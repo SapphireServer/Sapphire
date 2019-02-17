@@ -318,7 +318,7 @@ void Sapphire::Action::Action::buildEffectPackets()
   }
 }
 
-void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& chara )
+void Sapphire::Action::Action::damageTarget( uint16_t potency, Entity::Chara& chara )
 {
   // todo: scale potency into damage from stats
 
@@ -335,7 +335,7 @@ void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& ch
   {
     entry.value = static_cast< int16_t >( potency / 10 );
     // todo: rename this? need to confirm how it works again
-    entry.bonusPercent = 1;
+    entry.valueMultiplier = 1;
   }
   else
     entry.value = static_cast< int16_t >( potency );
@@ -371,7 +371,7 @@ void Sapphire::Action::Action::damageTarget( uint32_t potency, Entity::Chara& ch
   m_effects[ EffectPacketIdentity::DamageEffect ].m_hitActors.emplace_back( chara.getId() );
 }
 
-void Sapphire::Action::Action::healTarget( uint32_t potency, Entity::Chara& chara )
+void Sapphire::Action::Action::healTarget( uint16_t potency, Entity::Chara& chara )
 {
   // todo: scale potency into healing from stats
 
@@ -387,7 +387,7 @@ void Sapphire::Action::Action::healTarget( uint32_t potency, Entity::Chara& char
   {
     entry.value = static_cast< int16_t >( potency / 10 );
     // todo: rename this? need to confirm how it works again
-    entry.bonusPercent = 1;
+    entry.valueMultiplier = 1;
   }
   else
     entry.value = static_cast< int16_t >( potency );

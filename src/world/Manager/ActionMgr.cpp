@@ -48,7 +48,11 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
     return;
   }
 
-  if( targetId != player.getId() )
+  if( targetId == 0 )
+  {
+    action->setTargetChara( player.getAsChara() );
+  }
+  else if( targetId != player.getId() )
   {
     auto target = player.lookupTargetById( targetId );
     if( !target )
@@ -127,19 +131,34 @@ bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
   if( player.getLevel() < actionData.classJobLevel )
     return false;
 
-  if( player.getClass() != static_cast< Common::ClassJob >( actionData.classJob ) )
+  auto currentClass = player.getClass();
+  auto actionClass = static_cast< Common::ClassJob >( actionData.classJob );
+
+  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass )
   {
     // check if not a base class action
     auto exdData = framework()->get< Data::ExdDataGenerated >();
     assert( exdData );
 
-    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
     if( !classJob )
       return false;
 
     if( classJob->classJobParent != actionData.classJob )
       return false;
   }
+
+  // reset target on actions that can only be casted on yourself while having a target set
+  // todo: check what actions send when targeting an enemy
+  if( actionData.canTargetSelf &&
+      !actionData.canTargetFriendly &&
+      !actionData.canTargetHostile &&
+      !actionData.canTargetParty )
+  {
+    currentAction.setTargetChara( currentAction.getSourceChara() );
+  }
+
+  // todo: party/enemy validation
 
   // validate range
 

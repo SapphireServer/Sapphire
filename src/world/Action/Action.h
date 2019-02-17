@@ -68,14 +68,14 @@ namespace Sapphire::Action
      * @param potency The amount of damage the target takes
      * @param chara The chara to inflict damage upon
      */
-    void damageTarget( uint32_t potency, Entity::Chara& chara );
+    void damageTarget( uint16_t potency, Entity::Chara& chara );
 
     /*!
      * @brief Heals a target and adds the effect entry
      * @param potency Amount of healing to apply
      * @param chara Chara to receive healing
      */
-    void healTarget( uint32_t potency, Entity::Chara& chara );
+    void healTarget( uint16_t potency, Entity::Chara& chara );
 
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
