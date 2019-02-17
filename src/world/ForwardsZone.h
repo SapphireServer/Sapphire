@@ -85,6 +85,8 @@ namespace Action
 {
 TYPE_FORWARD( Action );
 TYPE_FORWARD( EventAction );
+
+using ActionCallback = std::function< void( Entity::Player&, uint32_t, uint64_t ) >;
 }
 
 namespace Network
@@ -112,8 +114,6 @@ namespace Scripting
 {
 class NativeScriptMgr;
 }
-
-typedef std::function< void( Entity::Player&, uint32_t, uint64_t ) > ActionCallback;
 
 }
 

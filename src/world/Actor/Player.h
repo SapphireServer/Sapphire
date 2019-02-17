@@ -52,12 +52,12 @@ namespace Sapphire::Entity
     // EventHandlers
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! start an event action */
-    void eventActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback,
-                           ActionCallback interruptCallback, uint64_t additional );
+    void eventActionStart( uint32_t eventId, uint32_t action, Action::ActionCallback finishCallback,
+                           Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start an event item action */
-    void eventItemActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback,
-                               ActionCallback interruptCallback, uint64_t additional );
+    void eventItemActionStart( uint32_t eventId, uint32_t action, Action::ActionCallback finishCallback,
+                               Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start/register a normal event */
     void
