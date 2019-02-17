@@ -419,6 +419,7 @@ void Sapphire::Action::Action::calculateActionCost()
   }
 }
 
+// todo: this shouldn't be in action and instead be in some general stat calc util
 void Sapphire::Action::Action::calculateMPCost( uint8_t costArrayIndex )
 {
   auto level = m_pSource->getLevel();
