@@ -33,7 +33,7 @@ namespace fs = std::experimental::filesystem;
 // garbage to ignore models
 bool ignoreModels = false;
 
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -319,21 +319,21 @@ void loadAllInstanceContentEntries()
     if( name.empty() )
       continue;
     auto type = std::get< uint8_t >( fields.at( 0 ) );
-    auto teri = std::get< uint32_t >( fields.at( 9 ) );
+    auto teri = std::get< std::string >( fields.at( 3 ) );
     auto i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
     std::string outStr(
-      std::to_string( id ) + ", \"" + name + "\", \"" + zoneNameMap[ teri ] + "\"," + std::to_string( teri ) + "\n"
+      std::to_string( id ) + ", \"" + name + "\", \"" + teri + "\"," + teri + "\n"
     );
     out.write( outStr.c_str(), outStr.size() );
     //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
-    zoneDumpList.emplace( zoneNameMap[ teri ] );
+    zoneDumpList.emplace( teri );
 
     std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
     Sapphire::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
-    contentList.push_back( { id, name, zoneNameMap[ teri ], type } );
+    contentList.push_back( { id, name, teri, type } );
   }
   out.close();
 }
