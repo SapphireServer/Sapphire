@@ -110,3 +110,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubFst026 );

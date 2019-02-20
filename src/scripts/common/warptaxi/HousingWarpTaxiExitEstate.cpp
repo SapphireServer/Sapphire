@@ -23,3 +23,5 @@ public:
     } );
   }
 };
+
+EXPOSE_SCRIPT( HousingWarpTaxiExitEstate );

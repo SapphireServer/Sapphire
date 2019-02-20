@@ -314,7 +314,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     scriptEntry +
     "   private:\n" +
     sceneStr +
-    "};\n\n"
+    "};\n\nEXPOSE_SCRIPT( " + className + " );"
   );
 
   std::ofstream outputFile;

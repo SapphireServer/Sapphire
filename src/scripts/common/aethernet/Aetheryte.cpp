@@ -122,3 +122,5 @@ public:
       aethernet( eventId, player, actorId );
   }
 };
+
+EXPOSE_SCRIPT( Aetheryte );

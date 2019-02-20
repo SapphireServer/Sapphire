@@ -1,25 +1,32 @@
 #include <ScriptObject.h>
 #include <Territory/InstanceContent.h>
 
-class INSTANCE_NAME : public InstanceContentScript
+using namespace Sapphire;
+
+class INSTANCE_NAME :
+  public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
-   INSTANCE_NAME() : InstanceContentScript( INSTANCE_ID )
-   { }
+  INSTANCE_NAME() :
+    Sapphire::ScriptAPI::InstanceContentScript( INSTANCE_ID )
+  { }
 
-   void onInit( InstanceContentPtr instance ) override
-   {
-   EOBJ_INIT
-   }
+  void onInit( InstanceContent& instance ) override
+  {
+EOBJ_INIT
+  }
 
-   void onUpdate( InstanceContentPtr instance, uint32_t currTime ) override
-   {
+  void onUpdate( InstanceContent& instance, uint32_t currTime ) override
+  {
 
-   }
+  }
 
-   void onEnterTerritory( InstanceContentPtr instance, Sapphire::Entity::Player& player, Entity::Player &player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
-   {
+  void onEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+                         uint16_t param2 ) override
+  {
 
-   }
+  }
 
 };
+
+EXPOSE_SCRIPT( INSTANCE_NAME );

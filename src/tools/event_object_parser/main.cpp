@@ -33,7 +33,7 @@ namespace fs = std::experimental::filesystem;
 // garbage to ignore models
 bool ignoreModels = false;
 
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -290,8 +290,12 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 
 void loadAllInstanceContentEntries()
 {
-  auto& catInstance = eData->get_category( "InstanceContent" );
+  auto& catInstance = eData->get_category( "ContentFinderCondition" );
+  auto& territoryTypeSheet = eData->get_category( "TerritoryType" );
+  auto& instanceContentSheet = eData->get_category( "InstanceContent" );
+
   auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
+  auto instanceContentData = static_cast< xiv::exd::Exd >( instanceContentSheet.get_data_ln( xiv::exd::Language::en ) );
 
   if( zoneNameMap.size() == 0 )
   {
@@ -315,11 +319,49 @@ void loadAllInstanceContentEntries()
     auto id = row.first;
     auto& fields = row.second;
 
-    auto name = std::get< std::string >( fields.at( 3 ) );
+    auto contentLinkType = std::get< uint8_t >( fields.at( 2 ) );
+    auto contentLink = std::get< uint16_t >( fields.at( 3 ) );
+
+    std::string name;
+    uint8_t type = 0;
+
+    if( contentLinkType == 1 )
+    {
+      // instancecontent
+      auto row = instanceContentData.get_row( contentLink );
+
+      name = std::get< std::string >( row.at( 3 ) );
+      type = std::get< uint8_t >( row.at( 0 ) );
+      id = contentLink;
+    }
+//    else if( contentLinkType == 2 )
+//    {
+//      // partycontent
+//      auto row = partyContentData.get_row( contentLink );
+//
+//      name = std::get< std::string >( row.at( 2 ) );
+//    }
+//    else if( contentLinkType == 3 )
+//    {
+//      // publiccontent
+//      auto row = publicContentData.get_row( contentLink );
+//
+//      name = std::get< std::string >( row.at( 3 ) );
+//    }
+//    else if( contentLinkType == 4 )
+//    {
+//      // goldsaucercontent
+//    }
+    else
+    {
+      continue;
+    }
+
+
     if( name.empty() )
       continue;
-    auto type = std::get< uint8_t >( fields.at( 0 ) );
-    auto teri = std::get< uint32_t >( fields.at( 9 ) );
+
+    auto teri = std::get< uint16_t >( fields.at( 1 ) );
     auto i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
@@ -379,20 +421,23 @@ int main( int argc, char* argv[] )
     }
   }
 
-  std::map< uint8_t, std::string > contentTypeMap;
-  contentTypeMap[ 0 ] = "";
-  contentTypeMap[ 1 ] = "raids";
-  contentTypeMap[ 2 ] = "dungeons";
-  contentTypeMap[ 3 ] = "guildhests";
-  contentTypeMap[ 4 ] = "trials";
-  contentTypeMap[ 5 ] = "pvp";
-  contentTypeMap[ 6 ] = "pvp";
-  contentTypeMap[ 7 ] = "questbattles";
-  contentTypeMap[ 8 ] = "hallofthenovice";
-  contentTypeMap[ 9 ] = "deepdungeon";
-  contentTypeMap[ 10 ] = "treasurehunt";
-  contentTypeMap[ 11 ] = "events";
-  contentTypeMap[ 12 ] = "pvp";
+  std::map< uint8_t, std::string > instanceContentTypeMap;
+  instanceContentTypeMap[ 0 ] = "";
+  instanceContentTypeMap[ 1 ] = "raids";
+  instanceContentTypeMap[ 2 ] = "dungeons";
+  instanceContentTypeMap[ 3 ] = "guildhests";
+  instanceContentTypeMap[ 4 ] = "trials";
+  instanceContentTypeMap[ 5 ] = "pvp/thefeast";
+  instanceContentTypeMap[ 6 ] = "pvp";
+  instanceContentTypeMap[ 7 ] = "questbattles";
+  instanceContentTypeMap[ 8 ] = "hallofthenovice";
+  instanceContentTypeMap[ 9 ] = "deepdungeon";
+  instanceContentTypeMap[ 10 ] = "treasurehunt";
+  instanceContentTypeMap[ 11 ] = "events";
+  instanceContentTypeMap[ 12 ] = "pvp/rivalwings";
+  instanceContentTypeMap[ 13 ] = "maskedcarnivale"; // todo: better name?
+  instanceContentTypeMap[ 14 ] = "goldsaucer/mahjong";
+  instanceContentTypeMap[ 15 ] = "goldsaucer";
 
   if( !fs::exists( "instance.tmpl" ) )
     throw std::runtime_error( "instance.tmpl is missing in working directory" );
@@ -446,18 +491,18 @@ int main( int argc, char* argv[] )
 
       loadEobjNames();
       //dumpLevelExdEntries( zoneId, zoneName );
-      std::string eobjFileName( entry.name + "_eobj.csv" );
-      std::ofstream eobjOut( eobjFileName, std::ios::trunc );
-      if( !eobjOut.good() )
-        throw std::string( "Unable to create " + zoneName +
-                           "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
-
-      eobjOut.close();
-      eobjOut.open( eobjFileName, std::ios::app );
-
-      if( !eobjOut.good() )
-        throw std::string( "Unable to create " + zoneName +
-                           "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
+//      std::string eobjFileName( entry.name + "_eobj.csv" );
+//      std::ofstream eobjOut( eobjFileName, std::ios::trunc );
+//      if( !eobjOut.good() )
+//        throw std::string( "Unable to create " + zoneName +
+//                           "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
+//
+//      eobjOut.close();
+//      eobjOut.open( eobjFileName, std::ios::app );
+//
+//      if( !eobjOut.good() )
+//        throw std::string( "Unable to create " + zoneName +
+//                           "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
       LGB_FILE bgLgb( &section[ 0 ], "bg" );
       LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
@@ -566,10 +611,10 @@ int main( int argc, char* argv[] )
 
                       if( sgbFile.stateEntries.size() > 0 )
                       {
-                        states = "      // States -> ";
+                        states = "    // States -> ";
                         for( auto entries1 : sgbFile.stateEntries )
                         {
-                          states += entries1.name + " ";
+                          states += entries1.name + " (id: " + std::to_string( entries1.header.id ) + ") ";
                         }
                         states += "\n";
                       }
@@ -612,7 +657,7 @@ int main( int argc, char* argv[] )
                 if( count1 > 0 )
                   name = name + "_" + std::to_string( count1 );
 
-                eobjects += "      instance->registerEObj( \"" + name + "\", " + std::to_string( id ) +
+                eobjects += "    instance.registerEObj( \"" + name + "\", " + std::to_string( id ) +
                             ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) +
                             ", " +
                             "{ " + std::to_string( pObj->header.translation.x ) + "f, "
@@ -664,8 +709,8 @@ int main( int argc, char* argv[] )
 
     std::string subdir = "";
 
-    auto subdirIt = contentTypeMap.find( entry.type );
-    if( subdirIt != contentTypeMap.end() )
+    auto subdirIt = instanceContentTypeMap.find( entry.type );
+    if( subdirIt != instanceContentTypeMap.end() )
       subdir = subdirIt->second + "/";
 
     fs::path outDir( "instances/" + subdir );
@@ -682,7 +727,7 @@ int main( int argc, char* argv[] )
             std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count()
             << " seconds\n";
 
-  getchar();
+//  getchar();
 
   if( eData )
     delete eData;

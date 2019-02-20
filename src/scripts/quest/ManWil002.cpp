@@ -244,3 +244,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( ManWil002 );
