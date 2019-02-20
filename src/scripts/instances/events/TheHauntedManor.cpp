@@ -29,7 +29,7 @@ public:
     instance.registerEObj( "Suspiciouspumpkin", 2007548, 0, 4, { 67.828171f, 0.000000f, 10.094330f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Suspiciouschest", 2007562, 0, 4, { 3.501173f, -18.779980f, -0.195926f }, 1.000000f, 1.568754f ); 
     instance.registerEObj( "Entrance", 2000182, 6381325, 5, { 73.499107f, -0.000000f, 4.652901f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
 
   }
 

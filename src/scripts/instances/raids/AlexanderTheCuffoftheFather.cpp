@@ -27,22 +27,22 @@ public:
     instance.registerEObj( "unknown_5", 2005428, 5828205, 4, { -5.111024f, -22.178221f, 3.677231f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { -19.655809f, 31.065201f, 144.212204f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgpl_d2a2_ring1wall", 2005047, 5962936, 4, { -16.018070f, 27.033091f, 118.517899f }, 1.000000f, 0.000000f ); 
-      // States -> rw01_def (id: 33) rw01_opn (id: 34) rw01_around2opn (id: 35) 
+    // States -> rw01_def (id: 33) rw01_opn (id: 34) rw01_around2opn (id: 35) 
     instance.registerEObj( "sgpl_d2a2_ring3wall", 2005047, 5962937, 4, { 4.629210f, -8.535899f, 53.038620f }, 1.000000f, 0.000000f ); 
-      // States -> rw03_def (id: 31) rw03_opn (id: 32) rw03_around2opn (id: 33) 
+    // States -> rw03_def (id: 31) rw03_opn (id: 32) rw03_around2opn (id: 33) 
     instance.registerEObj( "unknown_6", 2002735, 0, 4, { 0.000000f, -28.000000f, -53.246899f }, 0.750000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118", 2002872, 5787859, 4, { -0.137953f, -26.000000f, -52.603008f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "sgvf_w_lvd_b0118_1", 2002872, 5787862, 4, { 0.000000f, -26.000000f, -96.909851f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_7", 2006105, 5883005, 4, { 0.000000f, -28.000000f, -75.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Exit", 2005313, 5908620, 4, { 0.000000f, -26.000000f, -110.560898f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Exit_1", 2000139, 0, 4, { 0.000000f, -27.991100f, -115.007500f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Steamspoutingcontraption_1", 2005427, 5828202, 4, { -5.000190f, -15.985280f, 39.105530f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000182, 5787826, 5, { -16.006710f, 36.148560f, 161.008804f }, 0.991760f, 0.000048f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Entrance_1", 2000182, 5908672, 5, { 0.002526f, -28.000019f, -23.439610f }, 0.991760f, 0.000048f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
 
   }
 

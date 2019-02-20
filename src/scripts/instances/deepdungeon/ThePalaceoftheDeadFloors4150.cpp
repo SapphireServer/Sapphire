@@ -14,9 +14,9 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "sgvf_w_lvd_b0959", 2000608, 6367892, 4, { -300.000000f, 0.000000f, -225.000000f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_on2off (id: 4) vf_bextwall_off (id: 10) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_on2off (id: 4) vf_bextwall_off (id: 10) 
     instance.registerEObj( "sgvf_w_lvd_b0959_1", 2002872, 6392196, 4, { 300.000000f, 0.000000f, 374.000000f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_on2off (id: 4) vf_bextwall_off (id: 10) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_on2off (id: 4) vf_bextwall_off (id: 10) 
     instance.registerEObj( "unknown_0", 2007351, 6277715, 4, { 300.036102f, 0.000000f, 373.916687f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_1", 2007352, 6394671, 4, { 307.159912f, 0.000000f, 370.556702f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_2", 2007353, 6394677, 4, { 305.303894f, 0.000000f, 380.231415f }, 1.000000f, 0.000000f ); 

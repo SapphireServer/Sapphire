@@ -60,7 +60,7 @@ public:
     instance.registerEObj( "Allaganterminal", 2001162, 4317929, 4, { -15.875440f, -423.430511f, 18.778770f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Silentterminal_2", 2002600, 4334493, 4, { -24.909149f, -423.472595f, 41.999378f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000629, 4294859, 5, { -0.075790f, 0.000000f, 0.310051f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
 
   }
 

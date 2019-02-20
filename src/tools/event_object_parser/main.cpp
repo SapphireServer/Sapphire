@@ -611,7 +611,7 @@ int main( int argc, char* argv[] )
 
                       if( sgbFile.stateEntries.size() > 0 )
                       {
-                        states = "      // States -> ";
+                        states = "    // States -> ";
                         for( auto entries1 : sgbFile.stateEntries )
                         {
                           states += entries1.name + " (id: " + std::to_string( entries1.header.id ) + ") ";

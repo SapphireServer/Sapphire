@@ -14,7 +14,7 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "Entrance", 2000182, 7676036, 5, { 100.000000f, 2.000000f, 113.000000f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "unknown_0", 2002618, 7738683, 4, { 96.000000f, 2.000000f, 104.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_1", 2009702, 7767980, 4, { 103.000000f, 2.000000f, 105.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_2", 2009703, 7767985, 4, { 101.000000f, 2.000000f, 88.000000f }, 1.000000f, 0.000000f ); 

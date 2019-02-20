@@ -32,13 +32,13 @@ public:
     instance.registerEObj( "Ingress", 2007471, 0, 4, { 1.998901f, -16.647579f, 36.697880f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_13", 2002735, 0, 4, { 2.000000f, -18.940580f, 37.027279f }, 0.500000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118", 2002872, 6487232, 4, { 1.792570f, -18.500000f, 38.188919f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "Exit", 2006235, 0, 4, { 11.500000f, -115.007301f, -18.204100f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Entrance", 2000182, 6449464, 5, { -0.025814f, -10.500000f, 188.076599f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { 2.874061f, -10.500000f, 177.815994f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance_1", 2000182, 6449481, 5, { -7.931533f, -18.500000f, 50.286880f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
 
   }
 

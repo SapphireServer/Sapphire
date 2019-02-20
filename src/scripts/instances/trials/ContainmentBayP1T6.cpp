@@ -20,7 +20,7 @@ public:
     instance.registerEObj( "unknown_4", 2007464, 0, 4, { -0.015320f, -0.015320f, -14.419800f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "sgpl_w_lvd_collison_only", 2002618, 6563705, 4, { 6.090889f, 0.000000f, -1.422338f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000182, 6392588, 5, { 0.132306f, 0.592461f, 10.611330f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 0.001971f, 0.000000f, -11.776730f }, 1.000000f, 0.000000f ); 
 
   }
