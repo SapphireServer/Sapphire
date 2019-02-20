@@ -1,5 +1,15 @@
 #include <Script/NativeScriptApi.h>
 
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors110();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors1120();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors2130();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors3140();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors4150();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors5160();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors6170();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors7180();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors8190();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHeavenonHighFloors91100();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptThePalaceoftheDeadFloors101110();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptThePalaceoftheDeadFloors110();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptThePalaceoftheDeadFloors111120();
@@ -46,6 +56,7 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptNeverreap();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptPharosSirius();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptPharosSiriusHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSaintMociannesArboretum();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSaintMociannesArboretumHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSastasha();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSastashaHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptShisuioftheVioletTides();
@@ -57,10 +68,12 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheAery();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheAetherochemicalResearchFacility();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheAntitower();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheAurumVale();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheBurn();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheDrownedCityofSkalla();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheDuskVigil();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFractalContinuum();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFractalContinuumHard();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheGhimlytDark();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheGreatGubalLibrary();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheGreatGubalLibraryHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheKeeperoftheLake();
@@ -72,6 +85,7 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheStoneVigil();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheStoneVigilHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheSunkenTempleofQarn();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheSunkenTempleofQarnHard();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheSwallowsCompass();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheTamTaraDeepcroft();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheTamTaraDeepcroftHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheTempleoftheFist();
@@ -82,6 +96,11 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWanderersPalaceHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptXelphatol();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheHauntedManor();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheValentionesCeremony();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAirForceOne();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAdvancedMahjongRanked();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptFourplayerMahjongKuitanDisabled();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptFourplayerMahjongKuitanEnabled();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptNoviceMahjongRanked();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAllsWellthatEndsintheWell();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAnnoytheVoid();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptBasicTrainingEnemyParties();
@@ -110,25 +129,52 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptFinalExercise();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptHealMultipleAllies();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptHealanAlly();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptInteractwiththeBattlefield();
-extern Sapphire::ScriptAPI::ScriptObject* makeScriptAstragalos();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAChorusSlime();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptALittleKnightMusic();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAllsWellThatStartsWell();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAmazingTechnicolorPitFiends();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptBeautyandaBeast();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptBehemothsandBroomsticks();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptBlobsintheWoods();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptBombedyofErrors();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptChimeraonaHotTinRoof();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptDirtyRottenAzulmagia();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptEyeSociety();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptGentlemenPreferSwords();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHereComestheBoom();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptMidsummerNightsExplosion();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptMissTyphon();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptMuchAdoAboutPudding();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptOnaClearDayYouCanSmellForever();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSomeLikeItExcruciatinglyHot();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSunsetBullevard();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheMeNobodyNodes();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptThePlantomoftheOpera();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheSwordofMusic();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheThreepennyTurtles();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptToKillaMockingslime();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptWaitingforGolem();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSealRockSeize();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheBorderlandRuinsSecure();
-extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeast4on4LightParty();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFieldsofGloryShatter();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAstragalos();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHiddenGorge();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeast4on4Ranked();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeast4on4Training();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastCustomMatchCrystalTower();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastCustomMatchFeastingGrounds();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastCustomMatchLichenweed();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastRanked();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastTeamCustomMatchCrystalTower();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastTeamRanked();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFeastTraining();
-extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFieldsofGloryShatter();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptABloodyReunion();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptASpectaclefortheAges();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptBloodDragoon();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptBloodontheDeck();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptCuriousGorgeMeetsHisMatch();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptDarkwingDragon();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptEmissaryoftheDawn();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptInThalsName();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptInterdimensionalRift();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptItsProbablyaTrap();
@@ -145,6 +191,7 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFaceofTrueEvil();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheHeartoftheProblem();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheOrphansandtheBrokenBlade();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheResonant();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWilloftheMoon();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptWhenClansCollide();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptWithHeartandSteel();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlexanderTheArmoftheFather();
@@ -171,6 +218,14 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlexanderTheHeartoftheCreato
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlexanderTheHeartoftheCreatorSavage();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlexanderTheSouloftheCreator();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlexanderTheSouloftheCreatorSavage();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV10();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV10Savage();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV20();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV20Savage();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV30();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV30Savage();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV40();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptAlphascapeV40Savage();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptDeltascapeV10();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptDeltascapeV10Savage();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptDeltascapeV20();
@@ -199,6 +254,8 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFinalCoilofBahamutTurn2()
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFinalCoilofBahamutTurn3();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFinalCoilofBahamutTurn4();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheLabyrinthoftheAncients();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheOrbonneMonastery();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheRidoranaLighthouse();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheRoyalCityofRabanastre();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheSecondCoilofBahamutSavageTurn1();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheSecondCoilofBahamutSavageTurn2();
@@ -216,6 +273,7 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWorldofDarkness();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheAquapolis();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheHiddenCanalsofUznair();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheLostCanalsofUznair();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheShiftingAltarsofUznair();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptARelicReborntheChimera();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptARelicReborntheHydra();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptAkhAfahAmphitheatreExtreme();
@@ -223,6 +281,7 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptAkhAfahAmphitheatreHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptBattleintheBigKeep();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptBattleontheBigBridge();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptCapeWestwind();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptCastrumFluminis();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptContainmentBayP1T6();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptContainmentBayP1T6Extreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptContainmentBayS1T7();
@@ -231,6 +290,8 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptContainmentBayZ1T9();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptContainmentBayZ1T9Extreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptEmanation();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptEmanationExtreme();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHellsKier();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptHellsKierExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSpecialEventI();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSpecialEventII();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptSpecialEventIII();
@@ -240,6 +301,8 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheBowlofEmbersHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheChrysalis();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheDragonsNeck();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheFinalStepsofFaith();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheGreatHunt();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheGreatHuntExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheHowlingEye();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheHowlingEyeExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheHowlingEyeHard();
@@ -250,6 +313,7 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheLimitlessBlueHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheMinstrelsBalladNidhoggsRage();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheMinstrelsBalladShinryusDomain();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheMinstrelsBalladThordansReign();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheMinstrelsBalladTsukuyomisPain();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheMinstrelsBalladUltimasBane();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheNavel();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheNavelExtreme();
@@ -263,6 +327,8 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheStrikingTreeExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheStrikingTreeHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWhorleaterExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWhorleaterHard();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWreathofSnakes();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptTheWreathofSnakesExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptThokastThokExtreme();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptThokastThokHard();
 extern Sapphire::ScriptAPI::ScriptObject* makeScriptThornmarchExtreme();
@@ -271,6 +337,16 @@ extern Sapphire::ScriptAPI::ScriptObject* makeScriptUrthsFount();
 
 const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 {
+   makeScriptHeavenonHighFloors110(),
+   makeScriptHeavenonHighFloors1120(),
+   makeScriptHeavenonHighFloors2130(),
+   makeScriptHeavenonHighFloors3140(),
+   makeScriptHeavenonHighFloors4150(),
+   makeScriptHeavenonHighFloors5160(),
+   makeScriptHeavenonHighFloors6170(),
+   makeScriptHeavenonHighFloors7180(),
+   makeScriptHeavenonHighFloors8190(),
+   makeScriptHeavenonHighFloors91100(),
    makeScriptThePalaceoftheDeadFloors101110(),
    makeScriptThePalaceoftheDeadFloors110(),
    makeScriptThePalaceoftheDeadFloors111120(),
@@ -317,6 +393,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptPharosSirius(),
    makeScriptPharosSiriusHard(),
    makeScriptSaintMociannesArboretum(),
+   makeScriptSaintMociannesArboretumHard(),
    makeScriptSastasha(),
    makeScriptSastashaHard(),
    makeScriptShisuioftheVioletTides(),
@@ -328,10 +405,12 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheAetherochemicalResearchFacility(),
    makeScriptTheAntitower(),
    makeScriptTheAurumVale(),
+   makeScriptTheBurn(),
    makeScriptTheDrownedCityofSkalla(),
    makeScriptTheDuskVigil(),
    makeScriptTheFractalContinuum(),
    makeScriptTheFractalContinuumHard(),
+   makeScriptTheGhimlytDark(),
    makeScriptTheGreatGubalLibrary(),
    makeScriptTheGreatGubalLibraryHard(),
    makeScriptTheKeeperoftheLake(),
@@ -343,6 +422,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheStoneVigilHard(),
    makeScriptTheSunkenTempleofQarn(),
    makeScriptTheSunkenTempleofQarnHard(),
+   makeScriptTheSwallowsCompass(),
    makeScriptTheTamTaraDeepcroft(),
    makeScriptTheTamTaraDeepcroftHard(),
    makeScriptTheTempleoftheFist(),
@@ -353,6 +433,11 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptXelphatol(),
    makeScriptTheHauntedManor(),
    makeScriptTheValentionesCeremony(),
+   makeScriptAirForceOne(),
+   makeScriptAdvancedMahjongRanked(),
+   makeScriptFourplayerMahjongKuitanDisabled(),
+   makeScriptFourplayerMahjongKuitanEnabled(),
+   makeScriptNoviceMahjongRanked(),
    makeScriptAllsWellthatEndsintheWell(),
    makeScriptAnnoytheVoid(),
    makeScriptBasicTrainingEnemyParties(),
@@ -381,25 +466,52 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptHealMultipleAllies(),
    makeScriptHealanAlly(),
    makeScriptInteractwiththeBattlefield(),
-   makeScriptAstragalos(),
+   makeScriptAChorusSlime(),
+   makeScriptALittleKnightMusic(),
+   makeScriptAllsWellThatStartsWell(),
+   makeScriptAmazingTechnicolorPitFiends(),
+   makeScriptBeautyandaBeast(),
+   makeScriptBehemothsandBroomsticks(),
+   makeScriptBlobsintheWoods(),
+   makeScriptBombedyofErrors(),
+   makeScriptChimeraonaHotTinRoof(),
+   makeScriptDirtyRottenAzulmagia(),
+   makeScriptEyeSociety(),
+   makeScriptGentlemenPreferSwords(),
+   makeScriptHereComestheBoom(),
+   makeScriptMidsummerNightsExplosion(),
+   makeScriptMissTyphon(),
+   makeScriptMuchAdoAboutPudding(),
+   makeScriptOnaClearDayYouCanSmellForever(),
+   makeScriptSomeLikeItExcruciatinglyHot(),
+   makeScriptSunsetBullevard(),
+   makeScriptTheMeNobodyNodes(),
+   makeScriptThePlantomoftheOpera(),
+   makeScriptTheSwordofMusic(),
+   makeScriptTheThreepennyTurtles(),
+   makeScriptToKillaMockingslime(),
+   makeScriptWaitingforGolem(),
    makeScriptSealRockSeize(),
    makeScriptTheBorderlandRuinsSecure(),
-   makeScriptTheFeast4on4LightParty(),
+   makeScriptTheFieldsofGloryShatter(),
+   makeScriptAstragalos(),
+   makeScriptHiddenGorge(),
    makeScriptTheFeast4on4Ranked(),
    makeScriptTheFeast4on4Training(),
    makeScriptTheFeastCustomMatchCrystalTower(),
    makeScriptTheFeastCustomMatchFeastingGrounds(),
    makeScriptTheFeastCustomMatchLichenweed(),
    makeScriptTheFeastRanked(),
+   makeScriptTheFeastTeamCustomMatchCrystalTower(),
    makeScriptTheFeastTeamRanked(),
    makeScriptTheFeastTraining(),
-   makeScriptTheFieldsofGloryShatter(),
    makeScriptABloodyReunion(),
    makeScriptASpectaclefortheAges(),
    makeScriptBloodDragoon(),
    makeScriptBloodontheDeck(),
    makeScriptCuriousGorgeMeetsHisMatch(),
    makeScriptDarkwingDragon(),
+   makeScriptEmissaryoftheDawn(),
    makeScriptInThalsName(),
    makeScriptInterdimensionalRift(),
    makeScriptItsProbablyaTrap(),
@@ -416,6 +528,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheHeartoftheProblem(),
    makeScriptTheOrphansandtheBrokenBlade(),
    makeScriptTheResonant(),
+   makeScriptTheWilloftheMoon(),
    makeScriptWhenClansCollide(),
    makeScriptWithHeartandSteel(),
    makeScriptAlexanderTheArmoftheFather(),
@@ -442,6 +555,14 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptAlexanderTheHeartoftheCreatorSavage(),
    makeScriptAlexanderTheSouloftheCreator(),
    makeScriptAlexanderTheSouloftheCreatorSavage(),
+   makeScriptAlphascapeV10(),
+   makeScriptAlphascapeV10Savage(),
+   makeScriptAlphascapeV20(),
+   makeScriptAlphascapeV20Savage(),
+   makeScriptAlphascapeV30(),
+   makeScriptAlphascapeV30Savage(),
+   makeScriptAlphascapeV40(),
+   makeScriptAlphascapeV40Savage(),
    makeScriptDeltascapeV10(),
    makeScriptDeltascapeV10Savage(),
    makeScriptDeltascapeV20(),
@@ -470,6 +591,8 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheFinalCoilofBahamutTurn3(),
    makeScriptTheFinalCoilofBahamutTurn4(),
    makeScriptTheLabyrinthoftheAncients(),
+   makeScriptTheOrbonneMonastery(),
+   makeScriptTheRidoranaLighthouse(),
    makeScriptTheRoyalCityofRabanastre(),
    makeScriptTheSecondCoilofBahamutSavageTurn1(),
    makeScriptTheSecondCoilofBahamutSavageTurn2(),
@@ -487,6 +610,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheAquapolis(),
    makeScriptTheHiddenCanalsofUznair(),
    makeScriptTheLostCanalsofUznair(),
+   makeScriptTheShiftingAltarsofUznair(),
    makeScriptARelicReborntheChimera(),
    makeScriptARelicReborntheHydra(),
    makeScriptAkhAfahAmphitheatreExtreme(),
@@ -494,6 +618,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptBattleintheBigKeep(),
    makeScriptBattleontheBigBridge(),
    makeScriptCapeWestwind(),
+   makeScriptCastrumFluminis(),
    makeScriptContainmentBayP1T6(),
    makeScriptContainmentBayP1T6Extreme(),
    makeScriptContainmentBayS1T7(),
@@ -502,6 +627,8 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptContainmentBayZ1T9Extreme(),
    makeScriptEmanation(),
    makeScriptEmanationExtreme(),
+   makeScriptHellsKier(),
+   makeScriptHellsKierExtreme(),
    makeScriptSpecialEventI(),
    makeScriptSpecialEventII(),
    makeScriptSpecialEventIII(),
@@ -511,6 +638,8 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheChrysalis(),
    makeScriptTheDragonsNeck(),
    makeScriptTheFinalStepsofFaith(),
+   makeScriptTheGreatHunt(),
+   makeScriptTheGreatHuntExtreme(),
    makeScriptTheHowlingEye(),
    makeScriptTheHowlingEyeExtreme(),
    makeScriptTheHowlingEyeHard(),
@@ -521,6 +650,7 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheMinstrelsBalladNidhoggsRage(),
    makeScriptTheMinstrelsBalladShinryusDomain(),
    makeScriptTheMinstrelsBalladThordansReign(),
+   makeScriptTheMinstrelsBalladTsukuyomisPain(),
    makeScriptTheMinstrelsBalladUltimasBane(),
    makeScriptTheNavel(),
    makeScriptTheNavelExtreme(),
@@ -534,6 +664,8 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
    makeScriptTheStrikingTreeHard(),
    makeScriptTheWhorleaterExtreme(),
    makeScriptTheWhorleaterHard(),
+   makeScriptTheWreathofSnakes(),
+   makeScriptTheWreathofSnakesExtreme(),
    makeScriptThokastThokExtreme(),
    makeScriptThokastThokHard(),
    makeScriptThornmarchExtreme(),
