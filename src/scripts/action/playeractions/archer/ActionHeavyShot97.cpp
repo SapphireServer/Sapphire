@@ -19,3 +19,4 @@ public:
 
 };
 
+EXPOSE_SCRIPT( ActionHeavyShot97 );
