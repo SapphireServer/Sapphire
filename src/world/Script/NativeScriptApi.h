@@ -221,11 +221,11 @@ namespace Sapphire::ScriptAPI
   public:
     explicit InstanceContentScript( uint32_t instanceContentId );
 
-    virtual void onInit( Sapphire::InstanceContentPtr instance );
+    virtual void onInit( Sapphire::InstanceContent& instance );
 
-    virtual void onUpdate( Sapphire::InstanceContentPtr instance, uint32_t currTime );
+    virtual void onUpdate( Sapphire::InstanceContent& instance, uint32_t currTime );
 
-    virtual void onEnterTerritory( Sapphire::InstanceContentPtr instance, Sapphire::Entity::Player& player, uint32_t eventId,
+    virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                   uint16_t param1, uint16_t param2 );
   };
 
