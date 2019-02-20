@@ -14,25 +14,25 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "Entrance", 2000182, 4600269, 5, { -245.383194f, 17.225630f, 16.103081f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { -279.773407f, 17.233170f, 19.434681f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_0", 2001609, 0, 4, { 241.292603f, 11.057950f, 9.784212f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance_1", 2001649, 4097866, 5, { 238.950500f, 9.900879f, -1.209344f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit_1", 2001610, 4097973, 4, { -280.512299f, 17.240601f, 20.057501f }, 1.000000f, 0.000000f ); 
-      // States -> vf_htras1_on (id: 2) vf_htras1_of (id: 3) 
+    // States -> vf_htras1_on (id: 2) vf_htras1_of (id: 3) 
     instance.registerEObj( "sgvf_w_lvd_b0094", 2001611, 4097992, 4, { 19.113859f, 0.900208f, 98.170502f }, 0.991760f, 0.000048f ); 
-      // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
+    // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
     instance.registerEObj( "sgvf_w_lvd_b0118", 2001612, 4098036, 4, { 17.948280f, 0.925217f, 99.310219f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "sgvf_w_lvd_b0094_1", 2001613, 4098064, 4, { -120.074501f, -5.801239f, -111.402496f }, 1.000000f, 0.000000f ); 
-      // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
+    // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
     instance.registerEObj( "sgvf_w_lvd_b0118_1", 2001614, 4098077, 4, { -121.598503f, -5.727614f, -112.049599f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "sgvf_w_lvd_b0094_2", 2001615, 4098237, 4, { -228.286301f, 17.565599f, 16.208900f }, 1.000000f, 0.000048f ); 
-      // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
+    // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
     instance.registerEObj( "sgvf_w_lvd_b0118_2", 2001616, 4098241, 4, { -229.136703f, 17.565599f, 16.208900f }, 1.000000f, 0.000048f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_1", 2001618, 4014394, 4, { 29.098881f, 1.785278f, 130.418793f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Aetherialflow", 2001619, 0, 4, { 32.968849f, 3.815735f, 131.179199f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_2", 2001620, 2815987, 4, { 120.471397f, -0.516086f, -57.500610f }, 1.000000f, 0.000000f ); 
@@ -58,7 +58,7 @@ public:
     instance.registerEObj( "unknown_16", 2001645, 4018088, 4, { -261.194214f, 17.568060f, -11.064940f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_17", 2001646, 4018087, 4, { -239.163101f, 17.568661f, -4.435994f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Aetherialflow_1", 2001647, 4103310, 4, { -177.996506f, -14.694460f, -133.043503f }, 0.991760f, 0.000048f ); 
-      // States -> tornade_off (id: 2) tornade_on (id: 3) 
+    // States -> tornade_off (id: 2) tornade_on (id: 3) 
     instance.registerEObj( "unknown_18", 2001648, 4105956, 4, { -171.435196f, -14.633480f, -127.946999f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_19", 2001650, 0, 4, { -230.125793f, 17.157061f, 16.380630f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { 242.225601f, 9.970665f, -11.333600f }, 1.000000f, 0.000000f ); 

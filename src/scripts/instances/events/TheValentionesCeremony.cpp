@@ -52,7 +52,7 @@ public:
     instance.registerEObj( "ValentionesDaycard_10", 2009396, 7231805, 4, { 3.961101f, -11.917360f, -246.662094f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "ValentionesDaycard_11", 2009397, 7231806, 4, { 8.203044f, -11.917360f, -246.662094f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Entrance", 2000182, 7186874, 5, { -0.017344f, 0.700000f, 15.850460f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 0.151178f, -11.881100f, -262.439209f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_1", 2007457, 7167001, 4, { -0.198283f, 0.437501f, 3.359166f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_2", 2007457, 7167005, 4, { -10.222270f, -6.000000f, -25.717331f }, 1.000000f, 0.000000f ); 

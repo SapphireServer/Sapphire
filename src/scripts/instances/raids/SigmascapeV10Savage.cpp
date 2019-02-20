@@ -32,7 +32,7 @@ public:
     instance.registerEObj( "Aetherialstream_7", 2009407, 7231098, 4, { 215.991302f, -110.000000f, 71.061279f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "sgvf_z3o7_b1359_1", 2007457, 7297634, 4, { 178.511902f, -110.002403f, -0.198364f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Entrance", 2007457, 7181869, 5, { -3.537696f, 0.000001f, 18.750830f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 0.076233f, -0.015320f, -9.170715f }, 0.991760f, 0.000048f ); 
 
   }

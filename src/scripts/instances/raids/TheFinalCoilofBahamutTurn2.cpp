@@ -15,11 +15,11 @@ public:
   {
     instance.registerEObj( "unknown_0", 2004618, 0, 4, { 8.377602f, -4.963000f, 2.130980f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w1b2_b0338", 2004622, 5004388, 4, { 0.000000f, -4.963000f, 0.000000f }, 1.000000f, 0.000000f ); 
-      // States -> brr_off (id: 2) brr_on2off (id: 3) brr_on (id: 4) brr_off2on (id: 5) 
+    // States -> brr_off (id: 2) brr_on2off (id: 3) brr_on (id: 4) brr_off2on (id: 5) 
     instance.registerEObj( "unknown_1", 2004138, 4985190, 4, { 3.028988f, -85.357613f, 329.862915f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { -8.983331f, -89.405617f, 340.705505f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000182, 4895376, 5, { -2.304138f, -95.841980f, 373.883514f }, 0.991760f, 0.000048f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "unknown_2", 2004138, 4772070, 4, { -3.471196f, -85.362328f, 329.862915f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_3", 2004138, 0, 4, { 3.028988f, -85.357613f, 329.862915f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_4", 2004138, 4772073, 4, { 82.671562f, 89.558182f, 312.686188f }, 1.000000f, 0.000000f ); 
@@ -45,7 +45,7 @@ public:
     instance.registerEObj( "unknown_24", 2004138, 4772083, 4, { 67.627632f, 1.029588f, -0.043371f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_25", 2002735, 0, 4, { 0.046454f, 0.339829f, 55.289249f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118", 2002872, 4896001, 4, { -0.021759f, 0.578989f, 57.955990f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "Allaganterminal", 2004142, 4797408, 4, { 0.001913f, -4.224863f, -30.000130f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgpl_w_lvd_colwithnavi", 2004137, 4895798, 4, { -0.366558f, -4.738363f, -24.911970f }, 1.000000f, 0.000000f ); 
 

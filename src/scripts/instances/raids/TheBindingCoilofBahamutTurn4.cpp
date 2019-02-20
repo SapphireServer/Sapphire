@@ -27,9 +27,9 @@ public:
     instance.registerEObj( "unknown_9", 2001764, 4330325, 4, { 2.346304f, 0.058136f, 5.385328f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_10", 2001764, 4330326, 4, { 4.663461f, 0.058136f, 4.726402f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000630, 4294847, 5, { -12.531030f, 0.000001f, 12.592170f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "sgvf_w_lvd_b0055", 2000615, 4374568, 4, { -15.534740f, 0.058137f, -15.601170f }, 1.000000f, 0.000000f ); 
-      // States -> vf_dext01_of (id: 19) vf_dext01_on (id: 20) 
+    // States -> vf_dext01_of (id: 19) vf_dext01_on (id: 20) 
 
   }
 

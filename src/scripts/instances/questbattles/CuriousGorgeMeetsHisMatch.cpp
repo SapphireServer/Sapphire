@@ -14,7 +14,7 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "Summoningbell", 2000401, 4260827, 4, { 14.143430f, 5.238082f, 13.664930f }, 1.000000f, 0.000000f ); 
-      // States -> vf_rtbell_on (id: 10) 
+    // States -> vf_rtbell_on (id: 10) 
     instance.registerEObj( "Teamboard", 2009097, 4302533, 4, { 15.508660f, 6.051773f, -14.767720f }, 1.000000f, 0.000000f ); 
 
   }

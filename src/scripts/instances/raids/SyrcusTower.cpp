@@ -15,32 +15,32 @@ public:
   {
     instance.registerEObj( "unknown_0", 2002587, 0, 4, { -370.000000f, 500.115387f, -199.956299f }, 0.700000f, -1.570451f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250", 2002872, 4738783, 4, { -394.730194f, 500.000000f, -199.572800f }, 0.991760f, 0.000048f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { -415.668213f, 500.000000f, -200.003296f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgbg_l1r2_d2_mete2", 2004244, 4757482, 4, { -390.384705f, 500.000000f, -194.533203f }, 1.000000f, 0.000000f ); 
-      // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
+    // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
     instance.registerEObj( "sgbg_l1r2_d2_mete2_1", 2004292, 4757483, 4, { -401.338287f, 500.000000f, -196.787003f }, 1.000000f, 0.000000f ); 
-      // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
+    // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
     instance.registerEObj( "sgbg_l1r2_d2_mete2_2", 2004293, 4757484, 4, { -403.504913f, 500.000000f, -196.539597f }, 1.000000f, 0.000000f ); 
-      // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
+    // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
     instance.registerEObj( "sgbg_l1r2_d2_mete2_3", 2004294, 4757485, 4, { -405.170593f, 500.000000f, -202.118393f }, 1.000000f, 0.000000f ); 
-      // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
+    // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
     instance.registerEObj( "sgbg_l1r2_d2_mete2_4", 2004295, 4757486, 4, { -400.173798f, 500.000000f, -200.892807f }, 1.000000f, 0.000000f ); 
-      // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
+    // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
     instance.registerEObj( "sgbg_l1r2_d2_mete2_5", 2004296, 4757487, 4, { -395.280304f, 500.000000f, -200.854401f }, 1.000000f, 0.000000f ); 
-      // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
+    // States -> b4_come_off_01 (id: 2) b4_come_off_02 (id: 3) b4_come_on_01 (id: 4) b4_come_off_03 (id: 5) b4_come_on_02 (id: 6) b4_come_on_03 (id: 7) b4_come_on_04 (id: 8) b4_come_on_05 (id: 9) b4_come_on_06 (id: 10) b4_come_fdout (id: 15) 
     instance.registerEObj( "sgbg_l1r2_d2_mete1", 2004243, 4757498, 4, { -400.242615f, 500.000000f, -197.116501f }, 1.000000f, 0.000000f ); 
-      // States -> b4_mete_off_01 (id: 1) b4_mete_off_02 (id: 2) b4_mete_on_01 (id: 3) b4_mete_off_03 (id: 4) b4_mete_on_02 (id: 5) b4_mete_on_03 (id: 6) b4_mete_on_04 (id: 7) b4_mete_on_05 (id: 8) b4_mete_on_06 (id: 9) b4_mete_fdout (id: 18) 
+    // States -> b4_mete_off_01 (id: 1) b4_mete_off_02 (id: 2) b4_mete_on_01 (id: 3) b4_mete_off_03 (id: 4) b4_mete_on_02 (id: 5) b4_mete_on_03 (id: 6) b4_mete_on_04 (id: 7) b4_mete_on_05 (id: 8) b4_mete_on_06 (id: 9) b4_mete_fdout (id: 18) 
     instance.registerEObj( "unknown_1", 2004354, 0, 4, { -397.029785f, 500.000000f, -196.979202f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_2", 2004355, 0, 4, { -459.071411f, 506.001801f, -196.468506f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_3", 2004236, 4759659, 4, { -1.397732f, -589.900085f, -194.801498f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_4", 2004237, 0, 4, { 2.182007f, -589.929077f, -198.077499f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_5", 2002587, 0, 4, { -0.015320f, -590.000000f, -152.513794f }, 0.686646f, 0.000048f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250_1", 2002872, 4725495, 4, { 0.228821f, -590.000000f, -174.995300f }, 0.991760f, 0.000048f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_6", 2002587, 0, 4, { -0.883440f, -4.000000f, -141.001801f }, 0.700000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250_2", 2002872, 4738653, 4, { -0.991882f, 0.000000f, -196.720993f }, 0.991760f, 0.000048f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_7", 2004245, 4711823, 4, { -0.379705f, 0.000000f, -145.342300f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_8", 2004246, 4711824, 4, { 0.710614f, 0.000000f, -199.171204f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_9", 2004247, 4711825, 4, { 0.439319f, 0.000001f, -201.553802f }, 1.000000f, 0.000000f ); 
@@ -52,21 +52,21 @@ public:
     instance.registerEObj( "unknown_15", 2004540, 0, 4, { 2.310606f, 0.000000f, -199.315903f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_16", 2002587, 0, 4, { 16.500000f, 600.000000f, -175.000000f }, 0.700000f, -0.584685f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250_3", 2002872, 4738751, 4, { 6.038667f, 600.000000f, -191.625595f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_17", 2004249, 0, 4, { 0.534058f, 600.000000f, -204.089493f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_18", 2004372, 0, 4, { 2.491530f, 600.000000f, -197.343201f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_19", 2004498, 0, 4, { 7.797371f, 600.000000f, -197.855301f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_20", 2002587, 0, 4, { 0.000000f, -700.000000f, 79.955803f }, 0.700000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250_4", 2002872, 4725557, 4, { -0.328611f, -700.000000f, 53.732899f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_21", 2002587, 0, 4, { 29.805300f, -400.000000f, -200.000000f }, 0.700000f, -1.570451f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250_5", 2002872, 4725580, 4, { 5.249963f, -400.000000f, -199.878006f }, 0.991760f, 0.000048f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_22", 2002587, 0, 4, { 0.000000f, 200.000000f, -229.757797f }, 0.700000f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0250_6", 2002872, 4738682, 4, { 0.542766f, 199.899994f, -231.713898f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "Entrance", 2000182, 4723157, 5, { -0.325782f, -897.940918f, 371.584106f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Allaganteleporter", 2004154, 4645409, 4, { -5.014030f, -894.781982f, 324.891296f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Allaganteleporter_1", 2004155, 4645410, 4, { 8.084772f, -708.339111f, 175.045898f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Allaganteleporter_2", 2004158, 4645412, 4, { 7.971835f, -598.362915f, -76.990211f }, 0.991760f, 0.000048f ); 

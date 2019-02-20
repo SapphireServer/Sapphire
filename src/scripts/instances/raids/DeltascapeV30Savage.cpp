@@ -18,7 +18,7 @@ public:
     instance.registerEObj( "unknown_1", 2007457, 6847573, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_2", 2007457, 6848219, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgbg_z3o4_a1_mto01", 2007457, 6953156, 4, { 250.000000f, 250.995605f, 0.000000f }, 1.000000f, -0.000000f ); 
-      // States -> mete_hide (id: 19) mete_pre (id: 20) mete_phase_1 (id: 21) mete_phase_2 (id: 22) mete_phase_3 (id: 23) mete_phase_4 (id: 24) mete_fade (id: 25) mete_phase_5 (id: 26) 
+    // States -> mete_hide (id: 19) mete_pre (id: 20) mete_phase_1 (id: 21) mete_phase_2 (id: 22) mete_phase_3 (id: 23) mete_phase_4 (id: 24) mete_fade (id: 25) mete_phase_5 (id: 26) 
     instance.registerEObj( "unknown_3", 2007457, 6929138, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_4", 2007457, 6847577, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, -0.000000f ); 
     instance.registerEObj( "unknown_5", 2007457, 6853325, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
@@ -32,7 +32,7 @@ public:
     instance.registerEObj( "unknown_13", 2007457, 6846644, 4, { 5.000000f, 0.000000f, -15.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_14", 2007457, 6846645, 4, { 15.000000f, 0.000000f, -15.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000182, 6912959, 5, { 0.000000f, 0.000000f, 15.000000f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 0.000000f, 0.000000f, -10.000000f }, 1.000000f, 0.000000f ); 
 
   }

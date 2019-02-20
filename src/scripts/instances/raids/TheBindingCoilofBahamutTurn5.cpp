@@ -22,7 +22,7 @@ public:
     instance.registerEObj( "unknown_6", 2002664, 0, 4, { -7.768790f, 50.005032f, -4.092178f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Allaganterminal", 2001163, 4328464, 4, { 51.910549f, 48.460838f, 72.757553f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000631, 4294944, 5, { -26.751080f, 100.099998f, -128.204498f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
 
   }
 

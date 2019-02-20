@@ -14,7 +14,7 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "sgpl_evt_300_jobdark03", 2007457, 6941254, 4, { -613.766602f, 59.266399f, -460.085205f }, 1.000000f, 0.294434f ); 
-      // States -> vfx_on (id: 49) vfx_off (id: 50) 
+    // States -> vfx_on (id: 49) vfx_off (id: 50) 
 
   }
 

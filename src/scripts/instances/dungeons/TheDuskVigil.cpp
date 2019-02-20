@@ -14,24 +14,24 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "sgvf_w_lvd_b0118", 2002872, 5658893, 4, { -0.378468f, -0.000006f, 19.173130f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_0", 2002735, 0, 4, { -0.473083f, -0.015320f, 21.194759f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118_1", 2005189, 5658883, 4, { 0.051215f, 0.000000f, -19.347589f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_1", 2002735, 0, 4, { 191.935699f, -8.000000f, -97.548279f }, 1.143130f, 0.000000f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118_2", 2002872, 5670058, 4, { 191.873398f, -8.000000f, -94.706589f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "sgvf_w_lvd_b0118_3", 2005190, 5670071, 4, { 192.629501f, -8.000000f, -145.825104f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_2", 2005319, 0, 4, { 191.294998f, -8.000000f, -126.640503f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_3", 2002735, 0, 4, { -69.815361f, 32.171459f, -368.314209f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118_4", 2002872, 5670105, 4, { -69.864067f, 32.000050f, -370.484314f }, 1.000000f, 0.000000f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_4", 2005395, 0, 4, { -72.186203f, 32.000000f, -389.922302f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { -119.582703f, -47.846481f, 223.251007f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Exit", 2000139, 0, 4, { -69.846916f, 32.000000f, -403.795990f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000182, 5653670, 5, { -135.662598f, -48.859058f, 229.988297f }, 0.991760f, 0.000048f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "unknown_5", 2005169, 5674328, 4, { -66.894547f, -5.577260f, 129.660202f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_6", 2005170, 5674333, 4, { -28.173691f, -5.988469f, 165.738907f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_7", 2005171, 5674334, 4, { 32.157242f, -8.242720f, 98.301018f }, 0.991760f, 0.000048f ); 
@@ -51,13 +51,13 @@ public:
     instance.registerEObj( "unknown_12", 2005186, 5584485, 4, { 21.875490f, 28.000000f, -217.942505f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_13", 2005187, 5584486, 4, { -35.156700f, 32.000000f, -286.161285f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgvf_r2d1_b0622", 2005320, 5800343, 4, { 179.680298f, 16.000111f, -261.236206f }, 1.000000f, 0.000000f ); 
-      // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
+    // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
     instance.registerEObj( "sgvf_r2d1_b0622_1", 2005321, 5800818, 4, { 127.707603f, 20.323111f, -262.321411f }, 1.000000f, 0.000000f ); 
-      // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
+    // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
     instance.registerEObj( "sgvf_r2d1_b0622_2", 2005322, 5800840, 4, { 5.201134f, 28.557409f, -289.850006f }, 1.000000f, 0.000000f ); 
-      // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
+    // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
     instance.registerEObj( "sgvf_r2d1_b0622_3", 2005323, 5800842, 4, { -21.532181f, 32.000061f, -289.092407f }, 1.000000f, 0.000000f ); 
-      // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
+    // States -> snow_def_01 (id: 3) snow_start_01 (id: 4) snow_start_02 (id: 5) 
     instance.registerEObj( "unknown_14", 2005353, 5584312, 4, { -73.144119f, 32.000000f, -405.536011f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Chapeldoor", 2005357, 5584428, 4, { -69.550163f, 31.950060f, -291.505493f }, 1.000000f, 0.000000f ); 
 

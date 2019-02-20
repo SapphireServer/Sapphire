@@ -35,7 +35,7 @@ public:
     instance.registerEObj( "Exhaustductα_7", 2006966, 6166807, 4, { 148.760101f, 79.972527f, 224.975006f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_4", 2002735, 0, 4, { 51.013248f, 39.939819f, 88.328903f }, 1.000000f, -0.523599f ); 
     instance.registerEObj( "sgvf_w_lvd_b0118", 2002872, 6184075, 4, { 51.497959f, 39.939819f, 88.859413f }, 0.991760f, 0.000048f ); 
-      // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
+    // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
     instance.registerEObj( "unknown_5", 2006969, 6168354, 4, { 51.316040f, 39.993900f, 88.853271f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "unknown_6", 2006954, 6169546, 4, { 76.247498f, 42.568901f, 132.191803f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_7", 2006968, 6242752, 4, { 76.247498f, 42.568901f, 132.191803f }, 1.000000f, -0.000000f ); 
@@ -48,20 +48,20 @@ public:
     instance.registerEObj( "unknown_14", 2006650, 0, 4, { -23.000000f, 0.000000f, 23.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_15", 2006698, 0, 4, { -23.000000f, 0.000000f, -23.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "sgpl_d2a7_jail_col", 2006964, 6215558, 4, { 23.000000f, 0.000000f, -23.000000f }, 1.000000f, 0.000000f ); 
-      // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
+    // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
     instance.registerEObj( "sgpl_d2a7_jail_col_1", 2006964, 6215559, 4, { 23.000000f, 0.000000f, 23.000000f }, 1.000000f, 0.000000f ); 
-      // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
+    // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
     instance.registerEObj( "sgpl_d2a7_jail_col_2", 2006964, 6215560, 4, { -23.000000f, 0.000000f, -23.000000f }, 1.000000f, 0.000000f ); 
-      // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
+    // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
     instance.registerEObj( "sgpl_d2a7_jail_col_3", 2006964, 6215561, 4, { 23.000000f, 0.000000f, -23.000000f }, 1.000000f, 0.000000f ); 
-      // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
+    // States -> eyecol_on (id: 31) eyecol_off (id: 32) chrcol_on (id: 35) chrcol_off (id: 44) allcol_off (id: 46) 
     instance.registerEObj( "Exit", 2005313, 6185488, 4, { -0.329697f, 0.000000f, -28.830790f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "unknown_16", 2006979, 0, 4, { 23.000000f, 0.000000f, -23.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Shortcut", 2000700, 0, 4, { 220.005096f, 120.491501f, 359.291504f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "Entrance", 2000182, 6177872, 5, { 220.000000f, 120.000000f, 383.467712f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Entrance_1", 2000182, 6184212, 5, { 62.804680f, 40.200001f, 108.771896f }, 0.991760f, -0.523599f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit_1", 2000139, 0, 4, { 0.000000f, 0.000000f, -29.143539f }, 1.000000f, 0.000000f ); 
 
   }

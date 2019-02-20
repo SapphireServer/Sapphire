@@ -15,7 +15,7 @@ public:
   {
     instance.registerEObj( "unknown_0", 2007457, 7684588, 4, { 100.000000f, 0.000000f, 100.000000f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Entrance", 2000182, 7581179, 5, { 100.000000f, 0.000000f, 115.000000f }, 1.000000f, -0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "Exit", 2000139, 0, 4, { 100.000000f, 0.000000f, 85.000000f }, 1.000000f, 0.000000f ); 
 
   }

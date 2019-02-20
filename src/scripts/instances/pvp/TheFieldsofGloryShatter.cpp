@@ -14,11 +14,11 @@ public:
   void onInit( InstanceContent& instance ) override
   {
     instance.registerEObj( "sgvf_w_lvd_b0286", 2007022, 7583664, 4, { -263.444885f, 52.175270f, -209.921402f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "sgvf_w_lvd_b0286_1", 2007023, 7583666, 4, { -91.249367f, 27.082781f, 248.251297f }, 1.000000f, 0.000000f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "sgvf_w_lvd_b0286_2", 2007024, 7583668, 4, { 262.704590f, 7.555402f, -83.636391f }, 0.991760f, 0.000048f ); 
-      // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
+    // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
     instance.registerEObj( "sgbg_r2p1_q0_col02", 2007038, 7583676, 4, { -33.290001f, 8.500000f, -64.930000f }, 1.000000f, 0.345772f ); 
     instance.registerEObj( "sgbg_r2p1_q0_col02_1", 2007039, 7583680, 4, { -29.181200f, 4.895900f, -181.130005f }, 1.000000f, -0.000000f ); 
     instance.registerEObj( "sgbg_r2p1_q0_col02_2", 2007040, 7583684, 4, { 49.409801f, 1.000000f, 95.446404f }, 1.000000f, -0.000000f ); 
