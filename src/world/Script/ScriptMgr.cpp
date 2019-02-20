@@ -371,7 +371,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
   if( script )
   {
-    script->onInit( instance );
+    script->onInit( *instance );
     return true;
   }
 
@@ -384,7 +384,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instan
 
   if( script )
   {
-    script->onUpdate( instance, currTime );
+    script->onUpdate( *instance, currTime );
     return true;
   }
 
@@ -397,7 +397,7 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContentPt
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
   if( script )
   {
-    script->onEnterTerritory( instance, player, eventId, param1, param2 );
+    script->onEnterTerritory( *instance, player, eventId, param1, param2 );
     return true;
   }
 
