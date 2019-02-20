@@ -103,3 +103,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( SastashaHard );

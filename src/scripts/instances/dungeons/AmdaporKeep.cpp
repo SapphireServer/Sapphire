@@ -231,3 +231,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( AmdaporKeep );

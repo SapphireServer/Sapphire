@@ -107,3 +107,5 @@ private:
                       } );
   };
 };
+
+EXPOSE_SCRIPT( SubFst011 );

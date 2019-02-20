@@ -56,3 +56,5 @@ private:
     player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
   }
 };
+
+EXPOSE_SCRIPT( GilShop );

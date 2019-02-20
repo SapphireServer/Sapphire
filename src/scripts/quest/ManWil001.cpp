@@ -187,3 +187,5 @@ public:
     }
   }
 };
+
+EXPOSE_SCRIPT( ManWil001 );

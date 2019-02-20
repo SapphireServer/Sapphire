@@ -15,3 +15,5 @@ public:
     player.addStatusEffectByIdIfNotExist( 50, 20000, player, 30 );
   }
 };
+
+EXPOSE_SCRIPT( ActionSprint3 );

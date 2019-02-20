@@ -132,3 +132,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( HalataliHard );

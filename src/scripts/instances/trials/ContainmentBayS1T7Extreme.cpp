@@ -29,3 +29,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ContainmentBayS1T7Extreme );

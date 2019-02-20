@@ -262,3 +262,5 @@ private:
                       } );
   }
 };
+
+EXPOSE_SCRIPT( ManFst004 );

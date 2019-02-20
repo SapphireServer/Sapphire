@@ -148,3 +148,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( SyrcusTower );

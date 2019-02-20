@@ -67,3 +67,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheStepsofFaith );

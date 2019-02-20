@@ -72,3 +72,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheStoneVigilHard );

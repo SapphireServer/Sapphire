@@ -76,3 +76,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheFinalCoilofBahamutTurn1 );

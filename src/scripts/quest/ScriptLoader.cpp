@@ -1,92 +1,96 @@
 #include <Script/NativeScriptApi.h>
 
-#include "ManFst001.cpp"
-#include "ManFst002.cpp"
-#include "ManFst003.cpp"
-#include "ManFst004.cpp"
-#include "ManSea001.cpp"
-#include "ManSea002.cpp"
-#include "ManSea003.cpp"
-#include "ManWil001.cpp"
-#include "ManWil002.cpp"
-#include "subquest/gridania/SubFst001.cpp"
-#include "subquest/gridania/SubFst002.cpp"
-#include "subquest/gridania/SubFst003.cpp"
-#include "subquest/gridania/SubFst004.cpp"
-#include "subquest/gridania/SubFst005.cpp"
-#include "subquest/gridania/SubFst008.cpp"
-#include "subquest/gridania/SubFst009.cpp"
-#include "subquest/gridania/SubFst010.cpp"
-#include "subquest/gridania/SubFst011.cpp"
-#include "subquest/gridania/SubFst013.cpp"
-#include "subquest/gridania/SubFst014.cpp"
-#include "subquest/gridania/SubFst015.cpp"
-#include "subquest/gridania/SubFst019.cpp"
-#include "subquest/gridania/SubFst026.cpp"
-#include "subquest/gridania/SubFst029.cpp"
-#include "subquest/gridania/SubFst030.cpp"
-#include "subquest/gridania/SubFst041.cpp"
-#include "subquest/gridania/SubFst045.cpp"
-#include "subquest/limsa/SubSea001.cpp"
-#include "subquest/limsa/SubSea012.cpp"
-#include "subquest/uldah/SubWil000.cpp"
-#include "subquest/uldah/SubWil001.cpp"
-#include "subquest/uldah/SubWil002.cpp"
-#include "subquest/uldah/SubWil004.cpp"
-#include "subquest/uldah/SubWil006.cpp"
-#include "subquest/uldah/SubWil007.cpp"
-#include "subquest/uldah/SubWil018.cpp"
-#include "subquest/uldah/SubWil019.cpp"
-#include "subquest/uldah/SubWil021.cpp"
-#include "subquest/uldah/SubWil022.cpp"
-#include "subquest/uldah/SubWil027.cpp"
-#include "subquest/uldah/SubWil028.cpp"
-#include "subquest/uldah/SubWil029.cpp"
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManFst001();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManFst002();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManFst003();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManFst004();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManSea001();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManSea002();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManSea003();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManWil001();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManWil002();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManWil003();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptManWil004();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst001();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst002();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst003();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst004();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst005();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst008();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst009();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst010();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst011();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst013();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst014();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst015();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst019();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst026();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst029();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst030();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst041();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubFst045();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubSea001();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubSea012();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil000();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil001();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil002();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil004();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil006();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil007();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil018();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil019();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil021();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil022();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil027();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil028();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptSubWil029();
 
 const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 {
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManFst001 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManFst002 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManFst003 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManFst004 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManSea001 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManSea002 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManSea003 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManWil001 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ManWil002 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst001 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst002 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst003 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst004 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst005 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst008 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst009 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst010 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst011 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst013 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst014 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst015 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst019 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst026 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst029 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst030 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst041 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubFst045 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubSea001 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubSea012 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil000 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil001 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil002 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil004 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil006 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil007 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil018 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil019 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil021 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil022 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil027 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil028 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new SubWil029 ),
+   makeScriptManFst001(),
+   makeScriptManFst002(),
+   makeScriptManFst003(),
+   makeScriptManFst004(),
+   makeScriptManSea001(),
+   makeScriptManSea002(),
+   makeScriptManSea003(),
+   makeScriptManWil001(),
+   makeScriptManWil002(),
+   makeScriptManWil003(),
+   makeScriptManWil004(),
+   makeScriptSubFst001(),
+   makeScriptSubFst002(),
+   makeScriptSubFst003(),
+   makeScriptSubFst004(),
+   makeScriptSubFst005(),
+   makeScriptSubFst008(),
+   makeScriptSubFst009(),
+   makeScriptSubFst010(),
+   makeScriptSubFst011(),
+   makeScriptSubFst013(),
+   makeScriptSubFst014(),
+   makeScriptSubFst015(),
+   makeScriptSubFst019(),
+   makeScriptSubFst026(),
+   makeScriptSubFst029(),
+   makeScriptSubFst030(),
+   makeScriptSubFst041(),
+   makeScriptSubFst045(),
+   makeScriptSubSea001(),
+   makeScriptSubSea012(),
+   makeScriptSubWil000(),
+   makeScriptSubWil001(),
+   makeScriptSubWil002(),
+   makeScriptSubWil004(),
+   makeScriptSubWil006(),
+   makeScriptSubWil007(),
+   makeScriptSubWil018(),
+   makeScriptSubWil019(),
+   makeScriptSubWil021(),
+   makeScriptSubWil022(),
+   makeScriptSubWil027(),
+   makeScriptSubWil028(),
+   makeScriptSubWil029(),
 
    nullptr
 };

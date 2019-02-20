@@ -220,3 +220,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheAquapolis );

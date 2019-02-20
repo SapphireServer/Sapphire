@@ -43,3 +43,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ExecuteaComboinBattle );

@@ -32,3 +32,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ThePalaceoftheDeadFloors191200 );

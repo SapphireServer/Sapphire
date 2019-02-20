@@ -60,3 +60,5 @@ public:
     Scene00100( player );
   }
 };
+
+EXPOSE_SCRIPT( CmnDefInnBed );
