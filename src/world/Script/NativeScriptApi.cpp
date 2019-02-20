@@ -177,15 +177,15 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onInit( InstanceContentPtr instance )
+  void InstanceContentScript::onInit( InstanceContent& instance )
   {
   }
 
-  void InstanceContentScript::onUpdate( InstanceContentPtr instance, uint32_t currTime )
+  void InstanceContentScript::onUpdate( InstanceContent& instance, uint32_t currTime )
   {
   }
 
-  void InstanceContentScript::onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId,
+  void InstanceContentScript::onEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId,
                                                 uint16_t param1, uint16_t param2 )
   {
   }
