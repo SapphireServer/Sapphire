@@ -35,3 +35,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( CapeWestwind );

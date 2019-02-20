@@ -16,3 +16,5 @@ public:
     player.returnToHomepoint();
   }
 };
+
+EXPOSE_SCRIPT( ActionReturn6 );

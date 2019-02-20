@@ -114,3 +114,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( CopperbellMinesHard );

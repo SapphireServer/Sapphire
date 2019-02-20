@@ -31,3 +31,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( UndertheArmor );

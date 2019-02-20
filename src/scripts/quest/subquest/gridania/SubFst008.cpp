@@ -139,3 +139,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubFst008 );

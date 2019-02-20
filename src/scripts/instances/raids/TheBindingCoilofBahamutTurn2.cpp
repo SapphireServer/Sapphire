@@ -96,3 +96,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheBindingCoilofBahamutTurn2 );

@@ -123,3 +123,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheBindingCoilofBahamutTurn3 );

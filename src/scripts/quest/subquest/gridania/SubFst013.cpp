@@ -193,3 +193,5 @@ public:
       Scene00096( player );
   }
 };
+
+EXPOSE_SCRIPT( SubFst013 );

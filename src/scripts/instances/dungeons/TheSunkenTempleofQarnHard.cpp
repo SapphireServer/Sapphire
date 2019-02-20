@@ -126,3 +126,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheSunkenTempleofQarnHard );

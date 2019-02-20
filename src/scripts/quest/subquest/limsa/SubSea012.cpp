@@ -133,3 +133,4 @@ private:
 
 };
 
+EXPOSE_SCRIPT( SubSea012 );

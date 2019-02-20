@@ -235,3 +235,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheWorldofDarkness );

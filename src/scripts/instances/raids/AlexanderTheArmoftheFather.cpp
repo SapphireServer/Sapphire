@@ -29,3 +29,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( AlexanderTheArmoftheFather );

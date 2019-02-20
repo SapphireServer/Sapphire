@@ -88,3 +88,5 @@ private:
                     } );
   }
 };
+
+EXPOSE_SCRIPT( SubFst045 );

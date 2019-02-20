@@ -322,3 +322,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubWil018 );

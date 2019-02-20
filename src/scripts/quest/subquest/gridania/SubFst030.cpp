@@ -199,3 +199,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubFst030 );

@@ -34,3 +34,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( FinalExercise );

@@ -49,3 +49,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheHowlingEye );

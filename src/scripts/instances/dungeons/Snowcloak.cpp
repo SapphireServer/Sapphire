@@ -107,3 +107,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( Snowcloak );

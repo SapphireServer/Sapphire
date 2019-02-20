@@ -92,3 +92,5 @@ public:
     }
   }
 };
+
+EXPOSE_SCRIPT( SubFst001 );

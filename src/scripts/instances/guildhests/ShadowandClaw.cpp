@@ -61,3 +61,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ShadowandClaw );

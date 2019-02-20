@@ -91,3 +91,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheFinalCoilofBahamutTurn2 );

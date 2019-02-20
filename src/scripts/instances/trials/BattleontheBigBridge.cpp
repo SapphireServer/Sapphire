@@ -46,3 +46,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( BattleontheBigBridge );

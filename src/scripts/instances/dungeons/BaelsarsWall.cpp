@@ -85,3 +85,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( BaelsarsWall );

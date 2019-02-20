@@ -50,3 +50,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( AkhAfahAmphitheatreHard );

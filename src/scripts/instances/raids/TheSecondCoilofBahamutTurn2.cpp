@@ -58,3 +58,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheSecondCoilofBahamutTurn2 );

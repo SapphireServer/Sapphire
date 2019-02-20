@@ -45,3 +45,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheUnendingCoilofBahamutUltimate );

@@ -125,3 +125,5 @@ public:
     }
   }
 };
+
+EXPOSE_SCRIPT( OpeningUldah );

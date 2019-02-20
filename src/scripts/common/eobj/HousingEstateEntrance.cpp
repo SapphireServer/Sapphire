@@ -83,3 +83,5 @@ public:
     } );
   }
 };
+
+EXPOSE_SCRIPT( HousingEstateEntrance );

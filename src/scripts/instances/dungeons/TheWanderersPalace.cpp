@@ -128,3 +128,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheWanderersPalace );

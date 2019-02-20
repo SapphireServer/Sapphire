@@ -6,4 +6,6 @@
 
 #include <Event/EventDefs.h>
 
+#define EXPOSE_SCRIPT( className ) Sapphire::ScriptAPI::ScriptObject* makeScript##className() { return new className; }
+
 #endif //SAPPHIRE_SCRIPTOBJECT_H

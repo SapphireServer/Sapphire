@@ -201,3 +201,5 @@ private:
                       } );
   }
 };
+
+EXPOSE_SCRIPT( ManSea002 );
