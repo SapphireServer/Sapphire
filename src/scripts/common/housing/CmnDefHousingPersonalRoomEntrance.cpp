@@ -19,3 +19,5 @@ public:
     } );
   }
 };
+
+EXPOSE_SCRIPT( CmnDefHousingPersonalRoomEntrance );

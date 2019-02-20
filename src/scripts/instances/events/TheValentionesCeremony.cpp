@@ -117,3 +117,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheValentionesCeremony );

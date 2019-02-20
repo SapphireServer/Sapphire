@@ -101,3 +101,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( HaukkeManor );

@@ -66,3 +66,5 @@ public:
     player.playScene( warp->conditionSuccessEvent, 0, HIDE_HOTBAR, 0, 0, 7, nullptr );
   }
 };
+
+EXPOSE_SCRIPT( WarpTaxi );

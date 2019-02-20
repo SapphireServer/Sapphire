@@ -118,3 +118,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ARelicReborntheHydra );

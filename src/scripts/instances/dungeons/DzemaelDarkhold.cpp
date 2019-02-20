@@ -193,3 +193,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( DzemaelDarkhold );

@@ -130,3 +130,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheThousandMawsofTotoRak );

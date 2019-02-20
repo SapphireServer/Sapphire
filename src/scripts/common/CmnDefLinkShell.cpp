@@ -62,3 +62,5 @@ public:
     Scene00001( player );
   }
 };
+
+EXPOSE_SCRIPT( CmnDefLinkShell );

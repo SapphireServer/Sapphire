@@ -134,3 +134,5 @@ public:
     // todo: handle closed events
   }
 };
+
+EXPOSE_SCRIPT( OpeningLimsa );

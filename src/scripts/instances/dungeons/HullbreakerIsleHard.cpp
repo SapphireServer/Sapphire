@@ -82,3 +82,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( HullbreakerIsleHard );

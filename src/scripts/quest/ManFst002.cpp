@@ -221,3 +221,5 @@ public:
       Scene00005( player );
   }
 };
+
+EXPOSE_SCRIPT( ManFst002 );

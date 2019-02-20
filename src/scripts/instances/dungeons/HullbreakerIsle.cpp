@@ -142,3 +142,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( HullbreakerIsle );

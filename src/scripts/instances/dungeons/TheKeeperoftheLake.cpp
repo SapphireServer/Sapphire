@@ -88,3 +88,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheKeeperoftheLake );

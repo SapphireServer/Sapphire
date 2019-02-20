@@ -330,3 +330,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubWil007 );

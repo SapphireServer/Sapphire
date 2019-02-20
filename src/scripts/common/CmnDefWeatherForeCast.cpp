@@ -25,3 +25,5 @@ public:
     Scene00000( player );
   }
 };
+
+EXPOSE_SCRIPT( CmnDefWeatherForeCast );

@@ -37,3 +37,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheFinalStepsofFaith );

@@ -247,3 +247,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ThePraetorium );

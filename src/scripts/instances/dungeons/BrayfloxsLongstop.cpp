@@ -65,3 +65,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( BrayfloxsLongstop );

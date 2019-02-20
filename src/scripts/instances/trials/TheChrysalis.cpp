@@ -77,3 +77,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheChrysalis );

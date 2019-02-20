@@ -139,3 +139,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( HaukkeManorHard );

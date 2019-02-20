@@ -344,3 +344,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubSea001 );

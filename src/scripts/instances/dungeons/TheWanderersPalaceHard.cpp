@@ -89,3 +89,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheWanderersPalaceHard );

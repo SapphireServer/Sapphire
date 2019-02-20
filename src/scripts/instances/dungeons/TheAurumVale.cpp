@@ -62,3 +62,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheAurumVale );
