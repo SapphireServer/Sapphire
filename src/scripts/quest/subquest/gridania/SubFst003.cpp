@@ -122,3 +122,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubFst003 );

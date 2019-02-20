@@ -20,3 +20,5 @@ public:
     currentAction.getSourceChara()->getAsPlayer()->returnToHomepoint();
   }
 };
+
+EXPOSE_SCRIPT( ActionReturn6 );

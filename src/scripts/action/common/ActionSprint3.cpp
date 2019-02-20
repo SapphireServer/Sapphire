@@ -21,3 +21,5 @@ public:
     sourceChara->getAsPlayer()->addStatusEffectByIdIfNotExist( 50, 20000, *sourceChara, 30 );
   }
 };
+
+EXPOSE_SCRIPT( ActionSprint3 );

@@ -82,6 +82,7 @@ find_path(MYSQL_INCLUDE_DIR
     /usr/local/mysql/include
     "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/include"
     "${PROGRAM_FILES_64}/MySQL/include"
+    "${PROGRAM_FILES_64}/MariaDB 10.3/include/mysql"
     "C:/MySQL/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/include"
     "$ENV{ProgramFiles}/MySQL/MySQL Server 5.7/include"
@@ -113,11 +114,13 @@ if( WIN32 )
   find_library( MYSQL_LIBRARY
     NAMES
       libmysql
+      libmariadb
     PATHS
       ${MYSQL_ADD_LIBRARIES_PATH}
       "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/lib"
       "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/lib/opt"
       "${PROGRAM_FILES_64}/MySQL/lib"
+      "${PROGRAM_FILES_64}/MariaDB 10.3/lib"
       "C:/MySQL/lib/debug"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/lib"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/lib/opt"
@@ -170,6 +173,7 @@ if( WIN32 )
         "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin"
         "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin/opt"
         "${PROGRAM_FILES_64}/MySQL/bin"
+        "${PROGRAM_FILES_64}/MariaDB 10.3/bin"
         "C:/MySQL/bin/debug"
         "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/bin"
         "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/bin/opt"

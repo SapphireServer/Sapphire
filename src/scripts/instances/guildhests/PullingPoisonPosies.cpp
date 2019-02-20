@@ -9,23 +9,24 @@ class PullingPoisonPosies :
 public:
   PullingPoisonPosies() :
     Sapphire::ScriptAPI::InstanceContentScript( 10005 )
-  {
-  }
+  { }
 
-  void onInit( InstanceContentPtr instance ) override
-  {
-
-  }
-
-  void onUpdate( InstanceContentPtr instance, uint32_t currTime ) override
+  void onInit( InstanceContent& instance ) override
   {
 
   }
 
-  void onEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+  void onUpdate( InstanceContent& instance, uint32_t currTime ) override
+  {
+
+  }
+
+  void onEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
 
   }
 
 };
+
+EXPOSE_SCRIPT( PullingPoisonPosies );

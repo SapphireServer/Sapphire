@@ -257,3 +257,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( ManFst003 );
