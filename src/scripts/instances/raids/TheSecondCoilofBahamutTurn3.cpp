@@ -156,3 +156,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheSecondCoilofBahamutTurn3 );

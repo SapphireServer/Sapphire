@@ -154,3 +154,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheTamTaraDeepcroftHard );

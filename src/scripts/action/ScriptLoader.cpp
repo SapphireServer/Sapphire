@@ -1,12 +1,12 @@
 #include <Script/NativeScriptApi.h>
 
-#include "ActionReturn6.cpp"
-#include "ActionSprint3.cpp"
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptActionReturn6();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptActionSprint3();
 
 const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 {
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ActionReturn6 ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new ActionSprint3 ),
+   makeScriptActionReturn6(),
+   makeScriptActionSprint3(),
 
    nullptr
 };

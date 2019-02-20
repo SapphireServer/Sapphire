@@ -124,3 +124,5 @@ public:
     }
   }
 };
+
+EXPOSE_SCRIPT( OpeningGridania );

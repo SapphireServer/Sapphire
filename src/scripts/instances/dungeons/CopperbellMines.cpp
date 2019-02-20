@@ -129,3 +129,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( CopperbellMines );

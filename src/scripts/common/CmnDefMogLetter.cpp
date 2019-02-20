@@ -25,3 +25,5 @@ public:
                       } );
   }
 };
+
+EXPOSE_SCRIPT( CmnDefMogLetter );

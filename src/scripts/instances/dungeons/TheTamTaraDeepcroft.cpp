@@ -75,3 +75,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheTamTaraDeepcroft );

@@ -47,3 +47,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( ThePalaceoftheDeadFloors4150 );

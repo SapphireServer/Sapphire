@@ -40,3 +40,5 @@ public:
     } );
   }
 };
+
+EXPOSE_SCRIPT( HousingAethernet );

@@ -120,3 +120,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( Sastasha );

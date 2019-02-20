@@ -217,3 +217,5 @@ private:
                       } );
   }
 };
+
+EXPOSE_SCRIPT( ManSea003 );

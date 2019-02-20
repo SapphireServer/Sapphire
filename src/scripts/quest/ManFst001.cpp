@@ -105,3 +105,5 @@ public:
       Scene00004( player );
   }
 };
+
+EXPOSE_SCRIPT( ManFst001 );

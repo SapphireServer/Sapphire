@@ -91,3 +91,5 @@ private:
                       } );
   }
 };
+
+EXPOSE_SCRIPT( SubWil001 );

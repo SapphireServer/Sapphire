@@ -153,3 +153,5 @@ public:
       Scene00011( player );
   }
 };
+
+EXPOSE_SCRIPT( ManSea001 );

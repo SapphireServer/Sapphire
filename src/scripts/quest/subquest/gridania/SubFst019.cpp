@@ -92,3 +92,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubFst019 );

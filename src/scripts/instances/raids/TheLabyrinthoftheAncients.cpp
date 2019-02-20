@@ -174,3 +174,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheLabyrinthoftheAncients );

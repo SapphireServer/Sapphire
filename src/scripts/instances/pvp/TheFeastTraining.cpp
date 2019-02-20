@@ -41,3 +41,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheFeastTraining );

@@ -48,3 +48,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheWeaponsRefrainUltimate );

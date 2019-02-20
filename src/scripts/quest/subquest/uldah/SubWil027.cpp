@@ -89,3 +89,4 @@ private:
   }
 };
 
+EXPOSE_SCRIPT( SubWil027 );

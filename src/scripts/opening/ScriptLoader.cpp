@@ -1,14 +1,14 @@
 #include <Script/NativeScriptApi.h>
 
-#include "OpeningGridania.cpp"
-#include "OpeningLimsa.cpp"
-#include "OpeningUldah.cpp"
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptOpeningGridania();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptOpeningLimsa();
+extern Sapphire::ScriptAPI::ScriptObject* makeScriptOpeningUldah();
 
 const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 {
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new OpeningGridania ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new OpeningLimsa ),
-   static_cast< Sapphire::ScriptAPI::ScriptObject* >( new OpeningUldah ),
+   makeScriptOpeningGridania(),
+   makeScriptOpeningLimsa(),
+   makeScriptOpeningUldah(),
 
    nullptr
 };

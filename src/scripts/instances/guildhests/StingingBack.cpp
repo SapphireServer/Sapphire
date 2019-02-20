@@ -33,3 +33,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( StingingBack );

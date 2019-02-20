@@ -95,3 +95,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( AmdaporKeepHard );

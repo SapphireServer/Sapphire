@@ -69,3 +69,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheCarteneauFlatsHeliodrome );

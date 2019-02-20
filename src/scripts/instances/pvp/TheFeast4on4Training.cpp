@@ -33,3 +33,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheFeast4on4Training );

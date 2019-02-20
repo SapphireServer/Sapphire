@@ -57,3 +57,5 @@ public:
   }
 
 };
+
+EXPOSE_SCRIPT( TheSecondCoilofBahamutSavageTurn1 );
