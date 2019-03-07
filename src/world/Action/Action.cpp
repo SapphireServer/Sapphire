@@ -272,6 +272,10 @@ void Sapphire::Action::Action::execute()
                                             0x219, m_id, m_id, m_id, m_id );
     m_pSource->sendToInRangeSet( control, true );*/
 
+    if( auto player = m_pSource->getAsPlayer() )
+    {
+      player->unsetStateFlag( PlayerStateFlag::Casting );
+    }
   }
 
   if( !hasClientsideTarget() )
