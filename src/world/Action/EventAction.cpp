@@ -26,7 +26,7 @@ Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t ev
   m_id = action;
   m_pFw = pFw;
   auto pExdData = pFw->get< Data::ExdDataGenerated >();
-  m_castTime = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+  m_castTimeMs = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
   m_onActionFinishClb = std::move( finishRef );
   m_onActionInterruptClb = std::move( interruptRef );
   m_pSource = std::move( pActor );

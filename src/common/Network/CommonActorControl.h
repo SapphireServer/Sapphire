@@ -36,13 +36,13 @@ enum ActorControlType : uint16_t
     CastInterrupt = 0x0F,
 
     /*!
-     * @brief Sets the cooldown for an action
+     * @brief Sent when a player uses an action
      *
-     * @param param1 Seems to be always 1 from what I've seen, needs more research
-     * @param param2 The actionid to set the cooldown for
-     * @param param3 The time in milliseconds to apply the cooldown for, 0 resets the cooldown
+     * param1 Seems to be always 1 from what I've seen, needs more research
+     * param2 The actionid
+     * param3 The action cooldown in ms / 10
      */
-    SetActionCooldown = 0x11,
+    ActionStart = 0x11,
 
     StatusEffectGain = 0x14,
     StatusEffectLose = 0x15,

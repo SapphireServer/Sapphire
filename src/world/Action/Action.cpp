@@ -62,8 +62,8 @@ bool Sapphire::Action::Action::init()
     m_actionData = actionData;
   }
 
-  m_castTime = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
-  m_recastTime = static_cast< uint16_t >( m_actionData->recast100ms * 100 );
+  m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
+  m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
   m_cooldownGroup = m_actionData->cooldownGroup;
   m_range = m_actionData->range;
   m_effectRange = m_actionData->effectRange;
@@ -129,17 +129,17 @@ void Sapphire::Action::Action::setInterrupted( Common::ActionInterruptType type 
 
 uint32_t Sapphire::Action::Action::getCastTime() const
 {
-  return m_castTime;
+  return m_castTimeMs;
 }
 
 void Sapphire::Action::Action::setCastTime( uint32_t castTime )
 {
-  m_castTime = castTime;
+  m_castTimeMs = castTime;
 }
 
 bool Sapphire::Action::Action::hasCastTime() const
 {
-  return m_castTime > 0;
+  return m_castTimeMs > 0;
 }
 
 Sapphire::Entity::CharaPtr Sapphire::Action::Action::getSourceChara() const
@@ -166,7 +166,7 @@ bool Sapphire::Action::Action::update()
 
   uint64_t currTime = Util::getTimeMs();
 
-  if( !hasCastTime() || std::difftime( currTime, m_startTime ) > m_castTime )
+  if( !hasCastTime() || std::difftime( currTime, m_startTime ) > m_castTimeMs )
   {
     execute();
     return true;
@@ -191,7 +191,7 @@ void Sapphire::Action::Action::start()
     castPacket->data().skillType = Common::SkillType::Normal;
     castPacket->data().unknown_1 = m_id;
     // This is used for the cast bar above the target bar of the caster.
-    castPacket->data().cast_time = m_castTime / 1000.f;
+    castPacket->data().cast_time = m_castTimeMs / 1000.f;
     castPacket->data().target_id = static_cast< uint32_t >( m_targetId );
 
     m_pSource->sendToInRangeSet( castPacket, true );
@@ -201,6 +201,10 @@ void Sapphire::Action::Action::start()
       player->setStateFlag( PlayerStateFlag::Casting );
     }
   }
+
+  // todo: m_recastTimeMs needs to be adjusted for player sks/sps
+  auto actionStartPkt = makeActorControl143( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
+  player->queuePacket( actionStartPkt );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   if( !pScriptMgr->onStart( *this ) )
@@ -230,9 +234,6 @@ void Sapphire::Action::Action::interrupt()
   if( m_pSource->isPlayer() )
   {
     auto player = m_pSource->getAsPlayer();
-
-    auto resetCooldownPkt = makeActorControl143( m_pSource->getId(), ActorControlType::SetActionCooldown, 1, getId(), 0 );
-    player->queuePacket( resetCooldownPkt );
 
     // todo: reset cooldown for actual player
 
