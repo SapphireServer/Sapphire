@@ -303,7 +303,7 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
     pEvent->setPlayedScene( true );
 
   setCurrentAction( pEventAction );
-  pEventAction->onStart();
+  pEventAction->start();
 }
 
 

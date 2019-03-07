@@ -145,7 +145,7 @@ bool Sapphire::Action::Action::update()
 
   if( isInterrupted() )
   {
-    onInterrupt();
+    interrupt();
     return true;
   }
 
@@ -158,14 +158,14 @@ bool Sapphire::Action::Action::update()
 
   if( !hasCastTime() || std::difftime( currTime, m_startTime ) > m_castTime )
   {
-    onExecute();
+    execute();
     return true;
   }
 
   return false;
 }
 
-void Sapphire::Action::Action::onStart()
+void Sapphire::Action::Action::start()
 {
   assert( m_pSource );
 
@@ -196,7 +196,7 @@ void Sapphire::Action::Action::onStart()
   if( !pScriptMgr->onStart( *this ) )
   {
     // script not implemented
-    onInterrupt();
+    interrupt();
 
     if( player )
     {
@@ -209,10 +209,10 @@ void Sapphire::Action::Action::onStart()
 
   // instantly finish cast if there's no cast time
   if( !hasCastTime() )
-    onExecute();
+    execute();
 }
 
-void Sapphire::Action::Action::onInterrupt()
+void Sapphire::Action::Action::interrupt()
 {
   assert( m_pSource );
 
@@ -249,7 +249,7 @@ void Sapphire::Action::Action::onInterrupt()
   pScriptMgr->onInterrupt( *this );
 }
 
-void Sapphire::Action::Action::onExecute()
+void Sapphire::Action::Action::execute()
 {
   assert( m_pSource );
 
