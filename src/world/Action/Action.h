@@ -20,18 +20,20 @@ namespace Sapphire::Action
   public:
 
     Action();
+    Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw );
     Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw );
 
     virtual ~Action();
 
     uint32_t getId() const;
 
+    bool init();
+
     void setPos( Common::FFXIVARR_POSITION3 pos );
     Common::FFXIVARR_POSITION3 getPos() const;
 
-    void setTargetChara( Entity::CharaPtr chara );
-    void setResidentTargetId( uint64_t targetId );
-    Entity::CharaPtr getTargetChara() const;
+    void setTargetId( uint64_t targetId );
+    uint64_t getTargetId() const;
     Entity::CharaPtr getSourceChara() const;
 
     bool isInterrupted() const;
@@ -40,11 +42,14 @@ namespace Sapphire::Action
     uint32_t getCastTime() const;
     void setCastTime( uint32_t castTime );
 
+    uint32_t getAdditionalData() const;
+    void setAdditionalData( uint32_t data );
+
     /*!
      * @brief Checks if the action *may* target a resident instead of an actor
      * @return true if the target *may* be a resident and not an actor, otherwise false.
      */
-    bool hasResidentTarget() const;
+    bool hasClientsideTarget() const;
 
     /*!
      * @brief Tests whether the action is instantly usable or has a cast assoc'd with it
@@ -101,11 +106,11 @@ namespace Sapphire::Action
     uint8_t m_effectRange;
     Common::ActionAspect m_aspect;
 
+    uint32_t m_additionalData;
 
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;
     uint64_t m_targetId;
-    bool m_hasResidentTarget;
 
     Common::ActionInterruptType m_interruptType;
 

@@ -140,11 +140,11 @@ namespace Sapphire::ScriptAPI
   public:
     explicit ActionScript( uint32_t abilityId );
 
-    virtual void onStart( Sapphire::Action::Action& currentAction );
+    virtual void onStart( Sapphire::Action::Action& action );
 
-    virtual void onFinish( Sapphire::Action::Action& currentAction );
+    virtual void onExecute( Sapphire::Action::Action& action );
 
-    virtual void onInterrupt( Sapphire::Action::Action& currentAction );
+    virtual void onInterrupt( Sapphire::Action::Action& action );
   };
 
   /*!

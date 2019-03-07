@@ -539,7 +539,7 @@ namespace Sapphire::Common
 
   enum class ActionPrimaryCostType : uint8_t
   {
-//    None = 0, // ?
+    None = 0, // ?
     MagicPoints = 3,
     TacticsPoints = 5,
 //    WARGauge = 22,
@@ -929,6 +929,12 @@ namespace Sapphire::Common
     HasEstateGreeting = 4,
     EstateFlagUnknown = 8,
     IsFreeCompanyEstate = 16,
+  };
+
+  struct PlayerTeleportQuery
+  {
+    uint16_t targetAetheryte;
+    uint16_t cost;
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

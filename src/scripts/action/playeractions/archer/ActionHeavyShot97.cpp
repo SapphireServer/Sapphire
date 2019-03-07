@@ -12,9 +12,9 @@ public:
   {
   }
 
-  void onFinish( Sapphire::Action::Action& currentAction ) override
+  void onExecute( Sapphire::Action::Action& action ) override
   {
-    if( auto player = currentAction.getSourceChara()->getAsPlayer() )
+    if( auto player = action.getSourceChara()->getAsPlayer() )
       player->sendDebug( "Imagine you just hit an enemy for 150 potency. Incredible, right?" );
   }
 

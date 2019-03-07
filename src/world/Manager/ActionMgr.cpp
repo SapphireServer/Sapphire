@@ -24,7 +24,9 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
 
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
-  action->setPos( pos );
+
+  if( !action->init() )
+    return;
 
   if( !actionData->targetArea )
   {
@@ -32,6 +34,8 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
     action->interrupt();
     return;
   }
+
+  action->setPos( pos );
 
   bootstrapAction( player, action, *actionData );
 }
@@ -41,6 +45,9 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
 {
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
 
+  if( !action->init() )
+    return;
+
   // cancel any aoe actions casted with this packet
   if( actionData->targetArea )
   {
@@ -48,24 +55,7 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
     return;
   }
 
-  if( targetId == 0 )
-  {
-    action->setTargetChara( player.getAsChara() );
-  }
-  else if( targetId != player.getId() )
-  {
-    auto target = player.lookupTargetById( targetId );
-    if( !target )
-    {
-      // an eobj?
-      player.sendDebug( "Unable to find actor for targetId#{0}, passing through to event scripts...", targetId );
-      action->setResidentTargetId( targetId );
-    }
-    else if( auto chara = target->getAsChara() )
-    {
-      action->setTargetChara( chara );
-    }
-  }
+  action->setTargetId( targetId );
 
   bootstrapAction( player, action, *actionData );
 }

@@ -26,50 +26,70 @@ using namespace Sapphire::Network::ActorControl;
 Sapphire::Action::Action::Action() = default;
 Sapphire::Action::Action::~Action() = default;
 
+Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
+                                  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
+{
+}
+
 Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
                                   Data::ActionPtr actionData, FrameworkPtr fw ) :
                                   m_pSource( std::move( caster ) ),
                                   m_pFw( std::move( fw ) ),
+                                  m_actionData( std::move( actionData ) ),
                                   m_id( actionId ),
+                                  m_targetId( 0 ),
                                   m_startTime( 0 ),
-                                  m_interruptType( Common::ActionInterruptType::None ),
-                                  m_hasResidentTarget( false )
+                                  m_interruptType( Common::ActionInterruptType::None )
 {
-  m_actionData = actionData;
-
-  m_castTime = static_cast< uint32_t >( actionData->cast100ms * 100 );
-  m_recastTime = static_cast< uint16_t >( actionData->recast100ms * 100 );
-  m_cooldownGroup = actionData->cooldownGroup;
-  m_range = actionData->range;
-  m_effectRange = actionData->effectRange;
-  m_aspect = static_cast< Common::ActionAspect >( actionData->aspect );
-
-  // a default range is set by the game for the class/job
-  if( m_range == -1 )
-  {
-    switch( static_cast< Common::ClassJob >( actionData->classJob ) )
-    {
-      case Common::ClassJob::Bard:
-      case Common::ClassJob::Archer:
-        m_range = 25;
-
-      // anything that isnt ranged
-      default:
-        m_range = 3;
-    }
-  }
-
-  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( actionData->costType );
-  m_primaryCost = actionData->cost;
-
-  // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
-
-  calculateActionCost();
 }
 
 uint32_t Sapphire::Action::Action::getId() const
 {
   return m_id;
+}
+
+bool Sapphire::Action::Action::init()
+{
+  if( !m_actionData )
+  {
+    // need to get actionData
+    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+    assert( exdData );
+
+    auto actionData = exdData->get< Data::Action >( m_id );
+    assert( actionData );
+
+    m_actionData = actionData;
+  }
+
+  m_castTime = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
+  m_recastTime = static_cast< uint16_t >( m_actionData->recast100ms * 100 );
+  m_cooldownGroup = m_actionData->cooldownGroup;
+  m_range = m_actionData->range;
+  m_effectRange = m_actionData->effectRange;
+  m_aspect = static_cast< Common::ActionAspect >( m_actionData->aspect );
+
+  // a default range is set by the game for the class/job
+  if( m_range == -1 )
+  {
+    switch( static_cast< Common::ClassJob >( m_actionData->classJob ) )
+    {
+      case Common::ClassJob::Bard:
+      case Common::ClassJob::Archer:
+        m_range = 25;
+
+        // anything that isnt ranged
+      default:
+        m_range = 3;
+    }
+  }
+
+  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->costType );
+  m_primaryCost = m_actionData->cost;
+
+  // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
+
+  return true;
 }
 
 void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
@@ -82,29 +102,19 @@ Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Action::Action::getPos() const
   return m_pos;
 }
 
-void Sapphire::Action::Action::setTargetChara( Sapphire::Entity::CharaPtr chara )
-{
-  assert( chara );
-
-  m_pTarget = chara;
-  m_targetId = chara->getId();
-  m_hasResidentTarget = false;
-}
-
-void Sapphire::Action::Action::setResidentTargetId( uint64_t targetId )
+void Sapphire::Action::Action::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
-  m_hasResidentTarget = true;
 }
 
-bool Sapphire::Action::Action::hasResidentTarget() const
+uint64_t Sapphire::Action::Action::getTargetId() const
 {
-  return m_hasResidentTarget;
+  return m_targetId;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getTargetChara() const
+bool Sapphire::Action::Action::hasClientsideTarget() const
 {
-  return m_pTarget;
+  return m_targetId > 0xFFFFFFFF;
 }
 
 bool Sapphire::Action::Action::isInterrupted() const
@@ -149,7 +159,7 @@ bool Sapphire::Action::Action::update()
     return true;
   }
 
-  if( !hasResidentTarget() )
+  if( !hasClientsideTarget() )
   {
     // todo: check if the target is still in range
   }
@@ -264,9 +274,8 @@ void Sapphire::Action::Action::execute()
 
   }
 
-  if( !hasResidentTarget() )
+  if( !hasClientsideTarget() )
   {
-    assert( m_pTarget );
     pScriptMgr->onExecute( *this );
   }
   else if( auto player = m_pSource->getAsPlayer() )
@@ -282,17 +291,19 @@ void Sapphire::Action::Action::calculateActionCost()
   // check primary cost
   switch( m_primaryCostType )
   {
+    case ActionPrimaryCostType::None:
+    {
+      break;
+    }
     case ActionPrimaryCostType::MagicPoints:
     {
       calculateMPCost( m_primaryCost );
       break;
     }
-
     case ActionPrimaryCostType::TacticsPoints:
     {
       break;
     }
-
 
     default:
     {
@@ -434,13 +445,13 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
 
   // reset target on actions that can only be casted on yourself while having a target set
   // todo: check what actions send when targeting an enemy
-  if( m_actionData->canTargetSelf &&
-      !m_actionData->canTargetFriendly &&
-      !m_actionData->canTargetHostile &&
-      !m_actionData->canTargetParty )
-  {
-    setTargetChara( getSourceChara() );
-  }
+//  if( m_actionData->canTargetSelf &&
+//      !m_actionData->canTargetFriendly &&
+//      !m_actionData->canTargetHostile &&
+//      !m_actionData->canTargetParty )
+//  {
+//    setTargetId( getSourceChara() );
+//  }
 
   // todo: party/enemy validation
 
@@ -449,5 +460,17 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
 
   // todo: validate costs/conditionals here
 
+  calculateActionCost();
+
   return true;
+}
+
+uint32_t Sapphire::Action::Action::getAdditionalData() const
+{
+  return m_additionalData;
+}
+
+void Sapphire::Action::Action::setAdditionalData( uint32_t data )
+{
+  m_additionalData = data;
 }
