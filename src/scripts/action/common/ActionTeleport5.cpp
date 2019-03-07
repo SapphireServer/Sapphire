@@ -23,21 +23,17 @@ public:
 
     auto teleportQuery = player->getTeleportQuery();
 
-    if( player->getCurrency( Common::CurrencyType::Gil ) < teleportQuery.cost )
+    if( player->getCurrency( Common::CurrencyType::Gil ) < teleportQuery.cost ||
+        teleportQuery.targetAetheryte == 0 )
     {
       action.interrupt();
       return;
     }
 
-    if( teleportQuery.targetAetheryte == 0 )
-    {
-      action.interrupt();
-    }
-
     player->removeCurrency( Common::CurrencyType::Gil, teleportQuery.cost );
 
     player->setZoningType( Common::ZoneingType::Teleport );
-    player->teleport( static_cast< uint16_t >( teleportQuery.targetAetheryte ) );
+    player->teleport( teleportQuery.targetAetheryte );
 
     player->clearTeleportQuery();
   }
