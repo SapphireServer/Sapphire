@@ -35,7 +35,7 @@ Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t ev
 
 Sapphire::Action::EventAction::~EventAction() = default;
 
-void Sapphire::Action::EventAction::onStart()
+void Sapphire::Action::EventAction::start()
 {
   if( !m_pSource )
     return;
@@ -54,7 +54,7 @@ void Sapphire::Action::EventAction::onStart()
     m_pSource->sendToInRangeSet( control );
 }
 
-void Sapphire::Action::EventAction::onExecute()
+void Sapphire::Action::EventAction::execute()
 {
   if( !m_pSource )
     return;
@@ -90,7 +90,7 @@ void Sapphire::Action::EventAction::onExecute()
 
 }
 
-void Sapphire::Action::EventAction::onInterrupt()
+void Sapphire::Action::EventAction::interrupt()
 {
   if( !m_pSource )
     return;

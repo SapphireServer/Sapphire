@@ -61,21 +61,24 @@ namespace Sapphire::Action
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
      */
-    virtual void onStart();
+    virtual void start();
 
     /*!
      * @brief Finishes the cast, effected targets are calculated here.
      */
-    virtual void onExecute();
+    virtual void execute();
 
     /*!
      * @brief Called when a cast is interrupted for any reason
      *
      * m_interruptType will have the reason why the action was interrupted (eg. damage, movement, ...)
      */
-    virtual void onInterrupt();
+    virtual void interrupt();
 
-    // update action, if returns true, action is done and has to be removed from the actor
+    /*!
+     * @brief Called on each player update tick
+     * @return true if a cast has finished and should be removed from the owning chara
+     */
     virtual bool update();
 
   protected:

@@ -29,7 +29,7 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
   if( !actionData->targetArea )
   {
     // not an action that has an aoe, cancel it
-    action->onInterrupt();
+    action->interrupt();
     return;
   }
 
@@ -44,7 +44,7 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   // cancel any aoe actions casted with this packet
   if( actionData->targetArea )
   {
-    action->onInterrupt();
+    action->interrupt();
     return;
   }
 
@@ -102,7 +102,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
   if( !currentAction->precheck() )
   {
     // forcefully interrupt the action and reset the cooldown
-    currentAction->onInterrupt();
+    currentAction->interrupt();
     return;
   }
 
@@ -113,7 +113,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
   }
 
   // todo: what do in cases of swiftcast/etc? script callback?
-  currentAction->onStart();
+  currentAction->start();
 }
 
 void World::Manager::ActionMgr::handleItemActionVFX( Sapphire::Entity::Player& player, uint32_t itemId, uint16_t vfxId )
