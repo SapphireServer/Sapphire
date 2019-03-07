@@ -83,7 +83,7 @@ struct FFXIVIpcAoESkillHandler :
   /* 0002 */ uint8_t pad_0002[2];
   /* 0004 */ uint32_t actionId;
   /* 0008 */ uint16_t sequence;
-  /* 000A */ char pad_000C[6];
+  /* 000A */ uint8_t pad_000C[6];
   /* 0010 */ Common::FFXIVARR_POSITION3 pos;
   /* 001C */ uint32_t unknown; // could almost be rotation + 16 bits more padding?
 };
