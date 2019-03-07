@@ -99,8 +99,8 @@ namespace Sapphire::Action
     uint16_t m_primaryCost;
 
     uint64_t m_startTime;
-    uint32_t m_castTime;
-    uint16_t m_recastTime;
+    uint32_t m_castTimeMs;
+    uint32_t m_recastTimeMs;
     uint8_t m_cooldownGroup;
     int8_t m_range;
     uint8_t m_effectRange;
