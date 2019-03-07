@@ -63,7 +63,7 @@ struct FFXIVIpcUpdatePosition :
 struct FFXIVIpcSkillHandler :
   FFXIVIpcBasePacket< SkillHandler >
 {
-  /* 0000 */ char pad_0000[1];
+  /* 0000 */ char pad_0000;
   /* 0001 */ uint8_t type;
   /* 0002 */ char pad_0002[2];
   /* 0004 */ uint32_t actionId;
@@ -78,7 +78,7 @@ struct FFXIVIpcSkillHandler :
 struct FFXIVIpcAoESkillHandler :
   FFXIVIpcBasePacket< AoESkillHandler >
 {
-  /* 0000 */ char pad_0000[1];
+  /* 0000 */ char pad_0000;
   /* 0001 */ uint8_t type;
   /* 0002 */ char pad_0002[2];
   /* 0004 */ uint32_t actionId;
