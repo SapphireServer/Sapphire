@@ -11,12 +11,11 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
-#include "Action/EventAction.h"
-#include "Action/EventItemAction.h"
-
 #include "Territory/Zone.h"
 #include "ServerMgr.h"
 #include "Framework.h"
+
+#include "Action/EventAction.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -279,14 +278,13 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
 
 void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint32_t action,
-                                                 ActionCallback finishCallback,
-                                                 ActionCallback interruptCallback,
+                                                 Action::ActionCallback finishCallback,
+                                                 Action::ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
   auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
                                                 finishCallback, interruptCallback, additional, m_pFw );
 
-  setCurrentAction( pEventAction );
   auto pEvent = getEvent( eventId );
 
   if( !pEvent && getEventCount() )
@@ -303,22 +301,24 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
 
   if( pEvent )
     pEvent->setPlayedScene( true );
-  pEventAction->onStart();
+
+  setCurrentAction( pEventAction );
+  pEventAction->start();
 }
 
 
 void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                      uint32_t action,
-                                                     ActionCallback finishCallback,
-                                                     ActionCallback interruptCallback,
+                                                     Action::ActionCallback finishCallback,
+                                                     Action::ActionCallback interruptCallback,
                                                      uint64_t additional )
 {
-  Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
-                                                                     finishCallback, interruptCallback, additional );
-
-  setCurrentAction( pEventItemAction );
-
-  pEventItemAction->onStart();
+//  Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
+//                                                                     finishCallback, interruptCallback, additional );
+//
+//  setCurrentAction( pEventItemAction );
+//
+//  pEventItemAction->onStart();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

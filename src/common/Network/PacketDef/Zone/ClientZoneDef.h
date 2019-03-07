@@ -63,13 +63,29 @@ struct FFXIVIpcUpdatePosition :
 struct FFXIVIpcSkillHandler :
   FFXIVIpcBasePacket< SkillHandler >
 {
-  /* 0000 */ char pad_0000[1];
+  /* 0000 */ uint8_t pad_0000;
   /* 0001 */ uint8_t type;
-  /* 0002 */ char pad_0002[2];
+  /* 0002 */ uint8_t pad_0002[2];
   /* 0004 */ uint32_t actionId;
-  /* 0008 */ uint32_t useCount;
-  /* 000C */ char pad_000C[4];
+  /* 0008 */ uint16_t sequence;
+  /* 000A */ uint8_t pad_000C[6];
   /* 0010 */ uint64_t targetId;
+  /* 0018 */ uint16_t itemSourceSlot;
+  /* 001A */ uint16_t itemSourceContainer;
+  /* 001C */ uint32_t unknown;
+};
+
+struct FFXIVIpcAoESkillHandler :
+  FFXIVIpcBasePacket< AoESkillHandler >
+{
+  /* 0000 */ uint8_t pad_0000;
+  /* 0001 */ uint8_t type;
+  /* 0002 */ uint8_t pad_0002[2];
+  /* 0004 */ uint32_t actionId;
+  /* 0008 */ uint16_t sequence;
+  /* 000A */ uint8_t pad_000C[6];
+  /* 0010 */ Common::FFXIVARR_POSITION3 pos;
+  /* 001C */ uint32_t unknown; // could almost be rotation + 16 bits more padding?
 };
 
 struct FFXIVIpcZoneLineHandler :
@@ -91,9 +107,9 @@ struct FFXIVIpcEventHandlerReturn :
   /* 0004 */ uint16_t scene;
   /* 0006 */ uint16_t param1;
   /* 0008 */ uint16_t param2;
-  /* 000A */ char pad_000A[2];
+  /* 000A */ uint8_t pad_000A[2];
   /* 000C */ uint16_t param3;
-  /* 000E */ char pad_000E[2];
+  /* 000E */ uint8_t pad_000E[2];
   /* 0010 */ uint16_t param4;
 };
 
@@ -155,7 +171,7 @@ struct FFXIVIpcSetSearchInfo :
     };
   };
 
-  /* 0008 */ char pad_0008[9];
+  /* 0008 */ uint8_t pad_0008[9];
   /* 0011 */ Common::ClientLanguage language;
   /* 0012 */ char searchComment[193];
 };
@@ -175,9 +191,9 @@ struct FFXIVIpcTellHandler : FFXIVIpcBasePacket< TellReq >
 struct FFXIVIpcChatHandler :
   FFXIVIpcBasePacket< ChatHandler >
 {
-  /* 0000 */ char pad_0000[4];
+  /* 0000 */ uint8_t pad_0000[4];
   /* 0004 */ uint32_t sourceId;
-  /* 0008 */ char pad_0008[16];
+  /* 0008 */ uint8_t pad_0008[16];
   /* 0018 */ Common::ChatType chatType;
   /* 001A */ char message[1012];
 };
@@ -194,7 +210,7 @@ struct FFXIVIpcLinkshellEventHandler :
 {
   /* 0000 */ uint32_t eventId;
   /* 0004 */ uint16_t scene;
-  /* 0006 */ char pad_0006[1];
+  /* 0006 */ uint8_t pad_0006[1];
   /* 0007 */ char lsName[21];
 };
 
@@ -203,13 +219,13 @@ struct FFXIVIpcInventoryModifyHandler :
 {
   /* 0000 */ uint32_t seq;
   /* 0004 */ Common::InventoryOperation action;
-  /* 0005 */ char pad_0005[7];
+  /* 0005 */ uint8_t pad_0005[7];
   /* 000C */ uint16_t fromContainer;
-  /* 000E */ char pad_000E[2];
+  /* 000E */ uint8_t pad_000E[2];
   /* 0010 */ uint8_t fromSlot;
-  /* 0011 */ char pad_0011[15];
+  /* 0011 */ uint8_t pad_0011[15];
   /* 0020 */ uint16_t toContainer;
-  /* 0022 */ char pad_0022[2];
+  /* 0022 */ uint8_t pad_0022[2];
   /* 0024 */ uint8_t toSlot;
   /* 0025 */ uint8_t pad_0025[3];
   /* 0028 */ uint32_t splitCount;
@@ -245,11 +261,11 @@ struct FFXIVIpcSetSharedEstateSettings :
   /* 0008 */ uint64_t char2ContentId;
   /* 0010 */ uint64_t char3ContentId;
   /* 0018 */ uint8_t char1Permissions;
-  /* 0019 */ char padding1[0x7];
+  /* 0019 */ uint8_t padding1[0x7];
   /* 0020 */ uint8_t char2Permissions;
-  /* 0021 */ char padding2[0x7];
+  /* 0021 */ uint8_t padding2[0x7];
   /* 0028 */ uint8_t char3Permissions;
-  /* 0029 */ char padding3[0x7];
+  /* 0029 */ uint8_t padding3[0x7];
 };
 
 struct FFXIVIpcMarketBoardRequestItemListings :

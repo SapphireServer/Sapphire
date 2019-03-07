@@ -23,8 +23,9 @@ src/tools/[Bb]in/exd_struct_gen
 # decompiled scripts
 src/tools/bin/generated/*
 
-# Build Directory
+# Build Directories
 build/
+build-*/
 cmake-build-*/
 
 # Prerequisites

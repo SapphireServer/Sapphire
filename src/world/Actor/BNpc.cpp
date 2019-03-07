@@ -23,7 +23,6 @@
 #include "Navi/NaviProvider.h"
 
 #include "StatusEffect/StatusEffect.h"
-#include "Action/ActionCollision.h"
 #include "ServerMgr.h"
 #include "Session.h"
 #include "Math/CalcBattle.h"

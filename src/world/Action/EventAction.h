@@ -9,31 +9,29 @@
 namespace Sapphire::Action
 {
 
-  class EventAction : public Action
-  {
+class EventAction : public Action
+{
 
-  public:
-    EventAction();
+public:
+  virtual ~EventAction();
 
-    ~EventAction();
+  EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+               ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional, FrameworkPtr pFw );
 
-    EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                 ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional, FrameworkPtr pFw );
+  void start() override;
 
-    void onStart() override;
+  void execute() override;
 
-    void onFinish() override;
+  void interrupt() override;
 
-    void onInterrupt() override;
+private:
+  uint32_t m_eventId;
+  uint64_t m_additional;
 
-  private:
-    uint32_t m_eventId;
-    uint64_t m_additional;
+  ActionCallback m_onActionFinishClb;
+  ActionCallback m_onActionInterruptClb;
 
-    ActionCallback m_onActionFinishClb;
-    ActionCallback m_onActionInterruptClb;
-
-  };
+};
 
 }
 

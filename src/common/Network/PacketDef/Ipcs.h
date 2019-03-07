@@ -304,6 +304,7 @@ namespace Sapphire::Network::Packets
     SkillHandler = 0x013B, // updated 4.5
     GMCommand1 = 0x013C, // updated 4.5
     GMCommand2 = 0x013D, // updated 4.5
+    AoESkillHandler = 0x13E, // updated 4.5
 
     UpdatePositionHandler = 0x013F, // updated 4.5
     UpdatePositionInstance = 0x0183, // updated 4.3

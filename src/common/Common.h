@@ -525,8 +525,7 @@ namespace Sapphire::Common
 
   };
 
-  enum struct ActionAspect :
-    uint8_t
+  enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected
     Fire = 1,
@@ -536,6 +535,21 @@ namespace Sapphire::Common
     Lightning = 5,
     Water = 6,
     Unaspected = 7    // Doesn't imply magical unaspected damage - could be unaspected physical
+  };
+
+  enum class ActionPrimaryCostType : uint8_t
+  {
+    None = 0, // ?
+    MagicPoints = 3,
+    TacticsPoints = 5,
+//    WARGauge = 22,
+//    DRKGauge = 25,
+//    AetherflowStack = 30,
+//    Status = 32,
+//    PLDGauge = 41,
+//    RDMGaugeBoth = 74,
+////  RDMGaugeBlack = 75, // not right?
+//    DRGGauge3Eyes = 76,
   };
 
   enum class ActionType : int8_t
@@ -584,11 +598,32 @@ namespace Sapphire::Common
     CritDirectHitDamage = 3
   };
 
+  enum ItemActionType : uint16_t
+  {
+    ItemActionVFX = 944,
+  };
+
   enum ActionEffectDisplayType : uint8_t
   {
     HideActionName = 0,
     ShowActionName = 1,
     ShowItemName = 2,
+  };
+
+  struct EffectEntry
+  {
+    Common::ActionEffectType effectType;
+    Common::ActionHitSeverityType hitSeverity;
+    uint8_t param;
+    /*!
+     * @brief Shows an additional percentage in the battle log
+     *
+     * Has no effect on what is shown and stored in value
+     */
+    int8_t bonusPercent;
+    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
+    uint8_t flags;
+    int16_t value;
   };
 
   enum class ActionCollisionType : uint8_t
@@ -602,6 +637,13 @@ namespace Sapphire::Common
     Unknown2,
     PersistentArea, // for when you set aoe like asylum
     Unknown3
+  };
+
+  enum class ActionInterruptType : uint8_t
+  {
+    None,
+    RegularInterrupt,
+    DamageInterrupt,
   };
 
   enum HandleActionType : uint8_t
@@ -887,6 +929,12 @@ namespace Sapphire::Common
     HasEstateGreeting = 4,
     EstateFlagUnknown = 8,
     IsFreeCompanyEstate = 16,
+  };
+
+  struct PlayerTeleportQuery
+  {
+    uint16_t targetAetheryte;
+    uint16_t cost;
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

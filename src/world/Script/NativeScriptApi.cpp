@@ -88,15 +88,15 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void ActionScript::onStart( Entity::Chara& sourceActor, Entity::Chara& targetActor )
+  void ActionScript::onStart( Sapphire::Action::Action& action )
   {
   }
 
-  void ActionScript::onCastFinish( Entity::Player& player, Entity::Chara& targetActor )
+  void ActionScript::onExecute( Sapphire::Action::Action& action )
   {
   }
 
-  void ActionScript::onInterrupt( Entity::Chara& sourceActor/*, Sapphire::Entity::Chara targetActor*/ )
+  void ActionScript::onInterrupt( Sapphire::Action::Action& action )
   {
   }
 
@@ -138,6 +138,10 @@ namespace Sapphire::ScriptAPI
 
   void EventScript::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                               uint32_t catalogId )
+  {
+  }
+
+  void EventScript::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId )
   {
   }
 

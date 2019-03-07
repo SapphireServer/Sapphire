@@ -864,3 +864,8 @@ void Sapphire::Zone::updateSpawnPoints()
 
 }
 
+uint32_t Sapphire::Zone::getNextEffectSequence()
+{
+  return m_effectCounter++;
+}
+

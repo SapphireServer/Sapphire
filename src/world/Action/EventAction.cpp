@@ -17,34 +17,25 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Action::EventAction::EventAction()
-{
-  m_handleActionType = HandleActionType::Event;
-}
-
 Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
                                             ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional,
                                             FrameworkPtr pFw )
 {
   m_additional = additional;
-  m_handleActionType = HandleActionType::Event;
   m_eventId = eventId;
   m_id = action;
   m_pFw = pFw;
   auto pExdData = pFw->get< Data::ExdDataGenerated >();
-  m_castTime = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
-  m_onActionFinishClb = finishRef;
-  m_onActionInterruptClb = interruptRef;
-  m_pSource = pActor;
-  m_bInterrupt = false;
+  m_castTimeMs = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+  m_onActionFinishClb = std::move( finishRef );
+  m_onActionInterruptClb = std::move( interruptRef );
+  m_pSource = std::move( pActor );
+  m_interruptType = Common::ActionInterruptType::None;
 }
 
-Sapphire::Action::EventAction::~EventAction()
-{
+Sapphire::Action::EventAction::~EventAction() = default;
 
-}
-
-void Sapphire::Action::EventAction::onStart()
+void Sapphire::Action::EventAction::start()
 {
   if( !m_pSource )
     return;
@@ -63,7 +54,7 @@ void Sapphire::Action::EventAction::onStart()
     m_pSource->sendToInRangeSet( control );
 }
 
-void Sapphire::Action::EventAction::onFinish()
+void Sapphire::Action::EventAction::execute()
 {
   if( !m_pSource )
     return;
@@ -99,7 +90,7 @@ void Sapphire::Action::EventAction::onFinish()
 
 }
 
-void Sapphire::Action::EventAction::onInterrupt()
+void Sapphire::Action::EventAction::interrupt()
 {
   if( !m_pSource )
     return;
