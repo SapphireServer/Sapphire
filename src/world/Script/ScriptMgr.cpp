@@ -328,37 +328,37 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
   return didCallScript;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onExecute( Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onExecute( Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
-    script->onFinish( currentAction );
+    script->onExecute( action );
     return true;
   }
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInterrupt( Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onInterrupt( Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
-    script->onInterrupt( currentAction );
+    script->onInterrupt( action );
     return true;
   }
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onStart( Action::Action& currentAction )
+bool Sapphire::Scripting::ScriptMgr::onStart( Action::Action& action )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( currentAction.getId() );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
   {
-    script->onStart( currentAction );
+    script->onStart( action );
     return true;
   }
 

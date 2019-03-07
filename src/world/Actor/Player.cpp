@@ -34,6 +34,8 @@
 
 #include "Script/ScriptMgr.h"
 
+#include "Action/Action.h"
+
 #include "Math/CalcStats.h"
 #include "Math/CalcBattle.h"
 
@@ -1830,8 +1832,47 @@ void Sapphire::Entity::Player::emoteInterrupt()
 
 void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
-  m_teleportTargetAetheryte = aetheryteId;
-  sendDebug( "requested aetheryte destination: {0}", aetheryteId );
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  // TODO: only register this action if enough gil is in possession
+  auto targetAetheryte = pExdData->get< Sapphire::Data::Aetheryte >( aetheryteId );
+
+  if( targetAetheryte )
+  {
+    auto fromAetheryte = pExdData->get< Sapphire::Data::Aetheryte >(
+      pExdData->get< Sapphire::Data::TerritoryType >( getZoneId() )->aetheryte );
+
+    // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
+    auto cost = static_cast< uint16_t > (
+      ( std::sqrt( std::pow( fromAetheryte->aetherstreamX - targetAetheryte->aetherstreamX, 2 ) +
+                   std::pow( fromAetheryte->aetherstreamY - targetAetheryte->aetherstreamY, 2 ) ) / 2 ) + 100 );
+
+    // cap at 999 gil
+    cost = std::min< uint16_t >( 999, cost );
+
+    bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
+    // TODO: figure out what param1 really does
+    queuePacket( makeActorControl143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+
+    if( !insufficientGil )
+    {
+      m_teleportQuery.targetAetheryte = aetheryteId;
+      m_teleportQuery.cost = cost;
+    }
+    else
+    {
+      clearTeleportQuery();
+    }
+  }
+}
+
+Sapphire::Common::PlayerTeleportQuery Sapphire::Entity::Player::getTeleportQuery() const
+{
+  return m_teleportQuery;
+}
+
+void Sapphire::Entity::Player::clearTeleportQuery()
+{
+  memset( &m_teleportQuery, 0x0, sizeof( Common::PlayerTeleportQuery ) );
 }
 
 uint8_t Sapphire::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actorId )

@@ -533,6 +533,10 @@ namespace Sapphire::Entity
     /*! query teleport of a specified type */
     void teleportQuery( uint16_t aetheryteId );
 
+    Common::PlayerTeleportQuery getTeleportQuery() const;
+
+    void clearTeleportQuery();
+
     /*! prepares zoning / fades out the screen */
     void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
 
@@ -1086,7 +1090,7 @@ namespace Sapphire::Entity
     uint32_t m_mount;
     uint32_t m_emoteMode;
 
-    uint16_t m_teleportTargetAetheryte;
+    Common::PlayerTeleportQuery m_teleportQuery;
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

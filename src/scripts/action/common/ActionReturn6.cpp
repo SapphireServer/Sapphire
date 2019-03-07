@@ -12,12 +12,12 @@ public:
   {
   }
 
-  void onFinish( Sapphire::Action::Action& currentAction ) override
+  void onExecute( Sapphire::Action::Action& action ) override
   {
-    if( !currentAction.getSourceChara()->isPlayer() )
+    if( !action.getSourceChara()->isPlayer() )
       return;
 
-    currentAction.getSourceChara()->getAsPlayer()->returnToHomepoint();
+    action.getSourceChara()->getAsPlayer()->returnToHomepoint();
   }
 };
 
