@@ -29,7 +29,7 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
   if( !actionData->targetArea )
   {
     // not an action that has an aoe, cancel it
-    action->castInterrupt();
+    action->onInterrupt();
     return;
   }
 
@@ -44,7 +44,7 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   // cancel any aoe actions casted with this packet
   if( actionData->targetArea )
   {
-    action->castInterrupt();
+    action->onInterrupt();
     return;
   }
 
@@ -99,10 +99,10 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
-  if( !canPlayerUseAction( player, *currentAction, actionData ) )
+  if( !currentAction->precheck() )
   {
     // forcefully interrupt the action and reset the cooldown
-    currentAction->castInterrupt();
+    currentAction->onInterrupt();
     return;
   }
 
@@ -113,63 +113,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
   }
 
   // todo: what do in cases of swiftcast/etc? script callback?
-  currentAction->castStart();
-}
-
-bool World::Manager::ActionMgr::canPlayerUseAction( Entity::Player& player,
-                                                    Action::Action& currentAction,
-                                                    Data::Action& actionData )
-{
-  // lol
-  if( !player.isAlive() )
-    return false;
-
-  // npc actions/non player actions
-  if( actionData.classJob == -1 )
-    return false;
-
-  if( player.getLevel() < actionData.classJobLevel )
-    return false;
-
-  auto currentClass = player.getClass();
-  auto actionClass = static_cast< Common::ClassJob >( actionData.classJob );
-
-  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass )
-  {
-    // check if not a base class action
-    auto exdData = framework()->get< Data::ExdDataGenerated >();
-    assert( exdData );
-
-    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
-    if( !classJob )
-      return false;
-
-    if( classJob->classJobParent != actionData.classJob )
-      return false;
-  }
-
-  // reset target on actions that can only be casted on yourself while having a target set
-  // todo: check what actions send when targeting an enemy
-  if( actionData.canTargetSelf &&
-      !actionData.canTargetFriendly &&
-      !actionData.canTargetHostile &&
-      !actionData.canTargetParty )
-  {
-    currentAction.setTargetChara( currentAction.getSourceChara() );
-  }
-
-  // todo: party/enemy validation
-
-  // validate range
-
-
-  auto& actionCost = currentAction.getCostArray();
-  for( uint8_t i = 0; i < actionCost.size(); ++i )
-  {
-    // todo: validate costs/conditionals here
-  }
-
-  return true;
+  currentAction->onStart();
 }
 
 void World::Manager::ActionMgr::handleItemActionVFX( Sapphire::Entity::Player& player, uint32_t itemId, uint16_t vfxId )

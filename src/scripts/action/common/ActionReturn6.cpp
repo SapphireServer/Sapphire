@@ -12,7 +12,7 @@ public:
   {
   }
 
-  void onCastFinish( Sapphire::Action::Action& currentAction ) override
+  void onFinish( Sapphire::Action::Action& currentAction ) override
   {
     if( !currentAction.getSourceChara()->isPlayer() )
       return;

@@ -31,7 +31,6 @@ namespace Sapphire::World::Manager
 
   private:
     void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, Data::Action& actionData );
-    bool canPlayerUseAction( Entity::Player& player, Action::Action& currentAction, Data::Action& actionData );
 
     // item action handlers
     void handleItemActionVFX( Entity::Player& player, uint32_t itemId, uint16_t vfxId );

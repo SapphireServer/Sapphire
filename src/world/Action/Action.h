@@ -18,16 +18,9 @@ namespace Sapphire::Action
   {
 
   public:
-    struct ActionCostEntry
-    {
-      Common::ActionCostType m_costType;
-      uint16_t m_cost;
-    };
-
-    using ActionCostArray = std::array< ActionCostEntry, 2 >;
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr action, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw );
 
     virtual ~Action();
 
@@ -53,36 +46,34 @@ namespace Sapphire::Action
      */
     bool hasResidentTarget() const;
 
-    const ActionCostArray& getCostArray() const;
-
     /*!
      * @brief Tests whether the action is instantly usable or has a cast assoc'd with it
      * @return true if action has a cast time
      */
     bool hasCastTime() const;
 
-    void buildEffectPackets();
-
     /*!
-     * @brief Damages a target and adds the effect entry
-     * @param potency The amount of damage the target takes
-     * @param chara The chara to inflict damage upon
+     * @brief Tests if an action is castable by the current source chara
+     * @return true if castable, false if the caster doesn't meet the requirements
      */
-    void damageTarget( uint16_t potency, Entity::Chara& chara );
-
-    /*!
-     * @brief Heals a target and adds the effect entry
-     * @param potency Amount of healing to apply
-     * @param chara Chara to receive healing
-     */
-    void healTarget( uint16_t potency, Entity::Chara& chara );
+    bool precheck();
 
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
      */
-    virtual void castStart();
-    virtual void castFinish();
-    virtual void castInterrupt();
+    virtual void onStart();
+
+    /*!
+     * @brief Finishes the cast, effected targets are calculated here.
+     */
+    virtual void onExecute();
+
+    /*!
+     * @brief Called when a cast is interrupted for any reason
+     *
+     * m_interruptType will have the reason why the action was interrupted (eg. damage, movement, ...)
+     */
+    virtual void onInterrupt();
 
     // update action, if returns true, action is done and has to be removed from the actor
     virtual bool update();
@@ -90,31 +81,14 @@ namespace Sapphire::Action
   protected:
 
     void calculateActionCost();
-    void calculateMPCost( uint8_t costArrayIndex );
+    void calculateMPCost( uint16_t baseCost );
 
-    /*!
-     * @brief Some actions are capable of both healing and dealing damage. This identifies them.
-     */
-    enum EffectPacketIdentity : uint8_t
-    {
-      DamageEffect,
-      HealingEffect,
-
-      MAX_ACTION_EFFECT_PACKET_IDENT
-    };
-
-    struct EffectPacketData
-    {
-      std::vector< Common::EffectEntry > m_entries;
-      std::vector< uint32_t > m_hitActors;
-    };
+    bool playerPrecheck( Entity::Player& player );
 
     uint32_t m_id;
 
-    Common::ActionCostType m_costType;
-    uint16_t m_cost;
-
-    ActionCostArray m_actionCost;
+    Common::ActionPrimaryCostType m_primaryCostType;
+    uint16_t m_primaryCost;
 
     uint64_t m_startTime;
     uint32_t m_castTime;
@@ -124,6 +98,7 @@ namespace Sapphire::Action
     uint8_t m_effectRange;
     Common::ActionAspect m_aspect;
 
+
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;
     uint64_t m_targetId;
@@ -132,10 +107,9 @@ namespace Sapphire::Action
     Common::ActionInterruptType m_interruptType;
 
     FrameworkPtr m_pFw;
+    Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
-
-    std::array< EffectPacketData, MAX_ACTION_EFFECT_PACKET_IDENT > m_effects;
   };
 }
 
