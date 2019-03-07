@@ -388,17 +388,6 @@ struct FFXIVIpcUpdateHpMpTp :
 * Structural representation of the packet sent by the server
 * for battle actions
 */
-struct EffectEntry
-{
-  Common::ActionEffectType effectType;
-  Common::ActionHitSeverityType hitSeverity;
-  uint8_t param;
-  int8_t bonusPercent; // shows an additional percentage in the battle log, will not change the damage number sent & shown
-  uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
-  uint8_t flags;
-  int16_t value;
-};
-
 struct EffectHeader
 {
   uint64_t animationTargetId; // who the animation targets
@@ -426,7 +415,7 @@ struct FFXIVIpcEffect : FFXIVIpcBasePacket< Effect >
   uint64_t animationTargetId; // who the animation targets
 
   uint32_t actionId; // what the casting player casts, shown in battle log/ui
-  uint32_t globalEffectCounter; // seems to only increment on retail?
+  uint32_t sequence; // seems to only increment on retail?
 
   float animationLockTime; // maybe? doesn't seem to do anything
   uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
@@ -458,7 +447,7 @@ struct FFXIVIpcAoeEffect
 {
   EffectHeader header;
 
-  EffectEntry effects[size];
+  Common::EffectEntry effects[size];
 
   uint16_t padding_6A[3];
 
@@ -1154,15 +1143,15 @@ struct FFXIVIpcCurrencyCrystalInfo :
 struct FFXIVIpcInventoryTransactionFinish :
   FFXIVIpcBasePacket< InventoryTransactionFinish >
 {
-  uint32_t transactionId;
-  uint32_t transactionId1;
+  uint32_t sequenceId;
+  uint32_t sequenceId1;
   uint64_t padding;
 };
 
 struct FFXIVIpcInventoryTransaction :
   FFXIVIpcBasePacket< InventoryTransaction >
 {
-  uint32_t transactionId;
+  uint32_t sequence;
   uint8_t type;
   uint8_t padding;
   uint16_t padding1;

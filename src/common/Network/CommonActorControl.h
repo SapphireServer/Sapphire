@@ -17,10 +17,10 @@ enum ActorControlType : uint16_t
 {
     /*! Toggles weapon status -> Sheathed/UnSheathed
         \param param1 status 0|1 */
-      ToggleWeapon = 0x00,
+    ToggleWeapon = 0x00,
     /*! Toggles Autoattack status on/off
         \param param1 status 0|1 */
-      AutoAttack = 0x01,
+    AutoAttack = 0x01,
     SetStatus = 0x02,
     CastStart = 0x03,
     ToggleAggro = 0x04,
@@ -35,6 +35,13 @@ enum ActorControlType : uint16_t
     DeathAnimation = 0x0E,
     CastInterrupt = 0x0F,
 
+    /*!
+     * @brief Sent when a player uses an action
+     *
+     * param1 Seems to be always 1 from what I've seen, needs more research
+     * param2 The actionid
+     * param3 The action cooldown in ms / 10
+     */
     ActionStart = 0x11,
 
     StatusEffectGain = 0x14,

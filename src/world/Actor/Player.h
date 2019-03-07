@@ -52,12 +52,12 @@ namespace Sapphire::Entity
     // EventHandlers
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! start an event action */
-    void eventActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback,
-                           ActionCallback interruptCallback, uint64_t additional );
+    void eventActionStart( uint32_t eventId, uint32_t action, Action::ActionCallback finishCallback,
+                           Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start an event item action */
-    void eventItemActionStart( uint32_t eventId, uint32_t action, ActionCallback finishCallback,
-                               ActionCallback interruptCallback, uint64_t additional );
+    void eventItemActionStart( uint32_t eventId, uint32_t action, Action::ActionCallback finishCallback,
+                               Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start/register a normal event */
     void
@@ -531,7 +531,11 @@ namespace Sapphire::Entity
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
 
     /*! query teleport of a specified type */
-    void teleportQuery( uint16_t aetheryteId, FrameworkPtr pFw );
+    void teleportQuery( uint16_t aetheryteId );
+
+    Common::PlayerTeleportQuery getTeleportQuery() const;
+
+    void clearTeleportQuery();
 
     /*! prepares zoning / fades out the screen */
     void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
@@ -1085,6 +1089,8 @@ namespace Sapphire::Entity
     uint16_t m_companionId;
     uint32_t m_mount;
     uint32_t m_emoteMode;
+
+    Common::PlayerTeleportQuery m_teleportQuery;
 
     Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

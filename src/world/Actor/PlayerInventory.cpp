@@ -751,7 +751,7 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
 void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )
 {
   // i am not entirely sure how this should be generated or if it even is important for us...
-  uint32_t transactionId = getNextInventorySequence();
+  uint32_t sequence = getNextInventorySequence();
 
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
 
@@ -761,7 +761,7 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fr
   updateContainer( fromInventoryId, fromSlotId, nullptr );
 
   auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
-  invTransPacket->data().transactionId = transactionId;
+  invTransPacket->data().sequence = sequence;
   invTransPacket->data().ownerId = getId();
   invTransPacket->data().storageId = fromInventoryId;
   invTransPacket->data().catalogId = fromItem->getId();
@@ -771,8 +771,8 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fr
   queuePacket( invTransPacket );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
-  invTransFinPacket->data().transactionId = transactionId;
-  invTransFinPacket->data().transactionId1 = transactionId;
+  invTransFinPacket->data().sequenceId = sequence;
+  invTransFinPacket->data().sequenceId1 = sequence;
   queuePacket( invTransFinPacket );
 }
 
@@ -883,7 +883,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
 
   // send inv update
   auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
-  invTransPacket->data().transactionId = seq;
+  invTransPacket->data().sequence = seq;
   invTransPacket->data().ownerId = getId();
   invTransPacket->data().storageId = type;
   invTransPacket->data().catalogId = item->getId();
@@ -893,8 +893,8 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
   queuePacket( invTransPacket );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
-  invTransFinPacket->data().transactionId = seq;
-  invTransFinPacket->data().transactionId1 = seq;
+  invTransFinPacket->data().sequenceId = seq;
+  invTransFinPacket->data().sequenceId1 = seq;
   queuePacket( invTransFinPacket );
 
   return item;

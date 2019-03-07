@@ -26,7 +26,6 @@
 #include "Manager/EventMgr.h"
 
 #include "Action/Action.h"
-#include "Action/ActionTeleport.h"
 
 
 #include "Session.h"
@@ -140,7 +139,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::CastCancel: // Cancel cast
     {
       if( player.getCurrentAction() )
-        player.getCurrentAction()->setInterrupted();
+        player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
       break;
     }
     case ClientTriggerType::Examine:
@@ -275,11 +274,15 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::Teleport: // Teleport
     {
 
-      player.teleportQuery( param11, pFw );
+      player.teleportQuery( param11 );
       break;
     }
     case ClientTriggerType::DyeItem: // Dye item
     {
+      // param11 = item to dye container
+      // param12 = item to dye slot
+      // param2 = dye bag container
+      // param4 = dye bag slot
       break;
     }
     case ClientTriggerType::DirectorInitFinish: // Director init finish

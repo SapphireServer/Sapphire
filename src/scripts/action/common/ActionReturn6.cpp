@@ -1,6 +1,7 @@
 #include <Script/NativeScriptApi.h>
-#include "../ScriptObject.h"
+#include <ScriptObject.h>
 #include <Actor/Player.h>
+#include <Action/Action.h>
 
 class ActionReturn6 :
   public Sapphire::ScriptAPI::ActionScript
@@ -11,9 +12,12 @@ public:
   {
   }
 
-  void onCastFinish( Sapphire::Entity::Player& player, Sapphire::Entity::Chara& targetActor ) override
+  void onExecute( Sapphire::Action::Action& action ) override
   {
-    player.returnToHomepoint();
+    if( !action.getSourceChara()->isPlayer() )
+      return;
+
+    action.getSourceChara()->getAsPlayer()->returnToHomepoint();
   }
 };
 

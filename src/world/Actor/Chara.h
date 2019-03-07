@@ -180,8 +180,6 @@ namespace Sapphire::Entity
 
     Common::ClassJob getClass() const;
 
-    uint8_t getClassAsInt() const;
-
     void setClass( Common::ClassJob classJob );
 
     void setTargetId( uint64_t targetId );
@@ -211,9 +209,6 @@ namespace Sapphire::Entity
     Common::ActorStatus getStatus() const;
 
     void setStatus( Common::ActorStatus status );
-
-    void
-    handleScriptSkill( uint32_t type, uint16_t actionId, uint64_t param1, uint64_t param2, Entity::Chara& target );
 
     virtual void autoAttack( CharaPtr pTarget );
 

@@ -9,6 +9,7 @@
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
 #include "Event/EventHandler.h"
+#include "Action/Action.h"
 
 #include "Manager/EventMgr.h"
 
@@ -299,13 +300,69 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
   return true;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onCastFinish( Entity::Player& player, Entity::CharaPtr pTarget, uint32_t actionId )
+bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( actionId );
+  auto pEventMgr = framework()->get< World::Manager::EventMgr >();
+  bool didCallScript = false;
+
+  for( size_t i = 0; i < 30; i++ )
+  {
+    auto activeQuests = player.getQuestActive( static_cast< uint16_t >( i ) );
+    if( !activeQuests )
+      continue;
+
+    uint32_t questId = activeQuests->c.questId | Event::EventHandler::EventHandlerType::Quest << 16;
+
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
+    if( script )
+    {
+      didCallScript = true;
+      std::string objName = pEventMgr->getEventName( questId );
+
+      player.sendDebug( "Calling: {0}.onEObjHit actorId#{1}", objName, actorId );
+
+      script->onEObjHit( player, actorId );
+    }
+  }
+
+  return didCallScript;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onExecute( Action::Action& action )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
 
   if( script )
-    script->onCastFinish( player, *pTarget );
-  return true;
+  {
+    script->onExecute( action );
+    return true;
+  }
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onInterrupt( Action::Action& action )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+
+  if( script )
+  {
+    script->onInterrupt( action );
+    return true;
+  }
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onStart( Action::Action& action )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+
+  if( script )
+  {
+    script->onStart( action );
+    return true;
+  }
+
+  return false;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId )
