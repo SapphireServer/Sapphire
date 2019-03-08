@@ -287,7 +287,7 @@ int Sapphire::Network::RestConnector::createCharacter( char* sId, std::string na
 {
   std::string json_string =
     "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name +
-    "\",\"infoJson\": \"" + Sapphire::Util::base64_encode( ( uint8_t* ) infoJson.c_str(), infoJson.length() ) + "\"}";
+    "\",\"infoJson\": \"" + Sapphire::Util::base64Encode( ( uint8_t* ) infoJson.c_str(), infoJson.length() ) + "\"}";
 
   HttpResponse r = requestApi( "createCharacter", json_string );
 

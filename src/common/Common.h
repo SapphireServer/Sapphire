@@ -374,8 +374,7 @@ namespace Sapphire::Common
     uint32_t sourceActorId;
   };
 
-  enum CharaLook :
-    uint8_t
+  enum CharaLook : uint8_t
   {
     Race = 0x00,
     Gender = 0x01,
@@ -406,8 +405,7 @@ namespace Sapphire::Common
 
   };
 
-  enum MoveType :
-    uint8_t
+  enum MoveType : uint8_t
   {
     Running = 0x00,
     Walking = 0x02,
@@ -415,8 +413,7 @@ namespace Sapphire::Common
     Jumping = 0x10,
   };
 
-  enum MoveState :
-    uint8_t
+  enum MoveState : uint8_t
   {
     No = 0x00,
     LeaveCollision = 0x01,
@@ -424,8 +421,7 @@ namespace Sapphire::Common
     StartFalling = 0x04,
   };
 
-  enum MoveSpeed :
-    uint8_t
+  enum MoveSpeed : uint8_t
   {
     Walk = 24,
     Run = 60,
@@ -797,8 +793,7 @@ namespace Sapphire::Common
     Unused100
   };
 
-  enum EquipDisplayFlags :
-    uint8_t
+  enum EquipDisplayFlags : uint8_t
   {
     HideNothing = 0x0,
     HideHead = 0x1,
@@ -811,8 +806,7 @@ namespace Sapphire::Common
     Visor = 0x40,
   };
 
-  enum SkillType :
-    uint8_t
+  enum SkillType : uint8_t
   {
     Normal = 0x1,
     ItemAction = 0x2,
