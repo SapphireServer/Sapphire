@@ -211,7 +211,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, framework() );
 
   std::vector< std::thread > thread_list;
-  thread_list.emplace_back( std::thread( std::bind( &Network::Hive::Run, hive.get() ) ) );
+  thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
 
   auto pDebugCom = std::make_shared< DebugCommandMgr >( framework() );
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >( framework() );

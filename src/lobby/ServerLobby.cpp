@@ -73,7 +73,7 @@ namespace Sapphire
 
     std::vector< std::thread > threadGroup;
 
-    threadGroup.emplace_back( std::bind( &Network::Hive::Run, hive.get() ) );
+    threadGroup.emplace_back( std::bind( &Network::Hive::run, hive.get() ) );
 
     for( auto& thread : threadGroup )
       if( thread.joinable() )

@@ -47,13 +47,13 @@ namespace Sapphire::Network
     void generateEncryptionKey( uint32_t key, const std::string& keyPhrase );
 
     // overwrite the parents onConnect for our game socket needs
-    void OnAccept( const std::string& host, uint16_t port ) override;
+    void onAccept( const std::string& host, uint16_t port ) override;
 
-    void OnDisconnect() override;
+    void onDisconnect() override;
 
-    void OnRecv( std::vector< uint8_t >& buffer ) override;
+    void onRecv( std::vector< uint8_t >& buffer ) override;
 
-    void OnError( const asio::error_code& error ) override;
+    void onError( const asio::error_code& error ) override;
 
     void sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId );
 

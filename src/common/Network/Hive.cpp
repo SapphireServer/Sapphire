@@ -2,8 +2,8 @@
 #include <functional>
 #include "Hive.h"
 
-namespace Sapphire {
-namespace Network {
+namespace Sapphire::Network
+{
 
 //-----------------------------------------------------------------------------
 
@@ -17,29 +17,29 @@ Hive::~Hive()
 {
 }
 
-asio::io_service& Hive::GetService()
+asio::io_service& Hive::getService()
 {
   return m_io_service;
 }
 
-bool Hive::HasStopped()
+bool Hive::hasStopped()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 1;
   return m_shutdown.compare_exchange_strong( v1, v2 );
 }
 
-void Hive::Poll()
+void Hive::poll()
 {
   m_io_service.poll();
 }
 
-void Hive::Run()
+void Hive::run()
 {
   m_io_service.run();
 }
 
-void Hive::Stop()
+void Hive::stop()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 0;
@@ -51,7 +51,7 @@ void Hive::Stop()
   }
 }
 
-void Hive::Reset()
+void Hive::reset()
 {
   uint32_t v1 = 0;
   uint32_t v2 = 1;
@@ -62,5 +62,4 @@ void Hive::Reset()
   }
 }
 
-}
 }
