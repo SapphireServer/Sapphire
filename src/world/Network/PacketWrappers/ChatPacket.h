@@ -1,7 +1,7 @@
 #ifndef _CHATPACKET_H
 #define _CHATPACKET_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 

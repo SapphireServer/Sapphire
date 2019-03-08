@@ -1,7 +1,7 @@
 #ifndef _QUESTMESSAGE_H
 #define _QUESTMESSAGE_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 

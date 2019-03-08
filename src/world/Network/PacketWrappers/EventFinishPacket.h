@@ -1,7 +1,7 @@
 #ifndef _EVENTFINISH_H
 #define _EVENTFINISH_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 
 namespace Sapphire::Network::Packets::Server
 {

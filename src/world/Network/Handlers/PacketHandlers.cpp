@@ -1,7 +1,7 @@
 #include <Common.h>
 #include <Vector3.cpp>
 #include <Network/CommonNetwork.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>

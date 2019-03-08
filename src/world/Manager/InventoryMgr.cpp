@@ -6,7 +6,7 @@
 #include "Inventory/HousingItem.h"
 #include "Manager/ItemMgr.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 
 #include <Database/DatabaseDef.h>
 #include <Exd/ExdDataGenerated.h>

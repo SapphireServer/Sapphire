@@ -8,7 +8,6 @@
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 
 #include <Logging/Logger.h>
-#include <Network/GamePacketNew.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/CommonActorControl.h>
 #include <Util/UtilMath.h>

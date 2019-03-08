@@ -10,7 +10,7 @@
 #include <MySqlBase.h>
 #include <Connection.h>
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Actor/Player.h"

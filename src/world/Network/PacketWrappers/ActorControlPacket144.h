@@ -1,7 +1,7 @@
 #ifndef _ACTORCONTROL144_H
 #define _ACTORCONTROL144_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 namespace Sapphire::Network::Packets::Server

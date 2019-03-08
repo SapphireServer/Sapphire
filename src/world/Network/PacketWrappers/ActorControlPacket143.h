@@ -1,7 +1,7 @@
 #ifndef _ACTORCONTROL143_H
 #define _ACTORCONTROL143_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 

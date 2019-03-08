@@ -2,7 +2,7 @@
 #define _PLAYERSPAWN_H
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Util/Util.h>
 #include "Actor/Player.h"
 #include "Forwards.h"

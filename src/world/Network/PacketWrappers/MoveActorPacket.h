@@ -1,7 +1,7 @@
 #ifndef _MOVEACTORPACKET_H
 #define _MOVEACTORPACKET_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Util/UtilMath.h>
 #include "Actor/Player.h"

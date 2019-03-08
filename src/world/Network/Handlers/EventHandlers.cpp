@@ -2,7 +2,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonNetwork.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>

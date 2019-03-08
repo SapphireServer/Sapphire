@@ -1,7 +1,7 @@
 #ifndef _DIRECTORPLAYSCENE_H
 #define _DIRECTORPLAYSCENE_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include "Forwards.h"
 
 namespace Sapphire::Network::Packets::Server

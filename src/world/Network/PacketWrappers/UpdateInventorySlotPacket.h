@@ -1,7 +1,7 @@
 #ifndef _INVENTORY_SLOT_UPDATE_PACKET_H
 #define _INVENTORY_SLOT_UPDATE_PACKET_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include "Actor/Player.h"
 #include "Inventory/Item.h"
 #include "Forwards.h"
