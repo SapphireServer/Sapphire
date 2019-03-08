@@ -2,7 +2,7 @@
 
 #include <Common.h>
 #include <Version.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>

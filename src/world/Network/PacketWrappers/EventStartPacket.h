@@ -1,7 +1,7 @@
 #ifndef _EVENTSTART_H
 #define _EVENTSTART_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include "Forwards.h"
 
 namespace Sapphire::Network::Packets::Server

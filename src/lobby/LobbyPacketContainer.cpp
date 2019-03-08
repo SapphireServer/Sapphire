@@ -1,6 +1,6 @@
 #include "LobbyPacketContainer.h"
 #include <Network/CommonNetwork.h>
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Crypt/blowfish.h>
 #include <Common.h>
 

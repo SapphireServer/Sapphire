@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_EFFECTPACKET_H
 #define SAPPHIRE_EFFECTPACKET_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 #include <string>

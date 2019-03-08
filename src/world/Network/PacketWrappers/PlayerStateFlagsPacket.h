@@ -1,7 +1,7 @@
 #ifndef _PLAYERSTATE_H
 #define _PLAYERSTATE_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 

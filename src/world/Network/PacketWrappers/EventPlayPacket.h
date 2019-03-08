@@ -1,7 +1,7 @@
 #ifndef _EVENTPLAY_H
 #define _EVENTPLAY_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include "Forwards.h"
 
 namespace Sapphire::Network::Packets::Server

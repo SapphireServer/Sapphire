@@ -1,7 +1,7 @@
 #ifndef _SERVERNOTICEPACKET_H
 #define _SERVERNOTICEPACKET_H
 
-#include <Network/GamePacketNew.h>
+#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 
