@@ -55,94 +55,94 @@ namespace Sapphire::Network
 
     Connection& operator=( const Connection& rhs );
 
-    void StartSend();
+    void startSend();
 
-    void StartRecv( int32_t total_bytes );
+    void startRecv( int32_t total_bytes );
 
-    void StartError( const asio::error_code& error );
+    void startError( const asio::error_code& error );
 
-    void DispatchSend( std::vector< uint8_t > buffer );
+    void dispatchSend( std::vector< uint8_t > buffer );
 
-    void DispatchRecv( int32_t total_bytes );
+    void dispatchRecv( int32_t total_bytes );
 
-    void HandleConnect( const asio::error_code& error );
+    void handleConnect( const asio::error_code& error );
 
-    void HandleSend( const asio::error_code& error, std::list< std::vector< uint8_t > >::iterator itr );
+    void handleSend( const asio::error_code& error, std::list< std::vector< uint8_t > >::iterator itr );
 
-    void HandleRecv( const asio::error_code& error, int32_t actual_bytes );
+    void handleRecv( const asio::error_code& error, int32_t actual_bytes );
 
 
   private:
     // Called when the connection has successfully connected to the local host.
-    virtual void OnAccept( const std::string& host, uint16_t port )
+    virtual void onAccept( const std::string& host, uint16_t port )
     {
     };
 
     // Called when the connection has successfully connected to the remote host.
-    virtual void OnConnect( const std::string& host, uint16_t port )
+    virtual void onConnect( const std::string& host, uint16_t port )
     {
     };
 
     // Called when data has been sent by the connection.
-    virtual void OnSend( const std::vector< uint8_t >& buffer )
+    virtual void onSend( const std::vector< uint8_t >& buffer )
     {
     };
 
     // Called when data has been received by the connection.
-    virtual void OnRecv( std::vector< uint8_t >& buffer )
+    virtual void onRecv( std::vector< uint8_t >& buffer )
     {
     };
 
     // Called when an error is encountered.
-    virtual void OnError( const asio::error_code& error )
+    virtual void onError( const asio::error_code& error )
     {
     };
 
     // Called when the connection has been disconnected
-    virtual void OnDisconnect()
+    virtual void onDisconnect()
     {
     };
 
   public:
     // Returns the Hive object.
-    HivePtr GetHive();
+    HivePtr getHive();
 
     // Returns the socket object.
-    asio::ip::tcp::socket& GetSocket();
+    asio::ip::tcp::socket& getSocket();
 
     // Returns the strand object.
-    asio::strand& GetStrand();
+    asio::strand& getStrand();
 
     // Sets the application specific receive buffer size used. For stream
     // based protocols such as HTTP, you want this to be pretty large, like
     // 64kb. For packet based protocols, then it will be much smaller,
     // usually 512b - 8kb depending on the protocol. The default value is
     // 4kb.
-    void SetReceiveBufferSize( int32_t size );
+    void setReceiveBufferSize( int32_t size );
 
     // Returns the size of the receive buffer size of the current object.
-    int32_t GetReceiveBufferSize() const;
+    int32_t getReceiveBufferSize() const;
 
     // Returns true if this object has an error associated with it.
-    bool HasError();
+    bool hasError();
 
     // Binds the socket to the specified interface.
-    void Bind( const std::string& ip, uint16_t port );
+    void bind( const std::string& ip, uint16_t port );
 
     // Starts an a/synchronous connect.
-    void Connect( const std::string& host, uint16_t port );
+    void connect( const std::string& host, uint16_t port );
 
     // Posts data to be sent to the connection.
-    void Send( const std::vector< uint8_t >& buffer );
+    void send( const std::vector< uint8_t >& buffer );
 
     // Posts a recv for the connection to process. If total_bytes is 0, then
     // as many bytes as possible up to GetReceiveBufferSize() will be
     // waited for. If Recv is not 0, then the connection will wait for exactly
     // total_bytes before invoking OnRecv.
-    void Recv( int32_t total_bytes = 0 );
+    void recv( int32_t total_bytes = 0 );
 
     // Posts an asynchronous disconnect event for the object to process.
-    void Disconnect();
+    void disconnect();
   };
 
   //-----------------------------------------------------------------------------
@@ -155,9 +155,9 @@ namespace Sapphire::Network
     try
     {
       AcceptorPtr acceptor( new Acceptor( pHive ) );
-      acceptor->Listen( listenIp, port );
+      acceptor->listen( listenIp, port );
       std::shared_ptr< T > connection( new T( pHive, acceptor, pFw ) );
-      acceptor->Accept( connection );
+      acceptor->accept( connection );
       return connection;
     }
     catch( std::runtime_error e )

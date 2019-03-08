@@ -68,10 +68,10 @@ bool Sapphire::World::Session::loadPlayer()
 void Sapphire::World::Session::close()
 {
   if( m_pZoneConnection )
-    m_pZoneConnection->Disconnect();
+    m_pZoneConnection->disconnect();
 
   if( m_pChatConnection )
-    m_pChatConnection->Disconnect();
+    m_pChatConnection->disconnect();
 
   // remove the session from the player
   if( m_pPlayer )

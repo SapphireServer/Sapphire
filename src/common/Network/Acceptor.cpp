@@ -2,15 +2,15 @@
 #include "Acceptor.h"
 #include "Connection.h"
 
-namespace Sapphire {
-namespace Network {
+namespace Sapphire::Network 
+{
 
 //-----------------------------------------------------------------------------
 
 Acceptor::Acceptor( HivePtr hive ) :
   m_hive( hive ),
-  m_acceptor( hive->GetService() ),
-  m_io_strand( hive->GetService() ),
+  m_acceptor( hive->getService() ),
+  m_io_strand( hive->getService() ),
   m_error_state( 0 )
 {
 }
@@ -20,18 +20,17 @@ Acceptor::~Acceptor()
 }
 
 
-bool Acceptor::OnAccept( ConnectionPtr connection, const std::string& host, uint16_t port )
+bool Acceptor::onAccept( ConnectionPtr connection, const std::string& host, uint16_t port )
 {
   return true;
 }
 
-void Acceptor::OnError( const asio::error_code& error )
+void Acceptor::onError( const asio::error_code& error )
 {
 
 }
 
-
-void Acceptor::StartError( const asio::error_code& error )
+void Acceptor::startError( const asio::error_code& error )
 {
   uint32_t v1 = 1;
   uint32_t v2 = 0;
@@ -40,60 +39,60 @@ void Acceptor::StartError( const asio::error_code& error )
     asio::error_code ec;
     m_acceptor.cancel( ec );
     m_acceptor.close( ec );
-    OnError( error );
+    onError( error );
   }
 }
 
-void Acceptor::DispatchAccept( ConnectionPtr connection )
+void Acceptor::dispatchAccept( ConnectionPtr connection )
 {
-  m_acceptor.async_accept( connection->GetSocket(),
-                           connection->GetStrand().wrap( std::bind( &Acceptor::HandleAccept,
+  m_acceptor.async_accept( connection->getSocket(),
+                           connection->getStrand().wrap( std::bind( &Acceptor::handleAccept,
                                                                     shared_from_this(),
                                                                     std::placeholders::_1,
                                                                     connection ) ) );
 }
 
-void Acceptor::HandleAccept( const asio::error_code& error, ConnectionPtr connection )
+void Acceptor::handleAccept( const asio::error_code& error, ConnectionPtr connection )
 {
-  if( error || HasError() || m_hive->HasStopped() )
+  if( error || hasError() || m_hive->hasStopped() )
   {
-    connection->StartError( error );
+    connection->startError( error );
   }
   else
   {
-    if( connection->GetSocket().is_open() )
+    if( connection->getSocket().is_open() )
     {
-      if( OnAccept( connection,
-                    connection->GetSocket().remote_endpoint().address().to_string(),
-                    connection->GetSocket().remote_endpoint().port() ) )
+      if( onAccept( connection,
+                    connection->getSocket().remote_endpoint().address().to_string(),
+                    connection->getSocket().remote_endpoint().port() ) )
       {
-        connection->OnAccept( m_acceptor.local_endpoint().address().to_string(),
+        connection->onAccept( m_acceptor.local_endpoint().address().to_string(),
                               m_acceptor.local_endpoint().port() );
-        connection->Recv();
+        connection->recv();
       }
     }
     else
     {
-      connection->StartError( error );
+      connection->startError( error );
     }
   }
 }
 
-void Acceptor::Stop()
+void Acceptor::stop()
 {
 
 }
 
-void Acceptor::Accept( ConnectionPtr connection )
+void Acceptor::accept( ConnectionPtr connection )
 {
-  m_io_strand.post( std::bind( &Acceptor::DispatchAccept, shared_from_this(), connection ) );
+  m_io_strand.post( std::bind( &Acceptor::dispatchAccept, shared_from_this(), connection ) );
 }
 
-void Acceptor::Listen( const std::string& host, const uint16_t& port )
+void Acceptor::listen( const std::string& host, const uint16_t& port )
 {
   try
   {
-    asio::ip::tcp::resolver resolver( m_hive->GetService() );
+    asio::ip::tcp::resolver resolver( m_hive->getService() );
     asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
     asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 
@@ -110,22 +109,21 @@ void Acceptor::Listen( const std::string& host, const uint16_t& port )
 
 }
 
-HivePtr Acceptor::GetHive()
+HivePtr Acceptor::getHive()
 {
   return m_hive;
 }
 
-asio::ip::tcp::acceptor& Acceptor::GetAcceptor()
+asio::ip::tcp::acceptor& Acceptor::getAcceptor()
 {
   return m_acceptor;
 }
 
-bool Acceptor::HasError()
+bool Acceptor::hasError()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 1;
   return ( m_error_state.compare_exchange_strong( v1, v2 ) );
 }
 
-}
 }

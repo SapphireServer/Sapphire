@@ -33,11 +33,11 @@ namespace Sapphire::Network
 
     Acceptor& operator=( const Acceptor& rhs );
 
-    void StartError( const asio::error_code& error );
+    void startError( const asio::error_code& error );
 
-    void DispatchAccept( ConnectionPtr connection );
+    void dispatchAccept( ConnectionPtr connection );
 
-    void HandleAccept( const asio::error_code& error, ConnectionPtr connection );
+    void handleAccept( const asio::error_code& error, ConnectionPtr connection );
 
   private:
     // Called when a connection has connected to the server. This function
@@ -45,12 +45,12 @@ namespace Sapphire::Network
     // connection will be kept. If the connection will not be kept, the
     // connection's Disconnect function should be called and the function
     // should return false.
-    virtual bool OnAccept( ConnectionPtr connection, const std::string& host, uint16_t port );
+    virtual bool onAccept( ConnectionPtr connection, const std::string& host, uint16_t port );
 
     // Called when an error is encountered. Most typically, this is when the
     // acceptor is being closed via the Stop function or if the Listen is
     // called on an address that is not available.
-    virtual void OnError( const asio::error_code& error );
+    virtual void onError( const asio::error_code& error );
 
   public:
     Acceptor( HivePtr hive );
@@ -58,28 +58,28 @@ namespace Sapphire::Network
     virtual ~Acceptor();
 
     // Returns the Hive object.
-    HivePtr GetHive();
+    HivePtr getHive();
 
     // Returns the acceptor object.
-    asio::ip::tcp::acceptor& GetAcceptor();
+    asio::ip::tcp::acceptor& getAcceptor();
 
     // Returns the strand object.
-    asio::strand& GetStrand();
+    asio::strand& getStrand();
 
     // Returns true if this object has an error associated with it.
-    bool HasError();
+    bool hasError();
 
   public:
     // Begin listening on the specific network interface.
-    void Listen( const std::string& host, const uint16_t& port );
+    void listen( const std::string& host, const uint16_t& port );
 
     // Posts the connection to the listening interface. The next client that
     // connections will be given this connection. If multiple calls to Accept
     // are called at a time, then they are accepted in a FIFO order.
-    void Accept( ConnectionPtr connection );
+    void accept( ConnectionPtr connection );
 
     // Stop the Acceptor from listening.
-    void Stop();
+    void stop();
   };
 
 }

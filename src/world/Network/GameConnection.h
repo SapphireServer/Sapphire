@@ -62,13 +62,13 @@ namespace Sapphire::Network
     ~GameConnection();
 
     // overwrite the parents onConnect for our game socket needs
-    void OnAccept( const std::string& host, uint16_t port ) override;
+    void onAccept( const std::string& host, uint16_t port ) override;
 
-    void OnDisconnect() override;
+    void onDisconnect() override;
 
-    void OnRecv( std::vector< uint8_t >& buffer ) override;
+    void onRecv( std::vector< uint8_t >& buffer ) override;
 
-    void OnError( const asio::error_code& error ) override;
+    void onError( const asio::error_code& error ) override;
 
     void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                         const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );

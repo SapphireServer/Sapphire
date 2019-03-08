@@ -38,21 +38,21 @@ Sapphire::Network::GameConnection::~GameConnection()
 
 
 // overwrite the parents onConnect for our game socket needs
-void Sapphire::Network::GameConnection::OnAccept( const std::string& host, uint16_t port )
+void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint16_t port )
 {
   auto connection = make_GameConnection( m_hive, m_pAcceptor, m_pFw );
-  m_pAcceptor->Accept( connection );
+  m_pAcceptor->accept( connection );
 
   Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
 
 
-void Sapphire::Network::GameConnection::OnDisconnect()
+void Sapphire::Network::GameConnection::onDisconnect()
 {
   Logger::debug( "DISCONNECT" );
 }
 
-void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
+void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 {
   Packets::FFXIVARR_PACKET_HEADER packetHeader;
   const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
@@ -61,14 +61,14 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
   {
     Logger::info( "Dropping connection due to incomplete packet header." );
     Logger::info( "FIXME: Packet message bounary is not implemented." );
-    Disconnect();
+    disconnect();
     return;
   }
 
   if( headerResult == Malformed )
   {
     Logger::info( "Dropping connection due to malformed packet header." );
-    Disconnect();
+    disconnect();
     return;
   }
 
@@ -81,14 +81,14 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
   {
     Logger::info( "Dropping connection due to incomplete packets." );
     Logger::info( "FIXME: Packet message bounary is not implemented." );
-    Disconnect();
+    disconnect();
     return;
   }
 
   if( packetResult == Malformed )
   {
     Logger::info( "Dropping connection due to malformed packets." );
-    Disconnect();
+    disconnect();
     return;
   }
 
@@ -97,7 +97,7 @@ void Sapphire::Network::GameConnection::OnRecv( std::vector< uint8_t >& buffer )
 
 }
 
-void Sapphire::Network::GameConnection::OnError( const asio::error_code& error )
+void Sapphire::Network::GameConnection::onError( const asio::error_code& error )
 {
   Logger::info( "GameConnection closed: {0}", error.message() );
 }
@@ -432,7 +432,7 @@ void Sapphire::Network::GameConnection::sendPacket( Packets::LobbyPacketContaine
   uint8_t* dataPtr = pLpc.getRawData( false );
   std::vector< uint8_t > sendBuffer;
   sendBuffer.assign( dataPtr, dataPtr + size );
-  Send( sendBuffer );
+  send( sendBuffer );
 }
 
 void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
@@ -440,7 +440,7 @@ void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* p
   std::vector< uint8_t > sendBuffer;
 
   pPacket->fillSendBuffer( sendBuffer );
-  Send( sendBuffer );
+  send( sendBuffer );
 }
 
 void Sapphire::Network::GameConnection::sendSinglePacket( FFXIVPacketBasePtr pPacket )
