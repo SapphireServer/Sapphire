@@ -18,7 +18,7 @@ Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
 }
 
 Sapphire::Db::DbConnection::DbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* queue,
-                                      Sapphire::Db::ConnectionInfo& connInfo ) :
+                                          Sapphire::Db::ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),
   m_queue( queue ),
@@ -209,7 +209,9 @@ std::shared_ptr< Mysql::PreparedStatement > Sapphire::Db::DbConnection::getPrepa
   return ret;
 }
 
-void Sapphire::Db::DbConnection::prepareStatement( uint32_t index, const std::string& sql, Sapphire::Db::ConnectionFlags flags )
+void Sapphire::Db::DbConnection::prepareStatement( uint32_t index,
+                                                   const std::string& sql,
+                                                   Sapphire::Db::ConnectionFlags flags )
 {
   m_queries.insert( PreparedStatementMap::value_type( index, std::make_pair( sql, flags ) ) );
 

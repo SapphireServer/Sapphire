@@ -104,5 +104,5 @@ bool Sapphire::Db::DbLoader::process( std::queue< Predicate >& queue )
 template
 Sapphire::Db::DbLoader&
 Sapphire::Db::DbLoader::addDb< Sapphire::Db::ZoneDbConnection >( Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >&,
-                                                          const ConnectionInfo& );
+                                                                 const ConnectionInfo& );
 

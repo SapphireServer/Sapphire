@@ -12,7 +12,6 @@ namespace Sapphire::Network::Packets
 {
 
   using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
-
   class PacketContainer
   {
   public:

@@ -2,12 +2,7 @@
 #include "Acceptor.h"
 #include "Connection.h"
 
-namespace Sapphire::Network 
-{
-
-//-----------------------------------------------------------------------------
-
-Acceptor::Acceptor( HivePtr hive ) :
+Sapphire::Network::Acceptor::Acceptor( HivePtr hive ) :
   m_hive( hive ),
   m_acceptor( hive->getService() ),
   m_io_strand( hive->getService() ),
@@ -15,22 +10,21 @@ Acceptor::Acceptor( HivePtr hive ) :
 {
 }
 
-Acceptor::~Acceptor()
+Sapphire::Network::Acceptor::~Acceptor()
 {
 }
 
-
-bool Acceptor::onAccept( ConnectionPtr connection, const std::string& host, uint16_t port )
+bool Sapphire::Network::Acceptor::onAccept( ConnectionPtr connection, const std::string& host, uint16_t port )
 {
   return true;
 }
 
-void Acceptor::onError( const asio::error_code& error )
+void Sapphire::Network::Acceptor::onError( const asio::error_code& error )
 {
 
 }
 
-void Acceptor::startError( const asio::error_code& error )
+void Sapphire::Network::Acceptor::startError( const asio::error_code& error )
 {
   uint32_t v1 = 1;
   uint32_t v2 = 0;
@@ -43,7 +37,7 @@ void Acceptor::startError( const asio::error_code& error )
   }
 }
 
-void Acceptor::dispatchAccept( ConnectionPtr connection )
+void Sapphire::Network::Acceptor::dispatchAccept( ConnectionPtr connection )
 {
   m_acceptor.async_accept( connection->getSocket(),
                            connection->getStrand().wrap( std::bind( &Acceptor::handleAccept,
@@ -52,7 +46,7 @@ void Acceptor::dispatchAccept( ConnectionPtr connection )
                                                                     connection ) ) );
 }
 
-void Acceptor::handleAccept( const asio::error_code& error, ConnectionPtr connection )
+void Sapphire::Network::Acceptor::handleAccept( const asio::error_code& error, ConnectionPtr connection )
 {
   if( error || hasError() || m_hive->hasStopped() )
   {
@@ -78,17 +72,17 @@ void Acceptor::handleAccept( const asio::error_code& error, ConnectionPtr connec
   }
 }
 
-void Acceptor::stop()
+void Sapphire::Network::Acceptor::stop()
 {
 
 }
 
-void Acceptor::accept( ConnectionPtr connection )
+void Sapphire::Network::Acceptor::accept( ConnectionPtr connection )
 {
   m_io_strand.post( std::bind( &Acceptor::dispatchAccept, shared_from_this(), connection ) );
 }
 
-void Acceptor::listen( const std::string& host, const uint16_t& port )
+void Sapphire::Network::Acceptor::listen( const std::string& host, const uint16_t& port )
 {
   try
   {
@@ -109,21 +103,19 @@ void Acceptor::listen( const std::string& host, const uint16_t& port )
 
 }
 
-HivePtr Acceptor::getHive()
+Sapphire::Network::HivePtr Sapphire::Network::Acceptor::getHive()
 {
   return m_hive;
 }
 
-asio::ip::tcp::acceptor& Acceptor::getAcceptor()
+asio::ip::tcp::acceptor& Sapphire::Network::Acceptor::getAcceptor()
 {
   return m_acceptor;
 }
 
-bool Acceptor::hasError()
+bool Sapphire::Network::Acceptor::hasError()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 1;
   return ( m_error_state.compare_exchange_strong( v1, v2 ) );
-}
-
 }

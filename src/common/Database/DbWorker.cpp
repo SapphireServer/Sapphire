@@ -2,7 +2,8 @@
 #include "Operation.h"
 #include "Util/LockedWaitQueue.h"
 
-Sapphire::Db::DbWorker::DbWorker( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* newQueue, DbConnection* pConn )
+Sapphire::Db::DbWorker::DbWorker( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* newQueue,
+                                  DbConnection* pConn )
 {
   m_pConn = pConn;
   m_queue = newQueue;

@@ -44,7 +44,7 @@ namespace Sapphire::Db
 
     bool prepareStatements();
 
-    inline ConnectionInfo getConnectionInfo() const
+    const ConnectionInfo& getConnectionInfo() const
     {
       return m_connectionInfo;
     }

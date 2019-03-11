@@ -9,7 +9,6 @@ namespace Sapphire::Util
 {
 
   template< typename T, typename ActorIdType = uint32_t >
-
   class SpawnIndexAllocator
   {
   public:

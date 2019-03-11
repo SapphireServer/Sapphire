@@ -39,9 +39,8 @@ bool Sapphire::Db::StatementTask::execute()
 
 
 Sapphire::Db::PreparedStatementTask::PreparedStatementTask( std::shared_ptr< Sapphire::Db::PreparedStatement > stmt,
-                                                        bool async ) :
+                                                            bool async ) :
   m_stmt( stmt )
-//, m_result(nullptr)
 {
   m_hasResult = async; // If the operation is async, then there's a result
 }
