@@ -33,7 +33,6 @@ namespace Sapphire::Common::Config
     } network;
   };
 
-
   struct WorldConfig
   {
     GlobalConfig global;

@@ -32,7 +32,7 @@ namespace Sapphire::Util
 
   void valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex );
 
-  template <class T>
+  template< class T >
   inline void hashCombine( std::size_t& seed, const T& v )
   {
       std::hash< T > hasher;

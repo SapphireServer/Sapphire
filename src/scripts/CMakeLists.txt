@@ -55,8 +55,8 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
-	if( UNIX )
-          cotire("script_${_name}")
+        if( UNIX )
+            cotire("script_${_name}")
         endif()
 
         if(MSVC)

@@ -10,8 +10,7 @@
 #include "Logging/Logger.h"
 #include <mysql.h>
 
-class PingOperation :
-  public Sapphire::Db::Operation
+class PingOperation : public Sapphire::Db::Operation
 {
   bool execute() override
   {
@@ -255,26 +254,6 @@ void Sapphire::Db::DbWorkerPool< T >::directExecute( std::shared_ptr< PreparedSt
   connection->execute( stmt );
   connection->unlock();
 }
-
-/*
-template <class T>
-void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, const char* sql)
-{
-   if (!trans)
-      Execute(sql);
-   else
-      trans->Append(sql);
-}
-
-template <class T>
-void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction& trans, PreparedStatement* stmt)
-{
-   if (!trans)
-      Execute(stmt);
-   else
-      trans->Append(stmt);
-}
-*/
 
 template
 class Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection >;

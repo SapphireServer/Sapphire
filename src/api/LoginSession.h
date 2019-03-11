@@ -14,8 +14,8 @@ namespace Sapphire
   {
 
   private:
-    uint32_t m_IP;
-    uint32_t m_accountID;
+    uint32_t m_ip;
+    uint32_t m_accountId;
     uint8_t m_sessionId[56];
 
   public:
@@ -25,9 +25,9 @@ namespace Sapphire
 
     ~LoginSession( void );
 
-    uint32_t getIP()
+    uint32_t getIp()
     {
-      return m_IP;
+      return m_ip;
     }
 
     void setSessionId( uint8_t* sessionId )
@@ -35,28 +35,20 @@ namespace Sapphire
       memcpy( m_sessionId, sessionId, 56 );
     }
 
-    void setIP( uint32_t iP )
+    void setIp( uint32_t ip )
     {
-      m_IP = iP;
+      m_ip = ip;
     }
 
-    uint32_t getAccountID()
+    uint32_t getAccountId()
     {
-      return m_accountID;
+      return m_accountId;
     }
 
-    void setAccountID( uint32_t iD )
+    void setAccountId( uint32_t id )
     {
-      m_accountID = iD;
+      m_accountId = id;
     }
-
-    /*INLINE CLobbySocket* getSocket() {
-    return m_pGS;
-    }
-
-    INLINE void setSocket(CLobbySocket * pS) {
-    m_pGS = pS;
-    }*/
 
   };
 

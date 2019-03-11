@@ -13,11 +13,11 @@
 namespace Sapphire::Entity
 {
 
-  typedef struct
+  using HateListEntry = struct
   {
     uint32_t m_hateAmount;
     CharaPtr m_pChara;
-  } HateListEntry;
+  };
 
   enum class BNpcState
   {

@@ -22,9 +22,7 @@ namespace Sapphire::Network
 {
 
   class Hive;
-
   class Acceptor;
-
   class Connection;
 
   //-----------------------------------------------------------------------------
@@ -32,7 +30,6 @@ namespace Sapphire::Network
   class Connection : public std::enable_shared_from_this< Connection >
   {
     friend class Acceptor;
-
     friend class Hive;
 
   protected:
