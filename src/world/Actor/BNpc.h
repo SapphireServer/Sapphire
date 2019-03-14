@@ -13,7 +13,7 @@
 namespace Sapphire::Entity
 {
 
-  using HateListEntry = struct
+  struct HateListEntry
   {
     uint32_t m_hateAmount;
     CharaPtr m_pChara;

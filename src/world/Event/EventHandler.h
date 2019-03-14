@@ -79,8 +79,7 @@ namespace Sapphire::Event
     using SceneChainCallback = std::function< void( Entity::Player& ) >;
     using EventFinishCallback = std::function< void( Entity::Player&, uint64_t ) >;
 
-    EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId, EventType eventType,
-                  uint32_t eventParam );
+    EventHandler( uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam );
 
     ~EventHandler()
     {
@@ -118,10 +117,7 @@ namespace Sapphire::Event
 
     void removeNestedEvent();
 
-
   protected:
-    Entity::Player* m_pOwner;
-
     uint64_t m_actorId;
     uint32_t m_eventId;
     uint16_t m_entryId;
