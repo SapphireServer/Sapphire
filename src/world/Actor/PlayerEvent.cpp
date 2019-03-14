@@ -90,7 +90,7 @@ void Sapphire::Entity::Player::eventStart( uint64_t actorId, uint32_t eventId,
                                            uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback )
 {
 
-  auto newEvent = Event::make_EventHandler( this, actorId, eventId, eventType, eventParam2 );
+  auto newEvent = Event::make_EventHandler( actorId, eventId, eventType, eventParam2 );
 
   newEvent->setEventFinishCallback( callback );
 

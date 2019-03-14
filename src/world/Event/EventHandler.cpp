@@ -1,8 +1,7 @@
 #include "EventHandler.h"
 
-Sapphire::Event::EventHandler::EventHandler( Entity::Player* pOwner, uint64_t actorId, uint32_t eventId,
-                                         EventType eventType, uint32_t eventParam ) :
-  m_pOwner( pOwner ),
+Sapphire::Event::EventHandler::EventHandler( uint64_t actorId, uint32_t eventId,
+                                             EventType eventType, uint32_t eventParam ) :
   m_actorId( actorId ),
   m_eventId( eventId ),
   m_eventType( eventType ),
