@@ -205,6 +205,7 @@ void PlayerMinimal::saveAsNew()
   uint32_t startZone;
   float x, y, z, o;
   int32_t startTown = 0;
+  int32_t homePoint = 0;
 
   switch( static_cast< Sapphire::Common::ClassJob >( m_class ) )
   {
@@ -217,6 +218,7 @@ void PlayerMinimal::saveAsNew()
       o = -2.1f;
       startZone = 183;
       startTown = 2;
+      homePoint = 2;
       break;
 
     case Sapphire::Common::ClassJob::Marauder:
@@ -227,6 +229,7 @@ void PlayerMinimal::saveAsNew()
       o = 1.5f;
       startTown = 1;
       startZone = 181;
+      homePoint = 8;
       break;
 
     case Sapphire::Common::ClassJob::Thaumaturge:
@@ -238,6 +241,7 @@ void PlayerMinimal::saveAsNew()
       o = -0.3f;
       startTown = 3;
       startZone = 182;
+      homePoint = 9;
       break;
 
     default:
@@ -273,7 +277,7 @@ void PlayerMinimal::saveAsNew()
   stmt->setInt( 20, m_class );
   stmt->setInt( 21, 1 );
   stmt->setInt( 22, m_class );
-  stmt->setInt( 23, 2 );
+  stmt->setInt( 23, homePoint );
   stmt->setInt( 24, startTown );
   stmt->setBinary( 25, discovery );
   stmt->setBinary( 26, howTo );
