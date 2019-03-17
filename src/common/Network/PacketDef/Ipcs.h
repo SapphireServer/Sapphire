@@ -325,8 +325,8 @@ namespace Sapphire::Network::Packets
     ReturnEventHandler = 0x0158, // updated 4.5
     TradeReturnEventHandler = 0x0159, // updated 4.5
 
-    LinkshellEventHandler = 0x1150, // updated 4.1 ??
-    LinkshellEventHandler1 = 0x1151, // updated 4.1 ??
+    LinkshellEventHandler = 0x016B, // updated 4.5
+    LinkshellEventHandler1 = 0x016C, // updated 4.5
 
     LandRenameHandler = 0x0175, // updated 4.5
     HousingUpdateHouseGreeting = 0x0176, // updated 4.5
