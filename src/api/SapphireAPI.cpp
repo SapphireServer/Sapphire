@@ -10,9 +10,6 @@
 
 #include <Database/DatabaseDef.h>
 
-Sapphire::Network::SapphireAPI::SapphireAPI() = default;
-Sapphire::Network::SapphireAPI::~SapphireAPI() = default;
-
 bool Sapphire::Network::SapphireAPI::login( const std::string& username, const std::string& pass, std::string& sId )
 {
   std::string query =

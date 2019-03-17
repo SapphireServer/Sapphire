@@ -18,9 +18,8 @@ namespace Sapphire::Network
   class SapphireAPI
   {
   public:
-    SapphireAPI();
-
-    ~SapphireAPI();
+    SapphireAPI() = default;
+    ~SapphireAPI() = default;
 
     using SessionMap = std::map< std::string, std::shared_ptr< Session > >;
 
