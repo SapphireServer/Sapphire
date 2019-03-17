@@ -28,12 +28,12 @@ namespace Sapphire::Network
 
     bool createAccount( const std::string& username, const std::string& pass, std::string& sId );
 
-    int32_t createCharacter( const int& accountId, const std::string& name,
-                             const std::string& infoJson, const int& gmRank );
+    int32_t createCharacter( uint32_t accountId, const std::string& name,
+                             const std::string& infoJson, uint32_t gmRank );
 
     void deleteCharacter( std::string name, uint32_t accountId );
 
-    bool insertSession( const uint32_t& accountId, std::string& sId );
+    bool insertSession( uint32_t accountId, std::string& sId );
 
     std::vector< Sapphire::PlayerMinimal > getCharList( uint32_t accountId );
 
