@@ -37,18 +37,21 @@ public:
     }
     else
     {
-      player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341, std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
+      player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341,
+                        std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
     }
   }
 
   void inner2( Entity::Player& player, uint64_t actorId )
   {
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, 32529, [this, actorId]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      player.eventStart( actorId, 1310721, Event::EventHandler::Nest, 1, 0 );
+    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, 32529,
+                      [this, actorId]( Entity::Player& player, const Event::SceneResult& result )
+                      {
+                        player.eventStart( actorId, 1310721, Event::EventHandler::Nest, 1, 0 );
 
-      player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341, std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
-    } );
+                        player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341,
+                                          std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
+                      } );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

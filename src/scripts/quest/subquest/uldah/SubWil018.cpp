@@ -162,7 +162,7 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 7, true );
+                        player.setQuestBitFlag8( getId(), 1, true );
                       } );
   }
 
@@ -189,7 +189,7 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 6, true );
+                        player.setQuestBitFlag8( getId(), 2, true );
                       } );
   }
 
@@ -216,7 +216,7 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 5, true );
+                        player.setQuestBitFlag8( getId(), 3, true );
                       } );
   }
 
@@ -270,7 +270,7 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 3, true );
+                        player.setQuestBitFlag8( getId(), 5, true );
                       } );
   }
 
