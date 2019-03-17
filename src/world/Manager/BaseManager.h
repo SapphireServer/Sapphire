@@ -9,7 +9,7 @@ namespace Sapphire::World::Manager
   class BaseManager
   {
   public:
-    explicit BaseManager( FrameworkPtr pFw ) : m_pFw( pFw ) {};
+    explicit BaseManager( FrameworkPtr pFw ) : m_pFw( std::move( pFw ) ) {};
     virtual ~BaseManager() = default;
 
     FrameworkPtr framework() const

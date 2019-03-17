@@ -5,6 +5,7 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Territory/ZonePosition.h>
+#include <Territory/Zone.h>
 
 #include <Manager/HousingMgr.h>
 
@@ -13,7 +14,7 @@
 using namespace Sapphire::World::Manager;
 
 Sapphire::World::Manager::PlayerMgr::PlayerMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
+  BaseManager( std::move( pFw ) )
 {
 
 }
@@ -62,7 +63,12 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire:
   }
 
   if( !destinationZone )
+  {
+    player.sendDebug( "Unable to find applicable territory for Warp#{0}. "
+                      "Check that it exists inside zonepositions table.",
+                      landId );
     return;
+  }
 
   player.setPos( terriPos->getTargetPosition() );
   player.setRot( terriPos->getTargetRotation() );

@@ -10,16 +10,6 @@
 
 #include <Database/DatabaseDef.h>
 
-Sapphire::Network::SapphireAPI::SapphireAPI()
-{
-
-}
-
-Sapphire::Network::SapphireAPI::~SapphireAPI()
-{
-
-}
-
 bool Sapphire::Network::SapphireAPI::login( const std::string& username, const std::string& pass, std::string& sId )
 {
   std::string query =
@@ -63,7 +53,7 @@ bool Sapphire::Network::SapphireAPI::login( const std::string& username, const s
 }
 
 
-bool Sapphire::Network::SapphireAPI::insertSession( const uint32_t& accountId, std::string& sId )
+bool Sapphire::Network::SapphireAPI::insertSession( const uint32_t accountId, std::string& sId )
 {
   // create session for the new sessionid and store to sessionlist
   auto pSession = std::make_shared< Session >();
@@ -106,9 +96,9 @@ bool Sapphire::Network::SapphireAPI::createAccount( const std::string& username,
 
 }
 
-int
-Sapphire::Network::SapphireAPI::createCharacter( const int& accountId, const std::string& name, const std::string& infoJson,
-                                             const int& gmRank )
+int Sapphire::Network::SapphireAPI::createCharacter( const uint32_t accountId, const std::string& name,
+                                                     const std::string& infoJson,
+                                                     const uint32_t gmRank )
 {
   Sapphire::PlayerMinimal newPlayer;
 
@@ -179,7 +169,7 @@ Sapphire::Network::SapphireAPI::createCharacter( const int& accountId, const std
   return newPlayer.getAccountId();
 }
 
-void Sapphire::Network::SapphireAPI::deleteCharacter( std::string name, uint32_t accountId )
+void Sapphire::Network::SapphireAPI::deleteCharacter( std::string name, const uint32_t accountId )
 {
   PlayerMinimal deletePlayer;
   auto charList = getCharList( accountId );
