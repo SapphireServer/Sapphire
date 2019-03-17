@@ -11,8 +11,7 @@ using namespace Sapphire;
 // Start NPC: 1001680
 // End NPC: 1001691
 
-class SubWil019 :
-  public Sapphire::ScriptAPI::EventScript
+class SubWil019 : public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
