@@ -285,7 +285,7 @@ void Sapphire::Action::Action::execute()
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
-    pScriptMgr->onEObjHit( *player, m_targetId );
+    pScriptMgr->onEObjHit( *player, m_targetId, getId() );
     return;
   }
 }
