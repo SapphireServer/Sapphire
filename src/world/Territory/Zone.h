@@ -48,14 +48,13 @@ namespace Sapphire
 
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;
+    std::map< uint8_t, int32_t > m_weatherRateMap;
 
     int64_t m_lastMobUpdate;
 
     FestivalPair m_currentFestival;
 
     std::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
-
-    std::map< uint8_t, int32_t > m_weatherRateMap;
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
