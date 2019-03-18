@@ -34,8 +34,6 @@ namespace Sapphire
     m_pConfig = std::make_shared< ConfigMgr >();
   }
 
-  ServerLobby::~ServerLobby( void ) = default;
-
   LobbySessionPtr ServerLobby::getSession( char* sessionId )
   {
     return g_restConnector.getSession( sessionId );

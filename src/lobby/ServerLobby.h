@@ -34,7 +34,7 @@ namespace Sapphire
   public:
     ServerLobby( const std::string& configPath );
 
-    ~ServerLobby( void );
+    ~ServerLobby( void ) = default;
 
     void run( int32_t argc, char* argv[] );
 

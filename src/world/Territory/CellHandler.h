@@ -18,8 +18,6 @@
 #define GetRelatCoord( Coord, CellCoord ) ((_maxX-Coord)-CellCoord*_cellSize)
 namespace Sapphire {
 
-class Zone;
-
 template< class T >
 class CellHandler
 {

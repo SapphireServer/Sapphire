@@ -402,25 +402,25 @@ void Sapphire::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACK
       // todo: validate client version based on sha1 or gamever/bootver
       sendServiceAccountList( packet, tmpId );
     }
-      break;
+    break;
 
     case ReqCharList:
     {
       getCharList( packet, tmpId );
     }
-      break;
+    break;
 
     case ReqEnterWorld:
     {
       enterWorld( packet, tmpId );
     }
-      break;
+    break;
 
     case ReqCharCreate:
     {
       createOrModifyChar( packet, tmpId );
     }
-      break;
+    break;
 
   }
 
