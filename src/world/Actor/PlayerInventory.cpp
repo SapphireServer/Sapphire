@@ -147,22 +147,6 @@ void Sapphire::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
     setClassJob( newClassJob );
 }
 
-// equip an item
-void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
-{
-
-  //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
-  if( sendUpdate )
-  {
-    updateModels( equipSlotId, pItem, true );
-    this->sendModel();
-    m_itemLevel = calculateEquippedGearItemLevel();
-    sendItemLevel();
-  }
-  else
-    updateModels( equipSlotId, pItem, false );
-}
-
 void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapphire::ItemPtr& pItem, bool updateClass )
 {
   uint64_t model = pItem->getModelId1();
@@ -229,6 +213,23 @@ Sapphire::Common::GearModelSlot Sapphire::Entity::Player::equipSlotToModelSlot( 
       return GearModelSlot::ModelRing2;
   }
 }
+
+// equip an item
+void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendUpdate )
+{
+
+  //g_framework.getLogger().debug( "Equipping into slot " + std::to_string( equipSlotId ) );
+  if( sendUpdate )
+  {
+    updateModels( equipSlotId, pItem, true );
+    sendModel();
+    m_itemLevel = calculateEquippedGearItemLevel();
+    sendItemLevel();
+  }
+  else
+    updateModels( equipSlotId, pItem, false );
+}
+
 
 void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem )
 {

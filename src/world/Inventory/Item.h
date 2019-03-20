@@ -99,6 +99,11 @@ namespace Sapphire
     uint16_t m_spiritBond;
     uint32_t m_reservedFlag;
 
+    uint32_t m_blockRate;
+    uint32_t m_block;
+    uint32_t m_defense;
+    uint32_t m_defenseMag;
+
     FrameworkPtr m_pFw;
     uint32_t m_additionalData;
   };
