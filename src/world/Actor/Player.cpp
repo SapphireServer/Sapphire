@@ -254,7 +254,6 @@ void Sapphire::Entity::Player::calculateStats()
   auto tribeInfo = pExdData->get< Sapphire::Data::Tribe >( tribe );
   auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
 
-  // TODO: put formula somewhere else...
   float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
 
   m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) +
@@ -270,6 +269,8 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) +
                                              tribeInfo->pIE );
 
+  m_baseStats.determination = static_cast< uint32_t >( base );
+  m_baseStats.pie = static_cast< uint32_t >( base );
   m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
   m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
   m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
@@ -277,6 +278,10 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
   m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
   m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
+
+  m_baseStats.attack = m_baseStats.str;
+  m_baseStats.attackPotMagic = m_baseStats.inte;
+  m_baseStats.healingPotMagic = m_baseStats.mnd;
 
   m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
 
@@ -287,9 +292,6 @@ void Sapphire::Entity::Player::calculateStats()
 
   if( m_hp > m_baseStats.max_hp )
     m_hp = m_baseStats.max_hp;
-
-
-  m_baseStats.determination = static_cast< uint32_t >( base );
 
 }
 
@@ -327,10 +329,10 @@ void Sapphire::Entity::Player::sendStats()
   statPacket->data().spellSpeed1 = m_baseStats.spellSpeed;
   statPacket->data().spellSpeedMod = 100;
 
-  statPacket->data().criticalHitRate = m_baseStats.spellSpeed;
-  statPacket->data().defense = m_baseStats.spellSpeed;
-  statPacket->data().magicDefense = m_baseStats.spellSpeed;
-  statPacket->data().attack = m_baseStats.spellSpeed;
+  statPacket->data().criticalHitRate = m_baseStats.critHitRate;
+  statPacket->data().defense = m_baseStats.defense;
+  statPacket->data().magicDefense = m_baseStats.magicDefense;
+  statPacket->data().tenacity = m_baseStats.tenacity;
 
   queuePacket( statPacket );
 }
