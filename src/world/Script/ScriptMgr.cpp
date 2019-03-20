@@ -300,7 +300,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
   return true;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId )
+bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
 {
   auto pEventMgr = framework()->get< World::Manager::EventMgr >();
   bool didCallScript = false;
@@ -321,7 +321,7 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
 
       player.sendDebug( "Calling: {0}.onEObjHit actorId#{1}", objName, actorId );
 
-      script->onEObjHit( player, actorId );
+      script->onEObjHit( player, actorId, actionId );
     }
   }
 
