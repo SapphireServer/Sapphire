@@ -29,6 +29,10 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool i
   m_itemLevel = itemInfo->levelItem;
   m_maxStackSize = itemInfo->stackSize;
   m_additionalData = itemInfo->additionalData;
+  m_blockRate = itemInfo->blockRate;
+  m_block = itemInfo->block;
+  m_defense = itemInfo->defensePhys;
+  m_defenseMag = itemInfo->defenseMag;
 }
 
 float Sapphire::Item::getAutoAttackDmg() const

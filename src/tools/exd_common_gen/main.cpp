@@ -110,6 +110,7 @@ int main()
   result += "namespace Sapphire {\n";
   result += "namespace Common {\n";
   result += generateEnum( "ActionCategory", 0, "uint8_t" );
+  result += generateEnum( "BaseParam", 1, "uint8_t" );
   result += generateEnum( "BeastReputationRank", 1, "uint8_t" );
   result += generateEnum( "BeastTribe", 11, "uint8_t" );
   result += generateEnum( "ClassJob", 0, "uint8_t" );
