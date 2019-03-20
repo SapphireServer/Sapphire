@@ -53,6 +53,7 @@ namespace Sapphire::Network
 
     LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
+    std::vector< uint8_t > m_packets;
 
   public:
     ConnectionType m_conType;

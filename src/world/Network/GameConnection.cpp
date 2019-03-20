@@ -154,45 +154,25 @@ void Sapphire::Network::GameConnection::onDisconnect()
 
 void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 {
+  m_packets.insert( std::end( m_packets ), std::begin( buffer ), std::end( buffer ) );	
   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
   Packets::FFXIVARR_PACKET_HEADER packetHeader{};
-  const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
+  const auto headerResult = Packets::getHeader( m_packets, 0, packetHeader );
 
-  if( headerResult == Incomplete )
-  {
-    Logger::info( "Dropping connection due to incomplete packet header." );
-    Logger::info( "FIXME: Packet message bounary is not implemented." );
-    disconnect();
+  if( ( headerResult == Incomplete ) || ( headerResult == Malformed ) )
     return;
-  }
-  else if( headerResult == Malformed )
-  {
-    Logger::info( "Dropping connection due to malformed packet header." );
-    disconnect();
-    return;
-  }
 
   // Dissect packet list
   std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-  const auto packetResult = Packets::getPackets( buffer, sizeof( struct FFXIVARR_PACKET_HEADER ),
+  const auto packetResult = Packets::getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
                                                  packetHeader, packetList );
 
-  if( packetResult == Incomplete )
-  {
-    Logger::info( "Dropping connection due to incomplete packets." );
-    Logger::info( "FIXME: Packet message bounary is not implemented." );
-    disconnect();
+  if( ( packetResult == Incomplete ) || ( packetResult == Malformed ) )
     return;
-  }
-  else if( packetResult == Malformed )
-  {
-    Logger::info( "Dropping connection due to malformed packets." );
-    disconnect();
-    return;
-  }
 
   // Handle it
   handlePackets( packetHeader, packetList );
+  m_packets.clear();
 }
 
 void Sapphire::Network::GameConnection::onError( const asio::error_code& error )
