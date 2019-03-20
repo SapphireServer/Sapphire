@@ -3258,6 +3258,12 @@ struct Item
    bool isPvP;
    bool isGlamourous;
 
+   struct
+   {
+     uint8_t baseparam;
+     int16_t value;
+   } param[6];
+
    Item( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
