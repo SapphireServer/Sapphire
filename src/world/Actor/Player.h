@@ -319,7 +319,7 @@ namespace Sapphire::Entity
     void equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
 
     /*! remove an item from an equipment slot */
-    void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem );
+    void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
 
     /*! equip a weapon, possibly forcing a job change */
     void equipWeapon( ItemPtr pItem, bool updateClass );

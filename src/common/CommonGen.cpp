@@ -20,6 +20,11 @@ bool operator==( const uint8_t& g, const BaseParam& t )
   return static_cast< uint8_t >( t ) == g;
 }
 
+bool operator!=( const uint8_t& g, const BaseParam& t )
+{
+  return static_cast< uint8_t >( t ) != g;
+}
+
 bool operator==( const BeastReputationRank& t, const uint8_t& g )
 {
   return static_cast< uint8_t >( t ) == g;
