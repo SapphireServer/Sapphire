@@ -386,6 +386,11 @@ void Sapphire::Entity::Chara::setCurrentAction( Sapphire::Action::ActionPtr pAct
   m_pCurrentAction = std::move( pAction );
 }
 
+uint32_t Sapphire::Entity::Chara::getBonusStat( Common::BaseParam bonus ) const
+{
+  return m_bonusStats[ static_cast< uint8_t >( bonus ) ];
+}
+
 /*!
 Autoattack prototype implementation
 TODO: move the check if the autoAttack can be performed to the callee

@@ -239,7 +239,12 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, ItemP
   m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] += pItem->getDefense();
   m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] += pItem->getDefenseMag();
 
-  sendStats();
+  calculateStats();
+  if( sendUpdate )
+  {
+    sendStats();
+    sendStatusUpdate();
+  }
 }
 
 
@@ -270,9 +275,12 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
   m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] -= pItem->getDefense();
   m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] -= pItem->getDefenseMag();
 
+  calculateStats();
+
   if( sendUpdate )
   {
     sendStats();
+    sendStatusUpdate();
   }
 }
 

@@ -136,8 +136,9 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
 
   uint8_t level = pPlayer->getLevel();
 
+  auto vitMod = pPlayer->getBonusStat( Common::BaseParam::Vitality );
   float baseStat = calculateBaseStat( pPlayer );
-  uint16_t vitStat = pPlayer->getStats().vit;
+  uint16_t vitStat = pPlayer->getStats().vit + static_cast< uint16_t >( vitMod );
   uint16_t hpMod = paramGrowthInfo->hpModifier;
   uint16_t jobModHp = classInfo->modifierHitPoints;
   float approxBaseHp = 0.0f; // Read above
@@ -169,8 +170,10 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   if( !classInfo || !paramGrowthInfo )
     return 0;
 
+  auto pieMod = pPlayer->getBonusStat( Common::BaseParam::Piety );
+
   float baseStat = calculateBaseStat( pPlayer );
-  uint16_t piety = pPlayer->getStats().pie;
+  uint16_t piety = pPlayer->getStats().pie + pieMod;
   uint16_t pietyScalar = paramGrowthInfo->mpModifier;
   uint16_t jobModMp = classInfo->modifierManaPoints;
   uint16_t baseMp = paramGrowthInfo->mpModifier;
