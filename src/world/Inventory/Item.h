@@ -11,6 +11,13 @@ namespace Sapphire
   {
 
   public:
+
+    struct BaseParamStruct
+    {
+      uint8_t baseParam;
+      int16_t value;
+    };
+
     Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool isHq = false );
 
     virtual ~Item() = default;
@@ -49,6 +56,10 @@ namespace Sapphire
 
     uint16_t getWeaponDmg() const;
 
+    uint16_t getDefense() const;
+
+    uint16_t getDefenseMag() const;
+
     bool isWeapon() const;
 
     float getAutoAttackDmg() const;
@@ -71,6 +82,7 @@ namespace Sapphire
     void setReservedFlag( uint32_t flag );
     uint32_t getReservedFlag() const;
 
+    BaseParamStruct* getBaseParams();
 
   protected:
     uint32_t m_id;
@@ -106,6 +118,9 @@ namespace Sapphire
 
     FrameworkPtr m_pFw;
     uint32_t m_additionalData;
+
+    BaseParamStruct m_baseParam[6];
+
   };
 
 }
