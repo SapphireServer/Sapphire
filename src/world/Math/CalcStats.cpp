@@ -184,7 +184,7 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   return result;
 }
 
-float CalcStats::pBlk( const Entity::Chara& chara )
+float CalcStats::pBlk( const Chara& chara )
 {
   auto level = chara.getLevel();
   float blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
@@ -193,7 +193,7 @@ float CalcStats::pBlk( const Entity::Chara& chara )
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
 }
 
-float CalcStats::pDhr( const Entity::Chara& chara )
+float CalcStats::pDhr( const Chara& chara )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
@@ -207,7 +207,7 @@ float CalcStats::pDhr( const Entity::Chara& chara )
   return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
 }
 
-float CalcStats::pChr( const Entity::Chara& chara )
+float CalcStats::pChr( const Chara& chara )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
