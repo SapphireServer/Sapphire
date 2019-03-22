@@ -16,6 +16,9 @@ namespace Sapphire::Math
 
     static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
 
+    static float pBlk( const Sapphire::Entity::Chara& );
+    static float pDhr( const Sapphire::Entity::Chara& );
+    static float pChr( const Sapphire::Entity::Chara& );
   private:
 
   };
