@@ -183,3 +183,40 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
 
   return result;
 }
+
+float CalcStats::pBlk( const Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  float blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
+  float levelVal =  static_cast< float >( levelTable[ level ][ 4 ] );
+
+  return std::floor( ( 30 * blockRate ) / levelVal + 10 );
+}
+
+float CalcStats::pDhr( const Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+  auto level = chara.getLevel();
+
+  float dhRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::DirectHitRate ) ) +
+                 baseStats.accuracy;
+
+  float divVal =  static_cast< float >( levelTable[ level ][ 4 ] );
+  float subVal =  static_cast< float >( levelTable[ level ][ 3 ] );
+
+  return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
+}
+
+float CalcStats::pChr( const Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+  auto level = chara.getLevel();
+
+  float chRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::CriticalHit ) ) +
+                 baseStats.critHitRate;
+
+  float divVal =  static_cast< float >( levelTable[ level ][ 4 ] );
+  float subVal =  static_cast< float >( levelTable[ level ][ 3 ] );
+
+  return std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
+}
