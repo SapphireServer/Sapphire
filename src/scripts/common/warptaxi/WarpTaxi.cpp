@@ -27,12 +27,12 @@ public:
       player.eventFinish( 1310721, 0 );
       player.eventFinish( getId(), 1 );
 
-      auto exdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
+      auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
       auto warp = exdData->get< Sapphire::Data::Warp >( getId() );
       if( !warp )
         return;
 
-      auto playerMgr = getFramework()->get< Sapphire::World::Manager::PlayerMgr >();
+      auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();
       playerMgr->movePlayerToLandDestination( player, warp->level, result.param3 );
     }
     else
@@ -56,7 +56,7 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto exdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
+    auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
     if( !exdData )
       return;
 

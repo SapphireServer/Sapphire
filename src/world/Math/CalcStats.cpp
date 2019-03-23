@@ -13,9 +13,10 @@
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 
-const int levelTable[70][7] =
+const int levelTable[71][7] =
 { 
 // PIE, MP, MAIN,SUB,DIV,HP,ELMT,THREAT
+  { 1, 1, 1, 1, 1, 1, 1 },
   { 50, 104, 20, 56, 56, 0, 52 },
   { 55, 114, 21, 57, 57, 0, 54 },
   { 60, 123, 22, 60, 60, 0, 56 },
@@ -184,11 +185,91 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   return result;
 }
 
+uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
+{
+  auto level = chara.getLevel();
+
+  // each level range is 1-10, 11-20, 21-30, ... therefore:
+  // level 50 should be in the 4th group, not the 5t
+  // dividing by 10 on the border will break this unless we subtract 1
+  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
+
+  float cost = baseCost;
+
+  // thanks to andrew for helping me figure this shit out
+  // played with this some more and it seems to be accurate for everything i've tried
+  switch( levelGroup )
+  {
+    // level 1-10
+    case 0:
+    {
+      // r^2 = 0.9999
+      cost = 0.0952f * level + 0.9467f;
+      break;
+    }
+
+    // level 11-20
+    case 1:
+    {
+      // r^2 = 1
+      cost = 0.19f * level;
+      break;
+    }
+
+    // level 21-30
+    case 2:
+    {
+      // r^2 = 1
+      cost = 0.38f * level - 3.8f;
+      break;
+    }
+
+    // level 31-40
+    case 3:
+    {
+      // r^2 = 1
+      cost = 0.6652f * level - 12.358f;
+      break;
+    }
+
+    // level 41-50
+    case 4:
+    {
+      // r^2 = 1
+      cost = 1.2352f * level - 35.159f;
+      break;
+    }
+
+    // level 51-60
+    case 5:
+    {
+      // r^2 = 1
+      cost = 0.0654f * std::exp( 0.1201f * level );
+      break;
+    }
+
+    // level 61-70
+    case 6:
+    {
+      // r^2 = 0.9998
+      cost = 0.2313f * ( level * level ) - 26.98f * level + 875.21f;
+      break;
+    }
+
+    default:
+    {
+      return 0;
+    }
+  }
+
+  return static_cast< uint16_t >( std::round( cost * baseCost ) );
+}
+
 float CalcStats::pBlk( const Chara& chara )
 {
   auto level = chara.getLevel();
   float blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
-  float levelVal =  static_cast< float >( levelTable[ level ][ 4 ] );
+  float levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
 }
@@ -201,8 +282,8 @@ float CalcStats::pDhr( const Chara& chara )
   float dhRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::DirectHitRate ) ) +
                  baseStats.accuracy;
 
-  float divVal =  static_cast< float >( levelTable[ level ][ 4 ] );
-  float subVal =  static_cast< float >( levelTable[ level ][ 3 ] );
+  float divVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  float subVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
 
   return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
 }
@@ -215,8 +296,8 @@ float CalcStats::pChr( const Chara& chara )
   float chRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::CriticalHit ) ) +
                  baseStats.critHitRate;
 
-  float divVal =  static_cast< float >( levelTable[ level ][ 4 ] );
-  float subVal =  static_cast< float >( levelTable[ level ][ 3 ] );
+  float divVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  float subVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
 
   return std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
 }

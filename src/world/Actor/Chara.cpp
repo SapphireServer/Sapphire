@@ -658,3 +658,13 @@ int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
 {
   return m_lastUpdate;
 }
+
+void Sapphire::Entity::Chara::setLastComboActionId( uint32_t actionId )
+{
+  m_lastComboActionId = actionId;
+}
+
+uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
+{
+  return m_lastComboActionId;
+}
