@@ -579,6 +579,13 @@ namespace Sapphire::Common
     TpLoss = 12,
     TpGain = 13,
     GpGain = 14,
+    /*!
+     * @brief Tells the client that it should show combo indicators on actions.
+     *
+     * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
+     * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
+     */
+    StartActionCombo = 28,
     Knockback = 33,
     Mount = 38,
     VFX = 59, // links to VFX sheet
