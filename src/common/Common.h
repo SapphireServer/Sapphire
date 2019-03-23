@@ -931,6 +931,18 @@ namespace Sapphire::Common
     uint16_t cost;
   };
 
+  enum LevelTableEntry : uint8_t
+  {
+    PIE,
+    MP,
+    MAIN,
+    SUB,
+    DIV,
+    HP,
+    ELMT,
+    THREAT
+  };
+
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
 }
