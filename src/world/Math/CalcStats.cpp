@@ -191,7 +191,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
   // each level range is 1-10, 11-20, 21-30, ... therefore:
   // level 50 should be in the 4th group, not the 5t
   // dividing by 10 on the border will break this unless we subtract 1
-  auto levelGroup = std::max< decltype( level ) >( level - 1, 1 ) / 10;
+  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
 
   float cost = baseCost;
 
@@ -207,7 +207,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
       break;
     }
 
-      // level 11-20
+    // level 11-20
     case 1:
     {
       // r^2 = 1
@@ -215,7 +215,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
       break;
     }
 
-      // level 21-30
+    // level 21-30
     case 2:
     {
       // r^2 = 1
@@ -223,7 +223,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
       break;
     }
 
-      // level 31-40
+    // level 31-40
     case 3:
     {
       // r^2 = 1
@@ -231,7 +231,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
       break;
     }
 
-      // level 41-50
+    // level 41-50
     case 4:
     {
       // r^2 = 1
@@ -239,7 +239,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
       break;
     }
 
-      // level 51-60
+    // level 51-60
     case 5:
     {
       // r^2 = 1
@@ -247,7 +247,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
       break;
     }
 
-      // level 61-70
+    // level 61-70
     case 6:
     {
       // r^2 = 0.9998
