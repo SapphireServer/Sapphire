@@ -161,7 +161,7 @@ namespace Sapphire::ScriptAPI
     }
 
   public:
-    explicit EventScript( uint32_t questId );
+    explicit EventScript( uint32_t eventId );
 
     virtual void onTalk( uint32_t eventId, Sapphire::Entity::Player& player, uint64_t actorId );
 
@@ -171,12 +171,12 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEnterTerritory( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
-    virtual void onWithinRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+    virtual void onWithinRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1,float x, float y, float z );
 
     virtual void onOutsideRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
-    virtual void
-      onEventItem( Sapphire::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId );
+    virtual void onEventItem( Sapphire::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime,
+                              uint64_t targetId );
 
     virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                             uint32_t catalogId );
@@ -228,7 +228,7 @@ namespace Sapphire::ScriptAPI
     virtual void onUpdate( Sapphire::InstanceContent& instance, uint32_t currTime );
 
     virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
-                                  uint16_t param1, uint16_t param2 );
+                                   uint16_t param1, uint16_t param2 );
   };
 
 }
