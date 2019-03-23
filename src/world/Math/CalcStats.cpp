@@ -13,9 +13,10 @@
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 
-const int levelTable[70][7] =
+const int levelTable[71][7] =
 { 
 // PIE, MP, MAIN,SUB,DIV,HP,ELMT,THREAT
+  { 1, 1, 1, 1, 1, 1, 1 },
   { 50, 104, 20, 56, 56, 0, 52 },
   { 55, 114, 21, 57, 57, 0, 54 },
   { 60, 123, 22, 60, 60, 0, 56 },
