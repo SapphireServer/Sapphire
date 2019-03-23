@@ -26,7 +26,7 @@ public:
       if( result.param2 != 1 )
         return;
 
-      auto terriMgr = getFramework()->get< Sapphire::World::Manager::TerritoryMgr >();
+      auto terriMgr = framework()->get< Sapphire::World::Manager::TerritoryMgr >();
       if( !terriMgr )
         return;
 

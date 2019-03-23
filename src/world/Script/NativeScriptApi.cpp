@@ -37,7 +37,7 @@ namespace Sapphire::ScriptAPI
     m_framework = fw;
   }
 
-  Sapphire::Framework* ScriptObject::getFramework() const
+  Sapphire::Framework* ScriptObject::framework() const
   {
     return m_framework;
   }

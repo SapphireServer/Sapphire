@@ -61,7 +61,7 @@ namespace Sapphire::ScriptAPI
     *
     * @return A pointer to Core::Framework
     */
-    virtual Sapphire::Framework* getFramework() const;
+    virtual Sapphire::Framework* framework() const;
   };
 
 
