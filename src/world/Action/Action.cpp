@@ -281,6 +281,13 @@ void Sapphire::Action::Action::execute()
     }
   }
 
+  if( isComboAction() )
+  {
+    auto player = m_pSource->getAsPlayer();
+
+    player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
+  }
+
   if( !hasClientsideTarget() )
   {
     pScriptMgr->onExecute( *this );
@@ -289,6 +296,13 @@ void Sapphire::Action::Action::execute()
   {
     pScriptMgr->onEObjHit( *player, m_targetId, getId() );
     return;
+  }
+
+  // set currently casted action as the combo action if it interrupts a combo
+  // ignore it otherwise (ogcds, etc.)
+  if( !m_actionData->preservesCombo )
+  {
+    m_pSource->setLastComboActionId( getId() );
   }
 }
 
@@ -399,4 +413,16 @@ uint32_t Sapphire::Action::Action::getAdditionalData() const
 void Sapphire::Action::Action::setAdditionalData( uint32_t data )
 {
   m_additionalData = data;
+}
+
+bool Sapphire::Action::Action::isComboAction() const
+{
+  auto lastActionId = m_pSource->getLastComboActionId();
+
+  if( lastActionId == 0 )
+  {
+    return false;
+  }
+
+  return m_actionData->actionCombo == lastActionId;
 }
