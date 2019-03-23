@@ -603,7 +603,8 @@ namespace Sapphire::Common
 
   enum ItemActionType : uint16_t
   {
-    ItemActionVFX = 944,
+    ItemActionVFX = 852,
+    ItemActionVFX2 = 944,
   };
 
   enum ActionEffectDisplayType : uint8_t
