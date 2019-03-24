@@ -263,6 +263,14 @@ namespace Sapphire::Common
 
   };
 
+  enum class UnlockEntry : uint16_t
+  {
+    Return = 1,
+    Teleport = 4,
+    GearSets = 6,
+    HuntingLog = 21,
+  };
+
   enum ContainerType : uint16_t
   {
     Unknown = 0,
