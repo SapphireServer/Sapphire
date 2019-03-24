@@ -175,6 +175,31 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
                     CONNECTION_SYNC );
 
+  /// CHARA MONSTERNOTE
+  prepareStatement( CHARA_MONSTERNOTE_INS,
+                    "INSERT INTO charamonsternote ( CharacterId, Category_0, Category_1, Category_2,"
+                    "                               Category_3, Category_4, Category_5, Category_6,"
+                    "                               Category_7, Category_8, Category_9, Category_10,"
+                    "                               Category_11, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
+
+  prepareStatement( CHARA_MONSTERNOTE_UP, "UPDATE charamonsternote "
+                                          " SET Category_0 = ?,"
+                                              " Category_1 = ?,"
+                                              " Category_2 = ?,"
+                                              " Category_3 = ?,"
+                                              " Category_4 = ?,"
+                                              " Category_5 = ?,"
+                                              " Category_6 = ?,"
+                                              " Category_7 = ?,"
+                                              " Category_8 = ?,"
+                                              " Category_9 = ?,"
+                                              " Category_10 = ?,"
+                                              " Category_11 = ?"
+                                              " WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
+
   /// ZONE QUERIES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
                     "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "

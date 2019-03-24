@@ -187,6 +187,7 @@ void PlayerMinimal::saveAsNew()
   std::vector< uint8_t > orchestrion( 40 );
   std::vector< uint8_t > modelEquip( 40 );
   std::vector< uint8_t > questTracking8( 10 );
+  std::vector< uint8_t > monsterNote( 41 );
   std::vector< int16_t > questTracking = { -1, -1, -1, -1, -1 };
 
   memset( questComplete.data(), 0, questComplete.size() );
@@ -327,6 +328,12 @@ void PlayerMinimal::saveAsNew()
 
   createInvDbContainer( InventoryType::Currency );
   createInvDbContainer( InventoryType::Crystal );
+
+  auto stmtMonsterNote = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_MONSTERNOTE_INS );
+  stmtMonsterNote->setInt( 1, m_id );
+  for( uint8_t i = 1; i <= 12; ++i )
+    stmtMonsterNote->setBinary( i + 1, monsterNote );
+  g_charaDb.directExecute( stmtMonsterNote );
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SETUP EQUIPMENT / STARTING GEAR
