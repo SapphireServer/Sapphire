@@ -6,8 +6,8 @@
 using namespace Sapphire::Network::Packets;
 
 PacketParseResult Sapphire::Network::Packets::getHeader( const std::vector< uint8_t >& buffer,
-                                                     const uint32_t offset,
-                                                     FFXIVARR_PACKET_HEADER& header )
+                                                         const uint32_t offset,
+                                                         FFXIVARR_PACKET_HEADER& header )
 {
   const auto headerSize = sizeof( FFXIVARR_PACKET_HEADER );
 
@@ -26,8 +26,8 @@ PacketParseResult Sapphire::Network::Packets::getHeader( const std::vector< uint
 }
 
 PacketParseResult Sapphire::Network::Packets::getSegmentHeader( const std::vector< uint8_t >& buffer,
-                                                            const uint32_t offset,
-                                                            FFXIVARR_PACKET_SEGMENT_HEADER& header )
+                                                                const uint32_t offset,
+                                                                FFXIVARR_PACKET_SEGMENT_HEADER& header )
 {
   const auto headerSize = sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
 
@@ -43,9 +43,9 @@ PacketParseResult Sapphire::Network::Packets::getSegmentHeader( const std::vecto
 }
 
 PacketParseResult Sapphire::Network::Packets::getPackets( const std::vector< uint8_t >& buffer,
-                                                      const uint32_t offset,
-                                                      const FFXIVARR_PACKET_HEADER& packetHeader,
-                                                      std::vector< FFXIVARR_PACKET_RAW >& packets )
+                                                          const uint32_t offset,
+                                                          const FFXIVARR_PACKET_HEADER& packetHeader,
+                                                          std::vector< FFXIVARR_PACKET_RAW >& packets )
 {
   // sanity check: check there's enough bytes in the buffer
   const auto bytesExpected = packetHeader.size - sizeof( struct FFXIVARR_PACKET_HEADER );
@@ -82,7 +82,7 @@ PacketParseResult Sapphire::Network::Packets::getPackets( const std::vector< uin
 }
 
 PacketParseResult Sapphire::Network::Packets::getPacket( const std::vector< uint8_t >& buffer, const uint32_t offset,
-                                                     FFXIVARR_PACKET_RAW& packet )
+                                                         FFXIVARR_PACKET_RAW& packet )
 {
   // Copy segment header
   const auto headerResult = getSegmentHeader( buffer, offset, packet.segHdr );
