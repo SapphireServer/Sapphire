@@ -38,6 +38,7 @@ namespace Sapphire::Network
 
     LockedQueue< Packets::GamePacketPtr > m_inQueue;
     LockedQueue< Packets::GamePacketPtr > m_outQueue;
+    std::vector< uint8_t > m_packets;
 
   public:
     GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
