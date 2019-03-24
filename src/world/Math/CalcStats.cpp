@@ -308,15 +308,18 @@ float CalcStats::potency( uint16_t potency )
   return potency / 100.f;
 }
 
-float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage, bool isMagicDamage )
-{
-  const auto& baseStats = chara.getStats();
-  auto level = chara.getLevel();
-
-  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
-
-  float jobAttribute = 1.f;
-}
+//float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage, bool isMagicDamage )
+//{
+//  const auto& baseStats = chara.getStats();
+//  auto level = chara.getLevel();
+//
+//  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+//
+//  float jobAttribute = 1.f;
+//
+//  // todo: fix this
+//  return 1.f
+//}
 
 // todo: this is all retarded, needs to be per weapon and etcetc
 //uint32_t CalcStats::getPrimaryClassJobAttribute( const Sapphire::Entity::Chara& chara )
@@ -436,10 +439,10 @@ float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
   return std::floor( 15.f * baseStats.magicDefense ) / 100.f;
 }
 
-float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
-{
-
-}
+//float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
+//{
+//
+//}
 
 float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
 {
