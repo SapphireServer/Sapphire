@@ -155,6 +155,8 @@ namespace Sapphire::Network::Packets
     InventoryActionAck = 0x019D, // updated 4.5
     UpdateInventorySlot = 0x019E, // updated 4.5
 
+    HuntingLogEntry = 0x01A9, // added 4.5
+
     EventPlay = 0x01AB, // updated 4.5
     DirectorPlayScene = 0x01AF, // updated 4.5
     EventOpenGilShop = 0x01B2, // updated 4.5
