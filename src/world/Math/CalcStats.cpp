@@ -415,3 +415,35 @@ float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
 
   return std::floor( 200.f * ( baseStats.critHitRate - subVal ) / divVal + 1400.f ) / 1000.f;
 }
+
+float CalcStats::physicalDefence( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 15.f * baseStats.defense ) / 100.f;
+}
+
+float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 15.f * baseStats.magicDefense ) / 100.f;
+}
+
+float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
+{
+
+}
+
+float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+
+  return std::floor( 100.f * ( baseStats.healingPotMagic - 292.f ) / 264.f + 100.f ) / 100.f;
+}
