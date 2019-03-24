@@ -662,9 +662,18 @@ int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
 void Sapphire::Entity::Chara::setLastComboActionId( uint32_t actionId )
 {
   m_lastComboActionId = actionId;
+  m_lastComboActionTime = Util::getTimeMs();
 }
 
 uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
 {
+  // initially check for the time passed first, if it's more than the threshold just return 0 for the combo
+  // we can hide the implementation detail this way and it just works:tm: for anything that uses it
+
+  if( std::difftime( Util::getTimeMs(), m_lastComboActionTime ) > Common::MAX_COMBO_LENGTH )
+  {
+    return 0;
+  }
+
   return m_lastComboActionId;
 }
