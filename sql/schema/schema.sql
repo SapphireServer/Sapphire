@@ -586,7 +586,7 @@ COLLATE='latin1_swedish_ci' ENGINE=InnoDB;
 
 
 CREATE TABLE `charamonsternote` (
-  `CharacterId` bigint(20) UNSIGNED DEFAULT NULL,
+  `CharacterId` int(20) NOT NULL,
   `Category_0` binary(41) DEFAULT NULL,
   `Category_1` binary(41) DEFAULT NULL,
   `Category_2` binary(41) DEFAULT NULL,
