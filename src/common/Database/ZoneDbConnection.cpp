@@ -200,6 +200,14 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                               " WHERE CharacterId = ?;",
                     CONNECTION_ASYNC );
 
+  /// CLASS INFO
+  prepareStatement( CHARA_MONSTERNOTE_SEL, "SELECT Category_0, Category_1, Category_2, "
+                                                  "Category_3, Category_4, Category_5, "
+                                                  "Category_6, Category_7, Category_8, "
+                                                  "Category_9, Category_10, Category_11 FROM charamonsternote "
+                                                  "WHERE CharacterId = ?;",
+                    CONNECTION_SYNC );
+
   /// ZONE QUERIES
   prepareStatement( ZONE_SEL_BNPCTEMPLATES,
                     "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
