@@ -205,7 +205,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 
   m_pCell = nullptr;
 
-  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() )
+  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || loadHuntingLog() )
     Logger::error( "Player #{0}  data corrupt!", char_id_str );
 
   m_maxHp = getMaxHp();
@@ -333,6 +333,26 @@ bool Sapphire::Entity::Player::loadSearchInfo()
   return true;
 }
 
+
+bool Sapphire::Entity::Player::loadHuntingLog()
+{
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::CHARA_MONSTERNOTE_SEL );
+  stmt->setUInt( 1, m_id );
+  auto res = pDb->query( stmt );
+
+  if( !res->next() )
+    return false;
+
+  for( auto i = 0; i < 12; ++i )
+  {
+    std::string catStr = fmt::format( "Category_{}", i );
+    auto cat = res->getBlobVector( catStr );
+    m_huntingLogEntries[i].rank = cat[0];
+    memcpy( reinterpret_cast< char* >( m_huntingLogEntries[i].entries ), cat.data() + 1, cat.size() - 1 );
+  }
+  return true;
+}
 
 void Sapphire::Entity::Player::updateSql()
 {

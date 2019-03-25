@@ -263,6 +263,12 @@ namespace Sapphire::Common
 
   };
 
+  struct HuntingLogEntry
+  {
+    uint8_t rank;
+    uint8_t entries[10][4];
+  };
+
   enum class UnlockEntry : uint16_t
   {
     Return = 1,

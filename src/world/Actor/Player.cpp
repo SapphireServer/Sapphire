@@ -1976,3 +1976,9 @@ void Sapphire::Entity::Player::sendLandFlagsSlot( Common::LandFlagsSlot slot )
 
   queuePacket( landFlags );
 }
+
+Sapphire::Common::HuntingLogEntry& Sapphire::Entity::Player::getHuntingLogEntry( uint8_t index )
+{
+  assert( index < m_huntingLogEntries.size() );
+  return m_huntingLogEntries[ index ];
+}

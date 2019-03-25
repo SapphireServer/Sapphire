@@ -8,6 +8,7 @@
 #include <set>
 #include <map>
 #include <queue>
+#include <array>
 
 namespace Sapphire::Entity
 {
@@ -66,7 +67,7 @@ namespace Sapphire::Entity
     } m_baseStats;
 
     // array for bonuses, 80 to have some spare room.
-    uint32_t m_bonusStats[ 80 ];
+    std::array< uint32_t, 80 > m_bonusStats;
 
   protected:
     char m_name[34];
