@@ -31,7 +31,7 @@ private:
       // buy
       if( result.param2 == 1 )
       {
-        auto shopMgr = getFramework()->get< Sapphire::World::Manager::ShopMgr >();
+        auto shopMgr = framework()->get< Sapphire::World::Manager::ShopMgr >();
 
         shopMgr->purchaseGilShopItem( player, result.eventId, result.param3, result.param4 );
       }

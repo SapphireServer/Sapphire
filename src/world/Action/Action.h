@@ -45,6 +45,8 @@ namespace Sapphire::Action
     uint32_t getAdditionalData() const;
     void setAdditionalData( uint32_t data );
 
+    bool isComboAction() const;
+
     /*!
      * @brief Checks if the action *may* target a resident instead of an actor
      * @return true if the target *may* be a resident and not an actor, otherwise false.

@@ -77,6 +77,7 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
     }
 
     case Common::ItemActionType::ItemActionVFX:
+    case Common::ItemActionType::ItemActionVFX2:
     {
       handleItemActionVFX( player, itemId, itemActionData->data[ 0 ] );
 
