@@ -26,7 +26,7 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto pFw = getFramework();
+      auto pFw = framework();
       if( !pFw )
         return LandPurchaseResult::ERR_INTERNAL;
       // Purchase Land

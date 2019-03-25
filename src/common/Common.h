@@ -263,6 +263,14 @@ namespace Sapphire::Common
 
   };
 
+  enum class UnlockEntry : uint16_t
+  {
+    Return = 1,
+    Teleport = 4,
+    GearSets = 6,
+    HuntingLog = 21,
+  };
+
   enum ContainerType : uint16_t
   {
     Unknown = 0,
@@ -579,6 +587,13 @@ namespace Sapphire::Common
     TpLoss = 12,
     TpGain = 13,
     GpGain = 14,
+    /*!
+     * @brief Tells the client that it should show combo indicators on actions.
+     *
+     * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
+     * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
+     */
+    StartActionCombo = 28,
     Knockback = 33,
     Mount = 38,
     VFX = 59, // links to VFX sheet
@@ -596,7 +611,8 @@ namespace Sapphire::Common
 
   enum ItemActionType : uint16_t
   {
-    ItemActionVFX = 944,
+    ItemActionVFX = 852,
+    ItemActionVFX2 = 944,
   };
 
   enum ActionEffectDisplayType : uint8_t
@@ -929,6 +945,18 @@ namespace Sapphire::Common
   {
     uint16_t targetAetheryte;
     uint16_t cost;
+  };
+
+  enum LevelTableEntry : uint8_t
+  {
+    PIE,
+    MP,
+    MAIN,
+    SUB,
+    DIV,
+    HP,
+    ELMT,
+    THREAT
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

@@ -102,6 +102,8 @@ namespace Sapphire::Entity
     uint64_t m_targetId;
     /*! Ptr to a queued action */
     Action::ActionPtr m_pCurrentAction;
+    /*! the id of the last combo action used (IgnoresCombo) */
+    uint32_t m_lastComboActionId;
     /*! Invincibility type */
     Common::InvincibilityType m_invincibilityType;
 
@@ -242,6 +244,9 @@ namespace Sapphire::Entity
     Action::ActionPtr getCurrentAction() const;
 
     void setCurrentAction( Action::ActionPtr pAction );
+
+    uint32_t getLastComboActionId() const;
+    void setLastComboActionId( uint32_t actionId );
 
     uint32_t getBonusStat( Common::BaseParam bonus ) const;
 

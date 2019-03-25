@@ -21,7 +21,7 @@ public:
   {
     player.playScene( eventId, 0, HIDE_HOTBAR | NO_DEFAULT_CAMERA, [this, eventId]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto pExdData = getFramework()->get< Sapphire::Data::ExdDataGenerated >();
+      auto pExdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
       if( !pExdData )
         return;
 
@@ -42,7 +42,7 @@ public:
       // moving a player inside an event will crash the game so we end it hre
       player.eventFinish( eventId, 1 );
 
-      auto playerMgr = getFramework()->get< Sapphire::World::Manager::PlayerMgr >();
+      auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();
       playerMgr->movePlayerToLandDestination( player, pHousingAethernet->level, housingZone->getWardNum() );
     } );
   }
