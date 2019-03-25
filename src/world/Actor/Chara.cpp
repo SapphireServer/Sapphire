@@ -43,6 +43,8 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   m_lastTickTime = 0;
   m_lastUpdate = 0;
 
+  m_bonusStats.fill( 0 );
+
   // initialize the free slot queue
   for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
   {
