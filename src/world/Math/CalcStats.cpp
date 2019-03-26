@@ -265,16 +265,16 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
   return static_cast< uint16_t >( std::round( cost * baseCost ) );
 }
 
-float CalcStats::pBlk( const Chara& chara )
+float CalcStats::blockProbability( const Chara& chara )
 {
   auto level = chara.getLevel();
-  float blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
-  float levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  auto blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
+  auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
 }
 
-float CalcStats::pDhr( const Chara& chara )
+float CalcStats::directHitProbability( const Chara& chara )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
@@ -282,13 +282,13 @@ float CalcStats::pDhr( const Chara& chara )
   float dhRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::DirectHitRate ) ) +
                  baseStats.accuracy;
 
-  float divVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
-  float subVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
 
   return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
 }
 
-float CalcStats::pChr( const Chara& chara )
+float CalcStats::criticalHitProbability( const Chara& chara )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
@@ -296,8 +296,157 @@ float CalcStats::pChr( const Chara& chara )
   float chRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::CriticalHit ) ) +
                  baseStats.critHitRate;
 
-  float divVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
-  float subVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
 
   return std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
+}
+
+
+float CalcStats::potency( uint16_t potency )
+{
+  return potency / 100.f;
+}
+
+//float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage, bool isMagicDamage )
+//{
+//  const auto& baseStats = chara.getStats();
+//  auto level = chara.getLevel();
+//
+//  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+//
+//  float jobAttribute = 1.f;
+//
+//  // todo: fix this
+//  return 1.f
+//}
+
+// todo: this is all retarded, needs to be per weapon and etcetc
+//uint32_t CalcStats::getPrimaryClassJobAttribute( const Sapphire::Entity::Chara& chara )
+//{
+//
+//}
+
+float CalcStats::calcAttackPower( uint32_t attackPower )
+{
+  return std::floor( ( 125.f * ( attackPower - 292.f ) / 292.f ) + 100.f ) / 100.f;
+}
+
+float CalcStats::magicAttackPower( const Sapphire::Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+
+  return calcAttackPower( baseStats.attackPotMagic );
+}
+
+float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+
+  return calcAttackPower( baseStats.healingPotMagic );
+}
+
+float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+
+  return calcAttackPower( baseStats.attack );
+}
+
+float CalcStats::determination( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 130.f * ( baseStats.determination - mainVal ) / divVal + 1000.f ) / 1000.f;
+}
+
+float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 100.f * ( baseStats.tenacity - subVal ) / divVal + 1000.f ) / 1000.f;
+}
+
+float CalcStats::speed( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  uint32_t speedVal = 0;
+
+  // check whether we use spellspeed or skillspeed
+  // todo: this is kinda shitty though
+  switch( chara.getClass() )
+  {
+    case Common::ClassJob::Arcanist:
+    case Common::ClassJob::Astrologian:
+    case Common::ClassJob::Whitemage:
+    case Common::ClassJob::Redmage:
+    case Common::ClassJob::Bluemage:
+    case Common::ClassJob::Blackmage:
+    case Common::ClassJob::Summoner:
+    case Common::ClassJob::Scholar:
+    case Common::ClassJob::Thaumaturge:
+      speedVal = baseStats.spellSpeed;
+      break;
+
+    default:
+      speedVal = baseStats.skillSpeed;
+  }
+
+  return std::floor( 130.f * ( speedVal - subVal ) / divVal + 1000.f ) / 1000.f;
+}
+
+float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 200.f * ( baseStats.critHitRate - subVal ) / divVal + 1400.f ) / 1000.f;
+}
+
+float CalcStats::physicalDefence( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 15.f * baseStats.defense ) / 100.f;
+}
+
+float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  const auto& baseStats = chara.getStats();
+
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( 15.f * baseStats.magicDefense ) / 100.f;
+}
+
+//float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
+//{
+//
+//}
+
+float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+
+  return std::floor( 100.f * ( baseStats.healingPotMagic - 292.f ) / 264.f + 100.f ) / 100.f;
 }
