@@ -387,9 +387,7 @@ void Sapphire::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACK
   uint32_t tmpId = packet.segHdr.target_actor;
 
   Logger::info( "OpCode [{0}]", *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) );
-
-  Logger::info( Util::binaryToHexDump( packet.data.data(), packet.data.size() ) );
-
+  
   switch( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) )
   {
     case ClientVersionInfo:
