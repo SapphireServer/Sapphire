@@ -16,13 +16,16 @@
 #include <streambuf>
 #include <regex>
 
+#include <Util/CrashHandler.h>
+
+Sapphire::Common::Util::CrashHandler crashHandler;
+
 Sapphire::Data::ExdDataGenerated g_exdData;
 
 using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
-
 
 int main()
 {
