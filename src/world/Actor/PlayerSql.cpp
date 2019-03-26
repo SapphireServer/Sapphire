@@ -205,7 +205,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 
   m_pCell = nullptr;
 
-  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || loadHuntingLog() )
+  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() )
     Logger::error( "Player #{0}  data corrupt!", char_id_str );
 
   m_maxHp = getMaxHp();
