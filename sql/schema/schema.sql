@@ -95,7 +95,7 @@ CREATE TABLE `charainfo` (
   `Orchestrion` binary(40) DEFAULT NULL,
   `EquippedMannequin` int(5) DEFAULT '0',
   `ConfigFlags` smallint(5) NOT NULL DEFAULT '0',
-  `QuestCompleteFlags` varbinary(396) DEFAULT NULL,
+  `QuestCompleteFlags` varbinary(476) DEFAULT NULL,
   `OpeningSequence` int(3) DEFAULT '0',
   `QuestTracking` binary(10) DEFAULT NULL,
   `GrandCompany` int(3) DEFAULT '0',
