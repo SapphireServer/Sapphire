@@ -1099,6 +1099,8 @@ namespace Sapphire::Entity
     Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
+
+    void sendHuntingLog();
   };
 
 }
