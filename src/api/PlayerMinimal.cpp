@@ -181,7 +181,7 @@ void PlayerMinimal::saveAsNew()
   std::vector< uint8_t > howTo( 33 );
   std::vector< uint8_t > aetherytes( 16 );
   std::vector< uint8_t > discovery( 421 );
-  std::vector< uint8_t > questComplete( 396 );
+  std::vector< uint8_t > questComplete( 476 );
   std::vector< uint8_t > unlocks( 64 );
   std::vector< uint8_t > mountGuide( 15 );
   std::vector< uint8_t > orchestrion( 40 );
