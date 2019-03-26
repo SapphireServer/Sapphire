@@ -103,8 +103,17 @@ namespace Sapphire::Entity
     uint64_t m_targetId;
     /*! Ptr to a queued action */
     Action::ActionPtr m_pCurrentAction;
-    /*! the id of the last combo action used (IgnoresCombo) */
+
+    /*!
+     * @brief the id of the last combo action used (IgnoresCombo)
+     */
     uint32_t m_lastComboActionId;
+
+    /*!
+     * @brief when the last combo action was used in ms
+     */
+    uint64_t m_lastComboActionTime;
+
     /*! Invincibility type */
     Common::InvincibilityType m_invincibilityType;
 

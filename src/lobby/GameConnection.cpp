@@ -54,16 +54,13 @@ void Sapphire::Network::GameConnection::onDisconnect()
 
 void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 {
-  Packets::FFXIVARR_PACKET_HEADER packetHeader;
-  const auto headerResult = Packets::getHeader( buffer, 0, packetHeader );
+  m_packets.insert( std::end( m_packets ), std::begin( buffer ), std::end( buffer ) );
+  // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
+  Packets::FFXIVARR_PACKET_HEADER packetHeader{};
+  const auto headerResult = Packets::getHeader( m_packets, 0, packetHeader );
 
   if( headerResult == Incomplete )
-  {
-    Logger::info( "Dropping connection due to incomplete packet header." );
-    Logger::info( "FIXME: Packet message bounary is not implemented." );
-    disconnect();
     return;
-  }
 
   if( headerResult == Malformed )
   {
@@ -74,16 +71,11 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 
   // Dissect packet list
   std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-  const auto packetResult = Packets::getPackets( buffer, sizeof( struct FFXIVARR_PACKET_HEADER ),
+  const auto packetResult = Packets::getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
                                                  packetHeader, packetList );
 
   if( packetResult == Incomplete )
-  {
-    Logger::info( "Dropping connection due to incomplete packets." );
-    Logger::info( "FIXME: Packet message bounary is not implemented." );
-    disconnect();
     return;
-  }
 
   if( packetResult == Malformed )
   {
@@ -94,6 +86,7 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 
   // Handle it
   handlePackets( packetHeader, packetList );
+  m_packets.clear();
 
 }
 
@@ -243,15 +236,15 @@ void Sapphire::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet,
 
 bool Sapphire::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
-  LobbySessionPtr pSession = g_serverLobby.getSession( ( char* ) &packet.data[ 0 ] + 0x20 );
+  LobbySessionPtr pSession = g_serverLobby.getSession( ( char* ) &packet.data[ 0 ] + 0x22 );
 
   if( g_serverLobby.getConfig().allowNoSessionConnect && pSession == nullptr )
   {
     auto session = make_LobbySession();
     session->setAccountID( 0 );
-    session->setSessionId( ( uint8_t* ) &packet.data[ 0 ] + 0x20 );
+    session->setSessionId( ( uint8_t* ) &packet.data[ 0 ] + 0x22 );
     pSession = session;
-    Logger::info( "Allowed connection with no session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    Logger::info( "Allowed connection with no session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x22 ) );
   }
 
   if( pSession != nullptr )
@@ -395,6 +388,8 @@ void Sapphire::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACK
 
   Logger::info( "OpCode [{0}]", *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) );
 
+  Logger::info( Util::binaryToHexDump( packet.data.data(), packet.data.size() ) );
+
   switch( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) )
   {
     case ClientVersionInfo:
@@ -458,7 +453,7 @@ void Sapphire::Network::GameConnection::generateEncryptionKey( uint32_t key, con
   m_baseKey[ 2 ] = 0x34;
   m_baseKey[ 3 ] = 0x12;
   memcpy( m_baseKey + 0x04, &key, 4 );
-  m_baseKey[ 8 ] = 0x30;
+  m_baseKey[ 8 ] = 0xC6;
   m_baseKey[ 9 ] = 0x11;
   memcpy( ( char* ) m_baseKey + 0x0C, keyPhrase.c_str(), keyPhrase.size() );
   Sapphire::Util::md5( m_baseKey, m_encKey, 0x2C );

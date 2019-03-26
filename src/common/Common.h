@@ -21,6 +21,13 @@ namespace Sapphire::Common
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
+  /*!
+   * @brief The maximum length (in ms) of a combo before it is canceled/voided.
+   *
+   * The client has a combo timer of about 12 seconds, with a 0.5 second grace on top for latency considerations.
+   */
+  const uint16_t MAX_COMBO_LENGTH = 12500;
+
   struct FFXIVARR_POSITION3_U16
   {
     uint16_t x;
