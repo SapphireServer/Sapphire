@@ -65,6 +65,9 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
 
 #ifndef _WIN32
 
+  // used as is from: https://oroboro.com/stack-trace-on-crash/
+  // only changes output slightly
+
   void* addrlist[ max_frames + 1 ];
 
   int addrlen = backtrace( addrlist, sizeof( addrlist ) / sizeof( void* ) );

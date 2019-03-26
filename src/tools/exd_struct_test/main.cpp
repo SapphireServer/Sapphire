@@ -27,20 +27,10 @@ using namespace Sapphire;
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
-int shit()
-{
-  int* ptr = nullptr;
-
-  *ptr = 1;
-}
-
-
 int main()
 {
 
   Logger::init( "struct_test" );
-
-  shit();
 
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
