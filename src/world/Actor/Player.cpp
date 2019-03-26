@@ -1678,6 +1678,9 @@ void Sapphire::Entity::Player::sendZonePackets()
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
+  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+    sendHuntingLog();
+
   sendStats();
 
   // only initialize the UI if the player in fact just logged in.
@@ -1981,4 +1984,48 @@ Sapphire::Common::HuntingLogEntry& Sapphire::Entity::Player::getHuntingLogEntry(
 {
   assert( index < m_huntingLogEntries.size() );
   return m_huntingLogEntries[ index ];
+}
+
+void Sapphire::Entity::Player::sendHuntingLog()
+{
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  uint8_t count = 0;
+  for( const auto& entry : m_huntingLogEntries )
+  {
+    uint64_t completionFlag = 0;
+    auto huntPacket = makeZonePacket< FFXIVIpcHuntingLogEntry >( getId() );
+
+    huntPacket->data().u0 = -1;
+    huntPacket->data().rank = entry.rank;
+    huntPacket->data().index = count;
+
+    for( int i = 1; i <= 10; ++i )
+    {
+      auto index0 = i - 1;
+      bool allComplete = true;
+      auto monsterNoteId = ( count + 1 ) * 10000 + entry.rank * 10 + i;
+
+      auto monsterNote = pExdData->get< Data::MonsterNote >( monsterNoteId );
+      if( !monsterNote )
+        continue;
+
+      const auto huntEntry = entry.entries[ index0 ];
+      for( int x = 0; x < 3; ++x )
+      {
+        if( ( huntEntry[ x ] == monsterNote->count[ x ] ) && monsterNote->count[ x ] != 0 )
+          completionFlag |= ( 1ull << ( index0 * 5 + x ) );
+        else if( monsterNote->count[ x ] != 0 )
+          allComplete = false;
+      }
+
+      if( allComplete )
+        completionFlag |= ( 1ull << ( index0 * 5 + 4 ) );
+
+    }
+
+    memcpy( huntPacket->data().entries, entry.entries, sizeof( entry.entries ) );
+    huntPacket->data().completeFlags = completionFlag;
+    ++count;
+    queuePacket( huntPacket );
+  }
 }
