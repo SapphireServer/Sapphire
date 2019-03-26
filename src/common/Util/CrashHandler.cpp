@@ -7,7 +7,7 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 #else
-
+#include <stackwalker/StackWalker.h>
 #endif
 
 using namespace Sapphire::Common;
@@ -134,7 +134,8 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
 
 #else
 
-#warning Crash handling isn''t supported on Windows yet.
+  StackWalker sw;
+  sw.ShowCallstack();
 
 #endif
 }
