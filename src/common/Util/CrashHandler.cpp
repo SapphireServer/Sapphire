@@ -8,7 +8,19 @@
 #include <cxxabi.h>
 #else
 #include <stackwalker/StackWalker.h>
+
+class SapphireStackWalker : public StackWalker
+{
+public:
+  SapphireStackWalker() : StackWalker() {}
+protected:
+  virtual void OnOutput( LPCSTR szText )
+  {
+    Logger::critical( szText );
+  }
+};
 #endif
+
 
 using namespace Sapphire::Common;
 
@@ -137,7 +149,7 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
 
 #else
 
-  StackWalker sw;
+  SapphireStackWalker sw;
   sw.ShowCallstack();
 
 #endif
