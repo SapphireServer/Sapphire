@@ -1,5 +1,7 @@
 #include "Logger.h"
 
+#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warning", "error", "fatal", "off" }
+
 #include <spdlog/spdlog.h>
 #include <spdlog/async.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -9,16 +11,6 @@
 #include <experimental/filesystem> // or #include <filesystem>
 
 namespace fs = std::experimental::filesystem;
-
-Sapphire::Logger::Logger()
-{
-
-}
-
-Sapphire::Logger::~Logger()
-{
-
-}
 
 void Sapphire::Logger::init( const std::string& logPath )
 {
