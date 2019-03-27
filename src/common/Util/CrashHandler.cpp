@@ -16,11 +16,10 @@ public:
 protected:
   virtual void OnOutput( LPCSTR szText )
   {
-    Logger::critical( szText );
+    Sapphire::Logger::critical( "{}", szText );
   }
 };
 #endif
-
 
 using namespace Sapphire::Common;
 
