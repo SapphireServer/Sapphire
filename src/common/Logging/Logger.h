@@ -13,8 +13,8 @@ namespace Sapphire
 
   private:
     std::string m_logFile;
-    Logger();
-    ~Logger();
+    Logger() = default;
+    ~Logger() = default;
 
   public:
 
