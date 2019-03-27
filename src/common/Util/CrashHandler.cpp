@@ -16,7 +16,7 @@ public:
 protected:
   virtual void OnOutput( LPCSTR szText )
   {
-    Sapphire::Logger::critical( "{}", szText );
+    Sapphire::Logger::fatal( "{}", szText );
   }
 };
 #endif
