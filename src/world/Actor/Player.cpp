@@ -2054,13 +2054,11 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     auto note = pExdData->get< Sapphire::Data::MonsterNote >( monsterNoteId );
     for( auto x = 0; x < 4; ++x )
     {
-      Logger::debug( "checking monsterNoteId#{}, monsternoteTarget#{}", monsterNoteId, note->monsterNoteTarget[ x ] );
       auto note1 = pExdData->get< Sapphire::Data::MonsterNoteTarget >( note->monsterNoteTarget[ x ] );
       if( note1->bNpcName == id && logEntry.entries[ i - 1 ][ x ] < note->count[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
         queuePacket( makeActorControl143( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
-        Logger::debug( "Kill counts!" );
         logChanged = true;
         sectionChanged = true;
       }

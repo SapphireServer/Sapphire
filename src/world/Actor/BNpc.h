@@ -100,6 +100,8 @@ namespace Sapphire::Entity
 
     void pushNearbyBNpcs();
 
+    void setOwner( CharaPtr m_pChara );
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -129,6 +131,8 @@ namespace Sapphire::Entity
     std::vector< Common::FFXIVARR_POSITION3 > m_naviLastPath;
     uint8_t m_naviPathStep;
     Common::FFXIVARR_POSITION3 m_naviTarget;
+
+    CharaPtr m_pOwner;
 
   };
 
