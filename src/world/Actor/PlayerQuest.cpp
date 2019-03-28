@@ -1053,7 +1053,6 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
   // TODO: use the correct formula, this one is wrong
   uint32_t exp =
     ( questInfo->expFactor * paramGrowth->questExpModifier * ( 45 + 5 * questInfo->classJobLevel0 ) ) / 100;
-  exp = exp + ( questInfo->expFactor / 100 ) * 10000;
 
   exp = questInfo->expFactor;
 
@@ -1070,14 +1069,14 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
   {
     for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
     {
-      addItem( questInfo->itemCountReward0.at( i ) );
+      addItem( questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
     }
   }
 
   if( optionalItemCount > 0 )
   {
     auto itemId = questInfo->itemReward1.at( optionalChoice );
-    addItem( questInfo->itemCountReward1.at( optionalChoice ) );
+    addItem( itemId, questInfo->itemCountReward1.at( optionalChoice ) );
   }
 
   if( gilReward > 0 )
