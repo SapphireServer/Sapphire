@@ -966,6 +966,12 @@ namespace Sapphire::Entity
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
+    void sendHuntingLog();
+
+    void updateDbMonsterNote();
+
+    void updateHuntingLog( uint16_t id );
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     uint64_t m_lastMoveTime;
@@ -1100,7 +1106,6 @@ namespace Sapphire::Entity
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
 
-    void sendHuntingLog();
   };
 
 }
