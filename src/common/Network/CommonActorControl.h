@@ -199,6 +199,11 @@ enum ActorControlType : uint16_t
 
     GilTrailMsg = 0x211,
 
+    HuntingLogRankUnlock = 0x21D,
+    HuntingLogEntryUpdate = 0x21E,
+    HuntingLogSectionFinish = 0x21F,
+    HuntingLogRankFinish = 0x220,
+
     SetMaxGearSets = 0x230,
 
     SetCharaGearParamUI = 0x260,

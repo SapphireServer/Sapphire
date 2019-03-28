@@ -494,6 +494,9 @@ void Sapphire::Entity::Player::updateSql()
   ////// Class
   updateDbClass();
 
+  ////// MonterNote
+  updateDbMonsterNote();
+
 }
 
 void Sapphire::Entity::Player::updateDbClass() const
@@ -509,6 +512,26 @@ void Sapphire::Entity::Player::updateDbClass() const
   stmtS->setInt( 3, m_id );
   stmtS->setInt( 4, classJobIndex );
   pDb->execute( stmtS );
+}
+
+void Sapphire::Entity::Player::updateDbMonsterNote()
+{
+  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  // Category_0-11
+  auto stmt = pDb->getPreparedStatement( Db::CHARA_MONSTERNOTE_UP );
+  //std::array< std::vector< uint8_t >, 12 > vectors;
+  std::vector< uint8_t > vector( 41 );
+  for( std::size_t i = 0; i < m_huntingLogEntries.size(); ++i )
+  {
+    vector[ 0 ] = m_huntingLogEntries[ i ].rank;
+
+    memcpy( &vector[ 1 ],
+            reinterpret_cast< uint8_t* >( m_huntingLogEntries[ i ].entries ),
+            40 );
+    stmt->setBinary( i + 1, vector );
+  }
+  stmt->setInt( 13, m_id );
+  pDb->execute( stmt );
 }
 
 void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
