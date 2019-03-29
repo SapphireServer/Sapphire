@@ -392,12 +392,15 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
+  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
+
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 1, 1, 1 ) );
+    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
     tmpPlayer->onMobAggro( getAsBNpc() );
   }
+
 }
 
 void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
@@ -676,14 +679,14 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   {
     auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( m_pChara->getId() );
     setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId2 = m_pChara->getId();
+    setOwnerPacket->data().actorId = m_pChara->getId();
     sendToInRangeSet( setOwnerPacket );
   }
   else
   {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( m_pChara->getId() );
+    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
     setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId2 = INVALID_GAME_OBJECT_ID;
+    setOwnerPacket->data().actorId = 0;
     sendToInRangeSet( setOwnerPacket );
   }
 }
