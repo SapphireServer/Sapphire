@@ -78,6 +78,7 @@ Sapphire::Data::Action::Action( uint32_t row_id, Sapphire::Data::ExdDataGenerate
    affectsPosition = exdData->getField< bool >( row, 48 );
    omen = exdData->getField< uint8_t >( row, 49 );
    isPvP = exdData->getField< bool >( row, 50 );
+   isPlayerAction = exdData->getField< bool >( row, 62 );
 }
 
 Sapphire::Data::ActionCastTimeline::ActionCastTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -423,6 +424,85 @@ Sapphire::Data::AnimaWeaponItem::AnimaWeaponItem( uint32_t row_id, Sapphire::Dat
    item.push_back( exdData->getField< uint32_t >( row, 11 ) );
    item.push_back( exdData->getField< uint32_t >( row, 12 ) );
    item.push_back( exdData->getField< uint32_t >( row, 13 ) );
+}
+
+Sapphire::Data::AozAction::AozAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_AozActionDat.get_row( row_id );
+   action = exdData->getField< uint32_t >( row, 0 );
+}
+
+Sapphire::Data::AozActionTransient::AozActionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_AozActionTransientDat.get_row( row_id );
+   icon = exdData->getField< uint32_t >( row, 1 );
+   stats = exdData->getField< std::string >( row, 2 );
+   description = exdData->getField< std::string >( row, 3 );
+   location = exdData->getField< uint16_t >( row, 5 );
+   startQuest = exdData->getField< uint32_t >( row, 6 );
+   nextQuest = exdData->getField< uint32_t >( row, 7 );
+}
+
+Sapphire::Data::AOZArrangement::AOZArrangement( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_AOZArrangementDat.get_row( row_id, subRow );
+   aOZContentBriefingBNpc = exdData->getField< uint16_t >( row, 0 );
+}
+
+Sapphire::Data::AOZBoss::AOZBoss( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_AOZBossDat.get_row( row_id );
+   boss = exdData->getField< uint16_t >( row, 0 );
+}
+
+Sapphire::Data::AOZContent::AOZContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_AOZContentDat.get_row( row_id );
+   standardFinishTime = exdData->getField< uint16_t >( row, 0 );
+   idealFinishTime = exdData->getField< uint16_t >( row, 1 );
+   act1FightType = exdData->getField< uint8_t >( row, 2 );
+   act1 = exdData->getField< uint16_t >( row, 3 );
+   arenaType1 = exdData->getField< uint8_t >( row, 4 );
+   act2FightType = exdData->getField< uint8_t >( row, 5 );
+   act2 = exdData->getField< uint16_t >( row, 6 );
+   arenaType2 = exdData->getField< uint8_t >( row, 7 );
+   act3FightType = exdData->getField< uint8_t >( row, 8 );
+   act3 = exdData->getField< uint16_t >( row, 9 );
+   arenaType3 = exdData->getField< uint8_t >( row, 10 );
+   contentEntry = exdData->getField< uint32_t >( row, 11 );
+   order = exdData->getField< uint8_t >( row, 12 );
+   gilReward = exdData->getField< uint16_t >( row, 13 );
+   alliedSealsReward = exdData->getField< uint16_t >( row, 14 );
+   tomestonesReward = exdData->getField< uint16_t >( row, 15 );
+}
+
+Sapphire::Data::AOZContentBriefingBNpc::AOZContentBriefingBNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_AOZContentBriefingBNpcDat.get_row( row_id );
+   bNpcName = exdData->getField< uint32_t >( row, 0 );
+   targetSmall = exdData->getField< uint32_t >( row, 1 );
+   targetLarge = exdData->getField< uint32_t >( row, 2 );
+   endurance = exdData->getField< uint8_t >( row, 4 );
+   fire = exdData->getField< uint8_t >( row, 5 );
+   ice = exdData->getField< uint8_t >( row, 6 );
+   wind = exdData->getField< uint8_t >( row, 7 );
+   earth = exdData->getField< uint8_t >( row, 8 );
+   thunder = exdData->getField< uint8_t >( row, 9 );
+   water = exdData->getField< uint8_t >( row, 10 );
+   slashing = exdData->getField< uint8_t >( row, 11 );
+   piercing = exdData->getField< uint8_t >( row, 12 );
+   blunt = exdData->getField< uint8_t >( row, 13 );
+   magic = exdData->getField< uint8_t >( row, 14 );
+   slowResistance = exdData->getField< bool >( row, 15 );
+   petrificationResistance = exdData->getField< bool >( row, 16 );
+   paralysisResistance = exdData->getField< bool >( row, 17 );
+   silenceResistance = exdData->getField< bool >( row, 18 );
+   blindResistance = exdData->getField< bool >( row, 19 );
+   stunResistance = exdData->getField< bool >( row, 20 );
+   sleepResistance = exdData->getField< bool >( row, 21 );
+   bindResistance = exdData->getField< bool >( row, 22 );
+   heavyResistance = exdData->getField< bool >( row, 23 );
+   instaDeathResistance = exdData->getField< bool >( row, 24 );
 }
 
 Sapphire::Data::AquariumFish::AquariumFish( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -1275,7 +1355,7 @@ Sapphire::Data::ContentFinderCondition::ContentFinderCondition( uint32_t row_id,
    dutyRecorderAllowed = exdData->getField< bool >( row, 30 );
    name = exdData->getField< std::string >( row, 34 );
    contentType = exdData->getField< uint8_t >( row, 35 );
-   transient = exdData->getField< uint8_t >( row, 36 );
+   transient = exdData->getField< uint32_t >( row, 37 );
    image = exdData->getField< uint32_t >( row, 39 );
 }
 
@@ -1448,6 +1528,12 @@ Sapphire::Data::Credit::Credit( uint32_t row_id, uint32_t subRow, Sapphire::Data
    germanCast2 = exdData->getField< uint16_t >( row, 10 );
 }
 
+Sapphire::Data::CreditBackImage::CreditBackImage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_CreditBackImageDat.get_row( row_id, subRow );
+   backImage = exdData->getField< uint32_t >( row, 2 );
+}
+
 Sapphire::Data::CreditCast::CreditCast( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_CreditCastDat.get_row( row_id );
@@ -1528,6 +1614,19 @@ Sapphire::Data::CustomTalk::CustomTalk( uint32_t row_id, Sapphire::Data::ExdData
    scriptArg.push_back( exdData->getField< uint32_t >( row, 61 ) );
    scriptArg.push_back( exdData->getField< uint32_t >( row, 62 ) );
    text = exdData->getField< bool >( row, 66 );
+}
+
+Sapphire::Data::CustomTalkDynamicIcon::CustomTalkDynamicIcon( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_CustomTalkDynamicIconDat.get_row( row_id, subRow );
+   smallIcon = exdData->getField< uint32_t >( row, 0 );
+   largeIcon = exdData->getField< uint32_t >( row, 1 );
+}
+
+Sapphire::Data::CustomTalkNestHandlers::CustomTalkNestHandlers( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_CustomTalkNestHandlersDat.get_row( row_id, subRow );
+   nestHandler = exdData->getField< uint32_t >( row, 0 );
 }
 
 Sapphire::Data::Cutscene::Cutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -1680,6 +1779,35 @@ Sapphire::Data::DeliveryQuest::DeliveryQuest( uint32_t row_id, Sapphire::Data::E
    quest = exdData->getField< int32_t >( row, 0 );
 }
 
+Sapphire::Data::DescriptionPage::DescriptionPage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_DescriptionPageDat.get_row( row_id, subRow );
+   text1 = exdData->getField< uint32_t >( row, 1 );
+   image1 = exdData->getField< uint32_t >( row, 2 );
+   text2 = exdData->getField< uint32_t >( row, 3 );
+   image2 = exdData->getField< uint32_t >( row, 4 );
+   text3 = exdData->getField< uint32_t >( row, 5 );
+   image3 = exdData->getField< uint32_t >( row, 6 );
+   text4 = exdData->getField< uint32_t >( row, 7 );
+   image4 = exdData->getField< uint32_t >( row, 8 );
+   text5 = exdData->getField< uint32_t >( row, 9 );
+   image5 = exdData->getField< uint32_t >( row, 10 );
+   text6 = exdData->getField< uint32_t >( row, 11 );
+   image6 = exdData->getField< uint32_t >( row, 12 );
+   text7 = exdData->getField< uint32_t >( row, 13 );
+   image7 = exdData->getField< uint32_t >( row, 14 );
+   text8 = exdData->getField< uint32_t >( row, 15 );
+   image8 = exdData->getField< uint32_t >( row, 16 );
+   text9 = exdData->getField< uint32_t >( row, 17 );
+   image9 = exdData->getField< uint32_t >( row, 18 );
+}
+
+Sapphire::Data::DescriptionString::DescriptionString( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_DescriptionStringDat.get_row( row_id );
+   text = exdData->getField< std::string >( row, 0 );
+}
+
 Sapphire::Data::DisposalShop::DisposalShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_DisposalShopDat.get_row( row_id );
@@ -1746,6 +1874,18 @@ Sapphire::Data::DpsChallengeTransient::DpsChallengeTransient( uint32_t row_id, S
 {
    auto row = exdData->m_DpsChallengeTransientDat.get_row( row_id );
    instanceContent = exdData->getField< uint16_t >( row, 0 );
+}
+
+Sapphire::Data::EmjAddon::EmjAddon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_EmjAddonDat.get_row( row_id );
+   text = exdData->getField< std::string >( row, 0 );
+}
+
+Sapphire::Data::EmjDani::EmjDani( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_EmjDaniDat.get_row( row_id );
+   icon = exdData->getField< uint32_t >( row, 0 );
 }
 
 Sapphire::Data::Emote::Emote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -1865,6 +2005,18 @@ Sapphire::Data::ENpcBase::ENpcBase( uint32_t row_id, Sapphire::Data::ExdDataGene
    modelRightRing = exdData->getField< uint32_t >( row, 88 );
    dyeRightRing = exdData->getField< uint8_t >( row, 89 );
    balloon = exdData->getField< uint16_t >( row, 91 );
+}
+
+Sapphire::Data::ENpcDressUp::ENpcDressUp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_ENpcDressUpDat.get_row( row_id );
+   eNpcDressUpDress = exdData->getField< uint8_t >( row, 1 );
+}
+
+Sapphire::Data::ENpcDressUpDress::ENpcDressUpDress( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_ENpcDressUpDressDat.get_row( row_id, subRow );
+   eNpc = exdData->getField< uint32_t >( row, 6 );
 }
 
 Sapphire::Data::ENpcResident::ENpcResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -2738,6 +2890,12 @@ Sapphire::Data::GFateClimbing2TotemType::GFateClimbing2TotemType( uint32_t row_i
    publicContentTextData = exdData->getField< uint32_t >( row, 0 );
 }
 
+Sapphire::Data::GFateRideShooting::GFateRideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_GFateRideShootingDat.get_row( row_id );
+   contentEntry = exdData->getField< uint32_t >( row, 0 );
+}
+
 Sapphire::Data::GilShop::GilShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_GilShopDat.get_row( row_id );
@@ -3174,6 +3332,19 @@ Sapphire::Data::InstanceContentBuff::InstanceContentBuff( uint32_t row_id, Sapph
    echoDeath = exdData->getField< uint16_t >( row, 1 );
 }
 
+Sapphire::Data::InstanceContentCSBonus::InstanceContentCSBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_InstanceContentCSBonusDat.get_row( row_id );
+   instance = exdData->getField< uint16_t >( row, 0 );
+   item = exdData->getField< uint32_t >( row, 1 );
+}
+
+Sapphire::Data::InstanceContentGuide::InstanceContentGuide( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_InstanceContentGuideDat.get_row( row_id );
+   instance = exdData->getField< uint32_t >( row, 0 );
+}
+
 Sapphire::Data::InstanceContentTextData::InstanceContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_InstanceContentTextDataDat.get_row( row_id );
@@ -3591,6 +3762,7 @@ Sapphire::Data::ManeuversArmor::ManeuversArmor( uint32_t row_id, Sapphire::Data:
 Sapphire::Data::Map::Map( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_MapDat.get_row( row_id );
+   mapIndex = exdData->getField< int8_t >( row, 2 );
    hierarchy = exdData->getField< uint8_t >( row, 3 );
    mapMarkerRange = exdData->getField< uint16_t >( row, 4 );
    id = exdData->getField< std::string >( row, 5 );
@@ -4156,11 +4328,16 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
    beastReputationRank = exdData->getField< uint8_t >( row, 33 );
    mountRequired = exdData->getField< int32_t >( row, 37 );
    isHouseRequired = exdData->getField< bool >( row, 38 );
-   eNpcResidentStart = exdData->getField< uint32_t >( row, 40 );
-   eNpcResidentEnd = exdData->getField< uint32_t >( row, 42 );
+   deliveryQuest = exdData->getField< uint8_t >( row, 39 );
+   issuerStart = exdData->getField< uint32_t >( row, 40 );
+   behavior = exdData->getField< uint16_t >( row, 41 );
+   targetEnd = exdData->getField< uint32_t >( row, 42 );
    isRepeatable = exdData->getField< bool >( row, 43 );
    repeatIntervalType = exdData->getField< uint8_t >( row, 44 );
    questRepeatFlag = exdData->getField< uint8_t >( row, 45 );
+   unlocksSystemContent = exdData->getField< bool >( row, 46 );
+   type = exdData->getField< uint8_t >( row, 48 );
+   questClassJobSupply = exdData->getField< uint16_t >( row, 49 );
    scriptInstruction.push_back( exdData->getField< std::string >( row, 50 ) );
    scriptInstruction.push_back( exdData->getField< std::string >( row, 51 ) );
    scriptInstruction.push_back( exdData->getField< std::string >( row, 52 ) );
@@ -4261,177 +4438,334 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
    scriptArg.push_back( exdData->getField< uint32_t >( row, 147 ) );
    scriptArg.push_back( exdData->getField< uint32_t >( row, 148 ) );
    scriptArg.push_back( exdData->getField< uint32_t >( row, 149 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1222 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1223 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1224 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1225 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1226 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1227 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1228 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1229 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1230 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1231 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1232 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1233 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1234 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1235 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1236 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1237 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1238 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1239 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1240 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1241 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1242 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1243 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1244 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1245 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1246 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1247 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1248 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1249 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1250 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1251 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1252 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1253 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1254 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1255 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1256 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1257 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1258 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1259 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1260 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1261 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1262 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1263 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1264 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1265 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1266 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1267 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1268 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1269 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1270 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1271 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1272 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1273 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1274 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1275 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1276 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1277 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1278 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1279 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1280 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1281 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1282 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1283 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1284 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1285 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1286 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1287 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1288 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1289 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1290 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1291 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1292 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1293 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1294 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1295 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1296 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1297 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1298 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1299 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1300 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1301 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1302 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1303 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1304 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1305 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1306 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1307 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1308 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1309 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1310 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1311 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1312 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1313 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1314 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1315 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1316 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1317 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1318 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1319 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1320 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1321 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1322 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1323 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1324 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1325 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1326 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1327 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1328 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1329 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1330 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1331 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1332 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1333 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1334 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1335 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1336 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1337 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1338 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1339 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1340 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1341 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1342 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1343 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1344 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1345 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1346 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1347 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1348 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1349 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1350 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1351 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1352 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1353 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1354 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1355 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1356 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1357 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1358 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1359 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1360 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1361 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1362 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1363 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1364 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1365 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1366 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1367 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1368 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1369 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1370 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1371 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1372 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1373 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1374 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1375 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1376 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1377 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1378 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1379 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1380 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1381 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1382 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1383 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1384 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1385 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1386 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1387 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1388 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1389 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1390 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1391 ) );
-   level.push_back( exdData->getField< uint32_t >( row, 1392 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 150 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 151 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 152 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 153 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 154 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 155 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 156 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 157 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 158 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 159 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 160 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 161 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 162 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 163 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 164 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 165 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 166 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 167 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 168 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 169 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 170 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 171 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 172 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 173 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 174 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 175 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 176 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 177 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 178 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 179 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 180 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 181 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 182 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 183 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 184 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 185 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 186 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 187 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 188 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 189 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 190 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 191 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 192 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 193 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 194 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 195 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 196 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 197 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 198 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 199 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 200 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 201 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 202 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 203 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 204 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 205 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 206 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 207 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 208 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 209 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 210 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 211 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 212 ) );
+   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 213 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 214 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 215 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 216 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 217 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 218 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 219 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 220 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 221 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 222 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 223 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 224 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 225 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 226 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 227 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 228 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 229 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 230 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 231 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 232 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 233 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 234 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 235 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 236 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 237 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 238 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 239 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 240 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 241 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 242 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 243 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 244 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 245 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 246 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 247 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 248 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 249 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 250 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 251 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 252 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 253 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 254 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 255 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 256 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 257 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 258 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 259 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 260 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 261 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 262 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 263 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 264 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 265 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 266 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 267 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 268 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 269 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 270 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 271 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 272 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 273 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 274 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 275 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 276 ) );
+   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 277 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 278 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 279 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 280 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 281 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 282 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 283 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 284 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 285 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 286 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 287 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 288 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 289 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 290 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 291 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 292 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 293 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 294 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 295 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 296 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 297 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 298 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 299 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 300 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 301 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 302 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 303 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 304 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 305 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 306 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 307 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 308 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 309 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 310 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 311 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 312 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 313 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 314 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 315 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 316 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 317 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 318 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 319 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 320 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 321 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 322 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 323 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 324 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 325 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 326 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 327 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 328 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 329 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 330 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 331 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 332 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 333 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 334 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 335 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 336 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 337 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 338 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 339 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 340 ) );
+   actorSpawn.push_back( exdData->getField< uint32_t >( row, 341 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 342 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 343 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 344 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 345 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 346 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 347 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 348 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 349 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 350 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 351 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 352 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 353 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 354 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 355 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 356 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 357 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 358 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 359 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 360 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 361 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 362 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 363 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 364 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 365 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 366 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 367 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 368 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 369 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 370 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 371 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 372 ) );
+   questUInt8A.push_back( exdData->getField< uint8_t >( row, 373 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 374 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 375 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 376 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 377 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 378 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 379 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 380 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 381 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 382 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 383 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 384 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 385 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 386 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 387 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 388 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 389 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 390 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 391 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 392 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 393 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 394 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 395 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 396 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 397 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 398 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 399 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 400 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 401 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 402 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 403 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 404 ) );
+   questUInt8B.push_back( exdData->getField< uint8_t >( row, 405 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1174 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1175 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1176 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1177 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1178 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1179 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1180 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1181 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1182 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1183 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1184 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1185 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1186 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1187 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1188 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1189 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1190 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1191 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1192 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1193 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1194 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1195 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1196 ) );
+   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1197 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1198 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1199 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1200 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1201 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1202 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1203 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1204 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1205 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1206 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1207 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1208 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1209 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1210 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1211 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1212 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1213 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1214 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1215 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1216 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1217 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1218 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1219 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1220 ) );
+   toDoQty.push_back( exdData->getField< uint8_t >( row, 1221 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1222 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1223 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1224 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1225 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1226 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1227 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1228 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1229 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1230 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1231 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1232 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1233 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1234 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1235 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1236 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1237 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1238 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1239 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1240 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1241 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1242 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1243 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1244 ) );
+   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1245 ) );
    classJobRequired = exdData->getField< uint8_t >( row, 1438 );
    expFactor = exdData->getField< uint16_t >( row, 1440 );
    gilReward = exdData->getField< uint32_t >( row, 1441 );
@@ -4496,6 +4830,312 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
    iconSpecial = exdData->getField< uint32_t >( row, 1509 );
    eventIconType = exdData->getField< uint8_t >( row, 1512 );
    sortKey = exdData->getField< uint16_t >( row, 1514 );
+}
+
+Sapphire::Data::QuestBattle::QuestBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_QuestBattleDat.get_row( row_id );
+   quest = exdData->getField< int32_t >( row, 0 );
+   timeLimit = exdData->getField< uint16_t >( row, 2 );
+   levelSync = exdData->getField< uint16_t >( row, 3 );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 4 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 5 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 6 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 7 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 8 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 9 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 10 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 11 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 12 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 13 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 14 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 15 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 16 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 17 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 18 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 19 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 20 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 21 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 22 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 23 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 24 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 25 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 26 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 27 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 28 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 29 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 30 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 31 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 32 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 33 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 34 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 35 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 36 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 37 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 38 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 39 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 40 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 41 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 42 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 43 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 44 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 45 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 46 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 47 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 48 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 49 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 50 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 51 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 52 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 53 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 54 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 55 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 56 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 57 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 58 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 59 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 60 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 61 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 62 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 63 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 64 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 65 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 66 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 67 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 68 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 69 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 70 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 71 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 72 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 73 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 74 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 75 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 76 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 77 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 78 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 79 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 80 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 81 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 82 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 83 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 84 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 85 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 86 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 87 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 88 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 89 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 90 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 91 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 92 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 93 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 94 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 95 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 96 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 97 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 98 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 99 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 100 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 101 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 102 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 103 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 104 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 105 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 106 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 107 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 108 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 109 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 110 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 111 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 112 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 113 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 114 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 115 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 116 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 117 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 118 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 119 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 120 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 121 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 122 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 123 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 124 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 125 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 126 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 127 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 128 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 129 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 130 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 131 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 132 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 133 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 134 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 135 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 136 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 137 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 138 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 139 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 140 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 141 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 142 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 143 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 144 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 145 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 146 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 147 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 148 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 149 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 150 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 151 ) );
+   scriptInstruction.push_back( exdData->getField< std::string >( row, 152 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 153 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 154 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 155 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 156 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 157 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 158 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 159 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 160 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 161 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 162 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 163 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 164 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 165 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 166 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 167 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 168 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 169 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 170 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 171 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 172 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 173 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 174 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 175 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 176 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 177 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 178 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 179 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 180 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 181 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 182 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 183 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 184 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 185 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 186 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 187 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 188 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 189 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 190 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 191 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 192 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 193 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 194 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 195 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 196 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 197 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 198 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 199 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 200 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 201 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 202 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 203 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 204 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 205 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 206 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 207 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 208 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 209 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 210 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 211 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 212 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 213 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 214 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 215 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 216 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 217 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 218 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 219 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 220 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 221 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 222 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 223 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 224 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 225 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 226 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 227 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 228 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 229 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 230 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 231 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 232 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 233 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 234 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 235 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 236 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 237 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 238 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 239 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 240 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 241 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 242 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 243 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 244 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 245 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 246 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 247 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 248 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 249 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 250 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 251 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 252 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 253 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 254 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 255 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 256 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 257 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 258 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 259 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 260 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 261 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 262 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 263 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 264 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 265 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 266 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 267 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 268 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 269 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 270 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 271 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 272 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 273 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 274 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 275 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 276 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 277 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 278 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 279 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 280 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 281 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 282 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 283 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 284 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 285 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 286 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 287 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 288 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 289 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 290 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 291 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 292 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 293 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 294 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 295 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 296 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 297 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 298 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 299 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 300 ) );
+   scriptValue.push_back( exdData->getField< std::string >( row, 301 ) );
 }
 
 Sapphire::Data::QuestClassJobReward::QuestClassJobReward( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
@@ -4603,6 +5243,25 @@ Sapphire::Data::RacingChocoboParam::RacingChocoboParam( uint32_t row_id, Sapphir
 {
    auto row = exdData->m_RacingChocoboParamDat.get_row( row_id );
    name = exdData->getField< std::string >( row, 0 );
+}
+
+Sapphire::Data::RecastNavimesh::RecastNavimesh( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_RecastNavimeshDat.get_row( row_id );
+   tileSize = exdData->getField< float >( row, 1 );
+   cellSize = exdData->getField< float >( row, 2 );
+   cellHeight = exdData->getField< float >( row, 3 );
+   agentHeight = exdData->getField< float >( row, 4 );
+   agentRadius = exdData->getField< float >( row, 5 );
+   agentMaxClimb = exdData->getField< float >( row, 6 );
+   agentMaxSlope = exdData->getField< float >( row, 7 );
+   regionMinSize = exdData->getField< float >( row, 9 );
+   regionMergedSize = exdData->getField< float >( row, 10 );
+   maxEdgeLength = exdData->getField< float >( row, 12 );
+   maxEdgeError = exdData->getField< float >( row, 13 );
+   vertsPerPoly = exdData->getField< float >( row, 14 );
+   detailMeshSampleDistance = exdData->getField< float >( row, 15 );
+   detailMeshMaxSampleError = exdData->getField< float >( row, 16 );
 }
 
 Sapphire::Data::Recipe::Recipe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -5162,6 +5821,186 @@ Sapphire::Data::SpecialShop::SpecialShop( uint32_t row_id, Sapphire::Data::ExdDa
    questItem.push_back( exdData->getField< int32_t >( row, 1258 ) );
    questItem.push_back( exdData->getField< int32_t >( row, 1259 ) );
    questItem.push_back( exdData->getField< int32_t >( row, 1260 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1261 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1262 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1263 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1264 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1265 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1266 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1267 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1268 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1269 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1270 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1271 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1272 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1273 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1274 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1275 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1276 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1277 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1278 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1279 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1280 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1281 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1282 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1283 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1284 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1285 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1286 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1287 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1288 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1289 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1290 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1291 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1292 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1293 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1294 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1295 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1296 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1297 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1298 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1299 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1300 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1301 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1302 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1303 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1304 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1305 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1306 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1307 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1308 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1309 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1310 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1311 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1312 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1313 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1314 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1315 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1316 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1317 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1318 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1319 ) );
+   unknown.push_back( exdData->getField< int32_t >( row, 1320 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1321 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1322 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1323 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1324 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1325 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1326 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1327 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1328 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1329 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1330 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1331 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1332 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1333 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1334 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1335 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1336 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1337 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1338 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1339 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1340 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1341 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1342 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1343 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1344 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1345 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1346 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1347 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1348 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1349 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1350 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1351 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1352 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1353 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1354 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1355 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1356 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1357 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1358 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1359 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1360 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1361 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1362 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1363 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1364 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1365 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1366 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1367 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1368 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1369 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1370 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1371 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1372 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1373 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1374 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1375 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1376 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1377 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1378 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1379 ) );
+   achievementUnlock.push_back( exdData->getField< int32_t >( row, 1380 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1801 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1802 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1803 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1804 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1805 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1806 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1807 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1808 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1809 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1810 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1811 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1812 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1813 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1814 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1815 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1816 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1817 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1818 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1819 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1820 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1821 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1822 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1823 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1824 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1825 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1826 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1827 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1828 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1829 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1830 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1831 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1832 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1833 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1834 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1835 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1836 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1837 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1838 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1839 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1840 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1841 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1842 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1843 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1844 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1845 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1846 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1847 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1848 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1849 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1850 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1851 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1852 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1853 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1854 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1855 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1856 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1857 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1858 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1859 ) );
+   patchNumber.push_back( exdData->getField< uint16_t >( row, 1860 ) );
    questUnlock = exdData->getField< uint32_t >( row, 1862 );
    questShop = exdData->getField< int32_t >( row, 1863 );
    notCompleteText = exdData->getField< int32_t >( row, 1864 );
@@ -5310,6 +6149,7 @@ Sapphire::Data::TerritoryType::TerritoryType( uint32_t row_id, Sapphire::Data::E
    territoryIntendedUse = exdData->getField< uint8_t >( row, 9 );
    weatherRate = exdData->getField< uint8_t >( row, 12 );
    arrayEventHandler = exdData->getField< uint32_t >( row, 22 );
+   questBattle = exdData->getField< uint16_t >( row, 23 );
    aetheryte = exdData->getField< int32_t >( row, 24 );
 }
 
@@ -5543,8 +6383,8 @@ Sapphire::Data::TutorialTank::TutorialTank( uint32_t row_id, Sapphire::Data::Exd
 Sapphire::Data::UIColor::UIColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_UIColorDat.get_row( row_id );
-   foreground = exdData->getField< uint32_t >( row, 0 );
-   background = exdData->getField< uint32_t >( row, 1 );
+   uIForeground = exdData->getField< uint32_t >( row, 0 );
+   uIGlow = exdData->getField< uint32_t >( row, 1 );
 }
 
 Sapphire::Data::VaseFlower::VaseFlower( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -5628,6 +6468,13 @@ Sapphire::Data::WeatherRate::WeatherRate( uint32_t row_id, Sapphire::Data::ExdDa
    auto row = exdData->m_WeatherRateDat.get_row( row_id );
 }
 
+Sapphire::Data::WeatherReportReplace::WeatherReportReplace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_WeatherReportReplaceDat.get_row( row_id );
+   placeNameSub = exdData->getField< uint16_t >( row, 0 );
+   placeNameParent = exdData->getField< uint16_t >( row, 1 );
+}
+
 Sapphire::Data::WeddingBGM::WeddingBGM( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_WeddingBGMDat.get_row( row_id );
@@ -5706,6 +6553,7 @@ Sapphire::Data::WorldDCGroupType::WorldDCGroupType( uint32_t row_id, Sapphire::D
 {
    auto row = exdData->m_WorldDCGroupTypeDat.get_row( row_id );
    name = exdData->getField< std::string >( row, 0 );
+   region = exdData->getField< uint8_t >( row, 1 );
 }
 
 Sapphire::Data::YKW::YKW( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -5805,6 +6653,12 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_AnimaWeaponFUITalkParamDat = setupDatAccess( "AnimaWeaponFUITalkParam", xiv::exd::Language::en );
       m_AnimaWeaponIconDat = setupDatAccess( "AnimaWeaponIcon", xiv::exd::Language::none );
       m_AnimaWeaponItemDat = setupDatAccess( "AnimaWeaponItem", xiv::exd::Language::none );
+      m_AozActionDat = setupDatAccess( "AozAction", xiv::exd::Language::none );
+      m_AozActionTransientDat = setupDatAccess( "AozActionTransient", xiv::exd::Language::en );
+      m_AOZArrangementDat = setupDatAccess( "AOZArrangement", xiv::exd::Language::none );
+      m_AOZBossDat = setupDatAccess( "AOZBoss", xiv::exd::Language::none );
+      m_AOZContentDat = setupDatAccess( "AOZContent", xiv::exd::Language::none );
+      m_AOZContentBriefingBNpcDat = setupDatAccess( "AOZContentBriefingBNpc", xiv::exd::Language::none );
       m_AquariumFishDat = setupDatAccess( "AquariumFish", xiv::exd::Language::none );
       m_AquariumWaterDat = setupDatAccess( "AquariumWater", xiv::exd::Language::en );
       m_ArrayEventHandlerDat = setupDatAccess( "ArrayEventHandler", xiv::exd::Language::none );
@@ -5884,9 +6738,12 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_CraftLeveDat = setupDatAccess( "CraftLeve", xiv::exd::Language::none );
       m_CraftTypeDat = setupDatAccess( "CraftType", xiv::exd::Language::en );
       m_CreditDat = setupDatAccess( "Credit", xiv::exd::Language::none );
+      m_CreditBackImageDat = setupDatAccess( "CreditBackImage", xiv::exd::Language::none );
       m_CreditCastDat = setupDatAccess( "CreditCast", xiv::exd::Language::en );
       m_CurrencyDat = setupDatAccess( "Currency", xiv::exd::Language::none );
       m_CustomTalkDat = setupDatAccess( "CustomTalk", xiv::exd::Language::en );
+      m_CustomTalkDynamicIconDat = setupDatAccess( "CustomTalkDynamicIcon", xiv::exd::Language::none );
+      m_CustomTalkNestHandlersDat = setupDatAccess( "CustomTalkNestHandlers", xiv::exd::Language::none );
       m_CutsceneDat = setupDatAccess( "Cutscene", xiv::exd::Language::none );
       m_CutScreenImageDat = setupDatAccess( "CutScreenImage", xiv::exd::Language::none );
       m_DailySupplyItemDat = setupDatAccess( "DailySupplyItem", xiv::exd::Language::none );
@@ -5904,15 +6761,21 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_DefaultTalkDat = setupDatAccess( "DefaultTalk", xiv::exd::Language::en );
       m_DefaultTalkLipSyncTypeDat = setupDatAccess( "DefaultTalkLipSyncType", xiv::exd::Language::none );
       m_DeliveryQuestDat = setupDatAccess( "DeliveryQuest", xiv::exd::Language::none );
+      m_DescriptionPageDat = setupDatAccess( "DescriptionPage", xiv::exd::Language::none );
+      m_DescriptionStringDat = setupDatAccess( "DescriptionString", xiv::exd::Language::en );
       m_DisposalShopDat = setupDatAccess( "DisposalShop", xiv::exd::Language::en );
       m_DisposalShopFilterTypeDat = setupDatAccess( "DisposalShopFilterType", xiv::exd::Language::en );
       m_DisposalShopItemDat = setupDatAccess( "DisposalShopItem", xiv::exd::Language::none );
       m_DpsChallengeDat = setupDatAccess( "DpsChallenge", xiv::exd::Language::en );
       m_DpsChallengeOfficerDat = setupDatAccess( "DpsChallengeOfficer", xiv::exd::Language::none );
       m_DpsChallengeTransientDat = setupDatAccess( "DpsChallengeTransient", xiv::exd::Language::none );
+      m_EmjAddonDat = setupDatAccess( "EmjAddon", xiv::exd::Language::en );
+      m_EmjDaniDat = setupDatAccess( "EmjDani", xiv::exd::Language::none );
       m_EmoteDat = setupDatAccess( "Emote", xiv::exd::Language::en );
       m_EmoteCategoryDat = setupDatAccess( "EmoteCategory", xiv::exd::Language::en );
       m_ENpcBaseDat = setupDatAccess( "ENpcBase", xiv::exd::Language::none );
+      m_ENpcDressUpDat = setupDatAccess( "ENpcDressUp", xiv::exd::Language::none );
+      m_ENpcDressUpDressDat = setupDatAccess( "ENpcDressUpDress", xiv::exd::Language::none );
       m_ENpcResidentDat = setupDatAccess( "ENpcResident", xiv::exd::Language::en );
       m_EObjDat = setupDatAccess( "EObj", xiv::exd::Language::none );
       m_EObjNameDat = setupDatAccess( "EObjName", xiv::exd::Language::en );
@@ -5993,6 +6856,7 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_GFateClimbing2Dat = setupDatAccess( "GFateClimbing2", xiv::exd::Language::none );
       m_GFateClimbing2ContentDat = setupDatAccess( "GFateClimbing2Content", xiv::exd::Language::none );
       m_GFateClimbing2TotemTypeDat = setupDatAccess( "GFateClimbing2TotemType", xiv::exd::Language::none );
+      m_GFateRideShootingDat = setupDatAccess( "GFateRideShooting", xiv::exd::Language::none );
       m_GilShopDat = setupDatAccess( "GilShop", xiv::exd::Language::en );
       m_GilShopItemDat = setupDatAccess( "GilShopItem", xiv::exd::Language::none );
       m_GoldSaucerArcadeMachineDat = setupDatAccess( "GoldSaucerArcadeMachine", xiv::exd::Language::en );
@@ -6012,9 +6876,9 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_HousingEmploymentNpcRaceDat = setupDatAccess( "HousingEmploymentNpcRace", xiv::exd::Language::en );
       m_HousingExteriorDat = setupDatAccess( "HousingExterior", xiv::exd::Language::none );
       m_HousingFurnitureDat = setupDatAccess( "HousingFurniture", xiv::exd::Language::none );
+      m_HousingLandSetDat = setupDatAccess( "HousingLandSet", xiv::exd::Language::none );
       m_HousingMapMarkerInfoDat = setupDatAccess( "HousingMapMarkerInfo", xiv::exd::Language::none );
       m_HousingMerchantPoseDat = setupDatAccess( "HousingMerchantPose", xiv::exd::Language::en );
-      m_HousingLandSetDat = setupDatAccess( "HousingLandSet", xiv::exd::Language::none );
       m_HousingPlacementDat = setupDatAccess( "HousingPlacement", xiv::exd::Language::en );
       m_HousingPresetDat = setupDatAccess( "HousingPreset", xiv::exd::Language::en );
       m_HousingUnitedExteriorDat = setupDatAccess( "HousingUnitedExterior", xiv::exd::Language::none );
@@ -6024,6 +6888,8 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_HowToPageDat = setupDatAccess( "HowToPage", xiv::exd::Language::en );
       m_InstanceContentDat = setupDatAccess( "InstanceContent", xiv::exd::Language::en );
       m_InstanceContentBuffDat = setupDatAccess( "InstanceContentBuff", xiv::exd::Language::none );
+      m_InstanceContentCSBonusDat = setupDatAccess( "InstanceContentCSBonus", xiv::exd::Language::none );
+      m_InstanceContentGuideDat = setupDatAccess( "InstanceContentGuide", xiv::exd::Language::none );
       m_InstanceContentTextDataDat = setupDatAccess( "InstanceContentTextData", xiv::exd::Language::en );
       m_ItemDat = setupDatAccess( "Item", xiv::exd::Language::en );
       m_ItemActionDat = setupDatAccess( "ItemAction", xiv::exd::Language::none );
@@ -6109,6 +6975,7 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_PvPSelectTraitDat = setupDatAccess( "PvPSelectTrait", xiv::exd::Language::en );
       m_PvPTraitDat = setupDatAccess( "PvPTrait", xiv::exd::Language::none );
       m_QuestDat = setupDatAccess( "Quest", xiv::exd::Language::en );
+      m_QuestBattleDat = setupDatAccess( "QuestBattle", xiv::exd::Language::none );
       m_QuestClassJobRewardDat = setupDatAccess( "QuestClassJobReward", xiv::exd::Language::none );
       m_QuestClassJobSupplyDat = setupDatAccess( "QuestClassJobSupply", xiv::exd::Language::none );
       m_QuestRepeatFlagDat = setupDatAccess( "QuestRepeatFlag", xiv::exd::Language::none );
@@ -6121,6 +6988,7 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_RacingChocoboNameCategoryDat = setupDatAccess( "RacingChocoboNameCategory", xiv::exd::Language::en );
       m_RacingChocoboNameInfoDat = setupDatAccess( "RacingChocoboNameInfo", xiv::exd::Language::none );
       m_RacingChocoboParamDat = setupDatAccess( "RacingChocoboParam", xiv::exd::Language::en );
+      m_RecastNavimeshDat = setupDatAccess( "RecastNavimesh", xiv::exd::Language::none );
       m_RecipeDat = setupDatAccess( "Recipe", xiv::exd::Language::none );
       m_RecipeElementDat = setupDatAccess( "RecipeElement", xiv::exd::Language::en );
       m_RecipeLevelTableDat = setupDatAccess( "RecipeLevelTable", xiv::exd::Language::none );
@@ -6202,6 +7070,7 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_WeatherDat = setupDatAccess( "Weather", xiv::exd::Language::en );
       m_WeatherGroupDat = setupDatAccess( "WeatherGroup", xiv::exd::Language::none );
       m_WeatherRateDat = setupDatAccess( "WeatherRate", xiv::exd::Language::none );
+      m_WeatherReportReplaceDat = setupDatAccess( "WeatherReportReplace", xiv::exd::Language::none );
       m_WeddingBGMDat = setupDatAccess( "WeddingBGM", xiv::exd::Language::en );
       m_WeeklyBingoOrderDataDat = setupDatAccess( "WeeklyBingoOrderData", xiv::exd::Language::none );
       m_WeeklyBingoRewardDataDat = setupDatAccess( "WeeklyBingoRewardData", xiv::exd::Language::none );

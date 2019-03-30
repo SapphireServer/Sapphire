@@ -11,8 +11,7 @@
 
 using namespace Sapphire;
 
-class ManFst004 :
-  public Sapphire::ScriptAPI::EventScript
+class ManFst004 : public Sapphire::ScriptAPI::EventScript
 {
 private:
   // Basic quest information
@@ -23,8 +22,7 @@ private:
   // GetQuestUI8BL
   // GetQuestUI8CH
 
-  enum Sequence :
-    uint8_t
+  enum Sequence : uint8_t
   {
     Seq0 = 0,
     Seq1 = 1,

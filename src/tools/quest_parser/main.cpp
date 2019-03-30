@@ -282,8 +282,8 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   std::string additional = "// Quest Script: " + pQuestData->id + "\n";
   additional += "// Quest Name: " + pQuestData->name + "\n";
   additional += "// Quest ID: " + std::to_string( questId ) + "\n";
-  additional += "// Start NPC: " + std::to_string( pQuestData->eNpcResidentStart ) + "\n";
-  additional += "// End NPC: " + std::to_string( pQuestData->eNpcResidentEnd ) + "\n\n";
+  additional += "// Start NPC: " + std::to_string( pQuestData->issuerStart ) + "\n";
+  additional += "// End NPC: " + std::to_string( pQuestData->targetEnd ) + "\n\n";
 
   std::string actionEntry;
   std::string scriptEntry;
