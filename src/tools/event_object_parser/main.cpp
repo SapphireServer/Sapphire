@@ -32,8 +32,7 @@ namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
-
-std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
+std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
