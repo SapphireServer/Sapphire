@@ -103,8 +103,7 @@ namespace Sapphire
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
     std::set< uint32_t > m_spawnedPlayers;
 
-    // the players which are bound to the instance, regardless of inside or offline
-    std::set< uint32_t > m_boundPlayerIds;
+    uint32_t m_boundPlayerId;
   };
 
 }

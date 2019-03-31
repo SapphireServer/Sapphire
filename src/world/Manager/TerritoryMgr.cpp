@@ -11,6 +11,7 @@
 #include "Territory/Zone.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/QuestBattle.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
 #include "Framework.h"
@@ -268,6 +269,45 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
   m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ][ pZone->getGuId() ] = pZone;
   m_zoneSet.insert( { pZone } );
+
+  return pZone;
+}
+
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uint32_t contentFinderConditionId )
+{
+
+  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  if( !pContentFinderCondition )
+    return nullptr;
+
+  auto questBattleId = pContentFinderCondition->content;
+
+  auto pQuestBattleInfo = pExdData->get< Sapphire::Data::QuestBattle >( questBattleId );
+  if( !pQuestBattleInfo )
+    return nullptr;
+
+  auto pQuestInfo = pExdData->get< Sapphire::Data::Quest >( pQuestBattleInfo->quest );
+  if( !pQuestInfo )
+    return nullptr;
+
+  if( !isInstanceContentTerritory( pContentFinderCondition->territoryType ) )
+    return nullptr;
+
+  auto pTeri = getTerritoryDetail( pContentFinderCondition->territoryType );
+
+  if( !pTeri || pQuestInfo->name.empty() )
+    return nullptr;
+
+  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", questBattleId, pQuestInfo->name );
+
+  auto pZone = make_QuestBattle( pQuestBattleInfo, pContentFinderCondition->territoryType, getNextInstanceId(),
+                                 pTeri->name, pQuestInfo->name, questBattleId, framework() );
+  pZone->init();
+
+  m_instanceContentIdToInstanceMap[ questBattleId ][ pZone->getGuId() ] = pZone;
+  m_instanceIdToZonePtrMap[ pZone->getGuId() ] = pZone;
+  m_instanceZoneSet.insert( pZone );
 
   return pZone;
 }

@@ -8,6 +8,7 @@
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
+#include <Logging/Logger.h>
 
 
 using namespace Sapphire::Common;
@@ -58,6 +59,7 @@ void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& play
 
 void Sapphire::Event::Director::sendDirectorInit( Sapphire::Entity::Player& player ) const
 {
+  Logger::debug( "DirectorID#{}, QuestBattleID#{}", m_directorId, m_contentId );
   player.queuePacket( makeActorControl143( player.getId(), DirectorInit, m_directorId, m_contentId ) );
 }
 

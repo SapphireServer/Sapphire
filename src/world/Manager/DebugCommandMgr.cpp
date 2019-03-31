@@ -29,6 +29,7 @@
 #include "Territory/Zone.h"
 #include "Territory/HousingZone.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/QuestBattle.h"
 #include "Manager/TerritoryMgr.h"
 #include "Event/EventDefs.h"
 
@@ -58,6 +59,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "help", &DebugCommandMgr::help, "Shows registered commands.", 0 );
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
+  registerCommand( "questbattle", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
 }
 
@@ -781,9 +783,8 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   }
 }
 
-void
-Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player& player,
-                                                     std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player& player,
+                                                          std::shared_ptr< DebugCommand > command )
 {
   auto pTeriMgr = framework()->get< TerritoryMgr >();
   std::string cmd( data ), params, subCommand;
@@ -845,6 +846,220 @@ Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player&
     }
 
     auto pInstanceContent = instance->getAsInstanceContent();
+    if( pInstanceContent->isPlayerBound( player.getId() ) )
+    {
+      pInstanceContent->unbindPlayer( player.getId() );
+      player.sendDebug( "Now unbound from instance with id#{0} -> {1}", pInstanceContent->getGuId(), pInstanceContent->getName() );
+    }
+    else
+      player.sendDebug( "Player not bound to instance with id#{0}", instanceId );
+
+  }
+  else if( subCommand == "createzone" || subCommand == "crz" )
+  {
+    uint32_t zoneId;
+    sscanf( params.c_str(), "%d", &zoneId );
+
+    auto instance = pTeriMgr->createTerritoryInstance( zoneId );
+    if( instance )
+      player.sendDebug(
+        "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+    else
+      player.sendDebug( "Failed to create instance with id#{0}", zoneId );
+  }
+  else if( subCommand == "remove" || subCommand == "rm" )
+  {
+    uint32_t terriId;
+    sscanf( params.c_str(), "%d", &terriId );
+
+    if( pTeriMgr->removeTerritoryInstance( terriId ) )
+      player.sendDebug( "Removed instance with id#{0}", terriId );
+    else
+      player.sendDebug( "Failed to remove instance with id#{0}", terriId );
+  }
+  else if( subCommand == "return" || subCommand == "ret" )
+  {
+    player.exitInstance();
+  }
+  else if( subCommand == "set" )
+  {
+    uint32_t index;
+    uint32_t value;
+    sscanf( params.c_str(), "%d %d", &index, &value );
+
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
+  }
+  else if( subCommand == "objstate" )
+  {
+    char objName[128];
+    uint8_t state;
+
+    sscanf( params.c_str(), "%s %hhu", objName, &state );
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+      return;
+
+    obj->setState( state );
+  }
+  else if( subCommand == "objflag" )
+  {
+    char objName[256];
+    uint32_t state1;
+    uint32_t state2;
+
+    sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+    {
+      player.sendDebug( "No eobj found." );
+      return;
+    }
+
+    obj->setAnimationFlag( state1, state2 );
+  }
+  else if( subCommand == "seq" )
+  {
+    uint8_t seq;
+
+    sscanf( params.c_str(), "%hhu", &seq );
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    instance->setSequence( seq );
+  }
+  else if( subCommand == "branch" )
+  {
+    uint8_t branch;
+
+    sscanf( params.c_str(), "%hhu", &branch );
+
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    instance->setBranch( branch );
+  }
+  else if( subCommand == "qte_start" )
+  {
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    player.sendDebug( "qte start" );
+    instance->startQte();
+  }
+  else if( subCommand == "event_start" )
+  {
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    player.sendDebug( "evt start" );
+    instance->startEventCutscene();
+  }
+  else if( subCommand == "event_end" )
+  {
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    player.sendDebug( "evt end" );
+    instance->endEventCutscene();
+  }
+  else if( subCommand == "bgm" )
+  {
+    uint16_t bgmId;
+    sscanf( params.c_str(), "%hd", &bgmId );
+
+    if( auto instance = player.getCurrentInstance() )
+      instance->setCurrentBGM( bgmId );
+  }
+  else
+  {
+    player.sendDebug( "Unknown sub command." );
+  }
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity::Player& player,
+                                                             std::shared_ptr< DebugCommand > command )
+{
+  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  std::string cmd( data ), params, subCommand;
+  auto cmdPos = cmd.find_first_of( ' ' );
+
+  if( cmdPos != std::string::npos )
+  {
+    params = cmd.substr( cmdPos + 1 );
+
+    auto p = params.find_first_of( ' ' );
+
+    if( p != std::string::npos )
+    {
+      subCommand = params.substr( 0, p );
+      params = params.substr( subCommand.length() + 1 );
+    }
+    else
+      subCommand = params;
+  }
+
+  if( subCommand == "create" || subCommand == "cr" )
+  {
+    uint32_t contentFinderConditionId;
+    sscanf( params.c_str(), "%d", &contentFinderConditionId );
+
+    auto instance = pTeriMgr->createQuestBattle( contentFinderConditionId );
+    if( instance )
+      player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
+    else
+      player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
+  }
+  else if( subCommand == "bind" )
+  {
+    uint32_t instanceId;
+    sscanf( params.c_str(), "%d", &instanceId );
+
+    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    if( instance )
+    {
+      auto pInstanceContent = instance->getAsQuestBattle();
+      pInstanceContent->bindPlayer( player.getId() );
+      player.sendDebug(
+        "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+        " -> " + pInstanceContent->getName() );
+    }
+    else
+      player.sendDebug( "Unknown instance with id#{0}", instanceId );
+  }
+  else if( subCommand == "unbind" )
+  {
+    uint32_t instanceId;
+    sscanf( params.c_str(), "%d", &instanceId );
+
+    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    if( !instance )
+    {
+      player.sendDebug( "Unknown instance with id#{0} ", instanceId );
+      return;
+    }
+
+    auto pInstanceContent = instance->getAsQuestBattle();
     if( pInstanceContent->isPlayerBound( player.getId() ) )
     {
       pInstanceContent->unbindPlayer( player.getId() );

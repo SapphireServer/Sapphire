@@ -4431,7 +4431,7 @@ struct QuestBattle
    uint16_t timeLimit;
    uint16_t levelSync;
    std::vector< std::string > scriptInstruction;
-   std::vector< std::string > scriptValue;
+   std::vector< uint32_t > scriptValue;
 
    QuestBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
