@@ -394,7 +394,7 @@ uint16_t Sapphire::QuestBattle::getCurrentBGM() const
 bool Sapphire::QuestBattle::bindPlayer( uint32_t playerId )
 {
   // if player already bound, return false
-  if( m_boundPlayerId != 0)
+  if( m_boundPlayerId != 0 )
     return false;
 
   m_boundPlayerId = playerId;
