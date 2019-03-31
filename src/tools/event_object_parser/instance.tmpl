@@ -3,12 +3,10 @@
 
 using namespace Sapphire;
 
-class INSTANCE_NAME :
-  public Sapphire::ScriptAPI::InstanceContentScript
+class INSTANCE_NAME : public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
-  INSTANCE_NAME() :
-    Sapphire::ScriptAPI::InstanceContentScript( INSTANCE_ID )
+  INSTANCE_NAME() : Sapphire::ScriptAPI::InstanceContentScript( INSTANCE_ID )
   { }
 
   void onInit( InstanceContent& instance ) override
