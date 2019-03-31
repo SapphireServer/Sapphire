@@ -290,11 +290,15 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 void loadAllInstanceContentEntries()
 {
   auto& catInstance = eData->get_category( "ContentFinderCondition" );
+  auto& catQuest = eData->get_category( "Quest" );
+  auto& catQuestBattle = eData->get_category( "QuestBattle" );
   auto& territoryTypeSheet = eData->get_category( "TerritoryType" );
   auto& instanceContentSheet = eData->get_category( "InstanceContent" );
 
   auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
   auto instanceContentData = static_cast< xiv::exd::Exd >( instanceContentSheet.get_data_ln( xiv::exd::Language::en ) );
+  auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
+  auto questDataData = static_cast< xiv::exd::Exd >( catQuest.get_data_ln( xiv::exd::Language::en ) );
 
   if( zoneNameMap.size() == 0 )
   {
@@ -318,11 +322,14 @@ void loadAllInstanceContentEntries()
     auto id = row.first;
     auto& fields = row.second;
 
+    uint16_t teriId;
+
     auto contentLinkType = std::get< uint8_t >( fields.at( 2 ) );
     auto contentLink = std::get< uint16_t >( fields.at( 3 ) );
 
     std::string name;
     uint8_t type = 0;
+    teriId = std::get< uint16_t >( fields.at( 1 ) );
 
     if( contentLinkType == 1 )
     {
@@ -331,6 +338,23 @@ void loadAllInstanceContentEntries()
 
       name = std::get< std::string >( row.at( 3 ) );
       type = std::get< uint8_t >( row.at( 0 ) );
+      id = contentLink;
+      //std::cout << name << "\n";
+    }
+    else if( contentLinkType == 5 )
+    {
+      std::cout << contentLinkType << "\n";
+      // instancecontent
+      auto row = questBattleData.get_row( contentLink );
+      int32_t questId1 = std::get< int32_t >( row.at( 0 ) );
+      if( questId1 > 99999 )
+        continue;
+      auto row1 = questDataData.get_row( questId1 );
+
+      name = std::get< std::string >( row1.at( 0 ) );
+      std::cout << name << "\n";
+
+      type = 7;
       id = contentLink;
     }
 //    else if( contentLinkType == 2 )
@@ -360,7 +384,7 @@ void loadAllInstanceContentEntries()
     if( name.empty() )
       continue;
 
-    auto teri = std::get< uint16_t >( fields.at( 1 ) );
+    auto teri = teriId;
     auto i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
@@ -441,7 +465,14 @@ int main( int argc, char* argv[] )
   if( !fs::exists( "instance.tmpl" ) )
     throw std::runtime_error( "instance.tmpl is missing in working directory" );
 
-  initExd( gamePath );
+  try
+  {
+    initExd( gamePath );
+  }
+  catch( std::runtime_error error )
+  {
+    std::cout << error.what();
+  }
   if( dumpInstances )
   {
     loadAllInstanceContentEntries();

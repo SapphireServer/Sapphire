@@ -231,6 +231,22 @@ namespace Sapphire::ScriptAPI
                                    uint16_t param1, uint16_t param2 );
   };
 
+  /*!
+  * @brief The base class for any scripts that implement behaviour related to instance content zones
+  */
+  class QuestBattleScript : public ScriptObject
+  {
+  public:
+    explicit QuestBattleScript( uint32_t questBattleId );
+
+    virtual void onInit( Sapphire::QuestBattle& instance );
+
+    virtual void onUpdate( Sapphire::QuestBattle& instance, uint32_t currTime );
+
+    virtual void onEnterTerritory( Sapphire::QuestBattle& instance, Sapphire::Entity::Player& player, uint32_t eventId,
+                                   uint16_t param1, uint16_t param2 );
+  };
+
 }
 
 #endif

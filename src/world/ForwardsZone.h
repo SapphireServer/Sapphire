@@ -23,6 +23,7 @@ TYPE_FORWARD( Zone );
 TYPE_FORWARD( HousingZone );
 TYPE_FORWARD( House );
 TYPE_FORWARD( InstanceContent );
+TYPE_FORWARD( QuestBattle );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( ZonePosition );
