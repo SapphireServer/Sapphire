@@ -1,0 +1,32 @@
+#include <ScriptObject.h>
+#include <Territory/QuestBattle.h>
+
+using namespace Sapphire;
+
+class INSTANCE_NAME : public Sapphire::ScriptAPI::QuestBattleScript
+{
+private:
+SCRIPT_INSTRUCTIONS
+public:
+  INSTANCE_NAME() : Sapphire::ScriptAPI::QuestBattleScript( INSTANCE_ID )
+  { }
+
+  void onInit( QuestBattle& instance ) override
+  {
+EOBJ_INIT
+  }
+
+  void onUpdate( QuestBattle& instance, uint32_t currTime ) override
+  {
+
+  }
+
+  void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+                         uint16_t param2 ) override
+  {
+
+  }
+
+};
+
+EXPOSE_SCRIPT( INSTANCE_NAME );

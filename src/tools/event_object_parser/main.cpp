@@ -482,6 +482,11 @@ int main( int argc, char* argv[] )
     zoneDumpList.emplace( zoneName );
   }
 
+
+  auto& catQuestBattle = eData->get_category( "QuestBattle" );
+  auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
+
+
   for( auto entry : contentList )
   {
     std::string eobjects = "";
@@ -728,13 +733,38 @@ int main( int argc, char* argv[] )
     }
     std::cout << "\n\n\n";
 
-    std::ifstream t( "instance.tmpl" );
+    std::ifstream t;
+    if( entry.type == 7 )
+    {
+      t = std::ifstream ( "questbattle.tmpl" );
+    }
+    else
+      t = std::ifstream ( "instance.tmpl" );
+
     std::string instanceTpl( ( std::istreambuf_iterator< char >( t ) ),
                              std::istreambuf_iterator< char >() );
 
     auto result = std::regex_replace( instanceTpl, std::regex( "\\INSTANCE_NAME" ), entry.name );
     result = std::regex_replace( result, std::regex( "\\INSTANCE_ID" ), std::to_string( entry.id ) );
     result = std::regex_replace( result, std::regex( "\\EOBJ_INIT" ), eobjects );
+
+    if( entry.type == 7 )
+    {
+      if( entry.id > 200 )
+        continue;
+
+      std::string instruction;
+      auto row = questBattleData.get_row( entry.id );
+      for( int i = 0; i < 149; ++i )
+      {
+        if( std::get< std::string >( row.at( 4 + i ) ).empty() )
+          continue;
+        instruction += "  static constexpr auto " + std::get< std::string >( row.at( 4 + i ) ) + " = " +
+                       std::to_string( std::get< uint32_t >( row.at( 154 + i ) ) )+ ";\n";
+      }
+
+      result = std::regex_replace( result, std::regex( "\\SCRIPT_INSTRUCTIONS" ), instruction );
+    }
 
 
     std::string subdir = "";
