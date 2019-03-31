@@ -13,7 +13,7 @@ namespace Sapphire::Entity
                  Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
-                                                    InstanceContentPtr, uint64_t ) >;
+                                                    ZonePtr, uint64_t ) >;
 
     uint32_t getGimmickId() const;
 
@@ -35,9 +35,9 @@ namespace Sapphire::Entity
 
     const std::string& getName() const;
 
-    InstanceContentPtr getParentInstance() const;
+    ZonePtr getParentInstance() const;
 
-    void setParentInstance( InstanceContentPtr instance );
+    void setParentInstance( ZonePtr instance );
 
     void spawn( PlayerPtr pTarget ) override;
 
@@ -56,7 +56,7 @@ namespace Sapphire::Entity
     uint8_t m_state;
     float m_scale;
     std::string m_name;
-    InstanceContentPtr m_parentInstance;
+    ZonePtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
 
 

@@ -17,6 +17,7 @@
 
 #include "Zone.h"
 #include "InstanceContent.h"
+#include "QuestBattle.h"
 #include "Manager/TerritoryMgr.h"
 
 #include "Session.h"
@@ -747,6 +748,11 @@ Sapphire::Entity::EventObjectPtr Sapphire::Zone::getEObj( uint32_t objId )
 Sapphire::InstanceContentPtr Sapphire::Zone::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Zone >( shared_from_this() );
+}
+
+Sapphire::QuestBattlePtr Sapphire::Zone::getAsQuestBattle()
+{
+  return std::dynamic_pointer_cast< QuestBattle, Zone >( shared_from_this() );
 }
 
 uint32_t Sapphire::Zone::getNextEObjId()

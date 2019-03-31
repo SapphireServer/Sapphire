@@ -48,7 +48,7 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
 bool Sapphire::QuestBattle::init()
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsInstanceContent() );
+  pScriptMgr->onInstanceInit( getAsQuestBattle() );
 
   return true;
 }
@@ -152,7 +152,7 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsInstanceContent(), currTime );
+  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), currTime );
 }
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
@@ -348,8 +348,8 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
   if( it == m_eventIdToObjectMap.end() )
     return;
 
-  if( auto onTalk = it->second->getOnTalkHandler() )
-    onTalk( player, it->second, getAsInstanceContent(), actorId );
+  if( auto onTalkHandler = it->second->getOnTalkHandler() )
+    onTalkHandler( player, it->second, getAsQuestBattle(), actorId );
   else
     player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
                       it->second->getObjectId(), eventId );
@@ -359,7 +359,7 @@ void
 Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
+  pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
 
   // TODO: this may or may not be correct for questbattles
   player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |

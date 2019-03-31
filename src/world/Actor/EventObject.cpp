@@ -102,12 +102,12 @@ uint32_t Sapphire::Entity::EventObject::getHousingLink() const
   return m_housingLink;
 }
 
-void Sapphire::Entity::EventObject::setParentInstance( Sapphire::InstanceContentPtr instance )
+void Sapphire::Entity::EventObject::setParentInstance( Sapphire::ZonePtr instance )
 {
   m_parentInstance = instance;
 }
 
-Sapphire::InstanceContentPtr Sapphire::Entity::EventObject::getParentInstance() const
+Sapphire::ZonePtr Sapphire::Entity::EventObject::getParentInstance() const
 {
   return m_parentInstance;
 }
