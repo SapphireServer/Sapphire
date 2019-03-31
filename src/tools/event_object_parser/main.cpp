@@ -395,7 +395,7 @@ void loadAllInstanceContentEntries()
     //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
     zoneDumpList.emplace( zoneNameMap[ teri ] );
 
-    std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
+    std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
     Sapphire::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { id, name, zoneNameMap[ teri ], type } );
@@ -664,7 +664,7 @@ int main( int argc, char* argv[] )
                 if( eobjNameMap.find( id ) != eobjNameMap.end() )
                 {
                   name = eobjNameMap[ id ];
-                  std::string remove = "★_ '()[]-\x1a\x1\x2\x1f\x1\x3.:";
+                  std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
                   Sapphire::Util::eraseAllIn( name, remove );
 
                   name[ 0 ] = toupper( name[ 0 ] );
