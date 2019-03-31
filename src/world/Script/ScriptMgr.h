@@ -100,6 +100,13 @@ namespace Sapphire::Scripting
     onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                               uint16_t param2 );
 
+    bool onInstanceInit( QuestBattlePtr instance );
+
+    bool onInstanceUpdate( QuestBattlePtr instance, uint32_t currTime );
+
+    bool onInstanceEnterTerritory( QuestBattlePtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+                                   uint16_t param2 );
+
     bool loadDir( const std::string& dirname, std::set< std::string >& files, const std::string& ext );
 
     NativeScriptMgr& getNativeScriptHandler();
