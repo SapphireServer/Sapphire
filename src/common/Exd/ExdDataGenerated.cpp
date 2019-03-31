@@ -4835,9 +4835,9 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
 Sapphire::Data::QuestBattle::QuestBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_QuestBattleDat.get_row( row_id );
-   quest = exdData->getField< int32_t >( row, 0 );
    timeLimit = exdData->getField< uint16_t >( row, 2 );
-   levelSync = exdData->getField< uint16_t >( row, 3 );
+  quest = exdData->getField< int32_t >( row, 0 );
+  levelSync = exdData->getField< uint16_t >( row, 3 );
    scriptInstruction.push_back( exdData->getField< std::string >( row, 4 ) );
    scriptInstruction.push_back( exdData->getField< std::string >( row, 5 ) );
    scriptInstruction.push_back( exdData->getField< std::string >( row, 6 ) );
