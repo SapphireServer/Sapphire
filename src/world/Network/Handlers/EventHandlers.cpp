@@ -21,6 +21,7 @@
 #include "Manager/EventMgr.h"
 
 #include "Territory/InstanceContent.h"
+#include "Territory/QuestBattle.h"
 
 #include "Session.h"
 
@@ -173,9 +174,14 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( FrameworkPtr
 
   std::string objName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId );
+  player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId && 0xFFFF );
 
   if( auto instance = player.getCurrentInstance() )
+  {
+    player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
+    instance->onEnterTerritory( player, eventId, param1, param2 );
+  }
+  else if( auto instance = player.getCurrentQuestBattle() )
   {
     player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
     instance->onEnterTerritory( player, eventId, param1, param2 );

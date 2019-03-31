@@ -106,6 +106,8 @@ namespace Sapphire::World::Manager
 
     ZonePtr createInstanceContent( uint32_t contentFinderConditionId );
 
+    ZonePtr createQuestBattle( uint32_t contentFinderConditionId );
+
     ZonePtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */

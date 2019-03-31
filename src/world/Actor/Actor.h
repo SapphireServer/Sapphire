@@ -127,6 +127,8 @@ namespace Sapphire::Entity
 
     InstanceContentPtr getCurrentInstance() const;
 
+    QuestBattlePtr getCurrentQuestBattle() const;
+
     // get the current cell of a region the actor is in
     Cell* getCellPtr();
 

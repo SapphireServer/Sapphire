@@ -73,6 +73,7 @@ namespace Sapphire::Event
       HousingAethernet = 0x001E,
       FcTalk = 0x001F,
       ICDirector = 0x8003,
+      QuestBattleDirector = 0x8006,
     };
 
     using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;

@@ -98,22 +98,19 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
   {
     case Created:
     {
-      if( m_boundPlayerIds.size() == 0 )
+      if( m_boundPlayerId == 0 )
         return;
 
-      for( auto playerId : m_boundPlayerIds )
-      {
-        auto it = m_playerMap.find( playerId );
-        if( it == m_playerMap.end() )
-          return;
+      auto it = m_playerMap.find( m_boundPlayerId );
+      if( it == m_playerMap.end() )
+        return;
 
-        auto player = it->second;
-        if( !player->isLoadingComplete() ||
-            !player->isDirectorInitialized() ||
-            !player->isOnEnterEventDone() ||
-            player->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
-          return;
-      }
+      auto player = it->second;
+      if( !player->isLoadingComplete() ||
+          !player->isDirectorInitialized() ||
+          !player->isOnEnterEventDone() ||
+          player->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
+        return;
 
       if( m_instanceCommenceTime == 0 )
       {
@@ -127,9 +124,7 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
       for( const auto& playerIt : m_playerMap )
       {
         auto pPlayer = playerIt.second;
-        pPlayer->queuePacket( makeActorControl143( pPlayer->getId(), DirectorUpdate,
-                                                   getDirectorId(), 0x40000001,
-                                                   m_pBattleDetails->timeLimit * 60u ) );
+        pPlayer->sendDebug( " ALL DONE LOADING " );
       }
 
       m_state = DutyInProgress;
@@ -157,11 +152,12 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
 {
-  sendDirectorInit( player );
+
 }
 
 void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
 {
+  player.sendQuestMessage( getDirectorId(), 0, 2, Util::getTimeSeconds(), 0x0708 );
   sendDirectorVars( player );
   player.setDirectorInitialized( true );
 }
@@ -362,11 +358,11 @@ Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventI
   pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
 
   // TODO: this may or may not be correct for questbattles
-  player.directorPlayScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
-                                                HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                                DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
-                                                // todo: wtf is 0x00100000
-                                                DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
+  player.playScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                        HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                        DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                        // todo: wtf is 0x00100000
+                                        DISABLE_CANCEL_EMOTE, 0 );
 
 }
 
@@ -398,21 +394,22 @@ uint16_t Sapphire::QuestBattle::getCurrentBGM() const
 bool Sapphire::QuestBattle::bindPlayer( uint32_t playerId )
 {
   // if player already bound, return false
-  if( m_boundPlayerIds.count( playerId ) )
+  if( m_boundPlayerId != 0)
     return false;
 
-  m_boundPlayerIds.insert( playerId );
+  m_boundPlayerId = playerId;
   return true;
 }
 
 bool Sapphire::QuestBattle::isPlayerBound( uint32_t playerId ) const
 {
-  return m_boundPlayerIds.count( playerId ) > 0;
+  return m_boundPlayerId == playerId;
 }
 
 void Sapphire::QuestBattle::unbindPlayer( uint32_t playerId )
 {
-  m_boundPlayerIds.erase( playerId );
+  if( m_boundPlayerId != playerId )
+    return;
 
   auto it = m_playerMap.find( playerId );
   if( it != m_playerMap.end() )
