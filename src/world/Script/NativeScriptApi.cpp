@@ -194,5 +194,25 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  ///////////////////////////////////////////////////////////////////
+
+  QuestBattleScript::QuestBattleScript( uint32_t questBattleId ) :
+    ScriptObject( uint32_t{ 0x8006 } << 16 | questBattleId, typeid( QuestBattleScript ).hash_code() )
+  {
+  }
+
+  void QuestBattleScript::onInit( QuestBattle& instance )
+  {
+  }
+
+  void QuestBattleScript::onUpdate( QuestBattle& instance, uint32_t currTime )
+  {
+  }
+
+  void QuestBattleScript::onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId,
+                                            uint16_t param1, uint16_t param2 )
+  {
+  }
+
 }
 
