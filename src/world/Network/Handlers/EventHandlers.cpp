@@ -174,7 +174,7 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( FrameworkPtr
 
   std::string objName = pEventMgr->getEventName( eventId );
 
-  player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId && 0xFFFF );
+  player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId & 0xFFFF );
 
   if( auto instance = player.getCurrentInstance() )
   {
