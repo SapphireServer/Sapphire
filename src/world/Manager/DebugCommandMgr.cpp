@@ -1030,45 +1030,6 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     else
       player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
   }
-  else if( subCommand == "bind" )
-  {
-    uint32_t instanceId;
-    sscanf( params.c_str(), "%d", &instanceId );
-
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance )
-    {
-      auto pInstanceContent = instance->getAsQuestBattle();
-      pInstanceContent->bindPlayer( player.getId() );
-      player.sendDebug(
-        "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
-        " -> " + pInstanceContent->getName() );
-    }
-    else
-      player.sendDebug( "Unknown instance with id#{0}", instanceId );
-  }
-  else if( subCommand == "unbind" )
-  {
-    uint32_t instanceId;
-    sscanf( params.c_str(), "%d", &instanceId );
-
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( !instance )
-    {
-      player.sendDebug( "Unknown instance with id#{0} ", instanceId );
-      return;
-    }
-
-    auto pInstanceContent = instance->getAsQuestBattle();
-    if( pInstanceContent->isPlayerBound( player.getId() ) )
-    {
-      pInstanceContent->unbindPlayer( player.getId() );
-      player.sendDebug( "Now unbound from instance with id#{0} -> {1}", pInstanceContent->getGuId(), pInstanceContent->getName() );
-    }
-    else
-      player.sendDebug( "Player not bound to instance with id#{0}", instanceId );
-
-  }
   else if( subCommand == "createzone" || subCommand == "crz" )
   {
     uint32_t zoneId;

@@ -1,5 +1,6 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
 
 using namespace Sapphire;
 
@@ -27,6 +28,12 @@ private:
 public:
   ChasingShadows() : Sapphire::ScriptAPI::QuestBattleScript( 11 )
   { }
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player )
+  {
+    player.setRot( 3.f );
+    player.setPos( { 323.f, -1.28f, -320.f } );
+  }
 
   void onInit( QuestBattle& instance ) override
   {

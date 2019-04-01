@@ -239,6 +239,8 @@ namespace Sapphire::ScriptAPI
   public:
     explicit QuestBattleScript( uint32_t questBattleId );
 
+    virtual void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player );
+
     virtual void onInit( Sapphire::QuestBattle& instance );
 
     virtual void onUpdate( Sapphire::QuestBattle& instance, uint32_t currTime );
