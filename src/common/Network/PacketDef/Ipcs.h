@@ -80,6 +80,7 @@ namespace Sapphire::Network::Packets
     InitSearchInfo = 0x0107, // updated 4.4
     ExamineSearchComment = 0x0102, // updated 4.1
 
+    ServerNoticeShort = 0x010B, // added 4.5
     ServerNotice = 0x010C, // updated 4.5
     SetOnlineStatus = 0x010D, // updated 4.5
 
