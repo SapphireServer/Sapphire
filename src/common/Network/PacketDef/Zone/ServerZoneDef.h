@@ -733,12 +733,24 @@ namespace Sapphire::Network::Packets::Server
     uint16_t serverId;
     uint16_t zoneId;
     uint16_t unknown1;
-    uint16_t unknown2;
+    uint16_t contentfinderConditionId;
     uint32_t unknown3;
     uint32_t unknown4;
     uint8_t weatherId;
     uint8_t bitmask;
     uint8_t bitmask1;
+    // bitmask1 findings
+    //0 = unknown ( 7B F8 69 )
+    //1 = show playguide window ( 7B 69 )
+    //2 = unknown ( 7B 69 )
+    //4 = disables record ready check ( 7B DF DF F8 F0 E4 110 (all sorts of social packets) )
+    //8 = hide server icon ( 7B 69 )
+    //16 = enable flight ( 7B F8 69 )
+    //32 = unknown ( 7B F8 69 )
+    //64 = unknown ( 7B F8 69 )
+    //128 = shows message "You are now in the instanced area XX A.
+    //Current instance can be confirmed at any time using the /instance text command." ( 7B F8 69 )
+
     uint8_t unknown5;
     uint16_t festivalId;
     uint16_t additionalFestivalId;
