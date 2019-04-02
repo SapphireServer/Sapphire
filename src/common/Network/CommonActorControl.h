@@ -149,6 +149,7 @@ enum ActorControlType : uint16_t
 
     FishingMsg = 0x140,
 
+    FishingTotalFishCaught = 0x142,
     FishingBaitMsg = 0x145,
 
     FishingReachMsg = 0x147,
