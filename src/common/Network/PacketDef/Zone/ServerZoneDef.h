@@ -137,14 +137,34 @@ namespace Sapphire::Network::Packets::Server
     char searchComment[195];
     char padding;
   };
-
+  
+  /**
+  * Structural representation of the packet sent by the server
+  * to display a server notice message
+  */
+  struct FFXIVIpcServerNoticeShort : FFXIVIpcBasePacket< ServerNoticeShort >
+  {
+    // these are actually display flags
+    /* 0000 */ uint8_t padding;
+    // 0 = chat log
+    // 2 = nothing
+    // 4 = on screen message
+    // 5 = on screen message + chat log
+    char message[538];
+  };
+  
   /**
   * Structural representation of the packet sent by the server
   * to display a server notice message
   */
   struct FFXIVIpcServerNotice : FFXIVIpcBasePacket< ServerNotice >
   {
+    // these are actually display flags
     /* 0000 */ uint8_t padding;
+    // 0 = chat log
+    // 2 = nothing
+    // 4 = on screen message
+    // 5 = on screen message + chat log
     char message[775];
   };
 
