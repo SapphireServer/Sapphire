@@ -11,8 +11,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Ping response packet.
   */
-  class UpdateHpMpTpPacket :
-    public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
+  class UpdateHpMpTpPacket : public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
   {
   public:
     UpdateHpMpTpPacket( Entity::Chara& actor ) :

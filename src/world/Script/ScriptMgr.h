@@ -94,7 +94,7 @@ namespace Sapphire::Scripting
 
     bool onInstanceInit( InstanceContentPtr instance );
 
-    bool onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime );
+    bool onInstanceUpdate( InstanceContentPtr instance, uint64_t tickCount );
 
     bool
     onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
@@ -104,7 +104,7 @@ namespace Sapphire::Scripting
 
     bool onInstanceInit( QuestBattlePtr instance );
 
-    bool onInstanceUpdate( QuestBattlePtr instance, uint32_t currTime );
+    bool onInstanceUpdate( QuestBattlePtr instance, uint64_t tickCount );
 
     bool onInstanceEnterTerritory( QuestBattlePtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                                    uint16_t param2 );

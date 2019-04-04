@@ -19,9 +19,9 @@ namespace Sapphire::World::Territory::Housing
     bool init() override;
 
     void onPlayerZoneIn( Entity::Player& player ) override;
-    void onUpdate( uint32_t currTime ) override;
+    void onUpdate( uint64_t tickCount ) override;
 
-    uint32_t getLastActivityTime() const;
+    uint64_t getLastActivityTime() const;
 
     const Common::LandIdent getLandIdent() const;
 
@@ -34,7 +34,7 @@ namespace Sapphire::World::Territory::Housing
 
   private:
     Common::LandIdent m_landIdent;
-    uint32_t m_lastActivityTime;
+    uint64_t m_lastActivityTime;
 
     std::array< Sapphire::Common::HousingObject, 400 > m_housingObjects;
   };

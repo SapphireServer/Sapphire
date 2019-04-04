@@ -39,7 +39,7 @@ public:
 
   }
 
-  void onUpdate( InstanceContent& instance, uint32_t currTime ) override
+  void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
   {
 
   }

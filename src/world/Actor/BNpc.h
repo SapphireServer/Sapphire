@@ -84,7 +84,7 @@ namespace Sapphire::Entity
     void aggro( CharaPtr pChara );
     void deaggro( CharaPtr pChara );
 
-    void update( int64_t currTime ) override;
+    void update( uint64_t tickCount ) override;
     void onTick() override;
 
     void onActionHostile( CharaPtr pSource ) override;

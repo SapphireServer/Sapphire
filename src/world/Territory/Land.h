@@ -53,7 +53,7 @@ namespace Sapphire
     void setCurrentPrice( uint32_t currentPrice );
     bool setPreset( uint32_t itemId );
     void updateLandDb();
-    void update( uint32_t currTime );
+    void update( uint64_t tickCount );
 
     uint32_t getCurrentPrice() const;
     uint32_t getMaxPrice() const;

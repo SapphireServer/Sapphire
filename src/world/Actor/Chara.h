@@ -251,7 +251,7 @@ namespace Sapphire::Entity
 
     virtual bool checkAction();
 
-    virtual void update( int64_t currTime );
+    virtual void update( uint64_t tickCount );
 
     Action::ActionPtr getCurrentAction() const;
 

@@ -11,8 +11,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Ping response packet.
   */
-  class PingPacket :
-    public ZoneChannelPacket< FFXIVIpcPing >
+  class PingPacket : public ZoneChannelPacket< FFXIVIpcPing >
   {
   public:
     PingPacket( Entity::Player& player, int32_t inVal ) :

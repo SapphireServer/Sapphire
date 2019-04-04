@@ -47,7 +47,7 @@ namespace Sapphire
 
     void onDirectorSync( Entity::Player& player ) override;
 
-    void onUpdate( uint32_t currTime ) override;
+    void onUpdate( uint64_t tickCount ) override;
 
     void onTalk( Entity::Player& player, uint32_t eventId, uint64_t actorId );
 

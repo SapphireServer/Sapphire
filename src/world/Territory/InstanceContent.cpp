@@ -93,7 +93,7 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
   clearDirector( player );
 }
 
-void Sapphire::InstanceContent::onUpdate( uint32_t currTime )
+void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 {
   switch( m_state )
   {
@@ -118,10 +118,10 @@ void Sapphire::InstanceContent::onUpdate( uint32_t currTime )
 
       if( m_instanceCommenceTime == 0 )
       {
-        m_instanceCommenceTime = Util::getTimeMs() + instanceStartDelay;
+        m_instanceCommenceTime = tickCount + instanceStartDelay;
         return;
       }
-      else if( Util::getTimeMs() < m_instanceCommenceTime )
+      else if( tickCount < m_instanceCommenceTime )
         return;
 
       for( const auto& playerIt : m_playerMap )
@@ -154,7 +154,7 @@ void Sapphire::InstanceContent::onUpdate( uint32_t currTime )
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsInstanceContent(), currTime );
+  pScriptMgr->onInstanceUpdate( getAsInstanceContent(), tickCount );
 }
 
 void Sapphire::InstanceContent::onFinishLoading( Entity::Player& player )

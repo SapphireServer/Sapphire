@@ -147,7 +147,7 @@ namespace Sapphire::Entity
     void onDeath() override;
 
     /*! Event called on every session iteration */
-    void update( int64_t currTime ) override;
+    void update( uint64_t tickCount ) override;
 
     /*! Event to be called upon Bnpc kill */
     void onMobKill( uint16_t nameId );
