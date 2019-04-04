@@ -18,7 +18,7 @@ namespace Sapphire::World::Util
     virtual bool conditionApplies( const Entity::Actor& actor );
   };
 
-  class ActorFilterRange : public ActorFilter
+  class ActorFilterInRange : public ActorFilter
   {
     FFXIVARR_POSITION3 m_startPos;
     float m_range;
