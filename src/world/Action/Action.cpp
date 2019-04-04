@@ -267,7 +267,7 @@ void Sapphire::Action::Action::execute()
   assert( m_pSource );
 
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
-  if( !costCheck( true ) )
+  if( !consumeResources() )
   {
     interrupt();
     return;
@@ -405,7 +405,7 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
   // validate range
 
 
-  if( !costCheck() )
+  if( !hasResources() )
     return false;
 
   return true;
@@ -431,11 +431,6 @@ bool Sapphire::Action::Action::isComboAction() const
   }
 
   return m_actionData->actionCombo == lastActionId;
-}
-
-bool Sapphire::Action::Action::costCheck( bool subtractCosts )
-{
-  return primaryCostCheck( subtractCosts ) && secondaryCostCheck( subtractCosts );
 }
 
 bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
@@ -485,4 +480,14 @@ bool Sapphire::Action::Action::secondaryCostCheck( bool subtractCosts )
 {
   // todo: these need to be mapped
   return true;
+}
+
+bool Sapphire::Action::Action::hasResources()
+{
+  return primaryCostCheck( false ) && secondaryCostCheck( false );
+}
+
+bool Sapphire::Action::Action::consumeResources()
+{
+  return primaryCostCheck( true ) && secondaryCostCheck( true );
 }
