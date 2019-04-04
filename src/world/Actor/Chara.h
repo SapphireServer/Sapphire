@@ -217,6 +217,8 @@ namespace Sapphire::Entity
 
     void setGp( uint32_t gp );
 
+    void setTp( uint32_t tp );
+
     void setInvincibilityType( Common::InvincibilityType type );
 
     void die();

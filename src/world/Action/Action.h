@@ -48,6 +48,13 @@ namespace Sapphire::Action
     bool isComboAction() const;
 
     /*!
+     * @brief Checks whether the source chara has the required stats/debuffs/etc to cast an action.
+     * @param subtractCosts Whether we should subtract the costs (eg, mp/tp) from the player or to just check them
+     * @return whether the requirements are met by the caster
+     */
+    bool casterHasCostRequirements( bool subtractCosts = false );
+
+    /*!
      * @brief Checks if the action *may* target a resident instead of an actor
      * @return true if the target *may* be a resident and not an actor, otherwise false.
      */
@@ -91,7 +98,9 @@ namespace Sapphire::Action
   protected:
 
     void calculateActionCost();
-    void calculateMPCost( uint16_t baseCost );
+
+    bool primaryCostCheck( bool subtractCosts );
+    bool secondaryCostCheck( bool subtractCosts );
 
     bool playerPrecheck( Entity::Player& player );
 
