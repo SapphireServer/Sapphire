@@ -48,6 +48,18 @@ namespace Sapphire::Action
     bool isComboAction() const;
 
     /*!
+     * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
+     * @return true if they have the required resources
+     */
+    bool hasResources();
+
+    /*!
+     * @brief Checks if a chara has enough resources available to cast the action and then consumes them (tp/mp/etc)
+     * @return true if they have the required resources
+     */
+    bool consumeResources();
+
+    /*!
      * @brief Checks if the action *may* target a resident instead of an actor
      * @return true if the target *may* be a resident and not an actor, otherwise false.
      */
@@ -91,7 +103,9 @@ namespace Sapphire::Action
   protected:
 
     void calculateActionCost();
-    void calculateMPCost( uint16_t baseCost );
+
+    bool primaryCostCheck( bool subtractCosts );
+    bool secondaryCostCheck( bool subtractCosts );
 
     bool playerPrecheck( Entity::Player& player );
 
