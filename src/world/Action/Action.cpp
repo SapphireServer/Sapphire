@@ -266,6 +266,13 @@ void Sapphire::Action::Action::execute()
 {
   assert( m_pSource );
 
+  // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
+  if( !consumeResources() )
+  {
+    interrupt();
+    return;
+  }
+
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   if( hasCastTime() )
@@ -398,9 +405,8 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
   // validate range
 
 
-  // todo: validate costs/conditionals here
-
-  calculateActionCost();
+  if( !hasResources() )
+    return false;
 
   return true;
 }
@@ -425,4 +431,63 @@ bool Sapphire::Action::Action::isComboAction() const
   }
 
   return m_actionData->actionCombo == lastActionId;
+}
+
+bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
+{
+  switch( m_primaryCostType )
+  {
+    case Common::ActionPrimaryCostType::TacticsPoints:
+    {
+      auto curTp = m_pSource->getTp();
+
+      if( curTp < m_primaryCost )
+        return false;
+
+      if( subtractCosts )
+        m_pSource->setTp( curTp - m_primaryCost );
+
+      return true;
+    }
+
+    case Common::ActionPrimaryCostType::MagicPoints:
+    {
+      auto curMp = m_pSource->getMp();
+
+      auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
+
+      if( curMp < cost )
+        return false;
+
+      if( subtractCosts )
+        m_pSource->setMp( curMp - cost );
+
+      return true;
+    }
+
+    // free casts, likely just pure ogcds
+    case Common::ActionPrimaryCostType::None:
+    {
+      return true;
+    }
+
+    default:
+      return false;
+  }
+}
+
+bool Sapphire::Action::Action::secondaryCostCheck( bool subtractCosts )
+{
+  // todo: these need to be mapped
+  return true;
+}
+
+bool Sapphire::Action::Action::hasResources()
+{
+  return primaryCostCheck( false ) && secondaryCostCheck( false );
+}
+
+bool Sapphire::Action::Action::consumeResources()
+{
+  return primaryCostCheck( true ) && secondaryCostCheck( true );
 }
