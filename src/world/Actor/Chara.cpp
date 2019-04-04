@@ -181,6 +181,13 @@ void Sapphire::Entity::Chara::setGp( uint32_t gp )
   sendStatusUpdate();
 }
 
+/*! \param tp amount to set*/
+void Sapphire::Entity::Chara::setTp( uint32_t tp )
+{
+  m_tp = tp;
+  sendStatusUpdate();
+}
+
 /*! \param type invincibility type to set */
 void Sapphire::Entity::Chara::setInvincibilityType( Common::InvincibilityType type )
 {
