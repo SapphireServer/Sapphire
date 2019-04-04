@@ -48,14 +48,15 @@ namespace Sapphire::Action
     bool isComboAction() const;
 
     /*!
-     * @brief Checks whether the source chara has the required stats/debuffs/etc to cast an action.
-     * @param subtractCosts Whether we should subtract the costs (eg, mp/tp) from the player or to just check them
-     * @return whether the requirements are met by the caster
+     * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
+     * @return true if they have the required resources
      */
-    bool costCheck( bool subtractCosts = false );
-
     bool hasResources();
 
+    /*!
+     * @brief Checks if a chara has enough resources available to cast the action and then consumes them (tp/mp/etc)
+     * @return true if they have the required resources
+     */
     bool consumeResources();
 
     /*!
