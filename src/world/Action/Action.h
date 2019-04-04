@@ -52,7 +52,7 @@ namespace Sapphire::Action
      * @param subtractCosts Whether we should subtract the costs (eg, mp/tp) from the player or to just check them
      * @return whether the requirements are met by the caster
      */
-    bool casterHasCostRequirements( bool subtractCosts = false );
+    bool costCheck( bool subtractCosts = false );
 
     /*!
      * @brief Checks if the action *may* target a resident instead of an actor
