@@ -54,6 +54,10 @@ namespace Sapphire::Action
      */
     bool costCheck( bool subtractCosts = false );
 
+    bool hasResources();
+
+    bool consumeResources();
+
     /*!
      * @brief Checks if the action *may* target a resident instead of an actor
      * @return true if the target *may* be a resident and not an actor, otherwise false.
