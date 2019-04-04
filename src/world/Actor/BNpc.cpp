@@ -424,7 +424,7 @@ void Sapphire::Entity::BNpc::onTick()
   }
 }
 
-void Sapphire::Entity::BNpc::update( int64_t currTime )
+void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 {
   const uint8_t minActorDistance = 4;
   const uint8_t maxDistanceToOrigin = 40;
@@ -549,7 +549,7 @@ void Sapphire::Entity::BNpc::update( int64_t currTime )
   }
 
 
-  Chara::update( currTime );
+  Chara::update( tickCount );
 }
 
 void Sapphire::Entity::BNpc::regainHp()

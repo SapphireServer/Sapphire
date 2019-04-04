@@ -120,7 +120,7 @@ namespace Sapphire::World::Manager
     Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;
 
     /*! loop for processing territory logic, iterating all existing instances */
-    void updateTerritoryInstances( uint32_t currentTime );
+    void updateTerritoryInstances( uint64_t tickCount );
 
     /*! returns a ZonePositionPtr if found, else nullptr */
     ZonePositionPtr getTerritoryPosition( uint32_t territoryPositionId ) const;

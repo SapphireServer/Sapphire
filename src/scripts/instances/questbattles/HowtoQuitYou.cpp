@@ -89,7 +89,7 @@ public:
 
   }
 
-  void onUpdate( QuestBattle& instance, uint32_t currTime ) override
+  void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
 
   }

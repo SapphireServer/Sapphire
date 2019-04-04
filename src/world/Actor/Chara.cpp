@@ -284,16 +284,16 @@ bool Sapphire::Entity::Chara::checkAction()
 
 }
 
-void Sapphire::Entity::Chara::update( int64_t currTime )
+void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
-  if( std::difftime( currTime, m_lastTickTime ) > 3000 )
+  if( std::difftime( tickCount, m_lastTickTime ) > 3000 )
   {
     onTick();
 
-    m_lastTickTime = currTime;
+    m_lastTickTime = tickCount;
   }
 
-  m_lastUpdate = currTime;
+  m_lastUpdate = tickCount;
 }
 
 /*!

@@ -436,13 +436,13 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContentPtr instance
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContentPtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
     return true;
   }
 
@@ -486,13 +486,13 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( QuestBattlePtr instance )
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, uint32_t currTime )
+bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
 
   if( script )
   {
-    script->onUpdate( *instance, currTime );
+    script->onUpdate( *instance, tickCount );
     return true;
   }
 

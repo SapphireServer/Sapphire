@@ -153,8 +153,6 @@ bool Sapphire::HousingZone::init()
   return true;
 }
 
-Sapphire::HousingZone::~HousingZone() = default;
-
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
   Logger::debug( "HousingZone::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
@@ -284,11 +282,11 @@ bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
   return player.getPos().x < -15000.0f; //ToDo: get correct pos
 }
 
-void Sapphire::HousingZone::onUpdate( uint32_t currTime )
+void Sapphire::HousingZone::onUpdate( uint64_t tickCount )
 {
   for( auto pLandItr : m_landPtrMap )
   {
-    pLandItr.second->update( currTime );
+    pLandItr.second->update( tickCount );
   }
 }
 

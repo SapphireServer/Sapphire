@@ -166,9 +166,9 @@ bool Sapphire::Action::Action::update()
     // todo: check if the target is still in range
   }
 
-  uint64_t currTime = Util::getTimeMs();
+  uint64_t tickCount = Util::getTimeMs();
 
-  if( !hasCastTime() || std::difftime( currTime, m_startTime ) > m_castTimeMs )
+  if( !hasCastTime() || std::difftime( tickCount, m_startTime ) > m_castTimeMs )
   {
     execute();
     return true;

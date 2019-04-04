@@ -1054,10 +1054,10 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
                       true );
 }
 
-void Sapphire::Entity::Player::update( int64_t currTime )
+void Sapphire::Entity::Player::update( uint64_t tickCount )
 {
   // a zoning is pending, lets do it
-  if( m_queuedZoneing && ( currTime - m_queuedZoneing->m_queueTime ) > 800 )
+  if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
     if( getCurrentZone()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
@@ -1087,7 +1087,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
 
   updateStatusEffects();
 
-  m_lastUpdate = currTime;
+  m_lastUpdate = tickCount;
 
   if( !checkAction() )
   {
@@ -1115,9 +1115,9 @@ void Sapphire::Entity::Player::update( int64_t currTime )
                               actor->getPos().x, actor->getPos().y, actor->getPos().z ) <= range )
           {
 
-            if( ( currTime - m_lastAttack ) > mainWeap->getDelay() )
+            if( ( tickCount - m_lastAttack ) > mainWeap->getDelay() )
             {
-              m_lastAttack = currTime;
+              m_lastAttack = tickCount;
               autoAttack( actor->getAsChara() );
             }
 
@@ -1127,7 +1127,7 @@ void Sapphire::Entity::Player::update( int64_t currTime )
     }
   }
 
-  Chara::update( currTime );
+  Chara::update( tickCount );
 }
 
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )

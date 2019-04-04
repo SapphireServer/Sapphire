@@ -51,6 +51,7 @@ namespace Sapphire
     std::map< uint8_t, int32_t > m_weatherRateMap;
 
     int64_t m_lastMobUpdate;
+    int64_t m_lastUpdate;
 
     FestivalPair m_currentFestival;
 
@@ -101,7 +102,7 @@ namespace Sapphire
 
     virtual void onLeaveTerritory( Entity::Player& player );
 
-    virtual void onUpdate( uint32_t currTime );
+    virtual void onUpdate( uint64_t tickCount );
 
     virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
 
@@ -146,11 +147,11 @@ namespace Sapphire
     bool loadSpawnGroups();
 
     bool checkWeather();
-    void updateBNpcs( int64_t tickCount );
+    void updateBNpcs( uint64_t tickCount );
 
-    bool update( uint32_t currTime );
+    bool update( uint64_t tickCount );
 
-    void updateSessions( bool changedWeather );
+    void updateSessions( uint64_t tickCount, bool changedWeather );
 
     Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
                                          uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );

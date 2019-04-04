@@ -11,8 +11,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The update model packet.
   */
-  class ModelEquipPacket :
-    public ZoneChannelPacket< FFXIVIpcModelEquip >
+  class ModelEquipPacket : public ZoneChannelPacket< FFXIVIpcModelEquip >
   {
   public:
     ModelEquipPacket( Entity::Player& player ) :

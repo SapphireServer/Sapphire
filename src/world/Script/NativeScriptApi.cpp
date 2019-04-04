@@ -185,7 +185,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void InstanceContentScript::onUpdate( InstanceContent& instance, uint32_t currTime )
+  void InstanceContentScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
   {
   }
 
@@ -209,7 +209,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void QuestBattleScript::onUpdate( QuestBattle& instance, uint32_t currTime )
+  void QuestBattleScript::onUpdate( QuestBattle& instance, uint64_t tickCount )
   {
   }
 

@@ -68,7 +68,8 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 ),
   m_nextActorId( 0x500D0000 ),
-  m_pFw( pFw )
+  m_pFw( pFw ),
+  m_lastUpdate( 0 )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   m_guId = guId;
@@ -386,13 +387,13 @@ bool Sapphire::Zone::checkWeather()
   return false;
 }
 
-void Sapphire::Zone::updateBNpcs( int64_t tickCount )
+void Sapphire::Zone::updateBNpcs( uint64_t tickCount )
 {
   if( ( tickCount - m_lastMobUpdate ) <= 250 )
     return;
 
   m_lastMobUpdate = tickCount;
-  uint32_t currTime = Sapphire::Util::getTimeSeconds();
+  uint64_t currTime = Sapphire::Util::getTimeSeconds();
 
   for( const auto& entry : m_bNpcMap )
   {
@@ -442,30 +443,26 @@ void Sapphire::Zone::updateBNpcs( int64_t tickCount )
 }
 
 
-bool Sapphire::Zone::update( uint32_t currTime )
+bool Sapphire::Zone::update( uint64_t tickCount )
 {
-  int64_t tickCount = Util::getTimeMs();
-
   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
   bool changedWeather = checkWeather();
 
-  updateSessions( changedWeather );
+  updateSessions( tickCount, changedWeather );
   updateBNpcs( tickCount );
-  onUpdate( currTime );
+  onUpdate( tickCount );
 
   updateSpawnPoints();
   return true;
 }
 
-void Sapphire::Zone::updateSessions( bool changedWeather )
+void Sapphire::Zone::updateSessions( uint64_t tickCount, bool changedWeather )
 {
-  auto it = m_sessionSet.begin();
-
   // update sessions in this zone
-  for( ; it != m_sessionSet.end(); )
+  for( auto it = m_sessionSet.begin(); it != m_sessionSet.end(); ++it )
   {
 
-    auto pSession = ( *it );
+    auto pSession = *it;
 
     if( !pSession )
     {
@@ -484,6 +481,8 @@ void Sapphire::Zone::updateSessions( bool changedWeather )
       continue;
     }
 
+    m_lastUpdate = tickCount;
+
     if( changedWeather )
     {
       auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
@@ -494,7 +493,6 @@ void Sapphire::Zone::updateSessions( bool changedWeather )
 
     // perform session duties
     pSession->update();
-    ++it;
   }
 }
 
@@ -702,7 +700,7 @@ void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
   Logger::debug( "Zone::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
-void Sapphire::Zone::onUpdate( uint32_t currTime )
+void Sapphire::Zone::onUpdate( uint64_t tickCount )
 {
 
 }

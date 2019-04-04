@@ -15,8 +15,7 @@ namespace Sapphire::Network::Packets::Server
   * @brief The Client UI Initialization packet. This must be sent to the client
   * once upon connection to configure the UI.
   */
-  class MoveActorPacket :
-    public ZoneChannelPacket< FFXIVIpcActorMove >
+  class MoveActorPacket : public ZoneChannelPacket< FFXIVIpcActorMove >
   {
   public:
     MoveActorPacket( Entity::Chara& actor, uint8_t headRotation, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation = 0 ) :

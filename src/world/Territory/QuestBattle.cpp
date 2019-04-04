@@ -40,7 +40,6 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
   m_questBattleId( questBattleId ),
   m_state( Created ),
   m_instanceCommenceTime( 0 )
- // m_currentBgm( pInstanceConfiguration->bGM )
 {
 
 }
@@ -51,12 +50,6 @@ bool Sapphire::QuestBattle::init()
   pScriptMgr->onInstanceInit( getAsQuestBattle() );
 
   return true;
-}
-
-
-Sapphire::QuestBattle::~QuestBattle()
-{
-
 }
 
 uint32_t Sapphire::QuestBattle::getQuestBattleId() const
@@ -79,10 +72,7 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
   // mark player as "bound by duty"
   player.setStateFlag( PlayerStateFlag::BoundByDuty );
 
-  // if the instance was not started yet, director init is sent on enter event.
-  // else it will be sent on finish loading.
-  if( m_state == Created )
-    sendDirectorInit( player );
+  sendDirectorInit( player );
 
 }
 
@@ -101,7 +91,7 @@ void Sapphire::QuestBattle::onEnterSceneFinish( Entity::Player& player )
   setSequence( 2 );
 }
 
-void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
+void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 {
   switch( m_state )
   {
@@ -135,16 +125,17 @@ void Sapphire::QuestBattle::onUpdate( uint32_t currTime )
       break;
 
     case DutyInProgress:
-    {
       break;
-    }
 
     case DutyFinished:
       break;
+
+    case DutyFailed:
+      setSequence( 0xFE );
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), currTime );
+  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), tickCount );
 }
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
@@ -247,7 +238,6 @@ void Sapphire::QuestBattle::setBranch( uint8_t value )
 {
   setDirectorBranch( value );
   sendDirectorVars( *m_pPlayer );
-
 }
 
 void Sapphire::QuestBattle::startQte()

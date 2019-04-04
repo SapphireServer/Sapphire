@@ -500,16 +500,16 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getZoneByLandSetId( ui
   return zoneMap->second;
 }
 
-void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t currentTime )
+void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
 {
   for( auto& zone : m_zoneSet )
   {
-    zone->update( currentTime );
+    zone->update( tickCount );
   }
 
   for( auto& zone : m_instanceZoneSet )
   {
-    zone->update( currentTime );
+    zone->update( tickCount );
   }
 
   // remove internal house zones with nobody in them
@@ -518,10 +518,10 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint32_t 
     auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( it->second );
     assert( zone ); // wtf??
 
-    auto diff = std::difftime( currentTime, zone->getLastActivityTime() );
+    auto diff = std::difftime( tickCount, zone->getLastActivityTime() );
 
     // todo: make this timeout configurable, though should be pretty relaxed in any case
-    if( diff > 60 )
+    if( diff > 6000 )
     {
       Logger::info( "Removing HousingInteriorTerritory#{0} - has been inactive for 60 seconds", zone->getGuId() );
 

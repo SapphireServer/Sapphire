@@ -36,7 +36,8 @@ namespace Sapphire::Event
       Created,
       DutyReset,
       DutyInProgress,
-      DutyFinished
+      DutyFinished,
+      DutyFailed
     };
 
     Director( DirectorType type, uint16_t contentId );

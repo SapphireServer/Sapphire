@@ -34,12 +34,12 @@ namespace Sapphire
                  const std::string& contentName,
                  FrameworkPtr pFw );
 
-    virtual ~HousingZone();
+    virtual ~HousingZone() = default;
 
     bool init() override;
 
     void onPlayerZoneIn( Entity::Player& player ) override;
-    void onUpdate( uint32_t currTime ) override;
+    void onUpdate( uint64_t tickCount ) override;
 
     void sendLandSet( Entity::Player& player );
     void sendLandUpdate( uint8_t landId );
