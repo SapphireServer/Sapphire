@@ -267,7 +267,7 @@ void Sapphire::Action::Action::execute()
   assert( m_pSource );
 
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
-  if( !casterHasCostRequirements( true ) )
+  if( !costCheck( true ) )
   {
     interrupt();
     return;
@@ -405,7 +405,7 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
   // validate range
 
 
-  if( !casterHasCostRequirements() )
+  if( !costCheck() )
     return false;
 
   return true;
@@ -433,7 +433,7 @@ bool Sapphire::Action::Action::isComboAction() const
   return m_actionData->actionCombo == lastActionId;
 }
 
-bool Sapphire::Action::Action::casterHasCostRequirements( bool subtractCosts )
+bool Sapphire::Action::Action::costCheck( bool subtractCosts )
 {
   return primaryCostCheck( subtractCosts ) && secondaryCostCheck( subtractCosts );
 }
@@ -470,7 +470,7 @@ bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
       return true;
     }
 
-      // free casts, likely just pure ogcds
+    // free casts, likely just pure ogcds
     case Common::ActionPrimaryCostType::None:
     {
       return true;
