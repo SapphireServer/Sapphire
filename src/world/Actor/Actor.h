@@ -58,6 +58,7 @@ namespace Sapphire::Entity
     Common::ObjKind getObjKind() const;
 
     Common::FFXIVARR_POSITION3& getPos();
+    const Common::FFXIVARR_POSITION3& getPos() const;
 
     void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true );
 

@@ -20,6 +20,7 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         StatusEffect/*.c*
         Territory/*.c*
         Territory/Housing/*.c*
+        Util/*.c*
         Navi/*.c*)
 
 add_executable( world ${SERVER_SOURCE_FILES} )
