@@ -15,21 +15,18 @@ namespace Sapphire::World::Util
   public:
     ActorFilter() = default;
     virtual ~ActorFilter() = default;
-    virtual bool conditionApplies( const Entity::Actor& actor );
+    virtual bool conditionApplies( const Entity::Actor& actor ) = 0;
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+ 
   class ActorFilterInRange : public ActorFilter
   {
-    FFXIVARR_POSITION3 m_startPos;
+    Common::FFXIVARR_POSITION3 m_startPos;
     float m_range;
   public:
-    ActorFilterInRange( FFXIVARR_POSITION3 startPos, float range ) : m_startPos( startPos ), m_range( range );
-
-    bool conditionApplies( const Entity::Actor& actor ) override
-    {
-      return Util::distance( m_startPos.x, m_startPos.y, m_startPos.z,
-                             actor.getPos().x, actor.getPos().y, actor.getPos().z ) <= m_range;
-    }
+    ActorFilterInRange( Common::FFXIVARR_POSITION3 startPos, float range );
+    bool conditionApplies( const Entity::Actor& actor ) override;
   };
 
   // usage in psudocode
@@ -45,3 +42,5 @@ namespace Sapphire::World::Util
   //    return resultSet;
   //
 }
+
+#endif

@@ -54,6 +54,11 @@ Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::Actor::getPos()
   return m_pos;
 }
 
+const Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::Actor::getPos() const
+{
+  return m_pos;
+}
+
 void Sapphire::Entity::Actor::setPos( float x, float y, float z, bool broadcastUpdate )
 {
   m_pos.x = x;
