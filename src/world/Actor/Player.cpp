@@ -2051,6 +2051,11 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     bool sectionChanged = false;
     uint32_t monsterNoteId = static_cast< uint32_t >( ( static_cast< uint8_t >( getClass() ) ) * 10000 + logEntry.rank * 10 + i );
     auto note = pExdData->get< Sapphire::Data::MonsterNote >( monsterNoteId );
+
+    // for classes that don't have entries, if the first fails the rest will fail
+    if( !note )
+      break;
+
     for( auto x = 0; x < 4; ++x )
     {
       auto note1 = pExdData->get< Sapphire::Data::MonsterNoteTarget >( note->monsterNoteTarget[ x ] );
@@ -2086,6 +2091,10 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
                                         static_cast< uint8_t >( getClass() ), logEntry.rank + 1, 0 ) );
     }
   }
-  sendHuntingLog();
+  
+  if( logChanged )
+  {
+    sendHuntingLog();
+  }
 }
 
