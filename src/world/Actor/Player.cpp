@@ -2044,12 +2044,18 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 
   bool logChanged = false;
 
+  // make sure we get the matching base-class if a job is being used
+  auto currentClass = static_cast< uint8_t >( getClass() );
+  auto classJobInfo = pExdData->get< Sapphire::Data::ClassJob >( currentClass );
+  if( !classJobInfo )
+    return;
+
   bool allSectionsComplete = true;
   for( int i = 1; i <= 10; ++i )
   {
     bool sectionComplete = true;
     bool sectionChanged = false;
-    uint32_t monsterNoteId = static_cast< uint32_t >( ( static_cast< uint8_t >( getClass() ) ) * 10000 + logEntry.rank * 10 + i );
+    uint32_t monsterNoteId = static_cast< uint32_t >( classJobInfo->classJobParent * 10000 + logEntry.rank * 10 + i );
     auto note = pExdData->get< Sapphire::Data::MonsterNote >( monsterNoteId );
 
     // for classes that don't have entries, if the first fails the rest will fail
@@ -2093,8 +2099,6 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
   }
   
   if( logChanged )
-  {
     sendHuntingLog();
-  }
 }
 
