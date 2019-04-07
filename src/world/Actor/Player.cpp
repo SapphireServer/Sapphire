@@ -2097,7 +2097,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
                                         static_cast< uint8_t >( getClass() ), logEntry.rank + 1, 0 ) );
     }
   }
-  
+
   if( logChanged )
     sendHuntingLog();
 }

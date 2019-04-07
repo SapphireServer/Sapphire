@@ -2,6 +2,7 @@
 #define _ACTION_H_
 
 #include <Common.h>
+#include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
 
 namespace Sapphire::Data
@@ -77,6 +78,34 @@ namespace Sapphire::Action
     bool precheck();
 
     /*!
+     * @brief Snapshots characters affected by a cast.
+     * @param filters A vector of filters to be applied to the in range set of the caster
+     * @param actors Actors that match the filters are copied here
+     * @return true if actors are hit
+     */
+    bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
+
+    /*!
+     * @brief Adds an actor filter to this action.
+     * @param filter The ptr to the ActorFilter to add
+     */
+    void addActorFilter( World::Util::ActorFilterPtr filter );
+
+    /*!
+     * @brief Adds the default actor filters based on the CastType entry in the Action exd.
+     */
+    void addDefaultActorFilters();
+
+
+    std::vector< Entity::CharaPtr >& getHitActors();
+
+    /*!
+     * @brief Returns the first hit actor inside the m_hitActors vector.
+     * @return The CharaPtr otherwise nullptr
+     */
+    Entity::CharaPtr getHitActor();
+
+    /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
      */
     virtual void start();
@@ -108,6 +137,8 @@ namespace Sapphire::Action
 
     bool playerPrecheck( Entity::Player& player );
 
+    bool preFilterActor( Entity::Actor& actor ) const;
+
     uint32_t m_id;
 
     Common::ActionPrimaryCostType m_primaryCostType;
@@ -119,7 +150,9 @@ namespace Sapphire::Action
     uint8_t m_cooldownGroup;
     int8_t m_range;
     uint8_t m_effectRange;
+    uint8_t m_xAxisModifier;
     Common::ActionAspect m_aspect;
+    Common::CastType m_castType;
 
     uint32_t m_additionalData;
 
@@ -127,12 +160,21 @@ namespace Sapphire::Action
     Entity::CharaPtr m_pTarget;
     uint64_t m_targetId;
 
+    bool m_canTargetSelf;
+    bool m_canTargetParty;
+    bool m_canTargetFriendly;
+    bool m_canTargetHostile;
+    bool m_canTargetDead;
+
     Common::ActionInterruptType m_interruptType;
 
     FrameworkPtr m_pFw;
     Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
+
+    std::vector< World::Util::ActorFilterPtr > m_actorFilters;
+    std::vector< Entity::CharaPtr > m_hitActors;
   };
 }
 

@@ -3,12 +3,12 @@
 #include <Actor/Player.h>
 #include <Action/Action.h>
 
-class ActionHardSlash3617 :
+class ActionUnleash3621 :
   public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionHardSlash3617() :
-    Sapphire::ScriptAPI::ActionScript( 3617 )
+  ActionUnleash3621() :
+    Sapphire::ScriptAPI::ActionScript( 3621 )
   {
   }
 
@@ -19,7 +19,6 @@ public:
       chara->setHp( chara->getHp() - chara->getMaxHp() * 0.34f );
     }
   }
-
 };
 
-EXPOSE_SCRIPT( ActionHardSlash3617 );
+EXPOSE_SCRIPT( ActionUnleash3621 );
