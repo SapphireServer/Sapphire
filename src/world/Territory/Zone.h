@@ -50,6 +50,8 @@ namespace Sapphire
     int64_t m_lastMobUpdate;
     int64_t m_lastUpdate;
 
+    uint64_t m_lastActivityTime;
+
     FestivalPair m_currentFestival;
 
     std::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
@@ -80,6 +82,8 @@ namespace Sapphire
     void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
 
     std::shared_ptr< Data::TerritoryType > getTerritoryTypeInfo() const;
+
+    uint64_t getLastActivityTime() const;
 
     virtual bool init();
 

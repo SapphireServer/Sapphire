@@ -69,7 +69,8 @@ Sapphire::Zone::Zone( uint16_t territoryTypeId, uint32_t guId,
   m_nextEObjId( 0x400D0000 ),
   m_nextActorId( 0x500D0000 ),
   m_pFw( pFw ),
-  m_lastUpdate( 0 )
+  m_lastUpdate( 0 ),
+  m_lastActivityTime( Util::getTimeMs() )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   m_guId = guId;
@@ -439,6 +440,10 @@ void Sapphire::Zone::updateBNpcs( uint64_t tickCount )
 
 }
 
+uint64_t Sapphire::Zone::getLastActivityTime() const
+{
+  return m_lastActivityTime;
+}
 
 bool Sapphire::Zone::update( uint64_t tickCount )
 {
@@ -450,6 +455,10 @@ bool Sapphire::Zone::update( uint64_t tickCount )
   onUpdate( tickCount );
 
   updateSpawnPoints();
+
+  if( m_playerMap.size() > 0 )
+    m_lastActivityTime = tickCount;
+
   return true;
 }
 
