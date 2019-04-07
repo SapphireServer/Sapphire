@@ -516,3 +516,16 @@ Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeS
 {
   return *m_nativeScriptMgr;
 }
+
+bool
+Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onDutyComplete( *instance, player );
+    return true;
+  }
+
+  return false;
+}

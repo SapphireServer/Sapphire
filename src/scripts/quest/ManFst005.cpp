@@ -69,6 +69,14 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
        Scene00002( player );
    }
 
+   void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
+   {
+     if( player.getQuestSeq( eventId ) == Seq2 )
+     {
+       Scene00005( player );
+     }
+   }
+
    private:
    //////////////////////////////////////////////////////////////////////
    // Available Scenes in this quest, not necessarly all are used
@@ -129,9 +137,14 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
 
    void Scene00005( Entity::Player& player )
    {
-     player.playScene( getId(), 5, HIDE_HOTBAR,
+     player.playScene( getId(), 5, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                   HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                   DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                   // todo: wtf is 0x00100000
+                                   DISABLE_CANCEL_EMOTE,
                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
                        {
+                         player.updateQuest( result.eventId, Seq3 );
                        } );
    }
 

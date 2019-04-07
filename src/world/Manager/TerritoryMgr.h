@@ -111,10 +111,10 @@ namespace Sapphire::World::Manager
     ZonePtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */
-    bool removeTerritoryInstance( uint32_t territoryTypeId );
+    bool removeTerritoryInstance( uint32_t guId );
 
     /*! returns a ZonePtr to the instance or nullptr if not found */
-    ZonePtr getInstanceZonePtr( uint32_t instanceId ) const;
+    ZonePtr getInstanceZonePtr( uint32_t guId ) const;
 
     /*! returns the cached detail of a territory, nullptr if not found */
     Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;
@@ -165,6 +165,7 @@ namespace Sapphire::World::Manager
     using LandSetIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
     using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+    using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
@@ -182,8 +183,11 @@ namespace Sapphire::World::Manager
     /*! map holding actual instances of InstanceContent */
     InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
 
+    /*! map holding actual instances of InstanceContent */
+    QuestBattleIdToInstanceMap m_questBattleIdToInstanceMap;
+
     /*! flat map for easier lookup of instances by guid */
-    InstanceIdToZonePtrMap m_instanceIdToZonePtrMap;
+    InstanceIdToZonePtrMap m_guIdToZonePtrMap;
 
     /*! map holding positions for zonelines */
     PositionMap m_territoryPositionMap;
