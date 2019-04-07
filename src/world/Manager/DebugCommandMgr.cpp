@@ -60,6 +60,7 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
   registerCommand( "questbattle", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
+  registerCommand( "qb", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
 }
 
@@ -1029,6 +1030,26 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
       player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
+  }
+  else if( subCommand == "complete" )
+  {
+
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    instance->success();
+
+  }
+  else if( subCommand == "fail" )
+  {
+
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    if( !instance )
+      return;
+
+    instance->fail();
+
   }
   else if( subCommand == "createzone" || subCommand == "crz" )
   {

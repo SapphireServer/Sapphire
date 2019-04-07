@@ -61,6 +61,11 @@ namespace Sapphire
 
     void endEventCutscene();
 
+    uint32_t getQuestId() const;
+
+    void fail();
+    void success();
+
     void clearDirector( Entity::Player& player );
 
     Event::Director::DirectorState getState() const;

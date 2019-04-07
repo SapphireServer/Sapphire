@@ -39,7 +39,6 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
   Zone( territoryTypeId, guId, internalName, contentName, pFw ),
   m_landIdent( ident )
 {
-  m_lastActivityTime = 0;
 }
 
 Housing::HousingInteriorTerritory::~HousingInteriorTerritory() = default;
@@ -105,13 +104,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onUpdate( uint64_t tickCount )
 {
-  if( m_playerMap.size() > 0 )
-    m_lastActivityTime = tickCount;
-}
 
-uint64_t Sapphire::World::Territory::Housing::HousingInteriorTerritory::getLastActivityTime() const
-{
-  return m_lastActivityTime;
 }
 
 const Common::LandIdent Sapphire::World::Territory::Housing::HousingInteriorTerritory::getLandIdent() const

@@ -39,7 +39,7 @@ void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
   m_actors.insert( pAct );
 }
 
-void Sapphire::Cell::removeActor( Entity::ActorPtr pAct )
+void Sapphire::Cell::removeActorFromCell( Entity::ActorPtr pAct )
 {
   if( pAct->isPlayer() )
     --m_playerCount;
