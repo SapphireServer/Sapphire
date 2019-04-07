@@ -972,6 +972,13 @@ namespace Sapphire::Common
     THREAT
   };
 
+  enum CastType : uint8_t
+  {
+    SingleTarget = 1,
+    CircularAOE = 2,
+    RectangularAOE = 4,
+  };
+
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
 }
