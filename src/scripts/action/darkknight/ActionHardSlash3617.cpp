@@ -16,7 +16,7 @@ public:
   {
     for( auto& chara : action.getHitActors() )
     {
-      chara->setHp( chara->getHp() - chara->getMaxHp() * 0.34f );
+      chara->takeDamage( chara->getMaxHp() * 0.34f );
     }
   }
 
