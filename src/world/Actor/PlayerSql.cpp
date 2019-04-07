@@ -31,6 +31,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 {
   auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  m_pSession = pSession;
 
   const std::string char_id_str = std::to_string( charId );
 

@@ -2102,3 +2102,8 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     sendHuntingLog();
 }
 
+Sapphire::World::SessionPtr Sapphire::Entity::Player::getSession()
+{
+  return m_pSession;
+}
+

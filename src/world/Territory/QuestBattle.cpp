@@ -333,3 +333,33 @@ void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
   // remove "bound by duty" state
   player.unsetStateFlag( PlayerStateFlag::BoundByDuty );
 }
+
+void Sapphire::QuestBattle::success()
+{
+
+  m_pPlayer->eventStart( m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+  m_pPlayer->playScene( getDirectorId(), 60001, 0x40000,
+    [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      player.eventFinish( getDirectorId(), 1 );
+      player.eventStart( player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+      player.playScene( getDirectorId(), 6, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
+                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                        {
+                          player.eventFinish( getDirectorId(), 1 );
+                          auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+                          pScriptMgr->onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+                        } );
+
+    } );
+}
+
+void Sapphire::QuestBattle::fail()
+{
+
+}
+
+uint32_t Sapphire::QuestBattle::getQuestId() const
+{
+  return m_pBattleDetails->quest;
+}

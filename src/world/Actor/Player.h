@@ -972,6 +972,8 @@ namespace Sapphire::Entity
 
     void updateHuntingLog( uint16_t id );
 
+    World::SessionPtr getSession();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     uint64_t m_lastMoveTime;
@@ -981,6 +983,8 @@ namespace Sapphire::Entity
   private:
     uint32_t m_lastWrite;
     uint32_t m_lastPing;
+
+    World::SessionPtr m_pSession;
 
     bool m_bIsLogin;
 

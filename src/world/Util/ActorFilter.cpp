@@ -14,7 +14,7 @@ Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_
 bool Sapphire::World::Util::ActorFilterInRange::conditionApplies( const Entity::Actor& actor )
 {
   return Sapphire::Util::distance( m_startPos.x, m_startPos.y, m_startPos.z,
-                               actor.getPos().x, actor.getPos().y, actor.getPos().z ) <= m_range;
+                                   actor.getPos().x, actor.getPos().y, actor.getPos().z ) <= m_range;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////

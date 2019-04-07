@@ -36,7 +36,7 @@ public:
 
   void addActor( Entity::ActorPtr pAct );
 
-  void removeActor( Entity::ActorPtr pAct );
+  void removeActorFromCell( Entity::ActorPtr pAct );
 
   bool hasActor( Entity::ActorPtr pAct )
   {
