@@ -315,14 +315,6 @@ Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventI
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
-
-  // TODO: this may or may not be correct for questbattles
-  player.playScene( getDirectorId(), 1, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
-                                        HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                        DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
-                                        // todo: wtf is 0x00100000
-                                        DISABLE_CANCEL_EMOTE, 0 );
-
 }
 
 void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
@@ -349,6 +341,7 @@ void Sapphire::QuestBattle::success()
                           player.eventFinish( getDirectorId(), 1 );
                           auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
                           pScriptMgr->onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+                          player.exitInstance();
                         } );
 
     } );

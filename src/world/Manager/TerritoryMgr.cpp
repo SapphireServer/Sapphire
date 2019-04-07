@@ -520,7 +520,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
     auto diff = std::difftime( tickCount, zone->getLastActivityTime() );
 
     // todo: make this timeout configurable, though should be pretty relaxed in any case
-    if( diff > 6000 )
+    if( diff > 60000 )
     {
       Logger::info( "Removing HousingInteriorTerritory#{0} - has been inactive for 60 seconds", zone->getGuId() );
 
@@ -544,7 +544,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
       auto diff = std::difftime( tickCount, zone->getLastActivityTime() );
 
       // todo: make this timeout configurable, though should be pretty relaxed in any case
-      if( diff > 6000 )
+      if( diff > 60000 )
       {
         Logger::info( "Removing QuestBattle#{0} - has been inactive for 60 seconds", zone->getGuId() );
 
