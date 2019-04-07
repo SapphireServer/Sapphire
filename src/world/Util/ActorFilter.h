@@ -9,7 +9,6 @@
 
 namespace Sapphire::World::Util
 {
-
   class ActorFilter
   {
   public:
@@ -17,6 +16,8 @@ namespace Sapphire::World::Util
     virtual ~ActorFilter() = default;
     virtual bool conditionApplies( const Entity::Actor& actor ) = 0;
   };
+
+  using ActorFilterPtr = std::shared_ptr< ActorFilter >;
 
   /////////////////////////////////////////////////////////////////////////////
  
@@ -29,18 +30,15 @@ namespace Sapphire::World::Util
     bool conditionApplies( const Entity::Actor& actor ) override;
   };
 
-  // usage in psudocode
-  //
-  //  std::set< ActorPtr > filterActorList( inputSet, filter )
-  //  {
-  //    std::set< ActorPtr > resultSet;
-  //    for( every actor in inputSet )
-  //    {
-  //       if( filter.conditionApplies( actor ) )
-  //         resultSet.insert( actor.asPointer() );
-  //    }
-  //    return resultSet;
-  //
+  /////////////////////////////////////////////////////////////////////////////
+
+  class ActorFilterSingleTarget : public ActorFilter
+  {
+    uint32_t m_actorId;
+  public:
+    explicit ActorFilterSingleTarget( uint32_t actorId );
+    bool conditionApplies( const Entity::Actor& actor ) override;
+  };
 }
 
 #endif

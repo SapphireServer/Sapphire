@@ -13,7 +13,7 @@ namespace Sapphire::World
   public:
     Session( uint32_t sessionId, FrameworkPtr pFw );
 
-    ~Session();
+    ~Session() = default;
 
     void setZoneConnection( Network::GameConnectionPtr zoneCon );
 

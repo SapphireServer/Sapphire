@@ -17,6 +17,8 @@
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Logging/Logger.h>
+#include <Util/ActorFilter.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -69,7 +71,16 @@ bool Sapphire::Action::Action::init()
   m_cooldownGroup = m_actionData->cooldownGroup;
   m_range = m_actionData->range;
   m_effectRange = m_actionData->effectRange;
+  m_castType = static_cast< Common::CastType >( m_actionData->castType );
   m_aspect = static_cast< Common::ActionAspect >( m_actionData->aspect );
+
+  // todo: move this to bitset
+  m_canTargetSelf = m_actionData->canTargetSelf;
+  m_canTargetParty = m_actionData->canTargetParty;
+  m_canTargetFriendly = m_actionData->canTargetFriendly;
+  m_canTargetHostile = m_actionData->canTargetHostile;
+  // todo: this one doesn't look right based on whats in that col, probably has shifted
+  m_canTargetDead = m_actionData->canTargetDead;
 
   // a default range is set by the game for the class/job
   if( m_range == -1 )
@@ -89,7 +100,23 @@ bool Sapphire::Action::Action::init()
   m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->costType );
   m_primaryCost = m_actionData->cost;
 
+  if( !m_actionData->targetArea )
+  {
+    // override pos to target position
+    // todo: this is kinda dirty
+    for( auto& actor : m_pSource->getInRangeActors() )
+    {
+      if( actor->getId() == m_targetId )
+      {
+        m_pos = actor->getPos();
+        break;
+      }
+    }
+  }
+
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
+
+  addDefaultActorFilters();
 
   return true;
 }
@@ -297,7 +324,13 @@ void Sapphire::Action::Action::execute()
 
   if( !hasClientsideTarget() )
   {
-    pScriptMgr->onExecute( *this );
+    snapshotAffectedActors( m_hitActors );
+
+    if( !m_hitActors.empty() )
+    {
+      // only call script if actors are hit
+      pScriptMgr->onExecute( *this );
+    }
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
@@ -311,42 +344,6 @@ void Sapphire::Action::Action::execute()
   {
     m_pSource->setLastComboActionId( getId() );
   }
-}
-
-void Sapphire::Action::Action::calculateActionCost()
-{
-  // todo: just a test handler for now to get MP output for each cast, not sure where we should put this
-  // check primary cost
-  switch( m_primaryCostType )
-  {
-    case ActionPrimaryCostType::None:
-    {
-      break;
-    }
-    case ActionPrimaryCostType::MagicPoints:
-    {
-      // todo: not sure if we should store the final value like this?
-      m_primaryCost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
-      break;
-    }
-    case ActionPrimaryCostType::TacticsPoints:
-    {
-      break;
-    }
-
-    default:
-    {
-      if( auto player = m_pSource->getAsPlayer() )
-      {
-        player->sendDebug( "action#{0} is missing a handler for cost type: {1}",
-                           m_id, static_cast< uint8_t >( m_primaryCostType ) );
-      }
-
-      break;
-    }
-  }
-
-  // todo: secondary cost type needs to be handled
 }
 
 bool Sapphire::Action::Action::precheck()
@@ -490,4 +487,102 @@ bool Sapphire::Action::Action::hasResources()
 bool Sapphire::Action::Action::consumeResources()
 {
   return primaryCostCheck( true ) && secondaryCostCheck( true );
+}
+
+bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
+{
+  for( const auto& actor : m_pSource->getInRangeActors() )
+  {
+    // check for initial target validity based on flags in action exd (pc/enemy/etc.)
+    if( !preFilterActor( *actor ) )
+      continue;
+
+    for( const auto& filter : m_actorFilters )
+    {
+      if( filter->conditionApplies( *actor ) )
+      {
+        actors.push_back( actor->getAsChara() );
+        break;
+      }
+    }
+  }
+
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    player->sendDebug( "Hit {} actors with {} filters", actors.size(), m_actorFilters.size() );
+    for( const auto& actor : actors )
+    {
+      player->sendDebug( "hit actor#{}", actor->getId() );
+    }
+  }
+}
+
+void Sapphire::Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
+{
+  m_actorFilters.push_back( std::move( filter ) );
+}
+
+void Sapphire::Action::Action::addDefaultActorFilters()
+{
+  switch( m_castType )
+  {
+    case Common::CastType::SingleTarget:
+    {
+      auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
+
+      addActorFilter( filter );
+
+      break;
+    }
+
+    case Common::CastType::CircularAOE:
+    {
+      auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
+
+      addActorFilter( filter );
+
+      break;
+    }
+
+//    case Common::CastType::RectangularAOE:
+//    {
+//      break;
+//    }
+
+    default:
+    {
+      Logger::error( "[{}] Action#{} has CastType#{} but that cast type is unhandled. Cancelling cast.",
+                     m_pSource->getId(), getId(), m_castType );
+
+      interrupt();
+    }
+  }
+}
+
+bool Sapphire::Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
+{
+  auto kind = actor.getObjKind();
+
+  // todo: are there any server side eobjs that players can hit?
+  if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
+    return false;
+
+  // todo: handle things such based on canTargetX
+
+  return true;
+}
+
+std::vector< Sapphire::Entity::CharaPtr >& Sapphire::Action::Action::getHitCharas()
+{
+  return m_hitActors;
+}
+
+Sapphire::Entity::CharaPtr Sapphire::Action::Action::getHitChara()
+{
+  if( !m_hitActors.empty() )
+  {
+    return m_hitActors.at( 0 );
+  }
+
+  return nullptr;
 }

@@ -45,6 +45,8 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
 {
   auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
 
+  action->setTargetId( targetId );
+
   if( !action->init() )
     return;
 
@@ -54,8 +56,6 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
     action->interrupt();
     return;
   }
-
-  action->setTargetId( targetId );
 
   bootstrapAction( player, action, *actionData );
 }
