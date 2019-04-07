@@ -100,6 +100,20 @@ bool Sapphire::Action::Action::init()
   m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->costType );
   m_primaryCost = m_actionData->cost;
 
+  if( !m_actionData->targetArea )
+  {
+    // override pos to target position
+    // todo: this is kinda dirty
+    for( auto& actor : m_pSource->getInRangeActors() )
+    {
+      if( actor->getId() == m_targetId )
+      {
+        m_pos = actor->getPos();
+        break;
+      }
+    }
+  }
+
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
 
   addDefaultActorFilters();
@@ -558,12 +572,12 @@ bool Sapphire::Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) 
   return true;
 }
 
-std::vector< Sapphire::Entity::CharaPtr >& Sapphire::Action::Action::getHitActors()
+std::vector< Sapphire::Entity::CharaPtr >& Sapphire::Action::Action::getHitCharas()
 {
   return m_hitActors;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getHitActor()
+Sapphire::Entity::CharaPtr Sapphire::Action::Action::getHitChara()
 {
   if( !m_hitActors.empty() )
   {

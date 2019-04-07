@@ -97,13 +97,13 @@ namespace Sapphire::Action
     void addDefaultActorFilters();
 
 
-    std::vector< Entity::CharaPtr >& getHitActors();
+    std::vector< Entity::CharaPtr >& getHitCharas();
 
     /*!
      * @brief Returns the first hit actor inside the m_hitActors vector.
      * @return The CharaPtr otherwise nullptr
      */
-    Entity::CharaPtr getHitActor();
+    Entity::CharaPtr getHitChara();
 
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).

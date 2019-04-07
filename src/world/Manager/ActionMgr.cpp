@@ -47,9 +47,6 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
 
   action->setTargetId( targetId );
 
-  if( player.getId() == targetId )
-    action->setPos( player.getPos() );
-
   if( !action->init() )
     return;
 

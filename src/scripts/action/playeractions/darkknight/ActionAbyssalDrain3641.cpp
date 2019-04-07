@@ -3,22 +3,22 @@
 #include <Actor/Player.h>
 #include <Action/Action.h>
 
-class ActionUnleash3621 :
+class ActionAbyssalDrain3641 :
   public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionUnleash3621() :
-    Sapphire::ScriptAPI::ActionScript( 3621 )
+  ActionAbyssalDrain3641() :
+    Sapphire::ScriptAPI::ActionScript( 3641 )
   {
   }
 
   void onExecute( Sapphire::Action::Action& action ) override
   {
-    for( auto& chara : action.getHitActors() )
+    for( auto& chara : action.getHitCharas() )
     {
-      chara->takeDamage( chara->getMaxHp() * 0.34f );
+      chara->takeDamage( chara->getMaxHp() * 0.5f );
     }
   }
 };
 
-EXPOSE_SCRIPT( ActionUnleash3621 );
+EXPOSE_SCRIPT( ActionAbyssalDrain3641 );
