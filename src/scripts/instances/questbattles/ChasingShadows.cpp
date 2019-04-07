@@ -52,6 +52,12 @@ public:
 
   }
 
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.updateQuest( instance.getQuestId(), 2 );
+    player.exitInstance();
+  }
+
 };
 
 EXPOSE_SCRIPT( ChasingShadows );

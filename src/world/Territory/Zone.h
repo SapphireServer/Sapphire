@@ -21,7 +21,6 @@ namespace Sapphire
 
   class ZonePosition;
 
-  using SessionSet = std::set< World::SessionPtr >;
   using FestivalPair = std::pair< uint16_t, uint16_t >;
 
   namespace Data
@@ -43,8 +42,6 @@ namespace Sapphire
     std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
     std::unordered_map< int32_t, Entity::BNpcPtr > m_bNpcMap;
     std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
-
-    SessionSet m_sessionSet;
 
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;

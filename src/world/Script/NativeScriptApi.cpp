@@ -201,6 +201,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestBattleScript::onDutyComplete( Sapphire::QuestBattle& instance, Entity::Player& player )
+  {
+
+  }
+
   void QuestBattleScript::onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player )
   {
   }

@@ -222,6 +222,7 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
   else
   {
     Logger::debug( "[{0}] Undefined Zone IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
+
     Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
                                                        pPacket.segHdr.size ) );
   }
