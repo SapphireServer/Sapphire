@@ -1084,7 +1084,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1097,7 +1097,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1115,7 +1115,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1134,7 +1134,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1146,7 +1146,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%hhu", &branch );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1154,7 +1154,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1163,7 +1163,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
@@ -1172,7 +1172,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
     if( !instance )
       return;
 
