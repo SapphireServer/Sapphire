@@ -174,6 +174,11 @@ enum ActorControlType : uint16_t
 
     AetherReductionDlg = 0x17D,
 
+    /*!
+     * param1 = state
+     * param2 = actorid
+     */
+    EObjSetState = 0x199,
     Unk6 = 0x19C,
     EObjAnimation = 0x19D,
 
