@@ -178,7 +178,7 @@ enum ActorControlType : uint16_t
      * param1 = state
      * param2 = actorid
      */
-    QuestBattleEObjState = 0x199,
+    EObjSetState = 0x199,
     Unk6 = 0x19C,
     EObjAnimation = 0x19D,
 
