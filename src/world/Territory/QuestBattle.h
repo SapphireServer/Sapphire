@@ -84,8 +84,9 @@ namespace Sapphire
     uint32_t m_questBattleId;
     Event::Director::DirectorState m_state;
 
-    int64_t m_instanceExpireTime;
+    uint64_t m_instanceExpireTime;
     uint64_t m_instanceCommenceTime;
+    uint64_t m_instanceFailTime;
 
     std::map< std::string, Entity::EventObjectPtr > m_eventObjectMap;
     std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventIdToObjectMap;
