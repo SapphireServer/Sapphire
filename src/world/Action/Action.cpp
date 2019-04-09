@@ -515,6 +515,9 @@ bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::Char
       player->sendDebug( "hit actor#{}", actor->getId() );
     }
   }
+  if( actors.empty() )
+    return false;
+  return true;
 }
 
 void Sapphire::Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
