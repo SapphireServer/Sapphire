@@ -490,6 +490,9 @@ bool Sapphire::Entity::Player::exitInstance()
   auto pZone = getCurrentZone();
   auto pInstance = pZone->getAsInstanceContent();
 
+  resetHp();
+  resetMp();
+
   // check if housing zone
   if( pTeriMgr->isHousingTerritory( m_prevTerritoryTypeId ) )
   {

@@ -93,12 +93,14 @@ void Sapphire::QuestBattle::onEnterSceneFinish( Entity::Player& player )
 
 void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 {
+  if( !m_pPlayer )
+    return;
+
   switch( m_state )
   {
     case Created:
     {
-      if( !m_pPlayer )
-        return;
+
 
       if( !m_pPlayer->isLoadingComplete() ||
           !m_pPlayer->isDirectorInitialized() ||
@@ -131,7 +133,20 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
       break;
 
     case DutyFailed:
-      setSequence( 0xFE );
+    {
+      if( getSequence() != 0xFE )
+      {
+        setSequence( 0xFE );
+        m_instanceFailTime = tickCount;
+      }
+
+      if( ( static_cast< int64_t >( tickCount ) - static_cast< int64_t >( m_instanceFailTime ) ) > 6000 )
+      {
+        m_pPlayer->exitInstance();
+        m_pPlayer.reset();
+      }
+      break;
+    }
   }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
@@ -349,7 +364,7 @@ void Sapphire::QuestBattle::success()
 
 void Sapphire::QuestBattle::fail()
 {
-
+  m_state = DutyFailed;
 }
 
 uint32_t Sapphire::QuestBattle::getQuestId() const
