@@ -36,7 +36,6 @@ Sapphire::Data::ExdDataGenerated g_exdData;
 
 using namespace Sapphire;
 
-
 namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
@@ -63,11 +62,6 @@ xiv::dat::GameData* data1 = nullptr;
 xiv::exd::ExdData* eData = nullptr;
 
 using namespace std::chrono_literals;
-
-struct face
-{
-  int32_t f1, f2, f3;
-};
 
 void initExd( const std::string& gamePath )
 {
@@ -129,45 +123,6 @@ int parseBlockEntry( char* data, std::vector< PCB_BLOCK_ENTRY >& entries, int gO
   }
 
   return 0;
-}
-
-void dumpLevelExdEntries( uint32_t zoneId, const std::string& name = std::string() )
-{
-  static auto& cat = eData->get_category( "Level" );
-  static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
-
-  std::string fileName( name + "_" + std::to_string( zoneId ) + "_Level" + ".csv" );
-  std::ofstream outfile( fileName, std::ios::trunc );
-  std::cout << "[Info] Writing level.exd entries to " << fileName << "\n";
-  if( outfile.good() )
-  {
-    outfile.close();
-    outfile.open( fileName, std::ios::app );
-    static auto rows = exd.get_rows();
-    for( auto& row : rows )
-    {
-      auto id = row.first;
-      auto& fields = row.second;
-      auto x = std::get< float >( fields.at( 0 ) );
-      auto y = std::get< float >( fields.at( 1 ) );
-      auto z = std::get< float >( fields.at( 2 ) );
-      auto yaw = std::get< float >( fields.at( 3 ) );
-      auto radius = std::get< float >( fields.at( 4 ) );
-      auto type = std::get< uint8_t >( fields.at( 5 ) );
-      auto objectid = std::get< uint32_t >( fields.at( 6 ) );
-      auto zone = std::get< uint16_t >( fields.at( 9 ) );
-
-      if( zone == zoneId )
-      {
-        std::string outStr(
-          std::to_string( id ) + ", " + std::to_string( objectid ) + ", " +
-          std::to_string( x ) + ", " + std::to_string( y ) + ", " + std::to_string( z ) + ", " +
-          std::to_string( yaw ) + ", " + std::to_string( radius ) + ", " + std::to_string( type ) + "\n"
-        );
-        outfile.write( outStr.c_str(), outStr.size() );
-      }
-    }
-  }
 }
 
 std::string zoneNameToPath( const std::string& name )
@@ -317,24 +272,6 @@ void loadAllInstanceContentEntries()
   }
 }
 
-void readFileToBuffer( const std::string& path, std::vector< char >& buf )
-{
-  auto inFile = std::ifstream( path, std::ios::binary );
-  if( inFile.good() )
-  {
-    inFile.seekg( 0, inFile.end );
-    int32_t fileSize = ( int32_t ) inFile.tellg();
-    buf.resize( fileSize );
-    inFile.seekg( 0, inFile.beg );
-    inFile.read( &buf[ 0 ], fileSize );
-    inFile.close();
-  }
-  else
-  {
-    throw std::runtime_error( "Unable to open " + path );
-  }
-}
-
 int main( int argc, char* argv[] )
 {
   auto startTime = std::chrono::system_clock::now();
@@ -348,7 +285,6 @@ int main( int argc, char* argv[] )
     Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
-
 
   std::vector< std::string > argVec( argv + 1, argv + argc );
   // todo: support expansions
@@ -394,11 +330,11 @@ int main( int argc, char* argv[] )
   {
     std::cout << error.what();
   }
+  
   loadAllInstanceContentEntries();
 
   auto& catQuestBattle = eData->get_category( "QuestBattle" );
   auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
-
 
   for( auto entry : contentList )
   {
