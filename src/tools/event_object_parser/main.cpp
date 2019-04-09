@@ -15,7 +15,8 @@
 #include "lgb.h"
 #include "sgb.h"
 
-#ifndef STANDALONE
+#include <Exd/ExdDataGenerated.h>
+#include <Logging/Logger.h>
 
 #include <GameData.h>
 #include <File.h>
@@ -26,15 +27,23 @@
 
 #include <experimental/filesystem>
 
-#endif
+
+#include <Util/CrashHandler.h>
+
+Sapphire::Common::Util::CrashHandler crashHandler;
+
+Sapphire::Data::ExdDataGenerated g_exdData;
+
+using namespace Sapphire;
+
 
 namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "/home/mordred/sqpack" );
+//std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
-std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
 uint32_t zoneId;
 
@@ -52,13 +61,6 @@ std::set< std::string > zoneDumpList;
 
 xiv::dat::GameData* data1 = nullptr;
 xiv::exd::ExdData* eData = nullptr;
-
-enum class TerritoryTypeExdIndexes :
-  size_t
-{
-  TerritoryType = 0,
-  Path = 1
-};
 
 using namespace std::chrono_literals;
 
@@ -173,62 +175,35 @@ std::string zoneNameToPath( const std::string& name )
   std::string path;
   bool found = false;
 
-#ifdef STANDALONE
-  auto inFile = std::ifstream( "territorytype.exh.csv" );
-  if( inFile.good() )
+  auto teriIdList = g_exdData.getTerritoryTypeIdList();
+  for( auto teriId : teriIdList )
   {
-     std::string line;
-     std::regex re( "(\\d+),\"(.*)\",\"(.*)\",.*" );
-     while( std::getline( inFile, line ) )
-     {
-        std::smatch match;
-        if( std::regex_match( line, match, re )
-        {
-           auto tmpId = std::stoul( match[1].str() );
-           if( !found && name == match[2].str() )
-           {
-              zoneId = tmpId;
-              path = match[3].str();
-              found = true;
-           }
-           zoneNameMap[tmpId] = match[2].str();
-        }
-     }
-     inFile.close();
-  }
-#else
-
-  auto& cat = eData->get_category( "TerritoryType" );
-  auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
-  for( auto& row : exd.get_rows() )
-  {
-    auto& fields = row.second;
-    auto teriName = std::get< std::string >(
-      fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::TerritoryType ) ) );
+    auto teri = g_exdData.get< Sapphire::Data::TerritoryType >( teriId );
+    if( !teri )
+      continue;
+    
+    auto teriName = teri->name;
+    auto teriPath = teri->bg;
+    
     if( teriName.empty() )
       continue;
-    auto teriPath = std::get< std::string >( fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-    if( !found && ( Sapphire::Util::toLowerCopy( name) == Sapphire::Util::toLowerCopy( teriName ) ) )
+    
+    if( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) )
     {
       path = teriPath;
       found = true;
-      zoneId = row.first;
+      break;
     }
-    zoneNameMap[ row.first ] = teriName;
   }
-#endif
 
   if( found )
   {
-    //path = path.substr( path.find_first_of( "/" ) + 1, path.size() - path.find_first_of( "/" ));
-    //path = std::string( "ffxiv/" ) + path;
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
-    std::cout << "[Info] " << "Found path for " << name << ": " << path << std::endl;
+    Logger::debug( "Found path for {0}: {1}", name, path );
   }
   else
   {
-    throw std::runtime_error( "Unable to find path for " + name +
-                              ".\n\tPlease double check spelling or open 0a0000.win32.index with FFXIV Explorer and extract territorytype.exh as CSV\n\tand copy territorytype.exh.csv into pcb_reader.exe directory if using standalone" );
+    throw std::runtime_error( "Unable to find path for " + name );
   }
 
   return path;
@@ -289,118 +264,57 @@ void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
 
 void loadAllInstanceContentEntries()
 {
-  auto& catInstance = eData->get_category( "ContentFinderCondition" );
-  auto& catQuest = eData->get_category( "Quest" );
-  auto& catQuestBattle = eData->get_category( "QuestBattle" );
-  auto& territoryTypeSheet = eData->get_category( "TerritoryType" );
-  auto& instanceContentSheet = eData->get_category( "InstanceContent" );
-
-  auto exdInstance = static_cast< xiv::exd::Exd >( catInstance.get_data_ln( xiv::exd::Language::en ) );
-  auto instanceContentData = static_cast< xiv::exd::Exd >( instanceContentSheet.get_data_ln( xiv::exd::Language::en ) );
-  auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
-  auto questDataData = static_cast< xiv::exd::Exd >( catQuest.get_data_ln( xiv::exd::Language::en ) );
-
-  if( zoneNameMap.size() == 0 )
+  auto cfcIdList = g_exdData.getContentFinderConditionIdList();
+  for( auto cfcId : cfcIdList )
   {
-    zoneNameToPath( "f1d1" );
-  }
-
-  std::ofstream out( "instancecontent.csv", std::ios::trunc );
-  if( out.good() )
-  {
-    out.close();
-  }
-  out.open( "instancecontent.csv", std::ios::app );
-  if( !out.good() )
-  {
-    throw std::runtime_error( "Unable to create instancecontent.csv!" );
-  }
-  std::cout << "[Info] Writing instancecontent.csv\n";
-
-  for( auto& row : exdInstance.get_rows() )
-  {
-    auto id = row.first;
-    auto& fields = row.second;
-
-    uint16_t teriId;
-
-    auto contentLinkType = std::get< uint8_t >( fields.at( 2 ) );
-    auto contentLink = std::get< uint16_t >( fields.at( 3 ) );
-
-    std::string name;
-    uint8_t type = 0;
-    teriId = std::get< uint16_t >( fields.at( 1 ) );
-
-    if( contentLinkType == 1 )
-    {
-      // instancecontent
-      auto row = instanceContentData.get_row( contentLink );
-
-      name = std::get< std::string >( row.at( 3 ) );
-      type = std::get< uint8_t >( row.at( 0 ) );
-      id = contentLink;
-      //std::cout << name << "\n";
-    }
-    else if( contentLinkType == 5 )
-    {
-      std::cout << contentLinkType << "\n";
-      // instancecontent
-      auto row = questBattleData.get_row( contentLink );
-      int32_t questId1 = std::get< int32_t >( row.at( 0 ) );
-      if( questId1 > 99999 )
-        continue;
-      auto row1 = questDataData.get_row( questId1 );
-
-      name = std::get< std::string >( row1.at( 0 ) );
-      std::cout << name << "\n";
-
-      type = 7;
-      id = contentLink;
-    }
-//    else if( contentLinkType == 2 )
-//    {
-//      // partycontent
-//      auto row = partyContentData.get_row( contentLink );
-//
-//      name = std::get< std::string >( row.at( 2 ) );
-//    }
-//    else if( contentLinkType == 3 )
-//    {
-//      // publiccontent
-//      auto row = publicContentData.get_row( contentLink );
-//
-//      name = std::get< std::string >( row.at( 3 ) );
-//    }
-//    else if( contentLinkType == 4 )
-//    {
-//      // goldsaucercontent
-//    }
-    else
-    {
+    auto cfc = g_exdData.get< Sapphire::Data::ContentFinderCondition >( cfcId );
+    if( !cfc )
       continue;
+    
+    uint16_t teriId = cfc->territoryType;
+    auto tt = g_exdData.get< Sapphire::Data::TerritoryType >( teriId );
+    if( !tt )
+      continue;
+    uint16_t contentId = cfc->content;
+    uint8_t type;
+    std::string name;
+    
+    if( cfc->contentLinkType == 1 )
+    {
+      auto ic = g_exdData.get< Sapphire::Data::InstanceContent >( cfc->content );
+      if( !ic )
+        continue;
+      type = ic->instanceContentType;
+      name = ic->name;
     }
-
-
+    else if( cfc->contentLinkType == 5 )
+    { 
+      auto qb = g_exdData.get< Sapphire::Data::QuestBattle >( cfc->content );
+      if( !qb )
+        continue;
+      auto q = g_exdData.get< Sapphire::Data::Quest >( qb->quest );
+      if( !q )
+        continue;
+      type = 7;
+      name = q->name;
+    }
+    else
+      continue;
+    
     if( name.empty() )
       continue;
-
-    auto teri = teriId;
+    
     auto i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
-    std::string outStr(
-      std::to_string( id ) + ", \"" + name + "\", \"" + zoneNameMap[ teri ] + "\"," + std::to_string( teri ) + "\n"
-    );
-    out.write( outStr.c_str(), outStr.size() );
-    //zoneInstanceMap[zoneId].push_back( std::make_pair( id, name ) );
-    zoneDumpList.emplace( zoneNameMap[ teri ] );
+    
+    zoneDumpList.emplace( tt->name );
 
     std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
     Sapphire::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
-    contentList.push_back( { id, name, zoneNameMap[ teri ], type } );
+    contentList.push_back( { contentId, name, tt->name, type } );
   }
-  out.close();
 }
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf )
@@ -426,13 +340,20 @@ int main( int argc, char* argv[] )
   auto startTime = std::chrono::system_clock::now();
   auto entryStartTime = std::chrono::system_clock::now();
 
+  Logger::init( "Event Object Parser" );
+
+  Logger::info( "Setting up EXD data" );
+  if( !g_exdData.init( gamePath ) )
+  {
+    Logger::fatal( "Error setting up EXD data " );
+    return 0;
+  }
+
+
   std::vector< std::string > argVec( argv + 1, argv + argc );
   // todo: support expansions
   std::string zoneName = "r2t2";
-  bool dumpInstances = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
-  { return arg == "--instance-dump"; } ) != argVec.end();
   ignoreModels = true;
-  dumpInstances = true;
   if( argc > 1 )
   {
     zoneName = argv[ 1 ];
@@ -473,15 +394,7 @@ int main( int argc, char* argv[] )
   {
     std::cout << error.what();
   }
-  if( dumpInstances )
-  {
-    loadAllInstanceContentEntries();
-  }
-  else
-  {
-    zoneDumpList.emplace( zoneName );
-  }
-
+  loadAllInstanceContentEntries();
 
   auto& catQuestBattle = eData->get_category( "QuestBattle" );
   auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
@@ -504,7 +417,6 @@ int main( int argc, char* argv[] )
       std::vector< char > section1;
       std::vector< char > section2;
 
-#ifndef STANDALONE
       const xiv::dat::Cat& test = data1->getCategory( "bg" );
 
       auto test_file = data1->getFile( bgLgbPath );
@@ -513,31 +425,12 @@ int main( int argc, char* argv[] )
       auto planmap_file = data1->getFile( planmapLgbPath );
       section2 = planmap_file->access_data_sections().at( 0 );
 
-#else
-      {
-         readFileToBuffer( bgLgbPath, section );
-         readFileToBuffer( listPcbPath, section1 );
-      }
-#endif
 
       std::vector< std::string > stringList;
 
       uint32_t offset1 = 0x20;
 
       loadEobjNames();
-      //dumpLevelExdEntries( zoneId, zoneName );
-//      std::string eobjFileName( entry.name + "_eobj.csv" );
-//      std::ofstream eobjOut( eobjFileName, std::ios::trunc );
-//      if( !eobjOut.good() )
-//        throw std::string( "Unable to create " + zoneName +
-//                           "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
-//
-//      eobjOut.close();
-//      eobjOut.open( eobjFileName, std::ios::app );
-//
-//      if( !eobjOut.good() )
-//        throw std::string( "Unable to create " + zoneName +
-//                           "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
 
       LGB_FILE bgLgb( &section[ 0 ], "bg" );
       LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
@@ -556,15 +449,9 @@ int main( int argc, char* argv[] )
           {
             char* dataSection = nullptr;
             //std::cout << fileName << " ";
-#ifndef STANDALONE
             auto file = data1->getFile( fileName );
             auto sections = file->get_data_sections();
             dataSection = &sections.at( 0 )[ 0 ];
-#else
-            std::vector< char > buf;
-            readFileToBuffer( fileName, buf );
-            dataSection = &buf[0];
-#endif
             sgbFile = SGB_FILE( &dataSection[ 0 ] );
             sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
             return true;
@@ -580,7 +467,7 @@ int main( int argc, char* argv[] )
         std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
         uint32_t totalGroups = 0;
         uint32_t totalGroupEntries = 0;
-
+        std::cout << zoneName << "\n";
         uint32_t count = 0;
         for( const auto& lgb : lgbList )
         {
