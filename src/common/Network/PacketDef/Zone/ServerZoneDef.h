@@ -752,9 +752,9 @@ namespace Sapphire::Network::Packets::Server
     //Current instance can be confirmed at any time using the /instance text command." ( 7B F8 69 )
 
     uint8_t unknown5;
+    uint32_t unknown8;
     uint16_t festivalId;
     uint16_t additionalFestivalId;
-    uint32_t unknown8;
     uint32_t unknown9;
     uint32_t unknown10;
     uint32_t unknown11;
