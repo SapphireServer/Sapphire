@@ -64,9 +64,28 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
      auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
      if( actor == Actor0 )
-       Scene00000( player );
+     {
+       if( !player.hasQuest( eventId ) )
+       {
+         Scene00000( player );
+       }
+       else
+       {
+         Scene00009( player );
+       }
+     }
+
      if( actor == Eobject0 )
        Scene00002( player );
+     if( actor == Eobject1 )
+     {
+       player.eventActionStart( getId(), EventActionProcessShor,
+                                [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                {
+                                  player.updateQuest( getId(), SeqFinish );
+                                },
+                                nullptr, getId() );
+     }
    }
 
    void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
@@ -177,14 +196,20 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
      player.playScene( getId(), 9, HIDE_HOTBAR,
                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
                        {
+                         Scene00010( player );
                        } );
    }
 
    void Scene00010( Entity::Player& player )
    {
-     player.playScene( getId(), 10, HIDE_HOTBAR,
+     player.playScene( getId(), 10, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI,
                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
                        {
+                         if( result.param2 == 1 )
+                           if( player.giveQuestRewards( getId(), 0 ) )
+                           {
+                             player.finishQuest( getId() );
+                           }
                        } );
    }
 
