@@ -108,6 +108,8 @@ namespace Sapphire::World::Manager
 
     ZonePtr createQuestBattle( uint32_t contentFinderConditionId );
 
+    void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
+
     ZonePtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */
@@ -166,6 +168,7 @@ namespace Sapphire::World::Manager
     using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
     using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+    using QuestBattleIdToContentFinderCondMap = std::unordered_map< uint16_t, uint16_t >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
@@ -212,6 +215,9 @@ namespace Sapphire::World::Manager
 
     /*! Max distance at which actors in range of a player are sent */
     float m_inRangeDistance;
+
+    /*! Map used to find a contentFinderConditionID to a questBattle */
+    QuestBattleIdToContentFinderCondMap m_questBattleToContentFinderMap;
 
   public:
     /*! returns a list of instanceContent InstanceIds currently active */

@@ -1,5 +1,6 @@
 #include <Actor/Player.h>
 #include "Manager/EventMgr.h"
+#include "Manager/TerritoryMgr.h"
 #include <ScriptObject.h>
 #include "Framework.h"
 
@@ -141,7 +142,11 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
                        {
                          if( result.param2 == 1 )
                          {
-                           // enter instance
+                           auto pTeriMgr = framework()->get< Sapphire::World::Manager::TerritoryMgr >();
+                           if( !pTeriMgr )
+                             return;
+                           player.eventFinish( result.eventId, 0 );
+                           pTeriMgr->createAndJoinQuestBattle( player, Questbattle0 );
                          }
                        } );
    }

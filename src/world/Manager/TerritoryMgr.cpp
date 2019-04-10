@@ -40,6 +40,15 @@ void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
     if( !teri1->name.empty() )
       m_territoryTypeDetailCacheMap[ id ] = teri1;
   }
+
+  for( auto id : pExdData->getContentFinderConditionIdList() )
+  {
+    auto cfc = pExdData->get< Sapphire::Data::ContentFinderCondition >( id );
+    if( !cfc || cfc->contentLinkType != 5 )
+      continue;
+
+    m_questBattleToContentFinderMap[ cfc->content ] = id;
+  }
 }
 
 bool Sapphire::World::Manager::TerritoryMgr::isValidTerritory( uint32_t territoryTypeId ) const
@@ -273,15 +282,19 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uint32_t contentFinderConditionId )
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uint32_t questBattleId )
 {
+
+  auto it = m_questBattleToContentFinderMap.find( questBattleId );
+  if( it == m_questBattleToContentFinderMap.end() )
+    return nullptr;
+
+  auto contentFinderConditionId = it->second;
 
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
   if( !pContentFinderCondition )
     return nullptr;
-
-  auto questBattleId = pContentFinderCondition->content;
 
   auto pQuestBattleInfo = pExdData->get< Sapphire::Data::QuestBattle >( questBattleId );
   if( !pQuestBattleInfo )
@@ -299,7 +312,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uin
   if( !pTeri || pQuestInfo->name.empty() )
     return nullptr;
 
-  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", questBattleId, pQuestInfo->name );
+  Logger::debug( "Starting instance for QuestBattle id: {0} ({1})", questBattleId, pQuestInfo->name );
 
   auto pZone = make_QuestBattle( pQuestBattleInfo, pContentFinderCondition->territoryType, getNextInstanceId(),
                                  pTeri->name, pQuestInfo->name, questBattleId, framework() );
@@ -660,6 +673,16 @@ void Sapphire::World::Manager::TerritoryMgr::disableCurrentFestival()
 float Sapphire::World::Manager::TerritoryMgr::getInRangeDistance() const
 {
   return m_inRangeDistance;
+}
+
+void Sapphire::World::Manager::TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint16_t questBattleId )
+{
+  auto qb = createQuestBattle( questBattleId );
+  if( !qb )
+    return;
+
+  player.setInstance( qb );
+
 }
 
 
