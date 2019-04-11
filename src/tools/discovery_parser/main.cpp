@@ -13,9 +13,9 @@
 
 #include <Util/Util.h>
 
-#include "pcb.h"
-#include "lgb.h"
-#include "sgb.h"
+#include <Exd/StructureDef/pcb.h>
+#include <Exd/StructureDef/lgb.h>
+#include <Exd/StructureDef/sgb.h>
 #include "tex.h"
 #include "tex_decode.h"
 
