@@ -252,7 +252,7 @@ public:
 
 struct LGB_GROUP_HEADER
 {
-  uint32_t unknown;
+  uint32_t id;
   int32_t groupNameOffset;
   int32_t entriesOffset;
   int32_t entryCount;
@@ -310,12 +310,11 @@ struct LGB_GROUP
         {
           entries.push_back( std::make_shared< LGB_MAPRANGE_ENTRY >( buf, entryOffset ) );
         }
-        /*
         else
         {
-           entries[i] = nullptr;
+           entries.push_back( std::make_shared< LGB_ENTRY >( buf, entryOffset ) );
         }
-        */
+
 
       }
       catch( std::exception& e )
