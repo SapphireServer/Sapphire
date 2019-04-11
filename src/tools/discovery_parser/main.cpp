@@ -13,9 +13,9 @@
 
 #include <Util/Util.h>
 
-#include <Exd/StructureDef/pcb.h>
-#include <Exd/StructureDef/lgb.h>
-#include <Exd/StructureDef/sgb.h>
+#include <datReader/DatCategories/bg/pcb.h>
+#include <datReader/DatCategories/bg/lgb.h>
+#include <datReader/DatCategories/bg/sgb.h>
 #include "tex.h"
 #include "tex_decode.h"
 
