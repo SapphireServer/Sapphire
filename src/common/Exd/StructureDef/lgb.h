@@ -278,7 +278,7 @@ struct LGB_GROUP
       {
         const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
         // garbage to skip model loading
-        if( !ignoreModels && type == LgbEntryType::BgParts )
+        if( type == LgbEntryType::BgParts )
         {
           entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
         }
@@ -331,9 +331,15 @@ struct LGB_FILE
 {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
-  std::string name;
+  std::string m_name;
 
-  LGB_FILE( char* buf, const std::string& name )
+  LGB_FILE( char* buf, const std::string& name ) :
+    LGB_FILE( buf )
+  {
+    m_name = name;
+  }
+
+  LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )

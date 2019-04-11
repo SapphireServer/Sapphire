@@ -11,9 +11,6 @@
 
 #include "vec3.h"
 
-// garbage to skip model loading
-extern bool ignoreModels;
-
 //
 // ported from https://github.com/ufx/SaintCoinach/blob/master/SaintCoinach/Graphics/Sgb/SgbDataType.cs
 
@@ -36,6 +33,7 @@ enum SgbGroupEntryType :
   uint32_t
 {
   Model = 0x01,
+  Gimmick = 0x06,
 };
 
 struct SGB_GROUP_HEADER
@@ -62,6 +60,35 @@ struct SGB_GROUP_HEADER
 
   uint32_t unknown40;
   uint32_t unknown44;
+};
+
+struct SGB_GROUP1C_HEADER
+{
+  SgbDataType type;
+  int32_t nameOffset;
+  uint32_t unknown08;
+
+  int32_t entryCount;
+  uint32_t unknown14;
+  int32_t modelFileOffset;
+  vec3 unknownFloat3;
+  vec3 unknownFloat3_2;
+  int32_t stateOffset;
+  int32_t modelFileOffset2;
+  uint32_t unknown3;
+  float unknown4;
+  int32_t nameOffset2;
+  vec3 unknownFloat3_3;
+};
+
+struct SGB_GROUP1C_ENTRY
+{
+  uint32_t unk;
+  uint32_t unk2;
+  int32_t nameOffset;
+  uint32_t index;
+  uint32_t unk3;
+  int32_t modelFileOffset;
 };
 
 struct SGB_GROUP_ENTRY
@@ -113,8 +140,9 @@ struct SGB_MODEL_ENTRY :
   std::string modelFileName;
   std::string collisionFileName;
 
-  SGB_MODEL_ENTRY( char* buf, uint32_t offset )
+  SGB_MODEL_ENTRY( char* buf, uint32_t offset, SgbGroupEntryType type )
   {
+    this->type = type;
     header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     modelFileName = std::string( buf + offset + header.modelFileOffset );
@@ -143,9 +171,9 @@ struct SGB_GROUP
       if( entryOffset > fileSize )
         throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
       auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
-      if( type == SgbGroupEntryType::Model && !ignoreModels )
+      if( type == SgbGroupEntryType::Model || type == SgbGroupEntryType::Gimmick )
       {
-        entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset ) );
+        entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset, ( SgbGroupEntryType )type ) );
       }
       else
       {
@@ -248,6 +276,5 @@ struct SGB_FILE
     }
   };
 };
-
 
 #endif // !_SGB_H

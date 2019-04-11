@@ -11,9 +11,9 @@
 #include <variant>
 #include <Util/Util.h>
 
-#include "pcb.h"
-#include "lgb.h"
-#include "sgb.h"
+#include <Exd/StructureDef/pcb.h>
+#include <Exd/StructureDef/lgb.h>
+#include <Exd/StructureDef/sgb.h>
 
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
@@ -40,7 +40,7 @@ namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
-std::string gamePath( "/home/mordred/sqpack" );
+std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 //std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -58,15 +58,15 @@ std::vector< instanceContent > contentList;
 
 std::set< std::string > zoneDumpList;
 
-xiv::dat::GameData* data1 = nullptr;
+xiv::dat::GameData* gameData = nullptr;
 xiv::exd::ExdData* eData = nullptr;
 
 using namespace std::chrono_literals;
 
 void initExd( const std::string& gamePath )
 {
-  data1 = data1 ? data1 : new xiv::dat::GameData( gamePath );
-  eData = eData ? eData : new xiv::exd::ExdData( *data1 );
+  gameData = gameData ? gameData : new xiv::dat::GameData( gamePath );
+  eData = eData ? eData : new xiv::exd::ExdData( *gameData );
 }
 
 int parseBlockEntry( char* data, std::vector< PCB_BLOCK_ENTRY >& entries, int gOff )
@@ -348,19 +348,48 @@ int main( int argc, char* argv[] )
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
       std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
+      std::string planeventLgbPath( zonePath + "/level/planevent.lgb" );
       std::string collisionFilePath( zonePath + "/collision/" );
+      std::string plannerFilePath( zonePath + "/level/planner.lgb" );
+      std::string lcbFilePath( zonePath + "/level/" + zoneName + ".lcb" );
+      std::string svbFilePath( zonePath + "/level/" + zoneName + ".svb" );
       std::vector< char > section;
       std::vector< char > section1;
       std::vector< char > section2;
+      std::vector< char > section3;
 
-      const xiv::dat::Cat& test = data1->getCategory( "bg" );
+      const xiv::dat::Cat& test = gameData->getCategory( "bg" );
 
-      auto test_file = data1->getFile( bgLgbPath );
+      auto test_file = gameData->getFile( bgLgbPath );
       section = test_file->access_data_sections().at( 0 );
 
-      auto planmap_file = data1->getFile( planmapLgbPath );
+      auto planmap_file = gameData->getFile( planmapLgbPath );
       section2 = planmap_file->access_data_sections().at( 0 );
 
+      auto planeventFile = gameData->getFile( planeventLgbPath );
+      section3 = planeventFile->access_data_sections().at( 0 );
+
+      auto exportFile = [&]( const std::string& path )
+      {
+        try
+        {
+          auto file = gameData->getFile( path );
+
+          if( !file )
+          {
+            return;
+          }
+          auto p = fs::path( path );
+          fs::create_directories( p.parent_path() );
+          file->exportToFile( p );
+        }
+        catch( const std::exception& ex ) {}
+      };
+
+      exportFile( planeventLgbPath );
+      exportFile( plannerFilePath );
+      exportFile( lcbFilePath );
+      exportFile( svbFilePath );
 
       std::vector< std::string > stringList;
 
@@ -370,8 +399,9 @@ int main( int argc, char* argv[] )
 
       LGB_FILE bgLgb( &section[ 0 ], "bg" );
       LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
+      LGB_FILE planeventLgb( &section3[ 0 ], "planevent" );
 
-      std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
+      std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb, planeventLgb };
       uint32_t max_index = 0;
 
       //if( ignoreModels )
@@ -385,7 +415,7 @@ int main( int argc, char* argv[] )
           {
             char* dataSection = nullptr;
             //std::cout << fileName << " ";
-            auto file = data1->getFile( fileName );
+            auto file = gameData->getFile( fileName );
             auto sections = file->get_data_sections();
             dataSection = &sections.at( 0 )[ 0 ];
             sgbFile = SGB_FILE( &dataSection[ 0 ] );
@@ -453,7 +483,7 @@ int main( int argc, char* argv[] )
                       char* dataSection = nullptr;
                       //std::cout << fileName << " ";
 
-                      auto file = data1->getFile( pGObjR->gimmickFileName );
+                      auto file = gameData->getFile( pGObjR->gimmickFileName );
                       auto sections = file->get_data_sections();
                       dataSection = &sections.at( 0 )[ 0 ];
                       auto sgbFile = SGB_FILE( &dataSection[ 0 ] );
@@ -487,7 +517,7 @@ int main( int argc, char* argv[] )
                 if( eobjNameMap.find( id ) != eobjNameMap.end() )
                 {
                   name = eobjNameMap[ id ];
-                  std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
+                  std::string remove = "\",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
                   Sapphire::Util::eraseAllIn( name, remove );
 
                   name[ 0 ] = toupper( name[ 0 ] );
@@ -614,7 +644,7 @@ int main( int argc, char* argv[] )
 
   if( eData )
     delete eData;
-  if( data1 )
-    delete data1;
+  if( gameData )
+    delete gameData;
   return 0;
 }
