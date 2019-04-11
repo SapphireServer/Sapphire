@@ -16,9 +16,9 @@
 #include <streambuf>
 #include <regex>
 
-#include <Exd/StructureDef/pcb.h>
-#include <Exd/StructureDef/lgb.h>
-#include <Exd/StructureDef/sgb.h>
+#include <datReader/DatCategories/bg/pcb.h>
+#include <datReader/DatCategories/bg/lgb.h>
+#include <datReader/DatCategories/bg/sgb.h>
 
 #include <Util/CrashHandler.h>
 
@@ -90,7 +90,7 @@ int main( int argc, char* argv[] )
 
   std::vector< std::string > levelNames;
   std::vector< std::string > paths;
-  
+
   std::vector< uint32_t > lgbGroupIds;
   std::vector< DupeResult > lgbGroupDupes;
 
