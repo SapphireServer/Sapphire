@@ -394,13 +394,13 @@ int main( int argc, char* argv[] )
           }
           catch( std::exception& e )
           {
-            std::cout << "[Error] " << "Unable to load SGB " << fileName << "\n\tError:\n\t" << e.what() << "\n";
+            Logger::error( "Unable to load SGB {}", fileName );
+	    Logger::error( "{}", e.what() );
             sgbFiles.insert( std::make_pair( fileName, sgbFile ) );
           }
           return false;
         };
 
-        std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
         uint32_t totalGroups = 0;
         uint32_t totalGroupEntries = 0;
         std::cout << zoneName << "\n";
@@ -539,20 +539,15 @@ int main( int argc, char* argv[] )
             }
           }
         }
-        std::cout << "[Info] " << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
+	Logger::info( "Total Groups {}, Total Entries {}", totalGroups, totalGroupEntries );
       }
-      std::cout << "[Success] " << "Exported " << zoneName << " in " <<
+      Logger::info( "Exported {} in {} seconds", zoneName, 
                 std::chrono::duration_cast< std::chrono::seconds >(
-                  std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
+                  std::chrono::system_clock::now() - entryStartTime ).count() );
     }
     catch( std::exception& e )
     {
-      std::cout << "[Error] " << e.what() << std::endl;
-      std::cout << "[Error] "
-                << "Unable to extract collision data.\n\tIf using standalone ensure your working directory folder layout is \n\tbg/[ffxiv|ex1|ex2]/teri/type/zone/[level|collision]"
-                << std::endl;
-      std::cout << std::endl;
-      std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
+      Logger::error( "{}", e.what() );
     }
     std::cout << "\n\n\n";
 
@@ -608,12 +603,8 @@ int main( int argc, char* argv[] )
 
   }
 
-
-  std::cout << "\n\n\n[Success] Finished all tasks in " <<
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count()
-            << " seconds\n";
-
-//  getchar();
+  Logger::info( "Finished all tasts in {} seconds", 
+            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count() );
 
   if( data1 )
     delete data1;
