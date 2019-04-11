@@ -223,7 +223,8 @@ struct LGB_MAPRANGE_HEADER :
   uint16_t unknown3;
   uint32_t unknown5;
   uint32_t mapId;
-  uint32_t offsetX, offsetY;
+  uint32_t offsetX;
+  uint32_t offsetY;
   uint32_t unkInts[4];
   uint16_t unkShort;
   uint8_t unkFlag;
