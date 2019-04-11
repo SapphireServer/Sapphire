@@ -369,28 +369,6 @@ int main( int argc, char* argv[] )
       auto planeventFile = gameData->getFile( planeventLgbPath );
       section3 = planeventFile->access_data_sections().at( 0 );
 
-      auto exportFile = [&]( const std::string& path )
-      {
-        try
-        {
-          auto file = gameData->getFile( path );
-
-          if( !file )
-          {
-            return;
-          }
-          auto p = fs::path( path );
-          fs::create_directories( p.parent_path() );
-          file->exportToFile( p );
-        }
-        catch( const std::exception& ex ) {}
-      };
-
-      exportFile( planeventLgbPath );
-      exportFile( plannerFilePath );
-      exportFile( lcbFilePath );
-      exportFile( svbFilePath );
-
       std::vector< std::string > stringList;
 
       uint32_t offset1 = 0x20;
