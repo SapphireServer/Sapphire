@@ -59,14 +59,12 @@ std::vector< instanceContent > contentList;
 std::set< std::string > zoneDumpList;
 
 xiv::dat::GameData* data1 = nullptr;
-xiv::exd::ExdData* eData = nullptr;
 
 using namespace std::chrono_literals;
 
 void initExd( const std::string& gamePath )
 {
   data1 = data1 ? data1 : new xiv::dat::GameData( gamePath );
-  eData = eData ? eData : new xiv::exd::ExdData( *data1 );
 }
 
 int parseBlockEntry( char* data, std::vector< PCB_BLOCK_ENTRY >& entries, int gOff )
@@ -125,10 +123,15 @@ int parseBlockEntry( char* data, std::vector< PCB_BLOCK_ENTRY >& entries, int gO
   return 0;
 }
 
+std::unordered_map< std::string, std::string > g_nameMap;
 std::string zoneNameToPath( const std::string& name )
 {
   std::string path;
   bool found = false;
+
+  auto it = g_nameMap.find( Sapphire::Util::toLowerCopy( name ) );
+  if( it != g_nameMap.end() )
+    return it->second;
 
   auto teriIdList = g_exdData.getTerritoryTypeIdList();
   for( auto teriId : teriIdList )
@@ -155,6 +158,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
     Logger::debug( "Found path for {0}: {1}", name, path );
+    g_nameMap[ Sapphire::Util::toLowerCopy( name ) ] = path; 
   }
   else
   {
@@ -166,16 +170,15 @@ std::string zoneNameToPath( const std::string& name )
 
 void loadEobjNames()
 {
-  auto& cat = eData->get_category( "EObjName" );
-  auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
-  for( auto& row : exd.get_rows() )
+  auto nameIdList = g_exdData.getEObjNameIdList();
+  for( auto id : nameIdList )
   {
-    auto id = row.first;
-    auto& fields = row.second;
-    auto name = std::get< std::string >( fields.at( 0 ) );
+    auto eObjName = g_exdData.get< Sapphire::Data::EObjName >( id );
+    if( !eObjName )
+      continue;
 
-    if( !name.empty() )
-      eobjNameMap[ id ] = name;
+    if( !eObjName->singular.empty() )
+      eobjNameMap[ id ] = eObjName->singular;
   }
 }
 
@@ -332,9 +335,7 @@ int main( int argc, char* argv[] )
   }
   
   loadAllInstanceContentEntries();
-
-  auto& catQuestBattle = eData->get_category( "QuestBattle" );
-  auto questBattleData = static_cast< xiv::exd::Exd >( catQuestBattle.get_data_ln( xiv::exd::Language::none ) );
+  loadEobjNames();
 
   for( auto entry : contentList )
   {
@@ -366,7 +367,6 @@ int main( int argc, char* argv[] )
 
       uint32_t offset1 = 0x20;
 
-      loadEobjNames();
 
       LGB_FILE bgLgb( &section[ 0 ], "bg" );
       LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
@@ -576,14 +576,17 @@ int main( int argc, char* argv[] )
       if( entry.id > 200 )
         continue;
 
+      auto qb = g_exdData.get< Sapphire::Data::QuestBattle >( entry.id );
+      if( !qb )
+        continue;
+
       std::string instruction;
-      auto row = questBattleData.get_row( entry.id );
       for( int i = 0; i < 149; ++i )
       {
-        if( std::get< std::string >( row.at( 4 + i ) ).empty() )
+        if( qb->scriptInstruction[ i ].empty() )
           continue;
-        instruction += "  static constexpr auto " + std::get< std::string >( row.at( 4 + i ) ) + " = " +
-                       std::to_string( std::get< uint32_t >( row.at( 154 + i ) ) )+ ";\n";
+        instruction += "  static constexpr auto " + qb->scriptInstruction[ i ] + " = " +
+                       std::to_string( qb->scriptValue[ i ] ) + ";\n";
       }
 
       result = std::regex_replace( result, std::regex( "\\SCRIPT_INSTRUCTIONS" ), instruction );
@@ -612,8 +615,6 @@ int main( int argc, char* argv[] )
 
 //  getchar();
 
-  if( eData )
-    delete eData;
   if( data1 )
     delete data1;
   return 0;
