@@ -12,9 +12,9 @@
 #include <Util/Util.h>
 #include <Util/CrashHandler.h>
 
-#include "pcb.h"
-#include "lgb.h"
-#include "sgb.h"
+#include <datReader/DatCategories/bg/pcb.h>
+#include <datReader/DatCategories/bg/lgb.h>
+#include <datReader/DatCategories/bg/sgb.h>
 
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
@@ -37,7 +37,7 @@ namespace fs = std::experimental::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
-std::string gamePath( "/home/mordred/sqpack" );
+std::string gamePath( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 //std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 
@@ -241,9 +241,14 @@ int main( int argc, char* argv[] )
       std::string listPcbPath( zonePath + "/collision/list.pcb" );
       std::string bgLgbPath( zonePath + "/level/bg.lgb" );
       std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
+      std::string planeventLgbPath( zonePath + "/level/planevent.lgb" );
       std::string collisionFilePath( zonePath + "/collision/" );
+      std::string plannerFilePath( zonePath + "/level/planner.lgb" );
+      std::string lcbFilePath( zonePath + "/level/" + zoneName + ".lcb" );
+      std::string svbFilePath( zonePath + "/level/" + zoneName + ".svb" );
       std::vector< char > section;
       std::vector< char > section2;
+      std::vector< char > section3;
 
       const xiv::dat::Cat& test = data1->getCategory( "bg" );
 
@@ -254,6 +259,7 @@ int main( int argc, char* argv[] )
 
       LGB_FILE bgLgb( &section[ 0 ], "bg" );
       LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
+      LGB_FILE planeventLgb( &section3[ 0 ], "planevent" );
 
       std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
 

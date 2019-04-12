@@ -223,7 +223,8 @@ struct LGB_MAPRANGE_HEADER :
   uint16_t unknown3;
   uint32_t unknown5;
   uint32_t mapId;
-  uint32_t offsetX, offsetY;
+  uint32_t offsetX;
+  uint32_t offsetY;
   uint32_t unkInts[4];
   uint16_t unkShort;
   uint8_t unkFlag;
@@ -246,29 +247,12 @@ public:
   {
     header = *reinterpret_cast< LGB_MAPRANGE_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-
-  };
-};
-
-struct LGB_POPRANGE_ENTRY :
-  public LGB_ENTRY
-{
-public:
-  LGB_MAPRANGE_HEADER header;
-  std::string name;
-
-  LGB_POPRANGE_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
-  {
-    header = *reinterpret_cast< LGB_MAPRANGE_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-
   };
 };
 
 struct LGB_GROUP_HEADER
 {
-  uint32_t unknown;
+  uint32_t id;
   int32_t groupNameOffset;
   int32_t entriesOffset;
   int32_t entryCount;
@@ -306,20 +290,31 @@ struct LGB_GROUP
       {
         const auto type = *reinterpret_cast<LgbEntryType*>( buf + entryOffset );
         // garbage to skip model loading
-        if( type == LgbEntryType::PopRange )
+        if( type == LgbEntryType::BgParts )
         {
-          entries.push_back( std::make_shared< LGB_POPRANGE_ENTRY >( buf, entryOffset ) );
+          entries.push_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::Gimmick )
+        {
+          entries.push_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::EventNpc )
+        {
+          entries.push_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::EventObject )
+        {
+          entries.push_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::MapRange )
         {
           entries.push_back( std::make_shared< LGB_MAPRANGE_ENTRY >( buf, entryOffset ) );
         }
-        /*
         else
         {
-           entries[i] = nullptr;
+           entries.push_back( std::make_shared< LGB_ENTRY >( buf, entryOffset ) );
         }
-        */
+
 
       }
       catch( std::exception& e )
@@ -347,9 +342,15 @@ struct LGB_FILE
 {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
-  std::string name;
+  std::string m_name;
 
-  LGB_FILE( char* buf, const std::string& name )
+  LGB_FILE( char* buf, const std::string& name ) :
+    LGB_FILE( buf )
+  {
+    m_name = name;
+  }
+
+  LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
