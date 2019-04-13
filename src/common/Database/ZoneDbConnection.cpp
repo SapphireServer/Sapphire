@@ -175,6 +175,12 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
                     CONNECTION_SYNC );
 
+  prepareStatement( CHARA_ITEMGLOBAL_SELECT,
+                    "SELECT catalogId, stack, reservedFlag, signatureId, flags, durability, refine, materia_0, materia_1, "
+                    "materia_2, materia_3, materia_4, stain, pattern, buffer_0, buffer_1, buffer_2, buffer_3, buffer_4 "
+                    "FROM charaglobalitem WHERE itemId = ?",
+                    CONNECTION_SYNC );
+
   /// CHARA MONSTERNOTE
   prepareStatement( CHARA_MONSTERNOTE_INS,
                     "INSERT INTO charamonsternote ( CharacterId, Category_0, Category_1, Category_2,"

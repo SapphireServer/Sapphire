@@ -321,7 +321,10 @@ bool Sapphire::Entity::Player::loadSearchInfo()
   auto res = pDb->query( stmt );
 
   if( !res->next() )
+  {
+    Logger::error( "Failed to load search info for character#{}", m_id );
     return false;
+  }
 
   m_searchSelectClass = res->getUInt8( 2 );
   m_searchSelectRegion = res->getUInt8( 3 );
@@ -343,7 +346,10 @@ bool Sapphire::Entity::Player::loadHuntingLog()
   auto res = pDb->query( stmt );
 
   if( !res->next() )
+  {
+    Logger::error( "Failed to load hunting log data for character#{}", m_id );
     return false;
+  }
 
   for( auto i = 0; i < 12; ++i )
   {
