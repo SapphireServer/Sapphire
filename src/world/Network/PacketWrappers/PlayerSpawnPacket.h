@@ -46,7 +46,7 @@ namespace Sapphire::Network::Packets::Server
 
       auto item = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
       if( item )
-        m_data.mainWeaponModel = item->getModelId1();
+        m_data.mainWeaponModel = player.getModelMainWeapon();
       m_data.secWeaponModel = player.getModelSubWeapon();
 
       m_data.models[ Common::GearModelSlot::ModelHead ] = player.getModelForSlot( Common::GearModelSlot::ModelHead );
