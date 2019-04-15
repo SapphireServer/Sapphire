@@ -103,6 +103,8 @@ namespace Sapphire::Entity
     uint64_t m_targetId;
     /*! Ptr to a queued action */
     Action::ActionPtr m_pCurrentAction;
+    /*! id of the director this chara is assigned to */
+    uint32_t m_directorId;
 
     /*!
      * @brief the id of the last combo action used (IgnoresCombo)
@@ -261,6 +263,9 @@ namespace Sapphire::Entity
     void setLastComboActionId( uint32_t actionId );
 
     uint32_t getBonusStat( Common::BaseParam bonus ) const;
+
+    uint32_t getDirectorId() const;
+    void setDirectorId( uint32_t directorId );
 
   };
 

@@ -12,6 +12,8 @@
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
+#include "Actor/BNpc.h"
+#include "Actor/BNpcTemplate.h"
 
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
@@ -370,4 +372,97 @@ void Sapphire::QuestBattle::fail()
 uint32_t Sapphire::QuestBattle::getQuestId() const
 {
   return m_pBattleDetails->quest;
+}
+
+Sapphire::Entity::BNpcPtr
+  Sapphire::QuestBattle::createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
+                                                   uint32_t hp, uint16_t nameId, uint32_t directorId,
+                                                   uint8_t bnpcType )
+{
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto levelData = pExdData->get< Sapphire::Data::Level >( levelId );
+  if( !levelData )
+    return nullptr;
+
+  if( levelData->type != 9 )
+    return nullptr;
+
+  auto bnpcBaseId = levelData->object;
+
+  auto bnpcBaseData = pExdData->get< Sapphire::Data::BNpcBase >( bnpcBaseId );
+  if( !bnpcBaseData )
+    return nullptr;
+
+  //BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
+  //  uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
+  //  uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
+  //  uint8_t* customize )
+
+  std::vector< uint8_t > customize( 26 );
+  if( bnpcBaseData->bNpcCustomize != 0 )
+  {
+    auto bnpcCustomizeData = pExdData->get< Sapphire::Data::BNpcCustomize >( bnpcBaseData->bNpcCustomize );
+    if( bnpcCustomizeData )
+    {
+      customize[0] = bnpcCustomizeData->race;
+      customize[1] = bnpcCustomizeData->gender;
+      customize[2] = bnpcCustomizeData->bodyType;
+      customize[3] = bnpcCustomizeData->height;
+      customize[4] = bnpcCustomizeData->tribe;
+      customize[5] = bnpcCustomizeData->face;
+      customize[6] = bnpcCustomizeData->hairStyle;
+      customize[7] = bnpcCustomizeData->hairHighlight;
+      customize[8] = bnpcCustomizeData->skinColor;
+      customize[9] = bnpcCustomizeData->eyeHeterochromia;
+      customize[10] = bnpcCustomizeData->hairColor;
+      customize[11] = bnpcCustomizeData->hairHighlightColor;
+      customize[12] = bnpcCustomizeData->facialFeature;
+      customize[13] = bnpcCustomizeData->facialFeatureColor;
+      customize[14] = bnpcCustomizeData->eyebrows;
+      customize[15] = bnpcCustomizeData->eyeColor;
+      customize[16] = bnpcCustomizeData->eyeShape;
+      customize[17] = bnpcCustomizeData->nose;
+      customize[18] = bnpcCustomizeData->jaw;
+      customize[19] = bnpcCustomizeData->mouth;
+      customize[20] = bnpcCustomizeData->lipColor;
+      customize[21] = bnpcCustomizeData->bustOrTone1;
+      customize[22] = bnpcCustomizeData->extraFeature1;
+      customize[23] = bnpcCustomizeData->extraFeature2OrBust;
+      customize[24] = bnpcCustomizeData->facePaint;
+      customize[25] = bnpcCustomizeData->facePaintColor;
+    }
+  }
+
+  std::vector< uint32_t > models( 10 );
+  uint64_t modelMain = 0;
+  uint64_t modeloff = 0;
+  if( bnpcBaseData->npcEquip != 0 )
+  {
+    auto npcEquipData = pExdData->get< Sapphire::Data::NpcEquip >( bnpcBaseData->npcEquip );
+    if( npcEquipData )
+    {
+      modelMain = npcEquipData->modelMainHand;
+      modeloff = npcEquipData->modelOffHand;
+
+      models[0] = npcEquipData->modelHead;
+      models[1] = npcEquipData->modelBody;
+      models[2] = npcEquipData->modelHands;
+      models[3] = npcEquipData->modelLegs;
+      models[4] = npcEquipData->modelFeet;
+      models[5] = npcEquipData->modelEars;
+      models[6] = npcEquipData->modelNeck;
+      models[7] = npcEquipData->modelWrists;
+      models[8] = npcEquipData->modelLeftRing;
+      models[9] = npcEquipData->modelRightRing;
+    }
+  }
+
+  auto tmp = std::make_shared< Entity::BNpcTemplate >( 0, bnpcBaseId, nameId, modelMain, modeloff, 1, bnpcType, 0, 4,
+                                                       bnpcBaseData->modelChara, 0, &models[0], &customize[0] );
+
+  auto bnpc = std::make_shared< Entity::BNpc >( getNextActorId(), tmp, levelData->x, levelData->y, levelData->z,
+                                                levelData->yaw, level, hp, shared_from_this(), m_pFw );
+
+  bnpc->setDirectorId( directorId );
+  return bnpc;
 }
