@@ -151,17 +151,25 @@ void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapp
 {
   uint64_t model = pItem->getModelId1();
   uint64_t model2 = pItem->getModelId2();
+  uint64_t stain = pItem->getStain();
 
   switch( equipSlotId )
   {
     case MainHand:
-      m_modelMainWeapon = model;
+      m_modelMainWeapon = model | ( stain << 48 );
+
       m_modelSubWeapon = model2;
+
+      if( m_modelSubWeapon > 0 )
+      {
+        m_modelSubWeapon = m_modelSubWeapon | ( stain << 48 );
+      }
+
       equipWeapon( pItem, updateClass );
       break;
 
     case OffHand:
-      m_modelSubWeapon = model;
+      m_modelSubWeapon = model | ( stain << 48 );
       break;
 
     case SoulCrystal:
@@ -175,6 +183,8 @@ void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapp
       auto modelSlot = equipSlotToModelSlot( equipSlotId );
       if( modelSlot == GearModelSlot::ModelInvalid )
         break;
+
+      model = model | stain << 24;
       m_modelEquip[ static_cast< uint8_t >( modelSlot ) ] = static_cast< uint32_t >( model );
       break;
 
