@@ -3,9 +3,9 @@
 #include <cstring>
 
 Sapphire::Entity::BNpcTemplate::BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
-                                          uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
-                                          uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
-                                          uint8_t* customize ) :
+                                              uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
+                                              uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
+                                              uint8_t* customize ) :
   m_id( id ),
   m_bNpcBaseId( baseId ),
   m_bNpcNameId( nameId ),

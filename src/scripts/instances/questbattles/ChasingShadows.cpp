@@ -1,6 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
 #include <Actor/Player.h>
+#include <Actor/Actor.h>
+#include <Actor/Bnpc.h>
 
 using namespace Sapphire;
 
@@ -37,8 +39,17 @@ public:
 
   void onInit( QuestBattle& instance ) override
   {
-    instance.registerEObj( "unknown_0", 2005192, 5760474, 4, { -51.493111f, 0.309087f, 71.436897f }, 1.000000f, -0.000006f ); 
-
+    instance.registerEObj( "unknown_0", 2005192, 5760474, 4, { -51.493111f, 0.309087f, 71.436897f }, 1.000000f, -0.000006f );
+    auto a1 = instance.createBNpcFromLevelEntry( INIT_POP_BOSS, 12, 0, 21141, 939, instance.getDirectorId(), 4 );
+    auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_01, 10, 0, 1440, 938, instance.getDirectorId(), 4 );
+    auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_02, 10, 0, 1440, 938, instance.getDirectorId(), 4 );
+    instance.pushActor( a1 );
+    instance.pushActor( a2 );
+    instance.pushActor( a3 );
+    auto a4 = instance.createBNpcFromLevelEntry( INIT_P_POP_IDA, 50, 0, 27780, 1375, instance.getDirectorId(), 0 );
+    auto a5 = instance.createBNpcFromLevelEntry( INIT_P_POP_PAPARIMO, 50, 0, 27780, 1376, instance.getDirectorId(), 0 );
+    instance.pushActor( a4 );
+    instance.pushActor( a5 );
   }
 
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override

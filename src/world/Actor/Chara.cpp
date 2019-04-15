@@ -37,7 +37,8 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
-  m_pFw( std::move( std::move( pFw ) ) )
+  m_pFw( std::move( std::move( pFw ) ) ),
+  m_directorId( 0 )
 {
 
   m_lastTickTime = 0;
@@ -685,4 +686,14 @@ uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
   }
 
   return m_lastComboActionId;
+}
+
+uint32_t Sapphire::Entity::Chara::getDirectorId() const
+{
+  return m_directorId;
+}
+
+void Sapphire::Entity::Chara::setDirectorId( uint32_t directorId )
+{
+  m_directorId = directorId;
 }

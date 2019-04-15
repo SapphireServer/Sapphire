@@ -79,6 +79,10 @@ namespace Sapphire
     /*! number of milliseconds after all players are ready for the instance to commence (spawn circle removed) */
     const uint32_t instanceStartDelay = 1250;
 
+    Entity::BNpcPtr createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
+                                              uint32_t hp, uint16_t nameId, uint32_t directorId,
+                                              uint8_t bnpcType );
+
   private:
     std::shared_ptr< Sapphire::Data::QuestBattle > m_pBattleDetails;
     uint32_t m_questBattleId;
