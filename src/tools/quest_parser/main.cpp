@@ -69,7 +69,10 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     "// Content needs to be added by hand to make it function\n"
     "// In order for this script to be loaded, move it to the correct folder in <root>/scripts/\n"
     "\n"
-    "#include <ScriptObject.h>\n\n"
+    "#include <Actor/Player.h>\n"
+    "#include \"Manager/EventMgr.h\"\n"
+    "#include <ScriptObject.h>\n"
+    "#include \"Framework.h\"\n\n"
   );
 
   std::size_t splitPos( pQuestData->id.find( "_" ) );
@@ -135,93 +138,6 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     }
   }
   seqStr += "    };\n";
-  std::string rewards;
-  rewards.reserve( 0xFFF );
-  rewards += "    // Quest rewards \n";
-  rewards += ( pQuestData->expFactor != 0 ) ? "    static constexpr auto RewardExpFactor = " +
-                                              std::to_string( pQuestData->expFactor ) + ";\n" : "";
-  rewards += ( pQuestData->gilReward != 0 ) ? "    static constexpr auto RewardGil = " +
-                                              std::to_string( pQuestData->gilReward ) + ";\n" : "";
-  rewards += ( pQuestData->emoteReward != 0 ) ? "    static constexpr auto RewardEmote = " +
-                                                std::to_string( pQuestData->emoteReward ) + ";\n" : "";
-  rewards += ( pQuestData->actionReward != 0 ) ? "    static constexpr auto RewardAction = " +
-                                                 std::to_string( pQuestData->actionReward ) + ";\n" : "";
-  rewards += ( pQuestData->generalActionReward[ 0 ] != 0 ) ? "    static constexpr auto RewardGeneralAction1 = " +
-                                                             std::to_string( pQuestData->generalActionReward[ 0 ] ) +
-                                                             ";\n" : "";
-  rewards += ( pQuestData->generalActionReward[ 1 ] != 0 ) ? "    static constexpr auto RewardGeneralAction2 = " +
-                                                             std::to_string( pQuestData->generalActionReward[ 1 ] ) +
-                                                             ";\n" : "";
-  rewards += ( pQuestData->gCSeals != 0 ) ? "    static constexpr auto RewardGCSeals = " +
-                                            std::to_string( pQuestData->gCSeals ) + ";\n" : "";
-  rewards += ( pQuestData->otherReward != 0 ) ? "     static constexpr auto RewardOther = " +
-                                                std::to_string( pQuestData->otherReward ) + ";\n" : "";
-  rewards += ( pQuestData->reputationReward != 0 ) ? "    static constexpr auto RewardReputation = " +
-                                                     std::to_string( pQuestData->reputationReward ) + ";\n" : "";
-  rewards += ( pQuestData->tomestoneReward != 0 ) ? "    static constexpr auto RewardTomeType = " +
-                                                    std::to_string( pQuestData->tomestoneReward ) + ";\n" : "";
-  rewards += ( pQuestData->tomestoneCountReward != 0 ) ? "    static constexpr auto RewardTomeCount = " +
-                                                         std::to_string( pQuestData->tomestoneCountReward ) + ";\n"
-                                                       : "";
-  rewards += ( pQuestData->instanceContentUnlock != 0 ) ? "    static constexpr auto InstancedContentUnlock = " +
-                                                          std::to_string( pQuestData->instanceContentUnlock ) + ";\n"
-                                                        : "";
-
-  if( !pQuestData->itemReward0.empty() )
-  {
-    rewards += "    static constexpr auto RewardItem = { ";
-    for( size_t ca = 0; ca < pQuestData->itemReward0.size(); ca++ )
-    {
-      rewards += std::to_string( pQuestData->itemReward0.at( ca ) );
-      if( ca != pQuestData->itemReward0.size() - 1 )
-      {
-        rewards += ", ";
-      }
-    }
-    rewards += " };\n";
-  }
-
-  if( !pQuestData->itemReward0.empty() )
-  {
-    rewards += "    static constexpr auto RewardItemCount = { ";
-    for( size_t ca = 0; ca < pQuestData->itemCountReward0.size(); ca++ )
-    {
-      rewards += std::to_string( pQuestData->itemCountReward0.at( ca ) );
-      if( ca != pQuestData->itemCountReward0.size() - 1 )
-      {
-        rewards += ", ";
-      }
-    }
-    rewards += " };\n";
-  }
-
-  if( !pQuestData->itemReward1.empty() )
-  {
-    rewards += "    static constexpr auto RewardItemOptional = { ";
-    for( size_t ca = 0; ca < pQuestData->itemReward1.size(); ca++ )
-    {
-      rewards += std::to_string( pQuestData->itemReward1.at( ca ) );
-      if( ca != pQuestData->itemReward1.size() - 1 )
-      {
-        rewards += ", ";
-      }
-    }
-    rewards += " };\n";
-  }
-
-  if( !pQuestData->itemCountReward1.empty() )
-  {
-    rewards += "    static constexpr auto RewardItemOptionalCount = { ";
-    for( size_t ca = 0; ca < pQuestData->itemCountReward1.size(); ca++ )
-    {
-      rewards += std::to_string( pQuestData->itemCountReward1.at( ca ) );
-      if( ca != pQuestData->itemCountReward1.size() - 1 )
-      {
-        rewards += ", ";
-      }
-    }
-    rewards += " };\n";
-  }
 
   bool hasERange = false;
   bool hasEmote = false;
@@ -237,7 +153,10 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   for( size_t ca = 0; ca < pQuestData->scriptInstruction.size(); ca++ )
   {
     if( ( pQuestData->scriptInstruction.at( ca ).find( "HOWTO" ) != std::string::npos ) ||
-        ( pQuestData->scriptInstruction.at( ca ).find( "HOW_TO" ) != std::string::npos ) )
+        ( pQuestData->scriptInstruction.at( ca ).find( "HOW_TO" ) != std::string::npos ) ||
+        ( pQuestData->scriptInstruction.at( ca ).find( "LOC_MARK" ) != std::string::npos ) ||
+        ( pQuestData->scriptInstruction.at( ca ).find( "LocMark" ) != std::string::npos )
+	)
       continue;
 
     if( ( pQuestData->scriptInstruction.at( ca ).find( "EMOTENO" ) != std::string::npos ) ||
@@ -340,7 +259,6 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     "    // Basic quest information \n" );
   constructor += questVarStr + "\n";
   constructor += seqStr + "\n";
-  constructor += rewards + "\n";
   constructor += sentities + "\n";
   constructor += "  public:\n";
   constructor += "    " + className + "() : Sapphire::ScriptAPI::EventScript" + "( " + std::to_string( questId ) + " ){}; \n";
