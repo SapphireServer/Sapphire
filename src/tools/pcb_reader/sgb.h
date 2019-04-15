@@ -243,7 +243,7 @@ struct SGB_FILE
 {
   SGB_HEADER header;
   std::vector< SGB_GROUP > entries;
-  std::set< std::string > offset1cObjects;
+  std::set< std::string > stateEntries;
 
   SGB_FILE()
   {
@@ -260,9 +260,9 @@ struct SGB_FILE
 
     try
     {
-      auto group = SGB_GROUP( buf, this, &offset1cObjects, header.fileSize, baseOffset + header.sharedOffset );
+      auto group = SGB_GROUP( buf, this, &stateEntries, header.fileSize, baseOffset + header.sharedOffset );
       entries.push_back( group );
-      auto group2 = SGB_GROUP( buf, this, &offset1cObjects, header.fileSize, baseOffset+ header.offset1C, true );
+      auto group2 = SGB_GROUP( buf, this, &stateEntries, header.fileSize, baseOffset+ header.offset1C, true );
       entries.push_back( group2 );
     }
     catch( std::exception& e )

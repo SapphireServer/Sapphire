@@ -124,9 +124,14 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 {
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  // load actual item
-  auto itemRes = pDb->query(
-    "SELECT catalogId, stack, flags FROM charaglobalitem WHERE itemId = " + std::to_string( uId ) + ";" );
+
+  //  1 catalogId, 2 stack, 3 reservedFlag, 4 signatureId, 5 flags, 6 durability, 7 refine, 8 materia_0, 9 materia_1,
+  //  10 materia_2, 11 materia_3, 12 materia_4, 13 stain, 14 pattern, 15 buffer_0, 16 buffer_1, 17 buffer_2,
+  //  18 buffer_3, 19 buffer_4
+  auto query = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_SELECT );
+  query->setUInt64( 1, uId );
+
+  auto itemRes = pDb->query( query );
   if( !itemRes->next() )
     return nullptr;
 
@@ -141,6 +146,8 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
                                isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
+    pItem->setStain( itemRes->getUInt16( 13 ) );
+    pItem->setDurability( itemRes->getInt16( 6 ) );
 
     return pItem;
   }

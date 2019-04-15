@@ -13,9 +13,9 @@
 
 #include <Util/Util.h>
 
-#include "pcb.h"
-#include "lgb.h"
-#include "sgb.h"
+#include <datReader/DatCategories/bg/pcb.h>
+#include <datReader/DatCategories/bg/lgb.h>
+#include <datReader/DatCategories/bg/sgb.h>
 #include "tex.h"
 #include "tex_decode.h"
 
@@ -46,7 +46,7 @@ std::string zoneName;
 
 std::set< std::string > zoneDumpList;
 
-xiv::dat::GameData* data1 = nullptr;
+xiv::dat::GameData* gameData = nullptr;
 xiv::exd::ExdData* eData = nullptr;
 
 void readFileToBuffer( const std::string& path, std::vector< char >& buf );
@@ -135,8 +135,8 @@ struct face
 // init
 void initExd( const std::string& gamePath )
 {
-  data1 = data1 ? data1 : new xiv::dat::GameData( gamePath );
-  eData = eData ? eData : new xiv::exd::ExdData( *data1 );
+  gameData = gameData ? gameData : new xiv::dat::GameData( gamePath );
+  eData = eData ? eData : new xiv::exd::ExdData( *gameData );
 }
 
 std::string zoneNameToPath( const std::string& name )
@@ -338,13 +338,13 @@ int main( int argc, char* argv[] )
     std::vector< char > section1;
     std::vector< char > section2;
 
-    auto test_file = data1->getFile( bgLgbPath );
+    auto test_file = gameData->getFile( bgLgbPath );
     section = test_file->access_data_sections().at( 0 );
 
-    auto planmap_file = data1->getFile( planmapLgbPath );
+    auto planmap_file = gameData->getFile( planmapLgbPath );
     section2 = planmap_file->access_data_sections().at( 0 );
 
-    auto test_file1 = data1->getFile( listPcbPath );
+    auto test_file1 = gameData->getFile( listPcbPath );
     section1 = test_file1->access_data_sections().at( 0 );
 
     std::vector< std::string > stringList;
@@ -467,7 +467,7 @@ int main( int argc, char* argv[] )
 
   if( eData )
     delete eData;
-  if( data1 )
-    delete data1;
+  if( gameData )
+    delete gameData;
   return 0;
 }
