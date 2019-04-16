@@ -241,6 +241,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onDutyComplete( Sapphire::QuestBattle& instance, Entity::Player& player );
 
+    virtual void onDutyCommence( QuestBattle& instance, Entity::Player& player );
+
     virtual void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player );
 
     virtual void onInit( Sapphire::QuestBattle& instance );

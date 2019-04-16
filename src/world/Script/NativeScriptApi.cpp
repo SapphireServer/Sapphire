@@ -218,6 +218,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestBattleScript::onDutyCommence( QuestBattle& instance, Entity::Player& player )
+  {
+  }
+
   void QuestBattleScript::onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId,
                                             uint16_t param1, uint16_t param2 )
   {

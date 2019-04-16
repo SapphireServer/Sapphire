@@ -119,6 +119,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
         return;
 
       onEnterSceneFinish( *m_pPlayer );
+      auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+      pScriptMgr->onDutyCommence( *this, *m_pPlayer );
 
       m_state = DutyInProgress;
       m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->timeLimit * 60u );
@@ -129,6 +131,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
       break;
 
     case DutyInProgress:
+      updateBNpcs( tickCount );
       break;
 
     case DutyFinished:
@@ -464,5 +467,32 @@ Sapphire::Entity::BNpcPtr
                                                 levelData->yaw, level, hp, shared_from_this(), m_pFw );
 
   bnpc->setDirectorId( directorId );
+  bnpc->setLevelId( levelId );
   return bnpc;
+}
+
+Sapphire::Entity::BNpcPtr Sapphire::QuestBattle::getActiveBNpcByLevelId( uint32_t levelId )
+{
+  for( auto bnpcIt : m_bNpcMap )
+  {
+    if( bnpcIt.second->getLevelId() == levelId )
+      return bnpcIt.second;
+  }
+  return nullptr;
+}
+
+uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()
+{
+  uint32_t count = 0;
+  for( auto bnpcIt : m_bNpcMap )
+  {
+    if( bnpcIt.second->getEnemyType() == 4 )
+      count++;
+  }
+  return count;
+}
+
+Sapphire::Entity::PlayerPtr Sapphire::QuestBattle::getPlayerPtr()
+{
+  return m_pPlayer;
 }

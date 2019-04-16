@@ -68,6 +68,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_level = level;
   m_invincibilityType = InvincibilityNone;
   m_currentStance = Common::Stance::Passive;
+  m_levelId = 0;
 
   m_pCurrentZone = pZone;
 
@@ -157,6 +158,7 @@ uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
+  m_lastRoamTargetReached = Util::getTimeSeconds();
   pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
 }
 
@@ -393,11 +395,11 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   m_state = BNpcState::Combat;
 
   sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
+  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
 
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
     tmpPlayer->onMobAggro( getAsBNpc() );
   }
 
@@ -472,6 +474,10 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
     case BNpcState::Idle:
     {
+      auto pHatedActor = hateListGetHighest();
+      if( pHatedActor )
+        aggro( pHatedActor );
+
       if( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick )
       {
         auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
@@ -689,4 +695,14 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
     setOwnerPacket->data().actorId = 0;
     sendToInRangeSet( setOwnerPacket );
   }
+}
+
+void Sapphire::Entity::BNpc::setLevelId( uint32_t levelId )
+{
+  m_levelId = levelId;
+}
+
+uint32_t Sapphire::Entity::BNpc::getLevelId() const
+{
+  return m_levelId;
 }
