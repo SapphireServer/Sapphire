@@ -289,7 +289,7 @@ enum ActorControlType : uint16_t
     SetDutyActionActive = 0x5EA,
     SetDutyActionRemaining = 0x5EB,
 
-    EurekaStep = 0x73A, // alters the Eureka maps depending on the progress of the player
+    EurekaStep = 0x73A, // alters the progress of the player on Eureka (is used for all the eureka zones)
   };
 
   enum ClientTriggerType
