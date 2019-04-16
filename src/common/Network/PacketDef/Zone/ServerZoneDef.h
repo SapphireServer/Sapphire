@@ -1039,7 +1039,9 @@ namespace Sapphire::Network::Packets::Server
     char padding1[8];
     uint64_t mainWeaponModel;
     uint64_t secWeaponModel;
-    char unknown2[16];
+    uint8_t unknown2;
+    uint16_t worldId;
+    char unknown3[12];
     struct ItemData
     {
       uint32_t catalogId;
