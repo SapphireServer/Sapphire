@@ -182,6 +182,7 @@ namespace Sapphire::Network::Packets
     Mount = 0x01E8, // updated 4.5
 
     DirectorVars = 0x01EA, // updated 4.5
+    DirectorPopUp = 0x01F5, // display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
