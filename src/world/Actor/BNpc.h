@@ -102,6 +102,9 @@ namespace Sapphire::Entity
 
     void setOwner( CharaPtr m_pChara );
 
+    void setLevelId( uint32_t levelId );
+    uint32_t getLevelId() const;
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -114,6 +117,7 @@ namespace Sapphire::Entity
     uint16_t m_modelChara;
     uint32_t m_displayFlags;
     uint8_t m_level;
+    uint32_t m_levelId;
 
     float m_scale;
     float m_naviTargetReachedDistance;

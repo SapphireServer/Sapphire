@@ -145,6 +145,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
     case DutyInProgress:
     {
+      updateBNpcs( tickCount );
       break;
     }
 

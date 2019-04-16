@@ -106,6 +106,8 @@ namespace Sapphire::Scripting
 
     bool onInstanceUpdate( QuestBattlePtr instance, uint64_t tickCount );
 
+    bool onDutyCommence( QuestBattle& instance, Entity::Player& player );
+
     bool onInstanceEnterTerritory( QuestBattlePtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                                    uint16_t param2 );
 

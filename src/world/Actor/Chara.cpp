@@ -81,6 +81,11 @@ uint32_t Sapphire::Entity::Chara::getHp() const
   return m_hp;
 }
 
+uint32_t Sapphire::Entity::Chara::getHpPercent() const
+{
+  return ( m_hp * 100 ) / m_maxHp;
+}
+
 /*! \return current MP */
 uint32_t Sapphire::Entity::Chara::getMp() const
 {

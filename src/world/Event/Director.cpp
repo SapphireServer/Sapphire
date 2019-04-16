@@ -182,3 +182,16 @@ void Sapphire::Event::Director::setDirectorSequence( uint8_t value )
 {
   m_sequence = value;
 }
+
+void Sapphire::Event::Director::setCustomVar( uint32_t varId, uint32_t value )
+{
+  m_customVarMap[ varId ] = value;
+}
+
+uint32_t Sapphire::Event::Director::getCustomVar( uint32_t varId )
+{
+  auto it = m_customVarMap.find( varId );
+  if( it != m_customVarMap.end() )
+    return it->second;
+  return 0;
+}

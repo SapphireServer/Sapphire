@@ -576,7 +576,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t u15;
     uint32_t bNPCBase;
     uint32_t bNPCName;
-    uint32_t u18;
+    uint32_t levelId;
     uint32_t u19;
     uint32_t directorId;
     uint32_t spawnerId;

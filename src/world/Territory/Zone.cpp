@@ -451,7 +451,6 @@ bool Sapphire::Zone::update( uint64_t tickCount )
   bool changedWeather = checkWeather();
 
   updateSessions( tickCount, changedWeather );
-  updateBNpcs( tickCount );
   onUpdate( tickCount );
 
   updateSpawnPoints();
@@ -708,7 +707,7 @@ void Sapphire::Zone::onLeaveTerritory( Entity::Player& player )
 
 void Sapphire::Zone::onUpdate( uint64_t tickCount )
 {
-
+  updateBNpcs( tickCount );
 }
 
 void Sapphire::Zone::onFinishLoading( Entity::Player& player )

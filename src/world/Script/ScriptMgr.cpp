@@ -499,6 +499,20 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattlePtr instance, 
   return false;
 }
 
+
+bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onDutyCommence( instance, player );
+    return true;
+  }
+
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( QuestBattlePtr instance, Entity::Player& player,
                                                                uint32_t eventId, uint16_t param1, uint16_t param2 )
 {

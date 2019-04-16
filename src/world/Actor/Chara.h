@@ -187,6 +187,8 @@ namespace Sapphire::Entity
 
     uint32_t getHp() const;
 
+    uint32_t getHpPercent() const;
+
     uint32_t getMp() const;
 
     uint16_t getTp() const;

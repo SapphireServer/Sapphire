@@ -66,6 +66,9 @@ namespace Sapphire
     void fail();
     void success();
 
+    Entity::BNpcPtr getActiveBNpcByLevelId( uint32_t levelId );
+    uint32_t getCountEnemyBNpc();
+
     void clearDirector( Entity::Player& player );
 
     Event::Director::DirectorState getState() const;
@@ -82,6 +85,8 @@ namespace Sapphire
     Entity::BNpcPtr createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
                                               uint32_t hp, uint16_t nameId, uint32_t directorId,
                                               uint8_t bnpcType );
+
+    Entity::PlayerPtr getPlayerPtr();
 
   private:
     std::shared_ptr< Sapphire::Data::QuestBattle > m_pBattleDetails;

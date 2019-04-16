@@ -27,9 +27,14 @@ private:
   static constexpr auto CUT_SCENE_01 = 54;
   static constexpr auto HOW_TO_QIB = 79;
 
+  enum vars
+  {
+    SET_1_SPAWNED,
+    SET_2_SPAWNED
+  };
+
 public:
-  ChasingShadows() : Sapphire::ScriptAPI::QuestBattleScript( 11 )
-  { }
+  ChasingShadows() : Sapphire::ScriptAPI::QuestBattleScript( 11 ) {}
 
   void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player )
   {
@@ -40,25 +45,35 @@ public:
   void onInit( QuestBattle& instance ) override
   {
     instance.registerEObj( "unknown_0", 2005192, 5760474, 4, { -51.493111f, 0.309087f, 71.436897f }, 1.000000f, -0.000006f );
-    auto a1 = instance.createBNpcFromLevelEntry( INIT_POP_BOSS, 12, 0, 21141, 939,
-                                                 instance.getDirectorId(), Common::BNpcType::Enemy );
-    auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_01, 10, 0, 1440, 938,
-                                                 instance.getDirectorId(), Common::BNpcType::Enemy );
-    auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_02, 10, 0, 1440, 938,
-                                                 instance.getDirectorId(), Common::BNpcType::Enemy );
-    instance.pushActor( a1 );
-    instance.pushActor( a2 );
-    instance.pushActor( a3 );
-    auto a4 = instance.createBNpcFromLevelEntry( INIT_P_POP_IDA, 50, 0, 27780, 1375,
-                                                 instance.getDirectorId(), Common::BNpcType::Friendly );
-    auto a5 = instance.createBNpcFromLevelEntry( INIT_P_POP_PAPARIMO, 50, 0, 27780, 1376,
-                                                 instance.getDirectorId(), Common::BNpcType::Friendly );
-    instance.pushActor( a4 );
-    instance.pushActor( a5 );
+
   }
 
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto pair1Spawnd = instance.getCustomVar( SET_1_SPAWNED );
+
+    auto boss = instance.getActiveBNpcByLevelId( INIT_POP_BOSS );
+    if( !boss )
+      return;
+
+    if( pair1Spawnd == 0 && boss->getHpPercent() <= 90 )
+    {
+      instance.setCustomVar( SET_1_SPAWNED, 1 );
+      auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_03, 10, 0, 1440, 938,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_04, 10, 0, 1440, 938,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+
+      instance.pushActor( a2 );
+      instance.pushActor( a3 );
+
+      auto pPlayer = instance.getPlayerPtr();
+      a2->hateListAdd( pPlayer, 1 );
+      pPlayer->hateListAdd( a2 );
+
+      a3->hateListAdd( pPlayer, 1 );
+      pPlayer->hateListAdd( a3 );
+    }
 
   }
 
@@ -71,11 +86,53 @@ public:
                       DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
                       // todo: wtf is 0x00100000
                       DISABLE_CANCEL_EMOTE, 0 );
+
   }
 
   void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
   {
     player.updateQuest( instance.getQuestId(), 2 );
+  }
+
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto a1 = instance.createBNpcFromLevelEntry( INIT_POP_BOSS, 12, 0, 21141, 939,
+                                                 instance.getDirectorId(), Common::BNpcType::Enemy );
+    auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_01, 10, 0, 1440, 938,
+                                                 instance.getDirectorId(), Common::BNpcType::Enemy );
+    auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_02, 10, 0, 1440, 938,
+                                                 instance.getDirectorId(), Common::BNpcType::Enemy );
+
+    auto a4 = instance.createBNpcFromLevelEntry( INIT_P_POP_IDA, 50, 0, 27780, 1375,
+                                                 instance.getDirectorId(), Common::BNpcType::Friendly );
+    auto a5 = instance.createBNpcFromLevelEntry( INIT_P_POP_PAPARIMO, 50, 0, 27780, 1376,
+                                                 instance.getDirectorId(), Common::BNpcType::Friendly );
+    instance.pushActor( a1 );
+    instance.pushActor( a2 );
+    instance.pushActor( a3 );
+    instance.pushActor( a4 );
+    instance.pushActor( a5 );
+
+    a1->hateListAdd( a4, 10000 );
+    a1->hateListAdd( a5, 10000 );
+
+    a2->hateListAdd( a4, 10000 );
+    a2->hateListAdd( a5, 10000 );
+    a2->hateListAdd( player.getAsPlayer(), 1 );
+    player.hateListAdd( a2 );
+
+    a3->hateListAdd( a4, 10000 );
+    a3->hateListAdd( a5, 10000 );
+    a3->hateListAdd( player.getAsPlayer(), 1 );
+    player.hateListAdd( a3 );
+
+    a4->hateListAdd( a1, 10000 );
+    a4->hateListAdd( a2, 9999 );
+    a4->hateListAdd( a3, 9999 );
+
+    a5->hateListAdd( a1, 10000 );
+    a5->hateListAdd( a2, 9999 );
+    a5->hateListAdd( a3, 9999 );
   }
 
 };

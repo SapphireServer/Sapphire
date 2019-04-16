@@ -50,6 +50,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.pos.y = bnpc.getPos().y;
       m_data.pos.z = bnpc.getPos().z;
       m_data.rotation = Util::floatToUInt16Rot( bnpc.getRot() );
+      m_data.levelId = bnpc.getLevelId();
 
       m_data.enemyType = bnpc.getEnemyType();
       m_data.mainWeaponModel = bnpc.getWeaponMain();
