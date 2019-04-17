@@ -102,6 +102,8 @@ namespace Sapphire::Entity
 
     void onDeath() override;
 
+    void autoAttack( CharaPtr pTarget ) override;
+
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 

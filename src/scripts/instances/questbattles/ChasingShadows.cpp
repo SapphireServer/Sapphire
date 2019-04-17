@@ -30,7 +30,9 @@ private:
   enum vars
   {
     SET_1_SPAWNED,
-    SET_2_SPAWNED
+    SET_2_SPAWNED,
+    SET_3_SPAWNED,
+    SUCCESS_CALLED,
   };
 
 public:
@@ -45,18 +47,37 @@ public:
   void onInit( QuestBattle& instance ) override
   {
     instance.registerEObj( "unknown_0", 2005192, 5760474, 4, { -51.493111f, 0.309087f, 71.436897f }, 1.000000f, -0.000006f );
-
   }
 
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
     auto pair1Spawnd = instance.getCustomVar( SET_1_SPAWNED );
+    auto pair2Spawnd = instance.getCustomVar( SET_2_SPAWNED );
+    auto pair3Spawnd = instance.getCustomVar( SET_3_SPAWNED );
+    auto successCalled = instance.getCustomVar( SUCCESS_CALLED );
 
     auto boss = instance.getActiveBNpcByLevelId( INIT_POP_BOSS );
-    if( !boss )
+    auto ida = instance.getActiveBNpcByLevelId( INIT_P_POP_IDA );
+    auto papa = instance.getActiveBNpcByLevelId( INIT_P_POP_PAPARIMO );
+    auto pPlayer = instance.getPlayerPtr();
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
+    {
+      instance.setCustomVar( SUCCESS_CALLED, 1 );
+      instance.success();
+      return;
+    }
+
+    if( !boss || !ida || !papa )
       return;
 
-    if( pair1Spawnd == 0 && boss->getHpPercent() <= 90 )
+    if( pair1Spawnd == 0 && boss->getHpPercent() <= 75 )
     {
       instance.setCustomVar( SET_1_SPAWNED, 1 );
       auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_03, 10, 0, 1440, 938,
@@ -66,10 +87,66 @@ public:
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
 
-      auto pPlayer = instance.getPlayerPtr();
-      a2->hateListAdd( pPlayer, 1 );
+      a2->hateListAdd( ida, 10000 );
+      a3->hateListAdd( ida, 10000 );
+      a2->hateListAdd( papa, 10000 );
+      a3->hateListAdd( papa, 10000 );
 
-      a3->hateListAdd( pPlayer, 1 );
+
+      auto a4 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_01, 5, 0, 300, 937,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_02, 5, 0, 300, 937,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      a4->setFlag( Entity::NoDeaggro );
+      a5->setFlag( Entity::NoDeaggro );
+
+      auto pPlayer = instance.getPlayerPtr();
+      a4->hateListAdd( pPlayer, 1 );
+      a5->hateListAdd( pPlayer, 1 );
+    }
+
+    if( pair2Spawnd == 0 && boss->getHpPercent() <= 50 )
+    {
+      instance.setCustomVar( SET_2_SPAWNED, 1 );
+      auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_05, 10, 0, 1440, 938,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_06, 10, 0, 1440, 938,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      a2->setFlag( Entity::NoDeaggro );
+      a3->setFlag( Entity::NoDeaggro );
+
+      a2->hateListAdd( ida, 10000 );
+      a3->hateListAdd( ida, 10000 );
+      a2->hateListAdd( papa, 10000 );
+      a3->hateListAdd( papa, 10000 );
+
+      auto a4 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_03, 5, 0, 300, 937,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_04, 5, 0, 300, 937,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      a4->setFlag( Entity::NoDeaggro );
+      a5->setFlag( Entity::NoDeaggro );
+
+      auto pPlayer = instance.getPlayerPtr();
+      a4->hateListAdd( pPlayer, 1 );
+      a5->hateListAdd( pPlayer, 1 );
+
+    }
+
+    if( pair3Spawnd == 0 && boss->getHpPercent() <= 25 )
+    {
+      instance.setCustomVar( SET_3_SPAWNED, 1 );
+
+      auto a4 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_05, 5, 0, 300, 937,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_06, 5, 0, 300, 937,
+                                                   instance.getDirectorId(), Common::BNpcType::Enemy );
+      a4->setFlag( Entity::NoDeaggro );
+      a5->setFlag( Entity::NoDeaggro );
+
+      auto pPlayer = instance.getPlayerPtr();
+      a4->hateListAdd( pPlayer, 1 );
+      a5->hateListAdd( pPlayer, 1 );
     }
 
   }

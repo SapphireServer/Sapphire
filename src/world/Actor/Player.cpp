@@ -14,6 +14,7 @@
 
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/RNGMgr.h"
 
 #include "Territory/Zone.h"
 #include "Territory/ZonePosition.h"
@@ -1554,8 +1555,11 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   //uint64_t tick = Util::getTimeMs();
   //srand(static_cast< uint32_t >(tick));
 
-  uint32_t damage = static_cast< uint32_t >( mainWeap->getAutoAttackDmg() );
-  uint32_t variation = 0 + rand() % 3;
+  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
+
+  auto damage = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( static_cast< uint32_t > ( getLevel() * 1.5f ),
+                                         getLevel() + static_cast< uint32_t >( mainWeap->getAutoAttackDmg() * 2 ) ).next() );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1566,6 +1570,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.param = variation;
 
     effectPacket->addEffect( entry );
 
