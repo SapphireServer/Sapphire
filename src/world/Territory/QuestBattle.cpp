@@ -348,7 +348,7 @@ void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
 
 void Sapphire::QuestBattle::success()
 {
-
+  //m_state = DutyFinished;
   m_pPlayer->eventStart( m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
   m_pPlayer->playScene( getDirectorId(), 60001, 0x40000,
     [ & ]( Entity::Player& player, const Event::SceneResult& result )
@@ -382,7 +382,7 @@ uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()
   uint32_t count = 0;
   for( auto bnpcIt : m_bNpcMap )
   {
-    if( bnpcIt.second->getEnemyType() == 4 )
+    if( bnpcIt.second->getEnemyType() == 4 && bnpcIt.second->isAlive() )
       count++;
   }
   return count;

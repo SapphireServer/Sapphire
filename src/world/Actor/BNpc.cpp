@@ -36,6 +36,7 @@
 #include <Logging/Logger.h>
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
+#include <Manager/RNGMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -392,7 +393,10 @@ bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara
 
 void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 {
-  m_lastAttack = Util::getTimeMs();
+  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 50, 600 ).next() );
+
+  m_lastAttack = Util::getTimeMs() + variation;
   hateListUpdate( pChara, 1 );
 
   changeTarget( pChara->getId() );
@@ -720,4 +724,34 @@ bool Sapphire::Entity::BNpc::hasFlag( uint32_t flag ) const
 void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
 {
   m_flags |= flag;
+}
+
+void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
+{
+
+  uint64_t tick = Util::getTimeMs();
+
+  // todo: this needs to use the auto attack delay for the equipped weapon
+  if( ( tick - m_lastAttack ) > 2500 )
+  {
+    pTarget->onActionHostile( getAsChara() );
+    m_lastAttack = tick;
+    srand( static_cast< uint32_t >( tick ) );
+
+    auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+    auto damage = static_cast< uint16_t >( pRNGMgr->getRandGenerator< float >( m_level, m_level + m_level * 1.5f ).next() );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
+    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
+    Common::EffectEntry effectEntry{};
+    effectEntry.value = damage;
+    effectEntry.effectType = ActionEffectType::Damage;
+    effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
+    effectPacket->addEffect( effectEntry );
+
+    sendToInRangeSet( effectPacket );
+
+    pTarget->takeDamage( damage );
+
+  }
 }
