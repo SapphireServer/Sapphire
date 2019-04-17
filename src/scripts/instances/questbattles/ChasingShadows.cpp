@@ -2,7 +2,7 @@
 #include <Territory/QuestBattle.h>
 #include <Actor/Player.h>
 #include <Actor/Actor.h>
-#include <Actor/Bnpc.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -69,10 +69,8 @@ public:
 
       auto pPlayer = instance.getPlayerPtr();
       a2->hateListAdd( pPlayer, 1 );
-      pPlayer->hateListAdd( a2 );
 
       a3->hateListAdd( pPlayer, 1 );
-      pPlayer->hateListAdd( a3 );
     }
 
   }
@@ -116,15 +114,13 @@ public:
     a1->hateListAdd( a4, 10000 );
     a1->hateListAdd( a5, 10000 );
 
+    a2->hateListAdd( player.getAsPlayer(), 1 );
     a2->hateListAdd( a4, 10000 );
     a2->hateListAdd( a5, 10000 );
-    a2->hateListAdd( player.getAsPlayer(), 1 );
-    player.hateListAdd( a2 );
 
+    a3->hateListAdd( player.getAsPlayer(), 1 );
     a3->hateListAdd( a4, 10000 );
     a3->hateListAdd( a5, 10000 );
-    a3->hateListAdd( player.getAsPlayer(), 1 );
-    player.hateListAdd( a3 );
 
     a4->hateListAdd( a1, 10000 );
     a4->hateListAdd( a2, 9999 );

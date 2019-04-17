@@ -338,6 +338,11 @@ void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int
   hateEntry->m_pChara = pChara;
 
   m_hateList.insert( hateEntry );
+  if( pChara->isPlayer() )
+  {
+    auto pPlayer = pChara->getAsPlayer();
+    pPlayer->hateListAdd( getAsBNpc() );
+  }
 }
 
 void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
