@@ -64,9 +64,6 @@ public:
       auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_04, 10, 0, 1440, 938,
                                                    instance.getDirectorId(), Common::BNpcType::Enemy );
 
-      instance.pushActor( a2 );
-      instance.pushActor( a3 );
-
       auto pPlayer = instance.getPlayerPtr();
       a2->hateListAdd( pPlayer, 1 );
 
@@ -105,12 +102,6 @@ public:
                                                  instance.getDirectorId(), Common::BNpcType::Friendly );
     auto a5 = instance.createBNpcFromLevelEntry( INIT_P_POP_PAPARIMO, 50, 0, 27780, 1376,
                                                  instance.getDirectorId(), Common::BNpcType::Friendly );
-    instance.pushActor( a1 );
-    instance.pushActor( a2 );
-    instance.pushActor( a3 );
-    instance.pushActor( a4 );
-    instance.pushActor( a5 );
-
     a1->hateListAdd( a4, 10000 );
     a1->hateListAdd( a5, 10000 );
 
