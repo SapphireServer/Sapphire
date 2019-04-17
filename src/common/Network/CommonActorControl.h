@@ -77,7 +77,7 @@ enum ActorControlType : uint16_t
     TreasureScreenMsg = 0x57,
     SetOwnerId = 0x59,
     ItemRepairMsg = 0x5C,
-    BluActionLearn = 0x63, // Displays "Action Learned!" animation. Only used for visual, doesn't actually unlock it. param1: actionId. param2: 0 = text only, 1 = text+animation
+    BluActionLearn = 0x63, // Displays "Action Learned!" animation. Only used for visual, doesn't actually unlock it. param1: actionId. param2: 0 = text only, 1 = text+animation. Verification needed
 
     DirectorInit = 0x64,
     DirectorClear = 0x65,
