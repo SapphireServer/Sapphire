@@ -29,6 +29,17 @@ namespace Sapphire::Entity
     Dead,
   };
 
+  enum BNpcFlag
+  {
+    None = 0,
+    Immobile = 1,
+    TurningDisabled = 2,
+    Invincible = 4,
+    InvincibleRefill = 8,
+    NoDeaggro = 16,
+    Untargetable = 32,
+  };
+
   /*!
   \class BNpc
   \brief Base class for all BNpcs
@@ -105,6 +116,9 @@ namespace Sapphire::Entity
     void setLevelId( uint32_t levelId );
     uint32_t getLevelId() const;
 
+    bool hasFlag( uint32_t flag ) const;
+    void setFlag( uint32_t flags );
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -118,6 +132,8 @@ namespace Sapphire::Entity
     uint32_t m_displayFlags;
     uint8_t m_level;
     uint32_t m_levelId;
+
+    uint32_t m_flags;
 
     float m_scale;
     float m_naviTargetReachedDistance;
