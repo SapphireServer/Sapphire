@@ -483,7 +483,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       if( pHatedActor )
         aggro( pHatedActor );
 
-      if( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick )
+      if( !hasFlag( Immobile ) && ( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick ) )
       {
         auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
         auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
@@ -525,7 +525,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
                                         pHatedActor->getPos().y,
                                         pHatedActor->getPos().z );
 
-        if( distanceOrig > maxDistanceToOrigin )
+        if( !hasFlag( NoDeaggro ) && ( distanceOrig > maxDistanceToOrigin ) )
         {
           hateListClear();
           changeTarget( INVALID_GAME_OBJECT_ID64 );
@@ -535,7 +535,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           break;
         }
 
-        if( distance > minActorDistance )
+        if( !hasFlag( Immobile ) && ( distance > minActorDistance ) )
         {
           //auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
           //if ( ( currTime - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
@@ -543,7 +543,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
         }
         else
         {
-          if( face( pHatedActor->getPos() ) )
+          if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
             sendPositionUpdate();
           // in combat range. ATTACK!
           autoAttack( pHatedActor );
@@ -710,4 +710,14 @@ void Sapphire::Entity::BNpc::setLevelId( uint32_t levelId )
 uint32_t Sapphire::Entity::BNpc::getLevelId() const
 {
   return m_levelId;
+}
+
+bool Sapphire::Entity::BNpc::hasFlag( uint32_t flag ) const
+{
+  return m_flags & flag;
+}
+
+void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
+{
+  m_flags |= flag;
 }

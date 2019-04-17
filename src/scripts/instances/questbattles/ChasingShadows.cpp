@@ -63,6 +63,8 @@ public:
                                                    instance.getDirectorId(), Common::BNpcType::Enemy );
       auto a3 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_04, 10, 0, 1440, 938,
                                                    instance.getDirectorId(), Common::BNpcType::Enemy );
+      a2->setFlag( Entity::NoDeaggro );
+      a3->setFlag( Entity::NoDeaggro );
 
       auto pPlayer = instance.getPlayerPtr();
       a2->hateListAdd( pPlayer, 1 );
@@ -102,6 +104,11 @@ public:
                                                  instance.getDirectorId(), Common::BNpcType::Friendly );
     auto a5 = instance.createBNpcFromLevelEntry( INIT_P_POP_PAPARIMO, 50, 0, 27780, 1376,
                                                  instance.getDirectorId(), Common::BNpcType::Friendly );
+    a1->setFlag( Entity::NoDeaggro );
+    a2->setFlag( Entity::NoDeaggro );
+    a3->setFlag( Entity::NoDeaggro );
+    a4->setFlag( Entity::NoDeaggro );
+    a5->setFlag( Entity::NoDeaggro );
     a1->hateListAdd( a4, 10000 );
     a1->hateListAdd( a5, 10000 );
 
