@@ -158,6 +158,9 @@ namespace Sapphire
                                          uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );
 
     void registerEObj( Entity::EventObjectPtr object );
+    Entity::BNpcPtr createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
+                                              uint32_t hp, uint16_t nameId, uint32_t directorId, uint8_t bnpcType );
+    Entity::BNpcPtr getActiveBNpcByLevelId( uint32_t levelId );
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
