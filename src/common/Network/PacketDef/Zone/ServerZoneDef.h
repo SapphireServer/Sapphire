@@ -1550,6 +1550,22 @@ namespace Sapphire::Network::Packets::Server
     uint16_t u28;
   };
 
+  struct FFXIVIpcDirectorPopUp : FFXIVIpcBasePacket< DirectorPopUp >
+  {
+    uint32_t directorId;
+    uint16_t pad1[2];
+    uint64_t sourceActorId;
+    /*!
+     * 2 = green text in log
+     */
+    uint8_t flags;
+    uint8_t pad2[3];
+    uint32_t bNPCName;
+    uint32_t textId;
+    uint32_t popupTimeMs;
+    uint32_t pad3[4];
+  };
+
 
   struct FFXIVIpcActorGauge : FFXIVIpcBasePacket< ActorGauge >
   {
