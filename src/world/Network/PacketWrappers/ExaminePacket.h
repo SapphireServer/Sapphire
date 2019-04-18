@@ -49,6 +49,8 @@ namespace Sapphire::Network::Packets::Server
         m_data.mainWeaponModel = pTarget->getModelMainWeapon();
         m_data.secWeaponModel = pTarget->getModelSubWeapon();
 
+        m_data.worldId = 67; // TODO: world id from server
+
         memcpy( m_data.look, pTarget->getLookArray(), sizeof( m_data.look ) );
 
         m_data.models[ Common::GearModelSlot::ModelHead ] = pTarget->getModelForSlot( Common::GearModelSlot::ModelHead );

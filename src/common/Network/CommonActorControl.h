@@ -77,6 +77,7 @@ enum ActorControlType : uint16_t
     TreasureScreenMsg = 0x57,
     SetOwnerId = 0x59,
     ItemRepairMsg = 0x5C,
+    BluActionLearn = 0x63, // Displays "Action Learned!" animation. Only used for visual, doesn't actually unlock it. param1: actionId. param2: 0 = text only, 1 = text+animation. Verification needed
 
     DirectorInit = 0x64,
     DirectorClear = 0x65,
@@ -287,6 +288,8 @@ enum ActorControlType : uint16_t
     SetDutyActionHud = 0x5E9, // disable/enable
     SetDutyActionActive = 0x5EA,
     SetDutyActionRemaining = 0x5EB,
+
+    EurekaStep = 0x73A, // alters the progress of the player on Eureka (is used for all the eureka zones)
   };
 
   enum ClientTriggerType
