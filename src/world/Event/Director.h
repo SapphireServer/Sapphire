@@ -26,7 +26,9 @@ namespace Sapphire::Event
       PublicContent = 0x8004,
       QuestBattle = 0x8006,
       CompanyLeve = 0x8007,
+      TreasureHunt = 0x8009,
       GoldSaucer = 0x800A,
+      CompanyCraftDirector = 0x800B,
       DpsChallange = 0x800D,
       Fate = 0x801A
     };
