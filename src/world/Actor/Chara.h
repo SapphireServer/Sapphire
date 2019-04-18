@@ -128,6 +128,9 @@ namespace Sapphire::Entity
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
     FrameworkPtr m_pFw;
 
+    /*! Detour Crowd AgentId */
+    uint32_t m_agentId;
+
   public:
     Chara( Common::ObjKind type, FrameworkPtr pFw );
 
@@ -268,6 +271,9 @@ namespace Sapphire::Entity
 
     uint32_t getDirectorId() const;
     void setDirectorId( uint32_t directorId );
+
+    uint32_t getAgentId() const;
+    void setAgentId( uint32_t agentId );
 
   };
 

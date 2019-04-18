@@ -283,8 +283,11 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     }
   }
 
-
   step();
+  auto pos1 = pNaviProvider->getMovePos( *this );
+
+  Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
+  setPos( pos1 );
   m_pCurrentZone->updateActorPosition( *this );
   return false;
 }
@@ -471,6 +474,14 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
     case BNpcState::Roaming:
     {
+      auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+      auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+
+      if( !pNaviProvider )
+      {
+        pNaviProvider->setMoveTarget( *this, m_roamPos );
+      }
+
       if( moveTo( m_roamPos ) )
       {
         m_lastRoamTargetReached = Util::getTimeSeconds();
