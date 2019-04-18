@@ -5,6 +5,7 @@
 #include "ForwardsZone.h"
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
+#include <recastnavigation/DetourCrowd/Include/DetourCrowd.h>
 
 namespace Sapphire::World::Navi
 {
@@ -47,11 +48,24 @@ namespace Sapphire::World::Navi
 
     bool hasNaviMesh() const;
 
+    int32_t addAgent( Entity::Chara& chara );
+
+    void removeAgent( Entity::Chara& chara );
+
+    void updateCrowd( float timeInSeconds );
+
+    static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
+
+    void setMoveTarget( Entity::Chara& chara, const Common::FFXIVARR_POSITION3& endPos );
+
+    Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
+
   protected:
     std::string m_internalName;
 
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;
+    std::unique_ptr< dtCrowd > m_pCrowd;
 
     float m_polyFindRange[ 3 ];
 
@@ -62,6 +76,8 @@ namespace Sapphire::World::Navi
     bool getSteerTarget( dtNavMeshQuery* navQuery, const float* startPos, const float* endPos, const float minTargetDist,
 		                     const dtPolyRef* path, const int32_t pathSize, float* steerPos, uint8_t& steerPosFlag,
 			       	           dtPolyRef& steerPosRef, float* outPoints = 0, int32_t* outPointCount = 0 );
+
+
 
     FrameworkPtr m_pFw;
   };

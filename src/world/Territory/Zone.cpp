@@ -19,6 +19,7 @@
 #include "InstanceContent.h"
 #include "QuestBattle.h"
 #include "Manager/TerritoryMgr.h"
+#include "Navi/Naviprovider.h"
 
 #include "Session.h"
 #include "Actor/Chara.h"
@@ -41,7 +42,8 @@
 #include "Zone.h"
 #include "Framework.h"
 
-#include <Manager/RNGMgr.h>
+#include "Manager/RNGMgr.h"
+#include "Manager/NaviMgr.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -128,6 +130,11 @@ bool Sapphire::Zone::init()
   {
     // all good
   }
+
+  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+  pNaviMgr->setupTerritory( m_territoryTypeInfo->bg );
+
+  m_pNaviProvider = pNaviMgr->getNaviProvider( m_territoryTypeInfo->bg );
 
   return true;
 }
@@ -231,9 +238,15 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
     }
   }
 
+  int32_t agentId = -1;
+
   if( pActor->isPlayer() )
   {
     auto pPlayer = pActor->getAsPlayer();
+
+    if( m_pNaviProvider )
+      agentId = m_pNaviProvider->addAgent( *pPlayer );
+    pPlayer->setAgentId( agentId );
 
     auto pServerZone = m_pFw->get< World::ServerMgr >();
     m_playerMap[ pPlayer->getId() ] = pPlayer;
@@ -242,6 +255,10 @@ void Sapphire::Zone::pushActor( Entity::ActorPtr pActor )
   else if( pActor->isBattleNpc() )
   {
     auto pBNpc = pActor->getAsBNpc();
+
+    if( m_pNaviProvider )
+      agentId = m_pNaviProvider->addAgent( *pBNpc );
+    pBNpc->setAgentId( agentId );
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;
     updateCellActivity( cx, cy, 2 );
@@ -263,6 +280,9 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
   if( pActor->isPlayer() )
   {
 
+    if( m_pNaviProvider )
+      m_pNaviProvider->removeAgent( *pActor->getAsChara() );
+
     // If it's a player and he's inside boundaries - update his nearby cells
     if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
         pActor->getPos().z <= _maxY && pActor->getPos().z >= _minY )
@@ -278,6 +298,8 @@ void Sapphire::Zone::removeActor( Entity::ActorPtr pActor )
   }
   else if( pActor->isBattleNpc() )
   {
+    if( m_pNaviProvider )
+      m_pNaviProvider->removeAgent( *pActor->getAsChara() );
     m_bNpcMap.erase( pActor->getId() );
   }
 
@@ -450,6 +472,9 @@ bool Sapphire::Zone::update( uint64_t tickCount )
 {
   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
   bool changedWeather = checkWeather();
+
+  if( m_pNaviProvider )
+    m_pNaviProvider->updateCrowd( 0.001f * tickCount  );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
@@ -982,4 +1007,9 @@ Sapphire::Entity::BNpcPtr Sapphire::Zone::getActiveBNpcByLevelId( uint32_t level
       return bnpcIt.second;
   }
   return nullptr;
+}
+
+std::shared_ptr< Sapphire::World::Navi::NaviProvider > Sapphire::Zone::getNaviProvider()
+{
+  return m_pNaviProvider;
 }

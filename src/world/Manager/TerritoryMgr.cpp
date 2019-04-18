@@ -180,9 +180,12 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 
     uint32_t guid = getNextInstanceId();
 
-    auto pNaviMgr = framework()->get< Manager::NaviMgr >();
+    auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
+    pZone->init();
+
     std::string bgPath = territoryInfo->bg;
-    bool hasNaviMesh = pNaviMgr->setupTerritory( bgPath );
+
+    bool hasNaviMesh = pZone->getNaviProvider() != nullptr;
 
     Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
                   territoryTypeId,
@@ -192,9 +195,6 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
                   ( isPrivateTerritory( territoryTypeId ) ? "PRIVATE" : "PUBLIC" ),
                   hasNaviMesh ? "NAVI" : "",
                   pPlaceName->name );
-
-    auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
-    pZone->init();
 
     InstanceIdToZonePtrMap instanceMap;
     instanceMap[ guid ] = pZone;

@@ -702,3 +702,13 @@ void Sapphire::Entity::Chara::setDirectorId( uint32_t directorId )
 {
   m_directorId = directorId;
 }
+
+uint32_t Sapphire::Entity::Chara::getAgentId() const
+{
+  return m_agentId;
+}
+
+void Sapphire::Entity::Chara::setAgentId( uint32_t agentId )
+{
+  m_agentId = agentId;
+}
