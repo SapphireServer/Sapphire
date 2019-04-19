@@ -61,6 +61,9 @@ namespace Sapphire::World::Navi
     Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
 
     bool isAgentActive( Entity::Chara& chara ) const;
+    bool hasTargetState( Entity::Chara& chara ) const;
+
+    void resetMoveTarget( Entity::Chara& chara );
 
   protected:
     std::string m_internalName;

@@ -638,3 +638,14 @@ bool Sapphire::World::Navi::NaviProvider::isAgentActive( Entity::Chara& chara ) 
   return ag && ag->active;
 
 }
+
+bool Sapphire::World::Navi::NaviProvider::hasTargetState( Entity::Chara& chara ) const
+{
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
+  return ag->targetState != DT_CROWDAGENT_TARGET_NONE;
+}
+
+void Sapphire::World::Navi::NaviProvider::resetMoveTarget( Entity::Chara& chara )
+{
+  m_pCrowd->resetMoveTarget( chara.getAgentId() );
+}

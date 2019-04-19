@@ -224,12 +224,6 @@ void Sapphire::Entity::BNpc::step()
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  if( Util::distance( getPos(), pos ) <= m_naviTargetReachedDistance )
-  {
-    // Reached destination
-    m_naviLastPath.clear();
-    return true;
-  }
 
   auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
   auto pNaviProvider = m_pCurrentZone->getNaviProvider();
@@ -281,9 +275,15 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   step();*/
 
-  pNaviProvider->setMoveTarget( *this, pos );
+  //pNaviProvider->setMoveTarget( *this, pos );
   auto pos1 = pNaviProvider->getMovePos( *this );
 
+  if( Util::distance( pos1, pos ) < 0.1f )
+  {
+    // Reached destination
+    pNaviProvider->resetMoveTarget( *this );
+    return true;
+  }
   //Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
 
   m_pCurrentZone->updateActorPosition( *this );
@@ -480,7 +480,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
       if( pNaviProvider )
       {
-        //if( !pNaviProvider->isAgentActive( *this ) )
+        //if( !pNaviProvider->hasTargetState( *this ) )
           pNaviProvider->setMoveTarget( *this, m_roamPos );
       }
 
