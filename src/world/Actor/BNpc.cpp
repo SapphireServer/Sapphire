@@ -236,46 +236,6 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  /*auto path = pNaviProvider->findFollowPath( m_pos, pos );
-
-  if( !path.empty() )
-  {
-    m_naviLastPath = path;
-    m_naviTarget = pos;
-    m_naviPathStep = 0;
-    m_naviLastUpdate = Util::getTimeMs();
-  }
-  else
-  {
-    Logger::debug( "No path found from x{0} y{1} z{2} to x{3} y{4} z{5} in {6}",
-                   getPos().x, getPos().y, getPos().z, pos.x, pos.y, pos.z, m_pCurrentZone->getInternalName() );
-
-
-    hateListClear();
-
-    if( m_state == BNpcState::Roaming )
-    {
-      Logger::warn( "BNpc Base#{0} Name#{1} unable to path from x{2} y{3} z{4} while roaming. "
-                    "Possible pathing error in area. Returning BNpc to spawn position x{5} y{6} z{7}.",
-                    m_bNpcBaseId, m_bNpcNameId,
-                    getPos().x, getPos().y, getPos().z,
-                    m_spawnPos.x, m_spawnPos.y, m_spawnPos.z );
-
-      m_lastRoamTargetReached = Util::getTimeSeconds();
-      m_state = BNpcState::Idle;
-
-      m_naviLastPath.clear();
-
-      setPos( m_spawnPos );
-      sendPositionUpdate();
-
-      return true;
-    }
-  }
-
-  step();*/
-
-  //pNaviProvider->setMoveTarget( *this, pos );
   auto pos1 = pNaviProvider->getMovePos( *this );
 
   if( Util::distance( pos1, pos ) < 1.1f )
@@ -284,11 +244,10 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     face( pos1 );
     setPos( pos1 );
     sendPositionUpdate();
-    pNaviProvider->resetMoveTarget( *this );
+    //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
     return true;
   }
-  //Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
 
   m_pCurrentZone->updateActorPosition( *this );
   face( pos1 );
@@ -504,10 +463,14 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       if( pHatedActor )
         aggro( pHatedActor );
 
+      auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+      auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+
+      if( pNaviProvider->syncPosToChara( *this ) )
+        sendPositionUpdate();
+
       if( !hasFlag( Immobile ) && ( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick ) )
       {
-        auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-        auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
         if( !pNaviProvider )
         {

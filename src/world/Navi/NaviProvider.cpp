@@ -656,3 +656,13 @@ void Sapphire::World::Navi::NaviProvider::updateAgentPosition( Entity::Chara& ch
   auto newIndex = addAgent( chara );
   chara.setAgentId( newIndex );
 }
+
+bool Sapphire::World::Navi::NaviProvider::syncPosToChara( Entity::Chara& chara )
+{
+  auto pos = getMovePos( chara );
+  if( pos.x == chara.getPos().x && pos.y == chara.getPos().y && pos.z == chara.getPos().z )
+    return false;
+
+  chara.setPos( pos );
+  return true;
+}

@@ -67,6 +67,8 @@ namespace Sapphire::World::Navi
 
     void updateAgentPosition( Entity::Chara& chara );
 
+    bool syncPosToChara( Entity::Chara& chara );
+
   protected:
     std::string m_internalName;
 
