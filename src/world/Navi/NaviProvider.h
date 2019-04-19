@@ -60,11 +60,14 @@ namespace Sapphire::World::Navi
 
     Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
 
+    bool isAgentActive( Entity::Chara& chara ) const;
+
   protected:
     std::string m_internalName;
 
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;
+    dtObstacleAvoidanceDebugData* m_vod;
     std::unique_ptr< dtCrowd > m_pCrowd;
 
     float m_polyFindRange[ 3 ];

@@ -48,6 +48,42 @@ bool Sapphire::World::Navi::NaviProvider::init()
     if( !m_pCrowd->init( 1000, 10.f, m_naviMesh ) )
       return false;
 
+    dtObstacleAvoidanceParams params;
+    // Use mostly default settings, copy from dtCrowd.
+    memcpy(&params, m_pCrowd->getObstacleAvoidanceParams(0), sizeof(dtObstacleAvoidanceParams));
+
+    // Low (11)
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 5;
+    params.adaptiveRings = 2;
+    params.adaptiveDepth = 1;
+    m_pCrowd->setObstacleAvoidanceParams(0, &params);
+
+    // Medium (22)
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 5;
+    params.adaptiveRings = 2;
+    params.adaptiveDepth = 2;
+    m_pCrowd->setObstacleAvoidanceParams(1, &params);
+
+    // Good (45)
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 7;
+    params.adaptiveRings = 2;
+    params.adaptiveDepth = 3;
+    m_pCrowd->setObstacleAvoidanceParams(2, &params);
+
+    // High (66)
+    params.velBias = 0.5f;
+    params.adaptiveDivs = 7;
+    params.adaptiveRings = 3;
+    params.adaptiveDepth = 3;
+
+    m_pCrowd->setObstacleAvoidanceParams(3, &params);
+
+    m_vod = dtAllocObstacleAvoidanceDebugData();
+    m_vod->init( 2048 );
+
     initQuery();
 
     return true;
@@ -535,19 +571,23 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   dtCrowdAgentParams params;
   std::memset( &params, 0, sizeof( params ) );
   params.height = 7.f;
-  params.maxAcceleration = 8.f;
-  params.maxSpeed = 3.5f;
-  params.radius = 5.f;
+  params.maxAcceleration = 16.f;
+  params.maxSpeed = 13.5f;
+  params.radius = 2.f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 30.0f;
-
+  params.updateFlags = 0;
+  //params.updateFlags |= DT_CROWD_OBSTACLE_AVOIDANCE;
   float position[] = { chara.getPos().x, chara.getPos().y, chara.getPos().z };
   return m_pCrowd->addAgent( position, &params );
 }
 
 void Sapphire::World::Navi::NaviProvider::updateCrowd( float timeInSeconds )
 {
+
   dtCrowdAgentDebugInfo info;
+  info.idx = -1;
+  info.vod = m_vod;
   m_pCrowd->update( timeInSeconds, &info );
 }
 
@@ -574,7 +614,7 @@ void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
   const float* halfExtents = m_pCrowd->getQueryExtents();
 
   float vel[ 3 ];
-  float p[ 3 ] = { chara.getPos().x, chara.getPos().y, chara.getPos().z };
+  float p[ 3 ] = { endPos.x, endPos.y, endPos.z };
 
   const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
   if( ag && ag->active )
@@ -590,4 +630,11 @@ Sapphire::Common::FFXIVARR_POSITION3 Sapphire::World::Navi::NaviProvider::getMov
   if( !ag )
     return { 0.f, 0.f, 0.f };
   return { ag->npos[ 0 ], ag->npos[ 1 ], ag->npos[ 2 ] };
+}
+
+bool Sapphire::World::Navi::NaviProvider::isAgentActive( Entity::Chara& chara ) const
+{
+  const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
+  return ag && ag->active;
+
 }
