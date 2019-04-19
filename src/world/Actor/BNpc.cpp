@@ -232,7 +232,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   {
     // Reached destination
     m_naviLastPath.clear();
-    return true;
+  //  return true;
   }
 
   auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
@@ -246,7 +246,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  auto path = pNaviProvider->findFollowPath( m_pos, pos );
+  /*auto path = pNaviProvider->findFollowPath( m_pos, pos );
 
   if( !path.empty() )
   {
@@ -283,12 +283,17 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     }
   }
 
-  step();
+  step();*/
+
+  //pNaviProvider->setMoveTarget( *this, pos );
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
-  setPos( pos1 );
+  //Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
+
   m_pCurrentZone->updateActorPosition( *this );
+  face( pos1 );
+  setPos( pos1 );
+  sendPositionUpdate();
   return false;
 }
 
@@ -477,9 +482,10 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
       auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
 
-      if( !pNaviProvider )
+      if( pNaviProvider )
       {
-        pNaviProvider->setMoveTarget( *this, m_roamPos );
+        //if( !pNaviProvider->isAgentActive( *this ) )
+          pNaviProvider->setMoveTarget( *this, m_roamPos );
       }
 
       if( moveTo( m_roamPos ) )

@@ -474,7 +474,7 @@ bool Sapphire::Zone::update( uint64_t tickCount )
   bool changedWeather = checkWeather();
 
   if( m_pNaviProvider )
-    m_pNaviProvider->updateCrowd( 0.001f * tickCount  );
+    m_pNaviProvider->updateCrowd( 0.02f );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
