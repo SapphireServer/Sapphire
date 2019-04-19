@@ -3906,6 +3906,12 @@ Sapphire::Data::ModelChara::ModelChara( uint32_t row_id, Sapphire::Data::ExdData
    variant = exdData->getField< uint8_t >( row, 3 );
 }
 
+Sapphire::Data::ModelSkeleton::ModelSkeleton( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
+{
+   auto row = exdData->m_ModelSkeletonDat.get_row( row_id );
+   scaleFactor = exdData->getField< float >( row, 0 );
+}
+
 Sapphire::Data::ModelState::ModelState( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
    auto row = exdData->m_ModelStateDat.get_row( row_id );
@@ -6935,6 +6941,7 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
       m_MobHuntOrderTypeDat = setupDatAccess( "MobHuntOrderType", xiv::exd::Language::none );
       m_MobHuntTargetDat = setupDatAccess( "MobHuntTarget", xiv::exd::Language::none );
       m_ModelCharaDat = setupDatAccess( "ModelChara", xiv::exd::Language::none );
+      m_ModelSkeletonDat = setupDatAccess( "ModelSkeleton", xiv::exd::Language::none );
       m_ModelStateDat = setupDatAccess( "ModelState", xiv::exd::Language::none );
       m_MonsterNoteDat = setupDatAccess( "MonsterNote", xiv::exd::Language::en );
       m_MonsterNoteTargetDat = setupDatAccess( "MonsterNoteTarget", xiv::exd::Language::none );

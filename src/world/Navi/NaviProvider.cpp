@@ -573,7 +573,7 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   params.height = 7.f;
   params.maxAcceleration = 26.f;
   params.maxSpeed = 13.5f;
-  params.radius = 2.f;
+  params.radius = chara.getScale() / 2;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 30.0f;
   params.updateFlags = 0;
@@ -584,7 +584,6 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
 
 void Sapphire::World::Navi::NaviProvider::updateCrowd( float timeInSeconds )
 {
-
   dtCrowdAgentDebugInfo info;
   info.idx = -1;
   info.vod = m_vod;

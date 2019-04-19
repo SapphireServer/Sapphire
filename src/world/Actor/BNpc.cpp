@@ -100,6 +100,14 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
 
   m_scale = bNpcBaseData->scale;
 
+  auto modelChara = exdData->get< Data::ModelChara >( bNpcBaseData->modelChara );
+  if( modelChara )
+  {
+    auto modelSkeleton = exdData->get< Data::ModelSkeleton >( modelChara->model );
+    if( modelSkeleton )
+      m_scale *= modelSkeleton->scaleFactor;
+  }
+
   // todo: is this actually good?
   //m_naviTargetReachedDistance = m_scale * 2.f;
   m_naviTargetReachedDistance = 4.f;
@@ -115,11 +123,6 @@ uint8_t Sapphire::Entity::BNpc::getAggressionMode() const
 float Sapphire::Entity::BNpc::getNaviTargetReachedDistance() const
 {
   return m_naviTargetReachedDistance;
-}
-
-float Sapphire::Entity::BNpc::getScale() const
-{
-  return m_scale;
 }
 
 uint8_t Sapphire::Entity::BNpc::getEnemyType() const

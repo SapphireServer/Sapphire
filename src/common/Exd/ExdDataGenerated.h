@@ -342,6 +342,7 @@ struct MinionSkillType;
 struct MobHuntOrderType;
 struct MobHuntTarget;
 struct ModelChara;
+struct ModelSkeleton;
 struct ModelState;
 struct MonsterNote;
 struct MonsterNoteTarget;
@@ -3934,6 +3935,13 @@ struct ModelChara
    ModelChara( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct ModelSkeleton
+{
+   float scaleFactor;
+
+   ModelSkeleton( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct ModelState
 {
    uint16_t start;
@@ -5802,6 +5810,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MobHuntOrderTypeDat;
      xiv::exd::Exd m_MobHuntTargetDat;
      xiv::exd::Exd m_ModelCharaDat;
+     xiv::exd::Exd m_ModelSkeletonDat;
      xiv::exd::Exd m_ModelStateDat;
      xiv::exd::Exd m_MonsterNoteDat;
      xiv::exd::Exd m_MonsterNoteTargetDat;
@@ -6274,6 +6283,7 @@ struct ZoneSharedGroup
      using MobHuntOrderTypePtr = std::shared_ptr< MobHuntOrderType >;
      using MobHuntTargetPtr = std::shared_ptr< MobHuntTarget >;
      using ModelCharaPtr = std::shared_ptr< ModelChara >;
+     using ModelSkeletonPtr = std::shared_ptr< ModelSkeleton >;
      using ModelStatePtr = std::shared_ptr< ModelState >;
      using MonsterNotePtr = std::shared_ptr< MonsterNote >;
      using MonsterNoteTargetPtr = std::shared_ptr< MonsterNoteTarget >;
@@ -6777,6 +6787,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MobHuntOrderTypeIdList;
      std::set< uint32_t > m_MobHuntTargetIdList;
      std::set< uint32_t > m_ModelCharaIdList;
+     std::set< uint32_t > m_ModelSkeletonIdList;
      std::set< uint32_t > m_ModelStateIdList;
      std::set< uint32_t > m_MonsterNoteIdList;
      std::set< uint32_t > m_MonsterNoteTargetIdList;
@@ -8868,6 +8879,12 @@ const std::set< uint32_t >& getModelCharaIdList()
    if( m_ModelCharaIdList.size() == 0 )
       loadIdList( m_ModelCharaDat, m_ModelCharaIdList );
    return m_ModelCharaIdList;
+}
+const std::set< uint32_t >& getModelSkeletonIdList()
+{
+   if( m_ModelSkeletonIdList.size() == 0 )
+      loadIdList( m_ModelSkeletonDat, m_ModelSkeletonIdList );
+   return m_ModelSkeletonIdList;
 }
 const std::set< uint32_t >& getModelStateIdList()
 {
