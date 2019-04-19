@@ -571,7 +571,7 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   dtCrowdAgentParams params;
   std::memset( &params, 0, sizeof( params ) );
   params.height = 7.f;
-  params.maxAcceleration = 16.f;
+  params.maxAcceleration = 26.f;
   params.maxSpeed = 13.5f;
   params.radius = 2.f;
   params.collisionQueryRange = params.radius * 12.0f;
