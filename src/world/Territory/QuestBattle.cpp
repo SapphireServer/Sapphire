@@ -48,6 +48,9 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
 
 bool Sapphire::QuestBattle::init()
 {
+  if( !Zone::init() )
+    return false;
+
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceInit( getAsQuestBattle() );
 

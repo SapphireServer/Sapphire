@@ -39,7 +39,7 @@ Sapphire::World::Navi::NaviProviderPtr Sapphire::World::Manager::NaviMgr::getNav
 
 std::string Sapphire::World::Manager::NaviMgr::getBgName( const std::string& bgPath )
 {
-  auto findPos = bgPath.find_last_of( "/" );
+  auto findPos = bgPath.find_last_of( '/' );
   if( findPos != std::string::npos )
     return bgPath.substr( findPos + 1 );
 
