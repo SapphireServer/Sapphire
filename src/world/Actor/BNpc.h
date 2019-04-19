@@ -111,8 +111,6 @@ namespace Sapphire::Entity
 
     void checkAggro();
 
-    void pushNearbyBNpcs();
-
     void setOwner( CharaPtr m_pChara );
 
     void setLevelId( uint32_t levelId );
