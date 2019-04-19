@@ -71,7 +71,7 @@ namespace Sapphire::Entity
 
     uint8_t getAggressionMode() const;
 
-    float getScale() const;
+
     float getNaviTargetReachedDistance() const;
 
     // return true if it reached the position

@@ -38,7 +38,8 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_pFw( std::move( std::move( pFw ) ) ),
-  m_directorId( 0 )
+  m_directorId( 0 ),
+  m_scale( 2.f )
 {
 
   m_lastTickTime = 0;
@@ -711,4 +712,10 @@ uint32_t Sapphire::Entity::Chara::getAgentId() const
 void Sapphire::Entity::Chara::setAgentId( uint32_t agentId )
 {
   m_agentId = agentId;
+}
+
+
+float Sapphire::Entity::Chara::getScale() const
+{
+  return m_scale;
 }
