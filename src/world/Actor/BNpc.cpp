@@ -224,19 +224,15 @@ void Sapphire::Entity::BNpc::step()
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  // do this first, this will update local actor position and the position of other actors
-  // and then this npc will then path from the position after pushing/being pushed
-  //pushNearbyBNpcs();
-
   if( Util::distance( getPos(), pos ) <= m_naviTargetReachedDistance )
   {
     // Reached destination
     m_naviLastPath.clear();
-  //  return true;
+    return true;
   }
 
   auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-  auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
   if( !pNaviProvider )
   {
@@ -285,7 +281,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   step();*/
 
-  //pNaviProvider->setMoveTarget( *this, pos );
+  pNaviProvider->setMoveTarget( *this, pos );
   auto pos1 = pNaviProvider->getMovePos( *this );
 
   //Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
@@ -480,7 +476,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
     case BNpcState::Roaming:
     {
       auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-      auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+      auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
       if( pNaviProvider )
       {
@@ -507,7 +503,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       if( !hasFlag( Immobile ) && ( Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick ) )
       {
         auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-        auto pNaviProvider = pNaviMgr->getNaviProvider( m_pCurrentZone->getBgPath() );
+        auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
         if( !pNaviProvider )
         {
@@ -668,39 +664,6 @@ void Sapphire::Entity::BNpc::checkAggro()
     {
       aggro( pClosestChara );
     }
-  }
-}
-
-void Sapphire::Entity::BNpc::pushNearbyBNpcs()
-{
-  for( auto& bNpc : m_inRangeBNpc )
-  {
-    auto pos = bNpc->getPos();
-    auto distance = Util::distance( m_pos, bNpc->getPos() );
-
-
-    // todo: not sure what's good here
-    auto factor = bNpc->getNaviTargetReachedDistance();
-
-    auto delta = static_cast< float >( Util::getTimeMs() - bNpc->getLastUpdateTime() ) / 1000.f;
-    delta = std::min< float >( factor, delta );
-
-    // too far away, ignore it
-    if( distance > factor )
-      continue;
-
-    auto angle = Util::calcAngFrom( m_pos.x, m_pos.y, pos.x, pos.y ) + PI;
-
-    auto x = ( cosf( angle ) );
-    auto z = ( sinf( angle ) );
-
-    bNpc->setPos( pos.x + ( x * factor * delta ),
-                  pos.y,
-                  pos.z + ( z * factor * delta ), true );
-
-//    setPos( m_pos.x + ( xBase * -pushDistance ),
-//            m_pos.y,
-//            m_pos.z + ( zBase * -pushDistance ) );
   }
 }
 

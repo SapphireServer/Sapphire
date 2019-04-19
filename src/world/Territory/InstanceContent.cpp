@@ -48,6 +48,9 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
 
 bool Sapphire::InstanceContent::init()
 {
+  if( !Zone::init() )
+    return false;
+
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceInit( getAsInstanceContent() );
 
@@ -99,7 +102,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
   {
     case Created:
     {
-      if( m_boundPlayerIds.size() == 0 )
+      if( m_boundPlayerIds.empty() )
         return;
 
       for( auto playerId : m_boundPlayerIds )
