@@ -278,10 +278,14 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   //pNaviProvider->setMoveTarget( *this, pos );
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, pos ) < 0.1f )
+  if( Util::distance( pos1, pos ) < 1.1f )
   {
     // Reached destination
+    face( pos1 );
+    setPos( pos1 );
+    sendPositionUpdate();
     pNaviProvider->resetMoveTarget( *this );
+    pNaviProvider->updateAgentPosition( *this );
     return true;
   }
   //Logger::debug( "{} {} {}", pos1.x, pos1.y, pos1.z );
