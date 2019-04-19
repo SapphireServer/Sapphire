@@ -419,6 +419,14 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
     {
       setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
 
+      auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+      auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+      if( pNaviProvider )
+      {
+        //if( !pNaviProvider->hasTargetState( *this ) )
+        pNaviProvider->setMoveTarget( *this, m_spawnPos );
+      }
+
       if( moveTo( m_spawnPos ) )
       {
         setInvincibilityType( InvincibilityType::InvincibilityNone );
@@ -521,9 +529,16 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
         if( !hasFlag( Immobile ) && ( distance > minActorDistance ) )
         {
+          auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+          auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+          if( pNaviProvider )
+          {
+            //if( !pNaviProvider->hasTargetState( *this ) )
+            pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
+          }
           //auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
           //if ( ( currTime - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
-            moveTo( pHatedActor->getPos() );
+          moveTo( pHatedActor->getPos() );
         }
         else
         {
