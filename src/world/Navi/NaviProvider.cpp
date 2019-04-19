@@ -649,3 +649,10 @@ void Sapphire::World::Navi::NaviProvider::resetMoveTarget( Entity::Chara& chara 
 {
   m_pCrowd->resetMoveTarget( chara.getAgentId() );
 }
+
+void Sapphire::World::Navi::NaviProvider::updateAgentPosition( Entity::Chara& chara )
+{
+  removeAgent( chara );
+  auto newIndex = addAgent( chara );
+  chara.setAgentId( newIndex );
+}

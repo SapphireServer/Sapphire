@@ -65,6 +65,8 @@ namespace Sapphire::World::Navi
 
     void resetMoveTarget( Entity::Chara& chara );
 
+    void updateAgentPosition( Entity::Chara& chara );
+
   protected:
     std::string m_internalName;
 
