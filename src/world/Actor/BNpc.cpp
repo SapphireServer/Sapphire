@@ -241,7 +241,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, pos ) < 1.1f )
+  if( Util::distance( pos1, pos ) < ( getScale() / 2 ) )
   {
     // Reached destination
     face( pos1 );
@@ -258,6 +258,41 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   sendPositionUpdate();
   return false;
 }
+
+bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
+{
+
+  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+
+  if( !pNaviProvider )
+  {
+    Logger::error( "No NaviProvider for zone#{0} - {1}",
+                   m_pCurrentZone->getGuId(),
+                   m_pCurrentZone->getInternalName() );
+    return false;
+  }
+
+  auto pos1 = pNaviProvider->getMovePos( *this );
+
+  if( Util::distance( pos1, targetChara.getPos() ) <= ( ( getScale() / 2 + targetChara.getScale() / 2 ) ) )
+  {
+    // Reached destination
+    face( pos1 );
+    setPos( pos1 );
+    sendPositionUpdate();
+    //pNaviProvider->resetMoveTarget( *this );
+    pNaviProvider->updateAgentPosition( *this );
+    return true;
+  }
+
+  m_pCurrentZone->updateActorPosition( *this );
+  face( pos1 );
+  setPos( pos1 );
+  sendPositionUpdate();
+  return false;
+}
+
 
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
@@ -411,6 +446,8 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
+  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
+  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
   switch( m_state )
   {
@@ -422,11 +459,8 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
     {
       setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
 
-      auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-      auto pNaviProvider = m_pCurrentZone->getNaviProvider();
       if( pNaviProvider )
       {
-        //if( !pNaviProvider->hasTargetState( *this ) )
         pNaviProvider->setMoveTarget( *this, m_spawnPos );
       }
 
@@ -449,13 +483,10 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
     case BNpcState::Roaming:
     {
-      auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-      auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
       if( pNaviProvider )
       {
-        //if( !pNaviProvider->hasTargetState( *this ) )
-          pNaviProvider->setMoveTarget( *this, m_roamPos );
+        pNaviProvider->setMoveTarget( *this, m_roamPos );
       }
 
       if( moveTo( m_roamPos ) )
@@ -473,9 +504,6 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       auto pHatedActor = hateListGetHighest();
       if( pHatedActor )
         aggro( pHatedActor );
-
-      auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-      auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
       if( pNaviProvider->syncPosToChara( *this ) )
         sendPositionUpdate();
@@ -513,6 +541,9 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
         pHatedActor = hateListGetHighest();
       }
 
+      if( pNaviProvider->syncPosToChara( *this ) )
+        sendPositionUpdate();
+
       if( pHatedActor )
       {
         auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
@@ -530,18 +561,16 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           break;
         }
 
-        if( !hasFlag( Immobile ) && ( distance > minActorDistance ) )
+        if( distance > ( getScale() / 2 + pHatedActor->getScale() / 2 ) )
         {
-          auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-          auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+          if( hasFlag( Immobile ) )
+            break;
+
           if( pNaviProvider )
           {
-            //if( !pNaviProvider->hasTargetState( *this ) )
             pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
           }
-          //auto pTeriMgr = m_pFw->get< World::Manager::TerritoryMgr >();
-          //if ( ( currTime - m_lastAttack ) > 600 && pTeriMgr->isDefaultTerritory( getCurrentZone()->getTerritoryTypeId() ) )
-          moveTo( pHatedActor->getPos() );
+          moveTo( *pHatedActor );
         }
         else
         {
@@ -666,7 +695,7 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   {
     auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
     setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId = 0;
+    setOwnerPacket->data().actorId = INVALID_GAME_OBJECT_ID;
     sendToInRangeSet( setOwnerPacket );
   }
 }

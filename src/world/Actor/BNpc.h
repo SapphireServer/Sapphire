@@ -77,6 +77,8 @@ namespace Sapphire::Entity
     // return true if it reached the position
     bool moveTo( const Common::FFXIVARR_POSITION3& pos );
 
+    bool moveTo( const Entity::Chara& targetChara );
+
     // processes movement
     void step();
 
