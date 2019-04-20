@@ -159,6 +159,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceUpdate( getAsInstanceContent(), tickCount );
+
+  m_lastUpdate = tickCount;
 }
 
 void Sapphire::InstanceContent::onFinishLoading( Entity::Player& player )

@@ -159,6 +159,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onInstanceUpdate( getAsQuestBattle(), tickCount );
+
+  m_lastUpdate = tickCount;
 }
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )

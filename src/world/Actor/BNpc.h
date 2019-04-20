@@ -137,7 +137,6 @@ namespace Sapphire::Entity
 
     uint32_t m_flags;
 
-    float m_scale;
     float m_naviTargetReachedDistance;
 
     uint32_t m_timeOfDeath;

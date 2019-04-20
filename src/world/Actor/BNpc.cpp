@@ -228,7 +228,6 @@ void Sapphire::Entity::BNpc::step()
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
 
-  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
   auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
   if( !pNaviProvider )
@@ -239,21 +238,24 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
+  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
+
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, pos ) < ( getScale() / 2 ) )
+  if( Util::distance( pos1, pos ) < getScale() )
   {
     // Reached destination
-    face( pos1 );
+    face( pos );
     setPos( pos1 );
     sendPositionUpdate();
     //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
+    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
     return true;
   }
 
   m_pCurrentZone->updateActorPosition( *this );
-  face( pos1 );
+  face( pos );
   setPos( pos1 );
   sendPositionUpdate();
   return false;
@@ -262,7 +264,6 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 {
 
-  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
   auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
   if( !pNaviProvider )
@@ -273,21 +274,24 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     return false;
   }
 
+  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
+
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, targetChara.getPos() ) <= ( ( getScale() / 2 + targetChara.getScale() / 2 ) ) )
+  if( Util::distance( pos1, targetChara.getPos() ) <= ( getScale() + targetChara.getScale() ) )
   {
     // Reached destination
-    face( pos1 );
+    face( targetChara.getPos() );
     setPos( pos1 );
     sendPositionUpdate();
     //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
+    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
     return true;
   }
 
   m_pCurrentZone->updateActorPosition( *this );
-  face( pos1 );
+  face( targetChara.getPos() );
   setPos( pos1 );
   sendPositionUpdate();
   return false;
@@ -446,7 +450,6 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
-  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
   auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
   switch( m_state )
