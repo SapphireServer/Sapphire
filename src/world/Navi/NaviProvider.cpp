@@ -570,12 +570,12 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
 {
   dtCrowdAgentParams params;
   std::memset( &params, 0, sizeof( params ) );
-  params.height = 7.f;
-  params.maxAcceleration = 126.f;
-  params.maxSpeed = 13.5f;
+  params.height = 3.f;
+  params.maxAcceleration = 25.f;
+  params.maxSpeed = std::pow( 2, chara.getScale() * 0.35f ) + 1.f;
   params.radius = chara.getScale() / 2;
-  params.collisionQueryRange = params.radius * 20.0f;
-  params.pathOptimizationRange = params.radius * 10.0f;
+  params.collisionQueryRange = params.radius * 12.0f;
+  params.pathOptimizationRange = params.radius * 20.0f;
   params.updateFlags = 0;
   //params.updateFlags |= DT_CROWD_OBSTACLE_AVOIDANCE;
   float position[] = { chara.getPos().x, chara.getPos().y, chara.getPos().z };
@@ -664,4 +664,24 @@ bool Sapphire::World::Navi::NaviProvider::syncPosToChara( Entity::Chara& chara )
 
   chara.setPos( pos );
   return true;
+}
+
+void Sapphire::World::Navi::NaviProvider::addAgentUpdateFlag( Sapphire::Entity::Chara& chara, uint8_t flags )
+{
+  auto ag = m_pCrowd->getEditableAgent( chara.getAgentId() );
+
+  if( !ag )
+    return;
+
+  ag->params.updateFlags |= flags;
+}
+
+void Sapphire::World::Navi::NaviProvider::removeAgentUpdateFlag( Sapphire::Entity::Chara& chara, uint8_t flags )
+{
+  auto ag = m_pCrowd->getEditableAgent( chara.getAgentId() );
+
+  if( !ag )
+    return;
+
+  ag->params.updateFlags &= ~flags;
 }
