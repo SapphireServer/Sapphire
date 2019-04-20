@@ -278,7 +278,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, targetChara.getPos() ) <= ( getScale() + targetChara.getScale() ) )
+  if( Util::distance( pos1, targetChara.getPos() ) <= ( getScale() + targetChara.getScale() ) + 0.25f )
   {
     // Reached destination
     face( targetChara.getPos() );
@@ -534,9 +534,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
         return;
 
       auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
-                                          m_spawnPos.x,
-                                          m_spawnPos.y,
-                                          m_spawnPos.z );
+                                          m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
 
       if( pHatedActor && !pHatedActor->isAlive() )
       {
@@ -550,9 +548,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       if( pHatedActor )
       {
         auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pHatedActor->getPos().x,
-                                        pHatedActor->getPos().y,
-                                        pHatedActor->getPos().z );
+                                        pHatedActor->getPos().x, pHatedActor->getPos().y, pHatedActor->getPos().z );
 
         if( !hasFlag( NoDeaggro ) && ( distanceOrig > maxDistanceToOrigin ) )
         {
@@ -564,7 +560,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           break;
         }
 
-        if( distance > ( getScale() / 2 + pHatedActor->getScale() / 2 ) )
+        if( distance > ( getScale() + pHatedActor->getScale() ) )
         {
           if( hasFlag( Immobile ) )
             break;
