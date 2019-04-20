@@ -571,7 +571,8 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           }
           moveTo( *pHatedActor );
         }
-        else
+
+        if( ( distance - getScale() ) < 5 )
         {
           if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
             sendPositionUpdate();
