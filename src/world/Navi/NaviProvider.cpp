@@ -683,5 +683,5 @@ void Sapphire::World::Navi::NaviProvider::removeAgentUpdateFlag( Sapphire::Entit
   if( !ag )
     return;
 
-  ag->params.updateFlags ^= flags;
+  ag->params.updateFlags &= ~flags;
 }
