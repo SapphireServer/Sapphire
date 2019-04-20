@@ -473,16 +473,20 @@ bool Sapphire::Zone::update( uint64_t tickCount )
   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
   bool changedWeather = checkWeather();
 
+  auto dt = std::difftime( tickCount, m_lastUpdate ) / 1000.f;
+
   if( m_pNaviProvider )
-    m_pNaviProvider->updateCrowd( 0.02f );
+    m_pNaviProvider->updateCrowd( dt );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
 
   updateSpawnPoints();
 
-  if( m_playerMap.size() > 0 )
+  if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
+
+  m_lastUpdate = tickCount;
 
   return true;
 }
@@ -507,8 +511,6 @@ void Sapphire::Zone::updateSessions( uint64_t tickCount, bool changedWeather )
       removeActor( pPlayer );
       return;
     }
-
-    m_lastUpdate = tickCount;
 
     if( changedWeather )
     {

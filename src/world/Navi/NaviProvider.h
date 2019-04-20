@@ -69,6 +69,9 @@ namespace Sapphire::World::Navi
 
     bool syncPosToChara( Entity::Chara& chara );
 
+    void addAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
+    void removeAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
+
   protected:
     std::string m_internalName;
 
