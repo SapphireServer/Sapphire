@@ -573,7 +573,7 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   params.height = 3.f;
   params.maxAcceleration = 25.f;
   params.maxSpeed = std::pow( 2, chara.getScale() * 0.35f ) + 1.f;
-  params.radius = ( chara.getScale() ) * 0.9f;
+  params.radius = ( chara.getScale() ) * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
   params.updateFlags = 0;
