@@ -19,7 +19,7 @@
 #include "InstanceContent.h"
 #include "QuestBattle.h"
 #include "Manager/TerritoryMgr.h"
-#include "Navi/Naviprovider.h"
+#include "Navi/NaviProvider.h"
 
 #include "Session.h"
 #include "Actor/Chara.h"
