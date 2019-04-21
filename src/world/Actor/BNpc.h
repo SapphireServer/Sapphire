@@ -79,9 +79,6 @@ namespace Sapphire::Entity
 
     bool moveTo( const Entity::Chara& targetChara );
 
-    // processes movement
-    void step();
-
     void sendPositionUpdate();
 
     BNpcState getState() const;
