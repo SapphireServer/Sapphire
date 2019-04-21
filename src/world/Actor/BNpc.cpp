@@ -238,7 +238,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
+//  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
@@ -250,7 +250,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     sendPositionUpdate();
     //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
-    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
+//    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
     return true;
   }
 
@@ -274,7 +274,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     return false;
   }
 
-  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
+//  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
@@ -286,7 +286,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     sendPositionUpdate();
     //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
-    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
+//    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
     return true;
   }
 
