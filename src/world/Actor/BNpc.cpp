@@ -70,6 +70,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_invincibilityType = InvincibilityNone;
   m_currentStance = Common::Stance::Passive;
   m_levelId = 0;
+  m_flags = 0;
 
   m_pCurrentZone = pZone;
 
@@ -182,49 +183,6 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
   m_state = state;
 }
 
-void Sapphire::Entity::BNpc::step()
-{
-  if( m_naviLastPath.empty() )
-    // No path to track
-    return;
-
-  auto stepPos = m_naviLastPath[ m_naviPathStep ];
-
-  auto distanceToStep = Util::distance( getPos(), stepPos );
-  auto distanceToDest = Util::distance( getPos(), m_naviTarget );
-
-  if( distanceToStep <= 4 && m_naviPathStep < m_naviLastPath.size() - 1 )
-  {
-    // Reached step in path
-    m_naviPathStep++;
-    stepPos = m_naviLastPath[ m_naviPathStep ];
-  }
-
-  // This is probably not a good way to do it but works fine for now
-  float angle = Util::calcAngFrom( getPos().x, getPos().z, stepPos.x, stepPos.z ) + PI;
-
-  auto delta = static_cast< float >( Util::getTimeMs() - m_lastUpdate ) / 1000.f;
-
-  float speed = 7.5f * delta;
-
-  if( m_state == BNpcState::Roaming )
-    speed *= 0.27f;
-
-  // this seems to fix it but i don't know why :(
-  if( speed > distanceToDest )
-    speed = distanceToDest / delta;
-
-  auto x = ( cosf( angle ) * speed );
-  auto y = stepPos.y;
-  auto z = ( sinf( angle ) * speed );
-
-
-  face( stepPos );
-  setPos( { getPos().x + x, y, getPos().z + z } );
-  sendPositionUpdate();
-
-}
-
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
 
@@ -238,8 +196,6 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-//  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
-
   auto pos1 = pNaviProvider->getMovePos( *this );
 
   if( Util::distance( pos1, pos ) < getRadius() + 3.f )
@@ -248,9 +204,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     face( pos );
     setPos( pos1 );
     sendPositionUpdate();
-    //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
-//    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
     return true;
   }
 
@@ -274,8 +228,6 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     return false;
   }
 
-//  pNaviProvider->addAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
-
   auto pos1 = pNaviProvider->getMovePos( *this );
 
   if( Util::distance( pos1, targetChara.getPos() ) <= ( getRadius() + targetChara.getRadius() ) + 3.f )
@@ -284,9 +236,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     face( targetChara.getPos() );
     setPos( pos1 );
     sendPositionUpdate();
-    //pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
-//    pNaviProvider->removeAgentUpdateFlag( *this, DT_CROWD_OBSTACLE_AVOIDANCE );
     return true;
   }
 
@@ -446,7 +396,6 @@ void Sapphire::Entity::BNpc::onTick()
 
 void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 {
-  const uint8_t minActorDistance = 4;
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
@@ -463,9 +412,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
 
       if( pNaviProvider )
-      {
         pNaviProvider->setMoveTarget( *this, m_spawnPos );
-      }
 
       if( moveTo( m_spawnPos ) )
       {
@@ -488,9 +435,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
     {
 
       if( pNaviProvider )
-      {
         pNaviProvider->setMoveTarget( *this, m_roamPos );
-      }
 
       if( moveTo( m_roamPos ) )
       {
@@ -566,9 +511,8 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
             break;
 
           if( pNaviProvider )
-          {
             pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
-          }
+
           moveTo( *pHatedActor );
         }
 
