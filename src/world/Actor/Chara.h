@@ -132,7 +132,7 @@ namespace Sapphire::Entity
     uint32_t m_agentId;
 
     /*! Detour Crowd actor scale */
-    float m_scale;
+    float m_radius;
 
   public:
     Chara( Common::ObjKind type, FrameworkPtr pFw );
@@ -278,7 +278,7 @@ namespace Sapphire::Entity
     uint32_t getAgentId() const;
     void setAgentId( uint32_t agentId );
 
-    float getScale() const;
+    float getRadius() const;
 
   };
 

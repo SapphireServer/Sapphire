@@ -98,14 +98,14 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   auto bNpcBaseData = exdData->get< Data::BNpcBase >( m_bNpcBaseId );
   assert( bNpcBaseData );
 
-  m_scale = bNpcBaseData->scale;
+  m_radius = bNpcBaseData->scale;
 
   auto modelChara = exdData->get< Data::ModelChara >( bNpcBaseData->modelChara );
   if( modelChara )
   {
     auto modelSkeleton = exdData->get< Data::ModelSkeleton >( modelChara->model );
     if( modelSkeleton )
-      m_scale *= modelSkeleton->scaleFactor;
+      m_radius *= modelSkeleton->scaleFactor;
   }
 
   // todo: is this actually good?
@@ -242,7 +242,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, pos ) < getScale() )
+  if( Util::distance( pos1, pos ) < getRadius() + 3.f )
   {
     // Reached destination
     face( pos );
@@ -278,7 +278,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, targetChara.getPos() ) <= ( getScale() + targetChara.getScale() ) + 0.25f )
+  if( Util::distance( pos1, targetChara.getPos() ) <= ( getRadius() + targetChara.getRadius() ) + 3.f )
   {
     // Reached destination
     face( targetChara.getPos() );
@@ -560,7 +560,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           break;
         }
 
-        if( distance > ( getScale() + pHatedActor->getScale() ) )
+        if( distance > ( getRadius() + pHatedActor->getRadius() ) )
         {
           if( hasFlag( Immobile ) )
             break;
@@ -572,10 +572,11 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           moveTo( *pHatedActor );
         }
 
-        if( ( distance - getScale() ) < 5 )
+        if( distance < ( getRadius() + pHatedActor->getRadius() + 3.f ) )
         {
           if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
             sendPositionUpdate();
+
           // in combat range. ATTACK!
           autoAttack( pHatedActor );
         }
