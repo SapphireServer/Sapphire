@@ -578,7 +578,7 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
   params.updateFlags = 0;
-  //params.updateFlags |= DT_CROWD_OBSTACLE_AVOIDANCE;
+  params.updateFlags |= DT_CROWD_ANTICIPATE_TURNS;
   float position[] = { chara.getPos().x, chara.getPos().y, chara.getPos().z };
   return m_pCrowd->addAgent( position, &params );
 }

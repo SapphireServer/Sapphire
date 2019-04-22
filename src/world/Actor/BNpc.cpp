@@ -352,7 +352,7 @@ bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara
 void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 {
   auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 50, 600 ).next() );
+  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 500, 1000 ).next() );
 
   m_lastAttack = Util::getTimeMs() + variation;
   hateListUpdate( pChara, 1 );
@@ -380,7 +380,8 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->queuePacket( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
+    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
+    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 0, 0, 0 ) );
     tmpPlayer->onMobDeaggro( getAsBNpc() );
   }
 }
