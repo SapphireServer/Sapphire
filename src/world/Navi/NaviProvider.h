@@ -72,6 +72,8 @@ namespace Sapphire::World::Navi
     void addAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
     void removeAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
 
+    void updateAgentParameters( Entity::BNpc& bnpc );
+
   protected:
     std::string m_internalName;
 

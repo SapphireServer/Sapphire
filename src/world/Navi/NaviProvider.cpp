@@ -6,6 +6,7 @@
 
 #include "Actor/Actor.h"
 #include "Actor/Chara.h"
+#include "Actor/BNpc.h"
 
 #include <Manager/RNGMgr.h>
 
@@ -580,6 +581,22 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   //params.updateFlags |= DT_CROWD_OBSTACLE_AVOIDANCE;
   float position[] = { chara.getPos().x, chara.getPos().y, chara.getPos().z };
   return m_pCrowd->addAgent( position, &params );
+}
+
+void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& bnpc )
+{
+  dtCrowdAgentParams params;
+  std::memset( &params, 0, sizeof( params ) );
+  params.height = 3.f;
+  params.maxAcceleration = 25.f;
+  params.maxSpeed = std::pow( 2, bnpc.getRadius() * 0.35f ) + 1.f;
+  if( bnpc.getState() == Entity::BNpcState::Combat || bnpc.getState() == Entity::BNpcState::Retreat )
+    params.maxSpeed *= 2;
+  params.radius = ( bnpc.getRadius() ) * 0.75f;
+  params.collisionQueryRange = params.radius * 12.0f;
+  params.pathOptimizationRange = params.radius * 20.0f;
+  params.updateFlags = 0;
+  m_pCrowd->updateAgentParameters( bnpc.getAgentId(), &params );
 }
 
 void Sapphire::World::Navi::NaviProvider::updateCrowd( float timeInSeconds )

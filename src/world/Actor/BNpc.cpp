@@ -247,7 +247,6 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
   return false;
 }
 
-
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
   uint8_t unk1 = 0x3a;
@@ -478,6 +477,8 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       if( !pHatedActor )
         return;
 
+      pNaviProvider->updateAgentParameters( *this );
+
       auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
                                           m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
 
@@ -531,6 +532,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
         setStance( Stance::Passive );
         //setOwner( nullptr );
         m_state = BNpcState::Retreat;
+        pNaviProvider->updateAgentParameters( *this );
       }
     }
   }
