@@ -181,11 +181,11 @@ int32_t Sapphire::World::Navi::NaviProvider::fixupShortcuts( dtPolyRef* path, in
   // in the path, short cut to that polygon directly.
   const int32_t maxLookAhead = 6;
   int32_t cut = 0;
-  for( int32_t i = dtMin( maxLookAhead, npath ) - 1; i > 1 && cut == 0; i-- ) 
+  for( int32_t i = dtMin( maxLookAhead, npath ) - 1; i > 1 && cut == 0; i-- )
   {
     for( int32_t j = 0; j < nneis; j++ )
     {
-      if( path[ i ] == neis[ j ] ) 
+      if( path[ i ] == neis[ j ] )
       {
         cut = i;
         break;
@@ -310,7 +310,7 @@ Sapphire::Common::FFXIVARR_POSITION3
   return { randomPt[ 0 ], randomPt[ 1 ], randomPt[ 2 ] };
 }
 
-std::vector< Sapphire::Common::FFXIVARR_POSITION3 > 
+std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
   Sapphire::World::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
                                                        const Common::FFXIVARR_POSITION3& endPos )
 {
@@ -546,7 +546,7 @@ bool Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
       break;
 
     auto data = reinterpret_cast< uint8_t* >( dtAlloc( tileHeader.dataSize, DT_ALLOC_PERM ) );
-    if( !data ) 
+    if( !data )
       break;
     memset( data, 0, tileHeader.dataSize );
     readLen = fread( data, tileHeader.dataSize, 1, fp );
@@ -629,14 +629,24 @@ void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
   const dtQueryFilter* filter = m_pCrowd->getFilter( 0 );
   const float* halfExtents = m_pCrowd->getQueryExtents();
 
-  float vel[ 3 ];
   float p[ 3 ] = { endPos.x, endPos.y, endPos.z };
+
+  dtPolyRef ref;
+
+  auto status = m_naviMeshQuery->findNearestPoly( p, halfExtents, filter, &ref, nullptr );
+
+  if( !dtStatusSucceed( status ) )
+  {
+    Logger::error( "Failed to find nearest poly for Chara#{} for pos X: {} Y: {} Z: {}",
+                   chara.getId(), endPos.x, endPos.y, endPos.z );
+
+    return;
+  }
 
   const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
   if( ag && ag->active )
   {
-    calcVel( vel, ag->npos, p, ag->params.maxSpeed );
-    m_pCrowd->requestMoveVelocity( chara.getAgentId(), vel );
+    m_pCrowd->requestMoveTarget( chara.getAgentId(), ref, p );
   }
 }
 
