@@ -629,7 +629,6 @@ void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
   const dtQueryFilter* filter = m_pCrowd->getFilter( 0 );
   const float* halfExtents = m_pCrowd->getQueryExtents();
 
-  float vel[ 3 ];
   float p[ 3 ] = { endPos.x, endPos.y, endPos.z };
 
   dtPolyRef ref;
@@ -647,8 +646,6 @@ void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
   const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
   if( ag && ag->active )
   {
-    calcVel( vel, ag->npos, p, ag->params.maxSpeed );
-    //m_pCrowd->requestMoveVelocity( chara.getAgentId(), vel );
     m_pCrowd->requestMoveTarget( chara.getAgentId(), ref, p );
   }
 }
