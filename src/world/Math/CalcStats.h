@@ -139,7 +139,7 @@ namespace Sapphire::Math
      *
      * @param attackPower The magic/physical attack power value.
      */
-    static float calcAttackPower( uint32_t attackPower );
+    static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
 
