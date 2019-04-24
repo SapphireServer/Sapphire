@@ -22,18 +22,22 @@
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Navi/NaviProvider.h"
 
+#include "Math/CalcBattle.h"
+#include "Math/CalcStats.h"
+
 #include "StatusEffect/StatusEffect.h"
+
 #include "ServerMgr.h"
 #include "Session.h"
-#include "Math/CalcBattle.h"
 #include "Chara.h"
 #include "Player.h"
 #include "BNpc.h"
 #include "BNpcTemplate.h"
-#include "Manager/TerritoryMgr.h"
+
 #include "Common.h"
 #include "Framework.h"
-#include <Logging/Logger.h>
+
+#include <Manager/TerritoryMgr.h>
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
@@ -72,7 +76,9 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_levelId = 0;
   m_flags = 0;
 
-  m_pCurrentZone = pZone;
+  m_class = ClassJob::Adventurer;
+
+  m_pCurrentZone = std::move( pZone );
 
   m_spawnPos = m_pos;
 
@@ -112,6 +118,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   // todo: is this actually good?
   //m_naviTargetReachedDistance = m_scale * 2.f;
   m_naviTargetReachedDistance = 4.f;
+
+  calculateStats();
 }
 
 Sapphire::Entity::BNpc::~BNpc() = default;
@@ -262,7 +270,7 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
 void Sapphire::Entity::BNpc::hateListClear()
 {
   auto it = m_hateList.begin();
-  for( auto listEntry : m_hateList )
+  for( auto& listEntry : m_hateList )
   {
     if( isInRangeSet( listEntry->m_pChara ) )
       deaggro( listEntry->m_pChara );
@@ -681,7 +689,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-    auto damage = static_cast< uint16_t >( pRNGMgr->getRandGenerator< float >( m_level, m_level + m_level * 1.5f ).next() );
+    auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
@@ -696,4 +704,38 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     pTarget->takeDamage( damage );
 
   }
+}
+
+void Sapphire::Entity::BNpc::calculateStats()
+{
+  uint8_t level = getLevel();
+  uint8_t job = static_cast< uint8_t >( getClass() );
+
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+
+  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( job );
+  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
+
+  float base = Math::CalcStats::calculateBaseStat( *this );
+
+  m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) );
+  m_baseStats.dex = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierDexterity ) / 100 ) );
+  m_baseStats.vit = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierVitality ) / 100 ) );
+  m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierIntelligence ) / 100 ) );
+  m_baseStats.mnd = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierMind ) / 100 ) );
+  m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) );
+
+  m_baseStats.determination = static_cast< uint32_t >( base );
+  m_baseStats.pie = static_cast< uint32_t >( base );
+  m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
+  m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
+  m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
+  m_baseStats.critHitRate = paramGrowthInfo->baseSpeed;
+  m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
+  m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
+  m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
+
+  m_baseStats.attack = m_baseStats.str;
+  m_baseStats.attackPotMagic = m_baseStats.inte;
+  m_baseStats.healingPotMagic = m_baseStats.mnd;
 }

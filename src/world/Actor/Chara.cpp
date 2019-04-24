@@ -719,3 +719,14 @@ float Sapphire::Entity::Chara::getRadius() const
 {
   return m_radius;
 }
+
+Sapphire::Common::BaseParam Sapphire::Entity::Chara::getPrimaryStat() const
+{
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto classJob = exdData->get< Data::ClassJob >( static_cast< uint16_t >( getClass() ) );
+  assert( classJob );
+
+  return static_cast< Sapphire::Common::BaseParam >( classJob->primaryStat );
+}
