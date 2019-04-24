@@ -495,8 +495,6 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( baseStats.healingPotMagic - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-////////
-
 float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
@@ -534,17 +532,15 @@ uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 
   switch( chara.getPrimaryStat() )
   {
+    case Common::BaseParam::Strength:
     default:
-      return 1;
+      return baseStats.str;
 
     case Common::BaseParam::Intelligence:
       return baseStats.inte;
 
     case Common::BaseParam::Mind:
       return baseStats.mnd;
-
-    case Common::BaseParam::Strength:
-      return baseStats.str;
 
     case Common::BaseParam::Vitality:
       return baseStats.vit;
