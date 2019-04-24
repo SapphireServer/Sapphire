@@ -280,6 +280,8 @@ namespace Sapphire::Entity
 
     float getRadius() const;
 
+    Common::BaseParam getPrimaryStat() const;
+
   };
 
 }

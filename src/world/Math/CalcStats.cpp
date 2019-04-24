@@ -2,10 +2,12 @@
 
 #include <Exd/ExdDataGenerated.h>
 #include <Common.h>
+#include <Logging/Logger.h>
 
 #include "Actor/Chara.h"
-
 #include "Actor/Player.h"
+
+#include "Inventory/Item.h"
 
 #include "CalcStats.h"
 #include "Framework.h"
@@ -108,10 +110,10 @@ const int levelTable[71][7] =
 // 3 Versions. SB and HW are linear, ARR is polynomial.
 // Originally from Player.cpp, calculateStats().
 
-float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
+float CalcStats::calculateBaseStat( const Chara& chara )
 {
   float base = 0.0f;
-  uint8_t level = pPlayer->getLevel();
+  uint8_t level = chara.getLevel();
 
   if( level > 70 )
     level = 70;
@@ -138,7 +140,7 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   uint8_t level = pPlayer->getLevel();
 
   auto vitMod = pPlayer->getBonusStat( Common::BaseParam::Vitality );
-  float baseStat = calculateBaseStat( pPlayer );
+  float baseStat = calculateBaseStat( *pPlayer );
   uint16_t vitStat = pPlayer->getStats().vit + static_cast< uint16_t >( vitMod );
   uint16_t hpMod = paramGrowthInfo->hpModifier;
   uint16_t jobModHp = classInfo->modifierHitPoints;
@@ -173,7 +175,7 @@ uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
 
   auto pieMod = pPlayer->getBonusStat( Common::BaseParam::Piety );
 
-  float baseStat = calculateBaseStat( pPlayer );
+  float baseStat = calculateBaseStat( *pPlayer );
   uint16_t piety = pPlayer->getStats().pie + pieMod;
   uint16_t pietyScalar = paramGrowthInfo->mpModifier;
   uint16_t jobModMp = classInfo->modifierManaPoints;
@@ -308,49 +310,67 @@ float CalcStats::potency( uint16_t potency )
   return potency / 100.f;
 }
 
-//float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage, bool isMagicDamage )
-//{
-//  const auto& baseStats = chara.getStats();
-//  auto level = chara.getLevel();
-//
-//  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
-//
-//  float jobAttribute = 1.f;
-//
-//  // todo: fix this
-//  return 1.f
-//}
+float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
+{
+  const auto& baseStats = chara.getStats();
+  auto level = chara.getLevel();
 
-// todo: this is all retarded, needs to be per weapon and etcetc
-//uint32_t CalcStats::getPrimaryClassJobAttribute( const Sapphire::Entity::Chara& chara )
-//{
-//
-//}
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+
+  uint32_t jobAttribute = 1;
+
+  switch( chara.getPrimaryStat() )
+  {
+    case Common::BaseParam::Intelligence:
+    {
+      jobAttribute = baseStats.healingPotMagic;
+      break;
+    }
+    case Common::BaseParam::Mind:
+    {
+      jobAttribute = baseStats.attackPotMagic;
+      break;
+    }
+
+    default:
+    {
+      jobAttribute = baseStats.attack;
+      break;
+    }
+  }
+
+  return std::floor( ( ( mainVal * jobAttribute ) / 1000.f ) + weaponDamage );
+}
 
 float CalcStats::calcAttackPower( uint32_t attackPower )
 {
   return std::floor( ( 125.f * ( attackPower - 292.f ) / 292.f ) + 100.f ) / 100.f;
 }
 
-float CalcStats::magicAttackPower( const Sapphire::Entity::Chara& chara )
-{
-  const auto& baseStats = chara.getStats();
-
-  return calcAttackPower( baseStats.attackPotMagic );
-}
-
-float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
-{
-  const auto& baseStats = chara.getStats();
-
-  return calcAttackPower( baseStats.healingPotMagic );
-}
-
 float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
 {
   const auto& baseStats = chara.getStats();
 
-  return calcAttackPower( baseStats.attack );
+  // todo: this is wrong
+  if( chara.isBattleNpc() )
+    return calcAttackPower( baseStats.attack );
+
+  switch( chara.getPrimaryStat() )
+  {
+    case Common::BaseParam::Mind:
+    {
+      return calcAttackPower( baseStats.healingPotMagic );
+    }
+    case Common::BaseParam::Intelligence:
+    {
+      return calcAttackPower( baseStats.attackPotMagic );
+    }
+
+    default:
+    {
+      return calcAttackPower( baseStats.attack );
+    }
+  }
 }
 
 float CalcStats::determination( const Sapphire::Entity::Chara& chara )
@@ -386,18 +406,10 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
   uint32_t speedVal = 0;
 
   // check whether we use spellspeed or skillspeed
-  // todo: this is kinda shitty though
-  switch( chara.getClass() )
+  switch( chara.getPrimaryStat() )
   {
-    case Common::ClassJob::Arcanist:
-    case Common::ClassJob::Astrologian:
-    case Common::ClassJob::Whitemage:
-    case Common::ClassJob::Redmage:
-    case Common::ClassJob::Bluemage:
-    case Common::ClassJob::Blackmage:
-    case Common::ClassJob::Summoner:
-    case Common::ClassJob::Scholar:
-    case Common::ClassJob::Thaumaturge:
+    case Common::BaseParam::Intelligence:
+    case Common::BaseParam::Mind:
       speedVal = baseStats.spellSpeed;
       break;
 
@@ -439,14 +451,105 @@ float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
   return std::floor( 15.f * baseStats.magicDefense ) / 100.f;
 }
 
-//float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
-//{
-//
-//}
+float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  auto blockStrength = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockStrength ) );
+  auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( ( 30 * blockStrength ) / levelVal + 10 ) / 100.f;
+}
+
+float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
+{
+  // todo: default values for NPCs, not sure what we should have here
+  float autoAttackDelay = 2.f;
+  float weaponDamage = 10.f;
+
+  // fetch actual auto attack delay if its a player
+  if( chara.isPlayer() )
+  {
+    // todo: ew
+    auto pPlayer = const_cast< Entity::Chara& >( chara ).getAsPlayer();
+    assert( pPlayer );
+
+    auto pItem = pPlayer->getEquippedWeapon();
+    assert( pItem );
+
+    autoAttackDelay = pItem->getDelay() / 1000.f;
+    weaponDamage = pItem->getWeaponDmg();
+  }
+
+  auto level = chara.getLevel();
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+
+  auto innerCalc = std::floor( ( ( mainVal * primaryStatValue( chara ) ) / 1000.f ) + weaponDamage );
+
+  return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
+}
 
 float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
 {
   const auto& baseStats = chara.getStats();
 
   return std::floor( 100.f * ( baseStats.healingPotMagic - 292.f ) / 264.f + 100.f ) / 100.f;
+}
+
+////////
+
+float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+{
+  // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
+  // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
+
+  auto pot = potency( AUTO_ATTACK_POTENCY );
+  auto aa = autoAttack( chara );
+  //auto ap = attackPower( chara );
+  auto ap = 1.f;
+  auto det = determination( chara );
+  auto ten = tenacity( chara );
+
+  Logger::info( "auto attack: pot: {} aa: {} ap: {} det: {} ten: {}", pot, aa, ap, det, ten );
+
+  auto factor = std::floor( pot * aa * ap * det * ten );
+
+  // todo: traits
+
+  factor = std::floor( factor * speed( chara ) );
+
+  // todo: surely this aint right?
+  //factor = std::floor( factor * criticalHitProbability( chara ) );
+  //factor = std::floor( factor * directHitProbability( chara ) );
+
+  // todo: random 0.95 - 1.05 factor
+
+  // todo: buffs
+
+  return factor;
+}
+
+uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
+{
+  const auto& baseStats = chara.getStats();
+
+  switch( chara.getPrimaryStat() )
+  {
+    default:
+      return 1;
+
+    case Common::BaseParam::Intelligence:
+      return baseStats.inte;
+
+    case Common::BaseParam::Mind:
+      return baseStats.mnd;
+
+    case Common::BaseParam::Strength:
+      return baseStats.str;
+
+    case Common::BaseParam::Vitality:
+      return baseStats.vit;
+
+    case Common::BaseParam::Dexterity:
+      return baseStats.dex;
+  }
 }

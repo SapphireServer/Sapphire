@@ -1114,6 +1114,7 @@ Sapphire::Data::ClassJob::ClassJob( uint32_t row_id, Sapphire::Data::ExdDataGene
    classJobParent = exdData->getField< uint8_t >( row, 26 );
    nameEnglish = exdData->getField< std::string >( row, 27 );
    itemStartingWeapon = exdData->getField< int32_t >( row, 28 );
+   primaryStat = exdData->getField< uint8_t >( row, 33 );
    limitBreak1 = exdData->getField< uint16_t >( row, 34 );
    limitBreak2 = exdData->getField< uint16_t >( row, 35 );
    limitBreak3 = exdData->getField< uint16_t >( row, 36 );

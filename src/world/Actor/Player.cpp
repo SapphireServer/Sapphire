@@ -256,7 +256,7 @@ void Sapphire::Entity::Player::calculateStats()
   auto tribeInfo = pExdData->get< Sapphire::Data::Tribe >( tribe );
   auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
 
-  float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
+  float base = Math::CalcStats::calculateBaseStat( *this );
 
   m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) +
                                              tribeInfo->sTR );
@@ -1559,8 +1559,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
   auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
 
-  auto damage = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( static_cast< uint32_t > ( getLevel() * 1.5f ),
-                                         getLevel() + static_cast< uint32_t >( mainWeap->getAutoAttackDmg() * 2 ) ).next() );
+  auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -2116,3 +2115,13 @@ Sapphire::World::SessionPtr Sapphire::Entity::Player::getSession()
   return m_pSession;
 }
 
+void Sapphire::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
+{
+  m_activeLand.plot = land;
+  m_activeLand.ward = ward;
+}
+
+Sapphire::Common::ActiveLand Sapphire::Entity::Player::getActiveLand() const
+{
+  return m_activeLand;
+}
