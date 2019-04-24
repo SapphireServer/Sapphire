@@ -342,9 +342,13 @@ float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weapo
   return std::floor( ( ( mainVal * jobAttribute ) / 1000.f ) + weaponDamage );
 }
 
-float CalcStats::calcAttackPower( uint32_t attackPower )
+float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower )
 {
-  return std::floor( ( 125.f * ( attackPower - 292.f ) / 292.f ) + 100.f ) / 100.f;
+  auto level = chara.getLevel();
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( ( 125.f * ( attackPower - mainVal ) / divVal ) + 100.f ) / 100.f;
 }
 
 float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
@@ -353,22 +357,22 @@ float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
 
   // todo: this is wrong
   if( chara.isBattleNpc() )
-    return calcAttackPower( baseStats.attack );
+    return calcAttackPower( chara, baseStats.attack );
 
   switch( chara.getPrimaryStat() )
   {
     case Common::BaseParam::Mind:
     {
-      return calcAttackPower( baseStats.healingPotMagic );
+      return calcAttackPower( chara, baseStats.healingPotMagic );
     }
     case Common::BaseParam::Intelligence:
     {
-      return calcAttackPower( baseStats.attackPotMagic );
+      return calcAttackPower( chara, baseStats.attackPotMagic );
     }
 
     default:
     {
-      return calcAttackPower( baseStats.attack );
+      return calcAttackPower( chara, baseStats.attack );
     }
   }
 }
@@ -502,8 +506,7 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
 
   auto pot = potency( AUTO_ATTACK_POTENCY );
   auto aa = autoAttack( chara );
-  //auto ap = attackPower( chara );
-  auto ap = 1.f;
+  auto ap = attackPower( chara );
   auto det = determination( chara );
   auto ten = tenacity( chara );
 
