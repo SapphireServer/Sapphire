@@ -314,6 +314,9 @@ int main( int argc, char* argv[] )
   if( generateNavmesh )
     exportFileType |= ExportFileType::Navmesh;
 
+  if( argc > 1 )
+    gamePath = std::string( argv[ 1 ] );
+
   try
   {
     initExd( gamePath );
@@ -321,7 +324,7 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
-    printf( "Unable to initialise EXD!\n Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\"\n" );
+    printf( "Unable to initialise EXD!\n Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\"\n" );
     return -1;
   }
   ExportMgr exportMgr( nJobs );
@@ -486,7 +489,7 @@ int main( int argc, char* argv[] )
     {
       printf( "%s", ( std::string( e.what() ) + "\n" ).c_str() );
       printf( "Unable to extract collision data.\n" );
-      printf( "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\"\n" );
+      printf( "Usage: nav_export \"path/to/game/sqpack/ffxiv\"\n" );
     }
   }
   pCache->purge();
