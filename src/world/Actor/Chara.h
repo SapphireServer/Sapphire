@@ -191,6 +191,8 @@ namespace Sapphire::Entity
 
     ActorStats getStats() const;
 
+    uint32_t getStatValue( Common::BaseParam baseParam ) const;
+
     uint32_t getHp() const;
 
     uint32_t getHpPercent() const;
