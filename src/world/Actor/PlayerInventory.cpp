@@ -843,7 +843,7 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
   {
     auto currItem = it->second;
 
-    if( currItem )
+    if( currItem && currItem->getCategory() != Common::ItemUICategory::SoulCrystal )
     {
       iLvlResult += currItem->getItemLevel();
 
