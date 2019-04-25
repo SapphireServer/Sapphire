@@ -1105,9 +1105,10 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
       {
         if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
         {
+          auto chara = actor->getAsChara();
+
           // default autoattack range
-          // TODO make this dependant on bnpc size
-          uint32_t range = 7;
+          float range = 3.f + chara->getRadius();
 
           // default autoattack range for ranged classes
           if( getClass() == ClassJob::Machinist ||
