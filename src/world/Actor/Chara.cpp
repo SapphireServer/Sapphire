@@ -793,8 +793,8 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
 
     case Common::BaseParam::AttackPower:
     {
-      value = m_baseStats.attack;
-      break;
+      // todo: think this is right... not sure
+      return getStatValue( Common::BaseParam::Strength );
     }
 
     case Common::BaseParam::AttackMagicPotency:
