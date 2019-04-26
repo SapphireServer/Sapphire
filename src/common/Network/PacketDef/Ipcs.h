@@ -74,6 +74,9 @@ namespace Sapphire::Network::Packets
     CancelAllianceForming = 0x00C6, // updated 4.2
 
     Chat = 0x00F7, // updated 4.5?
+
+    WorldVisitList = 0x00FE, // added 4.5
+
     SocialList = 0x0103, // updated 4.5
 
     UpdateSearchInfo = 0x0106, // updated 4.5
