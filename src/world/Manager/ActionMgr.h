@@ -23,8 +23,8 @@ namespace Sapphire::World::Manager
 
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
                                      Data::ActionPtr actionData, uint64_t targetId );
-    void handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
-                                Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos );
+    void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                   Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );

@@ -17,8 +17,8 @@ World::Manager::ActionMgr::ActionMgr( Sapphire::FrameworkPtr pFw ) :
 
 }
 
-void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                       Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos )
+void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                                          Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos )
 {
   player.sendDebug( "got aoe act: {0}", actionData->name );
 

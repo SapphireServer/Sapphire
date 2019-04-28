@@ -983,6 +983,7 @@ namespace Sapphire::Common
     SingleTarget = 1,
     CircularAOE = 2,
     RectangularAOE = 4,
+    CircularAoEPlaced = 7
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
