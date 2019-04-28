@@ -27,7 +27,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
   const auto itemSourceSlot = packet.data().itemSourceSlot;
   const auto itemSourceContainer = packet.data().itemSourceContainer;
 
-//  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
+  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
 
   auto exdData = m_pFw->get< Data::ExdDataGenerated >();
   assert( exdData );
@@ -81,9 +81,9 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
-                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                          Entity::Player& player )
+void Sapphire::Network::GameConnection::placedActionHandler( FrameworkPtr pFw,
+                                                             const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                             Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcAoESkillHandler >( inPacket );
 
@@ -99,8 +99,8 @@ void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
     return;
   }
 
-//  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
-//                    type, sequence, actionId, pos.x, pos.y, pos.z );
+  player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
+                    type, sequence, actionId, pos.x, pos.y, pos.z );
 
   auto exdData = m_pFw->get< Data::ExdDataGenerated >();
   assert( exdData );
@@ -112,5 +112,5 @@ void Sapphire::Network::GameConnection::aoeActionHandler( FrameworkPtr pFw,
     return;
 
   auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handleAoEPlayerAction( player, actionId, action, pos );
+  actionMgr->handlePlacedPlayerAction( player, actionId, action, pos );
 }

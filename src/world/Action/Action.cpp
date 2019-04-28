@@ -100,7 +100,7 @@ bool Sapphire::Action::Action::init()
   m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->costType );
   m_primaryCost = m_actionData->cost;
 
-  if( !m_actionData->targetArea )
+  /*if( !m_actionData->targetArea )
   {
     // override pos to target position
     // todo: this is kinda dirty
@@ -112,7 +112,7 @@ bool Sapphire::Action::Action::init()
         break;
       }
     }
-  }
+  }*/
 
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
 
