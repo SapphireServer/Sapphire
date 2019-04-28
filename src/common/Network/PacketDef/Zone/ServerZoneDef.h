@@ -54,6 +54,19 @@ namespace Sapphire::Network::Packets::Server
 
   /**
   * Structural representation of the packet sent by the server
+  * to show a list of worlds for world visit
+  */
+  struct FFXIVIpcWorldVisitList : FFXIVIpcBasePacket< WorldVisitList >
+  {
+    struct worldEntry
+    {
+      uint16_t id; // this is the id of the world from lobby
+      uint16_t status; // 1 = available (this is what retail sends) | 2+ = unavailable (this will need to be checked with retail if it's exactly 2 or not since it does not actually lock the option)
+    } world[16];
+  };
+
+  /**
+  * Structural representation of the packet sent by the server
   * carrying chat messages
   */
   struct FFXIVIpcLogout : FFXIVIpcBasePacket< Logout >
