@@ -270,7 +270,7 @@ uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint1
 float CalcStats::blockProbability( const Chara& chara )
 {
   auto level = chara.getLevel();
-  auto blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
+  auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
@@ -281,8 +281,7 @@ float CalcStats::directHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float dhRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::DirectHitRate ) ) +
-                 baseStats.accuracy;
+  float dhRate = chara.getStatValue( Common::BaseParam::DirectHitRate );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -295,8 +294,7 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float chRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::CriticalHit ) ) +
-                 baseStats.critHitRate;
+  float chRate = chara.getStatValue( Common::BaseParam::CriticalHit );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -348,61 +346,70 @@ float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
+  // todo: not sure if its ( ap - mv ) / mv or ( ap - mv ) / dv
   return std::floor( ( 125.f * ( attackPower - mainVal ) / divVal ) + 100.f ) / 100.f;
 }
 
-float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
+float CalcStats::getPrimaryAttackPower( const Sapphire::Entity::Chara& chara )
 {
   const auto& baseStats = chara.getStats();
-
-  // todo: this is wrong
-  if( chara.isBattleNpc() )
-    return calcAttackPower( chara, baseStats.attack );
 
   switch( chara.getPrimaryStat() )
   {
     case Common::BaseParam::Mind:
     {
-      return calcAttackPower( chara, baseStats.healingPotMagic );
+      return healingMagicPower( chara );
     }
     case Common::BaseParam::Intelligence:
     {
-      return calcAttackPower( chara, baseStats.attackPotMagic );
+      return magicAttackPower( chara );
     }
 
     default:
     {
-      return calcAttackPower( chara, baseStats.attack );
+      return attackPower( chara );
     }
   }
+}
+
+float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
+{
+  return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::AttackPower ) );
+}
+
+float CalcStats::magicAttackPower( const Sapphire::Entity::Chara& chara )
+{
+  return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::AttackMagicPotency ) );
+}
+
+float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
+{
+  return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::HealingMagicPotency ) );
 }
 
 float CalcStats::determination( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 130.f * ( baseStats.determination - mainVal ) / divVal + 1000.f ) / 1000.f;
+  return std::floor( 130.f * ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal + 1000.f ) / 1000.f;
 }
 
 float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 100.f * ( baseStats.tenacity - subVal ) / divVal + 1000.f ) / 1000.f;
+  return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::Tenacity ) - subVal ) / divVal + 1000.f ) / 1000.f;
 }
 
 float CalcStats::speed( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -414,11 +421,11 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
   {
     case Common::BaseParam::Intelligence:
     case Common::BaseParam::Mind:
-      speedVal = baseStats.spellSpeed;
+      speedVal = chara.getStatValue( Common::BaseParam::SpellSpeed );
       break;
 
     default:
-      speedVal = baseStats.skillSpeed;
+      speedVal = chara.getStatValue( Common::BaseParam::SkillSpeed );
   }
 
   return std::floor( 130.f * ( speedVal - subVal ) / divVal + 1000.f ) / 1000.f;
@@ -427,32 +434,29 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
 float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 200.f * ( baseStats.critHitRate - subVal ) / divVal + 1400.f ) / 1000.f;
+  return std::floor( 200.f * ( chara.getStatValue( Common::BaseParam::CriticalHit ) - subVal ) / divVal + 1400.f ) / 1000.f;
 }
 
 float CalcStats::physicalDefence( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 15.f * baseStats.defense ) / 100.f;
+  return std::floor( 15.f * chara.getStatValue( Common::BaseParam::Defense ) ) / 100.f;
 }
 
 float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 15.f * baseStats.magicDefense ) / 100.f;
+  return std::floor( 15.f * chara.getStatValue( Common::BaseParam::MagicDefense ) ) / 100.f;
 }
 
 float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
@@ -494,9 +498,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
 
 float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
 {
-  const auto& baseStats = chara.getStats();
-
-  return std::floor( 100.f * ( baseStats.healingPotMagic - 292.f ) / 264.f + 100.f ) / 100.f;
+  return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
 float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara )
@@ -506,11 +508,11 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
 
   auto pot = potency( AUTO_ATTACK_POTENCY );
   auto aa = autoAttack( chara );
-  auto ap = attackPower( chara );
+  auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
   auto ten = tenacity( chara );
 
-  Logger::info( "auto attack: pot: {} aa: {} ap: {} det: {} ten: {}", pot, aa, ap, det, ten );
+  Logger::debug( "auto attack: pot: {} aa: {} ap: {} det: {} ten: {}", pot, aa, ap, det, ten );
 
   auto factor = std::floor( pot * aa * ap * det * ten );
 
@@ -531,24 +533,5 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
 
 uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 {
-  const auto& baseStats = chara.getStats();
-
-  switch( chara.getPrimaryStat() )
-  {
-    case Common::BaseParam::Strength:
-    default:
-      return baseStats.str;
-
-    case Common::BaseParam::Intelligence:
-      return baseStats.inte;
-
-    case Common::BaseParam::Mind:
-      return baseStats.mnd;
-
-    case Common::BaseParam::Vitality:
-      return baseStats.vit;
-
-    case Common::BaseParam::Dexterity:
-      return baseStats.dex;
-  }
+  return chara.getStatValue( chara.getPrimaryStat() );
 }

@@ -63,7 +63,13 @@ namespace Sapphire::Math
      *
      * @param chara The source/casting character.
      */
+    static float getPrimaryAttackPower( const Sapphire::Entity::Chara& chara );
+
     static float attackPower( const Sapphire::Entity::Chara& chara );
+
+    static float magicAttackPower( const Sapphire::Entity::Chara& chara );
+
+    static float healingMagicPower( const Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates determinations contribution to damage and healing output.
@@ -132,6 +138,7 @@ namespace Sapphire::Math
 
     static float calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara );
 
+    static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
   private:
 
     /*!
@@ -141,7 +148,6 @@ namespace Sapphire::Math
      */
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
-    static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
 
   };
 
