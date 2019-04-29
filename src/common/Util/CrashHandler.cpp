@@ -7,18 +7,26 @@
 #include <execinfo.h>
 #include <cxxabi.h>
 #else
-#include <stackwalker/StackWalker.h>
 
-class SapphireStackWalker : public StackWalker
+#include <windows.h>
+#include <intrin.h>
+#include <dbghelp.h>
+
+#pragma comment(lib, "dbghelp.lib")
+
+inline std::string basename( const std::string& file )
 {
-public:
-  SapphireStackWalker() : StackWalker() {}
-protected:
-  virtual void OnOutput( LPCSTR szText )
-  {
-    Sapphire::Logger::fatal( "{}", szText );
-  }
-};
+    size_t i = file.find_last_of( "\\/" );
+    if ( i == std::string::npos )
+    {
+        return file;
+    }
+    else
+    {
+        return file.substr( i + 1 );
+    }
+}
+
 #endif
 
 using namespace Sapphire::Common;
@@ -148,8 +156,74 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
 
 #else
 
-  SapphireStackWalker sw;
-  sw.ShowCallstack();
+  DWORD machine = IMAGE_FILE_MACHINE_AMD64;
+
+  HANDLE process = GetCurrentProcess();
+  HANDLE thread = GetCurrentThread();
+  CONTEXT context = {};
+  context.ContextFlags = CONTEXT_FULL;
+  RtlCaptureContext( &context );
+
+  SymInitialize( process, NULL, TRUE );
+  SymSetOptions( SYMOPT_LOAD_LINES );
+
+  STACKFRAME frame = {};
+  frame.AddrPC.Offset = context.Rip;
+  frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrFrame.Offset = context.Rbp;
+  frame.AddrFrame.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.Rsp;
+  frame.AddrStack.Mode = AddrModeFlat;
+
+  while( StackWalk( machine, process, thread, &frame, &context, NULL, SymFunctionTableAccess, SymGetModuleBase, NULL ) )
+  {
+    auto moduleBase = SymGetModuleBase( process, frame.AddrPC.Offset );
+
+    std::string moduleName;
+    std::string funcName;
+    std::string fileName;
+    int lineNum = 0;
+
+    char moduelBuff[MAX_PATH];
+    if( moduleBase && GetModuleFileNameA( ( HINSTANCE ) moduleBase, moduelBuff, MAX_PATH ) )
+    {
+      moduleName = basename( moduelBuff );
+    }
+    else
+    {
+      moduleName = "Unknown Module";
+    }
+
+
+    DWORD64 offset = 0;
+    char symbolBuffer[sizeof( IMAGEHLP_SYMBOL ) + 255];
+    PIMAGEHLP_SYMBOL symbol = ( PIMAGEHLP_SYMBOL ) symbolBuffer;
+    symbol->SizeOfStruct = ( sizeof IMAGEHLP_SYMBOL ) + 255;
+    symbol->MaxNameLength = 254;
+
+    if( SymGetSymFromAddr( process, frame.AddrPC.Offset, &offset, symbol ) )
+    {
+      funcName = symbol->Name;
+    }
+    else
+    {
+      funcName = "Unknown Function";
+    }
+
+    IMAGEHLP_LINE line;
+    line.SizeOfStruct = sizeof( IMAGEHLP_LINE );
+
+    DWORD offset_ln = 0;
+    if( SymGetLineFromAddr( process, frame.AddrPC.Offset, &offset_ln, &line ) )
+    {
+      fileName = line.FileName;
+      lineNum = line.LineNumber;
+    }
+
+    Logger::fatal( "[{:x}] {}({}): {} ({})", frame.AddrPC.Offset, fileName, lineNum, funcName, moduleName );
+  }
+
+  SymCleanup( process );
 
 #endif
 }

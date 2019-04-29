@@ -136,6 +136,12 @@ bool Sapphire::Zone::init()
 
   m_pNaviProvider = pNaviMgr->getNaviProvider( m_territoryTypeInfo->bg );
 
+  if( !m_pNaviProvider )
+  {
+    Logger::fatal( "No navmesh found for TerritoryType#{}", getTerritoryTypeId() );
+    throw std::runtime_error( "Missing navmesh file(s)." );
+  }
+
   return true;
 }
 

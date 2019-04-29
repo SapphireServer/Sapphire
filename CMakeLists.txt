@@ -44,7 +44,6 @@ add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "deps/recastnavigation" )
-add_subdirectory( "deps/stackwalker" )
 
 ##############################
 #  Main Sapphire Components  #
