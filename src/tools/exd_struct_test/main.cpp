@@ -111,6 +111,8 @@ int main( int argc, char* argv[] )
 
   Logger::init( "struct_test" );
 
+  assert(false);
+
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
