@@ -54,7 +54,9 @@ int main()
   auto gld1 = g_exdData.get< Sapphire::Data::ActionTransient >( id );
   if( gld )
   {
-    Logger::info( "got {0}", gld->name );
+    if( gld->classJob == -1 || gld->name.empty() )
+      continue;
+    Logger::info( "{0} - {1}", id, gld->name );
     std::string desc = gld1->description;
     stripUnicode( desc );;
     desc = std::regex_replace( desc, std::regex( "HI" ), "\n" );
@@ -125,7 +127,21 @@ int main()
 	Logger::info( "Combo Potency: {}", potStr);
       }
     }
+    
+    std::smatch sm5;
+    std::regex r5(R"(Cure Potency: \d*)");
+    if( std::regex_search(desc, sm5, r5 ) )
+    {
+      std::string potStr = sm5.str();
+      auto pos = potStr.find_last_of( " " );
+      if( pos  != std::string::npos )
+      {
+        potStr = potStr.substr( pos + 1 );
+	Logger::info( "Cure Potency: {}", potStr);
+      }
+    }
 
+    Logger::info( "-" );
   }
   else
     Logger::warn( "failed to get classjob {}", 1 );
