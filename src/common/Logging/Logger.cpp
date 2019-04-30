@@ -1,6 +1,6 @@
 #include "Logger.h"
 
-#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warning", "error", "fatal", "off" }
+#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warn", "error", "fatal", "off" }
 
 #include <spdlog/spdlog.h>
 #include <spdlog/async.h>
