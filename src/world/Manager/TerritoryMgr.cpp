@@ -66,8 +66,9 @@ bool Sapphire::World::Manager::TerritoryMgr::init()
     createDefaultTerritories();
     createHousingTerritories();
   }
-  catch( std::runtime_error& )
+  catch( const std::runtime_error& ex )
   {
+    Logger::fatal( "Caught exception during territory init: {}", ex.what() );
     return false;
   }
 
