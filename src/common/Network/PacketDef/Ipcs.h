@@ -131,7 +131,7 @@ namespace Sapphire::Network::Packets
     ActorCast = 0x017C, // updated 4.5
 
     PartyList = 0x017E, // updated 4.5
-
+    HateRank = 0x017F, // updated 4.5
     HateList = 0x0180, // updated 4.5
     ObjectSpawn = 0x0181, // updated 4.5
     ObjectDespawn = 0x0182, // updated 4.5

@@ -1411,12 +1411,19 @@ void Sapphire::Entity::Player::sendHateList()
 {
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
   hateListPacket->data().numEntries = m_actorIdTohateSlotMap.size();
+  auto hateRankPacket = makeZonePacket< FFXIVIpcHateRank >( getId() );
+  hateRankPacket->data().numEntries = m_actorIdTohateSlotMap.size();
   auto it = m_actorIdTohateSlotMap.begin();
   for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
   {
+    // TODO: get actual hate values for these
     hateListPacket->data().entry[ i ].actorId = it->first;
     hateListPacket->data().entry[ i ].hatePercent = 100;
+
+    hateRankPacket->data().entry[ i ].actorId = it->first;
+    hateRankPacket->data().entry[ i ].hateAmount = 1;
   }
+  queuePacket( hateRankPacket );
   queuePacket( hateListPacket );
 }
 
@@ -1571,7 +1578,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-    entry.param = variation;
+    entry.param = 0x72;
 
     effectPacket->addEffect( entry );
 
@@ -1586,6 +1593,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     entry.value = damage;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.param = 0x73;
 
     effectPacket->addEffect( entry );
 
