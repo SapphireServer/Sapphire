@@ -719,6 +719,17 @@ namespace Sapphire::Network::Packets::Server
     uint32_t padding;
   };
 
+  struct FFXIVIpcHateRank : FFXIVIpcBasePacket< HateRank >
+  {
+    uint32_t numEntries;
+    struct
+    {
+      uint32_t actorId;
+      uint32_t hateAmount;
+    } entry[32];
+    uint32_t padding;
+  };
+
   struct FFXIVIpcUpdateClassInfo : FFXIVIpcBasePacket< UpdateClassInfo >
   {
     uint8_t classId;

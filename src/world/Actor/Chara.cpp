@@ -436,6 +436,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     effectEntry.value = damage;
     effectEntry.effectType = ActionEffectType::Damage;
     effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
+    effectEntry.param = 0x71;
     effectPacket->addEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
