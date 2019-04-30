@@ -401,6 +401,9 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
   auto pNaviProvider = m_pCurrentZone->getNaviProvider();
 
+  if( !pNaviProvider )
+    return;
+
   switch( m_state )
   {
     case BNpcState::Dead:
