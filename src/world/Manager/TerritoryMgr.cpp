@@ -261,8 +261,9 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   if( !isValidTerritory( territoryTypeId ) )
     return nullptr;
 
-  if( isInstanceContentTerritory( territoryTypeId ) )
-    return nullptr;
+//  nb: disabled for now because there's not a real reason to have this constraint, makes testing some stuff easier too
+//  if( isInstanceContentTerritory( territoryTypeId ) )
+//    return nullptr;
 
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto pTeri = getTerritoryDetail( territoryTypeId );
@@ -436,7 +437,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
 bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t guId )
 {
   ZonePtr pZone;
-  if( ( pZone = getInstanceZonePtr( guId ) ) == nullptr )
+  if( ( pZone = getTerritoryByGuId( guId ) ) == nullptr )
     return false;
 
   m_guIdToZonePtrMap.erase( pZone->getGuId() );
@@ -455,7 +456,7 @@ bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t g
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getInstanceZonePtr( uint32_t guId ) const
+Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getTerritoryByGuId( uint32_t guId ) const
 {
   auto it = m_guIdToZonePtrMap.find( guId );
   if( it == m_guIdToZonePtrMap.end() )
@@ -646,7 +647,7 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getLinkedInstance( uin
   auto it = m_playerIdToInstanceMap.find( playerId );
   if( it != m_playerIdToInstanceMap.end() )
   {
-    return getInstanceZonePtr( it->second );
+    return getTerritoryByGuId( it->second );
   }
   return nullptr;
 }

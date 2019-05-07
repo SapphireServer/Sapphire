@@ -430,7 +430,7 @@ bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
   m_onEnterEventDone = false;
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
-  auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
+  auto instance = pTeriMgr->getTerritoryByGuId( instanceContentId );
   if( !instance )
     return false;
 
