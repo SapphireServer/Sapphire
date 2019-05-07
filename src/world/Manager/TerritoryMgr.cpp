@@ -261,8 +261,9 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
   if( !isValidTerritory( territoryTypeId ) )
     return nullptr;
 
-  if( isInstanceContentTerritory( territoryTypeId ) )
-    return nullptr;
+//  nb: disabled for now because there's not a real reason to have this constraint, makes testing some stuff easier too
+//  if( isInstanceContentTerritory( territoryTypeId ) )
+//    return nullptr;
 
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
   auto pTeri = getTerritoryDetail( territoryTypeId );
