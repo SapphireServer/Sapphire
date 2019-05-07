@@ -822,10 +822,16 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance )
+    auto terri = pTeriMgr->getTerritoryByGuId( instanceId );
+    if( terri )
     {
-      auto pInstanceContent = instance->getAsInstanceContent();
+      auto pInstanceContent = terri->getAsInstanceContent();
+      if( !pInstanceContent )
+      {
+        player.sendDebug( "Instance id#{} is not an InstanceContent territory.", instanceId );
+        return;
+      }
+
       pInstanceContent->bindPlayer( player.getId() );
       player.sendDebug(
         "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
@@ -839,7 +845,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    auto instance = pTeriMgr->getTerritoryByGuId( instanceId );
     if( !instance )
     {
       player.sendDebug( "Unknown instance with id#{0} ", instanceId );

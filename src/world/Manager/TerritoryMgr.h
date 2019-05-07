@@ -116,7 +116,7 @@ namespace Sapphire::World::Manager
     bool removeTerritoryInstance( uint32_t guId );
 
     /*! returns a ZonePtr to the instance or nullptr if not found */
-    ZonePtr getInstanceZonePtr( uint32_t guId ) const;
+    ZonePtr getTerritoryByGuId( uint32_t guId ) const;
 
     /*! returns the cached detail of a territory, nullptr if not found */
     Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;
