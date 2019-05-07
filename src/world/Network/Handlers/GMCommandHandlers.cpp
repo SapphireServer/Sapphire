@@ -465,7 +465,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Teri:
     {
       auto pTeriMgr = pFw->get< TerritoryMgr >();
-      if( auto instance = pTeriMgr->getInstanceZonePtr( param1 ) )
+      if( auto instance = pTeriMgr->getTerritoryByGuId( param1 ) )
       {
         player.sendDebug( "Found instance: {0}, id#{1}", instance->getName(), param1 );
 
