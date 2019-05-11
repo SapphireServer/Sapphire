@@ -10,7 +10,8 @@ namespace Sapphire::Math
   class CalcStats
   {
   public:
-    static const uint32_t AUTO_ATTACK_POTENCY = 100;
+    static const uint32_t AUTO_ATTACK_POTENCY = 110;
+    static const uint32_t RANGED_AUTO_ATTACK_POTENCY = 100;
 
     static float calculateBaseStat( const Entity::Chara& chara );
 
@@ -48,6 +49,8 @@ namespace Sapphire::Math
      * @param potency The action potency
      */
     static float potency( uint16_t potency );
+
+    static float autoAttackPotency( const Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Weapon damage is the contribution the weapon's damage rating
