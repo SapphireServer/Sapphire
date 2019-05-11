@@ -793,7 +793,14 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
 
     case Common::BaseParam::AttackPower:
     {
-      // todo: think this is right... not sure
+      auto primaryStat = getPrimaryStat();
+
+      // everything else uses str for atk power except for brd/rogue/etc who use dex
+      if( primaryStat == Common::BaseParam::Dexterity )
+      {
+        return getStatValue( primaryStat );
+      }
+
       return getStatValue( Common::BaseParam::Strength );
     }
 

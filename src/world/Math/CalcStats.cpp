@@ -308,6 +308,40 @@ float CalcStats::potency( uint16_t potency )
   return potency / 100.f;
 }
 
+float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
+{
+  uint32_t aaPotency = AUTO_ATTACK_POTENCY;
+
+  // check if ranged class
+  switch( chara.getClass() )
+  {
+    case Common::ClassJob::Machinist:
+    case Common::ClassJob::Bard:
+    case Common::ClassJob::Archer:
+      aaPotency = RANGED_AUTO_ATTACK_POTENCY;
+
+    default:
+      break;
+  }
+
+  float autoAttackDelay = 2.5f;
+  // fetch actual auto attack delay if its a player
+  if( chara.isPlayer() )
+  {
+    // todo: ew
+    auto pPlayer = const_cast< Entity::Chara& >( chara ).getAsPlayer();
+    assert( pPlayer );
+
+    auto pItem = pPlayer->getEquippedWeapon();
+    assert( pItem );
+
+    autoAttackDelay = pItem->getDelay() / 1000.f;
+  }
+
+  // factors in f(PTC) in order to not lose precision
+  return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
+}
+
 float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
 {
   const auto& baseStats = chara.getStats();
@@ -491,7 +525,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  auto innerCalc = std::floor( ( ( mainVal * primaryStatValue( chara ) ) / 1000.f ) + weaponDamage );
+  auto innerCalc = std::floor( ( mainVal * primaryStatValue( chara ) / 1000.f ) + weaponDamage );
 
   return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
 }
@@ -506,7 +540,7 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
 
-  auto pot = potency( AUTO_ATTACK_POTENCY );
+  auto pot = autoAttackPotency( chara );
   auto aa = autoAttack( chara );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
