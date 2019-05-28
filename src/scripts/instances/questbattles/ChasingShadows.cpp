@@ -61,23 +61,20 @@ public:
     auto papa = instance.getActiveBNpcByLevelId( INIT_P_POP_PAPARIMO );
     auto pPlayer = instance.getPlayerPtr();
 
+    uint32_t bossHpPercent = 0;
+    if( boss )
+      bossHpPercent = boss->getHpPercent();
+
     if( pPlayer && !pPlayer->isAlive() )
     {
       instance.fail();
       return;
     }
 
-    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
-    {
-      instance.setCustomVar( SUCCESS_CALLED, 1 );
-      instance.success();
-      return;
-    }
-
-    if( !boss || !ida || !papa )
+    if( !ida || !papa )
       return;
 
-    if( pair1Spawnd == 0 && boss->getHpPercent() <= 75 )
+    if( pair1Spawnd == 0 && bossHpPercent <= 75 )
     {
       instance.setCustomVar( SET_1_SPAWNED, 1 );
       auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_03, 10, 0, 1440, 938,
@@ -105,7 +102,7 @@ public:
       a5->hateListAdd( pPlayer, 1 );
     }
 
-    if( pair2Spawnd == 0 && boss->getHpPercent() <= 50 )
+    if( pair2Spawnd == 0 && bossHpPercent <= 50 )
     {
       instance.setCustomVar( SET_2_SPAWNED, 1 );
       auto a2 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_B_05, 10, 0, 1440, 938,
@@ -133,7 +130,7 @@ public:
 
     }
 
-    if( pair3Spawnd == 0 && boss->getHpPercent() <= 25 )
+    if( pair3Spawnd == 0 && bossHpPercent <= 25 )
     {
       instance.setCustomVar( SET_3_SPAWNED, 1 );
 
@@ -147,6 +144,13 @@ public:
       auto pPlayer = instance.getPlayerPtr();
       a4->hateListAdd( pPlayer, 1 );
       a5->hateListAdd( pPlayer, 1 );
+    }
+
+    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
+    {
+      instance.setCustomVar( SUCCESS_CALLED, 1 );
+      instance.success();
+      return;
     }
   }
 
