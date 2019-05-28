@@ -385,7 +385,7 @@ uint32_t Sapphire::QuestBattle::getQuestId() const
 uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()
 {
   uint32_t count = 0;
-  for( auto bnpcIt : m_bNpcMap )
+  for( const auto& bnpcIt : m_bNpcMap )
   {
     if( bnpcIt.second->getEnemyType() == 4 && bnpcIt.second->isAlive() )
       count++;
