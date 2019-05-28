@@ -67,6 +67,13 @@ public:
       return;
     }
 
+    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
+    {
+      instance.setCustomVar( SUCCESS_CALLED, 1 );
+      instance.success();
+      return;
+    }
+
     if( !boss || !ida || !papa )
       return;
 
@@ -141,14 +148,6 @@ public:
       a4->hateListAdd( pPlayer, 1 );
       a5->hateListAdd( pPlayer, 1 );
     }
-
-    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
-    {
-      instance.setCustomVar( SUCCESS_CALLED, 1 );
-      instance.success();
-      return;
-    }
-
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
