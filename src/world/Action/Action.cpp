@@ -491,7 +491,7 @@ bool Sapphire::Action::Action::consumeResources()
 
 bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
 {
-  for( const auto& actor : m_pSource->getInRangeActors() )
+  for( const auto& actor : m_pSource->getInRangeActors( true ) )
   {
     // check for initial target validity based on flags in action exd (pc/enemy/etc.)
     if( !preFilterActor( *actor ) )
@@ -515,9 +515,8 @@ bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::Char
       player->sendDebug( "hit actor#{}", actor->getId() );
     }
   }
-  if( actors.empty() )
-    return false;
-  return true;
+
+  return !actors.empty();
 }
 
 void Sapphire::Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
