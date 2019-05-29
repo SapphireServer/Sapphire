@@ -1485,6 +1485,7 @@ struct ClassJob
    uint8_t classJobParent;
    std::string nameEnglish;
    int32_t itemStartingWeapon;
+   uint8_t primaryStat;
    uint16_t limitBreak1;
    uint16_t limitBreak2;
    uint16_t limitBreak3;

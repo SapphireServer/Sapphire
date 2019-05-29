@@ -933,6 +933,8 @@ namespace Sapphire::Entity
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();
 
+    ItemPtr getEquippedWeapon();
+
     /*! return the current amount of currency of type */
     uint32_t getCurrency( Common::CurrencyType type );
 
@@ -964,6 +966,8 @@ namespace Sapphire::Entity
 
     Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     void sendHuntingLog();
@@ -973,8 +977,6 @@ namespace Sapphire::Entity
     void updateHuntingLog( uint16_t id );
 
     World::SessionPtr getSession();
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     uint64_t m_lastMoveTime;
     uint8_t m_lastMoveflag;
