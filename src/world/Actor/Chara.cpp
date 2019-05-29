@@ -21,7 +21,7 @@
 #include "Action/Action.h"
 #include "ServerMgr.h"
 #include "Session.h"
-#include "Math/CalcBattle.h"
+#include "Math/CalcStats.h"
 #include "Chara.h"
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
@@ -719,4 +719,150 @@ void Sapphire::Entity::Chara::setAgentId( uint32_t agentId )
 float Sapphire::Entity::Chara::getRadius() const
 {
   return m_radius;
+}
+
+Sapphire::Common::BaseParam Sapphire::Entity::Chara::getPrimaryStat() const
+{
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+
+  auto classJob = exdData->get< Data::ClassJob >( static_cast< uint16_t >( getClass() ) );
+  assert( classJob );
+
+  return static_cast< Sapphire::Common::BaseParam >( classJob->primaryStat );
+}
+
+uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam baseParam ) const
+{
+  uint32_t value = 0;
+
+  switch( baseParam )
+  {
+    case Common::BaseParam::Strength:
+    {
+      value = m_baseStats.str;
+      break;
+    }
+
+    case Common::BaseParam::Dexterity:
+    {
+      value = m_baseStats.dex;
+      break;
+    }
+
+    case Common::BaseParam::Vitality:
+    {
+      value = m_baseStats.vit;
+      break;
+    }
+
+    case Common::BaseParam::Intelligence:
+    {
+      value = m_baseStats.inte;
+      break;
+    }
+
+    case Common::BaseParam::Mind:
+    {
+      value = m_baseStats.mnd;
+      break;
+    }
+
+    case Common::BaseParam::Piety:
+    {
+      value = m_baseStats.pie;
+      break;
+    }
+
+    case Common::BaseParam::Determination:
+    {
+      value = m_baseStats.determination;
+      break;
+    }
+
+    case Common::BaseParam::HP:
+    {
+      value = m_baseStats.max_hp;
+      break;
+    }
+
+    case Common::BaseParam::MP:
+    {
+      value = m_baseStats.max_mp;
+      break;
+    }
+
+    case Common::BaseParam::AttackPower:
+    {
+      auto primaryStat = getPrimaryStat();
+
+      // everything else uses str for atk power except for brd/rogue/etc who use dex
+      if( primaryStat == Common::BaseParam::Dexterity )
+      {
+        return getStatValue( primaryStat );
+      }
+
+      return getStatValue( Common::BaseParam::Strength );
+    }
+
+    case Common::BaseParam::AttackMagicPotency:
+    {
+      value = m_baseStats.attackPotMagic;
+      break;
+    }
+
+    case Common::BaseParam::HealingMagicPotency:
+    {
+      value = m_baseStats.healingPotMagic;
+      break;
+    }
+
+    case Common::BaseParam::SkillSpeed:
+    {
+      value = m_baseStats.skillSpeed;
+      break;
+    }
+
+    case Common::BaseParam::SpellSpeed:
+    {
+      value = m_baseStats.spellSpeed;
+      break;
+    }
+
+    case Common::BaseParam::CriticalHit:
+    {
+      value = m_baseStats.critHitRate;
+      break;
+    }
+
+    case Common::BaseParam::Defense:
+    {
+      value = m_baseStats.defense;
+      break;
+    }
+
+    case Common::BaseParam::MagicDefense:
+    {
+      value = m_baseStats.magicDefense;
+      break;
+    }
+
+    case Common::BaseParam::Tenacity:
+    {
+      value = m_baseStats.tenacity;
+      break;
+    }
+
+    // todo: not sure if this is right?
+    case Common::BaseParam::DirectHitRate:
+    {
+      value = m_baseStats.accuracy;
+      break;
+    }
+
+    default:
+      break;
+  }
+
+  return value + getBonusStat( baseParam );
 }

@@ -118,6 +118,8 @@ namespace Sapphire::Entity
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
 
+    void calculateStats() override;
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;

@@ -831,17 +831,6 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fr
   queuePacket( invTransFinPacket );
 }
 
-void Sapphire::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
-{
-  m_activeLand.plot = land;
-  m_activeLand.ward = ward;
-}
-
-Sapphire::Common::ActiveLand Sapphire::Entity::Player::getActiveLand() const
-{
-  return m_activeLand;
-}
-
 uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
 {
   uint32_t iLvlResult = 0;
@@ -854,7 +843,7 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
   {
     auto currItem = it->second;
 
-    if( currItem )
+    if( currItem && currItem->getCategory() != Common::ItemUICategory::SoulCrystal )
     {
       iLvlResult += currItem->getItemLevel();
 
@@ -871,6 +860,10 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
   return static_cast< uint16_t >( std::min( static_cast< int32_t >( iLvlResult / 13 ), 9999 ) );
 }
 
+Sapphire::ItemPtr Sapphire::Entity::Player::getEquippedWeapon()
+{
+  return m_storageMap[ GearSet0 ]->getItem( GearSetSlot::MainHand );
+}
 
 uint8_t Sapphire::Entity::Player::getFreeSlotsInBags()
 {
