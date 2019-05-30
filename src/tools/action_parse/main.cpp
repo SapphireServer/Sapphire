@@ -17,7 +17,11 @@
 #include <streambuf>
 #include <regex>
 
+#include <experimental/filesystem>
+
 Sapphire::Data::ExdDataGenerated g_exdData;
+
+namespace fs = std::experimental::filesystem;
 
 using namespace Sapphire;
 
@@ -70,6 +74,9 @@ int main()
 
   Logger::init( "action_parse" );
 
+  if( !fs::exists( "ActionLut.cpp.tmpl" ) )
+    throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
+
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
@@ -78,7 +85,7 @@ int main()
   }
   auto idList = g_exdData.getActionIdList();
 
-  std::unordered_map< uint32_t, ActionEntry > actions;
+  std::map< uint32_t, ActionEntry > actions;
 
   auto total = idList.size();
   int cursor = 0;
@@ -233,13 +240,33 @@ int main()
 
   // dump entries
   Logger::info( "Found {} player actions", actions.size() );
+
+  std::string output;
   for( const auto& action : actions )
   {
     const auto& data = action.second;
-    Logger::info( " - {:<5} {:<25} pot: {:<4} flank pot: {:<4} front pot: {:<4} rear pot: {:<4} cure pot: {:<4} restore %: {:<4}",
-                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
-                  data.curePotency, data.restorePercentage );
+//    Logger::info( " - {:<5} {:<25} pot: {:<4} flank pot: {:<4} front pot: {:<4} rear pot: {:<4} cure pot: {:<4} restore %: {:<4}",
+//                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
+//                  data.curePotency, data.restorePercentage );
+
+    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {} }} }},\n",
+                            data.name, action.first,
+                            data.potency, data.flankPotency, data.frontPotency, data.rearPotency, data.curePotency );
+
+    output += out;
+//    Logger::info( out );
   }
+
+  std::ifstream ifs( "ActionLut.cpp.tmpl" );
+
+  std::string actionTmpl( ( std::istreambuf_iterator< char >( ifs ) ),
+                            std::istreambuf_iterator< char >() );
+
+  auto result = std::regex_replace( actionTmpl, std::regex( "%INSERT_GARBAGE%" ), output );
+
+  std::ofstream outH( "ActionLut.cpp" );
+  outH << result;
+  outH.close();
 
   return 0;
 }
