@@ -75,7 +75,7 @@ namespace Sapphire::World::Action
      * @brief Tests if an action is castable by the current source chara
      * @return true if castable, false if the caster doesn't meet the requirements
      */
-    bool precheck();
+    bool preCheck();
 
     /*!
      * @brief Snapshots characters affected by a cast.
@@ -135,7 +135,7 @@ namespace Sapphire::World::Action
     bool primaryCostCheck( bool subtractCosts );
     bool secondaryCostCheck( bool subtractCosts );
 
-    bool playerPrecheck( Entity::Player& player );
+    bool playerPreCheck( Entity::Player& player );
 
     bool preFilterActor( Entity::Actor& actor ) const;
 

@@ -22,6 +22,7 @@ namespace Sapphire::World::Action
     using Lut = std::unordered_map< uint16_t, ActionEntry >;
 
     static bool validEntryExists( uint16_t actionId );
+    static const ActionEntry& getEntry( uint16_t actionId );
 
     static Lut m_actionLut;
   };
