@@ -90,7 +90,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
-  if( !currentAction->precheck() )
+  if( !currentAction->preCheck() )
   {
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();

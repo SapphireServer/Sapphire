@@ -239,17 +239,16 @@ void Action::start()
   player->queuePacket( actionStartPkt );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  if( !pScriptMgr->onStart( *this ) )
-  {
-    // check the lut initially and see if we have something usable, otherwise cancel the cast
-//    Sapphire::World::Action::ActionLut::validEntryExists( getId() );
 
-    // script not implemented
+  // check the lut too and see if we have something usable, otherwise cancel the cast
+  if( !pScriptMgr->onStart( *this ) && !ActionLut::validEntryExists( getId() ) )
+  {
+    // script not implemented and insufficient lut data (no potencies)
     interrupt();
 
     if( player )
     {
-      player->sendUrgent( "Action not implemented, missing script for action#{0}", getId() );
+      player->sendUrgent( "Action not implemented, missing script/lut entry for action#{0}", getId() );
       player->setCurrentAction( nullptr );
     }
 
@@ -335,7 +334,17 @@ void Action::execute()
     if( !m_hitActors.empty() )
     {
       // only call script if actors are hit
-      pScriptMgr->onExecute( *this );
+      if( !pScriptMgr->onExecute( *this ) && ActionLut::validEntryExists( getId() ) )
+      {
+        auto lutEntry = ActionLut::getEntry( getId() );
+
+        // no script exists but we have a valid lut entry
+        if( auto player = getSourceChara()->getAsPlayer() )
+        {
+          player->sendDebug( "Hit target: pot: {} (f: {}, r: {}), heal pot: {}",
+                             lutEntry.potency, lutEntry.flankPotency, lutEntry.rearPotency, lutEntry.curePotency );
+        }
+      }
     }
   }
   else if( auto player = m_pSource->getAsPlayer() )
@@ -352,18 +361,18 @@ void Action::execute()
   }
 }
 
-bool Action::precheck()
+bool Action::preCheck()
 {
   if( auto player = m_pSource->getAsPlayer() )
   {
-    if( !playerPrecheck( *player ) )
+    if( !playerPreCheck( *player ) )
       return false;
   }
 
   return true;
 }
 
-bool Action::playerPrecheck( Entity::Player& player )
+bool Action::playerPreCheck( Entity::Player& player )
 {
   // lol
   if( !player.isAlive() )
@@ -393,17 +402,18 @@ bool Action::playerPrecheck( Entity::Player& player )
       return false;
   }
 
-  // reset target on actions that can only be casted on yourself while having a target set
-  // todo: check what actions send when targeting an enemy
-//  if( m_actionData->canTargetSelf &&
-//      !m_actionData->canTargetFriendly &&
-//      !m_actionData->canTargetHostile &&
-//      !m_actionData->canTargetParty )
-//  {
-//    setTargetId( getSourceChara() );
-//  }
+  if( !m_actionData->canTargetSelf && getTargetId() == m_pSource->getId() )
+    return false;
 
-  // todo: party/enemy validation
+  // todo: does this need to check for party/alliance stuff or it's just same type?
+  // todo: m_pTarget doesn't exist at this stage because we only fill it when we snapshot targets
+//  if( !m_actionData->canTargetFriendly && m_pSource->getObjKind() == m_pTarget->getObjKind() )
+//    return false;
+//
+//  if( !m_actionData->canTargetHostile && m_pSource->getObjKind() != m_pTarget->getObjKind() )
+//    return false;
+
+  // todo: party/dead validation
 
   // validate range
 
