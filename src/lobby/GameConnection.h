@@ -36,8 +36,8 @@ namespace Sapphire::Network
 
     LobbySessionPtr m_pSession;
 
-    LockedQueue< Packets::GamePacketPtr > m_inQueue;
-    LockedQueue< Packets::GamePacketPtr > m_outQueue;
+    Common::Util::LockedQueue< Packets::GamePacketPtr > m_inQueue;
+    Common::Util::LockedQueue< Packets::GamePacketPtr > m_outQueue;
     std::vector< uint8_t > m_packets;
 
   public:

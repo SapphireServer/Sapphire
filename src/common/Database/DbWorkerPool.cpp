@@ -21,7 +21,7 @@ class PingOperation : public Sapphire::Db::Operation
 
 template< class T >
 Sapphire::Db::DbWorkerPool< T >::DbWorkerPool() :
-  m_queue( new Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >() ),
+  m_queue( new Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >() ),
   m_asyncThreads( 0 ),
   m_synchThreads( 0 )
 {

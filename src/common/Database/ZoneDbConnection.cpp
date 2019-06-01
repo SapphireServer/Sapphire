@@ -6,7 +6,7 @@ Sapphire::Db::ZoneDbConnection::ZoneDbConnection( ConnectionInfo& connInfo ) :
 {
 }
 
-Sapphire::Db::ZoneDbConnection::ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q,
+Sapphire::Db::ZoneDbConnection::ZoneDbConnection( Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* q,
                                                   ConnectionInfo& connInfo ) :
   DbConnection( q, connInfo )
 {

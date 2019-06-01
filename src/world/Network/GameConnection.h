@@ -51,8 +51,8 @@ namespace Sapphire::Network
 
     World::SessionPtr m_pSession;
 
-    LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
-    LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
+    Common::Util::LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+    Common::Util::LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
     std::vector< uint8_t > m_packets;
 
   public:

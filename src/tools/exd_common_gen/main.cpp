@@ -55,7 +55,7 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
     }
 
     std::string remove = ",_-':!(){} \x02\x1f\x01\x03";
-    Sapphire::Util::eraseAllIn( value, remove );
+    Common::Util::eraseAllIn( value, remove );
 
     value[ 0 ] = std::toupper( value[ 0 ] );
 

@@ -12,7 +12,7 @@ public:
   {
   }
 
-  void onExecute( Sapphire::Action::Action& action ) override
+  void onExecute( Sapphire::World::Action::Action& action ) override
   {
     for( auto& chara : action.getHitCharas() )
     {

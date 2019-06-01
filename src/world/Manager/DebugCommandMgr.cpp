@@ -683,7 +683,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().r16 = Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
     player.queuePacket( setActorPosPacket );
   }
 }

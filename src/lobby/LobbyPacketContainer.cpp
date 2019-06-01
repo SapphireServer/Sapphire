@@ -48,7 +48,7 @@ uint8_t* Sapphire::Network::Packets::LobbyPacketContainer::getRawData( bool adds
   if( addstuff )
   {
     m_header.unknown_0 = 0xff41a05252;
-    m_header.timestamp = Sapphire::Util::getTimeMs();
+    m_header.timestamp = Common::Util::getTimeMs();
   }
   memcpy( m_dataBuf, &m_header, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
   return m_dataBuf;

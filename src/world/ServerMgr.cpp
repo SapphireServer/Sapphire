@@ -270,8 +270,8 @@ void Sapphire::World::ServerMgr::mainLoop()
   {
     std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 
-    auto currTime = Util::getTimeSeconds();
-    auto tickCount = Util::getTimeMs();
+    auto currTime = Common::Util::getTimeSeconds();
+    auto tickCount = Common::Util::getTimeMs();
 
     pTeriMgr->updateTerritoryInstances( tickCount );
 

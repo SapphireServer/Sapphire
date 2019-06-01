@@ -419,7 +419,7 @@ void Sapphire::Zone::updateBNpcs( uint64_t tickCount )
     return;
 
   m_lastMobUpdate = tickCount;
-  uint64_t currTime = Sapphire::Util::getTimeSeconds();
+  uint64_t currTime = Common::Util::getTimeSeconds();
 
   for( const auto& entry : m_bNpcMap )
   {
