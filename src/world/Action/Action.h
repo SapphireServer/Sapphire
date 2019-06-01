@@ -11,7 +11,7 @@ namespace Sapphire::Data
   using ActionPtr = std::shared_ptr< Action >;
 }
 
-namespace Sapphire::Action
+namespace Sapphire::World::Action
 {
 
   class Action

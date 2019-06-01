@@ -17,7 +17,7 @@ Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
 
 }
 
-Sapphire::Db::DbConnection::DbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* queue,
+Sapphire::Db::DbConnection::DbConnection( Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* queue,
                                           Sapphire::Db::ConnectionInfo& connInfo ) :
   m_reconnecting( false ),
   m_prepareError( false ),

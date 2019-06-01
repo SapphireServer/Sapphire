@@ -76,7 +76,7 @@ std::string Sapphire::Network::Packets::PacketContainer::toString()
   std::string str = "\n";
   for( uint32_t i = 0; i < m_ipcHdr.size; i++ )
   {
-    str += Util::intToHexString( static_cast< int32_t >( tmpBuffer[ i ] & 0xFF ) ) + " ";
+    str += Common::Util::intToHexString( static_cast< int32_t >( tmpBuffer[ i ] & 0xFF ) ) + " ";
 
     if( ( i + 1 ) % 16 == 0 )
       str += "\n";

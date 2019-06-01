@@ -12,7 +12,7 @@ public:
   {
   }
 
-  void onExecute( Sapphire::Action::Action& action ) override
+  void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto chara = action.getHitChara();
     chara->takeDamage( chara->getMaxHp() * 0.34f );

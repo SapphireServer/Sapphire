@@ -121,7 +121,7 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-    outStr += Sapphire::Util::intToHexString( pBinData[ i ] & 0xFF );
+    outStr += Common::Util::intToHexString( pBinData[ i ] & 0xFF );
   }
 
   return outStr;

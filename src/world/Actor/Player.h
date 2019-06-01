@@ -53,12 +53,12 @@ namespace Sapphire::Entity
     // EventHandlers
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! start an event action */
-    void eventActionStart( uint32_t eventId, uint32_t action, Action::ActionCallback finishCallback,
-                           Action::ActionCallback interruptCallback, uint64_t additional );
+    void eventActionStart( uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
+                           World::Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start an event item action */
-    void eventItemActionStart( uint32_t eventId, uint32_t action, Action::ActionCallback finishCallback,
-                               Action::ActionCallback interruptCallback, uint64_t additional );
+    void eventItemActionStart( uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
+                               World::Action::ActionCallback interruptCallback, uint64_t additional );
 
     /*! start/register a normal event */
     void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1,
@@ -1107,8 +1107,8 @@ namespace Sapphire::Entity
 
     Common::PlayerTeleportQuery m_teleportQuery;
 
-    Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
-    Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+    Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
+    Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
 

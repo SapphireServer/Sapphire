@@ -18,7 +18,7 @@
 class case_insensitive_equals {
 public:
   bool operator()(const std::string &key1, const std::string &key2) const {
-    return Sapphire::Util::toLowerCopy( key1 ) == Sapphire::Util::toLowerCopy( key2 );
+    return Sapphire::Common::Util::toLowerCopy( key1 ) == Sapphire::Common::Util::toLowerCopy( key2 );
   }
 };
 class case_insensitive_hash {
@@ -27,7 +27,7 @@ public:
   {
     std::size_t seed=0;
     for( auto &c : key )
-      Sapphire::Util::hashCombine< char >( seed, std::tolower( c ) );
+      Sapphire::Common::Util::hashCombine< char >( seed, std::tolower( c ) );
     return seed;
   }
 };
@@ -388,7 +388,7 @@ namespace SimpleWeb {
                         
                         auto range=request->header.equal_range("Connection");
                         for(auto it=range.first;it!=range.second;it++) {
-                            if( Sapphire::Util::toLowerCopy( it->second ) == "close" )
+                            if( Sapphire::Common::Util::toLowerCopy( it->second ) == "close" )
                                 return;
                         }
                         if(http_version>1.05)

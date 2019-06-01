@@ -112,7 +112,7 @@ namespace Sapphire::Db
 
     ZoneDbConnection( ConnectionInfo& connInfo );
 
-    ZoneDbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
+    ZoneDbConnection( Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* q, ConnectionInfo& connInfo );
 
     ~ZoneDbConnection();
 

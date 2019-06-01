@@ -1621,7 +1621,7 @@ void Sapphire::Entity::Player::setCFPenaltyTimestamp( uint32_t timestamp )
 
 uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 {
-  auto currentTimestamp = Sapphire::Util::getTimeSeconds();
+  auto currentTimestamp = Common::Util::getTimeSeconds();
   auto endTimestamp = getCFPenaltyTimestamp();
 
   // check if penalty timestamp already passed current time
@@ -1634,7 +1634,7 @@ uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 
 void Sapphire::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
-  auto currentTimestamp = Sapphire::Util::getTimeSeconds();
+  auto currentTimestamp = Common::Util::getTimeSeconds();
   setCFPenaltyTimestamp( currentTimestamp + minutes * 60 );
 }
 

@@ -14,8 +14,8 @@ namespace fs = std::experimental::filesystem;
 
 Sapphire::World::Session::Session( uint32_t sessionId, FrameworkPtr pFw ) :
   m_sessionId( sessionId ),
-  m_lastDataTime( Util::getTimeSeconds() ),
-  m_lastSqlTime( Util::getTimeSeconds() ),
+  m_lastDataTime( Common::Util::getTimeSeconds() ),
+  m_lastSqlTime( Common::Util::getTimeSeconds() ),
   m_isValid( false ),
   m_pFw( std::move( pFw ) ),
   m_isReplaying( false )
@@ -102,12 +102,12 @@ bool Sapphire::World::Session::isValid() const
 
 void Sapphire::World::Session::updateLastDataTime()
 {
-  m_lastDataTime = Util::getTimeSeconds();
+  m_lastDataTime = Common::Util::getTimeSeconds();
 }
 
 void Sapphire::World::Session::updateLastSqlTime()
 {
-  m_lastSqlTime = Util::getTimeSeconds();
+  m_lastSqlTime = Common::Util::getTimeSeconds();
 }
 
 void Sapphire::World::Session::startReplay( const std::string& path )
@@ -146,7 +146,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
   for( auto set : loadedSets )
   {
     m_replayCache.push_back( std::tuple< uint64_t, std::string >(
-      Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
+      Common::Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
     Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
   }
@@ -166,7 +166,7 @@ void Sapphire::World::Session::processReplay()
   int at = 0;
   for( const auto& set : m_replayCache )
   {
-    if( std::get< 0 >( set ) <= Util::getTimeMs() )
+    if( std::get< 0 >( set ) <= Common::Util::getTimeMs() )
     {
       m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
       m_replayCache.erase( m_replayCache.begin() + at );
@@ -201,9 +201,9 @@ void Sapphire::World::Session::update()
     m_pZoneConnection->processInQueue();
 
     // SESSION LOGIC
-    m_pPlayer->update( Util::getTimeMs() );
+    m_pPlayer->update( Common::Util::getTimeMs() );
 
-    if( Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
+    if( Common::Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
     {
       updateLastSqlTime();
       m_pPlayer->updateSql();

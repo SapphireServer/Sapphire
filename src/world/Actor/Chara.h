@@ -102,7 +102,7 @@ namespace Sapphire::Entity
     /*! Id of the currently selected target actor */
     uint64_t m_targetId;
     /*! Ptr to a queued action */
-    Action::ActionPtr m_pCurrentAction;
+    World::Action::ActionPtr m_pCurrentAction;
     /*! id of the director this chara is assigned to */
     uint32_t m_directorId;
 
@@ -265,9 +265,9 @@ namespace Sapphire::Entity
 
     virtual void update( uint64_t tickCount );
 
-    Action::ActionPtr getCurrentAction() const;
+    World::Action::ActionPtr getCurrentAction() const;
 
-    void setCurrentAction( Action::ActionPtr pAction );
+    void setCurrentAction( World::Action::ActionPtr pAction );
 
     uint32_t getLastComboActionId() const;
     void setLastComboActionId( uint32_t actionId );

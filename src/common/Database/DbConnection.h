@@ -42,7 +42,7 @@ namespace Sapphire::Db
     DbConnection( ConnectionInfo& connInfo );
 
     // Constructor for asynchronous connections.
-    DbConnection( Sapphire::LockedWaitQueue< std::shared_ptr< Operation > >* queue, ConnectionInfo& connInfo );
+    DbConnection( Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* queue, ConnectionInfo& connInfo );
 
     virtual ~DbConnection();
 
@@ -92,7 +92,7 @@ namespace Sapphire::Db
     bool m_prepareError;
 
   private:
-    LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
+    Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
     std::shared_ptr< DbWorker > m_worker;
     std::shared_ptr< Mysql::Connection > m_pConnection;
     ConnectionInfo& m_connectionInfo;
