@@ -3,7 +3,7 @@
 #include "Connection.h"
 
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 
 Network::Acceptor::Acceptor( HivePtr hive ) :
   m_hive( hive ),

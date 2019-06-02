@@ -8,7 +8,7 @@
 #include "GamePacket.h"
 #include "Forwards.h"
 
-namespace Sapphire::Common::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;

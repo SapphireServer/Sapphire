@@ -4,7 +4,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire::Common::Network::Packets::Server {
+namespace Sapphire::Network::Packets::Server {
 
 struct FFXIVIpcRetainerList :
   FFXIVIpcBasePacket< LobbyRetainerList >

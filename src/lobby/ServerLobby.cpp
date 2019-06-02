@@ -21,6 +21,8 @@
 
 #include <thread>
 
+using namespace Sapphire;
+
 Sapphire::Lobby::Network::RestConnector g_restConnector;
 
 namespace Sapphire::Lobby
@@ -63,15 +65,15 @@ namespace Sapphire::Lobby
 
     Logger::setLogLevel( m_config.global.general.logLevel );
 
-    auto pFw = std::make_shared< Common::Framework >();
-    Common::Network::HivePtr hive( new Common::Network::Hive() );
-    Common::Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
+    auto pFw = std::make_shared< Framework >();
+    auto hive = Sapphire::Network::make_Hive();
+    Sapphire::Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
 
     Logger::info( "Lobby server running on {0}:{1}", m_ip, m_port );
 
     std::vector< std::thread > threadGroup;
 
-    threadGroup.emplace_back( std::bind( &Common::Network::Hive::run, hive.get() ) );
+    threadGroup.emplace_back( std::bind( &Sapphire::Network::Hive::run, hive.get() ) );
 
     for( auto& thread : threadGroup )
       if( thread.joinable() )

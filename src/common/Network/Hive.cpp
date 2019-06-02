@@ -2,7 +2,7 @@
 #include <functional>
 #include "Hive.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 
 //-----------------------------------------------------------------------------
 

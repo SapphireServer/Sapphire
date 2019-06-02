@@ -12,13 +12,7 @@
 #include "Acceptor.h"
 #include <memory>
 
-namespace Sapphire::Common
-{
-  class Framework;
-  using FrameworkPtr = std::shared_ptr< Framework >;
-}
-
-namespace Sapphire::Common::Network
+namespace Sapphire::Network
 {
 
   class Hive;

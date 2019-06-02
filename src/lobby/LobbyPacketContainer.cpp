@@ -6,12 +6,12 @@
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
-using namespace Sapphire::Common::Network::Packets;
+using namespace Sapphire::Network::Packets;
 
 Lobby::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
 {
-  memset( &m_header, 0, sizeof( Common::Network::Packets::FFXIVARR_PACKET_HEADER ) );
-  m_header.size = sizeof( Common::Network::Packets::FFXIVARR_PACKET_HEADER );
+  memset( &m_header, 0, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
+  m_header.size = sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER );
 
   m_encKey = encKey;
 
@@ -51,6 +51,6 @@ uint8_t* Lobby::Network::Packets::LobbyPacketContainer::getRawData( bool addstuf
     m_header.unknown_0 = 0xff41a05252;
     m_header.timestamp = Common::Util::getTimeMs();
   }
-  memcpy( m_dataBuf, &m_header, sizeof( Common::Network::Packets::FFXIVARR_PACKET_HEADER ) );
+  memcpy( m_dataBuf, &m_header, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
   return m_dataBuf;
 }
