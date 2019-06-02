@@ -10,6 +10,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
 #include <cmath>
+#include <Network/PacketWrappers/EffectPacket.h>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -521,6 +522,29 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     sscanf( params.c_str(), "%d", &id );
     player.learnAction( id );
+  }
+  else if ( subCommand == "effect")
+  {
+    uint16_t param1;
+    sscanf( params.c_str(), "%hu", &param1 );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), param1 );
+    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
+
+    Common::EffectEntry entry{};
+    entry.value = param1;
+    entry.effectType = Common::ActionEffectType::Damage;
+    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+
+    effectPacket->addEffect( entry );
+
+    auto sequence = player.getCurrentZone()->getNextEffectSequence();
+    effectPacket->setSequence( sequence );
+
+//    effectPacket->setAnimationId( param1 );
+//    effectPacket->setEffectFlags( 0 );
+
+    player.queuePacket( effectPacket );
   }
   else
   {
