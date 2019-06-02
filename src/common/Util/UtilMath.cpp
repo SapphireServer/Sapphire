@@ -17,7 +17,8 @@ float Util::distance( float x, float y, float z, float x1, float y1, float z1 )
   return sqrtf( distanceSq( x, y, z, x1, y1, z1 ) );
 }
 
-float Util::distance( const Common::FFXIVARR_POSITION3& pos1, const Common::FFXIVARR_POSITION3& pos2 )
+float Util::distance( const Sapphire::Common::FFXIVARR_POSITION3& pos1,
+                      const Sapphire::Common::FFXIVARR_POSITION3& pos2 )
 {
   return sqrtf( distanceSq( pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z ) );
 }
