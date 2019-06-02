@@ -9,10 +9,10 @@
 
 #include "Forwards.h"
 
-namespace Sapphire::Network::Packets
+namespace Sapphire::Lobby::Network::Packets
 {
 
-  using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
+  using FFXIVPacketBasePtr = std::shared_ptr< Common::Network::Packets::FFXIVPacketBase >;
 
   class LobbyPacketContainer
   {
@@ -28,7 +28,7 @@ namespace Sapphire::Network::Packets
     uint8_t* getRawData( bool addstuff = true );
 
   private:
-    Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
+    Common::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
 
     uint8_t* m_encKey;
 

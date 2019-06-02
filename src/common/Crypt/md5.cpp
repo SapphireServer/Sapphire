@@ -37,7 +37,7 @@
   (b)[(i) + 3] = (uint8_t) ( (n) >> 24 );       \
 }
 
-void Sapphire::Util::md5_starts( md5_context* ctx )
+void Sapphire::Common::Util::md5_starts( md5_context* ctx )
 {
   ctx->total[ 0 ] = 0;
   ctx->total[ 1 ] = 0;
@@ -48,7 +48,7 @@ void Sapphire::Util::md5_starts( md5_context* ctx )
   ctx->state[ 3 ] = 0x10325476;
 }
 
-void md5_process( Sapphire::Util::md5_context* ctx, uint8_t data[64] )
+void md5_process( Sapphire::Common::Util::md5_context* ctx, uint8_t data[64] )
 {
   uint32_t X[16], A, B, C, D;
 
@@ -171,7 +171,7 @@ void md5_process( Sapphire::Util::md5_context* ctx, uint8_t data[64] )
   ctx->state[ 3 ] += D;
 }
 
-void Sapphire::Util::md5_update( md5_context* ctx, uint8_t* input, uint32_t length )
+void Sapphire::Common::Util::md5_update( md5_context* ctx, uint8_t* input, uint32_t length )
 {
   uint32_t left, fill;
 
@@ -219,7 +219,7 @@ static uint8_t md5_padding[64] =
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
   };
 
-void Sapphire::Util::md5_finish( md5_context* ctx, uint8_t digest[16] )
+void Sapphire::Common::Util::md5_finish( md5_context* ctx, uint8_t digest[16] )
 {
   uint32_t last, padn;
   uint32_t high, low;
@@ -248,7 +248,7 @@ void Sapphire::Util::md5_finish( md5_context* ctx, uint8_t digest[16] )
 * those are the standard RFC 1321 test vectors
 */
 
-void Sapphire::Util::md5( uint8_t* text, uint8_t* hash, int32_t size )
+void Sapphire::Common::Util::md5( uint8_t* text, uint8_t* hash, int32_t size )
 {
   md5_context ctx;
   md5_starts( &ctx );

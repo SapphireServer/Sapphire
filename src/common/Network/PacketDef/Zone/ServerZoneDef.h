@@ -10,7 +10,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Common::Network::Packets::Server
 {
 
   /**

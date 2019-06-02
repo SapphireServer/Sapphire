@@ -16,10 +16,10 @@
 
 #define DECLARE_HANDLER( x ) void x( Packets::GamePacketPtr pInPacket, Entity::PlayerPtr pPlayer )
 
-namespace Sapphire::Network
+namespace Sapphire::Lobby::Network
 {
 
-  class GameConnection : public Connection
+  class GameConnection : public Common::Network::Connection
   {
 
   private:
@@ -32,16 +32,16 @@ namespace Sapphire::Network
 
     bool m_bEncryptionInitialized;
 
-    AcceptorPtr m_pAcceptor;
+    Common::Network::AcceptorPtr m_pAcceptor;
 
     LobbySessionPtr m_pSession;
 
-    Common::Util::LockedQueue< Packets::GamePacketPtr > m_inQueue;
-    Common::Util::LockedQueue< Packets::GamePacketPtr > m_outQueue;
+    Common::Util::LockedQueue< Common::Network::Packets::GamePacketPtr > m_inQueue;
+    Common::Util::LockedQueue< Common::Network::Packets::GamePacketPtr > m_outQueue;
     std::vector< uint8_t > m_packets;
 
   public:
-    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
+    GameConnection( Common::Network::HivePtr pHive, Common::Network::AcceptorPtr pAcceptor, Common::FrameworkPtr pFw );
 
     ~GameConnection();
 
@@ -58,26 +58,26 @@ namespace Sapphire::Network
 
     void sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId );
 
-    void getCharList( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void getCharList( Common::Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    void enterWorld( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void enterWorld( Common::Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    bool sendServiceAccountList( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    bool sendServiceAccountList( Common::Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    bool createOrModifyChar( Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    bool createOrModifyChar( Common::Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    void handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                        const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData );
+    void handlePackets( const Common::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+                        const std::vector< Common::Network::Packets::FFXIVARR_PACKET_RAW >& packetData );
 
-    void handleGamePacket( Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleGamePacket( Common::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handlePacket( Packets::FFXIVPacketBasePtr pPacket );
+    void handlePacket( Common::Network::Packets::FFXIVPacketBasePtr pPacket );
 
-    void sendPackets( Packets::PacketContainer* pPacket );
+    void sendPackets( Common::Network::Packets::PacketContainer* pPacket );
 
     void sendPacket( Packets::LobbyPacketContainer& pLpc );
 
-    void sendSinglePacket( Packets::FFXIVPacketBasePtr pPacket );
+    void sendSinglePacket( Common::Network::Packets::FFXIVPacketBasePtr pPacket );
 
 
   };

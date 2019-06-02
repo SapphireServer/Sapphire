@@ -28,12 +28,12 @@ namespace Sapphire::Network
     None
   };
 
-  class GameConnection : public Connection
+  class GameConnection : public Common::Network::Connection
   {
 
   private:
     typedef void ( GameConnection::* Handler )( FrameworkPtr pFw,
-                                                const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                const Common::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -51,7 +51,7 @@ namespace Sapphire::Network
 
     World::SessionPtr m_pSession;
 
-    Common::Util::LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+    Common::Util::LockedQueue< Common::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     Common::Util::LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
     std::vector< uint8_t > m_packets;
 

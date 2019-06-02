@@ -10,7 +10,7 @@
 // The following enumerations are structures to require their type be included.
 // They are also defined within the Sapphire::Common namespace to avoid collisions.
 // +---------------------------------------------------------------------------
-namespace Sapphire::Network::ActorControl
+namespace Sapphire::Common::Network::ActorControl
 {
 
 enum ActorControlType : uint16_t

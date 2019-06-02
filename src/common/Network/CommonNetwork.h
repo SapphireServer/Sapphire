@@ -5,7 +5,7 @@
 #include <vector>
 #include "PacketDef/Ipcs.h"
 
-namespace Sapphire::Network::Packets
+namespace Sapphire::Common::Network::Packets
 {
 
   /**
