@@ -14,7 +14,7 @@
 #include "CommonNetwork.h"
 #include "PacketDef/Ipcs.h"
 
-namespace Sapphire::Common::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   // Must forward define these in order to enable the compiler to produce the

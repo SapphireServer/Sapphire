@@ -4,7 +4,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire::Common::Network::Packets::Client
+namespace Sapphire::Network::Packets::Client
 {
 
 struct FFXIVIpcGmCommand1 :

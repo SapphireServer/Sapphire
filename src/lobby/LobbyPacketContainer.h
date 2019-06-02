@@ -12,7 +12,7 @@
 namespace Sapphire::Lobby::Network::Packets
 {
 
-  using FFXIVPacketBasePtr = std::shared_ptr< Common::Network::Packets::FFXIVPacketBase >;
+  using FFXIVPacketBasePtr = std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase >;
 
   class LobbyPacketContainer
   {
@@ -28,7 +28,7 @@ namespace Sapphire::Lobby::Network::Packets
     uint8_t* getRawData( bool addstuff = true );
 
   private:
-    Common::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
+    Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER m_header;
 
     uint8_t* m_encKey;
 

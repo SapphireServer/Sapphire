@@ -28,12 +28,12 @@ namespace Sapphire::Network
     None
   };
 
-  class GameConnection : public Common::Network::Connection
+  class GameConnection : public Network::Connection
   {
 
   private:
     typedef void ( GameConnection::* Handler )( FrameworkPtr pFw,
-                                                const Common::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                const Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -51,7 +51,7 @@ namespace Sapphire::Network
 
     World::SessionPtr m_pSession;
 
-    Common::Util::LockedQueue< Common::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+    Common::Util::LockedQueue< Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     Common::Util::LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
     std::vector< uint8_t > m_packets;
 
@@ -82,15 +82,15 @@ namespace Sapphire::Network
 
     void processOutQueue();
 
-    void handlePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handlePacket( Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleZonePacket( Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleChatPacket( Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
     void sendPackets( Packets::PacketContainer* pPacket );
 
-    void sendSinglePacket( Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
+    void sendSinglePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
 
     void injectPacket( const std::string& packetpath, Entity::Player& player );
 

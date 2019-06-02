@@ -3,8 +3,8 @@
 
 #include <string.h>   // memcpy
 
-using namespace Sapphire::Common;
-using namespace Sapphire::Common::Network::Packets;
+using namespace Sapphire;
+using namespace Sapphire::Network::Packets;
 
 PacketParseResult Network::Packets::getHeader( const std::vector< uint8_t >& buffer,
                                                          const uint32_t offset,

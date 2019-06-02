@@ -3,7 +3,7 @@
 #include <functional>
 #include "Framework.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 
 Network::Connection::Connection( HivePtr hive, FrameworkPtr pFw ) :
   m_hive( hive ),

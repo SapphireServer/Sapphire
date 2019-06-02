@@ -7,7 +7,7 @@
 #include <string.h>
 #include <memory>
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 
 Network::Packets::PacketContainer::PacketContainer( uint32_t segmentTargetOverride ) :
   m_segmentTargetOverride( segmentTargetOverride )

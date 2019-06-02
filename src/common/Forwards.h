@@ -3,6 +3,12 @@
 
 #include <memory>
 
+namespace Sapphire
+{
+  class Framework;
+  using FrameworkPtr = std::shared_ptr< Framework >;
+}
+
 namespace Sapphire::Common
 {
   class ConfigMgr;
@@ -11,7 +17,7 @@ namespace Sapphire::Common
   using FrameworkPtr = std::shared_ptr< Framework >;
 }
 
-namespace Sapphire::Common::Network
+namespace Sapphire::Network
 {
   class Hive;
   class Acceptor;
@@ -21,7 +27,7 @@ namespace Sapphire::Common::Network
   using ConnectionPtr = std::shared_ptr< Connection >;
 }
 
-namespace Sapphire::Common::Network::Packets
+namespace Sapphire::Network::Packets
 {
   class GamePacket;
   class FFXIVPacketBase;

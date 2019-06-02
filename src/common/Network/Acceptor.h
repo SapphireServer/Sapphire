@@ -13,7 +13,7 @@
 #include <vector>
 
 
-namespace Sapphire::Common::Network
+namespace Sapphire::Network
 {
 
   class Connection;

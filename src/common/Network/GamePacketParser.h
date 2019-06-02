@@ -3,7 +3,7 @@
 
 #include "CommonNetwork.h"
 
-namespace Sapphire::Common::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   enum PacketParseResult

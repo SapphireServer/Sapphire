@@ -7,13 +7,9 @@
 #include <memory>
 #include "PlayerMinimal.h"
 
-namespace Sapphire
+namespace Sapphire::API
 {
   class Session;
-}
-
-namespace Sapphire::Network
-{
 
   class SapphireAPI
   {
@@ -34,7 +30,7 @@ namespace Sapphire::Network
 
     bool insertSession( uint32_t accountId, std::string& sId );
 
-    std::vector< Sapphire::PlayerMinimal > getCharList( uint32_t accountId );
+    std::vector< API::PlayerMinimal > getCharList( uint32_t accountId );
 
     bool checkNameTaken( std::string name );
 

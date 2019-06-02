@@ -7,7 +7,7 @@
 #include <memory>
 #include <cassert>
 
-namespace Sapphire::Common
+namespace Sapphire
 {
 
   class Framework
