@@ -34,19 +34,18 @@ Action::Action() = default;
 Action::~Action() = default;
 
 Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
-                                  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
+  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
 {
 }
 
-Action::Action( Entity::CharaPtr caster, uint32_t actionId,
-                                  Data::ActionPtr actionData, FrameworkPtr fw ) :
-                                  m_pSource( std::move( caster ) ),
-                                  m_pFw( std::move( fw ) ),
-                                  m_actionData( std::move( actionData ) ),
-                                  m_id( actionId ),
-                                  m_targetId( 0 ),
-                                  m_startTime( 0 ),
-                                  m_interruptType( Common::ActionInterruptType::None )
+Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw ) :
+  m_pSource( std::move( caster ) ),
+  m_pFw( std::move( fw ) ),
+  m_actionData( std::move( actionData ) ),
+  m_id( actionId ),
+  m_targetId( 0 ),
+  m_startTime( 0 ),
+  m_interruptType( Common::ActionInterruptType::None )
 {
 }
 
