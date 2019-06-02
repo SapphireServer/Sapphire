@@ -12,9 +12,7 @@ namespace Sapphire
 namespace Sapphire::Common
 {
   class ConfigMgr;
-  class Framework;
   using ConfigMgrPtr = std::shared_ptr< ConfigMgr >;
-  using FrameworkPtr = std::shared_ptr< Framework >;
 }
 
 namespace Sapphire::Network

@@ -11,6 +11,7 @@
 #include "EventAction.h"
 #include "Framework.h"
 
+using namespace Sapphire;
 using namespace Sapphire::World;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
