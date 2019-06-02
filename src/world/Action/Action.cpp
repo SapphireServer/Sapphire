@@ -21,24 +21,24 @@
 #include <Logging/Logger.h>
 #include <Util/ActorFilter.h>
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World;
 
-using namespace Sapphire::World::Action;
 
+Action::Action::Action() = default;
+Action::Action::~Action() = default;
 
-Action::Action() = default;
-Action::~Action() = default;
-
-Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
   Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
 {
 }
 
-Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw ) :
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw ) :
   m_pSource( std::move( caster ) ),
   m_pFw( std::move( fw ) ),
   m_actionData( std::move( actionData ) ),
@@ -49,12 +49,12 @@ Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr acti
 {
 }
 
-uint32_t Action::getId() const
+uint32_t Action::Action::getId() const
 {
   return m_id;
 }
 
-bool Action::init()
+bool Action::Action::init()
 {
   if( !m_actionData )
   {
@@ -123,62 +123,62 @@ bool Action::init()
   return true;
 }
 
-void Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+void Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
 {
   m_pos = pos;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Action::getPos() const
+Sapphire::Common::FFXIVARR_POSITION3 Action::Action::getPos() const
 {
   return m_pos;
 }
 
-void Action::setTargetId( uint64_t targetId )
+void Action::Action::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
 }
 
-uint64_t Action::getTargetId() const
+uint64_t Action::Action::getTargetId() const
 {
   return m_targetId;
 }
 
-bool Action::hasClientsideTarget() const
+bool Action::Action::hasClientsideTarget() const
 {
   return m_targetId > 0xFFFFFFFF;
 }
 
-bool Action::isInterrupted() const
+bool Action::Action::isInterrupted() const
 {
   return m_interruptType != Common::ActionInterruptType::None;
 }
 
-void Action::setInterrupted( Common::ActionInterruptType type )
+void Action::Action::setInterrupted( Common::ActionInterruptType type )
 {
   m_interruptType = type;
 }
 
-uint32_t Action::getCastTime() const
+uint32_t Action::Action::getCastTime() const
 {
   return m_castTimeMs;
 }
 
-void Action::setCastTime( uint32_t castTime )
+void Action::Action::setCastTime( uint32_t castTime )
 {
   m_castTimeMs = castTime;
 }
 
-bool Action::hasCastTime() const
+bool Action::Action::hasCastTime() const
 {
   return m_castTimeMs > 0;
 }
 
-Sapphire::Entity::CharaPtr Action::getSourceChara() const
+Sapphire::Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
 }
 
-bool Action::update()
+bool Action::Action::update()
 {
   // action has not been started yet
   if( m_startTime == 0 )
@@ -206,7 +206,7 @@ bool Action::update()
   return false;
 }
 
-void Action::start()
+void Action::Action::start()
 {
   assert( m_pSource );
 
@@ -259,7 +259,7 @@ void Action::start()
     execute();
 }
 
-void Action::interrupt()
+void Action::Action::interrupt()
 {
   assert( m_pSource );
 
@@ -293,7 +293,7 @@ void Action::interrupt()
   pScriptMgr->onInterrupt( *this );
 }
 
-void Action::execute()
+void Action::Action::execute()
 {
   assert( m_pSource );
 
@@ -360,7 +360,7 @@ void Action::execute()
   }
 }
 
-bool Action::preCheck()
+bool Action::Action::preCheck()
 {
   if( auto player = m_pSource->getAsPlayer() )
   {
@@ -371,7 +371,7 @@ bool Action::preCheck()
   return true;
 }
 
-bool Action::playerPreCheck( Entity::Player& player )
+bool Action::Action::playerPreCheck( Entity::Player& player )
 {
   // lol
   if( !player.isAlive() )
@@ -423,17 +423,17 @@ bool Action::playerPreCheck( Entity::Player& player )
   return true;
 }
 
-uint32_t Action::getAdditionalData() const
+uint32_t Action::Action::getAdditionalData() const
 {
   return m_additionalData;
 }
 
-void Action::setAdditionalData( uint32_t data )
+void Action::Action::setAdditionalData( uint32_t data )
 {
   m_additionalData = data;
 }
 
-bool Action::isComboAction() const
+bool Action::Action::isComboAction() const
 {
   auto lastActionId = m_pSource->getLastComboActionId();
 
@@ -445,7 +445,7 @@ bool Action::isComboAction() const
   return m_actionData->actionCombo == lastActionId;
 }
 
-bool Action::primaryCostCheck( bool subtractCosts )
+bool Action::Action::primaryCostCheck( bool subtractCosts )
 {
   switch( m_primaryCostType )
   {
@@ -488,23 +488,23 @@ bool Action::primaryCostCheck( bool subtractCosts )
   }
 }
 
-bool Action::secondaryCostCheck( bool subtractCosts )
+bool Action::Action::secondaryCostCheck( bool subtractCosts )
 {
   // todo: these need to be mapped
   return true;
 }
 
-bool Action::hasResources()
+bool Action::Action::hasResources()
 {
   return primaryCostCheck( false ) && secondaryCostCheck( false );
 }
 
-bool Action::consumeResources()
+bool Action::Action::consumeResources()
 {
   return primaryCostCheck( true ) && secondaryCostCheck( true );
 }
 
-bool Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
+bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
 {
   for( const auto& actor : m_pSource->getInRangeActors( true ) )
   {
@@ -534,12 +534,12 @@ bool Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
   return !actors.empty();
 }
 
-void Action::addActorFilter( World::Util::ActorFilterPtr filter )
+void Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
 {
   m_actorFilters.push_back( std::move( filter ) );
 }
 
-void Action::addDefaultActorFilters()
+void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
@@ -576,7 +576,7 @@ void Action::addDefaultActorFilters()
   }
 }
 
-bool Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
+bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
 {
   auto kind = actor.getObjKind();
 
@@ -589,12 +589,12 @@ bool Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
   return true;
 }
 
-std::vector< Sapphire::Entity::CharaPtr >& Action::getHitCharas()
+std::vector< Sapphire::Entity::CharaPtr >& Action::Action::getHitCharas()
 {
   return m_hitActors;
 }
 
-Sapphire::Entity::CharaPtr Action::getHitChara()
+Sapphire::Entity::CharaPtr Action::Action::getHitChara()
 {
   if( !m_hitActors.empty() )
   {

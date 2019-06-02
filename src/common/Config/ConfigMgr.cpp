@@ -5,6 +5,7 @@
 
 namespace fs = std::experimental::filesystem;
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 
 /**
