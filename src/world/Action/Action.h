@@ -130,8 +130,6 @@ namespace Sapphire::World::Action
 
   protected:
 
-    void calculateActionCost();
-
     bool primaryCostCheck( bool subtractCosts );
     bool secondaryCostCheck( bool subtractCosts );
 

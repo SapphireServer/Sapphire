@@ -4,10 +4,8 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire {
-namespace Network {
-namespace Packets {
-namespace Client {
+namespace Sapphire::Common::Network::Packets::Client
+{
 
 struct FFXIVIpcGmCommand1 :
   FFXIVIpcBasePacket< GMCommand1 >
@@ -325,9 +323,6 @@ struct FFXIVIpcMarketBoardRequestItemListingInfo :
   /* 0000 */ uint32_t requestId;
 };
 
-}
-}
-}
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H

@@ -21,9 +21,9 @@
 
 #include <thread>
 
-Sapphire::Network::RestConnector g_restConnector;
+Sapphire::Lobby::Network::RestConnector g_restConnector;
 
-namespace Sapphire
+namespace Sapphire::Lobby
 {
 
 
@@ -31,7 +31,7 @@ namespace Sapphire
     m_configPath( configPath ),
     m_numConnections( 0 )
   {
-    m_pConfig = std::make_shared< ConfigMgr >();
+    m_pConfig = std::make_shared< Sapphire::Common::ConfigMgr >();
   }
 
   LobbySessionPtr ServerLobby::getSession( char* sessionId )
@@ -63,15 +63,15 @@ namespace Sapphire
 
     Logger::setLogLevel( m_config.global.general.logLevel );
 
-    auto pFw = std::make_shared< Framework >();
-    Network::HivePtr hive( new Network::Hive() );
-    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
+    auto pFw = std::make_shared< Common::Framework >();
+    Common::Network::HivePtr hive( new Common::Network::Hive() );
+    Common::Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
 
     Logger::info( "Lobby server running on {0}:{1}", m_ip, m_port );
 
     std::vector< std::thread > threadGroup;
 
-    threadGroup.emplace_back( std::bind( &Network::Hive::run, hive.get() ) );
+    threadGroup.emplace_back( std::bind( &Common::Network::Hive::run, hive.get() ) );
 
     for( auto& thread : threadGroup )
       if( thread.joinable() )
