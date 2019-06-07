@@ -29,7 +29,7 @@
 #include <Framework.h>
 #include <Logging/Logger.h>
 
-#include "SapphireAPI.h"
+#include "SapphireApi.h"
 
 #include <Util/CrashHandler.h>
 
@@ -37,7 +37,7 @@ Sapphire::Common::Util::CrashHandler crashHandler;
 
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
-Sapphire::API::SapphireAPI g_sapphireAPI;
+Sapphire::Api::SapphireApi g_sapphireAPI;
 
 namespace fs = std::experimental::filesystem;
 

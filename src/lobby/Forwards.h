@@ -20,10 +20,6 @@ namespace Sapphire
 namespace Sapphire::Lobby
 {
   TYPE_FORWARD( LobbySession );
-}
-
-namespace Sapphire::Lobby::Network
-{
   TYPE_FORWARD( GameConnection );
 }
 

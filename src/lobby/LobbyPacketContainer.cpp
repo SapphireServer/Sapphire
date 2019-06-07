@@ -8,7 +8,7 @@ using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 
-Lobby::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
+LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
 {
   memset( &m_header, 0, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
   m_header.size = sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER );
@@ -18,12 +18,12 @@ Lobby::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t* en
   memset( m_dataBuf, 0, 0x1570 );
 }
 
-Lobby::Network::Packets::LobbyPacketContainer::~LobbyPacketContainer()
+LobbyPacketContainer::~LobbyPacketContainer()
 {
   m_entryList.clear();
 }
 
-void Lobby::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
+void LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
 {
   memcpy( m_dataBuf + m_header.size, &pEntry->getData()[ 0 ], pEntry->getSize() );
 
@@ -39,12 +39,12 @@ void Lobby::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBasePt
   m_header.count++;
 }
 
-uint16_t Lobby::Network::Packets::LobbyPacketContainer::getSize() const
+uint16_t LobbyPacketContainer::getSize() const
 {
   return m_header.size;
 }
 
-uint8_t* Lobby::Network::Packets::LobbyPacketContainer::getRawData( bool addstuff )
+uint8_t* LobbyPacketContainer::getRawData( bool addstuff )
 {
   if( addstuff )
   {

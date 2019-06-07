@@ -1,6 +1,6 @@
 #include "Session.h"
 
-using namespace Sapphire::API;
+using namespace Sapphire::Api;
 
 Session::Session()
 {

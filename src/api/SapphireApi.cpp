@@ -1,4 +1,4 @@
-#include "SapphireAPI.h"
+#include "SapphireApi.h"
 #include <Crypt/base64.h>
 #include "Session.h"
 #include "PlayerMinimal.h"
@@ -10,9 +10,9 @@
 
 #include <Database/DatabaseDef.h>
 
-using namespace Sapphire::API;
+using namespace Sapphire::Api;
 
-bool SapphireAPI::login( const std::string& username, const std::string& pass, std::string& sId )
+bool SapphireApi::login( const std::string& username, const std::string& pass, std::string& sId )
 {
   std::string query =
     "SELECT account_id FROM accounts WHERE account_name = '" + username + "' AND account_pass = '" + pass + "';";
@@ -55,7 +55,7 @@ bool SapphireAPI::login( const std::string& username, const std::string& pass, s
 }
 
 
-bool SapphireAPI::insertSession( const uint32_t accountId, std::string& sId )
+bool SapphireApi::insertSession( const uint32_t accountId, std::string& sId )
 {
   // create session for the new sessionid and store to sessionlist
   auto pSession = std::make_shared< Session >();
@@ -68,7 +68,7 @@ bool SapphireAPI::insertSession( const uint32_t accountId, std::string& sId )
 
 }
 
-bool SapphireAPI::createAccount( const std::string& username, const std::string& pass, std::string& sId )
+bool SapphireApi::createAccount( const std::string& username, const std::string& pass, std::string& sId )
 {
   // get account from login name
   auto pQR = g_charaDb.query( "SELECT account_id FROM accounts WHERE account_name = '" + username + "';" );
@@ -98,11 +98,11 @@ bool SapphireAPI::createAccount( const std::string& username, const std::string&
 
 }
 
-int SapphireAPI::createCharacter( const uint32_t accountId, const std::string& name,
-                                           const std::string& infoJson,
-                                           const uint32_t gmRank )
+int SapphireApi::createCharacter( const uint32_t accountId, const std::string& name,
+                                  const std::string& infoJson,
+                                  const uint32_t gmRank )
 {
-  API::PlayerMinimal newPlayer;
+  Api::PlayerMinimal newPlayer;
 
   newPlayer.setAccountId( accountId );
   newPlayer.setId( getNextCharId() );
@@ -171,7 +171,7 @@ int SapphireAPI::createCharacter( const uint32_t accountId, const std::string& n
   return newPlayer.getAccountId();
 }
 
-void SapphireAPI::deleteCharacter( std::string name, const uint32_t accountId )
+void SapphireApi::deleteCharacter( std::string name, const uint32_t accountId )
 {
   PlayerMinimal deletePlayer;
   auto charList = getCharList( accountId );
@@ -201,17 +201,17 @@ void SapphireAPI::deleteCharacter( std::string name, const uint32_t accountId )
   g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
 }
 
-std::vector< PlayerMinimal > SapphireAPI::getCharList( uint32_t accountId )
+std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
 {
 
-  std::vector< API::PlayerMinimal > charList;
+  std::vector< Api::PlayerMinimal > charList;
 
   auto pQR = g_charaDb.query(
     "SELECT CharacterId, ContentId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
 
   while( pQR->next() )
   {
-    API::PlayerMinimal player;
+    Api::PlayerMinimal player;
 
     uint32_t charId = pQR->getUInt( 1 );
 
@@ -222,7 +222,7 @@ std::vector< PlayerMinimal > SapphireAPI::getCharList( uint32_t accountId )
   return charList;
 }
 
-bool SapphireAPI::checkNameTaken( std::string name )
+bool SapphireApi::checkNameTaken( std::string name )
 {
 
   g_charaDb.escapeString( name );
@@ -236,7 +236,7 @@ bool SapphireAPI::checkNameTaken( std::string name )
     return true;
 }
 
-uint32_t SapphireAPI::getNextCharId()
+uint32_t SapphireApi::getNextCharId()
 {
   uint32_t charId = 0;
 
@@ -252,7 +252,7 @@ uint32_t SapphireAPI::getNextCharId()
   return charId;
 }
 
-uint64_t SapphireAPI::getNextContentId()
+uint64_t SapphireApi::getNextContentId()
 {
   uint64_t contentId = 0;
 
@@ -268,7 +268,7 @@ uint64_t SapphireAPI::getNextContentId()
   return contentId;
 }
 
-int SapphireAPI::checkSession( const std::string& sId )
+int SapphireApi::checkSession( const std::string& sId )
 {
   auto it = m_sessionMap.find( sId );
 
@@ -279,7 +279,7 @@ int SapphireAPI::checkSession( const std::string& sId )
 }
 
 
-bool SapphireAPI::removeSession( const std::string& sId )
+bool SapphireApi::removeSession( const std::string& sId )
 {
   auto it = m_sessionMap.find( sId );
 
