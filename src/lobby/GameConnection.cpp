@@ -58,8 +58,8 @@ void Lobby::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 {
   m_packets.insert( std::end( m_packets ), std::begin( buffer ), std::end( buffer ) );
   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
-  Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER packetHeader{};
-  const auto headerResult = Sapphire::Network::Packets::getHeader( m_packets, 0, packetHeader );
+  FFXIVARR_PACKET_HEADER packetHeader{};
+  const auto headerResult = getHeader( m_packets, 0, packetHeader );
 
   if( headerResult == Incomplete )
     return;
@@ -383,7 +383,7 @@ bool Lobby::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& packet, uin
   return false;
 }
 
-void Lobby::GameConnection::handleGamePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& packet )
+void Lobby::GameConnection::handleGamePacket( Network::Packets::FFXIVARR_PACKET_RAW& packet )
 {
 
   uint32_t tmpId = packet.segHdr.target_actor;
@@ -430,7 +430,7 @@ void Lobby::GameConnection::sendPacket( LobbyPacketContainer& pLpc )
   send( sendBuffer );
 }
 
-void Lobby::GameConnection::sendPackets( Sapphire::Network::Packets::PacketContainer* pPacket )
+void Lobby::GameConnection::sendPackets( Network::Packets::PacketContainer* pPacket )
 {
   std::vector< uint8_t > sendBuffer;
 
@@ -459,8 +459,8 @@ void Lobby::GameConnection::generateEncryptionKey( uint32_t key, const std::stri
   Common::Util::md5( m_baseKey, m_encKey, 0x2C );
 }
 
-void Lobby::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                    const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
+void Lobby::GameConnection::handlePackets( const Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+                                           const std::vector< Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
 
   for( auto inPacket : packetData )
