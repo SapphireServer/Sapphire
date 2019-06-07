@@ -15,7 +15,7 @@ namespace Sapphire
   class Session;
 }
 
-namespace Sapphire::Lobby::Network
+namespace Sapphire::Lobby
 {
   class LobbySession;
 

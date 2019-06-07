@@ -12,17 +12,17 @@ using namespace Sapphire;
 
 typedef std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string > > CharList;
 
-Lobby::Network::RestConnector::RestConnector()
+Lobby::RestConnector::RestConnector()
 {
 
 }
 
-Lobby::Network::RestConnector::~RestConnector()
+Lobby::RestConnector::~RestConnector()
 {
 
 }
 
-HttpResponse Lobby::Network::RestConnector::requestApi( std::string endpoint, std::string data )
+HttpResponse Lobby::RestConnector::requestApi( std::string endpoint, std::string data )
 {
   HttpClient client( restHost );
 
@@ -41,7 +41,7 @@ HttpResponse Lobby::Network::RestConnector::requestApi( std::string endpoint, st
   return r;
 }
 
-Lobby::LobbySessionPtr Lobby::Network::RestConnector::getSession( char* sId )
+Lobby::LobbySessionPtr Lobby::RestConnector::getSession( char* sId )
 {
   std::string json_string = "{\"sId\": \"" + std::string( sId ) + "\",\"secret\": \"" + serverSecret + "\"}";
 
@@ -83,7 +83,7 @@ Lobby::LobbySessionPtr Lobby::Network::RestConnector::getSession( char* sId )
   }
 }
 
-bool Lobby::Network::RestConnector::checkNameTaken( std::string name )
+bool Lobby::RestConnector::checkNameTaken( std::string name )
 {
   std::string json_string = "{\"name\": \"" + name + "\",\"secret\": \"" + serverSecret + "\"}";
 
@@ -117,7 +117,7 @@ bool Lobby::Network::RestConnector::checkNameTaken( std::string name )
   }
 }
 
-uint32_t Lobby::Network::RestConnector::getNextCharId()
+uint32_t Lobby::RestConnector::getNextCharId()
 {
   std::string json_string = "{\"secret\": \"" + serverSecret + "\"}";
 
@@ -156,7 +156,7 @@ uint32_t Lobby::Network::RestConnector::getNextCharId()
   }
 }
 
-uint64_t Lobby::Network::RestConnector::getNextContentId()
+uint64_t Lobby::RestConnector::getNextContentId()
 {
   std::string json_string = "{\"secret\": \"" + serverSecret + "\"}";
 
@@ -195,7 +195,7 @@ uint64_t Lobby::Network::RestConnector::getNextContentId()
   }
 }
 
-CharList Lobby::Network::RestConnector::getCharList( char* sId )
+CharList Lobby::RestConnector::getCharList( char* sId )
 {
   std::string json_string = "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\"}";
 
@@ -251,7 +251,7 @@ CharList Lobby::Network::RestConnector::getCharList( char* sId )
   }
 }
 
-bool Lobby::Network::RestConnector::deleteCharacter( char* sId, std::string name )
+bool Lobby::RestConnector::deleteCharacter( char* sId, std::string name )
 {
   std::string json_string =
     "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name + "\"}";
@@ -285,7 +285,7 @@ bool Lobby::Network::RestConnector::deleteCharacter( char* sId, std::string name
   }
 }
 
-int Lobby::Network::RestConnector::createCharacter( char* sId, std::string name, std::string infoJson )
+int Lobby::RestConnector::createCharacter( char* sId, std::string name, std::string infoJson )
 {
   std::string json_string =
     "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name +

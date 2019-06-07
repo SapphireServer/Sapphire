@@ -9,7 +9,7 @@
 
 #include "Forwards.h"
 
-namespace Sapphire::Lobby::Network::Packets
+namespace Sapphire::Network::Packets
 {
 
   using FFXIVPacketBasePtr = std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase >;

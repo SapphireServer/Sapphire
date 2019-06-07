@@ -23,7 +23,7 @@
 
 using namespace Sapphire;
 
-Sapphire::Lobby::Network::RestConnector g_restConnector;
+Sapphire::Lobby::RestConnector g_restConnector;
 
 namespace Sapphire::Lobby
 {
@@ -65,9 +65,9 @@ namespace Sapphire::Lobby
 
     Logger::setLogLevel( m_config.global.general.logLevel );
 
-    auto pFw = std::make_shared< Framework >();
-    auto hive = Sapphire::Network::make_Hive();
-    Sapphire::Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, pFw );
+    auto pFw = make_Framework();
+    auto hive = Network::make_Hive();
+    Network::addServerToHive< GameConnection >( m_ip, m_port, hive, pFw );
 
     Logger::info( "Lobby server running on {0}:{1}", m_ip, m_port );
 
