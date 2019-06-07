@@ -66,7 +66,7 @@ size_t Sapphire::World::ServerMgr::getSessionCount() const
 
 bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
-  auto pConfig = framework()->get< Sapphire::ConfigMgr >();
+  auto pConfig = framework()->get< Common::ConfigMgr >();
 
   Logger::info( "Loading config {0}", m_configName );
 
@@ -123,8 +123,8 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
   printBanner();
 
-  auto pConfig = std::make_shared< ConfigMgr >();
-  framework()->set< ConfigMgr >( pConfig );
+  auto pConfig = std::make_shared< Common::ConfigMgr >();
+  framework()->set< Common::ConfigMgr >( pConfig );
   if( !loadSettings( argc, argv ) )
   {
     Logger::fatal( "Unable to load settings!" );
@@ -270,8 +270,8 @@ void Sapphire::World::ServerMgr::mainLoop()
   {
     std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
 
-    auto currTime = Util::getTimeSeconds();
-    auto tickCount = Util::getTimeMs();
+    auto currTime = Common::Util::getTimeSeconds();
+    auto tickCount = Common::Util::getTimeMs();
 
     pTeriMgr->updateTerritoryInstances( tickCount );
 

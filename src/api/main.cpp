@@ -29,8 +29,7 @@
 #include <Framework.h>
 #include <Logging/Logger.h>
 
-#include "Forwards.h"
-#include "SapphireAPI.h"
+#include "SapphireApi.h"
 
 #include <Util/CrashHandler.h>
 
@@ -38,7 +37,7 @@ Sapphire::Common::Util::CrashHandler crashHandler;
 
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
-Sapphire::Network::SapphireAPI g_sapphireAPI;
+Sapphire::Api::SapphireApi g_sapphireAPI;
 
 namespace fs = std::experimental::filesystem;
 
@@ -59,7 +58,7 @@ Sapphire::Common::Config::ApiConfig   m_config;
 
 void reloadConfig()
 {
-  auto pConfig = std::make_shared< Sapphire::ConfigMgr >();
+  auto pConfig = std::make_shared< Sapphire::Common::ConfigMgr >();
 
   Logger::info( "Loading config " + configPath );
 
@@ -106,7 +105,7 @@ bool loadSettings( int32_t argc, char* argv[] )
 
     try
     {
-      arg = Sapphire::Util::toLowerCopy( std::string( args[ i ] ) );
+      arg = Common::Util::toLowerCopy( std::string( args[ i ] ) );
       val = std::string( args[ i + 1 ] );
 
       // trim '-' from start of arg
@@ -336,7 +335,7 @@ void createCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< H
     std::string name = json["name"];
     std::string infoJson = json["infoJson"];
 
-    std::string finalJson = Sapphire::Util::base64Decode( infoJson );
+    std::string finalJson = Common::Util::base64Decode( infoJson );
 
     // reloadConfig();
 

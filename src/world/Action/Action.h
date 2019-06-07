@@ -11,7 +11,7 @@ namespace Sapphire::Data
   using ActionPtr = std::shared_ptr< Action >;
 }
 
-namespace Sapphire::Action
+namespace Sapphire::World::Action
 {
 
   class Action
@@ -75,7 +75,7 @@ namespace Sapphire::Action
      * @brief Tests if an action is castable by the current source chara
      * @return true if castable, false if the caster doesn't meet the requirements
      */
-    bool precheck();
+    bool preCheck();
 
     /*!
      * @brief Snapshots characters affected by a cast.
@@ -130,12 +130,10 @@ namespace Sapphire::Action
 
   protected:
 
-    void calculateActionCost();
-
     bool primaryCostCheck( bool subtractCosts );
     bool secondaryCostCheck( bool subtractCosts );
 
-    bool playerPrecheck( Entity::Player& player );
+    bool playerPreCheck( Entity::Player& player );
 
     bool preFilterActor( Entity::Actor& actor ) const;
 

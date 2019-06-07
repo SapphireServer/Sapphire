@@ -7,19 +7,15 @@
 #include <memory>
 #include "PlayerMinimal.h"
 
-namespace Sapphire
+namespace Sapphire::Api
 {
   class Session;
-}
 
-namespace Sapphire::Network
-{
-
-  class SapphireAPI
+  class SapphireApi
   {
   public:
-    SapphireAPI() = default;
-    ~SapphireAPI() = default;
+    SapphireApi() = default;
+    ~SapphireApi() = default;
 
     using SessionMap = std::map< std::string, std::shared_ptr< Session > >;
 
@@ -34,7 +30,7 @@ namespace Sapphire::Network
 
     bool insertSession( uint32_t accountId, std::string& sId );
 
-    std::vector< Sapphire::PlayerMinimal > getCharList( uint32_t accountId );
+    std::vector< Api::PlayerMinimal > getCharList( uint32_t accountId );
 
     bool checkNameTaken( std::string name );
 

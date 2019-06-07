@@ -278,11 +278,11 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
 
 void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint32_t action,
-                                                 Action::ActionCallback finishCallback,
-                                                 Action::ActionCallback interruptCallback,
+                                                 World::Action::ActionCallback finishCallback,
+                                                 World::Action::ActionCallback interruptCallback,
                                                  uint64_t additional )
 {
-  auto pEventAction = Action::make_EventAction( getAsChara(), eventId, action,
+  auto pEventAction = World::Action::make_EventAction( getAsChara(), eventId, action,
                                                 finishCallback, interruptCallback, additional, m_pFw );
 
   auto pEvent = getEvent( eventId );
@@ -309,8 +309,8 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
 
 void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
                                                      uint32_t action,
-                                                     Action::ActionCallback finishCallback,
-                                                     Action::ActionCallback interruptCallback,
+                                                     World::Action::ActionCallback finishCallback,
+                                                     World::Action::ActionCallback interruptCallback,
                                                      uint64_t additional )
 {
 //  Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,

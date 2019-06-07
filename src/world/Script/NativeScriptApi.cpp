@@ -83,20 +83,20 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  ActionScript::ActionScript( uint32_t abilityId ) :
-    ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
+  ActionScript::ActionScript( uint32_t actionId ) :
+    ScriptObject( actionId, typeid( ActionScript ).hash_code() )
   {
   }
 
-  void ActionScript::onStart( Sapphire::Action::Action& action )
+  void ActionScript::onStart( Sapphire::World::Action::Action& action )
   {
   }
 
-  void ActionScript::onExecute( Sapphire::Action::Action& action )
+  void ActionScript::onExecute( Sapphire::World::Action::Action& action )
   {
   }
 
-  void ActionScript::onInterrupt( Sapphire::Action::Action& action )
+  void ActionScript::onInterrupt( Sapphire::World::Action::Action& action )
   {
   }
 

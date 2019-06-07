@@ -7,7 +7,9 @@
 #include <string.h>
 #include <memory>
 
-Sapphire::Network::Packets::PacketContainer::PacketContainer( uint32_t segmentTargetOverride ) :
+using namespace Sapphire;
+
+Network::Packets::PacketContainer::PacketContainer( uint32_t segmentTargetOverride ) :
   m_segmentTargetOverride( segmentTargetOverride )
 {
   memset( &m_ipcHdr, 0, sizeof( FFXIVARR_PACKET_HEADER ) );
@@ -15,12 +17,12 @@ Sapphire::Network::Packets::PacketContainer::PacketContainer( uint32_t segmentTa
   m_ipcHdr.count = 0;
 }
 
-Sapphire::Network::Packets::PacketContainer::~PacketContainer()
+Network::Packets::PacketContainer::~PacketContainer()
 {
   m_entryList.clear();
 }
 
-void Sapphire::Network::Packets::PacketContainer::addPacket( Sapphire::Network::Packets::FFXIVPacketBasePtr entry )
+void Network::Packets::PacketContainer::addPacket( Network::Packets::FFXIVPacketBasePtr entry )
 {
   m_entryList.push_back( entry );
 
@@ -28,7 +30,7 @@ void Sapphire::Network::Packets::PacketContainer::addPacket( Sapphire::Network::
   m_ipcHdr.count++;
 }
 
-void Sapphire::Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& sendBuffer )
+void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& sendBuffer )
 {
   std::vector< uint8_t > tempBuffer( m_ipcHdr.size );
   memset( &tempBuffer[ 0 ], 0, m_ipcHdr.size );
@@ -67,7 +69,7 @@ void Sapphire::Network::Packets::PacketContainer::fillSendBuffer( std::vector< u
 
 }
 
-std::string Sapphire::Network::Packets::PacketContainer::toString()
+std::string Network::Packets::PacketContainer::toString()
 {
   std::vector< uint8_t > tmpBuffer;
 
@@ -76,7 +78,7 @@ std::string Sapphire::Network::Packets::PacketContainer::toString()
   std::string str = "\n";
   for( uint32_t i = 0; i < m_ipcHdr.size; i++ )
   {
-    str += Util::intToHexString( static_cast< int32_t >( tmpBuffer[ i ] & 0xFF ) ) + " ";
+    str += Common::Util::intToHexString( static_cast< int32_t >( tmpBuffer[ i ] & 0xFF ) ) + " ";
 
     if( ( i + 1 ) % 16 == 0 )
       str += "\n";

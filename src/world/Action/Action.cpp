@@ -1,4 +1,5 @@
 #include "Action.h"
+#include "ActionLut.h"
 
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
@@ -20,39 +21,40 @@
 #include <Logging/Logger.h>
 #include <Util/ActorFilter.h>
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World;
 
 
-Sapphire::Action::Action::Action() = default;
-Sapphire::Action::Action::~Action() = default;
+Action::Action::Action() = default;
+Action::Action::~Action() = default;
 
-Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
-                                  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
+  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
 {
 }
 
-Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
-                                  Data::ActionPtr actionData, FrameworkPtr fw ) :
-                                  m_pSource( std::move( caster ) ),
-                                  m_pFw( std::move( fw ) ),
-                                  m_actionData( std::move( actionData ) ),
-                                  m_id( actionId ),
-                                  m_targetId( 0 ),
-                                  m_startTime( 0 ),
-                                  m_interruptType( Common::ActionInterruptType::None )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw ) :
+  m_pSource( std::move( caster ) ),
+  m_pFw( std::move( fw ) ),
+  m_actionData( std::move( actionData ) ),
+  m_id( actionId ),
+  m_targetId( 0 ),
+  m_startTime( 0 ),
+  m_interruptType( Common::ActionInterruptType::None )
 {
 }
 
-uint32_t Sapphire::Action::Action::getId() const
+uint32_t Action::Action::getId() const
 {
   return m_id;
 }
 
-bool Sapphire::Action::Action::init()
+bool Action::Action::init()
 {
   if( !m_actionData )
   {
@@ -121,62 +123,62 @@ bool Sapphire::Action::Action::init()
   return true;
 }
 
-void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+void Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
 {
   m_pos = pos;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Action::Action::getPos() const
+Sapphire::Common::FFXIVARR_POSITION3 Action::Action::getPos() const
 {
   return m_pos;
 }
 
-void Sapphire::Action::Action::setTargetId( uint64_t targetId )
+void Action::Action::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
 }
 
-uint64_t Sapphire::Action::Action::getTargetId() const
+uint64_t Action::Action::getTargetId() const
 {
   return m_targetId;
 }
 
-bool Sapphire::Action::Action::hasClientsideTarget() const
+bool Action::Action::hasClientsideTarget() const
 {
   return m_targetId > 0xFFFFFFFF;
 }
 
-bool Sapphire::Action::Action::isInterrupted() const
+bool Action::Action::isInterrupted() const
 {
   return m_interruptType != Common::ActionInterruptType::None;
 }
 
-void Sapphire::Action::Action::setInterrupted( Common::ActionInterruptType type )
+void Action::Action::setInterrupted( Common::ActionInterruptType type )
 {
   m_interruptType = type;
 }
 
-uint32_t Sapphire::Action::Action::getCastTime() const
+uint32_t Action::Action::getCastTime() const
 {
   return m_castTimeMs;
 }
 
-void Sapphire::Action::Action::setCastTime( uint32_t castTime )
+void Action::Action::setCastTime( uint32_t castTime )
 {
   m_castTimeMs = castTime;
 }
 
-bool Sapphire::Action::Action::hasCastTime() const
+bool Action::Action::hasCastTime() const
 {
   return m_castTimeMs > 0;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getSourceChara() const
+Sapphire::Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
 }
 
-bool Sapphire::Action::Action::update()
+bool Action::Action::update()
 {
   // action has not been started yet
   if( m_startTime == 0 )
@@ -193,7 +195,7 @@ bool Sapphire::Action::Action::update()
     // todo: check if the target is still in range
   }
 
-  uint64_t tickCount = Util::getTimeMs();
+  uint64_t tickCount = Common::Util::getTimeMs();
 
   if( !hasCastTime() || std::difftime( tickCount, m_startTime ) > m_castTimeMs )
   {
@@ -204,11 +206,11 @@ bool Sapphire::Action::Action::update()
   return false;
 }
 
-void Sapphire::Action::Action::start()
+void Action::Action::start()
 {
   assert( m_pSource );
 
-  m_startTime = Util::getTimeMs();
+  m_startTime = Common::Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
 
@@ -236,14 +238,16 @@ void Sapphire::Action::Action::start()
   player->queuePacket( actionStartPkt );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  if( !pScriptMgr->onStart( *this ) )
+
+  // check the lut too and see if we have something usable, otherwise cancel the cast
+  if( !pScriptMgr->onStart( *this ) && !ActionLut::validEntryExists( getId() ) )
   {
-    // script not implemented
+    // script not implemented and insufficient lut data (no potencies)
     interrupt();
 
     if( player )
     {
-      player->sendUrgent( "Action not implemented, missing script for action#{0}", getId() );
+      player->sendUrgent( "Action not implemented, missing script/lut entry for action#{0}", getId() );
       player->setCurrentAction( nullptr );
     }
 
@@ -255,7 +259,7 @@ void Sapphire::Action::Action::start()
     execute();
 }
 
-void Sapphire::Action::Action::interrupt()
+void Action::Action::interrupt()
 {
   assert( m_pSource );
 
@@ -289,7 +293,7 @@ void Sapphire::Action::Action::interrupt()
   pScriptMgr->onInterrupt( *this );
 }
 
-void Sapphire::Action::Action::execute()
+void Action::Action::execute()
 {
   assert( m_pSource );
 
@@ -329,7 +333,17 @@ void Sapphire::Action::Action::execute()
     if( !m_hitActors.empty() )
     {
       // only call script if actors are hit
-      pScriptMgr->onExecute( *this );
+      if( !pScriptMgr->onExecute( *this ) && ActionLut::validEntryExists( getId() ) )
+      {
+        auto lutEntry = ActionLut::getEntry( getId() );
+
+        // no script exists but we have a valid lut entry
+        if( auto player = getSourceChara()->getAsPlayer() )
+        {
+          player->sendDebug( "Hit target: pot: {} (f: {}, r: {}), heal pot: {}",
+                             lutEntry.potency, lutEntry.flankPotency, lutEntry.rearPotency, lutEntry.curePotency );
+        }
+      }
     }
   }
   else if( auto player = m_pSource->getAsPlayer() )
@@ -346,18 +360,18 @@ void Sapphire::Action::Action::execute()
   }
 }
 
-bool Sapphire::Action::Action::precheck()
+bool Action::Action::preCheck()
 {
   if( auto player = m_pSource->getAsPlayer() )
   {
-    if( !playerPrecheck( *player ) )
+    if( !playerPreCheck( *player ) )
       return false;
   }
 
   return true;
 }
 
-bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
+bool Action::Action::playerPreCheck( Entity::Player& player )
 {
   // lol
   if( !player.isAlive() )
@@ -387,17 +401,18 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
       return false;
   }
 
-  // reset target on actions that can only be casted on yourself while having a target set
-  // todo: check what actions send when targeting an enemy
-//  if( m_actionData->canTargetSelf &&
-//      !m_actionData->canTargetFriendly &&
-//      !m_actionData->canTargetHostile &&
-//      !m_actionData->canTargetParty )
-//  {
-//    setTargetId( getSourceChara() );
-//  }
+  if( !m_actionData->canTargetSelf && getTargetId() == m_pSource->getId() )
+    return false;
 
-  // todo: party/enemy validation
+  // todo: does this need to check for party/alliance stuff or it's just same type?
+  // todo: m_pTarget doesn't exist at this stage because we only fill it when we snapshot targets
+//  if( !m_actionData->canTargetFriendly && m_pSource->getObjKind() == m_pTarget->getObjKind() )
+//    return false;
+//
+//  if( !m_actionData->canTargetHostile && m_pSource->getObjKind() != m_pTarget->getObjKind() )
+//    return false;
+
+  // todo: party/dead validation
 
   // validate range
 
@@ -408,17 +423,17 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
   return true;
 }
 
-uint32_t Sapphire::Action::Action::getAdditionalData() const
+uint32_t Action::Action::getAdditionalData() const
 {
   return m_additionalData;
 }
 
-void Sapphire::Action::Action::setAdditionalData( uint32_t data )
+void Action::Action::setAdditionalData( uint32_t data )
 {
   m_additionalData = data;
 }
 
-bool Sapphire::Action::Action::isComboAction() const
+bool Action::Action::isComboAction() const
 {
   auto lastActionId = m_pSource->getLastComboActionId();
 
@@ -430,7 +445,7 @@ bool Sapphire::Action::Action::isComboAction() const
   return m_actionData->actionCombo == lastActionId;
 }
 
-bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
+bool Action::Action::primaryCostCheck( bool subtractCosts )
 {
   switch( m_primaryCostType )
   {
@@ -473,23 +488,23 @@ bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
   }
 }
 
-bool Sapphire::Action::Action::secondaryCostCheck( bool subtractCosts )
+bool Action::Action::secondaryCostCheck( bool subtractCosts )
 {
   // todo: these need to be mapped
   return true;
 }
 
-bool Sapphire::Action::Action::hasResources()
+bool Action::Action::hasResources()
 {
   return primaryCostCheck( false ) && secondaryCostCheck( false );
 }
 
-bool Sapphire::Action::Action::consumeResources()
+bool Action::Action::consumeResources()
 {
   return primaryCostCheck( true ) && secondaryCostCheck( true );
 }
 
-bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
+bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
 {
   for( const auto& actor : m_pSource->getInRangeActors( true ) )
   {
@@ -519,12 +534,12 @@ bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::Char
   return !actors.empty();
 }
 
-void Sapphire::Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
+void Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
 {
   m_actorFilters.push_back( std::move( filter ) );
 }
 
-void Sapphire::Action::Action::addDefaultActorFilters()
+void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
@@ -561,7 +576,7 @@ void Sapphire::Action::Action::addDefaultActorFilters()
   }
 }
 
-bool Sapphire::Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
+bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
 {
   auto kind = actor.getObjKind();
 
@@ -574,12 +589,12 @@ bool Sapphire::Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) 
   return true;
 }
 
-std::vector< Sapphire::Entity::CharaPtr >& Sapphire::Action::Action::getHitCharas()
+std::vector< Sapphire::Entity::CharaPtr >& Action::Action::getHitCharas()
 {
   return m_hitActors;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getHitChara()
+Sapphire::Entity::CharaPtr Action::Action::getHitChara()
 {
   if( !m_hitActors.empty() )
   {
