@@ -83,7 +83,7 @@ namespace Sapphire::Db
 
     const std::string& getDatabaseName() const;
 
-    std::unique_ptr< Sapphire::LockedWaitQueue< std::shared_ptr< Operation > > > m_queue;
+    std::unique_ptr< Common::Util::LockedWaitQueue< std::shared_ptr< Operation > > > m_queue;
     std::array< std::vector< std::shared_ptr< T > >, IDX_SIZE > m_connections;
     ConnectionInfo m_connectionInfo;
     uint8_t m_asyncThreads;

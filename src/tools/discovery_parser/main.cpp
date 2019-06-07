@@ -26,6 +26,8 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
+using namespace Sapphire;
+
 // garbage to ignore models
 bool ignoreModels = false;
 
@@ -165,7 +167,7 @@ std::string zoneNameToPath( const std::string& name )
       info.name = teriName;
       zoneInfoMap[ row.first ] = info;
 
-      if( !found && ( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) ) )
+      if( !found && ( Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( teriName ) ) )
       {
         found = true;
         path = teriPath;
@@ -177,7 +179,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     for( const auto& entry : zoneInfoMap )
     {
-      if( found = Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( entry.second.name ) )
+      if( found = Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( entry.second.name ) )
       {
         path = entry.second.path;
         zoneId = entry.second.id;

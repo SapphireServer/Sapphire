@@ -11,15 +11,17 @@
 #include "EventAction.h"
 #include "Framework.h"
 
+using namespace Sapphire;
+using namespace Sapphire::World;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                                            ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional,
-                                            FrameworkPtr pFw )
+Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
+                                  ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional,
+                                  FrameworkPtr pFw )
 {
   m_additional = additional;
   m_eventId = eventId;
@@ -33,14 +35,14 @@ Sapphire::Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t ev
   m_interruptType = Common::ActionInterruptType::None;
 }
 
-Sapphire::Action::EventAction::~EventAction() = default;
+Action::EventAction::~EventAction() = default;
 
-void Sapphire::Action::EventAction::start()
+void Action::EventAction::start()
 {
   if( !m_pSource )
     return;
 
-  m_startTime = Util::getTimeMs();
+  m_startTime = Common::Util::getTimeMs();
 
   auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastStart, 1, m_id, 0x4000004E );
 
@@ -54,7 +56,7 @@ void Sapphire::Action::EventAction::start()
     m_pSource->sendToInRangeSet( control );
 }
 
-void Sapphire::Action::EventAction::execute()
+void Action::EventAction::execute()
 {
   if( !m_pSource )
     return;
@@ -90,7 +92,7 @@ void Sapphire::Action::EventAction::execute()
 
 }
 
-void Sapphire::Action::EventAction::interrupt()
+void Action::EventAction::interrupt()
 {
   if( !m_pSource )
     return;

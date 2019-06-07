@@ -17,10 +17,7 @@ DbManager::DbManager( const std::string& host, const std::string& database, cons
 {
 }
 
-DbManager::~DbManager()
-{
-
-}
+DbManager::~DbManager() = default;
 
 bool DbManager::execute( const std::string& sql )
 {

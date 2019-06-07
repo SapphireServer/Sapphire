@@ -4,10 +4,11 @@
 #include <Crypt/blowfish.h>
 #include <Common.h>
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 
-Sapphire::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
+LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
 {
   memset( &m_header, 0, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
   m_header.size = sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER );
@@ -17,12 +18,12 @@ Sapphire::Network::Packets::LobbyPacketContainer::LobbyPacketContainer( uint8_t*
   memset( m_dataBuf, 0, 0x1570 );
 }
 
-Sapphire::Network::Packets::LobbyPacketContainer::~LobbyPacketContainer()
+LobbyPacketContainer::~LobbyPacketContainer()
 {
   m_entryList.clear();
 }
 
-void Sapphire::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
+void LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
 {
   memcpy( m_dataBuf + m_header.size, &pEntry->getData()[ 0 ], pEntry->getSize() );
 
@@ -38,17 +39,17 @@ void Sapphire::Network::Packets::LobbyPacketContainer::addPacket( FFXIVPacketBas
   m_header.count++;
 }
 
-uint16_t Sapphire::Network::Packets::LobbyPacketContainer::getSize() const
+uint16_t LobbyPacketContainer::getSize() const
 {
   return m_header.size;
 }
 
-uint8_t* Sapphire::Network::Packets::LobbyPacketContainer::getRawData( bool addstuff )
+uint8_t* LobbyPacketContainer::getRawData( bool addstuff )
 {
   if( addstuff )
   {
     m_header.unknown_0 = 0xff41a05252;
-    m_header.timestamp = Sapphire::Util::getTimeMs();
+    m_header.timestamp = Common::Util::getTimeMs();
   }
   memcpy( m_dataBuf, &m_header, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
   return m_dataBuf;

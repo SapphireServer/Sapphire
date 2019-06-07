@@ -8,7 +8,7 @@
 
 extern Sapphire::Data::ExdDataGenerated g_exdDataGen;
 
-namespace Sapphire {
+namespace Sapphire::Api {
 
 using namespace Common;
 

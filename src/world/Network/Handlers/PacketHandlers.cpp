@@ -393,7 +393,7 @@ void Sapphire::Network::GameConnection::pingHandler( FrameworkPtr pFw,
 
   queueOutPacket( std::make_shared< Server::PingPacket >( player, packet.data().timestamp ) );
 
-  player.setLastPing( Sapphire::Util::getTimeSeconds() );
+  player.setLastPing( Common::Util::getTimeSeconds() );
 }
 
 

@@ -154,7 +154,7 @@ bool Sapphire::Scripting::ScriptLoader::isModuleLoaded( std::string name )
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
 
-    if( Util::toLowerCopy( it->second->library_name ) == Util::toLowerCopy( name ) )
+    if( Common::Util::toLowerCopy( it->second->library_name ) == Common::Util::toLowerCopy( name ) )
       return true;
   }
 

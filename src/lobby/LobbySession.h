@@ -7,7 +7,7 @@
 #include <string>
 #include <string.h>
 
-namespace Sapphire
+namespace Sapphire::Lobby
 {
 
   class LobbySession

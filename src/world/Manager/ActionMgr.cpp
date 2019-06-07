@@ -1,6 +1,7 @@
 #include "ActionMgr.h"
 
 #include "Action/Action.h"
+#include "Action/ItemAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
@@ -66,31 +67,18 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
 {
   player.sendDebug( "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
 
-  // todo: check we have item & remove item from inventory
+  auto action = Action::make_ItemAction( player.getAsChara(), itemId, itemActionData,
+                                         itemSourceSlot, itemSourceContainer, framework() );
 
-  switch( itemActionData->type )
-  {
-    default:
-    {
-      player.sendDebug( "ItemAction type {0} not supported.", itemActionData->type );
-      break;
-    }
-
-    case Common::ItemActionType::ItemActionVFX:
-    case Common::ItemActionType::ItemActionVFX2:
-    {
-      handleItemActionVFX( player, itemId, itemActionData->data[ 0 ] );
-
-      break;
-    }
-  }
+  // todo: item actions don't have cast times? if so we can just start it and we're good
+  action->start();
 }
 
 void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
-  if( !currentAction->precheck() )
+  if( !currentAction->preCheck() )
   {
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
@@ -105,19 +93,4 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
 
   // todo: what do in cases of swiftcast/etc? script callback?
   currentAction->start();
-}
-
-void World::Manager::ActionMgr::handleItemActionVFX( Sapphire::Entity::Player& player, uint32_t itemId, uint16_t vfxId )
-{
-  Common::EffectEntry effect{};
-  effect.effectType = Common::ActionEffectType::VFX;
-  effect.value = vfxId;
-
-  auto effectPacket = std::make_shared< Network::Packets::Server::EffectPacket >( player.getId(), player.getId(), itemId );
-  effectPacket->setTargetActor( player.getId() );
-  effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
-  effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
-  effectPacket->addEffect( effect );
-
-  player.sendToInRangeSet( effectPacket, true );
 }

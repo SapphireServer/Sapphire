@@ -391,13 +391,13 @@ void Sapphire::Entity::Chara::sendStatusUpdate()
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */
-Sapphire::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() const
+Sapphire::World::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() const
 {
   return m_pCurrentAction;
 }
 
 /*! \param ActionPtr of the action to be registered */
-void Sapphire::Entity::Chara::setCurrentAction( Sapphire::Action::ActionPtr pAction )
+void Sapphire::Entity::Chara::setCurrentAction( Sapphire::World::Action::ActionPtr pAction )
 {
   m_pCurrentAction = std::move( pAction );
 }

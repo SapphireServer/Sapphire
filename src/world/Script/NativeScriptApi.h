@@ -138,13 +138,13 @@ namespace Sapphire::ScriptAPI
   class ActionScript :  public ScriptObject
   {
   public:
-    explicit ActionScript( uint32_t abilityId );
+    explicit ActionScript( uint32_t actionId );
 
-    virtual void onStart( Sapphire::Action::Action& action );
+    virtual void onStart( Sapphire::World::Action::Action& action );
 
-    virtual void onExecute( Sapphire::Action::Action& action );
+    virtual void onExecute( Sapphire::World::Action::Action& action );
 
-    virtual void onInterrupt( Sapphire::Action::Action& action );
+    virtual void onInterrupt( Sapphire::World::Action::Action& action );
   };
 
   /*!

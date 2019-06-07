@@ -69,7 +69,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.pos.x = player.getPos().x;
       m_data.pos.y = player.getPos().y;
       m_data.pos.z = player.getPos().z;
-      m_data.rotation = Util::floatToUInt16Rot( player.getRot() );
+      m_data.rotation = Common::Util::floatToUInt16Rot( player.getRot() );
 
 
       m_data.title = player.getTitle();
@@ -133,7 +133,7 @@ namespace Sapphire::Network::Packets::Server
       //m_data.unknown_60 = 3;
       //m_data.unknown_61 = 7;
 
-      uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
+      uint64_t currentTimeMs = Common::Util::getTimeMs();
 
       for( auto const& effect : player.getStatusEffectMap() )
       {

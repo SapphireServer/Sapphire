@@ -257,14 +257,14 @@ int main()
 //    Logger::info( out );
   }
 
-  std::ifstream ifs( "ActionLut.cpp.tmpl" );
+  std::ifstream ifs( "ActionLutData.cpp.tmpl" );
 
   std::string actionTmpl( ( std::istreambuf_iterator< char >( ifs ) ),
                             std::istreambuf_iterator< char >() );
 
   auto result = std::regex_replace( actionTmpl, std::regex( "%INSERT_GARBAGE%" ), output );
 
-  std::ofstream outH( "ActionLut.cpp" );
+  std::ofstream outH( "ActionLutData.cpp" );
   outH << result;
   outH.close();
 

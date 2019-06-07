@@ -14,7 +14,7 @@ public:
   {
   }
 
-  void onExecute( Sapphire::Action::Action& action ) override
+  void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto player = action.getSourceChara()->getAsPlayer();
 

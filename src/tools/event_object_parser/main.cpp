@@ -62,7 +62,7 @@ std::string zoneNameToPath( const std::string& name )
 {
   std::string path;
 
-  auto it = g_nameMap.find( Sapphire::Util::toLowerCopy( name ) );
+  auto it = g_nameMap.find( Common::Util::toLowerCopy( name ) );
   if( it != g_nameMap.end() )
     return it->second;
 
@@ -79,7 +79,7 @@ std::string zoneNameToPath( const std::string& name )
     if( teriName.empty() )
       continue;
     
-    if( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) )
+    if( Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( teriName ) )
     {
       path = teriPath;
       break;
@@ -90,7 +90,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
     Logger::debug( "Found path for {0}: {1}", name, path );
-    g_nameMap[ Sapphire::Util::toLowerCopy( name ) ] = path; 
+    g_nameMap[ Common::Util::toLowerCopy( name ) ] = path;
   }
   else
   {
@@ -161,7 +161,7 @@ void loadAllInstanceContentEntries()
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
     
     std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
-    Sapphire::Util::eraseAllIn( name, remove );
+    Common::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { contentId, name, tt->name, type } );
   }
@@ -332,7 +332,7 @@ int main( int argc, char* argv[] )
               {
                 name = eobjNameMap[ id ];
                 std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
-                Sapphire::Util::eraseAllIn( name, remove );
+                Common::Util::eraseAllIn( name, remove );
                 name[ 0 ] = toupper( name[ 0 ] );
               }
               if( name.empty() )

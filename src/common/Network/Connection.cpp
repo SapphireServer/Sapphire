@@ -3,7 +3,9 @@
 #include <functional>
 #include "Framework.h"
 
-Sapphire::Network::Connection::Connection( HivePtr hive, FrameworkPtr pFw ) :
+using namespace Sapphire;
+
+Network::Connection::Connection( HivePtr hive, FrameworkPtr pFw ) :
   m_hive( hive ),
   m_socket( hive->getService() ),
   m_io_strand( hive->getService() ),
@@ -13,11 +15,9 @@ Sapphire::Network::Connection::Connection( HivePtr hive, FrameworkPtr pFw ) :
 {
 }
 
-Sapphire::Network::Connection::~Connection()
-{
-}
+Network::Connection::~Connection() = default;
 
-void Sapphire::Network::Connection::bind( const std::string& ip, uint16_t port )
+void Network::Connection::bind( const std::string& ip, uint16_t port )
 {
   asio::ip::tcp::endpoint endpoint( asio::ip::address::from_string( ip ), port );
   m_socket.open( endpoint.protocol() );
@@ -25,7 +25,7 @@ void Sapphire::Network::Connection::bind( const std::string& ip, uint16_t port )
   m_socket.bind( endpoint );
 }
 
-void Sapphire::Network::Connection::startSend()
+void Network::Connection::startSend()
 {
   if( !m_pending_sends.empty() )
   {
@@ -38,7 +38,7 @@ void Sapphire::Network::Connection::startSend()
   }
 }
 
-void Sapphire::Network::Connection::startRecv( int32_t total_bytes )
+void Network::Connection::startRecv( int32_t total_bytes )
 {
   if( total_bytes > 0 )
   {
@@ -61,7 +61,7 @@ void Sapphire::Network::Connection::startRecv( int32_t total_bytes )
   }
 }
 
-void Sapphire::Network::Connection::startError( const asio::error_code& error )
+void Network::Connection::startError( const asio::error_code& error )
 {
   uint32_t v1 = 1;
   uint32_t v2 = 0;
@@ -74,7 +74,7 @@ void Sapphire::Network::Connection::startError( const asio::error_code& error )
   }
 }
 
-void Sapphire::Network::Connection::handleConnect( const asio::error_code& error )
+void Network::Connection::handleConnect( const asio::error_code& error )
 {
   if( error || hasError() || m_hive->hasStopped() )
   {
@@ -94,8 +94,8 @@ void Sapphire::Network::Connection::handleConnect( const asio::error_code& error
   }
 }
 
-void Sapphire::Network::Connection::handleSend( const asio::error_code& error,
-                                                std::list< std::vector< uint8_t > >::iterator itr )
+void Network::Connection::handleSend( const asio::error_code& error,
+                                      std::list< std::vector< uint8_t > >::iterator itr )
 {
   if( error || hasError() || m_hive->hasStopped() )
   {
@@ -109,7 +109,7 @@ void Sapphire::Network::Connection::handleSend( const asio::error_code& error,
   }
 }
 
-void Sapphire::Network::Connection::handleRecv( const asio::error_code& error, int32_t actual_bytes )
+void Network::Connection::handleRecv( const asio::error_code& error, int32_t actual_bytes )
 {
   if( error || hasError() || m_hive->hasStopped() )
   {
@@ -128,7 +128,7 @@ void Sapphire::Network::Connection::handleRecv( const asio::error_code& error, i
   }
 }
 
-void Sapphire::Network::Connection::dispatchSend( std::vector< uint8_t > buffer )
+void Network::Connection::dispatchSend( std::vector< uint8_t > buffer )
 {
   bool should_start_send = m_pending_sends.empty();
   m_pending_sends.push_back( buffer );
@@ -138,7 +138,7 @@ void Sapphire::Network::Connection::dispatchSend( std::vector< uint8_t > buffer 
   }
 }
 
-void Sapphire::Network::Connection::dispatchRecv( int32_t total_bytes )
+void Network::Connection::dispatchRecv( int32_t total_bytes )
 {
   bool should_start_receive = m_pending_recvs.empty();
   m_pending_recvs.push_back( total_bytes );
@@ -149,7 +149,7 @@ void Sapphire::Network::Connection::dispatchRecv( int32_t total_bytes )
 }
 
 
-void Sapphire::Network::Connection::connect( const std::string& host, uint16_t port )
+void Network::Connection::connect( const std::string& host, uint16_t port )
 {
   asio::ip::tcp::resolver resolver( m_hive->getService() );
   asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
@@ -160,48 +160,48 @@ void Sapphire::Network::Connection::connect( const std::string& host, uint16_t p
 
 }
 
-void Sapphire::Network::Connection::disconnect()
+void Network::Connection::disconnect()
 {
   onDisconnect();
   m_socket.close();
 }
 
-void Sapphire::Network::Connection::recv( int32_t total_bytes )
+void Network::Connection::recv( int32_t total_bytes )
 {
   m_io_strand.post( std::bind( &Connection::dispatchRecv, shared_from_this(), total_bytes ) );
 }
 
-void Sapphire::Network::Connection::send( const std::vector< uint8_t >& buffer )
+void Network::Connection::send( const std::vector< uint8_t >& buffer )
 {
   m_io_strand.post( std::bind( &Connection::dispatchSend, shared_from_this(), buffer ) );
 }
 
-asio::ip::tcp::socket& Sapphire::Network::Connection::getSocket()
+asio::ip::tcp::socket& Network::Connection::getSocket()
 {
   return m_socket;
 }
 
-asio::strand& Sapphire::Network::Connection::getStrand()
+asio::strand& Network::Connection::getStrand()
 {
   return m_io_strand;
 }
 
-Sapphire::Network::HivePtr Sapphire::Network::Connection::getHive()
+Network::HivePtr Network::Connection::getHive()
 {
   return m_hive;
 }
 
-void Sapphire::Network::Connection::setReceiveBufferSize( int32_t size )
+void Network::Connection::setReceiveBufferSize( int32_t size )
 {
   m_receive_buffer_size = size;
 }
 
-int32_t Sapphire::Network::Connection::getReceiveBufferSize() const
+int32_t Network::Connection::getReceiveBufferSize() const
 {
   return m_receive_buffer_size;
 }
 
-bool Sapphire::Network::Connection::hasError()
+bool Network::Connection::hasError()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 1;

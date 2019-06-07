@@ -49,7 +49,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.pos.x = bnpc.getPos().x;
       m_data.pos.y = bnpc.getPos().y;
       m_data.pos.z = bnpc.getPos().z;
-      m_data.rotation = Util::floatToUInt16Rot( bnpc.getRot() );
+      m_data.rotation = Common::Util::floatToUInt16Rot( bnpc.getRot() );
       m_data.levelId = bnpc.getLevelId();
 
       m_data.enemyType = bnpc.getEnemyType();
@@ -87,7 +87,7 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.targetId = static_cast< uint64_t >( bnpc.getTargetId() );
 
-      uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
+      uint64_t currentTimeMs = Common::Util::getTimeMs();
 
       for( auto const& effect : bnpc.getStatusEffectMap() )
       {

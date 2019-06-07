@@ -12,12 +12,6 @@
 #include "Acceptor.h"
 #include <memory>
 
-namespace Sapphire
-{
-  class Framework;
-  using FrameworkPtr = std::shared_ptr< Framework >;
-}
-
 namespace Sapphire::Network
 {
 
@@ -41,7 +35,7 @@ namespace Sapphire::Network
     std::list< std::vector< uint8_t > > m_pending_sends;
     int32_t m_receive_buffer_size;
     std::atomic< uint32_t > m_error_state;
-    Sapphire::FrameworkPtr m_pFw;
+    FrameworkPtr m_pFw;
 
     Connection( HivePtr hive, FrameworkPtr pFw );
 

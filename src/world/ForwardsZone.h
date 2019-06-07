@@ -82,10 +82,11 @@ TYPE_FORWARD( Director );
 TYPE_FORWARD( EventHandler );
 }
 
-namespace Action
+namespace World::Action
 {
 TYPE_FORWARD( Action );
 TYPE_FORWARD( EventAction );
+TYPE_FORWARD( ItemAction );
 
 using ActionCallback = std::function< void( Entity::Player&, uint32_t, uint64_t ) >;
 }

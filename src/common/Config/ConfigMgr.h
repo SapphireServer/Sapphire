@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include "ConfigDef.h"
 
-namespace Sapphire
+namespace Sapphire::Common
 {
     class ConfigMgr
     {

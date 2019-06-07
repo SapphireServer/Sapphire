@@ -10,6 +10,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
 #include <cmath>
+#include <Network/PacketWrappers/EffectPacket.h>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -522,6 +523,29 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
     player.learnAction( id );
   }
+  else if ( subCommand == "effect")
+  {
+    uint16_t param1;
+    sscanf( params.c_str(), "%hu", &param1 );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), param1 );
+    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
+
+    Common::EffectEntry entry{};
+    entry.value = param1;
+    entry.effectType = Common::ActionEffectType::Damage;
+    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+
+    effectPacket->addEffect( entry );
+
+    auto sequence = player.getCurrentZone()->getNextEffectSequence();
+    effectPacket->setSequence( sequence );
+
+//    effectPacket->setAnimationId( param1 );
+//    effectPacket->setEffectFlags( 0 );
+
+    player.queuePacket( effectPacket );
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid ADD command.", subCommand );
@@ -683,7 +707,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().r16 = Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
     player.queuePacket( setActorPosPacket );
   }
 }

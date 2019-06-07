@@ -14,12 +14,12 @@ namespace Sapphire::Db
   class DbWorker
   {
   public:
-    DbWorker( LockedWaitQueue< std::shared_ptr< Operation > >* newQueue, DbConnection* connection );
+    DbWorker( Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* newQueue, DbConnection* connection );
 
     ~DbWorker();
 
   private:
-    LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
+    Common::Util::LockedWaitQueue< std::shared_ptr< Operation > >* m_queue;
     DbConnection* m_pConn;
 
     void workerThread();

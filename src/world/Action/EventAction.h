@@ -6,7 +6,7 @@
 #include "ForwardsZone.h"
 #include "Action.h"
 
-namespace Sapphire::Action
+namespace Sapphire::World::Action
 {
 
 class EventAction : public Action
