@@ -359,7 +359,7 @@ bool DbManager::modeCheck()
 
   if( missing > 0 )
   {
-    Logger::warn( "Database is missing {} migrations.", missing );
+    Logger::warn( "Database is missing {} migration(s).", missing );
   }
   else
   {
