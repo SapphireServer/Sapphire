@@ -13,9 +13,10 @@ enum class Mode
 {
   INIT,
   LIQUIDATE,
-  UPDATE,
+  MIGRATE,
   CHECK,
-  CLEAN_CHARS
+  CLEAN_CHARS,
+  ADD_MIGRATION,
 };
 
 class DbManager
@@ -37,6 +38,12 @@ class DbManager
 
     bool modeLiquidate();
 
+    bool modeCheck();
+
+    bool modeMigrate();
+
+    bool modeAddMigration();
+
     virtual ~DbManager();
 
     const std::string& getLastError();
@@ -48,6 +55,8 @@ class DbManager
     void setInsertFile( const std::string& insertFile );
 
     void setForceMode( bool mode );
+
+    void setMigratioName( const std::string& name );
 
   private:
     std::string m_host;
@@ -61,6 +70,8 @@ class DbManager
     std::string m_iFile;
     std::string m_sFile;
     bool m_force;
+
+    std::string m_migrationName;
 };
 
 

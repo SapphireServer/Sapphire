@@ -19,6 +19,8 @@ namespace Sapphire::Common::Util
 
   std::string toLowerCopy( const std::string& inStr );
 
+  std::string fmtUtcTime( const std::string& fmt );
+
   uint64_t getTimeMs();
 
   /*!
