@@ -41,10 +41,12 @@ std::map< char, std::string > numberToStringMap
     { '9', "nine" },
   };
 
-std::vector< std::string > cppKeyWords
+std::vector< std::string > reservedWords
   {
     "new",
-    "class"
+    "class",
+    "long",
+    "short"
   };
 
 //std::string datLocation( "/home/mordred/sqpack" );
@@ -89,7 +91,7 @@ std::string generateSetDatAccessCall( const std::string& exd )
   if( langs.size() > 1 )
     lang = "xiv::exd::Language::en";
 
-  return "      m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );\n";
+  return "    m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );\n";
 }
 
 std::string generateDirectGetterDef()
@@ -203,7 +205,7 @@ std::string generateStruct( const std::string& exd )
     }
     fieldName[ 0 ] = std::tolower( fieldName[ 0 ] );
 
-    std::string badChars = ",-':![](){}<>% \x02\x1f\x01\x03";
+    std::string badChars = ",-':![](){}/<>% \x02\x1f\x01\x03";
     std::for_each( badChars.begin(), badChars.end(), [ &fieldName ]( const char c ) 
     {
       fieldName.erase( std::remove( fieldName.begin(), fieldName.end(), c ), fieldName.end() );
@@ -218,23 +220,23 @@ std::string generateStruct( const std::string& exd )
       }
     }
 
-    for( std::string keyword : cppKeyWords )
+    for( std::string keyword : reservedWords )
     {
       if( fieldName == keyword )
-        fieldName[ 0 ] = toupper( fieldName[ 0 ] );
+        fieldName = fmt::format( "_{}", fieldName );
     }
 
     indexToNameMap[ count ] = fieldName;
     indexToTypeMap[ count ] = type;
     if( indexToTarget.find( count ) != indexToTarget.end() )
-      result += "   std::shared_ptr< " + indexToTarget[ count ] + "> " + fieldName + ";\n";
+      result += "  std::shared_ptr< " + indexToTarget[ count ] + "> " + fieldName + ";\n";
     else
     {
       if( indexIsArrayMap.find( count ) != indexIsArrayMap.end() )
       {
         type = "std::vector< " + type + " >";
       }
-      result += "   " + type + " " + fieldName + ";\n";
+      result += "  " + type + " " + fieldName + ";\n";
 
     }
 
@@ -244,11 +246,11 @@ std::string generateStruct( const std::string& exd )
   auto exhHead = exh.get_header();
   if( exhHead.variant == 2 )
   {
-    result += "\n   " + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );\n";
+    result += "\n  " + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );\n";
   }
   else
   {
-    result += "\n   " + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );\n";
+    result += "\n  " + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );\n";
   }
   result += "};\n\n";
 
@@ -265,7 +267,7 @@ std::string generateConstructorsDecl( const std::string& exd )
 
   int count = 0;
 
-  std::string indent = "   ";
+  std::string indent = "  ";
   auto exhHead = exh.get_header();
   if( exhHead.variant == 2 )
   {
@@ -406,22 +408,6 @@ int main( int argc, char** argv )
   }
 
   Logger::info( "Processed {} definition files, writing files...", entryCount );
-
-  getterDecl +=
-    "\n     template< class T >\n"
-    "     std::shared_ptr< T > get( uint32_t id )\n"
-    "     {\n"
-    "        try\n"
-    "        {\n"
-    "           auto info = std::make_shared< T >( id, this );\n"
-    "           return info;\n"
-    "        }\n"
-    "        catch( ... )\n"
-    "        {\n"
-    "           return nullptr;\n"
-    "        }\n"
-    "        return nullptr;\n"
-    "     }\n";
 
   getterDef += generateDirectGetterDef();
 

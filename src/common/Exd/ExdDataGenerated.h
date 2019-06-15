@@ -125,6 +125,8 @@ struct CompanyCraftProcess;
 struct CompanyCraftSequence;
 struct CompanyCraftSupplyItem;
 struct CompanyCraftType;
+struct CompanyLeve;
+struct CompanyLeveRule;
 struct CompleteJournal;
 struct CompleteJournalCategory;
 struct ContentCloseCycle;
@@ -148,6 +150,8 @@ struct CraftType;
 struct Credit;
 struct CreditBackImage;
 struct CreditCast;
+struct CreditList;
+struct CreditListText;
 struct Currency;
 struct CustomTalk;
 struct CustomTalkDynamicIcon;
@@ -354,6 +358,8 @@ struct MountSpeed;
 struct MountTransient;
 struct MoveTimeline;
 struct MoveVfx;
+struct NotebookDivision;
+struct NotebookDivisionCategory;
 struct NpcEquip;
 struct NpcYell;
 struct Omen;
@@ -458,6 +464,7 @@ struct TraitTransient;
 struct Transformation;
 struct Treasure;
 struct TreasureHuntRank;
+struct TreasureSpot;
 struct Tribe;
 struct TripleTriad;
 struct TripleTriadCard;
@@ -493,2753 +500,2805 @@ struct ZoneSharedGroup;
 
 struct Achievement
 {
-   uint8_t achievementCategory;
-   std::string name;
-   std::string description;
-   uint8_t points;
-   uint16_t title;
-   uint32_t item;
-   uint16_t icon;
-   uint8_t type;
-   int32_t key;
-   std::vector< int32_t > data;
-   uint16_t order;
-   bool initialHide;
+  uint8_t achievementCategory;
+  std::string name;
+  std::string description;
+  uint8_t points;
+  uint16_t title;
+  uint32_t item;
+  uint16_t icon;
+  uint8_t type;
+  int32_t key;
+  std::vector< int32_t > data;
+  uint16_t order;
+  bool initialHide;
 
-   Achievement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Achievement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AchievementCategory
 {
-   std::string name;
-   uint8_t achievementKind;
-   bool hideCategory;
+  std::string name;
+  uint8_t achievementKind;
+  bool hideCategory;
 
-   AchievementCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AchievementCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AchievementKind
 {
-   std::string name;
+  std::string name;
 
-   AchievementKind( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AchievementKind( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Action
 {
-   std::string name;
-   uint16_t icon;
-   uint8_t actionCategory;
-   uint8_t animationStart;
-   uint8_t vFX;
-   int16_t animationEnd;
-   uint16_t actionTimelineHit;
-   int8_t classJob;
-   uint8_t classJobLevel;
-   bool isRoleAction;
-   int8_t range;
-   bool canTargetSelf;
-   bool canTargetParty;
-   bool canTargetFriendly;
-   bool canTargetHostile;
-   bool targetArea;
-   bool canTargetDead;
-   uint8_t castType;
-   uint8_t effectRange;
-   uint8_t xAxisModifier;
-   uint8_t costType;
-   uint16_t cost;
-   uint16_t actionCombo;
-   bool preservesCombo;
-   uint16_t cast100ms;
-   uint16_t recast100ms;
-   uint8_t cooldownGroup;
-   int8_t attackType;
-   uint8_t aspect;
-   uint8_t actionProcStatus;
-   uint16_t statusGainSelf;
-   uint32_t unlockLink;
-   uint8_t classJobCategory;
-   bool affectsPosition;
-   uint8_t omen;
-   bool isPvP;
-   bool isPlayerAction;
+  std::string name;
+  uint16_t icon;
+  uint8_t actionCategory;
+  uint8_t animationStart;
+  uint8_t vFX;
+  int16_t animationEnd;
+  uint16_t actionTimelineHit;
+  int8_t classJob;
+  uint8_t classJobLevel;
+  bool isRoleAction;
+  int8_t range;
+  bool canTargetSelf;
+  bool canTargetParty;
+  bool canTargetFriendly;
+  bool canTargetHostile;
+  bool targetArea;
+  bool canTargetDead;
+  uint8_t castType;
+  uint8_t effectRange;
+  uint8_t xAxisModifier;
+  uint8_t primaryCostType;
+  uint16_t primaryCostValue;
+  uint8_t secondaryCostType;
+  uint16_t secondaryCostValue;
+  uint16_t actionCombo;
+  bool preservesCombo;
+  uint16_t cast100ms;
+  uint16_t recast100ms;
+  uint8_t cooldownGroup;
+  int8_t attackType;
+  uint8_t aspect;
+  uint8_t actionProcStatus;
+  uint16_t statusGainSelf;
+  uint32_t unlockLink;
+  uint8_t classJobCategory;
+  bool affectsPosition;
+  uint8_t omen;
+  bool isPvP;
+  bool isPlayerAction;
 
-   Action( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Action( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionCastTimeline
 {
-   uint16_t name;
-   uint16_t vFX;
+  uint16_t name;
+  uint16_t vFX;
 
-   ActionCastTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionCastTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionCastVFX
 {
-   uint16_t vFX;
+  uint16_t vFX;
 
-   ActionCastVFX( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionCastVFX( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionCategory
 {
-   std::string name;
+  std::string name;
 
-   ActionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionComboRoute
 {
-   std::string name;
-   std::vector< uint16_t > action;
+  std::string name;
+  std::vector< uint16_t > action;
 
-   ActionComboRoute( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionComboRoute( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionIndirection
 {
-   int32_t name;
+  int32_t name;
 
-   ActionIndirection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionIndirection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionParam
 {
-   int16_t name;
+  int16_t name;
 
-   ActionParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionProcStatus
 {
-   uint16_t status;
+  uint16_t status;
 
-   ActionProcStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionProcStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionTimeline
 {
-   std::string key;
+  std::string key;
 
-   ActionTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionTimelineMove
 {
 
-   ActionTimelineMove( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionTimelineMove( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionTimelineReplace
 {
-   uint16_t old;
-   uint16_t New;
+  uint16_t old;
+  uint16_t _new;
 
-   ActionTimelineReplace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionTimelineReplace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActionTransient
 {
-   std::string description;
+  std::string description;
 
-   ActionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActivityFeedButtons
 {
-   std::string bannerURL;
-   std::string description;
-   std::string language;
-   std::string pictureURL;
+  std::string bannerURL;
+  std::string description;
+  std::string language;
+  std::string pictureURL;
 
-   ActivityFeedButtons( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActivityFeedButtons( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActivityFeedCaptions
 {
-   std::string jA;
-   std::string eN;
-   std::string dE;
-   std::string fR;
+  std::string jA;
+  std::string eN;
+  std::string dE;
+  std::string fR;
 
-   ActivityFeedCaptions( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActivityFeedCaptions( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActivityFeedGroupCaptions
 {
-   std::string jA;
-   std::string eN;
-   std::string dE;
-   std::string fR;
+  std::string jA;
+  std::string eN;
+  std::string dE;
+  std::string fR;
 
-   ActivityFeedGroupCaptions( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActivityFeedGroupCaptions( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ActivityFeedImages
 {
-   std::string expansionImage;
-   std::string activityFeedJA;
-   std::string activityFeedEN;
-   std::string activityFeedDE;
-   std::string activityFeedFR;
+  std::string expansionImage;
+  std::string activityFeedJA;
+  std::string activityFeedEN;
+  std::string activityFeedDE;
+  std::string activityFeedFR;
 
-   ActivityFeedImages( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ActivityFeedImages( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Addon
 {
-   std::string text;
+  std::string text;
 
-   Addon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Addon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AddonHud
 {
-   std::string _long;
-   std::string _short;
-   std::string _function;
+  std::string _long;
+  std::string _short;
+  std::string function;
 
-   AddonHud( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AddonHud( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Adventure
 {
-   int32_t level;
-   uint16_t emote;
-   uint16_t minTime;
-   uint16_t maxTime;
-   int32_t placeName;
-   int32_t iconList;
-   int32_t iconDiscovered;
-   std::string name;
-   std::string impression;
-   std::string description;
-   int32_t iconUndiscovered;
-   bool isInitial;
+  int32_t level;
+  uint16_t emote;
+  uint16_t minTime;
+  uint16_t maxTime;
+  int32_t placeName;
+  int32_t iconList;
+  int32_t iconDiscovered;
+  std::string name;
+  std::string impression;
+  std::string description;
+  int32_t iconUndiscovered;
+  bool isInitial;
 
-   Adventure( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Adventure( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AdventureExPhase
 {
-   uint32_t quest;
-   uint32_t adventureBegin;
-   uint32_t adventureEnd;
+  uint32_t quest;
+  uint32_t adventureBegin;
+  uint32_t adventureEnd;
 
-   AdventureExPhase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AdventureExPhase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AetherCurrent
 {
-   uint32_t quest;
+  uint32_t quest;
 
-   AetherCurrent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AetherCurrent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AetherCurrentCompFlgSet
 {
-   int32_t territory;
-   std::vector< int32_t > aetherCurrent;
+  int32_t territory;
+  std::vector< int32_t > aetherCurrent;
 
-   AetherCurrentCompFlgSet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AetherCurrentCompFlgSet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AetherialWheel
 {
-   int32_t itemUnprimed;
-   int32_t itemPrimed;
-   uint8_t grade;
-   uint8_t hoursRequired;
+  int32_t itemUnprimed;
+  int32_t itemPrimed;
+  uint8_t grade;
+  uint8_t hoursRequired;
 
-   AetherialWheel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AetherialWheel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Aetheryte
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   uint16_t placeName;
-   uint16_t aethernetName;
-   uint16_t territory;
-   std::vector< uint32_t > level;
-   bool isAetheryte;
-   uint8_t aethernetGroup;
-   uint32_t requiredQuest;
-   uint16_t map;
-   int16_t aetherstreamX;
-   int16_t aetherstreamY;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  uint16_t placeName;
+  uint16_t aethernetName;
+  uint16_t territory;
+  std::vector< uint32_t > level;
+  bool isAetheryte;
+  uint8_t aethernetGroup;
+  uint32_t requiredQuest;
+  uint16_t map;
+  int16_t aetherstreamX;
+  int16_t aetherstreamY;
 
-   Aetheryte( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Aetheryte( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AetheryteSystemDefine
 {
-   std::string text;
+  std::string text;
 
-   AetheryteSystemDefine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AetheryteSystemDefine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AirshipExplorationLevel
 {
-   uint32_t expToNext;
+  uint32_t expToNext;
 
-   AirshipExplorationLevel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AirshipExplorationLevel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AirshipExplorationLog
 {
-   std::string text;
+  std::string text;
 
-   AirshipExplorationLog( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AirshipExplorationLog( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AirshipExplorationParamType
 {
-   std::string name;
+  std::string name;
 
-   AirshipExplorationParamType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AirshipExplorationParamType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AirshipExplorationPart
 {
-   uint8_t rank;
-   uint8_t components;
-   int16_t surveillance;
-   int16_t retrieval;
-   int16_t speed;
-   int16_t range;
-   int16_t favor;
-   uint8_t repairMaterials;
+  uint8_t rank;
+  uint8_t components;
+  int16_t surveillance;
+  int16_t retrieval;
+  int16_t speed;
+  int16_t range;
+  int16_t favor;
+  uint8_t repairMaterials;
 
-   AirshipExplorationPart( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AirshipExplorationPart( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AirshipExplorationPoint
 {
-   std::string name;
-   std::string nameShort;
-   uint8_t requiredLevel;
-   uint16_t requiredFuel;
-   uint16_t durationmin;
-   uint8_t requiredSurveillance;
-   uint32_t expReward;
+  std::string name;
+  std::string nameShort;
+  uint8_t requiredLevel;
+  uint16_t requiredFuel;
+  uint16_t durationmin;
+  uint8_t requiredSurveillance;
+  uint32_t expReward;
 
-   AirshipExplorationPoint( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AirshipExplorationPoint( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5
 {
-   int32_t item;
-   uint8_t secondaryStatTotal;
-   std::vector< uint8_t > parameter;
+  int32_t item;
+  uint8_t secondaryStatTotal;
+  std::vector< uint8_t > parameter;
 
-   AnimaWeapon5( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeapon5( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5Param
 {
-   uint8_t baseParam;
-   std::string name;
+  uint8_t baseParam;
+  std::string name;
 
-   AnimaWeapon5Param( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeapon5Param( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5PatternGroup
 {
-   std::string name;
+  std::string name;
 
-   AnimaWeapon5PatternGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeapon5PatternGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5SpiritTalk
 {
-   int32_t dialogue;
+  int32_t dialogue;
 
-   AnimaWeapon5SpiritTalk( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeapon5SpiritTalk( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5SpiritTalkParam
 {
-   std::string prologue;
-   std::string epilogue;
+  std::string prologue;
+  std::string epilogue;
 
-   AnimaWeapon5SpiritTalkParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeapon5SpiritTalkParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeapon5TradeItem
 {
-   uint32_t crystalSand;
-   uint8_t qty;
-   uint8_t category;
+  uint32_t crystalSand;
+  uint8_t qty;
+  uint8_t category;
 
-   AnimaWeapon5TradeItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeapon5TradeItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeaponFUITalk
 {
-   int32_t dialogue;
+  int32_t dialogue;
 
-   AnimaWeaponFUITalk( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeaponFUITalk( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeaponFUITalkParam
 {
-   std::string prologue;
-   std::string epilogue;
+  std::string prologue;
+  std::string epilogue;
 
-   AnimaWeaponFUITalkParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeaponFUITalkParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeaponIcon
 {
-   int32_t hyperconductive;
-   int32_t reborn;
-   int32_t sharpened;
-   int32_t zodiac;
-   int32_t zodiacLux;
+  int32_t hyperconductive;
+  int32_t reborn;
+  int32_t sharpened;
+  int32_t zodiac;
+  int32_t zodiacLux;
 
-   AnimaWeaponIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeaponIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AnimaWeaponItem
 {
-   std::vector< uint32_t > item;
+  std::vector< uint32_t > item;
 
-   AnimaWeaponItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AnimaWeaponItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AozAction
 {
-   uint32_t action;
+  uint32_t action;
 
-   AozAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AozAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AozActionTransient
 {
-   uint32_t icon;
-   std::string stats;
-   std::string description;
-   uint16_t location;
-   uint32_t startQuest;
-   uint32_t nextQuest;
+  uint32_t icon;
+  std::string stats;
+  std::string description;
+  uint16_t location;
+  uint32_t startQuest;
+  uint32_t nextQuest;
 
-   AozActionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AozActionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AOZArrangement
 {
-   uint16_t aOZContentBriefingBNpc;
+  uint16_t aOZContentBriefingBNpc;
 
-   AOZArrangement( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  AOZArrangement( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AOZBoss
 {
-   uint16_t boss;
+  uint16_t boss;
 
-   AOZBoss( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AOZBoss( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AOZContent
 {
-   uint16_t standardFinishTime;
-   uint16_t idealFinishTime;
-   uint8_t act1FightType;
-   uint16_t act1;
-   uint8_t arenaType1;
-   uint8_t act2FightType;
-   uint16_t act2;
-   uint8_t arenaType2;
-   uint8_t act3FightType;
-   uint16_t act3;
-   uint8_t arenaType3;
-   uint32_t contentEntry;
-   uint8_t order;
-   uint16_t gilReward;
-   uint16_t alliedSealsReward;
-   uint16_t tomestonesReward;
+  uint16_t standardFinishTime;
+  uint16_t idealFinishTime;
+  uint8_t act1FightType;
+  uint16_t act1;
+  uint8_t arenaType1;
+  uint8_t act2FightType;
+  uint16_t act2;
+  uint8_t arenaType2;
+  uint8_t act3FightType;
+  uint16_t act3;
+  uint8_t arenaType3;
+  uint32_t contentEntry;
+  uint8_t order;
+  uint16_t gilReward;
+  uint16_t alliedSealsReward;
+  uint16_t tomestonesReward;
 
-   AOZContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AOZContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AOZContentBriefingBNpc
 {
-   uint32_t bNpcName;
-   uint32_t targetSmall;
-   uint32_t targetLarge;
-   uint8_t endurance;
-   uint8_t fire;
-   uint8_t ice;
-   uint8_t wind;
-   uint8_t earth;
-   uint8_t thunder;
-   uint8_t water;
-   uint8_t slashing;
-   uint8_t piercing;
-   uint8_t blunt;
-   uint8_t magic;
-   bool slowResistance;
-   bool petrificationResistance;
-   bool paralysisResistance;
-   bool silenceResistance;
-   bool blindResistance;
-   bool stunResistance;
-   bool sleepResistance;
-   bool bindResistance;
-   bool heavyResistance;
-   bool instaDeathResistance;
+  uint32_t bNpcName;
+  uint32_t targetSmall;
+  uint32_t targetLarge;
+  uint8_t endurance;
+  uint8_t fire;
+  uint8_t ice;
+  uint8_t wind;
+  uint8_t earth;
+  uint8_t thunder;
+  uint8_t water;
+  uint8_t slashing;
+  uint8_t piercing;
+  uint8_t blunt;
+  uint8_t magic;
+  bool slowResistance;
+  bool petrificationResistance;
+  bool paralysisResistance;
+  bool silenceResistance;
+  bool blindResistance;
+  bool stunResistance;
+  bool sleepResistance;
+  bool bindResistance;
+  bool heavyResistance;
+  bool instaDeathResistance;
 
-   AOZContentBriefingBNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AOZContentBriefingBNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AquariumFish
 {
-   uint8_t aquariumWater;
-   uint8_t size;
-   uint32_t item;
+  uint8_t aquariumWater;
+  uint8_t size;
+  uint32_t item;
 
-   AquariumFish( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AquariumFish( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AquariumWater
 {
-   std::string name;
+  std::string name;
 
-   AquariumWater( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AquariumWater( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ArrayEventHandler
 {
-   std::vector< uint32_t > data;
+  std::vector< uint32_t > data;
 
-   ArrayEventHandler( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ArrayEventHandler( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AttackType
 {
-   std::string name;
+  std::string name;
 
-   AttackType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  AttackType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BacklightColor
 {
-   uint32_t color;
+  uint32_t color;
 
-   BacklightColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BacklightColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Balloon
 {
-   std::string dialogue;
+  std::string dialogue;
 
-   Balloon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Balloon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BaseParam
 {
-   int8_t order;
-   std::string name;
-   std::string description;
-   uint8_t oneHWpn;
-   uint8_t oH;
-   uint8_t head;
-   uint8_t chest;
-   uint8_t hands;
-   uint8_t waist;
-   uint8_t legs;
-   uint8_t feet;
-   uint8_t earring;
-   uint8_t necklace;
-   uint8_t bracelet;
-   uint8_t ring;
-   uint8_t twoHWpn;
-   uint8_t chestHead;
-   uint8_t chestHeadLegsFeet;
-   uint8_t legsFeet;
-   uint8_t headChestHandsLegsFeet;
-   uint8_t chestLegsGloves;
-   uint8_t chestLegsFeet;
+  int8_t order;
+  std::string name;
+  std::string description;
+  uint8_t oneHWpn;
+  uint8_t oH;
+  uint8_t head;
+  uint8_t chest;
+  uint8_t hands;
+  uint8_t waist;
+  uint8_t legs;
+  uint8_t feet;
+  uint8_t earring;
+  uint8_t necklace;
+  uint8_t bracelet;
+  uint8_t ring;
+  uint8_t twoHWpn;
+  uint8_t chestHead;
+  uint8_t chestHeadLegsFeet;
+  uint8_t legsFeet;
+  uint8_t headChestHandsLegsFeet;
+  uint8_t chestLegsGloves;
+  uint8_t chestLegsFeet;
 
-   BaseParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BaseParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BattleLeve
 {
-   std::vector< uint16_t > enemyLevel;
-   std::vector< uint32_t > bNpcName;
-   std::vector< int32_t > itemsInvolved;
-   std::vector< uint8_t > itemsInvolvedQty;
-   std::vector< uint8_t > itemDropRate;
+  std::vector< uint16_t > enemyLevel;
+  std::vector< uint32_t > bNpcName;
+  std::vector< int32_t > itemsInvolved;
+  std::vector< uint8_t > itemsInvolvedQty;
+  std::vector< uint8_t > itemDropRate;
 
-   BattleLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BattleLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BeastRankBonus
 {
-   uint32_t item;
-   std::vector< uint8_t > itemQuantity;
+  uint32_t item;
+  std::vector< uint8_t > itemQuantity;
 
-   BeastRankBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BeastRankBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BeastReputationRank
 {
-   uint16_t requiredReputation;
-   std::string name;
+  uint16_t requiredReputation;
+  std::string name;
 
-   BeastReputationRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BeastReputationRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BeastTribe
 {
-   uint8_t minLevel;
-   uint8_t maxLevel;
-   uint8_t beastRankBonus;
-   uint32_t iconReputation;
-   uint32_t icon;
-   uint8_t maxRank;
-   uint32_t alliedBeastTribeQuest;
-   uint8_t expansion;
-   uint32_t currencyItem;
-   uint8_t displayOrder;
-   std::string name;
-   std::string nameRelation;
+  uint8_t minLevel;
+  uint8_t maxLevel;
+  uint8_t beastRankBonus;
+  uint32_t iconReputation;
+  uint32_t icon;
+  uint8_t maxRank;
+  uint32_t alliedBeastTribeQuest;
+  uint8_t expansion;
+  uint32_t currencyItem;
+  uint8_t displayOrder;
+  std::string name;
+  std::string nameRelation;
 
-   BeastTribe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BeastTribe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Behavior
 {
-   uint16_t balloon;
+  uint16_t balloon;
 
-   Behavior( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  Behavior( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BGM
 {
-   std::string file;
+  std::string file;
 
-   BGM( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BGM( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BGMFade
 {
-   int32_t bGMFadeType;
+  int32_t bGMFadeType;
 
-   BGMFade( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BGMFade( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BGMSituation
 {
-   uint16_t bGMDay;
-   uint16_t bGMNight;
-   uint16_t bGMBattle;
-   uint16_t bGMField;
+  uint16_t bGMDay;
+  uint16_t bGMNight;
+  uint16_t bGMBattle;
+  uint16_t bGMField;
 
-   BGMSituation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BGMSituation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BGMSwitch
 {
-   uint8_t bGMSystemDefine;
-   uint32_t quest;
+  uint8_t bGMSystemDefine;
+  uint32_t quest;
 
-   BGMSwitch( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  BGMSwitch( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BGMSystemDefine
 {
-   float define;
+  float define;
 
-   BGMSystemDefine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BGMSystemDefine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BNpcAnnounceIcon
 {
-   uint32_t icon;
+  uint32_t icon;
 
-   BNpcAnnounceIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BNpcAnnounceIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BNpcBase
 {
-   uint16_t behavior;
-   uint8_t actionTimelineMove;
-   float scale;
-   uint16_t modelChara;
-   uint16_t bNpcCustomize;
-   uint16_t npcEquip;
-   int32_t arrayEventHandler;
-   uint8_t bNpcParts;
+  uint16_t behavior;
+  uint8_t actionTimelineMove;
+  float scale;
+  uint16_t modelChara;
+  uint16_t bNpcCustomize;
+  uint16_t npcEquip;
+  int32_t arrayEventHandler;
+  uint8_t bNpcParts;
 
-   BNpcBase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BNpcBase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BNpcCustomize
 {
-   uint8_t race;
-   uint8_t gender;
-   uint8_t bodyType;
-   uint8_t height;
-   uint8_t tribe;
-   uint8_t face;
-   uint8_t hairStyle;
-   uint8_t hairHighlight;
-   uint8_t skinColor;
-   uint8_t eyeHeterochromia;
-   uint8_t hairColor;
-   uint8_t hairHighlightColor;
-   uint8_t facialFeature;
-   uint8_t facialFeatureColor;
-   uint8_t eyebrows;
-   uint8_t eyeColor;
-   uint8_t eyeShape;
-   uint8_t nose;
-   uint8_t jaw;
-   uint8_t mouth;
-   uint8_t lipColor;
-   uint8_t bustOrTone1;
-   uint8_t extraFeature1;
-   uint8_t extraFeature2OrBust;
-   uint8_t facePaint;
-   uint8_t facePaintColor;
+  uint8_t race;
+  uint8_t gender;
+  uint8_t bodyType;
+  uint8_t height;
+  uint8_t tribe;
+  uint8_t face;
+  uint8_t hairStyle;
+  uint8_t hairHighlight;
+  uint8_t skinColor;
+  uint8_t eyeHeterochromia;
+  uint8_t hairColor;
+  uint8_t hairHighlightColor;
+  uint8_t facialFeature;
+  uint8_t facialFeatureColor;
+  uint8_t eyebrows;
+  uint8_t eyeColor;
+  uint8_t eyeShape;
+  uint8_t nose;
+  uint8_t jaw;
+  uint8_t mouth;
+  uint8_t lipColor;
+  uint8_t bustOrTone1;
+  uint8_t extraFeature1;
+  uint8_t extraFeature2OrBust;
+  uint8_t facePaint;
+  uint8_t facePaintColor;
 
-   BNpcCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BNpcCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BNpcName
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
 
-   BNpcName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BNpcName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BNpcParts
 {
-   uint16_t bNpcBase1;
-   uint8_t partSlot1;
-   float x1;
-   float y1;
-   float z1;
-   float scale1;
-   uint16_t bNpcBase2;
-   uint8_t partSlot2;
-   float x2;
-   float y2;
-   float z2;
-   float scale2;
-   uint16_t bNpcBase3;
-   uint8_t partSlot3;
-   float x3;
-   float y3;
-   float z3;
-   int16_t scale3;
-   uint16_t bNpcBase4;
-   uint8_t partSlot4;
-   float x4;
-   float y4;
-   float z4;
-   float scale4;
-   uint16_t bNpcBase5;
-   uint8_t partSlot5;
-   float x5;
-   float y5;
-   float z5;
-   float scale5;
+  uint16_t bNpcBase1;
+  uint8_t partSlot1;
+  float x1;
+  float y1;
+  float z1;
+  float scale1;
+  uint16_t bNpcBase2;
+  uint8_t partSlot2;
+  float x2;
+  float y2;
+  float z2;
+  float scale2;
+  uint16_t bNpcBase3;
+  uint8_t partSlot3;
+  float x3;
+  float y3;
+  float z3;
+  int16_t scale3;
+  uint16_t bNpcBase4;
+  uint8_t partSlot4;
+  float x4;
+  float y4;
+  float z4;
+  float scale4;
+  uint16_t bNpcBase5;
+  uint8_t partSlot5;
+  float x5;
+  float y5;
+  float z5;
+  float scale5;
 
-   BNpcParts( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BNpcParts( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Buddy
 {
-   int32_t questRequirement2;
-   int32_t questRequirement1;
-   std::string soundEffect4;
-   std::string soundEffect3;
-   std::string soundEffect2;
-   std::string soundEffect1;
+  int32_t questRequirement2;
+  int32_t questRequirement1;
+  std::string soundEffect4;
+  std::string soundEffect3;
+  std::string soundEffect2;
+  std::string soundEffect1;
 
-   Buddy( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Buddy( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BuddyAction
 {
-   std::string name;
-   std::string description;
-   int32_t icon;
-   int32_t iconStatus;
+  std::string name;
+  std::string description;
+  int32_t icon;
+  int32_t iconStatus;
 
-   BuddyAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BuddyAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BuddyEquip
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string name;
-   int32_t modelTop;
-   int32_t modelBody;
-   int32_t modelLegs;
-   uint8_t grandCompany;
-   uint16_t iconHead;
-   uint16_t iconBody;
-   uint16_t iconLegs;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string name;
+  int32_t modelTop;
+  int32_t modelBody;
+  int32_t modelLegs;
+  uint8_t grandCompany;
+  uint16_t iconHead;
+  uint16_t iconBody;
+  uint16_t iconLegs;
 
-   BuddyEquip( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BuddyEquip( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BuddyItem
 {
-   uint16_t item;
+  uint16_t item;
 
-   BuddyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BuddyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BuddyRank
 {
-   uint32_t expRequired;
+  uint32_t expRequired;
 
-   BuddyRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BuddyRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct BuddySkill
 {
-   uint8_t buddyLevel;
-   bool isActive;
-   uint16_t defender;
-   uint16_t attacker;
-   uint16_t healer;
+  uint8_t buddyLevel;
+  bool isActive;
+  uint16_t defender;
+  uint16_t attacker;
+  uint16_t healer;
 
-   BuddySkill( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  BuddySkill( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Cabinet
 {
-   int32_t item;
-   uint16_t order;
-   uint8_t category;
+  int32_t item;
+  uint16_t order;
+  uint8_t category;
 
-   Cabinet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Cabinet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CabinetCategory
 {
-   uint8_t menuOrder;
-   int32_t icon;
-   int32_t category;
+  uint8_t menuOrder;
+  int32_t icon;
+  int32_t category;
 
-   CabinetCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CabinetCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Calendar
 {
-   std::vector< uint8_t > month;
-   std::vector< uint8_t > day;
+  std::vector< uint8_t > month;
+  std::vector< uint8_t > day;
 
-   Calendar( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Calendar( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CharaMakeCustomize
 {
-   uint32_t icon;
-   uint16_t data;
-   bool isPurchasable;
+  uint32_t icon;
+  uint16_t data;
+  bool isPurchasable;
 
-   CharaMakeCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CharaMakeCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CharaMakeType
 {
-   int32_t race;
-   int32_t tribe;
-   int8_t gender;
-   std::vector< int32_t > facialFeatureIcon;
+  int32_t race;
+  int32_t tribe;
+  int8_t gender;
+  std::vector< int32_t > facialFeatureIcon;
 
-   CharaMakeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CharaMakeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRace
 {
-   uint8_t chocoboRaceRank;
-   uint8_t chocoboRaceTerritory;
+  uint8_t chocoboRaceRank;
+  uint8_t chocoboRaceTerritory;
 
-   ChocoboRace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceAbility
 {
-   std::string name;
-   std::string description;
-   uint32_t icon;
-   int8_t chocoboRaceAbilityType;
-   uint8_t value;
+  std::string name;
+  std::string description;
+  uint32_t icon;
+  int8_t chocoboRaceAbilityType;
+  uint8_t value;
 
-   ChocoboRaceAbility( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceAbility( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceAbilityType
 {
-   bool isActive;
+  bool isActive;
 
-   ChocoboRaceAbilityType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceAbilityType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceItem
 {
-   std::string name;
-   std::string description;
-   uint32_t icon;
+  std::string name;
+  std::string description;
+  uint32_t icon;
 
-   ChocoboRaceItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceRank
 {
-   uint16_t ratingMin;
-   uint16_t ratingMax;
-   uint16_t name;
-   uint16_t fee;
-   int32_t icon;
+  uint16_t ratingMin;
+  uint16_t ratingMax;
+  uint16_t name;
+  uint16_t fee;
+  int32_t icon;
 
-   ChocoboRaceRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceStatus
 {
-   int32_t status;
+  int32_t status;
 
-   ChocoboRaceStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceTerritory
 {
-   uint16_t name;
-   int32_t icon;
+  uint16_t name;
+  int32_t icon;
 
-   ChocoboRaceTerritory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceTerritory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceTutorial
 {
-   std::vector< int32_t > npcYell;
+  std::vector< int32_t > npcYell;
 
-   ChocoboRaceTutorial( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceTutorial( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboRaceWeather
 {
-   int32_t weatherType1;
-   int32_t weatherType2;
+  int32_t weatherType1;
+  int32_t weatherType2;
 
-   ChocoboRaceWeather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboRaceWeather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboTaxi
 {
-   uint32_t location;
+  uint32_t location;
 
-   ChocoboTaxi( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboTaxi( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ChocoboTaxiStand
 {
-   std::string placeName;
+  std::string placeName;
 
-   ChocoboTaxiStand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ChocoboTaxiStand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ClassJob
 {
-   std::string name;
-   std::string abbreviation;
-   uint8_t classJobCategory;
-   int8_t expArrayIndex;
-   uint16_t modifierHitPoints;
-   uint16_t modifierManaPoints;
-   uint16_t modifierStrength;
-   uint16_t modifierVitality;
-   uint16_t modifierDexterity;
-   uint16_t modifierIntelligence;
-   uint16_t modifierMind;
-   uint16_t modifierPiety;
-   uint8_t classJobParent;
-   std::string nameEnglish;
-   int32_t itemStartingWeapon;
-   uint8_t primaryStat;
-   uint16_t limitBreak1;
-   uint16_t limitBreak2;
-   uint16_t limitBreak3;
-   uint32_t itemSoulCrystal;
-   uint32_t unlockQuest;
-   uint32_t relicQuest;
-   uint32_t prerequisite;
-   uint8_t startingLevel;
+  std::string name;
+  std::string abbreviation;
+  uint8_t classJobCategory;
+  int8_t expArrayIndex;
+  uint16_t modifierHitPoints;
+  uint16_t modifierManaPoints;
+  uint16_t modifierStrength;
+  uint16_t modifierVitality;
+  uint16_t modifierDexterity;
+  uint16_t modifierIntelligence;
+  uint16_t modifierMind;
+  uint16_t modifierPiety;
+  uint8_t classJobParent;
+  std::string nameEnglish;
+  int32_t itemStartingWeapon;
+  uint8_t role;
+  uint8_t startingTown;
+  uint8_t primaryStat;
+  uint16_t limitBreak1;
+  uint16_t limitBreak2;
+  uint16_t limitBreak3;
+  uint32_t itemSoulCrystal;
+  uint32_t unlockQuest;
+  uint32_t relicQuest;
+  uint32_t prerequisite;
+  uint8_t startingLevel;
+  uint8_t partyBonus;
+  bool isLimitedJob;
 
-   ClassJob( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ClassJob( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ClassJobCategory
 {
-   std::string name;
-   bool aDV;
-   bool gLA;
-   bool pGL;
-   bool mRD;
-   bool lNC;
-   bool aRC;
-   bool cNJ;
-   bool tHM;
-   bool cRP;
-   bool bSM;
-   bool aRM;
-   bool gSM;
-   bool lTW;
-   bool wVR;
-   bool aLC;
-   bool cUL;
-   bool mIN;
-   bool bTN;
-   bool fSH;
-   bool pLD;
-   bool mNK;
-   bool wAR;
-   bool dRG;
-   bool bRD;
-   bool wHM;
-   bool bLM;
-   bool aCN;
-   bool sMN;
-   bool sCH;
-   bool rOG;
-   bool nIN;
-   bool mCH;
-   bool dRK;
-   bool aST;
-   bool sAM;
-   bool rDM;
+  std::string name;
+  bool aDV;
+  bool gLA;
+  bool pGL;
+  bool mRD;
+  bool lNC;
+  bool aRC;
+  bool cNJ;
+  bool tHM;
+  bool cRP;
+  bool bSM;
+  bool aRM;
+  bool gSM;
+  bool lTW;
+  bool wVR;
+  bool aLC;
+  bool cUL;
+  bool mIN;
+  bool bTN;
+  bool fSH;
+  bool pLD;
+  bool mNK;
+  bool wAR;
+  bool dRG;
+  bool bRD;
+  bool wHM;
+  bool bLM;
+  bool aCN;
+  bool sMN;
+  bool sCH;
+  bool rOG;
+  bool nIN;
+  bool mCH;
+  bool dRK;
+  bool aST;
+  bool sAM;
+  bool rDM;
 
-   ClassJobCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ClassJobCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Companion
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   uint16_t model;
-   uint8_t behavior;
-   uint16_t icon;
-   uint8_t cost;
-   uint16_t hP;
-   uint16_t skillAngle;
-   uint8_t skillCost;
-   uint8_t minionRace;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  uint16_t model;
+  uint8_t behavior;
+  uint16_t icon;
+  uint16_t order;
+  uint8_t cost;
+  uint16_t hP;
+  uint16_t skillAngle;
+  uint8_t skillCost;
+  uint8_t minionRace;
 
-   Companion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Companion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanionMove
 {
-   std::string name;
+  std::string name;
 
-   CompanionMove( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanionMove( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanionTransient
 {
-   std::string description;
-   std::string descriptionEnhanced;
-   std::string tooltip;
-   std::string specialActionName;
-   std::string specialActionDescription;
-   uint8_t attack;
-   uint8_t defense;
-   uint8_t speed;
-   bool hasAreaAttack;
-   bool strengthGate;
-   bool strengthEye;
-   bool strengthShield;
-   bool strengthArcana;
-   uint8_t minionSkillType;
+  std::string description;
+  std::string descriptionEnhanced;
+  std::string tooltip;
+  std::string specialActionName;
+  std::string specialActionDescription;
+  uint8_t attack;
+  uint8_t defense;
+  uint8_t speed;
+  bool hasAreaAttack;
+  bool strengthGate;
+  bool strengthEye;
+  bool strengthShield;
+  bool strengthArcana;
+  uint8_t minionSkillType;
 
-   CompanionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyAction
 {
-   std::string name;
-   std::string description;
-   int32_t icon;
-   uint8_t fCRank;
-   uint32_t cost;
-   uint8_t order;
-   bool purchasable;
+  std::string name;
+  std::string description;
+  int32_t icon;
+  uint8_t fCRank;
+  uint32_t cost;
+  uint8_t order;
+  bool purchasable;
 
-   CompanyAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftDraft
 {
-   std::string name;
-   uint8_t companyCraftDraftCategory;
-   uint32_t order;
+  std::string name;
+  uint8_t companyCraftDraftCategory;
+  uint32_t order;
 
-   CompanyCraftDraft( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftDraft( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftDraftCategory
 {
-   std::string name;
+  std::string name;
 
-   CompanyCraftDraftCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftDraftCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftManufactoryState
 {
-   std::string name;
+  std::string name;
 
-   CompanyCraftManufactoryState( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftManufactoryState( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftPart
 {
-   uint8_t companyCraftType;
-   std::vector< uint16_t > companyCraftProcess;
+  uint8_t companyCraftType;
+  std::vector< uint16_t > companyCraftProcess;
 
-   CompanyCraftPart( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftPart( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftProcess
 {
 
-   CompanyCraftProcess( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftProcess( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftSequence
 {
-   int32_t resultItem;
-   int32_t companyCraftDraftCategory;
-   int32_t companyCraftType;
-   int32_t companyCraftDraft;
-   std::vector< uint16_t > companyCraftPart;
+  int32_t resultItem;
+  int32_t companyCraftDraftCategory;
+  int32_t companyCraftType;
+  int32_t companyCraftDraft;
+  std::vector< uint16_t > companyCraftPart;
 
-   CompanyCraftSequence( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftSequence( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftSupplyItem
 {
-   uint32_t item;
+  uint32_t item;
 
-   CompanyCraftSupplyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftSupplyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompanyCraftType
 {
-   std::string name;
+  std::string name;
 
-   CompanyCraftType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompanyCraftType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CompanyLeve
+{
+  int32_t eventItem;
+  uint8_t eventItemAmount;
+  int32_t companyLeveRule;
+
+  CompanyLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CompanyLeveRule
+{
+  std::string type;
+
+  CompanyLeveRule( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompleteJournal
 {
-   uint16_t requiredLevel;
-   int32_t icon;
-   std::string name;
-   std::vector< int32_t > cutscene;
+  uint16_t requiredLevel;
+  int32_t icon;
+  std::string name;
+  std::vector< int32_t > cutscene;
 
-   CompleteJournal( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompleteJournal( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CompleteJournalCategory
 {
-   uint32_t firstQuest;
-   uint32_t lastQuest;
+  uint32_t firstQuest;
+  uint32_t lastQuest;
 
-   CompleteJournalCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CompleteJournalCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentCloseCycle
 {
-   uint32_t unixtime;
-   uint32_t timeSeconds;
+  uint32_t unixtime;
+  uint32_t timeSeconds;
 
-   ContentCloseCycle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentCloseCycle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentExAction
 {
-   uint32_t name;
-   uint8_t charges;
+  uint32_t name;
+  uint8_t charges;
 
-   ContentExAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentExAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentFinderCondition
 {
-   uint16_t territoryType;
-   uint8_t contentLinkType;
-   uint16_t content;
-   uint8_t contentMemberType;
-   uint8_t classJobLevelRequired;
-   uint8_t classJobLevelSync;
-   uint16_t itemLevelRequired;
-   uint16_t itemLevelSync;
-   bool allowReplacement;
-   bool highEndDuty;
-   bool dutyRecorderAllowed;
-   std::string name;
-   uint8_t contentType;
-   uint8_t transient;
-   uint32_t image;
+  uint16_t territoryType;
+  uint8_t contentLinkType;
+  uint16_t content;
+  uint8_t contentMemberType;
+  uint8_t classJobLevelRequired;
+  uint8_t classJobLevelSync;
+  uint16_t itemLevelRequired;
+  uint16_t itemLevelSync;
+  bool allowReplacement;
+  bool highEndDuty;
+  bool dutyRecorderAllowed;
+  std::string name;
+  uint8_t contentType;
+  uint32_t transient;
+  uint32_t image;
+  bool levelingRoulette;
+  bool level5060Roulette;
+  bool mSQRoulette;
+  bool guildHestRoulette;
+  bool expertRoulette;
+  bool trialRoulette;
+  bool dailyFrontlineChallenge;
+  bool level70Roulette;
+  bool mentorRoulette;
+  bool allianceRoulette;
+  bool normalRaidRoulette;
 
-   ContentFinderCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentFinderCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentFinderConditionTransient
 {
-   std::string description;
+  std::string description;
 
-   ContentFinderConditionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentFinderConditionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentGauge
 {
-   std::string name;
-   uint8_t color;
-   std::string textString;
+  std::string name;
+  uint8_t color;
+  std::string textString;
 
-   ContentGauge( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentGauge( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentGaugeColor
 {
-   uint32_t androidColor1;
-   uint32_t androidColor2;
-   uint32_t androidColor3;
+  uint32_t androidColor1;
+  uint32_t androidColor2;
+  uint32_t androidColor3;
 
-   ContentGaugeColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentGaugeColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentMemberType
 {
-   uint8_t tanksPerParty;
-   uint8_t healersPerParty;
-   uint8_t meleesPerParty;
-   uint8_t rangedPerParty;
+  uint8_t tanksPerParty;
+  uint8_t healersPerParty;
+  uint8_t meleesPerParty;
+  uint8_t rangedPerParty;
 
-   ContentMemberType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentMemberType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentNpcTalk
 {
-   std::vector< uint32_t > contentTalk;
+  std::vector< uint32_t > contentTalk;
 
-   ContentNpcTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentNpcTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentRoulette
 {
-   std::string name;
-   std::string description;
-   std::string dutyType;
-   bool isInDutyFinder;
-   uint8_t openRule;
-   uint8_t requiredLevel;
-   uint16_t itemLevelRequired;
-   uint32_t icon;
-   uint8_t contentRouletteRoleBonus;
-   uint16_t rewardTomeA;
-   uint16_t rewardTomeB;
-   uint16_t rewardTomeC;
-   uint8_t sortKey;
-   uint8_t contentMemberType;
-   bool requireAllDuties;
-   uint8_t contentRouletteOpenRule;
-   uint16_t instanceContent;
+  std::string name;
+  std::string description;
+  std::string dutyType;
+  bool isInDutyFinder;
+  uint8_t openRule;
+  uint8_t requiredLevel;
+  uint16_t itemLevelRequired;
+  uint32_t icon;
+  uint8_t contentRouletteRoleBonus;
+  uint16_t rewardTomeA;
+  uint16_t rewardTomeB;
+  uint16_t rewardTomeC;
+  uint8_t sortKey;
+  uint8_t contentMemberType;
+  bool requireAllDuties;
+  uint8_t contentRouletteOpenRule;
+  uint16_t instanceContent;
 
-   ContentRoulette( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentRoulette( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentRouletteOpenRule
 {
-   uint32_t type;
+  uint32_t type;
 
-   ContentRouletteOpenRule( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentRouletteOpenRule( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentRouletteRoleBonus
 {
-   uint32_t itemRewardType;
-   uint8_t rewardAmount;
+  uint32_t itemRewardType;
+  uint8_t rewardAmount;
 
-   ContentRouletteRoleBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentRouletteRoleBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentsNote
 {
-   uint8_t contentType;
-   uint8_t menuOrder;
-   int32_t requiredAmount;
-   int32_t expMultiplier;
-   int32_t gilRward;
-   uint16_t levelUnlock;
-   uint16_t howTo;
-   std::string name;
-   std::string description;
-   int32_t expCap;
+  uint8_t contentType;
+  uint8_t menuOrder;
+  int32_t requiredAmount;
+  int32_t expMultiplier;
+  int32_t gilRward;
+  uint16_t levelUnlock;
+  uint16_t howTo;
+  std::string name;
+  std::string description;
+  int32_t expCap;
 
-   ContentsNote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentsNote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentTalk
 {
-   uint8_t contentTalkParam;
-   std::string text;
+  uint8_t contentTalkParam;
+  std::string text;
 
-   ContentTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentTalkParam
 {
-   bool param;
-   uint32_t testAction;
+  bool param;
+  uint32_t testAction;
 
-   ContentTalkParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentTalkParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentType
 {
-   std::string name;
-   uint32_t icon;
-   uint32_t iconDutyFinder;
+  std::string name;
+  uint32_t icon;
+  uint32_t iconDutyFinder;
 
-   ContentType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ContentType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CraftAction
 {
-   std::string name;
-   std::string description;
-   uint16_t animationStart;
-   uint16_t animationEnd;
-   uint16_t icon;
-   int8_t classJob;
-   uint8_t classJobCategory;
-   uint8_t classJobLevel;
-   uint32_t questRequirement;
-   bool specialist;
-   uint8_t cost;
-   int32_t cRP;
-   int32_t bSM;
-   int32_t aRM;
-   int32_t gSM;
-   int32_t lTW;
-   int32_t wVR;
-   int32_t aLC;
-   int32_t cUL;
+  std::string name;
+  std::string description;
+  uint16_t animationStart;
+  uint16_t animationEnd;
+  uint16_t icon;
+  int8_t classJob;
+  uint8_t classJobCategory;
+  uint8_t classJobLevel;
+  uint32_t questRequirement;
+  bool specialist;
+  uint8_t cost;
+  int32_t cRP;
+  int32_t bSM;
+  int32_t aRM;
+  int32_t gSM;
+  int32_t lTW;
+  int32_t wVR;
+  int32_t aLC;
+  int32_t cUL;
 
-   CraftAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CraftAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CraftLeve
 {
-   int32_t leve;
-   int32_t craftLeveTalk;
-   uint8_t repeats;
+  int32_t leve;
+  int32_t craftLeveTalk;
+  uint8_t repeats;
 
-   CraftLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CraftLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CraftType
 {
-   std::string name;
+  std::string name;
 
-   CraftType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CraftType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Credit
 {
-   uint16_t roles1;
-   uint16_t japaneseCast1;
-   uint16_t englishCast1;
-   uint16_t frenchCast1;
-   uint16_t germanCast1;
-   uint16_t roles2;
-   uint16_t japaneseCast2;
-   uint16_t englishCast2;
-   uint16_t frenchCast2;
-   uint16_t germanCast2;
+  uint16_t roles1;
+  uint16_t japaneseCast1;
+  uint16_t englishCast1;
+  uint16_t frenchCast1;
+  uint16_t germanCast1;
+  uint16_t roles2;
+  uint16_t japaneseCast2;
+  uint16_t englishCast2;
+  uint16_t frenchCast2;
+  uint16_t germanCast2;
 
-   Credit( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  Credit( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CreditBackImage
 {
-   uint32_t backImage;
+  uint32_t backImage;
 
-   CreditBackImage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  CreditBackImage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CreditCast
 {
-   std::string name;
+  std::string name;
 
-   CreditCast( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CreditCast( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CreditList
+{
+  uint16_t scale;
+  uint32_t icon;
+  uint32_t font;
+  uint32_t cast;
+
+  CreditList( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CreditListText
+{
+  std::string name;
+
+  CreditListText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Currency
 {
-   uint32_t item;
-   uint32_t limit;
+  uint32_t item;
+  uint32_t limit;
 
-   Currency( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Currency( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CustomTalk
 {
-   uint32_t iconActor;
-   uint32_t iconMap;
-   std::string name;
-   std::vector< std::string > scriptInstruction;
-   std::vector< uint32_t > scriptArg;
-   bool text;
+  uint32_t iconActor;
+  uint32_t iconMap;
+  std::string name;
+  std::vector< std::string > scriptInstruction;
+  std::vector< uint32_t > scriptArg;
+  bool text;
 
-   CustomTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CustomTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CustomTalkDynamicIcon
 {
-   uint32_t smallIcon;
-   uint32_t largeIcon;
+  uint32_t smallIcon;
+  uint32_t largeIcon;
 
-   CustomTalkDynamicIcon( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  CustomTalkDynamicIcon( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CustomTalkNestHandlers
 {
-   uint32_t nestHandler;
+  uint32_t nestHandler;
 
-   CustomTalkNestHandlers( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  CustomTalkNestHandlers( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Cutscene
 {
-   std::string path;
+  std::string path;
 
-   Cutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Cutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CutScreenImage
 {
-   int32_t image;
+  int32_t image;
 
-   CutScreenImage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  CutScreenImage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DailySupplyItem
 {
 
-   DailySupplyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DailySupplyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeon
 {
-   std::string name;
+  std::string name;
 
-   DeepDungeon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonBan
 {
-   uint16_t screenImage;
-   uint16_t logMessage;
-   uint16_t name;
+  uint16_t screenImage;
+  uint16_t logMessage;
+  uint16_t name;
 
-   DeepDungeonBan( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonBan( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonDanger
 {
-   uint16_t screenImage;
-   uint16_t logMessage;
-   uint16_t name;
+  uint16_t screenImage;
+  uint16_t logMessage;
+  uint16_t name;
 
-   DeepDungeonDanger( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonDanger( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonEquipment
 {
-   uint32_t icon;
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string name;
-   std::string description;
+  uint32_t icon;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string name;
+  std::string description;
 
-   DeepDungeonEquipment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonEquipment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonFloorEffectUI
 {
-   uint32_t icon;
-   std::string name;
-   std::string description;
+  uint32_t icon;
+  std::string name;
+  std::string description;
 
-   DeepDungeonFloorEffectUI( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonFloorEffectUI( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonItem
 {
-   uint32_t icon;
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string name;
-   std::string tooltip;
-   uint32_t action;
+  uint32_t icon;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string name;
+  std::string tooltip;
+  uint32_t action;
 
-   DeepDungeonItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonLayer
 {
-   uint8_t deepDungeon;
+  uint8_t deepDungeon;
 
-   DeepDungeonLayer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonLayer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonMagicStone
 {
-   uint32_t icon;
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string name;
-   std::string tooltip;
+  uint32_t icon;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string name;
+  std::string tooltip;
 
-   DeepDungeonMagicStone( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonMagicStone( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonMap5X
 {
-   std::vector< uint16_t > deepDungeonRoom;
+  std::vector< uint16_t > deepDungeonRoom;
 
-   DeepDungeonMap5X( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonMap5X( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonRoom
 {
-   std::vector< uint32_t > level;
+  std::vector< uint32_t > level;
 
-   DeepDungeonRoom( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonRoom( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeonStatus
 {
-   uint16_t screenImage;
-   uint16_t logMessage;
-   uint16_t name;
+  uint16_t screenImage;
+  uint16_t logMessage;
+  uint16_t name;
 
-   DeepDungeonStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeepDungeonStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DefaultTalk
 {
-   std::vector< uint16_t > actionTimelinePose;
-   std::vector< std::string > text;
+  std::vector< uint16_t > actionTimelinePose;
+  std::vector< std::string > text;
 
-   DefaultTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DefaultTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DefaultTalkLipSyncType
 {
-   int32_t actionTimeline;
+  int32_t actionTimeline;
 
-   DefaultTalkLipSyncType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DefaultTalkLipSyncType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeliveryQuest
 {
-   int32_t quest;
+  int32_t quest;
 
-   DeliveryQuest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DeliveryQuest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DescriptionPage
 {
-   uint32_t text1;
-   uint32_t image1;
-   uint32_t text2;
-   uint32_t image2;
-   uint32_t text3;
-   uint32_t image3;
-   uint32_t text4;
-   uint32_t image4;
-   uint32_t text5;
-   uint32_t image5;
-   uint32_t text6;
-   uint32_t image6;
-   uint32_t text7;
-   uint32_t image7;
-   uint32_t text8;
-   uint32_t image8;
-   uint32_t text9;
-   uint32_t image9;
+  uint32_t text1;
+  uint32_t image1;
+  uint32_t text2;
+  uint32_t image2;
+  uint32_t text3;
+  uint32_t image3;
+  uint32_t text4;
+  uint32_t image4;
+  uint32_t text5;
+  uint32_t image5;
+  uint32_t text6;
+  uint32_t image6;
+  uint32_t text7;
+  uint32_t image7;
+  uint32_t text8;
+  uint32_t image8;
+  uint32_t text9;
+  uint32_t image9;
 
-   DescriptionPage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  DescriptionPage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DescriptionString
 {
-   std::string text;
+  std::string text;
 
-   DescriptionString( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DescriptionString( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DisposalShop
 {
-   std::string shopName;
+  std::string shopName;
 
-   DisposalShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DisposalShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DisposalShopFilterType
 {
-   std::string category;
+  std::string category;
 
-   DisposalShopFilterType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DisposalShopFilterType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DisposalShopItem
 {
-   int32_t itemDisposed;
-   int32_t itemReceived;
-   uint32_t quantityReceived;
+  int32_t itemDisposed;
+  int32_t itemReceived;
+  uint32_t quantityReceived;
 
-   DisposalShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  DisposalShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DpsChallenge
 {
-   uint16_t playerLevel;
-   uint16_t placeName;
-   uint32_t icon;
-   uint16_t order;
-   std::string name;
-   std::string description;
+  uint16_t playerLevel;
+  uint16_t placeName;
+  uint32_t icon;
+  uint16_t order;
+  std::string name;
+  std::string description;
 
-   DpsChallenge( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DpsChallenge( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DpsChallengeOfficer
 {
-   uint32_t unlockQuest;
-   std::vector< uint16_t > challengeName;
+  uint32_t unlockQuest;
+  std::vector< uint16_t > challengeName;
 
-   DpsChallengeOfficer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DpsChallengeOfficer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DpsChallengeTransient
 {
-   uint16_t instanceContent;
+  uint16_t instanceContent;
 
-   DpsChallengeTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  DpsChallengeTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EmjAddon
 {
-   std::string text;
+  std::string text;
 
-   EmjAddon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EmjAddon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EmjDani
 {
-   uint32_t icon;
+  uint32_t icon;
 
-   EmjDani( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EmjDani( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Emote
 {
-   std::string name;
-   std::vector< uint16_t > actionTimeline;
-   uint8_t emoteCategory;
-   uint8_t emoteMode;
-   bool hasCancelEmote;
-   bool drawsWeapon;
-   int32_t textCommand;
-   uint16_t icon;
-   uint16_t logMessageTargeted;
-   uint16_t logMessageUntargeted;
-   uint32_t unlockLink;
+  std::string name;
+  std::vector< uint16_t > actionTimeline;
+  uint8_t emoteCategory;
+  uint8_t emoteMode;
+  bool hasCancelEmote;
+  bool drawsWeapon;
+  int32_t textCommand;
+  uint16_t icon;
+  uint16_t logMessageTargeted;
+  uint16_t logMessageUntargeted;
+  uint32_t unlockLink;
 
-   Emote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Emote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EmoteCategory
 {
-   std::string name;
+  std::string name;
 
-   EmoteCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EmoteCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ENpcBase
 {
-   std::vector< uint32_t > eNpcData;
-   uint8_t race;
-   uint8_t gender;
-   uint8_t bodyType;
-   uint8_t height;
-   uint8_t tribe;
-   uint8_t face;
-   uint8_t hairStyle;
-   uint8_t hairHighlight;
-   uint8_t skinColor;
-   uint8_t eyeHeterochromia;
-   uint8_t hairColor;
-   uint8_t hairHighlightColor;
-   uint8_t facialFeature;
-   uint8_t facialFeatureColor;
-   uint8_t eyebrows;
-   uint8_t eyeColor;
-   uint8_t eyeShape;
-   uint8_t nose;
-   uint8_t jaw;
-   uint8_t mouth;
-   uint8_t lipColor;
-   uint8_t bustOrTone1;
-   uint8_t extraFeature1;
-   uint8_t extraFeature2OrBust;
-   uint8_t facePaint;
-   uint8_t facePaintColor;
-   uint16_t npcEquip;
-   uint16_t behavior;
-   uint64_t modelMainHand;
-   uint8_t dyeMainHand;
-   uint64_t modelOffHand;
-   uint8_t dyeOffHand;
-   uint32_t modelHead;
-   uint8_t dyeHead;
-   bool visor;
-   uint32_t modelBody;
-   uint8_t dyeBody;
-   uint32_t modelHands;
-   uint8_t dyeHands;
-   uint32_t modelLegs;
-   uint8_t dyeLegs;
-   uint32_t modelFeet;
-   uint8_t dyeFeet;
-   uint32_t modelEars;
-   uint8_t dyeEars;
-   uint32_t modelNeck;
-   uint8_t dyeNeck;
-   uint32_t modelWrists;
-   uint8_t dyeWrists;
-   uint32_t modelLeftRing;
-   uint8_t dyeLeftRing;
-   uint32_t modelRightRing;
-   uint8_t dyeRightRing;
-   uint16_t balloon;
+  std::vector< uint32_t > eNpcData;
+  float scale;
+  uint16_t modelChara;
+  uint8_t race;
+  uint8_t gender;
+  uint8_t bodyType;
+  uint8_t height;
+  uint8_t tribe;
+  uint8_t face;
+  uint8_t hairStyle;
+  uint8_t hairHighlight;
+  uint8_t skinColor;
+  uint8_t eyeHeterochromia;
+  uint8_t hairColor;
+  uint8_t hairHighlightColor;
+  uint8_t facialFeature;
+  uint8_t facialFeatureColor;
+  uint8_t eyebrows;
+  uint8_t eyeColor;
+  uint8_t eyeShape;
+  uint8_t nose;
+  uint8_t jaw;
+  uint8_t mouth;
+  uint8_t lipColor;
+  uint8_t bustOrTone1;
+  uint8_t extraFeature1;
+  uint8_t extraFeature2OrBust;
+  uint8_t facePaint;
+  uint8_t facePaintColor;
+  uint16_t npcEquip;
+  uint16_t behavior;
+  uint64_t modelMainHand;
+  uint8_t dyeMainHand;
+  uint64_t modelOffHand;
+  uint8_t dyeOffHand;
+  uint32_t modelHead;
+  uint8_t dyeHead;
+  bool visor;
+  uint32_t modelBody;
+  uint8_t dyeBody;
+  uint32_t modelHands;
+  uint8_t dyeHands;
+  uint32_t modelLegs;
+  uint8_t dyeLegs;
+  uint32_t modelFeet;
+  uint8_t dyeFeet;
+  uint32_t modelEars;
+  uint8_t dyeEars;
+  uint32_t modelNeck;
+  uint8_t dyeNeck;
+  uint32_t modelWrists;
+  uint8_t dyeWrists;
+  uint32_t modelLeftRing;
+  uint8_t dyeLeftRing;
+  uint32_t modelRightRing;
+  uint8_t dyeRightRing;
+  uint16_t balloon;
 
-   ENpcBase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ENpcBase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ENpcDressUp
 {
-   uint8_t eNpcDressUpDress;
+  uint8_t eNpcDressUpDress;
 
-   ENpcDressUp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ENpcDressUp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ENpcDressUpDress
 {
-   uint32_t eNpc;
+  uint32_t eNpc;
 
-   ENpcDressUpDress( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  ENpcDressUpDress( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ENpcResident
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string title;
-   uint8_t map;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string title;
+  uint8_t map;
 
-   ENpcResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ENpcResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EObj
 {
-   uint32_t data;
-   uint16_t sgbPath;
+  uint32_t data;
+  uint16_t sgbPath;
 
-   EObj( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EObj( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EObjName
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
 
-   EObjName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EObjName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EquipRaceCategory
 {
-   bool hyur;
-   bool elezen;
-   bool lalafell;
-   bool miqote;
-   bool roegadyn;
-   bool auRa;
-   bool male;
-   bool female;
+  bool hyur;
+  bool elezen;
+  bool lalafell;
+  bool miqote;
+  bool roegadyn;
+  bool auRa;
+  bool male;
+  bool female;
 
-   EquipRaceCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EquipRaceCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EquipSlotCategory
 {
-   int8_t mainHand;
-   int8_t offHand;
-   int8_t head;
-   int8_t body;
-   int8_t gloves;
-   int8_t waist;
-   int8_t legs;
-   int8_t feet;
-   int8_t ears;
-   int8_t neck;
-   int8_t wrists;
-   int8_t fingerL;
-   int8_t fingerR;
-   int8_t soulCrystal;
+  int8_t mainHand;
+  int8_t offHand;
+  int8_t head;
+  int8_t body;
+  int8_t gloves;
+  int8_t waist;
+  int8_t legs;
+  int8_t feet;
+  int8_t ears;
+  int8_t neck;
+  int8_t wrists;
+  int8_t fingerL;
+  int8_t fingerR;
+  int8_t soulCrystal;
 
-   EquipSlotCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EquipSlotCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaAetherItem
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string name;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string name;
 
-   EurekaAetherItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaAetherItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaAethernet
 {
-   uint16_t location;
+  uint16_t location;
 
-   EurekaAethernet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaAethernet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaGrowData
 {
-   uint16_t baseResistance;
+  uint16_t baseResistance;
 
-   EurekaGrowData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaGrowData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaLogosMixerProbability
 {
-   uint8_t probability;
+  uint8_t probability;
 
-   EurekaLogosMixerProbability( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaLogosMixerProbability( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaMagiaAction
 {
-   uint32_t action;
-   uint8_t maxUses;
+  uint32_t action;
+  uint8_t maxUses;
 
-   EurekaMagiaAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaMagiaAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaMagiciteItem
 {
-   uint8_t eurekaMagiciteItemType;
-   uint8_t classJobCategory;
-   uint32_t item;
+  uint8_t eurekaMagiciteItemType;
+  uint8_t classJobCategory;
+  uint32_t item;
 
-   EurekaMagiciteItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaMagiciteItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaMagiciteItemType
 {
-   std::string type;
+  std::string type;
 
-   EurekaMagiciteItemType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaMagiciteItemType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EurekaSphereElementAdjust
 {
-   uint16_t powerModifier;
+  uint16_t powerModifier;
 
-   EurekaSphereElementAdjust( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EurekaSphereElementAdjust( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventAction
 {
-   std::string name;
-   uint16_t icon;
-   uint8_t castTime;
-   std::vector< uint16_t > animation;
+  std::string name;
+  uint16_t icon;
+  uint8_t castTime;
+  std::vector< uint16_t > animation;
 
-   EventAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventIconPriority
 {
-   std::vector< uint32_t > icon;
+  std::vector< uint32_t > icon;
 
-   EventIconPriority( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventIconPriority( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventIconType
 {
-   uint32_t npcIconAvailable;
-   uint32_t mapIconAvailable;
-   uint32_t npcIconInvalid;
-   uint32_t mapIconInvalid;
-   uint8_t iconRange;
+  uint32_t npcIconAvailable;
+  uint32_t mapIconAvailable;
+  uint32_t npcIconInvalid;
+  uint32_t mapIconInvalid;
+  uint8_t iconRange;
 
-   EventIconType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventIconType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventItem
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string name;
-   uint16_t icon;
-   uint16_t action;
-   uint8_t stackSize;
-   uint32_t quest;
-   uint8_t castTime;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string name;
+  uint16_t icon;
+  uint16_t action;
+  uint8_t stackSize;
+  uint32_t quest;
+  uint8_t castTime;
 
-   EventItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventItemCastTimeline
 {
-   uint32_t actionTimeline;
+  uint32_t actionTimeline;
 
-   EventItemCastTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventItemCastTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventItemHelp
 {
-   std::string description;
+  std::string description;
 
-   EventItemHelp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventItemHelp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct EventItemTimeline
 {
-   uint32_t actionTimeline;
+  uint32_t actionTimeline;
 
-   EventItemTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  EventItemTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ExportedSG
 {
-   std::string sgbPath;
+  std::string sgbPath;
 
-   ExportedSG( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ExportedSG( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ExVersion
 {
-   std::string name;
+  std::string name;
 
-   ExVersion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ExVersion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Fate
 {
-   uint8_t eurekaFate;
-   uint32_t location;
-   uint8_t classJobLevel;
-   uint8_t classJobLevelMax;
-   uint32_t eventItem;
-   uint32_t iconObjective;
-   uint32_t iconMap;
-   int32_t music;
-   bool hasWorldMapIcon;
-   std::string name;
-   std::string description;
-   std::string objective;
-   std::vector< std::string > statusText;
-   uint32_t arrayIndex;
+  uint8_t eurekaFate;
+  uint32_t location;
+  uint8_t classJobLevel;
+  uint8_t classJobLevelMax;
+  uint32_t eventItem;
+  uint32_t iconObjective;
+  uint32_t iconMap;
+  int32_t music;
+  bool hasWorldMapIcon;
+  std::string name;
+  std::string description;
+  std::string objective;
+  std::vector< std::string > statusText;
+  uint32_t arrayIndex;
 
-   Fate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Fate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCActivity
 {
-   std::string text;
-   uint8_t fCActivityCategory;
+  std::string text;
+  uint8_t fCActivityCategory;
 
-   FCActivity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCActivity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCActivityCategory
 {
-   std::string name;
+  std::string name;
 
-   FCActivityCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCActivityCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCAuthority
 {
-   std::string name;
-   int32_t fCAuthorityCategory;
+  std::string name;
+  int32_t fCAuthorityCategory;
 
-   FCAuthority( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCAuthority( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCAuthorityCategory
 {
-   std::string name;
+  std::string name;
 
-   FCAuthorityCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCAuthorityCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCChestName
 {
-   std::string name;
+  std::string name;
 
-   FCChestName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCChestName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FccShop
 {
-   std::string name;
+  std::string name;
 
-   FccShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FccShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCHierarchy
 {
-   std::string name;
+  std::string name;
 
-   FCHierarchy( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCHierarchy( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCProfile
 {
-   std::string name;
+  std::string name;
 
-   FCProfile( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCProfile( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCReputation
 {
-   uint32_t pointsToNext;
-   uint32_t requiredPoints;
-   std::string name;
+  uint32_t pointsToNext;
+  uint32_t requiredPoints;
+  std::string name;
 
-   FCReputation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCReputation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FCRights
 {
-   std::string name;
-   std::string description;
-   uint16_t icon;
-   uint8_t fCRank;
+  std::string name;
+  std::string description;
+  uint16_t icon;
+  uint8_t fCRank;
 
-   FCRights( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FCRights( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Festival
 {
-   std::string name;
+  std::string name;
 
-   Festival( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Festival( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FieldMarker
 {
-   int32_t vFX;
-   uint16_t icon;
+  int32_t vFX;
+  uint16_t icon;
 
-   FieldMarker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FieldMarker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FishingRecordType
 {
-   int32_t addon;
+  int32_t addon;
 
-   FishingRecordType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FishingRecordType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FishingRecordTypeTransient
 {
-   int32_t image;
+  int32_t image;
 
-   FishingRecordTypeTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FishingRecordTypeTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FishingSpot
 {
-   uint8_t gatheringLevel;
-   std::string bigFishOnReach;
-   std::string bigFishOnEnd;
-   uint8_t fishingSpotCategory;
-   uint16_t territoryType;
-   int16_t x;
-   int16_t z;
-   uint16_t radius;
-   std::vector< int32_t > item;
-   uint16_t placeName;
+  uint8_t gatheringLevel;
+  std::string bigFishOnReach;
+  std::string bigFishOnEnd;
+  uint8_t fishingSpotCategory;
+  uint16_t territoryType;
+  int16_t x;
+  int16_t z;
+  uint16_t radius;
+  std::vector< int32_t > item;
+  uint16_t placeName;
 
-   FishingSpot( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FishingSpot( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FishParameter
 {
-   std::string text;
-   int32_t item;
-   uint16_t gatheringItemLevel;
-   bool isHidden;
-   uint8_t fishingRecordType;
-   int32_t territoryType;
-   bool isInLog;
-   bool timeRestricted;
-   bool weatherRestricted;
-   uint16_t gatheringSubCategory;
+  std::string text;
+  int32_t item;
+  uint16_t gatheringItemLevel;
+  bool isHidden;
+  uint8_t fishingRecordType;
+  int32_t territoryType;
+  bool isInLog;
+  bool timeRestricted;
+  bool weatherRestricted;
+  uint16_t gatheringSubCategory;
 
-   FishParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  FishParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Frontline03
 {
-   std::vector< uint32_t > emptyIcon;
-   std::vector< uint32_t > maelstromIcon;
-   std::vector< uint32_t > twinAdderIcon;
-   std::vector< uint32_t > immortalFlamesIcon;
+  std::vector< uint32_t > emptyIcon;
+  std::vector< uint32_t > maelstromIcon;
+  std::vector< uint32_t > twinAdderIcon;
+  std::vector< uint32_t > immortalFlamesIcon;
 
-   Frontline03( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Frontline03( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Frontline04
 {
-   int32_t level1;
-   int32_t level2;
-   int32_t level3;
-   std::vector< int32_t > unknownLevel;
+  int32_t level1;
+  int32_t level2;
+  int32_t level3;
+  std::vector< int32_t > unknownLevel;
 
-   Frontline04( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Frontline04( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GardeningSeed
 {
-   uint32_t item;
-   uint32_t icon;
+  uint32_t item;
+  uint32_t icon;
 
-   GardeningSeed( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GardeningSeed( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringCondition
 {
-   std::string text;
+  std::string text;
 
-   GatheringCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringExp
 {
-   uint16_t exp;
+  uint16_t exp;
 
-   GatheringExp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringExp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringItem
 {
-   int32_t item;
-   uint16_t gatheringItemLevel;
-   bool isHidden;
+  int32_t item;
+  uint16_t gatheringItemLevel;
+  bool isHidden;
 
-   GatheringItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringItemLevelConvertTable
 {
-   uint8_t gatheringItemLevel;
-   uint8_t stars;
+  uint8_t gatheringItemLevel;
+  uint8_t stars;
 
-   GatheringItemLevelConvertTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringItemLevelConvertTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringItemPoint
 {
-   uint32_t gatheringPoint;
+  uint32_t gatheringPoint;
 
-   GatheringItemPoint( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringItemPoint( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringLeve
 {
-   int32_t requiredItem1;
-   uint8_t leveLevel;
-   int32_t requiredItem2;
+  int32_t requiredItem1;
+  uint8_t leveLevel;
+  int32_t requiredItem2;
 
-   GatheringLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringLeveRoute
 {
 
-   GatheringLeveRoute( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringLeveRoute( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringNotebookList
 {
-   std::vector< int32_t > gatheringItem;
+  std::vector< int32_t > gatheringItem;
 
-   GatheringNotebookList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringNotebookList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringPoint
 {
-   int32_t gatheringPointBase;
-   std::vector< uint16_t > gatheringPointBonus;
-   uint16_t territoryType;
-   uint16_t placeName;
-   uint16_t gatheringSubCategory;
+  int32_t gatheringPointBase;
+  std::vector< uint16_t > gatheringPointBonus;
+  uint16_t territoryType;
+  uint16_t placeName;
+  uint16_t gatheringSubCategory;
 
-   GatheringPoint( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringPoint( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringPointBase
 {
-   int32_t gatheringType;
-   uint8_t gatheringLevel;
-   std::vector< int32_t > item;
-   bool isLimited;
+  int32_t gatheringType;
+  uint8_t gatheringLevel;
+  std::vector< int32_t > item;
+  bool isLimited;
 
-   GatheringPointBase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringPointBase( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringPointBonus
 {
-   uint8_t condition;
-   uint16_t conditionValue;
-   uint8_t bonusType;
-   uint16_t bonusValue;
+  uint8_t condition;
+  uint16_t conditionValue;
+  uint8_t bonusType;
+  uint16_t bonusValue;
 
-   GatheringPointBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringPointBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringPointBonusType
 {
-   std::string text;
+  std::string text;
 
-   GatheringPointBonusType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringPointBonusType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringPointName
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
 
-   GatheringPointName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringPointName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringSubCategory
 {
-   int32_t item;
-   std::string folkloreBook;
+  int32_t item;
+  std::string folkloreBook;
 
-   GatheringSubCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringSubCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringType
 {
-   std::string name;
-   int32_t iconMain;
-   int32_t iconOff;
+  std::string name;
+  int32_t iconMain;
+  int32_t iconOff;
 
-   GatheringType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GatheringType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GcArmyCaptureTactics
 {
-   int32_t name;
-   uint8_t hP;
-   uint8_t damageDealt;
-   uint8_t damageReceived;
-   uint32_t tactic;
-   uint32_t icon;
+  int32_t name;
+  uint8_t hP;
+  uint8_t damageDealt;
+  uint8_t damageReceived;
+  uint32_t tactic;
+  uint32_t icon;
 
-   GcArmyCaptureTactics( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GcArmyCaptureTactics( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GcArmyExpedition
 {
-   uint8_t requiredFlag;
-   uint8_t unlockFlag;
-   uint8_t requiredLevel;
-   uint16_t requiredSeals;
-   uint32_t rewardExperience;
-   uint8_t percentBase;
-   uint8_t gcArmyExpeditionType;
-   std::string name;
-   std::string description;
+  uint8_t requiredFlag;
+  uint8_t unlockFlag;
+  uint8_t requiredLevel;
+  uint16_t requiredSeals;
+  uint32_t rewardExperience;
+  uint8_t percentBase;
+  uint8_t gcArmyExpeditionType;
+  std::string name;
+  std::string description;
 
-   GcArmyExpedition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GcArmyExpedition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GcArmyExpeditionMemberBonus
 {
-   uint8_t race;
-   uint8_t classJob;
+  uint8_t race;
+  uint8_t classJob;
 
-   GcArmyExpeditionMemberBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GcArmyExpeditionMemberBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GcArmyExpeditionType
 {
-   std::string name;
+  std::string name;
 
-   GcArmyExpeditionType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GcArmyExpeditionType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GcArmyMemberGrow
 {
-   uint8_t classJob;
-   int32_t classBook;
+  uint8_t classJob;
+  int32_t classBook;
 
-   GcArmyMemberGrow( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GcArmyMemberGrow( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GcArmyTraining
 {
-   int8_t physicalBonus;
-   int8_t mentalBonus;
-   int8_t tacticalBonus;
-   uint32_t experience;
-   std::string name;
-   std::string description;
+  int8_t physicalBonus;
+  int8_t mentalBonus;
+  int8_t tacticalBonus;
+  uint32_t experience;
+  std::string name;
+  std::string description;
 
-   GcArmyTraining( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GcArmyTraining( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCRankGridaniaFemaleText
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string nameRank;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string nameRank;
 
-   GCRankGridaniaFemaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCRankGridaniaFemaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCRankGridaniaMaleText
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string nameRank;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string nameRank;
 
-   GCRankGridaniaMaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCRankGridaniaMaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCRankLimsaFemaleText
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string nameRank;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string nameRank;
 
-   GCRankLimsaFemaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCRankLimsaFemaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCRankLimsaMaleText
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string nameRank;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string nameRank;
 
-   GCRankLimsaMaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCRankLimsaMaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCRankUldahFemaleText
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string nameRank;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string nameRank;
 
-   GCRankUldahFemaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCRankUldahFemaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCRankUldahMaleText
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string nameRank;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string nameRank;
 
-   GCRankUldahMaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCRankUldahMaleText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCScripShopCategory
 {
-   int8_t grandCompany;
-   int8_t tier;
-   int8_t subCategory;
+  int8_t grandCompany;
+  int8_t tier;
+  int8_t subCategory;
 
-   GCScripShopCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCScripShopCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCScripShopItem
 {
-   int32_t item;
-   int32_t requiredGrandCompanyRank;
-   uint32_t costGCSeals;
-   uint8_t sortKey;
+  int32_t item;
+  int32_t requiredGrandCompanyRank;
+  uint32_t costGCSeals;
+  uint8_t sortKey;
 
-   GCScripShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  GCScripShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCShop
 {
-   int8_t grandCompany;
+  int8_t grandCompany;
 
-   GCShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCShopItemCategory
 {
-   std::string name;
+  std::string name;
 
-   GCShopItemCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCShopItemCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCSupplyDuty
 {
 
-   GCSupplyDuty( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCSupplyDuty( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GCSupplyDutyReward
 {
-   uint32_t experienceSupply;
-   uint32_t experienceProvisioning;
-   uint32_t sealsExpertDelivery;
-   uint32_t sealsSupply;
-   uint32_t sealsProvisioning;
+  uint32_t experienceSupply;
+  uint32_t experienceProvisioning;
+  uint32_t sealsExpertDelivery;
+  uint32_t sealsSupply;
+  uint32_t sealsProvisioning;
 
-   GCSupplyDutyReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GCSupplyDutyReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GeneralAction
 {
-   std::string name;
-   std::string description;
-   uint16_t action;
-   uint16_t unlockLink;
-   int32_t icon;
+  std::string name;
+  std::string description;
+  uint16_t action;
+  uint16_t unlockLink;
+  int32_t icon;
 
-   GeneralAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GeneralAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GFATE
 {
-   std::vector< uint32_t > icon;
+  std::vector< uint32_t > icon;
 
-   GFATE( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GFATE( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GFateClimbing2
 {
-   uint32_t contentEntry;
+  uint32_t contentEntry;
 
-   GFateClimbing2( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GFateClimbing2( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GFateClimbing2Content
 {
-   uint32_t publicContentTextData;
+  uint32_t publicContentTextData;
 
-   GFateClimbing2Content( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GFateClimbing2Content( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GFateClimbing2TotemType
 {
-   uint32_t publicContentTextData;
+  uint32_t publicContentTextData;
 
-   GFateClimbing2TotemType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GFateClimbing2TotemType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GFateRideShooting
 {
-   uint32_t contentEntry;
+  uint32_t contentEntry;
 
-   GFateRideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GFateRideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GilShop
 {
-   std::string name;
-   uint32_t icon;
-   std::vector< uint32_t > questRequired;
-   int32_t acceptTalk;
-   int32_t failTalk;
+  std::string name;
+  uint32_t icon;
+  std::vector< uint32_t > questRequired;
+  int32_t acceptTalk;
+  int32_t failTalk;
 
-   GilShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GilShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GilShopItem
 {
-   int32_t item;
-   std::vector< int32_t > rowRequired;
-   uint16_t stateRequired;
-   uint16_t patch;
+  int32_t item;
+  std::vector< int32_t > rowRequired;
+  uint16_t stateRequired;
+  uint16_t patch;
 
-   GilShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  GilShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GoldSaucerArcadeMachine
 {
-   uint32_t failImage;
-   uint32_t poor;
-   uint32_t good;
-   uint32_t great;
-   uint32_t excellent;
+  uint32_t failImage;
+  uint32_t poor;
+  uint32_t good;
+  uint32_t great;
+  uint32_t excellent;
 
-   GoldSaucerArcadeMachine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GoldSaucerArcadeMachine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GoldSaucerTextData
 {
-   std::string text;
+  std::string text;
 
-   GoldSaucerTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GoldSaucerTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GrandCompany
 {
-   std::string name;
+  std::string name;
 
-   GrandCompany( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GrandCompany( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GrandCompanyRank
 {
-   uint8_t tier;
-   uint8_t order;
-   uint32_t maxSeals;
-   uint32_t requiredSeals;
-   int32_t iconMaelstrom;
-   int32_t iconSerpents;
-   int32_t iconFlames;
-   int32_t questMaelstrom;
-   int32_t questSerpents;
-   int32_t questFlames;
+  uint8_t tier;
+  uint8_t order;
+  uint32_t maxSeals;
+  uint32_t requiredSeals;
+  int32_t iconMaelstrom;
+  int32_t iconSerpents;
+  int32_t iconFlames;
+  int32_t questMaelstrom;
+  int32_t questSerpents;
+  int32_t questFlames;
 
-   GrandCompanyRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GrandCompanyRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuardianDeity
 {
-   std::string name;
-   std::string description;
-   uint16_t icon;
+  std::string name;
+  std::string description;
+  uint16_t icon;
 
-   GuardianDeity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GuardianDeity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuildleveAssignment
 {
-   uint32_t assignmentTalk;
-   std::vector< uint32_t > quest;
+  uint32_t assignmentTalk;
+  std::vector< uint32_t > quest;
 
-   GuildleveAssignment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GuildleveAssignment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuildleveAssignmentCategory
 {
-   std::vector< int32_t > category;
+  std::vector< int32_t > category;
 
-   GuildleveAssignmentCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GuildleveAssignmentCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuildOrderGuide
 {
 
-   GuildOrderGuide( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GuildOrderGuide( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuildOrderOfficer
 {
 
-   GuildOrderOfficer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  GuildOrderOfficer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HairMakeType
 {
-   int32_t race;
-   int32_t tribe;
-   int8_t gender;
+  int32_t race;
+  int32_t tribe;
+  int8_t gender;
 
-   HairMakeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HairMakeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HouseRetainerPose
 {
-   uint16_t actionTimeline;
+  uint16_t actionTimeline;
 
-   HouseRetainerPose( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HouseRetainerPose( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingAethernet
 {
-   uint32_t level;
-   uint16_t territoryType;
-   uint16_t placeName;
-   uint8_t order;
+  uint32_t level;
+  uint16_t territoryType;
+  uint16_t placeName;
+  uint8_t order;
 
-   HousingAethernet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingAethernet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingAppeal
 {
-   std::string tag;
-   uint32_t icon;
-   uint8_t order;
+  std::string tag;
+  uint32_t icon;
+  uint8_t order;
 
-   HousingAppeal( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingAppeal( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingEmploymentNpcList
 {
-   uint8_t race;
-   std::vector< uint32_t > eNpcBase;
+  uint8_t race;
+  std::vector< uint32_t > eNpcBase;
 
-   HousingEmploymentNpcList( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingEmploymentNpcList( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingEmploymentNpcRace
 {
-   std::string race;
+  std::string race;
 
-   HousingEmploymentNpcRace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingEmploymentNpcRace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingExterior
 {
-   uint16_t placeName;
-   uint8_t housingSize;
-   std::string model;
+  uint16_t placeName;
+  uint8_t housingSize;
+  std::string model;
 
-   HousingExterior( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingExterior( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingFurniture
 {
-   uint16_t modelKey;
-   uint8_t housingItemCategory;
-   uint8_t usageType;
-   uint32_t usageParameter;
-   uint8_t housingLayoutLimit;
-   uint8_t aquariumTier;
-   uint32_t customTalk;
-   uint32_t item;
-   bool destroyOnRemoval;
-   bool tooltip;
+  uint16_t modelKey;
+  uint8_t housingItemCategory;
+  uint8_t usageType;
+  uint32_t usageParameter;
+  uint8_t aquariumTier;
+  uint32_t customTalk;
+  uint32_t item;
+  bool destroyOnRemoval;
+  bool tooltip;
 
-   HousingFurniture( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingFurniture( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingLandSet
@@ -3248,2220 +3307,2250 @@ struct HousingLandSet
   std::vector< uint32_t > minPrice;
   std::vector< uint32_t > initialPrice;
 
-   HousingLandSet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingLandSet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingMapMarkerInfo
 {
-   uint16_t map;
-   float x;
-   float y;
-   float z;
-   float plotNumberDistance;
+  float x;
+  float y;
+  float z;
+  uint16_t map;
 
-   HousingMapMarkerInfo( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingMapMarkerInfo( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingMerchantPose
 {
-   uint16_t actionTimeline;
-   std::string pose;
+  uint16_t actionTimeline;
+  std::string pose;
 
-   HousingMerchantPose( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingMerchantPose( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingPlacement
 {
-   std::string text;
+  std::string text;
 
-   HousingPlacement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingPlacement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingPreset
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   uint16_t placeName;
-   uint8_t housingSize;
-   int32_t exteriorRoof;
-   int32_t exteriorWall;
-   int32_t exteriorWindow;
-   int32_t exteriorDoor;
-   int32_t interiorWall;
-   int32_t interiorFlooring;
-   int32_t interiorLighting;
-   int32_t otherFloorWall;
-   int32_t otherFloorFlooring;
-   int32_t otherFloorLighting;
-   int32_t basementWall;
-   int32_t basementFlooring;
-   int32_t basementLighting;
-   int32_t mansionLighting;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  uint16_t placeName;
+  uint8_t housingSize;
+  int32_t exteriorRoof;
+  int32_t exteriorWall;
+  int32_t exteriorWindow;
+  int32_t exteriorDoor;
+  int32_t interiorWall;
+  int32_t interiorFlooring;
+  int32_t interiorLighting;
+  int32_t otherFloorWall;
+  int32_t otherFloorFlooring;
+  int32_t otherFloorLighting;
+  int32_t basementWall;
+  int32_t basementFlooring;
+  int32_t basementLighting;
+  int32_t mansionLighting;
 
-   HousingPreset( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingPreset( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingUnitedExterior
 {
-   std::vector< uint32_t > item;
+  std::vector< uint32_t > item;
 
-   HousingUnitedExterior( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingUnitedExterior( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HousingYardObject
 {
-   uint8_t modelKey;
-   uint8_t housingItemCategory;
-   uint8_t usageType;
-   uint32_t usageParameter;
-   uint8_t housingLayoutLimit;
-   uint32_t customTalk;
-   uint32_t item;
-   bool destroyOnRemoval;
+  uint8_t modelKey;
+  uint8_t housingItemCategory;
+  uint8_t usageType;
+  uint32_t usageParameter;
+  uint32_t customTalk;
+  uint32_t item;
+  bool destroyOnRemoval;
 
-   HousingYardObject( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HousingYardObject( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HowTo
 {
-   std::vector< int16_t > images;
-   int8_t category;
+  std::vector< int16_t > images;
+  int8_t category;
 
-   HowTo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HowTo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HowToCategory
 {
-   std::string category;
+  std::string category;
 
-   HowToCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HowToCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HowToPage
 {
-   int32_t image;
+  int32_t image;
 
-   HowToPage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  HowToPage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct InstanceContent
 {
-   uint8_t instanceContentType;
-   uint8_t weekRestriction;
-   uint16_t timeLimitmin;
-   std::string name;
-   uint16_t bGM;
-   uint16_t winBGM;
-   uint32_t cutscene;
-   uint16_t order;
-   uint32_t instanceContentTextDataBossStart;
-   uint32_t instanceContentTextDataBossEnd;
-   uint32_t bNpcBaseBoss;
-   uint32_t instanceContentTextDataObjectiveStart;
-   uint32_t instanceContentTextDataObjectiveEnd;
-   uint16_t sortKey;
-   uint16_t newPlayerBonusA;
-   uint16_t newPlayerBonusB;
-   uint32_t finalBossExp;
-   uint16_t finalBossCurrencyA;
-   uint16_t finalBossCurrencyB;
-   uint16_t finalBossCurrencyC;
-   uint32_t instanceClearExp;
-   int32_t instanceContentBuff;
-   uint32_t reqInstance;
-   uint8_t partyCondition;
+  uint8_t instanceContentType;
+  uint8_t weekRestriction;
+  uint16_t timeLimitmin;
+  std::string name;
+  uint16_t bGM;
+  uint16_t winBGM;
+  uint32_t cutscene;
+  uint16_t order;
+  uint32_t instanceContentTextDataBossStart;
+  uint32_t instanceContentTextDataBossEnd;
+  uint32_t bNpcBaseBoss;
+  uint32_t instanceContentTextDataObjectiveStart;
+  uint32_t instanceContentTextDataObjectiveEnd;
+  uint16_t sortKey;
+  uint16_t newPlayerBonusA;
+  uint16_t newPlayerBonusB;
+  uint32_t finalBossExp;
+  uint16_t finalBossCurrencyA;
+  uint16_t finalBossCurrencyB;
+  uint16_t finalBossCurrencyC;
+  uint32_t instanceClearExp;
+  int32_t instanceContentBuff;
+  uint32_t reqInstance;
+  uint8_t partyCondition;
 
-   InstanceContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  InstanceContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct InstanceContentBuff
 {
-   uint16_t echoStart;
-   uint16_t echoDeath;
+  uint16_t echoStart;
+  uint16_t echoDeath;
 
-   InstanceContentBuff( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  InstanceContentBuff( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct InstanceContentCSBonus
 {
-   uint16_t instance;
-   uint32_t item;
+  uint16_t instance;
+  uint32_t item;
 
-   InstanceContentCSBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  InstanceContentCSBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct InstanceContentGuide
 {
-   uint32_t instance;
+  uint32_t instance;
 
-   InstanceContentGuide( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  InstanceContentGuide( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct InstanceContentTextData
 {
-   std::string text;
+  std::string text;
 
-   InstanceContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  InstanceContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Item
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   std::string description;
-   std::string name;
-   uint16_t icon;
-   uint16_t levelItem;
-   uint8_t rarity;
-   uint8_t filterGroup;
-   uint32_t additionalData;
-   uint8_t itemUICategory;
-   uint8_t itemSearchCategory;
-   uint8_t equipSlotCategory;
-   uint32_t stackSize;
-   bool isUnique;
-   bool isUntradable;
-   bool isIndisposable;
-   bool isEquippable;
-   uint32_t priceMid;
-   uint32_t priceLow;
-   bool canBeHq;
-   bool isDyeable;
-   bool isCrestWorthy;
-   uint16_t itemAction;
-   uint16_t cooldowns;
-   uint8_t classJobRepair;
-   int32_t itemRepair;
-   int32_t itemGlamour;
-   uint16_t salvage;
-   bool isCollectable;
-   uint16_t aetherialReduce;
-   uint8_t levelEquip;
-   uint8_t equipRestriction;
-   uint8_t classJobCategory;
-   uint8_t grandCompany;
-   uint8_t itemSeries;
-   uint8_t baseParamModifier;
-   uint64_t modelMain;
-   uint64_t modelSub;
-   uint8_t classJobUse;
-   uint16_t damagePhys;
-   uint16_t damageMag;
-   uint16_t delayms;
-   uint16_t blockRate;
-   uint16_t block;
-   uint16_t defensePhys;
-   uint16_t defenseMag;
-   uint8_t itemSpecialBonus;
-   uint8_t itemSpecialBonusParam;
-   uint8_t materializeType;
-   uint8_t materiaSlotCount;
-   bool isAdvancedMeldingPermitted;
-   bool isPvP;
-   bool isGlamourous;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  std::string description;
+  std::string name;
+  uint16_t icon;
+  uint16_t levelItem;
+  uint8_t rarity;
+  uint8_t filterGroup;
+  uint32_t additionalData;
+  uint8_t itemUICategory;
+  uint8_t itemSearchCategory;
+  uint8_t equipSlotCategory;
+  uint32_t stackSize;
+  bool isUnique;
+  bool isUntradable;
+  bool isIndisposable;
+  bool isEquippable;
+  uint32_t priceMid;
+  uint32_t priceLow;
+  bool canBeHq;
+  bool isDyeable;
+  bool isCrestWorthy;
+  uint16_t itemAction;
+  uint16_t cooldowns;
+  uint8_t classJobRepair;
+  int32_t itemRepair;
+  int32_t itemGlamour;
+  uint16_t salvage;
+  bool isCollectable;
+  uint16_t aetherialReduce;
+  uint8_t levelEquip;
+  uint8_t equipRestriction;
+  uint8_t classJobCategory;
+  uint8_t grandCompany;
+  uint8_t itemSeries;
+  uint8_t baseParamModifier;
+  uint64_t modelMain;
+  uint64_t modelSub;
+  uint8_t classJobUse;
+  uint16_t damagePhys;
+  uint16_t damageMag;
+  uint16_t delayms;
+  uint16_t blockRate;
+  uint16_t block;
+  uint16_t defensePhys;
+  uint16_t defenseMag;
+  uint8_t itemSpecialBonus;
+  uint8_t itemSpecialBonusParam;
+  uint8_t materializeType;
+  uint8_t materiaSlotCount;
+  bool isAdvancedMeldingPermitted;
+  bool isPvP;
+  bool isGlamourous;
 
-   struct
-   {
-     uint8_t baseparam;
-     int16_t value;
-   } param[6];
+  struct
+  {
+    uint8_t baseparam;
+    int16_t value;
+  } param[6];
 
-   Item( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Item( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemAction
 {
-   uint16_t type;
-   std::vector< uint16_t > data;
-   std::vector< uint16_t > dataHQ;
+  uint16_t type;
+  std::vector< uint16_t > data;
+  std::vector< uint16_t > dataHQ;
 
-   ItemAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemFood
 {
+  uint8_t eXPBonus;
 
-   ItemFood( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemFood( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemLevel
 {
-   uint16_t strength;
-   uint16_t dexterity;
-   uint16_t vitality;
-   uint16_t intelligence;
-   uint16_t mind;
-   uint16_t piety;
-   uint16_t hP;
-   uint16_t mP;
-   uint16_t tP;
-   uint16_t gP;
-   uint16_t cP;
-   uint16_t physicalDamage;
-   uint16_t magicalDamage;
-   uint16_t delay;
-   uint16_t additionalEffect;
-   uint16_t attackSpeed;
-   uint16_t blockRate;
-   uint16_t blockStrength;
-   uint16_t tenacity;
-   uint16_t attackPower;
-   uint16_t defense;
-   uint16_t directHitRate;
-   uint16_t evasion;
-   uint16_t magicDefense;
-   uint16_t criticalHitPower;
-   uint16_t criticalHitResilience;
-   uint16_t criticalHit;
-   uint16_t criticalHitEvasion;
-   uint16_t slashingResistance;
-   uint16_t piercingResistance;
-   uint16_t bluntResistance;
-   uint16_t projectileResistance;
-   uint16_t attackMagicPotency;
-   uint16_t healingMagicPotency;
-   uint16_t enhancementMagicPotency;
-   uint16_t enfeeblingMagicPotency;
-   uint16_t fireResistance;
-   uint16_t iceResistance;
-   uint16_t windResistance;
-   uint16_t earthResistance;
-   uint16_t lightningResistance;
-   uint16_t waterResistance;
-   uint16_t magicResistance;
-   uint16_t determination;
-   uint16_t skillSpeed;
-   uint16_t spellSpeed;
-   uint16_t haste;
-   uint16_t morale;
-   uint16_t enmity;
-   uint16_t enmityReduction;
-   uint16_t carefulDesynthesis;
-   uint16_t eXPBonus;
-   uint16_t regen;
-   uint16_t refresh;
-   uint16_t movementSpeed;
-   uint16_t spikes;
-   uint16_t slowResistance;
-   uint16_t petrificationResistance;
-   uint16_t paralysisResistance;
-   uint16_t silenceResistance;
-   uint16_t blindResistance;
-   uint16_t poisonResistance;
-   uint16_t stunResistance;
-   uint16_t sleepResistance;
-   uint16_t bindResistance;
-   uint16_t heavyResistance;
-   uint16_t doomResistance;
-   uint16_t reducedDurabilityLoss;
-   uint16_t increasedSpiritbondGain;
-   uint16_t craftsmanship;
-   uint16_t control;
-   uint16_t gathering;
-   uint16_t perception;
+  uint16_t strength;
+  uint16_t dexterity;
+  uint16_t vitality;
+  uint16_t intelligence;
+  uint16_t mind;
+  uint16_t piety;
+  uint16_t hP;
+  uint16_t mP;
+  uint16_t tP;
+  uint16_t gP;
+  uint16_t cP;
+  uint16_t physicalDamage;
+  uint16_t magicalDamage;
+  uint16_t delay;
+  uint16_t additionalEffect;
+  uint16_t attackSpeed;
+  uint16_t blockRate;
+  uint16_t blockStrength;
+  uint16_t tenacity;
+  uint16_t attackPower;
+  uint16_t defense;
+  uint16_t directHitRate;
+  uint16_t evasion;
+  uint16_t magicDefense;
+  uint16_t criticalHitPower;
+  uint16_t criticalHitResilience;
+  uint16_t criticalHit;
+  uint16_t criticalHitEvasion;
+  uint16_t slashingResistance;
+  uint16_t piercingResistance;
+  uint16_t bluntResistance;
+  uint16_t projectileResistance;
+  uint16_t attackMagicPotency;
+  uint16_t healingMagicPotency;
+  uint16_t enhancementMagicPotency;
+  uint16_t enfeeblingMagicPotency;
+  uint16_t fireResistance;
+  uint16_t iceResistance;
+  uint16_t windResistance;
+  uint16_t earthResistance;
+  uint16_t lightningResistance;
+  uint16_t waterResistance;
+  uint16_t magicResistance;
+  uint16_t determination;
+  uint16_t skillSpeed;
+  uint16_t spellSpeed;
+  uint16_t haste;
+  uint16_t morale;
+  uint16_t enmity;
+  uint16_t enmityReduction;
+  uint16_t carefulDesynthesis;
+  uint16_t eXPBonus;
+  uint16_t regen;
+  uint16_t refresh;
+  uint16_t movementSpeed;
+  uint16_t spikes;
+  uint16_t slowResistance;
+  uint16_t petrificationResistance;
+  uint16_t paralysisResistance;
+  uint16_t silenceResistance;
+  uint16_t blindResistance;
+  uint16_t poisonResistance;
+  uint16_t stunResistance;
+  uint16_t sleepResistance;
+  uint16_t bindResistance;
+  uint16_t heavyResistance;
+  uint16_t doomResistance;
+  uint16_t reducedDurabilityLoss;
+  uint16_t increasedSpiritbondGain;
+  uint16_t craftsmanship;
+  uint16_t control;
+  uint16_t gathering;
+  uint16_t perception;
 
-   ItemLevel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemLevel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemSearchCategory
 {
-   std::string name;
-   int32_t icon;
-   uint8_t category;
-   uint8_t order;
-   int8_t classJob;
+  std::string name;
+  int32_t icon;
+  uint8_t category;
+  uint8_t order;
+  int8_t classJob;
 
-   ItemSearchCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemSearchCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemSeries
 {
-   std::string name;
+  std::string name;
 
-   ItemSeries( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemSeries( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemSpecialBonus
 {
-   std::string name;
+  std::string name;
 
-   ItemSpecialBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemSpecialBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemUICategory
 {
-   std::string name;
-   int32_t icon;
-   uint8_t orderMinor;
-   uint8_t orderMajor;
+  std::string name;
+  int32_t icon;
+  uint8_t orderMinor;
+  uint8_t orderMajor;
 
-   ItemUICategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ItemUICategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct JournalCategory
 {
-   std::string name;
-   uint8_t journalSection;
+  std::string name;
+  uint8_t journalSection;
 
-   JournalCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  JournalCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct JournalGenre
 {
-   int32_t icon;
-   uint8_t journalCategory;
-   std::string name;
+  int32_t icon;
+  uint8_t journalCategory;
+  std::string name;
 
-   JournalGenre( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  JournalGenre( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct JournalSection
 {
-   std::string name;
+  std::string name;
 
-   JournalSection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  JournalSection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Leve
 {
-   std::string name;
-   std::string description;
-   int32_t leveClient;
-   int32_t leveAssignmentType;
-   uint16_t classJobLevel;
-   uint8_t allowanceCost;
-   int32_t placeNameStart;
-   int32_t placeNameIssued;
-   uint8_t classJobCategory;
-   int32_t journalGenre;
-   int32_t placeNameStartZone;
-   int32_t iconCityState;
-   int32_t dataId;
-   uint32_t expReward;
-   uint32_t gilReward;
-   uint16_t leveRewardItem;
-   uint8_t leveVfx;
-   uint8_t leveVfxFrame;
-   uint32_t levelLevemete;
-   int32_t iconIssuer;
-   uint32_t levelStart;
-   uint16_t bGM;
+  std::string name;
+  std::string description;
+  int32_t leveClient;
+  int32_t leveAssignmentType;
+  uint16_t classJobLevel;
+  uint8_t allowanceCost;
+  int32_t placeNameStart;
+  int32_t placeNameIssued;
+  uint8_t classJobCategory;
+  int32_t journalGenre;
+  int32_t placeNameStartZone;
+  int32_t iconCityState;
+  int32_t dataId;
+  uint32_t expReward;
+  uint32_t gilReward;
+  uint16_t leveRewardItem;
+  uint8_t leveVfx;
+  uint8_t leveVfxFrame;
+  uint32_t levelLevemete;
+  int32_t iconIssuer;
+  uint32_t levelStart;
+  uint16_t bGM;
 
-   Leve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Leve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LeveAssignmentType
 {
-   bool isFaction;
-   int32_t icon;
-   std::string name;
+  bool isFaction;
+  int32_t icon;
+  std::string name;
 
-   LeveAssignmentType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LeveAssignmentType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LeveClient
 {
-   std::string name;
+  std::string name;
 
-   LeveClient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LeveClient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Level
 {
-   float x;
-   float y;
-   float z;
-   float yaw;
-   float radius;
-   uint8_t type;
-   uint32_t object;
-   uint16_t map;
-   uint32_t eventId;
-   uint16_t territory;
+  float x;
+  float y;
+  float z;
+  float yaw;
+  float radius;
+  uint8_t type;
+  uint32_t object;
+  uint16_t map;
+  uint32_t eventId;
+  uint16_t territory;
 
-   Level( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Level( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LeveRewardItem
 {
 
-   LeveRewardItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LeveRewardItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LeveRewardItemGroup
 {
 
-   LeveRewardItemGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LeveRewardItemGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LeveVfx
 {
-   std::string effect;
-   int32_t icon;
+  std::string effect;
+  int32_t icon;
 
-   LeveVfx( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LeveVfx( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LogFilter
 {
-   uint8_t logKind;
-   std::string name;
-   std::string example;
+  uint8_t logKind;
+  std::string name;
+  std::string example;
 
-   LogFilter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LogFilter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LogKind
 {
-   std::string format;
-   std::string name;
-   std::string example;
-   uint8_t logKindCategoryText;
+  std::string format;
+  std::string name;
+  std::string example;
+  uint8_t logKindCategoryText;
 
-   LogKind( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LogKind( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LogKindCategoryText
 {
-   std::string text;
+  std::string text;
 
-   LogKindCategoryText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LogKindCategoryText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LogMessage
 {
-   uint16_t logKind;
-   std::string text;
+  uint16_t logKind;
+  std::string text;
 
-   LogMessage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LogMessage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct LotteryExchangeShop
 {
-   std::vector< int32_t > itemAccepted;
-   std::vector< uint32_t > amountAccepted;
+  std::vector< int32_t > itemAccepted;
+  std::vector< uint32_t > amountAccepted;
 
-   LotteryExchangeShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  LotteryExchangeShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MacroIcon
 {
-   int32_t icon;
+  int32_t icon;
 
-   MacroIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MacroIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MacroIconRedirectOld
 {
-   uint32_t iconOld;
-   int32_t iconNew;
+  uint32_t iconOld;
+  int32_t iconNew;
 
-   MacroIconRedirectOld( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MacroIconRedirectOld( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MainCommand
 {
-   int32_t icon;
-   uint8_t mainCommandCategory;
-   std::string name;
-   std::string description;
+  int32_t icon;
+  uint8_t mainCommandCategory;
+  std::string name;
+  std::string description;
 
-   MainCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MainCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MainCommandCategory
 {
-   std::string name;
+  std::string name;
 
-   MainCommandCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MainCommandCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ManeuversArmor
 {
-   std::vector< uint32_t > bNpcBase;
-   std::vector< uint32_t > icon;
+  std::vector< uint32_t > bNpcBase;
+  std::vector< uint32_t > icon;
 
-   ManeuversArmor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ManeuversArmor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Map
 {
-   int8_t mapIndex;
-   uint8_t hierarchy;
-   uint16_t mapMarkerRange;
-   std::string id;
-   uint16_t sizeFactor;
-   int16_t offsetX;
-   int16_t offsetY;
-   uint16_t placeNameRegion;
-   uint16_t placeName;
-   uint16_t placeNameSub;
-   int16_t discoveryIndex;
-   uint16_t territoryType;
-   bool discoveryArrayByte;
+  int8_t mapIndex;
+  uint8_t hierarchy;
+  uint16_t mapMarkerRange;
+  std::string id;
+  uint16_t sizeFactor;
+  int16_t offsetX;
+  int16_t offsetY;
+  uint16_t placeNameRegion;
+  uint16_t placeName;
+  uint16_t placeNameSub;
+  int16_t discoveryIndex;
+  uint16_t territoryType;
+  bool discoveryArrayByte;
 
-   Map( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Map( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MapMarker
 {
-   int16_t x;
-   int16_t y;
-   uint16_t icon;
-   uint16_t placeNameSubtext;
-   uint8_t subtextOrientation;
-   uint8_t mapMarkerRegion;
-   uint8_t type;
-   uint8_t dataType;
-   uint16_t dataKey;
+  int16_t x;
+  int16_t y;
+  uint16_t icon;
+  uint16_t placeNameSubtext;
+  uint8_t subtextOrientation;
+  uint8_t mapMarkerRegion;
+  uint8_t type;
+  uint8_t dataType;
+  uint16_t dataKey;
 
-   MapMarker( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  MapMarker( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MapMarkerRegion
 {
-   int16_t x;
+  int16_t x;
 
-   MapMarkerRegion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MapMarkerRegion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MapSymbol
 {
-   int32_t icon;
-   int32_t placeName;
+  int32_t icon;
+  int32_t placeName;
 
-   MapSymbol( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MapSymbol( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Marker
 {
-   int32_t icon;
-   std::string name;
+  int32_t icon;
+  std::string name;
 
-   Marker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Marker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MasterpieceSupplyDuty
 {
-   uint8_t classJob;
-   uint8_t classJobLevel;
-   uint16_t rewardCurrency;
+  uint8_t classJob;
+  uint8_t classJobLevel;
+  uint16_t rewardCurrency;
 
-   MasterpieceSupplyDuty( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MasterpieceSupplyDuty( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MasterpieceSupplyMultiplier
 {
-   std::vector< uint16_t > xpMultiplier;
-   std::vector< uint16_t > currencyMultiplier;
+  std::vector< uint16_t > xpMultiplier;
+  std::vector< uint16_t > currencyMultiplier;
 
-   MasterpieceSupplyMultiplier( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MasterpieceSupplyMultiplier( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Materia
 {
-   std::vector< int32_t > item;
-   uint8_t baseParam;
-   std::vector< uint8_t > value;
+  std::vector< int32_t > item;
+  uint8_t baseParam;
+  std::vector< uint8_t > value;
 
-   Materia( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Materia( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MiniGameRA
 {
-   int32_t icon;
-   int32_t bGM;
+  int32_t icon;
+  int32_t bGM;
 
-   MiniGameRA( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MiniGameRA( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MinionRace
 {
-   std::string name;
+  std::string name;
 
-   MinionRace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MinionRace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MinionRules
 {
-   std::string rule;
-   std::string description;
+  std::string rule;
+  std::string description;
 
-   MinionRules( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MinionRules( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MinionSkillType
 {
-   std::string name;
+  std::string name;
 
-   MinionSkillType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MinionSkillType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MobHuntOrderType
 {
-   uint32_t quest;
-   uint32_t eventItem;
+  uint32_t quest;
+  uint32_t eventItem;
 
-   MobHuntOrderType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MobHuntOrderType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MobHuntTarget
 {
-   uint16_t name;
-   uint16_t fATE;
-   uint32_t icon;
-   uint16_t territoryType;
-   uint16_t placeName;
+  uint16_t name;
+  uint16_t fATE;
+  uint32_t icon;
+  uint16_t territoryType;
+  uint16_t placeName;
 
-   MobHuntTarget( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MobHuntTarget( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ModelChara
 {
-   uint8_t type;
-   uint16_t model;
-   uint8_t base;
-   uint8_t variant;
+  uint8_t type;
+  uint16_t model;
+  uint8_t base;
+  uint8_t variant;
 
-   ModelChara( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ModelChara( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ModelSkeleton
 {
-   float scaleFactor;
+  float scaleFactor;
 
-   ModelSkeleton( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ModelSkeleton( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ModelState
 {
-   uint16_t start;
-   uint16_t end;
+  uint16_t start;
+  uint16_t end;
 
-   ModelState( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ModelState( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MonsterNote
 {
-   std::vector< uint16_t > monsterNoteTarget;
-   std::vector< uint8_t > count;
-   uint32_t reward;
-   std::string name;
+  std::vector< uint16_t > monsterNoteTarget;
+  std::vector< uint8_t > count;
+  uint32_t reward;
+  std::string name;
 
-   MonsterNote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MonsterNote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MonsterNoteTarget
 {
-   uint16_t bNpcName;
-   int32_t icon;
+  uint16_t bNpcName;
+  int32_t icon;
 
-   MonsterNoteTarget( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MonsterNoteTarget( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Mount
 {
-   std::string singular;
-   int8_t adjective;
-   std::string plural;
-   int8_t possessivePronoun;
-   int8_t startsWithVowel;
-   int8_t pronoun;
-   int8_t article;
-   int32_t modelChara;
-   uint8_t flyingCondition;
-   uint8_t isFlying;
-   uint8_t mountCustomize;
-   uint16_t rideBGM;
-   int16_t order;
-   uint16_t icon;
-   uint8_t extraSeats;
-   uint16_t mountAction;
-   bool isAirborne;
-   bool useEP;
-   bool isImmobile;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  int32_t modelChara;
+  uint8_t flyingCondition;
+  uint8_t isFlying;
+  uint8_t mountCustomize;
+  uint16_t rideBGM;
+  int16_t order;
+  uint16_t icon;
+  uint8_t extraSeats;
+  uint16_t mountAction;
+  bool isAirborne;
+  bool useEP;
+  bool isImmobile;
 
-   Mount( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Mount( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MountAction
 {
-   std::vector< uint16_t > action;
+  std::vector< uint16_t > action;
 
-   MountAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MountAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MountCustomize
 {
-   float hyurMaleScale;
-   float hyurFemaleScale;
-   float elezenMaleScale;
-   float elezenFemaleScale;
-   float lalaMaleScale;
-   float lalaFemaleScale;
-   float miqoMaleScale;
-   float miqoFemaleScale;
-   float roeMaleScale;
-   float roeFemaleScale;
-   float auRaMaleScale;
-   float auRaFemaleScale;
-   uint8_t hyurMaleCameraHeight;
-   uint8_t hyurFemaleCameraHeight;
-   uint8_t elezenMaleCameraHeight;
-   uint8_t elezenFemaleCameraHeight;
-   uint8_t lalaMaleCameraHeight;
-   uint8_t lalaFemaleCameraHeight;
-   uint8_t miqoMaleCameraHeight;
-   uint8_t miqoFemaleCameraHeight;
-   uint8_t roeMaleCameraHeight;
-   uint8_t roeFemaleCameraHeight;
-   uint8_t auRaMaleCameraHeight;
-   uint8_t auRaFemaleCameraHeight;
+  float hyurMaleScale;
+  float hyurFemaleScale;
+  float elezenMaleScale;
+  float elezenFemaleScale;
+  float lalaMaleScale;
+  float lalaFemaleScale;
+  float miqoMaleScale;
+  float miqoFemaleScale;
+  float roeMaleScale;
+  float roeFemaleScale;
+  float auRaMaleScale;
+  float auRaFemaleScale;
+  uint8_t hyurMaleCameraHeight;
+  uint8_t hyurFemaleCameraHeight;
+  uint8_t elezenMaleCameraHeight;
+  uint8_t elezenFemaleCameraHeight;
+  uint8_t lalaMaleCameraHeight;
+  uint8_t lalaFemaleCameraHeight;
+  uint8_t miqoMaleCameraHeight;
+  uint8_t miqoFemaleCameraHeight;
+  uint8_t roeMaleCameraHeight;
+  uint8_t roeFemaleCameraHeight;
+  uint8_t auRaMaleCameraHeight;
+  uint8_t auRaFemaleCameraHeight;
 
-   MountCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MountCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MountFlyingCondition
 {
-   uint32_t quest;
+  uint32_t quest;
 
-   MountFlyingCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MountFlyingCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MountSpeed
 {
-   uint32_t quest;
+  uint32_t quest;
 
-   MountSpeed( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MountSpeed( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MountTransient
 {
-   std::string description;
-   std::string descriptionEnhanced;
-   std::string tooltip;
+  std::string description;
+  std::string descriptionEnhanced;
+  std::string tooltip;
 
-   MountTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MountTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MoveTimeline
 {
-   uint16_t idle;
-   uint16_t moveForward;
-   uint16_t moveBack;
-   uint16_t moveLeft;
-   uint16_t moveRight;
-   uint16_t moveUp;
-   uint16_t moveDown;
-   uint16_t moveTurnLeft;
-   uint16_t moveTurnRight;
-   uint16_t extra;
+  uint16_t idle;
+  uint16_t moveForward;
+  uint16_t moveBack;
+  uint16_t moveLeft;
+  uint16_t moveRight;
+  uint16_t moveUp;
+  uint16_t moveDown;
+  uint16_t moveTurnLeft;
+  uint16_t moveTurnRight;
+  uint16_t extra;
 
-   MoveTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MoveTimeline( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MoveVfx
 {
-   uint16_t vFXNormal;
-   uint16_t vFXWalking;
+  uint16_t vFXNormal;
+  uint16_t vFXWalking;
 
-   MoveVfx( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  MoveVfx( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct NotebookDivision
+{
+  std::string name;
+  uint8_t notebookDivisionCategory;
+
+  NotebookDivision( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct NotebookDivisionCategory
+{
+  std::string name;
+
+  NotebookDivisionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct NpcEquip
 {
-   uint64_t modelMainHand;
-   uint8_t dyeMainHand;
-   uint64_t modelOffHand;
-   uint8_t dyeOffHand;
-   uint32_t modelHead;
-   uint8_t dyeHead;
-   bool visor;
-   uint32_t modelBody;
-   uint8_t dyeBody;
-   uint32_t modelHands;
-   uint8_t dyeHands;
-   uint32_t modelLegs;
-   uint8_t dyeLegs;
-   uint32_t modelFeet;
-   uint8_t dyeFeet;
-   uint32_t modelEars;
-   uint8_t dyeEars;
-   uint32_t modelNeck;
-   uint8_t dyeNeck;
-   uint32_t modelWrists;
-   uint8_t dyeWrists;
-   uint32_t modelLeftRing;
-   uint8_t dyeLeftRing;
-   uint32_t modelRightRing;
-   uint8_t dyeRightRing;
+  uint64_t modelMainHand;
+  uint8_t dyeMainHand;
+  uint64_t modelOffHand;
+  uint8_t dyeOffHand;
+  uint32_t modelHead;
+  uint8_t dyeHead;
+  bool visor;
+  uint32_t modelBody;
+  uint8_t dyeBody;
+  uint32_t modelHands;
+  uint8_t dyeHands;
+  uint32_t modelLegs;
+  uint8_t dyeLegs;
+  uint32_t modelFeet;
+  uint8_t dyeFeet;
+  uint32_t modelEars;
+  uint8_t dyeEars;
+  uint32_t modelNeck;
+  uint8_t dyeNeck;
+  uint32_t modelWrists;
+  uint8_t dyeWrists;
+  uint32_t modelLeftRing;
+  uint8_t dyeLeftRing;
+  uint32_t modelRightRing;
+  uint8_t dyeRightRing;
 
-   NpcEquip( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  NpcEquip( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct NpcYell
 {
-   std::string text;
+  std::string text;
 
-   NpcYell( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  NpcYell( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Omen
 {
-   std::string fileName;
+  std::string fileName;
 
-   Omen( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Omen( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct OnlineStatus
 {
-   uint8_t priority;
-   std::string name;
-   uint32_t icon;
+  uint8_t priority;
+  std::string name;
+  uint32_t icon;
 
-   OnlineStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  OnlineStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Opening
 {
-   std::string name;
-   uint32_t quest;
+  std::string name;
+  uint32_t quest;
 
-   Opening( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Opening( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Orchestrion
 {
-   std::string name;
-   std::string description;
+  std::string name;
+  std::string description;
 
-   Orchestrion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Orchestrion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct OrchestrionCategory
 {
-   std::string name;
+  std::string name;
 
-   OrchestrionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  OrchestrionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct OrchestrionPath
 {
-   std::string file;
+  std::string file;
 
-   OrchestrionPath( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  OrchestrionPath( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct OrchestrionUiparam
 {
-   uint8_t orchestrionCategory;
-   uint16_t order;
+  uint8_t orchestrionCategory;
+  uint16_t order;
 
-   OrchestrionUiparam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  OrchestrionUiparam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ParamGrow
 {
-   int32_t expToNext;
-   uint8_t additionalActions;
-   int32_t mpModifier;
-   int32_t baseSpeed;
-   int32_t levelModifier;
-   uint8_t questExpModifier;
-   uint16_t hpModifier;
-   int32_t huntingLogExpReward;
+  int32_t expToNext;
+  uint8_t additionalActions;
+  uint16_t scaledQuestXP;
+  int32_t mpModifier;
+  int32_t baseSpeed;
+  int32_t levelModifier;
+  uint8_t questExpModifier;
+  uint16_t hpModifier;
+  int32_t huntingLogExpReward;
+  uint16_t itemLevelSync;
 
-   ParamGrow( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ParamGrow( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PartyContent
 {
-   uint8_t key;
-   uint16_t timeLimit;
-   std::string name;
-   uint32_t textDataStart;
-   uint32_t textDataEnd;
-   uint16_t contentFinderCondition;
-   uint32_t image;
+  uint8_t key;
+  uint16_t timeLimit;
+  std::string name;
+  uint32_t textDataStart;
+  uint32_t textDataEnd;
+  uint16_t contentFinderCondition;
+  uint32_t image;
 
-   PartyContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PartyContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PartyContentCutscene
 {
-   uint32_t cutscene;
+  uint32_t cutscene;
 
-   PartyContentCutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PartyContentCutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PartyContentTextData
 {
-   std::string data;
+  std::string data;
 
-   PartyContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PartyContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Perform
 {
-   std::string name;
-   uint64_t modelKey;
-   uint16_t animationStart;
-   uint16_t animationEnd;
-   uint16_t animationIdle;
-   uint16_t animationPlay01;
-   uint16_t animationPlay02;
-   int32_t stopAnimation;
-   std::string instrument;
-   uint8_t transient;
+  std::string name;
+  uint64_t modelKey;
+  uint16_t animationStart;
+  uint16_t animationEnd;
+  uint16_t animationIdle;
+  uint16_t animationPlay01;
+  uint16_t animationPlay02;
+  int32_t stopAnimation;
+  std::string instrument;
+  uint8_t transient;
 
-   Perform( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Perform( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PerformTransient
 {
-   std::string text;
+  std::string text;
 
-   PerformTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PerformTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Pet
 {
-   std::string name;
+  std::string name;
 
-   Pet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Pet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PetAction
 {
-   std::string name;
-   std::string description;
-   int32_t icon;
-   uint16_t action;
-   uint8_t pet;
+  std::string name;
+  std::string description;
+  int32_t icon;
+  uint16_t action;
+  uint8_t pet;
 
-   PetAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PetAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Picture
 {
-   int32_t item;
-   int32_t image;
-   int32_t signature;
+  int32_t item;
+  int32_t image;
+  int32_t signature;
 
-   Picture( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Picture( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PlaceName
 {
-   std::string name;
-   std::string nameNoArticle;
+  std::string name;
+  std::string nameNoArticle;
 
-   PlaceName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PlaceName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PlantPotFlowerSeed
 {
-   std::vector< uint32_t > seedIcon;
+  std::vector< uint32_t > seedIcon;
 
-   PlantPotFlowerSeed( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PlantPotFlowerSeed( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PreHandler
 {
-   uint32_t gilShop;
-   uint16_t actionTimeline;
+  uint32_t target;
+  uint16_t actionTimeline;
 
-   PreHandler( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PreHandler( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PublicContent
 {
-   uint8_t type;
-   uint16_t timeLimit;
-   uint32_t mapIcon;
-   std::string name;
-   uint32_t textDataStart;
-   uint32_t textDataEnd;
-   uint16_t contentFinderCondition;
-   uint16_t additionalData;
+  uint8_t type;
+  uint16_t timeLimit;
+  uint32_t mapIcon;
+  std::string name;
+  uint32_t textDataStart;
+  uint32_t textDataEnd;
+  uint16_t contentFinderCondition;
+  uint16_t additionalData;
 
-   PublicContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PublicContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PublicContentCutscene
 {
-   uint32_t cutscene;
-   uint32_t cutscene2;
+  uint32_t cutscene;
+  uint32_t cutscene2;
 
-   PublicContentCutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PublicContentCutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PublicContentTextData
 {
-   std::string textData;
+  std::string textData;
 
-   PublicContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PublicContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PvPAction
 {
-   uint16_t action;
+  uint16_t action;
 
-   PvPAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PvPAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PvPActionSort
 {
-   uint8_t name;
-   uint16_t action;
+  uint8_t name;
+  uint16_t action;
 
-   PvPActionSort( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  PvPActionSort( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PvPRank
 {
-   uint32_t expRequired;
+  uint32_t expRequired;
 
-   PvPRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PvPRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PvPSelectTrait
 {
-   std::string effect;
-   uint32_t icon;
-   int16_t value;
+  std::string effect;
+  uint32_t icon;
+  int16_t value;
 
-   PvPSelectTrait( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PvPSelectTrait( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PvPTrait
 {
-   uint16_t trait1;
-   uint16_t trait2;
-   uint16_t trait3;
+  uint16_t trait1;
+  uint16_t trait2;
+  uint16_t trait3;
 
-   PvPTrait( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  PvPTrait( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Quest
 {
-   std::string name;
-   std::string id;
-   uint8_t expansion;
-   uint8_t classJobCategory0;
-   uint16_t classJobLevel0;
-   uint8_t questLevelOffset;
-   uint16_t levelMax;
-   uint8_t classJobCategory1;
-   uint16_t classJobLevel1;
-   uint8_t previousQuestJoin;
-   uint32_t previousQuest0;
-   uint32_t previousQuest1;
-   uint32_t previousQuest2;
-   uint8_t questLockJoin;
-   std::vector< uint32_t > questLock;
-   uint8_t classJobUnlock;
-   uint8_t grandCompany;
-   uint8_t grandCompanyRank;
-   uint8_t instanceContentJoin;
-   std::vector< uint32_t > instanceContent;
-   uint8_t festival;
-   uint16_t bellStart;
-   uint16_t bellEnd;
-   uint8_t beastTribe;
-   uint8_t beastReputationRank;
-   int32_t mountRequired;
-   bool isHouseRequired;
-   uint8_t deliveryQuest;
-   uint32_t issuerStart;
-   uint16_t behavior;
-   uint32_t targetEnd;
-   bool isRepeatable;
-   uint8_t repeatIntervalType;
-   uint8_t questRepeatFlag;
-   bool unlocksSystemContent;
-   uint8_t type;
-   uint16_t questClassJobSupply;
-   std::vector< std::string > scriptInstruction;
-   std::vector< uint32_t > scriptArg;
-   std::vector< uint8_t > actorSpawnSeq;
-   std::vector< uint8_t > actorDespawnSeq;
-   std::vector< uint32_t > actorSpawn;
-   std::vector< uint8_t > questUInt8A;
-   std::vector< uint8_t > questUInt8B;
-   std::vector< uint8_t > toDoCompleteSeq;
-   std::vector< uint8_t > toDoQty;
-   std::vector< uint32_t > toDoMainLocation;
-   uint8_t classJobRequired;
-   uint16_t expFactor;
-   uint32_t gilReward;
-   uint16_t gCSeals;
-   std::vector< uint8_t > itemCatalyst;
-   std::vector< uint8_t > itemCountCatalyst;
-   uint8_t itemRewardType;
-   std::vector< uint32_t > itemReward0;
-   std::vector< uint8_t > itemCountReward0;
-   std::vector< uint8_t > stainReward0;
-   std::vector< uint32_t > itemReward1;
-   std::vector< uint8_t > itemCountReward1;
-   std::vector< bool > isHQReward1;
-   std::vector< uint8_t > stainReward1;
-   uint8_t emoteReward;
-   uint16_t actionReward;
-   std::vector< uint8_t > generalActionReward;
-   uint8_t otherReward;
-   uint32_t instanceContentUnlock;
-   uint8_t tomestoneReward;
-   uint8_t tomestoneCountReward;
-   uint8_t reputationReward;
-   uint16_t placeName;
-   uint8_t journalGenre;
-   uint32_t icon;
-   uint32_t iconSpecial;
-   uint8_t eventIconType;
-   uint16_t sortKey;
+  std::string name;
+  std::string id;
+  uint8_t expansion;
+  uint8_t classJobCategory0;
+  uint16_t classJobLevel0;
+  uint8_t questLevelOffset;
+  uint16_t levelMax;
+  uint8_t classJobCategory1;
+  uint16_t classJobLevel1;
+  uint8_t previousQuestJoin;
+  uint32_t previousQuest0;
+  uint32_t previousQuest1;
+  uint32_t previousQuest2;
+  uint8_t questLockJoin;
+  std::vector< uint32_t > questLock;
+  uint8_t classJobUnlock;
+  uint8_t grandCompany;
+  uint8_t grandCompanyRank;
+  uint8_t instanceContentJoin;
+  std::vector< uint32_t > instanceContent;
+  uint8_t festival;
+  uint16_t bellStart;
+  uint16_t bellEnd;
+  uint8_t beastTribe;
+  uint8_t beastReputationRank;
+  int32_t mountRequired;
+  bool isHouseRequired;
+  uint8_t deliveryQuest;
+  uint32_t issuerStart;
+  uint16_t behavior;
+  uint32_t targetEnd;
+  bool isRepeatable;
+  uint8_t repeatIntervalType;
+  uint8_t questRepeatFlag;
+  bool unlocksSystemContent;
+  uint8_t type;
+  uint16_t questClassJobSupply;
+  std::vector< std::string > scriptInstruction;
+  std::vector< uint32_t > scriptArg;
+  std::vector< uint8_t > actorSpawnSeq;
+  std::vector< uint8_t > actorDespawnSeq;
+  std::vector< uint32_t > actorSpawn;
+  std::vector< uint8_t > questUInt8A;
+  std::vector< uint8_t > questUInt8B;
+  std::vector< uint8_t > toDoCompleteSeq;
+  std::vector< uint8_t > toDoQty;
+  std::vector< uint32_t > toDoMainLocation;
+  uint8_t classJobRequired;
+  uint16_t expFactor;
+  uint32_t gilReward;
+  uint16_t gCSeals;
+  std::vector< uint8_t > itemCatalyst;
+  std::vector< uint8_t > itemCountCatalyst;
+  uint8_t itemRewardType;
+  std::vector< uint32_t > itemReward0;
+  std::vector< uint8_t > itemCountReward0;
+  std::vector< uint8_t > stainReward0;
+  std::vector< uint32_t > itemReward1;
+  std::vector< uint8_t > itemCountReward1;
+  std::vector< bool > isHQReward1;
+  std::vector< uint8_t > stainReward1;
+  uint8_t emoteReward;
+  uint16_t actionReward;
+  std::vector< uint8_t > generalActionReward;
+  uint8_t otherReward;
+  uint32_t instanceContentUnlock;
+  uint8_t tomestoneReward;
+  uint8_t tomestoneCountReward;
+  uint8_t reputationReward;
+  uint16_t placeName;
+  uint8_t journalGenre;
+  uint32_t icon;
+  uint32_t iconSpecial;
+  uint8_t eventIconType;
+  uint16_t sortKey;
 
-   Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestBattle
 {
-   int32_t quest;
-   uint16_t timeLimit;
-   uint16_t levelSync;
-   std::vector< std::string > scriptInstruction;
-   std::vector< uint32_t > scriptValue;
+  int32_t quest;
+  uint16_t timeLimit;
+  uint16_t levelSync;
+  std::vector< std::string > scriptInstruction;
+  std::vector< uint32_t > scriptValue;
 
-   QuestBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  QuestBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestClassJobReward
 {
-   uint8_t classJobCategory;
-   std::vector< uint32_t > rewardItem;
-   std::vector< uint8_t > rewardAmount;
-   std::vector< uint32_t > requiredItem;
-   std::vector< uint8_t > requiredAmount;
+  uint8_t classJobCategory;
+  std::vector< uint32_t > rewardItem;
+  std::vector< uint8_t > rewardAmount;
+  std::vector< uint32_t > requiredItem;
+  std::vector< uint8_t > requiredAmount;
 
-   QuestClassJobReward( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  QuestClassJobReward( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestClassJobSupply
 {
-   uint8_t classJobCategory;
-   uint32_t eNpcResident;
-   uint32_t item;
+  uint8_t classJobCategory;
+  uint32_t eNpcResident;
+  uint32_t item;
 
-   QuestClassJobSupply( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  QuestClassJobSupply( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestRepeatFlag
 {
-   uint32_t quest;
+  uint32_t quest;
 
-   QuestRepeatFlag( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  QuestRepeatFlag( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestRewardOther
 {
-   uint32_t icon;
-   std::string name;
+  uint32_t icon;
+  std::string name;
 
-   QuestRewardOther( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  QuestRewardOther( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuickChat
 {
-   std::string nameAction;
-   int32_t icon;
-   int32_t addon;
-   int8_t quickChatTransient;
+  std::string nameAction;
+  int32_t icon;
+  int32_t addon;
+  int8_t quickChatTransient;
 
-   QuickChat( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  QuickChat( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuickChatTransient
 {
-   std::string textOutput;
+  std::string textOutput;
 
-   QuickChatTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  QuickChatTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Race
 {
-   std::string masculine;
-   std::string feminine;
-   int32_t rSEMBody;
-   int32_t rSEMHands;
-   int32_t rSEMLegs;
-   int32_t rSEMFeet;
-   int32_t rSEFBody;
-   int32_t rSEFHands;
-   int32_t rSEFLegs;
-   int32_t rSEFFeet;
+  std::string masculine;
+  std::string feminine;
+  int32_t rSEMBody;
+  int32_t rSEMHands;
+  int32_t rSEMLegs;
+  int32_t rSEMFeet;
+  int32_t rSEFBody;
+  int32_t rSEFHands;
+  int32_t rSEFLegs;
+  int32_t rSEFFeet;
 
-   Race( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Race( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RacingChocoboItem
 {
-   int32_t item;
-   uint8_t category;
-   std::vector< uint8_t > param;
+  int32_t item;
+  uint8_t category;
+  std::vector< uint8_t > param;
 
-   RacingChocoboItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RacingChocoboItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RacingChocoboName
 {
-   std::string name;
+  std::string name;
 
-   RacingChocoboName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RacingChocoboName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RacingChocoboNameCategory
 {
-   uint8_t sortKey;
-   std::string name;
+  uint8_t sortKey;
+  std::string name;
 
-   RacingChocoboNameCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RacingChocoboNameCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RacingChocoboNameInfo
 {
-   uint8_t racingChocoboNameCategory;
+  uint8_t racingChocoboNameCategory;
 
-   RacingChocoboNameInfo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RacingChocoboNameInfo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RacingChocoboParam
 {
-   std::string name;
+  std::string name;
 
-   RacingChocoboParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RacingChocoboParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RecastNavimesh
 {
-   float tileSize;
-   float cellSize;
-   float cellHeight;
-   float agentHeight;
-   float agentRadius;
-   float agentMaxClimb;
-   float agentMaxSlope;
-   float regionMinSize;
-   float regionMergedSize;
-   float maxEdgeLength;
-   float maxEdgeError;
-   float vertsPerPoly;
-   float detailMeshSampleDistance;
-   float detailMeshMaxSampleError;
+  float tileSize;
+  float cellSize;
+  float cellHeight;
+  float agentHeight;
+  float agentRadius;
+  float agentMaxClimb;
+  float agentMaxSlope;
+  float regionMinSize;
+  float regionMergedSize;
+  float maxEdgeLength;
+  float maxEdgeError;
+  float vertsPerPoly;
+  float detailMeshSampleDistance;
+  float detailMeshMaxSampleError;
 
-   RecastNavimesh( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RecastNavimesh( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Recipe
 {
-   int32_t craftType;
-   uint16_t recipeLevelTable;
-   int32_t itemResult;
-   uint8_t amountResult;
-   uint8_t recipeElement;
-   bool isSecondary;
-   uint16_t difficultyFactor;
-   uint16_t qualityFactor;
-   uint16_t durabilityFactor;
-   uint16_t requiredCraftsmanship;
-   uint16_t requiredControl;
-   uint16_t quickSynthCraftsmanship;
-   uint16_t quickSynthControl;
-   uint16_t secretRecipeBook;
-   bool canQuickSynth;
-   bool canHq;
-   bool expRewarded;
-   int32_t statusRequired;
-   int32_t itemRequired;
-   bool isSpecializationRequired;
-   uint16_t patchNumber;
+  int32_t craftType;
+  uint16_t recipeLevelTable;
+  int32_t itemResult;
+  uint8_t amountResult;
+  uint8_t recipeElement;
+  bool isSecondary;
+  uint16_t difficultyFactor;
+  uint16_t qualityFactor;
+  uint16_t durabilityFactor;
+  uint16_t requiredCraftsmanship;
+  uint16_t requiredControl;
+  uint16_t quickSynthCraftsmanship;
+  uint16_t quickSynthControl;
+  uint16_t secretRecipeBook;
+  bool canQuickSynth;
+  bool canHq;
+  bool expRewarded;
+  int32_t statusRequired;
+  int32_t itemRequired;
+  bool isSpecializationRequired;
+  uint16_t patchNumber;
 
-   Recipe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Recipe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RecipeElement
 {
-   std::string name;
+  std::string name;
 
-   RecipeElement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RecipeElement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RecipeLevelTable
 {
-   uint8_t classJobLevel;
-   uint8_t stars;
-   uint16_t suggestedCraftsmanship;
-   uint16_t difficulty;
-   int16_t quality;
-   uint16_t durability;
+  uint8_t classJobLevel;
+  uint8_t stars;
+  uint16_t suggestedCraftsmanship;
+  uint16_t difficulty;
+  int16_t quality;
+  uint16_t durability;
 
-   RecipeLevelTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RecipeLevelTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RecipeNotebookList
 {
-   std::vector< int32_t > recipe;
+  std::vector< int32_t > recipe;
 
-   RecipeNotebookList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RecipeNotebookList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RecommendContents
 {
-   int32_t level;
+  int32_t level;
 
-   RecommendContents( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RecommendContents( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Relic
 {
-   uint32_t itemAtma;
-   uint32_t itemAnimus;
-   int32_t icon;
+  uint32_t itemAtma;
+  uint32_t itemAnimus;
+  int32_t icon;
 
-   Relic( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Relic( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Relic3
 {
-   uint32_t itemAnimus;
-   uint32_t itemScroll;
-   uint8_t materiaLimit;
-   uint32_t itemNovus;
-   int32_t icon;
+  uint32_t itemAnimus;
+  uint32_t itemScroll;
+  uint8_t materiaLimit;
+  uint32_t itemNovus;
+  int32_t icon;
 
-   Relic3( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Relic3( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RelicItem
 {
-   uint32_t gladiatorItem;
-   uint32_t pugilistItem;
-   uint32_t marauderItem;
-   uint32_t lancerItem;
-   uint32_t archerItem;
-   uint32_t conjurerItem;
-   uint32_t thaumaturgeItem;
-   uint32_t arcanistSMNItem;
-   uint32_t arcanistSCHItem;
-   uint32_t shieldItem;
-   uint32_t rogueItem;
+  uint32_t gladiatorItem;
+  uint32_t pugilistItem;
+  uint32_t marauderItem;
+  uint32_t lancerItem;
+  uint32_t archerItem;
+  uint32_t conjurerItem;
+  uint32_t thaumaturgeItem;
+  uint32_t arcanistSMNItem;
+  uint32_t arcanistSCHItem;
+  uint32_t shieldItem;
+  uint32_t rogueItem;
 
-   RelicItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RelicItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RelicNote
 {
-   uint32_t eventItem;
-   std::vector< uint16_t > monsterNoteTargetNM;
-   std::vector< uint16_t > leve;
+  uint32_t eventItem;
+  std::vector< uint16_t > monsterNoteTargetNM;
+  std::vector< uint16_t > leve;
 
-   RelicNote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RelicNote( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RelicNoteCategory
 {
-   std::string text;
+  std::string text;
 
-   RelicNoteCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RelicNoteCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Resident
 {
-   uint64_t model;
-   int32_t npcYell;
-   uint8_t residentMotionType;
+  uint64_t model;
+  int32_t npcYell;
+  uint8_t residentMotionType;
 
-   Resident( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  Resident( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTask
 {
-   bool isRandom;
-   uint8_t classJobCategory;
-   uint8_t retainerLevel;
-   uint16_t retainerTaskParameter;
-   uint16_t ventureCost;
-   uint16_t maxTimemin;
-   int32_t experience;
-   uint16_t requiredItemLevel;
-   uint16_t requiredGathering;
-   uint16_t task;
+  bool isRandom;
+  uint8_t classJobCategory;
+  uint8_t retainerLevel;
+  uint16_t retainerTaskParameter;
+  uint16_t ventureCost;
+  uint16_t maxTimemin;
+  int32_t experience;
+  uint16_t requiredItemLevel;
+  uint16_t requiredGathering;
+  uint16_t task;
 
-   RetainerTask( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RetainerTask( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTaskLvRange
 {
-   uint8_t min;
-   uint8_t max;
+  uint8_t min;
+  uint8_t max;
 
-   RetainerTaskLvRange( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RetainerTaskLvRange( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTaskNormal
 {
-   int32_t item;
-   uint8_t quantity0;
-   uint8_t quantity1;
-   uint8_t quantity2;
-   int16_t gatheringLog;
-   int16_t fishingLog;
+  int32_t item;
+  uint8_t quantity0;
+  uint8_t quantity1;
+  uint8_t quantity2;
+  int16_t gatheringLog;
+  int16_t fishingLog;
 
-   RetainerTaskNormal( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RetainerTaskNormal( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTaskParameter
 {
-   std::vector< int16_t > itemLevelDoW;
-   std::vector< int16_t > gatheringDoL;
-   std::vector< int16_t > gatheringFSH;
+  std::vector< int16_t > itemLevelDoW;
+  std::vector< int16_t > gatheringDoL;
+  std::vector< int16_t > gatheringFSH;
 
-   RetainerTaskParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RetainerTaskParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTaskRandom
 {
-   std::string name;
-   int16_t requirement;
+  std::string name;
+  int16_t requirement;
 
-   RetainerTaskRandom( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RetainerTaskRandom( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RPParameter
 {
-   uint16_t bNpcName;
-   uint8_t classJob;
+  uint16_t bNpcName;
+  uint8_t classJob;
 
-   RPParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  RPParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Salvage
 {
-   uint16_t optimalSkill;
+  uint16_t optimalSkill;
 
-   Salvage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Salvage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SatisfactionNpc
 {
-   int32_t npc;
-   int32_t questRequired;
-   uint8_t deliveriesPerWeek;
-   std::vector< int32_t > supplyIndex;
-   std::vector< uint16_t > satisfactionRequired;
-   int32_t icon;
+  int32_t npc;
+  int32_t questRequired;
+  uint8_t deliveriesPerWeek;
+  std::vector< int32_t > supplyIndex;
+  std::vector< uint16_t > satisfactionRequired;
+  int32_t icon;
 
-   SatisfactionNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SatisfactionNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SatisfactionSupply
 {
-   uint8_t slot;
-   uint8_t probability;
-   int32_t item;
-   uint16_t collectabilityLow;
-   uint16_t collectabilityMid;
-   uint16_t collectabilityHigh;
-   uint16_t reward;
+  uint8_t slot;
+  uint8_t probability;
+  int32_t item;
+  uint16_t collectabilityLow;
+  uint16_t collectabilityMid;
+  uint16_t collectabilityHigh;
+  uint16_t reward;
 
-   SatisfactionSupply( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  SatisfactionSupply( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SatisfactionSupplyReward
 {
-   uint16_t satisfactionLow;
-   uint16_t satisfactionMid;
-   uint16_t satisfactionHigh;
-   uint16_t gilLow;
-   uint16_t gilMid;
-   uint16_t gilHigh;
+  uint16_t satisfactionLow;
+  uint16_t satisfactionMid;
+  uint16_t satisfactionHigh;
+  uint16_t gilLow;
+  uint16_t gilMid;
+  uint16_t gilHigh;
 
-   SatisfactionSupplyReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SatisfactionSupplyReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ScenarioTree
 {
-   uint8_t type;
-   uint16_t image;
+  uint8_t type;
+  uint16_t image;
 
-   ScenarioTree( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ScenarioTree( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ScenarioTreeTips
 {
-   uint32_t tips1;
-   uint32_t tips2;
+  uint32_t tips1;
+  uint32_t tips2;
 
-   ScenarioTreeTips( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ScenarioTreeTips( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ScenarioTreeTipsClassQuest
 {
-   uint32_t quest;
-   uint16_t requiredLevel;
-   uint8_t requiredExpansion;
-   uint32_t requiredQuest;
+  uint32_t quest;
+  uint16_t requiredLevel;
+  uint8_t requiredExpansion;
+  uint32_t requiredQuest;
 
-   ScenarioTreeTipsClassQuest( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  ScenarioTreeTipsClassQuest( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ScenarioTreeTipsQuest
 {
-   uint32_t level;
+  uint32_t level;
 
-   ScenarioTreeTipsQuest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ScenarioTreeTipsQuest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ScenarioType
 {
-   std::string type;
+  std::string type;
 
-   ScenarioType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ScenarioType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ScreenImage
 {
-   uint32_t image;
+  uint32_t image;
 
-   ScreenImage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  ScreenImage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SecretRecipeBook
 {
-   int32_t item;
-   std::string name;
+  int32_t item;
+  std::string name;
 
-   SecretRecipeBook( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SecretRecipeBook( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SkyIsland2Mission
 {
-   uint32_t item1;
-   uint32_t item2;
-   uint16_t objective1;
-   uint8_t requiredAmount1;
-   uint16_t objective2;
-   uint8_t requiredAmount2;
-   uint16_t objective3;
-   uint32_t image;
+  uint32_t item1;
+  uint32_t item2;
+  uint16_t objective1;
+  uint8_t requiredAmount1;
+  uint16_t objective2;
+  uint8_t requiredAmount2;
+  uint16_t objective3;
+  uint32_t image;
 
-   SkyIsland2Mission( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SkyIsland2Mission( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SkyIsland2MissionDetail
 {
-   uint8_t type;
-   uint8_t range;
-   uint32_t eObj;
-   std::string objective;
+  uint8_t type;
+  uint8_t range;
+  uint32_t eObj;
+  std::string objective;
 
-   SkyIsland2MissionDetail( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SkyIsland2MissionDetail( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SkyIsland2MissionType
 {
-   bool type;
+  bool type;
 
-   SkyIsland2MissionType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SkyIsland2MissionType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SkyIsland2RangeType
 {
-   uint8_t type;
+  uint8_t type;
 
-   SkyIsland2RangeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SkyIsland2RangeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SpearfishingItem
 {
-   std::string description;
-   int32_t item;
-   uint16_t gatheringItemLevel;
-   uint16_t territoryType;
-   bool isVisible;
+  std::string description;
+  int32_t item;
+  uint16_t gatheringItemLevel;
+  uint16_t territoryType;
+  bool isVisible;
 
-   SpearfishingItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SpearfishingItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SpearfishingNotebook
 {
-   uint8_t gatheringLevel;
-   int32_t territoryType;
-   int16_t x;
-   int16_t y;
-   uint16_t radius;
-   uint16_t placeName;
-   uint16_t gatheringPointBase;
+  uint8_t gatheringLevel;
+  int32_t territoryType;
+  int16_t x;
+  int16_t y;
+  uint16_t radius;
+  uint16_t placeName;
+  uint16_t gatheringPointBase;
 
-   SpearfishingNotebook( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SpearfishingNotebook( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SpearfishingRecordPage
 {
-   int32_t placeName;
-   int32_t image;
+  int32_t placeName;
+  int32_t image;
 
-   SpearfishingRecordPage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SpearfishingRecordPage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SpecialShop
 {
-   std::string name;
-   std::vector< int32_t > questItem;
-   std::vector< int32_t > unknown;
-   std::vector< int32_t > achievementUnlock;
-   std::vector< uint16_t > patchNumber;
-   uint32_t questUnlock;
-   int32_t questShop;
-   int32_t notCompleteText;
-   int32_t completeText;
+  std::string name;
+  std::vector< int32_t > questItem;
+  std::vector< int32_t > unknown;
+  std::vector< int32_t > achievementUnlock;
+  std::vector< uint16_t > patchNumber;
+  uint32_t questUnlock;
+  int32_t questShop;
+  int32_t notCompleteText;
+  int32_t completeText;
 
-   SpecialShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SpecialShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SpecialShopItemCategory
 {
-   std::string name;
+  std::string name;
 
-   SpecialShopItemCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SpecialShopItemCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Stain
 {
-   uint32_t color;
-   uint8_t shade;
-   std::string name;
+  uint32_t color;
+  uint8_t shade;
+  std::string name;
 
-   Stain( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Stain( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct StainTransient
 {
-   uint32_t item1;
-   uint32_t item2;
+  uint32_t item1;
+  uint32_t item2;
 
-   StainTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  StainTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Status
 {
-   std::string name;
-   std::string description;
-   uint16_t icon;
-   uint8_t maxStacks;
-   uint8_t category;
-   uint8_t hitEffect;
-   uint8_t vFX;
-   bool lockMovement;
-   bool lockActions;
-   bool lockControl;
-   bool transfiguration;
-   bool canDispel;
-   bool inflictedByActor;
-   bool isPermanent;
-   bool isFcBuff;
-   bool invisibility;
+  std::string name;
+  std::string description;
+  uint16_t icon;
+  uint8_t maxStacks;
+  uint8_t category;
+  uint8_t hitEffect;
+  uint8_t vFX;
+  bool lockMovement;
+  bool lockActions;
+  bool lockControl;
+  bool transfiguration;
+  bool canDispel;
+  bool inflictedByActor;
+  bool isPermanent;
+  bool isFcBuff;
+  bool invisibility;
 
-   Status( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Status( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct StatusHitEffect
 {
-   uint16_t location;
+  uint16_t location;
 
-   StatusHitEffect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  StatusHitEffect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct StatusLoopVFX
 {
-   uint16_t vFX;
-   uint16_t vFX2;
-   uint16_t vFX3;
+  uint16_t vFX;
+  uint16_t vFX2;
+  uint16_t vFX3;
 
-   StatusLoopVFX( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  StatusLoopVFX( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Story
 {
 
-   Story( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Story( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SubmarineExploration
 {
-   std::string destination;
-   std::string location;
-   uint8_t rankReq;
-   uint8_t ceruleumTankReq;
-   uint16_t durationmin;
-   uint8_t distanceForSurvey;
-   uint32_t expReward;
+  std::string destination;
+  std::string location;
+  uint8_t rankReq;
+  uint8_t ceruleumTankReq;
+  uint16_t durationmin;
+  uint8_t distanceForSurvey;
+  uint32_t expReward;
 
-   SubmarineExploration( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SubmarineExploration( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SubmarinePart
 {
-   uint8_t slot;
-   uint8_t rank;
-   uint8_t components;
-   int16_t surveillance;
-   int16_t retrieval;
-   int16_t speed;
-   int16_t range;
-   int16_t favor;
-   uint8_t repairMaterials;
+  uint8_t slot;
+  uint8_t rank;
+  uint8_t components;
+  int16_t surveillance;
+  int16_t retrieval;
+  int16_t speed;
+  int16_t range;
+  int16_t favor;
+  uint8_t repairMaterials;
 
-   SubmarinePart( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SubmarinePart( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SubmarineRank
 {
-   uint16_t rank;
-   uint32_t expToNext;
+  uint16_t rank;
+  uint32_t expToNext;
 
-   SubmarineRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SubmarineRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SwitchTalk
 {
-   std::vector< uint32_t > quest;
-   std::vector< uint32_t > defaultTalk;
+  std::vector< uint32_t > quest;
+  std::vector< uint32_t > defaultTalk;
 
-   SwitchTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SwitchTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TerritoryType
 {
-   std::string name;
-   std::string bg;
-   uint16_t placeNameRegion;
-   uint16_t placeNameZone;
-   uint16_t placeName;
-   uint16_t map;
-   uint8_t territoryIntendedUse;
-   uint8_t weatherRate;
-   uint32_t arrayEventHandler;
-   uint16_t questBattle;
-   int32_t aetheryte;
+  std::string name;
+  std::string bg;
+  uint16_t placeNameRegion;
+  uint16_t placeNameZone;
+  uint16_t placeName;
+  uint16_t map;
+  uint8_t territoryIntendedUse;
+  uint8_t weatherRate;
+  int32_t placeNameRegionIcon;
+  int32_t placeNameIcon;
+  uint32_t arrayEventHandler;
+  uint16_t questBattle;
+  int32_t aetheryte;
+  bool isPvpZone;
 
-   TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TextCommand
 {
-   std::string command;
-   std::string shortCommand;
-   std::string description;
-   std::string alias;
-   std::string shortAlias;
+  std::string command;
+  std::string shortCommand;
+  std::string description;
+  std::string alias;
+  std::string shortAlias;
 
-   TextCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TextCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Title
 {
-   std::string masculine;
-   std::string feminine;
-   bool isPrefix;
-   uint16_t order;
+  std::string masculine;
+  std::string feminine;
+  bool isPrefix;
+  uint16_t order;
 
-   Title( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Title( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Tomestones
 {
-   uint16_t weeklyLimit;
+  uint16_t weeklyLimit;
 
-   Tomestones( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Tomestones( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TomestonesItem
 {
-   int32_t item;
-   int32_t tomestones;
+  int32_t item;
+  int32_t tomestones;
 
-   TomestonesItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TomestonesItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TopicSelect
 {
-   std::string name;
+  std::string name;
 
-   TopicSelect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TopicSelect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Town
 {
-   std::string name;
-   int32_t icon;
+  std::string name;
+  int32_t icon;
 
-   Town( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Town( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Trait
 {
-   std::string name;
-   int32_t icon;
-   uint8_t classJob;
-   uint8_t level;
-   uint32_t quest;
-   int16_t value;
-   uint8_t classJobCategory;
+  std::string name;
+  int32_t icon;
+  uint8_t classJob;
+  uint8_t level;
+  uint32_t quest;
+  int16_t value;
+  uint8_t classJobCategory;
 
-   Trait( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Trait( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TraitRecast
 {
-   uint16_t trait;
-   uint16_t action;
-   uint16_t timeds;
+  uint16_t trait;
+  uint16_t action;
+  uint16_t timeds;
 
-   TraitRecast( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TraitRecast( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TraitTransient
 {
-   std::string description;
+  std::string description;
 
-   TraitTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TraitTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Transformation
 {
-   int16_t model;
-   int32_t bNpcCustomize;
-   std::vector< uint16_t > action;
-   float speed;
-   float scale;
-   bool isPvP;
-   bool isEvent;
-   bool playerCamera;
+  int16_t model;
+  uint16_t bNpcName;
+  int32_t bNpcCustomize;
+  int32_t npcEquip;
+  std::vector< uint16_t > action;
+  float speed;
+  float scale;
+  bool isPvP;
+  bool isEvent;
+  bool playerCamera;
+  uint16_t startVFX;
+  uint16_t endVFX;
+  uint8_t rPParameter;
 
-   Transformation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Transformation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Treasure
 {
-   uint32_t item;
+  uint32_t item;
 
-   Treasure( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Treasure( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TreasureHuntRank
 {
-   uint32_t icon;
-   int32_t itemName;
-   int32_t keyItemName;
-   int32_t instanceMap;
-   uint8_t maxPartySize;
-   uint8_t minPartySize;
+  uint32_t icon;
+  int32_t itemName;
+  int32_t keyItemName;
+  int32_t instanceMap;
+  uint8_t maxPartySize;
+  uint8_t minPartySize;
 
-   TreasureHuntRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TreasureHuntRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TreasureSpot
+{
+  int32_t location;
+
+  TreasureSpot( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Tribe
 {
-   std::string masculine;
-   std::string feminine;
-   int8_t sTR;
-   int8_t dEX;
-   int8_t vIT;
-   int8_t iNT;
-   int8_t mND;
-   int8_t pIE;
+  std::string masculine;
+  std::string feminine;
+  int8_t sTR;
+  int8_t dEX;
+  int8_t vIT;
+  int8_t iNT;
+  int8_t mND;
+  int8_t pIE;
 
-   Tribe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Tribe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriad
 {
-   std::vector< uint16_t > tripleTriadCardFixed;
-   std::vector< uint16_t > tripleTriadCardVariable;
-   std::vector< uint8_t > tripleTriadRule;
-   bool usesRegionalRules;
-   uint16_t fee;
-   uint8_t previousQuestJoin;
-   std::vector< uint32_t > previousQuest;
-   uint16_t startTime;
-   uint16_t endTime;
-   uint32_t defaultTalkChallenge;
-   uint32_t defaultTalkUnavailable;
-   uint32_t defaultTalkNPCWin;
-   uint32_t defaultTalkDraw;
-   uint32_t defaultTalkPCWin;
-   std::vector< uint32_t > itemPossibleReward;
+  std::vector< uint16_t > tripleTriadCardFixed;
+  std::vector< uint16_t > tripleTriadCardVariable;
+  std::vector< uint8_t > tripleTriadRule;
+  bool usesRegionalRules;
+  uint16_t fee;
+  uint8_t previousQuestJoin;
+  std::vector< uint32_t > previousQuest;
+  uint16_t startTime;
+  uint16_t endTime;
+  uint32_t defaultTalkChallenge;
+  uint32_t defaultTalkUnavailable;
+  uint32_t defaultTalkNPCWin;
+  uint32_t defaultTalkDraw;
+  uint32_t defaultTalkPCWin;
+  std::vector< uint32_t > itemPossibleReward;
 
-   TripleTriad( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriad( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriadCard
 {
-   std::string name;
-   int8_t startsWithVowel;
-   std::string description;
+  std::string name;
+  int8_t startsWithVowel;
+  std::string description;
 
-   TripleTriadCard( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriadCard( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriadCardRarity
 {
-   uint8_t stars;
+  uint8_t stars;
 
-   TripleTriadCardRarity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriadCardRarity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriadCardResident
 {
-   uint8_t top;
-   uint8_t bottom;
-   uint8_t left;
-   uint8_t right;
-   uint8_t tripleTriadCardRarity;
-   uint8_t tripleTriadCardType;
-   uint16_t saleValue;
-   uint8_t sortKey;
+  uint8_t top;
+  uint8_t bottom;
+  uint8_t left;
+  uint8_t right;
+  uint8_t tripleTriadCardRarity;
+  uint8_t tripleTriadCardType;
+  uint16_t saleValue;
+  uint8_t sortKey;
 
-   TripleTriadCardResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriadCardResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriadCardType
 {
-   std::string name;
+  std::string name;
 
-   TripleTriadCardType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriadCardType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriadCompetition
 {
-   std::string name;
+  std::string name;
 
-   TripleTriadCompetition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriadCompetition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TripleTriadRule
 {
-   std::string name;
+  std::string name;
 
-   TripleTriadRule( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TripleTriadRule( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Tutorial
 {
-   uint32_t exp;
-   uint32_t gil;
-   uint32_t rewardTank;
-   uint32_t rewardMelee;
-   uint32_t rewardRanged;
-   uint32_t objective;
+  uint32_t exp;
+  uint32_t gil;
+  uint32_t rewardTank;
+  uint32_t rewardMelee;
+  uint32_t rewardRanged;
+  uint32_t objective;
 
-   Tutorial( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Tutorial( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TutorialDPS
 {
-   uint8_t objective;
+  uint8_t objective;
 
-   TutorialDPS( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TutorialDPS( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TutorialHealer
 {
-   uint8_t objective;
+  uint8_t objective;
 
-   TutorialHealer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TutorialHealer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TutorialTank
 {
-   uint8_t objective;
+  uint8_t objective;
 
-   TutorialTank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  TutorialTank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct UIColor
 {
-   uint32_t uIForeground;
-   uint32_t uIGlow;
+  uint32_t uIForeground;
+  uint32_t uIGlow;
 
-   UIColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  UIColor( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct VaseFlower
 {
-   uint32_t item;
+  uint32_t item;
 
-   VaseFlower( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  VaseFlower( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct VFX
 {
-   std::string location;
+  std::string location;
 
-   VFX( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  VFX( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Warp
 {
-   uint32_t level;
-   uint16_t placeName;
-   uint32_t conditionSuccessEvent;
-   uint32_t conditionFailEvent;
-   uint32_t confirmEvent;
-   uint16_t warpCondition;
-   uint16_t warpLogic;
+  uint32_t level;
+  uint16_t placeName;
+  uint32_t conditionSuccessEvent;
+  uint32_t conditionFailEvent;
+  uint32_t confirmEvent;
+  uint16_t warpCondition;
+  uint16_t warpLogic;
 
-   Warp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Warp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WarpCondition
 {
-   uint32_t requiredQuest1;
-   uint32_t requiredQuest2;
-   uint32_t dRequiredQuest3;
-   uint32_t requiredQuest4;
+  uint32_t requiredQuest1;
+  uint32_t requiredQuest2;
+  uint32_t dRequiredQuest3;
+  uint32_t requiredQuest4;
 
-   WarpCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WarpCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WarpLogic
 {
-   std::string warpName;
-   std::vector< std::string > function;
-   std::vector< uint32_t > argument;
-   std::string question;
-   std::string responseYes;
-   std::string responseNo;
+  std::string warpName;
+  std::vector< std::string > function;
+  std::string question;
+  std::string responseYes;
+  std::string responseNo;
 
-   WarpLogic( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WarpLogic( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Weather
 {
-   int32_t icon;
-   std::string name;
-   std::string description;
+  int32_t icon;
+  std::string name;
+  std::string description;
 
-   Weather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  Weather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeatherGroup
 {
-   int32_t weatherRate;
+  int32_t weatherRate;
 
-   WeatherGroup( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  WeatherGroup( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeatherRate
 {
 
-   WeatherRate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeatherRate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeatherReportReplace
 {
-   uint16_t placeNameSub;
-   uint16_t placeNameParent;
+  uint16_t placeNameSub;
+  uint16_t placeNameParent;
 
-   WeatherReportReplace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeatherReportReplace( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeddingBGM
 {
-   uint16_t song;
-   std::string songName;
+  uint16_t song;
+  std::string songName;
 
-   WeddingBGM( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeddingBGM( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeeklyBingoOrderData
 {
-   uint32_t type;
-   uint32_t data;
-   uint8_t text;
-   uint32_t icon;
+  uint32_t type;
+  uint32_t data;
+  uint8_t text;
+  uint32_t icon;
 
-   WeeklyBingoOrderData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeeklyBingoOrderData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeeklyBingoRewardData
 {
-   uint32_t rewardItem2;
-   bool rewardHQ2;
-   uint16_t rewardQuantity2;
+  uint32_t rewardItem2;
+  bool rewardHQ2;
+  uint16_t rewardQuantity2;
 
-   WeeklyBingoRewardData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeeklyBingoRewardData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeeklyBingoText
 {
-   std::string description;
+  std::string description;
 
-   WeeklyBingoText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeeklyBingoText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WeeklyLotBonus
 {
-   std::vector< uint8_t > weeklyLotBonusThreshold;
+  std::vector< uint8_t > weeklyLotBonusThreshold;
 
-   WeeklyLotBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WeeklyLotBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct World
 {
-   std::string name;
-   uint8_t dataCenter;
-   bool isPublic;
+  std::string name;
+  uint8_t dataCenter;
+  bool isPublic;
 
-   World( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  World( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct WorldDCGroupType
 {
-   std::string name;
-   uint8_t region;
+  std::string name;
+  uint8_t region;
 
-   WorldDCGroupType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  WorldDCGroupType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct YKW
 {
-   uint32_t item;
-   std::vector< uint16_t > location;
+  uint32_t item;
+  std::vector< uint16_t > location;
 
-   YKW( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  YKW( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ZoneSharedGroup
 {
-   uint32_t quest1;
-   uint32_t quest2;
-   uint32_t quest3;
-   uint32_t quest4;
-   uint32_t quest5;
-   uint32_t quest6;
+  uint32_t quest1;
+  uint32_t quest2;
+  uint32_t quest3;
+  uint32_t quest4;
+  uint32_t quest5;
+  uint32_t quest6;
 
-   ZoneSharedGroup( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+  ZoneSharedGroup( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 
@@ -5469,23 +5558,53 @@ struct ZoneSharedGroup
   class ExdDataGenerated
   {
   public:
-     ExdDataGenerated();
-     ~ExdDataGenerated();
+    ExdDataGenerated();
+    ~ExdDataGenerated();
 
-     bool init( const std::string& path );
+    bool init( const std::string& path );
 
-     xiv::exd::Exd setupDatAccess( const std::string& name, xiv::exd::Language lang );
+    xiv::exd::Exd setupDatAccess( const std::string& name, xiv::exd::Language lang );
 
-     template< class T >
-     T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
-     {
-        return std::get< T >( fields.at( index ) );
-     }
+    template< class T >
+    T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
+    {
+       return std::get< T >( fields.at( index ) );
+    }
 
-     void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
+    void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
 
-     std::shared_ptr< xiv::dat::GameData > m_data;
-     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
+    std::shared_ptr< xiv::dat::GameData > m_data;
+    std::shared_ptr< xiv::exd::ExdData > m_exd_data;
+
+    template< class T >
+    std::shared_ptr< T > get( uint32_t id )
+    {
+      try
+      {
+        auto info = std::make_shared< T >( id, this );
+        return info;
+      }
+      catch( ... )
+      {
+        return nullptr;
+      }
+      return nullptr;
+    }
+
+    template< class T >
+    std::shared_ptr< T > get( uint32_t id, uint32_t slotId )
+    {
+      try
+      {
+        auto info = std::make_shared< T >( id, slotId, this );
+        return info;
+      }
+      catch( ... )
+      {
+        return nullptr;
+      }
+      return nullptr;
+    }
 
      xiv::exd::Exd m_AchievementDat;
      xiv::exd::Exd m_AchievementCategoryDat;
@@ -5594,6 +5713,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CompanyCraftSequenceDat;
      xiv::exd::Exd m_CompanyCraftSupplyItemDat;
      xiv::exd::Exd m_CompanyCraftTypeDat;
+     xiv::exd::Exd m_CompanyLeveDat;
+     xiv::exd::Exd m_CompanyLeveRuleDat;
      xiv::exd::Exd m_CompleteJournalDat;
      xiv::exd::Exd m_CompleteJournalCategoryDat;
      xiv::exd::Exd m_ContentCloseCycleDat;
@@ -5617,6 +5738,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CreditDat;
      xiv::exd::Exd m_CreditBackImageDat;
      xiv::exd::Exd m_CreditCastDat;
+     xiv::exd::Exd m_CreditListDat;
+     xiv::exd::Exd m_CreditListTextDat;
      xiv::exd::Exd m_CurrencyDat;
      xiv::exd::Exd m_CustomTalkDat;
      xiv::exd::Exd m_CustomTalkDynamicIconDat;
@@ -5823,6 +5946,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MountTransientDat;
      xiv::exd::Exd m_MoveTimelineDat;
      xiv::exd::Exd m_MoveVfxDat;
+     xiv::exd::Exd m_NotebookDivisionDat;
+     xiv::exd::Exd m_NotebookDivisionCategoryDat;
      xiv::exd::Exd m_NpcEquipDat;
      xiv::exd::Exd m_NpcYellDat;
      xiv::exd::Exd m_OmenDat;
@@ -5927,6 +6052,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_TransformationDat;
      xiv::exd::Exd m_TreasureDat;
      xiv::exd::Exd m_TreasureHuntRankDat;
+     xiv::exd::Exd m_TreasureSpotDat;
      xiv::exd::Exd m_TribeDat;
      xiv::exd::Exd m_TripleTriadDat;
      xiv::exd::Exd m_TripleTriadCardDat;
@@ -6067,6 +6193,8 @@ struct ZoneSharedGroup
      using CompanyCraftSequencePtr = std::shared_ptr< CompanyCraftSequence >;
      using CompanyCraftSupplyItemPtr = std::shared_ptr< CompanyCraftSupplyItem >;
      using CompanyCraftTypePtr = std::shared_ptr< CompanyCraftType >;
+     using CompanyLevePtr = std::shared_ptr< CompanyLeve >;
+     using CompanyLeveRulePtr = std::shared_ptr< CompanyLeveRule >;
      using CompleteJournalPtr = std::shared_ptr< CompleteJournal >;
      using CompleteJournalCategoryPtr = std::shared_ptr< CompleteJournalCategory >;
      using ContentCloseCyclePtr = std::shared_ptr< ContentCloseCycle >;
@@ -6090,6 +6218,8 @@ struct ZoneSharedGroup
      using CreditPtr = std::shared_ptr< Credit >;
      using CreditBackImagePtr = std::shared_ptr< CreditBackImage >;
      using CreditCastPtr = std::shared_ptr< CreditCast >;
+     using CreditListPtr = std::shared_ptr< CreditList >;
+     using CreditListTextPtr = std::shared_ptr< CreditListText >;
      using CurrencyPtr = std::shared_ptr< Currency >;
      using CustomTalkPtr = std::shared_ptr< CustomTalk >;
      using CustomTalkDynamicIconPtr = std::shared_ptr< CustomTalkDynamicIcon >;
@@ -6296,6 +6426,8 @@ struct ZoneSharedGroup
      using MountTransientPtr = std::shared_ptr< MountTransient >;
      using MoveTimelinePtr = std::shared_ptr< MoveTimeline >;
      using MoveVfxPtr = std::shared_ptr< MoveVfx >;
+     using NotebookDivisionPtr = std::shared_ptr< NotebookDivision >;
+     using NotebookDivisionCategoryPtr = std::shared_ptr< NotebookDivisionCategory >;
      using NpcEquipPtr = std::shared_ptr< NpcEquip >;
      using NpcYellPtr = std::shared_ptr< NpcYell >;
      using OmenPtr = std::shared_ptr< Omen >;
@@ -6400,6 +6532,7 @@ struct ZoneSharedGroup
      using TransformationPtr = std::shared_ptr< Transformation >;
      using TreasurePtr = std::shared_ptr< Treasure >;
      using TreasureHuntRankPtr = std::shared_ptr< TreasureHuntRank >;
+     using TreasureSpotPtr = std::shared_ptr< TreasureSpot >;
      using TribePtr = std::shared_ptr< Tribe >;
      using TripleTriadPtr = std::shared_ptr< TripleTriad >;
      using TripleTriadCardPtr = std::shared_ptr< TripleTriadCard >;
@@ -6431,37 +6564,6 @@ struct ZoneSharedGroup
      using WorldDCGroupTypePtr = std::shared_ptr< WorldDCGroupType >;
      using YKWPtr = std::shared_ptr< YKW >;
      using ZoneSharedGroupPtr = std::shared_ptr< ZoneSharedGroup >;
-
-     template< class T >
-     std::shared_ptr< T > get( uint32_t id )
-     {
-        try
-        {
-           auto info = std::make_shared< T >( id, this );
-           return info;
-        }
-        catch( ... )
-        {
-           return nullptr;
-        }
-        return nullptr;
-     }
-
-    template< class T >
-    std::shared_ptr< T > get( uint32_t id, uint32_t slotId )
-    {
-      try
-      {
-        auto info = std::make_shared< T >( id, slotId, this );
-        return info;
-      }
-      catch( std::runtime_error error )
-      {
-        // std::cout << error.what();
-        return nullptr;
-      }
-      return nullptr;
-    }
 
 
      std::set< uint32_t > m_AchievementIdList;
@@ -6571,6 +6673,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CompanyCraftSequenceIdList;
      std::set< uint32_t > m_CompanyCraftSupplyItemIdList;
      std::set< uint32_t > m_CompanyCraftTypeIdList;
+     std::set< uint32_t > m_CompanyLeveIdList;
+     std::set< uint32_t > m_CompanyLeveRuleIdList;
      std::set< uint32_t > m_CompleteJournalIdList;
      std::set< uint32_t > m_CompleteJournalCategoryIdList;
      std::set< uint32_t > m_ContentCloseCycleIdList;
@@ -6594,6 +6698,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CreditIdList;
      std::set< uint32_t > m_CreditBackImageIdList;
      std::set< uint32_t > m_CreditCastIdList;
+     std::set< uint32_t > m_CreditListIdList;
+     std::set< uint32_t > m_CreditListTextIdList;
      std::set< uint32_t > m_CurrencyIdList;
      std::set< uint32_t > m_CustomTalkIdList;
      std::set< uint32_t > m_CustomTalkDynamicIconIdList;
@@ -6800,6 +6906,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MountTransientIdList;
      std::set< uint32_t > m_MoveTimelineIdList;
      std::set< uint32_t > m_MoveVfxIdList;
+     std::set< uint32_t > m_NotebookDivisionIdList;
+     std::set< uint32_t > m_NotebookDivisionCategoryIdList;
      std::set< uint32_t > m_NpcEquipIdList;
      std::set< uint32_t > m_NpcYellIdList;
      std::set< uint32_t > m_OmenIdList;
@@ -6904,6 +7012,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_TransformationIdList;
      std::set< uint32_t > m_TreasureIdList;
      std::set< uint32_t > m_TreasureHuntRankIdList;
+     std::set< uint32_t > m_TreasureSpotIdList;
      std::set< uint32_t > m_TribeIdList;
      std::set< uint32_t > m_TripleTriadIdList;
      std::set< uint32_t > m_TripleTriadCardIdList;
@@ -7579,6 +7688,18 @@ const std::set< uint32_t >& getCompanyCraftTypeIdList()
       loadIdList( m_CompanyCraftTypeDat, m_CompanyCraftTypeIdList );
    return m_CompanyCraftTypeIdList;
 }
+const std::set< uint32_t >& getCompanyLeveIdList()
+{
+   if( m_CompanyLeveIdList.size() == 0 )
+      loadIdList( m_CompanyLeveDat, m_CompanyLeveIdList );
+   return m_CompanyLeveIdList;
+}
+const std::set< uint32_t >& getCompanyLeveRuleIdList()
+{
+   if( m_CompanyLeveRuleIdList.size() == 0 )
+      loadIdList( m_CompanyLeveRuleDat, m_CompanyLeveRuleIdList );
+   return m_CompanyLeveRuleIdList;
+}
 const std::set< uint32_t >& getCompleteJournalIdList()
 {
    if( m_CompleteJournalIdList.size() == 0 )
@@ -7716,6 +7837,18 @@ const std::set< uint32_t >& getCreditCastIdList()
    if( m_CreditCastIdList.size() == 0 )
       loadIdList( m_CreditCastDat, m_CreditCastIdList );
    return m_CreditCastIdList;
+}
+const std::set< uint32_t >& getCreditListIdList()
+{
+   if( m_CreditListIdList.size() == 0 )
+      loadIdList( m_CreditListDat, m_CreditListIdList );
+   return m_CreditListIdList;
+}
+const std::set< uint32_t >& getCreditListTextIdList()
+{
+   if( m_CreditListTextIdList.size() == 0 )
+      loadIdList( m_CreditListTextDat, m_CreditListTextIdList );
+   return m_CreditListTextIdList;
 }
 const std::set< uint32_t >& getCurrencyIdList()
 {
@@ -8953,6 +9086,18 @@ const std::set< uint32_t >& getMoveVfxIdList()
       loadIdList( m_MoveVfxDat, m_MoveVfxIdList );
    return m_MoveVfxIdList;
 }
+const std::set< uint32_t >& getNotebookDivisionIdList()
+{
+   if( m_NotebookDivisionIdList.size() == 0 )
+      loadIdList( m_NotebookDivisionDat, m_NotebookDivisionIdList );
+   return m_NotebookDivisionIdList;
+}
+const std::set< uint32_t >& getNotebookDivisionCategoryIdList()
+{
+   if( m_NotebookDivisionCategoryIdList.size() == 0 )
+      loadIdList( m_NotebookDivisionCategoryDat, m_NotebookDivisionCategoryIdList );
+   return m_NotebookDivisionCategoryIdList;
+}
 const std::set< uint32_t >& getNpcEquipIdList()
 {
    if( m_NpcEquipIdList.size() == 0 )
@@ -9576,6 +9721,12 @@ const std::set< uint32_t >& getTreasureHuntRankIdList()
    if( m_TreasureHuntRankIdList.size() == 0 )
       loadIdList( m_TreasureHuntRankDat, m_TreasureHuntRankIdList );
    return m_TreasureHuntRankIdList;
+}
+const std::set< uint32_t >& getTreasureSpotIdList()
+{
+   if( m_TreasureSpotIdList.size() == 0 )
+      loadIdList( m_TreasureSpotDat, m_TreasureSpotIdList );
+   return m_TreasureSpotIdList;
 }
 const std::set< uint32_t >& getTribeIdList()
 {
