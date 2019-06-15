@@ -1,9 +1,5 @@
 #include "ExdDataGenerated.h"
-#include <boost/make_shared.hpp>
-
-#include <boost/variant.hpp>
-
-
+#include <memory>
 CONSTRUCTORS
 
 Sapphire::Data::ExdDataGenerated::ExdDataGenerated()
@@ -16,37 +12,37 @@ Sapphire::Data::ExdDataGenerated::~ExdDataGenerated()
 
 xiv::exd::Exd Sapphire::Data::ExdDataGenerated::setupDatAccess( const std::string& name, xiv::exd::Language lang )
 {
-   auto& cat = m_exd_data->get_category( name );
-   return static_cast< xiv::exd::Exd >( cat.get_data_ln( lang ) );
+  auto& cat = m_exd_data->get_category( name );
+  return static_cast< xiv::exd::Exd >( cat.get_data_ln( lang ) );
 };
 
 
 void Sapphire::Data::ExdDataGenerated::loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList )
 {
-   auto pDataRows = data.get_rows();
+  auto pDataRows = data.get_rows();
 
-   for( auto row : pDataRows )
-   {
-      uint32_t id = row.first;
-      outIdList.insert( id );
-   }
+  for( auto row : pDataRows )
+  {
+    uint32_t id = row.first;
+    outIdList.insert( id );
+  }
 }
 
 bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
 {
-   try
-   {
-      m_data = std::make_shared< xiv::dat::GameData >( path );
-      m_exd_data = std::make_shared< xiv::exd::ExdData >( *m_data );
+  try
+  {
+    m_data = std::make_shared< xiv::dat::GameData >( path );
+    m_exd_data = std::make_shared< xiv::exd::ExdData >( *m_data );
 
 SETUPDATACCESS
-   }
-   catch( std::runtime_error )
-   {
-      return false;
-   }
+  }
+  catch( std::runtime_error )
+  {
+    return false;
+  }
 
-   return true;
+  return true;
 }
 
 ///////////////////////////////////////////////////////////////

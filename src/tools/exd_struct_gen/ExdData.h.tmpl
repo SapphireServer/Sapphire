@@ -25,23 +25,53 @@ STRUCTS
   class ExdDataGenerated
   {
   public:
-     ExdDataGenerated();
-     ~ExdDataGenerated();
+    ExdDataGenerated();
+    ~ExdDataGenerated();
 
-     bool init( const std::string& path );
+    bool init( const std::string& path );
 
-     xiv::exd::Exd setupDatAccess( const std::string& name, xiv::exd::Language lang );
+    xiv::exd::Exd setupDatAccess( const std::string& name, xiv::exd::Language lang );
 
-     template< class T >
-     T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
-     {
-        return std::get< T >( fields.at( index ) );
-     }
+    template< class T >
+    T getField( std::vector< xiv::exd::Field >& fields, uint32_t index )
+    {
+       return std::get< T >( fields.at( index ) );
+    }
 
-     void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
+    void loadIdList( xiv::exd::Exd& data, std::set< uint32_t >& outIdList );
 
-     std::shared_ptr< xiv::dat::GameData > m_data;
-     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
+    std::shared_ptr< xiv::dat::GameData > m_data;
+    std::shared_ptr< xiv::exd::ExdData > m_exd_data;
+
+    template< class T >
+    std::shared_ptr< T > get( uint32_t id )
+    {
+      try
+      {
+        auto info = std::make_shared< T >( id, this );
+        return info;
+      }
+      catch( ... )
+      {
+        return nullptr;
+      }
+      return nullptr;
+    }
+
+    template< class T >
+    std::shared_ptr< T > get( uint32_t id, uint32_t slotId )
+    {
+      try
+      {
+        auto info = std::make_shared< T >( id, slotId, this );
+        return info;
+      }
+      catch( ... )
+      {
+        return nullptr;
+      }
+      return nullptr;
+    }
 
 DATACCESS
 
