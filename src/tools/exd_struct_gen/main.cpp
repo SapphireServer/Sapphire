@@ -11,6 +11,7 @@
 #include <set>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
+#include <experimental/filesystem>
 
 #include <nlohmann/json.hpp>
 
@@ -20,6 +21,8 @@
 #include <algorithm>
 
 using namespace Sapphire;
+
+namespace fs = std::experimental::filesystem;
 
 Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
@@ -111,65 +114,63 @@ std::string generateStruct( const std::string& exd )
 
   int count = 0;
 
-  auto json = nlohmann::json();
-
-  std::ifstream exJson( "ex.json" );
-  exJson >> json;
-
-  for( auto& sheet : json[ "sheets" ] )
+  auto path = fmt::format( "Definitions/{}.json", exd );
+  if( !fs::exists( path ) )
   {
-    if( sheet[ "sheet" ] != exd )
-      continue;
-  
-    for( auto& definition : sheet[ "definitions" ] )
-    {
-      uint32_t index;
-      std::string converterTarget = "";
-      bool isRepeat = false;
-      int num = 0;
-      try
-      {
-        index = definition.at( "index" );
-      }
-      catch( ... )
-      {
-        index = 0;
-      }
- 
-      try
-      {
-        std::string fieldName = std::string( definition.at( "name" ) );
-        indexToNameMap[ index ] = fieldName;
-      }
-      catch( ... )
-      {
-      }
+    Logger::warn( "No definition for exd: {}", exd );
+    return "";
+  }
 
-      try
-      {
-        converterTarget = std::string( definition.at( "converter" ).at( "target" ) );
-        if( nameTaken.find( converterTarget ) != nameTaken.end() )
-          indexToTarget[ index ] = converterTarget;
-      }
-      catch( ... )
-      {
-      }
- 
-      try
-      {
-        num = definition.at( "count" );
-        isRepeat = true;
-        indexIsArrayMap[ index ] = true;
-        indexCountMap[ index ] = num;
-        std::string fName = definition.at( "definition" ).at( "name" );
-        indexToNameMap[ index ] = fName;
-      }
-      catch( ... )
-      {
-      }
+  auto sheet = nlohmann::json();
+  std::ifstream defJson( path );
+  defJson >> sheet;
+
+  for( auto& definition : sheet[ "definitions" ] )
+  {
+    uint32_t index;
+    std::string converterTarget = "";
+    bool isRepeat = false;
+    int num = 0;
+    try
+    {
+      index = definition.at( "index" );
+    }
+    catch( ... )
+    {
+      index = 0;
     }
 
+    try
+    {
+      std::string fieldName = std::string( definition.at( "name" ) );
+      indexToNameMap[ index ] = fieldName;
+    }
+    catch( ... )
+    {
+    }
 
+    try
+    {
+      converterTarget = std::string( definition.at( "converter" ).at( "target" ) );
+      if( nameTaken.find( converterTarget ) != nameTaken.end() )
+        indexToTarget[ index ] = converterTarget;
+    }
+    catch( ... )
+    {
+    }
+
+    try
+    {
+      num = definition.at( "count" );
+      isRepeat = true;
+      indexIsArrayMap[ index ] = true;
+      indexCountMap[ index ] = num;
+      std::string fName = definition.at( "definition" ).at( "name" );
+      indexToNameMap[ index ] = fName;
+    }
+    catch( ... )
+    {
+    }
   }
 
   std::string result = "struct " + exd + "\n{\n";
@@ -351,11 +352,6 @@ int main( int argc, char** argv )
                     std::istreambuf_iterator< char >() );
 
 
-  std::ifstream exJson( "ex.json" );
-
-  auto json = nlohmann::json();
-  exJson >> json;
-
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
   {
@@ -380,18 +376,36 @@ int main( int argc, char** argv )
   //nameTaken[name] = "1";
   //}
   //
-  for( auto& sheet : json[ "sheets" ] )
-  { 
-      std::string name = sheet[ "sheet" ];
-      forwards += "struct " + name + ";\n";
-      structDefs += generateStruct( name );
-      dataDecl += generateDatAccessDecl( name );
-      idListsDecl += generateIdListDecl( name );
-      getterDecl += generateDirectGetters( name );
-      datAccCall += generateSetDatAccessCall( name );
-      constructorDecl += generateConstructorsDecl( name );
-      idListGetters += generateIdListGetter( name );
+
+  if( !fs::exists( "Definitions" ) )
+  {
+    Logger::error( "Missing definitions directory. Copy it from SaintCoinach to the working directory." );
+    return 1;
   }
+
+  uint32_t entryCount = 0;
+  for( auto& entry : fs::directory_iterator( "./Definitions/" ) )
+  {
+    auto& path = entry.path();
+
+    if( path.extension() != ".json" )
+      continue;
+
+    entryCount++;
+
+    auto name = path.stem().string();
+
+    forwards += "struct " + name + ";\n";
+    structDefs += generateStruct( name );
+    dataDecl += generateDatAccessDecl( name );
+    idListsDecl += generateIdListDecl( name );
+    getterDecl += generateDirectGetters( name );
+    datAccCall += generateSetDatAccessCall( name );
+    constructorDecl += generateConstructorsDecl( name );
+    idListGetters += generateIdListGetter( name );
+  }
+
+  Logger::info( "Processed {} definition files, writing files...", entryCount );
 
   getterDecl +=
     "\n     template< class T >\n"
@@ -437,6 +451,8 @@ int main( int argc, char** argv )
   outC.close();
 
 //   g_log.info( result );
+
+  Logger::info( "done." );
 
   return 0;
 }
