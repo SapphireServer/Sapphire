@@ -394,6 +394,7 @@ bool DbManager::modeMigrate()
     return false;
   }
 
+  std::vector< std::string > migrations;
   for( auto& entry : fs::directory_iterator( "sql/migrations" ) )
   {
     auto& path = entry.path();
@@ -401,6 +402,15 @@ bool DbManager::modeMigrate()
     // just in case...
     if( path.extension() != ".sql" )
       continue;
+
+    migrations.emplace_back( path.string() );
+  }
+
+  std::sort( migrations.begin(), migrations.end() );
+
+  for( auto& entry : migrations )
+  {
+    auto path = fs::path( entry );
 
     if( std::find( appliedMigrations.begin(), appliedMigrations.end(), path.filename().string() ) == appliedMigrations.end() )
     {
@@ -432,6 +442,8 @@ bool DbManager::modeMigrate()
     }
   }
 
+
+
   return true;
 }
 
@@ -451,6 +463,12 @@ bool DbManager::modeAddMigration()
   }
 
   auto path = fmt::format( "sql/migrations/{}", filename );
+
+  if( fs::exists( path ) )
+  {
+    Logger::error( "Migration '{}' already exists.", filename );
+    return false;
+  }
 
   std::ofstream mFile( path );
 
