@@ -10,7 +10,7 @@
 
 #include "Territory/Zone.h"
 
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 

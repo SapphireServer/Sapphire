@@ -457,7 +457,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
 
-  auto statusEffectAdd = makeZonePacket< FFXIVIpcAddStatusEffect >( getId() );
+  auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().actor_id1 = pEffect->getSrcActorId();

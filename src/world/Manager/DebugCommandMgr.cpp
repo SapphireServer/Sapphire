@@ -18,7 +18,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/GameConnection.h"
 #include "Script/ScriptMgr.h"
@@ -237,7 +237,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    player.queuePacket( std::make_shared< InitUIPacket >( player ) );
+    player.queuePacket( std::make_shared< PlayerSetupPacket >( player ) );
   }
   else if( subCommand == "classjob" )
   {

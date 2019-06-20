@@ -10,7 +10,7 @@
 #include <Database/DatabaseDef.h>
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Manager/TerritoryMgr.h"
 #include "Territory/Zone.h"
