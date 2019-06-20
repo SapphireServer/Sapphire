@@ -25,7 +25,7 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ModelEquipPacket.h"
@@ -1717,7 +1717,7 @@ void Sapphire::Entity::Player::sendZonePackets()
     }
     queuePacket( contentFinderList );
 
-    queuePacket( std::make_shared< InitUIPacket >( *this ) );
+    queuePacket( std::make_shared< PlayerSetupPacket >( *this ) );
 
     auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
     classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );

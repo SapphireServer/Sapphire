@@ -51,7 +51,7 @@ namespace Sapphire::Network::Packets
     ActorFreeSpawn = 0x0191,
     InitZone = 0x019A,
 
-    AddStatusEffect = 0x0141,
+    EffectResult = 0x0141,
     ActorControl142 = 0x0142,
     ActorControl143 = 0x0143,
     ActorControl144 = 0x0144,
@@ -137,7 +137,7 @@ namespace Sapphire::Network::Packets
     ObjectDespawn = 0x0182, // updated 4.5
     UpdateClassInfo = 0x0183, // updated 4.5
     SilentSetClassJob = 0x0184, // updated 4.5 - seems to be the case, not sure if it's actually used for anything
-    InitUI = 0x0185, // updated 4.5
+    PlayerSetup = 0x0185, // updated 4.5
     PlayerStats = 0x0186, // updated 4.5
     ActorOwner = 0x0187, // updated 4.5
     PlayerStateFlags = 0x0188, // updated 4.5
