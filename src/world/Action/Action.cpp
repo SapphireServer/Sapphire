@@ -99,8 +99,8 @@ bool Action::Action::init()
     }
   }
 
-  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->costType );
-  m_primaryCost = m_actionData->cost;
+  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->primaryCostType );
+  m_primaryCost = m_actionData->primaryCostValue;
 
   /*if( !m_actionData->targetArea )
   {

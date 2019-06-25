@@ -305,7 +305,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * add a status effect
   */
-  struct FFXIVIpcAddStatusEffect : FFXIVIpcBasePacket< AddStatusEffect >
+  struct FFXIVIpcEffectResult : FFXIVIpcBasePacket< EffectResult >
   {
     uint32_t unknown;
     uint32_t actor_id;
@@ -793,7 +793,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server to initialize
   * the client UI upon initial connection.
   */
-  struct FFXIVIpcInitUI : FFXIVIpcBasePacket< InitUI >
+  struct FFXIVIpcPlayerSetup : FFXIVIpcBasePacket< PlayerSetup >
   {
     // plain C types for a bit until the packet is actually fixed.
     // makes conversion between different editors easier.

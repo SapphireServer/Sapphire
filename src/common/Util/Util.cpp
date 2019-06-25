@@ -141,3 +141,15 @@ void Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t&
   outVal = 1 << bitIndex;
 }
 
+
+std::string Util::fmtUtcTime( const std::string& fmt )
+{
+  auto t = std::time( nullptr );
+  auto tm = std::gmtime( &t );
+
+  std::stringstream ss;
+
+  ss << std::put_time( tm, fmt.c_str() );
+
+  return ss.str();
+}

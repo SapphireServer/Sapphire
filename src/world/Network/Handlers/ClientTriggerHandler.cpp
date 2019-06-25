@@ -15,7 +15,7 @@
 #include "Network/GameConnection.h"
 
 #include "Network/PacketWrappers/ExaminePacket.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
