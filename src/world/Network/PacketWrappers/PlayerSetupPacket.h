@@ -10,14 +10,14 @@ namespace Sapphire::Network::Packets::Server
 {
 
   /**
-  * @brief The Client UI Initialization packet. This must be sent to the client
+  * @brief The Client Player Initialization packet. This must be sent to the client
   * once upon connection to configure the UI.
   */
-  class InitUIPacket : public ZoneChannelPacket< FFXIVIpcInitUI >
+  class PlayerSetupPacket : public ZoneChannelPacket< FFXIVIpcPlayerSetup >
   {
   public:
-    InitUIPacket( Entity::Player& player ) :
-      ZoneChannelPacket< FFXIVIpcInitUI >( player.getId(), player.getId() )
+    PlayerSetupPacket( Entity::Player& player ) :
+      ZoneChannelPacket< FFXIVIpcPlayerSetup >( player.getId(), player.getId() )
     {
       initialize( player );
     };
