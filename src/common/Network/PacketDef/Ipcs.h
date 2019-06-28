@@ -94,20 +94,20 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    LinkshellList = 0x011F, // updated 4.5
+    LinkshellList = 0x012A, // updated 5.0
 
     MailDeleteRequest = 0x012B, // updated 5.0
-    // gap added in 5.0
-    //   0x12D
-    //   0x12E
-    //   0x12F
-    //   0x130
-    //   0x132
-    //   0x133
-    //   0x134
-    //   0x135
-    //   0x136
-    //   0x137
+    // gap added in 5.0 - reshuffled from somewhere else?
+    //   0x012D
+    //   0x012E
+    //   0x012F
+    //   0x0130
+    //   0x0132
+    //   0x0133
+    //   0x0134
+    //   0x0135
+    //   0x0136
+    //   0x0137
     ReqMoogleMailList = 0x0138, // updated 5.0
     ReqMoogleMailLetter = 0x0122, // unchanged 5.0???
     MailLetterNotification = 0x0123, // unchanged 5.0???
@@ -315,8 +315,8 @@ namespace Sapphire::Network::Packets
     ClearWaymarks = 0x0135, // updated 4.5
 
     ZoneLineHandler = 0x0139, // updated 5.0
-    ClientTrigger = 0x0140, // updated 5.0
-    DiscoveryHandler = 0x0141, // updated 5.0
+    ClientTrigger = 0x013A, // updated 5.0
+    DiscoveryHandler = 0x013B, // updated 5.0
 
     AddWaymark = 0x013A, // updated 4.5
 
