@@ -60,8 +60,8 @@ namespace Sapphire::Network::Packets
     ///////////////////////////////////////////////////
 
     ChatBanned = 0x006B,
-    Playtime = 0x006C, // updated 4.5
-    Logout = 0x0077, // updated 4.5
+    Playtime = 0x0100, // updated 5.0
+    Logout = 0x0077, // updated 5.0
     CFNotify = 0x0078,
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
@@ -77,20 +77,20 @@ namespace Sapphire::Network::Packets
 
     WorldVisitList = 0x00FE, // added 4.5
 
-    SocialList = 0x0103, // updated 4.5
+    SocialList = 0x010D, // updated 5.0
 
-    UpdateSearchInfo = 0x0106, // updated 4.5
-    InitSearchInfo = 0x0107, // updated 4.4
+    UpdateSearchInfo = 0x0110, // updated 5.0
+    InitSearchInfo = 0x0111, // updated 5.0
     ExamineSearchComment = 0x0102, // updated 4.1
 
-    ServerNoticeShort = 0x010B, // added 4.5
-    ServerNotice = 0x010C, // updated 4.5
-    SetOnlineStatus = 0x010D, // updated 4.5
+    ServerNoticeShort = 0x0115, // updated 5.0
+    ServerNotice = 0x0116, // updated 5.0
+    SetOnlineStatus = 0x0117, // updated 5.0
 
-    CountdownInitiate = 0x0114, // updated 4.5
-    CountdownCancel = 0x0115, // updated 4.5
+    CountdownInitiate = 0x011E, // updated 5.0
+    CountdownCancel = 0x011F, // updated 5.0
 
-    BlackList = 0x0118, // updated 4.5
+    BlackList = 0x0121, // updated 5.0
 
     LogMessage = 0x00D0,
 
@@ -121,27 +121,27 @@ namespace Sapphire::Network::Packets
 
     GCAffiliation = 0x0165, // updated 4.5
 
-    PlayerSpawn = 0x0175, // updated 4.5
-    NpcSpawn = 0x0176, // updated 4.5
-    NpcSpawn2 = 0x0177, // ( Bigger statuseffectlist? ) updated 4.5
-    ActorMove = 0x0178, // updated 4.5
+    PlayerSpawn = 0x017F, // updated 5.0
+    NpcSpawn = 0x0180, // updated 5.0
+    NpcSpawn2 = 0x0181, // ( Bigger statuseffectlist? ) updated 5.0
+    ActorMove = 0x0182, // updated 5.0
 
-    ActorSetPos = 0x017A, // updated 4.5
+    ActorSetPos = 0x0184, // updated 5.0
 
-    ActorCast = 0x017C, // updated 4.5
+    ActorCast = 0x0187, // updated 5.0
 
-    PartyList = 0x017E, // updated 4.5
-    HateRank = 0x017F, // updated 4.5
-    HateList = 0x0180, // updated 4.5
-    ObjectSpawn = 0x0181, // updated 4.5
-    ObjectDespawn = 0x0182, // updated 4.5
-    UpdateClassInfo = 0x0183, // updated 4.5
-    SilentSetClassJob = 0x0184, // updated 4.5 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x0185, // updated 4.5
-    PlayerStats = 0x0186, // updated 4.5
-    ActorOwner = 0x0187, // updated 4.5
-    PlayerStateFlags = 0x0188, // updated 4.5
-    PlayerClassInfo = 0x0189, // updated 4.5
+    PartyList = 0x0188, // updated 5.0
+    HateRank = 0x0189, // updated 5.0
+    HateList = 0x018A, // updated 5.0
+    ObjectSpawn = 0x018B, // updated 5.0
+    ObjectDespawn = 0x018C, // updated 5.0
+    UpdateClassInfo = 0x018D, // updated 5.0
+    SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
+    PlayerSetup = 0x018F, // updated 5.0
+    PlayerStats = 0x0190, // updated 5.0
+    ActorOwner = 0x0191, // updated 5.0
+    PlayerStateFlags = 0x0192, // updated 5.0
+    PlayerClassInfo = 0x0193, // updated 5.0
 
     ModelEquip = 0x018B, // updated 4.5
     Examine = 0x018C, // updated 4.5
@@ -149,12 +149,12 @@ namespace Sapphire::Network::Packets
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-    ItemInfo = 0x0196, // updated 4.5
-    ContainerInfo = 0x0197, // updated 4.5
+    ItemInfo = 0x01A1, // updated 5.0
+    ContainerInfo = 0x01A2, // updated 5.0
     InventoryTransactionFinish = 0x0198, // updated 4.5
     InventoryTransaction = 0x0199, // updated 4.5
 
-    CurrencyCrystalInfo = 0x019B, // updated 4.5
+    CurrencyCrystalInfo = 0x01A5, // updated 5.0
 
     InventoryActionAck = 0x019D, // updated 4.5
     UpdateInventorySlot = 0x019E, // updated 4.5
