@@ -159,11 +159,11 @@ namespace Sapphire::Network::Packets
     InventoryActionAck = 0x019D, // updated 4.5
     UpdateInventorySlot = 0x019E, // updated 4.5
 
-    HuntingLogEntry = 0x01A9, // added 4.5
+    HuntingLogEntry = 0x01B3, // updated 5.0
 
-    EventPlay = 0x01AB, // updated 4.5
-    DirectorPlayScene = 0x01AF, // updated 4.5
-    EventOpenGilShop = 0x01B2, // updated 4.5
+    EventPlay = 0x01B5, // updated 5.0
+    DirectorPlayScene = 0x01B9, // updated 5.0
+    EventOpenGilShop = 0x01BC, // updated 5.0
 
     EventStart = 0x01B4, // updated 4.5
     EventFinish = 0x01B5, // updated 4.5
@@ -233,8 +233,8 @@ namespace Sapphire::Network::Packets
 
     // Unknown IPC types that still need to be sent
     // TODO: figure all these out properly
-    IPCTYPE_UNK_320 = 0x0253, // updated 4.5
-    IPCTYPE_UNK_322 = 0x0255, // updated 4.5
+    IPCTYPE_UNK_320 = 0x025E, // updated 4.5
+    IPCTYPE_UNK_322 = 0x0260, // updated 4.5
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02BC, // only available in mahjong instance
