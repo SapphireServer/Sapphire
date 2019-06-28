@@ -27,6 +27,9 @@ namespace fs = std::experimental::filesystem;
 Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
 
+std::shared_ptr< xiv::dat::GameData > m_data;
+std::shared_ptr< xiv::exd::ExdData > m_exd_data;
+
 std::map< char, std::string > numberToStringMap
   {
     { '0', "zero" },
@@ -83,7 +86,7 @@ std::string generateIdListGetter( const std::string& exd )
 
 std::string generateSetDatAccessCall( const std::string& exd )
 {
-  auto& cat = g_exdData.m_exd_data->get_category( exd );
+  auto& cat = m_exd_data->get_category( exd );
   auto exh = cat.get_header();
 
   std::string lang = "xiv::exd::Language::none";
@@ -110,7 +113,7 @@ std::map< std::string, std::string > nameTaken;
 
 std::string generateStruct( const std::string& exd )
 {
-  auto& cat = g_exdData.m_exd_data->get_category( exd );
+  auto& cat = m_exd_data->get_category( exd );
   auto exh = cat.get_header();
   auto exhMem = exh.get_exh_members();
 
@@ -261,7 +264,7 @@ std::string generateConstructorsDecl( const std::string& exd )
 {
   std::string result;
 
-  auto& cat = g_exdData.m_exd_data->get_category( exd );
+  auto& cat = m_exd_data->get_category( exd );
   auto exh = cat.get_header();
   auto exhMem = exh.get_exh_members();
 
@@ -355,11 +358,10 @@ int main( int argc, char** argv )
 
 
   Logger::info( "Setting up EXD data" );
-  if( !g_exdData.init( datLocation ) )
-  {
-    Logger::fatal( "Error setting up EXD data " );
-    return 0;
-  }
+
+  m_data = std::make_shared< xiv::dat::GameData >( datLocation );
+  m_exd_data = std::make_shared< xiv::exd::ExdData >( *m_data );
+
   Logger::info( "Generating structs, this may take several minutes..." );
   Logger::info( "Go grab a coffee..." );
 
@@ -385,6 +387,8 @@ int main( int argc, char** argv )
     return 1;
   }
 
+  auto& cats = m_exd_data->get_cat_names();
+
   uint32_t entryCount = 0;
   for( auto& entry : fs::directory_iterator( "./Definitions/" ) )
   {
@@ -393,9 +397,13 @@ int main( int argc, char** argv )
     if( path.extension() != ".json" )
       continue;
 
-    entryCount++;
-
     auto name = path.stem().string();
+
+    if( std::find( cats.begin(), cats.end(), name ) == cats.end() )
+    {
+      Logger::warn( "have definition for {} but the sheet doesn't exist", name );
+      continue;
+    }
 
     forwards += "struct " + name + ";\n";
     structDefs += generateStruct( name );
@@ -405,6 +413,8 @@ int main( int argc, char** argv )
     datAccCall += generateSetDatAccessCall( name );
     constructorDecl += generateConstructorsDecl( name );
     idListGetters += generateIdListGetter( name );
+
+    entryCount++;
   }
 
   Logger::info( "Processed {} definition files, writing files...", entryCount );
