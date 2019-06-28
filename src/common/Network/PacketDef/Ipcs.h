@@ -151,7 +151,7 @@ namespace Sapphire::Network::Packets
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x018F, // updated 5.0
     PlayerStats = 0x0190, // updated 5.0
-    ActorOwner = 0x0191, // updated 5.0
+    ActorOwner = 0x0192, // updated 5.0
     PlayerStateFlags = 0x0193, // updated 5.0
     PlayerClassInfo = 0x0194, // updated 5.0
 
@@ -177,8 +177,8 @@ namespace Sapphire::Network::Packets
     DirectorPlayScene = 0x01B9, // updated 5.0
     EventOpenGilShop = 0x01BC, // updated 5.0
 
-    EventStart = 0x01B4, // updated 4.5
-    EventFinish = 0x01B5, // updated 4.5
+    EventStart = 0x01BE, // updated 5.0
+    EventFinish = 0x01BF, // updated 5.0
 
     EventLinkshell = 0x1169,
 
@@ -201,9 +201,9 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
-    WeatherChange = 0x0205, // updated 4.5
-    PlayerTitleList = 0x0206, // updated 4.5?
-    Discovery = 0x0207, // updated 4.5?
+    WeatherChange = 0x0210, // updated 5.0
+    PlayerTitleList = 0x0211, // updated 5.0
+    Discovery = 0x0212, // updated 5.0
 
     EorzeaTimeOffset = 0x0209, // updated 4.5
 
@@ -328,34 +328,34 @@ namespace Sapphire::Network::Packets
     UpdatePositionHandler = 0x0141, // updated 5.0
     UpdatePositionInstance = 0x0183, // updated 4.3
 
-    InventoryModifyHandler = 0x0146, // updated 4.5 ( +4 )
+    InventoryModifyHandler = 0x0148, // updated 5.0
 
-    ReqPlaceHousingItem = 0x149, // updated 4.5
+    ReqPlaceHousingItem = 0x014B, // updated 5.0
+    BuildPresetHandler = 0x014F, // updated 5.0
 
-    BuildPresetHandler = 0x014E, // updated 4.5
-    TalkEventHandler = 0x014F, // updated 4.5
-    EmoteEventHandler = 0x0150, // updated 4.5
-    WithinRangeEventHandler = 0x0151, // updated 4.5
-    OutOfRangeEventHandler = 0x0152, // updated 4.5
-    EnterTeriEventHandler = 0x0153, // updated 4.5
+    TalkEventHandler = 0x0151, // updated 5.0
+    EmoteEventHandler = 0x0152, // updated 5.0
+    WithinRangeEventHandler = 0x0153, // updated 5.0
+    OutOfRangeEventHandler = 0x0154, // updated 5.0
+    EnterTeriEventHandler = 0x0155, // updated 5.0
+    ShopEventHandler = 0x0156, // updated 5.0
 
-    ShopEventHandler = 0x0155, // updated 4.5
-
-    ReturnEventHandler = 0x0158, // updated 4.5
-    TradeReturnEventHandler = 0x0159, // updated 4.5
+    ReturnEventHandler = 0x015A, // updated 5.0?
+    TradeReturnEventHandler = 0x015B, // updated 5.0?
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
 
-    LandRenameHandler = 0x0175, // updated 4.5
-    HousingUpdateHouseGreeting = 0x0176, // updated 4.5
-    HousingUpdateObjectPosition = 0x0177, // updated 4.5
+    ReqEquipDisplayFlagsChange = 0x0175, // updated 5.0
 
-    SetSharedEstateSettings = 0x017B, // updated 4.5
+    LandRenameHandler = 0x0177, // updated 5.0
+    HousingUpdateHouseGreeting = 0x0178, // updated 5.0
+    HousingUpdateObjectPosition = 0x0179, // updated 5.0
+
+    SetSharedEstateSettings = 0x017B, // updated 5.0
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
-    ReqEquipDisplayFlagsChange = 0x0173, // updated 4.5
 
 
   };
