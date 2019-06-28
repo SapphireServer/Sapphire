@@ -73,7 +73,7 @@ namespace Sapphire::Network::Packets
     SocialRequestResponse = 0x00BB, // updated 4.1
     CancelAllianceForming = 0x00C6, // updated 4.2
 
-    Chat = 0x00F7, // updated 4.5?
+    Chat = 0x0104, // updated 5.0
 
     WorldVisitList = 0x00FE, // added 4.5
 
@@ -288,10 +288,9 @@ namespace Sapphire::Network::Packets
     ChatHandler = 0x00D9, // updated 5.0
 
     SocialListHandler = 0x00E1, // updated 5.0
+    SetSearchInfoHandler = 0x00E4, // updated 5.0
     ReqSearchInfoHandler = 0x00E6, // updated 5.0
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
-
-    SetSearchInfoHandler = 0x00E4, // updated 5.0
 
     BlackListHandler = 0x00F2, // updated 5.0
     PlayerSearchHandler = 0x00E6, // updated 4.5
