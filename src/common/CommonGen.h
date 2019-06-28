@@ -716,7 +716,7 @@ enum class HousingAppeal : uint8_t
   Tavern = 5,
   Eatery = 6,
   ImmersiveExperience = 7,
-  Café = 8,
+  Cafe = 8,
   Aquarium = 9,
   Sanctum = 10,
   Venue = 11,

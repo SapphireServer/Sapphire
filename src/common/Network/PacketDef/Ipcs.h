@@ -96,10 +96,21 @@ namespace Sapphire::Network::Packets
 
     LinkshellList = 0x011F, // updated 4.5
 
-    MailDeleteRequest = 0x0120, // updated 4.5
-    ReqMoogleMailList = 0x0121, // updated 4.5
-    ReqMoogleMailLetter = 0x0122, // updated 4.5
-    MailLetterNotification = 0x0123, // updated 4.5
+    MailDeleteRequest = 0x012B, // updated 5.0
+    // gap added in 5.0
+    //   0x12D
+    //   0x12E
+    //   0x12F
+    //   0x130
+    //   0x132
+    //   0x133
+    //   0x134
+    //   0x135
+    //   0x136
+    //   0x137
+    ReqMoogleMailList = 0x0138, // updated 5.0
+    ReqMoogleMailLetter = 0x0122, // unchanged 5.0???
+    MailLetterNotification = 0x0123, // unchanged 5.0???
 
     MarketBoardItemListingCount = 0x0125, // updated 4.5
     MarketBoardItemListing = 0x0126, // updated 4.5
@@ -111,15 +122,16 @@ namespace Sapphire::Network::Packets
     FreeCompanyInfo = 0x013D, // updated 4.5
     ExamineFreeCompanyInfo = 0x013E, // updated 4.5
 
-    StatusEffectList = 0x0151, // updated 4.5
-    Effect = 0x0154, // updated 4.5
-    AoeEffect8 = 0x0157, // updated 4.5
-    AoeEffect16 = 0x0158, // updated 4.5
-    AoeEffect24 = 0x0159, // updated 4.5
-    AoeEffect32 = 0x015A, // updated 4.5
-    PersistantEffect = 0x015B, // updated 4.5
+    StatusEffectList = 0x015B, // updated 5.0
+    EurekaStatusEffectList = 0x015C, // updated 5.0
+    Effect = 0x015E, // updated 5.0
+    AoeEffect8 = 0x0161, // updated 5.0
+    AoeEffect16 = 0x0162, // updated 5.0
+    AoeEffect24 = 0x0163, // updated 5.0
+    AoeEffect32 = 0x0164, // updated 5.0
+    PersistantEffect = 0x0165, // updated 5.0
 
-    GCAffiliation = 0x0165, // updated 4.5
+    GCAffiliation = 0x016F, // updated 5.0
 
     PlayerSpawn = 0x017F, // updated 5.0
     NpcSpawn = 0x0180, // updated 5.0
@@ -140,8 +152,8 @@ namespace Sapphire::Network::Packets
     PlayerSetup = 0x018F, // updated 5.0
     PlayerStats = 0x0190, // updated 5.0
     ActorOwner = 0x0191, // updated 5.0
-    PlayerStateFlags = 0x0192, // updated 5.0
-    PlayerClassInfo = 0x0193, // updated 5.0
+    PlayerStateFlags = 0x0193, // updated 5.0
+    PlayerClassInfo = 0x0194, // updated 5.0
 
     ModelEquip = 0x018B, // updated 4.5
     Examine = 0x018C, // updated 4.5
@@ -273,18 +285,18 @@ namespace Sapphire::Network::Packets
     SocialReqSendHandler = 0x00AE, // updated 4.1
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
-    ChatHandler = 0x00D7, // updated 4.5
+    ChatHandler = 0x00D9, // updated 5.0
 
-    SocialListHandler = 0x00DF, // updated 4.5
-    ReqSearchInfoHandler = 0x00E4, // updated 4.5
-    ReqExamineSearchCommentHandler = 0x00E5, // updated 4.5
+    SocialListHandler = 0x00E1, // updated 5.0
+    ReqSearchInfoHandler = 0x00E6, // updated 5.0
+    ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
-    SetSearchInfoHandler = 0x00E2, // unchanged 4.5
+    SetSearchInfoHandler = 0x00E4, // updated 5.0
 
-    BlackListHandler = 0x00F0, // updated 4.5
+    BlackListHandler = 0x00F2, // updated 5.0
     PlayerSearchHandler = 0x00E6, // updated 4.5
 
-    LinkshellListHandler = 0x00F8, // updated 4.5
+    LinkshellListHandler = 0x00FA, // updated 5.0
 
     MarketBoardRequestItemListingInfo = 0x0102, // updated 4.5
     MarketBoardRequestItemListings = 0x0103, // updated 4.5
@@ -302,18 +314,18 @@ namespace Sapphire::Network::Packets
     ReqCountdownCancel = 0x0134, // updated 4.5
     ClearWaymarks = 0x0135, // updated 4.5
 
-    ZoneLineHandler = 0x0137, // updated 4.5
-    ClientTrigger = 0x0138, // updated 4.5
-    DiscoveryHandler = 0x0139, // updated 4.5
+    ZoneLineHandler = 0x0139, // updated 5.0
+    ClientTrigger = 0x0140, // updated 5.0
+    DiscoveryHandler = 0x0141, // updated 5.0
 
     AddWaymark = 0x013A, // updated 4.5
 
-    SkillHandler = 0x013B, // updated 4.5
-    GMCommand1 = 0x013C, // updated 4.5
-    GMCommand2 = 0x013D, // updated 4.5
-    AoESkillHandler = 0x13E, // updated 4.5
+    SkillHandler = 0x013D, // updated 5.0
+    GMCommand1 = 0x013E, // updated 5.0
+    GMCommand2 = 0x013F, // updated 5.0
+    AoESkillHandler = 0x140, // updated 5.0
 
-    UpdatePositionHandler = 0x013F, // updated 4.5
+    UpdatePositionHandler = 0x0141, // updated 5.0
     UpdatePositionInstance = 0x0183, // updated 4.3
 
     InventoryModifyHandler = 0x0146, // updated 4.5 ( +4 )
