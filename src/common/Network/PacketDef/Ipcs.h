@@ -182,22 +182,22 @@ namespace Sapphire::Network::Packets
 
     EventLinkshell = 0x1169,
 
-    QuestActiveList = 0x01C8, // updated 4.5
-    QuestUpdate = 0x01C9, // updated 4.5
-    QuestCompleteList = 0x01CA, // updated 4.5
+    QuestActiveList = 0x01D2, // updated 5.0
+    QuestUpdate = 0x01D3, // updated 5.0
+    QuestCompleteList = 0x01D4, // updated 5.0
 
-    QuestFinish = 0x01CB, // updated 4.5
-    MSQTrackerComplete = 0x01CC, // updated 4.5
+    QuestFinish = 0x01D5, // updated 5.0
+    MSQTrackerComplete = 0x01D6, // updated 5.0
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
-    QuestMessage = 0x01D3, // updated 4.5
+    QuestMessage = 0x01DE, // updated 5.0
 
-    QuestTracker = 0x01D8, // updated 4.5
+    QuestTracker = 0x01E3, // updated 5.0
 
-    Mount = 0x01E8, // updated 4.5
+    Mount = 0x01F3, // updated 5.0
 
-    DirectorVars = 0x01EA, // updated 4.5
-    DirectorPopUp = 0x01F5, // display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
+    DirectorVars = 0x01F5, // updated 5.0
+    DirectorPopUp = 0x0200, // updated 5.0 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
@@ -205,29 +205,29 @@ namespace Sapphire::Network::Packets
     PlayerTitleList = 0x0211, // updated 5.0
     Discovery = 0x0212, // updated 5.0
 
-    EorzeaTimeOffset = 0x0209, // updated 4.5
+    EorzeaTimeOffset = 0x0214, // updated 5.0
 
-    EquipDisplayFlags = 0x0215, // updated 4.5
+    EquipDisplayFlags = 0x0220, // updated 5.0
 
     /// Housing //////////////////////////////////////
 
-    LandSetInitialize = 0x0229, // updated 4.5
-    LandUpdate = 0x022A, // updated 4.5
-    YardObjectSpawn = 0x022B, // updated 4.5
-    HousingIndoorInitialize = 0x022C, // updated 4.5
-    LandPriceUpdate = 0x022D, // updated 4.5
-    LandInfoSign = 0x022E, // updated 4.5
-    LandRename = 0x022F, // updated 4.5
-    HousingEstateGreeting = 0x0230, // updated 4.5
-    HousingUpdateLandFlagsSlot = 0x0231, // updated 4.5
-    HousingLandFlags = 0x0232, // updated 4.5
-    HousingShowEstateGuestAccess = 0x0233, // updated 4.5
+    LandSetInitialize = 0x0234, // updated 5.0
+    LandUpdate = 0x0235, // updated 5.0
+    YardObjectSpawn = 0x0236, // updated 5.0
+    HousingIndoorInitialize = 0x0237, // updated 5.0
+    LandPriceUpdate = 0x0238, // updated 5.0
+    LandInfoSign = 0x0239, // updated 5.0
+    LandRename = 0x023A, // updated 5.0
+    HousingEstateGreeting = 0x023B, // updated 5.0
+    HousingUpdateLandFlagsSlot = 0x023C, // updated 5.0
+    HousingLandFlags = 0x023D, // updated 5.0
+    HousingShowEstateGuestAccess = 0x023E, // updated 5.0
 
-    HousingObjectInitialize = 0x0235, // updated 4.45
-    HousingInternalObjectSpawn = 0x236, // updated 4.5
+    HousingObjectInitialize = 0x0240, // updated 5.0
+    HousingInternalObjectSpawn = 0x241, // updated 5.0
 
-    HousingWardInfo = 0x0238, // updated 4.5
-    HousingObjectMove = 0x0239, // updated 4.5
+    HousingWardInfo = 0x0243, // updated 5.0
+    HousingObjectMove = 0x0244, // updated 5.0
 
     SharedEstateSettingsResponse = 0x0245, // updated 4.5
 
