@@ -278,6 +278,7 @@ struct GrandCompanyRank;
 struct GuardianDeity;
 struct GuildleveAssignment;
 struct GuildleveAssignmentCategory;
+struct GuildOrder;
 struct GuildOrderGuide;
 struct GuildOrderOfficer;
 struct HairMakeType;
@@ -405,7 +406,6 @@ struct RacingChocoboNameInfo;
 struct RacingChocoboParam;
 struct RecastNavimesh;
 struct Recipe;
-struct RecipeElement;
 struct RecipeLevelTable;
 struct RecipeNotebookList;
 struct RecommendContents;
@@ -511,7 +511,7 @@ struct Achievement
   int32_t key;
   std::vector< int32_t > data;
   uint16_t order;
-  bool initialHide;
+  uint8_t initialHide;
 
   Achievement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1111,12 +1111,10 @@ struct BeastReputationRank
 struct BeastTribe
 {
   uint8_t minLevel;
-  uint8_t maxLevel;
   uint8_t beastRankBonus;
   uint32_t iconReputation;
   uint32_t icon;
   uint8_t maxRank;
-  uint32_t alliedBeastTribeQuest;
   uint8_t expansion;
   uint32_t currencyItem;
   uint8_t displayOrder;
@@ -1734,6 +1732,7 @@ struct ContentFinderCondition
   uint8_t contentLinkType;
   uint16_t content;
   uint8_t contentMemberType;
+  uint32_t unlockQuest;
   uint8_t classJobLevelRequired;
   uint8_t classJobLevelSync;
   uint16_t itemLevelRequired;
@@ -1743,8 +1742,11 @@ struct ContentFinderCondition
   bool dutyRecorderAllowed;
   std::string name;
   uint8_t contentType;
+  uint8_t transientKey;
   uint32_t transient;
+  uint16_t sortKey;
   uint32_t image;
+  uint32_t icon;
   bool levelingRoulette;
   bool level5060Roulette;
   bool mSQRoulette;
@@ -1843,12 +1845,14 @@ struct ContentRouletteRoleBonus
 struct ContentsNote
 {
   uint8_t contentType;
+  int32_t icon;
   uint8_t menuOrder;
   int32_t requiredAmount;
   int32_t expMultiplier;
   int32_t gilRward;
   uint16_t levelUnlock;
   uint16_t howTo;
+  uint32_t reqUnlock;
   std::string name;
   std::string description;
   int32_t expCap;
@@ -2351,6 +2355,21 @@ struct ENpcDressUp
 struct ENpcDressUpDress
 {
   uint32_t eNpc;
+  uint16_t behavior;
+  uint64_t modelMainHand;
+  uint8_t dyeMainHand;
+  uint64_t modelOffHand;
+  uint8_t dyeOffHand;
+  uint32_t modelHead;
+  uint8_t dyeHead;
+  uint32_t modelBody;
+  uint8_t dyeBody;
+  uint32_t modelHands;
+  uint8_t dyeHands;
+  uint32_t modelLegs;
+  uint8_t dyeLegs;
+  uint32_t modelFeet;
+  uint8_t dyeFeet;
 
   ENpcDressUpDress( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2688,6 +2707,10 @@ struct FieldMarker
 struct FishingRecordType
 {
   int32_t addon;
+  uint16_t rankBRequirement;
+  uint16_t rankARequirement;
+  uint16_t rankAARequirement;
+  uint16_t rankAAARequirement;
 
   FishingRecordType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2711,6 +2734,7 @@ struct FishingSpot
   uint16_t radius;
   std::vector< int32_t > item;
   uint16_t placeName;
+  uint8_t order;
 
   FishingSpot( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2723,10 +2747,10 @@ struct FishParameter
   bool isHidden;
   uint8_t fishingRecordType;
   int32_t territoryType;
+  uint16_t gatheringSubCategory;
   bool isInLog;
   bool timeRestricted;
   bool weatherRestricted;
-  uint16_t gatheringSubCategory;
 
   FishParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3133,7 +3157,6 @@ struct GilShop
 {
   std::string name;
   uint32_t icon;
-  std::vector< uint32_t > questRequired;
   int32_t acceptTalk;
   int32_t failTalk;
 
@@ -3213,6 +3236,21 @@ struct GuildleveAssignmentCategory
   std::vector< int32_t > category;
 
   GuildleveAssignmentCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GuildOrder
+{
+  uint32_t eNpcName;
+  std::string objective;
+  std::string description1;
+  std::string description2;
+  std::string description3;
+  uint32_t completionBonusExp;
+  uint32_t rewardExp;
+  uint32_t completionBonusGil;
+  uint32_t rewardGil;
+
+  GuildOrder( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuildOrderGuide
@@ -3422,13 +3460,15 @@ struct InstanceContent
   uint32_t instanceContentTextDataObjectiveStart;
   uint32_t instanceContentTextDataObjectiveEnd;
   uint16_t sortKey;
+  uint32_t instanceClearExp;
   uint16_t newPlayerBonusA;
-  uint16_t newPlayerBonusB;
-  uint32_t finalBossExp;
+  uint16_t finalBossCurrencyC;
   uint16_t finalBossCurrencyA;
   uint16_t finalBossCurrencyB;
-  uint16_t finalBossCurrencyC;
-  uint32_t instanceClearExp;
+  uint16_t newPlayerBonusB;
+  uint32_t instanceClearGil;
+  uint32_t instanceContentRewardItem;
+  uint32_t finalBossExp;
   int32_t instanceContentBuff;
   uint32_t reqInstance;
   uint8_t partyCondition;
@@ -4004,7 +4044,6 @@ struct ModelSkeleton
 struct ModelState
 {
   uint16_t start;
-  uint16_t end;
 
   ModelState( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4061,18 +4100,6 @@ struct MountAction
 
 struct MountCustomize
 {
-  float hyurMaleScale;
-  float hyurFemaleScale;
-  float elezenMaleScale;
-  float elezenFemaleScale;
-  float lalaMaleScale;
-  float lalaFemaleScale;
-  float miqoMaleScale;
-  float miqoFemaleScale;
-  float roeMaleScale;
-  float roeFemaleScale;
-  float auRaMaleScale;
-  float auRaFemaleScale;
   uint8_t hyurMaleCameraHeight;
   uint8_t hyurFemaleCameraHeight;
   uint8_t elezenMaleCameraHeight;
@@ -4436,7 +4463,6 @@ struct Quest
   uint8_t classJobCategory0;
   uint16_t classJobLevel0;
   uint8_t questLevelOffset;
-  uint16_t levelMax;
   uint8_t classJobCategory1;
   uint16_t classJobLevel1;
   uint8_t previousQuestJoin;
@@ -4455,6 +4481,7 @@ struct Quest
   uint16_t bellEnd;
   uint8_t beastTribe;
   uint8_t beastReputationRank;
+  uint16_t levelMax;
   int32_t mountRequired;
   bool isHouseRequired;
   uint8_t deliveryQuest;
@@ -4652,7 +4679,6 @@ struct Recipe
   uint16_t recipeLevelTable;
   int32_t itemResult;
   uint8_t amountResult;
-  uint8_t recipeElement;
   bool isSecondary;
   uint16_t difficultyFactor;
   uint16_t qualityFactor;
@@ -4673,20 +4699,13 @@ struct Recipe
   Recipe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct RecipeElement
-{
-  std::string name;
-
-  RecipeElement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
 struct RecipeLevelTable
 {
   uint8_t classJobLevel;
   uint8_t stars;
   uint16_t suggestedCraftsmanship;
   uint16_t difficulty;
-  int16_t quality;
+  uint32_t quality;
   uint16_t durability;
 
   RecipeLevelTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -5006,7 +5025,6 @@ struct SpecialShop
   std::vector< int32_t > achievementUnlock;
   std::vector< uint16_t > patchNumber;
   uint32_t questUnlock;
-  int32_t questShop;
   int32_t notCompleteText;
   int32_t completeText;
 
@@ -5232,6 +5250,7 @@ struct Transformation
   int32_t bNpcCustomize;
   int32_t npcEquip;
   std::vector< uint16_t > action;
+  uint8_t rPParameter;
   float speed;
   float scale;
   bool isPvP;
@@ -5239,7 +5258,6 @@ struct Transformation
   bool playerCamera;
   uint16_t startVFX;
   uint16_t endVFX;
-  uint8_t rPParameter;
 
   Transformation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5866,6 +5884,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GuardianDeityDat;
      xiv::exd::Exd m_GuildleveAssignmentDat;
      xiv::exd::Exd m_GuildleveAssignmentCategoryDat;
+     xiv::exd::Exd m_GuildOrderDat;
      xiv::exd::Exd m_GuildOrderGuideDat;
      xiv::exd::Exd m_GuildOrderOfficerDat;
      xiv::exd::Exd m_HairMakeTypeDat;
@@ -5993,7 +6012,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_RacingChocoboParamDat;
      xiv::exd::Exd m_RecastNavimeshDat;
      xiv::exd::Exd m_RecipeDat;
-     xiv::exd::Exd m_RecipeElementDat;
      xiv::exd::Exd m_RecipeLevelTableDat;
      xiv::exd::Exd m_RecipeNotebookListDat;
      xiv::exd::Exd m_RecommendContentsDat;
@@ -6346,6 +6364,7 @@ struct ZoneSharedGroup
      using GuardianDeityPtr = std::shared_ptr< GuardianDeity >;
      using GuildleveAssignmentPtr = std::shared_ptr< GuildleveAssignment >;
      using GuildleveAssignmentCategoryPtr = std::shared_ptr< GuildleveAssignmentCategory >;
+     using GuildOrderPtr = std::shared_ptr< GuildOrder >;
      using GuildOrderGuidePtr = std::shared_ptr< GuildOrderGuide >;
      using GuildOrderOfficerPtr = std::shared_ptr< GuildOrderOfficer >;
      using HairMakeTypePtr = std::shared_ptr< HairMakeType >;
@@ -6473,7 +6492,6 @@ struct ZoneSharedGroup
      using RacingChocoboParamPtr = std::shared_ptr< RacingChocoboParam >;
      using RecastNavimeshPtr = std::shared_ptr< RecastNavimesh >;
      using RecipePtr = std::shared_ptr< Recipe >;
-     using RecipeElementPtr = std::shared_ptr< RecipeElement >;
      using RecipeLevelTablePtr = std::shared_ptr< RecipeLevelTable >;
      using RecipeNotebookListPtr = std::shared_ptr< RecipeNotebookList >;
      using RecommendContentsPtr = std::shared_ptr< RecommendContents >;
@@ -6826,6 +6844,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GuardianDeityIdList;
      std::set< uint32_t > m_GuildleveAssignmentIdList;
      std::set< uint32_t > m_GuildleveAssignmentCategoryIdList;
+     std::set< uint32_t > m_GuildOrderIdList;
      std::set< uint32_t > m_GuildOrderGuideIdList;
      std::set< uint32_t > m_GuildOrderOfficerIdList;
      std::set< uint32_t > m_HairMakeTypeIdList;
@@ -6953,7 +6972,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_RacingChocoboParamIdList;
      std::set< uint32_t > m_RecastNavimeshIdList;
      std::set< uint32_t > m_RecipeIdList;
-     std::set< uint32_t > m_RecipeElementIdList;
      std::set< uint32_t > m_RecipeLevelTableIdList;
      std::set< uint32_t > m_RecipeNotebookListIdList;
      std::set< uint32_t > m_RecommendContentsIdList;
@@ -8606,6 +8624,12 @@ const std::set< uint32_t >& getGuildleveAssignmentCategoryIdList()
       loadIdList( m_GuildleveAssignmentCategoryDat, m_GuildleveAssignmentCategoryIdList );
    return m_GuildleveAssignmentCategoryIdList;
 }
+const std::set< uint32_t >& getGuildOrderIdList()
+{
+   if( m_GuildOrderIdList.size() == 0 )
+      loadIdList( m_GuildOrderDat, m_GuildOrderIdList );
+   return m_GuildOrderIdList;
+}
 const std::set< uint32_t >& getGuildOrderGuideIdList()
 {
    if( m_GuildOrderGuideIdList.size() == 0 )
@@ -9367,12 +9391,6 @@ const std::set< uint32_t >& getRecipeIdList()
    if( m_RecipeIdList.size() == 0 )
       loadIdList( m_RecipeDat, m_RecipeIdList );
    return m_RecipeIdList;
-}
-const std::set< uint32_t >& getRecipeElementIdList()
-{
-   if( m_RecipeElementIdList.size() == 0 )
-      loadIdList( m_RecipeElementDat, m_RecipeElementIdList );
-   return m_RecipeElementIdList;
 }
 const std::set< uint32_t >& getRecipeLevelTableIdList()
 {
