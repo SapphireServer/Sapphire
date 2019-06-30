@@ -149,6 +149,9 @@ namespace Sapphire::Network::Packets
     Examine = 0x0197, // updated 5.0
     CharaNameReq = 0x0198, // updated 5.0
 
+    // nb: see #565 on github
+    UpdateRetainerItemSalePrice = 0x019D, // updated 5.0
+
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
     ItemInfo = 0x01A1, // updated 5.0
