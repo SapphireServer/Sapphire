@@ -73,6 +73,8 @@ namespace Sapphire::Network::Packets
     SocialRequestResponse = 0x00BB, // updated 4.1
     CancelAllianceForming = 0x00C6, // updated 4.2
 
+    LogMessage = 0x00D0,
+
     Chat = 0x0104, // updated 5.0
 
     WorldVisitList = 0x00FE, // added 4.5
@@ -90,17 +92,17 @@ namespace Sapphire::Network::Packets
     CountdownInitiate = 0x011E, // updated 5.0
     CountdownCancel = 0x011F, // updated 5.0
 
-    BlackList = 0x0121, // updated 5.0
-
-    LogMessage = 0x00D0,
-
+    PlayerAddedToBlacklist = 0x0120, // updated 5.0
+    PlayerRemovedFromBlacklist = 0x0121, // updated 5.0
+    BlackList = 0x0123, // updated 5.0
+    
     LinkshellList = 0x012A, // updated 5.0
 
     MailDeleteRequest = 0x012B, // updated 5.0
     // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
-    ReqMoogleMailLetter = 0x0122, // unchanged 5.0???
-    MailLetterNotification = 0x0123, // unchanged 5.0???
+    ReqMoogleMailLetter = 0x0139, // updated 5.0
+    MailLetterNotification = 0x013A, // updated 5.0
 
     MarketBoardItemListingCount = 0x0125, // updated 4.5
     MarketBoardItemListing = 0x0126, // updated 4.5
