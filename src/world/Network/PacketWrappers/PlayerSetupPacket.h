@@ -71,8 +71,8 @@ namespace Sapphire::Network::Packets::Server
       memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
 
       // possibly max level or current level
-      m_data.maxLevel = 0x46;
-      m_data.expansion = 2;
+      m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
+      m_data.expansion = Common::CURRENT_EXPANSION_ID;
 
       // df stuff
       // todo: actually do this properly

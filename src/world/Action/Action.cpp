@@ -466,7 +466,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     {
       auto curMp = m_pSource->getMp();
 
-      auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
+      auto cost = m_primaryCost * 100;
 
       if( curMp < cost )
         return false;
