@@ -257,18 +257,18 @@ namespace Sapphire::Network::Packets
   enum ClientZoneIpcType : uint16_t
   {
 
-    PingHandler = 0x0065, // unchanged 4.5
-    InitHandler = 0x0066, // unchanged 4.5
+    PingHandler = 0x0065, // unchanged 5.0
+    InitHandler = 0x0066, // unchanged 5.0
 
-    FinishLoadingHandler = 0x0069, // unchanged 4.5
+    FinishLoadingHandler = 0x0069, // unchanged 5.0
 
     CFCommenceHandler = 0x006F,
 
 
     CFRegisterDuty = 0x0071,
     CFRegisterRoulette = 0x0072,
-    PlayTimeHandler = 0x0073, // unchanged 4.5
-    LogoutHandler = 0x0074, // unchanged 4.5
+    PlayTimeHandler = 0x0073, // unchanged 5.0
+    LogoutHandler = 0x0074, // unchanged 5.0
     CancelLogout = 0x0075, // updated 5.0
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
@@ -283,8 +283,9 @@ namespace Sapphire::Network::Packets
     ReqSearchInfoHandler = 0x00E6, // updated 5.0
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
+    ReqRemovePlayerFromBlacklist = 0x00F1, // updated 5.0
     BlackListHandler = 0x00F2, // updated 5.0
-    PlayerSearchHandler = 0x00E6, // updated 4.5
+    PlayerSearchHandler = 0x00F4, // updated 5.0
 
     LinkshellListHandler = 0x00FA, // updated 5.0
 
