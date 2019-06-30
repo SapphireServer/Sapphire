@@ -97,17 +97,7 @@ namespace Sapphire::Network::Packets
     LinkshellList = 0x012A, // updated 5.0
 
     MailDeleteRequest = 0x012B, // updated 5.0
-    // gap added in 5.0 - reshuffled from somewhere else?
-    //   0x012D
-    //   0x012E
-    //   0x012F
-    //   0x0130
-    //   0x0132
-    //   0x0133
-    //   0x0134
-    //   0x0135
-    //   0x0136
-    //   0x0137
+    // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
     ReqMoogleMailLetter = 0x0122, // unchanged 5.0???
     MailLetterNotification = 0x0123, // unchanged 5.0???
