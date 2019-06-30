@@ -20,15 +20,6 @@ namespace Sapphire::Math
     static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
 
     /*!
-     * @brief Calculates the MP cost of a spell given its base cost
-     *
-     * @param chara The Chara that is casting the action
-     * @param baseCost The action cost
-     * @return The total MP to be consumed by a successful cast
-     */
-    static uint16_t calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost );
-
-    /*!
      * @brief Calculates the probability of a block happening
      */
     static float blockProbability( const Sapphire::Entity::Chara& chara );

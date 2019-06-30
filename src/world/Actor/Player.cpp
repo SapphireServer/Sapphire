@@ -695,7 +695,7 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
 
   queuePacket( makeActorControl143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
-  if( level >= 70 ) // temporary fix for leveling over levelcap
+  if( level >= Common::MAX_PLAYER_LEVEL ) // temporary fix for leveling over levelcap
   {
     queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
     return;

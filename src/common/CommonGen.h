@@ -6,8 +6,7 @@
 /* This file has been automatically generated.
    Changes will be lost upon regeneration.
    To change the content edit tools/exd_common_gen */
-namespace Sapphire {
-namespace Common {
+namespace Sapphire::Common {
 
 ///////////////////////////////////////////////////////////
 //ActionCategory.exd
@@ -173,6 +172,8 @@ enum class ClassJob : uint8_t
   Samurai = 34,
   Redmage = 35,
   Bluemage = 36,
+  Gunbreaker = 37,
+  Dancer = 38,
 };
 
 ///////////////////////////////////////////////////////////
@@ -199,14 +200,10 @@ enum class ContentType : uint8_t
   DisciplesoftheHand = 17,
   RetainerVentures = 18,
   GoldSaucer = 19,
-  one = 20,
   DeepDungeons = 21,
-  two = 22,
-  three = 23,
   WondrousTails = 24,
   CustomDeliveries = 25,
   Eureka = 26,
-  four = 27,
 };
 
 ///////////////////////////////////////////////////////////
@@ -217,7 +214,6 @@ enum class EmoteCategory : uint8_t
   General = 1,
   Special = 2,
   Expressions = 3,
-  one = 4,
 };
 
 ///////////////////////////////////////////////////////////
@@ -227,7 +223,7 @@ enum class ExVersion : uint8_t
   ARealmReborn = 0,
   Heavensward = 1,
   Stormblood = 2,
-  three = 3,
+  Shadowbringers = 3,
 };
 
 ///////////////////////////////////////////////////////////
@@ -369,6 +365,8 @@ enum class ItemUICategory : uint8_t
   SubmersibleBow = 103,
   SubmersibleBridge = 104,
   BlueMagesArm = 105,
+  GunbreakersArm = 106,
+  DancersArm = 107,
 };
 
 ///////////////////////////////////////////////////////////
@@ -393,7 +391,7 @@ enum class ItemSearchCategory : uint8_t
   ConjurersArms = 15,
   ArcanistsArms = 16,
   Shields = 17,
-  ThrowingWeapons = 18,
+  DancersArms = 18,
   CarpentersTools = 19,
   BlacksmithsTools = 20,
   ArmorersTools = 21,
@@ -454,13 +452,15 @@ enum class ItemSearchCategory : uint8_t
   DarkKnightsArms = 76,
   MachinistsArms = 77,
   AstrologiansArms = 78,
-  Airship_SubmersibleComponents = 79,
+  AirshipSubmersibleComponents = 79,
   OrchestrionComponents = 80,
   GardeningItems = 81,
   Paintings = 82,
   SamuraisArms = 83,
   RedMagesArms = 84,
   ScholarsArms = 85,
+  GunbreakersArms = 86,
+  ThrowingWeapons = 87,
 };
 
 ///////////////////////////////////////////////////////////
@@ -527,6 +527,8 @@ enum class Race : uint8_t
   Miqote = 4,
   Roegadyn = 5,
   AuRa = 6,
+  Hrothgar = 7,
+  Viera = 8,
 };
 
 ///////////////////////////////////////////////////////////
@@ -546,6 +548,10 @@ enum class Tribe : uint8_t
   Hellsguard = 10,
   Raen = 11,
   Xaela = 12,
+  Helions = 13,
+  TheLost = 14,
+  Rava = 15,
+  Veena = 16,
 };
 
 ///////////////////////////////////////////////////////////
@@ -558,6 +564,7 @@ enum class Town : uint8_t
   Uldah = 3,
   Ishgard = 4,
   Kugane = 7,
+  TheCrystarium = 10,
 };
 
 ///////////////////////////////////////////////////////////
@@ -680,7 +687,21 @@ enum class Weather : uint8_t
   TrueBlue = 113,
   TrueBlue1 = 114,
   TrueBlue2 = 115,
+  UmbralTurbulence = 116,
   TrueBlue3 = 117,
+  EverlastingLight = 118,
+  Gales2 = 119,
+  Termination = 120,
+  Termination1 = 121,
+  Dreams = 122,
+  Dreams1 = 123,
+  Dreams2 = 124,
+  Brilliance = 125,
+  Brilliance1 = 126,
+  Termination2 = 127,
+  Termination3 = 128,
+  EverlastingLight1 = 129,
+  Termination4 = 131,
 };
 
 ///////////////////////////////////////////////////////////
@@ -703,8 +724,12 @@ enum class HousingAppeal : uint8_t
   Library = 14,
   PhotoStudio = 15,
   HauntedHouse = 16,
+  Atelier = 17,
+  Bathhouse = 18,
+  Garden = 19,
+  FarEastern = 20,
 };
-}
+
 }
 #endif
 
