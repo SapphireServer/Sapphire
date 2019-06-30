@@ -269,6 +269,7 @@ namespace Sapphire::Network::Packets
     CFRegisterRoulette = 0x0072,
     PlayTimeHandler = 0x0073, // unchanged 4.5
     LogoutHandler = 0x0074, // unchanged 4.5
+    CancelLogout = 0x0075, // updated 5.0
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
 
