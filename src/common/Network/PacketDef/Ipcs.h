@@ -156,13 +156,13 @@ namespace Sapphire::Network::Packets
 
     ItemInfo = 0x01A1, // updated 5.0
     ContainerInfo = 0x01A2, // updated 5.0
-    InventoryTransactionFinish = 0x0198, // updated 4.5
-    InventoryTransaction = 0x0199, // updated 4.5
+    InventoryTransactionFinish = 0x01A3, // updated 5.0
+    InventoryTransaction = 0x01A4, // updated 5.0
 
     CurrencyCrystalInfo = 0x01A5, // updated 5.0
 
-    InventoryActionAck = 0x019D, // updated 4.5
-    UpdateInventorySlot = 0x019E, // updated 4.5
+    InventoryActionAck = 0x01A7, // updated 5.0
+    UpdateInventorySlot = 0x01A8, // updated 5.0
 
     HuntingLogEntry = 0x01B3, // updated 5.0
 
@@ -233,16 +233,17 @@ namespace Sapphire::Network::Packets
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
     PerformNote = 0x0286, // updated 4.3
 
-    PrepareZoning = 0x0299, // updated 4.5
+    PrepareZoning = 0x02A4, // updated 5.0
     ActorGauge = 0x0292, // updated 4.3
 
     // Unknown IPC types that still need to be sent
     // TODO: figure all these out properly
-    IPCTYPE_UNK_320 = 0x025E, // updated 4.5
-    IPCTYPE_UNK_322 = 0x0260, // updated 4.5
+    // daily quest related, init seed and current quota probably
+    IPCTYPE_UNK_320 = 0x025E, // updated 5.0
+    IPCTYPE_UNK_322 = 0x0260, // updated 5.0
 
     /// Doman Mahjong //////////////////////////////////////
-    MahjongOpenGui = 0x02BC, // only available in mahjong instance
+    MahjongOpenGui = 0x02A4, // only available in mahjong instance
     MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
     MahjongPlayerAction = 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
     MahjongEndRoundTsumo = 0x02BF, // called tsumo
