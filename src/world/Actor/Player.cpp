@@ -285,7 +285,7 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.attackPotMagic = m_baseStats.inte;
   m_baseStats.healingPotMagic = m_baseStats.mnd;
 
-  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
+  m_baseStats.max_mp = 10000;
 
   m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer(), m_pFw );
 
