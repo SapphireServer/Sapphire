@@ -239,7 +239,10 @@ bool DbManager::modeInit()
     content1.erase( 0, pos_ + delimiter1.length() );
   }
 
-  return true;
+  Logger::info( "======================================================" );
+  Logger::info( "Running migrations..." );
+
+  return modeMigrate();
 }
 
 bool promptForChar( const char* prompt, char& readch )
