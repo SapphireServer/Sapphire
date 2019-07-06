@@ -22,18 +22,20 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
     m_stmts.resize( MAX_STATEMENTS );
 
   /// CHARA
-  prepareStatement( CHARA_SEL, "SELECT ContentId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
-                               "Customize, ModelMainWeapon, ModelSubWeapon, ModelSystemWeapon, "
-                               "ModelEquip, EmoteModeType, FirstLoginTime, Language, IsNewGame, "
-                               "IsNewAdventurer, TerritoryType, TerritoryId, PosX, PosY, PosZ, PosR, "
-                               "OTerritoryType, OTerritoryId, OPosX, OPosY, OPosZ, OPosR, GuardianDeity, "
-                               "BirthDay, BirthMonth, Class, Status, TotalPlayTime, FirstClass, HomePoint, "
-                               "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
-                               "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
-                               "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
-                               "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil, "
-                               "Pose "
-                               "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
+  prepareStatement( CHARA_SEL,
+                    "SELECT ContentId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
+                    "Customize, ModelMainWeapon, ModelSubWeapon, ModelSystemWeapon, "
+                    "ModelEquip, EmoteModeType, FirstLoginTime, Language, IsNewGame, "
+                    "IsNewAdventurer, TerritoryType, TerritoryId, PosX, PosY, PosZ, PosR, "
+                    "OTerritoryType, OTerritoryId, OPosX, OPosY, OPosZ, OPosR, GuardianDeity, "
+                    "BirthDay, BirthMonth, Class, Status, TotalPlayTime, FirstClass, HomePoint, "
+                    "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
+                    "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
+                    "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
+                    "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil, "
+                    "Pose "
+                    "FROM charainfo WHERE CharacterId = ?;",
+                    CONNECTION_SYNC );
 
 
   prepareStatement( CHARA_UP,
@@ -47,19 +49,23 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, Orchestrion = ?, "
                     "EquippedMannequin = ?, ConfigFlags = ?, QuestCompleteFlags = ?, OpeningSequence = ?, "
                     "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, EquipDisplayFlags = ?, Unlocks = ?, "
-                    "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
+                    "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
 
 
-  prepareStatement( CHARA_SEL_MINIMAL, "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryType, GuardianDeity, "
-                                       "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
-                                       "FROM charainfo WHERE CharacterId = ?;", CONNECTION_SYNC );
+  prepareStatement( CHARA_SEL_MINIMAL,
+                    "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryType, GuardianDeity, "
+                    "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
+                    "FROM charainfo WHERE CharacterId = ?;",
+                    CONNECTION_SYNC );
 
-  prepareStatement( CHARA_INS, "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
-                               "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
-                               "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
-                               "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
-                               "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "
-                               "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
+  prepareStatement( CHARA_INS,
+                    "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
+                    "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
+                    "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
+                    "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
+                    "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "
+                    "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_UP_NAME, "UPDATE charainfo SET Name = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
