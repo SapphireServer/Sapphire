@@ -95,7 +95,7 @@ namespace Sapphire::Network::Packets
     PlayerAddedToBlacklist = 0x0120, // updated 5.0
     PlayerRemovedFromBlacklist = 0x0121, // updated 5.0
     BlackList = 0x0123, // updated 5.0
-    
+
     LinkshellList = 0x012A, // updated 5.0
 
     MailDeleteRequest = 0x012B, // updated 5.0
@@ -152,7 +152,7 @@ namespace Sapphire::Network::Packets
     CharaNameReq = 0x0198, // updated 5.0
 
     // nb: see #565 on github
-    UpdateRetainerItemSalePrice = 0x019D, // updated 5.0
+    UpdateRetainerItemSalePrice = 0x019F, // updated 5.0
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
