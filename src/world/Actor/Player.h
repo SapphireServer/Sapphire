@@ -1036,19 +1036,19 @@ namespace Sapphire::Entity
 
     uint16_t m_activeTitle;
     uint8_t m_titleList[48];
-    uint8_t m_howTo[33];
+    uint8_t m_howTo[34];
     uint8_t m_minions[40];
-    uint8_t m_mountGuide[17];
+    uint8_t m_mountGuide[19];
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
     uint8_t m_questCompleteFlags[476];
-    uint8_t m_discovery[421];
+    uint8_t m_discovery[445];
     uint32_t m_playTime;
 
-    uint16_t m_classArray[26];
-    uint32_t m_expArray[26];
-    uint8_t m_aetheryte[17];
+    uint16_t m_classArray[28];
+    uint32_t m_expArray[28];
+    uint8_t m_aetheryte[21];
     uint8_t m_unlocks[64];
     uint8_t m_orchestrion[40];
 

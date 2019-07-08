@@ -971,8 +971,6 @@ namespace Sapphire::Common
 
   enum LevelTableEntry : uint8_t
   {
-    PIE,
-    MP,
     MAIN,
     SUB,
     DIV,
