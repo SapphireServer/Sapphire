@@ -656,8 +656,8 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcActorMove : FFXIVIpcBasePacket< ActorMove >
   {
-    /* 0000 */ uint8_t rotation;
-    /* 0001 */ uint8_t headRotation;
+    /* 0000 */ uint8_t headRotation;
+    /* 0001 */ uint8_t rotation;
     /* 0002 */ uint8_t animationType;
     /* 0003 */ uint8_t animationState;
     /* 0004 */ uint8_t animationSpeed;
