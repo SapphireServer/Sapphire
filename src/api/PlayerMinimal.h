@@ -31,6 +31,8 @@ namespace Sapphire::Api
 
     std::string getClassString();
 
+    std::string getLevelsString();
+
     uint8_t getClassLevel();
 
     // return the id of the actor

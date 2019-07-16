@@ -860,13 +860,13 @@ namespace Sapphire::Network::Packets::Server
     unsigned char unknown95[9];
     unsigned char unknown9F[2];
     unsigned char unknownA1[3];
-    unsigned int exp[28];
+    unsigned int exp[Common::CLASSJOB_SLOTS];
     unsigned int unknown108;
     unsigned int pvpTotalExp;
     unsigned int unknownPvp110;
     unsigned int pvpExp;
     unsigned int pvpFrontlineOverallRanks[3];
-    unsigned short levels[28];
+    unsigned short levels[Common::CLASSJOB_SLOTS];
     unsigned short unknown15C[9];
     unsigned short u1;
     unsigned short u2;
