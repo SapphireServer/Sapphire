@@ -395,7 +395,7 @@ Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t ev
                                                   HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
                                                   DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
                                                   // todo: wtf is 0x00100000
-                                                  DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
+                                                  DISABLE_CANCEL_EMOTE, 0, 0x9, 0 );
   }
   else
     player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
