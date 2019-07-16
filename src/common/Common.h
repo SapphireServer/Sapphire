@@ -24,6 +24,8 @@ namespace Sapphire::Common
   const uint16_t MAX_PLAYER_LEVEL = 80;
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
+  const uint8_t CLASSJOB_SLOTS = 28;
+
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
    *
