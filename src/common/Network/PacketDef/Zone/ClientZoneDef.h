@@ -51,11 +51,11 @@ struct FFXIVIpcUpdatePosition :
   /* 0000 */ float rotation;
   /* 0004 */ uint8_t unk_1[ 3 ];
   /* 0007 */ uint8_t headPosition;
-  /* 0008 */ uint8_t animationType;
-  /* 0009 */ uint8_t animationState;
-  /* 000A */ uint8_t clientAnimationType;
-  /* 000B */ uint8_t unk_2;
-  /* 000C */ Common::FFXIVARR_POSITION3 position;
+  /* 0008 */ Common::FFXIVARR_POSITION3 position;
+  /* 000C */ uint8_t animationType;
+  /* 000D */ uint8_t animationState;
+  /* 000E */ uint8_t clientAnimationType;
+  /* 000F */ uint8_t unk_2;
 };
 
 struct FFXIVIpcSkillHandler :

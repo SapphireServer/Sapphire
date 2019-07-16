@@ -323,7 +323,6 @@ namespace Sapphire::Network::Packets
     AoESkillHandler = 0x140, // updated 5.0
 
     UpdatePositionHandler = 0x0141, // updated 5.0
-    UpdatePositionInstance = 0x0183, // updated 4.3
 
     InventoryModifyHandler = 0x0148, // updated 5.0
 
@@ -350,6 +349,8 @@ namespace Sapphire::Network::Packets
     HousingUpdateObjectPosition = 0x0179, // updated 5.0
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
+
+    UpdatePositionInstance = 0x0180, // updated 5.0
 
     PerformNoteHandler = 0x029B, // updated 4.3
 

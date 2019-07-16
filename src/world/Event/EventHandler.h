@@ -49,7 +49,7 @@ namespace Sapphire::Event
     {
       Quest = 0x0001,
       Warp = 0x0002,
-      Unknown = 0x0003, // Came up in the client with "Begin" unsure that means
+      GatheringPoint = 0x0003, // Came up in the client with "Begin" unsure that means
       Shop = 0x0004,
       Aetheryte = 0x0005,
       GuildLeveAssignment = 0x0006,
