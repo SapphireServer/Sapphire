@@ -1,10 +1,11 @@
 #include "PlayerMinimal.h"
 
-#include <Util/Util.h>
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
 
 #include <Database/DatabaseDef.h>
+
+#include <nlohmann/json.hpp>
 
 extern Sapphire::Data::ExdDataGenerated g_exdDataGen;
 
@@ -123,11 +124,23 @@ std::string PlayerMinimal::getModelString()
   return modelString;
 }
 
+std::string PlayerMinimal::getLevelsString()
+{
+  auto levelsArray = nlohmann::json();
+
+  for( int i = 0; i < Common::CLASSJOB_SLOTS; ++i )
+  {
+    // these must be strings
+    levelsArray.push_back( std::to_string( m_classMap[ i ] ) );
+  }
+
+  return levelsArray.dump();
+}
+
 std::string PlayerMinimal::getInfoJson()
 {
   std::string charDetails = "{\"content\":[\"" + std::string( getName() ) + "\"," +
-                            "[\"0\",\"0\",\"0\",\"0\",\"" + std::to_string( m_classLevel ) +
-                            "\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\",\"0\"],"
+                            getLevelsString() + ","
                             "\"0\",\"0\",\"0\",\"" +
                             std::to_string( getBirthMonth() ) +
                             "\",\"" + std::to_string( getBirthDay() ) +
