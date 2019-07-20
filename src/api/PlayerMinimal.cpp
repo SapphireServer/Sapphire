@@ -139,22 +139,80 @@ std::string PlayerMinimal::getLevelsString()
 
 std::string PlayerMinimal::getInfoJson()
 {
-  std::string charDetails = "{\"content\":[\"" + std::string( getName() ) + "\"," +
-                            getLevelsString() + ","
-                            "\"0\",\"0\",\"0\",\"" +
-                            std::to_string( getBirthMonth() ) +
-                            "\",\"" + std::to_string( getBirthDay() ) +
-                            "\",\"" + std::to_string( getGuardianDeity() ) +
-                            "\",\"" + std::to_string( m_class ) +
-                            "\",\"0\",\"" + std::to_string( getZoneId() ) +
-                            "\",\"0\"," +
-                            "[" + getLookString() + "]," +
-                            "\"" + std::to_string( m_modelMainWeapon ) + "\",\"" + std::to_string( m_modelSubWeapon ) + "\"," +
-                            "[" + getModelString() + "]," +
-                            "\"1\",\"0\",\"0\",\"0\",\"" + std::to_string( m_equipDisplayFlags ) +
-                            "\",\"0\",\"\",\"0\",\"0\"]," +
-                            "\"classname\":\"ClientSelectData\",\"classid\":116}";
-  return charDetails;
+  auto payload = nlohmann::json();
+  auto& c = payload["content"];
+
+  c.push_back( getName() );
+
+  // class levels
+  auto levelsArray = nlohmann::json();
+  for( int i = 0; i < Common::CLASSJOB_SLOTS; ++i )
+  {
+    // these must be strings
+    levelsArray.push_back( std::to_string( m_classMap[ i ] ) );
+  }
+
+  c.push_back( levelsArray );
+
+  // unknowns
+  c.push_back( "0" );
+  c.push_back( "0" );
+  c.push_back( "0" );
+
+  //
+  c.push_back( std::to_string( getBirthMonth() ) );
+  c.push_back( std::to_string( getBirthDay() ) );
+  c.push_back( std::to_string( getGuardianDeity() ) );
+
+  c.push_back( std::to_string( m_class ) );
+
+  // unknown
+  c.push_back( "0" );
+
+  c.push_back( std::to_string( getZoneId() ) );
+
+  // unknown
+  c.push_back( "0" );
+
+  // look map
+  auto lookArray = nlohmann::json();
+  for( auto& it : m_lookMap )
+  {
+    lookArray.push_back( std::to_string( it.second ) );
+  }
+  c.push_back( lookArray );
+
+  // weapons
+  c.push_back( std::to_string( m_modelMainWeapon ) );
+  c.push_back( std::to_string( m_modelSubWeapon ) );
+
+  // model
+  auto modelArray = nlohmann::json();
+  for( auto i : m_modelEquip )
+  {
+    modelArray.push_back( std::to_string( i ) );
+  }
+  c.push_back( modelArray );
+
+  // unknowns
+  c.push_back( "1" );
+  c.push_back( "0" );
+  c.push_back( "0" );
+  c.push_back( "0" );
+
+  c.push_back( std::to_string( m_equipDisplayFlags ) );
+
+  // unknowns
+  c.push_back( "0" );
+  c.push_back( "0" );
+  c.push_back( "0" );
+  c.push_back( "0" );
+
+
+  payload["classname"] = "ClientSelectData";
+  payload["classid"] = 116;
+
+  return payload.dump();
 }
 
 uint8_t PlayerMinimal::getClassLevel()
