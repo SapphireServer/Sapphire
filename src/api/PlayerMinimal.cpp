@@ -14,16 +14,10 @@ namespace Sapphire::Api {
 using namespace Common;
 
 // player constructor
-PlayerMinimal::PlayerMinimal( void ) :
+PlayerMinimal::PlayerMinimal() :
   m_id( 0 )
 {
 
-
-}
-
-// deconstructor
-PlayerMinimal::~PlayerMinimal( void )
-{
 
 }
 
@@ -83,58 +77,6 @@ void PlayerMinimal::load( uint32_t charId )
     m_classMap[ classIdx ] = lvl;
     m_classLevel = getClassLevel();
   }
-}
-
-
-std::string PlayerMinimal::getLookString()
-{
-
-  auto it = m_lookMap.begin();
-
-  std::string lookString;
-
-  for( ; it != m_lookMap.end(); ++it )
-  {
-
-    std::string s = std::to_string( it->second );
-
-    lookString += "\"" + s + "\"";
-    if( it != m_lookMap.end() )
-    {
-      lookString += ",";
-    }
-  }
-
-  return lookString.substr( 0, lookString.size() - 1 );
-}
-
-std::string PlayerMinimal::getModelString()
-{
-  std::string modelString = "\""
-                            + std::to_string( m_modelEquip[ 0 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 1 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 2 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 3 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 4 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 5 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 6 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 7 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 8 ] ) + "\",\""
-                            + std::to_string( m_modelEquip[ 9 ] ) + "\"";
-  return modelString;
-}
-
-std::string PlayerMinimal::getLevelsString()
-{
-  auto levelsArray = nlohmann::json();
-
-  for( int i = 0; i < Common::CLASSJOB_SLOTS; ++i )
-  {
-    // these must be strings
-    levelsArray.push_back( std::to_string( m_classMap[ i ] ) );
-  }
-
-  return levelsArray.dump();
 }
 
 std::string PlayerMinimal::getInfoJson()
@@ -219,30 +161,6 @@ uint8_t PlayerMinimal::getClassLevel()
 {
   uint8_t classJobIndex = g_exdDataGen.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( m_class ) )->expArrayIndex;
   return static_cast< uint8_t >( m_classMap[ classJobIndex ] );
-}
-
-std::string PlayerMinimal::getClassString()
-{
-
-  std::map< uint8_t, uint16_t >::iterator it;
-
-  it = m_classMap.begin();
-
-  std::string classString;
-
-  for( ; it != m_classMap.end(); ++it )
-  {
-
-    std::string s = std::to_string( it->second );
-
-    classString += "\"" + s + "\"";
-    if( it != m_classMap.end() )
-    {
-      classString += ",";
-    }
-  }
-
-  return classString.substr( 0, classString.size() - 1 );
 }
 
 void PlayerMinimal::saveAsNew()

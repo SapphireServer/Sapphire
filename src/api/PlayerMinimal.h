@@ -11,9 +11,9 @@ namespace Sapphire::Api
   class PlayerMinimal
   {
   public:
-    PlayerMinimal( void );
+    PlayerMinimal();
 
-    ~PlayerMinimal( void );
+    ~PlayerMinimal() = default;
 
     // write player to the database
     void write();
