@@ -315,7 +315,7 @@ enum ActorControlType : uint16_t
     UpdatedSeenHowTos = 0x133,
     AllotAttribute = 0x135,
 
-    ClearWaymarks = 0x13A,
+    ClearFieldMarkers = 0x13A,
     CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,
