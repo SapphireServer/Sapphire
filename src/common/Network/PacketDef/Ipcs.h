@@ -313,15 +313,14 @@ namespace Sapphire::Network::Packets
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x0133, // updated 4.5
-    ReqCountdownCancel = 0x0134, // updated 4.5
-    ClearWaymarks = 0x0135, // updated 4.5
+    ReqCountdownInitiate = 0x0135, // updated 5.0
+    ReqCountdownCancel = 0x0136, // updated 5.0
 
     ZoneLineHandler = 0x0139, // updated 5.0
     ClientTrigger = 0x013A, // updated 5.0
     DiscoveryHandler = 0x013B, // updated 5.0
 
-    AddWaymark = 0x013A, // updated 4.5
+    PlaceFieldMarker = 0x013C, // updated 5.0
 
     SkillHandler = 0x013D, // updated 5.0
     GMCommand1 = 0x013E, // updated 5.0
@@ -331,6 +330,7 @@ namespace Sapphire::Network::Packets
     UpdatePositionHandler = 0x0141, // updated 5.0
 
     InventoryModifyHandler = 0x0148, // updated 5.0
+    InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
     BuildPresetHandler = 0x014F, // updated 5.0
