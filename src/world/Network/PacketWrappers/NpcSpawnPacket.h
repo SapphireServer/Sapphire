@@ -17,11 +17,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The packet sent to spawn a player.
   */
-  class NpcSpawnPacket : public ZoneChannelPacket< FFXIVIpcNpcSpawn >
+  class NpcSpawnPacket : public WorldChannelPacket< FFXIVIpcNpcSpawn >
   {
   public:
     NpcSpawnPacket( Entity::BNpc& bnpc, Entity::Player& target ) :
-      ZoneChannelPacket< FFXIVIpcNpcSpawn >( bnpc.getId(), target.getId() )
+      WorldChannelPacket< FFXIVIpcNpcSpawn >( bnpc.getId(), target.getId() )
     {
       initialize( bnpc, target );
     };

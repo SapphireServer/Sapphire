@@ -76,7 +76,7 @@ void Sapphire::World::Session::close()
     // do one last update to db
     m_pPlayer->updateSql();
     // reset the zone, so the zone handler knows to remove the actor
-    m_pPlayer->setCurrentZone( nullptr );
+    m_pPlayer->setCurrentTerritory( nullptr );
   }
 }
 

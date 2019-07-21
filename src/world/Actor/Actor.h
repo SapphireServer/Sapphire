@@ -122,9 +122,9 @@ namespace Sapphire::Entity
 
     BNpcPtr getAsBNpc();
 
-    TerritoryPtr getCurrentZone() const;
+    TerritoryPtr getCurrentTerritory() const;
 
-    void setCurrentZone( TerritoryPtr currZone );
+    void setCurrentTerritory( TerritoryPtr currZone );
 
     InstanceContentPtr getCurrentInstance() const;
 

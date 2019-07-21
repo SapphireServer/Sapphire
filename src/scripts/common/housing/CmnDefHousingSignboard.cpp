@@ -34,7 +34,7 @@ public:
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();
 
-        auto pTerritory = player.getCurrentZone();
+        auto pTerritory = player.getCurrentTerritory();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         auto pHouMgr = pFw->get< HousingMgr >();
 

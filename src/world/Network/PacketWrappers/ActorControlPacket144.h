@@ -10,7 +10,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Ping response packet.
   */
-  class ActorControlPacket144 : public ZoneChannelPacket< FFXIVIpcActorControl144 >
+  class ActorControlPacket144 : public WorldChannelPacket< FFXIVIpcActorControl144 >
   {
   public:
     ActorControlPacket144( uint32_t actorId,
@@ -21,7 +21,7 @@ namespace Sapphire::Network::Packets::Server
                            uint32_t param4 = 0,
                            uint64_t targetId = 0,
                            uint32_t padding1 = 0 ) :
-      ZoneChannelPacket< FFXIVIpcActorControl144 >( actorId, actorId )
+      WorldChannelPacket< FFXIVIpcActorControl144 >( actorId, actorId )
     {
       initialize( category, param1, param2, param3, param4, targetId );
     };

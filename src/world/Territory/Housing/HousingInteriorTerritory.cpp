@@ -57,7 +57,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                   getGuId(), getTerritoryTypeId(), player.getId() );
 
-  auto indoorInitPacket = makeZonePacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );
+  auto indoorInitPacket = makeWorldPacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );
   indoorInitPacket->data().u1 = 0;
   indoorInitPacket->data().u2 = 0;
   indoorInitPacket->data().u3 = 0;
@@ -80,7 +80,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   auto yardPacketTotal = static_cast< uint8_t >( 2 + pLand->getSize() );
   for( uint8_t yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
-    auto objectInitPacket = makeZonePacket< Server::FFXIVIpcHousingObjectInitialize >( player.getId() );
+    auto objectInitPacket = makeWorldPacket< Server::FFXIVIpcHousingObjectInitialize >( player.getId() );
     memcpy( &objectInitPacket->data().landIdent, &m_landIdent, sizeof( Common::LandIdent ) );
 
     if( isFcHouse )
@@ -174,7 +174,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
 
   for( const auto& player : m_playerMap )
   {
-    auto objectSpawnPkt = makeZonePacket< Server::FFXIVIpcHousingInternalObjectSpawn >( player.second->getId() );
+    auto objectSpawnPkt = makeWorldPacket< Server::FFXIVIpcHousingInternalObjectSpawn >( player.second->getId() );
 
     objectSpawnPkt->data().containerId = containerType;
     objectSpawnPkt->data().containerOffset = slot;
@@ -204,7 +204,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
     if( player.second->getId() == sourcePlayer.getId() )
       continue;
 
-    auto moveObjPkt = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
+    auto moveObjPkt = makeWorldPacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
     moveObjPkt->data().itemRotation = obj.rotation;
     moveObjPkt->data().pos = obj.pos;

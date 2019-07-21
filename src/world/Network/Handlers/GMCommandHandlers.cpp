@@ -93,7 +93,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
   if( player.getGmRank() <= 0 )
     return;
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
   const auto commandId = packet.data().commandId;
   const auto param1 = packet.data().param1;
   const auto param2 = packet.data().param2;
@@ -190,9 +190,9 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Weather:
     {
-      targetPlayer->getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
+      targetPlayer->getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
       player.sendNotice( "Weather in Territory \"{0}\" of {1} set in range.",
-                         targetPlayer->getCurrentZone()->getName(), targetPlayer->getName() );
+                         targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getName() );
       break;
     }
     case GmCommand::Call:
@@ -217,7 +217,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
                          "\nPlayTime: {8}",
                          targetPlayer->getName(),
                          targetPlayer->getCurrency( CurrencyType::Gil ),
-                         targetPlayer->getCurrentZone()->getName(),
+                         targetPlayer->getCurrentTerritory()->getName(),
                          targetPlayer->getZoneId(),
                          static_cast< uint8_t >( targetPlayer->getClass() ),
                          targetPlayer->getLevel(),
@@ -257,11 +257,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     {
       targetPlayer->setOnlineStatusMask( param1 );
 
-      auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
+      auto statusPacket = makeWorldPacket< FFXIVIpcSetOnlineStatus >( player.getId() );
       statusPacket->data().onlineStatusFlags = param1;
       queueOutPacket( statusPacket );
 
-      auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
+      auto searchInfoPacket = makeWorldPacket< FFXIVIpcSetSearchInfo >( player.getId() );
       searchInfoPacket->data().onlineStatusFlags = param1;
       searchInfoPacket->data().selectRegion = targetPlayer->getSearchSelectRegion();
       strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
@@ -551,7 +551,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::TeriInfo:
     {
-      auto pCurrentZone = player.getCurrentZone();
+      auto pCurrentZone = player.getCurrentTerritory();
       player.sendNotice( "ZoneId: {0}"
                          "\nName: {1}"
                          "\nInternalName: {2}"
@@ -596,7 +596,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
 
   auto pServerZone = pFw->get< World::ServerMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
   const auto commandId = packet.data().commandId;
   const auto param1 = packet.data().param1;
@@ -657,7 +657,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         player.exitInstance();
       }
-      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+      if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
       {
         // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         if( targetPlayer->getCurrentInstance() )
@@ -666,7 +666,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
         }
-        player.setInstance( targetPlayer->getCurrentZone()->getGuId() );
+        player.setInstance( targetPlayer->getCurrentTerritory()->getGuId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
@@ -687,9 +687,9 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         targetPlayer->exitInstance();
       }
-      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+      if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
       {
-        targetPlayer->setInstance( player.getCurrentZone()->getGuId() );
+        targetPlayer->setInstance( player.getCurrentTerritory()->getGuId() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );

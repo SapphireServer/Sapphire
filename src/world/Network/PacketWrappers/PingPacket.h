@@ -11,11 +11,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Ping response packet.
   */
-  class PingPacket : public ZoneChannelPacket< FFXIVIpcPing >
+  class PingPacket : public WorldChannelPacket< FFXIVIpcPing >
   {
   public:
     PingPacket( Entity::Player& player, int32_t inVal ) :
-      ZoneChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
+      WorldChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
     {
       initialize( player, inVal );
     };

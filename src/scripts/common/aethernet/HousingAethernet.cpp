@@ -25,7 +25,7 @@ public:
       if( !pExdData )
         return;
 
-      auto housingZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+      auto housingZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
       if( !housingZone )
         return;
 
@@ -35,7 +35,7 @@ public:
         return;
 
       // check we're teleporting to the same territorytype
-      if( player.getCurrentZone()->getTerritoryTypeId() != pHousingAethernet->territoryType )
+      if( player.getCurrentTerritory()->getTerritoryTypeId() != pHousingAethernet->territoryType )
         return;
 
       // todo: this needs to be done properly and used queued zoning + aethernet animation

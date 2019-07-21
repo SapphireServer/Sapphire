@@ -49,7 +49,7 @@ void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& pla
 
 void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& player ) const
 {
-  auto varPacket = makeZonePacket< FFXIVIpcDirectorVars >( player.getId() );
+  auto varPacket = makeWorldPacket< FFXIVIpcDirectorVars >( player.getId() );
   varPacket->data().m_directorId = getDirectorId();
   varPacket->data().m_sequence = getSequence();
   varPacket->data().m_branch = 0;

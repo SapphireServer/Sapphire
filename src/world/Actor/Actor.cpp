@@ -331,13 +331,13 @@ std::set< Sapphire::Entity::ActorPtr > Sapphire::Entity::Actor::getInRangeActors
 }
 
 /*! \return TerritoryPtr to the current zone, nullptr if not set */
-Sapphire::TerritoryPtr Sapphire::Entity::Actor::getCurrentZone() const
+Sapphire::TerritoryPtr Sapphire::Entity::Actor::getCurrentTerritory() const
 {
   return m_pCurrentZone;
 }
 
 /*! \param TerritoryPtr to the zone to be set as current */
-void Sapphire::Entity::Actor::setCurrentZone( TerritoryPtr currZone )
+void Sapphire::Entity::Actor::setCurrentTerritory( TerritoryPtr currZone )
 {
   m_pCurrentZone = currZone;
 }

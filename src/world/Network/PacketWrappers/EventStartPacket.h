@@ -10,7 +10,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The packet sent to start an event.
   */
-  class EventStartPacket : public ZoneChannelPacket< FFXIVIpcEventStart >
+  class EventStartPacket : public WorldChannelPacket< FFXIVIpcEventStart >
   {
   public:
     EventStartPacket( uint32_t playerId,
@@ -19,7 +19,7 @@ namespace Sapphire::Network::Packets::Server
                       uint8_t param1 = 0,
                       uint8_t param2 = 0,
                       uint32_t param3 = 0 ) :
-      ZoneChannelPacket< FFXIVIpcEventStart >( playerId, playerId )
+      WorldChannelPacket< FFXIVIpcEventStart >( playerId, playerId )
     {
       initialize( actorId, eventId, param1, param2, param3 );
     };

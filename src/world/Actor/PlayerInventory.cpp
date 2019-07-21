@@ -815,7 +815,7 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fr
   m_storageMap[ fromInventoryId ]->removeItem( fromSlotId );
   updateContainer( fromInventoryId, fromSlotId, nullptr );
 
-  auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
+  auto invTransPacket = makeWorldPacket< FFXIVIpcInventoryTransaction >( getId() );
   invTransPacket->data().sequence = sequence;
   invTransPacket->data().ownerId = getId();
   invTransPacket->data().storageId = fromInventoryId;
@@ -825,7 +825,7 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fr
   invTransPacket->data().type = 7;
   queuePacket( invTransPacket );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
+  auto invTransFinPacket = makeWorldPacket< FFXIVIpcInventoryTransactionFinish >( getId() );
   invTransFinPacket->data().sequenceId = sequence;
   invTransFinPacket->data().sequenceId1 = sequence;
   queuePacket( invTransFinPacket );
@@ -930,7 +930,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
   auto seq = getNextInventorySequence();
 
   // send inv update
-  auto invTransPacket = makeZonePacket< FFXIVIpcInventoryTransaction >( getId() );
+  auto invTransPacket = makeWorldPacket< FFXIVIpcInventoryTransaction >( getId() );
   invTransPacket->data().sequence = seq;
   invTransPacket->data().ownerId = getId();
   invTransPacket->data().storageId = type;
@@ -940,7 +940,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
   invTransPacket->data().type = 7;
   queuePacket( invTransPacket );
 
-  auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
+  auto invTransFinPacket = makeWorldPacket< FFXIVIpcInventoryTransactionFinish >( getId() );
   invTransFinPacket->data().sequenceId = seq;
   invTransFinPacket->data().sequenceId1 = seq;
   queuePacket( invTransFinPacket );

@@ -216,7 +216,7 @@ void Action::Action::start()
 
   if( hasCastTime() )
   {
-    auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
+    auto castPacket = makeWorldPacket< Server::FFXIVIpcActorCast >( getId() );
 
     castPacket->data().action_id = static_cast< uint16_t >( m_id );
     castPacket->data().skillType = Common::SkillType::Normal;

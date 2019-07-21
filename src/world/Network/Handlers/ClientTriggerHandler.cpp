@@ -67,7 +67,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
                                                               Entity::Player& player )
 {
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
 
   const auto commandId = packet.data().commandId;
   const auto param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
@@ -173,7 +173,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       uint64_t targetContentId = param1;
       // todo: look up player by content id
       /*
-        auto packet = makeZonePacket< FFXIVIpcCharaNameReq >( player.getId() );
+        auto packet = makeWorldPacket< FFXIVIpcCharaNameReq >( player.getId() );
         packet->data().contentId = targetContentId;
 
         // lookup the name
@@ -287,12 +287,12 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::DirectorInitFinish: // Director init finish
     {
-      player.getCurrentZone()->onInitDirector( player );
+      player.getCurrentTerritory()->onInitDirector( player );
       break;
     }
     case ClientTriggerType::DirectorSync: // Director init finish
     {
-      player.getCurrentZone()->onDirectorSync( player );
+      player.getCurrentTerritory()->onDirectorSync( player );
       break;
     }
     case ClientTriggerType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
@@ -313,7 +313,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestHousingBuildPreset:
     {
-      auto zone = player.getCurrentZone();
+      auto zone = player.getCurrentTerritory();
       auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
       if (!hZone)
         return;

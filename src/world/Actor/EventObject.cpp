@@ -120,7 +120,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
 
   Logger::debug( "Spawning EObj: id#{0} name={1}", getId(), getName() );
 
-  auto eobjStatePacket = makeZonePacket< FFXIVIpcObjectSpawn >( getId(), pTarget->getId() );
+  auto eobjStatePacket = makeWorldPacket< FFXIVIpcObjectSpawn >( getId(), pTarget->getId() );
   eobjStatePacket->data().spawnIndex = spawnIndex;
   eobjStatePacket->data().objKind = getObjKind();
   eobjStatePacket->data().state = getState();
