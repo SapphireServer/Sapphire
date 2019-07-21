@@ -23,15 +23,7 @@ namespace Sapphire::Api
 
     void saveAsNew();
 
-    std::string getLookString();
-
     std::string getInfoJson();
-
-    std::string getModelString();
-
-    std::string getClassString();
-
-    std::string getLevelsString();
 
     uint8_t getClassLevel();
 
