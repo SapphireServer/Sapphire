@@ -11,11 +11,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The update model packet.
   */
-  class ModelEquipPacket : public ZoneChannelPacket< FFXIVIpcModelEquip >
+  class ModelEquipPacket : public WorldChannelPacket< FFXIVIpcModelEquip >
   {
   public:
     ModelEquipPacket( Entity::Player& player ) :
-      ZoneChannelPacket< FFXIVIpcModelEquip >( player.getId(), player.getId() )
+      WorldChannelPacket< FFXIVIpcModelEquip >( player.getId(), player.getId() )
     {
       initialize( player );
     };

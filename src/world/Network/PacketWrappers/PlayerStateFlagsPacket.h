@@ -11,17 +11,17 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief Packet sent to set a players state, this impacts which actions he can perform.
   */
-  class PlayerStateFlagsPacket : public ZoneChannelPacket< FFXIVIpcPlayerStateFlags >
+  class PlayerStateFlagsPacket : public WorldChannelPacket< FFXIVIpcPlayerStateFlags >
   {
   public:
     PlayerStateFlagsPacket( Entity::Player& player ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
+      WorldChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
     {
       initialize( player.getStateFlags() );
     }
 
     PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
-      ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
+      WorldChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
     {
       uint8_t newFlags[12];
       memset( newFlags, 0, 12 );

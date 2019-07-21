@@ -18,7 +18,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
 
   const auto type = packet.data().type;
   const auto actionId = packet.data().actionId;
@@ -85,7 +85,7 @@ void Sapphire::Network::GameConnection::placedActionHandler( FrameworkPtr pFw,
                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                              Entity::Player& player )
 {
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcAoESkillHandler >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcAoESkillHandler >( inPacket );
 
   const auto type = packet.data().type;
   const auto actionId = packet.data().actionId;

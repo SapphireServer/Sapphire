@@ -645,14 +645,14 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   m_pOwner = m_pChara;
   if( m_pChara != nullptr )
   {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( m_pChara->getId() );
+    auto setOwnerPacket = makeWorldPacket< FFXIVIpcActorOwner >( m_pChara->getId() );
     setOwnerPacket->data().type = 0x01;
     setOwnerPacket->data().actorId = m_pChara->getId();
     sendToInRangeSet( setOwnerPacket );
   }
   else
   {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
+    auto setOwnerPacket = makeWorldPacket< FFXIVIpcActorOwner >( getId() );
     setOwnerPacket->data().type = 0x01;
     setOwnerPacket->data().actorId = INVALID_GAME_OBJECT_ID;
     sendToInRangeSet( setOwnerPacket );

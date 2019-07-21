@@ -64,14 +64,14 @@ bool Sapphire::World::Manager::MarketMgr::init()
 void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Entity::Player& player, uint32_t catalogId,
                                                                   uint32_t requestId )
 {
-  auto countPkt = makeZonePacket< Server::FFFXIVIpcMarketBoardItemListingCount >( player.getId() );
+  auto countPkt = makeWorldPacket< Server::FFFXIVIpcMarketBoardItemListingCount >( player.getId() );
   countPkt->data().quantity = 1 << 8;
   countPkt->data().itemCatalogId = catalogId;
   countPkt->data().requestId = requestId;
 
   player.queuePacket( countPkt );
 
-  auto historyPkt = makeZonePacket< Server::FFXIVIpcMarketBoardItemListingHistory >( player.getId() );
+  auto historyPkt = makeWorldPacket< Server::FFXIVIpcMarketBoardItemListingHistory >( player.getId() );
   historyPkt->data().itemCatalogId = catalogId;
   historyPkt->data().itemCatalogId2 = catalogId;
 
@@ -111,7 +111,7 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
   auto endIdx = std::min< size_t >( startIdx + 20, numResults );
   auto size = endIdx - startIdx;
 
-  auto resultPkt = makeZonePacket< Server::FFXIVIpcMarketBoardSearchResult >( player.getId() );
+  auto resultPkt = makeWorldPacket< Server::FFXIVIpcMarketBoardSearchResult >( player.getId() );
   resultPkt->data().itemIndexStart = startIdx;
   resultPkt->data().requestId = requestId;
 

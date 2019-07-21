@@ -509,7 +509,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
     }
 
     // this session is not linked to this area anymore, remove it from zone session list
-    if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
+    if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
     {
       removeActor( pPlayer );
       return;
@@ -517,7 +517,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
 
     if( changedWeather )
     {
-      auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
+      auto weatherChangePacket = makeWorldPacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
       weatherChangePacket->data().weatherId = static_cast< uint8_t >( m_currentWeather );
       weatherChangePacket->data().delay = 5.0f;
       pPlayer->queuePacket( weatherChangePacket );
@@ -527,7 +527,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
     pPlayer->getSession()->update();
 
     // this session is not linked to this area anymore, remove it from zone session list
-    if( ( !pPlayer->getCurrentZone() ) || ( pPlayer->getCurrentZone() != shared_from_this() ) )
+    if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
       return;
   }
 }
@@ -609,7 +609,7 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
 void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
 {
 
-  if( actor.getCurrentZone() != shared_from_this() )
+  if( actor.getCurrentTerritory() != shared_from_this() )
     return;
 
   //actor.checkInRangeActors();

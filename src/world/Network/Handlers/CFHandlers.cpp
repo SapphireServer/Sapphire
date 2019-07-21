@@ -25,7 +25,7 @@ void Sapphire::Network::GameConnection::cfDutyInfoRequest( FrameworkPtr pFw,
                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
-  auto dutyInfoPacket = makeZonePacket< FFXIVIpcCFDutyInfo >( player.getId() );
+  auto dutyInfoPacket = makeWorldPacket< FFXIVIpcCFDutyInfo >( player.getId() );
   auto penaltyMinutes = player.getCFPenaltyMinutes();
   if( penaltyMinutes > 255 )
   {
@@ -35,7 +35,7 @@ void Sapphire::Network::GameConnection::cfDutyInfoRequest( FrameworkPtr pFw,
   dutyInfoPacket->data().penaltyTime = penaltyMinutes;
   queueOutPacket( dutyInfoPacket );
 
-  auto inNeedsPacket = makeZonePacket< FFXIVIpcCFPlayerInNeed >( player.getId() );
+  auto inNeedsPacket = makeWorldPacket< FFXIVIpcCFPlayerInNeed >( player.getId() );
   queueOutPacket( inNeedsPacket );
 
 }
@@ -68,7 +68,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
   player.sendDebug( "Duty register request for contentid#{0}", contentId );
 
   // let's cancel it because otherwise you can't register it again
-  auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
+  auto cfCancelPacket = makeWorldPacket< FFXIVIpcCFNotify >( player.getId() );
   cfCancelPacket->data().state1 = 3;
   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
   queueOutPacket( cfCancelPacket );
@@ -93,7 +93,7 @@ void Sapphire::Network::GameConnection::cfRegisterRoulette( FrameworkPtr pFw,
                                                             const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-  auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
+  auto cfCancelPacket = makeWorldPacket< FFXIVIpcCFNotify >( player.getId() );
   cfCancelPacket->data().state1 = 3;
   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
   queueOutPacket( cfCancelPacket );

@@ -167,7 +167,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
-    auto housingObjectInit = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
+    auto housingObjectInit = makeWorldPacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
     memset( &housingObjectInit->data().landIdent, 0xFF, sizeof( Common::LandIdent ) );
     housingObjectInit->data().u1 = 0xFF;
     housingObjectInit->data().packetNum = yardPacketNum;
@@ -182,7 +182,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
     player.queuePacket( housingObjectInit );
   }
 
-  auto landSetMap = makeZonePacket< FFXIVIpcLandSetMap >( player.getId() );
+  auto landSetMap = makeWorldPacket< FFXIVIpcLandSetMap >( player.getId() );
   landSetMap->data().subdivision = isInSubdivision ? 1 : 2;
 
   uint8_t startIndex = isInSubdivision ? 30 : 0;
@@ -198,7 +198,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 {
-  auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
+  auto landsetInitializePacket = makeWorldPacket< FFXIVIpcLandSetInitialize >( player.getId() );
 
   landsetInitializePacket->data().landIdent.wardNum = m_wardNum;
   //landsetInitializePacket->data().landIdent.landSetId = m_landSetId;
@@ -247,7 +247,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
   {
     auto pPlayer = playerIt.second;
 
-    auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
+    auto landUpdatePacket = makeWorldPacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
     landUpdatePacket->data().landIdent.landId = landId;
 
     auto& landData = landUpdatePacket->data().land;
@@ -362,7 +362,7 @@ void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, In
   // spawn obj in zone
   for( const auto& player : m_playerMap )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
+    auto packet = makeWorldPacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
 
     packet->data().landId = landId;
     packet->data().objectArray = static_cast< uint8_t >( slotId );
@@ -390,7 +390,7 @@ void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, u
     if( player.second->getId() == sourcePlayer.getId() )
       continue;
 
-    auto packet = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
+    auto packet = makeWorldPacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
     packet->data().itemRotation = item.getRot();
     packet->data().pos = item.getPos();

@@ -39,7 +39,7 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( FrameworkPtr pFw,
   auto pExdData = pFw->get< Data::ExdDataGenerated >();
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerTalk >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcEventHandlerTalk >( inPacket );
 
   const auto actorId = packet.data().actorId;
   const auto eventId = packet.data().eventId;
@@ -81,7 +81,7 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( FrameworkPtr pFw,
   auto pExdData = pFw->get< Data::ExdDataGenerated >();
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerEmote >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcEventHandlerEmote >( inPacket );
 
   const auto actorId = packet.data().actorId;
   const auto eventId = packet.data().eventId;
@@ -117,7 +117,7 @@ void Sapphire::Network::GameConnection::eventHandlerWithinRange( FrameworkPtr pF
   auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerWithinRange >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcEventHandlerWithinRange >( inPacket );
 
   const auto eventId = packet.data().eventId;
   const auto param1 = packet.data().param1;
@@ -141,7 +141,7 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( FrameworkPtr p
   auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcEventHandlerOutsideRange >( inPacket );
   const auto eventId = packet.data().eventId;
   const auto param1 = packet.data().param1;
   const auto& pos = packet.data().position;
@@ -164,7 +164,7 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( FrameworkPtr
   auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEnterTerritoryHandler >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcEnterTerritoryHandler >( inPacket );
 
   const auto eventId = packet.data().eventId;
   const auto param1 = packet.data().param1;
@@ -201,7 +201,7 @@ void Sapphire::Network::GameConnection::eventHandlerReturn( FrameworkPtr pFw,
 {
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcEventHandlerReturn >( inPacket );
   const auto eventId = packet.data().eventId;
   const auto scene = packet.data().scene;
   const auto param1 = packet.data().param1;
@@ -246,9 +246,9 @@ void Sapphire::Network::GameConnection::eventHandlerLinkshell( FrameworkPtr pFw,
                                                                const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                Entity::Player& player )
 {
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcLinkshellEventHandler >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcLinkshellEventHandler >( inPacket );
 
-  auto linkshellEvent = makeZonePacket< Server::FFXIVIpcEventLinkshell >( player.getId() );
+  auto linkshellEvent = makeWorldPacket< Server::FFXIVIpcEventLinkshell >( player.getId() );
   linkshellEvent->data().eventId = packet.data().eventId;
   linkshellEvent->data().scene = static_cast< uint8_t >( packet.data().scene );
   linkshellEvent->data().param3 = 1;
@@ -263,7 +263,7 @@ void Sapphire::Network::GameConnection::eventHandlerShop( FrameworkPtr pFw,
 {
   auto pEventMgr = pFw->get< World::Manager::EventMgr >();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcShopEventHandler >( inPacket );
+  const auto packet = WorldChannelPacket< Client::FFXIVIpcShopEventHandler >( inPacket );
 
   auto pScriptMgr = pFw->get< Scripting::ScriptMgr >();
   auto pExdData = pFw->get< Data::ExdDataGenerated >();

@@ -16,11 +16,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Examine response packet.
   */
-  class ExaminePacket : public ZoneChannelPacket< FFXIVIpcExamine >
+  class ExaminePacket : public WorldChannelPacket< FFXIVIpcExamine >
   {
   public:
     ExaminePacket( Entity::Player& player, Entity::PlayerPtr pTarget ) :
-      ZoneChannelPacket< FFXIVIpcExamine >( pTarget->getId(), player.getId() )
+      WorldChannelPacket< FFXIVIpcExamine >( pTarget->getId(), player.getId() )
     {
       initialize( player, pTarget );
     };
