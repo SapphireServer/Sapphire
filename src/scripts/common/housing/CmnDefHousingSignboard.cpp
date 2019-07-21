@@ -1,6 +1,5 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
-#include <Territory/Zone.h>
 #include <Territory/HousingZone.h>
 #include <Manager/HousingMgr.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>

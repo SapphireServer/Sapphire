@@ -16,7 +16,7 @@
 #include "Event/EventDefs.h"
 
 #include "TerritoryMgr.h"
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
 #include "HousingMgr.h"

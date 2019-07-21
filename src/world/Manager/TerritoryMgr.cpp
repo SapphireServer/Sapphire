@@ -8,7 +8,7 @@
 
 #include "Actor/Player.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
@@ -181,7 +181,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 
     uint32_t guid = getNextInstanceId();
 
-    auto pZone = make_Zone( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
+    auto pZone = make_Territory( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
     pZone->init();
 
     std::string bgPath = territoryInfo->bg;
@@ -197,9 +197,9 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
                   hasNaviMesh ? "NAVI" : "",
                   pPlaceName->name );
 
-    InstanceIdToZonePtrMap instanceMap;
+    InstanceIdToTerritoryPtrMap instanceMap;
     instanceMap[ guid ] = pZone;
-    m_guIdToZonePtrMap[ guid ] = pZone;
+    m_guIdToTerritoryPtrMap[ guid ] = pZone;
     m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ] = instanceMap;
     m_zoneSet.insert( { pZone } );
 
@@ -243,11 +243,11 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
                                             pPlaceName->name, framework() );
       pHousingZone->init();
 
-      InstanceIdToZonePtrMap instanceMap;
+      InstanceIdToTerritoryPtrMap instanceMap;
       instanceMap[ guid ] = pHousingZone;
-      m_guIdToZonePtrMap[ guid ] = pHousingZone;
+      m_guIdToTerritoryPtrMap[ guid ] = pHousingZone;
       m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ][ guid ] = pHousingZone;
-      m_landSetIdToZonePtrMap[ pHousingZone->getLandSetId() ] = pHousingZone;
+      m_landSetIdToTerritoryPtrMap[ pHousingZone->getLandSetId() ] = pHousingZone;
       m_zoneSet.insert( { pHousingZone } );
     }
 
@@ -256,7 +256,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
 {
   if( !isValidTerritory( territoryTypeId ) )
     return nullptr;
@@ -274,17 +274,17 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createTerritoryInstanc
 
   Logger::debug( "Starting instance for territory: {0} ({1})", territoryTypeId, pPlaceName->name );
 
-  auto pZone = make_Zone( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, framework() );
+  auto pZone = make_Territory( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, framework() );
   pZone->init();
 
-  m_guIdToZonePtrMap[ pZone->getGuId() ] = pZone;
+  m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ][ pZone->getGuId() ] = pZone;
   m_zoneSet.insert( { pZone } );
 
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uint32_t questBattleId )
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uint32_t questBattleId )
 {
 
   auto it = m_questBattleToContentFinderMap.find( questBattleId );
@@ -321,13 +321,13 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle( uin
   pZone->init();
 
   m_questBattleIdToInstanceMap[ questBattleId ][ pZone->getGuId() ] = pZone;
-  m_guIdToZonePtrMap[ pZone->getGuId() ] = pZone;
+  m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
 
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
 {
 
   auto pExdData = framework()->get< Data::ExdDataGenerated >();
@@ -355,19 +355,19 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent(
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
-  m_guIdToZonePtrMap[ pZone->getGuId() ] = pZone;
+  m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
 
   return pZone;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInterior( const Common::LandIdent landIdent )
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInterior( const Common::LandIdent landIdent )
 {
   // check if zone already spawned first
   auto ident = *reinterpret_cast< const uint64_t* >( &landIdent );
 
-  auto it = m_landIdentToZonePtrMap.find( ident );
-  if( it != m_landIdentToZonePtrMap.end() )
+  auto it = m_landIdentToTerritoryPtrMap.find( ident );
+  if( it != m_landIdentToTerritoryPtrMap.end() )
   {
     return it->second;
   }
@@ -427,8 +427,8 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
 
   zone->init();
 
-  m_landIdentToZonePtrMap[ ident ] = zone;
-  m_guIdToZonePtrMap[ zone->getGuId() ] = zone;
+  m_landIdentToTerritoryPtrMap[ ident ] = zone;
+  m_guIdToTerritoryPtrMap[ zone->getGuId() ] = zone;
   m_zoneSet.insert( { zone } );
 
   return zone;
@@ -436,11 +436,11 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousingInt
 
 bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t guId )
 {
-  ZonePtr pZone;
+  TerritoryPtr pZone;
   if( ( pZone = getTerritoryByGuId( guId ) ) == nullptr )
     return false;
 
-  m_guIdToZonePtrMap.erase( pZone->getGuId() );
+  m_guIdToTerritoryPtrMap.erase( pZone->getGuId() );
 
   m_instanceZoneSet.erase( pZone );
   m_zoneSet.erase( pZone );
@@ -456,10 +456,10 @@ bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t g
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getTerritoryByGuId( uint32_t guId ) const
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getTerritoryByGuId( uint32_t guId ) const
 {
-  auto it = m_guIdToZonePtrMap.find( guId );
-  if( it == m_guIdToZonePtrMap.end() )
+  auto it = m_guIdToTerritoryPtrMap.find( guId );
+  if( it == m_guIdToTerritoryPtrMap.end() )
     return nullptr;
 
   return it->second;
@@ -495,7 +495,7 @@ Sapphire::ZonePositionPtr Sapphire::World::Manager::TerritoryMgr::getTerritoryPo
   return nullptr;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const
 {
   auto zoneMap = m_territoryTypeIdToInstanceGuidMap.find( territoryTypeId );
   if( zoneMap == m_territoryTypeIdToInstanceGuidMap.end() )
@@ -505,10 +505,10 @@ Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritoryType
   return zoneMap->second.begin()->second;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId ) const
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId ) const
 {
-  auto zoneMap = m_landSetIdToZonePtrMap.find( landSetId );
-  if( zoneMap == m_landSetIdToZonePtrMap.end() )
+  auto zoneMap = m_landSetIdToTerritoryPtrMap.find( landSetId );
+  if( zoneMap == m_landSetIdToTerritoryPtrMap.end() )
     return nullptr;
 
   return zoneMap->second;
@@ -527,7 +527,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
   }
 
   // remove internal house zones with nobody in them
-  for( auto it = m_landIdentToZonePtrMap.begin(); it != m_landIdentToZonePtrMap.end(); )
+  for( auto it = m_landIdentToTerritoryPtrMap.begin(); it != m_landIdentToTerritoryPtrMap.end(); )
   {
     auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( it->second );
     assert( zone ); // wtf??
@@ -541,7 +541,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
 
       // remove zone from maps
       m_zoneSet.erase( zone );
-      it = m_landIdentToZonePtrMap.erase( it );
+      it = m_landIdentToTerritoryPtrMap.erase( it );
     }
     else
       it++;
@@ -565,7 +565,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
 
         // remove zone from maps
         m_instanceZoneSet.erase( zone );
-        m_guIdToZonePtrMap.erase( zone->getGuId() );
+        m_guIdToTerritoryPtrMap.erase( zone->getGuId() );
         inIt = m_questBattleIdToInstanceMap[ zone->getQuestBattleId() ].erase( inIt );
       }
       else
@@ -598,11 +598,11 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( uint32_t territoryTypeI
   return movePlayer( pZone, pPlayer );
 }
 
-bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire::Entity::PlayerPtr pPlayer )
+bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sapphire::Entity::PlayerPtr pPlayer )
 {
   if( !pZone )
   {
-    Logger::error( "Zone not found on this server." );
+    Logger::error( "Territory not found on this server." );
     return false;
   }
 
@@ -642,7 +642,7 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( ZonePtr pZone, Sapphire
   return true;
 }
 
-Sapphire::ZonePtr Sapphire::World::Manager::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getLinkedInstance( uint32_t playerId ) const
 {
   auto it = m_playerIdToInstanceMap.find( playerId );
   if( it != m_playerIdToInstanceMap.end() )

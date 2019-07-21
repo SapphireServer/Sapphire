@@ -16,7 +16,7 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/Land.h"
@@ -437,7 +437,7 @@ bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
   return setInstance( instance );
 }
 
-bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
 {
   m_onEnterEventDone = false;
   if( !instance )
@@ -458,7 +458,7 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
   return pTeriMgr->movePlayer( instance, getAsPlayer() );
 }
 
-bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_POSITION3 pos )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos )
 {
   m_onEnterEventDone = false;
   if( !instance )

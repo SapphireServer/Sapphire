@@ -51,7 +51,7 @@ namespace Sapphire::Entity
   public:
     BNpc( FrameworkPtr pFw );
     BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-          uint8_t level, uint32_t maxHp, ZonePtr pZone,FrameworkPtr pFw );
+          uint8_t level, uint32_t maxHp, TerritoryPtr pZone,FrameworkPtr pFw );
 
     virtual ~BNpc() override;
 

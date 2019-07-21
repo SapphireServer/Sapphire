@@ -480,10 +480,10 @@ namespace Sapphire::Entity
     bool setInstance( uint32_t instanceContentId );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( ZonePtr instance );
+    bool setInstance( TerritoryPtr instance );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( Sapphire::ZonePtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
+    bool setInstance( Sapphire::TerritoryPtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
 
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();

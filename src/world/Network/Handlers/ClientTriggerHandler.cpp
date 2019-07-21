@@ -8,7 +8,7 @@
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Util/Util.h>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Manager/HousingMgr.h"
 

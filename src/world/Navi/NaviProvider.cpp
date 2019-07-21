@@ -1,6 +1,6 @@
 #include <Common.h>
 #include <Framework.h>
-#include <Territory/Zone.h>
+#include <Territory/Territory.h>
 #include <Logging/Logger.h>
 #include <ServerMgr.h>
 
