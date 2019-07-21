@@ -460,18 +460,21 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
-  statusEffectAdd->data().actor_id1 = pEffect->getSrcActorId();
   statusEffectAdd->data().current_hp = getHp();
   statusEffectAdd->data().current_mp = getMp();
   statusEffectAdd->data().current_tp = getTp();
-  statusEffectAdd->data().duration = static_cast< float >( pEffect->getDuration() ) / 1000;
-  statusEffectAdd->data().effect_id = pEffect->getId();
-  statusEffectAdd->data().effect_index = nextSlot;
   statusEffectAdd->data().max_hp = getMaxHp();
   statusEffectAdd->data().max_mp = getMaxMp();
   statusEffectAdd->data().max_something = 1;
   //statusEffectAdd->data().unknown2 = 28;
-  statusEffectAdd->data().param = pEffect->getParam();
+
+  auto& status = statusEffectAdd->data().statusEntries[0];
+
+  status.sourceActorId = pEffect->getSrcActorId();
+  status.duration = static_cast< float >( pEffect->getDuration() ) / 1000;
+  status.id = pEffect->getId();
+  status.index = nextSlot;
+  status.param = pEffect->getParam();
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
