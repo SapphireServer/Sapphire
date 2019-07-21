@@ -5,7 +5,7 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Territory/ZonePosition.h>
-#include <Territory/Zone.h>
+#include <Territory/Territory.h>
 
 #include <Manager/HousingMgr.h>
 
@@ -26,7 +26,7 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire:
   if( !terriMgr )
     return;
 
-  Sapphire::ZonePtr destinationZone;
+  Sapphire::TerritoryPtr destinationZone;
 
   auto terriPos = terriMgr->getTerritoryPosition( landId );
   if( terriPos )

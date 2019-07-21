@@ -14,7 +14,7 @@
 #include "Session.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
@@ -191,7 +191,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Weather:
     {
       targetPlayer->getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
-      player.sendNotice( "Weather in Zone \"{0}\" of {1} set in range.",
+      player.sendNotice( "Weather in Territory \"{0}\" of {1} set in range.",
                          targetPlayer->getCurrentZone()->getName(), targetPlayer->getName() );
       break;
     }
@@ -208,7 +208,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     {
       player.sendNotice( "Name: {0}"
                          "\nGil: {1}"
-                         "\nZone: {2}"
+                         "\nTerritory: {2}"
                          "({3})"
                          "\nClass: {4}"
                          "\nLevel: {5}"
@@ -659,7 +659,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       }
       if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
       {
-        // Checks if the target player is in an InstanceContent to avoid binding to a Zone or PublicContent
+        // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         if( targetPlayer->getCurrentInstance() )
         {
           auto pInstanceContent = targetPlayer->getCurrentInstance()->getAsInstanceContent();

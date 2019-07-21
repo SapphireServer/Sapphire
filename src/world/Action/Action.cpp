@@ -11,7 +11,7 @@
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include <Network/CommonActorControl.h>
 #include "Network/PacketWrappers/ActorControlPacket142.h"

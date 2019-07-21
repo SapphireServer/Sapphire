@@ -15,7 +15,7 @@
 
 #include "Network/GameConnection.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Land.h"
 #include "Territory/ZonePosition.h"

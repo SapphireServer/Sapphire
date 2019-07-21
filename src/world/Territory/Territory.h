@@ -29,7 +29,7 @@ namespace Sapphire
     struct TerritoryType;
   }
 
-  class Zone : public CellHandler< Cell >, public std::enable_shared_from_this< Zone >
+  class Territory : public CellHandler< Cell >, public std::enable_shared_from_this< Territory >
   {
   protected:
     uint32_t m_territoryTypeId;
@@ -66,12 +66,12 @@ namespace Sapphire
     std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
   public:
-    Zone();
+    Territory();
 
-    Zone( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
-          const std::string& placeName, FrameworkPtr pFw );
+    Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
+               const std::string& placeName, FrameworkPtr pFw );
 
-    virtual ~Zone();
+    virtual ~Territory();
 
     /*! overrides the zone's weather, set to 0 to unlock */
     void setWeatherOverride( Common::Weather weather );

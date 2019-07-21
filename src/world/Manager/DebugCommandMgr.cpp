@@ -27,7 +27,7 @@
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
@@ -1267,7 +1267,7 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
 //          player.sendLandFlags();
 //        }
 //        else
-//          player.sendDebug( "You aren't in a housing Zone." );
+//          player.sendDebug( "You aren't in a housing Territory." );
 //      }
 //    }
 //    else

@@ -8,7 +8,7 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 
 #include "Manager/DebugCommandMgr.h"

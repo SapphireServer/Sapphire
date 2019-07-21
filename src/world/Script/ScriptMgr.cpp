@@ -3,7 +3,7 @@
 
 #include <watchdog/Watchdog.h>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
 #include "Actor/Player.h"
@@ -412,7 +412,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, u
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
+bool Sapphire::Scripting::ScriptMgr::onZoneInit( TerritoryPtr pZone )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( pZone->getTerritoryTypeId() );
   if( script )

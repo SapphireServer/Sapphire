@@ -36,7 +36,7 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
                                                                                          const std::string& internalName,
                                                                                          const std::string& contentName,
                                                                                          FrameworkPtr pFw ) :
-  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
+  Territory( territoryTypeId, guId, internalName, contentName, pFw ),
   m_landIdent( ident )
 {
 }
@@ -54,7 +54,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 {
   auto pHousingMgr = m_pFw->get< HousingMgr >();
 
-  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                   getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto indoorInitPacket = makeZonePacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );

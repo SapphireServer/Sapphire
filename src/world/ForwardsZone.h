@@ -19,7 +19,7 @@ typedef std::vector< x > x ## PtrList;
 namespace Sapphire
 {
 TYPE_FORWARD( Cell );
-TYPE_FORWARD( Zone );
+TYPE_FORWARD( Territory );
 TYPE_FORWARD( HousingZone );
 TYPE_FORWARD( House );
 TYPE_FORWARD( InstanceContent );

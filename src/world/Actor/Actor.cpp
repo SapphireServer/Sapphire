@@ -6,7 +6,7 @@
 #include <Util/UtilMath.h>
 #include <utility>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include "Network/GameConnection.h"
 
@@ -330,14 +330,14 @@ std::set< Sapphire::Entity::ActorPtr > Sapphire::Entity::Actor::getInRangeActors
   return tempInRange;
 }
 
-/*! \return ZonePtr to the current zone, nullptr if not set */
-Sapphire::ZonePtr Sapphire::Entity::Actor::getCurrentZone() const
+/*! \return TerritoryPtr to the current zone, nullptr if not set */
+Sapphire::TerritoryPtr Sapphire::Entity::Actor::getCurrentZone() const
 {
   return m_pCurrentZone;
 }
 
-/*! \param ZonePtr to the zone to be set as current */
-void Sapphire::Entity::Actor::setCurrentZone( ZonePtr currZone )
+/*! \param TerritoryPtr to the zone to be set as current */
+void Sapphire::Entity::Actor::setCurrentZone( TerritoryPtr currZone )
 {
   m_pCurrentZone = currZone;
 }
