@@ -146,7 +146,7 @@ std::string PlayerMinimal::getInfoJson()
 
   // unknowns
   c.push_back( "0" );
-  c.push_back( "0" );
+  c.push_back( "" );
   c.push_back( "0" );
   c.push_back( "0" );
 
