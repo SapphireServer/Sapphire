@@ -84,6 +84,7 @@ std::string PlayerMinimal::getInfoJson()
   auto payload = nlohmann::json();
   auto& c = payload["content"];
 
+  // DisplayName
   c.push_back( getName() );
 
   // class levels
@@ -94,26 +95,33 @@ std::string PlayerMinimal::getInfoJson()
     levelsArray.push_back( std::to_string( m_classMap[ i ] ) );
   }
 
+  // ClassLv
   c.push_back( levelsArray );
 
-  // unknowns
+  // Race
   c.push_back( "0" );
+  // Tribe
   c.push_back( "0" );
+  // Sex
   c.push_back( "0" );
 
-  //
+  // BirthMonth
   c.push_back( std::to_string( getBirthMonth() ) );
+  // Birthday
   c.push_back( std::to_string( getBirthDay() ) );
+  // GuardianDeity
   c.push_back( std::to_string( getGuardianDeity() ) );
 
+  // Class
   c.push_back( std::to_string( m_class ) );
 
-  // unknown
+  // ZoneId
   c.push_back( "0" );
 
+  // TerritoryType
   c.push_back( std::to_string( getZoneId() ) );
 
-  // unknown
+  // ContentFinderCondition
   c.push_back( "0" );
 
   // look map
@@ -122,10 +130,12 @@ std::string PlayerMinimal::getInfoJson()
   {
     lookArray.push_back( std::to_string( it.second ) );
   }
+  // Customize
   c.push_back( lookArray );
 
-  // weapons
+  // ModelMainWeapon
   c.push_back( std::to_string( m_modelMainWeapon ) );
+  // ModelSubWeapon
   c.push_back( std::to_string( m_modelSubWeapon ) );
 
   // model
@@ -134,20 +144,29 @@ std::string PlayerMinimal::getInfoJson()
   {
     modelArray.push_back( std::to_string( i ) );
   }
+  // ModelEquip
   c.push_back( modelArray );
 
-  // unknowns
+  // MainWeapon
   c.push_back( "1" );
+  // SubWeapon
   c.push_back( "0" );
-  c.push_back( "0" );
+  // JobStone
   c.push_back( "0" );
 
+  // RemakeFlag
+  c.push_back( "0" );
+
+  // ConfigFlags
   c.push_back( std::to_string( m_equipDisplayFlags ) );
 
-  // unknowns
+  // Voice
   c.push_back( "0" );
+  // WorldName
   c.push_back( "" );
+  // LoginStatus
   c.push_back( "0" );
+  // IsOutTerritory
   c.push_back( "0" );
 
 
