@@ -349,14 +349,19 @@ namespace Sapphire::Network::Packets::Server
     uint32_t max_hp;
     uint16_t max_mp;
     uint16_t max_something;
-    uint8_t effect_index; // which position do i display this
-    uint8_t unknown3;
-    uint16_t effect_id;
-    uint16_t param;
-    uint16_t unknown5;    // Sort this out (old right half of power/param property)
-    float duration;
-    uint32_t actor_id1;
-    uint8_t unknown4[52];
+
+    struct StatusEntry
+    {
+      uint8_t index; // which position do i display this
+      uint8_t unknown3;
+      uint16_t id;
+      uint16_t param;
+      uint16_t unknown5;    // Sort this out (old right half of power/param property)
+      float duration;
+      uint32_t sourceActorId;
+    } statusEntries[4];
+
+    uint32_t unknown4;
   };
 
   /**
