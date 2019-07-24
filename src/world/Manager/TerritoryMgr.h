@@ -205,7 +205,7 @@ namespace Sapphire::World::Manager
     uint32_t m_lastInstanceId;
 
     /*! set of TerritoryPtrs for quick iteration*/
-    std::set< TerritoryPtr > m_zoneSet;
+    std::set< TerritoryPtr > m_territorySet;
 
     /*! set of TerritoryPtrs for quick iteration*/
     std::set< TerritoryPtr > m_instanceZoneSet;

@@ -201,7 +201,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
     instanceMap[ guid ] = pZone;
     m_guIdToTerritoryPtrMap[ guid ] = pZone;
     m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ] = instanceMap;
-    m_zoneSet.insert( { pZone } );
+    m_territorySet.insert( { pZone } );
 
   }
 
@@ -248,7 +248,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
       m_guIdToTerritoryPtrMap[ guid ] = pHousingZone;
       m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ][ guid ] = pHousingZone;
       m_landSetIdToTerritoryPtrMap[ pHousingZone->getLandSetId() ] = pHousingZone;
-      m_zoneSet.insert( { pHousingZone } );
+      m_territorySet.insert( { pHousingZone } );
     }
 
   }
@@ -279,7 +279,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createTerritoryIn
 
   m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ][ pZone->getGuId() ] = pZone;
-  m_zoneSet.insert( { pZone } );
+  m_territorySet.insert( { pZone } );
 
   return pZone;
 }
@@ -429,7 +429,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousi
 
   m_landIdentToTerritoryPtrMap[ ident ] = zone;
   m_guIdToTerritoryPtrMap[ zone->getGuId() ] = zone;
-  m_zoneSet.insert( { zone } );
+  m_territorySet.insert( { zone } );
 
   return zone;
 }
@@ -443,7 +443,7 @@ bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t g
   m_guIdToTerritoryPtrMap.erase( pZone->getGuId() );
 
   m_instanceZoneSet.erase( pZone );
-  m_zoneSet.erase( pZone );
+  m_territorySet.erase( pZone );
 
   if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
   {
@@ -516,7 +516,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByLandSetI
 
 void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
 {
-  for( auto& zone : m_zoneSet )
+  for( auto& zone : m_territorySet )
   {
     zone->update( tickCount );
   }
@@ -540,7 +540,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
       Logger::info( "Removing HousingInteriorTerritory#{0} - has been inactive for 60 seconds", zone->getGuId() );
 
       // remove zone from maps
-      m_zoneSet.erase( zone );
+      m_territorySet.erase( zone );
       it = m_landIdentToTerritoryPtrMap.erase( it );
     }
     else
@@ -661,7 +661,7 @@ void Sapphire::World::Manager::TerritoryMgr::setCurrentFestival( uint16_t festiv
 {
   m_currentFestival = { festivalId, additionalFestival };
 
-  for( const auto& zone : m_zoneSet )
+  for( const auto& zone : m_territorySet )
   {
     zone->setCurrentFestival( festivalId, additionalFestival );
   }
