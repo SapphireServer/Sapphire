@@ -982,6 +982,7 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket< PlayerStats >
   {
+    // order comes from baseparam order column
     uint32_t strength;
     uint32_t dexterity;
     uint32_t vitality;
@@ -991,45 +992,30 @@ namespace Sapphire::Network::Packets::Server
     uint32_t hp;
     uint32_t mp;
     uint32_t tp;
-    uint32_t gp; // Set to 10000 as non-gatherer for some reason
+    uint32_t gp;
     uint32_t cp;
-    uint32_t unknown_2;
+    uint32_t delay;
     uint32_t tenacity;
-    uint32_t attack;
+    uint32_t attackPower;
     uint32_t defense;
-    uint32_t accuracy;
-    uint32_t spellSpeed;
+    uint32_t directHitRate;
+    uint32_t evasion;
     uint32_t magicDefense;
-    uint32_t criticalHitRate;
-    uint32_t resistanceSlashing;
-    uint32_t resistancePiercing;
-    uint32_t resistanceBlunt;
+    uint32_t criticalHit;
     uint32_t attackMagicPotency;
     uint32_t healingMagicPotency;
-    uint32_t fire;
-    uint32_t ice;
-    uint32_t wind;
-    uint32_t earth;
-    uint32_t lightning;
-    uint32_t water;
+    uint32_t elementalBonus;
     uint32_t determination;
     uint32_t skillSpeed;
-    uint32_t spellSpeed1;
-    uint32_t spellSpeedMod;
-    uint32_t unknown_6;
+    uint32_t spellSpeed;
+    uint32_t haste;
     uint32_t craftsmanship;
     uint32_t control;
     uint32_t gathering;
     uint32_t perception;
-    uint32_t resistanceSlow;
-    uint32_t resistanceSilence;
-    uint32_t resistanceBlind;
-    uint32_t resistancePoison;
-    uint32_t resistanceStun;
-    uint32_t resistanceSleep;
-    uint32_t resistanceBind;
-    uint32_t resistanceHeavy;
-    uint32_t unknown_7[9]; // possibly level sync stats.
+
+    // todo: what is here?
+    uint32_t unknown[26];
   };
 
   /**
