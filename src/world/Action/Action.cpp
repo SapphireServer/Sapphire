@@ -371,14 +371,15 @@ void Action::Action::buildEffects()
   // no script exists but we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
-    player->sendDebug( "Hit target: pot: {} (f: {}, r: {}), heal pot: {}",
-                       lutEntry.potency, lutEntry.flankPotency, lutEntry.rearPotency, lutEntry.curePotency );
+    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}",
+                       lutEntry.potency, lutEntry.comboPotency, lutEntry.flankPotency, lutEntry.rearPotency,
+                       lutEntry.curePotency );
   }
 
   for( auto& actor : m_hitActors )
   {
     // todo: this is shit
-    if( actor->getObjKind() == m_pSource->getObjKind() && lutEntry.curePotency > 0 )
+    if( lutEntry.curePotency > 0 )
       m_effectBuilder->healTarget( actor, lutEntry.curePotency );
 
     else if( lutEntry.potency > 0 )
