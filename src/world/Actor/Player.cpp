@@ -311,8 +311,8 @@ bool Sapphire::Entity::Player::isAutoattackOn() const
 
 void Sapphire::Entity::Player::sendStats()
 {
-
   auto statPacket = makeWorldPacket< FFXIVIpcPlayerStats >( getId() );
+
   statPacket->data().strength = getStatValue( Common::BaseParam::Strength );
   statPacket->data().dexterity = getStatValue( Common::BaseParam::Dexterity );
   statPacket->data().vitality = getStatValue( Common::BaseParam::Vitality );
@@ -322,16 +322,14 @@ void Sapphire::Entity::Player::sendStats()
   statPacket->data().determination = getStatValue( Common::BaseParam::Determination );
   statPacket->data().hp = getStatValue( Common::BaseParam::HP );
   statPacket->data().mp = getStatValue( Common::BaseParam::MP );
-  statPacket->data().accuracy = m_baseStats.accuracy;
-  statPacket->data().attack = getStatValue( Common::BaseParam::AttackPower );
+  statPacket->data().directHitRate = getStatValue( Common::BaseParam::DirectHitRate );
+  statPacket->data().attackPower = getStatValue( Common::BaseParam::AttackPower );
   statPacket->data().attackMagicPotency = getStatValue( Common::BaseParam::AttackMagicPotency );
   statPacket->data().healingMagicPotency = getStatValue( Common::BaseParam::HealingMagicPotency );
   statPacket->data().skillSpeed = getStatValue( Common::BaseParam::SkillSpeed );
   statPacket->data().spellSpeed = getStatValue( Common::BaseParam::SpellSpeed );
-  statPacket->data().spellSpeed1 = getStatValue( Common::BaseParam::SpellSpeed );
-  statPacket->data().spellSpeedMod = 100;
-
-  statPacket->data().criticalHitRate = getStatValue( Common::BaseParam::CriticalHit );
+  statPacket->data().haste = 100;
+  statPacket->data().criticalHit = getStatValue( Common::BaseParam::CriticalHit );
   statPacket->data().defense = getStatValue( Common::BaseParam::Defense );
   statPacket->data().magicDefense = getStatValue( Common::BaseParam::MagicDefense );
   statPacket->data().tenacity = getStatValue( Common::BaseParam::Tenacity );

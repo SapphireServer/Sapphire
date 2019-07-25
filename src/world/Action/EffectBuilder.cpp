@@ -65,13 +65,15 @@ void EffectBuilder::damageTarget( Entity::CharaPtr& target, uint32_t amount, Com
 
 void EffectBuilder::buildAndSendPackets()
 {
-  Logger::info( "EffectBuilder result: " );
-  Logger::info( "Targets afflicted: {}", m_resolvedEffects.size() );
+  Logger::debug( "EffectBuilder result: " );
+  Logger::debug( "Targets afflicted: {}", m_resolvedEffects.size() );
 
   // test shit
   for( auto& effect : m_resolvedEffects )
   {
     auto& result = effect.second;
+
+    Logger::debug( " - id: {}", result->getTarget()->getId() );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), result->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
