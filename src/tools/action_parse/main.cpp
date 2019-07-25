@@ -74,7 +74,7 @@ int main()
 
   Logger::init( "action_parse" );
 
-  if( !fs::exists( "ActionLut.cpp.tmpl" ) )
+  if( !fs::exists( "ActionLutData.cpp.tmpl" ) )
     throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
 
   Logger::info( "Setting up EXD data" );
