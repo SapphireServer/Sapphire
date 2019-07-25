@@ -85,6 +85,8 @@ namespace Sapphire::World::Action
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
 
+    void buildEffects();
+
     /*!
      * @brief Adds an actor filter to this action.
      * @param filter The ptr to the ActorFilter to add
@@ -170,6 +172,8 @@ namespace Sapphire::World::Action
     Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
+
+    EffectBuilderPtr m_effectBuilder;
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;

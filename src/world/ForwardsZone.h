@@ -87,6 +87,8 @@ namespace World::Action
 TYPE_FORWARD( Action );
 TYPE_FORWARD( EventAction );
 TYPE_FORWARD( ItemAction );
+TYPE_FORWARD( EffectBuilder );
+TYPE_FORWARD( EffectResult );
 
 using ActionCallback = std::function< void( Entity::Player&, uint32_t, uint64_t ) >;
 }

@@ -1,5 +1,6 @@
 #include "Action.h"
 #include "ActionLut.h"
+#include "EffectBuilder.h"
 
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
@@ -17,8 +18,9 @@
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
-#include <Network/PacketWrappers/EffectPacket.h>
+
 #include <Logging/Logger.h>
+
 #include <Util/ActorFilter.h>
 
 using namespace Sapphire;
@@ -67,6 +69,8 @@ bool Action::Action::init()
 
     m_actionData = actionData;
   }
+
+  m_effectBuilder = make_EffectBuilder( m_pSource, getId() );
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
@@ -326,30 +330,13 @@ void Action::Action::execute()
     player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
-  if( !hasClientsideTarget() )
+  if( !hasClientsideTarget()  )
   {
-    snapshotAffectedActors( m_hitActors );
-
-    if( !m_hitActors.empty() )
-    {
-      // only call script if actors are hit
-      if( !pScriptMgr->onExecute( *this ) && ActionLut::validEntryExists( getId() ) )
-      {
-        auto lutEntry = ActionLut::getEntry( getId() );
-
-        // no script exists but we have a valid lut entry
-        if( auto player = getSourceChara()->getAsPlayer() )
-        {
-          player->sendDebug( "Hit target: pot: {} (f: {}, r: {}), heal pot: {}",
-                             lutEntry.potency, lutEntry.flankPotency, lutEntry.rearPotency, lutEntry.curePotency );
-        }
-      }
-    }
+    buildEffects();
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
     pScriptMgr->onEObjHit( *player, m_targetId, getId() );
-    return;
   }
 
   // set currently casted action as the combo action if it interrupts a combo
@@ -358,6 +345,50 @@ void Action::Action::execute()
   {
     m_pSource->setLastComboActionId( getId() );
   }
+}
+
+void Action::Action::buildEffects()
+{
+  snapshotAffectedActors( m_hitActors );
+
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+
+  if( !pScriptMgr->onExecute( *this ) && !ActionLut::validEntryExists( getId() ) )
+  {
+    if( auto player = m_pSource->getAsPlayer() )
+    {
+      player->sendUrgent( "missing lut entry for action#{}", getId() );
+    }
+
+    return;
+  }
+
+  if( m_hitActors.empty() )
+    return;
+
+  auto lutEntry = ActionLut::getEntry( getId() );
+
+  // no script exists but we have a valid lut entry
+  if( auto player = getSourceChara()->getAsPlayer() )
+  {
+    player->sendDebug( "Hit target: pot: {} (f: {}, r: {}), heal pot: {}",
+                       lutEntry.potency, lutEntry.flankPotency, lutEntry.rearPotency, lutEntry.curePotency );
+  }
+
+  for( auto& actor : m_hitActors )
+  {
+    // todo: this is shit
+    if( actor->getObjKind() == m_pSource->getObjKind() && lutEntry.curePotency > 0 )
+      m_effectBuilder->healTarget( actor, lutEntry.curePotency );
+
+    else if( lutEntry.potency > 0 )
+      m_effectBuilder->damageTarget( actor, lutEntry.potency );
+  }
+
+  m_effectBuilder->buildAndSendPackets();
+
+  // at this point we're done with it and no longer need it
+  m_effectBuilder.reset();
 }
 
 bool Action::Action::preCheck()
