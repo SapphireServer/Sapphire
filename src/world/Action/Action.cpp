@@ -22,6 +22,7 @@
 #include <Logging/Logger.h>
 
 #include <Util/ActorFilter.h>
+#include <Util/UtilMath.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -223,13 +224,20 @@ void Action::Action::start()
   if( hasCastTime() )
   {
     auto castPacket = makeWorldPacket< Server::FFXIVIpcActorCast >( getId() );
+    auto& data = castPacket->data();
 
-    castPacket->data().action_id = static_cast< uint16_t >( m_id );
-    castPacket->data().skillType = Common::SkillType::Normal;
-    castPacket->data().unknown_1 = m_id;
+    data.action_id = static_cast< uint16_t >( m_id );
+    data.skillType = Common::SkillType::Normal;
+    data.unknown_1 = m_id;
     // This is used for the cast bar above the target bar of the caster.
-    castPacket->data().cast_time = m_castTimeMs / 1000.f;
-    castPacket->data().target_id = static_cast< uint32_t >( m_targetId );
+    data.cast_time = m_castTimeMs / 1000.f;
+    data.target_id = static_cast< uint32_t >( m_targetId );
+
+    auto pos = m_pSource->getPos();
+    data.posX = Common::Util::floatToUInt16( pos.x );
+    data.posY = Common::Util::floatToUInt16( pos.y );
+    data.posZ = Common::Util::floatToUInt16( pos.z );
+    data.rotation = m_pSource->getRot();
 
     m_pSource->sendToInRangeSet( castPacket, true );
 

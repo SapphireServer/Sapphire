@@ -136,7 +136,9 @@ namespace Sapphire::Network::Packets
 
     ActorSetPos = 0x0184, // updated 5.0
 
-    ActorCast = 0x0187, // updated 5.0
+    ActorCast = 0x0186, // updated 5.0
+
+    SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
 
     PartyList = 0x0188, // updated 5.0
     HateRank = 0x0189, // updated 5.0
