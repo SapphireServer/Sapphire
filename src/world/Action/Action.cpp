@@ -2,6 +2,8 @@
 #include "ActionLut.h"
 #include "EffectBuilder.h"
 
+#include <Inventory/Item.h>
+
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
 #include "Framework.h"
@@ -357,6 +359,32 @@ void Action::Action::execute()
   }
 }
 
+std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
+{
+  // todo: what do for npcs?
+  auto wepDmg = 1.f;
+
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  auto dmg = Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+
+  return std::make_pair( dmg, Common::ActionHitSeverityType::NormalDamage );
+}
+
 void Action::Action::buildEffects()
 {
   snapshotAffectedActors( m_hitActors );
@@ -390,10 +418,16 @@ void Action::Action::buildEffects()
   {
     // todo: this is shit
     if( lutEntry.curePotency > 0 )
+    {
+
       m_effectBuilder->healTarget( actor, lutEntry.curePotency );
+    }
 
     else if( lutEntry.potency > 0 )
-      m_effectBuilder->damageTarget( actor, lutEntry.potency );
+    {
+      auto dmg = calcDamage( lutEntry.potency );
+      m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
+    }
   }
 
   m_effectBuilder->buildAndSendPackets();

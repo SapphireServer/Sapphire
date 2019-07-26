@@ -123,6 +123,67 @@ void Sapphire::Entity::Chara::setClass( Common::ClassJob classJob )
   m_class = classJob;
 }
 
+Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
+{
+  switch( getClass() )
+  {
+    case ClassJob::Gladiator:
+    case ClassJob::Marauder:
+    case ClassJob::Paladin:
+    case ClassJob::Warrior:
+    case ClassJob::Darkknight:
+    case ClassJob::Gunbreaker:
+      return Role::Tank;
+
+    case ClassJob::Pugilist:
+    case ClassJob::Lancer:
+    case ClassJob::Monk:
+    case ClassJob::Dragoon:
+    case ClassJob::Rogue:
+    case ClassJob::Ninja:
+    case ClassJob::Samurai:
+      return Role::Melee;
+
+    case ClassJob::Archer:
+    case ClassJob::Bard:
+    case ClassJob::Machinist:
+    case ClassJob::Dancer:
+      return Role::RangedPhysical;
+
+    case ClassJob::Conjurer:
+    case ClassJob::Whitemage:
+    case ClassJob::Scholar:
+    case ClassJob::Astrologian:
+      return Role::Healer;
+
+    case ClassJob::Thaumaturge:
+    case ClassJob::Blackmage:
+    case ClassJob::Arcanist:
+    case ClassJob::Summoner:
+    case ClassJob::Redmage:
+    case ClassJob::Bluemage:
+      return Role::RangedMagical;
+
+    case ClassJob::Carpenter:
+    case ClassJob::Blacksmith:
+    case ClassJob::Armorer:
+    case ClassJob::Goldsmith:
+    case ClassJob::Leatherworker:
+    case ClassJob::Weaver:
+    case ClassJob::Alchemist:
+    case ClassJob::Culinarian:
+      return Role::Crafter;
+
+    case ClassJob::Miner:
+    case ClassJob::Botanist:
+    case ClassJob::Fisher:
+      return Role::Gatherer;
+
+    default:
+      return Role::None;
+  }
+}
+
 /*! \param Id of the target to set */
 void Sapphire::Entity::Chara::setTargetId( uint64_t targetId )
 {

@@ -25,6 +25,11 @@ uint32_t EffectResult::getValue() const
   return m_value;
 }
 
+void EffectResult::setParam( uint8_t param )
+{
+  m_param = param;
+}
+
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity )
 {
   m_severity = severity;
@@ -49,7 +54,7 @@ Common::EffectEntry EffectResult::buildEffectEntry() const
   entry.value = getValue();
   entry.hitSeverity = m_severity;
   entry.effectType = m_type;
-
+  entry.param = m_param;
 
   return entry;
 }
