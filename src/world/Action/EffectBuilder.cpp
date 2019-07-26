@@ -1,7 +1,7 @@
 #include "EffectBuilder.h"
 #include "EffectResult.h"
 
-#include <Actor/Chara.h>
+#include <Actor/Player.h>
 
 #include <Network/PacketWrappers/EffectPacket.h>
 
@@ -16,9 +16,10 @@ using namespace Sapphire;
 using namespace Sapphire::World::Action;
 using namespace Sapphire::Network::Packets;
 
-EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId ) :
+EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence ) :
   m_sourceChara( std::move( source ) ),
-  m_actionId( actionId )
+  m_actionId( actionId ),
+  m_sequence( sequence )
 {
 
 }
@@ -77,13 +78,25 @@ void EffectBuilder::buildAndSendPackets()
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), result->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
+    effectPacket->setSequence( m_sequence );
 
     effectPacket->addEffect( result->buildEffectEntry() );
 
-    auto sequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
-    effectPacket->setSequence( sequence );
+    m_sourceChara->sendToInRangeSet( effectPacket, false );
 
-    m_sourceChara->sendToInRangeSet( effectPacket, true );
+    // send a dupe packet to the caster with hiddenAnimation field set
+    if( auto player = m_sourceChara->getAsPlayer() )
+    {
+      auto effectPacket2 = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), result->getTarget()->getId(), m_actionId );
+      effectPacket2->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
+      effectPacket2->setSequence( m_sequence );
+
+      effectPacket2->data().hiddenAnimation = m_sequence;
+
+      effectPacket2->addEffect( result->buildEffectEntry() );
+
+      player->queuePacket( effectPacket2 );
+    }
   }
 
 }

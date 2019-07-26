@@ -17,7 +17,7 @@ namespace Sapphire::World::Action
       CriticalDirectHit
     };
 
-    EffectBuilder( Entity::CharaPtr source, uint32_t actionId );
+    EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence );
 
 
     void healTarget( Entity::CharaPtr& target, uint32_t amount,
@@ -34,11 +34,11 @@ namespace Sapphire::World::Action
 
     uint32_t getResultDelayMs();
 
+  private:
+    uint32_t m_actionId;
+    uint16_t m_sequence;
 
     Entity::CharaPtr m_sourceChara;
-
-    uint32_t m_actionId;
-
     std::unordered_map< uint32_t, EffectResultPtr > m_resolvedEffects;
   };
 

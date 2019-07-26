@@ -35,19 +35,21 @@ using namespace Sapphire::World;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
-  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw ) :
+  Action( std::move( caster ), actionId, sequence, nullptr, std::move( fw ) )
 {
 }
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw ) :
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
+                        Data::ActionPtr actionData, FrameworkPtr fw ) :
   m_pSource( std::move( caster ) ),
   m_pFw( std::move( fw ) ),
   m_actionData( std::move( actionData ) ),
   m_id( actionId ),
   m_targetId( 0 ),
   m_startTime( 0 ),
-  m_interruptType( Common::ActionInterruptType::None )
+  m_interruptType( Common::ActionInterruptType::None ),
+  m_sequence( sequence )
 {
 }
 
@@ -70,7 +72,7 @@ bool Action::Action::init()
     m_actionData = actionData;
   }
 
-  m_effectBuilder = make_EffectBuilder( m_pSource, getId() );
+  m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_sequence );
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
