@@ -20,8 +20,8 @@ namespace Sapphire::World::Action
   public:
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw );
-    Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData, FrameworkPtr fw );
 
     virtual ~Action();
 
@@ -140,6 +140,8 @@ namespace Sapphire::World::Action
     bool preFilterActor( Entity::Actor& actor ) const;
 
     uint32_t m_id;
+
+    uint16_t m_sequence;
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost;
