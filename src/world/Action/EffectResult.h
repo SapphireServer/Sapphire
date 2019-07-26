@@ -22,6 +22,8 @@ namespace Sapphire::World::Action
 
     uint32_t getValue() const;
 
+    void setParam( uint8_t param );
+
     Common::EffectEntry buildEffectEntry() const;
 
   private:
@@ -33,6 +35,7 @@ namespace Sapphire::World::Action
     Common::ActionEffectType m_type;
 
     uint32_t m_value;
+    uint8_t m_param;
   };
 }
 

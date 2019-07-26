@@ -219,16 +219,9 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
 {
   uint32_t aaPotency = AUTO_ATTACK_POTENCY;
 
-  // check if ranged class
-  switch( chara.getClass() )
+  if( chara.getRole() == Common::Role::RangedPhysical )
   {
-    case Common::ClassJob::Machinist:
-    case Common::ClassJob::Bard:
-    case Common::ClassJob::Archer:
-      aaPotency = RANGED_AUTO_ATTACK_POTENCY;
-
-    default:
-      break;
+    aaPotency = RANGED_AUTO_ATTACK_POTENCY;
   }
 
   float autoAttackDelay = 2.5f;
@@ -442,7 +435,7 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+float CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
@@ -451,12 +444,25 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
   auto aa = autoAttack( chara );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
-  auto ten = tenacity( chara );
 
-  Logger::debug( "auto attack: pot: {} aa: {} ap: {} det: {} ten: {}", pot, aa, ap, det, ten );
+  auto ten = 1.f;
+  if( chara.getRole() == Common::Role::Tank )
+    ten = tenacity( chara );
 
+  // todo: everything after tenacity
   auto factor = std::floor( pot * aa * ap * det * ten );
 
+  constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, aa, ap, det, ten, factor );
+  }
+  else
+  {
+    Logger::debug( format, pot, aa, ap, det, ten, factor );
+  }
+  
   // todo: traits
 
   factor = std::floor( factor * speed( chara ) );
@@ -468,6 +474,38 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
   // todo: random 0.95 - 1.05 factor
 
   // todo: buffs
+
+  return factor;
+}
+
+float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
+  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
+
+  auto pot = potency( ptc );
+  auto wd = weaponDamage( chara, wepDmg );
+  auto ap = getPrimaryAttackPower( chara );
+  auto det = determination( chara );
+
+  auto ten = 1.f;
+  if( chara.getRole() == Common::Role::Tank )
+    ten = tenacity( chara );
+
+  auto factor = std::floor( pot * wd * ap * det * ten );
+
+  constexpr auto format = "dmg: pot: {} wd: {} ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, wd, ap, det, ten, factor );
+  }
+  else
+  {
+    Logger::debug( format, pot, wd, ap, det, ten, factor );
+  }
+
+  // todo: the rest
 
   return factor;
 }

@@ -128,7 +128,9 @@ namespace Sapphire::Math
 
     ////////////////////////////////////////////
 
-    static float calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+    static float calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+
+    static float calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
   private:

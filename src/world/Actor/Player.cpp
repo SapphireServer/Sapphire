@@ -1565,7 +1565,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
   auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
 
-  auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
+  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {

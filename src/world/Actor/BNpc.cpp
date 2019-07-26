@@ -692,7 +692,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-    auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
+    auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
