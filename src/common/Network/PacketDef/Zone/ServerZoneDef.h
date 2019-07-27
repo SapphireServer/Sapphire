@@ -120,6 +120,10 @@ namespace Sapphire::Network::Packets::Server
     PlayerEntry entries[10];
   };
 
+  struct FFXIVIpcExamineSearchInfo : FFXIVIpcBasePacket< ExamineSearchInfo >
+  {
+    
+  };
 
   struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< UpdateSearchInfo >
   {
