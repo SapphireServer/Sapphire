@@ -959,8 +959,8 @@ namespace Sapphire::Network::Packets::Server
     uint32_t hp;
     uint32_t mp;
     uint32_t tp;
-    uint32_t unknown;
-    uint32_t unknown_1;
+    uint32_t gp; // Set to 10000 as non-gatherer for some reason
+    uint32_t cp;
     uint32_t unknown_2;
     uint32_t tenacity;
     uint32_t attack;
