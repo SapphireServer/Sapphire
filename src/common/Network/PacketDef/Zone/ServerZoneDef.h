@@ -122,7 +122,95 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFXIVIpcExamineSearchInfo : FFXIVIpcBasePacket< ExamineSearchInfo >
   {
-    
+    uint32_t unknown;
+    uint16_t unknown1;
+    uint16_t unknown2;
+    char padding[16];
+    uint32_t unknown3;
+    uint16_t unknown4;
+    uint16_t unknown5;
+    uint16_t unknown6;
+    uint8_t worldId;
+    char searchMessage[193];
+    char fcName[24];
+    uint8_t unknown7;
+    uint16_t padding1;
+    uint16_t gldId; // 1
+    uint16_t gldLevel;
+    uint16_t pglId; // 2
+    uint16_t pglLevel;
+    uint16_t mrdId; // 3
+    uint16_t mrdLevel;
+    uint16_t lncId; // 4
+    uint16_t lncLevel;
+    uint16_t arcId; // 5
+    uint16_t arcLevel;
+    uint16_t cnjId; // 6
+    uint16_t cnjLevel;
+    uint16_t thmId; // 7
+    uint16_t thmLevel;
+    uint16_t crpId; // 8
+    uint16_t crpLevel;
+    uint16_t bsmId; // 9
+    uint16_t bsmLevel;
+    uint16_t armId; // 10
+    uint16_t armLevel;
+    uint16_t gsmId; // 11
+    uint16_t gsmLevel;
+    uint16_t ltwId; // 12
+    uint16_t ltwLevel;
+    uint16_t wvrId; // 13
+    uint16_t wvrLevel;
+    uint16_t alcId; // 14
+    uint16_t alcLevel;
+    uint16_t culId; // 15
+    uint16_t culLevel;
+    uint16_t minId; // 16
+    uint16_t minLevel;
+    uint16_t btnId; // 17
+    uint16_t btnLevel;
+    uint16_t fshId; // 18
+    uint16_t fshLevel;
+    uint16_t culId; // 19
+    uint16_t culLevel;
+    uint16_t mnkId; // 20
+    uint16_t mnkLevel;
+    uint16_t warId; // 21
+    uint16_t warLevel;
+    uint16_t drgId; // 22
+    uint16_t drgLevel;
+    uint16_t brdId; // 23
+    uint16_t brdLevel;
+    uint16_t pldId; // 24
+    uint16_t pldLevel;
+    uint16_t blmId; // 25
+    uint16_t blmLevel;
+    uint16_t acnId; // 26
+    uint16_t acnLevel;
+    uint16_t schId; // 27
+    uint16_t schLevel;
+    uint16_t smnId; // 28
+    uint16_t smnLevel;
+    uint16_t rogId; // 29
+    uint16_t rogLevel;
+    uint16_t ninId; // 30
+    uint16_t ninLevel;
+    uint16_t mchId; // 31
+    uint16_t mchLevel;
+    uint16_t drkId; // 32
+    uint16_t drkLevel;
+    uint16_t astId; // 33
+    uint16_t astLevel;
+    uint16_t samId; // 34
+    uint16_t samLevel;
+    uint16_t rdmId; // 35
+    uint16_t rdmLevel;
+    uint16_t bluId; // 36
+    uint16_t bluLevel;
+    uint16_t gnbId; // 37
+    uint16_t gnbLevel;
+    uint16_t dncId; // 38
+    uint16_t dncLevel;
   };
 
   struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< UpdateSearchInfo >
