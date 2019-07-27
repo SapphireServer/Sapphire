@@ -9,14 +9,6 @@ namespace Sapphire::World::Action
   class EffectBuilder
   {
   public:
-    enum HitSeverity
-    {
-      Normal,
-      Critical,
-      DirectHit,
-      CriticalDirectHit
-    };
-
     EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence );
 
 
@@ -32,7 +24,7 @@ namespace Sapphire::World::Action
   private:
     EffectResultPtr getResult( Entity::CharaPtr& chara );
 
-    uint32_t getResultDelayMs();
+    uint64_t getResultDelayMs();
 
   private:
     uint32_t m_actionId;

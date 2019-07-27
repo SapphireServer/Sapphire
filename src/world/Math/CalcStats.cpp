@@ -462,7 +462,7 @@ float CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
   {
     Logger::debug( format, pot, aa, ap, det, ten, factor );
   }
-  
+
   // todo: traits
 
   factor = std::floor( factor * speed( chara ) );
@@ -494,15 +494,15 @@ float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_
 
   auto factor = std::floor( pot * wd * ap * det * ten );
 
-  constexpr auto format = "dmg: pot: {} wd: {} ap: {} det: {} ten: {} = {}";
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
-    player->sendDebug( format, pot, wd, ap, det, ten, factor );
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
   }
   else
   {
-    Logger::debug( format, pot, wd, ap, det, ten, factor );
+    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
   }
 
   // todo: the rest

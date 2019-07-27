@@ -65,6 +65,8 @@ namespace Sapphire
     uint32_t m_effectCounter;
     std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
+    std::vector< World::Action::EffectResultPtr > m_effectResults;
+
   public:
     Territory();
 
@@ -174,6 +176,10 @@ namespace Sapphire
     uint32_t getNextEffectSequence();
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
+
+    void addEffectResult( World::Action::EffectResultPtr result );
+
+    void processEffectResults( uint64_t tickCount );
   };
 
 }
