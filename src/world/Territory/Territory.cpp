@@ -31,15 +31,15 @@
 #include "Actor/SpawnPoint.h"
 #include "Actor/BNpcTemplate.h"
 
+#include "Action/EffectResult.h"
+
 #include "Network/GameConnection.h"
 
 #include "Script/ScriptMgr.h"
 
-#include "Session.h"
 #include "ForwardsZone.h"
 #include "ServerMgr.h"
 #include "CellHandler.h"
-#include "Territory.h"
 #include "Framework.h"
 
 #include "Manager/RNGMgr.h"
@@ -485,6 +485,8 @@ bool Sapphire::Territory::update( uint64_t tickCount )
   onUpdate( tickCount );
 
   updateSpawnPoints();
+
+  processEffectResults( tickCount );
 
   if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
@@ -1006,7 +1008,7 @@ Sapphire::Entity::BNpcPtr
 
 Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByLevelId( uint32_t levelId )
 {
-  for( auto bnpcIt : m_bNpcMap )
+  for( const auto& bnpcIt : m_bNpcMap )
   {
     if( bnpcIt.second->getLevelId() == levelId )
       return bnpcIt.second;
@@ -1017,4 +1019,29 @@ Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByLevelId( uint32_t 
 std::shared_ptr< Sapphire::World::Navi::NaviProvider > Sapphire::Territory::getNaviProvider()
 {
   return m_pNaviProvider;
+}
+
+void Sapphire::Territory::addEffectResult( Sapphire::World::Action::EffectResultPtr result )
+{
+  m_effectResults.emplace_back( std::move( result ) );
+}
+
+void Sapphire::Territory::processEffectResults( uint64_t tickCount )
+
+{
+  // todo: move this to generic territory/instance delay wrapper cause it might be useful scheduling other things
+  for( auto it = m_effectResults.begin(); it != m_effectResults.end(); )
+  {
+    auto effect = *it;
+
+    if( tickCount < effect->getDelay() )
+    {
+      ++it;
+      continue;
+    }
+
+    effect->execute();
+
+    it = m_effectResults.erase( it );
+  }
 }

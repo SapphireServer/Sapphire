@@ -24,11 +24,11 @@ EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16
 
 }
 
-uint32_t EffectBuilder::getResultDelayMs()
+uint64_t EffectBuilder::getResultDelayMs()
 {
   // todo: actually figure this retarded shit out
 
-  return Common::Util::getTimeMs() + 1000;
+  return Common::Util::getTimeMs() + 850;
 }
 
 EffectResultPtr EffectBuilder::getResult( Entity::CharaPtr& chara )
@@ -69,11 +69,9 @@ void EffectBuilder::buildAndSendPackets()
   Logger::debug( "EffectBuilder result: " );
   Logger::debug( "Targets afflicted: {}", m_resolvedEffects.size() );
 
-  // test shit
-  for( auto& effect : m_resolvedEffects )
+  for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
   {
-    auto& result = effect.second;
-
+    auto result = it->second;
     Logger::debug( " - id: {}", result->getTarget()->getId() );
 
     auto seq = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
@@ -85,6 +83,10 @@ void EffectBuilder::buildAndSendPackets()
     effectPacket->addEffect( result->buildEffectEntry() );
 
     m_sourceChara->sendToInRangeSet( effectPacket, true );
-  }
 
+    // add effect to territory
+    m_sourceChara->getCurrentTerritory()->addEffectResult( std::move( result ) );
+
+    it = m_resolvedEffects.erase( it );
+  }
 }

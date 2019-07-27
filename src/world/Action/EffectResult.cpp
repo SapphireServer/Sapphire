@@ -2,15 +2,19 @@
 
 #include <Util/Util.h>
 
+#include "Actor/Chara.h"
+
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
 
-EffectResult::EffectResult( Entity::CharaPtr target, uint32_t runAfter ) :
+EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
   m_target( std::move( target ) ),
-  m_runAfter( runAfter ),
+  m_delayMs( runAfter ),
   m_value( 0 ),
-  m_severity( Common::ActionHitSeverityType::NormalDamage )
+  m_severity( Common::ActionHitSeverityType::NormalDamage ),
+  m_type( Common::ActionEffectType::Nothing ),
+  m_param( 0 )
 {
 
 }
@@ -23,6 +27,11 @@ Entity::CharaPtr EffectResult::getTarget() const
 uint32_t EffectResult::getValue() const
 {
   return m_value;
+}
+
+uint64_t EffectResult::getDelay()
+{
+  return m_delayMs;
 }
 
 void EffectResult::setParam( uint8_t param )
@@ -57,4 +66,25 @@ Common::EffectEntry EffectResult::buildEffectEntry() const
   entry.param = m_param;
 
   return entry;
+}
+
+void EffectResult::execute()
+{
+  switch( m_type )
+  {
+    case Common::ActionEffectType::Damage:
+    {
+      m_target->takeDamage( m_value );
+      break;
+    }
+
+    case Common::ActionEffectType::Heal:
+    {
+      m_target->heal( m_value );
+      break;
+    }
+
+    default:
+      break;
+  }
 }

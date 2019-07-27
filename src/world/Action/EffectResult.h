@@ -13,7 +13,7 @@ namespace Sapphire::World::Action
   class EffectResult
   {
   public:
-    explicit EffectResult( Entity::CharaPtr target, uint32_t delayMs );
+    explicit EffectResult( Entity::CharaPtr target, uint64_t delayMs );
 
     void damage( uint32_t amount, Common::ActionHitSeverityType severity );
     void heal( uint32_t amount, Common::ActionHitSeverityType severity );
@@ -22,12 +22,16 @@ namespace Sapphire::World::Action
 
     uint32_t getValue() const;
 
+    uint64_t getDelay();
+
     void setParam( uint8_t param );
 
     Common::EffectEntry buildEffectEntry() const;
 
+    void execute();
+
   private:
-    uint64_t m_runAfter;
+    uint64_t m_delayMs;
 
     Entity::CharaPtr m_target;
 
