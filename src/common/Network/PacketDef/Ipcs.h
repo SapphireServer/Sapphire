@@ -81,6 +81,7 @@ namespace Sapphire::Network::Packets
 
     SocialList = 0x010D, // updated 5.0
 
+    ExamineSearchInfo = 0x10F, // added 5.0
     UpdateSearchInfo = 0x0110, // updated 5.0
     InitSearchInfo = 0x0111, // updated 5.0
     ExamineSearchComment = 0x0102, // updated 4.1
