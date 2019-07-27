@@ -83,6 +83,7 @@ namespace Sapphire::Network::Packets
 
     UpdateSearchInfo = 0x0110, // updated 5.0
     InitSearchInfo = 0x0111, // updated 5.0
+    ExamineSearchInfo = 0x000F, 
     ExamineSearchComment = 0x0102, // updated 4.1
 
     ServerNoticeShort = 0x0115, // updated 5.0
