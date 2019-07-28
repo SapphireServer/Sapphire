@@ -135,7 +135,7 @@ namespace Sapphire::Network::Packets::Server
     char fcName[24];
     uint8_t unknown7;
     uint16_t padding1;
-    uint16_t classJobIdLevel[Common::CLASSJOB_SLOTS * 2]; // Pairs of classJobId, classJobLevel
+    uint16_t classJobIdLevel[76]; // Pairs of classJobId, classJobLevel (38 * 2)
     /*
     Like this:
     uint16_t gldId; // 1
