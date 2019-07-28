@@ -120,6 +120,27 @@ namespace Sapphire::Network::Packets::Server
     PlayerEntry entries[10];
   };
 
+  struct FFXIVIpcExamineSearchInfo : FFXIVIpcBasePacket< ExamineSearchInfo >
+  {
+    uint32_t unknown;
+    uint16_t unknown1;
+    uint16_t unknown2;
+    char padding[16];
+    uint32_t unknown3;
+    uint16_t unknown4;
+    uint16_t unknown5;
+    uint16_t unknown6;
+    uint8_t worldId;
+    char searchMessage[193];
+    char fcName[24];
+    uint8_t unknown7;
+    uint16_t padding1;
+    struct ClassJobEntry
+    {
+      uint16_t id;
+      uint16_t level;
+    } levelEntries[Common::CLASSJOB_TOTAL];
+  };
 
   struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< UpdateSearchInfo >
   {
@@ -955,8 +976,8 @@ namespace Sapphire::Network::Packets::Server
     uint32_t hp;
     uint32_t mp;
     uint32_t tp;
-    uint32_t unknown;
-    uint32_t unknown_1;
+    uint32_t gp; // Set to 10000 as non-gatherer for some reason
+    uint32_t cp;
     uint32_t unknown_2;
     uint32_t tenacity;
     uint32_t attack;
