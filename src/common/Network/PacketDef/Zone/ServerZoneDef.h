@@ -135,14 +135,11 @@ namespace Sapphire::Network::Packets::Server
     char fcName[24];
     uint8_t unknown7;
     uint16_t padding1;
-    uint16_t classJobIdLevel[76]; // Pairs of classJobId, classJobLevel (38 * 2)
-    /*
-    Like this:
-    uint16_t gldId; // 1
-    uint16_t gldLevel;
-    uint16_t pglId;
-    etc... through DNC (38)
-    */
+    struct ClassJobEntry
+    {
+      uint16_t id;
+      uint16_t level;
+    } levelEntries[Common::CLASSJOB_TOTAL];
   };
 
   struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< UpdateSearchInfo >
