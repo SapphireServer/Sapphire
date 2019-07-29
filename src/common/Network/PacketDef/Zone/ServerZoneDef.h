@@ -247,6 +247,22 @@ namespace Sapphire::Network::Packets::Server
     } entry[8];
   };
 
+  struct FFXIVIpcFreeCompanyMemberLogInOut : FFXIVIpcBasePacket< FreeCompanyMemberLogInOut >
+  {
+    uint16_t unknown;
+    uint16_t unknown1;
+    uint16_t unknown2;
+    uint16_t unknown3;
+    uint16_t unknown4;
+    char padding[6];
+    uint8_t status; // 0x0F Login, 0x10 Logout
+    uint8_t padding1;
+    char padding2[6];
+    uint16_t unknown5;
+    char fc[46];
+    char character[32];
+  };
+
   /**
   * Structural representation of the packet sent by the server
   * to send a list of mail the player has
@@ -299,6 +315,16 @@ namespace Sapphire::Network::Packets::Server
     char padding3; // null terminator?
     char fcEstateProfile[20]; // todo: size needs confirmation
     uint32_t padding4;
+  };
+
+  struct FFXIVIpcFreeCompanyUpdateShortMessage : FFXIVIpcBasePacket< FreeCompanyUpdateShortMessage >
+  {
+    uint32_t unknown;
+    uint16_t unknown1;
+    uint16_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown5;
+    char shortMessage[104];
   };
 
   struct FFXIVIpcStatusEffectList : FFXIVIpcBasePacket< StatusEffectList >

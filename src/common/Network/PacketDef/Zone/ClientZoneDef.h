@@ -323,6 +323,16 @@ struct FFXIVIpcMarketBoardRequestItemListingInfo :
   /* 0000 */ uint32_t requestId;
 };
 
+struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
+  FFXIVIpcBasePacket< FreeCompanyUpdateShortMessageHandler >
+{
+  char shortMessage[104]; // Contains old/gibberish data in remaining slots if not filled
+  uint8_t padding;
+  uint8_t unknown;
+  uint32_t unknown1;
+  uint16_t unknown2;
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H
