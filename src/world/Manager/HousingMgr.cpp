@@ -322,7 +322,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
   if( !land )
     return;
 
-  auto landInfoSignPacket = makeWorldPacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
+  auto landInfoSignPacket = makeZonePacket< Server::FFXIVIpcLandInfoSign >( player.getId() );
   landInfoSignPacket->data().houseSize = land->getSize();
   landInfoSignPacket->data().houseType = static_cast< uint8_t >( land->getLandType() );
   landInfoSignPacket->data().landIdent = ident;
@@ -354,7 +354,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignFree( Entity::Player& pla
     return;
 
   auto land = hZone->getLand( ident.landId );
-  auto plotPricePacket = makeWorldPacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
+  auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
   plotPricePacket->data().price = land->getCurrentPrice();
   plotPricePacket->data().timeLeft = land->getDevaluationTime();
   player.queuePacket( plotPricePacket );
@@ -469,7 +469,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
   if( !hZone )
     return;
 
-  auto wardInfoPacket = makeWorldPacket< Server::FFXIVIpcHousingWardInfo >( player.getId() );
+  auto wardInfoPacket = makeZonePacket< Server::FFXIVIpcHousingWardInfo >( player.getId() );
   wardInfoPacket->data().landIdent.wardNum = wardId;
   wardInfoPacket->data().landIdent.territoryTypeId = territoryTypeId;
 
@@ -538,7 +538,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateGreeting( Entity::Player& p
   if( !house )
     return;
 
-  auto greetingPacket = makeWorldPacket< FFXIVIpcHousingEstateGreeting >( player.getId() );
+  auto greetingPacket = makeZonePacket< FFXIVIpcHousingEstateGreeting >( player.getId() );
 
   greetingPacket->data().landIdent = ident;
 
@@ -723,7 +723,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& 
   if( !house )
     return;
 
-  auto landRenamePacket = makeWorldPacket< Server::FFXIVIpcLandRename >( player.getId() );
+  auto landRenamePacket = makeZonePacket< Server::FFXIVIpcLandRename >( player.getId() );
 
   landRenamePacket->data().landIdent = ident;
   memcpy( &landRenamePacket->data().houseName, house->getHouseName().c_str(), 20 );
@@ -747,7 +747,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Pl
   if( !house )
     return;
 
-  auto estateGreetingPacket = makeWorldPacket< Server::FFXIVIpcHousingEstateGreeting >( player.getId() );
+  auto estateGreetingPacket = makeZonePacket< Server::FFXIVIpcHousingEstateGreeting >( player.getId() );
 
   estateGreetingPacket->data().landIdent = ident;
   memcpy( &estateGreetingPacket->data().message, house->getHouseGreeting().c_str(), sizeof( estateGreetingPacket->data().message ) );
@@ -795,7 +795,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   if( !hasPermission( player, *land, 0 ) )
     return;
 
-  auto packet = makeWorldPacket< Server::FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
+  auto packet = makeZonePacket< Server::FFXIVIpcHousingShowEstateGuestAccess >( player.getId() );
   packet->data().ident = ident;
 
   player.queuePacket( packet );

@@ -188,7 +188,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
                      player.getPos().y + static_cast< float >( posY ),
                      player.getPos().z + static_cast< float >( posZ ) );
 
-    auto setActorPosPacket = makeWorldPacket< FFXIVIpcActorSetPos >( player.getId() );
+    auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
@@ -208,7 +208,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t discover_id;
     sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
-    auto discoveryPacket = makeWorldPacket< FFXIVIpcDiscovery >( player.getId() );
+    auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
     discoveryPacket->data().map_id = map_id;
     discoveryPacket->data().map_part_id = discover_id;
     player.queuePacket( discoveryPacket );
@@ -281,7 +281,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
 
-    auto msqPacket = makeWorldPacket< FFXIVIpcMSQTrackerProgress >( player.getId() );
+    auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerProgress >( player.getId() );
     msqPacket->data().id = id;
     player.queuePacket( msqPacket );
 
@@ -292,7 +292,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
 
-    auto msqPacket = makeWorldPacket< FFXIVIpcMSQTrackerComplete >( player.getId() );
+    auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerComplete >( player.getId() );
     msqPacket->data().id = id;
     player.queuePacket( msqPacket );
 
@@ -459,7 +459,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
 
 
-    //pBNpc->setCurrentTerritory( playerZone );
+    //pBNpc->setCurrentZone( playerZone );
     //pBNpc->setPos( player.getPos().x, player.getPos().y, player.getPos().z );
 
     playerZone->pushActor( pBNpc );
@@ -494,7 +494,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     player.sendNotice( "Injecting ACTOR_CONTROL {0}", opcode );
 
-    auto actorControl = makeWorldPacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
+    auto actorControl = makeZonePacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
     actorControl->data().category = opcode;
     actorControl->data().param1 = param1;
     actorControl->data().param2 = param2;
@@ -703,7 +703,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
   }
   if( offset != 0 )
   {
-    auto setActorPosPacket = makeWorldPacket< FFXIVIpcActorSetPos >( player.getId() );
+    auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;

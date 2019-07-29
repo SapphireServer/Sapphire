@@ -12,11 +12,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Chat packet.
   */
-  class ChatPacket : public WorldChannelPacket< FFXIVIpcChat >
+  class ChatPacket : public ZoneChannelPacket< FFXIVIpcChat >
   {
   public:
     ChatPacket( Entity::Player& player, Common::ChatType chatType, const std::string& msg ) :
-      WorldChannelPacket< FFXIVIpcChat >( player.getId(), player.getId() )
+      ZoneChannelPacket< FFXIVIpcChat >( player.getId(), player.getId() )
     {
       initialize( player, chatType, msg );
     };

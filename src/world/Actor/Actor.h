@@ -32,7 +32,7 @@ namespace Sapphire::Entity
     /*! Id of the zone the actor currently is in */
     uint32_t m_territoryTypeId;
     /*! Ptr to the ZoneObj the actor belongs to */
-    TerritoryPtr m_pCurrentZone;
+    TerritoryPtr m_pCurrentTerritory;
 
     /*! list of various actors in range */
     std::set< ActorPtr > m_inRangeActor;
@@ -124,7 +124,7 @@ namespace Sapphire::Entity
 
     TerritoryPtr getCurrentTerritory() const;
 
-    void setCurrentTerritory( TerritoryPtr currZone );
+    void setCurrentZone( TerritoryPtr currZone );
 
     InstanceContentPtr getCurrentInstance() const;
 

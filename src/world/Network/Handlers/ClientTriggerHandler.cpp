@@ -67,7 +67,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
                                                               Entity::Player& player )
 {
 
-  const auto packet = WorldChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcClientTrigger >( inPacket );
 
   const auto commandId = packet.data().commandId;
   const auto param1 = *reinterpret_cast< const uint64_t* >( &packet.data().param11 );
@@ -173,7 +173,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       uint64_t targetContentId = param1;
       // todo: look up player by content id
       /*
-        auto packet = makeWorldPacket< FFXIVIpcCharaNameReq >( player.getId() );
+        auto packet = makeZonePacket< FFXIVIpcCharaNameReq >( player.getId() );
         packet->data().contentId = targetContentId;
 
         // lookup the name

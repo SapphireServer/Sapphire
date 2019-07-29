@@ -32,7 +32,7 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
 
     if( container->getId() == Common::InventoryType::Currency || container->getId() == Common::InventoryType::Crystal )
     {
-      auto currencyInfoPacket = makeWorldPacket< Server::FFXIVIpcCurrencyCrystalInfo >( player.getId() );
+      auto currencyInfoPacket = makeZonePacket< Server::FFXIVIpcCurrencyCrystalInfo >( player.getId() );
       currencyInfoPacket->data().containerSequence = sequence;
       currencyInfoPacket->data().catalogId = itM->second->getId();
       currencyInfoPacket->data().unknown = 1;
@@ -44,7 +44,7 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
     }
     else
     {
-      auto itemInfoPacket = makeWorldPacket< Server::FFXIVIpcItemInfo >( player.getId() );
+      auto itemInfoPacket = makeZonePacket< Server::FFXIVIpcItemInfo >( player.getId() );
       itemInfoPacket->data().containerSequence = sequence;
       itemInfoPacket->data().containerId = container->getId();
       itemInfoPacket->data().slot = itM->first;
@@ -60,7 +60,7 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
     }
   }
 
-  auto containerInfoPacket = makeWorldPacket< Server::FFXIVIpcContainerInfo >( player.getId() );
+  auto containerInfoPacket = makeZonePacket< Server::FFXIVIpcContainerInfo >( player.getId() );
   containerInfoPacket->data().containerSequence = sequence;
   containerInfoPacket->data().numItems = container->getEntryCount();
   containerInfoPacket->data().containerId = container->getId();

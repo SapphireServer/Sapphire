@@ -78,7 +78,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
 
   m_class = ClassJob::Adventurer;
 
-  m_pCurrentZone = std::move( pZone );
+  m_pCurrentTerritory = std::move( pZone );
 
   m_spawnPos = m_pos;
 
@@ -194,13 +194,13 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
 
-  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
   {
     Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentZone->getGuId(),
-                   m_pCurrentZone->getInternalName() );
+                   m_pCurrentTerritory->getGuId(),
+                   m_pCurrentTerritory->getInternalName() );
     return false;
   }
 
@@ -216,7 +216,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return true;
   }
 
-  m_pCurrentZone->updateActorPosition( *this );
+  m_pCurrentTerritory->updateActorPosition( *this );
   face( pos );
   setPos( pos1 );
   sendPositionUpdate();
@@ -226,13 +226,13 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 {
 
-  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
   {
     Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentZone->getGuId(),
-                   m_pCurrentZone->getInternalName() );
+                   m_pCurrentTerritory->getGuId(),
+                   m_pCurrentTerritory->getInternalName() );
     return false;
   }
 
@@ -248,7 +248,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     return true;
   }
 
-  m_pCurrentZone->updateActorPosition( *this );
+  m_pCurrentTerritory->updateActorPosition( *this );
   face( targetChara.getPos() );
   setPos( pos1 );
   sendPositionUpdate();
@@ -407,7 +407,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
-  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
     return;
@@ -645,14 +645,14 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   m_pOwner = m_pChara;
   if( m_pChara != nullptr )
   {
-    auto setOwnerPacket = makeWorldPacket< FFXIVIpcActorOwner >( m_pChara->getId() );
+    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( m_pChara->getId() );
     setOwnerPacket->data().type = 0x01;
     setOwnerPacket->data().actorId = m_pChara->getId();
     sendToInRangeSet( setOwnerPacket );
   }
   else
   {
-    auto setOwnerPacket = makeWorldPacket< FFXIVIpcActorOwner >( getId() );
+    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
     setOwnerPacket->data().type = 0x01;
     setOwnerPacket->data().actorId = INVALID_GAME_OBJECT_ID;
     sendToInRangeSet( setOwnerPacket );

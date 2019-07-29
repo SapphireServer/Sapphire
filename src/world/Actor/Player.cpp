@@ -236,7 +236,7 @@ uint64_t Sapphire::Entity::Player::getOnlineStatusMask() const
 
 void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
 {
-  auto preparePacket = makeWorldPacket< FFXIVIpcPrepareZoning >( getId() );
+  auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( getId() );
   preparePacket->data().targetZone = targetZone;
   preparePacket->data().fadeOutTime = fadeOutTime;
   preparePacket->data().animation = animation;
@@ -311,7 +311,7 @@ bool Sapphire::Entity::Player::isAutoattackOn() const
 
 void Sapphire::Entity::Player::sendStats()
 {
-  auto statPacket = makeWorldPacket< FFXIVIpcPlayerStats >( getId() );
+  auto statPacket = makeZonePacket< FFXIVIpcPlayerStats >( getId() );
 
   statPacket->data().strength = getStatValue( Common::BaseParam::Strength );
   statPacket->data().dexterity = getStatValue( Common::BaseParam::Dexterity );
@@ -731,7 +731,7 @@ void Sapphire::Entity::Player::gainLevel()
   m_hp = getMaxHp();
   m_mp = getMaxMp();
 
-  auto effectListPacket = makeWorldPacket< FFXIVIpcStatusEffectList >( getId() );
+  auto effectListPacket = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
   effectListPacket->data().classId = static_cast< uint8_t > ( getClass() );
   effectListPacket->data().level1 = getLevel();
   effectListPacket->data().level = getLevel();
@@ -745,7 +745,7 @@ void Sapphire::Entity::Player::gainLevel()
   sendToInRangeSet( makeActorControl142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
                                          getLevel(), getLevel() - 1 ), true );
 
-  auto classInfoPacket = makeWorldPacket< FFXIVIpcUpdateClassInfo >( getId() );
+  auto classInfoPacket = makeZonePacket< FFXIVIpcUpdateClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t > ( getClass() );
   classInfoPacket->data().level1 = getLevel();
   classInfoPacket->data().level = getLevel();
@@ -818,7 +818,7 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 
   m_tp = 0;
 
-  auto classInfoPacket = makeWorldPacket< FFXIVIpcPlayerClassInfo >( getId() );
+  auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
   classInfoPacket->data().classLevel = getLevel();
   classInfoPacket->data().syncedLevel = getLevel();
@@ -954,7 +954,7 @@ void Sapphire::Entity::Player::setGc( uint8_t gc )
 {
   m_gc = gc;
 
-  auto gcAffPacket = makeWorldPacket< FFXIVGCAffiliation >( getId() );
+  auto gcAffPacket = makeZonePacket< FFXIVGCAffiliation >( getId() );
   gcAffPacket->data().gcId = m_gc;
   gcAffPacket->data().gcRank[ 0 ] = m_gcRank[ 0 ];
   gcAffPacket->data().gcRank[ 1 ] = m_gcRank[ 1 ];
@@ -966,7 +966,7 @@ void Sapphire::Entity::Player::setGcRankAt( uint8_t index, uint8_t rank )
 {
   m_gcRank[ index ] = rank;
 
-  auto gcAffPacket = makeWorldPacket< FFXIVGCAffiliation >( getId() );
+  auto gcAffPacket = makeZonePacket< FFXIVGCAffiliation >( getId() );
   gcAffPacket->data().gcId = m_gc;
   gcAffPacket->data().gcRank[ 0 ] = m_gcRank[ 0 ];
   gcAffPacket->data().gcRank[ 1 ] = m_gcRank[ 1 ];
@@ -1069,7 +1069,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
     }
     else
     {
-      auto setActorPosPacket = makeWorldPacket< FFXIVIpcActorSetPos >( getId() );
+      auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( getId() );
       setActorPosPacket->data().r16 = Util::floatToUInt16Rot( m_queuedZoneing->m_targetRotation );
       setActorPosPacket->data().waitForLoad = 0x04;
       setActorPosPacket->data().x = targetPos.x;
@@ -1153,7 +1153,7 @@ void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
   if( spawnId == m_actorSpawnIndexAllocator.getAllocFailId() )
     return;
 
-  auto freeActorSpawnPacket = makeWorldPacket< FFXIVIpcActorFreeSpawn >( getId() );
+  auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
   freeActorSpawnPacket->data().actorId = actorId;
   freeActorSpawnPacket->data().spawnId = spawnId;
   queuePacket( freeActorSpawnPacket );
@@ -1408,9 +1408,9 @@ bool Sapphire::Entity::Player::hateListHasEntry( BNpcPtr pBNpc )
 
 void Sapphire::Entity::Player::sendHateList()
 {
-  auto hateListPacket = makeWorldPacket< FFXIVIpcHateList >( getId() );
+  auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
   hateListPacket->data().numEntries = m_actorIdTohateSlotMap.size();
-  auto hateRankPacket = makeWorldPacket< FFXIVIpcHateRank >( getId() );
+  auto hateRankPacket = makeZonePacket< FFXIVIpcHateRank >( getId() );
   hateRankPacket->data().numEntries = m_actorIdTohateSlotMap.size();
   auto it = m_actorIdTohateSlotMap.begin();
   for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
@@ -1490,7 +1490,7 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
 void Sapphire::Entity::Player::setEquipDisplayFlags( uint8_t state )
 {
   m_equipDisplayFlags = state;
-  auto paramPacket = makeWorldPacket< FFXIVIpcEquipDisplayFlags >( getId() );
+  auto paramPacket = makeZonePacket< FFXIVIpcEquipDisplayFlags >( getId() );
   paramPacket->data().bitmask = m_equipDisplayFlags;
   sendToInRangeSet( paramPacket, true );
 }
@@ -1507,7 +1507,7 @@ void Sapphire::Entity::Player::mount( uint32_t id )
                                          static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
   sendToInRangeSet( makeActorControl143( getId(), 0x39e, 12 ), true ); //?
 
-  auto mountPacket = makeWorldPacket< FFXIVIpcMount >( getId() );
+  auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
   mountPacket->data().id = id;
   sendToInRangeSet( mountPacket, true );
 }
@@ -1655,7 +1655,7 @@ uint16_t Sapphire::Entity::Player::getItemLevel() const
 void Sapphire::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
 {
   // TODO: maybe change to persistent?
-  auto packet = makeWorldPacket< FFXIVIpcEorzeaTimeOffset >( getId() );
+  auto packet = makeZonePacket< FFXIVIpcEorzeaTimeOffset >( getId() );
   packet->data().timestamp = timestamp;
 
   // Send to single player
@@ -1683,7 +1683,7 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   getCurrentTerritory()->onBeforePlayerZoneIn( *this );
 
-  auto initPacket = makeWorldPacket< FFXIVIpcInit >( getId() );
+  auto initPacket = makeZonePacket< FFXIVIpcInit >( getId() );
   initPacket->data().charId = getId();
   queuePacket( initPacket );
 
@@ -1706,7 +1706,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   // only initialize the UI if the player in fact just logged in.
   if( isLogin() )
   {
-    auto contentFinderList = makeWorldPacket< FFXIVIpcCFAvailableContents >( getId() );
+    auto contentFinderList = makeZonePacket< FFXIVIpcCFAvailableContents >( getId() );
 
     for( auto i = 0; i < sizeof( contentFinderList->data().contents ); i++ )
     {
@@ -1717,7 +1717,7 @@ void Sapphire::Entity::Player::sendZonePackets()
 
     queuePacket( std::make_shared< PlayerSetupPacket >( *this ) );
 
-    auto classInfoPacket = makeWorldPacket< FFXIVIpcPlayerClassInfo >( getId() );
+    auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
     classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
     classInfoPacket->data().unknown = 1;
     classInfoPacket->data().syncedLevel = getLevel();
@@ -1746,7 +1746,7 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   sendLandFlags();
 
-  auto initZonePacket = makeWorldPacket< FFXIVIpcInitZone >( getId() );
+  auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
   initZonePacket->data().zoneId = getCurrentTerritory()->getTerritoryTypeId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentTerritory()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
@@ -1761,10 +1761,10 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   if( isLogin() )
   {
-    auto unk322 = makeWorldPacket< FFXIVARR_IPC_UNK322 >( getId() );
+    auto unk322 = makeZonePacket< FFXIVARR_IPC_UNK322 >( getId() );
     queuePacket( unk322 );
 
-    auto unk320 = makeWorldPacket< FFXIVARR_IPC_UNK320 >( getId() );
+    auto unk320 = makeZonePacket< FFXIVARR_IPC_UNK320 >( getId() );
     queuePacket( unk320 );
   }
 
@@ -1786,7 +1786,7 @@ bool Sapphire::Entity::Player::isDirectorInitialized() const
 
 void Sapphire::Entity::Player::sendTitleList()
 {
-  auto titleListPacket = makeWorldPacket< FFXIVIpcPlayerTitleList >( getId() );
+  auto titleListPacket = makeZonePacket< FFXIVIpcPlayerTitleList >( getId() );
   memcpy( titleListPacket->data().titleList, getTitleList(), sizeof( titleListPacket->data().titleList ) );
 
   queuePacket( titleListPacket );
@@ -1930,7 +1930,7 @@ void Sapphire::Entity::Player::freeObjSpawnIndexForActorId( uint32_t actorId )
   if( spawnId == m_objSpawnIndexAllocator.getAllocFailId() )
     return;
 
-  auto freeObjectSpawnPacket = makeWorldPacket< FFXIVIpcObjectDespawn >( getId() );
+  auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcObjectDespawn >( getId() );
   freeObjectSpawnPacket->data().spawnIndex = spawnId;
   queuePacket( freeObjectSpawnPacket );
 }
@@ -1961,7 +1961,7 @@ void Sapphire::Entity::Player::setLandFlags( uint8_t flagSlot, uint32_t landFlag
 
 void Sapphire::Entity::Player::sendLandFlags()
 {
-  auto landFlags = makeWorldPacket< FFXIVIpcHousingLandFlags >( getId() );
+  auto landFlags = makeZonePacket< FFXIVIpcHousingLandFlags >( getId() );
 
   landFlags->data().freeCompanyHouse = m_landFlags[ Common::LandFlagsSlot::FreeCompany ];
   landFlags->data().privateHouse = m_landFlags[ Common::LandFlagsSlot::Private ];
@@ -1974,7 +1974,7 @@ void Sapphire::Entity::Player::sendLandFlags()
 
 void Sapphire::Entity::Player::sendLandFlagsSlot( Common::LandFlagsSlot slot )
 {
-  auto landFlags = makeWorldPacket< FFXIVIpcHousingUpdateLandFlagsSlot >( getId() );
+  auto landFlags = makeZonePacket< FFXIVIpcHousingUpdateLandFlagsSlot >( getId() );
 
   uint32_t type = 0;
 
@@ -2012,7 +2012,7 @@ void Sapphire::Entity::Player::sendHuntingLog()
   for( const auto& entry : m_huntingLogEntries )
   {
     uint64_t completionFlag = 0;
-    auto huntPacket = makeWorldPacket< FFXIVIpcHuntingLogEntry >( getId() );
+    auto huntPacket = makeZonePacket< FFXIVIpcHuntingLogEntry >( getId() );
 
     huntPacket->data().u0 = -1;
     huntPacket->data().rank = entry.rank;
