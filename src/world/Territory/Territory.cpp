@@ -519,7 +519,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
 
     if( changedWeather )
     {
-      auto weatherChangePacket = makeWorldPacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
+      auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
       weatherChangePacket->data().weatherId = static_cast< uint8_t >( m_currentWeather );
       weatherChangePacket->data().delay = 5.0f;
       pPlayer->queuePacket( weatherChangePacket );

@@ -225,7 +225,7 @@ void Action::Action::start()
 
   if( hasCastTime() )
   {
-    auto castPacket = makeWorldPacket< Server::FFXIVIpcActorCast >( getId() );
+    auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
     auto& data = castPacket->data();
 
     data.action_id = static_cast< uint16_t >( m_id );

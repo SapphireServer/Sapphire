@@ -11,11 +11,11 @@
 namespace Sapphire::Network::Packets::Server
 {
 
-  class EffectPacket : public WorldChannelPacket< FFXIVIpcEffect >
+  class EffectPacket : public ZoneChannelPacket< FFXIVIpcEffect >
   {
   public:
     EffectPacket( uint64_t sourceId, uint32_t targetId, uint32_t actionId ) :
-      WorldChannelPacket< FFXIVIpcEffect >( static_cast< uint32_t >( sourceId ), targetId )
+      ZoneChannelPacket< FFXIVIpcEffect >( static_cast< uint32_t >( sourceId ), targetId )
     {
       m_data.effectCount = 0;
       m_data.actionId = actionId;

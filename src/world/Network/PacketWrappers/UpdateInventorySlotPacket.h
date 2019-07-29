@@ -12,11 +12,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The update inventory-slot packet.
   */
-  class UpdateInventorySlotPacket : public WorldChannelPacket< FFXIVIpcUpdateInventorySlot >
+  class UpdateInventorySlotPacket : public ZoneChannelPacket< FFXIVIpcUpdateInventorySlot >
   {
   public:
     UpdateInventorySlotPacket( uint32_t playerId, uint8_t slot, uint16_t storageId, const Item& item ) :
-      WorldChannelPacket< FFXIVIpcUpdateInventorySlot >( playerId, playerId )
+      ZoneChannelPacket< FFXIVIpcUpdateInventorySlot >( playerId, playerId )
     {
       initialize( slot, storageId, item );
     };

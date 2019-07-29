@@ -141,7 +141,7 @@ void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
   pEvent->setEventReturnCallback( eventCallback );
   pEvent->setSceneChainCallback( nullptr );
 
-  auto openGilShopPacket = makeWorldPacket< Server::FFXIVIpcEventOpenGilShop >( getId() );
+  auto openGilShopPacket = makeZonePacket< Server::FFXIVIpcEventOpenGilShop >( getId() );
   openGilShopPacket->data().eventId = eventId;
   openGilShopPacket->data().sceneFlags = flags;
   openGilShopPacket->data().actorId = getId();

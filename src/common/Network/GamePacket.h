@@ -23,7 +23,7 @@ namespace Sapphire::Network::Packets
   class FFXIVIpcPacket;
 
   template< class T >
-  using WorldChannelPacket = FFXIVIpcPacket< T, ServerZoneIpcType >;
+  using ZoneChannelPacket = FFXIVIpcPacket< T, ServerZoneIpcType >;
 
   template< class T >
   using ChatChannelPacket = FFXIVIpcPacket< T, ServerChatIpcType >;
@@ -33,9 +33,9 @@ namespace Sapphire::Network::Packets
 
 
   template< class T, typename... Args >
-  std::shared_ptr< WorldChannelPacket< T > > makeWorldPacket( Args... args )
+  std::shared_ptr< ZoneChannelPacket< T > > makeZonePacket( Args... args )
   {
-    return std::make_shared< WorldChannelPacket< T > >( args... );
+    return std::make_shared< ZoneChannelPacket< T > >( args... );
   }
 
   template< class T, typename... Args >

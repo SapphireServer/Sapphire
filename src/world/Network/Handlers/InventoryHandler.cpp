@@ -27,7 +27,7 @@ void Sapphire::Network::GameConnection::inventoryModifyHandler( FrameworkPtr pFw
                                                                 const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                 Entity::Player& player )
 {
-  const auto packet = WorldChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
 
   const auto action = packet.data().action;
   const auto splitCount = packet.data().splitCount;
@@ -37,7 +37,7 @@ void Sapphire::Network::GameConnection::inventoryModifyHandler( FrameworkPtr pFw
   const auto toSlot = packet.data().toSlot;
   const auto toContainer = packet.data().toContainer;
 
-  auto ackPacket = makeWorldPacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
+  auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
   ackPacket->data().sequence = packet.data().seq;
   ackPacket->data().type = 7;
   player.queuePacket( ackPacket );

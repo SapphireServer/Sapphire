@@ -10,7 +10,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The packet sent to play an event.
   */
-  class EventPlayPacket : public WorldChannelPacket< FFXIVIpcEventPlay >
+  class EventPlayPacket : public ZoneChannelPacket< FFXIVIpcEventPlay >
   {
   public:
     EventPlayPacket( uint32_t playerId,
@@ -21,7 +21,7 @@ namespace Sapphire::Network::Packets::Server
                      uint8_t param3,
                      uint32_t param4 = 0,
                      uint32_t param5 = 0 ) :
-      WorldChannelPacket< FFXIVIpcEventPlay >( playerId, playerId )
+      ZoneChannelPacket< FFXIVIpcEventPlay >( playerId, playerId )
     {
       initialize( actorId, eventId, scene, flags, param3, param4, param5 );
     };

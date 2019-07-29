@@ -93,7 +93,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
   if( player.getGmRank() <= 0 )
     return;
 
-  const auto packet = WorldChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
   const auto commandId = packet.data().commandId;
   const auto param1 = packet.data().param1;
   const auto param2 = packet.data().param2;
@@ -257,11 +257,11 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     {
       targetPlayer->setOnlineStatusMask( param1 );
 
-      auto statusPacket = makeWorldPacket< FFXIVIpcSetOnlineStatus >( player.getId() );
+      auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
       statusPacket->data().onlineStatusFlags = param1;
       queueOutPacket( statusPacket );
 
-      auto searchInfoPacket = makeWorldPacket< FFXIVIpcSetSearchInfo >( player.getId() );
+      auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
       searchInfoPacket->data().onlineStatusFlags = param1;
       searchInfoPacket->data().selectRegion = targetPlayer->getSearchSelectRegion();
       strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
@@ -596,7 +596,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
 
   auto pServerZone = pFw->get< World::ServerMgr >();
 
-  const auto packet = WorldChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
   const auto commandId = packet.data().commandId;
   const auto param1 = packet.data().param1;

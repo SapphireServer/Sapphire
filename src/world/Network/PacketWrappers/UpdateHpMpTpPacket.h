@@ -11,11 +11,11 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Ping response packet.
   */
-  class UpdateHpMpTpPacket : public WorldChannelPacket< FFXIVIpcUpdateHpMpTp >
+  class UpdateHpMpTpPacket : public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
   {
   public:
     UpdateHpMpTpPacket( Entity::Chara& actor ) :
-      WorldChannelPacket< FFXIVIpcUpdateHpMpTp >( actor.getId(), actor.getId() )
+      ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >( actor.getId(), actor.getId() )
     {
       initialize( actor );
     };

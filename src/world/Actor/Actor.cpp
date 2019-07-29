@@ -66,7 +66,7 @@ void Sapphire::Entity::Actor::setPos( float x, float y, float z, bool broadcastU
   m_pos.z = z;
 
   if( broadcastUpdate )
-    m_pCurrentZone->updateActorPosition( *this );
+    m_pCurrentTerritory->updateActorPosition( *this );
 }
 
 void Sapphire::Entity::Actor::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
@@ -74,7 +74,7 @@ void Sapphire::Entity::Actor::setPos( const Sapphire::Common::FFXIVARR_POSITION3
   m_pos = pos;
 
   if( broadcastUpdate )
-    m_pCurrentZone->updateActorPosition( *this );
+    m_pCurrentTerritory->updateActorPosition( *this );
 }
 
 float Sapphire::Entity::Actor::getRot() const
@@ -333,20 +333,20 @@ std::set< Sapphire::Entity::ActorPtr > Sapphire::Entity::Actor::getInRangeActors
 /*! \return TerritoryPtr to the current zone, nullptr if not set */
 Sapphire::TerritoryPtr Sapphire::Entity::Actor::getCurrentTerritory() const
 {
-  return m_pCurrentZone;
+  return m_pCurrentTerritory;
 }
 
 /*! \param TerritoryPtr to the zone to be set as current */
-void Sapphire::Entity::Actor::setCurrentTerritory( TerritoryPtr currZone )
+void Sapphire::Entity::Actor::setCurrentZone( TerritoryPtr currZone )
 {
-  m_pCurrentZone = currZone;
+  m_pCurrentTerritory = currZone;
 }
 
 /*! \return InstanceContentPtr to the current instance, nullptr if not an instance or not set */
 Sapphire::InstanceContentPtr Sapphire::Entity::Actor::getCurrentInstance() const
 {
-  if( m_pCurrentZone )
-    return m_pCurrentZone->getAsInstanceContent();
+  if( m_pCurrentTerritory )
+    return m_pCurrentTerritory->getAsInstanceContent();
 
   return nullptr;
 }
@@ -354,8 +354,8 @@ Sapphire::InstanceContentPtr Sapphire::Entity::Actor::getCurrentInstance() const
 /*! \return QuestBattlePtr to the current instance, nullptr if not an instance or not set */
 Sapphire::QuestBattlePtr Sapphire::Entity::Actor::getCurrentQuestBattle() const
 {
-  if( m_pCurrentZone )
-    return m_pCurrentZone->getAsQuestBattle();
+  if( m_pCurrentTerritory )
+    return m_pCurrentTerritory->getAsQuestBattle();
 
   return nullptr;
 }

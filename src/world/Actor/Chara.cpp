@@ -518,7 +518,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
 
-  auto statusEffectAdd = makeWorldPacket< FFXIVIpcEffectResult >( getId() );
+  auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().current_hp = getHp();
@@ -639,7 +639,7 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   uint64_t currentTimeMs = Util::getTimeMs();
 
 
-  auto statusEffectList = makeWorldPacket< FFXIVIpcStatusEffectList >( getId() );
+  auto statusEffectList = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
   statusEffectList->data().classId = static_cast< uint8_t >( getClass() );
   statusEffectList->data().level = getLevel();
   statusEffectList->data().level1 = getLevel();

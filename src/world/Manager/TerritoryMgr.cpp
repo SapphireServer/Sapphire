@@ -631,7 +631,7 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
   if( pPlayer->getLastPing() != 0 && pPlayer->getCurrentTerritory() )
     pPlayer->getCurrentTerritory()->removeActor( pPlayer );
 
-  pPlayer->setCurrentTerritory( pZone );
+  pPlayer->setCurrentZone( pZone );
   pZone->pushActor( pPlayer );
 
   // map player to instanceId so it can be tracked.
