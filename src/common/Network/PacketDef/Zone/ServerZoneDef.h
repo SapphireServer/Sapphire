@@ -457,12 +457,21 @@ namespace Sapphire::Network::Packets::Server
     uint64_t animationTargetId; // who the animation targets
 
     uint32_t actionId; // what the casting player casts, shown in battle log/ui
-    uint32_t sequence; // seems to only increment on retail?
+    /*!
+     * @brief Zone sequence for the effect. Used to link effects that are split across multiple packets as one
+     */
+    uint32_t sequence;
 
     float animationLockTime; // maybe? doesn't seem to do anything
-    uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+    uint32_t someTargetId; // always 0x0E000000?
 
-    uint16_t sourceSequence; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+    /*!
+     * @brief The cast sequence from the originating player. Should only be sent to the source, 0 for every other player.
+     *
+     * This needs to match the sequence sent from the player in the action start packet otherwise you'll cancel the
+     * initial animation and start a new one once the packet arrives.
+     */
+    uint16_t sourceSequence;
     uint16_t rotation;
     uint16_t actionAnimationId; // the animation that is played by the casting character
     uint8_t variation; // variation in the animation
