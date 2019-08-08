@@ -101,7 +101,6 @@ namespace Sapphire::Network::Packets
 
     MailDeleteRequest = 0x012B, // updated 5.0
 
-    FreeCompanyEvent = 0x012C, // added 5.0
     // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
     ReqMoogleMailLetter = 0x0139, // updated 5.0
@@ -374,6 +373,8 @@ namespace Sapphire::Network::Packets
   {
     Tell = 0x0064, // updated for sb
     TellErrNotFound = 0x0066,
+
+    FreeCompanyEvent = 0x012C, // added 5.0
   };
 
   /**
