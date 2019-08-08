@@ -247,7 +247,7 @@ namespace Sapphire::Network::Packets::Server
     } entry[8];
   };
 
-  struct FFXIVIpcFreeCompanyMemberLogInOut : FFXIVIpcBasePacket< FreeCompanyMemberLogInOut >
+  struct FFXIVIpcFreeCompanyEvent : FFXIVIpcBasePacket< FreeCompanyEvent >
   {
     uint16_t unknown;
     uint16_t unknown1;
@@ -255,12 +255,12 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknown3;
     uint16_t unknown4;
     char padding[6];
-    uint8_t status; // 0x0F Login, 0x10 Logout
+    uint8_t eventID; // 0x0F Login, 0x10 Logout
     uint8_t padding1;
     char padding2[6];
     uint16_t unknown5;
-    char fc[46];
-    char character[32];
+    char fcName[46];
+    char characterName[32];
   };
 
   /**
