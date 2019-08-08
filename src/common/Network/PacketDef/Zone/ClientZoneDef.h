@@ -326,7 +326,7 @@ struct FFXIVIpcMarketBoardRequestItemListingInfo :
 struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
   FFXIVIpcBasePacket< FreeCompanyUpdateShortMessageHandler >
 {
-  char shortMessage[104]; // Contains old/gibberish data in remaining slots if not filled
+  char shortMessage[104];
   uint8_t padding;
   uint8_t unknown;
   uint32_t unknown1;
