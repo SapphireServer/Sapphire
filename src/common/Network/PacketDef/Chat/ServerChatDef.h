@@ -29,6 +29,36 @@ struct FFXIVIpcTellErrNotFound : FFXIVIpcBasePacket< TellErrNotFound >
   char receipientName[32];
 };
 
+struct FFXIVIpcFreeCompanyEvent : FFXIVIpcBasePacket< FreeCompanyEvent >
+{
+  uint16_t unknown;
+  uint16_t unknown1;
+  uint16_t unknown2;
+  uint16_t unknown3;
+  uint16_t unknown4;
+  char padding[6];
+  uint8_t eventID;
+  /*
+  * 0x0F Login
+  * 0x10 Logout
+  */
+  uint8_t padding1;
+  char padding2[6];
+  uint16_t unknown5;
+  char parameter[46];
+  /**
+  * eventID  | parameter usage
+  * 0x0F       FC name
+  * 0x10       FC name
+  */
+  char parameter1[32];
+  /**
+  * eventID  | parameter1 usage
+  * 0x0F       Character name
+  * 0x10       Character name
+  */
+};
+
 } /* Sapphire::Common::Network::Packets::Server */
 
 
