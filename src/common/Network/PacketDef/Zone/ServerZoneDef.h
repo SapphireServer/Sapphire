@@ -301,6 +301,16 @@ namespace Sapphire::Network::Packets::Server
     uint32_t padding4;
   };
 
+  struct FFXIVIpcFreeCompanyUpdateShortMessage : FFXIVIpcBasePacket< FreeCompanyUpdateShortMessage >
+  {
+    uint32_t unknown;
+    uint16_t unknown1;
+    uint16_t unknown2;
+    uint32_t unknown3;
+    uint32_t unknown5;
+    char shortMessage[104];
+  };
+
   struct FFXIVIpcStatusEffectList : FFXIVIpcBasePacket< StatusEffectList >
   {
     uint8_t classId;

@@ -100,6 +100,7 @@ namespace Sapphire::Network::Packets
     LinkshellList = 0x012A, // updated 5.0
 
     MailDeleteRequest = 0x012B, // updated 5.0
+
     // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
     ReqMoogleMailLetter = 0x0139, // updated 5.0
@@ -114,6 +115,8 @@ namespace Sapphire::Network::Packets
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
     FreeCompanyInfo = 0x013D, // updated 4.5
     ExamineFreeCompanyInfo = 0x013E, // updated 4.5
+
+    FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
 
     StatusEffectList = 0x015B, // updated 5.0
     EurekaStatusEffectList = 0x015C, // updated 5.0
@@ -304,6 +307,8 @@ namespace Sapphire::Network::Packets
 
     FcInfoReqHandler = 0x011A, // updated 4.2
 
+    FreeCompanyUpdateShortMessageHandler = 0x0123, // added 5.0
+
     ReqMarketWishList = 0x012C, // updated 4.3
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
@@ -368,6 +373,8 @@ namespace Sapphire::Network::Packets
   {
     Tell = 0x0064, // updated for sb
     TellErrNotFound = 0x0066,
+
+    FreeCompanyEvent = 0x012C, // added 5.0
   };
 
   /**
