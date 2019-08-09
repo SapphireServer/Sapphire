@@ -13,8 +13,8 @@
 namespace Sapphire::Network::ActorControl
 {
 
-enum ActorControlType : uint16_t
-{
+  enum ActorControlType : uint16_t
+  {
     /*! Toggles weapon status -> Sheathed/UnSheathed
         \param param1 status 0|1 */
     ToggleWeapon = 0x00,
@@ -97,6 +97,8 @@ enum ActorControlType : uint16_t
     ActionLearnMsg1 = 0x87,
 
     FreeEventPos = 0x8A,
+
+    DailyQuestSeed = 0x90, // param1 = the daily quest seed
 
     SetBGM = 0xA1,
 
