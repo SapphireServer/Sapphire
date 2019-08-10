@@ -272,7 +272,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to show the mail delivery notification
   */
-  struct FFXIVIpcMailLetterNotificationt : FFXIVIpcBasePacket< MailLetterNotification >
+  struct FFXIVIpcMailLetterNotification : FFXIVIpcBasePacket< MailLetterNotification >
   {
     uint32_t sendbackCount; // The amount of letters sent back since you ran out of room (moogle dialog changes based on this)
     uint16_t friendLetters; // The amount of letters in the friends section of the letterbox
@@ -281,6 +281,88 @@ namespace Sapphire::Network::Packets::Server
     uint8_t isGmLetter; // Makes the letter notification flash red
     uint8_t isSupportDesk; // After setting this to 1 we can no longer update mail notifications (more research needed on the support desk)
     char unk2[0x4]; // This has probs something to do with the support desk (inquiry id?)
+  };
+
+  struct FFFXIVIpcMarketBoardItemListingCount : FFXIVIpcBasePacket< MarketBoardItemListingCount >
+  {
+    uint32_t itemCatalogId;
+    uint32_t unknown1; // does some shit if nonzero
+    uint16_t requestId;
+    uint16_t quantity; // high/low u8s read separately?
+    uint32_t unknown3;
+  };
+
+  struct FFXIVIpcMarketBoardItemListing : FFXIVIpcBasePacket< MarketBoardItemListing >
+  {
+    struct itemListing // 152 bytes each
+    {
+      uint32_t unknown;
+      uint8_t padding;
+      uint16_t unknown1;
+      uint8_t padding1;
+      struct unknown2
+      {
+        uint32_t unknown3;
+        uint16_t unknown4;
+        uint16_t unknown5;
+      } unknown6[3];
+      uint32_t pricePerUnit;
+      uint32_t unknown7;
+      uint32_t itemQuantity;
+      uint32_t unknown8;
+      uint32_t unknown9;
+      uint32_t unknown10;
+      uint32_t unknown11;
+      char padding2[16];
+      char retainerName[64];
+      bool hq;
+      uint16_t padding3;
+      uint8_t unknown12;
+      uint64_t padding4;
+    } listing[10]; // Multiple packets are sent if there are more than 10 search results.
+    uint32_t unknown13;
+    char padding5[16];
+    uint8_t unknown14;
+    uint16_t padding6;
+    uint8_t unknown15;
+    uint64_t padding7;
+    uint32_t unknown16;
+    uint32_t padding8;
+  };
+
+  struct FFXIVIpcMarketBoardItemListingHistory : FFXIVIpcBasePacket< MarketBoardItemListingHistory >
+  {
+    uint32_t itemCatalogId;
+    uint32_t itemCatalogId2;
+
+    struct MarketListing
+    {
+      uint32_t salePrice;
+      uint32_t purchaseTime;
+      uint32_t quantity;
+      uint8_t isHq;
+      uint8_t padding;
+      uint8_t onMannequin;
+
+      char buyerName[33];
+
+      uint32_t itemCatalogId;
+    } listing[20];
+  };
+
+  struct FFXIVIpcMarketBoardSearchResult : FFXIVIpcBasePacket< MarketBoardSearchResult >
+  {
+    struct MarketBoardItem
+    {
+      uint32_t itemCatalogId;
+      uint16_t quantity;
+      uint16_t demand;
+    } items[20];
+
+    uint32_t itemIndexEnd;
+    uint32_t padding1;
+    uint32_t itemIndexStart;
+    uint32_t requestId;
   };
 
   struct FFXIVIpcExamineFreeCompanyInfo : FFXIVIpcBasePacket< ExamineFreeCompanyInfo >
@@ -1887,50 +1969,6 @@ namespace Sapphire::Network::Packets::Server
     uint32_t otherActorId;
 
     char otherName[32];
-  };
-
-  struct FFXIVIpcMarketBoardSearchResult : FFXIVIpcBasePacket< MarketBoardSearchResult >
-  {
-      struct MarketBoardItem
-      {
-          uint32_t itemCatalogId;
-          uint16_t quantity;
-          uint16_t demand;
-      } items[20];
-
-      uint32_t itemIndexEnd;
-      uint32_t padding1;
-      uint32_t itemIndexStart;
-      uint32_t requestId;
-  };
-
-  struct FFFXIVIpcMarketBoardItemListingCount : FFXIVIpcBasePacket< MarketBoardItemListingCount >
-  {
-    uint32_t itemCatalogId;
-    uint32_t unknown1; // does some shit if nonzero
-    uint16_t requestId;
-    uint16_t quantity; // high/low u8s read separately?
-    uint32_t unknown3;
-  };
-
-  struct FFXIVIpcMarketBoardItemListingHistory : FFXIVIpcBasePacket< MarketBoardItemListingHistory >
-  {
-      uint32_t itemCatalogId;
-      uint32_t itemCatalogId2;
-
-      struct MarketListing
-      {
-          uint32_t salePrice;
-          uint32_t purchaseTime;
-          uint32_t quantity;
-          uint8_t isHq;
-          uint8_t padding;
-          uint8_t onMannequin;
-
-          char buyerName[33];
-
-          uint32_t itemCatalogId;
-      } listing[20];
   };
 
 }
