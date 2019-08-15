@@ -313,11 +313,20 @@ namespace Sapphire::Network::Packets::Server
       uint32_t unknown9;
       uint32_t unknown10;
       uint32_t unknown11;
-      char padding2[16];
+      char unknown12[16]; // Materia? Doesn't seem to match any IDs
       char retainerName[64];
       bool hq;
-      uint16_t padding3;
-      uint8_t unknown12;
+      uint8_t materiaCount;
+      uint8_t padding3;
+      uint8_t retainerCity;
+      /**
+       * 0x01 Limsa Lominsa
+       * 0x02 Gridania
+       * 0x03 Ul'dah
+       * 0x04 Ishgard
+       * 0x07 Kugane
+       * 0x0A Crystarium
+       */
       uint64_t padding4;
     } listing[10]; // Multiple packets are sent if there are more than 10 search results.
     uint32_t unknown13;
