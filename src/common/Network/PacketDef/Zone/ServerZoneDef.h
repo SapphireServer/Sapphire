@@ -296,7 +296,7 @@ namespace Sapphire::Network::Packets::Server
   {
     struct itemListing // 152 bytes each
     {
-      uint32_t unknown;
+      uint32_t unknown; // Changes if multiple packets are sent for a single item
       uint8_t padding;
       uint16_t unknown1;
       uint8_t padding1;
@@ -309,15 +309,18 @@ namespace Sapphire::Network::Packets::Server
       uint32_t pricePerUnit;
       uint32_t unknown7;
       uint32_t itemQuantity;
-      uint32_t unknown8;
-      uint32_t unknown9;
+      uint32_t itemID;
+      uint16_t unknown8;
+      uint16_t unknown9;
       uint32_t unknown10;
-      uint32_t unknown11;
-      char unknown12[16]; // Materia? Doesn't seem to match any IDs
+      uint16_t unknown11; // Always 30000
+      uint16_t padding3;
+      uint16_t materiaValue[5]; // Materia ID = (materiaValue & 0xFF0) >> 4
+      uint32_t padding4;
       char retainerName[64];
       bool hq;
       uint8_t materiaCount;
-      uint8_t padding3;
+      uint8_t padding5;
       uint8_t retainerCity;
       /**
        * 0x01 Limsa Lominsa
@@ -327,16 +330,16 @@ namespace Sapphire::Network::Packets::Server
        * 0x07 Kugane
        * 0x0A Crystarium
        */
-      uint64_t padding4;
+      uint64_t padding6;
     } listing[10]; // Multiple packets are sent if there are more than 10 search results.
-    uint32_t unknown13;
-    char padding5[16];
+    uint32_t unknown12;
+    char padding7[16];
+    uint8_t unknown13;
+    uint16_t padding8;
     uint8_t unknown14;
-    uint16_t padding6;
-    uint8_t unknown15;
-    uint64_t padding7;
-    uint32_t unknown16;
-    uint32_t padding8;
+    uint64_t padding9;
+    uint32_t unknown15;
+    uint32_t padding10;
   };
 
   struct FFXIVIpcMarketBoardItemListingHistory : FFXIVIpcBasePacket< MarketBoardItemListingHistory >
