@@ -313,7 +313,7 @@ namespace Sapphire::Network::Packets::Server
       uint16_t unknown8;
       uint16_t unknown9;
       uint32_t unknown10;
-      uint16_t unknown11; // Always 30000
+      uint16_t durability;
       uint16_t padding3;
       uint16_t materiaValue[5];
       /**
