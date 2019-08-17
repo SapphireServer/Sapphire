@@ -296,36 +296,32 @@ namespace Sapphire::Network::Packets::Server
   {
     struct ItemListing // 152 bytes each
     {
-      uint32_t unknown; // Changes if multiple packets are sent for a single item
-      uint8_t padding;
-      uint16_t unknown1;
-      uint8_t padding1;
-      struct unknown2
-      {
-        uint32_t unknown3;
-        uint16_t unknown4;
-        uint16_t unknown5;
-      } unknown6[3];
+      uint64_t listingId;
+      uint64_t retainerId;
+      uint64_t retainerOwnerId;
+      uint64_t artisanId;
       uint32_t pricePerUnit;
-      uint32_t unknown7;
+      uint32_t totalTax;
       uint32_t itemQuantity;
       uint32_t itemId;
-      uint16_t unknown8;
-      uint16_t unknown9;
-      uint32_t unknown10;
+      uint16_t lastReviewTime;
+      uint16_t containerId;
+      uint32_t slotId;
       uint16_t durability;
-      uint16_t padding3;
+      uint16_t spiritBond;
       /**
        * auto materiaId = (i & 0xFF0) >> 4;
        * auto index = i & 0xF;
        * auto leftover = i >> 8;
        */
       uint16_t materiaValue[5];
-      uint32_t padding4;
-      char retainerName[64];
+      uint16_t padding1;
+      uint32_t padding2;
+      char retainerName[32];
+      char playerName[32];
       bool hq;
       uint8_t materiaCount;
-      uint8_t padding5;
+      uint8_t onMannequin;
       /**
        * 0x01 Limsa Lominsa
        * 0x02 Gridania
@@ -335,9 +331,13 @@ namespace Sapphire::Network::Packets::Server
        * 0x0A Crystarium
        */
       uint8_t retainerCity;
-      uint64_t padding6;
+      uint16_t dyeId;
+      uint16_t padding3;
+      uint32_t padding4;
     } listing[10]; // Multiple packets are sent if there are more than 10 search results.
-    uint32_t unknown12;
+    uint8_t listingIndexEnd;
+    uint8_t listingIndexStart;
+    uint16_t requestId;
     char padding7[16];
     uint8_t unknown13;
     uint16_t padding8;
