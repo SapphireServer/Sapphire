@@ -106,7 +106,7 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x0139, // updated 5.0
     MailLetterNotification = 0x013A, // updated 5.0
 
-    MarketBoardItemListingCount = 0x0125, // updated 4.5
+    MarketBoardItemListingCount = 0x013B, // updated 5.0
     MarketBoardItemListing = 0x013C, // updated 5.0
     MarketBoardItemListingHistory = 0x012A, // updated 4.5
     MarketBoardSearchResult = 0x0139, // updated 4.5
