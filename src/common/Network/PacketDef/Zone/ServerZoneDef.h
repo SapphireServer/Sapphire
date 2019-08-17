@@ -315,18 +315,17 @@ namespace Sapphire::Network::Packets::Server
       uint32_t unknown10;
       uint16_t durability;
       uint16_t padding3;
-      uint16_t materiaValue[5];
       /**
        * auto materiaId = (i & 0xFF0) >> 4;
        * auto index = i & 0xF;
        * auto leftover = i >> 8;
        */
+      uint16_t materiaValue[5];
       uint32_t padding4;
       char retainerName[64];
       bool hq;
       uint8_t materiaCount;
       uint8_t padding5;
-      uint8_t retainerCity;
       /**
        * 0x01 Limsa Lominsa
        * 0x02 Gridania
@@ -335,6 +334,7 @@ namespace Sapphire::Network::Packets::Server
        * 0x07 Kugane
        * 0x0A Crystarium
        */
+      uint8_t retainerCity;
       uint64_t padding6;
     } listing[10]; // Multiple packets are sent if there are more than 10 search results.
     uint32_t unknown12;
