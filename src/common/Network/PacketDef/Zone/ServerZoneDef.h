@@ -294,7 +294,7 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFXIVIpcMarketBoardItemListing : FFXIVIpcBasePacket< MarketBoardItemListing >
   {
-    struct itemListing // 152 bytes each
+    struct ItemListing // 152 bytes each
     {
       uint32_t unknown; // Changes if multiple packets are sent for a single item
       uint8_t padding;
@@ -309,13 +309,18 @@ namespace Sapphire::Network::Packets::Server
       uint32_t pricePerUnit;
       uint32_t unknown7;
       uint32_t itemQuantity;
-      uint32_t itemID;
+      uint32_t itemId;
       uint16_t unknown8;
       uint16_t unknown9;
       uint32_t unknown10;
       uint16_t unknown11; // Always 30000
       uint16_t padding3;
-      uint16_t materiaValue[5]; // Materia ID = (materiaValue & 0xFF0) >> 4
+      uint16_t materiaValue[5];
+      /**
+       * auto materiaId = (i & 0xFF0) >> 4;
+       * auto index = i & 0xF;
+       * auto leftover = i >> 8;
+       */
       uint32_t padding4;
       char retainerName[64];
       bool hq;
