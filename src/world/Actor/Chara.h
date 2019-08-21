@@ -209,6 +209,8 @@ namespace Sapphire::Entity
 
     void setClass( Common::ClassJob classJob );
 
+    Common::Role getRole() const;
+
     void setTargetId( uint64_t targetId );
 
     uint64_t getTargetId() const;

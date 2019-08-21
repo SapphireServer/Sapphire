@@ -74,7 +74,7 @@ int main()
 
   Logger::init( "action_parse" );
 
-  if( !fs::exists( "ActionLut.cpp.tmpl" ) )
+  if( !fs::exists( "ActionLutData.cpp.tmpl" ) )
     throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
 
   Logger::info( "Setting up EXD data" );
@@ -249,9 +249,11 @@ int main()
 //                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
 //                  data.curePotency, data.restorePercentage );
 
-    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {} }} }},\n",
+    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {} }} }},\n",
                             data.name, action.first,
-                            data.potency, data.flankPotency, data.frontPotency, data.rearPotency, data.curePotency );
+                            data.potency, data.comboPotency,
+                            data.flankPotency, data.frontPotency, data.rearPotency,
+                            data.curePotency );
 
     output += out;
 //    Logger::info( out );

@@ -11,7 +11,7 @@
 #include "Forwards.h"
 #include "Action/Action.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"
@@ -53,7 +53,7 @@ Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
 }
 
 Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-                              uint8_t level, uint32_t maxHp, ZonePtr pZone, FrameworkPtr pFw ) :
+                              uint8_t level, uint32_t maxHp, TerritoryPtr pZone, FrameworkPtr pFw ) :
   Npc( ObjKind::BattleNpc, pFw )
 {
   m_id = id;
@@ -78,7 +78,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
 
   m_class = ClassJob::Adventurer;
 
-  m_pCurrentZone = std::move( pZone );
+  m_pCurrentTerritory = std::move( pZone );
 
   m_spawnPos = m_pos;
 
@@ -194,13 +194,13 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
 
-  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
   {
     Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentZone->getGuId(),
-                   m_pCurrentZone->getInternalName() );
+                   m_pCurrentTerritory->getGuId(),
+                   m_pCurrentTerritory->getInternalName() );
     return false;
   }
 
@@ -216,7 +216,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return true;
   }
 
-  m_pCurrentZone->updateActorPosition( *this );
+  m_pCurrentTerritory->updateActorPosition( *this );
   face( pos );
   setPos( pos1 );
   sendPositionUpdate();
@@ -226,13 +226,13 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 {
 
-  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
   {
     Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentZone->getGuId(),
-                   m_pCurrentZone->getInternalName() );
+                   m_pCurrentTerritory->getGuId(),
+                   m_pCurrentTerritory->getInternalName() );
     return false;
   }
 
@@ -248,7 +248,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     return true;
   }
 
-  m_pCurrentZone->updateActorPosition( *this );
+  m_pCurrentTerritory->updateActorPosition( *this );
   face( targetChara.getPos() );
   setPos( pos1 );
   sendPositionUpdate();
@@ -407,7 +407,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
-  auto pNaviProvider = m_pCurrentZone->getNaviProvider();
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
     return;
@@ -692,7 +692,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-    auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
+    auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );

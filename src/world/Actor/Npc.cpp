@@ -9,7 +9,7 @@
 #include "Forwards.h"
 #include "Action/Action.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket142.h"

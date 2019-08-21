@@ -22,9 +22,9 @@ namespace Sapphire::World::Manager
     ~ActionMgr() = default;
 
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                     Data::ActionPtr actionData, uint64_t targetId );
+                                     Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
     void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                   Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos );
+                                   Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );

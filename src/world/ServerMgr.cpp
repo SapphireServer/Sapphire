@@ -286,7 +286,7 @@ void Sapphire::World::ServerMgr::mainLoop()
 
         // if the player is in a zone, let the zone handler take care of his updates
         // else do it here.
-        if( !session->getPlayer()->getCurrentZone() )
+        if( !session->getPlayer()->getCurrentTerritory() )
           session->update();
 
       }

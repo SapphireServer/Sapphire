@@ -8,7 +8,7 @@
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Util/Util.h>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Manager/HousingMgr.h"
 
@@ -287,12 +287,12 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::DirectorInitFinish: // Director init finish
     {
-      player.getCurrentZone()->onInitDirector( player );
+      player.getCurrentTerritory()->onInitDirector( player );
       break;
     }
     case ClientTriggerType::DirectorSync: // Director init finish
     {
-      player.getCurrentZone()->onDirectorSync( player );
+      player.getCurrentTerritory()->onDirectorSync( player );
       break;
     }
     case ClientTriggerType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
@@ -313,7 +313,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestHousingBuildPreset:
     {
-      auto zone = player.getCurrentZone();
+      auto zone = player.getCurrentTerritory();
       auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
       if (!hZone)
         return;

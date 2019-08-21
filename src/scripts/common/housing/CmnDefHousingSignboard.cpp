@@ -1,6 +1,5 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
-#include <Territory/Zone.h>
 #include <Territory/HousingZone.h>
 #include <Manager/HousingMgr.h>
 #include <Network/PacketWrappers/ActorControlPacket143.h>
@@ -35,7 +34,7 @@ public:
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();
 
-        auto pTerritory = player.getCurrentZone();
+        auto pTerritory = player.getCurrentTerritory();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         auto pHouMgr = pFw->get< HousingMgr >();
 

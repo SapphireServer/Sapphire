@@ -15,7 +15,7 @@
 
 #include "Network/GameConnection.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Land.h"
 #include "Territory/ZonePosition.h"
@@ -281,7 +281,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
 
   player.sendDebug( "Walking ZoneLine#{0}", zoneLineId );
 
-  auto pZone = player.getCurrentZone();
+  auto pZone = player.getCurrentTerritory();
 
   auto pLine = pTeriMgr->getTerritoryPosition( zoneLineId );
 
@@ -411,7 +411,7 @@ void Sapphire::Network::GameConnection::finishLoadingHandler( FrameworkPtr pFw,
   gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
   player.queuePacket( gcPacket );
 
-  player.getCurrentZone()->onFinishLoading( player );
+  player.getCurrentTerritory()->onFinishLoading( player );
 
   // player is done zoning
   player.setLoadingComplete( true );
@@ -428,7 +428,7 @@ void Sapphire::Network::GameConnection::finishLoadingHandler( FrameworkPtr pFw,
   player.spawn( player.getAsPlayer() );
 
   // notify the zone of a change in position to force an "inRangeActor" update
-  player.getCurrentZone()->updateActorPosition( player );
+  player.getCurrentTerritory()->updateActorPosition( player );
 }
 
 void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
@@ -450,7 +450,7 @@ void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
     int32_t entrysizes = sizeof( listPacket->data().entries );
     memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
-    listPacket->data().entries[ 0 ].bytes[ 2 ] = player.getCurrentZone()->getTerritoryTypeId();
+    listPacket->data().entries[ 0 ].bytes[ 2 ] = player.getCurrentTerritory()->getTerritoryTypeId();
     listPacket->data().entries[ 0 ].bytes[ 3 ] = 0x80;
     listPacket->data().entries[ 0 ].bytes[ 4 ] = 0x02;
     listPacket->data().entries[ 0 ].bytes[ 6 ] = 0x3B;
@@ -458,7 +458,7 @@ void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
     listPacket->data().entries[ 0 ].classJob = static_cast< uint8_t >( player.getClass() );
     listPacket->data().entries[ 0 ].contentId = player.getContentId();
     listPacket->data().entries[ 0 ].level = player.getLevel();
-    listPacket->data().entries[ 0 ].zoneId = player.getCurrentZone()->getTerritoryTypeId();
+    listPacket->data().entries[ 0 ].zoneId = player.getCurrentTerritory()->getTerritoryTypeId();
     listPacket->data().entries[ 0 ].zoneId1 = 0x0100;
     // TODO: no idea what this does
     //listPacket.data().entries[0].one = 1;
@@ -516,7 +516,7 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
       if( player.isActingAsGm() )
         chatPacket->data().chatType = ChatType::GMSay;
 
-      player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
+      player.getCurrentTerritory()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
     case ChatType::Yell:
@@ -524,7 +524,7 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
       if( player.isActingAsGm() )
         chatPacket->data().chatType = ChatType::GMYell;
 
-      player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
+      player.getCurrentTerritory()->queuePacketForRange( player, 6000, chatPacket );
       break;
     }
     case ChatType::Shout:
@@ -532,12 +532,12 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
       if( player.isActingAsGm() )
         chatPacket->data().chatType = ChatType::GMShout;
 
-      player.getCurrentZone()->queuePacketForRange( player, 6000, chatPacket );
+      player.getCurrentTerritory()->queuePacketForRange( player, 6000, chatPacket );
       break;
     }
     default:
     {
-      player.getCurrentZone()->queuePacketForRange( player, 50, chatPacket );
+      player.getCurrentTerritory()->queuePacketForRange( player, 50, chatPacket );
       break;
     }
   }

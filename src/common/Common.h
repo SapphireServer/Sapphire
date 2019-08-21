@@ -990,6 +990,18 @@ namespace Sapphire::Common
     CircularAoEPlaced = 7
   };
 
+  enum class Role : uint8_t
+  {
+    None,
+    Tank,
+    Healer,
+    RangedPhysical,
+    RangedMagical,
+    Melee,
+    Crafter,
+    Gatherer
+  };
+
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
 }

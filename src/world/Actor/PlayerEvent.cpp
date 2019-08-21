@@ -11,7 +11,7 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "ServerMgr.h"
 #include "Framework.h"
 

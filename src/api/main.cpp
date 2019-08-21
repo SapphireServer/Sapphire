@@ -699,7 +699,7 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
   catch( const exception& )
   {
     string content = "Path not found: " + request->path;
-    *response << buildHttpResponse( 400, content );
+    *response << buildHttpResponse( 404, content );
   }
 }
 
