@@ -1,5 +1,8 @@
 #include "Action.h"
 #include "ActionLut.h"
+#include "EffectBuilder.h"
+
+#include <Inventory/Item.h>
 
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
@@ -11,15 +14,17 @@
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include <Network/CommonActorControl.h>
 #include "Network/PacketWrappers/ActorControlPacket142.h"
 #include "Network/PacketWrappers/ActorControlPacket143.h"
 #include "Network/PacketWrappers/ActorControlPacket144.h"
-#include <Network/PacketWrappers/EffectPacket.h>
+
 #include <Logging/Logger.h>
+
 #include <Util/ActorFilter.h>
+#include <Util/UtilMath.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -33,19 +38,21 @@ using namespace Sapphire::World;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
-  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw ) :
+  Action( std::move( caster ), actionId, sequence, nullptr, std::move( fw ) )
 {
 }
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw ) :
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
+                        Data::ActionPtr actionData, FrameworkPtr fw ) :
   m_pSource( std::move( caster ) ),
   m_pFw( std::move( fw ) ),
   m_actionData( std::move( actionData ) ),
   m_id( actionId ),
   m_targetId( 0 ),
   m_startTime( 0 ),
-  m_interruptType( Common::ActionInterruptType::None )
+  m_interruptType( Common::ActionInterruptType::None ),
+  m_sequence( sequence )
 {
 }
 
@@ -67,6 +74,8 @@ bool Action::Action::init()
 
     m_actionData = actionData;
   }
+
+  m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_sequence );
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
@@ -217,13 +226,20 @@ void Action::Action::start()
   if( hasCastTime() )
   {
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
+    auto& data = castPacket->data();
 
-    castPacket->data().action_id = static_cast< uint16_t >( m_id );
-    castPacket->data().skillType = Common::SkillType::Normal;
-    castPacket->data().unknown_1 = m_id;
+    data.action_id = static_cast< uint16_t >( m_id );
+    data.skillType = Common::SkillType::Normal;
+    data.unknown_1 = m_id;
     // This is used for the cast bar above the target bar of the caster.
-    castPacket->data().cast_time = m_castTimeMs / 1000.f;
-    castPacket->data().target_id = static_cast< uint32_t >( m_targetId );
+    data.cast_time = m_castTimeMs / 1000.f;
+    data.target_id = static_cast< uint32_t >( m_targetId );
+
+    auto pos = m_pSource->getPos();
+    data.posX = Common::Util::floatToUInt16( pos.x );
+    data.posY = Common::Util::floatToUInt16( pos.y );
+    data.posZ = Common::Util::floatToUInt16( pos.z );
+    data.rotation = m_pSource->getRot();
 
     m_pSource->sendToInRangeSet( castPacket, true );
 
@@ -326,30 +342,13 @@ void Action::Action::execute()
     player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
-  if( !hasClientsideTarget() )
+  if( !hasClientsideTarget()  )
   {
-    snapshotAffectedActors( m_hitActors );
-
-    if( !m_hitActors.empty() )
-    {
-      // only call script if actors are hit
-      if( !pScriptMgr->onExecute( *this ) && ActionLut::validEntryExists( getId() ) )
-      {
-        auto lutEntry = ActionLut::getEntry( getId() );
-
-        // no script exists but we have a valid lut entry
-        if( auto player = getSourceChara()->getAsPlayer() )
-        {
-          player->sendDebug( "Hit target: pot: {} (f: {}, r: {}), heal pot: {}",
-                             lutEntry.potency, lutEntry.flankPotency, lutEntry.rearPotency, lutEntry.curePotency );
-        }
-      }
-    }
+    buildEffects();
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
     pScriptMgr->onEObjHit( *player, m_targetId, getId() );
-    return;
   }
 
   // set currently casted action as the combo action if it interrupts a combo
@@ -358,6 +357,83 @@ void Action::Action::execute()
   {
     m_pSource->setLastComboActionId( getId() );
   }
+}
+
+std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
+{
+  // todo: what do for npcs?
+  auto wepDmg = 1.f;
+
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  auto dmg = Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+
+  return std::make_pair( dmg, Common::ActionHitSeverityType::NormalDamage );
+}
+
+void Action::Action::buildEffects()
+{
+  snapshotAffectedActors( m_hitActors );
+
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+
+  if( !pScriptMgr->onExecute( *this ) && !ActionLut::validEntryExists( getId() ) )
+  {
+    if( auto player = m_pSource->getAsPlayer() )
+    {
+      player->sendUrgent( "missing lut entry for action#{}", getId() );
+    }
+
+    return;
+  }
+
+  if( m_hitActors.empty() )
+    return;
+
+  auto lutEntry = ActionLut::getEntry( getId() );
+
+  // no script exists but we have a valid lut entry
+  if( auto player = getSourceChara()->getAsPlayer() )
+  {
+    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}",
+                       lutEntry.potency, lutEntry.comboPotency, lutEntry.flankPotency, lutEntry.rearPotency,
+                       lutEntry.curePotency );
+  }
+
+  for( auto& actor : m_hitActors )
+  {
+    // todo: this is shit
+    if( lutEntry.curePotency > 0 )
+    {
+
+      m_effectBuilder->healTarget( actor, lutEntry.curePotency );
+    }
+
+    else if( lutEntry.potency > 0 )
+    {
+      auto dmg = calcDamage( lutEntry.potency );
+      m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
+    }
+  }
+
+  m_effectBuilder->buildAndSendPackets();
+
+  // at this point we're done with it and no longer need it
+  m_effectBuilder.reset();
 }
 
 bool Action::Action::preCheck()

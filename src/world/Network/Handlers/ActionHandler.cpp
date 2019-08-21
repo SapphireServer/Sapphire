@@ -48,7 +48,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
       if( !action )
         return;
 
-      actionMgr->handleTargetedPlayerAction( player, actionId, action, targetId );
+      actionMgr->handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
       break;
     }
 
@@ -112,5 +112,5 @@ void Sapphire::Network::GameConnection::placedActionHandler( FrameworkPtr pFw,
     return;
 
   auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handlePlacedPlayerAction( player, actionId, action, pos );
+  actionMgr->handlePlacedPlayerAction( player, actionId, action, pos, sequence );
 }

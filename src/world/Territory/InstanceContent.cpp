@@ -34,7 +34,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
                                             const std::string& contentName,
                                             uint32_t instanceContentId,
                                             FrameworkPtr pFw ) :
-  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
   Director( Event::Director::InstanceContent, instanceContentId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),
@@ -48,7 +48,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
 
 bool Sapphire::InstanceContent::init()
 {
-  if( !Zone::init() )
+  if( !Territory::init() )
     return false;
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
@@ -75,7 +75,7 @@ Sapphire::Data::ExdDataGenerated::InstanceContentPtr Sapphire::InstanceContent::
 
 void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "InstanceContent::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "InstanceContent::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   // mark player as "bound by duty"
@@ -90,7 +90,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "InstanceContent::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "InstanceContent::onLeaveTerritory: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   clearDirector( player );
@@ -318,7 +318,7 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Zone " +
+    Logger::error( "InstanceContent::onRegisterEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }

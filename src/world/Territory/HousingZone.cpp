@@ -33,7 +33,7 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum,
                                     const std::string& internalName,
                                     const std::string& contentName,
                                     FrameworkPtr pFw ) :
-  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
+  Territory( territoryTypeId, guId, internalName, contentName, pFw ),
   m_wardNum( wardNum ),
   m_territoryTypeId( territoryTypeId ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum ),
@@ -155,7 +155,7 @@ bool Sapphire::HousingZone::init()
 
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "HousingZone::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "HousingZone::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto isInSubdivision = isPlayerSubInstance( player ) ? true : false;

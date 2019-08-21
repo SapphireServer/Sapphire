@@ -16,7 +16,7 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/Land.h"
@@ -311,8 +311,8 @@ bool Sapphire::Entity::Player::isAutoattackOn() const
 
 void Sapphire::Entity::Player::sendStats()
 {
-
   auto statPacket = makeZonePacket< FFXIVIpcPlayerStats >( getId() );
+
   statPacket->data().strength = getStatValue( Common::BaseParam::Strength );
   statPacket->data().dexterity = getStatValue( Common::BaseParam::Dexterity );
   statPacket->data().vitality = getStatValue( Common::BaseParam::Vitality );
@@ -322,16 +322,14 @@ void Sapphire::Entity::Player::sendStats()
   statPacket->data().determination = getStatValue( Common::BaseParam::Determination );
   statPacket->data().hp = getStatValue( Common::BaseParam::HP );
   statPacket->data().mp = getStatValue( Common::BaseParam::MP );
-  statPacket->data().accuracy = m_baseStats.accuracy;
-  statPacket->data().attack = getStatValue( Common::BaseParam::AttackPower );
+  statPacket->data().directHitRate = getStatValue( Common::BaseParam::DirectHitRate );
+  statPacket->data().attackPower = getStatValue( Common::BaseParam::AttackPower );
   statPacket->data().attackMagicPotency = getStatValue( Common::BaseParam::AttackMagicPotency );
   statPacket->data().healingMagicPotency = getStatValue( Common::BaseParam::HealingMagicPotency );
   statPacket->data().skillSpeed = getStatValue( Common::BaseParam::SkillSpeed );
   statPacket->data().spellSpeed = getStatValue( Common::BaseParam::SpellSpeed );
-  statPacket->data().spellSpeed1 = getStatValue( Common::BaseParam::SpellSpeed );
-  statPacket->data().spellSpeedMod = 100;
-
-  statPacket->data().criticalHitRate = getStatValue( Common::BaseParam::CriticalHit );
+  statPacket->data().haste = 100;
+  statPacket->data().criticalHit = getStatValue( Common::BaseParam::CriticalHit );
   statPacket->data().defense = getStatValue( Common::BaseParam::Defense );
   statPacket->data().magicDefense = getStatValue( Common::BaseParam::MagicDefense );
   statPacket->data().tenacity = getStatValue( Common::BaseParam::Tenacity );
@@ -437,14 +435,14 @@ bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
   return setInstance( instance );
 }
 
-bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
 {
   m_onEnterEventDone = false;
   if( !instance )
     return false;
 
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-  auto currentZone = getCurrentZone();
+  auto currentZone = getCurrentTerritory();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
@@ -458,14 +456,14 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
   return pTeriMgr->movePlayer( instance, getAsPlayer() );
 }
 
-bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_POSITION3 pos )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos )
 {
   m_onEnterEventDone = false;
   if( !instance )
     return false;
 
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-  auto currentZone = getCurrentZone();
+  auto currentZone = getCurrentTerritory();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
@@ -489,7 +487,7 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto pTeriMgr = m_pFw->get< TerritoryMgr >();
 
-  auto pZone = getCurrentZone();
+  auto pZone = getCurrentTerritory();
   auto pInstance = pZone->getAsInstanceContent();
 
   resetHp();
@@ -596,7 +594,7 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   int32_t offset = 4;
 
   auto info = pExdData->get< Sapphire::Data::Map >(
-    pExdData->get< Sapphire::Data::TerritoryType >( getCurrentZone()->getTerritoryTypeId() )->map );
+    pExdData->get< Sapphire::Data::TerritoryType >( getCurrentTerritory()->getTerritoryTypeId() )->map );
   if( info->discoveryArrayByte )
     offset = 5 + 2 * info->discoveryIndex;
   else
@@ -1065,7 +1063,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-    if( getCurrentZone()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
+    if( getCurrentTerritory()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
     {
       performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation );
     }
@@ -1567,7 +1565,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
   auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
 
-  auto damage = Math::CalcStats::calculateAutoAttackDamage( *this );
+  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1683,7 +1681,7 @@ void Sapphire::Entity::Player::sendZonePackets()
     pServerMgr->updatePlayerName( getId(), getName() );
   }
 
-  getCurrentZone()->onBeforePlayerZoneIn( *this );
+  getCurrentTerritory()->onBeforePlayerZoneIn( *this );
 
   auto initPacket = makeZonePacket< FFXIVIpcInit >( getId() );
   initPacket->data().charId = getId();
@@ -1749,17 +1747,17 @@ void Sapphire::Entity::Player::sendZonePackets()
   sendLandFlags();
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
-  initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
-  initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
+  initZonePacket->data().zoneId = getCurrentTerritory()->getTerritoryTypeId();
+  initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentTerritory()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
-  initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
-  initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
+  initZonePacket->data().festivalId = getCurrentTerritory()->getCurrentFestival().first;
+  initZonePacket->data().additionalFestivalId = getCurrentTerritory()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;
   queuePacket( initZonePacket );
 
-  getCurrentZone()->onPlayerZoneIn( *this );
+  getCurrentTerritory()->onPlayerZoneIn( *this );
 
   if( isLogin() )
   {

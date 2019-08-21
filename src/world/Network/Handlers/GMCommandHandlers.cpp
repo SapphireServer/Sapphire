@@ -14,7 +14,7 @@
 #include "Session.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
@@ -190,9 +190,9 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Weather:
     {
-      targetPlayer->getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
-      player.sendNotice( "Weather in Zone \"{0}\" of {1} set in range.",
-                         targetPlayer->getCurrentZone()->getName(), targetPlayer->getName() );
+      targetPlayer->getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
+      player.sendNotice( "Weather in Territory \"{0}\" of {1} set in range.",
+                         targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getName() );
       break;
     }
     case GmCommand::Call:
@@ -208,7 +208,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     {
       player.sendNotice( "Name: {0}"
                          "\nGil: {1}"
-                         "\nZone: {2}"
+                         "\nTerritory: {2}"
                          "({3})"
                          "\nClass: {4}"
                          "\nLevel: {5}"
@@ -217,7 +217,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
                          "\nPlayTime: {8}",
                          targetPlayer->getName(),
                          targetPlayer->getCurrency( CurrencyType::Gil ),
-                         targetPlayer->getCurrentZone()->getName(),
+                         targetPlayer->getCurrentTerritory()->getName(),
                          targetPlayer->getZoneId(),
                          static_cast< uint8_t >( targetPlayer->getClass() ),
                          targetPlayer->getLevel(),
@@ -551,7 +551,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::TeriInfo:
     {
-      auto pCurrentZone = player.getCurrentZone();
+      auto pCurrentZone = player.getCurrentTerritory();
       player.sendNotice( "ZoneId: {0}"
                          "\nName: {1}"
                          "\nInternalName: {2}"
@@ -657,16 +657,16 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         player.exitInstance();
       }
-      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+      if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
       {
-        // Checks if the target player is in an InstanceContent to avoid binding to a Zone or PublicContent
+        // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         if( targetPlayer->getCurrentInstance() )
         {
           auto pInstanceContent = targetPlayer->getCurrentInstance()->getAsInstanceContent();
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
         }
-        player.setInstance( targetPlayer->getCurrentZone()->getGuId() );
+        player.setInstance( targetPlayer->getCurrentTerritory()->getGuId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
@@ -687,9 +687,9 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       {
         targetPlayer->exitInstance();
       }
-      if( targetPlayer->getCurrentZone()->getGuId() != player.getCurrentZone()->getGuId() )
+      if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
       {
-        targetPlayer->setInstance( player.getCurrentZone()->getGuId() );
+        targetPlayer->setInstance( player.getCurrentTerritory()->getGuId() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );

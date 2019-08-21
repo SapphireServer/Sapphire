@@ -102,21 +102,21 @@ namespace Sapphire::World::Manager
     bool isHousingTerritory( uint32_t territoryTypeId ) const;
 
     /*! creates a new instance for a given territoryTypeId */
-    ZonePtr createTerritoryInstance( uint32_t territoryTypeId );
+    TerritoryPtr createTerritoryInstance( uint32_t territoryTypeId );
 
-    ZonePtr createInstanceContent( uint32_t contentFinderConditionId );
+    TerritoryPtr createInstanceContent( uint32_t contentFinderConditionId );
 
-    ZonePtr createQuestBattle( uint32_t contentFinderConditionId );
+    TerritoryPtr createQuestBattle( uint32_t contentFinderConditionId );
 
     void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
 
-    ZonePtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
+    TerritoryPtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
 
     /*! removes instance by instanceId, return true if successful */
     bool removeTerritoryInstance( uint32_t guId );
 
-    /*! returns a ZonePtr to the instance or nullptr if not found */
-    ZonePtr getTerritoryByGuId( uint32_t guId ) const;
+    /*! returns a TerritoryPtr to the instance or nullptr if not found */
+    TerritoryPtr getTerritoryByGuId( uint32_t guId ) const;
 
     /*! returns the cached detail of a territory, nullptr if not found */
     Data::TerritoryTypePtr getTerritoryDetail( uint32_t territoryTypeId ) const;
@@ -129,17 +129,17 @@ namespace Sapphire::World::Manager
 
     /*! returns a default Zone by territoryTypeId
         TODO: Mind multiple instances?! */
-    ZonePtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
+    TerritoryPtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
 
     /*! returns a Zone by landSetId */
-    ZonePtr getZoneByLandSetId( uint32_t landSetId ) const;
+    TerritoryPtr getZoneByLandSetId( uint32_t landSetId ) const;
 
     bool movePlayer( uint32_t territoryTypeId, Entity::PlayerPtr pPlayer );
 
-    bool movePlayer( ZonePtr, Entity::PlayerPtr pPlayer );
+    bool movePlayer( TerritoryPtr, Entity::PlayerPtr pPlayer );
 
     /*! returns an instancePtr if the player is still bound to an isntance */
-    ZonePtr getLinkedInstance( uint32_t playerId ) const;
+    TerritoryPtr getLinkedInstance( uint32_t playerId ) const;
 
     /*!
      * @brief Sets the current festival for every zone
@@ -163,16 +163,16 @@ namespace Sapphire::World::Manager
 
   private:
     using TerritoryTypeDetailCache = std::unordered_map< uint16_t, Data::TerritoryTypePtr >;
-    using InstanceIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
-    using LandSetIdToZonePtrMap = std::unordered_map< uint32_t, ZonePtr >;
-    using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
-    using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
-    using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToZonePtrMap >;
+    using InstanceIdToTerritoryPtrMap = std::unordered_map< uint32_t, TerritoryPtr >;
+    using LandSetIdToTerritoryPtrMap = std::unordered_map< uint32_t, TerritoryPtr >;
+    using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
+    using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
+    using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToContentFinderCondMap = std::unordered_map< uint16_t, uint16_t >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
-    using LandIdentToZonePtrMap = std::unordered_map< uint64_t, ZonePtr >;
+    using LandIdentToTerritoryPtrMap = std::unordered_map< uint64_t, TerritoryPtr >;
 
     /*! map holding details for territory templates */
     TerritoryTypeDetailCache m_territoryTypeDetailCacheMap;
@@ -181,7 +181,7 @@ namespace Sapphire::World::Manager
     TerritoryTypeIdToInstanceMap m_territoryTypeIdToInstanceGuidMap;
 
     /*! map holding actual instances of default territories */
-    LandSetIdToZonePtrMap m_landSetIdToZonePtrMap;
+    LandSetIdToTerritoryPtrMap m_landSetIdToTerritoryPtrMap;
 
     /*! map holding actual instances of InstanceContent */
     InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
@@ -190,7 +190,7 @@ namespace Sapphire::World::Manager
     QuestBattleIdToInstanceMap m_questBattleIdToInstanceMap;
 
     /*! flat map for easier lookup of instances by guid */
-    InstanceIdToZonePtrMap m_guIdToZonePtrMap;
+    InstanceIdToTerritoryPtrMap m_guIdToTerritoryPtrMap;
 
     /*! map holding positions for zonelines */
     PositionMap m_territoryPositionMap;
@@ -199,16 +199,16 @@ namespace Sapphire::World::Manager
     PlayerIdToInstanceIdMap m_playerIdToInstanceMap;
 
     /*! map for storing landident to zones, used for internal housing zones */
-    LandIdentToZonePtrMap m_landIdentToZonePtrMap;
+    LandIdentToTerritoryPtrMap m_landIdentToTerritoryPtrMap;
 
     /*! internal counter for instanceIds */
     uint32_t m_lastInstanceId;
 
-    /*! set of ZonePtrs for quick iteration*/
-    std::set< ZonePtr > m_zoneSet;
+    /*! set of TerritoryPtrs for quick iteration*/
+    std::set< TerritoryPtr > m_territorySet;
 
-    /*! set of ZonePtrs for quick iteration*/
-    std::set< ZonePtr > m_instanceZoneSet;
+    /*! set of TerritoryPtrs for quick iteration*/
+    std::set< TerritoryPtr > m_instanceZoneSet;
 
     /*! current festival(s) to set for public zones from festival.exd */
     std::pair< uint16_t, uint16_t > m_currentFestival;

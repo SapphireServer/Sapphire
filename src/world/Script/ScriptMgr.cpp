@@ -3,7 +3,7 @@
 
 #include <watchdog/Watchdog.h>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
 #include "Actor/Player.h"
@@ -163,7 +163,7 @@ void Sapphire::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& pl
 bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId )
 {
   // check if the actor is an eobj and call its script if we have one
-  auto zone = player.getCurrentZone();
+  auto zone = player.getCurrentTerritory();
   if( auto eobj = zone->getEObj( actorId ) )
   {
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getObjectId() );
@@ -412,7 +412,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, u
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onZoneInit( ZonePtr pZone )
+bool Sapphire::Scripting::ScriptMgr::onZoneInit( TerritoryPtr pZone )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( pZone->getTerritoryTypeId() );
   if( script )
