@@ -877,10 +877,10 @@ namespace Sapphire::Network::Packets::Server
     unsigned char maxLevel;
     unsigned char expansion;
     unsigned char unknown76;
+    unsigned char unknown77;
     unsigned char race;
     unsigned char tribe;
     unsigned char gender;
-    unsigned char unknown7A;
     unsigned char currentJob;
     unsigned char currentClass;
     unsigned char deity;
