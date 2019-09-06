@@ -225,6 +225,14 @@ namespace Sapphire::Network::ActorControl
     SetFestival = 0x386, // param1: festival.exd index
 
     ToggleOrchestrionUnlock = 0x396,
+
+    /*!
+    * param1 = mountSpeed
+    * Retail sends 12 for mount speed star 1 unlocked and 15 for mount speed star 2 unlocked
+    * This also has to be sent before mounting finishes for it to take effect
+    */
+    SetMountSpeed = 0x39F,
+
     Dismount = 0x3A1, // updated 4.5
 
     // Duty Recorder
