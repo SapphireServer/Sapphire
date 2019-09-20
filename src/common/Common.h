@@ -210,7 +210,7 @@ namespace Sapphire::Common
     Currency = 2000,
     Crystal = 2001,
     //UNKNOWN_0 = 2003,
-      KeyItem = 2004,
+    KeyItem = 2004,
     HandIn = 2005,
     DamagedGear = 2007,
     //UNKNOWN_1 = 2008,
@@ -229,6 +229,9 @@ namespace Sapphire::Common
 
     ArmorySoulCrystal = 3400,
     ArmoryMain = 3500,
+    
+    SaddleBag0 = 4000,
+    SaddleBag1 = 4001,
 
     RetainerBag0 = 10000,
     RetainerBag1 = 10001,
