@@ -513,6 +513,23 @@ namespace Sapphire::Network::Packets::Server
 
   /**
   * Structural representation of the packet sent by the server
+  * to update certain player details / status
+  */
+  struct FFXIVIpcActorControl20F : FFXIVIpcBasePacket< ActorControl20F >
+  {
+    /* 0000 */ uint16_t category;
+    /* 0002 */ uint16_t padding;
+    /* 0004 */ uint32_t resultType; // 4321 => item used, 4922 => item obtained, 4925 => exp obtained
+    /* 0008 */ uint32_t param2;
+    /* 000C */ uint32_t itemId;
+    /* 0010 */ uint32_t param4;
+    /* 0014 */ uint32_t expGained;
+    /* 0018 */ uint32_t param6;
+    /* 0018 */ uint32_t padding1;
+  };
+
+  /**
+  * Structural representation of the packet sent by the server
   * to update HP / MP / TP
   */
   struct FFXIVIpcUpdateHpMpTp : FFXIVIpcBasePacket< UpdateHpMpTp >
