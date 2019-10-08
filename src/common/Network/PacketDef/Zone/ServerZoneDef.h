@@ -519,7 +519,7 @@ namespace Sapphire::Network::Packets::Server
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
-    /* 0004 */ uint32_t resultType; // 4321 => item used, 4922 => item obtained, 4925 => exp obtained
+    /* 0004 */ Common::DesynthPacketType resultType;
     /* 0008 */ uint32_t param2;
     /* 000C */ uint32_t itemId;
     /* 0010 */ uint32_t param4;
