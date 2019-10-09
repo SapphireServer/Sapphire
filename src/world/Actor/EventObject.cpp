@@ -3,9 +3,9 @@
 #include "Territory/InstanceContent.h"
 #include "Actor/Player.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 
 #include <Logging/Logger.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>

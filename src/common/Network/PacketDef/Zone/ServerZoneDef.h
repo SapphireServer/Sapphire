@@ -467,7 +467,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl142 : FFXIVIpcBasePacket< ActorControl142 >
+  struct FFXIVIpcActorControl : FFXIVIpcBasePacket< ActorControl >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
@@ -482,7 +482,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl143 : FFXIVIpcBasePacket< ActorControl143 >
+  struct FFXIVIpcActorControlSelf : FFXIVIpcBasePacket< ActorControlSelf >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
@@ -499,7 +499,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl144 : FFXIVIpcBasePacket< ActorControl144 >
+  struct FFXIVIpcActorControlTarget : FFXIVIpcBasePacket< ActorControlTarget >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;

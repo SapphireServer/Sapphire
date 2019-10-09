@@ -52,9 +52,9 @@ namespace Sapphire::Network::Packets
     InitZone = 0x019A,
 
     EffectResult = 0x0141,
-    ActorControl142 = 0x0142,
-    ActorControl143 = 0x0143,
-    ActorControl144 = 0x0144,
+    ActorControl = 0x0142,
+    ActorControlSelf = 0x0143,
+    ActorControlTarget = 0x0144,
     UpdateHpMpTp = 0x0145,
 
     ///////////////////////////////////////////////////

@@ -22,9 +22,9 @@
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
@@ -458,7 +458,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     case GmCommand::Wireframe:
     {
       player.queuePacket(
-        std::make_shared< ActorControlPacket143 >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
+        std::make_shared< ActorControlSelfPacket >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
       player.sendNotice( "Wireframe Rendering for {0} was toggled", player.getName() );
       break;
     }

@@ -3,8 +3,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 #include "Actor/Player.h"
 

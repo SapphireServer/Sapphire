@@ -13,7 +13,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Database/DatabaseDef.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 
 #include "Territory.h"
 #include "InstanceContent.h"

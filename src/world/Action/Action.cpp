@@ -17,9 +17,9 @@
 #include "Territory/Territory.h"
 
 #include <Network/CommonActorControl.h>
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 
 #include <Logging/Logger.h>
 
@@ -325,7 +325,7 @@ void Action::Action::execute()
   if( hasCastTime() )
   {
     // todo: what's this?
-    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
+    /*auto control = ActorControlSelfPacket( m_pTarget->getId(), ActorControlType::Unk7,
                                             0x219, m_id, m_id, m_id, m_id );
     m_pSource->sendToInRangeSet( control, true );*/
 

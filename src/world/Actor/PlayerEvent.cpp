@@ -3,7 +3,7 @@
 #include <Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/EventStartPacket.h"
