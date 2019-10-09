@@ -261,6 +261,9 @@ namespace Sapphire::Network::Packets
     // 2C3 and 2C4 are currently unknown
     MahjongEndRoundDraw = 0x02C5, // self explanatory
     MahjongEndGame = 0x02C6, // finished oorasu(all-last) round; shows a result screen.
+
+    // Desynth /////////////////////////////////////////////
+    DesynthResult = 0x020F,
   };
 
   /**

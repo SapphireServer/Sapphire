@@ -515,11 +515,11 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl20F : FFXIVIpcBasePacket< ActorControl20F >
+  struct FFXIVIpcDesynthResult : FFXIVIpcBasePacket< DesynthResult >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
-    /* 0004 */ Common::DesynthPacketType resultType;
+    /* 0004 */ Common::DesynthResultType resultType;
     /* 0008 */ uint32_t param2;
     /* 000C */ uint32_t itemId;
     /* 0010 */ uint32_t param4;

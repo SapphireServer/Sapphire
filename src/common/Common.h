@@ -1005,7 +1005,7 @@ namespace Sapphire::Common
     Gatherer
   };
 
-  enum DesynthPacketType : uint32_t
+  enum DesynthResultType : uint32_t
   {
     ItemConsumed = 4921,
     ItemObtained = 4922,
