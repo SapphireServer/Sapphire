@@ -206,6 +206,14 @@ namespace Sapphire::Network::ActorControl
     ChallengeEntryCompleteMsg = 0x20B,
     ChallengeEntryUnlockMsg = 0x20C,
 
+    /*!
+     * Sent when a player desynths an item, one packet per result type (one for consumed item, one for each obtained items, and one for exp if the player received exp)
+     * param1 = result type (4921 => Item consumed, 4922 => Item obtained, 4925 => Exp obtained)
+     * param3 = item id (used for result types 4921 & 4922)
+     * param5 = exp amount (x 100)
+     */
+    DesynthResult = 0x20F,
+
     GilTrailMsg = 0x211,
 
     HuntingLogRankUnlock = 0x21D,
