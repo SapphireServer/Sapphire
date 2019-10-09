@@ -16,8 +16,8 @@
 #include "DebugCommandMgr.h"
 
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/GameConnection.h"
@@ -494,7 +494,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     player.sendNotice( "Injecting ACTOR_CONTROL {0}", opcode );
 
-    auto actorControl = makeZonePacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
+    auto actorControl = makeZonePacket< FFXIVIpcActorControlSelf >( playerId, player.getId() );
     actorControl->data().category = opcode;
     actorControl->data().param1 = param1;
     actorControl->data().param2 = param2;
@@ -511,7 +511,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     player.queuePacket( noticePacket );
 
-    Network::Packets::Server::ActorControlPacket143 controlPacket( player, opcode,
+    Network::Packets::Server::ActorControlSelfPacket controlPacket( player, opcode,
     param1, param2, param3, param4, param5, param6, playerId );
     player.queuePacket( controlPacket );*/
 

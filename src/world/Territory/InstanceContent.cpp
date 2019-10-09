@@ -13,8 +13,8 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 
 #include "Event/EventHandler.h"
@@ -410,7 +410,7 @@ void Sapphire::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
     auto player = playerIt.second;
     // note: retail do send a BGM_MUTE(1) first before any BGM transition, but YOLO in this case.
     // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
-    // player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
+    // player->queuePacket( ActorControlSelfPacket( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
     player->queuePacket(
       makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
   }

@@ -2,7 +2,7 @@
 #include <Actor/Player.h>
 #include <Territory/HousingZone.h>
 #include <Manager/HousingMgr.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
 #include <Exd/ExdDataGenerated.h>
 #include "Framework.h"
