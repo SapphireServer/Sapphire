@@ -39,7 +39,7 @@ namespace Sapphire::Network::Packets::Server
   };
 
   template< typename... Args >
-  std::shared_ptr< ActorControlPacket > makeActorControl142( Args... args )
+  std::shared_ptr< ActorControlPacket > makeActorControl( Args... args )
   {
     return std::make_shared< ActorControlPacket >( args... );
   }

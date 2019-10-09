@@ -80,7 +80,7 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
 
   for( const auto& player : m_inRangePlayers )
   {
-    player->queuePacket( makeActorControl142( getId(), DirectorEObjMod, state ) );
+    player->queuePacket( makeActorControl( getId(), DirectorEObjMod, state ) );
   }
 }
 
@@ -88,7 +88,7 @@ void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t an
 {
   for( const auto& player : m_inRangePlayers )
   {
-    player->queuePacket( makeActorControl142( getId(), EObjAnimation, flag, animationFlag ) );
+    player->queuePacket( makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
   }
 }
 

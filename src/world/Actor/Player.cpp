@@ -373,19 +373,19 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   if( type == 1 ) // teleport
   {
     prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
-    sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x04 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
     setZoningType( Common::ZoneingType::Teleport );
   }
   else if( type == 2 ) // aethernet
   {
     prepareZoning( data->territory, true, 1, 112 );
-    sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x04 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
     setZoningType( Common::ZoneingType::Teleport );
   }
   else if( type == 3 ) // return
   {
     prepareZoning( data->territory, true, 1, 111 );
-    sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x03 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x03 ) );
     setZoningType( Common::ZoneingType::Return );
   }
 
@@ -565,7 +565,7 @@ void Sapphire::Entity::Player::registerAetheryte( uint8_t aetheryteId )
   Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
   m_aetheryte[ index ] |= value;
-  queuePacket( makeActorControl143( getId(), LearnTeleport, aetheryteId, 1 ) );
+  queuePacket( makeActorControlSelf( getId(), LearnTeleport, aetheryteId, 1 ) );
 }
 
 bool Sapphire::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -656,7 +656,7 @@ void Sapphire::Entity::Player::learnAction( uint16_t actionId )
 
   m_unlocks[ index ] |= value;
 
-  queuePacket( makeActorControl143( getId(), ToggleActionUnlock, actionId, 1 ) );
+  queuePacket( makeActorControlSelf( getId(), ToggleActionUnlock, actionId, 1 ) );
 }
 
 void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -667,7 +667,7 @@ void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
 
   m_orchestrion[ index ] |= value;
 
-  queuePacket( makeActorControl143( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
+  queuePacket( makeActorControlSelf( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
 bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
@@ -691,11 +691,11 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
 
   uint32_t neededExpToLevelplus1 = pExdData->get< Sapphire::Data::ParamGrow >( level + 1 )->expToNext;
 
-  queuePacket( makeActorControl143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
+  queuePacket( makeActorControlSelf( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
   if( level >= Common::MAX_PLAYER_LEVEL ) // temporary fix for leveling over levelcap
   {
-    queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+    queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
     return;
   }
 
@@ -707,13 +707,13 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
              ( currentExp + amount - neededExpToLevel );
     setExp( amount );
     gainLevel();
-    queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+    queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
 
   }
   else
   {
     queuePacket(
-      makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
+      makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
     setExp( currentExp + amount );
   }
 
@@ -742,8 +742,8 @@ void Sapphire::Entity::Player::gainLevel()
   effectListPacket->data().max_mp = getMaxMp();
   sendToInRangeSet( effectListPacket, true );
 
-  sendToInRangeSet( makeActorControl142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
-                                         getLevel(), getLevel() - 1 ), true );
+  sendToInRangeSet( makeActorControl( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
+                                      getLevel(), getLevel() - 1 ), true );
 
   auto classInfoPacket = makeZonePacket< FFXIVIpcUpdateClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t > ( getClass() );
@@ -824,7 +824,7 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
   classInfoPacket->data().syncedLevel = getLevel();
   queuePacket( classInfoPacket );
 
-  sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
+  sendToInRangeSet( makeActorControl( getId(), ClassJobChange, 0x04 ), true );
 
   sendStatusUpdate();
 }
@@ -920,7 +920,7 @@ void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
   pPlayer->freePlayerSpawnId( getId() );
 
-  pPlayer->queuePacket( makeActorControl143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  pPlayer->queuePacket( makeActorControlSelf( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::ActorPtr Sapphire::Entity::Player::lookupTargetById( uint64_t targetId )
@@ -1016,8 +1016,8 @@ void Sapphire::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
   auto newOnlineStatus = getOnlineStatus();
 
   if( prevOnlineStatus != newOnlineStatus )
-    sendToInRangeSet( makeActorControl142( getId(), SetStatusIcon,
-                                           static_cast< uint8_t >( getOnlineStatus() ) ), true );
+    sendToInRangeSet( makeActorControl( getId(), SetStatusIcon,
+                                        static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
 
@@ -1053,8 +1053,7 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
   auto newOnlineStatus = getOnlineStatus();
 
   if( prevOnlineStatus != newOnlineStatus )
-    sendToInRangeSet( makeActorControl142( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ),
-                      true );
+    sendToInRangeSet( makeActorControl( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Entity::Player::update( uint64_t tickCount )
@@ -1169,7 +1168,7 @@ void Sapphire::Entity::Player::setHomepoint( uint8_t aetheryteId )
 {
   m_homePoint = aetheryteId;
 
-  queuePacket( makeActorControl143( getId(), SetHomepoint, aetheryteId ) );
+  queuePacket( makeActorControlSelf( getId(), SetHomepoint, aetheryteId ) );
 }
 
 /*! get homepoint */
@@ -1347,7 +1346,7 @@ void Sapphire::Entity::Player::sendDebug( const std::string& message ) //Grey Te
 void Sapphire::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,
                                            uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  queuePacket( makeActorControl144( getId(), ActorControlType::LogMsg, messageId, param2, param3, param4, param5, param6 ) );
+  queuePacket( makeActorControlTarget( getId(), ActorControlType::LogMsg, messageId, param2, param3, param4, param5, param6 ) );
 }
 
 void Sapphire::Entity::Player::updateHowtosSeen( uint32_t howToId )
@@ -1429,14 +1428,14 @@ void Sapphire::Entity::Player::sendHateList()
 void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
 {
   hateListAdd( pBNpc );
-  queuePacket( makeActorControl142( getId(), ToggleAggro, 1 ) );
+  queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
 }
 
 void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
 {
   hateListRemove( pBNpc );
   if( m_actorIdTohateSlotMap.empty() )
-    queuePacket( makeActorControl142( getId(), ToggleAggro ) );
+    queuePacket( makeActorControl( getId(), ToggleAggro ) );
 }
 
 bool Sapphire::Entity::Player::isLogin() const
@@ -1484,7 +1483,7 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
 
   m_activeTitle = titleId;
 
-  sendToInRangeSet( makeActorControl142( getId(), SetTitle, titleId ), true );
+  sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
 }
 
 void Sapphire::Entity::Player::setEquipDisplayFlags( uint8_t state )
@@ -1503,9 +1502,9 @@ uint8_t Sapphire::Entity::Player::getEquipDisplayFlags() const
 void Sapphire::Entity::Player::mount( uint32_t id )
 {
   m_mount = id;
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::SetStatus,
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
                                          static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
-  sendToInRangeSet( makeActorControl143( getId(), 0x39e, 12 ), true ); //?
+  sendToInRangeSet( makeActorControlSelf( getId(), 0x39e, 12 ), true ); //?
 
   auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
   mountPacket->data().id = id;
@@ -1514,9 +1513,9 @@ void Sapphire::Entity::Player::mount( uint32_t id )
 
 void Sapphire::Entity::Player::dismount()
 {
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::SetStatus,
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
                                          static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
-  sendToInRangeSet( makeActorControl143( getId(), ActorControlType::Dismount, 1 ), true );
+  sendToInRangeSet( makeActorControlSelf( getId(), ActorControlType::Dismount, 1 ), true );
   m_mount = 0;
 }
 
@@ -1530,7 +1529,7 @@ void Sapphire::Entity::Player::spawnCompanion( uint16_t id )
     return;
 
   m_companionId = id;
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleCompanion, id ), true );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleCompanion, id ), true );
 }
 
 uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
@@ -1691,7 +1690,7 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   if( isLogin() )
   {
-    queuePacket( makeActorControl143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+    queuePacket( makeActorControlSelf( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1796,8 +1795,8 @@ void
 Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0,
                                              bool shouldSetStatus = false )
 {
-  auto zoneInPacket = makeActorControl143( getId(), ZoneIn, param1, param2, param3, param4 );
-  auto SetStatusPacket = makeActorControl142( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+  auto zoneInPacket = makeActorControlSelf( getId(), ZoneIn, param1, param2, param3, param4 );
+  auto SetStatusPacket = makeActorControl( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
   if( !getGmInvis() )
     sendToInRangeSet( zoneInPacket );
@@ -1845,13 +1844,13 @@ void Sapphire::Entity::Player::finishZoning()
 
 void Sapphire::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent )
 {
-  sendToInRangeSet( makeActorControl144( getId(), ActorControlType::Emote,
+  sendToInRangeSet( makeActorControlTarget( getId(), ActorControlType::Emote,
                                          emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
 }
 
 void Sapphire::Entity::Player::emoteInterrupt()
 {
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::EmoteInterrupt ) );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::EmoteInterrupt ) );
 }
 
 void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
@@ -1875,7 +1874,7 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
     bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
     // TODO: figure out what param1 really does
-    queuePacket( makeActorControl143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+    queuePacket( makeActorControlSelf( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
 
     if( !insufficientGil )
     {
@@ -2083,7 +2082,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
       if( note1->bNpcName == id && logEntry.entries[ i - 1 ][ x ] < note->count[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
-        queuePacket( makeActorControl143( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
+        queuePacket( makeActorControlSelf( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
         logChanged = true;
         sectionChanged = true;
       }
@@ -2092,7 +2091,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     }
     if( logChanged && sectionComplete && sectionChanged )
     {
-      queuePacket( makeActorControl143( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
+      queuePacket( makeActorControlSelf( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
       gainExp( note->reward );
     }
     if( !sectionComplete )
@@ -2102,13 +2101,13 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
   }
   if( logChanged && allSectionsComplete )
   {
-    queuePacket( makeActorControl143( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
+    queuePacket( makeActorControlSelf( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
     gainExp( rankRewards[ logEntry.rank ] );
     if( logEntry.rank < 4 )
     {
       logEntry.rank++;
       memset( logEntry.entries, 0, 40 );
-      queuePacket( makeActorControl143( getId(), HuntingLogRankUnlock,
+      queuePacket( makeActorControlSelf( getId(), HuntingLogRankUnlock,
                                         static_cast< uint8_t >( getClass() ), logEntry.rank + 1, 0 ) );
     }
   }

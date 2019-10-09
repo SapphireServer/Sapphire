@@ -250,7 +250,8 @@ void Action::Action::start()
   }
 
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
-  auto actionStartPkt = makeActorControl143( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
+  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(),
+                                              m_recastTimeMs / 10 );
   player->queuePacket( actionStartPkt );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
@@ -299,8 +300,8 @@ void Action::Action::interrupt()
 
     // Note: When cast interrupt from taking too much damage, set the last value to 1.
     // This enables the cast interrupt effect.
-    auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                        0x219, 1, m_id, interruptEffect );
+    auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt,
+                                     0x219, 1, m_id, interruptEffect );
 
     m_pSource->sendToInRangeSet( control, true );
   }

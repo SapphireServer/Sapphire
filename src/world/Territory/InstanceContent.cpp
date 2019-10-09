@@ -130,9 +130,9 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       for( const auto& playerIt : m_playerMap )
       {
         auto pPlayer = playerIt.second;
-        pPlayer->queuePacket( makeActorControl143( pPlayer->getId(), DirectorUpdate,
-                                                   getDirectorId(), 0x40000001,
-                                                   m_instanceConfiguration->timeLimitmin * 60u ) );
+        pPlayer->queuePacket( makeActorControlSelf( pPlayer->getId(), DirectorUpdate,
+                                                    getDirectorId(), 0x40000001,
+                                                    m_instanceConfiguration->timeLimitmin * 60u ) );
       }
 
       if( m_pEntranceEObj )
@@ -176,7 +176,7 @@ void Sapphire::InstanceContent::onInitDirector( Entity::Player& player )
 
 void Sapphire::InstanceContent::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 
@@ -282,7 +282,7 @@ void Sapphire::InstanceContent::startQte()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
   }
 }
 
@@ -292,7 +292,7 @@ void Sapphire::InstanceContent::startEventCutscene()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
   }
 }
 
@@ -301,7 +301,7 @@ void Sapphire::InstanceContent::endEventCutscene()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
   }
 }
 
@@ -412,13 +412,13 @@ void Sapphire::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
     // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
     // player->queuePacket( ActorControlSelfPacket( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
     player->queuePacket(
-      makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
+      makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
   }
 }
 
 void Sapphire::InstanceContent::setPlayerBGM( Sapphire::Entity::Player& player, uint16_t bgmId )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
 }
 
 uint16_t Sapphire::InstanceContent::getCurrentBGM() const

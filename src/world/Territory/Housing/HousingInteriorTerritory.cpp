@@ -99,7 +99,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   }
 
   if( isFcHouse )
-    player.queuePacket( Server::makeActorControl143( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
+    player.queuePacket(
+      Server::makeActorControlSelf( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onUpdate( uint64_t tickCount )
@@ -223,7 +224,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::removeHousin
 
   for( const auto& player : m_playerMap )
   {
-    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem, slot );
+    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem,
+                                             slot );
 
     player.second->queuePacket( pkt );
   }

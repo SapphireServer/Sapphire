@@ -165,7 +165,7 @@ void Sapphire::Territory::setCurrentFestival( uint16_t festivalId, uint16_t addi
   {
     auto player = playerEntry.second;
 
-    auto enableFestival = makeActorControl143( player->getId(), SetFestival, festivalId, additionalFestivalId );
+    auto enableFestival = makeActorControlSelf( player->getId(), SetFestival, festivalId, additionalFestivalId );
     playerEntry.second->queuePacket( enableFestival );
   }
 }
