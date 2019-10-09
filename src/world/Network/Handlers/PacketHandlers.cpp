@@ -95,8 +95,8 @@ void Sapphire::Network::GameConnection::setSearchInfoHandler( FrameworkPtr pFw,
   strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
 
-  player.sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon,
-                                                static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
+  player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
+                                             static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Network::GameConnection::reqSearchInfoHandler( FrameworkPtr pFw,

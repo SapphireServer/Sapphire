@@ -177,7 +177,7 @@ void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
 
 void Sapphire::QuestBattle::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 void Sapphire::QuestBattle::setVar( uint8_t index, uint8_t value )
@@ -267,17 +267,17 @@ void Sapphire::QuestBattle::setBranch( uint8_t value )
 
 void Sapphire::QuestBattle::startQte()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
 }
 
 void Sapphire::QuestBattle::startEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
 }
 
 void Sapphire::QuestBattle::endEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
 }
 
 void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )

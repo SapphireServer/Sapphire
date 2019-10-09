@@ -45,7 +45,7 @@ public:
         {
           case LandPurchaseResult::SUCCESS:
           {
-            auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
+            auto screenMsgPkt = makeActorControlSelf( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
 
             player.sendLogMessage( 0x0D16, pTerritory->getTerritoryTypeInfo()->placeName, activeLand.ward + 1, activeLand.plot + 1 );

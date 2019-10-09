@@ -291,13 +291,13 @@ void Sapphire::Entity::Chara::die()
   // if the actor is a player, the update needs to be send to himself too
   bool selfNeedsUpdate = isPlayer();
 
-  FFXIVPacketBasePtr packet = makeActorControl142( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
+  FFXIVPacketBasePtr packet = makeActorControl( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
   sendToInRangeSet( packet, selfNeedsUpdate );
 
   // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
   //       although that might be handled by setting the HP to 1 and doing some script magic
 
-  FFXIVPacketBasePtr packet1 = makeActorControl142( m_id, DeathAnimation, 0, 0, 0, 0x20 );
+  FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0x20 );
   sendToInRangeSet( packet1, selfNeedsUpdate );
 
 }
@@ -329,7 +329,7 @@ void Sapphire::Entity::Chara::setStance( Stance stance )
 {
   m_currentStance = stance;
 
-  FFXIVPacketBasePtr packet = makeActorControl142( m_id, ToggleWeapon, stance, 0 );
+  FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 0 );
   sendToInRangeSet( packet );
 }
 
@@ -372,7 +372,7 @@ Change the current target and propagate to in range players
 void Sapphire::Entity::Chara::changeTarget( uint64_t targetId )
 {
   setTargetId( targetId );
-  FFXIVPacketBasePtr packet = makeActorControl144( m_id, SetTarget, 0, 0, 0, 0, targetId );
+  FFXIVPacketBasePtr packet = makeActorControlTarget( m_id, SetTarget, 0, 0, 0, 0, targetId );
   sendToInRangeSet( packet );
 }
 
@@ -602,7 +602,7 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  sendToInRangeSet( makeActorControl142( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
 
   m_statusEffectMap.erase( effectSlotId );
 
@@ -718,15 +718,15 @@ void Sapphire::Entity::Chara::updateStatusEffects()
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
-    sendToInRangeSet( makeActorControl142( getId(), HPFloatingText, 0,
-                                           static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickDmg );
-    sendToInRangeSet( makeActorControl142( getId(), HPFloatingText, 0,
-                                           static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
   }
 }
 

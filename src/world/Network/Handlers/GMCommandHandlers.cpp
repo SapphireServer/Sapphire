@@ -228,7 +228,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Speed:
     {
-      targetPlayer->queuePacket( makeActorControl143( player.getId(), Flee, param1 ) );
+      targetPlayer->queuePacket( makeActorControlSelf( player.getId(), Flee, param1 ) );
       player.sendNotice( "Speed for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
@@ -267,8 +267,8 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
       strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
       targetPlayer->queuePacket( searchInfoPacket );
 
-      targetPlayer->sendToInRangeSet( makeActorControl142( player.getId(), SetStatusIcon,
-                                                           static_cast< uint8_t >( player.getOnlineStatus() ) ),
+      targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
+                                                        static_cast< uint8_t >( player.getOnlineStatus() ) ),
                                       true );
       player.sendNotice( "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
@@ -643,9 +643,9 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
 
-      targetPlayer->sendToInRangeSet( makeActorControl143( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
-      targetPlayer->sendToInRangeSet( makeActorControl142( player.getId(), SetStatus,
-                                                           static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
+      targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
+      targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,
+                                                        static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );
       player.sendNotice( "Raised {0}", targetPlayer->getName() );
       break;

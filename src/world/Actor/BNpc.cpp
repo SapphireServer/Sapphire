@@ -178,7 +178,7 @@ void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
-  pTarget->queuePacket( makeActorControl143( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  pTarget->queuePacket( makeActorControlSelf( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
@@ -369,8 +369,8 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
 
   if( pChara->isPlayer() )
   {
@@ -388,8 +388,8 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
-    sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleAggro, 0, 0, 0 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 0, 0, 0 ) );
     tmpPlayer->onMobDeaggro( getAsBNpc() );
   }
 }

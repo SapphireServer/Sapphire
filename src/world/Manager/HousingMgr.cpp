@@ -427,7 +427,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
   // TODO: actually use permissions here for FC houses
   if( !hasPermission( player, *pLand, 0 ) )
   {
-    auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3304, 0 );
+    auto msgPkt = makeActorControlSelf( player.getId(), ActorControl::LogMsg, 3304, 0 );
     player.queuePacket( msgPkt );
     return false;
   }
@@ -436,7 +436,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
   // TODO: additionally check for yard items
   if( pLand->getHouse() )
   {
-    auto msgPkt = makeActorControl143( player.getId(), ActorControl::LogMsg, 3315, 0 );
+    auto msgPkt = makeActorControlSelf( player.getId(), ActorControl::LogMsg, 3315, 0 );
     player.queuePacket( msgPkt );
     return false;
   }
@@ -453,8 +453,8 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
-  auto screenMsgPkt2 = makeActorControl143( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
-                                            pLand->getLandIdent().wardNum + 1, plot + 1 );
+  auto screenMsgPkt2 = makeActorControlSelf( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
+                                             pLand->getLandIdent().wardNum + 1, plot + 1 );
   player.queuePacket( screenMsgPkt2 );
   pHousing->sendLandUpdate( plot );
 
@@ -692,7 +692,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   pLand->setLandType( LandType::Private );
   hZone->sendLandUpdate( plotNum );
 
-  auto pSuccessBuildingPacket = makeActorControl142( player.getId(), ActorControl::BuildPresetResponse, plotNum );
+  auto pSuccessBuildingPacket = makeActorControl( player.getId(), ActorControl::BuildPresetResponse, plotNum );
 
   player.queuePacket( pSuccessBuildingPacket );
 
@@ -1034,7 +1034,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     status = placeInteriorItem( player, item );
 
   if( status )
-    player.queuePacket( Server::makeActorControl143( player.getId(), 0x3f3 ) );
+    player.queuePacket( Server::makeActorControlSelf( player.getId(), 0x3f3 ) );
   else
     player.sendUrgent( "An internal error occurred when placing the item." );
 }
@@ -1298,7 +1298,8 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   // send confirmation to player
   uint32_t param1 = ( ident.landId << 16 ) | containerId;
 
-  player.queuePacket( Server::makeActorControl143( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slotIdx ) );
+  player.queuePacket(
+    Server::makeActorControlSelf( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slotIdx ) );
 
   return true;
 }
@@ -1333,7 +1334,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
   terri.updateYardObjectPos( player, slot, ident.landId, *item );
 
   uint32_t param1 = ( ident.landId << 16 ) | InventoryType::HousingExteriorPlacedItems;
-  player.queuePacket( Server::makeActorControl143( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slot ) );
+  player.queuePacket( Server::makeActorControlSelf( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slot ) );
 
 
   return true;
@@ -1567,7 +1568,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
 
   invMgr->sendInventoryContainer( player, it->second );
 
-  auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateExternalAppearanceUI, plot );
+  auto pkt = Server::makeActorControlSelf( player.getId(), Network::ActorControl::ShowEstateExternalAppearanceUI, plot );
   player.queuePacket( pkt );
 
 }
@@ -1597,7 +1598,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
 
   invMgr->sendInventoryContainer( player, it->second );
 
-  auto pkt = Server::makeActorControl143( player.getId(), Network::ActorControl::ShowEstateInternalAppearanceUI );
+  auto pkt = Server::makeActorControlSelf( player.getId(), Network::ActorControl::ShowEstateInternalAppearanceUI );
   player.queuePacket( pkt );
 }
 

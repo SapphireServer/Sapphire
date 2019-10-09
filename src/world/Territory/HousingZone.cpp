@@ -413,7 +413,8 @@ void Sapphire::HousingZone::despawnYardObject( uint16_t landId, uint16_t slot )
   for( const auto& player : m_playerMap )
   {
     auto param = ( landId << 16 ) | slot;
-    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem, param );
+    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem,
+                                             param );
 
     player.second->queuePacket( pkt );
   }
