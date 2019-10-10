@@ -322,15 +322,7 @@ namespace Sapphire::Network::Packets::Server
       bool hq;
       uint8_t materiaCount;
       uint8_t onMannequin;
-      /**
-       * 0x01 Limsa Lominsa
-       * 0x02 Gridania
-       * 0x03 Ul'dah
-       * 0x04 Ishgard
-       * 0x07 Kugane
-       * 0x0A Crystarium
-       */
-      uint8_t retainerCity;
+      Common::MarketCity marketCity;
       uint16_t dyeId;
       uint16_t padding3;
       uint32_t padding4;
