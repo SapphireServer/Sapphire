@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_QUESTBATTLE_H
 #define SAPPHIRE_QUESTBATTLE_H
 
-#include "Zone.h"
+#include "Territory.h"
 #include "Event/Director.h"
 #include "Forwards.h"
 
@@ -12,7 +12,7 @@ namespace Sapphire::Data
 
 namespace Sapphire
 {
-  class QuestBattle : public Event::Director, public Zone
+  class QuestBattle : public Event::Director, public Territory
   {
   public:
     QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle > pBattleDetails,

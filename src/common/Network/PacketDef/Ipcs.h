@@ -52,10 +52,10 @@ namespace Sapphire::Network::Packets
     InitZone = 0x019A,
 
     EffectResult = 0x0141,
-    ActorControl142 = 0x0142,
-    ActorControl143 = 0x0143,
-    ActorControl144 = 0x0144,
-    UpdateHpMpTp = 0x0145,
+    ActorControl = 0x0142,
+    ActorControlSelf = 0x0143,
+    ActorControlTarget = 0x0144,
+    UpdateHpMpTp = 0x0145, // used when resting
 
     ///////////////////////////////////////////////////
 
@@ -136,8 +136,8 @@ namespace Sapphire::Network::Packets
 
     ActorSetPos = 0x0184, // updated 5.0
 
-    ActorCast = 0x0187, // updated 5.0
-
+    ActorCast = 0x0186, // updated 5.0
+    SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
     PartyList = 0x0188, // updated 5.0
     HateRank = 0x0189, // updated 5.0
     HateList = 0x018A, // updated 5.0
@@ -164,7 +164,6 @@ namespace Sapphire::Network::Packets
     ContainerInfo = 0x01A2, // updated 5.0
     InventoryTransactionFinish = 0x01A3, // updated 5.0
     InventoryTransaction = 0x01A4, // updated 5.0
-
     CurrencyCrystalInfo = 0x01A5, // updated 5.0
 
     InventoryActionAck = 0x01A7, // updated 5.0
@@ -242,11 +241,9 @@ namespace Sapphire::Network::Packets
     PrepareZoning = 0x02A4, // updated 5.0
     ActorGauge = 0x0292, // updated 4.3
 
-    // Unknown IPC types that still need to be sent
-    // TODO: figure all these out properly
-    // daily quest related, init seed and current quota probably
-    IPCTYPE_UNK_320 = 0x025E, // updated 5.0
-    IPCTYPE_UNK_322 = 0x0260, // updated 5.0
+    // daily quest info -> without them sent,  login will take longer...
+    DailyQuests = 0x025E, // updated 5.0
+    DailyQuestRepeatFlags = 0x0260, // updated 5.0
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
@@ -313,15 +310,14 @@ namespace Sapphire::Network::Packets
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x0133, // updated 4.5
-    ReqCountdownCancel = 0x0134, // updated 4.5
-    ClearWaymarks = 0x0135, // updated 4.5
+    ReqCountdownInitiate = 0x0135, // updated 5.0
+    ReqCountdownCancel = 0x0136, // updated 5.0
 
     ZoneLineHandler = 0x0139, // updated 5.0
     ClientTrigger = 0x013A, // updated 5.0
     DiscoveryHandler = 0x013B, // updated 5.0
 
-    AddWaymark = 0x013A, // updated 4.5
+    PlaceFieldMarker = 0x013C, // updated 5.0
 
     SkillHandler = 0x013D, // updated 5.0
     GMCommand1 = 0x013E, // updated 5.0
@@ -331,6 +327,7 @@ namespace Sapphire::Network::Packets
     UpdatePositionHandler = 0x0141, // updated 5.0
 
     InventoryModifyHandler = 0x0148, // updated 5.0
+    InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
     BuildPresetHandler = 0x014F, // updated 5.0

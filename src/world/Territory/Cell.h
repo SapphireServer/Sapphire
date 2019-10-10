@@ -13,7 +13,7 @@ typedef std::set< Entity::ActorPtr > ActorSet;
 
 class Cell
 {
-  friend class Zone;
+  friend class Territory;
 
 private:
   bool m_bForcedActive;
@@ -25,14 +25,14 @@ private:
   bool m_bUnloadPending;
 
   uint16_t m_playerCount;
-  ZonePtr m_pZone;
+  TerritoryPtr m_pZone;
 
 public:
   Cell();
 
   ~Cell();
 
-  void init( uint32_t x, uint32_t y, ZonePtr pZone );
+  void init( uint32_t x, uint32_t y, TerritoryPtr pZone );
 
   void addActor( Entity::ActorPtr pAct );
 

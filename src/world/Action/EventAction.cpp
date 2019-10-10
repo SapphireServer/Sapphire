@@ -3,8 +3,8 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 #include "Actor/Player.h"
 
@@ -44,7 +44,7 @@ void Action::EventAction::start()
 
   m_startTime = Common::Util::getTimeMs();
 
-  auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastStart, 1, m_id, 0x4000004E );
+  auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastStart, 1, m_id, 0x4000004E );
 
   if( m_pSource->isPlayer() )
   {
@@ -70,7 +70,7 @@ void Action::EventAction::execute()
     if( m_onActionFinishClb )
       m_onActionFinishClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );
 
-    auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastStart, 0, m_id );
+    auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastStart, 0, m_id );
 
     if( !pEvent->hasPlayedScene() )
       m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
@@ -100,11 +100,11 @@ void Action::EventAction::interrupt()
   try
   {
 
-    auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id );
+    auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id );
 
     if( m_pSource->isPlayer() )
     {
-      auto control1 = makeActorControl143( m_pSource->getId(), ActorControlType::FreeEventPos, m_eventId );
+      auto control1 = makeActorControlSelf( m_pSource->getId(), ActorControlType::FreeEventPos, m_eventId );
 
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );

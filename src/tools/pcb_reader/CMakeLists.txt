@@ -11,7 +11,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 add_executable(pcb_reader2 ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
 if (UNIX)
-    target_link_libraries( pcb_reader2 common xivdat pthread mysqlclient dl z stdc++fs Recast Detour DetourTileCache )
+    target_link_libraries( pcb_reader2 common xivdat pthread mysql dl z stdc++fs Recast Detour DetourTileCache )
 else()
     target_link_libraries( pcb_reader2 common xivdat mysql zlib Recast Detour DetourTileCache )
 endif()

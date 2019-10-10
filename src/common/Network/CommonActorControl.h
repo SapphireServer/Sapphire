@@ -206,6 +206,14 @@ namespace Sapphire::Network::ActorControl
     ChallengeEntryCompleteMsg = 0x20B,
     ChallengeEntryUnlockMsg = 0x20C,
 
+    /*!
+     * Sent when a player desynths an item, one packet per result type (one for consumed item, one for each obtained items, and one for exp if the player received exp)
+     * param1 = result type (4921 => Item consumed, 4922 => Item obtained, 4925 => Exp obtained)
+     * param3 = item id (used for result types 4921 & 4922)
+     * param5 = exp amount (x 100)
+     */
+    DesynthResult = 0x20F,
+
     GilTrailMsg = 0x211,
 
     HuntingLogRankUnlock = 0x21D,
@@ -225,6 +233,14 @@ namespace Sapphire::Network::ActorControl
     SetFestival = 0x386, // param1: festival.exd index
 
     ToggleOrchestrionUnlock = 0x396,
+
+    /*!
+    * param1 = mountSpeed
+    * Retail sends 12 for mount speed star 1 unlocked and 15 for mount speed star 2 unlocked
+    * This also has to be sent before mounting finishes for it to take effect
+    */
+    SetMountSpeed = 0x39F,
+
     Dismount = 0x3A1, // updated 4.5
 
     // Duty Recorder
@@ -317,7 +333,7 @@ namespace Sapphire::Network::ActorControl
     UpdatedSeenHowTos = 0x133,
     AllotAttribute = 0x135,
 
-    ClearWaymarks = 0x13A,
+    ClearFieldMarkers = 0x13A,
     CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,

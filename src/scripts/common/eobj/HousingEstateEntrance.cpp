@@ -30,7 +30,7 @@ public:
       if( !terriMgr )
         return;
 
-      auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+      auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
       if( !zone )
         return;
 

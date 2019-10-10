@@ -11,9 +11,9 @@ namespace Sapphire::Api
   class PlayerMinimal
   {
   public:
-    PlayerMinimal( void );
+    PlayerMinimal();
 
-    ~PlayerMinimal( void );
+    ~PlayerMinimal() = default;
 
     // write player to the database
     void write();
@@ -23,15 +23,7 @@ namespace Sapphire::Api
 
     void saveAsNew();
 
-    std::string getLookString();
-
     std::string getInfoJson();
-
-    std::string getModelString();
-
-    std::string getClassString();
-
-    std::string getLevelsString();
 
     uint8_t getClassLevel();
 
