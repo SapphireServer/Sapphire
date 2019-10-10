@@ -55,7 +55,7 @@ namespace Sapphire::Network::Packets
     ActorControl = 0x0142,
     ActorControlSelf = 0x0143,
     ActorControlTarget = 0x0144,
-    UpdateHpMpTp = 0x0145,
+    UpdateHpMpTp = 0x0145, // used when resting
 
     ///////////////////////////////////////////////////
 
@@ -137,9 +137,7 @@ namespace Sapphire::Network::Packets
     ActorSetPos = 0x0184, // updated 5.0
 
     ActorCast = 0x0186, // updated 5.0
-
     SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
-
     PartyList = 0x0188, // updated 5.0
     HateRank = 0x0189, // updated 5.0
     HateList = 0x018A, // updated 5.0
@@ -166,7 +164,6 @@ namespace Sapphire::Network::Packets
     ContainerInfo = 0x01A2, // updated 5.0
     InventoryTransactionFinish = 0x01A3, // updated 5.0
     InventoryTransaction = 0x01A4, // updated 5.0
-
     CurrencyCrystalInfo = 0x01A5, // updated 5.0
 
     InventoryActionAck = 0x01A7, // updated 5.0
@@ -244,11 +241,9 @@ namespace Sapphire::Network::Packets
     PrepareZoning = 0x02A4, // updated 5.0
     ActorGauge = 0x0292, // updated 4.3
 
-    // Unknown IPC types that still need to be sent
-    // TODO: figure all these out properly
-    // daily quest related, init seed and current quota probably
-    IPCTYPE_UNK_320 = 0x025E, // updated 5.0
-    IPCTYPE_UNK_322 = 0x0260, // updated 5.0
+    // daily quest info -> without them sent,  login will take longer...
+    DailyQuests = 0x025E, // updated 5.0
+    DailyQuestRepeatFlags = 0x0260, // updated 5.0
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance

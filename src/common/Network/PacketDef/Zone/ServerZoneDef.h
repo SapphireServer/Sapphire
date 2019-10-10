@@ -520,8 +520,9 @@ namespace Sapphire::Network::Packets::Server
     /* 0000 */ uint32_t hp;
     /* 0004 */ uint16_t mp;
     /* 0006 */ uint16_t tp;
-    /* 0008 */ uint32_t unknown_8;
-    /* 000C */ uint32_t unknown_12;
+    /* 0008 */ uint16_t gp;
+    /* 0010 */ uint16_t unknown_10;
+    /* 0012 */ uint32_t unknown_12;
   };
 
 
@@ -1557,7 +1558,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * UNKOWN TYPE
   */
-  struct FFXIVARR_IPC_UNK322 : FFXIVIpcBasePacket< IPCTYPE_UNK_322 >
+  struct FFXIVARR_IPC_UNK322 : FFXIVIpcBasePacket< DailyQuestRepeatFlags >
   {
     /* 0000 */ uint8_t unk[8];
   };
@@ -1565,7 +1566,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * UNKOWN TYPE
   */
-  struct FFXIVARR_IPC_UNK320 : FFXIVIpcBasePacket< IPCTYPE_UNK_320 >
+  struct FFXIVARR_IPC_UNK320 : FFXIVIpcBasePacket< DailyQuests >
   {
     /* 0000 */ uint8_t unk[0x38];
   };
