@@ -8,12 +8,12 @@
 
 #include "Forwards.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/EffectPacket.h"
 
@@ -123,6 +123,67 @@ void Sapphire::Entity::Chara::setClass( Common::ClassJob classJob )
   m_class = classJob;
 }
 
+Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
+{
+  switch( getClass() )
+  {
+    case ClassJob::Gladiator:
+    case ClassJob::Marauder:
+    case ClassJob::Paladin:
+    case ClassJob::Warrior:
+    case ClassJob::Darkknight:
+    case ClassJob::Gunbreaker:
+      return Role::Tank;
+
+    case ClassJob::Pugilist:
+    case ClassJob::Lancer:
+    case ClassJob::Monk:
+    case ClassJob::Dragoon:
+    case ClassJob::Rogue:
+    case ClassJob::Ninja:
+    case ClassJob::Samurai:
+      return Role::Melee;
+
+    case ClassJob::Archer:
+    case ClassJob::Bard:
+    case ClassJob::Machinist:
+    case ClassJob::Dancer:
+      return Role::RangedPhysical;
+
+    case ClassJob::Conjurer:
+    case ClassJob::Whitemage:
+    case ClassJob::Scholar:
+    case ClassJob::Astrologian:
+      return Role::Healer;
+
+    case ClassJob::Thaumaturge:
+    case ClassJob::Blackmage:
+    case ClassJob::Arcanist:
+    case ClassJob::Summoner:
+    case ClassJob::Redmage:
+    case ClassJob::Bluemage:
+      return Role::RangedMagical;
+
+    case ClassJob::Carpenter:
+    case ClassJob::Blacksmith:
+    case ClassJob::Armorer:
+    case ClassJob::Goldsmith:
+    case ClassJob::Leatherworker:
+    case ClassJob::Weaver:
+    case ClassJob::Alchemist:
+    case ClassJob::Culinarian:
+      return Role::Crafter;
+
+    case ClassJob::Miner:
+    case ClassJob::Botanist:
+    case ClassJob::Fisher:
+      return Role::Gatherer;
+
+    default:
+      return Role::None;
+  }
+}
+
 /*! \param Id of the target to set */
 void Sapphire::Entity::Chara::setTargetId( uint64_t targetId )
 {
@@ -230,13 +291,13 @@ void Sapphire::Entity::Chara::die()
   // if the actor is a player, the update needs to be send to himself too
   bool selfNeedsUpdate = isPlayer();
 
-  FFXIVPacketBasePtr packet = makeActorControl142( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
+  FFXIVPacketBasePtr packet = makeActorControl( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
   sendToInRangeSet( packet, selfNeedsUpdate );
 
   // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
   //       although that might be handled by setting the HP to 1 and doing some script magic
 
-  FFXIVPacketBasePtr packet1 = makeActorControl142( m_id, DeathAnimation, 0, 0, 0, 0x20 );
+  FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0x20 );
   sendToInRangeSet( packet1, selfNeedsUpdate );
 
 }
@@ -268,7 +329,7 @@ void Sapphire::Entity::Chara::setStance( Stance stance )
 {
   m_currentStance = stance;
 
-  FFXIVPacketBasePtr packet = makeActorControl142( m_id, ToggleWeapon, stance, 0 );
+  FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 0 );
   sendToInRangeSet( packet );
 }
 
@@ -311,7 +372,7 @@ Change the current target and propagate to in range players
 void Sapphire::Entity::Chara::changeTarget( uint64_t targetId )
 {
   setTargetId( targetId );
-  FFXIVPacketBasePtr packet = makeActorControl144( m_id, SetTarget, 0, 0, 0, 0, targetId );
+  FFXIVPacketBasePtr packet = makeActorControlTarget( m_id, SetTarget, 0, 0, 0, 0, targetId );
   sendToInRangeSet( packet );
 }
 
@@ -460,18 +521,21 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
-  statusEffectAdd->data().actor_id1 = pEffect->getSrcActorId();
   statusEffectAdd->data().current_hp = getHp();
   statusEffectAdd->data().current_mp = getMp();
   statusEffectAdd->data().current_tp = getTp();
-  statusEffectAdd->data().duration = static_cast< float >( pEffect->getDuration() ) / 1000;
-  statusEffectAdd->data().effect_id = pEffect->getId();
-  statusEffectAdd->data().effect_index = nextSlot;
   statusEffectAdd->data().max_hp = getMaxHp();
   statusEffectAdd->data().max_mp = getMaxMp();
   statusEffectAdd->data().max_something = 1;
   //statusEffectAdd->data().unknown2 = 28;
-  statusEffectAdd->data().param = pEffect->getParam();
+
+  auto& status = statusEffectAdd->data().statusEntries[0];
+
+  status.sourceActorId = pEffect->getSrcActorId();
+  status.duration = static_cast< float >( pEffect->getDuration() ) / 1000;
+  status.id = pEffect->getId();
+  status.index = nextSlot;
+  status.param = pEffect->getParam();
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
@@ -538,7 +602,7 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  sendToInRangeSet( makeActorControl142( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
 
   m_statusEffectMap.erase( effectSlotId );
 
@@ -654,15 +718,15 @@ void Sapphire::Entity::Chara::updateStatusEffects()
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
-    sendToInRangeSet( makeActorControl142( getId(), HPFloatingText, 0,
-                                           static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickDmg );
-    sendToInRangeSet( makeActorControl142( getId(), HPFloatingText, 0,
-                                           static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
   }
 }
 

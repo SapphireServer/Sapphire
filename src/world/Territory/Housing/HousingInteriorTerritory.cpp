@@ -6,7 +6,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
@@ -36,7 +36,7 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
                                                                                          const std::string& internalName,
                                                                                          const std::string& contentName,
                                                                                          FrameworkPtr pFw ) :
-  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
+  Territory( territoryTypeId, guId, internalName, contentName, pFw ),
   m_landIdent( ident )
 {
 }
@@ -54,7 +54,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 {
   auto pHousingMgr = m_pFw->get< HousingMgr >();
 
-  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                   getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto indoorInitPacket = makeZonePacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );
@@ -99,7 +99,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   }
 
   if( isFcHouse )
-    player.queuePacket( Server::makeActorControl143( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
+    player.queuePacket(
+      Server::makeActorControlSelf( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onUpdate( uint64_t tickCount )
@@ -223,7 +224,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::removeHousin
 
   for( const auto& player : m_playerMap )
   {
-    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem, slot );
+    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem,
+                                             slot );
 
     player.second->queuePacket( pkt );
   }

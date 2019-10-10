@@ -6,7 +6,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
@@ -33,7 +33,7 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum,
                                     const std::string& internalName,
                                     const std::string& contentName,
                                     FrameworkPtr pFw ) :
-  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
+  Territory( territoryTypeId, guId, internalName, contentName, pFw ),
   m_wardNum( wardNum ),
   m_territoryTypeId( territoryTypeId ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum ),
@@ -155,7 +155,7 @@ bool Sapphire::HousingZone::init()
 
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "HousingZone::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "HousingZone::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto isInSubdivision = isPlayerSubInstance( player ) ? true : false;
@@ -413,7 +413,8 @@ void Sapphire::HousingZone::despawnYardObject( uint16_t landId, uint16_t slot )
   for( const auto& player : m_playerMap )
   {
     auto param = ( landId << 16 ) | slot;
-    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem, param );
+    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem,
+                                             param );
 
     player.second->queuePacket( pkt );
   }

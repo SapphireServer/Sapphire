@@ -13,7 +13,7 @@
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
 #include "Manager/ItemMgr.h"
@@ -64,7 +64,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   m_prevPos.z = res->getFloat( "OPosZ" );
   m_prevRot = res->getFloat( "OPosR" );
 
-  ZonePtr pCurrZone = nullptr;
+  TerritoryPtr pCurrZone = nullptr;
 
   // if the zone is an instanceContent zone, we need to actually find the instance
   if( pTeriMgr->isInstanceContentTerritory( zoneId ) )
@@ -108,7 +108,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   // see if a valid zone could be found for the character
   if( !pCurrZone )
   {
-    Logger::error( "[{0}] Zone #{1} not found!", char_id_str, zoneId );
+    Logger::error( "[{0}] Territory #{1} not found!", char_id_str, zoneId );
     Logger::error( "[{0}] Setting default zone instead", char_id_str );
 
     // default to new gridania

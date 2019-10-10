@@ -19,12 +19,13 @@ World::Manager::ActionMgr::ActionMgr( Sapphire::FrameworkPtr pFw ) :
 }
 
 void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                          Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos )
+                                                          Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos,
+                                                          uint16_t sequence )
 {
   player.sendDebug( "got aoe act: {0}", actionData->name );
 
 
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
 
   if( !action->init() )
     return;
@@ -42,9 +43,10 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
 }
 
 void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                            Data::ActionPtr actionData, uint64_t targetId )
+                                                            Data::ActionPtr actionData, uint64_t targetId,
+                                                            uint16_t sequence )
 {
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
 
   action->setTargetId( targetId );
 

@@ -3,10 +3,10 @@
 #include <Network/CommonActorControl.h>
 #include <algorithm>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Inventory/Item.h"
@@ -25,7 +25,7 @@
 #include "Actor/Player.h"
 
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 #include "Manager/InventoryMgr.h"
 #include "Manager/ItemMgr.h"
@@ -109,7 +109,7 @@ void Sapphire::Entity::Player::initInventory()
 
 void Sapphire::Entity::Player::sendItemLevel()
 {
-  queuePacket( makeActorControl142( getId(), SetItemLevel, getItemLevel(), 0 ) );
+  queuePacket( makeActorControl( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
 void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
@@ -379,7 +379,7 @@ void Sapphire::Entity::Player::addCrystal( Common::CrystalType type, uint32_t am
                                                                     Common::InventoryType::Crystal,
                                                                     *currItem );
   queuePacket( invUpdate );
-  queuePacket( makeActorControl143( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
+  queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
 }
 
 void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
@@ -603,7 +603,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
         // return existing stack if we have no overflow - items fit into a preexisting stack
         if( quantity == 0 )
         {
-          queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+          queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
 
           return item;
         }
@@ -635,7 +635,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
                                                                       *item );
     queuePacket( invUpdate );
 
-    queuePacket( makeActorControl143( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+    queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
   }
 
   return item;

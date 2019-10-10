@@ -15,93 +15,93 @@
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 
-const int levelTable[81][5] =
+const int levelTable[81][6] =
 { 
   // MAIN,SUB,DIV,HP,ELMT,THREAT
-  { 1, 1, 1, 1, 1 },
-  { 20, 56, 56, 0, 52 },
-  { 21, 57, 57, 0, 54 },
-  { 22, 60, 60, 0, 56 },
-  { 24, 62, 62, 0, 58 },
-  { 26, 65, 65, 0, 60 },
-  { 27, 68, 68, 0, 62 },
-  { 29, 70, 70, 0, 64 },
-  { 31, 73, 73, 0, 66 },
-  { 33, 76, 76, 0, 68 },
-  { 35, 78, 78, 0, 70 },
-  { 36, 82, 82, 0, 73 },
-  { 38, 85, 85, 0, 75 },
-  { 41, 89, 89, 0, 78 },
-  { 44, 93, 93, 0, 81 },
-  { 46, 96, 96, 0, 84 },
-  { 49, 100, 100, 0, 86 },
-  { 52, 104, 104, 0, 89 },
-  { 54, 109, 109, 0, 93 },
-  { 57, 113, 113, 0, 95 },
-  { 60, 116, 116, 0, 98 },
-  { 63, 122, 122, 0, 102 },
-  { 67, 127, 127, 0, 105 },
-  { 71, 133, 133, 0, 109 },
-  { 74, 138, 138, 0, 113 },
-  { 78, 144, 144, 0, 117 },
-  { 81, 150, 150, 0, 121 },
-  { 85, 155, 155, 0, 125 },
-  { 89, 162, 162, 0, 129 },
-  { 92, 168, 168, 0, 133 },
-  { 97, 173, 173, 0, 137 },
-  { 101, 181, 181, 0, 143 },
-  { 106, 188, 188, 0, 148 },
-  { 110, 194, 194, 0, 153 },
-  { 115, 202, 202, 0, 159 },
-  { 119, 209, 209, 0, 165 },
-  { 124, 215, 215, 0, 170 },
-  { 128, 223, 223, 0, 176 },
-  { 134, 229, 229, 0, 181 },
-  { 139, 236, 236, 0, 186 },
-  { 144, 244, 244, 0, 192 },
-  { 150, 253, 253, 0, 200 },
-  { 155, 263, 263, 0, 207 },
-  { 161, 272, 272, 0, 215 },
-  { 166, 283, 283, 0, 223 },
-  { 171, 292, 292, 0, 231 },
-  { 177, 302, 302, 0, 238 },
-  { 183, 311, 311, 0, 246 },
-  { 189, 322, 322, 0, 254 },
-  { 196, 331, 331, 0, 261 },
-  { 202, 341, 341, 1700, 269 },
-  { 204, 342, 393, 1774, 270 },
-  { 205, 344, 444, 1851, 271 },
-  { 207, 345, 496, 1931, 273 },
-  { 209, 346, 548, 2015, 274 },
-  { 210, 347, 600, 2102, 275 },
-  { 212, 349, 651, 2194, 276 },
-  { 214, 350, 703, 2289, 278 },
-  { 215, 351, 755, 2388, 279 },
-  { 217, 352, 806, 2492, 280 },
-  { 218, 354, 858, 2600, 282 },
-  { 224, 355, 941, 2700, 283 },
-  { 228, 356, 1032, 2800, 284 },
-  { 236, 357, 1133, 2900, 286 },
-  { 244, 358, 1243, 3000, 287 },
-  { 252, 359, 1364, 3100, 288 },
-  { 260, 360, 1497, 3200, 290 },
-  { 268, 361, 1643, 3300, 292 },
-  { 276, 362, 1802, 3400, 293 },
-  { 284, 363, 1978, 3500, 294 },
-  { 292, 364, 2170, 3600, 295 },
+  { 1, 1, 1, 1, 1, 1 },
+  { 20, 56, 56, 0, 52, 2 },
+  { 21, 57, 57, 0, 54, 2 },
+  { 22, 60, 60, 0, 56, 3 },
+  { 24, 62, 62, 0, 58, 3 },
+  { 26, 65, 65, 0, 60, 3 },
+  { 27, 68, 68, 0, 62, 3 },
+  { 29, 70, 70, 0, 64, 4 },
+  { 31, 73, 73, 0, 66, 4 },
+  { 33, 76, 76, 0, 68, 4 },
+  { 35, 78, 78, 0, 70, 5 },
+  { 36, 82, 82, 0, 73, 5 },
+  { 38, 85, 85, 0, 75, 5 },
+  { 41, 89, 89, 0, 78, 6 },
+  { 44, 93, 93, 0, 81, 6 },
+  { 46, 96, 96, 0, 84, 7 },
+  { 49, 100, 100, 0, 86, 7 },
+  { 52, 104, 104, 0, 89, 8 },
+  { 54, 109, 109, 0, 93, 9 },
+  { 57, 113, 113, 0, 95, 9 },
+  { 60, 116, 116, 0, 98, 10 },
+  { 63, 122, 122, 0, 102, 10 },
+  { 67, 127, 127, 0, 105, 11 },
+  { 71, 133, 133, 0, 109, 12 },
+  { 74, 138, 138, 0, 113, 13 },
+  { 78, 144, 144, 0, 117, 14 },
+  { 81, 150, 150, 0, 121, 15 },
+  { 85, 155, 155, 0, 125, 16 },
+  { 89, 162, 162, 0, 129, 17 },
+  { 92, 168, 168, 0, 133, 18 },
+  { 97, 173, 173, 0, 137, 19 },
+  { 101, 181, 181, 0, 143, 20 },
+  { 106, 188, 188, 0, 148, 22 },
+  { 110, 194, 194, 0, 153, 23 },
+  { 115, 202, 202, 0, 159, 25 },
+  { 119, 209, 209, 0, 165, 27 },
+  { 124, 215, 215, 0, 170, 29 },
+  { 128, 223, 223, 0, 176, 31 },
+  { 134, 229, 229, 0, 181, 33 },
+  { 139, 236, 236, 0, 186, 35 },
+  { 144, 244, 244, 0, 192, 38 },
+  { 150, 253, 253, 0, 200, 40 },
+  { 155, 263, 263, 0, 207, 43 },
+  { 161, 272, 272, 0, 215, 46 },
+  { 166, 283, 283, 0, 223, 49 },
+  { 171, 292, 292, 0, 231, 52 },
+  { 177, 302, 302, 0, 238, 55 },
+  { 183, 311, 311, 0, 246, 58 },
+  { 189, 322, 322, 0, 254, 62 },
+  { 196, 331, 331, 0, 261, 66 },
+  { 202, 341, 341, 1700, 269, 70 },
+  { 204, 342, 393, 1774, 270, 84 },
+  { 205, 344, 444, 1851, 271, 99 },
+  { 207, 345, 496, 1931, 273, 113 },
+  { 209, 346, 548, 2015, 274, 128 },
+  { 210, 347, 600, 2102, 275, 142 },
+  { 212, 349, 651, 2194, 276, 157 },
+  { 214, 350, 703, 2289, 278, 171 },
+  { 215, 351, 755, 2388, 279, 186 },
+  { 217, 352, 806, 2492, 280, 200 },
+  { 218, 354, 858, 2600, 282, 215 },
+  { 224, 355, 941, 2700, 283, 232 },
+  { 228, 356, 1032, 2800, 284, 250 },
+  { 236, 357, 1133, 2900, 286, 269 },
+  { 244, 358, 1243, 3000, 287, 290 },
+  { 252, 359, 1364, 3100, 288, 313 },
+  { 260, 360, 1497, 3200, 290, 337 },
+  { 268, 361, 1643, 3300, 292, 363 },
+  { 276, 362, 1802, 3400, 293, 392 },
+  { 284, 363, 1978, 3500, 294, 422 },
+  { 292, 364, 2170, 3600, 295, 455 },
 
-  // todo: add proper shbr values
+  // todo: add proper shbr values - hp/elmt/threat
   // sub/div added from http://theoryjerks.akhmorning.com/resources/levelmods/
-  { 292, 365, 2263, 3600, 295 },
-  { 292, 366, 2360, 3600, 295 },
-  { 292, 367, 2461, 3600, 295 },
-  { 292, 368, 2566, 3600, 295 },
-  { 292, 370, 2676, 3600, 295 },
-  { 292, 372, 2790, 3600, 295 },
-  { 292, 374, 2910, 3600, 295 },
-  { 292, 376, 3034, 3600, 295 },
-  { 292, 378, 3164, 3600, 295 },
-  { 292, 380, 3300, 3600, 295 },
+  { 296, 365, 2263, 3600, 466, 466 },
+  { 300, 366, 2360, 3600, 295, 466 },
+  { 305, 367, 2461, 3600, 295, 466 },
+  { 310, 368, 2566, 3600, 295, 466 },
+  { 315, 370, 2676, 3600, 295, 466 },
+  { 320, 372, 2790, 3600, 295, 466 },
+  { 325, 374, 2910, 3600, 295, 466 },
+  { 330, 376, 3034, 3600, 295, 466 },
+  { 335, 378, 3164, 3600, 295, 466 },
+  { 340, 380, 3300, 3600, 569, 569 },
 };
 
 /*
@@ -219,16 +219,9 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
 {
   uint32_t aaPotency = AUTO_ATTACK_POTENCY;
 
-  // check if ranged class
-  switch( chara.getClass() )
+  if( chara.getRole() == Common::Role::RangedPhysical )
   {
-    case Common::ClassJob::Machinist:
-    case Common::ClassJob::Bard:
-    case Common::ClassJob::Archer:
-      aaPotency = RANGED_AUTO_ATTACK_POTENCY;
-
-    default:
-      break;
+    aaPotency = RANGED_AUTO_ATTACK_POTENCY;
   }
 
   float autoAttackDelay = 2.5f;
@@ -442,7 +435,7 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+float CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
@@ -451,11 +444,24 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
   auto aa = autoAttack( chara );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
-  auto ten = tenacity( chara );
 
-  Logger::debug( "auto attack: pot: {} aa: {} ap: {} det: {} ten: {}", pot, aa, ap, det, ten );
+  auto ten = 1.f;
+  if( chara.getRole() == Common::Role::Tank )
+    ten = tenacity( chara );
 
+  // todo: everything after tenacity
   auto factor = std::floor( pot * aa * ap * det * ten );
+
+  constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, aa, ap, det, ten, factor );
+  }
+  else
+  {
+    Logger::debug( format, pot, aa, ap, det, ten, factor );
+  }
 
   // todo: traits
 
@@ -468,6 +474,38 @@ float CalcStats::calculateAutoAttackDamage( const Sapphire::Entity::Chara& chara
   // todo: random 0.95 - 1.05 factor
 
   // todo: buffs
+
+  return factor;
+}
+
+float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
+  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
+
+  auto pot = potency( ptc );
+  auto wd = weaponDamage( chara, wepDmg );
+  auto ap = getPrimaryAttackPower( chara );
+  auto det = determination( chara );
+
+  auto ten = 1.f;
+  if( chara.getRole() == Common::Role::Tank )
+    ten = tenacity( chara );
+
+  auto factor = std::floor( pot * wd * ap * det * ten );
+
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+  }
+  else
+  {
+    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+  }
+
+  // todo: the rest
 
   return factor;
 }

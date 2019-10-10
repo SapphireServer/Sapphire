@@ -24,7 +24,7 @@ add_executable(discovery_parser ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_F
 #)
 
 if (UNIX)
-    target_link_libraries (discovery_parser common xivdat pthread mysqlclient dl z stdc++fs)
+    target_link_libraries (discovery_parser common xivdat pthread mysql dl z stdc++fs)
 else()
     target_link_libraries (discovery_parser common xivdat mysql zlib)
 endif()

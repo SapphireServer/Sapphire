@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_HOUSINGZONE_H
 #define SAPPHIRE_HOUSINGZONE_H
 
-#include "Zone.h"
+#include "Territory.h"
 #include "Forwards.h"
 
 #include <array>
@@ -24,7 +24,7 @@ namespace Sapphire
     RELOCATE = 4,
   };
 
-  class HousingZone : public Zone
+  class HousingZone : public Territory
   {
   public:
     HousingZone( uint8_t landSetId,

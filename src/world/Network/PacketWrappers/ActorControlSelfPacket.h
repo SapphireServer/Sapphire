@@ -12,18 +12,18 @@ namespace Sapphire::Network::Packets::Server
   /**
   * @brief The Ping response packet.
   */
-  class ActorControlPacket143 : public ZoneChannelPacket< FFXIVIpcActorControl143 >
+  class ActorControlSelfPacket : public ZoneChannelPacket< FFXIVIpcActorControlSelf >
   {
   public:
-    ActorControlPacket143( uint32_t actorId,
-                           uint16_t category,
-                           uint32_t param1 = 0,
-                           uint32_t param2 = 0,
-                           uint32_t param3 = 0,
-                           uint32_t param4 = 0,
-                           uint32_t param5 = 0,
-                           uint32_t padding1 = 0 ) :
-      ZoneChannelPacket< FFXIVIpcActorControl143 >( actorId, actorId )
+    ActorControlSelfPacket( uint32_t actorId,
+                            uint16_t category,
+                            uint32_t param1 = 0,
+                            uint32_t param2 = 0,
+                            uint32_t param3 = 0,
+                            uint32_t param4 = 0,
+                            uint32_t param5 = 0,
+                            uint32_t padding1 = 0 ) :
+      ZoneChannelPacket< FFXIVIpcActorControlSelf >( actorId, actorId )
     {
       initialize( category, param1, param2, param3, param4, param5 );
     };
@@ -43,9 +43,9 @@ namespace Sapphire::Network::Packets::Server
   };
 
   template< typename... Args >
-  std::shared_ptr< ActorControlPacket143 > makeActorControl143( Args... args )
+  std::shared_ptr< ActorControlSelfPacket > makeActorControlSelf( Args... args )
   {
-    return std::make_shared< ActorControlPacket143 >( args... );
+    return std::make_shared< ActorControlSelfPacket >( args... );
   }
 
 }

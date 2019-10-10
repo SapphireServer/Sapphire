@@ -6,8 +6,8 @@
 
 #include "Actor/Player.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include <Logging/Logger.h>
 
 
@@ -44,7 +44,7 @@ uint8_t Sapphire::Event::Director::getSequence() const
 
 void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& player ) const
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorClear, m_directorId ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorClear, m_directorId ) );
 }
 
 void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& player ) const
@@ -60,7 +60,7 @@ void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& play
 void Sapphire::Event::Director::sendDirectorInit( Sapphire::Entity::Player& player ) const
 {
   Logger::debug( "DirectorID#{}, QuestBattleID#{}", m_directorId, m_contentId );
-  player.queuePacket( makeActorControl143( player.getId(), DirectorInit, m_directorId, m_contentId ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorInit, m_directorId, m_contentId ) );
 }
 
 Sapphire::Event::Director::DirectorType Sapphire::Event::Director::getType() const

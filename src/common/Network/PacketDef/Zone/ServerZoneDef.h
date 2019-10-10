@@ -448,21 +448,26 @@ namespace Sapphire::Network::Packets::Server
     uint32_t max_hp;
     uint16_t max_mp;
     uint16_t max_something;
-    uint8_t effect_index; // which position do i display this
-    uint8_t unknown3;
-    uint16_t effect_id;
-    uint16_t param;
-    uint16_t unknown5;    // Sort this out (old right half of power/param property)
-    float duration;
-    uint32_t actor_id1;
-    uint8_t unknown4[52];
+
+    struct StatusEntry
+    {
+      uint8_t index; // which position do i display this
+      uint8_t unknown3;
+      uint16_t id;
+      uint16_t param;
+      uint16_t unknown5;    // Sort this out (old right half of power/param property)
+      float duration;
+      uint32_t sourceActorId;
+    } statusEntries[4];
+
+    uint32_t unknown4;
   };
 
   /**
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl142 : FFXIVIpcBasePacket< ActorControl142 >
+  struct FFXIVIpcActorControl : FFXIVIpcBasePacket< ActorControl >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
@@ -477,7 +482,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl143 : FFXIVIpcBasePacket< ActorControl143 >
+  struct FFXIVIpcActorControlSelf : FFXIVIpcBasePacket< ActorControlSelf >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
@@ -494,7 +499,7 @@ namespace Sapphire::Network::Packets::Server
   * Structural representation of the packet sent by the server
   * to update certain player details / status
   */
-  struct FFXIVIpcActorControl144 : FFXIVIpcBasePacket< ActorControl144 >
+  struct FFXIVIpcActorControlTarget : FFXIVIpcBasePacket< ActorControlTarget >
   {
     /* 0000 */ uint16_t category;
     /* 0002 */ uint16_t padding;
@@ -515,8 +520,9 @@ namespace Sapphire::Network::Packets::Server
     /* 0000 */ uint32_t hp;
     /* 0004 */ uint16_t mp;
     /* 0006 */ uint16_t tp;
-    /* 0008 */ uint32_t unknown_8;
-    /* 000C */ uint32_t unknown_12;
+    /* 0008 */ uint16_t gp;
+    /* 0010 */ uint16_t unknown_10;
+    /* 0012 */ uint32_t unknown_12;
   };
 
 
@@ -551,12 +557,21 @@ namespace Sapphire::Network::Packets::Server
     uint64_t animationTargetId; // who the animation targets
 
     uint32_t actionId; // what the casting player casts, shown in battle log/ui
-    uint32_t sequence; // seems to only increment on retail?
+    /*!
+     * @brief Zone sequence for the effect. Used to link effects that are split across multiple packets as one
+     */
+    uint32_t sequence;
 
     float animationLockTime; // maybe? doesn't seem to do anything
-    uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+    uint32_t someTargetId; // always 0x0E000000?
 
-    uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+    /*!
+     * @brief The cast sequence from the originating player. Should only be sent to the source, 0 for every other player.
+     *
+     * This needs to match the sequence sent from the player in the action start packet otherwise you'll cancel the
+     * initial animation and start a new one once the packet arrives.
+     */
+    uint16_t sourceSequence;
     uint16_t rotation;
     uint16_t actionAnimationId; // the animation that is played by the casting character
     uint8_t variation; // variation in the animation
@@ -962,10 +977,10 @@ namespace Sapphire::Network::Packets::Server
     unsigned char maxLevel;
     unsigned char expansion;
     unsigned char unknown76;
+    unsigned char unknown77;
     unsigned char race;
     unsigned char tribe;
     unsigned char gender;
-    unsigned char unknown7A;
     unsigned char currentJob;
     unsigned char currentClass;
     unsigned char deity;
@@ -1076,6 +1091,7 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcPlayerStats : FFXIVIpcBasePacket< PlayerStats >
   {
+    // order comes from baseparam order column
     uint32_t strength;
     uint32_t dexterity;
     uint32_t vitality;
@@ -1085,45 +1101,30 @@ namespace Sapphire::Network::Packets::Server
     uint32_t hp;
     uint32_t mp;
     uint32_t tp;
-    uint32_t gp; // Set to 10000 as non-gatherer for some reason
+    uint32_t gp;
     uint32_t cp;
-    uint32_t unknown_2;
+    uint32_t delay;
     uint32_t tenacity;
-    uint32_t attack;
+    uint32_t attackPower;
     uint32_t defense;
-    uint32_t accuracy;
-    uint32_t spellSpeed;
+    uint32_t directHitRate;
+    uint32_t evasion;
     uint32_t magicDefense;
-    uint32_t criticalHitRate;
-    uint32_t resistanceSlashing;
-    uint32_t resistancePiercing;
-    uint32_t resistanceBlunt;
+    uint32_t criticalHit;
     uint32_t attackMagicPotency;
     uint32_t healingMagicPotency;
-    uint32_t fire;
-    uint32_t ice;
-    uint32_t wind;
-    uint32_t earth;
-    uint32_t lightning;
-    uint32_t water;
+    uint32_t elementalBonus;
     uint32_t determination;
     uint32_t skillSpeed;
-    uint32_t spellSpeed1;
-    uint32_t spellSpeedMod;
-    uint32_t unknown_6;
+    uint32_t spellSpeed;
+    uint32_t haste;
     uint32_t craftsmanship;
     uint32_t control;
     uint32_t gathering;
     uint32_t perception;
-    uint32_t resistanceSlow;
-    uint32_t resistanceSilence;
-    uint32_t resistanceBlind;
-    uint32_t resistancePoison;
-    uint32_t resistanceStun;
-    uint32_t resistanceSleep;
-    uint32_t resistanceBind;
-    uint32_t resistanceHeavy;
-    uint32_t unknown_7[9]; // possibly level sync stats.
+
+    // todo: what is here?
+    uint32_t unknown[26];
   };
 
   /**
@@ -1557,7 +1558,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * UNKOWN TYPE
   */
-  struct FFXIVARR_IPC_UNK322 : FFXIVIpcBasePacket< IPCTYPE_UNK_322 >
+  struct FFXIVARR_IPC_UNK322 : FFXIVIpcBasePacket< DailyQuestRepeatFlags >
   {
     /* 0000 */ uint8_t unk[8];
   };
@@ -1565,7 +1566,7 @@ namespace Sapphire::Network::Packets::Server
   /**
   * UNKOWN TYPE
   */
-  struct FFXIVARR_IPC_UNK320 : FFXIVIpcBasePacket< IPCTYPE_UNK_320 >
+  struct FFXIVARR_IPC_UNK320 : FFXIVIpcBasePacket< DailyQuests >
   {
     /* 0000 */ uint8_t unk[0x38];
   };

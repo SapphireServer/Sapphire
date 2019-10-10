@@ -8,7 +8,7 @@
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Util/Util.h>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Manager/HousingMgr.h"
 
@@ -20,7 +20,7 @@
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
@@ -52,7 +52,7 @@ void examineHandler( Sapphire::FrameworkPtr pFw, Sapphire::Entity::Player& playe
     {
       if( pTarget->isActingAsGm() || pTarget->getZoneId() != player.getZoneId() )
       {
-        player.queuePacket( makeActorControl142( player.getId(), ActorControlType::ExamineError ) );
+        player.queuePacket( makeActorControl( player.getId(), ActorControlType::ExamineError ) );
       }
       else
       {
@@ -95,7 +95,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
         player.setAutoattack( false );
       }
 
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 0, param11, 1 ) );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 0, param11, 1 ) );
 
       break;
     }
@@ -109,7 +109,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       else
         player.setAutoattack( false );
 
-      player.sendToInRangeSet( makeActorControl142( player.getId(), 1, param11, 1 ) );
+      player.sendToInRangeSet( makeActorControl( player.getId(), 1, param11, 1 ) );
 
       break;
     }
@@ -207,9 +207,9 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
         player.setPersistentEmote( emoteData->emoteMode );
         player.setStatus( Common::ActorStatus::EmoteMode );
 
-        player.sendToInRangeSet( makeActorControl142( player.getId(), ActorControlType::SetStatus,
-                                                      static_cast< uint8_t >( Common::ActorStatus::EmoteMode ),
-                                                      emoteData->hasCancelEmote ? 1 : 0 ), true );
+        player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
+                                                            static_cast< uint8_t >( Common::ActorStatus::EmoteMode ),
+                                                            emoteData->hasCancelEmote ? 1 : 0 ), true );
       }
 
       if( emoteData->drawsWeapon )
@@ -229,8 +229,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       player.setPersistentEmote( 0 );
       player.emoteInterrupt();
       player.setStatus( Common::ActorStatus::Idle );
-      auto pSetStatusPacket = makeActorControl142( player.getId(), SetStatus,
-                                                   static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+      auto pSetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
       player.sendToInRangeSet( pSetStatusPacket );
       break;
     }
@@ -238,14 +237,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::PoseReapply: // reapply pose
     {
       player.setPose( param12 );
-      auto pSetStatusPacket = makeActorControl142( player.getId(), SetPose, param11, param12 );
+      auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
       player.sendToInRangeSet( pSetStatusPacket, true );
       break;
     }
     case ClientTriggerType::PoseCancel: // cancel pose
     {
       player.setPose( param12 );
-      auto pSetStatusPacket = makeActorControl142( player.getId(), SetPose, param11, param12 );
+      auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
       player.sendToInRangeSet( pSetStatusPacket, true );
       break;
     }
@@ -287,12 +286,12 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::DirectorInitFinish: // Director init finish
     {
-      player.getCurrentZone()->onInitDirector( player );
+      player.getCurrentTerritory()->onInitDirector( player );
       break;
     }
     case ClientTriggerType::DirectorSync: // Director init finish
     {
-      player.getCurrentZone()->onDirectorSync( player );
+      player.getCurrentTerritory()->onDirectorSync( player );
       break;
     }
     case ClientTriggerType::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
@@ -313,14 +312,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestHousingBuildPreset:
     {
-      auto zone = player.getCurrentZone();
+      auto zone = player.getCurrentTerritory();
       auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
       if (!hZone)
         return;
 
       player.setActiveLand( param11, hZone->getWardNum() );
 
-      auto pShowBuildPresetUIPacket = makeActorControl142( player.getId(), ShowBuildPresetUI, param11 );
+      auto pShowBuildPresetUIPacket = makeActorControl( player.getId(), ShowBuildPresetUI, param11 );
       player.queuePacket( pShowBuildPresetUIPacket );
 
       break;
@@ -404,7 +403,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
 
       uint8_t ward = ( param12 >> 16 ) & 0xFF;
       uint8_t plot = ( param12 & 0xFF );
-      auto pShowHousingItemUIPacket = makeActorControl142( player.getId(), ShowHousingItemUI, 0, plot );
+      auto pShowHousingItemUIPacket = makeActorControl( player.getId(), ShowHousingItemUI, 0, plot );
 
       player.queuePacket( pShowHousingItemUIPacket );
 

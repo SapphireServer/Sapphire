@@ -15,8 +15,8 @@
 #include "Actor/BNpc.h"
 #include "Actor/BNpcTemplate.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 
 #include "Event/EventHandler.h"
@@ -36,7 +36,7 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
                                     const std::string& contentName,
                                     uint32_t questBattleId,
                                     FrameworkPtr pFw ) :
-  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
   Director( Event::Director::QuestBattle, questBattleId ),
   m_pBattleDetails( pBattleDetails ),
   m_questBattleId( questBattleId ),
@@ -48,7 +48,7 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
 
 bool Sapphire::QuestBattle::init()
 {
-  if( !Zone::init() )
+  if( !Territory::init() )
     return false;
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
@@ -69,7 +69,7 @@ Sapphire::Data::ExdDataGenerated::QuestBattlePtr Sapphire::QuestBattle::getQuest
 
 void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "QuestBattle::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "QuestBattle::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   m_pPlayer = player.getAsPlayer();
@@ -83,7 +83,7 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::QuestBattle::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "QuestBattle::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "QuestBattle::onLeaveTerritory: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   clearDirector( player );
@@ -177,7 +177,7 @@ void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
 
 void Sapphire::QuestBattle::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 void Sapphire::QuestBattle::setVar( uint8_t index, uint8_t value )
@@ -267,17 +267,17 @@ void Sapphire::QuestBattle::setBranch( uint8_t value )
 
 void Sapphire::QuestBattle::startQte()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
 }
 
 void Sapphire::QuestBattle::startEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
 }
 
 void Sapphire::QuestBattle::endEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
 }
 
 void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
@@ -291,7 +291,7 @@ void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Zone " +
+    Logger::error( "InstanceContent::onRegisterEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }

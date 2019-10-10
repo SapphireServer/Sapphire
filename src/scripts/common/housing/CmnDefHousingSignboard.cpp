@@ -1,9 +1,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
-#include <Territory/Zone.h>
 #include <Territory/HousingZone.h>
 #include <Manager/HousingMgr.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
 #include <Exd/ExdDataGenerated.h>
 #include "Framework.h"
@@ -35,7 +34,7 @@ public:
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();
 
-        auto pTerritory = player.getCurrentZone();
+        auto pTerritory = player.getCurrentTerritory();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         auto pHouMgr = pFw->get< HousingMgr >();
 
@@ -46,7 +45,7 @@ public:
         {
           case LandPurchaseResult::SUCCESS:
           {
-            auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
+            auto screenMsgPkt = makeActorControlSelf( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
 
             player.sendLogMessage( 0x0D16, pTerritory->getTerritoryTypeInfo()->placeName, activeLand.ward + 1, activeLand.plot + 1 );

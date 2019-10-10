@@ -20,8 +20,8 @@ namespace Sapphire::World::Action
   public:
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw );
-    Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData, FrameworkPtr fw );
 
     virtual ~Action();
 
@@ -85,6 +85,8 @@ namespace Sapphire::World::Action
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
 
+    void buildEffects();
+
     /*!
      * @brief Adds an actor filter to this action.
      * @param filter The ptr to the ActorFilter to add
@@ -95,6 +97,10 @@ namespace Sapphire::World::Action
      * @brief Adds the default actor filters based on the CastType entry in the Action exd.
      */
     void addDefaultActorFilters();
+
+    std::pair< uint32_t, Common::ActionHitSeverityType > calcDamage( uint32_t potency );
+
+    std::pair< uint32_t, Common::ActionHitSeverityType > calcHealing( uint32_t potency );
 
 
     std::vector< Entity::CharaPtr >& getHitCharas();
@@ -139,6 +145,8 @@ namespace Sapphire::World::Action
 
     uint32_t m_id;
 
+    uint16_t m_sequence;
+
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost;
 
@@ -170,6 +178,8 @@ namespace Sapphire::World::Action
     Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
+
+    EffectBuilderPtr m_effectBuilder;
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;

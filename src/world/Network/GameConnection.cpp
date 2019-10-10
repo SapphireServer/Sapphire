@@ -8,7 +8,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
@@ -215,13 +215,13 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
     std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
     if( opcode != PingHandler && opcode != UpdatePositionHandler )
-      Logger::debug( "[{0}] Handling Zone IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
+      Logger::debug( "[{0}] Handling World IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
     ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
   }
   else
   {
-    Logger::debug( "[{0}] Undefined Zone IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
+    Logger::debug( "[{0}] Undefined World IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
 
     Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
                                                        pPacket.segHdr.size ) );
@@ -433,7 +433,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
           *( unsigned int* ) ( &pe1->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe1 );
-          Logger::info( "[{0}] Setting session for zone connection", id );
+          Logger::info( "[{0}] Setting session for world connection", id );
           session->setZoneConnection( pCon );
         }
           // chat connection, assinging it to the session
