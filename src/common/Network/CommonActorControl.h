@@ -142,6 +142,15 @@ namespace Sapphire::Network::ActorControl
 
     SetPose = 0x127,
 
+    /*!
+     * This is used for general crafting events, I found some of them but some are missing:
+     * 
+     * param1 = event type, the rest of the struct depends on this param.
+     *  - 18 & 19: Quicksynth result, 19 means HQ result item, item ID is param2 and is + 1 000 000 when HQ. 
+     *             Quantity is param3 (possible quicksynth that gives more than one item in the future?)
+     * 
+     * All the other values have unkown behavior for now. 
+     */
     CraftingUnk = 0x12C,
 
     GatheringSenseMsg = 0x130,
