@@ -175,6 +175,14 @@ namespace Sapphire::Network::ActorControl
 
     RelicInfuseMsg = 0x179,
 
+    /*!
+     * Sent as result of an aetherial reduction.
+     * param1 = Reduced item ID + 500 000 (idk what this 500 000 is but it's always here no matter what)
+     * param2 = First result item id (+ 1 000 000 if HQ)
+     * param3 = First result item quantity
+     * param4 = (Optional) Second result item id (+ 1 000 000 if HQ)
+     * param5 = (Optional) Second result item quantity
+     */ 
     AetherReductionDlg = 0x17D,
 
     /*!
