@@ -40,9 +40,9 @@ struct FFXIVIpcClientTrigger :
   /* 0004 */ uint32_t param11;
   /* 0008 */ uint32_t param12;
   /* 000C */ uint32_t param2;
-  /* 0010 */ uint32_t param4; // todo: really?
-  /* 0014 */ uint32_t param5;
-  /* 0018 */ uint64_t param3;
+  /* 0010 */ uint32_t param3;
+  /* 0014 */ uint32_t param4;
+  /* 0018 */ uint64_t param5;
 };
 
 struct FFXIVIpcUpdatePosition :
