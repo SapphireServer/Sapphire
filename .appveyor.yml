@@ -20,8 +20,8 @@ before_build:
   - git submodule update --init
   - mkdir build
   - cd build
-  - cmake .. -G "Visual Studio 16 2019" -A Win64
-  - cmake --build . --target ALL_BUILD --config Release
+  - cmake .. -G "Visual Studio 16 2019" -A x64
+  - cmake --build . --target ALL_BUILD --config RelWithDebInfo
 
 build_script:
   - cd bin  
