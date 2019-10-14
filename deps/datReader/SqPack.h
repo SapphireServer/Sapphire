@@ -3,7 +3,7 @@
 
 #include <fstream>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "bparse.h"
 
@@ -49,7 +49,7 @@ class SqPack
 
 public:
    // Full path to the sqpack file
-   SqPack( const std::experimental::filesystem::path& i_path );
+   SqPack( const std::filesystem::path& i_path );
    virtual ~SqPack();
 
 protected:

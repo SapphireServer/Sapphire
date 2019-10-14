@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <mutex>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 namespace xiv
 {
@@ -21,7 +21,7 @@ class GameData
 {
 public:
    // This should be the path in which the .index/.datX files are located
-   GameData( const std::experimental::filesystem::path& path );
+   GameData( const std::filesystem::path& path );
    ~GameData();
 
    static const std::string buildDatStr( const std::string folder, const int cat, const int exNum, const int chunk, const std::string platform, const std::string type );
@@ -61,7 +61,7 @@ protected:
    void createExCategory( uint32_t catNum );
 
    // Path given to constructor, pointing to the folder with the .index/.datX files
-   const std::experimental::filesystem::path m_path;
+   const std::filesystem::path m_path;
 
    // Stored categories, indexed by their number, categories are instantiated and parsed individually when they are needed
    std::unordered_map<uint32_t, std::unique_ptr<Cat>> m_cats;

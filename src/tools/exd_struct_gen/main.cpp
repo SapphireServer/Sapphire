@@ -11,7 +11,7 @@
 #include <set>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include <nlohmann/json.hpp>
 
@@ -22,7 +22,7 @@
 
 using namespace Sapphire;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;

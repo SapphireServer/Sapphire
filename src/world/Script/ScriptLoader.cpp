@@ -5,11 +5,11 @@
 #include <Util/Util.h>
 #include "ServerMgr.h"
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "Framework.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 const std::string Sapphire::Scripting::ScriptLoader::getModuleExtension()
 {

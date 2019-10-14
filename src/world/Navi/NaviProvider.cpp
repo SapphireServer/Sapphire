@@ -16,7 +16,7 @@
 #include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
 #include <DetourCommon.h>
 #include <recastnavigation/Recast/Include/Recast.h>
-#include <experimental/filesystem>
+#include <filesystem>
 
 Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName, FrameworkPtr pFw ) :
   m_naviMesh( nullptr ),
@@ -34,12 +34,12 @@ bool Sapphire::World::Navi::NaviProvider::init()
 {
   auto& cfg = m_pFw->get< Sapphire::World::ServerMgr >()->getConfig();
 
-  auto meshesFolder = std::experimental::filesystem::path( cfg.navigation.meshPath );
-  auto meshFolder = meshesFolder / std::experimental::filesystem::path( m_internalName );
+  auto meshesFolder = std::filesystem::path( cfg.navigation.meshPath );
+  auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
 
-  if( std::experimental::filesystem::exists( meshFolder ) )
+  if( std::filesystem::exists( meshFolder ) )
   {
-    auto baseMesh = meshFolder / std::experimental::filesystem::path( m_internalName + ".nav" );
+    auto baseMesh = meshFolder / std::filesystem::path( m_internalName + ".nav" );
 
     if( !loadMesh( baseMesh.string() ) )
       return false;

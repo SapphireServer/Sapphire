@@ -51,7 +51,7 @@ namespace xiv
 namespace dat
 {
 
-   SqPack::SqPack( const std::experimental::filesystem::path& path ) :
+   SqPack::SqPack( const std::filesystem::path& path ) :
       // Open the file
       m_handle( path.string(), std::ios_base::in | std::ios_base::binary )
    {

@@ -10,7 +10,7 @@ namespace xiv
 namespace dat
 {
 
-Cat::Cat( const std::experimental::filesystem::path& basePath, uint32_t catNum, const std::string& name ) :
+Cat::Cat( const std::filesystem::path& basePath, uint32_t catNum, const std::string& name ) :
    m_name( name ),
    m_catNum( catNum ),
    m_chunk( -1 )
@@ -30,7 +30,7 @@ Cat::Cat( const std::experimental::filesystem::path& basePath, uint32_t catNum, 
    }
 }
 
-Cat::Cat( const std::experimental::filesystem::path& basePath, uint32_t catNum, const std::string& name, uint32_t exNum, uint32_t chunk ) :
+Cat::Cat( const std::filesystem::path& basePath, uint32_t catNum, const std::string& name, uint32_t exNum, uint32_t chunk ) :
    m_name( name ),
    m_catNum( catNum ),
    m_chunk( chunk )

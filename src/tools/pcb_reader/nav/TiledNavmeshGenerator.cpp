@@ -1,11 +1,11 @@
 #include "TiledNavmeshGenerator.h"
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <cstring>
 
 #include <recastnavigation/Detour/Include/DetourNavMeshBuilder.h>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 
 inline unsigned int nextPow2( uint32_t v )
