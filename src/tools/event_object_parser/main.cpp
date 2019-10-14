@@ -26,14 +26,14 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 Sapphire::Common::Util::CrashHandler crashHandler;
 Sapphire::Data::ExdDataGenerated g_exdData;
 
 using namespace Sapphire;
 using namespace std::chrono_literals;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;

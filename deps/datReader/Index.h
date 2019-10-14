@@ -5,7 +5,7 @@
 
 #include <unordered_map>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 namespace xiv {
 namespace dat {
@@ -16,7 +16,7 @@ class Index : public SqPack
 {
 public:
    // Full path to the index file
-   Index( const std::experimental::filesystem::path& i_path );
+   Index( const std::filesystem::path& i_path );
    virtual ~Index();
 
    // An entry in the hash table, representing a file in a given dat

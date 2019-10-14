@@ -1,4 +1,4 @@
-#include <experimental/filesystem>
+#include <filesystem>
 #include <time.h>
 
 #include <Util/Util.h>
@@ -10,7 +10,7 @@
 
 #include "Session.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 Sapphire::World::Session::Session( uint32_t sessionId, FrameworkPtr pFw ) :
   m_sessionId( sessionId ),

@@ -56,7 +56,7 @@ namespace xiv
 namespace dat
 {
 
-Index::Index(const std::experimental::filesystem::path& path) :
+Index::Index(const std::filesystem::path& path) :
    SqPack( path )
 {
    if( !m_handle )
