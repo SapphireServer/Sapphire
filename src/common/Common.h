@@ -232,6 +232,9 @@ namespace Sapphire::Common
     
     SaddleBag0 = 4000,
     SaddleBag1 = 4001,
+    // These are the ones you get when paying for premium companion app
+    PremiumSaddleBag0 = 4100,
+    PremiumSaddleBag1 = 4101,
 
     RetainerBag0 = 10000,
     RetainerBag1 = 10001,
