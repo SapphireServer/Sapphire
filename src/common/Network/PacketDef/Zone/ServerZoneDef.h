@@ -1550,10 +1550,9 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcDiscovery : FFXIVIpcBasePacket< Discovery >
   {
-    /* 0000 */ uint32_t map_part_id;
-    /* 0004 */ uint32_t map_id;
+    /* 0000 */ uint32_t mapPartId;
+    /* 0004 */ uint32_t mapId;
   };
-
 
   /**
   * UNKOWN TYPE

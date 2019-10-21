@@ -429,7 +429,7 @@ int main( int argc, char* argv[] )
               }
               return true;
             };
-            auto exportSgbModel = [&]( const std::string& sgbFilePath, LGB_ENTRY* pGimmick, bool isEobj = false  )
+            auto exportSgbModel = [&]( const std::string& sgbFilePath, LgbEntry* pGimmick, bool isEobj = false  )
             {
               if( auto pSgbFile = pCache->getSgbFile( sgbFilePath ) )
               {

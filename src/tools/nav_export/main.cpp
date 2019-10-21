@@ -257,7 +257,7 @@ bool pcbTransformModel( const std::string& fileName, const vec3* scale, const ve
   return true;
 };
 
-void exportSgbModel( const std::string& sgbFilePath, LGB_ENTRY* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
+void exportSgbModel( const std::string& sgbFilePath, LgbEntry* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
 {
   if( auto pSgbFile = pCache->getSgbFile( sgbFilePath ) )
   {
