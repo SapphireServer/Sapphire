@@ -44,6 +44,8 @@
 #include "Manager/NaviMgr.h"
 #include "Manager/ActionMgr.h"
 
+#include "Territory/InstanceObjectCache.h"
+
 using namespace Sapphire::World::Manager;
 
 Sapphire::World::ServerMgr::ServerMgr( const std::string& configName, FrameworkPtr pFw ) :
@@ -170,6 +172,10 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     return;
   }
   framework()->set< Scripting::ScriptMgr >( pScript );
+
+  Logger::info( "Setting up InstanceObjectCache" );
+  auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >( framework() );
+  framework()->set< Sapphire::InstanceObjectCache >( pInstanceObjCache );
 
   auto pActionMgr = std::make_shared< Manager::ActionMgr >( framework() );
   framework()->set< Manager::ActionMgr >( pActionMgr );

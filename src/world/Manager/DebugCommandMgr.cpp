@@ -209,31 +209,10 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
     auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
-    discoveryPacket->data().map_id = map_id;
-    discoveryPacket->data().map_part_id = discover_id;
+    discoveryPacket->data().mapId = map_id;
+    discoveryPacket->data().mapPartId = discover_id;
     player.queuePacket( discoveryPacket );
   }
-
-  else if( ( subCommand == "discovery_pos" ) && ( params != "" ) )
-  {
-    int32_t map_id;
-    int32_t discover_id;
-    int32_t pos_id;
-    sscanf( params.c_str(), "%i %i %i", &pos_id, &map_id, &discover_id );
-
-    std::string query2 = "UPDATE IGNORE `discoveryinfo` SET `discover_id` = '" + std::to_string( discover_id ) +
-                         "' WHERE `discoveryinfo`.`id` = " + std::to_string( pos_id ) + ";";
-
-    std::string query1 =
-      "INSERT IGNORE INTO `discoveryinfo` (`id`, `map_id`, `discover_id`) VALUES ('" + std::to_string( pos_id ) +
-      "', '" + std::to_string( map_id ) +
-      "', '" + std::to_string( discover_id ) + "')";
-
-    pDb->execute( query1 );
-    pDb->execute( query2 );
-
-  }
-
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();

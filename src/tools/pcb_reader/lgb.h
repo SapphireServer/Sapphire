@@ -68,7 +68,7 @@ enum class LgbEntryType :
   SphereCastRange = 75,
 };
 
-struct LGB_ENTRY_HEADER
+struct InstanceObject
 {
   LgbEntryType type;
   uint32_t unknown;
@@ -78,25 +78,25 @@ struct LGB_ENTRY_HEADER
   vec3 scale;
 };
 
-class LGB_ENTRY
+class LgbEntry
 {
 public:
   char* m_buf;
   uint32_t m_offset;
-  LGB_ENTRY_HEADER header;
+  InstanceObject header;
 
-  LGB_ENTRY()
+  LgbEntry()
   {
     m_buf = nullptr;
     m_offset = 0;
     memset( &header, 0, sizeof( header ) );
   };
 
-  LGB_ENTRY( char* buf, uint32_t offset )
+  LgbEntry( char* buf, uint32_t offset )
   {
     m_buf = buf;
     m_offset = offset;
-    header = *reinterpret_cast< LGB_ENTRY_HEADER* >( buf + offset );
+    header = *reinterpret_cast< InstanceObject* >( buf + offset );
   };
 
   const LgbEntryType getType() const
@@ -104,14 +104,14 @@ public:
     return header.type;
   };
 
-  virtual ~LGB_ENTRY()
+  virtual ~LgbEntry()
   {
   };
 };
 
 
-struct LGB_BGPARTS_HEADER :
-  public LGB_ENTRY_HEADER
+struct BgPartsData :
+  public InstanceObject
 {
   uint32_t modelFileOffset;
   uint32_t collisionFileOffset;
@@ -124,10 +124,10 @@ struct LGB_BGPARTS_HEADER :
 };
 
 class LGB_BGPARTS_ENTRY :
-  public LGB_ENTRY
+  public LgbEntry
 {
 public:
-  LGB_BGPARTS_HEADER header;
+  BgPartsData header;
   std::string name;
   std::string modelFileName;
   std::string collisionFileName;
@@ -137,65 +137,65 @@ public:
   };
 
   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
+          LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast<LGB_BGPARTS_HEADER*>( buf + offset );
+    header = *reinterpret_cast<BgPartsData*>( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     modelFileName = std::string( buf + offset + header.modelFileOffset );
     collisionFileName = std::string( buf + offset + header.collisionFileOffset );
   };
 };
 
-struct LGB_GIMMICK_HEADER :
-  public LGB_ENTRY_HEADER
+struct GimmickData :
+  public InstanceObject
 {
   uint32_t gimmickFileOffset;
   char unknownBytes[100];
 };
 
 class LGB_GIMMICK_ENTRY :
-  public LGB_ENTRY
+  public LgbEntry
 {
 public:
-  LGB_GIMMICK_HEADER header;
+  GimmickData header;
   std::string name;
   std::string gimmickFileName;
 
   LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
+          LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast<LGB_GIMMICK_HEADER*>( buf + offset );
+    header = *reinterpret_cast<GimmickData*>( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
     //std::cout << "\t " << gimmickFileName << " unknown: " << header.unknown << "\n";
   };
 };
 
-struct LGB_ENPC_HEADER :
-  public LGB_ENTRY_HEADER
+struct ENpcData :
+  public InstanceObject
 {
   uint32_t enpcId;
   uint8_t unknown1[0x24];
 };
 
 class LGB_ENPC_ENTRY :
-  public LGB_ENTRY
+  public LgbEntry
 {
 public:
-  LGB_ENPC_HEADER header;
+  ENpcData header;
   std::string name;
 
   LGB_ENPC_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
+          LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< LGB_ENPC_HEADER* >( buf + offset );
+    header = *reinterpret_cast< ENpcData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
     //std::cout << "\t ENpc " << header.enpcId << " " << name << "\n";
   };
 };
 
-struct LGB_EOBJ_HEADER :
-  public LGB_ENTRY_HEADER
+struct EObjData :
+  public InstanceObject
 {
   uint32_t eobjId;
   uint32_t levelHierachyId;
@@ -203,23 +203,23 @@ struct LGB_EOBJ_HEADER :
 };
 
 class LGB_EOBJ_ENTRY :
-  public LGB_ENTRY
+  public LgbEntry
 {
 public:
-  LGB_EOBJ_HEADER header;
+  EObjData header;
   std::string name;
 
   LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
+          LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< LGB_EOBJ_HEADER* >( buf + offset );
+    header = *reinterpret_cast< EObjData* >( buf + offset );
     //std::cout << "\t " << header.eobjId << " " << name << " unknown: " << header.unknown << "\n";
     name = std::string( buf + offset + header.nameOffset );
   };
 };
 
-struct LGB_MAPRANGE_HEADER :
-  public LGB_ENTRY_HEADER
+struct MapRangeData :
+  public InstanceObject
 {
   uint32_t type;
   uint16_t unknown2;
@@ -227,35 +227,34 @@ struct LGB_MAPRANGE_HEADER :
   uint8_t unknown4[0x10];
 };
 
-struct LGB_MAPRANGE_ENTRY :
-  public LGB_ENTRY
+struct LGB_MAP_RANGE_ENTRY : public LgbEntry
 {
 public:
-  LGB_MAPRANGE_HEADER header;
+  MapRangeData header;
   std::string name;
 
-  LGB_MAPRANGE_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
+  LGB_MAP_RANGE_ENTRY( char* buf, uint32_t offset ) :
+          LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< LGB_MAPRANGE_HEADER* >( buf + offset );
+    header = *reinterpret_cast< MapRangeData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
   };
 };
 
 struct LGB_COLLISION_BOX_HEADER :
-  public LGB_ENTRY_HEADER
+  public InstanceObject
 {
   uint8_t unk[100];
 };
 
 struct LGB_COLLISION_BOX_ENTRY :
-  public LGB_ENTRY
+  public LgbEntry
 {
   LGB_COLLISION_BOX_HEADER header;
   std::string name;
 
   LGB_COLLISION_BOX_ENTRY( char* buf, uint32_t offset ) :
-    LGB_ENTRY( buf, offset )
+          LgbEntry( buf, offset )
   {
     header = *reinterpret_cast< LGB_COLLISION_BOX_HEADER* >( buf + offset );
     header.type = LgbEntryType::CollisionBox;
@@ -305,7 +304,7 @@ struct LGB_GROUP
   LGB_FILE* parent;
   LGB_GROUP_HEADER header;
   std::string name;
-  std::vector< std::shared_ptr< LGB_ENTRY > > entries;
+  std::vector< std::shared_ptr< LgbEntry > > entries;
 
   LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
   {

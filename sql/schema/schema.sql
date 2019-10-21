@@ -400,13 +400,6 @@ CREATE TABLE `dbupdate` (
   PRIMARY KEY(`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `discoveryinfo` (
-  `id` int(10) NOT NULL,
-  `map_id` int(3) NOT NULL,
-  `discover_id` int(3) NOT NULL,
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE `house` (
   `HouseId` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `LandSetId` int(10) UNSIGNED DEFAULT NULL,

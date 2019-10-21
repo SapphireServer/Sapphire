@@ -84,7 +84,7 @@ Index::Index(const std::experimental::filesystem::path& path) :
       // The dat number is found in the offset, last four bits
       hashTableEntry.datNum = ( indexHashTableEntry.datOffset & 0xF ) / 0x2;
       // The offset in the dat file, needs to strip the dat number indicator
-      hashTableEntry.datOffset = ( indexHashTableEntry.datOffset & 0xFFFFFFF0 ) * 0x08;
+      hashTableEntry.datOffset = ( indexHashTableEntry.datOffset - ( indexHashTableEntry.datOffset & 0x000F ) ) * 0x08;
       hashTableEntry.dirHash = indexHashTableEntry.dirHash;
       hashTableEntry.filenameHash = indexHashTableEntry.filenameHash;
    }

@@ -19,7 +19,9 @@
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
+
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
@@ -350,7 +352,26 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   }
 
   setStateFlag( PlayerStateFlag::BetweenAreas );
+
+  auto pInstanceObjectCache = m_pFw->get< InstanceObjectCache >();
+
   auto targetPos = pTeriMgr->getTerritoryPosition( data->level.at( 0 ) );
+
+  auto pop = pInstanceObjectCache->getPopRange( data->territory, data->level[ 0 ] );
+  auto pop1 = pInstanceObjectCache->getPopRange( data->territory, data->level[ 1 ] );
+
+  if( pop )
+  {
+    sendDebug( "Teleport: popRange {0} found!", data->level.at( 0 ) );
+  }
+  else if( pop1 )
+  {
+    sendDebug( "Teleport: popRange {0} found!", data->level.at( 1 ) );
+  }
+  else
+  {
+    sendDebug( "Teleport: popRange not found!" );
+  }
 
   Common::FFXIVARR_POSITION3 pos;
   pos.x = 0;
