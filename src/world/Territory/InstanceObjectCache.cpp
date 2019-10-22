@@ -69,7 +69,6 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
       {
         for( const auto& pEntry : group.entries )
         {
-
           if( pEntry->getType() == LgbEntryType::MapRange )
           {
             auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY* >( pEntry.get() );
@@ -82,12 +81,6 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
           }
           else if( pEntry->getType() == LgbEntryType::PopRange )
           {
-            if( pEntry->header.instanceId == 1359242 )
-            {
-              std::cout << ">>>" << id << "__" << static_cast< uint32_t >( pEntry->getType() ) << ">>>\n";
-              //break;
-            }
-
             auto pPopRange = reinterpret_cast< LGB_POP_RANGE_ENTRY* >( pEntry.get() );
             m_popRangeCache.insert( id, *pPopRange );
           }

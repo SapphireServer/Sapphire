@@ -293,15 +293,15 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
   if( pExitRange )
   {
     player.sendDebug( "Found ExitRange#{0}", zoneLineId );
-    player.sendDebug( "destTerritoryType#{0}", pExitRange->header.destTerritoryType );
-    player.sendDebug( "destInstanceObjectId#{0}", pExitRange->header.destInstanceObjectId );
+    player.sendDebug( "destTerritoryType#{0}", pExitRange->data.destTerritoryType );
+    player.sendDebug( "destInstanceObjectId#{0}", pExitRange->data.destInstanceObjectId );
 
-    auto pPopRange = pInstanceObjectCache->getPopRange( pExitRange->header.destTerritoryType,
-                                                        pExitRange->header.destInstanceObjectId );
+    auto pPopRange = pInstanceObjectCache->getPopRange( pExitRange->data.destTerritoryType,
+                                                        pExitRange->data.destInstanceObjectId );
     if( pPopRange )
     {
-      targetZone = pExitRange->header.destTerritoryType;
-      player.sendDebug( "\tFound PopRange#{0}", pExitRange->header.destInstanceObjectId );
+      targetZone = pExitRange->data.destTerritoryType;
+      player.sendDebug( "\tFound PopRange#{0}", pExitRange->data.destInstanceObjectId );
       player.sendDebug( "\t{0}", pPopRange->header.transform.translation.x );
       player.sendDebug( "\t{0}", pPopRange->header.transform.translation.y );
       player.sendDebug( "\t{0}", pPopRange->header.transform.translation.z );
@@ -312,7 +312,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
       player.sendDebug( "ZoneLine #{0} found.", zoneLineId );
 
       auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
-      preparePacket->data().targetZone = pExitRange->header.destTerritoryType;
+      preparePacket->data().targetZone = pExitRange->data.destTerritoryType;
 
       //ActorControlSelfPacket controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
       //                                     0x03, player.getId(), 0x01, targetZone );
@@ -372,9 +372,9 @@ void Sapphire::Network::GameConnection::discoveryHandler( FrameworkPtr pFw,
   {
     auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
     discoveryPacket->data().mapId = tInfo->map;
-    discoveryPacket->data().mapPartId = pRefInfo->header.discoveryIndex;
+    discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
     player.queuePacket( discoveryPacket );
-    player.discover( tInfo->map, pRefInfo->header.discoveryIndex );
+    player.discover( tInfo->map, pRefInfo->data.discoveryIndex );
   }
 
 }

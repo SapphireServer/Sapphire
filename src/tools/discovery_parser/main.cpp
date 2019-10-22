@@ -222,12 +222,12 @@ void loadEobjNames()
 void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
 {
   auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY* >( pObj );
-  if( !pMapRange->header.discoveryEnabled )
+  if( !pMapRange->data.discoveryEnabled )
     return;
 
   auto subArea = 0;
   auto mapId = -1;
-  auto discoveryIndex = pMapRange->header.discoveryIndex;
+  auto discoveryIndex = pMapRange->data.discoveryIndex;
 
   vec3 translation = pObj->header.transform.translation;
 
@@ -236,8 +236,8 @@ void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
                       std::to_string( pMapRange->header.transform.translation.y ) + " " +
                       std::to_string( pMapRange->header.transform.translation.z ) + " " +
                       std::to_string( pMapRange->header.transform.rotation.y ) + " " +
-                      std::to_string( pMapRange->header.mapId ) + " " +
-                      std::to_string( pMapRange->header.discoveryIndex ) + "\n"
+                      std::to_string( pMapRange->data.mapId ) + " " +
+                      std::to_string( pMapRange->data.discoveryIndex ) + "\n"
   );
 
   out.write( outStr.c_str(), outStr.size() );
