@@ -284,10 +284,10 @@ int main( int argc, char* argv[] )
               uint32_t eobjlevelHierachyId = 0;
 
               auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-              id = pEobj->header.eobjId;
+              id = pEobj->data.eobjId;
               unknown = pEobj->header.instanceId;
 
-              eobjlevelHierachyId = pEobj->header.levelHierachyId;
+              eobjlevelHierachyId = pEobj->data.levelHierachyId;
 
               std::string states = "";
               std::string gimmickName = "";
@@ -295,7 +295,7 @@ int main( int argc, char* argv[] )
               {
                 auto pGObj = pEntry1.get();
                 if( pGObj->getType() == LgbEntryType::Gimmick &&
-                    pGObj->header.instanceId == pEobj->header.levelHierachyId )
+                    pGObj->header.instanceId == pEobj->data.levelHierachyId )
                 {
                   auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
                   char* dataSection = nullptr;

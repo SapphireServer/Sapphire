@@ -108,7 +108,7 @@ struct RelativePositions
   int32_t PosCount;
 };
 
-struct PopRangeData : InstanceObject
+struct PopRangeData : public InstanceObject
 {
   PopType popType;
   RelativePositions relativePositions;

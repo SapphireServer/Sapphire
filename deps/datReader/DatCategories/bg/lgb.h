@@ -55,7 +55,7 @@ public:
 class LGB_BGPARTS_ENTRY : public LgbEntry
 {
 public:
-  BgPartsData header;
+  BgPartsData data;
   std::string name;
   std::string modelFileName;
   std::string collisionFileName;
@@ -66,38 +66,38 @@ public:
 
   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< BgPartsData* >( buf + offset );
+    data = *reinterpret_cast< BgPartsData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + header.modelFileOffset );
-    collisionFileName = std::string( buf + offset + header.collisionFileOffset );
+    modelFileName = std::string( buf + offset + data.modelFileOffset );
+    collisionFileName = std::string( buf + offset + data.collisionFileOffset );
   };
 };
 
 class LGB_GIMMICK_ENTRY : public LgbEntry
 {
 public:
-  GimmickData header;
+  GimmickData data;
   std::string name;
   std::string gimmickFileName;
 
   LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< GimmickData* >( buf + offset );
+    data = *reinterpret_cast< GimmickData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + header.gimmickFileOffset );
+    gimmickFileName = std::string( buf + offset + data.gimmickFileOffset );
   };
 };
 
 class LGB_ENPC_ENTRY : public LgbEntry
 {
 public:
-  ENpcData header;
+  ENpcData data;
   std::string name;
 
   LGB_ENPC_ENTRY( char* buf, uint32_t offset ) :
     LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< ENpcData* >( buf + offset );
+    data = *reinterpret_cast< ENpcData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
   };
 };
@@ -105,12 +105,12 @@ public:
 class LGB_EOBJ_ENTRY : public LgbEntry
 {
 public:
-  EObjData header;
+  EObjData data;
   std::string name;
 
   LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< EObjData* >( buf + offset );
+    data = *reinterpret_cast< EObjData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
   };
 };
@@ -118,12 +118,12 @@ public:
 struct LGB_MAP_RANGE_ENTRY : public LgbEntry
 {
 public:
-  MapRangeData header;
+  MapRangeData data;
   std::string name;
 
   LGB_MAP_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< MapRangeData* >( buf + offset );
+    data = *reinterpret_cast< MapRangeData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
   };
 };
@@ -131,25 +131,24 @@ public:
 struct LGB_EXIT_RANGE_ENTRY : public LgbEntry
 {
 public:
-  ExitRangeData header;
+  ExitRangeData data;
   std::string name;
 
   LGB_EXIT_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< ExitRangeData* >( buf + offset );
+    data = *reinterpret_cast< ExitRangeData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
-
   };
 };
 
 struct LGB_POP_RANGE_ENTRY : public LgbEntry
 {
 public:
-  PopRangeData header;
+  PopRangeData data;
 
   LGB_POP_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
   {
-    header = *reinterpret_cast< PopRangeData* >( buf + offset );
+    data = *reinterpret_cast< PopRangeData* >( buf + offset );
   };
 };
 

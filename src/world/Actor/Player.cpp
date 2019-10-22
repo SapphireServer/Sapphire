@@ -370,7 +370,7 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   }
   else
   {
-    sendDebug( "Teleport: popRange not found!" );
+    sendDebug( "Teleport: popRange {0} not found in {1}!", data->level[ 0 ], data->territory );
   }
 
   Common::FFXIVARR_POSITION3 pos;
