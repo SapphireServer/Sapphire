@@ -290,21 +290,16 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
 
   Common::FFXIVARR_POSITION3 targetPos{};
   uint32_t targetZone;
+  float rotation = 0.0f;
+
   if( pExitRange )
   {
-    player.sendDebug( "Found ExitRange#{0}", zoneLineId );
-    player.sendDebug( "destTerritoryType#{0}", pExitRange->data.destTerritoryType );
-    player.sendDebug( "destInstanceObjectId#{0}", pExitRange->data.destInstanceObjectId );
-
     auto pPopRange = pInstanceObjectCache->getPopRange( pExitRange->data.destTerritoryType,
                                                         pExitRange->data.destInstanceObjectId );
     if( pPopRange )
     {
       targetZone = pExitRange->data.destTerritoryType;
-      player.sendDebug( "\tFound PopRange#{0}", pExitRange->data.destInstanceObjectId );
-      player.sendDebug( "\t{0}", pPopRange->header.transform.translation.x );
-      player.sendDebug( "\t{0}", pPopRange->header.transform.translation.y );
-      player.sendDebug( "\t{0}", pPopRange->header.transform.translation.z );
+      rotation = pPopRange->header.transform.rotation.y * -1.f;
       targetPos = Common::FFXIVARR_POSITION3 { pPopRange->header.transform.translation.x,
                                                pPopRange->header.transform.translation.y,
                                                pPopRange->header.transform.translation.z };
@@ -314,42 +309,12 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
       auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
       preparePacket->data().targetZone = pExitRange->data.destTerritoryType;
 
-      //ActorControlSelfPacket controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
-      //                                     0x03, player.getId(), 0x01, targetZone );
       player.queuePacket( preparePacket );
 
     }
   }
 
   player.sendDebug( "Walking ZoneLine#{0}", zoneLineId );
-
-  auto pZone = player.getCurrentTerritory();
-
-  float rotation = 0.0f;
-
-/*  if( pLine != nullptr )
-  {
-    player.sendDebug( "ZoneLine #{0} found.", zoneLineId );
-    targetPos = pLine->getTargetPosition();
-    targetZone = pLine->getTargetZoneId();
-    rotation = pLine->getTargetRotation();
-
-    auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
-    preparePacket->data().targetZone = targetZone;
-
-    //ActorControlSelfPacket controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
-    //                                     0x03, player.getId(), 0x01, targetZone );
-    player.queuePacket( preparePacket );
-  }
-  else
-  {
-    // No zoneline found, revert to last zone
-    player.sendUrgent( "ZoneLine {0} not found.", zoneLineId );
-    targetPos.x = 0;
-    targetPos.y = 0;
-    targetPos.z = 0;
-    targetZone = pZone->getTerritoryTypeId();
-  }*/
 
   player.performZoning( targetZone, targetPos, rotation );
 }
