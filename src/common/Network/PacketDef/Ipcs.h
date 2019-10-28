@@ -330,14 +330,14 @@ namespace Sapphire::Network::Packets
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
-    BuildPresetHandler = 0x014F, // updated 5.0
+    BuildPresetHandler = 0x0150, // updated 5.0
 
     TalkEventHandler = 0x0151, // updated 5.0
     EmoteEventHandler = 0x0152, // updated 5.0
     WithinRangeEventHandler = 0x0153, // updated 5.0
     OutOfRangeEventHandler = 0x0154, // updated 5.0
     EnterTeriEventHandler = 0x0155, // updated 5.0
-    ShopEventHandler = 0x0156, // updated 5.0
+    ShopEventHandler = 0x0157, // updated 5.0
 
     ReturnEventHandler = 0x015A, // updated 5.0?
     TradeReturnEventHandler = 0x015B, // updated 5.0?

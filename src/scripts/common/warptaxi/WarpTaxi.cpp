@@ -1,6 +1,11 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/Lgb.h>
+
+#include "Territory/InstanceObjectCache.h"
+
 #include <Exd/ExdDataGenerated.h>
 #include <Framework.h>
 #include <Manager/PlayerMgr.h>
@@ -28,11 +33,25 @@ public:
       player.eventFinish( getId(), 1 );
 
       auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
+      auto pPopRange = framework()->get< Sapphire::InstanceObjectCache >();
+
       auto warp = exdData->get< Sapphire::Data::Warp >( getId() );
       if( !warp )
         return;
 
       auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();
+
+      auto pPop = pPopRange->getPopRange(  warp->level,  warp->level );
+
+      if( !pPop )
+      {
+        std::cout << "not found...";
+      }
+      else
+      {
+        std::cout << "found!!";
+      }
+
       playerMgr->movePlayerToLandDestination( player, warp->level, result.param3 );
     }
     else

@@ -6673,7 +6673,7 @@ Sapphire::Data::Warp::Warp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
 {
   auto row = exdData->m_WarpDat.get_row( row_id );
   level = exdData->getField< uint32_t >( row, 0 );
-  placeName = exdData->getField< uint16_t >( row, 1 );
+  territoryType = exdData->getField< uint16_t >( row, 1 );
   conditionSuccessEvent = exdData->getField< uint32_t >( row, 2 );
   conditionFailEvent = exdData->getField< uint32_t >( row, 3 );
   confirmEvent = exdData->getField< uint32_t >( row, 4 );
