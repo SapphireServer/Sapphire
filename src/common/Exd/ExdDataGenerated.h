@@ -5432,7 +5432,7 @@ struct VFX
 struct Warp
 {
   uint32_t level;
-  uint16_t placeName;
+  uint16_t territoryType;
   uint32_t conditionSuccessEvent;
   uint32_t conditionFailEvent;
   uint32_t confirmEvent;

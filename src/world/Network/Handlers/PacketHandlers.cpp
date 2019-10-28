@@ -299,7 +299,7 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
     if( pPopRange )
     {
       targetZone = pExitRange->data.destTerritoryType;
-      rotation = pPopRange->header.transform.rotation.y * -1.f;
+      rotation = pPopRange->header.transform.rotation.y;
       targetPos = Common::FFXIVARR_POSITION3 { pPopRange->header.transform.translation.x,
                                                pPopRange->header.transform.translation.y,
                                                pPopRange->header.transform.translation.z };

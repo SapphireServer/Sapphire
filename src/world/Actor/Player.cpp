@@ -369,7 +369,7 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     pos.x = pop->header.transform.translation.x;
     pos.y = pop->header.transform.translation.y;
     pos.z = pop->header.transform.translation.z;
-    rot = pop->header.transform.rotation.y * -1;
+    rot = pop->header.transform.rotation.y;
   }
   else
   {
