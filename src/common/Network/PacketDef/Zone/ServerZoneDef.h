@@ -322,7 +322,7 @@ namespace Sapphire::Network::Packets::Server
       bool hq;
       uint8_t materiaCount;
       uint8_t onMannequin;
-      Common::MarketCity marketCity;
+      Common::City marketCity;
       uint16_t dyeId;
       uint16_t padding3;
       uint32_t padding4;
