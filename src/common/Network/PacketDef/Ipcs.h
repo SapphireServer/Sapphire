@@ -125,10 +125,10 @@ namespace Sapphire::Network::Packets
     StatusEffectList = 0x015B, // updated 5.0
     EurekaStatusEffectList = 0x015C, // updated 5.0
     Effect = 0x00A7, // updated 5.1
-    AoeEffect8 = 0x0161, // updated 5.0
-    AoeEffect16 = 0x0162, // updated 5.0
-    AoeEffect24 = 0x0163, // updated 5.0
-    AoeEffect32 = 0x0164, // updated 5.0
+    AoeEffect8 = 0x00A9, // updated 5.1
+    AoeEffect16 = 0x015F, // updated 5.1
+    AoeEffect24 = 0x0292, // updated 5.1
+    AoeEffect32 = 0x0268, // updated 5.1
     PersistantEffect = 0x0165, // updated 5.0
 
     GCAffiliation = 0x016F, // updated 5.0
@@ -142,12 +142,12 @@ namespace Sapphire::Network::Packets
 
     ActorCast = 0x012C, // updated 5.1
     SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
-    PartyList = 0x0188, // updated 5.0
-    HateRank = 0x0189, // updated 5.0
-    HateList = 0x018A, // updated 5.0
+    PartyList = 0x0231, // updated 5.1
+    HateRank = 0x0354, // updated 5.1
+    HateList = 0x00C7, // updated 5.1
     ObjectSpawn = 0x0156, // updated 5.1
     ObjectDespawn = 0x00A3, // updated 5.1
-    UpdateClassInfo = 0x018D, // updated 5.0
+    UpdateClassInfo = 0x0258, // updated 5.1
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x0110, // updated 5.1
     PlayerStats = 0x00CF, // updated 5.1
@@ -164,14 +164,14 @@ namespace Sapphire::Network::Packets
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-    ItemInfo = 0x01A1, // updated 5.0
-    ContainerInfo = 0x01A2, // updated 5.0
-    InventoryTransactionFinish = 0x01A3, // updated 5.0
-    InventoryTransaction = 0x01A4, // updated 5.0
-    CurrencyCrystalInfo = 0x01A5, // updated 5.0
+    ItemInfo = 0x0145, // updated 5.1
+    ContainerInfo = 0x0246, // updated 5.1
+    InventoryTransactionFinish = 0x01AB, // updated 5.1
+    InventoryTransaction = 0x023E, // updated 5.1
+    CurrencyCrystalInfo = 0x031E, // updated 5.1
 
-    InventoryActionAck = 0x01A7, // updated 5.0
-    UpdateInventorySlot = 0x01A8, // updated 5.0
+    InventoryActionAck = 0x0084, // updated 5.1
+    UpdateInventorySlot = 0x0072, // updated 5.1
 
     HuntingLogEntry = 0x01B3, // updated 5.0
 
