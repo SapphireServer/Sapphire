@@ -138,25 +138,25 @@ namespace Sapphire::Network::Packets
     NpcSpawn2 = 0x0115, // ( Bigger statuseffectlist? ) updated 5.1
     ActorMove = 0x01BC, // updated 5.1
 
-    ActorSetPos = 0x0184, // updated 5.0
+    ActorSetPos = 0x0311, // updated 5.1
 
-    ActorCast = 0x0186, // updated 5.0
+    ActorCast = 0x012C, // updated 5.1
     SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
     PartyList = 0x0188, // updated 5.0
     HateRank = 0x0189, // updated 5.0
     HateList = 0x018A, // updated 5.0
-    ObjectSpawn = 0x018B, // updated 5.0
-    ObjectDespawn = 0x018C, // updated 5.0
+    ObjectSpawn = 0x0156, // updated 5.1
+    ObjectDespawn = 0x00A3, // updated 5.1
     UpdateClassInfo = 0x018D, // updated 5.0
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x018F, // updated 5.0
-    PlayerStats = 0x0190, // updated 5.0
-    ActorOwner = 0x0192, // updated 5.0
-    PlayerStateFlags = 0x0193, // updated 5.0
-    PlayerClassInfo = 0x0194, // updated 5.0
+    PlayerSetup = 0x0110, // updated 5.1
+    PlayerStats = 0x00CF, // updated 5.1
+    ActorOwner = 0x01A5, // updated 5.1
+    PlayerStateFlags = 0x019F, // updated 5.1
+    PlayerClassInfo = 0x02D4, // updated 5.1
 
-    ModelEquip = 0x0196, // updated 5.0
-    Examine = 0x0197, // updated 5.0
+    ModelEquip = 0x025E, // updated 5.1
+    Examine = 0x00EA, // updated 5.1
     CharaNameReq = 0x0198, // updated 5.0
 
     // nb: see #565 on github
