@@ -79,23 +79,23 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x0104, // updated 5.0
+    Chat = 0x02DC, // updated 5.1
 
     WorldVisitList = 0x00FE, // added 4.5
 
-    SocialList = 0x010D, // updated 5.0
+    SocialList = 0x007A, // updated 5.1
 
-    ExamineSearchInfo = 0x010F, // added 5.0
-    UpdateSearchInfo = 0x0110, // updated 5.0
-    InitSearchInfo = 0x0111, // updated 5.0
+    ExamineSearchInfo = 0x03D7, // updated 5.1
+    UpdateSearchInfo = 0x0358, // updated 5.1
+    InitSearchInfo = 0x03A1, // updated 5.1
     ExamineSearchComment = 0x0102, // updated 4.1
 
     ServerNoticeShort = 0x0115, // updated 5.0
     ServerNotice = 0x0116, // updated 5.0
-    SetOnlineStatus = 0x0117, // updated 5.0
+    SetOnlineStatus = 0x015E, // updated 5.1
 
-    CountdownInitiate = 0x011E, // updated 5.0
-    CountdownCancel = 0x011F, // updated 5.0
+    CountdownInitiate = 0x01EE, // updated 5.1
+    CountdownCancel = 0x03C6, // updated 5.1
 
     PlayerAddedToBlacklist = 0x0120, // updated 5.0
     PlayerRemovedFromBlacklist = 0x0121, // updated 5.0
