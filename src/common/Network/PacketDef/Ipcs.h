@@ -48,20 +48,24 @@ namespace Sapphire::Network::Packets
     Ping = 0x0065,
     Init = 0x0066,
 
-    ActorFreeSpawn = 0x0191,
-    InitZone = 0x019A,
+    ActorFreeSpawn = 0x0097, // updated 5.1
+    InitZone = 0x019B, // updated 5.1
 
-    EffectResult = 0x0141,
-    ActorControl = 0x0142,
-    ActorControlSelf = 0x0143,
-    ActorControlTarget = 0x0144,
-    UpdateHpMpTp = 0x0145, // used when resting
+    EffectResult = 0x0153, // updated 5.1
+    ActorControl = 0x0264, // updated 5.1
+    ActorControlSelf = 0x0164, // updated 5.1
+    ActorControlTarget = 0x016C, // updated 5.1
+
+    /*!
+     * @brief Used when resting
+     */
+    UpdateHpMpTp = 0x032D, // updated 5.1
 
     ///////////////////////////////////////////////////
 
     ChatBanned = 0x006B,
-    Playtime = 0x0100, // updated 5.0
-    Logout = 0x0077, // updated 5.0
+    Playtime = 0x01DB, // updated 5.1
+    Logout = 0x011D, // updated 5.1
     CFNotify = 0x0078,
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
@@ -129,7 +133,7 @@ namespace Sapphire::Network::Packets
 
     GCAffiliation = 0x016F, // updated 5.0
 
-    PlayerSpawn = 0x017F, // updated 5.0
+    PlayerSpawn = 0x0386, // updated 5.1
     NpcSpawn = 0x0180, // updated 5.0
     NpcSpawn2 = 0x0181, // ( Bigger statuseffectlist? ) updated 5.0
     ActorMove = 0x0182, // updated 5.0
@@ -265,7 +269,7 @@ namespace Sapphire::Network::Packets
   {
 
     PingHandler = 0x0065, // unchanged 5.0
-    InitHandler = 0x0066, // unchanged 5.0
+    InitHandler = 0x03D2, // updated 5.1
 
     FinishLoadingHandler = 0x0069, // unchanged 5.0
 
