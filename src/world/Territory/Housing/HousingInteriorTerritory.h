@@ -5,7 +5,7 @@
 
 namespace Sapphire::World::Territory::Housing
 {
-  class HousingInteriorTerritory : public Territory
+class HousingInteriorTerritory : public Sapphire::Territory
   {
   public:
     HousingInteriorTerritory( Common::LandIdent ident, uint16_t territoryTypeId,
