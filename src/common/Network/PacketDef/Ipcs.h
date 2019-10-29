@@ -97,9 +97,9 @@ namespace Sapphire::Network::Packets
     CountdownInitiate = 0x01EE, // updated 5.1
     CountdownCancel = 0x03C6, // updated 5.1
 
-    PlayerAddedToBlacklist = 0x0120, // updated 5.0
-    PlayerRemovedFromBlacklist = 0x0121, // updated 5.0
-    BlackList = 0x0123, // updated 5.0
+    PlayerAddedToBlacklist = 0x033F, // updated 5.1
+    PlayerRemovedFromBlacklist = 0x0385, // updated 5.1
+    BlackList = 0x031F, // updated 5.1
 
     LinkshellList = 0x012A, // updated 5.0
 
@@ -124,7 +124,7 @@ namespace Sapphire::Network::Packets
 
     StatusEffectList = 0x015B, // updated 5.0
     EurekaStatusEffectList = 0x015C, // updated 5.0
-    Effect = 0x015E, // updated 5.0
+    Effect = 0x00A7, // updated 5.1
     AoeEffect8 = 0x0161, // updated 5.0
     AoeEffect16 = 0x0162, // updated 5.0
     AoeEffect24 = 0x0163, // updated 5.0
@@ -134,9 +134,9 @@ namespace Sapphire::Network::Packets
     GCAffiliation = 0x016F, // updated 5.0
 
     PlayerSpawn = 0x0386, // updated 5.1
-    NpcSpawn = 0x0180, // updated 5.0
-    NpcSpawn2 = 0x0181, // ( Bigger statuseffectlist? ) updated 5.0
-    ActorMove = 0x0182, // updated 5.0
+    NpcSpawn = 0x010A, // updated 5.1
+    NpcSpawn2 = 0x0115, // ( Bigger statuseffectlist? ) updated 5.1
+    ActorMove = 0x01BC, // updated 5.1
 
     ActorSetPos = 0x0184, // updated 5.0
 
