@@ -52,8 +52,8 @@ namespace Sapphire::Network::Packets
     InitZone = 0x019B, // updated 5.1
 
     EffectResult = 0x0153, // updated 5.1
-    ActorControl = 0x0264, // updated 5.1
-    ActorControlSelf = 0x0164, // updated 5.1
+    ActorControl = 0x0164, // updated 5.1
+    ActorControlSelf = 0x0264, // updated 5.1
     ActorControlTarget = 0x016C, // updated 5.1
 
     /*!
