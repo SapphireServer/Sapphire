@@ -993,16 +993,6 @@ namespace Sapphire::Common
     CircularAoEPlaced = 7
   };
 
-  enum City : uint8_t
-  {
-    LimsaLominsa = 1,
-    Gridania = 2,
-    Uldah = 3,
-    Ishgard = 4,
-    Kugane = 7,
-    Crystarium = 10
-  };
-
   enum class Role : uint8_t
   {
     None,
