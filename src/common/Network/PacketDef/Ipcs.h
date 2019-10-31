@@ -122,8 +122,9 @@ namespace Sapphire::Network::Packets
 
     FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
 
-    StatusEffectList = 0x015B, // updated 5.0
-    EurekaStatusEffectList = 0x015C, // updated 5.0
+    StatusEffectList = 0x023A, // updated 5.1
+    EurekaStatusEffectList = 0x0398, // updated 5.1
+    BossStatusEffectList = 0x00E6, // added 5.1
     Effect = 0x00A7, // updated 5.1
     AoeEffect8 = 0x00A9, // updated 5.1
     AoeEffect16 = 0x015F, // updated 5.1
@@ -164,11 +165,11 @@ namespace Sapphire::Network::Packets
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-    ItemInfo = 0x0145, // updated 5.1
-    ContainerInfo = 0x0246, // updated 5.1
+    ItemInfo = 0x031E, // updated 5.1
+    ContainerInfo = 0x0145, // updated 5.1
     InventoryTransactionFinish = 0x01AB, // updated 5.1
     InventoryTransaction = 0x023E, // updated 5.1
-    CurrencyCrystalInfo = 0x031E, // updated 5.1
+    CurrencyCrystalInfo = 0x0246, // updated 5.1
 
     InventoryActionAck = 0x0084, // updated 5.1
     UpdateInventorySlot = 0x0072, // updated 5.1
@@ -271,7 +272,7 @@ namespace Sapphire::Network::Packets
     PingHandler = 0x0065, // unchanged 5.0
     InitHandler = 0x03D2, // updated 5.1
 
-    FinishLoadingHandler = 0x0069, // unchanged 5.0
+    FinishLoadingHandler = 0x01DC, // updated 5.1
 
     CFCommenceHandler = 0x006F,
 
@@ -289,16 +290,16 @@ namespace Sapphire::Network::Packets
 
     ChatHandler = 0x00D9, // updated 5.0
 
-    SocialListHandler = 0x00E1, // updated 5.0
+    SocialListHandler = 0x01F6, // updated 5.1
     SetSearchInfoHandler = 0x00E4, // updated 5.0
-    ReqSearchInfoHandler = 0x00E6, // updated 5.0
+    ReqSearchInfoHandler = 0x024D, // updated 5.1
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
     ReqRemovePlayerFromBlacklist = 0x00F1, // updated 5.0
-    BlackListHandler = 0x00F2, // updated 5.0
+    BlackListHandler = 0x0167, // updated 5.1
     PlayerSearchHandler = 0x00F4, // updated 5.0
 
-    LinkshellListHandler = 0x00FA, // updated 5.0
+    LinkshellListHandler = 0x00D3, // updated 5.1
 
     MarketBoardRequestItemListingInfo = 0x0102, // updated 4.5
     MarketBoardRequestItemListings = 0x0103, // updated 4.5
@@ -318,7 +319,7 @@ namespace Sapphire::Network::Packets
     ReqCountdownCancel = 0x0136, // updated 5.0
 
     ZoneLineHandler = 0x0139, // updated 5.0
-    ClientTrigger = 0x013A, // updated 5.0
+    ClientTrigger = 0x00B1, // updated 5.1
     DiscoveryHandler = 0x013B, // updated 5.0
 
     PlaceFieldMarker = 0x013C, // updated 5.0
@@ -328,7 +329,7 @@ namespace Sapphire::Network::Packets
     GMCommand2 = 0x013F, // updated 5.0
     AoESkillHandler = 0x140, // updated 5.0
 
-    UpdatePositionHandler = 0x0141, // updated 5.0
+    UpdatePositionHandler = 0x01EC, // updated 5.1
 
     InventoryModifyHandler = 0x0148, // updated 5.0
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
