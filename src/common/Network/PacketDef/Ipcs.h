@@ -279,16 +279,16 @@ namespace Sapphire::Network::Packets
 
     CFRegisterDuty = 0x0071,
     CFRegisterRoulette = 0x0072,
-    PlayTimeHandler = 0x0073, // unchanged 5.0
-    LogoutHandler = 0x0074, // unchanged 5.0
-    CancelLogout = 0x0075, // updated 5.0
+    PlayTimeHandler = 0x0276, // updated 5.1
+    LogoutHandler = 0x02D6, // updated 5.1
+    CancelLogout = 0x008F, // updated 5.1
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
 
     SocialReqSendHandler = 0x00AE, // updated 4.1
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
-    ChatHandler = 0x00D9, // updated 5.0
+    ChatHandler = 0x02FF, // updated 5.1
 
     SocialListHandler = 0x01F6, // updated 5.1
     SetSearchInfoHandler = 0x00E4, // updated 5.0
@@ -325,7 +325,7 @@ namespace Sapphire::Network::Packets
     PlaceFieldMarker = 0x013C, // updated 5.0
 
     SkillHandler = 0x013D, // updated 5.0
-    GMCommand1 = 0x013E, // updated 5.0
+    GMCommand1 = 0x00A4, // updated 5.1
     GMCommand2 = 0x013F, // updated 5.0
     AoESkillHandler = 0x140, // updated 5.0
 
@@ -352,7 +352,7 @@ namespace Sapphire::Network::Packets
 
     ReqEquipDisplayFlagsChange = 0x0175, // updated 5.0
 
-    LandRenameHandler = 0x0177, // updated 5.0
+    LandRenameHandler = 0xF177, // updated 5.0
     HousingUpdateHouseGreeting = 0x0178, // updated 5.0
     HousingUpdateObjectPosition = 0x0179, // updated 5.0
 
