@@ -204,13 +204,13 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
-    WeatherChange = 0x0210, // updated 5.0
-    PlayerTitleList = 0x0211, // updated 5.0
-    Discovery = 0x0212, // updated 5.0
+    WeatherChange = 0x00B6, // updated 5.1
+    PlayerTitleList = 0x037D, // updated 5.1
+    Discovery = 0x0094, // updated 5.1
 
-    EorzeaTimeOffset = 0x0214, // updated 5.0
+    EorzeaTimeOffset = 0x03B8, // updated 5.1
 
-    EquipDisplayFlags = 0x0220, // updated 5.0
+    EquipDisplayFlags = 0x00F6, // updated 5.1
 
     /// Housing //////////////////////////////////////
 
@@ -318,9 +318,9 @@ namespace Sapphire::Network::Packets
     ReqCountdownInitiate = 0x0135, // updated 5.0
     ReqCountdownCancel = 0x0136, // updated 5.0
 
-    ZoneLineHandler = 0x0139, // updated 5.0
+    ZoneLineHandler = 0x02E0, // updated 5.1
     ClientTrigger = 0x00B1, // updated 5.1
-    DiscoveryHandler = 0x013B, // updated 5.0
+    DiscoveryHandler = 0x0177, // updated 5.1
 
     PlaceFieldMarker = 0x013C, // updated 5.0
 
