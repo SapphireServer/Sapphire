@@ -247,8 +247,8 @@ namespace Sapphire::Network::Packets
     ActorGauge = 0x0292, // updated 4.3
 
     // daily quest info -> without them sent,  login will take longer...
-    DailyQuests = 0x025E, // updated 5.0
-    DailyQuestRepeatFlags = 0x0260, // updated 5.0
+    DailyQuests = 0x02B6, // updated 5.1
+    DailyQuestRepeatFlags = 0x0124, // updated 5.1
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
