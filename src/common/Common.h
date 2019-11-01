@@ -27,6 +27,8 @@ namespace Sapphire::Common
   const uint8_t CLASSJOB_TOTAL = 38;
   const uint8_t CLASSJOB_SLOTS = 28;
 
+  const uint8_t TOWN_COUNT = 6;
+
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
    *
