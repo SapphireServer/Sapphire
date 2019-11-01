@@ -24,6 +24,9 @@ namespace Sapphire::Network::ActorControl
     SetStatus = 0x02,
     CastStart = 0x03,
     ToggleAggro = 0x04,
+    /*!
+     * param1 = ClassJob ID
+     */
     ClassJobChange = 0x05,
     DefeatMsg = 0x06,
     GainExpMsg = 0x07,
@@ -372,6 +375,12 @@ namespace Sapphire::Network::ActorControl
     EmoteReq = 0x1F4,
     EmoteCancel = 0x1F6,
     PersistentEmoteCancel = 0x1F7,
+    /*!
+     * param2 = pose ID
+     *      0 = idle pose 0 (just standing)
+     *      1 = idle pose 1
+     *    2-4 = idle poses 2-4
+     */
     PoseChange = 0x1F9,
     PoseReapply = 0x1FA,
     PoseCancel = 0x1FB,

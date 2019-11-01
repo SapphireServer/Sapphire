@@ -111,8 +111,8 @@ namespace Sapphire::Network::Packets
     MailLetterNotification = 0x013A, // updated 5.0
 
     MarketBoardItemListingCount = 0x013B, // updated 5.0
-    MarketBoardItemListing = 0x013C, // updated 5.0
-    MarketBoardItemListingHistory = 0x012A, // updated 4.5
+    MarketBoardItemListing = 0x036A, // updated 5.1
+    MarketBoardItemListingHistory = 0x0194, // updated 5.1
     MarketBoardSearchResult = 0x0139, // updated 4.5
 
     CharaFreeCompanyTag = 0x013B, // updated 4.5
