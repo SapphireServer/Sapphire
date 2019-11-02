@@ -283,6 +283,15 @@ namespace Sapphire::Network::Packets::Server
     char unk2[0x4]; // This has probs something to do with the support desk (inquiry id?)
   };
 
+  struct FFFXIVIpcMarketTaxRates : FFXIVIpcBasePacket< MarketTaxRates >
+  {
+    uint32_t unknown1;
+    uint16_t padding1;
+    uint16_t unknown2;
+    uint32_t taxRate[Common::TOWN_COUNT]; // In the order of Common::Town
+    uint64_t unknown3;
+  };
+
   struct FFFXIVIpcMarketBoardItemListingCount : FFXIVIpcBasePacket< MarketBoardItemListingCount >
   {
     uint32_t itemCatalogId;
