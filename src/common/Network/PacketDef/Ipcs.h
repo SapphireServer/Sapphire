@@ -333,7 +333,7 @@ namespace Sapphire::Network::Packets
 
     UpdatePositionHandler = 0x01EC, // updated 5.1
 
-    InventoryModifyHandler = 0x0148, // updated 5.0
+    InventoryModifyHandler = 0x0372, // updated 5.1
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
