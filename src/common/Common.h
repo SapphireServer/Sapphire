@@ -216,6 +216,8 @@ namespace Sapphire::Common
     HandIn = 2005,
     DamagedGear = 2007,
     //UNKNOWN_1 = 2008,
+    // Temporary inventory that is used for the "trade" window
+    TradeInventory = 2009,
 
     ArmoryOff = 3200,
     ArmoryHead = 3201,
