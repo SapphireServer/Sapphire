@@ -127,8 +127,17 @@ std::string generateStruct( const std::string& exd )
   }
 
   auto sheet = nlohmann::json();
-  std::ifstream defJson( path );
-  defJson >> sheet;
+
+  try
+  {
+    std::ifstream defJson( path );
+    defJson >> sheet;
+  }
+  catch( const std::exception& ex )
+  {
+    Logger::error( "Failed parsing json definition, err: {}  file: {}", ex.what(), path );
+    return "";
+  }
 
   for( auto& definition : sheet[ "definitions" ] )
   {

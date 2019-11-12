@@ -145,6 +145,15 @@ namespace Sapphire::Network::ActorControl
 
     SetPose = 0x127,
 
+    /*!
+     * This is used for general crafting events, I found some of them but some are missing:
+     * 
+     * param1 = event type, the rest of the struct depends on this param.
+     *  - 18 & 19: Quicksynth result, 19 means HQ result item, item ID is param2 and is + 1 000 000 when HQ. 
+     *             Quantity is param3 (possible quicksynth that gives more than one item in the future?)
+     * 
+     * All the other values have unkown behavior for now. 
+     */
     CraftingUnk = 0x12C,
 
     GatheringSenseMsg = 0x130,
@@ -178,6 +187,14 @@ namespace Sapphire::Network::ActorControl
 
     RelicInfuseMsg = 0x179,
 
+    /*!
+     * Sent as result of an aetherial reduction.
+     * param1 = Reduced item ID + 500 000 (idk what this 500 000 is but it's always here no matter what)
+     * param2 = First result item id (+ 1 000 000 if HQ)
+     * param3 = First result item quantity
+     * param4 = (Optional) Second result item id (+ 1 000 000 if HQ)
+     * param5 = (Optional) Second result item quantity
+     */ 
     AetherReductionDlg = 0x17D,
 
     /*!
