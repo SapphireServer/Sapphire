@@ -53,7 +53,7 @@ namespace Sapphire::Network::Packets
 
     EffectResult = 0x00B9, // updated 5.11
     ActorControl = 0x008D, // updated 5.11
-    ActorControlSelf = 0x0240, // updated 5.111
+    ActorControlSelf = 0x00EB, // updated 5.11
     ActorControlTarget = 0x01F5, // updated 5.11
 
     /*!
@@ -148,7 +148,7 @@ namespace Sapphire::Network::Packets
     PartyList = 0x022B, // updated 5.11
     HateRank = 0x00B8, // updated 5.11
     HateList = 0x03C5, // updated 5.11
-    ObjectSpawn = 0x0105, // updated 5.111
+    ObjectSpawn = 0x02A0, // updated 5.11
     ObjectDespawn = 0x036B, // updated 5.11
     UpdateClassInfo = 0x0258, // updated 5.1
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
