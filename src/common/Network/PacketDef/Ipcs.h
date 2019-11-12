@@ -145,7 +145,7 @@ namespace Sapphire::Network::Packets
     HateList = 0x018A, // updated 5.0
     ObjectSpawn = 0x018B, // updated 5.0
     ObjectDespawn = 0x018C, // updated 5.0
-    UpdateClassInfo = 0x0399, // updated 5.11
+    UpdateClassInfo = 0x00FC, // updated 5.11
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x01A1, // updated 5.11
     PlayerStats = 0x0324, // updated 5.11
