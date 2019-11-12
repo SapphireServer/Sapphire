@@ -138,7 +138,7 @@ namespace Sapphire::Network::Packets
 
     PlayerSpawn = 0x0243, // updated 5.11
     NpcSpawn = 0x021B, // updated 5.11
-    NpcSpawn2 = 0x0115, // ( Bigger statuseffectlist? ) updated 5.1
+    NpcSpawn2 = 0x0137, // ( Bigger statuseffectlist? ) updated 5.11
     ActorMove = 0x00DD, // updated 5.11
 
     ActorSetPos = 0x0092, // updated 5.11
