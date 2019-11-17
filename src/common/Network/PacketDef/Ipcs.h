@@ -136,7 +136,7 @@ namespace Sapphire::Network::Packets
 
     GCAffiliation = 0x016F, // updated 5.0
 
-    PlayerSpawn = 0x0386, // updated 5.1
+    PlayerSpawn = 0x0243, // updated 5.1
     NpcSpawn = 0x010A, // updated 5.1
     NpcSpawn2 = 0x0115, // ( Bigger statuseffectlist? ) updated 5.1
     ActorMove = 0x01BC, // updated 5.1
