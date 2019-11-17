@@ -178,12 +178,12 @@ namespace Sapphire::Network::Packets
 
     HuntingLogEntry = 0x01B3, // updated 5.0
 
-    EventPlay = 0x01B5, // updated 5.0
+    EventPlay = 0x0386, // updated 5.11
     DirectorPlayScene = 0x01B9, // updated 5.0
     EventOpenGilShop = 0x01BC, // updated 5.0
 
-    EventStart = 0x01BE, // updated 5.0
-    EventFinish = 0x01BF, // updated 5.0
+    EventStart = 0x00C9, // updated 5.11
+    EventFinish = 0x0387, // updated 5.11
 
     EventLinkshell = 0x1169,
 
@@ -341,7 +341,7 @@ namespace Sapphire::Network::Packets
 
     TalkEventHandler = 0x0151, // updated 5.0
     EmoteEventHandler = 0x0152, // updated 5.0
-    WithinRangeEventHandler = 0x0153, // updated 5.0
+    WithinRangeEventHandler = 0x0165, // updated 5.11
     OutOfRangeEventHandler = 0x0154, // updated 5.0
     EnterTeriEventHandler = 0x0155, // updated 5.0
     ShopEventHandler = 0x0156, // updated 5.0
