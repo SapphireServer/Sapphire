@@ -110,12 +110,12 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x0139, // updated 5.0
     MailLetterNotification = 0x013A, // updated 5.0
 
-    MarketTaxRates = 0x0076, // added 5.1
+    MarketTaxRates = 0x039F, // updated 5.11
 
-    MarketBoardItemListingCount = 0x039D, // updated 5.1
-    MarketBoardItemListing = 0x036A, // updated 5.1
-    MarketBoardItemListingHistory = 0x0194, // updated 5.1
-    MarketBoardSearchResult = 0x0371, // updated 5.1
+    MarketBoardItemListingCount = 0x00F2, // updated 5.11
+    MarketBoardItemListing = 0x01E2, // updated 5.11
+    MarketBoardItemListingHistory = 0x0123, // updated 5.11
+    MarketBoardSearchResult = 0x00B7, // updated 5.11
 
     CharaFreeCompanyTag = 0x013B, // updated 4.5
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
@@ -145,15 +145,16 @@ namespace Sapphire::Network::Packets
 
     ActorCast = 0x028E, // updated 5.11
     SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
+
     PartyList = 0x022B, // updated 5.11
     HateRank = 0x00B8, // updated 5.11
     HateList = 0x03C5, // updated 5.11
     ObjectSpawn = 0x02A0, // updated 5.11
     ObjectDespawn = 0x036B, // updated 5.11
-    UpdateClassInfo = 0x0258, // updated 5.1
+    UpdateClassInfo = 0x00FC, // updated 5.11
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x0110, // updated 5.1
-    PlayerStats = 0x00CF, // updated 5.1
+    PlayerSetup = 0x01A1, // updated 5.11
+    PlayerStats = 0x0324, // updated 5.11
     ActorOwner = 0x0322, // updated 5.11
     PlayerStateFlags = 0x019F, // updated 5.1
     PlayerClassInfo = 0x02D4, // updated 5.1
@@ -167,14 +168,14 @@ namespace Sapphire::Network::Packets
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-    ItemInfo = 0x031E, // updated 5.1
+    ItemInfo = 0x01D4, // updated 5.11
     ContainerInfo = 0x0145, // updated 5.1
     InventoryTransactionFinish = 0x01AB, // updated 5.1
     InventoryTransaction = 0x023E, // updated 5.1
-    CurrencyCrystalInfo = 0x0246, // updated 5.1
+    CurrencyCrystalInfo = 0x02CA, // updated 5.11
 
     InventoryActionAck = 0x0084, // updated 5.1
-    UpdateInventorySlot = 0x0072, // updated 5.1
+    UpdateInventorySlot = 0x0112, // updated 5.11
 
     HuntingLogEntry = 0x01B3, // updated 5.0
 
@@ -333,7 +334,8 @@ namespace Sapphire::Network::Packets
 
     UpdatePositionHandler = 0x01EC, // updated 5.1
 
-    InventoryModifyHandler = 0x0372, // updated 5.1
+    InventoryModifyHandler = 0x029B, // updated 5.11
+    
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
