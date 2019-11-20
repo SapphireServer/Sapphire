@@ -48,18 +48,18 @@ namespace Sapphire::Network::Packets
     Ping = 0x0065,
     Init = 0x0066,
 
-    ActorFreeSpawn = 0x0097, // updated 5.1
-    InitZone = 0x019B, // updated 5.1
+    ActorFreeSpawn = 0x0249, // updated 5.11
+    InitZone = 0x01D8, // updated 5.11
 
-    EffectResult = 0x0153, // updated 5.1
-    ActorControl = 0x0164, // updated 5.1
-    ActorControlSelf = 0x0264, // updated 5.1
-    ActorControlTarget = 0x016C, // updated 5.1
+    EffectResult = 0x00B9, // updated 5.11
+    ActorControl = 0x008D, // updated 5.11
+    ActorControlSelf = 0x00EB, // updated 5.11
+    ActorControlTarget = 0x01F5, // updated 5.11
 
     /*!
      * @brief Used when resting
      */
-    UpdateHpMpTp = 0x032D, // updated 5.1
+    UpdateHpMpTp = 0x012D, // updated 5.11
 
     ///////////////////////////////////////////////////
 
@@ -94,8 +94,8 @@ namespace Sapphire::Network::Packets
     ServerNotice = 0x0116, // updated 5.0
     SetOnlineStatus = 0x015E, // updated 5.1
 
-    CountdownInitiate = 0x01EE, // updated 5.1
-    CountdownCancel = 0x03C6, // updated 5.1
+    CountdownInitiate = 0x0309, // updated 5.11
+    CountdownCancel = 0x013C, // updated 5.11
 
     PlayerAddedToBlacklist = 0x033F, // updated 5.1
     PlayerRemovedFromBlacklist = 0x0385, // updated 5.1
@@ -124,41 +124,41 @@ namespace Sapphire::Network::Packets
 
     FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
 
-    StatusEffectList = 0x023A, // updated 5.1
-    EurekaStatusEffectList = 0x0398, // updated 5.1
+    StatusEffectList = 0x0399, // updated 5.11
+    EurekaStatusEffectList = 0x01C2, // updated 5.11
     BossStatusEffectList = 0x00E6, // added 5.1
-    Effect = 0x00A7, // updated 5.1
-    AoeEffect8 = 0x00A9, // updated 5.1
-    AoeEffect16 = 0x015F, // updated 5.1
-    AoeEffect24 = 0x0292, // updated 5.1
-    AoeEffect32 = 0x0268, // updated 5.1
+    Effect = 0x0165, // updated 5.11
+    AoeEffect8 = 0x00E9, // updated 5.11
+    AoeEffect16 = 0x007F, // updated 5.11
+    AoeEffect24 = 0x0299, // updated 5.11
+    AoeEffect32 = 0x01DF, // updated 5.11
     PersistantEffect = 0x0165, // updated 5.0
 
     GCAffiliation = 0x016F, // updated 5.0
 
-    PlayerSpawn = 0x0386, // updated 5.1
-    NpcSpawn = 0x010A, // updated 5.1
-    NpcSpawn2 = 0x0115, // ( Bigger statuseffectlist? ) updated 5.1
-    ActorMove = 0x01BC, // updated 5.1
+    PlayerSpawn = 0x0243, // updated 5.11
+    NpcSpawn = 0x021B, // updated 5.11
+    NpcSpawn2 = 0x0137, // ( Bigger statuseffectlist? ) updated 5.11
+    ActorMove = 0x00DD, // updated 5.11
 
-    ActorSetPos = 0x0311, // updated 5.1
+    ActorSetPos = 0x0092, // updated 5.11
 
-    ActorCast = 0x012C, // updated 5.1
+    ActorCast = 0x028E, // updated 5.11
     SomeCustomiseChangePacketProbably = 0x0187, // added 5.0
-    PartyList = 0x0231, // updated 5.1
-    HateRank = 0x0354, // updated 5.1
-    HateList = 0x00C7, // updated 5.1
-    ObjectSpawn = 0x0156, // updated 5.1
-    ObjectDespawn = 0x00A3, // updated 5.1
+    PartyList = 0x022B, // updated 5.11
+    HateRank = 0x00B8, // updated 5.11
+    HateList = 0x03C5, // updated 5.11
+    ObjectSpawn = 0x02A0, // updated 5.11
+    ObjectDespawn = 0x036B, // updated 5.11
     UpdateClassInfo = 0x0258, // updated 5.1
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x0110, // updated 5.1
     PlayerStats = 0x00CF, // updated 5.1
-    ActorOwner = 0x01A5, // updated 5.1
+    ActorOwner = 0x0322, // updated 5.11
     PlayerStateFlags = 0x019F, // updated 5.1
     PlayerClassInfo = 0x02D4, // updated 5.1
 
-    ModelEquip = 0x025E, // updated 5.1
+    ModelEquip = 0x0170, // updated 5.11
     Examine = 0x00EA, // updated 5.1
     CharaNameReq = 0x0198, // updated 5.0
 
@@ -206,13 +206,13 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
-    WeatherChange = 0x00B6, // updated 5.1
+    WeatherChange = 0x02FB, // updated 5.11
     PlayerTitleList = 0x037D, // updated 5.1
     Discovery = 0x0094, // updated 5.1
 
     EorzeaTimeOffset = 0x03B8, // updated 5.1
 
-    EquipDisplayFlags = 0x00F6, // updated 5.1
+    EquipDisplayFlags = 0x011D, // updated 5.11
 
     /// Housing //////////////////////////////////////
 
