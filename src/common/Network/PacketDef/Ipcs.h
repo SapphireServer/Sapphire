@@ -321,7 +321,7 @@ namespace Sapphire::Network::Packets
     ReqCountdownCancel = 0x0136, // updated 5.0
 
     ZoneLineHandler = 0x02E0, // updated 5.1
-    ClientTrigger = 0x00B1, // updated 5.1
+    ClientTrigger = 0x01F2, // updated 5.11
     DiscoveryHandler = 0x0177, // updated 5.1
 
     PlaceFieldMarker = 0x013C, // updated 5.0
