@@ -345,13 +345,13 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
 
   auto pTeri = getTerritoryDetail( pContentFinderCondition->territoryType );
 
-  if( !pTeri || pInstanceContent->name.empty() )
+  if( !pTeri || pContentFinderCondition->name.empty() )
     return nullptr;
 
   Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pInstanceContent->name );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                     pTeri->name, pInstanceContent->name, instanceContentId, framework() );
+                                       pTeri->name, pContentFinderCondition->name, instanceContentId, framework() );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;

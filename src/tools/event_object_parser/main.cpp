@@ -137,7 +137,7 @@ void loadAllInstanceContentEntries()
       if( !ic )
         continue;
       type = ic->instanceContentType;
-      name = ic->name;
+      name = cfc->name;
     }
     else if( cfc->contentLinkType == 5 )
     { 
