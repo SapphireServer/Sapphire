@@ -4,6 +4,7 @@
 #include "PreparedStatement.h"
 #include <mysql.h>
 
+#include <stdexcept>
 #include <vector>
 
 Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,

@@ -3,6 +3,7 @@
 
 #include <Common.h>
 #include <set>
+#include <string>
 
 namespace Sapphire
 {

@@ -1,6 +1,8 @@
 #ifndef SAPPHIRE_DBCOMMON_H
 #define SAPPHIRE_DBCOMMON_H
 
+#include <string>
+
 namespace Sapphire::Db
 {
   struct ConnectionInfo
