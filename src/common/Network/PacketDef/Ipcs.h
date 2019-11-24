@@ -332,7 +332,7 @@ namespace Sapphire::Network::Packets
     GMCommand2 = 0x013F, // updated 5.0
     AoESkillHandler = 0x140, // updated 5.0
 
-    UpdatePositionHandler = 0x01EC, // updated 5.1
+    UpdatePositionHandler = 0x01BF, // updated 5.11
 
     InventoryModifyHandler = 0x029B, // updated 5.11
     
