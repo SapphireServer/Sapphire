@@ -694,8 +694,8 @@ namespace Sapphire::Network::Packets::Server
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint32_t u29b;
-    uint32_t u30b;
+    uint32_t elementalLevel;
+    uint32_t element;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
