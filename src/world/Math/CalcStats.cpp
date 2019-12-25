@@ -154,7 +154,7 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
 
   auto vitMod = pPlayer->getBonusStat( Common::BaseParam::Vitality );
   float baseStat = calculateBaseStat( *pPlayer );
-  uint16_t vitStat = pPlayer->getStats().vit + static_cast< uint16_t >( vitMod );
+  uint16_t vitStat =  static_cast< uint16_t >( pPlayer->getStats().vit ) +  static_cast< uint16_t >( vitMod );
   uint16_t hpMod = paramGrowthInfo->hpModifier;
   uint16_t jobModHp = classInfo->modifierHitPoints;
   float approxBaseHp = 0.0f; // Read above
@@ -483,7 +483,7 @@ float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
 
-  auto pot = potency( ptc );
+  auto pot = potency( static_cast<uint16_t>(ptc) );
   auto wd = weaponDamage( chara, wepDmg );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );

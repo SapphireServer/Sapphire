@@ -38,7 +38,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
   {
     default:
     {
-      player.sendDebug( "Skill type {0} not supported. Defaulting to normal action", type );
+      player.sendDebug( "Skill type {0} not supported. Defaulting to normal action", type ); break;
     }
     case Common::SkillType::Normal:
     {
