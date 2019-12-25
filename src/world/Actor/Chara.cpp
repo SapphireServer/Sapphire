@@ -35,10 +35,10 @@ using namespace Sapphire::Network::ActorControl;
 
 Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
   Actor( type ),
-  m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
-  m_pFw( std::move( std::move( pFw ) ) ),
   m_directorId( 0 ),
+  m_pose( 0 ),
+  m_pFw( std::move( std::move( pFw ) ) ),
   m_radius( 1.f )
 {
 
@@ -245,14 +245,14 @@ void Sapphire::Entity::Chara::setMp( uint32_t mp )
 /*! \param gp amount to set*/
 void Sapphire::Entity::Chara::setGp( uint32_t gp )
 {
-  m_gp = gp;
+  m_gp = static_cast<uint16_t>(gp);
   sendStatusUpdate();
 }
 
 /*! \param tp amount to set*/
 void Sapphire::Entity::Chara::setTp( uint32_t tp )
 {
-  m_tp = tp;
+  m_tp = static_cast<uint16_t>(tp);
   sendStatusUpdate();
 }
 
@@ -308,7 +308,7 @@ position
 
 \param Position to look towards
 */
-bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
+bool Sapphire::Entity::Chara::face(const Common::FFXIVARR_POSITION3& p , float epsilon)
 {
   float oldRot = getRot();
   float rot = Util::calcAngFrom( getPos().x, getPos().z, p.x, p.z );
@@ -316,7 +316,7 @@ bool Sapphire::Entity::Chara::face( const Common::FFXIVARR_POSITION3& p )
 
   setRot( newRot );
 
-  return oldRot != newRot;
+  return (fabs(oldRot - newRot) < epsilon);
 }
 
 /*!
@@ -354,14 +354,14 @@ bool Sapphire::Entity::Chara::checkAction()
 
 void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
-  if( std::difftime( tickCount, m_lastTickTime ) > 3000 )
+  if( std::difftime( static_cast<time_t>(tickCount), m_lastTickTime ) > 3000 )
   {
     onTick();
 
-    m_lastTickTime = tickCount;
+    m_lastTickTime = static_cast<time_t>(tickCount);
   }
 
-  m_lastUpdate = tickCount;
+  m_lastUpdate = static_cast<time_t>(tickCount);
 }
 
 /*!
@@ -494,7 +494,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::EffectEntry effectEntry{};
-    effectEntry.value = damage;
+    effectEntry.value = static_cast<int16_t>(damage);
     effectEntry.effectType = ActionEffectType::Damage;
     effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
     effectEntry.param = 0x71;

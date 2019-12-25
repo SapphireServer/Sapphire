@@ -78,7 +78,7 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
 
 void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
-                                                 Data::Action& actionData )
+                                                 Data::Action& /*actionData*/ )
 {
   if( !currentAction->preCheck() )
   {

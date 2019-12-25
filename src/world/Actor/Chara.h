@@ -183,7 +183,7 @@ namespace Sapphire::Entity
 
     std::string getName() const;
 
-    bool face( const Common::FFXIVARR_POSITION3& p );
+    bool face( const Common::FFXIVARR_POSITION3& p , float epsilon = 0.005f);
 
     Common::Stance getStance() const;
 
