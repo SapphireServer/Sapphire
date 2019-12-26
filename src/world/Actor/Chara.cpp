@@ -245,14 +245,14 @@ void Sapphire::Entity::Chara::setMp( uint32_t mp )
 /*! \param gp amount to set*/
 void Sapphire::Entity::Chara::setGp( uint32_t gp )
 {
-  m_gp = gp;
+  m_gp = static_cast< uint16_t >( gp );
   sendStatusUpdate();
 }
 
 /*! \param tp amount to set*/
 void Sapphire::Entity::Chara::setTp( uint32_t tp )
 {
-  m_tp = tp;
+  m_tp = static_cast< uint16_t >( tp );
   sendStatusUpdate();
 }
 
@@ -354,14 +354,14 @@ bool Sapphire::Entity::Chara::checkAction()
 
 void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
-  if( std::difftime( tickCount, m_lastTickTime ) > 3000 )
+  if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
   {
     onTick();
 
-    m_lastTickTime = tickCount;
+    m_lastTickTime = static_cast< time_t >( tickCount );
   }
 
-  m_lastUpdate = tickCount;
+  m_lastUpdate = static_cast< time_t >( tickCount );
 }
 
 /*!
@@ -494,7 +494,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::EffectEntry effectEntry{};
-    effectEntry.value = damage;
+    effectEntry.value = static_cast< int16_t >( damage );
     effectEntry.effectType = ActionEffectType::Damage;
     effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
     effectEntry.param = 0x71;
@@ -522,10 +522,10 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().current_hp = getHp();
-  statusEffectAdd->data().current_mp = getMp();
+  statusEffectAdd->data().current_mp = static_cast< uint16_t >( getMp() );
   statusEffectAdd->data().current_tp = getTp();
   statusEffectAdd->data().max_hp = getMaxHp();
-  statusEffectAdd->data().max_mp = getMaxMp();
+  statusEffectAdd->data().max_mp = static_cast< uint16_t >( getMaxMp() );
   statusEffectAdd->data().max_something = 1;
   //statusEffectAdd->data().unknown2 = 28;
 
@@ -533,8 +533,8 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 
   status.sourceActorId = pEffect->getSrcActorId();
   status.duration = static_cast< float >( pEffect->getDuration() ) / 1000;
-  status.id = pEffect->getId();
-  status.index = nextSlot;
+  status.id = static_cast< uint16_t >( pEffect->getId() );
+  status.index = static_cast< uint8_t >( nextSlot );
   status.param = pEffect->getParam();
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );
@@ -568,7 +568,7 @@ int8_t Sapphire::Entity::Chara::getStatusEffectFreeSlot()
   if( m_statusEffectFreeSlotQueue.empty() )
     return freeEffectSlot;
 
-  freeEffectSlot = m_statusEffectFreeSlotQueue.front();
+  freeEffectSlot = static_cast< int8_t >( m_statusEffectFreeSlotQueue.front() );
   m_statusEffectFreeSlotQueue.pop();
 
   return freeEffectSlot;
