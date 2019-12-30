@@ -32,7 +32,7 @@ void Sapphire::Network::GameConnection::cfDutyInfoRequest( FrameworkPtr pFw,
     // cap it since it's uint8_t in packets
     penaltyMinutes = 255;
   }
-  dutyInfoPacket->data().penaltyTime = penaltyMinutes;
+  dutyInfoPacket->data().penaltyTime = static_cast< uint8_t >( penaltyMinutes );
   queueOutPacket( dutyInfoPacket );
 
   auto inNeedsPacket = makeZonePacket< FFXIVIpcCFPlayerInNeed >( player.getId() );
@@ -62,7 +62,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
   }
 
   // todo: rand bias problem, will do for now tho
-  auto index = std::rand() % selectedContent.size();
+  auto index = static_cast< uint32_t >( std::rand() ) % selectedContent.size();
   auto contentId = selectedContent.at( index );
 
   player.sendDebug( "Duty register request for contentid#{0}", contentId );

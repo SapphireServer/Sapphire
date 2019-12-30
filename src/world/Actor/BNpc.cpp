@@ -301,7 +301,7 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
 void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
 {
   auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = hateAmount;
+  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
   hateEntry->m_pChara = pChara;
 
   m_hateList.insert( hateEntry );
@@ -318,13 +318,13 @@ void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, 
   {
     if( listEntry->m_pChara == pChara )
     {
-      listEntry->m_hateAmount += hateAmount;
+      listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
       return;
     }
   }
 
   auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = hateAmount;
+  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
   hateEntry->m_pChara = pChara;
   m_hateList.insert( hateEntry );
 }
@@ -590,7 +590,7 @@ void Sapphire::Entity::BNpc::onDeath()
     // TODO: handle drops 
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
-      pPlayer->onMobKill( m_bNpcNameId );
+      pPlayer->onMobKill( static_cast< uint16_t >( m_bNpcNameId ) );
   }
   hateListClear();
 }
@@ -654,7 +654,7 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   {
     auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
     setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId = INVALID_GAME_OBJECT_ID;
+    setOwnerPacket->data().actorId = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
     sendToInRangeSet( setOwnerPacket );
   }
 }
@@ -697,7 +697,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::EffectEntry effectEntry{};
-    effectEntry.value = damage;
+    effectEntry.value = static_cast< int16_t >( damage );
     effectEntry.effectType = ActionEffectType::Damage;
     effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
     effectEntry.param = 0x71;
@@ -705,7 +705,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 
     sendToInRangeSet( effectPacket );
 
-    pTarget->takeDamage( damage );
+    pTarget->takeDamage( static_cast< uint16_t >( damage ) );
 
   }
 }
@@ -731,13 +731,13 @@ void Sapphire::Entity::BNpc::calculateStats()
 
   m_baseStats.determination = static_cast< uint32_t >( base );
   m_baseStats.pie = static_cast< uint32_t >( base );
-  m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
-  m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
-  m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
-  m_baseStats.critHitRate = paramGrowthInfo->baseSpeed;
-  m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
-  m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
-  m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
+  m_baseStats.skillSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.spellSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.accuracy = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.critHitRate = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.attackPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.healingPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.tenacity = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
 
   m_baseStats.attack = m_baseStats.str;
   m_baseStats.attackPotMagic = m_baseStats.inte;
