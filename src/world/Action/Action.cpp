@@ -429,6 +429,8 @@ void Action::Action::buildEffects()
     {
       auto dmg = calcDamage( lutEntry.potency );
       m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
+      if ( dmg.first > 0 )
+        actor->onActionHostile( m_pSource );
     }
   }
 
