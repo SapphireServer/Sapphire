@@ -338,6 +338,8 @@ namespace Sapphire::Network::ActorControl
     SetDutyActionRemaining = 0x5EB,
 
     EurekaStep = 0x73A, // alters the progress of the player on Eureka (is used for all the eureka zones)
+
+    Unk039C = 0x039C, // Event battle level sync dialog?
   };
 
   enum ClientTriggerType
@@ -441,6 +443,8 @@ namespace Sapphire::Network::ActorControl
 
     OpenDuelUI = 0x898, // Open a duel ui
     DuelRequestResult = 0x899, // either accept/reject
+
+    Unk232C = 0x232C, // Event battle level sync dialog?
 
   };
 

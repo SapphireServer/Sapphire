@@ -21,6 +21,7 @@
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
@@ -491,6 +492,15 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
 
       player.sendDebug( "can teleport: {0}, unk: {1}, privateEstateAccess: {2}, unk: {3}",
                         canTeleport, unk1, privateEstateAccess, unk );
+      break;
+    }
+    case ClientTriggerType::Unk232C:
+    {
+      auto packet = makeActorControlSelf(player.getId(), ActorControl::Unk039C, 0, param12, param2);
+      player.queuePacket(packet);
+
+      player.sendDebug("Unk232C: level sync: {0}, ilevel sync?: {1}",
+        param12, param2);
       break;
     }
 
