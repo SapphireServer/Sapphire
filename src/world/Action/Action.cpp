@@ -402,6 +402,9 @@ void Action::Action::buildEffects()
     return;
   }
 
+  if (getId() == 3) // fix sprint for now
+    return;
+
   if( m_hitActors.empty() )
     return;
 
