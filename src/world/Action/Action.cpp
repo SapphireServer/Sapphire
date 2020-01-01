@@ -336,7 +336,7 @@ void Action::Action::execute()
     }
   }
 
-  if( isComboAction() )
+  if( isCorrectCombo() )
   {
     auto player = m_pSource->getAsPlayer();
 
@@ -354,7 +354,7 @@ void Action::Action::execute()
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
-  if( !m_actionData->preservesCombo )
+  if( !m_actionData->preservesCombo && ( !isComboAction() || isCorrectCombo() ) )
   {
     m_pSource->setLastComboActionId( getId() );
   }
@@ -418,19 +418,40 @@ void Action::Action::buildEffects()
 
   for( auto& actor : m_hitActors )
   {
-    // todo: this is shit
-    if( lutEntry.curePotency > 0 )
+    if( lutEntry.potency > 0 )
     {
-
-      m_effectBuilder->healTarget( actor, lutEntry.curePotency );
-    }
-
-    else if( lutEntry.potency > 0 )
-    {
-      auto dmg = calcDamage( lutEntry.potency );
+      auto dmg = calcDamage( isCorrectCombo() ? lutEntry.comboPotency : lutEntry.potency );
       m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
+
       if ( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
+
+      if ( isCorrectCombo() )
+      {
+        m_effectBuilder->comboVisualEffect( actor );
+      }
+
+      if ( !isComboAction() || isCorrectCombo() )
+      {
+        if( lutEntry.curePotency > 0 ) // actions with self heal
+        {
+          /*
+            Calling m_effectBuilder->healTarget( m_pSource, lutEntry.curePotency ) seems to work fine,
+            but it will end up sending two Effect packets to the client. However on retail everything is in one single packet.
+          */
+          m_effectBuilder->selfHeal( actor, m_pSource, lutEntry.curePotency );
+        }
+
+        if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
+        {
+          m_effectBuilder->startCombo( actor, getId() );
+        }
+      }
+    }
+    else if( lutEntry.curePotency > 0 )
+    {
+      // todo: calcHealing()
+      m_effectBuilder->healTarget( actor, lutEntry.curePotency );
     }
   }
 
@@ -513,7 +534,7 @@ void Action::Action::setAdditionalData( uint32_t data )
   m_additionalData = data;
 }
 
-bool Action::Action::isComboAction() const
+bool Action::Action::isCorrectCombo() const
 {
   auto lastActionId = m_pSource->getLastComboActionId();
 
@@ -523,6 +544,11 @@ bool Action::Action::isComboAction() const
   }
 
   return m_actionData->actionCombo == lastActionId;
+}
+
+bool Action::Action::isComboAction() const
+{
+  return m_actionData->actionCombo != 0;
 }
 
 bool Action::Action::primaryCostCheck( bool subtractCosts )

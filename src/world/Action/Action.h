@@ -45,6 +45,8 @@ namespace Sapphire::World::Action
     uint32_t getAdditionalData() const;
     void setAdditionalData( uint32_t data );
 
+    bool isCorrectCombo() const;
+
     bool isComboAction() const;
 
     /*!

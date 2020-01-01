@@ -15,14 +15,21 @@ namespace Sapphire::World::Action
     void healTarget( Entity::CharaPtr& target, uint32_t amount,
                      Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal );
 
+    void selfHeal( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount,
+                     Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal );
+
     void damageTarget( Entity::CharaPtr& target, uint32_t amount,
                        Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage );
+
+    void startCombo( Entity::CharaPtr& target, uint16_t actionId );
+
+    void comboVisualEffect( Entity::CharaPtr& target );
 
     void buildAndSendPackets();
 
 
   private:
-    EffectResultPtr getResult( Entity::CharaPtr& chara );
+    std::shared_ptr< std::vector< EffectResultPtr > > getResultList( Entity::CharaPtr& chara );
 
     uint64_t getResultDelayMs();
 
@@ -31,7 +38,7 @@ namespace Sapphire::World::Action
     uint16_t m_sequence;
 
     Entity::CharaPtr m_sourceChara;
-    std::unordered_map< uint32_t, EffectResultPtr > m_resolvedEffects;
+    std::unordered_map< uint32_t, std::shared_ptr< std::vector< EffectResultPtr > > > m_resolvedEffects;
   };
 
 }
