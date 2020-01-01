@@ -391,8 +391,9 @@ void Action::Action::buildEffects()
   snapshotAffectedActors( m_hitActors );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto hasLutEntry = ActionLut::validEntryExists( getId() );
 
-  if( !pScriptMgr->onExecute( *this ) && !ActionLut::validEntryExists( getId() ) )
+  if( !pScriptMgr->onExecute( *this ) && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
@@ -402,10 +403,7 @@ void Action::Action::buildEffects()
     return;
   }
 
-  if (getId() == 3) // fix sprint for now
-    return;
-
-  if( m_hitActors.empty() )
+  if( !hasLutEntry || m_hitActors.empty() )
     return;
 
   auto lutEntry = ActionLut::getEntry( getId() );
