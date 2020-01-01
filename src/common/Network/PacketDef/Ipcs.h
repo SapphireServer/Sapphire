@@ -155,7 +155,7 @@ namespace Sapphire::Network::Packets
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x0295, // updated 5.18
     PlayerStats = 0x017A, // updated 5.18
-    ActorOwner = 0x0322, // updated 5.11
+    ActorOwner = 0x03BB, // updated 5.18
     PlayerStateFlags = 0x02C6, // updated 5.18
     PlayerClassInfo = 0x01B0, // updated 5.18
 
