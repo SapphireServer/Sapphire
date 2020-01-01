@@ -244,6 +244,7 @@ namespace Sapphire::Network::Packets::Server
       uint8_t rank;
       uint16_t padding;
       uint8_t lsName[20];
+      uint8_t unk[16];
     } entry[8];
   };
 
@@ -440,15 +441,25 @@ namespace Sapphire::Network::Packets::Server
   {
     uint32_t unknown;
     uint32_t actor_id;
-    uint8_t unknown1;
-    uint8_t unknown2;
-    uint16_t padding1;
+    //uint8_t unknown1;
+    //uint8_t unknown2;
+    //uint16_t padding1;
+    //uint32_t current_hp;
+    //uint16_t current_mp;
+    //uint16_t current_tp;
+    //uint32_t max_hp;
+    //uint16_t max_mp;
+    //uint16_t max_something;
     uint32_t current_hp;
-    uint16_t current_mp;
-    uint16_t current_tp;
     uint32_t max_hp;
+    uint16_t current_mp;
+    uint16_t unknown1;
     uint16_t max_mp;
-    uint16_t max_something;
+    uint8_t unknown2;
+    uint8_t classId;
+    uint8_t unknown4;
+    uint8_t unkFlag;
+    uint16_t unknown6;
 
     struct StatusEntry
     {
@@ -461,7 +472,7 @@ namespace Sapphire::Network::Packets::Server
       uint32_t sourceActorId;
     } statusEntries[4];
 
-    uint32_t unknown4;
+    uint32_t unknown7;
   };
 
   /**
@@ -930,8 +941,10 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown10;
     uint32_t unknown11;
     uint32_t unknown12[4];
+    uint32_t unknown13[3];
     Common::FFXIVARR_POSITION3 pos;
-    uint32_t unknown13;
+    uint32_t unknown14[3];
+    uint32_t unknown15;
   };
 
 
@@ -1028,6 +1041,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionHealRank;
     unsigned char u19[2];
     unsigned char mountGuideMask[19];
+    uint8_t unk1[9];
     char name[32];
     unsigned char unknownOword[16];
     unsigned char unknownOw;
@@ -1496,7 +1510,7 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcQuestCompleteList : FFXIVIpcBasePacket< QuestCompleteList >
   {
     uint8_t questCompleteMask[480];
-    uint8_t unknownCompleteMask[32];
+    uint8_t unknownCompleteMask[80];
   };
 
   /**
