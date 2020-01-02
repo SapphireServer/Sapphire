@@ -594,9 +594,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
           newStackSize = maxStack;
         }
         else
-        {
           quantity = 0;
-        }
 
         item->setStackSize( newStackSize );
         writeItem( item );
