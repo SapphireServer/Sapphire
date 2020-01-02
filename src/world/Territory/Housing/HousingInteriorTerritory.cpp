@@ -63,8 +63,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   indoorInitPacket->data().u3 = 0;
   indoorInitPacket->data().u4 = 0;
 
-  auto landSetId = pHousingMgr->toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum );
-  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( m_landIdent.landId );
+  auto landSetId = pHousingMgr->toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
+  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
   auto pHouse = pLand->getHouse();
 
   for( auto i = 0; i < 10; i++ )
@@ -154,7 +154,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
 
       auto obj = housingMgr->getYardObjectForItem( housingItem );
 
-      m_housingObjects[ offset ] = obj;
+      m_housingObjects[static_cast< size_t >( offset ) ] = obj;
     }
 
     containerIdx++;
@@ -171,14 +171,14 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
   auto offset = ( containerIdx * 50 ) + slot;
   auto obj = housingMgr->getYardObjectForItem( item );
 
-  m_housingObjects[ offset ] = obj;
+  m_housingObjects[ static_cast< size_t >( offset ) ] = obj;
 
   for( const auto& player : m_playerMap )
   {
     auto objectSpawnPkt = makeZonePacket< Server::FFXIVIpcHousingInternalObjectSpawn >( player.second->getId() );
 
     objectSpawnPkt->data().containerId = containerType;
-    objectSpawnPkt->data().containerOffset = slot;
+    objectSpawnPkt->data().containerOffset = static_cast< uint8_t >( slot );
 
     objectSpawnPkt->data().object.itemId = item->getAdditionalData() & 0xFFFF;
     objectSpawnPkt->data().object.rotation = item->getRot();
@@ -207,7 +207,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
 
     auto moveObjPkt = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
-    moveObjPkt->data().itemRotation = obj.rotation;
+    moveObjPkt->data().itemRotation = static_cast< uint16_t >( obj.rotation );
     moveObjPkt->data().pos = obj.pos;
 
     // todo: how does this work when an item is in a slot >50 or u8 max? my guess is landid is the container index, but not sure...
