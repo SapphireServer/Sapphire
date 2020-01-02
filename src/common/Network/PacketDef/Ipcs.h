@@ -266,6 +266,8 @@ namespace Sapphire::Network::Packets
     DailyQuests = 0x02D8, // updated 5.18
     DailyQuestRepeatFlags = 0x03A3, // updated 5.18
 
+    GetItemSoundEffect = 0x02FA, // 5.18, may have other uses.
+
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
     MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
