@@ -90,7 +90,7 @@ void EffectBuilder::damageTarget( Entity::CharaPtr& target, uint32_t amount, Com
 void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
   auto resultList = getResultList( target );
-  assert( resultList  );
+  assert( resultList );
 
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->startCombo( actionId );
@@ -100,7 +100,7 @@ void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 void EffectBuilder::comboVisualEffect( Entity::CharaPtr& target )
 {
   auto resultList = getResultList( target );
-  assert( resultList  );
+  assert( resultList );
 
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->comboVisualEffect();

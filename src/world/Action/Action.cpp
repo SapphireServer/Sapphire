@@ -357,7 +357,7 @@ void Action::Action::execute()
   if( !m_actionData->preservesCombo )
   {
     // potential combo starter or correct combo from last action
-    if ( ( !isComboAction() || isCorrectCombo() ) )
+    if( ( !isComboAction() || isCorrectCombo() ) )
     {
       m_pSource->setLastComboActionId( getId() );
     }
@@ -431,15 +431,15 @@ void Action::Action::buildEffects()
       auto dmg = calcDamage( isCorrectCombo() ? lutEntry.comboPotency : lutEntry.potency );
       m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
 
-      if ( dmg.first > 0 )
+      if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
-      if ( isCorrectCombo() )
+      if( isCorrectCombo() )
       {
         m_effectBuilder->comboVisualEffect( actor );
       }
 
-      if ( !isComboAction() || isCorrectCombo() )
+      if( !isComboAction() || isCorrectCombo() )
       {
         if( lutEntry.curePotency > 0 ) // actions with self heal
         {
@@ -450,12 +450,12 @@ void Action::Action::buildEffects()
           m_effectBuilder->selfHeal( actor, m_pSource, lutEntry.curePotency );
         }
 
-        if ( lutEntry.restoreMPPercentage > 0 )
+        if( lutEntry.restoreMPPercentage > 0 )
         {
           m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
         }
 
-        if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
+        if( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
         {
           m_effectBuilder->startCombo( actor, getId() );
         }
@@ -466,13 +466,13 @@ void Action::Action::buildEffects()
       // todo: calcHealing()
       m_effectBuilder->healTarget( actor, lutEntry.curePotency );
 
-      if ( lutEntry.restoreMPPercentage > 0 )
+      if( lutEntry.restoreMPPercentage > 0 )
       {
         // always restore caster mp I don't think there are any actions that can restore target MP post 5.0
         m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
       }
     }
-    else if ( lutEntry.restoreMPPercentage > 0 )
+    else if( lutEntry.restoreMPPercentage > 0 )
     {
       m_effectBuilder->restoreMP( m_pSource, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
     }
