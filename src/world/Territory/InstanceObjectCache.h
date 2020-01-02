@@ -38,7 +38,6 @@ namespace Sapphire
       return nullptr;
     }
 
-    template< typename T >
     void insert( uint16_t zoneId, T& entry )
     {
       auto pShared = std::make_shared< T >( entry );
