@@ -354,9 +354,17 @@ void Action::Action::execute()
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
-  if( !m_actionData->preservesCombo && ( !isComboAction() || isCorrectCombo() ) )
+  if( !m_actionData->preservesCombo )
   {
-    m_pSource->setLastComboActionId( getId() );
+    // potential combo starter or correct combo from last action
+    if ( ( !isComboAction() || isCorrectCombo() ) )
+    {
+      m_pSource->setLastComboActionId( getId() );
+    }
+    else // clear last combo action if the combo breaks
+    {
+      m_pSource->setLastComboActionId( 0 );
+    }
   }
 }
 
