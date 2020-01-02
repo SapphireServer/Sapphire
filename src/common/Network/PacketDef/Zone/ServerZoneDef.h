@@ -1421,11 +1421,24 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown[8];
   };
 
+  template< int ArgCount >
+  struct FFXIVIpcEventPlayN
+  {
+    uint64_t actorId;
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t padding;
+    uint32_t sceneFlags;
+    uint8_t paramCount;
+    uint8_t padding2[3];
+    uint32_t params[ArgCount];
+  };
+
   /**
   * Structural representation of the packet sent by the server
   * to play an event
   */
-  struct FFXIVIpcDirectorPlayScene : FFXIVIpcBasePacket< DirectorPlayScene >
+  struct FFXIVIpcDirectorPlayScene : FFXIVIpcBasePacket< EventPlay32 >
   {
     uint64_t actorId;
     uint32_t eventId;
@@ -1454,15 +1467,10 @@ namespace Sapphire::Network::Packets::Server
     /* 000C */ uint32_t padding1;
   };
 
-  struct FFXIVIpcEventOpenGilShop : FFXIVIpcBasePacket< EventOpenGilShop >
+  struct FFXIVIpcEventPlay255 :
+    FFXIVIpcBasePacket< EventPlay255 >,
+    FFXIVIpcEventPlayN< 255 >
   {
-    uint64_t actorId;
-    uint32_t eventId;
-    uint16_t scene;
-    uint16_t padding;
-    uint32_t sceneFlags;
-
-    uint32_t unknown_wtf[0x101];
   };
 
 
