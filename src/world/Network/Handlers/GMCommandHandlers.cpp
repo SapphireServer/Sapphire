@@ -130,13 +130,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
   {
     case GmCommand::Lv:
     {
-      targetPlayer->setLevel( param1 );
+      targetPlayer->setLevel( static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Race:
     {
-      targetPlayer->setLookAt( CharaLook::Race, param1 );
+      targetPlayer->setLookAt( CharaLook::Race, static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Race for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
@@ -152,7 +152,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Tribe:
     {
-      targetPlayer->setLookAt( CharaLook::Tribe, param1 );
+      targetPlayer->setLookAt( CharaLook::Tribe, static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
@@ -168,7 +168,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Sex:
     {
-      targetPlayer->setLookAt( CharaLook::Gender, param1 );
+      targetPlayer->setLookAt( CharaLook::Gender, static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Sex for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
@@ -325,7 +325,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         }
         else
         {
-          targetActor->getAsPlayer()->learnSong( param2, 0 );
+          targetActor->getAsPlayer()->learnSong( static_cast< uint8_t >( param2 ), 0 );
           player.sendNotice( "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
@@ -374,27 +374,27 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::QuestAccept:
     {
-      targetPlayer->updateQuest( param1, 1 );
+      targetPlayer->updateQuest( static_cast< uint16_t >( param1 ), 1 );
       break;
     }
     case GmCommand::QuestCancel:
     {
-      targetPlayer->removeQuest( param1 );
+      targetPlayer->removeQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
     case GmCommand::QuestComplete:
     {
-      targetPlayer->finishQuest( param1 );
+      targetPlayer->finishQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
     case GmCommand::QuestIncomplete:
     {
-      targetPlayer->unfinishQuest( param1 );
+      targetPlayer->unfinishQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
     case GmCommand::QuestSequence:
     {
-      targetPlayer->updateQuest( param1, param2 );
+      targetPlayer->updateQuest( static_cast< uint16_t >( param1 ), static_cast< uint8_t >( param2 ) );
       break;
     }
     case GmCommand::GC:
@@ -405,7 +405,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         return;
       }
 
-      targetPlayer->setGc( param1 );
+      targetPlayer->setGc( static_cast< uint8_t >( param1 ) );
 
       // if we're changing them to a GC, check if they have a rank and if not, set it to the lowest rank
       if( param1 > 0 )
@@ -413,7 +413,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         auto gcRankIdx = static_cast< uint8_t >( param1 ) - 1;
         if( targetPlayer->getGcRankArray()[ gcRankIdx ] == 0 )
         {
-          player.setGcRankAt( gcRankIdx, 1 );
+          player.setGcRankAt( static_cast< uint8_t >( gcRankIdx ), 1 );
         }
       }
 
@@ -430,7 +430,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         return;
       }
 
-      targetPlayer->setGcRankAt( gcId, param1 );
+      targetPlayer->setGcRankAt( static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
       player.sendNotice( "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
                          targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
@@ -448,7 +448,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         }
         else
         {
-          targetActor->getAsPlayer()->registerAetheryte( param2 );
+          targetActor->getAsPlayer()->registerAetheryte( static_cast< uint8_t >( param2 ) );
           player.sendNotice( "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
@@ -521,7 +521,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
             if( data->isAetheryte )
             {
               doTeleport = true;
-              teleport = i;
+              teleport = static_cast< uint16_t >( i );
               break;
             }
           }
@@ -533,7 +533,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         else
         {
           targetPlayer->setPos( targetPlayer->getPos() );
-          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+          targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getPos(), 0 );
         }
 
         player.sendNotice( "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );
