@@ -180,8 +180,13 @@ namespace Sapphire::Network::Packets
     HuntingLogEntry = 0x01B3, // updated 5.0
 
     EventPlay = 0x0279, // updated 5.18
-    DirectorPlayScene = 0x01B9, // updated 5.0
-    EventOpenGilShop = 0x01B1, // updated 5.18
+    EventPlay4 = 0x02F7, // updated 5.18
+    EventPlay8 = 0x0119, // updated 5.18
+    EventPlay16 = 0x01FB, // updated 5.18
+    EventPlay32 = 0x0364, // updated 5.18
+    EventPlay64 = 0x00E5, // updated 5.18
+    EventPlay128 = 0x02BE, // updated 5.18
+    EventPlay255 = 0x01B1, // updated 5.18
 
     EventStart = 0x0230, // updated 5.18
     EventFinish = 0x01E4, // updated 5.18
