@@ -308,7 +308,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::AbandonQuest:
     {
-      player.removeQuest( static_cast< uint16_t >( param1 ) );
+      player.removeQuest( static_cast< uint16_t >( param1 ), true );
       break;
     }
     case ClientTriggerType::RequestHousingBuildPreset:

@@ -18,7 +18,7 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 
   int8_t idx = getQuestIndex( questId );
 
-  removeQuest( questId );
+  removeQuest( questId, false );
   updateQuestsCompleted( questId );
 
   sendQuestTracker();
@@ -31,7 +31,7 @@ void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
   sendQuestInfo();
 }
 
-void Sapphire::Entity::Player::removeQuest( uint16_t questId )
+void Sapphire::Entity::Player::removeQuest( uint16_t questId, bool abandoned )
 {
 
   int8_t idx = getQuestIndex( questId );
@@ -45,11 +45,14 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
     questUpdatePacket->data().questInfo.c.sequence = 0xFF;
     queuePacket( questUpdatePacket );
 
-    auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
-    questFinishPacket->data().questId = questId;
-    questFinishPacket->data().flag1 = 1;
-    questFinishPacket->data().flag2 = 1;
-    queuePacket( questFinishPacket );
+    if( !abandoned )
+    {
+      auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
+      questFinishPacket->data().questId = questId;
+      questFinishPacket->data().flag1 = 1;
+      questFinishPacket->data().flag2 = 1;
+      queuePacket( questFinishPacket );
+    }
 
     for( int32_t ii = 0; ii < 5; ii++ )
     {

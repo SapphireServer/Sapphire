@@ -379,7 +379,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::QuestCancel:
     {
-      targetPlayer->removeQuest( static_cast< uint16_t >( param1 ) );
+      targetPlayer->removeQuest( static_cast< uint16_t >( param1 ), true );
       break;
     }
     case GmCommand::QuestComplete:
