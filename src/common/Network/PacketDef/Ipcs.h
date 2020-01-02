@@ -180,13 +180,16 @@ namespace Sapphire::Network::Packets
     HuntingLogEntry = 0x01B3, // updated 5.0
 
     EventPlay = 0x0279, // updated 5.18
-    DirectorPlayScene = 0x01B9, // updated 5.0
-    EventOpenGilShop = 0x01B1, // updated 5.18
+    EventPlay4 = 0x02F7, // updated 5.18
+    EventPlay8 = 0x0119, // updated 5.18
+    EventPlay16 = 0x01FB, // updated 5.18
+    EventPlay32 = 0x0364, // updated 5.18
+    EventPlay64 = 0x00E5, // updated 5.18
+    EventPlay128 = 0x02BE, // updated 5.18
+    EventPlay255 = 0x01B1, // updated 5.18
 
     EventStart = 0x0230, // updated 5.18
     EventFinish = 0x01E4, // updated 5.18
-    EventUnk0 = 0x02F7, // updated 5.18
-    EventUnk1 = 0x0100, // updated 5.18
     UseMooch = 0x0233, // updated 5.18
 
     EventLinkshell = 0x1169,
@@ -205,8 +208,15 @@ namespace Sapphire::Network::Packets
 
     Mount = 0x02F0, // updated 5.18
 
-    DirectorVars = 0x01F5, // updated 5.0
-    DirectorPopUp = 0x0200, // updated 5.0 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
+    DirectorVars = 0x00E6, // updated 5.18
+    SomeDirectorUnk1 = 0x0084, // updated 5.18
+    SomeDirectorUnk2 = 0x00C1, // updated 5.18
+    SomeDirectorUnk4 = 0x0100, // updated 5.18
+    SomeDirectorUnk8 = 0x028A, // updated 5.18
+    SomeDirectorUnk16 = 0x028C, // updated 5.18
+    DirectorPopUp = 0x0162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
+    DirectorPopUp4 = 0x0214, // updated 5.18
+    DirectorPopUp8 = 0x00F8, // updated 5.18
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 

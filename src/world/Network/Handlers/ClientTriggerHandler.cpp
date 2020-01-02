@@ -128,7 +128,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::SpawnCompanionReq:
     {
-      player.spawnCompanion( param1 );
+      player.spawnCompanion( static_cast< uint16_t >( param1 ) );
       break;
     }
     case ClientTriggerType::RemoveStatusEffect: // Remove status (clicking it off)
@@ -237,14 +237,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::PoseChange: // change pose
     case ClientTriggerType::PoseReapply: // reapply pose
     {
-      player.setPose( param12 );
+      player.setPose( static_cast< uint8_t >( param12 ) );
       auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
       player.sendToInRangeSet( pSetStatusPacket, true );
       break;
     }
     case ClientTriggerType::PoseCancel: // cancel pose
     {
-      player.setPose( param12 );
+      player.setPose( static_cast< uint8_t >( param12 ) );
       auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
       player.sendToInRangeSet( pSetStatusPacket, true );
       break;
@@ -274,7 +274,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::Teleport: // Teleport
     {
 
-      player.teleportQuery( param11 );
+      player.teleportQuery( static_cast< uint16_t >( param11 ) );
       break;
     }
     case ClientTriggerType::DyeItem: // Dye item
@@ -318,7 +318,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       if (!hZone)
         return;
 
-      player.setActiveLand( param11, hZone->getWardNum() );
+      player.setActiveLand( static_cast< uint8_t >( param11 ), hZone->getWardNum() );
 
       auto pShowBuildPresetUIPacket = makeActorControl( player.getId(), ShowBuildPresetUI, param11 );
       player.queuePacket( pShowBuildPresetUIPacket );
@@ -349,7 +349,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       if( !pHousingMgr )
         break;
 
-      pHousingMgr->sendWardLandInfo( player, param12, param11 );
+      pHousingMgr->sendWardLandInfo( player, static_cast< uint8_t >( param12 ), static_cast< uint8_t >( param11 ) );
 
       break;
     }
@@ -463,7 +463,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       auto sendToStoreroom = ( param4 >> 16 ) != 0;
 
       //player, plot, containerId, slot, sendToStoreroom
-      housingMgr->reqRemoveHousingItem( player, param12, param2, slot, sendToStoreroom );
+      housingMgr->reqRemoveHousingItem( player, static_cast< uint16_t >( param12 ), static_cast< uint16_t >( param2 ), static_cast< uint8_t >( slot ), sendToStoreroom );
 
       break;
     }
@@ -471,7 +471,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     {
       auto housingMgr = m_pFw->get< HousingMgr >();
 
-      housingMgr->reqEstateExteriorRemodel( player, param11 );
+      housingMgr->reqEstateExteriorRemodel( player, static_cast< uint16_t >( param11 ) );
 
       break;
     }
