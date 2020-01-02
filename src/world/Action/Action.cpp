@@ -419,9 +419,9 @@ void Action::Action::buildEffects()
   // no script exists but we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
-    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}",
+    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
                        lutEntry.potency, lutEntry.comboPotency, lutEntry.flankPotency, lutEntry.rearPotency,
-                       lutEntry.curePotency );
+                       lutEntry.curePotency, lutEntry.restoreMPPercentage );
   }
 
   for( auto& actor : m_hitActors )
@@ -450,6 +450,11 @@ void Action::Action::buildEffects()
           m_effectBuilder->selfHeal( actor, m_pSource, lutEntry.curePotency );
         }
 
+        if ( lutEntry.restoreMPPercentage > 0 )
+        {
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
+        }
+
         if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
         {
           m_effectBuilder->startCombo( actor, getId() );
@@ -460,6 +465,16 @@ void Action::Action::buildEffects()
     {
       // todo: calcHealing()
       m_effectBuilder->healTarget( actor, lutEntry.curePotency );
+
+      if ( lutEntry.restoreMPPercentage > 0 )
+      {
+        // always restore caster mp I don't think there are any actions that can restore target MP post 5.0
+        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
+      }
+    }
+    else if ( lutEntry.restoreMPPercentage > 0 )
+    {
+      m_effectBuilder->restoreMP( m_pSource, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
     }
   }
 

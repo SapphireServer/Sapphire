@@ -17,6 +17,7 @@ namespace Sapphire::World::Action
 
     void damage( uint32_t amount, Common::ActionHitSeverityType severity );
     void heal( uint32_t amount, Common::ActionHitSeverityType severity, bool isSelfHeal );
+    void restoreMP( uint32_t amount );
     void startCombo( uint16_t actionId );
     void comboVisualEffect();
 

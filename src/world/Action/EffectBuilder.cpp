@@ -67,6 +67,16 @@ void EffectBuilder::selfHeal( Entity::CharaPtr& target, Entity::CharaPtr& source
   resultList->push_back( std::move( nextResult ) );
 }
 
+void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount, Common::ActionHitSeverityType severity )
+{
+  auto resultList = getResultList( target );
+  assert( resultList );
+
+  EffectResultPtr nextResult = make_EffectResult( source, getResultDelayMs() ); // restore mp source actor
+  nextResult->restoreMP( amount );
+  resultList->push_back( std::move( nextResult ) );
+}
+
 void EffectBuilder::damageTarget( Entity::CharaPtr& target, uint32_t amount, Common::ActionHitSeverityType severity )
 {
   auto resultList = getResultList( target );

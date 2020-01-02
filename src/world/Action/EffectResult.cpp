@@ -57,6 +57,14 @@ void EffectResult::heal( uint32_t amount, Sapphire::Common::ActionHitSeverityTyp
   m_type = Common::ActionEffectType::Heal;
 }
 
+void EffectResult::restoreMP( uint32_t amount )
+{
+  m_value = amount;
+  m_flag = 0x80;
+
+  m_type = Common::ActionEffectType::MpGain;
+}
+
 void EffectResult::startCombo( uint16_t actionId )
 {
   m_value = actionId;
@@ -97,6 +105,12 @@ void EffectResult::execute()
     case Common::ActionEffectType::Heal:
     {
       m_target->heal( m_value );
+      break;
+    }
+
+    case Common::ActionEffectType::MpGain:
+    {
+      m_target->restoreMP( m_value );
       break;
     }
 

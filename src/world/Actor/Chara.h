@@ -263,6 +263,8 @@ namespace Sapphire::Entity
 
     virtual void heal( uint32_t amount );
 
+    virtual void restoreMP( uint32_t amount );
+
     virtual bool checkAction();
 
     virtual void update( uint64_t tickCount );
