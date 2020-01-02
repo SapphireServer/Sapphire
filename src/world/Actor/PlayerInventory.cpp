@@ -607,6 +607,11 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
         {
           queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
 
+          auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
+          soundEffectPacket->data().sequenceId = 0xFFFFFFFF;
+          soundEffectPacket->data().sequenceId1 = 6; // this seems to have to be 6 in order to make that sound
+          queuePacket( soundEffectPacket );
+
           return item;
         }
 
@@ -638,6 +643,11 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
     queuePacket( invUpdate );
 
     queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+
+    auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
+    soundEffectPacket->data().sequenceId = 0xFFFFFFFF;
+    soundEffectPacket->data().sequenceId1 = 6; // this seems to have to be 6 in order to make that sound
+    queuePacket( soundEffectPacket );
   }
 
   return item;

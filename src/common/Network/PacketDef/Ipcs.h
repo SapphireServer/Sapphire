@@ -171,12 +171,13 @@ namespace Sapphire::Network::Packets
 
     ItemInfo = 0x00F2, // updated 5.18
     ContainerInfo = 0x01F2, // updated 5.18
-    InventoryTransactionFinish = 0x01AB, // updated 5.1
+    InventoryTransactionFinish = 0x02FA, // updated 5.18
     InventoryTransaction = 0x023E, // updated 5.1
     CurrencyCrystalInfo = 0x02BF, // updated 5.18
 
     InventoryActionAck = 0x0084, // updated 5.1
     UpdateInventorySlot = 0x0370, // updated 5.18
+    //InventoryUnknown = 0x02FA, // updated 5.18, not sure what it is besides playing the get item sound effect
 
     HuntingLogEntry = 0x01B3, // updated 5.0
 
