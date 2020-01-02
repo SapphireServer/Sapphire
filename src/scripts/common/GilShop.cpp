@@ -43,7 +43,7 @@ private:
 
       }
 
-      player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
+      player.playGilShop( result.eventId, SCENE_FLAGS, result.param2 == 1 ? 3 : 2, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
       return;
     }
 
@@ -53,7 +53,7 @@ private:
 
   void shopCallback( Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
+    player.playGilShop( result.eventId, SCENE_FLAGS, 0, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
   }
 };
 
