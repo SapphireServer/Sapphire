@@ -200,7 +200,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t aetheryteId;
     sscanf( params.c_str(), "%i", &aetheryteId );
 
-    player.teleport( aetheryteId );
+    player.teleport( static_cast< uint16_t >( aetheryteId ) );
   }
   else if( ( subCommand == "discovery" ) && ( params != "" ) )
   {
@@ -209,8 +209,8 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
     auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
-    discoveryPacket->data().map_id = map_id;
-    discoveryPacket->data().map_part_id = discover_id;
+    discoveryPacket->data().map_id = static_cast< uint32_t >( map_id );
+    discoveryPacket->data().map_part_id = static_cast< uint32_t >( discover_id );
     player.queuePacket( discoveryPacket );
   }
 
@@ -258,7 +258,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t minutes;
     sscanf( params.c_str(), "%d", &minutes );
 
-    player.setCFPenaltyMinutes( minutes );
+    player.setCFPenaltyMinutes( static_cast< uint32_t >( minutes ) );
   }
   else if( subCommand == "eorzeatime" )
   {
@@ -274,7 +274,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
 
     player.dismount();
-    player.mount( id );
+    player.mount( static_cast< uint32_t >( id ) );
   }
   else if( subCommand == "msqguide" )
   {
@@ -282,7 +282,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
 
     auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerProgress >( player.getId() );
-    msqPacket->data().id = id;
+    msqPacket->data().id = static_cast< uint32_t >( id );
     player.queuePacket( msqPacket );
 
     player.sendDebug( "MSQ Guide updated " );
@@ -293,7 +293,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
 
     auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerComplete >( player.getId() );
-    msqPacket->data().id = id;
+    msqPacket->data().id = static_cast< uint32_t >( id );
     player.queuePacket( msqPacket );
 
     player.sendDebug( "MSQ Guide updated " );
@@ -434,7 +434,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     uint32_t titleId;
     sscanf( params.c_str(), "%u", &titleId );
 
-    player.addTitle( titleId );
+    player.addTitle( static_cast< uint16_t >( titleId ) );
     player.sendNotice( "Added title (id#{0})", titleId );
   }
   else if( subCommand == "bnpc" )
@@ -495,13 +495,13 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     player.sendNotice( "Injecting ACTOR_CONTROL {0}", opcode );
 
     auto actorControl = makeZonePacket< FFXIVIpcActorControlSelf >( playerId, player.getId() );
-    actorControl->data().category = opcode;
-    actorControl->data().param1 = param1;
-    actorControl->data().param2 = param2;
-    actorControl->data().param3 = param3;
-    actorControl->data().param4 = param4;
-    actorControl->data().param5 = param5;
-    actorControl->data().param6 = param6;
+    actorControl->data().category = static_cast< uint16_t >( opcode );
+    actorControl->data().param1 = static_cast< uint16_t >( param1 );
+    actorControl->data().param2 = static_cast< uint16_t >( param2 );
+    actorControl->data().param3 = static_cast< uint16_t >( param3 );
+    actorControl->data().param4 = static_cast< uint16_t >( param4 );
+    actorControl->data().param5 = static_cast< uint16_t >( param5 );
+    actorControl->data().param6 = static_cast< uint16_t >( param6 );
     player.queuePacket( actorControl );
 
 
@@ -521,7 +521,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     uint32_t id;
 
     sscanf( params.c_str(), "%d", &id );
-    player.learnAction( id );
+    player.learnAction( static_cast< uint16_t >( id ) );
   }
   else if ( subCommand == "effect")
   {
@@ -532,7 +532,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = param1;
+    entry.value = static_cast< int16_t >( param1 );
     entry.effectType = Common::ActionEffectType::Damage;
     entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
 

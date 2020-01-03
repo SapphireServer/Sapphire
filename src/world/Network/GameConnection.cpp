@@ -224,7 +224,7 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
     Logger::debug( "[{0}] Undefined World IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
 
     Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
-                                                       pPacket.segHdr.size ) );
+                                                       static_cast< uint16_t >( pPacket.segHdr.size) ) );
   }
 }
 
@@ -392,7 +392,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
     {
       case SEGMENTTYPE_SESSIONINIT:
       {
-        char* id = ( char* ) &( inPacket.data[ 4 ] );
+        char* id = reinterpret_cast< char* >( &( inPacket.data[ 4 ] ) );
         uint32_t playerId = std::stoul( id );
         auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
@@ -423,15 +423,15 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           m_pSession = session;
 
         auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
-        *( unsigned int* ) ( &pe->data()[ 0 ] ) = 0xE0037603;
-        *( unsigned int* ) ( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
+        *reinterpret_cast< unsigned int* >( &pe->data()[ 0 ] ) = 0xE0037603;
+        *reinterpret_cast< unsigned int* >( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
         sendSinglePacket( pe );
 
         // main connection, assinging it to the session
         if( ipcHeader.connectionType == ConnectionType::Zone )
         {
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
-          *( unsigned int* ) ( &pe1->data()[ 0 ] ) = playerId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe1 );
           Logger::info( "[{0}] Setting session for world connection", id );
           session->setZoneConnection( pCon );
@@ -440,11 +440,11 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         else if( ipcHeader.connectionType == ConnectionType::Chat )
         {
           auto pe2 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
-          *( unsigned int* ) ( &pe2->data()[ 0 ] ) = playerId;
+          *reinterpret_cast< unsigned int* >( &pe2->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe2 );
 
           auto pe3 = std::make_shared< FFXIVRawPacket >( 0x03, 0x28, playerId, playerId );
-          *( unsigned short* ) ( &pe3->data()[ 2 ] ) = 0x02;
+          *reinterpret_cast< unsigned short* >( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
           Logger::info( "[{0}] Setting session for chat connection", id );
@@ -461,12 +461,12 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
       }
       case SEGMENTTYPE_KEEPALIVE: // keep alive
       {
-        uint32_t id = *( uint32_t* ) &inPacket.data[ 0 ];
-        uint32_t timeStamp = *( uint32_t* ) &inPacket.data[ 4 ];
+        uint32_t id = *reinterpret_cast< uint32_t* >( &inPacket.data[ 0 ] );
+        uint32_t timeStamp = *reinterpret_cast< uint32_t* >( &inPacket.data[ 4 ] );
 
         auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
-        *( unsigned int* ) ( &pe4->data()[ 0 ] ) = id;
-        *( unsigned int* ) ( &pe4->data()[ 4 ] ) = timeStamp;
+        *reinterpret_cast< unsigned int* >( &pe4->data()[ 0 ] ) = id;
+        *reinterpret_cast< unsigned int* >( &pe4->data()[ 4 ] ) = timeStamp;
         sendSinglePacket( pe4 );
 
         break;
