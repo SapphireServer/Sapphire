@@ -494,9 +494,9 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
                         canTeleport, unk1, privateEstateAccess, unk );
       break;
     }
-    case ClientTriggerType::Unk232C:
+    case ClientTriggerType::RequestEventBattle:
     {
-      auto packet = makeActorControlSelf(player.getId(), ActorControl::Unk039C, 0, param12, param2);
+      auto packet = makeActorControlSelf(player.getId(), ActorControl::EventBattleDialog, 0, param12, param2);
       player.queuePacket(packet);
 
       player.sendDebug("Unk232C: level sync: {0}, ilevel sync?: {1}",
