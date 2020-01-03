@@ -67,9 +67,11 @@ namespace Sapphire::Network::Packets
     Playtime = 0x01DB, // updated 5.1
     Logout = 0x011D, // updated 5.1
     CFNotify = 0x0078,
+    CFNotifyPop = 0x01F8, // added 5.18
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
     CFPlayerInNeed = 0x007F,
+    CFPreferredRole = 0x032A, // added 5.18
 
     SocialRequestError = 0x00AD,
 
