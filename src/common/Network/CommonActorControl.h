@@ -264,6 +264,8 @@ namespace Sapphire::Network::ActorControl
 
     ToggleOrchestrionUnlock = 0x396,
 
+    EventBattleDialog = 0x39C,
+
     /*!
     * param1 = mountSpeed
     * Retail sends 12 for mount speed star 1 unlocked and 15 for mount speed star 2 unlocked
@@ -390,6 +392,8 @@ namespace Sapphire::Network::ActorControl
     AchievementCrit = 0x202,
     AchievementComp = 0x203,
     AchievementCatChat = 0x206,
+
+    RequestEventBattle = 0x232C,
 
     QuestJournalUpdateQuestVisibility = 0x2BE,
     QuestJournalClosed = 0x2BF,
