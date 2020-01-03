@@ -67,7 +67,7 @@ void EffectBuilder::selfHeal( Entity::CharaPtr& target, Entity::CharaPtr& source
   resultList->push_back( std::move( nextResult ) );
 }
 
-void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount, Common::ActionHitSeverityType severity )
+void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount )
 {
   auto resultList = getResultList( target );
   assert( resultList );

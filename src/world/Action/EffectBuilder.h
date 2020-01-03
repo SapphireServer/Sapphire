@@ -18,8 +18,7 @@ namespace Sapphire::World::Action
     void selfHeal( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount,
                      Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal );
 
-    void restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount,
-                   Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal );
+    void restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount );
 
     void damageTarget( Entity::CharaPtr& target, uint32_t amount,
                        Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage );
