@@ -372,7 +372,7 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   // TODO: this should be simplified and a type created in server_common/common.h.
   if( type == 1 ) // teleport
   {
-    prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
+    prepareZoning( data->territory, true, 1, 0 ); // TODO: Really?
     sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
     setZoningType( Common::ZoneingType::Teleport );
   }
