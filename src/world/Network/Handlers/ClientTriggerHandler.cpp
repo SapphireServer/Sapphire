@@ -496,11 +496,10 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestEventBattle:
     {
-      auto packet = makeActorControlSelf(player.getId(), ActorControl::EventBattleDialog, 0, param12, param2);
-      player.queuePacket(packet);
+      auto packet = makeActorControlSelf( player.getId(), ActorControl::EventBattleDialog, 0, param12, param2 );
+      player.queuePacket( packet );
 
-      player.sendDebug("Unk232C: level sync: {0}, ilevel sync?: {1}",
-        param12, param2);
+      player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", param12, param2 );
       break;
     }
 
