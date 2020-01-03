@@ -343,8 +343,8 @@ namespace Sapphire::Network::Packets
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x01BE, // updated 5.18
-    GMCommand1 = 0x00A4, // updated 5.1
-    GMCommand2 = 0x013F, // updated 5.0
+    GMCommand1 = 0x014D, // updated 5.18
+    GMCommand2 = 0x032C, // updated 5.18
     AoESkillHandler = 0x140, // updated 5.0
 
     UpdatePositionHandler = 0x0318, // updated 5.18
