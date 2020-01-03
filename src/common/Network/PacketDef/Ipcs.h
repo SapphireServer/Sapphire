@@ -260,7 +260,7 @@ namespace Sapphire::Network::Packets
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
     PerformNote = 0x0286, // updated 4.3
 
-    PrepareZoning = 0x02A4, // updated 5.0
+    PrepareZoning = 0x035C, // updated 5.18
     ActorGauge = 0x016D, // updated 5.18
 
     // daily quest info -> without them sent,  login will take longer...

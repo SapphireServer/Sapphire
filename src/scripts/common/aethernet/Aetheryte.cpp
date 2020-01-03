@@ -59,7 +59,8 @@ public:
   {
     if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
     {
-      player.playScene( eventId, 0, 1, [this]( Entity::Player& player, const Event::SceneResult& result )
+      // eventParam4 (or params[1] if using EventPlay8, which is actually used on retail) anything bigger than 1 will show select instance menu item
+      player.playScene( eventId, 0, 1, 0, 1, 2, [this]( Entity::Player& player, const Event::SceneResult& result )
       {
         if( result.param1 == 256 ) // set homepoint
         {
