@@ -66,10 +66,11 @@ namespace Sapphire::Network::Packets
     ChatBanned = 0x006B,
     Playtime = 0x00E7, // updated 5.18
     Logout = 0x142, // updated 5.18
-    CFNotify = 0x0078,
+    CFNotify = 0x01F8, // updated 5.18
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
     CFPlayerInNeed = 0x007F,
+    CFPreferredRole = 0x032A, // added 5.18
 
     SocialRequestError = 0x00AD,
 
