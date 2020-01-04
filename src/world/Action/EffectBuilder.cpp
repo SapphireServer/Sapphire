@@ -180,7 +180,7 @@ void EffectBuilder::buildAndSendPackets()
     pHeader->rotation = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
     pHeader->effectDisplayType = Common::ActionEffectDisplayType::ShowActionName;
     pHeader->effectCount = static_cast< uint8_t >( targetCount );
-    pHeader->hiddenAnimation = 1;
+    pHeader->sourceSequence = m_sequence;
     pHeader->globalEffectCounter = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
     uint8_t targetIndex = 0;

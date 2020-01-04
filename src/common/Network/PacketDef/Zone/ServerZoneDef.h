@@ -589,7 +589,7 @@ namespace Sapphire::Network::Packets::Server
     float animationLockTime; // maybe? doesn't seem to do anything
     uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
 
-    uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+    uint16_t sourceSequence; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
     uint16_t rotation;
     uint16_t actionAnimationId; // the animation that is played by the casting character
     uint8_t variation; // variation in the animation
