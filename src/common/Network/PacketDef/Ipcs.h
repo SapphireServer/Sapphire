@@ -171,11 +171,11 @@ namespace Sapphire::Network::Packets
 
     ItemInfo = 0x00F2, // updated 5.18
     ContainerInfo = 0x01F2, // updated 5.18
-    InventoryTransactionFinish = 0x01AB, // updated 5.1
-    InventoryTransaction = 0x023E, // updated 5.1
+    InventoryTransactionFinish = 0x00D2, // updated 5.18
+    InventoryTransaction = 0x0233, // updated 5.18
     CurrencyCrystalInfo = 0x02BF, // updated 5.18
 
-    InventoryActionAck = 0x0084, // updated 5.1
+    InventoryActionAck = 0x02FA, // updated 5.18
     UpdateInventorySlot = 0x0370, // updated 5.18
 
     HuntingLogEntry = 0x01B3, // updated 5.0
