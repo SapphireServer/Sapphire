@@ -27,6 +27,8 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
 
+  action->setPos( pos );
+
   if( !action->init() )
     return;
 
@@ -36,8 +38,6 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
     action->interrupt();
     return;
   }
-
-  action->setPos( pos );
 
   bootstrapAction( player, action, *actionData );
 }
@@ -49,6 +49,8 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
 
   action->setTargetId( targetId );
+
+  action->setPos( player.getPos() );
 
   if( !action->init() )
     return;

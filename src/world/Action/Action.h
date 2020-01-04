@@ -2,6 +2,7 @@
 #define _ACTION_H_
 
 #include <Common.h>
+#include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
 
@@ -146,6 +147,8 @@ namespace Sapphire::World::Action
 
     bool preFilterActor( Entity::Actor& actor ) const;
 
+    bool hasValidLutEntry() const;
+
     uint32_t m_id;
 
     uint16_t m_sequence;
@@ -186,6 +189,8 @@ namespace Sapphire::World::Action
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;
+
+    ActionEntry m_lutEntry;
   };
 }
 

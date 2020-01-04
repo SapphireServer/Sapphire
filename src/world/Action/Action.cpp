@@ -1,5 +1,4 @@
 #include "Action.h"
-#include "ActionLut.h"
 #include "EffectBuilder.h"
 
 #include <Inventory/Item.h>
@@ -127,6 +126,15 @@ bool Action::Action::init()
 
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
 
+  if( ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
+  {
+    m_lutEntry = ActionLut::getEntry( static_cast< uint16_t >( getId() ) );
+  }
+  else
+  {
+    std::memset( &m_lutEntry, 0, sizeof( ActionEntry ) );
+  }
+
   addDefaultActorFilters();
 
   return true;
@@ -235,7 +243,7 @@ bool Action::Action::update()
     if( !m_pTarget->isAlive() )
     {
       // interrupt the cast if target died
-      setInterrupted(  Common::ActionInterruptType::RegularInterrupt );
+      setInterrupted( Common::ActionInterruptType::RegularInterrupt );
       interrupt();
       return true;
     }
@@ -428,7 +436,7 @@ void Action::Action::buildEffects()
   snapshotAffectedActors( m_hitActors );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  auto hasLutEntry = ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) );
+  auto hasLutEntry = hasValidLutEntry();
 
   if( !pScriptMgr->onExecute( *this ) && !hasLutEntry )
   {
@@ -443,21 +451,19 @@ void Action::Action::buildEffects()
   if( !hasLutEntry || m_hitActors.empty() )
     return;
 
-  auto lutEntry = ActionLut::getEntry( static_cast< uint16_t >( getId() ) );
-
   // no script exists but we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
     player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
-                       lutEntry.potency, lutEntry.comboPotency, lutEntry.flankPotency, lutEntry.rearPotency,
-                       lutEntry.curePotency, lutEntry.restoreMPPercentage );
+                       m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
+                       m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
   }
 
   for( auto& actor : m_hitActors )
   {
-    if( lutEntry.potency > 0 )
+    if( m_lutEntry.potency > 0 )
     {
-      auto dmg = calcDamage( isCorrectCombo() ? lutEntry.comboPotency : lutEntry.potency );
+      auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
       m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
@@ -470,18 +476,18 @@ void Action::Action::buildEffects()
 
       if( !isComboAction() || isCorrectCombo() )
       {
-        if( lutEntry.curePotency > 0 ) // actions with self heal
+        if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
           /*
             Calling m_effectBuilder->healTarget( m_pSource, lutEntry.curePotency ) seems to work fine,
             but it will end up sending two Effect packets to the client. However on retail everything is in one single packet.
           */
-          m_effectBuilder->selfHeal( actor, m_pSource, lutEntry.curePotency );
+          m_effectBuilder->selfHeal( actor, m_pSource, m_lutEntry.curePotency );
         }
 
-        if( lutEntry.restoreMPPercentage > 0 )
+        if( m_lutEntry.restoreMPPercentage > 0 )
         {
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * m_lutEntry.restoreMPPercentage / 100 );
         }
 
         if( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
@@ -490,20 +496,20 @@ void Action::Action::buildEffects()
         }
       }
     }
-    else if( lutEntry.curePotency > 0 )
+    else if( m_lutEntry.curePotency > 0 )
     {
       // todo: calcHealing()
-      m_effectBuilder->healTarget( actor, lutEntry.curePotency );
+      m_effectBuilder->healTarget( actor, m_lutEntry.curePotency );
 
-      if( lutEntry.restoreMPPercentage > 0 )
+      if( m_lutEntry.restoreMPPercentage > 0 )
       {
         // always restore caster mp I don't think there are any actions that can restore target MP post 5.0
-        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
+        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * m_lutEntry.restoreMPPercentage / 100 );
       }
     }
-    else if( lutEntry.restoreMPPercentage > 0 )
+    else if( m_lutEntry.restoreMPPercentage > 0 )
     {
-      m_effectBuilder->restoreMP( m_pSource, m_pSource, m_pSource->getMp() * lutEntry.restoreMPPercentage / 100 );
+      m_effectBuilder->restoreMP( m_pSource, m_pSource, m_pSource->getMp() * m_lutEntry.restoreMPPercentage / 100 );
     }
   }
 
@@ -737,10 +743,23 @@ void Action::Action::addDefaultActorFilters()
 bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
 {
   auto kind = actor.getObjKind();
+  auto chara = actor.getAsChara();
 
   // todo: are there any server side eobjs that players can hit?
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
+
+  if( m_lutEntry.potency > 0 && chara == m_pSource )
+  {
+    // damage action shouldn't hit self
+    return false;
+  }
+
+  if ( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() )
+  {
+    // can't deal damage or heal a dead entity
+    return false;
+  }
 
   // todo: handle things such based on canTargetX
 
@@ -760,4 +779,10 @@ Sapphire::Entity::CharaPtr Action::Action::getHitChara()
   }
 
   return nullptr;
+}
+
+bool Action::Action::hasValidLutEntry() const
+{
+  return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
+    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
 }
