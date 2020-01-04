@@ -35,6 +35,8 @@ namespace Sapphire::World::Action
 
     uint64_t getResultDelayMs();
 
+    std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase > buildNextEffectPacket( uint32_t globalSequence );
+
   private:
     uint32_t m_actionId;
     uint16_t m_sequence;

@@ -688,9 +688,6 @@ bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& ac
         break;
       }
     }
-
-    if ( actors.size() == 32 )
-      break; // cannot add more than 32 targets
   }
 
   if( auto player = m_pSource->getAsPlayer() )

@@ -110,19 +110,31 @@ void EffectBuilder::comboVisualEffect( Entity::CharaPtr& target )
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();
-  assert( targetCount <= 32 );
   Logger::debug( "EffectBuilder result: " );
   Logger::debug( "Targets afflicted: {}", targetCount );
 
-  if( targetCount > 1 ) // use AoeEffect packets
+  auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
+
+  while( m_resolvedEffects.size() > 0 )
   {
-    int packetSize = targetCount <= 8 ? 8 :
-                         ( targetCount <= 16 ? 16 :
-                         ( targetCount <= 24 ? 24 : 32 ) );
+    auto packet = buildNextEffectPacket( globalSequence );
+    m_sourceChara->sendToInRangeSet( packet, true );
+  }
+}
+
+std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_t globalSequence )
+{
+  auto remainingTargetCount = m_resolvedEffects.size();
+
+  if( remainingTargetCount > 1 ) // use AoeEffect packets
+  {
+    int packetSize = remainingTargetCount <= 8 ? 8 :
+                   ( remainingTargetCount <= 16 ? 16 :
+                   ( remainingTargetCount <= 24 ? 24 : 32 ) );
 
     using EffectHeader = Server::FFXIVIpcAoeEffect< 8 >; // dummy type to access header part of the packet
 
-    FFXIVPacketBasePtr pPacket = nullptr;
+    FFXIVPacketBasePtr effectPacket = nullptr;
     EffectHeader* pHeader;
     Common::EffectEntry* pEntry;
     uint64_t* pEffectTargetId;
@@ -136,7 +148,7 @@ void EffectBuilder::buildAndSendPackets()
         pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
         pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
         pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
-        pPacket = std::move( p );
+        effectPacket = std::move( p );
         break;
       }
       case 16:
@@ -146,7 +158,7 @@ void EffectBuilder::buildAndSendPackets()
         pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
         pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
         pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
-        pPacket = std::move( p );
+        effectPacket = std::move( p );
         break;
       }
       case 24:
@@ -156,7 +168,7 @@ void EffectBuilder::buildAndSendPackets()
         pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
         pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
         pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
-        pPacket = std::move( p );
+        effectPacket = std::move( p );
         break;
       }
       case 32:
@@ -166,11 +178,11 @@ void EffectBuilder::buildAndSendPackets()
         pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
         pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
         pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
-        pPacket = std::move( p );
+        effectPacket = std::move( p );
         break;
       }
     }
-    assert( pPacket != nullptr );
+    assert( effectPacket != nullptr );
 
     pHeader->actionAnimationId = m_sourceChara->getId();
     pHeader->actionId = m_actionId;
@@ -179,9 +191,9 @@ void EffectBuilder::buildAndSendPackets()
     pHeader->someTargetId = 0xE0000000;
     pHeader->rotation = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
     pHeader->effectDisplayType = Common::ActionEffectDisplayType::ShowActionName;
-    pHeader->effectCount = static_cast< uint8_t >( targetCount );
+    pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
-    pHeader->globalEffectCounter = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
+    pHeader->globalEffectCounter = globalSequence;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
@@ -203,13 +215,16 @@ void EffectBuilder::buildAndSendPackets()
       it = m_resolvedEffects.erase( it );
 
       targetIndex++;
+
+      if( targetIndex == packetSize )
+        break;
     }
 
     pFlag[0] = 0x7FFF;
     pFlag[1] = 0x7FFF;
     pFlag[2] = 0x7FFF;
-    
-    m_sourceChara->sendToInRangeSet( pPacket, true );
+
+    return effectPacket;
   }
   else
   {
@@ -233,8 +248,8 @@ void EffectBuilder::buildAndSendPackets()
 
     resultList->clear();
 
-    m_sourceChara->sendToInRangeSet( effectPacket, true );
-
     m_resolvedEffects.clear();
+
+    return effectPacket;
   }
 }
