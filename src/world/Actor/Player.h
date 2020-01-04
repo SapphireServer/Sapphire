@@ -183,7 +183,7 @@ namespace Sapphire::Entity
     void unfinishQuest( uint16_t questId );
 
     /*! remove a given quest */
-    void removeQuest( uint16_t questId, bool abandoned );
+    void removeQuest( uint16_t questId );
 
     /*! add a quest to the completed quests mask */
     void updateQuestsCompleted( uint32_t questId );
