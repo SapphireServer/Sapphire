@@ -2003,15 +2003,6 @@ namespace Sapphire::Network::Packets::Server
     char otherName[32];
   };
 
-  struct FFXIVIpcInventoryUnknown : FFXIVIpcBasePacket< InventoryUnknown >
-  {
-    uint32_t unk1;
-    uint16_t unk2;
-    uint16_t unk3;
-    uint32_t unk4;
-    uint32_t unk5;
-  };
-
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/
