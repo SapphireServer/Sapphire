@@ -537,33 +537,6 @@ namespace Sapphire::Network::Packets::Server
     /* 0012 */ uint32_t unknown_12;
   };
 
-
-  /**
-  * Structural representation of the packet sent by the server
-  * for battle actions
-  */
-  struct EffectHeader
-  {
-    uint64_t animationTargetId; // who the animation targets
-
-    uint32_t actionId; // what the casting player casts, shown in battle log/ui
-    uint32_t globalEffectCounter; // seems to only increment on retail?
-
-    float animationLockTime; // maybe? doesn't seem to do anything
-    uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
-
-    uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
-    uint16_t rotation;
-    uint16_t actionAnimationId; // the animation that is played by the casting character
-    uint8_t variation; // variation in the animation
-    Common::ActionEffectDisplayType effectDisplayType;
-
-    uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
-    uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
-    uint16_t padding_21;
-
-  };
-
   struct FFXIVIpcEffect : FFXIVIpcBasePacket< Effect >
   {
     uint64_t animationTargetId; // who the animation targets
@@ -608,17 +581,35 @@ namespace Sapphire::Network::Packets::Server
   template< int size >
   struct FFXIVIpcAoeEffect
   {
-    EffectHeader header;
+    uint64_t animationTargetId; // who the animation targets
 
-    Common::EffectEntry effects[size];
+    uint32_t actionId; // what the casting player casts, shown in battle log/ui
+    uint32_t globalEffectCounter; // seems to only increment on retail?
+
+    float animationLockTime; // maybe? doesn't seem to do anything
+    uint32_t someTargetId; // always 00 00 00 E0, 0x0E000000 is the internal def for INVALID TARGET ID
+
+    uint16_t hiddenAnimation; // if 0, always shows animation, otherwise hides it. counts up by 1 for each animation skipped on a caster
+    uint16_t rotation;
+    uint16_t actionAnimationId; // the animation that is played by the casting character
+    uint8_t variation; // variation in the animation
+    Common::ActionEffectDisplayType effectDisplayType;
+
+    uint8_t unknown20; // is read by handler, runs code which gets the LODWORD of animationLockTime (wtf?)
+    uint8_t effectCount; // ignores effects if 0, otherwise parses all of them
+    uint16_t padding_21[3];
+    uint16_t padding;
+
+    struct
+    {
+      Common::EffectEntry entries[8];
+    } effects[size];
 
     uint16_t padding_6A[3];
 
-    uint32_t effectTargetId[size];
-    Common::FFXIVARR_POSITION3 position;
-    uint32_t effectFlags;
-
-    uint32_t padding_78;
+    uint64_t effectTargetId[size];
+    uint16_t unkFlag[3]; // all 0x7FFF
+    uint16_t unk[3];
   };
 
   struct FFXIVIpcAoeEffect8 :

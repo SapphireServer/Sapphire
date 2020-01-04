@@ -109,12 +109,111 @@ void EffectBuilder::comboVisualEffect( Entity::CharaPtr& target )
 
 void EffectBuilder::buildAndSendPackets()
 {
+  auto targetCount = m_resolvedEffects.size();
+  assert( targetCount <= 32 );
   Logger::debug( "EffectBuilder result: " );
-  Logger::debug( "Targets afflicted: {}", m_resolvedEffects.size() );
+  Logger::debug( "Targets afflicted: {}", targetCount );
 
-  for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
+  if( targetCount > 1 ) // use AoeEffect packets
   {
-    auto resultList = it->second;
+    int packetSize = targetCount <= 8 ? 8 :
+                         ( targetCount <= 16 ? 16 :
+                         ( targetCount <= 24 ? 24 : 32 ) );
+
+    using EffectHeader = Server::FFXIVIpcAoeEffect< 8 >; // dummy type to access header part of the packet
+
+    FFXIVPacketBasePtr pPacket = nullptr;
+    EffectHeader* pHeader;
+    Common::EffectEntry* pEntry;
+    uint64_t* pEffectTargetId;
+    uint16_t* pFlag;
+    switch( packetSize )
+    {
+      case 8:
+      {
+        auto p = makeZonePacket< Server::FFXIVIpcAoeEffect8 >( m_sourceChara->getId() );
+        pHeader = ( EffectHeader* )( &( p->data() ) );
+        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
+        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
+        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pPacket = std::move( p );
+        break;
+      }
+      case 16:
+      {
+        auto p = makeZonePacket< Server::FFXIVIpcAoeEffect16 >( m_sourceChara->getId() );
+        pHeader = ( EffectHeader* )( &( p->data() ) );
+        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
+        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
+        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pPacket = std::move( p );
+        break;
+      }
+      case 24:
+      {
+        auto p = makeZonePacket< Server::FFXIVIpcAoeEffect24 >( m_sourceChara->getId() );
+        pHeader = ( EffectHeader* )( &( p->data() ) );
+        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
+        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
+        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pPacket = std::move( p );
+        break;
+      }
+      case 32:
+      {
+        auto p = makeZonePacket< Server::FFXIVIpcAoeEffect32 >( m_sourceChara->getId() );
+        pHeader = ( EffectHeader* )( &( p->data() ) );
+        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
+        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
+        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pPacket = std::move( p );
+        break;
+      }
+    }
+    assert( pPacket != nullptr );
+
+    pHeader->actionAnimationId = m_sourceChara->getId();
+    pHeader->actionId = m_actionId;
+    pHeader->actionAnimationId = static_cast< uint16_t >( m_actionId );
+    pHeader->animationTargetId = m_sourceChara->getId();
+    pHeader->someTargetId = 0xE0000000;
+    pHeader->rotation = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
+    pHeader->effectDisplayType = Common::ActionEffectDisplayType::ShowActionName;
+    pHeader->effectCount = static_cast< uint8_t >( targetCount );
+    pHeader->hiddenAnimation = 1;
+    pHeader->globalEffectCounter = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
+
+    uint8_t targetIndex = 0;
+    for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
+    {
+      auto resultList = it->second;
+      assert( resultList->size() > 0 );
+      auto firstResult = resultList->data()[ 0 ];
+      pEffectTargetId[ targetIndex ] = firstResult->getTarget()->getId();
+      Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
+
+      for( auto i = 0; i < resultList->size(); i++ )
+      {
+        auto result = resultList->data()[ i ];
+        pEntry[ targetIndex * 8 + i ] = result->buildEffectEntry();
+        m_sourceChara->getCurrentTerritory()->addEffectResult( std::move( result ) );
+      }
+      resultList->clear();
+
+      it = m_resolvedEffects.erase( it );
+
+      targetIndex++;
+    }
+
+    pFlag[0] = 0x7FFF;
+    pFlag[1] = 0x7FFF;
+    pFlag[2] = 0x7FFF;
+    
+    m_sourceChara->sendToInRangeSet( pPacket, true );
+  }
+  else
+  {
+    auto resultList = m_resolvedEffects.begin()->second;
     assert( resultList->size() > 0 );
     auto firstResult = resultList->data()[ 0 ];
     Logger::debug( " - id: {}", firstResult->getTarget()->getId() );
@@ -129,7 +228,6 @@ void EffectBuilder::buildAndSendPackets()
     {
       auto result = resultList->data()[ i ];
       effectPacket->addEffect( result->buildEffectEntry() );
-      // add effect to territory
       m_sourceChara->getCurrentTerritory()->addEffectResult( std::move( result ) );
     }
 
@@ -137,6 +235,6 @@ void EffectBuilder::buildAndSendPackets()
 
     m_sourceChara->sendToInRangeSet( effectPacket, true );
 
-    it = m_resolvedEffects.erase( it );
+    m_resolvedEffects.clear();
   }
 }

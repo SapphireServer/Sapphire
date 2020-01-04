@@ -459,6 +459,10 @@ void Action::Action::buildEffects()
                        m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
   }
 
+  // when aoe, these effects are in the target whatever is hit first
+  bool shouldRestoreMP = true;
+  bool shouldShowComboEffect = true;
+
   for( auto& actor : m_hitActors )
   {
     if( m_lutEntry.potency > 0 )
@@ -469,30 +473,28 @@ void Action::Action::buildEffects()
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
-      if( isCorrectCombo() )
+      if( isCorrectCombo() && shouldShowComboEffect )
       {
         m_effectBuilder->comboVisualEffect( actor );
+        shouldShowComboEffect = false;
       }
 
       if( !isComboAction() || isCorrectCombo() )
       {
         if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
-          /*
-            Calling m_effectBuilder->healTarget( m_pSource, lutEntry.curePotency ) seems to work fine,
-            but it will end up sending two Effect packets to the client. However on retail everything is in one single packet.
-          */
           m_effectBuilder->selfHeal( actor, m_pSource, m_lutEntry.curePotency );
         }
 
-        if( m_lutEntry.restoreMPPercentage > 0 )
+        if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
         {
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * m_lutEntry.restoreMPPercentage / 100 );
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100 );
+          shouldRestoreMP = false;
         }
 
         if( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
         {
-          m_effectBuilder->startCombo( actor, getId() );
+          m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
         }
       }
     }
@@ -501,15 +503,17 @@ void Action::Action::buildEffects()
       // todo: calcHealing()
       m_effectBuilder->healTarget( actor, m_lutEntry.curePotency );
 
-      if( m_lutEntry.restoreMPPercentage > 0 )
+      if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
         // always restore caster mp I don't think there are any actions that can restore target MP post 5.0
-        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMp() * m_lutEntry.restoreMPPercentage / 100 );
+        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100 );
+        shouldRestoreMP = false;
       }
     }
-    else if( m_lutEntry.restoreMPPercentage > 0 )
+    else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
     {
-      m_effectBuilder->restoreMP( m_pSource, m_pSource, m_pSource->getMp() * m_lutEntry.restoreMPPercentage / 100 );
+      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100 );
+      shouldRestoreMP = false;
     }
   }
 
@@ -684,6 +688,9 @@ bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& ac
         break;
       }
     }
+
+    if ( actors.size() == 32 )
+      break; // cannot add more than 32 targets
   }
 
   if( auto player = m_pSource->getAsPlayer() )
