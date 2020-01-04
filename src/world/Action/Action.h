@@ -37,6 +37,7 @@ namespace Sapphire::World::Action
     Entity::CharaPtr getSourceChara() const;
 
     bool isInterrupted() const;
+    Common::ActionInterruptType getInterruptType() const;
     void setInterrupted( Common::ActionInterruptType type );
 
     uint32_t getCastTime() const;

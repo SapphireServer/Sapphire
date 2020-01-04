@@ -162,6 +162,11 @@ bool Action::Action::isInterrupted() const
   return m_interruptType != Common::ActionInterruptType::None;
 }
 
+Common::ActionInterruptType Action::Action::getInterruptType() const
+{
+  return m_interruptType;
+}
+
 void Action::Action::setInterrupted( Common::ActionInterruptType type )
 {
   m_interruptType = type;
@@ -210,6 +215,30 @@ bool Action::Action::update()
   {
     execute();
     return true;
+  }
+
+  if ( m_pTarget == nullptr && m_targetId != 0 )
+  {
+    // try to search for the target actor
+    for( auto actor : m_pSource->getInRangeActors( true ) )
+    {
+      if ( actor->getId() == m_targetId )
+      {
+        m_pTarget = actor->getAsChara();
+        break;
+      }
+    }
+  }
+
+  if ( m_pTarget != nullptr )
+  {
+    if ( !m_pTarget->isAlive() )
+    {
+      // interrupt the cast if target died
+      setInterrupted(  Common::ActionInterruptType::RegularInterrupt );
+      interrupt();
+      return true;
+    }
   }
 
   return false;
