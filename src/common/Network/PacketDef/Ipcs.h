@@ -267,7 +267,7 @@ namespace Sapphire::Network::Packets
     DailyQuests = 0x02D8, // updated 5.18
     DailyQuestRepeatFlags = 0x03A3, // updated 5.18
 
-    GetItemSoundEffect = 0x02FA, // 5.18, may have other uses.
+    InventoryUnknown = 0x02FA, // 5.18, inventory related
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance

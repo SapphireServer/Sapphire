@@ -2003,7 +2003,7 @@ namespace Sapphire::Network::Packets::Server
     char otherName[32];
   };
 
-  struct FFXIVIpcGetItemSoundEffect : FFXIVIpcBasePacket< GetItemSoundEffect >
+  struct FFXIVIpcInventoryUnknown : FFXIVIpcBasePacket< InventoryUnknown >
   {
     uint32_t unk1;
     uint16_t unk2;
