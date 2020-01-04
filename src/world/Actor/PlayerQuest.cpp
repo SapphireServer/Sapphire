@@ -27,7 +27,7 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 
   updateQuestsCompleted( questId );
 
-  sendQuestTracker();
+  //sendQuestTracker(); already sent in removeQuest()
 }
 
 void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
