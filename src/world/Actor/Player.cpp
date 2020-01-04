@@ -2151,7 +2151,7 @@ bool Sapphire::Entity::Player::checkAction()
 
   if( m_pCurrentAction->update() )
   {
-    if ( m_pCurrentAction->isInterrupted() && m_pCurrentAction->getInterruptType() != Common::ActionInterruptType::DamageInterrupt )
+    if( m_pCurrentAction->isInterrupted() && m_pCurrentAction->getInterruptType() != Common::ActionInterruptType::DamageInterrupt )
     {
       // we moved (or whatever not damage interrupt) so we don't want to execute queued cast
       m_pQueuedAction = nullptr;
@@ -2161,7 +2161,7 @@ bool Sapphire::Entity::Player::checkAction()
     if( hasQueuedAction() )
     {
       sendDebug( "Queued skill start: {0}", m_pQueuedAction->getId() );
-      if ( m_pQueuedAction->hasCastTime() )
+      if( m_pQueuedAction->hasCastTime() )
       {
         setCurrentAction( m_pQueuedAction );
       }

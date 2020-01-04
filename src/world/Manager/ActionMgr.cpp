@@ -87,7 +87,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
     return;
   }
 
-  if ( player.getCurrentAction() )
+  if( player.getCurrentAction() )
   {
     player.sendDebug( "Skill queued: {0}", currentAction->getId() );
     player.setQueuedAction( currentAction );

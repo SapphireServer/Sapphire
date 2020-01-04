@@ -217,12 +217,12 @@ bool Action::Action::update()
     return true;
   }
 
-  if ( m_pTarget == nullptr && m_targetId != 0 )
+  if( m_pTarget == nullptr && m_targetId != 0 )
   {
     // try to search for the target actor
     for( auto actor : m_pSource->getInRangeActors( true ) )
     {
-      if ( actor->getId() == m_targetId )
+      if( actor->getId() == m_targetId )
       {
         m_pTarget = actor->getAsChara();
         break;
@@ -230,9 +230,9 @@ bool Action::Action::update()
     }
   }
 
-  if ( m_pTarget != nullptr )
+  if( m_pTarget != nullptr )
   {
-    if ( !m_pTarget->isAlive() )
+    if( !m_pTarget->isAlive() )
     {
       // interrupt the cast if target died
       setInterrupted(  Common::ActionInterruptType::RegularInterrupt );
