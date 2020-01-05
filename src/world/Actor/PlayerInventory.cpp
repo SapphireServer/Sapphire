@@ -678,7 +678,9 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
   if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
     unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem, true );
 
-
+  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
+      static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+    sendStatusEffectUpdate(); // send if any equip is changed
 }
 
 bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
@@ -813,6 +815,10 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
 
   updateContainer( toInventoryId, toSlot, fromItem );
   updateContainer( fromInventoryId, fromSlotId, toItem );
+
+  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
+    static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+    sendStatusEffectUpdate(); // send if any equip is changed
 }
 
 void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )
