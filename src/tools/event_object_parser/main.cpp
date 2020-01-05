@@ -284,10 +284,10 @@ int main( int argc, char* argv[] )
               uint32_t eobjlevelHierachyId = 0;
 
               auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-              id = pEobj->header.eobjId;
-              unknown = pEobj->header.unknown;
+              id = pEobj->data.eobjId;
+              unknown = pEobj->header.instanceId;
 
-              eobjlevelHierachyId = pEobj->header.levelHierachyId;
+              eobjlevelHierachyId = pEobj->data.levelHierachyId;
 
               std::string states = "";
               std::string gimmickName = "";
@@ -295,7 +295,7 @@ int main( int argc, char* argv[] )
               {
                 auto pGObj = pEntry1.get();
                 if( pGObj->getType() == LgbEntryType::Gimmick &&
-                    pGObj->header.unknown == pEobj->header.levelHierachyId )
+                    pGObj->header.instanceId == pEobj->data.levelHierachyId )
                 {
                   auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
                   char* dataSection = nullptr;
@@ -361,13 +361,13 @@ int main( int argc, char* argv[] )
               eobjects += "    instance.registerEObj( \"" + name + "\", " + std::to_string( id ) +
                             ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) +
                             ", " +
-                            "{ " + std::to_string( pObj->header.translation.x ) + "f, "
-                            + std::to_string( pObj->header.translation.y ) + "f, "
-                            + std::to_string( pObj->header.translation.z ) + "f }, " +
-                            std::to_string( pObj->header.scale.x ) + "f, " +
+                            "{ " + std::to_string( pObj->header.transform.translation.x ) + "f, "
+                            + std::to_string( pObj->header.transform.translation.y ) + "f, "
+                            + std::to_string( pObj->header.transform.translation.z ) + "f }, " +
+                            std::to_string( pObj->header.transform.scale.x ) + "f, " +
 
                             // the rotation inside the sgbs is the inverse of what the game uses
-                            std::to_string( pObj->header.rotation.y * -1.f ) + "f ); \n" + states;
+                            std::to_string( pObj->header.transform.rotation.y * -1.f ) + "f ); \n" + states;
             }
           }
         }

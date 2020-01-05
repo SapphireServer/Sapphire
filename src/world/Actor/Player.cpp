@@ -3,6 +3,9 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/Lgb.h>
+
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
@@ -19,6 +22,7 @@
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
 
 #include "Network/GameConnection.h"
@@ -346,12 +350,12 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   auto data = pExdData->get< Sapphire::Data::Aetheryte >( aetheryteId );
 
   if( data == nullptr )
-  {
     return;
-  }
 
   setStateFlag( PlayerStateFlag::BetweenAreas );
-  auto targetPos = pTeriMgr->getTerritoryPosition( data->level.at( 0 ) );
+
+  auto pInstanceObjectCache = m_pFw->get< InstanceObjectCache >();
+  auto pop = pInstanceObjectCache->getPopRange( data->territory, data->level[ 0 ] );
 
   Common::FFXIVARR_POSITION3 pos;
   pos.x = 0;
@@ -359,10 +363,18 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   pos.z = 0;
   float rot = 0;
 
-  if( targetPos != nullptr )
+  if( pop )
   {
-    pos = targetPos->getTargetPosition();
-    rot = targetPos->getTargetRotation();
+    sendDebug( "Teleport: popRange {0} found!", data->level.at( 0 ) );
+
+    pos.x = pop->header.transform.translation.x;
+    pos.y = pop->header.transform.translation.y;
+    pos.z = pop->header.transform.translation.z;
+    rot = pop->header.transform.rotation.y;
+  }
+  else
+  {
+    sendDebug( "Teleport: popRange {0} not found in {1}!", data->level[ 0 ], data->territory );
   }
 
   sendDebug( "Teleport: {0} {1} ({2})",
