@@ -105,7 +105,7 @@ void EffectBuilder::buildAndSendPackets()
 
   auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
-  while( m_resolvedEffects.size() > 0 )
+  while( !m_resolvedEffects.empty() )
   {
     auto packet = buildNextEffectPacket( globalSequence );
     m_sourceChara->sendToInRangeSet( packet, true );
@@ -188,7 +188,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
     {
       auto resultList = it->second;
-      assert( resultList->size() > 0 );
+      assert( !resultList->empty() );
       auto firstResult = resultList->data()[ 0 ];
       pEffectTargetId[ targetIndex ] = firstResult->getTarget()->getId();
       Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
