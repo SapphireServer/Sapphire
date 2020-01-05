@@ -39,7 +39,7 @@ public:
         return;
 
       // todo: this needs to be done properly and used queued zoning + aethernet animation
-      // moving a player inside an event will crash the game so we end it hre
+      // moving a player inside an event will crash the game so we end it here
       player.eventFinish( eventId, 1 );
 
       auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();

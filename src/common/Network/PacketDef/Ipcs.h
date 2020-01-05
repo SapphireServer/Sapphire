@@ -352,7 +352,7 @@ namespace Sapphire::Network::Packets
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
-    BuildPresetHandler = 0x014F, // updated 5.0
+    BuildPresetHandler = 0x0150, // updated 5.0
 
     TalkEventHandler = 0x02FD, // updated 5.18
     EmoteEventHandler = 0x0183, // updated 5.18

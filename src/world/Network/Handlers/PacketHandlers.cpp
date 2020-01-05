@@ -9,6 +9,9 @@
 #include <Database/DatabaseDef.h>
 #include <Util/Util.h>
 
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/Lgb.h>
+
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
@@ -20,6 +23,7 @@
 #include "Territory/Land.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/House.h"
+#include "Territory/InstanceObjectCache.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
@@ -274,44 +278,43 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                          Entity::Player& player )
 {
-  auto pTeriMgr = pFw->get< TerritoryMgr >();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
   const auto zoneLineId = packet.data().zoneLineId;
 
-  player.sendDebug( "Walking ZoneLine#{0}", zoneLineId );
+  auto pTeriMgr = pFw->get< TerritoryMgr >();
+  auto pInstanceObjectCache = pFw->get< InstanceObjectCache >();
+  auto tInfo = player.getCurrentTerritory()->getTerritoryTypeInfo();
 
-  auto pZone = player.getCurrentTerritory();
-
-  auto pLine = pTeriMgr->getTerritoryPosition( zoneLineId );
+  auto pExitRange = pInstanceObjectCache->getExitRange( player.getTerritoryTypeId(), zoneLineId );
 
   Common::FFXIVARR_POSITION3 targetPos{};
   uint32_t targetZone;
   float rotation = 0.0f;
 
-  if( pLine != nullptr )
+  if( pExitRange )
   {
-    player.sendDebug( "ZoneLine #{0} found.", zoneLineId );
-    targetPos = pLine->getTargetPosition();
-    targetZone = pLine->getTargetZoneId();
-    rotation = pLine->getTargetRotation();
+    auto pPopRange = pInstanceObjectCache->getPopRange( pExitRange->data.destTerritoryType,
+                                                        pExitRange->data.destInstanceObjectId );
+    if( pPopRange )
+    {
+      targetZone = pExitRange->data.destTerritoryType;
+      rotation = pPopRange->header.transform.rotation.y;
+      targetPos = Common::FFXIVARR_POSITION3 { pPopRange->header.transform.translation.x,
+                                               pPopRange->header.transform.translation.y,
+                                               pPopRange->header.transform.translation.z };
 
-    auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
-    preparePacket->data().targetZone = targetZone;
+      player.sendDebug( "ZoneLine #{0} found.", zoneLineId );
 
-    //ActorControlSelfPacket controlPacket( pPlayer, ActorControlType::DespawnZoneScreenMsg,
-    //                                     0x03, player.getId(), 0x01, targetZone );
-    player.queuePacket( preparePacket );
+      auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
+      preparePacket->data().targetZone = pExitRange->data.destTerritoryType;
+
+      player.queuePacket( preparePacket );
+
+    }
   }
-  else
-  {
-    // No zoneline found, revert to last zone
-    player.sendUrgent( "ZoneLine {0} not found.", zoneLineId );
-    targetPos.x = 0;
-    targetPos.y = 0;
-    targetPos.z = 0;
-    targetZone = pZone->getTerritoryTypeId();
-  }
+
+  player.sendDebug( "Walking ZoneLine#{0}", zoneLineId );
 
   player.performZoning( targetZone, targetPos, rotation );
 }
@@ -321,29 +324,23 @@ void Sapphire::Network::GameConnection::discoveryHandler( FrameworkPtr pFw,
                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
+  auto pInstanceObjectCache = pFw->get< InstanceObjectCache >();
+  auto tInfo = player.getCurrentTerritory()->getTerritoryTypeInfo();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
   const auto positionRef = packet.data().positionRef;
 
-  auto pDb = pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto pRefInfo = pInstanceObjectCache->getMapRange( player.getTerritoryTypeId(), positionRef );
 
-  auto pQR = pDb->query( "SELECT id, map_id, discover_id "
-                         "FROM discoveryinfo "
-                         "WHERE id = " + std::to_string( positionRef ) + ";" );
-
-  if( !pQR->next() )
-  {
-    player.sendDebug( "Discovery ref pos id#{0} not found!", positionRef );
-    return;
-  }
-
-  auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
-  discoveryPacket->data().map_id = pQR->getUInt( 2 );
-  discoveryPacket->data().map_part_id = pQR->getUInt( 3 );
-
-  player.queuePacket( discoveryPacket );
   player.sendDebug( "Discovery ref pos id#{0}", positionRef );
 
-  player.discover( pQR->getUInt16( 2 ), pQR->getUInt16( 3 ) );
+  if( pRefInfo )
+  {
+    auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
+    discoveryPacket->data().mapId = tInfo->map;
+    discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
+    player.queuePacket( discoveryPacket );
+    player.discover( tInfo->map, pRefInfo->data.discoveryIndex );
+  }
 
 }
 
