@@ -47,63 +47,53 @@ std::shared_ptr< std::vector< EffectResultPtr > > EffectBuilder::getResultList( 
   return it->second;
 }
 
-void EffectBuilder::healTarget( Entity::CharaPtr& target, uint32_t amount, Common::ActionHitSeverityType severity )
+void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  auto resultList = getResultList( target );
+  auto resultList = getResultList( effectTarget );
   assert( resultList );
 
-  EffectResultPtr nextResult = make_EffectResult( target, getResultDelayMs() );
-  nextResult->heal( amount, severity, false );
+  EffectResultPtr nextResult = make_EffectResult( healingTarget, getResultDelayMs() );
+  nextResult->heal( amount, severity, flag );
   resultList->push_back( std::move( nextResult ) );
 }
 
-void EffectBuilder::selfHeal( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount, Common::ActionHitSeverityType severity )
+void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
 {
   auto resultList = getResultList( target );
   assert( resultList );
 
-  EffectResultPtr nextResult = make_EffectResult( source, getResultDelayMs() ); // heal the source actor
-  nextResult->heal( amount, severity, true );
+  EffectResultPtr nextResult = make_EffectResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
+  nextResult->restoreMP( amount, flag );
   resultList->push_back( std::move( nextResult ) );
 }
 
-void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& source, uint32_t amount )
+void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  auto resultList = getResultList( target );
+  auto resultList = getResultList( effectTarget );
   assert( resultList );
 
-  EffectResultPtr nextResult = make_EffectResult( source, getResultDelayMs() ); // restore mp source actor
-  nextResult->restoreMP( amount );
-  resultList->push_back( std::move( nextResult ) );
-}
-
-void EffectBuilder::damageTarget( Entity::CharaPtr& target, uint32_t amount, Common::ActionHitSeverityType severity )
-{
-  auto resultList = getResultList( target );
-  assert( resultList );
-
-  EffectResultPtr nextResult = make_EffectResult( target, getResultDelayMs() );
-  nextResult->damage( amount, severity );
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, getResultDelayMs() );
+  nextResult->damage( amount, severity, flag );
   resultList->push_back( std::move( nextResult ) );
 }
 
 void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
   auto resultList = getResultList( target );
-  assert( resultList );
+  assert( resultList  );
 
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->startCombo( actionId );
   resultList->push_back( std::move( nextResult ) );
 }
 
-void EffectBuilder::comboVisualEffect( Entity::CharaPtr& target )
+void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 {
   auto resultList = getResultList( target );
-  assert( resultList );
+  assert( resultList  );
 
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
-  nextResult->comboVisualEffect();
+  nextResult->comboSucceed();
   resultList->push_back( std::move( nextResult ) );
 }
 
@@ -125,7 +115,7 @@ void EffectBuilder::buildAndSendPackets()
 
   auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
-  while( m_resolvedEffects.size() > 0 )
+  while( !m_resolvedEffects.empty() )
   {
     auto packet = buildNextEffectPacket( globalSequence );
     m_sourceChara->sendToInRangeSet( packet, true );
@@ -154,47 +144,46 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
       case 8:
       {
         auto p = makeZonePacket< Server::FFXIVIpcAoeEffect8 >( m_sourceChara->getId() );
-        pHeader = ( EffectHeader* )( &( p->data() ) );
-        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
-        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
-        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pHeader = reinterpret_cast< EffectHeader* >( &p->data() );
+        pEntry = reinterpret_cast< Common::EffectEntry* >( &p->data().effects );
+        pEffectTargetId = reinterpret_cast< uint64_t* >( &p->data().effectTargetId );
+        pFlag = reinterpret_cast< uint16_t* >( &p->data().unkFlag );
         effectPacket = std::move( p );
         break;
       }
       case 16:
       {
         auto p = makeZonePacket< Server::FFXIVIpcAoeEffect16 >( m_sourceChara->getId() );
-        pHeader = ( EffectHeader* )( &( p->data() ) );
-        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
-        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
-        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pHeader = reinterpret_cast< EffectHeader* >( &p->data() );
+        pEntry = reinterpret_cast< Common::EffectEntry* >( &p->data().effects );
+        pEffectTargetId = reinterpret_cast< uint64_t* >( &p->data().effectTargetId );
+        pFlag = reinterpret_cast< uint16_t* >( &p->data().unkFlag );
         effectPacket = std::move( p );
         break;
       }
       case 24:
       {
         auto p = makeZonePacket< Server::FFXIVIpcAoeEffect24 >( m_sourceChara->getId() );
-        pHeader = ( EffectHeader* )( &( p->data() ) );
-        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
-        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
-        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pHeader = reinterpret_cast< EffectHeader* >( &p->data() );
+        pEntry = reinterpret_cast< Common::EffectEntry* >( &p->data().effects );
+        pEffectTargetId = reinterpret_cast< uint64_t* >( &p->data().effectTargetId );
+        pFlag = reinterpret_cast< uint16_t* >( &p->data().unkFlag );
         effectPacket = std::move( p );
         break;
       }
       case 32:
       {
         auto p = makeZonePacket< Server::FFXIVIpcAoeEffect32 >( m_sourceChara->getId() );
-        pHeader = ( EffectHeader* )( &( p->data() ) );
-        pEntry = ( Common::EffectEntry* )( &( p->data().effects ) );
-        pEffectTargetId = ( uint64_t* )( &( p->data().effectTargetId ) );
-        pFlag = ( uint16_t* )( &( p->data().unkFlag ) );
+        pHeader = reinterpret_cast< EffectHeader* >( &p->data() );
+        pEntry = reinterpret_cast< Common::EffectEntry* >( &p->data().effects );
+        pEffectTargetId = reinterpret_cast< uint64_t* >( &p->data().effectTargetId );
+        pFlag = reinterpret_cast< uint16_t* >( &p->data().unkFlag );
         effectPacket = std::move( p );
         break;
       }
     }
-    assert( effectPacket != nullptr );
+    assert( effectPacket );
 
-    pHeader->actionAnimationId = m_sourceChara->getId();
     pHeader->actionId = m_actionId;
     pHeader->actionAnimationId = static_cast< uint16_t >( m_actionId );
     pHeader->animationTargetId = m_sourceChara->getId();
@@ -209,7 +198,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
     {
       auto resultList = it->second;
-      assert( resultList->size() > 0 );
+      assert( !resultList->empty() );
       auto firstResult = resultList->data()[ 0 ];
       pEffectTargetId[ targetIndex ] = firstResult->getTarget()->getId();
       Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
@@ -239,7 +228,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
   else
   {
     auto resultList = m_resolvedEffects.begin()->second;
-    assert( resultList->size() > 0 );
+    assert( !resultList->empty() );
     auto firstResult = resultList->data()[ 0 ];
     Logger::debug( " - id: {}", firstResult->getTarget()->getId() );
 
