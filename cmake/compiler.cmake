@@ -6,6 +6,7 @@ else()
   add_definitions( -D_WIN32_WINNT=0x601 )
   add_definitions( -D_CRT_SECURE_NO_WARNINGS )
   add_definitions( -DNOMINMAX )
+  add_definitions( -D_SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING )
       
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc" )
   message( STATUS "Enabling Build with Multiple Processes.." )
