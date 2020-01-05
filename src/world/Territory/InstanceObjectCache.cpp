@@ -12,6 +12,8 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
+#include <Logging/Logger.h>
+
 Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework > pFramework ) :
   m_pFramework( pFramework )
 {
@@ -35,10 +37,6 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
     if( path.empty() )
       continue;
 
-    // TODO: Horrible workaround... Fails if expansion is not installed
-    if( path.find( "ex3" ) != std::string::npos )
-      continue;
-
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
 
     // TODO: it does feel like this needs to be streamlined into the datReader instead of being done here...
@@ -47,10 +45,21 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
     std::vector< char > bgSection;
     std::vector< char > planmapSection;
 
-    auto test_file = pExd->getGameData()->getFile( bgLgbPath );
-    bgSection = test_file->access_data_sections().at( 0 );
+    std::unique_ptr< xiv::dat::File > bgFile;
+    std::unique_ptr< xiv::dat::File > planmap_file;
 
-    auto planmap_file = pExd->getGameData()->getFile( planmapLgbPath );
+    try
+    {
+      bgFile = pExd->getGameData()->getFile( bgLgbPath );
+      planmap_file = pExd->getGameData()->getFile( planmapLgbPath );
+    }
+    catch( std::runtime_error& )
+    {
+      // ignore files that aren't found
+      continue;
+    }
+
+    bgSection = bgFile->access_data_sections().at( 0 );
     planmapSection = planmap_file->access_data_sections().at( 0 );
 
     std::vector< std::string > stringList;
@@ -89,6 +98,11 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
     }
   }
   std::cout << "\n";
+
+  Logger::debug(
+    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {}",
+    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size()
+  );
 }
 
 

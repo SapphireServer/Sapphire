@@ -53,6 +53,11 @@ namespace Sapphire
         it->second[ entry.header.instanceId ] = pShared;
       }
     }
+
+    uint32_t size() const
+    {
+      return m_objectCache.size();
+    }
   };
 
   class InstanceObjectCache
