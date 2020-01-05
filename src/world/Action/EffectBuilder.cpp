@@ -172,7 +172,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
         break;
       }
     }
-    assert( effectPacket != nullptr );
+    assert( effectPacket );
 
     pHeader->actionId = m_actionId;
     pHeader->actionAnimationId = static_cast< uint16_t >( m_actionId );

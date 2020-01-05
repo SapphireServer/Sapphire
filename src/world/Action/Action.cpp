@@ -461,7 +461,7 @@ void Action::Action::buildEffects()
 
   // when aoe, these effects are in the target whatever is hit first
   bool shouldRestoreMP = true;
-  bool shouldShowComboEffect = true;
+  bool shouldApplyComboSucceedEffect = true;
 
   for( auto& actor : m_hitActors )
   {
@@ -473,10 +473,10 @@ void Action::Action::buildEffects()
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
-      if( isCorrectCombo() && shouldShowComboEffect )
+      if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
         m_effectBuilder->comboSucceed( actor );
-        shouldShowComboEffect = false;
+        shouldApplyComboSucceedEffect = false;
       }
 
       if( !isComboAction() || isCorrectCombo() )
