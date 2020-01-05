@@ -754,20 +754,18 @@ bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
   // todo: are there any server side eobjs that players can hit?
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
-
-  if( m_lutEntry.potency > 0 && chara->getId() == m_pSource->getId() )
-  {
-    // damage action shouldn't hit self
+  
+  if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
     return false;
-  }
-
-  if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() )
-  {
-    // can't deal damage or heal a dead entity
+  
+  if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
     return false;
-  }
 
-  // todo: handle things such based on canTargetX
+  if( m_lutEntry.potency > 0 && m_pSource->getObjKind() == chara->getObjKind() ) // !m_canTargetFriendly not working for aoe
+    return false;
+
+  if( ( m_lutEntry.potency == 0 && m_lutEntry.curePotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
+    return false;
 
   return true;
 }

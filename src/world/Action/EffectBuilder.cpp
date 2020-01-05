@@ -115,11 +115,12 @@ void EffectBuilder::buildAndSendPackets()
 
   auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
-  while( !m_resolvedEffects.empty() )
+  do // we want to send at least one packet even nothing is hit so other players can see
   {
     auto packet = buildNextEffectPacket( globalSequence );
     m_sourceChara->sendToInRangeSet( packet, true );
   }
+  while( !m_resolvedEffects.empty() );
 }
 
 std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_t globalSequence )
@@ -128,9 +129,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
 
   if( remainingTargetCount > 1 ) // use AoeEffect packets
   {
-    int packetSize = remainingTargetCount <= 8 ? 8 :
-                   ( remainingTargetCount <= 16 ? 16 :
-                   ( remainingTargetCount <= 24 ? 24 : 32 ) );
+    int packetSize = remainingTargetCount <= 8 ? 8 : ( remainingTargetCount <= 16 ? 16 : ( remainingTargetCount <= 24 ? 24 : 32 ) );
 
     using EffectHeader = Server::FFXIVIpcAoeEffect< 8 >; // dummy type to access header part of the packet
 
@@ -225,7 +224,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
 
     return effectPacket;
   }
-  else
+  else if ( remainingTargetCount == 1 ) // use Effect for single target
   {
     auto resultList = m_resolvedEffects.begin()->second;
     assert( !resultList->empty() );
@@ -248,6 +247,22 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     resultList->clear();
 
     m_resolvedEffects.clear();
+
+    return effectPacket;
+  }
+  else // nothing is hit, this only happens when using aoe and AoeEffect8 is used on retail
+  {
+    auto effectPacket = makeZonePacket< Server::FFXIVIpcAoeEffect8 >( m_sourceChara->getId() );
+
+    effectPacket->data().actionId = m_actionId;
+    effectPacket->data().actionAnimationId = static_cast< uint16_t >( m_actionId );
+    effectPacket->data().animationTargetId = m_sourceChara->getId();
+    effectPacket->data().someTargetId = 0xE0000000;
+    effectPacket->data().rotation = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
+    effectPacket->data().effectDisplayType = Common::ActionEffectDisplayType::HideActionName;
+    effectPacket->data().effectCount = 0;
+    effectPacket->data().sourceSequence = m_sequence;
+    effectPacket->data().globalSequence = globalSequence;
 
     return effectPacket;
   }
