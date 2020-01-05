@@ -34,7 +34,7 @@ void Sapphire::House::updateHouseDb()
   auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_UP );
   stmt->setUInt( 6, m_houseId );
 
-  stmt->setInt64( 1, m_buildTime );
+  stmt->setInt64( 1, static_cast< int64_t >( m_buildTime ) );
   stmt->setBool( 2, m_hasAetheryte );
 
   stmt->setString( 3, m_estateComment );

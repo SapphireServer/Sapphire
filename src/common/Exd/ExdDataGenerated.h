@@ -20,6 +20,7 @@ class ExdDataGenerated;
 
 struct Achievement;
 struct AchievementCategory;
+struct AchievementHideCondition;
 struct AchievementKind;
 struct Action;
 struct ActionCastTimeline;
@@ -38,7 +39,6 @@ struct ActivityFeedCaptions;
 struct ActivityFeedGroupCaptions;
 struct ActivityFeedImages;
 struct Addon;
-struct AddonHud;
 struct Adventure;
 struct AdventureExPhase;
 struct AetherCurrent;
@@ -79,6 +79,7 @@ struct BeastRankBonus;
 struct BeastReputationRank;
 struct BeastTribe;
 struct Behavior;
+struct BenchmarkOverrideEquipment;
 struct BGM;
 struct BGMFade;
 struct BGMSituation;
@@ -137,6 +138,7 @@ struct ContentGauge;
 struct ContentGaugeColor;
 struct ContentMemberType;
 struct ContentNpcTalk;
+struct ContentRandomSelect;
 struct ContentRoulette;
 struct ContentRouletteOpenRule;
 struct ContentRouletteRoleBonus;
@@ -146,6 +148,7 @@ struct ContentTalkParam;
 struct ContentType;
 struct CraftAction;
 struct CraftLeve;
+struct CraftLevelDifference;
 struct CraftType;
 struct Credit;
 struct CreditBackImage;
@@ -159,6 +162,10 @@ struct CustomTalkNestHandlers;
 struct Cutscene;
 struct CutScreenImage;
 struct DailySupplyItem;
+struct DawnContent;
+struct DawnGrowMember;
+struct DawnMemberUIParam;
+struct DawnQuestMember;
 struct DeepDungeon;
 struct DeepDungeonBan;
 struct DeepDungeonDanger;
@@ -211,6 +218,7 @@ struct EventItemTimeline;
 struct ExportedSG;
 struct ExVersion;
 struct Fate;
+struct FateProgressUI;
 struct FCActivity;
 struct FCActivityCategory;
 struct FCAuthority;
@@ -229,6 +237,8 @@ struct FishingSpot;
 struct FishParameter;
 struct Frontline03;
 struct Frontline04;
+struct FurnitureCatalogCategory;
+struct FurnitureCatalogItemList;
 struct GardeningSeed;
 struct GatheringCondition;
 struct GatheringExp;
@@ -276,6 +286,10 @@ struct GoldSaucerTextData;
 struct GrandCompany;
 struct GrandCompanyRank;
 struct GuardianDeity;
+struct Guide;
+struct GuidePage;
+struct GuidePageString;
+struct GuideTitle;
 struct GuildleveAssignment;
 struct GuildleveAssignmentCategory;
 struct GuildOrder;
@@ -299,6 +313,9 @@ struct HousingYardObject;
 struct HowTo;
 struct HowToCategory;
 struct HowToPage;
+struct HugeCraftworksNpc;
+struct HugeCraftworksRank;
+struct IndividualWeather;
 struct InstanceContent;
 struct InstanceContentBuff;
 struct InstanceContentCSBonus;
@@ -312,6 +329,8 @@ struct ItemSearchCategory;
 struct ItemSeries;
 struct ItemSpecialBonus;
 struct ItemUICategory;
+struct JobHudManual;
+struct JobHudManualPriority;
 struct JournalCategory;
 struct JournalGenre;
 struct JournalSection;
@@ -340,11 +359,16 @@ struct Marker;
 struct MasterpieceSupplyDuty;
 struct MasterpieceSupplyMultiplier;
 struct Materia;
+struct MateriaJoinRate;
+struct MateriaJoinRateGatherCraft;
 struct MiniGameRA;
 struct MinionRace;
 struct MinionRules;
 struct MinionSkillType;
+struct MobHuntOrder;
 struct MobHuntOrderType;
+struct MobHuntReward;
+struct MobHuntRewardCap;
 struct MobHuntTarget;
 struct ModelChara;
 struct ModelSkeleton;
@@ -361,10 +385,13 @@ struct MoveTimeline;
 struct MoveVfx;
 struct NotebookDivision;
 struct NotebookDivisionCategory;
+struct NotoriousMonster;
 struct NpcEquip;
 struct NpcYell;
 struct Omen;
 struct OnlineStatus;
+struct OpenContent;
+struct OpenContentCandidateName;
 struct Opening;
 struct Orchestrion;
 struct OrchestrionCategory;
@@ -436,6 +463,8 @@ struct SkyIsland2Mission;
 struct SkyIsland2MissionDetail;
 struct SkyIsland2MissionType;
 struct SkyIsland2RangeType;
+struct SnipeTalk;
+struct SnipeTalkName;
 struct SpearfishingItem;
 struct SpearfishingNotebook;
 struct SpearfishingRecordPage;
@@ -448,6 +477,7 @@ struct StatusHitEffect;
 struct StatusLoopVFX;
 struct Story;
 struct SubmarineExploration;
+struct SubmarineMap;
 struct SubmarinePart;
 struct SubmarineRank;
 struct SwitchTalk;
@@ -494,6 +524,8 @@ struct WeeklyBingoText;
 struct WeeklyLotBonus;
 struct World;
 struct WorldDCGroupType;
+struct YardCatalogCategory;
+struct YardCatalogItemList;
 struct YKW;
 struct ZoneSharedGroup;
 
@@ -511,7 +543,7 @@ struct Achievement
   int32_t key;
   std::vector< int32_t > data;
   uint16_t order;
-  uint8_t initialHide;
+  uint8_t achievementHideCondition;
 
   Achievement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -523,6 +555,15 @@ struct AchievementCategory
   bool hideCategory;
 
   AchievementCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct AchievementHideCondition
+{
+  bool hideAchievement;
+  bool hideName;
+  bool hideConditions;
+
+  AchievementHideCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AchievementKind
@@ -542,6 +583,7 @@ struct Action
   int16_t animationEnd;
   uint16_t actionTimelineHit;
   int8_t classJob;
+  uint8_t behaviourType;
   uint8_t classJobLevel;
   bool isRoleAction;
   int8_t range;
@@ -563,6 +605,7 @@ struct Action
   uint16_t cast100ms;
   uint16_t recast100ms;
   uint8_t cooldownGroup;
+  uint8_t maxCharges;
   int8_t attackType;
   uint8_t aspect;
   uint8_t actionProcStatus;
@@ -570,7 +613,7 @@ struct Action
   uint32_t unlockLink;
   uint8_t classJobCategory;
   bool affectsPosition;
-  uint8_t omen;
+  uint16_t omen;
   bool isPvP;
   bool isPlayerAction;
 
@@ -702,15 +745,6 @@ struct Addon
   std::string text;
 
   Addon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct AddonHud
-{
-  std::string _long;
-  std::string _short;
-  std::string function;
-
-  AddonHud( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Adventure
@@ -1131,6 +1165,36 @@ struct Behavior
   Behavior( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct BenchmarkOverrideEquipment
+{
+  uint64_t modelMainHand;
+  uint8_t dyeMainHand;
+  uint64_t modelOffHand;
+  uint8_t dyeOffHand;
+  uint32_t modelHead;
+  uint8_t dyeHead;
+  uint32_t modelBody;
+  uint8_t dyeBody;
+  uint32_t modelHands;
+  uint8_t dyeHands;
+  uint32_t modelLegs;
+  uint8_t dyeLegs;
+  uint32_t modelFeet;
+  uint8_t dyeFeet;
+  uint32_t modelEars;
+  uint8_t dyeEars;
+  uint32_t modelNeck;
+  uint8_t dyeNeck;
+  uint32_t modelWrists;
+  uint8_t dyeWrists;
+  uint32_t modelLeftRing;
+  uint8_t dyeLeftRing;
+  uint32_t modelRightRing;
+  uint8_t dyeRightRing;
+
+  BenchmarkOverrideEquipment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct BGM
 {
   std::string file;
@@ -1368,6 +1432,7 @@ struct Calendar
 
 struct CharaMakeCustomize
 {
+  uint8_t featureID;
   uint32_t icon;
   uint16_t data;
   bool isPurchasable;
@@ -1481,6 +1546,7 @@ struct ClassJob
   std::string abbreviation;
   uint8_t classJobCategory;
   int8_t expArrayIndex;
+  uint8_t jobIndex;
   uint16_t modifierHitPoints;
   uint16_t modifierManaPoints;
   uint16_t modifierStrength;
@@ -1498,6 +1564,7 @@ struct ClassJob
   uint16_t limitBreak1;
   uint16_t limitBreak2;
   uint16_t limitBreak3;
+  uint8_t uIPriority;
   uint32_t itemSoulCrystal;
   uint32_t unlockQuest;
   uint32_t relicQuest;
@@ -1505,6 +1572,7 @@ struct ClassJob
   uint8_t startingLevel;
   uint8_t partyBonus;
   bool isLimitedJob;
+  bool canQueueForDuty;
 
   ClassJob( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1548,6 +1616,9 @@ struct ClassJobCategory
   bool aST;
   bool sAM;
   bool rDM;
+  bool bLU;
+  bool gNB;
+  bool dNC;
 
   ClassJobCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1737,6 +1808,7 @@ struct ContentFinderCondition
   uint8_t classJobLevelSync;
   uint16_t itemLevelRequired;
   uint16_t itemLevelSync;
+  bool allowUndersized;
   bool allowReplacement;
   bool highEndDuty;
   bool dutyRecorderAllowed;
@@ -1802,6 +1874,13 @@ struct ContentNpcTalk
   std::vector< uint32_t > contentTalk;
 
   ContentNpcTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct ContentRandomSelect
+{
+  uint16_t name;
+
+  ContentRandomSelect( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentRoulette
@@ -1919,6 +1998,15 @@ struct CraftLeve
   CraftLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct CraftLevelDifference
+{
+  int16_t difference;
+  int16_t progressFactor;
+  int16_t qualityFactor;
+
+  CraftLevelDifference( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct CraftType
 {
   std::string name;
@@ -2026,6 +2114,47 @@ struct DailySupplyItem
 {
 
   DailySupplyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DawnContent
+{
+  uint32_t content;
+  uint32_t exp;
+
+  DawnContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DawnGrowMember
+{
+  uint32_t member;
+  uint32_t imageName;
+  uint32_t bigImageOld;
+  uint32_t bigImageNew;
+  uint32_t smallImageOld;
+  uint32_t smallImageNew;
+  uint8_t _class;
+
+  DawnGrowMember( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DawnMemberUIParam
+{
+  std::string classSingular;
+  uint32_t voiceLine;
+  std::string classPlural;
+
+  DawnMemberUIParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DawnQuestMember
+{
+  uint32_t member;
+  uint32_t imageName;
+  uint32_t bigImageOld;
+  uint32_t bigImageNew;
+  uint8_t _class;
+
+  DawnQuestMember( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct DeepDungeon
@@ -2165,23 +2294,23 @@ struct DeliveryQuest
 
 struct DescriptionPage
 {
-  uint32_t text1;
+  uint16_t text1;
   uint32_t image1;
-  uint32_t text2;
+  uint16_t text2;
   uint32_t image2;
-  uint32_t text3;
+  uint16_t text3;
   uint32_t image3;
-  uint32_t text4;
+  uint16_t text4;
   uint32_t image4;
-  uint32_t text5;
+  uint16_t text5;
   uint32_t image5;
-  uint32_t text6;
+  uint16_t text6;
   uint32_t image6;
-  uint32_t text7;
+  uint16_t text7;
   uint32_t image7;
-  uint32_t text8;
+  uint16_t text8;
   uint32_t image8;
-  uint32_t text9;
+  uint16_t text9;
   uint32_t image9;
 
   DescriptionPage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -2612,6 +2741,17 @@ struct Fate
   Fate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct FateProgressUI
+{
+  int32_t location;
+  int32_t achievement;
+  uint8_t reqFatesToRank2;
+  uint8_t reqFatesToRank3;
+  uint8_t displayOrder;
+
+  FateProgressUI( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct FCActivity
 {
   std::string text;
@@ -2775,6 +2915,22 @@ struct Frontline04
   Frontline04( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct FurnitureCatalogCategory
+{
+  std::string category;
+
+  FurnitureCatalogCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct FurnitureCatalogItemList
+{
+  uint16_t category;
+  int32_t item;
+  uint16_t patch;
+
+  FurnitureCatalogItemList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct GardeningSeed
 {
   uint32_t item;
@@ -2792,7 +2948,7 @@ struct GatheringCondition
 
 struct GatheringExp
 {
-  uint16_t exp;
+  int32_t exp;
 
   GatheringExp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3223,6 +3379,36 @@ struct GuardianDeity
   GuardianDeity( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct Guide
+{
+  uint16_t guideTitle;
+  uint16_t guidePage;
+
+  Guide( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GuidePage
+{
+  uint8_t key;
+  uint32_t output;
+
+  GuidePage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GuidePageString
+{
+  std::string string;
+
+  GuidePageString( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GuideTitle
+{
+  std::string title;
+
+  GuideTitle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct GuildleveAssignment
 {
   uint32_t assignmentTalk;
@@ -3442,6 +3628,37 @@ struct HowToPage
   int32_t image;
 
   HowToPage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct HugeCraftworksNpc
+{
+  uint32_t eNpcResident;
+  uint16_t classJobCategory;
+  std::vector< uint32_t > itemRequested;
+  std::vector< uint8_t > qtyRequested;
+  std::vector< uint32_t > itemReward;
+  std::vector< uint8_t > qtyItemReward;
+  std::vector< uint32_t > itemUnkown;
+  std::vector< uint8_t > qtyItemUnkown;
+  std::string transient;
+
+  HugeCraftworksNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct HugeCraftworksRank
+{
+  uint8_t crafterLevel;
+  uint32_t expRewardPerItem;
+
+  HugeCraftworksRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct IndividualWeather
+{
+  std::vector< uint8_t > weather;
+  std::vector< uint32_t > quest;
+
+  IndividualWeather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct InstanceContent
@@ -3704,6 +3921,21 @@ struct ItemUICategory
   uint8_t orderMajor;
 
   ItemUICategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct JobHudManual
+{
+  uint32_t action;
+  uint16_t guide;
+
+  JobHudManual( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct JobHudManualPriority
+{
+  std::vector< uint8_t > jobHudManual;
+
+  JobHudManualPriority( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct JournalCategory
@@ -3975,6 +4207,22 @@ struct Materia
   Materia( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MateriaJoinRate
+{
+  std::vector< float > NQOvermeldSlot;
+  std::vector< float > HQOvermeldSlot;
+
+  MateriaJoinRate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MateriaJoinRateGatherCraft
+{
+  std::vector< float > NQOvermeldSlot;
+  std::vector< float > HQOvermeldSlot;
+
+  MateriaJoinRateGatherCraft( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct MiniGameRA
 {
   int32_t icon;
@@ -4005,12 +4253,39 @@ struct MinionSkillType
   MinionSkillType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MobHuntOrder
+{
+  uint16_t target;
+  uint8_t stars;
+  uint8_t mobHuntReward;
+
+  MobHuntOrder( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct MobHuntOrderType
 {
   uint32_t quest;
   uint32_t eventItem;
+  uint16_t orderStart;
+  uint8_t orderAmount;
 
   MobHuntOrderType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MobHuntReward
+{
+  uint32_t expReward;
+  uint16_t gilReward;
+  uint16_t currencyReward;
+
+  MobHuntReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MobHuntRewardCap
+{
+  uint32_t expCap;
+
+  MobHuntRewardCap( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MobHuntTarget
@@ -4100,6 +4375,22 @@ struct MountAction
 
 struct MountCustomize
 {
+  uint16_t hyurMaleScale;
+  uint16_t hyurFemaleScale;
+  uint16_t elezenMaleScale;
+  uint16_t elezenFemaleScale;
+  uint16_t lalaMaleScale;
+  uint16_t lalaFemaleScale;
+  uint16_t miqoMaleScale;
+  uint16_t miqoFemaleScale;
+  uint16_t roeMaleScale;
+  uint16_t roeFemaleScale;
+  uint16_t auRaMaleScale;
+  uint16_t auRaFemaleScale;
+  uint16_t hrothgarMaleScale;
+  uint16_t hrothgarFemaleScale;
+  uint16_t vieraMaleScale;
+  uint16_t vieraFemaleScale;
   uint8_t hyurMaleCameraHeight;
   uint8_t hyurFemaleCameraHeight;
   uint8_t elezenMaleCameraHeight;
@@ -4112,6 +4403,10 @@ struct MountCustomize
   uint8_t roeFemaleCameraHeight;
   uint8_t auRaMaleCameraHeight;
   uint8_t auRaFemaleCameraHeight;
+  uint8_t hrothgarMaleCameraHeight;
+  uint8_t hrothgarRoeFemaleCameraHeight;
+  uint8_t vieraMaleCameraHeight;
+  uint8_t vieraFemaleCameraHeight;
 
   MountCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4178,6 +4473,15 @@ struct NotebookDivisionCategory
   NotebookDivisionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct NotoriousMonster
+{
+  int32_t bNpcBase;
+  uint8_t rank;
+  uint32_t bNpcName;
+
+  NotoriousMonster( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct NpcEquip
 {
   uint64_t modelMainHand;
@@ -4232,6 +4536,21 @@ struct OnlineStatus
   OnlineStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct OpenContent
+{
+  std::vector< uint16_t > content;
+  std::vector< uint32_t > candidateName;
+
+  OpenContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct OpenContentCandidateName
+{
+  std::string name;
+
+  OpenContentCandidateName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct Opening
 {
   std::string name;
@@ -4282,6 +4601,7 @@ struct ParamGrow
   uint16_t hpModifier;
   int32_t huntingLogExpReward;
   uint16_t itemLevelSync;
+  uint16_t craftingLevel;
 
   ParamGrow( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4486,7 +4806,7 @@ struct Quest
   bool isHouseRequired;
   uint8_t deliveryQuest;
   uint32_t issuerStart;
-  uint16_t behavior;
+  uint32_t behavior;
   uint32_t targetEnd;
   bool isRepeatable;
   uint8_t repeatIntervalType;
@@ -4539,6 +4859,7 @@ struct Quest
 struct QuestBattle
 {
   int32_t quest;
+  uint8_t questBattleScene;
   uint16_t timeLimit;
   uint16_t levelSync;
   std::vector< std::string > scriptInstruction;
@@ -4680,6 +5001,7 @@ struct Recipe
   int32_t itemResult;
   uint8_t amountResult;
   bool isSecondary;
+  uint8_t materialQualityFactor;
   uint16_t difficultyFactor;
   uint16_t qualityFactor;
   uint16_t durabilityFactor;
@@ -4704,6 +5026,7 @@ struct RecipeLevelTable
   uint8_t classJobLevel;
   uint8_t stars;
   uint16_t suggestedCraftsmanship;
+  uint16_t suggestedControl;
   uint16_t difficulty;
   uint32_t quality;
   uint16_t durability;
@@ -4985,6 +5308,21 @@ struct SkyIsland2RangeType
   SkyIsland2RangeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct SnipeTalk
+{
+  uint16_t name;
+  std::string text;
+
+  SnipeTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct SnipeTalkName
+{
+  std::string name;
+
+  SnipeTalkName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct SpearfishingItem
 {
   std::string description;
@@ -5112,6 +5450,14 @@ struct SubmarineExploration
   SubmarineExploration( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct SubmarineMap
+{
+  std::string name;
+  uint32_t image;
+
+  SubmarineMap( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct SubmarinePart
 {
   uint8_t slot;
@@ -5151,6 +5497,7 @@ struct TerritoryType
   uint16_t placeNameZone;
   uint16_t placeName;
   uint16_t map;
+  uint8_t loadingImage;
   uint8_t territoryIntendedUse;
   uint8_t weatherRate;
   int32_t placeNameRegionIcon;
@@ -5551,6 +5898,22 @@ struct WorldDCGroupType
   WorldDCGroupType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct YardCatalogCategory
+{
+  std::string category;
+
+  YardCatalogCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct YardCatalogItemList
+{
+  uint16_t category;
+  int32_t item;
+  uint16_t patch;
+
+  YardCatalogItemList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct YKW
 {
   uint32_t item;
@@ -5631,6 +5994,7 @@ struct ZoneSharedGroup
 
      xiv::exd::Exd m_AchievementDat;
      xiv::exd::Exd m_AchievementCategoryDat;
+     xiv::exd::Exd m_AchievementHideConditionDat;
      xiv::exd::Exd m_AchievementKindDat;
      xiv::exd::Exd m_ActionDat;
      xiv::exd::Exd m_ActionCastTimelineDat;
@@ -5649,7 +6013,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ActivityFeedGroupCaptionsDat;
      xiv::exd::Exd m_ActivityFeedImagesDat;
      xiv::exd::Exd m_AddonDat;
-     xiv::exd::Exd m_AddonHudDat;
      xiv::exd::Exd m_AdventureDat;
      xiv::exd::Exd m_AdventureExPhaseDat;
      xiv::exd::Exd m_AetherCurrentDat;
@@ -5690,6 +6053,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_BeastReputationRankDat;
      xiv::exd::Exd m_BeastTribeDat;
      xiv::exd::Exd m_BehaviorDat;
+     xiv::exd::Exd m_BenchmarkOverrideEquipmentDat;
      xiv::exd::Exd m_BGMDat;
      xiv::exd::Exd m_BGMFadeDat;
      xiv::exd::Exd m_BGMSituationDat;
@@ -5748,6 +6112,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ContentGaugeColorDat;
      xiv::exd::Exd m_ContentMemberTypeDat;
      xiv::exd::Exd m_ContentNpcTalkDat;
+     xiv::exd::Exd m_ContentRandomSelectDat;
      xiv::exd::Exd m_ContentRouletteDat;
      xiv::exd::Exd m_ContentRouletteOpenRuleDat;
      xiv::exd::Exd m_ContentRouletteRoleBonusDat;
@@ -5757,6 +6122,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ContentTypeDat;
      xiv::exd::Exd m_CraftActionDat;
      xiv::exd::Exd m_CraftLeveDat;
+     xiv::exd::Exd m_CraftLevelDifferenceDat;
      xiv::exd::Exd m_CraftTypeDat;
      xiv::exd::Exd m_CreditDat;
      xiv::exd::Exd m_CreditBackImageDat;
@@ -5770,6 +6136,10 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CutsceneDat;
      xiv::exd::Exd m_CutScreenImageDat;
      xiv::exd::Exd m_DailySupplyItemDat;
+     xiv::exd::Exd m_DawnContentDat;
+     xiv::exd::Exd m_DawnGrowMemberDat;
+     xiv::exd::Exd m_DawnMemberUIParamDat;
+     xiv::exd::Exd m_DawnQuestMemberDat;
      xiv::exd::Exd m_DeepDungeonDat;
      xiv::exd::Exd m_DeepDungeonBanDat;
      xiv::exd::Exd m_DeepDungeonDangerDat;
@@ -5822,6 +6192,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ExportedSGDat;
      xiv::exd::Exd m_ExVersionDat;
      xiv::exd::Exd m_FateDat;
+     xiv::exd::Exd m_FateProgressUIDat;
      xiv::exd::Exd m_FCActivityDat;
      xiv::exd::Exd m_FCActivityCategoryDat;
      xiv::exd::Exd m_FCAuthorityDat;
@@ -5840,6 +6211,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_FishParameterDat;
      xiv::exd::Exd m_Frontline03Dat;
      xiv::exd::Exd m_Frontline04Dat;
+     xiv::exd::Exd m_FurnitureCatalogCategoryDat;
+     xiv::exd::Exd m_FurnitureCatalogItemListDat;
      xiv::exd::Exd m_GardeningSeedDat;
      xiv::exd::Exd m_GatheringConditionDat;
      xiv::exd::Exd m_GatheringExpDat;
@@ -5887,6 +6260,10 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GrandCompanyDat;
      xiv::exd::Exd m_GrandCompanyRankDat;
      xiv::exd::Exd m_GuardianDeityDat;
+     xiv::exd::Exd m_GuideDat;
+     xiv::exd::Exd m_GuidePageDat;
+     xiv::exd::Exd m_GuidePageStringDat;
+     xiv::exd::Exd m_GuideTitleDat;
      xiv::exd::Exd m_GuildleveAssignmentDat;
      xiv::exd::Exd m_GuildleveAssignmentCategoryDat;
      xiv::exd::Exd m_GuildOrderDat;
@@ -5910,6 +6287,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_HowToDat;
      xiv::exd::Exd m_HowToCategoryDat;
      xiv::exd::Exd m_HowToPageDat;
+     xiv::exd::Exd m_HugeCraftworksNpcDat;
+     xiv::exd::Exd m_HugeCraftworksRankDat;
+     xiv::exd::Exd m_IndividualWeatherDat;
      xiv::exd::Exd m_InstanceContentDat;
      xiv::exd::Exd m_InstanceContentBuffDat;
      xiv::exd::Exd m_InstanceContentCSBonusDat;
@@ -5923,6 +6303,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ItemSeriesDat;
      xiv::exd::Exd m_ItemSpecialBonusDat;
      xiv::exd::Exd m_ItemUICategoryDat;
+     xiv::exd::Exd m_JobHudManualDat;
+     xiv::exd::Exd m_JobHudManualPriorityDat;
      xiv::exd::Exd m_JournalCategoryDat;
      xiv::exd::Exd m_JournalGenreDat;
      xiv::exd::Exd m_JournalSectionDat;
@@ -5951,11 +6333,16 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MasterpieceSupplyDutyDat;
      xiv::exd::Exd m_MasterpieceSupplyMultiplierDat;
      xiv::exd::Exd m_MateriaDat;
+     xiv::exd::Exd m_MateriaJoinRateDat;
+     xiv::exd::Exd m_MateriaJoinRateGatherCraftDat;
      xiv::exd::Exd m_MiniGameRADat;
      xiv::exd::Exd m_MinionRaceDat;
      xiv::exd::Exd m_MinionRulesDat;
      xiv::exd::Exd m_MinionSkillTypeDat;
+     xiv::exd::Exd m_MobHuntOrderDat;
      xiv::exd::Exd m_MobHuntOrderTypeDat;
+     xiv::exd::Exd m_MobHuntRewardDat;
+     xiv::exd::Exd m_MobHuntRewardCapDat;
      xiv::exd::Exd m_MobHuntTargetDat;
      xiv::exd::Exd m_ModelCharaDat;
      xiv::exd::Exd m_ModelSkeletonDat;
@@ -5972,10 +6359,13 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MoveVfxDat;
      xiv::exd::Exd m_NotebookDivisionDat;
      xiv::exd::Exd m_NotebookDivisionCategoryDat;
+     xiv::exd::Exd m_NotoriousMonsterDat;
      xiv::exd::Exd m_NpcEquipDat;
      xiv::exd::Exd m_NpcYellDat;
      xiv::exd::Exd m_OmenDat;
      xiv::exd::Exd m_OnlineStatusDat;
+     xiv::exd::Exd m_OpenContentDat;
+     xiv::exd::Exd m_OpenContentCandidateNameDat;
      xiv::exd::Exd m_OpeningDat;
      xiv::exd::Exd m_OrchestrionDat;
      xiv::exd::Exd m_OrchestrionCategoryDat;
@@ -6047,6 +6437,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_SkyIsland2MissionDetailDat;
      xiv::exd::Exd m_SkyIsland2MissionTypeDat;
      xiv::exd::Exd m_SkyIsland2RangeTypeDat;
+     xiv::exd::Exd m_SnipeTalkDat;
+     xiv::exd::Exd m_SnipeTalkNameDat;
      xiv::exd::Exd m_SpearfishingItemDat;
      xiv::exd::Exd m_SpearfishingNotebookDat;
      xiv::exd::Exd m_SpearfishingRecordPageDat;
@@ -6059,6 +6451,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_StatusLoopVFXDat;
      xiv::exd::Exd m_StoryDat;
      xiv::exd::Exd m_SubmarineExplorationDat;
+     xiv::exd::Exd m_SubmarineMapDat;
      xiv::exd::Exd m_SubmarinePartDat;
      xiv::exd::Exd m_SubmarineRankDat;
      xiv::exd::Exd m_SwitchTalkDat;
@@ -6105,12 +6498,15 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_WeeklyLotBonusDat;
      xiv::exd::Exd m_WorldDat;
      xiv::exd::Exd m_WorldDCGroupTypeDat;
+     xiv::exd::Exd m_YardCatalogCategoryDat;
+     xiv::exd::Exd m_YardCatalogItemListDat;
      xiv::exd::Exd m_YKWDat;
      xiv::exd::Exd m_ZoneSharedGroupDat;
 
 
      using AchievementPtr = std::shared_ptr< Achievement >;
      using AchievementCategoryPtr = std::shared_ptr< AchievementCategory >;
+     using AchievementHideConditionPtr = std::shared_ptr< AchievementHideCondition >;
      using AchievementKindPtr = std::shared_ptr< AchievementKind >;
      using ActionPtr = std::shared_ptr< Action >;
      using ActionCastTimelinePtr = std::shared_ptr< ActionCastTimeline >;
@@ -6129,7 +6525,6 @@ struct ZoneSharedGroup
      using ActivityFeedGroupCaptionsPtr = std::shared_ptr< ActivityFeedGroupCaptions >;
      using ActivityFeedImagesPtr = std::shared_ptr< ActivityFeedImages >;
      using AddonPtr = std::shared_ptr< Addon >;
-     using AddonHudPtr = std::shared_ptr< AddonHud >;
      using AdventurePtr = std::shared_ptr< Adventure >;
      using AdventureExPhasePtr = std::shared_ptr< AdventureExPhase >;
      using AetherCurrentPtr = std::shared_ptr< AetherCurrent >;
@@ -6170,6 +6565,7 @@ struct ZoneSharedGroup
      using BeastReputationRankPtr = std::shared_ptr< BeastReputationRank >;
      using BeastTribePtr = std::shared_ptr< BeastTribe >;
      using BehaviorPtr = std::shared_ptr< Behavior >;
+     using BenchmarkOverrideEquipmentPtr = std::shared_ptr< BenchmarkOverrideEquipment >;
      using BGMPtr = std::shared_ptr< BGM >;
      using BGMFadePtr = std::shared_ptr< BGMFade >;
      using BGMSituationPtr = std::shared_ptr< BGMSituation >;
@@ -6228,6 +6624,7 @@ struct ZoneSharedGroup
      using ContentGaugeColorPtr = std::shared_ptr< ContentGaugeColor >;
      using ContentMemberTypePtr = std::shared_ptr< ContentMemberType >;
      using ContentNpcTalkPtr = std::shared_ptr< ContentNpcTalk >;
+     using ContentRandomSelectPtr = std::shared_ptr< ContentRandomSelect >;
      using ContentRoulettePtr = std::shared_ptr< ContentRoulette >;
      using ContentRouletteOpenRulePtr = std::shared_ptr< ContentRouletteOpenRule >;
      using ContentRouletteRoleBonusPtr = std::shared_ptr< ContentRouletteRoleBonus >;
@@ -6237,6 +6634,7 @@ struct ZoneSharedGroup
      using ContentTypePtr = std::shared_ptr< ContentType >;
      using CraftActionPtr = std::shared_ptr< CraftAction >;
      using CraftLevePtr = std::shared_ptr< CraftLeve >;
+     using CraftLevelDifferencePtr = std::shared_ptr< CraftLevelDifference >;
      using CraftTypePtr = std::shared_ptr< CraftType >;
      using CreditPtr = std::shared_ptr< Credit >;
      using CreditBackImagePtr = std::shared_ptr< CreditBackImage >;
@@ -6250,6 +6648,10 @@ struct ZoneSharedGroup
      using CutscenePtr = std::shared_ptr< Cutscene >;
      using CutScreenImagePtr = std::shared_ptr< CutScreenImage >;
      using DailySupplyItemPtr = std::shared_ptr< DailySupplyItem >;
+     using DawnContentPtr = std::shared_ptr< DawnContent >;
+     using DawnGrowMemberPtr = std::shared_ptr< DawnGrowMember >;
+     using DawnMemberUIParamPtr = std::shared_ptr< DawnMemberUIParam >;
+     using DawnQuestMemberPtr = std::shared_ptr< DawnQuestMember >;
      using DeepDungeonPtr = std::shared_ptr< DeepDungeon >;
      using DeepDungeonBanPtr = std::shared_ptr< DeepDungeonBan >;
      using DeepDungeonDangerPtr = std::shared_ptr< DeepDungeonDanger >;
@@ -6302,6 +6704,7 @@ struct ZoneSharedGroup
      using ExportedSGPtr = std::shared_ptr< ExportedSG >;
      using ExVersionPtr = std::shared_ptr< ExVersion >;
      using FatePtr = std::shared_ptr< Fate >;
+     using FateProgressUIPtr = std::shared_ptr< FateProgressUI >;
      using FCActivityPtr = std::shared_ptr< FCActivity >;
      using FCActivityCategoryPtr = std::shared_ptr< FCActivityCategory >;
      using FCAuthorityPtr = std::shared_ptr< FCAuthority >;
@@ -6320,6 +6723,8 @@ struct ZoneSharedGroup
      using FishParameterPtr = std::shared_ptr< FishParameter >;
      using Frontline03Ptr = std::shared_ptr< Frontline03 >;
      using Frontline04Ptr = std::shared_ptr< Frontline04 >;
+     using FurnitureCatalogCategoryPtr = std::shared_ptr< FurnitureCatalogCategory >;
+     using FurnitureCatalogItemListPtr = std::shared_ptr< FurnitureCatalogItemList >;
      using GardeningSeedPtr = std::shared_ptr< GardeningSeed >;
      using GatheringConditionPtr = std::shared_ptr< GatheringCondition >;
      using GatheringExpPtr = std::shared_ptr< GatheringExp >;
@@ -6367,6 +6772,10 @@ struct ZoneSharedGroup
      using GrandCompanyPtr = std::shared_ptr< GrandCompany >;
      using GrandCompanyRankPtr = std::shared_ptr< GrandCompanyRank >;
      using GuardianDeityPtr = std::shared_ptr< GuardianDeity >;
+     using GuidePtr = std::shared_ptr< Guide >;
+     using GuidePagePtr = std::shared_ptr< GuidePage >;
+     using GuidePageStringPtr = std::shared_ptr< GuidePageString >;
+     using GuideTitlePtr = std::shared_ptr< GuideTitle >;
      using GuildleveAssignmentPtr = std::shared_ptr< GuildleveAssignment >;
      using GuildleveAssignmentCategoryPtr = std::shared_ptr< GuildleveAssignmentCategory >;
      using GuildOrderPtr = std::shared_ptr< GuildOrder >;
@@ -6390,6 +6799,9 @@ struct ZoneSharedGroup
      using HowToPtr = std::shared_ptr< HowTo >;
      using HowToCategoryPtr = std::shared_ptr< HowToCategory >;
      using HowToPagePtr = std::shared_ptr< HowToPage >;
+     using HugeCraftworksNpcPtr = std::shared_ptr< HugeCraftworksNpc >;
+     using HugeCraftworksRankPtr = std::shared_ptr< HugeCraftworksRank >;
+     using IndividualWeatherPtr = std::shared_ptr< IndividualWeather >;
      using InstanceContentPtr = std::shared_ptr< InstanceContent >;
      using InstanceContentBuffPtr = std::shared_ptr< InstanceContentBuff >;
      using InstanceContentCSBonusPtr = std::shared_ptr< InstanceContentCSBonus >;
@@ -6403,6 +6815,8 @@ struct ZoneSharedGroup
      using ItemSeriesPtr = std::shared_ptr< ItemSeries >;
      using ItemSpecialBonusPtr = std::shared_ptr< ItemSpecialBonus >;
      using ItemUICategoryPtr = std::shared_ptr< ItemUICategory >;
+     using JobHudManualPtr = std::shared_ptr< JobHudManual >;
+     using JobHudManualPriorityPtr = std::shared_ptr< JobHudManualPriority >;
      using JournalCategoryPtr = std::shared_ptr< JournalCategory >;
      using JournalGenrePtr = std::shared_ptr< JournalGenre >;
      using JournalSectionPtr = std::shared_ptr< JournalSection >;
@@ -6431,11 +6845,16 @@ struct ZoneSharedGroup
      using MasterpieceSupplyDutyPtr = std::shared_ptr< MasterpieceSupplyDuty >;
      using MasterpieceSupplyMultiplierPtr = std::shared_ptr< MasterpieceSupplyMultiplier >;
      using MateriaPtr = std::shared_ptr< Materia >;
+     using MateriaJoinRatePtr = std::shared_ptr< MateriaJoinRate >;
+     using MateriaJoinRateGatherCraftPtr = std::shared_ptr< MateriaJoinRateGatherCraft >;
      using MiniGameRAPtr = std::shared_ptr< MiniGameRA >;
      using MinionRacePtr = std::shared_ptr< MinionRace >;
      using MinionRulesPtr = std::shared_ptr< MinionRules >;
      using MinionSkillTypePtr = std::shared_ptr< MinionSkillType >;
+     using MobHuntOrderPtr = std::shared_ptr< MobHuntOrder >;
      using MobHuntOrderTypePtr = std::shared_ptr< MobHuntOrderType >;
+     using MobHuntRewardPtr = std::shared_ptr< MobHuntReward >;
+     using MobHuntRewardCapPtr = std::shared_ptr< MobHuntRewardCap >;
      using MobHuntTargetPtr = std::shared_ptr< MobHuntTarget >;
      using ModelCharaPtr = std::shared_ptr< ModelChara >;
      using ModelSkeletonPtr = std::shared_ptr< ModelSkeleton >;
@@ -6452,10 +6871,13 @@ struct ZoneSharedGroup
      using MoveVfxPtr = std::shared_ptr< MoveVfx >;
      using NotebookDivisionPtr = std::shared_ptr< NotebookDivision >;
      using NotebookDivisionCategoryPtr = std::shared_ptr< NotebookDivisionCategory >;
+     using NotoriousMonsterPtr = std::shared_ptr< NotoriousMonster >;
      using NpcEquipPtr = std::shared_ptr< NpcEquip >;
      using NpcYellPtr = std::shared_ptr< NpcYell >;
      using OmenPtr = std::shared_ptr< Omen >;
      using OnlineStatusPtr = std::shared_ptr< OnlineStatus >;
+     using OpenContentPtr = std::shared_ptr< OpenContent >;
+     using OpenContentCandidateNamePtr = std::shared_ptr< OpenContentCandidateName >;
      using OpeningPtr = std::shared_ptr< Opening >;
      using OrchestrionPtr = std::shared_ptr< Orchestrion >;
      using OrchestrionCategoryPtr = std::shared_ptr< OrchestrionCategory >;
@@ -6527,6 +6949,8 @@ struct ZoneSharedGroup
      using SkyIsland2MissionDetailPtr = std::shared_ptr< SkyIsland2MissionDetail >;
      using SkyIsland2MissionTypePtr = std::shared_ptr< SkyIsland2MissionType >;
      using SkyIsland2RangeTypePtr = std::shared_ptr< SkyIsland2RangeType >;
+     using SnipeTalkPtr = std::shared_ptr< SnipeTalk >;
+     using SnipeTalkNamePtr = std::shared_ptr< SnipeTalkName >;
      using SpearfishingItemPtr = std::shared_ptr< SpearfishingItem >;
      using SpearfishingNotebookPtr = std::shared_ptr< SpearfishingNotebook >;
      using SpearfishingRecordPagePtr = std::shared_ptr< SpearfishingRecordPage >;
@@ -6539,6 +6963,7 @@ struct ZoneSharedGroup
      using StatusLoopVFXPtr = std::shared_ptr< StatusLoopVFX >;
      using StoryPtr = std::shared_ptr< Story >;
      using SubmarineExplorationPtr = std::shared_ptr< SubmarineExploration >;
+     using SubmarineMapPtr = std::shared_ptr< SubmarineMap >;
      using SubmarinePartPtr = std::shared_ptr< SubmarinePart >;
      using SubmarineRankPtr = std::shared_ptr< SubmarineRank >;
      using SwitchTalkPtr = std::shared_ptr< SwitchTalk >;
@@ -6585,12 +7010,15 @@ struct ZoneSharedGroup
      using WeeklyLotBonusPtr = std::shared_ptr< WeeklyLotBonus >;
      using WorldPtr = std::shared_ptr< World >;
      using WorldDCGroupTypePtr = std::shared_ptr< WorldDCGroupType >;
+     using YardCatalogCategoryPtr = std::shared_ptr< YardCatalogCategory >;
+     using YardCatalogItemListPtr = std::shared_ptr< YardCatalogItemList >;
      using YKWPtr = std::shared_ptr< YKW >;
      using ZoneSharedGroupPtr = std::shared_ptr< ZoneSharedGroup >;
 
 
      std::set< uint32_t > m_AchievementIdList;
      std::set< uint32_t > m_AchievementCategoryIdList;
+     std::set< uint32_t > m_AchievementHideConditionIdList;
      std::set< uint32_t > m_AchievementKindIdList;
      std::set< uint32_t > m_ActionIdList;
      std::set< uint32_t > m_ActionCastTimelineIdList;
@@ -6609,7 +7037,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ActivityFeedGroupCaptionsIdList;
      std::set< uint32_t > m_ActivityFeedImagesIdList;
      std::set< uint32_t > m_AddonIdList;
-     std::set< uint32_t > m_AddonHudIdList;
      std::set< uint32_t > m_AdventureIdList;
      std::set< uint32_t > m_AdventureExPhaseIdList;
      std::set< uint32_t > m_AetherCurrentIdList;
@@ -6650,6 +7077,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_BeastReputationRankIdList;
      std::set< uint32_t > m_BeastTribeIdList;
      std::set< uint32_t > m_BehaviorIdList;
+     std::set< uint32_t > m_BenchmarkOverrideEquipmentIdList;
      std::set< uint32_t > m_BGMIdList;
      std::set< uint32_t > m_BGMFadeIdList;
      std::set< uint32_t > m_BGMSituationIdList;
@@ -6708,6 +7136,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ContentGaugeColorIdList;
      std::set< uint32_t > m_ContentMemberTypeIdList;
      std::set< uint32_t > m_ContentNpcTalkIdList;
+     std::set< uint32_t > m_ContentRandomSelectIdList;
      std::set< uint32_t > m_ContentRouletteIdList;
      std::set< uint32_t > m_ContentRouletteOpenRuleIdList;
      std::set< uint32_t > m_ContentRouletteRoleBonusIdList;
@@ -6717,6 +7146,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ContentTypeIdList;
      std::set< uint32_t > m_CraftActionIdList;
      std::set< uint32_t > m_CraftLeveIdList;
+     std::set< uint32_t > m_CraftLevelDifferenceIdList;
      std::set< uint32_t > m_CraftTypeIdList;
      std::set< uint32_t > m_CreditIdList;
      std::set< uint32_t > m_CreditBackImageIdList;
@@ -6730,6 +7160,10 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CutsceneIdList;
      std::set< uint32_t > m_CutScreenImageIdList;
      std::set< uint32_t > m_DailySupplyItemIdList;
+     std::set< uint32_t > m_DawnContentIdList;
+     std::set< uint32_t > m_DawnGrowMemberIdList;
+     std::set< uint32_t > m_DawnMemberUIParamIdList;
+     std::set< uint32_t > m_DawnQuestMemberIdList;
      std::set< uint32_t > m_DeepDungeonIdList;
      std::set< uint32_t > m_DeepDungeonBanIdList;
      std::set< uint32_t > m_DeepDungeonDangerIdList;
@@ -6782,6 +7216,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ExportedSGIdList;
      std::set< uint32_t > m_ExVersionIdList;
      std::set< uint32_t > m_FateIdList;
+     std::set< uint32_t > m_FateProgressUIIdList;
      std::set< uint32_t > m_FCActivityIdList;
      std::set< uint32_t > m_FCActivityCategoryIdList;
      std::set< uint32_t > m_FCAuthorityIdList;
@@ -6800,6 +7235,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_FishParameterIdList;
      std::set< uint32_t > m_Frontline03IdList;
      std::set< uint32_t > m_Frontline04IdList;
+     std::set< uint32_t > m_FurnitureCatalogCategoryIdList;
+     std::set< uint32_t > m_FurnitureCatalogItemListIdList;
      std::set< uint32_t > m_GardeningSeedIdList;
      std::set< uint32_t > m_GatheringConditionIdList;
      std::set< uint32_t > m_GatheringExpIdList;
@@ -6847,6 +7284,10 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GrandCompanyIdList;
      std::set< uint32_t > m_GrandCompanyRankIdList;
      std::set< uint32_t > m_GuardianDeityIdList;
+     std::set< uint32_t > m_GuideIdList;
+     std::set< uint32_t > m_GuidePageIdList;
+     std::set< uint32_t > m_GuidePageStringIdList;
+     std::set< uint32_t > m_GuideTitleIdList;
      std::set< uint32_t > m_GuildleveAssignmentIdList;
      std::set< uint32_t > m_GuildleveAssignmentCategoryIdList;
      std::set< uint32_t > m_GuildOrderIdList;
@@ -6870,6 +7311,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_HowToIdList;
      std::set< uint32_t > m_HowToCategoryIdList;
      std::set< uint32_t > m_HowToPageIdList;
+     std::set< uint32_t > m_HugeCraftworksNpcIdList;
+     std::set< uint32_t > m_HugeCraftworksRankIdList;
+     std::set< uint32_t > m_IndividualWeatherIdList;
      std::set< uint32_t > m_InstanceContentIdList;
      std::set< uint32_t > m_InstanceContentBuffIdList;
      std::set< uint32_t > m_InstanceContentCSBonusIdList;
@@ -6883,6 +7327,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ItemSeriesIdList;
      std::set< uint32_t > m_ItemSpecialBonusIdList;
      std::set< uint32_t > m_ItemUICategoryIdList;
+     std::set< uint32_t > m_JobHudManualIdList;
+     std::set< uint32_t > m_JobHudManualPriorityIdList;
      std::set< uint32_t > m_JournalCategoryIdList;
      std::set< uint32_t > m_JournalGenreIdList;
      std::set< uint32_t > m_JournalSectionIdList;
@@ -6911,11 +7357,16 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MasterpieceSupplyDutyIdList;
      std::set< uint32_t > m_MasterpieceSupplyMultiplierIdList;
      std::set< uint32_t > m_MateriaIdList;
+     std::set< uint32_t > m_MateriaJoinRateIdList;
+     std::set< uint32_t > m_MateriaJoinRateGatherCraftIdList;
      std::set< uint32_t > m_MiniGameRAIdList;
      std::set< uint32_t > m_MinionRaceIdList;
      std::set< uint32_t > m_MinionRulesIdList;
      std::set< uint32_t > m_MinionSkillTypeIdList;
+     std::set< uint32_t > m_MobHuntOrderIdList;
      std::set< uint32_t > m_MobHuntOrderTypeIdList;
+     std::set< uint32_t > m_MobHuntRewardIdList;
+     std::set< uint32_t > m_MobHuntRewardCapIdList;
      std::set< uint32_t > m_MobHuntTargetIdList;
      std::set< uint32_t > m_ModelCharaIdList;
      std::set< uint32_t > m_ModelSkeletonIdList;
@@ -6932,10 +7383,13 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MoveVfxIdList;
      std::set< uint32_t > m_NotebookDivisionIdList;
      std::set< uint32_t > m_NotebookDivisionCategoryIdList;
+     std::set< uint32_t > m_NotoriousMonsterIdList;
      std::set< uint32_t > m_NpcEquipIdList;
      std::set< uint32_t > m_NpcYellIdList;
      std::set< uint32_t > m_OmenIdList;
      std::set< uint32_t > m_OnlineStatusIdList;
+     std::set< uint32_t > m_OpenContentIdList;
+     std::set< uint32_t > m_OpenContentCandidateNameIdList;
      std::set< uint32_t > m_OpeningIdList;
      std::set< uint32_t > m_OrchestrionIdList;
      std::set< uint32_t > m_OrchestrionCategoryIdList;
@@ -7007,6 +7461,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_SkyIsland2MissionDetailIdList;
      std::set< uint32_t > m_SkyIsland2MissionTypeIdList;
      std::set< uint32_t > m_SkyIsland2RangeTypeIdList;
+     std::set< uint32_t > m_SnipeTalkIdList;
+     std::set< uint32_t > m_SnipeTalkNameIdList;
      std::set< uint32_t > m_SpearfishingItemIdList;
      std::set< uint32_t > m_SpearfishingNotebookIdList;
      std::set< uint32_t > m_SpearfishingRecordPageIdList;
@@ -7019,6 +7475,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_StatusLoopVFXIdList;
      std::set< uint32_t > m_StoryIdList;
      std::set< uint32_t > m_SubmarineExplorationIdList;
+     std::set< uint32_t > m_SubmarineMapIdList;
      std::set< uint32_t > m_SubmarinePartIdList;
      std::set< uint32_t > m_SubmarineRankIdList;
      std::set< uint32_t > m_SwitchTalkIdList;
@@ -7065,6 +7522,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_WeeklyLotBonusIdList;
      std::set< uint32_t > m_WorldIdList;
      std::set< uint32_t > m_WorldDCGroupTypeIdList;
+     std::set< uint32_t > m_YardCatalogCategoryIdList;
+     std::set< uint32_t > m_YardCatalogItemListIdList;
      std::set< uint32_t > m_YKWIdList;
      std::set< uint32_t > m_ZoneSharedGroupIdList;
 
@@ -7080,6 +7539,12 @@ const std::set< uint32_t >& getAchievementCategoryIdList()
    if( m_AchievementCategoryIdList.size() == 0 )
       loadIdList( m_AchievementCategoryDat, m_AchievementCategoryIdList );
    return m_AchievementCategoryIdList;
+}
+const std::set< uint32_t >& getAchievementHideConditionIdList()
+{
+   if( m_AchievementHideConditionIdList.size() == 0 )
+      loadIdList( m_AchievementHideConditionDat, m_AchievementHideConditionIdList );
+   return m_AchievementHideConditionIdList;
 }
 const std::set< uint32_t >& getAchievementKindIdList()
 {
@@ -7188,12 +7653,6 @@ const std::set< uint32_t >& getAddonIdList()
    if( m_AddonIdList.size() == 0 )
       loadIdList( m_AddonDat, m_AddonIdList );
    return m_AddonIdList;
-}
-const std::set< uint32_t >& getAddonHudIdList()
-{
-   if( m_AddonHudIdList.size() == 0 )
-      loadIdList( m_AddonHudDat, m_AddonHudIdList );
-   return m_AddonHudIdList;
 }
 const std::set< uint32_t >& getAdventureIdList()
 {
@@ -7434,6 +7893,12 @@ const std::set< uint32_t >& getBehaviorIdList()
    if( m_BehaviorIdList.size() == 0 )
       loadIdList( m_BehaviorDat, m_BehaviorIdList );
    return m_BehaviorIdList;
+}
+const std::set< uint32_t >& getBenchmarkOverrideEquipmentIdList()
+{
+   if( m_BenchmarkOverrideEquipmentIdList.size() == 0 )
+      loadIdList( m_BenchmarkOverrideEquipmentDat, m_BenchmarkOverrideEquipmentIdList );
+   return m_BenchmarkOverrideEquipmentIdList;
 }
 const std::set< uint32_t >& getBGMIdList()
 {
@@ -7783,6 +8248,12 @@ const std::set< uint32_t >& getContentNpcTalkIdList()
       loadIdList( m_ContentNpcTalkDat, m_ContentNpcTalkIdList );
    return m_ContentNpcTalkIdList;
 }
+const std::set< uint32_t >& getContentRandomSelectIdList()
+{
+   if( m_ContentRandomSelectIdList.size() == 0 )
+      loadIdList( m_ContentRandomSelectDat, m_ContentRandomSelectIdList );
+   return m_ContentRandomSelectIdList;
+}
 const std::set< uint32_t >& getContentRouletteIdList()
 {
    if( m_ContentRouletteIdList.size() == 0 )
@@ -7836,6 +8307,12 @@ const std::set< uint32_t >& getCraftLeveIdList()
    if( m_CraftLeveIdList.size() == 0 )
       loadIdList( m_CraftLeveDat, m_CraftLeveIdList );
    return m_CraftLeveIdList;
+}
+const std::set< uint32_t >& getCraftLevelDifferenceIdList()
+{
+   if( m_CraftLevelDifferenceIdList.size() == 0 )
+      loadIdList( m_CraftLevelDifferenceDat, m_CraftLevelDifferenceIdList );
+   return m_CraftLevelDifferenceIdList;
 }
 const std::set< uint32_t >& getCraftTypeIdList()
 {
@@ -7914,6 +8391,30 @@ const std::set< uint32_t >& getDailySupplyItemIdList()
    if( m_DailySupplyItemIdList.size() == 0 )
       loadIdList( m_DailySupplyItemDat, m_DailySupplyItemIdList );
    return m_DailySupplyItemIdList;
+}
+const std::set< uint32_t >& getDawnContentIdList()
+{
+   if( m_DawnContentIdList.size() == 0 )
+      loadIdList( m_DawnContentDat, m_DawnContentIdList );
+   return m_DawnContentIdList;
+}
+const std::set< uint32_t >& getDawnGrowMemberIdList()
+{
+   if( m_DawnGrowMemberIdList.size() == 0 )
+      loadIdList( m_DawnGrowMemberDat, m_DawnGrowMemberIdList );
+   return m_DawnGrowMemberIdList;
+}
+const std::set< uint32_t >& getDawnMemberUIParamIdList()
+{
+   if( m_DawnMemberUIParamIdList.size() == 0 )
+      loadIdList( m_DawnMemberUIParamDat, m_DawnMemberUIParamIdList );
+   return m_DawnMemberUIParamIdList;
+}
+const std::set< uint32_t >& getDawnQuestMemberIdList()
+{
+   if( m_DawnQuestMemberIdList.size() == 0 )
+      loadIdList( m_DawnQuestMemberDat, m_DawnQuestMemberIdList );
+   return m_DawnQuestMemberIdList;
 }
 const std::set< uint32_t >& getDeepDungeonIdList()
 {
@@ -8227,6 +8728,12 @@ const std::set< uint32_t >& getFateIdList()
       loadIdList( m_FateDat, m_FateIdList );
    return m_FateIdList;
 }
+const std::set< uint32_t >& getFateProgressUIIdList()
+{
+   if( m_FateProgressUIIdList.size() == 0 )
+      loadIdList( m_FateProgressUIDat, m_FateProgressUIIdList );
+   return m_FateProgressUIIdList;
+}
 const std::set< uint32_t >& getFCActivityIdList()
 {
    if( m_FCActivityIdList.size() == 0 )
@@ -8334,6 +8841,18 @@ const std::set< uint32_t >& getFrontline04IdList()
    if( m_Frontline04IdList.size() == 0 )
       loadIdList( m_Frontline04Dat, m_Frontline04IdList );
    return m_Frontline04IdList;
+}
+const std::set< uint32_t >& getFurnitureCatalogCategoryIdList()
+{
+   if( m_FurnitureCatalogCategoryIdList.size() == 0 )
+      loadIdList( m_FurnitureCatalogCategoryDat, m_FurnitureCatalogCategoryIdList );
+   return m_FurnitureCatalogCategoryIdList;
+}
+const std::set< uint32_t >& getFurnitureCatalogItemListIdList()
+{
+   if( m_FurnitureCatalogItemListIdList.size() == 0 )
+      loadIdList( m_FurnitureCatalogItemListDat, m_FurnitureCatalogItemListIdList );
+   return m_FurnitureCatalogItemListIdList;
 }
 const std::set< uint32_t >& getGardeningSeedIdList()
 {
@@ -8617,6 +9136,30 @@ const std::set< uint32_t >& getGuardianDeityIdList()
       loadIdList( m_GuardianDeityDat, m_GuardianDeityIdList );
    return m_GuardianDeityIdList;
 }
+const std::set< uint32_t >& getGuideIdList()
+{
+   if( m_GuideIdList.size() == 0 )
+      loadIdList( m_GuideDat, m_GuideIdList );
+   return m_GuideIdList;
+}
+const std::set< uint32_t >& getGuidePageIdList()
+{
+   if( m_GuidePageIdList.size() == 0 )
+      loadIdList( m_GuidePageDat, m_GuidePageIdList );
+   return m_GuidePageIdList;
+}
+const std::set< uint32_t >& getGuidePageStringIdList()
+{
+   if( m_GuidePageStringIdList.size() == 0 )
+      loadIdList( m_GuidePageStringDat, m_GuidePageStringIdList );
+   return m_GuidePageStringIdList;
+}
+const std::set< uint32_t >& getGuideTitleIdList()
+{
+   if( m_GuideTitleIdList.size() == 0 )
+      loadIdList( m_GuideTitleDat, m_GuideTitleIdList );
+   return m_GuideTitleIdList;
+}
 const std::set< uint32_t >& getGuildleveAssignmentIdList()
 {
    if( m_GuildleveAssignmentIdList.size() == 0 )
@@ -8755,6 +9298,24 @@ const std::set< uint32_t >& getHowToPageIdList()
       loadIdList( m_HowToPageDat, m_HowToPageIdList );
    return m_HowToPageIdList;
 }
+const std::set< uint32_t >& getHugeCraftworksNpcIdList()
+{
+   if( m_HugeCraftworksNpcIdList.size() == 0 )
+      loadIdList( m_HugeCraftworksNpcDat, m_HugeCraftworksNpcIdList );
+   return m_HugeCraftworksNpcIdList;
+}
+const std::set< uint32_t >& getHugeCraftworksRankIdList()
+{
+   if( m_HugeCraftworksRankIdList.size() == 0 )
+      loadIdList( m_HugeCraftworksRankDat, m_HugeCraftworksRankIdList );
+   return m_HugeCraftworksRankIdList;
+}
+const std::set< uint32_t >& getIndividualWeatherIdList()
+{
+   if( m_IndividualWeatherIdList.size() == 0 )
+      loadIdList( m_IndividualWeatherDat, m_IndividualWeatherIdList );
+   return m_IndividualWeatherIdList;
+}
 const std::set< uint32_t >& getInstanceContentIdList()
 {
    if( m_InstanceContentIdList.size() == 0 )
@@ -8832,6 +9393,18 @@ const std::set< uint32_t >& getItemUICategoryIdList()
    if( m_ItemUICategoryIdList.size() == 0 )
       loadIdList( m_ItemUICategoryDat, m_ItemUICategoryIdList );
    return m_ItemUICategoryIdList;
+}
+const std::set< uint32_t >& getJobHudManualIdList()
+{
+   if( m_JobHudManualIdList.size() == 0 )
+      loadIdList( m_JobHudManualDat, m_JobHudManualIdList );
+   return m_JobHudManualIdList;
+}
+const std::set< uint32_t >& getJobHudManualPriorityIdList()
+{
+   if( m_JobHudManualPriorityIdList.size() == 0 )
+      loadIdList( m_JobHudManualPriorityDat, m_JobHudManualPriorityIdList );
+   return m_JobHudManualPriorityIdList;
 }
 const std::set< uint32_t >& getJournalCategoryIdList()
 {
@@ -9001,6 +9574,18 @@ const std::set< uint32_t >& getMateriaIdList()
       loadIdList( m_MateriaDat, m_MateriaIdList );
    return m_MateriaIdList;
 }
+const std::set< uint32_t >& getMateriaJoinRateIdList()
+{
+   if( m_MateriaJoinRateIdList.size() == 0 )
+      loadIdList( m_MateriaJoinRateDat, m_MateriaJoinRateIdList );
+   return m_MateriaJoinRateIdList;
+}
+const std::set< uint32_t >& getMateriaJoinRateGatherCraftIdList()
+{
+   if( m_MateriaJoinRateGatherCraftIdList.size() == 0 )
+      loadIdList( m_MateriaJoinRateGatherCraftDat, m_MateriaJoinRateGatherCraftIdList );
+   return m_MateriaJoinRateGatherCraftIdList;
+}
 const std::set< uint32_t >& getMiniGameRAIdList()
 {
    if( m_MiniGameRAIdList.size() == 0 )
@@ -9025,11 +9610,29 @@ const std::set< uint32_t >& getMinionSkillTypeIdList()
       loadIdList( m_MinionSkillTypeDat, m_MinionSkillTypeIdList );
    return m_MinionSkillTypeIdList;
 }
+const std::set< uint32_t >& getMobHuntOrderIdList()
+{
+   if( m_MobHuntOrderIdList.size() == 0 )
+      loadIdList( m_MobHuntOrderDat, m_MobHuntOrderIdList );
+   return m_MobHuntOrderIdList;
+}
 const std::set< uint32_t >& getMobHuntOrderTypeIdList()
 {
    if( m_MobHuntOrderTypeIdList.size() == 0 )
       loadIdList( m_MobHuntOrderTypeDat, m_MobHuntOrderTypeIdList );
    return m_MobHuntOrderTypeIdList;
+}
+const std::set< uint32_t >& getMobHuntRewardIdList()
+{
+   if( m_MobHuntRewardIdList.size() == 0 )
+      loadIdList( m_MobHuntRewardDat, m_MobHuntRewardIdList );
+   return m_MobHuntRewardIdList;
+}
+const std::set< uint32_t >& getMobHuntRewardCapIdList()
+{
+   if( m_MobHuntRewardCapIdList.size() == 0 )
+      loadIdList( m_MobHuntRewardCapDat, m_MobHuntRewardCapIdList );
+   return m_MobHuntRewardCapIdList;
 }
 const std::set< uint32_t >& getMobHuntTargetIdList()
 {
@@ -9127,6 +9730,12 @@ const std::set< uint32_t >& getNotebookDivisionCategoryIdList()
       loadIdList( m_NotebookDivisionCategoryDat, m_NotebookDivisionCategoryIdList );
    return m_NotebookDivisionCategoryIdList;
 }
+const std::set< uint32_t >& getNotoriousMonsterIdList()
+{
+   if( m_NotoriousMonsterIdList.size() == 0 )
+      loadIdList( m_NotoriousMonsterDat, m_NotoriousMonsterIdList );
+   return m_NotoriousMonsterIdList;
+}
 const std::set< uint32_t >& getNpcEquipIdList()
 {
    if( m_NpcEquipIdList.size() == 0 )
@@ -9150,6 +9759,18 @@ const std::set< uint32_t >& getOnlineStatusIdList()
    if( m_OnlineStatusIdList.size() == 0 )
       loadIdList( m_OnlineStatusDat, m_OnlineStatusIdList );
    return m_OnlineStatusIdList;
+}
+const std::set< uint32_t >& getOpenContentIdList()
+{
+   if( m_OpenContentIdList.size() == 0 )
+      loadIdList( m_OpenContentDat, m_OpenContentIdList );
+   return m_OpenContentIdList;
+}
+const std::set< uint32_t >& getOpenContentCandidateNameIdList()
+{
+   if( m_OpenContentCandidateNameIdList.size() == 0 )
+      loadIdList( m_OpenContentCandidateNameDat, m_OpenContentCandidateNameIdList );
+   return m_OpenContentCandidateNameIdList;
 }
 const std::set< uint32_t >& getOpeningIdList()
 {
@@ -9577,6 +10198,18 @@ const std::set< uint32_t >& getSkyIsland2RangeTypeIdList()
       loadIdList( m_SkyIsland2RangeTypeDat, m_SkyIsland2RangeTypeIdList );
    return m_SkyIsland2RangeTypeIdList;
 }
+const std::set< uint32_t >& getSnipeTalkIdList()
+{
+   if( m_SnipeTalkIdList.size() == 0 )
+      loadIdList( m_SnipeTalkDat, m_SnipeTalkIdList );
+   return m_SnipeTalkIdList;
+}
+const std::set< uint32_t >& getSnipeTalkNameIdList()
+{
+   if( m_SnipeTalkNameIdList.size() == 0 )
+      loadIdList( m_SnipeTalkNameDat, m_SnipeTalkNameIdList );
+   return m_SnipeTalkNameIdList;
+}
 const std::set< uint32_t >& getSpearfishingItemIdList()
 {
    if( m_SpearfishingItemIdList.size() == 0 )
@@ -9648,6 +10281,12 @@ const std::set< uint32_t >& getSubmarineExplorationIdList()
    if( m_SubmarineExplorationIdList.size() == 0 )
       loadIdList( m_SubmarineExplorationDat, m_SubmarineExplorationIdList );
    return m_SubmarineExplorationIdList;
+}
+const std::set< uint32_t >& getSubmarineMapIdList()
+{
+   if( m_SubmarineMapIdList.size() == 0 )
+      loadIdList( m_SubmarineMapDat, m_SubmarineMapIdList );
+   return m_SubmarineMapIdList;
 }
 const std::set< uint32_t >& getSubmarinePartIdList()
 {
@@ -9924,6 +10563,18 @@ const std::set< uint32_t >& getWorldDCGroupTypeIdList()
    if( m_WorldDCGroupTypeIdList.size() == 0 )
       loadIdList( m_WorldDCGroupTypeDat, m_WorldDCGroupTypeIdList );
    return m_WorldDCGroupTypeIdList;
+}
+const std::set< uint32_t >& getYardCatalogCategoryIdList()
+{
+   if( m_YardCatalogCategoryIdList.size() == 0 )
+      loadIdList( m_YardCatalogCategoryDat, m_YardCatalogCategoryIdList );
+   return m_YardCatalogCategoryIdList;
+}
+const std::set< uint32_t >& getYardCatalogItemListIdList()
+{
+   if( m_YardCatalogItemListIdList.size() == 0 )
+      loadIdList( m_YardCatalogItemListDat, m_YardCatalogItemListIdList );
+   return m_YardCatalogItemListIdList;
 }
 const std::set< uint32_t >& getYKWIdList()
 {

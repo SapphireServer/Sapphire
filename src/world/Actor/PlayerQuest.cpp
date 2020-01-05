@@ -15,14 +15,19 @@ using namespace Sapphire::Network::Packets::Server;
 
 void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 {
-
   int8_t idx = getQuestIndex( questId );
 
   removeQuest( questId );
+
+  auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
+  questFinishPacket->data().questId = questId;
+  questFinishPacket->data().flag1 = 1;
+  questFinishPacket->data().flag2 = 1;
+  queuePacket( questFinishPacket );
+
   updateQuestsCompleted( questId );
 
-  sendQuestTracker();
-
+  //sendQuestTracker(); already sent in removeQuest()
 }
 
 void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
@@ -33,23 +38,15 @@ void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
 
 void Sapphire::Entity::Player::removeQuest( uint16_t questId )
 {
-
   int8_t idx = getQuestIndex( questId );
 
   if( ( idx != -1 ) && ( m_activeQuests[ idx ] != nullptr ) )
   {
-
     auto questUpdatePacket = makeZonePacket< FFXIVIpcQuestUpdate >( getId() );
     questUpdatePacket->data().slot = static_cast< uint8_t >( idx );
     questUpdatePacket->data().questInfo.c.questId = 0;
     questUpdatePacket->data().questInfo.c.sequence = 0xFF;
     queuePacket( questUpdatePacket );
-
-    auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
-    questFinishPacket->data().questId = questId;
-    questFinishPacket->data().flag1 = 1;
-    questFinishPacket->data().flag2 = 1;
-    queuePacket( questFinishPacket );
 
     for( int32_t ii = 0; ii < 5; ii++ )
     {
@@ -67,7 +64,6 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
   }
 
   sendQuestTracker();
-
 }
 
 bool Sapphire::Entity::Player::hasQuest( uint32_t questId )
@@ -1067,7 +1063,7 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
 
   if( rewardItemCount > 0 )
   {
-    for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
+    for( uint32_t i = 0; i < rewardItemCount; i++ )
     {
       addItem( questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
     }
@@ -1075,8 +1071,15 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
 
   if( optionalItemCount > 0 )
   {
-    auto itemId = questInfo->itemReward1.at( optionalChoice );
-    addItem( itemId, questInfo->itemCountReward1.at( optionalChoice ) );
+    for( uint32_t i = 0; i < optionalItemCount; i++ )
+    {
+      auto itemId = questInfo->itemReward1.at( i );
+      if( itemId == optionalChoice )
+      {
+        addItem( itemId, questInfo->itemCountReward1.at( i ) );
+        break;
+      }
+    }
   }
 
   if( gilReward > 0 )

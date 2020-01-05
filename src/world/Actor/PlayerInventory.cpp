@@ -593,6 +593,8 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
           quantity = newStackSize - maxStack;
           newStackSize = maxStack;
         }
+        else
+          quantity = 0;
 
         item->setStackSize( newStackSize );
         writeItem( item );
@@ -604,6 +606,11 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
         if( quantity == 0 )
         {
           queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+
+          auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
+          soundEffectPacket->data().sequence = 0xFFFFFFFF;
+          soundEffectPacket->data().type = 6;
+          queuePacket( soundEffectPacket );
 
           return item;
         }
@@ -636,6 +643,11 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
     queuePacket( invUpdate );
 
     queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+
+    auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
+    soundEffectPacket->data().sequence = 0xFFFFFFFF;
+    soundEffectPacket->data().type = 6;
+    queuePacket( soundEffectPacket );
   }
 
   return item;
@@ -666,7 +678,9 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
   if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
     unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem, true );
 
-
+  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
+      static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+    sendStatusEffectUpdate(); // send if any equip is changed
 }
 
 bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
@@ -801,6 +815,10 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
 
   updateContainer( toInventoryId, toSlot, fromItem );
   updateContainer( fromInventoryId, fromSlotId, toItem );
+
+  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
+    static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+    sendStatusEffectUpdate(); // send if any equip is changed
 }
 
 void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fromSlotId )

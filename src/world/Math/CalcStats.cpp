@@ -19,55 +19,55 @@ const int levelTable[81][6] =
 { 
   // MAIN,SUB,DIV,HP,ELMT,THREAT
   { 1, 1, 1, 1, 1, 1 },
-  { 20, 56, 56, 0, 52, 2 },
-  { 21, 57, 57, 0, 54, 2 },
-  { 22, 60, 60, 0, 56, 3 },
-  { 24, 62, 62, 0, 58, 3 },
-  { 26, 65, 65, 0, 60, 3 },
-  { 27, 68, 68, 0, 62, 3 },
-  { 29, 70, 70, 0, 64, 4 },
-  { 31, 73, 73, 0, 66, 4 },
-  { 33, 76, 76, 0, 68, 4 },
-  { 35, 78, 78, 0, 70, 5 },
-  { 36, 82, 82, 0, 73, 5 },
-  { 38, 85, 85, 0, 75, 5 },
-  { 41, 89, 89, 0, 78, 6 },
-  { 44, 93, 93, 0, 81, 6 },
-  { 46, 96, 96, 0, 84, 7 },
-  { 49, 100, 100, 0, 86, 7 },
-  { 52, 104, 104, 0, 89, 8 },
-  { 54, 109, 109, 0, 93, 9 },
-  { 57, 113, 113, 0, 95, 9 },
-  { 60, 116, 116, 0, 98, 10 },
-  { 63, 122, 122, 0, 102, 10 },
-  { 67, 127, 127, 0, 105, 11 },
-  { 71, 133, 133, 0, 109, 12 },
-  { 74, 138, 138, 0, 113, 13 },
-  { 78, 144, 144, 0, 117, 14 },
-  { 81, 150, 150, 0, 121, 15 },
-  { 85, 155, 155, 0, 125, 16 },
-  { 89, 162, 162, 0, 129, 17 },
-  { 92, 168, 168, 0, 133, 18 },
-  { 97, 173, 173, 0, 137, 19 },
-  { 101, 181, 181, 0, 143, 20 },
-  { 106, 188, 188, 0, 148, 22 },
-  { 110, 194, 194, 0, 153, 23 },
-  { 115, 202, 202, 0, 159, 25 },
-  { 119, 209, 209, 0, 165, 27 },
-  { 124, 215, 215, 0, 170, 29 },
-  { 128, 223, 223, 0, 176, 31 },
-  { 134, 229, 229, 0, 181, 33 },
-  { 139, 236, 236, 0, 186, 35 },
-  { 144, 244, 244, 0, 192, 38 },
-  { 150, 253, 253, 0, 200, 40 },
-  { 155, 263, 263, 0, 207, 43 },
-  { 161, 272, 272, 0, 215, 46 },
-  { 166, 283, 283, 0, 223, 49 },
-  { 171, 292, 292, 0, 231, 52 },
-  { 177, 302, 302, 0, 238, 55 },
-  { 183, 311, 311, 0, 246, 58 },
-  { 189, 322, 322, 0, 254, 62 },
-  { 196, 331, 331, 0, 261, 66 },
+  { 20, 56, 56, 86, 52, 2 },
+  { 21, 57, 57, 101, 54, 2 },
+  { 22, 60, 60, 109, 56, 3 },
+  { 24, 62, 62, 116, 58, 3 },
+  { 26, 65, 65, 123, 60, 3 },
+  { 27, 68, 68, 131, 62, 3 },
+  { 29, 70, 70, 138, 64, 4 },
+  { 31, 73, 73, 145, 66, 4 },
+  { 33, 76, 76, 153, 68, 4 },
+  { 35, 78, 78, 160, 70, 5 },
+  { 36, 82, 82, 174, 73, 5 },
+  { 38, 85, 85, 188, 75, 5 },
+  { 41, 89, 89, 202, 78, 6 },
+  { 44, 93, 93, 216, 81, 6 },
+  { 46, 96, 96, 230, 84, 7 },
+  { 49, 100, 100, 244, 86, 7 },
+  { 52, 104, 104, 258, 89, 8 },
+  { 54, 109, 109, 272, 93, 9 },
+  { 57, 113, 113, 286, 95, 9 },
+  { 60, 116, 116, 300, 98, 10 },
+  { 63, 122, 122, 333, 102, 10 },
+  { 67, 127, 127, 366, 105, 11 },
+  { 71, 133, 133, 399, 109, 12 },
+  { 74, 138, 138, 432, 113, 13 },
+  { 78, 144, 144, 465, 117, 14 },
+  { 81, 150, 150, 498, 121, 15 },
+  { 85, 155, 155, 531, 125, 16 },
+  { 89, 162, 162, 564, 129, 17 },
+  { 92, 168, 168, 597, 133, 18 },
+  { 97, 173, 173, 630, 137, 19 },
+  { 101, 181, 181, 669, 143, 20 },
+  { 106, 188, 188, 708, 148, 22 },
+  { 110, 194, 194, 747, 153, 23 },
+  { 115, 202, 202, 786, 159, 25 },
+  { 119, 209, 209, 825, 165, 27 },
+  { 124, 215, 215, 864, 170, 29 },
+  { 128, 223, 223, 903, 176, 31 },
+  { 134, 229, 229, 942, 181, 33 },
+  { 139, 236, 236, 981, 186, 35 },
+  { 144, 244, 244, 1020, 192, 38 },
+  { 150, 253, 253, 1088, 200, 40 },
+  { 155, 263, 263, 1156, 207, 43 },
+  { 161, 272, 272, 1224, 215, 46 },
+  { 166, 283, 283, 1292, 223, 49 },
+  { 171, 292, 292, 1360, 231, 52 },
+  { 177, 302, 302, 1428, 238, 55 },
+  { 183, 311, 311, 1496, 246, 58 },
+  { 189, 322, 322, 1564, 254, 62 },
+  { 196, 331, 331, 1632, 261, 66 },
   { 202, 341, 341, 1700, 269, 70 },
   { 204, 342, 393, 1774, 270, 84 },
   { 205, 344, 444, 1851, 271, 99 },
@@ -92,7 +92,7 @@ const int levelTable[81][6] =
 
   // todo: add proper shbr values - hp/elmt/threat
   // sub/div added from http://theoryjerks.akhmorning.com/resources/levelmods/
-  { 296, 365, 2263, 3600, 466, 466 },
+  { 296, 365, 2263, 3600, 295, 466 },
   { 300, 366, 2360, 3600, 295, 466 },
   { 305, 367, 2461, 3600, 295, 466 },
   { 310, 368, 2566, 3600, 295, 466 },
@@ -131,7 +131,7 @@ float CalcStats::calculateBaseStat( const Chara& chara )
   if( level > Common::MAX_PLAYER_LEVEL )
     level = Common::MAX_PLAYER_LEVEL;
 
-  return static_cast< float >( levelTable[level][2] );
+  return static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 }
 
 // Leggerless' HP Formula
@@ -154,19 +154,22 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
 
   auto vitMod = pPlayer->getBonusStat( Common::BaseParam::Vitality );
   float baseStat = calculateBaseStat( *pPlayer );
-  uint16_t vitStat = pPlayer->getStats().vit + static_cast< uint16_t >( vitMod );
+  uint16_t vitStat = static_cast< uint16_t >( pPlayer->getStats().vit ) + static_cast< uint16_t >( vitMod );
   uint16_t hpMod = paramGrowthInfo->hpModifier;
   uint16_t jobModHp = classInfo->modifierHitPoints;
   float approxBaseHp = 0.0f; // Read above
 
   // These values are not precise.
-
+  /*
   if( level >= 60 )
     approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
   else if( level >= 50 )
     approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
   else
     approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
+  */
+  // just use the table at least better than what it was
+  approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
                                              floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
@@ -483,7 +486,7 @@ float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
 
-  auto pot = potency( ptc );
+  auto pot = potency( static_cast< uint16_t >( ptc ) );
   auto wd = weaponDamage( chara, wepDmg );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );

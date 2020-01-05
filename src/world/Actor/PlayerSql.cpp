@@ -217,6 +217,10 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   m_modelSubWeapon = 0;
   m_lastTickTime = 0;
 
+  //m_pInventory->load();
+
+  initInventory(); // moved up so we don't lose hp every login
+
   calculateStats();
 
   // first login, run the script event
@@ -241,10 +245,6 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   //     setStateFlag( PlayerStateFlag::NewAdventurer );
 
   setStateFlag( PlayerStateFlag::BetweenAreas );
-
-  //m_pInventory->load();
-
-  initInventory();
 
   initHateSlotQueue();
 

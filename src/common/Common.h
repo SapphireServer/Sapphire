@@ -27,6 +27,8 @@ namespace Sapphire::Common
   const uint8_t CLASSJOB_TOTAL = 38;
   const uint8_t CLASSJOB_SLOTS = 28;
 
+  const uint8_t TOWN_COUNT = 6;
+
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
    *
@@ -214,6 +216,8 @@ namespace Sapphire::Common
     HandIn = 2005,
     DamagedGear = 2007,
     //UNKNOWN_1 = 2008,
+    // Temporary inventory that is used for the "trade" window
+    TradeInventory = 2009,
 
     ArmoryOff = 3200,
     ArmoryHead = 3201,
@@ -232,6 +236,9 @@ namespace Sapphire::Common
     
     SaddleBag0 = 4000,
     SaddleBag1 = 4001,
+    // These are the ones you get when paying for premium companion app
+    PremiumSaddleBag0 = 4100,
+    PremiumSaddleBag1 = 4101,
 
     RetainerBag0 = 10000,
     RetainerBag1 = 10001,

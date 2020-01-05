@@ -24,6 +24,9 @@ namespace Sapphire::Network::ActorControl
     SetStatus = 0x02,
     CastStart = 0x03,
     ToggleAggro = 0x04,
+    /*!
+     * param1 = ClassJob ID
+     */
     ClassJobChange = 0x05,
     DefeatMsg = 0x06,
     GainExpMsg = 0x07,
@@ -142,6 +145,15 @@ namespace Sapphire::Network::ActorControl
 
     SetPose = 0x127,
 
+    /*!
+     * This is used for general crafting events, I found some of them but some are missing:
+     * 
+     * param1 = event type, the rest of the struct depends on this param.
+     *  - 18 & 19: Quicksynth result, 19 means HQ result item, item ID is param2 and is + 1 000 000 when HQ. 
+     *             Quantity is param3 (possible quicksynth that gives more than one item in the future?)
+     * 
+     * All the other values have unkown behavior for now. 
+     */
     CraftingUnk = 0x12C,
 
     GatheringSenseMsg = 0x130,
@@ -175,6 +187,14 @@ namespace Sapphire::Network::ActorControl
 
     RelicInfuseMsg = 0x179,
 
+    /*!
+     * Sent as result of an aetherial reduction.
+     * param1 = Reduced item ID + 500 000 (idk what this 500 000 is but it's always here no matter what)
+     * param2 = First result item id (+ 1 000 000 if HQ)
+     * param3 = First result item quantity
+     * param4 = (Optional) Second result item id (+ 1 000 000 if HQ)
+     * param5 = (Optional) Second result item quantity
+     */ 
     AetherReductionDlg = 0x17D,
 
     /*!
@@ -208,11 +228,19 @@ namespace Sapphire::Network::ActorControl
 
     /*!
      * Sent when a player desynths an item, one packet per result type (one for consumed item, one for each obtained items, and one for exp if the player received exp)
-     * param1 = result type (4921 => Item consumed, 4922 => Item obtained, 4925 => Exp obtained)
-     * param3 = item id (used for result types 4921 & 4922)
+     * param1 = result type
+     *          4921 => Desynth item consumed
+     *          4922 => Desynth item obtained
+     *          4925 => Desynth exp obtained)
+     *          3553 => Reduction item used
+     *          3555 => Reduction item obtained
+     * param3 = u32 item id (+100 000 if item is HQ)
+     * param4 = item amount (used only for reduction it seems)
      * param5 = exp amount (x 100)
+     * 
+     * Idk exactly how reduce's param3 is formatted, it seems like it's item id + 500 000 but it seems too... shady.
      */
-    DesynthResult = 0x20F,
+    DesynthOrReductionResult = 0x20F,
 
     GilTrailMsg = 0x211,
 
@@ -230,9 +258,13 @@ namespace Sapphire::Network::ActorControl
 
     GearSetEquipMsg = 0x321,
 
+    SetBait = 0x325, // param1: bait ID
+
     SetFestival = 0x386, // param1: festival.exd index
 
     ToggleOrchestrionUnlock = 0x396,
+
+    EventBattleDialog = 0x39C,
 
     /*!
     * param1 = mountSpeed
@@ -347,6 +379,12 @@ namespace Sapphire::Network::ActorControl
     EmoteReq = 0x1F4,
     EmoteCancel = 0x1F6,
     PersistentEmoteCancel = 0x1F7,
+    /*!
+     * param2 = pose ID
+     *      0 = idle pose 0 (just standing)
+     *      1 = idle pose 1
+     *    2-4 = idle poses 2-4
+     */
     PoseChange = 0x1F9,
     PoseReapply = 0x1FA,
     PoseCancel = 0x1FB,
@@ -354,6 +392,8 @@ namespace Sapphire::Network::ActorControl
     AchievementCrit = 0x202,
     AchievementComp = 0x203,
     AchievementCatChat = 0x206,
+
+    RequestEventBattle = 0x232C,
 
     QuestJournalUpdateQuestVisibility = 0x2BE,
     QuestJournalClosed = 0x2BF,

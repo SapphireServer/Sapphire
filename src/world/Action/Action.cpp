@@ -206,7 +206,7 @@ bool Action::Action::update()
 
   uint64_t tickCount = Common::Util::getTimeMs();
 
-  if( !hasCastTime() || std::difftime( tickCount, m_startTime ) > m_castTimeMs )
+  if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > m_castTimeMs )
   {
     execute();
     return true;
@@ -257,7 +257,7 @@ void Action::Action::start()
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   // check the lut too and see if we have something usable, otherwise cancel the cast
-  if( !pScriptMgr->onStart( *this ) && !ActionLut::validEntryExists( getId() ) )
+  if( !pScriptMgr->onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
   {
     // script not implemented and insufficient lut data (no potencies)
     interrupt();
@@ -391,8 +391,9 @@ void Action::Action::buildEffects()
   snapshotAffectedActors( m_hitActors );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto hasLutEntry = ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) );
 
-  if( !pScriptMgr->onExecute( *this ) && !ActionLut::validEntryExists( getId() ) )
+  if( !pScriptMgr->onExecute( *this ) && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
@@ -402,10 +403,10 @@ void Action::Action::buildEffects()
     return;
   }
 
-  if( m_hitActors.empty() )
+  if( !hasLutEntry || m_hitActors.empty() )
     return;
 
-  auto lutEntry = ActionLut::getEntry( getId() );
+  auto lutEntry = ActionLut::getEntry( static_cast< uint16_t >( getId() ) );
 
   // no script exists but we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
@@ -545,11 +546,11 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
 
       auto cost = m_primaryCost * 100;
 
-      if( curMp < cost )
+      if( curMp < static_cast< uint32_t >( cost ) )
         return false;
 
       if( subtractCosts )
-        m_pSource->setMp( curMp - cost );
+        m_pSource->setMp( curMp - static_cast< uint32_t >( cost ) );
 
       return true;
     }
