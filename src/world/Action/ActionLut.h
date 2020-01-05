@@ -13,7 +13,7 @@ namespace Sapphire::World::Action
     uint16_t frontPotency;
     uint16_t rearPotency;
     uint16_t curePotency;
-//    uint16_t restorePercentage;
+    uint16_t restoreMPPercentage;
   };
 
   class ActionLut
