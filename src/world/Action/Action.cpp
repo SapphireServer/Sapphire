@@ -393,8 +393,8 @@ void Action::Action::execute()
   // ignore it otherwise (ogcds, etc.)
   if( !m_actionData->preservesCombo )
   {
-    // potential combo starter or correct combo from last action
-    if( ( !isComboAction() || isCorrectCombo() ) )
+    // potential combo starter or correct combo from last action, must hit something to progress combo
+    if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
     {
       m_pSource->setLastComboActionId( getId() );
     }
