@@ -295,7 +295,7 @@ namespace Sapphire::Network::Packets
 
 
     CFRegisterDuty = 0x0071,
-    CFRegisterRoulette = 0x0072,
+    CFRegisterRoulette = 0xFF72,
     PlayTimeHandler = 0x0276, // updated 5.1
     LogoutHandler = 0x015D, // updated 5.18
     CancelLogout = 0x008F, // updated 5.1
@@ -342,8 +342,8 @@ namespace Sapphire::Network::Packets
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x01BE, // updated 5.18
     GMCommand1 = 0x014D, // updated 5.18
-    GMCommand2 = 0x032C, // updated 5.18
-    AoESkillHandler = 0x140, // updated 5.0
+    GMCommand2 = 0x03C2, // updated 5.18
+    AoESkillHandler = 0x0072, // updated 5.18
 
     UpdatePositionHandler = 0x0318, // updated 5.18
 
@@ -352,7 +352,7 @@ namespace Sapphire::Network::Packets
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
-    BuildPresetHandler = 0x014F, // updated 5.0
+    BuildPresetHandler = 0x0150, // updated 5.0
 
     TalkEventHandler = 0x02FD, // updated 5.18
     EmoteEventHandler = 0x0183, // updated 5.18

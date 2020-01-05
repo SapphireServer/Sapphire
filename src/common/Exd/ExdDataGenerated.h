@@ -5957,6 +5957,11 @@ struct ZoneSharedGroup
     std::shared_ptr< xiv::dat::GameData > m_data;
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
 
+    std::shared_ptr< xiv::dat::GameData > getGameData()
+    {
+      return m_data;
+    }
+
     template< class T >
     std::shared_ptr< T > get( uint32_t id )
     {
