@@ -184,7 +184,6 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     }
     assert( effectPacket != nullptr );
 
-    pHeader->actionAnimationId = m_sourceChara->getId();
     pHeader->actionId = m_actionId;
     pHeader->actionAnimationId = static_cast< uint16_t >( m_actionId );
     pHeader->animationTargetId = m_sourceChara->getId();
