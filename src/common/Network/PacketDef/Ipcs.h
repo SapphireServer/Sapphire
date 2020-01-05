@@ -156,7 +156,7 @@ namespace Sapphire::Network::Packets
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x0295, // updated 5.18
     PlayerStats = 0x017A, // updated 5.18
-    ActorOwner = 0x0322, // updated 5.11
+    ActorOwner = 0x03BB, // updated 5.18
     PlayerStateFlags = 0x02C6, // updated 5.18
     PlayerClassInfo = 0x01B0, // updated 5.18
 
@@ -341,8 +341,8 @@ namespace Sapphire::Network::Packets
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x01BE, // updated 5.18
-    GMCommand1 = 0x00A4, // updated 5.1
-    GMCommand2 = 0x013F, // updated 5.0
+    GMCommand1 = 0x014D, // updated 5.18
+    GMCommand2 = 0x032C, // updated 5.18
     AoESkillHandler = 0x140, // updated 5.0
 
     UpdatePositionHandler = 0x0318, // updated 5.18

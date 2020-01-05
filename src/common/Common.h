@@ -629,6 +629,7 @@ namespace Sapphire::Common
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
     StartActionCombo = 28,
+    ComboVisualEffect = 29,
     Knockback = 33,
     Mount = 38,
     VFX = 59, // links to VFX sheet
