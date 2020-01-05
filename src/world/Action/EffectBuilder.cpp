@@ -107,6 +107,16 @@ void EffectBuilder::comboVisualEffect( Entity::CharaPtr& target )
   resultList->push_back( std::move( nextResult ) );
 }
 
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+{
+  auto resultList = getResultList( target );
+  assert( resultList );
+
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  nextResult->applyStatusEffect( statusId, param );
+  resultList->push_back( std::move( nextResult ) );
+}
+
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();

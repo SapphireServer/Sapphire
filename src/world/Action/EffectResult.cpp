@@ -35,11 +35,6 @@ uint64_t EffectResult::getDelay()
   return m_delayMs;
 }
 
-void EffectResult::setParam( uint8_t param )
-{
-  m_param = param;
-}
-
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity )
 {
   m_severity = severity;
@@ -76,6 +71,14 @@ void EffectResult::startCombo( uint16_t actionId )
 void EffectResult::comboVisualEffect()
 {
   m_type = Common::ActionEffectType::ComboVisualEffect;
+}
+
+void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
+{
+  m_value = statusId;
+  m_param = param;
+
+  m_type = Common::ActionEffectType::ApplyStatusEffect;
 }
 
 Common::EffectEntry EffectResult::buildEffectEntry() const
