@@ -2140,8 +2140,7 @@ bool Sapphire::Entity::Player::hasQueuedAction() const
 
 void Sapphire::Entity::Player::setQueuedAction( Sapphire::World::Action::ActionPtr pAction )
 {
-  m_pQueuedAction = nullptr; // overwrite whatever is already there
-  m_pQueuedAction = std::move( pAction );
+  m_pQueuedAction = std::move( pAction ); // overwrite previous queued action if any
 }
 
 bool Sapphire::Entity::Player::checkAction()

@@ -468,14 +468,14 @@ void Action::Action::buildEffects()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_effectBuilder->damageTarget( actor, dmg.first, dmg.second );
+      m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
       if( isCorrectCombo() && shouldShowComboEffect )
       {
-        m_effectBuilder->comboVisualEffect( actor );
+        m_effectBuilder->comboSucceed( actor );
         shouldShowComboEffect = false;
       }
 
@@ -483,12 +483,12 @@ void Action::Action::buildEffects()
       {
         if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
-          m_effectBuilder->selfHeal( actor, m_pSource, m_lutEntry.curePotency );
+          m_effectBuilder->heal( actor, m_pSource, m_lutEntry.curePotency, Common::ActionHitSeverityType::NormalHeal, Common::ActionEffectResultFlag::EffectOnSource );
         }
 
         if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
         {
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100 );
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
           shouldRestoreMP = false;
         }
 
@@ -501,18 +501,17 @@ void Action::Action::buildEffects()
     else if( m_lutEntry.curePotency > 0 )
     {
       // todo: calcHealing()
-      m_effectBuilder->healTarget( actor, m_lutEntry.curePotency );
+      m_effectBuilder->heal( actor, actor, m_lutEntry.curePotency );
 
       if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
-        // always restore caster mp I don't think there are any actions that can restore target MP post 5.0
-        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100 );
+        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
         shouldRestoreMP = false;
       }
     }
     else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
     {
-      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100 );
+      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
       shouldRestoreMP = false;
     }
   }
@@ -753,7 +752,7 @@ bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
 
-  if( m_lutEntry.potency > 0 && chara == m_pSource )
+  if( m_lutEntry.potency > 0 && chara->getId() == m_pSource->getId() )
   {
     // damage action shouldn't hit self
     return false;
