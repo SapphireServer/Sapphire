@@ -26,7 +26,7 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.effectDisplayType = Common::ActionEffectDisplayType::ShowActionName;
 
-      std::memset( m_data.effects, 0, sizeof(Common::EffectEntry) * 8 );
+      std::memset( m_data.effects, 0, sizeof( Common::EffectEntry ) * 8 );
     }
 
     void addEffect( const Common::EffectEntry& effect )

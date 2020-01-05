@@ -15,7 +15,7 @@ EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
   m_severity( Common::ActionHitSeverityType::NormalDamage ),
   m_type( Common::ActionEffectType::Nothing ),
   m_param( 0 ),
-  m_flag( 0 )
+  m_flag( Common::ActionEffectResultFlag::None )
 {
 
 }
@@ -40,27 +40,28 @@ void EffectResult::setParam( uint8_t param )
   m_param = param;
 }
 
-void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity )
+void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   m_severity = severity;
   m_value = amount;
+  m_flag = flag;
 
   m_type = Common::ActionEffectType::Damage;
 }
 
-void EffectResult::heal( uint32_t amount, Sapphire::Common::ActionHitSeverityType severity, bool isSelfHeal )
+void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   m_severity = severity;
   m_value = amount;
-  m_flag = isSelfHeal ? 0x80 : 0; // flag == 0x80 displays healing text at source actor
+  m_flag = flag;
 
   m_type = Common::ActionEffectType::Heal;
 }
 
-void EffectResult::restoreMP( uint32_t amount )
+void EffectResult::restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag )
 {
   m_value = amount;
-  m_flag = 0x80;
+  m_flag = flag;
 
   m_type = Common::ActionEffectType::MpGain;
 }
@@ -68,14 +69,15 @@ void EffectResult::restoreMP( uint32_t amount )
 void EffectResult::startCombo( uint16_t actionId )
 {
   m_value = actionId;
-  m_flag = 0x80;
+  m_flag = Common::ActionEffectResultFlag::EffectOnSource;
 
   m_type = Common::ActionEffectType::StartActionCombo;
 }
 
-void EffectResult::comboVisualEffect()
+void EffectResult::comboSucceed()
 {
-  m_type = Common::ActionEffectType::ComboVisualEffect;
+  // no EffectOnSource flag on this
+  m_type = Common::ActionEffectType::ComboSucceed;
 }
 
 Common::EffectEntry EffectResult::buildEffectEntry() const
@@ -87,7 +89,7 @@ Common::EffectEntry EffectResult::buildEffectEntry() const
   entry.hitSeverity = m_severity;
   entry.effectType = m_type;
   entry.param = m_param;
-  entry.flags = m_flag;
+  entry.flags = static_cast< uint8_t >( m_flag );
 
   return entry;
 }
