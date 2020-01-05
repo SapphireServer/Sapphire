@@ -436,12 +436,12 @@ void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
   uint8_t type = inPacket.data[ 0x1A ];
   uint8_t count = inPacket.data[ 0x1B ];
 
-  if( type == 0x02 )
+  if( type == 1 )
   { // party list
 
     auto listPacket = makeZonePacket< FFXIVIpcSocialList >( player.getId() );
 
-    listPacket->data().type = 2;
+    listPacket->data().type = 1;
     listPacket->data().sequence = count;
 
     int32_t entrysizes = sizeof( listPacket->data().entries );
@@ -462,19 +462,21 @@ void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
 
     memcpy( listPacket->data().entries[ 0 ].name, player.getName().c_str(), strlen( player.getName().c_str() ) );
 
-    // TODO: actually store and read language from somewhere
-    listPacket->data().entries[ 0 ].bytes1[ 0 ] = 0x01;//flags (lang)
-    // TODO: these flags need to be figured out
-    //listPacket.data().entries[0].bytes1[1] = 0x00;//flags
+    // GC icon
+    listPacket->data().entries[ 0 ].bytes1[ 0 ] = 2;
+    // client language J = 0, E = 1, D = 2, F = 3
+    listPacket->data().entries[ 0 ].bytes1[ 1 ] = 1;
+    // user language settings flag J = 1, E = 2, D = 4, F = 8
+    listPacket->data().entries[ 0 ].bytes1[ 2 ] = 1 + 2; 
     listPacket->data().entries[ 0 ].onlineStatusMask = player.getOnlineStatusMask();
 
     queueOutPacket( listPacket );
 
   }
-  else if( type == 0x0b )
+  else if( type == 2 )
   { // friend list
     auto listPacket = makeZonePacket< FFXIVIpcSocialList >( player.getId() );
-    listPacket->data().type = 0x0B;
+    listPacket->data().type = 2;
     listPacket->data().sequence = count;
     memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
