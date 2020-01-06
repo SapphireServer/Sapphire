@@ -249,11 +249,11 @@ int main()
 //                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
 //                  data.curePotency, data.restorePercentage );
 
-    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {} }} }},\n",
+    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {}, {} }} }},\n",
                             data.name, action.first,
                             data.potency, data.comboPotency,
                             data.flankPotency, data.frontPotency, data.rearPotency,
-                            data.curePotency );
+                            data.curePotency, 0 );
 
     output += out;
 //    Logger::info( out );

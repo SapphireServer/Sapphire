@@ -438,6 +438,18 @@ void Sapphire::Entity::Chara::heal( uint32_t amount )
   sendStatusUpdate();
 }
 
+void Sapphire::Entity::Chara::restoreMP( uint32_t amount )
+{
+  if( ( m_mp + amount ) > getMaxMp() )
+  {
+    m_mp = getMaxMp();
+  }
+  else
+    m_mp += amount;
+
+  sendStatusUpdate();
+}
+
 /*!
 Send an HpMpTp update to players in range ( and potentially to self )
 TODO: poor naming, should be changed. Status is not HP. Also should be virtual

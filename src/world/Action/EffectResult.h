@@ -15,8 +15,11 @@ namespace Sapphire::World::Action
   public:
     explicit EffectResult( Entity::CharaPtr target, uint64_t delayMs );
 
-    void damage( uint32_t amount, Common::ActionHitSeverityType severity );
-    void heal( uint32_t amount, Common::ActionHitSeverityType severity );
+    void damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void startCombo( uint16_t actionId );
+    void comboSucceed();
 
     Entity::CharaPtr getTarget() const;
 
@@ -40,6 +43,7 @@ namespace Sapphire::World::Action
 
     uint32_t m_value;
     uint8_t m_param;
+    Common::ActionEffectResultFlag m_flag;
   };
 }
 

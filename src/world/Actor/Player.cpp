@@ -80,7 +80,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_emoteMode( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
-  m_falling( false )
+  m_falling( false ),
+  m_pQueuedAction( nullptr )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -2142,4 +2143,43 @@ void Sapphire::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
 Sapphire::Common::ActiveLand Sapphire::Entity::Player::getActiveLand() const
 {
   return m_activeLand;
+}
+
+bool Sapphire::Entity::Player::hasQueuedAction() const
+{
+  return m_pQueuedAction != nullptr;
+}
+
+void Sapphire::Entity::Player::setQueuedAction( Sapphire::World::Action::ActionPtr pAction )
+{
+  m_pQueuedAction = std::move( pAction ); // overwrite previous queued action if any
+}
+
+bool Sapphire::Entity::Player::checkAction()
+{
+  if( m_pCurrentAction == nullptr )
+    return false;
+
+  if( m_pCurrentAction->update() )
+  {
+    if( m_pCurrentAction->isInterrupted() && m_pCurrentAction->getInterruptType() != Common::ActionInterruptType::DamageInterrupt )
+    {
+      // we moved (or whatever not damage interrupt) so we don't want to execute queued cast
+      m_pQueuedAction = nullptr;
+    }
+    m_pCurrentAction = nullptr;
+
+    if( hasQueuedAction() )
+    {
+      sendDebug( "Queued skill start: {0}", m_pQueuedAction->getId() );
+      if( m_pQueuedAction->hasCastTime() )
+      {
+        setCurrentAction( m_pQueuedAction );
+      }
+      m_pQueuedAction->start();
+      m_pQueuedAction = nullptr;
+    }
+  }
+
+  return true;
 }
