@@ -629,6 +629,7 @@ namespace Sapphire::Common
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
     StartActionCombo = 28,
+    ComboSucceed = 29,
     Knockback = 33,
     Mount = 38,
     VFX = 59, // links to VFX sheet
@@ -642,6 +643,12 @@ namespace Sapphire::Common
     NormalHeal = 1,
     DirectHitDamage = 2,
     CritDirectHitDamage = 3
+  };
+
+  enum class ActionEffectResultFlag : uint8_t
+  {
+    None = 0,
+    EffectOnSource = 0x80,
   };
 
   enum ItemActionType : uint16_t

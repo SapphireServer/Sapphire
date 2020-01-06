@@ -27,6 +27,8 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
 
+  action->setPos( pos );
+
   if( !action->init() )
     return;
 
@@ -36,8 +38,6 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
     action->interrupt();
     return;
   }
-
-  action->setPos( pos );
 
   bootstrapAction( player, action, *actionData );
 }
@@ -49,6 +49,8 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
 
   action->setTargetId( targetId );
+
+  action->setPos( player.getPos() );
 
   if( !action->init() )
     return;
@@ -87,12 +89,20 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
     return;
   }
 
-  // if we have a cast time we want to associate the action with the player so update is called
-  if( currentAction->hasCastTime() )
+  if( player.getCurrentAction() )
   {
-    player.setCurrentAction( currentAction );
+    player.sendDebug( "Skill queued: {0}", currentAction->getId() );
+    player.setQueuedAction( currentAction );
   }
+  else
+  {
+    // if we have a cast time we want to associate the action with the player so update is called
+    if( currentAction->hasCastTime() )
+    {
+      player.setCurrentAction( currentAction );
+    }
 
-  // todo: what do in cases of swiftcast/etc? script callback?
-  currentAction->start();
+    // todo: what do in cases of swiftcast/etc? script callback?
+    currentAction->start();
+  }
 }
