@@ -2,7 +2,7 @@
 #include <Actor/Player.h>
 
 #include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/Lgb.h>
+#include <datReader/DatCategories/bg/lgb.h>
 
 #include "Territory/InstanceObjectCache.h"
 
