@@ -447,14 +447,14 @@ void Action::Action::buildEffects()
     return;
   }
 
-  if( !hasLutEntry || m_hitActors.empty() )
+  if( !hasLutEntry || m_hitActors.empty() ) // this is just "if ( weCanNotUseGenericActionHandler )" in case we start to expand it.
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets(); 
+    m_effectBuilder->buildAndSendPackets();
     return;
   }
 
-  // no script exists but we have a valid lut entry
+  // we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
     player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
