@@ -1,5 +1,4 @@
 #include "Action.h"
-#include "EffectBuilder.h"
 
 #include <Inventory/Item.h>
 
@@ -450,7 +449,8 @@ void Action::Action::buildEffects()
 
   if( !hasLutEntry || m_hitActors.empty() )
   {
-    m_effectBuilder->buildAndSendPackets(); // send any effect packet added by script
+    // send any effect packet added by script or an empty one just to play animation for other players
+    m_effectBuilder->buildAndSendPackets(); 
     return;
   }
 
