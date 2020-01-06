@@ -84,6 +84,13 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
   moveToResultList( target, nextResult );
 }
 
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  nextResult->applyStatusEffect( statusId, param );
+  moveToResultList( target, nextResult );
+}
+
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();
