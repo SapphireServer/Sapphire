@@ -30,7 +30,7 @@ namespace Sapphire::World::Action
 
 
   private:
-    std::shared_ptr< std::vector< EffectResultPtr > > getResultList( Entity::CharaPtr& chara );
+    void moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result );
 
     uint64_t getResultDelayMs();
 
