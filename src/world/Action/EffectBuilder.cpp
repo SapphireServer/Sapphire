@@ -86,12 +86,9 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 
 void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
 {
-  auto resultList = getResultList( target );
-  assert( resultList );
-
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->applyStatusEffect( statusId, param );
-  resultList->push_back( std::move( nextResult ) );
+  moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::buildAndSendPackets()
