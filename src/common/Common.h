@@ -622,6 +622,7 @@ namespace Sapphire::Common
     TpLoss = 12,
     TpGain = 13,
     GpGain = 14,
+    ApplyStatusEffect = 15,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
@@ -668,13 +669,13 @@ namespace Sapphire::Common
   {
     Common::ActionEffectType effectType;
     Common::ActionHitSeverityType hitSeverity;
-    uint8_t param;
+    uint8_t unk;
     /*!
      * @brief Shows an additional percentage in the battle log
      *
      * Has no effect on what is shown and stored in value
      */
-    int8_t bonusPercent;
+    uint8_t param; // this one is the real param
     uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
     uint8_t flags;
     int16_t value;

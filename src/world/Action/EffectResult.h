@@ -20,14 +20,13 @@ namespace Sapphire::World::Action
     void restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
+    void applyStatusEffect( uint16_t statusId, uint8_t param );
 
     Entity::CharaPtr getTarget() const;
 
     uint32_t getValue() const;
 
     uint64_t getDelay();
-
-    void setParam( uint8_t param );
 
     Common::EffectEntry buildEffectEntry() const;
 

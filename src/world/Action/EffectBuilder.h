@@ -26,6 +26,8 @@ namespace Sapphire::World::Action
 
     void comboSucceed( Entity::CharaPtr& target );
 
+    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param );
+
     void buildAndSendPackets();
 
 
