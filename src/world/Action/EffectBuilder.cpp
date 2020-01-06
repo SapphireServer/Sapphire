@@ -31,70 +31,57 @@ uint64_t EffectBuilder::getResultDelayMs()
   return Common::Util::getTimeMs() + 850;
 }
 
-std::shared_ptr< std::vector< EffectResultPtr > > EffectBuilder::getResultList( Entity::CharaPtr& chara )
+void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
 {
   auto it = m_resolvedEffects.find( chara->getId() );
   if( it == m_resolvedEffects.end() )
   {
-    // create a new one and return it
+    // create a new one
     auto resultList = std::make_shared< std::vector< EffectResultPtr > >();
 
     m_resolvedEffects[ chara->getId() ] = resultList;
 
-    return resultList;
+    resultList->push_back( std::move( result ) );
+
+    return;
   }
 
-  return it->second;
+  it->second->push_back( std::move( result ) );
 }
 
 void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  auto resultList = getResultList( effectTarget );
-  assert( resultList );
-
   EffectResultPtr nextResult = make_EffectResult( healingTarget, getResultDelayMs() );
   nextResult->heal( amount, severity, flag );
-  resultList->push_back( std::move( nextResult ) );
+  moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
 {
-  auto resultList = getResultList( target );
-  assert( resultList );
-
   EffectResultPtr nextResult = make_EffectResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
   nextResult->restoreMP( amount, flag );
-  resultList->push_back( std::move( nextResult ) );
+  moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  auto resultList = getResultList( effectTarget );
-  assert( resultList );
-
   EffectResultPtr nextResult = make_EffectResult( damagingTarget, getResultDelayMs() );
   nextResult->damage( amount, severity, flag );
-  resultList->push_back( std::move( nextResult ) );
+  moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  auto resultList = getResultList( target );
-  assert( resultList  );
-
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->startCombo( actionId );
-  resultList->push_back( std::move( nextResult ) );
+  moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  auto resultList = getResultList( target );
-  assert( resultList  );
-
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->comboSucceed();
-  resultList->push_back( std::move( nextResult ) );
+  moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::buildAndSendPackets()
