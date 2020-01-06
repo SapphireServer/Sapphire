@@ -5,6 +5,7 @@
 #include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
+#include "EffectBuilder.h"
 
 namespace Sapphire::Data
 {
@@ -88,6 +89,8 @@ namespace Sapphire::World::Action
      * @return true if actors are hit
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
+
+    EffectBuilderPtr getEffectbuilder();
 
     void buildEffects();
 
