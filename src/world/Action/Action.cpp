@@ -1,5 +1,4 @@
 #include "Action.h"
-#include "EffectBuilder.h"
 
 #include <Inventory/Item.h>
 
@@ -449,7 +448,11 @@ void Action::Action::buildEffects()
   }
 
   if( !hasLutEntry || m_hitActors.empty() )
+  {
+    // send any effect packet added by script or an empty one just to play animation for other players
+    m_effectBuilder->buildAndSendPackets(); 
     return;
+  }
 
   // no script exists but we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
@@ -786,4 +789,9 @@ bool Action::Action::hasValidLutEntry() const
 {
   return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
     m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
+}
+
+Action::EffectBuilderPtr Action::Action::getEffectbuilder()
+{
+  return m_effectBuilder;
 }

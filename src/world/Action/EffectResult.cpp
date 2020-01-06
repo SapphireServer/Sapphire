@@ -35,11 +35,6 @@ uint64_t EffectResult::getDelay()
   return m_delayMs;
 }
 
-void EffectResult::setParam( uint8_t param )
-{
-  m_param = param;
-}
-
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   m_severity = severity;
@@ -78,6 +73,14 @@ void EffectResult::comboSucceed()
 {
   // no EffectOnSource flag on this
   m_type = Common::ActionEffectType::ComboSucceed;
+}
+
+void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
+{
+  m_value = statusId;
+  m_param = param;
+
+  m_type = Common::ActionEffectType::ApplyStatusEffect;
 }
 
 Common::EffectEntry EffectResult::buildEffectEntry() const
