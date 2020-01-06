@@ -4,7 +4,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/Lgb.h>
+#include <datReader/DatCategories/bg/lgb.h>
 
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>

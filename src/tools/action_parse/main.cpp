@@ -25,7 +25,7 @@ namespace fs = std::experimental::filesystem;
 
 using namespace Sapphire;
 
-const std::string datLocation( "/home/mordred/sqpack" );
+std::string datLocation( "/home/mordred/sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
 struct ActionEntry
@@ -69,13 +69,18 @@ uint32_t stripNonNumerics( std::string& str )
   return std::atoi( str.c_str() );
 }
 
-int main()
+int main( int argc, char* argv[] )
 {
 
   Logger::init( "action_parse" );
 
   if( !fs::exists( "ActionLutData.cpp.tmpl" ) )
     throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
+
+  if( argc == 2 )
+  {
+    datLocation = std::string( argv[ 1 ] );
+  }
 
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )

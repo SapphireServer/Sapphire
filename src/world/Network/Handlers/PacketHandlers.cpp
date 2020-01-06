@@ -10,7 +10,7 @@
 #include <Util/Util.h>
 
 #include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/Lgb.h>
+#include <datReader/DatCategories/bg/lgb.h>
 
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
