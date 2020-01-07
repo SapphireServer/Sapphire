@@ -425,9 +425,30 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
     }
   }
 
-  auto dmg = Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+  return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+}
 
-  return std::make_pair( dmg, Common::ActionHitSeverityType::NormalDamage );
+std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
+{
+  auto wepDmg = 1.f;
+
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
 }
 
 void Action::Action::buildEffects()
@@ -486,7 +507,8 @@ void Action::Action::buildEffects()
       {
         if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
-          m_effectBuilder->heal( actor, m_pSource, m_lutEntry.curePotency, Common::ActionHitSeverityType::NormalHeal, Common::ActionEffectResultFlag::EffectOnSource );
+          auto heal = calcHealing( m_lutEntry.curePotency );
+          m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
         }
 
         if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
@@ -503,8 +525,8 @@ void Action::Action::buildEffects()
     }
     else if( m_lutEntry.curePotency > 0 )
     {
-      // todo: calcHealing()
-      m_effectBuilder->heal( actor, actor, m_lutEntry.curePotency );
+      auto heal = calcHealing( m_lutEntry.curePotency );
+      m_effectBuilder->heal( actor, actor, heal.first, heal.second );
 
       if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
