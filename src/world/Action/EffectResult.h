@@ -37,7 +37,8 @@ namespace Sapphire::World::Action
 
     Entity::CharaPtr m_target;
 
-    Common::ActionHitSeverityType m_severity;
+    Common::ActionHitSeverityType m_hitSeverity;
+    Common::ActionHitSeverityType m_healSeverity;
     Common::ActionEffectType m_type;
 
     uint32_t m_value;

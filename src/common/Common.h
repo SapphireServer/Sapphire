@@ -639,9 +639,9 @@ namespace Sapphire::Common
   enum class ActionHitSeverityType : uint8_t
   {
     NormalDamage = 0,
-    CritHeal = 0,
+    NormalHeal = 0,
     CritDamage = 1,
-    NormalHeal = 1,
+    CritHeal = 1,
     DirectHitDamage = 2,
     CritDirectHitDamage = 3
   };
@@ -669,7 +669,7 @@ namespace Sapphire::Common
   {
     Common::ActionEffectType effectType;
     Common::ActionHitSeverityType hitSeverity;
-    uint8_t unk;
+    Common::ActionHitSeverityType healSeverity;
     /*!
      * @brief Shows an additional percentage in the battle log
      *

@@ -1585,9 +1585,9 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = damage;
+    entry.value = damage.first;
     entry.effectType = Common::ActionEffectType::Damage;
-    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.hitSeverity = damage.second;
     entry.param = 0x72;
 
     effectPacket->addEffect( entry );
@@ -1600,9 +1600,9 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = damage;
+    entry.value = damage.first;
     entry.effectType = Common::ActionEffectType::Damage;
-    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.hitSeverity = damage.second;
     entry.param = 0x73;
 
     effectPacket->addEffect( entry );
@@ -1611,7 +1611,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   }
 
-  pTarget->takeDamage( damage );
+  pTarget->takeDamage( damage.first );
 
 }
 
