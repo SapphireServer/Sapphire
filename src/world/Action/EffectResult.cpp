@@ -12,7 +12,8 @@ EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
   m_target( std::move( target ) ),
   m_delayMs( runAfter ),
   m_value( 0 ),
-  m_severity( Common::ActionHitSeverityType::NormalDamage ),
+  m_hitSeverity( Common::ActionHitSeverityType::NormalDamage ),
+  m_healSeverity( Common::ActionHitSeverityType::NormalHeal ),
   m_type( Common::ActionEffectType::Nothing ),
   m_param( 0 ),
   m_flag( Common::ActionEffectResultFlag::None )
@@ -37,7 +38,7 @@ uint64_t EffectResult::getDelay()
 
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  m_severity = severity;
+  m_hitSeverity = severity;
   m_value = amount;
   m_flag = flag;
 
@@ -46,7 +47,7 @@ void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severi
 
 void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  m_severity = severity;
+  m_healSeverity = severity;
   m_value = amount;
   m_flag = flag;
 
@@ -89,7 +90,8 @@ Common::EffectEntry EffectResult::buildEffectEntry() const
 
   // todo: that retarded shit so > u16 max numbers work
   entry.value = getValue();
-  entry.hitSeverity = m_severity;
+  entry.hitSeverity = m_hitSeverity;
+  entry.healSeverity = m_healSeverity;
   entry.effectType = m_type;
   entry.param = m_param;
   entry.flags = static_cast< uint8_t >( m_flag );

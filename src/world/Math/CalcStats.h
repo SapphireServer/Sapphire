@@ -1,6 +1,7 @@
 #ifndef _CALCSTATS_H
 #define _CALCSTATS_H
 
+#include <random>
 #include <Common.h>
 #include "Forwards.h"
 
@@ -128,9 +129,11 @@ namespace Sapphire::Math
 
     ////////////////////////////////////////////
 
-    static float calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+    static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
 
-    static float calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+
+    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
   private:
@@ -142,7 +145,9 @@ namespace Sapphire::Math
      */
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
-
+    static std::random_device dev;
+    static std::mt19937 rng;
+    static std::uniform_int_distribution< std::mt19937::result_type > range100;
   };
 
 }
