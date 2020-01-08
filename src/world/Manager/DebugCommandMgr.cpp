@@ -513,7 +513,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     Common::EffectEntry entry{};
     entry.value = static_cast< int16_t >( param1 );
     entry.effectType = Common::ActionEffectType::Damage;
-    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.param0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
 
     effectPacket->addEffect( entry );
 
