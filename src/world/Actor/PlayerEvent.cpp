@@ -145,8 +145,22 @@ void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, ui
   openGilShopPacket->data().eventId = eventId;
   openGilShopPacket->data().sceneFlags = flags;
   openGilShopPacket->data().actorId = getId();
-  openGilShopPacket->data().params[ 0 ] = 1;
-  openGilShopPacket->data().params[ 1 ] = param;
+  switch( param )
+  {
+    case 1:
+    {
+      openGilShopPacket->data().params[ 0 ] = 0x02;
+      openGilShopPacket->data().params[ 1 ] = 1;
+      openGilShopPacket->data().params[ 2 ] = 0x64;
+      break;
+    }
+    case 2:
+    {
+      openGilShopPacket->data().params[ 0 ] = 0xA2;
+      openGilShopPacket->data().params[ 1 ] = 2;
+      break;
+    }
+  }
 
   openGilShopPacket->data().scene = 10;
 

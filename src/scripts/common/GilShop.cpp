@@ -43,7 +43,7 @@ private:
 
       }
 
-      player.playGilShop( result.eventId, SCENE_FLAGS, result.param2 == 1 ? 3 : 2, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
+      player.playGilShop( result.eventId, SCENE_FLAGS, result.param2, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
       return;
     }
 
