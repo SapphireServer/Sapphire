@@ -130,7 +130,7 @@ void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
   playScene( eventId, scene, flags, eventParam2, eventParam3, 0, eventCallback );
 }
 
-void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, uint32_t param,
+void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, uint32_t param1,
                                             Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
@@ -145,7 +145,7 @@ void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, ui
   openGilShopPacket->data().eventId = eventId;
   openGilShopPacket->data().sceneFlags = flags;
   openGilShopPacket->data().actorId = getId();
-  switch( param )
+  switch( param1 )
   {
     case 1:
     {

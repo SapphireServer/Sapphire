@@ -67,7 +67,7 @@ namespace Sapphire::Entity
     /*! play a subevent */
     void playScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
 
-    void playGilShop( uint32_t eventId, uint32_t flags, uint32_t param,
+    void playGilShop( uint32_t eventId, uint32_t flags, uint32_t param1,
                       Event::EventHandler::SceneReturnCallback eventCallback );
 
     void directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
