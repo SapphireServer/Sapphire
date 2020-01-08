@@ -7,13 +7,19 @@ namespace Sapphire::World::Action
 {
   struct ActionEntry
   {
-    uint16_t potency;
-    uint16_t comboPotency;
-    uint16_t flankPotency;
-    uint16_t frontPotency;
-    uint16_t rearPotency;
-    uint16_t curePotency;
-    uint16_t restoreMPPercentage;
+    uint16_t damagePotency;
+    uint16_t damageComboPotency;
+    uint16_t damageDirectionalPotency;
+    uint16_t healPotency;
+    uint16_t selfHealPotency;
+    uint16_t selfStatus;
+    uint16_t selfStatusDuration;
+    uint16_t selfStatusParam;
+    uint16_t targetStatus;
+    uint16_t targetStatusDuration;
+    uint16_t targetStatusParam;
+    uint16_t gainMPPercentage;
+    uint16_t gainJobResource;
   };
 
   class ActionLut

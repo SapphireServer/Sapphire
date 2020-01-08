@@ -51,43 +51,43 @@ void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr r
 
 void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( healingTarget, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( healingTarget, nullptr, getResultDelayMs() );
   nextResult->heal( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
+  EffectResultPtr nextResult = make_EffectResult( restoringTarget, nullptr, getResultDelayMs() ); // restore mp source actor
   nextResult->restoreMP( amount, flag );
   moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( damagingTarget, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, nullptr, getResultDelayMs() );
   nextResult->damage( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
   nextResult->startCombo( actionId );
   moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
   nextResult->comboSucceed();
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, param );
+  EffectResultPtr nextResult = make_EffectResult( target, source, 0 );
+  nextResult->applyStatusEffect( statusId, duration, param );
   moveToResultList( target, nextResult );
 }
 

@@ -1100,8 +1100,6 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( !isAlive() )
     return;
 
-  updateStatusEffects();
-
   m_lastUpdate = tickCount;
 
   if( !checkAction() )

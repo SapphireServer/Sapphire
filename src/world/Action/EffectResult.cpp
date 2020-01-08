@@ -8,10 +8,12 @@ using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
 
-EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
+EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, uint64_t runAfter ) :
   m_target( std::move( target ) ),
+  m_source( std::move( source ) ),
   m_delayMs( runAfter ),
   m_value( 0 ),
+  m_value2( 0 ),
   m_param0( 0 ),
   m_param1( 0 ),
   m_type( Common::ActionEffectType::Nothing ),
@@ -19,6 +21,11 @@ EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
   m_flag( Common::ActionEffectResultFlag::None )
 {
 
+}
+
+Entity::CharaPtr EffectResult::getSource() const
+{
+  return m_source;
 }
 
 Entity::CharaPtr EffectResult::getTarget() const
@@ -76,9 +83,10 @@ void EffectResult::comboSucceed()
   m_type = Common::ActionEffectType::ComboSucceed;
 }
 
-void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
+void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint8_t param )
 {
   m_value = statusId;
+  m_value2 = duration;
   m_param2 = param;
 
   m_type = Common::ActionEffectType::ApplyStatusEffect;
@@ -118,6 +126,12 @@ void EffectResult::execute()
     case Common::ActionEffectType::MpGain:
     {
       m_target->restoreMP( m_value );
+      break;
+    }
+
+    case Common::ActionEffectType::ApplyStatusEffect:
+    {
+      m_target->addStatusEffectById( m_value, m_value2, *m_source, m_param2 );
       break;
     }
 

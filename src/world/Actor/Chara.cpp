@@ -354,6 +354,8 @@ bool Sapphire::Entity::Chara::checkAction()
 
 void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
+  updateStatusEffects();
+
   if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
   {
     onTick();
@@ -557,6 +559,9 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 /*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
+  if( hasStatusEffect( id ) ) // todo: check if we want to refresh it or discard and keep the old one
+    removeSingleStatusEffectById( id, false );
+
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
   addStatusEffect( effect );
@@ -593,19 +598,19 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
   m_statusEffectFreeSlotQueue.push( slotId );
 }
 
-void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
+void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool sendPacket )
 {
   for( auto effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
-      removeStatusEffect( effectIt.first );
+      removeStatusEffect( effectIt.first, sendPacket );
       break;
     }
   }
 }
 
-void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
+void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendPacket )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -616,7 +621,8 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+  if( sendPacket )
+    sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
 
   m_statusEffectMap.erase( effectSlotId );
 
@@ -694,10 +700,10 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     uint32_t duration = effect->getDuration();
     uint32_t tickRate = effect->getTickRate();
 
-    if( ( currentTimeMs - startTime ) > duration )
+    if( duration > 0 && ( currentTimeMs - startTime ) > duration )
     {
       // remove status effect
-      removeStatusEffect( effectIndex );
+      removeStatusEffect( effectIndex, true );
       // break because removing invalidates iterators
       break;
     }
@@ -746,7 +752,15 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 
 bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
 {
-  return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
+  //return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
+  for( auto effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getId() == id )
+    {
+      return true;
+    }
+  }
+  return false;
 }
 
 int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
