@@ -37,12 +37,13 @@ namespace Sapphire::World::Action
 
     Entity::CharaPtr m_target;
 
-    Common::ActionHitSeverityType m_hitSeverity;
-    Common::ActionHitSeverityType m_healSeverity;
     Common::ActionEffectType m_type;
 
+    uint8_t m_param0;
+    uint8_t m_param1;
+    uint8_t m_param2;
+
     uint32_t m_value;
-    uint8_t m_param;
     Common::ActionEffectResultFlag m_flag;
   };
 }
