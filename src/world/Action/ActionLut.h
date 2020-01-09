@@ -13,10 +13,10 @@ namespace Sapphire::World::Action
     uint16_t healPotency;
     uint16_t selfHealPotency;
     uint16_t selfStatus;
-    uint16_t selfStatusDuration;
+    uint32_t selfStatusDuration;
     uint16_t selfStatusParam;
     uint16_t targetStatus;
-    uint16_t targetStatusDuration;
+    uint32_t targetStatusDuration;
     uint16_t targetStatusParam;
     uint16_t gainMPPercentage;
     uint16_t gainJobResource;
