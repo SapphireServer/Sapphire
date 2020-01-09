@@ -74,8 +74,9 @@ ActionLut::Lut ActionLut::m_actionLut =
   //has damage: potency 350, combo potency 0, directional potency 0
   { 7384, { 350, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
   //Requiescat, レクイエスカット
+  //has damage: potency 550, combo potency 0, directional potency 0
   //applies to self: Requiescat, レクイエスカット, duration 12000, param 0
-  { 7383, { 0, 0, 0, 0, 0, 1368, 12000, 0, 0, 0, 0, 0, 0 } },
+  { 7383, { 550, 0, 0, 0, 0, 1368, 12000, 0, 0, 0, 0, 0, 0 } },
   //Passage of Arms, パッセージ・オブ・アームズ
   //applies to self: Passage of Arms, パッセージ・オブ・アームズ, duration 18000, param 0
   { 7385, { 0, 0, 0, 0, 0, 1175, 18000, 0, 0, 0, 0, 0, 0 } },
@@ -2157,6 +2158,11 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //more than 1 effect is found
   //Demolish, 破砕拳: EffectTypeDot, physical, potency 65
   //{ 246, { 4, 1, 65, 0, 0 } },
+  //Mantra, マントラ: EffectTypeHealReceiveMultiplier, 10%
+  { 102, { 5, 0, 10, 0, 0 } },
+  //more than 1 effect is found
+  //Mantra, マントラ: EffectTypeHealReceiveMultiplier, 20%
+  //{ 102, { 5, 0, 20, 0, 0 } },
   //Fists of Fire, 紅蓮の構え: EffectTypeDamageMultiplier, all, 10%
   { 103, { 1, 0, 10, 0, 0 } },
   //Earth's Reply, 金剛の決意: EffectTypeDamageReceiveMultiplier, all, -10%
@@ -2246,6 +2252,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //more than 1 effect is found
   //Stormbite, ストームバイト: EffectTypeDot, physical, potency 60
   //{ 1201, { 4, 1, 60, 0, 0 } },
+  //Nature's Minne, 地神のミンネ: EffectTypeHealReceiveMultiplier, 20%
+  { 1202, { 5, 0, 20, 0, 0 } },
   //Tactician, タクティシャン: EffectTypeDamageReceiveMultiplier, all, -10%
   { 1951, { 2, 0, -10, 0, 0 } },
   //Bioblaster, バイオブラスト: EffectTypeDot, physical, potency 60
@@ -2485,6 +2493,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   { 263, { 2, 0, -15, 0, 0 } },
   //Infernal Fetters, 炎獄の鎖: EffectTypeDamageMultiplier, all, -10%
   { 377, { 1, 0, -10, 0, 0 } },
+  //Infirmity, 虚弱: EffectTypeHealReceiveMultiplier, -50%
+  { 172, { 5, 0, -50, 0, 0 } },
   //Disseminate, ディスセミネイト: EffectTypeDamageReceiveMultiplier, all, 25%
   { 348, { 2, 0, 25, 0, 0 } },
   //Damage Up, ダメージ上昇: EffectTypeDamageMultiplier, all, 25%
@@ -2496,8 +2506,11 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //{ 443, { 1, 0, 25, 0, 0 } },
   //Frost Blade, 凍てつく剣: EffectTypeDamageReceiveMultiplier, all, -10%
   { 526, { 2, 0, -10, 0, 0 } },
+  //Bluefire, 青碧の炎: EffectTypeHealReceiveMultiplier, -80%
+  { 591, { 5, 0, -80, 0, 0 } },
+  //more than 1 effect is found
   //Bluefire, 青碧の炎: EffectTypeDamageMultiplier, all, -90%
-  { 591, { 1, 0, -90, 0, 0 } },
+  //{ 591, { 1, 0, -90, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -50%
   { 438, { 1, 0, -50, 0, 0 } },
   //more than 1 effect is found

@@ -27,6 +27,7 @@ namespace Sapphire::World::Action
   const uint32_t EffectTypeDamageReceiveMultiplier = 2;
   const uint32_t EffectTypeHot = 3;
   const uint32_t EffectTypeDot = 4;
+  const uint32_t EffectTypeHealReceiveMultiplier = 5;
 
   struct StatusEffectEntry
   {

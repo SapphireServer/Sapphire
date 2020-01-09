@@ -638,8 +638,16 @@ float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& ch
 
 float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal, int8_t healType )
 {
-  // todo
-  return originalHeal;
+  float heal = originalHeal;
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeHealReceiveMultiplier )
+      continue;
+    heal *= ( 1.0f + ( effectEntry.effectValue2 / 100.0f ) );
+  }
+  return heal;
 }
 
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
