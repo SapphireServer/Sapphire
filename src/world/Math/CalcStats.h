@@ -133,6 +133,8 @@ namespace Sapphire::Math
 
     static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg );
 
+    static float applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, int8_t attackType );
+
     static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );

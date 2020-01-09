@@ -12,12 +12,13 @@ EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, ui
   m_target( std::move( target ) ),
   m_source( std::move( source ) ),
   m_delayMs( runAfter ),
+  m_type( Common::ActionEffectType::Nothing ),
   m_value( 0 ),
   m_value2( 0 ),
   m_param0( 0 ),
   m_param1( 0 ),
-  m_type( Common::ActionEffectType::Nothing ),
   m_param2( 0 ),
+  m_attackType( -1 ),
   m_flag( Common::ActionEffectResultFlag::None )
 {
 
@@ -43,11 +44,12 @@ uint64_t EffectResult::getDelay()
   return m_delayMs;
 }
 
-void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectResult::damage( uint32_t amount, int8_t attackType, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   m_param0 = static_cast< uint8_t >( severity );
   m_value = amount;
   m_flag = flag;
+  m_attackType = attackType;
 
   m_type = Common::ActionEffectType::Damage;
 }

@@ -573,6 +573,25 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   return std::pair( factor, hitType );
 }
 
+float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, int8_t attackType )
+{
+  float damage = originalDamage;
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageReceiveMultiplier )
+      continue;
+    if( effectEntry.effectValue1 == 0 ||
+      ( effectEntry.effectValue1 == 1 && ( attackType == -1 || attackType == 1 || attackType == 2 || attackType == 3 || attackType == 4 ) ) ||
+      ( effectEntry.effectValue1 == 2 && attackType == 5 ) )
+    {
+      damage *= ( 1.0f + ( effectEntry.effectValue2 / 100.0f ) );
+    }
+  }
+  return damage;
+}
+
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
 {
   // lol just for testing

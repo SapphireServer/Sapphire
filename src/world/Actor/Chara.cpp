@@ -390,8 +390,6 @@ uint8_t Sapphire::Entity::Chara::getLevel() const
 Let an actor take damage and perform necessary steps
 according to resulting hp, propagates new hp value to players
 in range
-TODO: eventually this needs to distinguish between physical and
-magical dmg and take status effects into account
 
 \param amount of damage to be taken
 */
@@ -504,6 +502,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
+    damage = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage, -1 );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );

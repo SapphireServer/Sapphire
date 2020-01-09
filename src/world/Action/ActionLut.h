@@ -24,6 +24,9 @@ namespace Sapphire::World::Action
 
   const uint32_t EffectTypeInvalid = 0;
   const uint32_t EffectTypeDamageMultiplier = 1;
+  const uint32_t EffectTypeDamageReceiveMultiplier = 2;
+  const uint32_t EffectTypeHot = 3;
+  const uint32_t EffectTypeDot = 4;
 
   struct StatusEffectEntry
   {
