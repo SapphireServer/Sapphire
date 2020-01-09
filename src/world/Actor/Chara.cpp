@@ -508,8 +508,8 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     Common::EffectEntry effectEntry{};
     effectEntry.value = static_cast< int16_t >( damage );
     effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
-    effectEntry.param = 0x71;
+    effectEntry.param0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
+    effectEntry.param2 = 0x71;
     effectPacket->addEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );

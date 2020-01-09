@@ -104,6 +104,10 @@ const int levelTable[81][6] =
   { 340, 380, 3300, 3600, 569, 569 },
 };
 
+std::random_device CalcStats::dev;
+std::mt19937 CalcStats::rng( dev() );
+std::uniform_int_distribution< std::mt19937::result_type > CalcStats::range100( 0, 99 );
+
 /*
    Class used for battle-related formulas and calculations.
    Big thanks to the Theoryjerks group!
@@ -438,7 +442,7 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-float CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
@@ -454,6 +458,29 @@ float CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 
   // todo: everything after tenacity
   auto factor = std::floor( pot * aa * ap * det * ten );
+  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+
+  // todo: traits
+
+  factor = std::floor( factor * speed( chara ) );
+
+  if( criticalHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= criticalHitBonus( chara );
+    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+  }
+
+  if( directHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= 1.25f;
+    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
+                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
+                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
+  }
+
+  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  // todo: buffs
 
   constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
 
@@ -466,22 +493,10 @@ float CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
     Logger::debug( format, pot, aa, ap, det, ten, factor );
   }
 
-  // todo: traits
-
-  factor = std::floor( factor * speed( chara ) );
-
-  // todo: surely this aint right?
-  //factor = std::floor( factor * criticalHitProbability( chara ) );
-  //factor = std::floor( factor * directHitProbability( chara ) );
-
-  // todo: random 0.95 - 1.05 factor
-
-  // todo: buffs
-
-  return factor;
+  return std::pair( factor, hitType );
 }
 
-float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
@@ -496,6 +511,25 @@ float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_
     ten = tenacity( chara );
 
   auto factor = std::floor( pot * wd * ap * det * ten );
+  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+
+  if( criticalHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= criticalHitBonus( chara );
+    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+  }
+
+  if( directHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= 1.25f;
+    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
+                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
+                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
+  }
+
+  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  // todo: buffs
 
   constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
 
@@ -508,9 +542,24 @@ float CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_
     Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
   }
 
-  // todo: the rest
+  return std::pair( factor, hitType );
+}
 
-  return factor;
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // lol just for testing
+  auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );
+  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
+
+  if( criticalHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= criticalHitBonus( chara );
+    hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
+  }
+
+  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  return std::pair( factor, hitType );
 }
 
 uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )

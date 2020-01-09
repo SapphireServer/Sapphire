@@ -697,15 +697,15 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage );
+    effectEntry.value = static_cast< int16_t >( damage.first );
     effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
-    effectEntry.param = 0x71;
+    effectEntry.param0 = static_cast< uint8_t >( damage.second );
+    effectEntry.param2 = 0x71;
     effectPacket->addEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
-    pTarget->takeDamage( static_cast< uint16_t >( damage ) );
+    pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
 
   }
 }
