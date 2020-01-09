@@ -29,7 +29,9 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
   m_pFw( pFw ),
-  m_cachedHotOrDotValue( 0 )
+  m_cachedHotOrDotValue( 0 ),
+  m_cachedSourceCrit( 0 ),
+  m_cachedSourceCritBonus( 0 )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto entry = pExdData->get< Sapphire::Data::Status >( id );
