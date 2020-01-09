@@ -63,10 +63,10 @@ void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& resto
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, int8_t attackType, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   EffectResultPtr nextResult = make_EffectResult( damagingTarget, nullptr, getResultDelayMs() );
-  nextResult->damage( amount, attackType, severity, flag );
+  nextResult->damage( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 

@@ -18,7 +18,7 @@ namespace Sapphire::World::Action
     void restoreMP( Entity::CharaPtr& effectTarget, Entity::CharaPtr& restoringTarget, uint32_t amount,
                     Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None);
 
-    void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, int8_t attackType,
+    void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount,
                  Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage,
                  Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None);
 

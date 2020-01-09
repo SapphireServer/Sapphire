@@ -496,7 +496,7 @@ void Action::Action::buildEffects()
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
       dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, m_actionData->attackType );
-      m_effectBuilder->damage( actor, actor, dmg.first, m_actionData->attackType, dmg.second );
+      m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
