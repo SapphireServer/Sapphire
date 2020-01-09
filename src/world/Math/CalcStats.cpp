@@ -9,6 +9,10 @@
 
 #include "Inventory/Item.h"
 
+#include "StatusEffect/StatusEffect.h"
+
+#include "Action/Action.h"
+
 #include "CalcStats.h"
 #include "Framework.h"
 
@@ -480,7 +484,17 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
 
-  // todo: buffs
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
+      continue;
+    if( effectEntry.effectValue1 == 0 || effectEntry.effectValue1 == 1 )
+    {
+      factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+    }
+  }
 
   constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
 
@@ -496,7 +510,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
@@ -529,6 +543,20 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
 
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
+      continue;
+    if( effectEntry.effectValue1 == 0 ||
+      ( effectEntry.effectValue1 == 1 && action.isPhysical() ) ||
+      ( effectEntry.effectValue1 == 2 && action.isMagic() ) )
+    {
+      factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+    }
+  }
+
   // todo: buffs
 
   constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
@@ -545,7 +573,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
 {
   // lol just for testing
   auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );

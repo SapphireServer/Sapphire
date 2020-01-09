@@ -22,15 +22,32 @@ namespace Sapphire::World::Action
     uint16_t gainJobResource;
   };
 
+  const uint32_t EffectTypeInvalid = 0;
+  const uint32_t EffectTypeDamageMultiplier = 1;
+
+  struct StatusEffectEntry
+  {
+    uint32_t effectType;
+    int32_t effectValue1;
+    int32_t effectValue2;
+    int32_t effectValue3;
+    int32_t effectValue4;
+  };
+
   class ActionLut
   {
   public:
     using Lut = std::unordered_map< uint16_t, ActionEntry >;
+    using StatusEffectTable = std::unordered_map< uint16_t, StatusEffectEntry >;
 
     static bool validEntryExists( uint16_t actionId );
     static const ActionEntry& getEntry( uint16_t actionId );
 
+    static bool validStatusEffectExists( uint16_t statusId );
+    static const StatusEffectEntry& getStatusEffectEntry( uint16_t statusId );
+
     static Lut m_actionLut;
+    static StatusEffectTable m_statusEffectTable;
   };
 }
 

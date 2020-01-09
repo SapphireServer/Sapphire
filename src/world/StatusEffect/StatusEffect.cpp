@@ -41,6 +41,11 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   Util::eraseAll( m_name, '-' );
   Util::eraseAll( m_name, '(' );
   Util::eraseAll( m_name, ')' );
+
+  if( Sapphire::World::Action::ActionLut::validStatusEffectExists( id ) )
+    m_effectEntry = Sapphire::World::Action::ActionLut::getStatusEffectEntry( id );
+  else
+    m_effectEntry.effectType = Sapphire::World::Action::EffectTypeInvalid;
 }
 
 
@@ -152,4 +157,9 @@ void Sapphire::StatusEffect::StatusEffect::setParam( uint16_t param )
 const std::string& Sapphire::StatusEffect::StatusEffect::getName() const
 {
   return m_name;
+}
+
+const Sapphire::World::Action::StatusEffectEntry& Sapphire::StatusEffect::StatusEffect::getEffectEntry() const
+{
+  return m_effectEntry;
 }

@@ -25,3 +25,24 @@ const ActionEntry& ActionLut::getEntry( uint16_t actionId )
 
   return it->second;
 }
+
+bool ActionLut::validStatusEffectExists( uint16_t statusId )
+{
+  auto it = m_statusEffectTable.find( statusId );
+
+  if( it == m_statusEffectTable.end() )
+    return false;
+
+  const auto& entry = it->second;
+
+  return entry.effectType != 0;
+}
+
+const StatusEffectEntry& ActionLut::getStatusEffectEntry( uint16_t statusId )
+{
+  auto it = m_statusEffectTable.find( statusId );
+
+  assert( it != m_statusEffectTable.end() );
+
+  return it->second;
+}

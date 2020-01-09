@@ -425,7 +425,7 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
     }
   }
 
-  return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+  return Math::CalcStats::calcActionDamage( *m_pSource, *this, potency, wepDmg );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
@@ -448,7 +448,7 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
     }
   }
 
-  return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
+  return Math::CalcStats::calcActionHealing( *m_pSource, *this, potency, wepDmg );
 }
 
 void Action::Action::buildEffects()
@@ -478,7 +478,8 @@ void Action::Action::buildEffects()
   // we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
-    player->sendDebug( "dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, shpot: {}, ss: {}, ts: {}, gmp: {}, gjob: {}",
+    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, shpot: {}, ss: {}, ts: {}, gmp: {}, gjob: {}",
+                       m_actionData->attackType,
                        m_lutEntry.damagePotency, m_lutEntry.damageComboPotency, m_lutEntry.damageDirectionalPotency,
                        m_lutEntry.healPotency, m_lutEntry.selfHealPotency,
                        m_lutEntry.selfStatus, m_lutEntry.targetStatus,
@@ -828,4 +829,23 @@ bool Action::Action::hasValidLutEntry() const
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
 {
   return m_effectBuilder;
+}
+
+Data::ActionPtr Action::Action::getActionData() const
+{
+  return m_actionData;
+}
+
+bool Action::Action::isPhysical() const
+{
+  return m_actionData->attackType == -1 ||
+         m_actionData->attackType == 1 ||
+         m_actionData->attackType == 2 ||
+         m_actionData->attackType == 3 ||
+         m_actionData->attackType == 4;
+}
+
+bool Action::Action::isMagic() const
+{
+  return m_actionData->attackType == 5;
 }
