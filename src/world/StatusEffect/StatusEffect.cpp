@@ -10,6 +10,8 @@
 
 #include "Script/ScriptMgr.h"
 
+#include "Math/CalcStats.h"
+
 #include "StatusEffect.h"
 #include "Framework.h"
 
@@ -26,7 +28,8 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
-  m_pFw( pFw )
+  m_pFw( pFw ),
+  m_cachedHotOrDotValue( 0 )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto entry = pExdData->get< Sapphire::Data::Status >( id );
@@ -61,7 +64,30 @@ void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uin
 std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
   auto thisTick = m_currTickEffect;
-  m_currTickEffect = std::make_pair( 0, 0 );
+  if( m_effectEntry.effectType == Sapphire::World::Action::EffectTypeDot )
+  {
+    auto value = m_cachedHotOrDotValue;
+    if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
+    {
+      value *= m_cachedSourceCritBonus;
+    }
+    value *= 1.0f + ( ( Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) - 50.0f ) / 1000.0f );
+    m_currTickEffect = std::make_pair( 1, value );
+  }
+  else if( m_effectEntry.effectType == Sapphire::World::Action::EffectTypeHot )
+  {
+    auto value = m_cachedHotOrDotValue;
+    if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
+    {
+      value *= m_cachedSourceCritBonus;
+    }
+    value *= 1.0f + ( ( Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) - 50.0f ) / 1000.0f );
+    m_currTickEffect = std::make_pair( 2, value );
+  }
+  else
+  {
+    m_currTickEffect = std::make_pair( 0, 0 );
+  }
   return thisTick;
 }
 
@@ -92,23 +118,21 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
   m_startTime = Util::getTimeMs();
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
-  // this is only right when an action is being used by the player
-  // else you probably need to use an actorcontrol
-
-  //GamePacketNew< FFXIVIpcEffect > effectPacket( m_sourceActor->getId() );
-  //effectPacket.data().targetId = m_sourceActor->getId();
-  //effectPacket.data().actionAnimationId = 3;
-  //effectPacket.data().unknown_3 = 1;
-  //effectPacket.data().actionTextId = 3;
-  //effectPacket.data().unknown_5 = 1;
-  //effectPacket.data().unknown_6 = 321;
-  //effectPacket.data().rotation = ( uint16_t ) ( 0x8000 * ( ( m_sourceActor->getPos().getR() + 3.1415926 ) ) / 3.1415926 );
-  //effectPacket.data().effectTargetId = m_sourceActor->getId();
-  //effectPacket.data().effects[4].unknown_1 = 17;
-  //effectPacket.data().effects[4].bonusPercent = 30;
-  //effectPacket.data().effects[4].param1 = m_id;
-  //effectPacket.data().effects[4].unknown_5 = 0x80;
-  //m_sourceActor->sendToInRangeSet( effectPacket, true );
+  if( m_effectEntry.effectType == Sapphire::World::Action::EffectTypeDot )
+  {
+    auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( *m_sourceActor );
+    auto damage = Sapphire::Math::CalcStats::calcDamageBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
+    m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
+      m_effectEntry.effectValue1 == 1 ? -1 : ( m_effectEntry.effectValue1 == 2 ? 5 : -128 ) );
+  }
+  else if( m_effectEntry.effectType == Sapphire::World::Action::EffectTypeHot )
+  {
+    auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( *m_sourceActor );
+    auto heal = Sapphire::Math::CalcStats::calcHealBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
+    m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal, m_effectEntry.effectValue1 );
+  }
+  m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor );
+  m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
 
   pScriptMgr->onStatusReceive( m_targetActor, m_id );
 }

@@ -406,49 +406,12 @@ void Action::Action::execute()
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
 {
-  // todo: what do for npcs?
-  auto wepDmg = 1.f;
-
-  if( auto player = m_pSource->getAsPlayer() )
-  {
-    auto item = player->getEquippedWeapon();
-    assert( item );
-
-    auto role = player->getRole();
-    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
-      wepDmg = item->getMagicalDmg();
-    }
-    else
-    {
-      wepDmg = item->getPhysicalDmg();
-    }
-  }
-
-  return Math::CalcStats::calcActionDamage( *m_pSource, *this, potency, wepDmg );
+  return Math::CalcStats::calcActionDamage( *m_pSource, *this, potency, Math::CalcStats::getWeaponDamage( *m_pSource ) );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
 {
-  auto wepDmg = 1.f;
-
-  if( auto player = m_pSource->getAsPlayer() )
-  {
-    auto item = player->getEquippedWeapon();
-    assert( item );
-
-    auto role = player->getRole();
-    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
-      wepDmg = item->getMagicalDmg();
-    }
-    else
-    {
-      wepDmg = item->getPhysicalDmg();
-    }
-  }
-
-  return Math::CalcStats::calcActionHealing( *m_pSource, *this, potency, wepDmg );
+  return Math::CalcStats::calcActionHealing( *m_pSource, *this, potency, Math::CalcStats::getWeaponDamage( *m_pSource ) );
 }
 
 void Action::Action::buildEffects()
@@ -512,6 +475,7 @@ void Action::Action::buildEffects()
         if( m_lutEntry.selfHealPotency > 0 ) // actions with self heal
         {
           auto heal = calcHealing( m_lutEntry.selfHealPotency );
+          heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first, 0 );
           m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
         }
 
@@ -530,6 +494,7 @@ void Action::Action::buildEffects()
     else if( m_lutEntry.healPotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.healPotency );
+      heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first, 0 );
       m_effectBuilder->heal( actor, actor, heal.first, heal.second );
 
       if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )

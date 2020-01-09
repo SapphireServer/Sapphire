@@ -738,14 +738,14 @@ void Sapphire::Entity::Chara::updateStatusEffects()
   {
     takeDamage( thisTickDmg );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
+                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
   }
 
   if( thisTickHeal != 0 )
   {
-    heal( thisTickDmg );
+    heal( thisTickHeal );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
+                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ), true );
   }
 }
 

@@ -64,6 +64,9 @@ private:
   std::pair< uint8_t, uint32_t > m_currTickEffect;
   FrameworkPtr m_pFw;
   Sapphire::World::Action::StatusEffectEntry m_effectEntry;
+  uint32_t m_cachedHotOrDotValue;
+  float m_cachedSourceCrit;
+  float m_cachedSourceCritBonus;
 };
 
 }

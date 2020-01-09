@@ -332,6 +332,29 @@ float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
   return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::HealingMagicPotency ) );
 }
 
+float CalcStats::getWeaponDamage( Sapphire::Entity::Chara& chara )
+{
+  auto wepDmg = chara.getLevel();
+
+  if( auto player = chara.getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  return wepDmg;
+}
+
 float CalcStats::determination( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
@@ -510,10 +533,10 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
+float CalcStats::calcDamageBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
-  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
+  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋ 
 
   auto pot = potency( static_cast< uint16_t >( ptc ) );
   auto wd = weaponDamage( chara, wepDmg );
@@ -525,6 +548,40 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     ten = tenacity( chara );
 
   auto factor = std::floor( pot * wd * ap * det * ten );
+
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+  }
+
+  return factor;
+}
+
+float CalcStats::calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // reused damage formula just for testing
+  auto pot = potency( static_cast< uint16_t >( ptc ) );
+  auto wd = weaponDamage( chara, wepDmg );
+  auto ap = getPrimaryAttackPower( chara );
+  auto det = determination( chara );
+
+  auto factor = std::floor( pot * wd * ap * det );
+
+  constexpr auto format = "heal: pot: {} ({}) wd: {} ({}) ap: {} det: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, factor );
+  }
+
+  return factor;
+}
+
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
+{
+  auto factor =calcDamageBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   if( criticalHitProbability( chara ) > range100( rng ) )
@@ -557,19 +614,6 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     }
   }
 
-  // todo: buffs
-
-  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
-
-  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
-  {
-    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
-  }
-  else
-  {
-    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
-  }
-
   return std::pair( factor, hitType );
 }
 
@@ -592,10 +636,15 @@ float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& ch
   return damage;
 }
 
+float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal, int8_t healType )
+{
+  // todo
+  return originalHeal;
+}
+
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
 {
-  // lol just for testing
-  auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );
+  auto factor = calcHealBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
 
   if( criticalHitProbability( chara ) > range100( rng ) )
