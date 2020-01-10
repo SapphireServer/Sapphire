@@ -626,14 +626,19 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
 
+  uint8_t actionType = 0;
+  if( action.isPhysical() )
+    actionType = Sapphire::World::Action::EffectActionTypeFilterPhysical;
+  else if( action.isMagical() )
+    actionType = Sapphire::World::Action::EffectActionTypeFilterMagical;
+
   for( auto const& entry : chara.getStatusEffectMap() )
   {
     auto status = entry.second;
     auto effectEntry = status->getEffectEntry();
     if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
       continue;
-    uint8_t actionType = action.isPhysical() ? Sapphire::World::Action::EffectActionTypeFilterPhysical :
-                       ( action.isMagical() ? Sapphire::World::Action::EffectActionTypeFilterMagical : 0 );
+
     if( effectEntry.effectValue1 & actionType )
     {
       factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
@@ -643,20 +648,23 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   return std::pair( factor, hitType );
 }
 
-float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, int8_t attackType )
+float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, Sapphire::Common::AttackType attackType )
 {
   float damage = originalDamage;
+
+  uint8_t actionType = 0;
+  if( World::Action::Action::isAttackTypePhysical( attackType ) )
+    actionType = Sapphire::World::Action::EffectActionTypeFilterPhysical;
+  else if( World::Action::Action::isAttackTypeMagical( attackType ) )
+    actionType = Sapphire::World::Action::EffectActionTypeFilterMagical;
+
   for( auto const& entry : chara.getStatusEffectMap() )
   {
     auto status = entry.second;
     auto effectEntry = status->getEffectEntry();
     if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageReceiveMultiplier )
       continue;
-    uint8_t actionType = 0;
-    if( World::Action::Action::isAttackTypePhysical( attackType ) )
-      actionType = Sapphire::World::Action::EffectActionTypeFilterPhysical;
-    else if( World::Action::Action::isAttackTypeMagical( attackType )  )
-      actionType = Sapphire::World::Action::EffectActionTypeFilterMagical;
+
     if( effectEntry.effectValue1 & actionType )
     {
       damage *= ( 1.0f + ( effectEntry.effectValue2 / 100.0f ) );
@@ -665,7 +673,7 @@ float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& ch
   return damage;
 }
 
-float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal, int8_t healType )
+float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal )
 {
   float heal = originalHeal;
   for( auto const& entry : chara.getStatusEffectMap() )

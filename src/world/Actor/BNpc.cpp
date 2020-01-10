@@ -693,7 +693,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 
     auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
     auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-    damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, -1 );
+    damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, Common::AttackType::Physical );
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::EffectEntry effectEntry{};
