@@ -441,12 +441,12 @@ void Action::Action::buildEffects()
   // we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
-    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, shpot: {}, ss: {}, ts: {}, gmp: {}, gjob: {}",
+    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, shpot: {}, ss: {}, ts: {}, gmp: {}",
                        m_actionData->attackType,
                        m_lutEntry.damagePotency, m_lutEntry.damageComboPotency, m_lutEntry.damageDirectionalPotency,
                        m_lutEntry.healPotency, m_lutEntry.selfHealPotency,
                        m_lutEntry.selfStatus, m_lutEntry.targetStatus,
-                       m_lutEntry.gainMPPercentage, m_lutEntry.gainJobResource );
+                       m_lutEntry.gainMPPercentage );
   }
 
   // when aoe, these effects are in the target whatever is hit first
@@ -789,7 +789,7 @@ Sapphire::Entity::CharaPtr Action::Action::getHitChara()
 bool Action::Action::hasValidLutEntry() const
 {
   return m_lutEntry.damagePotency != 0 || m_lutEntry.healPotency != 0 || m_lutEntry.selfHealPotency != 0 || m_lutEntry.selfStatus != 0 ||
-    m_lutEntry.targetStatus != 0 || m_lutEntry.gainMPPercentage != 0 || m_lutEntry.gainJobResource != 0;
+    m_lutEntry.targetStatus != 0 || m_lutEntry.gainMPPercentage != 0;
 }
 
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()

@@ -19,7 +19,6 @@ namespace Sapphire::World::Action
     uint32_t targetStatusDuration;
     uint16_t targetStatusParam;
     uint16_t gainMPPercentage;
-    uint16_t gainJobResource;
   };
 
   const uint32_t EffectTypeInvalid = 0;

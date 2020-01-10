@@ -14,7 +14,7 @@ bool ActionLut::validEntryExists( uint16_t actionId )
 
   // if all of these fields are 0, it's not 'valid' due to parse error or no useful data
   return entry.damagePotency != 0 || entry.healPotency != 0 || entry.selfHealPotency != 0 || entry.selfStatus != 0 ||
-    entry.targetStatus != 0 || entry.gainMPPercentage != 0 || entry.gainJobResource != 0;
+    entry.targetStatus != 0 || entry.gainMPPercentage != 0;
 }
 
 const ActionEntry& ActionLut::getEntry( uint16_t actionId )
