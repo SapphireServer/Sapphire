@@ -1100,8 +1100,6 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( !isAlive() )
     return;
 
-  updateStatusEffects();
-
   m_lastUpdate = tickCount;
 
   if( !checkAction() )
@@ -1578,6 +1576,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
 
   auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
+  damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, -1 );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {

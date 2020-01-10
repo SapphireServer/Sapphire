@@ -406,49 +406,12 @@ void Action::Action::execute()
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
 {
-  // todo: what do for npcs?
-  auto wepDmg = 1.f;
-
-  if( auto player = m_pSource->getAsPlayer() )
-  {
-    auto item = player->getEquippedWeapon();
-    assert( item );
-
-    auto role = player->getRole();
-    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
-      wepDmg = item->getMagicalDmg();
-    }
-    else
-    {
-      wepDmg = item->getPhysicalDmg();
-    }
-  }
-
-  return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+  return Math::CalcStats::calcActionDamage( *m_pSource, *this, potency, Math::CalcStats::getWeaponDamage( *m_pSource ) );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
 {
-  auto wepDmg = 1.f;
-
-  if( auto player = m_pSource->getAsPlayer() )
-  {
-    auto item = player->getEquippedWeapon();
-    assert( item );
-
-    auto role = player->getRole();
-    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
-      wepDmg = item->getMagicalDmg();
-    }
-    else
-    {
-      wepDmg = item->getPhysicalDmg();
-    }
-  }
-
-  return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
+  return Math::CalcStats::calcActionHealing( *m_pSource, *this, potency, Math::CalcStats::getWeaponDamage( *m_pSource ) );
 }
 
 void Action::Action::buildEffects()
@@ -468,19 +431,22 @@ void Action::Action::buildEffects()
     return;
   }
 
-  if( !hasLutEntry || m_hitActors.empty() )
+  if( !hasLutEntry ) // this is just "if ( weCanNotUseGenericActionHandler )" in case we start to expand it.
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets(); 
+    m_effectBuilder->buildAndSendPackets();
     return;
   }
-
-  // no script exists but we have a valid lut entry
+  
+  // we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
-    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
-                       m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
-                       m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
+    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, shpot: {}, ss: {}, ts: {}, gmp: {}",
+                       m_actionData->attackType,
+                       m_lutEntry.damagePotency, m_lutEntry.damageComboPotency, m_lutEntry.damageDirectionalPotency,
+                       m_lutEntry.healPotency, m_lutEntry.selfHealPotency,
+                       m_lutEntry.selfStatus, m_lutEntry.targetStatus,
+                       m_lutEntry.gainMPPercentage );
   }
 
   // when aoe, these effects are in the target whatever is hit first
@@ -489,9 +455,10 @@ void Action::Action::buildEffects()
 
   for( auto& actor : m_hitActors )
   {
-    if( m_lutEntry.potency > 0 )
+    if( m_lutEntry.damagePotency > 0 )
     {
-      auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
+      auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
+      dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, m_actionData->attackType );
       m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
@@ -505,15 +472,16 @@ void Action::Action::buildEffects()
 
       if( !isComboAction() || isCorrectCombo() )
       {
-        if( m_lutEntry.curePotency > 0 ) // actions with self heal
+        if( m_lutEntry.selfHealPotency > 0 ) // actions with self heal
         {
-          auto heal = calcHealing( m_lutEntry.curePotency );
+          auto heal = calcHealing( m_lutEntry.selfHealPotency );
+          heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first, 0 );
           m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
         }
 
-        if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+        if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
         {
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
           shouldRestoreMP = false;
         }
 
@@ -523,24 +491,35 @@ void Action::Action::buildEffects()
         }
       }
     }
-    else if( m_lutEntry.curePotency > 0 )
+    else if( m_lutEntry.healPotency > 0 )
     {
-      auto heal = calcHealing( m_lutEntry.curePotency );
+      auto heal = calcHealing( m_lutEntry.healPotency );
+      heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first, 0 );
       m_effectBuilder->heal( actor, actor, heal.first, heal.second );
 
-      if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+      if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
       {
-        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
         shouldRestoreMP = false;
       }
     }
-    else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+    else if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
     {
-      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
       shouldRestoreMP = false;
+    }
+
+    if( m_lutEntry.targetStatus != 0 )
+    {
+      m_effectBuilder->applyStatusEffect( actor, m_pSource, m_lutEntry.targetStatus, m_lutEntry.targetStatusDuration, m_lutEntry.targetStatusParam );
     }
   }
 
+  if( m_lutEntry.selfStatus != 0 )
+  {
+    m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
+  }
+  
   m_effectBuilder->buildAndSendPackets();
 
   // at this point we're done with it and no longer need it
@@ -565,7 +544,7 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
     return false;
 
   // npc actions/non player actions
-  if( m_actionData->classJob == -1 )
+  if( m_actionData->classJob == -1 && !m_actionData->isRoleAction )
     return false;
 
   if( player.getLevel() < m_actionData->classJobLevel )
@@ -574,7 +553,7 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
   auto currentClass = player.getClass();
   auto actionClass = static_cast< Common::ClassJob >( m_actionData->classJob );
 
-  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass )
+  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass && !m_actionData->isRoleAction )
   {
     // check if not a base class action
     auto exdData = m_pFw->get< Data::ExdDataGenerated >();
@@ -777,18 +756,18 @@ bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
   
-  if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
+  if( m_lutEntry.damagePotency > 0 && chara->getId() == m_pSource->getId() ) // !m_canTargetSelf
     return false;
   
-  if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
+  if( ( m_lutEntry.damagePotency > 0 || m_lutEntry.healPotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
     return false;
 
-  if( m_lutEntry.potency > 0 && m_pSource->getObjKind() == chara->getObjKind() ) // !m_canTargetFriendly not working for aoe
+  if( m_lutEntry.damagePotency > 0 && m_pSource->getObjKind() == chara->getObjKind() ) // !m_canTargetFriendly not working for aoe
     return false;
 
-  if( ( m_lutEntry.potency == 0 && m_lutEntry.curePotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
+  if( ( m_lutEntry.damagePotency == 0 && m_lutEntry.healPotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
     return false;
-
+  
   return true;
 }
 
@@ -809,11 +788,40 @@ Sapphire::Entity::CharaPtr Action::Action::getHitChara()
 
 bool Action::Action::hasValidLutEntry() const
 {
-  return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
-    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
+  return m_lutEntry.damagePotency != 0 || m_lutEntry.healPotency != 0 || m_lutEntry.selfHealPotency != 0 || m_lutEntry.selfStatus != 0 ||
+    m_lutEntry.targetStatus != 0 || m_lutEntry.gainMPPercentage != 0;
 }
 
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
 {
   return m_effectBuilder;
+}
+
+Data::ActionPtr Action::Action::getActionData() const
+{
+  return m_actionData;
+}
+
+bool Action::Action::isPhysical() const
+{
+  return isAttackTypePhysical( m_actionData->attackType );
+}
+
+bool Action::Action::isMagical() const
+{
+  return isAttackTypeMagical( m_actionData->attackType );
+}
+
+bool Action::Action::isAttackTypePhysical( int8_t attackType )
+{
+  return attackType == -1 ||
+         attackType == 1 ||
+         attackType == 2 ||
+         attackType == 3 ||
+         attackType == 4;
+}
+
+bool Action::Action::isAttackTypeMagical( int8_t attackType )
+{
+  return attackType == 5;
 }

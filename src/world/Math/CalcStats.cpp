@@ -9,6 +9,10 @@
 
 #include "Inventory/Item.h"
 
+#include "StatusEffect/StatusEffect.h"
+
+#include "Action/Action.h"
+
 #include "CalcStats.h"
 #include "Framework.h"
 
@@ -190,7 +194,7 @@ float CalcStats::blockProbability( const Chara& chara )
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
 }
 
-float CalcStats::directHitProbability( const Chara& chara )
+float CalcStats::directHitProbability( const Chara& chara, uint8_t filterType )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
@@ -200,10 +204,23 @@ float CalcStats::directHitProbability( const Chara& chara )
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
 
-  return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
+  auto result = std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
+
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeCritDHRateBonus )
+      continue;
+    if( effectEntry.effectValue1 & filterType )
+    {
+      result += effectEntry.effectValue3;
+    }
+  }
+  return result;
 }
 
-float CalcStats::criticalHitProbability( const Chara& chara )
+float CalcStats::criticalHitProbability( const Chara& chara, uint8_t filterType )
 {
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
@@ -213,7 +230,20 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
 
-  return std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
+  auto result = std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
+
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeCritDHRateBonus )
+      continue;
+    if( effectEntry.effectValue1 & filterType )
+    {
+      result += effectEntry.effectValue2;
+    }
+  }
+  return result;
 }
 
 
@@ -326,6 +356,29 @@ float CalcStats::magicAttackPower( const Sapphire::Entity::Chara& chara )
 float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
 {
   return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::HealingMagicPotency ) );
+}
+
+float CalcStats::getWeaponDamage( Sapphire::Entity::Chara& chara )
+{
+  auto wepDmg = chara.getLevel();
+
+  if( auto player = chara.getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  return wepDmg;
 }
 
 float CalcStats::determination( const Sapphire::Entity::Chara& chara )
@@ -464,13 +517,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   factor = std::floor( factor * speed( chara ) );
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara, Sapphire::World::Action::EffectCritDHBonusFilterDamage ) > range100( rng ) )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
+  if( directHitProbability( chara, Sapphire::World::Action::EffectCritDHBonusFilterDamage ) > range100( rng ) )
   {
     factor *= 1.25f;
     hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
@@ -480,7 +533,17 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
 
-  // todo: buffs
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
+      continue;
+    if( effectEntry.effectValue1 & Sapphire::World::Action::EffectActionTypeFilterPhysical )
+    {
+      factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+    }
+  }
 
   constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
 
@@ -496,10 +559,10 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+float CalcStats::calcDamageBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
-  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
+  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋ 
 
   auto pot = potency( static_cast< uint16_t >( ptc ) );
   auto wd = weaponDamage( chara, wepDmg );
@@ -511,15 +574,49 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     ten = tenacity( chara );
 
   auto factor = std::floor( pot * wd * ap * det * ten );
+
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+  }
+
+  return factor;
+}
+
+float CalcStats::calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // reused damage formula just for testing
+  auto pot = potency( static_cast< uint16_t >( ptc ) );
+  auto wd = weaponDamage( chara, wepDmg );
+  auto ap = getPrimaryAttackPower( chara );
+  auto det = determination( chara );
+
+  auto factor = std::floor( pot * wd * ap * det );
+
+  constexpr auto format = "heal: pot: {} ({}) wd: {} ({}) ap: {} det: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, factor );
+  }
+
+  return factor;
+}
+
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
+{
+  auto factor =calcDamageBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara, Sapphire::World::Action::EffectCritDHBonusFilterDamage ) > range100( rng ) )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
+  if( directHitProbability( chara, Sapphire::World::Action::EffectCritDHBonusFilterDamage ) > range100( rng ) )
   {
     factor *= 1.25f;
     hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
@@ -529,35 +626,84 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
 
-  // todo: buffs
-
-  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
-
-  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  for( auto const& entry : chara.getStatusEffectMap() )
   {
-    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
-  }
-  else
-  {
-    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
+      continue;
+    uint8_t actionType = action.isPhysical() ? Sapphire::World::Action::EffectActionTypeFilterPhysical :
+                       ( action.isMagical() ? Sapphire::World::Action::EffectActionTypeFilterMagical : 0 );
+    if( effectEntry.effectValue1 & actionType )
+    {
+      factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+    }
   }
 
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, int8_t attackType )
 {
-  // lol just for testing
-  auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );
+  float damage = originalDamage;
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageReceiveMultiplier )
+      continue;
+    uint8_t actionType = 0;
+    if( World::Action::Action::isAttackTypePhysical( attackType ) )
+      actionType = Sapphire::World::Action::EffectActionTypeFilterPhysical;
+    else if( World::Action::Action::isAttackTypeMagical( attackType )  )
+      actionType = Sapphire::World::Action::EffectActionTypeFilterMagical;
+    if( effectEntry.effectValue1 & actionType )
+    {
+      damage *= ( 1.0f + ( effectEntry.effectValue2 / 100.0f ) );
+    }
+  }
+  return damage;
+}
+
+float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal, int8_t healType )
+{
+  float heal = originalHeal;
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeHealReceiveMultiplier )
+      continue;
+    heal *= ( 1.0f + ( effectEntry.effectValue2 / 100.0f ) );
+  }
+  return heal;
+}
+
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
+{
+  auto factor = calcHealBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara, Sapphire::World::Action::EffectCritDHBonusFilterHeal ) > range100( rng ) )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
   }
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( effectEntry.effectType != Sapphire::World::Action::EffectTypeHealCastMultiplier )
+      continue;
+
+    if( static_cast< Common::ActionCategory >( action.getActionData()->actionCategory ) == Common::ActionCategory::Spell ) // must be a "cast"
+    {
+      factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+    }
+  }
 
   return std::pair( factor, hitType );
 }
