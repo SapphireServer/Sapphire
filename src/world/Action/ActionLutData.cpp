@@ -2085,10 +2085,10 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Fight or Flight, ファイト・オア・フライト: EffectTypeDamageMultiplier, physical, 25%
   { 76, { 1, 1, 25, 0, 0 } },
   //Sentinel, センチネル: EffectTypeDamageReceiveMultiplier, all, -30%
-  { 74, { 2, 0, -30, 0, 0 } },
+  { 74, { 2, 255, -30, 0, 0 } },
   //more than 1 effect is found
   //Sentinel, センチネル: EffectTypeDamageReceiveMultiplier, all, -30%
-  //{ 74, { 2, 0, -30, 0, 0 } },
+  //{ 74, { 2, 255, -30, 0, 0 } },
   //Circle of Scorn, サークル・オブ・ドゥーム: EffectTypeDot, physical, potency 35
   { 248, { 4, 1, 35, 0, 0 } },
   //Goring Blade, ゴアブレード: EffectTypeDot, physical, potency 85
@@ -2096,44 +2096,44 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Requiescat, レクイエスカット: EffectTypeDamageMultiplier, magic, 50%
   { 1368, { 1, 2, 50, 0, 0 } },
   //Vulnerability Down, 被ダメージ低下: EffectTypeDamageReceiveMultiplier, all, -30%
-  { 912, { 2, 0, -30, 0, 0 } },
+  { 912, { 2, 255, -30, 0, 0 } },
   //more than 1 effect is found
   //Vulnerability Down, 被ダメージ低下: EffectTypeDamageReceiveMultiplier, all, -30%
-  //{ 912, { 2, 0, -30, 0, 0 } },
+  //{ 912, { 2, 255, -30, 0, 0 } },
   //Storm's Eye, シュトルムブレハ: EffectTypeDamageMultiplier, all, 10%
-  { 90, { 1, 0, 10, 0, 0 } },
+  { 90, { 1, 255, 10, 0, 0 } },
   //Raw Intuition, 原初の直感: EffectTypeDamageReceiveMultiplier, all, -20%
-  { 735, { 2, 0, -20, 0, 0 } },
+  { 735, { 2, 255, -20, 0, 0 } },
   //more than 1 effect is found
   //Raw Intuition, 原初の直感: EffectTypeDamageReceiveMultiplier, all, -20%
-  //{ 735, { 2, 0, -20, 0, 0 } },
+  //{ 735, { 2, 255, -20, 0, 0 } },
   //Nascent Glint, 原初の猛り［被］: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1858, { 2, 0, -10, 0, 0 } },
+  { 1858, { 2, 255, -10, 0, 0 } },
   //Darkside, 暗黒: EffectTypeDamageMultiplier, all, 10%
-  { 751, { 1, 0, 10, 0, 0 } },
+  { 751, { 1, 255, 10, 0, 0 } },
   //more than 1 effect is found
   //Darkside, 暗黒: EffectTypeDamageMultiplier, all, 10%
-  //{ 751, { 1, 0, 10, 0, 0 } },
+  //{ 751, { 1, 255, 10, 0, 0 } },
   //Darkside, 暗黒: EffectTypeDamageMultiplier, all, 10%
-  //{ 751, { 1, 0, 10, 0, 0 } },
+  //{ 751, { 1, 255, 10, 0, 0 } },
   //Darkside, 暗黒: EffectTypeDamageMultiplier, all, 10%
-  //{ 751, { 1, 0, 10, 0, 0 } },
+  //{ 751, { 1, 255, 10, 0, 0 } },
   //Shadow Wall, シャドウウォール: EffectTypeDamageReceiveMultiplier, all, -30%
-  { 747, { 2, 0, -30, 0, 0 } },
+  { 747, { 2, 255, -30, 0, 0 } },
   //more than 1 effect is found
   //Shadow Wall, シャドウウォール: EffectTypeDamageReceiveMultiplier, all, -30%
-  //{ 747, { 2, 0, -30, 0, 0 } },
+  //{ 747, { 2, 255, -30, 0, 0 } },
   //Dark Missionary, ダークミッショナリー: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1894, { 2, 0, -10, 0, 0 } },
+  { 1894, { 2, 255, -10, 0, 0 } },
   //No Mercy, ノー・マーシー: EffectTypeDamageMultiplier, all, 20%
-  { 1831, { 1, 0, 20, 0, 0 } },
+  { 1831, { 1, 255, 20, 0, 0 } },
   //Camouflage, カモフラージュ: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1832, { 2, 0, -10, 0, 0 } },
+  { 1832, { 2, 255, -10, 0, 0 } },
   //Nebula, ネビュラ: EffectTypeDamageReceiveMultiplier, all, -30%
-  { 1834, { 2, 0, -30, 0, 0 } },
+  { 1834, { 2, 255, -30, 0, 0 } },
   //more than 1 effect is found
   //Nebula, ネビュラ: EffectTypeDamageReceiveMultiplier, all, -30%
-  //{ 1834, { 2, 0, -30, 0, 0 } },
+  //{ 1834, { 2, 255, -30, 0, 0 } },
   //Aurora, オーロラ: EffectTypeHot, potency 200
   { 1835, { 3, 0, 200, 0, 0 } },
   //Sonic Break, ソニックブレイク: EffectTypeDot, unknown, potency 90
@@ -2141,18 +2141,18 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Bow Shock, バウショック: EffectTypeDot, unknown, potency 90
   { 1838, { 4, 0, 90, 0, 0 } },
   //Heart of Light, ハート・オブ・ライト: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1839, { 2, 0, -10, 0, 0 } },
+  { 1839, { 2, 255, -10, 0, 0 } },
   //Heart of Stone, ハート・オブ・ストーン: EffectTypeDamageReceiveMultiplier, all, -7%
-  { 1840, { 2, 0, -7, 0, 0 } },
+  { 1840, { 2, 255, -7, 0, 0 } },
   //Fists of Earth, 金剛の構え: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 104, { 2, 0, -10, 0, 0 } },
+  { 104, { 2, 255, -10, 0, 0 } },
   //Twin Snakes, 双掌打: EffectTypeDamageMultiplier, all, 10%
-  { 101, { 1, 0, 10, 0, 0 } },
+  { 101, { 1, 255, 10, 0, 0 } },
   //more than 1 effect is found
   //Twin Snakes, 双掌打: EffectTypeDamageMultiplier, all, 10%
-  //{ 101, { 1, 0, 10, 0, 0 } },
+  //{ 101, { 1, 255, 10, 0, 0 } },
   //Twin Snakes, 双掌打: EffectTypeDamageMultiplier, all, 10%
-  //{ 101, { 1, 0, 10, 0, 0 } },
+  //{ 101, { 1, 255, 10, 0, 0 } },
   //Demolish, 破砕拳: EffectTypeDot, physical, potency 65
   { 246, { 4, 1, 65, 0, 0 } },
   //more than 1 effect is found
@@ -2164,33 +2164,35 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Mantra, マントラ: EffectTypeHealReceiveMultiplier, 20%
   //{ 102, { 5, 0, 20, 0, 0 } },
   //Fists of Fire, 紅蓮の構え: EffectTypeDamageMultiplier, all, 10%
-  { 103, { 1, 0, 10, 0, 0 } },
+  { 103, { 1, 255, 10, 0, 0 } },
   //Earth's Reply, 金剛の決意: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1180, { 2, 0, -10, 0, 0 } },
+  { 1180, { 2, 255, -10, 0, 0 } },
   //Riddle of Fire, 紅蓮の極意: EffectTypeDamageMultiplier, all, 25%
-  { 1181, { 1, 0, 25, 0, 0 } },
+  { 1181, { 1, 255, 25, 0, 0 } },
   //more than 1 effect is found
   //Riddle of Fire, 紅蓮の極意: EffectTypeDamageMultiplier, all, 30%
-  //{ 1181, { 1, 0, 30, 0, 0 } },
+  //{ 1181, { 1, 255, 30, 0, 0 } },
   //Brotherhood, 桃園結義：攻撃: EffectTypeDamageMultiplier, physical, 5%
   { 1185, { 1, 1, 5, 0, 0 } },
   //Disembowel, ディセムボウル: EffectTypeDamageMultiplier, all, 10%
-  { 1914, { 1, 0, 10, 0, 0 } },
+  { 1914, { 1, 255, 10, 0, 0 } },
   //Lance Charge, ランスチャージ: EffectTypeDamageMultiplier, all, 15%
-  { 1864, { 1, 0, 15, 0, 0 } },
+  { 1864, { 1, 255, 15, 0, 0 } },
   //Chaos Thrust, 桜華狂咲: EffectTypeDot, physical, potency 45
   { 118, { 4, 1, 45, 0, 0 } },
+  //Battle Litany, バトルリタニー: EffectTypeCritDHRateBonus, damage, crit 10%, dh 0%
+  { 786, { 7, 1, 10, 0, 0 } },
   //Left Eye, 竜の左眼: EffectTypeDamageMultiplier, all, 5%
-  { 1454, { 1, 0, 5, 0, 0 } },
+  { 1454, { 1, 255, 5, 0, 0 } },
   //Right Eye, 竜の右眼: EffectTypeDamageMultiplier, all, 10%
-  { 1453, { 1, 0, 10, 0, 0 } },
+  { 1453, { 1, 255, 10, 0, 0 } },
   //Right Eye, 竜の右眼: EffectTypeDamageMultiplier, all, 10%
-  { 1910, { 1, 0, 10, 0, 0 } },
+  { 1910, { 1, 255, 10, 0, 0 } },
   //Vulnerability Up, 被ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, 5%
-  { 638, { 2, 0, 5, 0, 0 } },
+  { 638, { 2, 255, 5, 0, 0 } },
   //more than 1 effect is found
   //Vulnerability Up, 被ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, 10%
-  //{ 638, { 2, 0, 10, 0, 0 } },
+  //{ 638, { 2, 255, 10, 0, 0 } },
   //Shadow Fang, 影牙: EffectTypeDot, physical, potency 90
   { 508, { 4, 1, 90, 0, 0 } },
   //more than 1 effect is found
@@ -2199,18 +2201,18 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Shadow Fang, 影牙: EffectTypeDot, physical, potency 50
   //{ 508, { 4, 1, 50, 0, 0 } },
   //Kassatsu, 活殺自在: EffectTypeDamageMultiplier, all, 30%
-  { 497, { 1, 0, 30, 0, 0 } },
+  { 497, { 1, 255, 30, 0, 0 } },
   //Ten Chi Jin, 天地人: EffectTypeDamageMultiplier, all, 150%
-  { 1186, { 1, 0, 150, 0, 0 } },
+  { 1186, { 1, 255, 150, 0, 0 } },
   //Jinpu, 陣風: EffectTypeDamageMultiplier, all, 13%
-  { 1298, { 1, 0, 13, 0, 0 } },
+  { 1298, { 1, 255, 13, 0, 0 } },
   //more than 1 effect is found
   //Jinpu, 陣風: EffectTypeDamageMultiplier, all, 13%
-  //{ 1298, { 1, 0, 13, 0, 0 } },
+  //{ 1298, { 1, 255, 13, 0, 0 } },
   //Jinpu, 陣風: EffectTypeDamageMultiplier, all, 13%
-  //{ 1298, { 1, 0, 13, 0, 0 } },
+  //{ 1298, { 1, 255, 13, 0, 0 } },
   //Kaiten, 必殺剣・回天: EffectTypeDamageMultiplier, all, 50%
-  { 1229, { 1, 0, 50, 0, 0 } },
+  { 1229, { 1, 255, 50, 0, 0 } },
   //Higanbana, 彼岸花: EffectTypeDot, physical, potency 60
   { 1228, { 4, 1, 60, 0, 0 } },
   //more than 1 effect is found
@@ -2221,7 +2223,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Higanbana, 彼岸花: EffectTypeDot, physical, potency 35
   //{ 1228, { 4, 1, 35, 0, 0 } },
   //Raging Strikes, 猛者の撃: EffectTypeDamageMultiplier, all, 10%
-  { 125, { 1, 0, 10, 0, 0 } },
+  { 125, { 1, 255, 10, 0, 0 } },
   //Venomous Bite, ベノムバイト: EffectTypeDot, physical, potency 30
   { 124, { 4, 1, 30, 0, 0 } },
   //more than 1 effect is found
@@ -2246,7 +2248,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Caustic Bite, コースティックバイト: EffectTypeDot, physical, potency 50
   //{ 1200, { 4, 1, 50, 0, 0 } },
   //Troubadour, トルバドゥール: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1934, { 2, 0, -10, 0, 0 } },
+  { 1934, { 2, 255, -10, 0, 0 } },
   //Stormbite, ストームバイト: EffectTypeDot, physical, potency 50
   { 1201, { 4, 1, 50, 0, 0 } },
   //more than 1 effect is found
@@ -2255,15 +2257,15 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Nature's Minne, 地神のミンネ: EffectTypeHealReceiveMultiplier, 20%
   { 1202, { 5, 0, 20, 0, 0 } },
   //Tactician, タクティシャン: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1951, { 2, 0, -10, 0, 0 } },
+  { 1951, { 2, 255, -10, 0, 0 } },
   //Bioblaster, バイオブラスト: EffectTypeDot, physical, potency 60
   { 1866, { 4, 1, 60, 0, 0 } },
   //Standard Finish, スタンダードフィニッシュ: EffectTypeDamageMultiplier, all, 5%
-  { 1821, { 1, 0, 5, 0, 0 } },
+  { 1821, { 1, 255, 5, 0, 0 } },
   //Shield Samba, 守りのサンバ: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 1826, { 2, 0, -10, 0, 0 } },
+  { 1826, { 2, 255, -10, 0, 0 } },
   //Technical Finish, テクニカルフィニッシュ: EffectTypeDamageMultiplier, all, 5%
-  { 1822, { 1, 0, 5, 0, 0 } },
+  { 1822, { 1, 255, 5, 0, 0 } },
   //Thunder, サンダー: EffectTypeDot, magic, potency 40
   { 161, { 4, 2, 40, 0, 0 } },
   //Thunder II, サンダラ: EffectTypeDot, magic, potency 30
@@ -2326,7 +2328,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Miasma III, ミアズガ: EffectTypeDot, magic, potency 40
   //{ 1215, { 4, 2, 40, 0, 0 } },
   //Devotion, エギの加護: EffectTypeDamageMultiplier, all, 5%
-  { 1213, { 1, 0, 5, 0, 0 } },
+  { 1213, { 1, 255, 5, 0, 0 } },
   //Everlasting Flight, 不死鳥の翼: EffectTypeHot, potency 100
   { 1868, { 3, 0, 100, 0, 0 } },
   //more than 1 effect is found
@@ -2342,7 +2344,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Embolden, エンボルデン: EffectTypeDamageMultiplier, physical, 2%
   { 1297, { 1, 1, 2, 0, 0 } },
   //Manafication, マナフィケーション: EffectTypeDamageMultiplier, all, 5%
-  { 1971, { 1, 0, 5, 0, 0 } },
+  { 1971, { 1, 255, 5, 0, 0 } },
   //Aero, エアロ: EffectTypeDot, magic, potency 30
   { 143, { 4, 2, 30, 0, 0 } },
   //Aero II, エアロラ: EffectTypeDot, magic, potency 60
@@ -2355,14 +2357,22 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   { 1219, { 3, 0, 200, 0, 0 } },
   //Dia, ディア: EffectTypeDot, magic, potency 60
   { 1871, { 4, 2, 60, 0, 0 } },
+  //Temperance, テンパランス: EffectTypeHealCastMultiplier, 20%
+  { 1872, { 6, 0, 20, 0, 0 } },
   //Temperance, テンパランス：効果: EffectTypeDamageReceiveMultiplier, all, 10%
-  { 1873, { 2, 0, 10, 0, 0 } },
+  { 1873, { 2, 255, 10, 0, 0 } },
+  //Dissipation, 転化: EffectTypeHealCastMultiplier, 20%
+  { 791, { 6, 0, 20, 0, 0 } },
   //Biolysis, 蠱毒法: EffectTypeDot, magic, potency 60
   { 1895, { 4, 2, 60, 0, 0 } },
   //Whispering Dawn, 光の囁き: EffectTypeHot, potency 120
   { 315, { 3, 0, 120, 0, 0 } },
+  //Fey Illumination, フェイイルミネーション: EffectTypeHealCastMultiplier, 10%
+  { 317, { 6, 0, 10, 0, 0 } },
   //Angel's Whisper, 光輝の囁き: EffectTypeHot, potency 120
   { 1874, { 3, 0, 120, 0, 0 } },
+  //Seraphic Illumination, セラフィックイルミネーション: EffectTypeHealCastMultiplier, 10%
+  { 1875, { 6, 0, 10, 0, 0 } },
   //Combust, コンバス: EffectTypeDot, magic, potency 40
   { 838, { 4, 2, 40, 0, 0 } },
   //more than 1 effect is found
@@ -2386,7 +2396,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Combust II, コンバラ: EffectTypeDot, magic, potency 35
   //{ 843, { 4, 2, 35, 0, 0 } },
   //Divination, ディヴィネーション: EffectTypeDamageMultiplier, all, 0%
-  { 1878, { 1, 0, 0, 0, 0 } },
+  { 1878, { 1, 255, 0, 0, 0 } },
   //Wheel of Fortune, 運命の輪: EffectTypeHot, potency 50
   { 956, { 3, 0, 50, 0, 0 } },
   //more than 1 effect is found
@@ -2407,73 +2417,77 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //more than 1 effect is found
   //Diurnal Intersection, 星天交差［日］: EffectTypeHot, potency 80
   //{ 1888, { 3, 0, 80, 0, 0 } },
+  //Neutral Sect, ニュートラルセクト: EffectTypeHealCastMultiplier, 20%
+  { 1892, { 6, 0, 20, 0, 0 } },
   //The Balance, アーゼマの均衡: EffectTypeDamageMultiplier, all, 6%
-  { 1882, { 1, 0, 6, 0, 0 } },
+  { 1882, { 1, 255, 6, 0, 0 } },
   //The Arrow, オシュオンの矢: EffectTypeDamageMultiplier, all, 6%
-  { 1884, { 1, 0, 6, 0, 0 } },
+  { 1884, { 1, 255, 6, 0, 0 } },
   //The Spear, ハルオーネの槍: EffectTypeDamageMultiplier, all, 6%
-  { 1885, { 1, 0, 6, 0, 0 } },
+  { 1885, { 1, 255, 6, 0, 0 } },
   //The Bole, 世界樹の幹: EffectTypeDamageMultiplier, all, 6%
-  { 1883, { 1, 0, 6, 0, 0 } },
+  { 1883, { 1, 255, 6, 0, 0 } },
   //The Ewer, サリャクの水瓶: EffectTypeDamageMultiplier, all, 6%
-  { 1886, { 1, 0, 6, 0, 0 } },
+  { 1886, { 1, 255, 6, 0, 0 } },
   //The Spire, ビエルゴの塔: EffectTypeDamageMultiplier, all, 6%
-  { 1887, { 1, 0, 6, 0, 0 } },
+  { 1887, { 1, 255, 6, 0, 0 } },
   //Lord of Crowns, クラウンロード: EffectTypeDamageMultiplier, all, 8%
-  { 1876, { 1, 0, 8, 0, 0 } },
+  { 1876, { 1, 255, 8, 0, 0 } },
   //Lady of Crowns, クラウンレディ: EffectTypeDamageMultiplier, all, 8%
-  { 1877, { 1, 0, 8, 0, 0 } },
+  { 1877, { 1, 255, 8, 0, 0 } },
   //Off-guard, ガードオファ: EffectTypeDamageReceiveMultiplier, all, 50%
-  { 1717, { 2, 0, 50, 0, 0 } },
+  { 1717, { 2, 255, 50, 0, 0 } },
   //Boost, 力溜め: EffectTypeDamageMultiplier, all, 50%
-  { 1716, { 1, 0, 50, 0, 0 } },
+  { 1716, { 1, 255, 50, 0, 0 } },
   //Peculiar Light, 不思議な光: EffectTypeDamageReceiveMultiplier, magic, 30%
   { 1721, { 2, 2, 30, 0, 0 } },
   //Mighty Guard, マイティガード: EffectTypeDamageMultiplier, all, -70%
-  { 1719, { 1, 0, -70, 0, 0 } },
+  { 1719, { 1, 255, -70, 0, 0 } },
   //more than 1 effect is found
   //Mighty Guard, マイティガード: EffectTypeDamageReceiveMultiplier, all, -40%
-  //{ 1719, { 2, 0, -40, 0, 0 } },
+  //{ 1719, { 2, 255, -40, 0, 0 } },
   //Bleeding, ペイン: EffectTypeDot, magic, potency 25
   { 1714, { 4, 2, 25, 0, 0 } },
   //Waxing Nocturne, 狂戦士化: EffectTypeDamageMultiplier, all, 50%
-  { 1718, { 1, 0, 50, 0, 0 } },
+  { 1718, { 1, 255, 50, 0, 0 } },
   //Windburn, 裂傷: EffectTypeDot, magic, potency 20
   { 1723, { 4, 2, 20, 0, 0 } },
   //Diamondback, 超硬化: EffectTypeDamageReceiveMultiplier, all, -90%
-  { 1722, { 2, 0, -90, 0, 0 } },
+  { 1722, { 2, 255, -90, 0, 0 } },
   //Reprisal, リプライザル: EffectTypeDamageMultiplier, all, -10%
-  { 1193, { 1, 0, -10, 0, 0 } },
+  { 1193, { 1, 255, -10, 0, 0 } },
   //more than 1 effect is found
   //Reprisal, リプライザル: EffectTypeDamageMultiplier, all, -10%
-  //{ 1193, { 1, 0, -10, 0, 0 } },
+  //{ 1193, { 1, 255, -10, 0, 0 } },
   //Choco Beak, チョコビーク: EffectTypeDot, physical, potency 20
   { 236, { 4, 1, 20, 0, 0 } },
+  //Choco Surge, チョコサージ: EffectTypeHealCastMultiplier, 30%
+  { 238, { 6, 0, 30, 0, 0 } },
   //Choco Regen, チョコリジェネ: EffectTypeHot, potency 25
   { 237, { 3, 0, 25, 0, 0 } },
   //Vulnerability Up, 被ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, 5%
-  { 1208, { 2, 0, 5, 0, 0 } },
+  { 1208, { 2, 255, 5, 0, 0 } },
   //more than 1 effect is found
   //Vulnerability Up, 被ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, 5%
-  //{ 1208, { 2, 0, 5, 0, 0 } },
+  //{ 1208, { 2, 255, 5, 0, 0 } },
   //Boost, 力溜め: EffectTypeDamageMultiplier, all, 30%
-  { 1656, { 1, 0, 30, 0, 0 } },
+  { 1656, { 1, 255, 30, 0, 0 } },
   //Magic Burst L, ロゴス・マジックバースト: EffectTypeDamageMultiplier, magic, 1%
   { 1652, { 1, 2, 1, 0, 0 } },
   //Bravery L, ロゴス・ブレイブ: EffectTypeDamageMultiplier, all, 10%
-  { 1646, { 1, 0, 10, 0, 0 } },
+  { 1646, { 1, 255, 10, 0, 0 } },
   //Double Edge L, ロゴス・ダブルエッジ: EffectTypeDamageMultiplier, physical, 15%
   { 1653, { 1, 1, 15, 0, 0 } },
   //Wisdom of the Aetherweaver, 術士の記憶: EffectTypeDamageMultiplier, magic, 60%
   { 1631, { 1, 2, 60, 0, 0 } },
   //Wisdom of the Martialist, 闘士の記憶: EffectTypeDamageMultiplier, all, 40%
-  { 1632, { 1, 0, 40, 0, 0 } },
+  { 1632, { 1, 255, 40, 0, 0 } },
   //Wisdom of the Skirmisher, 武人の記憶: EffectTypeDamageMultiplier, all, 20%
-  { 1636, { 1, 0, 20, 0, 0 } },
+  { 1636, { 1, 255, 20, 0, 0 } },
   //Wisdom of the Watcher, 斥候の記憶: EffectTypeDamageMultiplier, all, -5%
-  { 1637, { 1, 0, -5, 0, 0 } },
+  { 1637, { 1, 255, -5, 0, 0 } },
   //Wisdom of the Templar, 聖騎士の記憶: EffectTypeDamageMultiplier, all, -5%
-  { 1638, { 1, 0, -5, 0, 0 } },
+  { 1638, { 1, 255, -5, 0, 0 } },
   //Wisdom of the Duelist, 剣豪の記憶: EffectTypeDamageMultiplier, physical, 40%
   { 1740, { 1, 1, 40, 0, 0 } },
   //more than 1 effect is found
@@ -2484,81 +2498,89 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Wisdom of the Fiendhunter, 弓聖の記憶: EffectTypeDamageMultiplier, physical, 25%
   { 1741, { 1, 1, 25, 0, 0 } },
   //Last Bastion, ラストバスティオン: EffectTypeDamageReceiveMultiplier, all, -50%
-  { 196, { 2, 0, -50, 0, 0 } },
+  { 196, { 2, 255, -50, 0, 0 } },
   //Land Waker, 原初の大地: EffectTypeDamageReceiveMultiplier, all, -50%
-  { 863, { 2, 0, -50, 0, 0 } },
+  { 863, { 2, 255, -50, 0, 0 } },
   //Dark Force, ダークフォース: EffectTypeDamageReceiveMultiplier, all, -50%
-  { 864, { 2, 0, -50, 0, 0 } },
+  { 864, { 2, 255, -50, 0, 0 } },
   //Damage Up, ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, -15%
-  { 263, { 2, 0, -15, 0, 0 } },
+  { 263, { 2, 255, -15, 0, 0 } },
   //Infernal Fetters, 炎獄の鎖: EffectTypeDamageMultiplier, all, -10%
-  { 377, { 1, 0, -10, 0, 0 } },
+  { 377, { 1, 255, -10, 0, 0 } },
   //Infirmity, 虚弱: EffectTypeHealReceiveMultiplier, -50%
   { 172, { 5, 0, -50, 0, 0 } },
   //Disseminate, ディスセミネイト: EffectTypeDamageReceiveMultiplier, all, 25%
-  { 348, { 2, 0, 25, 0, 0 } },
+  { 348, { 2, 255, 25, 0, 0 } },
   //Damage Up, ダメージ上昇: EffectTypeDamageMultiplier, all, 25%
-  { 443, { 1, 0, 25, 0, 0 } },
+  { 443, { 1, 255, 25, 0, 0 } },
   //more than 1 effect is found
   //Damage Up, ダメージ上昇: EffectTypeDamageMultiplier, all, 15%
-  //{ 443, { 1, 0, 15, 0, 0 } },
+  //{ 443, { 1, 255, 15, 0, 0 } },
   //Damage Up, ダメージ上昇: EffectTypeDamageMultiplier, all, 25%
-  //{ 443, { 1, 0, 25, 0, 0 } },
+  //{ 443, { 1, 255, 25, 0, 0 } },
   //Frost Blade, 凍てつく剣: EffectTypeDamageReceiveMultiplier, all, -10%
-  { 526, { 2, 0, -10, 0, 0 } },
+  { 526, { 2, 255, -10, 0, 0 } },
   //Bluefire, 青碧の炎: EffectTypeHealReceiveMultiplier, -80%
   { 591, { 5, 0, -80, 0, 0 } },
   //more than 1 effect is found
   //Bluefire, 青碧の炎: EffectTypeDamageMultiplier, all, -90%
-  //{ 591, { 1, 0, -90, 0, 0 } },
+  //{ 591, { 1, 255, -90, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -50%
-  { 438, { 1, 0, -50, 0, 0 } },
+  { 438, { 1, 255, -50, 0, 0 } },
   //more than 1 effect is found
   //Minimum, ミニマム: EffectTypeDamageReceiveMultiplier, all, 50%
-  //{ 438, { 2, 0, 50, 0, 0 } },
+  //{ 438, { 2, 255, 50, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageReceiveMultiplier, all, 45%
-  //{ 438, { 2, 0, 45, 0, 0 } },
+  //{ 438, { 2, 255, 45, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -90%
-  //{ 438, { 1, 0, -90, 0, 0 } },
+  //{ 438, { 1, 255, -90, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageReceiveMultiplier, all, 50%
-  //{ 438, { 2, 0, 50, 0, 0 } },
+  //{ 438, { 2, 255, 50, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -50%
-  //{ 438, { 1, 0, -50, 0, 0 } },
+  //{ 438, { 1, 255, -50, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -50%
-  //{ 438, { 1, 0, -50, 0, 0 } },
+  //{ 438, { 1, 255, -50, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageReceiveMultiplier, all, 50%
-  //{ 438, { 2, 0, 50, 0, 0 } },
+  //{ 438, { 2, 255, 50, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageReceiveMultiplier, all, 45%
-  //{ 438, { 2, 0, 45, 0, 0 } },
+  //{ 438, { 2, 255, 45, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -90%
-  //{ 438, { 1, 0, -90, 0, 0 } },
+  //{ 438, { 1, 255, -90, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageReceiveMultiplier, all, 50%
-  //{ 438, { 2, 0, 50, 0, 0 } },
+  //{ 438, { 2, 255, 50, 0, 0 } },
   //Minimum, ミニマム: EffectTypeDamageMultiplier, all, -50%
-  //{ 438, { 1, 0, -50, 0, 0 } },
+  //{ 438, { 1, 255, -50, 0, 0 } },
   //Bigbulge Biggerbrain, マッチョサイエンティスト: EffectTypeDamageReceiveMultiplier, all, -30%
-  { 1003, { 2, 0, -30, 0, 0 } },
+  { 1003, { 2, 255, -30, 0, 0 } },
   //Damage Down, ダメージ低下: EffectTypeDamageMultiplier, all, -3%
-  { 1016, { 1, 0, -3, 0, 0 } },
+  { 1016, { 1, 255, -3, 0, 0 } },
   //more than 1 effect is found
   //Damage Down, ダメージ低下: EffectTypeDamageMultiplier, all, -3%
-  //{ 1016, { 1, 0, -3, 0, 0 } },
+  //{ 1016, { 1, 255, -3, 0, 0 } },
   //Damage Down, ダメージ低下: EffectTypeDamageMultiplier, all, -10%
-  //{ 1016, { 1, 0, -10, 0, 0 } },
+  //{ 1016, { 1, 255, -10, 0, 0 } },
   //Damage Down, ダメージ低下: EffectTypeDamageMultiplier, all, -10%
-  //{ 1016, { 1, 0, -10, 0, 0 } },
+  //{ 1016, { 1, 255, -10, 0, 0 } },
   //Vulnerability Up, 被ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, 10%
-  { 202, { 2, 0, 10, 0, 0 } },
+  { 202, { 2, 255, 10, 0, 0 } },
   //Offensive Optimization, 攻撃形態: EffectTypeDamageReceiveMultiplier, all, 50%
-  { 681, { 2, 0, 50, 0, 0 } },
+  { 681, { 2, 255, 50, 0, 0 } },
   //Defensive Optimization, 防御形態: EffectTypeDamageReceiveMultiplier, all, -50%
-  { 682, { 2, 0, -50, 0, 0 } },
+  { 682, { 2, 255, -50, 0, 0 } },
   //Blessing of Earth, 土の加護: EffectTypeDamageReceiveMultiplier, all, -40%
-  { 683, { 2, 0, -40, 0, 0 } },
+  { 683, { 2, 255, -40, 0, 0 } },
   //Magic Vulnerability Down, 被魔法ダメージ軽減: EffectTypeDamageReceiveMultiplier, magic, -25%
   { 812, { 2, 2, -25, 0, 0 } },
   //Vulnerability Up, 被ダメージ上昇: EffectTypeDamageReceiveMultiplier, all, 10%
-  { 714, { 2, 0, 10, 0, 0 } },
+  { 714, { 2, 255, 10, 0, 0 } },
+  //Healing Potency Down, 魔法回復力ダウン: EffectTypeHealCastMultiplier, -30%
+  { 933, { 6, 0, -30, 0, 0 } },
   //Rampart, ランパート: EffectTypeDamageReceiveMultiplier, all, -20%
-  { 1191, { 2, 0, -20, 0, 0 } },
+  { 1191, { 2, 255, -20, 0, 0 } },
+  //Berserk, バーサク: EffectTypeCritDHRateBonus, damage, crit 100%, dh 100%
+  { 86, { 7, 1, 100, 100, 100 } },
+  //Inner Release, 原初の解放: EffectTypeCritDHRateBonus, damage, crit 100%, dh 100%
+  { 1177, { 7, 1, 100, 100, 100 } },
+  //Devilment, 攻めのタンゴ: EffectTypeCritDHRateBonus, damage, crit 20%, dh 20%
+  { 1825, { 7, 1, 20, 20, 20 } },
 };

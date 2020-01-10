@@ -26,12 +26,12 @@ namespace Sapphire::Math
     /*!
      * @brief Calculates the probability of a direct hit happening
      */
-    static float directHitProbability( const Sapphire::Entity::Chara& chara );
+    static float directHitProbability( const Sapphire::Entity::Chara& chara, uint8_t filterType );
 
     /*!
      * @brief Calculates the probability of a critical hit happening
      */
-    static float criticalHitProbability( const Sapphire::Entity::Chara& chara );
+    static float criticalHitProbability( const Sapphire::Entity::Chara& chara, uint8_t filterType );
 
     /*!
      * @brief Calculates the contribution of potency to damage output.

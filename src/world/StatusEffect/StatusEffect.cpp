@@ -124,17 +124,45 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
   {
     auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( *m_sourceActor );
     auto damage = Sapphire::Math::CalcStats::calcDamageBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
+
+    for( auto const& entry : m_sourceActor->getStatusEffectMap() )
+    {
+      auto status = entry.second;
+      auto effectEntry = status->getEffectEntry();
+      if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
+        continue;
+      if( effectEntry.effectValue1 & m_effectEntry.effectValue1 )
+      {
+        damage *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+      }
+    }
+
     m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
-      m_effectEntry.effectValue1 == 1 ? -1 : ( m_effectEntry.effectValue1 == 2 ? 5 : -128 ) );
+        m_effectEntry.effectValue1 == Sapphire::World::Action::EffectActionTypeFilterPhysical ? -1 :
+      ( m_effectEntry.effectValue1 == Sapphire::World::Action::EffectActionTypeFilterMagical ? 5 : -128 ) );
+    m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Sapphire::World::Action::EffectCritDHBonusFilterDamage );
+    m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
   }
   else if( m_effectEntry.effectType == Sapphire::World::Action::EffectTypeHot )
   {
     auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( *m_sourceActor );
     auto heal = Sapphire::Math::CalcStats::calcHealBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
+
+    if( m_effectEntry.effectValue1 == 0 ) // this value is always 0 atm, if statement here just in case there is a hot that isn't a "cast"
+    {
+      for( auto const& entry : m_sourceActor->getStatusEffectMap() )
+      {
+        auto status = entry.second;
+        auto effectEntry = status->getEffectEntry();
+        if( effectEntry.effectType != Sapphire::World::Action::EffectTypeHealCastMultiplier )
+          continue;
+        heal *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+      }
+    }
     m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal, m_effectEntry.effectValue1 );
+    m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Sapphire::World::Action::EffectCritDHBonusFilterHeal );
+    m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
   }
-  m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor );
-  m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
 
   pScriptMgr->onStatusReceive( m_targetActor, m_id );
 }
