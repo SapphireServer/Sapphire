@@ -804,14 +804,24 @@ Data::ActionPtr Action::Action::getActionData() const
 
 bool Action::Action::isPhysical() const
 {
-  return m_actionData->attackType == -1 ||
-         m_actionData->attackType == 1 ||
-         m_actionData->attackType == 2 ||
-         m_actionData->attackType == 3 ||
-         m_actionData->attackType == 4;
+  return isAttackTypePhysical( m_actionData->attackType );
 }
 
-bool Action::Action::isMagic() const
+bool Action::Action::isMagical() const
 {
-  return m_actionData->attackType == 5;
+  return isAttackTypeMagical( m_actionData->attackType );
+}
+
+bool Action::Action::isAttackTypePhysical( int8_t attackType )
+{
+  return attackType == -1 ||
+         attackType == 1 ||
+         attackType == 2 ||
+         attackType == 3 ||
+         attackType == 4;
+}
+
+bool Action::Action::isAttackTypeMagical( int8_t attackType )
+{
+  return attackType == 5;
 }

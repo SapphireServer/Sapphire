@@ -633,7 +633,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageMultiplier )
       continue;
     uint8_t actionType = action.isPhysical() ? Sapphire::World::Action::EffectActionTypeFilterPhysical :
-                       ( action.isMagic() ? Sapphire::World::Action::EffectActionTypeFilterMagical : 0 );
+                       ( action.isMagical() ? Sapphire::World::Action::EffectActionTypeFilterMagical : 0 );
     if( effectEntry.effectValue1 & actionType )
     {
       factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
@@ -653,9 +653,9 @@ float CalcStats::applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& ch
     if( effectEntry.effectType != Sapphire::World::Action::EffectTypeDamageReceiveMultiplier )
       continue;
     uint8_t actionType = 0;
-    if( attackType == -1 || attackType == 1 || attackType == 2 || attackType == 3 || attackType == 4 )
+    if( World::Action::Action::isAttackTypePhysical( attackType ) )
       actionType = Sapphire::World::Action::EffectActionTypeFilterPhysical;
-    else if( attackType == 5 )
+    else if( World::Action::Action::isAttackTypeMagical( attackType )  )
       actionType = Sapphire::World::Action::EffectActionTypeFilterMagical;
     if( effectEntry.effectValue1 & actionType )
     {
@@ -699,7 +699,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     if( effectEntry.effectType != Sapphire::World::Action::EffectTypeHealCastMultiplier )
       continue;
 
-    if( action.getActionData()->actionCategory == 2 ) // must be a "cast"
+    if( static_cast< Common::ActionCategory >( action.getActionData()->actionCategory ) == Common::ActionCategory::Spell ) // must be a "cast"
     {
       factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
     }

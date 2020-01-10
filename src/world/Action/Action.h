@@ -121,7 +121,10 @@ namespace Sapphire::World::Action
     Data::ActionPtr getActionData() const;
 
     bool isPhysical() const;
-    bool isMagic() const;
+    bool isMagical() const;
+
+    static bool isAttackTypePhysical( int8_t attackType );
+    static bool isAttackTypeMagical( int8_t attackType );
 
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
