@@ -32,7 +32,7 @@ enum class ActionCategory : uint8_t
 
 ///////////////////////////////////////////////////////////
 //AttackType.exd
-enum class AttackType : int32_t
+enum class AttackType : int8_t
 {
   Physical = -1,
   None = 0,
