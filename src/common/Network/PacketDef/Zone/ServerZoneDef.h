@@ -439,7 +439,7 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcEffectResult : FFXIVIpcBasePacket< EffectResult >
   {
-    uint32_t unknown;
+    uint32_t globalSequence;
     uint32_t actor_id;
     //uint8_t unknown1;
     //uint8_t unknown2;

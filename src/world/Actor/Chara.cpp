@@ -533,6 +533,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
+  statusEffectAdd->data().globalSequence = getCurrentTerritory()->getNextEffectSequence();
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().current_hp = getHp();
   statusEffectAdd->data().current_mp = static_cast< uint16_t >( getMp() );
