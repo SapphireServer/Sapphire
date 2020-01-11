@@ -480,44 +480,9 @@ uint32_t Sapphire::Entity::Chara::getBonusStat( Common::BaseParam bonus ) const
   return m_bonusStats[ static_cast< uint8_t >( bonus ) ];
 }
 
-/*!
-Autoattack prototype implementation
-TODO: move the check if the autoAttack can be performed to the callee
-also rename autoAttack to autoAttack as that is more elaborate
-On top of that, this only solves attacks from melee classes.
-Will have to be extended for ranged attacks.
-
-\param ActorPtr the autoAttack is performed on
-*/
 void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 {
-
-  uint64_t tick = Util::getTimeMs();
-
-  // todo: this needs to use the auto attack delay for the equipped weapon
-  if( ( tick - m_lastAttack ) > 2500 )
-  {
-    pTarget->onActionHostile( getAsChara() );
-    m_lastAttack = tick;
-    srand( static_cast< uint32_t >( tick ) );
-
-    auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
-    damage = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage, Common::AttackType::Physical );
-
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage );
-    effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.param0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
-    effectEntry.param2 = 0x71;
-    effectPacket->addEffect( effectEntry );
-
-    sendToInRangeSet( effectPacket );
-
-    pTarget->takeDamage( damage );
-
-  }
+  // moved to BNpc
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */

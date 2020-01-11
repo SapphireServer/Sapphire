@@ -591,14 +591,15 @@ namespace Sapphire::Common
 //    DRGGauge3Eyes = 76,
   };
 
-  enum class ActionType : int8_t
+  enum class AttackType : int8_t
   {
-    WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+    //WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+    Physical = -1, // seems to be the case
     Unknown_0 = 0,
-    Slashing = 1,
-    Piercing = 2,
-    Blunt = 3,
-    Unknown_4 = 4,
+    Slashing = 1, // likely not used post 5.0
+    Piercing = 2, // likely not used post 5.0
+    Blunt = 3, // likely not used post 5.0
+    Unknown_4 = 4, // likely not used post 5.0
     Magical = 5,
     Darkness = 6,
     Unknown_7 = 7,
@@ -650,6 +651,7 @@ namespace Sapphire::Common
   {
     None = 0,
     EffectOnSource = 0x80,
+    Reflected = 0xA0,
   };
 
   enum ItemActionType : uint16_t
@@ -1020,12 +1022,38 @@ namespace Sapphire::Common
     Gatherer
   };
 
-  enum class AttackType : int8_t
+  enum class StatusEffectType : uint32_t
   {
-    Physical = -1,
+    Invalid = 0,
+    DamageMultiplier = 1,
+    DamageReceiveMultiplier = 2,
+    Hot = 3,
+    Dot = 4,
+    HealReceiveMultiplier = 5,
+    HealCastMultiplier = 6,
+    CritDHRateBonus = 7,
+    DamageReceiveTrigger = 8,
+  };
+
+  enum class ActionTypeFilter : int32_t
+  {
+    Unknown = 0,
+    Physical = 1,
+    Magical = 2,
+    All = 255,
+  };
+
+  enum class CritDHBonusFilter : int32_t
+  {
     None = 0,
-    Magic = 5,
-    LimitBreak = 8,
+    Damage = 1,
+    Heal = 2,
+    All = 255,
+  };
+
+  enum class StatusEffectTriggerResult : int32_t
+  {
+    ReflectDamage = 1,
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
