@@ -607,7 +607,7 @@ float CalcStats::calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, ui
 
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg )
 {
-  auto factor =calcDamageBaseOnPotency( chara, ptc, wepDmg );
+  auto factor = calcDamageBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   if( criticalHitProbability( chara, Sapphire::World::Action::EffectCritDHBonusFilterDamage ) > range100( rng ) )

@@ -31,16 +31,6 @@ enum class ActionCategory : uint8_t
 };
 
 ///////////////////////////////////////////////////////////
-//AttackType.exd
-enum class AttackType : int8_t
-{
-  Physical = -1,
-  None = 0,
-  Magic = 5,
-  LimitBreak = 8,
-};
-
-///////////////////////////////////////////////////////////
 //BaseParam.exd
 enum class BaseParam : uint8_t
 {

@@ -1020,6 +1020,14 @@ namespace Sapphire::Common
     Gatherer
   };
 
+  enum class AttackType : int8_t
+  {
+    Physical = -1,
+    None = 0,
+    Magic = 5,
+    LimitBreak = 8,
+  };
+
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
 }
