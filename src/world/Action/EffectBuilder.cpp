@@ -86,7 +86,7 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 
 void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, source, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, source, getResultDelayMs() );
   nextResult->applyStatusEffect( statusId, duration, param );
   moveToResultList( target, nextResult );
 }
