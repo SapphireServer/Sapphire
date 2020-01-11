@@ -458,7 +458,7 @@ void Action::Action::buildEffects()
     if( m_lutEntry.damagePotency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
-      dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, m_actionData->attackType );
+      dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, static_cast< Common::AttackType >( m_actionData->attackType ) );
       m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
@@ -475,7 +475,7 @@ void Action::Action::buildEffects()
         if( m_lutEntry.selfHealPotency > 0 ) // actions with self heal
         {
           auto heal = calcHealing( m_lutEntry.selfHealPotency );
-          heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first, 0 );
+          heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
           m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
         }
 
@@ -494,7 +494,7 @@ void Action::Action::buildEffects()
     else if( m_lutEntry.healPotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.healPotency );
-      heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first, 0 );
+      heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first );
       m_effectBuilder->heal( actor, actor, heal.first, heal.second );
 
       if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
@@ -804,24 +804,20 @@ Data::ActionPtr Action::Action::getActionData() const
 
 bool Action::Action::isPhysical() const
 {
-  return isAttackTypePhysical( m_actionData->attackType );
+  return isAttackTypePhysical( static_cast< Common::AttackType >( m_actionData->attackType ) );
 }
 
 bool Action::Action::isMagical() const
 {
-  return isAttackTypeMagical( m_actionData->attackType );
+  return isAttackTypeMagical( static_cast< Common::AttackType >( m_actionData->attackType ) );
 }
 
-bool Action::Action::isAttackTypePhysical( int8_t attackType )
+bool Action::Action::isAttackTypePhysical( Common::AttackType attackType )
 {
-  return attackType == -1 ||
-         attackType == 1 ||
-         attackType == 2 ||
-         attackType == 3 ||
-         attackType == 4;
+  return attackType == Common::AttackType::Physical;
 }
 
-bool Action::Action::isAttackTypeMagical( int8_t attackType )
+bool Action::Action::isAttackTypeMagical( Common::AttackType attackType )
 {
-  return attackType == 5;
+  return attackType == Common::AttackType::Magic;
 }

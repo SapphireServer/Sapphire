@@ -138,8 +138,8 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
     }
 
     m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
-        m_effectEntry.effectValue1 == Sapphire::World::Action::EffectActionTypeFilterPhysical ? -1 :
-      ( m_effectEntry.effectValue1 == Sapphire::World::Action::EffectActionTypeFilterMagical ? 5 : -128 ) );
+        m_effectEntry.effectValue1 == Sapphire::World::Action::EffectActionTypeFilterPhysical ? Common::AttackType::Physical :
+      ( m_effectEntry.effectValue1 == Sapphire::World::Action::EffectActionTypeFilterMagical ? Common::AttackType::Magic : Common::AttackType::None ) );
     m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Sapphire::World::Action::EffectCritDHBonusFilterDamage );
     m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
   }
@@ -159,7 +159,7 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
         heal *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
       }
     }
-    m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal, m_effectEntry.effectValue1 );
+    m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal );
     m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Sapphire::World::Action::EffectCritDHBonusFilterHeal );
     m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
   }

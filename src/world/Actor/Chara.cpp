@@ -502,7 +502,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
-    damage = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage, -1 );
+    damage = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage, Common::AttackType::Physical );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );

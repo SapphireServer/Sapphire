@@ -123,8 +123,8 @@ namespace Sapphire::World::Action
     bool isPhysical() const;
     bool isMagical() const;
 
-    static bool isAttackTypePhysical( int8_t attackType );
-    static bool isAttackTypeMagical( int8_t attackType );
+    static bool isAttackTypePhysical( Common::AttackType attackType );
+    static bool isAttackTypeMagical( Common::AttackType attackType );
 
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
