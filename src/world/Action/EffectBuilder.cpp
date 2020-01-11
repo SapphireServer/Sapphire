@@ -28,7 +28,7 @@ uint64_t EffectBuilder::getResultDelayMs()
 {
   // todo: actually figure this retarded shit out
 
-  return Common::Util::getTimeMs() + 850;
+  return Common::Util::getTimeMs() + 600;
 }
 
 void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
@@ -176,6 +176,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
     pHeader->globalSequence = globalSequence;
+    pHeader->animationLockTime = 0.6f;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
@@ -220,6 +221,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setSequence( seq, m_sequence );
+    effectPacket->data().animationLockTime = 0.6f;
 
     for( int i = 0; i < resultList->size(); i++ )
     {
@@ -247,6 +249,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     effectPacket->data().effectCount = 0;
     effectPacket->data().sourceSequence = m_sequence;
     effectPacket->data().globalSequence = globalSequence;
+    effectPacket->data().animationLockTime = 0.6f;
 
     return effectPacket;
   }
