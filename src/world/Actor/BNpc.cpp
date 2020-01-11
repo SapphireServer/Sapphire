@@ -679,9 +679,17 @@ void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
   m_flags |= flag;
 }
 
+/*!
+Autoattack prototype implementation
+TODO: move the check if the autoAttack can be performed to the callee
+also rename autoAttack to autoAttack as that is more elaborate
+On top of that, this only solves attacks from melee classes.
+Will have to be extended for ranged attacks.
+
+\param ActorPtr the autoAttack is performed on
+*/
 void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 {
-
   uint64_t tick = Util::getTimeMs();
 
   // todo: this needs to use the auto attack delay for the equipped weapon
@@ -689,24 +697,19 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
   {
     pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
-    srand( static_cast< uint32_t >( tick ) );
 
-    auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
+    auto pSource = getAsChara();
     auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
     damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, Common::AttackType::Physical );
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage.first );
-    effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.param0 = static_cast< uint8_t >( damage.second );
-    effectEntry.param2 = 0x71;
-    effectPacket->addEffect( effectEntry );
+    auto reflectDmg = Math::CalcStats::calcDamageReflect( pSource, pTarget, damage.first, Common::ActionTypeFilter::Physical );
 
-    sendToInRangeSet( effectPacket );
-
-    pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
-
+    World::Action::EffectBuilder effectBuilder( pSource, 7, 0 );
+    effectBuilder.damage( pTarget, pTarget, damage.first, damage.second );
+    if( reflectDmg.first > 0 )
+    {
+      effectBuilder.damage( pTarget, pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+    }
+    effectBuilder.buildAndSendPackets();
   }
 }
 

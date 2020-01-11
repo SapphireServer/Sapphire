@@ -1569,49 +1569,28 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
   pTarget->onActionHostile( getAsChara() );
-  //uint64_t tick = Util::getTimeMs();
-  //srand(static_cast< uint32_t >(tick));
 
-  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
-
+  auto pSource = getAsChara();
   auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
   damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, Common::AttackType::Physical );
+  auto reflectDmg = Math::CalcStats::calcDamageReflect( pSource, pTarget, damage.first, Common::ActionTypeFilter::Physical );
 
+  World::Action::EffectBuilderPtr effectBuilder = nullptr;
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 8 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-
-    Common::EffectEntry entry{};
-    entry.value = damage.first;
-    entry.effectType = Common::ActionEffectType::Damage;
-    entry.param0 = static_cast< uint8_t >( damage.second );
-    entry.param2 = 0x72;
-
-    effectPacket->addEffect( entry );
-
-    sendToInRangeSet( effectPacket, true );
+    effectBuilder = World::Action::make_EffectBuilder( pSource, 8, 0 );
   }
   else
   {
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-
-    Common::EffectEntry entry{};
-    entry.value = damage.first;
-    entry.effectType = Common::ActionEffectType::Damage;
-    entry.param0 = static_cast< uint8_t >( damage.second );
-    entry.param2 = 0x73;
-
-    effectPacket->addEffect( entry );
-
-    sendToInRangeSet( effectPacket, true );
-
+    effectBuilder = World::Action::make_EffectBuilder( pSource, 7, 0 );
   }
 
-  pTarget->takeDamage( damage.first );
-
+  effectBuilder->damage( pTarget, pTarget, damage.first, damage.second );
+  if( reflectDmg.first > 0 )
+  {
+    effectBuilder->damage( pTarget, pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+  }
+  effectBuilder->buildAndSendPackets();
 }
 
 

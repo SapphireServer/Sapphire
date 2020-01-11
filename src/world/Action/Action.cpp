@@ -406,12 +406,12 @@ void Action::Action::execute()
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
 {
-  return Math::CalcStats::calcActionDamage( *m_pSource, *this, potency, Math::CalcStats::getWeaponDamage( *m_pSource ) );
+  return Math::CalcStats::calcActionDamage( *m_pSource, static_cast< Common::AttackType >( m_actionData->attackType ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
 {
-  return Math::CalcStats::calcActionHealing( *m_pSource, *this, potency, Math::CalcStats::getWeaponDamage( *m_pSource ) );
+  return Math::CalcStats::calcActionHealing( *m_pSource, static_cast< Common::ActionCategory >( m_actionData->actionCategory ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 void Action::Action::buildEffects()
@@ -457,12 +457,23 @@ void Action::Action::buildEffects()
   {
     if( m_lutEntry.damagePotency > 0 )
     {
+      Common::AttackType attackType = static_cast< Common::AttackType >( m_actionData->attackType );
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
-      dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, static_cast< Common::AttackType >( m_actionData->attackType ) );
-      m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
+      dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, attackType );
+      auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
+                        attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
+                      ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
 
       if( dmg.first > 0 )
+      {
         actor->onActionHostile( m_pSource );
+        m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
+      }
+
+      if( reflectDmg.first > 0 )
+      {
+        m_effectBuilder->damage( actor, m_pSource, dmg.first, dmg.second, Common::ActionEffectResultFlag::Reflected );
+      }
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
@@ -819,5 +830,5 @@ bool Action::Action::isAttackTypePhysical( Common::AttackType attackType )
 
 bool Action::Action::isAttackTypeMagical( Common::AttackType attackType )
 {
-  return attackType == Common::AttackType::Magic;
+  return attackType == Common::AttackType::Magical;
 }

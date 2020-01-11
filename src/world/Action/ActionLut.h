@@ -21,23 +21,6 @@ namespace Sapphire::World::Action
     uint16_t gainMPPercentage;
   };
 
-  const uint32_t EffectTypeInvalid = 0;
-  const uint32_t EffectTypeDamageMultiplier = 1;
-  const uint32_t EffectTypeDamageReceiveMultiplier = 2;
-  const uint32_t EffectTypeHot = 3;
-  const uint32_t EffectTypeDot = 4;
-  const uint32_t EffectTypeHealReceiveMultiplier = 5;
-  const uint32_t EffectTypeHealCastMultiplier = 6;
-  const uint32_t EffectTypeCritDHRateBonus = 7;
-
-  const uint8_t EffectActionTypeFilterPhysical = 1;
-  const uint8_t EffectActionTypeFilterMagical = 2;
-  const uint8_t EffectActionTypeFilterAll = 255;
-
-  const uint8_t EffectCritDHBonusFilterDamage = 1;
-  const uint8_t EffectCritDHBonusFilterHeal = 2;
-  const uint8_t EffectCritDHBonusFilterAll = 255;
-
   struct StatusEffectEntry
   {
     uint32_t effectType;
