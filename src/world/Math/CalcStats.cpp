@@ -481,6 +481,10 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
     autoAttackDelay = pItem->getDelay() / 1000.f;
     weaponDamage = pItem->getWeaponDmg();
   }
+  else
+  {
+    weaponDamage = chara.getLevel() * 10;
+  }
 
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
