@@ -38,7 +38,7 @@ private:
 public:
   ChasingShadows() : Sapphire::ScriptAPI::QuestBattleScript( 11 ) {}
 
-  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player )
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
   {
     player.setRot( 3.f );
     player.setPos( { 323.f, -1.28f, -320.f } );

@@ -38,19 +38,18 @@ namespace Sapphire
       return nullptr;
     }
 
-    void insert( uint16_t zoneId, T& entry )
+    void insert( uint16_t zoneId, std::shared_ptr< T > entry )
     {
-      auto pShared = std::make_shared< T >( entry );
       if( m_objectCache.find( zoneId ) == m_objectCache.end() )
       {
         ObjectMap cache;
-        cache[ entry.header.instanceId ] = pShared;
+        cache[ entry->header.instanceId ] = std::move( entry );
         m_objectCache[ zoneId ] = cache;
       }
       else
       {
         auto it = m_objectCache.find( zoneId );
-        it->second[ entry.header.instanceId ] = pShared;
+        it->second[ entry->header.instanceId ] = std::move( entry );
       }
     }
 
@@ -67,7 +66,7 @@ namespace Sapphire
     using ExitRangePtr = std::shared_ptr< LGB_EXIT_RANGE_ENTRY >;
     using PopRangePtr = std::shared_ptr< LGB_POP_RANGE_ENTRY >;
 
-    InstanceObjectCache( std::shared_ptr< Framework > pFramework );
+    explicit InstanceObjectCache( std::shared_ptr< Framework > pFramework );
     ~InstanceObjectCache() = default;
 
     MapRangePtr getMapRange( uint16_t zoneId, uint32_t mapRangeId );
