@@ -80,18 +80,18 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
         {
           if( pEntry->getType() == LgbEntryType::MapRange )
           {
-            auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY* >( pEntry.get() );
-            m_mapRangeCache.insert( id, *pMapRange );
+            auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
+            m_mapRangeCache.insert( id, pMapRange );
           }
           else if( pEntry->getType() == LgbEntryType::ExitRange )
           {
-            auto pExitRange = reinterpret_cast< LGB_EXIT_RANGE_ENTRY* >( pEntry.get() );
-            m_exitRangeCache.insert( id, *pExitRange);
+            auto pExitRange = std::reinterpret_pointer_cast< LGB_EXIT_RANGE_ENTRY >( pEntry );
+            m_exitRangeCache.insert( id, pExitRange );
           }
           else if( pEntry->getType() == LgbEntryType::PopRange )
           {
-            auto pPopRange = reinterpret_cast< LGB_POP_RANGE_ENTRY* >( pEntry.get() );
-            m_popRangeCache.insert( id, *pPopRange );
+            auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
+            m_popRangeCache.insert( id, pPopRange );
           }
         }
       }
