@@ -72,7 +72,7 @@ class SubFst034 : public Sapphire::ScriptAPI::EventScript
 
   }
 
-  void onBNpcKill( uint32_t npcId, Entity::Player& player )
+  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override
   {
     switch( npcId )
     {
