@@ -28,7 +28,7 @@ uint64_t EffectBuilder::getResultDelayMs()
 {
   // todo: actually figure this retarded shit out
 
-  return Common::Util::getTimeMs() + 850;
+  return Common::Util::getTimeMs() + 600;
 }
 
 void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
@@ -86,7 +86,7 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 
 void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, source, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, source, getResultDelayMs() );
   nextResult->applyStatusEffect( statusId, duration, param );
   moveToResultList( target, nextResult );
 }
@@ -176,6 +176,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
     pHeader->globalSequence = globalSequence;
+    pHeader->animationLockTime = 0.6f;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
