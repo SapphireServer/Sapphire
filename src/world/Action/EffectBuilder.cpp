@@ -28,7 +28,7 @@ uint64_t EffectBuilder::getResultDelayMs()
 {
   // todo: actually figure this retarded shit out
 
-  return Common::Util::getTimeMs() + 850;
+  return Common::Util::getTimeMs() + 600;
 }
 
 void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
@@ -51,43 +51,43 @@ void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr r
 
 void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( healingTarget, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( healingTarget, nullptr, getResultDelayMs() );
   nextResult->heal( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
+  EffectResultPtr nextResult = make_EffectResult( restoringTarget, nullptr, getResultDelayMs() ); // restore mp source actor
   nextResult->restoreMP( amount, flag );
   moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( damagingTarget, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, nullptr, getResultDelayMs() );
   nextResult->damage( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
   nextResult->startCombo( actionId );
   moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
   nextResult->comboSucceed();
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, param );
+  EffectResultPtr nextResult = make_EffectResult( target, source, getResultDelayMs() );
+  nextResult->applyStatusEffect( statusId, duration, param );
   moveToResultList( target, nextResult );
 }
 
@@ -176,6 +176,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
     pHeader->globalSequence = globalSequence;
+    pHeader->animationLockTime = 0.6f;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
@@ -220,6 +221,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setSequence( seq, m_sequence );
+    effectPacket->data().animationLockTime = 0.6f;
 
     for( int i = 0; i < resultList->size(); i++ )
     {
@@ -247,6 +249,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     effectPacket->data().effectCount = 0;
     effectPacket->data().sourceSequence = m_sequence;
     effectPacket->data().globalSequence = globalSequence;
+    effectPacket->data().animationLockTime = 0.6f;
 
     return effectPacket;
   }

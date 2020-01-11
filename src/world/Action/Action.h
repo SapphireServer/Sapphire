@@ -118,6 +118,14 @@ namespace Sapphire::World::Action
      */
     Entity::CharaPtr getHitChara();
 
+    Data::ActionPtr getActionData() const;
+
+    bool isPhysical() const;
+    bool isMagical() const;
+
+    static bool isAttackTypePhysical( Common::AttackType attackType );
+    static bool isAttackTypeMagical( Common::AttackType attackType );
+
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
      */

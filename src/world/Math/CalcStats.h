@@ -26,12 +26,12 @@ namespace Sapphire::Math
     /*!
      * @brief Calculates the probability of a direct hit happening
      */
-    static float directHitProbability( const Sapphire::Entity::Chara& chara );
+    static float directHitProbability( const Sapphire::Entity::Chara& chara, uint8_t filterType );
 
     /*!
      * @brief Calculates the probability of a critical hit happening
      */
-    static float criticalHitProbability( const Sapphire::Entity::Chara& chara );
+    static float criticalHitProbability( const Sapphire::Entity::Chara& chara, uint8_t filterType );
 
     /*!
      * @brief Calculates the contribution of potency to damage output.
@@ -63,6 +63,8 @@ namespace Sapphire::Math
     static float magicAttackPower( const Sapphire::Entity::Chara& chara );
 
     static float healingMagicPower( const Sapphire::Entity::Chara& chara );
+
+    static float getWeaponDamage( Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates determinations contribution to damage and healing output.
@@ -129,13 +131,25 @@ namespace Sapphire::Math
 
     ////////////////////////////////////////////
 
+    static float calcDamageBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+
+    static float calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+
     static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+    static float applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, Common::AttackType attackType );
+
+    static float applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal );
+
+    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( const Sapphire::Entity::Chara& chara, const Sapphire::World::Action::Action& action, uint32_t ptc, float wepDmg );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
+
+    static std::random_device dev;
+    static std::mt19937 rng;
+    static std::uniform_int_distribution< std::mt19937::result_type > range100;
   private:
 
     /*!
@@ -144,10 +158,6 @@ namespace Sapphire::Math
      * @param attackPower The magic/physical attack power value.
      */
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
-
-    static std::random_device dev;
-    static std::mt19937 rng;
-    static std::uniform_int_distribution< std::mt19937::result_type > range100;
   };
 
 }

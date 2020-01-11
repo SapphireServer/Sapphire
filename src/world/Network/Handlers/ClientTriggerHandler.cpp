@@ -134,7 +134,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::RemoveStatusEffect: // Remove status (clicking it off)
     {
       // todo: check if status can be removed by client from exd
-      player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
+      player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ), true );
       break;
     }
     case ClientTriggerType::CastCancel: // Cancel cast
