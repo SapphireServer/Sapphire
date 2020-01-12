@@ -252,15 +252,8 @@ float CalcStats::potency( uint16_t potency )
   return potency / 100.f;
 }
 
-float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
+float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara, uint32_t aaPotency )
 {
-  uint32_t aaPotency = AUTO_ATTACK_POTENCY;
-
-  if( chara.getRole() == Common::Role::RangedPhysical )
-  {
-    aaPotency = RANGED_AUTO_ATTACK_POTENCY;
-  }
-
   float autoAttackDelay = 2.5f;
   // fetch actual auto attack delay if its a player
   if( chara.isPlayer() )
@@ -495,12 +488,12 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
 
-  auto pot = autoAttackPotency( chara );
+  auto pot = autoAttackPotency( chara, ptc );
   auto aa = autoAttack( chara );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );

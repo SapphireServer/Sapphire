@@ -2816,6 +2816,14 @@ ActionLut::Lut ActionLut::m_actionLut =
   //Hagakure, 葉隠
   { 7495, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
+  //attack, 攻撃
+  //has damage: potency 110, combo potency 0, directional potency 0
+  { 7, { 110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+
+  //Shot, ショット
+  //has damage: potency 110, combo potency 0, directional potency 0
+  { 8, { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+
 };
 
 ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =

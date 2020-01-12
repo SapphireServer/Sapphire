@@ -94,8 +94,8 @@ void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPt
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();
-  Logger::debug( "EffectBuilder result: " );
-  Logger::debug( "Targets afflicted: {}", targetCount );
+  //Logger::debug( "EffectBuilder result: " );
+  //Logger::debug( "Targets afflicted: {}", targetCount );
 
   auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
@@ -184,7 +184,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
       assert( !resultList->empty() );
       auto firstResult = resultList->data()[ 0 ];
       pEffectTargetId[ targetIndex ] = firstResult->getTarget()->getId();
-      Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
+      //Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
 
       for( auto i = 0; i < resultList->size(); i++ )
       {
@@ -213,7 +213,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     auto resultList = m_resolvedEffects.begin()->second;
     assert( !resultList->empty() );
     auto firstResult = resultList->data()[ 0 ];
-    Logger::debug( " - id: {}", firstResult->getTarget()->getId() );
+    //Logger::debug( " - id: {}", firstResult->getTarget()->getId() );
 
     auto seq = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 

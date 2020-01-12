@@ -680,10 +680,7 @@ void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
 }
 
 /*!
-Autoattack prototype implementation
-TODO: move the check if the autoAttack can be performed to the callee
-also rename autoAttack to autoAttack as that is more elaborate
-On top of that, this only solves attacks from melee classes.
+TODO: this only solves attacks from melee classes.
 Will have to be extended for ranged attacks.
 
 \param ActorPtr the autoAttack is performed on
@@ -698,18 +695,20 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
 
-    auto pSource = getAsChara();
-    auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-    damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, Common::AttackType::Physical );
-    auto reflectDmg = Math::CalcStats::calcDamageReflect( pSource, pTarget, damage.first, Common::ActionTypeFilter::Physical );
+    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+    assert( exdData );
+    auto actionData = exdData->get< Data::Action >( 7 );
+    assert( actionData );
+    auto action = World::Action::make_Action( getAsChara(), 7, 0, actionData, m_pFw );
 
-    World::Action::EffectBuilder effectBuilder( pSource, 7, 0 );
-    effectBuilder.damage( pTarget, pTarget, damage.first, damage.second );
-    if( reflectDmg.first > 0 )
+    action->setTargetId( pTarget->getId() );
+    action->setPos( getPos() );
+    action->setAutoAttack();
+
+    if( action->init() )
     {
-      effectBuilder.damage( pTarget, pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+      action->start();
     }
-    effectBuilder.buildAndSendPackets();
   }
 }
 

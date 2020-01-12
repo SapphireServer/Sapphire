@@ -11,9 +11,6 @@ namespace Sapphire::Math
   class CalcStats
   {
   public:
-    static const uint32_t AUTO_ATTACK_POTENCY = 110;
-    static const uint32_t RANGED_AUTO_ATTACK_POTENCY = 100;
-
     static float calculateBaseStat( const Entity::Chara& chara );
 
     static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
@@ -40,7 +37,7 @@ namespace Sapphire::Math
      */
     static float potency( uint16_t potency );
 
-    static float autoAttackPotency( const Sapphire::Entity::Chara& chara );
+    static float autoAttackPotency( const Sapphire::Entity::Chara& chara, uint32_t aaPotency );
 
     /*!
      * @brief Weapon damage is the contribution the weapon's damage rating
@@ -135,7 +132,7 @@ namespace Sapphire::Math
 
     static float calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+    static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc );
 
     static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, Common::AttackType attackType, uint32_t ptc, float wepDmg );
 
