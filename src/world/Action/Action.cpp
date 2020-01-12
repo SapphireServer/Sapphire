@@ -50,7 +50,8 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
   m_targetId( 0 ),
   m_startTime( 0 ),
   m_interruptType( Common::ActionInterruptType::None ),
-  m_sequence( sequence )
+  m_sequence( sequence ),
+  m_isAutoAttack( false )
 {
 }
 
@@ -288,7 +289,8 @@ void Action::Action::start()
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(),
                                               m_recastTimeMs / 10 );
-  player->queuePacket( actionStartPkt );
+  if( player )
+    player->queuePacket( actionStartPkt );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
@@ -406,7 +408,10 @@ void Action::Action::execute()
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
 {
-  return Math::CalcStats::calcActionDamage( *m_pSource, static_cast< Common::AttackType >( m_actionData->attackType ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
+  if( m_isAutoAttack )
+    return Math::CalcStats::calcAutoAttackDamage( *m_pSource, potency );
+  else
+    return Math::CalcStats::calcActionDamage( *m_pSource, static_cast< Common::AttackType >( m_actionData->attackType ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
@@ -472,7 +477,7 @@ void Action::Action::buildEffects()
 
       if( reflectDmg.first > 0 )
       {
-        m_effectBuilder->damage( actor, m_pSource, dmg.first, dmg.second, Common::ActionEffectResultFlag::Reflected );
+        m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
       }
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
@@ -811,6 +816,11 @@ Action::EffectBuilderPtr Action::Action::getEffectbuilder()
 Data::ActionPtr Action::Action::getActionData() const
 {
   return m_actionData;
+}
+
+void Action::Action::setAutoAttack()
+{
+  m_isAutoAttack = true;
 }
 
 bool Action::Action::isPhysical() const

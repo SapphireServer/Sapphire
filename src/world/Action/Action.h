@@ -52,6 +52,8 @@ namespace Sapphire::World::Action
 
     bool isComboAction() const;
 
+    void setAutoAttack();
+
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
      * @return true if they have the required resources
@@ -188,6 +190,7 @@ namespace Sapphire::World::Action
     bool m_canTargetFriendly;
     bool m_canTargetHostile;
     bool m_canTargetDead;
+    bool m_isAutoAttack;
 
     Common::ActionInterruptType m_interruptType;
 

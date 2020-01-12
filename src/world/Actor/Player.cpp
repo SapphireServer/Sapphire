@@ -1565,32 +1565,31 @@ uint32_t Sapphire::Entity::Player::getPersistentEmote() const
 
 void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 {
-
-  auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-
   pTarget->onActionHostile( getAsChara() );
-
-  auto pSource = getAsChara();
-  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-  damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pTarget, damage.first, Common::AttackType::Physical );
-  auto reflectDmg = Math::CalcStats::calcDamageReflect( pSource, pTarget, damage.first, Common::ActionTypeFilter::Physical );
-
-  World::Action::EffectBuilderPtr effectBuilder = nullptr;
+  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+  assert( exdData );
+  World::Action::ActionPtr action;
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
-    effectBuilder = World::Action::make_EffectBuilder( pSource, 8, 0 );
+    auto actionData = exdData->get< Data::Action >( 8 );
+    assert( actionData );
+    action = World::Action::make_Action( getAsChara(), 8, 0, actionData, m_pFw );
   }
   else
   {
-    effectBuilder = World::Action::make_EffectBuilder( pSource, 7, 0 );
+    auto actionData = exdData->get< Data::Action >( 7 );
+    assert( actionData );
+    action = World::Action::make_Action( getAsChara(), 7, 0, actionData, m_pFw );
   }
 
-  effectBuilder->damage( pTarget, pTarget, damage.first, damage.second );
-  if( reflectDmg.first > 0 )
+  action->setTargetId( pTarget->getId() );
+  action->setPos( getPos() );
+  action->setAutoAttack();
+
+  if( action->init() )
   {
-    effectBuilder->damage( pTarget, pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+    action->start();
   }
-  effectBuilder->buildAndSendPackets();
 }
 
 
