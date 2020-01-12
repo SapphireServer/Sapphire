@@ -288,6 +288,8 @@ namespace Sapphire::Entity
 
     Common::BaseParam getPrimaryStat() const;
 
+    float applyShieldProtection( float damage );
+
   };
 
 }

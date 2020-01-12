@@ -148,8 +148,6 @@ namespace Sapphire::Math
 
     static float calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, Sapphire::Common::ActionTypeFilter filter );
 
-    static float applyShieldProtection( Sapphire::Entity::CharaPtr pChara, float damage );
-
     static std::random_device dev;
     static std::mt19937 rng;
     static std::uniform_int_distribution< std::mt19937::result_type > range100;

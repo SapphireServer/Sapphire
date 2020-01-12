@@ -980,3 +980,48 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
 
   return value + getBonusStat( baseParam );
 }
+
+float Sapphire::Entity::Chara::applyShieldProtection( float damage )
+{
+  float remainingDamage = damage;
+  bool shieldChanged = false;
+  std::vector< uint8_t > destroyedShieldSlotList;
+
+  for( auto const& entry : getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+
+    if( static_cast< Sapphire::Common::StatusEffectType >( effectEntry.effectType ) == Sapphire::Common::StatusEffectType::Shield )
+    {
+      shieldChanged = true;
+      if( remainingDamage < effectEntry.effectValue1 )
+      {
+        effectEntry.effectValue1 -= static_cast< int32_t >( remainingDamage );
+        status->replaceEffectEntry( effectEntry );
+        remainingDamage = 0;
+        break;
+      }
+      else
+      {
+        remainingDamage -= effectEntry.effectValue1;
+        destroyedShieldSlotList.push_back( entry.first );
+      }
+    }
+  }
+
+  if( shieldChanged )
+  {
+    if( !destroyedShieldSlotList.empty() )
+    {
+      for( auto const& slotId : destroyedShieldSlotList )
+      {
+        removeStatusEffect( slotId, true, false );
+      }
+      sendStatusEffectUpdate();
+    }
+    else
+      sendEffectResultToUpdateShieldValue(); // yes this is the packet to update shield value
+  }
+  return remainingDamage;
+}
