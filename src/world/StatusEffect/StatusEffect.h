@@ -51,6 +51,8 @@ public:
 
   const Sapphire::World::Action::StatusEffectEntry& getEffectEntry() const;
 
+  void replaceEffectEntry( Sapphire::World::Action::StatusEffectEntry entryOverride );
+
 private:
   uint32_t m_id;
   Entity::CharaPtr m_sourceActor;
@@ -64,7 +66,7 @@ private:
   std::pair< uint8_t, uint32_t > m_currTickEffect;
   FrameworkPtr m_pFw;
   Sapphire::World::Action::StatusEffectEntry m_effectEntry;
-  uint32_t m_cachedHotOrDotValue;
+  uint32_t m_value;
   float m_cachedSourceCrit;
   float m_cachedSourceCritBonus;
 };

@@ -4,6 +4,8 @@
 #include <ForwardsZone.h>
 #include <Common.h>
 
+#include "StatusEffect/StatusEffect.h"
+
 namespace Sapphire::World::Action
 {
   /*!
@@ -21,6 +23,8 @@ namespace Sapphire::World::Action
     void startCombo( uint16_t actionId );
     void comboSucceed();
     void applyStatusEffect( uint16_t statusId, uint32_t duration, uint8_t param );
+    void applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect );
+    void statusNoEffect( uint16_t statusId );
 
     Entity::CharaPtr getSource() const;
     Entity::CharaPtr getTarget() const;
@@ -48,6 +52,8 @@ namespace Sapphire::World::Action
     uint32_t m_value;
     uint32_t m_value2;
     Common::ActionEffectResultFlag m_flag;
+
+    StatusEffect::StatusEffectPtr m_pPreBuiltStatusEffect;
   };
 }
 

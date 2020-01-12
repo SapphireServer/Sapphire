@@ -716,7 +716,7 @@ uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamageReflect( Sapphire::Entity::CharaPtr pCharaAttacker, Sapphire::Entity::CharaPtr pCharaVictim, float damage, Sapphire::Common::ActionTypeFilter filter )
 {
-  for( auto entry : pCharaVictim->getStatusEffectMap() )
+  for( auto const& entry : pCharaVictim->getStatusEffectMap() )
   {
     auto status = entry.second;
     auto effectEntry = status->getEffectEntry();
@@ -740,7 +740,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamag
 float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, Sapphire::Common::ActionTypeFilter filter )
 {
   float result = 0;
-  for( auto entry : pChara->getStatusEffectMap() )
+  for( auto const& entry : pChara->getStatusEffectMap() )
   {
     auto status = entry.second;
     auto effectEntry = status->getEffectEntry();
@@ -754,4 +754,49 @@ float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, 
     }
   }
   return result;
+}
+
+float CalcStats::applyShieldProtection( Sapphire::Entity::CharaPtr pChara, float damage )
+{
+  float remainingDamage = damage;
+  bool shieldChanged = false;
+  std::vector< uint8_t > destroyedShieldSlotList;
+
+  for( auto const& entry : pChara->getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+
+    if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) == Common::StatusEffectType::Shield )
+    {
+      shieldChanged = true;
+      if( remainingDamage < effectEntry.effectValue1 )
+      {
+        effectEntry.effectValue1 -= static_cast< int32_t >( remainingDamage );
+        status->replaceEffectEntry( effectEntry );
+        remainingDamage = 0;
+        break;
+      }
+      else
+      {
+        remainingDamage -= effectEntry.effectValue1;
+        destroyedShieldSlotList.push_back( entry.first );
+      }
+    }
+  }
+
+  if( shieldChanged )
+  {
+    if( !destroyedShieldSlotList.empty() )
+    {
+      for( auto const& slotId : destroyedShieldSlotList )
+      {
+        pChara->removeStatusEffect( slotId, true, false );
+      }
+      pChara->sendStatusEffectUpdate();
+    }
+    else
+      pChara->sendEffectResultToUpdateShieldValue(); // yes this is the packet to update shield value
+  }
+  return remainingDamage;
 }

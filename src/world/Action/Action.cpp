@@ -51,7 +51,8 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
   m_startTime( 0 ),
   m_interruptType( Common::ActionInterruptType::None ),
   m_sequence( sequence ),
-  m_isAutoAttack( false )
+  m_isAutoAttack( false ),
+  m_disableGenericHandler( false )
 {
 }
 
@@ -295,7 +296,7 @@ void Action::Action::start()
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   // check the lut too and see if we have something usable, otherwise cancel the cast
-  if( !pScriptMgr->onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
+  if( !pScriptMgr->onStart( *this ) && !hasValidLutEntry() )
   {
     // script not implemented and insufficient lut data (no potencies)
     interrupt();
@@ -424,9 +425,8 @@ void Action::Action::buildEffects()
   snapshotAffectedActors( m_hitActors );
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  auto hasLutEntry = hasValidLutEntry();
 
-  if( !pScriptMgr->onExecute( *this ) && !hasLutEntry )
+  if( !pScriptMgr->onExecute( *this ) && !hasValidLutEntry() )
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
@@ -436,7 +436,7 @@ void Action::Action::buildEffects()
     return;
   }
 
-  if( !hasLutEntry ) // this is just "if ( weCanNotUseGenericActionHandler )" in case we start to expand it.
+  if( m_disableGenericHandler || !hasValidLutEntry() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_effectBuilder->buildAndSendPackets();
@@ -469,7 +469,8 @@ void Action::Action::buildEffects()
       if( dmg.first > 0 )
       {
         actor->onActionHostile( m_pSource );
-        m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
+        dmg.first = Math::CalcStats::applyShieldProtection( actor, dmg.first );
+        m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
       }
 
       auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
@@ -824,9 +825,19 @@ Data::ActionPtr Action::Action::getActionData() const
   return m_actionData;
 }
 
+Action::ActionEntry Action::Action::getActionEntry() const
+{
+  return m_lutEntry;
+}
+
 void Action::Action::setAutoAttack()
 {
   m_isAutoAttack = true;
+}
+
+void Action::Action::disableGenericHandler()
+{
+  m_disableGenericHandler = true;
 }
 
 bool Action::Action::isPhysical() const
@@ -847,4 +858,10 @@ bool Action::Action::isAttackTypePhysical( Common::AttackType attackType )
 bool Action::Action::isAttackTypeMagical( Common::AttackType attackType )
 {
   return attackType == Common::AttackType::Magical;
+}
+
+Sapphire::StatusEffect::StatusEffectPtr Action::Action::createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate )
+{
+  // workaround to framework access issue in action script
+  return StatusEffect::make_StatusEffect( id, sourceActor, targetActor, duration, tickRate, m_pFw );
 }

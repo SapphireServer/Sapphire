@@ -624,6 +624,7 @@ namespace Sapphire::Common
     TpGain = 13,
     GpGain = 14,
     ApplyStatusEffect = 15,
+    StatusNoEffect = 21,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
@@ -650,6 +651,7 @@ namespace Sapphire::Common
   enum class ActionEffectResultFlag : uint8_t
   {
     None = 0,
+    Absorbed = 4,
     EffectOnSource = 0x80,
     Reflected = 0xA0,
   };
@@ -1034,6 +1036,7 @@ namespace Sapphire::Common
     CritDHRateBonus = 7,
     DamageReceiveTrigger = 8,
     DamageDealtTrigger = 9,
+    Shield = 10,
   };
 
   enum class ActionTypeFilter : int32_t

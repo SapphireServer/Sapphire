@@ -501,13 +501,11 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().current_hp = getHp();
   statusEffectAdd->data().current_mp = static_cast< uint16_t >( getMp() );
-  //statusEffectAdd->data().current_tp = getTp();
+  statusEffectAdd->data().current_tp = getTp();
   statusEffectAdd->data().max_hp = getMaxHp();
   statusEffectAdd->data().max_mp = static_cast< uint16_t >( getMaxMp() );
-  //statusEffectAdd->data().max_something = 1;
-  //statusEffectAdd->data().unknown2 = 28;
-  statusEffectAdd->data().classId = static_cast< uint8_t >(getClass());
-  statusEffectAdd->data().unkFlag = 1;
+  statusEffectAdd->data().classId = static_cast< uint8_t >( getClass() );
+  statusEffectAdd->data().entryCount = 1; // todo: add multiple status but send only one result
 
   auto& status = statusEffectAdd->data().statusEntries[0];
 
@@ -517,31 +515,47 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   status.index = static_cast< uint8_t >( nextSlot );
   status.param = pEffect->getParam();
 
-  sendToInRangeSet( statusEffectAdd, isPlayer() );
+  float totalShieldValue = 0;
+  for( auto effectIt : m_statusEffectMap )
+  {
+    auto statusEffect = effectIt.second;
+    if( static_cast< Common::StatusEffectType >( statusEffect->getEffectEntry().effectType ) == Common::StatusEffectType::Shield )
+    {
+      totalShieldValue += statusEffect->getEffectEntry().effectValue1;
+    }
+  }
+
+  if( totalShieldValue > 0 )
+  {
+    totalShieldValue /= getMaxHp();
+    totalShieldValue *= 100;
+    statusEffectAdd->data().shieldPercentage = totalShieldValue >= 255 ? 255 : static_cast< uint8_t >( totalShieldValue );
+  }
+
+  sendToInRangeSet( statusEffectAdd, true );
+  sendStatusEffectUpdate(); // although client buff displays correctly without this but retail sends it so we do it as well
 }
 
-/*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
-  if( hasStatusEffect( id ) ) // todo: check if we want to refresh it or discard and keep the old one
-    removeSingleStatusEffectById( id, false );
+  auto oldEffect = getStatusEffectById( id );
+  if( oldEffect.second )
+    removeStatusEffect( oldEffect.first, false, false );
 
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
   addStatusEffect( effect );
 }
 
-/*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
                                                              uint16_t param )
 {
-  if( hasStatusEffect( id ) )
+  if( getStatusEffectById( id ).second )
     return;
 
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
   addStatusEffect( effect );
-
 }
 
 int8_t Sapphire::Entity::Chara::getStatusEffectFreeSlot()
@@ -562,19 +576,19 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
   m_statusEffectFreeSlotQueue.push( slotId );
 }
 
-void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool sendPacket )
+void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool sendActorControl, bool sendStatusList )
 {
   for( auto effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
-      removeStatusEffect( effectIt.first, sendPacket );
+      removeStatusEffect( effectIt.first, sendActorControl, sendStatusList );
       break;
     }
   }
 }
 
-void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendPacket )
+void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendActorControl, bool sendStatusList )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -585,12 +599,13 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sen
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  if( sendPacket )
+  if( sendActorControl )
     sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
 
   m_statusEffectMap.erase( effectSlotId );
 
-  sendStatusEffectUpdate();
+  if( sendStatusList )
+    sendStatusEffectUpdate();
 }
 
 std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectMap() const
@@ -622,7 +637,6 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-
   auto statusEffectList = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
   statusEffectList->data().classId = static_cast< uint8_t >( getClass() );
   statusEffectList->data().level = getLevel();
@@ -633,18 +647,63 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   statusEffectList->data().max_hp = getMaxHp();
   statusEffectList->data().max_mp = getMaxMp();
   uint8_t slot = 0;
+  float totalShieldValue = 0;
   for( auto effectIt : m_statusEffectMap )
   {
-    float timeLeft = static_cast< float >( effectIt.second->getDuration() -
-                                           ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
+    auto statusEffect = effectIt.second;
+    if( static_cast< Common::StatusEffectType >( statusEffect->getEffectEntry().effectType ) == Common::StatusEffectType::Shield )
+    {
+      totalShieldValue += statusEffect->getEffectEntry().effectValue1;
+    }
+
+    float timeLeft = static_cast< float >( statusEffect->getDuration() -
+                                           ( currentTimeMs - statusEffect->getStartTimeMs() ) ) / 1000;
     statusEffectList->data().effect[ slot ].duration = timeLeft;
-    statusEffectList->data().effect[ slot ].effect_id = effectIt.second->getId();
-    statusEffectList->data().effect[ slot ].sourceActorId = effectIt.second->getSrcActorId();
+    statusEffectList->data().effect[ slot ].effect_id = statusEffect->getId();
+    statusEffectList->data().effect[ slot ].sourceActorId = statusEffect->getSrcActorId();
     slot++;
   }
 
-  sendToInRangeSet( statusEffectList, isPlayer() );
+  if( totalShieldValue > 0 )
+  {
+    totalShieldValue /= getMaxHp();
+    totalShieldValue *= 100;
+    statusEffectList->data().shieldPercentage = totalShieldValue >= 255 ? 255 : static_cast< uint8_t >( totalShieldValue );
+  }
 
+  sendToInRangeSet( statusEffectList, true );
+}
+
+void Sapphire::Entity::Chara::sendEffectResultToUpdateShieldValue()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcEffectResult >( getId() );
+
+  pPacket->data().actor_id = getId();
+  pPacket->data().current_hp = getHp();
+  pPacket->data().current_mp = static_cast< uint16_t >( getMp() );
+  pPacket->data().current_tp = getTp();
+  pPacket->data().max_hp = getMaxHp();
+  pPacket->data().max_mp = static_cast< uint16_t >( getMaxMp() );
+  pPacket->data().classId = static_cast< uint8_t >( getClass() );
+
+  float totalShieldValue = 0;
+  for( auto effectIt : m_statusEffectMap )
+  {
+    auto statusEffect = effectIt.second;
+    if( static_cast< Common::StatusEffectType >( statusEffect->getEffectEntry().effectType ) == Common::StatusEffectType::Shield )
+    {
+      totalShieldValue += statusEffect->getEffectEntry().effectValue1;
+    }
+  }
+
+  if( totalShieldValue > 0 )
+  {
+    totalShieldValue /= getMaxHp();
+    totalShieldValue *= 100;
+    pPacket->data().shieldPercentage = totalShieldValue >= 255 ? 255 : static_cast< uint8_t >( totalShieldValue );
+  }
+
+  sendToInRangeSet( pPacket, true );
 }
 
 void Sapphire::Entity::Chara::updateStatusEffects()
@@ -667,7 +726,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     if( duration > 0 && ( currentTimeMs - startTime ) > duration )
     {
       // remove status effect
-      removeStatusEffect( effectIndex, true );
+      removeStatusEffect( effectIndex, true, true );
       // break because removing invalidates iterators
       break;
     }
@@ -714,17 +773,16 @@ void Sapphire::Entity::Chara::updateStatusEffects()
   }
 }
 
-bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
+std::pair< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectById( uint32_t id )
 {
-  //return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
   for( auto effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
-      return true;
+      return std::make_pair( effectIt.first, effectIt.second );
     }
   }
-  return false;
+  return std::make_pair( 0, nullptr );
 }
 
 int64_t Sapphire::Entity::Chara::getLastUpdateTime() const

@@ -29,7 +29,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
   m_pFw( pFw ),
-  m_cachedHotOrDotValue( 0 ),
+  m_value( 0 ),
   m_cachedSourceCrit( 0 ),
   m_cachedSourceCritBonus( 0 )
 {
@@ -53,7 +53,6 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
     m_effectEntry.effectType = static_cast< uint32_t >( Common::StatusEffectType::Invalid );
 }
 
-
 Sapphire::StatusEffect::StatusEffect::~StatusEffect()
 {
 }
@@ -69,7 +68,7 @@ std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffe
   auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
   if( statusEffectType == Common::StatusEffectType::Dot )
   {
-    auto value = m_cachedHotOrDotValue;
+    auto value = m_value;
     if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
     {
       value *= m_cachedSourceCritBonus;
@@ -79,7 +78,7 @@ std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffe
   }
   else if( statusEffectType == Common::StatusEffectType::Hot )
   {
-    auto value = m_cachedHotOrDotValue;
+    auto value = m_value;
     if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
     {
       value *= m_cachedSourceCritBonus;
@@ -138,7 +137,7 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
       }
     }
 
-    m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
+    m_value = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
         m_effectEntry.effectValue1 == static_cast< int32_t >( Common::ActionTypeFilter::Physical ) ? Common::AttackType::Physical :
       ( m_effectEntry.effectValue1 == static_cast< int32_t >( Common::ActionTypeFilter::Magical ) ? Common::AttackType::Magical : Common::AttackType::Unknown_0 ) );
     m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Common::CritDHBonusFilter::Damage );
@@ -160,7 +159,7 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
         heal *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
       }
     }
-    m_cachedHotOrDotValue = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal );
+    m_value = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal );
     m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Common::CritDHBonusFilter::Heal );
     m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
   }
@@ -217,4 +216,9 @@ const std::string& Sapphire::StatusEffect::StatusEffect::getName() const
 const Sapphire::World::Action::StatusEffectEntry& Sapphire::StatusEffect::StatusEffect::getEffectEntry() const
 {
   return m_effectEntry;
+}
+
+void Sapphire::StatusEffect::StatusEffect::replaceEffectEntry( Sapphire::World::Action::StatusEffectEntry entryOverride )
+{
+  m_effectEntry = entryOverride;
 }
