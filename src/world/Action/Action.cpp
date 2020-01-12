@@ -527,13 +527,15 @@ void Action::Action::buildEffects()
 
     if( m_lutEntry.targetStatus != 0 )
     {
-      m_effectBuilder->applyStatusEffect( actor, m_pSource, m_lutEntry.targetStatus, m_lutEntry.targetStatusDuration, m_lutEntry.targetStatusParam );
+      if( !isComboAction() || isCorrectCombo() )
+        m_effectBuilder->applyStatusEffect( actor, m_pSource, m_lutEntry.targetStatus, m_lutEntry.targetStatusDuration, m_lutEntry.targetStatusParam );
     }
   }
 
   if( m_lutEntry.selfStatus != 0 )
   {
-    m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
+    if( !isComboAction() || isCorrectCombo() )
+      m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
   }
   
   m_effectBuilder->buildAndSendPackets();
