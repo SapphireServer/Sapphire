@@ -144,7 +144,9 @@ namespace Sapphire::Math
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
 
-    static std::pair< float, Sapphire::Common::ActionHitSeverityType > calcDamageReflect( Sapphire::Entity::CharaPtr charaAttacker, Sapphire::Entity::CharaPtr charaVictim, float damage, Sapphire::Common::ActionTypeFilter filter );
+    static std::pair< float, Sapphire::Common::ActionHitSeverityType > calcDamageReflect( Sapphire::Entity::CharaPtr pCharaAttacker, Sapphire::Entity::CharaPtr pCharaVictim, float damage, Sapphire::Common::ActionTypeFilter filter );
+
+    static float calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, Sapphire::Common::ActionTypeFilter filter );
 
     static std::random_device dev;
     static std::mt19937 rng;

@@ -1033,6 +1033,7 @@ namespace Sapphire::Common
     HealCastMultiplier = 6,
     CritDHRateBonus = 7,
     DamageReceiveTrigger = 8,
+    DamageDealtTrigger = 9,
   };
 
   enum class ActionTypeFilter : int32_t
@@ -1054,6 +1055,7 @@ namespace Sapphire::Common
   enum class StatusEffectTriggerResult : int32_t
   {
     ReflectDamage = 1,
+    AbsorbHP = 2,
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

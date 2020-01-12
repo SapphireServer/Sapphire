@@ -714,9 +714,9 @@ uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
   return chara.getStatValue( chara.getPrimaryStat() );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamageReflect( Sapphire::Entity::CharaPtr charaAttacker, Sapphire::Entity::CharaPtr charaVictim, float damage, Sapphire::Common::ActionTypeFilter filter )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamageReflect( Sapphire::Entity::CharaPtr pCharaAttacker, Sapphire::Entity::CharaPtr pCharaVictim, float damage, Sapphire::Common::ActionTypeFilter filter )
 {
-  for( auto entry : charaVictim->getStatusEffectMap() )
+  for( auto entry : pCharaVictim->getStatusEffectMap() )
   {
     auto status = entry.second;
     auto effectEntry = status->getEffectEntry();
@@ -725,14 +725,33 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamag
     {
       if( static_cast< Common::StatusEffectTriggerResult >( effectEntry.effectValue3 ) == Common::StatusEffectTriggerResult::ReflectDamage )
       {
-          auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( charaVictim );
+          auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( pCharaVictim );
           // any magical reflect damage exists?
-          auto damage = Sapphire::Math::CalcStats::calcActionDamage( *charaVictim, Common::AttackType::Physical, effectEntry.effectValue2, wepDmg );
-          damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *charaAttacker, damage.first, Common::AttackType::Physical );
+          auto damage = Sapphire::Math::CalcStats::calcActionDamage( *pCharaVictim, Common::AttackType::Physical, effectEntry.effectValue2, wepDmg );
+          damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pCharaAttacker, damage.first, Common::AttackType::Physical );
 
           return damage;
       }
     }
   }
   return std::pair< float, Sapphire::Common::ActionHitSeverityType >( 0, Sapphire::Common::ActionHitSeverityType::NormalDamage );
+}
+
+float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, Sapphire::Common::ActionTypeFilter filter )
+{
+  float result = 0;
+  for( auto entry : pChara->getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+
+    if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) == Common::StatusEffectType::DamageDealtTrigger )
+    {
+      if( static_cast< Common::StatusEffectTriggerResult >( effectEntry.effectValue3 ) == Common::StatusEffectTriggerResult::AbsorbHP )
+      {
+        result += damage * effectEntry.effectValue2 / 100.0f;
+      }
+    }
+  }
+  return result;
 }

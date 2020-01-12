@@ -463,21 +463,27 @@ void Action::Action::buildEffects()
     if( m_lutEntry.damagePotency > 0 )
     {
       Common::AttackType attackType = static_cast< Common::AttackType >( m_actionData->attackType );
+
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
       dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, attackType );
-      auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
-                        attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
-                      ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
-
       if( dmg.first > 0 )
       {
         actor->onActionHostile( m_pSource );
         m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
       }
 
+      auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
+                          attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
+                        ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
       if( reflectDmg.first > 0 )
       {
         m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+      }
+
+      auto absorb = Math::CalcStats::calcAbsorbHP( m_pSource, dmg.first, Common::ActionTypeFilter::All );
+      if( absorb > 0 )
+      {
+        m_effectBuilder->heal( actor, m_pSource, absorb, Common::ActionHitSeverityType::NormalHeal, Common::ActionEffectResultFlag::EffectOnSource );
       }
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
@@ -488,41 +494,37 @@ void Action::Action::buildEffects()
 
       if( !isComboAction() || isCorrectCombo() )
       {
-        if( m_lutEntry.selfHealPotency > 0 ) // actions with self heal
-        {
-          auto heal = calcHealing( m_lutEntry.selfHealPotency );
-          heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
-          m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
-        }
-
-        if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
-        {
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
-          shouldRestoreMP = false;
-        }
-
         if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
         {
           m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
         }
       }
     }
-    else if( m_lutEntry.healPotency > 0 )
+
+    if( m_lutEntry.healPotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.healPotency );
       heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first );
       m_effectBuilder->heal( actor, actor, heal.first, heal.second );
+    }
 
-      if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
+    if( m_lutEntry.selfHealPotency > 0 ) // actions with self heal
+    {
+      if( !isComboAction() || isCorrectCombo() )
+      {
+        auto heal = calcHealing( m_lutEntry.selfHealPotency );
+        heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
+        m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
+      }
+    }
+
+    if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
+    {
+      if( !isComboAction() || isCorrectCombo() )
       {
         m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
         shouldRestoreMP = false;
       }
-    }
-    else if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
-    {
-      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
-      shouldRestoreMP = false;
     }
 
     if( m_lutEntry.targetStatus != 0 )
