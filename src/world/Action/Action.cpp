@@ -469,7 +469,7 @@ void Action::Action::buildEffects()
       if( dmg.first > 0 )
       {
         actor->onActionHostile( m_pSource );
-        dmg.first = Math::CalcStats::applyShieldProtection( actor, dmg.first );
+        dmg.first = actor->applyShieldProtection( dmg.first );
         m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
       }
 
