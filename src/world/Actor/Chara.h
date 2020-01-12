@@ -146,13 +146,13 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    void removeStatusEffect( uint8_t effectSlotId, bool sendPacket );
+    void removeStatusEffect( uint8_t effectSlotId, bool sendActorControl, bool sendStatusList );
 
-    void removeSingleStatusEffectById( uint32_t id, bool sendPacket );
+    void removeSingleStatusEffectById( uint32_t id, bool sendActorControl, bool sendStatusList );
 
     void updateStatusEffects();
 
-    bool hasStatusEffect( uint32_t id );
+    std::pair< uint8_t, StatusEffect::StatusEffectPtr > getStatusEffectById( uint32_t id );
 
     int8_t getStatusEffectFreeSlot();
 
@@ -166,6 +166,8 @@ namespace Sapphire::Entity
 
     void sendStatusEffectUpdate();
 
+    void sendEffectResultToUpdateShieldValue();
+
     /*! return a const pointer to the look array */
     const uint8_t* getLookArray() const;
 
@@ -177,8 +179,6 @@ namespace Sapphire::Entity
     // add a status effect by id if it doesn't exist
     void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
 
-    // remove a status effect by id
-    void removeSingleStatusEffectFromId( uint32_t id );
     /// End Status Effect Functions
 
     std::string getName() const;

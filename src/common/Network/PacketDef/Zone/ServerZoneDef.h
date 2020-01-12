@@ -422,7 +422,8 @@ namespace Sapphire::Network::Packets::Server
     uint16_t current_mp;
     uint16_t max_mp;
     uint16_t currentTp;
-    uint16_t unknown1;
+    uint8_t shieldPercentage;
+    uint8_t unknown1;
     Common::StatusEffect effect[30];
     uint32_t padding;
   };
@@ -441,25 +442,16 @@ namespace Sapphire::Network::Packets::Server
   {
     uint32_t globalSequence;
     uint32_t actor_id;
-    //uint8_t unknown1;
-    //uint8_t unknown2;
-    //uint16_t padding1;
-    //uint32_t current_hp;
-    //uint16_t current_mp;
-    //uint16_t current_tp;
-    //uint32_t max_hp;
-    //uint16_t max_mp;
-    //uint16_t max_something;
     uint32_t current_hp;
     uint32_t max_hp;
     uint16_t current_mp;
-    uint16_t unknown1;
+    uint16_t current_tp;
     uint16_t max_mp;
-    uint8_t unknown2;
+    uint8_t unknown1;
     uint8_t classId;
-    uint8_t unknown4;
-    uint8_t unkFlag;
-    uint16_t unknown6;
+    uint8_t shieldPercentage;
+    uint8_t entryCount;
+    uint16_t unknown2;
 
     struct StatusEntry
     {
@@ -467,12 +459,12 @@ namespace Sapphire::Network::Packets::Server
       uint8_t unknown3;
       uint16_t id;
       uint16_t param;
-      uint16_t unknown5;    // Sort this out (old right half of power/param property)
+      uint16_t unknown4;    // Sort this out (old right half of power/param property)
       float duration;
       uint32_t sourceActorId;
     } statusEntries[4];
 
-    uint32_t unknown7;
+    uint32_t unknown5;
   };
 
   /**

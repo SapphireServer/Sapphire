@@ -18,7 +18,8 @@ EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, ui
   m_param0( 0 ),
   m_param1( 0 ),
   m_param2( 0 ),
-  m_flag( Common::ActionEffectResultFlag::None )
+  m_flag( Common::ActionEffectResultFlag::None ),
+  m_pPreBuiltStatusEffect( nullptr )
 {
 
 }
@@ -92,6 +93,22 @@ void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint
   m_type = Common::ActionEffectType::ApplyStatusEffect;
 }
 
+void EffectResult::applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect )
+{
+  m_value = pStatusEffect->getId();
+  m_param2 = pStatusEffect->getParam();
+  m_pPreBuiltStatusEffect = std::move( pStatusEffect );
+
+  m_type = Common::ActionEffectType::ApplyStatusEffect;
+}
+
+void EffectResult::statusNoEffect( uint16_t statusId )
+{
+  m_value = statusId;
+
+  m_type = Common::ActionEffectType::StatusNoEffect;
+}
+
 Common::EffectEntry EffectResult::buildEffectEntry() const
 {
   Common::EffectEntry entry{};
@@ -131,7 +148,22 @@ void EffectResult::execute()
 
     case Common::ActionEffectType::ApplyStatusEffect:
     {
-      m_target->addStatusEffectById( m_value, m_value2, *m_source, m_param2 );
+      //remove same effect from the same source (refreshing old buff)
+      for( auto const& entry : m_target->getStatusEffectMap() )
+      {
+        auto statusEffect = entry.second;
+        if( statusEffect->getId() == m_value && statusEffect->getSrcActorId() == m_source->getId() )
+        {
+          // refreshing does not show "-status" flying text, and we don't send status list now because we are adding a new one
+          m_target->removeStatusEffect( entry.first, false, false ); 
+          break;
+        }
+      }
+
+      if( m_pPreBuiltStatusEffect )
+        m_target->addStatusEffect( m_pPreBuiltStatusEffect );
+      else
+        m_target->addStatusEffectById( m_value, m_value2, *m_source, m_param2 );
       break;
     }
 

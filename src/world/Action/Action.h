@@ -6,6 +6,7 @@
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
 #include "EffectBuilder.h"
+#include "StatusEffect/StatusEffect.h"
 
 namespace Sapphire::Data
 {
@@ -53,6 +54,10 @@ namespace Sapphire::World::Action
     bool isComboAction() const;
 
     void setAutoAttack();
+
+    void disableGenericHandler();
+
+    StatusEffect::StatusEffectPtr createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate );
 
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
@@ -121,6 +126,8 @@ namespace Sapphire::World::Action
     Entity::CharaPtr getHitChara();
 
     Data::ActionPtr getActionData() const;
+
+    ActionEntry getActionEntry() const;
 
     bool isPhysical() const;
     bool isMagical() const;
@@ -191,6 +198,7 @@ namespace Sapphire::World::Action
     bool m_canTargetHostile;
     bool m_canTargetDead;
     bool m_isAutoAttack;
+    bool m_disableGenericHandler;
 
     Common::ActionInterruptType m_interruptType;
 

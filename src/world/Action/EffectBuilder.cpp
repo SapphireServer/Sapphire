@@ -91,6 +91,20 @@ void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPt
   moveToResultList( target, nextResult );
 }
 
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, source, getResultDelayMs() );
+  nextResult->applyStatusEffect( pStatusEffect );
+  moveToResultList( target, nextResult );
+}
+
+void EffectBuilder::statusNoEffect( Entity::CharaPtr& target, uint16_t statusId )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
+  nextResult->statusNoEffect( statusId );
+  moveToResultList( target, nextResult );
+}
+
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();
