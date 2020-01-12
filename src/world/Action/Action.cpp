@@ -483,6 +483,8 @@ void Action::Action::buildEffects()
       auto absorb = Math::CalcStats::calcAbsorbHP( m_pSource, dmg.first, Common::ActionTypeFilter::All );
       if( absorb > 0 )
       {
+        if( absorb > actor->getHp() )
+          absorb = actor->getHp();
         m_effectBuilder->heal( actor, m_pSource, absorb, Common::ActionHitSeverityType::NormalHeal, Common::ActionEffectResultFlag::EffectOnSource );
       }
 
