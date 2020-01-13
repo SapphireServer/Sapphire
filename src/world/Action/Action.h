@@ -118,6 +118,8 @@ namespace Sapphire::World::Action
      */
     Entity::CharaPtr getHitChara();
 
+    float getAnimationLock();
+
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
      */
