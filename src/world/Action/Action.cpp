@@ -439,7 +439,7 @@ void Action::Action::buildEffects()
   if( m_disableGenericHandler || !hasValidLutEntry() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets();
+    m_effectBuilder->buildAndSendPackets( getAnimationLock() );
     return;
   }
   
@@ -543,7 +543,7 @@ void Action::Action::buildEffects()
       m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
   }
   
-  m_effectBuilder->buildAndSendPackets();
+  m_effectBuilder->buildAndSendPackets( getAnimationLock() );
 
   // at this point we're done with it and no longer need it
   m_effectBuilder.reset();
@@ -813,6 +813,22 @@ bool Action::Action::hasValidLutEntry() const
 {
   return m_lutEntry.damagePotency != 0 || m_lutEntry.healPotency != 0 || m_lutEntry.selfHealPotency != 0 || m_lutEntry.selfStatus != 0 ||
     m_lutEntry.targetStatus != 0 || m_lutEntry.gainMPPercentage != 0;
+}
+
+float Action::Action::getAnimationLock()
+{
+  switch( static_cast< Common::ActionCategory >( m_actionData->actionCategory ) )
+  {
+    case Common::ActionCategory::Item:
+    {
+      return 1.1f;
+    }
+    case Common::ActionCategory::Mount:
+    {
+      return 0.1f;
+    }
+  }
+  return 0.6f;
 }
 
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
