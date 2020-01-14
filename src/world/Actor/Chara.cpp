@@ -709,9 +709,6 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-  uint32_t thisTickDmg = 0;
-  uint32_t thisTickHeal = 0;
-
   for( auto effectIt : m_statusEffectMap )
   {
     uint8_t effectIndex = effectIt.first;
@@ -734,41 +731,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     {
       effect->setLastTick( currentTimeMs );
       effect->onTick();
-
-      auto thisEffect = effect->getTickEffect();
-
-      switch( thisEffect.first )
-      {
-
-        case 1:
-        {
-          thisTickDmg += thisEffect.second;
-          break;
-        }
-
-        case 2:
-        {
-          thisTickHeal += thisEffect.second;
-          break;
-        }
-
-      }
     }
-
-  }
-
-  if( thisTickDmg != 0 )
-  {
-    takeDamage( thisTickDmg );
-    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
-  }
-
-  if( thisTickHeal != 0 )
-  {
-    heal( thisTickHeal );
-    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ), true );
   }
 }
 
@@ -1035,4 +998,43 @@ float Sapphire::Entity::Chara::applyShieldProtection( float damage )
       sendEffectResultToUpdateShieldValue(); // yes this is the packet to update shield value
   }
   return remainingDamage;
+}
+
+void Sapphire::Entity::Chara::onTick()
+{
+  uint32_t thisTickDmg = 0;
+  uint32_t thisTickHeal = 0;
+
+  for( auto effectIt : m_statusEffectMap )
+  {
+    auto thisEffect = effectIt.second->getTickEffect();
+    switch( thisEffect.first )
+    {
+      case 1:
+      {
+        thisTickDmg += thisEffect.second;
+        break;
+      }
+
+      case 2:
+      {
+        thisTickHeal += thisEffect.second;
+        break;
+      }
+    }
+  }
+
+  if( thisTickDmg != 0 )
+  {
+    takeDamage( thisTickDmg );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
+  }
+
+  if( thisTickHeal != 0 )
+  {
+    heal( thisTickHeal );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ), true );
+  }
 }
