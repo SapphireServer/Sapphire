@@ -28,7 +28,7 @@ uint64_t EffectBuilder::getResultDelayMs()
 {
   // todo: actually figure this retarded shit out
 
-  return Common::Util::getTimeMs() + 850;
+  return Common::Util::getTimeMs() + 600;
 }
 
 void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
@@ -105,7 +105,7 @@ void EffectBuilder::statusNoEffect( Entity::CharaPtr& target, uint16_t statusId 
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::buildAndSendPackets()
+void EffectBuilder::buildAndSendPackets( float animationLock )
 {
   auto targetCount = m_resolvedEffects.size();
   //Logger::debug( "EffectBuilder result: " );
@@ -115,13 +115,13 @@ void EffectBuilder::buildAndSendPackets()
 
   do // we want to send at least one packet even nothing is hit so other players can see
   {
-    auto packet = buildNextEffectPacket( globalSequence );
+    auto packet = buildNextEffectPacket( globalSequence, animationLock );
     m_sourceChara->sendToInRangeSet( packet, true );
   }
   while( !m_resolvedEffects.empty() );
 }
 
-std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_t globalSequence )
+std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_t globalSequence, float animationLock )
 {
   auto remainingTargetCount = m_resolvedEffects.size();
 
@@ -190,6 +190,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
     pHeader->globalSequence = globalSequence;
+    pHeader->animationLockTime = animationLock;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
@@ -234,6 +235,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setSequence( seq, m_sequence );
+    effectPacket->data().animationLockTime = animationLock;
 
     for( int i = 0; i < resultList->size(); i++ )
     {
@@ -261,6 +263,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     effectPacket->data().effectCount = 0;
     effectPacket->data().sourceSequence = m_sequence;
     effectPacket->data().globalSequence = globalSequence;
+    effectPacket->data().animationLockTime = animationLock;
 
     return effectPacket;
   }

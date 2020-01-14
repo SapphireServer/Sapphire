@@ -126,8 +126,8 @@ namespace Sapphire::World::Action
     Entity::CharaPtr getHitChara();
 
     Data::ActionPtr getActionData() const;
-
     ActionEntry getActionEntry() const;
+    float getAnimationLock();
 
     bool isPhysical() const;
     bool isMagical() const;

@@ -31,14 +31,14 @@ namespace Sapphire::World::Action
 
     void statusNoEffect( Entity::CharaPtr& target, uint16_t statusId );
 
-    void buildAndSendPackets();
+    void buildAndSendPackets( float animationLock  );
 
   private:
     void moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result );
 
     uint64_t getResultDelayMs();
 
-    std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase > buildNextEffectPacket( uint32_t globalSequence );
+    std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase > buildNextEffectPacket( uint32_t globalSequence, float animationLock );
 
   private:
     uint32_t m_actionId;
