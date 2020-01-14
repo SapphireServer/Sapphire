@@ -135,8 +135,6 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
 void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
-  if( m_lastTick == 0 )
-    m_lastTick = m_startTime;
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onStatusReceive( m_targetActor, m_id );

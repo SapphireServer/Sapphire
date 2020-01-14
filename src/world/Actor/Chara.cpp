@@ -542,7 +542,7 @@ void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration
 {
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
-  effect->setLastTick( lastTickOverride );
+  effect->setLastTick( lastTickOverride == 0 ? Util::getTimeMs() : lastTickOverride );
   addStatusEffect( effect );
 }
 
@@ -553,7 +553,7 @@ void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_
 
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
-  effect->setLastTick( lastTickOverride );
+  effect->setLastTick( lastTickOverride == 0 ? Util::getTimeMs() : lastTickOverride );
   addStatusEffect( effect );
 }
 
