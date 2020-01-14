@@ -64,7 +64,6 @@ void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uin
 
 std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
-  auto thisTick = m_currTickEffect;
   auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
   if( statusEffectType == Common::StatusEffectType::Dot )
   {
@@ -90,7 +89,7 @@ std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffe
   {
     m_currTickEffect = std::make_pair( 0, 0 );
   }
-  return thisTick;
+  return m_currTickEffect;
 }
 
 void Sapphire::StatusEffect::StatusEffect::onTick()
@@ -98,6 +97,12 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   m_lastTick = Util::getTimeMs();
   pScriptMgr->onStatusTick( m_targetActor, *this );
+
+  auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
+  if( statusEffectType == Common::StatusEffectType::MPRestore )
+  {
+    m_targetActor->restoreMP( m_effectEntry.effectValue1 * 10 );
+  }
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const

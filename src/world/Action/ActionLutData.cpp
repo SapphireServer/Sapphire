@@ -2369,9 +2369,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 7538, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Reprisal, リプライザル
-  //has damage: potency 210, combo potency 0, directional potency 0
   //applies to targets: Reprisal, リプライザル, duration 10000, param 0
-  { 7535, { 210, 0, 0, 0, 0, 0, 0, 0, 1193, 10000, 0, 0 } },
+  { 7535, { 0, 0, 0, 0, 0, 0, 0, 0, 1193, 10000, 0, 0 } },
 
   //Shirk, シャーク
   { 7537, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
@@ -3505,5 +3504,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
 
   //Devilment, 攻めのタンゴ: CritDHRateBonus, Damage, crit 20%, dh 20%
   { 1825, { 7, 1, 20, 20, 0 } },
+
+  //Lucid Dreaming, ルーシッドドリーム: MPRestore, value 50
+  { 1204, { 11, 50, 0, 0, 0 } },
 
 };

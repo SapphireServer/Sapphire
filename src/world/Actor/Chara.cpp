@@ -537,25 +537,22 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   sendStatusEffectUpdate(); // although client buff displays correctly without this but retail sends it so we do it as well
 }
 
-void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
+void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param, uint64_t lastTickOverride )
 {
-  auto oldEffect = getStatusEffectById( id );
-  if( oldEffect.second )
-    removeStatusEffect( oldEffect.first, false, false );
-
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
+  effect->setLastTick( lastTickOverride );
   addStatusEffect( effect );
 }
 
-void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
-                                                             uint16_t param )
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param, uint64_t lastTickOverride )
 {
   if( getStatusEffectById( id ).second )
     return;
 
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
+  effect->setLastTick( lastTickOverride );
   addStatusEffect( effect );
 }
 
