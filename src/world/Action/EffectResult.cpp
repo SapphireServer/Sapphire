@@ -14,7 +14,7 @@ EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, ui
   m_delayMs( runAfter ),
   m_type( Common::ActionEffectType::Nothing ),
   m_value( 0 ),
-  m_value2( 0 ),
+  m_statusDuration( 0 ),
   m_param0( 0 ),
   m_param1( 0 ),
   m_param2( 0 ),
@@ -87,7 +87,7 @@ void EffectResult::comboSucceed()
 void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint8_t param )
 {
   m_value = statusId;
-  m_value2 = duration;
+  m_statusDuration = duration;
   m_param2 = param;
 
   m_type = Common::ActionEffectType::ApplyStatusEffect;
@@ -168,7 +168,7 @@ void EffectResult::execute()
         m_target->addStatusEffect( m_pPreBuiltStatusEffect );
       }
       else
-        m_target->addStatusEffectById( m_value, m_value2, *m_source, m_param2, lastTickOverride );
+        m_target->addStatusEffectById( m_value, m_statusDuration, *m_source, m_param2, lastTickOverride );
 
       break;
     }

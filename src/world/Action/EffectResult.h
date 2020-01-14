@@ -50,7 +50,7 @@ namespace Sapphire::World::Action
     uint8_t m_param2;
 
     uint32_t m_value;
-    uint32_t m_value2;
+    uint32_t m_statusDuration;
     Common::ActionEffectResultFlag m_flag;
 
     StatusEffect::StatusEffectPtr m_pPreBuiltStatusEffect;
