@@ -44,6 +44,7 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
 
   m_lastTickTime = 0;
   m_lastUpdate = 0;
+  m_lastAttack = Util::getTimeMs();
 
   m_bonusStats.fill( 0 );
 

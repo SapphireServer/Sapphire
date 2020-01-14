@@ -306,7 +306,6 @@ void Sapphire::Entity::Player::calculateStats()
 void Sapphire::Entity::Player::setAutoattack( bool mode )
 {
   m_bAutoattack = mode;
-  m_lastAttack = Util::getTimeMs();
 }
 
 bool Sapphire::Entity::Player::isAutoattackOn() const
