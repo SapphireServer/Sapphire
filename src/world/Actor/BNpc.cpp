@@ -735,6 +735,7 @@ void Sapphire::Entity::BNpc::calculateStats()
   m_baseStats.pie = static_cast< uint32_t >( base );
   m_baseStats.skillSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
   m_baseStats.spellSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.haste = 100;
   m_baseStats.accuracy = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
   m_baseStats.critHitRate = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
   m_baseStats.attackPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );

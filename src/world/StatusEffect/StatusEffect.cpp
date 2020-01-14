@@ -5,6 +5,7 @@
 
 #include <algorithm>
 
+#include "Actor/Player.h"
 #include "Actor/Chara.h"
 #include "Actor/Actor.h"
 
@@ -64,31 +65,39 @@ void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uin
 
 std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
-  auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
-  if( statusEffectType == Common::StatusEffectType::Dot )
+  switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {
-    auto value = m_value;
-    if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
+    case Common::StatusEffectType::Dot:
     {
-      value *= m_cachedSourceCritBonus;
+      auto value = m_value;
+      if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
+      {
+        value *= m_cachedSourceCritBonus;
+      }
+      value *= 1.0f + ( ( Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) - 50.0f ) / 1000.0f );
+      m_currTickEffect = std::make_pair( 1, value );
+      break;
     }
-    value *= 1.0f + ( ( Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) - 50.0f ) / 1000.0f );
-    m_currTickEffect = std::make_pair( 1, value );
-  }
-  else if( statusEffectType == Common::StatusEffectType::Hot )
-  {
-    auto value = m_value;
-    if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
+
+    case Common::StatusEffectType::Hot:
     {
-      value *= m_cachedSourceCritBonus;
+      auto value = m_value;
+      if( m_cachedSourceCrit > Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) )
+      {
+        value *= m_cachedSourceCritBonus;
+      }
+      value *= 1.0f + ( ( Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) - 50.0f ) / 1000.0f );
+      m_currTickEffect = std::make_pair( 2, value );
+      break;
     }
-    value *= 1.0f + ( ( Sapphire::Math::CalcStats::range100( Sapphire::Math::CalcStats::rng ) - 50.0f ) / 1000.0f );
-    m_currTickEffect = std::make_pair( 2, value );
+
+    default:
+    {
+      m_currTickEffect = std::make_pair( 0, 0 );
+      break;
+    }
   }
-  else
-  {
-    m_currTickEffect = std::make_pair( 0, 0 );
-  }
+
   return m_currTickEffect;
 }
 
@@ -123,59 +132,86 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
 void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
+  if( m_lastTick == 0 )
+    m_lastTick = m_startTime;
+
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
-  if( statusEffectType == Common::StatusEffectType::Dot )
+  pScriptMgr->onStatusReceive( m_targetActor, m_id );
+
+  switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {
-    auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( m_sourceActor );
-    auto damage = Sapphire::Math::CalcStats::calcDamageBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
-
-    for( auto const& entry : m_sourceActor->getStatusEffectMap() )
+    case Common::StatusEffectType::Dot:
     {
-      auto status = entry.second;
-      auto effectEntry = status->getEffectEntry();
-      if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::DamageMultiplier )
-        continue;
-      if( effectEntry.effectValue1 & m_effectEntry.effectValue1 )
-      {
-        damage *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
-      }
-    }
+      auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( m_sourceActor );
+      auto damage = Sapphire::Math::CalcStats::calcDamageBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
 
-    m_value = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
-        m_effectEntry.effectValue1 == static_cast< int32_t >( Common::ActionTypeFilter::Physical ) ? Common::AttackType::Physical :
-      ( m_effectEntry.effectValue1 == static_cast< int32_t >( Common::ActionTypeFilter::Magical ) ? Common::AttackType::Magical : Common::AttackType::Unknown_0 ) );
-    m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Common::CritDHBonusFilter::Damage );
-    m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
-  }
-  else if( statusEffectType == Common::StatusEffectType::Hot )
-  {
-    auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( m_sourceActor );
-    auto heal = Sapphire::Math::CalcStats::calcHealBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
-
-    if( m_effectEntry.effectValue1 == 0 ) // this value is always 0 atm, if statement here just in case there is a hot that isn't a "cast"
-    {
       for( auto const& entry : m_sourceActor->getStatusEffectMap() )
       {
         auto status = entry.second;
         auto effectEntry = status->getEffectEntry();
-        if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::HealCastMultiplier )
+        if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::DamageMultiplier )
           continue;
-        heal *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+        if( effectEntry.effectValue1 & m_effectEntry.effectValue1 )
+        {
+          damage *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+        }
       }
-    }
-    m_value = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal );
-    m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Common::CritDHBonusFilter::Heal );
-    m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
-  }
 
-  pScriptMgr->onStatusReceive( m_targetActor, m_id );
+      m_value = Sapphire::Math::CalcStats::applyDamageReceiveMultiplier( *m_targetActor, damage,
+        m_effectEntry.effectValue1 == static_cast< int32_t >( Common::ActionTypeFilter::Physical ) ? Common::AttackType::Physical :
+        ( m_effectEntry.effectValue1 == static_cast< int32_t >( Common::ActionTypeFilter::Magical ) ? Common::AttackType::Magical : Common::AttackType::Unknown_0 ) );
+      m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Common::CritDHBonusFilter::Damage );
+      m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
+      break;
+    }
+
+    case Common::StatusEffectType::Hot:
+    {
+      auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( m_sourceActor );
+      auto heal = Sapphire::Math::CalcStats::calcHealBaseOnPotency( *m_sourceActor, m_effectEntry.effectValue2, wepDmg );
+
+      if( m_effectEntry.effectValue1 == 0 ) // this value is always 0 atm, if statement here just in case there is a hot that isn't a "cast"
+      {
+        for( auto const& entry : m_sourceActor->getStatusEffectMap() )
+        {
+          auto status = entry.second;
+          auto effectEntry = status->getEffectEntry();
+          if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::HealCastMultiplier )
+            continue;
+          heal *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+        }
+      }
+      m_value = Sapphire::Math::CalcStats::applyHealingReceiveMultiplier( *m_targetActor, heal );
+      m_cachedSourceCrit = Sapphire::Math::CalcStats::criticalHitProbability( *m_sourceActor, Common::CritDHBonusFilter::Heal );
+      m_cachedSourceCritBonus = Sapphire::Math::CalcStats::criticalHitBonus( *m_sourceActor );
+      break;
+    }
+
+    case Common::StatusEffectType::Haste:
+    {
+      auto pPlayer = m_targetActor->getAsPlayer();
+      if( pPlayer )
+        pPlayer->sendStats();
+      break;
+    }
+  }
 }
 
 void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   pScriptMgr->onStatusTimeOut( m_targetActor, m_id );
+
+  switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
+  {
+    case Common::StatusEffectType::Haste:
+    {
+      auto pPlayer = m_targetActor->getAsPlayer();
+      if( pPlayer )
+        pPlayer->sendStats();
+      break;
+    }
+  }
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getId() const

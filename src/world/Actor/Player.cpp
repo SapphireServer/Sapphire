@@ -280,6 +280,7 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.pie = static_cast< uint32_t >( base );
   m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
   m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
+  m_baseStats.haste = 100;
   m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
   m_baseStats.critHitRate = paramGrowthInfo->baseSpeed;
   m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
@@ -332,7 +333,7 @@ void Sapphire::Entity::Player::sendStats()
   statPacket->data().healingMagicPotency = getStatValue( Common::BaseParam::HealingMagicPotency );
   statPacket->data().skillSpeed = getStatValue( Common::BaseParam::SkillSpeed );
   statPacket->data().spellSpeed = getStatValue( Common::BaseParam::SpellSpeed );
-  statPacket->data().haste = 100;
+  statPacket->data().haste = getStatValue( Common::BaseParam::Haste );
   statPacket->data().criticalHit = getStatValue( Common::BaseParam::CriticalHit );
   statPacket->data().defense = getStatValue( Common::BaseParam::Defense );
   statPacket->data().magicDefense = getStatValue( Common::BaseParam::MagicDefense );
@@ -1128,7 +1129,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
                               actor->getPos().x, actor->getPos().y, actor->getPos().z ) <= range )
           {
 
-            if( ( tickCount - m_lastAttack ) > mainWeap->getDelay() )
+            if( ( tickCount - m_lastAttack ) > ( static_cast< float >( mainWeap->getDelay() ) * ( getStatValue( Common::BaseParam::Haste ) / 100.0f ) ) )
             {
               m_lastAttack = tickCount;
               autoAttack( actor->getAsChara() );

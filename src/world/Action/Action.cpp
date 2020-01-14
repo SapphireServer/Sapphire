@@ -79,6 +79,14 @@ bool Action::Action::init()
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
+  auto actionCategory = static_cast< Common::ActionCategory >( m_actionData->actionCategory );
+  if( actionCategory == Common::ActionCategory::Spell || actionCategory == Common::ActionCategory::Weaponskill )
+  {
+    auto haste = m_pSource->getStatValue( Common::BaseParam::Haste );
+    m_castTimeMs = static_cast< uint32_t >( m_castTimeMs * ( m_pSource->getStatValue( Common::BaseParam::Haste ) / 100.0f ) );
+    m_recastTimeMs = static_cast< uint32_t >( m_recastTimeMs * ( m_pSource->getStatValue( Common::BaseParam::Haste ) / 100.0f ) );
+  }
+
   m_cooldownGroup = m_actionData->cooldownGroup;
   m_range = m_actionData->range;
   m_effectRange = m_actionData->effectRange;
