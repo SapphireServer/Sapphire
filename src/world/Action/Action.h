@@ -129,8 +129,6 @@ namespace Sapphire::World::Action
     ActionEntry getActionEntry() const;
     float getAnimationLock();
 
-    float getAnimationLock();
-
     bool isPhysical() const;
     bool isMagical() const;
 
