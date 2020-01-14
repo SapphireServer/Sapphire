@@ -148,12 +148,14 @@ void EffectResult::execute()
 
     case Common::ActionEffectType::ApplyStatusEffect:
     {
+      uint64_t lastTickOverride = 0;
       //remove same effect from the same source (refreshing old buff)
       for( auto const& entry : m_target->getStatusEffectMap() )
       {
         auto statusEffect = entry.second;
         if( statusEffect->getId() == m_value && statusEffect->getSrcActorId() == m_source->getId() )
         {
+          lastTickOverride = statusEffect->getLastTickMs();
           // refreshing does not show "-status" flying text, and we don't send status list now because we are adding a new one
           m_target->removeStatusEffect( entry.first, false, false ); 
           break;
@@ -161,9 +163,13 @@ void EffectResult::execute()
       }
 
       if( m_pPreBuiltStatusEffect )
+      {
+        m_pPreBuiltStatusEffect->setLastTick( lastTickOverride );
         m_target->addStatusEffect( m_pPreBuiltStatusEffect );
+      }
       else
-        m_target->addStatusEffectById( m_value, m_value2, *m_source, m_param2 );
+        m_target->addStatusEffectById( m_value, m_value2, *m_source, m_param2, lastTickOverride );
+
       break;
     }
 
