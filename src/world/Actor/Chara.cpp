@@ -538,17 +538,12 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 
 void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
-  auto oldEffect = getStatusEffectById( id );
-  if( oldEffect.second )
-    removeStatusEffect( oldEffect.first, false, false );
-
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
   addStatusEffect( effect );
 }
 
-void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
-                                                             uint16_t param )
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
   if( getStatusEffectById( id ).second )
     return;
