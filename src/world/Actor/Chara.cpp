@@ -494,8 +494,8 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   if( nextSlot == -1 )
     return;
 
-  pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
+  pEffect->applyStatus();
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
@@ -595,13 +595,13 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sen
 
   statusEffectFreeSlot( effectSlotId );
 
+  m_statusEffectMap.erase( effectSlotId );
+
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
   if( sendActorControl )
     sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
-
-  m_statusEffectMap.erase( effectSlotId );
 
   if( sendStatusList )
     sendStatusEffectUpdate();
@@ -939,6 +939,18 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
     case Common::BaseParam::SpellSpeed:
     {
       value = m_baseStats.spellSpeed;
+      break;
+    }
+
+    case Common::BaseParam::Haste:
+    {
+      value = m_baseStats.haste;
+      for( auto const& statusIt : m_statusEffectMap )
+      {
+        auto effectEntry = statusIt.second->getEffectEntry();
+        if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) == Common::StatusEffectType::Haste )
+          value -= effectEntry.effectValue1;
+      }
       break;
     }
 

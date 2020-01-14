@@ -3508,4 +3508,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Lucid Dreaming, ルーシッドドリーム: MPRestore, value 50
   { 1204, { 11, 50, 0, 0, 0 } },
 
+  //Presence of Mind, 神速魔: Haste, 20%
+  { 157, { 12, 20, 0, 0, 0 } },
+
 };

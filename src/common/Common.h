@@ -1038,6 +1038,7 @@ namespace Sapphire::Common
     DamageDealtTrigger = 9,
     Shield = 10,
     MPRestore = 11,
+    Haste = 12,
   };
 
   enum class ActionTypeFilter : int32_t
