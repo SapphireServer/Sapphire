@@ -24,13 +24,6 @@ EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16
 
 }
 
-uint64_t EffectBuilder::getResultDelayMs()
-{
-  // todo: actually figure this retarded shit out
-
-  return Common::Util::getTimeMs() + 600;
-}
-
 void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
 {
   auto it = m_resolvedEffects.find( chara->getId() );
@@ -49,23 +42,23 @@ void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr r
   it->second->push_back( std::move( result ) );
 }
 
-void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( healingTarget, nullptr, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( healingTarget, nullptr, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->heal( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
-void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
+void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( restoringTarget, nullptr, getResultDelayMs() ); // restore mp source actor
+  EffectResultPtr nextResult = make_EffectResult( restoringTarget, nullptr, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->restoreMP( amount, flag );
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( damagingTarget, nullptr, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, nullptr, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->damage( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
@@ -84,16 +77,16 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, source, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( target, source, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->applyStatusEffect( statusId, duration, param );
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, source, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( target, source, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->applyStatusEffect( pStatusEffect );
   moveToResultList( target, nextResult );
 }
