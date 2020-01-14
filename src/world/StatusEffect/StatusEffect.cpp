@@ -98,6 +98,12 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   m_lastTick = Util::getTimeMs();
   pScriptMgr->onStatusTick( m_targetActor, *this );
+
+  auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
+  if( statusEffectType == Common::StatusEffectType::MPRestore )
+  {
+    m_targetActor->restoreMP( m_effectEntry.effectValue1 * 10 );
+  }
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
