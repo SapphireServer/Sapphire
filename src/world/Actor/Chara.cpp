@@ -722,7 +722,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     uint32_t duration = effect->getDuration();
     uint32_t tickRate = effect->getTickRate();
 
-    if( duration > 0 && ( currentTimeMs - startTime ) > duration )
+    if( effect->isMarkedToRemove() || ( duration > 0 && ( currentTimeMs - startTime ) > duration ) )
     {
       // remove status effect
       removeStatusEffect( effectIndex, true, true );

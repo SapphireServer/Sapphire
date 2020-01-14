@@ -9,6 +9,8 @@
 #include "Actor/Chara.h"
 #include "Actor/Actor.h"
 
+#include "Action/Action.h"
+
 #include "Script/ScriptMgr.h"
 
 #include "Math/CalcStats.h"
@@ -32,7 +34,8 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_pFw( pFw ),
   m_value( 0 ),
   m_cachedSourceCrit( 0 ),
-  m_cachedSourceCritBonus( 0 )
+  m_cachedSourceCritBonus( 0 ),
+  m_markToRemove( false )
 {
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
   auto entry = pExdData->get< Sapphire::Data::Status >( id );
@@ -262,4 +265,44 @@ const Sapphire::World::Action::StatusEffectEntry& Sapphire::StatusEffect::Status
 void Sapphire::StatusEffect::StatusEffect::replaceEffectEntry( Sapphire::World::Action::StatusEffectEntry entryOverride )
 {
   m_effectEntry = entryOverride;
+}
+
+void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World::Action::ActionPtr action )
+{
+  // todo: add script function for this if needed
+  //auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  //pScriptMgr->onBeforeActionStart( m_targetActor, *this );
+
+  switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
+  {
+    case Common::StatusEffectType::InstantCast:
+    {
+      if( !action->hasCastTime() )
+        return;
+      // value1: remaining uses
+      // value2-4: affected action ids, or all actions if value2 is 0
+      if( m_effectEntry.effectValue2 != 0 )
+      {
+        if( action->getId() != m_effectEntry.effectValue2 &&
+            action->getId() != m_effectEntry.effectValue3 &&
+            action->getId() != m_effectEntry.effectValue4 )
+          return;
+      }
+      if( m_effectEntry.effectValue1 > 0 )
+      {
+        m_effectEntry.effectValue1--;
+        if( m_effectEntry.effectValue1 == 0 )
+        {
+          m_markToRemove = true;
+        }
+        action->setCastTime( 0 );
+      }
+      break;
+    }
+  }
+}
+
+bool Sapphire::StatusEffect::StatusEffect::isMarkedToRemove()
+{
+  return m_markToRemove;
 }

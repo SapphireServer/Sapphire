@@ -19,6 +19,8 @@ public:
 
   void onTick();
 
+  void onBeforeActionStart( World::Action::ActionPtr action );
+
   void applyStatus();
 
   void removeStatus();
@@ -53,6 +55,8 @@ public:
 
   void replaceEffectEntry( Sapphire::World::Action::StatusEffectEntry entryOverride );
 
+  bool isMarkedToRemove();
+
 private:
   uint32_t m_id;
   Entity::CharaPtr m_sourceActor;
@@ -69,6 +73,7 @@ private:
   uint32_t m_value;
   float m_cachedSourceCrit;
   float m_cachedSourceCritBonus;
+  bool m_markToRemove;
 };
 
 }

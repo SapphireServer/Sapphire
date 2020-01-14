@@ -3511,4 +3511,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Presence of Mind, 神速魔: Haste, 20%
   { 157, { 12, 20, 0, 0, 0 } },
 
+  //Swiftcast, 迅速魔: InstantCast, 1 casts
+  { 167, { 13, 1, 0, 0, 0 } },
+
 };
