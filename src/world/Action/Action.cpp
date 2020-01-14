@@ -826,7 +826,7 @@ float Action::Action::getAnimationLock()
       return 0.1f;
     }
   }
-  return 0.6f;
+  return hasCastTime() ? 0.1f : 0.6f;
 }
 
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
