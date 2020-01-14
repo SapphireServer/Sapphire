@@ -13,21 +13,21 @@ namespace Sapphire::World::Action
 
     void heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount,
                Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal,
-               Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None);
+               Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
 
     void restoreMP( Entity::CharaPtr& effectTarget, Entity::CharaPtr& restoringTarget, uint32_t amount,
-                    Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None);
+                    Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
 
     void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount,
                  Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage,
-                 Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None);
-
+                 Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
+     
     void startCombo( Entity::CharaPtr& target, uint16_t actionId );
 
     void comboSucceed( Entity::CharaPtr& target );
 
-    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param );
-    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect );
+    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint8_t param, uint64_t resultDelayMs = 600 );
+    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs = 600 );
 
     void statusNoEffect( Entity::CharaPtr& target, uint16_t statusId );
 
@@ -35,8 +35,6 @@ namespace Sapphire::World::Action
 
   private:
     void moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result );
-
-    uint64_t getResultDelayMs();
 
     std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase > buildNextEffectPacket( uint32_t globalSequence, float animationLock );
 

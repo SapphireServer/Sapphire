@@ -252,7 +252,7 @@ namespace Sapphire::Entity
 
     virtual void onActionFriendly( Chara& pSource ) {};
 
-    virtual void onTick() {};
+    virtual void onTick();
 
     virtual void changeTarget( uint64_t targetId );
 

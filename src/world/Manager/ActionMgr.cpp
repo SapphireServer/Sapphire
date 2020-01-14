@@ -5,6 +5,8 @@
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
+#include "StatusEffect/StatusEffect.h"
+
 #include <Exd/ExdDataGenerated.h>
 #include "Framework.h"
 
@@ -87,6 +89,11 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
+  }
+
+  for( const auto& statusIt : player.getStatusEffectMap() )
+  {
+    statusIt.second->onBeforeActionStart( currentAction );
   }
 
   if( player.getCurrentAction() )

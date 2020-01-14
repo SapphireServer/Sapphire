@@ -541,14 +541,14 @@ void Action::Action::buildEffects()
     if( m_lutEntry.targetStatus != 0 )
     {
       if( !isComboAction() || isCorrectCombo() )
-        m_effectBuilder->applyStatusEffect( actor, m_pSource, m_lutEntry.targetStatus, m_lutEntry.targetStatusDuration, m_lutEntry.targetStatusParam );
+        m_effectBuilder->applyStatusEffect( actor, m_pSource, m_lutEntry.targetStatus, m_lutEntry.targetStatusDuration, m_lutEntry.targetStatusParam, 500 );
     }
   }
 
   if( m_lutEntry.selfStatus != 0 )
   {
     if( !isComboAction() || isCorrectCombo() )
-      m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
+      m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam, 500 );
   }
   
   m_effectBuilder->buildAndSendPackets( getAnimationLock() );

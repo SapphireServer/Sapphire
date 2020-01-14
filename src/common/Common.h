@@ -1039,6 +1039,7 @@ namespace Sapphire::Common
     Shield = 10,
     MPRestore = 11,
     Haste = 12,
+    InstantCast = 13,
   };
 
   enum class ActionTypeFilter : int32_t
