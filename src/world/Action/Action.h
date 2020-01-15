@@ -129,6 +129,8 @@ namespace Sapphire::World::Action
     ActionEntry getActionEntry() const;
     float getAnimationLock();
 
+    void setPrimaryCost( Common::ActionPrimaryCostType type, uint16_t cost );
+
     bool isPhysical() const;
     bool isMagical() const;
 

@@ -884,6 +884,12 @@ bool Action::Action::isAttackTypeMagical( Common::AttackType attackType )
   return attackType == Common::AttackType::Magical;
 }
 
+void Action::Action::setPrimaryCost( Common::ActionPrimaryCostType type, uint16_t cost )
+{
+  m_primaryCostType = type;
+  m_primaryCost = cost;
+}
+
 Sapphire::StatusEffect::StatusEffectPtr Action::Action::createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate )
 {
   // workaround to framework access issue in action script

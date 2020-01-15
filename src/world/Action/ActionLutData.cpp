@@ -1733,8 +1733,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Cure, ケアル
   //has heal: potency 450
-  //applies to self: Freecure, ケアルラ効果アップ, duration 15000, param 0
-  { 120, { 0, 0, 0, 450, 0, 155, 15000, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 120, { 0, 0, 0, 450, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Aero, エアロ
   //has damage: potency 50, combo potency 0, directional potency 0
