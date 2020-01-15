@@ -514,13 +514,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   factor = std::floor( factor * speed( chara ) );
 
-  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Damage ) > range100( rng ) )
+  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Damage ) > getRandomNumber0To99() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara, Common::CritDHBonusFilter::Damage ) > range100( rng ) )
+  if( directHitProbability( chara, Common::CritDHBonusFilter::Damage ) > getRandomNumber0To99() )
   {
     factor *= 1.25f;
     hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
@@ -528,7 +528,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
                          Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
   }
 
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To99() - 50.0f ) / 1000.0f );
 
   for( auto const& entry : chara.getStatusEffectMap() )
   {
@@ -607,13 +607,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto factor = calcDamageBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
-  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Damage ) > range100( rng ) )
+  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Damage ) > getRandomNumber0To99() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara, Common::CritDHBonusFilter::Damage ) > range100( rng ) )
+  if( directHitProbability( chara, Common::CritDHBonusFilter::Damage ) > getRandomNumber0To99() )
   {
     factor *= 1.25f;
     hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
@@ -621,7 +621,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
                          Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
   }
 
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To99() - 50.0f ) / 1000.0f );
 
   Common::ActionTypeFilter actionTypeFilter = Common::ActionTypeFilter::Unknown;
   if( World::Action::Action::isAttackTypePhysical( attackType ) )
@@ -689,13 +689,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto factor = calcHealBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
 
-  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Heal ) > range100( rng ) )
+  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Heal ) > getRandomNumber0To99() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
   }
 
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To99() - 50.0f ) / 1000.0f );
 
   for( auto const& entry : chara.getStatusEffectMap() )
   {
@@ -758,4 +758,9 @@ float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, 
     }
   }
   return result;
+}
+
+uint32_t CalcStats::getRandomNumber0To99()
+{
+  return range100( rng );
 }
