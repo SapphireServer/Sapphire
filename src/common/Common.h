@@ -412,7 +412,7 @@ namespace Sapphire::Common
   struct StatusEffect
   {
     uint16_t effect_id;
-    uint16_t unknown1;
+    uint16_t param;
     float duration;
     uint32_t sourceActorId;
   };

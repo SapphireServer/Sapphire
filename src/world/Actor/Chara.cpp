@@ -659,6 +659,7 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
                                            ( currentTimeMs - statusEffect->getStartTimeMs() ) ) / 1000;
     statusEffectList->data().effect[ slot ].duration = timeLeft;
     statusEffectList->data().effect[ slot ].effect_id = statusEffect->getId();
+    statusEffectList->data().effect[ slot ].param = statusEffect->getParam();
     statusEffectList->data().effect[ slot ].sourceActorId = statusEffect->getSrcActorId();
     slot++;
   }
