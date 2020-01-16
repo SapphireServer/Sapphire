@@ -744,16 +744,7 @@ void Sapphire::Entity::Player::gainLevel()
   m_hp = getMaxHp();
   m_mp = getMaxMp();
 
-  auto effectListPacket = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
-  effectListPacket->data().classId = static_cast< uint8_t > ( getClass() );
-  effectListPacket->data().level1 = getLevel();
-  effectListPacket->data().level = getLevel();
-  effectListPacket->data().current_hp = getMaxHp();
-  effectListPacket->data().current_mp = getMaxMp();
-  effectListPacket->data().currentTp = 1000;
-  effectListPacket->data().max_hp = getMaxHp();
-  effectListPacket->data().max_mp = getMaxMp();
-  sendToInRangeSet( effectListPacket, true );
+  sendStatusEffectUpdate();
 
   sendToInRangeSet( makeActorControl( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
                                       getLevel(), getLevel() - 1 ), true );

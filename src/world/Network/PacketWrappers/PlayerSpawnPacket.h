@@ -142,7 +142,7 @@ namespace Sapphire::Network::Packets::Server
                                                                        ( currentTimeMs -
                                                                          effect.second->getStartTimeMs() ) ) / 1000;
         m_data.effect[ effect.first ].sourceActorId = effect.second->getSrcActorId();
-        m_data.effect[ effect.first ].unknown1 = effect.second->getParam();
+        m_data.effect[ effect.first ].param = effect.second->getParam();
       }
 
     };
