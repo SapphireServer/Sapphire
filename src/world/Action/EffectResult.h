@@ -22,7 +22,7 @@ namespace Sapphire::World::Action
     void restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
-    void applyStatusEffect( uint16_t statusId, uint32_t duration, uint8_t param );
+    void applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param );
     void applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect );
     void statusNoEffect( uint16_t statusId );
 
@@ -47,7 +47,7 @@ namespace Sapphire::World::Action
 
     uint8_t m_param0;
     uint8_t m_param1;
-    uint8_t m_param2;
+    uint16_t m_param2;
 
     uint32_t m_value;
     uint32_t m_statusDuration;

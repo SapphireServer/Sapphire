@@ -297,6 +297,28 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
       }
       break;
     }
+
+    case Common::StatusEffectType::NoCostCast:
+    {
+      // value1: cost type, 0 = all costs, 1 = primary, 2 = secondary
+      // value2-4: affected action ids, or all actions if value2 is 0
+      if( m_effectEntry.effectValue2 != 0 )
+      {
+        if( action->getId() != m_effectEntry.effectValue2 &&
+            action->getId() != m_effectEntry.effectValue3 &&
+            action->getId() != m_effectEntry.effectValue4 )
+          return;
+      }
+
+      if( m_effectEntry.effectValue1 == 0 || m_effectEntry.effectValue1 == 1 )
+        action->setPrimaryCost( Common::ActionPrimaryCostType::None, 0 );
+
+      // secondary cost not implemented yet
+      //if( m_effectEntry.effectValue1 == 0 || m_effectEntry.effectValue1 == 2 )
+      //  action->setSecondaryCost();
+
+      break;
+    }
   }
 }
 

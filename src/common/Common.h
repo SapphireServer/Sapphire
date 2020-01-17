@@ -624,6 +624,7 @@ namespace Sapphire::Common
     TpGain = 13,
     GpGain = 14,
     ApplyStatusEffect = 15,
+    //ApplyStatusEffect2 = 16, // thin air uses this one but works fine with 15 wtf?
     StatusNoEffect = 21,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
@@ -1040,6 +1041,7 @@ namespace Sapphire::Common
     MPRestore = 11,
     Haste = 12,
     InstantCast = 13,
+    NoCostCast = 14,
   };
 
   enum class ActionTypeFilter : int32_t

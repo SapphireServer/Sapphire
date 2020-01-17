@@ -84,7 +84,7 @@ void EffectResult::comboSucceed()
   m_type = Common::ActionEffectType::ComboSucceed;
 }
 
-void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint8_t param )
+void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param )
 {
   m_value = statusId;
   m_statusDuration = duration;
@@ -118,7 +118,7 @@ Common::EffectEntry EffectResult::buildEffectEntry() const
   entry.param0 = m_param0;
   entry.param1 = m_param1;
   entry.effectType = m_type;
-  entry.param2 = m_param2;
+  entry.param2 = static_cast< uint8_t >( m_param2 );
   entry.flags = static_cast< uint8_t >( m_flag );
 
   return entry;
@@ -147,6 +147,7 @@ void EffectResult::execute()
     }
 
     case Common::ActionEffectType::ApplyStatusEffect:
+    //case Common::ActionEffectType::ApplyStatusEffect2:
     {
       uint64_t lastTickOverride = 0;
       //remove same effect from the same source (refreshing old buff)
