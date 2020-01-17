@@ -1812,8 +1812,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 3571, { 400, 0, 0, 400, 0, 0, 0, 0, 0, 0, 0, 5 } },
 
   //Thin Air, シンエアー
-  //applies to self: Thin Air, シンエアー, duration 12000, param 0
-  { 7430, { 0, 0, 0, 0, 0, 1217, 12000, 0, 0, 0, 0, 0 } },
+  //applies to self: Thin Air, シンエアー, duration 12000, param 65436
+  { 7430, { 0, 0, 0, 0, 0, 1217, 12000, 65436, 0, 0, 0, 0 } },
 
   //Tetragrammaton, テトラグラマトン
   //has heal: potency 700
@@ -3513,5 +3513,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
 
   //Swiftcast, 迅速魔: InstantCast, 1 casts
   { 167, { 13, 1, 0, 0, 0 } },
+
+  //Thin Air, シンエアー: NoCostCast, primary costs
+  { 1217, { 14, 1, 0, 0, 0 } },
 
 };
