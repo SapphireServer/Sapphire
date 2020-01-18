@@ -267,7 +267,7 @@ bool Lobby::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet,
   }
   else
   {
-    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x22 ) );
     sendError( 1, 5006, 13001, tmpId );
 
     return true;
