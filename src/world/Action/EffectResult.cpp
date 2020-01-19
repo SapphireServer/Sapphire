@@ -24,6 +24,11 @@ EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, ui
 
 }
 
+EffectResult::EffectResult( Entity::CharaPtr target, uint64_t delayMs ) :
+  EffectResult::EffectResult( std::move( target ), nullptr, delayMs )
+{
+}
+
 Entity::CharaPtr EffectResult::getSource() const
 {
   return m_source;

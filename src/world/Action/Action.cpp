@@ -146,6 +146,8 @@ bool Action::Action::init()
 
   addDefaultActorFilters();
 
+  m_effectBuilder->setAnimationLock( getAnimationLock() );
+
   return true;
 }
 
@@ -295,11 +297,13 @@ void Action::Action::start()
     }
   }
 
-  // todo: m_recastTimeMs needs to be adjusted for player sks/sps
-  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(),
-                                              m_recastTimeMs / 10 );
   if( player )
+  {
+    // todo: m_recastTimeMs needs to be adjusted for player sks/sps
+    auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(),
+      m_recastTimeMs / 10 );
     player->queuePacket( actionStartPkt );
+  }
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
@@ -447,7 +451,7 @@ void Action::Action::buildEffects()
   if( m_disableGenericHandler || !hasValidLutEntry() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets( getAnimationLock() );
+    m_effectBuilder->buildAndSendPackets();
     return;
   }
   
@@ -551,7 +555,7 @@ void Action::Action::buildEffects()
       m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
   }
   
-  m_effectBuilder->buildAndSendPackets( getAnimationLock() );
+  m_effectBuilder->buildAndSendPackets();
 
   // at this point we're done with it and no longer need it
   m_effectBuilder.reset();

@@ -16,6 +16,7 @@ namespace Sapphire::World::Action
   {
   public:
     explicit EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, uint64_t delayMs );
+    explicit EffectResult( Entity::CharaPtr target, uint64_t delayMs );
 
     void damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
     void heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );

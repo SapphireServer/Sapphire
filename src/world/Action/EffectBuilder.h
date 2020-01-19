@@ -11,6 +11,8 @@ namespace Sapphire::World::Action
   public:
     EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence );
 
+    void setAnimationLock( float animationLock );
+
     void heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount,
                Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal,
                Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
@@ -31,15 +33,16 @@ namespace Sapphire::World::Action
 
     void statusNoEffect( Entity::CharaPtr& target, uint16_t statusId );
 
-    void buildAndSendPackets( float animationLock );
+    void buildAndSendPackets();
 
   private:
     void moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result );
 
-    std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase > buildNextEffectPacket( uint32_t globalSequence, float animationLock );
+    std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase > buildNextEffectPacket( uint32_t globalSequence );
 
   private:
     uint32_t m_actionId;
+    float m_animationLock;
     uint16_t m_sequence;
 
     Entity::CharaPtr m_sourceChara;

@@ -531,7 +531,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   {
     totalShieldValue /= getMaxHp();
     totalShieldValue *= 100;
-    statusEffectAdd->data().shieldPercentage = totalShieldValue >= 255 ? 255 : static_cast< uint8_t >( totalShieldValue );
+    statusEffectAdd->data().shieldPercentage = static_cast< uint8_t >( std::min( 255.0f, totalShieldValue ) );
   }
 
   sendToInRangeSet( statusEffectAdd, true );
@@ -664,7 +664,7 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   {
     totalShieldValue /= getMaxHp();
     totalShieldValue *= 100;
-    statusEffectList->data().shieldPercentage = totalShieldValue >= 255 ? 255 : static_cast< uint8_t >( totalShieldValue );
+    statusEffectList->data().shieldPercentage = static_cast< uint8_t >( std::min( 255.0f, totalShieldValue ) );
   }
 
   sendToInRangeSet( statusEffectList, true );
@@ -696,7 +696,7 @@ void Sapphire::Entity::Chara::sendEffectResultToUpdateShieldValue()
   {
     totalShieldValue /= getMaxHp();
     totalShieldValue *= 100;
-    pPacket->data().shieldPercentage = totalShieldValue >= 255 ? 255 : static_cast< uint8_t >( totalShieldValue );
+    pPacket->data().shieldPercentage = static_cast< uint8_t >( std::min( 255.0f, totalShieldValue ) );
   }
 
   sendToInRangeSet( pPacket, true );

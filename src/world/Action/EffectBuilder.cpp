@@ -19,6 +19,7 @@ using namespace Sapphire::Network::Packets;
 EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence ) :
   m_sourceChara( std::move( source ) ),
   m_actionId( actionId ),
+  m_animationLock( 0.6f ),
   m_sequence( sequence )
 {
 
@@ -44,35 +45,35 @@ void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr r
 
 void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( healingTarget, nullptr, Common::Util::getTimeMs() + resultDelayMs );
+  EffectResultPtr nextResult = make_EffectResult( healingTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->heal( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( restoringTarget, nullptr, Common::Util::getTimeMs() + resultDelayMs );
+  EffectResultPtr nextResult = make_EffectResult( restoringTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->restoreMP( amount, flag );
   moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( damagingTarget, nullptr, Common::Util::getTimeMs() + resultDelayMs );
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->damage( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
 void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->startCombo( actionId );
   moveToResultList( target, nextResult );
 }
 
 void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->comboSucceed();
   moveToResultList( target, nextResult );
 }
@@ -93,12 +94,17 @@ void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPt
 
 void EffectBuilder::statusNoEffect( Entity::CharaPtr& target, uint16_t statusId )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, nullptr, 0 );
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
   nextResult->statusNoEffect( statusId );
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::buildAndSendPackets( float animationLock )
+void EffectBuilder::setAnimationLock( float animationLock )
+{
+  m_animationLock = animationLock;
+}
+
+void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();
   //Logger::debug( "EffectBuilder result: " );
@@ -108,13 +114,13 @@ void EffectBuilder::buildAndSendPackets( float animationLock )
 
   do // we want to send at least one packet even nothing is hit so other players can see
   {
-    auto packet = buildNextEffectPacket( globalSequence, animationLock );
+    auto packet = buildNextEffectPacket( globalSequence );
     m_sourceChara->sendToInRangeSet( packet, true );
   }
   while( !m_resolvedEffects.empty() );
 }
 
-std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_t globalSequence, float animationLock )
+std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_t globalSequence )
 {
   auto remainingTargetCount = m_resolvedEffects.size();
 
@@ -183,7 +189,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
     pHeader->globalSequence = globalSequence;
-    pHeader->animationLockTime = animationLock;
+    pHeader->animationLockTime = m_animationLock;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
@@ -228,7 +234,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setSequence( seq, m_sequence );
-    effectPacket->data().animationLockTime = animationLock;
+    effectPacket->data().animationLockTime = m_animationLock;
 
     for( int i = 0; i < resultList->size(); i++ )
     {
@@ -256,7 +262,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     effectPacket->data().effectCount = 0;
     effectPacket->data().sourceSequence = m_sequence;
     effectPacket->data().globalSequence = globalSequence;
-    effectPacket->data().animationLockTime = animationLock;
+    effectPacket->data().animationLockTime = m_animationLock;
 
     return effectPacket;
   }
