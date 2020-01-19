@@ -370,7 +370,7 @@ void Sapphire::Entity::Player::onDeath()
 // TODO: slightly ugly here and way too static. Needs too be done properly
 void Sapphire::Entity::Player::onTick()
 {
-
+  Chara::onTick();
   // add 3 seconds to total play time
   m_playTime += 3;
 
