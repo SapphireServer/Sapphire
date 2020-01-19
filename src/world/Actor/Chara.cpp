@@ -538,22 +538,20 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   sendStatusEffectUpdate(); // although client buff displays correctly without this but retail sends it so we do it as well
 }
 
-void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param, uint64_t lastTickOverride )
+void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
-  effect->setLastTick( lastTickOverride == 0 ? Util::getTimeMs() : lastTickOverride );
   addStatusEffect( effect );
 }
 
-void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param, uint64_t lastTickOverride )
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
   if( getStatusEffectById( id ).second )
     return;
 
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
   effect->setParam( param );
-  effect->setLastTick( lastTickOverride == 0 ? Util::getTimeMs() : lastTickOverride );
   addStatusEffect( effect );
 }
 
@@ -575,19 +573,19 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
   m_statusEffectFreeSlotQueue.push( slotId );
 }
 
-void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool sendActorControl, bool sendStatusList )
+void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool sendStatusList )
 {
   for( auto effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
-      removeStatusEffect( effectIt.first, sendActorControl, sendStatusList );
+      removeStatusEffect( effectIt.first );
       break;
     }
   }
 }
 
-void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendActorControl, bool sendStatusList )
+void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendStatusList )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -600,9 +598,7 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sen
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  if( sendActorControl )
-    sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
-
+  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), true );
   if( sendStatusList )
     sendStatusEffectUpdate();
 }
@@ -723,7 +719,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     if( effect->isMarkedToRemove() || ( duration > 0 && ( currentTimeMs - startTime ) > duration ) )
     {
       // remove status effect
-      removeStatusEffect( effectIndex, true, true );
+      removeStatusEffect( effectIndex );
       // break because removing invalidates iterators
       break;
     }
@@ -991,7 +987,7 @@ float Sapphire::Entity::Chara::applyShieldProtection( float damage )
     {
       for( auto const& slotId : destroyedShieldSlotList )
       {
-        removeStatusEffect( slotId, true, false );
+        removeStatusEffect( slotId, false );
       }
       sendStatusEffectUpdate();
     }

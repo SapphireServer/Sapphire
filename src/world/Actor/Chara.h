@@ -147,9 +147,9 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    void removeStatusEffect( uint8_t effectSlotId, bool sendActorControl, bool sendStatusList );
+    void removeStatusEffect( uint8_t effectSlotId, bool sendStatusList = true );
 
-    void removeSingleStatusEffectById( uint32_t id, bool sendActorControl, bool sendStatusList );
+    void removeSingleStatusEffectById( uint32_t id, bool sendStatusList = true );
 
     void updateStatusEffects();
 
@@ -175,10 +175,10 @@ namespace Sapphire::Entity
     const uint32_t* getModelArray() const;
 
     // add a status effect by id
-    void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0, uint64_t lastTickOverride = 0 );
+    void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
 
     // add a status effect by id if it doesn't exist
-    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0, uint64_t lastTickOverride = 0 );
+    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
 
     /// End Status Effect Functions
 

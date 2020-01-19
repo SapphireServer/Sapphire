@@ -326,3 +326,17 @@ bool Sapphire::StatusEffect::StatusEffect::isMarkedToRemove()
 {
   return m_markToRemove;
 }
+
+void Sapphire::StatusEffect::StatusEffect::refresh()
+{
+  m_value = 0;
+  m_cachedSourceCritBonus = 0;
+  m_cachedSourceCrit = 0;
+  applyStatus();
+}
+
+void Sapphire::StatusEffect::StatusEffect::refresh( Sapphire::World::Action::StatusEffectEntry newEntry )
+{
+  m_effectEntry = newEntry;
+  refresh();
+}

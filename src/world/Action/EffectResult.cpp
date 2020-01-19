@@ -150,26 +150,31 @@ void EffectResult::execute()
     //case Common::ActionEffectType::ApplyStatusEffect2:
     {
       uint64_t lastTickOverride = 0;
-      //remove same effect from the same source (refreshing old buff)
+      //refreshing old buff
       for( auto const& entry : m_target->getStatusEffectMap() )
       {
         auto statusEffect = entry.second;
         if( statusEffect->getId() == m_value && statusEffect->getSrcActorId() == m_source->getId() )
         {
-          lastTickOverride = statusEffect->getLastTickMs();
-          // refreshing does not show "-status" flying text, and we don't send status list now because we are adding a new one
-          m_target->removeStatusEffect( entry.first, false, false ); 
-          break;
+          if( m_pPreBuiltStatusEffect )
+          {
+            statusEffect->refresh( m_pPreBuiltStatusEffect->getEffectEntry() );
+          }
+          else
+          {
+            statusEffect->refresh();
+          }
+          m_target->sendStatusEffectUpdate();
+          return;
         }
       }
 
       if( m_pPreBuiltStatusEffect )
       {
-        m_pPreBuiltStatusEffect->setLastTick( lastTickOverride );
         m_target->addStatusEffect( m_pPreBuiltStatusEffect );
       }
       else
-        m_target->addStatusEffectById( m_value, m_statusDuration, *m_source, m_param2, lastTickOverride );
+        m_target->addStatusEffectById( m_value, m_statusDuration, *m_source, m_param2 );
 
       break;
     }

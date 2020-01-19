@@ -25,7 +25,7 @@ public:
     auto freecure = action.getSourceChara()->getStatusEffectById( STATUS_ID_FREECURE );
     if( freecure.second )
     {
-      action.getSourceChara()->removeStatusEffect( freecure.first, true, true );
+      action.getSourceChara()->removeStatusEffect( freecure.first );
     }
   }
 

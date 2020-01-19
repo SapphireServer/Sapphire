@@ -57,6 +57,9 @@ public:
 
   bool isMarkedToRemove();
 
+  void refresh();
+  void refresh( Sapphire::World::Action::StatusEffectEntry newEntry );
+
 private:
   uint32_t m_id;
   Entity::CharaPtr m_sourceActor;
