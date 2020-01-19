@@ -412,7 +412,7 @@ namespace Sapphire::Common
   struct StatusEffect
   {
     uint16_t effect_id;
-    uint16_t unknown1;
+    uint16_t param;
     float duration;
     uint32_t sourceActorId;
   };
@@ -591,9 +591,10 @@ namespace Sapphire::Common
 //    DRGGauge3Eyes = 76,
   };
 
-  enum class ActionType : int8_t
+  enum class AttackType : int8_t
   {
-    WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+    //WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+    Physical = -1, // seems to be the case
     Unknown_0 = 0,
     Slashing = 1,
     Piercing = 2,
@@ -623,6 +624,8 @@ namespace Sapphire::Common
     TpGain = 13,
     GpGain = 14,
     ApplyStatusEffect = 15,
+    //ApplyStatusEffect2 = 16, // thin air uses this one but works fine with 15 wtf?
+    StatusNoEffect = 21,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
@@ -649,7 +652,9 @@ namespace Sapphire::Common
   enum class ActionEffectResultFlag : uint8_t
   {
     None = 0,
+    Absorbed = 0x04,
     EffectOnSource = 0x80,
+    Reflected = 0xA0,
   };
 
   enum ItemActionType : uint16_t

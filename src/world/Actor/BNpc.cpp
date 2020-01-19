@@ -396,6 +396,7 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
 
 void Sapphire::Entity::BNpc::onTick()
 {
+  Chara::onTick();
   if( m_state == BNpcState::Retreat )
   {
     regainHp();
