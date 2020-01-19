@@ -44,6 +44,7 @@ Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
 
   m_lastTickTime = 0;
   m_lastUpdate = 0;
+  m_lastAttack = Util::getTimeMs();
 
   m_bonusStats.fill( 0 );
 
@@ -354,6 +355,8 @@ bool Sapphire::Entity::Chara::checkAction()
 
 void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
+  updateStatusEffects();
+
   if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
   {
     onTick();
@@ -532,16 +535,15 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
+  statusEffectAdd->data().globalSequence = getCurrentTerritory()->getNextEffectSequence();
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().current_hp = getHp();
   statusEffectAdd->data().current_mp = static_cast< uint16_t >( getMp() );
-  //statusEffectAdd->data().current_tp = getTp();
+  statusEffectAdd->data().current_tp = getTp();
   statusEffectAdd->data().max_hp = getMaxHp();
   statusEffectAdd->data().max_mp = static_cast< uint16_t >( getMaxMp() );
-  //statusEffectAdd->data().max_something = 1;
-  //statusEffectAdd->data().unknown2 = 28;
-  statusEffectAdd->data().classId = static_cast< uint8_t >(getClass());
-  statusEffectAdd->data().unkFlag = 1;
+  statusEffectAdd->data().classId = static_cast< uint8_t >( getClass() );
+  statusEffectAdd->data().entryCount = 1;
 
   auto& status = statusEffectAdd->data().statusEntries[0];
 
@@ -681,9 +683,6 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-  uint32_t thisTickDmg = 0;
-  uint32_t thisTickHeal = 0;
-
   for( auto effectIt : m_statusEffectMap )
   {
     uint8_t effectIndex = effectIt.first;
@@ -694,7 +693,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     uint32_t duration = effect->getDuration();
     uint32_t tickRate = effect->getTickRate();
 
-    if( ( currentTimeMs - startTime ) > duration )
+    if( duration > 0 && ( currentTimeMs - startTime ) > duration )
     {
       // remove status effect
       removeStatusEffect( effectIndex );
@@ -706,41 +705,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     {
       effect->setLastTick( currentTimeMs );
       effect->onTick();
-
-      auto thisEffect = effect->getTickEffect();
-
-      switch( thisEffect.first )
-      {
-
-        case 1:
-        {
-          thisTickDmg += thisEffect.second;
-          break;
-        }
-
-        case 2:
-        {
-          thisTickHeal += thisEffect.second;
-          break;
-        }
-
-      }
     }
-
-  }
-
-  if( thisTickDmg != 0 )
-  {
-    takeDamage( thisTickDmg );
-    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ) );
-  }
-
-  if( thisTickHeal != 0 )
-  {
-    heal( thisTickDmg );
-    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ) );
   }
 }
 
@@ -943,4 +908,43 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
   }
 
   return value + getBonusStat( baseParam );
+}
+
+void Sapphire::Entity::Chara::onTick()
+{
+  uint32_t thisTickDmg = 0;
+  uint32_t thisTickHeal = 0;
+
+  for( auto effectIt : m_statusEffectMap )
+  {
+    auto thisEffect = effectIt.second->getTickEffect();
+    switch( thisEffect.first )
+    {
+      case 1:
+      {
+        thisTickDmg += thisEffect.second;
+        break;
+      }
+
+      case 2:
+      {
+        thisTickHeal += thisEffect.second;
+        break;
+      }
+    }
+  }
+
+  if( thisTickDmg != 0 )
+  {
+    takeDamage( thisTickDmg );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
+  }
+
+  if( thisTickHeal != 0 )
+  {
+    heal( thisTickHeal );
+    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
+                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ), true );
+  }
 }

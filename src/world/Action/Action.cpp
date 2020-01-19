@@ -565,7 +565,7 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
     return false;
 
   // npc actions/non player actions
-  if( m_actionData->classJob == -1 )
+  if( m_actionData->classJob == -1 && !m_actionData->isRoleAction )
     return false;
 
   if( player.getLevel() < m_actionData->classJobLevel )
@@ -574,7 +574,7 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
   auto currentClass = player.getClass();
   auto actionClass = static_cast< Common::ClassJob >( m_actionData->classJob );
 
-  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass )
+  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass && !m_actionData->isRoleAction )
   {
     // check if not a base class action
     auto exdData = m_pFw->get< Data::ExdDataGenerated >();
