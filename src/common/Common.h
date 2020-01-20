@@ -652,7 +652,7 @@ namespace Sapphire::Common
   enum class ActionEffectResultFlag : uint8_t
   {
     None = 0,
-    Absorbed = 4,
+    Absorbed = 0x04,
     EffectOnSource = 0x80,
     Reflected = 0xA0,
   };

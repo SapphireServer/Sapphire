@@ -507,7 +507,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   statusEffectAdd->data().max_hp = getMaxHp();
   statusEffectAdd->data().max_mp = static_cast< uint16_t >( getMaxMp() );
   statusEffectAdd->data().classId = static_cast< uint8_t >( getClass() );
-  statusEffectAdd->data().entryCount = 1; // todo: add multiple status but send only one result
+  statusEffectAdd->data().entryCount = 1;
 
   auto& status = statusEffectAdd->data().statusEntries[0];
 
