@@ -291,7 +291,7 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
         m_effectEntry.effectValue1--;
         if( m_effectEntry.effectValue1 == 0 )
         {
-          m_markToRemove = true;
+          markToRemove();
         }
         action->setCastTime( 0 );
       }
@@ -325,6 +325,11 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
 bool Sapphire::StatusEffect::StatusEffect::isMarkedToRemove()
 {
   return m_markToRemove;
+}
+
+void Sapphire::StatusEffect::StatusEffect::markToRemove()
+{
+  m_markToRemove = true;
 }
 
 void Sapphire::StatusEffect::StatusEffect::refresh()

@@ -956,7 +956,6 @@ float Sapphire::Entity::Chara::applyShieldProtection( float damage )
 {
   float remainingDamage = damage;
   bool shieldChanged = false;
-  std::vector< uint8_t > destroyedShieldSlotList;
 
   for( auto const& entry : getStatusEffectMap() )
   {
@@ -976,24 +975,14 @@ float Sapphire::Entity::Chara::applyShieldProtection( float damage )
       else
       {
         remainingDamage -= effectEntry.effectValue1;
-        destroyedShieldSlotList.push_back( entry.first );
+        status->markToRemove();
       }
     }
   }
 
   if( shieldChanged )
-  {
-    if( !destroyedShieldSlotList.empty() )
-    {
-      for( auto const& slotId : destroyedShieldSlotList )
-      {
-        removeStatusEffect( slotId, false );
-      }
-      sendStatusEffectUpdate();
-    }
-    else
-      sendEffectResultToUpdateShieldValue(); // yes this is the packet to update shield value
-  }
+    sendEffectResultToUpdateShieldValue();
+
   return remainingDamage;
 }
 

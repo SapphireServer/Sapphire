@@ -57,6 +57,8 @@ public:
 
   bool isMarkedToRemove();
 
+  void markToRemove();
+
   void refresh();
   void refresh( Sapphire::World::Action::StatusEffectEntry newEntry );
 
