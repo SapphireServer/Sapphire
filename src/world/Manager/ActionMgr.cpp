@@ -79,7 +79,7 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
   action->start();
 }
 
-void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint32_t mountId,
+void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
                                                    Data::ActionPtr actionData, uint64_t targetId,
                                                    uint16_t sequence )
 {
