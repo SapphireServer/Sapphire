@@ -305,23 +305,6 @@ void Action::Action::start()
     player->queuePacket( actionStartPkt );
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-
-  // check the lut too and see if we have something usable, otherwise cancel the cast
-  if( !pScriptMgr->onStart( *this ) && !hasValidLutEntry() )
-  {
-    // script not implemented and insufficient lut data (no potencies)
-    interrupt();
-
-    if( player )
-    {
-      player->sendUrgent( "Action not implemented, missing script/lut entry for action#{0}", getId() );
-      player->setCurrentAction( nullptr );
-    }
-
-    return;
-  }
-
   // instantly finish cast if there's no cast time
   if( !hasCastTime() )
     execute();
@@ -438,15 +421,7 @@ void Action::Action::buildEffects()
 
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
-  if( !pScriptMgr->onExecute( *this ) && !hasValidLutEntry() )
-  {
-    if( auto player = m_pSource->getAsPlayer() )
-    {
-      player->sendUrgent( "missing lut entry for action#{}", getId() );
-    }
-
-    return;
-  }
+  pScriptMgr->onExecute( *this );
 
   if( m_disableGenericHandler || !hasValidLutEntry() )
   {
