@@ -91,6 +91,13 @@ void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t status
   moveToResultList( target, nextResult );
 }
 
+void EffectBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, getResultDelayMs() );
+  nextResult->mount( mountId );
+  moveToResultList( target, nextResult );
+}
+
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();

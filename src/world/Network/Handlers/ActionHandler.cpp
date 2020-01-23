@@ -72,7 +72,9 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
 
     case Common::SkillType::MountSkill:
     {
-
+      auto action = exdData->get< Data::Action >( 4 );
+      assert( action );
+      actionMgr->handleMountAction( player, actionId, action, targetId, sequence );
       break;
     }
   }
