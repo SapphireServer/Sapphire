@@ -1023,8 +1023,8 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char u19[2];
-    unsigned char mountGuideMask[28];
+    unsigned char u19[8];
+    unsigned char mountGuideMask[22];
     char name[32];
     unsigned char unknownOword[16];
     unsigned char unknownOw;
