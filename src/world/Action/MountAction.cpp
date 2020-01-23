@@ -15,7 +15,7 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Action;
 
-MountAction::MountAction( Sapphire::Entity::CharaPtr source, uint32_t mountId, uint16_t sequence, Data::ActionPtr actionData, Sapphire::FrameworkPtr fw ) :
+MountAction::MountAction( Sapphire::Entity::CharaPtr source, uint16_t mountId, uint16_t sequence, Data::ActionPtr actionData, Sapphire::FrameworkPtr fw ) :
   Action::Action( source, 4, sequence, actionData, fw ),
   m_mountId( mountId )
 {

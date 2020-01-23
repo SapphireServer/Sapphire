@@ -74,7 +74,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
     {
       auto action = exdData->get< Data::Action >( 4 );
       assert( action );
-      actionMgr->handleMountAction( player, actionId, action, targetId, sequence );
+      actionMgr->handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, sequence );
       break;
     }
   }
