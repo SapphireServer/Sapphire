@@ -63,7 +63,8 @@ namespace Sapphire::Network::Packets::Server
 
       memcpy( m_data.mountGuideMask, player.getMountGuideBitmask(), sizeof( m_data.mountGuideMask ) );
 
-      memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
+      //memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
+      memset( m_data.unlockBitmask, 255, sizeof( m_data.unlockBitmask ) );
 
       memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
 
