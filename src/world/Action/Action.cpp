@@ -683,6 +683,19 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
       return true;
     }
 
+    case Common::ActionPrimaryCostType::StatusEffect:
+    {
+      auto statusEntry = m_pSource->getStatusEffectById( m_primaryCost );
+
+      if( !statusEntry.second )
+        return false;
+
+      if( subtractCosts )
+        m_pSource->removeStatusEffect( statusEntry.first );
+
+      return true;
+    }
+
     // free casts, likely just pure ogcds
     case Common::ActionPrimaryCostType::None:
     {

@@ -22,17 +22,17 @@ public:
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    auto freecure = action.getSourceChara()->getStatusEffectById( STATUS_ID_FREECURE );
-    if( freecure.second )
+    auto effectEntry = action.getSourceChara()->getStatusEffectById( STATUS_ID_FREECURE );
+    if( effectEntry.second )
     {
-      action.getSourceChara()->removeStatusEffect( freecure.first );
+      action.getSourceChara()->removeStatusEffect( effectEntry.first );
     }
   }
 
   void onStart( Sapphire::World::Action::Action& action ) override
   {
-    auto freecure = action.getSourceChara()->getStatusEffectById( STATUS_ID_FREECURE );
-    if( freecure.second )
+    auto effectEntry = action.getSourceChara()->getStatusEffectById( STATUS_ID_FREECURE );
+    if( effectEntry.second )
     {
       action.setPrimaryCost( Common::ActionPrimaryCostType::None, 0 );
     }

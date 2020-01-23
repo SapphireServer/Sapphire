@@ -948,8 +948,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Heavy Shot, ヘヴィショット
   //has damage: potency 180, combo potency 0, directional potency 0
-  //applies to self: Straight Shot Ready, ストレートショット実行可, duration 10000, param 0
-  { 97, { 180, 0, 0, 0, 0, 122, 10000, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 97, { 180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Straight Shot, ストレートショット
   //has damage: potency 200, combo potency 0, directional potency 0
@@ -1417,8 +1417,7 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Energy Drain, エナジードレイン
   //has damage: potency 100, combo potency 0, directional potency 0
-  //restores mp: 5%
-  { 16508, { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5 } },
+  { 16508, { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Bio II, バイオラ
   //applies to targets: Bio II, バイオラ, duration 30000, param 0

@@ -9,25 +9,25 @@
 using namespace Sapphire;
 using namespace Sapphire::StatusEffect;
 
-const uint16_t STATUS_ID_FREECURE = 155;
+const uint16_t STATUS_ID_STRAIGHT_SHOT_READY = 122;
 
-class ActionCure120 :
+class ActionHeavyShot97 :
   public ScriptAPI::ActionScript
 {
 public:
-  ActionCure120() :
-    ScriptAPI::ActionScript( 120 )
+  ActionHeavyShot97() :
+    ScriptAPI::ActionScript( 97 )
   {
   }
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    if( action.getSourceChara()->getLevel() >= 30 && Math::CalcStats::getRandomNumber0To99() < 15 )
+    if( action.getSourceChara()->getLevel() >= 2 && Math::CalcStats::getRandomNumber0To99() < 20 )
     {
-      auto pEffect = action.createStatusEffect( STATUS_ID_FREECURE, action.getSourceChara(), action.getSourceChara(), 15000, 3000 );
+      auto pEffect = action.createStatusEffect( STATUS_ID_STRAIGHT_SHOT_READY, action.getSourceChara(), action.getSourceChara(), 10000, 3000 );
       action.getEffectbuilder()->applyStatusEffect( action.getSourceChara(), action.getSourceChara(), pEffect );
     }
   }
 };
 
-EXPOSE_SCRIPT( ActionCure120 );
+EXPOSE_SCRIPT( ActionHeavyShot97 );
