@@ -835,10 +835,11 @@ namespace Sapphire::Network::Packets::Server
     uint16_t action_id;
     Common::SkillType skillType;
     uint8_t unknown;
-    uint32_t unknown_1; // Also action id
+    uint32_t unknown_1; // action id or mount id
     float cast_time;
     uint32_t target_id;
-    float rotation; // In radians
+    uint16_t rotation;
+    uint16_t flag; // 1 = interruptible blinking cast bar
     uint32_t unknown_2;
     uint16_t posX;
     uint16_t posY;

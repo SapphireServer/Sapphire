@@ -3,6 +3,7 @@
 #include <Util/Util.h>
 
 #include "Actor/Chara.h"
+#include "Actor/Player.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -114,6 +115,14 @@ void EffectResult::statusNoEffect( uint16_t statusId )
   m_type = Common::ActionEffectType::StatusNoEffect;
 }
 
+void EffectResult::mount( uint16_t moundId )
+{
+  m_value = moundId;
+  m_param0 = 1;
+
+  m_type = Common::ActionEffectType::Mount;
+}
+
 Common::EffectEntry EffectResult::buildEffectEntry() const
 {
   Common::EffectEntry entry{};
@@ -181,6 +190,13 @@ void EffectResult::execute()
       else
         m_target->addStatusEffectById( m_value, m_statusDuration, *m_source, m_param2 );
 
+      break;
+    }
+
+    case Common::ActionEffectType::Mount:
+    {
+      auto pPlayer = m_target->getAsPlayer();
+      pPlayer->mount( m_value );
       break;
     }
 

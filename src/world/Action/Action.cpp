@@ -287,7 +287,7 @@ void Action::Action::start()
     data.posX = Common::Util::floatToUInt16( pos.x );
     data.posY = Common::Util::floatToUInt16( pos.y );
     data.posZ = Common::Util::floatToUInt16( pos.z );
-    data.rotation = m_pSource->getRot();
+    data.rotation = Common::Util::floatToUInt16Rot( m_pSource->getRot() );
 
     m_pSource->sendToInRangeSet( castPacket, true );
 
@@ -763,6 +763,7 @@ void Action::Action::addDefaultActorFilters()
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
+    case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
 

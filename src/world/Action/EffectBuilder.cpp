@@ -99,6 +99,13 @@ void EffectBuilder::statusNoEffect( Entity::CharaPtr& target, uint16_t statusId 
   moveToResultList( target, nextResult );
 }
 
+void EffectBuilder::mount( Entity::CharaPtr& target, uint16_t mountId, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->mount( mountId );
+  moveToResultList( target, nextResult );
+}
+
 void EffectBuilder::setAnimationLock( float animationLock )
 {
   m_animationLock = animationLock;

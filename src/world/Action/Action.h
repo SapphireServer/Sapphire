@@ -87,7 +87,7 @@ namespace Sapphire::World::Action
      * @brief Tests if an action is castable by the current source chara
      * @return true if castable, false if the caster doesn't meet the requirements
      */
-    bool preCheck();
+    virtual bool preCheck();
 
     /*!
      * @brief Snapshots characters affected by a cast.
