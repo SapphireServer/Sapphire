@@ -207,7 +207,7 @@ namespace Sapphire::Network::Packets
 
     QuestTracker = 0x0289, // updated 5.18
 
-    Mount = 0x02F0, // updated 5.18
+    Mount = 0x038F, // updated 5.18
 
     DirectorVars = 0x00E6, // updated 5.18
     SomeDirectorUnk1 = 0x0084, // updated 5.18
