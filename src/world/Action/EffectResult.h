@@ -21,7 +21,7 @@ namespace Sapphire::World::Action
     void startCombo( uint16_t actionId );
     void comboSucceed();
     void applyStatusEffect( uint16_t statusId, uint8_t param );
-    void mount( uint16_t moundId );
+    void mount( uint16_t mountId );
 
     Entity::CharaPtr getTarget() const;
 
