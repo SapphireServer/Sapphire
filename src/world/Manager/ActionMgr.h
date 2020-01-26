@@ -29,7 +29,7 @@ namespace Sapphire::World::Manager
     void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
 
-    void handleMountAction( Entity::Player& player, uint32_t mountId,
+    void handleMountAction( Entity::Player& player, uint16_t mountId,
                             Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
 
   private:

@@ -115,9 +115,9 @@ void EffectResult::statusNoEffect( uint16_t statusId )
   m_type = Common::ActionEffectType::StatusNoEffect;
 }
 
-void EffectResult::mount( uint16_t moundId )
+void EffectResult::mount( uint16_t mountId )
 {
-  m_value = moundId;
+  m_value = mountId;
   m_param0 = 1;
 
   m_type = Common::ActionEffectType::Mount;
