@@ -28,6 +28,8 @@ namespace Sapphire::World::Action
 
     void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param );
 
+    void mount( Entity::CharaPtr& target, uint16_t mountId );
+
     void buildAndSendPackets();
 
 
