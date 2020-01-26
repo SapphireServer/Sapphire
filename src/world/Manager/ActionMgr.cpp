@@ -2,6 +2,7 @@
 
 #include "Action/Action.h"
 #include "Action/ItemAction.h"
+#include "Action/MountAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
@@ -76,6 +77,22 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
 
   // todo: item actions don't have cast times? if so we can just start it and we're good
   action->start();
+}
+
+void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
+                                                   Data::ActionPtr actionData, uint64_t targetId,
+                                                   uint16_t sequence )
+{
+  player.sendDebug( "mount: {0}", mountId );
+
+  auto action = Action::make_MountAction( player.getAsPlayer(), mountId, sequence, actionData, framework() );
+
+  action->setTargetId( targetId );
+
+  if( !action->init() )
+    return;
+
+  bootstrapAction( player, action, *actionData );
 }
 
 void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
