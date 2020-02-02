@@ -22,7 +22,6 @@ public:
     uint8_t ib = pPlayer->gaugeWarGetIb();
     ib = std::min( 100, ib + 20 );
     pPlayer->gaugeWarSetIb( ib );
-    pPlayer->sendActorGuage();
   }
 };
 

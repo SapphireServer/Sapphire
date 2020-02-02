@@ -2161,6 +2161,7 @@ void Sapphire::Entity::Player::gaugeClear()
   std::memset( m_gauge, 0, sizeof( m_gauge ) );
   auto pPacket = makeZonePacket< FFXIVIpcEffect037F >( getId() );
   queuePacket( pPacket );
+  sendActorGauge();
 }
 
 void Sapphire::Entity::Player::gaugeSet( uint8_t index, uint8_t value )
@@ -2173,7 +2174,7 @@ uint8_t Sapphire::Entity::Player::gaugeGet( uint8_t index )
   return m_gauge[ index ];
 }
 
-void Sapphire::Entity::Player::sendActorGuage()
+void Sapphire::Entity::Player::sendActorGauge()
 {
   auto pPacket = makeZonePacket< FFXIVIpcActorGauge >( getId() );
   pPacket->data().classJobId = static_cast< uint8_t >( getClass() );
@@ -2197,6 +2198,8 @@ void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
     queuePacket( pPacket );
   }
   gaugeSet( 0, value );
+  if( oldValue != value )
+    sendActorGauge();
 }
 
 uint8_t Sapphire::Entity::Player::gaugeWarGetIb()

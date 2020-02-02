@@ -973,10 +973,12 @@ namespace Sapphire::Entity
 
     // Job UI
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void gaugeClear();
+    private:
     void gaugeSet( uint8_t index, uint8_t value );
     uint8_t gaugeGet( uint8_t index );
-    void sendActorGuage();
+    public:
+    void gaugeClear();
+    void sendActorGauge();
 
     void gaugeWarSetIb( uint8_t value );
     uint8_t gaugeWarGetIb();
