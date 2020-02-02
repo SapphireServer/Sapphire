@@ -835,6 +835,7 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
   sendStatusUpdate();
 
   gaugeClear();
+  sendActorGauge();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
@@ -2161,7 +2162,6 @@ void Sapphire::Entity::Player::gaugeClear()
   std::memset( m_gauge, 0, sizeof( m_gauge ) );
   auto pPacket = makeZonePacket< FFXIVIpcEffect037F >( getId() );
   queuePacket( pPacket );
-  sendActorGauge();
 }
 
 void Sapphire::Entity::Player::gaugeSet( uint8_t index, uint8_t value )
