@@ -1994,6 +1994,12 @@ namespace Sapphire::Network::Packets::Server
     char otherName[32];
   };
 
+  struct FFXIVIpcEffect037F : FFXIVIpcBasePacket< Effect037F >
+  {
+    uint32_t value1;
+    uint32_t value2;
+  };
+
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/

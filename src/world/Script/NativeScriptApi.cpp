@@ -96,6 +96,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void ActionScript::onAfterBuildEffect( Sapphire::World::Action::Action& action )
+  {
+  }
+
   void ActionScript::onInterrupt( Sapphire::World::Action::Action& action )
   {
   }

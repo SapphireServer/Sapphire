@@ -144,6 +144,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onExecute( Sapphire::World::Action::Action& action );
 
+    virtual void onAfterBuildEffect( Sapphire::World::Action::Action& action );
+
     virtual void onInterrupt( Sapphire::World::Action::Action& action );
   };
 

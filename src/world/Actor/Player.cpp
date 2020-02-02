@@ -106,6 +106,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
   m_actorSpawnIndexAllocator.init( MAX_DISPLAYED_ACTORS, true );
+
+  gaugeClear();
 }
 
 Sapphire::Entity::Player::~Player()
@@ -831,6 +833,8 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
   sendToInRangeSet( makeActorControl( getId(), ClassJobChange, 0x04 ), true );
 
   sendStatusUpdate();
+
+  gaugeClear();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
@@ -2150,4 +2154,52 @@ bool Sapphire::Entity::Player::checkAction()
   }
 
   return true;
+}
+
+void Sapphire::Entity::Player::gaugeClear()
+{
+  std::memset( m_gauge, 0, sizeof( m_gauge ) );
+  auto pPacket = makeZonePacket< FFXIVIpcEffect037F >( getId() );
+  queuePacket( pPacket );
+}
+
+void Sapphire::Entity::Player::gaugeSet( uint8_t index, uint8_t value )
+{
+  m_gauge[ index ] = value;
+}
+
+uint8_t Sapphire::Entity::Player::gaugeGet( uint8_t index )
+{
+  return m_gauge[ index ];
+}
+
+void Sapphire::Entity::Player::sendActorGuage()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcActorGauge >( getId() );
+  pPacket->data().classJobId = static_cast< uint8_t >( getClass() );
+  std::memcpy( pPacket->data().data, m_gauge, sizeof( m_gauge ) );
+
+  queuePacket( pPacket );
+}
+
+void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
+{
+  auto oldValue = gaugeWarGetIb();
+  if( ( oldValue == 0 && value != 0 ) ||
+      ( oldValue != 0 && value == 0 ) )
+  {
+    auto pPacket = makeZonePacket< FFXIVIpcEffect037F >( getId() );
+    if( value != 0 )
+    {
+      pPacket->data().value1 = 0x07;
+      pPacket->data().value2 = 0x7C;
+    }
+    queuePacket( pPacket );
+  }
+  gaugeSet( 0, value );
+}
+
+uint8_t Sapphire::Entity::Player::gaugeWarGetIb()
+{
+  return gaugeGet( 0 );
 }

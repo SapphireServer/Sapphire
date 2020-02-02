@@ -159,6 +159,7 @@ namespace Sapphire::Network::Packets
     ActorOwner = 0x03BB, // updated 5.18
     PlayerStateFlags = 0x02C6, // updated 5.18
     PlayerClassInfo = 0x01B0, // updated 5.18
+    Effect037F = 0x037F, // 5.18
 
     ModelEquip = 0x02E6, // updated 5.18
     Examine = 0x0366, // updated 5.18

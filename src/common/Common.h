@@ -624,8 +624,8 @@ namespace Sapphire::Common
     TpLoss = 12,
     TpGain = 13,
     GpGain = 14,
-    ApplyStatusEffect = 15,
-    //ApplyStatusEffect2 = 16, // thin air uses this one but works fine with 15 wtf?
+    ApplyStatusEffectTarget = 15,
+    ApplyStatusEffectSource = 16,
     StatusNoEffect = 21,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.

@@ -427,6 +427,7 @@ void Action::Action::buildEffects()
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_effectBuilder->buildAndSendPackets();
+    pScriptMgr->onAfterBuildEffect( *this );
     return;
   }
   
@@ -529,8 +530,9 @@ void Action::Action::buildEffects()
     if( !isComboAction() || isCorrectCombo() )
       m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
   }
-  
+
   m_effectBuilder->buildAndSendPackets();
+  pScriptMgr->onAfterBuildEffect( *this );
 
   // at this point we're done with it and no longer need it
   m_effectBuilder.reset();

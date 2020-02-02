@@ -78,6 +78,8 @@ namespace Sapphire::Scripting
 
     bool onExecute( World::Action::Action& action );
 
+    bool onAfterBuildEffect( World::Action::Action& action );
+
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
 
     bool onStatusTick( Entity::CharaPtr pActor, Sapphire::StatusEffect::StatusEffect& effect );

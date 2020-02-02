@@ -96,7 +96,7 @@ void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint
   m_statusDuration = duration;
   m_param2 = param;
 
-  m_type = Common::ActionEffectType::ApplyStatusEffect;
+  m_type = Common::ActionEffectType::ApplyStatusEffectTarget;
 }
 
 void EffectResult::applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect )
@@ -105,7 +105,7 @@ void EffectResult::applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffec
   m_param2 = pStatusEffect->getParam();
   m_pPreBuiltStatusEffect = std::move( pStatusEffect );
 
-  m_type = Common::ActionEffectType::ApplyStatusEffect;
+  m_type = Common::ActionEffectType::ApplyStatusEffectTarget;
 }
 
 void EffectResult::statusNoEffect( uint16_t statusId )
@@ -160,8 +160,8 @@ void EffectResult::execute()
       break;
     }
 
-    case Common::ActionEffectType::ApplyStatusEffect:
-    //case Common::ActionEffectType::ApplyStatusEffect2:
+    case Common::ActionEffectType::ApplyStatusEffectTarget:
+    case Common::ActionEffectType::ApplyStatusEffectSource:
     {
       uint64_t lastTickOverride = 0;
       //refreshing old buff
