@@ -485,7 +485,7 @@ void Action::Action::buildEffects()
 
       if( !isComboAction() || isCorrectCombo() )
       {
-        if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
+        if ( !m_actionData->preservesCombo ) // this matches retail packet, on all standalone actions even casts.
         {
           m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
         }
@@ -671,6 +671,23 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
         m_pSource->removeStatusEffect( statusEntry.first );
 
       return true;
+    }
+
+    case Common::ActionPrimaryCostType::WARGauge:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto ib = pPlayer->gaugeWarGetIb();
+        if( ib >= m_primaryCost )
+        {
+          if( subtractCosts )
+            pPlayer->gaugeWarSetIb( ib - m_primaryCost );
+
+          return true;
+        }
+      }
+      return false;
     }
 
     // free casts, likely just pure ogcds

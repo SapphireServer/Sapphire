@@ -190,8 +190,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 51, { 220, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Infuriate, ウォークライ
-  //applies to self: Nascent Chaos, 原初の混沌, duration 30000, param 0
-  { 52, { 0, 0, 0, 0, 0, 1897, 30000, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 52, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Fell Cleave, フェルクリーヴ
   //has damage: potency 590, combo potency 0, directional potency 0

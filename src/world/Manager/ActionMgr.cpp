@@ -103,6 +103,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
 {
   if( !currentAction->preCheck() )
   {
+    player.sendDebug( "preCheck failed" );
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
