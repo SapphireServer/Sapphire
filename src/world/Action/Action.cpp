@@ -12,6 +12,8 @@
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
 
+#include "Action/ActionLut.h"
+
 #include "Territory/Territory.h"
 
 #include <Network/CommonActorControl.h>
@@ -118,6 +120,18 @@ bool Action::Action::init()
 
   m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->primaryCostType );
   m_primaryCost = m_actionData->primaryCostValue;
+
+  if( m_primaryCostType != Common::ActionPrimaryCostType::None )
+  {
+    for( auto const& entry : m_pSource->getStatusEffectMap() )
+    {
+      if( entry.second->getParam() == 65436 ) // todo: decode this shit and figure out exact percentage to apply to primary cost, this magic number is 0%
+      {
+        setPrimaryCost( Common::ActionPrimaryCostType::None, 0 );
+        break;
+      }
+    }
+  }
 
   /*if( !m_actionData->targetArea )
   {
@@ -407,12 +421,12 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
   if( m_isAutoAttack )
     return Math::CalcStats::calcAutoAttackDamage( *m_pSource, potency );
   else
-    return Math::CalcStats::calcActionDamage( *m_pSource, static_cast< Common::AttackType >( m_actionData->attackType ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
+    return Math::CalcStats::calcActionDamage( this, *m_pSource, static_cast< Common::AttackType >( m_actionData->attackType ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
 {
-  return Math::CalcStats::calcActionHealing( *m_pSource, static_cast< Common::ActionCategory >( m_actionData->actionCategory ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
+  return Math::CalcStats::calcActionHealing( this, *m_pSource, static_cast< Common::ActionCategory >( m_actionData->actionCategory ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 void Action::Action::buildEffects()
@@ -432,18 +446,18 @@ void Action::Action::buildEffects()
   }
   
   // we have a valid lut entry
-  if( auto player = getSourceChara()->getAsPlayer() )
+  auto player = getSourceChara()->getAsPlayer();
+  if( player )
   {
-    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, shpot: {}, ss: {}, ts: {}, gmp: {}",
+    player->sendDebug( "type: {}, dpot: {} (dcpot: {}, ddpot: {}), hpot: {}, ss: {}, ts: {}, bonus: {}, breq: {}, bdata: {}",
                        m_actionData->attackType,
                        m_lutEntry.damagePotency, m_lutEntry.damageComboPotency, m_lutEntry.damageDirectionalPotency,
-                       m_lutEntry.healPotency, m_lutEntry.selfHealPotency,
-                       m_lutEntry.selfStatus, m_lutEntry.targetStatus,
-                       m_lutEntry.gainMPPercentage );
+                       m_lutEntry.healPotency, m_lutEntry.selfStatus, m_lutEntry.targetStatus,
+                       m_lutEntry.bonusEffect, m_lutEntry.bonusRequirement, m_lutEntry.bonusDataUInt32 );
   }
 
   // when aoe, these effects are in the target whatever is hit first
-  bool shouldRestoreMP = true;
+  bool shouldGainPower = true;
   bool shouldApplyComboSucceedEffect = true;
 
   for( auto& actor : m_hitActors )
@@ -499,23 +513,40 @@ void Action::Action::buildEffects()
       m_effectBuilder->heal( actor, actor, heal.first, heal.second );
     }
 
-    if( m_lutEntry.selfHealPotency > 0 ) // actions with self heal
+    if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::SelfHeal )
     {
-      if( !isComboAction() || isCorrectCombo() )
+      if( checkActionBonusRequirement() )
       {
-        auto heal = calcHealing( m_lutEntry.selfHealPotency );
+        auto heal = calcHealing( m_lutEntry.bonusDataUInt16L );
         heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
         m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
       }
     }
 
-    if( m_lutEntry.gainMPPercentage > 0 && shouldRestoreMP )
+    if( shouldGainPower )
     {
-      if( !isComboAction() || isCorrectCombo() )
+      if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainMPPercentage )
       {
-        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.gainMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
-        shouldRestoreMP = false;
+        if( checkActionBonusRequirement() )
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.bonusDataUInt16L / 100, Common::ActionEffectResultFlag::EffectOnSource );
       }
+
+      if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource )
+      {
+        if( checkActionBonusRequirement() )
+        {
+          switch( static_cast< Common::ClassJob >( m_lutEntry.bonusDataByte3 ) )
+          {
+            case Common::ClassJob::Marauder:
+            case Common::ClassJob::Warrior:
+            {
+              player->gaugeWarSetIb( std::min( 100, player->gaugeWarGetIb() + m_lutEntry.bonusDataByte4 ) );
+              break;
+            }
+          }
+        }
+      }
+      shouldGainPower = false;
     }
 
     if( m_lutEntry.targetStatus != 0 )
@@ -831,8 +862,8 @@ Sapphire::Entity::CharaPtr Action::Action::getHitChara()
 
 bool Action::Action::hasValidLutEntry() const
 {
-  return m_lutEntry.damagePotency != 0 || m_lutEntry.healPotency != 0 || m_lutEntry.selfHealPotency != 0 || m_lutEntry.selfStatus != 0 ||
-    m_lutEntry.targetStatus != 0 || m_lutEntry.gainMPPercentage != 0;
+  return m_lutEntry.damagePotency != 0 || m_lutEntry.healPotency != 0 || m_lutEntry.selfStatus != 0 ||
+    m_lutEntry.targetStatus != 0 || m_lutEntry.bonusEffect != 0;
 }
 
 float Action::Action::getAnimationLock()
@@ -900,6 +931,24 @@ void Action::Action::setPrimaryCost( Common::ActionPrimaryCostType type, uint16_
 {
   m_primaryCostType = type;
   m_primaryCost = cost;
+}
+
+bool Action::Action::checkActionBonusRequirement()
+{
+  if( !m_pSource->isPlayer() )
+    return false;
+
+  if( m_lutEntry.bonusRequirement & Common::ActionBonusEffectRequirement::RequireCorrectCombo )
+  {
+    if( !isCorrectCombo() )
+      return false;
+  }
+  if( m_lutEntry.bonusRequirement & Common::ActionBonusEffectRequirement::RequireCorrectPositional )
+  {
+    // todo
+  }
+
+  return true;
 }
 
 Sapphire::StatusEffect::StatusEffectPtr Action::Action::createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate )

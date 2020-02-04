@@ -11,14 +11,30 @@ namespace Sapphire::World::Action
     uint16_t damageComboPotency;
     uint16_t damageDirectionalPotency;
     uint16_t healPotency;
-    uint16_t selfHealPotency;
     uint16_t selfStatus;
     uint32_t selfStatusDuration;
     uint16_t selfStatusParam;
     uint16_t targetStatus;
     uint32_t targetStatusDuration;
     uint16_t targetStatusParam;
-    uint16_t gainMPPercentage;
+    uint8_t bonusEffect;
+    uint8_t bonusRequirement;
+    union
+    {
+      uint32_t bonusDataUInt32;
+      struct
+      {
+        uint16_t bonusDataUInt16L;
+        uint16_t bonusDataUInt16H;
+      };
+      struct
+      {
+        uint8_t bonusDataByte1;
+        uint8_t bonusDataByte2;
+        uint8_t bonusDataByte3;
+        uint8_t bonusDataByte4;
+      };
+    };
   };
 
   struct StatusEffectEntry

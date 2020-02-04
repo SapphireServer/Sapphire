@@ -57,6 +57,8 @@ namespace Sapphire::World::Action
 
     void disableGenericHandler();
 
+    bool checkActionBonusRequirement();
+
     StatusEffect::StatusEffectPtr createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate );
 
     /*!

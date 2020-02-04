@@ -1044,7 +1044,6 @@ namespace Sapphire::Common
     MPRestore = 11,
     Haste = 12,
     InstantCast = 13,
-    NoCostCast = 14,
   };
 
   enum class ActionTypeFilter : int32_t
@@ -1067,6 +1066,23 @@ namespace Sapphire::Common
   {
     ReflectDamage = 1,
     AbsorbHP = 2,
+  };
+
+  enum ActionBonusEffect : uint8_t
+  {
+    NoBonus = 0,
+    CritBonus = 1,
+    DHBonus = 2,
+    GainMPPercentage = 4,
+    GainJobResource = 8,
+    SelfHeal = 16,
+  };
+
+  enum ActionBonusEffectRequirement : uint8_t
+  {
+    NoRequirement = 0,
+    RequireCorrectCombo = 1,
+    RequireCorrectPositional = 2,
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

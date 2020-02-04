@@ -602,18 +602,44 @@ float CalcStats::calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, ui
   return factor;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, Sapphire::Common::AttackType attackType, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( Sapphire::World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, Sapphire::Common::AttackType attackType, uint32_t ptc, float wepDmg )
 {
   auto factor = calcDamageBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
-  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Damage ) > getRandomNumber0To99() )
+  auto critProb = criticalHitProbability( chara, Common::CritDHBonusFilter::Damage );
+  if( pAction )
+  {
+    auto lutEntry = pAction->getActionEntry();
+    if( lutEntry.bonusEffect & Common::ActionBonusEffect::CritBonus )
+    {
+      if( pAction->checkActionBonusRequirement() )
+      {
+        critProb += lutEntry.bonusDataUInt16L;
+      }
+    }
+  }
+
+  if( critProb > getRandomNumber0To99() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara, Common::CritDHBonusFilter::Damage ) > getRandomNumber0To99() )
+  auto dhProb = directHitProbability( chara, Common::CritDHBonusFilter::Damage );
+  if( pAction )
+  {
+    auto lutEntry = pAction->getActionEntry();
+    if( lutEntry.bonusEffect & Common::ActionBonusEffect::DHBonus )
+    {
+      if( pAction->checkActionBonusRequirement() )
+      {
+        dhProb += lutEntry.bonusDataUInt16L;
+      }
+    }
+  }
+
+  if( dhProb > getRandomNumber0To99() )
   {
     factor *= 1.25f;
     hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
@@ -684,12 +710,25 @@ float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& c
   return heal;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, Sapphire::Common::ActionCategory actionCategory, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( Sapphire::World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, Sapphire::Common::ActionCategory actionCategory, uint32_t ptc, float wepDmg )
 {
   auto factor = calcHealBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
 
-  if( criticalHitProbability( chara, Common::CritDHBonusFilter::Heal ) > getRandomNumber0To99() )
+  auto critProb = criticalHitProbability( chara, Common::CritDHBonusFilter::Heal );
+  if( pAction )
+  {
+    auto lutEntry = pAction->getActionEntry();
+    if( lutEntry.bonusEffect & Common::ActionBonusEffect::CritBonus )
+    {
+      if( pAction->checkActionBonusRequirement() )
+      {
+        critProb += lutEntry.bonusDataUInt16L;
+      }
+    }
+  }
+
+  if( critProb > getRandomNumber0To99() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
@@ -731,7 +770,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamag
       {
           auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( pCharaVictim );
           // any magical reflect damage exists?
-          auto damage = Sapphire::Math::CalcStats::calcActionDamage( *pCharaVictim, Common::AttackType::Physical, effectEntry.effectValue2, wepDmg );
+          auto damage = Sapphire::Math::CalcStats::calcActionDamage( nullptr, *pCharaVictim, Common::AttackType::Physical, effectEntry.effectValue2, wepDmg );
           damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pCharaAttacker, damage.first, Common::AttackType::Physical );
 
           return damage;
