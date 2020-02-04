@@ -17,6 +17,9 @@ public:
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
+    if( !action.isCorrectCombo() )
+      return;
+
     auto pPlayer = action.getSourceChara()->getAsPlayer();
     assert( pPlayer );
     uint8_t ib = pPlayer->gaugeWarGetIb();
