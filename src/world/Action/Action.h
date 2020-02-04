@@ -202,6 +202,7 @@ namespace Sapphire::World::Action
     bool m_canTargetDead;
     bool m_isAutoAttack;
     bool m_disableGenericHandler;
+    bool m_started;
 
     Common::ActionInterruptType m_interruptType;
 

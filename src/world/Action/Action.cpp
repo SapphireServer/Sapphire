@@ -54,7 +54,8 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
   m_interruptType( Common::ActionInterruptType::None ),
   m_sequence( sequence ),
   m_isAutoAttack( false ),
-  m_disableGenericHandler( false )
+  m_disableGenericHandler( false ),
+  m_started( false )
 {
 }
 
@@ -319,6 +320,8 @@ void Action::Action::start()
   // instantly finish cast if there's no cast time
   if( !hasCastTime() )
     execute();
+
+  m_started = true;
 }
 
 void Action::Action::interrupt( ActionInterruptType type )
@@ -342,7 +345,7 @@ void Action::Action::interrupt( ActionInterruptType type )
     player->unsetStateFlag( PlayerStateFlag::Casting );
   }
 
-  if( hasCastTime() )
+  if( m_started && hasCastTime() )
   {
     uint8_t interruptEffect = 0;
     if( m_interruptType == ActionInterruptType::DamageInterrupt )
@@ -401,6 +404,8 @@ void Action::Action::execute()
   {
     pScriptMgr->onEObjHit( *player, m_targetId, getId() );
   }
+
+  m_started = false;
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
