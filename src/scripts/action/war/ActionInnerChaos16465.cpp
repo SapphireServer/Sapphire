@@ -28,6 +28,7 @@ public:
     else
     {
       action.disableGenericHandler();
+      action.interrupt();
     }
   }
 };

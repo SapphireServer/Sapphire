@@ -92,10 +92,12 @@ void Action::EventAction::execute()
 
 }
 
-void Action::EventAction::interrupt()
+void Action::EventAction::interrupt( Common::ActionInterruptType type )
 {
   if( !m_pSource )
     return;
+
+  m_interruptType = type;
 
   try
   {

@@ -200,7 +200,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
   player.setPos( updatePositionPacket.data().position );
 
   if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
-    player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+    player.getCurrentAction()->interrupt();
 
   // if no one is in range, don't bother trying to send a position update
   if( !player.hasInRangeActor() )

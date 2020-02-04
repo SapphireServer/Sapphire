@@ -140,7 +140,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::CastCancel: // Cancel cast
     {
       if( player.getCurrentAction() )
-        player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+        player.getCurrentAction()->interrupt();
       break;
     }
     case ClientTriggerType::Examine:

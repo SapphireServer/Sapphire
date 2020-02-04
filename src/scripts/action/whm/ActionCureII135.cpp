@@ -29,7 +29,7 @@ public:
     }
   }
 
-  void onStart( Sapphire::World::Action::Action& action ) override
+  void onBeforePreCheck( Sapphire::World::Action::Action& action ) override
   {
     auto effectEntry = action.getSourceChara()->getStatusEffectById( STATUS_ID_FREECURE );
     if( effectEntry.second )

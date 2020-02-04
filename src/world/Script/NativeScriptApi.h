@@ -140,6 +140,8 @@ namespace Sapphire::ScriptAPI
   public:
     explicit ActionScript( uint32_t actionId );
 
+    virtual void onBeforePreCheck( Sapphire::World::Action::Action& action );
+
     virtual void onStart( Sapphire::World::Action::Action& action );
 
     virtual void onExecute( Sapphire::World::Action::Action& action );

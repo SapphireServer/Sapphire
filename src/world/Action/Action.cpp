@@ -200,11 +200,6 @@ Common::ActionInterruptType Action::Action::getInterruptType() const
   return m_interruptType;
 }
 
-void Action::Action::setInterrupted( Common::ActionInterruptType type )
-{
-  m_interruptType = type;
-}
-
 uint32_t Action::Action::getCastTime() const
 {
   return m_castTimeMs;
@@ -268,7 +263,6 @@ bool Action::Action::update()
     if( !m_pTarget->isAlive() )
     {
       // interrupt the cast if target died
-      setInterrupted( Common::ActionInterruptType::RegularInterrupt );
       interrupt();
       return true;
     }
@@ -319,14 +313,22 @@ void Action::Action::start()
     player->queuePacket( actionStartPkt );
   }
 
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  pScriptMgr->onStart( *this );
+
   // instantly finish cast if there's no cast time
   if( !hasCastTime() )
     execute();
 }
 
-void Action::Action::interrupt()
+void Action::Action::interrupt( ActionInterruptType type )
 {
+  if( isInterrupted() )
+    return;
+
   assert( m_pSource );
+
+  m_interruptType = type;
 
   // things that aren't players don't care about cooldowns and state flags
   if( m_pSource->isPlayer() )
@@ -436,6 +438,9 @@ void Action::Action::buildEffects()
   auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
 
   pScriptMgr->onExecute( *this );
+
+  if( isInterrupted() )
+    return;
 
   if( m_disableGenericHandler || !hasValidLutEntry() )
   {
@@ -571,6 +576,12 @@ void Action::Action::buildEffects()
 
 bool Action::Action::preCheck()
 {
+  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  pScriptMgr->onBeforePreCheck( *this );
+
+  if( isInterrupted() )
+    return false;
+
   if( auto player = m_pSource->getAsPlayer() )
   {
     if( !playerPreCheck( *player ) )

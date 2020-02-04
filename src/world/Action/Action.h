@@ -41,7 +41,6 @@ namespace Sapphire::World::Action
 
     bool isInterrupted() const;
     Common::ActionInterruptType getInterruptType() const;
-    void setInterrupted( Common::ActionInterruptType type );
 
     uint32_t getCastTime() const;
     void setCastTime( uint32_t castTime );
@@ -154,7 +153,7 @@ namespace Sapphire::World::Action
      *
      * m_interruptType will have the reason why the action was interrupted (eg. damage, movement, ...)
      */
-    virtual void interrupt();
+    virtual void interrupt( Common::ActionInterruptType type = Common::ActionInterruptType::RegularInterrupt );
 
     /*!
      * @brief Called on each player update tick

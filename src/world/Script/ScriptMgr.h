@@ -72,6 +72,8 @@ namespace Sapphire::Scripting
 
     bool onEObjHit( Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
+    bool onBeforePreCheck( World::Action::Action& action );
+
     bool onStart( World::Action::Action& action );
 
     bool onInterrupt( World::Action::Action& action );

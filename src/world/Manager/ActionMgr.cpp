@@ -101,17 +101,20 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
+  for( const auto& statusIt : player.getStatusEffectMap() )
+  {
+    statusIt.second->onBeforeActionStart( currentAction );
+  }
+
+  if( currentAction->isInterrupted() )
+    return;
+  
   if( !currentAction->preCheck() )
   {
     player.sendDebug( "preCheck failed" );
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
-  }
-
-  for( const auto& statusIt : player.getStatusEffectMap() )
-  {
-    statusIt.second->onBeforeActionStart( currentAction );
   }
 
   if( player.getCurrentAction() )
