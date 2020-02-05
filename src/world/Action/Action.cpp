@@ -475,14 +475,52 @@ void Action::Action::buildEffects()
     if( m_lutEntry.damagePotency > 0 )
     {
       Common::AttackType attackType = static_cast< Common::AttackType >( m_actionData->attackType );
-
+      actor->onActionHostile( m_pSource );
+      
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
       dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, attackType );
+
+      float originalDamage = dmg.first;
+      bool dodged = false;
+      float blocked = 0;
+      float parried = 0;
+
       if( dmg.first > 0 )
       {
-        actor->onActionHostile( m_pSource );
+        dodged = Math::CalcStats::calcDodge( *actor );
+
+        if( !dodged && dmg.second == Common::ActionHitSeverityType::NormalDamage && actor->isPlayer() )
+        {
+          blocked = Math::CalcStats::calcBlock( *actor, dmg.first );
+        }
+
+        if( !dodged && blocked == 0 && dmg.second == Common::ActionHitSeverityType::NormalDamage && actor->isPlayer() )
+        {
+          if( isPhysical() )
+          {
+            parried = Math::CalcStats::calcParry( *actor, dmg.first );
+          }
+        }
+      }
+
+      if( dodged )
+        dmg.first = 0;
+      else
+      {
+        dmg.first -= blocked;
+        dmg.first -= parried;
+      }
+
+      if( dmg.first > 0 )
+      {
         dmg.first = actor->applyShieldProtection( dmg.first );
-        m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
+        if( blocked > 0 )
+          m_effectBuilder->blockedDamage( actor, actor, dmg.first, static_cast< uint16_t >( blocked / originalDamage * 100 ) , dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
+        else if (parried > 0 )
+          m_effectBuilder->parriedDamage( actor, actor, dmg.first, static_cast< uint16_t >( parried / originalDamage * 100 ), dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
+        else
+          m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
+
 
         if( m_isAutoAttack && m_pSource->isPlayer() )
         {
@@ -494,31 +532,38 @@ void Action::Action::buildEffects()
             }
           }
         }
-      }
 
-      auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
-                          attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
-                        ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
-      if( reflectDmg.first > 0 )
+        auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
+          attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
+          ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
+        if( reflectDmg.first > 0 )
+        {
+          m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+        }
+
+        auto absorb = Math::CalcStats::calcAbsorbHP( m_pSource, dmg.first );
+        if( absorb > 0 )
+        {
+          if( absorb > actor->getHp() )
+            absorb = actor->getHp();
+          m_effectBuilder->heal( actor, m_pSource, absorb, Common::ActionHitSeverityType::NormalHeal, Common::ActionEffectResultFlag::EffectOnSource );
+        }
+      }
+      else
       {
-        m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected );
+        if( dodged )
+        {
+          m_effectBuilder->dodge( actor, actor );
+        }
       }
 
-      auto absorb = Math::CalcStats::calcAbsorbHP( m_pSource, dmg.first, Common::ActionTypeFilter::All );
-      if( absorb > 0 )
-      {
-        if( absorb > actor->getHp() )
-          absorb = actor->getHp();
-        m_effectBuilder->heal( actor, m_pSource, absorb, Common::ActionHitSeverityType::NormalHeal, Common::ActionEffectResultFlag::EffectOnSource );
-      }
-
-      if( isCorrectCombo() && shouldApplyComboSucceedEffect )
+      if( dmg.first > 0 && isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
         m_effectBuilder->comboSucceed( actor );
         shouldApplyComboSucceedEffect = false;
       }
 
-      if( !isComboAction() || isCorrectCombo() )
+      if( dmg.first > 0 && ( !isComboAction() || isCorrectCombo() ) )
       {
         if ( !m_actionData->preservesCombo ) // this matches retail packet, on all standalone actions even casts.
         {

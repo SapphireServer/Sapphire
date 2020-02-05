@@ -15,10 +15,14 @@ namespace Sapphire::Math
 
     static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
 
+    static float dodgeProbability( const Sapphire::Entity::Chara& chara );
+
     /*!
      * @brief Calculates the probability of a block happening
      */
     static float blockProbability( const Sapphire::Entity::Chara& chara );
+
+    static float parryProbability( const Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates the probability of a direct hit happening
@@ -115,6 +119,8 @@ namespace Sapphire::Math
      */
     static float blockStrength( const Sapphire::Entity::Chara& chara );
 
+    static float parryStrength( const Sapphire::Entity::Chara& chara );
+
     static float autoAttack( const Sapphire::Entity::Chara& chara );
 
     /*!
@@ -146,7 +152,13 @@ namespace Sapphire::Math
 
     static std::pair< float, Sapphire::Common::ActionHitSeverityType > calcDamageReflect( Sapphire::Entity::CharaPtr pCharaAttacker, Sapphire::Entity::CharaPtr pCharaVictim, float damage, Sapphire::Common::ActionTypeFilter filter );
 
-    static float calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, Sapphire::Common::ActionTypeFilter filter );
+    static float calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage );
+
+    static bool calcDodge( const Sapphire::Entity::Chara& chara );
+
+    static float calcBlock( const Sapphire::Entity::Chara& chara, float damage );
+
+    static float calcParry( const Sapphire::Entity::Chara& chara, float damage );
 
     static uint32_t getRandomNumber0To99();
   private:

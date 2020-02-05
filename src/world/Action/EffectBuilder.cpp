@@ -57,10 +57,31 @@ void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& resto
   moveToResultList( target, nextResult );
 }
 
+void EffectBuilder::dodge( Entity::CharaPtr& effectTarget, Entity::CharaPtr& dodgingTarget, Common::ActionEffectResultFlag flag )
+{
+  EffectResultPtr nextResult = make_EffectResult( dodgingTarget, 0 );
+  nextResult->dodge( flag );
+  moveToResultList( effectTarget, nextResult );
+}
+
 void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
   EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->damage( amount, severity, flag );
+  moveToResultList( effectTarget, nextResult );
+}
+
+void EffectBuilder::blockedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->blockedDamage( amount, rate, flag );
+  moveToResultList( effectTarget, nextResult );
+}
+
+void EffectBuilder::parriedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->parriedDamage( amount, rate, flag );
   moveToResultList( effectTarget, nextResult );
 }
 

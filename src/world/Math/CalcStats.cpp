@@ -185,13 +185,50 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   return result;
 }
 
+float CalcStats::dodgeProbability( const Sapphire::Entity::Chara& chara )
+{
+  // fake value: 5% for players.
+  return chara.isPlayer() ? 5 : 0;
+}
+
 float CalcStats::blockProbability( const Chara& chara )
 {
+  // fake value: 20% for pld.
+  float result = chara.getClass() == Common::ClassJob::Paladin ? 20 : 0;
+  /*
   auto level = chara.getLevel();
   auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( ( 30 * blockRate ) / levelVal + 10 );
+  float result = std::floor( ( 30 * blockRate ) / levelVal + 10 );
+  */
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::BlockParryRateBonus )
+      continue;
+    result += effectEntry.effectValue2;
+  }
+
+  return result;
+}
+
+float CalcStats::parryProbability( const Sapphire::Entity::Chara& chara )
+{
+  // fake value: 10% for players.
+  float result = chara.isPlayer() ? 10 : 0;
+
+  for( auto const& entry : chara.getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+    if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::BlockParryRateBonus )
+      continue;
+    result += effectEntry.effectValue3;
+  }
+
+  return result;
 }
 
 float CalcStats::directHitProbability( const Chara& chara, Sapphire::Common::CritDHBonusFilter filter )
@@ -453,6 +490,11 @@ float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockStrength ) / levelVal + 10 ) / 100.f;
+}
+
+float CalcStats::parryStrength( const Sapphire::Entity::Chara& chara )
+{
+  return 0.15f;
 }
 
 float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
@@ -780,7 +822,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamag
   return std::pair< float, Sapphire::Common::ActionHitSeverityType >( 0, Sapphire::Common::ActionHitSeverityType::NormalDamage );
 }
 
-float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, Sapphire::Common::ActionTypeFilter filter )
+float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage )
 {
   float result = 0;
   for( auto const& entry : pChara->getStatusEffectMap() )
@@ -797,6 +839,33 @@ float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage, 
     }
   }
   return result;
+}
+
+bool CalcStats::calcDodge( const Sapphire::Entity::Chara& chara )
+{
+  if( dodgeProbability( chara ) > getRandomNumber0To99() )
+  {
+    return true;
+  }
+  return false;
+}
+
+float CalcStats::calcBlock( const Sapphire::Entity::Chara& chara, float damage )
+{
+  if( blockProbability( chara ) > getRandomNumber0To99() )
+  {
+    return damage * blockStrength( chara );
+  }
+  return 0;
+}
+
+float CalcStats::calcParry( const Sapphire::Entity::Chara& chara, float damage )
+{
+  if( parryProbability( chara ) > getRandomNumber0To99() )
+  {
+    return damage * parryStrength( chara );
+  }
+  return 0;
 }
 
 uint32_t CalcStats::getRandomNumber0To99()

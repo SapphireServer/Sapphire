@@ -50,6 +50,13 @@ uint64_t EffectResult::getDelay()
   return m_delayMs;
 }
 
+void EffectResult::dodge( Common::ActionEffectResultFlag flag )
+{
+  m_flag = flag;
+
+  m_type = Common::ActionEffectType::Miss;
+}
+
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   m_param0 = static_cast< uint8_t >( severity );
@@ -57,6 +64,24 @@ void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severi
   m_flag = flag;
 
   m_type = Common::ActionEffectType::Damage;
+}
+
+void EffectResult::blockedDamage( uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag )
+{
+  m_value = amount;
+  m_flag = flag;
+  m_param2 = rate;
+
+  m_type = Common::ActionEffectType::BlockedDamage;
+}
+
+void EffectResult::parriedDamage( uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag )
+{
+  m_value = amount;
+  m_flag = flag;
+  m_param2 = rate;
+
+  m_type = Common::ActionEffectType::ParriedDamage;
 }
 
 void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )

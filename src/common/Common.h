@@ -1044,6 +1044,7 @@ namespace Sapphire::Common
     MPRestore = 11,
     Haste = 12,
     InstantCast = 13,
+    BlockParryRateBonus = 14,
   };
 
   enum class ActionTypeFilter : int32_t
