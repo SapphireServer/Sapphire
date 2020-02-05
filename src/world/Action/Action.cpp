@@ -483,6 +483,17 @@ void Action::Action::buildEffects()
         actor->onActionHostile( m_pSource );
         dmg.first = actor->applyShieldProtection( dmg.first );
         m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
+
+        if( m_isAutoAttack && m_pSource->isPlayer() )
+        {
+          if( auto player = m_pSource->getAsPlayer() )
+          {
+            if( player->getClass() == Common::ClassJob::Paladin )
+            {
+              player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
+            }
+          }
+        }
       }
 
       auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
@@ -730,6 +741,23 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
         {
           if( subtractCosts )
             pPlayer->gaugeWarSetIb( ib - m_primaryCost );
+
+          return true;
+        }
+      }
+      return false;
+    }
+
+    case Common::ActionPrimaryCostType::PLDGauge:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto oath = pPlayer->gaugePldGetOath();
+        if( oath >= m_primaryCost )
+        {
+          if( subtractCosts )
+            pPlayer->gaugePldSetOath( oath - m_primaryCost );
 
           return true;
         }

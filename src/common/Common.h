@@ -586,7 +586,7 @@ namespace Sapphire::Common
 //    DRKGauge = 25,
 //    AetherflowStack = 30,
 //    Status = 32,
-//    PLDGauge = 41,
+    PLDGauge = 41,
 //    RDMGaugeBoth = 74,
 ////  RDMGaugeBlack = 75, // not right?
 //    DRGGauge3Eyes = 76,

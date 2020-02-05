@@ -983,6 +983,9 @@ namespace Sapphire::Entity
     void gaugeWarSetIb( uint8_t value );
     uint8_t gaugeWarGetIb();
 
+    void gaugePldSetOath( uint8_t value );
+    uint8_t gaugePldGetOath();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );

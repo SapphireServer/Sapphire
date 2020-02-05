@@ -2206,3 +2206,16 @@ uint8_t Sapphire::Entity::Player::gaugeWarGetIb()
 {
   return gaugeGet( 0 );
 }
+
+void Sapphire::Entity::Player::gaugePldSetOath( uint8_t value )
+{
+  auto oldValue = gaugePldGetOath();
+  gaugeSet( 0, value );
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+uint8_t Sapphire::Entity::Player::gaugePldGetOath()
+{
+  return gaugeGet( 0 );
+}
