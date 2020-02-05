@@ -168,6 +168,8 @@ void EffectResult::execute()
   switch( m_type )
   {
     case Common::ActionEffectType::Damage:
+    case Common::ActionEffectType::BlockedDamage:
+    case Common::ActionEffectType::ParriedDamage:
     {
       m_target->takeDamage( m_value );
       break;
