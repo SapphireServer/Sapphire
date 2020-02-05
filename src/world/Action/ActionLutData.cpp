@@ -59,8 +59,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 29, { 370, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 5 } },
 
   //Sheltron, シェルトロン
-  //applies to self: Sheltron, シェルトロン, duration 10000, param 0
-  { 3542, { 0, 0, 0, 0, 1856, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  //applies to self: Sheltron, シェルトロン, duration 6000, param 0
+  { 3542, { 0, 0, 0, 0, 1856, 6000, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Prominence, プロミネンス
   //has damage: potency 100, combo potency 220, directional potency 0
@@ -3521,5 +3521,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
 
   //Swiftcast, 迅速魔: InstantCast, 1 casts
   { 167, { 13, 1, 0, 0, 0 } },
+
+  //Sheltron, シェルトロン: BlockParryRateBonus, block 100%, parry 0%
+  { 1856, { 14, 0, 100, 0, 0 } },
 
 };
