@@ -140,7 +140,7 @@ namespace xiv
 namespace dat
 {
 
-Dat::Dat( const std::experimental::filesystem::path& i_path, uint32_t i_nb ) :
+Dat::Dat( const std::filesystem::path& i_path, uint32_t i_nb ) :
    SqPack( i_path ),
    m_num( i_nb )
 {

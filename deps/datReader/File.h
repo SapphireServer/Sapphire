@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include <experimental/filesystem>
+#include <filesystem>
 #include <stdint.h>
 #include "bparse.h"
 
@@ -43,7 +43,7 @@ namespace xiv
          const std::vector<std::vector<char>>& get_data_sections() const;
          std::vector<std::vector<char>>& access_data_sections();
 
-         void exportToFile( const std::experimental::filesystem::path& i_path ) const;
+         void exportToFile( const std::filesystem::path& i_path ) const;
 
       protected:
          FileType _type;

@@ -3,7 +3,7 @@
 
 #include <chrono>
 #include <cstdint>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -16,7 +16,7 @@ class ObjExporter
 public:
   static std::string exportZone( const ExportedZone& zone )
   {
-    static std::string currPath = std::experimental::filesystem::current_path().string();
+    static std::string currPath = std::filesystem::current_path().string();
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -25,9 +25,9 @@ public:
 
     std::error_code e;
 
-    if( !std::experimental::filesystem::exists( dir, e ) )
+    if( !std::filesystem::exists( dir, e ) )
     {
-      if( !std::experimental::filesystem::create_directories( dir, e ) )
+      if( !std::filesystem::create_directories( dir, e ) )
       {
         printf( "Unable to create directory '%s'", ( dir ).c_str() );
         return "";
@@ -59,7 +59,7 @@ public:
 
   static std::string exportGroup( const std::string& zoneName, const ExportedGroup& group )
   {
-    static std::string currPath = std::experimental::filesystem::current_path().string();
+    static std::string currPath = std::filesystem::current_path().string();
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -67,9 +67,9 @@ public:
     auto fileName = dir + group.name + ".obj";
 
     std::error_code e;
-    if( !std::experimental::filesystem::exists( dir, e ) )
+    if( !std::filesystem::exists( dir, e ) )
     {
-      if( !std::experimental::filesystem::create_directories( dir, e ) )
+      if( !std::filesystem::create_directories( dir, e ) )
       {
         printf( "Unable to create directory '%s'", ( dir ).c_str() );
         return "";

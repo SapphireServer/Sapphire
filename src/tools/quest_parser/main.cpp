@@ -6,7 +6,7 @@
 #include <string>
 #include <cstring>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include <Exd.h>
 #include <ExdCat.h>
@@ -21,7 +21,7 @@
 #include <algorithm>
 
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 using namespace Sapphire;
 
 const std::string onTalkStr(
