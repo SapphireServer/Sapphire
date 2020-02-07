@@ -33,7 +33,7 @@ public:
     {
       player.playScene( eventId, 2, 0, [this]( Entity::Player& player, const Event::SceneResult& result )
       {
-        if( result.param1 == 256 )
+        if( result.param1 == 256 && result.param2 != 0 )
         {
           player.teleport( result.param2, 2 );
         }
@@ -69,7 +69,7 @@ public:
         }
         else if( result.param1 == 512 ) // aethernet access
         {
-          if( result.param2 == 4 )
+          if( result.param2 == 4 && result.param3 != 0 )
           {
             player.teleport( result.param3, 2 );
           }
