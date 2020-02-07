@@ -5,7 +5,7 @@
 #include <memory>
 #include <mutex>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 namespace xiv
 {
@@ -34,7 +34,7 @@ namespace xiv
           const Cat& get_category(const std::string& i_cat_name);
 
           // Export in csv in base flder i_ouput_path
-          void export_as_csvs(const std::experimental::filesystem::path& i_output_path);
+          void export_as_csvs(const std::filesystem::path& i_output_path);
 
       protected:
           // Lazy instantiation of category

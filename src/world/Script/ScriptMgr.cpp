@@ -27,7 +27,7 @@
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 Sapphire::Scripting::ScriptMgr::ScriptMgr( FrameworkPtr pFw ) :
   World::Manager::BaseManager( pFw ),

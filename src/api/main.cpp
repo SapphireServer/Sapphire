@@ -22,7 +22,7 @@
 //Added for the default_resource example
 #include <fstream>
 #include <string>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <vector>
 #include <algorithm>
 
@@ -39,7 +39,7 @@ Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
 Sapphire::Api::SapphireApi g_sapphireAPI;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 using namespace std;
 using namespace Sapphire;

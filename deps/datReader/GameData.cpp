@@ -53,7 +53,7 @@ namespace xiv
 namespace dat
 {
 
-GameData::GameData(const std::experimental::filesystem::path& path) try :
+GameData::GameData(const std::filesystem::path& path) try :
     m_path(path)
 {
    int maxExLevel = 0;
@@ -62,18 +62,18 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
 #ifdef _WIN32
   static constexpr auto sep = "\\";
 #else
-  static constexpr auto sep = std::experimental::filesystem::path::preferred_separator;
+  static constexpr auto sep = std::filesystem::path::preferred_separator;
 #endif
   
    // Determine which expansions are available
-   while( std::experimental::filesystem::exists( std::experimental::filesystem::path( m_path.string() + sep + "ex" + std::to_string( maxExLevel + 1 ) + sep + "ex" + std::to_string( maxExLevel + 1 ) + ".ver" ) ) )
+   while( std::filesystem::exists( std::filesystem::path( m_path.string() + sep + "ex" + std::to_string( maxExLevel + 1 ) + sep + "ex" + std::to_string( maxExLevel + 1 ) + ".ver" ) ) )
    {
       maxExLevel++;
    }
    
 
    // Iterate over the files in path
-   for( auto it = std::experimental::filesystem::directory_iterator( m_path.string() + "//ffxiv" ); it != std::experimental::filesystem::directory_iterator(); ++it )
+   for( auto it = std::filesystem::directory_iterator( m_path.string() + "//ffxiv" ); it != std::filesystem::directory_iterator(); ++it )
    {
       // Get the filename of the current element
       auto filename = it->path().filename().string();
@@ -99,14 +99,14 @@ GameData::GameData(const std::experimental::filesystem::path& path) try :
          {
             const std::string path = m_path.string() + sep + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, 0, "win32", "index" );
 
-            if( std::experimental::filesystem::exists( std::experimental::filesystem::path( path ) ) )
+            if( std::filesystem::exists( std::filesystem::path( path ) ) )
             {
 
                int chunkCount = 0;
 
                for(int chunkTest = 0; chunkTest < 256; chunkTest++ )
                {
-                  if( std::experimental::filesystem::exists( m_path.string() + sep + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, chunkTest, "win32", "index" ) ) )
+                  if( std::filesystem::exists( m_path.string() + sep + buildDatStr( "ex" + std::to_string( exNum ), cat_nb, exNum, chunkTest, "win32", "index" ) ) )
                   {
                      m_exCats[cat_nb].exNumToChunkMap[exNum].chunkToCatMap[chunkTest] = std::unique_ptr<Cat>();
                      chunkCount++;

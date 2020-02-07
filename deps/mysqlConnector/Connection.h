@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <string>
+
 #include "MysqlCommon.h"
 
 typedef struct st_mysql MYSQL;
