@@ -87,7 +87,6 @@ bool Action::Action::init()
   {
     auto haste = m_pSource->getStatValue( Common::BaseParam::Haste );
     m_castTimeMs = static_cast< uint32_t >( m_castTimeMs * ( m_pSource->getStatValue( Common::BaseParam::Haste ) / 100.0f ) );
-    m_recastTimeMs = static_cast< uint32_t >( m_recastTimeMs * ( m_pSource->getStatValue( Common::BaseParam::Haste ) / 100.0f ) );
   }
 
   m_cooldownGroup = m_actionData->cooldownGroup;
