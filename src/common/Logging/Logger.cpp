@@ -8,9 +8,9 @@
 #include <spdlog/sinks/daily_file_sink.h>
 
 // #include <iostream>
-#include <experimental/filesystem> // or #include <filesystem>
+#include <filesystem> // or #include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void Sapphire::Logger::init( const std::string& logPath )
 {

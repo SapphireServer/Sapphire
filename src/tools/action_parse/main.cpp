@@ -17,11 +17,11 @@
 #include <streambuf>
 #include <regex>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 Sapphire::Data::ExdDataGenerated g_exdData;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 using namespace Sapphire;
 

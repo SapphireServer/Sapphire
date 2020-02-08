@@ -12,9 +12,9 @@
 #include "obj_exporter.h"
 #include "nav/TiledNavmeshGenerator.h"
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 class NavmeshExporter
 {
@@ -23,7 +23,7 @@ public:
   {
     auto start = std::chrono::high_resolution_clock::now();
 
-    static std::string currPath = std::experimental::filesystem::current_path().string();
+    static std::string currPath = std::filesystem::current_path().string();
 
     auto dir = fs::current_path().string() + "/pcb_export/" + zone.name + "/";
     auto fileName = dir + zone.name;

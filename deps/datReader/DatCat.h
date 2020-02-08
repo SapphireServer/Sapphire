@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <vector>
-#include <experimental/filesystem>
+#include <filesystem>
 
 namespace xiv {
 namespace dat {
@@ -19,14 +19,14 @@ public:
    // basePath: Path to the folder containingthe datfiles
    // catNum: The number of the category
    // name: The name of the category, empty if not known
-   Cat( const std::experimental::filesystem::path& basePath, uint32_t catNum, const std::string& name );
+   Cat( const std::filesystem::path& basePath, uint32_t catNum, const std::string& name );
 
    // basePath: Path to the folder containingthe datfiles
    // catNum: The number of the category
    // name: The name of the category, empty if not known
    // exNum: The number of the expansion to load from
    // chunk: The chunk to load from
-   Cat( const std::experimental::filesystem::path& basePath, uint32_t catNum, const std::string& name, uint32_t exNum, uint32_t chunk );
+   Cat( const std::filesystem::path& basePath, uint32_t catNum, const std::string& name, uint32_t exNum, uint32_t chunk );
    ~Cat();
 
    // Returns .index of the category

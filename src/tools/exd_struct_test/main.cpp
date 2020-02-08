@@ -22,7 +22,7 @@
 
 #include <Util/CrashHandler.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 Sapphire::Common::Util::CrashHandler crashHandler;
 
@@ -31,7 +31,7 @@ xiv::dat::GameData* gameData = nullptr;
 
 using namespace Sapphire;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
 const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );

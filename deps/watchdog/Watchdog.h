@@ -31,8 +31,8 @@
 #include <mutex>
 
 #include <functional>
-#include <experimental/filesystem>
-namespace ci { namespace fs = std::experimental::filesystem; }
+#include <filesystem>
+namespace ci { namespace fs = std::filesystem; }
 
 //! Exception for when Watchdog can't locate a file or parse the wildcard
 class WatchedFileSystemExc : public std::exception {
@@ -319,7 +319,7 @@ protected:
       std::string                                                               mFilter;
       std::function<void(const ci::fs::path&)>                                  mCallback;
       std::function<void(const std::vector<ci::fs::path>&)>                     mListCallback;
-      std::map< std::string, std::experimental::filesystem::file_time_type >    mModificationTimes;
+      std::map< std::string, std::filesystem::file_time_type >    mModificationTimes;
    };
 
    std::mutex                      mMutex;
