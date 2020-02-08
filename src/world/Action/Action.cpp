@@ -465,9 +465,7 @@ void Action::Action::buildEffects()
                        m_lutEntry.bonusEffect, m_lutEntry.bonusRequirement, m_lutEntry.bonusDataUInt32 );
   }
 
-  // when aoe, these effects are in the target whatever is hit first
-  bool shouldGainPower = true;
-  bool shouldApplyComboSucceedEffect = true;
+  bool isFirstValidVictim = true;
 
   for( auto& actor : m_hitActors )
   {
@@ -520,18 +518,6 @@ void Action::Action::buildEffects()
         else
           m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None );
 
-
-        if( m_isAutoAttack && m_pSource->isPlayer() )
-        {
-          if( auto player = m_pSource->getAsPlayer() )
-          {
-            if( player->getClass() == Common::ClassJob::Paladin )
-            {
-              player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
-            }
-          }
-        }
-
         auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
           attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
           ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
@@ -554,19 +540,71 @@ void Action::Action::buildEffects()
         {
           m_effectBuilder->dodge( actor, actor );
         }
-      }
-
-      if( dmg.first > 0 && isCorrectCombo() && shouldApplyComboSucceedEffect )
-      {
-        m_effectBuilder->comboSucceed( actor );
-        shouldApplyComboSucceedEffect = false;
-      }
-
-      if( dmg.first > 0 && ( !isComboAction() || isCorrectCombo() ) )
-      {
-        if ( !m_actionData->preservesCombo ) // this matches retail packet, on all standalone actions even casts.
+        else
         {
-          m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
+          // todo: no effect or invulnerable
+        }
+      }
+
+      if( !dodged )
+      {
+        if( ( !isComboAction() || isCorrectCombo() ) )
+        {
+          if ( !m_actionData->preservesCombo ) // this matches retail packet, on all standalone actions even casts.
+          {
+            m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
+          }
+        }
+
+        if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::SelfHeal )
+        {
+          if( checkActionBonusRequirement() )
+          {
+            auto heal = calcHealing( m_lutEntry.bonusDataUInt16L );
+            heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
+            m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
+          }
+        }
+
+        if( isFirstValidVictim )
+        {
+          isFirstValidVictim = false;
+
+          if( isCorrectCombo() )
+            m_effectBuilder->comboSucceed( actor );
+
+          if( m_isAutoAttack && m_pSource->isPlayer() )
+          {
+            if( auto player = m_pSource->getAsPlayer() )
+            {
+              if( player->getClass() == Common::ClassJob::Paladin )
+              {
+                player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
+              }
+            }
+          }
+
+          if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainMPPercentage )
+          {
+            if( checkActionBonusRequirement() )
+              m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.bonusDataUInt16L / 100, Common::ActionEffectResultFlag::EffectOnSource );
+          }
+
+          if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource )
+          {
+            if( checkActionBonusRequirement() )
+            {
+              switch( static_cast< Common::ClassJob >( m_lutEntry.bonusDataByte3 ) )
+              {
+                case Common::ClassJob::Marauder:
+                case Common::ClassJob::Warrior:
+                {
+                  player->gaugeWarSetIb( std::min( 100, player->gaugeWarGetIb() + m_lutEntry.bonusDataByte4 ) );
+                  break;
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -576,42 +614,6 @@ void Action::Action::buildEffects()
       auto heal = calcHealing( m_lutEntry.healPotency );
       heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first );
       m_effectBuilder->heal( actor, actor, heal.first, heal.second );
-    }
-
-    if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::SelfHeal )
-    {
-      if( checkActionBonusRequirement() )
-      {
-        auto heal = calcHealing( m_lutEntry.bonusDataUInt16L );
-        heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
-        m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
-      }
-    }
-
-    if( shouldGainPower )
-    {
-      if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainMPPercentage )
-      {
-        if( checkActionBonusRequirement() )
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.bonusDataUInt16L / 100, Common::ActionEffectResultFlag::EffectOnSource );
-      }
-
-      if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource )
-      {
-        if( checkActionBonusRequirement() )
-        {
-          switch( static_cast< Common::ClassJob >( m_lutEntry.bonusDataByte3 ) )
-          {
-            case Common::ClassJob::Marauder:
-            case Common::ClassJob::Warrior:
-            {
-              player->gaugeWarSetIb( std::min( 100, player->gaugeWarGetIb() + m_lutEntry.bonusDataByte4 ) );
-              break;
-            }
-          }
-        }
-      }
-      shouldGainPower = false;
     }
 
     if( m_lutEntry.targetStatus != 0 )
