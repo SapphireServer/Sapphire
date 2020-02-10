@@ -18,7 +18,7 @@ Sapphire requires the following software:
 
 | *Name* | *Windows* | *Linux* |
 | ------ | --------- | ------- |
-| CMake 3.0.2+ and C++17 capable compiler | [Visual Studio 2019](https://www.visualstudio.com/) | `gcc 8` and `g++ 8` or newer, alternatively, `clang 8` and `clang++ 8` or newer. |
+| CMake 3.0.2+ and C++17 capable compiler | [Visual Studio 2019](https://www.visualstudio.com/) | `gcc 8` and `g++ 8` or newer, or equivalent `clang` version. |
 | MySQL Server 5.7 | [Official Site](https://dev.mysql.com/downloads/mysql/) | MySQL server from your distribution's package manager |
 
 Please check the [wiki](https://github.com/SapphireMordred/Sapphire/wiki) for detailed installation/build instructions for your OS.
