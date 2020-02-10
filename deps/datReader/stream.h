@@ -5,23 +5,17 @@
 #include <iostream>
 #include <vector>
 
-namespace xiv
+namespace xiv::utils::stream
 {
-namespace utils
-{
-namespace stream
-{
-template<typename CharT, typename TraitsT = std::char_traits<CharT> >
-class vectorwrapbuf : public std::basic_streambuf<CharT, TraitsT> 
-{
-public:
-    vectorwrapbuf(std::vector<CharT> &vec) 
+  template< typename CharT, typename TraitsT = std::char_traits< CharT > >
+  class vectorwrapbuf :
+    public std::basic_streambuf< CharT, TraitsT >
+  {
+  public:
+    vectorwrapbuf( std::vector< CharT >& vec )
     {
-        this->setg(vec.data(), vec.data(), vec.data() + vec.size());
+      this->setg( vec.data(), vec.data(), vec.data() + vec.size() );
     }
-};
+  };
 }
-}    
-}
-
 #endif // XIV_UTILS_STREAM_H
