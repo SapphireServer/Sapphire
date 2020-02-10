@@ -54,12 +54,12 @@ using xiv::utils::bparse::extract;
 namespace xiv::dat
 {
 
-   // Open the file
-   SqPack::SqPack( const std::filesystem::path& path ) :
-      m_handle( path.string(), std::ios_base::in | std::ios_base::binary )
-   {
-      // Extract the header
-      extract<SqPackHeader>( m_handle );
+  // Open the file
+  SqPack::SqPack( const std::filesystem::path& path ) :
+    m_handle( path.string(), std::ios_base::in | std::ios_base::binary )
+  {
+    // Extract the header
+    extract< SqPackHeader >( m_handle );
 
     // Skip until the IndexHeader the extract it
     m_handle.seekg( 0x400 );
