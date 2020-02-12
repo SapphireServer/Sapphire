@@ -63,6 +63,7 @@ void MountAction::execute()
 {
   assert( m_pSource );
 
+  m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
   m_effectBuilder->mount( m_pSource, m_mountId );
   m_effectBuilder->buildAndSendPackets();
 }
