@@ -424,6 +424,7 @@ void Sapphire::Network::GameConnection::finishLoadingHandler( FrameworkPtr pFw,
   // spawn the player for himself
   player.spawn( player.getAsPlayer() );
 
+  player.gaugeClear();
   player.sendActorGauge();
 
   // notify the zone of a change in position to force an "inRangeActor" update
