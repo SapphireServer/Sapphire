@@ -316,7 +316,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
   int cid[512];// TODO: Make grow when returning too many items.
   const int ncid = rcGetChunksOverlappingRect( m_chunkyMesh, tbmin, tbmax, cid, 512 );
 
-  if ( !ncid )
+  if( !ncid )
   {
     rcFreeHeightField(m_solid);
     m_solid = nullptr;
