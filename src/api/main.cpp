@@ -671,8 +671,9 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
   print_request_info( request );
   try
   {
-    auto web_root_path = fs::canonical( "web" );
-    auto path = fs::canonical( web_root_path / request->path );
+    auto web_root_path = fs::current_path() / "web";
+    auto path = web_root_path / request->path;
+
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )

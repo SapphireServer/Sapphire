@@ -306,6 +306,12 @@ namespace SimpleWeb {
                     request->method=line.substr(0, method_end);
                     request->path=line.substr(method_end+1, path_end-method_end-1);
 
+                    // strip first / from path if it exists
+                    if( request->path[ 0 ] == '/' )
+                    {
+                      request->path = request->path.substr( 1 );
+                    }
+
                     size_t protocol_end;
                     if((protocol_end=line.find('/', path_end+1))!=std::string::npos) {
                         if(line.compare(path_end+1, protocol_end-path_end-1, "HTTP")!=0)
