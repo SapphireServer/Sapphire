@@ -37,11 +37,9 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.hPCurr = player.getHp();
       m_data.mPCurr = player.getMp();
-      m_data.tPCurr = player.getTp();
       m_data.hPMax = player.getMaxHp();
       m_data.mPMax = player.getMaxMp();
 
-      //m_data.tPMax = 3000;
       m_data.level = player.getLevel();
       m_data.gmRank = player.getGmRank();
       m_data.pose = player.getPose();
