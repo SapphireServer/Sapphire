@@ -671,8 +671,9 @@ void defaultGet( shared_ptr< HttpServer::Response > response, shared_ptr< HttpSe
   print_request_info( request );
   try
   {
-    auto web_root_path = fs::canonical( "web" );
-    auto path = fs::canonical( web_root_path / request->path );
+    auto web_root_path = fs::current_path() / "web";
+    auto path = web_root_path / request->path;
+
     //Check if path is within web_root_path
     if( distance( web_root_path.begin(), web_root_path.end() ) > distance( path.begin(), path.end() ) ||
         !std::equal( web_root_path.begin(), web_root_path.end(), path.begin() ) )
@@ -718,19 +719,19 @@ int main( int argc, char* argv[] )
 
   Logger::setLogLevel( m_config.global.general.logLevel );
 
-  server.resource[ "^/ZoneName/([0-9]+)$" ][ "GET" ] = &getZoneName;
-  server.resource[ "^/sapphire-api/lobby/createAccount" ][ "POST" ] = &createAccount;
-  server.resource[ "^/sapphire-api/lobby/login" ][ "POST" ] = &login;
-  server.resource[ "^/sapphire-api/lobby/deleteCharacter" ][ "POST" ] = &deleteCharacter;
-  server.resource[ "^/sapphire-api/lobby/createCharacter" ][ "POST" ] = &createCharacter;
-  server.resource[ "^/sapphire-api/lobby/insertSession" ][ "POST" ] = &insertSession;
-  server.resource[ "^/sapphire-api/lobby/checkNameTaken" ][ "POST" ] = &checkNameTaken;
-  server.resource[ "^/sapphire-api/lobby/checkSession" ][ "POST" ] = &checkSession;
-  server.resource[ "^/sapphire-api/lobby/getNextCharId" ][ "POST" ] = &getNextCharId;
-  server.resource[ "^/sapphire-api/lobby/getNextContentId" ][ "POST" ] = &getNextContentId;
-  server.resource[ "^/sapphire-api/lobby/getCharacterList" ][ "POST" ] = &getCharacterList;
-  server.resource[ "^(/frontier-api/ffxivsupport/view/get_init)(.*)" ][ "GET" ] = &get_init;
-  server.resource[ "^(/frontier-api/ffxivsupport/information/get_headline_all)(.*)" ][ "GET" ] = &get_headline_all;
+  server.resource[ "^ZoneName/([0-9]+)$" ][ "GET" ] = &getZoneName;
+  server.resource[ "^sapphire-api/lobby/createAccount" ][ "POST" ] = &createAccount;
+  server.resource[ "^sapphire-api/lobby/login" ][ "POST" ] = &login;
+  server.resource[ "^sapphire-api/lobby/deleteCharacter" ][ "POST" ] = &deleteCharacter;
+  server.resource[ "^sapphire-api/lobby/createCharacter" ][ "POST" ] = &createCharacter;
+  server.resource[ "^sapphire-api/lobby/insertSession" ][ "POST" ] = &insertSession;
+  server.resource[ "^sapphire-api/lobby/checkNameTaken" ][ "POST" ] = &checkNameTaken;
+  server.resource[ "^sapphire-api/lobby/checkSession" ][ "POST" ] = &checkSession;
+  server.resource[ "^sapphire-api/lobby/getNextCharId" ][ "POST" ] = &getNextCharId;
+  server.resource[ "^sapphire-api/lobby/getNextContentId" ][ "POST" ] = &getNextContentId;
+  server.resource[ "^sapphire-api/lobby/getCharacterList" ][ "POST" ] = &getCharacterList;
+  server.resource[ "^(frontier-api/ffxivsupport/view/get_init)(.*)" ][ "GET" ] = &get_init;
+  server.resource[ "^(frontier-api/ffxivsupport/information/get_headline_all)(.*)" ][ "GET" ] = &get_headline_all;
 
   server.default_resource[ "GET" ] = &defaultGet;
 
