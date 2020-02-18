@@ -44,15 +44,15 @@ namespace Sapphire::Network::Packets
   enum ServerZoneIpcType : uint16_t
   {
     Ping = 0x0106, // updated 5.2
-    Init = 0x0308, // updated 5.2
+    Init = 0x0307, // updated 5.2
 
     ActorFreeSpawn = 0x009B, // updated 5.18
     InitZone = 0x033A, // updated 5.2
 
-    EffectResult = 0x0267, // updated 5.18
-    ActorControl = 0x03BE, // updated 5.18
+    EffectResult = 0x0340, // updated 5.2
+    ActorControl = 0x01E1, // updated 5.2
     ActorControlSelf = 0x010E, // updated 5.2
-    ActorControlTarget = 0x24d, // updated 5.18
+    ActorControlTarget = 0x00AE, // updated 5.2
 
     /*!
      * @brief Used when resting
@@ -63,7 +63,7 @@ namespace Sapphire::Network::Packets
 
     ChatBanned = 0x006B,
     Playtime = 0x00E7, // updated 5.18
-    Logout = 0x142, // updated 5.18
+    Logout = 0x0A1, // updated 5.2
     CFNotify = 0x01F8, // updated 5.18
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
@@ -78,7 +78,7 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x02A3, // updated 5.18
+    Chat = 0x0000, // updated 5.18
 
     WorldVisitList = 0x00FE, // added 4.5
 
@@ -123,10 +123,10 @@ namespace Sapphire::Network::Packets
 
     FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
 
-    StatusEffectList = 0x0183, // updated 5.18
+    StatusEffectList = 0x0374, // updated 5.2
     EurekaStatusEffectList = 0x0167, // updated 5.18
     BossStatusEffectList = 0x0312, // added 5.1
-    Effect = 0x026B, // updated 5.18
+    Effect = 0x028A, // updated 5.2
     AoeEffect8 = 0x033E, // updated 5.18
     AoeEffect16 = 0x0305, // updated 5.18
     AoeEffect24 = 0x023F, // updated 5.18
@@ -138,9 +138,9 @@ namespace Sapphire::Network::Packets
     PlayerSpawn = 0x027D, // updated 5.2
     NpcSpawn = 0x034B, // updated 5.2
     NpcSpawn2 = 0x010C, // ( Bigger statuseffectlist? ) updated 5.18
-    ActorMove = 0x021B, // updated 5.18
+    ActorMove = 0x0130, // updated 5.2
 
-    ActorSetPos = 0x0068, // updated 5.18
+    ActorSetPos = 0x00CF, // updated 5.2
 
     ActorCast = 0x03B1, // updated 5.18
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
@@ -170,26 +170,26 @@ namespace Sapphire::Network::Packets
 
     ItemInfo = 0x03D4, // updated 5.2
     ContainerInfo = 0x01A5, // updated 5.2
-    InventoryTransactionFinish = 0x00D2, // updated 5.18
+    InventoryTransactionFinish = 0x02D7, // updated 5.2
     InventoryTransaction = 0x01D8, // updated 5.2
-    CurrencyCrystalInfo = 0x02BF, // updated 5.18
+    CurrencyCrystalInfo = 0x0277, // updated 5.2
 
     InventoryActionAck = 0x0094, // updated 5.2
-    UpdateInventorySlot = 0x0370, // updated 5.18
+    UpdateInventorySlot = 0x02E9, // updated 5.2
 
     HuntingLogEntry = 0x01B3, // updated 5.0
 
-    EventPlay = 0x0279, // updated 5.18
+    EventPlay = 0x01F3, // updated 5.2
     EventPlay4 = 0x02F7, // updated 5.18
     EventPlay8 = 0x0119, // updated 5.18
     EventPlay16 = 0x01FB, // updated 5.18
     EventPlay32 = 0x0364, // updated 5.18
     EventPlay64 = 0x00E5, // updated 5.18
     EventPlay128 = 0x02BE, // updated 5.18
-    EventPlay255 = 0x01B1, // updated 5.18
+    EventPlay255 = 0x03B0, // updated 5.2
 
-    EventStart = 0x0230, // updated 5.18
-    EventFinish = 0x01E4, // updated 5.18
+    EventStart = 0x023D, // updated 5.2
+    EventFinish = 0x0318, // updated 5.2
     UseMooch = 0x0233, // updated 5.18
 
     EventLinkshell = 0x1169,
@@ -226,7 +226,7 @@ namespace Sapphire::Network::Packets
 
     EorzeaTimeOffset = 0x03B8, // updated 5.1
 
-    EquipDisplayFlags = 0x00FF, // updated 5.18
+    EquipDisplayFlags = 0x0173, // updated 5.2
 
     /// Housing //////////////////////////////////////
 
@@ -259,7 +259,7 @@ namespace Sapphire::Network::Packets
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
     PerformNote = 0x0286, // updated 4.3
 
-    PrepareZoning = 0x035C, // updated 5.18
+    PrepareZoning = 0x0208, // updated 5.2
     ActorGauge = 0x0162, // updated 5.2
 
     // daily quest info -> without them sent,  login will take longer...
@@ -295,7 +295,7 @@ namespace Sapphire::Network::Packets
     CFRegisterDuty = 0x0071,
     CFRegisterRoulette = 0xFF72,
     PlayTimeHandler = 0x0276, // updated 5.1
-    LogoutHandler = 0x015D, // updated 5.18
+    LogoutHandler = 0x029C, // updated 5.2
     CancelLogout = 0x008F, // updated 5.1
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
@@ -303,10 +303,10 @@ namespace Sapphire::Network::Packets
     SocialReqSendHandler = 0x00AE, // updated 4.1
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
-    ChatHandler = 0x0130, // updated 5.18
+    ChatHandler = 0x013A, // updated 5.2
 
     SocialListHandler = 0x03E7, // updated 5.2
-    SetSearchInfoHandler = 0x0320, // updated 5.18
+    SetSearchInfoHandler = 0x00A8, // updated 5.2
     ReqSearchInfoHandler = 0x007B, // updated 5.2
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
@@ -333,39 +333,39 @@ namespace Sapphire::Network::Packets
     ReqCountdownInitiate = 0x0135, // updated 5.0
     ReqCountdownCancel = 0x0136, // updated 5.0
 
-    ZoneLineHandler = 0x0174, // updated 5.18
+    ZoneLineHandler = 0x00B9, // updated 5.2
     ClientTrigger = 0x017C, // updated 5.2
     DiscoveryHandler = 0x017B, // updated 5.18
 
     PlaceFieldMarker = 0x013C, // updated 5.0
-    SkillHandler = 0x01BE, // updated 5.18
+    SkillHandler = 0x0225, // updated 5.2
     GMCommand1 = 0x014D, // updated 5.18
     GMCommand2 = 0x03C2, // updated 5.18
     AoESkillHandler = 0x0072, // updated 5.18
 
-    UpdatePositionHandler = 0x0318, // updated 5.18
+    UpdatePositionHandler = 0x0270, // updated 5.2
 
-    InventoryModifyHandler = 0x03C5, // updated 5.18
+    InventoryModifyHandler = 0x02E4, // updated 5.2
     
     InventoryEquipRecommendedItems = 0x0149, // updated 5.0
 
     ReqPlaceHousingItem = 0x014B, // updated 5.0
     BuildPresetHandler = 0x0150, // updated 5.0
 
-    TalkEventHandler = 0x02FD, // updated 5.18
+    TalkEventHandler = 0x0340, // updated 5.2
     EmoteEventHandler = 0x0183, // updated 5.18
     WithinRangeEventHandler = 0x0167, // updated 5.18
     OutOfRangeEventHandler = 0x02B5, // updated 5.18
     EnterTeriEventHandler = 0x0267, // updated 5.18
     ShopEventHandler = 0x0156, // updated 5.0
 
-    ReturnEventHandler = 0x026B, // updated 5.18
-    TradeReturnEventHandler = 0x02DD, // updated 5.18
+    ReturnEventHandler = 0x027F, // updated 5.2
+    TradeReturnEventHandler = 0x02DB, // updated 5.2
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
 
-    ReqEquipDisplayFlagsChange = 0x01FE, // updated 5.18
+    ReqEquipDisplayFlagsChange = 0x02E2, // updated 5.2
 
     LandRenameHandler = 0xF177, // updated 5.0
     HousingUpdateHouseGreeting = 0x0178, // updated 5.0
