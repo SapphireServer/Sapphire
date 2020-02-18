@@ -43,23 +43,21 @@ namespace Sapphire::Network::Packets
   */
   enum ServerZoneIpcType : uint16_t
   {
-
-    // static opcode ( the ones that rarely, if ever, change )
-    Ping = 0x0200, // updated 5.18
-    Init = 0x018E,
+    Ping = 0x0106, // updated 5.2
+    Init = 0x0308, // updated 5.2
 
     ActorFreeSpawn = 0x009B, // updated 5.18
-    InitZone = 0x007C, // updated 5.18
+    InitZone = 0x033A, // updated 5.2
 
     EffectResult = 0x0267, // updated 5.18
     ActorControl = 0x03BE, // updated 5.18
-    ActorControlSelf = 0x00E3, // updated 5.18
+    ActorControlSelf = 0x010E, // updated 5.2
     ActorControlTarget = 0x24d, // updated 5.18
 
     /*!
      * @brief Used when resting
      */
-    UpdateHpMpTp = 0x0125, // updated 5.18
+    UpdateHpMpTp = 0x00C1, // updated 5.2
 
     ///////////////////////////////////////////////////
 
@@ -84,25 +82,25 @@ namespace Sapphire::Network::Packets
 
     WorldVisitList = 0x00FE, // added 4.5
 
-    SocialList = 0x01F1, // updated 5.18
+    SocialList = 0x033E, // updated 5.2
 
     ExamineSearchInfo = 0x012B, // updated 5.18
     UpdateSearchInfo = 0x01E5, // updated 5.18
-    InitSearchInfo = 0x01D0, // updated 5.18
+    InitSearchInfo = 0x021C, // updated 5.2
     ExamineSearchComment = 0x0102, // updated 4.1
 
     ServerNoticeShort = 0x0115, // updated 5.0
-    ServerNotice = 0x0088, // updated 5.18
-    SetOnlineStatus = 0x015E, // updated 5.1
+    ServerNotice = 0x0308, // updated 5.2
+    SetOnlineStatus = 0x0185, // updated 5.2
 
     CountdownInitiate = 0x0309, // updated 5.11
     CountdownCancel = 0x00D9, // updated 5.18
 
     PlayerAddedToBlacklist = 0x033F, // updated 5.1
     PlayerRemovedFromBlacklist = 0x0385, // updated 5.1
-    BlackList = 0x0253, // updated 5.18
+    BlackList = 0x01A2, // updated 5.2
 
-    LinkshellList = 0x00AC, // updated 5.18
+    LinkshellList = 0x028C, // updated 5.2
 
     MailDeleteRequest = 0x012B, // updated 5.0
 
@@ -133,12 +131,12 @@ namespace Sapphire::Network::Packets
     AoeEffect16 = 0x0305, // updated 5.18
     AoeEffect24 = 0x023F, // updated 5.18
     AoeEffect32 = 0x0352, // updated 5.18
-    PersistantEffect = 0x019C, // updated 5.18
+    PersistantEffect = 0x00CE, // updated 5.2
 
     GCAffiliation = 0x016F, // updated 5.0
 
-    PlayerSpawn = 0x0262, // updated 5.18
-    NpcSpawn = 0x0186, // updated 5.18
+    PlayerSpawn = 0x027D, // updated 5.2
+    NpcSpawn = 0x034B, // updated 5.2
     NpcSpawn2 = 0x010C, // ( Bigger statuseffectlist? ) updated 5.18
     ActorMove = 0x021B, // updated 5.18
 
@@ -150,15 +148,15 @@ namespace Sapphire::Network::Packets
     PartyList = 0x0287, // updated 5.18
     HateRank = 0x0226, // updated 5.18
     HateList = 0x0361, // updated 5.18
-    ObjectSpawn = 0x027F, // updated 5.18
+    ObjectSpawn = 0x01B3, // updated 5.2
     ObjectDespawn = 0x034B, // updated 5.18
-    UpdateClassInfo = 0x0362, // updated 5.18
+    UpdateClassInfo = 0x0131, // updated 5.2
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x0295, // updated 5.18
-    PlayerStats = 0x017A, // updated 5.18
+    PlayerSetup = 0x0278, // updated 5.2
+    PlayerStats = 0x03C8, // updated 5.2
     ActorOwner = 0x03BB, // updated 5.18
-    PlayerStateFlags = 0x02C6, // updated 5.18
-    PlayerClassInfo = 0x01B0, // updated 5.18
+    PlayerStateFlags = 0x032B, // updated 5.2
+    PlayerClassInfo = 0x039A, // updated 5.2
     Effect037F = 0x037F, // 5.18
 
     ModelEquip = 0x02E6, // updated 5.18
@@ -170,13 +168,13 @@ namespace Sapphire::Network::Packets
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-    ItemInfo = 0x00F2, // updated 5.18
-    ContainerInfo = 0x01F2, // updated 5.18
+    ItemInfo = 0x03D4, // updated 5.2
+    ContainerInfo = 0x01A5, // updated 5.2
     InventoryTransactionFinish = 0x00D2, // updated 5.18
-    InventoryTransaction = 0x0233, // updated 5.18
+    InventoryTransaction = 0x01D8, // updated 5.2
     CurrencyCrystalInfo = 0x02BF, // updated 5.18
 
-    InventoryActionAck = 0x02FA, // updated 5.18
+    InventoryActionAck = 0x0094, // updated 5.2
     UpdateInventorySlot = 0x0370, // updated 5.18
 
     HuntingLogEntry = 0x01B3, // updated 5.0
@@ -196,9 +194,9 @@ namespace Sapphire::Network::Packets
 
     EventLinkshell = 0x1169,
 
-    QuestActiveList = 0x031E, // updated 5.18
+    QuestActiveList = 0x017B, // updated 5.2
     QuestUpdate = 0x0066, // updated 5.18
-    QuestCompleteList = 0x025D, // updated 5.18
+    QuestCompleteList = 0x0255, // updated 5.2
 
     QuestFinish = 0x013A, // updated 5.18
     MSQTrackerComplete = 0x01D6, // updated 5.0
@@ -206,7 +204,7 @@ namespace Sapphire::Network::Packets
 
     QuestMessage = 0x00BF, // updated 5.18
 
-    QuestTracker = 0x0289, // updated 5.18
+    QuestTracker = 0x0306, // updated 5.2
 
     Mount = 0x038F, // updated 5.18
 
@@ -241,7 +239,7 @@ namespace Sapphire::Network::Packets
     LandRename = 0x023A, // updated 5.0
     HousingEstateGreeting = 0x023B, // updated 5.0
     HousingUpdateLandFlagsSlot = 0x023C, // updated 5.0
-    HousingLandFlags = 0x01F3, // updated 5.18
+    HousingLandFlags = 0x00FE, // updated 5.2
     HousingShowEstateGuestAccess = 0x023E, // updated 5.0
 
     HousingObjectInitialize = 0x0240, // updated 5.0
@@ -262,11 +260,11 @@ namespace Sapphire::Network::Packets
     PerformNote = 0x0286, // updated 4.3
 
     PrepareZoning = 0x035C, // updated 5.18
-    ActorGauge = 0x016D, // updated 5.18
+    ActorGauge = 0x0162, // updated 5.2
 
     // daily quest info -> without them sent,  login will take longer...
-    DailyQuests = 0x02D8, // updated 5.18
-    DailyQuestRepeatFlags = 0x03A3, // updated 5.18
+    DailyQuests = 0x00A2, // updated 5.2
+    DailyQuestRepeatFlags = 0x013D, // updated 5.2
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
@@ -286,11 +284,10 @@ namespace Sapphire::Network::Packets
   */
   enum ClientZoneIpcType : uint16_t
   {
+    PingHandler = 0x0106, // updated 5.2
+    InitHandler = 0x0307, // updated 5.2
 
-    PingHandler = 0x0200, // updated 5.18
-    InitHandler = 0x018E, // updated 5.18
-
-    FinishLoadingHandler = 0x01F5, // updated 5.18
+    FinishLoadingHandler = 0x012B, // updated 5.2
 
     CFCommenceHandler = 0x006F,
 
@@ -308,16 +305,16 @@ namespace Sapphire::Network::Packets
 
     ChatHandler = 0x0130, // updated 5.18
 
-    SocialListHandler = 0x0090, // updated 5.18
+    SocialListHandler = 0x03E7, // updated 5.2
     SetSearchInfoHandler = 0x0320, // updated 5.18
-    ReqSearchInfoHandler = 0x0374, // updated 5.18
+    ReqSearchInfoHandler = 0x007B, // updated 5.2
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
     ReqRemovePlayerFromBlacklist = 0x00F1, // updated 5.0
-    BlackListHandler = 0x01EB, // updated 5.18
+    BlackListHandler = 0x0329, // updated 5.2
     PlayerSearchHandler = 0x00F4, // updated 5.0
 
-    LinkshellListHandler = 0x014A, // updated 5.18
+    LinkshellListHandler = 0x00A7, // updated 5.2
 
     MarketBoardRequestItemListingInfo = 0x0102, // updated 4.5
     MarketBoardRequestItemListings = 0x0103, // updated 4.5
@@ -337,7 +334,7 @@ namespace Sapphire::Network::Packets
     ReqCountdownCancel = 0x0136, // updated 5.0
 
     ZoneLineHandler = 0x0174, // updated 5.18
-    ClientTrigger = 0x03C0, // updated 5.18
+    ClientTrigger = 0x017C, // updated 5.2
     DiscoveryHandler = 0x017B, // updated 5.18
 
     PlaceFieldMarker = 0x013C, // updated 5.0
