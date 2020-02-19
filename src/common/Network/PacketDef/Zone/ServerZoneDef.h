@@ -738,9 +738,8 @@ namespace Sapphire::Network::Packets::Server
     uint32_t displayFlags;
     uint16_t fateID;
     uint16_t mPCurr;
-    uint16_t tPCurr;
-    uint16_t mPMax;
-    uint16_t tPMax;
+    uint16_t unknown1; // 0
+    uint16_t unknown2; // 0 or pretty big numbers > 30000
     uint16_t modelChara;
     uint16_t rotation;
     uint16_t activeMinion;
@@ -764,7 +763,6 @@ namespace Sapphire::Network::Packets::Server
     uint8_t scale;
     uint16_t elementalLevel; // Eureka
     uint16_t element; // Eureka
-    uint32_t u30b;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
