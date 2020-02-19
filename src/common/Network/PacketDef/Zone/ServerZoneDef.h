@@ -1993,7 +1993,7 @@ namespace Sapphire::Network::Packets::Server
     char otherName[32];
   };
 
-  struct FFXIVIpcEffect037F : FFXIVIpcBasePacket< Effect037F >
+  struct FFXIVIpcEffect0095 : FFXIVIpcBasePacket< Effect0095 >
   {
     uint32_t value1;
     uint32_t value2;

@@ -61,7 +61,7 @@ namespace Sapphire::Network::Packets
 
     ///////////////////////////////////////////////////
 
-    ChatBanned = 0x006B,
+    ChatBanned = 0x0000,//0x006B,
     Playtime = 0x00E7, // updated 5.18
     Logout = 0x0A1, // updated 5.2
     CFNotify = 0x01F8, // updated 5.18
@@ -78,9 +78,9 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x0000, // updated 5.18
+    Chat = 0x0154, // updated 5.2
 
-    WorldVisitList = 0x00FE, // added 4.5
+    WorldVisitList = 0x0000,//0x00FE, // added 4.5
 
     SocialList = 0x033E, // updated 5.2
 
@@ -102,7 +102,7 @@ namespace Sapphire::Network::Packets
 
     LinkshellList = 0x028C, // updated 5.2
 
-    MailDeleteRequest = 0x012B, // updated 5.0
+    MailDeleteRequest = 0x0000,//0x012B, // updated 5.0
 
     // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
@@ -157,7 +157,7 @@ namespace Sapphire::Network::Packets
     ActorOwner = 0x03BB, // updated 5.18
     PlayerStateFlags = 0x032B, // updated 5.2
     PlayerClassInfo = 0x039A, // updated 5.2
-    Effect037F = 0x037F, // 5.18
+    Effect0095 = 0x0095, // updated 5.2
 
     ModelEquip = 0x02E6, // updated 5.18
     Examine = 0x038B, // updated 5.2
@@ -214,7 +214,7 @@ namespace Sapphire::Network::Packets
     SomeDirectorUnk4 = 0x0100, // updated 5.18
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
-    DirectorPopUp = 0x0162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
+    DirectorPopUp = 0x0000,//0x0162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
     DirectorPopUp4 = 0x0214, // updated 5.18
     DirectorPopUp8 = 0x00F8, // updated 5.18
 
