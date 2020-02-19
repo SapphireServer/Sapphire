@@ -749,7 +749,6 @@ void Sapphire::Entity::Player::gainLevel()
   effectListPacket->data().level = getLevel();
   effectListPacket->data().current_hp = getMaxHp();
   effectListPacket->data().current_mp = getMaxMp();
-  effectListPacket->data().currentTp = 1000;
   effectListPacket->data().max_hp = getMaxHp();
   effectListPacket->data().max_mp = getMaxMp();
   sendToInRangeSet( effectListPacket, true );
