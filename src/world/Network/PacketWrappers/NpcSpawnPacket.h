@@ -35,9 +35,7 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.hPCurr = bnpc.getHp();
       m_data.mPCurr = bnpc.getMp();
-      m_data.tPCurr = bnpc.getTp();
       m_data.hPMax = bnpc.getMaxHp();
-      m_data.mPMax = bnpc.getMaxMp();
       m_data.subtype = 5;
 
       m_data.level = bnpc.getLevel();

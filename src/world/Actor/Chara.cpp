@@ -539,9 +539,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
   statusEffectAdd->data().current_hp = getHp();
   statusEffectAdd->data().current_mp = static_cast< uint16_t >( getMp() );
-  statusEffectAdd->data().current_tp = getTp();
   statusEffectAdd->data().max_hp = getMaxHp();
-  statusEffectAdd->data().max_mp = static_cast< uint16_t >( getMaxMp() );
   statusEffectAdd->data().classId = static_cast< uint8_t >( getClass() );
   statusEffectAdd->data().entryCount = 1;
 
@@ -661,7 +659,6 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   statusEffectList->data().level1 = getLevel();
   statusEffectList->data().current_hp = getHp();
   statusEffectList->data().current_mp = getMp();
-  statusEffectList->data().currentTp = getTp();
   statusEffectList->data().max_hp = getMaxHp();
   statusEffectList->data().max_mp = getMaxMp();
   uint8_t slot = 0;
