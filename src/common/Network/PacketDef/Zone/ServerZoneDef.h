@@ -421,9 +421,9 @@ namespace Sapphire::Network::Packets::Server
     uint32_t max_hp;
     uint16_t current_mp;
     uint16_t max_mp;
-    uint16_t currentTp;
     uint8_t shieldPercentage;
     uint8_t unknown1;
+    uint16_t unknown2;
     Common::StatusEffect effect[30];
     uint32_t padding;
   };
@@ -445,8 +445,6 @@ namespace Sapphire::Network::Packets::Server
     uint32_t current_hp;
     uint32_t max_hp;
     uint16_t current_mp;
-    uint16_t current_tp;
-    uint16_t max_mp;
     uint8_t unknown1;
     uint8_t classId;
     uint8_t shieldPercentage;
@@ -464,7 +462,6 @@ namespace Sapphire::Network::Packets::Server
       uint32_t sourceActorId;
     } statusEntries[4];
 
-    uint32_t unknown5;
   };
 
   /**
@@ -664,9 +661,8 @@ namespace Sapphire::Network::Packets::Server
     uint32_t displayFlags;
     uint16_t fateID;
     uint16_t mPCurr;
-    uint16_t tPCurr;
     uint16_t mPMax;
-    uint16_t tPMax;
+    uint16_t unk; // == 0
     uint16_t modelChara;
     uint16_t rotation;
     uint16_t activeMinion;
@@ -688,8 +684,11 @@ namespace Sapphire::Network::Packets::Server
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint32_t elementalLevel;
-    uint32_t element;
+
+    //uint32_t elementalLevel; one of these two field changed to 16bit
+    //uint32_t element;
+    uint8_t elementData[6];
+
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
@@ -739,9 +738,8 @@ namespace Sapphire::Network::Packets::Server
     uint32_t displayFlags;
     uint16_t fateID;
     uint16_t mPCurr;
-    uint16_t tPCurr;
-    uint16_t mPMax;
-    uint16_t tPMax;
+    uint16_t unknown1; // 0
+    uint16_t unknown2; // 0 or pretty big numbers > 30000
     uint16_t modelChara;
     uint16_t rotation;
     uint16_t activeMinion;
@@ -765,7 +763,6 @@ namespace Sapphire::Network::Packets::Server
     uint8_t scale;
     uint16_t elementalLevel; // Eureka
     uint16_t element; // Eureka
-    uint32_t u30b;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
@@ -1023,7 +1020,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char u19[8];
+    unsigned char u19[13];
     unsigned char mountGuideMask[22];
     char name[32];
     unsigned char unknownOword[16];
