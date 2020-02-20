@@ -46,7 +46,7 @@ namespace Sapphire::Network::Packets
     Ping = 0x0106, // updated 5.2
     Init = 0x0307, // updated 5.2
 
-    ActorFreeSpawn = 0x009B, // updated 5.18
+    ActorFreeSpawn = 0x01D1, // updated 5.2
     InitZone = 0x033A, // updated 5.2
 
     EffectResult = 0x0340, // updated 5.2
@@ -127,7 +127,7 @@ namespace Sapphire::Network::Packets
     EurekaStatusEffectList = 0x0167, // updated 5.18
     BossStatusEffectList = 0x0312, // added 5.1
     Effect = 0x028A, // updated 5.2
-    AoeEffect8 = 0x033E, // updated 5.18
+    AoeEffect8 = 0x01F5, // updated 5.2
     AoeEffect16 = 0x0305, // updated 5.18
     AoeEffect24 = 0x023F, // updated 5.18
     AoeEffect32 = 0x0352, // updated 5.18
@@ -146,15 +146,15 @@ namespace Sapphire::Network::Packets
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
     PartyList = 0x0287, // updated 5.18
-    HateRank = 0x0226, // updated 5.18
-    HateList = 0x0361, // updated 5.18
+    HateRank = 0x03AC, // updated 5.2
+    HateList = 0x00C8, // updated 5.2
     ObjectSpawn = 0x01B3, // updated 5.2
     ObjectDespawn = 0x034B, // updated 5.18
     UpdateClassInfo = 0x0131, // updated 5.2
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x0278, // updated 5.2
     PlayerStats = 0x03C8, // updated 5.2
-    ActorOwner = 0x03BB, // updated 5.18
+    ActorOwner = 0x0290, // updated 5.2
     PlayerStateFlags = 0x032B, // updated 5.2
     PlayerClassInfo = 0x039A, // updated 5.2
 
