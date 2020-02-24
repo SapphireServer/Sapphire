@@ -570,7 +570,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 
     for( uint8_t slot = 0; slot < storage->getMaxSize(); slot++ )
     {
-      if ( !canMerge && foundFreeSlot )
+      if( !canMerge && foundFreeSlot )
         break;
 
       auto item = storage->getItem( slot );
