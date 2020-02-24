@@ -82,7 +82,7 @@ void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
   m_value = statusId;
   m_param2 = param;
 
-  m_type = Common::ActionEffectType::ApplyStatusEffect;
+  m_type = Common::ActionEffectType::ApplyStatusEffectTarget;
 }
 
 void EffectResult::mount( uint16_t mountId )

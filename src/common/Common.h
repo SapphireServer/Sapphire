@@ -581,11 +581,12 @@ namespace Sapphire::Common
     None = 0, // ?
     MagicPoints = 3,
     TacticsPoints = 5,
-//    WARGauge = 22,
+    StatusEffect = 10,
+    WARGauge = 22,
 //    DRKGauge = 25,
 //    AetherflowStack = 30,
 //    Status = 32,
-//    PLDGauge = 41,
+    PLDGauge = 41,
 //    RDMGaugeBoth = 74,
 ////  RDMGaugeBlack = 75, // not right?
 //    DRGGauge3Eyes = 76,
@@ -623,17 +624,17 @@ namespace Sapphire::Common
     TpLoss = 12,
     TpGain = 13,
     GpGain = 14,
-    ApplyStatusEffect = 15,
-    //ApplyStatusEffect2 = 16, // thin air uses this one but works fine with 15 wtf?
-    StatusNoEffect = 21,
+    ApplyStatusEffectTarget = 15,
+    ApplyStatusEffectSource = 16, // effect entry on target but buff applies to source, like storm's eye
+    StatusNoEffect = 20, // shifted one up from 5.18
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
      * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
-    StartActionCombo = 27, // why this is changed lol
-    ComboSucceed = 29, // this is gone on retail and not working anymore
+    StartActionCombo = 27, // shifted one up from 5.18
+    ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,
     Mount = 39,
     VFX = 59, // links to VFX sheet
