@@ -195,10 +195,10 @@ namespace Sapphire::Network::Packets
     EventLinkshell = 0x1169,
 
     QuestActiveList = 0x017B, // updated 5.2
-    QuestUpdate = 0x0066, // updated 5.18
+    QuestUpdate = 0x02CE, // updated 5.2
     QuestCompleteList = 0x0255, // updated 5.2
 
-    QuestFinish = 0x013A, // updated 5.18
+    QuestFinish = 0x006F, // updated 5.2
     MSQTrackerComplete = 0x01D6, // updated 5.0
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
@@ -354,9 +354,9 @@ namespace Sapphire::Network::Packets
 
     TalkEventHandler = 0x0340, // updated 5.2
     EmoteEventHandler = 0x0183, // updated 5.18
-    WithinRangeEventHandler = 0x0167, // updated 5.18
-    OutOfRangeEventHandler = 0x02B5, // updated 5.18
-    EnterTeriEventHandler = 0x0267, // updated 5.18
+    WithinRangeEventHandler = 0x010E, // updated 5.2
+    OutOfRangeEventHandler = 0x00AE, // updated 5.2
+    EnterTeriEventHandler = 0x00C1, // updated 5.2
     ShopEventHandler = 0x0156, // updated 5.0
 
     ReturnEventHandler = 0x027F, // updated 5.2
