@@ -217,7 +217,7 @@ struct FFXIVIpcInventoryModifyHandler :
 {
   /* 0000 */ uint32_t seq;
   /* 0004 */ Common::InventoryOperation action;
-  /* 0005 */ uint8_t pad_0005[6];
+  /* 0006 */ uint8_t pad_0006[6];
   /* 000C */ uint16_t fromContainer;
   /* 000E */ uint8_t pad_000E[2];
   /* 0010 */ uint8_t fromSlot;
