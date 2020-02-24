@@ -112,7 +112,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   {
     auto modelSkeleton = exdData->get< Data::ModelSkeleton >( modelChara->model );
     if( modelSkeleton )
-      m_radius *= modelSkeleton->scaleFactor;
+      m_radius *= modelSkeleton->radius;
   }
 
   // todo: is this actually good?
