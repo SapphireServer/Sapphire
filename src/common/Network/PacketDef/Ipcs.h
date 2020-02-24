@@ -158,7 +158,7 @@ namespace Sapphire::Network::Packets
     PlayerStateFlags = 0x032B, // updated 5.2
     PlayerClassInfo = 0x039A, // updated 5.2
 
-    ModelEquip = 0x02E6, // updated 5.18
+    ModelEquip = 0x03C9, // updated 5.2
     Examine = 0x038B, // updated 5.2
     CharaNameReq = 0x0116, // updated 5.18
 
