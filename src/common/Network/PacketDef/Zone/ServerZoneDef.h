@@ -1295,8 +1295,7 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcInventoryTransaction : FFXIVIpcBasePacket< InventoryTransaction >
   {
     uint32_t sequence;
-    uint8_t type;
-    uint8_t padding;
+    uint16_t type;
     uint16_t padding1;
     uint32_t ownerId;
     uint32_t storageId;

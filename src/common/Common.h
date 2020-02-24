@@ -49,13 +49,13 @@ namespace Sapphire::Common
     uint8_t plot;
   };
 
-  enum InventoryOperation : uint8_t
+  enum InventoryOperation : uint16_t
   {
-    Discard = 0x07,
-    Move = 0x08,
-    Swap = 0x09,
-    Merge = 0x0C,
-    Split = 0x0A
+    Discard = 0x2EB,
+    Move = 0x2EC,
+    Swap = 0x2ED,
+    Merge = 0x2F0,
+    Split = 0x2EE
   };
 
   enum ClientLanguage : uint8_t
