@@ -338,8 +338,8 @@ namespace Sapphire::Network::Packets
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x0225, // updated 5.2
-    GMCommand1 = 0x014D, // updated 5.18
-    GMCommand2 = 0x03C2, // updated 5.18
+    GMCommand1 = 0x0393, // updated 5.2
+    GMCommand2 = 0x020B, // updated 5.2
     AoESkillHandler = 0x0072, // updated 5.18
 
     UpdatePositionHandler = 0x0270, // updated 5.2
@@ -352,7 +352,7 @@ namespace Sapphire::Network::Packets
     BuildPresetHandler = 0x0150, // updated 5.0
 
     TalkEventHandler = 0x0340, // updated 5.2
-    EmoteEventHandler = 0x0183, // updated 5.18
+    EmoteEventHandler = 0x01E1, // updated 5.2
     WithinRangeEventHandler = 0x010E, // updated 5.2
     OutOfRangeEventHandler = 0x00AE, // updated 5.2
     EnterTeriEventHandler = 0x00C1, // updated 5.2
