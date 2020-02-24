@@ -41,7 +41,7 @@ public:
 
       auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();
 
-      auto pPop = pPopRange->getPopRange(  warp->level,  warp->level );
+      auto pPop = pPopRange->getPopRange( warp->territoryType, warp->popRange );
 
       if( !pPop )
       {
@@ -52,7 +52,7 @@ public:
         std::cout << "found!!";
       }
 
-      playerMgr->movePlayerToLandDestination( player, warp->level, result.param3 );
+      playerMgr->movePlayerToLandDestination( player, warp->popRange, result.param3 );
     }
     else
     {
