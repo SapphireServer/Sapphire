@@ -534,7 +534,7 @@ bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantit
 }
 
 
-Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent )
+Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent, bool canMerge )
 {
   auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
@@ -570,10 +570,13 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 
     for( uint8_t slot = 0; slot < storage->getMaxSize(); slot++ )
     {
+      if( !canMerge && foundFreeSlot )
+        break;
+
       auto item = storage->getItem( slot );
 
       // add any items that are stackable
-      if( item && !itemInfo->isEquippable && item->getId() == catalogId )
+      if( canMerge && item && !itemInfo->isEquippable && item->getId() == catalogId )
       {
         uint32_t count = item->getStackSize();
         uint32_t maxStack = item->getMaxStackSize();
@@ -742,7 +745,7 @@ void Sapphire::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t from
     // todo: correct invalid move? again, not sure what retail does here
     return;
 
-  auto newItem = addItem( fromItem->getId(), itemCount, fromItem->isHq(), true );
+  auto newItem = addItem( fromItem->getId(), itemCount, fromItem->isHq(), true, false );
   if( !newItem )
     return;
 
@@ -840,7 +843,7 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint8_t fr
   invTransPacket->data().catalogId = fromItem->getId();
   invTransPacket->data().stackSize = fromItem->getStackSize();
   invTransPacket->data().slotId = fromSlotId;
-  invTransPacket->data().type = 7;
+  invTransPacket->data().type = Common::InventoryOperation::Discard;
   queuePacket( invTransPacket );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcInventoryTransactionFinish >( getId() );
