@@ -142,7 +142,7 @@ namespace Sapphire::Network::Packets
 
     ActorSetPos = 0x00CF, // updated 5.2
 
-    ActorCast = 0x03B1, // updated 5.18
+    ActorCast = 0x00F6, // updated 5.2
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
     PartyList = 0x0287, // updated 5.18
@@ -206,7 +206,7 @@ namespace Sapphire::Network::Packets
 
     QuestTracker = 0x0306, // updated 5.2
 
-    Mount = 0x038F, // updated 5.18
+    Mount = 0x023C, // updated 5.2
 
     DirectorVars = 0x00E6, // updated 5.18
     SomeDirectorUnk1 = 0x0084, // updated 5.18

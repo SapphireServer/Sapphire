@@ -636,7 +636,7 @@ namespace Sapphire::Common
     StartActionCombo = 27, // shifted one up from 5.18
     ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,
-    Mount = 39,
+    Mount = 40, // shifted one down from 5.18
     VFX = 59, // links to VFX sheet
   };
 
