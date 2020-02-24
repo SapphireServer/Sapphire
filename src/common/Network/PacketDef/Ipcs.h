@@ -118,7 +118,7 @@ namespace Sapphire::Network::Packets
 
     CharaFreeCompanyTag = 0x013B, // updated 4.5
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
-    FreeCompanyInfo = 0x013D, // updated 4.5
+    FreeCompanyInfo = 0x0000,//0x013D, // updated 4.5
     ExamineFreeCompanyInfo = 0x013E, // updated 4.5
 
     FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
@@ -133,7 +133,7 @@ namespace Sapphire::Network::Packets
     AoeEffect32 = 0x0352, // updated 5.18
     PersistantEffect = 0x00CE, // updated 5.2
 
-    GCAffiliation = 0x016F, // updated 5.0
+    GCAffiliation = 0x0000,//0x016F, // updated 5.0
 
     PlayerSpawn = 0x027D, // updated 5.2
     NpcSpawn = 0x034B, // updated 5.2
@@ -218,7 +218,7 @@ namespace Sapphire::Network::Packets
     DirectorPopUp4 = 0x0214, // updated 5.18
     DirectorPopUp8 = 0x00F8, // updated 5.18
 
-    CFAvailableContents = 0xF1FD, // updated 4.2
+    CFAvailableContents = 0x0000,//0xF1FD, // updated 4.2
 
     WeatherChange = 0x02FB, // updated 5.11
     PlayerTitleList = 0x037D, // updated 5.1

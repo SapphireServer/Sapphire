@@ -80,11 +80,11 @@ namespace Sapphire::Network::Packets::Server
   //      m_data.unknown70[4] = 1; // enable df
 
       // enable all raids/guildhests/dungeons
-      memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
-      memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
-      memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
-      memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
-      memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+      //memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
+      //memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
+      //memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
+      //memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
+      //memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
     };
   };
 
