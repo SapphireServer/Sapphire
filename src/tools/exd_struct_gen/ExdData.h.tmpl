@@ -13,8 +13,12 @@
 #include <set>
 #include <variant>
 
-namespace Sapphire {
-namespace Data {
+#if _WIN32
+#undef near
+#undef far
+#endif
+
+namespace Sapphire::Data {
 
 class ExdDataGenerated;
 
@@ -88,7 +92,6 @@ IDLISTGETTERS
 
   };
 
-}
 }
 
 #endif

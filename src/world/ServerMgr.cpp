@@ -26,8 +26,6 @@
 
 #include "Script/ScriptMgr.h"
 
-#include <Exd/ExdDataGenerated.h>
-
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include "Manager/LinkshellMgr.h"
