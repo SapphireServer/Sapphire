@@ -192,13 +192,15 @@ void SapphireApi::deleteCharacter( std::string name, const uint32_t accountId )
   g_charaDb.execute( "DELETE FROM characlass WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaglobalitem WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charainfoblacklist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charainfofriendlist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charainfolinkshell WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charainfosearch WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaitemcrystal WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+  g_charaDb.execute( "DELETE FROM charaitemcurrency WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+  g_charaDb.execute( "DELETE FROM charamonsternote WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
   g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+  g_charaDb.execute( "DELETE FROM charastatus WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
 }
 
 std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
