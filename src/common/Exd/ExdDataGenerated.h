@@ -13,6 +13,11 @@
 #include <set>
 #include <variant>
 
+#if _WIN32
+#undef near
+#undef far
+#endif
+
 namespace Sapphire {
 namespace Data {
 
