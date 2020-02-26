@@ -61,12 +61,8 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::ICDirector:
     {
-      auto contentInfo = pExdData->get< Sapphire::Data::InstanceContent >( eventId & 0xFFFF );
-      std::string name = contentInfo->name;
-      std::string remove( ",â˜…_ '()[]-\x1a\x1\x2\x1f\x1\x3.:" );
-      Util::eraseAllIn( name, remove );
-      name[ 0 ] = toupper( name[ 0 ] );
-      return name;
+      // auto contentInfo = pExdData->get< Sapphire::Data::InstanceContent >( eventId & 0xFFFF );
+      return "InstanceContentDirector#" + std::to_string( eventId & 0xFFFF );
     }
     case Event::EventHandler::EventHandlerType::QuestBattleDirector:
     {

@@ -348,10 +348,10 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
   if( !pTeri || pContentFinderCondition->name.empty() )
     return nullptr;
 
-  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pInstanceContent->name );
+  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pContentFinderCondition->name );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                       pTeri->name, pContentFinderCondition->name, instanceContentId, framework() );
+                                     pTeri->name, pContentFinderCondition->name, instanceContentId, framework() );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
