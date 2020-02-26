@@ -696,6 +696,11 @@ bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
 
 void Sapphire::Entity::Player::gainExp( uint32_t amount )
 {
+  if( getLevel() >= Common::MAX_PLAYER_LEVEL )
+  {
+    setExp( 0 );
+    return;
+  }
   auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   uint32_t currentExp = getExp();
