@@ -202,7 +202,7 @@ namespace Sapphire::Network::Packets
     MSQTrackerComplete = 0x01D6, // updated 5.0
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
-    QuestMessage = 0x00BF, // updated 5.18
+    QuestMessage = 0x0331, // updated 5.2
 
     QuestTracker = 0x0306, // updated 5.2
 
@@ -222,7 +222,7 @@ namespace Sapphire::Network::Packets
 
     WeatherChange = 0x02FB, // updated 5.11
     PlayerTitleList = 0x037D, // updated 5.1
-    Discovery = 0x02E7, // updated 5.18
+    Discovery = 0x0091, // updated 5.2
 
     EorzeaTimeOffset = 0x03B8, // updated 5.1
 
@@ -335,7 +335,7 @@ namespace Sapphire::Network::Packets
 
     ZoneLineHandler = 0x00B9, // updated 5.2
     ClientTrigger = 0x017C, // updated 5.2
-    DiscoveryHandler = 0x017B, // updated 5.18
+    DiscoveryHandler = 0x019A, // updated 5.2
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x0225, // updated 5.2
