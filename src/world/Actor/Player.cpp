@@ -693,11 +693,19 @@ bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
 
 void Sapphire::Entity::Player::gainExp( uint32_t amount )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-
   uint32_t currentExp = getExp();
 
   uint16_t level = getLevel();
+
+  if( level >= Common::MAX_PLAYER_LEVEL )
+  {
+    setExp( 0 );
+    if( currentExp != 0 )
+      queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), 0 ) );
+    return;
+  }
+
+  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
 
   uint32_t neededExpToLevel = pExdData->get< Sapphire::Data::ParamGrow >( level )->expToNext;
 
@@ -705,18 +713,14 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
 
   queuePacket( makeActorControlSelf( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
-  if( level >= Common::MAX_PLAYER_LEVEL ) // temporary fix for leveling over levelcap
-  {
-    queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
-    return;
-  }
-
   if( ( currentExp + amount ) >= neededExpToLevel )
   {
     // levelup
     amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ?
              neededExpToLevelplus1 - 1 :
              ( currentExp + amount - neededExpToLevel );
+    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
+      amount = 0;
     setExp( amount );
     gainLevel();
     queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
