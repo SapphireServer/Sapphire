@@ -11,6 +11,7 @@
 #include <Database/DatabaseDef.h>
 #include <cmath>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Service.h>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
@@ -372,6 +373,8 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   std::string subCommand;
   std::string params = "";
 
@@ -418,9 +421,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   }
   else if( subCommand == "bnpc" )
   {
-    auto serverZone = framework()->get< World::ServerMgr >();
-
-    auto bNpcTemplate = serverZone->getBNpcTemplate( params );
+    auto bNpcTemplate = serverMgr.getBNpcTemplate( params );
 
     if( !bNpcTemplate )
     {
@@ -577,8 +578,9 @@ void
 Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
                                                          std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( player.getId() );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto pSession = serverMgr.getSession( player.getId() );
   if( pSession )
     pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
@@ -586,8 +588,9 @@ Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Pla
 void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,
                                                                   std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( player.getId() );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto pSession = serverMgr.getSession( player.getId() );
   if( pSession )
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
@@ -595,7 +598,8 @@ void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, En
 void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Player& player,
                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   std::string subCommand;
   std::string params = "";
 
@@ -620,19 +624,19 @@ void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Play
 
   if( subCommand == "start" )
   {
-    auto pSession = pServerZone->getSession( player.getId() );
+    auto pSession = serverMgr.getSession( player.getId() );
     if( pSession )
       pSession->startReplay( params );
   }
   else if( subCommand == "stop" )
   {
-    auto pSession = pServerZone->getSession( player.getId() );
+    auto pSession = serverMgr.getSession( player.getId() );
     if( pSession )
       pSession->stopReplay();
   }
   else if( subCommand == "info" )
   {
-    auto pSession = pServerZone->getSession( player.getId() );
+    auto pSession = serverMgr.getSession( player.getId() );
     if( pSession )
       pSession->sendReplayInfo();
   }
@@ -695,10 +699,11 @@ void
 Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   player.sendDebug( "SapphireZone {0} \nRev: {1}", Version::VERSION, Version::GIT_HASH );
   player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
-  player.sendDebug( "Sessions: {0}", pServerZone->getSessionCount() );
+  player.sendDebug( "Sessions: {0}", serverMgr.getSessionCount() );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Player& player,

@@ -17,6 +17,7 @@
 #include <DetourCommon.h>
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <filesystem>
+#include <Service.h>
 
 Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName, FrameworkPtr pFw ) :
   m_naviMesh( nullptr ),
@@ -32,7 +33,8 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
 
 bool Sapphire::World::Navi::NaviProvider::init()
 {
-  auto& cfg = m_pFw->get< Sapphire::World::ServerMgr >()->getConfig();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& cfg = serverMgr.getConfig();
 
   auto meshesFolder = std::filesystem::path( cfg.navigation.meshPath );
   auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );

@@ -2,6 +2,7 @@
 #include <Exd/ExdDataGenerated.h>
 
 #include <watchdog/Watchdog.h>
+#include <Service.h>
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -49,9 +50,9 @@ void Sapphire::Scripting::ScriptMgr::update()
 bool Sapphire::Scripting::ScriptMgr::init()
 {
   std::set< std::string > files;
-  auto pServerMgr = framework()->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
-  auto status = loadDir( pServerMgr->getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
+  auto status = loadDir( serverMgr.getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
   {
@@ -81,12 +82,12 @@ bool Sapphire::Scripting::ScriptMgr::init()
 
 void Sapphire::Scripting::ScriptMgr::watchDirectories()
 {
-  auto pServerMgr = framework()->get< World::ServerMgr >();
-  auto shouldWatch = pServerMgr->getConfig().scripts.hotSwap;
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto shouldWatch = serverMgr.getConfig().scripts.hotSwap;
   if( !shouldWatch )
     return;
 
-  Watchdog::watchMany( pServerMgr->getConfig().scripts.path + "*" +
+  Watchdog::watchMany( serverMgr.getConfig().scripts.path + "*" +
                        m_nativeScriptMgr->getModuleExtension(),
                        [ this ]( const std::vector< ci::fs::path >& paths )
                        {
