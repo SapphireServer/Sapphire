@@ -973,6 +973,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char expansion;
     unsigned char unknown76;
     unsigned char unknown77;
+    unsigned char very_unknown;
     unsigned char race;
     unsigned char tribe;
     unsigned char gender;
@@ -999,7 +1000,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char craftingMasterMask;
     unsigned char unknown95[9];
     unsigned char unknown9F[2];
-    unsigned char unknownA1[3];
+    unsigned char unknownA1[6];
     unsigned int exp[Common::CLASSJOB_SLOTS];
     unsigned int unknown108;
     unsigned int pvpTotalExp;
@@ -1020,7 +1021,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char u19[13];
+    unsigned char u19[9];
     unsigned char mountGuideMask[22];
     char name[32];
     unsigned char unknownOword[16];
