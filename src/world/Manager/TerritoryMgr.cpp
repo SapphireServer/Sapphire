@@ -5,6 +5,7 @@
 #include "ServerMgr.h"
 
 #include <unordered_map>
+#include <Service.h>
 
 #include "Actor/Player.h"
 
@@ -72,7 +73,8 @@ bool Sapphire::World::Manager::TerritoryMgr::init()
     return false;
   }
 
-  auto& cfg = framework()->get< World::ServerMgr >()->getConfig();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& cfg = serverMgr.getConfig();
 
   m_inRangeDistance = cfg.network.inRangeDistance;
 

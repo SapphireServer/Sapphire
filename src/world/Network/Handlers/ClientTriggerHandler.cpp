@@ -34,6 +34,7 @@
 #include "Forwards.h"
 #include "Framework.h"
 #include <Network/PacketDef/Lobby/ServerLobbyDef.h>
+#include <Service.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -45,7 +46,8 @@ void examineHandler( Sapphire::FrameworkPtr pFw, Sapphire::Entity::Player& playe
 {
   using namespace Sapphire;
 
-  auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( targetId );
   if( pSession )
   {
     auto pTarget = pSession->getPlayer();

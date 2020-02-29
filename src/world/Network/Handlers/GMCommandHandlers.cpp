@@ -8,6 +8,7 @@
 #include <Exd/ExdDataGenerated.h>
 
 #include <unordered_map>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 
@@ -594,7 +595,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
   if( player.getGmRank() <= 0 )
     return;
 
-  auto pServerZone = pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
@@ -608,7 +609,7 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
   Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                  player.getName(), commandId, param1, param2, param3, param4, target );
 
-  auto targetSession = pServerZone->getSession( target );
+  auto targetSession = serverMgr.getSession( target );
   Sapphire::Entity::CharaPtr targetActor;
 
   if( targetSession != nullptr )

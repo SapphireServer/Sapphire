@@ -7,6 +7,7 @@
 #include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
+#include <Service.h>
 
 #include "Territory/Territory.h"
 
@@ -380,7 +381,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
 void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
@@ -397,18 +398,18 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id
-        auto session = pServerZone->getSession( playerId );
+        auto session = serverMgr.getSession( playerId );
 
         if( !session )
         {
           Logger::info( "[{0}] Session not registered, creating", id );
           // return;
-          if( !pServerZone->createSession( playerId ) )
+          if( !serverMgr.createSession( playerId ) )
           {
             disconnect();
             return;
           }
-          session = pServerZone->getSession( playerId );
+          session = serverMgr.getSession( playerId );
         }
           //TODO: Catch more things in lobby and send real errors
         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )

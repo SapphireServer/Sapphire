@@ -1,6 +1,7 @@
 #include "NativeScriptMgr.h"
 
 #include <Crypt/md5.h>
+#include <Service.h>
 #include "ServerMgr.h"
 
 #include "Framework.h"
@@ -124,8 +125,9 @@ namespace Sapphire::Scripting
   NativeScriptMgr::NativeScriptMgr( FrameworkPtr pFw  ) :
     World::Manager::BaseManager( pFw )
   {
-    auto pServerMgr = framework()->get< Sapphire::World::ServerMgr >();
-    m_loader.setCachePath( pServerMgr->getConfig().scripts.cachePath );
+    auto& serverMgr = Common::Service< Sapphire::World::ServerMgr >::ref();
+
+    m_loader.setCachePath( serverMgr.getConfig().scripts.cachePath );
   }
 
 

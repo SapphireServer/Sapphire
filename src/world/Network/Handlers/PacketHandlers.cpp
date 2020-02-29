@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 
@@ -120,7 +121,8 @@ void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( Framewor
 {
 
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
-  auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( targetId );
 
   Logger::debug( "reqExamineSearchCommentHandler: {0}", targetId );
 
@@ -148,7 +150,9 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( FrameworkPtr pFw,
 {
 
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
-  auto pSession = pFw->get< World::ServerMgr >()->getSession( targetId );
+
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( targetId );
 
   Logger::debug( "reqExamineFcInfo: {0}", targetId );
 
@@ -566,9 +570,9 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcTellHandler >( inPacket );
 
-  auto pZoneServer = pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
-  auto pSession = pZoneServer->getSession( packet.data().targetPCName );
+  auto pSession = serverMgr.getSession( packet.data().targetPCName );
 
   if( !pSession )
   {

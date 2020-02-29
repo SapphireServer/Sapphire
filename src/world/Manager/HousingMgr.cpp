@@ -10,6 +10,7 @@
 
 #include <unordered_map>
 #include <cstring>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
@@ -310,6 +311,8 @@ Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint32
 
 void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident )
 {
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   player.setActiveLand( static_cast< uint8_t >( ident.landId ), static_cast< uint8_t >( ident.wardNum ) );
 
   auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
@@ -336,7 +339,8 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
   }
 
   uint32_t playerId = static_cast< uint32_t >( land->getOwnerId() );
-  std::string playerName = framework()->get< World::ServerMgr >()->getPlayerNameFromDb( playerId );
+
+  std::string playerName = serverMgr.getPlayerNameFromDb( playerId );
 
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
 
@@ -463,6 +467,8 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
 void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId )
 {
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   auto landSetId = toLandSetId( territoryTypeId, wardId );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
@@ -509,7 +515,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
         entry.infoFlags |= Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getOwnerId();
-        auto playerName = framework()->get< World::ServerMgr >()->getPlayerNameFromDb( static_cast< uint32_t >( owner ) );
+        auto playerName = serverMgr.getPlayerNameFromDb( static_cast< uint32_t >( owner ) );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;

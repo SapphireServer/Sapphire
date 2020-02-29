@@ -10,6 +10,7 @@
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
 #include <cmath>
+#include <Service.h>
 
 #include "Session.h"
 #include "Player.h"
@@ -114,8 +115,8 @@ Sapphire::Entity::Player::~Player()
 
 void Sapphire::Entity::Player::injectPacket( const std::string& path )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
-  auto session = pServerZone->getSession( getId() );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto session = serverMgr.getSession( getId() );
   if( session )
     session->getZoneConnection()->injectPacket( path, *this );
 }
@@ -1257,8 +1258,8 @@ const uint8_t* Sapphire::Entity::Player::getGcRankArray() const
 
 void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( m_id );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( m_id );
 
   if( !pSession )
     return;
@@ -1272,8 +1273,8 @@ void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr
 
 void Sapphire::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( m_id );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( m_id );
 
   if( !pSession )
     return;
@@ -1689,8 +1690,8 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( isLogin() )
   {
     //Update player map in servermgr - in case player name has been changed
-    auto pServerMgr = m_pFw->get< World::ServerMgr >();
-    pServerMgr->updatePlayerName( getId(), getName() );
+    auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+    serverMgr.updatePlayerName( getId(), getName() );
   }
 
   getCurrentTerritory()->onBeforePlayerZoneIn( *this );

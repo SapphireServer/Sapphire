@@ -14,6 +14,7 @@
 #include <Network/CommonActorControl.h>
 #include <Database/DatabaseDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
+#include <Service.h>
 
 #include "Territory.h"
 #include "InstanceContent.h"
@@ -251,7 +252,6 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
       agentId = m_pNaviProvider->addAgent( *pPlayer );
     pPlayer->setAgentId( agentId );
 
-    auto pServerZone = m_pFw->get< World::ServerMgr >();
     m_playerMap[ pPlayer->getId() ] = pPlayer;
     updateCellActivity( cx, cy, 2 );
   }
@@ -319,7 +319,8 @@ void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uin
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -329,7 +330,7 @@ void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uin
     if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
     {
 
-      auto pSession = pServerZone->getSession( player->getId() );
+      auto pSession = serverMgr.getSession( player->getId() );
       //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
       if( pSession )
         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
@@ -345,14 +346,15 @@ void Sapphire::Territory::queuePacketForZone( Entity::Player& sourcePlayer,
   if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
     if( ( sourcePlayer.getId() != player->getId() ) ||
         ( ( sourcePlayer.getId() == player->getId() ) && forSelf ) )
     {
-      auto pSession = pServerZone->getSession( player->getId() );
+      auto pSession = serverMgr.getSession( player->getId() );
       if( pSession )
         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
     }
@@ -874,9 +876,9 @@ void Sapphire::Territory::updateSpawnPoints()
     {
       if( !point->getLinkedBNpc() && ( Util::getTimeSeconds() - point->getTimeOfDeath() ) > 60 )
       {
-        auto serverZone = m_pFw->get< World::ServerMgr >();
+        auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
-        auto bNpcTemplate = serverZone->getBNpcTemplate( group.getTemplateId() );
+        auto bNpcTemplate = serverMgr.getBNpcTemplate( group.getTemplateId() );
 
         if( !bNpcTemplate )
         {

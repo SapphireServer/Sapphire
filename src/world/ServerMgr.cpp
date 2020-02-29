@@ -28,6 +28,7 @@
 
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
+#include <Service.h>
 #include "Manager/LinkshellMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/HousingMgr.h"
@@ -66,20 +67,20 @@ size_t Sapphire::World::ServerMgr::getSessionCount() const
 
 bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
 {
-  auto pConfig = framework()->get< Common::ConfigMgr >();
+  auto& configMgr = Common::Service< Common::ConfigMgr >::ref();
 
   Logger::info( "Loading config {0}", m_configName );
 
   bool failedLoad = false;
 
   // load global cfg first
-  if( !pConfig->loadGlobalConfig( m_config.global ) )
+  if( !configMgr.loadGlobalConfig( m_config.global ) )
   {
     Logger::fatal( "Error loading config global.ini, copying default..." );
     failedLoad = true;
   }
 
-  if( !pConfig->loadConfig( m_configName ) )
+  if( !configMgr.loadConfig( m_configName ) )
   {
     Logger::fatal( "Error loading config {0}", m_configName );
     failedLoad = true;
@@ -93,20 +94,20 @@ bool Sapphire::World::ServerMgr::loadSettings( int32_t argc, char* argv[] )
   }
 
   // load world specific config
-  m_config.scripts.hotSwap = pConfig->getValue( "Scripts", "HotSwap", true );
-  m_config.scripts.path = pConfig->getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
-  m_config.scripts.cachePath = pConfig->getValue< std::string >( "Scripts", "CachePath", "./cache/" );
+  m_config.scripts.hotSwap = configMgr.getValue( "Scripts", "HotSwap", true );
+  m_config.scripts.path = configMgr.getValue< std::string >( "Scripts", "Path", "./compiledscripts/" );
+  m_config.scripts.cachePath = configMgr.getValue< std::string >( "Scripts", "CachePath", "./cache/" );
 
-  m_config.navigation.meshPath = pConfig->getValue< std::string >( "Navigation", "MeshPath", "navi" );
+  m_config.navigation.meshPath = configMgr.getValue< std::string >( "Navigation", "MeshPath", "navi" );
 
-  m_config.network.disconnectTimeout = pConfig->getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
-  m_config.network.listenIp = pConfig->getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
-  m_config.network.listenPort = pConfig->getValue< uint16_t >( "Network", "ListenPort", 54992 );
-  m_config.network.inRangeDistance = pConfig->getValue< float >( "Network", "InRangeDistance", 80.f );
+  m_config.network.disconnectTimeout = configMgr.getValue< uint16_t >( "Network", "DisconnectTimeout", 20 );
+  m_config.network.listenIp = configMgr.getValue< std::string >( "Network", "ListenIp", "0.0.0.0" );
+  m_config.network.listenPort = configMgr.getValue< uint16_t >( "Network", "ListenPort", 54992 );
+  m_config.network.inRangeDistance = configMgr.getValue< float >( "Network", "InRangeDistance", 80.f );
 
-  m_config.motd = pConfig->getValue< std::string >( "General", "MotD", "" );
+  m_config.motd = configMgr.getValue< std::string >( "General", "MotD", "" );
 
-  m_config.housing.defaultEstateName = pConfig->getValue< std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
+  m_config.housing.defaultEstateName = configMgr.getValue< std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
 
   m_port = m_config.network.listenPort;
   m_ip = m_config.network.listenIp;
@@ -124,7 +125,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   printBanner();
 
   auto pConfig = std::make_shared< Common::ConfigMgr >();
-  framework()->set< Common::ConfigMgr >( pConfig );
+  Common::Service< Common::ConfigMgr >::set( pConfig );
   if( !loadSettings( argc, argv ) )
   {
     Logger::fatal( "Unable to load settings!" );
