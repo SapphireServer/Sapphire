@@ -10,7 +10,6 @@
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 
-#include "Framework.h"
 
 #include "ServerLobby.h"
 

@@ -3,15 +3,14 @@
 
 #include <Common.h>
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 
 namespace Sapphire::World::Manager
 {
 
-  class ItemMgr : public BaseManager
+  class ItemMgr
   {
   public:
-    ItemMgr( FrameworkPtr pFw );
+    ItemMgr() = default;
 
     ItemPtr loadItem( uint64_t uId );
 

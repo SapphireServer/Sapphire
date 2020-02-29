@@ -14,7 +14,6 @@
 
 
 #include "Player.h"
-#include "Framework.h"
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
@@ -30,8 +29,7 @@
 #include "Manager/InventoryMgr.h"
 #include "Manager/ItemMgr.h"
 
-#include "Framework.h"
-#include <Network/CommonActorControl.h>
+#include <Service.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -43,7 +41,7 @@ void Sapphire::Entity::Player::initInventory()
 {
   auto setupContainer = [ this ]( InventoryType type, uint8_t maxSize, const std::string& tableName,
                                   bool isMultiStorage, bool isPersistentStorage = true )
-  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, m_pFw, isPersistentStorage ); };
+  { m_storageMap[ type ] = make_ItemContainer( type, maxSize, tableName, isMultiStorage, isPersistentStorage ); };
 
   // main bags
   setupContainer( Bag0, 34, "charaiteminventory", true );
@@ -114,13 +112,11 @@ void Sapphire::Entity::Player::sendItemLevel()
 
 void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 {
-  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
-  if( !exdData )
-    return;
+  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
-  auto itemInfo = exdData->get< Sapphire::Data::Item >( pItem->getId() );
+  auto itemInfo = exdData.get< Sapphire::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
-  auto classJobInfo = exdData->get< Sapphire::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto classJobInfo = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto currentParentClass = static_cast< ClassJob >( classJobInfo->classJobParent );
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
@@ -135,11 +131,9 @@ void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 
 void Sapphire::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
 {
-  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
-  if ( !exdData )
-    return;
+  auto exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
-  auto itemInfo = exdData->get< Sapphire::Data::Item >( pItem->getId() );
+  auto itemInfo = exdData.get< Sapphire::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
@@ -296,11 +290,9 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
 void Sapphire::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
 {
-  auto exdData = m_pFw->get< Sapphire::Data::ExdDataGenerated >();
-  if ( !exdData )
-    return;
+  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
-  auto currentClassJob = exdData->get< Sapphire::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto currentClassJob = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto parentClass = static_cast< ClassJob >( currentClassJob->classJobParent );
   setClassJob( parentClass );
 }
@@ -406,11 +398,11 @@ void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t
 
 void Sapphire::Entity::Player::sendInventory()
 {
-  auto pInvMgr = m_pFw->get< World::Manager::InventoryMgr >();
+  auto& invMgr = Common::Service< World::Manager::InventoryMgr >::ref();
 
   for( auto it = m_storageMap.begin(); it != m_storageMap.end(); ++it )
   {
-    pInvMgr->sendInventoryContainer( *this, it->second );
+    invMgr.sendInventoryContainer( *this, it->second );
   }
 }
 
@@ -474,7 +466,7 @@ uint32_t Sapphire::Entity::Player::getCrystal( CrystalType type )
 
 void Sapphire::Entity::Player::writeInventory( InventoryType type )
 {
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   auto storage = m_storageMap[ type ];
 
@@ -498,13 +490,13 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
   if( storage->isMultiStorage() )
     query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );
 
-  pDb->execute( query );
+  db.execute( query );
 }
 
 void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
 {
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
 
   // todo: add more fields
   stmt->setInt( 1, pItem->getStackSize() );
@@ -513,17 +505,17 @@ void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
 
   stmt->setInt64( 4, pItem->getUId() );
 
-  pDb->directExecute( stmt );
+  db.directExecute( stmt );
 }
 
 void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
 {
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
 
   stmt->setInt64( 1, item->getUId() );
 
-  pDb->directExecute( stmt );
+  db.directExecute( stmt );
 }
 
 
@@ -536,9 +528,8 @@ bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantit
 
 Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent, bool canMerge )
 {
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto itemInfo = exdData.get< Sapphire::Data::Item >( catalogId );
 
   // if item data doesn't exist or it's a blank field
   if( !itemInfo || itemInfo->levelItem == 0 )

@@ -26,7 +26,6 @@
 #include <vector>
 #include <algorithm>
 
-#include <Framework.h>
 #include <Logging/Logger.h>
 
 #include "SapphireApi.h"

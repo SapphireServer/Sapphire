@@ -50,7 +50,6 @@
 #include "Session.h"
 #include "ServerMgr.h"
 #include "Forwards.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -58,8 +57,7 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-void Sapphire::Network::GameConnection::fcInfoReqHandler( FrameworkPtr pFw,
-                                                          const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::fcInfoReqHandler( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
   // TODO: use new packet struct for this
@@ -68,8 +66,7 @@ void Sapphire::Network::GameConnection::fcInfoReqHandler( FrameworkPtr pFw,
   //queueOutPacket( pPe );
 }
 
-void Sapphire::Network::GameConnection::setSearchInfoHandler( FrameworkPtr pFw,
-                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::setSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetSearchInfo >( inPacket );
@@ -104,8 +101,7 @@ void Sapphire::Network::GameConnection::setSearchInfoHandler( FrameworkPtr pFw,
                                              static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
-void Sapphire::Network::GameConnection::reqSearchInfoHandler( FrameworkPtr pFw,
-                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
   auto searchInfoPacket = makeZonePacket< FFXIVIpcInitSearchInfo >( player.getId() );
@@ -115,8 +111,7 @@ void Sapphire::Network::GameConnection::reqSearchInfoHandler( FrameworkPtr pFw,
   queueOutPacket( searchInfoPacket );
 }
 
-void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( FrameworkPtr pFw,
-                                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                         Entity::Player& player )
 {
 
@@ -144,8 +139,7 @@ void Sapphire::Network::GameConnection::reqExamineSearchCommentHandler( Framewor
   }
 }
 
-void Sapphire::Network::GameConnection::reqExamineFcInfo( FrameworkPtr pFw,
-                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
 
@@ -175,16 +169,14 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( FrameworkPtr pFw,
   }
 }
 
-void Sapphire::Network::GameConnection::linkshellListHandler( FrameworkPtr pFw,
-                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::linkshellListHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
   auto linkshellListPacket = makeZonePacket< FFXIVIpcLinkshellList >( player.getId() );
   queueOutPacket( linkshellListPacket );
 }
 
-void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
-                                                               const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::updatePositionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                Entity::Player& player )
 {
   // if the player is marked for zoning we no longer want to update his pos
@@ -269,8 +261,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( FrameworkPtr pFw,
 }
 
 void
-Sapphire::Network::GameConnection::reqEquipDisplayFlagsHandler( FrameworkPtr pFw,
-                                                                const Packets::FFXIVARR_PACKET_RAW& inPacket,
+Sapphire::Network::GameConnection::reqEquipDisplayFlagsHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                 Entity::Player& player )
 {
   player.setEquipDisplayFlags( inPacket.data[ 0x10 ] );
@@ -278,19 +269,18 @@ Sapphire::Network::GameConnection::reqEquipDisplayFlagsHandler( FrameworkPtr pFw
   player.sendDebug( "EquipDisplayFlag CHANGE: {0}", player.getEquipDisplayFlags() );
 }
 
-void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
-                                                         const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::zoneLineHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                          Entity::Player& player )
 {
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneLineHandler >( inPacket );
   const auto zoneLineId = packet.data().zoneLineId;
 
-  auto pTeriMgr = pFw->get< TerritoryMgr >();
-  auto pInstanceObjectCache = pFw->get< InstanceObjectCache >();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto tInfo = player.getCurrentTerritory()->getTerritoryTypeInfo();
 
-  auto pExitRange = pInstanceObjectCache->getExitRange( player.getTerritoryTypeId(), zoneLineId );
+  auto pExitRange = instanceObjectCache.getExitRange( player.getTerritoryTypeId(), zoneLineId );
 
   Common::FFXIVARR_POSITION3 targetPos{};
   uint32_t targetZone;
@@ -298,8 +288,8 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
 
   if( pExitRange )
   {
-    auto pPopRange = pInstanceObjectCache->getPopRange( pExitRange->data.destTerritoryType,
-                                                        pExitRange->data.destInstanceObjectId );
+    auto pPopRange = instanceObjectCache.getPopRange( pExitRange->data.destTerritoryType,
+                                                       pExitRange->data.destInstanceObjectId );
     if( pPopRange )
     {
       targetZone = pExitRange->data.destTerritoryType;
@@ -324,16 +314,15 @@ void Sapphire::Network::GameConnection::zoneLineHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::discoveryHandler( FrameworkPtr pFw,
-                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::discoveryHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
-  auto pInstanceObjectCache = pFw->get< InstanceObjectCache >();
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto tInfo = player.getCurrentTerritory()->getTerritoryTypeInfo();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcDiscoveryHandler >( inPacket );
   const auto positionRef = packet.data().positionRef;
 
-  auto pRefInfo = pInstanceObjectCache->getMapRange( player.getTerritoryTypeId(), positionRef );
+  auto pRefInfo = instanceObjectCache.getMapRange( player.getTerritoryTypeId(), positionRef );
 
   player.sendDebug( "Discovery ref pos id#{0}", positionRef );
 
@@ -349,8 +338,7 @@ void Sapphire::Network::GameConnection::discoveryHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::playTimeHandler( FrameworkPtr pFw,
-                                                         const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::playTimeHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                          Entity::Player& player )
 {
   auto playTimePacket = makeZonePacket< FFXIVIpcPlayTime >( player.getId() );
@@ -359,8 +347,7 @@ void Sapphire::Network::GameConnection::playTimeHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::initHandler( FrameworkPtr pFw,
-                                                     const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::initHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
   // init handler means this is a login procedure
@@ -370,8 +357,7 @@ void Sapphire::Network::GameConnection::initHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::blackListHandler( FrameworkPtr pFw,
-                                                          const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::blackListHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                           Entity::Player& player )
 {
   uint8_t count = inPacket.data[ 0x11 ];
@@ -386,8 +372,7 @@ void Sapphire::Network::GameConnection::blackListHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::pingHandler( FrameworkPtr pFw,
-                                                     const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::pingHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcPingHandler >( inPacket );
@@ -398,8 +383,7 @@ void Sapphire::Network::GameConnection::pingHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::finishLoadingHandler( FrameworkPtr pFw,
-                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::finishLoadingHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
   player.sendQuestInfo();
@@ -432,8 +416,7 @@ void Sapphire::Network::GameConnection::finishLoadingHandler( FrameworkPtr pFw,
   player.getCurrentTerritory()->updateActorPosition( player );
 }
 
-void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
-                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
 
@@ -492,18 +475,17 @@ void Sapphire::Network::GameConnection::socialListHandler( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
-                                                     const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
-  auto pDebugCom = pFw->get< DebugCommandMgr >();
+  auto& debugCommandMgr = Common::Service< DebugCommandMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcChatHandler >( inPacket );
 
   if( packet.data().message[ 0 ] == '!' )
   {
     // execute game console command
-    pDebugCom->execCommand( const_cast< char* >( packet.data().message ) + 1, player );
+    debugCommandMgr.execCommand( const_cast< char* >( packet.data().message ) + 1, player );
     return;
   }
 
@@ -551,8 +533,7 @@ void Sapphire::Network::GameConnection::chatHandler( FrameworkPtr pFw,
 // currently we wait for the session to just time out after logout, this can be a problem is the user tries to
 // log right back in.
 // Also the packet needs to be converted to an ipc structure
-void Sapphire::Network::GameConnection::logoutHandler( FrameworkPtr pFw,
-                                                       const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::logoutHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
   auto logoutPacket = makeZonePacket< FFXIVIpcLogout >( player.getId() );
@@ -564,8 +545,7 @@ void Sapphire::Network::GameConnection::logoutHandler( FrameworkPtr pFw,
 }
 
 
-void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
-                                                     const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcTellHandler >( inPacket );
@@ -620,8 +600,7 @@ void Sapphire::Network::GameConnection::tellHandler( FrameworkPtr pFw,
   pTargetPlayer->queueChatPacket( tellPacket );
 }
 
-void Sapphire::Network::GameConnection::performNoteHandler( FrameworkPtr pFw,
-                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::performNoteHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
   auto performPacket = makeZonePacket< FFXIVIpcPerformNote >( player.getId() );
@@ -629,17 +608,16 @@ void Sapphire::Network::GameConnection::performNoteHandler( FrameworkPtr pFw,
   player.sendToInRangeSet( performPacket );
 }
 
-void Sapphire::Network::GameConnection::landRenameHandler( FrameworkPtr pFw,
-                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::landRenameHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcRenameLandHandler >( inPacket );
 
-  auto pHousingMgr = pFw->get< HousingMgr >();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-  auto landSetId = pHousingMgr->toLandSetId( packet.data().ident.territoryTypeId, packet.data().ident.wardNum );
+  auto landSetId = housingMgr.toLandSetId( packet.data().ident.territoryTypeId, packet.data().ident.wardNum );
 
-  auto pZone = pHousingMgr->getHousingZoneByLandSetId( landSetId );
+  auto pZone = housingMgr.getHousingZoneByLandSetId( landSetId );
   if( !pZone )
     return;
 
@@ -663,91 +641,83 @@ void Sapphire::Network::GameConnection::landRenameHandler( FrameworkPtr pFw,
   player.queuePacket( nameUpdatePacket );
 }
 
-void Sapphire::Network::GameConnection::buildPresetHandler( FrameworkPtr pFw,
-                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::buildPresetHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcBuildPresetHandler >( inPacket );
 
-  auto pHousingMgr = pFw->get< HousingMgr >();
-  pHousingMgr->buildPresetEstate( player, packet.data().plotNum, packet.data().itemId );
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  housingMgr.buildPresetEstate( player, packet.data().plotNum, packet.data().itemId );
 }
 
-void Sapphire::Network::GameConnection::housingUpdateGreetingHandler( FrameworkPtr pFw,
-                                                                      const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::housingUpdateGreetingHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                       Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateHouseGreeting >( inPacket );
 
-  auto pHousingMgr = pFw->get< HousingMgr >();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-  pHousingMgr->updateEstateGreeting( player, packet.data().ident, std::string( packet.data().greeting ) );
+  housingMgr.updateEstateGreeting( player, packet.data().ident, std::string( packet.data().greeting ) );
 }
 
-void Sapphire::Network::GameConnection::reqPlaceHousingItem( FrameworkPtr pFw,
-                                                             const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqPlaceHousingItem( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                              Entity::Player& player )
 {
-  auto housingMgr = pFw->get< HousingMgr >();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcReqPlaceHousingItem >( inPacket );
   const auto& data = packet.data();
 
   if( data.shouldPlaceItem == 1 )
   {
-    housingMgr->reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
+    housingMgr.reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId,
                                      data.position, data.rotation );
   }
   else
-    housingMgr->reqPlaceItemInStore( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId );
+    housingMgr.reqPlaceItemInStore( player, data.landId, data.sourceInvContainerId, data.sourceInvSlotId );
 
 }
 
-void Sapphire::Network::GameConnection::reqMoveHousingItem( FrameworkPtr pFw,
-                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-  auto housingMgr = pFw->get< HousingMgr >();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateObjectPosition >( inPacket );
   const auto& data = packet.data();
 
-  housingMgr->reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
-
+  housingMgr.reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
 }
 
-void Sapphire::Network::GameConnection::marketBoardSearch( FrameworkPtr pFw,
-                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::marketBoardSearch( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
-  auto marketMgr = pFw->get< MarketMgr >();
+  auto& marketMgr = Common::Service< MarketMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardSearch >( inPacket );
   const auto& data = packet.data();
 
   std::string_view searchStr( data.searchStr );
 
-  marketMgr->searchMarketboard( player, data.itemSearchCategory, data.maxEquipLevel, data.classJobId, data.searchStr,
+  marketMgr.searchMarketboard( player, data.itemSearchCategory, data.maxEquipLevel, data.classJobId, data.searchStr,
                                 data.requestId, data.startIdx );
 }
 
-void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( FrameworkPtr pFw,
-                                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                     Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemListingInfo >( inPacket );
 
-  auto marketMgr = pFw->get< MarketMgr >();
+  auto& marketMgr = Common::Service< MarketMgr >::ref();
 
-  marketMgr->requestItemListingInfo( player, packet.data().catalogId, packet.data().requestId );
+  marketMgr.requestItemListingInfo( player, packet.data().catalogId, packet.data().requestId );
 }
 
-void Sapphire::Network::GameConnection::marketBoardRequestItemListings( FrameworkPtr pFw,
-                                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::marketBoardRequestItemListings( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                         Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcMarketBoardRequestItemListings >( inPacket );
 
-  auto marketMgr = pFw->get< MarketMgr >();
+  auto& marketMgr = Common::Service< MarketMgr >::ref();
 
-  marketMgr->requestItemListings( player, packet.data().itemCatalogId );
+  marketMgr.requestItemListings( player, packet.data().itemCatalogId );
 }

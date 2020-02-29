@@ -5,6 +5,7 @@
 #include <Util/UtilMath.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -20,7 +21,6 @@
 #include "Event/EventHandler.h"
 
 #include "InstanceContent.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -32,9 +32,8 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
                                             uint32_t guId,
                                             const std::string& internalName,
                                             const std::string& contentName,
-                                            uint32_t instanceContentId,
-                                            FrameworkPtr pFw ) :
-  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+                                            uint32_t instanceContentId ) :
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::InstanceContent, instanceContentId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),
@@ -51,8 +50,8 @@ bool Sapphire::InstanceContent::init()
   if( !Territory::init() )
     return false;
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsInstanceContent() );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceInit( getAsInstanceContent() );
 
   return true;
 }
@@ -157,8 +156,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       break;
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsInstanceContent(), tickCount );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceUpdate( getAsInstanceContent(), tickCount );
 
   m_lastUpdate = tickCount;
 }
@@ -312,8 +311,8 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
@@ -385,8 +384,8 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
 void
 Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 
   if( !hasPlayerPreviouslySpawned( player ) )
   {

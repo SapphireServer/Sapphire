@@ -14,7 +14,6 @@
 
 #include "Territory/Territory.h"
 #include "ServerMgr.h"
-#include "Framework.h"
 
 #include "Action/EventAction.h"
 
@@ -300,7 +299,7 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint64_t additional )
 {
   auto pEventAction = World::Action::make_EventAction( getAsChara(), eventId, action,
-                                                finishCallback, interruptCallback, additional, m_pFw );
+                                                finishCallback, interruptCallback, additional );
 
   auto pEvent = getEvent( eventId );
 

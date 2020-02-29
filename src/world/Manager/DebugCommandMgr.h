@@ -6,20 +6,19 @@
 
 #include "DebugCommand/DebugCommand.h"
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 
 namespace Sapphire::World::Manager
 {
 
   // handler for in game commands
-  class DebugCommandMgr : public Manager::BaseManager
+  class DebugCommandMgr
   {
   private:
     // container mapping command string to command object
     std::map< std::string, std::shared_ptr< DebugCommand > > m_commandMap;
 
   public:
-    DebugCommandMgr( FrameworkPtr pFw );
+    DebugCommandMgr();
 
     ~DebugCommandMgr();
 

@@ -1,9 +1,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-#include <Framework.h>
 #include <Exd/ExdDataGenerated.h>
-
+#include <Service.h>
 
 
 using namespace Sapphire;
@@ -109,11 +108,9 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pExdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-    if( !pExdData )
-      return;
+    auto exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
-    auto aetherInfo = pExdData->get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
+    auto aetherInfo = exdData.get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
     if( !aetherInfo )
       return;
 

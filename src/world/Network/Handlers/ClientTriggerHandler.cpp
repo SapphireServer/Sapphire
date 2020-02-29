@@ -32,8 +32,6 @@
 #include "Session.h"
 #include "ServerMgr.h"
 #include "Forwards.h"
-#include "Framework.h"
-#include <Network/PacketDef/Lobby/ServerLobbyDef.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
@@ -42,7 +40,7 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-void examineHandler( Sapphire::FrameworkPtr pFw, Sapphire::Entity::Player& player, uint32_t targetId )
+void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 {
   using namespace Sapphire;
 
@@ -65,8 +63,7 @@ void examineHandler( Sapphire::FrameworkPtr pFw, Sapphire::Entity::Player& playe
   }
 }
 
-void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
-                                                              const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
 
@@ -148,7 +145,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     case ClientTriggerType::Examine:
     {
       uint32_t targetId = param11;
-      examineHandler( pFw, player, targetId );
+      examineHandler( player, targetId );
       break;
     }
     case ClientTriggerType::MarkPlayer: // Mark player
@@ -193,8 +190,8 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
       uint32_t emoteId = param11;
       bool isSilent = param2 == 1;
 
-      auto pExdData = pFw->get< Data::ExdDataGenerated >();
-      auto emoteData = pExdData->get< Data::Emote >( emoteId );
+      auto exdData = Common::Service< Data::ExdDataGenerated >::ref();
+      auto emoteData = exdData.get< Data::Emote >( emoteId );
 
       if( !emoteData )
         return;
@@ -329,70 +326,63 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestLandSignFree:
     {
-      auto pHousingMgr = pFw->get< HousingMgr >();
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
-      pHousingMgr->sendLandSignFree( player, ident );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      housingMgr.sendLandSignFree( player, ident );
 
       break;
     }
     case ClientTriggerType::RequestLandSignOwned:
     {
-      auto pHousingMgr = pFw->get< HousingMgr >();
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12, false );
-      pHousingMgr->sendLandSignOwned( player, ident );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12, false );
+      housingMgr.sendLandSignOwned( player, ident );
 
       break;
     }
     case ClientTriggerType::RequestWardLandInfo:
     {
-      auto pHousingMgr = pFw->get< HousingMgr >();
-      if( !pHousingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      pHousingMgr->sendWardLandInfo( player, static_cast< uint8_t >( param12 ), static_cast< uint8_t >( param11 ) );
+      housingMgr.sendWardLandInfo( player, static_cast< uint8_t >( param12 ), static_cast< uint8_t >( param11 ) );
 
       break;
     }
     case ClientTriggerType::RequestLandRelinquish:
     {
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
+
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
-      auto pHousingMgr = pFw->get< HousingMgr >();
-      pHousingMgr->relinquishLand( player, plot );
+      housingMgr.relinquishLand( player, plot );
 
       break;
     }
     case ClientTriggerType::RequestEstateRename:
     {
-      auto pHousingMgr = pFw->get< HousingMgr >();
-      if( !pHousingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
-      pHousingMgr->requestEstateRename( player, ident );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      housingMgr.requestEstateRename( player, ident );
 
       break;
     }
     case ClientTriggerType::RequestEstateEditGreeting:
     {
-      auto pHousingMgr = pFw->get< HousingMgr >();
-      if( !pHousingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
-      pHousingMgr->requestEstateEditGreeting( player, ident );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      housingMgr.requestEstateEditGreeting( player, ident );
 
       break;
     }
     case ClientTriggerType::RequestEstateEditGuestAccessSettings:
     {
-      auto pHousingMgr = pFw->get< HousingMgr >();
-      if( !pHousingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      auto ident = pHousingMgr->clientTriggerParamsToLandIdent( param11, param12 );
-      pHousingMgr->requestEstateEditGuestAccess( player, ident );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      housingMgr.requestEstateEditGuestAccess( player, ident );
 
       break;
     }
@@ -416,12 +406,10 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     }
     case ClientTriggerType::RequestEstateGreeting:
     {
-      auto housingMgr = pFw->get< HousingMgr >();
-      if( !housingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      auto ident = housingMgr->clientTriggerParamsToLandIdent( param11, param12 );
-      housingMgr->sendEstateGreeting( player, ident );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      housingMgr.sendEstateGreeting( player, ident );
 
       break;
     }
@@ -429,59 +417,55 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( FrameworkPtr pFw,
     {
       uint8_t plot = ( param12 & 0xFF );
 
-      auto housingMgr = pFw->get< HousingMgr >();
-      if( !housingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
       uint16_t inventoryType = Common::InventoryType::HousingExteriorPlacedItems;
       if( param2 == 1 )
         inventoryType = Common::InventoryType::HousingExteriorStoreroom;
 
-      housingMgr->sendEstateInventory( player, inventoryType, plot );
+      housingMgr.sendEstateInventory( player, inventoryType, plot );
 
       break;
     }
     case ClientTriggerType::RequestEstateInventory:
     {
-      auto housingMgr = pFw->get< HousingMgr >();
-      if( !housingMgr )
-        break;
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
       // param1 = 1 - storeroom
       // param1 = 0 - placed items
 
       if( param1 == 1 )
-        housingMgr->sendInternalEstateInventoryBatch( player, true );
+        housingMgr.sendInternalEstateInventoryBatch( player, true );
       else
-        housingMgr->sendInternalEstateInventoryBatch( player );
+        housingMgr.sendInternalEstateInventoryBatch( player );
 
       break;
     }
     case ClientTriggerType::RequestHousingItemRemove:
     {
-      auto housingMgr = m_pFw->get< HousingMgr >();
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
       auto slot = param4 & 0xFF;
       auto sendToStoreroom = ( param4 >> 16 ) != 0;
 
       //player, plot, containerId, slot, sendToStoreroom
-      housingMgr->reqRemoveHousingItem( player, static_cast< uint16_t >( param12 ), static_cast< uint16_t >( param2 ), static_cast< uint8_t >( slot ), sendToStoreroom );
+      housingMgr.reqRemoveHousingItem( player, static_cast< uint16_t >( param12 ), static_cast< uint16_t >( param2 ), static_cast< uint8_t >( slot ), sendToStoreroom );
 
       break;
     }
     case ClientTriggerType::RequestEstateExteriorRemodel:
     {
-      auto housingMgr = m_pFw->get< HousingMgr >();
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      housingMgr->reqEstateExteriorRemodel( player, static_cast< uint16_t >( param11 ) );
+      housingMgr.reqEstateExteriorRemodel( player, static_cast< uint16_t >( param11 ) );
 
       break;
     }
     case ClientTriggerType::RequestEstateInteriorRemodel:
     {
-      auto housingMgr = m_pFw->get< HousingMgr >();
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-      housingMgr->reqEstateInteriorRemodel( player );
+      housingMgr.reqEstateInteriorRemodel( player );
 
       break;
     }

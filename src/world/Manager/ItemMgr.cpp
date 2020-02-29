@@ -2,18 +2,12 @@
 
 #include "Inventory/ItemContainer.h"
 #include "Inventory/Item.h"
-#include "Framework.h"
 #include <Network/CommonActorControl.h>
 
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
-
-Sapphire::World::Manager::ItemMgr::ItemMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{
-
-}
+#include <Service.h>
 
 bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 {
@@ -122,27 +116,26 @@ bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategor
 
 Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   //  1 catalogId, 2 stack, 3 reservedFlag, 4 signatureId, 5 flags, 6 durability, 7 refine, 8 materia_0, 9 materia_1,
   //  10 materia_2, 11 materia_3, 12 materia_4, 13 stain, 14 pattern, 15 buffer_0, 16 buffer_1, 17 buffer_2,
   //  18 buffer_3, 19 buffer_4
-  auto query = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_SELECT );
+  auto query = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_SELECT );
   query->setUInt64( 1, uId );
 
-  auto itemRes = pDb->query( query );
+  auto itemRes = db.query( query );
   if( !itemRes->next() )
     return nullptr;
 
   try
   {
-    auto itemInfo = pExdData->get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
+    auto itemInfo = exdData.get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
     ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
-                               framework(),
                                isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
@@ -185,8 +178,9 @@ Sapphire::Common::ContainerType Sapphire::World::Manager::ItemMgr::getContainerT
 uint32_t Sapphire::World::Manager::ItemMgr::getNextUId()
 {
   uint32_t charId = 0;
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pQR = pDb->query( "SELECT MAX(ItemId) FROM charaglobalitem" );
+
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto pQR = db.query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
   if( !pQR->next() )
     return 0x00500001;

@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "ServerMgr.h"
-#include <Framework.h>
 
 #include <Util/CrashHandler.h>
 #include <Service.h>
@@ -14,8 +13,7 @@ Common::Util::CrashHandler crashHandler;
 
 int main( int32_t argc, char* argv[] )
 {
-  auto pFramework = make_Framework();
-  auto pServer = std::make_shared< ServerMgr >( "world.ini", pFramework );
+  auto pServer = std::make_shared< ServerMgr >( "world.ini" );
 
   Common::Service< ServerMgr >::set( pServer );
 
