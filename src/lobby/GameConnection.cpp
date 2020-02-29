@@ -25,9 +25,8 @@ extern Lobby::ServerLobby g_serverLobby;
 extern Lobby::RestConnector g_restConnector;
 
 Lobby::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                Sapphire::Network::AcceptorPtr pAcceptor,
-                                                FrameworkPtr pFw ) :
-  Sapphire::Network::Connection( pHive, pFw ),
+                                                Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Sapphire::Network::Connection( pHive ),
   m_pAcceptor( pAcceptor ),
   m_bEncryptionInitialized( false )
 {
@@ -42,7 +41,7 @@ Lobby::GameConnection::~GameConnection()
 // overwrite the parents onConnect for our game socket needs
 void Lobby::GameConnection::onAccept( const std::string& host, uint16_t port )
 {
-  auto connection = make_GameConnection( m_hive, m_pAcceptor, m_pFw );
+  auto connection = make_GameConnection( m_hive, m_pAcceptor );
   m_pAcceptor->accept( connection );
 
   Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
