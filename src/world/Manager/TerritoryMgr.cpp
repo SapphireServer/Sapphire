@@ -15,15 +15,13 @@
 #include "Territory/QuestBattle.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
-#include "Framework.h"
 
 #include "Territory/Land.h"
 #include "Territory/House.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
 #include "NaviMgr.h"
 
-Sapphire::World::Manager::TerritoryMgr::TerritoryMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw ),
+Sapphire::World::Manager::TerritoryMgr::TerritoryMgr() :
   m_lastInstanceId( 10000 )
 {
 
@@ -31,20 +29,20 @@ Sapphire::World::Manager::TerritoryMgr::TerritoryMgr( Sapphire::FrameworkPtr pFw
 
 void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto idList = pExdData->getTerritoryTypeIdList();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto idList = exdData.getTerritoryTypeIdList();
 
   for( auto id : idList )
   {
-    auto teri1 = pExdData->get< Sapphire::Data::TerritoryType >( id );
+    auto teri1 = exdData.get< Sapphire::Data::TerritoryType >( id );
 
     if( !teri1->name.empty() )
       m_territoryTypeDetailCacheMap[ id ] = teri1;
   }
 
-  for( auto id : pExdData->getContentFinderConditionIdList() )
+  for( auto id : exdData.getContentFinderConditionIdList() )
   {
-    auto cfc = pExdData->get< Sapphire::Data::ContentFinderCondition >( id );
+    auto cfc = exdData.get< Sapphire::Data::ContentFinderCondition >( id );
     if( !cfc || cfc->contentLinkType != 5 )
       continue;
 
@@ -165,7 +163,7 @@ bool Sapphire::World::Manager::TerritoryMgr::isHousingTerritory( uint32_t territ
 
 bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   // for each entry in territoryTypeExd, check if it is a normal and if so, add the zone object
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
@@ -176,14 +174,14 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
     if( territoryInfo->name.empty() )
       continue;
 
-    auto pPlaceName = pExdData->get< Sapphire::Data::PlaceName >( territoryInfo->placeName );
+    auto pPlaceName = exdData.get< Sapphire::Data::PlaceName >( territoryInfo->placeName );
 
     if( !pPlaceName || pPlaceName->name.empty() || !isDefaultTerritory( territoryTypeId ) )
       continue;
 
     uint32_t guid = getNextInstanceId();
 
-    auto pZone = make_Territory( territoryTypeId, guid, territoryInfo->name, pPlaceName->name, framework() );
+    auto pZone = make_Territory( territoryTypeId, guid, territoryInfo->name, pPlaceName->name );
     pZone->init();
 
     std::string bgPath = territoryInfo->bg;
@@ -213,7 +211,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
 bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
 {
   //separate housing zones from default
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   for( const auto& territory : m_territoryTypeDetailCacheMap )
   {
     auto territoryTypeId = territory.first;
@@ -224,7 +222,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
     if( territoryInfo->name.empty() )
       continue;
 
-    auto pPlaceName = pExdData->get< Sapphire::Data::PlaceName >( territoryInfo->placeName );
+    auto pPlaceName = exdData.get< Sapphire::Data::PlaceName >( territoryInfo->placeName );
 
     if( !pPlaceName || pPlaceName->name.empty() || !isHousingTerritory( territoryTypeId ) )
       continue;
@@ -241,8 +239,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
                     pPlaceName->name,
                     wardNum );
 
-      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name,
-                                            pPlaceName->name, framework() );
+      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->name, pPlaceName->name );
       pHousingZone->init();
 
       InstanceIdToTerritoryPtrMap instanceMap;
@@ -267,16 +264,16 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createTerritoryIn
 //  if( isInstanceContentTerritory( territoryTypeId ) )
 //    return nullptr;
 
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto pTeri = getTerritoryDetail( territoryTypeId );
-  auto pPlaceName = pExdData->get< Sapphire::Data::PlaceName >( pTeri->placeName );
+  auto pPlaceName = exdData.get< Sapphire::Data::PlaceName >( pTeri->placeName );
 
   if( !pTeri || !pPlaceName )
     return nullptr;
 
   Logger::debug( "Starting instance for territory: {0} ({1})", territoryTypeId, pPlaceName->name );
 
-  auto pZone = make_Territory( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name, framework() );
+  auto pZone = make_Territory( territoryTypeId, getNextInstanceId(), pTeri->name, pPlaceName->name );
   pZone->init();
 
   m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
@@ -295,16 +292,16 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
 
   auto contentFinderConditionId = it->second;
 
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto pContentFinderCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
   if( !pContentFinderCondition )
     return nullptr;
 
-  auto pQuestBattleInfo = pExdData->get< Sapphire::Data::QuestBattle >( questBattleId );
+  auto pQuestBattleInfo = exdData.get< Sapphire::Data::QuestBattle >( questBattleId );
   if( !pQuestBattleInfo )
     return nullptr;
 
-  auto pQuestInfo = pExdData->get< Sapphire::Data::Quest >( pQuestBattleInfo->quest );
+  auto pQuestInfo = exdData.get< Sapphire::Data::Quest >( pQuestBattleInfo->quest );
   if( !pQuestInfo )
     return nullptr;
 
@@ -319,7 +316,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
   Logger::debug( "Starting instance for QuestBattle id: {0} ({1})", questBattleId, pQuestInfo->name );
 
   auto pZone = make_QuestBattle( pQuestBattleInfo, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                 pTeri->name, pQuestInfo->name, questBattleId, framework() );
+                                 pTeri->name, pQuestInfo->name, questBattleId );
   pZone->init();
 
   m_questBattleIdToInstanceMap[ questBattleId ][ pZone->getGuId() ] = pZone;
@@ -331,14 +328,14 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
 
 Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceContent( uint32_t contentFinderConditionId )
 {
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pContentFinderCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  auto pContentFinderCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
   if( !pContentFinderCondition )
     return nullptr;
   auto instanceContentId = pContentFinderCondition->content;
 
-  auto pInstanceContent = pExdData->get< Sapphire::Data::InstanceContent >( instanceContentId );
+  auto pInstanceContent = exdData.get< Sapphire::Data::InstanceContent >( instanceContentId );
   if( !pInstanceContent )
     return nullptr;
 
@@ -353,7 +350,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
   Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pContentFinderCondition->name );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                     pTeri->name, pContentFinderCondition->name, instanceContentId, framework() );
+                                     pTeri->name, pContentFinderCondition->name, instanceContentId );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
@@ -375,10 +372,10 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousi
   }
 
   // otherwise, create it
-  auto housingMgr = framework()->get< Manager::HousingMgr >();
+  auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto parentZone = std::dynamic_pointer_cast< HousingZone >(
-    getZoneByLandSetId( housingMgr->toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ),
+    getZoneByLandSetId( housingMgr.toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ),
                                                  static_cast< uint8_t >( landIdent.wardNum ) ) ) );
 
   if( !parentZone )
@@ -425,7 +422,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousi
 
   auto zone = World::Territory::Housing::make_HousingInteriorTerritory( landIdent, territoryTypeId,
                                                                         getNextInstanceId(), terriInfo->name,
-                                                                        house->getHouseName(), framework() );
+                                                                        house->getHouseName() );
 
   zone->init();
 
@@ -469,8 +466,8 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getTerritoryByGuI
 
 void Sapphire::World::Manager::TerritoryMgr::loadTerritoryPositionMap()
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pQR = pDb->query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto pQR = db.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
 
   while( pQR->next() )
   {

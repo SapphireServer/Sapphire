@@ -4,6 +4,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 
 #include "Forwards.h"
@@ -25,7 +26,6 @@
 #include "Chara.h"
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
-#include "Framework.h"
 #include "Common.h"
 
 using namespace Sapphire::Common;
@@ -33,11 +33,10 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::Chara::Chara( ObjKind type, FrameworkPtr pFw ) :
+Sapphire::Entity::Chara::Chara( ObjKind type ) :
   Actor( type ),
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
-  m_pFw( std::move( std::move( pFw ) ) ),
   m_directorId( 0 ),
   m_radius( 1.f )
 {
@@ -557,7 +556,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 /*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
 {
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
+  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
   effect->setParam( param );
   addStatusEffect( effect );
 }
@@ -569,7 +568,7 @@ void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_
   if( hasStatusEffect( id ) )
     return;
 
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000, m_pFw );
+  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
   effect->setParam( param );
   addStatusEffect( effect );
 
@@ -763,10 +762,9 @@ float Sapphire::Entity::Chara::getRadius() const
 
 Sapphire::Common::BaseParam Sapphire::Entity::Chara::getPrimaryStat() const
 {
-  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-  assert( exdData );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto classJob = exdData->get< Data::ClassJob >( static_cast< uint16_t >( getClass() ) );
+  auto classJob = exdData.get< Data::ClassJob >( static_cast< uint16_t >( getClass() ) );
   assert( classJob );
 
   return static_cast< Sapphire::Common::BaseParam >( classJob->primaryStat );

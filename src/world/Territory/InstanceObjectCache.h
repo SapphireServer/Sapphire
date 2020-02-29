@@ -66,7 +66,7 @@ namespace Sapphire
     using ExitRangePtr = std::shared_ptr< LGB_EXIT_RANGE_ENTRY >;
     using PopRangePtr = std::shared_ptr< LGB_POP_RANGE_ENTRY >;
 
-    explicit InstanceObjectCache( std::shared_ptr< Framework > pFramework );
+    InstanceObjectCache();
     ~InstanceObjectCache() = default;
 
     MapRangePtr getMapRange( uint16_t zoneId, uint32_t mapRangeId );

@@ -8,6 +8,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
@@ -20,7 +21,6 @@
 
 #include "Forwards.h"
 #include "HousingInteriorTerritory.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -34,9 +34,8 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
                                                                                          uint16_t territoryTypeId,
                                                                                          uint32_t guId,
                                                                                          const std::string& internalName,
-                                                                                         const std::string& contentName,
-                                                                                         FrameworkPtr pFw ) :
-  Territory( territoryTypeId, guId, internalName, contentName, pFw ),
+                                                                                         const std::string& contentName ) :
+  Territory( territoryTypeId, guId, internalName, contentName ),
   m_landIdent( ident )
 {
 }
@@ -52,7 +51,7 @@ bool Sapphire::World::Territory::Housing::HousingInteriorTerritory::init()
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pHousingMgr = m_pFw->get< HousingMgr >();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
 
   Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                   getGuId(), getTerritoryTypeId(), player.getId() );
@@ -63,8 +62,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   indoorInitPacket->data().u3 = 0;
   indoorInitPacket->data().u4 = 0;
 
-  auto landSetId = pHousingMgr->toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
-  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
+  auto landSetId = housingMgr.toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
+  auto pLand = housingMgr.getHousingZoneByLandSetId( landSetId )->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
   auto pHouse = pLand->getHouse();
 
   for( auto i = 0; i < 10; i++ )
@@ -115,7 +114,7 @@ const Common::LandIdent Sapphire::World::Territory::Housing::HousingInteriorTerr
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjects()
 {
-  auto housingMgr = m_pFw->get< Manager::HousingMgr >();
+  auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto containerIds = {
     InventoryType::HousingInteriorPlacedItems1,
@@ -135,7 +134,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
   memset( &obj, 0x0, sizeof( Common::HousingObject ) );
   m_housingObjects.fill( obj );
 
-  auto containers = housingMgr->getEstateInventory( getLandIdent() );
+  auto containers = housingMgr.getEstateInventory( getLandIdent() );
 
   uint8_t containerIdx = 0;
   for( auto containerId : containerIds )
@@ -152,7 +151,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
 
       auto offset = item.first + ( containerIdx * 50 );
 
-      auto obj = housingMgr->getYardObjectForItem( housingItem );
+      auto obj = housingMgr.getYardObjectForItem( housingItem );
 
       m_housingObjects[static_cast< size_t >( offset ) ] = obj;
     }
@@ -166,10 +165,10 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
                                                                                         uint16_t containerType,
                                                                                         Inventory::HousingItemPtr item )
 {
-  auto housingMgr = m_pFw->get< Manager::HousingMgr >();
+  auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto offset = ( containerIdx * 50 ) + slot;
-  auto obj = housingMgr->getYardObjectForItem( item );
+  auto obj = housingMgr.getYardObjectForItem( item );
 
   m_housingObjects[ static_cast< size_t >( offset ) ] = obj;
 

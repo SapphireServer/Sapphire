@@ -4,7 +4,6 @@
 
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
-#include "Framework.h"
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -23,6 +22,7 @@
 
 #include <Util/ActorFilter.h>
 #include <Util/UtilMath.h>
+#include <Service.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -36,15 +36,14 @@ using namespace Sapphire::World;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw ) :
-  Action( std::move( caster ), actionId, sequence, nullptr, std::move( fw ) )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence) :
+  Action( std::move( caster ), actionId, sequence, nullptr )
 {
 }
 
 Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
-                        Data::ActionPtr actionData, FrameworkPtr fw ) :
+                        Data::ActionPtr actionData ) :
   m_pSource( std::move( caster ) ),
-  m_pFw( std::move( fw ) ),
   m_actionData( std::move( actionData ) ),
   m_id( actionId ),
   m_targetId( 0 ),
@@ -64,10 +63,9 @@ bool Action::Action::init()
   if( !m_actionData )
   {
     // need to get actionData
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-    assert( exdData );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-    auto actionData = exdData->get< Data::Action >( m_id );
+    auto actionData = exdData.get< Data::Action >( m_id );
     assert( actionData );
 
     m_actionData = actionData;
@@ -290,10 +288,10 @@ void Action::Action::start()
                                               m_recastTimeMs / 10 );
   player->queuePacket( actionStartPkt );
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   // check the lut too and see if we have something usable, otherwise cancel the cast
-  if( !pScriptMgr->onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
+  if( !scriptMgr.onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
   {
     // script not implemented and insufficient lut data (no potencies)
     interrupt();
@@ -342,8 +340,8 @@ void Action::Action::interrupt()
     m_pSource->sendToInRangeSet( control, true );
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInterrupt( *this );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInterrupt( *this );
 }
 
 void Action::Action::execute()
@@ -357,7 +355,7 @@ void Action::Action::execute()
     return;
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   if( hasCastTime() )
   {
@@ -385,7 +383,7 @@ void Action::Action::execute()
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
-    pScriptMgr->onEObjHit( *player, m_targetId, getId() );
+    scriptMgr.onEObjHit( *player, m_targetId, getId() );
   }
 
   // set currently casted action as the combo action if it interrupts a combo
@@ -455,10 +453,10 @@ void Action::Action::buildEffects()
 {
   snapshotAffectedActors( m_hitActors );
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto hasLutEntry = hasValidLutEntry();
 
-  if( !pScriptMgr->onExecute( *this ) && !hasLutEntry )
+  if( !scriptMgr.onExecute( *this ) && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
@@ -577,10 +575,9 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
   if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass && !m_actionData->isRoleAction )
   {
     // check if not a base class action
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-    assert( exdData );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
+    auto classJob = exdData.get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
     if( !classJob )
       return false;
 

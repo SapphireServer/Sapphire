@@ -1,7 +1,7 @@
 #include "HousingItem.h"
 
-Sapphire::Inventory::HousingItem::HousingItem( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw ) :
-  Sapphire::Item( uId, catalogId, pFw, false )
+Sapphire::Inventory::HousingItem::HousingItem( uint64_t uId, uint32_t catalogId ) :
+  Sapphire::Item( uId, catalogId, false )
 {
   m_stackSize = 1;
   m_spiritBond = 1;

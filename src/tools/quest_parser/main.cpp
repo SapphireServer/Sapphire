@@ -86,7 +86,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     "#include <Actor/Player.h>\n"
     "#include \"Manager/EventMgr.h\"\n"
     "#include <ScriptObject.h>\n"
-    "#include \"Framework.h\"\n\n"
+    "#include <Service.h>\n\n"
   );
 
   std::size_t splitPos( pQuestData->id.find( "_" ) );

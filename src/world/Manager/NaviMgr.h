@@ -2,26 +2,21 @@
 #define SAPPHIRE_NAVIMGR_H
 
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 
 #include <array>
 
 namespace Sapphire::World::Manager
 {
-  class NaviMgr : public BaseManager
+  class NaviMgr
   {
-
   public:
-
-    NaviMgr( FrameworkPtr pFw );
+    NaviMgr() = default;
     virtual ~NaviMgr() = default;
 
     bool setupTerritory( const std::string& bgPath );
     Navi::NaviProviderPtr getNaviProvider( const std::string& bgPath );
 
   private:
-    FrameworkPtr m_pFw;
-
     std::string getBgName( const std::string& bgPath );
 
     std::unordered_map< std::string, Navi::NaviProviderPtr > m_naviProviderTerritoryMap;

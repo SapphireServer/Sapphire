@@ -6,7 +6,6 @@
 
 #include "Network/GameConnection.h"
 #include "ServerMgr.h"
-#include "Framework.h"
 
 #include <Version.h>
 #include <Logging/Logger.h>
@@ -47,8 +46,7 @@
 
 using namespace Sapphire::World::Manager;
 
-Sapphire::World::ServerMgr::ServerMgr( const std::string& configName, FrameworkPtr pFw ) :
-  Manager::BaseManager( pFw ),
+Sapphire::World::ServerMgr::ServerMgr( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
@@ -124,8 +122,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
   printBanner();
 
-  auto pConfig = std::make_shared< Common::ConfigMgr >();
-  Common::Service< Common::ConfigMgr >::set( pConfig );
+  Common::Service< Common::ConfigMgr >::set();
   if( !loadSettings( argc, argv ) )
   {
     Logger::fatal( "Unable to load settings!" );
@@ -143,7 +140,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     Logger::fatal( "DataPath: {0}", dataPath );
     return;
   }
-  framework()->set< Data::ExdDataGenerated >( pExdData );
+  Common::Service< Data::ExdDataGenerated >::set( pExdData );
 
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;
@@ -153,56 +150,56 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
     Logger::fatal( "Database not initialized properly!" );
     return;
   }
-  framework()->set< Db::DbWorkerPool< Db::ZoneDbConnection > >( pDb );
+  Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::set( pDb );
 
   Logger::info( "LinkshellMgr: Caching linkshells" );
-  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >( framework() );
+  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >();
   if( !pLsMgr->loadLinkshells() )
   {
     Logger::fatal( "Unable to load linkshells!" );
     return;
   }
-  framework()->set< Manager::LinkshellMgr >( pLsMgr );
+  Common::Service< Manager::LinkshellMgr >::set( pLsMgr );
 
-  auto pScript = std::make_shared< Scripting::ScriptMgr >( framework() );
+  auto pScript = std::make_shared< Scripting::ScriptMgr >();
   if( !pScript->init() )
   {
     Logger::fatal( "Failed to setup scripts!" );
     return;
   }
-  framework()->set< Scripting::ScriptMgr >( pScript );
+  Common::Service< Scripting::ScriptMgr >::set( pScript );
 
   Logger::info( "Setting up InstanceObjectCache" );
-  auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >( framework() );
-  framework()->set< Sapphire::InstanceObjectCache >( pInstanceObjCache );
+  auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
+  Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
 
-  auto pActionMgr = std::make_shared< Manager::ActionMgr >( framework() );
-  framework()->set< Manager::ActionMgr >( pActionMgr );
+  auto pActionMgr = std::make_shared< Manager::ActionMgr >();
+  Common::Service< Manager::ActionMgr >::set( pActionMgr );
 
   loadBNpcTemplates();
 
-  auto pNaviMgr = std::make_shared< Manager::NaviMgr >( framework() );
-  framework()->set< Manager::NaviMgr >( pNaviMgr );
+  auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
+  Common::Service< Manager::NaviMgr >::set( pNaviMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );
-  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >( framework() );
-  auto pHousingMgr = std::make_shared< Manager::HousingMgr >( framework() );
-  framework()->set< Manager::HousingMgr >( pHousingMgr );
-  framework()->set< Manager::TerritoryMgr >( pTeriMgr );
+  auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
+  auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
+  Common::Service< Manager::HousingMgr >::set( pHousingMgr );
+  Common::Service< Manager::TerritoryMgr >::set( pTeriMgr );
+
   if( !pHousingMgr->init() )
   {
     Logger::fatal( "Failed to setup housing!" );
     return;
   }
-
   if( !pTeriMgr->init() )
   {
     Logger::fatal( "Failed to setup zones!" );
     return;
   }
 
-  auto pMarketMgr = std::make_shared< Manager::MarketMgr >( framework() );
-  framework()->set< Manager::MarketMgr >( pMarketMgr );
+  auto pMarketMgr = std::make_shared< Manager::MarketMgr >();
+  Common::Service< Manager::MarketMgr >::set( pMarketMgr );
 
   if( !pMarketMgr->init() )
   {
@@ -213,26 +210,26 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
 
 
   Network::HivePtr hive( new Network::Hive() );
-  Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive, framework() );
+  Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
 
   std::vector< std::thread > thread_list;
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
 
-  auto pDebugCom = std::make_shared< DebugCommandMgr >( framework() );
-  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >( framework() );
-  auto pShopMgr = std::make_shared< Manager::ShopMgr >( framework() );
-  auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >( framework() );
-  auto pEventMgr = std::make_shared< Manager::EventMgr >( framework() );
-  auto pItemMgr = std::make_shared< Manager::ItemMgr >( framework() );
-  auto pRNGMgr = std::make_shared< Manager::RNGMgr >( framework() );
+  auto pDebugCom = std::make_shared< DebugCommandMgr >();
+  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
+  auto pShopMgr = std::make_shared< Manager::ShopMgr >();
+  auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
+  auto pEventMgr = std::make_shared< Manager::EventMgr >();
+  auto pItemMgr = std::make_shared< Manager::ItemMgr >();
+  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
 
-  framework()->set< DebugCommandMgr >( pDebugCom );
-  framework()->set< Manager::PlayerMgr >( pPlayerMgr );
-  framework()->set< Manager::ShopMgr >( pShopMgr );
-  framework()->set< Manager::InventoryMgr >( pInventoryMgr );
-  framework()->set< Manager::EventMgr >( pEventMgr );
-  framework()->set< Manager::ItemMgr >( pItemMgr );
-  framework()->set< Manager::RNGMgr >( pRNGMgr );
+  Common::Service< DebugCommandMgr >::set( pDebugCom );
+  Common::Service< Manager::PlayerMgr >::set( pPlayerMgr );
+  Common::Service< Manager::ShopMgr >::set( pShopMgr );
+  Common::Service< Manager::InventoryMgr >::set( pInventoryMgr );
+  Common::Service< Manager::EventMgr >::set( pEventMgr );
+  Common::Service< Manager::ItemMgr >::set( pItemMgr );
+  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
@@ -267,9 +264,9 @@ void Sapphire::World::ServerMgr::printBanner() const
 
 void Sapphire::World::ServerMgr::mainLoop()
 {
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
-  auto pScriptMgr = framework()->get< Scripting::ScriptMgr >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   while( isRunning() )
   {
@@ -278,9 +275,9 @@ void Sapphire::World::ServerMgr::mainLoop()
     auto currTime = Common::Util::getTimeSeconds();
     auto tickCount = Common::Util::getTimeMs();
 
-    pTeriMgr->updateTerritoryInstances( tickCount );
+    terriMgr.updateTerritoryInstances( tickCount );
 
-    pScriptMgr->update();
+    scriptMgr.update();
 
     std::lock_guard< std::mutex > lock( m_sessionMutex );
     for( auto sessionIt : m_sessionMapById )
@@ -299,7 +296,7 @@ void Sapphire::World::ServerMgr::mainLoop()
 
     if( currTime - m_lastDBPingTime > 3 )
     {
-      pDb->keepAlive();
+      db.keepAlive();
       m_lastDBPingTime = currTime;
     }
 
@@ -361,7 +358,7 @@ bool Sapphire::World::ServerMgr::createSession( uint32_t sessionId )
 
   Logger::info( "[{0}] Creating new session", session_id_str );
 
-  std::shared_ptr< Session > newSession( new Session( sessionId, framework() ) );
+  std::shared_ptr< Session > newSession( new Session( sessionId ) );
   m_sessionMapById[ sessionId ] = newSession;
 
   if( !newSession->loadPlayer() )
@@ -425,8 +422,8 @@ std::string Sapphire::World::ServerMgr::getPlayerNameFromDb( uint32_t playerId, 
       return ( it->second );
   }
 
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( playerId ) );
 
   if( !res->next() )
     return "Unknown";
@@ -444,11 +441,10 @@ void Sapphire::World::ServerMgr::updatePlayerName( uint32_t playerId, const std:
 
 void Sapphire::World::ServerMgr::loadBNpcTemplates()
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCTEMPLATES );
-
-  auto res = pDb->query( stmt );
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCTEMPLATES );
+  auto res = db.query( stmt );
 
   while( res->next() )
   {

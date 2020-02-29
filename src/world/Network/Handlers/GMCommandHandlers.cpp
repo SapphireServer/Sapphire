@@ -31,7 +31,6 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "ServerMgr.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -87,8 +86,7 @@ enum GmCommand
   JumpNpc = 0x025F,
 };
 
-void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
-                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
@@ -465,8 +463,8 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Teri:
     {
-      auto pTeriMgr = pFw->get< TerritoryMgr >();
-      if( auto instance = pTeriMgr->getTerritoryByGuId( param1 ) )
+      auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+      if( auto instance = teriMgr.getTerritoryByGuId( param1 ) )
       {
         player.sendDebug( "Found instance: {0}, id#{1}", instance->getName(), param1 );
 
@@ -483,20 +481,20 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
         player.setInstance( instance );
       }
-      else if( !pTeriMgr->isValidTerritory( param1 ) )
+      else if( !teriMgr.isValidTerritory( param1 ) )
       {
         player.sendUrgent( "Invalid zone {0}", param1 );
       }
       else
       {
-        auto pZone = pTeriMgr->getZoneByTerritoryTypeId( param1 );
+        auto pZone = teriMgr.getZoneByTerritoryTypeId( param1 );
         if( !pZone )
         {
           player.sendUrgent( "No zone instance found for {0}", param1 );
           break;
         }
 
-        if( !pTeriMgr->isDefaultTerritory( param1 ) )
+        if( !teriMgr.isDefaultTerritory( param1 ) )
         {
           player.sendUrgent( "{0} is an instanced area - instance ID required to zone in.", pZone->getName() );
           break;
@@ -505,12 +503,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         bool doTeleport = false;
         uint16_t teleport;
 
-        auto pExdData = pFw->get< Data::ExdDataGenerated >();
-        auto idList = pExdData->getAetheryteIdList();
+        auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+        auto idList = exdData.getAetheryteIdList();
 
         for( auto i : idList )
         {
-          auto data = pExdData->get< Sapphire::Data::Aetheryte >( i );
+          auto data = exdData.get< Sapphire::Data::Aetheryte >( i );
 
           if( !data )
           {
@@ -588,8 +586,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
-                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )

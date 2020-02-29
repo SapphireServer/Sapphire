@@ -16,7 +16,7 @@ namespace Sapphire
   public:
 
     Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-          Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw );
+          Sapphire::Data::HousingLandSetPtr info );
     virtual ~Land();
     void init( Common::LandType type, Common::HouseSize size, Common::HouseStatus state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
 
@@ -100,8 +100,6 @@ namespace Sapphire
     //information
     char fcTag[7];
     uint8_t m_tag[3];
-
-    FrameworkPtr m_pFw;
   };
 
 }

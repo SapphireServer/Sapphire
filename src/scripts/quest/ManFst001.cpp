@@ -2,7 +2,7 @@
 #include <ScriptObject.h>
 #include "Manager/EventMgr.h"
 #include "Event/EventHandler.h"
-#include "Framework.h"
+#include <Service.h>
 
 // Quest Script: ManFst001_00039
 // Quest Name: Coming to Gridania
@@ -96,8 +96,8 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+    auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == ACTOR0 )
       Scene00000( player );

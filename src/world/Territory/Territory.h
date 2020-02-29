@@ -58,7 +58,6 @@ namespace Sapphire
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
-    FrameworkPtr m_pFw;
 
     std::vector< Entity::SpawnGroup > m_spawnGroups;
 
@@ -71,7 +70,7 @@ namespace Sapphire
     Territory();
 
     Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
-               const std::string& placeName, FrameworkPtr pFw );
+               const std::string& placeName );
 
     virtual ~Territory();
 

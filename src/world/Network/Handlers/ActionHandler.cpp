@@ -5,17 +5,16 @@
 #include <Logging/Logger.h>
 
 #include <Actor/Player.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
-#include "Framework.h"
 
 #include "Manager/ActionMgr.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 
-void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
-                                                       const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                        Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSkillHandler >( inPacket );
@@ -29,10 +28,8 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
 
   player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
 
-  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-  assert( exdData );
-
-  auto actionMgr = pFw->get< World::Manager::ActionMgr >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
 
   switch( type )
   {
@@ -42,39 +39,39 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
     }
     case Common::SkillType::Normal:
     {
-      auto action = exdData->get< Data::Action >( actionId );
+      auto action = exdData.get< Data::Action >( actionId );
 
       // ignore invalid actions
       if( !action )
         return;
 
-      actionMgr->handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
+      actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
       break;
     }
 
     case Common::SkillType::ItemAction:
     {
-      auto item = exdData->get< Data::Item >( actionId );
+      auto item = exdData.get< Data::Item >( actionId );
       if( !item )
         return;
 
       if( item->itemAction == 0 )
         return;
 
-      auto itemAction = exdData->get< Data::ItemAction >( item->itemAction );
+      auto itemAction = exdData.get< Data::ItemAction >( item->itemAction );
       if( !itemAction )
         return;
 
-      actionMgr->handleItemAction( player, actionId, itemAction, itemSourceSlot, itemSourceContainer );
+      actionMgr.handleItemAction( player, actionId, itemAction, itemSourceSlot, itemSourceContainer );
 
       break;
     }
 
     case Common::SkillType::MountSkill:
     {
-      auto action = exdData->get< Data::Action >( 4 );
+      auto action = exdData.get< Data::Action >( 4 );
       assert( action );
-      actionMgr->handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, sequence );
+      actionMgr.handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, sequence );
       break;
     }
   }
@@ -83,8 +80,7 @@ void Sapphire::Network::GameConnection::actionHandler( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::placedActionHandler( FrameworkPtr pFw,
-                                                             const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::placedActionHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                              Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcAoESkillHandler >( inPacket );
@@ -104,15 +100,14 @@ void Sapphire::Network::GameConnection::placedActionHandler( FrameworkPtr pFw,
   player.sendDebug( "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
                     type, sequence, actionId, pos.x, pos.y, pos.z );
 
-  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-  assert( exdData );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto action = exdData->get< Data::Action >( actionId );
+  auto action = exdData.get< Data::Action >( actionId );
 
   // ignore invalid actions
   if( !action )
     return;
 
-  auto actionMgr = pFw->get< World::Manager::ActionMgr >();
-  actionMgr->handlePlacedPlayerAction( player, actionId, action, pos, sequence );
+  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
+  actionMgr.handlePlacedPlayerAction( player, actionId, action, pos, sequence );
 }

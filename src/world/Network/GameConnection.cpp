@@ -18,7 +18,6 @@
 #include "GameConnection.h"
 #include "ServerMgr.h"
 #include "Session.h"
-#include "Framework.h"
 #include "Forwards.h"
 
 using namespace Sapphire::Common;
@@ -26,9 +25,8 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                   Sapphire::Network::AcceptorPtr pAcceptor,
-                                                   FrameworkPtr pFw ) :
-  Connection( pHive, pFw ),
+                                                   Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Connection( pHive ),
   m_pAcceptor( pAcceptor ),
   m_conType( ConnectionType::None )
 {
@@ -141,7 +139,7 @@ Sapphire::Network::GameConnection::~GameConnection() = default;
 // overwrite the parents onConnect for our game socket needs
 void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint16_t port )
 {
-  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor, m_pFw ) );
+  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
   m_pAcceptor->accept( connection );
   Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
@@ -218,7 +216,7 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
     if( opcode != PingHandler && opcode != UpdatePositionHandler )
       Logger::debug( "[{0}] Handling World IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
-    ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
+    ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {
@@ -242,7 +240,7 @@ void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Pac
 
     Logger::debug( "[{0}] Handling Chat IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
-    ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
+    ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {

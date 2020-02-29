@@ -4,8 +4,6 @@
 #include <Service.h>
 #include "ServerMgr.h"
 
-#include "Framework.h"
-
 namespace Sapphire::Scripting
 {
 
@@ -32,8 +30,6 @@ namespace Sapphire::Scripting
 
       auto script = scripts[ i ];
       module->scripts.push_back( script );
-
-      script->setFramework( framework().get() );
 
       m_scripts[ script->getType() ][ script->getId() ] = script;
 
@@ -122,8 +118,7 @@ namespace Sapphire::Scripting
     return m_loader.isModuleLoaded( name );
   }
 
-  NativeScriptMgr::NativeScriptMgr( FrameworkPtr pFw  ) :
-    World::Manager::BaseManager( pFw )
+  NativeScriptMgr::NativeScriptMgr()
   {
     auto& serverMgr = Common::Service< Sapphire::World::ServerMgr >::ref();
 
@@ -131,9 +126,9 @@ namespace Sapphire::Scripting
   }
 
 
-  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( FrameworkPtr pFw )
+  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr()
   {
-    return std::make_shared< NativeScriptMgr >( pFw );
+    return std::make_shared< NativeScriptMgr >();
   }
 }
 
