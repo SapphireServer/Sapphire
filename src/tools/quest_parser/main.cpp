@@ -27,7 +27,8 @@ using namespace Sapphire;
 const std::string onTalkStr(
   "  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
   "  {\n"
-  "    auto actor = Event::mapEventActorToRealActor( actorId );\n"
+  "    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();\n"
+  "    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
   "  }\n\n"
 );
 
@@ -40,6 +41,8 @@ const std::string onWithinRangeStr(
 const std::string onEmoteStr(
   "  void onEmote( uint32_t eventId, Entity::Player& player, uint64_t actorId, uint32_t emoteId ) override\n"
   "  {\n"
+  "    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();\n"
+  "    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
   "  }\n\n"
 );
 
@@ -101,12 +104,15 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         sceneName +
         "( Entity::Player& player )\n"
         "  {\n"
+        "    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )\n"
+        "    {\n"
+        "    };\n"
+        "\n"
         "    player.playScene( getId(), " +
-        sceneId +
-        ", 0,\n"
-        "      [ & ]( Entity::Player& player, const Event::SceneResult& result )\n"
-        "      {\n"
-        "      });\n"
+        sceneId + ", "
+        "NONE, "
+        "callback"
+        " );\n"
         "  }\n\n"
       );
     }
@@ -204,6 +210,8 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   additional += "// Start NPC: " + std::to_string( pQuestData->issuerStart ) + "\n";
   additional += "// End NPC: " + std::to_string( pQuestData->targetEnd ) + "\n\n";
 
+  additional += "using namespace Sapphire;\n\n";
+
   std::string actionEntry;
   std::string scriptEntry;
   scriptEntry.reserve( 0xFFFF );
@@ -224,7 +232,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 
   if( !enemy_ids.empty() )
     scriptEntry += std::string(
-      "  void onBNpcKill( uint32_t npcId, Entity::Player& player )\n"
+      "  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override\n"
       "  {\n" 
       "    switch( npcId )\n"
       "    {\n" );
@@ -240,7 +248,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 
   if( !action_ids.empty() )
     actionEntry += std::string(
-      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uin32_t actionId )\n"
+      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uin32_t actionId ) override\n"
       "  {\n" 
       "    switch( actionId )\n"
       "    {\n" );
