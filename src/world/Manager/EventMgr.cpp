@@ -1,22 +1,16 @@
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
+#include <Service.h>
 
-#include "Framework.h"
 #include "EventMgr.h"
 #include "Event/EventHandler.h"
 
 using namespace Sapphire::Common;
 
-Sapphire::World::Manager::EventMgr::EventMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{
-
-}
-
 std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   uint16_t eventType = eventId >> 16;
 
   auto unknown = std::string{ "unknown" };
@@ -25,7 +19,7 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
   {
     case Event::EventHandler::EventHandlerType::Quest:
     {
-      auto questInfo = pExdData->get< Sapphire::Data::Quest >( eventId );
+      auto questInfo = exdData.get< Sapphire::Data::Quest >( eventId );
       if( !questInfo )
         return unknown + "Quest";
 
@@ -36,7 +30,7 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::CustomTalk:
     {
-      auto customTalkInfo = pExdData->get< Sapphire::Data::CustomTalk >( eventId );
+      auto customTalkInfo = exdData.get< Sapphire::Data::CustomTalk >( eventId );
       if( !customTalkInfo )
         return unknown + "CustomTalk";
 
@@ -47,14 +41,14 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::Opening:
     {
-      auto openingInfo = pExdData->get< Sapphire::Data::Opening >( eventId );
+      auto openingInfo = exdData.get< Sapphire::Data::Opening >( eventId );
       if( openingInfo )
         return openingInfo->name;
       return unknown + "Opening";
     }
     case Event::EventHandler::EventHandlerType::Aetheryte:
     {
-      auto aetherInfo = pExdData->get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
+      auto aetherInfo = exdData.get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
       if( aetherInfo->isAetheryte )
         return "Aetheryte";
       return "Aethernet";
@@ -67,10 +61,10 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
     case Event::EventHandler::EventHandlerType::QuestBattleDirector:
     {
 
-      auto qbInfo = pExdData->get< Sapphire::Data::QuestBattle >( eventId & 0xFFFF );
+      auto qbInfo = exdData.get< Sapphire::Data::QuestBattle >( eventId & 0xFFFF );
       if( !qbInfo )
         return "unknown";
-      auto questInfo = pExdData->get< Sapphire::Data::Quest >( qbInfo->quest );
+      auto questInfo = exdData.get< Sapphire::Data::Quest >( qbInfo->quest );
       if( !questInfo )
         return "unknown";
 
@@ -84,7 +78,7 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Warp:
     {
-      auto warpInfo = pExdData->get< Sapphire::Data::Warp >( eventId );
+      auto warpInfo = exdData.get< Sapphire::Data::Warp >( eventId );
       if( warpInfo )
         return "WarpTaxi";
       return unknown + "ChocoboWarp"; //who know
@@ -92,7 +86,7 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Shop:
     {
-      auto shopInfo = pExdData->get< Sapphire::Data::GilShop >( eventId );
+      auto shopInfo = exdData.get< Sapphire::Data::GilShop >( eventId );
 
       return "GilShop" + std::to_string( eventId );
       /*if( shopInfo )
@@ -112,8 +106,8 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 
 uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto levelInfo = pExdData->get< Sapphire::Data::Level >( eventActorId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto levelInfo = exdData.get< Sapphire::Data::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->object;
 

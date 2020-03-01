@@ -14,6 +14,7 @@
 #include <Network/CommonActorControl.h>
 #include <Database/DatabaseDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
+#include <Service.h>
 
 #include "Territory.h"
 #include "InstanceContent.h"
@@ -40,7 +41,6 @@
 #include "ForwardsZone.h"
 #include "ServerMgr.h"
 #include "CellHandler.h"
-#include "Framework.h"
 
 #include "Manager/RNGMgr.h"
 #include "Manager/NaviMgr.h"
@@ -66,16 +66,14 @@ Sapphire::Territory::Territory() :
 }
 
 Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId,
-                                const std::string& internalName, const std::string& placeName,
-                                FrameworkPtr pFw ) :
+                                const std::string& internalName, const std::string& placeName ) :
   m_currentWeather( Weather::FairSkies ),
   m_nextEObjId( 0x400D0000 ),
   m_nextActorId( 0x500D0000 ),
-  m_pFw( pFw ),
   m_lastUpdate( 0 ),
   m_lastActivityTime( Util::getTimeMs() )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   m_guId = guId;
 
   m_territoryTypeId = territoryTypeId;
@@ -84,7 +82,7 @@ Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId,
   m_lastMobUpdate = 0;
 
   m_weatherOverride = Weather::None;
-  m_territoryTypeInfo = pExdData->get< Sapphire::Data::TerritoryType >( territoryTypeId );
+  m_territoryTypeInfo = exdData.get< Sapphire::Data::TerritoryType >( territoryTypeId );
   m_bgPath = m_territoryTypeInfo->bg;
 
   loadWeatherRates();
@@ -98,13 +96,13 @@ void Sapphire::Territory::loadWeatherRates()
   if( !m_territoryTypeInfo )
     return;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > pExdData->getWeatherRateIdList().size() ?
+  uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > exdData.getWeatherRateIdList().size() ?
                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
 
   uint8_t sumPc = 0;
-  auto weatherRateFields = pExdData->m_WeatherRateDat.get_row( weatherRateId );
+  auto weatherRateFields = exdData.m_WeatherRateDat.get_row( weatherRateId );
   for( size_t i = 0; i < 16; )
   {
     int32_t weatherId = std::get< int32_t >( weatherRateFields[ i ] );
@@ -122,17 +120,17 @@ Sapphire::Territory::~Territory() = default;
 
 bool Sapphire::Territory::init()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  if( pScriptMgr->onZoneInit( shared_from_this() ) )
+  if( scriptMgr.onZoneInit( shared_from_this() ) )
   {
     // all good
   }
 
-  auto pNaviMgr = m_pFw->get< World::Manager::NaviMgr >();
-  pNaviMgr->setupTerritory( m_territoryTypeInfo->bg );
+  auto& naviMgr = Common::Service< World::Manager::NaviMgr >::ref();
+  naviMgr.setupTerritory( m_territoryTypeInfo->bg );
 
-  m_pNaviProvider = pNaviMgr->getNaviProvider( m_territoryTypeInfo->bg );
+  m_pNaviProvider = naviMgr.getNaviProvider( m_territoryTypeInfo->bg );
 
   if( !m_pNaviProvider )
   {
@@ -251,7 +249,6 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
       agentId = m_pNaviProvider->addAgent( *pPlayer );
     pPlayer->setAgentId( agentId );
 
-    auto pServerZone = m_pFw->get< World::ServerMgr >();
     m_playerMap[ pPlayer->getId() ] = pPlayer;
     updateCellActivity( cx, cy, 2 );
   }
@@ -315,11 +312,12 @@ void Sapphire::Territory::removeActor( Entity::ActorPtr pActor )
 void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
                                           Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-  if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
@@ -329,7 +327,7 @@ void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uin
     if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
     {
 
-      auto pSession = pServerZone->getSession( player->getId() );
+      auto pSession = serverMgr.getSession( player->getId() );
       //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
       if( pSession )
         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
@@ -341,18 +339,19 @@ void Sapphire::Territory::queuePacketForZone( Entity::Player& sourcePlayer,
                                          Network::Packets::FFXIVPacketBasePtr pPacketEntry,
                                          bool forSelf )
 {
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-  if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   for( auto entry : m_playerMap )
   {
     auto player = entry.second;
     if( ( sourcePlayer.getId() != player->getId() ) ||
         ( ( sourcePlayer.getId() == player->getId() ) && forSelf ) )
     {
-      auto pSession = pServerZone->getSession( player->getId() );
+      auto pSession = serverMgr.getSession( player->getId() );
       if( pSession )
         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
     }
@@ -684,14 +683,14 @@ void Sapphire::Territory::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell
   if( pCell == nullptr )
     return;
 
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   // TODO: make sure gms can overwrite this. Potentially temporary solution
-  if( pTeriMgr->isPrivateTerritory( getTerritoryTypeId() ) )
+  if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
   auto iter = pCell->m_actors.begin();
 
-  float fRange = pTeriMgr->getInRangeDistance();
+  float fRange = teriMgr.getInRangeDistance();
   int32_t count = 0;
   while( iter != pCell->m_actors.end() )
   {
@@ -820,10 +819,10 @@ Sapphire::Data::TerritoryTypePtr Sapphire::Territory::getTerritoryTypeInfo() con
 
 bool Sapphire::Territory::loadSpawnGroups()
 {
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNGROUPS );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNGROUPS );
   stmt->setUInt( 1, getTerritoryTypeId() );
-  auto res = pDb->query( stmt );
+  auto res = db.query( stmt );
 
   while( res->next() )
   {
@@ -840,11 +839,11 @@ bool Sapphire::Territory::loadSpawnGroups()
   res.reset();
   stmt.reset();
 
-  stmt = pDb->getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNPOINTS );
+  stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNPOINTS );
   for( auto& group : m_spawnGroups )
   {
     stmt->setUInt( 1, group.getId() );
-    auto res = pDb->query( stmt );
+    auto res = db.query( stmt );
 
     while( res->next() )
     {
@@ -865,8 +864,8 @@ bool Sapphire::Territory::loadSpawnGroups()
 
 void Sapphire::Territory::updateSpawnPoints()
 {
-  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto rng = pRNGMgr->getRandGenerator< float >( 0.f, PI * 2 );
+  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto rng = RNGMgr.getRandGenerator< float >( 0.f, PI * 2 );
 
   for( auto& group : m_spawnGroups )
   {
@@ -874,9 +873,9 @@ void Sapphire::Territory::updateSpawnPoints()
     {
       if( !point->getLinkedBNpc() && ( Util::getTimeSeconds() - point->getTimeOfDeath() ) > 60 )
       {
-        auto serverZone = m_pFw->get< World::ServerMgr >();
+        auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
-        auto bNpcTemplate = serverZone->getBNpcTemplate( group.getTemplateId() );
+        auto bNpcTemplate = serverMgr.getBNpcTemplate( group.getTemplateId() );
 
         if( !bNpcTemplate )
         {
@@ -891,7 +890,7 @@ void Sapphire::Territory::updateSpawnPoints()
                                                        point->getPosZ(),
                                                        rng.next(),
                                                        group.getLevel(),
-                                                       group.getMaxHp(), shared_from_this(), m_pFw );
+                                                       group.getMaxHp(), shared_from_this() );
         point->setLinkedBNpc( pBNpc );
 
         pushActor( pBNpc );
@@ -916,8 +915,8 @@ Sapphire::Entity::BNpcPtr
                                             uint32_t hp, uint16_t nameId, uint32_t directorId,
                                             uint8_t bnpcType )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto levelData = pExdData->get< Sapphire::Data::Level >( levelId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto levelData = exdData.get< Sapphire::Data::Level >( levelId );
   if( !levelData )
     return nullptr;
 
@@ -926,7 +925,7 @@ Sapphire::Entity::BNpcPtr
 
   auto bnpcBaseId = levelData->object;
 
-  auto bnpcBaseData = pExdData->get< Sapphire::Data::BNpcBase >( bnpcBaseId );
+  auto bnpcBaseData = exdData.get< Sapphire::Data::BNpcBase >( bnpcBaseId );
   if( !bnpcBaseData )
     return nullptr;
 
@@ -938,7 +937,7 @@ Sapphire::Entity::BNpcPtr
   std::vector< uint8_t > customize( 26 );
   if( bnpcBaseData->bNpcCustomize != 0 )
   {
-    auto bnpcCustomizeData = pExdData->get< Sapphire::Data::BNpcCustomize >( bnpcBaseData->bNpcCustomize );
+    auto bnpcCustomizeData = exdData.get< Sapphire::Data::BNpcCustomize >( bnpcBaseData->bNpcCustomize );
     if( bnpcCustomizeData )
     {
       customize[0] = bnpcCustomizeData->race;
@@ -975,7 +974,7 @@ Sapphire::Entity::BNpcPtr
   uint64_t modeloff = 0;
   if( bnpcBaseData->npcEquip != 0 )
   {
-    auto npcEquipData = pExdData->get< Sapphire::Data::NpcEquip >( bnpcBaseData->npcEquip );
+    auto npcEquipData = exdData.get< Sapphire::Data::NpcEquip >( bnpcBaseData->npcEquip );
     if( npcEquipData )
     {
       modelMain = npcEquipData->modelMainHand;
@@ -998,7 +997,7 @@ Sapphire::Entity::BNpcPtr
                                                        bnpcBaseData->modelChara, 0, &models[0], &customize[0] );
 
   auto bnpc = std::make_shared< Entity::BNpc >( getNextActorId(), tmp, levelData->x, levelData->y, levelData->z,
-                                                levelData->yaw, level, hp, shared_from_this(), m_pFw );
+                                                levelData->yaw, level, hp, shared_from_this() );
 
   bnpc->setDirectorId( directorId );
   bnpc->setLevelId( levelId );

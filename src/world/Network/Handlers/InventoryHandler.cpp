@@ -17,14 +17,11 @@
 #include "Session.h"
 #include "ServerMgr.h"
 
-#include "Framework.h"
-
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
-void Sapphire::Network::GameConnection::inventoryModifyHandler( FrameworkPtr pFw,
-                                                                const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                                 Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );

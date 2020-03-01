@@ -2,7 +2,6 @@
 #define SAPPHIRE_TERRITORYMGR_H
 
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 #include <set>
 #include <unordered_map>
 
@@ -27,7 +26,7 @@ namespace Sapphire::World::Manager
      This class manages persistent and temporary instances alike.
 
   */
-  class TerritoryMgr : public Manager::BaseManager
+  class TerritoryMgr
   {
 
   public:
@@ -60,7 +59,7 @@ namespace Sapphire::World::Manager
       //Eureka = 41, // wat
     };
 
-    TerritoryMgr( FrameworkPtr pFw );
+    TerritoryMgr();
 
     /*! initializes the territoryMgr */
     bool init();

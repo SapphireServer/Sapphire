@@ -4,6 +4,7 @@
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Exd/ExdDataGenerated.h>
+#include <Service.h>
 
 #include "Manager/TerritoryMgr.h"
 #include "Territory/InstanceContent.h"
@@ -12,7 +13,6 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "Framework.h"
 #include "Session.h"
 
 using namespace Sapphire::Common;
@@ -21,8 +21,7 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 
-void Sapphire::Network::GameConnection::cfDutyInfoRequest( FrameworkPtr pFw,
-                                                           const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfDutyInfoRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
   auto dutyInfoPacket = makeZonePacket< FFXIVIpcCFDutyInfo >( player.getId() );
@@ -40,13 +39,12 @@ void Sapphire::Network::GameConnection::cfDutyInfoRequest( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
-                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
-  auto pTeriMgr = pFw->get< TerritoryMgr >();
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
   std::vector< uint16_t > selectedContent;
 
@@ -73,11 +71,11 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
   queueOutPacket( cfCancelPacket );
 
-  auto cfCondition = pExdData->get< Sapphire::Data::ContentFinderCondition >( contentId );
+  auto cfCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentId );
   if( !cfCondition )
     return;
 
-  auto instance = pTeriMgr->createInstanceContent( cfCondition->content );
+  auto instance = teriMgr.createInstanceContent( cfCondition->content );
   if( !instance )
     return;
 
@@ -89,8 +87,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( FrameworkPtr pFw,
   player.setInstance( instance );
 }
 
-void Sapphire::Network::GameConnection::cfRegisterRoulette( FrameworkPtr pFw,
-                                                            const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
@@ -101,8 +98,7 @@ void Sapphire::Network::GameConnection::cfRegisterRoulette( FrameworkPtr pFw,
   player.sendDebug( "Roulette register" );
 }
 
-void Sapphire::Network::GameConnection::cfDutyAccepted( FrameworkPtr pFw,
-                                                        const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                         Entity::Player& player )
 {
   player.sendDebug( "TODO: Duty accept" );

@@ -2,7 +2,6 @@
 #define SAPPHIRE_RNGMGR_H
 
 #include "Forwards.h"
-#include "BaseManager.h"
 
 #include <array>
 #include <algorithm>
@@ -47,13 +46,10 @@ namespace Sapphire::World::Manager
     std::mt19937 m_engine;
   };
 
-  class RNGMgr : public BaseManager
+  class RNGMgr
   {
-
   public:
-
-
-    RNGMgr( FrameworkPtr pFw );
+    RNGMgr();
     virtual ~RNGMgr() = default;
 
     RNGMgr( const RNGMgr& pRNGMgr ) = delete;

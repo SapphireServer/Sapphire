@@ -9,7 +9,7 @@
 
 #include "ForwardsZone.h"
 
-#define DECLARE_HANDLER( x ) void x( FrameworkPtr pFw, const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+#define DECLARE_HANDLER( x ) void x( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
 namespace Sapphire::Network::Packets
 {
@@ -32,8 +32,7 @@ namespace Sapphire::Network
   {
 
   private:
-    typedef void ( GameConnection::* Handler )( FrameworkPtr pFw,
-                                                const Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+    typedef void ( GameConnection::* Handler )( const Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -58,7 +57,7 @@ namespace Sapphire::Network
   public:
     ConnectionType m_conType;
 
-    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
 
     ~GameConnection();
 

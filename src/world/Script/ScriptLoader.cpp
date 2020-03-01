@@ -7,8 +7,6 @@
 
 #include <filesystem>
 
-#include "Framework.h"
-
 namespace fs = std::filesystem;
 
 const std::string Sapphire::Scripting::ScriptLoader::getModuleExtension()

@@ -8,6 +8,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
@@ -20,7 +21,6 @@
 #include "Forwards.h"
 #include "HousingZone.h"
 #include "Manager/HousingMgr.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -31,13 +31,11 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum,
                                     uint16_t territoryTypeId,
                                     uint32_t guId,
                                     const std::string& internalName,
-                                    const std::string& contentName,
-                                    FrameworkPtr pFw ) :
-  Territory( territoryTypeId, guId, internalName, contentName, pFw ),
+                                    const std::string& contentName ) :
+  Territory( territoryTypeId, guId, internalName, contentName ),
   m_wardNum( wardNum ),
   m_territoryTypeId( territoryTypeId ),
-  m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum ),
-  m_pFw( pFw )
+  m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
 {
 
 }
@@ -45,12 +43,12 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum,
 bool Sapphire::HousingZone::init()
 {
 
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   {
-    auto res = pDb->query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
+    auto res = db.query( "SELECT * FROM landset WHERE landsetid = " + std::to_string( m_landSetId ) );
     if( !res->next() )
     {
-      pDb->directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
+      db.directExecute( "INSERT INTO landset ( landsetid ) VALUES ( " + std::to_string( m_landSetId ) + " );" );
     }
   }
 
@@ -65,8 +63,8 @@ bool Sapphire::HousingZone::init()
   else if( m_territoryTypeId == 641 )
     housingIndex = 3;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Sapphire::Data::HousingLandSet >( housingIndex );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto info = exdData.get< Sapphire::Data::HousingLandSet >( housingIndex );
 
   // build yard objects array indices
   int16_t cursor = -1;
@@ -114,8 +112,8 @@ bool Sapphire::HousingZone::init()
     arr.fill( obj );
   }
 
-  auto housingMgr = m_pFw->get< World::Manager::HousingMgr >();
-  auto landCache = housingMgr->getLandCacheMap();
+  auto& housingMgr = Common::Service< World::Manager::HousingMgr >::ref();
+  auto landCache = housingMgr.getLandCacheMap();
 
   // make sure the landset exists
   auto landSetCache = landCache.find( m_landSetId );
@@ -128,15 +126,15 @@ bool Sapphire::HousingZone::init()
   // init the lands
   for( HousingMgr::LandCacheEntry& entry : landSetCache->second )
   {
-    auto land = make_Land( m_territoryTypeId, getWardNum(), entry.m_landId, m_landSetId, info, m_pFw );
+    auto land = make_Land( m_territoryTypeId, getWardNum(), entry.m_landId, m_landSetId, info );
 
     // setup house
     if( entry.m_houseId )
     {
       auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName,
-                               entry.m_estateComment, m_pFw );
+                               entry.m_estateComment );
 
-      housingMgr->updateHouseModels( house );
+      housingMgr.updateHouseModels( house );
       land->setHouse( house );
     }
 
@@ -325,8 +323,8 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
 
 void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident )
 {
-  auto housingMgr = m_pFw->get< World::Manager::HousingMgr >();
-  auto& landStorage = housingMgr->getEstateInventory( ident );
+  auto& housingMgr = Common::Service< World::Manager::HousingMgr >::ref();
+  auto& landStorage = housingMgr.getEstateInventory( ident );
 
   auto yardContainer = landStorage[ InventoryType::HousingExteriorPlacedItems ];
 
@@ -339,7 +337,7 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
     assert( housingItem );
 
     auto idx = item.first + arrayBounds.first;
-    m_yardObjects[ yardMapIndex ][ idx ] = housingMgr->getYardObjectForItem( housingItem );
+    m_yardObjects[ yardMapIndex ][ idx ] = housingMgr.getYardObjectForItem( housingItem );
   }
 }
 

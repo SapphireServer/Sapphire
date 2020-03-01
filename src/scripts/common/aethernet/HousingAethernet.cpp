@@ -1,10 +1,10 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-#include <Framework.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Territory/HousingZone.h>
 #include <Manager/PlayerMgr.h>
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -21,16 +21,14 @@ public:
   {
     player.playScene( eventId, 0, HIDE_HOTBAR | NO_DEFAULT_CAMERA, [this, eventId]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto pExdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-      if( !pExdData )
-        return;
+      auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
       auto housingZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
       if( !housingZone )
         return;
 
       // param2 is the index starting from 0 inside housingaethernet.exd, but the ID column starts at 0x001E0000........ wtf
-      auto pHousingAethernet = pExdData->get< Sapphire::Data::HousingAethernet >( getId() + result.param2 );
+      auto pHousingAethernet = exdData.get< Sapphire::Data::HousingAethernet >( getId() + result.param2 );
       if( !pHousingAethernet )
         return;
 
@@ -42,8 +40,8 @@ public:
       // moving a player inside an event will crash the game so we end it here
       player.eventFinish( eventId, 1 );
 
-      auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();
-      playerMgr->movePlayerToLandDestination( player, pHousingAethernet->level, housingZone->getWardNum() );
+      auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+      playerMgr.movePlayerToLandDestination( player, pHousingAethernet->level, housingZone->getWardNum() );
     } );
   }
 };

@@ -20,8 +20,7 @@ namespace Sapphire
                  uint32_t guId,
                  const std::string& internalName,
                  const std::string& contentName,
-                 uint32_t questBattleId,
-                 FrameworkPtr pFw );
+                 uint32_t questBattleId );
 
     virtual ~QuestBattle() = default;
 

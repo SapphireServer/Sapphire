@@ -1,22 +1,21 @@
 #include <Common.h>
 #include <Exd/ExdDataGenerated.h>
 #include <CommonGen.h>
+#include <Service.h>
 
-#include "Framework.h"
 #include "Item.h"
 
-Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool isHq ) :
+Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_id( catalogId ),
   m_uId( uId ),
   m_isHq( isHq ),
   m_stain( 0 ),
   m_durability( 30000 ),
   m_spiritBond( 0 ),
-  m_reservedFlag( 0 ),
-  m_pFw( pFw )
+  m_reservedFlag( 0 )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto itemInfo = exdData.get< Sapphire::Data::Item >( catalogId );
 
   m_delayMs = itemInfo->delayms;
   m_physicalDmg = itemInfo->damagePhys;

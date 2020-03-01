@@ -1,7 +1,6 @@
 #include "MarketMgr.h"
 
 #include <Exd/ExdDataGenerated.h>
-#include <Framework.h>
 #include <Logging/Logger.h>
 
 #include <Network/CommonNetwork.h>
@@ -14,26 +13,20 @@
 
 using namespace Sapphire::Network::Packets;
 
-Sapphire::World::Manager::MarketMgr::MarketMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{
-
-}
-
 bool Sapphire::World::Manager::MarketMgr::init()
 {
 //  Logger::info( "MarketMgr: warming up marketable item cache..." );
 //
 //  // build item cache
-//  auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-//  auto idList = exdData->getItemIdList();
+//  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+//  auto idList = exdData.getItemIdList();
 //
 //  for( auto id : idList )
 //  {
 //    if( id > 10000 )
 //      break;
 //
-//    auto item = exdData->get< Sapphire::Data::Item >( id );
+//    auto item = exdData.get< Sapphire::Data::Item >( id );
 //    if( !item )
 //      continue;
 //

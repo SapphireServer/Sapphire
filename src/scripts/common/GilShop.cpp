@@ -1,8 +1,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-#include <Framework.h>
 #include <Manager/ShopMgr.h>
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -31,9 +31,10 @@ private:
       // buy
       if( result.param2 == 1 )
       {
-        auto shopMgr = framework()->get< Sapphire::World::Manager::ShopMgr >();
+        auto& shopMgr = Common::Service< Sapphire::World::Manager::ShopMgr >::ref();
 
-        shopMgr->purchaseGilShopItem( player, result.eventId, result.param3, result.param4 );
+
+        shopMgr.purchaseGilShopItem( player, result.eventId, result.param3, result.param4 );
       }
 
       // sell

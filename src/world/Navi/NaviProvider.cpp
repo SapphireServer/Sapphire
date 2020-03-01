@@ -1,5 +1,4 @@
 #include <Common.h>
-#include <Framework.h>
 #include <Territory/Territory.h>
 #include <Logging/Logger.h>
 #include <ServerMgr.h>
@@ -17,12 +16,12 @@
 #include <DetourCommon.h>
 #include <recastnavigation/Recast/Include/Recast.h>
 #include <filesystem>
+#include <Service.h>
 
-Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName, FrameworkPtr pFw ) :
+Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalName ) :
   m_naviMesh( nullptr ),
   m_naviMeshQuery( nullptr ),
-  m_internalName( internalName ),
-  m_pFw( pFw )
+  m_internalName( internalName )
 {
   // Set defaults
   m_polyFindRange[ 0 ] = 10;
@@ -32,7 +31,8 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
 
 bool Sapphire::World::Navi::NaviProvider::init()
 {
-  auto& cfg = m_pFw->get< Sapphire::World::ServerMgr >()->getConfig();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& cfg = serverMgr.getConfig();
 
   auto meshesFolder = std::filesystem::path( cfg.navigation.meshPath );
   auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
@@ -297,8 +297,8 @@ Sapphire::Common::FFXIVARR_POSITION3
     return {};
   }
 
-  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto rng = pRNGMgr->getRandGenerator< float >( 0.f, 1.f );
+  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto rng = RNGMgr.getRandGenerator< float >( 0.f, 1.f );
   status = m_naviMeshQuery->findRandomPointAroundCircle( startRef, spos, maxRadius, &filter, frand,
              &randomRef, randomPt );
 

@@ -32,7 +32,7 @@ namespace Sapphire::World::Navi
     };
 
   public:
-    explicit NaviProvider( const std::string& internalName, FrameworkPtr pFw );
+    explicit NaviProvider( const std::string& internalName );
 
     bool init();
     bool loadMesh( const std::string& path );
@@ -94,7 +94,6 @@ namespace Sapphire::World::Navi
 
 
 
-    FrameworkPtr m_pFw;
   };
 
 }

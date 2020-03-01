@@ -16,7 +16,7 @@ namespace Sapphire::Math
 
     static float calculateBaseStat( const Entity::Chara& chara );
 
-    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
+    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
 
     /*!
      * @brief Calculates the probability of a block happening
