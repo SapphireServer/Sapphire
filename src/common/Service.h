@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <utility>
+#include <cassert>
 
 // stolen from: https://github.com/skypjack/entt/blob/master/src/entt/locator/locator.hpp
 
