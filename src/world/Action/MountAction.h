@@ -8,7 +8,7 @@ namespace Sapphire::World::Action
   class MountAction : public Action
   {
   public:
-    MountAction( Entity::CharaPtr source, uint16_t mountId, uint16_t sequence, Data::ActionPtr actionData, FrameworkPtr fw );
+    MountAction( Entity::CharaPtr source, uint16_t mountId, uint16_t sequence, Data::ActionPtr actionData );
     virtual ~MountAction() = default;
 
     bool preCheck() override;

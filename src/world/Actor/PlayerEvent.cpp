@@ -1,6 +1,7 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
@@ -13,7 +14,6 @@
 
 #include "Territory/Territory.h"
 #include "ServerMgr.h"
-#include "Framework.h"
 
 #include "Action/EventAction.h"
 
@@ -299,7 +299,7 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint64_t additional )
 {
   auto pEventAction = World::Action::make_EventAction( getAsChara(), eventId, action,
-                                                finishCallback, interruptCallback, additional, m_pFw );
+                                                finishCallback, interruptCallback, additional );
 
   auto pEvent = getEvent( eventId );
 
@@ -341,8 +341,9 @@ void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 void Sapphire::Entity::Player::onLogin()
 {
-  auto pServerMgr = m_pFw->get< Sapphire::World::ServerMgr >();
-  auto motd = pServerMgr->getConfig().motd;
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto motd = serverMgr.getConfig().motd;
 
   std::istringstream ss( motd );
   std::string msg;

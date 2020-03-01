@@ -41,7 +41,7 @@ namespace Sapphire::Lobby
     std::vector< uint8_t > m_packets;
 
   public:
-    GameConnection( Network::HivePtr pHive, Network::AcceptorPtr pAcceptor, FrameworkPtr pFw );
+    GameConnection( Network::HivePtr pHive, Network::AcceptorPtr pAcceptor );
 
     ~GameConnection();
 

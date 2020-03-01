@@ -18,7 +18,7 @@ namespace Sapphire
       int16_t value;
     };
 
-    Item( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw, bool isHq = false );
+    Item( uint64_t uId, uint32_t catalogId, bool isHq = false );
 
     virtual ~Item() = default;
 
@@ -116,7 +116,6 @@ namespace Sapphire
     uint32_t m_defense;
     uint32_t m_defenseMag;
 
-    FrameworkPtr m_pFw;
     uint32_t m_additionalData;
 
     BaseParamStruct m_baseParam[6];

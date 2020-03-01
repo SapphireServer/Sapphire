@@ -5,7 +5,7 @@
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
 #include <Exd/ExdDataGenerated.h>
-#include "Framework.h"
+#include <Service.h>
 
 
 using namespace Sapphire;
@@ -25,9 +25,6 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto pFw = framework();
-      if( !pFw )
-        return LandPurchaseResult::ERR_INTERNAL;
       // Purchase Land
       if( result.param2 == 2 )
       {
@@ -36,9 +33,9 @@ public:
 
         auto pTerritory = player.getCurrentTerritory();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
-        auto pHouMgr = pFw->get< HousingMgr >();
+        auto& pHouMgr = Common::Service< HousingMgr >::ref();
 
-        LandPurchaseResult res = pHouMgr->purchaseLand( player, activeLand.plot,
+        LandPurchaseResult res = pHouMgr.purchaseLand( player, activeLand.plot,
                                                         static_cast< uint8_t >( result.param2 ) );
 
         switch( res )

@@ -1,7 +1,6 @@
 #ifndef SAPPHIRE_ACTIONMGR_H
 #define SAPPHIRE_ACTIONMGR_H
 
-#include "BaseManager.h"
 #include "ForwardsZone.h"
 
 namespace Sapphire::Data
@@ -15,10 +14,10 @@ namespace Sapphire::Data
 
 namespace Sapphire::World::Manager
 {
-  class ActionMgr : public Manager::BaseManager
+  class ActionMgr
   {
   public:
-    explicit ActionMgr( FrameworkPtr pFw );
+    ActionMgr() = default;
     ~ActionMgr() = default;
 
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,

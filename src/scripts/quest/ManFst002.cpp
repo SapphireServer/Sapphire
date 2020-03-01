@@ -2,7 +2,7 @@
 #include <ScriptObject.h>
 #include "Event/EventHandler.h"
 #include "Manager/EventMgr.h"
-#include "Framework.h"
+#include <Service.h>
 
 // Quest Script: ManFst002_00124
 // Quest Name: Close to Home
@@ -193,8 +193,8 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == ACTOR0 )
       Scene00000( player );

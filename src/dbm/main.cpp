@@ -8,7 +8,7 @@
 #include <common/Util/CrashHandler.h>
 #include <common/Config/ConfigMgr.h>
 
-Sapphire::Common::Util::CrashHandler crashHandler;
+[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
 
 namespace fs = std::filesystem;
 

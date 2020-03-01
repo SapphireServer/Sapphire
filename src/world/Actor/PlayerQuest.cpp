@@ -2,12 +2,12 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
 #include "Session.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -1036,15 +1036,15 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
 bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   uint32_t playerLevel = getLevel();
-  auto questInfo = pExdData->get< Sapphire::Data::Quest >( questId );
+  auto questInfo = exdData.get< Sapphire::Data::Quest >( questId );
 
 
   if( !questInfo )
     return false;
 
-  auto paramGrowth = pExdData->get< Sapphire::Data::ParamGrow >( questInfo->classJobLevel0 );
+  auto paramGrowth = exdData.get< Sapphire::Data::ParamGrow >( questInfo->classJobLevel0 );
 
   // TODO: use the correct formula, this one is wrong
   uint32_t exp =

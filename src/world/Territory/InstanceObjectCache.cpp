@@ -1,6 +1,5 @@
 #include "InstanceObjectCache.h"
 #include "Exd/ExdDataGenerated.h"
-#include <Framework.h>
 
 #include <datReader/DatCategories/bg/pcb.h>
 #include <datReader/DatCategories/bg/lgb.h>
@@ -13,13 +12,13 @@
 #include <Exd.h>
 
 #include <Logging/Logger.h>
+#include <Service.h>
 
-Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework > pFramework ) :
-  m_pFramework( pFramework )
+Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
 
-  auto pExd = pFramework->get< Sapphire::Data::ExdDataGenerated >();
-  auto idList = pExd->getTerritoryTypeIdList();
+  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+  auto idList = exdData.getTerritoryTypeIdList();
 
   size_t count = 0;
   for( const auto& id : idList )
@@ -28,7 +27,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
     if( count++ % 10 == 0 )
       std::cout << ".";
 
-    auto territoryType = pExd->get< Sapphire::Data::TerritoryType >( id );
+    auto territoryType = exdData.get< Sapphire::Data::TerritoryType >( id );
     if( !territoryType )
       continue;
 
@@ -50,8 +49,8 @@ Sapphire::InstanceObjectCache::InstanceObjectCache( std::shared_ptr< Framework >
 
     try
     {
-      bgFile = pExd->getGameData()->getFile( bgLgbPath );
-      planmap_file = pExd->getGameData()->getFile( planmapLgbPath );
+      bgFile = exdData.getGameData()->getFile( bgLgbPath );
+      planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
     }
     catch( std::runtime_error& )
     {

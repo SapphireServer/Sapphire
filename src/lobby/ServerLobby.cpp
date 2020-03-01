@@ -10,7 +10,6 @@
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 
-#include "Framework.h"
 
 #include "ServerLobby.h"
 
@@ -65,9 +64,8 @@ namespace Sapphire::Lobby
 
     Logger::setLogLevel( m_config.global.general.logLevel );
 
-    auto pFw = make_Framework();
     auto hive = Network::make_Hive();
-    Network::addServerToHive< GameConnection >( m_ip, m_port, hive, pFw );
+    Network::addServerToHive< GameConnection >( m_ip, m_port, hive );
 
     Logger::info( "Lobby server running on {0}:{1}", m_ip, m_port );
 
