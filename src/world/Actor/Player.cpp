@@ -2162,8 +2162,6 @@ bool Sapphire::Entity::Player::checkAction()
 void Sapphire::Entity::Player::gaugeClear()
 {
   std::memset( m_gauge, 0, sizeof( m_gauge ) );
-  auto pPacket = makeZonePacket< FFXIVIpcEffect0095 >( getId() );
-  queuePacket( pPacket );
 }
 
 void Sapphire::Entity::Player::gaugeSet( uint8_t index, uint8_t value )

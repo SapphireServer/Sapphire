@@ -42,7 +42,7 @@ public:
         World::Action::StatusEffectEntry effectEntry;
         effectEntry.effectType = static_cast< uint32_t >( Common::StatusEffectType::Shield );
         effectEntry.effectValue1 = static_cast< int32_t >( shieldValue );
-        auto pNewEffect = action.createStatusEffect( STATUS_ID_GALVANIZE, action.getSourceChara(), pTarget, 30000, 3000 );
+        auto pNewEffect = Sapphire::StatusEffect::make_StatusEffect( STATUS_ID_GALVANIZE, action.getSourceChara(), pTarget, 30000, 3000 );
         pNewEffect->replaceEffectEntry( effectEntry );
         action.getEffectbuilder()->applyStatusEffect( pTarget, action.getSourceChara(), pNewEffect );
       }
@@ -58,7 +58,7 @@ public:
           World::Action::StatusEffectEntry effectEntry;
           effectEntry.effectType = static_cast< uint32_t >( Common::StatusEffectType::Shield );
           effectEntry.effectValue1 = static_cast< int32_t >( shieldValue ); // same shield value
-          auto pNewEffect = action.createStatusEffect( STATUS_ID_CATALYZE, action.getSourceChara(), pTarget, 30000, 3000 );
+          auto pNewEffect = Sapphire::StatusEffect::make_StatusEffect( STATUS_ID_CATALYZE, action.getSourceChara(), pTarget, 30000, 3000 );
           pNewEffect->replaceEffectEntry( effectEntry );
           action.getEffectbuilder()->applyStatusEffect( pTarget, action.getSourceChara(), pNewEffect );
         }

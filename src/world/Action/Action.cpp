@@ -1037,9 +1037,3 @@ bool Action::Action::checkActionBonusRequirement()
 
   return true;
 }
-
-Sapphire::StatusEffect::StatusEffectPtr Action::Action::createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate )
-{
-  // problem solved remove this
-  return StatusEffect::make_StatusEffect( id, sourceActor, targetActor, duration, tickRate );
-}

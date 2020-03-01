@@ -24,7 +24,7 @@ public:
   {
     if( action.getSourceChara()->getLevel() >= 2 && Math::CalcStats::getRandomNumber0To99() < 20 )
     {
-      auto pEffect = action.createStatusEffect( STATUS_ID_STRAIGHT_SHOT_READY, action.getSourceChara(), action.getSourceChara(), 10000, 3000 );
+      auto pEffect = Sapphire::StatusEffect::make_StatusEffect( STATUS_ID_STRAIGHT_SHOT_READY, action.getSourceChara(), action.getSourceChara(), 10000, 3000 );
       action.getEffectbuilder()->applyStatusEffect( action.getSourceChara(), action.getSourceChara(), pEffect );
     }
   }

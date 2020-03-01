@@ -58,8 +58,6 @@ namespace Sapphire::World::Action
 
     bool checkActionBonusRequirement();
 
-    StatusEffect::StatusEffectPtr createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate );
-
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
      * @return true if they have the required resources

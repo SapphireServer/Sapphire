@@ -27,7 +27,7 @@ public:
     pPlayer->gaugeWarSetIb( ib );
     if( pPlayer->getLevel() >= 72 )
     {
-      auto pEffect = action.createStatusEffect( STATUS_ID_NASCENT_CHAOS, action.getSourceChara(), action.getSourceChara(), 30000, 3000 );
+      auto pEffect = Sapphire::StatusEffect::make_StatusEffect( STATUS_ID_NASCENT_CHAOS, action.getSourceChara(), action.getSourceChara(), 30000, 3000 );
       action.getEffectbuilder()->applyStatusEffect( action.getSourceChara(), action.getSourceChara(), pEffect, 0 );
     }
   }

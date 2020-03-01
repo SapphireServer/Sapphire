@@ -28,10 +28,10 @@ public:
     effectEntry.effectValue1 = static_cast< int32_t >( Common::ActionTypeFilter::Physical );
     effectEntry.effectValue2 = 100;
     effectEntry.effectValue3 = 100;
-    auto pNewEffect = action.createStatusEffect( STATUS_ID_INNER_RELEASE, action.getSourceChara(), pSource, 10000, 3000 );
-    pNewEffect->replaceEffectEntry( effectEntry );
-    pNewEffect->setParam( 65436 );
-    action.getEffectbuilder()->applyStatusEffect( pSource, action.getSourceChara(), pNewEffect, 0 );
+    auto pEffect = Sapphire::StatusEffect::make_StatusEffect( STATUS_ID_INNER_RELEASE, action.getSourceChara(), pSource, 10000, 3000 );
+    pEffect->replaceEffectEntry( effectEntry );
+    pEffect->setParam( 65436 );
+    action.getEffectbuilder()->applyStatusEffect( pSource, action.getSourceChara(), pEffect, 0 );
   }
 };
 
