@@ -4,7 +4,6 @@
 
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
-#include "Framework.h"
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -25,6 +24,7 @@
 
 #include <Util/ActorFilter.h>
 #include <Util/UtilMath.h>
+#include <Service.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -38,15 +38,14 @@ using namespace Sapphire::World;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw ) :
-  Action( std::move( caster ), actionId, sequence, nullptr, std::move( fw ) )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence) :
+  Action( std::move( caster ), actionId, sequence, nullptr )
 {
 }
 
 Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
-                        Data::ActionPtr actionData, FrameworkPtr fw ) :
+                        Data::ActionPtr actionData ) :
   m_pSource( std::move( caster ) ),
-  m_pFw( std::move( fw ) ),
   m_actionData( std::move( actionData ) ),
   m_id( actionId ),
   m_targetId( 0 ),
@@ -69,10 +68,9 @@ bool Action::Action::init()
   if( !m_actionData )
   {
     // need to get actionData
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-    assert( exdData );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-    auto actionData = exdData->get< Data::Action >( m_id );
+    auto actionData = exdData.get< Data::Action >( m_id );
     assert( actionData );
 
     m_actionData = actionData;
@@ -313,8 +311,8 @@ void Action::Action::start()
     player->queuePacket( actionStartPkt );
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onStart( *this );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onStart( *this );
 
   // instantly finish cast if there's no cast time
   if( !hasCastTime() )
@@ -358,8 +356,8 @@ void Action::Action::interrupt( ActionInterruptType type )
     m_pSource->sendToInRangeSet( control, true );
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInterrupt( *this );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInterrupt( *this );
 }
 
 void Action::Action::execute()
@@ -373,7 +371,7 @@ void Action::Action::execute()
     return;
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   if( hasCastTime() )
   {
@@ -401,7 +399,7 @@ void Action::Action::execute()
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
-    pScriptMgr->onEObjHit( *player, m_targetId, getId() );
+    scriptMgr.onEObjHit( *player, m_targetId, getId() );
   }
 
   m_started = false;
@@ -439,9 +437,9 @@ void Action::Action::buildEffects()
 {
   snapshotAffectedActors( m_hitActors );
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  pScriptMgr->onExecute( *this );
+  scriptMgr.onExecute( *this );
 
   if( isInterrupted() )
     return;
@@ -450,7 +448,7 @@ void Action::Action::buildEffects()
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_effectBuilder->buildAndSendPackets();
-    pScriptMgr->onAfterBuildEffect( *this );
+    scriptMgr.onAfterBuildEffect( *this );
     return;
   }
   
@@ -630,7 +628,7 @@ void Action::Action::buildEffects()
   }
 
   m_effectBuilder->buildAndSendPackets();
-  pScriptMgr->onAfterBuildEffect( *this );
+  scriptMgr.onAfterBuildEffect( *this );
 
   // at this point we're done with it and no longer need it
   m_effectBuilder.reset();
@@ -638,8 +636,8 @@ void Action::Action::buildEffects()
 
 bool Action::Action::preCheck()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onBeforePreCheck( *this );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onBeforePreCheck( *this );
 
   if( isInterrupted() )
     return false;
@@ -672,10 +670,9 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
   if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass && !m_actionData->isRoleAction )
   {
     // check if not a base class action
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-    assert( exdData );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
+    auto classJob = exdData.get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
     if( !classJob )
       return false;
 
@@ -1043,6 +1040,6 @@ bool Action::Action::checkActionBonusRequirement()
 
 Sapphire::StatusEffect::StatusEffectPtr Action::Action::createStatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor, uint32_t duration, uint32_t tickRate )
 {
-  // workaround to framework access issue in action script
-  return StatusEffect::make_StatusEffect( id, sourceActor, targetActor, duration, tickRate, m_pFw );
+  // problem solved remove this
+  return StatusEffect::make_StatusEffect( id, sourceActor, targetActor, duration, tickRate );
 }

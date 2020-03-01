@@ -1,7 +1,7 @@
 #include <Actor/Player.h>
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
-#include "Framework.h"
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -44,8 +44,8 @@ class SubSea050 : public Sapphire::ScriptAPI::EventScript
   // Event Handlers
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor( actorId );
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Actor0 )
     {

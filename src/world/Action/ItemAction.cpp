@@ -10,14 +10,13 @@ using namespace Sapphire::World::Action;
 
 ItemAction::ItemAction( Sapphire::Entity::CharaPtr source, uint32_t itemId,
                         Sapphire::Data::ItemActionPtr itemActionData, uint16_t itemSourceSlot,
-                        uint16_t itemSourceContainer, Sapphire::FrameworkPtr fw ) :
+                        uint16_t itemSourceContainer ) :
   m_itemAction( std::move( itemActionData ) ),
   m_itemSourceSlot( itemSourceSlot ),
   m_itemSourceContainer( itemSourceContainer )
 {
   m_id = itemId;
   m_pSource = std::move( source );
-  m_pFw = std::move( fw );
 }
 
 void ItemAction::start()

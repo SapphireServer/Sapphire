@@ -13,7 +13,7 @@ namespace Sapphire::Math
   public:
     static float calculateBaseStat( const Entity::Chara& chara );
 
-    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
+    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
 
     static float dodgeProbability( const Sapphire::Entity::Chara& chara );
 

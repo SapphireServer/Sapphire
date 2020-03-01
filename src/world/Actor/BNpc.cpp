@@ -35,26 +35,26 @@
 #include "BNpcTemplate.h"
 
 #include "Common.h"
-#include "Framework.h"
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Service.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
-  Npc( ObjKind::BattleNpc, pFw )
+Sapphire::Entity::BNpc::BNpc() :
+  Npc( ObjKind::BattleNpc )
 {
 }
 
 Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-                              uint8_t level, uint32_t maxHp, TerritoryPtr pZone, FrameworkPtr pFw ) :
-  Npc( ObjKind::BattleNpc, pFw )
+                              uint8_t level, uint32_t maxHp, TerritoryPtr pZone ) :
+  Npc( ObjKind::BattleNpc )
 {
   m_id = id;
   m_modelChara = pTemplate->getModelChara();
@@ -99,18 +99,17 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
-  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-  assert( exdData );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto bNpcBaseData = exdData->get< Data::BNpcBase >( m_bNpcBaseId );
+  auto bNpcBaseData = exdData.get< Data::BNpcBase >( m_bNpcBaseId );
   assert( bNpcBaseData );
 
   m_radius = bNpcBaseData->scale;
 
-  auto modelChara = exdData->get< Data::ModelChara >( bNpcBaseData->modelChara );
+  auto modelChara = exdData.get< Data::ModelChara >( bNpcBaseData->modelChara );
   if( modelChara )
   {
-    auto modelSkeleton = exdData->get< Data::ModelSkeleton >( modelChara->model );
+    auto modelSkeleton = exdData.get< Data::ModelSkeleton >( modelChara->model );
     if( modelSkeleton )
       m_radius *= modelSkeleton->radius;
   }
@@ -359,8 +358,8 @@ bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara
 
 void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 {
-  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 500, 1000 ).next() );
+  auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   m_lastAttack = Util::getTimeMs() + variation;
   hateListUpdate( pChara, 1 );
@@ -696,11 +695,11 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
 
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
     assert( exdData );
-    auto actionData = exdData->get< Data::Action >( 7 );
+    auto actionData = exdData.get< Data::Action >( 7 );
     assert( actionData );
-    auto action = World::Action::make_Action( getAsChara(), 7, 0, actionData, m_pFw );
+    auto action = World::Action::make_Action( getAsChara(), 7, 0, actionData );
 
     action->setTargetId( pTarget->getId() );
     action->setPos( getPos() );
@@ -718,10 +717,10 @@ void Sapphire::Entity::BNpc::calculateStats()
   uint8_t level = getLevel();
   uint8_t job = static_cast< uint8_t >( getClass() );
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( job );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
+  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( job );
+  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( level );
 
   float base = Math::CalcStats::calculateBaseStat( *this );
 

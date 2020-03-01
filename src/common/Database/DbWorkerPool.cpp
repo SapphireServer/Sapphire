@@ -5,7 +5,6 @@
 #include "StatementTask.h"
 #include "Operation.h"
 #include "ZoneDbConnection.h"
-#include "Framework.h"
 
 #include "Logging/Logger.h"
 #include <mysql.h>

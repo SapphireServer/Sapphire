@@ -13,7 +13,7 @@ class StatusEffect
 {
 public:
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                uint32_t duration, uint32_t tickRate, FrameworkPtr pFw );
+                uint32_t duration, uint32_t tickRate );
 
   ~StatusEffect();
 
@@ -73,7 +73,6 @@ private:
   uint16_t m_param;
   std::string m_name;
   std::pair< uint8_t, uint32_t > m_currTickEffect;
-  FrameworkPtr m_pFw;
   Sapphire::World::Action::StatusEffectEntry m_effectEntry;
   uint32_t m_value;
   float m_cachedSourceCrit;

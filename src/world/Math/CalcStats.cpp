@@ -3,6 +3,7 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Common.h>
 #include <Logging/Logger.h>
+#include <Service.h>
 
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
@@ -14,7 +15,6 @@
 #include "Action/Action.h"
 
 #include "CalcStats.h"
-#include "Framework.h"
 
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
@@ -145,15 +145,15 @@ float CalcStats::calculateBaseStat( const Chara& chara )
 // Leggerless' HP Formula
 // ROUNDDOWN(JobModHP * (BaseHP / 100)) + ROUNDDOWN(VitHPMod / 100 * (VIT - BaseDET))
 
-uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pFw )
+uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 {
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
+  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;

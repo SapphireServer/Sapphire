@@ -5,6 +5,7 @@
 #include <Util/UtilMath.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -22,7 +23,6 @@
 #include "Event/EventHandler.h"
 
 #include "QuestBattle.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -34,9 +34,8 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
                                     uint32_t guId,
                                     const std::string& internalName,
                                     const std::string& contentName,
-                                    uint32_t questBattleId,
-                                    FrameworkPtr pFw ) :
-  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+                                    uint32_t questBattleId ) :
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::QuestBattle, questBattleId ),
   m_pBattleDetails( pBattleDetails ),
   m_questBattleId( questBattleId ),
@@ -51,8 +50,8 @@ bool Sapphire::QuestBattle::init()
   if( !Territory::init() )
     return false;
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsQuestBattle() );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceInit( getAsQuestBattle() );
 
   return true;
 }
@@ -101,6 +100,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
   if( !m_pPlayer )
     return;
 
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
   switch( m_state )
   {
     case Created:
@@ -122,8 +123,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
         return;
 
       onEnterSceneFinish( *m_pPlayer );
-      auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-      pScriptMgr->onDutyCommence( *this, *m_pPlayer );
+
+      scriptMgr.onDutyCommence( *this, *m_pPlayer );
 
       m_state = DutyInProgress;
       m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->timeLimit * 60u );
@@ -157,8 +158,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
     }
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), tickCount );
+  scriptMgr.onInstanceUpdate( getAsQuestBattle(), tickCount );
 
   m_lastUpdate = tickCount;
 }
@@ -285,8 +285,8 @@ void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
@@ -305,8 +305,9 @@ void Sapphire::QuestBattle::onBeforePlayerZoneIn( Sapphire::Entity::Player& play
 {
   player.setRot( PI );
   player.setPos( { 0.f, 0.f, 0.f } );
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onPlayerSetup( *this, player );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onPlayerSetup( *this, player );
 
   player.resetObjSpawnIndex();
 }
@@ -338,8 +339,8 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
 void
 Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
 }
 
 void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
@@ -364,8 +365,10 @@ void Sapphire::QuestBattle::success()
                         [ & ]( Entity::Player& player, const Event::SceneResult& result )
                         {
                           player.eventFinish( getDirectorId(), 1 );
-                          auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-                          pScriptMgr->onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+
+                          auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+                          scriptMgr.onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+
                           player.exitInstance();
                         } );
 

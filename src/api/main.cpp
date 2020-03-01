@@ -26,14 +26,13 @@
 #include <vector>
 #include <algorithm>
 
-#include <Framework.h>
 #include <Logging/Logger.h>
 
 #include "SapphireApi.h"
 
 #include <Util/CrashHandler.h>
 
-Sapphire::Common::Util::CrashHandler crashHandler;
+[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
 
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 Sapphire::Data::ExdDataGenerated g_exdDataGen;

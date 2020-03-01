@@ -25,7 +25,6 @@
 #include "Player.h"
 #include "Npc.h"
 #include "Manager/TerritoryMgr.h"
-#include "Framework.h"
 #include "Common.h"
 
 using namespace Sapphire::Common;
@@ -33,8 +32,8 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::Npc::Npc( ObjKind type, FrameworkPtr pFw ) :
-  Chara( type, pFw )
+Sapphire::Entity::Npc::Npc( ObjKind type ) :
+  Chara( type )
 {
 
 }

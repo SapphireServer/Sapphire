@@ -15,7 +15,7 @@ namespace Sapphire::World::Action
   {
   public:
     ItemAction( Entity::CharaPtr source, uint32_t itemId, Data::ItemActionPtr itemActionData,
-                uint16_t itemSourceSlot, uint16_t itemSourceContainer, FrameworkPtr fw );
+                uint16_t itemSourceSlot, uint16_t itemSourceContainer );
     virtual ~ItemAction() = default;
 
     void start() override;

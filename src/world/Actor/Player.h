@@ -41,7 +41,7 @@ namespace Sapphire::Entity
   {
   public:
     /*! Contructor */
-    Player( FrameworkPtr pFw );
+    Player();
 
     /*! Destructor */
     ~Player();

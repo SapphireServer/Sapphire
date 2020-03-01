@@ -9,16 +9,15 @@
 #include "House.h"
 
 #include <unordered_map>
-#include "Framework.h"
+#include <Service.h>
 
 Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
-                        const std::string& estateComment, FrameworkPtr pFw ) :
+                        const std::string& estateComment ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
   m_landIdent( ident ),
   m_estateName( estateName ),
-  m_estateComment( estateComment ),
-  m_pFw( pFw )
+  m_estateComment( estateComment )
 {
   m_interiorModelCache.fill( 0 );
   m_exteriorModelCache.fill( std::make_pair( 0, 0 ) );
@@ -28,10 +27,10 @@ Sapphire::House::~House() = default;
 
 void Sapphire::House::updateHouseDb()
 {
-  auto pDB = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   // BuildTime = 1, Aetheryte = 2, Comment = 3, HouseName = 4, Endorsements = 5, HouseId = 6
-  auto stmt = pDB->getPreparedStatement( Db::HOUSING_HOUSE_UP );
+  auto stmt = db.getPreparedStatement( Db::HOUSING_HOUSE_UP );
   stmt->setUInt( 6, m_houseId );
 
   stmt->setInt64( 1, static_cast< int64_t >( m_buildTime ) );
@@ -42,7 +41,7 @@ void Sapphire::House::updateHouseDb()
 
   stmt->setUInt64( 5, 0 );
 
-  pDB->execute( stmt );
+  db.execute( stmt );
 }
 
 uint32_t Sapphire::House::getLandSetId() const

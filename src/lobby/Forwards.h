@@ -12,11 +12,6 @@ x ## Ptr make_ ## x( Args &&...args ) { \
 return std::make_shared< x >( std::forward< Args >( args ) ... ); }\
 typedef std::vector< x > x ## PtrList;
 
-namespace Sapphire
-{
-  TYPE_FORWARD( Framework );
-}
-
 namespace Sapphire::Lobby
 {
   TYPE_FORWARD( LobbySession );

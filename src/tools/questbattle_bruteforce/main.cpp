@@ -20,7 +20,7 @@
 
 #include <filesystem>
 
-Sapphire::Common::Util::CrashHandler crashHandler;
+[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
 
 Sapphire::Data::ExdDataGenerated g_exdData;
 xiv::dat::GameData* gameData = nullptr;

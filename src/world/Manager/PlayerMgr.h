@@ -2,14 +2,13 @@
 #define SAPPHIRE_PLAYERMGR_H
 
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 
 namespace Sapphire::World::Manager
 {
-class PlayerMgr : public Manager::BaseManager
+class PlayerMgr
   {
   public:
-    PlayerMgr( FrameworkPtr pFw );
+    PlayerMgr() = default;
 
     void movePlayerToLandDestination( Sapphire::Entity::Player& player, uint32_t landId, uint16_t param = 0 );
   };

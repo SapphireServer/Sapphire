@@ -4,6 +4,7 @@
 #include <Logging/Logger.h>
 
 #include <algorithm>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Actor/Chara.h"
@@ -16,14 +17,13 @@
 #include "Math/CalcStats.h"
 
 #include "StatusEffect.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                    uint32_t duration, uint32_t tickRate, FrameworkPtr pFw ) :
+                                                    uint32_t duration, uint32_t tickRate ) :
   m_id( id ),
   m_sourceActor( sourceActor ),
   m_targetActor( targetActor ),
@@ -31,14 +31,13 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
-  m_pFw( pFw ),
   m_value( 0 ),
   m_cachedSourceCrit( 0 ),
   m_cachedSourceCritBonus( 0 ),
   m_markToRemove( false )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto entry = pExdData->get< Sapphire::Data::Status >( id );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto entry = exdData.get< Sapphire::Data::Status >( id );
   m_name = entry->name;
 
   std::replace( m_name.begin(), m_name.end(), ' ', '_' );
@@ -106,9 +105,10 @@ std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffe
 
 void Sapphire::StatusEffect::StatusEffect::onTick()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   m_lastTick = Util::getTimeMs();
-  pScriptMgr->onStatusTick( m_targetActor, *this );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onStatusTick( m_targetActor, *this );
 
   auto statusEffectType = static_cast< Common::StatusEffectType >( m_effectEntry.effectType );
   if( statusEffectType == Common::StatusEffectType::MPRestore )
@@ -135,9 +135,8 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
 void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
-
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onStatusReceive( m_targetActor, m_id );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onStatusReceive( m_targetActor, m_id );
 
   switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {
@@ -200,8 +199,8 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 
 void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onStatusTimeOut( m_targetActor, m_id );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onStatusTimeOut( m_targetActor, m_id );
 
   switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {

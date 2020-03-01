@@ -31,17 +31,6 @@ namespace Sapphire::ScriptAPI
     return m_type;
   }
 
-  void ScriptObject::setFramework( Sapphire::Framework* fw )
-  {
-    assert( fw );
-    m_framework = fw;
-  }
-
-  Sapphire::Framework* ScriptObject::framework() const
-  {
-    return m_framework;
-  }
-
   ///////////////////////////////////////////////////////////////////
 
   StatusEffectScript::StatusEffectScript( uint32_t effectId ) :

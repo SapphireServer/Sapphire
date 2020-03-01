@@ -9,17 +9,10 @@
 #include "StatusEffect/StatusEffect.h"
 
 #include <Exd/ExdDataGenerated.h>
-#include "Framework.h"
 
 #include <Network/PacketWrappers/EffectPacket.h>
 
 using namespace Sapphire;
-
-World::Manager::ActionMgr::ActionMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{
-
-}
 
 void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
                                                           Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos,
@@ -28,7 +21,7 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
   player.sendDebug( "got aoe act: {0}", actionData->name );
 
 
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
   action->setPos( pos );
 
@@ -49,7 +42,7 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
                                                             Data::ActionPtr actionData, uint64_t targetId,
                                                             uint16_t sequence )
 {
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
   action->setTargetId( targetId );
 
@@ -75,7 +68,7 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
   player.sendDebug( "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
 
   auto action = Action::make_ItemAction( player.getAsChara(), itemId, itemActionData,
-                                         itemSourceSlot, itemSourceContainer, framework() );
+                                         itemSourceSlot, itemSourceContainer );
 
   // todo: item actions don't have cast times? if so we can just start it and we're good
   action->start();
@@ -87,7 +80,7 @@ void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint1
 {
   player.sendDebug( "mount: {0}", mountId );
 
-  auto action = Action::make_MountAction( player.getAsPlayer(), mountId, sequence, actionData, framework() );
+  auto action = Action::make_MountAction( player.getAsPlayer(), mountId, sequence, actionData );
 
   action->setTargetId( targetId );
 

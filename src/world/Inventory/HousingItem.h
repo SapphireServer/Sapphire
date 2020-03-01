@@ -8,7 +8,7 @@ namespace Sapphire::Inventory
   class HousingItem : public Item
   {
   public:
-    HousingItem( uint64_t uId, uint32_t catalogId, FrameworkPtr pFw );
+    HousingItem( uint64_t uId, uint32_t catalogId );
     virtual ~HousingItem() = default;
 
     void setRot( float rot );

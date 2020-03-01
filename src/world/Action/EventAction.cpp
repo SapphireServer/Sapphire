@@ -2,6 +2,7 @@
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
@@ -9,7 +10,6 @@
 #include "Actor/Player.h"
 
 #include "EventAction.h"
-#include "Framework.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World;
@@ -20,15 +20,13 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
-                                  ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional,
-                                  FrameworkPtr pFw )
+                                  ActionCallback finishRef, ActionCallback interruptRef, uint64_t additional )
 {
   m_additional = additional;
   m_eventId = eventId;
   m_id = action;
-  m_pFw = pFw;
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
-  m_castTimeMs = pExdData->get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  m_castTimeMs = exdData.get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
   m_onActionFinishClb = std::move( finishRef );
   m_onActionInterruptClb = std::move( interruptRef );
   m_pSource = std::move( pActor );

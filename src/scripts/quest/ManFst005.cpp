@@ -2,7 +2,7 @@
 #include "Manager/EventMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include <ScriptObject.h>
-#include "Framework.h"
+#include <Service.h>
 
 // Quest Script: ManFst005_00445
 // Quest Name: Chasing Shadows
@@ -61,8 +61,8 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
    // Event Handlers
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-     auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-     auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+     auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
      if( actor == Actor0 )
      {
@@ -142,11 +142,10 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
                        {
                          if( result.param2 == 1 )
                          {
-                           auto pTeriMgr = framework()->get< Sapphire::World::Manager::TerritoryMgr >();
-                           if( !pTeriMgr )
-                             return;
+                           auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+
                            player.eventFinish( result.eventId, 0 );
-                           pTeriMgr->createAndJoinQuestBattle( player, Questbattle0 );
+                           pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
                          }
                        } );
    }

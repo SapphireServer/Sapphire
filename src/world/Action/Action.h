@@ -23,8 +23,8 @@ namespace Sapphire::World::Action
   public:
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw );
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData );
 
     virtual ~Action();
 
@@ -206,7 +206,6 @@ namespace Sapphire::World::Action
 
     Common::ActionInterruptType m_interruptType;
 
-    FrameworkPtr m_pFw;
     Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
