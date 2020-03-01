@@ -190,7 +190,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       uint32_t emoteId = param11;
       bool isSilent = param2 == 1;
 
-      auto exdData = Common::Service< Data::ExdDataGenerated >::ref();
+      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
       auto emoteData = exdData.get< Data::Emote >( emoteId );
 
       if( !emoteData )

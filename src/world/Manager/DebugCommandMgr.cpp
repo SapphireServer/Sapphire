@@ -535,7 +535,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
-  auto exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   std::string subCommand;
   std::string params = "";
 

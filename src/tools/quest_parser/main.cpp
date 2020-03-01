@@ -27,8 +27,8 @@ using namespace Sapphire;
 const std::string onTalkStr(
   "  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
   "  {\n"
-  "    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();\n"
-  "    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
+  "    auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();\n"
+  "    auto actor = eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
   "  }\n\n"
 );
 
@@ -41,8 +41,8 @@ const std::string onWithinRangeStr(
 const std::string onEmoteStr(
   "  void onEmote( uint32_t eventId, Entity::Player& player, uint64_t actorId, uint32_t emoteId ) override\n"
   "  {\n"
-  "    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();\n"
-  "    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
+  "    auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();\n"
+  "    auto actor = eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
   "  }\n\n"
 );
 

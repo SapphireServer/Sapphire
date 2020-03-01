@@ -131,7 +131,7 @@ void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 
 void Sapphire::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
 {
-  auto exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
   auto itemInfo = exdData.get< Sapphire::Data::Item >( pItem->getId() );
   auto itemClassJob = itemInfo->classJobUse;

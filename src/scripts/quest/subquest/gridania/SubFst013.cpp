@@ -161,7 +161,7 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( !player.hasQuest( getId() ) )
@@ -182,7 +182,7 @@ public:
 
   void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) override
   {
-    auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == ACTOR1 && emoteId == 5 && player.getQuestSeq( getId() ) == SEQ_1 )

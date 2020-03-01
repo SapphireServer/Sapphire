@@ -75,7 +75,7 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+    auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
     auto warp = exdData.get< Sapphire::Data::Warp >( eventId );
     if( !warp )
