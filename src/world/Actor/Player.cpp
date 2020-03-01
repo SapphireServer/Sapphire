@@ -2193,7 +2193,6 @@ void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
     if( value != 0 )
     {
       pPacket->data().value1 = 0x07;
-      pPacket->data().value2 = 0x7FED;
     }
     queuePacket( pPacket );
   }
