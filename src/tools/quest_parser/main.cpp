@@ -64,6 +64,17 @@ std::string titleCase( const std::string& str )
   return retStr;
 }
 
+std::string titleCaseNoUnderscores( const std::string& str )
+{
+  std::string result = titleCase( str );
+
+  result.erase( std::remove_if( result.begin(), result.end(), []( const char c ) {
+    return c == '_';
+  }), result.end());
+
+  return result;
+}
+
 void
 createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
 {
@@ -132,12 +143,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
       }
       else
       {
-        std::string seqName = titleCase( entry );
-
-        seqName.erase( std::remove_if( seqName.begin(), seqName.end(), []( const char c ) {
-          return c == '_';
-        }), seqName.end());
-
+        std::string seqName = titleCaseNoUnderscores( entry );
         std::string seqId = entry.substr( 4 );
         seqStr += "      " + seqName + " = " + seqId + ",\n";
       }
@@ -195,12 +201,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   std::sort( script_entities.begin(), script_entities.end() );
   for( auto& entity : script_entities )
   {
-    auto name = titleCase( entity );
-
-    name.erase( std::remove_if( name.begin(), name.end(), []( const char c ) {
-      return c == '_';
-    }), name.end());
-
+    auto name = titleCaseNoUnderscores( entity );
     sentities += "    static constexpr auto " + name + ";\n";
   }
 
@@ -239,7 +240,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 
   for( auto enemy : enemy_strings )
   { 
-    scriptEntry += "      case " + enemy + ": { break; }\n"; 
+    scriptEntry += "      case " + titleCaseNoUnderscores( enemy ) + ": { break; }\n";
   }
 
   if( !enemy_ids.empty() )
@@ -248,14 +249,14 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 
   if( !action_ids.empty() )
     actionEntry += std::string(
-      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uin32_t actionId ) override\n"
+      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uint32_t actionId )\n"
       "  {\n" 
       "    switch( actionId )\n"
       "    {\n" );
 
   for( auto action : action_names )
   { 
-    actionEntry += "      case " + action + ": { break; }\n"; 
+    actionEntry += "      case " + titleCaseNoUnderscores( action ) + ": { break; }\n";
   }
 
   if( !action_ids.empty() )
