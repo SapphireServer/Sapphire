@@ -63,7 +63,7 @@ bool Sapphire::HousingZone::init()
   else if( m_territoryTypeId == 641 )
     housingIndex = 3;
 
-  auto exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto info = exdData.get< Sapphire::Data::HousingLandSet >( housingIndex );
 
   // build yard objects array indices

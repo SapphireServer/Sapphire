@@ -869,7 +869,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   if( it == containers.end() )
     return;
 
-  auto invMgr = Common::Service< Manager::InventoryMgr >::ref();
+  auto& invMgr = Common::Service< Manager::InventoryMgr >::ref();
   invMgr.sendInventoryContainer( player, it->second );
 }
 

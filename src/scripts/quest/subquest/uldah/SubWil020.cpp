@@ -63,7 +63,7 @@ class SubWil020 : public Sapphire::ScriptAPI::EventScript
    // Event Handlers
    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
    {
-     auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+     auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
      auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
      /*player.setQuestUI8BH( getId(), 0 );

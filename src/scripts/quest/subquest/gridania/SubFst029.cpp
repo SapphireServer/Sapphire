@@ -47,7 +47,7 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == SubFst029::Actor0 && !player.hasQuest( getId() ) )
