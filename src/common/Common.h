@@ -1099,6 +1099,19 @@ namespace Sapphire::Common
     {
       uint8_t oathGauge;
     } pld;
+    struct
+    {
+      uint8_t blood;
+      uint16_t darksideTimeRemaining;
+      uint8_t darkArts;
+      uint16_t shadowTimeRemaining;
+    } drk;
+    struct
+    {
+      uint16_t lilyTimer;
+      uint8_t lilies;
+      uint8_t bloodLilies;
+    } whm;
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
