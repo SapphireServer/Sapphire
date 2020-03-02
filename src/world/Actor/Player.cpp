@@ -2161,24 +2161,14 @@ bool Sapphire::Entity::Player::checkAction()
 
 void Sapphire::Entity::Player::gaugeClear()
 {
-  std::memset( m_gauge, 0, sizeof( m_gauge ) );
-}
-
-void Sapphire::Entity::Player::gaugeSet( uint8_t index, uint8_t value )
-{
-  m_gauge[ index ] = value;
-}
-
-uint8_t Sapphire::Entity::Player::gaugeGet( uint8_t index )
-{
-  return m_gauge[ index ];
+  std::memset( &m_gauge, 0, sizeof( m_gauge ) );
 }
 
 void Sapphire::Entity::Player::sendActorGauge()
 {
   auto pPacket = makeZonePacket< FFXIVIpcActorGauge >( getId() );
   pPacket->data().classJobId = static_cast< uint8_t >( getClass() );
-  std::memcpy( pPacket->data().data, m_gauge, sizeof( m_gauge ) );
+  std::memcpy( pPacket->data().data, &m_gauge, sizeof( m_gauge ) );
 
   queuePacket( pPacket );
 }
@@ -2196,25 +2186,25 @@ void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
     }
     queuePacket( pPacket );
   }
-  gaugeSet( 0, value );
+  m_gauge.war.beastGauge = value;
   if( oldValue != value )
     sendActorGauge();
 }
 
 uint8_t Sapphire::Entity::Player::gaugeWarGetIb()
 {
-  return gaugeGet( 0 );
+  return m_gauge.war.beastGauge;
 }
 
 void Sapphire::Entity::Player::gaugePldSetOath( uint8_t value )
 {
   auto oldValue = gaugePldGetOath();
-  gaugeSet( 0, value );
+  m_gauge.pld.oathGauge = value;
   if( oldValue != value )
     sendActorGauge();
 }
 
 uint8_t Sapphire::Entity::Player::gaugePldGetOath()
 {
-  return gaugeGet( 0 );
+  return m_gauge.pld.oathGauge;
 }

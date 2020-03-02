@@ -973,10 +973,6 @@ namespace Sapphire::Entity
 
     // Job UI
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    private:
-    void gaugeSet( uint8_t index, uint8_t value );
-    uint8_t gaugeGet( uint8_t index );
-    public:
     void gaugeClear();
     void sendActorGauge();
 
@@ -1098,7 +1094,7 @@ namespace Sapphire::Entity
     bool m_bLoadingComplete;
     bool m_bAutoattack;
 
-    uint8_t m_gauge[15];
+    Common::JobGauge m_gauge;
 
     Common::ZoneingType m_zoningType;
     uint32_t m_territoryId;

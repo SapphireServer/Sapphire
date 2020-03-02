@@ -1085,6 +1085,22 @@ namespace Sapphire::Common
     RequireCorrectPositional = 2,
   };
 
+  union JobGauge
+  {
+    struct
+    {
+      uint8_t gauge_data[15];
+    } _raw;
+    struct
+    {
+      uint8_t beastGauge;
+    } war;
+    struct
+    {
+      uint8_t oathGauge;
+    } pld;
+  };
+
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
 }
