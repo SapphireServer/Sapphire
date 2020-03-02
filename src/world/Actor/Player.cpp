@@ -622,7 +622,28 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
   gainExp( exp );
 
+  // gain 10x additional EXP if entire map is completed
+  uint32_t mask = info->discoveryFlag;
+  uint32_t discoveredAreas;
+  if( info->discoveryArrayByte )
+  {
+    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) |
+                        m_discovery[ offset ];
+  }
+  else
+  {
+    discoveredAreas = ( m_discovery[ offset + 3 ] << 24 ) |
+                      ( m_discovery[ offset + 2 ] << 16 ) |
+                      ( m_discovery[ offset + 1 ] << 8  ) |
+                        m_discovery[ offset ];
+  }
 
+  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
+
+  if( allDiscovered )
+  {
+    gainExp( exp * 10 );
+  }
 }
 
 bool Sapphire::Entity::Player::isNewAdventurer() const
