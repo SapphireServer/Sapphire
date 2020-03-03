@@ -604,6 +604,12 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   int32_t offset = 4;
 
   auto info = exdData.get< Sapphire::Data::Map >( map_id );
+  if ( !info )
+  {
+    sendDebug( "discover(): Could not obtain map data for map_id == {0}", map_id );
+    return;
+  }
+
   if( info->discoveryArrayByte )
     offset = 5 + 2 * info->discoveryIndex;
   else
