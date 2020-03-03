@@ -221,7 +221,7 @@ namespace Sapphire::Network::Packets
 
     WeatherChange = 0x02FB, // updated 5.11
     PlayerTitleList = 0x037D, // updated 5.1
-    Discovery = 0x02E7, // updated 5.18
+    Discovery = 0x0091, // updated 5.2
 
     EorzeaTimeOffset = 0x03B8, // updated 5.1
 
@@ -334,7 +334,7 @@ namespace Sapphire::Network::Packets
 
     ZoneLineHandler = 0x00B9, // updated 5.2
     ClientTrigger = 0x017C, // updated 5.2
-    DiscoveryHandler = 0x017B, // updated 5.18
+    DiscoveryHandler = 0x019A, // updated 5.2
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x0225, // updated 5.2
