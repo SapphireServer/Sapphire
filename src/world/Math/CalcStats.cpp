@@ -590,10 +590,6 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   {
     player->sendDebug( format, pot, aa, ap, det, ten, factor );
   }
-  else
-  {
-    //Logger::debug( format, pot, aa, ap, det, ten, factor );
-  }
 
   return std::pair( factor, hitType );
 }
@@ -638,7 +634,7 @@ float CalcStats::calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, ui
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
-    //player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, factor );
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, factor );
   }
 
   return factor;
