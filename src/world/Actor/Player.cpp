@@ -2228,7 +2228,7 @@ void Sapphire::Entity::Player::sendActorGauge()
 {
   auto pPacket = makeZonePacket< FFXIVIpcActorGauge >( getId() );
   pPacket->data().classJobId = static_cast< uint8_t >( getClass() );
-  std::memcpy( pPacket->data().data, &m_gauge, sizeof( m_gauge ) );
+  std::memcpy( pPacket->data().data, &m_gauge, 15 );
 
   queuePacket( pPacket );
 }
