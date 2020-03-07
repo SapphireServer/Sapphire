@@ -1849,7 +1849,9 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 16533, { 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Afflatus Misery, ハート・オブ・ミゼリ
-  { 16535, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //has damage: potency 900, combo potency 0, directional potency 0
+  //has bonus effect: DamageFallOff, 75
+  { 16535, { 900, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 75 } },
 
   //Afflatus Rapture, ハート・オブ・ラプチャー
   //has heal: potency 300

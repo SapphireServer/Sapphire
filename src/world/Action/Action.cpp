@@ -464,15 +464,27 @@ void Action::Action::buildEffects()
   }
 
   bool isFirstValidVictim = true;
+  int victimCounter = 0;
 
   for( auto& actor : m_hitActors )
   {
+    victimCounter++;
     if( m_lutEntry.damagePotency > 0 )
     {
       Common::AttackType attackType = static_cast< Common::AttackType >( m_actionData->attackType );
       actor->onActionHostile( m_pSource );
       
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.damageComboPotency : m_lutEntry.damagePotency );
+      if( victimCounter > 1 )
+      {
+        if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::DamageFallOff )
+        {
+          if( checkActionBonusRequirement() )
+          {
+            dmg.first = static_cast< uint32_t >( 1.0 * dmg.first * ( m_lutEntry.bonusDataByte1 / 100.0 ) );
+          }
+        }
+      }
       dmg.first = Math::CalcStats::applyDamageReceiveMultiplier( *actor, dmg.first, attackType );
 
       float originalDamage = dmg.first;
@@ -801,6 +813,23 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
         {
           if( subtractCosts )
             pPlayer->gaugePldSetOath( oath - m_primaryCost );
+
+          return true;
+        }
+      }
+      return false;
+    }
+
+    case Common::ActionPrimaryCostType::WHMBloodLily:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto bloodLily = pPlayer->gaugeWhmGetBloodLily();
+        if( bloodLily >= m_primaryCost )
+        {
+          if( subtractCosts )
+            pPlayer->gaugeWhmSetLilies( pPlayer->gaugeWhmGetLily(), bloodLily - m_primaryCost );
 
           return true;
         }

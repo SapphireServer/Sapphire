@@ -587,6 +587,7 @@ namespace Sapphire::Common
 //    AetherflowStack = 30,
 //    Status = 32,
     PLDGauge = 41,
+    WHMBloodLily = 56,
     WHMLily = 57,
 //    RDMGaugeBoth = 74,
 ////  RDMGaugeBlack = 75, // not right?
@@ -1077,6 +1078,7 @@ namespace Sapphire::Common
     GainMPPercentage = 4,
     GainJobResource = 8,
     SelfHeal = 16,
+    DamageFallOff = 32,
   };
 
   enum ActionBonusEffectRequirement : uint8_t
