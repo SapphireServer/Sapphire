@@ -1124,6 +1124,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( !isAlive() )
     return;
 
+  int64_t interval = tickCount - m_lastUpdate;
   m_lastUpdate = tickCount;
 
   if( !checkAction() )
@@ -1163,6 +1164,35 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
         }
       }
     }
+  }
+
+  switch( getClass() )
+  {
+    case Common::ClassJob::Conjurer:
+    case Common::ClassJob::Whitemage:
+    {
+      if( hasStateFlag( Common::PlayerStateFlag::InCombat ) )
+      {
+        if( gaugeWhmGetLily() < 3 )
+        {
+          auto lilyTimer = gaugeWhmGetLilyTimer();
+          lilyTimer += interval;
+          if( lilyTimer >= 30000 )
+          {
+            gaugeWhmSetLilyTimer( 0 ); // packet is sent together with following lily update
+            gaugeWhmSetLilies( gaugeWhmGetLily() + 1, gaugeWhmGetBloodLily() );
+          }
+          else
+          {
+            gaugeWhmSetLilyTimer( lilyTimer ); // don't send any packet, the client increases the timer by itself
+          }
+        }
+        else
+        {
+          gaugeWhmSetLilyTimer( 0 );
+        }
+      }
+    };
   }
 
   Chara::update( tickCount );
@@ -1464,13 +1494,17 @@ void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
 {
   hateListAdd( pBNpc );
   queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
+  setStateFlag( Common::PlayerStateFlag::InCombat );
 }
 
 void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
 {
   hateListRemove( pBNpc );
   if( m_actorIdTohateSlotMap.empty() )
+  {
     queuePacket( makeActorControl( getId(), ToggleAggro ) );
+    unsetStateFlag( Common::PlayerStateFlag::InCombat );
+  }
 }
 
 bool Sapphire::Entity::Player::isLogin() const
@@ -2201,6 +2235,7 @@ void Sapphire::Entity::Player::sendActorGauge()
 
 void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
 {
+  assert( value >= 0 && value <= 100 );
   auto oldValue = gaugeWarGetIb();
   if( ( oldValue == 0 && value != 0 ) ||
       ( oldValue != 0 && value == 0 ) )
@@ -2224,6 +2259,7 @@ uint8_t Sapphire::Entity::Player::gaugeWarGetIb()
 
 void Sapphire::Entity::Player::gaugePldSetOath( uint8_t value )
 {
+  assert( value >= 0 && value <= 100 );
   auto oldValue = gaugePldGetOath();
   m_gauge.pld.oathGauge = value;
   if( oldValue != value )
@@ -2233,4 +2269,36 @@ void Sapphire::Entity::Player::gaugePldSetOath( uint8_t value )
 uint8_t Sapphire::Entity::Player::gaugePldGetOath()
 {
   return m_gauge.pld.oathGauge;
+}
+
+uint8_t Sapphire::Entity::Player::gaugeWhmGetLily()
+{
+  return m_gauge.whm.lilies;
+}
+
+uint8_t Sapphire::Entity::Player::gaugeWhmGetBloodLily()
+{
+  return m_gauge.whm.bloodLilies;
+}
+
+void Sapphire::Entity::Player::gaugeWhmSetLilies( uint8_t liles, uint8_t bloodLilies )
+{
+  assert( liles >= 0 && liles <= 3 );
+  assert( bloodLilies >= 0 && bloodLilies <= 3 );
+  m_gauge.whm.lilies = liles;
+  m_gauge.whm.bloodLilies = bloodLilies;
+  sendActorGauge();
+}
+
+void Sapphire::Entity::Player::gaugeWhmSetLilyTimer( uint16_t value, bool sendPacket )
+{
+  assert( value >= 0 && value <= 30000 );
+  m_gauge.whm.lilyTimer = value;
+  if( sendPacket )
+    sendActorGauge();
+}
+
+uint16_t Sapphire::Entity::Player::gaugeWhmGetLilyTimer()
+{
+  return m_gauge.whm.lilyTimer;
 }

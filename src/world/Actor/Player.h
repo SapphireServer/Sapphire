@@ -982,6 +982,12 @@ namespace Sapphire::Entity
     void gaugePldSetOath( uint8_t value );
     uint8_t gaugePldGetOath();
 
+    uint8_t gaugeWhmGetLily();
+    uint8_t gaugeWhmGetBloodLily();
+    void gaugeWhmSetLilies( uint8_t liles, uint8_t bloodLilies );
+    void gaugeWhmSetLilyTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeWhmGetLilyTimer();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );

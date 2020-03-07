@@ -808,6 +808,31 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
       return false;
     }
 
+    case Common::ActionPrimaryCostType::WHMLily:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto lily = pPlayer->gaugeWhmGetLily();
+        if( lily >= m_primaryCost )
+        {
+          if( subtractCosts )
+          {
+            lily -= m_primaryCost;
+            auto bloodLily = pPlayer->gaugeWhmGetBloodLily();
+            if( pPlayer->getLevel() >= 74 )
+            {
+              bloodLily = std::min( 3, bloodLily + m_primaryCost );
+            }
+            pPlayer->gaugeWhmSetLilies( lily, bloodLily );
+          }
+
+          return true;
+        }
+      }
+      return false;
+    }
+
     // free casts, likely just pure ogcds
     case Common::ActionPrimaryCostType::None:
     {

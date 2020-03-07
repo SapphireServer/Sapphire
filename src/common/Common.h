@@ -587,6 +587,7 @@ namespace Sapphire::Common
 //    AetherflowStack = 30,
 //    Status = 32,
     PLDGauge = 41,
+    WHMLily = 57,
 //    RDMGaugeBoth = 74,
 ////  RDMGaugeBlack = 75, // not right?
 //    DRGGauge3Eyes = 76,
