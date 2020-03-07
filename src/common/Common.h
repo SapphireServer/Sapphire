@@ -1226,11 +1226,14 @@ namespace Sapphire::Common
     } rdm;
     struct
     {
+      uint16_t unused;
+      uint8_t unused2;
       uint8_t kenki;
       SamSen senFlag;
     } sam;
     struct
     {
+      uint16_t unused;
       uint8_t aetherflowStacks;
       uint8_t fairyGauge;
       uint8_t seraphTimer;
@@ -1250,6 +1253,7 @@ namespace Sapphire::Common
     } war;
     struct
     {
+      uint16_t unused;
       uint16_t lilyTimer;
       uint8_t lilies;
       uint8_t bloodLilies;
