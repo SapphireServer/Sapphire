@@ -220,7 +220,7 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0x0000,//0xF1FD, // updated 4.2
 
-    WeatherChange = 0x02FB, // updated 5.11
+    WeatherChange = 0x03D6, // updated 5.2
     PlayerTitleList = 0x037D, // updated 5.1
     Discovery = 0x0091, // updated 5.2
 
