@@ -1232,6 +1232,7 @@ namespace Sapphire::Common
       uint16_t unused;
       uint8_t unused2;
       uint8_t kenki;
+      uint8_t meditationStacks;
       SamSen senFlag;
     } sam;
     struct
