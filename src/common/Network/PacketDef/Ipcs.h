@@ -63,7 +63,7 @@ namespace Sapphire::Network::Packets
 
     ChatBanned = 0x006B,
     Playtime = 0x00E7, // updated 5.18
-    Logout = 0x0A1, // updated 5.2
+    Logout = 0x01D4, // updated 5.21
     CFNotify = 0x01F8, // updated 5.18
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
@@ -194,10 +194,10 @@ namespace Sapphire::Network::Packets
     EventLinkshell = 0x1169,
 
     QuestActiveList = 0x01FA, // updated 5.21
-    QuestUpdate = 0x02CE, // updated 5.2
+    QuestUpdate = 0x00B1, // updated 5.21
     QuestCompleteList = 0x0093, // updated 5.21
 
-    QuestFinish = 0x006F, // updated 5.2
+    QuestFinish = 0x00AA, // updated 5.21
     MSQTrackerComplete = 0x01D6, // updated 5.0
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
@@ -294,7 +294,7 @@ namespace Sapphire::Network::Packets
     CFRegisterDuty = 0x0071,
     CFRegisterRoulette = 0xFF72,
     PlayTimeHandler = 0x0276, // updated 5.1
-    LogoutHandler = 0x029C, // updated 5.2
+    LogoutHandler = 0x0365, // updated 5.21
     CancelLogout = 0x008F, // updated 5.1
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
@@ -338,8 +338,8 @@ namespace Sapphire::Network::Packets
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x0372, // updated 5.21
-    GMCommand1 = 0x0393, // updated 5.2
-    GMCommand2 = 0x020B, // updated 5.2
+    GMCommand1 = 0x029A, // updated 5.21
+    GMCommand2 = 0x0182, // updated 5.21
     AoESkillHandler = 0x0072, // updated 5.18
 
     UpdatePositionHandler = 0x031A, // updated 5.21
@@ -352,10 +352,10 @@ namespace Sapphire::Network::Packets
     BuildPresetHandler = 0x0150, // updated 5.0
 
     TalkEventHandler = 0x02CF, // updated 5.21
-    EmoteEventHandler = 0x01E1, // updated 5.2
-    WithinRangeEventHandler = 0x010E, // updated 5.2
-    OutOfRangeEventHandler = 0x00AE, // updated 5.2
-    EnterTeriEventHandler = 0x00C1, // updated 5.2
+    EmoteEventHandler = 0x0246, // updated 5.21
+    WithinRangeEventHandler = 0x02D1, // updated 5.21
+    OutOfRangeEventHandler = 0x02FB, // updated 5.21
+    EnterTeriEventHandler = 0x0284, // updated 5.21
     ShopEventHandler = 0x0156, // updated 5.0
 
     ReturnEventHandler = 0x012E, // updated 5.21
