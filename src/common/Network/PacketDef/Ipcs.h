@@ -128,9 +128,9 @@ namespace Sapphire::Network::Packets
     BossStatusEffectList = 0x0312, // added 5.1
     Effect = 0x0371, // updated 5.21
     AoeEffect8 = 0x02DA, // updated 5.21
-    AoeEffect16 = 0x0305, // updated 5.18
-    AoeEffect24 = 0x023F, // updated 5.18
-    AoeEffect32 = 0x0352, // updated 5.18
+    AoeEffect16 = 0x012E, // updated 5.21
+    AoeEffect24 = 0x0089, // updated 5.21
+    AoeEffect32 = 0x01A9, // updated 5.21
     PersistantEffect = 0x03E7, // updated 5.21
 
     GCAffiliation = 0x016F, // updated 5.0
@@ -140,7 +140,7 @@ namespace Sapphire::Network::Packets
     NpcSpawn2 = 0x010C, // ( Bigger statuseffectlist? ) updated 5.18
     ActorMove = 0x0213, // updated 5.21
 
-    ActorSetPos = 0x00CF, // updated 5.2
+    ActorSetPos = 0x00CC, // updated 5.21
 
     ActorCast = 0x0262, // updated 5.21
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
@@ -179,10 +179,10 @@ namespace Sapphire::Network::Packets
     HuntingLogEntry = 0x01B3, // updated 5.0
 
     EventPlay = 0x0167, // updated 5.21
-    EventPlay4 = 0x02F7, // updated 5.18
+    EventPlay4 = 0x0313, // updated 5.21
     EventPlay8 = 0x0119, // updated 5.18
     EventPlay16 = 0x01FB, // updated 5.18
-    EventPlay32 = 0x0364, // updated 5.18
+    EventPlay32 = 0x017D, // updated 5.21
     EventPlay64 = 0x00E5, // updated 5.18
     EventPlay128 = 0x02BE, // updated 5.18
     EventPlay255 = 0x0249, // updated 5.21
@@ -219,7 +219,7 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
-    WeatherChange = 0x02FB, // updated 5.11
+    WeatherChange = 0x024A, // updated 5.21
     PlayerTitleList = 0x037D, // updated 5.1
     Discovery = 0x0091, // updated 5.2
 
