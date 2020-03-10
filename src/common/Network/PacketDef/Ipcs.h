@@ -64,7 +64,7 @@ namespace Sapphire::Network::Packets
     ChatBanned = 0x006B,
     Playtime = 0x00E7, // updated 5.18
     Logout = 0x01D4, // updated 5.21
-    CFNotify = 0x01F8, // updated 5.18
+    CFNotify = 0x0000,//0x01F8, // updated 5.18
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
     CFPlayerInNeed = 0x007F,
@@ -78,7 +78,7 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x0154, // updated 5.2
+    Chat = 0x022F, // updated 5.21
 
     WorldVisitList = 0x00FE, // added 4.5
 
@@ -201,7 +201,7 @@ namespace Sapphire::Network::Packets
     MSQTrackerComplete = 0x01D6, // updated 5.0
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
-    QuestMessage = 0x00BF, // updated 5.18
+    QuestMessage = 0x0379, // updated 5.21
 
     QuestTracker = 0x00B0, // updated 5.21
 
@@ -302,7 +302,7 @@ namespace Sapphire::Network::Packets
     SocialReqSendHandler = 0x00AE, // updated 4.1
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
-    ChatHandler = 0x013A, // updated 5.2
+    ChatHandler = 0x034C, // updated 5.21
 
     SocialListHandler = 0x0123, // updated 5.21
     SetSearchInfoHandler = 0x00A8, // updated 5.2
