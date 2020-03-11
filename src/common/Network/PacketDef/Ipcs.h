@@ -190,7 +190,6 @@ namespace Sapphire::Network::Packets
 
     EventStart = 0x0392, // updated 5.21
     EventFinish = 0x00EF, // updated 5.21
-    UseMooch = 0x006E, // updated 5.21
 
     EventLinkshell = 0x1169,
 
