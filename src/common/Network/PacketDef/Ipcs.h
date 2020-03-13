@@ -291,11 +291,11 @@ namespace Sapphire::Network::Packets
 
     FinishLoadingHandler = 0x01F5, // updated 5.18
 
-    CFCommenceHandler = 0x006F,
+    CFCommenceHandler = 0x0201, // updated 5.21
 
 
-    CFRegisterDuty = 0x0071,
-    CFRegisterRoulette = 0xFF72,
+    CFRegisterDuty = 0x00C4, // updated 5.21
+    CFRegisterRoulette = 0x030F, // updated 5.21
     PlayTimeHandler = 0x0276, // updated 5.1
     LogoutHandler = 0x015D, // updated 5.18
     CancelLogout = 0x008F, // updated 5.1
