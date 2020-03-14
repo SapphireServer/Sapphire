@@ -74,6 +74,7 @@ namespace Sapphire::Network::Packets::Server
             auto& entry = m_data.entries[i];
             entry.catalogId = pItem->getId();
             entry.quality = pItem->isHq();
+            entry.stain = (uint8_t)pItem->getStain(); //NOTE: More of this packet may be dye info?
             //entry.appearanceCatalogId = pItem->getGlamourId()
             // todo: glamour/materia etc.
           }
