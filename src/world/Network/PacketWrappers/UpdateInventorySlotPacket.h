@@ -34,7 +34,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.hqFlag = item.isHq() ? 1 : 0;
       m_data.condition = 60000; // 200%
       m_data.spiritBond = item.getSpiritbond();
-      m_data.color = 0;
+      m_data.color = item.getStain();
       m_data.glamourCatalogId = 0;
       m_data.materia1 = 0;
       m_data.materia2 = 0;
