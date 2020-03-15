@@ -1991,10 +1991,10 @@ namespace Sapphire::Network::Packets::Server
     char otherName[32];
   };
 
-  struct FFXIVIpcEffect0095 : FFXIVIpcBasePacket< Effect0095 >
+  struct FFXIVIpcCharaVisualEffect : FFXIVIpcBasePacket< CharaVisualEffect >
   {
-    uint32_t value1;
-    uint32_t value2;
+    uint32_t id;
+    uint32_t padding;
   };
 
 }

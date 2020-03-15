@@ -2267,10 +2267,10 @@ void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
   if( ( oldValue == 0 && value != 0 ) ||
       ( oldValue != 0 && value == 0 ) )
   {
-    auto pPacket = makeZonePacket< FFXIVIpcEffect0095 >( getId() );
+    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
     if( value != 0 )
     {
-      pPacket->data().value1 = 0x07;
+      pPacket->data().id = 7;
     }
     queuePacket( pPacket );
   }
