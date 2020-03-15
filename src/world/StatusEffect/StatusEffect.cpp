@@ -212,6 +212,18 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
       break;
     }
   }
+
+  // lol just hack it and hardcode this shit
+  if( m_markToRemove && m_id == 1178 )
+  {
+    if( auto drk = m_sourceActor->getAsPlayer() )
+    {
+      if( drk->getClass() == Common::ClassJob::Darkknight )
+      {
+        drk->gaugeDrkSetDarkArts( true );
+      }
+    }
+  }
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getId() const

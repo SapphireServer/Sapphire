@@ -333,8 +333,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 7390, { 0, 0, 0, 0, 1972, 10000, 65436, 0, 0, 0, 0, 0, 0 } },
 
   //The Blackest Night, ブラックナイト
-  //applies to self: Blackest Night, ブラックナイト, duration 0, param 0
-  { 7393, { 0, 0, 0, 0, 1178, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 7393, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Stalwart Soul, ストルワートソウル
   //has damage: potency 300, combo potency 0, directional potency 0

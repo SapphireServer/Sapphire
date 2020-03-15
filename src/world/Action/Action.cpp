@@ -154,6 +154,22 @@ bool Action::Action::init()
     }
   }
 
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    switch( player->getClass() )
+    {
+      case Common::ClassJob::Darkknight:
+      {
+        if( m_primaryCostType == Common::ActionPrimaryCostType::MagicPoints && player->gaugeDrkGetDarkArts() )
+        {
+          setPrimaryCost( Common::ActionPrimaryCostType::None, 0 );
+          player->gaugeDrkSetDarkArts( false );
+        }
+        break;
+      }
+    }
+  }
+
   /*if( !m_actionData->targetArea )
   {
     // override pos to target position
