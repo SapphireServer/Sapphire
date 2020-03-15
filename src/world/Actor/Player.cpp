@@ -2360,7 +2360,18 @@ bool Sapphire::Entity::Player::gaugeDrkGetDarkArts()
 void Sapphire::Entity::Player::gaugeDrkSetDarkSideTimer( uint16_t value, bool sendPacket )
 {
   assert( value >= 0 && value <= 60000 );
+  auto oldValue = gaugeDrkGetDarkSideTimer();
   m_gauge.drk.darksideTimer = value;
+  if( ( oldValue == 0 && value != 0 ) ||
+    ( oldValue != 0 && value == 0 ) )
+  {
+    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
+    if( value != 0 )
+    {
+      pPacket->data().id = 22;
+    }
+    queuePacket( pPacket );
+  }
   if( sendPacket )
     sendActorGauge();
 }
