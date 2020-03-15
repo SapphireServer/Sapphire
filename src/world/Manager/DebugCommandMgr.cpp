@@ -361,6 +361,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  else if( subCommand == "visual" )
+  {
+    int32_t id;
+    sscanf( params.c_str(), "%d", &id );
+    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( player.getId() );
+    pPacket->data().id = id;
+    player.queuePacket( pPacket );
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );
