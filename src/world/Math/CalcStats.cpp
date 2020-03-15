@@ -584,10 +584,21 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
     }
   }
 
-  constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
-
-  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  if( chara.isPlayer() )
   {
+    auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer();
+    switch( player->getClass() )
+    {
+      case Common::ClassJob::Darkknight:
+      {
+        if( player->gaugeDrkGetDarkSideTimer() > 0 )
+        {
+          factor *= 1.1f;
+        }
+        break;
+      }
+    }
+    constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
     player->sendDebug( format, pot, aa, ap, det, ten, factor );
   }
 
@@ -703,6 +714,22 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     if( effectEntry.effectValue1 & static_cast< int32_t >( actionTypeFilter ) )
     {
       factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
+    }
+  }
+
+  if( chara.isPlayer() )
+  {
+    auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer();
+    switch( player->getClass() )
+    {
+      case Common::ClassJob::Darkknight:
+      {
+        if( player->gaugeDrkGetDarkSideTimer() > 0 )
+        {
+          factor *= 1.1f;
+        }
+        break;
+      }
     }
   }
 

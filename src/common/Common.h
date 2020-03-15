@@ -583,7 +583,7 @@ namespace Sapphire::Common
     TacticsPoints = 5,
     StatusEffect = 10,
     WARGauge = 22,
-//    DRKGauge = 25,
+    DRKGauge = 25,
 //    AetherflowStack = 30,
 //    Status = 32,
     PLDGauge = 41,
@@ -1079,6 +1079,7 @@ namespace Sapphire::Common
     GainJobResource = 8,
     SelfHeal = 16,
     DamageFallOff = 32,
+    GainJobTimer = 64,
   };
 
   enum ActionBonusEffectRequirement : uint8_t
@@ -1185,9 +1186,9 @@ namespace Sapphire::Common
     struct
     {
       uint8_t blood;
-      uint16_t darksideTimeRemaining;
+      uint16_t darksideTimer;
       uint8_t darkArts;
-      uint16_t shadowTimeRemaining;
+      uint16_t shadowTimer;
     } drk;
     struct
     {

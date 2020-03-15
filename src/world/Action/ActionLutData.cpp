@@ -225,12 +225,12 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 7387, { 450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Shake It Off, シェイクオフ
-  //applies to targets: Shake It Off, シェイクオフ, duration 0, param 0
-  { 7388, { 0, 0, 0, 0, 0, 0, 0, 1457, 0, 0, 0, 0, 0 } },
+  //applies to targets: Shake It Off, シェイクオフ, duration 15000, param 0
+  { 7388, { 0, 0, 0, 0, 0, 0, 0, 1457, 15000, 0, 0, 0, 0 } },
 
   //Inner Release, 原初の解放
-  //comment: status removed need script
-  { 7389, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //applies to self: Inner Release, 原初の解放, duration 10000, param 65436
+  { 7389, { 0, 0, 0, 0, 1177, 10000, 65436, 0, 0, 0, 0, 0, 0 } },
 
   //Chaotic Cyclone, カオティックサイクロン
   //has damage: potency 400, combo potency 0, directional potency 0
@@ -271,13 +271,14 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Souleater, ソウルイーター
   //has damage: potency 100, combo potency 400, directional potency 0
-  //has heal: potency 300
-  { 3632, { 100, 400, 0, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //has bonus effect: 24, 169869612
+  //bonus effect requirement: RequireCorrectCombo
+  { 3632, { 100, 400, 0, 0, 0, 0, 0, 0, 0, 0, 24, 1, 169869612 } },
 
   //Flood of Darkness, 暗黒の波動
   //has damage: potency 250, combo potency 0, directional potency 0
-  //applies to self: Darkside, 暗黒, duration 30000, param 0
-  { 16466, { 250, 0, 0, 0, 751, 30000, 0, 0, 0, 0, 0, 0, 0 } },
+  //has bonus effect: GainJobTimer, 2127152
+  { 16466, { 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 2127152 } },
 
   //Blood Weapon, ブラッドウェポン
   //applies to self: Blood Weapon, ブラッドウェポン, duration 10000, param 0
@@ -289,8 +290,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Edge of Darkness, 暗黒の剣
   //has damage: potency 350, combo potency 0, directional potency 0
-  //applies to self: Darkside, 暗黒, duration 30000, param 0
-  { 16467, { 350, 0, 0, 0, 751, 30000, 0, 0, 0, 0, 0, 0, 0 } },
+  //has bonus effect: GainJobTimer, 2127152
+  { 16467, { 350, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 2127152 } },
 
   //Dark Mind, ダークマインド
   //applies to targets: Dark Mind, ダークマインド, duration 10000, param 0
@@ -328,8 +329,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 7391, { 210, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Delirium, ブラッドデリリアム
-  //applies to self: Delirium, ブラッドデリリアム, duration 10000, param 0
-  { 7390, { 0, 0, 0, 0, 1972, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  //applies to self: Delirium, ブラッドデリリアム, duration 10000, param 65436
+  { 7390, { 0, 0, 0, 0, 1972, 10000, 65436, 0, 0, 0, 0, 0, 0 } },
 
   //The Blackest Night, ブラックナイト
   //applies to self: Blackest Night, ブラックナイト, duration 0, param 0
@@ -343,8 +344,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Edge of Shadow, 漆黒の剣
   //has damage: potency 500, combo potency 0, directional potency 0
-  //applies to self: Darkside, 暗黒, duration 30000, param 0
-  { 16470, { 500, 0, 0, 0, 751, 30000, 0, 0, 0, 0, 0, 0, 0 } },
+  //has bonus effect: GainJobTimer, 2127152
+  { 16470, { 500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 2127152 } },
 
   //Dark Missionary, ダークミッショナリー
   //applies to targets: Dark Missionary, ダークミッショナリー, duration 15000, param 0
@@ -2833,6 +2834,11 @@ ActionLut::Lut ActionLut::m_actionLut =
   //Shot, ショット
   //has damage: potency 100, combo potency 0, directional potency 0
   { 8, { 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+
+  //Flood of Shadow, 漆黒の波動
+  //has damage: potency 300, combo potency 0, directional potency 0
+  //has bonus effect: GainJobTimer, 2127152
+  { 16469, { 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 2127152 } },
 
 };
 

@@ -988,6 +988,15 @@ namespace Sapphire::Entity
     void gaugeWhmSetLilyTimer( uint16_t value, bool sendPacket = false );
     uint16_t gaugeWhmGetLilyTimer();
 
+    void gaugeDrkSetBlood( uint8_t value );
+    uint8_t gaugeDrkGetBlood();
+    void gaugeDrkSetDarkArts( bool value );
+    bool gaugeDrkGetDarkArts();
+    void gaugeDrkSetDarkSideTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrkGetDarkSideTimer();
+    void gaugeDrkSetShadowTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrkGetShadowTimer();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );

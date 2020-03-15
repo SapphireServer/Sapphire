@@ -1192,7 +1192,25 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
           gaugeWhmSetLilyTimer( 0 );
         }
       }
-    };
+      break;
+    }
+    case Common::ClassJob::Darkknight:
+    {
+      auto dsTimer = gaugeDrkGetDarkSideTimer();
+      if( dsTimer > interval )
+        dsTimer -= interval;
+      else
+        dsTimer = 0;
+      gaugeDrkSetDarkSideTimer( dsTimer );
+
+      auto shadowTimer = gaugeDrkGetShadowTimer();
+      if( shadowTimer > interval )
+        shadowTimer -= interval;
+      else
+        shadowTimer = 0;
+      gaugeDrkSetShadowTimer( shadowTimer );
+      break;
+    }
   }
 
   Chara::update( tickCount );
@@ -2310,4 +2328,57 @@ void Sapphire::Entity::Player::gaugeWhmSetLilyTimer( uint16_t value, bool sendPa
 uint16_t Sapphire::Entity::Player::gaugeWhmGetLilyTimer()
 {
   return m_gauge.whm.lilyTimer;
+}
+
+void Sapphire::Entity::Player::gaugeDrkSetBlood( uint8_t value )
+{
+  assert( value >= 0 && value <= 100 );
+  auto oldValue = gaugeDrkGetBlood();
+  m_gauge.drk.blood = value;
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+uint8_t Sapphire::Entity::Player::gaugeDrkGetBlood()
+{
+  return m_gauge.drk.blood;
+}
+
+void Sapphire::Entity::Player::gaugeDrkSetDarkArts( bool value )
+{
+  auto oldValue = gaugeDrkGetDarkArts();
+  m_gauge.drk.darkArts = value ? 1 : 0;
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+bool Sapphire::Entity::Player::gaugeDrkGetDarkArts()
+{
+  return m_gauge.drk.darkArts > 0;
+}
+
+void Sapphire::Entity::Player::gaugeDrkSetDarkSideTimer( uint16_t value, bool sendPacket )
+{
+  assert( value >= 0 && value <= 60000 );
+  m_gauge.drk.darksideTimer = value;
+  if( sendPacket )
+    sendActorGauge();
+}
+
+uint16_t Sapphire::Entity::Player::gaugeDrkGetDarkSideTimer()
+{
+  return m_gauge.drk.darksideTimer;
+}
+
+void Sapphire::Entity::Player::gaugeDrkSetShadowTimer( uint16_t value, bool sendPacket )
+{
+  assert( value >= 0 && value <= 60000 );
+  m_gauge.drk.shadowTimer = value;
+  if( sendPacket )
+    sendActorGauge();
+}
+
+uint16_t Sapphire::Entity::Player::gaugeDrkGetShadowTimer()
+{
+  return m_gauge.drk.shadowTimer;
 }

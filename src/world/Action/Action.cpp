@@ -125,7 +125,30 @@ bool Action::Action::init()
     {
       if( entry.second->getParam() == 65436 ) // todo: decode this shit and figure out exact percentage to apply to primary cost, this magic number is 0%
       {
-        setPrimaryCost( Common::ActionPrimaryCostType::None, 0 );
+        /*
+        Since the client is displaying correctly without additional data, there should be a "primary primary cost type" defined for each class.
+        In the case of 65436, on whm, mp cost is removed, on drk, blood cost is removed but mp cost remains.
+        */
+        auto affectedPrimaryCost = Common::ActionPrimaryCostType::MagicPoints;
+        switch( m_pSource->getClass() )
+        {
+          case Common::ClassJob::Marauder:
+          case Common::ClassJob::Warrior:
+          {
+            affectedPrimaryCost = Common::ActionPrimaryCostType::WARGauge;
+            break;
+          }
+          case Common::ClassJob::Darkknight:
+          {
+            affectedPrimaryCost = Common::ActionPrimaryCostType::DRKGauge;
+            break;
+          }
+        }
+        if( m_primaryCostType == affectedPrimaryCost )
+        {
+          setPrimaryCost( Common::ActionPrimaryCostType::None, 0 );
+        }
+        
         break;
       }
     }
@@ -612,6 +635,26 @@ void Action::Action::buildEffects()
                   player->gaugeWarSetIb( std::min( 100, player->gaugeWarGetIb() + m_lutEntry.bonusDataByte4 ) );
                   break;
                 }
+                case Common::ClassJob::Darkknight:
+                {
+                  player->gaugeDrkSetBlood( std::min( 100, player->gaugeDrkGetBlood() + m_lutEntry.bonusDataByte4 ) );
+                  break;
+                }
+              }
+            }
+          }
+
+          if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobTimer )
+          {
+            if( checkActionBonusRequirement() )
+            {
+              switch( static_cast< Common::ClassJob >( m_lutEntry.bonusDataByte3 ) )
+              {
+                case Common::ClassJob::Darkknight:
+                {
+                  player->gaugeDrkSetDarkSideTimer( std::min( 60000, player->gaugeDrkGetDarkSideTimer() + m_lutEntry.bonusDataUInt16L ), true );
+                  break;
+                }
               }
             }
           }
@@ -855,6 +898,23 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
             }
             pPlayer->gaugeWhmSetLilies( lily, bloodLily );
           }
+
+          return true;
+        }
+      }
+      return false;
+    }
+
+    case Common::ActionPrimaryCostType::DRKGauge:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto blood = pPlayer->gaugeDrkGetBlood();
+        if( blood >= m_primaryCost )
+        {
+          if( subtractCosts )
+            pPlayer->gaugeDrkSetBlood( blood - m_primaryCost );
 
           return true;
         }
