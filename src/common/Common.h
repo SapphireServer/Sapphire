@@ -1148,6 +1148,13 @@ namespace Sapphire::Common
     Ruby = 3,
   };
 
+  enum class BrdSong : uint8_t
+  {
+    Mage = 5,
+    Army = 0x0A,
+    Wanderer = 0x0F,
+  };
+
   union JobGauge
   {
     struct
@@ -1172,6 +1179,13 @@ namespace Sapphire::Common
     } blm;
     struct
     {
+      uint16_t songTimer;
+      uint8_t songStacks;
+      uint8_t unused;
+      BrdSong song;
+    } brd;
+    struct
+    {
       uint8_t feathers;
       uint8_t esprit;
       uint8_t stepOrder[4];
@@ -1186,13 +1200,16 @@ namespace Sapphire::Common
     struct
     {
       uint8_t blood;
+      uint8_t unused;
       uint16_t darksideTimer;
       uint8_t darkArts;
+      uint8_t unused2;
       uint16_t shadowTimer;
     } drk;
     struct
     {
       uint8_t ammo;
+      uint8_t unused;
       uint16_t maxTimerDuration; // what is this?
       uint8_t ammoComboStep;
     } gnb;
@@ -1208,6 +1225,7 @@ namespace Sapphire::Common
     struct
     {
       uint8_t greasedLightningTimer;
+      uint8_t unused;
       uint8_t greasedLightningStacks;
       uint8_t chakra;
       uint8_t greasedLightningTimerFreezed;
@@ -1241,7 +1259,7 @@ namespace Sapphire::Common
       uint16_t unused;
       uint8_t aetherflowStacks;
       uint8_t fairyGauge;
-      uint8_t seraphTimer;
+      uint16_t seraphTimer;
       SchDismissedFairy dismissedFairy;
     } sch;
     struct

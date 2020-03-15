@@ -2260,6 +2260,12 @@ void Sapphire::Entity::Player::sendActorGauge()
   queuePacket( pPacket );
 }
 
+void Sapphire::Entity::Player::gaugeSetRaw( uint8_t* pData )
+{
+  std::memcpy( &m_gauge, pData, 15 );
+  sendActorGauge();
+}
+
 void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
 {
   assert( value >= 0 && value <= 100 );

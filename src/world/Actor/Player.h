@@ -975,6 +975,7 @@ namespace Sapphire::Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void gaugeClear();
     void sendActorGauge();
+    void gaugeSetRaw( uint8_t* pData );
 
     void gaugeWarSetIb( uint8_t value );
     uint8_t gaugeWarGetIb();
