@@ -1991,6 +1991,12 @@ namespace Sapphire::Network::Packets::Server
     char otherName[32];
   };
 
+  struct FFXIVIpcCharaVisualEffect : FFXIVIpcBasePacket< CharaVisualEffect >
+  {
+    uint32_t id;
+    uint32_t padding;
+  };
+
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/
