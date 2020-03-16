@@ -536,7 +536,7 @@ namespace Sapphire::Entity
 
     void clearTeleportQuery();
 
-    void setDyeingInfo(uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot);
+    void setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot );
     void dyeItemFromDyeingInfo();
 
     /*! prepares zoning / fades out the screen */
@@ -1123,7 +1123,7 @@ namespace Sapphire::Entity
       uint32_t itemToDyeSlot;
       uint32_t dyeBagContainer;
       uint32_t dyeBagSlot;
-    }; PlayerDyeingInfo m_dyeingInfo;
+    } m_dyeingInfo;
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
