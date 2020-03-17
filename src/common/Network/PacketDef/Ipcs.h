@@ -84,8 +84,8 @@ namespace Sapphire::Network::Packets
 
     SocialList = 0x0172, // updated 5.21 hotfix
 
-    ExamineSearchInfo = 0x014B, // updated 5.21
-    UpdateSearchInfo = 0x00EA, // updated 5.21
+    ExamineSearchInfo = 0x032B, // updated 5.21 hotfix
+    UpdateSearchInfo = 0x0379, // updated 5.21 hotfix
     InitSearchInfo = 0x00D1, // updated 5.21 hotfix
     ExamineSearchComment = 0x0102, // updated 4.1
 
@@ -109,7 +109,7 @@ namespace Sapphire::Network::Packets
     ReqMoogleMailLetter = 0x0139, // updated 5.0
     MailLetterNotification = 0x013A, // updated 5.0
 
-    MarketTaxRates = 0x01D7, // updated 5.21
+    MarketTaxRates = 0x034C, // updated 5.21 hotfix
 
     MarketBoardItemListingCount = 0x030A, // updated 5.2
     MarketBoardItemListing = 0x023E, // updated 5.2
@@ -128,9 +128,9 @@ namespace Sapphire::Network::Packets
     BossStatusEffectList = 0x0312, // added 5.1
     Effect = 0x0252, // updated 5.21 hotfix
     AoeEffect8 = 0x0140, // updated 5.21 hotfix
-    AoeEffect16 = 0x012E, // updated 5.21
-    AoeEffect24 = 0x0089, // updated 5.21
-    AoeEffect32 = 0x01A9, // updated 5.21
+    AoeEffect16 = 0x02A2, // updated 5.21 hotfix
+    AoeEffect24 = 0x01FD, // updated 5.21 hotfix
+    AoeEffect32 = 0x0376, // updated 5.21 hotfix
     PersistantEffect = 0x0110, // updated 5.21 hotfix
 
     GCAffiliation = 0x016F, // updated 5.0
@@ -140,7 +140,7 @@ namespace Sapphire::Network::Packets
     NpcSpawn2 = 0x010C, // ( Bigger statuseffectlist? ) updated 5.18
     ActorMove = 0x0080, // updated 5.21 hotfix
 
-    ActorSetPos = 0x00CC, // updated 5.21
+    ActorSetPos = 0x0295, // updated 5.21 hotfix
 
     ActorCast = 0x0262, // updated 5.21
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
@@ -160,7 +160,7 @@ namespace Sapphire::Network::Packets
     CharaVisualEffect = 0x030C, // updated 5.21 hotfix
 
     ModelEquip = 0x03A2, // updated 5.21 hotfix
-    Examine = 0x0210, // updated 5.21
+    Examine = 0x036E, // updated 5.21 hotfix
     CharaNameReq = 0x03A6, // updated 5.21
 
     // nb: see #565 on github
@@ -180,7 +180,7 @@ namespace Sapphire::Network::Packets
     HuntingLogEntry = 0x01B3, // updated 5.0
 
     EventPlay = 0x007F, // updated 5.21 hotfix
-    EventPlay4 = 0x0313, // updated 5.21
+    EventPlay4 = 0x03BD, // updated 5.21 hotfix
     EventPlay8 = 0x0119, // updated 5.18
     EventPlay16 = 0x01FB, // updated 5.18
     EventPlay32 = 0x017D, // updated 5.21
@@ -211,7 +211,7 @@ namespace Sapphire::Network::Packets
     DirectorVars = 0x00E6, // updated 5.18
     SomeDirectorUnk1 = 0x0084, // updated 5.18
     SomeDirectorUnk2 = 0x00C1, // updated 5.18
-    SomeDirectorUnk4 = 0x014A, // updated 5.21
+    SomeDirectorUnk4 = 0x01F3, // updated 5.21 hotfix
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
     DirectorPopUp = 0x0162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
@@ -306,7 +306,7 @@ namespace Sapphire::Network::Packets
     ChatHandler = 0x03AB, // updated 5.21 hotfix
 
     SocialListHandler = 0x02B9, // updated 5.21 hotfix
-    SetSearchInfoHandler = 0x039B, // updated 5.21
+    SetSearchInfoHandler = 0x025C, // updated 5.21 hotfix
     ReqSearchInfoHandler = 0x026F, // updated 5.21 hotfix
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
@@ -341,7 +341,7 @@ namespace Sapphire::Network::Packets
     SkillHandler = 0x0073, // updated 5.21 hotfix
     GMCommand1 = 0x0302, // updated 5.21 hotfix
     GMCommand2 = 0x01E5, // updated 5.21 hotfix
-    AoESkillHandler = 0x0072, // updated 5.18
+    AoESkillHandler = 0x0364, // updated 5.21 hotfix
 
     UpdatePositionHandler = 0x01B1, // updated 5.21 hotfix
 
