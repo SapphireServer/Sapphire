@@ -49,7 +49,7 @@ namespace Sapphire::Network::Packets
     ActorFreeSpawn = 0x006C, // updated 5.21 hotfix
     InitZone = 0x037B, // updated 5.21 hotfix
 
-    EffectResult = 0x02CF, // updated 5.21
+    EffectResult = 0x0281, // updated 5.21 hotfix
     ActorControl = 0x0380, // updated 5.21 hotfix
     ActorControlSelf = 0x0253, // updated 5.21 hotfix
     ActorControlTarget = 0x0206, // updated 5.21 hotfix
@@ -142,7 +142,7 @@ namespace Sapphire::Network::Packets
 
     ActorSetPos = 0x0295, // updated 5.21 hotfix
 
-    ActorCast = 0x0262, // updated 5.21
+    ActorCast = 0x02C3, // updated 5.21 hotfix
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
     PartyList = 0x0287, // updated 5.18
