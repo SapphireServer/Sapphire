@@ -1201,7 +1201,8 @@ namespace Sapphire::Network::Packets::Server
       uint32_t appearanceCatalogId;
       uint64_t crafterId;
       uint8_t quality;
-      uint8_t unknown[3];
+      uint8_t stain;
+      uint8_t unknown[2];
       struct Materia
       {
         uint16_t materiaId;

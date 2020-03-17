@@ -318,7 +318,7 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
 
   if( !ncid )
   {
-    rcFreeHeightField(m_solid);
+    rcFreeHeightField( m_solid );
     m_solid = nullptr;
     delete[] m_triareas;
     m_triareas = nullptr;
@@ -458,8 +458,8 @@ unsigned char* TiledNavmeshGenerator::buildTileMesh( const int tx, const int ty,
 
   if( m_cset->nconts == 0 )
   {
-    rcFreeCompactHeightfield(m_chf);
-    rcFreeContourSet(m_cset);
+    rcFreeCompactHeightfield( m_chf );
+    rcFreeContourSet( m_cset );
     m_chf = nullptr;
     m_cset = nullptr;
     return nullptr;

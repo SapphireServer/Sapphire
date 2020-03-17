@@ -1991,6 +1991,36 @@ uint8_t Sapphire::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actor
   return index;
 }
 
+void Sapphire::Entity::Player::setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot )
+{
+  m_dyeingInfo.itemToDyeContainer = itemToDyeContainer;
+  m_dyeingInfo.itemToDyeSlot = itemToDyeSlot;
+  m_dyeingInfo.dyeBagContainer = dyeBagContainer;
+  m_dyeingInfo.dyeBagSlot = dyeBagSlot;
+}
+
+void Sapphire::Entity::Player::dyeItemFromDyeingInfo()
+{
+  uint32_t itemToDyeContainer = m_dyeingInfo.itemToDyeContainer;
+  uint32_t itemToDyeSlot = m_dyeingInfo.itemToDyeSlot;
+  uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
+  uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
+
+  sendStateFlags(); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+  auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
+  auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
+
+  if ( !itemToDye || !dyeToUse ) return;
+
+  uint32_t stainColorID = dyeToUse->getAdditionalData();
+  itemToDye->setStain( stainColorID );
+
+  // TODO: subtract/remove dye used
+
+  insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
+  writeItem( itemToDye );
+}
+
 void Sapphire::Entity::Player::resetObjSpawnIndex()
 {
   m_objSpawnIndexAllocator.freeAllSpawnIndexes();
