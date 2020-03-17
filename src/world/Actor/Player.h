@@ -536,6 +536,9 @@ namespace Sapphire::Entity
 
     void clearTeleportQuery();
 
+    void setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot );
+    void dyeItemFromDyeingInfo();
+
     /*! prepares zoning / fades out the screen */
     void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
 
@@ -1113,6 +1116,14 @@ namespace Sapphire::Entity
     uint32_t m_emoteMode;
 
     Common::PlayerTeleportQuery m_teleportQuery;
+
+    struct PlayerDyeingInfo
+    {
+      uint32_t itemToDyeContainer;
+      uint32_t itemToDyeSlot;
+      uint32_t dyeBagContainer;
+      uint32_t dyeBagSlot;
+    } m_dyeingInfo;
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

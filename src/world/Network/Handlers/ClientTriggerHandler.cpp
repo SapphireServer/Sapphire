@@ -282,6 +282,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       // param12 = item to dye slot
       // param2 = dye bag container
       // param4 = dye bag slot
+      player.setDyeingInfo( param11, param12, param2, param4 );
       break;
     }
     case ClientTriggerType::DirectorInitFinish: // Director init finish
