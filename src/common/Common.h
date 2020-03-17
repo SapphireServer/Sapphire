@@ -51,11 +51,11 @@ namespace Sapphire::Common
 
   enum InventoryOperation : uint16_t
   {
-    Discard = 0x07A,
-    Move = 0x007B,
-    Swap = 0x007C,
-    Split = 0x007D,
-    Merge = 0x007F,
+    Discard = 0x06E,
+    Move = 0x006F,
+    Swap = 0x0070,
+    Split = 0x0071,
+    Merge = 0x0073,
   };
 
   enum ClientLanguage : uint8_t
