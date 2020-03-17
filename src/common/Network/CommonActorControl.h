@@ -372,7 +372,7 @@ namespace Sapphire::Network::ActorControl
 
     Timers = 0x1AB,
 
-    DyeItem = 0x1B5,
+    DyeItem = 0x1B0, // updated 5.21
 
     RequestChocoboInventory = 0x1C4,
 
