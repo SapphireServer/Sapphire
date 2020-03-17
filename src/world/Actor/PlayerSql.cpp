@@ -121,13 +121,6 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
     setRot( 0.0f );
   }
 
-  // Stats
-
-  m_hp = res->getUInt( "Hp" );
-  m_mp = res->getUInt( "Mp" );
-  m_tp = 0;
-
-
   // Model
   auto custom = res->getBlobVector( "Customize" );
   memcpy( reinterpret_cast< char* >( m_customize ), custom.data(), custom.size() );
@@ -209,6 +202,13 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() )
     Logger::error( "Player #{0}  data corrupt!", char_id_str );
 
+  initInventory();
+  calculateStats();
+
+  // Stats
+  m_hp = res->getUInt( "Hp" );
+  m_mp = res->getUInt( "Mp" );
+  m_tp = 0;
   m_maxHp = getMaxHp();
   m_maxMp = getMaxMp();
 
@@ -216,12 +216,6 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 
   m_modelSubWeapon = 0;
   m_lastTickTime = 0;
-
-  //m_pInventory->load();
-
-  initInventory(); // moved up so we don't lose hp every login
-
-  calculateStats();
 
   // first login, run the script event
   if( m_bNewGame )
