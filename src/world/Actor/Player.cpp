@@ -1833,15 +1833,6 @@ void Sapphire::Entity::Player::sendZonePackets()
     queuePacket( unk320 );
   }
 
-  //this is needed from 5.21, after InitZone and before FinishLoadingHandler
-  auto classInfoPacket = makeZonePacket< FFXIVIpcUpdateClassInfo >( getId() );
-  classInfoPacket->data().classId = static_cast< uint8_t > ( getClass() );
-  classInfoPacket->data().level1 = getLevel();
-  classInfoPacket->data().level = getLevel();
-  classInfoPacket->data().nextLevelIndex = getLevel();
-  classInfoPacket->data().currentExp = getExp();
-  queuePacket( classInfoPacket );
-
 //  if( getLastPing() == 0 )
 //    sendQuestInfo();
 

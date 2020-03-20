@@ -156,7 +156,7 @@ namespace Sapphire::Network::Packets
     PlayerStats = 0x03E1, // updated 5.21 hotfix
     ActorOwner = 0x03C8, // updated 5.21 hotfix
     PlayerStateFlags = 0x00AA, // updated 5.21 hotfix
-    PlayerClassInfo = 0x016B, // updated 5.21
+    PlayerClassInfo = 0x0169, // updated 5.21 hotfix
     CharaVisualEffect = 0x030C, // updated 5.21 hotfix
 
     ModelEquip = 0x03A2, // updated 5.21 hotfix
