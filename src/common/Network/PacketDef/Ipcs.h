@@ -148,7 +148,7 @@ namespace Sapphire::Network::Packets
     PartyList = 0x0287, // updated 5.18
     HateRank = 0x0381, // updated 5.21 hotfix
     HateList = 0x01F0, // updated 5.21 hotfix
-    ObjectSpawn = 0x01B3, // updated 5.2
+    ObjectSpawn = 0x0342, // updated 5.21 hotfix
     ObjectDespawn = 0x034B, // updated 5.18
     UpdateClassInfo = 0x0235, // updated 5.21 hotfix
     SilentSetClassJob = 0x018E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
@@ -156,12 +156,12 @@ namespace Sapphire::Network::Packets
     PlayerStats = 0x03E1, // updated 5.21 hotfix
     ActorOwner = 0x03C8, // updated 5.21 hotfix
     PlayerStateFlags = 0x00AA, // updated 5.21 hotfix
-    PlayerClassInfo = 0x016B, // updated 5.21
+    PlayerClassInfo = 0x0169, // updated 5.21 hotfix
     CharaVisualEffect = 0x030C, // updated 5.21 hotfix
 
     ModelEquip = 0x03A2, // updated 5.21 hotfix
     Examine = 0x036E, // updated 5.21 hotfix
-    CharaNameReq = 0x03A6, // updated 5.21
+    CharaNameReq = 0x02E4, // updated 5.21 hotfix
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0x019F, // updated 5.0
@@ -288,11 +288,11 @@ namespace Sapphire::Network::Packets
 
     FinishLoadingHandler = 0x0158, // updated 5.21 hotfix
 
-    CFCommenceHandler = 0x0201, // updated 5.21
+    CFCommenceHandler = 0x0078, // updated 5.21 hotfix
 
 
-    CFRegisterDuty = 0x00C4, // updated 5.21
-    CFRegisterRoulette = 0x030F, // updated 5.21
+    CFRegisterDuty = 0x0118, // updated 5.21 hotfix
+    CFRegisterRoulette = 0x037A, // updated 5.21 hotfix
     PlayTimeHandler = 0x0276, // updated 5.1
     LogoutHandler = 0x0139, // updated 5.21 hotfix
     CancelLogout = 0x008F, // updated 5.1
@@ -352,10 +352,10 @@ namespace Sapphire::Network::Packets
     BuildPresetHandler = 0x0150, // updated 5.0
 
     TalkEventHandler = 0x0281, // updated 5.21 hotfix
-    EmoteEventHandler = 0x0246, // updated 5.21
-    WithinRangeEventHandler = 0x02D1, // updated 5.21
-    OutOfRangeEventHandler = 0x02FB, // updated 5.21
-    EnterTeriEventHandler = 0x0284, // updated 5.21
+    EmoteEventHandler = 0x0380, // updated 5.21 hotfix
+    WithinRangeEventHandler = 0x0253, // updated 5.21 hotfix
+    OutOfRangeEventHandler = 0x0206, // updated 5.21 hotfix
+    EnterTeriEventHandler = 0x01B8, // updated 5.21 hotfix
     ShopEventHandler = 0x0156, // updated 5.0
 
     ReturnEventHandler = 0x02A2, // updated 5.21 hotfix
