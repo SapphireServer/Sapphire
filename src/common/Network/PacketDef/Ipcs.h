@@ -161,7 +161,7 @@ namespace Sapphire::Network::Packets
 
     ModelEquip = 0x03A2, // updated 5.21 hotfix
     Examine = 0x036E, // updated 5.21 hotfix
-    CharaNameReq = 0x03A6, // updated 5.21
+    CharaNameReq = 0x02E4, // updated 5.21 hotfix
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0x019F, // updated 5.0
@@ -288,11 +288,11 @@ namespace Sapphire::Network::Packets
 
     FinishLoadingHandler = 0x0158, // updated 5.21 hotfix
 
-    CFCommenceHandler = 0x0201, // updated 5.21
+    CFCommenceHandler = 0x0078, // updated 5.21 hotfix
 
 
-    CFRegisterDuty = 0x00C4, // updated 5.21
-    CFRegisterRoulette = 0x030F, // updated 5.21
+    CFRegisterDuty = 0x0118, // updated 5.21 hotfix
+    CFRegisterRoulette = 0x037A, // updated 5.21 hotfix
     PlayTimeHandler = 0x0276, // updated 5.1
     LogoutHandler = 0x0139, // updated 5.21 hotfix
     CancelLogout = 0x008F, // updated 5.1
