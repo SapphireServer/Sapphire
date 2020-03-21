@@ -335,7 +335,7 @@ void Sapphire::StatusEffect::StatusEffect::refresh( Sapphire::World::Action::Sta
   refresh();
 }
 
-bool Sapphire::StatusEffect::StatusEffect::onActionHitTarget( World::Action::Action* action, Entity::Chara* victim, int victimCounter )
+bool Sapphire::StatusEffect::StatusEffect::onActionHitTarget( World::Action::Action* action, Entity::CharaPtr victim, int victimCounter )
 {
   switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {
@@ -351,7 +351,7 @@ bool Sapphire::StatusEffect::StatusEffect::onActionHitTarget( World::Action::Act
             break;
         }
         float restored = 0.01f * m_targetActor->getMaxMp() * m_effectEntry.effectValue1;
-        action->getEffectbuilder()->restoreMP( m_targetActor, m_targetActor, static_cast< uint32_t >( restored ) );
+        action->getEffectbuilder()->restoreMP( victim, m_targetActor, static_cast< uint32_t >( restored ), Sapphire::Common::ActionEffectResultFlag::EffectOnSource );
       }
       break;
     }

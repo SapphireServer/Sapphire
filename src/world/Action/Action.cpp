@@ -511,7 +511,7 @@ void Action::Action::buildEffects()
     bool shouldHitThisTarget = true;
     for( const auto& statusIt : getSourceChara()->getStatusEffectMap() )
     {
-      bool result = statusIt.second->onActionHitTarget( this, actor.get(), victimCounter );
+      bool result = statusIt.second->onActionHitTarget( this, actor, victimCounter );
       if( !result )
         shouldHitThisTarget = false;
     }

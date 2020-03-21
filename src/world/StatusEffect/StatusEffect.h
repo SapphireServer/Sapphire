@@ -21,7 +21,7 @@ public:
 
   void onBeforeActionStart( World::Action::Action* action );
 
-  bool onActionHitTarget( World::Action::Action* action, Entity::Chara* victim, int victimCounter );
+  bool onActionHitTarget( World::Action::Action* action, Entity::CharaPtr victim, int victimCounter );
 
   void applyStatus();
 
