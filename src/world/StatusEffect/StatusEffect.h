@@ -19,7 +19,9 @@ public:
 
   void onTick();
 
-  void onBeforeActionStart( World::Action::ActionPtr action );
+  void onBeforeActionStart( World::Action::Action* action );
+
+  bool onActionHitTarget( World::Action::Action* action, Entity::Chara* victim, int victimCounter );
 
   void applyStatus();
 

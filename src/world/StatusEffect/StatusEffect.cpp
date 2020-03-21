@@ -276,7 +276,7 @@ void Sapphire::StatusEffect::StatusEffect::replaceEffectEntry( Sapphire::World::
   m_effectEntry = entryOverride;
 }
 
-void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World::Action::ActionPtr action )
+void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World::Action::Action* action )
 {
   // todo: add script function for this if needed
   //auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
@@ -295,7 +295,7 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
         if( action->getId() != m_effectEntry.effectValue2 &&
             action->getId() != m_effectEntry.effectValue3 &&
             action->getId() != m_effectEntry.effectValue4 )
-          return;
+          break;
       }
       if( m_effectEntry.effectValue1 > 0 )
       {
@@ -333,4 +333,28 @@ void Sapphire::StatusEffect::StatusEffect::refresh( Sapphire::World::Action::Sta
 {
   m_effectEntry = newEntry;
   refresh();
+}
+
+bool Sapphire::StatusEffect::StatusEffect::onActionHitTarget( World::Action::Action* action, Entity::Chara* victim, int victimCounter )
+{
+  switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
+  {
+    case Common::StatusEffectType::MPRestorePerGCD:
+    {
+      if( victimCounter == 1 && action->isGCD() )
+      {
+        if( m_effectEntry.effectValue2 != 0 )
+        {
+          if( action->getId() != m_effectEntry.effectValue2 &&
+            action->getId() != m_effectEntry.effectValue3 &&
+            action->getId() != m_effectEntry.effectValue4 )
+            break;
+        }
+        float restored = 0.01f * m_targetActor->getMaxMp() * m_effectEntry.effectValue1;
+        action->getEffectbuilder()->restoreMP( m_targetActor, m_targetActor, static_cast< uint32_t >( restored ) );
+      }
+      break;
+    }
+  }
+  return true;
 }

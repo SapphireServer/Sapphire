@@ -3533,4 +3533,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Sheltron, シェルトロン: BlockParryRateBonus, block 100%, parry 0%
   { 1856, { 14, 0, 100, 0, 0 } },
 
+  { 742, { 15, 6, 0, 0, 0 } },
+
+  { 1972, { 15, 2, 7392, 7391, 0 } },
+
 };

@@ -96,7 +96,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
 {
   for( const auto& statusIt : player.getStatusEffectMap() )
   {
-    statusIt.second->onBeforeActionStart( currentAction );
+    statusIt.second->onBeforeActionStart( currentAction.get() );
   }
 
   if( currentAction->isInterrupted() )

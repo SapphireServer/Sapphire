@@ -464,12 +464,12 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
   if( m_isAutoAttack )
     return Math::CalcStats::calcAutoAttackDamage( *m_pSource, potency );
   else
-    return Math::CalcStats::calcActionDamage( this, *m_pSource, static_cast< Common::AttackType >( m_actionData->attackType ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
+    return Math::CalcStats::calcActionDamage( this, *m_pSource, potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
 {
-  return Math::CalcStats::calcActionHealing( this, *m_pSource, static_cast< Common::ActionCategory >( m_actionData->actionCategory ), potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
+  return Math::CalcStats::calcActionHealing( this, *m_pSource, potency, Math::CalcStats::getWeaponDamage( m_pSource ) );
 }
 
 void Action::Action::buildEffects()
@@ -508,6 +508,15 @@ void Action::Action::buildEffects()
   for( auto& actor : m_hitActors )
   {
     victimCounter++;
+    bool shouldHitThisTarget = true;
+    for( const auto& statusIt : getSourceChara()->getStatusEffectMap() )
+    {
+      bool result = statusIt.second->onActionHitTarget( this, actor.get(), victimCounter );
+      if( !result )
+        shouldHitThisTarget = false;
+    }
+    if( !shouldHitThisTarget )
+      continue;
     if( m_lutEntry.damagePotency > 0 )
     {
       Common::AttackType attackType = static_cast< Common::AttackType >( m_actionData->attackType );
@@ -1132,6 +1141,12 @@ bool Action::Action::isPhysical() const
 bool Action::Action::isMagical() const
 {
   return isAttackTypeMagical( static_cast< Common::AttackType >( m_actionData->attackType ) );
+}
+
+bool Action::Action::isGCD() const
+{
+  auto actionCategory = static_cast< Common::ActionCategory >( m_actionData->actionCategory );
+  return actionCategory == Common::ActionCategory::Weaponskill || actionCategory == Common::ActionCategory::Spell;
 }
 
 bool Action::Action::isAttackTypePhysical( Common::AttackType attackType )

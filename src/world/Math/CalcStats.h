@@ -140,13 +140,13 @@ namespace Sapphire::Math
 
     static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, Common::AttackType attackType, uint32_t ptc, float wepDmg );
+    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
     static float applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, Common::AttackType attackType );
 
     static float applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, Sapphire::Common::ActionCategory actionCategory, uint32_t ptc, float wepDmg );
+    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
 

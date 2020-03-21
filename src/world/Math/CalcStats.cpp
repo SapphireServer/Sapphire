@@ -651,7 +651,7 @@ float CalcStats::calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, ui
   return factor;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( Sapphire::World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, Sapphire::Common::AttackType attackType, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( Sapphire::World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   auto factor = calcDamageBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
@@ -698,11 +698,12 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 
   factor *= 1.0f + ( ( getRandomNumber0To99() - 50.0f ) / 1000.0f );
 
-  Common::ActionTypeFilter actionTypeFilter = Common::ActionTypeFilter::Unknown;
-  if( World::Action::Action::isAttackTypePhysical( attackType ) )
-    actionTypeFilter = Common::ActionTypeFilter::Physical;
-  else if( World::Action::Action::isAttackTypeMagical( attackType ) )
-    actionTypeFilter = Common::ActionTypeFilter::Magical;
+  Common::ActionTypeFilter actionTypeFilter = Common::ActionTypeFilter::Physical;
+  if( pAction )
+  {
+    if( pAction->isMagical() )
+      actionTypeFilter = Common::ActionTypeFilter::Magical;
+  }
 
   for( auto const& entry : chara.getStatusEffectMap() )
   {
@@ -775,7 +776,7 @@ float CalcStats::applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& c
   return heal;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( Sapphire::World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, Sapphire::Common::ActionCategory actionCategory, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( Sapphire::World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   auto factor = calcHealBaseOnPotency( chara, ptc, wepDmg );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
@@ -808,7 +809,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
     if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::HealCastMultiplier )
       continue;
 
-    if( actionCategory == Common::ActionCategory::Spell ) // must be a "cast"
+    if( pAction->isGCD() ) // must be a "cast"
     {
       factor *= 1.0f + ( effectEntry.effectValue2 / 100.0f );
     }
@@ -835,7 +836,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcDamag
       {
           auto wepDmg = Sapphire::Math::CalcStats::getWeaponDamage( pCharaVictim );
           // any magical reflect damage exists?
-          auto damage = Sapphire::Math::CalcStats::calcActionDamage( nullptr, *pCharaVictim, Common::AttackType::Physical, effectEntry.effectValue2, wepDmg );
+          auto damage = Sapphire::Math::CalcStats::calcActionDamage( nullptr, *pCharaVictim, effectEntry.effectValue2, wepDmg );
           damage.first = Math::CalcStats::applyDamageReceiveMultiplier( *pCharaAttacker, damage.first, Common::AttackType::Physical );
 
           return damage;
