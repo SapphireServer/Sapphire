@@ -56,6 +56,17 @@ struct FFXIVIpcUpdatePosition :
   /* 0008 */ Common::FFXIVARR_POSITION3 position;
   /* 000C */ uint8_t unk[ 4 ]; // padding?
 };
+  
+  struct FFXIVIpcUpdatePositionInstance :
+  FFXIVIpcBasePacket< UpdatePositionInstance >
+{
+  /* 0000 */ float rotation;
+  /* 0004 */ float interpolateRotation;
+  /* 0008 */ uint32_t flags;
+  /* 000C */ Common::FFXIVARR_POSITION3 position;
+  /* 0018 */ Common::FFXIVARR_POSITION3 interpolatePosition;
+  /* 0024 */ uint32_t unknown;
+};
 
 
 struct FFXIVIpcSkillHandler :
