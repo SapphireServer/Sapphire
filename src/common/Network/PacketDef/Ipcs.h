@@ -372,7 +372,7 @@ namespace Sapphire::Network::Packets
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 
-    UpdatePositionInstance = 0x0180, // updated 5.0
+    UpdatePositionInstance = 0x0080, // updated 5.21 hotfix
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
