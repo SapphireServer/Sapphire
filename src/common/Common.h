@@ -587,6 +587,7 @@ namespace Sapphire::Common
 //    AetherflowStack = 30,
 //    Status = 32,
     PLDGauge = 41,
+    GNBAmmo = 55,
     WHMBloodLily = 56,
     WHMLily = 57,
 //    RDMGaugeBoth = 74,

@@ -1001,6 +1001,9 @@ namespace Sapphire::Entity
     void gaugeDrkSetShadowTimer( uint16_t value, bool sendPacket = false );
     uint16_t gaugeDrkGetShadowTimer();
 
+    void gaugeGnbSetAmmo( uint8_t value );
+    uint8_t gaugeGnbGetAmmo();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );

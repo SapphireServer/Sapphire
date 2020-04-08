@@ -2420,3 +2420,17 @@ uint16_t Sapphire::Entity::Player::gaugeDrkGetShadowTimer()
 {
   return m_gauge.drk.shadowTimer;
 }
+
+void Sapphire::Entity::Player::gaugeGnbSetAmmo( uint8_t value )
+{
+  assert( value >= 0 && value <= 2 );
+  auto oldValue = gaugeGnbGetAmmo();
+  m_gauge.gnb.ammo = value;
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+uint8_t Sapphire::Entity::Player::gaugeGnbGetAmmo()
+{
+  return m_gauge.gnb.ammo;
+}

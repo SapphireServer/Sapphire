@@ -947,6 +947,23 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
       return false;
     }
 
+    case Common::ActionPrimaryCostType::GNBAmmo:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto ammo = pPlayer->gaugeGnbGetAmmo();
+        if( ammo >= m_primaryCost )
+        {
+          if( subtractCosts )
+            pPlayer->gaugeGnbSetAmmo( ammo - m_primaryCost );
+
+          return true;
+        }
+      }
+      return false;
+    }
+
     // free casts, likely just pure ogcds
     case Common::ActionPrimaryCostType::None:
     {
