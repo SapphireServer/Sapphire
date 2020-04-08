@@ -1003,6 +1003,8 @@ namespace Sapphire::Entity
 
     void gaugeGnbSetAmmo( uint8_t value );
     uint8_t gaugeGnbGetAmmo();
+    void gaugeGnbSetComboStep( uint8_t value );
+    uint8_t gaugeGnbGetComboStep();
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 

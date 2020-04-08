@@ -130,6 +130,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onExecute( Sapphire::World::Action::Action& action );
 
+    virtual void onBeforeBuildEffect( Sapphire::World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter );
+
     virtual void onAfterBuildEffect( Sapphire::World::Action::Action& action );
 
     virtual void onInterrupt( Sapphire::World::Action::Action& action );

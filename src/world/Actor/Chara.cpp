@@ -576,7 +576,7 @@ void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool se
   {
     if( effectIt.second->getId() == id )
     {
-      removeStatusEffect( effectIt.first );
+      removeStatusEffect( effectIt.first, sendStatusList );
       break;
     }
   }

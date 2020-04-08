@@ -190,7 +190,6 @@ void EffectResult::execute()
     case Common::ActionEffectType::ApplyStatusEffectTarget:
     case Common::ActionEffectType::ApplyStatusEffectSource:
     {
-      uint64_t lastTickOverride = 0;
       //refreshing old buff
       for( auto const& entry : m_target->getStatusEffectMap() )
       {

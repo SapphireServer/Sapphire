@@ -2434,3 +2434,17 @@ uint8_t Sapphire::Entity::Player::gaugeGnbGetAmmo()
 {
   return m_gauge.gnb.ammo;
 }
+
+void Sapphire::Entity::Player::gaugeGnbSetComboStep( uint8_t value )
+{
+  assert( value >= 0 && value <= 2 );
+  auto oldValue = gaugeGnbGetComboStep();
+  m_gauge.gnb.ammoComboStep = value;
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+uint8_t Sapphire::Entity::Player::gaugeGnbGetComboStep()
+{
+  return m_gauge.gnb.ammoComboStep;
+}

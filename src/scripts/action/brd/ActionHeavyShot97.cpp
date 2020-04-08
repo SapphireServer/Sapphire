@@ -20,9 +20,9 @@ public:
   {
   }
 
-  void onExecute( Sapphire::World::Action::Action& action ) override
+  void onBeforeBuildEffect( Sapphire::World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter ) override
   {
-    if( action.getSourceChara()->getLevel() >= 2 && Math::CalcStats::getRandomNumber0To99() < 20 )
+    if( validVictimCounter > 0 && action.getSourceChara()->getLevel() >= 2 && Math::CalcStats::getRandomNumber0To99() < 20 )
     {
       auto pEffect = Sapphire::StatusEffect::make_StatusEffect( STATUS_ID_STRAIGHT_SHOT_READY, action.getSourceChara(), action.getSourceChara(), 10000, 3000 );
       action.getEffectbuilder()->applyStatusEffect( action.getSourceChara(), action.getSourceChara(), pEffect );

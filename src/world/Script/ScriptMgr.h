@@ -79,6 +79,8 @@ namespace Sapphire::Scripting
 
     bool onExecute( World::Action::Action& action );
 
+    bool onBeforeBuildEffect( World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter );
+
     bool onAfterBuildEffect( World::Action::Action& action );
 
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );

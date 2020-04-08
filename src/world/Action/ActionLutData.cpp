@@ -338,9 +338,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Stalwart Soul, ストルワートソウル
   //has damage: potency 300, combo potency 0, directional potency 0
-  //applies to self: Darkside, 暗黒, duration 30000, param 0
   //has bonus effect: GainMPPercentage, 6
-  { 16468, { 300, 0, 0, 0, 751, 30000, 0, 0, 0, 0, 4, 0, 6 } },
+  { 16468, { 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 6 } },
 
   //Edge of Shadow, 漆黒の剣
   //has damage: potency 500, combo potency 0, directional potency 0
@@ -364,9 +363,7 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Brutal Shell, ブルータルシェル
   //has damage: potency 100, combo potency 300, directional potency 0
-  //has heal: potency 150
-  //applies to self: Final Word: Escape Prohibition, 確定判決：逃亡禁止命令, duration 10000, param 0
-  { 16139, { 100, 300, 0, 150, 2154, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  { 16139, { 100, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Camouflage, カモフラージュ
   //applies to self: Camouflage, カモフラージュ, duration 20000, param 0
@@ -391,7 +388,9 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Solid Barrel, ソリッドバレル
   //has damage: potency 100, combo potency 400, directional potency 0
-  { 16145, { 100, 400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //has bonus effect: GainJobResource, 19202048
+  //bonus effect requirement: RequireCorrectCombo
+  { 16145, { 100, 400, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1, 19202048 } },
 
   //Burst Strike, バーストストライク
   //has damage: potency 500, combo potency 0, directional potency 0
@@ -403,7 +402,9 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Demon Slaughter, デーモンスローター
   //has damage: potency 100, combo potency 250, directional potency 0
-  { 16149, { 100, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //has bonus effect: GainJobResource, 19202048
+  //bonus effect requirement: RequireCorrectCombo
+  { 16149, { 100, 250, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1, 19202048 } },
 
   //Aurora, オーロラ
   //applies to targets: Aurora, オーロラ, duration 18000, param 0
@@ -424,18 +425,18 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Gnashing Fang, ビートファング
   //has damage: potency 450, combo potency 0, directional potency 0
-  //applies to self: Ready to Rip, ジャギュラーリップ実行可, duration 10000, param 0
-  { 16146, { 450, 0, 0, 0, 1842, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 16146, { 450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Savage Claw, サベッジクロウ
   //has damage: potency 550, combo potency 0, directional potency 0
-  //applies to self: Ready to Tear, アブドメンテアー実行可, duration 10000, param 0
-  { 16147, { 550, 0, 0, 0, 1843, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 16147, { 550, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Wicked Talon, ウィケッドタロン
   //has damage: potency 650, combo potency 0, directional potency 0
-  //applies to self: Ready to Gouge, アイガウジ実行可, duration 10000, param 0
-  { 16150, { 650, 0, 0, 0, 1844, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  //comment: status removed need script
+  { 16150, { 650, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Bow Shock, バウショック
   //has damage: potency 200, combo potency 0, directional potency 0

@@ -352,6 +352,18 @@ bool Sapphire::Scripting::ScriptMgr::onExecute( World::Action::Action& action )
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onBeforeBuildEffect( World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+
+  if( script )
+  {
+    script->onBeforeBuildEffect( action, victimCounter, validVictimCounter );
+    return true;
+  }
+  return false;
+};
+
 bool Sapphire::Scripting::ScriptMgr::onAfterBuildEffect( World::Action::Action& action )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );

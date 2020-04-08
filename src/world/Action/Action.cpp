@@ -486,6 +486,7 @@ void Action::Action::buildEffects()
   if( m_disableGenericHandler || !hasValidLutEntry() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
+    scriptMgr.onBeforeBuildEffect( *this, 0, 0 );
     m_effectBuilder->buildAndSendPackets();
     scriptMgr.onAfterBuildEffect( *this );
     return;
@@ -502,8 +503,7 @@ void Action::Action::buildEffects()
                        m_lutEntry.bonusEffect, m_lutEntry.bonusRequirement, m_lutEntry.bonusDataUInt32 );
   }
 
-  bool isFirstValidVictim = true;
-  int victimCounter = 0;
+  uint8_t victimCounter = 0, validVictimCounter = 0;
 
   for( auto& actor : m_hitActors )
   {
@@ -624,10 +624,8 @@ void Action::Action::buildEffects()
           }
         }
 
-        if( isFirstValidVictim )
+        if( validVictimCounter == 0 )
         {
-          isFirstValidVictim = false;
-
           if( isCorrectCombo() )
             m_effectBuilder->comboSucceed( actor );
 
@@ -665,6 +663,11 @@ void Action::Action::buildEffects()
                   player->gaugeDrkSetBlood( std::min( 100, player->gaugeDrkGetBlood() + m_lutEntry.bonusDataByte4 ) );
                   break;
                 }
+                case Common::ClassJob::Gunbreaker:
+                {
+                  player->gaugeGnbSetAmmo( std::min( 2, player->gaugeGnbGetAmmo() + m_lutEntry.bonusDataByte4 ) );
+                  break;
+                }
               }
             }
           }
@@ -684,6 +687,7 @@ void Action::Action::buildEffects()
             }
           }
         }
+        validVictimCounter++;
       }
     }
 
@@ -707,6 +711,7 @@ void Action::Action::buildEffects()
       m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
   }
 
+  scriptMgr.onBeforeBuildEffect( *this, victimCounter, validVictimCounter );
   m_effectBuilder->buildAndSendPackets();
   scriptMgr.onAfterBuildEffect( *this );
 
