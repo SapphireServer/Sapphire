@@ -29,7 +29,7 @@ public:
       heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *chara, heal.first );
       action.getEffectbuilder()->heal( chara, chara, heal.first, heal.second );
 
-      if( chara->getLevel() > 52 )
+      if( chara->getLevel() >= 52 )
       {
         World::Action::StatusEffectEntry effectEntry;
         effectEntry.effectType = static_cast< uint32_t >( Common::StatusEffectType::Shield );
