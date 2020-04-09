@@ -222,6 +222,13 @@ float CalcStats::parryProbability( const Sapphire::Entity::Chara& chara )
   for( auto const& entry : chara.getStatusEffectMap() )
   {
     auto status = entry.second;
+    // hardcoded Camouflage
+    if( status->getId() == 1832 )
+    {
+      result += 50;
+      continue;
+    }
+    //
     auto effectEntry = status->getEffectEntry();
     if( static_cast< Common::StatusEffectType >( effectEntry.effectType ) != Common::StatusEffectType::BlockParryRateBonus )
       continue;
