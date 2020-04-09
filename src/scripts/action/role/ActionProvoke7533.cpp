@@ -21,7 +21,7 @@ public:
     if( chara )
     {
       chara->onActionHostile( action.getSourceChara() );
-      // todo: missing flying text
+      action.getEffectbuilder()->provoke( chara );
     }
   }
 };

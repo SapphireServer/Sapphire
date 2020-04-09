@@ -43,6 +43,8 @@ namespace Sapphire::World::Action
 
     void mount( Entity::CharaPtr& target, uint16_t mountId, uint64_t resultDelayMs = 600 );
 
+    void provoke( Entity::CharaPtr& target );
+
     void buildAndSendPackets();
 
   private:

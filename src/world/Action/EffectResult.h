@@ -30,6 +30,7 @@ namespace Sapphire::World::Action
     void applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect );
     void statusNoEffect( uint16_t statusId );
     void mount( uint16_t mountId );
+    void provoke( );
 
     Entity::CharaPtr getSource() const;
     Entity::CharaPtr getTarget() const;

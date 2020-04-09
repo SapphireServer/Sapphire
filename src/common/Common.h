@@ -636,6 +636,7 @@ namespace Sapphire::Common
      * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
+    Provoke = 24,
     StartActionCombo = 27, // shifted one up from 5.18
     ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,

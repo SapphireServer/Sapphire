@@ -127,6 +127,13 @@ void EffectBuilder::mount( Entity::CharaPtr& target, uint16_t mountId, uint64_t 
   moveToResultList( target, nextResult );
 }
 
+void Sapphire::World::Action::EffectBuilder::provoke( Entity::CharaPtr& target )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  nextResult->provoke();
+  moveToResultList( target, nextResult );
+}
+
 void EffectBuilder::setAnimationLock( float animationLock )
 {
   m_animationLock = animationLock;

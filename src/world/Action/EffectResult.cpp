@@ -148,6 +148,11 @@ void EffectResult::mount( uint16_t mountId )
   m_type = Common::ActionEffectType::Mount;
 }
 
+void Sapphire::World::Action::EffectResult::provoke()
+{
+  m_type = Common::ActionEffectType::Provoke;
+}
+
 Common::EffectEntry EffectResult::buildEffectEntry() const
 {
   Common::EffectEntry entry{};
