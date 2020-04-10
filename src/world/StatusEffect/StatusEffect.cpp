@@ -261,6 +261,21 @@ void Sapphire::StatusEffect::StatusEffect::setParam( uint16_t param )
   m_param = param;
 }
 
+void Sapphire::StatusEffect::StatusEffect::setStacks( uint8_t stacks )
+{
+  if( ( m_param & 0x00FF ) != 0x00FF )
+  {
+    m_param = stacks;
+  }
+}
+
+uint8_t Sapphire::StatusEffect::StatusEffect::getStacks()
+{
+  if( ( m_param & 0x00FF ) == 0x00FF )
+    return 0;
+  return static_cast< uint8_t >( m_param & 0x00FF );
+}
+
 const std::string& Sapphire::StatusEffect::StatusEffect::getName() const
 {
   return m_name;
@@ -300,12 +315,14 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
       if( m_effectEntry.effectValue1 > 0 )
       {
         // if stacks equal to remaining uses, assume it is synced
-        if( m_effectEntry.effectValue1 == m_param )
+        if( m_effectEntry.effectValue1 == getStacks() )
         {
-          m_param--;
+          m_effectEntry.effectValue1--;
+          setStacks( m_effectEntry.effectValue1 );
           m_targetActor->sendStatusEffectUpdate();
         }
-        m_effectEntry.effectValue1--;
+        else
+          m_effectEntry.effectValue1--;
         if( m_effectEntry.effectValue1 == 0 )
         {
           markToRemove();
@@ -330,12 +347,14 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
         if( m_effectEntry.effectValue1 > 0 )
         {
           // if stacks equal to remaining uses, assume it is synced
-          if( m_effectEntry.effectValue1 == m_param )
+          if( m_effectEntry.effectValue1 == getStacks() )
           {
-            m_param--;
+            m_effectEntry.effectValue1--;
+            setStacks( m_effectEntry.effectValue1 );
             m_targetActor->sendStatusEffectUpdate();
           }
-          m_effectEntry.effectValue1--;
+          else
+            m_effectEntry.effectValue1--;
           if( m_effectEntry.effectValue1 == 0 )
           {
             markToRemove();

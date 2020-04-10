@@ -47,6 +47,10 @@ public:
 
   void setParam( uint16_t param );
 
+  void setStacks( uint8_t stacks );
+
+  uint8_t getStacks();
+
   void registerTickEffect( uint8_t type, uint32_t param );
 
   std::pair< uint8_t, uint32_t > getTickEffect();
