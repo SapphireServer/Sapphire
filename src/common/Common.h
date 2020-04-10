@@ -586,6 +586,7 @@ namespace Sapphire::Common
     DRKGauge = 25,
 //    AetherflowStack = 30,
 //    Status = 32,
+    SAMKenki = 39,
     PLDGauge = 41,
     GNBAmmo = 55,
     WHMBloodLily = 56,
@@ -1049,6 +1050,7 @@ namespace Sapphire::Common
     InstantCast = 13,
     BlockParryRateBonus = 14,
     MPRestorePerGCD = 15,
+    AlwaysCombo = 16,
   };
 
   enum class ActionTypeFilter : int32_t

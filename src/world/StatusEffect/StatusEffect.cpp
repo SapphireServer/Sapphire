@@ -299,6 +299,12 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
       }
       if( m_effectEntry.effectValue1 > 0 )
       {
+        // if stacks equal to remaining uses, assume it is synced
+        if( m_effectEntry.effectValue1 == m_param )
+        {
+          m_param--;
+          m_targetActor->sendStatusEffectUpdate();
+        }
         m_effectEntry.effectValue1--;
         if( m_effectEntry.effectValue1 == 0 )
         {
@@ -307,6 +313,37 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
         action->setCastTime( 0 );
       }
       break;
+    }
+    case Common::StatusEffectType::AlwaysCombo:
+    {
+      if( action->isGCD() )
+      {
+        // value1: remaining uses
+        // value2-4: affected action ids, or all actions if value2 is 0
+        if( m_effectEntry.effectValue2 != 0 )
+        {
+          if( action->getId() != m_effectEntry.effectValue2 &&
+            action->getId() != m_effectEntry.effectValue3 &&
+            action->getId() != m_effectEntry.effectValue4 )
+            break;
+        }
+        if( m_effectEntry.effectValue1 > 0 )
+        {
+          // if stacks equal to remaining uses, assume it is synced
+          if( m_effectEntry.effectValue1 == m_param )
+          {
+            m_param--;
+            m_targetActor->sendStatusEffectUpdate();
+          }
+          m_effectEntry.effectValue1--;
+          if( m_effectEntry.effectValue1 == 0 )
+          {
+            markToRemove();
+          }
+          action->setAlwaysCombo();
+        }
+        break;
+      }
     }
   }
 }

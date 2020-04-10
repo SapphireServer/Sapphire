@@ -2448,3 +2448,17 @@ uint8_t Sapphire::Entity::Player::gaugeGnbGetComboStep()
 {
   return m_gauge.gnb.ammoComboStep;
 }
+
+void Sapphire::Entity::Player::gaugeSamSetKenki( uint8_t value )
+{
+  assert( value >= 0 && value <= 100 );
+  auto oldValue = gaugeSamGetKenki();
+  m_gauge.sam.kenki = value;
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+uint8_t Sapphire::Entity::Player::gaugeSamGetKenki()
+{
+  return m_gauge.sam.kenki;
+}

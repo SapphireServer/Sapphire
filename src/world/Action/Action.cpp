@@ -54,7 +54,8 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
   m_sequence( sequence ),
   m_isAutoAttack( false ),
   m_disableGenericHandler( false ),
-  m_started( false )
+  m_started( false ),
+  m_shouldAlwaysCombo( false )
 {
 }
 
@@ -799,6 +800,9 @@ void Action::Action::setAdditionalData( uint32_t data )
 
 bool Action::Action::isCorrectCombo() const
 {
+  if( m_shouldAlwaysCombo )
+    return true;
+
   auto lastActionId = m_pSource->getLastComboActionId();
 
   if( lastActionId == 0 )
@@ -812,6 +816,11 @@ bool Action::Action::isCorrectCombo() const
 bool Action::Action::isComboAction() const
 {
   return m_actionData->actionCombo != 0;
+}
+
+void Sapphire::World::Action::Action::setAlwaysCombo()
+{
+  m_shouldAlwaysCombo = true;
 }
 
 bool Action::Action::primaryCostCheck( bool subtractCosts )
@@ -962,6 +971,23 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
         {
           if( subtractCosts )
             pPlayer->gaugeGnbSetAmmo( ammo - m_primaryCost );
+
+          return true;
+        }
+      }
+      return false;
+    }
+
+    case Common::ActionPrimaryCostType::SAMKenki:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        auto kenki = pPlayer->gaugeSamGetKenki();
+        if( kenki >= m_primaryCost )
+        {
+          if( subtractCosts )
+            pPlayer->gaugeSamSetKenki( kenki - m_primaryCost );
 
           return true;
         }

@@ -525,7 +525,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
   }
   else
   {
-    weaponDamage = chara.getLevel() * 10;
+    weaponDamage = chara.getLevel() * 3;
   }
 
   auto level = chara.getLevel();

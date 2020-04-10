@@ -1006,6 +1006,9 @@ namespace Sapphire::Entity
     void gaugeGnbSetComboStep( uint8_t value );
     uint8_t gaugeGnbGetComboStep();
 
+    void gaugeSamSetKenki( uint8_t value );
+    uint8_t gaugeSamGetKenki();
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );

@@ -878,8 +878,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 7480, { 100, 360, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Meikyo Shisui, 明鏡止水
-  //applies to self: Meikyo Shisui, 明鏡止水, duration 15000, param 0
-  { 7499, { 0, 0, 0, 0, 1233, 15000, 0, 0, 0, 0, 0, 0, 0 } },
+  //applies to self: Meikyo Shisui, 明鏡止水, duration 15000, param 3
+  { 7499, { 0, 0, 0, 0, 1233, 15000, 3, 0, 0, 0, 0, 0, 0 } },
 
   //Hissatsu: Kaiten, 必殺剣・回天
   //applies to self: Kaiten, 必殺剣・回天, duration 10000, param 0
@@ -3537,5 +3537,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   { 742, { 15, 6, 0, 0, 0 } },
 
   { 1972, { 15, 2, 7392, 7391, 0 } },
+
+  { 1233, { 16, 3, 0, 0, 0 } },
 
 };
