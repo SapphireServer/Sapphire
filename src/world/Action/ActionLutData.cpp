@@ -3534,10 +3534,16 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Sheltron, シェルトロン: BlockParryRateBonus, block 100%, parry 0%
   { 1856, { 14, 0, 100, 0, 0 } },
 
+  //Blood Weapon, ブラッドウェポン: MPRestorePerGCD, 6%
   { 742, { 15, 6, 0, 0, 0 } },
 
+  //Delirium, ブラッドデリリアム: MPRestorePerGCD, 2%
   { 1972, { 15, 2, 7392, 7391, 0 } },
 
+  //Meikyo Shisui, 明鏡止水: AlwaysCombo, 3 uses
   { 1233, { 16, 3, 0, 0, 0 } },
+
+  //Shifu, 士風: Haste, 13%
+  { 1299, { 12, 13, 0, 0, 0 } },
 
 };
