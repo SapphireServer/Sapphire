@@ -1196,6 +1196,12 @@ bool Action::Action::isGCD() const
   return actionCategory == Common::ActionCategory::Weaponskill || actionCategory == Common::ActionCategory::Spell;
 }
 
+bool Action::Action::isWeaponSkill() const
+{
+  auto actionCategory = static_cast< Common::ActionCategory >( m_actionData->actionCategory );
+  return actionCategory == Common::ActionCategory::Weaponskill;
+}
+
 bool Action::Action::isAttackTypePhysical( Common::AttackType attackType )
 {
   return attackType == Common::AttackType::Physical;

@@ -297,64 +297,83 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
   //auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
   //pScriptMgr->onBeforeActionStart( m_targetActor, *this );
 
+  auto checkAction1 = []( Sapphire::World::Action::Action* action, Sapphire::World::Action::StatusEffectEntry& effectEntry )
+  {
+    // value1: remaining uses if >= 0
+    // value2-4: affected action ids if value2 > 0, otherwise value3 is actionCategory filter (4 bytes for 4 categories)
+    if( effectEntry.effectValue1 == 0 )
+      return false;
+
+    if( effectEntry.effectValue2 != 0 )
+    {
+      if( action->getId() != effectEntry.effectValue2 &&
+        action->getId() != effectEntry.effectValue3 &&
+        action->getId() != effectEntry.effectValue4 )
+        return false;
+    }
+    else
+    {
+      if( effectEntry.effectValue3 != 0 )
+      {
+        auto ac = action->getActionData()->actionCategory;
+        uint8_t f1 = static_cast< uint8_t >( effectEntry.effectValue3 );
+        uint8_t f2 = static_cast< uint8_t >( effectEntry.effectValue3 >> 8 );
+        uint8_t f3 = static_cast< uint8_t >( effectEntry.effectValue3 >> 16 );
+        uint8_t f4 = static_cast< uint8_t >( effectEntry.effectValue3 >> 24 );
+        bool passed = false;
+        if( f1 != 0 && ac == f1 )
+          passed = true;
+        else if ( f2 != 0 && ac == f2 )
+          passed = true;
+        else if ( f3 != 0 && ac == f3 )
+          passed = true;
+        else if ( f4 != 0 && ac == f4 )
+          passed = true;
+        if( !passed )
+          return false;
+      }
+    }
+
+    return true;
+  };
+
   switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {
     case Common::StatusEffectType::InstantCast:
     {
-      if( !action->hasCastTime() )
-        return;
-      // value1: remaining uses
-      // value2-4: affected action ids, or all actions if value2 is 0
-      if( m_effectEntry.effectValue2 != 0 )
+      if( action->hasCastTime() && checkAction1( action, m_effectEntry ) )
       {
-        if( action->getId() != m_effectEntry.effectValue2 &&
-            action->getId() != m_effectEntry.effectValue3 &&
-            action->getId() != m_effectEntry.effectValue4 )
-          break;
-      }
-      if( m_effectEntry.effectValue1 > 0 )
-      {
-        // if stacks equal to remaining uses, assume it is synced
-        if( m_effectEntry.effectValue1 == getStacks() )
+        if( m_effectEntry.effectValue1 > 0 )
         {
+          if( m_effectEntry.effectValue1 == getStacks() )
+          {
+            // if stacks equal to remaining uses, assume it is synced
+            setStacks( getStacks() - 1 );
+            m_targetActor->sendStatusEffectUpdate();
+          }
           m_effectEntry.effectValue1--;
-          setStacks( m_effectEntry.effectValue1 );
-          m_targetActor->sendStatusEffectUpdate();
+          if( m_effectEntry.effectValue1 == 0 )
+          {
+            markToRemove();
+          }
+          action->setCastTime( 0 );
         }
-        else
-          m_effectEntry.effectValue1--;
-        if( m_effectEntry.effectValue1 == 0 )
-        {
-          markToRemove();
-        }
-        action->setCastTime( 0 );
       }
       break;
     }
     case Common::StatusEffectType::AlwaysCombo:
     {
-      if( action->isGCD() )
+      if( checkAction1( action, m_effectEntry ) )
       {
-        // value1: remaining uses
-        // value2-4: affected action ids, or all actions if value2 is 0
-        if( m_effectEntry.effectValue2 != 0 )
-        {
-          if( action->getId() != m_effectEntry.effectValue2 &&
-            action->getId() != m_effectEntry.effectValue3 &&
-            action->getId() != m_effectEntry.effectValue4 )
-            break;
-        }
         if( m_effectEntry.effectValue1 > 0 )
         {
-          // if stacks equal to remaining uses, assume it is synced
           if( m_effectEntry.effectValue1 == getStacks() )
           {
-            m_effectEntry.effectValue1--;
-            setStacks( m_effectEntry.effectValue1 );
+            // if stacks equal to remaining uses, assume it is synced
+            setStacks( getStacks() - 1 );
             m_targetActor->sendStatusEffectUpdate();
           }
-          else
-            m_effectEntry.effectValue1--;
+          m_effectEntry.effectValue1--;
           if( m_effectEntry.effectValue1 == 0 )
           {
             markToRemove();

@@ -3541,7 +3541,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   { 1972, { 15, 2, 7392, 7391, 0 } },
 
   //Meikyo Shisui, 明鏡止水: AlwaysCombo, 3 uses
-  { 1233, { 16, 3, 0, 0, 0 } },
+  { 1233, { 16, 3, 0, 3, 0 } },
 
   //Shifu, 士風: Haste, 13%
   { 1299, { 12, 13, 0, 0, 0 } },

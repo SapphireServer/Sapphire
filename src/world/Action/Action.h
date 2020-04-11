@@ -135,6 +135,7 @@ namespace Sapphire::World::Action
     bool isPhysical() const;
     bool isMagical() const;
     bool isGCD() const;
+    bool isWeaponSkill() const;
 
     static bool isAttackTypePhysical( Common::AttackType attackType );
     static bool isAttackTypeMagical( Common::AttackType attackType );
