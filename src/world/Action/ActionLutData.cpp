@@ -3023,8 +3023,8 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Jinpu, 陣風: DamageMultiplier, All, 13%
   //{ 1298, { 1, 255, 13, 0, 0 } },
 
-  //Kaiten, 必殺剣・回天: DamageMultiplier, All, 50%
-  { 1229, { 1, 255, 50, 0, 0 } },
+  //Kaiten, 必殺剣・回天: PotencyMultiplier, 1 uses, 50%
+  { 1229, { 17, 1, 0, 3, 50 } },
 
   //Higanbana, 彼岸花: Dot, Physical, potency 60
   { 1228, { 4, 1, 60, 0, 0 } },

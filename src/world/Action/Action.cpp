@@ -668,6 +668,11 @@ void Action::Action::buildEffects()
                   player->gaugeGnbSetAmmo( std::min( 2, player->gaugeGnbGetAmmo() + m_lutEntry.bonusDataByte4 ) );
                   break;
                 }
+                case Common::ClassJob::Samurai:
+                {
+                  player->gaugeSamSetKenki( std::min( 100, player->gaugeSamGetKenki() + m_lutEntry.bonusDataByte4 ) );
+                  break;
+                }
               }
             }
           }
@@ -1160,12 +1165,12 @@ Action::EffectBuilderPtr Action::Action::getEffectbuilder()
   return m_effectBuilder;
 }
 
-Data::ActionPtr Action::Action::getActionData() const
+Data::ActionPtr Action::Action::getActionData()
 {
   return m_actionData;
 }
 
-Action::ActionEntry Action::Action::getActionEntry() const
+Action::ActionEntry& Action::Action::getActionEntry()
 {
   return m_lutEntry;
 }

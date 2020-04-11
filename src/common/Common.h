@@ -1051,6 +1051,7 @@ namespace Sapphire::Common
     BlockParryRateBonus = 14,
     MPRestorePerGCD = 15,
     AlwaysCombo = 16,
+    PotencyMultiplier = 17,
   };
 
   enum class ActionTypeFilter : int32_t

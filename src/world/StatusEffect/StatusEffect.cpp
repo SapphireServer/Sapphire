@@ -380,8 +380,32 @@ void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World:
           }
           action->setAlwaysCombo();
         }
-        break;
       }
+      break;
+    }
+    case Common::StatusEffectType::PotencyMultiplier:
+    {
+      if( checkAction1( action, m_effectEntry ) )
+      {
+        if( m_effectEntry.effectValue1 > 0 )
+        {
+          if( m_effectEntry.effectValue1 == getStacks() )
+          {
+            // if stacks equal to remaining uses, assume it is synced
+            setStacks( getStacks() - 1 );
+            m_targetActor->sendStatusEffectUpdate();
+          }
+          m_effectEntry.effectValue1--;
+          if( m_effectEntry.effectValue1 == 0 )
+          {
+            markToRemove();
+          }
+          action->getActionEntry().damagePotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
+          action->getActionEntry().damageComboPotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
+          action->getActionEntry().damageDirectionalPotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
+        }
+      }
+      break;
     }
   }
 }
