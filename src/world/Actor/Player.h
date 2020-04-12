@@ -1016,6 +1016,8 @@ namespace Sapphire::Entity
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    void* getExdData();
+
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     void sendHuntingLog();

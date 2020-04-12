@@ -2497,3 +2497,8 @@ bool Sapphire::Entity::Player::gaugeSamHasAnySen()
 {
   return static_cast< uint8_t >( m_gauge.sam.sen ) > 0;
 }
+
+void* Sapphire::Entity::Player::getExdData()
+{
+  return &Common::Service< Data::ExdDataGenerated >::ref();
+}
