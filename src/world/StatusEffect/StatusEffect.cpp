@@ -294,116 +294,35 @@ void Sapphire::StatusEffect::StatusEffect::replaceEffectEntry( Sapphire::World::
 void Sapphire::StatusEffect::StatusEffect::onBeforeActionStart( Sapphire::World::Action::Action* action )
 {
   // todo: add script function for this if needed
-  //auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  //pScriptMgr->onBeforeActionStart( m_targetActor, *this );
-
-  auto checkAction1 = []( Sapphire::World::Action::Action* action, Sapphire::World::Action::StatusEffectEntry& effectEntry )
-  {
-    // value1: remaining uses if >= 0
-    // value2-4: affected action ids if value2 > 0, otherwise value3 is actionCategory filter (4 bytes for 4 categories)
-    if( effectEntry.effectValue1 == 0 )
-      return false;
-
-    if( effectEntry.effectValue2 != 0 )
-    {
-      if( action->getId() != effectEntry.effectValue2 &&
-        action->getId() != effectEntry.effectValue3 &&
-        action->getId() != effectEntry.effectValue4 )
-        return false;
-    }
-    else
-    {
-      if( effectEntry.effectValue3 != 0 )
-      {
-        auto ac = action->getActionData()->actionCategory;
-        uint8_t f1 = static_cast< uint8_t >( effectEntry.effectValue3 );
-        uint8_t f2 = static_cast< uint8_t >( effectEntry.effectValue3 >> 8 );
-        uint8_t f3 = static_cast< uint8_t >( effectEntry.effectValue3 >> 16 );
-        uint8_t f4 = static_cast< uint8_t >( effectEntry.effectValue3 >> 24 );
-        bool passed = false;
-        if( f1 != 0 && ac == f1 )
-          passed = true;
-        else if ( f2 != 0 && ac == f2 )
-          passed = true;
-        else if ( f3 != 0 && ac == f3 )
-          passed = true;
-        else if ( f4 != 0 && ac == f4 )
-          passed = true;
-        if( !passed )
-          return false;
-      }
-    }
-
-    return true;
-  };
-
   switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
   {
     case Common::StatusEffectType::InstantCast:
     {
-      if( action->hasCastTime() && checkAction1( action, m_effectEntry ) )
-      {
-        if( m_effectEntry.effectValue1 > 0 )
-        {
-          if( m_effectEntry.effectValue1 == getStacks() )
-          {
-            // if stacks equal to remaining uses, assume it is synced
-            setStacks( getStacks() - 1 );
-            m_targetActor->sendStatusEffectUpdate();
-          }
-          m_effectEntry.effectValue1--;
-          if( m_effectEntry.effectValue1 == 0 )
-          {
-            markToRemove();
-          }
-          action->setCastTime( 0 );
-        }
-      }
+      if( action->hasCastTime() && checkActionBoostType1( action ) )
+        action->setCastTime( 0 );
       break;
     }
     case Common::StatusEffectType::AlwaysCombo:
     {
-      if( checkAction1( action, m_effectEntry ) )
-      {
-        if( m_effectEntry.effectValue1 > 0 )
-        {
-          if( m_effectEntry.effectValue1 == getStacks() )
-          {
-            // if stacks equal to remaining uses, assume it is synced
-            setStacks( getStacks() - 1 );
-            m_targetActor->sendStatusEffectUpdate();
-          }
-          m_effectEntry.effectValue1--;
-          if( m_effectEntry.effectValue1 == 0 )
-          {
-            markToRemove();
-          }
-          action->setAlwaysCombo();
-        }
-      }
+      if( checkActionBoostType1( action ) )
+        action->setAlwaysCombo();
       break;
     }
+  }
+}
+
+void Sapphire::StatusEffect::StatusEffect::onActionExecute( Sapphire::World::Action::Action* action )
+{
+  // todo: add script function for this if needed
+  switch( static_cast< Common::StatusEffectType >( m_effectEntry.effectType ) )
+  {
     case Common::StatusEffectType::PotencyMultiplier:
     {
-      if( checkAction1( action, m_effectEntry ) )
+      if( checkActionBoostType1( action ) )
       {
-        if( m_effectEntry.effectValue1 > 0 )
-        {
-          if( m_effectEntry.effectValue1 == getStacks() )
-          {
-            // if stacks equal to remaining uses, assume it is synced
-            setStacks( getStacks() - 1 );
-            m_targetActor->sendStatusEffectUpdate();
-          }
-          m_effectEntry.effectValue1--;
-          if( m_effectEntry.effectValue1 == 0 )
-          {
-            markToRemove();
-          }
-          action->getActionEntry().damagePotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
-          action->getActionEntry().damageComboPotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
-          action->getActionEntry().damageDirectionalPotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
-        }
+        action->getActionEntry().damagePotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
+        action->getActionEntry().damageComboPotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
+        action->getActionEntry().damageDirectionalPotency *= 1.0 + ( m_effectEntry.effectValue4 / 100.0 );
       }
       break;
     }
@@ -442,18 +361,108 @@ bool Sapphire::StatusEffect::StatusEffect::onActionHitTarget( World::Action::Act
     {
       if( victimCounter == 1 && action->isGCD() )
       {
-        if( m_effectEntry.effectValue2 != 0 )
+        if( checkActionBoostType2( action ) )
         {
-          if( action->getId() != m_effectEntry.effectValue2 &&
-            action->getId() != m_effectEntry.effectValue3 &&
-            action->getId() != m_effectEntry.effectValue4 )
-            break;
+          float restored = 0.01f * m_targetActor->getMaxMp() * m_effectEntry.effectValue1;
+          action->getEffectbuilder()->restoreMP( victim, m_targetActor, static_cast< uint32_t >( restored ), Sapphire::Common::ActionEffectResultFlag::EffectOnSource );
         }
-        float restored = 0.01f * m_targetActor->getMaxMp() * m_effectEntry.effectValue1;
-        action->getEffectbuilder()->restoreMP( victim, m_targetActor, static_cast< uint32_t >( restored ), Sapphire::Common::ActionEffectResultFlag::EffectOnSource );
       }
       break;
     }
   }
+  return true;
+}
+
+bool Sapphire::StatusEffect::StatusEffect::checkActionBoostType1( World::Action::Action* action )
+{
+  // value1: remaining uses if >= 0, infinite uses if < 0 and can be custom data
+  // value2-4: affected action ids if value2 > 0,
+  //           otherwise value3 is actionCategory filter (4 bytes for 4 categories) and value4 is custom data
+  if( m_effectEntry.effectValue1 == 0 )
+    return false;
+
+  if( m_effectEntry.effectValue2 != 0 )
+  {
+    if( action->getId() != m_effectEntry.effectValue2 &&
+      action->getId() != m_effectEntry.effectValue3 &&
+      action->getId() != m_effectEntry.effectValue4 )
+      return false;
+  }
+  else
+  {
+    if( m_effectEntry.effectValue3 != 0 )
+    {
+      auto ac = action->getActionData()->actionCategory;
+      uint8_t f1 = static_cast< uint8_t >( m_effectEntry.effectValue3 );
+      uint8_t f2 = static_cast< uint8_t >( m_effectEntry.effectValue3 >> 8 );
+      uint8_t f3 = static_cast< uint8_t >( m_effectEntry.effectValue3 >> 16 );
+      uint8_t f4 = static_cast< uint8_t >( m_effectEntry.effectValue3 >> 24 );
+      bool passed = false;
+      if( f1 != 0 && ac == f1 )
+        passed = true;
+      else if ( f2 != 0 && ac == f2 )
+        passed = true;
+      else if ( f3 != 0 && ac == f3 )
+        passed = true;
+      else if ( f4 != 0 && ac == f4 )
+        passed = true;
+      if( !passed )
+        return false;
+    }
+  }
+
+  if( m_effectEntry.effectValue1 > 0 )
+  {
+    if( m_effectEntry.effectValue1 == getStacks() )
+    {
+      // if stacks equal to remaining uses, assume it is synced
+      setStacks( getStacks() - 1 );
+      m_targetActor->sendStatusEffectUpdate();
+    }
+    m_effectEntry.effectValue1--;
+    if( m_effectEntry.effectValue1 == 0 )
+    {
+      markToRemove();
+    }
+  }
+
+  return true;
+}
+
+bool Sapphire::StatusEffect::StatusEffect::checkActionBoostType2( World::Action::Action* action )
+{
+  // value1: custom data
+  // value2-4: affected action ids if value2 > 0,
+  //           otherwise value3 is actionCategory filter (4 bytes for 4 categories) and value4 is custom data
+  if( m_effectEntry.effectValue2 != 0 )
+  {
+    if( action->getId() != m_effectEntry.effectValue2 &&
+      action->getId() != m_effectEntry.effectValue3 &&
+      action->getId() != m_effectEntry.effectValue4 )
+      return false;
+  }
+  else
+  {
+    if( m_effectEntry.effectValue3 != 0 )
+    {
+      auto ac = action->getActionData()->actionCategory;
+      uint8_t f1 = static_cast< uint8_t >( m_effectEntry.effectValue3 );
+      uint8_t f2 = static_cast< uint8_t >( m_effectEntry.effectValue3 >> 8 );
+      uint8_t f3 = static_cast< uint8_t >( m_effectEntry.effectValue3 >> 16 );
+      uint8_t f4 = static_cast< uint8_t >( m_effectEntry.effectValue3 >> 24 );
+      bool passed = false;
+      if( f1 != 0 && ac == f1 )
+        passed = true;
+      else if ( f2 != 0 && ac == f2 )
+        passed = true;
+      else if ( f3 != 0 && ac == f3 )
+        passed = true;
+      else if ( f4 != 0 && ac == f4 )
+        passed = true;
+      if( !passed )
+        return false;
+    }
+  }
+
   return true;
 }

@@ -85,6 +85,7 @@ bool Action::Action::init()
   if( actionCategory == Common::ActionCategory::Spell || actionCategory == Common::ActionCategory::Weaponskill )
   {
     m_castTimeMs = static_cast< uint32_t >( m_castTimeMs * ( m_pSource->getStatValue( Common::BaseParam::Haste ) / 100.0f ) );
+    m_recastTimeMs = static_cast< uint32_t >( m_recastTimeMs * ( m_pSource->getStatValue( Common::BaseParam::Haste ) / 100.0f ) );
   }
 
   m_cooldownGroup = m_actionData->cooldownGroup;
@@ -477,6 +478,11 @@ void Action::Action::buildEffects()
   snapshotAffectedActors( m_hitActors );
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  for( const auto& statusIt : m_pSource->getStatusEffectMap() )
+  {
+    statusIt.second->onActionExecute( this );
+  }
 
   scriptMgr.onExecute( *this );
 
@@ -997,6 +1003,28 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
         }
       }
       return false;
+    }
+
+    case Common::ActionPrimaryCostType::SAMSen:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer )
+      {
+        // trust the client and assume the action is correct, you can cheat this by performing one sen midare :)
+        if( pPlayer->gaugeSamHasAnySen() )
+        {
+          if( subtractCosts )
+            pPlayer->gaugeSamSetSen( Common::SamSen::None );
+
+          return true;
+        }
+      }
+      return false;
+    }
+
+    case Common::ActionPrimaryCostType::SAMMeditation:
+    {
+      return true;
     }
 
     // free casts, likely just pure ogcds

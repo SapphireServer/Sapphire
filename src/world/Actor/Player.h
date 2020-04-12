@@ -1008,6 +1008,11 @@ namespace Sapphire::Entity
 
     void gaugeSamSetKenki( uint8_t value );
     uint8_t gaugeSamGetKenki();
+    void gaugeSamSetSen( Common::SamSen type, bool value );
+    void gaugeSamSetSen( Common::SamSen value );
+    bool gaugeSamGetSen( Common::SamSen type );
+    Common::SamSen gaugeSamGetSenRaw();
+    bool gaugeSamHasAnySen();
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -666,7 +666,7 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   sendToInRangeSet( statusEffectList, true );
 }
 
-void Sapphire::Entity::Chara::sendEffectResultToUpdateShieldValue()
+void Sapphire::Entity::Chara::sendShieldUpdate()
 {
   auto pPacket = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
@@ -730,7 +730,7 @@ std::pair< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::
 {
   for( auto effectIt : m_statusEffectMap )
   {
-    if( effectIt.second->getId() == id )
+    if( effectIt.second->getId() == id && !effectIt.second->isMarkedToRemove() )
     {
       return std::make_pair( effectIt.first, effectIt.second );
     }
@@ -974,7 +974,7 @@ float Sapphire::Entity::Chara::applyShieldProtection( float damage )
   }
 
   if( shieldChanged )
-    sendEffectResultToUpdateShieldValue();
+    sendShieldUpdate();
 
   return remainingDamage;
 }

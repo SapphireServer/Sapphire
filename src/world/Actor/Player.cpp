@@ -2462,3 +2462,38 @@ uint8_t Sapphire::Entity::Player::gaugeSamGetKenki()
 {
   return m_gauge.sam.kenki;
 }
+
+void Sapphire::Entity::Player::gaugeSamSetSen( Sapphire::Common::SamSen type, bool value )
+{
+  auto sen = static_cast< uint8_t >( type );
+  auto current = static_cast< uint8_t >( gaugeSamGetSenRaw() );
+  if( value )
+    current |= sen;
+  else
+    current &= ~sen;
+  gaugeSamSetSen( static_cast< Sapphire::Common::SamSen >( current ) );
+}
+
+void Sapphire::Entity::Player::gaugeSamSetSen( Sapphire::Common::SamSen value )
+{
+  assert( value >= 0 && value <= 7 );
+  auto oldValue = gaugeSamGetSenRaw();
+  m_gauge.sam.sen = value;
+  if( oldValue != value )
+    sendActorGauge();
+}
+
+bool Sapphire::Entity::Player::gaugeSamGetSen( Sapphire::Common::SamSen type )
+{
+  return ( static_cast< uint8_t >( m_gauge.sam.sen ) & static_cast< uint8_t >( type ) ) > 0;
+}
+
+Sapphire::Common::SamSen Sapphire::Entity::Player::gaugeSamGetSenRaw()
+{
+  return m_gauge.sam.sen;
+}
+
+bool Sapphire::Entity::Player::gaugeSamHasAnySen()
+{
+  return static_cast< uint8_t >( m_gauge.sam.sen ) > 0;
+}

@@ -587,10 +587,12 @@ namespace Sapphire::Common
 //    AetherflowStack = 30,
 //    Status = 32,
     SAMKenki = 39,
+    SAMSen = 40,
     PLDGauge = 41,
     GNBAmmo = 55,
     WHMBloodLily = 56,
     WHMLily = 57,
+    SAMMeditation = 63,
 //    RDMGaugeBoth = 74,
 ////  RDMGaugeBlack = 75, // not right?
 //    DRGGauge3Eyes = 76,
@@ -1258,7 +1260,7 @@ namespace Sapphire::Common
       uint8_t unused2;
       uint8_t kenki;
       uint8_t meditationStacks;
-      SamSen senFlag;
+      SamSen sen;
     } sam;
     struct
     {

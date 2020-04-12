@@ -166,7 +166,7 @@ namespace Sapphire::Entity
 
     void sendStatusEffectUpdate();
 
-    void sendEffectResultToUpdateShieldValue();
+    void sendShieldUpdate();
 
     /*! return a const pointer to the look array */
     const uint8_t* getLookArray() const;
