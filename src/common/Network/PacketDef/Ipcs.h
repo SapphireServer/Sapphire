@@ -78,7 +78,7 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x012B, // updated 5.21 hotfix
+    Chat = 0x0161, // updated 5.25
 
     WorldVisitList = 0x0000,//0x00FE, // added 4.5
 
