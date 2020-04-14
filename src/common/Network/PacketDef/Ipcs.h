@@ -62,13 +62,13 @@ namespace Sapphire::Network::Packets
     ///////////////////////////////////////////////////
 
     ChatBanned = 0x006B,
-    Playtime = 0x0284, // updated 5.21
+    Playtime = 0x0286, // updated 5.25
     Logout = 0x00CD, // updated 5.25
-    CFNotify = 0x0241, // updated 5.21
+    CFNotify = 0x0145, // updated 5.25
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x007A,
     CFPlayerInNeed = 0xF07F,
-    CFPreferredRole = 0x00D4, // added 5.21
+    CFPreferredRole = 0x0186, // added 5.25
 
     SocialRequestError = 0x00AD,
 
@@ -78,14 +78,14 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x012B, // updated 5.21 hotfix
+    Chat = 0x0161, // updated 5.25
 
     WorldVisitList = 0x00FE, // added 4.5
 
     SocialList = 0x0269, // updated 5.25
 
     ExamineSearchInfo = 0x032B, // updated 5.21 hotfix
-    UpdateSearchInfo = 0x0379, // updated 5.21 hotfix
+    UpdateSearchInfo = 0x00B3, // updated 5.25
     InitSearchInfo = 0x0347, // updated 5.25
     ExamineSearchComment = 0x0102, // updated 4.1
 
@@ -161,7 +161,7 @@ namespace Sapphire::Network::Packets
 
     ModelEquip = 0x01E5, // updated 5.25
     Examine = 0x036E, // updated 5.21 hotfix
-    CharaNameReq = 0x02E4, // updated 5.21 hotfix
+    CharaNameReq = 0x0145, // updated 5.25
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0x019F, // updated 5.0
@@ -221,7 +221,7 @@ namespace Sapphire::Network::Packets
 
     WeatherChange = 0x0157, // updated 5.25
     PlayerTitleList = 0x037D, // updated 5.1
-    Discovery = 0x0091, // updated 5.2
+    Discovery = 0x0173, // updated 5.25
 
     EorzeaTimeOffset = 0x03B8, // updated 5.1
 
@@ -305,7 +305,7 @@ namespace Sapphire::Network::Packets
     ChatHandler = 0x0189, // updated 5.25
 
     SocialListHandler = 0x0371, // updated 5.25
-    SetSearchInfoHandler = 0x025C, // updated 5.21 hotfix
+    SetSearchInfoHandler = 0x00FA, // updated 5.25
     ReqSearchInfoHandler = 0x0366, // updated 5.25
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
@@ -334,7 +334,7 @@ namespace Sapphire::Network::Packets
 
     ZoneLineHandler = 0x0214, // updated 5.25
     ClientTrigger = 0x017D, // updated 5.25
-    DiscoveryHandler = 0x019A, // updated 5.2
+    DiscoveryHandler = 0x02C8, // updated 5.25
 
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x0241, // updated 5.25
