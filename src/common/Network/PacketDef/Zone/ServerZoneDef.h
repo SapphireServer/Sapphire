@@ -1021,8 +1021,9 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char u19[9];
+    unsigned char u19[8];
     unsigned char mountGuideMask[22];
+    unsigned char u19_2;
     char name[32];
     unsigned char unknownOword[16];
     unsigned char unknownOw;
