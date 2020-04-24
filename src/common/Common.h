@@ -583,13 +583,19 @@ namespace Sapphire::Common
     TacticsPoints = 5,
     StatusEffect = 10,
     WARGauge = 22,
-//    DRKGauge = 25,
-//    AetherflowStack = 30,
-//    Status = 32,
+    DRKGauge = 25,
+    //    AetherflowStack = 30,
+    //    Status = 32,
+    SAMKenki = 39,
+    SAMSen = 40,
     PLDGauge = 41,
-//    RDMGaugeBoth = 74,
-////  RDMGaugeBlack = 75, // not right?
-//    DRGGauge3Eyes = 76,
+    GNBAmmo = 55,
+    WHMBloodLily = 56,
+    WHMLily = 57,
+    SAMMeditation = 63,
+    //    RDMGaugeBoth = 74,
+    ////  RDMGaugeBlack = 75, // not right?
+    //    DRGGauge3Eyes = 76,
   };
 
   enum class AttackType : int8_t
@@ -1025,6 +1031,200 @@ namespace Sapphire::Common
     Melee,
     Crafter,
     Gatherer
+  };
+
+  enum class AstCardType : uint8_t
+  {
+    None = 0,
+    Balance = 1,
+    Bole = 2,
+    Arrow = 3,
+    Spear = 4,
+    Ewer = 5,
+    Spire = 6,
+    Lord = 0x70,
+    Lady = 0x80,
+  };
+
+  enum class AstSealType : uint8_t
+  {
+    None = 0,
+    Sun = 1,
+    Moon = 2,
+    Celestrial = 3,
+  };
+
+  enum class DrgState : uint8_t
+  {
+    None = 0,
+    BloodOfTheDragon = 1,
+    LifeOfTheDragon = 2,
+  };
+
+  enum class SamSen : uint8_t
+  {
+    None = 0,
+    Setsu = 1,
+    Getsu = 2,
+    Ka = 4,
+  };
+
+  enum class SchDismissedFairy : uint8_t
+  {
+    None = 0,
+    Eos = 6,
+    Selene = 7,
+  };
+
+  enum class SmnPet : uint8_t
+  {
+    None = 0,
+    Ifrit = 3,
+    Titan = 4,
+    Garuda = 5,
+  };
+
+  enum class SmnPetGlam : uint8_t
+  {
+    None = 0,
+    Emerald = 1,
+    Topaz = 2,
+    Ruby = 3,
+  };
+
+  enum class BrdSong : uint8_t
+  {
+    Mage = 5,
+    Army = 0x0A,
+    Wanderer = 0x0F,
+  };
+
+  union JobGauge
+  {
+    struct
+    {
+      uint8_t gauge_data[15];
+    } _raw;
+
+    struct
+    {
+      uint32_t unused;
+      AstCardType card;
+      AstSealType seals[3];
+    } ast;
+    struct
+    {
+      uint16_t timeUntilNextPolyglot;
+      uint16_t elementTimer;
+      uint8_t elementStance;
+      uint8_t umbralhearts;
+      uint8_t polyglotStacks;
+      uint8_t enochainState;
+    } blm;
+    struct
+    {
+      uint16_t songTimer;
+      uint8_t songStacks;
+      uint8_t unused;
+      BrdSong song;
+    } brd;
+    struct
+    {
+      uint8_t feathers;
+      uint8_t esprit;
+      uint8_t stepOrder[4];
+      uint8_t completeSteps;
+    } dnc;
+    struct
+    {
+      uint16_t dragonTimer;
+      DrgState dragonState;
+      uint8_t eyes;
+    } drg;
+    struct
+    {
+      uint8_t blood;
+      uint8_t unused;
+      uint16_t darksideTimer;
+      uint8_t darkArts;
+      uint8_t unused2;
+      uint16_t shadowTimer;
+    } drk;
+    struct
+    {
+      uint8_t ammo;
+      uint8_t unused;
+      uint16_t maxTimerDuration;
+      uint8_t ammoComboStep;
+    } gnb;
+    struct
+    {
+      uint16_t overheatTimer;
+      uint16_t robotTimer;
+      uint8_t heat;
+      uint8_t battery;
+      uint8_t lastRobotBatteryPower;
+      uint8_t activeTimerFlag;
+    } mch;
+    struct
+    {
+      uint8_t greasedLightningTimer;
+      uint8_t unused;
+      uint8_t greasedLightningStacks;
+      uint8_t chakra;
+      uint8_t greasedLightningTimerFreezed;
+    } mnk;
+    struct
+    {
+      uint32_t hutonTimer;
+      uint8_t tenChiJinMudrasUsed;
+      uint8_t ninki;
+      uint8_t hutonManualCasts;
+    } nin;
+    struct
+    {
+      uint8_t oathGauge;
+    } pld;
+    struct
+    {
+      uint8_t whiteGauge;
+      uint8_t blackGauge;
+    } rdm;
+    struct
+    {
+      uint16_t unused;
+      uint8_t unused2;
+      uint8_t kenki;
+      uint8_t meditationStacks;
+      SamSen sen;
+    } sam;
+    struct
+    {
+      uint16_t unused;
+      uint8_t aetherflowStacks;
+      uint8_t fairyGauge;
+      uint16_t seraphTimer;
+      SchDismissedFairy dismissedFairy;
+    } sch;
+    struct
+    {
+      uint16_t timer;
+      SmnPet returnSummon;
+      SmnPetGlam petGlam;
+      uint8_t stacks;
+    } smn;
+
+    struct
+    {
+      uint8_t beastGauge;
+    } war;
+    struct
+    {
+      uint16_t unused;
+      uint16_t lilyTimer;
+      uint8_t lilies;
+      uint8_t bloodLilies;
+    } whm;
   };
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;

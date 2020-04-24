@@ -974,6 +974,12 @@ namespace Sapphire::Entity
 
     Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
 
+    // Job UI
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    void gaugeClear();
+    void sendActorGauge();
+    void gaugeSetRaw( uint8_t* pData );
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
@@ -1085,6 +1091,8 @@ namespace Sapphire::Entity
     bool m_bInCombat;
     bool m_bLoadingComplete;
     bool m_bAutoattack;
+
+    Common::JobGauge m_gauge;
 
     Common::ZoneingType m_zoningType;
     uint32_t m_territoryId;
