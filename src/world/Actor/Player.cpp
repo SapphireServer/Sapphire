@@ -106,6 +106,8 @@ Sapphire::Entity::Player::Player() :
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
   m_actorSpawnIndexAllocator.init( MAX_DISPLAYED_ACTORS, true );
+
+  gaugeClear();
 }
 
 Sapphire::Entity::Player::~Player()
@@ -866,6 +868,9 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
   sendToInRangeSet( makeActorControl( getId(), ClassJobChange, 0x04 ), true );
 
   sendStatusUpdate();
+
+  gaugeClear();
+  sendActorGauge();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
@@ -2235,4 +2240,24 @@ bool Sapphire::Entity::Player::checkAction()
   }
 
   return true;
+}
+
+void Sapphire::Entity::Player::gaugeClear()
+{
+  std::memset( &m_gauge, 0, sizeof( m_gauge ) );
+}
+
+void Sapphire::Entity::Player::sendActorGauge()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcActorGauge >( getId() );
+  pPacket->data().classJobId = static_cast< uint8_t >( getClass() );
+  std::memcpy( pPacket->data().data, &m_gauge, 15 );
+
+  queuePacket( pPacket );
+}
+
+void Sapphire::Entity::Player::gaugeSetRaw( uint8_t* pData )
+{
+  std::memcpy( &m_gauge, pData, 15 );
+  sendActorGauge();
 }
