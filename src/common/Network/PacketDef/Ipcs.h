@@ -70,7 +70,7 @@ namespace Sapphire::Network::Packets
     CFPlayerInNeed = 0xF07F,
     CFPreferredRole = 0x0186, // added 5.25
 
-    SocialRequestError = 0x00AD,
+    SocialRequestError = 0xF0AD,
 
     CFRegistered = 0x00B8, // updated 4.1
     SocialRequestResponse = 0x00BB, // updated 4.1
@@ -133,7 +133,7 @@ namespace Sapphire::Network::Packets
     AoeEffect32 = 0x0376, // updated 5.21 hotfix
     PersistantEffect = 0x032E, // updated 5.25
 
-    GCAffiliation = 0x0000,//0x016F, // updated 5.0
+    GCAffiliation = 0xF16F, // updated 5.0
 
     PlayerSpawn = 0x00B9, // updated 5.25
     NpcSpawn = 0x038D, // updated 5.25
