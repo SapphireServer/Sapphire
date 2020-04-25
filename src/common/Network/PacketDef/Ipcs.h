@@ -288,11 +288,11 @@ namespace Sapphire::Network::Packets
 
     FinishLoadingHandler = 0x008A, // updated 5.25
 
-    CFCommenceHandler = 0x0078, // updated 5.21 hotfix
+    CFCommenceHandler = 0x0228, // updated 5.25
 
 
-    CFRegisterDuty = 0x0118, // updated 5.21 hotfix
-    CFRegisterRoulette = 0x037A, // updated 5.21 hotfix
+    CFRegisterDuty = 0x0180, // updated 5.25
+    CFRegisterRoulette = 0x0395, // updated 5.25
     PlayTimeHandler = 0x02FE, // updated 5.25
     LogoutHandler = 0x00B7, // updated 5.25
     CancelLogout = 0x008F, // updated 5.1
