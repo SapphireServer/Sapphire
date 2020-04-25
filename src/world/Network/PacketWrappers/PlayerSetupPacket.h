@@ -25,6 +25,8 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player )
     {
+      memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.pvpLevel ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
+
       m_data.contentId = player.getContentId();
 
       // TODO: Support rested experience.
@@ -50,7 +52,7 @@ namespace Sapphire::Network::Packets::Server
       memset( &m_data.name[ 0 ], 0, sizeof( m_data.name ) );
       strcpy( &m_data.name[ 0 ], player.getName().c_str() );
 
-      memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
+      //memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
 
       // Set the class levels and exp.
       for( uint8_t i = 0; i < 25; i++ )
@@ -59,17 +61,16 @@ namespace Sapphire::Network::Packets::Server
         m_data.exp[ i ] = player.getExpArray()[ i ];
       }
 
-      memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
+      //memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
 
       //memcpy( m_data.mountGuideMask, player.getMountGuideBitmask(), sizeof( m_data.mountGuideMask ) );
       memset( m_data.mountGuideMask, 255, sizeof( m_data.mountGuideMask ) );
-
+      
       //memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
-      memset( m_data.unlockBitmask, 255, sizeof( m_data.unlockBitmask ) );
 
-      memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
+      //memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
 
-      memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
+      //memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
 
       // possibly max level or current level
       m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
@@ -80,11 +81,11 @@ namespace Sapphire::Network::Packets::Server
   //      m_data.unknown70[4] = 1; // enable df
 
       // enable all raids/guildhests/dungeons
-      //memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
-      //memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
-      //memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
-      //memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
-      //memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+      memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
+      memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
+      memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
+      memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
+      memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
     };
   };
 
