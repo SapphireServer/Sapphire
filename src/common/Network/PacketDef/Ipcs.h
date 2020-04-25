@@ -93,7 +93,7 @@ namespace Sapphire::Network::Packets
     ServerNotice = 0x00E9, // updated 5.25
     SetOnlineStatus = 0x0381, // updated 5.25
 
-    CountdownInitiate = 0x0309, // updated 5.11
+    CountdownInitiate = 0x0237, // updated 5.25
     CountdownCancel = 0x00D9, // updated 5.18
 
     PlayerAddedToBlacklist = 0x033F, // updated 5.1
@@ -234,17 +234,17 @@ namespace Sapphire::Network::Packets
     YardObjectSpawn = 0x0236, // updated 5.0
     HousingIndoorInitialize = 0x0237, // updated 5.0
     LandPriceUpdate = 0x0238, // updated 5.0
-    LandInfoSign = 0x0239, // updated 5.0
+    LandInfoSign = 0x037F, // updated 5.25
     LandRename = 0x023A, // updated 5.0
     HousingEstateGreeting = 0x023B, // updated 5.0
     HousingUpdateLandFlagsSlot = 0x023C, // updated 5.0
     HousingLandFlags = 0x0177, // updated 5.25
     HousingShowEstateGuestAccess = 0x023E, // updated 5.0
 
-    HousingObjectInitialize = 0x0240, // updated 5.0
+    HousingObjectInitialize = 0x0333, // updated 5.25
     HousingInternalObjectSpawn = 0x241, // updated 5.0
 
-    HousingWardInfo = 0x0243, // updated 5.0
+    HousingWardInfo = 0x01D1, // updated 5.25
     HousingObjectMove = 0x0244, // updated 5.0
 
     SharedEstateSettingsResponse = 0x0245, // updated 4.5
@@ -293,7 +293,7 @@ namespace Sapphire::Network::Packets
 
     CFRegisterDuty = 0x0118, // updated 5.21 hotfix
     CFRegisterRoulette = 0x037A, // updated 5.21 hotfix
-    PlayTimeHandler = 0x0276, // updated 5.1
+    PlayTimeHandler = 0x02FE, // updated 5.25
     LogoutHandler = 0x00B7, // updated 5.25
     CancelLogout = 0x008F, // updated 5.1
 
@@ -329,8 +329,8 @@ namespace Sapphire::Network::Packets
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x0135, // updated 5.0
-    ReqCountdownCancel = 0x0136, // updated 5.0
+    ReqCountdownInitiate = 0x009A, // updated 5.25
+    ReqCountdownCancel = 0x0244, // updated 5.25
 
     ZoneLineHandler = 0x0214, // updated 5.25
     ClientTrigger = 0x017D, // updated 5.25
@@ -368,7 +368,7 @@ namespace Sapphire::Network::Packets
 
     LandRenameHandler = 0xF177, // updated 5.0
     HousingUpdateHouseGreeting = 0x0178, // updated 5.0
-    HousingUpdateObjectPosition = 0xF179, // updated 5.0
+    HousingUpdateObjectPosition = 0x0159, // updated 5.25
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 
