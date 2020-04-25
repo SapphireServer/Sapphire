@@ -584,8 +584,8 @@ namespace Sapphire::Common
     StatusEffect = 10,
     WARGauge = 22,
     DRKGauge = 25,
-//    AetherflowStack = 30,
-//    Status = 32,
+    //    AetherflowStack = 30,
+    //    Status = 32,
     SAMKenki = 39,
     SAMSen = 40,
     PLDGauge = 41,
@@ -593,9 +593,9 @@ namespace Sapphire::Common
     WHMBloodLily = 56,
     WHMLily = 57,
     SAMMeditation = 63,
-//    RDMGaugeBoth = 74,
-////  RDMGaugeBlack = 75, // not right?
-//    DRGGauge3Eyes = 76,
+    //    RDMGaugeBoth = 74,
+    ////  RDMGaugeBlack = 75, // not right?
+    //    DRGGauge3Eyes = 76,
   };
 
   enum class AttackType : int8_t

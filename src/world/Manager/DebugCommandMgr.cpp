@@ -366,8 +366,9 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     uint8_t values[15];
     std::memset( values, 0, sizeof( values ) );
     sscanf( params.c_str(), "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-      &values[0], &values[1], &values[2], &values[3], &values[4], &values[5], &values[6], &values[7], &values[8],
-      &values[9], &values[10], &values[11], &values[12], &values[13], &values[14] );
+            &values[ 0 ], &values[ 1 ], &values[ 2 ], &values[ 3 ], &values[ 4 ],
+            &values[ 5 ], &values[ 6 ], &values[ 7 ], &values[ 8 ], &values[ 9 ],
+            &values[ 10 ], &values[ 11 ], &values[ 12 ], &values[ 13 ], &values[ 14 ] );
     player.gaugeSetRaw( values );
   }
   else if( subCommand == "visual" )
