@@ -69,7 +69,7 @@ namespace Sapphire::Network::Packets
     CFDutyInfo = 0x007A,
     CFPlayerInNeed = 0xF07F,
     CFPreferredRole = 0x0186, // added 5.25
-
+    CFCancel = 0x00B7, // updated 5.25
     SocialRequestError = 0xF0AD,
 
     CFRegistered = 0x00B8, // updated 4.1
@@ -119,9 +119,9 @@ namespace Sapphire::Network::Packets
     CharaFreeCompanyTag = 0x013B, // updated 4.5
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
     FreeCompanyInfo = 0x0000,//0x013D, // updated 4.5
-    ExamineFreeCompanyInfo = 0x013E, // updated 4.5
+    ExamineFreeCompanyInfo = 0xF13E, // updated 4.5
 
-    FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
+    FreeCompanyUpdateShortMessage = 0xF157, // added 5.0
 
     StatusEffectList = 0x01D7, // updated 5.25
     EurekaStatusEffectList = 0x0167, // updated 5.18
@@ -177,13 +177,13 @@ namespace Sapphire::Network::Packets
     InventoryActionAck = 0x01AE, // updated 5.25
     UpdateInventorySlot = 0x0151, // updated 5.25
 
-    HuntingLogEntry = 0x01B3, // updated 5.0
+    HuntingLogEntry = 0xF1B3, // updated 5.0
 
     EventPlay = 0x02C3, // updated 5.25
     EventPlay4 = 0x029A, // updated 5.25
     EventPlay8 = 0x0119, // updated 5.18
     EventPlay16 = 0x01FB, // updated 5.18
-    EventPlay32 = 0x017D, // updated 5.21
+    EventPlay32 = 0x02D9, // updated 5.25
     EventPlay64 = 0x00E5, // updated 5.18
     EventPlay128 = 0x02BE, // updated 5.18
     EventPlay255 = 0x01AC, // updated 5.25
@@ -290,7 +290,7 @@ namespace Sapphire::Network::Packets
 
     CFCommenceHandler = 0x0228, // updated 5.25
 
-
+    CFCancelHandler = 0x013E, // updated 5.25
     CFRegisterDuty = 0x0180, // updated 5.25
     CFRegisterRoulette = 0x0395, // updated 5.25
     PlayTimeHandler = 0x02FE, // updated 5.25
