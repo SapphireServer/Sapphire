@@ -61,7 +61,7 @@ namespace Sapphire::Network::Packets
 
     ///////////////////////////////////////////////////
 
-    ChatBanned = 0x006B,
+    ChatBanned = 0xF06B,
     Playtime = 0x0286, // updated 5.25
     Logout = 0x00CD, // updated 5.25
     CFNotify = 0x0145, // updated 5.25
@@ -69,7 +69,7 @@ namespace Sapphire::Network::Packets
     CFDutyInfo = 0x007A,
     CFPlayerInNeed = 0xF07F,
     CFPreferredRole = 0x0186, // added 5.25
-
+    CFCancel = 0x00B7, // updated 5.25
     SocialRequestError = 0xF0AD,
 
     CFRegistered = 0x00B8, // updated 4.1
@@ -80,7 +80,7 @@ namespace Sapphire::Network::Packets
 
     Chat = 0x0161, // updated 5.25
 
-    WorldVisitList = 0x00FE, // added 4.5
+    WorldVisitList = 0xF0FE, // added 4.5
 
     SocialList = 0x0269, // updated 5.25
 
@@ -93,7 +93,7 @@ namespace Sapphire::Network::Packets
     ServerNotice = 0x00E9, // updated 5.25
     SetOnlineStatus = 0x0381, // updated 5.25
 
-    CountdownInitiate = 0x0309, // updated 5.11
+    CountdownInitiate = 0x0237, // updated 5.25
     CountdownCancel = 0x00D9, // updated 5.18
 
     PlayerAddedToBlacklist = 0x033F, // updated 5.1
@@ -102,7 +102,7 @@ namespace Sapphire::Network::Packets
 
     LinkshellList = 0x00A9, // updated 5.25
 
-    MailDeleteRequest = 0x012B, // updated 5.0
+    MailDeleteRequest = 0xF12B, // updated 5.0
 
     // 12D - 137 - constant gap between 4.5x -> 5.0
     ReqMoogleMailList = 0x0138, // updated 5.0
@@ -118,10 +118,10 @@ namespace Sapphire::Network::Packets
 
     CharaFreeCompanyTag = 0x013B, // updated 4.5
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
-    FreeCompanyInfo = 0x013D, // updated 4.5
-    ExamineFreeCompanyInfo = 0x013E, // updated 4.5
+    FreeCompanyInfo = 0xF13D, // updated 4.5
+    ExamineFreeCompanyInfo = 0xF13E, // updated 4.5
 
-    FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
+    FreeCompanyUpdateShortMessage = 0xF157, // added 5.0
 
     StatusEffectList = 0x01D7, // updated 5.25
     EurekaStatusEffectList = 0x0167, // updated 5.18
@@ -177,13 +177,13 @@ namespace Sapphire::Network::Packets
     InventoryActionAck = 0x01AE, // updated 5.25
     UpdateInventorySlot = 0x0151, // updated 5.25
 
-    HuntingLogEntry = 0x01B3, // updated 5.0
+    HuntingLogEntry = 0xF1B3, // updated 5.0
 
     EventPlay = 0x02C3, // updated 5.25
     EventPlay4 = 0x029A, // updated 5.25
     EventPlay8 = 0x0119, // updated 5.18
     EventPlay16 = 0x01FB, // updated 5.18
-    EventPlay32 = 0x017D, // updated 5.21
+    EventPlay32 = 0x02D9, // updated 5.25
     EventPlay64 = 0x00E5, // updated 5.18
     EventPlay128 = 0x02BE, // updated 5.18
     EventPlay255 = 0x01AC, // updated 5.25
@@ -213,7 +213,7 @@ namespace Sapphire::Network::Packets
     SomeDirectorUnk4 = 0x01F3, // updated 5.21 hotfix
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
-    DirectorPopUp = 0x0162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
+    DirectorPopUp = 0xF162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
     DirectorPopUp4 = 0x0214, // updated 5.18
     DirectorPopUp8 = 0x00F8, // updated 5.18
 
@@ -234,17 +234,17 @@ namespace Sapphire::Network::Packets
     YardObjectSpawn = 0x0236, // updated 5.0
     HousingIndoorInitialize = 0x0237, // updated 5.0
     LandPriceUpdate = 0x0238, // updated 5.0
-    LandInfoSign = 0x0239, // updated 5.0
+    LandInfoSign = 0x037F, // updated 5.25
     LandRename = 0x023A, // updated 5.0
     HousingEstateGreeting = 0x023B, // updated 5.0
     HousingUpdateLandFlagsSlot = 0x023C, // updated 5.0
     HousingLandFlags = 0x0177, // updated 5.25
     HousingShowEstateGuestAccess = 0x023E, // updated 5.0
 
-    HousingObjectInitialize = 0x0240, // updated 5.0
+    HousingObjectInitialize = 0x0333, // updated 5.25
     HousingInternalObjectSpawn = 0x241, // updated 5.0
 
-    HousingWardInfo = 0x0243, // updated 5.0
+    HousingWardInfo = 0x01D1, // updated 5.25
     HousingObjectMove = 0x0244, // updated 5.0
 
     SharedEstateSettingsResponse = 0x0245, // updated 4.5
@@ -288,12 +288,12 @@ namespace Sapphire::Network::Packets
 
     FinishLoadingHandler = 0x008A, // updated 5.25
 
-    CFCommenceHandler = 0x0078, // updated 5.21 hotfix
+    CFCommenceHandler = 0x0228, // updated 5.25
 
-
-    CFRegisterDuty = 0x0118, // updated 5.21 hotfix
-    CFRegisterRoulette = 0x037A, // updated 5.21 hotfix
-    PlayTimeHandler = 0x0276, // updated 5.1
+    CFCancelHandler = 0x013E, // updated 5.25
+    CFRegisterDuty = 0x0180, // updated 5.25
+    CFRegisterRoulette = 0x0395, // updated 5.25
+    PlayTimeHandler = 0x02FE, // updated 5.25
     LogoutHandler = 0x00B7, // updated 5.25
     CancelLogout = 0x008F, // updated 5.1
 
@@ -329,8 +329,8 @@ namespace Sapphire::Network::Packets
 
     ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
-    ReqCountdownInitiate = 0x0135, // updated 5.0
-    ReqCountdownCancel = 0x0136, // updated 5.0
+    ReqCountdownInitiate = 0x009A, // updated 5.25
+    ReqCountdownCancel = 0x0244, // updated 5.25
 
     ZoneLineHandler = 0x0214, // updated 5.25
     ClientTrigger = 0x017D, // updated 5.25
@@ -368,7 +368,7 @@ namespace Sapphire::Network::Packets
 
     LandRenameHandler = 0xF177, // updated 5.0
     HousingUpdateHouseGreeting = 0x0178, // updated 5.0
-    HousingUpdateObjectPosition = 0xF179, // updated 5.0
+    HousingUpdateObjectPosition = 0x0159, // updated 5.25
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 
