@@ -1999,6 +1999,12 @@ namespace Sapphire::Network::Packets::Server
     uint32_t padding;
   };
 
+  struct FFXIVIpcCFCancel : FFXIVIpcBasePacket< CFCancel >
+  {
+    uint32_t cancelReason;
+    uint32_t unknown2;
+  };
+
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/

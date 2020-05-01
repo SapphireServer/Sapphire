@@ -66,10 +66,15 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
   player.sendDebug( "Duty register request for contentid#{0}", contentId );
 
   // let's cancel it because otherwise you can't register it again
+  /*
   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
   cfCancelPacket->data().state1 = 3;
   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
   queueOutPacket( cfCancelPacket );
+  */
+  auto packet = makeZonePacket< FFXIVIpcCFCancel >( player.getId() );
+  packet->data().cancelReason = 890;
+  queueOutPacket( packet );
 
   auto cfCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentId );
   if( !cfCondition )
@@ -90,10 +95,15 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
 void Sapphire::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
+  /*
   auto cfCancelPacket = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
   cfCancelPacket->data().state1 = 3;
   cfCancelPacket->data().state2 = 1; // Your registration is withdrawn.
   queueOutPacket( cfCancelPacket );
+  */
+  auto packet = makeZonePacket< FFXIVIpcCFCancel >( player.getId() );
+  packet->data().cancelReason = 890;
+  queueOutPacket( packet );
 
   player.sendDebug( "Roulette register" );
 }
@@ -102,4 +112,12 @@ void Sapphire::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_
                                                         Entity::Player& player )
 {
   player.sendDebug( "TODO: Duty accept" );
+}
+
+void Sapphire::Network::GameConnection::cfCancel( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+  Entity::Player& player )
+{
+  auto packet = makeZonePacket< FFXIVIpcCFCancel >( player.getId() );
+  packet->data().cancelReason = 890;
+  queueOutPacket( packet );
 }
