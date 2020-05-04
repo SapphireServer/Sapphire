@@ -143,6 +143,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( eventHandlerShop );
 
+    DECLARE_HANDLER( eventHandlerMapInteraction );
+
     DECLARE_HANDLER( eventHandlerLinkshell );
 
     DECLARE_HANDLER( logoutHandler );

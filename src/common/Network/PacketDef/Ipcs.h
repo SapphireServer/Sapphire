@@ -376,6 +376,7 @@ namespace Sapphire::Network::Packets
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
+    MapInteractionHandler = 0x0285, // updated 5.25
   };
 
   ////////////////////////////////////////////////////////////////////////////////

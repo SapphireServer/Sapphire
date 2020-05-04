@@ -8,6 +8,9 @@
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
+#include <Network/CommonActorControl.h>
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
@@ -271,6 +274,58 @@ void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVAR
   player.eventStart( player.getId(), eventId, Event::EventHandler::UI, 0, packet.data().param );
 
   scriptMgr.onTalk( player, player.getId(), eventId );
+}
+
+void Sapphire::Network::GameConnection::eventHandlerMapInteraction( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+  Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMapInteractionHandler >( inPacket );
+  if( packet.data().action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
+  {
+    // looks like shit but IT WORKS.
+    auto x = packet.data().position.x;
+    auto z = packet.data().position.z;
+    if( x < -448 && x > -453 )
+    {
+      // west
+      if( x > -451 )
+      {
+        // enter
+        auto p = makeActorControl( player.getId(), 242, 1174189454, 817758208, 67, 0 );
+        queueOutPacket( p );
+        player.addStatusEffectById( 1945, 0, player, 0, true );
+      }
+      else
+      {
+        // exit
+        auto p = makeActorControl( player.getId(), 242, 1182315916, 827392000, 68, 0 );
+        queueOutPacket( p );
+        player.removeSingleStatusEffectById( 1945 );
+      }
+    }
+    else if ( x > 637 && x < 641 )
+    {
+      // east
+      if( z > -188 )
+      {
+        // enter
+        auto p = makeActorControl( player.getId(), 242, 3521816124, 1737687040, 69, 0 );
+        queueOutPacket( p );
+        player.addStatusEffectById( 1945, 0, player, 0, true );
+      }
+      else
+      {
+        // exit
+        auto p = makeActorControl( player.getId(), 242, 3517228601, 1749483520, 70, 0 );
+        queueOutPacket( p );
+        player.removeSingleStatusEffectById( 1945 );
+      }
+    }
+    else
+    {
+      player.sendDebug( "Unknown dwarf house." );
+    }
+  }
 }
 
 

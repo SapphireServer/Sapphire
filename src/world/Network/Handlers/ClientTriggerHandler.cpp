@@ -489,7 +489,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", param12, param2 );
       break;
     }
-
+    case ClientTriggerType::Trigger612:
+    {
+      player.sendStateFlags();
+      break;
+    }
     default:
     {
       Logger::debug( "[{0}] Unhandled action: {1:04X}", m_pSession->getId(), commandId );

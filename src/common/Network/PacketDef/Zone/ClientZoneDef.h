@@ -344,6 +344,16 @@ struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
   uint16_t unknown2;
 };
 
+struct FFXIVIpcMapInteractionHandler :
+  FFXIVIpcBasePacket< MapInteractionHandler >
+{
+  uint32_t action;
+  uint32_t unknown2;
+  uint64_t unknown3;
+  uint32_t unknown4;
+  Common::FFXIVARR_POSITION3 position;
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H

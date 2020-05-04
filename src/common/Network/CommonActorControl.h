@@ -395,6 +395,8 @@ namespace Sapphire::Network::ActorControl
 
     RequestEventBattle = 0x232C,
 
+    Trigger612 = 0x264,
+
     QuestJournalUpdateQuestVisibility = 0x2BE,
     QuestJournalClosed = 0x2BF,
 
