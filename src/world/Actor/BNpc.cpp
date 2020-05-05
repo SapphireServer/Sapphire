@@ -494,6 +494,12 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
                                           m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
 
+      if (pHatedActor && pHatedActor->getCurrentTerritory() != m_pCurrentTerritory )
+      {
+        hateListRemove( pHatedActor );
+        pHatedActor = hateListGetHighest();
+      }
+
       if( pHatedActor && !pHatedActor->isAlive() )
       {
         hateListRemove( pHatedActor );
