@@ -1417,6 +1417,8 @@ void Sapphire::Entity::Player::hateListAdd( BNpcPtr pBNpc )
     m_actorIdTohateSlotMap[ pBNpc->getId() ] = hateId;
     sendHateList();
   }
+
+  setInCombat(true);
 }
 
 void Sapphire::Entity::Player::hateListRemove( BNpcPtr pBNpc )
@@ -1431,6 +1433,7 @@ void Sapphire::Entity::Player::hateListRemove( BNpcPtr pBNpc )
       m_freeHateSlotQueue.push( hateSlot );
       m_actorIdTohateSlotMap.erase( it );
       sendHateList();
+      setInCombat( !m_actorIdTohateSlotMap.empty() );
 
       return;
     }
