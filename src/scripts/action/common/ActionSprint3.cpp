@@ -18,9 +18,20 @@ public:
     if( !sourceChara->isPlayer() )
       return;
 
+    int32_t duration;
+
+    if ( sourceChara->getAsPlayer()->isInCombat() )
+    {
+      duration = 10000;
+    }
+    else
+    {
+      duration = 20000;
+    }
+
     action.getEffectbuilder()->applyStatusEffect( sourceChara, 50, 30 );
 
-    sourceChara->getAsPlayer()->addStatusEffectByIdIfNotExist( 50, 20000, *sourceChara, 30 );
+    sourceChara->getAsPlayer()->addStatusEffectByIdIfNotExist( 50, duration, *sourceChara, 30 );
   }
 };
 
