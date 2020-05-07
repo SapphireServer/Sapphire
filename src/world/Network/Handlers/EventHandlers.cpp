@@ -280,7 +280,9 @@ void Sapphire::Network::GameConnection::eventHandlerMapInteraction( const Packet
   Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcMapInteractionHandler >( inPacket );
-  if( packet.data().action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
+  auto action = packet.data().action;
+  player.sendDebug( "MapInteraction {}", action );
+  if( action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
   {
     // looks like shit but IT WORKS.
     auto x = packet.data().position.x;
