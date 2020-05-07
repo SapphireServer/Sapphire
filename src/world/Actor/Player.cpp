@@ -1608,11 +1608,14 @@ void Sapphire::Entity::Player::dismount()
 
 void Sapphire::Entity::Player::spawnCompanion( uint16_t id )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  if( id > 0 )
+  {
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto companion = exdData.get< Data::Companion >( id );
-  if( !id )
-    return;
+    auto companion = exdData.get< Data::Companion >( id );
+    if( !companion )
+      return;
+  }
 
   m_companionId = id;
   sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleCompanion, id ), true );

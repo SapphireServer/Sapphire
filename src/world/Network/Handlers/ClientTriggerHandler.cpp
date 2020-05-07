@@ -130,6 +130,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       player.spawnCompanion( static_cast< uint16_t >( param1 ) );
       break;
     }
+    case ClientTriggerType::DespawnCompanionReq:
+    {
+      player.spawnCompanion( 0 );
+      break;
+    }
     case ClientTriggerType::RemoveStatusEffect: // Remove status (clicking it off)
     {
       // todo: check if status can be removed by client from exd

@@ -350,6 +350,7 @@ namespace Sapphire::Network::ActorControl
 
     DismountReq = 0x65,
     SpawnCompanionReq = 0x66,
+    DespawnCompanionReq = 0x67,
     RemoveStatusEffect = 0x68,
     CastCancel = 0x69,
 
