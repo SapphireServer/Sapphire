@@ -21,6 +21,12 @@ namespace Sapphire::Network::Packets::Server
       initialize( slot, storageId, item );
     };
 
+    UpdateInventorySlotPacket( uint32_t playerId, uint8_t slot, uint16_t storageId ) :
+      ZoneChannelPacket< FFXIVIpcUpdateInventorySlot >( playerId, playerId )
+    {
+      initialize( slot, storageId );
+    };
+
   private:
     void initialize( uint8_t slot, uint16_t storageId, const Item& item )
     {
@@ -46,6 +52,15 @@ namespace Sapphire::Network::Packets::Server
       //uint8_t buffer3;
       //uint8_t buffer4;
       //uint8_t buffer5;
+    };
+
+    void initialize( uint8_t slot, uint16_t storageId )
+    {
+      m_data.sequence = 0;
+      m_data.containerId = storageId;
+      m_data.slot = slot;
+      m_data.quantity = 0;
+      m_data.catalogId = 0;
     };
   };
 
