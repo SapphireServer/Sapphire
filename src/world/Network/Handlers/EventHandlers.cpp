@@ -204,8 +204,8 @@ void Sapphire::Network::GameConnection::eventHandlerReturn( const Packets::FFXIV
 
   std::string eventName = eventMgr.getEventName( eventId );
 
-  player.sendDebug( "eventId: {0} ({0:08X}) scene: {1}, p1: {2}, p2: {3}, p3: {4}",
-                    eventId, scene, param1, param2, param3 );
+  player.sendDebug( "eventId: {0} ({0:08X}) scene: {1}, p1: {2}, p2: {3}, p3: {4}, p4: {5}",
+                    eventId, scene, param1, param2, param3, param4 );
 
   auto pEvent = player.getEvent( eventId );
   if( pEvent )

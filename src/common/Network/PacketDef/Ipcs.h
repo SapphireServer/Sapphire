@@ -209,7 +209,7 @@ namespace Sapphire::Network::Packets
 
     DirectorVars = 0x00E6, // updated 5.18
     SomeDirectorUnk1 = 0x0084, // updated 5.18
-    SomeDirectorUnk2 = 0x00C1, // updated 5.18
+    SomeDirectorUnk2 = 0xF0C1, // updated 5.18
     SomeDirectorUnk4 = 0x01F3, // updated 5.21 hotfix
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
@@ -376,6 +376,8 @@ namespace Sapphire::Network::Packets
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
+
+    ShopMessage = 0x00C1, // updated 5.25
   };
 
   ////////////////////////////////////////////////////////////////////////////////
