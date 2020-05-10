@@ -45,7 +45,7 @@ namespace Sapphire::Event
       TableGame = 24,
     };
 
-    enum EventHandlerType : uint16_t
+    enum class EventHandlerType : uint16_t
     {
       Quest = 0x0001,
       Warp = 0x0002,
