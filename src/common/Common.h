@@ -159,44 +159,46 @@ namespace Sapphire::Common
     ModelRing2 = 9
   };
 
-  enum EquipSlotCategory : uint8_t
+  enum class EquipSlotCategory : uint8_t
   {
-    Unequippable = 0,
-
     // main slots
 
-    CharaMainHand = 1,
-    CharaOffHand = 2,
-    CharaHead = 3,
-    CharaBody = 4,
-    CharaHands = 5,
-    CharaWaist = 6,
-    CharaLegs = 7,
-    CharaFeet = 8,
-    CharaEars = 9,
-    CharaNeck = 10,
-    CharaWrist = 11,
-    CharaRing = 12,
-    CharaSoulCrystal = 17,
+    CharaMainHand = 0,
+    CharaOffHand = 1,
+    CharaHead = 2,
+    CharaBody = 3,
+    CharaHands = 4,
+    CharaWaist = 5,
+    CharaLegs = 6,
+    CharaFeet = 7,
+    CharaEars = 8,
+    CharaNeck = 9,
+    CharaWrist = 10,
+    CharaRing = 11,
+    CharaSoulCrystal = 12,
 
-    // specials
-
+    /* following slots not seem to exist any more.
+       when multi-slot gear is moved into equipment slot, normal slot listed above is used.
+       client will move any incompatible gears into armory but no InventoryModifiyHandler is sent.
+       server need to move those silently in order to sync with client.
+    */
+    
     /*! Cannot equip gear to offhand slot */
-      MainTwoHandedWeapon = 13,
+      //MainTwoHandedWeapon = 13,
     /*! Can be equipped in either main or offhand slot */
-      MainOrOffHand = 14, // unused
+      //MainOrOffHand = 14, // unused
     /*! Cannot equip gear to head */
-      BodyDisallowHead = 15,
+      //BodyDisallowHead = 15,
     /*! Cannot equip gear to hands, legs and feet slots */
-      BodyDisallowHandsLegsFeet = 16,
+      //BodyDisallowHandsLegsFeet = 16,
     /*! Cannot equip gear to feet slot */
-      LegsDisallowFeet = 18,
+      //LegsDisallowFeet = 18,
     /*! Cannot equp gear to head, hands, legs, feet slots */
-      BodyDisallowAll = 19,
+      //BodyDisallowAll = 19,
     /*! Cannot equip gear to hands slot */
-      BodyDisallowHands = 20,
+      //BodyDisallowHands = 20,
     /*! Cannot equip gear to legs & feet slots */
-      BodyDisallowLegsFeet = 21,
+      //BodyDisallowLegsFeet = 21,
   };
 
   enum InventoryType : uint16_t
@@ -226,8 +228,8 @@ namespace Sapphire::Common
     ArmoryWaist = 3204,
     ArmoryLegs = 3205,
     ArmoryFeet = 3206,
-    ArmoryNeck = 3207,
-    ArmoryEar = 3208,
+    ArmoryEar = 3207,
+    ArmoryNeck = 3208,
     ArmoryWrist = 3209,
     ArmoryRing = 3300,
 
