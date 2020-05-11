@@ -27,56 +27,56 @@ bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 }
 
 
-uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
+uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( Common::EquipSlotCategory slot )
 {
 
-  switch( slotId )
+  switch( slot )
   {
-    case Common::CharaHead:
+    case Common::EquipSlotCategory::CharaHead:
       return Common::ArmoryHead;
 
-    case Common::CharaBody:
-    case Common::BodyDisallowHead:
-    case Common::BodyDisallowHandsLegsFeet:
-    case Common::BodyDisallowAll:
-    case Common::BodyDisallowHands:
-    case Common::BodyDisallowLegsFeet:
+    case Common::EquipSlotCategory::CharaBody:
+    //case Common::EquipSlotCategory::BodyDisallowHead:
+    //case Common::EquipSlotCategory::BodyDisallowHandsLegsFeet:
+    //case Common::EquipSlotCategory::BodyDisallowAll:
+    //case Common::EquipSlotCategory::BodyDisallowHands:
+    //case Common::EquipSlotCategory::BodyDisallowLegsFeet:
       return Common::ArmoryBody;
 
-    case Common::CharaEars:
+    case Common::EquipSlotCategory::CharaEars:
       return Common::ArmoryEar;
 
-    case Common::CharaFeet:
+    case Common::EquipSlotCategory::CharaFeet:
       return Common::ArmoryFeet;
 
-    case Common::CharaHands:
+    case Common::EquipSlotCategory::CharaHands:
       return Common::ArmoryHand;
 
-    case Common::CharaLegs:
-    case Common::LegsDisallowFeet:
+    case Common::EquipSlotCategory::CharaLegs:
+    //case Common::EquipSlotCategory::LegsDisallowFeet:
       return Common::ArmoryLegs;
 
-    case Common::CharaMainHand:
-    case Common::MainTwoHandedWeapon:
-    case Common::MainOrOffHand:
+    case Common::EquipSlotCategory::CharaMainHand:
+    //case Common::EquipSlotCategory::MainTwoHandedWeapon:
+    //case Common::EquipSlotCategory::MainOrOffHand:
       return Common::ArmoryMain;
 
-    case Common::CharaOffHand:
+    case Common::EquipSlotCategory::CharaOffHand:
       return Common::ArmoryOff;
 
-    case Common::CharaRing:
+    case Common::EquipSlotCategory::CharaRing:
       return Common::ArmoryRing;
 
-    case Common::CharaWaist:
+    case Common::EquipSlotCategory::CharaWaist:
       return Common::ArmoryWaist;
 
-    case Common::CharaWrist:
+    case Common::EquipSlotCategory::CharaWrist:
       return Common::ArmoryWrist;
 
-    case Common::CharaNeck:
+    case Common::EquipSlotCategory::CharaNeck:
       return Common::ArmoryNeck;
 
-    case Common::CharaSoulCrystal:
+    case Common::EquipSlotCategory::CharaSoulCrystal:
       return Common::ArmorySoulCrystal;
 
     default:

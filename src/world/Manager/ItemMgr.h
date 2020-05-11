@@ -20,7 +20,7 @@ namespace Sapphire::World::Manager
     static bool isOneHandedWeapon( Common::ItemUICategory weaponCategory );
     static bool isArmory( uint16_t containerId );
     static bool isEquipment( uint16_t containerId );
-    static uint16_t getCharaEquipSlotCategoryToArmoryId( uint8_t slotId );
+    static uint16_t getCharaEquipSlotCategoryToArmoryId( Common::EquipSlotCategory slot );
     static Common::ContainerType getContainerType( uint32_t containerId );
   };
 
