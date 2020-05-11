@@ -12,6 +12,7 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
+#include "Inventory/Item.h"
 #include "Territory/Territory.h"
 #include "ServerMgr.h"
 
@@ -147,19 +148,49 @@ void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, ui
   openGilShopPacket->data().actorId = getId();
   switch( param1 )
   {
+    case 0:
+    {
+      openGilShopPacket->data().paramSize = 0xA1;
+      break;
+    }
     case 1:
     {
-      openGilShopPacket->data().params[ 0 ] = 0x02;
-      openGilShopPacket->data().params[ 1 ] = 1;
-      openGilShopPacket->data().params[ 2 ] = 0x64;
+      openGilShopPacket->data().paramSize = 0x02;
+      openGilShopPacket->data().params[ 0 ] = 1;
+      openGilShopPacket->data().params[ 1 ] = 0x64;
       break;
     }
     case 2:
     {
-      openGilShopPacket->data().params[ 0 ] = 0xA2;
-      openGilShopPacket->data().params[ 1 ] = 2;
+      openGilShopPacket->data().paramSize = 0xA2;
+      openGilShopPacket->data().params[ 0 ] = 2;
       break;
     }
+    case 3:
+    {
+      openGilShopPacket->data().paramSize = 0xA2;
+      openGilShopPacket->data().params[ 0 ] = 3;
+      openGilShopPacket->data().params[ 1 ] = 0x64;
+      break;
+    }
+  }
+
+  auto& buyBackList = getBuyBackListForShop( eventId );
+  int index = param1 == 0 ? 1 : 2;
+  for( auto& entry : buyBackList )
+  {
+    if( index >= openGilShopPacket->data().paramSize )
+      break;
+    openGilShopPacket->data().params[ index++ ] = entry.item->getId();
+    openGilShopPacket->data().params[ index++ ] = entry.amount;
+    openGilShopPacket->data().params[ index++ ] = entry.value;
+    index += 2;
+    openGilShopPacket->data().params[ index++ ] = eventId;
+    index += 2;
+    openGilShopPacket->data().params[ index++ ] = ( ( entry.item->getDurability() << 16 ) + static_cast< uint16_t >( entry.item->isHq() ? 1 : 0 ) );
+    openGilShopPacket->data().params[ index++ ] = ( ( entry.item->getStain() << 16 ) + entry.item->getSpiritbond() );
+    openGilShopPacket->data().params[ index++ ] = 0; // glamour
+    index += 5;
   }
 
   openGilShopPacket->data().scene = 10;

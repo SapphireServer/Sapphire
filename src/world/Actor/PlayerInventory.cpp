@@ -521,15 +521,13 @@ void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
 
 bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
-
   return true;
 }
 
-
-Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent, bool canMerge )
+Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool silent, bool canMerge )
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto itemInfo = exdData.get< Sapphire::Data::Item >( catalogId );
+  auto itemInfo = exdData.get< Sapphire::Data::Item >( itemToAdd->getId() );
 
   // if item data doesn't exist or it's a blank field
   if( !itemInfo || itemInfo->levelItem == 0 )
@@ -537,10 +535,10 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
     return nullptr;
   }
 
-  quantity = std::min< uint32_t >( quantity, itemInfo->stackSize );
+  itemToAdd->setStackSize( std::min< uint32_t >( itemToAdd->getStackSize(), itemInfo->stackSize ) );
 
   // used for item obtain notification
-  uint32_t originalQuantity = quantity;
+  uint32_t originalQuantity = itemToAdd->getStackSize();
 
   std::pair< uint16_t, uint8_t > freeBagSlot;
   bool foundFreeSlot = false;
@@ -567,7 +565,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
       auto item = storage->getItem( slot );
 
       // add any items that are stackable
-      if( canMerge && item && !itemInfo->isEquippable && item->getId() == catalogId )
+      if( canMerge && item && !itemInfo->isEquippable && item->getId() == itemToAdd->getId() )
       {
         uint32_t count = item->getStackSize();
         uint32_t maxStack = item->getMaxStackSize();
@@ -577,18 +575,18 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
           continue;
 
         // check slot is same quality
-        if( item->isHq() != isHq )
+        if( item->isHq() != itemToAdd->isHq() )
           continue;
 
         // update stack
-        uint32_t newStackSize = count + quantity;
+        uint32_t newStackSize = count + itemToAdd->getStackSize();
         if( newStackSize > maxStack )
         {
-          quantity = newStackSize - maxStack;
+          itemToAdd->setStackSize( newStackSize - maxStack );
           newStackSize = maxStack;
         }
         else
-          quantity = 0;
+          itemToAdd->setStackSize( 0 );
 
         item->setStackSize( newStackSize );
         writeItem( item );
@@ -597,9 +595,9 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
         queuePacket( slotUpdate );
 
         // return existing stack if we have no overflow - items fit into a preexisting stack
-        if( quantity == 0 )
+        if( itemToAdd->getStackSize() == 0 )
         {
-          queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+          queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, itemToAdd->getId(), originalQuantity ) );
 
           auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
           soundEffectPacket->data().sequence = 0xFFFFFFFF;
@@ -622,21 +620,17 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
   if( !foundFreeSlot )
     return nullptr;
 
-  auto item = createItem( catalogId, quantity );
-  item->setHq( isHq );
-
   auto storage = m_storageMap[ freeBagSlot.first ];
-  storage->setItem( freeBagSlot.second, item );
+  storage->setItem( freeBagSlot.second, itemToAdd );
 
   writeInventory( static_cast< InventoryType >( freeBagSlot.first ) );
 
   if( !silent )
   {
-    auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first,
-                                                                      *item );
+    auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first, *itemToAdd );
     queuePacket( invUpdate );
 
-    queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+    queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, itemToAdd->getId(), originalQuantity ) );
 
     auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
     soundEffectPacket->data().sequence = 0xFFFFFFFF;
@@ -644,7 +638,15 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
     queuePacket( soundEffectPacket );
   }
 
-  return item;
+  return itemToAdd;
+}
+
+
+Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent, bool canMerge )
+{
+  auto item = createItem( catalogId, quantity );
+  item->setHq( isHq );
+  return addItem( item, silent, canMerge );
 }
 
 void
@@ -927,7 +929,7 @@ uint32_t Sapphire::Entity::Player::getNextInventorySequence()
   return m_inventorySequence++;
 }
 
-Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common::InventoryType type, uint16_t slotId )
+Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common::InventoryType type, uint16_t slotId, bool slient )
 {
   auto& container = m_storageMap[ type ];
 
@@ -938,6 +940,12 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
   // unlink item
   container->removeItem( slotId, false );
   updateContainer( type, slotId, nullptr );
+
+  if( !slient )
+  {
+    auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slotId, static_cast< uint16_t >( type ) );
+    queuePacket( invUpdate );
+  }
 
   auto seq = getNextInventorySequence();
 

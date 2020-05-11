@@ -42,7 +42,7 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   const auto actorId = packet.data().actorId;
   const auto eventId = packet.data().eventId;
 
-  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto eventType = static_cast< Event::EventHandler::EventHandlerType >( eventId >> 16 );
 
   std::string eventName = "onTalk";
   std::string objName = eventMgr.getEventName( eventId );
@@ -83,7 +83,7 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVA
   const auto actorId = packet.data().actorId;
   const auto eventId = packet.data().eventId;
   const auto emoteId = packet.data().emoteId;
-  const auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  const auto eventType = static_cast< Event::EventHandler::EventHandlerType >( eventId >> 16 );
 
   std::string eventName = "onEmote";
   std::string objName = eventMgr.getEventName( eventId );
@@ -204,8 +204,8 @@ void Sapphire::Network::GameConnection::eventHandlerReturn( const Packets::FFXIV
 
   std::string eventName = eventMgr.getEventName( eventId );
 
-  player.sendDebug( "eventId: {0} ({0:08X}) scene: {1}, p1: {2}, p2: {3}, p3: {4}",
-                    eventId, scene, param1, param2, param3 );
+  player.sendDebug( "eventId: {0} ({0:08X}) scene: {1}, p1: {2}, p2: {3}, p3: {4}, p4: {5}",
+                    eventId, scene, param1, param2, param3, param4 );
 
   auto pEvent = player.getEvent( eventId );
   if( pEvent )

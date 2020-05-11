@@ -33,6 +33,13 @@ namespace Sapphire::Entity
     }
   };
 
+  struct ShopBuyBackEntry
+  {
+    ItemPtr item;
+    uint32_t amount;
+    uint32_t value;
+  };
+
   /** Class representing the Player
   *  Inheriting from Actor
   *
@@ -921,7 +928,8 @@ namespace Sapphire::Entity
 
     InvSlotPair getFreeBagSlot();
 
-    Sapphire::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
+    ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
+    ItemPtr addItem( ItemPtr itemToAdd, bool slient = false, bool canMerge = true );
 
     void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
 
@@ -972,7 +980,7 @@ namespace Sapphire::Entity
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
 
-    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId );
+    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId, bool slient = false );
 
     // Job UI
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -995,6 +1003,10 @@ namespace Sapphire::Entity
     uint64_t m_lastMoveTime;
     uint8_t m_lastMoveflag;
     bool m_falling;
+
+    std::vector< ShopBuyBackEntry >& getBuyBackListForShop( uint32_t shopId );
+    void addBuyBackItemForShop( uint32_t shopId, const ShopBuyBackEntry& entry );
+    void clearBuyBackMap();
 
   private:
     uint32_t m_lastWrite;
@@ -1137,7 +1149,7 @@ namespace Sapphire::Entity
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
-
+    std::unordered_map< uint32_t, std::vector< ShopBuyBackEntry > > m_shopBuyBackMap;
   };
 
 }
