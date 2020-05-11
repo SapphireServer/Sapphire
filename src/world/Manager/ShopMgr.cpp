@@ -92,15 +92,15 @@ bool Sapphire::World::Manager::ShopMgr::shopBuyBack( Sapphire::Entity::Player& p
   if( buyBackList.size() > index )
   {
     auto& entry = buyBackList[ index ];
-    if( player.getCurrency( Common::CurrencyType::Gil ) < entry.value )
-      return false;
-
     auto originalStack = entry.item->getStackSize();
+    auto price = entry.pricePerItem * originalStack;
+    if( player.getCurrency( Common::CurrencyType::Gil ) < price )
+      return false;
 
     if( !player.addItem( entry.item ) )
       return false;
 
-    player.removeCurrency( Common::CurrencyType::Gil, entry.value );
+    player.removeCurrency( Common::CurrencyType::Gil, price );
 
     buyBackList.erase( buyBackList.begin() + index );
 
@@ -110,7 +110,7 @@ bool Sapphire::World::Manager::ShopMgr::shopBuyBack( Sapphire::Entity::Player& p
     packet->data().unknown2 = 3;
     packet->data().itemId = entry.item->getId();
     packet->data().amount = originalStack;
-    packet->data().price = entry.value * originalStack;
+    packet->data().price = price;
     packet->data().unknown6 = 0;
     packet->data().unknown7 = 0;
     player.queuePacket( packet );

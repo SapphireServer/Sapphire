@@ -37,7 +37,7 @@ namespace Sapphire::Entity
   {
     ItemPtr item;
     uint32_t amount;
-    uint32_t value;
+    uint32_t pricePerItem;
   };
 
   /** Class representing the Player
