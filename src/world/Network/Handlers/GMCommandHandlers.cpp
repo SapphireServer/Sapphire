@@ -345,14 +345,23 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
         player.sendUrgent( "Syntaxerror." );
         return;
       }
+      if( param1 <= 0x12 ) // crystal
+      {
+        targetPlayer->addCrystal( static_cast< Common::CrystalType >( param1 ), quantity, true );
+      }
+      else // item
+      {
+        // decode using the epic SE style HQ item id
+        bool isHq = param1 > 1000000;
 
-      if( !targetPlayer->addItem( param1, quantity ) )
-        player.sendUrgent( "Item #{0} could not be added to inventory.", param1 );
-      break;
+        if( !targetPlayer->addItem( isHq ? param1 - 1000000 : param1, quantity, isHq, false, true, true ) )
+          player.sendUrgent( "Item #{0} could not be added to inventory.", isHq ? param1 - 1000000 : param1 );
+        break;
+      }
     }
     case GmCommand::Gil:
     {
-      targetPlayer->addCurrency( CurrencyType::Gil, param1 );
+      targetPlayer->addCurrency( CurrencyType::Gil, param1, true );
       player.sendNotice( "Added {0} Gil for {1}", param1, targetPlayer->getName() );
       break;
     }
