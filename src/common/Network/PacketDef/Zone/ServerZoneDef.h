@@ -2018,6 +2018,19 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown7;
   };
 
+  struct FFXIVIpcLootMessage : FFXIVIpcBasePacket< LootMessage >
+  {
+    Common::LootMessageType msgType;
+    uint8_t padding[3];
+    uint32_t param1;
+    uint32_t param2;
+    uint32_t param3;
+    uint32_t param4;
+    uint32_t param5;
+    uint32_t param6;
+    uint32_t param7;
+  };
+
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/

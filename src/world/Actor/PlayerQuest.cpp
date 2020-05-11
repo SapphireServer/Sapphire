@@ -1065,7 +1065,7 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
   {
     for( uint32_t i = 0; i < rewardItemCount; i++ )
     {
-      addItem( questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
+      addItem( questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ), false, false, true, true );
     }
   }
 
@@ -1076,14 +1076,14 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
       auto itemId = questInfo->itemReward1.at( i );
       if( itemId == optionalChoice )
       {
-        addItem( itemId, questInfo->itemCountReward1.at( i ) );
+        addItem( itemId, questInfo->itemCountReward1.at( i ), false, false, true, true );
         break;
       }
     }
   }
 
   if( gilReward > 0 )
-    addCurrency( CurrencyType::Gil, gilReward );
+    addCurrency( CurrencyType::Gil, gilReward, true );
 
   return true;
 }

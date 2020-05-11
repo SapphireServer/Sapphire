@@ -376,8 +376,8 @@ namespace Sapphire::Network::Packets
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
-
     ShopMessage = 0x00C1, // updated 5.25
+    LootMessage = 0x00B1, // updated 5.25
   };
 
   ////////////////////////////////////////////////////////////////////////////////
