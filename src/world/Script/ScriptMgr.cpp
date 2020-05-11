@@ -284,7 +284,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
     if( !activeQuests )
       continue;
 
-    uint32_t questId = activeQuests->c.questId | Event::EventHandler::EventHandlerType::Quest << 16;
+    uint32_t questId = activeQuests->c.questId | static_cast< uint16_t >( Event::EventHandler::EventHandlerType::Quest ) << 16;
 
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
@@ -311,7 +311,7 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
     if( !activeQuests )
       continue;
 
-    uint32_t questId = activeQuests->c.questId | Event::EventHandler::EventHandlerType::Quest << 16;
+    uint32_t questId = activeQuests->c.questId | static_cast< uint16_t >( Event::EventHandler::EventHandlerType::Quest ) << 16;
 
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
