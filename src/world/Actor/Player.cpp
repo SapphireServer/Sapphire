@@ -1371,6 +1371,7 @@ void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFX
   m_bMarkedForZoning = true;
   setRot( rotation );
   setZone( zoneId );
+  clearBuyBackMap();
 }
 
 bool Sapphire::Entity::Player::isMarkedForZoning() const
@@ -2268,6 +2269,22 @@ bool Sapphire::Entity::Player::checkAction()
   }
 
   return true;
+}
+
+std::vector< Sapphire::Entity::ShopBuyBackEntry >& Sapphire::Entity::Player::getBuyBackListForShop( uint32_t shopId )
+{
+  return m_shopBuyBackMap[ shopId ];
+}
+
+void Sapphire::Entity::Player::addBuyBackItemForShop( uint32_t shopId, const Sapphire::Entity::ShopBuyBackEntry& entry )
+{
+  auto& list = m_shopBuyBackMap[ shopId ];
+  list.insert( list.begin(), entry );
+}
+
+void Sapphire::Entity::Player::clearBuyBackMap()
+{
+  m_shopBuyBackMap.clear();
 }
 
 void Sapphire::Entity::Player::gaugeClear()

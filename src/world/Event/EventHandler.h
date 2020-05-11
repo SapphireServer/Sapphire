@@ -45,7 +45,7 @@ namespace Sapphire::Event
       TableGame = 24,
     };
 
-    enum EventHandlerType : uint16_t
+    enum class EventHandlerType : uint16_t
     {
       Quest = 0x0001,
       Warp = 0x0002,
@@ -54,6 +54,7 @@ namespace Sapphire::Event
       Aetheryte = 0x0005,
       GuildLeveAssignment = 0x0006,
       DefaultTalk = 0x0009,
+      Craft = 0x000A,
       CustomTalk = 0x000B,
       CompanyLeveOfficer = 0x000C,
       CraftLeve = 0x000E,
@@ -63,6 +64,7 @@ namespace Sapphire::Event
       ChocoboTaxiStand = 0x0012,
       Opening = 0x0013,
       ExitRange = 0x0014,
+      Fishing = 0x0015,
       GCShop = 0x0016,
       GuildOrderGuide = 0x0017,
       GuildOrderOfficer = 0x0018,

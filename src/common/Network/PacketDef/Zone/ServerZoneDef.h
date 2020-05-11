@@ -1411,7 +1411,8 @@ namespace Sapphire::Network::Packets::Server
     uint16_t scene;
     uint16_t padding;
     uint32_t sceneFlags;
-    uint8_t paramCount;
+    uint32_t unknown;
+    uint8_t paramSize;
     uint8_t padding2[3];
     uint32_t params[ArgCount];
   };
@@ -2003,6 +2004,18 @@ namespace Sapphire::Network::Packets::Server
   {
     uint32_t cancelReason;
     uint32_t unknown2;
+  };
+
+  struct FFXIVIpcShopMessage : FFXIVIpcBasePacket< ShopMessage >
+  {
+    uint32_t shopId;
+    uint32_t msgType;
+    uint32_t unknown2;
+    uint32_t itemId;
+    uint32_t amount;
+    uint32_t price;
+    uint32_t unknown6;
+    uint32_t unknown7;
   };
 
 }
