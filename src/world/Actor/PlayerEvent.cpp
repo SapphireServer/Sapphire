@@ -183,7 +183,7 @@ void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, ui
       break;
     openGilShopPacket->data().params[ index++ ] = entry.item->getId();
     openGilShopPacket->data().params[ index++ ] = entry.amount;
-    openGilShopPacket->data().params[ index++ ] = entry.value;
+    openGilShopPacket->data().params[ index++ ] = entry.pricePerItem;
     index += 2;
     openGilShopPacket->data().params[ index++ ] = eventId;
     index += 2;
