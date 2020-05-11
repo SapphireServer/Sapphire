@@ -639,12 +639,13 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
             lootMsg->data().param3 = originalQuantity;
             queuePacket( lootMsg );
           }
-
-          auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
-          soundEffectPacket->data().sequence = 0xFFFFFFFF;
-          soundEffectPacket->data().type = 6;
-          queuePacket( soundEffectPacket );
-
+          if( !silent )
+          {
+            auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
+            soundEffectPacket->data().sequence = 0xFFFFFFFF;
+            soundEffectPacket->data().type = 6;
+            queuePacket( soundEffectPacket );
+          }
           return item;
         }
 
@@ -670,6 +671,11 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
   {
     auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), freeBagSlot.second, freeBagSlot.first, *itemToAdd );
     queuePacket( invUpdate );
+
+    auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
+    soundEffectPacket->data().sequence = 0xFFFFFFFF;
+    soundEffectPacket->data().type = 6;
+    queuePacket( soundEffectPacket );
   }
 
   if( sendLootMessage )
@@ -681,11 +687,6 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
     lootMsg->data().param3 = originalQuantity;
     queuePacket( lootMsg );
   }
-
-  auto soundEffectPacket = makeZonePacket< FFXIVIpcInventoryActionAck >( getId() );
-  soundEffectPacket->data().sequence = 0xFFFFFFFF;
-  soundEffectPacket->data().type = 6;
-  queuePacket( soundEffectPacket );
 
   return itemToAdd;
 }
