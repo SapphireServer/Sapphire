@@ -360,7 +360,7 @@ namespace Sapphire::Entity
     uint32_t getModelForSlot( Common::GearModelSlot slot );
 
     /*! add amount to the currency of type */
-    void addCurrency( Common::CurrencyType type, uint32_t amount );
+    void addCurrency( Common::CurrencyType type, uint32_t amount, bool sendLootMessage = false );
 
     /*! remove amount from the currency of type */
     void removeCurrency( Common::CurrencyType type, uint32_t amount );
@@ -928,8 +928,8 @@ namespace Sapphire::Entity
 
     InvSlotPair getFreeBagSlot();
 
-    ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
-    ItemPtr addItem( ItemPtr itemToAdd, bool slient = false, bool canMerge = true );
+    ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
+    ItemPtr addItem( ItemPtr itemToAdd, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
 
     void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
 
@@ -964,7 +964,7 @@ namespace Sapphire::Entity
     uint32_t getCrystal( Common::CrystalType type );
 
     /*! add amount to the crystal of type */
-    void addCrystal( Common::CrystalType type, uint32_t amount );
+    void addCrystal( Common::CrystalType type, uint32_t amount, bool sendLootMessage = false );
 
     /*! remove amount from the crystals of type */
     void removeCrystal( Common::CrystalType type, uint32_t amount );
@@ -980,7 +980,7 @@ namespace Sapphire::Entity
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
 
-    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId, bool slient = false );
+    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId, bool silent = false );
 
     // Job UI
     //////////////////////////////////////////////////////////////////////////////////////////////////////

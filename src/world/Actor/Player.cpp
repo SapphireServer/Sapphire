@@ -2284,6 +2284,13 @@ void Sapphire::Entity::Player::addBuyBackItemForShop( uint32_t shopId, const Sap
 
 void Sapphire::Entity::Player::clearBuyBackMap()
 {
+  for( auto& list : m_shopBuyBackMap )
+  {
+    for( auto& entry : list.second )
+    {
+      deleteItemDb( entry.item );
+    }
+  }
   m_shopBuyBackMap.clear();
 }
 
