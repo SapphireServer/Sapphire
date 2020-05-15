@@ -96,14 +96,21 @@ void EffectResult::mount( uint16_t mountId )
 Common::EffectEntry EffectResult::buildEffectEntry() const
 {
   Common::EffectEntry entry{};
-
-  // todo: that retarded shit so > u16 max numbers work
-  entry.value = getValue();
+  entry.effectType = m_type;
+  if( m_value > 0x0000FFFF )
+  {
+    entry.value = static_cast< uint16_t >( m_value & 0x0000FFFF );
+    entry.extendedValueHighestByte = static_cast< uint8_t >( m_value >> 16 );
+    entry.flags = static_cast< uint8_t >( m_flag ) + static_cast< uint8_t >( Common::ActionEffectResultFlag::ExtendedValue );
+  }
+  else
+  {
+    entry.value = static_cast< uint16_t >( m_value );
+    entry.flags = static_cast< uint8_t >( m_flag );
+  }
   entry.param0 = m_param0;
   entry.param1 = m_param1;
-  entry.effectType = m_type;
   entry.param2 = m_param2;
-  entry.flags = static_cast< uint8_t >( m_flag );
 
   return entry;
 }
