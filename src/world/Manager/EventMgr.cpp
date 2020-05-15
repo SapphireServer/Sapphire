@@ -11,7 +11,7 @@ using namespace Sapphire::Common;
 std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  uint16_t eventType = eventId >> 16;
+  auto eventType = static_cast< Event::EventHandler::EventHandlerType >( eventId >> 16 );
 
   auto unknown = std::string{ "unknown" };
 
