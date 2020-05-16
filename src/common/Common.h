@@ -663,6 +663,7 @@ namespace Sapphire::Common
   {
     None = 0,
     Absorbed = 0x04,
+    ExtendedValue = 0x40,
     EffectOnSource = 0x80,
     Reflected = 0xA0,
   };
@@ -691,7 +692,7 @@ namespace Sapphire::Common
      * Has no effect on what is shown and stored in value
      */
     uint8_t param2;
-    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
+    uint8_t extendedValueHighestByte;
     uint8_t flags;
     int16_t value;
   };
