@@ -276,12 +276,12 @@ void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVAR
   scriptMgr.onTalk( player, player.getId(), eventId );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerMapInteraction( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::eventHandlerWorldInteraction( const Packets::FFXIVARR_PACKET_RAW& inPacket,
   Entity::Player& player )
 {
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcMapInteractionHandler >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcWorldInteractionHandler >( inPacket );
   auto action = packet.data().action;
-  player.sendDebug( "MapInteraction {}", action );
+  player.sendDebug( "WorldInteraction {}", action );
   if( action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
   {
     // looks like shit but IT WORKS.

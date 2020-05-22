@@ -344,8 +344,8 @@ struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
   uint16_t unknown2;
 };
 
-struct FFXIVIpcMapInteractionHandler :
-  FFXIVIpcBasePacket< MapInteractionHandler >
+struct FFXIVIpcWorldInteractionHandler :
+  FFXIVIpcBasePacket< WorldInteractionHandler >
 {
   uint32_t action;
   uint32_t unknown2;
