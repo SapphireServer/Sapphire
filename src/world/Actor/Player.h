@@ -1070,7 +1070,7 @@ namespace Sapphire::Entity
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
-    uint8_t m_questCompleteFlags[476];
+    uint8_t m_questCompleteFlags[487];
     uint8_t m_discovery[445];
     uint32_t m_playTime;
 
