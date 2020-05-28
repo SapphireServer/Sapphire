@@ -1500,8 +1500,8 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcQuestCompleteList : FFXIVIpcBasePacket< QuestCompleteList >
   {
-    uint8_t questCompleteMask[480];
-    uint8_t unknownCompleteMask[80];
+    uint8_t questCompleteMask[487];
+    uint8_t unknownCompleteMask[73];
   };
 
   /**
