@@ -1015,7 +1015,7 @@ Sapphire::Entity::Player::sendQuestMessage( uint32_t questId, int8_t msgId, uint
 
 void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
 {
-  uint8_t index = questId / 8;
+  uint16_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
 
   uint8_t value = 0x80 >> bitIndex;
@@ -1025,7 +1025,7 @@ void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
 
 void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 {
-  uint8_t index = questId / 8;
+  uint16_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
 
   uint8_t value = 0x80 >> bitIndex;
