@@ -749,7 +749,7 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
         auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
         setpos->data().r16 = param4;
         setpos->data().waitForLoad = 18;
-        setpos->data().unknown1 = emote == 0x32 ? 1 : 2;
+        setpos->data().unknown1 = 1;
         setpos->data().x = packet.data().position.x;
         setpos->data().y = packet.data().position.y;
         setpos->data().z = packet.data().position.z;
