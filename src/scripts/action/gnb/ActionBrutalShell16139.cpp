@@ -22,14 +22,14 @@ public:
 
   void onBeforeBuildEffect( Sapphire::World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter ) override
   {
-    if( validVictimCounter > 0 )
+    if( validVictimCounter > 0 && action.isCorrectCombo() )
     {
       auto chara = action.getSourceChara();
       auto heal = action.calcHealing( 150 );
       heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *chara, heal.first );
       action.getEffectbuilder()->heal( chara, chara, heal.first, heal.second );
 
-      if( chara->getLevel() >= 52 )
+      if( chara->getLevel() >= 52 && heal.first > 0 )
       {
         World::Action::StatusEffectEntry effectEntry;
         effectEntry.effectType = static_cast< uint32_t >( Common::StatusEffectType::Shield );
