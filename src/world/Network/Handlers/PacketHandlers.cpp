@@ -724,3 +724,118 @@ void Sapphire::Network::GameConnection::marketBoardRequestItemListings( const Pa
 
   marketMgr.requestItemListings( player, packet.data().itemCatalogId );
 }
+
+void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+  Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcWorldInteractionHandler >( inPacket );
+  auto action = packet.data().action;
+  player.sendDebug( "WorldInteraction {}", action );
+  if( action == 0x1F5 )
+  {
+    auto emote = packet.data().param1;
+    if( emote == 0x32 || emote == 0x33 ) // "/sit"
+    {
+      auto param4 = packet.data().param4;
+      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+      auto emoteData = exdData.get< Data::Emote >( emote );
+
+      if( !emoteData )
+        return;
+
+      player.setPos( packet.data().position );
+      if( emote == 0x32 && player.hasInRangeActor() )
+      {
+        auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+        setpos->data().r16 = param4;
+        setpos->data().waitForLoad = 18;
+        setpos->data().unknown1 = emote == 0x32 ? 1 : 2;
+        setpos->data().x = packet.data().position.x;
+        setpos->data().y = packet.data().position.y;
+        setpos->data().z = packet.data().position.z;
+        player.sendToInRangeSet( setpos, false );
+      }
+      player.sendToInRangeSet( makeActorControlTarget( player.getId(), ActorControl::ActorControlType::Emote, emote, 0x12345678, 0x87654321, param4, 0xE0000000 ), true );
+
+      if( emote == 0x32 && emoteData->emoteMode != 0 )
+      {
+        player.setStance( Common::Stance::Passive );
+        player.setAutoattack( false );
+        player.setPersistentEmote( emoteData->emoteMode );
+        player.setStatus( Common::ActorStatus::EmoteMode );
+      }
+    }
+  }
+  else if( action == 0x1F8 )
+  {
+    if( player.getPersistentEmote() > 0 )
+    {
+      auto param2 = packet.data().param2;
+
+      player.setPos( packet.data().position );
+      if( player.hasInRangeActor() )
+      {
+        auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+        setpos->data().r16 = param2;
+        setpos->data().waitForLoad = 18;
+        setpos->data().unknown1 = 2;
+        setpos->data().x = packet.data().position.x;
+        setpos->data().y = packet.data().position.y;
+        setpos->data().z = packet.data().position.z;
+        player.sendToInRangeSet( setpos, false );
+      }
+
+      player.setPersistentEmote( 0 );
+      player.emoteInterrupt();
+      player.setStatus( Common::ActorStatus::Idle );
+      auto pSetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+      player.sendToInRangeSet( pSetStatusPacket );
+    }
+  }
+  else if( action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
+  {
+    // looks like shit but IT WORKS.
+    auto x = packet.data().position.x;
+    auto z = packet.data().position.z;
+    if( x < -448 && x > -453 )
+    {
+      // west
+      if( x > -451 )
+      {
+        // enter
+        auto p = makeActorControl( player.getId(), 242, 1174189454, 817758208, 67, 0 );
+        queueOutPacket( p );
+        player.addStatusEffectById( 1945, 0, player, 0, true );
+      }
+      else
+      {
+        // exit
+        auto p = makeActorControl( player.getId(), 242, 1182315916, 827392000, 68, 0 );
+        queueOutPacket( p );
+        player.removeSingleStatusEffectById( 1945 );
+      }
+    }
+    else if ( x > 637 && x < 641 )
+    {
+      // east
+      if( z > -188 )
+      {
+        // enter
+        auto p = makeActorControl( player.getId(), 242, 3521816124, 1737687040, 69, 0 );
+        queueOutPacket( p );
+        player.addStatusEffectById( 1945, 0, player, 0, true );
+      }
+      else
+      {
+        // exit
+        auto p = makeActorControl( player.getId(), 242, 3517228601, 1749483520, 70, 0 );
+        queueOutPacket( p );
+        player.removeSingleStatusEffectById( 1945 );
+      }
+    }
+    else
+    {
+      player.sendDebug( "Unknown dwarf house." );
+    }
+  }
+}

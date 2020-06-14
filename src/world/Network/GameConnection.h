@@ -143,8 +143,6 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( eventHandlerShop );
 
-    DECLARE_HANDLER( eventHandlerWorldInteraction );
-
     DECLARE_HANDLER( eventHandlerLinkshell );
 
     DECLARE_HANDLER( logoutHandler );
@@ -188,6 +186,8 @@ namespace Sapphire::Network
     DECLARE_HANDLER( marketBoardRequestItemInfo );
 
     DECLARE_HANDLER( marketBoardRequestItemListings );
+
+    DECLARE_HANDLER( worldInteractionhandler );
 
   };
 
