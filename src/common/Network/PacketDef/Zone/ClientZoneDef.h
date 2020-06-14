@@ -348,9 +348,10 @@ struct FFXIVIpcWorldInteractionHandler :
   FFXIVIpcBasePacket< WorldInteractionHandler >
 {
   uint32_t action;
-  uint32_t unknown2;
-  uint64_t unknown3;
-  uint32_t unknown4;
+  uint32_t param1;
+  uint32_t param2;
+  uint32_t param3;
+  uint32_t param4;
   Common::FFXIVARR_POSITION3 position;
 };
 
