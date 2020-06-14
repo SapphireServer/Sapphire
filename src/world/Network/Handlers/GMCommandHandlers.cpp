@@ -356,8 +356,8 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
 
         if( !targetPlayer->addItem( isHq ? param1 - 1000000 : param1, quantity, isHq, false, true, true ) )
           player.sendUrgent( "Item #{0} could not be added to inventory.", isHq ? param1 - 1000000 : param1 );
-        break;
       }
+      break;
     }
     case GmCommand::Gil:
     {
