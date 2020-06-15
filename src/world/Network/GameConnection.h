@@ -187,6 +187,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( marketBoardRequestItemListings );
 
+    DECLARE_HANDLER( worldInteractionhandler );
+
   };
 
 }
