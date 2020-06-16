@@ -64,7 +64,25 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   {
     auto questInfo = exdData.get< Sapphire::Data::Quest >( eventId );
     if( questInfo )
+    {
       player.sendUrgent( "Quest not implemented: {0} ({1})", questInfo->name, questInfo->id );
+      if( player.hasQuest( eventId ) )
+      {
+        player.giveQuestRewards( eventId, 0 );
+        player.finishQuest( eventId );
+      }
+      else
+      {
+        player.playScene( eventId, 0, 0,
+          [ eventId ]( Entity::Player& player, const Event::SceneResult& result )
+          {
+            if( result.param2 == 1 )
+            {
+              player.updateQuest( eventId, 255 );
+            }
+          });
+      }
+    }
   }
 
   player.checkEvent( eventId );
