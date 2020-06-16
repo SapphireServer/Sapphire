@@ -29,7 +29,7 @@ public:
       {
         kenki += 5;
       }
-      if( pPlayer->getLevel() >= 62 )
+      if( level >= 62 )
       {
         kenki += 5;
       }

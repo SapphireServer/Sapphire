@@ -15,22 +15,18 @@ public:
   {
   }
 
-  void onExecute( Sapphire::World::Action::Action& action ) override
+  void onStart( Sapphire::World::Action::Action& action ) override
   {
     auto pPlayer = action.getSourceChara()->getAsPlayer();
     assert( pPlayer );
-    if( pPlayer->gaugeSamHasAnySen() )
-    {
-      int kenki = pPlayer->gaugeSamGetKenki();
-      if( pPlayer->gaugeSamGetSen( Common::SamSen::Getsu ) )
-        kenki += 10;
-      if( pPlayer->gaugeSamGetSen( Common::SamSen::Setsu ) )
-        kenki += 10;
-      if( pPlayer->gaugeSamGetSen( Common::SamSen::Ka ) )
-        kenki += 10;
-      pPlayer->gaugeSamSetKenki( std::min( 100, kenki ) );
-      pPlayer->gaugeSamSetSen( Common::SamSen::None );
-    }
+    int kenki = pPlayer->gaugeSamGetKenki();
+    if( pPlayer->gaugeSamGetSen( Common::SamSen::Getsu ) )
+      kenki += 10;
+    if( pPlayer->gaugeSamGetSen( Common::SamSen::Setsu ) )
+      kenki += 10;
+    if( pPlayer->gaugeSamGetSen( Common::SamSen::Ka ) )
+      kenki += 10;
+    pPlayer->gaugeSamSetKenki( std::min( 100, kenki ) );
   }
 };
 
