@@ -694,6 +694,8 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
 
 Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent, bool canMerge, bool sendLootMessage )
 {
+  if( catalogId == 0 )
+    return nullptr;
   auto item = createItem( catalogId, quantity );
   item->setHq( isHq );
   return addItem( item, silent, canMerge, sendLootMessage );
