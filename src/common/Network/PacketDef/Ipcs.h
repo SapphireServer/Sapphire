@@ -336,6 +336,7 @@ namespace Sapphire::Network::Packets
     ClientTrigger = 0x017D, // updated 5.25
     DiscoveryHandler = 0x02C8, // updated 5.25
 
+    PlaceFieldMarkerPreset = 0x23F, // updated 5.25
     PlaceFieldMarker = 0x013C, // updated 5.0
     SkillHandler = 0x0241, // updated 5.25
     GMCommand1 = 0x01EC, // updated 5.25
