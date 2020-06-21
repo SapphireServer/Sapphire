@@ -1682,6 +1682,34 @@ namespace Sapphire::Network::Packets::Server
   };
 
   /**
+   * Structural representation of the packet sent by the server
+   * to place/remove field marker presets
+   */
+  struct FFXIVIpcPlaceFieldMarkerPreset : FFXIVIpcBasePacket< PlaceFieldMarkerPreset >
+  {
+    /*! which fieldmarks to show */
+    Common::FieldMarkerStatus status;
+    /*! A coordinates would be (float)Xints[0]/1000.0, (float)Yints[0]/1000.0, (float)Zints[0]/1000.0 */
+    uint32_t Xints[8];
+    uint32_t Yints[8];
+    uint32_t Zints[8];
+  };
+
+  /**
+   * Structural representation of the packet sent by the server
+   * to place/remove a field marker
+   */
+  struct FFXIVIpcPlaceFieldMarker : FFXIVIpcBasePacket< PlaceFieldMarker >
+  {
+    Common::FieldMarkerId markerId;
+    uint8_t status;
+    uint8_t pad[2];
+    uint32_t Xint;
+    uint32_t Yint;
+    uint32_t Zint;
+  };
+
+  /**
   * Structural representation of the packet sent by the server
   * to mount a player
   */
