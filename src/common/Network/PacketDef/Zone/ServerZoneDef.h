@@ -1701,7 +1701,7 @@ namespace Sapphire::Network::Packets::Server
    */
   struct FFXIVIpcPlaceFieldMarker : FFXIVIpcBasePacket< PlaceFieldMarker >
   {
-    uint8_t markerId;
+    Common::FieldMarkerId markerId;
     uint8_t status;
     uint8_t pad[2];
     uint32_t Xint;
