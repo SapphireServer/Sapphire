@@ -1687,23 +1687,26 @@ namespace Sapphire::Network::Packets::Server
    */
   struct FFXIVIpcPlaceFieldMarkerPreset : FFXIVIpcBasePacket< PlaceFieldMarkerPreset >
   {
-    enum FieldMarkerStatus
-    {
-      A = 0x1,
-      B = 0x2,
-      C = 0x4,
-      D = 0x8,
-      One = 0x10,
-      Two = 0x20,
-      Three = 0x40,
-      Four = 0x80
-    };
     /*! which fieldmarks to show */
-    enum FieldMarkerStatus status;
+    Common::FieldMarkerStatus status;
     /*! A coordinates would be (float)Xints[0]/1000.0, (float)Yints[0]/1000.0, (float)Zints[0]/1000.0 */
     uint32_t Xints[8];
     uint32_t Yints[8];
     uint32_t Zints[8];
+  };
+
+  /**
+   * Structural representation of the packet sent by the server
+   * to place/remove a field marker
+   */
+  struct FFXIVIpcPlaceFieldMarker : FFXIVIpcBasePacket< PlaceFieldMarker >
+  {
+    uint8_t markerId;
+    uint8_t status;
+    uint8_t pad[2];
+    uint32_t Xint;
+    uint32_t Yint;
+    uint32_t Zint;
   };
 
   /**
