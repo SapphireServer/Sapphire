@@ -577,6 +577,18 @@ namespace Sapphire::Common
     Three = 0x40,
     Four = 0x80
   };
+  // TODO: consolidate these two into one since FieldMarkerStatus == 1 << FieldMarkerId?
+  enum class FieldMarkerId : uint8_t
+  {
+    A,
+    B,
+    C,
+    D,
+    One,
+    Two,
+    Three,
+    Four
+  };
 
   enum struct ActionAspect : uint8_t
   {
