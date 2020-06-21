@@ -566,6 +566,30 @@ namespace Sapphire::Common
 
   };
 
+  enum FieldMarkerStatus : uint32_t
+  {
+    A = 0x1,
+    B = 0x2,
+    C = 0x4,
+    D = 0x8,
+    One = 0x10,
+    Two = 0x20,
+    Three = 0x40,
+    Four = 0x80
+  };
+  // TODO: consolidate these two into one since FieldMarkerStatus == 1 << FieldMarkerId?
+  enum class FieldMarkerId : uint8_t
+  {
+    A,
+    B,
+    C,
+    D,
+    One,
+    Two,
+    Three,
+    Four
+  };
+
   enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected
