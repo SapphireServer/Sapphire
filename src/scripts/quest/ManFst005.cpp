@@ -142,7 +142,8 @@ class ManFst005 : public Sapphire::ScriptAPI::EventScript
                        {
                          if( result.param2 == 1 )
                          {
-                           auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+                           //auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+                           auto& pTeriMgr = *reinterpret_cast< Sapphire::World::Manager::TerritoryMgr* >( player.getTerritoryMgr() );
 
                            player.eventFinish( result.eventId, 0 );
                            pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );

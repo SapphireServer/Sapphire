@@ -20,6 +20,7 @@
 
 #include "Event/EventHandler.h"
 #include "Manager/EventMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
@@ -57,31 +58,28 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
 
   if( auto instance = player.getCurrentInstance() )
   {
-    instance->onTalk( player, eventId, actorId );
+      instance->onTalk( player, eventId, actorId );
   }
-  else if( !scriptMgr.onTalk( player, actorId, eventId ) &&
-           eventType == Event::EventHandler::EventHandlerType::Quest )
+
+  bool eventCalled = false;
+  if( eventType == Event::EventHandler::EventHandlerType::Warp )
   {
-    auto questInfo = exdData.get< Sapphire::Data::Quest >( eventId );
-    if( questInfo )
+    auto it = Sapphire::World::Manager::TerritoryMgr::instanceExitEvent.find( eventId );
+    if( it != Sapphire::World::Manager::TerritoryMgr::instanceExitEvent.end() )
     {
-      player.sendUrgent( "Quest not implemented: {0} ({1})", questInfo->name, questInfo->id );
-      if( player.hasQuest( eventId ) )
-      {
-        player.giveQuestRewards( eventId, 0 );
-        player.finishQuest( eventId );
-      }
-      else
-      {
-        player.playScene( eventId, 0, 0,
-          [ eventId ]( Entity::Player& player, const Event::SceneResult& result )
-          {
-            if( result.param2 == 1 )
-            {
-              player.updateQuest( eventId, 255 );
-            }
-          });
-      }
+      player.eventFinish( eventId, 1 );
+      player.exitInstance();
+      eventCalled = true;
+    }
+  }
+  if( !eventCalled )
+  {
+    if( !scriptMgr.onTalk( player, actorId, eventId ) &&
+      eventType == Event::EventHandler::EventHandlerType::Quest )
+    {
+      auto questInfo = exdData.get< Sapphire::Data::Quest >( eventId );
+      if( questInfo )
+        player.sendUrgent( "Quest not implemented: {0} ({1})", questInfo->name, questInfo->id );
     }
   }
 

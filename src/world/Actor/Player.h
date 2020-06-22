@@ -1024,7 +1024,15 @@ namespace Sapphire::Entity
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    std::unordered_map< uint32_t, TerritoryPtr > m_privateInstanceMap;
+    TerritoryPtr getOrCreatePrivateInstance( uint32_t zoneId );
+    bool enterPredefinedPrivateInstance( uint32_t zoneId );
+
+    void* getEventMgr();
     void* getExdData();
+    void* getPlayerMgr();
+    void* getInstanceObjectCache();
+    void* getTerritoryMgr();
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 

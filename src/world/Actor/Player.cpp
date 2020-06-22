@@ -19,6 +19,8 @@
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
+#include <Manager/PlayerMgr.h>
+#include "Manager/EventMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
@@ -2525,7 +2527,69 @@ bool Sapphire::Entity::Player::gaugeSamHasAnySen()
   return static_cast< uint8_t >( m_gauge.sam.sen ) > 0;
 }
 
+void* Sapphire::Entity::Player::getEventMgr()
+{
+  return &Common::Service< Sapphire::World::Manager::EventMgr >::ref();
+}
+
 void* Sapphire::Entity::Player::getExdData()
 {
   return &Common::Service< Data::ExdDataGenerated >::ref();
+}
+
+void* Sapphire::Entity::Player::getPlayerMgr()
+{
+  return &Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+}
+
+void* Sapphire::Entity::Player::getInstanceObjectCache()
+{
+  return &Common::Service< Sapphire::InstanceObjectCache >::ref();
+}
+
+void* Sapphire::Entity::Player::getTerritoryMgr()
+{
+  return &Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+}
+
+Sapphire::TerritoryPtr Sapphire::Entity::Player::getOrCreatePrivateInstance( uint32_t zoneId )
+{
+  auto instance = m_privateInstanceMap[ zoneId ];
+  if( instance )
+    return instance;
+  auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+  instance = terriMgr.createTerritoryInstance( zoneId );
+  if( instance )
+  {
+    sendDebug( "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
+    m_privateInstanceMap[ zoneId ] = instance;
+    return instance;
+  }
+  else
+  {
+    sendDebug( "Failed to create instance with id#{0}", zoneId );
+    return nullptr;
+  }
+}
+
+bool Sapphire::Entity::Player::enterPredefinedPrivateInstance( uint32_t zoneId )
+{
+  auto it = Sapphire::World::Manager::TerritoryMgr::instanceSpawnInfo.find( zoneId );
+  if( it != Sapphire::World::Manager::TerritoryMgr::instanceSpawnInfo.end() )
+  {
+    auto info = it->second;
+
+    auto instance = getOrCreatePrivateInstance( zoneId );
+    if( instance )
+    {
+      auto result = setInstance( instance, info.pos );
+      if( result )
+        setRot( info.rot );
+      return result;
+    }
+  }
+  sendUrgent( "instance id: {} is not defined.", zoneId );
+  auto instance = getOrCreatePrivateInstance( zoneId );
+  if( instance )
+    return setInstance( instance );
 }

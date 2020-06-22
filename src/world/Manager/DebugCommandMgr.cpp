@@ -1022,6 +1022,15 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     if( auto instance = player.getCurrentInstance() )
       instance->setCurrentBGM( bgmId );
   }
+  else if( subCommand == "private" )
+  {
+    uint32_t zoneId = 0;
+    sscanf( params.c_str(), "%d", &zoneId );
+    if( zoneId > 0 )
+    {
+      player.enterPredefinedPrivateInstance( zoneId );
+    }
+  }
   else
   {
     player.sendDebug( "Unknown sub command." );

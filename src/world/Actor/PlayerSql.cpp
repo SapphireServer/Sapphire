@@ -64,63 +64,6 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   m_prevPos.z = res->getFloat( "OPosZ" );
   m_prevRot = res->getFloat( "OPosR" );
 
-  TerritoryPtr pCurrZone = nullptr;
-
-  // if the zone is an instanceContent zone, we need to actually find the instance
-  if( teriMgr.isInstanceContentTerritory( zoneId ) )
-  {
-    // try to find an instance actually linked to this player
-    pCurrZone = teriMgr.getLinkedInstance( m_id );
-    // if none found, revert to previous zone and position
-    if( !pCurrZone )
-    {
-      zoneId = m_prevTerritoryTypeId;
-      m_pos.x = m_prevPos.x;
-      m_pos.y = m_prevPos.y;
-      m_pos.z = m_prevPos.z;
-      setRot( m_prevRot );
-      pCurrZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
-    }
-  }
-  else if( teriMgr.isInternalEstateTerritory( zoneId ) )
-  {
-    // todo: this needs to go to the area just outside of the plot door
-    pCurrZone = teriMgr.getZoneByLandSetId( m_prevTerritoryId );
-
-    zoneId = m_prevTerritoryTypeId;
-    m_pos.x = m_prevPos.x;
-    m_pos.y = m_prevPos.y;
-    m_pos.z = m_prevPos.z;
-    setRot( m_prevRot );
-  }
-  else if( teriMgr.isHousingTerritory( zoneId ) )
-  {
-    pCurrZone = teriMgr.getZoneByLandSetId( m_territoryId );
-  }
-  else
-  {
-    pCurrZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
-  }
-
-  m_territoryTypeId = zoneId;
-
-  // TODO: logic for instances needs to be added here
-  // see if a valid zone could be found for the character
-  if( !pCurrZone )
-  {
-    Logger::error( "[{0}] Territory #{1} not found!", char_id_str, zoneId );
-    Logger::error( "[{0}] Setting default zone instead", char_id_str );
-
-    // default to new gridania
-    // TODO: should probably just abort and mark character as corrupt
-    pCurrZone = teriMgr.getZoneByTerritoryTypeId( 132 );
-
-    m_pos.x = 0.0f;
-    m_pos.y = 0.0f;
-    m_pos.z = 0.0f;
-    setRot( 0.0f );
-  }
-
   // Model
   auto custom = res->getBlobVector( "Customize" );
   memcpy( reinterpret_cast< char* >( m_customize ), custom.data(), custom.size() );
@@ -196,6 +139,72 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   memcpy( reinterpret_cast< char* >( m_gcRank ), gcRank.data(), gcRank.size() );
 
   res->free();
+
+  TerritoryPtr pCurrZone = nullptr;
+
+  // if the zone is an instanceContent zone, we need to actually find the instance
+  if( teriMgr.isInstanceContentTerritory( zoneId ) )
+  {
+    // try to find an instance actually linked to this player
+    pCurrZone = teriMgr.getLinkedInstance( m_id );
+    // if none found, revert to previous zone and position
+    if( !pCurrZone )
+    {
+      zoneId = m_prevTerritoryTypeId;
+      m_pos.x = m_prevPos.x;
+      m_pos.y = m_prevPos.y;
+      m_pos.z = m_prevPos.z;
+      setRot( m_prevRot );
+      pCurrZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
+    }
+  }
+  else if( teriMgr.isInternalEstateTerritory( zoneId ) )
+  {
+    // todo: this needs to go to the area just outside of the plot door
+    pCurrZone = teriMgr.getZoneByLandSetId( m_prevTerritoryId );
+
+    zoneId = m_prevTerritoryTypeId;
+    m_pos.x = m_prevPos.x;
+    m_pos.y = m_prevPos.y;
+    m_pos.z = m_prevPos.z;
+    setRot( m_prevRot );
+  }
+  else if( teriMgr.isHousingTerritory( zoneId ) )
+  {
+    pCurrZone = teriMgr.getZoneByLandSetId( m_territoryId );
+  }
+  else
+  {
+    pCurrZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
+  }
+
+  m_territoryTypeId = zoneId;
+
+  // TODO: logic for instances needs to be added here
+  if( !pCurrZone )
+  {
+    auto it = Sapphire::World::Manager::TerritoryMgr::instanceSpawnInfo.find( zoneId );
+    if( it != Sapphire::World::Manager::TerritoryMgr::instanceSpawnInfo.end() )
+    {
+      auto info = it->second;
+      pCurrZone = getOrCreatePrivateInstance( zoneId );
+    }
+  }
+  // see if a valid zone could be found for the character
+  if( !pCurrZone )
+  {
+    Logger::error( "[{0}] Territory #{1} not found!", char_id_str, zoneId );
+    Logger::error( "[{0}] Setting default zone instead", char_id_str );
+
+    // default to new gridania
+    // TODO: should probably just abort and mark character as corrupt
+    pCurrZone = teriMgr.getZoneByTerritoryTypeId( 132 );
+
+    m_pos.x = 0.0f;
+    m_pos.y = 0.0f;
+    m_pos.z = 0.0f;
+    setRot( 0.0f );
+  }
 
   m_pCell = nullptr;
 

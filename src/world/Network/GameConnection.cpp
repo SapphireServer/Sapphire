@@ -103,6 +103,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::ReturnEventHandler, "EventHandlerReturn", &GameConnection::eventHandlerReturn );
   setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",
                   &GameConnection::eventHandlerReturn );
+  setZoneHandler( ClientZoneIpcType::TradeMultipleReturnEventHander, "EventHandlerReturn", &GameConnection::eventHandlerReturn );
 
   setZoneHandler( ClientZoneIpcType::ShopEventHandler, "ShopEventHandler",
                   &GameConnection::eventHandlerShop );

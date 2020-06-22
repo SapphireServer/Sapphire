@@ -222,6 +222,14 @@ namespace Sapphire::World::Manager
     /*! returns a list of instanceContent InstanceIds currently active */
     InstanceIdList getInstanceContentIdList( uint16_t instanceContentId ) const;
 
+    struct InstanceSpawnInfo
+    {
+      Common::FFXIVARR_POSITION3 pos;
+      float rot;
+    };
+
+    static std::unordered_map< uint32_t, InstanceSpawnInfo > instanceSpawnInfo;
+    static std::unordered_map< uint32_t, uint32_t > instanceExitEvent;
   };
 
 }
