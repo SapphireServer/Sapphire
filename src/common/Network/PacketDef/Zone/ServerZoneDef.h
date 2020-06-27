@@ -2021,6 +2021,26 @@ namespace Sapphire::Network::Packets::Server
 
     char otherName[32];
   };
+  
+  struct FFXIVIpcRetainerInformation : FFXIVIpcBasePacket< RetainerInformation >
+  {
+    uint8_t unknown0[8];
+    uint32_t retainerId;
+    uint8_t unknown2[4];
+    uint8_t hireOrder;
+    uint8_t itemCount;
+    uint8_t unknown5[2];
+    uint32_t gil;
+    uint8_t sellingCount;
+    uint8_t cityId;
+    uint8_t classJob;
+    uint8_t level;
+    uint8_t unknown11[4];
+    uint32_t retainerTask;
+    uint32_t retainerTaskComplete;
+    uint8_t unknown14;
+    char retainerName[20];
+  };
 
   struct FFXIVIpcCharaVisualEffect : FFXIVIpcBasePacket< CharaVisualEffect >
   {

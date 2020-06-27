@@ -165,6 +165,7 @@ namespace Sapphire::Network::Packets
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0x019F, // updated 5.0
+    RetainerInformation = 0x0169, // updated 5.25
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
