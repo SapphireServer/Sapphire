@@ -2025,8 +2025,7 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcRetainerInformation : FFXIVIpcBasePacket< RetainerInformation >
   {
     uint8_t unknown0[8];
-    uint32_t retainerId;
-    uint8_t unknown2[4];
+    uint64_t retainerId;
     uint8_t hireOrder;
     uint8_t itemCount;
     uint8_t unknown5[2];
