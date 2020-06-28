@@ -43,7 +43,7 @@ private:
     {
       if( result.param2 == 1 ) // finish quest
       {
-        if( player.giveQuestRewards( getId(), 0 ) )
+        if( player.giveQuestRewards( getId(), result.param3 ) )
           player.finishQuest( getId() );
       }
     };
