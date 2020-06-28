@@ -63,7 +63,7 @@ public:
     {
       Scene00000( player );
     }
-    else if( actor == Actor0 )
+    else if( actor == Actor0 && player.getQuestSeq( getId() ) == SeqFinish ) 
     {
       Scene00007( player );
     }
@@ -131,14 +131,12 @@ private:
     auto currentCC = player.getQuestUI8AL( getId() );
 
     player.sendQuestMessage( getId(), 0, 2, currentCC + 1, 6 );
+    player.setQuestUI8AL( getId(), currentCC + 1 );
+    player.setQuestUI8BH( getId(), currentCC + 1 );
 
-    if( currentCC + 1 >= 6 )
+    if ( currentCC + 1 >= 6 )
     {
       player.updateQuest( getId(), SeqFinish );
-    }
-    else
-    {
-      player.setQuestUI8AL( getId(), currentCC + 1 );
     }
   }
 
@@ -211,13 +209,9 @@ private:
     player.playScene( getId(), 7, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
+                        if ( result.param2 == 1 )
                         {
                           Scene00088( player );
-                        }
-                        else
-                        {
-                          Scene00087( player );
                         }
                       } );
   }
@@ -227,7 +221,6 @@ private:
     player.playScene( getId(), 87, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        player.playScene( getId(), 87, 0, 0, 0 );
                       } );
   }
 
@@ -236,13 +229,9 @@ private:
     player.playScene( getId(), 88, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
+                        if ( player.giveQuestRewards( getId(), 0 ) )
                         {
-                          if( player.giveQuestRewards( getId(), 0 ) )
-                          {
-                            player.setQuestUI8AL( getId(), 0 );
-                            player.finishQuest( getId() );
-                          }
+                          player.finishQuest( getId() );
                         }
                       } );
   }
