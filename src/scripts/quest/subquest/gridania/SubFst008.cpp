@@ -93,6 +93,7 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         player.setQuestUI8BH( getId(), 1 );
+                        player.sendQuestMessage( getId(), 0, 0, 0, 0 );
                         player.updateQuest( getId(), SeqFinish );
                       } );
   }
@@ -102,14 +103,7 @@ private:
     player.playScene( getId(), 2, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
-                        {
-                          Scene00100( player );
-                        }
-                        else
-                        {
-                          Scene00099( player );
-                        }
+                        result.param2 == 1 ? Scene00100( player ) :  Scene00099( player );
                       } );
   }
 
@@ -131,7 +125,7 @@ private:
                         {
                           if( player.giveQuestRewards( getId(), 0 ) )
                           {
-                            player.setQuestUI8BH( getId(), 0 );
+                            player.setQuestUI8BH( getId(), result.param3 );
                             player.finishQuest( getId() );
                           }
                         }

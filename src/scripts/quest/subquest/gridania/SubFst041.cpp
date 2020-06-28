@@ -11,8 +11,6 @@ using namespace Sapphire;
 // Start NPC: 1000432
 // End NPC: 1000411
 
-//NEED TEST KILLCREDIT
-
 class SubFst041 :
   public Sapphire::ScriptAPI::EventScript
 {
@@ -38,7 +36,7 @@ private:
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1000432;
   static constexpr auto Actor1 = 1000411;
-  static constexpr auto Enemy0 = 159;
+  static constexpr auto Enemy0 = 197;  //159; WRONG INFO
   static constexpr auto Item0 = 2000142;
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq2Actor1 = 1;
@@ -61,28 +59,30 @@ public:
     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Actor0 )
-    {
       Scene00000( player );
-    }
     if( actor == Actor1 )
-    {
       Scene00001( player );
-    }
   }
 
-  void onMobKill( Entity::Player& player, uint64_t npcId )
+  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override
   {
     if( npcId != Enemy0 )
       return;
 
-    auto currentKC = player.getQuestUI8BH( getId() ) + 1;
+    auto currentKC = player.getQuestUI8BH( getId() );
 
-    if( currentKC >= 6 )
+    if ( currentKC + 1 >= 4 )
+    {
+      player.setQuestUI8AL( getId(), currentKC + 1 );
+      player.setQuestUI8BH( getId(), currentKC + 1 );
+      player.sendQuestMessage( getId(), 1, 0, 0, 0 );
       player.updateQuest( getId(), SeqFinish );
+    }
     else
     {
-      player.setQuestUI8BH( getId(), currentKC );
-      player.sendQuestMessage( getId(), 0, 2, currentKC, 6 );
+      player.setQuestUI8AL( getId(), currentKC + 1 );
+      player.setQuestUI8BH( getId(), currentKC + 1 );
+      player.sendQuestMessage( getId(), 0, 2, currentKC + 1, 4 );
     }
   }
 

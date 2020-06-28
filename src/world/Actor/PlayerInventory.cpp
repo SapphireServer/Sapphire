@@ -306,13 +306,13 @@ void Sapphire::Entity::Player::addCurrency( CurrencyType type, uint32_t amount, 
   if( !currItem )
   {
     // TODO: map currency type to itemid
-    currItem = createItem( 1 );
+    currItem = createTempItem( 1 );
     m_storageMap[ Currency ]->setItem( slot, currItem );
   }
 
   uint32_t currentAmount = currItem->getStackSize();
   currItem->setStackSize( currentAmount + amount );
-  writeItem( currItem );
+  updateItemDb( currItem );
 
   updateContainer( Currency, slot, currItem );
 
@@ -352,7 +352,7 @@ void Sapphire::Entity::Player::removeCurrency( Common::CurrencyType type, uint32
     currItem->setStackSize( 0 );
   else
     currItem->setStackSize( currentAmount - amount );
-  writeItem( currItem );
+  updateItemDb( currItem );
 
   auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
@@ -369,7 +369,7 @@ void Sapphire::Entity::Player::addCrystal( Common::CrystalType type, uint32_t am
   if( !currItem )
   {
     // TODO: map currency type to itemid
-    currItem = createItem( static_cast< uint8_t >( type ) + 1 );
+    currItem = createTempItem( static_cast< uint8_t >( type ) + 1 );
     m_storageMap[ Crystal ]->setItem( static_cast< uint8_t >( type ) - 1, currItem );
   }
 
@@ -377,7 +377,7 @@ void Sapphire::Entity::Player::addCrystal( Common::CrystalType type, uint32_t am
 
   currItem->setStackSize( currentAmount + amount );
 
-  writeItem( currItem );
+  updateItemDb( currItem );
 
   writeInventory( Crystal );
 
@@ -417,7 +417,7 @@ void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t
   else
     currItem->setStackSize( currentAmount - amount );
 
-  writeItem( currItem );
+  updateItemDb( currItem );
 
   auto invUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(),
                                                                     static_cast< uint8_t >( type ) - 1,
@@ -523,8 +523,11 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
   db.execute( query );
 }
 
-void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
+void Sapphire::Entity::Player::updateItemDb( Sapphire::ItemPtr pItem ) const
 {
+  if( pItem->getUId() == 0 )
+    writeItemDb( pItem );
+
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
 
@@ -540,6 +543,9 @@ void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
 
 void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
 {
+  if( item->getUId() == 0 )
+    return;
+
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
 
@@ -619,7 +625,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
           itemToAdd->setStackSize( 0 );
 
         item->setStackSize( newStackSize );
-        writeItem( item );
+        updateItemDb( item );
 
         if( !silent )
         {
@@ -662,6 +668,8 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
   if( !foundFreeSlot )
     return nullptr;
 
+  writeItemDb( itemToAdd );
+
   auto storage = m_storageMap[ freeBagSlot.first ];
   storage->setItem( freeBagSlot.second, itemToAdd );
 
@@ -696,7 +704,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 {
   if( catalogId == 0 )
     return nullptr;
-  auto item = createItem( catalogId, quantity );
+  auto item = createTempItem( catalogId, quantity );
   item->setHq( isHq );
   return addItem( item, silent, canMerge, sendLootMessage );
 }
@@ -799,7 +807,7 @@ void Sapphire::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t from
   updateContainer( fromInventoryId, fromSlotId, fromItem );
   updateContainer( toInventoryId, toSlot, newItem );
 
-  writeItem( fromItem );
+  updateItemDb( fromItem );
 }
 
 void Sapphire::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId,
@@ -826,14 +834,14 @@ void Sapphire::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t from
   else
   {
     fromItem->setStackSize( stackOverflow );
-    writeItem( fromItem );
+    updateItemDb( fromItem );
+    updateContainer( fromInventoryId, fromSlotId, fromItem );
   }
 
 
   toItem->setStackSize( stackSize );
-  writeItem( toItem );
+  updateItemDb( toItem );
 
-  updateContainer( fromInventoryId, fromSlotId, fromItem );
   updateContainer( toInventoryId, toSlot, toItem );
 }
 

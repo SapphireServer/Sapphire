@@ -920,8 +920,6 @@ namespace Sapphire::Entity
     using InvSlotPair = std::pair< uint16_t, int8_t >;
     using InvSlotPairVec = std::vector< InvSlotPair >;
 
-    ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
-
     bool loadInventory();
 
     InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
@@ -956,7 +954,11 @@ namespace Sapphire::Entity
 
     void writeInventory( Common::InventoryType type );
 
-    void writeItem( ItemPtr pItem ) const;
+    ItemPtr createTempItem( uint32_t catalogId, uint32_t quantity = 1 );
+
+    void updateItemDb( ItemPtr pItem ) const;
+
+    void writeItemDb( ItemPtr pItem ) const;
 
     void deleteItemDb( ItemPtr pItem ) const;
 
