@@ -1988,7 +1988,7 @@ void Sapphire::Entity::Player::dyeItemFromDyeingInfo()
   // TODO: subtract/remove dye used
 
   insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
-  writeItem( itemToDye );
+  updateItemDb( itemToDye );
 }
 
 void Sapphire::Entity::Player::resetObjSpawnIndex()

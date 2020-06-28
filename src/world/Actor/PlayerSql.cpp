@@ -618,11 +618,9 @@ void Sapphire::Entity::Player::insertQuest( uint16_t questId, uint8_t index, uin
   db.execute( stmt );
 }
 
-Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
+Sapphire::ItemPtr Sapphire::Entity::Player::createTempItem( uint32_t catalogId, uint32_t quantity )
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto& itemMgr = Common::Service< World::Manager::ItemMgr >::ref();
 
   auto itemInfo = exdData.get< Sapphire::Data::Item >( catalogId );
 
@@ -632,20 +630,30 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
   if( !itemInfo )
     return nullptr;
 
-  uint8_t flags = 0;
-
-  ItemPtr pItem = make_Item( itemMgr.getNextUId(), catalogId );
+  ItemPtr pItem = make_Item( 0, catalogId );
 
   pItem->setStackSize( quantity );
 
-  db.execute( "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
-               std::to_string( getId() ) + ", " +
-               std::to_string( pItem->getUId() ) + ", " +
-               std::to_string( pItem->getId() ) + ", " +
-               std::to_string( quantity ) + ", " +
-               std::to_string( flags ) + ");" );
-
   return pItem;
+}
+
+void Sapphire::Entity::Player::writeItemDb( Sapphire::ItemPtr pItem ) const
+{
+  if( pItem->getUId() == 0 )
+  {
+    auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+    auto& itemMgr = Common::Service< World::Manager::ItemMgr >::ref();
+
+    uint8_t flags = 0;
+    pItem->setUId( itemMgr.getNextUId() );
+    std::string sql = "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+                      std::to_string( getId() ) + ", " +
+                      std::to_string( pItem->getUId() ) + ", " +
+                      std::to_string( pItem->getId() ) + ", " +
+                      std::to_string( pItem->getStackSize() ) + ", " +
+                      std::to_string( flags ) + ");";
+    db.directExecute( sql );
+  }
 }
 
 bool Sapphire::Entity::Player::loadInventory()
