@@ -11,8 +11,6 @@ using namespace Sapphire;
 // Start NPC: 1000629
 // End NPC: 1000629
 
-//NEED TEST KILLCREDIT
-
 class SubFst026 :
   public Sapphire::ScriptAPI::EventScript
 {
@@ -55,28 +53,27 @@ public:
     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Actor0 && !player.hasQuest( getId() ) )
-    {
       Scene00000( player );
-    }
     else if( actor == Actor0 && player.getQuestSeq( getId() ) == SeqFinish )
-    {
       Scene00001( player );
-    }
   }
 
-  void onMobKill( Entity::Player& player, uint64_t npcId )
+  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override
   {
     if( npcId != Enemy0 )
       return;
 
-    auto currentKC = player.getQuestUI8AL( getId() ) + 1;
+    auto currentKC = player.getQuestUI8AL( getId() );
 
-    if( currentKC >= 6 )
+    if ( currentKC + 1 >= 6 )
+    {
+      player.sendQuestMessage( getId(), 0, 2, currentKC + 1, 6 );
       player.updateQuest( getId(), SeqFinish );
+    }
     else
     {
-      player.setQuestUI8AL( getId(), currentKC );
-      player.sendQuestMessage( getId(), 0, 2, currentKC, 6 );
+      player.setQuestUI8AL( getId(), currentKC + 1 );
+      player.sendQuestMessage( getId(), 0, 2, currentKC + 1, 6 );
     }
   }
 
