@@ -494,6 +494,18 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", param12, param2 );
       break;
     }
+    case ClientTriggerType::CameraMode:
+    {
+      if( param11 == 1 )
+      {
+        player.setOnlineStatusMask( player.getOnlineStatusMask() | 0x0000000000040000ui64 );
+      }
+      else
+      {
+        player.setOnlineStatusMask( player.getOnlineStatusMask() & 0xFFFFFFFFFFFBFFFFui64 );
+      }
+      break;
+    }
     case ClientTriggerType::Trigger612:
     {
       player.sendStateFlags();

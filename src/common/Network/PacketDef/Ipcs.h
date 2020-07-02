@@ -79,6 +79,7 @@ namespace Sapphire::Network::Packets
     LogMessage = 0x00D0,
 
     Chat = 0x0161, // updated 5.25
+    PartyChat = 0x0065, // updated 5.25
 
     WorldVisitList = 0xF0FE, // added 4.5
 
@@ -145,7 +146,7 @@ namespace Sapphire::Network::Packets
     ActorCast = 0x00C4, // updated 5.25
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-    PartyList = 0x0287, // updated 5.18
+    PartyList = 0x01B7, // updated 5.25
     HateRank = 0x012E, // updated 5.25
     HateList = 0x02C4, // updated 5.25
     ObjectSpawn = 0x00D2, // updated 5.25
@@ -228,6 +229,13 @@ namespace Sapphire::Network::Packets
 
     EquipDisplayFlags = 0x010D, // updated 5.25
 
+    ShopMessage = 0x00C1, // updated 5.25
+    LootMessage = 0x00B1, // updated 5.25
+    SocialInviteMessage = 0x02F0, // updated 5.25
+    SocialInviteMessage2 = 0x026E, // updated 5.25
+    SocialInviteResponseMessage = 0x0117, // updated 5.25
+    PartyMessage = 0x0284, // updated 5.25
+
     /// Housing //////////////////////////////////////
 
     LandSetInitialize = 0x0234, // updated 5.0
@@ -304,6 +312,7 @@ namespace Sapphire::Network::Packets
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
     ChatHandler = 0x0189, // updated 5.25
+    PartyChatHandler = 0x0065, // update 5.25
 
     SocialListHandler = 0x0371, // updated 5.25
     SetSearchInfoHandler = 0x00FA, // updated 5.25
@@ -380,8 +389,13 @@ namespace Sapphire::Network::Packets
     PerformNoteHandler = 0x029B, // updated 4.3
 
     WorldInteractionHandler = 0x0285, // updated 5.25
-    ShopMessage = 0x00C1, // updated 5.25
-    LootMessage = 0x00B1, // updated 5.25
+
+    SocialInviteHandler = 0x02BA, // updated 5.25
+    SocialInviteResponseHandler = 0x02C7, // updated 5.25
+    PartySetLeaderHandler = 0x02A5, // updated 5.25
+    LeavePartyHandler = 0x00C0, // updated 5.25
+    KickPartyMemberHandler = 0x0188, // update 5.25
+    DisbandPartyHandler = 0x0336, // update 5.25
   };
 
   ////////////////////////////////////////////////////////////////////////////////

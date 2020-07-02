@@ -46,6 +46,19 @@ namespace Sapphire::Network::Packets::Server
     char msg[1012];
   };
 
+  struct FFXIVIpcPartyChat : FFXIVIpcBasePacket< PartyChat >
+  {
+    uint64_t unknown;
+    uint64_t contentId;
+    uint32_t charaId;
+    uint8_t u1;
+    uint8_t u2;
+    uint8_t u3;
+    char name[32];
+    char message[1024];
+    uint8_t padding;
+  };
+
   struct FFXIVIpcChatBanned : FFXIVIpcBasePacket< ChatBanned >
   {
     uint8_t padding[4]; // I was not sure reinterpreting ZST is valid behavior in C++.
@@ -2078,6 +2091,83 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param7;
   };
 
+  struct FFXIVIpcSocialInviteMessage : FFXIVIpcBasePacket< SocialInviteMessage >
+  {
+    uint64_t contentId;
+    uint32_t expireTime;
+    uint8_t p1;
+    uint8_t p2;
+    uint8_t socialType;
+    uint8_t padding;
+    uint8_t type;
+    uint8_t unknown4;
+    char name[32];
+    uint8_t padding2[6];
+  };
+
+  struct FFXIVIpcSocialInviteMessage2 : FFXIVIpcBasePacket< SocialInviteMessage2 >
+  {
+    uint64_t contentId;
+    uint32_t unknown3;
+    uint8_t p1;
+    uint8_t p2;
+    uint8_t socialType;
+    uint8_t padding;
+    char name[32];
+  };
+
+  struct FFXIVIpcSocialInviteResponseMessage : FFXIVIpcBasePacket< SocialInviteResponseMessage >
+  {
+    uint64_t contentId;
+    uint32_t unknown3;
+    uint8_t u1AlwaysOne;
+    uint8_t response;
+    uint8_t u2AlwaysOne;
+    char name[32];
+    uint8_t padding;
+  };
+
+  struct FFXIVIpcPartyList : FFXIVIpcBasePacket< PartyList >
+  {
+    struct
+    {
+      char name[32];
+      uint64_t contentId;
+      uint32_t charaId;
+      uint32_t u1;
+      uint32_t u2;
+      uint32_t hp;
+      uint32_t maxHp;
+      uint16_t mp;
+      uint16_t maxMp;
+      uint16_t u3;
+      uint16_t zoneId;
+      uint8_t gposeSelectable;
+      uint8_t classId;
+      uint8_t u5;
+      uint8_t level;
+      uint8_t otherData[368];
+    } member[8];
+    uint64_t someContentId1;
+    uint64_t someContentId2;
+    uint8_t leaderIndex;
+    uint8_t partySize;
+    uint16_t padding1;
+    uint32_t padding2;
+  };
+
+  struct FFXIVIpcPartyMessage : FFXIVIpcBasePacket< PartyMessage >
+  {
+    uint64_t leaderContentId;
+    uint64_t memberContentId;
+    uint8_t u1;
+    uint8_t u2;
+    uint16_t type;
+    uint8_t partySize; // ?
+    char leaderName[32];
+    char memberName[32];
+    uint8_t padding[3];
+  };
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/
