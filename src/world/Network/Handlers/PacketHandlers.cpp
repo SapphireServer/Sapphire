@@ -87,18 +87,11 @@ void Sapphire::Network::GameConnection::setSearchInfoHandler( const Packets::FFX
     // mark player as new adventurer
     player.setNewAdventurer( true );
 
-  auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
-  statusPacket->data().onlineStatusFlags = status;
-  queueOutPacket( statusPacket );
-
   auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
   searchInfoPacket->data().onlineStatusFlags = status;
   searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
   strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
-
-  player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                             static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Network::GameConnection::reqSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -437,31 +430,47 @@ void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVA
     int32_t entrysizes = sizeof( listPacket->data().entries );
     memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
-    listPacket->data().entries[ 0 ].bytes[ 2 ] = player.getCurrentTerritory()->getTerritoryTypeId();
-    listPacket->data().entries[ 0 ].bytes[ 3 ] = 0x80;
-    listPacket->data().entries[ 0 ].bytes[ 4 ] = 0x02;
-    listPacket->data().entries[ 0 ].bytes[ 6 ] = 0x3B;
-    listPacket->data().entries[ 0 ].bytes[ 11 ] = 0x10;
-    listPacket->data().entries[ 0 ].classJob = static_cast< uint8_t >( player.getClass() );
-    listPacket->data().entries[ 0 ].contentId = player.getContentId();
-    listPacket->data().entries[ 0 ].level = player.getLevel();
-    listPacket->data().entries[ 0 ].zoneId = player.getCurrentTerritory()->getTerritoryTypeId();
-    listPacket->data().entries[ 0 ].zoneId1 = 0x0100;
-    // TODO: no idea what this does
-    //listPacket.data().entries[0].one = 1;
+    auto fillEntryAt = [ &listPacket ]( int i, Entity::PlayerPtr nextPlayer )
+    {
+      listPacket->data().entries[ i ].bytes[ 2 ] = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
+      listPacket->data().entries[ i ].bytes[ 3 ] = 0x80;
+      listPacket->data().entries[ i ].bytes[ 4 ] = 0x02;
+      listPacket->data().entries[ i ].bytes[ 6 ] = 0x3B;
+      listPacket->data().entries[ i ].bytes[ 8 ] = nextPlayer->isPartyLeader() ? 1 : 0;
+      listPacket->data().entries[ i ].bytes[ 11 ] = 0x10;
+      listPacket->data().entries[ i ].classJob = static_cast< uint8_t >( nextPlayer->getClass() );
+      listPacket->data().entries[ i ].contentId = nextPlayer->getContentId();
+      listPacket->data().entries[ i ].level = nextPlayer->getLevel();
+      listPacket->data().entries[ i ].zoneId = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
+      listPacket->data().entries[ i ].zoneId1 = 0x0100;
+      // TODO: no idea what this does
+      //listPacket.data().entries[0].one = 1;
 
-    memcpy( listPacket->data().entries[ 0 ].name, player.getName().c_str(), strlen( player.getName().c_str() ) );
+      memcpy( listPacket->data().entries[ i ].name, nextPlayer->getName().c_str(), strlen( nextPlayer->getName().c_str() ) );
 
-    // GC icon
-    listPacket->data().entries[ 0 ].bytes1[ 0 ] = 2;
-    // client language J = 0, E = 1, D = 2, F = 3
-    listPacket->data().entries[ 0 ].bytes1[ 1 ] = 1;
-    // user language settings flag J = 1, E = 2, D = 4, F = 8
-    listPacket->data().entries[ 0 ].bytes1[ 2 ] = 1 + 2; 
-    listPacket->data().entries[ 0 ].onlineStatusMask = player.getOnlineStatusMask();
+      // GC icon
+      listPacket->data().entries[ i ].bytes1[ 0 ] = 2;
+      // client language J = 0, E = 1, D = 2, F = 3
+      listPacket->data().entries[ i ].bytes1[ 1 ] = 1;
+      // user language settings flag J = 1, E = 2, D = 4, F = 8
+      listPacket->data().entries[ i ].bytes1[ 2 ] = 1 + 2; 
+      listPacket->data().entries[ i ].onlineStatusMask = nextPlayer->getOnlineStatusMask();
+    };
+    auto nextPlayer = player.getAsPlayer();
+    fillEntryAt( 0, nextPlayer );
+    if( player.isInParty() )
+    {
+      int i = 1;
+      player.getPartyLeader()->foreachPartyMember( [ &player, &fillEntryAt, &i ]( auto m )
+        {
+          if( m->getId() == player.getId() )
+            return;
+          fillEntryAt( i, m );
+          i++;
+        } );
+    }
 
     queueOutPacket( listPacket );
-
   }
   else if( type == 2 )
   { // friend list
@@ -476,6 +485,34 @@ void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVA
     // TODO: implement player search
   }
 
+}
+
+void Sapphire::Network::GameConnection::partyChatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  // proper party chat packet not working, <se.x> won't work with this workaround
+  if( !player.isInParty() )
+    return;
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcPartyChatHandler >( inPacket );
+  //FFXIVIpcPartyChat chat = {};
+  //chat.unknown = packet.data().unknown;
+  //chat.contentId = player.getContentId();
+  //chat.charaId = player.getId();
+  //chat.u1 = 0x44;
+  //memcpy( chat.name, player.getName().c_str(), player.getName().length() + 1 );
+  //memcpy( chat.message, packet.data().message, sizeof( chat.message ) );
+  auto leader = player.getPartyLeader();
+  leader->foreachPartyMember( [ &packet, &player/*, chat*/ ]( auto m )
+    {
+      if( player.getId() == m->getId() )
+        return;
+      //auto pChat = makeZonePacket< FFXIVIpcPartyChat >( m->getId() );
+      //memcpy( &pChat->data(), &chat, sizeof( chat ) );
+      //m->queuePacket( pChat );
+
+      /* workaround */
+      auto chatPacket = std::make_shared< Server::ChatPacket >( player, ChatType::Party, packet.data().message );
+      m->queuePacket( chatPacket );
+    } );
 }
 
 void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -792,4 +829,261 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
       player.sendToInRangeSet( pSetStatusPacket );
     }
   }
+}
+
+void Sapphire::Network::GameConnection::socialInviteHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcSocialInviteHandler >( inPacket );
+  switch( packetIn.data().socialType )
+  {
+    case 1:
+    {
+      if( player.isInParty() && !player.isPartyLeader() )
+        return;
+      std::string name( packetIn.data().name );
+      auto& serverMgr = Common::Service< Sapphire::World::ServerMgr >::ref();
+      auto session = serverMgr.getSession( name );
+      if( session )
+      {
+        auto targetPlayer = session->getPlayer();
+        if( targetPlayer->isInParty() )
+          return;
+        auto packet1 = makeZonePacket< FFXIVIpcSocialInviteMessage2 >( player.getId() );
+        packet1->data().contentId = targetPlayer->getContentId();
+        packet1->data().p1 = packetIn.data().p1;
+        packet1->data().p2 = packetIn.data().p2;
+        packet1->data().socialType = packetIn.data().socialType;
+        memcpy( packet1->data().name, targetPlayer->getName().c_str(), targetPlayer->getName().length() + 1 );
+        player.queuePacket( packet1 );
+
+        auto packet2 = makeZonePacket< FFXIVIpcSocialInviteMessage >( targetPlayer->getId() );
+        packet2->data().contentId = player.getContentId();
+        packet2->data().expireTime = Common::Util::getTimeSeconds() + 30;
+        packet2->data().p1 = packetIn.data().p1;
+        packet2->data().p2 = packetIn.data().p2;
+        packet2->data().socialType = packetIn.data().socialType;
+        packet2->data().type = 1;
+        packet2->data().unknown4 = 1;
+        memcpy( packet2->data().name, player.getName().c_str(), player.getName().length() + 1 );
+        targetPlayer->queuePacket( packet2 );
+
+        targetPlayer->setPartyInvitationSender( player.getAsPlayer() );
+      }
+      return;
+    }
+  }
+}
+
+void Sapphire::Network::GameConnection::socialInviteResponseHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcSocialInviteResponseHandler >( inPacket );
+  switch( packetIn.data().socialType )
+  {
+    case 1:
+    {
+      if( player.isInParty() || !player.getPartyInvitationSender() )
+        return;
+      auto response = packetIn.data().response;
+      auto sender = player.getPartyInvitationSender();
+      player.setPartyInvitationSender( nullptr );
+      auto packet1 = makeZonePacket< FFXIVIpcSocialInviteResponseMessage >( player.getId() );
+      packet1->data().contentId = sender->getContentId();
+      packet1->data().u1AlwaysOne = 1;
+      packet1->data().response = response;
+      packet1->data().u2AlwaysOne = 1;
+      memcpy( packet1->data().name, sender->getName().c_str(), sender->getName().length() + 1 );
+      player.queuePacket( packet1 );
+      if( response == 1 && ( !sender->isInParty() || sender->getPartyLeader()->getId() == sender->getId() ) )
+      {
+        if( !sender->isInParty() )
+        {
+          if( !sender->createEmptyParty() )
+            return;
+        }
+        auto member = player.getAsPlayer();
+        if( sender->addPartyMember( member ) )
+        {
+          FFXIVIpcPartyMessage msg = {};
+          msg.leaderContentId = sender->getContentId();
+          msg.memberContentId = player.getContentId();
+          msg.u1 = 1;
+          msg.type = 1;
+          msg.partySize = sender->getPartySize();
+          memcpy( msg.leaderName, sender->getName().c_str(), sender->getName().length() + 1 );
+          memcpy( msg.memberName, player.getName().c_str(), player.getName().length() + 1 );
+          sender->foreachPartyMember( [ msg ]( auto m )
+            {
+              auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+              memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+              m->queuePacket( packetMsg );
+            } );
+
+          auto packet2 = makeZonePacket< FFXIVIpcSocialInviteMessage >( sender->getId() );
+          packet2->data().contentId = player.getContentId();
+          packet2->data().expireTime = Common::Util::getTimeSeconds() + 30;
+          packet2->data().p1 = packetIn.data().p1;
+          packet2->data().p2 = packetIn.data().p2;
+          packet2->data().socialType = packetIn.data().socialType;
+          packet2->data().type = 4;
+          memcpy( packet2->data().name, player.getName().c_str(), player.getName().length() + 1 );
+          sender->queuePacket( packet2 );
+        }
+      }
+      else
+      {
+        auto packet2 = makeZonePacket< FFXIVIpcSocialInviteMessage >( sender->getId() );
+        packet2->data().contentId = player.getContentId();
+        packet2->data().expireTime = Common::Util::getTimeSeconds() + 30;
+        packet2->data().p1 = packetIn.data().p1;
+        packet2->data().p2 = packetIn.data().p2;
+        packet2->data().socialType = packetIn.data().socialType;
+        packet2->data().type = 5;
+        memcpy( packet2->data().name, player.getName().c_str(), player.getName().length() + 1 );
+        sender->queuePacket( packet2 );
+      }
+      return;
+    }
+  }
+}
+
+void Sapphire::Network::GameConnection::partySetLeaderHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  if( !player.isPartyLeader() )
+    return;
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcPartySetLeaderHandler >( inPacket );
+  Sapphire::Entity::PlayerPtr newLeader = nullptr;
+  player.foreachPartyMember( [ &packetIn, &newLeader ]( auto m )
+    {
+      if( m->getContentId() == packetIn.data().contentId )
+      {
+        newLeader = m;
+      }
+    } );
+  if( newLeader && player.changePartyLeader( newLeader ) )
+  {
+    FFXIVIpcPartyMessage msg = {};
+    msg.leaderContentId = player.getContentId();
+    msg.memberContentId = newLeader->getContentId();
+    msg.type = 2;
+    msg.u1 = 1;
+    msg.partySize = newLeader->getPartySize();
+    memcpy( msg.leaderName, player.getName().c_str(), player.getName().length() + 1 );
+    memcpy( msg.memberName, newLeader->getName().c_str(), newLeader->getName().length() + 1 );
+    newLeader->foreachPartyMember( [ msg ] ( auto m )
+      {
+        auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+        memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+        m->queuePacket( packetMsg );
+      } );
+  }
+}
+
+void Sapphire::Network::GameConnection::leavePartyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  if( !player.isInParty() )
+    return;
+  auto leader = player.getPartyLeader();
+  if( leader->getPartySize() <= 2 )
+  {
+    FFXIVIpcPartyMessage msg = {};
+    msg.leaderContentId = leader->getContentId();
+    msg.type = 3;
+    leader->foreachPartyMember( [ msg ] ( auto m )
+      {
+        auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+        memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+        m->queuePacket( packetMsg );
+      } );
+    leader->disbandParty();
+  }
+  else
+  {
+    FFXIVIpcPartyMessage msg = {};
+    msg.memberContentId = player.getContentId();
+    leader->foreachPartyMember( [ &player, &leader, &msg ] ( auto m )
+      {
+        if( m->getId() == player.getId() )
+        {
+          msg.leaderContentId = leader->getContentId();
+          msg.type = 5;
+        }
+        else
+        {
+          msg.leaderContentId = 0;
+          msg.type = 4;
+        }
+        auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+        memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+        m->queuePacket( packetMsg );
+      } );
+    leader->removePartyMember( player.getAsPlayer() );
+  }
+}
+
+void Sapphire::Network::GameConnection::kickPartyMemberHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  if( !player.isPartyLeader() )
+    return;
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcKickPartyMemberHander >( inPacket );
+  Sapphire::Entity::PlayerPtr toKick = nullptr;
+  player.foreachPartyMember( [ &packetIn, &toKick ]( auto m )
+    {
+      if( m->getContentId() == packetIn.data().contentId )
+      {
+        toKick = m;
+      }
+    } );
+  if( toKick )
+  {
+    if( player.getPartySize() <= 2 )
+    {
+      FFXIVIpcPartyMessage msg = {};
+      msg.leaderContentId = player.getContentId();
+      msg.type = 3;
+      player.foreachPartyMember( [ msg ] ( auto m )
+        {
+          auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+          memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+          m->queuePacket( packetMsg );
+        } );
+      player.disbandParty();
+    }
+    else
+    {
+      FFXIVIpcPartyMessage msg = {};
+      msg.leaderContentId = player.getContentId();
+      msg.memberContentId = toKick->getContentId();
+      player.foreachPartyMember( [ &toKick, &msg ] ( auto m )
+        {
+          if( m->getId() == toKick->getId() )
+          {
+            msg.type = 5;
+          }
+          else
+          {
+            msg.type = 4;
+          }
+          auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+          memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+          m->queuePacket( packetMsg );
+        } );
+      player.removePartyMember( toKick );
+    }
+  }
+}
+
+void Sapphire::Network::GameConnection::disbandPartyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  if( !player.isPartyLeader() )
+    return;
+  FFXIVIpcPartyMessage msg = {};
+  msg.leaderContentId = player.getContentId();
+  msg.type = 3;
+  player.foreachPartyMember( [ msg ] ( auto m )
+    {
+      auto packetMsg = makeZonePacket< FFXIVIpcPartyMessage >( m->getId() );
+      memcpy( &packetMsg->data(), &msg, sizeof( msg ) );
+      m->queuePacket( packetMsg );
+    } );
+  player.disbandParty();
 }

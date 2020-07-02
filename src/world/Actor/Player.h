@@ -990,8 +990,29 @@ namespace Sapphire::Entity
     void sendActorGauge();
     void gaugeSetRaw( uint8_t* pData );
 
+    // party
     //////////////////////////////////////////////////////////////////////////////////////////////////////
+  private:
+    PlayerPtr m_partyLeader;
+    PlayerPtr m_partyInvitationSender;
+    std::vector< PlayerPtr > m_partyMemberList;
+    void clearPartyList();
+    void sendPartyListToParty();
+  public:
+    bool isPartyLeader();
+    bool isInParty();
+    bool createEmptyParty();
+    void disbandParty();
+    PlayerPtr getPartyLeader();
+    PlayerPtr getPartyInvitationSender();
+    void setPartyInvitationSender( PlayerPtr sender );
+    bool addPartyMember( PlayerPtr member );
+    bool removePartyMember( PlayerPtr member );
+    bool changePartyLeader( PlayerPtr newLeader );
+    uint8_t getPartySize();
+    void foreachPartyMember( std::function< void( PlayerPtr member ) > callback);
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     void sendHuntingLog();
