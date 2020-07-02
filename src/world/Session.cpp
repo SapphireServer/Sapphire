@@ -73,6 +73,10 @@ void Sapphire::World::Session::close()
   if( m_pPlayer )
   {
     m_pPlayer->clearBuyBackMap();
+    if( m_pPlayer->isInParty() )
+    {
+      m_pPlayer->getPartyLeader()->removePartyMember( m_pPlayer );
+    }
     // do one last update to db
     m_pPlayer->updateSql();
     // reset the zone, so the zone handler knows to remove the actor
