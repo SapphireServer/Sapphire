@@ -340,7 +340,7 @@ namespace Sapphire::Network::Packets
 
     PlaceFieldMarkerPreset = 0x023F, // updated 5.25
     PlaceFieldMarker = 0x01BA, // updated 5.25
-    SkillHandler = 0x0241, // updated 5.25
+    SkillHandler = 0x033C, // updated 5.3
     GMCommand1 = 0x01EC, // updated 5.25
     GMCommand2 = 0x0368, // updated 5.25
     AoESkillHandler = 0x0364, // updated 5.21 hotfix
