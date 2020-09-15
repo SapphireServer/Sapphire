@@ -286,9 +286,11 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFFXIVIpcMarketTaxRates : FFXIVIpcBasePacket< MarketTaxRates >
   {
-    uint32_t unknown1;
-    uint16_t padding1;
-    uint16_t unknown2;
+    // Same handler as MiniCactpotInit
+    uint32_t type;
+    uint16_t category;
+    uint8_t unknown1;
+    uint8_t unknown2;
     uint32_t taxRate[Common::TOWN_COUNT]; // In the order of Common::Town
     uint64_t unknown3;
   };
@@ -1552,7 +1554,7 @@ namespace Sapphire::Network::Packets::Server
 
   /**
   * Structural representation of the packet sent by the server
-  * to send a unviel a map
+  * to send a unveil a map
   */
   struct FFXIVIpcDiscovery : FFXIVIpcBasePacket< Discovery >
   {
@@ -1679,6 +1681,52 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcEquipDisplayFlags : FFXIVIpcBasePacket< EquipDisplayFlags >
   {
     uint8_t bitmask;
+  };
+
+  struct FFXIVIpcMiniCactPotInit : FFXIVIpcBasePacket< MiniCactpotInit >
+  {
+    /*
+    * Looks like this shares a handler with MarketTaxRates and a few
+    * other packets, so these first fields are most likely discriminators
+    * or other metadata for the handler itself.
+    */
+    uint32_t type;
+    uint16_t category;
+    uint8_t unknown1;
+    uint8_t unknown2;
+    /*
+    * Always 18 for this packet, incidentally the number of payouts plus 1.
+    * Used similarly for MarketTaxRates => for (auto i = 0; i <= indexEnd; i++) {}
+    */
+    uint8_t indexEnd;
+    uint8_t unknown3;
+    uint16_t padding1;
+    /*
+    * On clicking a number, the client sends a ClientTrigger (DirectorSync) with an unknown
+    * param2, param5; param1 session, param3 column, param4 row; zero param6, and the server
+    * replies with an ActorControlSelf (DirectorUpdate) with an unknown param2; param1 session,
+    * param3 column, param4 row, param5 digit; zero param6. After a line is selected,
+    * the server replies with 9 DirectorUpdate packets, in order (column, row), containing every
+    * number on the board (why tho). Finally, one last DirectorUpdate is sent with parameters
+    * param1 session, param3 payout index; unknown param2, param4; zero param5, param6.
+    */
+    uint32_t column; // zero-based
+    uint32_t row;
+    uint32_t firstDigit;
+    uint32_t payouts[19]; // In in-game display order
+    uint32_t unknown4;
+    /*
+    * All of the below fields seem to be gibberish, and change completely between
+    * draws and characters.
+    */
+    uint32_t unknown5;
+    uint32_t unknown6;
+    uint32_t unknown7;
+    uint32_t unknown8;
+    uint16_t unknown9;
+    uint16_t unknown10;
+    uint32_t unknown11;
+    uint64_t unknown12;
   };
 
   /**
@@ -2077,7 +2125,6 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param6;
     uint32_t param7;
   };
-
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/
