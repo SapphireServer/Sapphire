@@ -415,6 +415,14 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 
 void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId, float x, float y, float z, float r, bool showZoneName )
 {
+  if( zoneId == 0 )
+  {
+    zoneId = getCurrentTerritory()->getTerritoryTypeId();
+    x = m_pos.x;
+    y = m_pos.y;
+    z = m_pos.z;
+    r = m_rot;
+  }
   Common::FFXIVARR_POSITION3 pos { x, y, z };
   m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, pos, Util::getTimeMs(), r );
   prepareZoning( showZoneName ? zoneId : 0, true, 1, 0 );
