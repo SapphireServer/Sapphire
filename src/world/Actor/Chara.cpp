@@ -598,11 +598,12 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sen
   if( pEffectIt == m_statusEffectMap.end() )
     return;
 
+  auto pEffect = pEffectIt->second;
+
   statusEffectFreeSlot( effectSlotId );
 
   m_statusEffectMap.erase( effectSlotId );
 
-  auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
   sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), true );

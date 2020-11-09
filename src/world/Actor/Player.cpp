@@ -2153,7 +2153,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
   const auto maxRank = 4;
   auto& pExdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto& logEntry = m_huntingLogEntries[ static_cast< uint8_t >( getClass() ) - 1 ];
+  auto logEntryIndex = static_cast< uint8_t >( getClass() ) - 1;
 
   bool logChanged = false;
 
@@ -2162,6 +2162,10 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
   auto classJobInfo = pExdData.get< Sapphire::Data::ClassJob >( currentClass );
   if( !classJobInfo )
     return;
+  if( classJobInfo->classJobParent > 0 )
+    logEntryIndex = classJobInfo->classJobParent;
+
+  auto& logEntry = m_huntingLogEntries[ logEntryIndex ];
 
   bool allSectionsComplete = true;
   for( int i = 1; i <= 10; ++i )
