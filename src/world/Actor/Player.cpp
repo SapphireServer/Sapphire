@@ -1638,7 +1638,6 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 {
   pTarget->onActionHostile( getAsChara() );
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  assert( exdData );
   World::Action::ActionPtr action;
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -2707,7 +2706,6 @@ void Sapphire::Entity::Player::gaugeSamSetSen( Sapphire::Common::SamSen type, bo
 
 void Sapphire::Entity::Player::gaugeSamSetSen( Sapphire::Common::SamSen value )
 {
-  assert( value >= 0 && value <= 7 );
   auto oldValue = gaugeSamGetSenRaw();
   m_gauge.sam.sen = value;
   if( oldValue != value )

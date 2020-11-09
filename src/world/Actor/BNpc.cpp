@@ -696,7 +696,6 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     m_lastAttack = tick;
 
     auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-    assert( exdData );
     auto actionData = exdData.get< Data::Action >( 7 );
     assert( actionData );
     auto action = World::Action::make_Action( getAsChara(), 7, 0, actionData );
