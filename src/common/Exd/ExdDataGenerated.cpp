@@ -1957,28 +1957,28 @@ Sapphire::Data::ContentFinderCondition::ContentFinderCondition( uint32_t row_id,
   classJobLevelSync = exdData->getField< uint8_t >( row, 16 );
   itemLevelRequired = exdData->getField< uint16_t >( row, 17 );
   itemLevelSync = exdData->getField< uint16_t >( row, 18 );
-  allowUndersized = exdData->getField< bool >( row, 19 );
-  allowReplacement = exdData->getField< bool >( row, 20 );
-  highEndDuty = exdData->getField< bool >( row, 26 );
-  dutyRecorderAllowed = exdData->getField< bool >( row, 30 );
-  name = exdData->getField< std::string >( row, 35 );
-  contentType = exdData->getField< uint8_t >( row, 36 );
-  transientKey = exdData->getField< uint8_t >( row, 37 );
-  transient = exdData->getField< uint32_t >( row, 38 );
-  sortKey = exdData->getField< uint16_t >( row, 39 );
-  image = exdData->getField< uint32_t >( row, 40 );
-  icon = exdData->getField< uint32_t >( row, 41 );
-  levelingRoulette = exdData->getField< bool >( row, 43 );
-  level5060Roulette = exdData->getField< bool >( row, 44 );
-  mSQRoulette = exdData->getField< bool >( row, 45 );
-  guildHestRoulette = exdData->getField< bool >( row, 46 );
-  expertRoulette = exdData->getField< bool >( row, 47 );
-  trialRoulette = exdData->getField< bool >( row, 48 );
-  dailyFrontlineChallenge = exdData->getField< bool >( row, 49 );
-  level70Roulette = exdData->getField< bool >( row, 50 );
-  mentorRoulette = exdData->getField< bool >( row, 51 );
-  allianceRoulette = exdData->getField< bool >( row, 57 );
-  normalRaidRoulette = exdData->getField< bool >( row, 59 );
+  allowUndersized = exdData->getField< bool >( row, 20 );
+  allowReplacement = exdData->getField< bool >( row, 21 );
+  highEndDuty = exdData->getField< bool >( row, 27 );
+  dutyRecorderAllowed = exdData->getField< bool >( row, 31 );
+  name = exdData->getField< std::string >( row, 36 );
+  contentType = exdData->getField< uint8_t >( row, 37 );
+  transientKey = exdData->getField< uint8_t >( row, 38 );
+  transient = exdData->getField< uint32_t >( row, 39 );
+  sortKey = exdData->getField< uint16_t >( row, 40 );
+  image = exdData->getField< uint32_t >( row, 41 );
+  icon = exdData->getField< uint32_t >( row, 42 );
+  levelingRoulette = exdData->getField< bool >( row, 44 );
+  level5060Roulette = exdData->getField< bool >( row, 45 );
+  mSQRoulette = exdData->getField< bool >( row, 46 );
+  guildHestRoulette = exdData->getField< bool >( row, 47 );
+  expertRoulette = exdData->getField< bool >( row, 48 );
+  trialRoulette = exdData->getField< bool >( row, 49 );
+  dailyFrontlineChallenge = exdData->getField< bool >( row, 50 );
+  level70Roulette = exdData->getField< bool >( row, 51 );
+  mentorRoulette = exdData->getField< bool >( row, 52 );
+  allianceRoulette = exdData->getField< bool >( row, 58 );
+  normalRaidRoulette = exdData->getField< bool >( row, 60 );
 }
 
 Sapphire::Data::ContentFinderConditionTransient::ContentFinderConditionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -2814,22 +2814,22 @@ Sapphire::Data::ENpcDressUp::ENpcDressUp( uint32_t row_id, Sapphire::Data::ExdDa
 Sapphire::Data::ENpcDressUpDress::ENpcDressUpDress( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
 {
   auto row = exdData->m_ENpcDressUpDressDat.get_row( row_id, subRow );
-  eNpc = exdData->getField< uint32_t >( row, 6 );
-  behavior = exdData->getField< uint16_t >( row, 8 );
-  modelMainHand = exdData->getField< uint64_t >( row, 35 );
-  dyeMainHand = exdData->getField< uint8_t >( row, 36 );
-  modelOffHand = exdData->getField< uint64_t >( row, 37 );
-  dyeOffHand = exdData->getField< uint8_t >( row, 38 );
-  modelHead = exdData->getField< uint32_t >( row, 39 );
-  dyeHead = exdData->getField< uint8_t >( row, 40 );
-  modelBody = exdData->getField< uint32_t >( row, 41 );
-  dyeBody = exdData->getField< uint8_t >( row, 42 );
-  modelHands = exdData->getField< uint32_t >( row, 43 );
-  dyeHands = exdData->getField< uint8_t >( row, 44 );
-  modelLegs = exdData->getField< uint32_t >( row, 45 );
-  dyeLegs = exdData->getField< uint8_t >( row, 46 );
-  modelFeet = exdData->getField< uint32_t >( row, 47 );
-  dyeFeet = exdData->getField< uint8_t >( row, 48 );
+  eNpc = exdData->getField< uint32_t >( row, 7 );
+  behavior = exdData->getField< uint16_t >( row, 9 );
+  modelMainHand = exdData->getField< uint64_t >( row, 37 );
+  dyeMainHand = exdData->getField< uint8_t >( row, 38 );
+  modelOffHand = exdData->getField< uint64_t >( row, 39 );
+  dyeOffHand = exdData->getField< uint8_t >( row, 40 );
+  modelHead = exdData->getField< uint32_t >( row, 41 );
+  dyeHead = exdData->getField< uint8_t >( row, 42 );
+  modelBody = exdData->getField< uint32_t >( row, 43 );
+  dyeBody = exdData->getField< uint8_t >( row, 44 );
+  modelHands = exdData->getField< uint32_t >( row, 45 );
+  dyeHands = exdData->getField< uint8_t >( row, 46 );
+  modelLegs = exdData->getField< uint32_t >( row, 47 );
+  dyeLegs = exdData->getField< uint8_t >( row, 48 );
+  modelFeet = exdData->getField< uint32_t >( row, 49 );
+  dyeFeet = exdData->getField< uint8_t >( row, 50 );
 }
 
 Sapphire::Data::ENpcResident::ENpcResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -3083,15 +3083,13 @@ Sapphire::Data::Fate::Fate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
   screenImageAccept = exdData->getField< uint16_t >( row, 15 );
   screenImageComplete = exdData->getField< uint16_t >( row, 16 );
   screenImageFailed = exdData->getField< uint16_t >( row, 17 );
-  hasWorldMapIcon = exdData->getField< bool >( row, 18 );
-  isQuest = exdData->getField< bool >( row, 19 );
-  name = exdData->getField< std::string >( row, 29 );
-  description = exdData->getField< std::string >( row, 30 );
-  objective = exdData->getField< std::string >( row, 31 );
-  statusText.push_back( exdData->getField< std::string >( row, 32 ) );
+  name = exdData->getField< std::string >( row, 30 );
+  description = exdData->getField< std::string >( row, 31 );
+  objective = exdData->getField< std::string >( row, 32 );
   statusText.push_back( exdData->getField< std::string >( row, 33 ) );
   statusText.push_back( exdData->getField< std::string >( row, 34 ) );
-  arrayIndex = exdData->getField< uint32_t >( row, 35 );
+  statusText.push_back( exdData->getField< std::string >( row, 35 ) );
+  arrayIndex = exdData->getField< uint32_t >( row, 36 );
 }
 
 Sapphire::Data::FateEvent::FateEvent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -4032,9 +4030,9 @@ Sapphire::Data::GuideTitle::GuideTitle( uint32_t row_id, Sapphire::Data::ExdData
 Sapphire::Data::GuildleveAssignment::GuildleveAssignment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
   auto row = exdData->m_GuildleveAssignmentDat.get_row( row_id );
-  assignmentTalk = exdData->getField< uint32_t >( row, 1 );
-  quest.push_back( exdData->getField< uint32_t >( row, 2 ) );
+  assignmentTalk = exdData->getField< uint32_t >( row, 2 );
   quest.push_back( exdData->getField< uint32_t >( row, 3 ) );
+  quest.push_back( exdData->getField< uint32_t >( row, 4 ) );
 }
 
 Sapphire::Data::GuildleveAssignmentCategory::GuildleveAssignmentCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -4483,41 +4481,89 @@ Sapphire::Data::HWDCrafterSupply::HWDCrafterSupply( uint32_t row_id, Sapphire::D
   itemTradeIn.push_back( exdData->getField< uint32_t >( row, 2 ) );
   itemTradeIn.push_back( exdData->getField< uint32_t >( row, 3 ) );
   itemTradeIn.push_back( exdData->getField< uint32_t >( row, 4 ) );
-  level.push_back( exdData->getField< uint8_t >( row, 16 ) );
+  itemTradeIn.push_back( exdData->getField< uint32_t >( row, 5 ) );
+  itemTradeIn.push_back( exdData->getField< uint32_t >( row, 6 ) );
+  itemTradeIn.push_back( exdData->getField< uint32_t >( row, 7 ) );
+  itemTradeIn.push_back( exdData->getField< uint32_t >( row, 8 ) );
+  itemTradeIn.push_back( exdData->getField< uint32_t >( row, 9 ) );
+  itemTradeIn.push_back( exdData->getField< uint32_t >( row, 10 ) );
   level.push_back( exdData->getField< uint8_t >( row, 17 ) );
   level.push_back( exdData->getField< uint8_t >( row, 18 ) );
   level.push_back( exdData->getField< uint8_t >( row, 19 ) );
   level.push_back( exdData->getField< uint8_t >( row, 20 ) );
-  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 48 ) );
-  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 49 ) );
-  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 50 ) );
-  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 51 ) );
-  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 52 ) );
-  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 64 ) );
-  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 65 ) );
-  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 66 ) );
-  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 67 ) );
-  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 68 ) );
-  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 80 ) );
-  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 81 ) );
-  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 82 ) );
-  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 83 ) );
-  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 84 ) );
-  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 96 ) );
-  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 97 ) );
-  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 98 ) );
-  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 99 ) );
-  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 100 ) );
-  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 112 ) );
-  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 113 ) );
-  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 114 ) );
-  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 115 ) );
-  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 116 ) );
-  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 128 ) );
-  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 129 ) );
-  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 130 ) );
-  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 131 ) );
-  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 132 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 21 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 22 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 23 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 24 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 25 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 26 ) );
+  level.push_back( exdData->getField< uint8_t >( row, 27 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 68 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 69 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 70 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 71 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 72 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 73 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 74 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 75 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 76 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 77 ) );
+  baseCollectableRating.push_back( exdData->getField< uint8_t >( row, 78 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 85 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 86 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 87 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 88 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 89 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 90 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 91 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 92 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 93 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 94 ) );
+  midBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 95 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 102 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 103 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 104 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 105 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 106 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 107 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 108 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 109 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 110 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 111 ) );
+  highBaseCollectableRating.push_back( exdData->getField< uint16_t >( row, 112 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 119 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 120 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 121 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 122 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 123 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 124 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 125 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 126 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 127 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 128 ) );
+  baseCollectableReward.push_back( exdData->getField< uint16_t >( row, 129 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 136 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 137 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 138 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 139 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 140 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 141 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 142 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 143 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 144 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 145 ) );
+  midCollectableReward.push_back( exdData->getField< uint16_t >( row, 146 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 153 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 154 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 155 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 156 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 157 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 158 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 159 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 160 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 161 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 162 ) );
+  highCollectableReward.push_back( exdData->getField< uint16_t >( row, 163 ) );
 }
 
 Sapphire::Data::HWDCrafterSupplyReward::HWDCrafterSupplyReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -4725,22 +4771,21 @@ Sapphire::Data::Item::Item( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
   itemUICategory = exdData->getField< uint8_t >( row, 15 );
   itemSearchCategory = exdData->getField< uint8_t >( row, 16 );
   equipSlotCategory = exdData->getField< uint8_t >( row, 17 );
-  stackSize = exdData->getField< uint32_t >( row, 19 );
-  isUnique = exdData->getField< bool >( row, 20 );
-  isUntradable = exdData->getField< bool >( row, 21 );
-  isIndisposable = exdData->getField< bool >( row, 22 );
-  isEquippable = exdData->getField< bool >( row, 23 );
-  priceMid = exdData->getField< uint32_t >( row, 24 );
-  priceLow = exdData->getField< uint32_t >( row, 25 );
-  canBeHq = exdData->getField< bool >( row, 26 );
-  isDyeable = exdData->getField< bool >( row, 27 );
-  isCrestWorthy = exdData->getField< bool >( row, 28 );
-  itemAction = exdData->getField< uint16_t >( row, 29 );
-  cooldowns = exdData->getField< uint16_t >( row, 31 );
-  classJobRepair = exdData->getField< uint8_t >( row, 32 );
-  itemRepair = exdData->getField< int32_t >( row, 33 );
-  itemGlamour = exdData->getField< int32_t >( row, 34 );
-  salvage = exdData->getField< uint16_t >( row, 35 );
+  stackSize = exdData->getField< uint32_t >( row, 20 );
+  isUnique = exdData->getField< bool >( row, 21 );
+  isUntradable = exdData->getField< bool >( row, 22 );
+  isIndisposable = exdData->getField< bool >( row, 23 );
+  isEquippable = exdData->getField< bool >( row, 24 );
+  priceMid = exdData->getField< uint32_t >( row, 25 );
+  priceLow = exdData->getField< uint32_t >( row, 26 );
+  canBeHq = exdData->getField< bool >( row, 27 );
+  isDyeable = exdData->getField< bool >( row, 28 );
+  isCrestWorthy = exdData->getField< bool >( row, 29 );
+  itemAction = exdData->getField< uint16_t >( row, 30 );
+  cooldowns = exdData->getField< uint16_t >( row, 32 );
+  classJobRepair = exdData->getField< uint8_t >( row, 33 );
+  itemRepair = exdData->getField< int32_t >( row, 34 );
+  itemGlamour = exdData->getField< int32_t >( row, 35 );
   isCollectable = exdData->getField< bool >( row, 37 );
   alwaysCollectable = exdData->getField< bool >( row, 38 );
   aetherialReduce = exdData->getField< uint16_t >( row, 39 );
@@ -4986,30 +5031,30 @@ Sapphire::Data::Leve::Leve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
   leveClient = exdData->getField< int32_t >( row, 2 );
   leveAssignmentType = exdData->getField< int32_t >( row, 3 );
   town = exdData->getField< int32_t >( row, 4 );
-  classJobLevel = exdData->getField< uint16_t >( row, 5 );
-  timeLimit = exdData->getField< uint8_t >( row, 6 );
-  allowanceCost = exdData->getField< uint8_t >( row, 7 );
-  evaluation = exdData->getField< int32_t >( row, 8 );
-  placeNameStart = exdData->getField< int32_t >( row, 9 );
-  placeNameIssued = exdData->getField< int32_t >( row, 10 );
-  classJobCategory = exdData->getField< uint8_t >( row, 12 );
-  journalGenre = exdData->getField< int32_t >( row, 13 );
-  placeNameStartZone = exdData->getField< int32_t >( row, 15 );
-  iconCityState = exdData->getField< int32_t >( row, 16 );
-  dataId = exdData->getField< int32_t >( row, 17 );
-  canCancel = exdData->getField< bool >( row, 18 );
-  maxDifficulty = exdData->getField< uint8_t >( row, 19 );
-  expFactor = exdData->getField< float >( row, 20 );
-  expReward = exdData->getField< uint32_t >( row, 21 );
-  gilReward = exdData->getField< uint32_t >( row, 22 );
-  leveRewardItem = exdData->getField< uint16_t >( row, 23 );
-  leveVfx = exdData->getField< uint8_t >( row, 24 );
-  leveVfxFrame = exdData->getField< uint8_t >( row, 25 );
-  levelLevemete = exdData->getField< uint32_t >( row, 26 );
-  iconIssuer = exdData->getField< int32_t >( row, 27 );
-  lockedLeve = exdData->getField< bool >( row, 28 );
-  levelStart = exdData->getField< uint32_t >( row, 29 );
-  bGM = exdData->getField< uint16_t >( row, 30 );
+  classJobLevel = exdData->getField< uint16_t >( row, 6 );
+  timeLimit = exdData->getField< uint8_t >( row, 7 );
+  allowanceCost = exdData->getField< uint8_t >( row, 8 );
+  evaluation = exdData->getField< int32_t >( row, 9 );
+  placeNameStart = exdData->getField< int32_t >( row, 10 );
+  placeNameIssued = exdData->getField< int32_t >( row, 11 );
+  classJobCategory = exdData->getField< uint8_t >( row, 13 );
+  journalGenre = exdData->getField< int32_t >( row, 14 );
+  placeNameStartZone = exdData->getField< int32_t >( row, 16 );
+  iconCityState = exdData->getField< int32_t >( row, 17 );
+  dataId = exdData->getField< int32_t >( row, 18 );
+  canCancel = exdData->getField< bool >( row, 19 );
+  maxDifficulty = exdData->getField< uint8_t >( row, 20 );
+  expFactor = exdData->getField< float >( row, 21 );
+  expReward = exdData->getField< uint32_t >( row, 22 );
+  gilReward = exdData->getField< uint32_t >( row, 23 );
+  leveRewardItem = exdData->getField< uint16_t >( row, 24 );
+  leveVfx = exdData->getField< uint8_t >( row, 25 );
+  leveVfxFrame = exdData->getField< uint8_t >( row, 26 );
+  levelLevemete = exdData->getField< uint32_t >( row, 27 );
+  iconIssuer = exdData->getField< int32_t >( row, 28 );
+  lockedLeve = exdData->getField< bool >( row, 29 );
+  levelStart = exdData->getField< uint32_t >( row, 30 );
+  bGM = exdData->getField< uint16_t >( row, 31 );
 }
 
 Sapphire::Data::LeveAssignmentType::LeveAssignmentType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -5983,8 +6028,8 @@ Sapphire::Data::PublicContent::PublicContent( uint32_t row_id, Sapphire::Data::E
   name = exdData->getField< std::string >( row, 3 );
   textDataStart = exdData->getField< uint32_t >( row, 4 );
   textDataEnd = exdData->getField< uint32_t >( row, 5 );
-  contentFinderCondition = exdData->getField< uint16_t >( row, 8 );
-  additionalData = exdData->getField< uint16_t >( row, 9 );
+  contentFinderCondition = exdData->getField< uint16_t >( row, 9 );
+  additionalData = exdData->getField< uint16_t >( row, 10 );
 }
 
 Sapphire::Data::PublicContentCutscene::PublicContentCutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -6085,9 +6130,9 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   isRepeatable = exdData->getField< bool >( row, 43 );
   repeatIntervalType = exdData->getField< uint8_t >( row, 44 );
   questRepeatFlag = exdData->getField< uint8_t >( row, 45 );
-  unlocksSystemContent = exdData->getField< bool >( row, 46 );
-  type = exdData->getField< uint8_t >( row, 48 );
-  questClassJobSupply = exdData->getField< uint16_t >( row, 49 );
+  type = exdData->getField< uint8_t >( row, 47 );
+  questClassJobSupply = exdData->getField< uint16_t >( row, 48 );
+  scriptInstruction.push_back( exdData->getField< std::string >( row, 49 ) );
   scriptInstruction.push_back( exdData->getField< std::string >( row, 50 ) );
   scriptInstruction.push_back( exdData->getField< std::string >( row, 51 ) );
   scriptInstruction.push_back( exdData->getField< std::string >( row, 52 ) );
@@ -6137,7 +6182,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   scriptInstruction.push_back( exdData->getField< std::string >( row, 96 ) );
   scriptInstruction.push_back( exdData->getField< std::string >( row, 97 ) );
   scriptInstruction.push_back( exdData->getField< std::string >( row, 98 ) );
-  scriptInstruction.push_back( exdData->getField< std::string >( row, 99 ) );
+  scriptArg.push_back( exdData->getField< uint32_t >( row, 99 ) );
   scriptArg.push_back( exdData->getField< uint32_t >( row, 100 ) );
   scriptArg.push_back( exdData->getField< uint32_t >( row, 101 ) );
   scriptArg.push_back( exdData->getField< uint32_t >( row, 102 ) );
@@ -6187,7 +6232,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   scriptArg.push_back( exdData->getField< uint32_t >( row, 146 ) );
   scriptArg.push_back( exdData->getField< uint32_t >( row, 147 ) );
   scriptArg.push_back( exdData->getField< uint32_t >( row, 148 ) );
-  scriptArg.push_back( exdData->getField< uint32_t >( row, 149 ) );
+  actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 149 ) );
   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 150 ) );
   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 151 ) );
   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 152 ) );
@@ -6251,7 +6296,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 210 ) );
   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 211 ) );
   actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 212 ) );
-  actorSpawnSeq.push_back( exdData->getField< uint8_t >( row, 213 ) );
+  actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 213 ) );
   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 214 ) );
   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 215 ) );
   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 216 ) );
@@ -6315,7 +6360,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 274 ) );
   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 275 ) );
   actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 276 ) );
-  actorDespawnSeq.push_back( exdData->getField< uint8_t >( row, 277 ) );
+  actorSpawn.push_back( exdData->getField< uint32_t >( row, 277 ) );
   actorSpawn.push_back( exdData->getField< uint32_t >( row, 278 ) );
   actorSpawn.push_back( exdData->getField< uint32_t >( row, 279 ) );
   actorSpawn.push_back( exdData->getField< uint32_t >( row, 280 ) );
@@ -6379,7 +6424,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   actorSpawn.push_back( exdData->getField< uint32_t >( row, 338 ) );
   actorSpawn.push_back( exdData->getField< uint32_t >( row, 339 ) );
   actorSpawn.push_back( exdData->getField< uint32_t >( row, 340 ) );
-  actorSpawn.push_back( exdData->getField< uint32_t >( row, 341 ) );
+  questUInt8A.push_back( exdData->getField< uint8_t >( row, 341 ) );
   questUInt8A.push_back( exdData->getField< uint8_t >( row, 342 ) );
   questUInt8A.push_back( exdData->getField< uint8_t >( row, 343 ) );
   questUInt8A.push_back( exdData->getField< uint8_t >( row, 344 ) );
@@ -6411,7 +6456,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   questUInt8A.push_back( exdData->getField< uint8_t >( row, 370 ) );
   questUInt8A.push_back( exdData->getField< uint8_t >( row, 371 ) );
   questUInt8A.push_back( exdData->getField< uint8_t >( row, 372 ) );
-  questUInt8A.push_back( exdData->getField< uint8_t >( row, 373 ) );
+  questUInt8B.push_back( exdData->getField< uint8_t >( row, 373 ) );
   questUInt8B.push_back( exdData->getField< uint8_t >( row, 374 ) );
   questUInt8B.push_back( exdData->getField< uint8_t >( row, 375 ) );
   questUInt8B.push_back( exdData->getField< uint8_t >( row, 376 ) );
@@ -6443,7 +6488,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   questUInt8B.push_back( exdData->getField< uint8_t >( row, 402 ) );
   questUInt8B.push_back( exdData->getField< uint8_t >( row, 403 ) );
   questUInt8B.push_back( exdData->getField< uint8_t >( row, 404 ) );
-  questUInt8B.push_back( exdData->getField< uint8_t >( row, 405 ) );
+  toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1173 ) );
   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1174 ) );
   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1175 ) );
   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1176 ) );
@@ -6467,7 +6512,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1194 ) );
   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1195 ) );
   toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1196 ) );
-  toDoCompleteSeq.push_back( exdData->getField< uint8_t >( row, 1197 ) );
+  toDoQty.push_back( exdData->getField< uint8_t >( row, 1197 ) );
   toDoQty.push_back( exdData->getField< uint8_t >( row, 1198 ) );
   toDoQty.push_back( exdData->getField< uint8_t >( row, 1199 ) );
   toDoQty.push_back( exdData->getField< uint8_t >( row, 1200 ) );
@@ -6491,7 +6536,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   toDoQty.push_back( exdData->getField< uint8_t >( row, 1218 ) );
   toDoQty.push_back( exdData->getField< uint8_t >( row, 1219 ) );
   toDoQty.push_back( exdData->getField< uint8_t >( row, 1220 ) );
-  toDoQty.push_back( exdData->getField< uint8_t >( row, 1221 ) );
+  toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1221 ) );
   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1222 ) );
   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1223 ) );
   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1224 ) );
@@ -6515,71 +6560,70 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1242 ) );
   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1243 ) );
   toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1244 ) );
-  toDoMainLocation.push_back( exdData->getField< uint32_t >( row, 1245 ) );
-  classJobRequired = exdData->getField< uint8_t >( row, 1439 );
-  expFactor = exdData->getField< uint16_t >( row, 1441 );
-  gilReward = exdData->getField< uint32_t >( row, 1442 );
-  gCSeals = exdData->getField< uint16_t >( row, 1444 );
+  classJobRequired = exdData->getField< uint8_t >( row, 1438 );
+  expFactor = exdData->getField< uint16_t >( row, 1440 );
+  gilReward = exdData->getField< uint32_t >( row, 1441 );
+  gCSeals = exdData->getField< uint16_t >( row, 1443 );
+  itemCatalyst.push_back( exdData->getField< uint8_t >( row, 1444 ) );
   itemCatalyst.push_back( exdData->getField< uint8_t >( row, 1445 ) );
   itemCatalyst.push_back( exdData->getField< uint8_t >( row, 1446 ) );
-  itemCatalyst.push_back( exdData->getField< uint8_t >( row, 1447 ) );
+  itemCountCatalyst.push_back( exdData->getField< uint8_t >( row, 1447 ) );
   itemCountCatalyst.push_back( exdData->getField< uint8_t >( row, 1448 ) );
   itemCountCatalyst.push_back( exdData->getField< uint8_t >( row, 1449 ) );
-  itemCountCatalyst.push_back( exdData->getField< uint8_t >( row, 1450 ) );
-  itemRewardType = exdData->getField< uint8_t >( row, 1451 );
+  itemRewardType = exdData->getField< uint8_t >( row, 1450 );
+  itemReward0.push_back( exdData->getField< uint32_t >( row, 1451 ) );
   itemReward0.push_back( exdData->getField< uint32_t >( row, 1452 ) );
   itemReward0.push_back( exdData->getField< uint32_t >( row, 1453 ) );
   itemReward0.push_back( exdData->getField< uint32_t >( row, 1454 ) );
   itemReward0.push_back( exdData->getField< uint32_t >( row, 1455 ) );
   itemReward0.push_back( exdData->getField< uint32_t >( row, 1456 ) );
-  itemReward0.push_back( exdData->getField< uint32_t >( row, 1457 ) );
+  itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1458 ) );
   itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1459 ) );
   itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1460 ) );
   itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1461 ) );
   itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1462 ) );
   itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1463 ) );
-  itemCountReward0.push_back( exdData->getField< uint8_t >( row, 1464 ) );
+  stainReward0.push_back( exdData->getField< uint8_t >( row, 1465 ) );
   stainReward0.push_back( exdData->getField< uint8_t >( row, 1466 ) );
   stainReward0.push_back( exdData->getField< uint8_t >( row, 1467 ) );
   stainReward0.push_back( exdData->getField< uint8_t >( row, 1468 ) );
   stainReward0.push_back( exdData->getField< uint8_t >( row, 1469 ) );
   stainReward0.push_back( exdData->getField< uint8_t >( row, 1470 ) );
-  stainReward0.push_back( exdData->getField< uint8_t >( row, 1471 ) );
+  itemReward1.push_back( exdData->getField< uint32_t >( row, 1472 ) );
   itemReward1.push_back( exdData->getField< uint32_t >( row, 1473 ) );
   itemReward1.push_back( exdData->getField< uint32_t >( row, 1474 ) );
   itemReward1.push_back( exdData->getField< uint32_t >( row, 1475 ) );
   itemReward1.push_back( exdData->getField< uint32_t >( row, 1476 ) );
-  itemReward1.push_back( exdData->getField< uint32_t >( row, 1477 ) );
+  itemCountReward1.push_back( exdData->getField< uint8_t >( row, 1477 ) );
   itemCountReward1.push_back( exdData->getField< uint8_t >( row, 1478 ) );
   itemCountReward1.push_back( exdData->getField< uint8_t >( row, 1479 ) );
   itemCountReward1.push_back( exdData->getField< uint8_t >( row, 1480 ) );
   itemCountReward1.push_back( exdData->getField< uint8_t >( row, 1481 ) );
-  itemCountReward1.push_back( exdData->getField< uint8_t >( row, 1482 ) );
+  isHQReward1.push_back( exdData->getField< bool >( row, 1482 ) );
   isHQReward1.push_back( exdData->getField< bool >( row, 1483 ) );
   isHQReward1.push_back( exdData->getField< bool >( row, 1484 ) );
   isHQReward1.push_back( exdData->getField< bool >( row, 1485 ) );
   isHQReward1.push_back( exdData->getField< bool >( row, 1486 ) );
-  isHQReward1.push_back( exdData->getField< bool >( row, 1487 ) );
+  stainReward1.push_back( exdData->getField< uint8_t >( row, 1487 ) );
   stainReward1.push_back( exdData->getField< uint8_t >( row, 1488 ) );
   stainReward1.push_back( exdData->getField< uint8_t >( row, 1489 ) );
   stainReward1.push_back( exdData->getField< uint8_t >( row, 1490 ) );
   stainReward1.push_back( exdData->getField< uint8_t >( row, 1491 ) );
-  stainReward1.push_back( exdData->getField< uint8_t >( row, 1492 ) );
-  emoteReward = exdData->getField< uint8_t >( row, 1493 );
-  actionReward = exdData->getField< uint16_t >( row, 1494 );
+  emoteReward = exdData->getField< uint8_t >( row, 1492 );
+  actionReward = exdData->getField< uint16_t >( row, 1493 );
+  generalActionReward.push_back( exdData->getField< uint8_t >( row, 1494 ) );
   generalActionReward.push_back( exdData->getField< uint8_t >( row, 1495 ) );
-  generalActionReward.push_back( exdData->getField< uint8_t >( row, 1496 ) );
-  otherReward = exdData->getField< uint8_t >( row, 1498 );
-  instanceContentUnlock = exdData->getField< uint32_t >( row, 1501 );
-  tomestoneReward = exdData->getField< uint8_t >( row, 1503 );
-  tomestoneCountReward = exdData->getField< uint8_t >( row, 1504 );
-  reputationReward = exdData->getField< uint8_t >( row, 1505 );
-  placeName = exdData->getField< uint16_t >( row, 1506 );
-  journalGenre = exdData->getField< uint8_t >( row, 1507 );
-  icon = exdData->getField< uint32_t >( row, 1509 );
-  iconSpecial = exdData->getField< uint32_t >( row, 1510 );
-  eventIconType = exdData->getField< uint8_t >( row, 1513 );
-  sortKey = exdData->getField< uint16_t >( row, 1515 );
+  otherReward = exdData->getField< uint8_t >( row, 1497 );
+  instanceContentUnlock = exdData->getField< uint32_t >( row, 1500 );
+  tomestoneReward = exdData->getField< uint8_t >( row, 1502 );
+  tomestoneCountReward = exdData->getField< uint8_t >( row, 1503 );
+  reputationReward = exdData->getField< uint8_t >( row, 1504 );
+  placeName = exdData->getField< uint16_t >( row, 1505 );
+  journalGenre = exdData->getField< uint8_t >( row, 1506 );
+  icon = exdData->getField< uint32_t >( row, 1508 );
+  iconSpecial = exdData->getField< uint32_t >( row, 1509 );
+  eventIconType = exdData->getField< uint8_t >( row, 1512 );
+  sortKey = exdData->getField< uint16_t >( row, 1514 );
 }
 
 Sapphire::Data::QuestBattle::QuestBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -7485,7 +7529,7 @@ Sapphire::Data::Resident::Resident( uint32_t row_id, uint32_t subRow, Sapphire::
   auto row = exdData->m_ResidentDat.get_row( row_id, subRow );
   model = exdData->getField< uint64_t >( row, 1 );
   npcYell = exdData->getField< int32_t >( row, 2 );
-  residentMotionType = exdData->getField< uint8_t >( row, 3 );
+  residentMotionType = exdData->getField< uint8_t >( row, 4 );
 }
 
 Sapphire::Data::RetainerTask::RetainerTask( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -8014,9 +8058,9 @@ Sapphire::Data::Status::Status( uint32_t row_id, Sapphire::Data::ExdDataGenerate
   inflictedByActor = exdData->getField< bool >( row, 15 );
   isPermanent = exdData->getField< bool >( row, 16 );
   partyListPriority = exdData->getField< uint8_t >( row, 17 );
-  log = exdData->getField< uint16_t >( row, 23 );
-  isFcBuff = exdData->getField< bool >( row, 24 );
-  invisibility = exdData->getField< bool >( row, 25 );
+  log = exdData->getField< uint16_t >( row, 24 );
+  isFcBuff = exdData->getField< bool >( row, 25 );
+  invisibility = exdData->getField< bool >( row, 26 );
 }
 
 Sapphire::Data::StatusHitEffect::StatusHitEffect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -8081,6 +8125,7 @@ Sapphire::Data::SubmarineRank::SubmarineRank( uint32_t row_id, Sapphire::Data::E
 Sapphire::Data::SwitchTalk::SwitchTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
 {
   auto row = exdData->m_SwitchTalkDat.get_row( row_id );
+  /*
   quest.push_back( exdData->getField< uint32_t >( row, 2 ) );
   quest.push_back( exdData->getField< uint32_t >( row, 3 ) );
   quest.push_back( exdData->getField< uint32_t >( row, 4 ) );
@@ -8112,6 +8157,7 @@ Sapphire::Data::SwitchTalk::SwitchTalk( uint32_t row_id, Sapphire::Data::ExdData
   defaultTalk.push_back( exdData->getField< uint32_t >( row, 30 ) );
   defaultTalk.push_back( exdData->getField< uint32_t >( row, 31 ) );
   defaultTalk.push_back( exdData->getField< uint32_t >( row, 32 ) );
+  */
 }
 
 Sapphire::Data::TerritoryType::TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -8141,6 +8187,8 @@ Sapphire::Data::TerritoryType::TerritoryType( uint32_t row_id, Sapphire::Data::E
   resident = exdData->getField< uint16_t >( row, 26 );
   achievementIndex = exdData->getField< int8_t >( row, 27 );
   isPvpZone = exdData->getField< bool >( row, 28 );
+  //ExVersion = 29
+  //MountSpeed = 33
 }
 
 Sapphire::Data::TextCommand::TextCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -8227,15 +8275,18 @@ Sapphire::Data::Transformation::Transformation( uint32_t row_id, Sapphire::Data:
   action2 = exdData->getField< uint16_t >( row, 10 );
   action3 = exdData->getField< uint16_t >( row, 12 );
   action4 = exdData->getField< uint16_t >( row, 14 );
-  action5 = exdData->getField< uint16_t >( row, 15 );
+  action5 = exdData->getField< uint16_t >( row, 16 );
   rPParameter = exdData->getField< uint8_t >( row, 18 );
-  speed = exdData->getField< float >( row, 19 );
-  scale = exdData->getField< float >( row, 20 );
-  isPvP = exdData->getField< bool >( row, 21 );
-  isEvent = exdData->getField< bool >( row, 22 );
-  playerCamera = exdData->getField< bool >( row, 23 );
-  startVFX = exdData->getField< bool >( row, 24 );
-  endVFX = exdData->getField< bool >( row, 25 );
+  //RemoveAction = 19
+  speed = exdData->getField< float >( row, 23 );
+  scale = exdData->getField< float >( row, 24 );
+  isPvP = exdData->getField< bool >( row, 25 );
+  isEvent = exdData->getField< bool >( row, 26 );
+  playerCamera = exdData->getField< bool >( row, 27 );
+  startVFX = exdData->getField< bool >( row, 30 );
+  endVFX = exdData->getField< bool >( row, 31 );
+  //Action6 = 32
+  //Action7 = 34
 }
 
 Sapphire::Data::Treasure::Treasure( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -8597,6 +8648,9 @@ Sapphire::Data::YKW::YKW( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exd
   location.push_back( exdData->getField< uint16_t >( row, 2 ) );
   location.push_back( exdData->getField< uint16_t >( row, 3 ) );
   location.push_back( exdData->getField< uint16_t >( row, 4 ) );
+  location.push_back( exdData->getField< uint16_t >( row, 5 ) );
+  location.push_back( exdData->getField< uint16_t >( row, 6 ) );
+  location.push_back( exdData->getField< uint16_t >( row, 7 ) );
 }
 
 Sapphire::Data::ZoneSharedGroup::ZoneSharedGroup( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
@@ -9094,7 +9148,7 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
     m_PictureDat = setupDatAccess( "Picture", xiv::exd::Language::none );
     m_PlaceNameDat = setupDatAccess( "PlaceName", xiv::exd::Language::en );
     m_PlantPotFlowerSeedDat = setupDatAccess( "PlantPotFlowerSeed", xiv::exd::Language::none );
-    m_PreHandlerDat = setupDatAccess( "PreHandler", xiv::exd::Language::none );
+    m_PreHandlerDat = setupDatAccess( "PreHandler", xiv::exd::Language::en );
     m_PresetCameraDat = setupDatAccess( "PresetCamera", xiv::exd::Language::none );
     m_PresetCameraAdjustDat = setupDatAccess( "PresetCameraAdjust", xiv::exd::Language::none );
     m_PublicContentDat = setupDatAccess( "PublicContent", xiv::exd::Language::en );
@@ -9144,14 +9198,14 @@ bool Sapphire::Data::ExdDataGenerated::init( const std::string& path )
     m_RetainerTaskParameterDat = setupDatAccess( "RetainerTaskParameter", xiv::exd::Language::none );
     m_RetainerTaskRandomDat = setupDatAccess( "RetainerTaskRandom", xiv::exd::Language::en );
     m_RPParameterDat = setupDatAccess( "RPParameter", xiv::exd::Language::none );
-    m_SalvageDat = setupDatAccess( "Salvage", xiv::exd::Language::none );
+    //m_SalvageDat = setupDatAccess( "Salvage", xiv::exd::Language::none ); // according to xivapi/ffxiv-datamining, this one is deleted.
     m_SatisfactionNpcDat = setupDatAccess( "SatisfactionNpc", xiv::exd::Language::none );
     m_SatisfactionSupplyDat = setupDatAccess( "SatisfactionSupply", xiv::exd::Language::none );
     m_SatisfactionSupplyRewardDat = setupDatAccess( "SatisfactionSupplyReward", xiv::exd::Language::none );
     m_ScenarioTreeDat = setupDatAccess( "ScenarioTree", xiv::exd::Language::none );
     m_ScenarioTreeTipsDat = setupDatAccess( "ScenarioTreeTips", xiv::exd::Language::none );
     m_ScenarioTreeTipsClassQuestDat = setupDatAccess( "ScenarioTreeTipsClassQuest", xiv::exd::Language::none );
-    m_ScenarioTreeTipsQuestDat = setupDatAccess( "ScenarioTreeTipsQuest", xiv::exd::Language::none );
+    //m_ScenarioTreeTipsQuestDat = setupDatAccess( "ScenarioTreeTipsQuest", xiv::exd::Language::none ); // according to xivapi/ffxiv-datamining, this one is deleted.
     m_ScenarioTypeDat = setupDatAccess( "ScenarioType", xiv::exd::Language::en );
     m_ScreenImageDat = setupDatAccess( "ScreenImage", xiv::exd::Language::none );
     m_SecretRecipeBookDat = setupDatAccess( "SecretRecipeBook", xiv::exd::Language::en );

@@ -4454,7 +4454,6 @@ struct Item
   uint8_t classJobRepair;
   int32_t itemRepair;
   int32_t itemGlamour;
-  uint16_t salvage;
   bool isCollectable;
   bool alwaysCollectable;
   uint16_t aetherialReduce;
