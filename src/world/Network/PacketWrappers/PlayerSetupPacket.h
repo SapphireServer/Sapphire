@@ -25,7 +25,7 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player )
     {
-      memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.pvpLevel ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
+      memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.padding2 ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
 
       m_data.contentId = player.getContentId();
 
@@ -62,16 +62,17 @@ namespace Sapphire::Network::Packets::Server
       }
 
       //memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
-
+      //m_data.orchestrionMask[0] = 0xFE;
       //memcpy( m_data.mountGuideMask, player.getMountGuideBitmask(), sizeof( m_data.mountGuideMask ) );
-      memset( m_data.mountGuideMask, 255, sizeof( m_data.mountGuideMask ) );
+      memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
+      m_data.mountGuideMask[21] = 0xBF; // mask out the broken mount
       
       //memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
-
+      //m_data.unlockBitmask[0] = 0xFD;
       //memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
-
+      //m_data.discovery[0] = 0xFB;
       //memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
-
+      //m_data.howto[0] = 0xEF;
       // possibly max level or current level
       m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
       m_data.expansion = Common::CURRENT_EXPANSION_ID;
@@ -82,10 +83,15 @@ namespace Sapphire::Network::Packets::Server
 
       // enable all raids/guildhests/dungeons
       memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
+      //m_data.unlockedDungeons[0] = 0xEE;
       memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
+      //m_data.unlockedGuildhests[0] = 0xDF;
       memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
+      //m_data.unlockedPvp[0] = 0xDE;
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
+      //m_data.unlockedRaids[0] = 0xDD;
       memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+      //m_data.unlockedTrials[0] = 0xDB;
     };
   };
 

@@ -879,7 +879,7 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
 
 void Sapphire::Network::GameConnection::socialInviteHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcSocialInviteHandler >( inPacket );
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcSocialReqSendHandler >( inPacket );
   switch( packetIn.data().socialType )
   {
     case 1:
@@ -894,7 +894,7 @@ void Sapphire::Network::GameConnection::socialInviteHandler( const Packets::FFXI
         auto targetPlayer = session->getPlayer();
         if( targetPlayer->isInParty() )
           return;
-        auto packet1 = makeZonePacket< FFXIVIpcSocialInviteMessage2 >( player.getId() );
+        auto packet1 = makeZonePacket< FFXIVIpcSocialMessage2 >( player.getId() );
         packet1->data().contentId = targetPlayer->getContentId();
         packet1->data().p1 = packetIn.data().p1;
         packet1->data().p2 = packetIn.data().p2;
@@ -902,7 +902,7 @@ void Sapphire::Network::GameConnection::socialInviteHandler( const Packets::FFXI
         memcpy( packet1->data().name, targetPlayer->getName().c_str(), targetPlayer->getName().length() + 1 );
         player.queuePacket( packet1 );
 
-        auto packet2 = makeZonePacket< FFXIVIpcSocialInviteMessage >( targetPlayer->getId() );
+        auto packet2 = makeZonePacket< FFXIVIpcSocialMessage >( targetPlayer->getId() );
         packet2->data().contentId = player.getContentId();
         packet2->data().expireTime = Common::Util::getTimeSeconds() + 30;
         packet2->data().p1 = packetIn.data().p1;
@@ -922,7 +922,7 @@ void Sapphire::Network::GameConnection::socialInviteHandler( const Packets::FFXI
 
 void Sapphire::Network::GameConnection::socialInviteResponseHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcSocialInviteResponseHandler >( inPacket );
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcSocialResponseHandler >( inPacket );
   switch( packetIn.data().socialType )
   {
     case 1:
@@ -932,7 +932,7 @@ void Sapphire::Network::GameConnection::socialInviteResponseHandler( const Packe
       auto response = packetIn.data().response;
       auto sender = player.getPartyInvitationSender();
       player.setPartyInvitationSender( nullptr );
-      auto packet1 = makeZonePacket< FFXIVIpcSocialInviteResponseMessage >( player.getId() );
+      auto packet1 = makeZonePacket< FFXIVIpcSocialRequestResponse >( player.getId() );
       packet1->data().contentId = sender->getContentId();
       packet1->data().u1AlwaysOne = 1;
       packet1->data().response = response;
@@ -964,7 +964,7 @@ void Sapphire::Network::GameConnection::socialInviteResponseHandler( const Packe
               m->queuePacket( packetMsg );
             } );
 
-          auto packet2 = makeZonePacket< FFXIVIpcSocialInviteMessage >( sender->getId() );
+          auto packet2 = makeZonePacket< FFXIVIpcSocialMessage >( sender->getId() );
           packet2->data().contentId = player.getContentId();
           packet2->data().expireTime = Common::Util::getTimeSeconds() + 30;
           packet2->data().p1 = packetIn.data().p1;
@@ -977,7 +977,7 @@ void Sapphire::Network::GameConnection::socialInviteResponseHandler( const Packe
       }
       else
       {
-        auto packet2 = makeZonePacket< FFXIVIpcSocialInviteMessage >( sender->getId() );
+        auto packet2 = makeZonePacket< FFXIVIpcSocialMessage >( sender->getId() );
         packet2->data().contentId = player.getContentId();
         packet2->data().expireTime = Common::Util::getTimeSeconds() + 30;
         packet2->data().p1 = packetIn.data().p1;
