@@ -362,8 +362,8 @@ struct FFXIVIpcWorldInteractionHandler :
   Common::FFXIVARR_POSITION3 position;
 };
 
-struct FFXIVIpcSocialInviteHandler :
-  FFXIVIpcBasePacket< SocialInviteHandler >
+struct FFXIVIpcSocialReqSendHandler :
+  FFXIVIpcBasePacket< SocialReqSendHandler >
 {
   uint64_t unknown;
   uint8_t p1;
@@ -373,8 +373,8 @@ struct FFXIVIpcSocialInviteHandler :
   uint8_t padding[5];
 };
 
-struct FFXIVIpcSocialInviteResponseHandler :
-  FFXIVIpcBasePacket< SocialInviteResponseHandler >
+struct FFXIVIpcSocialResponseHandler :
+  FFXIVIpcBasePacket< SocialResponseHandler >
 {
   uint64_t contentId;
   uint8_t p1;

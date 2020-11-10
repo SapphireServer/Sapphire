@@ -1023,6 +1023,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned int pvpExp;
     unsigned int pvpFrontlineOverallRanks[3];
     unsigned short levels[Common::CLASSJOB_SLOTS];
+    /*
     unsigned short unknown15C[9];
     unsigned short u1;
     unsigned short u2;
@@ -1039,6 +1040,15 @@ namespace Sapphire::Network::Packets::Server
     unsigned char u19[8];
     unsigned char mountGuideMask[22];
     unsigned char u19_2;
+    */
+    unsigned char unknown5_3a[176];
+    unsigned char companionName[21];
+    unsigned char companionDefRank;
+    unsigned char companionAttRank;
+    unsigned char companionHealRank;
+    unsigned char mountGuideMask[23];
+    unsigned char maybeReservedMountSlots;
+    //==
     char name[32];
     unsigned char unknownOword[16];
     unsigned char unknownOw;
@@ -1046,13 +1056,14 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetheryte[21];
     unsigned char discovery[445];
     unsigned char howto[34];
-    unsigned char minions[45];
+    unsigned char minions[51];
     unsigned char chocoboTaxiMask[10];
-    unsigned char watchedCutscenes[124];
+    unsigned char watchedCutscenes[131];
     unsigned char companionBardingMask[10];
     unsigned char companionEquippedHead;
     unsigned char companionEquippedBody;
     unsigned char companionEquippedLegs;
+    /*
     unsigned char unknown52A[4];
     unsigned char unknownMask52E[11];
     unsigned char fishingGuideMask[105];
@@ -1062,7 +1073,11 @@ namespace Sapphire::Network::Packets::Server
     unsigned char beastRank[11];
     unsigned char unknownPvp5AB[11];
     unsigned char unknown5B9[5];
+    */
+    unsigned char unknown5_3c[234];
+    //==
     unsigned char pose;
+    /*
     unsigned char unknown5B91;
     unsigned char challengeLogComplete[9];
     unsigned char weaponPose;
@@ -1076,24 +1091,30 @@ namespace Sapphire::Network::Packets::Server
     unsigned char u13;
     unsigned char aetherCurrentMask[22];
     unsigned char u10[3];
+    */
+    unsigned char unknown5_3d[292];
+    //==
     unsigned char orchestrionMask[40];
     unsigned char hallOfNoviceCompletion[3];
     unsigned char animaCompletion[11];
-    unsigned char u14[16];
-    unsigned char u15[13];
+    unsigned char unknown5_3e[33];
     unsigned char unlockedRaids[28];
     unsigned char unlockedDungeons[18];
     unsigned char unlockedGuildhests[10];
-    unsigned char unlockedTrials[8];
+    unsigned char unlockedTrials[9]; // 5.35 trial:pvp either 9:5 or 8:6 not confirmed
     unsigned char unlockedPvp[5];
     unsigned char clearedRaids[28];
     unsigned char clearedDungeons[18];
     unsigned char clearedGuildhests[10];
-    unsigned char clearedTrials[8];
+    unsigned char clearedTrials[9];
     unsigned char clearedPvp[5];
+    /*
     unsigned short fishingRecordsFishWeight[26];
     unsigned int exploratoryMissionNextTimestamp;
     unsigned char pvpLevel;
+    */
+    unsigned char padding2[8];
+    //==
   };
 
 
@@ -1777,6 +1798,7 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcMount : FFXIVIpcBasePacket< Mount >
   {
     uint32_t id;
+    uint32_t padding[3];
   };
 
   /**
@@ -1994,7 +2016,7 @@ namespace Sapphire::Network::Packets::Server
       uint32_t housePrice;
       uint8_t infoFlags;
       Common::HousingAppeal houseAppeal[3];
-      char estateOwnerName[30];
+      char estateOwnerName[32];
     } houseInfoEntry[60];
   };
 
@@ -2139,7 +2161,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param7;
   };
 
-  struct FFXIVIpcSocialInviteMessage : FFXIVIpcBasePacket< SocialInviteMessage >
+  struct FFXIVIpcSocialMessage : FFXIVIpcBasePacket< SocialMessage >
   {
     uint64_t contentId;
     uint32_t expireTime;
@@ -2153,7 +2175,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t padding2[6];
   };
 
-  struct FFXIVIpcSocialInviteMessage2 : FFXIVIpcBasePacket< SocialInviteMessage2 >
+  struct FFXIVIpcSocialMessage2 : FFXIVIpcBasePacket< SocialMessage2 >
   {
     uint64_t contentId;
     uint32_t unknown3;
@@ -2164,7 +2186,7 @@ namespace Sapphire::Network::Packets::Server
     char name[32];
   };
 
-  struct FFXIVIpcSocialInviteResponseMessage : FFXIVIpcBasePacket< SocialInviteResponseMessage >
+  struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket< SocialRequestResponse >
   {
     uint64_t contentId;
     uint32_t unknown3;
