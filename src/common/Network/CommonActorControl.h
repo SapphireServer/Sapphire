@@ -264,7 +264,7 @@ namespace Sapphire::Network::ActorControl
 
     ToggleOrchestrionUnlock = 0x396,
 
-    EventBattleDialog = 0x39C,
+    EventBattleDialog = 0x39D,
 
     /*!
     * param1 = mountSpeed
