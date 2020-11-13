@@ -395,6 +395,7 @@ namespace Sapphire::Network::Packets
     PerformNoteHandler = 0x029B, // updated 4.3
 
     WorldInteractionHandler = 0x00A9, // updated 5.35 hotfix
+    Dive = 0x02CC, // updated 5.35 hotfix
   };
 
   ////////////////////////////////////////////////////////////////////////////////
