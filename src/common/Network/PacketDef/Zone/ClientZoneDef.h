@@ -417,6 +417,15 @@ struct FFXIVIpcDisbandPartyHandler :
 };
 
 
+struct FFXIVIpcDive :
+  FFXIVIpcBasePacket< Dive >
+{
+  float unknown;
+  Common::FFXIVARR_POSITION3 posTarget;
+  Common::FFXIVARR_POSITION3 posOriginal;
+  uint32_t padding;
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H
