@@ -191,6 +191,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( worldInteractionhandler );
 
+    DECLARE_HANDLER( diveHandler );
+
     DECLARE_HANDLER( socialInviteHandler );
 
     DECLARE_HANDLER( socialInviteResponseHandler );

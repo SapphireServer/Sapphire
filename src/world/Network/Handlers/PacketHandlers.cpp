@@ -829,6 +829,65 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
       player.sendToInRangeSet( pSetStatusPacket );
     }
   }
+  else if ( action == 0x25E || // coming out from water
+            action == 0xD1 )  // underwater town portal
+  {
+    auto p = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
+    p->data().targetZone = player.getCurrentTerritory()->getTerritoryTypeId();
+    p->data().param4 = action == 0xD1 ? 14 : 227;
+    p->data().hideChar = action == 0xD1 ? 2 : 1;
+    p->data().fadeOut = action == 0xD1 ? 24 : 25;
+    p->data().fadeOutTime = 1;
+    p->data().unknown = action == 0xD1 ? 4 : 6;
+    auto x = packet.data().position.x;
+    auto y = packet.data().position.y;
+    auto z = packet.data().position.z;
+    auto rot = player.getRot();
+    if( action == 0xD1 )
+    {
+      auto exitRange = packet.data().param1;
+      
+      auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+      auto exit = instanceObjectCache.getExitRange( p->data().targetZone, exitRange );
+      if( exit )
+      {
+        player.sendDebug( "exitRange {0} found!", exitRange );
+        auto destZone = exit->data.destTerritoryType;
+        if( destZone == 0 )
+          destZone = p->data().targetZone;
+        else
+          p->data().targetZone = destZone;
+        auto pop = instanceObjectCache.getPopRange( destZone, exit->data.destInstanceObjectId );
+        if( pop )
+        {
+          player.sendDebug( "popRange {0} found!", exit->data.destInstanceObjectId );
+          x = pop->header.transform.translation.x;
+          y = pop->header.transform.translation.y;
+          z = pop->header.transform.translation.z;
+          //rot = pop->header.transform.rotation.y; all x/y/z not correct, maybe we don't need it since we have to be facing the portal anyway?
+        }
+        else
+        {
+          player.sendUrgent( "popRange {0} not found in {1}!", exit->data.destInstanceObjectId, destZone );
+        }
+      }
+      else
+      {
+        player.sendUrgent( "exitRange {0} not found in {1}!", exitRange, p->data().targetZone );
+      }
+    }
+    player.queuePacket( p );
+    player.setPos( x, y, z, true );
+    player.setRot( rot );
+    auto setPos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+    setPos->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
+    setPos->data().x = x;
+    setPos->data().y = y;
+    setPos->data().z = z;
+    setPos->data().waitForLoad = action == 0xD1 ? 24 : 25;
+    setPos->data().unknown1 = 0;
+    player.queuePacket( setPos ); // this packet needs a delay of 0.8 second to wait for the client finishing its water animation otherwise it looks odd.
+  }
   else if( action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
   {
     // looks like shit but IT WORKS.
@@ -875,6 +934,34 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
       player.sendDebug( "Unknown dwarf house." );
     }
   }
+}
+
+void Sapphire::Network::GameConnection::diveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packetIn = ZoneChannelPacket< Client::FFXIVIpcDive >( inPacket );
+  auto p = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
+  p->data().targetZone = player.getCurrentTerritory()->getTerritoryTypeId();
+  p->data().param4 = 218;
+  p->data().hideChar = 1;
+  p->data().fadeOut = 25;
+  p->data().fadeOutTime = 1;
+  p->data().unknown = 6;
+  player.queuePacket( p );
+
+  player.setStance( Common::Stance::Passive );
+
+  auto x = packetIn.data().posTarget.x;
+  auto y = packetIn.data().posTarget.y;
+  auto z = packetIn.data().posTarget.z;
+  player.setPos( x, y, z, true );
+  auto setPos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+  setPos->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
+  setPos->data().x = x;
+  setPos->data().y = y;
+  setPos->data().z = z;
+  setPos->data().waitForLoad = 25;
+  setPos->data().unknown1 = 0;
+  player.queuePacket( setPos ); // need delay, same as above.
 }
 
 void Sapphire::Network::GameConnection::socialInviteHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
