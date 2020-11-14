@@ -47,7 +47,7 @@ namespace Sapphire::Network::Packets
     Init = 0x03B9, // updated 5.25
 
     ActorFreeSpawn = 0x022F, // updated 5.3
-    InitZone = 00x0303, // updated 5.35
+    InitZone = 0x0303, // updated 5.35
 
     EffectResult = 0x035E, // updated 5.35
     ActorControl = 0x02DC, // updated 5.35
