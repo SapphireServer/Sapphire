@@ -990,6 +990,10 @@ namespace Sapphire::Entity
     void sendActorGauge();
     void gaugeSetRaw( uint8_t* pData );
 
+    uint32_t getVisualEffect();
+    void setVisualEffect( uint32_t effect, bool sendPacket = true );
+    void sendVisualEffect();
+
     void gaugeWarSetIb( uint8_t value );
     uint8_t gaugeWarGetIb();
 
@@ -1217,6 +1221,8 @@ namespace Sapphire::Entity
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
     std::unordered_map< uint32_t, std::vector< ShopBuyBackEntry > > m_shopBuyBackMap;
+
+    uint32_t m_effect;
   };
 
 }

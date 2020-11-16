@@ -402,6 +402,7 @@ void Sapphire::Network::GameConnection::finishLoadingHandler( const Packets::FFX
     player.setIsLogin( false );
   }
 
+  player.setVisualEffect( 0, false );
   // spawn the player for himself
   player.spawn( player.getAsPlayer() );
 

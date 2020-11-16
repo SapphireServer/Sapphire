@@ -83,7 +83,8 @@ Sapphire::Entity::Player::Player() :
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false ),
-  m_pQueuedAction( nullptr )
+  m_pQueuedAction( nullptr ),
+  m_effect( 0 )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -962,6 +963,13 @@ void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
   Logger::debug( "[{0}] Spawning {1} for {2}", pTarget->getId(), getName(), pTarget->getName() );
 
   pTarget->queuePacket( std::make_shared< PlayerSpawnPacket >( *getAsPlayer(), *pTarget ) );
+  if( m_effect > 0 )
+  {
+    auto effect = makeZonePacket< FFXIVIpcCharaVisualEffect >( pTarget->getId() );
+    effect->setSourceActor( getId() );
+    effect->data().id = m_effect;
+    pTarget->queuePacket( effect );
+  }
 }
 
 // despawn
@@ -2538,6 +2546,25 @@ void Sapphire::Entity::Player::gaugeSetRaw( uint8_t* pData )
   sendActorGauge();
 }
 
+uint32_t Sapphire::Entity::Player::getVisualEffect()
+{
+  return m_effect;
+}
+
+void Sapphire::Entity::Player::setVisualEffect( uint32_t effect, bool sendPacket )
+{
+  m_effect = effect;
+  if( sendPacket );
+    sendVisualEffect();
+}
+
+void Sapphire::Entity::Player::sendVisualEffect()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
+  pPacket->data().id = m_effect;
+  sendToInRangeSet( pPacket, true );
+}
+
 void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
 {
   assert( value >= 0 && value <= 100 );
@@ -2545,12 +2572,10 @@ void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
   if( ( oldValue == 0 && value != 0 ) ||
       ( oldValue != 0 && value == 0 ) )
   {
-    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
-    if( value != 0 )
-    {
-      pPacket->data().id = 7;
-    }
-    sendToInRangeSet( pPacket, true );
+    if( m_effect == 0 && value != 0 )
+      setVisualEffect( 7, true );
+    else if ( m_effect == 7 && value == 0 )
+      setVisualEffect( 0, true );
   }
   m_gauge.war.beastGauge = value;
   if( oldValue != value )
@@ -2643,12 +2668,10 @@ void Sapphire::Entity::Player::gaugeDrkSetDarkSideTimer( uint16_t value, bool se
   if( ( oldValue == 0 && value != 0 ) ||
     ( oldValue != 0 && value == 0 ) )
   {
-    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
-    if( value != 0 )
-    {
-      pPacket->data().id = 22;
-    }
-    sendToInRangeSet( pPacket, true );
+    if( m_effect == 0 && value != 0 )
+      setVisualEffect( 22, true );
+    else if ( m_effect == 22 && value == 0 )
+      setVisualEffect( 0, true );
   }
   if( sendPacket )
     sendActorGauge();
