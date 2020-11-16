@@ -2550,7 +2550,7 @@ void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )
     {
       pPacket->data().id = 7;
     }
-    queuePacket( pPacket );
+    sendToInRangeSet( pPacket, true );
   }
   m_gauge.war.beastGauge = value;
   if( oldValue != value )
@@ -2648,7 +2648,7 @@ void Sapphire::Entity::Player::gaugeDrkSetDarkSideTimer( uint16_t value, bool se
     {
       pPacket->data().id = 22;
     }
-    queuePacket( pPacket );
+    sendToInRangeSet( pPacket, true );
   }
   if( sendPacket )
     sendActorGauge();

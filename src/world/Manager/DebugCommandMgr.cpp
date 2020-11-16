@@ -377,7 +377,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
     auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( player.getId() );
     pPacket->data().id = id;
-    player.queuePacket( pPacket );
+    player.sendToInRangeSet( pPacket, true );
   }
   else
   {

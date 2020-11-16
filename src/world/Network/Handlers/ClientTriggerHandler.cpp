@@ -109,7 +109,9 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       else
         player.setAutoattack( false );
 
-      player.sendToInRangeSet( makeActorControl( player.getId(), 1, param11, 1 ) );
+      // the client seems to ignore source actor of this packet and always set auto-attack on itself. causing everyone on screen take their weapons out
+      player.queuePacket( makeActorControl( player.getId(), 1, param11, 1 ) );
+      //player.sendToInRangeSet( makeActorControl( player.getId(), 1, param11, 1 ) );
 
       break;
     }
