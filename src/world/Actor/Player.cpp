@@ -1544,22 +1544,31 @@ uint8_t Sapphire::Entity::Player::getEquipDisplayFlags() const
 
 void Sapphire::Entity::Player::mount( uint32_t id )
 {
-  m_mount = id;
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
-                                         static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
-  sendToInRangeSet( makeActorControlSelf( getId(), 0x39e, 12 ), true ); //?
+  if( id > 0 )
+  {
+    m_mount = id;
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
+      static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), ActorControlType::SetMountSpeed, 12 ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), 0x107, 1 ), true );
 
-  auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
-  mountPacket->data().id = id;
-  sendToInRangeSet( mountPacket, true );
+    auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
+    mountPacket->data().id = id;
+    sendToInRangeSet( mountPacket, true );
+  }
 }
 
 void Sapphire::Entity::Player::dismount()
 {
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
-                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
-  sendToInRangeSet( makeActorControlSelf( getId(), ActorControlType::Dismount, 1 ), true );
-  m_mount = 0;
+  if( m_mount > 0 )
+  {
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
+      static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::Dismount, 1 ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), 0x393, 1 ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), 0x107, 0 ), true );
+    m_mount = 0;
+  }
 }
 
 void Sapphire::Entity::Player::spawnCompanion( uint16_t id )

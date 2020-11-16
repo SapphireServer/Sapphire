@@ -264,16 +264,16 @@ namespace Sapphire::Network::ActorControl
 
     ToggleOrchestrionUnlock = 0x396,
 
-    EventBattleDialog = 0x39C,
+    EventBattleDialog = 0x39D,
 
     /*!
     * param1 = mountSpeed
     * Retail sends 12 for mount speed star 1 unlocked and 15 for mount speed star 2 unlocked
     * This also has to be sent before mounting finishes for it to take effect
     */
-    SetMountSpeed = 0x39F,
+    SetMountSpeed = 0x3A0, // updated 5.35 hotfix
 
-    Dismount = 0x3A1, // updated 4.5
+    Dismount = 0x3A2, // updated 5.35 hotfix
 
     // Duty Recorder
     BeginReplayAck = 0x3A2,
