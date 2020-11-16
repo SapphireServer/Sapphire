@@ -768,170 +768,179 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcWorldInteractionHandler >( inPacket );
   auto action = packet.data().action;
   player.sendDebug( "WorldInteraction {}", action );
-  if( action == 0x1F5 )
+  switch( action )
   {
-    auto emote = packet.data().param1;
-    if( emote == 0x32 || emote == 0x33 ) // "/sit"
+    case 0xD4: // enter dwarf house
     {
-      auto param4 = packet.data().param4;
-      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-      auto emoteData = exdData.get< Data::Emote >( emote );
-
-      if( !emoteData )
-        return;
-
-      player.setPos( packet.data().position );
-      if( emote == 0x32 && player.hasInRangeActor() )
+      if( player.getRace() != 3 ) // lalafell
+        break;
+      // looks like shit but IT WORKS.
+      auto x = packet.data().position.x;
+      auto z = packet.data().position.z;
+      if( x < -448 && x > -453 )
       {
-        auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
-        setpos->data().r16 = param4;
-        setpos->data().waitForLoad = 18;
-        setpos->data().unknown1 = 1;
-        setpos->data().x = packet.data().position.x;
-        setpos->data().y = packet.data().position.y;
-        setpos->data().z = packet.data().position.z;
-        player.sendToInRangeSet( setpos, false );
-      }
-      player.sendToInRangeSet( makeActorControlTarget( player.getId(), ActorControl::ActorControlType::Emote, emote, 0, 0, param4, 0xE0000000 ), true );
-
-      if( emote == 0x32 && emoteData->emoteMode != 0 )
-      {
-        player.setStance( Common::Stance::Passive );
-        player.setAutoattack( false );
-        player.setPersistentEmote( emoteData->emoteMode );
-        player.setStatus( Common::ActorStatus::EmoteMode );
-      }
-    }
-  }
-  else if( action == 0x1F8 )
-  {
-    if( player.getPersistentEmote() > 0 )
-    {
-      auto param2 = packet.data().param2;
-
-      player.setPos( packet.data().position );
-      if( player.hasInRangeActor() )
-      {
-        auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
-        setpos->data().r16 = param2;
-        setpos->data().waitForLoad = 18;
-        setpos->data().unknown1 = 2;
-        setpos->data().x = packet.data().position.x;
-        setpos->data().y = packet.data().position.y;
-        setpos->data().z = packet.data().position.z;
-        player.sendToInRangeSet( setpos, false );
-      }
-
-      player.setPersistentEmote( 0 );
-      player.emoteInterrupt();
-      player.setStatus( Common::ActorStatus::Idle );
-      auto pSetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-      player.sendToInRangeSet( pSetStatusPacket );
-    }
-  }
-  else if ( action == 0x25E || // coming out from water
-            action == 0xD1 )  // underwater town portal
-  {
-    auto p = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
-    p->data().targetZone = player.getCurrentTerritory()->getTerritoryTypeId();
-    p->data().param4 = action == 0xD1 ? 14 : 227;
-    p->data().hideChar = action == 0xD1 ? 2 : 1;
-    p->data().fadeOut = action == 0xD1 ? 24 : 25;
-    p->data().fadeOutTime = 1;
-    p->data().unknown = action == 0xD1 ? 4 : 6;
-    auto x = packet.data().position.x;
-    auto y = packet.data().position.y;
-    auto z = packet.data().position.z;
-    auto rot = player.getRot();
-    if( action == 0xD1 )
-    {
-      auto exitRange = packet.data().param1;
-      
-      auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-      auto exit = instanceObjectCache.getExitRange( p->data().targetZone, exitRange );
-      if( exit )
-      {
-        player.sendDebug( "exitRange {0} found!", exitRange );
-        auto destZone = exit->data.destTerritoryType;
-        if( destZone == 0 )
-          destZone = p->data().targetZone;
-        else
-          p->data().targetZone = destZone;
-        auto pop = instanceObjectCache.getPopRange( destZone, exit->data.destInstanceObjectId );
-        if( pop )
+        // west
+        if( x > -451 )
         {
-          player.sendDebug( "popRange {0} found!", exit->data.destInstanceObjectId );
-          x = pop->header.transform.translation.x;
-          y = pop->header.transform.translation.y;
-          z = pop->header.transform.translation.z;
-          //rot = pop->header.transform.rotation.y; all x/y/z not correct, maybe we don't need it since we have to be facing the portal anyway?
+          // enter
+          auto p = makeActorControl( player.getId(), 242, 1174189454, 817758208, 67, 0 );
+          queueOutPacket( p );
+          player.addStatusEffectById( 1945, 0, player, 0, true );
         }
         else
         {
-          player.sendUrgent( "popRange {0} not found in {1}!", exit->data.destInstanceObjectId, destZone );
+          // exit
+          auto p = makeActorControl( player.getId(), 242, 1182315916, 827392000, 68, 0 );
+          queueOutPacket( p );
+          player.removeSingleStatusEffectById( 1945 );
+        }
+      }
+      else if ( x > 637 && x < 641 )
+      {
+        // east
+        if( z > -188 )
+        {
+          // enter
+          auto p = makeActorControl( player.getId(), 242, 3521816124, 1737687040, 69, 0 );
+          queueOutPacket( p );
+          player.addStatusEffectById( 1945, 0, player, 0, true );
+        }
+        else
+        {
+          // exit
+          auto p = makeActorControl( player.getId(), 242, 3517228601, 1749483520, 70, 0 );
+          queueOutPacket( p );
+          player.removeSingleStatusEffectById( 1945 );
         }
       }
       else
       {
-        player.sendUrgent( "exitRange {0} not found in {1}!", exitRange, p->data().targetZone );
+        player.sendDebug( "Unknown dwarf house." );
       }
+      break;
     }
-    player.queuePacket( p );
-    player.setPos( x, y, z, true );
-    player.setRot( rot );
-    auto setPos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
-    setPos->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
-    setPos->data().x = x;
-    setPos->data().y = y;
-    setPos->data().z = z;
-    setPos->data().waitForLoad = action == 0xD1 ? 24 : 25;
-    setPos->data().unknown1 = 0;
-    player.queuePacket( setPos ); // this packet needs a delay of 0.8 second to wait for the client finishing its water animation otherwise it looks odd.
-  }
-  else if( action == 0xD4 && player.getRace() == 3 ) // enter dwarf house lalafell only of course
-  {
-    // looks like shit but IT WORKS.
-    auto x = packet.data().position.x;
-    auto z = packet.data().position.z;
-    if( x < -448 && x > -453 )
+    case 0x1F5: // emote
     {
-      // west
-      if( x > -451 )
+      auto emote = packet.data().param1;
+      if( emote == 0x32 || emote == 0x33 ) // "/sit"
       {
-        // enter
-        auto p = makeActorControl( player.getId(), 242, 1174189454, 817758208, 67, 0 );
-        queueOutPacket( p );
-        player.addStatusEffectById( 1945, 0, player, 0, true );
+        auto param4 = packet.data().param4;
+        auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+        auto emoteData = exdData.get< Data::Emote >( emote );
+
+        if( !emoteData )
+          break;
+
+        player.setPos( packet.data().position );
+        if( emote == 0x32 && player.hasInRangeActor() )
+        {
+          auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+          setpos->data().r16 = param4;
+          setpos->data().waitForLoad = 18;
+          setpos->data().unknown1 = 1;
+          setpos->data().x = packet.data().position.x;
+          setpos->data().y = packet.data().position.y;
+          setpos->data().z = packet.data().position.z;
+          player.sendToInRangeSet( setpos, false );
+        }
+        player.sendToInRangeSet( makeActorControlTarget( player.getId(), ActorControl::ActorControlType::Emote, emote, 0, 0, param4, 0xE0000000 ), true );
+
+        if( emote == 0x32 && emoteData->emoteMode != 0 )
+        {
+          player.setStance( Common::Stance::Passive );
+          player.setAutoattack( false );
+          player.setPersistentEmote( emoteData->emoteMode );
+          player.setStatus( Common::ActorStatus::EmoteMode );
+        }
       }
-      else
-      {
-        // exit
-        auto p = makeActorControl( player.getId(), 242, 1182315916, 827392000, 68, 0 );
-        queueOutPacket( p );
-        player.removeSingleStatusEffectById( 1945 );
-      }
+      break;
     }
-    else if ( x > 637 && x < 641 )
+    case 0x1F8:
     {
-      // east
-      if( z > -188 )
+      if( player.getPersistentEmote() > 0 )
       {
-        // enter
-        auto p = makeActorControl( player.getId(), 242, 3521816124, 1737687040, 69, 0 );
-        queueOutPacket( p );
-        player.addStatusEffectById( 1945, 0, player, 0, true );
+        auto param2 = packet.data().param2;
+
+        player.setPos( packet.data().position );
+        if( player.hasInRangeActor() )
+        {
+          auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+          setpos->data().r16 = param2;
+          setpos->data().waitForLoad = 18;
+          setpos->data().unknown1 = 2;
+          setpos->data().x = packet.data().position.x;
+          setpos->data().y = packet.data().position.y;
+          setpos->data().z = packet.data().position.z;
+          player.sendToInRangeSet( setpos, false );
+        }
+
+        player.setPersistentEmote( 0 );
+        player.emoteInterrupt();
+        player.setStatus( Common::ActorStatus::Idle );
+        auto pSetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+        player.sendToInRangeSet( pSetStatusPacket );
       }
-      else
-      {
-        // exit
-        auto p = makeActorControl( player.getId(), 242, 3517228601, 1749483520, 70, 0 );
-        queueOutPacket( p );
-        player.removeSingleStatusEffectById( 1945 );
-      }
+      break;
     }
-    else
+    case 0x25E: // coming out from water
+    case 0xD1: // underwater town portal
     {
-      player.sendDebug( "Unknown dwarf house." );
+      auto p = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
+      p->data().targetZone = player.getCurrentTerritory()->getTerritoryTypeId();
+      p->data().param4 = action == 0xD1 ? 14 : 227;
+      p->data().hideChar = action == 0xD1 ? 2 : 1;
+      p->data().fadeOut = action == 0xD1 ? 24 : 25;
+      p->data().fadeOutTime = 1;
+      p->data().unknown = action == 0xD1 ? 4 : 6;
+      auto x = packet.data().position.x;
+      auto y = packet.data().position.y;
+      auto z = packet.data().position.z;
+      auto rot = player.getRot();
+      if( action == 0xD1 )
+      {
+        auto exitRange = packet.data().param1;
+
+        auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+        auto exit = instanceObjectCache.getExitRange( p->data().targetZone, exitRange );
+        if( exit )
+        {
+          player.sendDebug( "exitRange {0} found!", exitRange );
+          auto destZone = exit->data.destTerritoryType;
+          if( destZone == 0 )
+            destZone = p->data().targetZone;
+          else
+            p->data().targetZone = destZone;
+          auto pop = instanceObjectCache.getPopRange( destZone, exit->data.destInstanceObjectId );
+          if( pop )
+          {
+            player.sendDebug( "popRange {0} found!", exit->data.destInstanceObjectId );
+            x = pop->header.transform.translation.x;
+            y = pop->header.transform.translation.y;
+            z = pop->header.transform.translation.z;
+            //rot = pop->header.transform.rotation.y; all x/y/z not correct, maybe we don't need it since we have to be facing the portal anyway?
+          }
+          else
+          {
+            player.sendUrgent( "popRange {0} not found in {1}!", exit->data.destInstanceObjectId, destZone );
+          }
+        }
+        else
+        {
+          player.sendUrgent( "exitRange {0} not found in {1}!", exitRange, p->data().targetZone );
+        }
+      }
+      player.queuePacket( p );
+      player.setPos( x, y, z, true );
+      player.setRot( rot );
+      auto setPos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
+      setPos->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
+      setPos->data().x = x;
+      setPos->data().y = y;
+      setPos->data().z = z;
+      setPos->data().waitForLoad = action == 0xD1 ? 24 : 25;
+      setPos->data().unknown1 = 0;
+      player.queuePacket( setPos ); // this packet needs a delay of 0.8 second to wait for the client finishing its water animation otherwise it looks odd.
+      break;
     }
   }
 }
