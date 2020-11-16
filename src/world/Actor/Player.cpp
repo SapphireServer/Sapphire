@@ -83,8 +83,7 @@ Sapphire::Entity::Player::Player() :
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false ),
-  m_pQueuedAction( nullptr ),
-  m_effect( 0 )
+  m_pQueuedAction( nullptr )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -2544,25 +2543,6 @@ void Sapphire::Entity::Player::gaugeSetRaw( uint8_t* pData )
 {
   std::memcpy( &m_gauge, pData, 15 );
   sendActorGauge();
-}
-
-uint32_t Sapphire::Entity::Player::getVisualEffect()
-{
-  return m_effect;
-}
-
-void Sapphire::Entity::Player::setVisualEffect( uint32_t effect, bool sendPacket )
-{
-  m_effect = effect;
-  if( sendPacket );
-    sendVisualEffect();
-}
-
-void Sapphire::Entity::Player::sendVisualEffect()
-{
-  auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
-  pPacket->data().id = m_effect;
-  sendToInRangeSet( pPacket, true );
 }
 
 void Sapphire::Entity::Player::gaugeWarSetIb( uint8_t value )

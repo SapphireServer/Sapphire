@@ -38,7 +38,8 @@ Sapphire::Entity::Chara::Chara( ObjKind type ) :
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_directorId( 0 ),
-  m_radius( 1.f )
+  m_radius( 1.f ),
+  m_effect( 0 )
 {
 
   m_lastTickTime = 0;
@@ -988,6 +989,25 @@ float Sapphire::Entity::Chara::applyShieldProtection( float damage )
     sendShieldUpdate();
 
   return remainingDamage;
+}
+
+uint32_t Sapphire::Entity::Chara::getVisualEffect()
+{
+  return m_effect;
+}
+
+void Sapphire::Entity::Chara::setVisualEffect( uint32_t effect, bool sendPacket )
+{
+  m_effect = effect;
+  if( sendPacket )
+    sendVisualEffect();
+}
+
+void Sapphire::Entity::Chara::sendVisualEffect()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( getId() );
+  pPacket->data().id = m_effect;
+  sendToInRangeSet( pPacket, true );
 }
 
 void Sapphire::Entity::Chara::onTick()

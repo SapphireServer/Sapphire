@@ -134,6 +134,8 @@ namespace Sapphire::Entity
     /*! Detour Crowd actor scale */
     float m_radius;
 
+    uint32_t m_effect;
+
   public:
     Chara( Common::ObjKind type );
 
@@ -289,6 +291,10 @@ namespace Sapphire::Entity
     Common::BaseParam getPrimaryStat() const;
 
     float applyShieldProtection( float damage );
+
+    uint32_t getVisualEffect();
+    void setVisualEffect( uint32_t effect, bool sendPacket = true );
+    void sendVisualEffect();
 
   };
 
