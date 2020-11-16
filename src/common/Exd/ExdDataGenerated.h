@@ -18,8 +18,7 @@
 #undef far
 #endif
 
-namespace Sapphire {
-namespace Data {
+namespace Sapphire::Data {
 
 class ExdDataGenerated;
 
@@ -73,7 +72,6 @@ struct AOZArrangement;
 struct AOZBoss;
 struct AOZContent;
 struct AOZContentBriefingBNpc;
-struct AOZReport;
 struct AquariumFish;
 struct AquariumWater;
 struct ArrayEventHandler;
@@ -116,6 +114,7 @@ struct Carry;
 struct Channeling;
 struct CharaMakeClassEquip;
 struct CharaMakeCustomize;
+struct CharaMakeName;
 struct CharaMakeType;
 struct ChocoboRace;
 struct ChocoboRaceAbility;
@@ -131,6 +130,12 @@ struct ChocoboTaxiStand;
 struct CircleActivity;
 struct ClassJob;
 struct ClassJobCategory;
+struct CollectablesShop;
+struct CollectablesShopItem;
+struct CollectablesShopItemGroup;
+struct CollectablesShopRefine;
+struct CollectablesShopRewardItem;
+struct CollectablesShopRewardScrip;
 struct Companion;
 struct CompanionMove;
 struct CompanionTransient;
@@ -147,6 +152,7 @@ struct CompanyLeve;
 struct CompanyLeveRule;
 struct CompleteJournal;
 struct CompleteJournalCategory;
+struct Condition;
 struct ConfigKey;
 struct ContentCloseCycle;
 struct ContentExAction;
@@ -212,6 +218,10 @@ struct DisposalShopItem;
 struct DpsChallenge;
 struct DpsChallengeOfficer;
 struct DpsChallengeTransient;
+struct DynamicEvent;
+struct DynamicEventEnemyType;
+struct DynamicEventSingleBattle;
+struct DynamicEventType;
 struct EmjAddon;
 struct EmjDani;
 struct Emote;
@@ -245,6 +255,7 @@ struct ExportedSG;
 struct ExVersion;
 struct Fate;
 struct FateEvent;
+struct FateMode;
 struct FateProgressUI;
 struct FateTokenType;
 struct FCActivity;
@@ -284,6 +295,8 @@ struct GatheringPointBase;
 struct GatheringPointBonus;
 struct GatheringPointBonusType;
 struct GatheringPointName;
+struct GatheringPointTransient;
+struct GatheringRarePopTimeTable;
 struct GatheringSubCategory;
 struct GatheringType;
 struct GcArmyCaptureTactics;
@@ -320,6 +333,8 @@ struct GoldSaucerTextData;
 struct GrandCompany;
 struct GrandCompanyRank;
 struct GroupPoseFrame;
+struct GroupPoseStamp;
+struct GroupPoseStampCategory;
 struct GuardianDeity;
 struct Guide;
 struct GuidePage;
@@ -357,6 +372,9 @@ struct HWDDevLayerControl;
 struct HWDDevLevelUI;
 struct HWDDevLively;
 struct HWDDevProgress;
+struct HWDGathereInspectTerm;
+struct HWDGathererInspection;
+struct HWDGathererInspectionReward;
 struct HWDInfoBoardArticle;
 struct HWDInfoBoardArticleTransient;
 struct HWDInfoBoardArticleType;
@@ -368,6 +386,9 @@ struct IKDFishParam;
 struct IKDRoute;
 struct IKDRouteTable;
 struct IKDSpot;
+struct InclusionShop;
+struct InclusionShopCategory;
+struct InclusionShopSeries;
 struct IndividualWeather;
 struct InstanceContent;
 struct InstanceContentBuff;
@@ -376,10 +397,13 @@ struct InstanceContentGuide;
 struct InstanceContentTextData;
 struct Item;
 struct ItemAction;
+struct ItemActionTelepo;
+struct ItemBarterCheck;
 struct ItemFood;
 struct ItemLevel;
 struct ItemSearchCategory;
 struct ItemSeries;
+struct ItemSortCategory;
 struct ItemSpecialBonus;
 struct ItemUICategory;
 struct JobHudManual;
@@ -445,6 +469,9 @@ struct MoveVfx;
 struct MovieSubtitle;
 struct MovieSubtitle500;
 struct MovieSubtitleVoyage;
+struct MYCTemporaryItem;
+struct MYCTemporaryItemUICategory;
+struct MYCWarResultNotebook;
 struct NotebookDivision;
 struct NotebookDivisionCategory;
 struct NotoriousMonster;
@@ -459,6 +486,7 @@ struct Orchestrion;
 struct OrchestrionCategory;
 struct OrchestrionPath;
 struct OrchestrionUiparam;
+struct Ornament;
 struct ParamGrow;
 struct PartyContent;
 struct PartyContentCutscene;
@@ -509,6 +537,7 @@ struct RacingChocoboParam;
 struct RecastNavimesh;
 struct Recipe;
 struct RecipeLevelTable;
+struct RecipeLookup;
 struct RecipeNotebookList;
 struct RecommendContents;
 struct Relic;
@@ -522,15 +551,16 @@ struct RetainerTaskLvRange;
 struct RetainerTaskNormal;
 struct RetainerTaskParameter;
 struct RetainerTaskRandom;
+struct RideShooting;
+struct RideShootingTextData;
 struct RPParameter;
-struct Salvage;
+struct SatisfactionArbitration;
 struct SatisfactionNpc;
 struct SatisfactionSupply;
 struct SatisfactionSupplyReward;
 struct ScenarioTree;
 struct ScenarioTreeTips;
 struct ScenarioTreeTipsClassQuest;
-struct ScenarioTreeTipsQuest;
 struct ScenarioType;
 struct ScreenImage;
 struct SecretRecipeBook;
@@ -556,7 +586,9 @@ struct SubmarineMap;
 struct SubmarinePart;
 struct SubmarineRank;
 struct SwitchTalk;
+struct SwitchTalkVariation;
 struct TerritoryType;
+struct TerritoryTypeTransient;
 struct TextCommand;
 struct Title;
 struct Tomestones;
@@ -620,7 +652,6 @@ struct Achievement
   int32_t key;
   std::vector< int32_t > data;
   uint16_t order;
-  uint8_t padding;
   uint8_t achievementHideCondition;
 
   Achievement( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -632,6 +663,7 @@ struct AchievementCategory
   uint8_t achievementKind;
   bool showComplete;
   bool hideCategory;
+  uint8_t order;
 
   AchievementCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -648,6 +680,7 @@ struct AchievementHideCondition
 struct AchievementKind
 {
   std::string name;
+  uint8_t order;
 
   AchievementKind( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -928,6 +961,7 @@ struct AetheryteSystemDefine
 
 struct AirshipExplorationLevel
 {
+  uint16_t capacity;
   uint32_t expToNext;
 
   AirshipExplorationLevel( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -1151,14 +1185,6 @@ struct AOZContentBriefingBNpc
   AOZContentBriefingBNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct AOZReport
-{
-  uint8_t reward;
-  int8_t order;
-
-  AOZReport( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
 struct AquariumFish
 {
   uint8_t aquariumWater;
@@ -1260,11 +1286,14 @@ struct BattleLeve
   std::vector< uint8_t > itemsInvolvedQty;
   std::vector< uint8_t > itemDropRate;
   std::vector< uint32_t > toDoNumberInvolved;
-  std::vector< uint32_t > toDoParam;
+  std::vector< uint8_t > toDoSequence;
   int32_t rule;
   uint8_t varient;
   uint16_t objective0;
   uint16_t objective1;
+  uint16_t objective2;
+  uint16_t help0;
+  uint16_t help1;
 
   BattleLeve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1278,6 +1307,14 @@ struct BattleLeveRule
 
 struct BeastRankBonus
 {
+  uint16_t neutral;
+  uint16_t recognized;
+  uint16_t friendly;
+  uint16_t trusted;
+  uint16_t respected;
+  uint16_t honored;
+  uint16_t sworn;
+  uint16_t alliedBloodsworn;
   uint32_t item;
   std::vector< uint8_t > itemQuantity;
 
@@ -1288,6 +1325,8 @@ struct BeastReputationRank
 {
   uint16_t requiredReputation;
   std::string name;
+  std::string alliedNames;
+  uint32_t color;
 
   BeastReputationRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1303,6 +1342,13 @@ struct BeastTribe
   uint32_t currencyItem;
   uint8_t displayOrder;
   std::string name;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+  int8_t dEF;
   std::string nameRelation;
 
   BeastTribe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -1310,7 +1356,13 @@ struct BeastTribe
 
 struct Behavior
 {
+  uint8_t condition0Target;
+  uint8_t condition0Type;
   int32_t balloon;
+  uint8_t condition1Target;
+  uint8_t condition1Type;
+  uint32_t contentArgument0;
+  uint8_t contentArgument1;
 
   Behavior( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1414,6 +1466,7 @@ struct BGMSwitch
 {
   uint8_t bGMSystemDefine;
   uint32_t quest;
+  uint16_t bGM;
 
   BGMSwitch( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1663,6 +1716,7 @@ struct Channeling
 {
   std::string file;
   uint8_t widthScale;
+  bool addedIn53;
 
   Channeling( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1693,6 +1747,56 @@ struct CharaMakeCustomize
   CharaMakeCustomize( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct CharaMakeName
+{
+  std::string hyurMidlanderMale;
+  std::string hyurMidlanderFemale;
+  std::string hyurMidlanderLastName;
+  std::string hyurHighlanderMale;
+  std::string hyurHighlanderFemale;
+  std::string hyurHighlanderLastName;
+  std::string elezenMale;
+  std::string elezenFemale;
+  std::string elezenWildwoodLastName;
+  std::string elezenDuskwightLastName;
+  std::string miqoteSunMale;
+  std::string miqoteSunFemale;
+  std::string miqoteSunMaleLastName;
+  std::string miqoteSunFemaleLastName;
+  std::string miqoteMoonMale;
+  std::string miqoteMoonFemale;
+  std::string miqoteMoonLastname;
+  std::string lalafellPlainsfolkFirstNameStart;
+  std::string lalafellPlainsfolkLastNameStart;
+  std::string lalafellPlainsfolkEndOfNames;
+  std::string lalafellDunesfolkMale;
+  std::string lalafellDunesfolkMaleLastName;
+  std::string lalafellDunesfolkFemale;
+  std::string lalafellDunesfolkFemaleLastName;
+  std::string roegadynSeaWolfMale;
+  std::string roegadynSeaWolfMaleLastName;
+  std::string roegadynSeaWolfFemale;
+  std::string roegadynSeaWolfFemaleLastName;
+  std::string roegadynHellsguardFirstName;
+  std::string roegadynHellsguardMaleLastName;
+  std::string roegadynHellsguardFemaleLastName;
+  std::string auRaRaenMale;
+  std::string auRaRaenFemale;
+  std::string auRaRaenLastName;
+  std::string auRaXaelaMale;
+  std::string auRaXaelaFemale;
+  std::string auRaXaelaLastName;
+  std::string hrothgarHellionsFirstName;
+  std::string hrothgarHellionsLastName;
+  std::string hrothgarLostFirstName;
+  std::string hrothgarLostLastName;
+  std::string vieraFirstName;
+  std::string vieraRavaLastName;
+  std::string vieraVeenaLastName;
+
+  CharaMakeName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct CharaMakeType
 {
   int32_t race;
@@ -1706,7 +1810,6 @@ struct CharaMakeType
   std::vector< uint32_t > subMenuMask;
   std::vector< uint32_t > customize;
   std::vector< uint8_t > voiceStruct;
-  std::vector< int32_t > facialFeatureOption;
 
   CharaMakeType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1798,6 +1901,7 @@ struct ChocoboTaxi
 
 struct ChocoboTaxiStand
 {
+  std::vector< uint16_t > targetLocations;
   std::string placeName;
 
   ChocoboTaxiStand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -1895,6 +1999,63 @@ struct ClassJobCategory
   bool dNC;
 
   ClassJobCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CollectablesShop
+{
+  std::string name;
+  uint32_t quest;
+  std::vector< uint16_t > shopItems;
+
+  CollectablesShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CollectablesShopItem
+{
+  uint32_t item;
+  uint8_t collectablesShopItemGroup;
+  uint16_t levelMin;
+  uint16_t levelMax;
+  uint16_t collectablesShopRefine;
+  uint16_t collectablesShopRewardScrip;
+
+  CollectablesShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CollectablesShopItemGroup
+{
+  std::string name;
+
+  CollectablesShopItemGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CollectablesShopRefine
+{
+  uint16_t lowCollectability;
+  uint16_t midCollectability;
+  uint16_t highCollectability;
+
+  CollectablesShopRefine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CollectablesShopRewardItem
+{
+  uint32_t item;
+
+  CollectablesShopRewardItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CollectablesShopRewardScrip
+{
+  uint16_t currency;
+  uint16_t lowReward;
+  uint16_t midReward;
+  uint16_t highReward;
+  uint16_t expRatioLow;
+  uint16_t expRatioMid;
+  uint16_t expRatioHigh;
+
+  CollectablesShopRewardScrip( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Companion
@@ -2014,10 +2175,12 @@ struct CompanyCraftProcess
 struct CompanyCraftSequence
 {
   int32_t resultItem;
+  int32_t category;
   int32_t companyCraftDraftCategory;
   int32_t companyCraftType;
   int32_t companyCraftDraft;
   std::vector< uint16_t > companyCraftPart;
+  uint32_t order;
 
   CompanyCraftSequence( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2038,15 +2201,14 @@ struct CompanyCraftType
 
 struct CompanyLeve
 {
-  std::vector< uint16_t > time;
+  std::vector< uint16_t > routePointTime;
   std::vector< int32_t > baseID;
   std::vector< uint16_t > enemyLevel;
   std::vector< uint32_t > bNpcName;
   std::vector< int32_t > itemsInvolved;
   std::vector< uint8_t > itemsInvolvedQty;
   std::vector< uint8_t > itemDropRate;
-  std::vector< uint32_t > toDoNumberInvolved;
-  std::vector< uint32_t > toDoParam;
+  std::vector< uint8_t > toDoSequence;
   int32_t rule;
   uint8_t ruleParam;
 
@@ -2078,6 +2240,13 @@ struct CompleteJournalCategory
   uint32_t lastQuest;
 
   CompleteJournalCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct Condition
+{
+  uint32_t logMessage;
+
+  Condition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ConfigKey
@@ -2122,6 +2291,7 @@ struct ContentFinderCondition
   uint8_t classJobLevelSync;
   uint16_t itemLevelRequired;
   uint16_t itemLevelSync;
+  bool addedIn53;
   bool allowUndersized;
   bool allowReplacement;
   bool highEndDuty;
@@ -2593,6 +2763,12 @@ struct DeepDungeonItem
 struct DeepDungeonLayer
 {
   uint8_t deepDungeon;
+  uint8_t floorSet;
+  uint16_t roomA;
+  uint16_t roomB;
+  uint16_t roomC;
+  uint8_t wepMinLv;
+  uint8_t armourMinLv;
 
   DeepDungeonLayer( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2759,6 +2935,45 @@ struct DpsChallengeTransient
   DpsChallengeTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct DynamicEvent
+{
+  uint8_t eventType;
+  uint8_t enemyType;
+  uint32_t lGBEventObject;
+  uint32_t lGBMapRange;
+  uint32_t quest;
+  uint8_t singleBattle;
+  uint32_t announce;
+  std::string name;
+  std::string description;
+
+  DynamicEvent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DynamicEventEnemyType
+{
+  std::string name;
+
+  DynamicEventEnemyType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DynamicEventSingleBattle
+{
+  int32_t actionIcon;
+  uint32_t icon;
+  std::string text;
+
+  DynamicEventSingleBattle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct DynamicEventType
+{
+  uint32_t iconObjective0;
+  uint32_t iconObjective1;
+
+  DynamicEventType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct EmjAddon
 {
   std::string text;
@@ -2887,8 +3102,11 @@ struct ENpcDressUp
 
 struct ENpcDressUpDress
 {
+  bool addedIn530;
   uint32_t eNpc;
+  uint16_t addedIn531;
   uint16_t behavior;
+  uint8_t addedIn532;
   uint64_t modelMainHand;
   uint8_t dyeMainHand;
   uint64_t modelOffHand;
@@ -2932,6 +3150,7 @@ struct EObj
   bool directorControl;
   bool target;
   uint8_t eventHighAddition;
+  bool addedIn53;
 
   EObj( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3137,6 +3356,8 @@ struct ExportedSG
 struct ExVersion
 {
   std::string name;
+  uint16_t acceptJingle;
+  uint16_t completeJingle;
 
   ExVersion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3145,6 +3366,7 @@ struct Fate
 {
   uint8_t eurekaFate;
   uint8_t rule;
+  uint16_t fateRuleEx;
   uint32_t location;
   uint8_t classJobLevel;
   uint8_t classJobLevelMax;
@@ -3158,13 +3380,19 @@ struct Fate
   uint16_t screenImageAccept;
   uint16_t screenImageComplete;
   uint16_t screenImageFailed;
-  bool hasWorldMapIcon;
-  bool isQuest;
+  bool specialFate;
+  uint16_t givenStatus;
+  bool adventEvent;
+  bool moonFaireEvent;
+  uint32_t fATEChain;
   std::string name;
   std::string description;
   std::string objective;
   std::vector< std::string > statusText;
   uint32_t arrayIndex;
+  uint32_t reqEventItem;
+  uint32_t turnInEventItem;
+  std::vector< uint16_t > objectiveIcon;
 
   Fate( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3181,6 +3409,16 @@ struct FateEvent
   std::vector< std::string > text;
 
   FateEvent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct FateMode
+{
+  uint32_t motivationIcon;
+  uint32_t motivationMapMarker;
+  uint32_t objectiveIcon;
+  uint32_t objectiveMapMarker;
+
+  FateMode( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FateProgressUI
@@ -3526,9 +3764,10 @@ struct GatheringPointBase
 struct GatheringPointBonus
 {
   uint8_t condition;
-  uint16_t conditionValue;
+  uint32_t conditionValue;
   uint8_t bonusType;
   uint16_t bonusValue;
+  bool addedIn53;
 
   GatheringPointBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3551,6 +3790,21 @@ struct GatheringPointName
   int8_t article;
 
   GatheringPointName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GatheringPointTransient
+{
+  uint16_t ephemeralStartTime;
+  uint16_t ephemeralEndTime;
+  int32_t gatheringRarePopTimeTable;
+
+  GatheringPointTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GatheringRarePopTimeTable
+{
+
+  GatheringRarePopTimeTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GatheringSubCategory
@@ -3920,6 +4174,22 @@ struct GroupPoseFrame
   GroupPoseFrame( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct GroupPoseStamp
+{
+  int32_t stampIcon;
+  int32_t category;
+  std::string name;
+
+  GroupPoseStamp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GroupPoseStampCategory
+{
+  std::string name;
+
+  GroupPoseStampCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct GuardianDeity
 {
   std::string name;
@@ -3961,6 +4231,7 @@ struct GuideTitle
 
 struct GuildleveAssignment
 {
+  uint8_t addedIn53;
   uint32_t assignmentTalk;
   std::vector< uint32_t > quest;
 
@@ -4215,12 +4486,14 @@ struct HWDCrafterSupply
 {
   std::vector< uint32_t > itemTradeIn;
   std::vector< uint8_t > level;
-  std::vector< uint8_t > baseCollectableRating;
-  std::vector< uint16_t > midBaseCollectableRating;
-  std::vector< uint16_t > highBaseCollectableRating;
+  std::vector< uint8_t > levelMax;
+  std::vector< uint16_t > baseCollectableRating;
+  std::vector< uint16_t > midCollectableRating;
+  std::vector< uint16_t > highCollectableRating;
   std::vector< uint16_t > baseCollectableReward;
   std::vector< uint16_t > midCollectableReward;
   std::vector< uint16_t > highCollectableReward;
+  std::vector< uint8_t > termName;
 
   HWDCrafterSupply( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4229,6 +4502,7 @@ struct HWDCrafterSupplyReward
 {
   uint16_t scriptRewardAmount;
   uint32_t expReward;
+  uint16_t Points;
 
   HWDCrafterSupplyReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4257,6 +4531,34 @@ struct HWDDevProgress
   bool canGoNext;
 
   HWDDevProgress( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct HWDGathereInspectTerm
+{
+  std::string name;
+
+  HWDGathereInspectTerm( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct HWDGathererInspection
+{
+  std::vector< uint32_t > itemRequired;
+  std::vector< uint32_t > fishParameter;
+  std::vector< uint8_t > amountRequired;
+  std::vector< uint32_t > itemReceived;
+  std::vector< uint16_t > reward1;
+  std::vector< uint16_t > reward2;
+  std::vector< uint8_t > phase;
+
+  HWDGathererInspection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct HWDGathererInspectionReward
+{
+  uint16_t scrips;
+  uint16_t points;
+
+  HWDGathererInspectionReward( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct HWDInfoBoardArticle
@@ -4350,9 +4652,34 @@ struct IKDSpot
   IKDSpot( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct InclusionShop
+{
+  std::vector< uint16_t > category;
+
+  InclusionShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct InclusionShopCategory
+{
+  std::string name;
+  uint8_t classJobCategory;
+  uint16_t inclusionShopSeries;
+
+  InclusionShopCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct InclusionShopSeries
+{
+  uint32_t specialShop;
+
+  InclusionShopSeries( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct IndividualWeather
 {
   std::vector< uint8_t > weather;
+  uint8_t addedIn530;
+  uint8_t addedIn531;
   std::vector< uint32_t > quest;
 
   IndividualWeather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -4364,28 +4691,28 @@ struct InstanceContent
   uint8_t weekRestriction;
   uint16_t timeLimitmin;
   uint16_t bGM;
-  uint32_t winBGM;
+  uint16_t winBGM;
   uint32_t cutscene;
-  uint8_t order;
-  bool colosseum;
+  uint16_t order;
+  uint8_t colosseum;
   uint32_t instanceContentTextDataBossStart;
   uint32_t instanceContentTextDataBossEnd;
   uint32_t bNpcBaseBoss;
   uint32_t instanceContentTextDataObjectiveStart;
-  uint16_t instanceContentTextDataObjectiveEnd;
-  uint32_t sortKey;
+  uint32_t instanceContentTextDataObjectiveEnd;
+  uint16_t sortKey;
   uint32_t instanceClearExp;
   uint16_t newPlayerBonusA;
-  uint32_t finalBossCurrencyC;
-  uint16_t finalBossCurrencyA;
+  uint16_t finalBossCurrencyC;
+  uint32_t finalBossCurrencyA;
   uint16_t finalBossCurrencyB;
-  uint32_t newPlayerBonusB;
+  uint16_t newPlayerBonusB;
   uint32_t instanceClearGil;
-  uint8_t instanceContentRewardItem;
-  int32_t finalBossExp;
+  uint32_t instanceContentRewardItem;
+  uint8_t finalBossExp;
   uint32_t instanceContentBuff;
-  int16_t reqInstance;
-  uint8_t partyCondition;
+  int32_t reqInstance;
+  int16_t partyCondition;
 
   InstanceContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4439,6 +4766,7 @@ struct Item
   uint8_t itemUICategory;
   uint8_t itemSearchCategory;
   uint8_t equipSlotCategory;
+  uint8_t itemSortCategory;
   uint32_t stackSize;
   bool isUnique;
   bool isUntradable;
@@ -4454,7 +4782,7 @@ struct Item
   uint8_t classJobRepair;
   int32_t itemRepair;
   int32_t itemGlamour;
-  uint16_t salvage;
+  uint16_t desynth;
   bool isCollectable;
   bool alwaysCollectable;
   uint16_t aetherialReduce;
@@ -4502,6 +4830,23 @@ struct ItemAction
   std::vector< uint16_t > dataHQ;
 
   ItemAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct ItemActionTelepo
+{
+  uint32_t requirement;
+  uint32_t denyMessage;
+
+  ItemActionTelepo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct ItemBarterCheck
+{
+  uint16_t category;
+  uint32_t question;
+  uint32_t confirm;
+
+  ItemBarterCheck( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ItemFood
@@ -4608,6 +4953,13 @@ struct ItemSeries
   ItemSeries( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct ItemSortCategory
+{
+  uint8_t param;
+
+  ItemSortCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct ItemSpecialBonus
 {
   std::string name;
@@ -4695,7 +5047,7 @@ struct Leve
   std::string name;
   std::string description;
   int32_t leveClient;
-  int32_t leveAssignmentType;
+  uint8_t leveAssignmentType;
   int32_t town;
   uint16_t classJobLevel;
   uint8_t timeLimit;
@@ -4827,6 +5179,8 @@ struct LotteryExchangeShop
 {
   std::vector< int32_t > itemAccepted;
   std::vector< uint32_t > amountAccepted;
+  std::string lua;
+  std::vector< uint32_t > logMessage;
 
   LotteryExchangeShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5293,6 +5647,38 @@ struct MovieSubtitleVoyage
   MovieSubtitleVoyage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MYCTemporaryItem
+{
+  uint8_t category;
+  uint8_t type;
+  uint32_t action;
+  uint8_t max;
+  uint8_t weight;
+  uint8_t order;
+
+  MYCTemporaryItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MYCTemporaryItemUICategory
+{
+  std::string name;
+
+  MYCTemporaryItemUICategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MYCWarResultNotebook
+{
+  uint8_t number;
+  int32_t icon;
+  int32_t image;
+  uint8_t rarity;
+  std::string nameJP;
+  std::string name;
+  std::string description;
+
+  MYCWarResultNotebook( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct NotebookDivision
 {
   std::string name;
@@ -5315,6 +5701,7 @@ struct NotebookDivision
 struct NotebookDivisionCategory
 {
   std::string name;
+  uint8_t index;
 
   NotebookDivisionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5425,6 +5812,8 @@ struct Orchestrion
 struct OrchestrionCategory
 {
   std::string name;
+  uint8_t hideCategory;
+  uint8_t order;
 
   OrchestrionCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5442,6 +5831,23 @@ struct OrchestrionUiparam
   uint16_t order;
 
   OrchestrionUiparam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct Ornament
+{
+  uint16_t model;
+  int16_t order;
+  uint16_t icon;
+  uint16_t transient;
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+
+  Ornament( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ParamGrow
@@ -5596,8 +6002,11 @@ struct PlantPotFlowerSeed
 
 struct PreHandler
 {
+  uint32_t image;
   uint32_t target;
-  uint16_t actionTimeline;
+  uint32_t unlockQuest;
+  uint32_t acceptMessage;
+  uint32_t denyMessage;
 
   PreHandler( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5739,39 +6148,57 @@ struct Quest
   uint32_t previousQuest2;
   uint8_t questLockJoin;
   std::vector< uint32_t > questLock;
+  uint16_t header;
   uint8_t classJobUnlock;
   uint8_t grandCompany;
   uint8_t grandCompanyRank;
   uint8_t instanceContentJoin;
   std::vector< uint32_t > instanceContent;
   uint8_t festival;
+  uint8_t festivalBegin;
+  uint8_t festivalEnd;
   uint16_t bellStart;
   uint16_t bellEnd;
   uint8_t beastTribe;
   uint8_t beastReputationRank;
-  uint16_t levelMax;
+  uint16_t beastReputationValue;
   int32_t mountRequired;
   bool isHouseRequired;
   uint8_t deliveryQuest;
   uint32_t issuerStart;
-  uint32_t behavior;
+  uint32_t issuerLocation;
+  uint16_t clientBehavior;
   uint32_t targetEnd;
   bool isRepeatable;
   uint8_t repeatIntervalType;
   uint8_t questRepeatFlag;
-  bool unlocksSystemContent;
+  bool canCancel;
   uint8_t type;
   uint16_t questClassJobSupply;
   std::vector< std::string > scriptInstruction;
   std::vector< uint32_t > scriptArg;
   std::vector< uint8_t > actorSpawnSeq;
   std::vector< uint8_t > actorDespawnSeq;
-  std::vector< uint32_t > actorSpawn;
+  std::vector< uint32_t > listener;
   std::vector< uint8_t > questUInt8A;
   std::vector< uint8_t > questUInt8B;
+  std::vector< uint8_t > conditionType;
+  std::vector< uint32_t > conditionValue;
+  std::vector< uint8_t > conditionOperator;
+  std::vector< uint16_t > behavior;
+  std::vector< bool > visibleBool;
+  std::vector< bool > conditionBool;
+  std::vector< bool > itemBool;
+  std::vector< bool > announceBool;
+  std::vector< bool > behaviorBool;
+  std::vector< bool > acceptBool;
+  std::vector< bool > qualifiedBool;
+  std::vector< bool > canTargetBool;
   std::vector< uint8_t > toDoCompleteSeq;
   std::vector< uint8_t > toDoQty;
   std::vector< uint32_t > toDoMainLocation;
+  std::vector< uint8_t > countableNum;
+  uint8_t levelMax;
   uint8_t classJobRequired;
   uint16_t expFactor;
   uint32_t gilReward;
@@ -5789,7 +6216,10 @@ struct Quest
   uint8_t emoteReward;
   uint16_t actionReward;
   std::vector< uint8_t > generalActionReward;
+  uint16_t systemReward0;
   uint8_t otherReward;
+  uint16_t systemReward1;
+  uint16_t gCTypeReward;
   uint32_t instanceContentUnlock;
   uint8_t tomestoneReward;
   uint8_t tomestoneCountReward;
@@ -5798,6 +6228,8 @@ struct Quest
   uint8_t journalGenre;
   uint32_t icon;
   uint32_t iconSpecial;
+  bool introduction;
+  bool hideOfferIcon;
   uint8_t eventIconType;
   uint16_t sortKey;
 
@@ -5941,6 +6373,7 @@ struct Race
   int32_t rSEFHands;
   int32_t rSEFLegs;
   int32_t rSEFFeet;
+  uint8_t exPac;
 
   Race( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6026,6 +6459,7 @@ struct Recipe
   int32_t statusRequired;
   int32_t itemRequired;
   bool isSpecializationRequired;
+  bool isExpert;
   uint16_t patchNumber;
 
   Recipe( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6042,6 +6476,20 @@ struct RecipeLevelTable
   uint16_t durability;
 
   RecipeLevelTable( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct RecipeLookup
+{
+  uint16_t cRP;
+  uint16_t bSM;
+  uint16_t aRM;
+  uint16_t gSM;
+  uint16_t lTW;
+  uint16_t wVR;
+  uint16_t aLC;
+  uint16_t cUL;
+
+  RecipeLookup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RecipeNotebookList
@@ -6131,6 +6579,7 @@ struct Resident
 {
   uint64_t model;
   int32_t npcYell;
+  uint16_t addedIn53;
   uint8_t residentMotionType;
 
   Resident( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6146,6 +6595,8 @@ struct RetainerTask
   uint16_t maxTimemin;
   int32_t experience;
   uint16_t requiredItemLevel;
+  uint8_t conditionParam0;
+  uint8_t conditionParam1;
   uint16_t requiredGathering;
   uint16_t task;
 
@@ -6189,6 +6640,24 @@ struct RetainerTaskRandom
   RetainerTaskRandom( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct RideShooting
+{
+  uint16_t gFateRideShooting;
+  uint16_t startText;
+  std::vector< uint32_t > popRange;
+  std::vector< uint32_t > eNpc;
+  std::vector< uint8_t > eNpcScale;
+
+  RideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct RideShootingTextData
+{
+  std::string string;
+
+  RideShootingTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct RPParameter
 {
   uint16_t bNpcName;
@@ -6197,11 +6666,11 @@ struct RPParameter
   RPParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct Salvage
+struct SatisfactionArbitration
 {
-  uint16_t optimalSkill;
+  uint32_t quest;
 
-  Salvage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  SatisfactionArbitration( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SatisfactionNpc
@@ -6213,6 +6682,8 @@ struct SatisfactionNpc
   std::vector< int32_t > supplyIndex;
   std::vector< uint16_t > satisfactionRequired;
   int32_t icon;
+  uint8_t addedIn530;
+  uint8_t addedIn531;
 
   SatisfactionNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6268,13 +6739,6 @@ struct ScenarioTreeTipsClassQuest
   ScenarioTreeTipsClassQuest( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct ScenarioTreeTipsQuest
-{
-  uint32_t level;
-
-  ScenarioTreeTipsQuest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
 struct ScenarioType
 {
   std::string type;
@@ -6304,11 +6768,15 @@ struct SkyIsland2Mission
 {
   uint32_t item1;
   uint32_t item2;
+  uint16_t placeName;
   uint16_t objective1;
+  uint32_t popRange0;
   uint8_t requiredAmount1;
   uint16_t objective2;
+  uint32_t popRange1;
   uint8_t requiredAmount2;
   uint16_t objective3;
+  uint32_t popRange2;
   uint32_t image;
 
   SkyIsland2Mission( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6392,11 +6860,11 @@ struct SpecialShop
   std::vector< int32_t > questItem;
   std::vector< int32_t > unknown;
   std::vector< int32_t > achievementUnlock;
-  std::vector< uint8_t > patchNumber;
-  uint16_t useCurrencyType;
-  uint16_t questUnlock;
-  uint16_t completeText;
-  uint16_t notCompleteText;
+  std::vector< uint16_t > patchNumber;
+  bool useCurrencyType;
+  uint32_t questUnlock;
+  int32_t completeText;
+  int32_t notCompleteText;
 
   SpecialShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6467,6 +6935,28 @@ struct StatusLoopVFX
 
 struct Story
 {
+  std::string script;
+  std::vector< std::string > instruction;
+  std::vector< uint32_t > argument;
+  std::vector< uint16_t > sequence;
+  std::vector< uint8_t > completedQuestOperator;
+  std::vector< uint32_t > completedQuest0;
+  std::vector< uint32_t > completedQuest1;
+  std::vector< uint32_t > completedQuest2;
+  std::vector< uint8_t > acceptedQuestOperator;
+  std::vector< uint32_t > acceptedQuest0;
+  std::vector< uint8_t > acceptedQuestSequence0;
+  std::vector< uint32_t > acceptedQuest1;
+  std::vector< uint8_t > acceptedQuestSequence1;
+  std::vector< uint32_t > acceptedQuest2;
+  std::vector< uint8_t > acceptedQuestSequence2;
+  std::vector< uint32_t > layerSet0;
+  std::vector< uint32_t > layerSet1;
+  std::vector< uint16_t > sequenceBegin;
+  std::vector< uint16_t > sequenceEnd;
+  std::vector< uint32_t > listener;
+  uint16_t layerSetTerritoryType0;
+  uint16_t layerSetTerritoryType1;
 
   Story( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6475,6 +6965,8 @@ struct SubmarineExploration
 {
   std::string destination;
   std::string location;
+  uint8_t map;
+  uint8_t stars;
   uint8_t rankReq;
   uint8_t ceruleumTankReq;
   uint16_t durationmin;
@@ -6509,18 +7001,30 @@ struct SubmarinePart
 
 struct SubmarineRank
 {
-  uint16_t rank;
+  uint16_t capacity;
   uint32_t expToNext;
+  uint8_t surveillanceBonus;
+  uint8_t retrievalBonus;
+  uint8_t speedBonus;
+  uint8_t rangeBonus;
+  uint8_t favorBonus;
 
   SubmarineRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct SwitchTalk
 {
-  std::vector< uint32_t > quest;
-  std::vector< uint32_t > defaultTalk;
 
   SwitchTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct SwitchTalkVariation
+{
+  uint32_t quest0;
+  uint32_t quest1;
+  uint32_t defaultTalk;
+
+  SwitchTalkVariation( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TerritoryType
@@ -6549,8 +7053,18 @@ struct TerritoryType
   uint16_t resident;
   int8_t achievementIndex;
   bool isPvpZone;
+  uint8_t exVersion;
+  uint8_t addedIn53;
+  uint8_t mountSpeed;
 
   TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TerritoryTypeTransient
+{
+  int16_t offsetZ;
+
+  TerritoryTypeTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct TextCommand
@@ -6646,14 +7160,17 @@ struct Transformation
   uint16_t action3;
   uint16_t action4;
   uint16_t action5;
-  uint8_t rPParameter;
+  uint16_t rPParameter;
+  uint16_t removeAction;
   float speed;
   float scale;
   bool isPvP;
   bool isEvent;
   bool playerCamera;
-  bool startVFX;
-  bool endVFX;
+  uint16_t startVFX;
+  uint16_t endVFX;
+  uint32_t action6;
+  uint16_t action7;
 
   Transformation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6672,7 +7189,7 @@ struct TreasureHuntRank
   int32_t keyItemName;
   int32_t instanceMap;
   uint8_t maxPartySize;
-  uint8_t minPartySize;
+  uint8_t treasureHuntTexture;
 
   TreasureHuntRank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -7121,7 +7638,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_AOZBossDat;
      xiv::exd::Exd m_AOZContentDat;
      xiv::exd::Exd m_AOZContentBriefingBNpcDat;
-     xiv::exd::Exd m_AOZReportDat;
      xiv::exd::Exd m_AquariumFishDat;
      xiv::exd::Exd m_AquariumWaterDat;
      xiv::exd::Exd m_ArrayEventHandlerDat;
@@ -7164,6 +7680,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ChannelingDat;
      xiv::exd::Exd m_CharaMakeClassEquipDat;
      xiv::exd::Exd m_CharaMakeCustomizeDat;
+     xiv::exd::Exd m_CharaMakeNameDat;
      xiv::exd::Exd m_CharaMakeTypeDat;
      xiv::exd::Exd m_ChocoboRaceDat;
      xiv::exd::Exd m_ChocoboRaceAbilityDat;
@@ -7179,6 +7696,12 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CircleActivityDat;
      xiv::exd::Exd m_ClassJobDat;
      xiv::exd::Exd m_ClassJobCategoryDat;
+     xiv::exd::Exd m_CollectablesShopDat;
+     xiv::exd::Exd m_CollectablesShopItemDat;
+     xiv::exd::Exd m_CollectablesShopItemGroupDat;
+     xiv::exd::Exd m_CollectablesShopRefineDat;
+     xiv::exd::Exd m_CollectablesShopRewardItemDat;
+     xiv::exd::Exd m_CollectablesShopRewardScripDat;
      xiv::exd::Exd m_CompanionDat;
      xiv::exd::Exd m_CompanionMoveDat;
      xiv::exd::Exd m_CompanionTransientDat;
@@ -7195,6 +7718,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CompanyLeveRuleDat;
      xiv::exd::Exd m_CompleteJournalDat;
      xiv::exd::Exd m_CompleteJournalCategoryDat;
+     xiv::exd::Exd m_ConditionDat;
      xiv::exd::Exd m_ConfigKeyDat;
      xiv::exd::Exd m_ContentCloseCycleDat;
      xiv::exd::Exd m_ContentExActionDat;
@@ -7260,6 +7784,10 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_DpsChallengeDat;
      xiv::exd::Exd m_DpsChallengeOfficerDat;
      xiv::exd::Exd m_DpsChallengeTransientDat;
+     xiv::exd::Exd m_DynamicEventDat;
+     xiv::exd::Exd m_DynamicEventEnemyTypeDat;
+     xiv::exd::Exd m_DynamicEventSingleBattleDat;
+     xiv::exd::Exd m_DynamicEventTypeDat;
      xiv::exd::Exd m_EmjAddonDat;
      xiv::exd::Exd m_EmjDaniDat;
      xiv::exd::Exd m_EmoteDat;
@@ -7293,6 +7821,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ExVersionDat;
      xiv::exd::Exd m_FateDat;
      xiv::exd::Exd m_FateEventDat;
+     xiv::exd::Exd m_FateModeDat;
      xiv::exd::Exd m_FateProgressUIDat;
      xiv::exd::Exd m_FateTokenTypeDat;
      xiv::exd::Exd m_FCActivityDat;
@@ -7332,6 +7861,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GatheringPointBonusDat;
      xiv::exd::Exd m_GatheringPointBonusTypeDat;
      xiv::exd::Exd m_GatheringPointNameDat;
+     xiv::exd::Exd m_GatheringPointTransientDat;
+     xiv::exd::Exd m_GatheringRarePopTimeTableDat;
      xiv::exd::Exd m_GatheringSubCategoryDat;
      xiv::exd::Exd m_GatheringTypeDat;
      xiv::exd::Exd m_GcArmyCaptureTacticsDat;
@@ -7368,6 +7899,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GrandCompanyDat;
      xiv::exd::Exd m_GrandCompanyRankDat;
      xiv::exd::Exd m_GroupPoseFrameDat;
+     xiv::exd::Exd m_GroupPoseStampDat;
+     xiv::exd::Exd m_GroupPoseStampCategoryDat;
      xiv::exd::Exd m_GuardianDeityDat;
      xiv::exd::Exd m_GuideDat;
      xiv::exd::Exd m_GuidePageDat;
@@ -7405,6 +7938,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_HWDDevLevelUIDat;
      xiv::exd::Exd m_HWDDevLivelyDat;
      xiv::exd::Exd m_HWDDevProgressDat;
+     xiv::exd::Exd m_HWDGathereInspectTermDat;
+     xiv::exd::Exd m_HWDGathererInspectionDat;
+     xiv::exd::Exd m_HWDGathererInspectionRewardDat;
      xiv::exd::Exd m_HWDInfoBoardArticleDat;
      xiv::exd::Exd m_HWDInfoBoardArticleTransientDat;
      xiv::exd::Exd m_HWDInfoBoardArticleTypeDat;
@@ -7416,6 +7952,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_IKDRouteDat;
      xiv::exd::Exd m_IKDRouteTableDat;
      xiv::exd::Exd m_IKDSpotDat;
+     xiv::exd::Exd m_InclusionShopDat;
+     xiv::exd::Exd m_InclusionShopCategoryDat;
+     xiv::exd::Exd m_InclusionShopSeriesDat;
      xiv::exd::Exd m_IndividualWeatherDat;
      xiv::exd::Exd m_InstanceContentDat;
      xiv::exd::Exd m_InstanceContentBuffDat;
@@ -7424,10 +7963,13 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_InstanceContentTextDataDat;
      xiv::exd::Exd m_ItemDat;
      xiv::exd::Exd m_ItemActionDat;
+     xiv::exd::Exd m_ItemActionTelepoDat;
+     xiv::exd::Exd m_ItemBarterCheckDat;
      xiv::exd::Exd m_ItemFoodDat;
      xiv::exd::Exd m_ItemLevelDat;
      xiv::exd::Exd m_ItemSearchCategoryDat;
      xiv::exd::Exd m_ItemSeriesDat;
+     xiv::exd::Exd m_ItemSortCategoryDat;
      xiv::exd::Exd m_ItemSpecialBonusDat;
      xiv::exd::Exd m_ItemUICategoryDat;
      xiv::exd::Exd m_JobHudManualDat;
@@ -7493,6 +8035,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MovieSubtitleDat;
      xiv::exd::Exd m_MovieSubtitle500Dat;
      xiv::exd::Exd m_MovieSubtitleVoyageDat;
+     xiv::exd::Exd m_MYCTemporaryItemDat;
+     xiv::exd::Exd m_MYCTemporaryItemUICategoryDat;
+     xiv::exd::Exd m_MYCWarResultNotebookDat;
      xiv::exd::Exd m_NotebookDivisionDat;
      xiv::exd::Exd m_NotebookDivisionCategoryDat;
      xiv::exd::Exd m_NotoriousMonsterDat;
@@ -7507,6 +8052,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_OrchestrionCategoryDat;
      xiv::exd::Exd m_OrchestrionPathDat;
      xiv::exd::Exd m_OrchestrionUiparamDat;
+     xiv::exd::Exd m_OrnamentDat;
      xiv::exd::Exd m_ParamGrowDat;
      xiv::exd::Exd m_PartyContentDat;
      xiv::exd::Exd m_PartyContentCutsceneDat;
@@ -7557,6 +8103,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_RecastNavimeshDat;
      xiv::exd::Exd m_RecipeDat;
      xiv::exd::Exd m_RecipeLevelTableDat;
+     xiv::exd::Exd m_RecipeLookupDat;
      xiv::exd::Exd m_RecipeNotebookListDat;
      xiv::exd::Exd m_RecommendContentsDat;
      xiv::exd::Exd m_RelicDat;
@@ -7570,15 +8117,16 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_RetainerTaskNormalDat;
      xiv::exd::Exd m_RetainerTaskParameterDat;
      xiv::exd::Exd m_RetainerTaskRandomDat;
+     xiv::exd::Exd m_RideShootingDat;
+     xiv::exd::Exd m_RideShootingTextDataDat;
      xiv::exd::Exd m_RPParameterDat;
-     xiv::exd::Exd m_SalvageDat;
+     xiv::exd::Exd m_SatisfactionArbitrationDat;
      xiv::exd::Exd m_SatisfactionNpcDat;
      xiv::exd::Exd m_SatisfactionSupplyDat;
      xiv::exd::Exd m_SatisfactionSupplyRewardDat;
      xiv::exd::Exd m_ScenarioTreeDat;
      xiv::exd::Exd m_ScenarioTreeTipsDat;
      xiv::exd::Exd m_ScenarioTreeTipsClassQuestDat;
-     xiv::exd::Exd m_ScenarioTreeTipsQuestDat;
      xiv::exd::Exd m_ScenarioTypeDat;
      xiv::exd::Exd m_ScreenImageDat;
      xiv::exd::Exd m_SecretRecipeBookDat;
@@ -7604,7 +8152,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_SubmarinePartDat;
      xiv::exd::Exd m_SubmarineRankDat;
      xiv::exd::Exd m_SwitchTalkDat;
+     xiv::exd::Exd m_SwitchTalkVariationDat;
      xiv::exd::Exd m_TerritoryTypeDat;
+     xiv::exd::Exd m_TerritoryTypeTransientDat;
      xiv::exd::Exd m_TextCommandDat;
      xiv::exd::Exd m_TitleDat;
      xiv::exd::Exd m_TomestonesDat;
@@ -7705,7 +8255,6 @@ struct ZoneSharedGroup
      using AOZBossPtr = std::shared_ptr< AOZBoss >;
      using AOZContentPtr = std::shared_ptr< AOZContent >;
      using AOZContentBriefingBNpcPtr = std::shared_ptr< AOZContentBriefingBNpc >;
-     using AOZReportPtr = std::shared_ptr< AOZReport >;
      using AquariumFishPtr = std::shared_ptr< AquariumFish >;
      using AquariumWaterPtr = std::shared_ptr< AquariumWater >;
      using ArrayEventHandlerPtr = std::shared_ptr< ArrayEventHandler >;
@@ -7748,6 +8297,7 @@ struct ZoneSharedGroup
      using ChannelingPtr = std::shared_ptr< Channeling >;
      using CharaMakeClassEquipPtr = std::shared_ptr< CharaMakeClassEquip >;
      using CharaMakeCustomizePtr = std::shared_ptr< CharaMakeCustomize >;
+     using CharaMakeNamePtr = std::shared_ptr< CharaMakeName >;
      using CharaMakeTypePtr = std::shared_ptr< CharaMakeType >;
      using ChocoboRacePtr = std::shared_ptr< ChocoboRace >;
      using ChocoboRaceAbilityPtr = std::shared_ptr< ChocoboRaceAbility >;
@@ -7763,6 +8313,12 @@ struct ZoneSharedGroup
      using CircleActivityPtr = std::shared_ptr< CircleActivity >;
      using ClassJobPtr = std::shared_ptr< ClassJob >;
      using ClassJobCategoryPtr = std::shared_ptr< ClassJobCategory >;
+     using CollectablesShopPtr = std::shared_ptr< CollectablesShop >;
+     using CollectablesShopItemPtr = std::shared_ptr< CollectablesShopItem >;
+     using CollectablesShopItemGroupPtr = std::shared_ptr< CollectablesShopItemGroup >;
+     using CollectablesShopRefinePtr = std::shared_ptr< CollectablesShopRefine >;
+     using CollectablesShopRewardItemPtr = std::shared_ptr< CollectablesShopRewardItem >;
+     using CollectablesShopRewardScripPtr = std::shared_ptr< CollectablesShopRewardScrip >;
      using CompanionPtr = std::shared_ptr< Companion >;
      using CompanionMovePtr = std::shared_ptr< CompanionMove >;
      using CompanionTransientPtr = std::shared_ptr< CompanionTransient >;
@@ -7779,6 +8335,7 @@ struct ZoneSharedGroup
      using CompanyLeveRulePtr = std::shared_ptr< CompanyLeveRule >;
      using CompleteJournalPtr = std::shared_ptr< CompleteJournal >;
      using CompleteJournalCategoryPtr = std::shared_ptr< CompleteJournalCategory >;
+     using ConditionPtr = std::shared_ptr< Condition >;
      using ConfigKeyPtr = std::shared_ptr< ConfigKey >;
      using ContentCloseCyclePtr = std::shared_ptr< ContentCloseCycle >;
      using ContentExActionPtr = std::shared_ptr< ContentExAction >;
@@ -7844,6 +8401,10 @@ struct ZoneSharedGroup
      using DpsChallengePtr = std::shared_ptr< DpsChallenge >;
      using DpsChallengeOfficerPtr = std::shared_ptr< DpsChallengeOfficer >;
      using DpsChallengeTransientPtr = std::shared_ptr< DpsChallengeTransient >;
+     using DynamicEventPtr = std::shared_ptr< DynamicEvent >;
+     using DynamicEventEnemyTypePtr = std::shared_ptr< DynamicEventEnemyType >;
+     using DynamicEventSingleBattlePtr = std::shared_ptr< DynamicEventSingleBattle >;
+     using DynamicEventTypePtr = std::shared_ptr< DynamicEventType >;
      using EmjAddonPtr = std::shared_ptr< EmjAddon >;
      using EmjDaniPtr = std::shared_ptr< EmjDani >;
      using EmotePtr = std::shared_ptr< Emote >;
@@ -7877,6 +8438,7 @@ struct ZoneSharedGroup
      using ExVersionPtr = std::shared_ptr< ExVersion >;
      using FatePtr = std::shared_ptr< Fate >;
      using FateEventPtr = std::shared_ptr< FateEvent >;
+     using FateModePtr = std::shared_ptr< FateMode >;
      using FateProgressUIPtr = std::shared_ptr< FateProgressUI >;
      using FateTokenTypePtr = std::shared_ptr< FateTokenType >;
      using FCActivityPtr = std::shared_ptr< FCActivity >;
@@ -7916,6 +8478,8 @@ struct ZoneSharedGroup
      using GatheringPointBonusPtr = std::shared_ptr< GatheringPointBonus >;
      using GatheringPointBonusTypePtr = std::shared_ptr< GatheringPointBonusType >;
      using GatheringPointNamePtr = std::shared_ptr< GatheringPointName >;
+     using GatheringPointTransientPtr = std::shared_ptr< GatheringPointTransient >;
+     using GatheringRarePopTimeTablePtr = std::shared_ptr< GatheringRarePopTimeTable >;
      using GatheringSubCategoryPtr = std::shared_ptr< GatheringSubCategory >;
      using GatheringTypePtr = std::shared_ptr< GatheringType >;
      using GcArmyCaptureTacticsPtr = std::shared_ptr< GcArmyCaptureTactics >;
@@ -7952,6 +8516,8 @@ struct ZoneSharedGroup
      using GrandCompanyPtr = std::shared_ptr< GrandCompany >;
      using GrandCompanyRankPtr = std::shared_ptr< GrandCompanyRank >;
      using GroupPoseFramePtr = std::shared_ptr< GroupPoseFrame >;
+     using GroupPoseStampPtr = std::shared_ptr< GroupPoseStamp >;
+     using GroupPoseStampCategoryPtr = std::shared_ptr< GroupPoseStampCategory >;
      using GuardianDeityPtr = std::shared_ptr< GuardianDeity >;
      using GuidePtr = std::shared_ptr< Guide >;
      using GuidePagePtr = std::shared_ptr< GuidePage >;
@@ -7989,6 +8555,9 @@ struct ZoneSharedGroup
      using HWDDevLevelUIPtr = std::shared_ptr< HWDDevLevelUI >;
      using HWDDevLivelyPtr = std::shared_ptr< HWDDevLively >;
      using HWDDevProgressPtr = std::shared_ptr< HWDDevProgress >;
+     using HWDGathereInspectTermPtr = std::shared_ptr< HWDGathereInspectTerm >;
+     using HWDGathererInspectionPtr = std::shared_ptr< HWDGathererInspection >;
+     using HWDGathererInspectionRewardPtr = std::shared_ptr< HWDGathererInspectionReward >;
      using HWDInfoBoardArticlePtr = std::shared_ptr< HWDInfoBoardArticle >;
      using HWDInfoBoardArticleTransientPtr = std::shared_ptr< HWDInfoBoardArticleTransient >;
      using HWDInfoBoardArticleTypePtr = std::shared_ptr< HWDInfoBoardArticleType >;
@@ -8000,6 +8569,9 @@ struct ZoneSharedGroup
      using IKDRoutePtr = std::shared_ptr< IKDRoute >;
      using IKDRouteTablePtr = std::shared_ptr< IKDRouteTable >;
      using IKDSpotPtr = std::shared_ptr< IKDSpot >;
+     using InclusionShopPtr = std::shared_ptr< InclusionShop >;
+     using InclusionShopCategoryPtr = std::shared_ptr< InclusionShopCategory >;
+     using InclusionShopSeriesPtr = std::shared_ptr< InclusionShopSeries >;
      using IndividualWeatherPtr = std::shared_ptr< IndividualWeather >;
      using InstanceContentPtr = std::shared_ptr< InstanceContent >;
      using InstanceContentBuffPtr = std::shared_ptr< InstanceContentBuff >;
@@ -8008,10 +8580,13 @@ struct ZoneSharedGroup
      using InstanceContentTextDataPtr = std::shared_ptr< InstanceContentTextData >;
      using ItemPtr = std::shared_ptr< Item >;
      using ItemActionPtr = std::shared_ptr< ItemAction >;
+     using ItemActionTelepoPtr = std::shared_ptr< ItemActionTelepo >;
+     using ItemBarterCheckPtr = std::shared_ptr< ItemBarterCheck >;
      using ItemFoodPtr = std::shared_ptr< ItemFood >;
      using ItemLevelPtr = std::shared_ptr< ItemLevel >;
      using ItemSearchCategoryPtr = std::shared_ptr< ItemSearchCategory >;
      using ItemSeriesPtr = std::shared_ptr< ItemSeries >;
+     using ItemSortCategoryPtr = std::shared_ptr< ItemSortCategory >;
      using ItemSpecialBonusPtr = std::shared_ptr< ItemSpecialBonus >;
      using ItemUICategoryPtr = std::shared_ptr< ItemUICategory >;
      using JobHudManualPtr = std::shared_ptr< JobHudManual >;
@@ -8077,6 +8652,9 @@ struct ZoneSharedGroup
      using MovieSubtitlePtr = std::shared_ptr< MovieSubtitle >;
      using MovieSubtitle500Ptr = std::shared_ptr< MovieSubtitle500 >;
      using MovieSubtitleVoyagePtr = std::shared_ptr< MovieSubtitleVoyage >;
+     using MYCTemporaryItemPtr = std::shared_ptr< MYCTemporaryItem >;
+     using MYCTemporaryItemUICategoryPtr = std::shared_ptr< MYCTemporaryItemUICategory >;
+     using MYCWarResultNotebookPtr = std::shared_ptr< MYCWarResultNotebook >;
      using NotebookDivisionPtr = std::shared_ptr< NotebookDivision >;
      using NotebookDivisionCategoryPtr = std::shared_ptr< NotebookDivisionCategory >;
      using NotoriousMonsterPtr = std::shared_ptr< NotoriousMonster >;
@@ -8091,6 +8669,7 @@ struct ZoneSharedGroup
      using OrchestrionCategoryPtr = std::shared_ptr< OrchestrionCategory >;
      using OrchestrionPathPtr = std::shared_ptr< OrchestrionPath >;
      using OrchestrionUiparamPtr = std::shared_ptr< OrchestrionUiparam >;
+     using OrnamentPtr = std::shared_ptr< Ornament >;
      using ParamGrowPtr = std::shared_ptr< ParamGrow >;
      using PartyContentPtr = std::shared_ptr< PartyContent >;
      using PartyContentCutscenePtr = std::shared_ptr< PartyContentCutscene >;
@@ -8141,6 +8720,7 @@ struct ZoneSharedGroup
      using RecastNavimeshPtr = std::shared_ptr< RecastNavimesh >;
      using RecipePtr = std::shared_ptr< Recipe >;
      using RecipeLevelTablePtr = std::shared_ptr< RecipeLevelTable >;
+     using RecipeLookupPtr = std::shared_ptr< RecipeLookup >;
      using RecipeNotebookListPtr = std::shared_ptr< RecipeNotebookList >;
      using RecommendContentsPtr = std::shared_ptr< RecommendContents >;
      using RelicPtr = std::shared_ptr< Relic >;
@@ -8154,15 +8734,16 @@ struct ZoneSharedGroup
      using RetainerTaskNormalPtr = std::shared_ptr< RetainerTaskNormal >;
      using RetainerTaskParameterPtr = std::shared_ptr< RetainerTaskParameter >;
      using RetainerTaskRandomPtr = std::shared_ptr< RetainerTaskRandom >;
+     using RideShootingPtr = std::shared_ptr< RideShooting >;
+     using RideShootingTextDataPtr = std::shared_ptr< RideShootingTextData >;
      using RPParameterPtr = std::shared_ptr< RPParameter >;
-     using SalvagePtr = std::shared_ptr< Salvage >;
+     using SatisfactionArbitrationPtr = std::shared_ptr< SatisfactionArbitration >;
      using SatisfactionNpcPtr = std::shared_ptr< SatisfactionNpc >;
      using SatisfactionSupplyPtr = std::shared_ptr< SatisfactionSupply >;
      using SatisfactionSupplyRewardPtr = std::shared_ptr< SatisfactionSupplyReward >;
      using ScenarioTreePtr = std::shared_ptr< ScenarioTree >;
      using ScenarioTreeTipsPtr = std::shared_ptr< ScenarioTreeTips >;
      using ScenarioTreeTipsClassQuestPtr = std::shared_ptr< ScenarioTreeTipsClassQuest >;
-     using ScenarioTreeTipsQuestPtr = std::shared_ptr< ScenarioTreeTipsQuest >;
      using ScenarioTypePtr = std::shared_ptr< ScenarioType >;
      using ScreenImagePtr = std::shared_ptr< ScreenImage >;
      using SecretRecipeBookPtr = std::shared_ptr< SecretRecipeBook >;
@@ -8188,7 +8769,9 @@ struct ZoneSharedGroup
      using SubmarinePartPtr = std::shared_ptr< SubmarinePart >;
      using SubmarineRankPtr = std::shared_ptr< SubmarineRank >;
      using SwitchTalkPtr = std::shared_ptr< SwitchTalk >;
+     using SwitchTalkVariationPtr = std::shared_ptr< SwitchTalkVariation >;
      using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
+     using TerritoryTypeTransientPtr = std::shared_ptr< TerritoryTypeTransient >;
      using TextCommandPtr = std::shared_ptr< TextCommand >;
      using TitlePtr = std::shared_ptr< Title >;
      using TomestonesPtr = std::shared_ptr< Tomestones >;
@@ -8289,7 +8872,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_AOZBossIdList;
      std::set< uint32_t > m_AOZContentIdList;
      std::set< uint32_t > m_AOZContentBriefingBNpcIdList;
-     std::set< uint32_t > m_AOZReportIdList;
      std::set< uint32_t > m_AquariumFishIdList;
      std::set< uint32_t > m_AquariumWaterIdList;
      std::set< uint32_t > m_ArrayEventHandlerIdList;
@@ -8332,6 +8914,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ChannelingIdList;
      std::set< uint32_t > m_CharaMakeClassEquipIdList;
      std::set< uint32_t > m_CharaMakeCustomizeIdList;
+     std::set< uint32_t > m_CharaMakeNameIdList;
      std::set< uint32_t > m_CharaMakeTypeIdList;
      std::set< uint32_t > m_ChocoboRaceIdList;
      std::set< uint32_t > m_ChocoboRaceAbilityIdList;
@@ -8347,6 +8930,12 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CircleActivityIdList;
      std::set< uint32_t > m_ClassJobIdList;
      std::set< uint32_t > m_ClassJobCategoryIdList;
+     std::set< uint32_t > m_CollectablesShopIdList;
+     std::set< uint32_t > m_CollectablesShopItemIdList;
+     std::set< uint32_t > m_CollectablesShopItemGroupIdList;
+     std::set< uint32_t > m_CollectablesShopRefineIdList;
+     std::set< uint32_t > m_CollectablesShopRewardItemIdList;
+     std::set< uint32_t > m_CollectablesShopRewardScripIdList;
      std::set< uint32_t > m_CompanionIdList;
      std::set< uint32_t > m_CompanionMoveIdList;
      std::set< uint32_t > m_CompanionTransientIdList;
@@ -8363,6 +8952,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CompanyLeveRuleIdList;
      std::set< uint32_t > m_CompleteJournalIdList;
      std::set< uint32_t > m_CompleteJournalCategoryIdList;
+     std::set< uint32_t > m_ConditionIdList;
      std::set< uint32_t > m_ConfigKeyIdList;
      std::set< uint32_t > m_ContentCloseCycleIdList;
      std::set< uint32_t > m_ContentExActionIdList;
@@ -8428,6 +9018,10 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_DpsChallengeIdList;
      std::set< uint32_t > m_DpsChallengeOfficerIdList;
      std::set< uint32_t > m_DpsChallengeTransientIdList;
+     std::set< uint32_t > m_DynamicEventIdList;
+     std::set< uint32_t > m_DynamicEventEnemyTypeIdList;
+     std::set< uint32_t > m_DynamicEventSingleBattleIdList;
+     std::set< uint32_t > m_DynamicEventTypeIdList;
      std::set< uint32_t > m_EmjAddonIdList;
      std::set< uint32_t > m_EmjDaniIdList;
      std::set< uint32_t > m_EmoteIdList;
@@ -8461,6 +9055,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ExVersionIdList;
      std::set< uint32_t > m_FateIdList;
      std::set< uint32_t > m_FateEventIdList;
+     std::set< uint32_t > m_FateModeIdList;
      std::set< uint32_t > m_FateProgressUIIdList;
      std::set< uint32_t > m_FateTokenTypeIdList;
      std::set< uint32_t > m_FCActivityIdList;
@@ -8500,6 +9095,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GatheringPointBonusIdList;
      std::set< uint32_t > m_GatheringPointBonusTypeIdList;
      std::set< uint32_t > m_GatheringPointNameIdList;
+     std::set< uint32_t > m_GatheringPointTransientIdList;
+     std::set< uint32_t > m_GatheringRarePopTimeTableIdList;
      std::set< uint32_t > m_GatheringSubCategoryIdList;
      std::set< uint32_t > m_GatheringTypeIdList;
      std::set< uint32_t > m_GcArmyCaptureTacticsIdList;
@@ -8536,6 +9133,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GrandCompanyIdList;
      std::set< uint32_t > m_GrandCompanyRankIdList;
      std::set< uint32_t > m_GroupPoseFrameIdList;
+     std::set< uint32_t > m_GroupPoseStampIdList;
+     std::set< uint32_t > m_GroupPoseStampCategoryIdList;
      std::set< uint32_t > m_GuardianDeityIdList;
      std::set< uint32_t > m_GuideIdList;
      std::set< uint32_t > m_GuidePageIdList;
@@ -8573,6 +9172,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_HWDDevLevelUIIdList;
      std::set< uint32_t > m_HWDDevLivelyIdList;
      std::set< uint32_t > m_HWDDevProgressIdList;
+     std::set< uint32_t > m_HWDGathereInspectTermIdList;
+     std::set< uint32_t > m_HWDGathererInspectionIdList;
+     std::set< uint32_t > m_HWDGathererInspectionRewardIdList;
      std::set< uint32_t > m_HWDInfoBoardArticleIdList;
      std::set< uint32_t > m_HWDInfoBoardArticleTransientIdList;
      std::set< uint32_t > m_HWDInfoBoardArticleTypeIdList;
@@ -8584,6 +9186,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_IKDRouteIdList;
      std::set< uint32_t > m_IKDRouteTableIdList;
      std::set< uint32_t > m_IKDSpotIdList;
+     std::set< uint32_t > m_InclusionShopIdList;
+     std::set< uint32_t > m_InclusionShopCategoryIdList;
+     std::set< uint32_t > m_InclusionShopSeriesIdList;
      std::set< uint32_t > m_IndividualWeatherIdList;
      std::set< uint32_t > m_InstanceContentIdList;
      std::set< uint32_t > m_InstanceContentBuffIdList;
@@ -8592,10 +9197,13 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_InstanceContentTextDataIdList;
      std::set< uint32_t > m_ItemIdList;
      std::set< uint32_t > m_ItemActionIdList;
+     std::set< uint32_t > m_ItemActionTelepoIdList;
+     std::set< uint32_t > m_ItemBarterCheckIdList;
      std::set< uint32_t > m_ItemFoodIdList;
      std::set< uint32_t > m_ItemLevelIdList;
      std::set< uint32_t > m_ItemSearchCategoryIdList;
      std::set< uint32_t > m_ItemSeriesIdList;
+     std::set< uint32_t > m_ItemSortCategoryIdList;
      std::set< uint32_t > m_ItemSpecialBonusIdList;
      std::set< uint32_t > m_ItemUICategoryIdList;
      std::set< uint32_t > m_JobHudManualIdList;
@@ -8661,6 +9269,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MovieSubtitleIdList;
      std::set< uint32_t > m_MovieSubtitle500IdList;
      std::set< uint32_t > m_MovieSubtitleVoyageIdList;
+     std::set< uint32_t > m_MYCTemporaryItemIdList;
+     std::set< uint32_t > m_MYCTemporaryItemUICategoryIdList;
+     std::set< uint32_t > m_MYCWarResultNotebookIdList;
      std::set< uint32_t > m_NotebookDivisionIdList;
      std::set< uint32_t > m_NotebookDivisionCategoryIdList;
      std::set< uint32_t > m_NotoriousMonsterIdList;
@@ -8675,6 +9286,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_OrchestrionCategoryIdList;
      std::set< uint32_t > m_OrchestrionPathIdList;
      std::set< uint32_t > m_OrchestrionUiparamIdList;
+     std::set< uint32_t > m_OrnamentIdList;
      std::set< uint32_t > m_ParamGrowIdList;
      std::set< uint32_t > m_PartyContentIdList;
      std::set< uint32_t > m_PartyContentCutsceneIdList;
@@ -8725,6 +9337,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_RecastNavimeshIdList;
      std::set< uint32_t > m_RecipeIdList;
      std::set< uint32_t > m_RecipeLevelTableIdList;
+     std::set< uint32_t > m_RecipeLookupIdList;
      std::set< uint32_t > m_RecipeNotebookListIdList;
      std::set< uint32_t > m_RecommendContentsIdList;
      std::set< uint32_t > m_RelicIdList;
@@ -8738,15 +9351,16 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_RetainerTaskNormalIdList;
      std::set< uint32_t > m_RetainerTaskParameterIdList;
      std::set< uint32_t > m_RetainerTaskRandomIdList;
+     std::set< uint32_t > m_RideShootingIdList;
+     std::set< uint32_t > m_RideShootingTextDataIdList;
      std::set< uint32_t > m_RPParameterIdList;
-     std::set< uint32_t > m_SalvageIdList;
+     std::set< uint32_t > m_SatisfactionArbitrationIdList;
      std::set< uint32_t > m_SatisfactionNpcIdList;
      std::set< uint32_t > m_SatisfactionSupplyIdList;
      std::set< uint32_t > m_SatisfactionSupplyRewardIdList;
      std::set< uint32_t > m_ScenarioTreeIdList;
      std::set< uint32_t > m_ScenarioTreeTipsIdList;
      std::set< uint32_t > m_ScenarioTreeTipsClassQuestIdList;
-     std::set< uint32_t > m_ScenarioTreeTipsQuestIdList;
      std::set< uint32_t > m_ScenarioTypeIdList;
      std::set< uint32_t > m_ScreenImageIdList;
      std::set< uint32_t > m_SecretRecipeBookIdList;
@@ -8772,7 +9386,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_SubmarinePartIdList;
      std::set< uint32_t > m_SubmarineRankIdList;
      std::set< uint32_t > m_SwitchTalkIdList;
+     std::set< uint32_t > m_SwitchTalkVariationIdList;
      std::set< uint32_t > m_TerritoryTypeIdList;
+     std::set< uint32_t > m_TerritoryTypeTransientIdList;
      std::set< uint32_t > m_TextCommandIdList;
      std::set< uint32_t > m_TitleIdList;
      std::set< uint32_t > m_TomestonesIdList;
@@ -9123,12 +9739,6 @@ const std::set< uint32_t >& getAOZContentBriefingBNpcIdList()
       loadIdList( m_AOZContentBriefingBNpcDat, m_AOZContentBriefingBNpcIdList );
    return m_AOZContentBriefingBNpcIdList;
 }
-const std::set< uint32_t >& getAOZReportIdList()
-{
-   if( m_AOZReportIdList.size() == 0 )
-      loadIdList( m_AOZReportDat, m_AOZReportIdList );
-   return m_AOZReportIdList;
-}
 const std::set< uint32_t >& getAquariumFishIdList()
 {
    if( m_AquariumFishIdList.size() == 0 )
@@ -9381,6 +9991,12 @@ const std::set< uint32_t >& getCharaMakeCustomizeIdList()
       loadIdList( m_CharaMakeCustomizeDat, m_CharaMakeCustomizeIdList );
    return m_CharaMakeCustomizeIdList;
 }
+const std::set< uint32_t >& getCharaMakeNameIdList()
+{
+   if( m_CharaMakeNameIdList.size() == 0 )
+      loadIdList( m_CharaMakeNameDat, m_CharaMakeNameIdList );
+   return m_CharaMakeNameIdList;
+}
 const std::set< uint32_t >& getCharaMakeTypeIdList()
 {
    if( m_CharaMakeTypeIdList.size() == 0 )
@@ -9470,6 +10086,42 @@ const std::set< uint32_t >& getClassJobCategoryIdList()
    if( m_ClassJobCategoryIdList.size() == 0 )
       loadIdList( m_ClassJobCategoryDat, m_ClassJobCategoryIdList );
    return m_ClassJobCategoryIdList;
+}
+const std::set< uint32_t >& getCollectablesShopIdList()
+{
+   if( m_CollectablesShopIdList.size() == 0 )
+      loadIdList( m_CollectablesShopDat, m_CollectablesShopIdList );
+   return m_CollectablesShopIdList;
+}
+const std::set< uint32_t >& getCollectablesShopItemIdList()
+{
+   if( m_CollectablesShopItemIdList.size() == 0 )
+      loadIdList( m_CollectablesShopItemDat, m_CollectablesShopItemIdList );
+   return m_CollectablesShopItemIdList;
+}
+const std::set< uint32_t >& getCollectablesShopItemGroupIdList()
+{
+   if( m_CollectablesShopItemGroupIdList.size() == 0 )
+      loadIdList( m_CollectablesShopItemGroupDat, m_CollectablesShopItemGroupIdList );
+   return m_CollectablesShopItemGroupIdList;
+}
+const std::set< uint32_t >& getCollectablesShopRefineIdList()
+{
+   if( m_CollectablesShopRefineIdList.size() == 0 )
+      loadIdList( m_CollectablesShopRefineDat, m_CollectablesShopRefineIdList );
+   return m_CollectablesShopRefineIdList;
+}
+const std::set< uint32_t >& getCollectablesShopRewardItemIdList()
+{
+   if( m_CollectablesShopRewardItemIdList.size() == 0 )
+      loadIdList( m_CollectablesShopRewardItemDat, m_CollectablesShopRewardItemIdList );
+   return m_CollectablesShopRewardItemIdList;
+}
+const std::set< uint32_t >& getCollectablesShopRewardScripIdList()
+{
+   if( m_CollectablesShopRewardScripIdList.size() == 0 )
+      loadIdList( m_CollectablesShopRewardScripDat, m_CollectablesShopRewardScripIdList );
+   return m_CollectablesShopRewardScripIdList;
 }
 const std::set< uint32_t >& getCompanionIdList()
 {
@@ -9566,6 +10218,12 @@ const std::set< uint32_t >& getCompleteJournalCategoryIdList()
    if( m_CompleteJournalCategoryIdList.size() == 0 )
       loadIdList( m_CompleteJournalCategoryDat, m_CompleteJournalCategoryIdList );
    return m_CompleteJournalCategoryIdList;
+}
+const std::set< uint32_t >& getConditionIdList()
+{
+   if( m_ConditionIdList.size() == 0 )
+      loadIdList( m_ConditionDat, m_ConditionIdList );
+   return m_ConditionIdList;
 }
 const std::set< uint32_t >& getConfigKeyIdList()
 {
@@ -9957,6 +10615,30 @@ const std::set< uint32_t >& getDpsChallengeTransientIdList()
       loadIdList( m_DpsChallengeTransientDat, m_DpsChallengeTransientIdList );
    return m_DpsChallengeTransientIdList;
 }
+const std::set< uint32_t >& getDynamicEventIdList()
+{
+   if( m_DynamicEventIdList.size() == 0 )
+      loadIdList( m_DynamicEventDat, m_DynamicEventIdList );
+   return m_DynamicEventIdList;
+}
+const std::set< uint32_t >& getDynamicEventEnemyTypeIdList()
+{
+   if( m_DynamicEventEnemyTypeIdList.size() == 0 )
+      loadIdList( m_DynamicEventEnemyTypeDat, m_DynamicEventEnemyTypeIdList );
+   return m_DynamicEventEnemyTypeIdList;
+}
+const std::set< uint32_t >& getDynamicEventSingleBattleIdList()
+{
+   if( m_DynamicEventSingleBattleIdList.size() == 0 )
+      loadIdList( m_DynamicEventSingleBattleDat, m_DynamicEventSingleBattleIdList );
+   return m_DynamicEventSingleBattleIdList;
+}
+const std::set< uint32_t >& getDynamicEventTypeIdList()
+{
+   if( m_DynamicEventTypeIdList.size() == 0 )
+      loadIdList( m_DynamicEventTypeDat, m_DynamicEventTypeIdList );
+   return m_DynamicEventTypeIdList;
+}
 const std::set< uint32_t >& getEmjAddonIdList()
 {
    if( m_EmjAddonIdList.size() == 0 )
@@ -10154,6 +10836,12 @@ const std::set< uint32_t >& getFateEventIdList()
    if( m_FateEventIdList.size() == 0 )
       loadIdList( m_FateEventDat, m_FateEventIdList );
    return m_FateEventIdList;
+}
+const std::set< uint32_t >& getFateModeIdList()
+{
+   if( m_FateModeIdList.size() == 0 )
+      loadIdList( m_FateModeDat, m_FateModeIdList );
+   return m_FateModeIdList;
 }
 const std::set< uint32_t >& getFateProgressUIIdList()
 {
@@ -10389,6 +11077,18 @@ const std::set< uint32_t >& getGatheringPointNameIdList()
       loadIdList( m_GatheringPointNameDat, m_GatheringPointNameIdList );
    return m_GatheringPointNameIdList;
 }
+const std::set< uint32_t >& getGatheringPointTransientIdList()
+{
+   if( m_GatheringPointTransientIdList.size() == 0 )
+      loadIdList( m_GatheringPointTransientDat, m_GatheringPointTransientIdList );
+   return m_GatheringPointTransientIdList;
+}
+const std::set< uint32_t >& getGatheringRarePopTimeTableIdList()
+{
+   if( m_GatheringRarePopTimeTableIdList.size() == 0 )
+      loadIdList( m_GatheringRarePopTimeTableDat, m_GatheringRarePopTimeTableIdList );
+   return m_GatheringRarePopTimeTableIdList;
+}
 const std::set< uint32_t >& getGatheringSubCategoryIdList()
 {
    if( m_GatheringSubCategoryIdList.size() == 0 )
@@ -10604,6 +11304,18 @@ const std::set< uint32_t >& getGroupPoseFrameIdList()
    if( m_GroupPoseFrameIdList.size() == 0 )
       loadIdList( m_GroupPoseFrameDat, m_GroupPoseFrameIdList );
    return m_GroupPoseFrameIdList;
+}
+const std::set< uint32_t >& getGroupPoseStampIdList()
+{
+   if( m_GroupPoseStampIdList.size() == 0 )
+      loadIdList( m_GroupPoseStampDat, m_GroupPoseStampIdList );
+   return m_GroupPoseStampIdList;
+}
+const std::set< uint32_t >& getGroupPoseStampCategoryIdList()
+{
+   if( m_GroupPoseStampCategoryIdList.size() == 0 )
+      loadIdList( m_GroupPoseStampCategoryDat, m_GroupPoseStampCategoryIdList );
+   return m_GroupPoseStampCategoryIdList;
 }
 const std::set< uint32_t >& getGuardianDeityIdList()
 {
@@ -10827,6 +11539,24 @@ const std::set< uint32_t >& getHWDDevProgressIdList()
       loadIdList( m_HWDDevProgressDat, m_HWDDevProgressIdList );
    return m_HWDDevProgressIdList;
 }
+const std::set< uint32_t >& getHWDGathereInspectTermIdList()
+{
+   if( m_HWDGathereInspectTermIdList.size() == 0 )
+      loadIdList( m_HWDGathereInspectTermDat, m_HWDGathereInspectTermIdList );
+   return m_HWDGathereInspectTermIdList;
+}
+const std::set< uint32_t >& getHWDGathererInspectionIdList()
+{
+   if( m_HWDGathererInspectionIdList.size() == 0 )
+      loadIdList( m_HWDGathererInspectionDat, m_HWDGathererInspectionIdList );
+   return m_HWDGathererInspectionIdList;
+}
+const std::set< uint32_t >& getHWDGathererInspectionRewardIdList()
+{
+   if( m_HWDGathererInspectionRewardIdList.size() == 0 )
+      loadIdList( m_HWDGathererInspectionRewardDat, m_HWDGathererInspectionRewardIdList );
+   return m_HWDGathererInspectionRewardIdList;
+}
 const std::set< uint32_t >& getHWDInfoBoardArticleIdList()
 {
    if( m_HWDInfoBoardArticleIdList.size() == 0 )
@@ -10893,6 +11623,24 @@ const std::set< uint32_t >& getIKDSpotIdList()
       loadIdList( m_IKDSpotDat, m_IKDSpotIdList );
    return m_IKDSpotIdList;
 }
+const std::set< uint32_t >& getInclusionShopIdList()
+{
+   if( m_InclusionShopIdList.size() == 0 )
+      loadIdList( m_InclusionShopDat, m_InclusionShopIdList );
+   return m_InclusionShopIdList;
+}
+const std::set< uint32_t >& getInclusionShopCategoryIdList()
+{
+   if( m_InclusionShopCategoryIdList.size() == 0 )
+      loadIdList( m_InclusionShopCategoryDat, m_InclusionShopCategoryIdList );
+   return m_InclusionShopCategoryIdList;
+}
+const std::set< uint32_t >& getInclusionShopSeriesIdList()
+{
+   if( m_InclusionShopSeriesIdList.size() == 0 )
+      loadIdList( m_InclusionShopSeriesDat, m_InclusionShopSeriesIdList );
+   return m_InclusionShopSeriesIdList;
+}
 const std::set< uint32_t >& getIndividualWeatherIdList()
 {
    if( m_IndividualWeatherIdList.size() == 0 )
@@ -10941,6 +11689,18 @@ const std::set< uint32_t >& getItemActionIdList()
       loadIdList( m_ItemActionDat, m_ItemActionIdList );
    return m_ItemActionIdList;
 }
+const std::set< uint32_t >& getItemActionTelepoIdList()
+{
+   if( m_ItemActionTelepoIdList.size() == 0 )
+      loadIdList( m_ItemActionTelepoDat, m_ItemActionTelepoIdList );
+   return m_ItemActionTelepoIdList;
+}
+const std::set< uint32_t >& getItemBarterCheckIdList()
+{
+   if( m_ItemBarterCheckIdList.size() == 0 )
+      loadIdList( m_ItemBarterCheckDat, m_ItemBarterCheckIdList );
+   return m_ItemBarterCheckIdList;
+}
 const std::set< uint32_t >& getItemFoodIdList()
 {
    if( m_ItemFoodIdList.size() == 0 )
@@ -10964,6 +11724,12 @@ const std::set< uint32_t >& getItemSeriesIdList()
    if( m_ItemSeriesIdList.size() == 0 )
       loadIdList( m_ItemSeriesDat, m_ItemSeriesIdList );
    return m_ItemSeriesIdList;
+}
+const std::set< uint32_t >& getItemSortCategoryIdList()
+{
+   if( m_ItemSortCategoryIdList.size() == 0 )
+      loadIdList( m_ItemSortCategoryDat, m_ItemSortCategoryIdList );
+   return m_ItemSortCategoryIdList;
 }
 const std::set< uint32_t >& getItemSpecialBonusIdList()
 {
@@ -11355,6 +12121,24 @@ const std::set< uint32_t >& getMovieSubtitleVoyageIdList()
       loadIdList( m_MovieSubtitleVoyageDat, m_MovieSubtitleVoyageIdList );
    return m_MovieSubtitleVoyageIdList;
 }
+const std::set< uint32_t >& getMYCTemporaryItemIdList()
+{
+   if( m_MYCTemporaryItemIdList.size() == 0 )
+      loadIdList( m_MYCTemporaryItemDat, m_MYCTemporaryItemIdList );
+   return m_MYCTemporaryItemIdList;
+}
+const std::set< uint32_t >& getMYCTemporaryItemUICategoryIdList()
+{
+   if( m_MYCTemporaryItemUICategoryIdList.size() == 0 )
+      loadIdList( m_MYCTemporaryItemUICategoryDat, m_MYCTemporaryItemUICategoryIdList );
+   return m_MYCTemporaryItemUICategoryIdList;
+}
+const std::set< uint32_t >& getMYCWarResultNotebookIdList()
+{
+   if( m_MYCWarResultNotebookIdList.size() == 0 )
+      loadIdList( m_MYCWarResultNotebookDat, m_MYCWarResultNotebookIdList );
+   return m_MYCWarResultNotebookIdList;
+}
 const std::set< uint32_t >& getNotebookDivisionIdList()
 {
    if( m_NotebookDivisionIdList.size() == 0 )
@@ -11438,6 +12222,12 @@ const std::set< uint32_t >& getOrchestrionUiparamIdList()
    if( m_OrchestrionUiparamIdList.size() == 0 )
       loadIdList( m_OrchestrionUiparamDat, m_OrchestrionUiparamIdList );
    return m_OrchestrionUiparamIdList;
+}
+const std::set< uint32_t >& getOrnamentIdList()
+{
+   if( m_OrnamentIdList.size() == 0 )
+      loadIdList( m_OrnamentDat, m_OrnamentIdList );
+   return m_OrnamentIdList;
 }
 const std::set< uint32_t >& getParamGrowIdList()
 {
@@ -11739,6 +12529,12 @@ const std::set< uint32_t >& getRecipeLevelTableIdList()
       loadIdList( m_RecipeLevelTableDat, m_RecipeLevelTableIdList );
    return m_RecipeLevelTableIdList;
 }
+const std::set< uint32_t >& getRecipeLookupIdList()
+{
+   if( m_RecipeLookupIdList.size() == 0 )
+      loadIdList( m_RecipeLookupDat, m_RecipeLookupIdList );
+   return m_RecipeLookupIdList;
+}
 const std::set< uint32_t >& getRecipeNotebookListIdList()
 {
    if( m_RecipeNotebookListIdList.size() == 0 )
@@ -11817,17 +12613,29 @@ const std::set< uint32_t >& getRetainerTaskRandomIdList()
       loadIdList( m_RetainerTaskRandomDat, m_RetainerTaskRandomIdList );
    return m_RetainerTaskRandomIdList;
 }
+const std::set< uint32_t >& getRideShootingIdList()
+{
+   if( m_RideShootingIdList.size() == 0 )
+      loadIdList( m_RideShootingDat, m_RideShootingIdList );
+   return m_RideShootingIdList;
+}
+const std::set< uint32_t >& getRideShootingTextDataIdList()
+{
+   if( m_RideShootingTextDataIdList.size() == 0 )
+      loadIdList( m_RideShootingTextDataDat, m_RideShootingTextDataIdList );
+   return m_RideShootingTextDataIdList;
+}
 const std::set< uint32_t >& getRPParameterIdList()
 {
    if( m_RPParameterIdList.size() == 0 )
       loadIdList( m_RPParameterDat, m_RPParameterIdList );
    return m_RPParameterIdList;
 }
-const std::set< uint32_t >& getSalvageIdList()
+const std::set< uint32_t >& getSatisfactionArbitrationIdList()
 {
-   if( m_SalvageIdList.size() == 0 )
-      loadIdList( m_SalvageDat, m_SalvageIdList );
-   return m_SalvageIdList;
+   if( m_SatisfactionArbitrationIdList.size() == 0 )
+      loadIdList( m_SatisfactionArbitrationDat, m_SatisfactionArbitrationIdList );
+   return m_SatisfactionArbitrationIdList;
 }
 const std::set< uint32_t >& getSatisfactionNpcIdList()
 {
@@ -11864,12 +12672,6 @@ const std::set< uint32_t >& getScenarioTreeTipsClassQuestIdList()
    if( m_ScenarioTreeTipsClassQuestIdList.size() == 0 )
       loadIdList( m_ScenarioTreeTipsClassQuestDat, m_ScenarioTreeTipsClassQuestIdList );
    return m_ScenarioTreeTipsClassQuestIdList;
-}
-const std::set< uint32_t >& getScenarioTreeTipsQuestIdList()
-{
-   if( m_ScenarioTreeTipsQuestIdList.size() == 0 )
-      loadIdList( m_ScenarioTreeTipsQuestDat, m_ScenarioTreeTipsQuestIdList );
-   return m_ScenarioTreeTipsQuestIdList;
 }
 const std::set< uint32_t >& getScenarioTypeIdList()
 {
@@ -12021,11 +12823,23 @@ const std::set< uint32_t >& getSwitchTalkIdList()
       loadIdList( m_SwitchTalkDat, m_SwitchTalkIdList );
    return m_SwitchTalkIdList;
 }
+const std::set< uint32_t >& getSwitchTalkVariationIdList()
+{
+   if( m_SwitchTalkVariationIdList.size() == 0 )
+      loadIdList( m_SwitchTalkVariationDat, m_SwitchTalkVariationIdList );
+   return m_SwitchTalkVariationIdList;
+}
 const std::set< uint32_t >& getTerritoryTypeIdList()
 {
    if( m_TerritoryTypeIdList.size() == 0 )
       loadIdList( m_TerritoryTypeDat, m_TerritoryTypeIdList );
    return m_TerritoryTypeIdList;
+}
+const std::set< uint32_t >& getTerritoryTypeTransientIdList()
+{
+   if( m_TerritoryTypeTransientIdList.size() == 0 )
+      loadIdList( m_TerritoryTypeTransientDat, m_TerritoryTypeTransientIdList );
+   return m_TerritoryTypeTransientIdList;
 }
 const std::set< uint32_t >& getTextCommandIdList()
 {
@@ -12319,7 +13133,6 @@ const std::set< uint32_t >& getZoneSharedGroupIdList()
 
   };
 
-}
 }
 
 #endif

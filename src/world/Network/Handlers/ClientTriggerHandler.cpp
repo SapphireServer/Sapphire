@@ -491,7 +491,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       auto packet = makeActorControlSelf( player.getId(), ActorControl::EventBattleDialog, 0, param12, param2 );
       player.queuePacket( packet );
 
-      player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", param12, param2 );
+      player.sendDebug( "event battle p1: {0}, p11: {1}, p12: {2}, p2: {3}, p3: {4}, p4: {5}, p5: {6}", param1, param11, param12, param2, param3, param4, param5 );
       break;
     }
 
