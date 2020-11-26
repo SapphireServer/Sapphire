@@ -2,8 +2,10 @@
 #define _ACTION_H_
 
 #include <Common.h>
+#include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
+#include "EffectBuilder.h"
 
 namespace Sapphire::Data
 {
@@ -11,7 +13,7 @@ namespace Sapphire::Data
   using ActionPtr = std::shared_ptr< Action >;
 }
 
-namespace Sapphire::Action
+namespace Sapphire::World::Action
 {
 
   class Action
@@ -20,8 +22,8 @@ namespace Sapphire::Action
   public:
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw );
-    Action( Entity::CharaPtr caster, uint32_t actionId, Data::ActionPtr actionData, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData );
 
     virtual ~Action();
 
@@ -37,6 +39,7 @@ namespace Sapphire::Action
     Entity::CharaPtr getSourceChara() const;
 
     bool isInterrupted() const;
+    Common::ActionInterruptType getInterruptType() const;
     void setInterrupted( Common::ActionInterruptType type );
 
     uint32_t getCastTime() const;
@@ -44,6 +47,8 @@ namespace Sapphire::Action
 
     uint32_t getAdditionalData() const;
     void setAdditionalData( uint32_t data );
+
+    bool isCorrectCombo() const;
 
     bool isComboAction() const;
 
@@ -75,7 +80,7 @@ namespace Sapphire::Action
      * @brief Tests if an action is castable by the current source chara
      * @return true if castable, false if the caster doesn't meet the requirements
      */
-    bool precheck();
+    virtual bool preCheck();
 
     /*!
      * @brief Snapshots characters affected by a cast.
@@ -84,6 +89,10 @@ namespace Sapphire::Action
      * @return true if actors are hit
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
+
+    EffectBuilderPtr getEffectbuilder();
+
+    void buildEffects();
 
     /*!
      * @brief Adds an actor filter to this action.
@@ -95,6 +104,10 @@ namespace Sapphire::Action
      * @brief Adds the default actor filters based on the CastType entry in the Action exd.
      */
     void addDefaultActorFilters();
+
+    std::pair< uint32_t, Common::ActionHitSeverityType > calcDamage( uint32_t potency );
+
+    std::pair< uint32_t, Common::ActionHitSeverityType > calcHealing( uint32_t potency );
 
 
     std::vector< Entity::CharaPtr >& getHitCharas();
@@ -130,16 +143,18 @@ namespace Sapphire::Action
 
   protected:
 
-    void calculateActionCost();
-
     bool primaryCostCheck( bool subtractCosts );
     bool secondaryCostCheck( bool subtractCosts );
 
-    bool playerPrecheck( Entity::Player& player );
+    bool playerPreCheck( Entity::Player& player );
 
     bool preFilterActor( Entity::Actor& actor ) const;
 
+    bool hasValidLutEntry() const;
+
     uint32_t m_id;
+
+    uint16_t m_sequence;
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost;
@@ -168,13 +183,16 @@ namespace Sapphire::Action
 
     Common::ActionInterruptType m_interruptType;
 
-    FrameworkPtr m_pFw;
     Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
 
+    EffectBuilderPtr m_effectBuilder;
+
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;
+
+    ActionEntry m_lutEntry;
   };
 }
 

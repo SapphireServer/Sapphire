@@ -2,16 +2,15 @@
 #define SAPPHIRE_MARKETMGR_H
 
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 
 #include <vector>
 
 namespace Sapphire::World::Manager
 {
-  class MarketMgr : public Manager::BaseManager
+  class MarketMgr
   {
   public:
-    explicit MarketMgr( FrameworkPtr pFw );
+    MarketMgr() = default;
 
     bool init();
 

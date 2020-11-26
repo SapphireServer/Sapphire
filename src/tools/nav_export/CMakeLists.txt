@@ -11,7 +11,7 @@ file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 add_executable( nav_export ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
 if (UNIX)
-    target_link_libraries( nav_export common xivdat pthread mysqlclient dl z stdc++fs Recast Detour DetourTileCache )
+    target_link_libraries( nav_export common xivdat pthread mysql dl z stdc++fs Recast Detour DetourTileCache )
 else()
     target_link_libraries( nav_export common xivdat mysql zlib Recast Detour DetourTileCache )
 endif()

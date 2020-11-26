@@ -17,16 +17,16 @@
 class case_insensitive_equals {
 public:
   bool operator()(const std::string &key1, const std::string &key2) const {
-    return Sapphire::Util::toLowerCopy( key1 ) == Sapphire::Util::toLowerCopy( key2 );
+    return Sapphire::Common::Util::toLowerCopy( key1 ) == Sapphire::Common::Util::toLowerCopy( key2 );
   }
 };
 class case_insensitive_hash {
 public:
-  size_t operator()( const std::string &key ) const 
+  size_t operator()( const std::string &key ) const
   {
     std::size_t seed=0;
     for( auto &c : key )
-      Sapphire::Util::hashCombine< char >( seed, std::tolower( c ) );
+      Sapphire::Common::Util::hashCombine< char >( seed, std::tolower( c ) );
     return seed;
   }
 };

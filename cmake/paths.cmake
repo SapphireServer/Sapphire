@@ -13,3 +13,4 @@ endif()
 # Create log folder
 file( MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/log )
 file( MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/navi )
+file( MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/data )

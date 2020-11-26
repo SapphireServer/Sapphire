@@ -2,13 +2,13 @@
 
 #include <Exd/ExdDataGenerated.h>
 #include <Common.h>
+#include <Service.h>
 
 #include "Actor/Chara.h"
 
 #include "Actor/Player.h"
 
 #include "CalcBattle.h"
-#include "Framework.h"
 
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
@@ -31,9 +31,9 @@ using namespace Sapphire::Entity;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency, Sapphire::FrameworkPtr pFw )
 {
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;

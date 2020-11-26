@@ -13,9 +13,9 @@
 #include <Logging/Logger.h>
 #include <Util/Util.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-namespace filesys = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 #include <fstream>
 #include <streambuf>
@@ -121,7 +121,7 @@ std::string binaryToHexString( uint8_t* pBinData, uint16_t size )
 
   for( uint32_t i = 0; i < size; i++ )
   {
-    outStr += Sapphire::Util::intToHexString( pBinData[ i ] & 0xFF );
+    outStr += Common::Util::intToHexString( pBinData[ i ] & 0xFF );
   }
 
   return outStr;
@@ -138,19 +138,19 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
   try
   {
     // Check if given path exists and points to a directory
-    if( filesys::exists( dirPath ) && filesys::is_directory( dirPath ) )
+    if( fs::exists( dirPath ) && fs::is_directory( dirPath ) )
     {
       // Create a Recursive Directory Iterator object and points to the starting of directory
-      filesys::recursive_directory_iterator iter( dirPath );
+      fs::recursive_directory_iterator iter( dirPath );
 
       // Create a Recursive Directory Iterator object pointing to end.
-      filesys::recursive_directory_iterator end;
+      fs::recursive_directory_iterator end;
 
       // Iterate till end
       while( iter != end )
       {
         // Check if current entry is a directory and if exists in skip list
-        if( filesys::is_directory( iter->path() ) &&
+        if( fs::is_directory( iter->path() ) &&
             ( std::find( dirSkipList.begin(), dirSkipList.end(), iter->path().filename() ) != dirSkipList.end() ) )
         {
           // Skip the iteration of current directory pointed by iterator
@@ -212,17 +212,17 @@ int dumpSpawns()
 
   for( auto file : listOfFiles )
   {
-    if( !filesys::is_directory( file ) )
+    if( !fs::is_directory( file ) )
     {
       auto pos = file.find_last_of( "\\" );
       if( pos != std::string::npos )
       {
 
-        auto pos = file.find_last_of( filesys::path::preferred_separator );
+        auto pos = file.find_last_of( fs::path::preferred_separator );
         if( pos != std::string::npos )
         {
           auto str = file.substr( 0, pos );
-          pos = str.find_last_of( filesys::path::preferred_separator );
+          pos = str.find_last_of( fs::path::preferred_separator );
           auto zone = str.substr( pos + 1 );
           //Logger::info( zone );
 
@@ -399,17 +399,17 @@ int dumpTemplates()
 
   for( auto file : listOfFiles )
   {
-    if( !filesys::is_directory( file ) )
+    if( !fs::is_directory( file ) )
     {
       auto pos = file.find_last_of( "\\" );
       if( pos != std::string::npos )
       {
 
-        auto pos = file.find_last_of( filesys::path::preferred_separator );
+        auto pos = file.find_last_of( fs::path::preferred_separator );
         if( pos != std::string::npos )
         {
           auto str = file.substr( 0, pos );
-          pos = str.find_last_of( filesys::path::preferred_separator );
+          pos = str.find_last_of( fs::path::preferred_separator );
           auto zone = str.substr( pos + 1 );
           //Logger::info( zone );
 
@@ -434,7 +434,7 @@ int dumpTemplates()
 
     }
 
-    /*  if( filesys::is_directory( file ) )
+    /*  if( fs::is_directory( file ) )
       {
          auto pos = file.find_last_of( "\\" );
          if( pos != std::string::npos )

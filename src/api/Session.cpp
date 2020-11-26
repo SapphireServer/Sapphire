@@ -1,6 +1,7 @@
 #include "Session.h"
 
-namespace Sapphire {
+using namespace Sapphire::Api;
+
 Session::Session()
 {
 
@@ -34,5 +35,4 @@ uint32_t Session::getAccountId() const
 void Session::setAccountId( uint32_t id )
 {
   m_accountId = id;
-}
 }

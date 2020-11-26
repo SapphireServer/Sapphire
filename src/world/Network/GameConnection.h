@@ -9,7 +9,7 @@
 
 #include "ForwardsZone.h"
 
-#define DECLARE_HANDLER( x ) void x( FrameworkPtr pFw, const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+#define DECLARE_HANDLER( x ) void x( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
 namespace Sapphire::Network::Packets
 {
@@ -28,12 +28,11 @@ namespace Sapphire::Network
     None
   };
 
-  class GameConnection : public Connection
+  class GameConnection : public Network::Connection
   {
 
   private:
-    typedef void ( GameConnection::* Handler )( FrameworkPtr pFw,
-                                                const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+    typedef void ( GameConnection::* Handler )( const Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -51,14 +50,14 @@ namespace Sapphire::Network
 
     World::SessionPtr m_pSession;
 
-    LockedQueue< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
-    LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
+    Common::Util::LockedQueue< Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
+    Common::Util::LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
     std::vector< uint8_t > m_packets;
 
   public:
     ConnectionType m_conType;
 
-    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
 
     ~GameConnection();
 
@@ -82,15 +81,15 @@ namespace Sapphire::Network
 
     void processOutQueue();
 
-    void handlePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handlePacket( Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleZonePacket( Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
-    void handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
+    void handleChatPacket( Network::Packets::FFXIVARR_PACKET_RAW& pPacket );
 
     void sendPackets( Packets::PacketContainer* pPacket );
 
-    void sendSinglePacket( Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
+    void sendSinglePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
 
     void injectPacket( const std::string& packetpath, Entity::Player& player );
 
@@ -156,9 +155,11 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( cfDutyAccepted );
 
+    DECLARE_HANDLER( cfCancel );
+
     DECLARE_HANDLER( actionHandler );
-    
-    DECLARE_HANDLER( aoeActionHandler );
+
+    DECLARE_HANDLER( placedActionHandler );
 
     DECLARE_HANDLER( gm1Handler );
 
@@ -186,6 +187,9 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( marketBoardRequestItemListings );
 
+    DECLARE_HANDLER( worldInteractionhandler );
+
+    DECLARE_HANDLER( diveHandler );
   };
 
 }

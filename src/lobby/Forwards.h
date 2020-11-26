@@ -12,9 +12,10 @@ x ## Ptr make_ ## x( Args &&...args ) { \
 return std::make_shared< x >( std::forward< Args >( args ) ... ); }\
 typedef std::vector< x > x ## PtrList;
 
-namespace Sapphire
+namespace Sapphire::Lobby
 {
   TYPE_FORWARD( LobbySession );
+  TYPE_FORWARD( GameConnection );
 }
 
 namespace Sapphire::Network
@@ -22,7 +23,6 @@ namespace Sapphire::Network
   TYPE_FORWARD( Hive );
   TYPE_FORWARD( Acceptor );
   TYPE_FORWARD( Connection );
-  TYPE_FORWARD( GameConnection );
 }
 
 namespace Sapphire::Network::Packets

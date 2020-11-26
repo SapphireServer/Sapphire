@@ -37,11 +37,9 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.hPCurr = player.getHp();
       m_data.mPCurr = player.getMp();
-      m_data.tPCurr = player.getTp();
       m_data.hPMax = player.getMaxHp();
       m_data.mPMax = player.getMaxMp();
 
-      //m_data.tPMax = 3000;
       m_data.level = player.getLevel();
       m_data.gmRank = player.getGmRank();
       m_data.pose = player.getPose();
@@ -69,7 +67,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.pos.x = player.getPos().x;
       m_data.pos.y = player.getPos().y;
       m_data.pos.z = player.getPos().z;
-      m_data.rotation = Util::floatToUInt16Rot( player.getRot() );
+      m_data.rotation = Common::Util::floatToUInt16Rot( player.getRot() );
 
 
       m_data.title = player.getTitle();
@@ -133,7 +131,7 @@ namespace Sapphire::Network::Packets::Server
       //m_data.unknown_60 = 3;
       //m_data.unknown_61 = 7;
 
-      uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
+      uint64_t currentTimeMs = Common::Util::getTimeMs();
 
       for( auto const& effect : player.getStatusEffectMap() )
       {
@@ -142,7 +140,7 @@ namespace Sapphire::Network::Packets::Server
                                                                        ( currentTimeMs -
                                                                          effect.second->getStartTimeMs() ) ) / 1000;
         m_data.effect[ effect.first ].sourceActorId = effect.second->getSrcActorId();
-        m_data.effect[ effect.first ].unknown1 = effect.second->getParam();
+        m_data.effect[ effect.first ].param = effect.second->getParam();
       }
 
     };

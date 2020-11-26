@@ -1,21 +1,20 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
+#include <Service.h>
 
 #include "Actor/Player.h"
 
 #include "Item.h"
-#include "Framework.h"
 #include "Forwards.h"
 #include "ItemContainer.h"
 
 Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName,
-                                        bool isMultiStorage, FrameworkPtr pFw, bool isPersistentStorage ) :
+                                        bool isMultiStorage, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
   m_tableName( tableName ),
   m_bMultiStorage( isMultiStorage ),
-  m_pFw( pFw ),
   m_isPersistentStorage( isPersistentStorage )
 {
 
@@ -38,13 +37,13 @@ uint8_t Sapphire::ItemContainer::getEntryCount() const
 
 void Sapphire::ItemContainer::removeItem( uint8_t slotId, bool removeFromDb )
 {
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto it = m_itemMap.find( slotId );
 
   if( it != m_itemMap.end() )
   {
     if( m_isPersistentStorage && removeFromDb )
-      pDb->execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
+      db.execute( "DELETE FROM charaglobalitem WHERE itemId = " + std::to_string( it->second->getUId() ) );
 
     m_itemMap.erase( it );
 

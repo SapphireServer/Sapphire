@@ -5,6 +5,7 @@
 #include <Util/UtilMath.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -15,14 +16,13 @@
 #include "Actor/BNpc.h"
 #include "Actor/BNpcTemplate.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 
 #include "Event/EventHandler.h"
 
 #include "QuestBattle.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -34,9 +34,8 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
                                     uint32_t guId,
                                     const std::string& internalName,
                                     const std::string& contentName,
-                                    uint32_t questBattleId,
-                                    FrameworkPtr pFw ) :
-  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+                                    uint32_t questBattleId ) :
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::QuestBattle, questBattleId ),
   m_pBattleDetails( pBattleDetails ),
   m_questBattleId( questBattleId ),
@@ -48,8 +47,11 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
 
 bool Sapphire::QuestBattle::init()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsQuestBattle() );
+  if( !Territory::init() )
+    return false;
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceInit( getAsQuestBattle() );
 
   return true;
 }
@@ -66,7 +68,7 @@ Sapphire::Data::ExdDataGenerated::QuestBattlePtr Sapphire::QuestBattle::getQuest
 
 void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "QuestBattle::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "QuestBattle::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   m_pPlayer = player.getAsPlayer();
@@ -80,7 +82,7 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::QuestBattle::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "QuestBattle::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "QuestBattle::onLeaveTerritory: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   clearDirector( player );
@@ -97,6 +99,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 {
   if( !m_pPlayer )
     return;
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   switch( m_state )
   {
@@ -119,8 +123,8 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
         return;
 
       onEnterSceneFinish( *m_pPlayer );
-      auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-      pScriptMgr->onDutyCommence( *this, *m_pPlayer );
+
+      scriptMgr.onDutyCommence( *this, *m_pPlayer );
 
       m_state = DutyInProgress;
       m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->timeLimit * 60u );
@@ -154,8 +158,9 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
     }
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsQuestBattle(), tickCount );
+  scriptMgr.onInstanceUpdate( getAsQuestBattle(), tickCount );
+
+  m_lastUpdate = tickCount;
 }
 
 void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
@@ -172,7 +177,7 @@ void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
 
 void Sapphire::QuestBattle::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 void Sapphire::QuestBattle::setVar( uint8_t index, uint8_t value )
@@ -262,17 +267,17 @@ void Sapphire::QuestBattle::setBranch( uint8_t value )
 
 void Sapphire::QuestBattle::startQte()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
 }
 
 void Sapphire::QuestBattle::startEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
 }
 
 void Sapphire::QuestBattle::endEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControl143( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
 }
 
 void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
@@ -280,13 +285,13 @@ void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Zone " +
+    Logger::error( "InstanceContent::onRegisterEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }
@@ -300,8 +305,9 @@ void Sapphire::QuestBattle::onBeforePlayerZoneIn( Sapphire::Entity::Player& play
 {
   player.setRot( PI );
   player.setPos( { 0.f, 0.f, 0.f } );
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onPlayerSetup( *this, player );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onPlayerSetup( *this, player );
 
   player.resetObjSpawnIndex();
 }
@@ -333,8 +339,8 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
 void
 Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
 }
 
 void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
@@ -359,8 +365,10 @@ void Sapphire::QuestBattle::success()
                         [ & ]( Entity::Player& player, const Event::SceneResult& result )
                         {
                           player.eventFinish( getDirectorId(), 1 );
-                          auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-                          pScriptMgr->onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+
+                          auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+                          scriptMgr.onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+
                           player.exitInstance();
                         } );
 
@@ -380,7 +388,7 @@ uint32_t Sapphire::QuestBattle::getQuestId() const
 uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()
 {
   uint32_t count = 0;
-  for( auto bnpcIt : m_bNpcMap )
+  for( const auto& bnpcIt : m_bNpcMap )
   {
     if( bnpcIt.second->getEnemyType() == 4 && bnpcIt.second->isAlive() )
       count++;

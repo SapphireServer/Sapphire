@@ -1,11 +1,11 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
+#include <Service.h>
 
 #include "Actor/EventObject.h"
 #include "Territory/HousingZone.h"
 #include "Manager/TerritoryMgr.h"
 #include "Territory/Land.h"
-#include "Framework.h"
 
 using namespace Sapphire;
 
@@ -26,11 +26,9 @@ public:
       if( result.param2 != 1 )
         return;
 
-      auto terriMgr = framework()->get< Sapphire::World::Manager::TerritoryMgr >();
-      if( !terriMgr )
-        return;
+      auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
-      auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentZone() );
+      auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
       if( !zone )
         return;
 
@@ -40,7 +38,7 @@ public:
       ident.wardNum = zone->getWardNum();
       ident.worldId = 67;
 
-      auto internalZone = terriMgr->findOrCreateHousingInterior( ident );
+      auto internalZone = terriMgr.findOrCreateHousingInterior( ident );
       if( !internalZone )
       {
         // an error occurred during event movement
@@ -60,6 +58,7 @@ public:
 
       switch( land->getSize() )
       {
+        // todo: think there's actually a poprange for this? double czech
         case 0:
         {
           pos = { 0.1321167f, 0.f, 2.746273f };

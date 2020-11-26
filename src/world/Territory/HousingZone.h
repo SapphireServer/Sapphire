@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_HOUSINGZONE_H
 #define SAPPHIRE_HOUSINGZONE_H
 
-#include "Zone.h"
+#include "Territory.h"
 #include "Forwards.h"
 
 #include <array>
@@ -24,15 +24,14 @@ namespace Sapphire
     RELOCATE = 4,
   };
 
-  class HousingZone : public Zone
+  class HousingZone : public Territory
   {
   public:
     HousingZone( uint8_t landSetId,
                  uint16_t territoryTypeId,
                  uint32_t guId,
                  const std::string& internalName,
-                 const std::string& contentName,
-                 FrameworkPtr pFw );
+                 const std::string& contentName );
 
     virtual ~HousingZone() = default;
 
@@ -87,7 +86,6 @@ namespace Sapphire
 
     YardObjectSubdivisionArray m_yardObjects;
     YardObjectArrayBoundsArray m_yardObjectArrayBounds;
-    FrameworkPtr m_pFw;
   };
 
 }

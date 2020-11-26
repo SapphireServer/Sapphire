@@ -33,7 +33,8 @@ set_target_properties( world
 target_link_libraries( world
                          PUBLIC
                            common 
-                            Detour)
+                            Detour
+                            DetourCrowd )
 target_include_directories( world
                               PUBLIC
                                 "${CMAKE_CURRENT_SOURCE_DIR}"

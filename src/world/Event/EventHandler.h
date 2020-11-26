@@ -45,17 +45,19 @@ namespace Sapphire::Event
       TableGame = 24,
     };
 
-    enum EventHandlerType : uint16_t
+    enum class EventHandlerType : uint16_t
     {
       Quest = 0x0001,
       Warp = 0x0002,
-      Unknown = 0x0003, // Came up in the client with "Begin" unsure that means
+      GatheringPoint = 0x0003, // Came up in the client with "Begin" unsure that means
       Shop = 0x0004,
       Aetheryte = 0x0005,
       GuildLeveAssignment = 0x0006,
       DefaultTalk = 0x0009,
+      Craft = 0x000A,
       CustomTalk = 0x000B,
       CompanyLeveOfficer = 0x000C,
+      Array = 0x000D,
       CraftLeve = 0x000E,
       GimmickAccessor = 0x000F,
       GimmickBill = 0x0010,
@@ -63,6 +65,7 @@ namespace Sapphire::Event
       ChocoboTaxiStand = 0x0012,
       Opening = 0x0013,
       ExitRange = 0x0014,
+      Fishing = 0x0015,
       GCShop = 0x0016,
       GuildOrderGuide = 0x0017,
       GuildOrderOfficer = 0x0018,
@@ -70,8 +73,11 @@ namespace Sapphire::Event
       Story = 0x001A,
       SpecialShop = 0x001B,
       BahamutGuide = 0x001C,
+      InstanceContentGuide = 0x001D,
       HousingAethernet = 0x001E,
       FcTalk = 0x001F,
+      Adventure = 0x0021,
+      DailyQuestSupply = 0x0022,
       ICDirector = 0x8003,
       QuestBattleDirector = 0x8006,
     };

@@ -8,19 +8,21 @@
 
 #include <nlohmann/json.hpp>
 
+using namespace Sapphire;
+
 typedef std::vector< std::tuple< std::string, uint32_t, uint64_t, std::string > > CharList;
 
-Sapphire::Network::RestConnector::RestConnector()
+Lobby::RestConnector::RestConnector()
 {
 
 }
 
-Sapphire::Network::RestConnector::~RestConnector()
+Lobby::RestConnector::~RestConnector()
 {
 
 }
 
-HttpResponse Sapphire::Network::RestConnector::requestApi( std::string endpoint, std::string data )
+HttpResponse Lobby::RestConnector::requestApi( std::string endpoint, std::string data )
 {
   HttpClient client( restHost );
 
@@ -39,7 +41,7 @@ HttpResponse Sapphire::Network::RestConnector::requestApi( std::string endpoint,
   return r;
 }
 
-Sapphire::LobbySessionPtr Sapphire::Network::RestConnector::getSession( char* sId )
+Lobby::LobbySessionPtr Lobby::RestConnector::getSession( char* sId )
 {
   std::string json_string = "{\"sId\": \"" + std::string( sId ) + "\",\"secret\": \"" + serverSecret + "\"}";
 
@@ -65,7 +67,7 @@ Sapphire::LobbySessionPtr Sapphire::Network::RestConnector::getSession( char* sI
 
     if( content.find( "invalid" ) == std::string::npos )
     {
-      LobbySessionPtr pSession( new Sapphire::LobbySession() );
+      LobbySessionPtr pSession( new Lobby::LobbySession() );
       pSession->setAccountID( json["result"].get< uint32_t >() );
       pSession->setSessionId( ( uint8_t* ) sId );
       return pSession;
@@ -81,7 +83,7 @@ Sapphire::LobbySessionPtr Sapphire::Network::RestConnector::getSession( char* sI
   }
 }
 
-bool Sapphire::Network::RestConnector::checkNameTaken( std::string name )
+bool Lobby::RestConnector::checkNameTaken( std::string name )
 {
   std::string json_string = "{\"name\": \"" + name + "\",\"secret\": \"" + serverSecret + "\"}";
 
@@ -115,7 +117,7 @@ bool Sapphire::Network::RestConnector::checkNameTaken( std::string name )
   }
 }
 
-uint32_t Sapphire::Network::RestConnector::getNextCharId()
+uint32_t Lobby::RestConnector::getNextCharId()
 {
   std::string json_string = "{\"secret\": \"" + serverSecret + "\"}";
 
@@ -154,7 +156,7 @@ uint32_t Sapphire::Network::RestConnector::getNextCharId()
   }
 }
 
-uint64_t Sapphire::Network::RestConnector::getNextContentId()
+uint64_t Lobby::RestConnector::getNextContentId()
 {
   std::string json_string = "{\"secret\": \"" + serverSecret + "\"}";
 
@@ -193,7 +195,7 @@ uint64_t Sapphire::Network::RestConnector::getNextContentId()
   }
 }
 
-CharList Sapphire::Network::RestConnector::getCharList( char* sId )
+CharList Lobby::RestConnector::getCharList( char* sId )
 {
   std::string json_string = "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\"}";
 
@@ -249,7 +251,7 @@ CharList Sapphire::Network::RestConnector::getCharList( char* sId )
   }
 }
 
-bool Sapphire::Network::RestConnector::deleteCharacter( char* sId, std::string name )
+bool Lobby::RestConnector::deleteCharacter( char* sId, std::string name )
 {
   std::string json_string =
     "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name + "\"}";
@@ -283,11 +285,11 @@ bool Sapphire::Network::RestConnector::deleteCharacter( char* sId, std::string n
   }
 }
 
-int Sapphire::Network::RestConnector::createCharacter( char* sId, std::string name, std::string infoJson )
+int Lobby::RestConnector::createCharacter( char* sId, std::string name, std::string infoJson )
 {
   std::string json_string =
     "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name +
-    "\",\"infoJson\": \"" + Sapphire::Util::base64Encode( ( uint8_t* ) infoJson.c_str(), infoJson.length() ) + "\"}";
+    "\",\"infoJson\": \"" + Common::Util::base64Encode( ( uint8_t* ) infoJson.c_str(), infoJson.length() ) + "\"}";
 
   HttpResponse r = requestApi( "createCharacter", json_string );
 

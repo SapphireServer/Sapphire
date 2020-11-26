@@ -26,14 +26,14 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-Sapphire::Common::Util::CrashHandler crashHandler;
+[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
 Sapphire::Data::ExdDataGenerated g_exdData;
 
 using namespace Sapphire;
 using namespace std::chrono_literals;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 // garbage to ignore models
 bool ignoreModels = false;
@@ -62,7 +62,7 @@ std::string zoneNameToPath( const std::string& name )
 {
   std::string path;
 
-  auto it = g_nameMap.find( Sapphire::Util::toLowerCopy( name ) );
+  auto it = g_nameMap.find( Common::Util::toLowerCopy( name ) );
   if( it != g_nameMap.end() )
     return it->second;
 
@@ -79,7 +79,7 @@ std::string zoneNameToPath( const std::string& name )
     if( teriName.empty() )
       continue;
     
-    if( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) )
+    if( Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( teriName ) )
     {
       path = teriPath;
       break;
@@ -90,7 +90,7 @@ std::string zoneNameToPath( const std::string& name )
   {
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
     Logger::debug( "Found path for {0}: {1}", name, path );
-    g_nameMap[ Sapphire::Util::toLowerCopy( name ) ] = path; 
+    g_nameMap[ Common::Util::toLowerCopy( name ) ] = path;
   }
   else
   {
@@ -137,7 +137,7 @@ void loadAllInstanceContentEntries()
       if( !ic )
         continue;
       type = ic->instanceContentType;
-      name = ic->name;
+      name = cfc->name;
     }
     else if( cfc->contentLinkType == 5 )
     { 
@@ -161,7 +161,7 @@ void loadAllInstanceContentEntries()
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
     
     std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
-    Sapphire::Util::eraseAllIn( name, remove );
+    Common::Util::eraseAllIn( name, remove );
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { contentId, name, tt->name, type } );
   }
@@ -284,10 +284,10 @@ int main( int argc, char* argv[] )
               uint32_t eobjlevelHierachyId = 0;
 
               auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-              id = pEobj->header.eobjId;
-              unknown = pEobj->header.unknown;
+              id = pEobj->data.eobjId;
+              unknown = pEobj->header.instanceId;
 
-              eobjlevelHierachyId = pEobj->header.levelHierachyId;
+              eobjlevelHierachyId = pEobj->data.levelHierachyId;
 
               std::string states = "";
               std::string gimmickName = "";
@@ -295,7 +295,7 @@ int main( int argc, char* argv[] )
               {
                 auto pGObj = pEntry1.get();
                 if( pGObj->getType() == LgbEntryType::Gimmick &&
-                    pGObj->header.unknown == pEobj->header.levelHierachyId )
+                    pGObj->header.instanceId == pEobj->data.levelHierachyId )
                 {
                   auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
                   char* dataSection = nullptr;
@@ -332,7 +332,7 @@ int main( int argc, char* argv[] )
               {
                 name = eobjNameMap[ id ];
                 std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
-                Sapphire::Util::eraseAllIn( name, remove );
+                Common::Util::eraseAllIn( name, remove );
                 name[ 0 ] = toupper( name[ 0 ] );
               }
               if( name.empty() )
@@ -361,13 +361,13 @@ int main( int argc, char* argv[] )
               eobjects += "    instance.registerEObj( \"" + name + "\", " + std::to_string( id ) +
                             ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) +
                             ", " +
-                            "{ " + std::to_string( pObj->header.translation.x ) + "f, "
-                            + std::to_string( pObj->header.translation.y ) + "f, "
-                            + std::to_string( pObj->header.translation.z ) + "f }, " +
-                            std::to_string( pObj->header.scale.x ) + "f, " +
+                            "{ " + std::to_string( pObj->header.transform.translation.x ) + "f, "
+                            + std::to_string( pObj->header.transform.translation.y ) + "f, "
+                            + std::to_string( pObj->header.transform.translation.z ) + "f }, " +
+                            std::to_string( pObj->header.transform.scale.x ) + "f, " +
 
                             // the rotation inside the sgbs is the inverse of what the game uses
-                            std::to_string( pObj->header.rotation.y * -1.f ) + "f ); \n" + states;
+                            std::to_string( pObj->header.transform.rotation.y * -1.f ) + "f ); \n" + states;
             }
           }
         }

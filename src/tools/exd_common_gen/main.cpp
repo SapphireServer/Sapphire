@@ -21,7 +21,7 @@ Sapphire::Data::ExdDataGenerated g_exdData;
 using namespace Sapphire;
 
 //const std::string datLocation( "/opt/sapphire_3_15_0/bin/sqpack" );
-const std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 
 std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::string& type, bool useLang = true )
 {
@@ -55,7 +55,7 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
     }
 
     std::string remove = ",_-':!(){} \x02\x1f\x01\x03";
-    Sapphire::Util::eraseAllIn( value, remove );
+    Common::Util::eraseAllIn( value, remove );
 
     value[ 0 ] = std::toupper( value[ 0 ] );
 
@@ -86,13 +86,20 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
 
 }
 
-int main()
+int main( int argc, char** argv )
 {
 
   Logger::init( "commongen" );
 
 
   Logger::info( "Setting up EXD data" );
+
+  if( argc > 1 )
+  {
+    Logger::info( "using dat path: {0}", std::string( argv[ 1 ] ) );
+    datLocation = std::string( argv[ 1 ] );
+  }
+
   if( !g_exdData.init( datLocation ) )
   {
     Logger::fatal( "Error setting up EXD data " );
@@ -107,8 +114,7 @@ int main()
     "/* This file has been automatically generated.\n   Changes will be lost upon regeneration.\n   To change the content edit tools/exd_common_gen */\n";
 
 
-  result += "namespace Sapphire {\n";
-  result += "namespace Common {\n";
+  result += "namespace Sapphire::Common {\n";
   result += generateEnum( "ActionCategory", 0, "uint8_t" );
   result += generateEnum( "BaseParam", 1, "uint8_t" );
   result += generateEnum( "BeastReputationRank", 1, "uint8_t" );
@@ -127,7 +133,6 @@ int main()
   result += generateEnum( "Town", 0, "uint8_t" );
   result += generateEnum( "Weather", 1, "uint8_t" );
   result += generateEnum( "HousingAppeal", 0, "uint8_t" );
-  result += "}\n";
   result += "}\n#endif\n";
   Logger::info( result );
   return 0;

@@ -2,41 +2,43 @@
 #include <functional>
 #include "Hive.h"
 
+using namespace Sapphire;
+
 //-----------------------------------------------------------------------------
 
-Sapphire::Network::Hive::Hive() :
+Network::Hive::Hive() :
   m_work_ptr( new asio::io_service::work( m_io_service ) ),
   m_shutdown( 0 )
 {
 }
 
-Sapphire::Network::Hive::~Hive()
+Network::Hive::~Hive()
 {
 }
 
-asio::io_service& Sapphire::Network::Hive::getService()
+asio::io_service& Network::Hive::getService()
 {
   return m_io_service;
 }
 
-bool Sapphire::Network::Hive::hasStopped()
+bool Network::Hive::hasStopped()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 1;
   return m_shutdown.compare_exchange_strong( v1, v2 );
 }
 
-void Sapphire::Network::Hive::poll()
+void Network::Hive::poll()
 {
   m_io_service.poll();
 }
 
-void Sapphire::Network::Hive::run()
+void Network::Hive::run()
 {
   m_io_service.run();
 }
 
-void Sapphire::Network::Hive::stop()
+void Network::Hive::stop()
 {
   uint32_t v1 = 1;
   uint32_t v2 = 0;
@@ -48,7 +50,7 @@ void Sapphire::Network::Hive::stop()
   }
 }
 
-void Sapphire::Network::Hive::reset()
+void Network::Hive::reset()
 {
   uint32_t v1 = 0;
   uint32_t v2 = 1;

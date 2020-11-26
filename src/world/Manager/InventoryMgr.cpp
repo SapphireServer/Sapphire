@@ -10,14 +10,9 @@
 
 #include <Database/DatabaseDef.h>
 #include <Exd/ExdDataGenerated.h>
-
-#include "Framework.h"
+#include <Service.h>
 
 using namespace Sapphire::Network::Packets;
-
-Sapphire::World::Manager::InventoryMgr::InventoryMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{ }
 
 void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::Entity::Player& player,
                                                                      Sapphire::ItemContainerPtr container )
@@ -71,15 +66,14 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
 Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Player& player,
                                                                       uint32_t catalogId, uint32_t quantity )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto itemMgr = framework()->get< Manager::ItemMgr >();
-  auto itemInfo = pExdData->get< Sapphire::Data::Item >( catalogId );
+  auto& pExdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& itemMgr = Common::Service< Manager::ItemMgr >::ref();
+  auto itemInfo = pExdData.get< Sapphire::Data::Item >( catalogId );
 
   if( !itemInfo )
     return nullptr;
 
-  auto item = make_Item( itemMgr->getNextUId(), catalogId, framework() );
+  auto item = make_Item( itemMgr.getNextUId(), catalogId );
 
   item->setStackSize( std::max< uint32_t >( 1, quantity ) );
 
@@ -103,9 +97,9 @@ void Sapphire::World::Manager::InventoryMgr::removeItemFromHousingContainer( Sap
                                                                              uint16_t containerId,
                                                                              uint16_t slotId )
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_DEL );
+  auto stmt = db.getPreparedStatement( Db::LAND_INV_DEL );
 
   auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
 
@@ -113,16 +107,16 @@ void Sapphire::World::Manager::InventoryMgr::removeItemFromHousingContainer( Sap
   stmt->setUInt( 2, containerId );
   stmt->setUInt( 3, slotId );
 
-  pDb->directExecute( stmt );
+  db.directExecute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t ident,
                                                                        uint16_t containerId, uint16_t slotId,
                                                                        uint64_t itemId )
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_UP );
+  auto stmt = db.getPreparedStatement( Db::LAND_INV_UP );
   // LandIdent, ContainerId, SlotId, ItemId, ItemId
 
   stmt->setUInt64( 1, ident );
@@ -134,14 +128,14 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t 
   // the second time is for the ON DUPLICATE KEY UPDATE condition
   stmt->setUInt64( 5, itemId );
 
-  pDb->directExecute( stmt );
+  db.directExecute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item )
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_UP_ITEMPOS );
+  auto stmt = db.getPreparedStatement( Db::LAND_INV_UP_ITEMPOS );
   // ItemId, PosX, PosY, PosZ, Rotation, PosX, PosY, PosZ, Rotation
 
   auto pos = item->getPos();
@@ -159,29 +153,29 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
   stmt->setUInt( 8, pos.z );
   stmt->setInt( 9, rot );
 
-  pDb->execute( stmt );
+  db.execute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::removeHousingItemPosition( Sapphire::Inventory::HousingItem& item )
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_DEL_ITEMPOS );
+  auto stmt = db.getPreparedStatement( Db::LAND_INV_DEL_ITEMPOS );
 
   stmt->setUInt64( 1, item.getUId() );
 
-  pDb->directExecute( stmt );
+  db.directExecute( stmt );
 }
 
 void Sapphire::World::Manager::InventoryMgr::saveItem( Sapphire::Entity::Player& player, Sapphire::ItemPtr item )
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto stmt = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
 
   stmt->setUInt( 1, player.getId() );
   stmt->setUInt64( 2, item->getUId() );
   stmt->setUInt( 3, item->getId() );
   stmt->setUInt( 4, item->getStackSize() );
 
-  pDb->directExecute( stmt );
+  db.directExecute( stmt );
 }

@@ -5,6 +5,7 @@
 #include "ForwardsZone.h"
 #include <recastnavigation/Detour/Include/DetourNavMesh.h>
 #include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
+#include <recastnavigation/DetourCrowd/Include/DetourCrowd.h>
 
 namespace Sapphire::World::Navi
 {
@@ -31,7 +32,7 @@ namespace Sapphire::World::Navi
     };
 
   public:
-    explicit NaviProvider( const std::string& internalName, FrameworkPtr pFw );
+    explicit NaviProvider( const std::string& internalName );
 
     bool init();
     bool loadMesh( const std::string& path );
@@ -47,11 +48,39 @@ namespace Sapphire::World::Navi
 
     bool hasNaviMesh() const;
 
+    int32_t addAgent( Entity::Chara& chara );
+
+    void removeAgent( Entity::Chara& chara );
+
+    void updateCrowd( float timeInSeconds );
+
+    static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
+
+    void setMoveTarget( Entity::Chara& chara, const Common::FFXIVARR_POSITION3& endPos );
+
+    Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
+
+    bool isAgentActive( Entity::Chara& chara ) const;
+    bool hasTargetState( Entity::Chara& chara ) const;
+
+    void resetMoveTarget( Entity::Chara& chara );
+
+    void updateAgentPosition( Entity::Chara& chara );
+
+    bool syncPosToChara( Entity::Chara& chara );
+
+    void addAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
+    void removeAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
+
+    void updateAgentParameters( Entity::BNpc& bnpc );
+
   protected:
     std::string m_internalName;
 
     dtNavMesh* m_naviMesh;
     dtNavMeshQuery* m_naviMeshQuery;
+    dtObstacleAvoidanceDebugData* m_vod;
+    std::unique_ptr< dtCrowd > m_pCrowd;
 
     float m_polyFindRange[ 3 ];
 
@@ -63,7 +92,8 @@ namespace Sapphire::World::Navi
 		                     const dtPolyRef* path, const int32_t pathSize, float* steerPos, uint8_t& steerPosFlag,
 			       	           dtPolyRef& steerPosRef, float* outPoints = 0, int32_t* outPointCount = 0 );
 
-    FrameworkPtr m_pFw;
+
+
   };
 
 }

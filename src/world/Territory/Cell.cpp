@@ -2,7 +2,7 @@
 
 #include "Actor/Chara.h"
 #include "Forwards.h"
-#include "Zone.h"
+#include "Territory.h"
 #include <Logging/Logger.h>
 
 // TODO: the entire zone / areahandling is a bit outdated ( in parts i used this for the 1.0 iteration )
@@ -22,11 +22,11 @@ Sapphire::Cell::~Cell()
   removeActors();
 }
 
-void Sapphire::Cell::init( uint32_t x, uint32_t y, ZonePtr pZone )
+void Sapphire::Cell::init( uint32_t x, uint32_t y, TerritoryPtr pZone )
 {
   m_pZone = pZone;
-  m_posX = x;
-  m_posY = y;
+  m_posX = static_cast< uint16_t >( x );
+  m_posY = static_cast< uint16_t >( y );
 
   m_actors.clear();
 }

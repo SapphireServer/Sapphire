@@ -21,7 +21,7 @@ namespace Sapphire::Entity
   {
 
   public:
-    Npc( Common::ObjKind type, FrameworkPtr pFw );
+    Npc( Common::ObjKind type );
 
     virtual ~Npc() override;
 

@@ -4,6 +4,15 @@
 #include <fstream>
 #include <streambuf>
 #include <sstream>
+#include <Logging/Logger.h>
+#include <filesystem>
+
+#include <common/Util/Util.h>
+
+using namespace Sapphire;
+using namespace Sapphire::Common;
+
+namespace fs = std::filesystem;
 
 DbManager::DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port ) :
   m_host( host ),
@@ -17,10 +26,7 @@ DbManager::DbManager( const std::string& host, const std::string& database, cons
 {
 }
 
-DbManager::~DbManager()
-{
-
-}
+DbManager::~DbManager() = default;
 
 bool DbManager::execute( const std::string& sql )
 {
@@ -110,9 +116,14 @@ bool DbManager::performAction()
     case Mode::LIQUIDATE:
       result = modeLiquidate();
       break;
-    case Mode::UPDATE:
+    case Mode::MIGRATE:
+      result = modeMigrate();
       break;
     case Mode::CHECK:
+      result = modeCheck();
+      break;
+    case Mode::ADD_MIGRATION:
+      result = modeAddMigration();
       break;
     case Mode::CLEAN_CHARS:
       break;
@@ -198,8 +209,8 @@ bool DbManager::modeInit()
     content.erase( 0, pos + delimiter.length() );
   }
 
-  std::cout << "======================================================" << std::endl;
-  std::cout << "Inserting default values..." << std::endl;
+  Logger::info( "======================================================" );
+  Logger::info( "Inserting default values..." );
 
 
   std::ifstream t1( m_iFile );
@@ -228,7 +239,10 @@ bool DbManager::modeInit()
     content1.erase( 0, pos_ + delimiter1.length() );
   }
 
-  return true;
+  Logger::info( "======================================================" );
+  Logger::info( "Running migrations..." );
+
+  return modeMigrate();
 }
 
 bool promptForChar( const char* prompt, char& readch )
@@ -276,7 +290,7 @@ bool DbManager::modeLiquidate()
 
     while( resultSet->next() )
     {
-      std::cout << "DROP TABLE `" + resultSet->getString( 1 ) + "`;" << "\n";
+      Logger::info( "DROP TABLE `{}`;", resultSet->getString( 1 ) );
       if( !execute( "DROP TABLE `" + resultSet->getString( 1 ) + "`;" ) )
         return false;
     }
@@ -298,6 +312,177 @@ void DbManager::setInsertFile( const std::string& iFile )
 void DbManager::setSchemaFile( const std::string& sFile )
 {
   m_sFile = sFile;
+}
+
+void DbManager::setMigratioName( const std::string& name )
+{
+  m_migrationName = name;
+}
+
+bool DbManager::modeCheck()
+{
+  if( !selectSchema() )
+    return false;
+
+  std::string query = "SELECT MigrationName FROM __Migration;";
+
+  std::vector< std::string > appliedMigrations;
+
+  try
+  {
+    auto stmt = m_pConnection->createStatement();
+    auto resultSet = stmt->executeQuery( query );
+
+    while( resultSet->next() )
+    {
+      appliedMigrations.emplace_back( resultSet->getString( 1 ) );
+    }
+  }
+  catch( std::runtime_error& e )
+  {
+    m_lastError = e.what();
+    return false;
+  }
+
+  uint32_t missing = 0;
+  for( auto& entry : fs::directory_iterator( "sql/migrations" ) )
+  {
+    auto& path = entry.path();
+
+    // just in case...
+    if( path.extension() != ".sql" )
+      continue;
+
+    if( std::find( appliedMigrations.begin(), appliedMigrations.end(), path.filename().string() ) == appliedMigrations.end() )
+    {
+      Logger::info( "Missing migration: {}", path.filename().string() );
+      missing++;
+    }
+  }
+
+  if( missing > 0 )
+  {
+    Logger::warn( "Database is missing {} migration(s).", missing );
+  }
+  else
+  {
+    Logger::info( "All available migrations have been applied." );
+  }
+
+  return true;
+}
+
+bool DbManager::modeMigrate()
+{
+  if( !selectSchema() )
+    return false;
+
+  std::string query = "SELECT MigrationName FROM __Migration;";
+
+  std::vector< std::string > appliedMigrations;
+
+  try
+  {
+    auto stmt = m_pConnection->createStatement();
+    auto resultSet = stmt->executeQuery( query );
+
+    while( resultSet->next() )
+    {
+      appliedMigrations.emplace_back( resultSet->getString( 1 ) );
+    }
+  }
+  catch( std::runtime_error& e )
+  {
+    m_lastError = e.what();
+    return false;
+  }
+
+  std::vector< std::string > migrations;
+  for( auto& entry : fs::directory_iterator( "sql/migrations" ) )
+  {
+    auto& path = entry.path();
+
+    // just in case...
+    if( path.extension() != ".sql" )
+      continue;
+
+    migrations.emplace_back( path.string() );
+  }
+
+  std::sort( migrations.begin(), migrations.end() );
+
+  for( auto& entry : migrations )
+  {
+    auto path = fs::path( entry );
+
+    if( std::find( appliedMigrations.begin(), appliedMigrations.end(), path.filename().string() ) == appliedMigrations.end() )
+    {
+      Logger::info( "Applying migration: {}", path.filename().string() );
+
+      std::ifstream mFile( path.string() );
+      if( !mFile.is_open() )
+      {
+        m_lastError = "File " + path.string() + " does not exist!";
+        return false;
+      }
+      std::string sql( ( std::istreambuf_iterator< char >( mFile ) ),
+                       ( std::istreambuf_iterator< char >( ) ) );
+
+      try
+      {
+        auto stmt = m_pConnection->createStatement();
+        stmt->executeQuery( sql );
+      }
+      catch( std::runtime_error& e )
+      {
+        m_lastError = e.what();
+        return false;
+      }
+
+      // insert into migrations table
+      if( !execute( fmt::format( "INSERT INTO __Migration (`MigrationName`) VALUES ('{}');", path.filename().string() ) ) )
+        return false;
+    }
+  }
+
+
+
+  return true;
+}
+
+bool DbManager::modeAddMigration()
+{
+  if( !selectSchema() )
+    return false;
+
+  fs::create_directories( "sql/migrations" );
+
+  auto filename = fmt::format( "{}_{}.sql", Util::fmtUtcTime( "%Y%m%d%H%M%S" ), m_migrationName );
+
+  if( filename.size() > 250 )
+  {
+    Logger::error( "Migration name '{}' is longer than 250 characters, please shorten its name.", filename );
+    return false;
+  }
+
+  auto path = fmt::format( "sql/migrations/{}", filename );
+
+  if( fs::exists( path ) )
+  {
+    Logger::error( "Migration '{}' already exists.", filename );
+    return false;
+  }
+
+  std::ofstream mFile( path );
+
+  mFile << fmt::format( "-- Migration generated at {}", Util::fmtUtcTime( "%Y/%m/%d %H:%M:%S" ) ) << std::endl;
+  mFile << fmt::format( "-- {}", filename ) << std::endl << std::endl;
+
+  mFile.close();
+
+  Logger::info( "New migration created: {}", path );
+
+  return true;
 }
 
 

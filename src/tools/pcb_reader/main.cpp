@@ -29,6 +29,8 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
+using namespace Sapphire;
+
 // garbage to ignore models
 bool noObj = false;
 
@@ -123,7 +125,7 @@ std::string zoneNameToPath( const std::string& name )
     if( teriName.empty() )
       continue;
     auto teriPath = std::get< std::string >( fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
-    if( !found && ( Sapphire::Util::toLowerCopy( name ) == Sapphire::Util::toLowerCopy( teriName ) ) )
+    if( !found && ( Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( teriName ) ) )
     {
       path = teriPath;
       found = true;
@@ -427,7 +429,7 @@ int main( int argc, char* argv[] )
               }
               return true;
             };
-            auto exportSgbModel = [&]( const std::string& sgbFilePath, LGB_ENTRY* pGimmick, bool isEobj = false  )
+            auto exportSgbModel = [&]( const std::string& sgbFilePath, LgbEntry* pGimmick, bool isEobj = false  )
             {
               if( auto pSgbFile = pCache->getSgbFile( sgbFilePath ) )
               {

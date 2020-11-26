@@ -9,10 +9,14 @@
 
 const std::string LOBBY_VERSION = "0.0.5";
 
-namespace Sapphire
+namespace Sapphire::Common
+{
+  class ConfigMgr;
+}
+
+namespace Sapphire::Lobby
 {
   class LobbySession;
-  class ConfigMgr;
 
   using LobbySessionMap = std::map< std::string, LobbySessionPtr >;
 
@@ -29,7 +33,7 @@ namespace Sapphire
     uint16_t m_port;
     std::string m_ip;
 
-    std::shared_ptr< ConfigMgr > m_pConfig;
+    std::shared_ptr< Sapphire::Common::ConfigMgr > m_pConfig;
 
   public:
     ServerLobby( const std::string& configPath );

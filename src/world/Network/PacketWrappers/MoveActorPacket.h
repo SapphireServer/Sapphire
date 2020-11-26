@@ -28,15 +28,15 @@ namespace Sapphire::Network::Packets::Server
     void initialize( Entity::Chara& actor, uint8_t headRotation, uint8_t animationType, uint8_t state, uint16_t animationSpeed, uint8_t unknownRotation )
     {
 
-      m_data.rotation = Util::floatToUInt8Rot( actor.getRot() );
+      m_data.rotation = Common::Util::floatToUInt8Rot( actor.getRot() );
       m_data.headRotation = headRotation;
       m_data.animationType = animationType;
       m_data.animationState = state;
       m_data.animationSpeed = animationSpeed;
       m_data.unknownRotation = unknownRotation;
-      m_data.posX = Util::floatToUInt16( actor.getPos().x );
-      m_data.posY = Util::floatToUInt16( actor.getPos().y );
-      m_data.posZ = Util::floatToUInt16( actor.getPos().z );
+      m_data.posX = Common::Util::floatToUInt16( actor.getPos().x );
+      m_data.posY = Common::Util::floatToUInt16( actor.getPos().y );
+      m_data.posZ = Common::Util::floatToUInt16( actor.getPos().z );
 
     };
   };

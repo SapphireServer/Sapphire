@@ -1,6 +1,7 @@
 #ifndef _CALCSTATS_H
 #define _CALCSTATS_H
 
+#include <random>
 #include <Common.h>
 #include "Forwards.h"
 
@@ -10,20 +11,12 @@ namespace Sapphire::Math
   class CalcStats
   {
   public:
-    static float calculateBaseStat( Sapphire::Entity::PlayerPtr pPlayer );
+    static const uint32_t AUTO_ATTACK_POTENCY = 110;
+    static const uint32_t RANGED_AUTO_ATTACK_POTENCY = 100;
 
-    static uint32_t calculateMaxMp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw );
+    static float calculateBaseStat( const Entity::Chara& chara );
 
-    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer, FrameworkPtr pFw  );
-
-    /*!
-     * @brief Calculates the MP cost of a spell given its base cost
-     *
-     * @param chara The Chara that is casting the action
-     * @param baseCost The action cost
-     * @return The total MP to be consumed by a successful cast
-     */
-    static uint16_t calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost );
+    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
 
     /*!
      * @brief Calculates the probability of a block happening
@@ -47,36 +40,28 @@ namespace Sapphire::Math
      */
     static float potency( uint16_t potency );
 
+    static float autoAttackPotency( const Sapphire::Entity::Chara& chara );
+
     /*!
      * @brief Weapon damage is the contribution the weapon's damage rating
      *
      * @param chara The source/casting character.
      * @param weaponDamage the weapons physical or magic damage
-     * @param isMagicDamage true if the damage is magical, otherwise it's treated as physical damage
      */
-    static float weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage, bool isMagicDamage );
+    static float weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage );
 
     /*!
-     * @brief Calculates the contribution of physical attack power to damage dealt
+     * @brief Calculates the contribution of attack power to damage dealt with consideration for the primary stat
      * @todo Only works at level 70
      *
      * @param chara The source/casting character.
      */
+    static float getPrimaryAttackPower( const Sapphire::Entity::Chara& chara );
+
     static float attackPower( const Sapphire::Entity::Chara& chara );
 
-    /*!
-     * @brief Calculates the contribution of magical attack power to damage dealt
-     * @todo Only works at level 70
-     *
-     * @param chara The source/casting character.
-     */
     static float magicAttackPower( const Sapphire::Entity::Chara& chara );
 
-    /*!
-     * @brief Calculates the contribution of healing magic power to healing dealt
-     *
-     * @param chara The source/casting character.
-     */
     static float healingMagicPower( const Sapphire::Entity::Chara& chara );
 
     /*!
@@ -131,6 +116,8 @@ namespace Sapphire::Math
      */
     static float blockStrength( const Sapphire::Entity::Chara& chara );
 
+    static float autoAttack( const Sapphire::Entity::Chara& chara );
+
     /*!
      * @brief Calculates the multiplier that healing magic potency affects healing output
      *
@@ -140,17 +127,27 @@ namespace Sapphire::Math
      */
     static float healingMagicPotency( const Sapphire::Entity::Chara& chara );
 
-  private:
+    ////////////////////////////////////////////
 
-    static uint32_t getPrimaryClassJobAttribute( const Sapphire::Entity::Chara& chara );
+    static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+
+    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+
+    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+
+    static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
+  private:
 
     /*!
      * @brief Has the main attack power calculation allowing for de-duplication of functions.
      *
      * @param attackPower The magic/physical attack power value.
      */
-    static float calcAttackPower( uint32_t attackPower );
+    static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
+    static std::random_device dev;
+    static std::mt19937 rng;
+    static std::uniform_int_distribution< std::mt19937::result_type > range100;
   };
 
 }

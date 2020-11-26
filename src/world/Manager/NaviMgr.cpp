@@ -2,12 +2,6 @@
 #include "Navi/NaviProvider.h"
 #include <Logging/Logger.h>
 
-Sapphire::World::Manager::NaviMgr::NaviMgr( FrameworkPtr pFw ) :
-  BaseManager( pFw ),
-  m_pFw( pFw )
-{
-}
-
 bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& bgPath )
 {
   std::string bg = getBgName( bgPath );
@@ -16,7 +10,7 @@ bool Sapphire::World::Manager::NaviMgr::setupTerritory( const std::string& bgPat
   if( m_naviProviderTerritoryMap.find( bg ) != m_naviProviderTerritoryMap.end() )
     return true;
 
-  auto provider = Navi::make_NaviProvider( bg, m_pFw );
+  auto provider = Navi::make_NaviProvider( bg );
 
   if( provider->init() )
   {
@@ -39,7 +33,7 @@ Sapphire::World::Navi::NaviProviderPtr Sapphire::World::Manager::NaviMgr::getNav
 
 std::string Sapphire::World::Manager::NaviMgr::getBgName( const std::string& bgPath )
 {
-  auto findPos = bgPath.find_last_of( "/" );
+  auto findPos = bgPath.find_last_of( '/' );
   if( findPos != std::string::npos )
     return bgPath.substr( findPos + 1 );
 

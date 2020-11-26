@@ -5,6 +5,7 @@
 #include <Util/UtilMath.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -13,14 +14,13 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 
 #include "Event/EventHandler.h"
 
 #include "InstanceContent.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -32,9 +32,8 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
                                             uint32_t guId,
                                             const std::string& internalName,
                                             const std::string& contentName,
-                                            uint32_t instanceContentId,
-                                            FrameworkPtr pFw ) :
-  Zone( static_cast< uint16_t >( territoryType ), guId, internalName, contentName, pFw ),
+                                            uint32_t instanceContentId ) :
+  Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::InstanceContent, instanceContentId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),
@@ -48,8 +47,11 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
 
 bool Sapphire::InstanceContent::init()
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceInit( getAsInstanceContent() );
+  if( !Territory::init() )
+    return false;
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceInit( getAsInstanceContent() );
 
   return true;
 }
@@ -72,7 +74,7 @@ Sapphire::Data::ExdDataGenerated::InstanceContentPtr Sapphire::InstanceContent::
 
 void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "InstanceContent::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "InstanceContent::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   // mark player as "bound by duty"
@@ -87,7 +89,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
 
 void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "InstanceContent::onLeaveTerritory: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "InstanceContent::onLeaveTerritory: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
   clearDirector( player );
@@ -99,7 +101,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
   {
     case Created:
     {
-      if( m_boundPlayerIds.size() == 0 )
+      if( m_boundPlayerIds.empty() )
         return;
 
       for( auto playerId : m_boundPlayerIds )
@@ -127,9 +129,9 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       for( const auto& playerIt : m_playerMap )
       {
         auto pPlayer = playerIt.second;
-        pPlayer->queuePacket( makeActorControl143( pPlayer->getId(), DirectorUpdate,
-                                                   getDirectorId(), 0x40000001,
-                                                   m_instanceConfiguration->timeLimitmin * 60u ) );
+        pPlayer->queuePacket( makeActorControlSelf( pPlayer->getId(), DirectorUpdate,
+                                                    getDirectorId(), 0x40000001,
+                                                    m_instanceConfiguration->timeLimitmin * 60u ) );
       }
 
       if( m_pEntranceEObj )
@@ -154,8 +156,10 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       break;
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceUpdate( getAsInstanceContent(), tickCount );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceUpdate( getAsInstanceContent(), tickCount );
+
+  m_lastUpdate = tickCount;
 }
 
 void Sapphire::InstanceContent::onFinishLoading( Entity::Player& player )
@@ -171,7 +175,7 @@ void Sapphire::InstanceContent::onInitDirector( Entity::Player& player )
 
 void Sapphire::InstanceContent::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 
@@ -277,7 +281,7 @@ void Sapphire::InstanceContent::startQte()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
   }
 }
 
@@ -287,7 +291,7 @@ void Sapphire::InstanceContent::startEventCutscene()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
   }
 }
 
@@ -296,7 +300,7 @@ void Sapphire::InstanceContent::endEventCutscene()
   for( const auto& playerIt : m_playerMap )
   {
     auto player = playerIt.second;
-    player->queuePacket( makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+    player->queuePacket( makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
   }
 }
 
@@ -307,13 +311,13 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto objData = pExdData->get< Sapphire::Data::EObj >( object->getObjectId() );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
   if( objData )
     // todo: data should be renamed to eventId
     m_eventIdToObjectMap[ objData->data ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Zone " +
+    Logger::error( "InstanceContent::onRegisterEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }
@@ -380,8 +384,8 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
 void
 Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceEnterTerritory( getAsInstanceContent(), player, eventId, param1, param2 );
 
   if( !hasPlayerPreviouslySpawned( player ) )
   {
@@ -390,7 +394,7 @@ Sapphire::InstanceContent::onEnterTerritory( Entity::Player& player, uint32_t ev
                                                   HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
                                                   DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
                                                   // todo: wtf is 0x00100000
-                                                  DISABLE_CANCEL_EMOTE, 0, 0x9, getCurrentBGM() );
+                                                  DISABLE_CANCEL_EMOTE, 0, 0x9, 0 );
   }
   else
     player.directorPlayScene( getDirectorId(), 2, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0x9, getCurrentBGM() );
@@ -405,15 +409,15 @@ void Sapphire::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
     auto player = playerIt.second;
     // note: retail do send a BGM_MUTE(1) first before any BGM transition, but YOLO in this case.
     // also do note that this code can't control the bgm granularly. (i.e. per player for WoD submap.) oops.
-    // player->queuePacket( ActorControlPacket143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
+    // player->queuePacket( ActorControlSelfPacket( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, 1 ) );
     player->queuePacket(
-      makeActorControl143( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
+      makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmIndex ) );
   }
 }
 
 void Sapphire::InstanceContent::setPlayerBGM( Sapphire::Entity::Player& player, uint16_t bgmId )
 {
-  player.queuePacket( makeActorControl143( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
+  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, getDirectorId(), 0x80000001, bgmId ) );
 }
 
 uint16_t Sapphire::InstanceContent::getCurrentBGM() const

@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_INSTANCECONTENT_H
 #define SAPPHIRE_INSTANCECONTENT_H
 
-#include "Zone.h"
+#include "Territory.h"
 #include "Event/Director.h"
 #include "Forwards.h"
 
@@ -12,7 +12,7 @@ namespace Sapphire::Data
 
 namespace Sapphire
 {
-  class InstanceContent : public Event::Director, public Zone
+  class InstanceContent : public Event::Director, public Territory
   {
   public:
     enum InstanceContentState
@@ -28,8 +28,7 @@ namespace Sapphire
                      uint32_t guId,
                      const std::string& internalName,
                      const std::string& contentName,
-                     uint32_t instanceContentId,
-                     FrameworkPtr pFw );
+                     uint32_t instanceContentId );
 
     virtual ~InstanceContent();
 

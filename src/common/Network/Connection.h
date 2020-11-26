@@ -12,12 +12,6 @@
 #include "Acceptor.h"
 #include <memory>
 
-namespace Sapphire
-{
-  class Framework;
-  using FrameworkPtr = std::shared_ptr< Framework >;
-}
-
 namespace Sapphire::Network
 {
 
@@ -41,9 +35,8 @@ namespace Sapphire::Network
     std::list< std::vector< uint8_t > > m_pending_sends;
     int32_t m_receive_buffer_size;
     std::atomic< uint32_t > m_error_state;
-    Sapphire::FrameworkPtr m_pFw;
 
-    Connection( HivePtr hive, FrameworkPtr pFw );
+    Connection( HivePtr hive );
 
     virtual ~Connection();
 
@@ -147,13 +140,13 @@ namespace Sapphire::Network
   //-----------------------------------------------------------------------------
 
   template< class T >
-  std::shared_ptr< T > addServerToHive( const std::string& listenIp, uint32_t port, HivePtr pHive, FrameworkPtr pFw )
+  std::shared_ptr< T > addServerToHive( const std::string& listenIp, uint32_t port, HivePtr pHive )
   {
     try
     {
       AcceptorPtr acceptor( new Acceptor( pHive ) );
       acceptor->listen( listenIp, port );
-      std::shared_ptr< T > connection( new T( pHive, acceptor, pFw ) );
+      std::shared_ptr< T > connection( new T( pHive, acceptor ) );
       acceptor->accept( connection );
       return connection;
     }

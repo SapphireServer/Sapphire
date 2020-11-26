@@ -11,6 +11,7 @@
 #include <set>
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
+#include <filesystem>
 
 #include <nlohmann/json.hpp>
 
@@ -21,8 +22,13 @@
 
 using namespace Sapphire;
 
+namespace fs = std::filesystem;
+
 Sapphire::Data::ExdDataGenerated g_exdData;
 bool skipUnmapped = true;
+
+std::shared_ptr< xiv::dat::GameData > m_data;
+std::shared_ptr< xiv::exd::ExdData > m_exd_data;
 
 std::map< char, std::string > numberToStringMap
   {
@@ -38,10 +44,12 @@ std::map< char, std::string > numberToStringMap
     { '9', "nine" },
   };
 
-std::vector< std::string > cppKeyWords
+std::vector< std::string > reservedWords
   {
     "new",
-    "class"
+    "class",
+    "long",
+    "short"
   };
 
 //std::string datLocation( "/home/mordred/sqpack" );
@@ -78,7 +86,7 @@ std::string generateIdListGetter( const std::string& exd )
 
 std::string generateSetDatAccessCall( const std::string& exd )
 {
-  auto& cat = g_exdData.m_exd_data->get_category( exd );
+  auto& cat = m_exd_data->get_category( exd );
   auto exh = cat.get_header();
 
   std::string lang = "xiv::exd::Language::none";
@@ -86,7 +94,7 @@ std::string generateSetDatAccessCall( const std::string& exd )
   if( langs.size() > 1 )
     lang = "xiv::exd::Language::en";
 
-  return "      m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );\n";
+  return "    m_" + exd + "Dat = setupDatAccess( \"" + exd + "\", " + lang + " );\n";
 }
 
 std::string generateDirectGetterDef()
@@ -105,71 +113,78 @@ std::map< std::string, std::string > nameTaken;
 
 std::string generateStruct( const std::string& exd )
 {
-  auto& cat = g_exdData.m_exd_data->get_category( exd );
+  auto& cat = m_exd_data->get_category( exd );
   auto exh = cat.get_header();
   auto exhMem = exh.get_exh_members();
 
   int count = 0;
 
-  auto json = nlohmann::json();
-
-  std::ifstream exJson( "ex.json" );
-  exJson >> json;
-
-  for( auto& sheet : json[ "sheets" ] )
+  auto path = fmt::format( "Definitions/{}.json", exd );
+  if( !fs::exists( path ) )
   {
-    if( sheet[ "sheet" ] != exd )
-      continue;
-  
-    for( auto& definition : sheet[ "definitions" ] )
-    {
-      uint32_t index;
-      std::string converterTarget = "";
-      bool isRepeat = false;
-      int num = 0;
-      try
-      {
-        index = definition.at( "index" );
-      }
-      catch( ... )
-      {
-        index = 0;
-      }
- 
-      try
-      {
-        std::string fieldName = std::string( definition.at( "name" ) );
-        indexToNameMap[ index ] = fieldName;
-      }
-      catch( ... )
-      {
-      }
+    Logger::warn( "No definition for exd: {}", exd );
+    return "";
+  }
 
-      try
-      {
-        converterTarget = std::string( definition.at( "converter" ).at( "target" ) );
-        if( nameTaken.find( converterTarget ) != nameTaken.end() )
-          indexToTarget[ index ] = converterTarget;
-      }
-      catch( ... )
-      {
-      }
- 
-      try
-      {
-        num = definition.at( "count" );
-        isRepeat = true;
-        indexIsArrayMap[ index ] = true;
-        indexCountMap[ index ] = num;
-        std::string fName = definition.at( "definition" ).at( "name" );
-        indexToNameMap[ index ] = fName;
-      }
-      catch( ... )
-      {
-      }
+  auto sheet = nlohmann::json();
+
+  try
+  {
+    std::ifstream defJson( path );
+    defJson >> sheet;
+  }
+  catch( const std::exception& ex )
+  {
+    Logger::error( "Failed parsing json definition, err: {}  file: {}", ex.what(), path );
+    return "";
+  }
+
+  for( auto& definition : sheet[ "definitions" ] )
+  {
+    uint32_t index;
+    std::string converterTarget = "";
+    bool isRepeat = false;
+    int num = 0;
+    try
+    {
+      index = definition.at( "index" );
+    }
+    catch( ... )
+    {
+      index = 0;
     }
 
+    try
+    {
+      std::string fieldName = std::string( definition.at( "name" ) );
+      indexToNameMap[ index ] = fieldName;
+    }
+    catch( ... )
+    {
+    }
 
+    try
+    {
+      converterTarget = std::string( definition.at( "converter" ).at( "target" ) );
+      if( nameTaken.find( converterTarget ) != nameTaken.end() )
+        indexToTarget[ index ] = converterTarget;
+    }
+    catch( ... )
+    {
+    }
+
+    try
+    {
+      num = definition.at( "count" );
+      isRepeat = true;
+      indexIsArrayMap[ index ] = true;
+      indexCountMap[ index ] = num;
+      std::string fName = definition.at( "definition" ).at( "name" );
+      indexToNameMap[ index ] = fName;
+    }
+    catch( ... )
+    {
+    }
   }
 
   std::string result = "struct " + exd + "\n{\n";
@@ -202,7 +217,7 @@ std::string generateStruct( const std::string& exd )
     }
     fieldName[ 0 ] = std::tolower( fieldName[ 0 ] );
 
-    std::string badChars = ",-':![](){}<>% \x02\x1f\x01\x03";
+    std::string badChars = ",-':![](){}/<>% \x02\x1f\x01\x03";
     std::for_each( badChars.begin(), badChars.end(), [ &fieldName ]( const char c ) 
     {
       fieldName.erase( std::remove( fieldName.begin(), fieldName.end(), c ), fieldName.end() );
@@ -217,23 +232,23 @@ std::string generateStruct( const std::string& exd )
       }
     }
 
-    for( std::string keyword : cppKeyWords )
+    for( std::string keyword : reservedWords )
     {
       if( fieldName == keyword )
-        fieldName[ 0 ] = toupper( fieldName[ 0 ] );
+        fieldName = fmt::format( "_{}", fieldName );
     }
 
     indexToNameMap[ count ] = fieldName;
     indexToTypeMap[ count ] = type;
     if( indexToTarget.find( count ) != indexToTarget.end() )
-      result += "   std::shared_ptr< " + indexToTarget[ count ] + "> " + fieldName + ";\n";
+      result += "  std::shared_ptr< " + indexToTarget[ count ] + "> " + fieldName + ";\n";
     else
     {
       if( indexIsArrayMap.find( count ) != indexIsArrayMap.end() )
       {
         type = "std::vector< " + type + " >";
       }
-      result += "   " + type + " " + fieldName + ";\n";
+      result += "  " + type + " " + fieldName + ";\n";
 
     }
 
@@ -243,11 +258,11 @@ std::string generateStruct( const std::string& exd )
   auto exhHead = exh.get_header();
   if( exhHead.variant == 2 )
   {
-    result += "\n   " + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );\n";
+    result += "\n  " + exd + "( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );\n";
   }
   else
   {
-    result += "\n   " + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );\n";
+    result += "\n  " + exd + "( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );\n";
   }
   result += "};\n\n";
 
@@ -258,13 +273,13 @@ std::string generateConstructorsDecl( const std::string& exd )
 {
   std::string result;
 
-  auto& cat = g_exdData.m_exd_data->get_category( exd );
+  auto& cat = m_exd_data->get_category( exd );
   auto exh = cat.get_header();
   auto exhMem = exh.get_exh_members();
 
   int count = 0;
 
-  std::string indent = "   ";
+  std::string indent = "  ";
   auto exhHead = exh.get_header();
   if( exhHead.variant == 2 )
   {
@@ -351,17 +366,11 @@ int main( int argc, char** argv )
                     std::istreambuf_iterator< char >() );
 
 
-  std::ifstream exJson( "ex.json" );
-
-  auto json = nlohmann::json();
-  exJson >> json;
-
   Logger::info( "Setting up EXD data" );
-  if( !g_exdData.init( datLocation ) )
-  {
-    Logger::fatal( "Error setting up EXD data " );
-    return 0;
-  }
+
+  m_data = std::make_shared< xiv::dat::GameData >( datLocation );
+  m_exd_data = std::make_shared< xiv::exd::ExdData >( *m_data );
+
   Logger::info( "Generating structs, this may take several minutes..." );
   Logger::info( "Go grab a coffee..." );
 
@@ -380,34 +389,44 @@ int main( int argc, char** argv )
   //nameTaken[name] = "1";
   //}
   //
-  for( auto& sheet : json[ "sheets" ] )
-  { 
-      std::string name = sheet[ "sheet" ];
-      forwards += "struct " + name + ";\n";
-      structDefs += generateStruct( name );
-      dataDecl += generateDatAccessDecl( name );
-      idListsDecl += generateIdListDecl( name );
-      getterDecl += generateDirectGetters( name );
-      datAccCall += generateSetDatAccessCall( name );
-      constructorDecl += generateConstructorsDecl( name );
-      idListGetters += generateIdListGetter( name );
+
+  if( !fs::exists( "Definitions" ) )
+  {
+    Logger::error( "Missing definitions directory. Copy it from SaintCoinach to the working directory." );
+    return 1;
   }
 
-  getterDecl +=
-    "\n     template< class T >\n"
-    "     std::shared_ptr< T > get( uint32_t id )\n"
-    "     {\n"
-    "        try\n"
-    "        {\n"
-    "           auto info = std::make_shared< T >( id, this );\n"
-    "           return info;\n"
-    "        }\n"
-    "        catch( ... )\n"
-    "        {\n"
-    "           return nullptr;\n"
-    "        }\n"
-    "        return nullptr;\n"
-    "     }\n";
+  auto& cats = m_exd_data->get_cat_names();
+
+  uint32_t entryCount = 0;
+  for( auto& entry : fs::directory_iterator( "./Definitions/" ) )
+  {
+    auto& path = entry.path();
+
+    if( path.extension() != ".json" )
+      continue;
+
+    auto name = path.stem().string();
+
+    if( std::find( cats.begin(), cats.end(), name ) == cats.end() )
+    {
+      Logger::warn( "have definition for {} but the sheet doesn't exist", name );
+      continue;
+    }
+
+    forwards += "struct " + name + ";\n";
+    structDefs += generateStruct( name );
+    dataDecl += generateDatAccessDecl( name );
+    idListsDecl += generateIdListDecl( name );
+    getterDecl += generateDirectGetters( name );
+    datAccCall += generateSetDatAccessCall( name );
+    constructorDecl += generateConstructorsDecl( name );
+    idListGetters += generateIdListGetter( name );
+
+    entryCount++;
+  }
+
+  Logger::info( "Processed {} definition files, writing files...", entryCount );
 
   getterDef += generateDirectGetterDef();
 
@@ -437,6 +456,8 @@ int main( int argc, char** argv )
   outC.close();
 
 //   g_log.info( result );
+
+  Logger::info( "done." );
 
   return 0;
 }

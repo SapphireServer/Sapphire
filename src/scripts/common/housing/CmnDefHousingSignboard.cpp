@@ -1,12 +1,11 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
-#include <Territory/Zone.h>
 #include <Territory/HousingZone.h>
 #include <Manager/HousingMgr.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
 #include <Exd/ExdDataGenerated.h>
-#include "Framework.h"
+#include <Service.h>
 
 
 using namespace Sapphire;
@@ -26,27 +25,24 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto pFw = framework();
-      if( !pFw )
-        return LandPurchaseResult::ERR_INTERNAL;
       // Purchase Land
       if( result.param2 == 2 )
       {
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();
 
-        auto pTerritory = player.getCurrentZone();
+        auto pTerritory = player.getCurrentTerritory();
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
-        auto pHouMgr = pFw->get< HousingMgr >();
+        auto& pHouMgr = Common::Service< HousingMgr >::ref();
 
-        LandPurchaseResult res = pHouMgr->purchaseLand( player, activeLand.plot,
+        LandPurchaseResult res = pHouMgr.purchaseLand( player, activeLand.plot,
                                                         static_cast< uint8_t >( result.param2 ) );
 
         switch( res )
         {
           case LandPurchaseResult::SUCCESS:
           {
-            auto screenMsgPkt = makeActorControl143( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
+            auto screenMsgPkt = makeActorControlSelf( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
             player.queuePacket( screenMsgPkt );
 
             player.sendLogMessage( 0x0D16, pTerritory->getTerritoryTypeInfo()->placeName, activeLand.ward + 1, activeLand.plot + 1 );

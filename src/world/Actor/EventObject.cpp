@@ -3,9 +3,9 @@
 #include "Territory/InstanceContent.h"
 #include "Actor/Player.h"
 
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 
 #include <Logging/Logger.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -80,7 +80,7 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
 
   for( const auto& player : m_inRangePlayers )
   {
-    player->queuePacket( makeActorControl142( getId(), DirectorEObjMod, state ) );
+    player->queuePacket( makeActorControl( getId(), DirectorEObjMod, state ) );
   }
 }
 
@@ -88,7 +88,7 @@ void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t an
 {
   for( const auto& player : m_inRangePlayers )
   {
-    player->queuePacket( makeActorControl142( getId(), EObjAnimation, flag, animationFlag ) );
+    player->queuePacket( makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
   }
 }
 
@@ -102,12 +102,12 @@ uint32_t Sapphire::Entity::EventObject::getHousingLink() const
   return m_housingLink;
 }
 
-void Sapphire::Entity::EventObject::setParentInstance( Sapphire::ZonePtr instance )
+void Sapphire::Entity::EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
 {
   m_parentInstance = instance;
 }
 
-Sapphire::ZonePtr Sapphire::Entity::EventObject::getParentInstance() const
+Sapphire::TerritoryPtr Sapphire::Entity::EventObject::getParentInstance() const
 {
   return m_parentInstance;
 }
