@@ -1,4 +1,4 @@
-#include <experimental/filesystem>
+#include <filesystem>
 #include <time.h>
 
 #include <Util/Util.h>
@@ -10,14 +10,13 @@
 
 #include "Session.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
-Sapphire::World::Session::Session( uint32_t sessionId, FrameworkPtr pFw ) :
+Sapphire::World::Session::Session( uint32_t sessionId ) :
   m_sessionId( sessionId ),
-  m_lastDataTime( Util::getTimeSeconds() ),
-  m_lastSqlTime( Util::getTimeSeconds() ),
+  m_lastDataTime( Common::Util::getTimeSeconds() ),
+  m_lastSqlTime( Common::Util::getTimeSeconds() ),
   m_isValid( false ),
-  m_pFw( std::move( pFw ) ),
   m_isReplaying( false )
 {
 }
@@ -48,7 +47,7 @@ Sapphire::Network::GameConnectionPtr Sapphire::World::Session::getChatConnection
 bool Sapphire::World::Session::loadPlayer()
 {
 
-  m_pPlayer = Entity::make_Player( m_pFw );
+  m_pPlayer = Entity::make_Player();
 
   if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
   {
@@ -73,6 +72,7 @@ void Sapphire::World::Session::close()
   // remove the session from the player
   if( m_pPlayer )
   {
+    m_pPlayer->clearBuyBackMap();
     // do one last update to db
     m_pPlayer->updateSql();
     // reset the zone, so the zone handler knows to remove the actor
@@ -102,12 +102,12 @@ bool Sapphire::World::Session::isValid() const
 
 void Sapphire::World::Session::updateLastDataTime()
 {
-  m_lastDataTime = Util::getTimeSeconds();
+  m_lastDataTime = Common::Util::getTimeSeconds();
 }
 
 void Sapphire::World::Session::updateLastSqlTime()
 {
-  m_lastSqlTime = Util::getTimeSeconds();
+  m_lastSqlTime = Common::Util::getTimeSeconds();
 }
 
 void Sapphire::World::Session::startReplay( const std::string& path )
@@ -146,7 +146,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
   for( auto set : loadedSets )
   {
     m_replayCache.push_back( std::tuple< uint64_t, std::string >(
-      Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
+      Common::Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
     Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
   }
@@ -166,7 +166,7 @@ void Sapphire::World::Session::processReplay()
   int at = 0;
   for( const auto& set : m_replayCache )
   {
-    if( std::get< 0 >( set ) <= Util::getTimeMs() )
+    if( std::get< 0 >( set ) <= Common::Util::getTimeMs() )
     {
       m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
       m_replayCache.erase( m_replayCache.begin() + at );
@@ -201,9 +201,9 @@ void Sapphire::World::Session::update()
     m_pZoneConnection->processInQueue();
 
     // SESSION LOGIC
-    m_pPlayer->update( Util::getTimeMs() );
+    m_pPlayer->update( Common::Util::getTimeMs() );
 
-    if( Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
+    if( Common::Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
     {
       updateLastSqlTime();
       m_pPlayer->updateSql();

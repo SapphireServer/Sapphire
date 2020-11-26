@@ -1,7 +1,6 @@
 #ifndef SAPPHIRE_ACTIONMGR_H
 #define SAPPHIRE_ACTIONMGR_H
 
-#include "BaseManager.h"
 #include "ForwardsZone.h"
 
 namespace Sapphire::Data
@@ -15,19 +14,22 @@ namespace Sapphire::Data
 
 namespace Sapphire::World::Manager
 {
-  class ActionMgr : public Manager::BaseManager
+  class ActionMgr
   {
   public:
-    explicit ActionMgr( FrameworkPtr pFw );
+    ActionMgr() = default;
     ~ActionMgr() = default;
 
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                     Data::ActionPtr actionData, uint64_t targetId );
-    void handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
-                                Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos );
+                                     Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
+    void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                   Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
+
+    void handleMountAction( Entity::Player& player, uint16_t mountId,
+                            Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
 
   private:
     void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, Data::Action& actionData );

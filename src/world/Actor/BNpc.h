@@ -49,9 +49,9 @@ namespace Sapphire::Entity
   {
 
   public:
-    BNpc( FrameworkPtr pFw );
+    BNpc();
     BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-          uint8_t level, uint32_t maxHp, ZonePtr pZone,FrameworkPtr pFw );
+          uint8_t level, uint32_t maxHp, TerritoryPtr pZone );
 
     virtual ~BNpc() override;
 
@@ -71,14 +71,13 @@ namespace Sapphire::Entity
 
     uint8_t getAggressionMode() const;
 
-    float getScale() const;
+
     float getNaviTargetReachedDistance() const;
 
     // return true if it reached the position
     bool moveTo( const Common::FFXIVARR_POSITION3& pos );
 
-    // processes movement
-    void step();
+    bool moveTo( const Entity::Chara& targetChara );
 
     void sendPositionUpdate();
 
@@ -111,8 +110,6 @@ namespace Sapphire::Entity
 
     void checkAggro();
 
-    void pushNearbyBNpcs();
-
     void setOwner( CharaPtr m_pChara );
 
     void setLevelId( uint32_t levelId );
@@ -120,6 +117,8 @@ namespace Sapphire::Entity
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
+
+    void calculateStats() override;
 
   private:
     uint32_t m_bNpcBaseId;
@@ -137,7 +136,6 @@ namespace Sapphire::Entity
 
     uint32_t m_flags;
 
-    float m_scale;
     float m_naviTargetReachedDistance;
 
     uint32_t m_timeOfDeath;

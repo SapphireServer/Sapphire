@@ -35,9 +35,7 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.hPCurr = bnpc.getHp();
       m_data.mPCurr = bnpc.getMp();
-      m_data.tPCurr = bnpc.getTp();
       m_data.hPMax = bnpc.getMaxHp();
-      m_data.mPMax = bnpc.getMaxMp();
       m_data.subtype = 5;
 
       m_data.level = bnpc.getLevel();
@@ -49,7 +47,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.pos.x = bnpc.getPos().x;
       m_data.pos.y = bnpc.getPos().y;
       m_data.pos.z = bnpc.getPos().z;
-      m_data.rotation = Util::floatToUInt16Rot( bnpc.getRot() );
+      m_data.rotation = Common::Util::floatToUInt16Rot( bnpc.getRot() );
       m_data.levelId = bnpc.getLevelId();
 
       m_data.enemyType = bnpc.getEnemyType();
@@ -87,7 +85,7 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.targetId = static_cast< uint64_t >( bnpc.getTargetId() );
 
-      uint64_t currentTimeMs = Sapphire::Util::getTimeMs();
+      uint64_t currentTimeMs = Common::Util::getTimeMs();
 
       for( auto const& effect : bnpc.getStatusEffectMap() )
       {
@@ -96,7 +94,7 @@ namespace Sapphire::Network::Packets::Server
                                                                        ( currentTimeMs -
                                                                          effect.second->getStartTimeMs() ) ) / 1000;
         m_data.effect[ effect.first ].sourceActorId = effect.second->getSrcActorId();
-        m_data.effect[ effect.first ].unknown1 = effect.second->getParam();
+        m_data.effect[ effect.first ].param = effect.second->getParam();
       }
 
     };

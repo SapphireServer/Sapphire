@@ -1,8 +1,8 @@
 #include "conv.h"
 
-namespace xiv {
-namespace utils {
-namespace conv {
+namespace xiv::utils::conv
+{
+
   float half2float( const uint16_t i_value )
   {
     uint32_t t1;
@@ -29,7 +29,5 @@ namespace conv {
     return i_value / 255.0f;
   }
 
-}
-}
 }
 

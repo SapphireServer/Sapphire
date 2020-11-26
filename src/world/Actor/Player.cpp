@@ -3,10 +3,14 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdDataGenerated.h>
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
 #include <cmath>
+#include <Service.h>
 
 #include "Session.h"
 #include "Player.h"
@@ -16,16 +20,17 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/ModelEquipPacket.h"
@@ -41,7 +46,6 @@
 #include "Math/CalcBattle.h"
 
 #include "ServerMgr.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -54,8 +58,8 @@ using InvSlotPair = std::pair< uint16_t, int8_t >;
 using InvSlotPairVec = std::vector< InvSlotPair >;
 
 // player constructor
-Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
-  Chara( ObjKind::Player, pFw ),
+Sapphire::Entity::Player::Player() :
+  Chara( ObjKind::Player ),
   m_lastWrite( 0 ),
   m_lastPing( 0 ),
   m_bIsLogin( false ),
@@ -76,7 +80,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_emoteMode( 0 ),
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
-  m_falling( false )
+  m_falling( false ),
+  m_pQueuedAction( nullptr )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -84,6 +89,7 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
   m_queuedZoneing = nullptr;
   m_status = ActorStatus::Idle;
   m_invincibilityType = InvincibilityType::InvincibilityNone;
+  m_radius = 1.f;
 
   memset( m_questTracking, 0, sizeof( m_questTracking ) );
   memset( m_name, 0, sizeof( m_name ) );
@@ -100,6 +106,8 @@ Sapphire::Entity::Player::Player( FrameworkPtr pFw ) :
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
   m_actorSpawnIndexAllocator.init( MAX_DISPLAYED_ACTORS, true );
+
+  gaugeClear();
 }
 
 Sapphire::Entity::Player::~Player()
@@ -108,8 +116,8 @@ Sapphire::Entity::Player::~Player()
 
 void Sapphire::Entity::Player::injectPacket( const std::string& path )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
-  auto session = pServerZone->getSession( getId() );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto session = serverMgr.getSession( getId() );
   if( session )
     session->getZoneConnection()->injectPacket( path, *this );
 }
@@ -194,9 +202,7 @@ bool Sapphire::Entity::Player::isMarkedForRemoval() const
 
 Sapphire::Common::OnlineStatus Sapphire::Entity::Player::getOnlineStatus() const
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  if( !pExdData )
-    return OnlineStatus::Online;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
   uint32_t statusDisplayOrder = 0xFF14;
   uint32_t applicableStatus = static_cast< uint32_t >( OnlineStatus::Online );
@@ -208,7 +214,7 @@ Sapphire::Common::OnlineStatus Sapphire::Entity::Player::getOnlineStatus() const
     if( !bit )
       continue;
 
-    auto pOnlineStatus = pExdData->get< Data::OnlineStatus >( i );
+    auto pOnlineStatus = exdData.get< Data::OnlineStatus >( i );
     if( !pOnlineStatus )
       continue;
 
@@ -249,13 +255,13 @@ void Sapphire::Entity::Player::calculateStats()
   uint8_t level = getLevel();
   uint8_t job = static_cast< uint8_t >( getClass() );
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( job );
-  auto tribeInfo = pExdData->get< Sapphire::Data::Tribe >( tribe );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
+  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( job );
+  auto tribeInfo = exdData.get< Sapphire::Data::Tribe >( tribe );
+  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( level );
 
-  float base = Math::CalcStats::calculateBaseStat( getAsPlayer() );
+  float base = Math::CalcStats::calculateBaseStat( *this );
 
   m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) +
                                              tribeInfo->sTR );
@@ -267,8 +273,8 @@ void Sapphire::Entity::Player::calculateStats()
                                               tribeInfo->iNT );
   m_baseStats.mnd = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierMind ) / 100 ) +
                                              tribeInfo->mND );
-  m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) +
-                                             tribeInfo->pIE );
+  /*m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) +
+                                             tribeInfo->pIE );*/
 
   m_baseStats.determination = static_cast< uint32_t >( base );
   m_baseStats.pie = static_cast< uint32_t >( base );
@@ -284,9 +290,9 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.attackPotMagic = m_baseStats.inte;
   m_baseStats.healingPotMagic = m_baseStats.mnd;
 
-  m_baseStats.max_mp = Math::CalcStats::calculateMaxMp( getAsPlayer(), m_pFw );
+  m_baseStats.max_mp = 10000;
 
-  m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer(), m_pFw );
+  m_baseStats.max_hp = Math::CalcStats::calculateMaxHp( getAsPlayer() );
 
   if( m_mp > m_baseStats.max_mp )
     m_mp = m_baseStats.max_mp;
@@ -300,7 +306,6 @@ void Sapphire::Entity::Player::calculateStats()
 void Sapphire::Entity::Player::setAutoattack( bool mode )
 {
   m_bAutoattack = mode;
-  m_lastAttack = Util::getTimeMs();
 }
 
 bool Sapphire::Entity::Player::isAutoattackOn() const
@@ -310,48 +315,46 @@ bool Sapphire::Entity::Player::isAutoattackOn() const
 
 void Sapphire::Entity::Player::sendStats()
 {
-
   auto statPacket = makeZonePacket< FFXIVIpcPlayerStats >( getId() );
-  statPacket->data().strength = m_baseStats.str + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Strength ) ];
-  statPacket->data().dexterity = m_baseStats.dex + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Dexterity ) ];
-  statPacket->data().vitality = m_baseStats.vit + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Vitality ) ];
-  statPacket->data().intelligence = m_baseStats.inte + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Intelligence ) ];
-  statPacket->data().mind = m_baseStats.mnd + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Mind ) ];
-  statPacket->data().piety = m_baseStats.pie + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Piety ) ];
-  statPacket->data().determination = m_baseStats.determination + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Determination ) ];
-  statPacket->data().hp = m_baseStats.max_hp + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::HP ) ];
-  statPacket->data().mp = m_baseStats.max_mp + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MP ) ];
-  statPacket->data().accuracy = m_baseStats.accuracy;
-  statPacket->data().attack = m_baseStats.attack + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::AttackPower ) ];
-  statPacket->data().attackMagicPotency = m_baseStats.attackPotMagic + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::AttackMagicPotency ) ];
-  statPacket->data().healingMagicPotency = m_baseStats.healingPotMagic + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::HealingMagicPotency ) ];
-  statPacket->data().skillSpeed = m_baseStats.skillSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SkillSpeed ) ];
-  statPacket->data().spellSpeed = m_baseStats.spellSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SpellSpeed ) ];
-  statPacket->data().spellSpeed1 = m_baseStats.spellSpeed + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::SpellSpeed ) ];
-  statPacket->data().spellSpeedMod = 100;
 
-  statPacket->data().criticalHitRate = m_baseStats.critHitRate + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::CriticalHit ) ];
-  statPacket->data().defense = m_baseStats.defense + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ];
-  statPacket->data().magicDefense = m_baseStats.magicDefense + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ];
-  statPacket->data().tenacity = m_baseStats.tenacity + m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Tenacity ) ];
+  statPacket->data().strength = getStatValue( Common::BaseParam::Strength );
+  statPacket->data().dexterity = getStatValue( Common::BaseParam::Dexterity );
+  statPacket->data().vitality = getStatValue( Common::BaseParam::Vitality );
+  statPacket->data().intelligence = getStatValue( Common::BaseParam::Intelligence );
+  statPacket->data().mind = getStatValue( Common::BaseParam::Mind );
+  statPacket->data().piety = getStatValue( Common::BaseParam::Piety );
+  statPacket->data().determination = getStatValue( Common::BaseParam::Determination );
+  statPacket->data().hp = getStatValue( Common::BaseParam::HP );
+  statPacket->data().mp = getStatValue( Common::BaseParam::MP );
+  statPacket->data().directHitRate = getStatValue( Common::BaseParam::DirectHitRate );
+  statPacket->data().attackPower = getStatValue( Common::BaseParam::AttackPower );
+  statPacket->data().attackMagicPotency = getStatValue( Common::BaseParam::AttackMagicPotency );
+  statPacket->data().healingMagicPotency = getStatValue( Common::BaseParam::HealingMagicPotency );
+  statPacket->data().skillSpeed = getStatValue( Common::BaseParam::SkillSpeed );
+  statPacket->data().spellSpeed = getStatValue( Common::BaseParam::SpellSpeed );
+  statPacket->data().haste = 100;
+  statPacket->data().criticalHit = getStatValue( Common::BaseParam::CriticalHit );
+  statPacket->data().defense = getStatValue( Common::BaseParam::Defense );
+  statPacket->data().magicDefense = getStatValue( Common::BaseParam::MagicDefense );
+  statPacket->data().tenacity = getStatValue( Common::BaseParam::Tenacity );
 
   queuePacket( statPacket );
 }
 
 void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto data = pExdData->get< Sapphire::Data::Aetheryte >( aetheryteId );
+  auto data = exdData.get< Sapphire::Data::Aetheryte >( aetheryteId );
 
   if( data == nullptr )
-  {
     return;
-  }
 
   setStateFlag( PlayerStateFlag::BetweenAreas );
-  auto targetPos = pTeriMgr->getTerritoryPosition( data->level.at( 0 ) );
+
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+  auto pop = instanceObjectCache.getPopRange( data->territory, data->level[ 0 ] );
 
   Common::FFXIVARR_POSITION3 pos;
   pos.x = 0;
@@ -359,34 +362,42 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   pos.z = 0;
   float rot = 0;
 
-  if( targetPos != nullptr )
+  if( pop )
   {
-    pos = targetPos->getTargetPosition();
-    rot = targetPos->getTargetRotation();
+    sendDebug( "Teleport: popRange {0} found!", data->level.at( 0 ) );
+
+    pos.x = pop->header.transform.translation.x;
+    pos.y = pop->header.transform.translation.y;
+    pos.z = pop->header.transform.translation.z;
+    rot = pop->header.transform.rotation.y;
+  }
+  else
+  {
+    sendDebug( "Teleport: popRange {0} not found in {1}!", data->level[ 0 ], data->territory );
   }
 
   sendDebug( "Teleport: {0} {1} ({2})",
-             pExdData->get< Sapphire::Data::PlaceName >( data->placeName )->name,
-             pExdData->get< Sapphire::Data::PlaceName >( data->aethernetName )->name,
+             exdData.get< Sapphire::Data::PlaceName >( data->placeName )->name,
+             exdData.get< Sapphire::Data::PlaceName >( data->aethernetName )->name,
              data->territory );
 
   // TODO: this should be simplified and a type created in server_common/common.h.
   if( type == 1 ) // teleport
   {
-    prepareZoning( data->territory, true, 1, 112 ); // TODO: Really?
-    sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x04 ) );
+    prepareZoning( data->territory, true, 1, 0 ); // TODO: Really?
+    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
     setZoningType( Common::ZoneingType::Teleport );
   }
   else if( type == 2 ) // aethernet
   {
     prepareZoning( data->territory, true, 1, 112 );
-    sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x04 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
     setZoningType( Common::ZoneingType::Teleport );
   }
   else if( type == 3 ) // return
   {
     prepareZoning( data->territory, true, 1, 111 );
-    sendToInRangeSet( makeActorControl142( getId(), ActorDespawnEffect, 0x03 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x03 ) );
     setZoningType( Common::ZoneingType::Return );
   }
 
@@ -409,16 +420,16 @@ void Sapphire::Entity::Player::returnToHomepoint()
 
 void Sapphire::Entity::Player::setZone( uint32_t zoneId )
 {
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   m_onEnterEventDone = false;
-  if( !pTeriMgr->movePlayer( zoneId, getAsPlayer() ) )
+  if( !teriMgr.movePlayer( zoneId, getAsPlayer() ) )
   {
     // todo: this will require proper handling, for now just return the player to their previous area
     m_pos = m_prevPos;
     m_rot = m_prevRot;
     m_territoryTypeId = m_prevTerritoryTypeId;
 
-    if( !pTeriMgr->movePlayer( m_territoryTypeId, getAsPlayer() ) )
+    if( !teriMgr.movePlayer( m_territoryTypeId, getAsPlayer() ) )
       return;
   }
 
@@ -427,23 +438,23 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
 bool Sapphire::Entity::Player::setInstance( uint32_t instanceContentId )
 {
   m_onEnterEventDone = false;
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto instance = pTeriMgr->getInstanceZonePtr( instanceContentId );
+  auto instance = teriMgr.getTerritoryByGuId( instanceContentId );
   if( !instance )
     return false;
 
   return setInstance( instance );
 }
 
-bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
 {
   m_onEnterEventDone = false;
   if( !instance )
     return false;
 
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-  auto currentZone = getCurrentZone();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto currentZone = getCurrentTerritory();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
@@ -454,17 +465,17 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance )
     m_prevTerritoryId = getTerritoryId();
   }
 
-  return pTeriMgr->movePlayer( instance, getAsPlayer() );
+  return teriMgr.movePlayer( instance, getAsPlayer() );
 }
 
-bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_POSITION3 pos )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos )
 {
   m_onEnterEventDone = false;
   if( !instance )
     return false;
 
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
-  auto currentZone = getCurrentZone();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto currentZone = getCurrentTerritory();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
@@ -475,7 +486,7 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_P
     m_prevTerritoryId = getTerritoryId();
   }
 
-  if( pTeriMgr->movePlayer( instance, getAsPlayer() ) )
+  if( teriMgr.movePlayer( instance, getAsPlayer() ) )
   {
     m_pos = pos;
     return true;
@@ -486,23 +497,23 @@ bool Sapphire::Entity::Player::setInstance( ZonePtr instance, Common::FFXIVARR_P
 
 bool Sapphire::Entity::Player::exitInstance()
 {
-  auto pTeriMgr = m_pFw->get< TerritoryMgr >();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto pZone = getCurrentZone();
+  auto pZone = getCurrentTerritory();
   auto pInstance = pZone->getAsInstanceContent();
 
   resetHp();
   resetMp();
 
   // check if housing zone
-  if( pTeriMgr->isHousingTerritory( m_prevTerritoryTypeId ) )
+  if( teriMgr.isHousingTerritory( m_prevTerritoryTypeId ) )
   {
-    if( !pTeriMgr->movePlayer( pTeriMgr->getZoneByLandSetId( m_prevTerritoryId ), getAsPlayer() ) )
+    if( !teriMgr.movePlayer( teriMgr.getZoneByLandSetId( m_prevTerritoryId ), getAsPlayer() ) )
       return false;
   }
   else
   {
-    if( !pTeriMgr->movePlayer( m_prevTerritoryTypeId, getAsPlayer() ) )
+    if( !teriMgr.movePlayer( m_prevTerritoryTypeId, getAsPlayer() ) )
       return false;
   }
 
@@ -566,7 +577,7 @@ void Sapphire::Entity::Player::registerAetheryte( uint8_t aetheryteId )
   Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
   m_aetheryte[ index ] |= value;
-  queuePacket( makeActorControl143( getId(), LearnTeleport, aetheryteId, 1 ) );
+  queuePacket( makeActorControlSelf( getId(), LearnTeleport, aetheryteId, 1 ) );
 }
 
 bool Sapphire::Entity::Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -590,12 +601,17 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
   // section to starts at 320 - 4 bytes long
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
   int32_t offset = 4;
 
-  auto info = pExdData->get< Sapphire::Data::Map >(
-    pExdData->get< Sapphire::Data::TerritoryType >( getCurrentZone()->getTerritoryTypeId() )->map );
+  auto info = exdData.get< Sapphire::Data::Map >( map_id );
+  if ( !info )
+  {
+    sendDebug( "discover(): Could not obtain map data for map_id == {0}", map_id );
+    return;
+  }
+
   if( info->discoveryArrayByte )
     offset = 5 + 2 * info->discoveryIndex;
   else
@@ -610,11 +626,32 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
   uint16_t level = getLevel();
 
-  uint32_t exp = ( pExdData->get< Sapphire::Data::ParamGrow >( level )->expToNext * 5 / 100 );
+  uint32_t exp = ( exdData.get< Sapphire::Data::ParamGrow >( level )->expToNext * 5 / 100 );
 
   gainExp( exp );
 
+  // gain 10x additional EXP if entire map is completed
+  uint32_t mask = info->discoveryFlag;
+  uint32_t discoveredAreas;
+  if( info->discoveryArrayByte )
+  {
+    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) |
+                        m_discovery[ offset ];
+  }
+  else
+  {
+    discoveredAreas = ( m_discovery[ offset + 3 ] << 24 ) |
+                      ( m_discovery[ offset + 2 ] << 16 ) |
+                      ( m_discovery[ offset + 1 ] << 8  ) |
+                        m_discovery[ offset ];
+  }
 
+  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
+
+  if( allDiscovered )
+  {
+    gainExp( exp * 10 );
+  }
 }
 
 bool Sapphire::Entity::Player::isNewAdventurer() const
@@ -657,7 +694,7 @@ void Sapphire::Entity::Player::learnAction( uint16_t actionId )
 
   m_unlocks[ index ] |= value;
 
-  queuePacket( makeActorControl143( getId(), ToggleActionUnlock, actionId, 1 ) );
+  queuePacket( makeActorControlSelf( getId(), ToggleActionUnlock, actionId, 1 ) );
 }
 
 void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -668,7 +705,7 @@ void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
 
   m_orchestrion[ index ] |= value;
 
-  queuePacket( makeActorControl143( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
+  queuePacket( makeActorControlSelf( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
 bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
@@ -682,23 +719,25 @@ bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
 
 void Sapphire::Entity::Player::gainExp( uint32_t amount )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-
   uint32_t currentExp = getExp();
 
   uint16_t level = getLevel();
 
-  uint32_t neededExpToLevel = pExdData->get< Sapphire::Data::ParamGrow >( level )->expToNext;
-
-  uint32_t neededExpToLevelplus1 = pExdData->get< Sapphire::Data::ParamGrow >( level + 1 )->expToNext;
-
-  queuePacket( makeActorControl143( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
-
-  if( level >= 70 ) // temporary fix for leveling over levelcap
+  if( level >= Common::MAX_PLAYER_LEVEL )
   {
-    queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+    setExp( 0 );
+    if( currentExp != 0 )
+      queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), 0 ) );
     return;
   }
+
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+
+  uint32_t neededExpToLevel = exdData.get< Sapphire::Data::ParamGrow >( level )->expToNext;
+
+  uint32_t neededExpToLevelplus1 = exdData.get< Sapphire::Data::ParamGrow >( level + 1 )->expToNext;
+
+  queuePacket( makeActorControlSelf( getId(), GainExpMsg, static_cast< uint8_t >( getClass() ), amount ) );
 
   if( ( currentExp + amount ) >= neededExpToLevel )
   {
@@ -706,15 +745,17 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
     amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelplus1 ?
              neededExpToLevelplus1 - 1 :
              ( currentExp + amount - neededExpToLevel );
+    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
+      amount = 0;
     setExp( amount );
     gainLevel();
-    queuePacket( makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
+    queuePacket( makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), amount ) );
 
   }
   else
   {
     queuePacket(
-      makeActorControl143( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
+      makeActorControlSelf( getId(), UpdateUiExp, static_cast< uint8_t >( getClass() ), currentExp + amount ) );
     setExp( currentExp + amount );
   }
 
@@ -738,13 +779,12 @@ void Sapphire::Entity::Player::gainLevel()
   effectListPacket->data().level = getLevel();
   effectListPacket->data().current_hp = getMaxHp();
   effectListPacket->data().current_mp = getMaxMp();
-  effectListPacket->data().currentTp = 1000;
   effectListPacket->data().max_hp = getMaxHp();
   effectListPacket->data().max_mp = getMaxMp();
   sendToInRangeSet( effectListPacket, true );
 
-  sendToInRangeSet( makeActorControl142( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
-                                         getLevel(), getLevel() - 1 ), true );
+  sendToInRangeSet( makeActorControl( getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ),
+                                      getLevel(), getLevel() - 1 ), true );
 
   auto classInfoPacket = makeZonePacket< FFXIVIpcUpdateClassInfo >( getId() );
   classInfoPacket->data().classId = static_cast< uint8_t > ( getClass() );
@@ -763,15 +803,15 @@ void Sapphire::Entity::Player::sendStatusUpdate()
 
 uint8_t Sapphire::Entity::Player::getLevel() const
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
 uint8_t Sapphire::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pClass ) )->expArrayIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
@@ -783,15 +823,15 @@ bool Sapphire::Entity::Player::isClassJobUnlocked( Common::ClassJob classJob ) c
 
 uint32_t Sapphire::Entity::Player::getExp() const
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   return m_expArray[ classJobIndex ];
 }
 
 void Sapphire::Entity::Player::setExp( uint32_t amount )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+  auto exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   m_expArray[ classJobIndex ] = amount;
 }
 
@@ -825,22 +865,25 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
   classInfoPacket->data().syncedLevel = getLevel();
   queuePacket( classInfoPacket );
 
-  sendToInRangeSet( makeActorControl142( getId(), ClassJobChange, 0x04 ), true );
+  sendToInRangeSet( makeActorControl( getId(), ClassJobChange, 0x04 ), true );
 
   sendStatusUpdate();
+
+  gaugeClear();
+  sendActorGauge();
 }
 
 void Sapphire::Entity::Player::setLevel( uint8_t level )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( getClass() ) )->expArrayIndex;
   m_classArray[ classJobIndex ] = level;
 }
 
 void Sapphire::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  uint8_t classJobIndex = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
   if( m_classArray[ classJobIndex ] == 0 )
     insertDbClass( classJobIndex );
@@ -921,7 +964,7 @@ void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
   pPlayer->freePlayerSpawnId( getId() );
 
-  pPlayer->queuePacket( makeActorControl143( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  pPlayer->queuePacket( makeActorControlSelf( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::ActorPtr Sapphire::Entity::Player::lookupTargetById( uint64_t targetId )
@@ -982,8 +1025,8 @@ const uint8_t* Sapphire::Entity::Player::getStateFlags() const
 
 bool Sapphire::Entity::Player::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto actionInfoPtr = pExdData->get< Sapphire::Data::Action >( actionId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto actionInfoPtr = exdData.get< Sapphire::Data::Action >( actionId );
   if( actionInfoPtr->preservesCombo )
     return false;
 
@@ -1017,8 +1060,8 @@ void Sapphire::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
   auto newOnlineStatus = getOnlineStatus();
 
   if( prevOnlineStatus != newOnlineStatus )
-    sendToInRangeSet( makeActorControl142( getId(), SetStatusIcon,
-                                           static_cast< uint8_t >( getOnlineStatus() ) ), true );
+    sendToInRangeSet( makeActorControl( getId(), SetStatusIcon,
+                                        static_cast< uint8_t >( getOnlineStatus() ) ), true );
 
 }
 
@@ -1054,8 +1097,7 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
   auto newOnlineStatus = getOnlineStatus();
 
   if( prevOnlineStatus != newOnlineStatus )
-    sendToInRangeSet( makeActorControl142( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ),
-                      true );
+    sendToInRangeSet( makeActorControl( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Entity::Player::update( uint64_t tickCount )
@@ -1064,7 +1106,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-    if( getCurrentZone()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
+    if( getCurrentTerritory()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
     {
       performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation );
     }
@@ -1089,8 +1131,6 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( !isAlive() )
     return;
 
-  updateStatusEffects();
-
   m_lastUpdate = tickCount;
 
   if( !checkAction() )
@@ -1104,9 +1144,10 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
       {
         if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
         {
+          auto chara = actor->getAsChara();
+
           // default autoattack range
-          // TODO make this dependant on bnpc size
-          uint32_t range = 7;
+          float range = 3.f + chara->getRadius();
 
           // default autoattack range for ranged classes
           if( getClass() == ClassJob::Machinist ||
@@ -1136,8 +1177,8 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
 
 void Sapphire::Entity::Player::onMobKill( uint16_t nameId )
 {
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onBNpcKill( *getAsPlayer(), nameId );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onBNpcKill( *getAsPlayer(), nameId );
 
   if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
   {
@@ -1169,7 +1210,7 @@ void Sapphire::Entity::Player::setHomepoint( uint8_t aetheryteId )
 {
   m_homePoint = aetheryteId;
 
-  queuePacket( makeActorControl143( getId(), SetHomepoint, aetheryteId ) );
+  queuePacket( makeActorControlSelf( getId(), SetHomepoint, aetheryteId ) );
 }
 
 /*! get homepoint */
@@ -1245,8 +1286,8 @@ const uint8_t* Sapphire::Entity::Player::getGcRankArray() const
 
 void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( m_id );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( m_id );
 
   if( !pSession )
     return;
@@ -1260,8 +1301,8 @@ void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr
 
 void Sapphire::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( m_id );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto pSession = serverMgr.getSession( m_id );
 
   if( !pSession )
     return;
@@ -1289,6 +1330,7 @@ void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFX
   m_bMarkedForZoning = true;
   setRot( rotation );
   setZone( zoneId );
+  clearBuyBackMap();
 }
 
 bool Sapphire::Entity::Player::isMarkedForZoning() const
@@ -1347,7 +1389,7 @@ void Sapphire::Entity::Player::sendDebug( const std::string& message ) //Grey Te
 void Sapphire::Entity::Player::sendLogMessage( uint32_t messageId, uint32_t param2, uint32_t param3,
                                            uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  queuePacket( makeActorControl144( getId(), ActorControlType::LogMsg, messageId, param2, param3, param4, param5, param6 ) );
+  queuePacket( makeActorControlTarget( getId(), ActorControlType::LogMsg, messageId, param2, param3, param4, param5, param6 ) );
 }
 
 void Sapphire::Entity::Player::updateHowtosSeen( uint32_t howToId )
@@ -1410,26 +1452,33 @@ void Sapphire::Entity::Player::sendHateList()
 {
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
   hateListPacket->data().numEntries = m_actorIdTohateSlotMap.size();
+  auto hateRankPacket = makeZonePacket< FFXIVIpcHateRank >( getId() );
+  hateRankPacket->data().numEntries = m_actorIdTohateSlotMap.size();
   auto it = m_actorIdTohateSlotMap.begin();
   for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
   {
+    // TODO: get actual hate values for these
     hateListPacket->data().entry[ i ].actorId = it->first;
     hateListPacket->data().entry[ i ].hatePercent = 100;
+
+    hateRankPacket->data().entry[ i ].actorId = it->first;
+    hateRankPacket->data().entry[ i ].hateAmount = 1;
   }
+  queuePacket( hateRankPacket );
   queuePacket( hateListPacket );
 }
 
 void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
 {
   hateListAdd( pBNpc );
-  queuePacket( makeActorControl142( getId(), ToggleAggro, 1 ) );
+  queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
 }
 
 void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
 {
   hateListRemove( pBNpc );
   if( m_actorIdTohateSlotMap.empty() )
-    queuePacket( makeActorControl142( getId(), ToggleAggro ) );
+    queuePacket( makeActorControl( getId(), ToggleAggro ) );
 }
 
 bool Sapphire::Entity::Player::isLogin() const
@@ -1477,7 +1526,7 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
 
   m_activeTitle = titleId;
 
-  sendToInRangeSet( makeActorControl142( getId(), SetTitle, titleId ), true );
+  sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
 }
 
 void Sapphire::Entity::Player::setEquipDisplayFlags( uint8_t state )
@@ -1495,35 +1544,46 @@ uint8_t Sapphire::Entity::Player::getEquipDisplayFlags() const
 
 void Sapphire::Entity::Player::mount( uint32_t id )
 {
-  m_mount = id;
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::SetStatus,
-                                         static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
-  sendToInRangeSet( makeActorControl143( getId(), 0x39e, 12 ), true ); //?
+  if( id > 0 )
+  {
+    m_mount = id;
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
+      static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), ActorControlType::SetMountSpeed, 12 ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), 0x107, 1 ), true );
 
-  auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
-  mountPacket->data().id = id;
-  sendToInRangeSet( mountPacket, true );
+    auto mountPacket = makeZonePacket< FFXIVIpcMount >( getId() );
+    mountPacket->data().id = id;
+    sendToInRangeSet( mountPacket, true );
+  }
 }
 
 void Sapphire::Entity::Player::dismount()
 {
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::SetStatus,
-                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
-  sendToInRangeSet( makeActorControl143( getId(), ActorControlType::Dismount, 1 ), true );
-  m_mount = 0;
+  if( m_mount > 0 )
+  {
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetStatus,
+      static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::Dismount, 1 ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), 0x393, 1 ), true );
+    sendToInRangeSet( makeActorControlSelf( getId(), 0x107, 0 ), true );
+    m_mount = 0;
+  }
 }
 
 void Sapphire::Entity::Player::spawnCompanion( uint16_t id )
 {
-  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-  assert( exdData );
+  if( id > 0 )
+  {
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto companion = exdData->get< Data::Companion >( id );
-  if( !id )
-    return;
+    auto companion = exdData.get< Data::Companion >( id );
+    if( !companion )
+      return;
+  }
 
   m_companionId = id;
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::ToggleCompanion, id ), true );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleCompanion, id ), true );
 }
 
 uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
@@ -1555,11 +1615,10 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   //uint64_t tick = Util::getTimeMs();
   //srand(static_cast< uint32_t >(tick));
 
-  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 0, 3 ).next() );
+  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
-  auto damage = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( static_cast< uint32_t > ( getLevel() * 1.5f ),
-                                         getLevel() + static_cast< uint32_t >( mainWeap->getAutoAttackDmg() * 2 ) ).next() );
+  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1567,10 +1626,10 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = damage;
+    entry.value = damage.first;
     entry.effectType = Common::ActionEffectType::Damage;
-    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
-    entry.param = variation;
+    entry.param0 = static_cast< uint8_t >( damage.second );
+    entry.param2 = 0x72;
 
     effectPacket->addEffect( entry );
 
@@ -1582,9 +1641,10 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = damage;
+    entry.value = damage.first;
     entry.effectType = Common::ActionEffectType::Damage;
-    entry.hitSeverity = Common::ActionHitSeverityType::NormalDamage;
+    entry.param0 = static_cast< uint8_t >( damage.second );
+    entry.param2 = 0x73;
 
     effectPacket->addEffect( entry );
 
@@ -1592,7 +1652,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   }
 
-  pTarget->takeDamage( damage );
+  pTarget->takeDamage( damage.first );
 
 }
 
@@ -1612,7 +1672,7 @@ void Sapphire::Entity::Player::setCFPenaltyTimestamp( uint32_t timestamp )
 
 uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 {
-  auto currentTimestamp = Sapphire::Util::getTimeSeconds();
+  auto currentTimestamp = Common::Util::getTimeSeconds();
   auto endTimestamp = getCFPenaltyTimestamp();
 
   // check if penalty timestamp already passed current time
@@ -1625,7 +1685,7 @@ uint32_t Sapphire::Entity::Player::getCFPenaltyMinutes() const
 
 void Sapphire::Entity::Player::setCFPenaltyMinutes( uint32_t minutes )
 {
-  auto currentTimestamp = Sapphire::Util::getTimeSeconds();
+  auto currentTimestamp = Common::Util::getTimeSeconds();
   setCFPenaltyTimestamp( currentTimestamp + minutes * 60 );
 }
 
@@ -1670,11 +1730,11 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( isLogin() )
   {
     //Update player map in servermgr - in case player name has been changed
-    auto pServerMgr = m_pFw->get< World::ServerMgr >();
-    pServerMgr->updatePlayerName( getId(), getName() );
+    auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+    serverMgr.updatePlayerName( getId(), getName() );
   }
 
-  getCurrentZone()->onBeforePlayerZoneIn( *this );
+  getCurrentTerritory()->onBeforePlayerZoneIn( *this );
 
   auto initPacket = makeZonePacket< FFXIVIpcInit >( getId() );
   initPacket->data().charId = getId();
@@ -1684,7 +1744,7 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   if( isLogin() )
   {
-    queuePacket( makeActorControl143( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+    queuePacket( makeActorControlSelf( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
@@ -1708,7 +1768,7 @@ void Sapphire::Entity::Player::sendZonePackets()
     }
     queuePacket( contentFinderList );
 
-    queuePacket( std::make_shared< InitUIPacket >( *this ) );
+    queuePacket( std::make_shared< PlayerSetupPacket >( *this ) );
 
     auto classInfoPacket = makeZonePacket< FFXIVIpcPlayerClassInfo >( getId() );
     classInfoPacket->data().classId = static_cast< uint8_t >( getClass() );
@@ -1721,8 +1781,8 @@ void Sapphire::Entity::Player::sendZonePackets()
     sendItemLevel();
   }
 
-  auto pHousingMgr = m_pFw->get< HousingMgr >();
-  if( Sapphire::LandPtr pLand = pHousingMgr->getLandByOwnerId( getId() ) )
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  if( Sapphire::LandPtr pLand = housingMgr.getLandByOwnerId( getId() ) )
   {
     uint32_t state = 0;
 
@@ -1740,17 +1800,17 @@ void Sapphire::Entity::Player::sendZonePackets()
   sendLandFlags();
 
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
-  initZonePacket->data().zoneId = getCurrentZone()->getTerritoryTypeId();
-  initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentZone()->getCurrentWeather() );
+  initZonePacket->data().zoneId = getCurrentTerritory()->getTerritoryTypeId();
+  initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentTerritory()->getCurrentWeather() );
   initZonePacket->data().bitmask = 0x1;
-  initZonePacket->data().festivalId = getCurrentZone()->getCurrentFestival().first;
-  initZonePacket->data().additionalFestivalId = getCurrentZone()->getCurrentFestival().second;
+  initZonePacket->data().festivalId = getCurrentTerritory()->getCurrentFestival().first;
+  initZonePacket->data().additionalFestivalId = getCurrentTerritory()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;
   queuePacket( initZonePacket );
 
-  getCurrentZone()->onPlayerZoneIn( *this );
+  getCurrentTerritory()->onPlayerZoneIn( *this );
 
   if( isLogin() )
   {
@@ -1789,8 +1849,8 @@ void
 Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0,
                                              bool shouldSetStatus = false )
 {
-  auto zoneInPacket = makeActorControl143( getId(), ZoneIn, param1, param2, param3, param4 );
-  auto SetStatusPacket = makeActorControl142( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+  auto zoneInPacket = makeActorControlSelf( getId(), ZoneIn, param1, param2, param3, param4 );
+  auto SetStatusPacket = makeActorControl( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
   if( !getGmInvis() )
     sendToInRangeSet( zoneInPacket );
@@ -1838,25 +1898,25 @@ void Sapphire::Entity::Player::finishZoning()
 
 void Sapphire::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent )
 {
-  sendToInRangeSet( makeActorControl144( getId(), ActorControlType::Emote,
+  sendToInRangeSet( makeActorControlTarget( getId(), ActorControlType::Emote,
                                          emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
 }
 
 void Sapphire::Entity::Player::emoteInterrupt()
 {
-  sendToInRangeSet( makeActorControl142( getId(), ActorControlType::EmoteInterrupt ) );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::EmoteInterrupt ) );
 }
 
 void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   // TODO: only register this action if enough gil is in possession
-  auto targetAetheryte = pExdData->get< Sapphire::Data::Aetheryte >( aetheryteId );
+  auto targetAetheryte = exdData.get< Sapphire::Data::Aetheryte >( aetheryteId );
 
   if( targetAetheryte )
   {
-    auto fromAetheryte = pExdData->get< Sapphire::Data::Aetheryte >(
-      pExdData->get< Sapphire::Data::TerritoryType >( getZoneId() )->aetheryte );
+    auto fromAetheryte = exdData.get< Sapphire::Data::Aetheryte >(
+      exdData.get< Sapphire::Data::TerritoryType >( getZoneId() )->aetheryte );
 
     // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
     auto cost = static_cast< uint16_t > (
@@ -1868,7 +1928,7 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
 
     bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
     // TODO: figure out what param1 really does
-    queuePacket( makeActorControl143( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+    queuePacket( makeActorControlSelf( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
 
     if( !insufficientGil )
     {
@@ -1908,6 +1968,36 @@ uint8_t Sapphire::Entity::Player::getNextObjSpawnIndexForActorId( uint32_t actor
   }
 
   return index;
+}
+
+void Sapphire::Entity::Player::setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot )
+{
+  m_dyeingInfo.itemToDyeContainer = itemToDyeContainer;
+  m_dyeingInfo.itemToDyeSlot = itemToDyeSlot;
+  m_dyeingInfo.dyeBagContainer = dyeBagContainer;
+  m_dyeingInfo.dyeBagSlot = dyeBagSlot;
+}
+
+void Sapphire::Entity::Player::dyeItemFromDyeingInfo()
+{
+  uint32_t itemToDyeContainer = m_dyeingInfo.itemToDyeContainer;
+  uint32_t itemToDyeSlot = m_dyeingInfo.itemToDyeSlot;
+  uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
+  uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
+
+  sendStateFlags(); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+  auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
+  auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
+
+  if ( !itemToDye || !dyeToUse ) return;
+
+  uint32_t stainColorID = dyeToUse->getAdditionalData();
+  itemToDye->setStain( stainColorID );
+
+  // TODO: subtract/remove dye used
+
+  insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
+  updateItemDb( itemToDye );
 }
 
 void Sapphire::Entity::Player::resetObjSpawnIndex()
@@ -2000,7 +2090,7 @@ Sapphire::Common::HuntingLogEntry& Sapphire::Entity::Player::getHuntingLogEntry(
 
 void Sapphire::Entity::Player::sendHuntingLog()
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   uint8_t count = 0;
   for( const auto& entry : m_huntingLogEntries )
   {
@@ -2017,7 +2107,7 @@ void Sapphire::Entity::Player::sendHuntingLog()
       bool allComplete = true;
       auto monsterNoteId = ( count + 1 ) * 10000 + entry.rank * 10 + i;
 
-      auto monsterNote = pExdData->get< Data::MonsterNote >( monsterNoteId );
+      auto monsterNote = exdData.get< Data::MonsterNote >( monsterNoteId );
       if( !monsterNote )
         continue;
 
@@ -2046,7 +2136,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 {
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
   const auto maxRank = 4;
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& pExdData = Common::Service< Data::ExdDataGenerated >::ref();
 
   auto& logEntry = m_huntingLogEntries[ static_cast< uint8_t >( getClass() ) - 1 ];
 
@@ -2054,7 +2144,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 
   // make sure we get the matching base-class if a job is being used
   auto currentClass = static_cast< uint8_t >( getClass() );
-  auto classJobInfo = pExdData->get< Sapphire::Data::ClassJob >( currentClass );
+  auto classJobInfo = pExdData.get< Sapphire::Data::ClassJob >( currentClass );
   if( !classJobInfo )
     return;
 
@@ -2064,7 +2154,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     bool sectionComplete = true;
     bool sectionChanged = false;
     uint32_t monsterNoteId = static_cast< uint32_t >( classJobInfo->classJobParent * 10000 + logEntry.rank * 10 + i );
-    auto note = pExdData->get< Sapphire::Data::MonsterNote >( monsterNoteId );
+    auto note = pExdData.get< Sapphire::Data::MonsterNote >( monsterNoteId );
 
     // for classes that don't have entries, if the first fails the rest will fail
     if( !note )
@@ -2072,11 +2162,11 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 
     for( auto x = 0; x < 4; ++x )
     {
-      auto note1 = pExdData->get< Sapphire::Data::MonsterNoteTarget >( note->monsterNoteTarget[ x ] );
+      auto note1 = pExdData.get< Sapphire::Data::MonsterNoteTarget >( note->monsterNoteTarget[ x ] );
       if( note1->bNpcName == id && logEntry.entries[ i - 1 ][ x ] < note->count[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
-        queuePacket( makeActorControl143( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
+        queuePacket( makeActorControlSelf( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
         logChanged = true;
         sectionChanged = true;
       }
@@ -2085,7 +2175,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     }
     if( logChanged && sectionComplete && sectionChanged )
     {
-      queuePacket( makeActorControl143( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
+      queuePacket( makeActorControlSelf( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
       gainExp( note->reward );
     }
     if( !sectionComplete )
@@ -2095,13 +2185,13 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
   }
   if( logChanged && allSectionsComplete )
   {
-    queuePacket( makeActorControl143( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
+    queuePacket( makeActorControlSelf( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
     gainExp( rankRewards[ logEntry.rank ] );
     if( logEntry.rank < 4 )
     {
       logEntry.rank++;
       memset( logEntry.entries, 0, 40 );
-      queuePacket( makeActorControl143( getId(), HuntingLogRankUnlock,
+      queuePacket( makeActorControlSelf( getId(), HuntingLogRankUnlock,
                                         static_cast< uint8_t >( getClass() ), logEntry.rank + 1, 0 ) );
     }
   }
@@ -2115,3 +2205,95 @@ Sapphire::World::SessionPtr Sapphire::Entity::Player::getSession()
   return m_pSession;
 }
 
+void Sapphire::Entity::Player::setActiveLand( uint8_t land, uint8_t ward )
+{
+  m_activeLand.plot = land;
+  m_activeLand.ward = ward;
+}
+
+Sapphire::Common::ActiveLand Sapphire::Entity::Player::getActiveLand() const
+{
+  return m_activeLand;
+}
+
+bool Sapphire::Entity::Player::hasQueuedAction() const
+{
+  return m_pQueuedAction != nullptr;
+}
+
+void Sapphire::Entity::Player::setQueuedAction( Sapphire::World::Action::ActionPtr pAction )
+{
+  m_pQueuedAction = std::move( pAction ); // overwrite previous queued action if any
+}
+
+bool Sapphire::Entity::Player::checkAction()
+{
+  if( m_pCurrentAction == nullptr )
+    return false;
+
+  if( m_pCurrentAction->update() )
+  {
+    if( m_pCurrentAction->isInterrupted() && m_pCurrentAction->getInterruptType() != Common::ActionInterruptType::DamageInterrupt )
+    {
+      // we moved (or whatever not damage interrupt) so we don't want to execute queued cast
+      m_pQueuedAction = nullptr;
+    }
+    m_pCurrentAction = nullptr;
+
+    if( hasQueuedAction() )
+    {
+      sendDebug( "Queued skill start: {0}", m_pQueuedAction->getId() );
+      if( m_pQueuedAction->hasCastTime() )
+      {
+        setCurrentAction( m_pQueuedAction );
+      }
+      m_pQueuedAction->start();
+      m_pQueuedAction = nullptr;
+    }
+  }
+
+  return true;
+}
+
+std::vector< Sapphire::Entity::ShopBuyBackEntry >& Sapphire::Entity::Player::getBuyBackListForShop( uint32_t shopId )
+{
+  return m_shopBuyBackMap[ shopId ];
+}
+
+void Sapphire::Entity::Player::addBuyBackItemForShop( uint32_t shopId, const Sapphire::Entity::ShopBuyBackEntry& entry )
+{
+  auto& list = m_shopBuyBackMap[ shopId ];
+  list.insert( list.begin(), entry );
+}
+
+void Sapphire::Entity::Player::clearBuyBackMap()
+{
+  for( auto& list : m_shopBuyBackMap )
+  {
+    for( auto& entry : list.second )
+    {
+      deleteItemDb( entry.item );
+    }
+  }
+  m_shopBuyBackMap.clear();
+}
+
+void Sapphire::Entity::Player::gaugeClear()
+{
+  std::memset( &m_gauge, 0, sizeof( m_gauge ) );
+}
+
+void Sapphire::Entity::Player::sendActorGauge()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcActorGauge >( getId() );
+  pPacket->data().classJobId = static_cast< uint8_t >( getClass() );
+  std::memcpy( pPacket->data().data, &m_gauge, 15 );
+
+  queuePacket( pPacket );
+}
+
+void Sapphire::Entity::Player::gaugeSetRaw( uint8_t* pData )
+{
+  std::memcpy( &m_gauge, pData, 15 );
+  sendActorGauge();
+}

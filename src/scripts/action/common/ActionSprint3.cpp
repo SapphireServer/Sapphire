@@ -11,12 +11,14 @@ public:
   {
   }
 
-  void onExecute( Sapphire::Action::Action& action ) override
+  void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto sourceChara = action.getSourceChara();
 
     if( !sourceChara->isPlayer() )
       return;
+
+    action.getEffectbuilder()->applyStatusEffect( sourceChara, 50, 30 );
 
     sourceChara->getAsPlayer()->addStatusEffectByIdIfNotExist( 50, 20000, *sourceChara, 30 );
   }

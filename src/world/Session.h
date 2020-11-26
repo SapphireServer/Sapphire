@@ -11,7 +11,7 @@ namespace Sapphire::World
   class Session : public std::enable_shared_from_this< Session >
   {
   public:
-    Session( uint32_t sessionId, FrameworkPtr pFw );
+    Session( uint32_t sessionId );
 
     ~Session() = default;
 
@@ -66,8 +66,6 @@ namespace Sapphire::World
 
     Network::GameConnectionPtr m_pZoneConnection;
     Network::GameConnectionPtr m_pChatConnection;
-
-    FrameworkPtr m_pFw;
 
   };
 

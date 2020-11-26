@@ -2,92 +2,111 @@
 
 #include <Exd/ExdDataGenerated.h>
 #include <Common.h>
+#include <Logging/Logger.h>
+#include <Service.h>
 
 #include "Actor/Chara.h"
-
 #include "Actor/Player.h"
 
+#include "Inventory/Item.h"
+
 #include "CalcStats.h"
-#include "Framework.h"
 
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 
-const int levelTable[71][7] =
+const int levelTable[81][6] =
 { 
-// PIE, MP, MAIN,SUB,DIV,HP,ELMT,THREAT
-  { 1, 1, 1, 1, 1, 1, 1 },
-  { 50, 104, 20, 56, 56, 0, 52 },
-  { 55, 114, 21, 57, 57, 0, 54 },
-  { 60, 123, 22, 60, 60, 0, 56 },
-  { 65, 133, 24, 62, 62, 0, 58 },
-  { 70, 142, 26, 65, 65, 0, 60 },
-  { 75, 152, 27, 68, 68, 0, 62 },
-  { 80, 161, 29, 70, 70, 0, 64 },
-  { 85, 171, 31, 73, 73, 0, 66 },
-  { 90, 180, 33, 76, 76, 0, 68 },
-  { 95, 190, 35, 78, 78, 0, 70 },
-  { 100, 209, 36, 82, 82, 0, 73 },
-  { 105, 228, 38, 85, 85, 0, 75 },
-  { 110, 247, 41, 89, 89, 0, 78 },
-  { 115, 266, 44, 93, 93, 0, 81 },
-  { 120, 285, 46, 96, 96, 0, 84 },
-  { 125, 304, 49, 100, 100, 0, 86 },
-  { 130, 323, 52, 104, 104, 0, 89 },
-  { 135, 342, 54, 109, 109, 0, 93 },
-  { 140, 361, 57, 113, 113, 0, 95 },
-  { 145, 380, 60, 116, 116, 0, 98 },
-  { 150, 418, 63, 122, 122, 0, 102 },
-  { 155, 456, 67, 127, 127, 0, 105 },
-  { 160, 494, 71, 133, 133, 0, 109 },
-  { 165, 532, 74, 138, 138, 0, 113 },
-  { 170, 570, 78, 144, 144, 0, 117 },
-  { 175, 608, 81, 150, 150, 0, 121 },
-  { 180, 646, 85, 155, 155, 0, 125 },
-  { 185, 684, 89, 162, 162, 0, 129 },
-  { 190, 722, 92, 168, 168, 0, 133 },
-  { 195, 760, 97, 173, 173, 0, 137 },
-  { 200, 826, 101, 181, 181, 0, 143 },
-  { 205, 893, 106, 188, 188, 0, 148 },
-  { 210, 959, 110, 194, 194, 0, 153 },
-  { 215, 1026, 115, 202, 202, 0, 159 },
-  { 220, 1092, 119, 209, 209, 0, 165 },
-  { 225, 1159, 124, 215, 215, 0, 170 },
-  { 230, 1225, 128, 223, 223, 0, 176 },
-  { 235, 1292, 134, 229, 229, 0, 181 },
-  { 240, 1358, 139, 236, 236, 0, 186 },
-  { 245, 1425, 144, 244, 244, 0, 192 },
-  { 250, 1548, 150, 253, 253, 0, 200 },
-  { 255, 1672, 155, 263, 263, 0, 207 },
-  { 260, 1795, 161, 272, 272, 0, 215 },
-  { 265, 1919, 166, 283, 283, 0, 223 },
-  { 270, 2042, 171, 292, 292, 0, 231 },
-  { 275, 2166, 177, 302, 302, 0, 238 },
-  { 280, 2289, 183, 311, 311, 0, 246 },
-  { 285, 2413, 189, 322, 322, 0, 254 },
-  { 290, 2536, 196, 331, 331, 0, 261 },
-  { 300, 2660, 202, 341, 341, 1700, 269 },
-  { 315, 3000, 204, 342, 393, 1774, 270 },
-  { 330, 3380, 205, 344, 444, 1851, 271 },
-  { 360, 3810, 207, 345, 496, 1931, 273 },
-  { 390, 4300, 209, 346, 548, 2015, 274 },
-  { 420, 4850, 210, 347, 600, 2102, 275 },
-  { 450, 5470, 212, 349, 651, 2194, 276 },
-  { 480, 6170, 214, 350, 703, 2289, 278 },
-  { 510, 6950, 215, 351, 755, 2388, 279 },
-  { 540, 7840, 217, 352, 806, 2492, 280 },
-  { 620, 8840, 218, 354, 858, 2600, 282 },
-  { 650, 8980, 224, 355, 941, 2700, 283 },
-  { 680, 9150, 228, 356, 1032, 2800, 284 },
-  { 710, 9350, 236, 357, 1133, 2900, 286 },
-  { 740, 9590, 244, 358, 1243, 3000, 287 },
-  { 770, 9870, 252, 359, 1364, 3100, 288 },
-  { 800, 10190, 260, 360, 1497, 3200, 290 },
-  { 830, 10560, 268, 361, 1643, 3300, 292 },
-  { 860, 10980, 276, 362, 1802, 3400, 293 },
-  { 890, 11450, 284, 363, 1978, 3500, 294 },
-  { 890, 12000, 292, 364, 2170, 3600, 295 } 
+  // MAIN,SUB,DIV,HP,ELMT,THREAT
+  { 1, 1, 1, 1, 1, 1 },
+  { 20, 56, 56, 86, 52, 2 },
+  { 21, 57, 57, 101, 54, 2 },
+  { 22, 60, 60, 109, 56, 3 },
+  { 24, 62, 62, 116, 58, 3 },
+  { 26, 65, 65, 123, 60, 3 },
+  { 27, 68, 68, 131, 62, 3 },
+  { 29, 70, 70, 138, 64, 4 },
+  { 31, 73, 73, 145, 66, 4 },
+  { 33, 76, 76, 153, 68, 4 },
+  { 35, 78, 78, 160, 70, 5 },
+  { 36, 82, 82, 174, 73, 5 },
+  { 38, 85, 85, 188, 75, 5 },
+  { 41, 89, 89, 202, 78, 6 },
+  { 44, 93, 93, 216, 81, 6 },
+  { 46, 96, 96, 230, 84, 7 },
+  { 49, 100, 100, 244, 86, 7 },
+  { 52, 104, 104, 258, 89, 8 },
+  { 54, 109, 109, 272, 93, 9 },
+  { 57, 113, 113, 286, 95, 9 },
+  { 60, 116, 116, 300, 98, 10 },
+  { 63, 122, 122, 333, 102, 10 },
+  { 67, 127, 127, 366, 105, 11 },
+  { 71, 133, 133, 399, 109, 12 },
+  { 74, 138, 138, 432, 113, 13 },
+  { 78, 144, 144, 465, 117, 14 },
+  { 81, 150, 150, 498, 121, 15 },
+  { 85, 155, 155, 531, 125, 16 },
+  { 89, 162, 162, 564, 129, 17 },
+  { 92, 168, 168, 597, 133, 18 },
+  { 97, 173, 173, 630, 137, 19 },
+  { 101, 181, 181, 669, 143, 20 },
+  { 106, 188, 188, 708, 148, 22 },
+  { 110, 194, 194, 747, 153, 23 },
+  { 115, 202, 202, 786, 159, 25 },
+  { 119, 209, 209, 825, 165, 27 },
+  { 124, 215, 215, 864, 170, 29 },
+  { 128, 223, 223, 903, 176, 31 },
+  { 134, 229, 229, 942, 181, 33 },
+  { 139, 236, 236, 981, 186, 35 },
+  { 144, 244, 244, 1020, 192, 38 },
+  { 150, 253, 253, 1088, 200, 40 },
+  { 155, 263, 263, 1156, 207, 43 },
+  { 161, 272, 272, 1224, 215, 46 },
+  { 166, 283, 283, 1292, 223, 49 },
+  { 171, 292, 292, 1360, 231, 52 },
+  { 177, 302, 302, 1428, 238, 55 },
+  { 183, 311, 311, 1496, 246, 58 },
+  { 189, 322, 322, 1564, 254, 62 },
+  { 196, 331, 331, 1632, 261, 66 },
+  { 202, 341, 341, 1700, 269, 70 },
+  { 204, 342, 393, 1774, 270, 84 },
+  { 205, 344, 444, 1851, 271, 99 },
+  { 207, 345, 496, 1931, 273, 113 },
+  { 209, 346, 548, 2015, 274, 128 },
+  { 210, 347, 600, 2102, 275, 142 },
+  { 212, 349, 651, 2194, 276, 157 },
+  { 214, 350, 703, 2289, 278, 171 },
+  { 215, 351, 755, 2388, 279, 186 },
+  { 217, 352, 806, 2492, 280, 200 },
+  { 218, 354, 858, 2600, 282, 215 },
+  { 224, 355, 941, 2700, 283, 232 },
+  { 228, 356, 1032, 2800, 284, 250 },
+  { 236, 357, 1133, 2900, 286, 269 },
+  { 244, 358, 1243, 3000, 287, 290 },
+  { 252, 359, 1364, 3100, 288, 313 },
+  { 260, 360, 1497, 3200, 290, 337 },
+  { 268, 361, 1643, 3300, 292, 363 },
+  { 276, 362, 1802, 3400, 293, 392 },
+  { 284, 363, 1978, 3500, 294, 422 },
+  { 292, 364, 2170, 3600, 295, 455 },
+
+  // todo: add proper shbr values - hp/elmt/threat
+  // sub/div added from http://theoryjerks.akhmorning.com/resources/levelmods/
+  { 296, 365, 2263, 3600, 295, 466 },
+  { 300, 366, 2360, 3600, 295, 466 },
+  { 305, 367, 2461, 3600, 295, 466 },
+  { 310, 368, 2566, 3600, 295, 466 },
+  { 315, 370, 2676, 3600, 295, 466 },
+  { 320, 372, 2790, 3600, 295, 466 },
+  { 325, 374, 2910, 3600, 295, 466 },
+  { 330, 376, 3034, 3600, 295, 466 },
+  { 335, 378, 3164, 3600, 295, 466 },
+  { 340, 380, 3300, 3600, 569, 569 },
 };
+
+std::random_device CalcStats::dev;
+std::mt19937 CalcStats::rng( dev() );
+std::uniform_int_distribution< std::mt19937::result_type > CalcStats::range100( 0, 99 );
 
 /*
    Class used for battle-related formulas and calculations.
@@ -108,29 +127,29 @@ const int levelTable[71][7] =
 // 3 Versions. SB and HW are linear, ARR is polynomial.
 // Originally from Player.cpp, calculateStats().
 
-float CalcStats::calculateBaseStat( PlayerPtr pPlayer )
+float CalcStats::calculateBaseStat( const Chara& chara )
 {
   float base = 0.0f;
-  uint8_t level = pPlayer->getLevel();
+  uint8_t level = chara.getLevel();
 
-  if( level > 70 )
-    level = 70;
+  if( level > Common::MAX_PLAYER_LEVEL )
+    level = Common::MAX_PLAYER_LEVEL;
 
-  return static_cast< float >( levelTable[level][2] );
+  return static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 }
 
 // Leggerless' HP Formula
 // ROUNDDOWN(JobModHP * (BaseHP / 100)) + ROUNDDOWN(VitHPMod / 100 * (VIT - BaseDET))
 
-uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pFw )
+uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 {
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
+  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
@@ -138,20 +157,23 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   uint8_t level = pPlayer->getLevel();
 
   auto vitMod = pPlayer->getBonusStat( Common::BaseParam::Vitality );
-  float baseStat = calculateBaseStat( pPlayer );
-  uint16_t vitStat = pPlayer->getStats().vit + static_cast< uint16_t >( vitMod );
+  float baseStat = calculateBaseStat( *pPlayer );
+  uint16_t vitStat = static_cast< uint16_t >( pPlayer->getStats().vit ) + static_cast< uint16_t >( vitMod );
   uint16_t hpMod = paramGrowthInfo->hpModifier;
   uint16_t jobModHp = classInfo->modifierHitPoints;
   float approxBaseHp = 0.0f; // Read above
 
   // These values are not precise.
-
+  /*
   if( level >= 60 )
     approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
   else if( level >= 50 )
     approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
   else
     approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
+  */
+  // just use the table at least better than what it was
+  approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
                                              floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
@@ -159,116 +181,10 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pF
   return result;
 }
 
-// Leggerless' MP Formula
-// ROUNDDOWN(((ROUNDDOWN(((PIE - BaseDET) * PieMPMod/100),0) + BaseMP) * JobModMP / 100),0)
-
-uint32_t CalcStats::calculateMaxMp( PlayerPtr pPlayer, Sapphire::FrameworkPtr pFw )
-{
-  auto pExdData = pFw->get< Data::ExdDataGenerated >();
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
-
-  if( !classInfo || !paramGrowthInfo )
-    return 0;
-
-  auto pieMod = pPlayer->getBonusStat( Common::BaseParam::Piety );
-
-  float baseStat = calculateBaseStat( pPlayer );
-  uint16_t piety = pPlayer->getStats().pie + pieMod;
-  uint16_t pietyScalar = paramGrowthInfo->mpModifier;
-  uint16_t jobModMp = classInfo->modifierManaPoints;
-  uint16_t baseMp = paramGrowthInfo->mpModifier;
-
-  uint16_t result = static_cast< uint16_t >( floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) *
-                                             jobModMp / 100 );
-
-  return result;
-}
-
-uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
-{
-  auto level = chara.getLevel();
-
-  // each level range is 1-10, 11-20, 21-30, ... therefore:
-  // level 50 should be in the 4th group, not the 5t
-  // dividing by 10 on the border will break this unless we subtract 1
-  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
-
-  float cost = baseCost;
-
-  // thanks to andrew for helping me figure this shit out
-  // played with this some more and it seems to be accurate for everything i've tried
-  switch( levelGroup )
-  {
-    // level 1-10
-    case 0:
-    {
-      // r^2 = 0.9999
-      cost = 0.0952f * level + 0.9467f;
-      break;
-    }
-
-    // level 11-20
-    case 1:
-    {
-      // r^2 = 1
-      cost = 0.19f * level;
-      break;
-    }
-
-    // level 21-30
-    case 2:
-    {
-      // r^2 = 1
-      cost = 0.38f * level - 3.8f;
-      break;
-    }
-
-    // level 31-40
-    case 3:
-    {
-      // r^2 = 1
-      cost = 0.6652f * level - 12.358f;
-      break;
-    }
-
-    // level 41-50
-    case 4:
-    {
-      // r^2 = 1
-      cost = 1.2352f * level - 35.159f;
-      break;
-    }
-
-    // level 51-60
-    case 5:
-    {
-      // r^2 = 1
-      cost = 0.0654f * std::exp( 0.1201f * level );
-      break;
-    }
-
-    // level 61-70
-    case 6:
-    {
-      // r^2 = 0.9998
-      cost = 0.2313f * ( level * level ) - 26.98f * level + 875.21f;
-      break;
-    }
-
-    default:
-    {
-      return 0;
-    }
-  }
-
-  return static_cast< uint16_t >( std::round( cost * baseCost ) );
-}
-
 float CalcStats::blockProbability( const Chara& chara )
 {
   auto level = chara.getLevel();
-  auto blockRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockRate ) );
+  auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
@@ -279,8 +195,7 @@ float CalcStats::directHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float dhRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::DirectHitRate ) ) +
-                 baseStats.accuracy;
+  float dhRate = chara.getStatValue( Common::BaseParam::DirectHitRate );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -293,8 +208,7 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float chRate = static_cast< float >( chara.getBonusStat( Common::BaseParam::CriticalHit ) ) +
-                 baseStats.critHitRate;
+  float chRate = chara.getStatValue( Common::BaseParam::CriticalHit );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -308,77 +222,135 @@ float CalcStats::potency( uint16_t potency )
   return potency / 100.f;
 }
 
-//float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage, bool isMagicDamage )
-//{
-//  const auto& baseStats = chara.getStats();
-//  auto level = chara.getLevel();
-//
-//  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
-//
-//  float jobAttribute = 1.f;
-//
-//  // todo: fix this
-//  return 1.f
-//}
-
-// todo: this is all retarded, needs to be per weapon and etcetc
-//uint32_t CalcStats::getPrimaryClassJobAttribute( const Sapphire::Entity::Chara& chara )
-//{
-//
-//}
-
-float CalcStats::calcAttackPower( uint32_t attackPower )
+float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
 {
-  return std::floor( ( 125.f * ( attackPower - 292.f ) / 292.f ) + 100.f ) / 100.f;
+  uint32_t aaPotency = AUTO_ATTACK_POTENCY;
+
+  if( chara.getRole() == Common::Role::RangedPhysical )
+  {
+    aaPotency = RANGED_AUTO_ATTACK_POTENCY;
+  }
+
+  float autoAttackDelay = 2.5f;
+  // fetch actual auto attack delay if its a player
+  if( chara.isPlayer() )
+  {
+    // todo: ew
+    auto pPlayer = const_cast< Entity::Chara& >( chara ).getAsPlayer();
+    assert( pPlayer );
+
+    auto pItem = pPlayer->getEquippedWeapon();
+    assert( pItem );
+
+    autoAttackDelay = pItem->getDelay() / 1000.f;
+  }
+
+  // factors in f(PTC) in order to not lose precision
+  return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
 }
 
-float CalcStats::magicAttackPower( const Sapphire::Entity::Chara& chara )
+float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
+{
+  const auto& baseStats = chara.getStats();
+  auto level = chara.getLevel();
+
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+
+  uint32_t jobAttribute = 1;
+
+  switch( chara.getPrimaryStat() )
+  {
+    case Common::BaseParam::Intelligence:
+    {
+      jobAttribute = baseStats.healingPotMagic;
+      break;
+    }
+    case Common::BaseParam::Mind:
+    {
+      jobAttribute = baseStats.attackPotMagic;
+      break;
+    }
+
+    default:
+    {
+      jobAttribute = baseStats.attack;
+      break;
+    }
+  }
+
+  return std::floor( ( ( mainVal * jobAttribute ) / 1000.f ) + weaponDamage );
+}
+
+float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower )
+{
+  auto level = chara.getLevel();
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  // todo: not sure if its ( ap - mv ) / mv or ( ap - mv ) / dv
+  return std::floor( ( 125.f * ( attackPower - mainVal ) / divVal ) + 100.f ) / 100.f;
+}
+
+float CalcStats::getPrimaryAttackPower( const Sapphire::Entity::Chara& chara )
 {
   const auto& baseStats = chara.getStats();
 
-  return calcAttackPower( baseStats.attackPotMagic );
-}
+  switch( chara.getPrimaryStat() )
+  {
+    case Common::BaseParam::Mind:
+    {
+      return healingMagicPower( chara );
+    }
+    case Common::BaseParam::Intelligence:
+    {
+      return magicAttackPower( chara );
+    }
 
-float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
-{
-  const auto& baseStats = chara.getStats();
-
-  return calcAttackPower( baseStats.healingPotMagic );
+    default:
+    {
+      return attackPower( chara );
+    }
+  }
 }
 
 float CalcStats::attackPower( const Sapphire::Entity::Chara& chara )
 {
-  const auto& baseStats = chara.getStats();
+  return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::AttackPower ) );
+}
 
-  return calcAttackPower( baseStats.attack );
+float CalcStats::magicAttackPower( const Sapphire::Entity::Chara& chara )
+{
+  return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::AttackMagicPotency ) );
+}
+
+float CalcStats::healingMagicPower( const Sapphire::Entity::Chara& chara )
+{
+  return calcAttackPower( chara, chara.getStatValue( Common::BaseParam::HealingMagicPotency ) );
 }
 
 float CalcStats::determination( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 130.f * ( baseStats.determination - mainVal ) / divVal + 1000.f ) / 1000.f;
+  return std::floor( 130.f * ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal + 1000.f ) / 1000.f;
 }
 
 float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 100.f * ( baseStats.tenacity - subVal ) / divVal + 1000.f ) / 1000.f;
+  return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::Tenacity ) - subVal ) / divVal + 1000.f ) / 1000.f;
 }
 
 float CalcStats::speed( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -386,23 +358,15 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
   uint32_t speedVal = 0;
 
   // check whether we use spellspeed or skillspeed
-  // todo: this is kinda shitty though
-  switch( chara.getClass() )
+  switch( chara.getPrimaryStat() )
   {
-    case Common::ClassJob::Arcanist:
-    case Common::ClassJob::Astrologian:
-    case Common::ClassJob::Whitemage:
-    case Common::ClassJob::Redmage:
-    case Common::ClassJob::Bluemage:
-    case Common::ClassJob::Blackmage:
-    case Common::ClassJob::Summoner:
-    case Common::ClassJob::Scholar:
-    case Common::ClassJob::Thaumaturge:
-      speedVal = baseStats.spellSpeed;
+    case Common::BaseParam::Intelligence:
+    case Common::BaseParam::Mind:
+      speedVal = chara.getStatValue( Common::BaseParam::SpellSpeed );
       break;
 
     default:
-      speedVal = baseStats.skillSpeed;
+      speedVal = chara.getStatValue( Common::BaseParam::SkillSpeed );
   }
 
   return std::floor( 130.f * ( speedVal - subVal ) / divVal + 1000.f ) / 1000.f;
@@ -411,42 +375,194 @@ float CalcStats::speed( const Sapphire::Entity::Chara& chara )
 float CalcStats::criticalHitBonus( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 200.f * ( baseStats.critHitRate - subVal ) / divVal + 1400.f ) / 1000.f;
+  return std::floor( 200.f * ( chara.getStatValue( Common::BaseParam::CriticalHit ) - subVal ) / divVal + 1400.f ) / 1000.f;
 }
 
 float CalcStats::physicalDefence( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 15.f * baseStats.defense ) / 100.f;
+  return std::floor( 15.f * chara.getStatValue( Common::BaseParam::Defense ) ) / 100.f;
 }
 
 float CalcStats::magicDefence( const Sapphire::Entity::Chara& chara )
 {
   auto level = chara.getLevel();
-  const auto& baseStats = chara.getStats();
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 15.f * baseStats.magicDefense ) / 100.f;
+  return std::floor( 15.f * chara.getStatValue( Common::BaseParam::MagicDefense ) ) / 100.f;
 }
 
-//float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
-//{
-//
-//}
+float CalcStats::blockStrength( const Sapphire::Entity::Chara& chara )
+{
+  auto level = chara.getLevel();
+  auto blockStrength = static_cast< float >( chara.getBonusStat( Common::BaseParam::BlockStrength ) );
+  auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
+
+  return std::floor( ( 30 * blockStrength ) / levelVal + 10 ) / 100.f;
+}
+
+float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
+{
+  // todo: default values for NPCs, not sure what we should have here
+  float autoAttackDelay = 2.f;
+  float weaponDamage = 10.f;
+
+  // fetch actual auto attack delay if its a player
+  if( chara.isPlayer() )
+  {
+    // todo: ew
+    auto pPlayer = const_cast< Entity::Chara& >( chara ).getAsPlayer();
+    assert( pPlayer );
+
+    auto pItem = pPlayer->getEquippedWeapon();
+    assert( pItem );
+
+    autoAttackDelay = pItem->getDelay() / 1000.f;
+    weaponDamage = pItem->getWeaponDmg();
+  }
+
+  auto level = chara.getLevel();
+  auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
+
+  auto innerCalc = std::floor( ( mainVal * primaryStatValue( chara ) / 1000.f ) + weaponDamage );
+
+  return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
+}
 
 float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
 {
-  const auto& baseStats = chara.getStats();
+  return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
+}
 
-  return std::floor( 100.f * ( baseStats.healingPotMagic - 292.f ) / 264.f + 100.f ) / 100.f;
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+{
+  // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
+  // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
+
+  auto pot = autoAttackPotency( chara );
+  auto aa = autoAttack( chara );
+  auto ap = getPrimaryAttackPower( chara );
+  auto det = determination( chara );
+
+  auto ten = 1.f;
+  if( chara.getRole() == Common::Role::Tank )
+    ten = tenacity( chara );
+
+  // todo: everything after tenacity
+  auto factor = std::floor( pot * aa * ap * det * ten );
+  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+
+  // todo: traits
+
+  factor = std::floor( factor * speed( chara ) );
+
+  if( criticalHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= criticalHitBonus( chara );
+    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+  }
+
+  if( directHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= 1.25f;
+    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
+                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
+                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
+  }
+
+  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  // todo: buffs
+
+  constexpr auto format = "auto attack: pot: {} aa: {} ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, aa, ap, det, ten, factor );
+  }
+  else
+  {
+    Logger::debug( format, pot, aa, ap, det, ten, factor );
+  }
+
+  return std::pair( factor, hitType );
+}
+
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
+  // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
+
+  auto pot = potency( static_cast< uint16_t >( ptc ) );
+  auto wd = weaponDamage( chara, wepDmg );
+  auto ap = getPrimaryAttackPower( chara );
+  auto det = determination( chara );
+
+  auto ten = 1.f;
+  if( chara.getRole() == Common::Role::Tank )
+    ten = tenacity( chara );
+
+  auto factor = std::floor( pot * wd * ap * det * ten );
+  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+
+  if( criticalHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= criticalHitBonus( chara );
+    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+  }
+
+  if( directHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= 1.25f;
+    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
+                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
+                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
+  }
+
+  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  // todo: buffs
+
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
+
+  if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
+  {
+    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+  }
+  else
+  {
+    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+  }
+
+  return std::pair( factor, hitType );
+}
+
+std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+{
+  // lol just for testing
+  auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );
+  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
+
+  if( criticalHitProbability( chara ) > range100( rng ) )
+  {
+    factor *= criticalHitBonus( chara );
+    hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
+  }
+
+  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+
+  return std::pair( factor, hitType );
+}
+
+uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
+{
+  return chara.getStatValue( chara.getPrimaryStat() );
 }

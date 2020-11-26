@@ -1,7 +1,7 @@
 #include <Actor/Player.h>
 #include <Manager/EventMgr.h>
 #include <ScriptObject.h>
-#include "Framework.h"
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -56,8 +56,8 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+    auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Actor0 )
     {
@@ -93,6 +93,7 @@ private:
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         player.setQuestUI8BH( getId(), 1 );
+                        player.sendQuestMessage( getId(), 0, 0, 0, 0 );
                         player.updateQuest( getId(), SeqFinish );
                       } );
   }
@@ -102,14 +103,7 @@ private:
     player.playScene( getId(), 2, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
-                        {
-                          Scene00100( player );
-                        }
-                        else
-                        {
-                          Scene00099( player );
-                        }
+                        result.param2 == 1 ? Scene00100( player ) :  Scene00099( player );
                       } );
   }
 
@@ -131,7 +125,7 @@ private:
                         {
                           if( player.giveQuestRewards( getId(), 0 ) )
                           {
-                            player.setQuestUI8BH( getId(), 0 );
+                            player.setQuestUI8BH( getId(), result.param3 );
                             player.finishQuest( getId() );
                           }
                         }

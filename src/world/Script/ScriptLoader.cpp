@@ -5,11 +5,9 @@
 #include <Util/Util.h>
 #include "ServerMgr.h"
 
-#include <experimental/filesystem>
+#include <filesystem>
 
-#include "Framework.h"
-
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 const std::string Sapphire::Scripting::ScriptLoader::getModuleExtension()
 {
@@ -154,7 +152,7 @@ bool Sapphire::Scripting::ScriptLoader::isModuleLoaded( std::string name )
   for( auto it = m_scriptMap.begin(); it != m_scriptMap.end(); ++it )
   {
 
-    if( Util::toLowerCopy( it->second->library_name ) == Util::toLowerCopy( name ) )
+    if( Common::Util::toLowerCopy( it->second->library_name ) == Common::Util::toLowerCopy( name ) )
       return true;
   }
 

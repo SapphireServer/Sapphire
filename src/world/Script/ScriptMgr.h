@@ -7,12 +7,11 @@
 
 #include <Common.h>
 #include "Forwards.h"
-#include "Manager/BaseManager.h"
 
 namespace Sapphire::Scripting
 {
 
-  class ScriptMgr : public World::Manager::BaseManager
+  class ScriptMgr
   {
   private:
     /*!
@@ -29,7 +28,7 @@ namespace Sapphire::Scripting
     bool m_firstScriptChangeNotificiation;
 
   public:
-    ScriptMgr( FrameworkPtr pFw );
+    ScriptMgr();
 
     ~ScriptMgr();
 
@@ -72,11 +71,11 @@ namespace Sapphire::Scripting
 
     bool onEObjHit( Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
-    bool onStart( Action::Action& action );
+    bool onStart( World::Action::Action& action );
 
-    bool onInterrupt( Action::Action& action );
+    bool onInterrupt( World::Action::Action& action );
 
-    bool onExecute( Action::Action& action );
+    bool onExecute( World::Action::Action& action );
 
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
 
@@ -84,7 +83,7 @@ namespace Sapphire::Scripting
 
     bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 
-    bool onZoneInit( ZonePtr pZone );
+    bool onZoneInit( TerritoryPtr pZone );
 
     bool onEventHandlerReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param1,
                                uint16_t param2, uint16_t param3 );

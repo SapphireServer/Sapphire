@@ -4,10 +4,8 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire {
-namespace Network {
-namespace Packets {
-namespace Client {
+namespace Sapphire::Network::Packets::Client
+{
 
 struct FFXIVIpcGmCommand1 :
   FFXIVIpcBasePacket< GMCommand1 >
@@ -51,14 +49,25 @@ struct FFXIVIpcUpdatePosition :
   FFXIVIpcBasePacket< UpdatePositionHandler >
 {
   /* 0000 */ float rotation;
-  /* 0004 */ uint8_t unk_1[ 3 ];
+  /* 0004 */ uint8_t animationType;
+  /* 0005 */ uint8_t animationState;
+  /* 0006 */ uint8_t clientAnimationType;
   /* 0007 */ uint8_t headPosition;
-  /* 0008 */ uint8_t animationType;
-  /* 0009 */ uint8_t animationState;
-  /* 000A */ uint8_t clientAnimationType;
-  /* 000B */ uint8_t unk_2;
-  /* 000C */ Common::FFXIVARR_POSITION3 position;
+  /* 0008 */ Common::FFXIVARR_POSITION3 position;
+  /* 000C */ uint8_t unk[ 4 ]; // padding?
 };
+  
+  struct FFXIVIpcUpdatePositionInstance :
+  FFXIVIpcBasePacket< UpdatePositionInstance >
+{
+  /* 0000 */ float rotation;
+  /* 0004 */ float interpolateRotation;
+  /* 0008 */ uint32_t flags;
+  /* 000C */ Common::FFXIVARR_POSITION3 position;
+  /* 0018 */ Common::FFXIVARR_POSITION3 interpolatePosition;
+  /* 0024 */ uint32_t unknown;
+};
+
 
 struct FFXIVIpcSkillHandler :
   FFXIVIpcBasePacket< SkillHandler >
@@ -198,6 +207,13 @@ struct FFXIVIpcChatHandler :
   /* 001A */ char message[1012];
 };
 
+struct FFXIVIpcPartyChatHandler :
+  FFXIVIpcBasePacket< ChatHandler >
+{
+  uint64_t unknown;
+  char message[1024];
+};
+
 struct FFXIVIpcShopEventHandler :
   FFXIVIpcBasePacket< ShopEventHandler >
 {
@@ -219,7 +235,7 @@ struct FFXIVIpcInventoryModifyHandler :
 {
   /* 0000 */ uint32_t seq;
   /* 0004 */ Common::InventoryOperation action;
-  /* 0005 */ uint8_t pad_0005[7];
+  /* 0006 */ uint8_t pad_0006[6];
   /* 000C */ uint16_t fromContainer;
   /* 000E */ uint8_t pad_000E[2];
   /* 0010 */ uint8_t fromSlot;
@@ -325,9 +341,91 @@ struct FFXIVIpcMarketBoardRequestItemListingInfo :
   /* 0000 */ uint32_t requestId;
 };
 
-}
-}
-}
+struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
+  FFXIVIpcBasePacket< FreeCompanyUpdateShortMessageHandler >
+{
+  char shortMessage[104];
+  uint8_t padding;
+  uint8_t unknown;
+  uint32_t unknown1;
+  uint16_t unknown2;
+};
+
+struct FFXIVIpcWorldInteractionHandler :
+  FFXIVIpcBasePacket< WorldInteractionHandler >
+{
+  uint32_t action;
+  uint32_t param1;
+  uint32_t param2;
+  uint32_t param3;
+  uint32_t param4;
+  Common::FFXIVARR_POSITION3 position;
+};
+
+struct FFXIVIpcSocialReqSendHandler :
+  FFXIVIpcBasePacket< SocialReqSendHandler >
+{
+  uint64_t unknown;
+  uint8_t p1;
+  uint8_t p2;
+  uint8_t socialType;
+  char name[32];
+  uint8_t padding[5];
+};
+
+struct FFXIVIpcSocialResponseHandler :
+  FFXIVIpcBasePacket< SocialResponseHandler >
+{
+  uint64_t contentId;
+  uint8_t p1;
+  uint8_t p2;
+  uint8_t socialType;
+  uint8_t response;
+  uint32_t unknown;
+};
+
+struct FFXIVIpcPartySetLeaderHandler :
+  FFXIVIpcBasePacket< PartySetLeaderHandler >
+{
+  uint64_t contentId;
+  uint8_t p1;
+  uint8_t p2;
+  char name[32];
+  uint8_t padding[6];
+};
+
+struct FFXIVIpcLeavePartyHandler :
+  FFXIVIpcBasePacket< LeavePartyHandler >
+{
+  uint64_t empty;
+};
+
+struct FFXIVIpcKickPartyMemberHander :
+  FFXIVIpcBasePacket< KickPartyMemberHandler >
+{
+  uint64_t contentId;
+  uint8_t p1;
+  uint8_t p2;
+  char name[32];
+  uint8_t padding[6];
+};
+
+struct FFXIVIpcDisbandPartyHandler :
+  FFXIVIpcBasePacket< DisbandPartyHandler >
+{
+  uint64_t empty;
+};
+
+
+struct FFXIVIpcDive :
+  FFXIVIpcBasePacket< Dive >
+{
+  float unknown;
+  Common::FFXIVARR_POSITION3 posTarget;
+  Common::FFXIVARR_POSITION3 posOriginal;
+  uint32_t padding;
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H

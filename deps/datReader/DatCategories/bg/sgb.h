@@ -22,15 +22,13 @@ struct SGB_GROUP;
 struct SGB_GROUP_HEADER;
 
 
-enum SgbDataType :
-  uint32_t
+enum SgbDataType : uint32_t
 {
   Unknown0008 = 0x0008,
   Group = 0x0100,
 };
 
-enum SgbGroupEntryType :
-  uint32_t
+enum SgbGroupEntryType : uint32_t
 {
   Model = 0x01,
   Gimmick = 0x06,
@@ -124,15 +122,13 @@ struct SGB_ENTRY_HEADER
   vec3 scale;
 };
 
-struct SGB_MODEL_HEADER :
-  public SGB_ENTRY_HEADER
+struct SGB_MODEL_HEADER : public SGB_ENTRY_HEADER
 {
   int32_t modelFileOffset;
   int32_t collisionFileOffset;
 };
 
-struct SGB_MODEL_ENTRY :
-  public SGB_GROUP_ENTRY
+struct SGB_MODEL_ENTRY : public SGB_GROUP_ENTRY
 {
   SGB_MODEL_HEADER header;
   SgbGroupEntryType type;

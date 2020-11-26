@@ -1,29 +1,27 @@
 #include "ActionMgr.h"
 
 #include "Action/Action.h"
+#include "Action/ItemAction.h"
+#include "Action/MountAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
 #include <Exd/ExdDataGenerated.h>
-#include "Framework.h"
 
 #include <Network/PacketWrappers/EffectPacket.h>
 
 using namespace Sapphire;
 
-World::Manager::ActionMgr::ActionMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{
-
-}
-
-void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                       Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos )
+void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                                          Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos,
+                                                          uint16_t sequence )
 {
   player.sendDebug( "got aoe act: {0}", actionData->name );
 
 
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
+
+  action->setPos( pos );
 
   if( !action->init() )
     return;
@@ -35,17 +33,18 @@ void World::Manager::ActionMgr::handleAoEPlayerAction( Entity::Player& player, u
     return;
   }
 
-  action->setPos( pos );
-
   bootstrapAction( player, action, *actionData );
 }
 
 void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                            Data::ActionPtr actionData, uint64_t targetId )
+                                                            Data::ActionPtr actionData, uint64_t targetId,
+                                                            uint16_t sequence )
 {
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, actionData, framework() );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
   action->setTargetId( targetId );
+
+  action->setPos( player.getPos() );
 
   if( !action->init() )
     return;
@@ -66,58 +65,54 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
 {
   player.sendDebug( "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
 
-  // todo: check we have item & remove item from inventory
+  auto action = Action::make_ItemAction( player.getAsChara(), itemId, itemActionData,
+                                         itemSourceSlot, itemSourceContainer );
 
-  switch( itemActionData->type )
-  {
-    default:
-    {
-      player.sendDebug( "ItemAction type {0} not supported.", itemActionData->type );
-      break;
-    }
+  // todo: item actions don't have cast times? if so we can just start it and we're good
+  action->start();
+}
 
-    case Common::ItemActionType::ItemActionVFX:
-    case Common::ItemActionType::ItemActionVFX2:
-    {
-      handleItemActionVFX( player, itemId, itemActionData->data[ 0 ] );
+void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
+                                                   Data::ActionPtr actionData, uint64_t targetId,
+                                                   uint16_t sequence )
+{
+  player.sendDebug( "mount: {0}", mountId );
 
-      break;
-    }
-  }
+  auto action = Action::make_MountAction( player.getAsPlayer(), mountId, sequence, actionData );
+
+  action->setTargetId( targetId );
+
+  if( !action->init() )
+    return;
+
+  bootstrapAction( player, action, *actionData );
 }
 
 void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
-  if( !currentAction->precheck() )
+  if( !currentAction->preCheck() )
   {
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
   }
 
-  // if we have a cast time we want to associate the action with the player so update is called
-  if( currentAction->hasCastTime() )
+  if( player.getCurrentAction() )
   {
-    player.setCurrentAction( currentAction );
+    player.sendDebug( "Skill queued: {0}", currentAction->getId() );
+    player.setQueuedAction( currentAction );
   }
+  else
+  {
+    // if we have a cast time we want to associate the action with the player so update is called
+    if( currentAction->hasCastTime() )
+    {
+      player.setCurrentAction( currentAction );
+    }
 
-  // todo: what do in cases of swiftcast/etc? script callback?
-  currentAction->start();
-}
-
-void World::Manager::ActionMgr::handleItemActionVFX( Sapphire::Entity::Player& player, uint32_t itemId, uint16_t vfxId )
-{
-  Common::EffectEntry effect{};
-  effect.effectType = Common::ActionEffectType::VFX;
-  effect.value = vfxId;
-
-  auto effectPacket = std::make_shared< Network::Packets::Server::EffectPacket >( player.getId(), player.getId(), itemId );
-  effectPacket->setTargetActor( player.getId() );
-  effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
-  effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
-  effectPacket->addEffect( effect );
-
-  player.sendToInRangeSet( effectPacket, true );
+    // todo: what do in cases of swiftcast/etc? script callback?
+    currentAction->start();
+  }
 }

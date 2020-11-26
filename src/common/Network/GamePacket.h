@@ -257,7 +257,7 @@ namespace Sapphire::Network::Packets
 
       // The IPC type itself.
       m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
-      m_ipcHdr.timestamp = Util::getTimeSeconds();
+      m_ipcHdr.timestamp = Common::Util::getTimeSeconds();
       m_segHdr.size = sizeof( T ) + sizeof( FFXIVARR_IPC_HEADER ) + sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
     };
 

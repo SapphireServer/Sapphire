@@ -18,7 +18,7 @@
 class case_insensitive_equals {
 public:
   bool operator()(const std::string &key1, const std::string &key2) const {
-    return Sapphire::Util::toLowerCopy( key1 ) == Sapphire::Util::toLowerCopy( key2 );
+    return Sapphire::Common::Util::toLowerCopy( key1 ) == Sapphire::Common::Util::toLowerCopy( key2 );
   }
 };
 class case_insensitive_hash {
@@ -27,7 +27,7 @@ public:
   {
     std::size_t seed=0;
     for( auto &c : key )
-      Sapphire::Util::hashCombine< char >( seed, std::tolower( c ) );
+      Sapphire::Common::Util::hashCombine< char >( seed, std::tolower( c ) );
     return seed;
   }
 };
@@ -304,7 +304,7 @@ namespace SimpleWeb {
                 size_t path_end;
                 if((path_end=line.find(' ', method_end+1))!=std::string::npos) {
                     request->method=line.substr(0, method_end);
-                    request->path=line.substr(method_end+1, path_end-method_end-1);
+                    request->path=line.substr(method_end+2, path_end-method_end-2);
 
                     size_t protocol_end;
                     if((protocol_end=line.find('/', path_end+1))!=std::string::npos) {
@@ -388,7 +388,7 @@ namespace SimpleWeb {
                         
                         auto range=request->header.equal_range("Connection");
                         for(auto it=range.first;it!=range.second;it++) {
-                            if( Sapphire::Util::toLowerCopy( it->second ) == "close" )
+                            if( Sapphire::Common::Util::toLowerCopy( it->second ) == "close" )
                                 return;
                         }
                         if(http_version>1.05)

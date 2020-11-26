@@ -1,6 +1,6 @@
 #include "Logger.h"
 
-#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warning", "error", "fatal", "off" }
+#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warn", "error", "fatal", "off" }
 
 #include <spdlog/spdlog.h>
 #include <spdlog/async.h>
@@ -8,9 +8,9 @@
 #include <spdlog/sinks/daily_file_sink.h>
 
 // #include <iostream>
-#include <experimental/filesystem> // or #include <filesystem>
+#include <filesystem> // or #include <filesystem>
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 void Sapphire::Logger::init( const std::string& logPath )
 {

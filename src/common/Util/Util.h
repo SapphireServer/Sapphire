@@ -5,7 +5,7 @@
 #include <string>
 #include <functional>
 
-namespace Sapphire::Util
+namespace Sapphire::Common::Util
 {
 
   std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
@@ -18,6 +18,8 @@ namespace Sapphire::Util
   void eraseAllIn( std::string& inOutStr, std::string& remove );
 
   std::string toLowerCopy( const std::string& inStr );
+
+  std::string fmtUtcTime( const std::string& fmt );
 
   uint64_t getTimeMs();
 

@@ -13,8 +13,8 @@
 namespace Sapphire::Network::ActorControl
 {
 
-enum ActorControlType : uint16_t
-{
+  enum ActorControlType : uint16_t
+  {
     /*! Toggles weapon status -> Sheathed/UnSheathed
         \param param1 status 0|1 */
     ToggleWeapon = 0x00,
@@ -24,6 +24,9 @@ enum ActorControlType : uint16_t
     SetStatus = 0x02,
     CastStart = 0x03,
     ToggleAggro = 0x04,
+    /*!
+     * param1 = ClassJob ID
+     */
     ClassJobChange = 0x05,
     DefeatMsg = 0x06,
     GainExpMsg = 0x07,
@@ -98,6 +101,8 @@ enum ActorControlType : uint16_t
 
     FreeEventPos = 0x8A,
 
+    DailyQuestSeed = 0x90, // param1 = the daily quest seed
+
     SetBGM = 0xA1,
 
     UnlockAetherCurrentMsg = 0xA4,
@@ -140,6 +145,15 @@ enum ActorControlType : uint16_t
 
     SetPose = 0x127,
 
+    /*!
+     * This is used for general crafting events, I found some of them but some are missing:
+     * 
+     * param1 = event type, the rest of the struct depends on this param.
+     *  - 18 & 19: Quicksynth result, 19 means HQ result item, item ID is param2 and is + 1 000 000 when HQ. 
+     *             Quantity is param3 (possible quicksynth that gives more than one item in the future?)
+     * 
+     * All the other values have unkown behavior for now. 
+     */
     CraftingUnk = 0x12C,
 
     GatheringSenseMsg = 0x130,
@@ -173,6 +187,14 @@ enum ActorControlType : uint16_t
 
     RelicInfuseMsg = 0x179,
 
+    /*!
+     * Sent as result of an aetherial reduction.
+     * param1 = Reduced item ID + 500 000 (idk what this 500 000 is but it's always here no matter what)
+     * param2 = First result item id (+ 1 000 000 if HQ)
+     * param3 = First result item quantity
+     * param4 = (Optional) Second result item id (+ 1 000 000 if HQ)
+     * param5 = (Optional) Second result item quantity
+     */ 
     AetherReductionDlg = 0x17D,
 
     /*!
@@ -204,6 +226,22 @@ enum ActorControlType : uint16_t
     ChallengeEntryCompleteMsg = 0x20B,
     ChallengeEntryUnlockMsg = 0x20C,
 
+    /*!
+     * Sent when a player desynths an item, one packet per result type (one for consumed item, one for each obtained items, and one for exp if the player received exp)
+     * param1 = result type
+     *          4921 => Desynth item consumed
+     *          4922 => Desynth item obtained
+     *          4925 => Desynth exp obtained)
+     *          3553 => Reduction item used
+     *          3555 => Reduction item obtained
+     * param3 = u32 item id (+100 000 if item is HQ)
+     * param4 = item amount (used only for reduction it seems)
+     * param5 = exp amount (x 100)
+     * 
+     * Idk exactly how reduce's param3 is formatted, it seems like it's item id + 500 000 but it seems too... shady.
+     */
+    DesynthOrReductionResult = 0x20F,
+
     GilTrailMsg = 0x211,
 
     HuntingLogRankUnlock = 0x21D,
@@ -220,10 +258,22 @@ enum ActorControlType : uint16_t
 
     GearSetEquipMsg = 0x321,
 
+    SetBait = 0x325, // param1: bait ID
+
     SetFestival = 0x386, // param1: festival.exd index
 
     ToggleOrchestrionUnlock = 0x396,
-    Dismount = 0x3A1, // updated 4.5
+
+    EventBattleDialog = 0x39D,
+
+    /*!
+    * param1 = mountSpeed
+    * Retail sends 12 for mount speed star 1 unlocked and 15 for mount speed star 2 unlocked
+    * This also has to be sent before mounting finishes for it to take effect
+    */
+    SetMountSpeed = 0x3A0, // updated 5.35 hotfix
+
+    Dismount = 0x3A2, // updated 5.35 hotfix
 
     // Duty Recorder
     BeginReplayAck = 0x3A2,
@@ -300,6 +350,7 @@ enum ActorControlType : uint16_t
 
     DismountReq = 0x65,
     SpawnCompanionReq = 0x66,
+    DespawnCompanionReq = 0x67,
     RemoveStatusEffect = 0x68,
     CastCancel = 0x69,
 
@@ -315,20 +366,26 @@ enum ActorControlType : uint16_t
     UpdatedSeenHowTos = 0x133,
     AllotAttribute = 0x135,
 
-    ClearWaymarks = 0x13A,
+    ClearFieldMarkers = 0x13A,
     CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,
 
     Timers = 0x1AB,
 
-    DyeItem = 0x1B5,
+    DyeItem = 0x1B0, // updated 5.21
 
     RequestChocoboInventory = 0x1C4,
 
     EmoteReq = 0x1F4,
     EmoteCancel = 0x1F6,
     PersistentEmoteCancel = 0x1F7,
+    /*!
+     * param2 = pose ID
+     *      0 = idle pose 0 (just standing)
+     *      1 = idle pose 1
+     *    2-4 = idle poses 2-4
+     */
     PoseChange = 0x1F9,
     PoseReapply = 0x1FA,
     PoseCancel = 0x1FB,
@@ -336,6 +393,8 @@ enum ActorControlType : uint16_t
     AchievementCrit = 0x202,
     AchievementComp = 0x203,
     AchievementCatChat = 0x206,
+
+    RequestEventBattle = 0x232C,
 
     QuestJournalUpdateQuestVisibility = 0x2BE,
     QuestJournalClosed = 0x2BF,

@@ -1,8 +1,9 @@
 #include "Action.h"
 
+#include <Inventory/Item.h>
+
 #include <Exd/ExdDataGenerated.h>
 #include <Util/Util.h>
-#include "Framework.h"
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -10,61 +11,67 @@
 #include "Actor/Player.h"
 #include "Actor/BNpc.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 
 #include <Network/CommonActorControl.h>
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/ActorControlPacket144.h"
-#include <Network/PacketWrappers/EffectPacket.h>
-#include <Logging/Logger.h>
-#include <Util/ActorFilter.h>
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 
+#include <Logging/Logger.h>
+
+#include <Util/ActorFilter.h>
+#include <Util/UtilMath.h>
+#include <Service.h>
+
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World;
 
 
-Sapphire::Action::Action::Action() = default;
-Sapphire::Action::Action::~Action() = default;
+Action::Action::Action() = default;
+Action::Action::~Action() = default;
 
-Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, FrameworkPtr fw ) :
-                                  Action( std::move( caster ), actionId, nullptr, std::move( fw ) )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence) :
+  Action( std::move( caster ), actionId, sequence, nullptr )
 {
 }
 
-Sapphire::Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId,
-                                  Data::ActionPtr actionData, FrameworkPtr fw ) :
-                                  m_pSource( std::move( caster ) ),
-                                  m_pFw( std::move( fw ) ),
-                                  m_actionData( std::move( actionData ) ),
-                                  m_id( actionId ),
-                                  m_targetId( 0 ),
-                                  m_startTime( 0 ),
-                                  m_interruptType( Common::ActionInterruptType::None )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
+                        Data::ActionPtr actionData ) :
+  m_pSource( std::move( caster ) ),
+  m_actionData( std::move( actionData ) ),
+  m_id( actionId ),
+  m_targetId( 0 ),
+  m_startTime( 0 ),
+  m_interruptType( Common::ActionInterruptType::None ),
+  m_sequence( sequence )
 {
 }
 
-uint32_t Sapphire::Action::Action::getId() const
+uint32_t Action::Action::getId() const
 {
   return m_id;
 }
 
-bool Sapphire::Action::Action::init()
+bool Action::Action::init()
 {
   if( !m_actionData )
   {
     // need to get actionData
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-    assert( exdData );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-    auto actionData = exdData->get< Data::Action >( m_id );
+    auto actionData = exdData.get< Data::Action >( m_id );
     assert( actionData );
 
     m_actionData = actionData;
   }
+
+  m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_sequence );
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
@@ -97,10 +104,10 @@ bool Sapphire::Action::Action::init()
     }
   }
 
-  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->costType );
-  m_primaryCost = m_actionData->cost;
+  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->primaryCostType );
+  m_primaryCost = m_actionData->primaryCostValue;
 
-  if( !m_actionData->targetArea )
+  /*if( !m_actionData->targetArea )
   {
     // override pos to target position
     // todo: this is kinda dirty
@@ -112,71 +119,85 @@ bool Sapphire::Action::Action::init()
         break;
       }
     }
-  }
+  }*/
 
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
+
+  if( ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
+  {
+    m_lutEntry = ActionLut::getEntry( static_cast< uint16_t >( getId() ) );
+  }
+  else
+  {
+    std::memset( &m_lutEntry, 0, sizeof( ActionEntry ) );
+  }
 
   addDefaultActorFilters();
 
   return true;
 }
 
-void Sapphire::Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+void Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
 {
   m_pos = pos;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Sapphire::Action::Action::getPos() const
+Sapphire::Common::FFXIVARR_POSITION3 Action::Action::getPos() const
 {
   return m_pos;
 }
 
-void Sapphire::Action::Action::setTargetId( uint64_t targetId )
+void Action::Action::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
 }
 
-uint64_t Sapphire::Action::Action::getTargetId() const
+uint64_t Action::Action::getTargetId() const
 {
   return m_targetId;
 }
 
-bool Sapphire::Action::Action::hasClientsideTarget() const
+bool Action::Action::hasClientsideTarget() const
 {
   return m_targetId > 0xFFFFFFFF;
 }
 
-bool Sapphire::Action::Action::isInterrupted() const
+bool Action::Action::isInterrupted() const
 {
   return m_interruptType != Common::ActionInterruptType::None;
 }
 
-void Sapphire::Action::Action::setInterrupted( Common::ActionInterruptType type )
+Common::ActionInterruptType Action::Action::getInterruptType() const
+{
+  return m_interruptType;
+}
+
+void Action::Action::setInterrupted( Common::ActionInterruptType type )
 {
   m_interruptType = type;
 }
 
-uint32_t Sapphire::Action::Action::getCastTime() const
+uint32_t Action::Action::getCastTime() const
 {
   return m_castTimeMs;
 }
 
-void Sapphire::Action::Action::setCastTime( uint32_t castTime )
+void Action::Action::setCastTime( uint32_t castTime )
 {
   m_castTimeMs = castTime;
 }
 
-bool Sapphire::Action::Action::hasCastTime() const
+bool Action::Action::hasCastTime() const
 {
   return m_castTimeMs > 0;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getSourceChara() const
+Sapphire::Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
 }
 
-bool Sapphire::Action::Action::update()
+bool Action::Action::update()
 {
   // action has not been started yet
   if( m_startTime == 0 )
@@ -193,35 +214,66 @@ bool Sapphire::Action::Action::update()
     // todo: check if the target is still in range
   }
 
-  uint64_t tickCount = Util::getTimeMs();
+  uint64_t tickCount = Common::Util::getTimeMs();
 
-  if( !hasCastTime() || std::difftime( tickCount, m_startTime ) > m_castTimeMs )
+  if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > m_castTimeMs )
   {
     execute();
     return true;
   }
 
+  if( m_pTarget == nullptr && m_targetId != 0 )
+  {
+    // try to search for the target actor
+    for( auto actor : m_pSource->getInRangeActors( true ) )
+    {
+      if( actor->getId() == m_targetId )
+      {
+        m_pTarget = actor->getAsChara();
+        break;
+      }
+    }
+  }
+
+  if( m_pTarget != nullptr )
+  {
+    if( !m_pTarget->isAlive() )
+    {
+      // interrupt the cast if target died
+      setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+      interrupt();
+      return true;
+    }
+  }
+
   return false;
 }
 
-void Sapphire::Action::Action::start()
+void Action::Action::start()
 {
   assert( m_pSource );
 
-  m_startTime = Util::getTimeMs();
+  m_startTime = Common::Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
 
   if( hasCastTime() )
   {
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
+    auto& data = castPacket->data();
 
-    castPacket->data().action_id = static_cast< uint16_t >( m_id );
-    castPacket->data().skillType = Common::SkillType::Normal;
-    castPacket->data().unknown_1 = m_id;
+    data.action_id = static_cast< uint16_t >( m_id );
+    data.skillType = Common::SkillType::Normal;
+    data.unknown_1 = m_id;
     // This is used for the cast bar above the target bar of the caster.
-    castPacket->data().cast_time = m_castTimeMs / 1000.f;
-    castPacket->data().target_id = static_cast< uint32_t >( m_targetId );
+    data.cast_time = m_castTimeMs / 1000.f;
+    data.target_id = static_cast< uint32_t >( m_targetId );
+
+    auto pos = m_pSource->getPos();
+    data.posX = Common::Util::floatToUInt16( pos.x );
+    data.posY = Common::Util::floatToUInt16( pos.y );
+    data.posZ = Common::Util::floatToUInt16( pos.z );
+    data.rotation = Common::Util::floatToUInt16Rot( m_pSource->getRot() );
 
     m_pSource->sendToInRangeSet( castPacket, true );
 
@@ -232,18 +284,21 @@ void Sapphire::Action::Action::start()
   }
 
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
-  auto actionStartPkt = makeActorControl143( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
+  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(),
+                                              m_recastTimeMs / 10 );
   player->queuePacket( actionStartPkt );
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  if( !pScriptMgr->onStart( *this ) )
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  // check the lut too and see if we have something usable, otherwise cancel the cast
+  if( !scriptMgr.onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
   {
-    // script not implemented
+    // script not implemented and insufficient lut data (no potencies)
     interrupt();
 
     if( player )
     {
-      player->sendUrgent( "Action not implemented, missing script for action#{0}", getId() );
+      player->sendUrgent( "Action not implemented, missing script/lut entry for action#{0}", getId() );
       player->setCurrentAction( nullptr );
     }
 
@@ -255,7 +310,7 @@ void Sapphire::Action::Action::start()
     execute();
 }
 
-void Sapphire::Action::Action::interrupt()
+void Action::Action::interrupt()
 {
   assert( m_pSource );
 
@@ -279,17 +334,17 @@ void Sapphire::Action::Action::interrupt()
 
     // Note: When cast interrupt from taking too much damage, set the last value to 1.
     // This enables the cast interrupt effect.
-    auto control = makeActorControl142( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                        0x219, 1, m_id, interruptEffect );
+    auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt,
+                                     0x219, 1, m_id, interruptEffect );
 
     m_pSource->sendToInRangeSet( control, true );
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
-  pScriptMgr->onInterrupt( *this );
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInterrupt( *this );
 }
 
-void Sapphire::Action::Action::execute()
+void Action::Action::execute()
 {
   assert( m_pSource );
 
@@ -300,12 +355,12 @@ void Sapphire::Action::Action::execute()
     return;
   }
 
-  auto pScriptMgr = m_pFw->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   if( hasCastTime() )
   {
     // todo: what's this?
-    /*auto control = ActorControlPacket143( m_pTarget->getId(), ActorControlType::Unk7,
+    /*auto control = ActorControlSelfPacket( m_pTarget->getId(), ActorControlType::Unk7,
                                             0x219, m_id, m_id, m_id, m_id );
     m_pSource->sendToInRangeSet( control, true );*/
 
@@ -315,56 +370,200 @@ void Sapphire::Action::Action::execute()
     }
   }
 
-  if( isComboAction() )
+  if( isCorrectCombo() )
   {
     auto player = m_pSource->getAsPlayer();
 
     player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
-  if( !hasClientsideTarget() )
+  if( !hasClientsideTarget()  )
   {
-    snapshotAffectedActors( m_hitActors );
-
-    if( !m_hitActors.empty() )
-    {
-      // only call script if actors are hit
-      pScriptMgr->onExecute( *this );
-    }
+    buildEffects();
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
-    pScriptMgr->onEObjHit( *player, m_targetId, getId() );
-    return;
+    scriptMgr.onEObjHit( *player, m_targetId, getId() );
   }
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
   if( !m_actionData->preservesCombo )
   {
-    m_pSource->setLastComboActionId( getId() );
+    // potential combo starter or correct combo from last action, must hit something to progress combo
+    if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
+    {
+      m_pSource->setLastComboActionId( getId() );
+    }
+    else // clear last combo action if the combo breaks
+    {
+      m_pSource->setLastComboActionId( 0 );
+    }
   }
 }
 
-bool Sapphire::Action::Action::precheck()
+std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
+{
+  // todo: what do for npcs?
+  auto wepDmg = 1.f;
+
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
+}
+
+std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
+{
+  auto wepDmg = 1.f;
+
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    auto item = player->getEquippedWeapon();
+    assert( item );
+
+    auto role = player->getRole();
+    if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
+    {
+      wepDmg = item->getMagicalDmg();
+    }
+    else
+    {
+      wepDmg = item->getPhysicalDmg();
+    }
+  }
+
+  return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
+}
+
+void Action::Action::buildEffects()
+{
+  snapshotAffectedActors( m_hitActors );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto hasLutEntry = hasValidLutEntry();
+
+  if( !scriptMgr.onExecute( *this ) && !hasLutEntry )
+  {
+    if( auto player = m_pSource->getAsPlayer() )
+    {
+      player->sendUrgent( "missing lut entry for action#{}", getId() );
+    }
+
+    return;
+  }
+
+  if( !hasLutEntry || m_hitActors.empty() )
+  {
+    // send any effect packet added by script or an empty one just to play animation for other players
+    m_effectBuilder->buildAndSendPackets(); 
+    return;
+  }
+
+  // no script exists but we have a valid lut entry
+  if( auto player = getSourceChara()->getAsPlayer() )
+  {
+    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
+                       m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
+                       m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
+  }
+
+  // when aoe, these effects are in the target whatever is hit first
+  bool shouldRestoreMP = true;
+  bool shouldApplyComboSucceedEffect = true;
+
+  for( auto& actor : m_hitActors )
+  {
+    if( m_lutEntry.potency > 0 )
+    {
+      auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
+      m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
+
+      if( dmg.first > 0 )
+        actor->onActionHostile( m_pSource );
+
+      if( isCorrectCombo() && shouldApplyComboSucceedEffect )
+      {
+        m_effectBuilder->comboSucceed( actor );
+        shouldApplyComboSucceedEffect = false;
+      }
+
+      if( !isComboAction() || isCorrectCombo() )
+      {
+        if( m_lutEntry.curePotency > 0 ) // actions with self heal
+        {
+          auto heal = calcHealing( m_lutEntry.curePotency );
+          m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
+        }
+
+        if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+        {
+          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+          shouldRestoreMP = false;
+        }
+
+        if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
+        {
+          m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
+        }
+      }
+    }
+    else if( m_lutEntry.curePotency > 0 )
+    {
+      auto heal = calcHealing( m_lutEntry.curePotency );
+      m_effectBuilder->heal( actor, actor, heal.first, heal.second );
+
+      if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+      {
+        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+        shouldRestoreMP = false;
+      }
+    }
+    else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+    {
+      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+      shouldRestoreMP = false;
+    }
+  }
+
+  m_effectBuilder->buildAndSendPackets();
+
+  // at this point we're done with it and no longer need it
+  m_effectBuilder.reset();
+}
+
+bool Action::Action::preCheck()
 {
   if( auto player = m_pSource->getAsPlayer() )
   {
-    if( !playerPrecheck( *player ) )
+    if( !playerPreCheck( *player ) )
       return false;
   }
 
   return true;
 }
 
-bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
+bool Action::Action::playerPreCheck( Entity::Player& player )
 {
   // lol
   if( !player.isAlive() )
     return false;
 
   // npc actions/non player actions
-  if( m_actionData->classJob == -1 )
+  if( m_actionData->classJob == -1 && !m_actionData->isRoleAction )
     return false;
 
   if( player.getLevel() < m_actionData->classJobLevel )
@@ -373,13 +572,12 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
   auto currentClass = player.getClass();
   auto actionClass = static_cast< Common::ClassJob >( m_actionData->classJob );
 
-  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass )
+  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass && !m_actionData->isRoleAction )
   {
     // check if not a base class action
-    auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-    assert( exdData );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-    auto classJob = exdData->get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
+    auto classJob = exdData.get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
     if( !classJob )
       return false;
 
@@ -387,17 +585,18 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
       return false;
   }
 
-  // reset target on actions that can only be casted on yourself while having a target set
-  // todo: check what actions send when targeting an enemy
-//  if( m_actionData->canTargetSelf &&
-//      !m_actionData->canTargetFriendly &&
-//      !m_actionData->canTargetHostile &&
-//      !m_actionData->canTargetParty )
-//  {
-//    setTargetId( getSourceChara() );
-//  }
+  if( !m_actionData->canTargetSelf && getTargetId() == m_pSource->getId() )
+    return false;
 
-  // todo: party/enemy validation
+  // todo: does this need to check for party/alliance stuff or it's just same type?
+  // todo: m_pTarget doesn't exist at this stage because we only fill it when we snapshot targets
+//  if( !m_actionData->canTargetFriendly && m_pSource->getObjKind() == m_pTarget->getObjKind() )
+//    return false;
+//
+//  if( !m_actionData->canTargetHostile && m_pSource->getObjKind() != m_pTarget->getObjKind() )
+//    return false;
+
+  // todo: party/dead validation
 
   // validate range
 
@@ -408,17 +607,17 @@ bool Sapphire::Action::Action::playerPrecheck( Entity::Player& player )
   return true;
 }
 
-uint32_t Sapphire::Action::Action::getAdditionalData() const
+uint32_t Action::Action::getAdditionalData() const
 {
   return m_additionalData;
 }
 
-void Sapphire::Action::Action::setAdditionalData( uint32_t data )
+void Action::Action::setAdditionalData( uint32_t data )
 {
   m_additionalData = data;
 }
 
-bool Sapphire::Action::Action::isComboAction() const
+bool Action::Action::isCorrectCombo() const
 {
   auto lastActionId = m_pSource->getLastComboActionId();
 
@@ -430,7 +629,12 @@ bool Sapphire::Action::Action::isComboAction() const
   return m_actionData->actionCombo == lastActionId;
 }
 
-bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
+bool Action::Action::isComboAction() const
+{
+  return m_actionData->actionCombo != 0;
+}
+
+bool Action::Action::primaryCostCheck( bool subtractCosts )
 {
   switch( m_primaryCostType )
   {
@@ -451,13 +655,13 @@ bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
     {
       auto curMp = m_pSource->getMp();
 
-      auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
+      auto cost = m_primaryCost * 100;
 
-      if( curMp < cost )
+      if( curMp < static_cast< uint32_t >( cost ) )
         return false;
 
       if( subtractCosts )
-        m_pSource->setMp( curMp - cost );
+        m_pSource->setMp( curMp - static_cast< uint32_t >( cost ) );
 
       return true;
     }
@@ -473,25 +677,25 @@ bool Sapphire::Action::Action::primaryCostCheck( bool subtractCosts )
   }
 }
 
-bool Sapphire::Action::Action::secondaryCostCheck( bool subtractCosts )
+bool Action::Action::secondaryCostCheck( bool subtractCosts )
 {
   // todo: these need to be mapped
   return true;
 }
 
-bool Sapphire::Action::Action::hasResources()
+bool Action::Action::hasResources()
 {
   return primaryCostCheck( false ) && secondaryCostCheck( false );
 }
 
-bool Sapphire::Action::Action::consumeResources()
+bool Action::Action::consumeResources()
 {
   return primaryCostCheck( true ) && secondaryCostCheck( true );
 }
 
-bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
+bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors )
 {
-  for( const auto& actor : m_pSource->getInRangeActors() )
+  for( const auto& actor : m_pSource->getInRangeActors( true ) )
   {
     // check for initial target validity based on flags in action exd (pc/enemy/etc.)
     if( !preFilterActor( *actor ) )
@@ -515,21 +719,21 @@ bool Sapphire::Action::Action::snapshotAffectedActors( std::vector< Entity::Char
       player->sendDebug( "hit actor#{}", actor->getId() );
     }
   }
-  if( actors.empty() )
-    return false;
-  return true;
+
+  return !actors.empty();
 }
 
-void Sapphire::Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
+void Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
 {
   m_actorFilters.push_back( std::move( filter ) );
 }
 
-void Sapphire::Action::Action::addDefaultActorFilters()
+void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
+    case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
 
@@ -562,25 +766,36 @@ void Sapphire::Action::Action::addDefaultActorFilters()
   }
 }
 
-bool Sapphire::Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
+bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
 {
   auto kind = actor.getObjKind();
+  auto chara = actor.getAsChara();
 
   // todo: are there any server side eobjs that players can hit?
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
+  
+  if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
+    return false;
+  
+  if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
+    return false;
 
-  // todo: handle things such based on canTargetX
+  if( m_lutEntry.potency > 0 && m_pSource->getObjKind() == chara->getObjKind() ) // !m_canTargetFriendly not working for aoe
+    return false;
+
+  if( ( m_lutEntry.potency == 0 && m_lutEntry.curePotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
+    return false;
 
   return true;
 }
 
-std::vector< Sapphire::Entity::CharaPtr >& Sapphire::Action::Action::getHitCharas()
+std::vector< Sapphire::Entity::CharaPtr >& Action::Action::getHitCharas()
 {
   return m_hitActors;
 }
 
-Sapphire::Entity::CharaPtr Sapphire::Action::Action::getHitChara()
+Sapphire::Entity::CharaPtr Action::Action::getHitChara()
 {
   if( !m_hitActors.empty() )
   {
@@ -588,4 +803,15 @@ Sapphire::Entity::CharaPtr Sapphire::Action::Action::getHitChara()
   }
 
   return nullptr;
+}
+
+bool Action::Action::hasValidLutEntry() const
+{
+  return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
+    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
+}
+
+Action::EffectBuilderPtr Action::Action::getEffectbuilder()
+{
+  return m_effectBuilder;
 }

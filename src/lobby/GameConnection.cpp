@@ -15,49 +15,50 @@
 #include "RestConnector.h"
 #include "LobbySession.h"
 
-extern Sapphire::ServerLobby g_serverLobby;
-extern Sapphire::Network::RestConnector g_restConnector;
+#include "Forwards.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
-Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                   Sapphire::Network::AcceptorPtr pAcceptor,
-                                                   FrameworkPtr pFw ) :
-  Connection( pHive, pFw ),
+extern Lobby::ServerLobby g_serverLobby;
+extern Lobby::RestConnector g_restConnector;
+
+Lobby::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
+                                                Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Sapphire::Network::Connection( pHive ),
   m_pAcceptor( pAcceptor ),
   m_bEncryptionInitialized( false )
 {
 }
 
-Sapphire::Network::GameConnection::~GameConnection()
+Lobby::GameConnection::~GameConnection()
 {
 
 }
 
 
 // overwrite the parents onConnect for our game socket needs
-void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint16_t port )
+void Lobby::GameConnection::onAccept( const std::string& host, uint16_t port )
 {
-  auto connection = make_GameConnection( m_hive, m_pAcceptor, m_pFw );
+  auto connection = make_GameConnection( m_hive, m_pAcceptor );
   m_pAcceptor->accept( connection );
 
   Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
 
 
-void Sapphire::Network::GameConnection::onDisconnect()
+void Lobby::GameConnection::onDisconnect()
 {
   Logger::debug( "DISCONNECT" );
 }
 
-void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
+void Lobby::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 {
   m_packets.insert( std::end( m_packets ), std::begin( buffer ), std::end( buffer ) );
   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
-  Packets::FFXIVARR_PACKET_HEADER packetHeader{};
-  const auto headerResult = Packets::getHeader( m_packets, 0, packetHeader );
+  FFXIVARR_PACKET_HEADER packetHeader{};
+  const auto headerResult = getHeader( m_packets, 0, packetHeader );
 
   if( headerResult == Incomplete )
     return;
@@ -70,9 +71,9 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
   }
 
   // Dissect packet list
-  std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-  const auto packetResult = Packets::getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
-                                                 packetHeader, packetList );
+  std::vector< FFXIVARR_PACKET_RAW > packetList;
+  const auto packetResult = getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
+                                        packetHeader, packetList );
 
   if( packetResult == Incomplete )
     return;
@@ -90,31 +91,31 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 
 }
 
-void Sapphire::Network::GameConnection::onError( const asio::error_code& error )
+void Lobby::GameConnection::onError( const asio::error_code& error )
 {
   Logger::info( "GameConnection closed: {0}", error.message() );
 }
 
 void
-Sapphire::Network::GameConnection::sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId )
+Lobby::GameConnection::sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId )
 {
   auto errorPacket = makeLobbyPacket< FFXIVIpcLobbyError >( tmpId );
   errorPacket->data().seq = sequence;
   errorPacket->data().error_id = errorcode;
   errorPacket->data().message_id = messageId;
 
-  Packets::LobbyPacketContainer pRP( m_encKey );
+  LobbyPacketContainer pRP( m_encKey );
   pRP.addPacket( errorPacket );
   sendPacket( pRP );
 }
 
-void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+void Lobby::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
   uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
   Logger::info( "Sequence [{0}]", sequence );
 
   Logger::info( "[{0}] ReqCharList", m_pSession->getAccountID() );
-  Packets::LobbyPacketContainer pRP( m_encKey );
+  LobbyPacketContainer pRP( m_encKey );
 
   auto serverListPacket = makeLobbyPacket< FFXIVIpcServerList >( tmpId );
   serverListPacket->data().seq = 1;
@@ -178,21 +179,21 @@ void Sapphire::Network::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet
     // TODO: Eventually move to account info storage
     if( i == 3 )
     {
-      charListPacket->data().entitledExpansion = 2;
+      charListPacket->data().entitledExpansion = Common::CURRENT_EXPANSION_ID;
       charListPacket->data().maxCharOnWorld = 25;
       charListPacket->data().unknown8 = 8;
       charListPacket->data().veteranRank = 12;
       charListPacket->data().counter = ( i * 4 ) + 1;
       charListPacket->data().unknown4 = 128;
     }
-    Packets::LobbyPacketContainer pRP( m_encKey );
+    LobbyPacketContainer pRP( m_encKey );
     pRP.addPacket( charListPacket );
     sendPacket( pRP );
 
   }
 }
 
-void Sapphire::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+void Lobby::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
   uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
   Logger::info( "Sequence [{0}]", sequence );
@@ -221,7 +222,7 @@ void Sapphire::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet,
 
   Logger::info( "[{0}] Logging in as {1} ({2})", m_pSession->getAccountID(), logInCharName, logInCharId );
 
-  Packets::LobbyPacketContainer pRP( m_encKey );
+  LobbyPacketContainer pRP( m_encKey );
 
   auto enterWorldPacket = makeLobbyPacket< FFXIVIpcEnterWorld >( tmpId );
   enterWorldPacket->data().contentId = lookupId;
@@ -234,7 +235,7 @@ void Sapphire::Network::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet,
   sendPacket( pRP );
 }
 
-bool Sapphire::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+bool Lobby::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
   LobbySessionPtr pSession = g_serverLobby.getSession( ( char* ) &packet.data[ 0 ] + 0x22 );
 
@@ -259,13 +260,13 @@ bool Sapphire::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_
     serviceIdInfoPacket->data().u2 = 0x99;
     serviceIdInfoPacket->data().serviceAccount[ 0 ].id = 0x002E4A2B;
 
-    Packets::LobbyPacketContainer pRP( m_encKey );
+    LobbyPacketContainer pRP( m_encKey );
     pRP.addPacket( serviceIdInfoPacket );
     sendPacket( pRP );
   }
   else
   {
-    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x22 ) );
     sendError( 1, 5006, 13001, tmpId );
 
     return true;
@@ -273,7 +274,7 @@ bool Sapphire::Network::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_
   return false;
 }
 
-bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+bool Lobby::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
   uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
   uint8_t type = *reinterpret_cast< uint8_t* >( &packet.data[ 0 ] + 0x29 );
@@ -292,7 +293,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
 
     Logger::info( "[{0}] Type 1: {1}", m_pSession->getAccountID(), name );
 
-    Packets::LobbyPacketContainer pRP( m_encKey );
+    LobbyPacketContainer pRP( m_encKey );
 
     m_pSession->newCharName = name;
 
@@ -323,7 +324,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
     if( g_restConnector.createCharacter( ( char* ) m_pSession->getSessionId(), m_pSession->newCharName, charDetails ) !=
         -1 )
     {
-      Packets::LobbyPacketContainer pRP( m_encKey );
+      LobbyPacketContainer pRP( m_encKey );
 
       auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
       charCreatePacket->data().content_id = newContentId;
@@ -365,7 +366,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
       charCreatePacket->data().unknown_7 = 1;
       charCreatePacket->data().unknown_8 = 1;
 
-      Packets::LobbyPacketContainer pRP( m_encKey );
+      LobbyPacketContainer pRP( m_encKey );
       pRP.addPacket( charCreatePacket );
       sendPacket( pRP );
     }
@@ -381,7 +382,7 @@ bool Sapphire::Network::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW&
   return false;
 }
 
-void Sapphire::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACKET_RAW& packet )
+void Lobby::GameConnection::handleGamePacket( Network::Packets::FFXIVARR_PACKET_RAW& packet )
 {
 
   uint32_t tmpId = packet.segHdr.target_actor;
@@ -419,7 +420,7 @@ void Sapphire::Network::GameConnection::handleGamePacket( Packets::FFXIVARR_PACK
 
 }
 
-void Sapphire::Network::GameConnection::sendPacket( Packets::LobbyPacketContainer& pLpc )
+void Lobby::GameConnection::sendPacket( LobbyPacketContainer& pLpc )
 {
   uint16_t size = pLpc.getSize();
   uint8_t* dataPtr = pLpc.getRawData( false );
@@ -428,7 +429,7 @@ void Sapphire::Network::GameConnection::sendPacket( Packets::LobbyPacketContaine
   send( sendBuffer );
 }
 
-void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
+void Lobby::GameConnection::sendPackets( Network::Packets::PacketContainer* pPacket )
 {
   std::vector< uint8_t > sendBuffer;
 
@@ -436,14 +437,14 @@ void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* p
   send( sendBuffer );
 }
 
-void Sapphire::Network::GameConnection::sendSinglePacket( FFXIVPacketBasePtr pPacket )
+void Lobby::GameConnection::sendSinglePacket( FFXIVPacketBasePtr pPacket )
 {
   PacketContainer pRP = PacketContainer();
   pRP.addPacket( pPacket );
   sendPackets( &pRP );
 }
 
-void Sapphire::Network::GameConnection::generateEncryptionKey( uint32_t key, const std::string& keyPhrase )
+void Lobby::GameConnection::generateEncryptionKey( uint32_t key, const std::string& keyPhrase )
 {
   memset( m_baseKey, 0, 0x2C );
   m_baseKey[ 0 ] = 0x78;
@@ -451,14 +452,14 @@ void Sapphire::Network::GameConnection::generateEncryptionKey( uint32_t key, con
   m_baseKey[ 2 ] = 0x34;
   m_baseKey[ 3 ] = 0x12;
   memcpy( m_baseKey + 0x04, &key, 4 );
-  m_baseKey[ 8 ] = 0xC6;
-  m_baseKey[ 9 ] = 0x11;
+  m_baseKey[ 8 ] = 0x88;
+  m_baseKey[ 9 ] = 0x13;
   memcpy( ( char* ) m_baseKey + 0x0C, keyPhrase.c_str(), keyPhrase.size() );
-  Sapphire::Util::md5( m_baseKey, m_encKey, 0x2C );
+  Common::Util::md5( m_baseKey, m_encKey, 0x2C );
 }
 
-void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                       const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
+void Lobby::GameConnection::handlePackets( const Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
+                                           const std::vector< Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
 
   for( auto inPacket : packetData )

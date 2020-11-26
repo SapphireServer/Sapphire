@@ -3,11 +3,14 @@
 #include <cctype>
 #include <set>
 #include <common/Logging/Logger.h>
-#include <experimental/filesystem>
+#include <filesystem>
 #include <MySqlConnector.h>
+#include <common/Util/CrashHandler.h>
+#include <common/Config/ConfigMgr.h>
 
+[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
 
-namespace filesys = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 #include <fstream>
 #include <streambuf>
@@ -27,19 +30,19 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
   try
   {
     // Check if given path exists and points to a directory
-    if( filesys::exists( dirPath ) && filesys::is_directory( dirPath ) )
+    if( fs::exists( dirPath ) && fs::is_directory( dirPath ) )
     {
       // Create a Recursive Directory Iterator object and points to the starting of directory
-      filesys::recursive_directory_iterator iter( dirPath );
+      fs::recursive_directory_iterator iter( dirPath );
 
       // Create a Recursive Directory Iterator object pointing to end.
-      filesys::recursive_directory_iterator end;
+      fs::recursive_directory_iterator end;
 
       // Iterate till end
       while( iter != end )
       {
         // Check if current entry is a directory and if exists in skip list
-        if( filesys::is_directory( iter->path() ) &&
+        if( fs::is_directory( iter->path() ) &&
             ( std::find( dirSkipList.begin(), dirSkipList.end(), iter->path().filename() ) != dirSkipList.end() ) )
         {
           // Skip the iteration of current directory pointed by iterator
@@ -77,13 +80,14 @@ std::string delChar( std::string &str, char del )
 
 void printUsage()
 {
-  Logger::info( " Usage: sapphire_dbm " );
+  Logger::info( " Usage: dbm " );
   Logger::info( "\t --mode" );
   Logger::info( "\t\t initialize -> Creates DB if not present and inserts default tables/data" );
   Logger::info( "\t\t check -> Checks if Sapphire DB-Version matches your DB-Version" );
-  Logger::info( "\t\t update -> Updates your DB-Version to Sapphire DB-Version" );
+  Logger::info( "\t\t migrate -> Updates your DB-Version to Sapphire DB-Version" );
   Logger::info( "\t\t clearchars -> Removes all character data from DB. Accounts will stay untouched" );
   Logger::info( "\t\t liquidate -> Removes all tables and deletes the DB" );
+  Logger::info( "\t\t add-migration -> Creates a new migration with the assoicated up/down sql files" );
   Logger::info( "\t --user <mysqlUserName>" );
   Logger::info( "\t --pass <mysqlPassword> ( default empty )" );
   Logger::info( "\t --host <mysqlHost> ( default 127.0.0.1 )" );
@@ -91,6 +95,7 @@ void printUsage()
   Logger::info( "\t --database <mysqlDatabase>" );
   Logger::info( "\t --sfile <path/to/schemafile> ( default sql/schema/schema.sql )" );
   Logger::info( "\t --force ( skips user input / auto Yes )" );
+  Logger::info( "\t --name <migration name>" );
 }
 
 int main( int32_t argc, char* argv[] )
@@ -109,7 +114,20 @@ int main( int32_t argc, char* argv[] )
   std::string sFile;
   std::string iFile;
 
+  std::string migrationName;
+
   bool force = false;
+
+  // load config first so it can still be overridden if required
+  Common::ConfigMgr configMgr;
+  Common::Config::GlobalConfig globalConfig;
+  if( configMgr.loadGlobalConfig( globalConfig ) )
+  {
+    host = globalConfig.database.host;
+    database = globalConfig.database.database;
+    user = globalConfig.database.user;
+    pass = globalConfig.database.password;
+  }
 
   std::vector< std::string > args( argv + 1, argv + argc );
   for( uint32_t i = 0; i + 1 < args.size(); i += 2 )
@@ -137,6 +155,8 @@ int main( int32_t argc, char* argv[] )
       iFile = val;
     else if( arg == "force" )
       force = true;
+    else if( arg == "name" )
+      migrationName = val;
   }
 
   if( host.empty() )
@@ -155,6 +175,12 @@ int main( int32_t argc, char* argv[] )
     dbm.setInsertFile( iFile );
     dbm.setSchemaFile( sFile );
   }
+
+  if( !migrationName.empty() )
+  {
+    dbm.setMigratioName( migrationName );
+  }
+
   if( force )
     dbm.setForceMode( true );
   //initialize|check|update|clearchars|liquidate
@@ -166,9 +192,9 @@ int main( int32_t argc, char* argv[] )
   {
     dbm.setMode( Mode::CHECK );
   }
-  else if( mode.find( "update" ) != std::string::npos )
+  else if( mode.find( "migrate" ) != std::string::npos )
   {
-    dbm.setMode( Mode::UPDATE );
+    dbm.setMode( Mode::MIGRATE );
   }
   else if( mode.find( "clearchars" ) != std::string::npos )
   {
@@ -177,6 +203,10 @@ int main( int32_t argc, char* argv[] )
   else if( mode.find( "liquidate" ) != std::string::npos )
   {
     dbm.setMode( Mode::LIQUIDATE );
+  }
+  else if( mode.find( "add-migration" ) != std::string::npos )
+  {
+    dbm.setMode( Mode::ADD_MIGRATION );
   }
   else
   {

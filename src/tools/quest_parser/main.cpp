@@ -6,7 +6,7 @@
 #include <string>
 #include <cstring>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include <Exd.h>
 #include <ExdCat.h>
@@ -21,13 +21,14 @@
 #include <algorithm>
 
 Sapphire::Data::ExdDataGenerated g_exdDataGen;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 using namespace Sapphire;
 
 const std::string onTalkStr(
   "  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
   "  {\n"
-  "    auto actor = Event::mapEventActorToRealActor( actorId );\n"
+  "    auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();\n"
+  "    auto actor = eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
   "  }\n\n"
 );
 
@@ -40,6 +41,8 @@ const std::string onWithinRangeStr(
 const std::string onEmoteStr(
   "  void onEmote( uint32_t eventId, Entity::Player& player, uint64_t actorId, uint32_t emoteId ) override\n"
   "  {\n"
+  "    auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();\n"
+  "    auto actor = eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );\n"
   "  }\n\n"
 );
 
@@ -61,6 +64,17 @@ std::string titleCase( const std::string& str )
   return retStr;
 }
 
+std::string titleCaseNoUnderscores( const std::string& str )
+{
+  std::string result = titleCase( str );
+
+  result.erase( std::remove_if( result.begin(), result.end(), []( const char c ) {
+    return c == '_';
+  }), result.end());
+
+  return result;
+}
+
 void
 createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< std::string >& additionalList, int questId )
 {
@@ -72,7 +86,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
     "#include <Actor/Player.h>\n"
     "#include \"Manager/EventMgr.h\"\n"
     "#include <ScriptObject.h>\n"
-    "#include \"Framework.h\"\n\n"
+    "#include <Service.h>\n\n"
   );
 
   std::size_t splitPos( pQuestData->id.find( "_" ) );
@@ -101,12 +115,15 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
         sceneName +
         "( Entity::Player& player )\n"
         "  {\n"
+        "    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )\n"
+        "    {\n"
+        "    };\n"
+        "\n"
         "    player.playScene( getId(), " +
-        sceneId +
-        ", 0,\n"
-        "      [ & ]( Entity::Player& player, const Event::SceneResult& result )\n"
-        "      {\n"
-        "      });\n"
+        sceneId + ", "
+        "NONE, "
+        "callback"
+        " );\n"
         "  }\n\n"
       );
     }
@@ -126,12 +143,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
       }
       else
       {
-        std::string seqName = titleCase( entry );
-
-        seqName.erase( std::remove_if( seqName.begin(), seqName.end(), []( const char c ) {
-          return c == '_';
-        }), seqName.end());
-
+        std::string seqName = titleCaseNoUnderscores( entry );
         std::string seqId = entry.substr( 4 );
         seqStr += "      " + seqName + " = " + seqId + ",\n";
       }
@@ -189,12 +201,7 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   std::sort( script_entities.begin(), script_entities.end() );
   for( auto& entity : script_entities )
   {
-    auto name = titleCase( entity );
-
-    name.erase( std::remove_if( name.begin(), name.end(), []( const char c ) {
-      return c == '_';
-    }), name.end());
-
+    auto name = titleCaseNoUnderscores( entity );
     sentities += "    static constexpr auto " + name + ";\n";
   }
 
@@ -203,6 +210,8 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
   additional += "// Quest ID: " + std::to_string( questId ) + "\n";
   additional += "// Start NPC: " + std::to_string( pQuestData->issuerStart ) + "\n";
   additional += "// End NPC: " + std::to_string( pQuestData->targetEnd ) + "\n\n";
+
+  additional += "using namespace Sapphire;\n\n";
 
   std::string actionEntry;
   std::string scriptEntry;
@@ -224,14 +233,14 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 
   if( !enemy_ids.empty() )
     scriptEntry += std::string(
-      "  void onBNpcKill( uint32_t npcId, Entity::Player& player )\n"
+      "  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override\n"
       "  {\n" 
       "    switch( npcId )\n"
       "    {\n" );
 
   for( auto enemy : enemy_strings )
   { 
-    scriptEntry += "      case " + enemy + ": { break; }\n"; 
+    scriptEntry += "      case " + titleCaseNoUnderscores( enemy ) + ": { break; }\n";
   }
 
   if( !enemy_ids.empty() )
@@ -240,14 +249,14 @@ createScript( std::shared_ptr< Sapphire::Data::Quest >& pQuestData, std::set< st
 
   if( !action_ids.empty() )
     actionEntry += std::string(
-      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uin32_t actionId )\n"
+      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uint32_t actionId )\n"
       "  {\n" 
       "    switch( actionId )\n"
       "    {\n" );
 
   for( auto action : action_names )
   { 
-    actionEntry += "      case " + action + ": { break; }\n"; 
+    actionEntry += "      case " + titleCaseNoUnderscores( action ) + ": { break; }\n";
   }
 
   if( !action_ids.empty() )

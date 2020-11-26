@@ -2,18 +2,12 @@
 
 #include "Inventory/ItemContainer.h"
 #include "Inventory/Item.h"
-#include "Framework.h"
 #include <Network/CommonActorControl.h>
 
 #include <Exd/ExdDataGenerated.h>
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
-
-Sapphire::World::Manager::ItemMgr::ItemMgr( Sapphire::FrameworkPtr pFw ) :
-  BaseManager( pFw )
-{
-
-}
+#include <Service.h>
 
 bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 {
@@ -33,56 +27,56 @@ bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 }
 
 
-uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
+uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( Common::EquipSlotCategory slot )
 {
 
-  switch( slotId )
+  switch( slot )
   {
-    case Common::CharaHead:
+    case Common::EquipSlotCategory::CharaHead:
       return Common::ArmoryHead;
 
-    case Common::CharaBody:
-    case Common::BodyDisallowHead:
-    case Common::BodyDisallowHandsLegsFeet:
-    case Common::BodyDisallowAll:
-    case Common::BodyDisallowHands:
-    case Common::BodyDisallowLegsFeet:
+    case Common::EquipSlotCategory::CharaBody:
+    //case Common::EquipSlotCategory::BodyDisallowHead:
+    //case Common::EquipSlotCategory::BodyDisallowHandsLegsFeet:
+    //case Common::EquipSlotCategory::BodyDisallowAll:
+    //case Common::EquipSlotCategory::BodyDisallowHands:
+    //case Common::EquipSlotCategory::BodyDisallowLegsFeet:
       return Common::ArmoryBody;
 
-    case Common::CharaEars:
+    case Common::EquipSlotCategory::CharaEars:
       return Common::ArmoryEar;
 
-    case Common::CharaFeet:
+    case Common::EquipSlotCategory::CharaFeet:
       return Common::ArmoryFeet;
 
-    case Common::CharaHands:
+    case Common::EquipSlotCategory::CharaHands:
       return Common::ArmoryHand;
 
-    case Common::CharaLegs:
-    case Common::LegsDisallowFeet:
+    case Common::EquipSlotCategory::CharaLegs:
+    //case Common::EquipSlotCategory::LegsDisallowFeet:
       return Common::ArmoryLegs;
 
-    case Common::CharaMainHand:
-    case Common::MainTwoHandedWeapon:
-    case Common::MainOrOffHand:
+    case Common::EquipSlotCategory::CharaMainHand:
+    //case Common::EquipSlotCategory::MainTwoHandedWeapon:
+    //case Common::EquipSlotCategory::MainOrOffHand:
       return Common::ArmoryMain;
 
-    case Common::CharaOffHand:
+    case Common::EquipSlotCategory::CharaOffHand:
       return Common::ArmoryOff;
 
-    case Common::CharaRing:
+    case Common::EquipSlotCategory::CharaRing:
       return Common::ArmoryRing;
 
-    case Common::CharaWaist:
+    case Common::EquipSlotCategory::CharaWaist:
       return Common::ArmoryWaist;
 
-    case Common::CharaWrist:
+    case Common::EquipSlotCategory::CharaWrist:
       return Common::ArmoryWrist;
 
-    case Common::CharaNeck:
+    case Common::EquipSlotCategory::CharaNeck:
       return Common::ArmoryNeck;
 
-    case Common::CharaSoulCrystal:
+    case Common::EquipSlotCategory::CharaSoulCrystal:
       return Common::ArmorySoulCrystal;
 
     default:
@@ -122,27 +116,26 @@ bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategor
 
 Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   //  1 catalogId, 2 stack, 3 reservedFlag, 4 signatureId, 5 flags, 6 durability, 7 refine, 8 materia_0, 9 materia_1,
   //  10 materia_2, 11 materia_3, 12 materia_4, 13 stain, 14 pattern, 15 buffer_0, 16 buffer_1, 17 buffer_2,
   //  18 buffer_3, 19 buffer_4
-  auto query = pDb->getPreparedStatement( Db::CHARA_ITEMGLOBAL_SELECT );
+  auto query = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_SELECT );
   query->setUInt64( 1, uId );
 
-  auto itemRes = pDb->query( query );
+  auto itemRes = db.query( query );
   if( !itemRes->next() )
     return nullptr;
 
   try
   {
-    auto itemInfo = pExdData->get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
+    auto itemInfo = exdData.get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
     ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
-                               framework(),
                                isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
@@ -185,8 +178,9 @@ Sapphire::Common::ContainerType Sapphire::World::Manager::ItemMgr::getContainerT
 uint32_t Sapphire::World::Manager::ItemMgr::getNextUId()
 {
   uint32_t charId = 0;
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pQR = pDb->query( "SELECT MAX(ItemId) FROM charaglobalitem" );
+
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto pQR = db.query( "SELECT MAX(ItemId) FROM charaglobalitem" );
 
   if( !pQR->next() )
     return 0x00500001;

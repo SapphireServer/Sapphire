@@ -12,7 +12,7 @@
 namespace Sapphire::Network::Packets
 {
 
-  using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
+  using FFXIVPacketBasePtr = std::shared_ptr< Sapphire::Network::Packets::FFXIVPacketBase >;
 
   class LobbyPacketContainer
   {

@@ -5,7 +5,7 @@
 #include <string>
 #include <string.h>
 
-namespace Sapphire
+namespace Sapphire::Api
 {
 
   class Session

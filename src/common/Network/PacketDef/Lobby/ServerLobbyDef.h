@@ -4,10 +4,7 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire {
-namespace Network {
-namespace Packets {
-namespace Server {
+namespace Sapphire::Network::Packets::Server {
 
 struct FFXIVIpcRetainerList :
   FFXIVIpcBasePacket< LobbyRetainerList >
@@ -152,7 +149,5 @@ struct FFXIVIpcLobbyError : FFXIVIpcBasePacket< LobbyError >
 };
 
 }
-}
-}
-}
+
 #endif

@@ -10,14 +10,16 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Database/DatabaseDef.h>
 #include <cmath>
+#include <Network/PacketWrappers/EffectPacket.h>
+#include <Service.h>
 
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
 
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ActorControlPacket142.h"
-#include "Network/PacketWrappers/ActorControlPacket143.h"
-#include "Network/PacketWrappers/InitUIPacket.h"
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/GameConnection.h"
 #include "Script/ScriptMgr.h"
@@ -26,7 +28,7 @@
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
 
-#include "Territory/Zone.h"
+#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
@@ -36,7 +38,6 @@
 #include "ServerMgr.h"
 
 #include "Session.h"
-#include "Framework.h"
 
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
@@ -44,8 +45,7 @@ using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::World::Manager;
 
 // instanciate and initialize commands
-Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr( FrameworkPtr pFw ) :
-  BaseManager( pFw )
+Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
 {
   // Push all commands onto the register map ( command name - function - description - required GM level )
   registerCommand( "set", &DebugCommandMgr::set, "Executes SET commands.", 1 );
@@ -142,8 +142,8 @@ void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player
 void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
-  auto pTerriMgr = framework()->get< TerritoryMgr >();
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   std::string subCommand = "";
   std::string params = "";
 
@@ -199,7 +199,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t aetheryteId;
     sscanf( params.c_str(), "%i", &aetheryteId );
 
-    player.teleport( aetheryteId );
+    player.teleport( static_cast< uint16_t >( aetheryteId ) );
   }
   else if( ( subCommand == "discovery" ) && ( params != "" ) )
   {
@@ -208,35 +208,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%i %i", &map_id, &discover_id );
 
     auto discoveryPacket = makeZonePacket< FFXIVIpcDiscovery >( player.getId() );
-    discoveryPacket->data().map_id = map_id;
-    discoveryPacket->data().map_part_id = discover_id;
+    discoveryPacket->data().mapId = static_cast< uint32_t >( map_id );
+    discoveryPacket->data().mapPartId = static_cast< uint32_t >( discover_id );
     player.queuePacket( discoveryPacket );
   }
-
-  else if( ( subCommand == "discovery_pos" ) && ( params != "" ) )
-  {
-    int32_t map_id;
-    int32_t discover_id;
-    int32_t pos_id;
-    sscanf( params.c_str(), "%i %i %i", &pos_id, &map_id, &discover_id );
-
-    std::string query2 = "UPDATE IGNORE `discoveryinfo` SET `discover_id` = '" + std::to_string( discover_id ) +
-                         "' WHERE `discoveryinfo`.`id` = " + std::to_string( pos_id ) + ";";
-
-    std::string query1 =
-      "INSERT IGNORE INTO `discoveryinfo` (`id`, `map_id`, `discover_id`) VALUES ('" + std::to_string( pos_id ) +
-      "', '" + std::to_string( map_id ) +
-      "', '" + std::to_string( discover_id ) + "')";
-
-    pDb->execute( query1 );
-    pDb->execute( query2 );
-
-  }
-
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    player.queuePacket( std::make_shared< InitUIPacket >( player ) );
+    player.queuePacket( std::make_shared< PlayerSetupPacket >( player ) );
   }
   else if( subCommand == "classjob" )
   {
@@ -257,7 +236,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     int32_t minutes;
     sscanf( params.c_str(), "%d", &minutes );
 
-    player.setCFPenaltyMinutes( minutes );
+    player.setCFPenaltyMinutes( static_cast< uint32_t >( minutes ) );
   }
   else if( subCommand == "eorzeatime" )
   {
@@ -273,7 +252,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
 
     player.dismount();
-    player.mount( id );
+    player.mount( static_cast< uint32_t >( id ) );
   }
   else if( subCommand == "msqguide" )
   {
@@ -281,7 +260,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
 
     auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerProgress >( player.getId() );
-    msqPacket->data().id = id;
+    msqPacket->data().id = static_cast< uint32_t >( id );
     player.queuePacket( msqPacket );
 
     player.sendDebug( "MSQ Guide updated " );
@@ -292,7 +271,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     sscanf( params.c_str(), "%d", &id );
 
     auto msqPacket = makeZonePacket< FFXIVIpcMSQTrackerComplete >( player.getId() );
-    msqPacket->data().id = id;
+    msqPacket->data().id = static_cast< uint32_t >( id );
     player.queuePacket( msqPacket );
 
     player.sendDebug( "MSQ Guide updated " );
@@ -303,7 +282,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
     sscanf( params.c_str(), "%d", &weatherId );
 
-    player.getCurrentZone()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
+    player.getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
   }
   else if( subCommand == "festival" )
   {
@@ -312,11 +291,11 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
     sscanf( params.c_str(), "%hu %hu", &festivalId, &additionalId );
 
-    pTerriMgr->setCurrentFestival( festivalId, additionalId );
+    terriMgr.setCurrentFestival( festivalId, additionalId );
   }
   else if( subCommand == "festivaldisable" )
   {
-    pTerriMgr->disableCurrentFestival();
+    terriMgr.disableCurrentFestival();
   }
   else if( subCommand == "BitFlag" )
   {
@@ -382,6 +361,24 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
       }
     }
   }
+  else if( subCommand == "gauge" )
+  {
+    uint8_t values[15];
+    std::memset( values, 0, sizeof( values ) );
+    sscanf( params.c_str(), "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+            &values[ 0 ], &values[ 1 ], &values[ 2 ], &values[ 3 ], &values[ 4 ],
+            &values[ 5 ], &values[ 6 ], &values[ 7 ], &values[ 8 ], &values[ 9 ],
+            &values[ 10 ], &values[ 11 ], &values[ 12 ], &values[ 13 ], &values[ 14 ] );
+    player.gaugeSetRaw( values );
+  }
+  else if( subCommand == "visual" )
+  {
+    int32_t id;
+    sscanf( params.c_str(), "%d", &id );
+    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( player.getId() );
+    pPacket->data().id = id;
+    player.queuePacket( pPacket );
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );
@@ -392,6 +389,8 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   std::string subCommand;
   std::string params = "";
 
@@ -423,7 +422,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
     auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
-                                                   duration, 3000, framework() );
+                                                   duration, 3000 );
     effect->setParam( param );
 
     player.addStatusEffect( effect );
@@ -433,28 +432,26 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     uint32_t titleId;
     sscanf( params.c_str(), "%u", &titleId );
 
-    player.addTitle( titleId );
+    player.addTitle( static_cast< uint16_t >( titleId ) );
     player.sendNotice( "Added title (id#{0})", titleId );
   }
   else if( subCommand == "bnpc" )
   {
-    auto serverZone = framework()->get< World::ServerMgr >();
-
-    auto bNpcTemplate = serverZone->getBNpcTemplate( params );
+    auto bNpcTemplate = serverMgr.getBNpcTemplate( params );
 
     if( !bNpcTemplate )
     {
       player.sendNotice( "Template {0} not found in cache!", params );
       return;
     }
-    auto playerZone = player.getCurrentZone();
+    auto playerZone = player.getCurrentTerritory();
     auto pBNpc = std::make_shared< Entity::BNpc >( playerZone->getNextActorId(),
                                                    bNpcTemplate,
                                                    player.getPos().x,
                                                    player.getPos().y,
                                                    player.getPos().z,
                                                    player.getRot(),
-                                                   1, 1000, playerZone, framework() );
+                                                   1, 1000, playerZone );
 
 
 
@@ -493,14 +490,14 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     player.sendNotice( "Injecting ACTOR_CONTROL {0}", opcode );
 
-    auto actorControl = makeZonePacket< FFXIVIpcActorControl143 >( playerId, player.getId() );
-    actorControl->data().category = opcode;
-    actorControl->data().param1 = param1;
-    actorControl->data().param2 = param2;
-    actorControl->data().param3 = param3;
-    actorControl->data().param4 = param4;
-    actorControl->data().param5 = param5;
-    actorControl->data().param6 = param6;
+    auto actorControl = makeZonePacket< FFXIVIpcActorControlSelf >( playerId, player.getId() );
+    actorControl->data().category = static_cast< uint16_t >( opcode );
+    actorControl->data().param1 = static_cast< uint16_t >( param1 );
+    actorControl->data().param2 = static_cast< uint16_t >( param2 );
+    actorControl->data().param3 = static_cast< uint16_t >( param3 );
+    actorControl->data().param4 = static_cast< uint16_t >( param4 );
+    actorControl->data().param5 = static_cast< uint16_t >( param5 );
+    actorControl->data().param6 = static_cast< uint16_t >( param6 );
     player.queuePacket( actorControl );
 
 
@@ -510,7 +507,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     player.queuePacket( noticePacket );
 
-    Network::Packets::Server::ActorControlPacket143 controlPacket( player, opcode,
+    Network::Packets::Server::ActorControlSelfPacket controlPacket( player, opcode,
     param1, param2, param3, param4, param5, param6, playerId );
     player.queuePacket( controlPacket );*/
 
@@ -520,7 +517,30 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     uint32_t id;
 
     sscanf( params.c_str(), "%d", &id );
-    player.learnAction( id );
+    player.learnAction( static_cast< uint16_t >( id ) );
+  }
+  else if ( subCommand == "effect")
+  {
+    uint16_t param1;
+    sscanf( params.c_str(), "%hu", &param1 );
+
+    auto effectPacket = std::make_shared< Server::EffectPacket >( player.getId(), player.getTargetId(), param1 );
+    effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
+
+    Common::EffectEntry entry{};
+    entry.value = static_cast< int16_t >( param1 );
+    entry.effectType = Common::ActionEffectType::Damage;
+    entry.param0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
+
+    effectPacket->addEffect( entry );
+
+    auto sequence = player.getCurrentTerritory()->getNextEffectSequence();
+    effectPacket->setSequence( sequence );
+
+//    effectPacket->setAnimationId( param1 );
+//    effectPacket->setEffectFlags( 0 );
+
+    player.queuePacket( effectPacket );
   }
   else
   {
@@ -533,7 +553,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player,
                                                      std::shared_ptr< DebugCommand > command )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   std::string subCommand;
   std::string params = "";
 
@@ -557,11 +577,11 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   if( ( subCommand == "pos" ) )
   {
 
-    int16_t map_id = pExdData->get< Sapphire::Data::TerritoryType >( player.getCurrentZone()->getTerritoryTypeId() )->map;
+    int16_t map_id = exdData.get< Sapphire::Data::TerritoryType >( player.getCurrentTerritory()->getTerritoryTypeId() )->map;
 
     player.sendNotice( "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                        player.getPos().x, player.getPos().y, player.getPos().z,
-                       player.getRot(), map_id, player.getCurrentZone()->getTerritoryTypeId() );
+                       player.getRot(), map_id, player.getCurrentTerritory()->getTerritoryTypeId() );
   }
   else
   {
@@ -574,8 +594,9 @@ void
 Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
                                                          std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( player.getId() );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto pSession = serverMgr.getSession( player.getId() );
   if( pSession )
     pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
@@ -583,8 +604,9 @@ Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Pla
 void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,
                                                                   std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
-  auto pSession = pServerZone->getSession( player.getId() );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto pSession = serverMgr.getSession( player.getId() );
   if( pSession )
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
@@ -592,7 +614,8 @@ void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, En
 void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Player& player,
                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   std::string subCommand;
   std::string params = "";
 
@@ -617,19 +640,19 @@ void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Play
 
   if( subCommand == "start" )
   {
-    auto pSession = pServerZone->getSession( player.getId() );
+    auto pSession = serverMgr.getSession( player.getId() );
     if( pSession )
       pSession->startReplay( params );
   }
   else if( subCommand == "stop" )
   {
-    auto pSession = pServerZone->getSession( player.getId() );
+    auto pSession = serverMgr.getSession( player.getId() );
     if( pSession )
       pSession->stopReplay();
   }
   else if( subCommand == "info" )
   {
-    auto pSession = pServerZone->getSession( player.getId() );
+    auto pSession = serverMgr.getSession( player.getId() );
     if( pSession )
       pSession->sendReplayInfo();
   }
@@ -683,7 +706,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    setActorPosPacket->data().r16 = Util::floatToUInt16Rot( player.getRot() );
+    setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( player.getRot() );
     player.queuePacket( setActorPosPacket );
   }
 }
@@ -692,16 +715,17 @@ void
 Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Player& player,
                                                        std::shared_ptr< DebugCommand > command )
 {
-  auto pServerZone = framework()->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   player.sendDebug( "SapphireZone {0} \nRev: {1}", Version::VERSION, Version::GIT_HASH );
   player.sendDebug( "Compiled: " __DATE__ " " __TIME__ );
-  player.sendDebug( "Sessions: {0}", pServerZone->getSessionCount() );
+  player.sendDebug( "Sessions: {0}", serverMgr.getSessionCount() );
 }
 
 void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Player& player,
                                                         std::shared_ptr< DebugCommand > command )
 {
-  auto pScriptMgr = framework()->get< Scripting::ScriptMgr >();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   std::string subCommand;
   std::string params = "";
 
@@ -727,7 +751,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   {
     if( subCommand == params )
       player.sendDebug( "Command failed: requires name of script" );
-    else if( pScriptMgr->getNativeScriptHandler().unloadScript( params ) )
+    else if( scriptMgr.getNativeScriptHandler().unloadScript( params ) )
       player.sendDebug( "Unloaded script successfully." );
     else
       player.sendDebug( "Failed to unload script: {0}", params );
@@ -739,7 +763,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
     else
     {
       std::set< Sapphire::Scripting::ScriptInfo* > scripts;
-      pScriptMgr->getNativeScriptHandler().findScripts( scripts, params );
+      scriptMgr.getNativeScriptHandler().findScripts( scripts, params );
 
       if( !scripts.empty() )
       {
@@ -761,7 +785,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
       player.sendDebug( "Command failed: requires relative path to script" );
     else
     {
-      if( pScriptMgr->getNativeScriptHandler().loadScript( params ) )
+      if( scriptMgr.getNativeScriptHandler().loadScript( params ) )
         player.sendDebug( "Loaded '{0}' successfully", params );
       else
         player.sendDebug( "Failed to load '{0}'", params );
@@ -774,7 +798,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
       player.sendDebug( "Command failed: requires name of script to reload" );
     else
     {
-      pScriptMgr->getNativeScriptHandler().queueScriptReload( params );
+      scriptMgr.getNativeScriptHandler().queueScriptReload( params );
       player.sendDebug( "Queued script reload for script: {0}", params );
     }
   }
@@ -787,7 +811,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
 void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player& player,
                                                           std::shared_ptr< DebugCommand > command )
 {
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -811,7 +835,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t contentFinderConditionId;
     sscanf( params.c_str(), "%d", &contentFinderConditionId );
 
-    auto instance = pTeriMgr->createInstanceContent( contentFinderConditionId );
+    auto instance = terriMgr.createInstanceContent( contentFinderConditionId );
     if( instance )
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
@@ -822,10 +846,16 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
-    if( instance )
+    auto terri = terriMgr.getTerritoryByGuId( instanceId );
+    if( terri )
     {
-      auto pInstanceContent = instance->getAsInstanceContent();
+      auto pInstanceContent = terri->getAsInstanceContent();
+      if( !pInstanceContent )
+      {
+        player.sendDebug( "Instance id#{} is not an InstanceContent territory.", instanceId );
+        return;
+      }
+
       pInstanceContent->bindPlayer( player.getId() );
       player.sendDebug(
         "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
@@ -839,7 +869,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t instanceId;
     sscanf( params.c_str(), "%d", &instanceId );
 
-    auto instance = pTeriMgr->getInstanceZonePtr( instanceId );
+    auto instance = terriMgr.getTerritoryByGuId( instanceId );
     if( !instance )
     {
       player.sendDebug( "Unknown instance with id#{0} ", instanceId );
@@ -861,7 +891,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t zoneId;
     sscanf( params.c_str(), "%d", &zoneId );
 
-    auto instance = pTeriMgr->createTerritoryInstance( zoneId );
+    auto instance = terriMgr.createTerritoryInstance( zoneId );
     if( instance )
       player.sendDebug(
         "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
@@ -873,7 +903,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint32_t terriId;
     sscanf( params.c_str(), "%d", &terriId );
 
-    if( pTeriMgr->removeTerritoryInstance( terriId ) )
+    if( terriMgr.removeTerritoryInstance( terriId ) )
       player.sendDebug( "Removed instance with id#{0}", terriId );
     else
       player.sendDebug( "Failed to remove instance with id#{0}", terriId );
@@ -889,7 +919,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -902,7 +932,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -920,7 +950,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -939,7 +969,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -951,7 +981,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%hhu", &branch );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -959,7 +989,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -968,7 +998,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -977,7 +1007,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1001,7 +1031,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity::Player& player,
                                                              std::shared_ptr< DebugCommand > command )
 {
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -1025,7 +1055,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     uint32_t contentFinderConditionId;
     sscanf( params.c_str(), "%d", &contentFinderConditionId );
 
-    auto instance = pTeriMgr->createQuestBattle( contentFinderConditionId );
+    auto instance = terriMgr.createQuestBattle( contentFinderConditionId );
     if( instance )
       player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
     else
@@ -1034,7 +1064,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   else if( subCommand == "complete" )
   {
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1044,7 +1074,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   else if( subCommand == "fail" )
   {
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1056,7 +1086,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     uint32_t zoneId;
     sscanf( params.c_str(), "%d", &zoneId );
 
-    auto instance = pTeriMgr->createTerritoryInstance( zoneId );
+    auto instance = terriMgr.createTerritoryInstance( zoneId );
     if( instance )
       player.sendDebug(
         "Created instance with id: " + std::to_string( instance->getGuId() ) + " -> " + instance->getName() );
@@ -1068,7 +1098,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     uint32_t terriId;
     sscanf( params.c_str(), "%d", &terriId );
 
-    if( pTeriMgr->removeTerritoryInstance( terriId ) )
+    if( terriMgr.removeTerritoryInstance( terriId ) )
       player.sendDebug( "Removed instance with id#{0}", terriId );
     else
       player.sendDebug( "Failed to remove instance with id#{0}", terriId );
@@ -1084,7 +1114,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1097,7 +1127,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1115,7 +1145,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1134,7 +1164,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1146,7 +1176,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%hhu", &branch );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1154,7 +1184,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1163,7 +1193,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1172,7 +1202,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentZone() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
     if( !instance )
       return;
 
@@ -1196,7 +1226,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Player& player,
                                                          std::shared_ptr< DebugCommand > command )
 {
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -1222,8 +1252,8 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
 //
 //    if ( permissionSet < 5 )
 //    {
-//      auto pZone = player.getCurrentZone();
-//      if( pTeriMgr->isHousingTerritory( pZone->getTerritoryTypeId() ) )
+//      auto pZone = player.getCurrentTerritory();
+//      if( terriMgr.isHousingTerritory( pZone->getTerritoryTypeId() ) )
 //      {
 //        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );
 //        if( pHousing )
@@ -1237,7 +1267,7 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
 //          player.sendLandFlags();
 //        }
 //        else
-//          player.sendDebug( "You aren't in a housing Zone." );
+//          player.sendDebug( "You aren't in a housing Territory." );
 //      }
 //    }
 //    else

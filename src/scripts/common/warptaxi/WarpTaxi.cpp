@@ -1,9 +1,14 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
+#include "Territory/InstanceObjectCache.h"
+
 #include <Exd/ExdDataGenerated.h>
-#include <Framework.h>
 #include <Manager/PlayerMgr.h>
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -27,13 +32,27 @@ public:
       player.eventFinish( 1310721, 0 );
       player.eventFinish( getId(), 1 );
 
-      auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-      auto warp = exdData->get< Sapphire::Data::Warp >( getId() );
+      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+      auto& popRange = Common::Service< Sapphire::InstanceObjectCache >::ref();
+
+      auto warp = exdData.get< Sapphire::Data::Warp >( getId() );
       if( !warp )
         return;
 
-      auto playerMgr = framework()->get< Sapphire::World::Manager::PlayerMgr >();
-      playerMgr->movePlayerToLandDestination( player, warp->level, result.param3 );
+      auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+
+      auto pPop = popRange.getPopRange( warp->territoryType, warp->popRange );
+
+      if( !pPop )
+      {
+        std::cout << "not found...";
+      }
+      else
+      {
+        std::cout << "found!!";
+      }
+
+      playerMgr.movePlayerToLandDestination( player, warp->popRange, result.param3 );
     }
     else
     {
@@ -56,11 +75,9 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-    if( !exdData )
-      return;
+    auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
-    auto warp = exdData->get< Sapphire::Data::Warp >( eventId );
+    auto warp = exdData.get< Sapphire::Data::Warp >( eventId );
     if( !warp )
       return;
 

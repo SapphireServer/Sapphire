@@ -6,8 +6,9 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketWrappers/ActorControlPacket143.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Actor/Actor.h"
@@ -20,7 +21,6 @@
 
 #include "Forwards.h"
 #include "HousingInteriorTerritory.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -34,9 +34,8 @@ Sapphire::World::Territory::Housing::HousingInteriorTerritory::HousingInteriorTe
                                                                                          uint16_t territoryTypeId,
                                                                                          uint32_t guId,
                                                                                          const std::string& internalName,
-                                                                                         const std::string& contentName,
-                                                                                         FrameworkPtr pFw ) :
-  Zone( territoryTypeId, guId, internalName, contentName, pFw ),
+                                                                                         const std::string& contentName ) :
+  Territory( territoryTypeId, guId, internalName, contentName ),
   m_landIdent( ident )
 {
 }
@@ -52,9 +51,9 @@ bool Sapphire::World::Territory::Housing::HousingInteriorTerritory::init()
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
-  auto pHousingMgr = m_pFw->get< HousingMgr >();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
 
-  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Zone#{0}|{1}, Entity#{2}",
+  Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                   getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto indoorInitPacket = makeZonePacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );
@@ -63,8 +62,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   indoorInitPacket->data().u3 = 0;
   indoorInitPacket->data().u4 = 0;
 
-  auto landSetId = pHousingMgr->toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum );
-  auto pLand = pHousingMgr->getHousingZoneByLandSetId( landSetId )->getLand( m_landIdent.landId );
+  auto landSetId = housingMgr.toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
+  auto pLand = housingMgr.getHousingZoneByLandSetId( landSetId )->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
   auto pHouse = pLand->getHouse();
 
   for( auto i = 0; i < 10; i++ )
@@ -99,7 +98,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
   }
 
   if( isFcHouse )
-    player.queuePacket( Server::makeActorControl143( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
+    player.queuePacket(
+      Server::makeActorControlSelf( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onUpdate( uint64_t tickCount )
@@ -114,7 +114,7 @@ const Common::LandIdent Sapphire::World::Territory::Housing::HousingInteriorTerr
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousingObjects()
 {
-  auto housingMgr = m_pFw->get< Manager::HousingMgr >();
+  auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto containerIds = {
     InventoryType::HousingInteriorPlacedItems1,
@@ -134,7 +134,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
   memset( &obj, 0x0, sizeof( Common::HousingObject ) );
   m_housingObjects.fill( obj );
 
-  auto containers = housingMgr->getEstateInventory( getLandIdent() );
+  auto containers = housingMgr.getEstateInventory( getLandIdent() );
 
   uint8_t containerIdx = 0;
   for( auto containerId : containerIds )
@@ -151,9 +151,9 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
 
       auto offset = item.first + ( containerIdx * 50 );
 
-      auto obj = housingMgr->getYardObjectForItem( housingItem );
+      auto obj = housingMgr.getYardObjectForItem( housingItem );
 
-      m_housingObjects[ offset ] = obj;
+      m_housingObjects[static_cast< size_t >( offset ) ] = obj;
     }
 
     containerIdx++;
@@ -165,19 +165,19 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
                                                                                         uint16_t containerType,
                                                                                         Inventory::HousingItemPtr item )
 {
-  auto housingMgr = m_pFw->get< Manager::HousingMgr >();
+  auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto offset = ( containerIdx * 50 ) + slot;
-  auto obj = housingMgr->getYardObjectForItem( item );
+  auto obj = housingMgr.getYardObjectForItem( item );
 
-  m_housingObjects[ offset ] = obj;
+  m_housingObjects[ static_cast< size_t >( offset ) ] = obj;
 
   for( const auto& player : m_playerMap )
   {
     auto objectSpawnPkt = makeZonePacket< Server::FFXIVIpcHousingInternalObjectSpawn >( player.second->getId() );
 
     objectSpawnPkt->data().containerId = containerType;
-    objectSpawnPkt->data().containerOffset = slot;
+    objectSpawnPkt->data().containerOffset = static_cast< uint8_t >( slot );
 
     objectSpawnPkt->data().object.itemId = item->getAdditionalData() & 0xFFFF;
     objectSpawnPkt->data().object.rotation = item->getRot();
@@ -206,7 +206,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
 
     auto moveObjPkt = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
-    moveObjPkt->data().itemRotation = obj.rotation;
+    moveObjPkt->data().itemRotation = static_cast< uint16_t >( obj.rotation );
     moveObjPkt->data().pos = obj.pos;
 
     // todo: how does this work when an item is in a slot >50 or u8 max? my guess is landid is the container index, but not sure...
@@ -223,7 +223,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::removeHousin
 
   for( const auto& player : m_playerMap )
   {
-    auto pkt = Server::makeActorControl143( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem, slot );
+    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem,
+                                             slot );
 
     player.second->queuePacket( pkt );
   }

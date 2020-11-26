@@ -2,12 +2,12 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Exd/ExdDataGenerated.h>
 #include <Network/PacketContainer.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
 #include "Session.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -15,14 +15,19 @@ using namespace Sapphire::Network::Packets::Server;
 
 void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 {
-
   int8_t idx = getQuestIndex( questId );
 
   removeQuest( questId );
+
+  auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
+  questFinishPacket->data().questId = questId;
+  questFinishPacket->data().flag1 = 1;
+  questFinishPacket->data().flag2 = 1;
+  queuePacket( questFinishPacket );
+
   updateQuestsCompleted( questId );
 
-  sendQuestTracker();
-
+  //sendQuestTracker(); already sent in removeQuest()
 }
 
 void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
@@ -33,23 +38,15 @@ void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
 
 void Sapphire::Entity::Player::removeQuest( uint16_t questId )
 {
-
   int8_t idx = getQuestIndex( questId );
 
   if( ( idx != -1 ) && ( m_activeQuests[ idx ] != nullptr ) )
   {
-
     auto questUpdatePacket = makeZonePacket< FFXIVIpcQuestUpdate >( getId() );
     questUpdatePacket->data().slot = static_cast< uint8_t >( idx );
     questUpdatePacket->data().questInfo.c.questId = 0;
     questUpdatePacket->data().questInfo.c.sequence = 0xFF;
     queuePacket( questUpdatePacket );
-
-    auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
-    questFinishPacket->data().questId = questId;
-    questFinishPacket->data().flag1 = 1;
-    questFinishPacket->data().flag2 = 1;
-    queuePacket( questFinishPacket );
 
     for( int32_t ii = 0; ii < 5; ii++ )
     {
@@ -67,7 +64,6 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
   }
 
   sendQuestTracker();
-
 }
 
 bool Sapphire::Entity::Player::hasQuest( uint32_t questId )
@@ -1019,7 +1015,7 @@ Sapphire::Entity::Player::sendQuestMessage( uint32_t questId, int8_t msgId, uint
 
 void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
 {
-  uint8_t index = questId / 8;
+  uint16_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
 
   uint8_t value = 0x80 >> bitIndex;
@@ -1029,7 +1025,7 @@ void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
 
 void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 {
-  uint8_t index = questId / 8;
+  uint16_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
 
   uint8_t value = 0x80 >> bitIndex;
@@ -1040,15 +1036,15 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
 bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
 {
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   uint32_t playerLevel = getLevel();
-  auto questInfo = pExdData->get< Sapphire::Data::Quest >( questId );
+  auto questInfo = exdData.get< Sapphire::Data::Quest >( questId );
 
 
   if( !questInfo )
     return false;
 
-  auto paramGrowth = pExdData->get< Sapphire::Data::ParamGrow >( questInfo->classJobLevel0 );
+  auto paramGrowth = exdData.get< Sapphire::Data::ParamGrow >( questInfo->classJobLevel0 );
 
   // TODO: use the correct formula, this one is wrong
   uint32_t exp =
@@ -1067,20 +1063,31 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
 
   if( rewardItemCount > 0 )
   {
-    for( uint32_t i = 0; i < questInfo->itemReward0.size(); i++ )
+    for( uint32_t i = 0; i < rewardItemCount; i++ )
     {
-      addItem( questInfo->itemReward0.at( i ), questInfo->itemCountReward0.at( i ) );
+      auto itemId = questInfo->itemReward0.at( i );
+      if( itemId > 0 )
+      {
+        addItem( itemId, questInfo->itemCountReward0.at( i ), false, false, true, true );
+      }
     }
   }
 
   if( optionalItemCount > 0 )
   {
-    auto itemId = questInfo->itemReward1.at( optionalChoice );
-    addItem( itemId, questInfo->itemCountReward1.at( optionalChoice ) );
+    for( uint32_t i = 0; i < optionalItemCount; i++ )
+    {
+      auto itemId = questInfo->itemReward1.at( i );
+      if( itemId > 0 && itemId == optionalChoice )
+      {
+        addItem( itemId, questInfo->itemCountReward1.at( i ), false, false, true, true );
+        break;
+      }
+    }
   }
 
   if( gilReward > 0 )
-    addCurrency( CurrencyType::Gil, gilReward );
+    addCurrency( CurrencyType::Gil, gilReward, true );
 
   return true;
 }

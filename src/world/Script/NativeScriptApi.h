@@ -26,8 +26,6 @@ namespace Sapphire::ScriptAPI
     uint32_t m_id;
     std::size_t m_type;
 
-    Sapphire::Framework* m_framework;
-
   public:
     /*!
     * @param id an ID which uniquely identifies this script in relation to it's type
@@ -48,20 +46,6 @@ namespace Sapphire::ScriptAPI
     * @return The hash_code of the script
     */
     virtual std::size_t getType() const;
-
-    /*!
-    * @brief Sets the ptr to the framework for use inside scripts
-    *
-    * @param fw The ptr to a Framework
-    */
-    virtual void setFramework( Sapphire::Framework* fw );
-
-    /*!
-    * @brief Returns the current ptr to framework set for the current script
-    *
-    * @return A pointer to Core::Framework
-    */
-    virtual Sapphire::Framework* framework() const;
   };
 
 
@@ -138,13 +122,13 @@ namespace Sapphire::ScriptAPI
   class ActionScript :  public ScriptObject
   {
   public:
-    explicit ActionScript( uint32_t abilityId );
+    explicit ActionScript( uint32_t actionId );
 
-    virtual void onStart( Sapphire::Action::Action& action );
+    virtual void onStart( Sapphire::World::Action::Action& action );
 
-    virtual void onExecute( Sapphire::Action::Action& action );
+    virtual void onExecute( Sapphire::World::Action::Action& action );
 
-    virtual void onInterrupt( Sapphire::Action::Action& action );
+    virtual void onInterrupt( Sapphire::World::Action::Action& action );
   };
 
   /*!

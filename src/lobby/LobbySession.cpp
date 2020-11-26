@@ -1,6 +1,7 @@
 #include "LobbySession.h"
 
-namespace Sapphire {
+using namespace Sapphire::Lobby;
+
 LobbySession::LobbySession( void )
 {
   //setSocket(NULL);
@@ -10,6 +11,5 @@ LobbySession::LobbySession( void )
 LobbySession::~LobbySession( void )
 {
 
-}
 }
 

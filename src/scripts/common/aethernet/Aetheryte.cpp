@@ -1,9 +1,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-#include <Framework.h>
 #include <Exd/ExdDataGenerated.h>
-
+#include <Service.h>
 
 
 using namespace Sapphire;
@@ -33,7 +32,7 @@ public:
     {
       player.playScene( eventId, 2, 0, [this]( Entity::Player& player, const Event::SceneResult& result )
       {
-        if( result.param1 == 256 )
+        if( result.param1 == 256 && result.param2 != 0 )
         {
           player.teleport( result.param2, 2 );
         }
@@ -59,7 +58,8 @@ public:
   {
     if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
     {
-      player.playScene( eventId, 0, 1, [this]( Entity::Player& player, const Event::SceneResult& result )
+      // eventParam4 (or params[1] if using EventPlay8, which is actually used on retail) anything bigger than 1 will show select instance menu item
+      player.playScene( eventId, 0, 1, 0, 1, 2, [this]( Entity::Player& player, const Event::SceneResult& result )
       {
         if( result.param1 == 256 ) // set homepoint
         {
@@ -68,7 +68,7 @@ public:
         }
         else if( result.param1 == 512 ) // aethernet access
         {
-          if( result.param2 == 4 )
+          if( result.param2 == 4 && result.param3 != 0 )
           {
             player.teleport( result.param3, 2 );
           }
@@ -108,11 +108,9 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pExdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-    if( !pExdData )
-      return;
+    auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
-    auto aetherInfo = pExdData->get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
+    auto aetherInfo = exdData.get< Sapphire::Data::Aetheryte >( eventId & 0xFFFF );
     if( !aetherInfo )
       return;
 

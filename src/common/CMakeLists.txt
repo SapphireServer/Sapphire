@@ -26,10 +26,6 @@ if( UNIX )
                            PUBLIC
                              pthread
                              stdc++fs )
-else()
-  target_link_libraries( common
-                           PUBLIC
-                             stackwalker )
 endif()
 
 target_include_directories( common

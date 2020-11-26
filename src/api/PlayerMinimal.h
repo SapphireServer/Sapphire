@@ -2,18 +2,19 @@
 #define _PLAYERMINIMAL_H
 
 #include <map>
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <string>
+#include <cstring>
 
-namespace Sapphire
+namespace Sapphire::Api
 {
 
   class PlayerMinimal
   {
   public:
-    PlayerMinimal( void );
+    PlayerMinimal();
 
-    ~PlayerMinimal( void );
+    ~PlayerMinimal() = default;
 
     // write player to the database
     void write();
@@ -23,13 +24,7 @@ namespace Sapphire
 
     void saveAsNew();
 
-    std::string getLookString();
-
     std::string getInfoJson();
-
-    std::string getModelString();
-
-    std::string getClassString();
 
     uint8_t getClassLevel();
 

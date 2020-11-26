@@ -31,17 +31,6 @@ namespace Sapphire::ScriptAPI
     return m_type;
   }
 
-  void ScriptObject::setFramework( Sapphire::Framework* fw )
-  {
-    assert( fw );
-    m_framework = fw;
-  }
-
-  Sapphire::Framework* ScriptObject::framework() const
-  {
-    return m_framework;
-  }
-
   ///////////////////////////////////////////////////////////////////
 
   StatusEffectScript::StatusEffectScript( uint32_t effectId ) :
@@ -83,20 +72,20 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  ActionScript::ActionScript( uint32_t abilityId ) :
-    ScriptObject( abilityId, typeid( ActionScript ).hash_code() )
+  ActionScript::ActionScript( uint32_t actionId ) :
+    ScriptObject( actionId, typeid( ActionScript ).hash_code() )
   {
   }
 
-  void ActionScript::onStart( Sapphire::Action::Action& action )
+  void ActionScript::onStart( Sapphire::World::Action::Action& action )
   {
   }
 
-  void ActionScript::onExecute( Sapphire::Action::Action& action )
+  void ActionScript::onExecute( Sapphire::World::Action::Action& action )
   {
   }
 
-  void ActionScript::onInterrupt( Sapphire::Action::Action& action )
+  void ActionScript::onInterrupt( Sapphire::World::Action::Action& action )
   {
   }
 
