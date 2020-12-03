@@ -423,6 +423,17 @@ void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId, float x, float y, 
     z = m_pos.z;
     r = m_rot;
   }
+  else
+  {
+    if( x == FLT_MAX )
+      x = m_pos.x;
+    if( y == FLT_MAX )
+      y = m_pos.y;
+    if( z == FLT_MAX )
+      z = m_pos.z;
+    if( r == FLT_MAX )
+      r = m_rot;
+  }
   Common::FFXIVARR_POSITION3 pos { x, y, z };
   m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, pos, Util::getTimeMs(), r );
   prepareZoning( showZoneName ? zoneId : 0, true, 1, 0 );

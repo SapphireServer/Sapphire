@@ -501,7 +501,7 @@ namespace Sapphire::Entity
     /*! gets the players territoryTypeId */
     uint32_t getTerritoryTypeId() const;
 
-    void forceZoneing( uint32_t zoneId = 0, float x = 0, float y = 0, float z = 0, float r = 0, bool showZoneName = false );
+    void forceZoneing( uint32_t zoneId = 0, float x = FLT_MAX, float y = FLT_MAX, float z = FLT_MAX, float r = FLT_MAX, bool showZoneName = false );
 
     /*! return player to preset homepoint */
     void returnToHomepoint();
