@@ -147,7 +147,8 @@ bool Sapphire::World::Manager::TerritoryMgr::isDefaultTerritory( uint32_t territ
   return pTeri->territoryIntendedUse == TerritoryIntendedUse::Inn ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::Town ||
          pTeri->territoryIntendedUse == TerritoryIntendedUse::OpenWorld ||
-         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea;
+         pTeri->territoryIntendedUse == TerritoryIntendedUse::OpeningArea ||
+         pTeri->territoryIntendedUse == 23;
 
 }
 
