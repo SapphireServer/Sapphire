@@ -255,6 +255,7 @@ namespace Sapphire::Network::Packets
 
     LandSetMap = 0x025B, // updated 4.5
 
+    ResidentialWardHouseListing = 0x0096,   // added 5.4
     //////////////////////////////////////////////////
 
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui

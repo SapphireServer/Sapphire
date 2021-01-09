@@ -1936,6 +1936,32 @@ namespace Sapphire::Network::Packets::Server
     } entry[3];
   };
 
+  /**
+* Structural representation of the packet sent by the server
+* when viewing a Ward in the Residential District menu
+*/
+  struct FFXIVIpcResidentialWardHouseListing : FFXIVIpcBasePacket< ResidentialWardHouseListing >
+  {
+    uint8_t unknown0;
+    uint8_t unknown1;
+    uint8_t wardId;     // 0 offset
+    uint8_t unknown3;
+    uint32_t unknown4;
+
+    // 60 listings per packet, 40 bytes each
+    // In sequential order based on housing plot number
+    struct houseListing 
+    {     
+      uint32_t housePrice;   // the last byte of the housing price is also the house size
+      //uint8_t houseSize;   //  0=S, 1=M, 2=L
+      uint8_t unknown5;
+      Common::HousingAppeal houseTag1;
+      Common::HousingAppeal houseTag2;
+      Common::HousingAppeal houseTag3;
+      char ownerName[32];    // if the house is for the sale this will be all null bytes
+    } listing[60]; 
+  };
+
   struct FFXIVIpcMSQTrackerProgress : FFXIVIpcBasePacket< MSQTrackerProgress >
   {
     uint32_t id;
