@@ -636,6 +636,8 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
 
       auto pItem = invMgr.createItem( player, static_cast< uint32_t >( item.second ) );
 
+      player.sendDebug( "container: {}, slot: {}, uid: {}", destContainer.first, item.first, pItem->getUId() );
+
       container->setItem( static_cast< uint8_t >( item.first ), pItem );
     }
 

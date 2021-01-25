@@ -21,7 +21,8 @@ public:
   {
     player.playScene( eventId, 0, HIDE_HOTBAR | NO_DEFAULT_CAMERA, [this, eventId]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+      //auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+      auto& exdData = *reinterpret_cast< Sapphire::Data::ExdDataGenerated* >( player.getExdData() );
 
       auto housingZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
       if( !housingZone )
@@ -40,7 +41,8 @@ public:
       // moving a player inside an event will crash the game so we end it here
       player.eventFinish( eventId, 1 );
 
-      auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+      //auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+      auto& playerMgr = *reinterpret_cast< Sapphire::World::Manager::PlayerMgr* >( player.getPlayerMgr() );
       playerMgr.movePlayerToLandDestination( player, pHousingAethernet->level, housingZone->getWardNum() );
     } );
   }
