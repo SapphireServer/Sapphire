@@ -173,7 +173,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( const Packets::FF
                                                                Entity::Player& player )
 {
   // if the player is marked for zoning we no longer want to update his pos
-  if( player.isMarkedForZoning() )
+  if( player.isMarkedForZoning() || !player.isLoadingComplete() )
     return;
 
   const auto updatePositionPacket = ZoneChannelPacket< Client::FFXIVIpcUpdatePosition >( inPacket );

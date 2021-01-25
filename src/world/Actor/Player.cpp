@@ -2787,6 +2787,19 @@ void* Sapphire::Entity::Player::getTerritoryMgr()
   return &Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 }
 
+void Sapphire::Entity::Player::setPosAndSendActorMove( float x, float y, float z, float rot )
+{
+  setRot( rot );
+  setPos( x, y, z, true );
+
+  auto setActorPosPacket = makeZonePacket< FFXIVIpcActorSetPos >( getId() );
+  setActorPosPacket->data().r16 = Common::Util::floatToUInt16Rot( rot );
+  setActorPosPacket->data().x = x;
+  setActorPosPacket->data().y = y;
+  setActorPosPacket->data().z = z;
+  queuePacket( setActorPosPacket );
+}
+
 Sapphire::TerritoryPtr Sapphire::Entity::Player::getOrCreatePrivateInstance( uint32_t zoneId )
 {
   auto instance = m_privateInstanceMap[ zoneId ];

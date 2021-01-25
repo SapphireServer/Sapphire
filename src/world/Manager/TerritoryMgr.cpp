@@ -644,6 +644,11 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
     // map player to instanceId so it can be tracked.
     m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
   }
+  else
+  {
+    pPlayer->removeFromInRange();
+    pPlayer->clearInRangeSet();
+  }
 
   pPlayer->sendZonePackets();
 
@@ -714,6 +719,14 @@ std::unordered_map< uint32_t, Sapphire::World::Manager::TerritoryMgr::InstanceSp
   { 507, { { -0.7, 0, 11.5 }, 3.1415 } },
   { 636, { { 0, 0, 8 }, -3.1416 } },
   { 680, { { 0, 16.35, -16.46 }, 0 } },
+  { 639, { { 0, 0, 10 }, -3.14 } },
+  { 681, { { 20, -1, 15 }, -2.25 } },
+  { 682, { { 144.15, -4.178, 55 }, 0 } },
+  { 683, { { 0, -5.169, 30 }, -3.14 } },
+  { 727, { { -454, 383, -127 }, 1.578 } },
+  { 738, { { 0, -2, 55 }, -3.14 } },
+  { 737, { { 250, 122, -346 }, -3.14 } },
+  { 744, { { 0, 0, 0 }, 0 } },
 };
 
 std::unordered_map< uint32_t, uint32_t > Sapphire::World::Manager::TerritoryMgr::instanceExitEvent =
@@ -734,4 +747,12 @@ std::unordered_map< uint32_t, uint32_t > Sapphire::World::Manager::TerritoryMgr:
   { 131213, 507 },
   { 131247, 636 },
   { 131274, 680 },
+  { 131260, 639 },
+  { 131266, 681 },
+  //{ 131268, 682 }, scripted
+  { 131273, 683 },
+  { 131276, 727 },
+  { 131286, 738 },
+  { 131289, 737 },
+  { 131294, 744 },
 };
