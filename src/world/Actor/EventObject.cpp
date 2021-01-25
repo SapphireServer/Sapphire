@@ -25,7 +25,8 @@ Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId,
   m_state( initialState ),
   m_objectId( objectId ),
   m_name( givenName ),
-  m_housingLink( 0 )
+  m_housingLink( 0 ),
+  m_flag( 0 )
 {
   m_id = actorId;
   m_pos.x = pos.x;
@@ -84,6 +85,12 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
   }
 }
 
+uint8_t Sapphire::Entity::EventObject::getFlag() const
+{
+  return m_flag;
+}
+
+
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
   for( const auto& player : m_inRangePlayers )
@@ -131,6 +138,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().actorId = getId();
   eobjStatePacket->data().housingLink = getHousingLink();
   eobjStatePacket->data().rotation = Util::floatToUInt16Rot( getRot() );
+  eobjStatePacket->data().flag = getFlag();
   pTarget->queuePacket( eobjStatePacket );
 }
 
