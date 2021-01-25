@@ -90,7 +90,6 @@ uint8_t Sapphire::Entity::EventObject::getFlag() const
   return m_flag;
 }
 
-
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
   for( const auto& player : m_inRangePlayers )
