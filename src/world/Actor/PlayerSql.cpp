@@ -214,7 +214,7 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 
   m_mount = res->getUInt8( "Mount" );
 
-  m_modelSubWeapon = 0;
+  m_modelSubWeapon = getModelSubWeapon();
   m_lastTickTime = 0;
 
   // first login, run the script event
