@@ -25,6 +25,8 @@ namespace Sapphire::Entity
 
     float getScale() const;
 
+    uint8_t getFlag() const;
+
     void setScale( float scale );
 
     void setOnTalkHandler( OnTalkEventHandler handler );
@@ -54,6 +56,7 @@ namespace Sapphire::Entity
     uint32_t m_gimmickId;
     uint32_t m_objectId;
     uint8_t m_state;
+    uint8_t m_flag;
     float m_scale;
     std::string m_name;
     TerritoryPtr m_parentInstance;
