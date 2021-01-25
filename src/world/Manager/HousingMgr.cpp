@@ -704,10 +704,12 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   pLand->updateLandDb();
 
-  // start house built event
+  // start house built event - disabled because it fucks your audio device
   // CmnDefHousingBuildHouse_00149
-  player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
-  player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
+  //player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
+  //player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
+  // instead we do a fake zone to unlock the client
+  Common::Service< TerritoryMgr >::ref().movePlayer( player.getCurrentTerritory(), player.getAsPlayer() );
 
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );

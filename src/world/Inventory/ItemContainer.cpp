@@ -92,7 +92,10 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint8_t slotId )
 void Sapphire::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
 {
   if( slotId > m_size )
+  {
+    Logger::error( "Slot out of range {0}", slotId );
     return;
+  }
 
   m_itemMap[ slotId ] = pItem;
 }

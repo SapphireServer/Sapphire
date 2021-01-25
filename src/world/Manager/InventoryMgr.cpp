@@ -143,15 +143,15 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
 
   stmt->setUInt64( 1, item->getUId() );
 
-  stmt->setUInt( 2, pos.x );
-  stmt->setUInt( 3, pos.y );
-  stmt->setUInt( 4, pos.z );
-  stmt->setInt( 5, rot );
+  stmt->setDouble( 2, static_cast< double >( pos.x ) );
+  stmt->setDouble( 3, static_cast< double >( pos.y ) );
+  stmt->setDouble( 4, static_cast< double >( pos.z ) );
+  stmt->setDouble( 5, static_cast< double >( rot ) );
 
-  stmt->setUInt( 6, pos.x );
-  stmt->setUInt( 7, pos.y );
-  stmt->setUInt( 8, pos.z );
-  stmt->setInt( 9, rot );
+  stmt->setDouble( 6, static_cast< double >( pos.x ) );
+  stmt->setDouble( 7, static_cast< double >( pos.y ) );
+  stmt->setDouble( 8, static_cast< double >( pos.z ) );
+  stmt->setDouble( 9, static_cast< double >( rot ) );
 
   db.execute( stmt );
 }
