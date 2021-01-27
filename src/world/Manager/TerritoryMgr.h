@@ -42,6 +42,7 @@ namespace Sapphire::World::Manager
       AllianceRaid = 8,
       OpenWorldInstanceBattle = 9,
       Trial = 10,
+      RaidPublicArea = 12,
       HousingArea = 13,
       HousingPrivateArea = 14,
       MSQPrivateArea = 15,
@@ -49,14 +50,24 @@ namespace Sapphire::World::Manager
       RaidFights = 17,
       ChocoboTutorial = 21,
       Wedding = 22,
+      DiademV1 = 26,
       BeginnerTutorial = 27,
+      PvPTheFeast = 28,
+      MSQEventArea = 29,
       FreeCompanyGarrison = 30,
       PalaceOfTheDead = 31,
       TreasureMapInstance = 33,
       EventTrial = 36,
-      TheFeastArea = 37,
+      TheFeastArea = 37, //custom match?
+      DiademV2 = 38,
       PrivateEventArea = 40,
-      //Eureka = 41, // wat
+      Eureka = 41, // wat
+      TheFeastCrystalTower = 42,
+      LeapOfFaith = 44,
+      MaskedCarnival = 45,
+      OceanFishing = 46,
+      DiademV3 = 47,
+      Bozja = 48,
     };
 
     TerritoryMgr();

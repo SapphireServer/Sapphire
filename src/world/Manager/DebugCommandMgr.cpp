@@ -227,9 +227,21 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     {
       player.setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
       player.setClassJob( static_cast< Common::ClassJob > ( id ) );
+      player.sendModel();
+      player.sendItemLevel();
+      player.calculateStats();
+      player.sendStats();
+      player.sendStatusEffectUpdate();
+      player.sendStatusUpdate();
     }
     else
       player.setClassJob( static_cast< Common::ClassJob > ( id ) );
+      player.sendModel();
+      player.sendItemLevel();
+      player.calculateStats();
+      player.sendStats();
+      player.sendStatusEffectUpdate();
+      player.sendStatusUpdate();
   }
   else if( subCommand == "cfpenalty" )
   {

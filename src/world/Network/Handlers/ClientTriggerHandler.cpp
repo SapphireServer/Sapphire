@@ -252,7 +252,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     {
       player.setPose( static_cast< uint8_t >( param12 ) );
       auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
-      player.sendToInRangeSet( pSetStatusPacket, true );
+      player.sendToInRangeSet( pSetStatusPacket, false );
       break;
     }
     case ClientTriggerType::Return: // return dead / accept raise
