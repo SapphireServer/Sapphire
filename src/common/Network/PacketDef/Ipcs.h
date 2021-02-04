@@ -194,6 +194,15 @@ namespace Sapphire::Network::Packets
     EventPlay128 = 0x038A, // updated 5.35 hotfix
     EventPlay255 = 0x034B, // updated 5.35 hotfix
 
+    EventYield = 0x037D, // updated 5.35 hotfix
+    //EventYield4 = 0x0000,
+    //EventYield8 = 0x0000,
+    //EventYield16 = 0x0000,
+    //EventYield32 = 0x0000,
+    //EventYield64 = 0x0000,
+    //EventYield128 = 0x0000,
+    //EventYield255 = 0x0000,
+
     EventStart = 0x009A, // updated 5.35 hotfix
     EventFinish = 0x007E, // updated 5.35 hotfix
 
