@@ -41,6 +41,8 @@ namespace Sapphire
 
     ExteriorModelsArray const& getHouseModels() const;
 
+    void clearModelCache();
+
     void updateHouseDb();
 
     void setHasAetheryte( bool hasAetheryte );

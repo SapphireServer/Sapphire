@@ -907,6 +907,8 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
 {
   assert( house );
 
+  house->clearModelCache();
+
   auto& containers = getEstateInventory( house->getLandIdent() );
 
   auto extContainer = containers.find( static_cast< uint16_t >( InventoryType::HousingExteriorAppearance ) );
