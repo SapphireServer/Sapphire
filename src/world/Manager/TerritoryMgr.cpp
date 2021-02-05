@@ -540,6 +540,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
 
       // remove zone from maps
       m_territorySet.erase( zone );
+      m_guIdToTerritoryPtrMap.erase( zone->getGuId() );
       it = m_landIdentToTerritoryPtrMap.erase( it );
     }
     else
@@ -627,14 +628,27 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 
+  bool zoneChanged = true;
   if( pPlayer->getLastPing() != 0 && pPlayer->getCurrentTerritory() )
-    pPlayer->getCurrentTerritory()->removeActor( pPlayer );
+  {
+    zoneChanged = pPlayer->getCurrentTerritory()->getGuId() != pZone->getGuId();
+    if( zoneChanged )
+      pPlayer->getCurrentTerritory()->removeActor( pPlayer );
+  }
 
-  pPlayer->setCurrentZone( pZone );
-  pZone->pushActor( pPlayer );
+  if( zoneChanged )
+  {
+    pPlayer->setCurrentZone( pZone );
+    pZone->pushActor( pPlayer );
 
-  // map player to instanceId so it can be tracked.
-  m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+    // map player to instanceId so it can be tracked.
+    m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+  }
+  else
+  {
+    pPlayer->removeFromInRange();
+    pPlayer->clearInRangeSet();
+  }
 
   pPlayer->sendZonePackets();
 

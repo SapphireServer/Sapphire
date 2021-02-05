@@ -240,5 +240,20 @@ void Sapphire::Land::update( uint64_t tickCount )
 
 Sapphire::Land::InvMaxItemsPair Sapphire::Land::getInventoryItemMax() const
 {
-  return std::make_pair( m_maxPlacedExternalItems, m_maxPlacedInternalItems );
+  switch( m_size )
+  {
+    case HouseSize::Cottage:
+    {
+      return std::make_pair( 20, 200 );
+    }
+    case HouseSize::House:
+    {
+      return std::make_pair( 30, 300 );
+    }
+    case HouseSize::Mansion:
+    {
+      return std::make_pair( 40, 400 );
+    }
+  }
+  assert( false );
 }

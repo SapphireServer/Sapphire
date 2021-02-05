@@ -691,6 +691,23 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIV
   housingMgr.reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
 }
 
+void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingEditExterior >( inPacket );
+
+  std::vector< uint16_t > containerList;
+  std::vector< uint8_t > slotList;
+  for( int i = 0; i < 9; i++ )
+  {
+    auto container = packet.data().container[i];
+    containerList.push_back( container );
+    slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
+  }
+
+  housingMgr.editExterior( player, packet.data().landId, containerList, slotList, packet.data().removeFlag );
+}
+
 void Sapphire::Network::GameConnection::marketBoardSearch( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
