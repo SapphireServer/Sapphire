@@ -541,6 +541,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
 
       // remove zone from maps
       m_territorySet.erase( zone );
+      m_guIdToTerritoryPtrMap.erase( zone->getGuId() );
       it = m_landIdentToTerritoryPtrMap.erase( it );
     }
     else
