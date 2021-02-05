@@ -86,10 +86,6 @@ namespace Sapphire
 
     Sapphire::HousePtr m_pHouse;
 
-    //item storage
-    //uint16_t m_maxPlacedExternalItems;
-    //uint16_t m_maxPlacedInternalItems;
-
     //price
     uint32_t m_initPrice;
     uint32_t m_nextDrop;

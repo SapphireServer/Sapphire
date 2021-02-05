@@ -396,6 +396,7 @@ namespace Sapphire::Network::Packets
     LandRenameHandler = 0x0155, // updated 5.35 hotfix
     HousingUpdateHouseGreeting = 0x02EA, // updated 5.35 hotfix
     HousingUpdateObjectPosition = 0x00D5, // updated 5.35 hotfix
+    HousingEditExterior = 0x0098, // updated 5.35 hotfix
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 

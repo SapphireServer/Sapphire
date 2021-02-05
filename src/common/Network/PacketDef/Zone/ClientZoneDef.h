@@ -426,6 +426,16 @@ struct FFXIVIpcDive :
   uint32_t padding;
 };
 
+struct FFXIVIpcHousingEditExterior :
+  FFXIVIpcBasePacket< HousingEditExterior >
+{
+  uint16_t landId;
+  uint8_t unknown[8];
+  uint16_t container[9];
+  uint16_t slot[9];
+  uint16_t padding;
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H
