@@ -743,7 +743,7 @@ void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXI
     slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
   }
 
-  housingMgr.editExterior( player, packet.data().landId, containerList, slotList );
+  housingMgr.editExterior( player, packet.data().landId, containerList, slotList, packet.data().removeFlag );
 }
 
 void Sapphire::Network::GameConnection::marketBoardSearch( const Packets::FFXIVARR_PACKET_RAW& inPacket,

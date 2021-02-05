@@ -430,7 +430,9 @@ struct FFXIVIpcHousingEditExterior :
   FFXIVIpcBasePacket< HousingEditExterior >
 {
   uint16_t landId;
-  uint8_t unknown[8];
+  uint8_t unknown[6];
+  uint8_t removeFlag;
+  uint8_t unknown2;
   uint16_t container[9];
   uint16_t slot[9];
   uint16_t padding;

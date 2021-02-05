@@ -1632,7 +1632,7 @@ Sapphire::Inventory::HousingItemPtr Sapphire::World::Manager::HousingMgr::getHou
   return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
 }
 
-void Sapphire::World::Manager::HousingMgr::editExterior( Sapphire::Entity::Player& player, uint16_t plot, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList )
+void Sapphire::World::Manager::HousingMgr::editExterior( Sapphire::Entity::Player& player, uint16_t plot, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList, uint8_t removeFlag )
 {
   auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
   if( !terri )
@@ -1654,18 +1654,35 @@ void Sapphire::World::Manager::HousingMgr::editExterior( Sapphire::Entity::Playe
     auto container = containerList.at( i );
     auto slot = slotList.at( i );
     if( container == 0x270F || slot == 0xFF )
+    {
+      if( i >= 5 )
+      {
+        auto removed = ( ( removeFlag >> ( i - 5 ) ) & 1 ) > 0;
+        if( removed )
+        {
+          auto oldItem = exteriorAppearenceContainer->getItem( i );
+          if( oldItem )
+          {
+            exteriorAppearenceContainer->removeItem( i );
+            invMgr.removeItemFromHousingContainer( land->getLandIdent(), exteriorAppearenceContainer->getId(), i );
+            player.addItem( oldItem, false, false, false );
+          }
+        }
+      }
       continue;
+    }
     auto item = getHousingItemFromPlayer( player, static_cast< Sapphire::Common::InventoryType >( container ), slot );
     if( item )
     {
       auto oldItem = exteriorAppearenceContainer->getItem( i );
+      exteriorAppearenceContainer->setItem( i, item );
       if( oldItem )
       {
-        player.addItem( oldItem, false, false, false );
+        player.insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( container ), slot, oldItem );
       }
-      exteriorAppearenceContainer->setItem( i, item );
     }
   }
+  invMgr.sendInventoryContainer( player, exteriorAppearenceContainer );
   invMgr.saveHousingContainer( land->getLandIdent(), exteriorAppearenceContainer );
   updateHouseModels( land->getHouse() );
   std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() )->sendLandUpdate( plot );

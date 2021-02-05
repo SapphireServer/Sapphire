@@ -181,7 +181,7 @@ namespace Sapphire::World::Manager
 
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
 
-    void editExterior( Sapphire::Entity::Player& player, uint16_t plot, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList );
+    void editExterior( Sapphire::Entity::Player& player, uint16_t plot, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList, uint8_t removeFlag );
 
   private:
 
