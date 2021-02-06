@@ -64,6 +64,11 @@ Sapphire::House::ExteriorModelsArray const& Sapphire::House::getHouseModels() co
   return m_exteriorModelCache;
 }
 
+void Sapphire::House::clearModelCache()
+{
+  m_exteriorModelCache.fill( std::make_pair( 0, 0 ) );
+}
+
 const std::string& Sapphire::House::getHouseName() const
 {
   return m_estateName;

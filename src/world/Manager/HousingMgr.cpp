@@ -702,10 +702,12 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   pLand->updateLandDb();
 
-  // start house built event
+  // start house built event - disabled because it fucks your audio device
   // CmnDefHousingBuildHouse_00149
-  player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
-  player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
+  //player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
+  //player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
+  // instead we do a fake zone to unlock the client
+  Common::Service< TerritoryMgr >::ref().movePlayer( player.getCurrentTerritory(), player.getAsPlayer() );
 
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
@@ -902,6 +904,8 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
 void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
 {
   assert( house );
+
+  house->clearModelCache();
 
   auto& containers = getEstateInventory( house->getLandIdent() );
 
@@ -1626,4 +1630,60 @@ Sapphire::Inventory::HousingItemPtr Sapphire::World::Manager::HousingMgr::getHou
     return nullptr;
 
   return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
+}
+
+void Sapphire::World::Manager::HousingMgr::editExterior( Sapphire::Entity::Player& player, uint16_t plot, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList, uint8_t removeFlag )
+{
+  auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+  if( !terri )
+    return;
+
+  auto land = terri->getLand( static_cast< uint8_t >( plot ) );
+  if( !land )
+    return;
+
+  if( !hasPermission( player, *land, 0 ) )
+    return;
+
+  auto& exteriorAppearenceContainer = getEstateInventory( land->getLandIdent() )[ InventoryType::HousingExteriorAppearance ];
+
+  auto& invMgr = Service< InventoryMgr >::ref();
+
+  for( int i = 0; i < 9; i++ )
+  {
+    auto container = containerList.at( i );
+    auto slot = slotList.at( i );
+    if( container == 0x270F || slot == 0xFF )
+    {
+      if( i >= 5 )
+      {
+        auto removed = ( ( removeFlag >> ( i - 5 ) ) & 1 ) > 0;
+        if( removed )
+        {
+          auto oldItem = exteriorAppearenceContainer->getItem( i );
+          if( oldItem )
+          {
+            exteriorAppearenceContainer->removeItem( i );
+            invMgr.removeItemFromHousingContainer( land->getLandIdent(), exteriorAppearenceContainer->getId(), i );
+            player.addItem( oldItem, false, false, false );
+          }
+        }
+      }
+      continue;
+    }
+    auto item = getHousingItemFromPlayer( player, static_cast< Sapphire::Common::InventoryType >( container ), slot );
+    if( item )
+    {
+      auto oldItem = exteriorAppearenceContainer->getItem( i );
+      exteriorAppearenceContainer->setItem( i, item );
+      if( oldItem )
+      {
+        player.insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( container ), slot, oldItem );
+      }
+    }
+  }
+  invMgr.sendInventoryContainer( player, exteriorAppearenceContainer );
+  invMgr.saveHousingContainer( land->getLandIdent(), exteriorAppearenceContainer );
+  updateHouseModels( land->getHouse() );
+  std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() )->sendLandUpdate( plot );
 }

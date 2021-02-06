@@ -181,6 +181,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( reqMoveHousingItem );
 
+    DECLARE_HANDLER( housingEditExterior );
+
     DECLARE_HANDLER( marketBoardSearch );
 
     DECLARE_HANDLER( marketBoardRequestItemInfo );

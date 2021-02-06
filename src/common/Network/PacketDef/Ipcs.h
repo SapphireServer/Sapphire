@@ -194,6 +194,15 @@ namespace Sapphire::Network::Packets
     EventPlay128 = 0x038A, // updated 5.35 hotfix
     EventPlay255 = 0x034B, // updated 5.35 hotfix
 
+    EventYield = 0x037D, // updated 5.35 hotfix
+    //EventYield4 = 0x0000,
+    //EventYield8 = 0x0000,
+    //EventYield16 = 0x0000,
+    //EventYield32 = 0x0000,
+    //EventYield64 = 0x0000,
+    //EventYield128 = 0x0000,
+    //EventYield255 = 0x0000,
+
     EventStart = 0x009A, // updated 5.35 hotfix
     EventFinish = 0x007E, // updated 5.35 hotfix
 
@@ -374,7 +383,7 @@ namespace Sapphire::Network::Packets
     OutOfRangeEventHandler = 0x0319, // updated 5.35 hotfix
     EnterTeriEventHandler = 0x0192, // updated 5.35 hotfix
     ShopEventHandler = 0x01F6, // updated 5.35 hotfix
-
+    EventYieldHandler = 0x0128, // updated 5.35 hotfix
     ReturnEventHandler = 0x02B4, // updated 5.35 hotfix
     TradeReturnEventHandler = 0x00A4, // updated 5.35 hotfix
     TradeMultipleReturnEventHander = 0x035C, // updated 5.35 hotfix
@@ -387,6 +396,7 @@ namespace Sapphire::Network::Packets
     LandRenameHandler = 0x0155, // updated 5.35 hotfix
     HousingUpdateHouseGreeting = 0x02EA, // updated 5.35 hotfix
     HousingUpdateObjectPosition = 0x00D5, // updated 5.35 hotfix
+    HousingEditExterior = 0x0098, // updated 5.35 hotfix
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 
