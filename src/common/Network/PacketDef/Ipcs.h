@@ -62,13 +62,13 @@ namespace Sapphire::Network::Packets
     ///////////////////////////////////////////////////
 
     ChatBanned = 0xF06B,
-    Playtime = 0x03A4, // updated 5.35 hotfix
+    Playtime = 0x01CC, // updated 5.45 hotfix
     Logout = 0x012A, // updated 5.45 hotfix
-    CFNotify = 0x02C4, // updated 5.35 hotfix
+    CFNotify = 0x026E, // updated 5.45 hotfix
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x0193, // updated 5.35 hotfix
     CFPlayerInNeed = 0xF07F,
-    CFPreferredRole = 0x0196, // updated 5.35 hotfix
+    CFPreferredRole = 0x012E, // updated 5.45 hotfix
     CFCancel = 0x00EC, // updated 5.35 hotfix
     SocialRequestError = 0xF0AD,
 
@@ -87,8 +87,8 @@ namespace Sapphire::Network::Packets
 
     SocialList = 0x0315, // updated 5.45 hotfix
 
-    ExamineSearchInfo = 0x03C3, // updated 5.35 hotfix
-    UpdateSearchInfo = 0x0121, // updated 5.35 hotfix
+    ExamineSearchInfo = 0x035F, // updated 5.45 hotfix
+    UpdateSearchInfo = 0x0310, // updated 5.45 hotfix
     InitSearchInfo = 0x01ED, // updated 5.45 hotfix
     ExamineSearchComment = 0x0102, // updated 4.1
 
@@ -114,14 +114,14 @@ namespace Sapphire::Network::Packets
 
     MarketTaxRates = 0x01F8, // updated 5.35 hotfix
 
-    MarketBoardSearchResult = 0x032C, // updated 5.35 hotfix
-    MarketBoardItemListingCount = 0x038F, // updated 5.35 hotfix
-    MarketBoardItemListingHistory = 0x0186, // updated 5.35 hotfix
-    MarketBoardItemListing = 0x025F, // updated 5.35 hotfix
+    MarketBoardSearchResult = 0x01D6, // updated 5.45 hotfix
+    MarketBoardItemListingCount = 0x00C0, // updated 5.45 hotfix
+    MarketBoardItemListingHistory = 0x01C3, // updated 5.45 hotfix
+    MarketBoardItemListing = 0x016B, // updated 5.45 hotfix
     
     CharaFreeCompanyTag = 0x013B, // updated 4.5
     FreeCompanyBoardMsg = 0x013C, // updated 4.5
-    FreeCompanyInfo = 0xF13D, // updated 4.5
+    FreeCompanyInfo = 0x03D0, // updated 5.45 hotfix
     ExamineFreeCompanyInfo = 0xF13E, // updated 4.5
 
     FreeCompanyUpdateShortMessage = 0xF157, // added 5.0
@@ -164,13 +164,13 @@ namespace Sapphire::Network::Packets
     CharaVisualEffect = 0x026A, // updated 5.45 hotfix
 
     ModelEquip = 0x024A, // updated 5.45 hotfix
-    Examine = 0x00BC, // updated 5.35 hotfix
+    Examine = 0x0261, // updated 5.45 hotfix
     CharaNameReq = 0x008E, // updated 5.35 hotfix
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
     RetainerSaleHistory = 0x020E, // updated 5.21 hotfix
-    RetainerInformation = 0x01F9, // updated 5.35 hotfix
+    RetainerInformation = 0x026B, // updated 5.45 hotfix
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
@@ -225,7 +225,7 @@ namespace Sapphire::Network::Packets
     DirectorVars = 0x011D, // updated 5.35 hotfix
     SomeDirectorUnk1 = 0x0084, // updated 5.18
     SomeDirectorUnk2 = 0xF0C1, // updated 5.18
-    SomeDirectorUnk4 = 0x0202, // updated 5.35 hotfix
+    SomeDirectorUnk4 = 0x0071, // updated 5.45 hotfix
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
     DirectorPopUp = 0xF162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
@@ -245,6 +245,8 @@ namespace Sapphire::Network::Packets
     MiniCactpotInit = 0x0286, // added 5.31
     ShopMessage = 0x02FC, // updated 5.45 hotfix
     LootMessage = 0x03B8, // updated 5.45 hotfix
+    ResultDialog = 0x0296, // updated 5.45 hotfix
+    DesynthResult = 0x0323, // updated 5.45 hotfix
 
     /// Housing //////////////////////////////////////
 
@@ -295,6 +297,16 @@ namespace Sapphire::Network::Packets
     // 2C3 and 2C4 are currently unknown
     MahjongEndRoundDraw = 0x02C5, // self explanatory
     MahjongEndGame = 0x02C6, // finished oorasu(all-last) round; shows a result screen.
+
+    /// Airship & Submarine //////////////////////////////////////
+    AirshipExplorationResult = 0x0131, // updated 5.45 hotfix
+    AirshipStatus = 0x0253, // updated 5.45 hotfix
+    AirshipStatusList = 0x0391, // updated 5.45 hotfix
+    AirshipTimers = 0x0206, // updated 5.45 hotfix
+    SubmarineExplorationResult = 0x00EB, // updated 5.45 hotfix
+    SubmarineProgressionStatus = 0x0333, // updated 5.45 hotfix
+    SubmarineStatusList = 0x01F2, // updated 5.45 hotfix
+    SubmarineTimers = 0x013B, // updated 5.45 hotfix
   };
 
   /**
@@ -330,7 +342,7 @@ namespace Sapphire::Network::Packets
     DisbandPartyHandler = 0x0205, // updated 5.35 hotfix
 
     SocialListHandler = 0x02B0, // updated 5.45 hotfix
-    SetSearchInfoHandler = 0x0314, // updated 5.35 hotfix
+    SetSearchInfoHandler = 0x0111, // updated 5.45 hotfix
     ReqSearchInfoHandler = 0x03AC, // updated 5.45 hotfix
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
@@ -361,8 +373,8 @@ namespace Sapphire::Network::Packets
     ClientTrigger = 0x0146, // updated 5.45 hotfix
     DiscoveryHandler = 0x00E3, // updated 5.35 hotfix
 
-    PlaceFieldMarkerPreset = 0x023F, // updated 5.25
-    PlaceFieldMarker = 0x01BA, // updated 5.25
+    PlaceFieldMarkerPreset = 0x01D3, // updated 5.45 hotfix
+    PlaceFieldMarker = 0x0392, // updated 5.45 hotfix
     SkillHandler = 0x0388, // updated 5.45 hotfix
     GMCommand1 = 0x01E0, // updated 5.45 hotfix
     GMCommand2 = 0x0114, // updated 5.45 hotfix
@@ -400,7 +412,7 @@ namespace Sapphire::Network::Packets
 
     SetSharedEstateSettings = 0x017B, // updated 5.0
 
-    UpdatePositionInstance = 0x0345, // updated 5.35 hotfix
+    UpdatePositionInstance = 0x034E, // updated 5.45 hotfix
 
     PerformNoteHandler = 0x029B, // updated 4.3
 
