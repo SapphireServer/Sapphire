@@ -1046,7 +1046,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char mountGuideMask[28];
+    unsigned char mountGuideMask[27];
     //==
     char name[32];
     unsigned char unknownOword[16];
