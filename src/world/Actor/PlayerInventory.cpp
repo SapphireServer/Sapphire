@@ -580,9 +580,9 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
   bool foundFreeSlot = false;
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
-
+  sendDebug( "adding item: {}, equipSlotCategory: {}, stackSize: {}", itemToAdd->getId(), itemInfo->equipSlotCategory, itemInfo->stackSize );
   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
-  if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
+  if( itemInfo->equipSlotCategory > 0 && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
   {
     auto bag = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( itemInfo->equipSlotCategory ) );
 
@@ -601,7 +601,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
       auto item = storage->getItem( slot );
 
       // add any items that are stackable
-      if( canMerge && item && !itemInfo->isEquippable && item->getId() == itemToAdd->getId() )
+      if( canMerge && item && item->getMaxStackSize() > 1 && item->getId() == itemToAdd->getId() )
       {
         uint32_t count = item->getStackSize();
         uint32_t maxStack = item->getMaxStackSize();

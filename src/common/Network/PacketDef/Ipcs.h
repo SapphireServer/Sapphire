@@ -66,7 +66,7 @@ namespace Sapphire::Network::Packets
     Logout = 0x012A, // updated 5.45 hotfix
     CFNotify = 0x026E, // updated 5.45 hotfix
     CFMemberStatus = 0x0079,
-    CFDutyInfo = 0x0193, // updated 5.35 hotfix
+    CFDutyInfo = 0xF193, // updated 5.35 hotfix
     CFPlayerInNeed = 0xF07F,
     CFPreferredRole = 0x012E, // updated 5.45 hotfix
     CFCancel = 0x00EC, // updated 5.35 hotfix
@@ -80,7 +80,7 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x0349, // updated 5.35 hotfix
+    Chat = 0x01BA, // updated 5.45 hotfix
     PartyChat = 0x0065,
 
     WorldVisitList = 0xF0FE, // added 4.5
