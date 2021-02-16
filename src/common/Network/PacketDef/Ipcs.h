@@ -76,7 +76,7 @@ namespace Sapphire::Network::Packets
     SocialRequestResponse = 0x01C7, // updated 5.35 hotfix
     SocialMessage = 0x0308, // updated 5.35 hotfix
     SocialMessage2 = 0x037C, // updated 5.35 hotfix
-    CancelAllianceForming = 0x00C6, // updated 4.2
+    CancelAllianceForming = 0xF0C6, // updated 4.2
 
     LogMessage = 0x00D0,
 
