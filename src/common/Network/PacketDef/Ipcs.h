@@ -62,7 +62,7 @@ namespace Sapphire::Network::Packets
     ///////////////////////////////////////////////////
 
     ChatBanned = 0xF06B,
-    Playtime = 0x01CC, // updated 5.45 hotfix
+    Playtime = 0x03A4, // updated 5.35 hotfix
     Logout = 0x012A, // updated 5.45 hotfix
     CFNotify = 0x026E, // updated 5.45 hotfix
     CFMemberStatus = 0x0079,
@@ -73,9 +73,9 @@ namespace Sapphire::Network::Packets
     SocialRequestError = 0xF0AD,
 
     CFRegistered = 0x010C, // updated 5.35 hotfix
-    SocialRequestResponse = 0x01C7, // updated 5.35 hotfix
-    SocialMessage = 0x0308, // updated 5.35 hotfix
-    SocialMessage2 = 0x037C, // updated 5.35 hotfix
+    SocialRequestResponse = 0x03A5, // updated 5.45 hotfix
+    SocialMessage = 0x030C, // updated 5.45 hotfix
+    SocialMessage2 = 0x00BB, // updated 5.45 hotfix
     CancelAllianceForming = 0x00C6, // updated 4.2
 
     LogMessage = 0x00D0,
@@ -148,8 +148,8 @@ namespace Sapphire::Network::Packets
     ActorCast = 0x034C, // updated 5.45 hotfix
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-    PartyList = 0x02B2, // updated 5.35 hotfix
-    PartyMessage = 0x00AE, // updated 5.35 hotfix
+    PartyList = 0x00F5, // updated 5.45 hotfix
+    PartyMessage = 0x01BC, // updated 5.45 hotfix
     HateRank = 0x0217, // updated 5.45 hotfix
     HateList = 0x00E5, // updated 5.45 hotfix
     ObjectSpawn = 0x0336, // updated 5.45 hotfix
@@ -194,7 +194,7 @@ namespace Sapphire::Network::Packets
     EventPlay128 = 0x02F4, // updated 5.45 hotfix
     EventPlay255 = 0x009D, // updated 5.45 hotfix
 
-    EventYield = 0x037D, // updated 5.35 hotfix
+    EventYield = 0x0268, // updated 5.45 hotfix
     //EventYield4 = 0x0000,
     //EventYield8 = 0x0000,
     //EventYield16 = 0x0000,
@@ -330,16 +330,16 @@ namespace Sapphire::Network::Packets
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
 
-    SocialReqSendHandler = 0x0387, // updated 5.35 hotfix
-    SocialResponseHandler = 0x028D, // updated 5.35 hotfix
+    SocialReqSendHandler = 0x0288, // updated 5.45 hotfix
+    SocialResponseHandler = 0x029B, // updated 5.45 hotfix
     CreateCrossWorldLS = 0x00AF, // updated 4.3
 
     ChatHandler = 0x00A4, // updated 5.45 hotfix
     PartyChatHandler = 0x0065,
-    PartySetLeaderHandler = 0x0208, // updated 5.35 hotfix
-    LeavePartyHandler = 0x0337, // updated 5.35 hotfix
-    KickPartyMemberHandler = 0x014C, // updated 5.35 hotfix
-    DisbandPartyHandler = 0x0205, // updated 5.35 hotfix
+    PartySetLeaderHandler = 0x02EF, // updated 5.45 hotfix
+    LeavePartyHandler = 0x017E, // updated 5.45 hotfix
+    KickPartyMemberHandler = 0x0070, // updated 5.45 hotfix
+    DisbandPartyHandler = 0x037A, // updated 5.45 hotfix
 
     SocialListHandler = 0x02B0, // updated 5.45 hotfix
     SetSearchInfoHandler = 0x0111, // updated 5.45 hotfix
@@ -395,7 +395,7 @@ namespace Sapphire::Network::Packets
     OutOfRangeEventHandler = 0x019B, // updated 5.45 hotfix
     EnterTeriEventHandler = 0x027F, // updated 5.45 hotfix
     ShopEventHandler = 0x01F6, // updated 5.35 hotfix
-    EventYieldHandler = 0x0128, // updated 5.35 hotfix
+    EventYieldHandler = 0x0230, // updated 5.45 hotfix
     ReturnEventHandler = 0x02AD, // updated 5.45 hotfix
     TradeReturnEventHandler = 0x00A7, // updated 5.45 hotfix
     TradeMultipleReturnEventHander = 0x035C, // updated 5.35 hotfix
