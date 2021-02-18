@@ -62,7 +62,7 @@ namespace Sapphire::Network::Packets
     ///////////////////////////////////////////////////
 
     ChatBanned = 0xF06B,
-    Playtime = 0x03A4, // updated 5.35 hotfix
+    Playtime = 0x0302, // updated 5.45 hotfix
     Logout = 0x012A, // updated 5.45 hotfix
     CFNotify = 0x026E, // updated 5.45 hotfix
     CFMemberStatus = 0x0079,
