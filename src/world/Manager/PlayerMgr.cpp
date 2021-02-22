@@ -16,8 +16,7 @@ using namespace Sapphire::World::Manager;
 void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire::Entity::Player& player, uint32_t landId, uint16_t param )
 {
   // check if we have one in the db first
-  //auto& terriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& terriMgr = *reinterpret_cast< Sapphire::World::Manager::TerritoryMgr* >( player.getTerritoryMgr() );
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
 
   Sapphire::TerritoryPtr destinationZone;
 

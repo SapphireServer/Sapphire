@@ -26,8 +26,7 @@ public:
       if( result.param2 != 1 )
         return;
 
-      //auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-      auto& terriMgr = *reinterpret_cast< Sapphire::World::Manager::TerritoryMgr* >( player.getTerritoryMgr() );
+      auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
       if( !zone )

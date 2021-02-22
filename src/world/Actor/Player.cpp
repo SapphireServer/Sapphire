@@ -2762,31 +2762,6 @@ bool Sapphire::Entity::Player::gaugeSamHasAnySen()
   return static_cast< uint8_t >( m_gauge.sam.sen ) > 0;
 }
 
-void* Sapphire::Entity::Player::getEventMgr()
-{
-  return &Common::Service< Sapphire::World::Manager::EventMgr >::ref();
-}
-
-void* Sapphire::Entity::Player::getExdData()
-{
-  return &Common::Service< Data::ExdDataGenerated >::ref();
-}
-
-void* Sapphire::Entity::Player::getPlayerMgr()
-{
-  return &Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-}
-
-void* Sapphire::Entity::Player::getInstanceObjectCache()
-{
-  return &Common::Service< Sapphire::InstanceObjectCache >::ref();
-}
-
-void* Sapphire::Entity::Player::getTerritoryMgr()
-{
-  return &Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-}
-
 void Sapphire::Entity::Player::setPosAndSendActorMove( float x, float y, float z, float rot )
 {
   setRot( rot );
