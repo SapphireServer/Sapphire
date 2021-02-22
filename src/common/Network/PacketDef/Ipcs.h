@@ -66,13 +66,13 @@ namespace Sapphire::Network::Packets
     Logout = 0x012A, // updated 5.45 hotfix
     CFNotify = 0x026E, // updated 5.45 hotfix
     CFMemberStatus = 0x0079,
-    CFDutyInfo = 0xF193, // updated 5.35 hotfix
+    CFDutyInfo = 0x0145, // updated 5.45 hotfix
     CFPlayerInNeed = 0xF07F,
     CFPreferredRole = 0x012E, // updated 5.45 hotfix
-    CFCancel = 0x00EC, // updated 5.35 hotfix
+    CFCancel = 0x0312, // updated 5.45 hotfix
     SocialRequestError = 0xF0AD,
 
-    CFRegistered = 0x010C, // updated 5.35 hotfix
+    CFRegistered = 0x01FB, // updated 5.45 hotfix
     SocialRequestResponse = 0x03A5, // updated 5.45 hotfix
     SocialMessage = 0x030C, // updated 5.45 hotfix
     SocialMessage2 = 0x00BB, // updated 5.45 hotfix
@@ -92,7 +92,7 @@ namespace Sapphire::Network::Packets
     InitSearchInfo = 0x01ED, // updated 5.45 hotfix
     ExamineSearchComment = 0x0102, // updated 4.1
 
-    ServerNoticeShort = 0x017A, // updated 5.35 hotfix
+    ServerNoticeShort = 0x03B4, // updated 5.45 hotfix
     ServerNotice = 0x0354, // updated 5.45 hotfix
     SetOnlineStatus = 0x0166, // updated 5.45 hotfix
 
@@ -131,9 +131,9 @@ namespace Sapphire::Network::Packets
     BossStatusEffectList = 0x0312, // added 5.1
     Effect = 0x027F, // updated 5.45 hotfix
     AoeEffect8 = 0x009B, // updated 5.45 hotfix
-    AoeEffect16 = 0x01B9, // updated 5.35 hotfix
-    AoeEffect24 = 0x02B4, // updated 5.35 hotfix
-    AoeEffect32 = 0x00A4, // updated 5.35 hotfix
+    AoeEffect16 = 0x028C, // updated 5.45 hotfix
+    AoeEffect24 = 0x02AD, // updated 5.45 hotfix
+    AoeEffect32 = 0x00A7, // updated 5.45 hotfix
     PersistantEffect = 0x0244, // updated 5.45 hotfix
 
     GCAffiliation = 0x0155, // updated 5.45 hotfix
@@ -153,7 +153,7 @@ namespace Sapphire::Network::Packets
     HateRank = 0x0217, // updated 5.45 hotfix
     HateList = 0x00E5, // updated 5.45 hotfix
     ObjectSpawn = 0x0336, // updated 5.45 hotfix
-    ObjectDespawn = 0x00C0, // updated 5.35 hotfix
+    ObjectDespawn = 0x02D0, // updated 5.45 hotfix
     UpdateClassInfo = 0x0179, // updated 5.45 hotfix
     SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     PlayerSetup = 0x01E9, // updated 5.45 hotfix
@@ -165,7 +165,7 @@ namespace Sapphire::Network::Packets
 
     ModelEquip = 0x024A, // updated 5.45 hotfix
     Examine = 0x0261, // updated 5.45 hotfix
-    CharaNameReq = 0x008E, // updated 5.35 hotfix
+    CharaNameReq = 0x0380, // updated 5.45 hotfix
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
@@ -222,7 +222,7 @@ namespace Sapphire::Network::Packets
 
     Mount = 0x0122, // updated 5.45 hotfix
 
-    DirectorVars = 0x011D, // updated 5.35 hotfix
+    DirectorVars = 0x0252, // updated 5.45 hotfix
     SomeDirectorUnk1 = 0x0084, // updated 5.18
     SomeDirectorUnk2 = 0xF0C1, // updated 5.18
     SomeDirectorUnk4 = 0x0071, // updated 5.45 hotfix
@@ -234,11 +234,11 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
-    WeatherChange = 0x027B, // updated 5.35 hotfix
-    PlayerTitleList = 0x0251, // updated 5.35 hotfix
-    Discovery = 0x031B, // updated 5.35 hotfix
+    WeatherChange = 0x0167, // updated 5.45 hotfix
+    PlayerTitleList = 0x00F3, // updated 5.45 hotfix
+    Discovery = 0x0247, // updated 5.45 hotfix
 
-    EorzeaTimeOffset = 0x01D4, // updated 5.35 hotfix
+    EorzeaTimeOffset = 0x00C5, // updated 5.45 hotfix
 
     EquipDisplayFlags = 0x0316, // updated 5.45 hotfix
 
@@ -251,28 +251,28 @@ namespace Sapphire::Network::Packets
     /// Housing //////////////////////////////////////
 
     LandSetInitialize = 0x03E2, // updated 5.45 hotfix
-    LandUpdate = 0x00BF, // updated 5.35 hotfix
-    YardObjectSpawn = 0x01CA, // updated 5.35 hotfix
-    HousingIndoorInitialize = 0x01FF, // updated 5.35 hotfix
-    LandPriceUpdate = 0x0380, // updated 5.35 hotfix
+    LandUpdate = 0x027E, // updated 5.45 hotfix
+    YardObjectSpawn = 0x010E, // updated 5.45 hotfix
+    HousingIndoorInitialize = 0x01A9, // updated 5.45 hotfix
+    LandPriceUpdate = 0x0379, // updated 5.45 hotfix
     LandInfoSign = 0x0398, // updated 5.45 hotfix
-    LandRename = 0x0140, // updated 5.35 hotfix
-    HousingEstateGreeting = 0x00C7, // updated 5.35 hotfix
-    HousingUpdateLandFlagsSlot = 0x027E, // updated 5.35 hotfix
+    LandRename = 0x00F6, // updated 5.45 hotfix
+    HousingEstateGreeting = 0x037D, // updated 5.45 hotfix
+    HousingUpdateLandFlagsSlot = 0x03AF, // updated 5.45 hotfix
     HousingLandFlags = 0x033B, // updated 5.45 hotfix
-    HousingShowEstateGuestAccess = 0x03B5, // updated 5.35 hotfix
+    HousingShowEstateGuestAccess = 0x01B3, // updated 5.45 hotfix
 
     HousingObjectInitialize = 0x00B5, // updated 5.45 hotfix
-    HousingInternalObjectSpawn = 0x0234, // updated 5.35 hotfix
+    HousingInternalObjectSpawn = 0x00BC, // updated 5.45 hotfix
 
-    HousingWardInfo = 0x02FD, // updated 5.35 hotfix
-    HousingObjectMove = 0x022C, // updated 5.35 hotfix
+    HousingWardInfo = 0x015E, // updated 5.45 hotfix
+    HousingObjectMove = 0x03E6, // updated 5.45 hotfix
 
-    SharedEstateSettingsResponse = 0x006A, // updated 5.35 hotfix
+    SharedEstateSettingsResponse = 0x03A4, // updated 5.45 hotfix
 
-    LandUpdateHouseName = 0x00B1, // updated 5.35 hotfix
+    LandUpdateHouseName = 0x0215, // updated 5.45 hotfix
 
-    LandSetMap = 0x0149, // updated 5.35 hotfix
+    LandSetMap = 0x00D2, // updated 5.45 hotfix
 
     //////////////////////////////////////////////////
 
@@ -322,11 +322,11 @@ namespace Sapphire::Network::Packets
     CFCommenceHandler = 0x0118, // updated 5.35 hotfix
 
     CFCancelHandler = 0x0332, // updated 5.35 hotfix
-    CFRegisterDuty = 0x0289, // updated 5.35 hotfix
-    CFRegisterRoulette = 0x0088, // updated 5.35 hotfix
-    PlayTimeHandler = 0x02A8, // updated 5.35 hotfix
+    CFRegisterDuty = 0x033C, // updated 5.45 hotfix
+    CFRegisterRoulette = 0x0121, // updated 5.45 hotfix
+    PlayTimeHandler = 0x0096, // updated 5.45 hotfix
     LogoutHandler = 0x0312, // updated 5.45 hotfix
-    CancelLogout = 0x03DB, // updated 5.35 hotfix
+    CancelLogout = 0x0307, // updated 5.45 hotfix
 
     CFDutyInfoHandler = 0x0078, // updated 4.2
 
@@ -384,17 +384,17 @@ namespace Sapphire::Network::Packets
 
     InventoryModifyHandler = 0x0110, // updated 5.45 hotfix
     
-    InventoryEquipRecommendedItems = 0x0116, // updated 5.35 hotfix
+    InventoryEquipRecommendedItems = 0x0186, // updated 5.45 hotfix
 
-    ReqPlaceHousingItem = 0x02AE, // updated 5.35 hotfix
-    BuildPresetHandler = 0x01C2, // updated 5.35 hotfix
+    ReqPlaceHousingItem = 0x0360, // updated 5.45 hotfix
+    BuildPresetHandler = 0x01D7, // updated 5.45 hotfix
 
     TalkEventHandler = 0x00C2, // updated 5.45 hotfix
     EmoteEventHandler = 0x03D5, // updated 5.45 hotfix
     WithinRangeEventHandler = 0x0171, // updated 5.45 hotfix
     OutOfRangeEventHandler = 0x019B, // updated 5.45 hotfix
     EnterTeriEventHandler = 0x027F, // updated 5.45 hotfix
-    ShopEventHandler = 0x01F6, // updated 5.35 hotfix
+    ShopEventHandler = 0x03D4, // updated 5.45 hotfix
     EventYieldHandler = 0x0230, // updated 5.45 hotfix
     ReturnEventHandler = 0x02AD, // updated 5.45 hotfix
     TradeReturnEventHandler = 0x00A7, // updated 5.45 hotfix
@@ -405,12 +405,12 @@ namespace Sapphire::Network::Packets
 
     ReqEquipDisplayFlagsChange = 0x03B0, // updated 5.45 hotfix
 
-    LandRenameHandler = 0x0155, // updated 5.35 hotfix
-    HousingUpdateHouseGreeting = 0x02EA, // updated 5.35 hotfix
-    HousingUpdateObjectPosition = 0x00D5, // updated 5.35 hotfix
-    HousingEditExterior = 0x0098, // updated 5.35 hotfix
+    LandRenameHandler = 0x0187, // updated 5.45 hotfix
+    HousingUpdateHouseGreeting = 0x0367, // updated 5.45 hotfix
+    HousingUpdateObjectPosition = 0x0265, // updated 5.45 hotfix
+    HousingEditExterior = 0x0297, // updated 5.45 hotfix
 
-    SetSharedEstateSettings = 0x017B, // updated 5.0
+    SetSharedEstateSettings = 0x0146, // updated 5.45 hotfix
 
     UpdatePositionInstance = 0x034E, // updated 5.45 hotfix
 
