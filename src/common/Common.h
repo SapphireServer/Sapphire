@@ -51,11 +51,11 @@ namespace Sapphire::Common
 
   enum InventoryOperation : uint16_t
   {
-    Discard = 0x013C,
-    Move = 0x013D,
-    Swap = 0x013E,
-    Split = 0x013F,
-    Merge = 0x0141,
+    Discard = 0x0117,
+    Move = 0x0118,
+    Swap = 0x0119,
+    Split = 0x011A,
+    Merge = 0x011C,
   };
 
   enum ClientLanguage : uint8_t
@@ -161,44 +161,27 @@ namespace Sapphire::Common
 
   enum class EquipSlotCategory : uint8_t
   {
-    // main slots
-
-    CharaMainHand = 0,
-    CharaOffHand = 1,
-    CharaHead = 2,
-    CharaBody = 3,
-    CharaHands = 4,
-    CharaWaist = 5,
-    CharaLegs = 6,
-    CharaFeet = 7,
-    CharaEars = 8,
-    CharaNeck = 9,
-    CharaWrist = 10,
-    CharaRing = 11,
-    CharaSoulCrystal = 12,
-
-    /* following slots not seem to exist any more.
-       when multi-slot gear is moved into equipment slot, normal slot listed above is used.
-       client will move any incompatible gears into armory but no InventoryModifiyHandler is sent.
-       server need to move those silently in order to sync with client.
-    */
-    
-    /*! Cannot equip gear to offhand slot */
-      //MainTwoHandedWeapon = 13,
-    /*! Can be equipped in either main or offhand slot */
-      //MainOrOffHand = 14, // unused
-    /*! Cannot equip gear to head */
-      //BodyDisallowHead = 15,
-    /*! Cannot equip gear to hands, legs and feet slots */
-      //BodyDisallowHandsLegsFeet = 16,
-    /*! Cannot equip gear to feet slot */
-      //LegsDisallowFeet = 18,
-    /*! Cannot equp gear to head, hands, legs, feet slots */
-      //BodyDisallowAll = 19,
-    /*! Cannot equip gear to hands slot */
-      //BodyDisallowHands = 20,
-    /*! Cannot equip gear to legs & feet slots */
-      //BodyDisallowLegsFeet = 21,
+    MainHand = 1,
+    OffHand = 2,
+    Head = 3,
+    Body = 4,
+    Hands = 5,
+    Waist = 6,
+    Legs = 7,
+    Feet = 8,
+    Ears = 9,
+    Neck = 10,
+    Wrist = 11,
+    Ring = 12,
+    MainTwoHandedWeapon = 13,
+    //MainOrOffHand = 14, // unused
+    BodyDisallowHead = 15,
+    BodyDisallowHandsLegsFeet = 16,
+    SoulCrystal = 17,
+    LegsDisallowFeet = 18,
+    BodyDisallowAll = 19,
+    BodyDisallowHands = 20,
+    BodyDisallowLegsFeet = 21,
   };
 
   enum InventoryType : uint16_t

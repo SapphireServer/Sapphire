@@ -1046,8 +1046,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char mountGuideMask[23];
-    unsigned char maybeReservedMountSlots;
+    unsigned char mountGuideMask[27];
     //==
     char name[32];
     unsigned char unknownOword[16];
@@ -1056,10 +1055,11 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetheryte[21];
     unsigned char discovery[445];
     unsigned char howto[34];
-    unsigned char minions[51];
+    unsigned char minions[53];
     unsigned char chocoboTaxiMask[10];
-    unsigned char watchedCutscenes[131];
+    unsigned char watchedCutscenes[135];
     unsigned char companionBardingMask[10];
+    unsigned char unknown5_45a; // companionBardingMask[11]?
     unsigned char companionEquippedHead;
     unsigned char companionEquippedBody;
     unsigned char companionEquippedLegs;
@@ -1074,7 +1074,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char unknownPvp5AB[11];
     unsigned char unknown5B9[5];
     */
-    unsigned char unknown5_3c[234];
+    unsigned char unknown5_45b[236];
     //==
     unsigned char pose;
     /*
@@ -1092,28 +1092,32 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetherCurrentMask[22];
     unsigned char u10[3];
     */
-    unsigned char unknown5_3d[292];
+    unsigned char unknown5_45c[294];
     //==
-    unsigned char orchestrionMask[40];
+    unsigned char orchestrionMask[40]; // this field may already be extended, if it is, the beginning bytes are at the end of unknown5_45c 
     unsigned char hallOfNoviceCompletion[3];
     unsigned char animaCompletion[11];
     unsigned char unknown5_3e[33];
     unsigned char unlockedRaids[28];
     unsigned char unlockedDungeons[18];
     unsigned char unlockedGuildhests[10];
-    unsigned char unlockedTrials[9]; // 5.35 trial:pvp either 9:5 or 8:6 not confirmed
-    unsigned char unlockedPvp[5];
+    /*
+      at least 8 bytes at most 10 bytes in unlockedTrials not confirmed, adjust unlockedPvp so they share a total of 15 bytes and sync with clearedTrials/clearedPvp.
+    */
+    unsigned char unlockedTrials[9];
+    unsigned char unlockedPvp[6];
+    //==
     unsigned char clearedRaids[28];
     unsigned char clearedDungeons[18];
     unsigned char clearedGuildhests[10];
     unsigned char clearedTrials[9];
-    unsigned char clearedPvp[5];
+    unsigned char clearedPvp[6];
     /*
     unsigned short fishingRecordsFishWeight[26];
     unsigned int exploratoryMissionNextTimestamp;
     unsigned char pvpLevel;
     */
-    unsigned char padding2[8];
+    unsigned char unknown5_45d[8];
     //==
   };
 
