@@ -272,7 +272,7 @@ namespace Sapphire::Network::Packets
 
     LandUpdateHouseName = 0x0215, // updated 5.45 hotfix
 
-    LandSetMap = 0x00D2, // updated 5.45 hotfix
+    LandSetMap = 0x0103, // updated 5.45 hotfix
 
     //////////////////////////////////////////////////
 
@@ -281,6 +281,7 @@ namespace Sapphire::Network::Packets
 
     PrepareZoning = 0x01EE, // updated 5.45 hotfix
     ActorGauge = 0x018E, // updated 5.45 hotfix
+    DutyGauge = 0x00D2, // updated 5.45 hotfix
 
     // daily quest info -> without them sent,  login will take longer...
     DailyQuests = 0x02C4, // updated 5.45 hotfix
@@ -378,7 +379,7 @@ namespace Sapphire::Network::Packets
     SkillHandler = 0x0388, // updated 5.45 hotfix
     GMCommand1 = 0x01E0, // updated 5.45 hotfix
     GMCommand2 = 0x0114, // updated 5.45 hotfix
-    AoESkillHandler = 0x030C, // updated 5.35 hotfix
+    AoESkillHandler = 0x03A0, // updated 5.45 hotfix
 
     UpdatePositionHandler = 0x031A, // updated 5.45 hotfix
 
