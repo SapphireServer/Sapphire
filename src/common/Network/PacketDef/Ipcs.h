@@ -277,7 +277,7 @@ namespace Sapphire::Network::Packets
     //////////////////////////////////////////////////
 
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
-    PerformNote = 0x0286, // updated 4.3
+    PerformNote = 0x0248, // updated 5.45 hotfix
 
     PrepareZoning = 0x01EE, // updated 5.45 hotfix
     ActorGauge = 0x018E, // updated 5.45 hotfix
@@ -415,7 +415,7 @@ namespace Sapphire::Network::Packets
 
     UpdatePositionInstance = 0x034E, // updated 5.45 hotfix
 
-    PerformNoteHandler = 0x029B, // updated 4.3
+    PerformNoteHandler = 0x0336, // updated 5.45 hotfix
 
     WorldInteractionHandler = 0x02E4, // updated 5.45 hotfix
     Dive = 0x00F1, // updated 5.45 hotfix
