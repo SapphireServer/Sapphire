@@ -757,6 +757,7 @@ namespace Sapphire::Common
 
     BetweenAreas = 24,
     BoundByDuty = 28,
+    Performing = 40,
     WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
 
