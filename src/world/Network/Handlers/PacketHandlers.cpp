@@ -607,7 +607,7 @@ void Sapphire::Network::GameConnection::performNoteHandler( const Packets::FFXIV
                                                             Entity::Player& player )
 {
   auto performPacket = makeZonePacket< FFXIVIpcPerformNote >( player.getId() );
-  memcpy( &performPacket->data().data[ 0 ], &inPacket.data[ 0x10 ], 32 );
+  memcpy( &performPacket->data().data[ 0 ], &inPacket.data[ 0x10 ], 16 );
   player.sendToInRangeSet( performPacket );
 }
 
