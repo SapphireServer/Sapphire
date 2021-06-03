@@ -776,8 +776,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint16_t elementalLevel; // Eureka
-    uint16_t element; // Eureka
+    uint8_t elemental[6];
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
