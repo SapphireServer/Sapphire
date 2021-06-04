@@ -370,15 +370,15 @@ namespace Sapphire::Network::Packets
     ReqCountdownInitiate = 0xF25F, // updated 5.35 hotfix
     ReqCountdownCancel = 0xF244, // updated 5.25
 
-    ZoneLineHandler = 0xF337, // updated 5.55 hotfix diff
+    ZoneLineHandler = 0x01C2, // updated 5.55 hotfix
     ClientTrigger = 0x0337, // updated 5.55 hotfix
     DiscoveryHandler = 0xF0E3, // updated 5.35 hotfix
 
     PlaceFieldMarkerPreset = 0xF10C, // updated 5.55 hotfix diff
     PlaceFieldMarker = 0xF2E2, // updated 5.55 hotfix diff
     SkillHandler = 0x02A2, // updated 5.55 hotfix
-    GMCommand1 = 0xF3DC, // updated 5.55 hotfix diff
-    GMCommand2 = 0xF13D, // updated 5.55 hotfix diff
+    GMCommand1 = 0x01F0, // updated 5.55 hotfix
+    GMCommand2 = 0x0068, // updated 5.55 hotfix
     AoESkillHandler = 0xF24B, // updated 5.55 hotfix diff
 
     UpdatePositionHandler = 0x024B, // updated 5.55 hotfix
