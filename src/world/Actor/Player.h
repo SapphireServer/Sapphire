@@ -584,7 +584,7 @@ namespace Sapphire::Entity
     uint16_t getCurrentCompanion() const;
 
     /*! get the current mount */
-    uint8_t getCurrentMount() const;
+    uint16_t getCurrentMount() const;
 
     /*! set current persistent emote */
     void setPersistentEmote( uint32_t emoteId );
@@ -1127,8 +1127,8 @@ namespace Sapphire::Entity
     uint16_t m_activeTitle;
     uint8_t m_titleList[48];
     uint8_t m_howTo[34];
-    uint8_t m_minions[40];
-    uint8_t m_mountGuide[27];
+    uint8_t m_minions[55];
+    uint8_t m_mountGuide[29];
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;

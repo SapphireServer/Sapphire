@@ -1654,7 +1654,7 @@ uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
   return m_companionId;
 }
 
-uint8_t Sapphire::Entity::Player::getCurrentMount() const
+uint16_t Sapphire::Entity::Player::getCurrentMount() const
 {
   return m_mount;
 }
