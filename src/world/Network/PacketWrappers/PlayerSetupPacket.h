@@ -25,7 +25,7 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player )
     {
-      memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.unknown5_45d ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
+      memset( &m_data.unknownOword[ 0 ], 255, reinterpret_cast< uint64_t >( &m_data.unknown5_55c ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
 
       m_data.contentId = player.getContentId();
 
