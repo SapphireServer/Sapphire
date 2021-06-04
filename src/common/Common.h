@@ -25,7 +25,7 @@ namespace Sapphire::Common
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
   const uint8_t CLASSJOB_TOTAL = 38;
-  const uint8_t CLASSJOB_SLOTS = 28;
+  const uint8_t CLASSJOB_SLOTS = 30;
 
   const uint8_t TOWN_COUNT = 6;
 
