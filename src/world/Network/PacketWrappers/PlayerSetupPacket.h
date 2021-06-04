@@ -65,7 +65,6 @@ namespace Sapphire::Network::Packets::Server
       //m_data.orchestrionMask[0] = 0xFE;
       //memcpy( m_data.mountGuideMask, player.getMountGuideBitmask(), sizeof( m_data.mountGuideMask ) );
       memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
-      m_data.mountGuideMask[21] = 0xBF; // mask out the broken mount
       
       //memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
       //m_data.unlockBitmask[0] = 0xFD;
