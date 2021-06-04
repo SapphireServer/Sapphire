@@ -47,23 +47,23 @@ namespace Sapphire::Network::Packets
     Init = 0x0203, // updated 5.55 hotfix
 
     ActorFreeSpawn = 0x01C5, // updated 5.55 hotfix
-    InitZone = 0x021C, // updated 5.55 hotfix diff
+    InitZone = 0x021C, // updated 5.55 hotfix
 
-    EffectResult = 0x01E9, // updated 5.55 hotfix diff
-    ActorControl = 0x01C8, // updated 5.55 hotfix diff
-    ActorControlSelf = 0x035A, // updated 5.55 hotfix diff
-    ActorControlTarget = 0x0338, // updated 5.55 hotfix diff
+    EffectResult = 0x01E9, // updated 5.55 hotfix
+    ActorControl = 0x01C8, // updated 5.55 hotfix
+    ActorControlSelf = 0x035A, // updated 5.55 hotfix
+    ActorControlTarget = 0x0338, // updated 5.55 hotfix
 
     /*!
      * @brief Used when resting
      */
-    UpdateHpMpTp = 0x0077, // updated 5.55 hotfix diff
+    UpdateHpMpTp = 0x0077, // updated 5.55 hotfix
 
     ///////////////////////////////////////////////////
 
     ChatBanned = 0xF06B,
     Playtime = 0x0348, // updated 5.55 hotfix diff
-    Logout = 0x0292, // updated 5.55 hotfix diff
+    Logout = 0x0292, // updated 5.55 hotfix
     CFNotify = 0x00DC, // updated 5.55 hotfix diff
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x02A3, // updated 5.55 hotfix diff
@@ -80,12 +80,12 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x00D0,
 
-    Chat = 0x0384, // updated 5.55 hotfix diff
+    Chat = 0x0384, // updated 5.55 hotfix
     PartyChat = 0xF065,
 
     WorldVisitList = 0xF0FE, // added 4.5
 
-    SocialList = 0x00DD, // updated 5.55 hotfix diff
+    SocialList = 0x00DD, // updated 5.55 hotfix
 
     ExamineSearchInfo = 0x022A, // updated 5.55 hotfix diff
     UpdateSearchInfo = 0x03DF, // updated 5.55 hotfix diff
@@ -94,16 +94,16 @@ namespace Sapphire::Network::Packets
 
     ServerNoticeShort = 0x032D, // updated 5.55 hotfix diff
     ServerNotice = 0x02CA, // updated 5.55 hotfix
-    SetOnlineStatus = 0x03A9, // updated 5.55 hotfix diff
+    SetOnlineStatus = 0x03A9, // updated 5.55 hotfix
 
     CountdownInitiate = 0x0237, // updated 5.25
     CountdownCancel = 0x00D9, // updated 5.18
 
     PlayerAddedToBlacklist = 0x033F, // updated 5.1
     PlayerRemovedFromBlacklist = 0x0385, // updated 5.1
-    BlackList = 0x0093, // updated 5.55 hotfix diff
+    BlackList = 0x0093, // updated 5.55 hotfix
 
-    LinkshellList = 0x0160, // updated 5.55 hotfix diff
+    LinkshellList = 0x0160, // updated 5.55 hotfix
 
     MailDeleteRequest = 0xF12B, // updated 5.0
 
@@ -129,41 +129,41 @@ namespace Sapphire::Network::Packets
     StatusEffectList = 0x018A, // updated 5.55 hotfix diff
     EurekaStatusEffectList = 0x0167, // updated 5.18
     BossStatusEffectList = 0x0312, // added 5.1
-    Effect = 0x0283, // updated 5.55 hotfix diff
-    AoeEffect8 = 0x025B, // updated 5.55 hotfix diff
+    Effect = 0x0283, // updated 5.55 hotfix
+    AoeEffect8 = 0x025B, // updated 5.55 hotfix
     AoeEffect16 = 0x015D, // updated 5.55 hotfix diff
     AoeEffect24 = 0x0091, // updated 5.55 hotfix diff
     AoeEffect32 = 0x0169, // updated 5.55 hotfix diff
-    PersistantEffect = 0x035E, // updated 5.55 hotfix diff
+    PersistantEffect = 0x035E, // updated 5.55 hotfix
 
     GCAffiliation = 0x0258, // updated 5.55 hotfix diff
 
-    PlayerSpawn = 0x02C1, // updated 5.55 hotfix diff
-    NpcSpawn = 0x00F1, // updated 5.55 hotfix diff
+    PlayerSpawn = 0x02C1, // updated 5.55 hotfix
+    NpcSpawn = 0x00F1, // updated 5.55 hotfix
     NpcSpawn2 = 0x01CB, // ( Bigger statuseffectlist? ) updated 5.3
-    ActorMove = 0x009D, // updated 5.55 hotfix diff
+    ActorMove = 0x009D, // updated 5.55 hotfix
 
-    ActorSetPos = 0x0266, // updated 5.55 hotfix diff
+    ActorSetPos = 0x0266, // updated 5.55 hotfix
 
-    ActorCast = 0x00A9, // updated 5.55 hotfix diff
+    ActorCast = 0x00A9, // updated 5.55 hotfix
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
     PartyList = 0x01B7, // updated 5.55 hotfix diff
     PartyMessage = 0x01C1, // updated 5.55 hotfix diff
-    HateRank = 0x006E, // updated 5.55 hotfix diff
-    HateList = 0x01F1, // updated 5.55 hotfix diff
-    ObjectSpawn = 0x00FE, // updated 5.55 hotfix diff
-    ObjectDespawn = 0x0201, // updated 5.55 hotfix diff
+    HateRank = 0x006E, // updated 5.55 hotfix
+    HateList = 0x01F1, // updated 5.55 hotfix
+    ObjectSpawn = 0x00FE, // updated 5.55 hotfix
+    ObjectDespawn = 0x0201, // updated 5.55 hotfix
     UpdateClassInfo = 0x0065, // updated 5.55 hotfix
     SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x01E7, // updated 5.55 hotfix diff
-    PlayerStats = 0x012E, // updated 5.55 hotfix diff
+    PlayerSetup = 0x01E7, // updated 5.55 hotfix
+    PlayerStats = 0x012E, // updated 5.55 hotfix
     ActorOwner = 0x00EB, // updated 5.55 hotfix diff
-    PlayerStateFlags = 0x0190, // updated 5.55 hotfix diff
-    PlayerClassInfo = 0x022B, // updated 5.55 hotfix diff
-    CharaVisualEffect = 0x033A, // updated 5.55 hotfix diff
+    PlayerStateFlags = 0x0190, // updated 5.55 hotfix
+    PlayerClassInfo = 0x022B, // updated 5.55 hotfix
+    CharaVisualEffect = 0x033A, // updated 5.55 hotfix
 
-    ModelEquip = 0x0264, // updated 5.55 hotfix diff
+    ModelEquip = 0x0264, // updated 5.55 hotfix
     Examine = 0x027C, // updated 5.55 hotfix diff
     CharaNameReq = 0x02EC, // updated 5.55 hotfix diff
 
@@ -180,10 +180,10 @@ namespace Sapphire::Network::Packets
     InventoryTransaction = 0x02FA, // updated 5.55 hotfix
     CurrencyCrystalInfo = 0x0166, // updated 5.55 hotfix
 
-    InventoryActionAck = 0x027D, // updated 5.55 hotfix diff
+    InventoryActionAck = 0x027D, // updated 5.55 hotfix
     UpdateInventorySlot = 0x0073, // updated 5.55 hotfix diff
 
-    HuntingLogEntry = 0x0080, // updated 5.55 hotfix diff
+    HuntingLogEntry = 0x0080, // updated 5.55 hotfix
 
     EventPlay = 0x0369, // updated 5.55 hotfix
     EventPlay4 = 0x0247, // updated 5.55 hotfix
@@ -203,14 +203,14 @@ namespace Sapphire::Network::Packets
     //EventYield128 = 0x0000,
     //EventYield255 = 0x0000,
 
-    EventStart = 0x0145, // updated 5.55 hotfix diff
-    EventFinish = 0x0174, // updated 5.55 hotfix diff
+    EventStart = 0x0145, // updated 5.55 hotfix
+    EventFinish = 0x0174, // updated 5.55 hotfix
 
     EventLinkshell = 0x1169,
 
-    QuestActiveList = 0x0381, // updated 5.55 hotfix diff
+    QuestActiveList = 0x0381, // updated 5.55 hotfix
     QuestUpdate = 0x031B, // updated 5.55 hotfix diff
-    QuestCompleteList = 0x031A, // updated 5.55 hotfix diff
+    QuestCompleteList = 0x031A, // updated 5.55 hotfix
 
     QuestFinish = 0x00E0, // updated 5.55 hotfix diff
     MSQTrackerComplete = 0xF1D6, // updated 5.0
@@ -218,9 +218,9 @@ namespace Sapphire::Network::Packets
 
     QuestMessage = 0x036E, // updated 5.55 hotfix diff
 
-    QuestTracker = 0x0294, // updated 5.55 hotfix diff
+    QuestTracker = 0x0294, // updated 5.55 hotfix
 
-    Mount = 0x016B, // updated 5.55 hotfix diff
+    Mount = 0x016B, // updated 5.55 hotfix
 
     DirectorVars = 0x0391, // updated 5.55 hotfix diff
     SomeDirectorUnk1 = 0x0084, // updated 5.18
@@ -243,7 +243,7 @@ namespace Sapphire::Network::Packets
     EquipDisplayFlags = 0x01C5, // updated 5.55 hotfix diff
 
     MiniCactpotInit = 0x0286, // added 5.31
-    ShopMessage = 0x0162, // updated 5.55 hotfix diff
+    ShopMessage = 0x0162, // updated 5.55 hotfix
     LootMessage = 0x0065, // updated 5.55 hotfix diff
     ResultDialog = 0x025D, // updated 5.55 hotfix
     DesynthResult = 0x0323, // updated 5.55 hotfix
