@@ -284,8 +284,8 @@ namespace Sapphire::Network::Packets
     DutyGauge = 0x01D3, // updated 5.55 hotfix diff
 
     // daily quest info -> without them sent,  login will take longer...
-    DailyQuests = 0x0360, // updated 5.55 hotfix diff*
-    DailyQuestRepeatFlags = 0x036C, // updated 5.55 hotfix diff*
+    DailyQuests = 0x0371, // updated 5.55 hotfix
+    DailyQuestRepeatFlags = 0x021F, // updated 5.55 hotfix
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
