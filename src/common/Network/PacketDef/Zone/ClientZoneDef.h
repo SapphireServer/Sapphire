@@ -427,7 +427,7 @@ struct FFXIVIpcDive :
 };
 
 struct FFXIVIpcHousingEditExterior :
-  FFXIVIpcBasePacket< HousingEditExterior >
+  FFXIVIpcBasePacket< HousingEditAppearance >
 {
   uint16_t landId;
   uint8_t unknown[6];
