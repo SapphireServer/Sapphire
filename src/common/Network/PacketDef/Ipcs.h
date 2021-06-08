@@ -164,7 +164,7 @@ namespace Sapphire::Network::Packets
     CharaVisualEffect = 0x033A, // updated 5.55 hotfix
 
     ModelEquip = 0x0264, // updated 5.55 hotfix
-    Examine = 0x027C, // updated 5.55 hotfix diff*
+    Examine = 0x027C, // updated 5.55 hotfix
     CharaNameReq = 0x02EC, // updated 5.55 hotfix diff
 
     // nb: see #565 on github
@@ -209,7 +209,7 @@ namespace Sapphire::Network::Packets
     EventLinkshell = 0x1169,
 
     QuestActiveList = 0x0381, // updated 5.55 hotfix
-    QuestUpdate = 0x031B, // updated 5.55 hotfix diff
+    QuestUpdate = 0x031B, // updated 5.55 hotfix
     QuestCompleteList = 0x031A, // updated 5.55 hotfix
 
     QuestFinish = 0x00E0, // updated 5.55 hotfix
@@ -228,7 +228,7 @@ namespace Sapphire::Network::Packets
     SomeDirectorUnk4 = 0x0101, // updated 5.55 hotfix
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
-    DirectorPopUp = 0xF162, // updated 5.18 - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
+    DirectorPopUp = 0xF162, // updated 5.18 (could be 0x02C2 in 5.55, needs confirmation - display dialogue pop-ups in duties and FATEs, for example, Teraflare's countdown
     DirectorPopUp4 = 0x0214, // updated 5.18
     DirectorPopUp8 = 0x00F8, // updated 5.18
 
@@ -240,7 +240,7 @@ namespace Sapphire::Network::Packets
 
     EorzeaTimeOffset = 0x01AE, // updated 5.55 hotfix
 
-    EquipDisplayFlags = 0x01A3, // updated 5.55 hotfix diff*
+    EquipDisplayFlags = 0x01A3, // updated 5.55 hotfix
 
     MiniCactpotInit = 0x0286, // added 5.31
     ShopMessage = 0x0162, // updated 5.55 hotfix
@@ -251,33 +251,33 @@ namespace Sapphire::Network::Packets
     /// Housing //////////////////////////////////////
 
     LandSetInitialize = 0x01E4, // updated 5.55 hotfix
-    LandUpdate = 0x012B, // updated 5.55 hotfix diff*
-    YardObjectSpawn = 0x0249, // updated 5.55 hotfix diff*
-    HousingIndoorInitialize = 0x0133, // updated 5.55 hotfix diff*
-    LandPriceUpdate = 0x00AA, // updated 5.55 hotfix diff*
-    LandInfoSign = 0x023D, // updated 5.55 hotfix diff*
-    LandRename = 0x0158, // updated 5.55 hotfix diff*
-    HousingEstateGreeting = 0x018D, // updated 5.55 hotfix diff*
+    LandUpdate = 0x012B, // updated 5.55 hotfix
+    YardObjectSpawn = 0x0249, // updated 5.55 hotfix
+    HousingIndoorInitialize = 0x0133, // updated 5.55 hotfix
+    LandPriceUpdate = 0x00AA, // updated 5.55 hotfix
+    LandInfoSign = 0x023D, // updated 5.55 hotfix
+    LandRename = 0x0158, // updated 5.55 hotfix
+    HousingEstateGreeting = 0x018D, // updated 5.55 hotfix
     HousingUpdateLandFlagsSlot = 0x03C8, // updated 5.55 hotfix
     HousingLandFlags = 0x037E, // updated 5.55 hotfix
-    HousingShowEstateGuestAccess = 0x01F8, // updated 5.55 hotfix diff*
+    HousingShowEstateGuestAccess = 0x01F8, // updated 5.55 hotfix
 
     HousingObjectInitialize = 0x0331, // updated 5.55 hotfix
-    HousingInternalObjectSpawn = 0x0092, // updated 5.55 hotfix diff*
+    HousingInternalObjectSpawn = 0x0092, // updated 5.55 hotfix
 
-    HousingWardInfo = 0x0279, // updated 5.55 hotfix diff*
-    HousingObjectMove = 0x0239, // updated 5.55 hotfix diff*
+    HousingWardInfo = 0x0279, // updated 5.55 hotfix
+    HousingObjectMove = 0x0239, // updated 5.55 hotfix
 
     SharedEstateSettingsResponse = 0x0263, // updated 5.55 hotfix
 
-    LandUpdateHouseName = 0x01D6, // updated 5.55 hotfix diff*
+    LandUpdateHouseName = 0x01D6, // updated 5.55 hotfix
 
-    LandSetMap = 0x01D3, // updated 5.55 hotfix diff*
+    LandSetMap = 0x01D3, // updated 5.55 hotfix
 
     //////////////////////////////////////////////////
 
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
-    PerformNote = 0x038B, // updated 5.55 hotfix diff
+    PerformNote = 0x038B, // updated 5.55 hotfix
 
     PrepareZoning = 0x00A4, // updated 5.55 hotfix
     ActorGauge = 0x03B1, // updated 5.55 hotfix
@@ -294,7 +294,7 @@ namespace Sapphire::Network::Packets
     MahjongEndRoundTsumo = 0x02BF, // called tsumo
     MahjongEndRoundRon = 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
     MahjongTileDiscard = 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
-    MahjongPlayersInfo = 0x02C2, // actor id, name, rating and stuff..
+    MahjongPlayersInfo = 0xF2C2, // actor id, name, rating and stuff..
     // 2C3 and 2C4 are currently unknown
     MahjongEndRoundDraw = 0x02C5, // self explanatory
     MahjongEndGame = 0x02C6, // finished oorasu(all-last) round; shows a result screen.
@@ -330,15 +330,15 @@ namespace Sapphire::Network::Packets
     CancelLogout = 0x010F, // updated 5.55 hotfix
     CFDutyInfoHandler = 0xF078, // updated 4.2
 
-    SocialReqSendHandler = 0x01B1, // updated 5.55 hotfix
-    SocialResponseHandler = 0x029B, // updated 5.45 hotfix
-    CreateCrossWorldLS = 0x00AF, // updated 4.3
+    SocialReqSendHandler = 0x028E, // updated 5.55 hotfix
+    SocialResponseHandler = 0x0373, // updated 5.55 hotfix
+    CreateCrossWorldLS = 0x028D, // updated 5.55 hotfix
 
     ChatHandler = 0x01B8, // updated 5.55 hotfix
     PartyChatHandler = 0x0065,
-    PartySetLeaderHandler = 0x02EF, // updated 5.45 hotfix
-    LeavePartyHandler = 0x01A4, // updated 5.55 hotfix diff
-    KickPartyMemberHandler = 0x0070, // updated 5.45 hotfix
+    PartySetLeaderHandler = 0x0142, // updated 5.55 hotfix
+    LeavePartyHandler = 0x026C, // updated 5.55 hotfix
+    KickPartyMemberHandler = 0x0379, // updated 5.55 hotfix
     DisbandPartyHandler = 0x037A, // updated 5.45 hotfix
 
     SocialListHandler = 0x00F2, // updated 5.55 hotfix
@@ -373,12 +373,12 @@ namespace Sapphire::Network::Packets
     ClientTrigger = 0x0337, // updated 5.55 hotfix
     DiscoveryHandler = 0x00E3, // updated 5.35 hotfix
 
-    PlaceFieldMarkerPreset = 0x010C, // updated 5.55 hotfix diff*
-    PlaceFieldMarker = 0x02E2, // updated 5.55 hotfix diff*
+    PlaceFieldMarkerPreset = 0xF10C, // updated 5.55 hotfix diff
+    PlaceFieldMarker = 0xF2E2, // updated 5.55 hotfix diff
     SkillHandler = 0x02A2, // updated 5.55 hotfix
     GMCommand1 = 0x01F0, // updated 5.55 hotfix
     GMCommand2 = 0x0068, // updated 5.55 hotfix
-    AoESkillHandler = 0x024B, // updated 5.55 hotfix diff*
+    AoESkillHandler = 0x02F6, // updated 5.55 hotfix
 
     UpdatePositionHandler = 0x024B, // updated 5.55 hotfix
 
@@ -386,16 +386,16 @@ namespace Sapphire::Network::Packets
     
     InventoryEquipRecommendedItems = 0x0186, // updated 5.45 hotfix
 
-    ReqPlaceHousingItem = 0x0313, // updated 5.55 hotfix diff*
-    BuildPresetHandler = 0x01E9, // updated 5.55 hotfix diff*
+    ReqPlaceHousingItem = 0x023E, // updated 5.55 hotfix
+    BuildPresetHandler = 0x0374, // updated 5.55 hotfix
 
     TalkEventHandler = 0x01E9, // updated 5.55 hotfix
-    EmoteEventHandler = 0x035A, // updated 5.55 hotfix diff*
-    WithinRangeEventHandler = 0x0338, // updated 5.55 hotfix diff*
-    OutOfRangeEventHandler = 0x0077, // updated 5.55 hotfix diff*
-    EnterTeriEventHandler = 0x0283, // updated 5.55 hotfix diff*
-    ShopEventHandler = 0x03D4, // updated 5.45 hotfix
-    EventYieldHandler = 0x02A0, // updated 5.55 hotfix diff*
+    EmoteEventHandler = 0xF35A, // updated 5.55 hotfix diff
+    WithinRangeEventHandler = 0x035A, // updated 5.55 hotfix
+    OutOfRangeEventHandler = 0x0338, // updated 5.55 hotfix
+    EnterTeriEventHandler = 0x0077, // updated 5.55 hotfix diff
+    ShopEventHandler = 0x0168, // updated 5.55 hotfix
+    EventYieldHandler = 0x02A0, // updated 5.55 hotfix diff
     ReturnEventHandler = 0x015D, // updated 5.55 hotfix
     TradeReturnEventHandler = 0x0091, // updated 5.55 hotfix
     TradeMultipleReturnEventHander = 0x035C, // updated 5.35 hotfix
@@ -403,21 +403,21 @@ namespace Sapphire::Network::Packets
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
 
-    ReqEquipDisplayFlagsChange = 0x025E, // updated 5.55 hotfix diff*
+    ReqEquipDisplayFlagsChange = 0x032B, // updated 5.55 hotfix
 
-    LandRenameHandler = 0x0330, // updated 5.55 hotfix diff*
-    HousingUpdateHouseGreeting = 0x01BD, // updated 5.55 hotfix diff*
-    HousingUpdateObjectPosition = 0x03A5, // updated 5.55 hotfix diff*
-    HousingEditExterior = 0x01D7, // updated 5.55 hotfix diff*
+    LandRenameHandler = 0x0206, // updated 5.55 hotfix
+    HousingUpdateHouseGreeting = 0x0330, // updated 5.55 hotfix
+    HousingUpdateObjectPosition = 0x03A5, // updated 5.55 hotfix
+    HousingEditAppearance = 0x00D7, // updated 5.55 hotfix
 
-    SetSharedEstateSettings = 0x03DC, // updated 5.55 hotfix diff*
+    SetSharedEstateSettings = 0x03DC, // updated 5.55 hotfix diff
 
     UpdatePositionInstance = 0x009D, // updated 5.55 hotfix
 
-    PerformNoteHandler = 0x00FE, // updated 5.55 hotfix diff*
+    PerformNoteHandler = 0x01F1, // updated 5.55 hotfix
 
-    WorldInteractionHandler = 0x007D, // updated 5.55 hotfix diff*
-    Dive = 0x0306, // updated 5.55 hotfix diff
+    WorldInteractionHandler = 0x0343, // updated 5.55 hotfix
+    Dive = 0x021C, // updated 5.55 hotfix
   };
 
   ////////////////////////////////////////////////////////////////////////////////

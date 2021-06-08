@@ -90,7 +90,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::ReqPlaceHousingItem, "ReqPlaceHousingItem", &GameConnection::reqPlaceHousingItem );
   setZoneHandler( ClientZoneIpcType::HousingUpdateObjectPosition, "HousingUpdateObjectPosition",
                   &GameConnection::reqMoveHousingItem );
-  setZoneHandler( ClientZoneIpcType::HousingEditExterior, "HousingEditExterior", &GameConnection::housingEditExterior );
+  setZoneHandler( ClientZoneIpcType::HousingEditAppearance, "HousingEditAppearance", &GameConnection::housingEditAppearance );
 
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
