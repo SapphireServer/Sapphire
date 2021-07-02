@@ -398,7 +398,7 @@ namespace Sapphire::Network::Packets
     EventYieldHandler = 0x02A0, // updated 5.55 hotfix diff
     ReturnEventHandler = 0x015D, // updated 5.55 hotfix
     TradeReturnEventHandler = 0x0091, // updated 5.55 hotfix
-    TradeMultipleReturnEventHander = 0x035C, // updated 5.35 hotfix
+    TradeReturnEventHandler2 = 0x0169, // updated 5.55 hotfix
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
