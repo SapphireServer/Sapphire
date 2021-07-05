@@ -266,7 +266,6 @@ bool Action::Action::update()
 
   if( isInterrupted() )
   {
-    interrupt();
     return true;
   }
 

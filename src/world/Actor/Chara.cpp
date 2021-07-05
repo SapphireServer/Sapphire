@@ -473,7 +473,7 @@ Sapphire::World::Action::ActionPtr Sapphire::Entity::Chara::getCurrentAction() c
 /*! \param ActionPtr of the action to be registered */
 void Sapphire::Entity::Chara::setCurrentAction( Sapphire::World::Action::ActionPtr pAction )
 {
-  m_pCurrentAction = std::move( pAction );
+  m_pCurrentAction = pAction;
 }
 
 uint32_t Sapphire::Entity::Chara::getBonusStat( Common::BaseParam bonus ) const
