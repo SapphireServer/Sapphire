@@ -57,6 +57,8 @@ void MountAction::start()
 
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
   player->queuePacket( actionStartPkt );
+
+  m_started = true;
 }
 
 void MountAction::execute()
