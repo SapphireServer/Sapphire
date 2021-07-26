@@ -1136,8 +1136,8 @@ namespace Sapphire::Entity
     uint8_t m_discovery[445];
     uint32_t m_playTime;
 
-    uint16_t m_classArray[28];
-    uint32_t m_expArray[28];
+    uint16_t m_classArray[ Common::CLASSJOB_SLOTS ];
+    uint32_t m_expArray[ Common::CLASSJOB_SLOTS ];
     uint8_t m_aetheryte[21];
     uint8_t m_unlocks[64];
     uint8_t m_orchestrion[40];

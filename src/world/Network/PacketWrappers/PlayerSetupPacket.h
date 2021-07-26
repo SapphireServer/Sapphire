@@ -55,7 +55,7 @@ namespace Sapphire::Network::Packets::Server
       //memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
 
       // Set the class levels and exp.
-      for( uint8_t i = 0; i < 25; i++ )
+      for( uint8_t i = 0; i < Common::CLASSJOB_SLOTS; i++ )
       {
         m_data.levels[ i ] = player.getClassArray()[ i ];
         m_data.exp[ i ] = player.getExpArray()[ i ];
