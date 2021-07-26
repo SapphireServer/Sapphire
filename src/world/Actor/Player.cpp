@@ -2269,7 +2269,7 @@ bool Sapphire::Entity::Player::hasQueuedAction() const
 
 void Sapphire::Entity::Player::setQueuedAction( Sapphire::World::Action::ActionPtr pAction )
 {
-  m_pQueuedAction = pAction;
+  m_pQueuedAction = std::move( pAction );
 }
 
 bool Sapphire::Entity::Player::checkAction()
