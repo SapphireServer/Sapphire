@@ -204,6 +204,7 @@ enum class ContentType : uint8_t
   WondrousTails = 24,
   CustomDeliveries = 25,
   Eureka = 26,
+  UltimateRaids = 28,
 };
 
 ///////////////////////////////////////////////////////////
@@ -672,14 +673,14 @@ enum class Weather : uint8_t
   Moonlight1 = 98,
   Moonlight2 = 99,
   Moonlight3 = 100,
-  FairSkies10 = 101,
+  RedMoon = 101,
   Scarlet = 102,
   Scarlet1 = 103,
   Scarlet2 = 104,
-  FairSkies11 = 105,
-  FairSkies12 = 106,
-  FairSkies13 = 107,
-  FairSkies14 = 108,
+  FairSkies10 = 105,
+  FairSkies11 = 106,
+  FairSkies12 = 107,
+  FairSkies13 = 108,
   Flames = 109,
   Tsunamis = 110,
   Cyclones = 111,
@@ -701,7 +702,23 @@ enum class Weather : uint8_t
   Termination2 = 127,
   Termination3 = 128,
   EverlastingLight1 = 129,
+  Eruptions1 = 130,
   Termination4 = 131,
+  FairSkies14 = 132,
+  UmbralFlare = 133,
+  UmbralDuststorm = 134,
+  UmbralLevin = 135,
+  UmbralTempest = 136,
+  Starshower = 137,
+  Delirium = 138,
+  Clouds2 = 139,
+  Clouds3 = 140,
+  Irradiance1 = 141,
+  Irradiance2 = 142,
+  StormClouds1 = 143,
+  Firestorm = 144,
+  SpectralCurrent = 145,
+  Climactic = 147,
 };
 
 ///////////////////////////////////////////////////////////
@@ -728,6 +745,10 @@ enum class HousingAppeal : uint8_t
   Bathhouse = 18,
   Garden = 19,
   FarEastern = 20,
+  VisitorsWelcome = 21,
+  Bakery = 22,
+  UnderRenovation = 23,
+  ConcertHall = 24,
 };
 
 }

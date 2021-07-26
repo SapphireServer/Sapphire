@@ -680,6 +680,7 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unk; // == 0
     uint16_t modelChara;
     uint16_t rotation;
+    uint16_t currentMount;
     uint16_t activeMinion;
     uint8_t spawnIndex;
     uint8_t state;
@@ -693,24 +694,20 @@ namespace Sapphire::Network::Packets::Server
     uint8_t classJob;
     uint8_t u26d;
     uint16_t u27a;
-    uint8_t currentMount;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-
-    //uint32_t elementalLevel; one of these two field changed to 16bit
-    //uint32_t element;
     uint8_t elementData[6];
-
+    uint8_t unknown5_5[3];
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
-    uint32_t unk30;
+    uint32_t unk30[2];
   };
 
   /**
@@ -753,9 +750,10 @@ namespace Sapphire::Network::Packets::Server
     uint32_t displayFlags;
     uint16_t fateID;
     uint16_t mPCurr;
-    uint16_t unknown1; // 0
-    uint16_t unknown2; // 0 or pretty big numbers > 30000
+    uint16_t unknown1;
+    uint16_t unknown2;
     uint16_t modelChara;
+    uint16_t currentMount;
     uint16_t rotation;
     uint16_t activeMinion;
     uint8_t spawnIndex;
@@ -770,14 +768,13 @@ namespace Sapphire::Network::Packets::Server
     uint8_t classJob;
     uint8_t u26d;
     uint16_t u27a;
-    uint8_t currentMount;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint16_t elementalLevel; // Eureka
-    uint16_t element; // Eureka
+    uint8_t elemental[6];
+    uint8_t unknown5_5[3];
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
@@ -789,7 +786,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t bNPCPartSlot;
     uint8_t unk32;
     uint16_t unk33;
-    uint32_t unk34;
+    uint32_t unk34[2];
   };
 
   /**
@@ -1041,12 +1038,12 @@ namespace Sapphire::Network::Packets::Server
     unsigned char mountGuideMask[22];
     unsigned char u19_2;
     */
-    unsigned char unknown5_3a[176];
+    unsigned char unknown5_55a[178];
     unsigned char companionName[21];
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char mountGuideMask[27];
+    unsigned char mountGuideMask[29];
     //==
     char name[32];
     unsigned char unknownOword[16];
@@ -1055,11 +1052,10 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetheryte[21];
     unsigned char discovery[445];
     unsigned char howto[34];
-    unsigned char minions[53];
+    unsigned char minions[55];
     unsigned char chocoboTaxiMask[10];
-    unsigned char watchedCutscenes[135];
-    unsigned char companionBardingMask[10];
-    unsigned char unknown5_45a; // companionBardingMask[11]?
+    unsigned char watchedCutscenes[137];
+    unsigned char companionBardingMask[11];
     unsigned char companionEquippedHead;
     unsigned char companionEquippedBody;
     unsigned char companionEquippedLegs;
@@ -1092,12 +1088,12 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetherCurrentMask[22];
     unsigned char u10[3];
     */
-    unsigned char unknown5_45c[294];
+    unsigned char unknown5_55b[295];
     //==
-    unsigned char orchestrionMask[40]; // this field may already be extended, if it is, the beginning bytes are at the end of unknown5_45c 
+    unsigned char orchestrionMask[40]; // this field may already be extended, if it is, the beginning bytes are at the end of unknown5_55b
     unsigned char hallOfNoviceCompletion[3];
     unsigned char animaCompletion[11];
-    unsigned char unknown5_3e[33];
+    unsigned char unknown5_55c[35];
     unsigned char unlockedRaids[28];
     unsigned char unlockedDungeons[18];
     unsigned char unlockedGuildhests[10];
@@ -1117,7 +1113,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned int exploratoryMissionNextTimestamp;
     unsigned char pvpLevel;
     */
-    unsigned char unknown5_45d[8];
+    unsigned char unknown5_55d[9];
     //==
   };
 

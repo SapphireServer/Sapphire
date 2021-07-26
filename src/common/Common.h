@@ -25,7 +25,7 @@ namespace Sapphire::Common
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
   const uint8_t CLASSJOB_TOTAL = 38;
-  const uint8_t CLASSJOB_SLOTS = 28;
+  const uint8_t CLASSJOB_SLOTS = 30;
 
   const uint8_t TOWN_COUNT = 6;
 
@@ -51,11 +51,11 @@ namespace Sapphire::Common
 
   enum InventoryOperation : uint16_t
   {
-    Discard = 0x0117,
-    Move = 0x0118,
-    Swap = 0x0119,
-    Split = 0x011A,
-    Merge = 0x011C,
+    Discard = 0x01DE,
+    Move = 0x01DF,
+    Swap = 0x01E0,
+    Split = 0x01E1,
+    Merge = 0x01E3,
   };
 
   enum ClientLanguage : uint8_t
