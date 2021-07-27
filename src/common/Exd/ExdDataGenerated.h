@@ -527,11 +527,14 @@ struct PvPRank;
 struct PvPSelectTrait;
 struct PvPTrait;
 struct Quest;
+struct QuestAcceptAdditionCondition;
 struct QuestBattle;
 struct QuestChapter;
 struct QuestClassJobReward;
 struct QuestClassJobSupply;
 struct QuestDerivedClass;
+struct QuestEffect;
+struct QuestEffectDefine;
 struct QuestRedo;
 struct QuestRedoChapterUI;
 struct QuestRedoChapterUICategory;
@@ -567,6 +570,7 @@ struct RetainerTaskNormal;
 struct RetainerTaskParameter;
 struct RetainerTaskRandom;
 struct RideShooting;
+struct RideShootingTargetType;
 struct RideShootingTextData;
 struct RPParameter;
 struct SatisfactionArbitration;
@@ -592,6 +596,7 @@ struct SpecialShop;
 struct SpecialShopItemCategory;
 struct Stain;
 struct StainTransient;
+struct StanceChange;
 struct Status;
 struct StatusHitEffect;
 struct StatusLoopVFX;
@@ -605,6 +610,7 @@ struct SwitchTalkVariation;
 struct TerritoryType;
 struct TerritoryTypeTransient;
 struct TextCommand;
+struct TextCommandParam;
 struct Title;
 struct Tomestones;
 struct TomestonesItem;
@@ -2393,8 +2399,8 @@ struct ContentFinderCondition
   uint16_t sortKey;
   uint32_t image;
   uint32_t icon;
-  bool levelingRoulette;
   bool level506070Roulette;
+  bool levelingRoulette;
   bool mSQRoulette;
   bool guildHestRoulette;
   bool expertRoulette;
@@ -2403,6 +2409,7 @@ struct ContentFinderCondition
   bool level80Roulette;
   bool mentorRoulette;
   bool allianceRoulette;
+  bool feastTeamRoulette;
   bool normalRaidRoulette;
 
   ContentFinderCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -3049,7 +3056,7 @@ struct DynamicEventEnemyType
 
 struct DynamicEventSingleBattle
 {
-  int32_t actionIcon;
+  int32_t bNpcName;
   uint32_t icon;
   std::string text;
 
@@ -3662,7 +3669,9 @@ struct Festival
 struct FieldMarker
 {
   int32_t vFX;
-  uint16_t icon;
+  uint16_t uiIcon;
+  uint16_t mapIcon;
+  std::string name;
 
   FieldMarker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4955,6 +4964,7 @@ struct Item
   uint8_t materiaSlotCount;
   bool isAdvancedMeldingPermitted;
   bool isPvP;
+  uint8_t subStatCategory;
   bool isGlamourous;
 
   struct
@@ -6407,6 +6417,14 @@ struct Quest
   Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct QuestAcceptAdditionCondition
+{
+  uint32_t requirement0;
+  uint32_t requirement1;
+
+  QuestAcceptAdditionCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct QuestBattle
 {
   int32_t quest;
@@ -6443,6 +6461,8 @@ struct QuestClassJobSupply
   uint8_t classJobCategory;
   uint32_t eNpcResident;
   uint32_t item;
+  uint8_t amountRequired;
+  bool itemHQ;
 
   QuestClassJobSupply( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6452,6 +6472,19 @@ struct QuestDerivedClass
   uint8_t classJob;
 
   QuestDerivedClass( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestEffect
+{
+
+  QuestEffect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestEffectDefine
+{
+  uint16_t effect;
+
+  QuestEffectDefine( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestRedo
@@ -6577,6 +6610,7 @@ struct RacingChocoboNameCategory
 struct RacingChocoboNameInfo
 {
   uint8_t racingChocoboNameCategory;
+  std::vector< uint16_t > name;
 
   RacingChocoboNameInfo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6667,6 +6701,7 @@ struct RecipeLookup
 
 struct RecipeNotebookList
 {
+  uint8_t count;
   std::vector< int32_t > recipe;
 
   RecipeNotebookList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6838,6 +6873,14 @@ struct RideShooting
   std::vector< uint8_t > eNpcScale;
 
   RideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct RideShootingTargetType
+{
+  uint32_t eObj;
+  int16_t score;
+
+  RideShootingTargetType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RideShootingTextData
@@ -7067,6 +7110,7 @@ struct Stain
 {
   uint32_t color;
   uint8_t shade;
+  uint8_t subOrder;
   std::string name;
 
   Stain( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -7078,6 +7122,13 @@ struct StainTransient
   uint32_t item2;
 
   StainTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct StanceChange
+{
+  std::vector< uint16_t > action;
+
+  StanceChange( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Status
@@ -7227,6 +7278,7 @@ struct TerritoryType
   uint8_t loadingImage;
   uint8_t exclusiveType;
   uint8_t territoryIntendedUse;
+  uint16_t contentFinderCondition;
   uint8_t weatherRate;
   bool pCSearch;
   bool stealth;
@@ -7261,8 +7313,16 @@ struct TextCommand
   std::string description;
   std::string alias;
   std::string shortAlias;
+  uint16_t param;
 
   TextCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TextCommandParam
+{
+  std::string param;
+
+  TextCommandParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Title
@@ -8328,11 +8388,14 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_PvPSelectTraitDat;
      xiv::exd::Exd m_PvPTraitDat;
      xiv::exd::Exd m_QuestDat;
+     xiv::exd::Exd m_QuestAcceptAdditionConditionDat;
      xiv::exd::Exd m_QuestBattleDat;
      xiv::exd::Exd m_QuestChapterDat;
      xiv::exd::Exd m_QuestClassJobRewardDat;
      xiv::exd::Exd m_QuestClassJobSupplyDat;
      xiv::exd::Exd m_QuestDerivedClassDat;
+     xiv::exd::Exd m_QuestEffectDat;
+     xiv::exd::Exd m_QuestEffectDefineDat;
      xiv::exd::Exd m_QuestRedoDat;
      xiv::exd::Exd m_QuestRedoChapterUIDat;
      xiv::exd::Exd m_QuestRedoChapterUICategoryDat;
@@ -8368,6 +8431,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_RetainerTaskParameterDat;
      xiv::exd::Exd m_RetainerTaskRandomDat;
      xiv::exd::Exd m_RideShootingDat;
+     xiv::exd::Exd m_RideShootingTargetTypeDat;
      xiv::exd::Exd m_RideShootingTextDataDat;
      xiv::exd::Exd m_RPParameterDat;
      xiv::exd::Exd m_SatisfactionArbitrationDat;
@@ -8393,6 +8457,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_SpecialShopItemCategoryDat;
      xiv::exd::Exd m_StainDat;
      xiv::exd::Exd m_StainTransientDat;
+     xiv::exd::Exd m_StanceChangeDat;
      xiv::exd::Exd m_StatusDat;
      xiv::exd::Exd m_StatusHitEffectDat;
      xiv::exd::Exd m_StatusLoopVFXDat;
@@ -8406,6 +8471,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_TerritoryTypeDat;
      xiv::exd::Exd m_TerritoryTypeTransientDat;
      xiv::exd::Exd m_TextCommandDat;
+     xiv::exd::Exd m_TextCommandParamDat;
      xiv::exd::Exd m_TitleDat;
      xiv::exd::Exd m_TomestonesDat;
      xiv::exd::Exd m_TomestonesItemDat;
@@ -8965,11 +9031,14 @@ struct ZoneSharedGroup
      using PvPSelectTraitPtr = std::shared_ptr< PvPSelectTrait >;
      using PvPTraitPtr = std::shared_ptr< PvPTrait >;
      using QuestPtr = std::shared_ptr< Quest >;
+     using QuestAcceptAdditionConditionPtr = std::shared_ptr< QuestAcceptAdditionCondition >;
      using QuestBattlePtr = std::shared_ptr< QuestBattle >;
      using QuestChapterPtr = std::shared_ptr< QuestChapter >;
      using QuestClassJobRewardPtr = std::shared_ptr< QuestClassJobReward >;
      using QuestClassJobSupplyPtr = std::shared_ptr< QuestClassJobSupply >;
      using QuestDerivedClassPtr = std::shared_ptr< QuestDerivedClass >;
+     using QuestEffectPtr = std::shared_ptr< QuestEffect >;
+     using QuestEffectDefinePtr = std::shared_ptr< QuestEffectDefine >;
      using QuestRedoPtr = std::shared_ptr< QuestRedo >;
      using QuestRedoChapterUIPtr = std::shared_ptr< QuestRedoChapterUI >;
      using QuestRedoChapterUICategoryPtr = std::shared_ptr< QuestRedoChapterUICategory >;
@@ -9005,6 +9074,7 @@ struct ZoneSharedGroup
      using RetainerTaskParameterPtr = std::shared_ptr< RetainerTaskParameter >;
      using RetainerTaskRandomPtr = std::shared_ptr< RetainerTaskRandom >;
      using RideShootingPtr = std::shared_ptr< RideShooting >;
+     using RideShootingTargetTypePtr = std::shared_ptr< RideShootingTargetType >;
      using RideShootingTextDataPtr = std::shared_ptr< RideShootingTextData >;
      using RPParameterPtr = std::shared_ptr< RPParameter >;
      using SatisfactionArbitrationPtr = std::shared_ptr< SatisfactionArbitration >;
@@ -9030,6 +9100,7 @@ struct ZoneSharedGroup
      using SpecialShopItemCategoryPtr = std::shared_ptr< SpecialShopItemCategory >;
      using StainPtr = std::shared_ptr< Stain >;
      using StainTransientPtr = std::shared_ptr< StainTransient >;
+     using StanceChangePtr = std::shared_ptr< StanceChange >;
      using StatusPtr = std::shared_ptr< Status >;
      using StatusHitEffectPtr = std::shared_ptr< StatusHitEffect >;
      using StatusLoopVFXPtr = std::shared_ptr< StatusLoopVFX >;
@@ -9043,6 +9114,7 @@ struct ZoneSharedGroup
      using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
      using TerritoryTypeTransientPtr = std::shared_ptr< TerritoryTypeTransient >;
      using TextCommandPtr = std::shared_ptr< TextCommand >;
+     using TextCommandParamPtr = std::shared_ptr< TextCommandParam >;
      using TitlePtr = std::shared_ptr< Title >;
      using TomestonesPtr = std::shared_ptr< Tomestones >;
      using TomestonesItemPtr = std::shared_ptr< TomestonesItem >;
@@ -9602,11 +9674,14 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_PvPSelectTraitIdList;
      std::set< uint32_t > m_PvPTraitIdList;
      std::set< uint32_t > m_QuestIdList;
+     std::set< uint32_t > m_QuestAcceptAdditionConditionIdList;
      std::set< uint32_t > m_QuestBattleIdList;
      std::set< uint32_t > m_QuestChapterIdList;
      std::set< uint32_t > m_QuestClassJobRewardIdList;
      std::set< uint32_t > m_QuestClassJobSupplyIdList;
      std::set< uint32_t > m_QuestDerivedClassIdList;
+     std::set< uint32_t > m_QuestEffectIdList;
+     std::set< uint32_t > m_QuestEffectDefineIdList;
      std::set< uint32_t > m_QuestRedoIdList;
      std::set< uint32_t > m_QuestRedoChapterUIIdList;
      std::set< uint32_t > m_QuestRedoChapterUICategoryIdList;
@@ -9642,6 +9717,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_RetainerTaskParameterIdList;
      std::set< uint32_t > m_RetainerTaskRandomIdList;
      std::set< uint32_t > m_RideShootingIdList;
+     std::set< uint32_t > m_RideShootingTargetTypeIdList;
      std::set< uint32_t > m_RideShootingTextDataIdList;
      std::set< uint32_t > m_RPParameterIdList;
      std::set< uint32_t > m_SatisfactionArbitrationIdList;
@@ -9667,6 +9743,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_SpecialShopItemCategoryIdList;
      std::set< uint32_t > m_StainIdList;
      std::set< uint32_t > m_StainTransientIdList;
+     std::set< uint32_t > m_StanceChangeIdList;
      std::set< uint32_t > m_StatusIdList;
      std::set< uint32_t > m_StatusHitEffectIdList;
      std::set< uint32_t > m_StatusLoopVFXIdList;
@@ -9680,6 +9757,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_TerritoryTypeIdList;
      std::set< uint32_t > m_TerritoryTypeTransientIdList;
      std::set< uint32_t > m_TextCommandIdList;
+     std::set< uint32_t > m_TextCommandParamIdList;
      std::set< uint32_t > m_TitleIdList;
      std::set< uint32_t > m_TomestonesIdList;
      std::set< uint32_t > m_TomestonesItemIdList;
@@ -12764,6 +12842,12 @@ const std::set< uint32_t >& getQuestIdList()
       loadIdList( m_QuestDat, m_QuestIdList );
    return m_QuestIdList;
 }
+const std::set< uint32_t >& getQuestAcceptAdditionConditionIdList()
+{
+   if( m_QuestAcceptAdditionConditionIdList.size() == 0 )
+      loadIdList( m_QuestAcceptAdditionConditionDat, m_QuestAcceptAdditionConditionIdList );
+   return m_QuestAcceptAdditionConditionIdList;
+}
 const std::set< uint32_t >& getQuestBattleIdList()
 {
    if( m_QuestBattleIdList.size() == 0 )
@@ -12793,6 +12877,18 @@ const std::set< uint32_t >& getQuestDerivedClassIdList()
    if( m_QuestDerivedClassIdList.size() == 0 )
       loadIdList( m_QuestDerivedClassDat, m_QuestDerivedClassIdList );
    return m_QuestDerivedClassIdList;
+}
+const std::set< uint32_t >& getQuestEffectIdList()
+{
+   if( m_QuestEffectIdList.size() == 0 )
+      loadIdList( m_QuestEffectDat, m_QuestEffectIdList );
+   return m_QuestEffectIdList;
+}
+const std::set< uint32_t >& getQuestEffectDefineIdList()
+{
+   if( m_QuestEffectDefineIdList.size() == 0 )
+      loadIdList( m_QuestEffectDefineDat, m_QuestEffectDefineIdList );
+   return m_QuestEffectDefineIdList;
 }
 const std::set< uint32_t >& getQuestRedoIdList()
 {
@@ -13004,6 +13100,12 @@ const std::set< uint32_t >& getRideShootingIdList()
       loadIdList( m_RideShootingDat, m_RideShootingIdList );
    return m_RideShootingIdList;
 }
+const std::set< uint32_t >& getRideShootingTargetTypeIdList()
+{
+   if( m_RideShootingTargetTypeIdList.size() == 0 )
+      loadIdList( m_RideShootingTargetTypeDat, m_RideShootingTargetTypeIdList );
+   return m_RideShootingTargetTypeIdList;
+}
 const std::set< uint32_t >& getRideShootingTextDataIdList()
 {
    if( m_RideShootingTextDataIdList.size() == 0 )
@@ -13154,6 +13256,12 @@ const std::set< uint32_t >& getStainTransientIdList()
       loadIdList( m_StainTransientDat, m_StainTransientIdList );
    return m_StainTransientIdList;
 }
+const std::set< uint32_t >& getStanceChangeIdList()
+{
+   if( m_StanceChangeIdList.size() == 0 )
+      loadIdList( m_StanceChangeDat, m_StanceChangeIdList );
+   return m_StanceChangeIdList;
+}
 const std::set< uint32_t >& getStatusIdList()
 {
    if( m_StatusIdList.size() == 0 )
@@ -13231,6 +13339,12 @@ const std::set< uint32_t >& getTextCommandIdList()
    if( m_TextCommandIdList.size() == 0 )
       loadIdList( m_TextCommandDat, m_TextCommandIdList );
    return m_TextCommandIdList;
+}
+const std::set< uint32_t >& getTextCommandParamIdList()
+{
+   if( m_TextCommandParamIdList.size() == 0 )
+      loadIdList( m_TextCommandParamDat, m_TextCommandParamIdList );
+   return m_TextCommandParamIdList;
 }
 const std::set< uint32_t >& getTitleIdList()
 {
