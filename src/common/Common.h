@@ -6,6 +6,7 @@
 
 #include "CommonGen.h"
 #include "Vector3.h"
+#include "Network/PacketDef/Ipcs.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -51,11 +52,11 @@ namespace Sapphire::Common
 
   enum InventoryOperation : uint16_t
   {
-    Discard = 0x01DE,
-    Move = 0x01DF,
-    Swap = 0x01E0,
-    Split = 0x01E1,
-    Merge = 0x01E3,
+    Discard = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 7,
+    Move = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 8,
+    Swap = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 9,
+    Split = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 10,
+    Merge = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 12
   };
 
   enum ClientLanguage : uint8_t
