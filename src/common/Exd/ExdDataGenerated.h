@@ -26,6 +26,7 @@ struct Achievement;
 struct AchievementCategory;
 struct AchievementHideCondition;
 struct AchievementKind;
+struct AchievementTarget;
 struct Action;
 struct ActionCastTimeline;
 struct ActionCastVFX;
@@ -72,6 +73,8 @@ struct AOZArrangement;
 struct AOZBoss;
 struct AOZContent;
 struct AOZContentBriefingBNpc;
+struct AOZReport;
+struct AOZScore;
 struct AquariumFish;
 struct AquariumWater;
 struct ArrayEventHandler;
@@ -152,6 +155,7 @@ struct CompanyLeve;
 struct CompanyLeveRule;
 struct CompleteJournal;
 struct CompleteJournalCategory;
+struct Completion;
 struct Condition;
 struct ConfigKey;
 struct ContentCloseCycle;
@@ -175,6 +179,7 @@ struct ContentType;
 struct CraftAction;
 struct CraftLeve;
 struct CraftLevelDifference;
+struct CraftLeveTalk;
 struct CraftType;
 struct Credit;
 struct CreditBackImage;
@@ -182,9 +187,9 @@ struct CreditCast;
 struct CreditList;
 struct CreditListText;
 struct CustomTalk;
-struct CustomTalkDynamicIcon;
 struct CustomTalkNestHandlers;
 struct Cutscene;
+struct CutSceneIncompQuest;
 struct CutsceneMotion;
 struct CutsceneWorkIndex;
 struct CutScreenImage;
@@ -245,6 +250,7 @@ struct EurekaMagiciteItem;
 struct EurekaMagiciteItemType;
 struct EurekaSphereElementAdjust;
 struct EventAction;
+struct EventCustomIconType;
 struct EventIconPriority;
 struct EventIconType;
 struct EventItem;
@@ -252,6 +258,7 @@ struct EventItemCastTimeline;
 struct EventItemHelp;
 struct EventItemTimeline;
 struct EventSystemDefine;
+struct ExportedGatheringPoint;
 struct ExportedSG;
 struct ExVersion;
 struct Fate;
@@ -301,6 +308,7 @@ struct GatheringRarePopTimeTable;
 struct GatheringSubCategory;
 struct GatheringType;
 struct GcArmyCaptureTactics;
+struct GcArmyEquipPreset;
 struct GcArmyExpedition;
 struct GcArmyExpeditionMemberBonus;
 struct GcArmyExpeditionType;
@@ -343,6 +351,7 @@ struct GuidePageString;
 struct GuideTitle;
 struct GuildleveAssignment;
 struct GuildleveAssignmentCategory;
+struct GuildleveAssignmentTalk;
 struct GuildOrder;
 struct GuildOrderGuide;
 struct GuildOrderOfficer;
@@ -408,6 +417,7 @@ struct ItemSeries;
 struct ItemSortCategory;
 struct ItemSpecialBonus;
 struct ItemUICategory;
+struct Jingle;
 struct JobHudManual;
 struct JobHudManualPriority;
 struct JournalCategory;
@@ -434,12 +444,11 @@ struct MainCommand;
 struct MainCommandCategory;
 struct ManeuversArmor;
 struct Map;
+struct MapCondition;
 struct MapMarker;
 struct MapMarkerRegion;
 struct MapSymbol;
 struct Marker;
-struct MasterpieceSupplyDuty;
-struct MasterpieceSupplyMultiplier;
 struct Materia;
 struct MateriaJoinRate;
 struct MateriaJoinRateGatherCraft;
@@ -496,9 +505,11 @@ struct PartyContentCutscene;
 struct PartyContentTextData;
 struct PatchMark;
 struct Perform;
+struct PerformGroup;
 struct PerformTransient;
 struct Pet;
 struct PetAction;
+struct PetMirage;
 struct PhysicsGroup;
 struct PhysicsWind;
 struct Picture;
@@ -510,18 +521,20 @@ struct PresetCameraAdjust;
 struct PublicContent;
 struct PublicContentCutscene;
 struct PublicContentTextData;
-struct Purify;
 struct PvPAction;
 struct PvPActionSort;
 struct PvPRank;
 struct PvPSelectTrait;
 struct PvPTrait;
 struct Quest;
+struct QuestAcceptAdditionCondition;
 struct QuestBattle;
 struct QuestChapter;
 struct QuestClassJobReward;
 struct QuestClassJobSupply;
 struct QuestDerivedClass;
+struct QuestEffect;
+struct QuestEffectDefine;
 struct QuestRedo;
 struct QuestRedoChapterUI;
 struct QuestRedoChapterUICategory;
@@ -550,12 +563,14 @@ struct RelicNote;
 struct RelicNoteCategory;
 struct Resident;
 struct ResistanceWeaponAdjust;
+struct RetainerFortuneRewardRange;
 struct RetainerTask;
 struct RetainerTaskLvRange;
 struct RetainerTaskNormal;
 struct RetainerTaskParameter;
 struct RetainerTaskRandom;
 struct RideShooting;
+struct RideShootingTargetType;
 struct RideShootingTextData;
 struct RPParameter;
 struct SatisfactionArbitration;
@@ -581,6 +596,7 @@ struct SpecialShop;
 struct SpecialShopItemCategory;
 struct Stain;
 struct StainTransient;
+struct StanceChange;
 struct Status;
 struct StatusHitEffect;
 struct StatusLoopVFX;
@@ -594,6 +610,7 @@ struct SwitchTalkVariation;
 struct TerritoryType;
 struct TerritoryTypeTransient;
 struct TextCommand;
+struct TextCommandParam;
 struct Title;
 struct Tomestones;
 struct TomestonesItem;
@@ -614,11 +631,14 @@ struct TripleTriadCardRarity;
 struct TripleTriadCardResident;
 struct TripleTriadCardType;
 struct TripleTriadCompetition;
+struct TripleTriadResident;
 struct TripleTriadRule;
 struct Tutorial;
 struct TutorialDPS;
 struct TutorialHealer;
 struct TutorialTank;
+struct UDS_Event;
+struct UDS_Property;
 struct UIColor;
 struct VaseFlower;
 struct VFX;
@@ -650,6 +670,7 @@ struct Achievement
   uint8_t achievementCategory;
   std::string name;
   std::string description;
+  uint8_t achievementTarget;
   uint8_t points;
   uint16_t title;
   uint32_t item;
@@ -691,6 +712,14 @@ struct AchievementKind
   AchievementKind( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct AchievementTarget
+{
+  uint8_t type;
+  uint32_t value;
+
+  AchievementTarget( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct Action
 {
   std::string name;
@@ -723,6 +752,7 @@ struct Action
   uint16_t cast100ms;
   uint16_t recast100ms;
   uint8_t cooldownGroup;
+  uint8_t additionalCooldownGroup;
   uint8_t maxCharges;
   int8_t attackType;
   uint8_t aspect;
@@ -771,6 +801,8 @@ struct ActionComboRoute
 struct ActionIndirection
 {
   int32_t name;
+  int8_t classJob;
+  int32_t previousComboAction;
 
   ActionIndirection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -949,6 +981,7 @@ struct Aetheryte
   std::vector< uint32_t > level;
   bool isAetheryte;
   uint8_t aethernetGroup;
+  bool invisible;
   uint32_t requiredQuest;
   uint16_t map;
   int16_t aetherstreamX;
@@ -1110,6 +1143,7 @@ struct AnimaWeaponItem
 struct AozAction
 {
   uint32_t action;
+  uint8_t rank;
 
   AozAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1207,6 +1241,24 @@ struct AOZContentBriefingBNpc
   bool flatOrDeathVuln;
 
   AOZContentBriefingBNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct AOZReport
+{
+  uint8_t reward;
+  int8_t order;
+
+  AOZReport( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct AOZScore
+{
+  bool isHidden;
+  int32_t score;
+  std::string name;
+  std::string description;
+
+  AOZScore( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AquariumFish
@@ -1741,7 +1793,6 @@ struct Channeling
 {
   std::string file;
   uint8_t widthScale;
-  bool addedIn53;
 
   Channeling( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1958,6 +2009,7 @@ struct ClassJob
   uint16_t modifierIntelligence;
   uint16_t modifierMind;
   uint16_t modifierPiety;
+  uint8_t pvPActionSortRow;
   uint8_t classJobParent;
   std::string nameEnglish;
   int32_t itemStartingWeapon;
@@ -2031,6 +2083,7 @@ struct CollectablesShop
 {
   std::string name;
   uint32_t quest;
+  uint8_t rewardType;
   std::vector< uint16_t > shopItems;
 
   CollectablesShop( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -2042,6 +2095,8 @@ struct CollectablesShopItem
   uint8_t collectablesShopItemGroup;
   uint16_t levelMin;
   uint16_t levelMax;
+  uint8_t stars;
+  uint8_t key;
   uint16_t collectablesShopRefine;
   uint16_t collectablesShopRewardScrip;
 
@@ -2067,6 +2122,9 @@ struct CollectablesShopRefine
 struct CollectablesShopRewardItem
 {
   uint32_t item;
+  uint8_t rewardLow;
+  uint8_t rewardMid;
+  uint8_t rewardHigh;
 
   CollectablesShopRewardItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2268,6 +2326,17 @@ struct CompleteJournalCategory
   CompleteJournalCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct Completion
+{
+  uint16_t group;
+  uint16_t key;
+  std::string lookupTable;
+  std::string text;
+  std::string groupTitle;
+
+  Completion( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct Condition
 {
   uint32_t logMessage;
@@ -2317,22 +2386,21 @@ struct ContentFinderCondition
   uint8_t classJobLevelSync;
   uint16_t itemLevelRequired;
   uint16_t itemLevelSync;
-  bool addedIn53;
   bool allowUndersized;
   bool allowReplacement;
   bool allowExplorerMode;
-  bool unknown54;
   bool highEndDuty;
   bool dutyRecorderAllowed;
   std::string name;
+  std::string nameShort;
   uint8_t contentType;
   uint8_t transientKey;
   uint32_t transient;
   uint16_t sortKey;
   uint32_t image;
   uint32_t icon;
-  bool levelingRoulette;
   bool level506070Roulette;
+  bool levelingRoulette;
   bool mSQRoulette;
   bool guildHestRoulette;
   bool expertRoulette;
@@ -2341,6 +2409,7 @@ struct ContentFinderCondition
   bool level80Roulette;
   bool mentorRoulette;
   bool allianceRoulette;
+  bool feastTeamRoulette;
   bool normalRaidRoulette;
 
   ContentFinderCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -2377,7 +2446,6 @@ struct ContentMemberType
   uint8_t healersPerParty;
   uint8_t meleesPerParty;
   uint8_t rangedPerParty;
-  uint8_t unknown54;
 
   ContentMemberType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2541,6 +2609,13 @@ struct CraftLevelDifference
   CraftLevelDifference( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct CraftLeveTalk
+{
+  std::vector< std::string > talk;
+
+  CraftLeveTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct CraftType
 {
   uint8_t mainPhysical;
@@ -2568,7 +2643,6 @@ struct Credit
 
 struct CreditBackImage
 {
-  bool unknown54;
   uint32_t backImage;
 
   CreditBackImage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -2605,18 +2679,11 @@ struct CustomTalk
   std::string name;
   std::vector< std::string > scriptInstruction;
   std::vector< uint32_t > scriptArg;
-  bool text;
-  bool unknown54;
+  std::string mainOption;
+  std::string subOption;
+  uint32_t specialLinks;
 
   CustomTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct CustomTalkDynamicIcon
-{
-  uint32_t smallIcon;
-  uint32_t largeIcon;
-
-  CustomTalkDynamicIcon( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CustomTalkNestHandlers
@@ -2631,6 +2698,13 @@ struct Cutscene
   std::string path;
 
   Cutscene( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CutSceneIncompQuest
+{
+  uint32_t quest;
+
+  CutSceneIncompQuest( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CutsceneMotion
@@ -2889,24 +2963,6 @@ struct Description
 struct DescriptionPage
 {
   uint32_t quest;
-  uint16_t text1;
-  uint32_t image1;
-  uint16_t text2;
-  uint32_t image2;
-  uint16_t text3;
-  uint32_t image3;
-  uint16_t text4;
-  uint32_t image4;
-  uint16_t text5;
-  uint32_t image5;
-  uint16_t text6;
-  uint32_t image6;
-  uint16_t text7;
-  uint32_t image7;
-  uint16_t text8;
-  uint32_t image8;
-  uint16_t text9;
-  uint32_t image9;
 
   DescriptionPage( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3000,7 +3056,7 @@ struct DynamicEventEnemyType
 
 struct DynamicEventSingleBattle
 {
-  int32_t actionIcon;
+  int32_t bNpcName;
   uint32_t icon;
   std::string text;
 
@@ -3144,11 +3200,8 @@ struct ENpcDressUp
 
 struct ENpcDressUpDress
 {
-  bool addedIn530;
   uint32_t eNpc;
-  uint16_t addedIn531;
   uint16_t behavior;
-  uint8_t addedIn532;
   uint64_t modelMainHand;
   uint8_t dyeMainHand;
   uint64_t modelOffHand;
@@ -3320,6 +3373,17 @@ struct EventAction
   EventAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct EventCustomIconType
+{
+  std::vector< uint32_t > announceQuest;
+  std::vector< uint32_t > announceQuestLocked;
+  std::vector< uint32_t > mapAnnounceQuest0;
+  std::vector< uint32_t > mapAnnounceQuestLocked;
+  std::vector< uint32_t > mapAnnounceQuest1;
+
+  EventCustomIconType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct EventIconPriority
 {
   std::vector< uint32_t > icon;
@@ -3388,6 +3452,15 @@ struct EventSystemDefine
   EventSystemDefine( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct ExportedGatheringPoint
+{
+  float x;
+  float y;
+  uint8_t radius;
+
+  ExportedGatheringPoint( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct ExportedSG
 {
   std::string sgbPath;
@@ -3406,6 +3479,10 @@ struct ExVersion
 
 struct Fate
 {
+  std::string name;
+  std::string description;
+  std::string objective;
+  std::vector< std::string > statusText;
   uint8_t eurekaFate;
   uint8_t rule;
   uint16_t fateRuleEx;
@@ -3422,15 +3499,12 @@ struct Fate
   uint16_t screenImageAccept;
   uint16_t screenImageComplete;
   uint16_t screenImageFailed;
+  uint32_t requiredQuest;
   bool specialFate;
   uint16_t givenStatus;
   bool adventEvent;
   bool moonFaireEvent;
   uint32_t fATEChain;
-  std::string name;
-  std::string description;
-  std::string objective;
-  std::vector< std::string > statusText;
   uint32_t arrayIndex;
   uint32_t reqEventItem;
   uint32_t turnInEventItem;
@@ -3595,7 +3669,9 @@ struct Festival
 struct FieldMarker
 {
   int32_t vFX;
-  uint16_t icon;
+  uint16_t uiIcon;
+  uint16_t mapIcon;
+  std::string name;
 
   FieldMarker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3669,7 +3745,6 @@ struct Frontline04
   int32_t level1;
   int32_t level2;
   int32_t level3;
-  std::vector< int32_t > unknownLevel;
 
   Frontline04( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3809,8 +3884,6 @@ struct GatheringPointBonus
   uint32_t conditionValue;
   uint8_t bonusType;
   uint16_t bonusValue;
-  bool unknown53;
-  uint32_t unknown54;
 
   GatheringPointBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3882,6 +3955,19 @@ struct GcArmyCaptureTactics
   GcArmyCaptureTactics( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct GcArmyEquipPreset
+{
+  int32_t mainHand;
+  int32_t offHand;
+  int32_t head;
+  int32_t body;
+  int32_t gloves;
+  int32_t legs;
+  int32_t feet;
+
+  GcArmyEquipPreset( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct GcArmyExpedition
 {
   uint8_t requiredFlag;
@@ -3916,6 +4002,10 @@ struct GcArmyMemberGrow
 {
   uint8_t classJob;
   int32_t classBook;
+  std::vector< uint16_t > equipPreset;
+  std::vector< uint8_t > physical;
+  std::vector< uint8_t > mental;
+  std::vector< uint8_t > tactical;
 
   GcArmyMemberGrow( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4128,7 +4218,8 @@ struct GilShop
 struct GilShopItem
 {
   int32_t item;
-  std::vector< int32_t > rowRequired;
+  std::vector< int32_t > questRequired;
+  int32_t achievementRequired;
   uint16_t stateRequired;
   uint16_t patch;
 
@@ -4212,7 +4303,6 @@ struct GroupPoseFrame
 {
   int32_t image;
   std::string gridText;
-  int32_t unknown54;
   std::string text;
 
   GroupPoseFrame( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -4222,8 +4312,6 @@ struct GroupPoseStamp
 {
   int32_t stampIcon;
   int32_t category;
-  int32_t unknown540;
-  bool unknown541;
   std::string name;
 
   GroupPoseStamp( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -4277,7 +4365,7 @@ struct GuideTitle
 
 struct GuildleveAssignment
 {
-  uint8_t addedIn53;
+  std::string type;
   uint32_t assignmentTalk;
   std::vector< uint32_t > quest;
 
@@ -4289,6 +4377,13 @@ struct GuildleveAssignmentCategory
   std::vector< int32_t > category;
 
   GuildleveAssignmentCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct GuildleveAssignmentTalk
+{
+  std::vector< std::string > talk;
+
+  GuildleveAssignmentTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct GuildOrder
@@ -4477,8 +4572,12 @@ struct HousingYardObject
 
 struct HowTo
 {
-  std::vector< int16_t > images;
+  std::string name;
+  bool announce;
+  std::vector< int16_t > howToPagePC;
+  std::vector< int16_t > howToPageController;
   int8_t category;
+  uint8_t sort;
 
   HowTo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4492,7 +4591,11 @@ struct HowToCategory
 
 struct HowToPage
 {
+  uint8_t type;
+  uint8_t iconType;
   int32_t image;
+  uint8_t textType;
+  std::vector< std::string > text;
 
   HowToPage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4677,7 +4780,6 @@ struct IKDFishParam
 {
   uint32_t fish;
   uint8_t iKDContentBonus;
-  uint8_t unknown54;
 
   IKDFishParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4733,8 +4835,6 @@ struct InclusionShopSeries
 struct IndividualWeather
 {
   std::vector< uint8_t > weather;
-  uint8_t addedIn530;
-  uint8_t addedIn531;
   std::vector< uint32_t > quest;
 
   IndividualWeather( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -4748,6 +4848,7 @@ struct InstanceContent
   uint16_t bGM;
   uint16_t winBGM;
   uint32_t cutscene;
+  uint32_t lGBEventRange;
   uint16_t order;
   uint8_t colosseum;
   uint32_t instanceContentTextDataBossStart;
@@ -4768,8 +4869,6 @@ struct InstanceContent
   uint32_t instanceContentBuff;
   int32_t reqInstance;
   int16_t partyCondition;
-  uint16_t unknown540;
-  uint16_t unknown541;
 
   InstanceContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4786,8 +4885,6 @@ struct InstanceContentCSBonus
 {
   uint16_t instance;
   uint32_t item;
-  uint8_t unknown540;
-  uint8_t unknown541;
 
   InstanceContentCSBonus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4845,7 +4942,6 @@ struct Item
   bool isCollectable;
   bool alwaysCollectable;
   uint16_t aetherialReduce;
-  uint16_t unknown54;
   uint8_t levelEquip;
   uint8_t equipRestriction;
   uint8_t classJobCategory;
@@ -4868,6 +4964,7 @@ struct Item
   uint8_t materiaSlotCount;
   bool isAdvancedMeldingPermitted;
   bool isPvP;
+  uint8_t subStatCategory;
   bool isGlamourous;
 
   struct
@@ -5035,6 +5132,13 @@ struct ItemUICategory
   uint8_t orderMajor;
 
   ItemUICategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct Jingle
+{
+  std::string name;
+
+  Jingle( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct JobHudManual
@@ -5239,8 +5343,6 @@ struct LotteryExchangeShop
 {
   std::vector< int32_t > itemAccepted;
   std::vector< uint32_t > amountAccepted;
-  std::vector< uint8_t > unknown540;
-  std::vector< uint8_t > unknown541;
   std::string lua;
   std::vector< uint32_t > logMessage;
 
@@ -5313,6 +5415,13 @@ struct Map
   Map( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MapCondition
+{
+  uint16_t quest;
+
+  MapCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct MapMarker
 {
   int16_t x;
@@ -5350,23 +5459,6 @@ struct Marker
   std::string name;
 
   Marker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct MasterpieceSupplyDuty
-{
-  uint8_t classJob;
-  uint8_t classJobLevel;
-  uint16_t rewardCurrency;
-
-  MasterpieceSupplyDuty( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct MasterpieceSupplyMultiplier
-{
-  std::vector< uint16_t > xpMultiplier;
-  std::vector< uint16_t > currencyMultiplier;
-
-  MasterpieceSupplyMultiplier( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Materia
@@ -5741,8 +5833,7 @@ struct MYCTemporaryItemUICategory
 struct MYCWarResultNotebook
 {
   uint8_t number;
-  uint8_t unknown540;
-  uint8_t unknown541;
+  uint8_t link;
   int32_t quest;
   int32_t icon;
   int32_t image;
@@ -5827,7 +5918,6 @@ struct NpcYell
   float balloonTime;
   bool isBalloonSlow;
   bool battleTalkTime;
-  uint8_t unknown54;
   std::string text;
 
   NpcYell( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6000,9 +6090,17 @@ struct Perform
   uint16_t animationPlay02;
   int32_t stopAnimation;
   std::string instrument;
+  int32_t order;
   uint8_t transient;
 
   Perform( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct PerformGroup
+{
+  std::vector< uint8_t > perform;
+
+  PerformGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PerformTransient
@@ -6030,6 +6128,13 @@ struct PetAction
   bool disableOrder;
 
   PetAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct PetMirage
+{
+  std::string name;
+
+  PetMirage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct PhysicsGroup
@@ -6142,11 +6247,12 @@ struct PublicContent
   std::string name;
   uint32_t textDataStart;
   uint32_t textDataEnd;
+  uint32_t startCutscene;
+  uint32_t lGBEventRange;
+  uint32_t lGBPopRange;
   uint16_t contentFinderCondition;
   uint16_t additionalData;
-  int32_t unknown540;
-  uint16_t unknown541;
-  uint16_t unknown542;
+  uint32_t endCutscene;
 
   PublicContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6166,14 +6272,6 @@ struct PublicContentTextData
   PublicContentTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
-struct Purify
-{
-  uint8_t _class;
-  uint8_t level;
-
-  Purify( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
 struct PvPAction
 {
   uint16_t action;
@@ -6184,7 +6282,7 @@ struct PvPAction
 
 struct PvPActionSort
 {
-  uint8_t name;
+  uint8_t actionType;
   uint16_t action;
 
   PvPActionSort( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6285,7 +6383,7 @@ struct Quest
   uint8_t classJobRequired;
   uint16_t expFactor;
   uint32_t gilReward;
-  uint16_t gCSeals;
+  uint32_t gCSeals;
   std::vector< uint8_t > itemCatalyst;
   std::vector< uint8_t > itemCountCatalyst;
   uint8_t itemRewardType;
@@ -6315,9 +6413,16 @@ struct Quest
   bool hideOfferIcon;
   uint8_t eventIconType;
   uint16_t sortKey;
-  bool unknown54;
 
   Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestAcceptAdditionCondition
+{
+  uint32_t requirement0;
+  uint32_t requirement1;
+
+  QuestAcceptAdditionCondition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestBattle
@@ -6356,6 +6461,8 @@ struct QuestClassJobSupply
   uint8_t classJobCategory;
   uint32_t eNpcResident;
   uint32_t item;
+  uint8_t amountRequired;
+  bool itemHQ;
 
   QuestClassJobSupply( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6365,6 +6472,19 @@ struct QuestDerivedClass
   uint8_t classJob;
 
   QuestDerivedClass( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestEffect
+{
+
+  QuestEffect( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestEffectDefine
+{
+  uint16_t effect;
+
+  QuestEffectDefine( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestRedo
@@ -6379,6 +6499,7 @@ struct QuestRedo
 struct QuestRedoChapterUI
 {
   uint32_t quest;
+  uint8_t uITab;
   uint8_t category;
   uint32_t questRedoUISmall;
   uint32_t questRedoUILarge;
@@ -6457,7 +6578,6 @@ struct Race
   int32_t rSEFHands;
   int32_t rSEFLegs;
   int32_t rSEFFeet;
-  uint8_t unknown54;
   uint8_t exPac;
 
   Race( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6490,6 +6610,7 @@ struct RacingChocoboNameCategory
 struct RacingChocoboNameInfo
 {
   uint8_t racingChocoboNameCategory;
+  std::vector< uint16_t > name;
 
   RacingChocoboNameInfo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6580,6 +6701,7 @@ struct RecipeLookup
 
 struct RecipeNotebookList
 {
+  uint8_t count;
   std::vector< int32_t > recipe;
 
   RecipeNotebookList( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6665,7 +6787,6 @@ struct Resident
 {
   uint64_t model;
   int32_t npcYell;
-  uint16_t addedIn53;
   uint8_t residentMotionType;
 
   Resident( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6679,6 +6800,13 @@ struct ResistanceWeaponAdjust
   uint32_t image;
 
   ResistanceWeaponAdjust( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct RetainerFortuneRewardRange
+{
+  uint16_t percentOfLevel;
+
+  RetainerFortuneRewardRange( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct RetainerTask
@@ -6747,6 +6875,14 @@ struct RideShooting
   RideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct RideShootingTargetType
+{
+  uint32_t eObj;
+  int16_t score;
+
+  RideShootingTargetType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct RideShootingTextData
 {
   std::string string;
@@ -6778,8 +6914,6 @@ struct SatisfactionNpc
   std::vector< int32_t > supplyIndex;
   std::vector< uint16_t > satisfactionRequired;
   int32_t icon;
-  uint8_t addedIn530;
-  uint8_t addedIn531;
 
   SatisfactionNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6813,9 +6947,6 @@ struct ScenarioTree
 {
   uint8_t type;
   uint16_t image;
-  uint32_t unknown540;
-  std::string unknown541;
-  int32_t unknown542;
 
   ScenarioTree( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6935,6 +7066,7 @@ struct SpearfishingItem
 struct SpearfishingNotebook
 {
   uint8_t gatheringLevel;
+  bool isShadowNode;
   int32_t territoryType;
   int16_t x;
   int16_t y;
@@ -6957,7 +7089,6 @@ struct SpecialShop
 {
   std::string name;
   std::vector< int32_t > questItem;
-  std::vector< int32_t > unknown;
   std::vector< int32_t > achievementUnlock;
   std::vector< uint16_t > patchNumber;
   uint8_t useCurrencyType;
@@ -6979,6 +7110,7 @@ struct Stain
 {
   uint32_t color;
   uint8_t shade;
+  uint8_t subOrder;
   std::string name;
 
   Stain( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -6990,6 +7122,13 @@ struct StainTransient
   uint32_t item2;
 
   StainTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct StanceChange
+{
+  std::vector< uint16_t > action;
+
+  StanceChange( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Status
@@ -7139,6 +7278,7 @@ struct TerritoryType
   uint8_t loadingImage;
   uint8_t exclusiveType;
   uint8_t territoryIntendedUse;
+  uint16_t contentFinderCondition;
   uint8_t weatherRate;
   bool pCSearch;
   bool stealth;
@@ -7154,9 +7294,7 @@ struct TerritoryType
   int8_t achievementIndex;
   bool isPvpZone;
   uint8_t exVersion;
-  uint8_t addedIn53;
   uint8_t mountSpeed;
-  bool unknown54;
 
   TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -7175,8 +7313,16 @@ struct TextCommand
   std::string description;
   std::string alias;
   std::string shortAlias;
+  uint16_t param;
 
   TextCommand( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TextCommandParam
+{
+  std::string param;
+
+  TextCommandParam( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Title
@@ -7272,7 +7418,6 @@ struct Transformation
   uint16_t endVFX;
   uint32_t action6;
   uint16_t action7;
-  bool unknown54;
 
   Transformation( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -7377,7 +7522,6 @@ struct TripleTriadCardResident
   uint8_t sortKey;
   uint16_t order;
   uint8_t uIPriority;
-  bool unknown54;
   uint8_t acquisitionType;
   uint32_t acquisition;
   uint32_t location;
@@ -7400,11 +7544,17 @@ struct TripleTriadCompetition
   TripleTriadCompetition( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct TripleTriadResident
+{
+  uint16_t order;
+
+  TripleTriadResident( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct TripleTriadRule
 {
   std::string name;
   std::string description;
-  bool unknown54;
 
   TripleTriadRule( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -7440,6 +7590,23 @@ struct TutorialTank
   uint8_t objective;
 
   TutorialTank( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct UDS_Event
+{
+  std::string text;
+  std::string type;
+  std::vector< int32_t > property;
+
+  UDS_Event( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct UDS_Property
+{
+  std::string text;
+  std::string type;
+
+  UDS_Property( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct UIColor
@@ -7551,7 +7718,6 @@ struct WebGuidance
   int32_t image;
   uint8_t url;
   std::string name;
-  std::string unknown54;
   std::string description;
 
   WebGuidance( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -7721,6 +7887,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_AchievementCategoryDat;
      xiv::exd::Exd m_AchievementHideConditionDat;
      xiv::exd::Exd m_AchievementKindDat;
+     xiv::exd::Exd m_AchievementTargetDat;
      xiv::exd::Exd m_ActionDat;
      xiv::exd::Exd m_ActionCastTimelineDat;
      xiv::exd::Exd m_ActionCastVFXDat;
@@ -7767,6 +7934,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_AOZBossDat;
      xiv::exd::Exd m_AOZContentDat;
      xiv::exd::Exd m_AOZContentBriefingBNpcDat;
+     xiv::exd::Exd m_AOZReportDat;
+     xiv::exd::Exd m_AOZScoreDat;
      xiv::exd::Exd m_AquariumFishDat;
      xiv::exd::Exd m_AquariumWaterDat;
      xiv::exd::Exd m_ArrayEventHandlerDat;
@@ -7847,6 +8016,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CompanyLeveRuleDat;
      xiv::exd::Exd m_CompleteJournalDat;
      xiv::exd::Exd m_CompleteJournalCategoryDat;
+     xiv::exd::Exd m_CompletionDat;
      xiv::exd::Exd m_ConditionDat;
      xiv::exd::Exd m_ConfigKeyDat;
      xiv::exd::Exd m_ContentCloseCycleDat;
@@ -7870,6 +8040,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CraftActionDat;
      xiv::exd::Exd m_CraftLeveDat;
      xiv::exd::Exd m_CraftLevelDifferenceDat;
+     xiv::exd::Exd m_CraftLeveTalkDat;
      xiv::exd::Exd m_CraftTypeDat;
      xiv::exd::Exd m_CreditDat;
      xiv::exd::Exd m_CreditBackImageDat;
@@ -7877,9 +8048,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CreditListDat;
      xiv::exd::Exd m_CreditListTextDat;
      xiv::exd::Exd m_CustomTalkDat;
-     xiv::exd::Exd m_CustomTalkDynamicIconDat;
      xiv::exd::Exd m_CustomTalkNestHandlersDat;
      xiv::exd::Exd m_CutsceneDat;
+     xiv::exd::Exd m_CutSceneIncompQuestDat;
      xiv::exd::Exd m_CutsceneMotionDat;
      xiv::exd::Exd m_CutsceneWorkIndexDat;
      xiv::exd::Exd m_CutScreenImageDat;
@@ -7940,6 +8111,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_EurekaMagiciteItemTypeDat;
      xiv::exd::Exd m_EurekaSphereElementAdjustDat;
      xiv::exd::Exd m_EventActionDat;
+     xiv::exd::Exd m_EventCustomIconTypeDat;
      xiv::exd::Exd m_EventIconPriorityDat;
      xiv::exd::Exd m_EventIconTypeDat;
      xiv::exd::Exd m_EventItemDat;
@@ -7947,6 +8119,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_EventItemHelpDat;
      xiv::exd::Exd m_EventItemTimelineDat;
      xiv::exd::Exd m_EventSystemDefineDat;
+     xiv::exd::Exd m_ExportedGatheringPointDat;
      xiv::exd::Exd m_ExportedSGDat;
      xiv::exd::Exd m_ExVersionDat;
      xiv::exd::Exd m_FateDat;
@@ -7996,6 +8169,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GatheringSubCategoryDat;
      xiv::exd::Exd m_GatheringTypeDat;
      xiv::exd::Exd m_GcArmyCaptureTacticsDat;
+     xiv::exd::Exd m_GcArmyEquipPresetDat;
      xiv::exd::Exd m_GcArmyExpeditionDat;
      xiv::exd::Exd m_GcArmyExpeditionMemberBonusDat;
      xiv::exd::Exd m_GcArmyExpeditionTypeDat;
@@ -8038,6 +8212,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GuideTitleDat;
      xiv::exd::Exd m_GuildleveAssignmentDat;
      xiv::exd::Exd m_GuildleveAssignmentCategoryDat;
+     xiv::exd::Exd m_GuildleveAssignmentTalkDat;
      xiv::exd::Exd m_GuildOrderDat;
      xiv::exd::Exd m_GuildOrderGuideDat;
      xiv::exd::Exd m_GuildOrderOfficerDat;
@@ -8103,6 +8278,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ItemSortCategoryDat;
      xiv::exd::Exd m_ItemSpecialBonusDat;
      xiv::exd::Exd m_ItemUICategoryDat;
+     xiv::exd::Exd m_JingleDat;
      xiv::exd::Exd m_JobHudManualDat;
      xiv::exd::Exd m_JobHudManualPriorityDat;
      xiv::exd::Exd m_JournalCategoryDat;
@@ -8129,12 +8305,11 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MainCommandCategoryDat;
      xiv::exd::Exd m_ManeuversArmorDat;
      xiv::exd::Exd m_MapDat;
+     xiv::exd::Exd m_MapConditionDat;
      xiv::exd::Exd m_MapMarkerDat;
      xiv::exd::Exd m_MapMarkerRegionDat;
      xiv::exd::Exd m_MapSymbolDat;
      xiv::exd::Exd m_MarkerDat;
-     xiv::exd::Exd m_MasterpieceSupplyDutyDat;
-     xiv::exd::Exd m_MasterpieceSupplyMultiplierDat;
      xiv::exd::Exd m_MateriaDat;
      xiv::exd::Exd m_MateriaJoinRateDat;
      xiv::exd::Exd m_MateriaJoinRateGatherCraftDat;
@@ -8191,9 +8366,11 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_PartyContentTextDataDat;
      xiv::exd::Exd m_PatchMarkDat;
      xiv::exd::Exd m_PerformDat;
+     xiv::exd::Exd m_PerformGroupDat;
      xiv::exd::Exd m_PerformTransientDat;
      xiv::exd::Exd m_PetDat;
      xiv::exd::Exd m_PetActionDat;
+     xiv::exd::Exd m_PetMirageDat;
      xiv::exd::Exd m_PhysicsGroupDat;
      xiv::exd::Exd m_PhysicsWindDat;
      xiv::exd::Exd m_PictureDat;
@@ -8205,18 +8382,20 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_PublicContentDat;
      xiv::exd::Exd m_PublicContentCutsceneDat;
      xiv::exd::Exd m_PublicContentTextDataDat;
-     xiv::exd::Exd m_PurifyDat;
      xiv::exd::Exd m_PvPActionDat;
      xiv::exd::Exd m_PvPActionSortDat;
      xiv::exd::Exd m_PvPRankDat;
      xiv::exd::Exd m_PvPSelectTraitDat;
      xiv::exd::Exd m_PvPTraitDat;
      xiv::exd::Exd m_QuestDat;
+     xiv::exd::Exd m_QuestAcceptAdditionConditionDat;
      xiv::exd::Exd m_QuestBattleDat;
      xiv::exd::Exd m_QuestChapterDat;
      xiv::exd::Exd m_QuestClassJobRewardDat;
      xiv::exd::Exd m_QuestClassJobSupplyDat;
      xiv::exd::Exd m_QuestDerivedClassDat;
+     xiv::exd::Exd m_QuestEffectDat;
+     xiv::exd::Exd m_QuestEffectDefineDat;
      xiv::exd::Exd m_QuestRedoDat;
      xiv::exd::Exd m_QuestRedoChapterUIDat;
      xiv::exd::Exd m_QuestRedoChapterUICategoryDat;
@@ -8245,12 +8424,14 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_RelicNoteCategoryDat;
      xiv::exd::Exd m_ResidentDat;
      xiv::exd::Exd m_ResistanceWeaponAdjustDat;
+     xiv::exd::Exd m_RetainerFortuneRewardRangeDat;
      xiv::exd::Exd m_RetainerTaskDat;
      xiv::exd::Exd m_RetainerTaskLvRangeDat;
      xiv::exd::Exd m_RetainerTaskNormalDat;
      xiv::exd::Exd m_RetainerTaskParameterDat;
      xiv::exd::Exd m_RetainerTaskRandomDat;
      xiv::exd::Exd m_RideShootingDat;
+     xiv::exd::Exd m_RideShootingTargetTypeDat;
      xiv::exd::Exd m_RideShootingTextDataDat;
      xiv::exd::Exd m_RPParameterDat;
      xiv::exd::Exd m_SatisfactionArbitrationDat;
@@ -8276,6 +8457,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_SpecialShopItemCategoryDat;
      xiv::exd::Exd m_StainDat;
      xiv::exd::Exd m_StainTransientDat;
+     xiv::exd::Exd m_StanceChangeDat;
      xiv::exd::Exd m_StatusDat;
      xiv::exd::Exd m_StatusHitEffectDat;
      xiv::exd::Exd m_StatusLoopVFXDat;
@@ -8289,6 +8471,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_TerritoryTypeDat;
      xiv::exd::Exd m_TerritoryTypeTransientDat;
      xiv::exd::Exd m_TextCommandDat;
+     xiv::exd::Exd m_TextCommandParamDat;
      xiv::exd::Exd m_TitleDat;
      xiv::exd::Exd m_TomestonesDat;
      xiv::exd::Exd m_TomestonesItemDat;
@@ -8309,11 +8492,14 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_TripleTriadCardResidentDat;
      xiv::exd::Exd m_TripleTriadCardTypeDat;
      xiv::exd::Exd m_TripleTriadCompetitionDat;
+     xiv::exd::Exd m_TripleTriadResidentDat;
      xiv::exd::Exd m_TripleTriadRuleDat;
      xiv::exd::Exd m_TutorialDat;
      xiv::exd::Exd m_TutorialDPSDat;
      xiv::exd::Exd m_TutorialHealerDat;
      xiv::exd::Exd m_TutorialTankDat;
+     xiv::exd::Exd m_UDS_EventDat;
+     xiv::exd::Exd m_UDS_PropertyDat;
      xiv::exd::Exd m_UIColorDat;
      xiv::exd::Exd m_VaseFlowerDat;
      xiv::exd::Exd m_VFXDat;
@@ -8344,6 +8530,7 @@ struct ZoneSharedGroup
      using AchievementCategoryPtr = std::shared_ptr< AchievementCategory >;
      using AchievementHideConditionPtr = std::shared_ptr< AchievementHideCondition >;
      using AchievementKindPtr = std::shared_ptr< AchievementKind >;
+     using AchievementTargetPtr = std::shared_ptr< AchievementTarget >;
      using ActionPtr = std::shared_ptr< Action >;
      using ActionCastTimelinePtr = std::shared_ptr< ActionCastTimeline >;
      using ActionCastVFXPtr = std::shared_ptr< ActionCastVFX >;
@@ -8390,6 +8577,8 @@ struct ZoneSharedGroup
      using AOZBossPtr = std::shared_ptr< AOZBoss >;
      using AOZContentPtr = std::shared_ptr< AOZContent >;
      using AOZContentBriefingBNpcPtr = std::shared_ptr< AOZContentBriefingBNpc >;
+     using AOZReportPtr = std::shared_ptr< AOZReport >;
+     using AOZScorePtr = std::shared_ptr< AOZScore >;
      using AquariumFishPtr = std::shared_ptr< AquariumFish >;
      using AquariumWaterPtr = std::shared_ptr< AquariumWater >;
      using ArrayEventHandlerPtr = std::shared_ptr< ArrayEventHandler >;
@@ -8470,6 +8659,7 @@ struct ZoneSharedGroup
      using CompanyLeveRulePtr = std::shared_ptr< CompanyLeveRule >;
      using CompleteJournalPtr = std::shared_ptr< CompleteJournal >;
      using CompleteJournalCategoryPtr = std::shared_ptr< CompleteJournalCategory >;
+     using CompletionPtr = std::shared_ptr< Completion >;
      using ConditionPtr = std::shared_ptr< Condition >;
      using ConfigKeyPtr = std::shared_ptr< ConfigKey >;
      using ContentCloseCyclePtr = std::shared_ptr< ContentCloseCycle >;
@@ -8493,6 +8683,7 @@ struct ZoneSharedGroup
      using CraftActionPtr = std::shared_ptr< CraftAction >;
      using CraftLevePtr = std::shared_ptr< CraftLeve >;
      using CraftLevelDifferencePtr = std::shared_ptr< CraftLevelDifference >;
+     using CraftLeveTalkPtr = std::shared_ptr< CraftLeveTalk >;
      using CraftTypePtr = std::shared_ptr< CraftType >;
      using CreditPtr = std::shared_ptr< Credit >;
      using CreditBackImagePtr = std::shared_ptr< CreditBackImage >;
@@ -8500,9 +8691,9 @@ struct ZoneSharedGroup
      using CreditListPtr = std::shared_ptr< CreditList >;
      using CreditListTextPtr = std::shared_ptr< CreditListText >;
      using CustomTalkPtr = std::shared_ptr< CustomTalk >;
-     using CustomTalkDynamicIconPtr = std::shared_ptr< CustomTalkDynamicIcon >;
      using CustomTalkNestHandlersPtr = std::shared_ptr< CustomTalkNestHandlers >;
      using CutscenePtr = std::shared_ptr< Cutscene >;
+     using CutSceneIncompQuestPtr = std::shared_ptr< CutSceneIncompQuest >;
      using CutsceneMotionPtr = std::shared_ptr< CutsceneMotion >;
      using CutsceneWorkIndexPtr = std::shared_ptr< CutsceneWorkIndex >;
      using CutScreenImagePtr = std::shared_ptr< CutScreenImage >;
@@ -8563,6 +8754,7 @@ struct ZoneSharedGroup
      using EurekaMagiciteItemTypePtr = std::shared_ptr< EurekaMagiciteItemType >;
      using EurekaSphereElementAdjustPtr = std::shared_ptr< EurekaSphereElementAdjust >;
      using EventActionPtr = std::shared_ptr< EventAction >;
+     using EventCustomIconTypePtr = std::shared_ptr< EventCustomIconType >;
      using EventIconPriorityPtr = std::shared_ptr< EventIconPriority >;
      using EventIconTypePtr = std::shared_ptr< EventIconType >;
      using EventItemPtr = std::shared_ptr< EventItem >;
@@ -8570,6 +8762,7 @@ struct ZoneSharedGroup
      using EventItemHelpPtr = std::shared_ptr< EventItemHelp >;
      using EventItemTimelinePtr = std::shared_ptr< EventItemTimeline >;
      using EventSystemDefinePtr = std::shared_ptr< EventSystemDefine >;
+     using ExportedGatheringPointPtr = std::shared_ptr< ExportedGatheringPoint >;
      using ExportedSGPtr = std::shared_ptr< ExportedSG >;
      using ExVersionPtr = std::shared_ptr< ExVersion >;
      using FatePtr = std::shared_ptr< Fate >;
@@ -8619,6 +8812,7 @@ struct ZoneSharedGroup
      using GatheringSubCategoryPtr = std::shared_ptr< GatheringSubCategory >;
      using GatheringTypePtr = std::shared_ptr< GatheringType >;
      using GcArmyCaptureTacticsPtr = std::shared_ptr< GcArmyCaptureTactics >;
+     using GcArmyEquipPresetPtr = std::shared_ptr< GcArmyEquipPreset >;
      using GcArmyExpeditionPtr = std::shared_ptr< GcArmyExpedition >;
      using GcArmyExpeditionMemberBonusPtr = std::shared_ptr< GcArmyExpeditionMemberBonus >;
      using GcArmyExpeditionTypePtr = std::shared_ptr< GcArmyExpeditionType >;
@@ -8661,6 +8855,7 @@ struct ZoneSharedGroup
      using GuideTitlePtr = std::shared_ptr< GuideTitle >;
      using GuildleveAssignmentPtr = std::shared_ptr< GuildleveAssignment >;
      using GuildleveAssignmentCategoryPtr = std::shared_ptr< GuildleveAssignmentCategory >;
+     using GuildleveAssignmentTalkPtr = std::shared_ptr< GuildleveAssignmentTalk >;
      using GuildOrderPtr = std::shared_ptr< GuildOrder >;
      using GuildOrderGuidePtr = std::shared_ptr< GuildOrderGuide >;
      using GuildOrderOfficerPtr = std::shared_ptr< GuildOrderOfficer >;
@@ -8726,6 +8921,7 @@ struct ZoneSharedGroup
      using ItemSortCategoryPtr = std::shared_ptr< ItemSortCategory >;
      using ItemSpecialBonusPtr = std::shared_ptr< ItemSpecialBonus >;
      using ItemUICategoryPtr = std::shared_ptr< ItemUICategory >;
+     using JinglePtr = std::shared_ptr< Jingle >;
      using JobHudManualPtr = std::shared_ptr< JobHudManual >;
      using JobHudManualPriorityPtr = std::shared_ptr< JobHudManualPriority >;
      using JournalCategoryPtr = std::shared_ptr< JournalCategory >;
@@ -8752,12 +8948,11 @@ struct ZoneSharedGroup
      using MainCommandCategoryPtr = std::shared_ptr< MainCommandCategory >;
      using ManeuversArmorPtr = std::shared_ptr< ManeuversArmor >;
      using MapPtr = std::shared_ptr< Map >;
+     using MapConditionPtr = std::shared_ptr< MapCondition >;
      using MapMarkerPtr = std::shared_ptr< MapMarker >;
      using MapMarkerRegionPtr = std::shared_ptr< MapMarkerRegion >;
      using MapSymbolPtr = std::shared_ptr< MapSymbol >;
      using MarkerPtr = std::shared_ptr< Marker >;
-     using MasterpieceSupplyDutyPtr = std::shared_ptr< MasterpieceSupplyDuty >;
-     using MasterpieceSupplyMultiplierPtr = std::shared_ptr< MasterpieceSupplyMultiplier >;
      using MateriaPtr = std::shared_ptr< Materia >;
      using MateriaJoinRatePtr = std::shared_ptr< MateriaJoinRate >;
      using MateriaJoinRateGatherCraftPtr = std::shared_ptr< MateriaJoinRateGatherCraft >;
@@ -8814,9 +9009,11 @@ struct ZoneSharedGroup
      using PartyContentTextDataPtr = std::shared_ptr< PartyContentTextData >;
      using PatchMarkPtr = std::shared_ptr< PatchMark >;
      using PerformPtr = std::shared_ptr< Perform >;
+     using PerformGroupPtr = std::shared_ptr< PerformGroup >;
      using PerformTransientPtr = std::shared_ptr< PerformTransient >;
      using PetPtr = std::shared_ptr< Pet >;
      using PetActionPtr = std::shared_ptr< PetAction >;
+     using PetMiragePtr = std::shared_ptr< PetMirage >;
      using PhysicsGroupPtr = std::shared_ptr< PhysicsGroup >;
      using PhysicsWindPtr = std::shared_ptr< PhysicsWind >;
      using PicturePtr = std::shared_ptr< Picture >;
@@ -8828,18 +9025,20 @@ struct ZoneSharedGroup
      using PublicContentPtr = std::shared_ptr< PublicContent >;
      using PublicContentCutscenePtr = std::shared_ptr< PublicContentCutscene >;
      using PublicContentTextDataPtr = std::shared_ptr< PublicContentTextData >;
-     using PurifyPtr = std::shared_ptr< Purify >;
      using PvPActionPtr = std::shared_ptr< PvPAction >;
      using PvPActionSortPtr = std::shared_ptr< PvPActionSort >;
      using PvPRankPtr = std::shared_ptr< PvPRank >;
      using PvPSelectTraitPtr = std::shared_ptr< PvPSelectTrait >;
      using PvPTraitPtr = std::shared_ptr< PvPTrait >;
      using QuestPtr = std::shared_ptr< Quest >;
+     using QuestAcceptAdditionConditionPtr = std::shared_ptr< QuestAcceptAdditionCondition >;
      using QuestBattlePtr = std::shared_ptr< QuestBattle >;
      using QuestChapterPtr = std::shared_ptr< QuestChapter >;
      using QuestClassJobRewardPtr = std::shared_ptr< QuestClassJobReward >;
      using QuestClassJobSupplyPtr = std::shared_ptr< QuestClassJobSupply >;
      using QuestDerivedClassPtr = std::shared_ptr< QuestDerivedClass >;
+     using QuestEffectPtr = std::shared_ptr< QuestEffect >;
+     using QuestEffectDefinePtr = std::shared_ptr< QuestEffectDefine >;
      using QuestRedoPtr = std::shared_ptr< QuestRedo >;
      using QuestRedoChapterUIPtr = std::shared_ptr< QuestRedoChapterUI >;
      using QuestRedoChapterUICategoryPtr = std::shared_ptr< QuestRedoChapterUICategory >;
@@ -8868,12 +9067,14 @@ struct ZoneSharedGroup
      using RelicNoteCategoryPtr = std::shared_ptr< RelicNoteCategory >;
      using ResidentPtr = std::shared_ptr< Resident >;
      using ResistanceWeaponAdjustPtr = std::shared_ptr< ResistanceWeaponAdjust >;
+     using RetainerFortuneRewardRangePtr = std::shared_ptr< RetainerFortuneRewardRange >;
      using RetainerTaskPtr = std::shared_ptr< RetainerTask >;
      using RetainerTaskLvRangePtr = std::shared_ptr< RetainerTaskLvRange >;
      using RetainerTaskNormalPtr = std::shared_ptr< RetainerTaskNormal >;
      using RetainerTaskParameterPtr = std::shared_ptr< RetainerTaskParameter >;
      using RetainerTaskRandomPtr = std::shared_ptr< RetainerTaskRandom >;
      using RideShootingPtr = std::shared_ptr< RideShooting >;
+     using RideShootingTargetTypePtr = std::shared_ptr< RideShootingTargetType >;
      using RideShootingTextDataPtr = std::shared_ptr< RideShootingTextData >;
      using RPParameterPtr = std::shared_ptr< RPParameter >;
      using SatisfactionArbitrationPtr = std::shared_ptr< SatisfactionArbitration >;
@@ -8899,6 +9100,7 @@ struct ZoneSharedGroup
      using SpecialShopItemCategoryPtr = std::shared_ptr< SpecialShopItemCategory >;
      using StainPtr = std::shared_ptr< Stain >;
      using StainTransientPtr = std::shared_ptr< StainTransient >;
+     using StanceChangePtr = std::shared_ptr< StanceChange >;
      using StatusPtr = std::shared_ptr< Status >;
      using StatusHitEffectPtr = std::shared_ptr< StatusHitEffect >;
      using StatusLoopVFXPtr = std::shared_ptr< StatusLoopVFX >;
@@ -8912,6 +9114,7 @@ struct ZoneSharedGroup
      using TerritoryTypePtr = std::shared_ptr< TerritoryType >;
      using TerritoryTypeTransientPtr = std::shared_ptr< TerritoryTypeTransient >;
      using TextCommandPtr = std::shared_ptr< TextCommand >;
+     using TextCommandParamPtr = std::shared_ptr< TextCommandParam >;
      using TitlePtr = std::shared_ptr< Title >;
      using TomestonesPtr = std::shared_ptr< Tomestones >;
      using TomestonesItemPtr = std::shared_ptr< TomestonesItem >;
@@ -8932,11 +9135,14 @@ struct ZoneSharedGroup
      using TripleTriadCardResidentPtr = std::shared_ptr< TripleTriadCardResident >;
      using TripleTriadCardTypePtr = std::shared_ptr< TripleTriadCardType >;
      using TripleTriadCompetitionPtr = std::shared_ptr< TripleTriadCompetition >;
+     using TripleTriadResidentPtr = std::shared_ptr< TripleTriadResident >;
      using TripleTriadRulePtr = std::shared_ptr< TripleTriadRule >;
      using TutorialPtr = std::shared_ptr< Tutorial >;
      using TutorialDPSPtr = std::shared_ptr< TutorialDPS >;
      using TutorialHealerPtr = std::shared_ptr< TutorialHealer >;
      using TutorialTankPtr = std::shared_ptr< TutorialTank >;
+     using UDS_EventPtr = std::shared_ptr< UDS_Event >;
+     using UDS_PropertyPtr = std::shared_ptr< UDS_Property >;
      using UIColorPtr = std::shared_ptr< UIColor >;
      using VaseFlowerPtr = std::shared_ptr< VaseFlower >;
      using VFXPtr = std::shared_ptr< VFX >;
@@ -8967,6 +9173,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_AchievementCategoryIdList;
      std::set< uint32_t > m_AchievementHideConditionIdList;
      std::set< uint32_t > m_AchievementKindIdList;
+     std::set< uint32_t > m_AchievementTargetIdList;
      std::set< uint32_t > m_ActionIdList;
      std::set< uint32_t > m_ActionCastTimelineIdList;
      std::set< uint32_t > m_ActionCastVFXIdList;
@@ -9013,6 +9220,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_AOZBossIdList;
      std::set< uint32_t > m_AOZContentIdList;
      std::set< uint32_t > m_AOZContentBriefingBNpcIdList;
+     std::set< uint32_t > m_AOZReportIdList;
+     std::set< uint32_t > m_AOZScoreIdList;
      std::set< uint32_t > m_AquariumFishIdList;
      std::set< uint32_t > m_AquariumWaterIdList;
      std::set< uint32_t > m_ArrayEventHandlerIdList;
@@ -9093,6 +9302,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CompanyLeveRuleIdList;
      std::set< uint32_t > m_CompleteJournalIdList;
      std::set< uint32_t > m_CompleteJournalCategoryIdList;
+     std::set< uint32_t > m_CompletionIdList;
      std::set< uint32_t > m_ConditionIdList;
      std::set< uint32_t > m_ConfigKeyIdList;
      std::set< uint32_t > m_ContentCloseCycleIdList;
@@ -9116,6 +9326,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CraftActionIdList;
      std::set< uint32_t > m_CraftLeveIdList;
      std::set< uint32_t > m_CraftLevelDifferenceIdList;
+     std::set< uint32_t > m_CraftLeveTalkIdList;
      std::set< uint32_t > m_CraftTypeIdList;
      std::set< uint32_t > m_CreditIdList;
      std::set< uint32_t > m_CreditBackImageIdList;
@@ -9123,9 +9334,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CreditListIdList;
      std::set< uint32_t > m_CreditListTextIdList;
      std::set< uint32_t > m_CustomTalkIdList;
-     std::set< uint32_t > m_CustomTalkDynamicIconIdList;
      std::set< uint32_t > m_CustomTalkNestHandlersIdList;
      std::set< uint32_t > m_CutsceneIdList;
+     std::set< uint32_t > m_CutSceneIncompQuestIdList;
      std::set< uint32_t > m_CutsceneMotionIdList;
      std::set< uint32_t > m_CutsceneWorkIndexIdList;
      std::set< uint32_t > m_CutScreenImageIdList;
@@ -9186,6 +9397,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_EurekaMagiciteItemTypeIdList;
      std::set< uint32_t > m_EurekaSphereElementAdjustIdList;
      std::set< uint32_t > m_EventActionIdList;
+     std::set< uint32_t > m_EventCustomIconTypeIdList;
      std::set< uint32_t > m_EventIconPriorityIdList;
      std::set< uint32_t > m_EventIconTypeIdList;
      std::set< uint32_t > m_EventItemIdList;
@@ -9193,6 +9405,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_EventItemHelpIdList;
      std::set< uint32_t > m_EventItemTimelineIdList;
      std::set< uint32_t > m_EventSystemDefineIdList;
+     std::set< uint32_t > m_ExportedGatheringPointIdList;
      std::set< uint32_t > m_ExportedSGIdList;
      std::set< uint32_t > m_ExVersionIdList;
      std::set< uint32_t > m_FateIdList;
@@ -9242,6 +9455,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GatheringSubCategoryIdList;
      std::set< uint32_t > m_GatheringTypeIdList;
      std::set< uint32_t > m_GcArmyCaptureTacticsIdList;
+     std::set< uint32_t > m_GcArmyEquipPresetIdList;
      std::set< uint32_t > m_GcArmyExpeditionIdList;
      std::set< uint32_t > m_GcArmyExpeditionMemberBonusIdList;
      std::set< uint32_t > m_GcArmyExpeditionTypeIdList;
@@ -9284,6 +9498,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GuideTitleIdList;
      std::set< uint32_t > m_GuildleveAssignmentIdList;
      std::set< uint32_t > m_GuildleveAssignmentCategoryIdList;
+     std::set< uint32_t > m_GuildleveAssignmentTalkIdList;
      std::set< uint32_t > m_GuildOrderIdList;
      std::set< uint32_t > m_GuildOrderGuideIdList;
      std::set< uint32_t > m_GuildOrderOfficerIdList;
@@ -9349,6 +9564,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ItemSortCategoryIdList;
      std::set< uint32_t > m_ItemSpecialBonusIdList;
      std::set< uint32_t > m_ItemUICategoryIdList;
+     std::set< uint32_t > m_JingleIdList;
      std::set< uint32_t > m_JobHudManualIdList;
      std::set< uint32_t > m_JobHudManualPriorityIdList;
      std::set< uint32_t > m_JournalCategoryIdList;
@@ -9375,12 +9591,11 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MainCommandCategoryIdList;
      std::set< uint32_t > m_ManeuversArmorIdList;
      std::set< uint32_t > m_MapIdList;
+     std::set< uint32_t > m_MapConditionIdList;
      std::set< uint32_t > m_MapMarkerIdList;
      std::set< uint32_t > m_MapMarkerRegionIdList;
      std::set< uint32_t > m_MapSymbolIdList;
      std::set< uint32_t > m_MarkerIdList;
-     std::set< uint32_t > m_MasterpieceSupplyDutyIdList;
-     std::set< uint32_t > m_MasterpieceSupplyMultiplierIdList;
      std::set< uint32_t > m_MateriaIdList;
      std::set< uint32_t > m_MateriaJoinRateIdList;
      std::set< uint32_t > m_MateriaJoinRateGatherCraftIdList;
@@ -9437,9 +9652,11 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_PartyContentTextDataIdList;
      std::set< uint32_t > m_PatchMarkIdList;
      std::set< uint32_t > m_PerformIdList;
+     std::set< uint32_t > m_PerformGroupIdList;
      std::set< uint32_t > m_PerformTransientIdList;
      std::set< uint32_t > m_PetIdList;
      std::set< uint32_t > m_PetActionIdList;
+     std::set< uint32_t > m_PetMirageIdList;
      std::set< uint32_t > m_PhysicsGroupIdList;
      std::set< uint32_t > m_PhysicsWindIdList;
      std::set< uint32_t > m_PictureIdList;
@@ -9451,18 +9668,20 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_PublicContentIdList;
      std::set< uint32_t > m_PublicContentCutsceneIdList;
      std::set< uint32_t > m_PublicContentTextDataIdList;
-     std::set< uint32_t > m_PurifyIdList;
      std::set< uint32_t > m_PvPActionIdList;
      std::set< uint32_t > m_PvPActionSortIdList;
      std::set< uint32_t > m_PvPRankIdList;
      std::set< uint32_t > m_PvPSelectTraitIdList;
      std::set< uint32_t > m_PvPTraitIdList;
      std::set< uint32_t > m_QuestIdList;
+     std::set< uint32_t > m_QuestAcceptAdditionConditionIdList;
      std::set< uint32_t > m_QuestBattleIdList;
      std::set< uint32_t > m_QuestChapterIdList;
      std::set< uint32_t > m_QuestClassJobRewardIdList;
      std::set< uint32_t > m_QuestClassJobSupplyIdList;
      std::set< uint32_t > m_QuestDerivedClassIdList;
+     std::set< uint32_t > m_QuestEffectIdList;
+     std::set< uint32_t > m_QuestEffectDefineIdList;
      std::set< uint32_t > m_QuestRedoIdList;
      std::set< uint32_t > m_QuestRedoChapterUIIdList;
      std::set< uint32_t > m_QuestRedoChapterUICategoryIdList;
@@ -9491,12 +9710,14 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_RelicNoteCategoryIdList;
      std::set< uint32_t > m_ResidentIdList;
      std::set< uint32_t > m_ResistanceWeaponAdjustIdList;
+     std::set< uint32_t > m_RetainerFortuneRewardRangeIdList;
      std::set< uint32_t > m_RetainerTaskIdList;
      std::set< uint32_t > m_RetainerTaskLvRangeIdList;
      std::set< uint32_t > m_RetainerTaskNormalIdList;
      std::set< uint32_t > m_RetainerTaskParameterIdList;
      std::set< uint32_t > m_RetainerTaskRandomIdList;
      std::set< uint32_t > m_RideShootingIdList;
+     std::set< uint32_t > m_RideShootingTargetTypeIdList;
      std::set< uint32_t > m_RideShootingTextDataIdList;
      std::set< uint32_t > m_RPParameterIdList;
      std::set< uint32_t > m_SatisfactionArbitrationIdList;
@@ -9522,6 +9743,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_SpecialShopItemCategoryIdList;
      std::set< uint32_t > m_StainIdList;
      std::set< uint32_t > m_StainTransientIdList;
+     std::set< uint32_t > m_StanceChangeIdList;
      std::set< uint32_t > m_StatusIdList;
      std::set< uint32_t > m_StatusHitEffectIdList;
      std::set< uint32_t > m_StatusLoopVFXIdList;
@@ -9535,6 +9757,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_TerritoryTypeIdList;
      std::set< uint32_t > m_TerritoryTypeTransientIdList;
      std::set< uint32_t > m_TextCommandIdList;
+     std::set< uint32_t > m_TextCommandParamIdList;
      std::set< uint32_t > m_TitleIdList;
      std::set< uint32_t > m_TomestonesIdList;
      std::set< uint32_t > m_TomestonesItemIdList;
@@ -9555,11 +9778,14 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_TripleTriadCardResidentIdList;
      std::set< uint32_t > m_TripleTriadCardTypeIdList;
      std::set< uint32_t > m_TripleTriadCompetitionIdList;
+     std::set< uint32_t > m_TripleTriadResidentIdList;
      std::set< uint32_t > m_TripleTriadRuleIdList;
      std::set< uint32_t > m_TutorialIdList;
      std::set< uint32_t > m_TutorialDPSIdList;
      std::set< uint32_t > m_TutorialHealerIdList;
      std::set< uint32_t > m_TutorialTankIdList;
+     std::set< uint32_t > m_UDS_EventIdList;
+     std::set< uint32_t > m_UDS_PropertyIdList;
      std::set< uint32_t > m_UIColorIdList;
      std::set< uint32_t > m_VaseFlowerIdList;
      std::set< uint32_t > m_VFXIdList;
@@ -9609,6 +9835,12 @@ const std::set< uint32_t >& getAchievementKindIdList()
    if( m_AchievementKindIdList.size() == 0 )
       loadIdList( m_AchievementKindDat, m_AchievementKindIdList );
    return m_AchievementKindIdList;
+}
+const std::set< uint32_t >& getAchievementTargetIdList()
+{
+   if( m_AchievementTargetIdList.size() == 0 )
+      loadIdList( m_AchievementTargetDat, m_AchievementTargetIdList );
+   return m_AchievementTargetIdList;
 }
 const std::set< uint32_t >& getActionIdList()
 {
@@ -9885,6 +10117,18 @@ const std::set< uint32_t >& getAOZContentBriefingBNpcIdList()
    if( m_AOZContentBriefingBNpcIdList.size() == 0 )
       loadIdList( m_AOZContentBriefingBNpcDat, m_AOZContentBriefingBNpcIdList );
    return m_AOZContentBriefingBNpcIdList;
+}
+const std::set< uint32_t >& getAOZReportIdList()
+{
+   if( m_AOZReportIdList.size() == 0 )
+      loadIdList( m_AOZReportDat, m_AOZReportIdList );
+   return m_AOZReportIdList;
+}
+const std::set< uint32_t >& getAOZScoreIdList()
+{
+   if( m_AOZScoreIdList.size() == 0 )
+      loadIdList( m_AOZScoreDat, m_AOZScoreIdList );
+   return m_AOZScoreIdList;
 }
 const std::set< uint32_t >& getAquariumFishIdList()
 {
@@ -10366,6 +10610,12 @@ const std::set< uint32_t >& getCompleteJournalCategoryIdList()
       loadIdList( m_CompleteJournalCategoryDat, m_CompleteJournalCategoryIdList );
    return m_CompleteJournalCategoryIdList;
 }
+const std::set< uint32_t >& getCompletionIdList()
+{
+   if( m_CompletionIdList.size() == 0 )
+      loadIdList( m_CompletionDat, m_CompletionIdList );
+   return m_CompletionIdList;
+}
 const std::set< uint32_t >& getConditionIdList()
 {
    if( m_ConditionIdList.size() == 0 )
@@ -10504,6 +10754,12 @@ const std::set< uint32_t >& getCraftLevelDifferenceIdList()
       loadIdList( m_CraftLevelDifferenceDat, m_CraftLevelDifferenceIdList );
    return m_CraftLevelDifferenceIdList;
 }
+const std::set< uint32_t >& getCraftLeveTalkIdList()
+{
+   if( m_CraftLeveTalkIdList.size() == 0 )
+      loadIdList( m_CraftLeveTalkDat, m_CraftLeveTalkIdList );
+   return m_CraftLeveTalkIdList;
+}
 const std::set< uint32_t >& getCraftTypeIdList()
 {
    if( m_CraftTypeIdList.size() == 0 )
@@ -10546,12 +10802,6 @@ const std::set< uint32_t >& getCustomTalkIdList()
       loadIdList( m_CustomTalkDat, m_CustomTalkIdList );
    return m_CustomTalkIdList;
 }
-const std::set< uint32_t >& getCustomTalkDynamicIconIdList()
-{
-   if( m_CustomTalkDynamicIconIdList.size() == 0 )
-      loadIdList( m_CustomTalkDynamicIconDat, m_CustomTalkDynamicIconIdList );
-   return m_CustomTalkDynamicIconIdList;
-}
 const std::set< uint32_t >& getCustomTalkNestHandlersIdList()
 {
    if( m_CustomTalkNestHandlersIdList.size() == 0 )
@@ -10563,6 +10813,12 @@ const std::set< uint32_t >& getCutsceneIdList()
    if( m_CutsceneIdList.size() == 0 )
       loadIdList( m_CutsceneDat, m_CutsceneIdList );
    return m_CutsceneIdList;
+}
+const std::set< uint32_t >& getCutSceneIncompQuestIdList()
+{
+   if( m_CutSceneIncompQuestIdList.size() == 0 )
+      loadIdList( m_CutSceneIncompQuestDat, m_CutSceneIncompQuestIdList );
+   return m_CutSceneIncompQuestIdList;
 }
 const std::set< uint32_t >& getCutsceneMotionIdList()
 {
@@ -10924,6 +11180,12 @@ const std::set< uint32_t >& getEventActionIdList()
       loadIdList( m_EventActionDat, m_EventActionIdList );
    return m_EventActionIdList;
 }
+const std::set< uint32_t >& getEventCustomIconTypeIdList()
+{
+   if( m_EventCustomIconTypeIdList.size() == 0 )
+      loadIdList( m_EventCustomIconTypeDat, m_EventCustomIconTypeIdList );
+   return m_EventCustomIconTypeIdList;
+}
 const std::set< uint32_t >& getEventIconPriorityIdList()
 {
    if( m_EventIconPriorityIdList.size() == 0 )
@@ -10965,6 +11227,12 @@ const std::set< uint32_t >& getEventSystemDefineIdList()
    if( m_EventSystemDefineIdList.size() == 0 )
       loadIdList( m_EventSystemDefineDat, m_EventSystemDefineIdList );
    return m_EventSystemDefineIdList;
+}
+const std::set< uint32_t >& getExportedGatheringPointIdList()
+{
+   if( m_ExportedGatheringPointIdList.size() == 0 )
+      loadIdList( m_ExportedGatheringPointDat, m_ExportedGatheringPointIdList );
+   return m_ExportedGatheringPointIdList;
 }
 const std::set< uint32_t >& getExportedSGIdList()
 {
@@ -11260,6 +11528,12 @@ const std::set< uint32_t >& getGcArmyCaptureTacticsIdList()
       loadIdList( m_GcArmyCaptureTacticsDat, m_GcArmyCaptureTacticsIdList );
    return m_GcArmyCaptureTacticsIdList;
 }
+const std::set< uint32_t >& getGcArmyEquipPresetIdList()
+{
+   if( m_GcArmyEquipPresetIdList.size() == 0 )
+      loadIdList( m_GcArmyEquipPresetDat, m_GcArmyEquipPresetIdList );
+   return m_GcArmyEquipPresetIdList;
+}
 const std::set< uint32_t >& getGcArmyExpeditionIdList()
 {
    if( m_GcArmyExpeditionIdList.size() == 0 )
@@ -11511,6 +11785,12 @@ const std::set< uint32_t >& getGuildleveAssignmentCategoryIdList()
    if( m_GuildleveAssignmentCategoryIdList.size() == 0 )
       loadIdList( m_GuildleveAssignmentCategoryDat, m_GuildleveAssignmentCategoryIdList );
    return m_GuildleveAssignmentCategoryIdList;
+}
+const std::set< uint32_t >& getGuildleveAssignmentTalkIdList()
+{
+   if( m_GuildleveAssignmentTalkIdList.size() == 0 )
+      loadIdList( m_GuildleveAssignmentTalkDat, m_GuildleveAssignmentTalkIdList );
+   return m_GuildleveAssignmentTalkIdList;
 }
 const std::set< uint32_t >& getGuildOrderIdList()
 {
@@ -11902,6 +12182,12 @@ const std::set< uint32_t >& getItemUICategoryIdList()
       loadIdList( m_ItemUICategoryDat, m_ItemUICategoryIdList );
    return m_ItemUICategoryIdList;
 }
+const std::set< uint32_t >& getJingleIdList()
+{
+   if( m_JingleIdList.size() == 0 )
+      loadIdList( m_JingleDat, m_JingleIdList );
+   return m_JingleIdList;
+}
 const std::set< uint32_t >& getJobHudManualIdList()
 {
    if( m_JobHudManualIdList.size() == 0 )
@@ -12058,6 +12344,12 @@ const std::set< uint32_t >& getMapIdList()
       loadIdList( m_MapDat, m_MapIdList );
    return m_MapIdList;
 }
+const std::set< uint32_t >& getMapConditionIdList()
+{
+   if( m_MapConditionIdList.size() == 0 )
+      loadIdList( m_MapConditionDat, m_MapConditionIdList );
+   return m_MapConditionIdList;
+}
 const std::set< uint32_t >& getMapMarkerIdList()
 {
    if( m_MapMarkerIdList.size() == 0 )
@@ -12081,18 +12373,6 @@ const std::set< uint32_t >& getMarkerIdList()
    if( m_MarkerIdList.size() == 0 )
       loadIdList( m_MarkerDat, m_MarkerIdList );
    return m_MarkerIdList;
-}
-const std::set< uint32_t >& getMasterpieceSupplyDutyIdList()
-{
-   if( m_MasterpieceSupplyDutyIdList.size() == 0 )
-      loadIdList( m_MasterpieceSupplyDutyDat, m_MasterpieceSupplyDutyIdList );
-   return m_MasterpieceSupplyDutyIdList;
-}
-const std::set< uint32_t >& getMasterpieceSupplyMultiplierIdList()
-{
-   if( m_MasterpieceSupplyMultiplierIdList.size() == 0 )
-      loadIdList( m_MasterpieceSupplyMultiplierDat, m_MasterpieceSupplyMultiplierIdList );
-   return m_MasterpieceSupplyMultiplierIdList;
 }
 const std::set< uint32_t >& getMateriaIdList()
 {
@@ -12430,6 +12710,12 @@ const std::set< uint32_t >& getPerformIdList()
       loadIdList( m_PerformDat, m_PerformIdList );
    return m_PerformIdList;
 }
+const std::set< uint32_t >& getPerformGroupIdList()
+{
+   if( m_PerformGroupIdList.size() == 0 )
+      loadIdList( m_PerformGroupDat, m_PerformGroupIdList );
+   return m_PerformGroupIdList;
+}
 const std::set< uint32_t >& getPerformTransientIdList()
 {
    if( m_PerformTransientIdList.size() == 0 )
@@ -12447,6 +12733,12 @@ const std::set< uint32_t >& getPetActionIdList()
    if( m_PetActionIdList.size() == 0 )
       loadIdList( m_PetActionDat, m_PetActionIdList );
    return m_PetActionIdList;
+}
+const std::set< uint32_t >& getPetMirageIdList()
+{
+   if( m_PetMirageIdList.size() == 0 )
+      loadIdList( m_PetMirageDat, m_PetMirageIdList );
+   return m_PetMirageIdList;
 }
 const std::set< uint32_t >& getPhysicsGroupIdList()
 {
@@ -12514,12 +12806,6 @@ const std::set< uint32_t >& getPublicContentTextDataIdList()
       loadIdList( m_PublicContentTextDataDat, m_PublicContentTextDataIdList );
    return m_PublicContentTextDataIdList;
 }
-const std::set< uint32_t >& getPurifyIdList()
-{
-   if( m_PurifyIdList.size() == 0 )
-      loadIdList( m_PurifyDat, m_PurifyIdList );
-   return m_PurifyIdList;
-}
 const std::set< uint32_t >& getPvPActionIdList()
 {
    if( m_PvPActionIdList.size() == 0 )
@@ -12556,6 +12842,12 @@ const std::set< uint32_t >& getQuestIdList()
       loadIdList( m_QuestDat, m_QuestIdList );
    return m_QuestIdList;
 }
+const std::set< uint32_t >& getQuestAcceptAdditionConditionIdList()
+{
+   if( m_QuestAcceptAdditionConditionIdList.size() == 0 )
+      loadIdList( m_QuestAcceptAdditionConditionDat, m_QuestAcceptAdditionConditionIdList );
+   return m_QuestAcceptAdditionConditionIdList;
+}
 const std::set< uint32_t >& getQuestBattleIdList()
 {
    if( m_QuestBattleIdList.size() == 0 )
@@ -12585,6 +12877,18 @@ const std::set< uint32_t >& getQuestDerivedClassIdList()
    if( m_QuestDerivedClassIdList.size() == 0 )
       loadIdList( m_QuestDerivedClassDat, m_QuestDerivedClassIdList );
    return m_QuestDerivedClassIdList;
+}
+const std::set< uint32_t >& getQuestEffectIdList()
+{
+   if( m_QuestEffectIdList.size() == 0 )
+      loadIdList( m_QuestEffectDat, m_QuestEffectIdList );
+   return m_QuestEffectIdList;
+}
+const std::set< uint32_t >& getQuestEffectDefineIdList()
+{
+   if( m_QuestEffectDefineIdList.size() == 0 )
+      loadIdList( m_QuestEffectDefineDat, m_QuestEffectDefineIdList );
+   return m_QuestEffectDefineIdList;
 }
 const std::set< uint32_t >& getQuestRedoIdList()
 {
@@ -12754,6 +13058,12 @@ const std::set< uint32_t >& getResistanceWeaponAdjustIdList()
       loadIdList( m_ResistanceWeaponAdjustDat, m_ResistanceWeaponAdjustIdList );
    return m_ResistanceWeaponAdjustIdList;
 }
+const std::set< uint32_t >& getRetainerFortuneRewardRangeIdList()
+{
+   if( m_RetainerFortuneRewardRangeIdList.size() == 0 )
+      loadIdList( m_RetainerFortuneRewardRangeDat, m_RetainerFortuneRewardRangeIdList );
+   return m_RetainerFortuneRewardRangeIdList;
+}
 const std::set< uint32_t >& getRetainerTaskIdList()
 {
    if( m_RetainerTaskIdList.size() == 0 )
@@ -12789,6 +13099,12 @@ const std::set< uint32_t >& getRideShootingIdList()
    if( m_RideShootingIdList.size() == 0 )
       loadIdList( m_RideShootingDat, m_RideShootingIdList );
    return m_RideShootingIdList;
+}
+const std::set< uint32_t >& getRideShootingTargetTypeIdList()
+{
+   if( m_RideShootingTargetTypeIdList.size() == 0 )
+      loadIdList( m_RideShootingTargetTypeDat, m_RideShootingTargetTypeIdList );
+   return m_RideShootingTargetTypeIdList;
 }
 const std::set< uint32_t >& getRideShootingTextDataIdList()
 {
@@ -12940,6 +13256,12 @@ const std::set< uint32_t >& getStainTransientIdList()
       loadIdList( m_StainTransientDat, m_StainTransientIdList );
    return m_StainTransientIdList;
 }
+const std::set< uint32_t >& getStanceChangeIdList()
+{
+   if( m_StanceChangeIdList.size() == 0 )
+      loadIdList( m_StanceChangeDat, m_StanceChangeIdList );
+   return m_StanceChangeIdList;
+}
 const std::set< uint32_t >& getStatusIdList()
 {
    if( m_StatusIdList.size() == 0 )
@@ -13017,6 +13339,12 @@ const std::set< uint32_t >& getTextCommandIdList()
    if( m_TextCommandIdList.size() == 0 )
       loadIdList( m_TextCommandDat, m_TextCommandIdList );
    return m_TextCommandIdList;
+}
+const std::set< uint32_t >& getTextCommandParamIdList()
+{
+   if( m_TextCommandParamIdList.size() == 0 )
+      loadIdList( m_TextCommandParamDat, m_TextCommandParamIdList );
+   return m_TextCommandParamIdList;
 }
 const std::set< uint32_t >& getTitleIdList()
 {
@@ -13138,6 +13466,12 @@ const std::set< uint32_t >& getTripleTriadCompetitionIdList()
       loadIdList( m_TripleTriadCompetitionDat, m_TripleTriadCompetitionIdList );
    return m_TripleTriadCompetitionIdList;
 }
+const std::set< uint32_t >& getTripleTriadResidentIdList()
+{
+   if( m_TripleTriadResidentIdList.size() == 0 )
+      loadIdList( m_TripleTriadResidentDat, m_TripleTriadResidentIdList );
+   return m_TripleTriadResidentIdList;
+}
 const std::set< uint32_t >& getTripleTriadRuleIdList()
 {
    if( m_TripleTriadRuleIdList.size() == 0 )
@@ -13167,6 +13501,18 @@ const std::set< uint32_t >& getTutorialTankIdList()
    if( m_TutorialTankIdList.size() == 0 )
       loadIdList( m_TutorialTankDat, m_TutorialTankIdList );
    return m_TutorialTankIdList;
+}
+const std::set< uint32_t >& getUDS_EventIdList()
+{
+   if( m_UDS_EventIdList.size() == 0 )
+      loadIdList( m_UDS_EventDat, m_UDS_EventIdList );
+   return m_UDS_EventIdList;
+}
+const std::set< uint32_t >& getUDS_PropertyIdList()
+{
+   if( m_UDS_PropertyIdList.size() == 0 )
+      loadIdList( m_UDS_PropertyDat, m_UDS_PropertyIdList );
+   return m_UDS_PropertyIdList;
 }
 const std::set< uint32_t >& getUIColorIdList()
 {

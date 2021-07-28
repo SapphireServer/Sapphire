@@ -132,7 +132,7 @@ private:
                       {
                         if( result.param2 == 1 )
                         {
-                          if( player.giveQuestRewards( getId(), 0 ) )
+                          if( player.giveQuestRewards( getId(), result.param3 ) )
                           {
                             player.setQuestUI8BH( getId(), 0 );
                             player.finishQuest( getId() );
