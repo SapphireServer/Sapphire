@@ -194,7 +194,7 @@ namespace Sapphire::Network::Packets
     EventPlay128 = 0x026E, // updated 5.58
     EventPlay255 = 0x039E, // updated 5.58
 
-    EventYield = 0x02CB, // updated 5.55 hotfix
+    EventYield = 0x0123, // updated 5.58
     //EventYield4 = 0x0000,
     //EventYield8 = 0x0000,
     //EventYield16 = 0x0000,
@@ -216,7 +216,7 @@ namespace Sapphire::Network::Packets
     MSQTrackerComplete = 0x01C1, // updated 5.58
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
-    QuestMessage = 0x036E, // updated 5.55 hotfix
+    QuestMessage = 0x0128, // updated 5.58
 
     QuestTracker = 0x038E, // updated 5.58
 
@@ -243,7 +243,7 @@ namespace Sapphire::Network::Packets
     EquipDisplayFlags = 0x0199, // updated 5.58
 
     MiniCactpotInit = 0x0286, // added 5.31
-    ShopMessage = 0x0162, // updated 5.55 hotfix
+    ShopMessage = 0x00D0, // updated 5.58
     LootMessage = 0x038C, // updated 5.58
     ResultDialog = 0x00DF, // updated 5.58
     DesynthResult = 0x038F, // updated 5.58
@@ -395,7 +395,7 @@ namespace Sapphire::Network::Packets
     OutOfRangeEventHandler = 0x0294, // updated 5.58
     EnterTeriEventHandler = 0x00C1, // updated 5.58
     ShopEventHandler = 0x02B8, // updated 5.58
-    EventYieldHandler = 0x02A0, // updated 5.55 hotfix
+    EventYieldHandler = 0x03A2, // updated 5.58
     ReturnEventHandler = 0x0333, // updated 5.58
     TradeReturnEventHandler = 0x0179, // updated 5.58
     TradeReturnEventHandler2 = 0x0169, // updated 5.55 hotfix
@@ -408,7 +408,8 @@ namespace Sapphire::Network::Packets
     LandRenameHandler = 0x0083, // updated 5.58
     HousingUpdateHouseGreeting = 0x031A, // updated 5.58
     HousingUpdateObjectPosition = 0x010E, // updated 5.58
-    HousingEditAppearance = 0x00D7, // updated 5.55 hotfix
+    HousingEditExterior = 0x0324, // updated 5.58
+    HousingEditInterior = 0x02F7, // updated 5.58
 
     SetSharedEstateSettings = 0x0342, // updated 5.58
 
