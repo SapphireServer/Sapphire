@@ -21,6 +21,7 @@
 
 #include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
+#include "Territory/Housing/HousingInteriorTerritory.h"
 #include "Territory/Land.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/House.h"
@@ -729,10 +730,13 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIV
   housingMgr.reqMoveHousingItem( player, data.ident, data.slot, data.pos, data.rotation );
 }
 
-void Sapphire::Network::GameConnection::housingEditAppearance( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& housingMgr = Common::Service< HousingMgr >::ref();
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingEditAppearance >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingEditExterior >( inPacket );
+  auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+  if( !terri )
+    return;
 
   std::vector< uint16_t > containerList;
   std::vector< uint8_t > slotList;
@@ -743,7 +747,27 @@ void Sapphire::Network::GameConnection::housingEditAppearance( const Packets::FF
     slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
   }
 
-  housingMgr.editExterior( player, packet.data().landId, containerList, slotList, packet.data().removeFlag );
+  housingMgr.editAppearance( false, player, terri->getLand( packet.data().landId )->getLandIdent(), containerList, slotList, packet.data().removeFlag );
+}
+
+void Sapphire::Network::GameConnection::housingEditInterior( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingEditInterior >( inPacket );
+  auto terri = std::dynamic_pointer_cast< World::Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
+  if( !terri )
+    return;
+  
+  std::vector< uint16_t > containerList;
+  std::vector< uint8_t > slotList;
+  for( int i = 0; i < 10; i++ )
+  {
+    auto container = packet.data().container[i];
+    containerList.push_back( container );
+    slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
+  }
+
+  housingMgr.editAppearance( true, player, terri->getLandIdent(), containerList, slotList, 0 );
 }
 
 void Sapphire::Network::GameConnection::marketBoardSearch( const Packets::FFXIVARR_PACKET_RAW& inPacket,
