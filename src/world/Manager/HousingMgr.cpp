@@ -1663,7 +1663,7 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
           if( oldItem )
           {
             housingContainer->removeItem( i );
-            invMgr.removeItemFromHousingContainer( land->getLandIdent(), housingContainer->getId(), i );
+            invMgr.removeItemFromHousingContainer( landIdent, housingContainer->getId(), i );
             player.addItem( oldItem, false, false, false );
           }
         }
@@ -1682,7 +1682,7 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
     }
   }
   invMgr.sendInventoryContainer( player, housingContainer );
-  invMgr.saveHousingContainer( land->getLandIdent(), housingContainer );
+  invMgr.saveHousingContainer( landIdent, housingContainer );
   updateHouseModels( land->getHouse() );
   if( !isInterior )
   {
