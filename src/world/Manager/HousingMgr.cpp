@@ -1634,7 +1634,7 @@ Sapphire::Inventory::HousingItemPtr Sapphire::World::Manager::HousingMgr::getHou
   return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
 }
 
-void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent& landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList, uint8_t removeFlag )
+void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList, uint8_t removeFlag )
 {
   auto landSetId = toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ), static_cast< uint8_t >( landIdent.wardNum ) );
   auto terri = getHousingZoneByLandSetId( landSetId );
@@ -1665,7 +1665,7 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
           if( oldItem )
           {
             housingContainer->removeItem( i );
-            invMgr.removeItemFromHousingContainer( land->getLandIdent(), housingContainer->getId(), i );
+            invMgr.removeItemFromHousingContainer( landIdent, housingContainer->getId(), i );
             player.addItem( oldItem, false, false, false );
           }
         }
@@ -1684,7 +1684,7 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
     }
   }
   invMgr.sendInventoryContainer( player, housingContainer );
-  invMgr.saveHousingContainer( land->getLandIdent(), housingContainer );
+  invMgr.saveHousingContainer( landIdent, housingContainer );
   updateHouseModels( land->getHouse() );
   if( !isInterior )
   {
