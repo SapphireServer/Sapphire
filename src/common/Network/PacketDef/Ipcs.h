@@ -390,7 +390,7 @@ namespace Sapphire::Network::Packets
     BuildPresetHandler = 0x00DC, // updated 5.58
 
     TalkEventHandler = 0x012D, // updated 5.58
-    EmoteEventHandler = 0xF35A, // updated 5.55 hotfix
+    EmoteEventHandler = 0x039E, // updated 5.58
     WithinRangeEventHandler = 0x022C, // updated 5.58
     OutOfRangeEventHandler = 0x0294, // updated 5.58
     EnterTeriEventHandler = 0x00C1, // updated 5.58
@@ -398,7 +398,7 @@ namespace Sapphire::Network::Packets
     EventYieldHandler = 0x03A2, // updated 5.58
     ReturnEventHandler = 0x0333, // updated 5.58
     TradeReturnEventHandler = 0x0179, // updated 5.58
-    TradeReturnEventHandler2 = 0x0169, // updated 5.55 hotfix
+    TradeReturnEventHandler2 = 0x02E1, // updated 5.58
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
