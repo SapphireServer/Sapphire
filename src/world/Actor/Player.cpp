@@ -513,11 +513,13 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIV
     m_prevTerritoryId = getTerritoryId();
   }
 
+  m_pos = pos;
   if( teriMgr.movePlayer( instance, getAsPlayer() ) )
   {
-    m_pos = pos;
     return true;
   }
+  else
+    m_pos = m_prevPos;
 
   return false;
 }
