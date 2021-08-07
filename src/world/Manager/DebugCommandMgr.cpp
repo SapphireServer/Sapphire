@@ -301,6 +301,76 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     terriMgr.disableCurrentFestival();
   }
+  else if( subCommand == "QuestVar" )
+  {
+    uint16_t questId;
+    uint8_t index;
+    uint8_t value;
+    sscanf( params.c_str(), "%hu %hhu %hhu", &questId, &index, &value );
+    switch( index )
+    {
+      case 1:
+      {
+        player.setQuestUI8AH( questId, value );
+        break;
+      }
+      case 2:
+      {
+        player.setQuestUI8AL( questId, value );
+        break;
+      }
+      case 3:
+      {
+        player.setQuestUI8BH( questId, value );
+        break;
+      }
+      case 4:
+      {
+        player.setQuestUI8BL( questId, value );
+        break;
+      }
+      case 5:
+      {
+        player.setQuestUI8CH( questId, value );
+        break;
+      }
+      case 6:
+      {
+        player.setQuestUI8CL( questId, value );
+        break;
+      }
+      case 7:
+      {
+        player.setQuestUI8DH( questId, value );
+        break;
+      }
+      case 8:
+      {
+        player.setQuestUI8DL( questId, value );
+        break;
+      }
+      case 9:
+      {
+        player.setQuestUI8EH( questId, value );
+        break;
+      }
+      case 10:
+      {
+        player.setQuestUI8EL( questId, value );
+        break;
+      }
+      case 11:
+      {
+        player.setQuestUI8FH( questId, value );
+        break;
+      }
+      case 12:
+      {
+        player.setQuestUI8FL( questId, value );
+        break;
+      }
+    }
+  }
   else if( subCommand == "BitFlag" )
   {
     uint16_t questId;
