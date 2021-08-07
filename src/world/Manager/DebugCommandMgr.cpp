@@ -659,9 +659,17 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
     int16_t map_id = exdData.get< Sapphire::Data::TerritoryType >( player.getCurrentTerritory()->getTerritoryTypeId() )->map;
 
-    player.sendNotice( "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
+    player.sendNotice( "Pos: x: {0}, y: {1}, z: {2}, r: {3}\n MapId: {4}, ZoneId:{5}, Weather:{6}, Festival:{7}, {8}",
                        player.getPos().x, player.getPos().y, player.getPos().z,
-                       player.getRot(), map_id, player.getCurrentTerritory()->getTerritoryTypeId() );
+                       player.getRot(), map_id, player.getCurrentTerritory()->getTerritoryTypeId(),
+                       static_cast< uint8_t >( player.getCurrentTerritory()->getCurrentWeather() ), player.getCurrentTerritory()->getCurrentFestival().first,
+                       player.getCurrentTerritory()->getCurrentFestival().second );
+    if( auto instance = player.getCurrentInstance() )
+    {
+      player.sendNotice( "Instance info:\nContentId: {}, DirectorId: {}\nSequence: {}, Branch: {}, BGM: {}",
+        instance->getInstanceContentId(), instance->getDirectorId(), instance->getSequence(),
+        instance->getBranch(), instance->getCurrentBGM() );
+    }
   }
   else
   {
