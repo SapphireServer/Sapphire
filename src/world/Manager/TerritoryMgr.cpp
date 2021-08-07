@@ -43,8 +43,8 @@ void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
   for( auto id : exdData.getContentFinderConditionIdList() )
   {
     auto cfc = exdData.get< Sapphire::Data::ContentFinderCondition >( id );
-    if( !cfc || cfc->contentLinkType != 5 )
-      continue;
+    //if( !cfc || cfc->contentLinkType != 5 )
+    //  continue;
 
     m_questBattleToContentFinderMap[ cfc->content ] = id;
   }

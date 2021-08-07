@@ -496,6 +496,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       player.sendDebug( "event battle p1: {0}, p11: {1}, p12: {2}, p2: {3}, p3: {4}, p4: {5}, p5: {6}", param1, param11, param12, param2, param3, param4, param5 );
       break;
     }
+    case ClientTriggerType::CutscenePlayed:
+    {
+      player.sendDebug( "cutscene: {}", param1 );
+      break;
+    }
     case ClientTriggerType::OpenPerformInstrumentUI:
     {
       //param11 = instrument, 0 = end
