@@ -495,7 +495,7 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
   return teriMgr.movePlayer( instance, getAsPlayer() );
 }
 
-bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos, float rot )
 {
   m_onEnterEventDone = false;
   if( !instance )
@@ -514,12 +514,16 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIV
   }
 
   m_pos = pos;
+  m_rot = rot;
   if( teriMgr.movePlayer( instance, getAsPlayer() ) )
   {
     return true;
   }
   else
+  {
     m_pos = m_prevPos;
+    m_rot= m_prevRot;
+  }
 
   return false;
 }
@@ -2806,12 +2810,7 @@ bool Sapphire::Entity::Player::enterPredefinedPrivateInstance( uint32_t zoneId )
 
     auto instance = getOrCreatePrivateInstance( zoneId );
     if( instance )
-    {
-      auto result = setInstance( instance, info.pos );
-      if( result )
-        setRot( info.rot );
-      return result;
-    }
+      return setInstance( instance, info.pos, info.rot );
   }
   sendUrgent( "instance id: {} is not defined.", zoneId );
   auto instance = getOrCreatePrivateInstance( zoneId );

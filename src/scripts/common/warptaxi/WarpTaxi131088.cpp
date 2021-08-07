@@ -24,7 +24,7 @@ public:
     if( instance )
     {
       Common::FFXIVARR_POSITION3 pos { 30, 1, 0 };
-      player.setInstance( instance, pos );
+      player.setInstance( instance, pos, player.getRot() );
     }
   }
 };
