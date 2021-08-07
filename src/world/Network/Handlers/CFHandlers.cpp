@@ -76,11 +76,11 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
   packet->data().cancelReason = 890;
   queueOutPacket( packet );
 
-  auto cfCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentId );
+  /*auto cfCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentId );
   if( !cfCondition )
-    return;
+    return;*/
 
-  auto instance = teriMgr.createInstanceContent( cfCondition->content );
+  auto instance = teriMgr.createInstanceContent( /*cfCondition->content*/ contentId );
   if( !instance )
     return;
 
@@ -89,7 +89,33 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
 
   player.sendDebug( "Created instance with id#", instance->getGuId() );
 
+  auto sourceZoneGuId = player.getCurrentTerritory()->getGuId();
   player.setInstance( instance );
+
+  if( player.isPartyLeader() )
+  {
+    player.foreachPartyMember( [ &player, &pInstance, sourceZoneGuId ]( Entity::PlayerPtr m )
+      {
+        if( m->getId() == player.getId() )
+          return;
+        if( m->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
+        {
+          player.sendUrgent( "Cannot teleport {} to the instance, target in event.", m->getName() );
+          m->sendUrgent( "Too busy to join instance created by {}.", player.getName() );
+          return;
+        }
+        if( m->getCurrentTerritory()->getGuId() != sourceZoneGuId )
+        {
+          player.sendUrgent( "Cannot teleport {} to the instance, target in different zone.", m->getName() );
+          m->sendUrgent( "Too far to join instance created by {}.", player.getName() );
+          return;
+        }
+        player.sendUrgent( "Teleporting {} to the instance...", m->getName() );
+        m->sendUrgent( "Joining instance created by {}.", player.getName() );
+        pInstance->bindPlayer( m->getId() );
+        m->setInstance( pInstance );
+      } );
+  }
 }
 
 void Sapphire::Network::GameConnection::cfRegisterRoulette( const Packets::FFXIVARR_PACKET_RAW& inPacket,
