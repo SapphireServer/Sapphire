@@ -1332,10 +1332,21 @@ private:
   void Scene00069( Entity::Player& player )
   {
     player.sendDebug( "SubCts999:67114 calling Scene00069: Normal(Talk, CutScene, FadeIn, TargetCanMove, SystemTalk), id=RAITMEAUX" );
+
     auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
     {
+      if( result.param1 == 768 && ( result.param2 >= 664 && result.param2 <= 670 ) )
+      {
+        player.playSceneChain( getId(), 69, 4203520, 0, 1, result.param2, bindScene( &SubCts999::Scene00069 ) );
+      }
     };
-    player.playScene( getId(), 69, NONE, callback );
+    bool hideWelcomeDialog = true;
+    auto pEvent = player.getEvent( getId() );
+    if( pEvent )
+    {
+      hideWelcomeDialog = pEvent->getSceneChainCallback() != nullptr;
+    }
+    player.playScene( getId(), 69, HIDE_HOTBAR, 0, hideWelcomeDialog ? 1 : 0, 0, callback );
   }
 
   void Scene00070( Entity::Player& player )
