@@ -496,6 +496,22 @@ public:
     onProgress( player, param1, param2, 4, 0 );
   }
 
+  void onSaveData( Sapphire::Entity::Player& player, const Common::EventSaveData& data ) override
+  {
+    if( data.scene == 69 )
+    {
+      player.setQuestUI8AH( getId(), data.params[0] );
+      player.setQuestUI8AL( getId(), data.params[1] );
+      player.setQuestUI8BH( getId(), data.params[2] );
+      player.setQuestUI8BL( getId(), data.params[3] );
+      player.setQuestUI8CH( getId(), data.params[4] );
+      player.setQuestUI8CL( getId(), data.params[5] );
+      player.setQuestUI8DH( getId(), data.params[6] );
+      player.setQuestUI8DL( getId(), data.params[7] );
+      player.sendDebug( "Ceremony settings saved." );
+    }
+  }
+
 private:
   void checkProgressSeq0( Entity::Player& player )
   {
@@ -1255,8 +1271,29 @@ private:
     {
       if( result.param1 > 0 && result.param2 == 1 )
       {
-        player.setQuestUI8AH( getId(), 18 );
-        player.setQuestUI8AL( getId(), 7 );
+        uint8_t plan = 3; // standard = 1, golden = 2, platinum = 3
+        player.setQuestUI8AH( getId(), 1 );
+        switch( plan )
+        {
+          case 1:
+            player.setQuestUI8AL( getId(), 1 );
+            break;
+          case 2:
+            player.setQuestUI8AL( getId(), 2 );
+            break;
+          case 3:
+            player.setQuestUI8AL( getId(), 5 );
+            break;
+        }
+        player.setQuestUI8BH( getId(), 1 );
+        player.setQuestUI8BL( getId(), 1 );
+        player.setQuestUI8CH( getId(), 1 );
+        player.setQuestUI8CL( getId(), 1 );
+        player.setQuestUI8DH( getId(), 1 );
+        player.setQuestUI8DL( getId(), 0 );
+
+        player.setQuestUI8EH( getId(), plan );
+
         player.eventFinish( getId(), 1 );
         player.enterPredefinedPrivateInstance( 393 );
       }
@@ -1325,7 +1362,7 @@ private:
         player.enterPredefinedPrivateInstance( 393 );
       }
     };
-    player.playScene( getId(), 71, NONE, callback );
+    player.playScene( getId(), 71, HIDE_HOTBAR, callback );
   }
 
   void Scene00072( Entity::Player& player )
@@ -1344,7 +1381,7 @@ private:
     {
       //checkProgressSeq12( player );
     };
-    player.playScene( getId(), 73, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, callback );
+    player.playScene( getId(), 73, HIDE_HOTBAR, callback );
   }
 
   void Scene00074( Entity::Player& player )
