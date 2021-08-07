@@ -146,6 +146,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void EventScript::onSaveData( Sapphire::Entity::Player& player, const Common::EventSaveData& data )
+  {
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   EventObjectScript::EventObjectScript( uint32_t eobjId ) :

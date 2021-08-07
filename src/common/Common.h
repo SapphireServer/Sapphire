@@ -1313,7 +1313,16 @@ namespace Sapphire::Common
     EmptyCoffer = 11, // seems like no param
   };
 
-  using PlayerStateFlagList = std::vector< PlayerStateFlag >;
+  struct EventSaveData
+  {
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t unknown1;
+    uint32_t params[11];
+    uint64_t unknown2;
+    uint8_t unknown3[4];
+    uint64_t unknown4;
+  };
 
 }
 

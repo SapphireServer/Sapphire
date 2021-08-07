@@ -118,6 +118,8 @@ namespace Sapphire::Scripting
 
     bool onDutyComplete( QuestBattlePtr instance, Entity::Player& player );
 
+    bool onSaveData( Entity::Player& player, const Common::EventSaveData& data );
+
     bool loadDir( const std::string& dirname, std::set< std::string >& files, const std::string& ext );
 
     NativeScriptMgr& getNativeScriptHandler();

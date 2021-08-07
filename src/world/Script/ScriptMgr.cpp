@@ -566,13 +566,24 @@ Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeS
   return *m_nativeScriptMgr;
 }
 
-bool
-Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
+bool Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
   if( script )
   {
     script->onDutyComplete( *instance, player );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onSaveData( Sapphire::Entity::Player& player, const Sapphire::Common::EventSaveData& data )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( data.eventId );
+  if( script )
+  {
+    script->onSaveData( player, data );
     return true;
   }
 

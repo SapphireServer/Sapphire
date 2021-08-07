@@ -289,5 +289,24 @@ void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVAR
   scriptMgr.onTalk( player, player.getId(), eventId );
 }
 
+void Sapphire::Network::GameConnection::saveDataEventHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcSaveDataEventHandler >( inPacket );
+
+  const auto eventId = packet.data().data.eventId;
+
+  std::string eventName = "onSaveData";
+  std::string objName = eventMgr.getEventName( eventId );
+  player.sendDebug( "Calling: {0}.{1} - {2} scene: {3}", objName, eventName, eventId, packet.data().data.scene );
+
+  scriptMgr.onSaveData( player, packet.data().data );
+
+  auto response = makeZonePacket< FFXIVIpcEventYield >( player.getId() );
+  response->data().eventId = eventId;
+  response->data().scene = packet.data().data.scene;
+  player.queuePacket( response );
+}
 

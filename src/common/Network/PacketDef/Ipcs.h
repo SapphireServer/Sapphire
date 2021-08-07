@@ -399,6 +399,7 @@ namespace Sapphire::Network::Packets
     ReturnEventHandler = 0x0333, // updated 5.58
     TradeReturnEventHandler = 0x0179, // updated 5.58
     TradeReturnEventHandler2 = 0x02E1, // updated 5.58
+    SaveDataEventHandler = 0x03D7, // updated 5.58
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5

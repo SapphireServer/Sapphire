@@ -172,6 +172,8 @@ namespace Sapphire::ScriptAPI
                                             uint32_t catalogId );
 
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
+
+    virtual void onSaveData( Sapphire::Entity::Player& player, const Common::EventSaveData& data );
   };
 
   /*!
