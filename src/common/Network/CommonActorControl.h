@@ -111,6 +111,8 @@ namespace Sapphire::Network::ActorControl
 
     ScreenFadeOut = 0xAA,
 
+    CeremonyDecoration = 0xB9,
+
     ZoneIn = 0xC8,
     ZoneInDefaultPos = 0xC9,
 

@@ -8,6 +8,8 @@
 #include <Service.h>
 #include "Manager/TerritoryMgr.h"
 #include "Manager/EventMgr.h"
+#include "Network/CommonActorControl.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 using namespace Sapphire;
 
@@ -414,6 +416,7 @@ private:
         }
         if( type == 4 ) // BASE_ID_TERRITORY_TYPE = unknown
         {
+          player.queuePacket( Sapphire::Network::Packets::Server::makeActorControlSelf( getId(), Sapphire::Network::ActorControl::ActorControlType::CeremonyDecoration, player.getQuestUI8FH( getId() ), player.getQuestUI8FL( getId() ), 0, 0 ) );
           Scene00067( player ); // Scene00067: Normal(SetWeddingFestivalParam), id=unknown
           break;
         }
@@ -448,6 +451,7 @@ private:
         }
         if( type == 4 ) // BASE_ID_TERRITORY_TYPE = unknown
         {
+          player.queuePacket( Sapphire::Network::Packets::Server::makeActorControlSelf( getId(), Sapphire::Network::ActorControl::ActorControlType::CeremonyDecoration, player.getQuestUI8FH( getId() ), player.getQuestUI8FL( getId() ), 0, 0 ) );
           Scene00073( player ); // Scene00073: Normal(FadeIn, SetWeddingFestivalParam), id=unknown
           break;
         }
@@ -508,6 +512,10 @@ public:
       player.setQuestUI8CL( getId(), data.params[5] );
       player.setQuestUI8DH( getId(), data.params[6] );
       player.setQuestUI8DL( getId(), data.params[7] );
+
+      // retail does not save these two values here, we borrow them since they are unused.
+      player.setQuestUI8FH( getId(), data.params[8] );
+      player.setQuestUI8FL( getId(), data.params[9] );
       player.sendDebug( "Ceremony settings saved." );
     }
   }
@@ -1294,6 +1302,9 @@ private:
 
         player.setQuestUI8EH( getId(), plan );
 
+        player.setQuestUI8FH( getId(), 1 ); // see onSaveData() for detail
+        player.setQuestUI8FL( getId(), 1 ); // see onSaveData() for detail
+        
         player.eventFinish( getId(), 1 );
         player.enterPredefinedPrivateInstance( 393 );
       }
