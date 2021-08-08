@@ -55,6 +55,9 @@ void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& play
   varPacket->data().m_branch = 0;
   memcpy( varPacket->data().m_unionData, m_unionData.arrData, sizeof( varPacket->data().m_unionData ) );
   player.queuePacket( varPacket );
+  player.sendDebug( "DirectorVar#{}: {:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}", getDirectorId(),
+    m_unionData.ui8.UI8A, m_unionData.ui8.UI8B, m_unionData.ui8.UI8C, m_unionData.ui8.UI8D, m_unionData.ui8.UI8E,
+    m_unionData.ui8.UI8F, m_unionData.ui8.UI8G, m_unionData.ui8.UI8H, m_unionData.ui8.UI8I, m_unionData.ui8.UI8J );
 }
 
 void Sapphire::Event::Director::sendDirectorInit( Sapphire::Entity::Player& player ) const
