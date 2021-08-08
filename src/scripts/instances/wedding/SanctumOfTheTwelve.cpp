@@ -23,7 +23,23 @@ public:
 
   void onPlayerZoneIn( PublicContent& instance, Entity::Player& player ) override
   {
-    player.setPosAndSendActorMove( 0, 250, -50, player.getRot() );
+    if( instance.getCustomVar( 1 ) == 0 || instance.getCustomVar( 1 ) == player.getId() )
+    {
+      if( player.hasQuest( 67114 ) )
+      {
+        instance.setCustomVar( 1, player.getId() );
+        instance.setDirectorUI8AL( player.getQuestUI8AH( 67114 ) );
+        instance.setDirectorUI8BL( player.getQuestUI8AL( 67114 ) );
+        instance.setDirectorUI8CL( player.getGuardianDeity() );
+        instance.setDirectorUI8DL( player.getGuardianDeity() );
+        instance.setDirectorUI8EL( player.getQuestUI8FH( 67114 ) );
+        instance.setDirectorUI8FL( player.getQuestUI8FL( 67114 ) );
+        instance.setDirectorUI8GL( 1 );
+        instance.setDirectorUI8HL( 1 );
+        instance.setDirectorUI8IL( 1 );
+        instance.setDirectorUI8JL( 1 );
+      }
+    }
   }
 
   void onLeaveTerritory( PublicContent& instance, Entity::Player& player ) override
@@ -32,6 +48,7 @@ public:
 
   void onEnterTerritory( PublicContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override
   {
+    player.setPosAndSendActorMove( 0, 250, -50, player.getRot() );
     player.directorPlayScene( instance.getDirectorId(), 1, NONE, 0, 0, 0 );
   }
  
