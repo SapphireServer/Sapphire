@@ -462,6 +462,19 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     player.setVisualEffect( id );
   }
+  else if (subCommand == "eventplay")
+  {
+  uint32_t eventId = 0;
+  uint32_t sceneId = 0;
+  uint32_t inputFlags = 0;
+  uint32_t param2 = 0;
+  uint32_t param3 = 0;
+
+  sscanf(params.c_str(), "%i %i %i %i %i", &eventId, &sceneId, &inputFlags, &param2, &param3);
+
+  player.eventStart(player.getId(), eventId, Event::EventHandler::Talk, 0, 0);
+  player.playScene(eventId, sceneId, inputFlags, param2, param3, nullptr);
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );
