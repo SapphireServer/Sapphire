@@ -45,6 +45,11 @@ uint8_t Sapphire::Event::Director::getSequence() const
 void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& player ) const
 {
   player.queuePacket( makeActorControlSelf( player.getId(), DirectorClear, m_directorId ) );
+  auto varPacket = makeZonePacket< FFXIVIpcDirectorVars >( player.getId() );
+  varPacket->data().m_directorId = getDirectorId();
+  varPacket->data().m_sequence = 0;
+  varPacket->data().m_branch = 0;
+  player.queuePacket( varPacket );
 }
 
 void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& player ) const
