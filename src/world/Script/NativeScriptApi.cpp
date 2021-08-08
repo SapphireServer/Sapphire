@@ -31,6 +31,10 @@ namespace Sapphire::ScriptAPI
     return m_type;
   }
 
+  void ScriptObject::onDebug( Entity::Player& player, uint32_t param )
+  {
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   StatusEffectScript::StatusEffectScript( uint32_t effectId ) :
@@ -229,6 +233,32 @@ namespace Sapphire::ScriptAPI
 
   void QuestBattleScript::onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId,
                                             uint16_t param1, uint16_t param2 )
+  {
+  }
+
+  PublicContentScript::PublicContentScript( uint32_t contentId ) :
+    ScriptObject( uint32_t{ 0x8004 } << 16 | contentId, typeid( PublicContentScript ).hash_code() )
+  {
+  }
+
+  void PublicContentScript::onInit( PublicContent& instance )
+  {
+  }
+
+  void PublicContentScript::onUpdate( PublicContent& instance, uint64_t tickCount )
+  {
+  }
+
+  void PublicContentScript::onPlayerZoneIn( PublicContent& instance, Entity::Player& player )
+  {
+  }
+
+  void PublicContentScript::onLeaveTerritory( PublicContent& instance, Entity::Player& player )
+  {
+  }
+
+  void PublicContentScript::onEnterTerritory( PublicContent& instance, Entity::Player& player, uint32_t eventId,
+    uint16_t param1, uint16_t param2 )
   {
   }
 

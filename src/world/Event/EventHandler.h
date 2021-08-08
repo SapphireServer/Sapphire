@@ -79,6 +79,7 @@ namespace Sapphire::Event
       Adventure = 0x0021,
       DailyQuestSupply = 0x0022,
       ICDirector = 0x8003,
+      PublicContentDirector = 0x8004,
       QuestBattleDirector = 0x8006,
     };
 

@@ -130,5 +130,17 @@ namespace Sapphire::Scripting
   {
     return std::make_shared< NativeScriptMgr >();
   }
+
+  Sapphire::ScriptAPI::ScriptObject* NativeScriptMgr::getScript( uint32_t scriptId )
+  {
+    for( auto typedMap : m_scripts )
+    {
+      auto script = typedMap.second.find( scriptId );
+      if( script == typedMap.second.end() )
+        continue;
+      return script->second;
+    }
+    return nullptr;
+  }
 }
 

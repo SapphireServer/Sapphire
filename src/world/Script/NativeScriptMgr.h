@@ -116,6 +116,8 @@ namespace Sapphire::Scripting
 
       return dynamic_cast< T* >( script->second );
     }
+
+    Sapphire::ScriptAPI::ScriptObject* getScript( uint32_t scriptId );
   };
 
 

@@ -310,6 +310,8 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
     m_eventObjectMap[ object->getName() ] = object;
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
+  if( object->getName() == "Entrance" )
+    m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
