@@ -20,7 +20,7 @@ namespace Sapphire
                      uint32_t guId,
                      const std::string& internalName,
                      const std::string& contentName,
-                     uint32_t contentId );
+                     uint32_t contentId, uint16_t contentFinderConditionId = 0 );
 
     virtual ~PublicContent();
 

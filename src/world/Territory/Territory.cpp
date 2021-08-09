@@ -781,6 +781,11 @@ Sapphire::Entity::EventObjectPtr Sapphire::Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Sapphire::Event::DirectorPtr Sapphire::Territory::getAsDirector()
+{
+  return std::dynamic_pointer_cast< Event::Director, Territory >( shared_from_this() );
+}
+
 Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );

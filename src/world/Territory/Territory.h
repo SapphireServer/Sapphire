@@ -166,6 +166,8 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
+    Event::DirectorPtr getAsDirector();
+
     InstanceContentPtr getAsInstanceContent();
 
     QuestBattlePtr getAsQuestBattle();

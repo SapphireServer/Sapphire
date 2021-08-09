@@ -2246,6 +2246,12 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknown;
     uint64_t unknown2;
   };
+
+  struct FFXIVDirectorUnk4 : FFXIVIpcBasePacket< SomeDirectorUnk4 >
+  {
+    uint32_t param[4];
+    uint64_t unknown;
+  };
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/

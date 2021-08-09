@@ -25,6 +25,8 @@
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
 
@@ -83,7 +85,8 @@ Sapphire::Entity::Player::Player() :
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false ),
-  m_pQueuedAction( nullptr )
+  m_pQueuedAction( nullptr ),
+  m_cfNotifiedContent( 0 )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -245,13 +248,16 @@ uint64_t Sapphire::Entity::Player::getOnlineStatusMask() const
   return m_onlineStatus;
 }
 
-void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
+void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation, uint8_t param4, uint8_t param7, uint8_t unknown )
 {
   auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( getId() );
   preparePacket->data().targetZone = targetZone;
   preparePacket->data().fadeOutTime = fadeOutTime;
   preparePacket->data().animation = animation;
   preparePacket->data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
+  preparePacket->data().param4 = param4;
+  preparePacket->data().param7 = param7;
+  preparePacket->data().unknown = unknown;
   queuePacket( preparePacket );
 }
 
@@ -532,8 +538,34 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto pZone = getCurrentTerritory();
-  auto pInstance = pZone->getAsInstanceContent();
+  if( auto d = getCurrentTerritory()->getAsDirector() )
+    if( d->getContentFinderConditionId() > 0 )
+    {
+      auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+      p->data().param[0] = d->getDirectorId();
+      p->data().param[1] = 1534;
+      p->data().param[2] = 1;
+      p->data().param[3] = d->getContentFinderConditionId();
+      queuePacket( p );
+
+      struct UNK038D : FFXIVIpcBasePacket< 0x038D >
+      {
+        uint32_t unknown[2];
+      };
+      auto p3 = makeZonePacket< UNK038D >( getId() );
+      queuePacket( p3 );
+
+      struct UNK00EA : FFXIVIpcBasePacket< 0x00EA >
+      {
+        uint32_t unknown[4];
+      };
+      auto p2 = makeZonePacket< UNK00EA >( getId() );
+      p2->data().unknown[0] = d->getContentFinderConditionId();
+      p2->data().unknown[1] = 5;
+      queuePacket( p2 );
+
+      prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
+    }
 
   resetHp();
   resetMp();
@@ -1856,7 +1888,29 @@ void Sapphire::Entity::Player::sendZonePackets()
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;
+  if( auto d = getCurrentTerritory()->getAsDirector() )
+  {
+    initZonePacket->data().contentfinderConditionId = d->getContentFinderConditionId();
+    initZonePacket->data().bitmask = 0xFF;
+    initZonePacket->data().bitmask1 = 0x2A;
+  }
   queuePacket( initZonePacket );
+
+  if( auto d = getCurrentTerritory()->getAsDirector() )
+  {
+    struct UNK00EA : FFXIVIpcBasePacket< 0x00EA >
+    {
+      uint32_t unknown[4];
+    };
+    auto p = makeZonePacket< UNK00EA >( getId() );
+    p->data().unknown[0] = d->getContentFinderConditionId();
+    p->data().unknown[2] = 1082270818;
+    queuePacket( p );
+    auto p2 = makeZonePacket< UNK00EA >( getId() );
+    p2->data().unknown[0] = d->getContentFinderConditionId();
+    p2->data().unknown[1] = 4;
+    queuePacket( p2 );
+  }
 
   getCurrentTerritory()->onPlayerZoneIn( *this );
 

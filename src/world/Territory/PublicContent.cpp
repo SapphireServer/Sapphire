@@ -28,9 +28,9 @@ Sapphire::PublicContent::PublicContent( std::shared_ptr< Sapphire::Data::PublicC
                                             uint32_t guId,
                                             const std::string& internalName,
                                             const std::string& contentName,
-                                            uint32_t contentId ) :
+                                            uint32_t contentId, uint16_t contentFinderConditionId ) :
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
-  Director( Event::Director::PublicContent, contentId ),
+  Director( Event::Director::PublicContent, contentId, contentFinderConditionId ),
   m_Configuration( pConfiguration ),
   m_ContentId( contentId )
 {
@@ -131,7 +131,7 @@ void Sapphire::PublicContent::onRegisterEObj( Entity::EventObjectPtr object )
     m_eventObjectMap[ object->getName() ] = object;
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
-  if( object->getName() == "Entrance" )
+  if( m_pEntranceEObj == nullptr && object->getName() == "Entrance" )
     m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();

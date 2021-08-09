@@ -42,11 +42,13 @@ namespace Sapphire::Event
       DutyFailed
     };
 
-    Director( DirectorType type, uint16_t contentId );
+    Director( DirectorType type, uint16_t contentId, uint16_t contentFinderConditionId = 0 );
 
     uint32_t getDirectorId() const;
 
     uint16_t getContentId() const;
+
+    uint16_t getContentFinderConditionId() const;
 
     DirectorType getType() const;
 
@@ -113,6 +115,8 @@ namespace Sapphire::Event
 
     /*! DirectorType | ContentId */
     uint32_t m_directorId;
+
+    uint16_t m_contentFinderConditionId;
 
     /*! currect sequence */
     uint8_t m_sequence;

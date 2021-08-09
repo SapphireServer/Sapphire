@@ -547,7 +547,7 @@ namespace Sapphire::Entity
     void dyeItemFromDyeingInfo();
 
     /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
+    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0, uint8_t param4 = 0, uint8_t param7 = 9, uint8_t unknown = 0 );
 
     /*! get player's title list (available titles) */
     uint8_t* getTitleList();
@@ -1065,6 +1065,7 @@ namespace Sapphire::Entity
     uint64_t m_lastMoveTime;
     uint8_t m_lastMoveflag;
     bool m_falling;
+    uint16_t m_cfNotifiedContent;
 
     std::vector< ShopBuyBackEntry >& getBuyBackListForShop( uint32_t shopId );
     void addBuyBackItemForShop( uint32_t shopId, const ShopBuyBackEntry& entry );

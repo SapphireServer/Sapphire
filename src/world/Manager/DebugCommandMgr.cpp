@@ -903,6 +903,11 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   {
     uint32_t id, param;
     sscanf( params.c_str(), "%u %u", &id, &param );
+    if( id == 0 )
+    {
+      if( auto d = player.getCurrentTerritory()->getAsDirector() )
+        id = d->getDirectorId();
+    }
     scriptMgr.onDebug( id, player, param );
   }
   else

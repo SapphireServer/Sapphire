@@ -16,9 +16,10 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Event::Director::Director( Sapphire::Event::Director::DirectorType type, uint16_t contentId ) :
+Sapphire::Event::Director::Director( Sapphire::Event::Director::DirectorType type, uint16_t contentId, uint16_t contentFinderConditionId ) :
   m_contentId( contentId ),
   m_type( type ),
+  m_contentFinderConditionId( contentFinderConditionId ),
   m_directorId( ( static_cast< uint32_t >( type ) << 16 ) | contentId ),
   m_sequence( 1 ),
   m_branch( 0 ),
@@ -37,6 +38,11 @@ uint16_t Sapphire::Event::Director::getContentId() const
   return m_contentId;
 }
 
+uint16_t Sapphire::Event::Director::getContentFinderConditionId() const
+{
+  return m_contentFinderConditionId;
+}
+
 uint8_t Sapphire::Event::Director::getSequence() const
 {
   return m_sequence;
@@ -46,7 +52,7 @@ void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& pla
 {
   player.queuePacket( makeActorControlSelf( player.getId(), DirectorClear, m_directorId ) );
   auto varPacket = makeZonePacket< FFXIVIpcDirectorVars >( player.getId() );
-  varPacket->data().m_directorId = getDirectorId();
+  varPacket->data().m_directorId = m_directorId;
   varPacket->data().m_sequence = 0;
   varPacket->data().m_branch = 0;
   player.queuePacket( varPacket );
@@ -57,17 +63,18 @@ void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& play
   auto varPacket = makeZonePacket< FFXIVIpcDirectorVars >( player.getId() );
   varPacket->data().m_directorId = getDirectorId();
   varPacket->data().m_sequence = getSequence();
-  varPacket->data().m_branch = 0;
+  varPacket->data().m_branch = getBranch();
   memcpy( varPacket->data().m_unionData, m_unionData.arrData, sizeof( varPacket->data().m_unionData ) );
   player.queuePacket( varPacket );
-  player.sendDebug( "DirectorVar#{}: {:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}", getDirectorId(),
+  player.sendDebug( "DirectorVar#{}: {:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}{:02X} seq{}, b{}", getDirectorId(),
     m_unionData.ui8.UI8A, m_unionData.ui8.UI8B, m_unionData.ui8.UI8C, m_unionData.ui8.UI8D, m_unionData.ui8.UI8E,
-    m_unionData.ui8.UI8F, m_unionData.ui8.UI8G, m_unionData.ui8.UI8H, m_unionData.ui8.UI8I, m_unionData.ui8.UI8J );
+    m_unionData.ui8.UI8F, m_unionData.ui8.UI8G, m_unionData.ui8.UI8H, m_unionData.ui8.UI8I, m_unionData.ui8.UI8J,
+    getSequence(), getBranch() );
 }
 
 void Sapphire::Event::Director::sendDirectorInit( Sapphire::Entity::Player& player ) const
 {
-  Logger::debug( "DirectorID#{}, ContentId#{}", m_directorId, m_contentId );
+  Logger::debug( "DirectorID#{}, ContentId#{}, ContentFinderConditionId#{}", m_directorId, m_contentId, m_contentFinderConditionId );
   player.queuePacket( makeActorControlSelf( player.getId(), DirectorInit, m_directorId, m_contentId ) );
 }
 

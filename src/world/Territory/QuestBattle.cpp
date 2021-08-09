@@ -34,9 +34,9 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
                                     uint32_t guId,
                                     const std::string& internalName,
                                     const std::string& contentName,
-                                    uint32_t questBattleId ) :
+                                    uint32_t questBattleId, uint16_t contentFinderConditionId ) :
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
-  Director( Event::Director::QuestBattle, questBattleId ),
+  Director( Event::Director::QuestBattle, questBattleId, contentFinderConditionId ),
   m_pBattleDetails( pBattleDetails ),
   m_questBattleId( questBattleId ),
   m_state( Created ),

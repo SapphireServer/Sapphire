@@ -324,7 +324,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
   Logger::debug( "Starting instance for QuestBattle id: {0} ({1})", questBattleId, pQuestInfo->name );
 
   auto pZone = make_QuestBattle( pQuestBattleInfo, pContentFinderCondition->territoryType, getNextInstanceId(),
-    pTeri->name, pQuestInfo->name, questBattleId );
+    pTeri->name, pQuestInfo->name, questBattleId, contentFinderConditionId );
   pZone->init();
 
   m_questBattleIdToInstanceMap[ questBattleId ][ pZone->getGuId() ] = pZone;
@@ -358,7 +358,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
   Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pContentFinderCondition->name );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-    pTeri->name, pContentFinderCondition->name, instanceContentId );
+    pTeri->name, pContentFinderCondition->name, instanceContentId, contentFinderConditionId );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
@@ -389,7 +389,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicConte
   Logger::debug( "Starting instance for PublicContent id: {0} ({1})", contentId, pContentFinderCondition->name );
 
   auto pZone = make_PublicContent( pPublicContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-    pTeri->name, pContentFinderCondition->name, contentId );
+    pTeri->name, pContentFinderCondition->name, contentId, contentFinderConditionId );
   pZone->init();
 
   m_publicContentIdToInstanceMap[ contentId ][ pZone->getGuId() ] = pZone;
@@ -420,7 +420,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicConte
 
   Logger::debug( "Starting instance for PublicContent id: {0} ({1})", contentId, pPublicContent->name );
 
-  auto pZone = make_PublicContent( pPublicContent, territoryId, getNextInstanceId(), pTeri->name, pPublicContent->name, contentId );
+  auto pZone = make_PublicContent( pPublicContent, territoryId, getNextInstanceId(), pTeri->name, pPublicContent->name, contentId, 0 );
   pZone->init();
 
   m_publicContentIdToInstanceMap[ contentId ][ pZone->getGuId() ] = pZone;

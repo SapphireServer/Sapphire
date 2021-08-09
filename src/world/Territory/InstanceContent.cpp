@@ -32,9 +32,9 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
                                             uint32_t guId,
                                             const std::string& internalName,
                                             const std::string& contentName,
-                                            uint32_t instanceContentId ) :
+                                            uint32_t instanceContentId, uint16_t contentFinderConditionId ) :
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
-  Director( Event::Director::InstanceContent, instanceContentId ),
+  Director( Event::Director::InstanceContent, instanceContentId, contentFinderConditionId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),
   m_state( Created ),
@@ -310,7 +310,7 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
     m_eventObjectMap[ object->getName() ] = object;
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
-  if( object->getName() == "Entrance" )
+  if( m_pEntranceEObj == nullptr && object->getName() == "Entrance" )
     m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();

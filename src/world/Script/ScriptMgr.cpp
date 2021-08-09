@@ -153,6 +153,8 @@ void Sapphire::Scripting::ScriptMgr::onDebug( uint32_t id, Entity::Player& playe
   auto script = m_nativeScriptMgr->getScript( id );
   if( script )
     script->onDebug( player, param );
+  else
+    player.sendUrgent( "{script {} not found.}", id );
 }
 
 void Sapphire::Scripting::ScriptMgr::onPlayerFirstEnterWorld( Entity::Player& player )
