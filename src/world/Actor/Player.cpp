@@ -81,7 +81,8 @@ Sapphire::Entity::Player::Player() :
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false ),
-  m_pQueuedAction( nullptr )
+  m_pQueuedAction( nullptr ),
+  m_cfNotifiedContent( 0 )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -239,13 +240,16 @@ uint64_t Sapphire::Entity::Player::getOnlineStatusMask() const
   return m_onlineStatus;
 }
 
-void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
+void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation, uint8_t param4, uint8_t param7, uint8_t unknown )
 {
   auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( getId() );
   preparePacket->data().targetZone = targetZone;
   preparePacket->data().fadeOutTime = fadeOutTime;
   preparePacket->data().animation = animation;
   preparePacket->data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
+  preparePacket->data().param4 = param4;
+  preparePacket->data().param7 = param7;
+  preparePacket->data().unknown = unknown;
   queuePacket( preparePacket );
 }
 

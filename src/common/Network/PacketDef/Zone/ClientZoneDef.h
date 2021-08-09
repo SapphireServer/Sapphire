@@ -446,6 +446,12 @@ struct FFXIVIpcHousingEditInterior :
   uint16_t slot[10];
 };
 
+struct FFXIVIpcCFCommenceHandler :
+  FFXIVIpcBasePacket< CFCommenceHandler >
+{
+  uint64_t param;
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H

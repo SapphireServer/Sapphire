@@ -120,7 +120,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty", &GameConnection::cfRegisterDuty );
   setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette", &GameConnection::cfRegisterRoulette );
   setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted", &GameConnection::cfDutyAccepted );
-  setZoneHandler( ClientZoneIpcType::CFCancelHandler, "CFCancel", &GameConnection::cfCancel );
+  //setZoneHandler( ClientZoneIpcType::CFCancelHandler, "CFCancel", &GameConnection::cfCancel );
 
   setZoneHandler( ClientZoneIpcType::ReqEquipDisplayFlagsChange, "ReqEquipDisplayFlagsChange",
                   &GameConnection::reqEquipDisplayFlagsHandler );
