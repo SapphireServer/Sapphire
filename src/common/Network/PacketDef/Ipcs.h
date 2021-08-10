@@ -320,7 +320,7 @@ namespace Sapphire::Network::Packets
 
     FinishLoadingHandler = 0x0217, // updated 5.58
 
-    CFCommenceHandler = 0xF118, // updated 5.35 hotfix
+    CFCommenceHandler = 0x02A3, // updated 5.58
 
     CFCancelHandler = 0x00A9, // updated 5.58
     CFRegisterDuty = 0x036A, // updated 5.58
