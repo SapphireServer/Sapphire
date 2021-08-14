@@ -314,8 +314,8 @@ void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uin
                                           Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
-    return;
+  //if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
+  //  return;
 
   auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
@@ -341,8 +341,8 @@ void Sapphire::Territory::queuePacketForZone( Entity::Player& sourcePlayer,
                                          bool forSelf )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
-    return;
+  //if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
+  //  return;
 
   auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
@@ -686,8 +686,8 @@ void Sapphire::Territory::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   // TODO: make sure gms can overwrite this. Potentially temporary solution
-  if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
-    return;
+  //if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
+  //  return;
 
   auto iter = pCell->m_actors.begin();
 
