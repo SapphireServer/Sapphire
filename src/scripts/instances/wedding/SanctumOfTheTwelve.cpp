@@ -50,7 +50,7 @@ public:
           if( p1 && p2 )
           {
             //skip seq 2, 3 for now
-            instance.setDirectorSequence( 4 );
+            instance.setSequence( 4 );
             p1->eventFinish( eventId, 1 );
             FFXIVCeremonySetActorAppearance packetData = {};
             packetData.u1 = 1;
