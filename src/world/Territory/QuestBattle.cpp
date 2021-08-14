@@ -330,7 +330,7 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
     return;
 
   if( auto onTalkHandler = it->second->getOnTalkHandler() )
-    onTalkHandler( player, it->second, getAsQuestBattle(), actorId );
+    onTalkHandler( player, it->second, getAsQuestBattle(), eventId, actorId );
   else
     player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
                       it->second->getObjectId(), eventId );

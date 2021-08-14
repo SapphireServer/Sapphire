@@ -1490,4 +1490,42 @@ void Sapphire::World::Manager::DebugCommandMgr::pc( char* data, Entity::Player& 
 
     instance->setBranch( branch );
   }
+  else if( subCommand == "objstate" )
+  {
+    char objName[128];
+    uint8_t state;
+
+    sscanf( params.c_str(), "%s %hhu", objName, &state );
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+      return;
+
+    obj->setState( state );
+  }
+  else if( subCommand == "objflag" )
+  {
+    char objName[256];
+    uint32_t state1;
+    uint32_t state2;
+
+    sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+    {
+      player.sendDebug( "No eobj found." );
+      return;
+    }
+
+    obj->setAnimationFlag( state1, state2 );
+  }
 }

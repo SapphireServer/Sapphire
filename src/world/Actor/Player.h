@@ -111,6 +111,8 @@ namespace Sapphire::Entity
     void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
                          Event::EventHandler::SceneChainCallback sceneChainCallback );
 
+    void playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, uint32_t param5, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback );
+
     /*! setup the event and return a ptr to it */
     Event::EventHandlerPtr bootstrapSceneEvent( uint32_t eventId, uint32_t flags );
 

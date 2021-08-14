@@ -3,6 +3,7 @@
 //ACTOR1 = CEREMONYSHOP01578
 //_ACTOR1 SET!!
 //SCENE_100 REMOVED!!
+#include <ctime>
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
@@ -12,11 +13,16 @@
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 using namespace Sapphire;
+using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::Server;
 
 class SubCts999 : public Sapphire::ScriptAPI::EventScript
 {
+private:
+  TerritoryPtr currentInstance;
 public:
-  SubCts999() : Sapphire::ScriptAPI::EventScript( 67114 ){}; 
+  SubCts999() : Sapphire::ScriptAPI::EventScript( 67114 ){ currentInstance = nullptr; }; 
   ~SubCts999() = default; 
 
   //SEQ_0, 1 entries
@@ -416,7 +422,7 @@ private:
         }
         if( type == 4 ) // BASE_ID_TERRITORY_TYPE = unknown
         {
-          player.queuePacket( Sapphire::Network::Packets::Server::makeActorControlSelf( getId(), Sapphire::Network::ActorControl::ActorControlType::CeremonyDecoration, player.getQuestUI8FH( getId() ), player.getQuestUI8FL( getId() ), 0, 0 ) );
+          player.queuePacket( makeActorControlSelf( getId(), ActorControlType::CeremonyDecoration, player.getQuestUI8FH( getId() ), player.getQuestUI8FL( getId() ), 0, 0 ) );
           Scene00067( player ); // Scene00067: Normal(SetWeddingFestivalParam), id=unknown
           break;
         }
@@ -451,7 +457,7 @@ private:
         }
         if( type == 4 ) // BASE_ID_TERRITORY_TYPE = unknown
         {
-          player.queuePacket( Sapphire::Network::Packets::Server::makeActorControlSelf( getId(), Sapphire::Network::ActorControl::ActorControlType::CeremonyDecoration, player.getQuestUI8FH( getId() ), player.getQuestUI8FL( getId() ), 0, 0 ) );
+          player.queuePacket( makeActorControlSelf( getId(), ActorControlType::CeremonyDecoration, player.getQuestUI8FH( getId() ), player.getQuestUI8FL( getId() ), 0, 0 ) );
           Scene00073( player ); // Scene00073: Normal(FadeIn, SetWeddingFestivalParam), id=unknown
           break;
         }
@@ -1365,12 +1371,25 @@ private:
     player.sendDebug( "SubCts999:67114 calling Scene00070: Normal(Talk, YesNo, TargetCanMove, SystemTalk), id=ETOINELLE" );
     auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      //if( result.param1 > 0 && result.param2 == 1 )
-      //{
-      //}
-      checkProgressSeq12( player );
+      if( result.param1 == 1024 && result.param3 == 2 )
+      {
+        player.prepareZoning( 392, true, 1, 0, 0, 1, 8 );
+        player.eventFinish( getId(), 1 );
+        if( !currentInstance )
+        {
+          auto& terriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+          currentInstance = terriMgr.createPublicContent( 1, 392 );
+        }
+        Common::FFXIVARR_POSITION3 pos;
+        pos.x = 0;
+        pos.y = 500;
+        pos.z = -50;
+        player.setInstance( currentInstance, pos, -3.14f );
+      }
     };
-    player.playScene( getId(), 70, NONE, callback );
+    std::vector< uint32_t > list;
+    list.push_back( std::time( 0 ) );
+    player.playScene16( getId(), 70, HIDE_HOTBAR, 0, 0, list, callback );
   }
 
   void Scene00071( Entity::Player& player )
@@ -1401,7 +1420,6 @@ private:
     player.sendDebug( "SubCts999:67114 calling Scene00073: Normal(FadeIn, SetWeddingFestivalParam), id=unknown" );
     auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      //checkProgressSeq12( player );
     };
     player.playScene( getId(), 73, HIDE_HOTBAR, callback );
   }

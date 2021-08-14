@@ -1830,14 +1830,14 @@ void Sapphire::Entity::Player::sendZonePackets()
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
-    sendHuntingLog();
-
   sendStats();
 
   // only initialize the UI if the player in fact just logged in.
   if( isLogin() )
   {
+    if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+      sendHuntingLog();
+
     auto contentFinderList = makeZonePacket< FFXIVIpcCFAvailableContents >( getId() );
 
     for( auto i = 0; i < sizeof( contentFinderList->data().contents ); i++ )
@@ -1898,18 +1898,31 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   if( auto d = getCurrentTerritory()->getAsDirector() )
   {
-    struct UNK00EA : FFXIVIpcBasePacket< 0x00EA >
+    if( d->getContentFinderConditionId() > 0 )
     {
-      uint32_t unknown[4];
-    };
-    auto p = makeZonePacket< UNK00EA >( getId() );
-    p->data().unknown[0] = d->getContentFinderConditionId();
-    p->data().unknown[2] = 1082270818;
-    queuePacket( p );
-    auto p2 = makeZonePacket< UNK00EA >( getId() );
-    p2->data().unknown[0] = d->getContentFinderConditionId();
-    p2->data().unknown[1] = 4;
-    queuePacket( p2 );
+      struct UNK00EA : FFXIVIpcBasePacket< 0x00EA >
+      {
+        uint32_t unknown[4];
+      };
+      auto p2 = makeZonePacket< UNK00EA >( getId() );
+      p2->data().unknown[0] = d->getContentFinderConditionId();
+      p2->data().unknown[1] = 4;
+      queuePacket( p2 );
+    }
+    if( d->getDirectorId() == 2147745793 )
+    {
+      initZonePacket->data().unknown4 = 5038252;
+      initZonePacket->data().bitmask = 174;
+      initZonePacket->data().bitmask1 = 0;
+      initZonePacket->data().unknown8 = 12152490;
+      initZonePacket->data().festivalId = 237;
+      initZonePacket->data().unknown9 = 1091141632;
+      initZonePacket->data().unknown10 = 1065353216;
+      initZonePacket->data().unknown12[3] = 116;
+      initZonePacket->data().unknown14[0] = 67372032;
+      initZonePacket->data().unknown14[1] = 16843012;
+      initZonePacket->data().unknown14[2] = 132097;
+    }
   }
 
   getCurrentTerritory()->onPlayerZoneIn( *this );

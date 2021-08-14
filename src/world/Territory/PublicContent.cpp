@@ -106,7 +106,7 @@ void Sapphire::PublicContent::onDirectorSync( Entity::Player& player )
 
 void Sapphire::PublicContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
 {
-  if( m_pEntranceEObj != nullptr )
+  /*if( m_pEntranceEObj != nullptr )
   {
     player.setRot( PI );
     player.setPos( m_pEntranceEObj->getPos() );
@@ -115,7 +115,7 @@ void Sapphire::PublicContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& pl
   {
     player.setRot( PI );
     player.setPos( { 0.f, 0.f, 0.f } );
-  }
+  }*/
   player.resetObjSpawnIndex();
 }
 
@@ -144,6 +144,15 @@ void Sapphire::PublicContent::onRegisterEObj( Entity::EventObjectPtr object )
       std::to_string( object->getObjectId() ) );
 }
 
+Sapphire::Entity::EventObjectPtr Sapphire::PublicContent::getEObjByName( const std::string& name )
+{
+  auto it = m_eventObjectMap.find( name );
+  if( it == m_eventObjectMap.end() )
+    return nullptr;
+
+  return it->second;
+}
+
 void Sapphire::PublicContent::clearDirector( Entity::Player& player )
 {
   sendDirectorClear( player );
@@ -157,7 +166,7 @@ void Sapphire::PublicContent::onTalk( Sapphire::Entity::Player& player, uint32_t
     return;
 
   if( auto onTalk = it->second->getOnTalkHandler() )
-    onTalk( player, it->second, getAsPublicContent(), actorId );
+    onTalk( player, it->second, getAsPublicContent(), eventId, actorId );
   else
     player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
       it->second->getObjectId(), eventId );

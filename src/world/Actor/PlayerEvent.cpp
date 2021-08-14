@@ -323,6 +323,34 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
     unsetStateFlag( PlayerStateFlag::InNpcEvent );
 }
 
+void Sapphire::Entity::Player::playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, uint32_t param5, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback )
+{
+  auto pEvent = bootstrapSceneEvent( eventId, flags );
+  if( !pEvent )
+    return;
+
+  pEvent->setPlayedScene( true );
+  pEvent->setEventReturnCallback( eventReturnCallback );
+  pEvent->setSceneChainCallback( nullptr );
+  auto eventPlay16 = makeZonePacket< FFXIVIpcEventPlay16 >( getId() );
+  eventPlay16->data().actorId = pEvent->getActorId();
+  eventPlay16->data().eventId = pEvent->getId();
+  eventPlay16->data().scene = scene;
+  eventPlay16->data().flags = flags;
+  eventPlay16->data().param3 = param3;
+  eventPlay16->data().param5 = param5;
+  eventPlay16->data().paramSize = paramList.size();
+  int i = 0;
+  for( auto p : paramList )
+  {
+    assert( i < 16 );
+    eventPlay16->data().param[ i ] = paramList.at( i );
+    i++;
+  }
+
+  queuePacket( eventPlay16 );
+}
+
 void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint32_t action,
                                                  World::Action::ActionCallback finishCallback,

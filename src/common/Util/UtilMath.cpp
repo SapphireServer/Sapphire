@@ -77,3 +77,8 @@ uint8_t Util::floatToUInt8Rot( float val )
 {
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
 }
+
+float Util::floatFromUInt16Rot( uint16_t rot )
+{
+  return rot / 32768.0f * PI - PI;
+}

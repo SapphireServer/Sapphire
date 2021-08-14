@@ -1439,6 +1439,20 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown[8];
   };
 
+  struct FFXIVIpcEventPlay16 : FFXIVIpcBasePacket< EventPlay16 >
+  {
+    uint64_t actorId;
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t padding;
+    uint32_t flags;
+    uint32_t param3;
+    uint8_t paramSize;
+    uint8_t padding1[3];
+    uint32_t param5;
+    uint32_t param[16];
+  };
+
   template< int ArgCount >
   struct FFXIVIpcEventPlayN
   {

@@ -48,6 +48,8 @@ namespace Sapphire
 
     uint32_t getContentId() const;
 
+    Entity::EventObjectPtr getEObjByName( const std::string& name );
+
     void clearDirector( Entity::Player& player );
 
     void onTalk( Entity::Player& player, uint32_t eventId, uint64_t actorId );
