@@ -2266,6 +2266,29 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param[4];
     uint64_t unknown;
   };
+
+  struct FFXIVCeremonySetActorAppearance : FFXIVIpcBasePacket< CeremonySetActorAppearance >
+  {
+    uint8_t u1;
+    uint8_t u2;
+    uint16_t padding1;
+    uint32_t u3;
+    struct
+    {
+      uint64_t mainWeaponModel;
+      uint64_t secWeaponModel;
+      uint64_t craftToolModel;
+      uint32_t c_u6;
+      uint32_t c_u7;
+      uint32_t charId;
+      uint16_t u4;
+      uint16_t guardianDeity;
+      uint32_t u5;
+      uint32_t models[10];
+      uint8_t look[26];
+      uint16_t padding3;
+    } actors[2];
+  };
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/

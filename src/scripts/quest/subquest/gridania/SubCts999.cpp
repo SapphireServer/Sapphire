@@ -11,6 +11,8 @@
 #include "Manager/EventMgr.h"
 #include "Network/CommonActorControl.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Territory/Territory.h"
+#include "Territory/PublicContent.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Network::ActorControl;
@@ -1375,15 +1377,32 @@ private:
       {
         player.prepareZoning( 392, true, 1, 0, 0, 1, 8 );
         player.eventFinish( getId(), 1 );
+        auto& terriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+        if( currentInstance )
+        {
+          if( currentInstance->getPopCount() == 0 )
+          {
+            auto terriId = currentInstance->getGuId();
+            if( terriMgr.removeTerritoryInstance( terriId ) )
+              player.sendDebug( "Removed old instance with id#{0}", terriId );
+            else
+              player.sendDebug( "Failed to remove old instance with id#{0}", terriId );
+            currentInstance = nullptr;
+          }
+          else
+          {
+            player.sendDebug( "Wedding in progress, joining..." );
+          }
+        }
         if( !currentInstance )
         {
-          auto& terriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+          player.sendDebug( "Creating new wedding instance..." );
           currentInstance = terriMgr.createPublicContent( 1, 392 );
         }
         Common::FFXIVARR_POSITION3 pos;
         pos.x = 0;
-        pos.y = 500;
-        pos.z = -50;
+        pos.y = 0;
+        pos.z = 0;
         player.setInstance( currentInstance, pos, -3.14f );
       }
     };
