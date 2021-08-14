@@ -1909,20 +1909,6 @@ void Sapphire::Entity::Player::sendZonePackets()
       p2->data().unknown[1] = 4;
       queuePacket( p2 );
     }
-    if( d->getDirectorId() == 2147745793 )
-    {
-      initZonePacket->data().unknown4 = 5038252;
-      initZonePacket->data().bitmask = 174;
-      initZonePacket->data().bitmask1 = 0;
-      initZonePacket->data().unknown8 = 12152490;
-      initZonePacket->data().festivalId = 237;
-      initZonePacket->data().unknown9 = 1091141632;
-      initZonePacket->data().unknown10 = 1065353216;
-      initZonePacket->data().unknown12[3] = 116;
-      initZonePacket->data().unknown14[0] = 67372032;
-      initZonePacket->data().unknown14[1] = 16843012;
-      initZonePacket->data().unknown14[2] = 132097;
-    }
   }
 
   getCurrentTerritory()->onPlayerZoneIn( *this );
