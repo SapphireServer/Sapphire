@@ -379,7 +379,7 @@ public:
                 ( v4 == 6 ? 1020 :
                 ( v4 == 7 ? 1021 :
                 ( v4 == 8 ? 1125 :
-                ( v4 == 9 ? 1126 : 1127 ) ) ) ) ) ) ) ) );
+                ( v4 == 9 ? 1126 : 1127 ) ) ) ) ) ) ) ) ); //FIX THIS SHIT BEFORE PR
               packetData.popupTimeMs = 6000;
               packetData.param[ 0 ] = 1024;
               packetData.param[ 1 ] = instance.getCustomVar( 1 );
@@ -397,12 +397,11 @@ public:
           {
             if( dt >= 78 )
             {
-              auto qBH = instance.getCustomVar( 102 );
-              instance.foreachPlayer( [ &instance, qBH ]( auto p )
+              instance.foreachPlayer( [ &instance ]( auto p )
                 {
                   p->eventStart( p->getId(), instance.getDirectorId(), Event::EventHandler::GameProgress, 1, 1 );
                   std::vector< uint32_t > paramList;
-                  paramList.push_back( 665 + qBH );
+                  paramList.push_back( 50002 );
 
                   auto seq5Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
                   {
