@@ -63,6 +63,13 @@ public:
             packetData.actors[0].charId = p1->getId();
             packetData.actors[0].guardianDeity = p1->getGuardianDeity();
             packetData.actors[0].models[ Common::GearModelSlot::ModelHead ] = p1->getModelForSlot( Common::GearModelSlot::ModelHead );
+            player.sendUrgent("p1 Head Model: {}", p1->getModelForSlot(Common::GearModelSlot::ModelHead));
+            if ((p1->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFF) == 208)
+            {
+              player.sendUrgent("Replacing p1 Model");
+              uint32_t gear = p1->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFFFFFF00;
+              packetData.actors[0].models[Common::GearModelSlot::ModelHead] = gear | 0xC7;
+            }
             packetData.actors[0].models[ Common::GearModelSlot::ModelBody ] = p1->getModelForSlot( Common::GearModelSlot::ModelBody );
             packetData.actors[0].models[ Common::GearModelSlot::ModelHands ] = p1->getModelForSlot( Common::GearModelSlot::ModelHands );
             packetData.actors[0].models[ Common::GearModelSlot::ModelLegs ] = p1->getModelForSlot( Common::GearModelSlot::ModelLegs );
@@ -73,6 +80,7 @@ public:
             packetData.actors[0].models[ Common::GearModelSlot::ModelRing2 ] = p1->getModelForSlot( Common::GearModelSlot::ModelRing2 );
             packetData.actors[0].models[ Common::GearModelSlot::ModelWrist ] = p1->getModelForSlot( Common::GearModelSlot::ModelWrist );
             memcpy( packetData.actors[0].look, p1->getLookArray(), sizeof( packetData.actors[0].look ) );
+            player.sendUrgent("p2 Head Model: {}", p2->getModelForSlot(Common::GearModelSlot::ModelHead));
             if( !( p2->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon ) )
             {
               packetData.actors[1].mainWeaponModel = p2->getModelMainWeapon();
@@ -81,6 +89,12 @@ public:
             packetData.actors[1].charId = p2->getId();
             packetData.actors[1].guardianDeity = p2->getGuardianDeity();
             packetData.actors[1].models[ Common::GearModelSlot::ModelHead ] = p2->getModelForSlot( Common::GearModelSlot::ModelHead );
+            if ((p2->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFF) == 208)
+            {
+              player.sendUrgent("Replacing p2 Model");
+              uint32_t gear = p2->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFFFFFF00;
+              packetData.actors[1].models[Common::GearModelSlot::ModelHead] = gear | 0xC7;
+            }
             packetData.actors[1].models[ Common::GearModelSlot::ModelBody ] = p2->getModelForSlot( Common::GearModelSlot::ModelBody );
             packetData.actors[1].models[ Common::GearModelSlot::ModelHands ] = p2->getModelForSlot( Common::GearModelSlot::ModelHands );
             packetData.actors[1].models[ Common::GearModelSlot::ModelLegs ] = p2->getModelForSlot( Common::GearModelSlot::ModelLegs );
