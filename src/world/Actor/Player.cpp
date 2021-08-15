@@ -1925,6 +1925,8 @@ void Sapphire::Entity::Player::sendZonePackets()
 //  if( getLastPing() == 0 )
 //    sendQuestInfo();
 
+  sendPartyList();
+
   m_bMarkedForZoning = false;
 }
 
@@ -2536,7 +2538,7 @@ uint8_t Sapphire::Entity::Player::getPartySize()
   return 0;
 }
 
-void Sapphire::Entity::Player::sendPartyListToParty()
+void Sapphire::Entity::Player::sendPartyListToParty( PlayerPtr filter )
 {
   assert( isPartyLeader() );
   FFXIVIpcPartyList partyList = {};
@@ -2571,9 +2573,25 @@ void Sapphire::Entity::Player::sendPartyListToParty()
 
   for( auto member : m_partyMemberList )
   {
-    auto packet = makeZonePacket< FFXIVIpcPartyList >( member->getId() );
-    memcpy( &packet->data().member[ 0 ], &partyList, sizeof( partyList ) );
-    member->queuePacket( packet );
+    if( !filter || member->getId() == filter->getId() )
+    {
+      auto packet = makeZonePacket< FFXIVIpcPartyList >( member->getId() );
+      memcpy( &packet->data().member[ 0 ], &partyList, sizeof( partyList ) );
+      member->queuePacket( packet );
+    }
+  }
+}
+
+void Sapphire::Entity::Player::sendPartyList()
+{
+  if( !isInParty() )
+  {
+    auto packet = makeZonePacket< FFXIVIpcPartyList >( getId() );
+    queuePacket( packet );
+  }
+  else
+  {
+    getPartyLeader()->sendPartyListToParty( getAsPlayer() );
   }
 }
 
@@ -2821,7 +2839,7 @@ bool Sapphire::Entity::Player::gaugeSamHasAnySen()
   return static_cast< uint8_t >( m_gauge.sam.sen ) > 0;
 }
 
-void Sapphire::Entity::Player::setPosAndSendActorMove( float x, float y, float z, float rot )
+void Sapphire::Entity::Player::setPosAndNotifyClient( float x, float y, float z, float rot )
 {
   setRot( rot );
   setPos( x, y, z, true );

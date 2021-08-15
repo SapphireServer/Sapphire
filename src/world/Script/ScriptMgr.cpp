@@ -588,12 +588,12 @@ bool Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr in
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onSaveData( Sapphire::Entity::Player& player, const Sapphire::Common::EventSaveData& data )
+bool Sapphire::Scripting::ScriptMgr::onEventYield( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t scene, std::vector< uint32_t > param )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( data.eventId );
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
   if( script )
   {
-    script->onSaveData( player, data );
+    script->onEventYield( player, scene, param );
     return true;
   }
 

@@ -303,24 +303,39 @@ void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVAR
   scriptMgr.onTalk( player, player.getId(), eventId );
 }
 
-void Sapphire::Network::GameConnection::saveDataEventHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+void Sapphire::Network::GameConnection::eventYieldHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcSaveDataEventHandler >( inPacket );
+  auto opcode = *reinterpret_cast< const uint16_t* >( &inPacket.data[ 2 ] );
+  auto eventId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 + 0 ] );
+  auto scene = *reinterpret_cast< const uint16_t* >( &inPacket.data[ 0x10 + 4 ] );
+  auto pParam = reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 + 8 ] );
+  
+  std::vector< uint32_t > param;
 
-  const auto eventId = packet.data().data.eventId;
+  switch( opcode )
+  {
+    case EventYield16Handler:
+    {
+      for( int i = 0; i < 16; i++ )
+      {
+        param.push_back( pParam[ i ] );
+      }
+      break;
+    }
+  }
 
-  std::string eventName = "onSaveData";
+  std::string eventName = "onEventYield";
   std::string objName = eventMgr.getEventName( eventId );
-  player.sendDebug( "Calling: {0}.{1} - {2} scene: {3}", objName, eventName, eventId, packet.data().data.scene );
+  player.sendDebug( "Calling: {0}.{1} - {2} scene: {3}", objName, eventName, eventId, scene );
 
-  scriptMgr.onSaveData( player, packet.data().data );
+  scriptMgr.onEventYield( player, eventId, scene, param );
 
-  auto response = makeZonePacket< FFXIVIpcEventYield >( player.getId() );
+  auto response = makeZonePacket< FFXIVIpcEventContinue >( player.getId() );
   response->data().eventId = eventId;
-  response->data().scene = packet.data().data.scene;
+  response->data().scene = scene;
   player.queuePacket( response );
 }
 

@@ -209,7 +209,7 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( disbandPartyHandler );
 
-    DECLARE_HANDLER( saveDataEventHandler );
+    DECLARE_HANDLER( eventYieldHandler );
   };
 
 }

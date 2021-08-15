@@ -111,7 +111,7 @@ namespace Sapphire::Entity
     void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
                          Event::EventHandler::SceneChainCallback sceneChainCallback );
 
-    void playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, uint32_t param5, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback );
+    void playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback );
 
     /*! setup the event and return a ptr to it */
     Event::EventHandlerPtr bootstrapSceneEvent( uint32_t eventId, uint32_t flags );
@@ -1033,7 +1033,8 @@ namespace Sapphire::Entity
     PlayerPtr m_partyInvitationSender;
     std::vector< PlayerPtr > m_partyMemberList;
     void clearPartyList();
-    void sendPartyListToParty();
+    void sendPartyListToParty( PlayerPtr filter = nullptr );
+    void sendPartyList();
   public:
     bool isPartyLeader();
     bool isInParty();
@@ -1049,7 +1050,7 @@ namespace Sapphire::Entity
     void foreachPartyMember( std::function< void( PlayerPtr member ) > callback);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void setPosAndSendActorMove( float x, float y, float z, float rot );
+    void setPosAndNotifyClient( float x, float y, float z, float rot );
     std::unordered_map< uint32_t, TerritoryPtr > m_privateInstanceMap;
     TerritoryPtr getOrCreatePrivateInstance( uint32_t zoneId );
     bool enterPredefinedPrivateInstance( uint32_t zoneId );

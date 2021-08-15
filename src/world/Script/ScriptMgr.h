@@ -120,7 +120,7 @@ namespace Sapphire::Scripting
 
     bool onDutyComplete( QuestBattlePtr instance, Entity::Player& player );
 
-    bool onSaveData( Entity::Player& player, const Common::EventSaveData& data );
+    bool onEventYield( Entity::Player& player, uint32_t eventId, uint16_t scene, std::vector< uint32_t > param );
 
     bool onPublicContentInit( PublicContentPtr instance );
 

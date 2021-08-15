@@ -508,22 +508,22 @@ public:
     onProgress( player, param1, param2, 4, 0 );
   }
 
-  void onSaveData( Sapphire::Entity::Player& player, const Common::EventSaveData& data ) override
+  void onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param ) override
   {
-    if( data.scene == 69 )
+    if( scene == 69 )
     {
-      player.setQuestUI8AH( getId(), data.params[0] );
-      player.setQuestUI8AL( getId(), data.params[1] );
-      player.setQuestUI8BH( getId(), data.params[2] );
-      player.setQuestUI8BL( getId(), data.params[3] );
-      player.setQuestUI8CH( getId(), data.params[4] );
-      player.setQuestUI8CL( getId(), data.params[5] );
-      player.setQuestUI8DH( getId(), data.params[6] );
-      player.setQuestUI8DL( getId(), data.params[7] );
+      player.setQuestUI8AH( getId(), param[0] );
+      player.setQuestUI8AL( getId(), param[1] );
+      player.setQuestUI8BH( getId(), param[2] );
+      player.setQuestUI8BL( getId(), param[3] );
+      player.setQuestUI8CH( getId(), param[4] );
+      player.setQuestUI8CL( getId(), param[5] );
+      player.setQuestUI8DH( getId(), param[6] );
+      player.setQuestUI8DL( getId(), param[7] );
 
       // retail does not save these two values here, we borrow them since they are unused.
-      player.setQuestUI8FH( getId(), data.params[8] );
-      player.setQuestUI8FL( getId(), data.params[9] );
+      player.setQuestUI8FH( getId(), param[8] );
+      player.setQuestUI8FL( getId(), param[9] );
       player.sendDebug( "Ceremony settings saved." );
     }
   }
@@ -1407,8 +1407,9 @@ private:
       }
     };
     std::vector< uint32_t > list;
+    list.push_back( 0 );
     list.push_back( std::time( 0 ) );
-    player.playScene16( getId(), 70, HIDE_HOTBAR, 0, 0, list, callback );
+    player.playScene16( getId(), 70, HIDE_HOTBAR, 0, list, callback );
   }
 
   void Scene00071( Entity::Player& player )

@@ -446,10 +446,22 @@ struct FFXIVIpcHousingEditInterior :
   uint16_t slot[10];
 };
 
-struct FFXIVIpcSaveDataEventHandler :
-  FFXIVIpcBasePacket< SaveDataEventHandler >
+struct FFXIVIpcEventYieldHandler :
+  FFXIVIpcBasePacket< EventYieldHandler >
 {
-  Common::EventSaveData data;
+  uint32_t eventId;
+  uint16_t scene;
+  uint16_t padding;
+  uint64_t unknown;
+};
+
+struct FFXIVIpcEventYield16Handler :
+  FFXIVIpcBasePacket< EventYield16Handler >
+{
+  uint32_t eventId;
+  uint16_t scene;
+  uint16_t padding;
+  uint32_t params[16];
 };
 
 struct FFXIVIpcCFCommenceHandler :

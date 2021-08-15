@@ -150,7 +150,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void EventScript::onSaveData( Sapphire::Entity::Player& player, const Common::EventSaveData& data )
+  void EventScript::onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param )
   {
   }
 
