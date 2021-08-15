@@ -590,7 +590,7 @@ public:
                   auto seq5Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
                   {
                     player.prepareZoning( 152, true, 1, 0, 0, 1, 8 );
-                    p->queuePacket( makeActorControlSelf( p->getId(), DirectorUpdate, instance.getDirectorId(), 0x80000001, 1 ) );
+                    player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, instance.getDirectorId(), 0x80000001, 1 ) );
                     if( player.getId() == instance.getCustomVar( 1 ) || player.getId() == instance.getCustomVar( 2 ) )
                     {
                       player.updateQuest( 67114, 255 );
