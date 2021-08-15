@@ -24,10 +24,9 @@ public:
     0: current time
     1: main actor 1 id
     2: main actor 2 id
-    3: seq 3 start time
-    4: seq 3 internal sequence
-    5: seq 3 remaining unfinished player count
-    6: seq 4 internal sequence
+    3: internal sequence start time
+    4: internal sequence
+    5: remaining unfinished player count
     101: questBL
     102: questBH
     103: questCL
@@ -46,20 +45,20 @@ public:
 
     auto mainBookHandler = [ & ]( Entity::Player& player, Entity::EventObjectPtr eobj, TerritoryPtr terri, uint32_t eventId, uint64_t actorId )
     {
+      auto v1 = instance.getCustomVar( 1 );
+      auto v2 = instance.getCustomVar( 2 );
+      if( v1 == 0 )
+      {
+        player.sendUrgent( "The host of this ceremony is not determined yet, become the host as the first one to join the instance with quest 67114 at seq 12." );
+        return;
+      }
+      if( v1 != player.getId() )
+      {
+        player.sendUrgent( "You are not the host of this ceremony." );
+        return;
+      }
       if( instance.getSequence() == 1 )
       {
-        auto v1 = instance.getCustomVar( 1 );
-        if( v1 == 0 )
-        {
-          player.sendUrgent( "The host of this ceremony is not determined yet, become the host as the first one to join the instance with quest 67114 at seq 12." );
-          return;
-        }
-        if( v1 != player.getId() )
-        {
-          player.sendUrgent( "You are not the host of this ceremony." );
-          return;
-        }
-        auto v2 = instance.getCustomVar( 2 );
         if( v2 > 0 )
         {
           auto p1 = instance.getPlayer( v1 );
@@ -95,6 +94,39 @@ public:
         }
       }
       else if( instance.getSequence() == 4 )
+      {
+        if( instance.getCustomVar( 4 ) == 5 )
+        {
+          auto p1 = instance.getPlayer( v1 );
+          auto p2 = instance.getPlayer( v2 );
+          if( p1 && p2 )
+          {
+            auto seq4Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+            {
+              if( result.param1 != 512 || result.param2 != 0 )
+                return;
+              instance.setCustomVar( 3, 0 );
+              instance.setCustomVar( 4, 0 );
+              instance.setSequence( 5 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  p->queuePacket( makeActorControlSelf( p->getId(), DirectorUpdate, instance.getDirectorId(), 0x80000001, 1 ) );
+                });
+            };
+            // event item workaround
+            player.eventFinish( eventId, 1 );
+            player.eventStart( player.getId(), instance.getDirectorId(), Event::EventHandler::Item, 0, 2001464 );
+            player.playScene( instance.getDirectorId(), 32, 134225921, 0, 1, 1086, seq4Callback );
+          }
+          else
+          {
+            player.sendUrgent( "Two main characters must be in the instance to continue the ceremony." );
+          }
+        }
+        else
+          player.sendUrgent( "Waiting for the cutscene and popup messages to finish..." );
+      }
+      else if( instance.getSequence() == 6 )
       {
         player.sendUrgent( "WIP..." );
       }
@@ -135,7 +167,7 @@ public:
           case 1:
           case 2:
           {
-            if( dt >= 1 + v4 * 6 )
+            if( dt >= 1 + v4 * 7 )
             {
               instance.setCustomVar( 4, v4 + 1 );
               FFXIVIpcDirectorPopUp packetData = {};
@@ -158,9 +190,8 @@ public:
           }
           case 3:
           {
-            if( dt < 20 )
+            if( dt < 23 )
               return;
-            instance.setCustomVar( 4, 255 );
             auto p1 = instance.getPlayer( instance.getCustomVar( 1 ) );
             auto p2 = instance.getPlayer( instance.getCustomVar( 2 ) );
             if( !p1 || !p2 )
@@ -244,20 +275,159 @@ public:
                   instance.setCustomVar( 5, v5 );
                   if( v5 == 0 )
                   {
-                    player.sendDebug( "all players finished scene" );
+                    instance.setCustomVar( 3, 0 );
+                    instance.setCustomVar( 4, 1 );
                   }
                 };
 
                 p->playScene16( instance.getDirectorId(), 3, 9219, 0, paramList, seq3Callback );
               });
+            instance.setCustomVar( 3, 0 );
+            instance.setCustomVar( 4, 0 );
             instance.setCustomVar( 5, instance.getPopCount() );
-            instance.setCustomVar( 6, 0 );
             instance.setSequence( 4 );
             break;
           }
         }
+        break;
       }
-      break;
+      case 4:
+      {
+        if( instance.getCustomVar( 3 ) == 0 )
+          instance.setCustomVar( 3, tickCount );
+        auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
+        auto v4 = instance.getCustomVar( 4 );
+        switch( v4 )
+        {
+          case 1:
+          case 2:
+          case 3:
+          {
+            if( dt >= 6 + ( v4 - 1 ) * 7 )
+            {
+              instance.setCustomVar( 4, v4 + 1 );
+              FFXIVIpcDirectorPopUp packetData = {};
+              packetData.directorId = instance.getDirectorId();
+              packetData.flags = 3;
+              packetData.bNPCName = 1010505;
+              packetData.textId = v4 == 1 ? 1008: ( v4 == 2 ? 1091 : 1097 );
+              packetData.popupTimeMs = 6000;
+              packetData.param[ 0 ] = 1024;
+              packetData.param[ 1 ] = instance.getCustomVar( 1 );
+              packetData.param[ 2 ] = instance.getCustomVar( 2 );
+              instance.foreachPlayer( [ &instance, &packetData ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVIpcDirectorPopUp >( p->getId() );
+                  memcpy( &packet->data(), &packetData, sizeof( packetData ) );
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 4:
+          {
+            if( dt >= 28 )
+            {
+              instance.setCustomVar( 4, 5 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVDirectorUnk4 >( p->getId() );
+                  packet->data().param[0] = instance.getDirectorId();
+                  packet->data().param[1] = 4353;
+                  packet->data().param[2] = 1;
+                  packet->data().param[3] = 0;
+                  p->queuePacket( packet );
+                });
+            }
+          }
+        }
+        break;
+      }
+      case 5:
+      {
+        if( instance.getCustomVar( 3 ) == 0 )
+          instance.setCustomVar( 3, tickCount );
+        auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
+        auto v4 = instance.getCustomVar( 4 );
+        switch( v4 )
+        {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+          case 10:
+          {
+            if( dt >= 1 + v4 * 7 )
+            {
+              instance.setCustomVar( 4, v4 + 1 );
+              FFXIVIpcDirectorPopUp packetData = {};
+              packetData.directorId = instance.getDirectorId();
+              packetData.flags = 3;
+              packetData.bNPCName = 1010505;
+              packetData.textId = v4 == 0 ? 1010 :
+                ( v4 == 1 ? 1011 :
+                ( v4 == 2 ? 1015 :
+                ( v4 == 3 ? 1103 :
+                ( v4 == 4 ? 1019 :
+                ( v4 == 5 ? 1107 :
+                ( v4 == 6 ? 1020 :
+                ( v4 == 7 ? 1021 :
+                ( v4 == 8 ? 1125 :
+                ( v4 == 9 ? 1126 : 1127 ) ) ) ) ) ) ) ) );
+              packetData.popupTimeMs = 6000;
+              packetData.param[ 0 ] = 1024;
+              packetData.param[ 1 ] = instance.getCustomVar( 1 );
+              packetData.param[ 2 ] = instance.getCustomVar( 2 );
+              instance.foreachPlayer( [ &instance, &packetData ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVIpcDirectorPopUp >( p->getId() );
+                  memcpy( &packet->data(), &packetData, sizeof( packetData ) );
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 11:
+          {
+            if( dt >= 78 )
+            {
+              auto qBH = instance.getCustomVar( 102 );
+              instance.foreachPlayer( [ &instance, qBH ]( auto p )
+                {
+                  p->eventStart( p->getId(), instance.getDirectorId(), Event::EventHandler::GameProgress, 1, 1 );
+                  std::vector< uint32_t > paramList;
+                  paramList.push_back( 665 + qBH );
+
+                  auto seq5Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                  {
+                    auto v5 = instance.getCustomVar( 5 );
+                    v5--;
+                    instance.setCustomVar( 5, v5 );
+                    if( v5 == 0 )
+                    {
+                      instance.setCustomVar( 3, 0 );
+                      instance.setCustomVar( 4, 1 );
+                    }
+                  };
+
+                  p->playScene16( instance.getDirectorId(), 3, 9219, 0, paramList, seq5Callback );
+                });
+              instance.setCustomVar( 3, 0 );
+              instance.setCustomVar( 4, 0 );
+              instance.setCustomVar( 5, instance.getPopCount() );
+              instance.setSequence( 6 );
+            }
+            break;
+          }
+        }
+        break;
+      }
     }
     instance.setCustomVar( 0, tickCount );
   }
@@ -323,7 +493,7 @@ public:
     {
       player.setPosAndNotifyClient( 0, 750, -50, -3.14f );
     }
-    //player.queuePacket( makeActorControlSelf( getId(), DirectorUpdate, instance.getDirectorId(), 0x80000003, 1200 ) ); // timer
+    //player.queuePacket( makeActorControlSelf( getId(), DirectorUpdate, instance.getDirectorId(), 0x80000003, 1200 ) ); // timer, we dont need it for now
     player.playScene( instance.getDirectorId(), 1, HIDE_HOTBAR, 0, 2, 4, callback );
   }
  
