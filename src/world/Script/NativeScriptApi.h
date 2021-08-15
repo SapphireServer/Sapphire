@@ -175,7 +175,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
-    virtual void onSaveData( Sapphire::Entity::Player& player, const Common::EventSaveData& data );
+    virtual void onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param );
   };
 
   /*!

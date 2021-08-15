@@ -2253,7 +2253,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t padding[3];
   };
 
-  struct FFXIVIpcEventYield : FFXIVIpcBasePacket< EventYield >
+  struct FFXIVIpcEventContinue : FFXIVIpcBasePacket< EventContinue >
   {
     uint32_t eventId;
     uint16_t scene;

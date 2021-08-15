@@ -1312,18 +1312,6 @@ namespace Sapphire::Common
     GetGil = 9, // p1: gil
     EmptyCoffer = 11, // seems like no param
   };
-
-  struct EventSaveData
-  {
-    uint32_t eventId;
-    uint16_t scene;
-    uint16_t unknown1;
-    uint32_t params[11];
-    uint64_t unknown2;
-    uint8_t unknown3[4];
-    uint64_t unknown4;
-  };
-
 }
 
 #endif

@@ -194,14 +194,7 @@ namespace Sapphire::Network::Packets
     EventPlay128 = 0x026E, // updated 5.58
     EventPlay255 = 0x039E, // updated 5.58
 
-    EventYield = 0x0123, // updated 5.58
-    //EventYield4 = 0x0000,
-    //EventYield8 = 0x0000,
-    //EventYield16 = 0x0000,
-    //EventYield32 = 0x0000,
-    //EventYield64 = 0x0000,
-    //EventYield128 = 0x0000,
-    //EventYield255 = 0x0000,
+    EventContinue = 0x0123, // updated 5.58
 
     EventStart = 0x01CC, // updated 5.58
     EventFinish = 0x0180, // updated 5.58
@@ -401,7 +394,7 @@ namespace Sapphire::Network::Packets
     ReturnEventHandler = 0x0333, // updated 5.58
     TradeReturnEventHandler = 0x0179, // updated 5.58
     TradeReturnEventHandler2 = 0x02E1, // updated 5.58
-    SaveDataEventHandler = 0x03D7, // updated 5.58
+    EventYield16Handler = 0x03D7, // updated 5.58
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
