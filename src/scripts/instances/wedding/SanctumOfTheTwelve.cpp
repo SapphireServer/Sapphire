@@ -126,9 +126,33 @@ public:
         else
           player.sendUrgent( "Waiting for the cutscene and popup messages to finish..." );
       }
+      else if( instance.getSequence() == 5 )
+      {
+        player.sendUrgent( "Waiting for the cutscene and popup messages to finish..." );
+      }
       else if( instance.getSequence() == 6 )
       {
-        player.sendUrgent( "WIP..." );
+        auto p1 = instance.getPlayer( v1 );
+        auto p2 = instance.getPlayer( v2 );
+        if( p1 && p2 )
+        {
+          auto seq4Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+          {
+            if( result.param1 != 512 || result.param2 != 0 )
+              return;
+            instance.setCustomVar( 3, 0 );
+            instance.setCustomVar( 4, 0 );
+            instance.setSequence( 7 );
+          };
+          // event item workaround
+          player.eventFinish( eventId, 1 );
+          player.eventStart( player.getId(), instance.getDirectorId(), Event::EventHandler::Item, 0, 2001464 );
+          player.playScene( instance.getDirectorId(), 32, 134225921, 0, 1, 1087, seq4Callback );
+        }
+        else
+        {
+          player.sendUrgent( "Two main characters must be in the instance to continue the ceremony." );
+        }
       }
     };
 
@@ -153,14 +177,14 @@ public:
 
   void onUpdate( PublicContent& instance, uint64_t tickCount ) override
   {
+    if( instance.getCustomVar( 3 ) == 0 )
+      instance.setCustomVar( 3, tickCount );
+    auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
+    auto v4 = instance.getCustomVar( 4 );
     switch( instance.getSequence() )
     {
       case 3:
       {
-        if( instance.getCustomVar( 3 ) == 0 )
-          instance.setCustomVar( 3, tickCount );
-        auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
-        auto v4 = instance.getCustomVar( 4 );
         switch( v4 )
         {
           case 0:
@@ -197,7 +221,7 @@ public:
             if( !p1 || !p2 )
             {
               instance.setSequence( 1 );
-              instance.foreachPlayer( [ &instance ]( auto p )
+              instance.foreachPlayer( []( auto p )
                 {
                   p->sendUrgent( "Failed to start the scene, missing main actors." );
                 });
@@ -280,7 +304,7 @@ public:
                   }
                 };
 
-                p->playScene16( instance.getDirectorId(), 3, 9219, 0, paramList, seq3Callback );
+                p->playScene16( instance.getDirectorId(), 3, 139469827, 0, paramList, seq3Callback );
               });
             instance.setCustomVar( 3, 0 );
             instance.setCustomVar( 4, 0 );
@@ -293,10 +317,6 @@ public:
       }
       case 4:
       {
-        if( instance.getCustomVar( 3 ) == 0 )
-          instance.setCustomVar( 3, tickCount );
-        auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
-        auto v4 = instance.getCustomVar( 4 );
         switch( v4 )
         {
           case 1:
@@ -339,16 +359,14 @@ public:
                   p->queuePacket( packet );
                 });
             }
+            break;
           }
         }
         break;
       }
       case 5:
       {
-        if( instance.getCustomVar( 3 ) == 0 )
-          instance.setCustomVar( 3, tickCount );
-        auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
-        auto v4 = instance.getCustomVar( 4 );
+        //first half of sec5
         switch( v4 )
         {
           case 0:
@@ -401,26 +419,188 @@ public:
                 {
                   p->eventStart( p->getId(), instance.getDirectorId(), Event::EventHandler::GameProgress, 1, 1 );
                   std::vector< uint32_t > paramList;
-                  paramList.push_back( 50002 );
-
+                  paramList.push_back( 671 );
                   auto seq5Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
                   {
-                    auto v5 = instance.getCustomVar( 5 );
-                    v5--;
-                    instance.setCustomVar( 5, v5 );
-                    if( v5 == 0 )
+                    auto seq5Callback2 = [ & ]( Entity::Player& player, const Event::SceneResult& result )
                     {
-                      instance.setCustomVar( 3, 0 );
-                      instance.setCustomVar( 4, 1 );
-                    }
+                      auto v5 = instance.getCustomVar( 5 );
+                      v5--;
+                      instance.setCustomVar( 5, v5 );
+                      if( v5 == 0 )
+                      {
+                        instance.setCustomVar( 3, 0 );
+                        instance.setCustomVar( 4, 101 );
+                      }
+                    };
+                    std::vector< uint32_t > paramList;
+                    paramList.push_back( 665 + instance.getCustomVar( 102 ) );
+                    player.playScene16( instance.getDirectorId(), 3, 139469827, 0, paramList, seq5Callback2 );
                   };
 
-                  p->playScene16( instance.getDirectorId(), 3, 9219, 0, paramList, seq5Callback );
+                  p->playScene16( instance.getDirectorId(), 3, 139469827, 0, paramList, seq5Callback );
+                });
+              instance.setCustomVar( 4, 100 );
+              instance.setCustomVar( 5, instance.getPopCount() );
+            }
+            break;
+          }
+        }
+        //second half of seq5
+        const uint16_t textIds[ 4 ] = { 1022, 1023, 1131, 1025 };
+        switch( v4 )
+        {
+          case 101:
+          case 102:
+          case 103:
+          case 104:
+          {
+            if( dt >= 6 + ( v4 - 101 ) * 7 )
+            {
+              instance.setCustomVar( 4, v4 + 1 );
+              FFXIVIpcDirectorPopUp packetData = {};
+              packetData.directorId = instance.getDirectorId();
+              packetData.flags = 3;
+              packetData.bNPCName = 1010505;
+              packetData.textId = textIds[ v4 - 101 ];
+              packetData.popupTimeMs = 6000;
+              packetData.param[ 0 ] = 1024;
+              packetData.param[ 1 ] = instance.getCustomVar( 1 );
+              packetData.param[ 2 ] = instance.getCustomVar( 2 );
+              instance.foreachPlayer( [ &instance, &packetData ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVIpcDirectorPopUp >( p->getId() );
+                  memcpy( &packet->data(), &packetData, sizeof( packetData ) );
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 105:
+          {
+            if( dt >= 34 )
+            {
+              instance.setCustomVar( 4, 106 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVDirectorUnk4 >( p->getId() );
+                  packet->data().param[0] = instance.getDirectorId();
+                  packet->data().param[1] = 4363;
+                  packet->data().param[2] = 1;
+                  packet->data().param[3] = 0;
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 106:
+          {
+            if( dt >= 40 )
+            {
+              instance.setCustomVar( 4, 107 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVDirectorUnk4 >( p->getId() );
+                  packet->data().param[0] = instance.getDirectorId();
+                  packet->data().param[1] = 4373;
+                  packet->data().param[2] = 25591553;
+                  packet->data().param[3] = 0;
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 107:
+          {
+            if( dt >= 46 )
+            {
+              // quest update here on retail
+              // set invisible wall state to 7
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  p->queuePacket( makeActorControlSelf( p->getId(), DirectorUpdate, instance.getDirectorId(), 0x80000001, 89 ) ); // bgm, how to map id from questDH?
                 });
               instance.setCustomVar( 3, 0 );
               instance.setCustomVar( 4, 0 );
-              instance.setCustomVar( 5, instance.getPopCount() );
               instance.setSequence( 6 );
+            }
+            break;
+          }
+        }
+        break;
+      }
+      case 7:
+      {
+        const uint16_t textIds[ 5 ] = { 1026, 1027, 1141, 1028, 1134 };
+        switch( v4 )
+        {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+          case 4:
+          {
+            if( dt >= 1 + v4 * 7 )
+            {
+              instance.setCustomVar( 4, v4 + 1 );
+              FFXIVIpcDirectorPopUp packetData = {};
+              packetData.directorId = instance.getDirectorId();
+              packetData.flags = 3;
+              packetData.bNPCName = 1010505;
+              packetData.textId = textIds[ v4 ];
+              packetData.popupTimeMs = 6000;
+              packetData.param[ 0 ] = 1024;
+              packetData.param[ 1 ] = instance.getCustomVar( 1 );
+              packetData.param[ 2 ] = instance.getCustomVar( 2 );
+              instance.foreachPlayer( [ &instance, &packetData ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVIpcDirectorPopUp >( p->getId() );
+                  memcpy( &packet->data(), &packetData, sizeof( packetData ) );
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 5:
+          {
+            if( dt >= 35 )
+            {
+              instance.setCustomVar( 4, 6 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVDirectorUnk4 >( p->getId() );
+                  packet->data().param[0] = instance.getDirectorId();
+                  packet->data().param[1] = 4360;
+                  packet->data().param[2] = 1;
+                  packet->data().param[3] = 0;
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 6:
+          {
+            if( dt >= 41 )
+            {
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  p->eventStart( p->getId(), instance.getDirectorId(), Event::EventHandler::GameProgress, 1, 1 );
+                  std::vector< uint32_t > paramList;
+                  paramList.push_back( 50006 );
+                  auto seq5Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                  {
+                    player.prepareZoning( 152, true, 1, 0, 0, 1, 8 );
+                    p->queuePacket( makeActorControlSelf( p->getId(), DirectorUpdate, instance.getDirectorId(), 0x80000001, 1 ) );
+                    if( player.getId() == instance.getCustomVar( 1 ) || player.getId() == instance.getCustomVar( 2 ) )
+                    {
+                      player.updateQuest( 67114, 255 );
+                    }
+                    player.eventFinish( instance.getDirectorId(), 1 );
+                    player.exitInstance();
+                  };
+                  p->playScene16( instance.getDirectorId(), 3, 139469827, 0, paramList, seq5Callback );
+                });
+              instance.setCustomVar( 4, 255 );
             }
             break;
           }
