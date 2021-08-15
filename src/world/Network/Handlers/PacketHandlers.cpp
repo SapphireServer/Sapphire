@@ -387,15 +387,18 @@ void Sapphire::Network::GameConnection::pingHandler( const Packets::FFXIVARR_PAC
 void Sapphire::Network::GameConnection::finishLoadingHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
-  player.sendQuestInfo();
+  if( player.isLogin() )
+  {
+    player.sendQuestInfo();
 
-  // TODO: load and save this data instead of hardcoding
-  auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
-  gcPacket->data().gcId = player.getGc();
-  gcPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
-  gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
-  gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
-  player.queuePacket( gcPacket );
+    // TODO: load and save this data instead of hardcoding
+    auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
+    gcPacket->data().gcId = player.getGc();
+    gcPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
+    gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
+    gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
+    player.queuePacket( gcPacket );
+  }
 
   player.getCurrentTerritory()->onFinishLoading( player );
 

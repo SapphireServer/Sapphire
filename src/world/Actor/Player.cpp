@@ -23,6 +23,8 @@
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
 
@@ -472,7 +474,7 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
   return teriMgr.movePlayer( instance, getAsPlayer() );
 }
 
-bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos, float rot )
 {
   m_onEnterEventDone = false;
   if( !instance )
@@ -490,10 +492,16 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIV
     m_prevTerritoryId = getTerritoryId();
   }
 
+  m_pos = pos;
+  m_rot = rot;
   if( teriMgr.movePlayer( instance, getAsPlayer() ) )
   {
-    m_pos = pos;
     return true;
+  }
+  else
+  {
+    m_pos = m_prevPos;
+    m_rot= m_prevRot;
   }
 
   return false;
@@ -503,8 +511,18 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto pZone = getCurrentTerritory();
-  auto pInstance = pZone->getAsInstanceContent();
+  if( auto d = getCurrentTerritory()->getAsDirector() )
+    if( d->getContentFinderConditionId() > 0 )
+    {
+      auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+      p->data().param[0] = d->getDirectorId();
+      p->data().param[1] = 1534;
+      p->data().param[2] = 1;
+      p->data().param[3] = d->getContentFinderConditionId();
+      queuePacket( p );
+
+      prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
+    }
 
   resetHp();
   resetMp();
@@ -1755,14 +1773,14 @@ void Sapphire::Entity::Player::sendZonePackets()
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
-    sendHuntingLog();
-
   sendStats();
 
   // only initialize the UI if the player in fact just logged in.
   if( isLogin() )
   {
+    if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+      sendHuntingLog();
+
     auto contentFinderList = makeZonePacket< FFXIVIpcCFAvailableContents >( getId() );
 
     for( auto i = 0; i < sizeof( contentFinderList->data().contents ); i++ )
@@ -1812,6 +1830,12 @@ void Sapphire::Entity::Player::sendZonePackets()
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;
+  if( auto d = getCurrentTerritory()->getAsDirector() )
+  {
+    initZonePacket->data().contentfinderConditionId = d->getContentFinderConditionId();
+    initZonePacket->data().bitmask = 0xFF;
+    initZonePacket->data().bitmask1 = 0x2A;
+  }
   queuePacket( initZonePacket );
 
   getCurrentTerritory()->onPlayerZoneIn( *this );

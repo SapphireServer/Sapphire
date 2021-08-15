@@ -1439,6 +1439,20 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown[8];
   };
 
+  struct FFXIVIpcEventPlay16 : FFXIVIpcBasePacket< EventPlay16 >
+  {
+    uint64_t actorId;
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t padding;
+    uint32_t flags;
+    uint32_t param3;
+    uint8_t paramSize;
+    uint8_t padding1[3];
+    uint32_t param[16];
+    uint32_t padding2;
+  };
+
   template< int ArgCount >
   struct FFXIVIpcEventPlayN
   {
@@ -1835,7 +1849,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t bNPCName;
     uint32_t textId;
     uint32_t popupTimeMs;
-    uint32_t pad3[4];
+    uint32_t param[6];
   };
 
 
@@ -2237,6 +2251,43 @@ namespace Sapphire::Network::Packets::Server
     char leaderName[32];
     char memberName[32];
     uint8_t padding[3];
+  };
+
+  struct FFXIVIpcEventContinue : FFXIVIpcBasePacket< EventContinue >
+  {
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t unknown;
+    uint64_t unknown2;
+  };
+
+  struct FFXIVDirectorUnk4 : FFXIVIpcBasePacket< SomeDirectorUnk4 >
+  {
+    uint32_t param[4];
+    uint64_t unknown;
+  };
+
+  struct FFXIVCeremonySetActorAppearance : FFXIVIpcBasePacket< CeremonySetActorAppearance >
+  {
+    uint8_t u1;
+    uint8_t questBL;
+    uint16_t padding1;
+    uint32_t u3;
+    struct
+    {
+      uint64_t mainWeaponModel;
+      uint64_t secWeaponModel;
+      uint64_t craftToolModel;
+      uint32_t c_u6;
+      uint32_t c_u7;
+      uint32_t charId;
+      uint16_t u4;
+      uint16_t guardianDeity;
+      uint32_t u5;
+      uint32_t models[10];
+      uint8_t look[26];
+      uint16_t padding3;
+    } actors[2];
   };
 }
 

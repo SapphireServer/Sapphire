@@ -118,6 +118,9 @@ namespace Sapphire::World::Manager
 
     TerritoryPtr createQuestBattle( uint32_t contentFinderConditionId );
 
+    TerritoryPtr createPublicContent( uint32_t contentFinderConditionId );
+    TerritoryPtr createPublicContent( uint16_t contentId, uint16_t territoryId );
+
     void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
 
     TerritoryPtr findOrCreateHousingInterior( const Common::LandIdent landIdent );
@@ -179,6 +182,7 @@ namespace Sapphire::World::Manager
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToContentFinderCondMap = std::unordered_map< uint16_t, uint16_t >;
+    using PublicContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
@@ -196,8 +200,11 @@ namespace Sapphire::World::Manager
     /*! map holding actual instances of InstanceContent */
     InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
 
-    /*! map holding actual instances of InstanceContent */
+    /*! map holding actual instances of QuestBattle */
     QuestBattleIdToInstanceMap m_questBattleIdToInstanceMap;
+
+    /*! map holding actual instances of PublicContent */
+    PublicContentIdToInstanceMap m_publicContentIdToInstanceMap;
 
     /*! flat map for easier lookup of instances by guid */
     InstanceIdToTerritoryPtrMap m_guIdToTerritoryPtrMap;
