@@ -1055,3 +1055,18 @@ void Sapphire::Territory::processEffectResults( uint64_t tickCount )
     it = m_effectResults.erase( it );
   }
 }
+
+Sapphire::Entity::PlayerPtr Sapphire::Territory::getPlayer( uint32_t charId )
+{
+  return m_playerMap[ charId ];
+}
+
+void Sapphire::Territory::foreachPlayer( std::function< void( Sapphire::Entity::PlayerPtr player ) > callback )
+{
+  if( !callback )
+    return;
+  for( auto entry : m_playerMap )
+  {
+    callback( entry.second );
+  }
+}

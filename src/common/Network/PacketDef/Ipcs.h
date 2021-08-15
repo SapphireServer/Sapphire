@@ -274,6 +274,8 @@ namespace Sapphire::Network::Packets
 
     LandSetMap = 0x02F6, // updated 5.58
 
+    CeremonySetActorAppearance = 0x00EB, // updated 5.58
+
     //////////////////////////////////////////////////
 
     DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
