@@ -511,18 +511,18 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  if( auto d = getCurrentTerritory()->getAsDirector() )
-    if( d->getContentFinderConditionId() > 0 )
-    {
-      auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
-      p->data().param[0] = d->getDirectorId();
-      p->data().param[1] = 1534;
-      p->data().param[2] = 1;
-      p->data().param[3] = d->getContentFinderConditionId();
-      queuePacket( p );
+  auto d = getCurrentTerritory()->getAsDirector();
+  if( d && d->getContentFinderConditionId() > 0 )
+  {
+    auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+    p->data().param[0] = d->getDirectorId();
+    p->data().param[1] = 1534;
+    p->data().param[2] = 1;
+    p->data().param[3] = d->getContentFinderConditionId();
+    queuePacket( p );
 
-      prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
-    }
+    prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
+  }
 
   resetHp();
   resetMp();
