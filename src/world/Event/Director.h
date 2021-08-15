@@ -106,8 +106,8 @@ namespace Sapphire::Event
 
     void setDirectorBranch( uint8_t value );
 
-    void setCustomVar( uint32_t varId, uint32_t value );
-    uint32_t getCustomVar( uint32_t varId );
+    void setCustomVar( uint32_t varId, uint64_t value );
+    uint64_t getCustomVar( uint32_t varId );
 
   private:
     /*! Id of the content of the director */
@@ -187,7 +187,7 @@ namespace Sapphire::Event
 
     uint32_t m_elapsedTime;
 
-    std::unordered_map< uint32_t, uint32_t > m_customVarMap;
+    std::unordered_map< uint32_t, uint64_t > m_customVarMap;
 
   };
 

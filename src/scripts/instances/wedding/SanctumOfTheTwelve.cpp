@@ -19,6 +19,23 @@ class SanctumOfTheTwelve : public Sapphire::ScriptAPI::PublicContentScript
 public:
   SanctumOfTheTwelve() : Sapphire::ScriptAPI::PublicContentScript( 1 ) { }
 
+  /*
+    Custom var usage:
+    0: current time
+    1: main actor 1 id
+    2: main actor 2 id
+    3: seq 3 start time
+    4: seq 3 internal sequence
+    5: seq 3 remaining unfinished player count
+    6: seq 4 internal sequence
+    101: questBL
+    102: questBH
+    103: questCL
+    104: questCH
+    105: questDL
+    106: questDH
+  */
+
   void onInit( PublicContent& instance ) override
   {
     auto exitHandler = [ & ]( Entity::Player& player, Entity::EventObjectPtr eobj, TerritoryPtr terri, uint32_t eventId, uint64_t actorId )
@@ -49,57 +66,23 @@ public:
           auto p2 = instance.getPlayer( v2 );
           if( p1 && p2 )
           {
-            //skip seq 2, 3 for now
-            instance.setSequence( 4 );
-            p1->eventFinish( eventId, 1 );
-            FFXIVCeremonySetActorAppearance packetData = {};
-            packetData.u1 = 1;
-            packetData.u2 = 1;
-            if( !( p1->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon ) )
+            auto seq1Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
             {
-              packetData.actors[0].mainWeaponModel = p1->getModelMainWeapon();
-              packetData.actors[0].secWeaponModel = p1->getModelSubWeapon();
-            }
-            packetData.actors[0].charId = p1->getId();
-            packetData.actors[0].guardianDeity = p1->getGuardianDeity();
-            packetData.actors[0].models[ Common::GearModelSlot::ModelHead ] = p1->getModelForSlot( Common::GearModelSlot::ModelHead );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelBody ] = p1->getModelForSlot( Common::GearModelSlot::ModelBody );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelHands ] = p1->getModelForSlot( Common::GearModelSlot::ModelHands );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelLegs ] = p1->getModelForSlot( Common::GearModelSlot::ModelLegs );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelFeet ] = p1->getModelForSlot( Common::GearModelSlot::ModelFeet );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelNeck ] = p1->getModelForSlot( Common::GearModelSlot::ModelNeck );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelEar ] = p1->getModelForSlot( Common::GearModelSlot::ModelEar );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelRing1 ] = p1->getModelForSlot( Common::GearModelSlot::ModelRing1 );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelRing2 ] = p1->getModelForSlot( Common::GearModelSlot::ModelRing2 );
-            packetData.actors[0].models[ Common::GearModelSlot::ModelWrist ] = p1->getModelForSlot( Common::GearModelSlot::ModelWrist );
-            memcpy( packetData.actors[0].look, p1->getLookArray(), sizeof( packetData.actors[0].look ) );
-            if( !( p2->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon ) )
-            {
-              packetData.actors[1].mainWeaponModel = p2->getModelMainWeapon();
-              packetData.actors[1].secWeaponModel = p2->getModelSubWeapon();
-            }
-            packetData.actors[1].charId = p2->getId();
-            packetData.actors[1].guardianDeity = p2->getGuardianDeity();
-            packetData.actors[1].models[ Common::GearModelSlot::ModelHead ] = p2->getModelForSlot( Common::GearModelSlot::ModelHead );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelBody ] = p2->getModelForSlot( Common::GearModelSlot::ModelBody );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelHands ] = p2->getModelForSlot( Common::GearModelSlot::ModelHands );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelLegs ] = p2->getModelForSlot( Common::GearModelSlot::ModelLegs );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelFeet ] = p2->getModelForSlot( Common::GearModelSlot::ModelFeet );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelNeck ] = p2->getModelForSlot( Common::GearModelSlot::ModelNeck );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelEar ] = p2->getModelForSlot( Common::GearModelSlot::ModelEar );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelRing1 ] = p2->getModelForSlot( Common::GearModelSlot::ModelRing1 );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelRing2 ] = p2->getModelForSlot( Common::GearModelSlot::ModelRing2 );
-            packetData.actors[1].models[ Common::GearModelSlot::ModelWrist ] = p2->getModelForSlot( Common::GearModelSlot::ModelWrist );
-            memcpy( packetData.actors[1].look, p2->getLookArray(), sizeof( packetData.actors[1].look ) );
-
-            instance.foreachPlayer( [ &instance, &packetData ]( auto p )
-              {
-                auto packet = makeZonePacket< FFXIVCeremonySetActorAppearance >( p->getId() );
-                memcpy( &packet->data(), &packetData, sizeof( packetData ) );
-                p->queuePacket( packet );
-                p->eventStart( p->getId(), instance.getDirectorId(), Event::EventHandler::EnterTerritory, 1, p->getZoneId() );
-                p->directorPlayScene( instance.getDirectorId(), 3, 9219, 0, 1, 50000 );
-              });
+              if( result.param1 != 512 || result.param2 != 0 )
+                return;
+              instance.setCustomVar( 3, 0 );
+              instance.setCustomVar( 4, 0 );
+              //skip 2 for now
+              instance.setSequence( 3 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  p->queuePacket( makeActorControlSelf( p->getId(), DirectorUpdate, instance.getDirectorId(), 0x80000001, 1 ) );
+                });
+            };
+            // event item workaround
+            player.eventFinish( eventId, 1 );
+            player.eventStart( player.getId(), instance.getDirectorId(), Event::EventHandler::Item, 0, 2001464 );
+            player.playScene( instance.getDirectorId(), 32, 134225921, 0, 1, 1077, seq1Callback );
           }
           else
           {
@@ -138,7 +121,145 @@ public:
 
   void onUpdate( PublicContent& instance, uint64_t tickCount ) override
   {
+    switch( instance.getSequence() )
+    {
+      case 3:
+      {
+        if( instance.getCustomVar( 3 ) == 0 )
+          instance.setCustomVar( 3, tickCount );
+        auto dt = std::difftime( tickCount, instance.getCustomVar( 3 ) ) / 1000.f;
+        auto v4 = instance.getCustomVar( 4 );
+        switch( v4 )
+        {
+          case 0:
+          case 1:
+          case 2:
+          {
+            if( dt >= 1 + v4 * 6 )
+            {
+              instance.setCustomVar( 4, v4 + 1 );
+              FFXIVIpcDirectorPopUp packetData = {};
+              packetData.directorId = instance.getDirectorId();
+              packetData.flags = 3;
+              packetData.bNPCName = 1010505;
+              packetData.textId = v4 == 0 ? 1088 : ( v4 == 1 ? 1006 : 1007 );
+              packetData.popupTimeMs = 6000;
+              packetData.param[ 0 ] = 1024;
+              packetData.param[ 1 ] = instance.getCustomVar( 1 );
+              packetData.param[ 2 ] = instance.getCustomVar( 2 );
+              instance.foreachPlayer( [ &instance, &packetData ]( auto p )
+                {
+                  auto packet = makeZonePacket< FFXIVIpcDirectorPopUp >( p->getId() );
+                  memcpy( &packet->data(), &packetData, sizeof( packetData ) );
+                  p->queuePacket( packet );
+                });
+            }
+            break;
+          }
+          case 3:
+          {
+            if( dt < 20 )
+              return;
+            instance.setCustomVar( 4, 255 );
+            auto p1 = instance.getPlayer( instance.getCustomVar( 1 ) );
+            auto p2 = instance.getPlayer( instance.getCustomVar( 2 ) );
+            if( !p1 || !p2 )
+            {
+              instance.setSequence( 1 );
+              instance.foreachPlayer( [ &instance ]( auto p )
+                {
+                  p->sendUrgent( "Failed to start the scene, missing main actors." );
+                });
+              return;
+            }
+            FFXIVCeremonySetActorAppearance packetData = {};
+            auto qBL = instance.getCustomVar( 101 );
+            packetData.questBL = qBL;
+            packetData.u1 = 1;
+            if( !( p1->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon ) )
+            {
+              packetData.actors[0].mainWeaponModel = p1->getModelMainWeapon();
+              packetData.actors[0].secWeaponModel = p1->getModelSubWeapon();
+            }
+            packetData.actors[0].charId = p1->getId();
+            packetData.actors[0].guardianDeity = p1->getGuardianDeity();
+            packetData.actors[0].models[ Common::GearModelSlot::ModelHead ] = p1->getModelForSlot( Common::GearModelSlot::ModelHead );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelBody ] = p1->getModelForSlot( Common::GearModelSlot::ModelBody );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelHands ] = p1->getModelForSlot( Common::GearModelSlot::ModelHands );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelLegs ] = p1->getModelForSlot( Common::GearModelSlot::ModelLegs );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelFeet ] = p1->getModelForSlot( Common::GearModelSlot::ModelFeet );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelNeck ] = p1->getModelForSlot( Common::GearModelSlot::ModelNeck );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelEar ] = p1->getModelForSlot( Common::GearModelSlot::ModelEar );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelRing1 ] = p1->getModelForSlot( Common::GearModelSlot::ModelRing1 );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelRing2 ] = p1->getModelForSlot( Common::GearModelSlot::ModelRing2 );
+            packetData.actors[0].models[ Common::GearModelSlot::ModelWrist ] = p1->getModelForSlot( Common::GearModelSlot::ModelWrist );
+            memcpy( packetData.actors[0].look, p1->getLookArray(), sizeof( packetData.actors[0].look ) );
+            if( !( p2->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon ) )
+            {
+              packetData.actors[1].mainWeaponModel = p2->getModelMainWeapon();
+              packetData.actors[1].secWeaponModel = p2->getModelSubWeapon();
+            }
+            packetData.actors[1].charId = p2->getId();
+            packetData.actors[1].guardianDeity = p2->getGuardianDeity();
+            packetData.actors[1].models[ Common::GearModelSlot::ModelHead ] = p2->getModelForSlot( Common::GearModelSlot::ModelHead );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelBody ] = p2->getModelForSlot( Common::GearModelSlot::ModelBody );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelHands ] = p2->getModelForSlot( Common::GearModelSlot::ModelHands );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelLegs ] = p2->getModelForSlot( Common::GearModelSlot::ModelLegs );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelFeet ] = p2->getModelForSlot( Common::GearModelSlot::ModelFeet );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelNeck ] = p2->getModelForSlot( Common::GearModelSlot::ModelNeck );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelEar ] = p2->getModelForSlot( Common::GearModelSlot::ModelEar );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelRing1 ] = p2->getModelForSlot( Common::GearModelSlot::ModelRing1 );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelRing2 ] = p2->getModelForSlot( Common::GearModelSlot::ModelRing2 );
+            packetData.actors[1].models[ Common::GearModelSlot::ModelWrist ] = p2->getModelForSlot( Common::GearModelSlot::ModelWrist );
+            memcpy( packetData.actors[1].look, p2->getLookArray(), sizeof( packetData.actors[1].look ) );
 
+            instance.foreachPlayer( [ &instance, &packetData, qBL ]( auto p )
+              {
+                auto packet = makeZonePacket< FFXIVCeremonySetActorAppearance >( p->getId() );
+                memcpy( &packet->data(), &packetData, sizeof( packetData ) );
+                p->queuePacket( packet );
+                p->eventStart( p->getId(), instance.getDirectorId(), Event::EventHandler::GameProgress, 1, 1 );
+                std::vector< uint32_t > paramList;
+                paramList.push_back( qBL < 2 ? 664 : 665 );
+
+                auto seq3Callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                {
+                  //keep everyone in their room for now
+                  /*
+                  if( player.getId() == instance.getCustomVar( 1 ) )
+                  {
+                    player.setPosAndNotifyClient( 1.454, 3.12581, -132.7992, -3.14 );
+                  }
+                  else if( player.getId() == instance.getCustomVar( 2 ) )
+                  {
+                    player.setPosAndNotifyClient( -1.454, 3.12581, -132.7992, -3.14 );
+                  }
+                  else
+                  {
+                    player.setPosAndNotifyClient( 0, 2.64, -119, -3.14 );
+                  }
+                  */
+                  auto v5 = instance.getCustomVar( 5 );
+                  v5--;
+                  instance.setCustomVar( 5, v5 );
+                  if( v5 == 0 )
+                  {
+                    player.sendDebug( "all players finished scene" );
+                  }
+                };
+
+                p->playScene16( instance.getDirectorId(), 3, 9219, 0, paramList, seq3Callback );
+              });
+            instance.setCustomVar( 5, instance.getPopCount() );
+            instance.setCustomVar( 6, 0 );
+            instance.setSequence( 4 );
+            break;
+          }
+        }
+      }
+      break;
+    }
+    instance.setCustomVar( 0, tickCount );
   }
 
   void onPlayerZoneIn( PublicContent& instance, Entity::Player& player ) override
@@ -154,10 +275,12 @@ public:
         instance.setDirectorUI8DL( player.getGuardianDeity() );
         instance.setDirectorUI8EL( player.getQuestUI8FH( 67114 ) );
         instance.setDirectorUI8FL( player.getQuestUI8FL( 67114 ) );
-        instance.setDirectorUI8GL( 1 );
-        instance.setDirectorUI8HL( 1 );
-        instance.setDirectorUI8IL( 1 );
-        instance.setDirectorUI8JL( 1 );
+        instance.setCustomVar( 101, player.getQuestUI8BL( 67114 ) );
+        instance.setCustomVar( 102, player.getQuestUI8BH( 67114 ) );
+        instance.setCustomVar( 103, player.getQuestUI8CL( 67114 ) );
+        instance.setCustomVar( 104, player.getQuestUI8CH( 67114 ) );
+        instance.setCustomVar( 105, player.getQuestUI8DL( 67114 ) );
+        instance.setCustomVar( 106, player.getQuestUI8DH( 67114 ) );
       }
     }
     else if( instance.getCustomVar( 2 ) == 0 || instance.getCustomVar( 2 ) == player.getId() )
@@ -188,17 +311,17 @@ public:
     auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
     {
     };
-    if( instance.getCustomVar( 1 ) == player.getId() )
+    if( instance.getCustomVar( 1 ) == player.getId() && instance.getSequence() == 1 )
     {
-      player.setPosAndSendActorMove( 0, 500, -50, -3.14f );
+      player.setPosAndNotifyClient( 0, 500, -50, -3.14f );
     }
-    else if( instance.getCustomVar( 2 ) == player.getId() )
+    else if( instance.getCustomVar( 2 ) == player.getId() && instance.getSequence() == 1 )
     {
-      player.setPosAndSendActorMove( 0, 250, -50, -3.14f );
+      player.setPosAndNotifyClient( 0, 250, -50, -3.14f );
     }
     else
     {
-      player.setPosAndSendActorMove( 0, 750, -50, -3.14f );
+      player.setPosAndNotifyClient( 0, 750, -50, -3.14f );
     }
     //player.queuePacket( makeActorControlSelf( getId(), DirectorUpdate, instance.getDirectorId(), 0x80000003, 1200 ) ); // timer
     player.playScene( instance.getDirectorId(), 1, HIDE_HOTBAR, 0, 2, 4, callback );

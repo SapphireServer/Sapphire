@@ -1407,8 +1407,9 @@ private:
       }
     };
     std::vector< uint32_t > list;
+    list.push_back( 0 );
     list.push_back( std::time( 0 ) );
-    player.playScene16( getId(), 70, HIDE_HOTBAR, 0, 0, list, callback );
+    player.playScene16( getId(), 70, HIDE_HOTBAR, 0, list, callback );
   }
 
   void Scene00071( Entity::Player& player )

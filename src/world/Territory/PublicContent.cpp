@@ -84,6 +84,7 @@ void Sapphire::PublicContent::onLeaveTerritory( Entity::Player& player )
 
 void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
 {
+  updateBNpcs( tickCount );
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onPublicContentUpdate( getAsPublicContent(), tickCount );
 }

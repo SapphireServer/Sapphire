@@ -323,7 +323,7 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
     unsetStateFlag( PlayerStateFlag::InNpcEvent );
 }
 
-void Sapphire::Entity::Player::playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, uint32_t param5, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback )
+void Sapphire::Entity::Player::playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
   if( !pEvent )
@@ -338,7 +338,6 @@ void Sapphire::Entity::Player::playScene16( uint32_t eventId, uint32_t scene, ui
   eventPlay16->data().scene = scene;
   eventPlay16->data().flags = flags;
   eventPlay16->data().param3 = param3;
-  eventPlay16->data().param5 = param5;
   eventPlay16->data().paramSize = paramList.size();
   int i = 0;
   for( auto p : paramList )

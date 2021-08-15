@@ -1449,8 +1449,8 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param3;
     uint8_t paramSize;
     uint8_t padding1[3];
-    uint32_t param5;
     uint32_t param[16];
+    uint32_t padding2;
   };
 
   template< int ArgCount >
@@ -1849,7 +1849,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t bNPCName;
     uint32_t textId;
     uint32_t popupTimeMs;
-    uint32_t pad3[4];
+    uint32_t param[6];
   };
 
 
@@ -2270,7 +2270,7 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVCeremonySetActorAppearance : FFXIVIpcBasePacket< CeremonySetActorAppearance >
   {
     uint8_t u1;
-    uint8_t u2;
+    uint8_t questBL;
     uint16_t padding1;
     uint32_t u3;
     struct

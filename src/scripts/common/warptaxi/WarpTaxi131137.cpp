@@ -19,7 +19,7 @@ public:
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
     player.eventFinish( getId(), 1 );
-    player.setPosAndSendActorMove( 24.7, 20.1, -679.2, 0.82 );
+    player.setPosAndNotifyClient( 24.7, 20.1, -679.2, 0.82 );
   }
 };
 
