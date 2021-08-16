@@ -111,6 +111,8 @@ namespace Sapphire::Network::ActorControl
 
     ScreenFadeOut = 0xAA,
 
+    CeremonyDecoration = 0xB9,
+
     ZoneIn = 0xC8,
     ZoneInDefaultPos = 0xC9,
 
@@ -364,6 +366,7 @@ namespace Sapphire::Network::ActorControl
     TitleList = 0x12F,
 
     UpdatedSeenHowTos = 0x133,
+    CutscenePlayed = 0x134, // param1 = cutscene id
     AllotAttribute = 0x135,
 
     ClearFieldMarkers = 0x13A,

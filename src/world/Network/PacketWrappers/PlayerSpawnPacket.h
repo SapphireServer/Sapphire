@@ -8,6 +8,8 @@
 #include "Forwards.h"
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
+#include "Territory/Territory.h"
+#include "Event/Director.h"
 
 namespace Sapphire::Network::Packets::Server
 {
@@ -143,6 +145,10 @@ namespace Sapphire::Network::Packets::Server
         m_data.effect[ effect.first ].param = effect.second->getParam();
       }
 
+      if( auto d = player.getCurrentTerritory()->getAsDirector() )
+      {
+        m_data.directorId = d->getDirectorId();
+      }
     };
   };
 

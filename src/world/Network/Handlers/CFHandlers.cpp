@@ -103,7 +103,6 @@ void Sapphire::Network::GameConnection::cfDutyAccepted( const Packets::FFXIVARR_
 
       player.prepareZoning( pInstance->getTerritoryTypeId(), true, 1, 0, 0, 1, 9 );
 
-      auto sourceZoneGuId = player.getCurrentTerritory()->getGuId();
       player.setInstance( instance );
     }
   }

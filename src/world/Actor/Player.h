@@ -111,6 +111,8 @@ namespace Sapphire::Entity
     void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
                          Event::EventHandler::SceneChainCallback sceneChainCallback );
 
+    void playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback );
+
     /*! setup the event and return a ptr to it */
     Event::EventHandlerPtr bootstrapSceneEvent( uint32_t eventId, uint32_t flags );
 
@@ -490,7 +492,7 @@ namespace Sapphire::Entity
     bool setInstance( TerritoryPtr instance );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( Sapphire::TerritoryPtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
+    bool setInstance( Sapphire::TerritoryPtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos, float rot );
 
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
@@ -991,6 +993,8 @@ namespace Sapphire::Entity
     void gaugeSetRaw( uint8_t* pData );
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void setPosAndNotifyClient( float x, float y, float z, float rot );
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 

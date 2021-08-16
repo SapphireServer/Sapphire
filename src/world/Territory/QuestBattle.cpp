@@ -34,9 +34,9 @@ Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle
                                     uint32_t guId,
                                     const std::string& internalName,
                                     const std::string& contentName,
-                                    uint32_t questBattleId ) :
+                                    uint32_t questBattleId, uint16_t contentFinderConditionId ) :
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
-  Director( Event::Director::QuestBattle, questBattleId ),
+  Director( Event::Director::QuestBattle, questBattleId, contentFinderConditionId ),
   m_pBattleDetails( pBattleDetails ),
   m_questBattleId( questBattleId ),
   m_state( Created ),
@@ -330,7 +330,7 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
     return;
 
   if( auto onTalkHandler = it->second->getOnTalkHandler() )
-    onTalkHandler( player, it->second, getAsQuestBattle(), actorId );
+    onTalkHandler( player, it->second, getAsQuestBattle(), eventId, actorId );
   else
     player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
                       it->second->getObjectId(), eventId );

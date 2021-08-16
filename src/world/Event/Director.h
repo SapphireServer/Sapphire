@@ -42,11 +42,13 @@ namespace Sapphire::Event
       DutyFailed
     };
 
-    Director( DirectorType type, uint16_t contentId );
+    Director( DirectorType type, uint16_t contentId, uint16_t contentFinderConditionId = 0 );
 
     uint32_t getDirectorId() const;
 
     uint16_t getContentId() const;
+
+    uint16_t getContentFinderConditionId() const;
 
     DirectorType getType() const;
 
@@ -104,8 +106,8 @@ namespace Sapphire::Event
 
     void setDirectorBranch( uint8_t value );
 
-    void setCustomVar( uint32_t varId, uint32_t value );
-    uint32_t getCustomVar( uint32_t varId );
+    void setCustomVar( uint32_t varId, uint64_t value );
+    uint64_t getCustomVar( uint32_t varId );
 
   private:
     /*! Id of the content of the director */
@@ -113,6 +115,8 @@ namespace Sapphire::Event
 
     /*! DirectorType | ContentId */
     uint32_t m_directorId;
+
+    uint16_t m_contentFinderConditionId;
 
     /*! currect sequence */
     uint8_t m_sequence;
@@ -183,7 +187,7 @@ namespace Sapphire::Event
 
     uint32_t m_elapsedTime;
 
-    std::unordered_map< uint32_t, uint32_t > m_customVarMap;
+    std::unordered_map< uint32_t, uint64_t > m_customVarMap;
 
   };
 

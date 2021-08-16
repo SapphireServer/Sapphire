@@ -19,6 +19,7 @@
 #include "Territory.h"
 #include "InstanceContent.h"
 #include "QuestBattle.h"
+#include "PublicContent.h"
 #include "Manager/TerritoryMgr.h"
 #include "Navi/NaviProvider.h"
 
@@ -780,6 +781,11 @@ Sapphire::Entity::EventObjectPtr Sapphire::Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Sapphire::Event::DirectorPtr Sapphire::Territory::getAsDirector()
+{
+  return std::dynamic_pointer_cast< Event::Director, Territory >( shared_from_this() );
+}
+
 Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );
@@ -788,6 +794,11 @@ Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 Sapphire::QuestBattlePtr Sapphire::Territory::getAsQuestBattle()
 {
   return std::dynamic_pointer_cast< QuestBattle, Territory >( shared_from_this() );
+}
+
+Sapphire::PublicContentPtr Sapphire::Territory::getAsPublicContent()
+{
+  return std::dynamic_pointer_cast< PublicContent, Territory >( shared_from_this() );
 }
 
 uint32_t Sapphire::Territory::getNextEObjId()
@@ -1042,5 +1053,20 @@ void Sapphire::Territory::processEffectResults( uint64_t tickCount )
     effect->execute();
 
     it = m_effectResults.erase( it );
+  }
+}
+
+Sapphire::Entity::PlayerPtr Sapphire::Territory::getPlayer( uint32_t charId )
+{
+  return m_playerMap[ charId ];
+}
+
+void Sapphire::Territory::foreachPlayer( std::function< void( Sapphire::Entity::PlayerPtr player ) > callback )
+{
+  if( !callback )
+    return;
+  for( auto entry : m_playerMap )
+  {
+    callback( entry.second );
   }
 }
