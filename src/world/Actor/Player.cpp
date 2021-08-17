@@ -538,34 +538,34 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  if( auto d = getCurrentTerritory()->getAsDirector() )
-    if( d->getContentFinderConditionId() > 0 )
+  auto d = getCurrentTerritory()->getAsDirector();
+  if( d && d->getContentFinderConditionId() > 0 )
+  {
+    auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+    p->data().param[0] = d->getDirectorId();
+    p->data().param[1] = 1534;
+    p->data().param[2] = 1;
+    p->data().param[3] = d->getContentFinderConditionId();
+    queuePacket( p );
+
+    struct UNK038D : FFXIVIpcBasePacket< 0x038D >
     {
-      auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
-      p->data().param[0] = d->getDirectorId();
-      p->data().param[1] = 1534;
-      p->data().param[2] = 1;
-      p->data().param[3] = d->getContentFinderConditionId();
-      queuePacket( p );
+      uint32_t unknown[2];
+    };
+    auto p3 = makeZonePacket< UNK038D >( getId() );
+    queuePacket( p3 );
 
-      struct UNK038D : FFXIVIpcBasePacket< 0x038D >
-      {
-        uint32_t unknown[2];
-      };
-      auto p3 = makeZonePacket< UNK038D >( getId() );
-      queuePacket( p3 );
+    struct UNK00EA : FFXIVIpcBasePacket< 0x00EA >
+    {
+      uint32_t unknown[4];
+    };
+    auto p2 = makeZonePacket< UNK00EA >( getId() );
+    p2->data().unknown[0] = d->getContentFinderConditionId();
+    p2->data().unknown[1] = 5;
+    queuePacket( p2 );
 
-      struct UNK00EA : FFXIVIpcBasePacket< 0x00EA >
-      {
-        uint32_t unknown[4];
-      };
-      auto p2 = makeZonePacket< UNK00EA >( getId() );
-      p2->data().unknown[0] = d->getContentFinderConditionId();
-      p2->data().unknown[1] = 5;
-      queuePacket( p2 );
-
-      prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
-    }
+    prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
+  }
 
   resetHp();
   resetMp();
