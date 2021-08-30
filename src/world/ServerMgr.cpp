@@ -41,6 +41,7 @@
 #include "Manager/RNGMgr.h"
 #include "Manager/NaviMgr.h"
 #include "Manager/ActionMgr.h"
+#include "Manager/MapMgr.h"
 
 #include "Territory/InstanceObjectCache.h"
 
@@ -172,6 +173,10 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   Logger::info( "Setting up InstanceObjectCache" );
   auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
   Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
+
+  Logger::info( "MapMgr: Caching map data" );
+  auto pMapMgr = std::make_shared< Manager::MapMgr >();
+  Common::Service< Manager::MapMgr >::set( pMapMgr );
 
   auto pActionMgr = std::make_shared< Manager::ActionMgr >();
   Common::Service< Manager::ActionMgr >::set( pActionMgr );

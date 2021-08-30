@@ -282,6 +282,14 @@ namespace Sapphire::Network::Packets
     DailyQuests = 0x0331, // updated 5.58
     DailyQuestRepeatFlags = 0x01D1, // updated 5.58
 
+    MapUpdate = 0x03A2, // updated 5.58
+    MapUpdate4 = 0x0284, // updated 5.58
+    MapUpdate8 = 0x01BC, // updated 5.58
+    MapUpdate16 = 0x02D1, // updated 5.58
+    MapUpdate32 = 0x00DB, // updated 5.58
+    MapUpdate64 = 0x0368, // updated 5.58
+    MapUpdate128 = 0x0349, // updated 5.58
+
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
     MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff

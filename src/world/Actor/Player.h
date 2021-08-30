@@ -194,6 +194,8 @@ namespace Sapphire::Entity
     /*! remove a given quest */
     void removeQuest( uint16_t questId );
 
+    bool isQuestCompleted( uint16_t questId );
+
     /*! add a quest to the completed quests mask */
     void updateQuestsCompleted( uint32_t questId );
 
@@ -644,7 +646,7 @@ namespace Sapphire::Entity
     void learnSong( uint8_t songId, uint32_t itemId );
 
     /*! check if an action is already unlocked in the bitmask. */
-    bool isActionLearned( uint8_t actionId ) const;
+    bool isActionLearned( uint16_t actionId ) const;
 
     /*! return a const pointer to the unlock bitmask array */
     const uint8_t* getUnlockBitmask() const;
@@ -654,6 +656,8 @@ namespace Sapphire::Entity
 
     /*! return a const pointer to the mount guide bitmask array */
     const uint8_t* getMountGuideBitmask() const;
+
+    const bool hasMount( int16_t mountId ) const;
 
     bool checkAction() override;
 
@@ -950,6 +954,7 @@ namespace Sapphire::Entity
     uint16_t calculateEquippedGearItemLevel();
 
     ItemPtr getEquippedWeapon();
+    ItemPtr getEquippedSecondaryWeapon();
 
     /*! return the current amount of currency of type */
     uint32_t getCurrency( Common::CurrencyType type );
