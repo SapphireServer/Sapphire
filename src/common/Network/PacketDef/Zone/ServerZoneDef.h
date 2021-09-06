@@ -931,7 +931,6 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown9;
     uint32_t unknown10;
     uint32_t festivalId;
-    uint32_t unknown11;
     uint32_t unknown12[3];
     uint32_t additionalFestivalId;
     uint32_t unknown13[3];

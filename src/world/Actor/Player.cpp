@@ -731,7 +731,7 @@ void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
   queuePacket( makeActorControlSelf( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
-bool Sapphire::Entity::Player::isActionLearned( uint16_t actionId ) const
+bool Sapphire::Entity::Player::isActionLearned( uint32_t actionId ) const
 {
   uint16_t index;
   uint8_t value;
@@ -1287,7 +1287,7 @@ const uint8_t* Sapphire::Entity::Player::getMountGuideBitmask() const
   return m_mountGuide;
 }
 
-const bool Sapphire::Entity::Player::hasMount( int16_t mountId ) const
+const bool Sapphire::Entity::Player::hasMount( uint32_t mountId ) const
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto mount = exdData.get< Data::Mount >( mountId );

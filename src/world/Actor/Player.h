@@ -646,7 +646,7 @@ namespace Sapphire::Entity
     void learnSong( uint8_t songId, uint32_t itemId );
 
     /*! check if an action is already unlocked in the bitmask. */
-    bool isActionLearned( uint16_t actionId ) const;
+    bool isActionLearned( uint32_t actionId ) const;
 
     /*! return a const pointer to the unlock bitmask array */
     const uint8_t* getUnlockBitmask() const;
@@ -657,7 +657,7 @@ namespace Sapphire::Entity
     /*! return a const pointer to the mount guide bitmask array */
     const uint8_t* getMountGuideBitmask() const;
 
-    const bool hasMount( int16_t mountId ) const;
+    const bool hasMount( uint32_t mountId ) const;
 
     bool checkAction() override;
 

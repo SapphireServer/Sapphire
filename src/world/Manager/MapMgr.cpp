@@ -59,8 +59,7 @@ Sapphire::World::Manager::MapMgr::MapMgr()
     for( int32_t i = 0; i <= Common::CLASSJOB_TOTAL; i++ )
       questData.classJobRequirements[ 1 ].classJobCategoryMask.set( i, ( &classJobsCategory->aDV )[ i ] );
 
-    questData.column18 = exdData.getField< uint8_t >( quest.second, 18 );
-
+    questData.classJobUnlockFlag = exdData.getField< uint8_t >( quest.second, 18 );
     questData.classJobUnlock = exdData.getField< uint8_t >( quest.second, 19 );
 
     questData.requiredGC = exdData.getField< uint8_t >( quest.second, 20 );
@@ -331,10 +330,10 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
 
   if( quest.classJobUnlock )
   {
-    if( quest.column18 == 3 )
+    if( quest.classJobUnlockFlag == 3 )
       if( static_cast< uint8_t >( player.getClass() ) != quest.classJobUnlock )
         return false;
-    else if( quest.column18 == 4 )
+    else if( quest.classJobUnlockFlag == 4 )
       if ( static_cast< uint8_t >( player.getClass() ) == quest.classJobUnlock )
         return false;
     else
@@ -359,7 +358,7 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
 
   if( eventData.first == 65968 ) // Quest: A Legend for a Legend
   {
-    uint16_t requiredMounts[] = { 28, 29, 30, 31, 40, 43 };
+    uint32_t requiredMounts[] = { 28, 29, 30, 31, 40, 43 };
 
     for( int32_t i = 0; i < 6; i++ )
     {
@@ -369,7 +368,7 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
   }
   else if( eventData.first == 67086 ) // Quest: Fiery Wings, Fiery Hearts
   {
-    uint16_t requiredMounts[] = { 75, 76, 77, 78, 90, 98, 104 };
+    uint32_t requiredMounts[] = { 75, 76, 77, 78, 90, 98, 104 };
 
     for( int32_t i = 0; i < 6; i++ )
     {
@@ -379,7 +378,7 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
   }
   else if( eventData.first == 68736 ) // Quest: A Lone Wolf No More
   {
-    uint16_t requiredMounts[] = { 115, 116, 133, 144, 158, 172, 182 };
+    uint32_t requiredMounts[] = { 115, 116, 133, 144, 158, 172, 182 };
 
     for( int32_t i = 0; i < 6; i++ )
     {

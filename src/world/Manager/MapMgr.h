@@ -52,7 +52,7 @@ namespace Sapphire::World::Manager
         uint16_t classJobLevel;
       } classJobRequirements[2];
 
-      uint8_t column18;
+      uint8_t classJobUnlockFlag;
       uint8_t classJobUnlock;
 
       uint8_t requiredGC;
