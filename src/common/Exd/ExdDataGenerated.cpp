@@ -4582,9 +4582,11 @@ Sapphire::Data::GuildleveAssignment::GuildleveAssignment( uint32_t row_id, Sapph
 {
   auto row = exdData->m_GuildleveAssignmentDat.get_row( row_id );
   type = exdData->getField< std::string >( row, 0 );
+  typeId = exdData->getField< uint8_t >( row, 1 );
   assignmentTalk = exdData->getField< uint32_t >( row, 2 );
   quest.push_back( exdData->getField< uint32_t >( row, 3 ) );
   quest.push_back( exdData->getField< uint32_t >( row, 4 ) );
+  grandCompanyRank = exdData->getField< uint8_t >( row, 10 );
 }
 
 Sapphire::Data::GuildleveAssignmentCategory::GuildleveAssignmentCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )
@@ -7669,13 +7671,16 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   classJobCategory1 = exdData->getField< uint8_t >( row, 6 );
   classJobLevel1 = exdData->getField< uint16_t >( row, 7 );
   previousQuestJoin = exdData->getField< uint8_t >( row, 8 );
-  previousQuest0 = exdData->getField< uint32_t >( row, 9 );
-  previousQuest1 = exdData->getField< uint32_t >( row, 11 );
-  previousQuest2 = exdData->getField< uint32_t >( row, 12 );
+  previousQuest.push_back( exdData->getField< uint32_t >( row, 9 ) );
+  previousQuest0Sequence = exdData->getField< uint8_t >( row, 10 );
+  previousQuest.push_back( exdData->getField< uint32_t >( row, 11 ) );
+  previousQuest.push_back( exdData->getField< uint32_t >( row, 12 ) );
   questLockJoin = exdData->getField< uint8_t >( row, 13 );
   questLock.push_back( exdData->getField< uint32_t >( row, 14 ) );
   questLock.push_back( exdData->getField< uint32_t >( row, 15 ) );
   header = exdData->getField< uint16_t >( row, 16 );
+  startTown = exdData->getField< uint8_t >( row, 17 );
+  classJobUnlockFlag = exdData->getField< uint8_t >( row, 18 );
   classJobUnlock = exdData->getField< uint8_t >( row, 19 );
   grandCompany = exdData->getField< uint8_t >( row, 20 );
   grandCompanyRank = exdData->getField< uint8_t >( row, 21 );
@@ -7691,6 +7696,8 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   beastTribe = exdData->getField< uint8_t >( row, 31 );
   beastReputationRank = exdData->getField< uint8_t >( row, 32 );
   beastReputationValue = exdData->getField< uint16_t >( row, 33 );
+  satisfactionNpc = exdData->getField< uint8_t >( row, 34 );
+  satisfactionLevel = exdData->getField< uint8_t >( row, 35 );
   mountRequired = exdData->getField< int32_t >( row, 36 );
   isHouseRequired = exdData->getField< bool >( row, 37 );
   deliveryQuest = exdData->getField< uint8_t >( row, 38 );

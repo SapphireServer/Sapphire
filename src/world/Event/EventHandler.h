@@ -85,6 +85,13 @@ namespace Sapphire::Event
       QuestBattleDirector = 0x8006,
     };
 
+    enum class EventState : uint8_t
+    {
+      Invisible,
+      Available,
+      Locked
+    };
+
     using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;
     using SceneChainCallback = std::function< void( Entity::Player& ) >;
     using EventFinishCallback = std::function< void( Entity::Player&, uint64_t ) >;

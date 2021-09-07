@@ -1,26 +1,26 @@
 #include <Common.h>
 #include <Service.h>
 
-#include <datReader/DatCategories/bg/lgb.h>
 #include <Exd/ExdDataGenerated.h>
 
 #include <Event/EventHandler.h>
 
 #include <Network/CommonActorControl.h>
-#include <Network/GameConnection.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 
-#include <Logging/Logger.h>
 #include <Util/Util.cpp>
 
 #include <Actor/Player.h>
-#include <Inventory/Item.h>
+
+#include <Script/ScriptMgr.h>
+#include <Script/NativeScriptMgr.h>
+
+#include <Territory/InstanceObjectCache.h>
+#include <datReader/DatCategories/bg/lgb.h>
 
 #include "MapMgr.h"
 #include "TerritoryMgr.h"
-
-#include "ServerMgr.h"
 
 using namespace Sapphire::Event;
 using namespace Sapphire::Network::Packets;
@@ -30,411 +30,402 @@ Sapphire::World::Manager::MapMgr::MapMgr()
 {  
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  size_t count = 0;
-
-  for( auto quest : exdData.m_QuestDat.get_rows() )
-  {
-    if( exdData.getField< std::string >( quest.second, 1 ).empty() ) // id
-      continue;
-
-    auto& questData = m_questData[ quest.first ];
-
-    questData.previousQuestJoin = exdData.getField< uint8_t >( quest.second, 8 );
-    questData.previousQuestKeys[ 0 ] = exdData.getField< uint32_t >( quest.second, 9 );
-    questData.previousQuest0Sequence = exdData.getField< uint8_t >( quest.second, 10 );
-    questData.previousQuestKeys[ 1 ] = exdData.getField< uint32_t >( quest.second, 11 );
-    questData.previousQuestKeys[ 2 ] = exdData.getField< uint32_t >( quest.second, 12 );
-
-    questData.questLockJoin = exdData.getField< uint8_t >( quest.second, 13 );
-    questData.questLockKeys[ 0 ] = exdData.getField< uint32_t >( quest.second, 14 );
-    questData.questLockKeys[ 1 ] = exdData.getField< uint32_t >( quest.second, 15 );
-
-    questData.classJobRequirements[ 0 ].classJobLevel = exdData.getField< uint16_t >( quest.second, 4 );
-    auto classJobsCategory = exdData.get< Data::ClassJobCategory >( exdData.getField< uint8_t >( quest.second, 3 ) );
-    for( int32_t i = 0; i <= Common::CLASSJOB_TOTAL; i++ )
-      questData.classJobRequirements[ 0 ].classJobCategoryMask.set( i, ( &classJobsCategory->aDV )[ i ] );
-      
-    questData.classJobRequirements[ 1 ].classJobLevel = exdData.getField< uint16_t >( quest.second, 7 );
-    classJobsCategory = exdData.get< Data::ClassJobCategory >( exdData.getField< uint8_t >( quest.second, 6 ) );
-    for( int32_t i = 0; i <= Common::CLASSJOB_TOTAL; i++ )
-      questData.classJobRequirements[ 1 ].classJobCategoryMask.set( i, ( &classJobsCategory->aDV )[ i ] );
-
-    questData.classJobUnlockFlag = exdData.getField< uint8_t >( quest.second, 18 );
-    questData.classJobUnlock = exdData.getField< uint8_t >( quest.second, 19 );
-
-    questData.requiredGC = exdData.getField< uint8_t >( quest.second, 20 );
-    questData.requiredGCRank = exdData.getField< uint8_t >( quest.second, 21 );
-
-    questData.startTown = exdData.getField< uint8_t >( quest.second, 17 );
-
-    questData.header = exdData.getField< uint16_t >( quest.second, 16 );
-
-    questData.instanceContentJoin = exdData.getField< uint8_t >( quest.second, 22 );
-    questData.instanceContent[ 0 ] = exdData.getField< uint32_t >( quest.second, 23 );
-    questData.instanceContent[ 1 ] = exdData.getField< uint32_t >( quest.second, 24 );
-    questData.instanceContent[ 2 ] = exdData.getField< uint32_t >( quest.second, 25 );
-
-    questData.festival = exdData.getField< uint8_t >( quest.second, 26 );
-    questData.festivalBegin = exdData.getField< uint8_t >( quest.second, 27 );
-    questData.festivalEnd = exdData.getField< uint8_t >( quest.second, 28 );
-    questData.bellStart = exdData.getField< uint16_t >( quest.second, 29 );
-    questData.bellEnd = exdData.getField< uint16_t >( quest.second, 30 );   
-
-    questData.repeatIntervalType = exdData.getField< uint8_t >( quest.second, 44 );
-    questData.questRepeatFlag = exdData.getField< uint8_t >( quest.second, 45 ); 
-
-    questData.beastTribe = exdData.getField< uint8_t >( quest.second, 31 );
-    questData.beastReputationRank = exdData.getField< uint8_t >( quest.second, 32 );
-    questData.beastReputationValue = exdData.getField< uint16_t >( quest.second, 33 );
-
-    questData.mount = exdData.getField< int32_t >( quest.second, 36 );
-
-    questData.satisfactionNpc = exdData.getField< uint8_t >( quest.second, 34 );
-    questData.satisfactionRank = exdData.getField< uint8_t >( quest.second, 35 );
-
-    questData.issuer = exdData.getField< uint32_t >( quest.second, 39 );
-
-    questData.deliveryQuest = exdData.getField< uint8_t >( quest.second, 38 );
-
-    questData.expansion = exdData.getField< uint8_t >( quest.second, 2 );
-
-    questData.type = exdData.getField< uint8_t >(quest.second, 47);
-
-    questData.isRepeatable = exdData.getField< bool >( quest.second, 43 );
-    questData.isHouseRequired = exdData.getField< bool >( quest.second, 37 );
-
-    questData.iconValid = exdData.get< Data::EventIconType >( exdData.getField< uint8_t >( quest.second, 1512 ) )->mapIconAvailable + 1 + questData.isRepeatable;
-    questData.iconInvalid = exdData.get< Data::EventIconType >( exdData.getField< uint8_t >( quest.second, 1512 ) )->mapIconInvalid + 1 + questData.isRepeatable;
-
-    uint32_t issuerLevelId = exdData.getField< uint32_t >( quest.second, 40 );
-    if( issuerLevelId != 0 )
-    {
-      if( count++ % 100 == 0 )
-        std::cout << ".";
-
-      auto level = exdData.get< Data::Level >( issuerLevelId );
-      auto territory = level->territory;
-
-      if( territory == 0 )
-        territory = exdData.get< Data::Map >( level->map )->territoryType;
-
-      EventData eventData;
-      eventData.iconId = questData.iconValid;
-      eventData.levelId = issuerLevelId;
-      eventData.actorId = questData.issuer;
-
-      m_mapData[ territory ].emplace( quest.first, eventData );
-    }
-  }
-  
-  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
-  auto m_gameData = new xiv::dat::GameData( serverMgr.getConfig().global.general.dataPath );
-
-  std::set< std::string > bgSet;
-
-  for( auto territoryTypeId : exdData.getTerritoryTypeIdList() )
-  {
-    auto territoryType = exdData.get< Data::TerritoryType >( territoryTypeId );
-    if( territoryType->bg.empty() )
-      continue;
-
-    if( bgSet.find( territoryType->bg ) != bgSet.end() )
-      continue;
-    else
-      bgSet.insert( territoryType->bg );
-
-    std::string planeventLgbPath( "bg/" + territoryType->bg.substr( 0, territoryType->bg.rfind( '/' ) ) + "/planevent.lgb" );
-    auto planeventFile = m_gameData->getFile( planeventLgbPath );
-    auto planeventData = planeventFile->access_data_sections().at( 0 );
-    LGB_FILE planeventLgb( &planeventData[ 0 ], "planevent" );
-
-    for( const auto& group : planeventLgb.groups )
-    {
-      for( const auto& pEntry : group.entries )
-      {
-        if( pEntry->getType() == LgbEntryType::EventNpc )
-        {
-          auto pNpc = reinterpret_cast< LGB_ENPC_ENTRY* >( pEntry.get() );
-
-          auto eNpcData = exdData.get< Data::ENpcBase >( pNpc->data.enpcId )->eNpcData;
-
-          for( auto npcData : eNpcData )
-          {
-            if( npcData == 0 )
-              continue; // Some npcs have data gaps, so we have to iterate through the entire array
-
-            if( count++ % 1000 == 0 )
-              std::cout << ".";
-
-            EventData eventData;
-            eventData.levelId = pNpc->data.instanceId;
-            eventData.actorId = pNpc->data.enpcId;
-
-            auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
-
-            switch( eventHandlerType )
-            {
-              case EventHandler::EventHandlerType::GuildLeveAssignment:
-              {
-                eventData.iconId = exdData.get< Data::EventIconType >( 5 )->mapIconAvailable + 1;
-
-                m_mapData[ territoryTypeId ].insert( std::make_pair( npcData, eventData ) );
-                break;
-              }
-
-              case EventHandler::EventHandlerType::CustomTalk:
-              {
-                // Include only the beginner arena icon yet. There a few other ones, that aren't referenced in the game files (Some examples are: The Triple Triad Tournament npc which has multiple icons and the ocean fishing icon)
-                if( npcData == 721223 )
-                {
-                  auto customTalk = exdData.get< Data::CustomTalk >( npcData );
-
-                  eventData.iconId = customTalk->iconMap;
-
-                  m_mapData[ territoryTypeId ].insert( std::make_pair( npcData, eventData ) );
-                }
-                break;
-              }
-
-              case EventHandler::EventHandlerType::GuildOrderGuide:
-              {
-                eventData.iconId = exdData.get< Data::EventIconType >( 6 )->mapIconAvailable + 1;
-
-                m_mapData[ territoryTypeId ].insert( std::make_pair( npcData, eventData ) );
-                break;
-              }
-
-              case EventHandler::EventHandlerType::TripleTriad:
-              {
-                eventData.iconId = exdData.get< Data::EventIconType >( 7 )->mapIconAvailable + 1;
-
-                m_mapData[ territoryTypeId ].insert( std::make_pair( npcData, eventData ) );
-                break;
-              }
-
-              case EventHandler::EventHandlerType::PreHandler:
-              {
-                //I think this is used in Bozja and Zadnor, need evidence
-                //m_mapData[ territoryTypeId ].insert( std::make_pair( eventData, 0 ) );
-                break;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  std::cout << "\n";
+  for( uint32_t questId = 65536; auto curQuest = exdData.get< Data::Quest >( questId ); questId++ )
+    m_quests.emplace( questId, curQuest );
 }
 
 void Sapphire::World::Manager::MapMgr::updateAll( Entity::Player& player )
 {
-  auto& mapData = m_mapData[ player.getTerritoryTypeId() ];
-  std::multimap< uint32_t, EventData, less > newMapData;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& objectCache = Common::Service< Sapphire::InstanceObjectCache >::ref();
 
-  for( auto eventData : mapData )
+  EventSet mapData;
+
+  auto eventNpcs = objectCache.getAllEventNpc( player.getZoneId() );
+  if( eventNpcs )
   {
-    switch( static_cast< EventHandler::EventHandlerType >( eventData.first >> 16 ) )
+    for( const auto& eventNpc : *eventNpcs )
     {
-      case EventHandler::EventHandlerType::Quest:
+      auto eNpc = exdData.get< Data::ENpcBase >( eventNpc.second->data.enpcId );
+      if( eNpc )
       {
-        if( isQuestAvailable( player, eventData ) )
-          newMapData.insert( eventData );
-
-        break;
-      }
-
-      case EventHandler::EventHandlerType::GuildLeveAssignment:
-      {
-        auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-        auto guildLeve = exdData.get< Data::GuildleveAssignment >( eventData.first );
-
-        if( player.isActionLearned( 5 )  )
+        auto eNpcData = eNpc->eNpcData;
+        for( auto npcData : eNpcData )
         {
-          if( player.isQuestCompleted( guildLeve->quest[ 0 ] ) )
+          if( npcData == 0 )
+            continue; // Some npcs have data gaps, so we have to iterate through the entire array
+
+          EventData eventData;
+          eventData.eventId = npcData;
+          eventData.levelId = eventNpc.first;
+        
+          auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
+
+          switch( eventHandlerType )
           {
-            if( eventData.first >= 393239 && eventData.first <= 393247 )
+            case EventHandler::EventHandlerType::Quest:
             {
-              if( player.getGc() != 0 )
-                newMapData.insert( eventData );
+              auto quest = m_quests[ npcData ];
+
+              if( quest->issuerLocation == eventNpc.first )
+              {
+                insertQuest( player, npcData, mapData );
+              }
+              break;
             }
-            else
+            case EventHandler::EventHandlerType::GuildLeveAssignment:
             {
-              newMapData.insert( eventData );
+              if( player.isActionLearned( 5 ) )
+              {
+                auto guildLeve = exdData.get< Data::GuildleveAssignment >( npcData );
+
+                eventData.iconId = exdData.get< Data::EventIconType >( 5 )->mapIconAvailable + 1;
+
+                if( player.isQuestCompleted( guildLeve->quest[ 0 ] ) ||
+                    ( ( guildLeve->typeId == 2 || npcData == 393217 || npcData == 393223 || npcData == 393225 ) && // Leve npc locations: Bentbranch / Horizon / Swiftperch
+                    ( player.isQuestCompleted( 220 ) || player.isQuestCompleted( 687 ) || player.isQuestCompleted( 693 ) ) ) )
+                {
+                  if( guildLeve->typeId == 2 )
+                  {
+                    if( player.getGc() != 0 )
+                    {
+                      for( int8_t i = 0; i < 3; i++ )
+                      {
+                        if( player.getGcRankArray()[ i ] >= guildLeve->grandCompanyRank )
+                        {
+                          mapData.insert( eventData );
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  else
+                  {
+                    mapData.insert( eventData );
+                  }
+                }
+              }              
+              break;
             }
-          }
-          else if( eventData.first == 393217 || eventData.first == 393223 || eventData.first == 393225 ) // Leve npc locations: Bentbranch / Horizon / Swiftperch
-          {
-            if( player.isQuestCompleted( 220 ) || player.isQuestCompleted( 687 ) || player.isQuestCompleted( 693 ) )
-              newMapData.insert( eventData );
+          
+            case EventHandler::EventHandlerType::CustomTalk:
+            {
+              // Include only the beginner arena icon yet. There a few other ones, that aren't referenced in the game files (Some examples are: The Triple Triad Tournament npc which has multiple icons and the ocean fishing icon)
+              if( npcData == 721223 )
+              {
+                auto customTalk = exdData.get< Data::CustomTalk >( npcData );
+                
+                eventData.iconId = customTalk->iconMap;
+                
+                mapData.insert( eventData );
+              }
+              break;
+            }
+          
+            case EventHandler::EventHandlerType::GuildOrderGuide:
+            {
+              if( player.isActionLearned( 7 ) )
+              {
+                eventData.iconId = exdData.get< Data::EventIconType >( 6 )->mapIconAvailable + 1;
+                
+                mapData.insert( eventData );
+              }
+              break;
+            }
+
+            case EventHandler::EventHandlerType::TripleTriad:
+            {
+              if( npcData == 2293771 ) // Triple Triad Master npc for now only
+              {
+                eventData.iconId = exdData.get< Data::EventIconType >( 7 )->mapIconAvailable + 1;
+                
+                mapData.insert( eventData );
+              }
+              break;
+            }
+          
+            case EventHandler::EventHandlerType::PreHandler:
+            {
+              //I think this is used in Bozja and Zadnor, need evidence
+              break;
+            }
           }
         }
-
-        break;
-      }
-
-      case EventHandler::EventHandlerType::CustomTalk:
-      {
-        newMapData.insert( eventData );
-
-        break;
-      }
-
-      case EventHandler::EventHandlerType::GuildOrderGuide:
-      {
-        if( player.isActionLearned( 7 ) )
-          newMapData.insert( eventData );
-
-        break;
-      }
-
-      case EventHandler::EventHandlerType::TripleTriad:
-      {
-        if( eventData.first == 2293771 ) // Triple Triad Master npc for now only
-          newMapData.insert( eventData );
-
-        break;
       }
     }
   }
   
-  sendPackets( player, newMapData, All );
+  auto eventObjs = objectCache.getAllEventObj( player.getZoneId() );
+  if( eventObjs )
+  {
+    for( const auto& eventObj : *eventObjs )
+    {
+      auto eObj = exdData.get< Data::EObj >( eventObj.second->data.eobjId );
+      if( eObj )
+      {
+        auto eObjData = eObj->data;
+        if( eObjData )
+        {
+          EventData eventData;
+          eventData.eventId = eObjData;
+          eventData.levelId = eventObj.first;
+        
+          auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( eObjData >> 16 );
+
+          if( eventHandlerType == EventHandler::EventHandlerType::Quest )
+          {
+            auto quest = m_quests[ eObjData ];
+
+            if( quest->issuerLocation == eventObj.first )
+            {
+              insertQuest( player, eObjData, mapData );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  
+  sendPackets( player, mapData, All );
 }
 
 void Sapphire::World::Manager::MapMgr::updateQuests( Entity::Player& player )
 {
-  auto& mapData = m_mapData[ player.getTerritoryTypeId() ];
-  std::multimap< uint32_t, EventData, less > newMapData;
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& objectCache = Common::Service< Sapphire::InstanceObjectCache >::ref();
 
-  for( auto& eventData : mapData )
+  EventSet mapData;
+
+  auto eventNpcs = objectCache.getAllEventNpc( player.getZoneId() );
+  if( eventNpcs )
   {
-    if( ( eventData.first >> 16 ) == static_cast< uint16_t >( EventHandler::EventHandlerType::Quest ) )
+    for( const auto& eventNpc : *eventNpcs )
     {
-      if( isQuestAvailable( player, eventData ) )
-        newMapData.insert( eventData );
+      auto eNpcData = exdData.get< Data::ENpcBase >( eventNpc.second->data.enpcId )->eNpcData;
+
+      for( auto npcData : eNpcData )
+      {
+        if( npcData == 0 )
+          continue; // Some npcs have data gaps, so we have to iterate through the entire array
+
+        EventData eventData;
+        eventData.eventId = npcData;
+        eventData.levelId = eventNpc.first;
+        
+        auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
+
+        if( eventHandlerType == EventHandler::EventHandlerType::Quest )
+        {
+          auto quest = m_quests[ npcData ];
+
+          if( quest->issuerLocation == eventNpc.first )
+          {
+            insertQuest( player, npcData, mapData );
+          }
+        }
+      }
     }
   }
-  
-  sendPackets( player, newMapData, Quest );;
+
+  auto eventObjs = objectCache.getAllEventObj( player.getZoneId() );
+  if( eventObjs )
+  {
+    for( const auto& eventObj : *eventObjs )
+    {
+      auto eObj = exdData.get< Data::EObj >( eventObj.second->data.eobjId );
+      if( eObj )
+      {
+        auto eObjData = eObj->data;
+        if( eObjData )
+        {
+          EventData eventData;
+          eventData.eventId = eObjData;
+          eventData.levelId = eventObj.first;
+        
+          auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( eObjData >> 16 );
+
+          if( eventHandlerType == EventHandler::EventHandlerType::Quest )
+          {
+            auto quest = m_quests[ eObjData ];
+
+            if( quest->issuerLocation == eventObj.first )
+            {
+              insertQuest( player, eObjData, mapData );
+            }
+          }
+        }
+      }
+    }
+  }
+
+  sendPackets( player, mapData, Quest );
 }
 
-bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player, std::pair< const uint32_t, EventData >& eventData )
+void Sapphire::World::Manager::MapMgr::insertQuest( Entity::Player& player, uint32_t questId, EventSet& mapData )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  auto quest = m_quests[ questId ];
+
+  if( isQuestVisible( player, questId, quest ) )
+  {
+    auto script = scriptMgr.getNativeScriptHandler().getScript< Sapphire::ScriptAPI::EventScript >( questId );
+
+    // Just don't show quests on map, that aren't implemented yet
+    if( script )
+    {                        
+      EventData eventData;
+      eventData.eventId = questId;
+
+      auto eventState = script->checkExtraConditions( player, questId );
+
+      if( eventState == Event::EventHandler::EventState::Available || eventState == Event::EventHandler::EventState::Locked )
+      {
+        if( eventState == Event::EventHandler::EventState::Available && isQuestAvailable( player, questId, quest ) )
+        {
+          eventData.iconId = exdData.get< Data::EventIconType >( quest->eventIconType )->mapIconAvailable + 1 + quest->isRepeatable;
+          eventData.levelId = quest->issuerLocation;
+        }
+        else
+        {
+          eventData.iconId = exdData.get< Data::EventIconType >( quest->eventIconType )->mapIconInvalid + 1 + quest->isRepeatable;
+          eventData.levelId = quest->issuerLocation;
+        }
+
+        mapData.insert( eventData );
+      }
+    }
+  }
+}
+
+bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player, uint32_t questId, Data::ExdDataGenerated::QuestPtr questPtr )
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto& quest = m_questData[ eventData.first ];
+  if( questPtr->grandCompany || questPtr->grandCompanyRank )
+  {
+    if( questPtr->grandCompany != player.getGc() )
+    {
+      if( questPtr->grandCompanyRank > player.getGcRankArray()[ player.getGc() - 1 ] )
+        return false;
+    }
+  }  
 
-  if( ( player.isQuestCompleted( eventData.first ) && ( !quest.isRepeatable && eventData.first != 67114 ) ) || player.hasQuest( eventData.first ) ||
-      ( quest.repeatIntervalType == 1 && quest.questRepeatFlag == 0 ) ) // Don't show daily beast tribe quests on the map yet.
+  if( questPtr->instanceContentJoin == 1 )
+  {
+    for( int32_t i = 0; i < 3; i++ )
+    {
+      if( questPtr->instanceContent[ i ] == 0 )
+        continue;
+
+      return false;
+    }
+
+    return true;
+  }
+  else if( questPtr->instanceContentJoin == 2 )
+  {
+    for( int32_t i = 0; i < 3; i++ )
+    {
+      if( questPtr->instanceContent[ i ] == 0 )
+        continue;
+
+      return false;
+    }
+  }  
+
+  if( questPtr->bellStart || questPtr->bellEnd )
+  {
+    uint64_t curEorzeaTime = Util::getEorzeanTimeStamp();
+    uint32_t convTime = 100 * ( curEorzeaTime / 3600 % 24 ) + curEorzeaTime / 60 % 60;
+
+    if( questPtr->bellStart <= questPtr->bellEnd )
+    {
+      if( convTime < questPtr->bellStart || convTime >= questPtr->bellEnd )
+        return false;
+    }
+    else
+    {
+      if( convTime < questPtr->bellStart && convTime >= questPtr->bellEnd )
+        return false;
+    }
+  }  
+
+  auto classJobCategory = &exdData.get< Data::ClassJobCategory >( questPtr->classJobCategory0 )->aDV;
+  if( !classJobCategory[ static_cast< uint8_t >( player.getClass() ) ] )
     return false;
 
-  if( quest.classJobUnlock )
+  if( questPtr->classJobCategory1 > 1 )
   {
-    if( quest.classJobUnlockFlag == 3 )
-      if( static_cast< uint8_t >( player.getClass() ) != quest.classJobUnlock )
+    classJobCategory = &exdData.get< Data::ClassJobCategory >( questPtr->classJobCategory1 )->aDV;
+    if( !classJobCategory[ static_cast< uint8_t >( player.getClass() ) ] )
+      return false;
+  }
+
+  return true;
+}
+
+bool Sapphire::World::Manager::MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Data::ExdDataGenerated::QuestPtr questPtr )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+
+  if( ( player.isQuestCompleted( questId ) && ( !questPtr->isRepeatable && questId != 67114 ) ) || player.hasQuest( questId ) )
+    return false;
+
+  if( questPtr->classJobUnlock )
+  {
+    if( questPtr->classJobUnlockFlag == 3 )
+      if( static_cast< uint8_t >( player.getClass() ) != questPtr->classJobUnlock )
         return false;
-    else if( quest.classJobUnlockFlag == 4 )
-      if ( static_cast< uint8_t >( player.getClass() ) == quest.classJobUnlock )
+    else if( questPtr->classJobUnlockFlag == 4 )
+      if ( static_cast< uint8_t >( player.getClass() ) == questPtr->classJobUnlock )
         return false;
     else
       return false;
   }
 
   // Was this really ever used?
-  if( quest.startTown )
+  if( questPtr->startTown )
   {
-    if( quest.startTown != player.getStartTown() )
+    if( questPtr->startTown != player.getStartTown() )
       return false;
   }
 
-  if( Common::CURRENT_EXPANSION_ID < quest.expansion )
+  if( Common::CURRENT_EXPANSION_ID < questPtr->expansion )
     return false;
 
-  if( quest.mount )
+  if( questPtr->mountRequired )
   {
-    if( !player.hasMount( quest.mount ) )
+    if( !player.hasMount( questPtr->mountRequired ) )
       return false;
   }
 
-  if( eventData.first == 65968 ) // Quest: A Legend for a Legend
+  if( questPtr->grandCompany )
   {
-    uint32_t requiredMounts[] = { 28, 29, 30, 31, 40, 43 };
-
-    for( int32_t i = 0; i < 6; i++ )
-    {
-      if( !player.hasMount( requiredMounts[ i ] ) )
-        return false;
-    }
-  }
-  else if( eventData.first == 67086 ) // Quest: Fiery Wings, Fiery Hearts
-  {
-    uint32_t requiredMounts[] = { 75, 76, 77, 78, 90, 98, 104 };
-
-    for( int32_t i = 0; i < 6; i++ )
-    {
-      if( !player.hasMount( requiredMounts[ i ] ) )
-        return false;
-    }
-  }
-  else if( eventData.first == 68736 ) // Quest: A Lone Wolf No More
-  {
-    uint32_t requiredMounts[] = { 115, 116, 133, 144, 158, 172, 182 };
-
-    for( int32_t i = 0; i < 6; i++ )
-    {
-      if( !player.hasMount( requiredMounts[ i ] ) )
-        return false;
-    }
-  }
-
-  if( quest.requiredGC || quest.requiredGCRank )
-  {
-    if( quest.requiredGC != player.getGc() )
-      return false;
-
-    if( quest.requiredGCRank > player.getGcRankArray()[ player.getGc() - 1 ] )
-      eventData.second.iconId = quest.iconInvalid;
-  }
-
-  if( quest.header != 0 )
-  {
-    if ( !player.isActionLearned( quest.header ) )
+    if( questPtr->grandCompany != player.getGc() )
       return false;
   }
 
-  //Required previous quests for ARR relic
-  if( eventData.first == 66971 ) // Quest: Up in Arms
+  if( questPtr->header != 0 )
   {
-    for( int32_t i = 0; i <= Common::CLASSJOB_TOTAL; i++ )
-    {
-      auto classJob = exdData.get< Data::ClassJob >( i );
-
-      if( player.isQuestCompleted( classJob->relicQuest ) )
-        break;
-
-      if( i == Common::CLASSJOB_TOTAL )
-        return false;
-    }
-  }
-  else if( eventData.first == 65897 ) // Quest: His Dark Materia
-  {
-    // Quests in the following order: A Ponze of Flesh, Labor of Love, Method in His Malice, A Treasured Mother
-    if( !player.isQuestCompleted( 357 ) || !player.isQuestCompleted( 358 ) || !player.isQuestCompleted( 359 ) || !player.isQuestCompleted( 360 ) )
+    if ( !player.isActionLearned( questPtr->header ) )
       return false;
   }
 
-  if( quest.previousQuestJoin == 1 )
+  if( questPtr->previousQuestJoin == 1 )
   {
     for( int32_t i = 0; i < 3; i++ )
     {
-      if( quest.previousQuestKeys[ i ] == 0 )
+      if( questPtr->previousQuest[ i ] == 0 )
         continue;
 
-      if( !player.isQuestCompleted( quest.previousQuestKeys[ i ] ) )
+      if( !player.isQuestCompleted( questPtr->previousQuest[ i ] ) )
       {
-        if( i == 0 && quest.previousQuest0Sequence != 0 )
+        if( i == 0 && questPtr->previousQuest0Sequence != 0 )
         {
-          if( player.getQuestSeq( quest.previousQuestKeys[ i ] ) < quest.previousQuest0Sequence )
+          if( player.getQuestSeq( questPtr->previousQuest[ i ] ) < questPtr->previousQuest0Sequence )
             return false;
         }
         else
@@ -444,14 +435,14 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
       }
     }
   }
-  else if( quest.previousQuestJoin == 2 )
+  else if( questPtr->previousQuestJoin == 2 )
   {
     for( int32_t i = 0; i < 3; i++ )
     {
-      if( quest.previousQuestKeys[ i ] == 0 )
+      if( questPtr->previousQuest[ i ] == 0 )
         continue;
 
-      if( player.isQuestCompleted( quest.previousQuestKeys[ i ] ) )
+      if( player.isQuestCompleted( questPtr->previousQuest[ i ] ) )
         break;
 
       if( i == 2 )
@@ -459,93 +450,54 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
     }
   }
 
-  if( quest.questLockJoin == 1 )
+  if( questPtr->questLockJoin == 1 )
   {
     for( int32_t i = 0; i < 2; i++ )
     {
-      if( quest.questLockKeys[ i ] == 0 )
+      if( questPtr->questLock[ i ] == 0 )
         continue;
 
-      if( !player.isQuestCompleted( quest.questLockKeys[ i ] ) && !player.hasQuest( quest.questLockKeys[ i ] ) )
+      if( !player.isQuestCompleted( questPtr->questLock[ i ] ) && !player.hasQuest( questPtr->questLock[ i ] ) )
         break;
 
       if( i == 1 )
         return false;
     }
   }
-  else if( quest.questLockJoin == 2 )
+  else if( questPtr->questLockJoin == 2 )
   {
     for( int32_t i = 0; i < 2; i++ )
     {
-      if( quest.questLockKeys[ i ] == 0 )
+      if( questPtr->questLock[ i ] == 0 )
         continue;
 
-      if( player.isQuestCompleted( quest.questLockKeys[ i ] ) || player.hasQuest( quest.questLockKeys[ i ] ) )
+      if( player.isQuestCompleted( questPtr->questLock[ i ] ) || player.hasQuest( questPtr->questLock[ i ] ) )
         return false;
     }
   }
 
-  if( quest.instanceContentJoin == 1 )
-  {
-    for( int32_t i = 0; i < 3; i++ )
-    {
-      if( quest.instanceContent[ i ] == 0 )
-        continue;
-
-      eventData.second.iconId = quest.iconInvalid;
-    }
-  }
-  else if( quest.instanceContentJoin == 2 )
-  {
-    for( int32_t i = 0; i < 3; i++ )
-    {
-      if( quest.instanceContent[ i ] == 0 )
-        continue;
-
-      eventData.second.iconId = quest.iconInvalid;
-    }
-  }
-
-  if( quest.festival )
+  if( questPtr->festival )
   {
     auto& territoryMgr = Common::Service< Manager::TerritoryMgr >::ref();
     auto& festival = territoryMgr.getCurrentFestival();
 
-    if( quest.festival != festival.first && quest.festival != festival.second )
+    if( questPtr->festival != festival.first && questPtr->festival != festival.second )
       return false;
 
     // Don't show festivals with begin state other than 0 yet
-    if( quest.festivalBegin != 0 )
+    if( questPtr->festivalBegin != 0 )
       return false;
   }
 
-  if( quest.bellStart || quest.bellEnd )
+  if( ( questPtr->type & 1 ) == 0 )
   {
-    uint64_t curEorzeaTime = Util::getEorzeanTimeStamp();
-    uint32_t convTime = 100 * (curEorzeaTime / 3600 % 24) + curEorzeaTime / 60 % 60;
+    auto classJobCategory = &exdData.get< Data::ClassJobCategory >( questPtr->classJobCategory0 )->aDV;
 
-    if( quest.bellStart <= quest.bellEnd )
-    {
-      if( convTime < quest.bellStart || convTime >= quest.bellEnd )
-        eventData.second.iconId = quest.iconInvalid;
-    }
-    else
-    {
-      if( convTime < quest.bellStart && convTime >= quest.bellEnd )
-        eventData.second.iconId = quest.iconInvalid;
-    }
-  }
-
-  if( !quest.classJobRequirements[0].classJobCategoryMask.test( static_cast< uint8_t >( player.getClass() ) ) )
-    eventData.second.iconId = quest.iconInvalid;
-
-  if( player.getQuestSeq( eventData.first ) || ( quest.type & 1 ) == 0 )
-  {
     for( int32_t i = 1; i <= Common::CLASSJOB_TOTAL; i++ )
     {
-      if( quest.classJobRequirements[0].classJobCategoryMask.test( i ) )
+      if( classJobCategory[ i ] )
       {
-        if( player.getLevelForClass( static_cast< Common::ClassJob >( i ) ) >=  quest.classJobRequirements[0].classJobLevel )
+        if( player.getLevelForClass( static_cast< Common::ClassJob >( i ) ) >=  questPtr->classJobLevel0 )
           break;
       }
 
@@ -555,30 +507,15 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
   }
   else
   {
-    if( player.getLevel() < quest.classJobRequirements[0].classJobLevel )
+    if( player.getLevel() < questPtr->classJobLevel0 )
       return false;
-  }
-
-  if( quest.classJobRequirements[1].classJobCategoryMask.any() )
-  {
-    for( int32_t i = 1; i <= Common::CLASSJOB_TOTAL; i++ )
-    {
-      if( quest.classJobRequirements[1].classJobCategoryMask.test( i ) )
-      {
-        if( player.getLevelForClass( static_cast< Common::ClassJob >( i ) ) >=  quest.classJobRequirements[1].classJobLevel )
-          break;
-      }
-
-      if( i == Common::CLASSJOB_TOTAL )
-        return false;
-    }
   }
 
   for( int32_t i = 0; i <= Common::CLASSJOB_TOTAL; i++ )
   {
     auto classJob = exdData.get< Data::ClassJob >( i );
 
-    if( classJob->relicQuest == eventData.first )
+    if( classJob->relicQuest == questId )
     {
       for( int32_t j = 0; i <= Common::CLASSJOB_TOTAL; i++ )
       {
@@ -592,157 +529,21 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
     }
   }
 
-  if( quest.beastTribe )
+  if( questPtr->beastTribe )
     return false;
 
-  if( quest.satisfactionNpc )
+  if( questPtr->satisfactionNpc )
     return false;
-
-  auto isRelicEquipped = [ &player, &eventData ]( uint32_t* mainWeaponId, uint32_t secondaryWeaponId )
-  {
-    for( int32_t i = 0; i < 10; i++ )
-    {
-      if( i == 0 )
-      {
-        if( player.getEquippedSecondaryWeapon() == nullptr )
-        {
-          if( player.getEquippedWeapon()->getId() == mainWeaponId[ i ] && secondaryWeaponId == 0 )
-            return true;
-        }
-        else if( player.getEquippedWeapon()->getId() == mainWeaponId[ i ] && player.getEquippedSecondaryWeapon()->getId() == secondaryWeaponId )
-        {
-          return true;
-        }
-      }
-      else
-      {
-        if( player.getEquippedWeapon()->getId() == mainWeaponId[ i ] )
-          return true;
-      }
-    }
-
-    return false;
-  };
-
-  switch( eventData.first )
-  {
-    case 65742: // Quest: Mmmmmm, Soulglazed Relics
-    {
-      uint32_t relicItemIds[] = { 7863, 7864, 7865, 7866, 7867, 9253, 7868, 7869, 7870, 7871 };
-
-      if( !isRelicEquipped( relicItemIds, 7872 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 65892: // Quest: Wherefore Art Thou, Zodiac
-    case 65897: // Quest: His Dark Materia
-    {
-      uint32_t relicItemIds[] = { 8649, 8650, 8651, 8652, 8653, 9254, 8654, 8655, 8656, 8657 };
-
-      if( !isRelicEquipped( relicItemIds, 8658 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 66096: // Quest: Rise and Shine
-    {
-      uint32_t relicItemIds[] = { 9491, 9492, 9493, 9494, 9495, 9501, 9496, 9497, 9498, 9499 };
-
-      if( !isRelicEquipped( relicItemIds, 9500 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 66097: // Quest: The Vital Title
-    {
-      uint32_t relicItemIds[] = { 10054, 10055, 10056, 10057, 10058, 10064, 10059, 10060, 10061, 10062 };
-
-      if( !isRelicEquipped( relicItemIds, 10063 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 66971: // Quest: Up in Arms
-    {
-      uint32_t relicItemIds[] = { 6257, 6258, 6259, 6260, 6261, 9250, 6262, 6263, 6264, 6265 };
-
-      if( !isRelicEquipped( relicItemIds, 0 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 66972: // Quest: Trials of the Braves
-    {
-      uint32_t relicItemIds[] = { 7824, 7825, 7826, 7827, 7828, 9251, 7829, 7830, 7831, 7832 };
-
-      if( !isRelicEquipped( relicItemIds, 7833 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 66998: // Quest: Celestial Radiance
-    case 67000: // Quest: Star Light, Star Bright
-    {
-      uint32_t relicItemIds[] = { 7834, 7835, 7836, 7837, 7838, 9252, 7839, 7840, 7841, 7842 };
-
-      if( !isRelicEquipped( relicItemIds, 7843 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-
-    case 67823: // Quest: The Vital Title
-    {
-      uint32_t relicItemIds[] = { 12124, 12133, 12142, 12151, 12160, 12169, 12178, 12187, 12196 };
-
-      if( !isRelicEquipped( relicItemIds, 12213 ) )
-        eventData.second.iconId = quest.iconInvalid;
-
-      break;
-    }
-  }
     
-  if( eventData.first >= 67001 && eventData.first <= 67003 ) // Quest: Call of the Wild
-  {
-    // Quests in the following order: Martial Perfection / Feathers and Folly / Like Clutchfather, Like Son / Revenge of the Furred / Spread Your Wings and Soar
-    if( !player.isQuestCompleted( 1221 ) || !player.isQuestCompleted( 1256 ) || !player.isQuestCompleted( 1378 ) || !player.isQuestCompleted( 1324 ) || !player.isQuestCompleted( 1493 ) )
-      return false;
-  }
-  else if( eventData.first == 67918 ) // Quest: When Good Dragons Go Bad
-  {
-    // Quests in the following order: The Nest of Honor / A Symbiotic Friendship / The Zenith of Craftsmanship / Heavensward
-    if( !player.isQuestCompleted( 2225 ) || !player.isQuestCompleted( 2260 ) || !player.isQuestCompleted( 2327 ) || !player.isQuestCompleted( 1669 ) )
-      return false;
-  }
-
-  if( eventData.first >= 66968 && eventData.first <= 66970 ) // Quest: An Ill-conceived Venture
+  if( questPtr->isHouseRequired )
     return false;
 
-  if( quest.isHouseRequired )
+  if( questPtr->deliveryQuest )
     return false;
 
-  if( quest.deliveryQuest )
-    return false;
-
-  if( eventData.first == 67114 ) // Quest: The Ties That Bind
-    return false;
-
-  if( eventData.first == 66112 ) // Quest: Like Sire Like Fledgling
+  if( player.getQuestSeq( questId ) == 0 )
   {
-    if( !( player.getHowToArray()[ 198 / 8 ] & ( 1 << ( 198 % 8 ) ) ) )
-      return false;
-  }
-
-  if( player.getQuestSeq( eventData.first ) == 0 )
-  {
-    auto questAccept = exdData.get< Data::QuestAcceptAdditionCondition >( eventData.first );
+    auto questAccept = exdData.get< Data::QuestAcceptAdditionCondition >( questId );
 
     if( questAccept )
     {
@@ -762,17 +563,13 @@ bool Sapphire::World::Manager::MapMgr::isQuestAvailable( Entity::Player& player,
     }
   }
 
-  // Quests in the following order: Open and Inviting / The Adventurer with All the Cards
-  if( eventData.first == 69566 || eventData.first == 69617 )
-    return false;
-
   return true;
 }
 
-bool Sapphire::World::Manager::MapMgr::isTripleTriadAvailable( Entity::Player& player, std::pair< const uint32_t, EventData >& eventData )
+bool Sapphire::World::Manager::MapMgr::isTripleTriadAvailable( Entity::Player& player, uint32_t tripleTriadId )
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto tripleTriad = exdData.get< Data::TripleTriad >( eventData.first );
+  auto tripleTriad = exdData.get< Data::TripleTriad >( tripleTriadId );
 
   if( tripleTriad->previousQuestJoin == 1 )
   {
@@ -803,20 +600,20 @@ bool Sapphire::World::Manager::MapMgr::isTripleTriadAvailable( Entity::Player& p
   return true;
 }
 
-void Sapphire::World::Manager::MapMgr::fillPacket( std::multimap< uint32_t, EventData, less >& mapData, uint32_t* iconIds, uint32_t* levelIds, uint32_t* eventIds )
+void Sapphire::World::Manager::MapMgr::fillPacket( EventSet& mapData, uint32_t* iconIds, uint32_t* levelIds, uint32_t* eventIds )
 {
   int32_t i = 0;
   for( auto& eventData : mapData )
   {
-    iconIds[ i ] = eventData.second.iconId;
-    levelIds[ i ] = eventData.second.levelId;
-    eventIds[ i ] = eventData.first;
+    iconIds[ i ] = eventData.iconId;
+    levelIds[ i ] = eventData.levelId;
+    eventIds[ i ] = eventData.eventId;
 
     i++;
   }
 }
 
-void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, std::multimap< uint32_t, EventData, less >& mapData, UpdateMode updateMode )
+void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode updateMode )
 {
   player.queuePacket( makeActorControlSelf( player.getId(), Network::ActorControl::BeginMapUpdate, updateMode ) );
 

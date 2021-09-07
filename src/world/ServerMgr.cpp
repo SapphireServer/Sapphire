@@ -174,7 +174,7 @@ void Sapphire::World::ServerMgr::run( int32_t argc, char* argv[] )
   auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
   Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
 
-  Logger::info( "MapMgr: Caching map data" );
+  Logger::info( "MapMgr: Caching quests" );
   auto pMapMgr = std::make_shared< Manager::MapMgr >();
   Common::Service< Manager::MapMgr >::set( pMapMgr );
 
