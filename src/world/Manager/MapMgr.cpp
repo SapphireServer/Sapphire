@@ -279,11 +279,11 @@ void Sapphire::World::Manager::MapMgr::insertQuest( Entity::Player& player, uint
       EventData eventData;
       eventData.eventId = questId;
 
-      auto eventState = script->checkExtraConditions( player, questId );
+      auto eventState = script->getQuestAvailability( player, questId );
 
-      if( eventState == Event::EventHandler::EventState::Available || eventState == Event::EventHandler::EventState::Locked )
+      if( eventState == Event::EventHandler::QuestAvailability::Available || eventState == Event::EventHandler::QuestAvailability::Locked )
       {
-        if( eventState == Event::EventHandler::EventState::Available && isQuestAvailable( player, questId, quest ) )
+        if( eventState == Event::EventHandler::QuestAvailability::Available && isQuestAvailable( player, questId, quest ) )
         {
           eventData.iconId = exdData.get< Data::EventIconType >( quest->eventIconType )->mapIconAvailable + 1 + quest->isRepeatable;
           eventData.levelId = quest->issuerLocation;

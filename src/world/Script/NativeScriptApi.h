@@ -170,7 +170,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param );
 
-    virtual Event::EventHandler::EventState checkExtraConditions( Sapphire::Entity::Player& player, uint32_t eventId );
+    virtual Event::EventHandler::QuestAvailability getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId );
   };
 
   /*!

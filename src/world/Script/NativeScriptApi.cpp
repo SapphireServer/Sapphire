@@ -137,9 +137,9 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  Event::EventHandler::EventState EventScript::checkExtraConditions( Sapphire::Entity::Player& player, uint32_t eventId )
+  Event::EventHandler::QuestAvailability EventScript::getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId )
   {
-    return Event::EventHandler::EventState::Available;
+    return Event::EventHandler::QuestAvailability::Available;
   }
 
   ///////////////////////////////////////////////////////////////////

@@ -85,7 +85,7 @@ namespace Sapphire::Event
       QuestBattleDirector = 0x8006,
     };
 
-    enum class EventState : uint8_t
+    enum class QuestAvailability : uint8_t
     {
       Invisible,
       Available,
