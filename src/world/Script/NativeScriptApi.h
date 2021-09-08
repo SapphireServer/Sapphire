@@ -2,6 +2,7 @@
 #define NATIVE_SCRIPT_API
 
 #include <string>
+#include <Event/EventHandler.h>
 #include "ForwardsZone.h"
 
 #ifdef _MSC_VER
@@ -168,6 +169,8 @@ namespace Sapphire::ScriptAPI
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
     virtual void onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param );
+
+    virtual Event::EventHandler::QuestAvailability getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId );
   };
 
   /*!

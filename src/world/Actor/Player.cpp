@@ -19,6 +19,7 @@
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
+#include "Manager/MapMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
@@ -730,7 +731,7 @@ void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
   queuePacket( makeActorControlSelf( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
-bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
+bool Sapphire::Entity::Player::isActionLearned( uint32_t actionId ) const
 {
   uint16_t index;
   uint8_t value;
@@ -1284,6 +1285,17 @@ const uint8_t* Sapphire::Entity::Player::getOrchestrionBitmask() const
 const uint8_t* Sapphire::Entity::Player::getMountGuideBitmask() const
 {
   return m_mountGuide;
+}
+
+const bool Sapphire::Entity::Player::hasMount( uint32_t mountId ) const
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto mount = exdData.get< Data::Mount >( mountId );
+
+  if( mount->order == -1 || mount->modelChara == 0 )
+    return false;
+
+  return m_mountGuide[ mount->order / 8 ] & ( 1 << ( mount->order % 8 ) );
 }
 
 uint64_t Sapphire::Entity::Player::getContentId() const
@@ -1890,6 +1902,8 @@ Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 
 
   setZoningType( Common::ZoneingType::None );
   unsetStateFlag( PlayerStateFlag::BetweenAreas );
+  
+  Common::Service< MapMgr >::ref().updateAll( *this );
 }
 
 void Sapphire::Entity::Player::finishZoning()

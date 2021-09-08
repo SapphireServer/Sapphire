@@ -4366,8 +4366,10 @@ struct GuideTitle
 struct GuildleveAssignment
 {
   std::string type;
+  uint8_t typeId;
   uint32_t assignmentTalk;
   std::vector< uint32_t > quest;
+  uint8_t grandCompanyRank;
 
   GuildleveAssignment( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6324,12 +6326,13 @@ struct Quest
   uint8_t classJobCategory1;
   uint16_t classJobLevel1;
   uint8_t previousQuestJoin;
-  uint32_t previousQuest0;
-  uint32_t previousQuest1;
-  uint32_t previousQuest2;
+  std::vector< uint32_t > previousQuest;
+  uint8_t previousQuest0Sequence;
   uint8_t questLockJoin;
   std::vector< uint32_t > questLock;
   uint16_t header;
+  uint8_t startTown;
+  uint8_t classJobUnlockFlag;
   uint8_t classJobUnlock;
   uint8_t grandCompany;
   uint8_t grandCompanyRank;
@@ -6343,6 +6346,8 @@ struct Quest
   uint8_t beastTribe;
   uint8_t beastReputationRank;
   uint16_t beastReputationValue;
+  uint8_t satisfactionNpc;
+  uint8_t satisfactionLevel;
   int32_t mountRequired;
   bool isHouseRequired;
   uint8_t deliveryQuest;

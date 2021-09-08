@@ -1,7 +1,6 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
-#include <Event/EventHandler.h>
 #include "NativeScriptApi.h"
 #include <cassert>
 
@@ -136,6 +135,11 @@ namespace Sapphire::ScriptAPI
 
   void EventScript::onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param )
   {
+  }
+
+  Event::EventHandler::QuestAvailability EventScript::getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId )
+  {
+    return Event::EventHandler::QuestAvailability::Available;
   }
 
   ///////////////////////////////////////////////////////////////////

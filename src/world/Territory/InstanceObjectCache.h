@@ -7,6 +7,8 @@
 struct LGB_MAP_RANGE_ENTRY;
 struct LGB_EXIT_RANGE_ENTRY;
 struct LGB_POP_RANGE_ENTRY;
+struct LGB_ENPC_ENTRY;
+struct LGB_EOBJ_ENTRY;
 
 
 namespace Sapphire
@@ -34,6 +36,16 @@ namespace Sapphire
         {
           return rangeIt->second;
         }
+      }
+      return nullptr;
+    }
+    
+    ObjectMap* getAll( uint16_t zoneId )
+    {
+      auto it = m_objectCache.find( zoneId );
+      if( it != m_objectCache.end() )
+      {
+        return &it->second;
       }
       return nullptr;
     }
@@ -65,6 +77,11 @@ namespace Sapphire
     using MapRangePtr = std::shared_ptr< LGB_MAP_RANGE_ENTRY >;
     using ExitRangePtr = std::shared_ptr< LGB_EXIT_RANGE_ENTRY >;
     using PopRangePtr = std::shared_ptr< LGB_POP_RANGE_ENTRY >;
+    using EventNpcPtr = std::shared_ptr< LGB_ENPC_ENTRY >;
+    using EventObjPtr = std::shared_ptr< LGB_EOBJ_ENTRY >;
+
+    using EventNpcMapPtr = std::unordered_map< uint32_t, EventNpcPtr >*;
+    using EventObjMapPtr = std::unordered_map< uint32_t, EventObjPtr >*;
 
     InstanceObjectCache();
     ~InstanceObjectCache() = default;
@@ -72,11 +89,18 @@ namespace Sapphire
     MapRangePtr getMapRange( uint16_t zoneId, uint32_t mapRangeId );
     ExitRangePtr getExitRange( uint16_t zoneId, uint32_t exitRangeId );
     PopRangePtr getPopRange( uint16_t zoneId, uint32_t popRangeId );
+    EventNpcPtr getEventNpc( uint16_t zoneId, uint32_t eventNpcId );
+    EventObjPtr getEventObj( uint16_t zoneId, uint32_t eventObjId );
+        
+    EventNpcMapPtr getAllEventNpc( uint16_t zoneId );
+    EventObjMapPtr getAllEventObj( uint16_t zoneId );
 
   private:
     ObjectCache< LGB_MAP_RANGE_ENTRY > m_mapRangeCache;
     ObjectCache< LGB_EXIT_RANGE_ENTRY > m_exitRangeCache;
     ObjectCache< LGB_POP_RANGE_ENTRY > m_popRangeCache;
+    ObjectCache< LGB_ENPC_ENTRY > m_eventNpcCache;
+    ObjectCache< LGB_EOBJ_ENTRY > m_eventObjCache;
     std::shared_ptr< Framework > m_pFramework;
 
   };

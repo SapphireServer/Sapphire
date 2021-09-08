@@ -928,12 +928,11 @@ namespace Sapphire::Network::Packets::Server
 
     uint8_t unknown5;
     uint32_t unknown8;
-    uint16_t festivalId;
-    uint16_t additionalFestivalId;
     uint32_t unknown9;
     uint32_t unknown10;
-    uint32_t unknown11;
-    uint32_t unknown12[4];
+    uint32_t festivalId;
+    uint32_t unknown12[3];
+    uint32_t additionalFestivalId;
     uint32_t unknown13[3];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t unknown14[3];
@@ -2288,6 +2287,60 @@ namespace Sapphire::Network::Packets::Server
       uint8_t look[26];
       uint16_t padding3;
     } actors[2];
+  };
+
+  //For quests this is only used for pre-accepted ones. Accepted quests are getting handled by the client.
+  template< int ArgCount >
+  struct FFXIVIpcMapUpdateN
+  {
+    uint8_t entryCount;
+    uint8_t padding[ 3 ];
+    uint32_t iconIds[ ArgCount ];
+    uint32_t levelIds[ ArgCount ];
+    uint32_t eventIds[ ArgCount ]; // possible event ids for this: Quest, GuildLeveAssignment, GuildOrderGuide, TripleTriad, CustomTalk, PreHandler
+    uint8_t additionalData[ ArgCount ]; // use unknown
+  };
+
+  struct FFXIVIpcMapUpdate :
+    FFXIVIpcBasePacket< MapUpdate >,
+    FFXIVIpcMapUpdateN< 2 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate4 :
+    FFXIVIpcBasePacket< MapUpdate4 >,
+    FFXIVIpcMapUpdateN< 4 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate8 :
+    FFXIVIpcBasePacket< MapUpdate8 >,
+    FFXIVIpcMapUpdateN< 8 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate16 :
+    FFXIVIpcBasePacket< MapUpdate16 >,
+    FFXIVIpcMapUpdateN< 16 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate32 :
+    FFXIVIpcBasePacket< MapUpdate32 >,
+    FFXIVIpcMapUpdateN< 32 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate64 :
+    FFXIVIpcBasePacket< MapUpdate64 >,
+    FFXIVIpcMapUpdateN< 64 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate128 :
+    FFXIVIpcBasePacket< MapUpdate128 >,
+    FFXIVIpcMapUpdateN< 128 >
+  {
   };
 }
 
