@@ -269,12 +269,7 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
 
 void Sapphire::Territory::removeActor( Entity::ActorPtr pActor )
 {
-  float mx = pActor->getPos().x;
-  float my = pActor->getPos().z;
-  uint32_t cx = getPosX( mx );
-  uint32_t cy = getPosY( my );
-
-  Cell* pCell = getCellPtr( cx, cy );
+  Cell* pCell = pActor->getCellPtr();
   if( pCell && pCell->hasActor( pActor ) )
     pCell->removeActorFromCell( pActor );
 
