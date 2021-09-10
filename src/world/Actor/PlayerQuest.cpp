@@ -19,8 +19,6 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 {
   int8_t idx = getQuestIndex( questId );
 
-  removeQuest( questId );
-
   auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
   questFinishPacket->data().questId = questId;
   questFinishPacket->data().flag1 = 1;
@@ -28,6 +26,7 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
   queuePacket( questFinishPacket );
 
   updateQuestsCompleted( questId );
+  removeQuest( questId );
 
   //sendQuestTracker(); already sent in removeQuest()
 }
