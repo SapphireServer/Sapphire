@@ -437,31 +437,31 @@ bool Sapphire::World::Manager::MapMgr::isQuestVisible( Entity::Player& player, u
   }
   else if( questPtr->previousQuestJoin == 2 )
   {
-    for( int32_t i = 0; i < 3; i++ )
+    for( int32_t i = 0; i <= 3; i++ )
     {
+      if( i == 3 )
+        return false;
+
       if( questPtr->previousQuest[ i ] == 0 )
         continue;
 
       if( player.isQuestCompleted( questPtr->previousQuest[ i ] ) )
         break;
-
-      if( i == 2 )
-        return false;
     }
   }
 
   if( questPtr->questLockJoin == 1 )
   {
-    for( int32_t i = 0; i < 2; i++ )
+    for( int32_t i = 0; i <= 2; i++ )
     {
+      if( i == 2 )
+        return false;
+
       if( questPtr->questLock[ i ] == 0 )
         continue;
 
       if( !player.isQuestCompleted( questPtr->questLock[ i ] ) && !player.hasQuest( questPtr->questLock[ i ] ) )
         break;
-
-      if( i == 1 )
-        return false;
     }
   }
   else if( questPtr->questLockJoin == 2 )
