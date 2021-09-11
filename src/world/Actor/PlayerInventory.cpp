@@ -862,7 +862,9 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
       && !World::Manager::ItemMgr::isArmory( fromInventoryId ) )
   {
     updateContainer( fromInventoryId, fromSlotId, nullptr );
-    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( toSlot ) );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto itemInfo = exdData.get< Sapphire::Data::Item >( toItem->getId() );
+    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( itemInfo->equipSlotCategory ) );
     fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
   }
 
