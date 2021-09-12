@@ -91,7 +91,6 @@ void Sapphire::PublicContent::onUpdate( uint64_t tickCount )
 
 void Sapphire::PublicContent::onFinishLoading( Entity::Player& player )
 {
-  sendDirectorInit( player );
 }
 
 void Sapphire::PublicContent::onInitDirector( Entity::Player& player )
