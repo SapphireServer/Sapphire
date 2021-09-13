@@ -80,11 +80,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   // mark player as "bound by duty"
   player.setStateFlag( PlayerStateFlag::BoundByDuty );
 
-  // if the instance was not started yet, director init is sent on enter event.
-  // else it will be sent on finish loading.
-  if( m_state == Created )
-    sendDirectorInit( player );
-
+  sendDirectorInit( player );
 }
 
 void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
@@ -164,7 +160,6 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
 void Sapphire::InstanceContent::onFinishLoading( Entity::Player& player )
 {
-  sendDirectorInit( player );
 }
 
 void Sapphire::InstanceContent::onInitDirector( Entity::Player& player )
