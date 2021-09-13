@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <map>
+#include <unordered_map>
+#include <set>
 
 #include <variant>
 
@@ -30,19 +32,37 @@ namespace xiv::exd
   {
     std::shared_ptr< dat::File > file;
     uint32_t offset;
+    uint8_t subRows;
+  };
+
+  struct ExdRow
+  {
+    uint32_t rowId;
+    uint8_t subRowId;
+  };
+
+  struct exdRowSort
+  {
+    constexpr bool operator()( const ExdRow& _Left, const ExdRow& _Right ) const
+    {
+      if( _Left.rowId == _Right.rowId )
+        return _Left.subRowId < _Right.subRowId;
+
+      return _Left.rowId < _Right.rowId;
+    }
   };
 
   // Data for a given language
   class Exd
   {
   public:
-    // i_exh: the header
-    // i_files: the multiple exd files
+    // exh: the header
+    // files: the multiple exd files
     Exd()
     {
     }
 
-    Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File>>& i_files );
+    Exd( std::shared_ptr< Exh > exh, const std::vector< std::shared_ptr< dat::File > >& files );
 
     ~Exd();
 
@@ -53,12 +73,9 @@ namespace xiv::exd
     const std::vector< Field > get_row( uint32_t id, uint32_t subRow );
 
     // Get all rows
-    const std::map< uint32_t, std::vector< Field>>& get_rows();
+    const std::map< ExdRow, std::vector< Field >, exdRowSort > get_rows();
 
   protected:
-    // Data indexed by the ID of the row, the vector is field with the same order as exh.members
-    std::map< uint32_t, std::vector< Field>> _data;
-    std::vector< std::shared_ptr< dat::File>> _files;
     std::shared_ptr< Exh > _exh;
     std::map< uint32_t, ExdCacheEntry > _idCache;
   };

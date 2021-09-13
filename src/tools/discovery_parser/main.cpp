@@ -162,12 +162,12 @@ std::string zoneNameToPath( const std::string& name )
       auto teriPath = std::get< std::string >(
         fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
       ZoneInfo info;
-      info.id = row.first;
+      info.id = row.first.rowId;
       info.path = teriPath;
       info.name = teriName;
       info.mapId = std::get< uint16_t >(
         fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Map ) ) );
-      zoneInfoMap[ row.first ] = info;
+      zoneInfoMap[ row.first.rowId ] = info;
 
       if( !found && ( Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( teriName ) ) )
       {
@@ -212,7 +212,7 @@ void loadEobjNames()
   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
   for( auto& row : exd.get_rows() )
   {
-    auto id = row.first;
+    auto id = row.first.rowId;
     auto& fields = row.second;
     auto name = std::get< std::string >( fields.at( 0 ) );
     eobjNameMap[ id ] = name;
