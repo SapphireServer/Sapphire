@@ -739,7 +739,7 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
     sendStatusEffectUpdate(); // send if any equip is changed
 }
 
-bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
+bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem, bool writeToDb )
 {
   auto containerType = World::Manager::ItemMgr::getContainerType( storageId );
 
@@ -752,7 +752,8 @@ bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slot
     case Bag:
     case CurrencyCrystal:
     {
-      writeInventory( static_cast< InventoryType >( storageId ) );
+      if( writeToDb )
+        writeInventory( static_cast< InventoryType >( storageId ) );
       break;
     }
 
@@ -767,7 +768,8 @@ bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slot
       else
         unequipItem( static_cast< GearSetSlot >( slotId ), pItem, true );
 
-      writeInventory( static_cast< InventoryType >( storageId ) );
+      if( writeToDb )
+        writeInventory( static_cast< InventoryType >( storageId ) );
       break;
     }
     default:
@@ -804,7 +806,7 @@ void Sapphire::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t from
 
   fromItem->setStackSize( fromItem->getStackSize() - itemCount );
 
-  updateContainer( fromInventoryId, fromSlotId, fromItem );
+  updateContainer( fromInventoryId, fromSlotId, fromItem, fromInventoryId != toInventoryId );
   updateContainer( toInventoryId, toSlot, newItem );
 
   updateItemDb( fromItem );
@@ -835,7 +837,7 @@ void Sapphire::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t from
   {
     fromItem->setStackSize( stackOverflow );
     updateItemDb( fromItem );
-    updateContainer( fromInventoryId, fromSlotId, fromItem );
+    updateContainer( fromInventoryId, fromSlotId, fromItem, fromInventoryId != toInventoryId );
   }
 
 
@@ -871,7 +873,7 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
   auto containerTypeFrom = World::Manager::ItemMgr::getContainerType( fromInventoryId );
   auto containerTypeTo = World::Manager::ItemMgr::getContainerType( toInventoryId );
 
-  updateContainer( toInventoryId, toSlot, fromItem );
+  updateContainer( toInventoryId, toSlot, fromItem, fromInventoryId != toInventoryId );
   updateContainer( fromInventoryId, fromSlotId, toItem );
 
   if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||

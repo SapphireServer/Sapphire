@@ -948,7 +948,7 @@ namespace Sapphire::Entity
 
     ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
 
-    bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem );
+    bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem, bool writeToDb = true );
 
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();
