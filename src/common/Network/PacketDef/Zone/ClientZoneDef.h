@@ -447,7 +447,7 @@ struct FFXIVIpcHousingEditInterior :
 };
 
 struct FFXIVIpcEventYieldHandler :
-  FFXIVIpcBasePacket< EventYieldHandler >
+  FFXIVIpcBasePacket< EventYield2Handler >
 {
   uint32_t eventId;
   uint16_t scene;
@@ -467,7 +467,8 @@ struct FFXIVIpcEventYield16Handler :
 struct FFXIVIpcCFCommenceHandler :
   FFXIVIpcBasePacket< CFCommenceHandler >
 {
-  uint64_t param;
+  uint8_t param;
+  uint8_t dummy[7];
 };
 
 }
