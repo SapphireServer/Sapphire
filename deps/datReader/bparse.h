@@ -93,8 +93,26 @@ namespace xiv::utils::bparse
     }
   }
 
+  template< typename StructType >
+  StructType extract( std::vector< char >& data, uint32_t pos, bool isLe = true )
+  {
+    StructType tempStruct = *reinterpret_cast< StructType* >( &data[ pos ] );
+
+    if( std::is_class< StructType >::value )
+    {
+      reorder( tempStruct );
+    }
+    else if( !isLe )
+    {
+      tempStruct = byteswap( tempStruct );
+    }
+    return tempStruct;
+  }
+
   // For cstrings
   std::string extract_cstring( std::istream& i_stream, const std::string& i_name );
+
+  std::string extract_cstring( std::vector< char >& data, uint32_t pos );
 
 }
 

@@ -1,8 +1,6 @@
 #include "Exd.h"
 
 #include "bparse.h"
-#include "stream.h"
-#include <fstream>
 #include "Exh.h"
 
 using xiv::utils::bparse::extract;
@@ -53,32 +51,24 @@ template<>
 
 namespace xiv::exd
 {
-  Exd::Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File>>& i_files )
+  Exd::Exd( std::shared_ptr< Exh > exh, const std::vector< std::shared_ptr< dat::File > >& files )
   {
-    _exh = i_exh;
-    _files = i_files;
+    _exh = exh;
 
 
     // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
-    for( auto& file_ptr : _files )
+    for( auto& file : files )
     {
-      // Get a stream
-      std::vector< char > dataCpy = file_ptr->get_data_sections().front();
-      std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
+      std::vector< char > dataCpy = file->get_data_sections().front();
 
-      // Extract the header and skip to the record indices
-      auto exd_header = extract< ExdHeader >( iss );
-      iss.seekg( 0x20 );
+      // Extract the header
+      auto exdHeader = extract< ExdHeader >( dataCpy, 0 );
 
-      // Preallocate and extract the record_indices
-      const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndex );
-      std::vector< ExdRecordIndex > record_indices;
-      record_indices.reserve( record_count );
-      for( uint32_t i = 0; i < record_count; ++i )
+      const uint32_t recordCount = exdHeader.index_size / sizeof( ExdRecordIndex );
+      for( uint32_t i = 0; i < recordCount; ++i )
       {
-        auto recordIndex = extract< ExdRecordIndex >( iss );
-        _idCache[ recordIndex.id ] = ExdCacheEntry{ file_ptr, recordIndex.offset };
+        auto recordIndex = extract< ExdRecordIndex >( dataCpy, 32 + ( i * sizeof( ExdRecordIndex ) ) );
+        _idCache[ recordIndex.id ] = ExdCacheEntry{ file, recordIndex.offset + 6, extract< uint8_t >( dataCpy, recordIndex.offset + 5 ) };
       }
     }
   }
@@ -91,40 +81,24 @@ namespace xiv::exd
   {
 
     auto cacheEntryIt = _idCache.find( id );
-    if( cacheEntryIt == _idCache.end() )
-      throw std::runtime_error( "Id not found: " + std::to_string( id ) );
+    if( cacheEntryIt == _idCache.end() || subRow >= cacheEntryIt->second.subRows )
+      throw std::runtime_error( "Id + SubId combination not found: " + std::to_string( id ) + "." + std::to_string( subRow ) );
 
-    // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
-    auto& file_ptr = cacheEntryIt->second.file;
+    auto dataCpy = cacheEntryIt->second.file->get_data_sections().front();
 
-    std::vector< char > dataCpy = file_ptr->get_data_sections().front();
-    std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
+    std::vector< Field > fields;
+    fields.reserve( _exh->get_members().size() );
 
-    // Get the vector fields for the given record and preallocate it
-    auto fields = _data[ id ];
-    fields.reserve( member_count );
-    iss.seekg( cacheEntryIt->second.offset + 6 );
+    uint32_t baseOffset = cacheEntryIt->second.offset + ( subRow * _exh->get_header().data_offset + 2 * ( subRow + 1 ) );
 
-    uint8_t subRows = *reinterpret_cast< uint8_t* >( &dataCpy[ cacheEntryIt->second.offset + 5 ] );
-
-    if( subRow >= subRows )
-      throw std::runtime_error( "Out of bounds sub-row!" );
-
-    int offset = cacheEntryIt->second.offset + 6 + ( subRow * _exh->get_header().data_offset + 2 * ( subRow + 1 ) );
-
-    for( auto& member_entry : _exh->get_exh_members() )
+    for( auto& memberEntry : _exh->get_exh_members() )
     {
-      // Seek to the position of the member to extract.
-      // 6 is because we have uint32_t/uint16_t at the start of each record
-      iss.seekg( offset + member_entry.offset );
-
       // Switch depending on the type to extract
-      switch( member_entry.type )
+      switch( memberEntry.type )
       {
         case DataType::string:
           // Extract the offset to the actual string
-          // Seek to it then extract the actual string
+          // Then extract the actual string from that offset
         {
           throw std::runtime_error( "String not implemented for variant 2!" );
           //auto string_offset = extract<uint32_t>( iss, "string_offset", false );
@@ -134,50 +108,46 @@ namespace xiv::exd
           break;
 
         case DataType::boolean:
-          fields.emplace_back( extract< bool >( iss, "bool" ) );
+          fields.emplace_back( extract< bool >( dataCpy, baseOffset + memberEntry.offset ) );
           break;
 
         case DataType::int8:
-          fields.emplace_back( extract< int8_t >( iss, "int8_t" ) );
+          fields.emplace_back( extract< int8_t >( dataCpy, baseOffset + memberEntry.offset ) );
           break;
 
         case DataType::uint8:
-          fields.emplace_back( extract< uint8_t >( iss, "uint8_t" ) );
+          fields.emplace_back( extract< uint8_t >( dataCpy, baseOffset + memberEntry.offset ) );
           break;
 
         case DataType::int16:
-          fields.emplace_back( extract< int16_t >( iss, "int16_t", false ) );
+          fields.emplace_back( extract< int16_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
           break;
 
         case DataType::uint16:
-          fields.emplace_back( extract< uint16_t >( iss, "uint16_t", false ) );
+          fields.emplace_back( extract< uint16_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
           break;
 
         case DataType::int32:
-          fields.emplace_back( extract< int32_t >( iss, "int32_t", false ) );
+          fields.emplace_back( extract< int32_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
           break;
 
         case DataType::uint32:
-          fields.emplace_back( extract< uint32_t >( iss, "uint32_t", false ) );
+          fields.emplace_back( extract< uint32_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
           break;
 
         case DataType::float32:
-          fields.emplace_back( extract< float >( iss, "float", false ) );
+          fields.emplace_back( extract< float >( dataCpy, baseOffset + memberEntry.offset, false ) );
           break;
 
         case DataType::uint64:
-          fields.emplace_back( extract< uint64_t >( iss, "uint64_t", false ) );
+          fields.emplace_back( extract< uint64_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
           break;
 
         default:
-          auto type = static_cast< uint16_t >( member_entry.type );
+          auto type = static_cast< uint16_t >( memberEntry.type );
           if( type < 0x19 || type > 0x20 )
             throw std::runtime_error( "Unknown DataType: " + std::to_string( type ) );
-          uint64_t val = extract< uint64_t >( iss, "bool" );
-          int32_t shift = type - 0x19;
-          int32_t i = 1 << shift;
-          val &= i;
-          fields.emplace_back( ( val & i ) == i );
+          fields.emplace_back( ( extract< uint8_t >( dataCpy, baseOffset + memberEntry.offset ) & ( 1 << ( type - 0x19 ) ) ) != 0 );
           break;
       }
     }
@@ -193,84 +163,68 @@ namespace xiv::exd
     if( cacheEntryIt == _idCache.end() )
       throw std::runtime_error( "Id not found: " + std::to_string( id ) );
 
-    // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
-    auto& file_ptr = cacheEntryIt->second.file;
+    auto dataCpy = cacheEntryIt->second.file->get_data_sections().front();
 
-    std::vector< char > dataCpy = file_ptr->get_data_sections().front();
-    std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
+    std::vector< Field > fields;
+    fields.reserve( _exh->get_members().size() );
 
-    // Get the vector fields for the given record and preallocate it
-    auto fields = _data[ id ];
-    fields.reserve( member_count );
-    iss.seekg( cacheEntryIt->second.offset + 6 );
+    auto stringBaseOffset = cacheEntryIt->second.offset + _exh->get_header().data_offset;
 
-    uint8_t subRows = *reinterpret_cast< uint8_t* >( &dataCpy[ cacheEntryIt->second.offset + 5 ] );
-
-    for( auto& member_entry : _exh->get_exh_members() )
+    for( auto& memberEntry : _exh->get_exh_members() )
     {
-      // Seek to the position of the member to extract.
-      // 6 is because we have uint32_t/uint16_t at the start of each record
-      iss.seekg( cacheEntryIt->second.offset + 6 + member_entry.offset );
-
       // Switch depending on the type to extract
-      switch( member_entry.type )
+      switch( memberEntry.type )
       {
         case DataType::string:
           // Extract the offset to the actual string
-          // Seek to it then extract the actual string
+          // Then extract the actual string from that offset
         {
-          auto string_offset = extract< uint32_t >( iss, "string_offset", false );
-          iss.seekg( cacheEntryIt->second.offset + 6 + _exh->get_header().data_offset + string_offset );
-          fields.emplace_back( utils::bparse::extract_cstring( iss, "string" ) );
+          auto stringOffset = extract< uint32_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false );
+          fields.emplace_back( utils::bparse::extract_cstring( dataCpy, stringBaseOffset + stringOffset ) );
         }
           break;
 
         case DataType::boolean:
-          fields.emplace_back( extract< bool >( iss, "bool" ) );
+          fields.emplace_back( extract< bool >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset ) );
           break;
 
         case DataType::int8:
-          fields.emplace_back( extract< int8_t >( iss, "int8_t" ) );
+          fields.emplace_back( extract< int8_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset ) );
           break;
 
         case DataType::uint8:
-          fields.emplace_back( extract< uint8_t >( iss, "uint8_t" ) );
+          fields.emplace_back( extract< uint8_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset ) );
           break;
 
         case DataType::int16:
-          fields.emplace_back( extract< int16_t >( iss, "int16_t", false ) );
+          fields.emplace_back( extract< int16_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false ) );
           break;
 
         case DataType::uint16:
-          fields.emplace_back( extract< uint16_t >( iss, "uint16_t", false ) );
+          fields.emplace_back( extract< uint16_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false ) );
           break;
 
         case DataType::int32:
-          fields.emplace_back( extract< int32_t >( iss, "int32_t", false ) );
+          fields.emplace_back( extract< int32_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false ) );
           break;
 
         case DataType::uint32:
-          fields.emplace_back( extract< uint32_t >( iss, "uint32_t", false ) );
+          fields.emplace_back( extract< uint32_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false ) );
           break;
 
         case DataType::float32:
-          fields.emplace_back( extract< float >( iss, "float", false ) );
+          fields.emplace_back( extract< float >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false ) );
           break;
 
         case DataType::uint64:
-          fields.emplace_back( extract< uint64_t >( iss, "uint64_t", false ) );
+          fields.emplace_back( extract< uint64_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset, false ) );
           break;
 
         default:
-          auto type = static_cast< uint16_t >( member_entry.type );
+          auto type = static_cast< uint16_t >( memberEntry.type );
           if( type < 0x19 || type > 0x20 )
             throw std::runtime_error( "Unknown DataType: " + std::to_string( type ) );
-          uint64_t val = extract< uint64_t >( iss, "bool" );
-          int32_t shift = type - 0x19;
-          int32_t i = 1 << shift;
-          val &= i;
-          fields.emplace_back( ( val & i ) == i );
+          fields.emplace_back( ( extract< uint8_t >( dataCpy, cacheEntryIt->second.offset + memberEntry.offset ) & ( 1 << ( type - 0x19 ) ) ) != 0 );
           break;
       }
     }
@@ -279,106 +233,99 @@ namespace xiv::exd
   }
 
   // Get all rows
-  const std::map< uint32_t, std::vector< Field>>& Exd::get_rows()
+  const std::map< ExdRow, std::vector< Field >, exdRowSort > Exd::get_rows()
   {
-    // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
-    for( auto& file_ptr : _files )
+    std::map< ExdRow, std::vector< Field >, exdRowSort > data;
+
+    // Iterates over all the cached ids
+    const uint32_t memberCount = _exh->get_members().size();
+    for( auto& cacheEntry : _idCache )
     {
-      // Get a stream
-      std::vector< char > dataCpy = file_ptr->get_data_sections().front();
-      std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
+      std::vector< char > dataCpy = cacheEntry.second.file->get_data_sections().front();
 
-      // Extract the header and skip to the record indices
-      auto exd_header = extract< ExdHeader >( iss );
-      iss.seekg( 0x20 );
+      auto baseOffset = cacheEntry.second.offset;
+      auto stringBaseOffset = baseOffset + _exh->get_header().data_offset;
 
-      // Preallocate and extract the record_indices
-      const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndex );
-      std::vector< ExdRecordIndex > record_indices;
-      record_indices.reserve( record_count );
-      for( uint32_t i = 0; i < record_count; ++i )
-      {
-        record_indices.emplace_back( extract< ExdRecordIndex >( iss ) );
-      }
-
-      for( auto& record_index : record_indices )
+      for( int32_t i = 0; i < cacheEntry.second.subRows; i++ )
       {
         // Get the vector fields for the given record and preallocate it
-        auto& fields = _data[ record_index.id ];
-        fields.reserve( member_count );
+        ExdRow row = { cacheEntry.first, i };
+        auto& fields = data[ row ];
+        fields.reserve( memberCount );
 
-        for( auto& member_entry : _exh->get_exh_members() )
+        if( _exh->get_header().variant == 2 )
+          baseOffset = cacheEntry.second.offset + ( i * _exh->get_header().data_offset + 2 * ( i + 1 ) );
+
+        for( auto& memberEntry : _exh->get_exh_members() )
           //for( auto& member_entry : _exh->get_members() )
         {
-          // Seek to the position of the member to extract.
-          // 6 is because we have uint32_t/uint16_t at the start of each record
-          iss.seekg( record_index.offset + 6 + member_entry.offset );
-
           // Switch depending on the type to extract
-          switch( member_entry.type )
+          switch( memberEntry.type )
           {
             case DataType::string:
               // Extract the offset to the actual string
-              // Seek to it then extract the actual string
+              // Then extract the actual string from that offset
             {
-              auto string_offset = extract< uint32_t >( iss, "string_offset", false );
-              iss.seekg( record_index.offset + 6 + _exh->get_header().data_offset + string_offset );
-              fields.emplace_back( utils::bparse::extract_cstring( iss, "string" ) );
+              if( _exh->get_header().variant == 1 )
+              {
+                auto stringOffset = extract< uint32_t >( dataCpy, baseOffset + memberEntry.offset, false );
+                fields.emplace_back( utils::bparse::extract_cstring( dataCpy, stringBaseOffset + stringOffset ) );
+              }
+              else if( _exh->get_header().variant == 2 )
+              {
+                throw std::runtime_error( "String not implemented for variant 2!" );
+              }
             }
               break;
 
             case DataType::boolean:
-              fields.emplace_back( extract< bool >( iss, "bool" ) );
+              fields.emplace_back( extract< bool >( dataCpy, baseOffset + memberEntry.offset ) );
               break;
 
             case DataType::int8:
-              fields.emplace_back( extract< int8_t >( iss, "int8_t" ) );
+              fields.emplace_back( extract< int8_t >( dataCpy, baseOffset + memberEntry.offset ) );
               break;
 
             case DataType::uint8:
-              fields.emplace_back( extract< uint8_t >( iss, "uint8_t" ) );
+              fields.emplace_back( extract< uint8_t >( dataCpy, baseOffset + memberEntry.offset ) );
               break;
 
             case DataType::int16:
-              fields.emplace_back( extract< int16_t >( iss, "int16_t", false ) );
+              fields.emplace_back( extract< int16_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
               break;
 
             case DataType::uint16:
-              fields.emplace_back( extract< uint16_t >( iss, "uint16_t", false ) );
+              fields.emplace_back( extract< uint16_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
               break;
 
             case DataType::int32:
-              fields.emplace_back( extract< int32_t >( iss, "int32_t", false ) );
+              fields.emplace_back( extract< int32_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
               break;
 
             case DataType::uint32:
-              fields.emplace_back( extract< uint32_t >( iss, "uint32_t", false ) );
+              fields.emplace_back( extract< uint32_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
               break;
 
             case DataType::float32:
-              fields.emplace_back( extract< float >( iss, "float", false ) );
+              fields.emplace_back( extract< float >( dataCpy, baseOffset + memberEntry.offset, false ) );
               break;
 
             case DataType::uint64:
-              fields.emplace_back( extract< uint64_t >( iss, "uint64_t", false ) );
+              fields.emplace_back( extract< uint64_t >( dataCpy, baseOffset + memberEntry.offset, false ) );
               break;
 
             default:
-              auto type = static_cast< uint16_t >( member_entry.type );
+              auto type = static_cast< uint16_t >( memberEntry.type );
               if( type < 0x19 || type > 0x20 )
                 throw std::runtime_error( "Unknown DataType: " + std::to_string( type ) );
-              uint64_t val = extract< uint64_t >( iss, "bool" );
-              int32_t shift = type - 0x19;
-              int32_t i = 1 << shift;
-              val &= i;
-              fields.emplace_back( ( val & i ) == i );
+              fields.emplace_back( ( extract< uint8_t >( dataCpy, baseOffset + memberEntry.offset ) & ( 1 << ( type - 0x19 ) ) ) != 0 );
               break;
           }
         }
       }
     }
-    return _data;
+    return data;
+
   }
 
 }
