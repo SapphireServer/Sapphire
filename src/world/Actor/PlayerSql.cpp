@@ -159,6 +159,8 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
 
   m_gmRank = res->getUInt8( "GMRank" );
 
+  m_equippedMannequin = res->getUInt8( "EquippedMannequin" );
+
   m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
 
   m_pose = res->getUInt8( "Pose" );
@@ -452,7 +454,7 @@ void Sapphire::Entity::Player::updateSql()
   memcpy( orchestrionVec.data(), m_orchestrion, sizeof( m_orchestrion ) );
   stmt->setBinary( 42, mountsVec );
 
-  stmt->setInt( 44, 0 ); // EquippedMannequin
+  stmt->setInt( 44, m_equippedMannequin ); // EquippedMannequin
 
   stmt->setInt( 45, 0 ); // DisplayFlags
   std::vector< uint8_t > questCompleteVec( sizeof( m_questCompleteFlags ) );
@@ -538,14 +540,14 @@ void Sapphire::Entity::Player::updateDbMonsterNote()
   db.execute( stmt );
 }
 
-void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex ) const
+void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex, const uint8_t classJobLevel ) const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmtClass = db.getPreparedStatement( Db::CHARA_CLASS_INS );
   stmtClass->setInt( 1, getId() );
   stmtClass->setInt( 2, classJobIndex );
   stmtClass->setInt( 3, 0 );
-  stmtClass->setInt( 4, 1 );
+  stmtClass->setInt( 4, classJobLevel );
   db.directExecute( stmtClass );
 }
 

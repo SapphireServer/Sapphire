@@ -47,12 +47,26 @@ void ItemAction::execute()
 
       break;
     }
+
+    case Common::ItemActionType::ItemActionMount:
+    {
+      handleMountItem();
+
+      break;
+    }
   }
 }
 
 void ItemAction::interrupt()
 {
 
+}
+
+void ItemAction::handleMountItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+  player->unlockMount( m_itemAction->data[ 0 ] );
+  player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot, false );
 }
 
 void ItemAction::handleVFXItem()

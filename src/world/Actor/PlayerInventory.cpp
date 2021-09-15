@@ -436,6 +436,14 @@ void Sapphire::Entity::Player::sendInventory()
   }
 }
 
+void Sapphire::Entity::Player::sendGearInventory()
+{
+  auto& invMgr = Common::Service< World::Manager::InventoryMgr >::ref();
+
+  invMgr.sendInventoryContainer( *this, m_storageMap[ GearSet0 ] );
+}
+
+
 Sapphire::Entity::Player::InvSlotPairVec Sapphire::Entity::Player::getSlotsOfItemsInInventory( uint32_t catalogId )
 {
   InvSlotPairVec outVec;
@@ -710,7 +718,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 }
 
 void
-Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot )
+Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, bool sendUpdate )
 {
 
   auto tmpItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
@@ -729,14 +737,23 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
     writeInventory( static_cast< InventoryType >( fromInventoryId ) );
 
   if( static_cast< InventoryType >( toInventoryId ) == GearSet0 )
-    equipItem( static_cast< GearSetSlot >( toSlot ), tmpItem, true );
+    equipItem( static_cast< GearSetSlot >( toSlot ), tmpItem, sendUpdate );
 
   if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
-    unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem, true );
+    unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem, sendUpdate );
 
   if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
       static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
     sendStatusEffectUpdate(); // send if any equip is changed
+}
+
+bool Sapphire::Entity::Player::updateGearContainer( uint8_t slotId, ItemPtr pItem )
+{
+  m_storageMap[ GearSet0 ]->setItem( slotId, pItem );
+
+  writeInventory( GearSet0 );
+
+  return true;
 }
 
 bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )

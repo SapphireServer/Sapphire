@@ -858,6 +858,13 @@ void Sapphire::Entity::Player::setExp( uint32_t amount )
   m_expArray[ classJobIndex ] = amount;
 }
 
+void Sapphire::Entity::Player::setExp( uint8_t classId, uint32_t amount )
+{
+  auto exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( classId ) )->expArrayIndex;
+  m_expArray[ classJobIndex ] = amount;
+}
+
 bool Sapphire::Entity::Player::isInCombat() const
 {
   return m_bInCombat;
@@ -909,9 +916,11 @@ void Sapphire::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob
   uint8_t classJobIndex = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( classjob ) )->expArrayIndex;
 
   if( m_classArray[ classJobIndex ] == 0 )
-    insertDbClass( classJobIndex );
+    insertDbClass( classJobIndex, level );
 
   m_classArray[ classJobIndex ] = level;
+
+  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::ClassJobUpdate, static_cast< uint8_t >( classjob ), level ) );
 }
 
 void Sapphire::Entity::Player::sendModel()
@@ -1287,6 +1296,19 @@ const uint8_t* Sapphire::Entity::Player::getMountGuideBitmask() const
   return m_mountGuide;
 }
 
+void Sapphire::Entity::Player::unlockMount( uint32_t mountId )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto mount = exdData.get< Data::Mount >( mountId );
+
+  if ( mount->order == -1 || mount->modelChara == 0 )
+    return;
+
+  m_mountGuide[ mount->order / 8 ] |= ( 1 << ( mount->order % 8 ) );
+
+  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::SetMountBitmask, mount->order, 1 ) );
+}
+
 const bool Sapphire::Entity::Player::hasMount( uint32_t mountId ) const
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
@@ -1563,12 +1585,24 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
   sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
 }
 
+void Sapphire::Entity::Player::setEquippedMannequin( uint8_t amount )
+{
+  m_equippedMannequin = amount;
+
+  queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
+}
+
 void Sapphire::Entity::Player::setEquipDisplayFlags( uint8_t state )
 {
   m_equipDisplayFlags = state;
   auto paramPacket = makeZonePacket< FFXIVIpcEquipDisplayFlags >( getId() );
   paramPacket->data().bitmask = m_equipDisplayFlags;
   sendToInRangeSet( paramPacket, true );
+}
+
+uint8_t Sapphire::Entity::Player::getEquippedMannequin() const
+{
+  return m_equippedMannequin;
 }
 
 uint8_t Sapphire::Entity::Player::getEquipDisplayFlags() const
@@ -1779,6 +1813,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( isLogin() )
   {
     queuePacket( makeActorControlSelf( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+    queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )

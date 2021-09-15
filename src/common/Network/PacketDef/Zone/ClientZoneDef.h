@@ -471,6 +471,14 @@ struct FFXIVIpcCFCommenceHandler :
   uint8_t dummy[7];
 };
 
+struct FFXIVInventoryEquipRecommendedItemsHandler :
+  FFXIVIpcBasePacket< InventoryEquipRecommendedItems >
+{
+  uint32_t contextId;
+  uint16_t storageId[14];
+  int16_t containerIndex[14];
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H
