@@ -302,7 +302,28 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
   if( !pQuestBattleInfo )
     return nullptr;
 
-  auto pQuestInfo = exdData.get< Sapphire::Data::Quest >( pQuestBattleInfo->quest );
+  auto eventId = pQuestBattleInfo->quest;
+  auto eventType = static_cast< Event::EventHandler::EventHandlerType >( eventId >> 16 );
+  switch( eventType )
+  {
+    case Event::EventHandler::EventHandlerType::Array:
+    {
+      auto eventArray = exdData.get< Sapphire::Data::ArrayEventHandler >( eventId );
+      if( eventArray )
+      {
+        for( int i = 0; i < eventArray->data.size(); i++ )
+        {
+          auto nextId = eventArray->data[ i ];
+          if( nextId == 0 )
+            break;
+          eventId = nextId;
+        }
+      }
+      break;
+    }
+  }
+
+  auto pQuestInfo = exdData.get< Sapphire::Data::Quest >( eventId );
   if( !pQuestInfo )
     return nullptr;
 
