@@ -680,6 +680,7 @@ namespace Sapphire::Common
     ItemActionVFX = 852,
     ItemActionVFX2 = 944,
     ItemActionMount = 1322,
+    ItemActionOrchestrion = 5845,
   };
 
   enum ActionEffectDisplayType : uint8_t
