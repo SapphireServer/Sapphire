@@ -29,6 +29,8 @@ namespace Sapphire::World::Action
 
     void handleMountItem();
 
+    void handleOrchestrionItem();
+
   private:
     Sapphire::Data::ItemActionPtr m_itemAction;
 

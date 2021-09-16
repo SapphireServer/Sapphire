@@ -348,6 +348,9 @@ namespace Sapphire::Entity
     /*! send player ilvl */
     void sendItemLevel();
 
+    /*! set player ilvl */
+    void setItemLevel();
+
     /*! get the current main hand model */
     uint64_t getModelMainWeapon() const;
 
@@ -946,12 +949,14 @@ namespace Sapphire::Entity
 
     InvSlotPair getFreeBagSlot();
 
+    InvSlotPair getFreeContainerSlot( uint32_t containerId );
+
     ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
     ItemPtr addItem( ItemPtr itemToAdd, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
 
     void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, bool sendUpdate = true );
 
-    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, bool sendUpdate = true );
 
     void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
 
@@ -963,8 +968,6 @@ namespace Sapphire::Entity
     ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
 
     bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem );
-
-    bool updateGearContainer( uint8_t slotId, ItemPtr pItem );
 
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();

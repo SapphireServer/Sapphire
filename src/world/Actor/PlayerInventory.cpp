@@ -110,6 +110,11 @@ void Sapphire::Entity::Player::sendItemLevel()
   queuePacket( makeActorControl( getId(), SetItemLevel, getItemLevel(), 0 ) );
 }
 
+void Sapphire::Entity::Player::setItemLevel()
+{
+  m_itemLevel = calculateEquippedGearItemLevel();
+}
+
 void Sapphire::Entity::Player::equipWeapon( ItemPtr pItem, bool updateClass )
 {
   auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
@@ -459,6 +464,17 @@ Sapphire::Entity::Player::InvSlotPairVec Sapphire::Entity::Player::getSlotsOfIte
   return outVec;
 }
 
+Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeContainerSlot( uint32_t containerId )
+{
+  auto freeSlot = static_cast < int8_t >( m_storageMap[ containerId ]->getFreeSlot() );
+
+  if( freeSlot != -1 )
+      return std::make_pair( containerId, freeSlot );
+
+  // no room in inventory
+  return std::make_pair( 0, -1 );
+}
+
 Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeBagSlot()
 {
   for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
@@ -742,18 +758,9 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
   if( static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
     unequipItem( static_cast< GearSetSlot >( fromSlotId ), tmpItem, sendUpdate );
 
-  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
-      static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+  if( ( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
+      static_cast< InventoryType >( fromInventoryId ) == GearSet0 ) && sendUpdate )
     sendStatusEffectUpdate(); // send if any equip is changed
-}
-
-bool Sapphire::Entity::Player::updateGearContainer( uint8_t slotId, ItemPtr pItem )
-{
-  m_storageMap[ GearSet0 ]->setItem( slotId, pItem );
-
-  writeInventory( GearSet0 );
-
-  return true;
 }
 
 bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
@@ -863,7 +870,7 @@ void Sapphire::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t from
 }
 
 void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromSlotId,
-                                         uint16_t toInventoryId, uint8_t toSlot )
+                                         uint16_t toInventoryId, uint8_t toSlot, bool sendUpdate )
 {
   auto fromItem = m_storageMap[ fromInventoryId ]->getItem( fromSlotId );
   auto toItem = m_storageMap[ toInventoryId ]->getItem( toSlot );
@@ -891,8 +898,8 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
   updateContainer( toInventoryId, toSlot, fromItem );
   updateContainer( fromInventoryId, fromSlotId, toItem );
 
-  if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
-    static_cast< InventoryType >( fromInventoryId ) == GearSet0 )
+  if( ( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
+    static_cast< InventoryType >( fromInventoryId ) == GearSet0 ) && sendUpdate )
     sendStatusEffectUpdate(); // send if any equip is changed
 }
 
