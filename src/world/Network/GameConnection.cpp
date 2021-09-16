@@ -138,8 +138,6 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::WorldInteractionHandler, "WorldInteractionHandler", &GameConnection::worldInteractionhandler );
   setZoneHandler( ClientZoneIpcType::Dive, "Dive", &GameConnection::diveHandler );
 
-  setZoneHandler( ClientZoneIpcType::InventoryEquipRecommendedItems, "InventoryEquipRecommendedItemsHandler", &GameConnection::inventoryEquipRecommendedItemsHandler );
-
   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
 
 }
