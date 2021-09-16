@@ -38,7 +38,6 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
-#include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
@@ -48,7 +47,6 @@
 #include "Manager/RNGMgr.h"
 
 #include "Action/Action.h"
-#include "Inventory/Item.h"
 
 #include "Session.h"
 #include "ServerMgr.h"
