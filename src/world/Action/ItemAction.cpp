@@ -57,7 +57,7 @@ void ItemAction::execute()
 
     case Common::ItemActionType::ItemActionOrchestrion:
     {
-      handleOrchestrionItem();
+      //handleOrchestrionItem();
 
       break;
     }
@@ -73,13 +73,6 @@ void ItemAction::handleMountItem()
 {
   auto player = getSourceChara()->getAsPlayer();
   player->unlockMount( m_itemAction->data[ 0 ] );
-  player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot, false );
-}
-
-void ItemAction::handleOrchestrionItem()
-{
-  auto player = getSourceChara()->getAsPlayer();
-  player->learnSong( m_itemAction->data[ 0 ], m_itemAction->data[ 1 ] );
   player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot, false );
 }
 
