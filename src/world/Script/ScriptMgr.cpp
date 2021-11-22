@@ -2,10 +2,12 @@
 #include <Exd/ExdDataGenerated.h>
 
 #include <watchdog/Watchdog.h>
+#include <Service.h>
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
@@ -22,18 +24,16 @@
 
 #include "NativeScriptMgr.h"
 #include "ServerMgr.h"
-#include "Framework.h"
 
 // enable the ambiguity fix for every platform to avoid #define nonsense
 #define WIN_AMBIGUITY_FIX
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
-Sapphire::Scripting::ScriptMgr::ScriptMgr( FrameworkPtr pFw ) :
-  World::Manager::BaseManager( pFw ),
+Sapphire::Scripting::ScriptMgr::ScriptMgr() :
   m_firstScriptChangeNotificiation( false )
 {
-  m_nativeScriptMgr = createNativeScriptMgr( pFw );
+  m_nativeScriptMgr = createNativeScriptMgr();
 }
 
 Sapphire::Scripting::ScriptMgr::~ScriptMgr()
@@ -49,9 +49,9 @@ void Sapphire::Scripting::ScriptMgr::update()
 bool Sapphire::Scripting::ScriptMgr::init()
 {
   std::set< std::string > files;
-  auto pServerMgr = framework()->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
-  auto status = loadDir( pServerMgr->getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
+  auto status = loadDir( serverMgr.getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
   {
@@ -81,12 +81,12 @@ bool Sapphire::Scripting::ScriptMgr::init()
 
 void Sapphire::Scripting::ScriptMgr::watchDirectories()
 {
-  auto pServerMgr = framework()->get< World::ServerMgr >();
-  auto shouldWatch = pServerMgr->getConfig().scripts.hotSwap;
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto shouldWatch = serverMgr.getConfig().scripts.hotSwap;
   if( !shouldWatch )
     return;
 
-  Watchdog::watchMany( pServerMgr->getConfig().scripts.path + "*" +
+  Watchdog::watchMany( serverMgr.getConfig().scripts.path + "*" +
                        m_nativeScriptMgr->getModuleExtension(),
                        [ this ]( const std::vector< ci::fs::path >& paths )
                        {
@@ -256,10 +256,10 @@ bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& 
 bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId,
                                                   uint32_t eventId, uint32_t castTime, uint64_t targetId )
 {
-  auto pEventMgr = framework()->get< World::Manager::EventMgr >();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   std::string eventName = "onEventItem";
-  std::string objName = pEventMgr->getEventName( eventId );
+  std::string objName = eventMgr.getEventName( eventId );
   player.sendDebug( "Calling: {0}.{1} - {2}", objName, eventName, eventId );
 
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
@@ -276,7 +276,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
 
 bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId )
 {
-  auto pEventMgr = framework()->get< World::Manager::EventMgr >();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   // loop through all active quests and try to call available onBNpcKill callbacks
   for( size_t i = 0; i < 30; i++ )
@@ -285,12 +285,12 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
     if( !activeQuests )
       continue;
 
-    uint32_t questId = activeQuests->c.questId | Event::EventHandler::EventHandlerType::Quest << 16;
+    uint32_t questId = activeQuests->c.questId | static_cast< uint16_t >( Event::EventHandler::EventHandlerType::Quest ) << 16;
 
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
     {
-      std::string objName = pEventMgr->getEventName( questId );
+      std::string objName = eventMgr.getEventName( questId );
 
       player.sendDebug( "Calling: {0}.onBnpcKill nameId#{1}", objName, nameId );
 
@@ -303,7 +303,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
 
 bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
 {
-  auto pEventMgr = framework()->get< World::Manager::EventMgr >();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
   bool didCallScript = false;
 
   for( size_t i = 0; i < 30; i++ )
@@ -312,13 +312,13 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
     if( !activeQuests )
       continue;
 
-    uint32_t questId = activeQuests->c.questId | Event::EventHandler::EventHandlerType::Quest << 16;
+    uint32_t questId = activeQuests->c.questId | static_cast< uint16_t >( Event::EventHandler::EventHandlerType::Quest ) << 16;
 
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
     if( script )
     {
       didCallScript = true;
-      std::string objName = pEventMgr->getEventName( questId );
+      std::string objName = eventMgr.getEventName( questId );
 
       player.sendDebug( "Calling: {0}.onEObjHit actorId#{1}", objName, actorId );
 
@@ -531,13 +531,86 @@ Sapphire::Scripting::NativeScriptMgr& Sapphire::Scripting::ScriptMgr::getNativeS
   return *m_nativeScriptMgr;
 }
 
-bool
-Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
+bool Sapphire::Scripting::ScriptMgr::onDutyComplete( Sapphire::QuestBattlePtr instance, Sapphire::Entity::Player& player )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance->getDirectorId() );
   if( script )
   {
     script->onDutyComplete( *instance, player );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onEventYield( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t scene, std::vector< uint32_t > param )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+  if( script )
+  {
+    script->onEventYield( player, scene, param );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onPublicContentInit( PublicContentPtr instance )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onInit( *instance );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onPublicContentUpdate( PublicContentPtr instance, uint64_t tickCount )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+
+  if( script )
+  {
+    script->onUpdate( *instance, tickCount );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onPublicContentPlayerZoneIn( PublicContentPtr instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onPlayerZoneIn( *instance, player );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onPublicContentLeaveTerritory( PublicContentPtr instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onLeaveTerritory( *instance, player );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onPublicContentEnterTerritory( PublicContentPtr instance, Entity::Player& player,
+  uint32_t eventId, uint16_t param1, uint16_t param2 )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::PublicContentScript >( instance->getDirectorId() );
+  if( script )
+  {
+    script->onEnterTerritory( *instance, player, eventId, param1, param2 );
     return true;
   }
 

@@ -25,9 +25,8 @@ extern Lobby::ServerLobby g_serverLobby;
 extern Lobby::RestConnector g_restConnector;
 
 Lobby::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                Sapphire::Network::AcceptorPtr pAcceptor,
-                                                FrameworkPtr pFw ) :
-  Sapphire::Network::Connection( pHive, pFw ),
+                                                Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Sapphire::Network::Connection( pHive ),
   m_pAcceptor( pAcceptor ),
   m_bEncryptionInitialized( false )
 {
@@ -42,7 +41,7 @@ Lobby::GameConnection::~GameConnection()
 // overwrite the parents onConnect for our game socket needs
 void Lobby::GameConnection::onAccept( const std::string& host, uint16_t port )
 {
-  auto connection = make_GameConnection( m_hive, m_pAcceptor, m_pFw );
+  auto connection = make_GameConnection( m_hive, m_pAcceptor );
   m_pAcceptor->accept( connection );
 
   Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
@@ -267,7 +266,7 @@ bool Lobby::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet,
   }
   else
   {
-    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x20 ) );
+    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x22 ) );
     sendError( 1, 5006, 13001, tmpId );
 
     return true;
@@ -453,8 +452,8 @@ void Lobby::GameConnection::generateEncryptionKey( uint32_t key, const std::stri
   m_baseKey[ 2 ] = 0x34;
   m_baseKey[ 3 ] = 0x12;
   memcpy( m_baseKey + 0x04, &key, 4 );
-  m_baseKey[ 8 ] = 0x88;
-  m_baseKey[ 9 ] = 0x13;
+  m_baseKey[ 8 ] = 0x18;
+  m_baseKey[ 9 ] = 0x15;
   memcpy( ( char* ) m_baseKey + 0x0C, keyPhrase.c_str(), keyPhrase.size() );
   Common::Util::md5( m_baseKey, m_encKey, 0x2C );
 }

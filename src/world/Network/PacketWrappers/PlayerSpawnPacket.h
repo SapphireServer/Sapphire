@@ -8,6 +8,8 @@
 #include "Forwards.h"
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
+#include "Territory/Territory.h"
+#include "Event/Director.h"
 
 namespace Sapphire::Network::Packets::Server
 {
@@ -37,11 +39,9 @@ namespace Sapphire::Network::Packets::Server
 
       m_data.hPCurr = player.getHp();
       m_data.mPCurr = player.getMp();
-      m_data.tPCurr = player.getTp();
       m_data.hPMax = player.getMaxHp();
       m_data.mPMax = player.getMaxMp();
 
-      //m_data.tPMax = 3000;
       m_data.level = player.getLevel();
       m_data.gmRank = player.getGmRank();
       m_data.pose = player.getPose();
@@ -142,9 +142,13 @@ namespace Sapphire::Network::Packets::Server
                                                                        ( currentTimeMs -
                                                                          effect.second->getStartTimeMs() ) ) / 1000;
         m_data.effect[ effect.first ].sourceActorId = effect.second->getSrcActorId();
-        m_data.effect[ effect.first ].unknown1 = effect.second->getParam();
+        m_data.effect[ effect.first ].param = effect.second->getParam();
       }
 
+      if( auto d = player.getCurrentTerritory()->getAsDirector() )
+      {
+        m_data.directorId = d->getDirectorId();
+      }
     };
   };
 

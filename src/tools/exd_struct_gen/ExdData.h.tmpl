@@ -13,8 +13,12 @@
 #include <set>
 #include <variant>
 
-namespace Sapphire {
-namespace Data {
+#if _WIN32
+#undef near
+#undef far
+#endif
+
+namespace Sapphire::Data {
 
 class ExdDataGenerated;
 
@@ -42,6 +46,11 @@ STRUCTS
 
     std::shared_ptr< xiv::dat::GameData > m_data;
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
+
+    std::shared_ptr< xiv::dat::GameData > getGameData()
+    {
+      return m_data;
+    }
 
     template< class T >
     std::shared_ptr< T > get( uint32_t id )
@@ -83,7 +92,6 @@ IDLISTGETTERS
 
   };
 
-}
 }
 
 #endif

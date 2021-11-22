@@ -4,7 +4,6 @@
 #include "Logging/Logger.h"
 
 #include "PreparedStatement.h"
-#include "Framework.h"
 
 Sapphire::Db::DbConnection::DbConnection( ConnectionInfo& connInfo ) :
   m_reconnecting( false ),

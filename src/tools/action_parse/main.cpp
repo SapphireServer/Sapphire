@@ -17,15 +17,15 @@
 #include <streambuf>
 #include <regex>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 Sapphire::Data::ExdDataGenerated g_exdData;
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 using namespace Sapphire;
 
-const std::string datLocation( "/home/mordred/sqpack" );
+std::string datLocation( "/home/mordred/sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
 struct ActionEntry
@@ -69,13 +69,18 @@ uint32_t stripNonNumerics( std::string& str )
   return std::atoi( str.c_str() );
 }
 
-int main()
+int main( int argc, char* argv[] )
 {
 
   Logger::init( "action_parse" );
 
   if( !fs::exists( "ActionLutData.cpp.tmpl" ) )
     throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
+
+  if( argc == 2 )
+  {
+    datLocation = std::string( argv[ 1 ] );
+  }
 
   Logger::info( "Setting up EXD data" );
   if( !g_exdData.init( datLocation ) )
@@ -249,11 +254,11 @@ int main()
 //                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
 //                  data.curePotency, data.restorePercentage );
 
-    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {} }} }},\n",
+    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {}, {} }} }},\n",
                             data.name, action.first,
                             data.potency, data.comboPotency,
                             data.flankPotency, data.frontPotency, data.rearPotency,
-                            data.curePotency );
+                            data.curePotency, 0 );
 
     output += out;
 //    Logger::info( out );

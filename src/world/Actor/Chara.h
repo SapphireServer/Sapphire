@@ -126,7 +126,6 @@ namespace Sapphire::Entity
     std::queue< uint8_t > m_statusEffectFreeSlotQueue;
     std::vector< std::pair< uint8_t, uint32_t > > m_statusEffectList;
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
-    FrameworkPtr m_pFw;
 
     /*! Detour Crowd AgentId */
     uint32_t m_agentId;
@@ -135,7 +134,7 @@ namespace Sapphire::Entity
     float m_radius;
 
   public:
-    Chara( Common::ObjKind type, FrameworkPtr pFw );
+    Chara( Common::ObjKind type );
 
     virtual ~Chara() override;
 
@@ -251,7 +250,7 @@ namespace Sapphire::Entity
 
     virtual void onActionFriendly( Chara& pSource ) {};
 
-    virtual void onTick() {};
+    virtual void onTick();
 
     virtual void changeTarget( uint64_t targetId );
 
@@ -262,6 +261,8 @@ namespace Sapphire::Entity
     virtual void takeDamage( uint32_t damage );
 
     virtual void heal( uint32_t amount );
+
+    virtual void restoreMP( uint32_t amount );
 
     virtual bool checkAction();
 

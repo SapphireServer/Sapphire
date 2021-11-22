@@ -9,7 +9,7 @@
 
 #include "ForwardsZone.h"
 
-#define DECLARE_HANDLER( x ) void x( FrameworkPtr pFw, const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+#define DECLARE_HANDLER( x ) void x( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
 namespace Sapphire::Network::Packets
 {
@@ -32,8 +32,7 @@ namespace Sapphire::Network
   {
 
   private:
-    typedef void ( GameConnection::* Handler )( FrameworkPtr pFw,
-                                                const Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
+    typedef void ( GameConnection::* Handler )( const Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                 Entity::Player& player );
 
     using HandlerMap = std::map< uint16_t, Handler >;
@@ -58,7 +57,7 @@ namespace Sapphire::Network
   public:
     ConnectionType m_conType;
 
-    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor, FrameworkPtr pFw );
+    GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
 
     ~GameConnection();
 
@@ -156,6 +155,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( cfDutyAccepted );
 
+    DECLARE_HANDLER( cfCancel );
+
     DECLARE_HANDLER( actionHandler );
 
     DECLARE_HANDLER( placedActionHandler );
@@ -180,12 +181,21 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( reqMoveHousingItem );
 
+    DECLARE_HANDLER( housingEditExterior );
+
+    DECLARE_HANDLER( housingEditInterior );
+
     DECLARE_HANDLER( marketBoardSearch );
 
     DECLARE_HANDLER( marketBoardRequestItemInfo );
 
     DECLARE_HANDLER( marketBoardRequestItemListings );
 
+    DECLARE_HANDLER( worldInteractionhandler );
+
+    DECLARE_HANDLER( diveHandler );
+
+    DECLARE_HANDLER( eventYieldHandler );
   };
 
 }

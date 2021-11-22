@@ -1,8 +1,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 
-#include <Framework.h>
 #include <Manager/ShopMgr.h>
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -25,25 +25,30 @@ public:
 private:
   void shopInteractionCallback( Entity::Player& player, const Event::SceneResult& result )
   {
-    // item purchase
-    if( result.param1 == 768 )
+    // buy, sell, buy back
+    if( result.param1 == 768 || result.param1 == 512 )
     {
       // buy
       if( result.param2 == 1 )
       {
-        auto shopMgr = framework()->get< Sapphire::World::Manager::ShopMgr >();
-
-        shopMgr->purchaseGilShopItem( player, result.eventId, result.param3, result.param4 );
+        auto& shopMgr = Common::Service< Sapphire::World::Manager::ShopMgr >::ref();
+        shopMgr.purchaseGilShopItem( player, result.eventId, result.param3, result.param4 );
       }
-
       // sell
       // can't sell if the vendor is yourself (eg, housing permit shop)
       else if( result.param2 == 2 && result.actorId != player.getId() )
       {
-
+        auto& shopMgr = Common::Service< Sapphire::World::Manager::ShopMgr >::ref();
+        shopMgr.shopSellItem( player, result.eventId, result.param3, result.param4 );
+      }
+      //buy back
+      else if( result.param2 == 3 && result.actorId != player.getId() )
+      {
+        auto& shopMgr = Common::Service< Sapphire::World::Manager::ShopMgr >::ref();
+        shopMgr.shopBuyBack( player, result.eventId, result.param3 );
       }
 
-      player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
+      player.playGilShop( result.eventId, SCENE_FLAGS, result.param2, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
       return;
     }
 
@@ -53,7 +58,7 @@ private:
 
   void shopCallback( Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playGilShop( result.eventId, SCENE_FLAGS, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
+    player.playGilShop( result.eventId, SCENE_FLAGS, 0, std::bind( &GilShop::shopInteractionCallback, this, std::placeholders::_1, std::placeholders::_2 ) );
   }
 };
 

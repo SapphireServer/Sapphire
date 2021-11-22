@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <set>
 #include <queue>
-#include "Manager/BaseManager.h"
 
 #include "ScriptLoader.h"
 
@@ -14,7 +13,7 @@ namespace Sapphire::Scripting
   /*!
    * @brief Contains all the functionality for easily loading, unloading, reloading and generally accessing scripts.
    */
-  class NativeScriptMgr : public World::Manager::BaseManager
+  class NativeScriptMgr
   {
   protected:
     /*!
@@ -41,7 +40,7 @@ namespace Sapphire::Scripting
     bool unloadScript( ScriptInfo* info );
 
   public:
-    NativeScriptMgr( FrameworkPtr pFw );
+    NativeScriptMgr();
 
     /*!
      * @brief Loads a script from a path
@@ -125,7 +124,7 @@ namespace Sapphire::Scripting
    *
    * @return a std::shared_ptr to NativeScriptMgr
    */
-  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr( FrameworkPtr pFw );
+  std::shared_ptr< NativeScriptMgr > createNativeScriptMgr();
 }
 
 #endif

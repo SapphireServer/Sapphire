@@ -2,8 +2,10 @@
 #define _ACTION_H_
 
 #include <Common.h>
+#include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
+#include "EffectBuilder.h"
 
 namespace Sapphire::Data
 {
@@ -20,8 +22,8 @@ namespace Sapphire::World::Action
   public:
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, FrameworkPtr fw );
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData, FrameworkPtr fw );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData );
 
     virtual ~Action();
 
@@ -37,6 +39,7 @@ namespace Sapphire::World::Action
     Entity::CharaPtr getSourceChara() const;
 
     bool isInterrupted() const;
+    Common::ActionInterruptType getInterruptType() const;
     void setInterrupted( Common::ActionInterruptType type );
 
     uint32_t getCastTime() const;
@@ -44,6 +47,8 @@ namespace Sapphire::World::Action
 
     uint32_t getAdditionalData() const;
     void setAdditionalData( uint32_t data );
+
+    bool isCorrectCombo() const;
 
     bool isComboAction() const;
 
@@ -75,7 +80,7 @@ namespace Sapphire::World::Action
      * @brief Tests if an action is castable by the current source chara
      * @return true if castable, false if the caster doesn't meet the requirements
      */
-    bool preCheck();
+    virtual bool preCheck();
 
     /*!
      * @brief Snapshots characters affected by a cast.
@@ -84,6 +89,8 @@ namespace Sapphire::World::Action
      * @return true if actors are hit
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
+
+    EffectBuilderPtr getEffectbuilder();
 
     void buildEffects();
 
@@ -143,6 +150,8 @@ namespace Sapphire::World::Action
 
     bool preFilterActor( Entity::Actor& actor ) const;
 
+    bool hasValidLutEntry() const;
+
     uint32_t m_id;
 
     uint16_t m_sequence;
@@ -174,7 +183,6 @@ namespace Sapphire::World::Action
 
     Common::ActionInterruptType m_interruptType;
 
-    FrameworkPtr m_pFw;
     Data::ActionPtr m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
@@ -183,6 +191,8 @@ namespace Sapphire::World::Action
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;
+
+    ActionEntry m_lutEntry;
   };
 }
 

@@ -7,6 +7,7 @@
 #include <Network/Acceptor.h>
 #include <Network/PacketContainer.h>
 #include <Network/GamePacketParser.h>
+#include <Service.h>
 
 #include "Territory/Territory.h"
 
@@ -17,7 +18,6 @@
 #include "GameConnection.h"
 #include "ServerMgr.h"
 #include "Session.h"
-#include "Framework.h"
 #include "Forwards.h"
 
 using namespace Sapphire::Common;
@@ -25,9 +25,8 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
 Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                   Sapphire::Network::AcceptorPtr pAcceptor,
-                                                   FrameworkPtr pFw ) :
-  Connection( pHive, pFw ),
+                                                   Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Connection( pHive ),
   m_pAcceptor( pAcceptor ),
   m_conType( ConnectionType::None )
 {
@@ -91,6 +90,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::ReqPlaceHousingItem, "ReqPlaceHousingItem", &GameConnection::reqPlaceHousingItem );
   setZoneHandler( ClientZoneIpcType::HousingUpdateObjectPosition, "HousingUpdateObjectPosition",
                   &GameConnection::reqMoveHousingItem );
+  setZoneHandler( ClientZoneIpcType::HousingEditExterior, "HousingEditExterior", &GameConnection::housingEditExterior );
+  setZoneHandler( ClientZoneIpcType::HousingEditInterior, "HousingEditInterior", &GameConnection::housingEditInterior );
 
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
@@ -101,9 +102,12 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandlerEnterTeri",
                   &GameConnection::eventHandlerEnterTerritory );
 
-  setZoneHandler( ClientZoneIpcType::ReturnEventHandler, "EventHandlerReturn", &GameConnection::eventHandlerReturn );
-  setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "EventHandlerReturn",
+  setZoneHandler( ClientZoneIpcType::ReturnEventHandler, "ReturnEventHandler", &GameConnection::eventHandlerReturn );
+  setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "TradeReturnEventHandler",
                   &GameConnection::eventHandlerReturn );
+  setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler2, "TradeReturnEventHandler2", &GameConnection::eventHandlerReturn );
+  setZoneHandler( ClientZoneIpcType::EventYield2Handler, "EventYield2Handler", &GameConnection::eventYieldHandler );
+  setZoneHandler( ClientZoneIpcType::EventYield16Handler, "EventYield16Handler", &GameConnection::eventYieldHandler );
 
   setZoneHandler( ClientZoneIpcType::ShopEventHandler, "ShopEventHandler",
                   &GameConnection::eventHandlerShop );
@@ -118,6 +122,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty", &GameConnection::cfRegisterDuty );
   setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette", &GameConnection::cfRegisterRoulette );
   setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted", &GameConnection::cfDutyAccepted );
+  //setZoneHandler( ClientZoneIpcType::CFCancelHandler, "CFCancel", &GameConnection::cfCancel );
 
   setZoneHandler( ClientZoneIpcType::ReqEquipDisplayFlagsChange, "ReqEquipDisplayFlagsChange",
                   &GameConnection::reqEquipDisplayFlagsHandler );
@@ -130,6 +135,9 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListings, "MarketBoardRequestItemListings",
                   &GameConnection::marketBoardRequestItemListings );
 
+  setZoneHandler( ClientZoneIpcType::WorldInteractionHandler, "WorldInteractionHandler", &GameConnection::worldInteractionhandler );
+  setZoneHandler( ClientZoneIpcType::Dive, "Dive", &GameConnection::diveHandler );
+
   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
 
 }
@@ -140,7 +148,7 @@ Sapphire::Network::GameConnection::~GameConnection() = default;
 // overwrite the parents onConnect for our game socket needs
 void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint16_t port )
 {
-  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor, m_pFw ) );
+  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
   m_pAcceptor->accept( connection );
   Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
 }
@@ -217,14 +225,14 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
     if( opcode != PingHandler && opcode != UpdatePositionHandler )
       Logger::debug( "[{0}] Handling World IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
-    ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
+    ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {
     Logger::debug( "[{0}] Undefined World IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
 
     Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
-                                                       pPacket.segHdr.size ) );
+                                                       static_cast< uint16_t >( pPacket.segHdr.size) ) );
   }
 }
 
@@ -241,7 +249,7 @@ void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Pac
 
     Logger::debug( "[{0}] Handling Chat IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
-    ( this->*( it->second ) )( m_pFw, pPacket, *m_pSession->getPlayer() );
+    ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {
@@ -380,7 +388,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
 void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
-  auto pServerZone = m_pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
@@ -392,23 +400,23 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
     {
       case SEGMENTTYPE_SESSIONINIT:
       {
-        char* id = ( char* ) &( inPacket.data[ 4 ] );
+        char* id = reinterpret_cast< char* >( &( inPacket.data[ 4 ] ) );
         uint32_t playerId = std::stoul( id );
         auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id
-        auto session = pServerZone->getSession( playerId );
+        auto session = serverMgr.getSession( playerId );
 
         if( !session )
         {
           Logger::info( "[{0}] Session not registered, creating", id );
           // return;
-          if( !pServerZone->createSession( playerId ) )
+          if( !serverMgr.createSession( playerId ) )
           {
             disconnect();
             return;
           }
-          session = pServerZone->getSession( playerId );
+          session = serverMgr.getSession( playerId );
         }
           //TODO: Catch more things in lobby and send real errors
         else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
@@ -423,15 +431,15 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           m_pSession = session;
 
         auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
-        *( unsigned int* ) ( &pe->data()[ 0 ] ) = 0xE0037603;
-        *( unsigned int* ) ( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
+        *reinterpret_cast< unsigned int* >( &pe->data()[ 0 ] ) = 0xE0037603;
+        *reinterpret_cast< unsigned int* >( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
         sendSinglePacket( pe );
 
         // main connection, assinging it to the session
         if( ipcHeader.connectionType == ConnectionType::Zone )
         {
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
-          *( unsigned int* ) ( &pe1->data()[ 0 ] ) = playerId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe1 );
           Logger::info( "[{0}] Setting session for world connection", id );
           session->setZoneConnection( pCon );
@@ -440,11 +448,11 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         else if( ipcHeader.connectionType == ConnectionType::Chat )
         {
           auto pe2 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
-          *( unsigned int* ) ( &pe2->data()[ 0 ] ) = playerId;
+          *reinterpret_cast< unsigned int* >( &pe2->data()[ 0 ] ) = playerId;
           sendSinglePacket( pe2 );
 
           auto pe3 = std::make_shared< FFXIVRawPacket >( 0x03, 0x28, playerId, playerId );
-          *( unsigned short* ) ( &pe3->data()[ 2 ] ) = 0x02;
+          *reinterpret_cast< unsigned short* >( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
           Logger::info( "[{0}] Setting session for chat connection", id );
@@ -461,12 +469,12 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
       }
       case SEGMENTTYPE_KEEPALIVE: // keep alive
       {
-        uint32_t id = *( uint32_t* ) &inPacket.data[ 0 ];
-        uint32_t timeStamp = *( uint32_t* ) &inPacket.data[ 4 ];
+        uint32_t id = *reinterpret_cast< uint32_t* >( &inPacket.data[ 0 ] );
+        uint32_t timeStamp = *reinterpret_cast< uint32_t* >( &inPacket.data[ 4 ] );
 
         auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
-        *( unsigned int* ) ( &pe4->data()[ 0 ] ) = id;
-        *( unsigned int* ) ( &pe4->data()[ 4 ] ) = timeStamp;
+        *reinterpret_cast< unsigned int* >( &pe4->data()[ 0 ] ) = id;
+        *reinterpret_cast< unsigned int* >( &pe4->data()[ 4 ] ) = timeStamp;
         sendSinglePacket( pe4 );
 
         break;

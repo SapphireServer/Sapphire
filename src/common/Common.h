@@ -6,6 +6,7 @@
 
 #include "CommonGen.h"
 #include "Vector3.h"
+#include "Network/PacketDef/Ipcs.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -25,7 +26,9 @@ namespace Sapphire::Common
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
   const uint8_t CLASSJOB_TOTAL = 38;
-  const uint8_t CLASSJOB_SLOTS = 28;
+  const uint8_t CLASSJOB_SLOTS = 30;
+
+  const uint8_t TOWN_COUNT = 6;
 
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
@@ -47,13 +50,13 @@ namespace Sapphire::Common
     uint8_t plot;
   };
 
-  enum InventoryOperation : uint8_t
+  enum InventoryOperation : uint16_t
   {
-    Discard = 0x07,
-    Move = 0x08,
-    Swap = 0x09,
-    Merge = 0x0C,
-    Split = 0x0A
+    Discard = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 7,
+    Move = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 8,
+    Swap = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 9,
+    Split = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 10,
+    Merge = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 12
   };
 
   enum ClientLanguage : uint8_t
@@ -157,44 +160,29 @@ namespace Sapphire::Common
     ModelRing2 = 9
   };
 
-  enum EquipSlotCategory : uint8_t
+  enum class EquipSlotCategory : uint8_t
   {
-    Unequippable = 0,
-
-    // main slots
-
-    CharaMainHand = 1,
-    CharaOffHand = 2,
-    CharaHead = 3,
-    CharaBody = 4,
-    CharaHands = 5,
-    CharaWaist = 6,
-    CharaLegs = 7,
-    CharaFeet = 8,
-    CharaEars = 9,
-    CharaNeck = 10,
-    CharaWrist = 11,
-    CharaRing = 12,
-    CharaSoulCrystal = 17,
-
-    // specials
-
-    /*! Cannot equip gear to offhand slot */
-      MainTwoHandedWeapon = 13,
-    /*! Can be equipped in either main or offhand slot */
-      MainOrOffHand = 14, // unused
-    /*! Cannot equip gear to head */
-      BodyDisallowHead = 15,
-    /*! Cannot equip gear to hands, legs and feet slots */
-      BodyDisallowHandsLegsFeet = 16,
-    /*! Cannot equip gear to feet slot */
-      LegsDisallowFeet = 18,
-    /*! Cannot equp gear to head, hands, legs, feet slots */
-      BodyDisallowAll = 19,
-    /*! Cannot equip gear to hands slot */
-      BodyDisallowHands = 20,
-    /*! Cannot equip gear to legs & feet slots */
-      BodyDisallowLegsFeet = 21,
+    MainHand = 1,
+    OffHand = 2,
+    Head = 3,
+    Body = 4,
+    Hands = 5,
+    Waist = 6,
+    Legs = 7,
+    Feet = 8,
+    Ears = 9,
+    Neck = 10,
+    Wrist = 11,
+    Ring = 12,
+    MainTwoHandedWeapon = 13,
+    //MainOrOffHand = 14, // unused
+    BodyDisallowHead = 15,
+    BodyDisallowHandsLegsFeet = 16,
+    SoulCrystal = 17,
+    LegsDisallowFeet = 18,
+    BodyDisallowAll = 19,
+    BodyDisallowHands = 20,
+    BodyDisallowLegsFeet = 21,
   };
 
   enum InventoryType : uint16_t
@@ -214,6 +202,8 @@ namespace Sapphire::Common
     HandIn = 2005,
     DamagedGear = 2007,
     //UNKNOWN_1 = 2008,
+    // Temporary inventory that is used for the "trade" window
+    TradeInventory = 2009,
 
     ArmoryOff = 3200,
     ArmoryHead = 3201,
@@ -222,8 +212,8 @@ namespace Sapphire::Common
     ArmoryWaist = 3204,
     ArmoryLegs = 3205,
     ArmoryFeet = 3206,
-    ArmoryNeck = 3207,
-    ArmoryEar = 3208,
+    ArmoryEar = 3207,
+    ArmoryNeck = 3208,
     ArmoryWrist = 3209,
     ArmoryRing = 3300,
 
@@ -232,6 +222,9 @@ namespace Sapphire::Common
     
     SaddleBag0 = 4000,
     SaddleBag1 = 4001,
+    // These are the ones you get when paying for premium companion app
+    PremiumSaddleBag0 = 4100,
+    PremiumSaddleBag1 = 4101,
 
     RetainerBag0 = 10000,
     RetainerBag1 = 10001,
@@ -405,7 +398,7 @@ namespace Sapphire::Common
   struct StatusEffect
   {
     uint16_t effect_id;
-    uint16_t unknown1;
+    uint16_t param;
     float duration;
     uint32_t sourceActorId;
   };
@@ -557,6 +550,30 @@ namespace Sapphire::Common
 
   };
 
+  enum FieldMarkerStatus : uint32_t
+  {
+    A = 0x1,
+    B = 0x2,
+    C = 0x4,
+    D = 0x8,
+    One = 0x10,
+    Two = 0x20,
+    Three = 0x40,
+    Four = 0x80
+  };
+  // TODO: consolidate these two into one since FieldMarkerStatus == 1 << FieldMarkerId?
+  enum class FieldMarkerId : uint8_t
+  {
+    A,
+    B,
+    C,
+    D,
+    One,
+    Two,
+    Three,
+    Four
+  };
+
   enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected
@@ -574,19 +591,27 @@ namespace Sapphire::Common
     None = 0, // ?
     MagicPoints = 3,
     TacticsPoints = 5,
-//    WARGauge = 22,
-//    DRKGauge = 25,
-//    AetherflowStack = 30,
-//    Status = 32,
-//    PLDGauge = 41,
-//    RDMGaugeBoth = 74,
-////  RDMGaugeBlack = 75, // not right?
-//    DRGGauge3Eyes = 76,
+    StatusEffect = 10,
+    WARGauge = 22,
+    DRKGauge = 25,
+    //    AetherflowStack = 30,
+    //    Status = 32,
+    SAMKenki = 39,
+    SAMSen = 40,
+    PLDGauge = 41,
+    GNBAmmo = 55,
+    WHMBloodLily = 56,
+    WHMLily = 57,
+    SAMMeditation = 63,
+    //    RDMGaugeBoth = 74,
+    ////  RDMGaugeBlack = 75, // not right?
+    //    DRGGauge3Eyes = 76,
   };
 
-  enum class ActionType : int8_t
+  enum class AttackType : int8_t
   {
-    WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+    //WeaponOverride = -1, // Needs more investigation (takes the damage type of the equipped weapon)?
+    Physical = -1, // seems to be the case
     Unknown_0 = 0,
     Slashing = 1,
     Piercing = 2,
@@ -615,26 +640,39 @@ namespace Sapphire::Common
     TpLoss = 12,
     TpGain = 13,
     GpGain = 14,
+    ApplyStatusEffectTarget = 15,
+    ApplyStatusEffectSource = 16, // effect entry on target but buff applies to source, like storm's eye
+    StatusNoEffect = 20, // shifted one up from 5.18
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
      * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
-    StartActionCombo = 28,
+    StartActionCombo = 27, // shifted one up from 5.18
+    ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,
-    Mount = 38,
+    Mount = 40, // shifted one down from 5.18
     VFX = 59, // links to VFX sheet
   };
 
   enum class ActionHitSeverityType : uint8_t
   {
     NormalDamage = 0,
-    CritHeal = 0,
+    NormalHeal = 0,
     CritDamage = 1,
-    NormalHeal = 1,
+    CritHeal = 1,
     DirectHitDamage = 2,
     CritDirectHitDamage = 3
+  };
+
+  enum class ActionEffectResultFlag : uint8_t
+  {
+    None = 0,
+    Absorbed = 0x04,
+    ExtendedValue = 0x40,
+    EffectOnSource = 0x80,
+    Reflected = 0xA0,
   };
 
   enum ItemActionType : uint16_t
@@ -653,15 +691,15 @@ namespace Sapphire::Common
   struct EffectEntry
   {
     Common::ActionEffectType effectType;
-    Common::ActionHitSeverityType hitSeverity;
-    uint8_t param;
+    uint8_t param0;
+    uint8_t param1;
     /*!
      * @brief Shows an additional percentage in the battle log
      *
      * Has no effect on what is shown and stored in value
      */
-    int8_t bonusPercent;
-    uint8_t valueMultiplier;      // This multiplies whatever value is in the 'value' param by 10. Possibly a workaround for big numbers
+    uint8_t param2;
+    uint8_t extendedValueHighestByte;
     uint8_t flags;
     int16_t value;
   };
@@ -719,6 +757,7 @@ namespace Sapphire::Common
 
     BetweenAreas = 24,
     BoundByDuty = 28,
+    Performing = 40,
     WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
 
@@ -989,6 +1028,7 @@ namespace Sapphire::Common
   {
     SingleTarget = 1,
     CircularAOE = 2,
+    Type3 = 3, // another single target? no idea how to call it
     RectangularAOE = 4,
     CircularAoEPlaced = 7
   };
@@ -1005,8 +1045,209 @@ namespace Sapphire::Common
     Gatherer
   };
 
-  using PlayerStateFlagList = std::vector< PlayerStateFlag >;
+  enum class AstCardType : uint8_t
+  {
+    None = 0,
+    Balance = 1,
+    Bole = 2,
+    Arrow = 3,
+    Spear = 4,
+    Ewer = 5,
+    Spire = 6,
+    Lord = 0x70,
+    Lady = 0x80,
+  };
 
+  enum class AstSealType : uint8_t
+  {
+    None = 0,
+    Sun = 1,
+    Moon = 2,
+    Celestrial = 3,
+  };
+
+  enum class DrgState : uint8_t
+  {
+    None = 0,
+    BloodOfTheDragon = 1,
+    LifeOfTheDragon = 2,
+  };
+
+  enum class SamSen : uint8_t
+  {
+    None = 0,
+    Setsu = 1,
+    Getsu = 2,
+    Ka = 4,
+  };
+
+  enum class SchDismissedFairy : uint8_t
+  {
+    None = 0,
+    Eos = 6,
+    Selene = 7,
+  };
+
+  enum class SmnPet : uint8_t
+  {
+    None = 0,
+    Ifrit = 3,
+    Titan = 4,
+    Garuda = 5,
+  };
+
+  enum class SmnPetGlam : uint8_t
+  {
+    None = 0,
+    Emerald = 1,
+    Topaz = 2,
+    Ruby = 3,
+  };
+
+  enum class BrdSong : uint8_t
+  {
+    Mage = 5,
+    Army = 0x0A,
+    Wanderer = 0x0F,
+  };
+
+  union JobGauge
+  {
+    struct
+    {
+      uint8_t gauge_data[15];
+    } _raw;
+
+    struct
+    {
+      uint32_t unused;
+      AstCardType card;
+      AstSealType seals[3];
+    } ast;
+    struct
+    {
+      uint16_t timeUntilNextPolyglot;
+      uint16_t elementTimer;
+      uint8_t elementStance;
+      uint8_t umbralhearts;
+      uint8_t polyglotStacks;
+      uint8_t enochainState;
+    } blm;
+    struct
+    {
+      uint16_t songTimer;
+      uint8_t songStacks;
+      uint8_t unused;
+      BrdSong song;
+    } brd;
+    struct
+    {
+      uint8_t feathers;
+      uint8_t esprit;
+      uint8_t stepOrder[4];
+      uint8_t completeSteps;
+    } dnc;
+    struct
+    {
+      uint16_t dragonTimer;
+      DrgState dragonState;
+      uint8_t eyes;
+    } drg;
+    struct
+    {
+      uint8_t blood;
+      uint8_t unused;
+      uint16_t darksideTimer;
+      uint8_t darkArts;
+      uint8_t unused2;
+      uint16_t shadowTimer;
+    } drk;
+    struct
+    {
+      uint8_t ammo;
+      uint8_t unused;
+      uint16_t maxTimerDuration;
+      uint8_t ammoComboStep;
+    } gnb;
+    struct
+    {
+      uint16_t overheatTimer;
+      uint16_t robotTimer;
+      uint8_t heat;
+      uint8_t battery;
+      uint8_t lastRobotBatteryPower;
+      uint8_t activeTimerFlag;
+    } mch;
+    struct
+    {
+      uint8_t greasedLightningTimer;
+      uint8_t unused;
+      uint8_t greasedLightningStacks;
+      uint8_t chakra;
+      uint8_t greasedLightningTimerFreezed;
+    } mnk;
+    struct
+    {
+      uint32_t hutonTimer;
+      uint8_t tenChiJinMudrasUsed;
+      uint8_t ninki;
+      uint8_t hutonManualCasts;
+    } nin;
+    struct
+    {
+      uint8_t oathGauge;
+    } pld;
+    struct
+    {
+      uint8_t whiteGauge;
+      uint8_t blackGauge;
+    } rdm;
+    struct
+    {
+      uint16_t unused;
+      uint8_t unused2;
+      uint8_t kenki;
+      uint8_t meditationStacks;
+      SamSen sen;
+    } sam;
+    struct
+    {
+      uint16_t unused;
+      uint8_t aetherflowStacks;
+      uint8_t fairyGauge;
+      uint16_t seraphTimer;
+      SchDismissedFairy dismissedFairy;
+    } sch;
+    struct
+    {
+      uint16_t timer;
+      SmnPet returnSummon;
+      SmnPetGlam petGlam;
+      uint8_t stacks;
+    } smn;
+
+    struct
+    {
+      uint8_t beastGauge;
+    } war;
+    struct
+    {
+      uint16_t unused;
+      uint16_t lilyTimer;
+      uint8_t lilies;
+      uint8_t bloodLilies;
+    } whm;
+  };
+
+  enum class LootMessageType : uint8_t
+  {
+    GetItem1 = 1, // p1: actorId, p4: itemId (HQ: itemId + 1,000,000 lol), p5: amount
+    GetItem2 = 3, // p1: actorId, p2: itemId, p3: amount, seems like same thing as GetItem1 but different param position.
+    FailedToGetLootNoFreeInventorySlot = 5, // p1: actorId
+    LootRolled = 7, // p1: actorId, p2: itemId, p3: amount
+    GetGil = 9, // p1: gil
+    EmptyCoffer = 11, // seems like no param
+  };
 }
 
 #endif

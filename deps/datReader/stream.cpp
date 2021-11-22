@@ -4,13 +4,7 @@
 #include <sstream>
 #include <streambuf>
 
-namespace xiv
-{
-namespace utils
-{
-namespace stream
+namespace xiv::utils::stream
 {
 
-}
-}    
 }

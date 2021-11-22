@@ -5,14 +5,13 @@
 
 namespace Sapphire::World::Territory::Housing
 {
-  class HousingInteriorTerritory : public Territory
+  class HousingInteriorTerritory : public Sapphire::Territory
   {
   public:
     HousingInteriorTerritory( Common::LandIdent ident, uint16_t territoryTypeId,
                               uint32_t guId,
                               const std::string& internalName,
-                              const std::string& contentName,
-                              FrameworkPtr pFw );
+                              const std::string& contentName );
 
     virtual ~HousingInteriorTerritory();
 

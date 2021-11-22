@@ -35,26 +35,26 @@
 #include "BNpcTemplate.h"
 
 #include "Common.h"
-#include "Framework.h"
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Service.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::BNpc::BNpc( FrameworkPtr pFw ) :
-  Npc( ObjKind::BattleNpc, pFw )
+Sapphire::Entity::BNpc::BNpc() :
+  Npc( ObjKind::BattleNpc )
 {
 }
 
 Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-                              uint8_t level, uint32_t maxHp, TerritoryPtr pZone, FrameworkPtr pFw ) :
-  Npc( ObjKind::BattleNpc, pFw )
+                              uint8_t level, uint32_t maxHp, TerritoryPtr pZone ) :
+  Npc( ObjKind::BattleNpc )
 {
   m_id = id;
   m_modelChara = pTemplate->getModelChara();
@@ -99,20 +99,19 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
   memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
 
-  auto exdData = m_pFw->get< Data::ExdDataGenerated >();
-  assert( exdData );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto bNpcBaseData = exdData->get< Data::BNpcBase >( m_bNpcBaseId );
+  auto bNpcBaseData = exdData.get< Data::BNpcBase >( m_bNpcBaseId );
   assert( bNpcBaseData );
 
   m_radius = bNpcBaseData->scale;
 
-  auto modelChara = exdData->get< Data::ModelChara >( bNpcBaseData->modelChara );
+  auto modelChara = exdData.get< Data::ModelChara >( bNpcBaseData->modelChara );
   if( modelChara )
   {
-    auto modelSkeleton = exdData->get< Data::ModelSkeleton >( modelChara->model );
+    auto modelSkeleton = exdData.get< Data::ModelSkeleton >( modelChara->model );
     if( modelSkeleton )
-      m_radius *= modelSkeleton->scaleFactor;
+      m_radius *= modelSkeleton->radius;
   }
 
   // todo: is this actually good?
@@ -301,7 +300,7 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
 void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
 {
   auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = hateAmount;
+  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
   hateEntry->m_pChara = pChara;
 
   m_hateList.insert( hateEntry );
@@ -318,13 +317,13 @@ void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, 
   {
     if( listEntry->m_pChara == pChara )
     {
-      listEntry->m_hateAmount += hateAmount;
+      listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
       return;
     }
   }
 
   auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = hateAmount;
+  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
   hateEntry->m_pChara = pChara;
   m_hateList.insert( hateEntry );
 }
@@ -359,8 +358,8 @@ bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara
 
 void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 {
-  auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
-  auto variation = static_cast< uint32_t >( pRNGMgr->getRandGenerator< float >( 500, 1000 ).next() );
+  auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   m_lastAttack = Util::getTimeMs() + variation;
   hateListUpdate( pChara, 1 );
@@ -396,6 +395,7 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
 
 void Sapphire::Entity::BNpc::onTick()
 {
+  Chara::onTick();
   if( m_state == BNpcState::Retreat )
   {
     regainHp();
@@ -590,7 +590,7 @@ void Sapphire::Entity::BNpc::onDeath()
     // TODO: handle drops 
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
-      pPlayer->onMobKill( m_bNpcNameId );
+      pPlayer->onMobKill( static_cast< uint16_t >( m_bNpcNameId ) );
   }
   hateListClear();
 }
@@ -654,7 +654,7 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   {
     auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
     setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId = INVALID_GAME_OBJECT_ID;
+    setOwnerPacket->data().actorId = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
     sendToInRangeSet( setOwnerPacket );
   }
 }
@@ -691,21 +691,20 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
 
-    auto pRNGMgr = m_pFw->get< World::Manager::RNGMgr >();
     auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::EffectEntry effectEntry{};
-    effectEntry.value = damage;
+    effectEntry.value = static_cast< int16_t >( damage.first );
     effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.hitSeverity = ActionHitSeverityType::NormalDamage;
-    effectEntry.param = 0x71;
+    effectEntry.param0 = static_cast< uint8_t >( damage.second );
+    effectEntry.param2 = 0x71;
     effectPacket->addEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
-    pTarget->takeDamage( damage );
+    pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
 
   }
 }
@@ -715,10 +714,10 @@ void Sapphire::Entity::BNpc::calculateStats()
   uint8_t level = getLevel();
   uint8_t job = static_cast< uint8_t >( getClass() );
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto classInfo = pExdData->get< Sapphire::Data::ClassJob >( job );
-  auto paramGrowthInfo = pExdData->get< Sapphire::Data::ParamGrow >( level );
+  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( job );
+  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( level );
 
   float base = Math::CalcStats::calculateBaseStat( *this );
 
@@ -727,17 +726,17 @@ void Sapphire::Entity::BNpc::calculateStats()
   m_baseStats.vit = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierVitality ) / 100 ) );
   m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierIntelligence ) / 100 ) );
   m_baseStats.mnd = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierMind ) / 100 ) );
-  m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) );
+  //m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) );
 
   m_baseStats.determination = static_cast< uint32_t >( base );
   m_baseStats.pie = static_cast< uint32_t >( base );
-  m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
-  m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
-  m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
-  m_baseStats.critHitRate = paramGrowthInfo->baseSpeed;
-  m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
-  m_baseStats.healingPotMagic = paramGrowthInfo->baseSpeed;
-  m_baseStats.tenacity = paramGrowthInfo->baseSpeed;
+  m_baseStats.skillSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.spellSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.accuracy = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.critHitRate = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.attackPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.healingPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  m_baseStats.tenacity = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
 
   m_baseStats.attack = m_baseStats.str;
   m_baseStats.attackPotMagic = m_baseStats.inte;

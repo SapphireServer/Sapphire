@@ -1,6 +1,7 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
@@ -11,9 +12,9 @@
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/DirectorPlayScenePacket.h"
 
+#include "Inventory/Item.h"
 #include "Territory/Territory.h"
 #include "ServerMgr.h"
-#include "Framework.h"
 
 #include "Action/EventAction.h"
 
@@ -130,7 +131,7 @@ void Sapphire::Entity::Player::playScene( uint32_t eventId, uint32_t scene,
   playScene( eventId, scene, flags, eventParam2, eventParam3, 0, eventCallback );
 }
 
-void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
+void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags, uint32_t param1,
                                             Event::EventHandler::SceneReturnCallback eventCallback )
 {
   auto pEvent = bootstrapSceneEvent( eventId, flags );
@@ -141,10 +142,56 @@ void Sapphire::Entity::Player::playGilShop( uint32_t eventId, uint32_t flags,
   pEvent->setEventReturnCallback( eventCallback );
   pEvent->setSceneChainCallback( nullptr );
 
-  auto openGilShopPacket = makeZonePacket< Server::FFXIVIpcEventOpenGilShop >( getId() );
+  auto openGilShopPacket = makeZonePacket< Server::FFXIVIpcEventPlay255 >( getId() );
   openGilShopPacket->data().eventId = eventId;
   openGilShopPacket->data().sceneFlags = flags;
   openGilShopPacket->data().actorId = getId();
+  switch( param1 )
+  {
+    case 0:
+    {
+      openGilShopPacket->data().paramSize = 0xA1;
+      break;
+    }
+    case 1:
+    {
+      openGilShopPacket->data().paramSize = 0x02;
+      openGilShopPacket->data().params[ 0 ] = 1;
+      openGilShopPacket->data().params[ 1 ] = 0x64;
+      break;
+    }
+    case 2:
+    {
+      openGilShopPacket->data().paramSize = 0xA2;
+      openGilShopPacket->data().params[ 0 ] = 2;
+      break;
+    }
+    case 3:
+    {
+      openGilShopPacket->data().paramSize = 0xA2;
+      openGilShopPacket->data().params[ 0 ] = 3;
+      openGilShopPacket->data().params[ 1 ] = 0x64;
+      break;
+    }
+  }
+
+  auto& buyBackList = getBuyBackListForShop( eventId );
+  int index = param1 == 0 ? 1 : 2;
+  for( auto& entry : buyBackList )
+  {
+    if( index >= openGilShopPacket->data().paramSize )
+      break;
+    openGilShopPacket->data().params[ index++ ] = entry.item->getId();
+    openGilShopPacket->data().params[ index++ ] = entry.amount;
+    openGilShopPacket->data().params[ index++ ] = entry.pricePerItem;
+    index += 2;
+    openGilShopPacket->data().params[ index++ ] = eventId;
+    index += 2;
+    openGilShopPacket->data().params[ index++ ] = ( ( entry.item->getDurability() << 16 ) + static_cast< uint16_t >( entry.item->isHq() ? 1 : 0 ) );
+    openGilShopPacket->data().params[ index++ ] = ( ( entry.item->getStain() << 16 ) + entry.item->getSpiritbond() );
+    openGilShopPacket->data().params[ index++ ] = 0; // glamour
+    index += 5;
+  }
 
   openGilShopPacket->data().scene = 10;
 
@@ -276,6 +323,33 @@ void Sapphire::Entity::Player::eventFinish( uint32_t eventId, uint32_t freePlaye
     unsetStateFlag( PlayerStateFlag::InNpcEvent );
 }
 
+void Sapphire::Entity::Player::playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback )
+{
+  auto pEvent = bootstrapSceneEvent( eventId, flags );
+  if( !pEvent )
+    return;
+
+  pEvent->setPlayedScene( true );
+  pEvent->setEventReturnCallback( eventReturnCallback );
+  pEvent->setSceneChainCallback( nullptr );
+  auto eventPlay16 = makeZonePacket< FFXIVIpcEventPlay16 >( getId() );
+  eventPlay16->data().actorId = pEvent->getActorId();
+  eventPlay16->data().eventId = pEvent->getId();
+  eventPlay16->data().scene = scene;
+  eventPlay16->data().flags = flags;
+  eventPlay16->data().param3 = param3;
+  eventPlay16->data().paramSize = paramList.size();
+  int i = 0;
+  for( auto p : paramList )
+  {
+    assert( i < 16 );
+    eventPlay16->data().param[ i ] = paramList.at( i );
+    i++;
+  }
+
+  queuePacket( eventPlay16 );
+}
+
 void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint32_t action,
                                                  World::Action::ActionCallback finishCallback,
@@ -283,7 +357,7 @@ void Sapphire::Entity::Player::eventActionStart( uint32_t eventId,
                                                  uint64_t additional )
 {
   auto pEventAction = World::Action::make_EventAction( getAsChara(), eventId, action,
-                                                finishCallback, interruptCallback, additional, m_pFw );
+                                                finishCallback, interruptCallback, additional );
 
   auto pEvent = getEvent( eventId );
 
@@ -325,8 +399,9 @@ void Sapphire::Entity::Player::eventItemActionStart( uint32_t eventId,
 
 void Sapphire::Entity::Player::onLogin()
 {
-  auto pServerMgr = m_pFw->get< Sapphire::World::ServerMgr >();
-  auto motd = pServerMgr->getConfig().motd;
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
+  auto motd = serverMgr.getConfig().motd;
 
   std::istringstream ss( motd );
   std::string msg;
@@ -354,7 +429,7 @@ void Sapphire::Entity::Player::onDeath()
 // TODO: slightly ugly here and way too static. Needs too be done properly
 void Sapphire::Entity::Player::onTick()
 {
-
+  Chara::onTick();
   // add 3 seconds to total play time
   m_playTime += 3;
 

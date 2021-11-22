@@ -4,6 +4,10 @@
 #include "PreparedStatement.h"
 #include <mysql.h>
 
+#ifdef _MSC_VER
+  // fixes compile error when compiling with vs2019
+  #include <stdexcept>
+#endif
 #include <vector>
 
 Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,

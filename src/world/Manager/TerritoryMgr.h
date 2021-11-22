@@ -2,7 +2,6 @@
 #define SAPPHIRE_TERRITORYMGR_H
 
 #include "ForwardsZone.h"
-#include "BaseManager.h"
 #include <set>
 #include <unordered_map>
 
@@ -27,7 +26,7 @@ namespace Sapphire::World::Manager
      This class manages persistent and temporary instances alike.
 
   */
-  class TerritoryMgr : public Manager::BaseManager
+  class TerritoryMgr
   {
 
   public:
@@ -43,6 +42,7 @@ namespace Sapphire::World::Manager
       AllianceRaid = 8,
       OpenWorldInstanceBattle = 9,
       Trial = 10,
+      RaidPublicArea = 12,
       HousingArea = 13,
       HousingPrivateArea = 14,
       MSQPrivateArea = 15,
@@ -50,17 +50,27 @@ namespace Sapphire::World::Manager
       RaidFights = 17,
       ChocoboTutorial = 21,
       Wedding = 22,
+      DiademV1 = 26,
       BeginnerTutorial = 27,
+      PvPTheFeast = 28,
+      MSQEventArea = 29,
       FreeCompanyGarrison = 30,
       PalaceOfTheDead = 31,
       TreasureMapInstance = 33,
       EventTrial = 36,
-      TheFeastArea = 37,
+      TheFeastArea = 37, //custom match?
+      DiademV2 = 38,
       PrivateEventArea = 40,
-      //Eureka = 41, // wat
+      Eureka = 41, // wat
+      TheFeastCrystalTower = 42,
+      LeapOfFaith = 44,
+      MaskedCarnival = 45,
+      OceanFishing = 46,
+      DiademV3 = 47,
+      Bozja = 48,
     };
 
-    TerritoryMgr( FrameworkPtr pFw );
+    TerritoryMgr();
 
     /*! initializes the territoryMgr */
     bool init();
@@ -107,6 +117,9 @@ namespace Sapphire::World::Manager
     TerritoryPtr createInstanceContent( uint32_t contentFinderConditionId );
 
     TerritoryPtr createQuestBattle( uint32_t contentFinderConditionId );
+
+    TerritoryPtr createPublicContent( uint32_t contentFinderConditionId );
+    TerritoryPtr createPublicContent( uint16_t contentId, uint16_t territoryId );
 
     void createAndJoinQuestBattle( Entity::Player& player, uint16_t contentFinderConditionId );
 
@@ -169,6 +182,7 @@ namespace Sapphire::World::Manager
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToContentFinderCondMap = std::unordered_map< uint16_t, uint16_t >;
+    using PublicContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
     using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
@@ -186,8 +200,11 @@ namespace Sapphire::World::Manager
     /*! map holding actual instances of InstanceContent */
     InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;
 
-    /*! map holding actual instances of InstanceContent */
+    /*! map holding actual instances of QuestBattle */
     QuestBattleIdToInstanceMap m_questBattleIdToInstanceMap;
+
+    /*! map holding actual instances of PublicContent */
+    PublicContentIdToInstanceMap m_publicContentIdToInstanceMap;
 
     /*! flat map for easier lookup of instances by guid */
     InstanceIdToTerritoryPtrMap m_guIdToTerritoryPtrMap;

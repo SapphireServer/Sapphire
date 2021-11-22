@@ -129,7 +129,7 @@ uint32_t Util::getTimeSeconds()
 
 uint64_t Util::getEorzeanTimeStamp()
 {
-  return static_cast< uint64_t >( getTimeSeconds() * 20.571428571428573f );
+  return static_cast< uint64_t >( getTimeSeconds() * 20.571428571428573 );
 }
 
 void Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex )

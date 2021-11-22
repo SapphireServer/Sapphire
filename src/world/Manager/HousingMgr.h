@@ -2,7 +2,6 @@
 #define SAPPHIRE_HOUSINGMGR_H
 
 #include "Forwards.h"
-#include "BaseManager.h"
 #include "Territory/HousingZone.h"
 #include <set>
 #include <unordered_map>
@@ -15,7 +14,7 @@ namespace Sapphire::Data
 
 namespace Sapphire::World::Manager
 {
-  class HousingMgr : public BaseManager
+  class HousingMgr
   {
 
   public:
@@ -69,7 +68,7 @@ namespace Sapphire::World::Manager
      */
     using LandIdentToInventoryContainerMap = std::unordered_map< uint64_t, ContainerIdToContainerMap >;
 
-    HousingMgr( FrameworkPtr pFw );
+    HousingMgr();
     virtual ~HousingMgr();
 
     bool init();
@@ -181,6 +180,8 @@ namespace Sapphire::World::Manager
     void reqEstateInteriorRemodel( Entity::Player& player );
 
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
+
+    void editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t > slotList, uint8_t removeFlag );
 
   private:
 

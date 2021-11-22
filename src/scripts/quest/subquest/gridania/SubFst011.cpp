@@ -1,7 +1,7 @@
 #include <Actor/Player.h>
 #include <Manager/EventMgr.h>
 #include <ScriptObject.h>
-#include "Framework.h"
+#include <Service.h>
 
 using namespace Sapphire;
 
@@ -10,8 +10,6 @@ using namespace Sapphire;
 // Quest ID: 65573
 // Start NPC: 1000195
 // End NPC: 1000195
-
-//NEED TEST KILLCREDIT
 
 class SubFst011 :
   public Sapphire::ScriptAPI::EventScript
@@ -49,8 +47,8 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto pEventMgr = m_framework->get< World::Manager::EventMgr >();
-    auto actor = pEventMgr->mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+    auto pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Actor0 && !player.hasQuest( getId() ) )
     {
@@ -67,15 +65,12 @@ public:
     if( npcId != Enemy0 )
       return;
 
-    auto currentKC = player.getQuestUI8AL( getId() ) + 1;
+    auto currentKC = player.getQuestUI8AL( getId() );
+    player.setQuestUI8AL( getId(), currentKC + 1 );
+    player.sendQuestMessage( getId(), 0, 2, currentKC + 1, 6 );
 
-    if( currentKC >= 6 )
+    if( currentKC + 1 >= 6 )
       player.updateQuest( getId(), SeqFinish );
-    else
-    {
-      player.setQuestUI8AL( getId(), currentKC );
-      player.sendQuestMessage( getId(), 0, 2, currentKC, 6 );
-    }
   }
 
 private:
@@ -99,7 +94,7 @@ private:
                       {
                         if( result.param2 == 1 )
                         {
-                          if( player.giveQuestRewards( getId(), 0 ) )
+                          if( player.giveQuestRewards( getId(), result.param3 ) )
                           {
                             player.finishQuest( getId() );
                           }

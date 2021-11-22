@@ -7,3 +7,6 @@
 [submodule "deps/recastnavigation"]
 	path = deps/recastnavigation
 	url = https://github.com/SapphireServer/recastnavigation
+[submodule "deps/ffxiv-actions"]
+	path = deps/ffxiv-actions
+	url = https://github.com/SapphireServer/ffxiv-actions.git

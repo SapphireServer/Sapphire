@@ -3,15 +3,14 @@
 
 #include <cstdint>
 #include <string>
-#include "Manager/BaseManager.h"
 
 namespace Sapphire::World::Manager
 {
 
-  class EventMgr : public BaseManager
+  class EventMgr
   {
   public:
-    EventMgr( FrameworkPtr pFw );
+    EventMgr() = default;
 
     std::string getEventName( uint32_t eventId );
 

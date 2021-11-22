@@ -6,18 +6,17 @@
 #include <mutex>
 #include <map>
 #include "ForwardsZone.h"
-#include "Manager/BaseManager.h"
 #include <Config/ConfigDef.h>
 
 namespace Sapphire::World
 {
 
-  class ServerMgr : public Manager::BaseManager
+  class ServerMgr
   {
   public:
-    ServerMgr( const std::string& configName, FrameworkPtr pFw );
+    ServerMgr( const std::string& configName );
 
-    ~ServerMgr() override;
+    ~ServerMgr();
 
     using WorldConfigPtr = std::shared_ptr< Sapphire::Common::Config::WorldConfig >;
 

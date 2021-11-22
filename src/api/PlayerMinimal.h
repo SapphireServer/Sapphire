@@ -2,8 +2,9 @@
 #define _PLAYERMINIMAL_H
 
 #include <map>
-#include <stdint.h>
-#include <string.h>
+#include <cstdint>
+#include <string>
+#include <cstring>
 
 namespace Sapphire::Api
 {

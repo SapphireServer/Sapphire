@@ -15,16 +15,19 @@ namespace Sapphire::World::Action
   public:
     explicit EffectResult( Entity::CharaPtr target, uint64_t delayMs );
 
-    void damage( uint32_t amount, Common::ActionHitSeverityType severity );
-    void heal( uint32_t amount, Common::ActionHitSeverityType severity );
+    void damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void startCombo( uint16_t actionId );
+    void comboSucceed();
+    void applyStatusEffect( uint16_t statusId, uint8_t param );
+    void mount( uint16_t mountId );
 
     Entity::CharaPtr getTarget() const;
 
     uint32_t getValue() const;
 
     uint64_t getDelay();
-
-    void setParam( uint8_t param );
 
     Common::EffectEntry buildEffectEntry() const;
 
@@ -35,11 +38,14 @@ namespace Sapphire::World::Action
 
     Entity::CharaPtr m_target;
 
-    Common::ActionHitSeverityType m_severity;
     Common::ActionEffectType m_type;
 
+    uint8_t m_param0;
+    uint8_t m_param1;
+    uint8_t m_param2;
+
     uint32_t m_value;
-    uint8_t m_param;
+    Common::ActionEffectResultFlag m_flag;
   };
 }
 

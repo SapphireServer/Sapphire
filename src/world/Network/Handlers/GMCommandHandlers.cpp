@@ -8,6 +8,7 @@
 #include <Exd/ExdDataGenerated.h>
 
 #include <unordered_map>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 
@@ -30,7 +31,6 @@
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
 #include "ServerMgr.h"
-#include "Framework.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -86,8 +86,7 @@ enum GmCommand
   JumpNpc = 0x025F,
 };
 
-void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
-                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
@@ -130,13 +129,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
   {
     case GmCommand::Lv:
     {
-      targetPlayer->setLevel( param1 );
+      targetPlayer->setLevel( static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Race:
     {
-      targetPlayer->setLookAt( CharaLook::Race, param1 );
+      targetPlayer->setLookAt( CharaLook::Race, static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Race for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
@@ -152,7 +151,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Tribe:
     {
-      targetPlayer->setLookAt( CharaLook::Tribe, param1 );
+      targetPlayer->setLookAt( CharaLook::Tribe, static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
@@ -168,7 +167,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Sex:
     {
-      targetPlayer->setLookAt( CharaLook::Gender, param1 );
+      targetPlayer->setLookAt( CharaLook::Gender, static_cast< uint8_t >( param1 ) );
       player.sendNotice( "Sex for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
@@ -325,7 +324,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         }
         else
         {
-          targetActor->getAsPlayer()->learnSong( param2, 0 );
+          targetActor->getAsPlayer()->learnSong( static_cast< uint8_t >( param2 ), 0 );
           player.sendNotice( "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
@@ -346,14 +345,23 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         player.sendUrgent( "Syntaxerror." );
         return;
       }
+      if( param1 <= 0x12 ) // crystal
+      {
+        targetPlayer->addCrystal( static_cast< Common::CrystalType >( param1 ), quantity, true );
+      }
+      else // item
+      {
+        // decode using the epic SE style HQ item id
+        bool isHq = param1 > 1000000;
 
-      if( !targetPlayer->addItem( param1, quantity ) )
-        player.sendUrgent( "Item #{0} could not be added to inventory.", param1 );
+        if( !targetPlayer->addItem( isHq ? param1 - 1000000 : param1, quantity, isHq, false, true, true ) )
+          player.sendUrgent( "Item #{0} could not be added to inventory.", isHq ? param1 - 1000000 : param1 );
+      }
       break;
     }
     case GmCommand::Gil:
     {
-      targetPlayer->addCurrency( CurrencyType::Gil, param1 );
+      targetPlayer->addCurrency( CurrencyType::Gil, param1, true );
       player.sendNotice( "Added {0} Gil for {1}", param1, targetPlayer->getName() );
       break;
     }
@@ -374,27 +382,27 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::QuestAccept:
     {
-      targetPlayer->updateQuest( param1, 1 );
+      targetPlayer->updateQuest( static_cast< uint16_t >( param1 ), 1 );
       break;
     }
     case GmCommand::QuestCancel:
     {
-      targetPlayer->removeQuest( param1 );
+      targetPlayer->removeQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
     case GmCommand::QuestComplete:
     {
-      targetPlayer->finishQuest( param1 );
+      targetPlayer->finishQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
     case GmCommand::QuestIncomplete:
     {
-      targetPlayer->unfinishQuest( param1 );
+      targetPlayer->unfinishQuest( static_cast< uint16_t >( param1 ) );
       break;
     }
     case GmCommand::QuestSequence:
     {
-      targetPlayer->updateQuest( param1, param2 );
+      targetPlayer->updateQuest( static_cast< uint16_t >( param1 ), static_cast< uint8_t >( param2 ) );
       break;
     }
     case GmCommand::GC:
@@ -405,7 +413,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         return;
       }
 
-      targetPlayer->setGc( param1 );
+      targetPlayer->setGc( static_cast< uint8_t >( param1 ) );
 
       // if we're changing them to a GC, check if they have a rank and if not, set it to the lowest rank
       if( param1 > 0 )
@@ -413,7 +421,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         auto gcRankIdx = static_cast< uint8_t >( param1 ) - 1;
         if( targetPlayer->getGcRankArray()[ gcRankIdx ] == 0 )
         {
-          player.setGcRankAt( gcRankIdx, 1 );
+          player.setGcRankAt( static_cast< uint8_t >( gcRankIdx ), 1 );
         }
       }
 
@@ -430,7 +438,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         return;
       }
 
-      targetPlayer->setGcRankAt( gcId, param1 );
+      targetPlayer->setGcRankAt( static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
       player.sendNotice( "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
                          targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
@@ -448,7 +456,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         }
         else
         {
-          targetActor->getAsPlayer()->registerAetheryte( param2 );
+          targetActor->getAsPlayer()->registerAetheryte( static_cast< uint8_t >( param2 ) );
           player.sendNotice( "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
@@ -464,8 +472,8 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
     }
     case GmCommand::Teri:
     {
-      auto pTeriMgr = pFw->get< TerritoryMgr >();
-      if( auto instance = pTeriMgr->getTerritoryByGuId( param1 ) )
+      auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+      if( auto instance = teriMgr.getTerritoryByGuId( param1 ) )
       {
         player.sendDebug( "Found instance: {0}, id#{1}", instance->getName(), param1 );
 
@@ -482,20 +490,20 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
         player.setInstance( instance );
       }
-      else if( !pTeriMgr->isValidTerritory( param1 ) )
+      else if( !teriMgr.isValidTerritory( param1 ) )
       {
         player.sendUrgent( "Invalid zone {0}", param1 );
       }
       else
       {
-        auto pZone = pTeriMgr->getZoneByTerritoryTypeId( param1 );
+        auto pZone = teriMgr.getZoneByTerritoryTypeId( param1 );
         if( !pZone )
         {
           player.sendUrgent( "No zone instance found for {0}", param1 );
           break;
         }
 
-        if( !pTeriMgr->isDefaultTerritory( param1 ) )
+        if( !teriMgr.isDefaultTerritory( param1 ) )
         {
           player.sendUrgent( "{0} is an instanced area - instance ID required to zone in.", pZone->getName() );
           break;
@@ -504,12 +512,12 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         bool doTeleport = false;
         uint16_t teleport;
 
-        auto pExdData = pFw->get< Data::ExdDataGenerated >();
-        auto idList = pExdData->getAetheryteIdList();
+        auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+        auto idList = exdData.getAetheryteIdList();
 
         for( auto i : idList )
         {
-          auto data = pExdData->get< Sapphire::Data::Aetheryte >( i );
+          auto data = exdData.get< Sapphire::Data::Aetheryte >( i );
 
           if( !data )
           {
@@ -521,7 +529,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
             if( data->isAetheryte )
             {
               doTeleport = true;
-              teleport = i;
+              teleport = static_cast< uint16_t >( i );
               break;
             }
           }
@@ -533,7 +541,7 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
         else
         {
           targetPlayer->setPos( targetPlayer->getPos() );
-          targetPlayer->performZoning( param1, targetPlayer->getPos(), 0 );
+          targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getPos(), 0 );
         }
 
         player.sendNotice( "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );
@@ -587,14 +595,13 @@ void Sapphire::Network::GameConnection::gm1Handler( FrameworkPtr pFw,
 
 }
 
-void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
-                                                    const Packets::FFXIVARR_PACKET_RAW& inPacket,
+void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                     Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
 
-  auto pServerZone = pFw->get< World::ServerMgr >();
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
 
@@ -605,10 +612,10 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
   const auto param4 = packet.data().param4;
   const auto target = std::string( packet.data().target );
 
-  Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
+  Logger::info( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                  player.getName(), commandId, param1, param2, param3, param4, target );
 
-  auto targetSession = pServerZone->getSession( target );
+  auto targetSession = serverMgr.getSession( target );
   Sapphire::Entity::CharaPtr targetActor;
 
   if( targetSession != nullptr )
@@ -642,8 +649,6 @@ void Sapphire::Network::GameConnection::gm2Handler( FrameworkPtr pFw,
       targetPlayer->setStatus( Common::ActorStatus::Idle );
       targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
-
-      targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), ZoneIn, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,
                                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );

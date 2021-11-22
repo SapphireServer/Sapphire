@@ -12,6 +12,7 @@
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Inventory/ItemContainer.h"
@@ -21,13 +22,12 @@
 
 #include "Forwards.h"
 #include "Land.h"
-#include "Framework.h"
 #include "House.h"
 
 using namespace Sapphire::Common;
 
 Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-                      Sapphire::Data::HousingLandSetPtr info, FrameworkPtr pFw ) :
+                      Sapphire::Data::HousingLandSetPtr info ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( Util::getTimeSeconds() + 21600 ),
@@ -38,8 +38,7 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
   m_fcIcon( 0 ),
   m_fcIconColor( 0 ),
   m_fcId( 0 ),
-  m_iconAddIcon( 0 ),
-  m_pFw( pFw )
+  m_iconAddIcon( 0 )
 {
   memset( &m_tag, 0x00, 3 );
 
@@ -63,8 +62,8 @@ void Sapphire::Land::init( Common::LandType type, Common::HouseSize size, Common
   m_currentPrice = currentPrice;
   m_ownerId = ownerId;
 
-  auto pExdData = m_pFw->get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto info = exdData.get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
   if( info )
   {
     m_mapMarkerPosition.x = info->x;
@@ -211,15 +210,15 @@ void Sapphire::Land::updateLandDb()
     houseId = getHouse()->getId();
 
   // todo: change to prepared statement
-  auto pDb = m_pFw->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  pDb->directExecute( "UPDATE land SET status = " + std::to_string( m_state )
-                      + ", LandPrice = " + std::to_string( getCurrentPrice() )
-                      + ", UpdateTime = " + std::to_string( getDevaluationTime() )
-                      + ", OwnerId = " + std::to_string( getOwnerId() )
-                      + ", HouseId = " + std::to_string( houseId )
-                      + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  db.directExecute( "UPDATE land SET status = " + std::to_string( m_state )
+                     + ", LandPrice = " + std::to_string( getCurrentPrice() )
+                     + ", UpdateTime = " + std::to_string( getDevaluationTime() )
+                     + ", OwnerId = " + std::to_string( getOwnerId() )
+                     + ", HouseId = " + std::to_string( houseId )
+                     + ", Type = " + std::to_string( static_cast< uint32_t >( m_type ) ) //TODO: add house id
                       + " WHERE LandSetId = " + std::to_string( m_landSetId )
-                      + " AND LandId = " + std::to_string( m_landIdent.landId ) + ";" );
+                     + " AND LandId = " + std::to_string( m_landIdent.landId ) + ";" );
 
   if( auto house = getHouse() )
     house->updateHouseDb();
@@ -241,5 +240,20 @@ void Sapphire::Land::update( uint64_t tickCount )
 
 Sapphire::Land::InvMaxItemsPair Sapphire::Land::getInventoryItemMax() const
 {
-  return std::make_pair( m_maxPlacedExternalItems, m_maxPlacedInternalItems );
+  switch( m_size )
+  {
+    case HouseSize::Cottage:
+    {
+      return std::make_pair( 20, 200 );
+    }
+    case HouseSize::House:
+    {
+      return std::make_pair( 30, 300 );
+    }
+    case HouseSize::Mansion:
+    {
+      return std::make_pair( 40, 400 );
+    }
+  }
+  assert( false );
 }

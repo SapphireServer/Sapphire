@@ -36,10 +36,11 @@ struct ZoneInfo
   uint16_t id;
   std::string name;
   std::string path;
+  uint16_t mapId;
 };
 
 // parsing shit
-std::string gamePath( "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::unordered_map< uint32_t, std::string > eobjNameMap;
 std::unordered_map< uint16_t, ZoneInfo > zoneInfoMap;
 std::unordered_map< uint16_t, std::vector< std::pair< uint16_t, std::string > > > zoneInstanceMap;
@@ -60,8 +61,7 @@ struct vec2
   float x, y;
 };
 
-struct DiscoveryMap :
-  std::enable_shared_from_this< DiscoveryMap >
+struct DiscoveryMap : std::enable_shared_from_this< DiscoveryMap >
 {
   std::string path;
   Image img;
@@ -120,11 +120,11 @@ struct DiscoveryMap :
 std::map< uint16_t, std::map< uint16_t, std::map< uint16_t, std::shared_ptr< DiscoveryMap > > > > discoveryMaps;
 
 
-enum class TerritoryTypeExdIndexes :
-  size_t
+enum class TerritoryTypeExdIndexes : size_t
 {
   TerritoryType = 0,
-  Path = 1
+  Path = 1,
+  Map = 6
 };
 
 using namespace std::chrono_literals;
@@ -162,10 +162,12 @@ std::string zoneNameToPath( const std::string& name )
       auto teriPath = std::get< std::string >(
         fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Path ) ) );
       ZoneInfo info;
-      info.id = row.first;
+      info.id = row.first.rowId;
       info.path = teriPath;
       info.name = teriName;
-      zoneInfoMap[ row.first ] = info;
+      info.mapId = std::get< uint16_t >(
+        fields.at( static_cast< size_t >( TerritoryTypeExdIndexes::Map ) ) );
+      zoneInfoMap[ row.first.rowId ] = info;
 
       if( !found && ( Common::Util::toLowerCopy( name ) == Common::Util::toLowerCopy( teriName ) ) )
       {
@@ -210,75 +212,37 @@ void loadEobjNames()
   static auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::en ) );
   for( auto& row : exd.get_rows() )
   {
-    auto id = row.first;
+    auto id = row.first.rowId;
     auto& fields = row.second;
     auto name = std::get< std::string >( fields.at( 0 ) );
     eobjNameMap[ id ] = name;
   }
 }
 
-void writeEobjEntry( std::ofstream& out, LGB_ENTRY* pObj )
+void writeMapRangeEntry( std::ofstream& out, LgbEntry* pObj )
 {
-  static std::string mapRangeStr( "\"MapRange\", " );
-  std::ofstream discoverySql( zoneName + "_poprange.txt", std::ios::app );
-  uint32_t id;
-  uint32_t unknown2 = 0, unknown2_1 = 0, unknown3 = 0;
-  std::string name;
-  std::string typeStr;
-  uint32_t eobjlevelHierachyId = 0;
-  static std::map< uint32_t, std::map< uint32_t, uint32_t > > exportedMapRange;
+  auto pMapRange = reinterpret_cast< LGB_MAP_RANGE_ENTRY* >( pObj );
+  if( !pMapRange->data.discoveryEnabled )
+    return;
 
-  auto pMapRange = reinterpret_cast< LGB_MAPRANGE_ENTRY* >( pObj );
-  id = pMapRange->header.unknown;
-  unknown2 = pMapRange->header.unknown2;
-  unknown2_1 = pMapRange->header.unknown2_1;
-  unknown3 = pMapRange->header.unknown3;
-  typeStr = mapRangeStr;
-
-  // discovery shit
-  vec2 pos{ 0 };
   auto subArea = 0;
   auto mapId = -1;
-  auto discoveryIndex = pMapRange->header.discoveryIndex;
+  auto discoveryIndex = pMapRange->data.discoveryIndex;
 
-  vec3 translation = pObj->header.translation;
+  vec3 translation = pObj->header.transform.translation;
 
-  bool found = false;
-  float scale = 100.f; //pMapRange->header.unknown2
-
-  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.unknown ) + " " +
-  std::to_string( pMapRange->header.translation.x ) + " " +
-  std::to_string( pMapRange->header.translation.y ) + " " +
-  std::to_string( pMapRange->header.translation.z ) + " " +
-  std::to_string( pMapRange->header.rotation.y ) + "\n"
+  std::string outStr( pMapRange->name + " " + std::to_string( pMapRange->header.instanceId ) + " " +
+                      std::to_string( pMapRange->header.transform.translation.x ) + " " +
+                      std::to_string( pMapRange->header.transform.translation.y ) + " " +
+                      std::to_string( pMapRange->header.transform.translation.z ) + " " +
+                      std::to_string( pMapRange->header.transform.rotation.y ) + " " +
+                      std::to_string( pMapRange->data.mapId ) + " " +
+                      std::to_string( pMapRange->data.discoveryIndex ) + "\n"
   );
 
-    //std::to_string( pObj->header.translation.x ) + ", " + std::to_string( pObj->header.translation.y ) + ", " + std::to_string( pObj->header.translation.z ) +
-    //", " + std::to_string( subArea ) + "" + "\n"
-  //);
-  discoverySql.write( outStr.c_str(), outStr.size() );
-  //out.write( outStr.c_str(), outStr.size() );
-}
+  out.write( outStr.c_str(), outStr.size() );
 
-void readFileToBuffer( const std::string& path, std::vector< char >& buf )
-{
-  auto inFile = std::ifstream( path, std::ios::binary );
-  if( inFile.good() )
-  {
-    inFile.seekg( 0, inFile.end );
-    int32_t fileSize = ( int32_t ) inFile.tellg();
-    buf.resize( fileSize );
-    inFile.seekg( 0, inFile.beg );
-    inFile.read( &buf[ 0 ], fileSize );
-    inFile.close();
-  }
-  else
-  {
-    throw std::runtime_error( "Unable to open " + path );
-  }
 }
-
-bool isEx = false;
 
 int main( int argc, char* argv[] )
 {
@@ -288,10 +252,6 @@ int main( int argc, char* argv[] )
   std::vector< std::string > argVec( argv + 1, argv + argc );
   zoneName = "s1h1";
 
-  bool dumpAll = ignoreModels = std::remove_if( argVec.begin(), argVec.end(), []( auto arg )
-  { return arg == "--dump-all"; } ) != argVec.end();
-  dumpAll = true;
-  ignoreModels = true;
   if( argc > 1 )
   {
     zoneName = argv[ 1 ];
@@ -304,118 +264,42 @@ int main( int argc, char* argv[] )
   }
 
   initExd( gamePath );
-  std::ofstream discoverySql( zoneName + "_poprange.txt", std::ios::trunc );
-  discoverySql.close();
+  std::ofstream discoverySql( "maprange_export.txt", std::ios::trunc );
 
-  if( dumpAll )
+  zoneNameToPath( "f1f1" );
+  zoneDumpList.emplace( "f1f1" );
+  zoneDumpList.emplace( "f1f2" );
+
+  for( const auto& zoneName : zoneDumpList )
   {
-    zoneNameToPath( "s1h1" );
-
-    zoneDumpList.emplace( "s1h1" );
-    zoneDumpList.emplace( "f1h1" );
-    zoneDumpList.emplace( "w1h1" );
-    zoneDumpList.emplace( "e1h1" );
-  }
-  else
-  {
-    zoneDumpList.emplace( zoneName );
-  }
-
-  LABEL_DUMP:
-  entryStartTime = std::chrono::system_clock::now();
-  zoneName = *zoneDumpList.begin();
-  discoverySql.open( zoneName + "_poprange.txt", std::ios::trunc );
-  discoverySql.write( ( zoneName + "\n" ).c_str() , zoneName.size() + 1 );
-  try
-  {
-    const auto zonePath = zoneNameToPath( zoneName );
-
-    std::string listPcbPath( zonePath + "/collision/list.pcb" );
-    std::string bgLgbPath( zonePath + "/level/bg.lgb" );
-    std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
-    std::string collisionFilePath( zonePath + "/collision/" );
-
-    isEx = bgLgbPath.find( "ex1" ) != -1 || bgLgbPath.find( "ex2" ) != -1;
-    std::vector< char > section;
-    std::vector< char > section1;
-    std::vector< char > section2;
-
-    auto test_file = gameData->getFile( bgLgbPath );
-    section = test_file->access_data_sections().at( 0 );
-
-    auto planmap_file = gameData->getFile( planmapLgbPath );
-    section2 = planmap_file->access_data_sections().at( 0 );
-
-    auto test_file1 = gameData->getFile( listPcbPath );
-    section1 = test_file1->access_data_sections().at( 0 );
-
-    std::vector< std::string > stringList;
-
-    uint32_t offset1 = 0x20;
-
-    //loadEobjNames();
-    //getMapExdEntries( zoneId );
-
-    std::string eobjFileName( zoneName + "_eobj.csv" );
-    std::ofstream eobjOut( eobjFileName, std::ios::trunc );
-    if( !eobjOut.good() )
-      throw std::string( "Unable to create " + zoneName +
-                         "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
-
-    eobjOut.close();
-    eobjOut.open( eobjFileName, std::ios::app );
-
-    if( !eobjOut.good() )
-      throw std::string( "Unable to create " + zoneName +
-                         "_eobj.csv for eobj entries. Run as admin or check there isnt already a handle on the file." ).c_str();
-
-    if( 0 )
+    entryStartTime = std::chrono::system_clock::now();
+    discoverySql.write( ( zoneName + "\n" ).c_str(), zoneName.size() + 1 );
+    try
     {
-      for( ;; )
-      {
+      const auto zonePath = zoneNameToPath( zoneName );
 
-        uint16_t trId = *( uint16_t* ) &section1[ offset1 ];
+      std::string bgLgbPath( zonePath + "/level/bg.lgb" );
+      std::string planmapLgbPath( zonePath + "/level/planmap.lgb" );
+      std::vector< char > section;
+      std::vector< char > section2;
 
-        char someString[200];
-        sprintf( someString, "%str%04d.pcb", collisionFilePath.c_str(), trId );
-        stringList.push_back( std::string( someString ) );
-        //std::cout << someString << "\n";
-        offset1 += 0x20;
+      auto test_file = gameData->getFile( bgLgbPath );
+      section = test_file->access_data_sections().at( 0 );
 
-        if( offset1 >= section1.size() )
-        {
-          break;
-        }
-      }
-    }
-    LGB_FILE bgLgb( &section[ 0 ], "bg" );
-    LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
+      auto planmap_file = gameData->getFile( planmapLgbPath );
+      section2 = planmap_file->access_data_sections().at( 0 );
 
-    std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
-    uint32_t max_index = 0;
+      std::vector< std::string > stringList;
 
-    // dont bother if we cant write to a file
-    FILE* fp_out = nullptr;
-    //auto fp_out = ignoreModels ? ( FILE* )nullptr : fopen( ( zoneName + ".obj" ).c_str(), "w" );
-    if( fp_out )
-    {
-      fprintf( fp_out, "\n" );
-      fclose( fp_out );
-    }
-    else if( /*!ignoreModels*/ false )
-    {
-      std::string errorMessage( "Cannot create " + zoneName + ".obj\n" +
-                                " Check no programs have a handle to file and run as admin.\n" );
-      std::cout << errorMessage;
-      throw std::runtime_error( errorMessage.c_str() );
-      return 0;
-    }
+      uint32_t offset1 = 0x20;
 
+      LGB_FILE bgLgb( &section[ 0 ], "bg" );
+      LGB_FILE planmapLgb( &section2[ 0 ], "planmap" );
 
-    {
-      std::map< std::string, PCB_FILE > pcbFiles;
+      std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
+      uint32_t max_index = 0;
 
-      std::cout << "[Info] " << ( ignoreModels ? "Dumping MapRange and EObj" : "Writing obj file " ) << "\n";
+      std::cout << "[Info] " << "Dumping MapRange and EObj" << "\n";
       uint32_t totalGroups = 0;
       uint32_t totalGroupEntries = 0;
 
@@ -423,48 +307,46 @@ int main( int argc, char* argv[] )
       {
         for( const auto& group : lgb.groups )
         {
-          //std::cout << "\t" << group.name << " Size " << group.header.entryCount << "\n";
           totalGroups++;
           for( const auto& pEntry : group.entries )
           {
-            if( pEntry->getType() == LgbEntryType::PopRange )
+            if( pEntry->getType() == LgbEntryType::MapRange )
             {
               totalGroupEntries++;
-              writeEobjEntry( eobjOut, pEntry.get() );
+              writeMapRangeEntry( discoverySql, pEntry.get() );
+            }
+            else if( pEntry->getType() == LgbEntryType::ExitRange )
+            {
+              auto pExitRange = reinterpret_cast< LGB_EXIT_RANGE_ENTRY* >( pEntry.get() );
+
             }
           }
         }
       }
-      std::cout << "[Info] " << "Loaded " << pcbFiles.size() << " PCB Files \n";
       std::cout << "[Info] " << "Total Groups " << totalGroups << " Total entries " << totalGroupEntries << "\n";
+
+      std::cout << "[Success] " << "Exported " << zoneName << " in " <<
+                std::chrono::duration_cast< std::chrono::seconds >(
+                  std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
     }
-    std::cout << "[Success] " << "Exported " << zoneName << " in " <<
-              std::chrono::duration_cast< std::chrono::seconds >(
-                std::chrono::system_clock::now() - entryStartTime ).count() << " seconds\n";
+    catch( std::exception& e )
+    {
+      std::cout << "[Error] " << e.what() << std::endl;
+      std::cout << "[Error] "
+                << "Unable to extract collision data.\n\tIf using standalone ensure your working directory folder layout is \n\tbg/[ffxiv|ex1|ex2]/teri/type/zone/[level|collision]"
+                << std::endl;
+      std::cout << std::endl;
+      std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
+    }
+    std::cout << "\n";
+    if( discoverySql.good() )
+      discoverySql.flush();
   }
-  catch( std::exception& e )
-  {
-    std::cout << "[Error] " << e.what() << std::endl;
-    std::cout << "[Error] "
-              << "Unable to extract collision data.\n\tIf using standalone ensure your working directory folder layout is \n\tbg/[ffxiv|ex1|ex2]/teri/type/zone/[level|collision]"
-              << std::endl;
-    std::cout << std::endl;
-    std::cout << "[Info] " << "Usage: pcb_reader2 territory \"path/to/game/sqpack/ffxiv\" " << std::endl;
-  }
-  std::cout << "\n\n\n";
-  if( discoverySql.good() )
-    discoverySql.flush();
-
-  LABEL_NEXT_ZONE_ENTRY:
-  zoneDumpList.erase( zoneName );
-  if( !zoneDumpList.empty() )
-    goto LABEL_DUMP;
-
-
-  std::cout << "\n\n\n[Success] Finished all tasks in " <<
+  std::cout << "\n[Success] Finished all tasks in " <<
             std::chrono::duration_cast< std::chrono::seconds >( std::chrono::system_clock::now() - startTime ).count()
             << " seconds\n";
 
+  std::cout << "Press any key to exit...";
   getchar();
 
   if( eData )

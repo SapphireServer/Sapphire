@@ -10,6 +10,7 @@
 
 #include <unordered_map>
 #include <cstring>
+#include <Service.h>
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
@@ -21,7 +22,6 @@
 #include "Territory/Housing/HousingInteriorTerritory.h"
 #include "HousingMgr.h"
 #include "Territory/Land.h"
-#include "Framework.h"
 #include "ServerMgr.h"
 #include "Territory/House.h"
 #include "InventoryMgr.h"
@@ -34,8 +34,7 @@ using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::Server;
 
-Sapphire::World::Manager::HousingMgr::HousingMgr( FrameworkPtr pFw ) :
-  BaseManager( pFw )
+Sapphire::World::Manager::HousingMgr::HousingMgr()
 {
   m_containerMap[ 0 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems1, InventoryType::HousingInteriorStoreroom1 );
   m_containerMap[ 1 ] = std::make_pair( InventoryType::HousingInteriorPlacedItems2, InventoryType::HousingInteriorStoreroom2 );
@@ -113,10 +112,10 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
 {
   Logger::info( "HousingMgr: Loading inventories for estates" );
 
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::LAND_INV_SEL_ALL );
-  auto res = pDb->query( stmt );
+  auto stmt = db.getPreparedStatement( Db::LAND_INV_SEL_ALL );
+  auto res = db.query( stmt );
 
   uint32_t itemCount = 0;
   while( res->next() )
@@ -130,7 +129,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
     auto stain = res->getUInt8( "stain" );
     auto characterId = res->getUInt64( "CharacterId" );
 
-    auto item = Inventory::make_HousingItem( itemId, catalogId, framework() );
+    auto item = Inventory::make_HousingItem( itemId, catalogId );
     item->setStain( stain );
     item->setStackSize( 1 );
     // todo: need to set the owner character id on the item
@@ -159,7 +158,7 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
       continue;
     }
 
-    container->second->setItem( slot, item );
+    container->second->setItem( static_cast< uint8_t >( slot ), item );
 
     itemCount++;
   }
@@ -171,10 +170,10 @@ bool Sapphire::World::Manager::HousingMgr::loadEstateInventories()
 
 void Sapphire::World::Manager::HousingMgr::initLandCache()
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::LAND_SEL_ALL );
-  auto res = pDb->query( stmt );
+  auto stmt = db.getPreparedStatement( Db::LAND_SEL_ALL );
+  auto res = db.query( stmt );
 
   while( res->next() )
   {
@@ -182,7 +181,7 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
     // land stuff
     entry.m_landSetId = res->getUInt64( "LandSetId" );
-    entry.m_landId = res->getUInt( "LandId" );
+    entry.m_landId = static_cast< uint16_t >( res->getUInt( "LandId" ) );
 
     entry.m_type = static_cast< Common::LandType >( res->getUInt( "Type" ) );
     entry.m_size = static_cast< Common::HouseSize >( res->getUInt8( "Size" ) );
@@ -233,16 +232,16 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
     // setup containers
     // todo: this is pretty garbage
     Common::LandIdent ident;
-    ident.territoryTypeId = entry.m_landSetId >> 16;
-    ident.wardNum = entry.m_landSetId & 0xFFFF;
-    ident.landId = entry.m_landId;
+    ident.territoryTypeId = static_cast< int16_t >( entry.m_landSetId >> 16 );
+    ident.wardNum = static_cast< int16_t >( entry.m_landSetId & 0xFFFF );
+    ident.landId = static_cast< int16_t >( entry.m_landId );
     ident.worldId = 67;
 
     auto& containers = getEstateInventory( ident );
 
     auto makeContainer = [ &containers, this ]( Common::InventoryType type, uint16_t size )
     {
-      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false, framework(), false );
+      containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false, false );
     };
 
     uint16_t count = 0;
@@ -272,8 +271,8 @@ void Sapphire::World::Manager::HousingMgr::initLandCache()
 
 uint64_t Sapphire::World::Manager::HousingMgr::getNextHouseId()
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto pQR = pDb->query( "SELECT MAX( HouseId ) FROM house" );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto pQR = db.query( "SELECT MAX( HouseId ) FROM house" );
 
   if( !pQR->next() )
     return 0;
@@ -288,14 +287,14 @@ uint32_t Sapphire::World::Manager::HousingMgr::toLandSetId( uint16_t territoryTy
 
 Sapphire::Data::HousingZonePtr Sapphire::World::Manager::HousingMgr::getHousingZoneByLandSetId( uint32_t id )
 {
-  auto pTeriMgr = framework()->get< TerritoryMgr >();
-  return std::dynamic_pointer_cast< HousingZone >( pTeriMgr->getZoneByLandSetId( id ) );
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  return std::dynamic_pointer_cast< HousingZone >( terriMgr.getZoneByLandSetId( id ) );
 }
 
 Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint32_t id )
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
-  auto res = pDb->query( "SELECT LandSetId, LandId FROM land WHERE OwnerId = " + std::to_string( id ) );
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto res = db.query( "SELECT LandSetId, LandId FROM land WHERE OwnerId = " + std::to_string( id ) );
 
   if( !res->next() )
     return nullptr;
@@ -305,20 +304,22 @@ Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint32
   if( !hZone )
     return nullptr;
 
-  return hZone->getLand( res->getUInt( 2 ) );
+  return hZone->getLand( static_cast< uint8_t >( res->getUInt( 2 ) ) );
 }
 
 void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident )
 {
-  player.setActiveLand( ident.landId, ident.wardNum );
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
 
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  player.setActiveLand( static_cast< uint8_t >( ident.landId ), static_cast< uint8_t >( ident.wardNum ) );
+
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( ident.landId );
+  auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
   if( !land )
     return;
 
@@ -335,8 +336,9 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
     std::strcpy( landInfoSignPacket->data().estateGreeting, house->getHouseGreeting().c_str() );
   }
 
-  uint32_t playerId = land->getOwnerId();
-  std::string playerName = framework()->get< World::ServerMgr >()->getPlayerNameFromDb( playerId );
+  uint32_t playerId = static_cast< uint32_t >( land->getOwnerId() );
+
+  std::string playerName = serverMgr.getPlayerNameFromDb( playerId );
 
   memcpy( &landInfoSignPacket->data().ownerName, playerName.c_str(), playerName.size() );
 
@@ -345,15 +347,15 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
 
 void Sapphire::World::Manager::HousingMgr::sendLandSignFree( Entity::Player& player, const Common::LandIdent ident )
 {
-  player.setActiveLand( ident.landId, ident.wardNum );
+  player.setActiveLand( static_cast< uint8_t >( ident.landId ), static_cast< uint8_t >( ident.wardNum ) );
 
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( ident.landId );
+  auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
   auto plotPricePacket = makeZonePacket< Server::FFXIVIpcLandPriceUpdate >( player.getId() );
   plotPricePacket->data().price = land->getCurrentPrice();
   plotPricePacket->data().timeLeft = land->getDevaluationTime();
@@ -463,6 +465,8 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
 
 void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId )
 {
+  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+
   auto landSetId = toLandSetId( territoryTypeId, wardId );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
@@ -471,7 +475,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
 
   auto wardInfoPacket = makeZonePacket< Server::FFXIVIpcHousingWardInfo >( player.getId() );
   wardInfoPacket->data().landIdent.wardNum = wardId;
-  wardInfoPacket->data().landIdent.territoryTypeId = territoryTypeId;
+  wardInfoPacket->data().landIdent.territoryTypeId = static_cast< int16_t >( territoryTypeId );
 
   // todo: properly get worldId
   wardInfoPacket->data().landIdent.worldId = 67;
@@ -509,7 +513,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
         entry.infoFlags |= Common::WardlandFlags::IsEstateOwned;
 
         auto owner = land->getOwnerId();
-        auto playerName = framework()->get< World::ServerMgr >()->getPlayerNameFromDb( owner );
+        auto playerName = serverMgr.getPlayerNameFromDb( static_cast< uint32_t >( owner ) );
         memcpy( &entry.estateOwnerName, playerName.c_str(), playerName.size() );
 
         break;
@@ -524,13 +528,13 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
 
 void Sapphire::World::Manager::HousingMgr::sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( ident.landId );
+  auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
   if( !land )
     return;
 
@@ -556,16 +560,16 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
   auto itemMax = land->getInventoryItemMax();
 
   // type, maxSize, tableName, isMultiStorage
-  auto intContainer = make_ItemContainer( InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true, framework() );
-  auto extContainer = make_ItemContainer( InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true, framework() );
+  auto intContainer = make_ItemContainer( InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true );
+  auto extContainer = make_ItemContainer( InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true );
 
   // add containers to inv collection
   auto& houseInventory = getEstateInventory( house->getLandIdent() );
   houseInventory[ InventoryType::HousingInteriorAppearance ] = intContainer;
   houseInventory[ InventoryType::HousingExteriorAppearance ] = extContainer;
 
-  auto exdData = framework()->get< Sapphire::Data::ExdDataGenerated >();
-  auto preset = exdData->get< Sapphire::Data::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
+  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+  auto preset = exdData.get< Sapphire::Data::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
   if( !preset )
     return false;
 
@@ -617,7 +621,7 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
     }
   };
 
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
 
   // create and link items
   for( auto& destContainer : invMap )
@@ -630,12 +634,12 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
       if( item.second == 0 )
         continue;
 
-      auto pItem = invMgr->createItem( player, item.second );
+      auto pItem = invMgr.createItem( player, static_cast< uint32_t >( item.second ) );
 
-      container->setItem( item.first, pItem );
+      container->setItem( static_cast< uint8_t >( item.first ), pItem );
     }
 
-    invMgr->saveHousingContainer( land->getLandIdent(), container );
+    invMgr.saveHousingContainer( land->getLandIdent(), container );
   }
 
   // lift off
@@ -646,16 +650,16 @@ bool Sapphire::World::Manager::HousingMgr::initHouseModels( Entity::Player& play
 
 void Sapphire::World::Manager::HousingMgr::createHouse( Sapphire::HousePtr house ) const
 {
-  auto pDb = framework()->get< Db::DbWorkerPool< Db::ZoneDbConnection > >();
+  auto& db = Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto stmt = pDb->getPreparedStatement( Db::HOUSING_HOUSE_INS );
+  auto stmt = db.getPreparedStatement( Db::HOUSING_HOUSE_INS );
   // LandSetId, HouseId, HouseName
 
   stmt->setUInt( 1, house->getLandSetId() );
   stmt->setUInt( 2, house->getId() );
   stmt->setString( 3, house->getHouseName() );
 
-  pDb->execute( stmt );
+  db.execute( stmt );
 }
 
 void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId )
@@ -675,7 +679,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   // create house
   auto ident = pLand->getLandIdent();
   auto house = make_House( getNextHouseId(), pLand->getLandSetId(), ident,
-                           "Estate #" + std::to_string( ident.landId + 1 ), "", framework() );
+                           "Estate #" + std::to_string( ident.landId + 1 ), "" );
 
   pLand->setHouse( house );
 
@@ -698,10 +702,12 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   pLand->updateLandDb();
 
-  // start house built event
+  // start house built event - disabled because it fucks your audio device
   // CmnDefHousingBuildHouse_00149
-  player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
-  player.playScene( 0x000B0095, 0, SET_BASE | HIDE_HOTBAR , 0, 1, plotNum, nullptr );
+  //player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
+  //player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
+  // instead we do a fake zone to unlock the client
+  Common::Service< TerritoryMgr >::ref().movePlayer( player.getCurrentTerritory(), player.getAsPlayer() );
 
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
@@ -711,13 +717,13 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
 void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( ident.landId );
+  auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
 
   auto house = land->getHouse();
   if( !house )
@@ -733,13 +739,13 @@ void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& 
 
 void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( ident.landId );
+  auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
   if( !land )
     return;
 
@@ -757,13 +763,13 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Pl
 
 void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent ident, const std::string& greeting )
 {
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto zone = getHousingZoneByLandSetId( landSetId );
 
   if( !zone )
     return;
 
-  auto land = zone->getLand( ident.landId );
+  auto land = zone->getLand( static_cast< uint8_t >( ident.landId ) );
   if( !land )
     return;
 
@@ -782,7 +788,7 @@ void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player&
 
 void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, const Common::LandIdent ident )
 {
-  auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+  auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto hZone = getHousingZoneByLandSetId( landSetId );
 
   if( !hZone )
@@ -804,13 +810,13 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
 Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerParamsToLandIdent( uint32_t param11, uint32_t param12, bool use16bits ) const
 {
   Common::LandIdent ident;
-  ident.worldId = param11 >> 16;
-  ident.territoryTypeId = param11 & 0xFFFF;
+  ident.worldId = static_cast< int16_t >( param11 >> 16 );
+  ident.territoryTypeId = static_cast< int16_t >( param11 & 0xFFFF );
 
   if( use16bits )
   {
-    ident.wardNum = param12 >> 16;
-    ident.landId = param12 & 0xFFFF;
+    ident.wardNum = static_cast< int16_t >( param12 >> 16 );
+    ident.landId = static_cast< int16_t >( param12 & 0xFFFF );
   }
   else
   {
@@ -837,13 +843,13 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
 
     auto ident = internalZone->getLandIdent();
 
-    auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
+    auto landSetId = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
     auto exteriorZone = getHousingZoneByLandSetId( landSetId );
 
     if( !exteriorZone )
       return;
 
-    targetLand = exteriorZone->getLand( ident.landId );
+    targetLand = exteriorZone->getLand( static_cast< uint8_t >( ident.landId ) );
   }
   else
   {
@@ -865,8 +871,8 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   if( it == containers.end() )
     return;
 
-  auto invMgr = framework()->get< Manager::InventoryMgr >();
-  invMgr->sendInventoryContainer( player, it->second );
+  auto& invMgr = Common::Service< Manager::InventoryMgr >::ref();
+  invMgr.sendInventoryContainer( player, it->second );
 }
 
 const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
@@ -898,6 +904,8 @@ Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
 void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr house )
 {
   assert( house );
+
+  house->clearModelCache();
 
   auto& containers = getEstateInventory( house->getLandIdent() );
 
@@ -940,8 +948,8 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
 
 uint32_t Sapphire::World::Manager::HousingMgr::getItemAdditionalData( uint32_t catalogId )
 {
-  auto pExdData = framework()->get< Data::ExdDataGenerated >();
-  auto info = pExdData->get< Sapphire::Data::Item >( catalogId );
+  auto& pExdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto info = pExdData.get< Sapphire::Data::Item >( catalogId );
   return info->additionalData;
 }
 
@@ -974,7 +982,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   // inside housing territory
   if( auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
   {
-    land = zone->getLand( landId );
+    land = zone->getLand( static_cast< uint8_t >( landId ) );
 
     isOutside = true;
   }
@@ -985,9 +993,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     // todo: this whole process is retarded and needs to be fixed
     // perhaps maintain a list of estates by ident inside housingmgr?
     auto ident = zone->getLandIdent();
-    auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+    auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
 
-    land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+    land = getHousingZoneByLandSetId( landSet )->getLand( static_cast< uint8_t >( ident.landId ) );
   }
   // wtf?
   else
@@ -1047,7 +1055,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
 
   if( auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
   {
-    land = zone->getLand( landId );
+    land = zone->getLand( static_cast< uint8_t >( landId ) );
     isOutside = true;
   }
   else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >(
@@ -1056,15 +1064,15 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
     // todo: this whole process is retarded and needs to be fixed
     // perhaps maintain a list of estates by ident inside housingmgr?
     auto ident = zone->getLandIdent();
-    auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
+    auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
 
-    land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+    land = getHousingZoneByLandSetId( landSet )->getLand( static_cast< uint8_t >( ident.landId ) );
   }
 
   if( !hasPermission( player, *land, 0 ) )
     return;
 
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Common::Service< InventoryMgr >::ref();
   auto ident = land->getLandIdent();
   auto& containers = getEstateInventory( ident );
 
@@ -1080,9 +1088,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
     if( !item )
       return;
 
-    container->setItem( freeSlot, item );
-    invMgr->sendInventoryContainer( player, container );
-    invMgr->saveHousingContainer( ident, container );
+    container->setItem( static_cast< uint8_t >( freeSlot ), item );
+    invMgr.sendInventoryContainer( player, container );
+    invMgr.saveHousingContainer( ident, container );
   }
   else
   {
@@ -1103,9 +1111,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
       if( !item )
         return;
 
-      container->setItem( freeSlot, item );
-      invMgr->sendInventoryContainer( player, container );
-      invMgr->saveHousingContainer( ident, container );
+      container->setItem( static_cast< uint8_t >( freeSlot ), item );
+      invMgr.sendInventoryContainer( player, container );
+      invMgr.saveHousingContainer( ident, container );
     }
   }
 }
@@ -1114,7 +1122,7 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
                                                               Inventory::HousingItemPtr item,
                                                               Common::LandIdent ident )
 {
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
 
   auto& container = getEstateInventory( ident )[ InventoryType::HousingExteriorPlacedItems ];
 
@@ -1125,21 +1133,21 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
     return false;
 
   // add item to inv
-  container->setItem( freeSlot, item );
+  container->setItem( static_cast< uint8_t >( freeSlot ), item );
 
   // we need to save the item again as removing it from the container on the player will remove it from charaglobalitem
   // todo: this needs to be handled a bit better as it might be possible to overwrite another item that is created in the meantime
-  invMgr->saveItem( player, item );
+  invMgr.saveItem( player, item );
 
-  invMgr->sendInventoryContainer( player, container );
-  invMgr->saveHousingContainer( ident, container );
-  invMgr->updateHousingItemPosition( item );
+  invMgr.sendInventoryContainer( player, container );
+  invMgr.saveHousingContainer( ident, container );
+  invMgr.updateHousingItemPosition( item );
 
   // add to zone and spawn
   auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
   assert( zone );
 
-  zone->spawnYardObject( ident.landId, freeSlot, *item );
+  zone->spawnYardObject( static_cast< uint8_t >( ident.landId ), static_cast< uint16_t >( freeSlot ), *item );
 
   return true;
 }
@@ -1147,7 +1155,7 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
 bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& player,
                                                               Inventory::HousingItemPtr item )
 {
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
 
   auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
   assert( zone );
@@ -1173,17 +1181,17 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     }
 
     // have a free slot
-    container->setItem( freeSlot, item );
+    container->setItem( static_cast< uint8_t >( freeSlot ), item );
 
     // resend container
-    invMgr->sendInventoryContainer( player, container );
-    invMgr->saveHousingContainer( ident, container );
-    invMgr->updateHousingItemPosition( item );
+    invMgr.sendInventoryContainer( player, container );
+    invMgr.saveHousingContainer( ident, container );
+    invMgr.updateHousingItemPosition( item );
 
     auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
     assert( zone );
 
-    zone->spawnHousingObject( containerIdx, freeSlot, containerId, item );
+    zone->spawnHousingObject( containerIdx, static_cast< uint16_t >( freeSlot ), containerId, item );
 
     return true;
   }
@@ -1218,7 +1226,7 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
   else
     containerIds = m_internalPlacedItemContainers;
 
-  auto invMgr = framework()->get< Manager::InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
   auto& containers = getEstateInventory( zone->getLandIdent() );
 
   for( auto containerId : containerIds )
@@ -1227,7 +1235,7 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
     if( container == containers.end() )
       break;
 
-    invMgr->sendInventoryContainer( player, container->second );
+    invMgr.sendInventoryContainer( player, container->second );
   }
 }
 
@@ -1235,8 +1243,8 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
                                                                Common::LandIdent ident, uint8_t slot,
                                                                Common::FFXIVARR_POSITION3 pos, float rot )
 {
-  auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+  auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
+  auto land = getHousingZoneByLandSetId( landSet )->getLand( static_cast< uint8_t >( ident.landId ) );
 
   if( !land )
     return;
@@ -1282,7 +1290,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
 
   auto container = it->second;
 
-  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slotIdx ) );
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( static_cast< uint8_t >( slotIdx ) ) );
   if( !item )
     return false;
 
@@ -1290,13 +1298,13 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   item->setRot( rot );
 
   // save
-  auto invMgr = framework()->get< InventoryMgr >();
-  invMgr->updateHousingItemPosition( item );
+  auto& invMgr = Service< InventoryMgr >::ref();
+  invMgr.updateHousingItemPosition( item );
 
-  terri.updateHousingObjectPosition( player, slot, item->getPos(), item->getRot() );
+  terri.updateHousingObjectPosition( player, slot, item->getPos(), static_cast< uint16_t >( item->getRot() ) );
 
   // send confirmation to player
-  uint32_t param1 = ( ident.landId << 16 ) | containerId;
+  uint32_t param1 = static_cast< uint32_t >( ( ident.landId << 16 ) | containerId );
 
   player.queuePacket(
     Server::makeActorControlSelf( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slotIdx ) );
@@ -1309,7 +1317,7 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
                                                              Sapphire::HousingZone& terri, Common::FFXIVARR_POSITION3 pos,
                                                              float rot )
 {
-  auto land = terri.getLand( ident.landId );
+  auto land = terri.getLand( static_cast< uint8_t >( ident.landId ) );
 
   if( !hasPermission( player, *land, 0 ) )
     return false;
@@ -1328,12 +1336,12 @@ bool Sapphire::World::Manager::HousingMgr::moveExternalItem( Entity::Player& pla
   item->setPos( pos );
   item->setRot( rot );
 
-  auto invMgr = framework()->get< InventoryMgr >();
-  invMgr->updateHousingItemPosition( item );
+  auto& invMgr = Service< InventoryMgr >::ref();
+  invMgr.updateHousingItemPosition( item );
 
-  terri.updateYardObjectPos( player, slot, ident.landId, *item );
+  terri.updateYardObjectPos( player, slot, static_cast< uint16_t >( ident.landId ), *item );
 
-  uint32_t param1 = ( ident.landId << 16 ) | InventoryType::HousingExteriorPlacedItems;
+  uint32_t param1 = static_cast< uint32_t >( ( ident.landId << 16 ) | InventoryType::HousingExteriorPlacedItems );
   player.queuePacket( Server::makeActorControlSelf( player.getId(), ActorControl::HousingItemMoveConfirm, param1, slot ) );
 
 
@@ -1348,8 +1356,8 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
     player.getCurrentTerritory() ) )
   {
     auto ident = terri->getLandIdent();
-    auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
-    auto land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+    auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
+    auto land = getHousingZoneByLandSetId( landSet )->getLand( static_cast< uint8_t >( ident.landId ) );
 
     if( !land )
       return;
@@ -1361,7 +1369,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
   }
   else if( auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
   {
-    auto land = terri->getLand( plot );
+    auto land = terri->getLand( static_cast< uint8_t >( plot ) );
     if( !land )
       return;
 
@@ -1406,7 +1414,7 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
 
   auto container = it->second;
 
-  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( slotId ) );
+  auto item = std::dynamic_pointer_cast< Inventory::HousingItem >( container->getItem( static_cast< uint8_t >( slotId ) ) );
   if( !item )
     return false;
 
@@ -1417,13 +1425,13 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
     if( !player.getFreeInventoryContainerSlot( containerPair ) )
       return false;
 
-    auto invMgr = framework()->get< InventoryMgr >();
+    auto& invMgr = Service< InventoryMgr >::ref();
 
     // remove it from housing inventory
-    container->removeItem( slotId );
-    invMgr->sendInventoryContainer( player, container );
-    invMgr->removeHousingItemPosition( *item );
-    invMgr->removeItemFromHousingContainer( terri.getLandIdent(), containerId, slotId );
+    container->removeItem( static_cast< uint8_t >( slotId ) );
+    invMgr.sendInventoryContainer( player, container );
+    invMgr.removeHousingItemPosition( *item );
+    invMgr.removeItemFromHousingContainer( terri.getLandIdent(), containerId, slotId );
 
     // add to player inv
     player.insertInventoryItem( containerPair.first, containerPair.second, item );
@@ -1439,23 +1447,23 @@ bool Sapphire::World::Manager::HousingMgr::removeInternalItem( Entity::Player& p
     if( !freeContainer )
       return false;
 
-    auto invMgr = framework()->get< InventoryMgr >();
+    auto& invMgr = Service< InventoryMgr >::ref();
 
-    container->removeItem( slotId );
-    invMgr->sendInventoryContainer( player, container );
-    invMgr->removeHousingItemPosition( *item );
-    invMgr->removeItemFromHousingContainer( terri.getLandIdent(), containerId, slotId );
+    container->removeItem( static_cast< uint8_t >( slotId ) );
+    invMgr.sendInventoryContainer( player, container );
+    invMgr.removeHousingItemPosition( *item );
+    invMgr.removeItemFromHousingContainer( terri.getLandIdent(), containerId, slotId );
 
-    freeContainer->setItem( slotId, item );
-    invMgr->sendInventoryContainer( player, freeContainer );
-    invMgr->saveHousingContainer( terri.getLandIdent(), freeContainer );
+    freeContainer->setItem( static_cast< uint8_t >( slotId ), item );
+    invMgr.sendInventoryContainer( player, freeContainer );
+    invMgr.saveHousingContainer( terri.getLandIdent(), freeContainer );
   }
 
   // despawn
   if( containerIdx != -1 )
   {
     auto arraySlot = ( containerIdx * 50 ) + slotId;
-    terri.removeHousingObject( arraySlot );
+    terri.removeHousingObject( static_cast< uint16_t >( arraySlot ) );
   }
 
   return true;
@@ -1479,7 +1487,7 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
 
   bool shouldDespawnItem = containerType != InventoryType::HousingExteriorStoreroom;
 
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
 
   if( sendToStoreroom )
   {
@@ -1490,13 +1498,13 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
       return false;
 
     sourceContainer->removeItem( slotId );
-    invMgr->sendInventoryContainer( player, sourceContainer );
-    invMgr->removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
-    invMgr->removeHousingItemPosition( *item );
+    invMgr.sendInventoryContainer( player, sourceContainer );
+    invMgr.removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
+    invMgr.removeHousingItemPosition( *item );
 
-    storeroomContainer->setItem( freeSlot, item );
-    invMgr->sendInventoryContainer( player, storeroomContainer );
-    invMgr->saveHousingContainer( land.getLandIdent(), storeroomContainer );
+    storeroomContainer->setItem( static_cast< uint8_t >( freeSlot ), item );
+    invMgr.sendInventoryContainer( player, storeroomContainer );
+    invMgr.saveHousingContainer( land.getLandIdent(), storeroomContainer );
   }
   else
   {
@@ -1506,16 +1514,16 @@ bool Sapphire::World::Manager::HousingMgr::removeExternalItem( Entity::Player& p
 
     // remove from housing inv
     sourceContainer->removeItem( slotId );
-    invMgr->sendInventoryContainer( player, sourceContainer );
-    invMgr->removeHousingItemPosition( *item );
-    invMgr->removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
+    invMgr.sendInventoryContainer( player, sourceContainer );
+    invMgr.removeHousingItemPosition( *item );
+    invMgr.removeItemFromHousingContainer( land.getLandIdent(), sourceContainer->getId(), slotId );
 
     // add to player inv
     player.insertInventoryItem( containerPair.first, containerPair.second, item );
   }
 
   if( shouldDespawnItem )
-    terri.despawnYardObject( land.getLandIdent().landId, slotId );
+    terri.despawnYardObject( static_cast< uint16_t >( land.getLandIdent().landId ), slotId );
 
   return true;
 }
@@ -1552,7 +1560,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
   if( !terri )
     return;
 
-  auto land = terri->getLand( plot );
+  auto land = terri->getLand( static_cast< uint8_t >( plot ) );
   if( !land )
     return;
 
@@ -1564,9 +1572,9 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
   if( it == inv.end() )
     return;
 
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
 
-  invMgr->sendInventoryContainer( player, it->second );
+  invMgr.sendInventoryContainer( player, it->second );
 
   auto pkt = Server::makeActorControlSelf( player.getId(), Network::ActorControl::ShowEstateExternalAppearanceUI, plot );
   player.queuePacket( pkt );
@@ -1580,8 +1588,8 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
     return;
 
   auto ident = terri->getLandIdent();
-  auto landSet = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto land = getHousingZoneByLandSetId( landSet )->getLand( ident.landId );
+  auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
+  auto land = getHousingZoneByLandSetId( landSet )->getLand( static_cast< uint8_t >( ident.landId ) );
 
   if( !land )
     return;
@@ -1594,9 +1602,9 @@ void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::E
   if( it == inv.end() )
     return;
 
-  auto invMgr = framework()->get< InventoryMgr >();
+  auto& invMgr = Service< InventoryMgr >::ref();
 
-  invMgr->sendInventoryContainer( player, it->second );
+  invMgr.sendInventoryContainer( player, it->second );
 
   auto pkt = Server::makeActorControlSelf( player.getId(), Network::ActorControl::ShowEstateInternalAppearanceUI );
   player.queuePacket( pkt );
@@ -1621,5 +1629,63 @@ Sapphire::Inventory::HousingItemPtr Sapphire::World::Manager::HousingMgr::getHou
   if( !tmpItem )
     return nullptr;
 
-  return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId(), framework() );
+  return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
+}
+
+void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t> slotList, uint8_t removeFlag )
+{
+  auto landSetId = toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ), static_cast< uint8_t >( landIdent.wardNum ) );
+  auto terri = getHousingZoneByLandSetId( landSetId );
+
+  auto land = terri->getLand( static_cast< uint8_t >( landIdent.landId ) );
+  if( !land )
+    return;
+
+  if( !hasPermission( player, *land, 0 ) )
+    return;
+
+  auto& housingContainer = getEstateInventory( landIdent )[ isInterior ? InventoryType::HousingInteriorAppearance : InventoryType::HousingExteriorAppearance ];
+
+  auto& invMgr = Service< InventoryMgr >::ref();
+
+  for( int i = 0; i < ( isInterior ? 10 : 9 ); i++ )
+  {
+    auto container = containerList.at( i );
+    auto slot = slotList.at( i );
+    if( container == 0x270F || slot == 0xFF )
+    {
+      if( i >= 5 )
+      {
+        auto removed = ( ( removeFlag >> ( i - 5 ) ) & 1 ) > 0;
+        if( removed )
+        {
+          auto oldItem = housingContainer->getItem( i );
+          if( oldItem )
+          {
+            housingContainer->removeItem( i );
+            invMgr.removeItemFromHousingContainer( landIdent, housingContainer->getId(), i );
+            player.addItem( oldItem, false, false, false );
+          }
+        }
+      }
+      continue;
+    }
+    auto item = getHousingItemFromPlayer( player, static_cast< Sapphire::Common::InventoryType >( container ), slot );
+    if( item )
+    {
+      auto oldItem = housingContainer->getItem( i );
+      housingContainer->setItem( i, item );
+      if( oldItem )
+      {
+        player.insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( container ), slot, oldItem );
+      }
+    }
+  }
+  invMgr.sendInventoryContainer( player, housingContainer );
+  invMgr.saveHousingContainer( landIdent, housingContainer );
+  updateHouseModels( land->getHouse() );
+  if( !isInterior )
+  {
+    terri->sendLandUpdate( landIdent.landId );
+  }
 }

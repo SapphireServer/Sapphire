@@ -89,7 +89,7 @@ std::string getEobjSgbPath( uint32_t eobjId )
 
   for( auto& row : exportedSgExd.get_rows() )
   {
-    auto id = row.first;
+    auto id = row.first.rowId;
     auto& fields = row.second;
 
     auto path = std::get< std::string >( fields.at( 0 ) );
@@ -100,7 +100,7 @@ std::string getEobjSgbPath( uint32_t eobjId )
 
   for( auto& row : eObjExd.get_rows() )
   {
-    auto id = row.first;
+    auto id = row.first.rowId;
     auto& fields = row.second;
 
     eobjSgbPaths[id] = std::get< uint16_t >( fields.at( 11 ) );
@@ -127,9 +127,9 @@ std::string zoneNameToPath( const std::string& name )
     {
       path = teriPath;
       found = true;
-      zoneId = row.first;
+      zoneId = row.first.rowId;
     }
-    zoneNameMap[ row.first ] = teriName;
+    zoneNameMap[ row.first.rowId ] = teriName;
   }
 
   if( found )
@@ -257,7 +257,7 @@ bool pcbTransformModel( const std::string& fileName, const vec3* scale, const ve
   return true;
 };
 
-void exportSgbModel( const std::string& sgbFilePath, LGB_ENTRY* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
+void exportSgbModel( const std::string& sgbFilePath, LgbEntry* pGimmick, ExportedGroup& exportgroup, bool isEobj = false  )
 {
   if( auto pSgbFile = pCache->getSgbFile( sgbFilePath ) )
   {
