@@ -1,6 +1,4 @@
-#ifndef XIV_DAT_DAT_H
-#define XIV_DAT_DAT_H
-
+#pragma once
 #include "SqPack.h"
 
 #include <mutex>
@@ -39,4 +37,3 @@ namespace xiv::dat
 
 }
 
-#endif // XIV_DAT_DAT_H

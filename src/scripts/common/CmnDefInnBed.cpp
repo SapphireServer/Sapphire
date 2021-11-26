@@ -17,11 +17,11 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      if( result.param2 > 0 )
-        Scene00001( player, result.param2 );
+      if( result.getResult( 0 ) > 0 )
+        Scene00001( player, result.getResult( 0 ) );
     };
 
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 1, callback );
+    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, { 1 }, callback );
   }
 
   // lay down
@@ -29,16 +29,16 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      Scene00002( player, result.param2 );
+      Scene00002( player, result.getResult( 0 ) );
     };
 
-    player.playScene( getId(), 1, 0xF32E48F8, 0, 1, param, callback );
+    eventMgr().playScene( player, getId(), 1, 0xF32E48F8, { 1, param } , callback );
   }
 
   // logout
   void Scene00002( Entity::Player& player, uint16_t param )
   {
-    player.playScene( getId(), 2, 0xF32E48F8, 0, 1, param, nullptr );
+    eventMgr().playScene( player, getId(), 2, 0xF32E48F8, { 1, param }, nullptr );
   }
 
   // wake up
@@ -47,7 +47,7 @@ public:
     auto callback = []( Entity::Player& player, const Event::SceneResult& result )
     {};
 
-    player.playScene( getId(), 100, 0x800, 0, 0, callback );
+    eventMgr().playScene( player, getId(), 100, 0x800, callback );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

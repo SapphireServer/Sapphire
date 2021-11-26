@@ -1,5 +1,4 @@
-#ifndef _CALCSTATS_H
-#define _CALCSTATS_H
+#pragma once
 
 #include <random>
 #include <Common.h>
@@ -16,7 +15,7 @@ namespace Sapphire::Math
 
     static float calculateBaseStat( const Entity::Chara& chara );
 
-    static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
+    static uint32_t calculateMaxHp( Sapphire::Entity::Player& player );
 
     /*!
      * @brief Calculates the probability of a block happening
@@ -152,4 +151,3 @@ namespace Sapphire::Math
 
 }
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_EVENTDEFS_H
-#define SAPPHIRE_EVENTDEFS_H
+#pragma once
 
 namespace Sapphire
 {
@@ -79,6 +78,3 @@ namespace Sapphire
     STD_TP_GAIN = 0X0D
   };
 }
-
-
-#endif //SAPPHIRE_EVENTDEFS_H

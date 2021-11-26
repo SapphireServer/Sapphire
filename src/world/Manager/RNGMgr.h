@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_RNGMGR_H
-#define SAPPHIRE_RNGMGR_H
+#pragma once
 
 #include "Forwards.h"
 
@@ -19,37 +18,30 @@ namespace Sapphire::World::Manager
   class RandGenerator
   {
   public:
-    RandGenerator( T minRange = std::numeric_limits< T >::min(), T maxRange = std::numeric_limits< T >::max() )
-      : m_engine( *engineSeed< std::mt19937::state_size >() ), m_dist( minRange, maxRange )
+    RandGenerator( std::shared_ptr< std::mt19937 > pEngine, T minRange = std::numeric_limits< T >::min(), T maxRange = std::numeric_limits< T >::max() )
+      : m_engine( pEngine ), m_dist( minRange, maxRange )
     {
 
     }
 
     T next()
     {
-      return m_dist( m_engine );
+      return m_dist( *m_engine );
     }
+
   private:
-    template< std::size_t STATE_SIZE >
-    std::unique_ptr< std::seed_seq > engineSeed()
-    {
-      std::array< uint32_t, STATE_SIZE > seedArray;
-      std::random_device rd;
-
-      std::generate_n( seedArray.data(), seedArray.size(), std::ref( rd ) );
-      auto pSeq = std::make_unique< std::seed_seq >( std::begin( seedArray ), std::end( seedArray ) );
-
-      return pSeq;
-    }
-
     std::uniform_real_distribution< T > m_dist;
-    std::mt19937 m_engine;
+    std::shared_ptr< std::mt19937 > m_engine;
   };
 
   class RNGMgr
   {
   public:
-    RNGMgr();
+    RNGMgr()
+    {
+      m_engine = std::make_shared< std::mt19937 >( *engineSeed< std::mt19937::state_size >() );
+    }
+
     virtual ~RNGMgr() = default;
 
     RNGMgr( const RNGMgr& pRNGMgr ) = delete;
@@ -65,7 +57,7 @@ namespace Sapphire::World::Manager
     template< typename T, typename = typename std::enable_if< std::is_arithmetic< T >::value, T >::type >
     RandGenerator< T > getRandGenerator( T minRange, T maxRange )
     {
-      return RandGenerator< T >( minRange, maxRange );
+      return RandGenerator< T >( m_engine, minRange, maxRange );
     }
 
   private:
@@ -73,6 +65,8 @@ namespace Sapphire::World::Manager
     template< std::size_t STATE_SIZE >
     std::unique_ptr< std::seed_seq > engineSeed()
     {
+      // initialize mt engine with manually seeded random_device
+
       std::array< uint32_t, STATE_SIZE > seedArray;
       std::random_device rd;
 
@@ -82,9 +76,7 @@ namespace Sapphire::World::Manager
       return pSeq;
     }
 
-    std::mt19937 m_engine;
+    std::shared_ptr< std::mt19937 > m_engine;
   };
 
 }
-
-#endif // SAPPHIRE_RNGMGR_H

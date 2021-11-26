@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_ACTIONLUT_H
-#define SAPPHIRE_ACTIONLUT_H
+#pragma once
 
 #include <unordered_map>
 
@@ -27,5 +26,3 @@ namespace Sapphire::World::Action
     static Lut m_actionLut;
   };
 }
-
-#endif //SAPPHIRE_ACTIONLUT_H

@@ -1,5 +1,4 @@
-#ifndef _BNPC_H_
-#define _BNPC_H_
+#pragma once
 
 #include <Common.h>
 
@@ -50,8 +49,9 @@ namespace Sapphire::Entity
 
   public:
     BNpc();
-    BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-          uint8_t level, uint32_t maxHp, TerritoryPtr pZone );
+
+    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone );
+    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone, uint32_t hp, Common::BNpcType type );
 
     virtual ~BNpc() override;
 
@@ -114,11 +114,16 @@ namespace Sapphire::Entity
 
     void setLevelId( uint32_t levelId );
     uint32_t getLevelId() const;
+    uint32_t getBoundInstanceId() const;
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
 
     void calculateStats() override;
+
+    uint32_t getRank() const;
+
+    Common::BNpcType getBNpcType() const;
 
   private:
     uint32_t m_bNpcBaseId;
@@ -133,10 +138,16 @@ namespace Sapphire::Entity
     uint32_t m_displayFlags;
     uint8_t m_level;
     uint32_t m_levelId;
+    uint32_t m_rank;
+    uint32_t m_boundInstanceId;
 
     uint32_t m_flags;
 
+    Common::BNpcType m_bnpcType;
+
     float m_naviTargetReachedDistance;
+
+    std::shared_ptr< Common::BNPCInstanceObject > m_pInfo;
 
     uint32_t m_timeOfDeath;
     uint32_t m_lastRoamTargetReached;
@@ -157,4 +168,3 @@ namespace Sapphire::Entity
   };
 
 }
-#endif

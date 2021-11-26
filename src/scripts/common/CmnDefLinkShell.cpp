@@ -20,7 +20,7 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      switch( result.param2 )
+      switch( result.getResult( 0 ) )
       {
         case ACTION_CREATE:
           Scene00002( player );
@@ -36,25 +36,25 @@ public:
       }
     };
 
-    player.playScene( getId(), 1, 0, 0, 0, callback );
+    eventMgr().playScene( player, getId(), 1, 0, callback );
   }
 
   // create linkshell
   void Scene00002( Entity::Player& player )
   {
-    player.playScene( getId(), 2, 0, 0, 0 );
+    eventMgr().playScene( player, getId(), 2, 0 );
   }
 
   // rename linkshell
   void Scene00003( Entity::Player& player )
   {
-    player.playScene( getId(), 3, 0, 0, 0 );
+    eventMgr().playScene( player, getId(), 3, 0 );
   }
 
   // remove linkshell
   void Scene00004( Entity::Player& player )
   {
-    player.playScene( getId(), 4, 0, 0, 0 );
+    eventMgr().playScene( player, getId(), 4, 0 );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

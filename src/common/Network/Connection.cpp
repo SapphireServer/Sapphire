@@ -43,19 +43,19 @@ void Network::Connection::startRecv( int32_t total_bytes )
     m_recv_buffer.resize( total_bytes );
     asio::async_read( m_socket,
                       asio::buffer( m_recv_buffer ),
-                      m_io_strand.wrap( std::bind( &Connection::handleRecv,
-                                                   shared_from_this(),
-                                                   std::placeholders::_1,
-                                                   std::placeholders::_2 ) ) );
+                      m_io_strand.wrap( [ capture0 = shared_from_this() ]( auto && PH1, auto && PH2 )
+                      {
+                        capture0->handleRecv( std::forward< decltype( PH1 ) > ( PH1 ), std::forward< decltype( PH2 ) > ( PH2 ) );
+                      } ) );
   }
   else
   {
     m_recv_buffer.resize( m_receive_buffer_size );
     m_socket.async_read_some( asio::buffer( m_recv_buffer ),
-                              m_io_strand.wrap( std::bind( &Connection::handleRecv,
-                                                           shared_from_this(),
-                                                           std::placeholders::_1,
-                                                           std::placeholders::_2 ) ) );
+                              m_io_strand.wrap( [ capture0 = shared_from_this() ]( auto && PH1, auto && PH2 )
+                              {
+                                capture0->handleRecv( std::forward< decltype( PH1 ) > ( PH1 ), std::forward< decltype( PH2 ) >( PH2 ) );
+                              } ) );
   }
 }
 
@@ -107,7 +107,7 @@ void Network::Connection::handleSend( const asio::error_code& error,
   }
 }
 
-void Network::Connection::handleRecv( const asio::error_code& error, int32_t actual_bytes )
+void Network::Connection::handleRecv( const asio::error_code& error, size_t actual_bytes )
 {
   if( error || hasError() || m_hive->hasStopped() )
   {

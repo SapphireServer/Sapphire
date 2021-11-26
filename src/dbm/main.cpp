@@ -3,14 +3,20 @@
 #include <cctype>
 #include <set>
 #include <common/Logging/Logger.h>
-#include <filesystem>
 #include <MySqlConnector.h>
 #include <common/Util/CrashHandler.h>
 #include <common/Config/ConfigMgr.h>
 
-[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
+Sapphire::Common::Util::CrashHandler crashHandler;
 
-namespace fs = std::filesystem;
+// fucking filesystem
+#if _MSC_VER >= 1925
+#include <filesystem>
+namespace filesys = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace filesys = std::experimental::filesystem;
+#endif
 
 #include <fstream>
 #include <streambuf>
@@ -30,19 +36,19 @@ std::vector< std::string > getAllFilesInDir( const std::string& dirPath,
   try
   {
     // Check if given path exists and points to a directory
-    if( fs::exists( dirPath ) && fs::is_directory( dirPath ) )
+    if( filesys::exists( dirPath ) && filesys::is_directory( dirPath ) )
     {
       // Create a Recursive Directory Iterator object and points to the starting of directory
-      fs::recursive_directory_iterator iter( dirPath );
+      filesys::recursive_directory_iterator iter( dirPath );
 
       // Create a Recursive Directory Iterator object pointing to end.
-      fs::recursive_directory_iterator end;
+      filesys::recursive_directory_iterator end;
 
       // Iterate till end
       while( iter != end )
       {
         // Check if current entry is a directory and if exists in skip list
-        if( fs::is_directory( iter->path() ) &&
+        if( filesys::is_directory( iter->path() ) &&
             ( std::find( dirSkipList.begin(), dirSkipList.end(), iter->path().filename() ) != dirSkipList.end() ) )
         {
           // Skip the iteration of current directory pointed by iterator

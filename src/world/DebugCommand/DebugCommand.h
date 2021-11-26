@@ -1,5 +1,4 @@
-#ifndef _GAMECOMMAND_H_
-#define _GAMECOMMAND_H_
+#pragma once
 
 #include <Common.h>
 
@@ -62,6 +61,3 @@ namespace Sapphire
   };
 
 }
-
-
-#endif

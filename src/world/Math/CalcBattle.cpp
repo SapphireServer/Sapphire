@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Common.h>
 #include <Service.h>
 
@@ -31,9 +31,9 @@ using namespace Sapphire::Entity;
 
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency, Sapphire::FrameworkPtr pFw )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;

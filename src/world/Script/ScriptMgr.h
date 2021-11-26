@@ -83,7 +83,7 @@ namespace Sapphire::Scripting
 
     bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 
-    bool onZoneInit( TerritoryPtr pZone );
+    bool onZoneInit( const Territory& zone );
 
     bool onEventHandlerReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param1,
                                uint16_t param2, uint16_t param3 );
@@ -91,38 +91,26 @@ namespace Sapphire::Scripting
     bool onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                     uint32_t catalogId );
 
-    bool onInstanceInit( InstanceContentPtr instance );
+    bool onInstanceInit( InstanceContent& instance );
 
-    bool onInstanceUpdate( InstanceContentPtr instance, uint64_t tickCount );
+    bool onInstanceUpdate( InstanceContent& instance, uint64_t tickCount );
 
     bool
-    onInstanceEnterTerritory( InstanceContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+    onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                               uint16_t param2 );
 
     bool onPlayerSetup( QuestBattle& instance, Entity::Player& player );
 
-    bool onInstanceInit( QuestBattlePtr instance );
+    bool onInstanceInit( QuestBattle& instance );
 
-    bool onInstanceUpdate( QuestBattlePtr instance, uint64_t tickCount );
+    bool onInstanceUpdate( QuestBattle& instance, uint64_t tickCount );
 
     bool onDutyCommence( QuestBattle& instance, Entity::Player& player );
 
-    bool onInstanceEnterTerritory( QuestBattlePtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
+    bool onInstanceEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                                    uint16_t param2 );
 
-    bool onDutyComplete( QuestBattlePtr instance, Entity::Player& player );
-
-    bool onEventYield( Entity::Player& player, uint32_t eventId, uint16_t scene, std::vector< uint32_t > param );
-
-    bool onPublicContentInit( PublicContentPtr instance );
-
-    bool onPublicContentUpdate( PublicContentPtr instance, uint64_t tickCount );
-
-    bool onPublicContentPlayerZoneIn( PublicContentPtr instance, Entity::Player& player );
-
-    bool onPublicContentLeaveTerritory( PublicContentPtr instance, Entity::Player& player );
-
-    bool onPublicContentEnterTerritory( PublicContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
+    bool onDutyComplete( QuestBattle& instance, Entity::Player& player );
 
     bool loadDir( const std::string& dirname, std::set< std::string >& files, const std::string& ext );
 

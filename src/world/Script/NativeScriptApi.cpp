@@ -1,6 +1,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
+#include <Event/EventHandler.h>
 #include "NativeScriptApi.h"
 #include <cassert>
 
@@ -90,8 +91,7 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  EventScript::EventScript( uint32_t eventId ) :
-    ScriptObject( eventId, typeid( EventScript ).hash_code() )
+  EventScript::EventScript( uint32_t eventId ) : ScriptObject( eventId, typeid( EventScript ).hash_code() )
   {
   }
 
@@ -133,13 +133,46 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void EventScript::onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param )
+  ///////////////////////////////////////////////////////////////////
+
+  QuestScript::QuestScript( uint32_t eventId ) : ScriptObject( eventId, typeid( QuestScript ).hash_code() )
   {
   }
 
-  Event::EventHandler::QuestAvailability EventScript::getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId )
+  void QuestScript::onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId )
   {
-    return Event::EventHandler::QuestAvailability::Available;
+  }
+
+  void QuestScript::onBNpcKill( uint32_t nameId, Entity::Player& player )
+  {
+  }
+
+  void QuestScript::onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Entity::Player& player )
+  {
+  }
+
+  void QuestScript::onEnterTerritory( World::Quest& quest, Entity::Player& player, uint16_t param1, uint16_t param2 )
+  {
+  }
+
+  void QuestScript::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
+  {
+  }
+
+  void QuestScript::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
+  {
+  }
+
+  void QuestScript::onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId )
+  {
+  }
+
+  void QuestScript::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId )
+  {
+  }
+
+  void QuestScript::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
+  {
   }
 
   ///////////////////////////////////////////////////////////////////
@@ -221,32 +254,6 @@ namespace Sapphire::ScriptAPI
 
   void QuestBattleScript::onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId,
                                             uint16_t param1, uint16_t param2 )
-  {
-  }
-
-  PublicContentScript::PublicContentScript( uint32_t contentId ) :
-    ScriptObject( uint32_t{ 0x8004 } << 16 | contentId, typeid( PublicContentScript ).hash_code() )
-  {
-  }
-
-  void PublicContentScript::onInit( PublicContent& instance )
-  {
-  }
-
-  void PublicContentScript::onUpdate( PublicContent& instance, uint64_t tickCount )
-  {
-  }
-
-  void PublicContentScript::onPlayerZoneIn( PublicContent& instance, Entity::Player& player )
-  {
-  }
-
-  void PublicContentScript::onLeaveTerritory( PublicContent& instance, Entity::Player& player )
-  {
-  }
-
-  void PublicContentScript::onEnterTerritory( PublicContent& instance, Entity::Player& player, uint32_t eventId,
-    uint16_t param1, uint16_t param2 )
   {
   }
 

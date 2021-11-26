@@ -1,9 +1,9 @@
 #include <Common.h>
 #include <Territory/Territory.h>
 #include <Logging/Logger.h>
-#include <ServerMgr.h>
+#include <WorldServer.h>
 
-#include "Actor/Actor.h"
+#include "Actor/GameObject.h"
 #include "Actor/Chara.h"
 #include "Actor/BNpc.h"
 
@@ -31,8 +31,8 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
 
 bool Sapphire::World::Navi::NaviProvider::init()
 {
-  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
-  auto& cfg = serverMgr.getConfig();
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& cfg = server.getConfig();
 
   auto meshesFolder = std::filesystem::path( cfg.navigation.meshPath );
   auto meshFolder = meshesFolder / std::filesystem::path( m_internalName );
@@ -569,11 +569,11 @@ bool Sapphire::World::Navi::NaviProvider::loadMesh( const std::string& path )
 
 int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
 {
-  dtCrowdAgentParams params;
+  dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
-  params.maxSpeed = std::pow( 2, chara.getRadius() * 0.35f ) + 1.f;
+  params.maxSpeed = (std::pow( 2.f, 1.f * 0.35f ) + 1.f)*0.5f;
   params.radius = ( chara.getRadius() ) * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
@@ -585,11 +585,11 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
 
 void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& bnpc )
 {
-  dtCrowdAgentParams params;
+  dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
-  params.maxSpeed = std::pow( 2, bnpc.getRadius() * 0.35f ) + 1.f;
+  params.maxSpeed = (std::pow( 2.f, 1.f * 0.35f ) + 1.f)*0.5f;
   if( bnpc.getState() == Entity::BNpcState::Combat || bnpc.getState() == Entity::BNpcState::Retreat )
     params.maxSpeed *= 2;
   params.radius = ( bnpc.getRadius() ) * 0.75f;
@@ -601,7 +601,7 @@ void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& b
 
 void Sapphire::World::Navi::NaviProvider::updateCrowd( float timeInSeconds )
 {
-  dtCrowdAgentDebugInfo info;
+  dtCrowdAgentDebugInfo info{};
   info.idx = -1;
   info.vod = m_vod;
   m_pCrowd->update( timeInSeconds, &info );

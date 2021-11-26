@@ -8,10 +8,8 @@
 #include "Forwards.h"
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
-#include "Territory/Territory.h"
-#include "Event/Director.h"
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
@@ -30,103 +28,109 @@ namespace Sapphire::Network::Packets::Server
     void initialize( Entity::Player& player, Entity::Player& target )
     {
       // todo: figure out unkown offsets
-      m_data.classJob = static_cast< uint8_t >( player.getClass() );
+      m_data.ClassJob = static_cast< uint8_t >( player.getClass() );
       //m_data.status = static_cast< uint8_t >( pPlayer->getStatus() );
 
 // TODO: world id from server
-      m_data.currentWorldId = 67;
-      m_data.homeWorldId = 67;
+      m_data.WorldId = 67;
+      //m_data.homeWorldId = 67;
 
-      m_data.hPCurr = player.getHp();
-      m_data.mPCurr = player.getMp();
-      m_data.hPMax = player.getMaxHp();
-      m_data.mPMax = player.getMaxMp();
+      m_data.Hp = player.getHp();
+      m_data.Mp = player.getMp();
+      m_data.HpMax = player.getMaxHp();
+      m_data.MpMax = player.getMaxMp();
 
-      m_data.level = player.getLevel();
-      m_data.gmRank = player.getGmRank();
-      m_data.pose = player.getPose();
+      m_data.Lv = player.getLevel();
+      m_data.GMRank = player.getGmRank();
+      m_data.ModeArgs = player.getPose();
 
-      memcpy( m_data.look, player.getLookArray(), sizeof( m_data.look ) );
+      if( player.isDirectorInitialized() )
+      {
+        m_data.ContentId = player.getDirectorId();
+      }
+
+      memcpy( m_data.Customize, player.getLookArray(), sizeof( m_data.Customize ) );
 
       auto item = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
       if( item )
-        m_data.mainWeaponModel = player.getModelMainWeapon();
-      m_data.secWeaponModel = player.getModelSubWeapon();
+        m_data.MainWeapon = player.getModelMainWeapon();
+      m_data.SubWeapon = player.getModelSubWeapon();
 
-      m_data.models[ Common::GearModelSlot::ModelHead ] = player.getModelForSlot( Common::GearModelSlot::ModelHead );
-      m_data.models[ Common::GearModelSlot::ModelBody ] = player.getModelForSlot( Common::GearModelSlot::ModelBody );
-      m_data.models[ Common::GearModelSlot::ModelHands ] = player.getModelForSlot( Common::GearModelSlot::ModelHands );
-      m_data.models[ Common::GearModelSlot::ModelLegs ] = player.getModelForSlot( Common::GearModelSlot::ModelLegs );
-      m_data.models[ Common::GearModelSlot::ModelFeet ] = player.getModelForSlot( Common::GearModelSlot::ModelFeet );
-      m_data.models[ Common::GearModelSlot::ModelNeck ] = player.getModelForSlot( Common::GearModelSlot::ModelNeck );
-      m_data.models[ Common::GearModelSlot::ModelEar ] = player.getModelForSlot( Common::GearModelSlot::ModelEar );
-      m_data.models[ Common::GearModelSlot::ModelRing1 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing1 );
-      m_data.models[ Common::GearModelSlot::ModelRing2 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing2 );
-      m_data.models[ Common::GearModelSlot::ModelWrist ] = player.getModelForSlot( Common::GearModelSlot::ModelWrist );
+      m_data.Equipment[ Common::GearModelSlot::ModelHead ] = player.getModelForSlot( Common::GearModelSlot::ModelHead );
+      m_data.Equipment[ Common::GearModelSlot::ModelBody ] = player.getModelForSlot( Common::GearModelSlot::ModelBody );
+      m_data.Equipment[ Common::GearModelSlot::ModelHands ] = player.getModelForSlot( Common::GearModelSlot::ModelHands );
+      m_data.Equipment[ Common::GearModelSlot::ModelLegs ] = player.getModelForSlot( Common::GearModelSlot::ModelLegs );
+      m_data.Equipment[ Common::GearModelSlot::ModelFeet ] = player.getModelForSlot( Common::GearModelSlot::ModelFeet );
+      m_data.Equipment[ Common::GearModelSlot::ModelNeck ] = player.getModelForSlot( Common::GearModelSlot::ModelNeck );
+      m_data.Equipment[ Common::GearModelSlot::ModelEar ] = player.getModelForSlot( Common::GearModelSlot::ModelEar );
+      m_data.Equipment[ Common::GearModelSlot::ModelRing1 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing1 );
+      m_data.Equipment[ Common::GearModelSlot::ModelRing2 ] = player.getModelForSlot( Common::GearModelSlot::ModelRing2 );
+      m_data.Equipment[ Common::GearModelSlot::ModelWrist ] = player.getModelForSlot( Common::GearModelSlot::ModelWrist );
 
-      strcpy( m_data.name, player.getName().c_str() );
+      strcpy( reinterpret_cast< char* >( m_data.Name ), player.getName().c_str() );
 
-      m_data.pos.x = player.getPos().x;
-      m_data.pos.y = player.getPos().y;
-      m_data.pos.z = player.getPos().z;
-      m_data.rotation = Common::Util::floatToUInt16Rot( player.getRot() );
+      m_data.Pos[ 0 ] = player.getPos().x;
+      m_data.Pos[ 1 ] = player.getPos().y;
+      m_data.Pos[ 2 ] = player.getPos().z;
+      m_data.Dir = Common::Util::floatToUInt16Rot( player.getRot() );
 
 
-      m_data.title = player.getTitle();
-      m_data.voice = player.getVoiceId();
-      m_data.currentMount = player.getCurrentMount();
+      m_data.Title = player.getTitle();
+      m_data.Voice = player.getVoiceId();
+
       //m_data.activeMinion = player.getCurrentCompanion();
-      m_data.activeMinion = 0;
+      //m_data.activeMinion = 0;
 
-      m_data.onlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
+      m_data.OnlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
 
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;
-      m_data.state = static_cast< uint8_t >( player.getStatus() );
-      m_data.modelType = player.getObjKind();
+      m_data.Mode = static_cast< uint8_t >( player.getStatus() );
+      m_data.ObjKind = player.getObjKind();
+      m_data.ObjType = 4;
       if( target.getId() == player.getId() )
       {
-        m_data.spawnIndex = 0x00;
+        m_data.Index = 0x00;
       }
       else
       {
-        m_data.spawnIndex = target.getSpawnIdForActorId( player.getId() );
+        m_data.Index = target.getSpawnIdForActorId( player.getId() );
 
-        if( !target.isActorSpawnIdValid( m_data.spawnIndex ) )
+        if( !target.isActorSpawnIdValid( m_data.Index ) )
           return;
       }
       // 0x20 == spawn hidden to be displayed by the spawneffect control
-      m_data.displayFlags = player.getStance();
+      m_data.ActiveType = player.getStance();
 
       if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() == true )
       {
-        m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
+        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }
 
       if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideHead )
       {
-        m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
+        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
       }
 
       if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon )
       {
-        m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
+        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
       }
 
       if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::Visor )
       {
-        m_data.displayFlags |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
+        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
       }
 
       if( !( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideLegacyMark ) )
       {
-        m_data.look[ 0xC ] = m_data.look[ 0xC ] | 1 << 7;
+        m_data.Customize[ 0xC ] = m_data.Customize[ 0xC ] | 1 << 7;
       }
 
-      m_data.currentMount = player.getCurrentMount();
-      m_data.persistentEmote = player.getPersistentEmote();
+     // m_data.currentMount = player.getCurrentMount();
+     // m_data.persistentEmote = player.getPersistentEmote();
 
-      m_data.targetId = player.getTargetId();
+      m_data.MainTarget = player.getTargetId();
       //m_data.type = 1;
       //m_data.unknown_33 = 4;
       //m_data.unknown_38 = 0x70;
@@ -137,18 +141,14 @@ namespace Sapphire::Network::Packets::Server
 
       for( auto const& effect : player.getStatusEffectMap() )
       {
-        m_data.effect[ effect.first ].effect_id = effect.second->getId();
-        m_data.effect[ effect.first ].duration = static_cast< float >( effect.second->getDuration() -
+        m_data.Status[ effect.first ].Id = effect.second->getId();
+        m_data.Status[ effect.first ].Time = static_cast< float >( effect.second->getDuration() -
                                                                        ( currentTimeMs -
                                                                          effect.second->getStartTimeMs() ) ) / 1000;
-        m_data.effect[ effect.first ].sourceActorId = effect.second->getSrcActorId();
-        m_data.effect[ effect.first ].param = effect.second->getParam();
+        m_data.Status[ effect.first ].Source = effect.second->getSrcActorId();
+        m_data.Status[ effect.first ].SystemParam = effect.second->getParam();
       }
 
-      if( auto d = player.getCurrentTerritory()->getAsDirector() )
-      {
-        m_data.directorId = d->getDirectorId();
-      }
     };
   };
 

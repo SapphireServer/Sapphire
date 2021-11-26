@@ -3,7 +3,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Database/DatabaseDef.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
@@ -11,9 +11,10 @@
 #include <Service.h>
 
 #include "Actor/Player.h"
-#include "Actor/Actor.h"
+#include "Actor/GameObject.h"
 #include "Actor/EventObject.h"
 #include "Manager/HousingMgr.h"
+#include "WorldServer.h"
 #include "Territory/Land.h"
 #include "Territory/House.h"
 #include "Inventory/ItemContainer.h"
@@ -24,7 +25,7 @@
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
 using namespace Sapphire;
@@ -52,15 +53,12 @@ bool Sapphire::World::Territory::Housing::HousingInteriorTerritory::init()
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZoneIn( Entity::Player& player )
 {
   auto& housingMgr = Common::Service< HousingMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   Logger::debug( "HousingInteriorTerritory::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                   getGuId(), getTerritoryTypeId(), player.getId() );
 
-  auto indoorInitPacket = makeZonePacket< Server::FFXIVIpcHousingIndoorInitialize >( player.getId() );
-  indoorInitPacket->data().u1 = 0;
-  indoorInitPacket->data().u2 = 0;
-  indoorInitPacket->data().u3 = 0;
-  indoorInitPacket->data().u4 = 0;
+  auto indoorInitPacket = makeZonePacket< FFXIVIpcInterior >( player.getId() );
 
   auto landSetId = housingMgr.toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
   auto pLand = housingMgr.getHousingZoneByLandSetId( landSetId )->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
@@ -68,38 +66,45 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 
   for( auto i = 0; i < 10; i++ )
   {
-    indoorInitPacket->data().indoorItems[ i ] = pHouse->getInteriorModel(
-      static_cast< Common::HouseInteriorSlot >( i ) );
+    indoorInitPacket->data().Interior[ i ] = static_cast< uint16_t >( pHouse->getInteriorModel(
+      static_cast< Common::HouseInteriorSlot >( i ) ) );
   }
 
-  player.queuePacket( indoorInitPacket );
+  server.queueForPlayer( player.getCharacterId(), indoorInitPacket );
 
   bool isFcHouse = pLand->getStatus() == Common::HouseStatus::PrivateEstate;
+  HouseSize size = pLand->getSize();
 
-  auto yardPacketTotal = static_cast< uint8_t >( 2 + pLand->getSize() );
-  for( uint8_t yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
+  switch( size )
   {
-    auto objectInitPacket = makeZonePacket< Server::FFXIVIpcHousingObjectInitialize >( player.getId() );
-    memcpy( &objectInitPacket->data().landIdent, &m_landIdent, sizeof( Common::LandIdent ) );
-
-    if( isFcHouse )
-      objectInitPacket->data().u1 = 2; // 2 = actrl 0x400 will hide the fc door, otherwise it will stay there
-    else
-      objectInitPacket->data().u1 = 0;
-
-    objectInitPacket->data().u2 = 100;
-    objectInitPacket->data().packetNum = yardPacketNum;
-    objectInitPacket->data().packetTotal = yardPacketTotal;
-
-    auto yardObjectSize = sizeof( Common::HousingObject );
-    memcpy( &objectInitPacket->data().object, m_housingObjects.data() + ( yardPacketNum * 100 ), yardObjectSize * 100 );
-
-    player.queuePacket( objectInitPacket );
+    case HouseSize::HOUSE_SIZE_S:
+    {
+      auto objectInitPacket = makeZonePacket< FFXIVIpcFurnitureListS >( player.getId() );
+      memcpy( &objectInitPacket->data().LandId, &m_landIdent, sizeof( Common::LandIdent ) );
+      memcpy( &objectInitPacket->data().Furnitures, m_housingObjects.data(), sizeof( Common::Furniture ) * 100 );
+      server.queueForPlayer( player.getCharacterId(), objectInitPacket );
+      break;
+    }
+    case HouseSize::HOUSE_SIZE_M:
+    {
+      auto objectInitPacket = makeZonePacket< FFXIVIpcFurnitureListM >( player.getId() );
+      memcpy( &objectInitPacket->data().LandId, &m_landIdent, sizeof( Common::LandIdent ) );
+      memcpy( &objectInitPacket->data().Furnitures, m_housingObjects.data(), sizeof( Common::Furniture ) * 150 );
+      server.queueForPlayer( player.getCharacterId(), objectInitPacket );
+      break;
+    }
+    case HouseSize::HOUSE_SIZE_L:
+    {
+            auto objectInitPacket = makeZonePacket< FFXIVIpcFurnitureListL >( player.getId() );
+      memcpy( &objectInitPacket->data().LandId, &m_landIdent, sizeof( Common::LandIdent ) );
+      memcpy( &objectInitPacket->data().Furnitures, m_housingObjects.data(), sizeof( Common::Furniture ) * 200 );
+      break;
+    }
   }
 
   if( isFcHouse )
-    player.queuePacket(
-      Server::makeActorControlSelf( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
+    server.queueForPlayer( player.getCharacterId(),
+      makeActorControlSelf( player.getId(), Network::ActorControl::HideAdditionalChambersDoor ) );
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onUpdate( uint64_t tickCount )
@@ -130,8 +135,8 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
   // zero out the array
   // there's some really weird behaviour where *some* values will cause the linkshell invite notification to pop up
   // for some reason
-  Common::HousingObject obj {};
-  memset( &obj, 0x0, sizeof( Common::HousingObject ) );
+  Common::Furniture obj {};
+  memset( &obj, 0x0, sizeof( Common::Furniture ) );
   m_housingObjects.fill( obj );
 
   auto containers = housingMgr.getEstateInventory( getLandIdent() );
@@ -165,6 +170,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
                                                                                         uint16_t containerType,
                                                                                         Inventory::HousingItemPtr item )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto offset = ( containerIdx * 50 ) + slot;
@@ -174,16 +180,18 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::spawnHousing
 
   for( const auto& player : m_playerMap )
   {
-    auto objectSpawnPkt = makeZonePacket< Server::FFXIVIpcHousingInternalObjectSpawn >( player.second->getId() );
+    auto objectSpawnPkt = makeZonePacket< FFXIVIpcFurniture >( player.second->getId() );
 
-    objectSpawnPkt->data().containerId = containerType;
-    objectSpawnPkt->data().containerOffset = static_cast< uint8_t >( slot );
+    objectSpawnPkt->data().StorageId = containerType;
+    objectSpawnPkt->data().ContainerIndex = static_cast< uint8_t >( slot );
 
-    objectSpawnPkt->data().object.itemId = item->getAdditionalData() & 0xFFFF;
-    objectSpawnPkt->data().object.rotation = item->getRot();
-    objectSpawnPkt->data().object.pos = item->getPos();
+    objectSpawnPkt->data().Furniture.patternId = item->getAdditionalData() & 0xFFFF;
+    objectSpawnPkt->data().Furniture.dir = Util::floatToUInt16Rot( item->getRot() );
+    objectSpawnPkt->data().Furniture.pos[ 0 ] = Util::floatToUInt16( item->getPos().x );
+    objectSpawnPkt->data().Furniture.pos[ 1 ] = Util::floatToUInt16( item->getPos().y );
+    objectSpawnPkt->data().Furniture.pos[ 2 ] = Util::floatToUInt16( item->getPos().z );
 
-    player.second->queuePacket( objectSpawnPkt );
+    server.queueForPlayer( player.second->getCharacterId(), objectSpawnPkt );
   }
 }
 
@@ -192,10 +200,13 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
                                                                                                  Common::FFXIVARR_POSITION3 pos,
                                                                                                  uint16_t rot )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto& obj = m_housingObjects[ slot ];
 
-  obj.pos = pos;
-  obj.rotation = rot;
+  obj.pos[ 0 ] = Util::floatToUInt16( pos.x );
+  obj.pos[ 1 ] = Util::floatToUInt16( pos.y );
+  obj.pos[ 2 ] = Util::floatToUInt16( pos.z );
+  obj.dir = Util::floatToUInt16Rot( rot );
 
   // todo: how does this update on other clients?
 
@@ -204,28 +215,30 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::updateHousin
     if( player.second->getId() == sourcePlayer.getId() )
       continue;
 
-    auto moveObjPkt = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
+    auto moveObjPkt = makeZonePacket< FFXIVIpcHousingObjectTransform >( player.second->getId() );
 
-    moveObjPkt->data().itemRotation = static_cast< uint16_t >( obj.rotation );
-    moveObjPkt->data().pos = obj.pos;
+    moveObjPkt->data().Dir = static_cast< uint16_t >( obj.dir );
+    moveObjPkt->data().Pos[ 0 ] = obj.pos[ 0 ];
+    moveObjPkt->data().Pos[ 1 ] = obj.pos[ 1 ];
+    moveObjPkt->data().Pos[ 2 ] = obj.pos[ 2 ];
 
     // todo: how does this work when an item is in a slot >50 or u8 max? my guess is landid is the container index, but not sure...
-    moveObjPkt->data().objectArray = static_cast< uint8_t >( slot % 50 );
-    moveObjPkt->data().landId = static_cast< uint8_t >( slot / 50 );
+    moveObjPkt->data().ContainerIndex = static_cast< uint8_t >( slot % 50 );
+    moveObjPkt->data().UserData2 = slot / 50;
 
-    player.second->queuePacket( moveObjPkt );
+    server.queueForPlayer( player.second->getCharacterId(), moveObjPkt );
   }
 }
 
 void Sapphire::World::Territory::Housing::HousingInteriorTerritory::removeHousingObject( uint16_t slot )
 {
-  memset( m_housingObjects.data() + slot, 0x0, sizeof( Common::HousingObject ) );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  memset( m_housingObjects.data() + slot, 0x0, sizeof( Common::Furniture ) );
 
   for( const auto& player : m_playerMap )
   {
-    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem,
-                                             slot );
+    auto pkt = makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveInteriorHousingItem, slot );
 
-    player.second->queuePacket( pkt );
+    server.queueForPlayer( player.second->getCharacterId(), pkt );
   }
 }

@@ -1,17 +1,11 @@
-#ifndef _ACTION_H_
-#define _ACTION_H_
+#pragma once
 
 #include <Common.h>
 #include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
 #include "EffectBuilder.h"
-
-namespace Sapphire::Data
-{
-  struct Action;
-  using ActionPtr = std::shared_ptr< Action >;
-}
+#include "Exd/Structs.h"
 
 namespace Sapphire::World::Action
 {
@@ -23,7 +17,7 @@ namespace Sapphire::World::Action
 
     Action();
     Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence );
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, Data::ActionPtr actionData );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData );
 
     virtual ~Action();
 
@@ -148,7 +142,7 @@ namespace Sapphire::World::Action
 
     bool playerPreCheck( Entity::Player& player );
 
-    bool preFilterActor( Entity::Actor& actor ) const;
+    bool preFilterActor( Entity::GameObject& actor ) const;
 
     bool hasValidLutEntry() const;
 
@@ -183,7 +177,7 @@ namespace Sapphire::World::Action
 
     Common::ActionInterruptType m_interruptType;
 
-    Data::ActionPtr m_actionData;
+    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos;
 
@@ -195,5 +189,3 @@ namespace Sapphire::World::Action
     ActionEntry m_lutEntry;
   };
 }
-
-#endif

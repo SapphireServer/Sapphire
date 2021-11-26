@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_EFFECTBUILDER_H
-#define SAPPHIRE_EFFECTBUILDER_H
+#pragma once
 
 #include <ForwardsZone.h>
 #include <Common.h>
@@ -49,5 +48,3 @@ namespace Sapphire::World::Action
   };
 
 }
-
-#endif //SAPPHIRE_EFFECTBUILDER_H

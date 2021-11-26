@@ -1,13 +1,13 @@
 #include "PlayerMinimal.h"
 
 #include <Common.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 
 #include <Database/DatabaseDef.h>
 
 #include <nlohmann/json.hpp>
 
-extern Sapphire::Data::ExdDataGenerated g_exdDataGen;
+extern Sapphire::Data::ExdData g_exdData;
 
 namespace Sapphire::Api {
 
@@ -15,7 +15,7 @@ using namespace Common;
 
 // player constructor
 PlayerMinimal::PlayerMinimal() :
-  m_id( 0 )
+  m_characterId( 0 )
 {
 
 
@@ -23,18 +23,19 @@ PlayerMinimal::PlayerMinimal() :
 
 // load player from the db
 // TODO change void CPlayer::load to bool, we want to know if something went wrong
-void PlayerMinimal::load( uint32_t charId )
+void PlayerMinimal::load( uint64_t charId )
 {
 
   auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_MINIMAL );
 
-  stmt->setUInt( 1, charId );
+  stmt->setUInt64( 1, charId );
   auto res = g_charaDb.query( stmt );
 
   if( !res->next() )
     return;
 
-  m_id = charId;
+  m_characterId = charId;
+  m_id = res->getUInt64( "EntityId" );
 
   memset( m_name, 0, 32 );
 
@@ -58,14 +59,13 @@ void PlayerMinimal::load( uint32_t charId )
   setBirthDay( res->getUInt8( "BirthDay" ), res->getUInt8( "BirthMonth" ) );
   m_guardianDeity = res->getUInt8( "GuardianDeity" );
   m_class = res->getUInt8( "Class" );
-  m_contentId = res->getUInt64( "ContentId" );
   m_territoryTypeId = res->getUInt16( "TerritoryType" );
 
   res.reset();
 
   // SELECT ClassIdx, Exp, Lvl
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
-  stmtClass->setInt( 1, m_id );
+  stmtClass->setUInt64( 1, m_characterId );
 
   auto resClass = g_charaDb.query( stmtClass );
 
@@ -122,7 +122,7 @@ std::string PlayerMinimal::getInfoJson()
   c.push_back( std::to_string( getZoneId() ) );
 
   // ContentFinderCondition
-  c.push_back( "0" );
+  //c.push_back( "0" );
 
   // look map
   auto lookArray = nlohmann::json();
@@ -167,7 +167,7 @@ std::string PlayerMinimal::getInfoJson()
   // LoginStatus
   c.push_back( "0" );
   // IsOutTerritory
-  c.push_back( "0" );
+  //c.push_back( "0" );
 
 
   payload["classname"] = "ClientSelectData";
@@ -178,7 +178,7 @@ std::string PlayerMinimal::getInfoJson()
 
 uint8_t PlayerMinimal::getClassLevel()
 {
-  uint8_t classJobIndex = g_exdDataGen.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( m_class ) )->expArrayIndex;
+  uint8_t classJobIndex = g_exdData.getRow< Component::Excel::ClassJob >( m_class )->data().WorkIndex;
   return static_cast< uint8_t >( m_classMap[ classJobIndex ] );
 }
 
@@ -257,16 +257,17 @@ void PlayerMinimal::saveAsNew()
       break;
   }
 
-  //        "(AccountId, CharacterId, ContentId, Name, Hp, Mp, "
+  //        "(AccountId, CharacterId, EntityId, Name, Hp, Mp, "
   //        "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
   //        "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
   //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
   //        "Aetheryte, GMRank, UPDATE_DATE )
 
   auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_INS );
-  stmt->setInt( 1, m_accountId );
-  stmt->setInt( 2, m_id );
-  stmt->setInt64( 3, m_contentId );
+  stmt->set( 1, m_accountId );
+  stmt->set( 2, m_characterId );
+  stmt->set( 3, m_id );
+
   stmt->setString( 4, std::string( m_name ) );
   stmt->setInt( 5, 100 );
   stmt->setInt( 6, 100 );
@@ -301,14 +302,14 @@ void PlayerMinimal::saveAsNew()
 
   // CharacterId, ClassIdx, Exp, Lvl
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
-  stmtClass->setInt( 1, m_id );
-  stmtClass->setInt( 2, g_exdDataGen.get< Sapphire::Data::ClassJob >( m_class )->expArrayIndex );
+  stmtClass->setUInt64( 1, m_characterId );
+  stmtClass->setInt( 2, g_exdData.getRow< Component::Excel::ClassJob >( m_class )->data().WorkIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, 1 );
   g_charaDb.directExecute( stmtClass );
 
   auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEARCHINFO_INS );
-  stmtSearchInfo->setInt( 1, m_id );
+  stmtSearchInfo->setUInt64( 1, m_characterId );
   g_charaDb.directExecute( stmtSearchInfo );
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -338,21 +339,21 @@ void PlayerMinimal::saveAsNew()
   createInvDbContainer( InventoryType::Crystal );
 
   auto stmtMonsterNote = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_MONSTERNOTE_INS );
-  stmtMonsterNote->setInt( 1, m_id );
+  stmtMonsterNote->setUInt64( 1, m_characterId );
   for( uint8_t i = 1; i <= 12; ++i )
     stmtMonsterNote->setBinary( i + 1, monsterNote );
   g_charaDb.directExecute( stmtMonsterNote );
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SETUP EQUIPMENT / STARTING GEAR
-  auto classJobInfo = g_exdDataGen.get< Sapphire::Data::ClassJob >( m_class );
-  uint32_t weaponId = classJobInfo->itemStartingWeapon;
+  auto classJobInfo = g_exdData.getRow< Component::Excel::ClassJob >( m_class );
+  uint32_t weaponId = classJobInfo->data().InitWeapon[0];
   uint64_t uniqueId = getNextUId64();
 
   uint8_t race = customize[ CharaLook::Race ];
   uint8_t gender = customize[ CharaLook::Gender ];
 
-  auto raceInfo = g_exdDataGen.get< Sapphire::Data::Race >( race );
+  auto raceInfo = g_exdData.getRow< Component::Excel::Race >( race );
 
   uint32_t body;
   uint32_t hands;
@@ -363,20 +364,10 @@ void PlayerMinimal::saveAsNew()
   uint64_t legsUid = getNextUId64();
   uint64_t feetUid = getNextUId64();
 
-  if( gender == 0 )
-  {
-    body = raceInfo->rSEMBody;
-    hands = raceInfo->rSEMHands;
-    legs = raceInfo->rSEMLegs;
-    feet = raceInfo->rSEMFeet;
-  }
-  else
-  {
-    body = raceInfo->rSEFBody;
-    hands = raceInfo->rSEFHands;
-    legs = raceInfo->rSEFLegs;
-    feet = raceInfo->rSEFFeet;
-  }
+  body = raceInfo->data().Body[ gender ];
+  hands = raceInfo->data().Hand[ gender ];
+  legs = raceInfo->data().Leg[ gender ];
+  feet = raceInfo->data().Foot[ gender ];
 
   insertDbGlobalItem( weaponId, uniqueId );
   insertDbGlobalItem( body, bodyUid );
@@ -384,18 +375,6 @@ void PlayerMinimal::saveAsNew()
   insertDbGlobalItem( legs, legsUid );
   insertDbGlobalItem( feet, feetUid );
 
-  // Universal accessories
-
-  uint64_t neckUid = getNextUId64();
-  uint64_t earUid = getNextUId64();
-  uint64_t wristUid = getNextUId64();
-  uint64_t ringUid = getNextUId64();
-
-
-  insertDbGlobalItem( 15130, neckUid );
-  insertDbGlobalItem( 15131, earUid );
-  insertDbGlobalItem( 15132, wristUid );
-  insertDbGlobalItem( 15133, ringUid );
 
   g_charaDb.execute( "INSERT INTO charaitemgearset (storageId, CharacterId, "
                      "container_" + std::to_string( GearSetSlot::MainHand ) + ", "
@@ -409,23 +388,23 @@ void PlayerMinimal::saveAsNew()
                      "container_" + std::to_string( GearSetSlot::Ring1 ) + ", UPDATE_DATE ) "
                      "VALUES ( " +
                      std::to_string( InventoryType::GearSet0 ) + ", " +
-                     std::to_string( m_id ) + ", " +
+                     std::to_string( m_characterId ) + ", " +
                      std::to_string( uniqueId ) + ", " +
                      std::to_string( bodyUid ) + ", " +
                      std::to_string( handsUid ) + ", " +
                      std::to_string( legsUid ) + ", " +
                      std::to_string( feetUid ) + ", " +
-                     std::to_string( neckUid ) + ", " +
-                     std::to_string( earUid ) + ", " +
-                     std::to_string( wristUid ) + ", " +
-                     std::to_string( ringUid ) + ", NOW());" );
+                     std::to_string( 0 ) + ", " +
+                     std::to_string( 0 ) + ", " +
+                     std::to_string( 0 ) + ", " +
+                     std::to_string( 0 ) + ", NOW());" );
 
 }
 
 void PlayerMinimal::insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) const
 {
   auto stmtItemGlobal = g_charaDb.getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );
-  stmtItemGlobal->setInt( 1, m_id );
+  stmtItemGlobal->setUInt64( 1, m_characterId );
   stmtItemGlobal->setInt64( 2, uniqueId );
   stmtItemGlobal->setInt( 3, itemId );
   stmtItemGlobal->setInt( 4, 1 ); // stack of 1
@@ -435,7 +414,7 @@ void PlayerMinimal::insertDbGlobalItem( uint32_t itemId, uint64_t uniqueId ) con
 void PlayerMinimal::createInvDbContainer( uint16_t slot ) const
 {
   auto stmtCreateInv = g_charaDb.getPreparedStatement( Db::CHARA_ITEMINV_INS );
-  stmtCreateInv->setInt( 1, m_id );
+  stmtCreateInv->setUInt64( 1, m_characterId );
   stmtCreateInv->setInt( 2, slot );
   g_charaDb.directExecute( stmtCreateInv );
 }

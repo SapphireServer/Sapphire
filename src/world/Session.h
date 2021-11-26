@@ -11,7 +11,7 @@ namespace Sapphire::World
   class Session : public std::enable_shared_from_this< Session >
   {
   public:
-    Session( uint32_t sessionId );
+    Session( uint32_t entityId );
 
     ~Session() = default;
 
@@ -51,14 +51,21 @@ namespace Sapphire::World
 
     Entity::PlayerPtr getPlayer() const;
 
+    /*! set timestamp for last received ping */
+    void setLastPing( uint32_t lastPing );
+
+    /*! get timestamp of last received ping */
+    uint32_t getLastPing() const;
+
   private:
-    uint32_t m_sessionId;
+    uint32_t m_entityId;
 
     Entity::PlayerPtr m_pPlayer;
 
     uint32_t m_lastDataTime;
 
     uint32_t m_lastSqlTime;
+    uint32_t m_lastPing;
     bool m_isValid;
 
     bool m_isReplaying;

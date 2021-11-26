@@ -1,6 +1,6 @@
 #include "MarketMgr.h"
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Logging/Logger.h>
 
 #include <Network/CommonNetwork.h>
@@ -11,7 +11,15 @@
 
 #include <algorithm>
 
+#include <Service.h>
+#include "WorldServer.h"
+#include "Session.h"
+#include "Network/GameConnection.h"
+
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 bool Sapphire::World::Manager::MarketMgr::init()
 {
@@ -57,34 +65,36 @@ bool Sapphire::World::Manager::MarketMgr::init()
 void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Entity::Player& player, uint32_t catalogId,
                                                                   uint32_t requestId )
 {
-  auto countPkt = makeZonePacket< Server::FFFXIVIpcMarketBoardItemListingCount >( player.getId() );
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto pSession = server.getSession( player.getCharacterId() );
+
+  auto countPkt = makeZonePacket< FFFXIVIpcMarketBoardItemListingCount >( player.getId() );
   countPkt->data().quantity = 1 << 8;
   countPkt->data().itemCatalogId = catalogId;
   countPkt->data().requestId = requestId;
 
-  player.queuePacket( countPkt );
+  pSession->getZoneConnection()->queueOutPacket( countPkt );
 
-  auto historyPkt = makeZonePacket< Server::FFXIVIpcMarketBoardItemListingHistory >( player.getId() );
-  historyPkt->data().itemCatalogId = catalogId;
-  historyPkt->data().itemCatalogId2 = catalogId;
+  auto historyPkt = makeZonePacket< FFXIVIpcGetItemHistoryResult >( player.getId() );
+  historyPkt->data().CatalogID = catalogId;
 
   std::string name = "fix game pls se :(((";
 
   for( int i = 0; i < 10; i++ )
   {
-    auto& listing = historyPkt->data().listing[ i ];
+    auto& listing = historyPkt->data().ItemHistoryList[ i ];
 
-    listing.itemCatalogId = catalogId;
-    listing.quantity = i + 1;
-    listing.purchaseTime = Common::Util::getTimeSeconds();
-    listing.salePrice = 69420420;
-    listing.isHq = 1;
-    listing.onMannequin = 1;
+    listing.CatalogID = catalogId;
+    listing.Stack = i + 1;
+    listing.BuyRealDate = Common::Util::getTimeSeconds();
+    listing.SellPrice = 69420420;
+    listing.SubQuality = 1;
 
-    strcpy( listing.buyerName, name.c_str() );
+    strcpy( listing.BuyCharacterName, name.c_str() );
   }
 
-  player.queuePacket( historyPkt );
+  pSession->getZoneConnection()->queueOutPacket( historyPkt );
 }
 
 
@@ -93,6 +103,9 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
                                                              const std::string_view& searchStr, uint32_t requestId,
                                                              uint32_t startIdx )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto pSession = server.getSession( player.getCharacterId() );
+
   ItemSearchResultList resultList;
   findItems( searchStr, itemSearchCategory, maxEquipLevel, classJob, resultList );
 
@@ -104,26 +117,26 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
   auto endIdx = std::min< size_t >( startIdx + 20, numResults );
   auto size = endIdx - startIdx;
 
-  auto resultPkt = makeZonePacket< Server::FFXIVIpcMarketBoardSearchResult >( player.getId() );
-  resultPkt->data().itemIndexStart = startIdx;
-  resultPkt->data().requestId = requestId;
+  auto resultPkt = makeZonePacket< FFXIVIpcCatalogSearchResult >( player.getId() );
+  resultPkt->data().Index = startIdx;
+  resultPkt->data().RequestKey = requestId;
 
   for( auto i = 0; i < size; i++ )
   {
     auto& item = resultList.at( startIdx + i );
-    auto& data = resultPkt->data().items[ i ];
+    auto& data = resultPkt->data().CatalogList[ i ];
 
-    data.itemCatalogId = item.catalogId;
-    data.quantity = item.quantity;
-    data.demand = 420;
+    data.CatalogID = item.catalogId;
+    data.StockCount = item.quantity;
+    data.RequestItemCount = 420;
   }
 
   if( size < 20 )
-    resultPkt->data().itemIndexEnd = 0;
+    resultPkt->data().NextIndex = 0;
   else
-    resultPkt->data().itemIndexEnd = startIdx + 20;
+    resultPkt->data().NextIndex = startIdx + 20;
 
-  player.queuePacket( resultPkt );
+  pSession->getZoneConnection()->queueOutPacket( resultPkt );
 }
 
 void Sapphire::World::Manager::MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint16_t catalogId )

@@ -28,27 +28,29 @@ bool SapphireApi::login( const std::string& username, const std::string& pass, s
 
   // session id string generation
   srand( ( uint32_t ) time( NULL ) + 42 );
-  uint8_t sid[58];
 
-  for( int32_t i = 0; i < 56; i += 4 )
+  std::string sessionId;
+  for( int32_t i = 0; i < 64 / 4; ++i )
   {
     short number = 0x1111 + rand() % 0xFFFF;
-    sprintf( ( char* ) sid + i, "%04hx", number );
+    char part[5];
+    sprintf( part, "%04hx", number );
+
+    if( i == 15 )
+    {
+      part[2] = 0;
+      part[3] = 0;
+    }
+    sessionId += std::string( part );
   }
 
   // create session for the new sessionid and store to sessionlist
   auto pSession = std::make_shared< Session >();
   pSession->setAccountId( accountId );
-  pSession->setSessionId( sid );
+  pSession->setSessionId( sessionId.c_str() );
 
-  std::stringstream ss;
-
-  for( size_t i = 0; i < 56; i++ )
-  {
-    ss << std::hex << sid[ i ];
-  }
-  m_sessionMap[ ss.str() ] = pSession;
-  sId = ss.str();
+  m_sessionMap[ sessionId ] = pSession;
+  sId = sessionId;
 
   return true;
 
@@ -60,7 +62,7 @@ bool SapphireApi::insertSession( const uint32_t accountId, std::string& sId )
   // create session for the new sessionid and store to sessionlist
   auto pSession = std::make_shared< Session >();
   pSession->setAccountId( accountId );
-  pSession->setSessionId( ( uint8_t* ) sId.c_str() );
+  pSession->setSessionId( sId.c_str() );
 
   m_sessionMap[ sId ] = pSession;
 
@@ -105,8 +107,8 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   Api::PlayerMinimal newPlayer;
 
   newPlayer.setAccountId( accountId );
-  newPlayer.setId( getNextCharId() );
-  newPlayer.setContentId( getNextContentId() );
+  newPlayer.setId( getNextEntityId() );
+  newPlayer.setCharacterId( getNextCharaId() );
   newPlayer.setName( name.c_str() );
 
   auto json = nlohmann::json::parse( infoJson );
@@ -186,21 +188,19 @@ void SapphireApi::deleteCharacter( std::string name, const uint32_t accountId )
     }
   }
 
-  int32_t id = deletePlayer.getId();
+  int32_t id = deletePlayer.getCharacterId();
 
-  g_charaDb.execute( "DELETE FROM charainfo WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM characlass WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaglobalitem WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charainfoblacklist WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charainfolinkshell WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charainfosearch WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaitemcrystal WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaitemcurrency WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charamonsternote WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
-  g_charaDb.execute( "DELETE FROM charastatus WHERE CharacterId LIKE '" + std::to_string( id ) + "';" );
+  g_charaDb.execute( "DELETE FROM charainfo WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM characlass WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaglobalitem WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charainfoblacklist WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charainfofriendlist WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charainfolinkshell WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charainfosearch WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaitemcrystal WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaiteminventory WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaitemgearset WHERE CharacterId = " + std::to_string( id ) + ";" );
+  g_charaDb.execute( "DELETE FROM charaquest WHERE CharacterId = " + std::to_string( id ) + ";" );
 }
 
 std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
@@ -209,13 +209,13 @@ std::vector< PlayerMinimal > SapphireApi::getCharList( uint32_t accountId )
   std::vector< Api::PlayerMinimal > charList;
 
   auto pQR = g_charaDb.query(
-    "SELECT CharacterId, ContentId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
+    "SELECT CharacterId FROM charainfo WHERE AccountId = " + std::to_string( accountId ) + ";" );
 
   while( pQR->next() )
   {
     Api::PlayerMinimal player;
 
-    uint32_t charId = pQR->getUInt( 1 );
+    auto charId = pQR->getUInt64( 1 );
 
     player.load( charId );
 
@@ -238,11 +238,11 @@ bool SapphireApi::checkNameTaken( std::string name )
     return true;
 }
 
-uint32_t SapphireApi::getNextCharId()
+uint32_t SapphireApi::getNextEntityId()
 {
   uint32_t charId = 0;
 
-  auto pQR = g_charaDb.query( "SELECT MAX(CharacterId) FROM charainfo" );
+  auto pQR = g_charaDb.query( "SELECT MAX(EntityId) FROM charainfo" );
 
   if( !pQR->next() )
     return 0x00200001;
@@ -254,11 +254,11 @@ uint32_t SapphireApi::getNextCharId()
   return charId;
 }
 
-uint64_t SapphireApi::getNextContentId()
+uint64_t SapphireApi::getNextCharaId()
 {
   uint64_t contentId = 0;
 
-  auto pQR = g_charaDb.query( "SELECT MAX(ContentId) FROM charainfo" );
+  auto pQR = g_charaDb.query( "SELECT MAX(CharacterId) FROM charainfo" );
 
   if( !pQR->next() )
     return 0x0040000001000001;

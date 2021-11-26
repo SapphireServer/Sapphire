@@ -12,21 +12,26 @@
 #include <Network/CommonActorControl.h>
 #include <Util/UtilMath.h>
 
+#include <Service.h>
+#include "WorldServer.h"
+#include "Session.h"
+#include "Network/GameConnection.h"
+
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId,
                                             uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
                                             float rotation, const std::string& givenName ) :
-  Sapphire::Entity::Actor( ObjKind::EventObj ),
+  Sapphire::Entity::GameObject( ObjKind::EventObj ),
   m_gimmickId( gimmickId ),
   m_state( initialState ),
   m_objectId( objectId ),
   m_name( givenName ),
-  m_housingLink( 0 ),
-  m_flag( 0 )
+  m_housingLink( 0 )
 {
   m_id = actorId;
   m_pos.x = pos.x;
@@ -79,22 +84,17 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
 {
   m_state = state;
 
-  for( const auto& player : m_inRangePlayers )
-  {
-    player->queuePacket( makeActorControl( getId(), DirectorEObjMod, state ) );
-  }
-}
-
-uint8_t Sapphire::Entity::EventObject::getFlag() const
-{
-  return m_flag;
+  sendToInRangeSet( makeActorControl( getId(), DirectorEObjMod, state ) );
 }
 
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
+
   for( const auto& player : m_inRangePlayers )
   {
-    player->queuePacket( makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
+    auto pSession = server.getSession( player->getCharacterId() );
+    pSession->getZoneConnection()->queueOutPacket( makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
   }
 }
 
@@ -124,21 +124,25 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   if( !pTarget->isObjSpawnIndexValid( spawnIndex ) )
     return;
 
+  auto& server = Common::Service< World::WorldServer >::ref();
+
   Logger::debug( "Spawning EObj: id#{0} name={1}", getId(), getName() );
 
-  auto eobjStatePacket = makeZonePacket< FFXIVIpcObjectSpawn >( getId(), pTarget->getId() );
-  eobjStatePacket->data().spawnIndex = spawnIndex;
-  eobjStatePacket->data().objKind = getObjKind();
-  eobjStatePacket->data().state = getState();
-  eobjStatePacket->data().objId = getObjectId();
-  eobjStatePacket->data().gimmickId = getGimmickId();
-  eobjStatePacket->data().position = getPos();
-  eobjStatePacket->data().scale = getScale();
-  eobjStatePacket->data().actorId = getId();
-  eobjStatePacket->data().housingLink = getHousingLink();
-  eobjStatePacket->data().rotation = Util::floatToUInt16Rot( getRot() );
-  eobjStatePacket->data().flag = getFlag();
-  pTarget->queuePacket( eobjStatePacket );
+  auto eobjStatePacket = makeZonePacket< FFXIVIpcCreateObject >( getId(), pTarget->getId() );
+  eobjStatePacket->data().Index = spawnIndex;
+  eobjStatePacket->data().Kind = getObjKind();
+  eobjStatePacket->data().Flag = getState();
+  eobjStatePacket->data().BaseId = getObjectId();
+  eobjStatePacket->data().BindLayoutId = getGimmickId();
+  eobjStatePacket->data().Pos = getPos();
+  eobjStatePacket->data().Scale = getScale();
+  eobjStatePacket->data().EntityId = getId();
+  eobjStatePacket->data().Dir = Util::floatToUInt16Rot( getRot() );
+
+  eobjStatePacket->data().Args3 = getHousingLink();
+
+  auto pSession = server.getSession( pTarget->getCharacterId() );
+  pSession->getZoneConnection()->queueOutPacket( eobjStatePacket );
 }
 
 

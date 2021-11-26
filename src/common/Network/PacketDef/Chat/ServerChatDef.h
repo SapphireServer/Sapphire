@@ -1,5 +1,4 @@
-#ifndef _CORE_NETWORK_PACKETS_CHAT_SERVER_IPC_H
-#define _CORE_NETWORK_PACKETS_CHAT_SERVER_IPC_H
+#pragma once
 
 #include <Common.h>
 #include <Network/CommonNetwork.h>
@@ -11,56 +10,54 @@ namespace Sapphire::Network::Packets::Server
 * Structural representation of the packet sent by the server as response
 * to a tell request
 */
-struct FFXIVIpcTell : FFXIVIpcBasePacket< Tell >
+struct FFXIVChatFrom : FFXIVIpcBasePacket< ChatFrom >
 {
-  uint64_t contentId;
-  uint16_t worldId;
-  uint8_t flags;
-  char receipientName[32];
-  char msg[1029];
+  uint64_t fromCharacterID;
+  uint8_t type;
+  char fromName[32]; //uint8_t
+  char message[1024]; //uint8_t
+};
+
+/**
+* Structural representation of the packet sent by the server as
+* message from a chat channel that the player is associated to
+*/
+struct FFXIVChatToChannel : FFXIVIpcBasePacket< Chat >
+{
+  uint64_t channelID;
+  uint64_t speakerCharacterID;
+  uint32_t speakerEntityID;
+  uint8_t type; 
+  char speakerName[32];
+  char message[1024];
+};
+
+struct FFXIVJoinChannelResult : FFXIVIpcBasePacket< JoinChannelResult >
+{
+  uint64_t channelID;
+  uint64_t characterID;
+  uint8_t result;
+};
+
+struct FFXIVRecvBusyStatus : FFXIVIpcBasePacket< RecvBusyStatus >
+{
+  char toName[32]; //uint8_t
+};
+
+struct FFXIVRecvFinderStatus : FFXIVIpcBasePacket< RecvFinderStatus >
+{
+  char toName[32]; //uint8_t
 };
 
 /**
 * Structural representation of the packet sent by the server as response
 * to a failed tell because of unavailable target player
 */
-struct FFXIVIpcTellErrNotFound : FFXIVIpcBasePacket< TellErrNotFound >
+struct FFXIVIpcTellNotFound : FFXIVIpcBasePacket< TellNotFound >
 {
-  char receipientName[32];
+  char toName[32]; //uint8_t
 };
 
-struct FFXIVIpcFreeCompanyEvent : FFXIVIpcBasePacket< FreeCompanyEvent >
-{
-  uint16_t unknown;
-  uint16_t unknown1;
-  uint16_t unknown2;
-  uint16_t unknown3;
-  uint16_t unknown4;
-  char padding[6];
-  uint8_t eventID;
-  /*
-  * 0x0F Login
-  * 0x10 Logout
-  */
-  uint8_t padding1;
-  char padding2[6];
-  uint16_t unknown5;
-  char parameter[46];
-  /**
-  * eventID  | parameter usage
-  * 0x0F       FC name
-  * 0x10       FC name
-  */
-  char parameter1[32];
-  /**
-  * eventID  | parameter1 usage
-  * 0x0F       Character name
-  * 0x10       Character name
-  */
-};
 
 } /* Sapphire::Common::Network::Packets::Server */
 
-
-
-#endif /*_CORE_NETWORK_PACKETS_CHAT_SERVER_IPC_H*/

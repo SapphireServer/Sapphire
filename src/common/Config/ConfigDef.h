@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_CONFIGDEF_H
-#define SAPPHIRE_CONFIGDEF_H
+#pragma once
 
 #include <Database/DbCommon.h>
 
@@ -92,5 +91,3 @@ namespace Sapphire::Common::Config
     } network;
   };
 }
-
-#endif //SAPPHIRE_CONFIGDEF_H

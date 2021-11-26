@@ -1,15 +1,12 @@
-
-#ifndef _CELL_H
-#define _CELL_H
-
-#include <stdint.h>
+#pragma once
+#include <cstdint>
 
 #include "ForwardsZone.h"
 #include <set>
 
 namespace Sapphire {
 
-typedef std::set< Entity::ActorPtr > ActorSet;
+typedef std::set< Entity::GameObjectPtr > ActorSet;
 
 class Cell
 {
@@ -34,11 +31,11 @@ public:
 
   void init( uint32_t x, uint32_t y, TerritoryPtr pZone );
 
-  void addActor( Entity::ActorPtr pAct );
+  void addActor( Entity::GameObjectPtr pAct );
 
-  void removeActorFromCell( Entity::ActorPtr pAct );
+  void removeActorFromCell( Entity::GameObjectPtr pAct );
 
-  bool hasActor( Entity::ActorPtr pAct )
+  bool hasActor( Entity::GameObjectPtr pAct )
   {
     return ( m_actors.find( pAct ) != m_actors.end() );
   }
@@ -120,4 +117,3 @@ public:
 };
 
 }
-#endif

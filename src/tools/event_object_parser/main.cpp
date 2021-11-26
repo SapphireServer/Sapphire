@@ -16,7 +16,7 @@
 #include <datReader/DatCategories/bg/lgb.h>
 #include <datReader/DatCategories/bg/sgb.h>
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Logging/Logger.h>
 
 #include <GameData.h>
@@ -29,7 +29,7 @@
 #include <filesystem>
 
 [[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
-Sapphire::Data::ExdDataGenerated g_exdData;
+Sapphire::Data::ExdData g_exdData;
 
 using namespace Sapphire;
 using namespace std::chrono_literals;
@@ -66,10 +66,10 @@ std::string zoneNameToPath( const std::string& name )
   if( it != g_nameMap.end() )
     return it->second;
 
-  auto teriIdList = g_exdData.getTerritoryTypeIdList();
+  auto teriIdList = g_exdData.getIdList< Component::Excel::TerritoryType >();
   for( auto teriId : teriIdList )
   {
-    auto teri = g_exdData.get< Sapphire::Data::TerritoryType >( teriId );
+    auto teri = g_exdData.getRow< Component::Excel::TerritoryType >( teriId );
     if( !teri )
       continue;
     
@@ -102,10 +102,10 @@ std::string zoneNameToPath( const std::string& name )
 
 void loadEobjNames()
 {
-  auto nameIdList = g_exdData.getEObjNameIdList();
+  auto nameIdList = g_exdData..getIdList< Component::Excel::EObj >();
   for( auto id : nameIdList )
   {
-    auto eObjName = g_exdData.get< Sapphire::Data::EObjName >( id );
+    auto eObjName = g_exdData.getRow< Component::Excel::EObjName >( id );
     if( !eObjName )
       continue;
 

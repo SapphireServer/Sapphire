@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_HOUSINGITEM_H
-#define SAPPHIRE_HOUSINGITEM_H
+#pragma once
 
 #include "Item.h"
 
@@ -22,5 +21,3 @@ namespace Sapphire::Inventory
     float m_rotation;
   };
 }
-
-#endif //SAPPHIRE_HOUSINGITEM_H

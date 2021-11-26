@@ -6,18 +6,18 @@
 #include "Actor/Player.h"
 #include "Forwards.h"
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
   * @brief The Client Player Initialization packet. This must be sent to the client
   * once upon connection to configure the UI.
   */
-  class PlayerSetupPacket : public ZoneChannelPacket< FFXIVIpcPlayerSetup >
+  class PlayerSetupPacket : public ZoneChannelPacket< FFXIVIpcPlayerStatus >
   {
   public:
     PlayerSetupPacket( Entity::Player& player ) :
-      ZoneChannelPacket< FFXIVIpcPlayerSetup >( player.getId(), player.getId() )
+      ZoneChannelPacket< FFXIVIpcPlayerStatus >( player.getId(), player.getId() )
     {
       initialize( player );
     };
@@ -25,67 +25,74 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player )
     {
-      m_data.contentId = player.getContentId();
+      m_data.CharaId = player.getCharacterId();
 
       // TODO: Support rested experience.
-      m_data.restedExp = 0;
+      //m_data.restedExp = 0;
       //m_data.padding = 0x100;
-      m_data.charId = player.getId();
-      m_data.race = player.getLookAt( Common::CharaLook::Race );
-      m_data.tribe = player.getLookAt( Common::CharaLook::Tribe );
-      m_data.gender = player.getLookAt( Common::CharaLook::Gender );
-      m_data.currentClass = static_cast< uint8_t >( player.getClass() );
-      m_data.currentJob = static_cast< uint8_t >( player.getClass() );
-      m_data.maxLevel = player.getLevel();
-      m_data.deity = static_cast< uint8_t >( player.getGuardianDeity() );
-      m_data.namedayMonth = player.getBirthMonth();
-      m_data.namedayDay = player.getBirthDay();
+      m_data.EntityId = player.getId();
+      m_data.Race = player.getLookAt( Common::CharaLook::Race );
+      m_data.Tribe = player.getLookAt( Common::CharaLook::Tribe );
+      m_data.Sex = player.getLookAt( Common::CharaLook::Gender );
+      m_data.ClassJob = static_cast< uint8_t >( player.getClass() );
+      m_data.FirstClass = static_cast< uint8_t >( player.getClass() );
+      //m_data.maxLevel = player.getLevel();
+      m_data.GuardianDeity = static_cast< uint8_t >( player.getGuardianDeity() );
+      m_data.BirthMonth = player.getBirthMonth();
+      m_data.Birthday = player.getBirthDay();
       // TODO: Support grand company status.
-      m_data.cityState = player.getStartTown();
+      m_data.StartTown = player.getStartTown();
       //m_data.gcRank = GCRank::None;
 
-      m_data.homepoint = player.getHomepoint();
-      m_data.pose = player.getPose();
+      m_data.HomePoint = player.getHomepoint();
+      //m_data.pose = player.getPose();
 
-      memset( &m_data.name[ 0 ], 0, sizeof( m_data.name ) );
-      strcpy( &m_data.name[ 0 ], player.getName().c_str() );
+      memset( &m_data.Name[ 0 ], 0, sizeof( m_data.Name ) );
+      strcpy( reinterpret_cast< char* >( m_data.Name ), player.getName().c_str() );
 
-      memcpy( m_data.aetheryte, player.getAetheryteArray(), sizeof( m_data.aetheryte ) );
+      memcpy( m_data.Aetheryte, player.getAetheryteArray().data(), sizeof( m_data.Aetheryte ) );
 
       // Set the class levels and exp.
-      for( uint8_t i = 0; i < Common::CLASSJOB_SLOTS; i++ )
+      for( uint8_t i = 0; i < 20; i++ )
       {
-        m_data.levels[ i ] = player.getClassArray()[ i ];
-        m_data.exp[ i ] = player.getExpArray()[ i ];
+        m_data.Lv[ i ] = player.getClassArray()[ i ];
+        m_data.Exp[ i ] = player.getExpArray()[ i ];
       }
 
-      memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
+    //  memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
 
-      memcpy( m_data.mountGuideMask, player.getMountGuideBitmask(), sizeof( m_data.mountGuideMask ) );
+      memcpy( m_data.MountList, player.getMountGuideBitmask().data(), sizeof( m_data.MountList ) );
 
-      memcpy( m_data.unlockBitmask, player.getUnlockBitmask(), sizeof( m_data.unlockBitmask ) );
+      memcpy( m_data.Reward, player.getUnlockBitmask().data(), sizeof( m_data.Reward ) );
 
-      memcpy( m_data.discovery, player.getDiscoveryBitmask(), sizeof( m_data.discovery ) );
+      memcpy( m_data.Discovery16, player.getDiscoveryBitmask().data(), sizeof( m_data.Discovery16 ) + sizeof( m_data.Discovery32 ) );
 
-      memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
+      memcpy( m_data.HowTo, player.getHowToArray().data(), sizeof( m_data.HowTo ) );
+
+      m_data.Anima = 0;
+      m_data.Pet = 0;
 
       // possibly max level or current level
-      m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
-      m_data.expansion = Common::CURRENT_EXPANSION_ID;
+   //   m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
+   //   m_data.expansion = Common::CURRENT_EXPANSION_ID;
 
       // df stuff
       // todo: actually do this properly
   //      m_data.unknown70[4] = 1; // enable df
 
       // enable all raids/guildhests/dungeons
-      memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
+     /* memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
       memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
       memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
-      memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+      memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );*/
     };
   };
-
+  template< typename... Args >
+  std::shared_ptr< PlayerSetupPacket > makePlayerSetup( Args... args )
+  {
+    return std::make_shared< PlayerSetupPacket >( args... );
+  }
 }
 
 #endif /*_CORE_NETWORK_PACKETS_CINITUIPACKET_H*/

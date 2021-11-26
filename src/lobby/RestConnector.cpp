@@ -3,7 +3,6 @@
 #include "ServerLobby.h"
 #include <Logging/Logger.h>
 #include <Crypt/base64.h>
-#include <time.h>
 #include <iomanip>
 
 #include <nlohmann/json.hpp>
@@ -69,7 +68,7 @@ Lobby::LobbySessionPtr Lobby::RestConnector::getSession( char* sId )
     {
       LobbySessionPtr pSession( new Lobby::LobbySession() );
       pSession->setAccountID( json["result"].get< uint32_t >() );
-      pSession->setSessionId( ( uint8_t* ) sId );
+      pSession->setSessionId( sId );
       return pSession;
     }
     else
@@ -121,7 +120,7 @@ uint32_t Lobby::RestConnector::getNextCharId()
 {
   std::string json_string = "{\"secret\": \"" + serverSecret + "\"}";
 
-  HttpResponse r = requestApi( "getNextCharId", json_string );
+  HttpResponse r = requestApi( "getNextEntityId", json_string );
 
   if( r == nullptr )
     return -1;
@@ -160,7 +159,7 @@ uint64_t Lobby::RestConnector::getNextContentId()
 {
   std::string json_string = "{\"secret\": \"" + serverSecret + "\"}";
 
-  HttpResponse r = requestApi( "getNextContentId", json_string );
+  HttpResponse r = requestApi( "getNextCharaId", json_string );
 
   if( r == nullptr )
     return -1;
@@ -197,7 +196,7 @@ uint64_t Lobby::RestConnector::getNextContentId()
 
 CharList Lobby::RestConnector::getCharList( char* sId )
 {
-  std::string json_string = "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\"}";
+  std::string json_string = "{\"sId\": \"" + std::string( sId ) + "\",\"secret\": \"" + serverSecret + "\"}";
 
   HttpResponse r = requestApi( "getCharacterList", json_string );
 
@@ -206,7 +205,7 @@ CharList Lobby::RestConnector::getCharList( char* sId )
     return list;
 
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
-  Logger::debug( content );
+  //Logger::debug( content );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
     auto json = nlohmann::json();
@@ -224,14 +223,14 @@ CharList Lobby::RestConnector::getCharList( char* sId )
     if( json["result"].get< std::string >().find( "invalid" ) == std::string::npos )
     {
 
-      Logger::debug( json["result"] );
+      //Logger::debug( json["result"] );
 
       for( auto& child : json["charArray"] )
       {
-        Logger::info( child["contentId"] );
+        //Logger::info( child["contentId"] );
         //std::string, uint32_t, uint64_t, std::string
         list.push_back( { child["name"],
-                          std::stoi( std::string( child["charId"] ) ),
+                          std::stoi( std::string( child["entityId"] ) ),
                           std::stoll( std::string( child["contentId"] ) ),
                           child["infoJson"] 
                         } );
@@ -254,7 +253,7 @@ CharList Lobby::RestConnector::getCharList( char* sId )
 bool Lobby::RestConnector::deleteCharacter( char* sId, std::string name )
 {
   std::string json_string =
-    "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name + "\"}";
+    "{\"sId\": \"" + std::string( sId ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name + "\"}";
 
   HttpResponse r = requestApi( "deleteCharacter", json_string );
 
@@ -288,7 +287,7 @@ bool Lobby::RestConnector::deleteCharacter( char* sId, std::string name )
 int Lobby::RestConnector::createCharacter( char* sId, std::string name, std::string infoJson )
 {
   std::string json_string =
-    "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name +
+    "{\"sId\": \"" + std::string( sId ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name +
     "\",\"infoJson\": \"" + Common::Util::base64Encode( ( uint8_t* ) infoJson.c_str(), infoJson.length() ) + "\"}";
 
   HttpResponse r = requestApi( "createCharacter", json_string );
@@ -297,7 +296,7 @@ int Lobby::RestConnector::createCharacter( char* sId, std::string name, std::str
     return -1;
 
   std::string content = std::string( std::istreambuf_iterator< char >( r->content ), {} );
-  Logger::debug( content );
+  //Logger::debug( content );
   if( r->status_code.find( "200" ) != std::string::npos )
   {
     auto json = nlohmann::json();

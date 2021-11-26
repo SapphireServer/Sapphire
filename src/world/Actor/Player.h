@@ -1,14 +1,16 @@
-#ifndef _PLAYER_H
-#define _PLAYER_H
+#pragma once
 
 #include "ForwardsZone.h"
 
 #include <Common.h>
 #include <Util/SpawnIndexAllocator.h>
 #include <spdlog/fmt/fmt.h>
+#include <optional>
 
 #include "Chara.h"
+#include "Quest/Quest.h"
 #include "Event/EventHandler.h"
+
 #include <map>
 #include <queue>
 #include <array>
@@ -33,13 +35,6 @@ namespace Sapphire::Entity
     }
   };
 
-  struct ShopBuyBackEntry
-  {
-    ItemPtr item;
-    uint32_t amount;
-    uint32_t pricePerItem;
-  };
-
   /** Class representing the Player
   *  Inheriting from Actor
   *
@@ -47,6 +42,20 @@ namespace Sapphire::Entity
   class Player : public Chara
   {
   public:
+    using TitleList = std::array< uint8_t, 48 >;
+    using HowToList = std::array< uint8_t, 34 >;
+    using MinionList = std::array< uint8_t, 40 >;
+    using MountList = std::array< uint8_t, 22 >;
+    using QuestComplete = std::array< uint8_t, 476 >;
+    using Discovery = std::array< uint8_t, 400 >;
+    using AetheryteList = std::array< uint8_t, 21 >;
+    using UnlockList = std::array< uint8_t, 64 >;
+    using OrchestrionList = std::array< uint8_t, 40 >;
+    using StateFlags = std::array< uint8_t, 12 >;
+
+    using ClassList = std::array< uint16_t, 28 >;
+    using ExpList = std::array< uint32_t, 28 >;
+
     /*! Contructor */
     Player();
 
@@ -55,75 +64,14 @@ namespace Sapphire::Entity
 
     void autoAttack( CharaPtr pTarget ) override;
 
-    void injectPacket( const std::string& path );
-
     // EventHandlers
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    /*! start an event action */
-    void eventActionStart( uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
-                           World::Action::ActionCallback interruptCallback, uint64_t additional );
-
-    /*! start an event item action */
-    void eventItemActionStart( uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
-                               World::Action::ActionCallback interruptCallback, uint64_t additional );
-
-    /*! start/register a normal event */
-    void eventStart( uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventParam, uint8_t eventParam1,
-                     uint32_t eventParam2, Event::EventHandler::EventFinishCallback callback = nullptr );
-
-    /*! play a subevent */
-    void playScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam2, uint32_t eventParam3 );
-
-    void playGilShop( uint32_t eventId, uint32_t flags, uint32_t param1,
-                      Event::EventHandler::SceneReturnCallback eventCallback );
-
-    void directorPlayScene( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t eventParam3,
-                            uint32_t eventParam4, uint32_t eventParam5 = 0 );
-
-    /*! play a subevent */
-    void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
-                    uint32_t eventParam2, uint32_t eventParam3,
-                    Event::EventHandler::SceneReturnCallback eventReturnCallback );
-
-    /*! play a subevent */
-    void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
-                    uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
-                    Event::EventHandler::SceneReturnCallback eventReturnCallback );
-
-    /*! play a subevent */
-    void playScene( uint32_t eventId, uint32_t scene, uint32_t flags,
-                    Event::EventHandler::SceneReturnCallback eventReturnCallback );
-
-    /*! play a subevent */
-    void playScene( uint32_t eventId, uint32_t scene, uint32_t flags );
-
-    /*! play a subevent */
-    void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                         uint32_t eventParam2, uint32_t eventParam3, uint32_t eventParam4,
-                         Event::EventHandler::SceneChainCallback sceneChainCallback );
-
-    /*! play a subevent */
-    void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                         uint32_t eventParam2, uint32_t eventParam3,
-                         Event::EventHandler::SceneChainCallback sceneChainCallback );
-
-    /*! play a subevent */
-    void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
-                         Event::EventHandler::SceneChainCallback sceneChainCallback );
-
-    void playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback );
-
-    /*! setup the event and return a ptr to it */
-    Event::EventHandlerPtr bootstrapSceneEvent( uint32_t eventId, uint32_t flags );
-
-    /*! finish / unregister an event */
-    void eventFinish( uint32_t eventId, uint32_t freePlayer );
 
     /*! add an event to the event array */
     void addEvent( Event::EventHandlerPtr pEvent );
 
     /*! retrieve an event from the event array */
-    Event::EventHandlerPtr getEvent( uint32_t eventId );
+    Event::EventHandlerPtr getEvent( uint32_t eventId ) const;
 
     /*! get number of active events */
     size_t getEventCount();
@@ -132,22 +80,10 @@ namespace Sapphire::Entity
     void removeEvent( uint32_t eventId );
 
     /*! return the eventlist */
-    std::map< uint32_t, Event::EventHandlerPtr >& eventList();
-
-    void checkEvent( uint32_t eventId );
-
-
+    std::map< uint32_t, Event::EventHandlerPtr >& getEventListRef();
 
     // Events
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    /*! Event to be called when zoning process gets triggered */
-    void onZoneStart();
-
-    /*! Event to be called when zoning process is finished */
-    void onZoneDone();
-
-    /*! Event to be called on login */
-    void onLogin();
 
     /*! Event to be called on update tick */
     void onTick() override;
@@ -158,32 +94,24 @@ namespace Sapphire::Entity
     /*! Event called on every session iteration */
     void update( uint64_t tickCount ) override;
 
-    /*! Event to be called upon Bnpc kill */
-    void onMobKill( uint16_t nameId );
-
-
     // Quest
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! load data for currently active quests */
     bool loadActiveQuests();
 
     /*! update quest ( register it as active quest if new ) */
-    void updateQuest( uint16_t questId, uint8_t sequence );
+    void updateQuest( const World::Quest& quest );
 
     /*! return true if quest is currently active */
     bool hasQuest( uint32_t questId );
 
-    /*! return the current quest sequence */
-    uint8_t getQuestSeq( uint16_t questId );
-
-    /*! send the quest tracker packet */
-    void sendQuestTracker();
-
-    /*! set quest tracker flag for a specified slot */
-    void setQuestTracker( uint16_t index, int16_t flag );
+    std::optional< World::Quest > getQuest( uint32_t questId );
 
     /*! return the index of a given quest in the players quest list */
     int8_t getQuestIndex( uint16_t questId );
+    World::Quest& getQuestByIndex( uint16_t questId );
+
+    int16_t getQuestTracking( uint8_t index ) const;
 
     /*! finish a given quest */
     void finishQuest( uint16_t questId );
@@ -193,8 +121,6 @@ namespace Sapphire::Entity
 
     /*! remove a given quest */
     void removeQuest( uint16_t questId );
-
-    bool isQuestCompleted( uint16_t questId );
 
     /*! add a quest to the completed quests mask */
     void updateQuestsCompleted( uint32_t questId );
@@ -210,137 +136,26 @@ namespace Sapphire::Entity
 
     bool giveQuestRewards( uint32_t questId, uint32_t optionalChoice );
 
-    std::shared_ptr< Common::QuestActive > getQuestActive( uint16_t index );
+    std::array< World::Quest, 30 >& getQuestArrayRef();
 
-    uint8_t getQuestUI8A( uint16_t questId );
+    QuestComplete& getQuestCompleteFlags();
 
-    uint8_t getQuestUI8B( uint16_t questId );
-
-    uint8_t getQuestUI8C( uint16_t questId );
-
-    uint8_t getQuestUI8D( uint16_t questId );
-
-    uint8_t getQuestUI8E( uint16_t questId );
-
-    uint8_t getQuestUI8F( uint16_t questId );
-
-    uint8_t getQuestUI8AH( uint16_t questId );
-
-    uint8_t getQuestUI8BH( uint16_t questId );
-
-    uint8_t getQuestUI8CH( uint16_t questId );
-
-    uint8_t getQuestUI8DH( uint16_t questId );
-
-    uint8_t getQuestUI8EH( uint16_t questId );
-
-    uint8_t getQuestUI8FH( uint16_t questId );
-
-    uint8_t getQuestUI8AL( uint16_t questId );
-
-    uint8_t getQuestUI8BL( uint16_t questId );
-
-    uint8_t getQuestUI8CL( uint16_t questId );
-
-    uint8_t getQuestUI8DL( uint16_t questId );
-
-    uint8_t getQuestUI8EL( uint16_t questId );
-
-    uint8_t getQuestUI8FL( uint16_t questId );
-
-    uint16_t getQuestUI16A( uint16_t questId );
-
-    uint16_t getQuestUI16B( uint16_t questId );
-
-    uint16_t getQuestUI16C( uint16_t questId );
-
-    uint32_t getQuestUI32A( uint16_t questId );
-
-    bool getQuestBitFlag8( uint16_t questId, uint8_t index );
-
-    bool getQuestBitFlag16( uint16_t questId, uint8_t index );
-
-    bool getQuestBitFlag24( uint16_t questId, uint8_t index );
-
-    bool getQuestBitFlag32( uint16_t questId, uint8_t index );
-
-    bool getQuestBitFlag40( uint16_t questId, uint8_t index );
-
-    bool getQuestBitFlag48( uint16_t questId, uint8_t index );
-
-
-    void setQuestUI8A( uint16_t questId, uint8_t val );
-
-    void setQuestUI8B( uint16_t questId, uint8_t val );
-
-    void setQuestUI8C( uint16_t questId, uint8_t val );
-
-    void setQuestUI8D( uint16_t questId, uint8_t val );
-
-    void setQuestUI8E( uint16_t questId, uint8_t val );
-
-    void setQuestUI8F( uint16_t questId, uint8_t val );
-
-    void setQuestUI8AH( uint16_t questId, uint8_t val );
-
-    void setQuestUI8BH( uint16_t questId, uint8_t val );
-
-    void setQuestUI8CH( uint16_t questId, uint8_t val );
-
-    void setQuestUI8DH( uint16_t questId, uint8_t val );
-
-    void setQuestUI8EH( uint16_t questId, uint8_t val );
-
-    void setQuestUI8FH( uint16_t questId, uint8_t val );
-
-    void setQuestUI8AL( uint16_t questId, uint8_t val );
-
-    void setQuestUI8BL( uint16_t questId, uint8_t val );
-
-    void setQuestUI8CL( uint16_t questId, uint8_t val );
-
-    void setQuestUI8DL( uint16_t questId, uint8_t val );
-
-    void setQuestUI8EL( uint16_t questId, uint8_t val );
-
-    void setQuestUI8FL( uint16_t questId, uint8_t val );
-
-    void setQuestUI16A( uint16_t questId, uint16_t val );
-
-    void setQuestUI16B( uint16_t questId, uint16_t val );
-
-    void setQuestUI16C( uint16_t questId, uint16_t val );
-
-    void setQuestUI32A( uint16_t questId, uint32_t val );
-
-    void setQuestBitFlag8( uint16_t questId, uint8_t index, bool val );
-
-    void setQuestBitFlag16( uint16_t questId, uint8_t index, bool val );
-
-    void setQuestBitFlag24( uint16_t questId, uint8_t index, bool val );
-
-    void setQuestBitFlag32( uint16_t questId, uint8_t index, bool val );
-
-    void setQuestBitFlag40( uint16_t questId, uint8_t index, bool val );
-
-    void setQuestBitFlag48( uint16_t questId, uint8_t index, bool val );
-
-    // Inventory / Item / Currency
+    // Inventory / Item / Currency / Shop
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! equip an item to a specified slot */
-    void equipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
+    void equipItem( Common::GearSetSlot equipSlotId, Item& item, bool sendModel );
 
     /*! remove an item from an equipment slot */
-    void unequipItem( Common::GearSetSlot equipSlotId, ItemPtr pItem, bool sendModel );
+    void unequipItem( Common::GearSetSlot equipSlotId, Item& item, bool sendModel );
 
     /*! equip a weapon, possibly forcing a job change */
-    void equipWeapon( ItemPtr pItem, bool updateClass );
+    void equipWeapon( const Item& item );
 
     /*! equip a soul crystal, possibly forcing a job change*/
-    void equipSoulCrystal( ItemPtr pItem, bool updateClass );
+    void equipSoulCrystal( const Item& item );
 
     /*! unequip a soul crystal, returning to the base class*/
-    void unequipSoulCrystal( ItemPtr pItem );
+    void unequipSoulCrystal();
 
     /*! get player ilvl */
     uint16_t getItemLevel() const;
@@ -364,7 +179,7 @@ namespace Sapphire::Entity
     uint32_t getModelForSlot( Common::GearModelSlot slot );
 
     /*! add amount to the currency of type */
-    void addCurrency( Common::CurrencyType type, uint32_t amount, bool sendLootMessage = false );
+    void addCurrency( Common::CurrencyType type, uint32_t amount );
 
     /*! remove amount from the currency of type */
     void removeCurrency( Common::CurrencyType type, uint32_t amount );
@@ -372,7 +187,7 @@ namespace Sapphire::Entity
     /*! return the current amount of crystals of type */
     uint32_t getCrystal( uint8_t type ) const;
 
-    void updateModels( Common::GearSetSlot equipSlotId, const Sapphire::ItemPtr& pItem, bool updateClass );
+    void updateModels( Common::GearSetSlot equipSlotId, const Sapphire::Item& item );
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
@@ -387,10 +202,19 @@ namespace Sapphire::Entity
     */
     bool collectHandInItems( std::vector< uint32_t > itemIds );
 
+    void addSoldItem( uint32_t itemId, uint8_t stackSize );
+
+    std::deque< std::pair< uint32_t, uint8_t > > *getSoldItems();
+
+    void clearSoldItems();
+
     // Class / Job / Exp
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! returns the level of the currently active class / job */
     uint8_t getLevel() const override;
+
+    /*! returns the level sync of current active class / job */
+    uint8_t getLevelSync() const;
 
     /*! returns the level of the provided class / job */
     uint8_t getLevelForClass( Common::ClassJob pClass ) const;
@@ -408,7 +232,7 @@ namespace Sapphire::Entity
     void gainExp( uint32_t amount );
 
     /*! gain a level on the currently active class / job */
-    void gainLevel();
+    void levelUp();
 
     /*! set level on the currently active class / job to given level */
     void setLevel( uint8_t level );
@@ -420,16 +244,10 @@ namespace Sapphire::Entity
     void setClassJob( Common::ClassJob classJob );
 
     /*! returns a pointer to the class array */
-    uint16_t* getClassArray();
-
-    /*! returns a const pointer to the class array */
-    const uint16_t* getClassArray() const;
+    ClassList& getClassArray();
 
     /*! returns a pointer to the exp array */
-    uint32_t* getExpArray();
-
-    /*! returns a const pointer to the exp array */
-    const uint32_t* getExpArray() const;
+    ExpList& getExpArray();
 
     // Base Look / Stats / Params
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,7 +279,7 @@ namespace Sapphire::Entity
     uint8_t getGc() const;
 
     /*! return the grand company rank */
-    const uint8_t* getGcRankArray() const;
+    const std::array< uint8_t, 3 >& getGcRankArray() const;
 
     /*! set look at index */
     void setLookAt( uint8_t index, uint8_t value );
@@ -491,10 +309,10 @@ namespace Sapphire::Entity
     bool setInstance( uint32_t instanceContentId );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( TerritoryPtr instance );
+    bool setInstance( const TerritoryPtr& instance );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( Sapphire::TerritoryPtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos, float rot );
+    bool setInstance( const Sapphire::TerritoryPtr& instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
 
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
@@ -504,6 +322,7 @@ namespace Sapphire::Entity
 
     /*! gets the players territoryTypeId */
     uint32_t getTerritoryTypeId() const;
+    uint32_t getPrevTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
 
@@ -513,8 +332,8 @@ namespace Sapphire::Entity
     /*! change position, sends update too */
     void changePosition( float x, float y, float z, float o );
 
-    /*! return the contentId */
-    uint64_t getContentId() const;
+    /*! return the characterId */
+    uint64_t getCharacterId() const;
 
     /*! return max hp */
     uint32_t getMaxHp();
@@ -534,8 +353,21 @@ namespace Sapphire::Entity
     /*! sets the list of current online status */
     void setOnlineStatusMask( uint64_t status );
 
+    /*! sets the list of current online status */
+    void setOnlineStatusCustomMask( uint64_t status );
+
+    /*! returns the current online status */
+    uint64_t getOnlineStatusCustomMask() const;
+
+    void addOnlineStatus( Common::OnlineStatus status );
+    void addOnlineStatus( const std::vector< Common::OnlineStatus >& status );
+    void removeOnlineStatus( Common::OnlineStatus status );
+    void removeOnlineStatus( const std::vector< Common::OnlineStatus >& status );
+
     /*! returns the current online status */
     uint64_t getOnlineStatusMask() const;
+
+    uint64_t getFullOnlineStatusMask() const;
 
     /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
@@ -551,12 +383,10 @@ namespace Sapphire::Entity
     void dyeItemFromDyeingInfo();
 
     /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0, uint8_t param4 = 0, uint8_t param7 = 0, uint8_t unknown = 0 );
+    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
 
     /*! get player's title list (available titles) */
-    uint8_t* getTitleList();
-
-    const uint8_t* getTitleList() const;
+    TitleList& getTitleList();
 
     /*! get player's active title */
     uint16_t getTitle() const;
@@ -571,24 +401,20 @@ namespace Sapphire::Entity
     void sendTitleList();
 
     /*! change gear param state */
-    void setEquipDisplayFlags( uint8_t state );
+    void setEquipDisplayFlags( uint16_t state );
 
     /*! get gear param state */
     uint8_t getEquipDisplayFlags() const;
 
-    /*! mount the specified mount and send the packets */
-    void mount( uint32_t id );
+    /*! mount the specified setMount and send the packets */
+    void setMount( uint32_t mountId );
 
-    /*! dismount the current mount and send the packets */
-    void dismount();
-
-    void spawnCompanion( uint16_t id );
-    void despawnCompanion();
+    void setCompanion( uint16_t id );
 
     uint16_t getCurrentCompanion() const;
 
-    /*! get the current mount */
-    uint16_t getCurrentMount() const;
+    /*! get the current setMount */
+    uint8_t getCurrentMount() const;
 
     /*! set current persistent emote */
     void setPersistentEmote( uint32_t emoteId );
@@ -610,10 +436,10 @@ namespace Sapphire::Entity
     bool isAetheryteRegistered( uint8_t aetheryteId ) const;
 
     /*! return a const pointer to the aetheryte unlock bitmask array */
-    int8_t getAetheryteMaskAt( uint8_t index ) const;
+    uint8_t getAetheryteMaskAt( uint8_t index ) const;
 
     /*! return a pointer to the aetheryte unlock bitmask array */
-    uint8_t* getAetheryteArray();
+    AetheryteList& getAetheryteArray();
 
     /*! set homepoint */
     void setHomepoint( uint8_t aetheryteId );
@@ -625,45 +451,52 @@ namespace Sapphire::Entity
     void discover( int16_t map_id, int16_t sub_id );
 
     /*! return a pointer to the discovery bitmask array */
-    uint8_t* getDiscoveryBitmask();
+    Discovery& getDiscoveryBitmask();
 
     /*! helper/debug function to reset all discovered areas */
     void resetDiscovery();
 
     /*! get a pointer to the howto bitmask array */
-    uint8_t* getHowToArray();
-
-    /*! get a const pointer to the howto bitmask array */
-    const uint8_t* getHowToArray() const;
+    HowToList& getHowToArray();
 
     /*! update bitmask for how-to's seen */
     void updateHowtosSeen( uint32_t howToId );
 
     /*! learn an action / update the unlock bitmask. */
-    void learnAction( uint16_t actionId );
+    void learnAction( Common::UnlockEntry unlockId );
 
     /*! learn a song / update the unlock bitmask. */
     void learnSong( uint8_t songId, uint32_t itemId );
 
     /*! check if an action is already unlocked in the bitmask. */
-    bool isActionLearned( uint32_t actionId ) const;
+    bool isActionLearned( Common::UnlockEntry unlockId ) const;
 
     /*! return a const pointer to the unlock bitmask array */
-    const uint8_t* getUnlockBitmask() const;
+    const UnlockList& getUnlockBitmask() const;
 
     /*! return a const pointer to the orchestrion bitmask array */
-    const uint8_t* getOrchestrionBitmask() const;
+    const OrchestrionList& getOrchestrionBitmask() const;
 
-    /*! return a const pointer to the mount guide bitmask array */
-    const uint8_t* getMountGuideBitmask() const;
-
-    const bool hasMount( uint32_t mountId ) const;
+    /*! return a const pointer to the setMount guide bitmask array */
+    MountList& getMountGuideBitmask();
 
     bool checkAction() override;
 
     bool hasQueuedAction() const;
 
     void setQueuedAction( World::Action::ActionPtr pAction );
+
+    void setLastActionTick( uint64_t tick );
+
+    uint64_t getLastActionTick() const;
+
+    void setRecastGroup( uint8_t index, float time );
+
+    float getRecastGroup( uint8_t index ) const;
+
+    void sendRecastGroups();
+
+    void resetRecastGroups();
 
     // Spawn handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -688,7 +521,7 @@ namespace Sapphire::Entity
     // Player State Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /* return a const pointer to the state flag array */
-    const uint8_t* getStateFlags() const;
+    const StateFlags& getStateFlags() const;
 
     /* set a specified state flag */
     void setStateFlag( Common::PlayerStateFlag flag );
@@ -702,24 +535,19 @@ namespace Sapphire::Entity
     /* reset a specified flag */
     void unsetStateFlag( Common::PlayerStateFlag flag );
 
-    // Player Session Handling
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! return the userlevel */
     uint8_t getUserLevel() const;
-
-    /*! set timestamp for last received ping */
-    void setLastPing( uint32_t ping );
-
-    /*! get timestamp of last received ping */
-    uint32_t getLastPing() const;
 
     // Player Database Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! generate the update sql based on update flags */
     void updateSql();
 
-    /*! load player from db, by id */
-    bool load( uint32_t charId, World::SessionPtr pSession );
+    /*! initialize player data from db, by character id */
+    bool loadFromDb( uint64_t characterId );
+
+    /*! unload player from logout */
+    void unload();
 
     /*! load active class data */
     bool loadClassData();
@@ -730,13 +558,22 @@ namespace Sapphire::Entity
     /*! load hunting log entries */
     bool loadHuntingLog();
 
+    /*! load friendlist */
+    bool loadFriendlist();
+
+    /*! update latest sync with db */
+    bool syncLastDBWrite();
+
+    /*! get latest db write timestamp */
+    uint64_t getLastDBWrite() const;
+
     // Player Network Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! send current models ( equipment ) */
     void sendModel();
 
     /*! send active state flags */
-    void sendStateFlags();
+    void sendStateFlags( bool updateInRange = true );
 
     /*! send status update */
     void sendStatusUpdate() override;
@@ -744,17 +581,8 @@ namespace Sapphire::Entity
     /*! send the entire inventory sequence */
     void sendInventory();
 
-    /*! send active quest list */
-    void sendQuestInfo();
-
     /*! send a quest specific message */
-    void sendQuestMessage( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1, uint32_t var2 );
-
-    /*! queue a packet for the player */
-    void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
-
-    /*! queue a char connection packet for the player */
-    void queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket );
+    void sendEventNotice( uint32_t questId, int8_t noticeId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 );
 
     /*! returns true if loading is complete ( 0x69 has been received ) */
     bool isLoadingComplete() const;
@@ -767,11 +595,6 @@ namespace Sapphire::Entity
 
     /*! return true if the player is marked for zoning */
     bool isMarkedForZoning() const;
-
-    void emote( uint32_t emoteId, uint64_t targetId, bool isSilent );
-
-    void emoteInterrupt();
-
 
     void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
 
@@ -791,30 +614,6 @@ namespace Sapphire::Entity
 
     uint8_t getSearchSelectClass() const;
 
-    void sendNotice( const std::string& message );
-    template< typename... Args >
-    void sendNotice( const std::string& message, const Args&... args )
-    {
-      sendNotice( fmt::format( message, args... ) );
-    }
-
-    void sendUrgent( const std::string& message );
-    template< typename... Args >
-    void sendUrgent( const std::string& message, const Args&... args )
-    {
-      sendUrgent( fmt::format( message, args... ) );
-    }
-
-    void sendDebug( const std::string& message );
-
-    template< typename... Args >
-    void sendDebug( const std::string& message, const Args&... args )
-    {
-      sendDebug( fmt::format( message, args... ) );
-    }
-
-    void sendLogMessage( uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
-
     bool isDirectorInitialized() const;
 
     void setDirectorInitialized( bool isInitialized );
@@ -830,16 +629,14 @@ namespace Sapphire::Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void initHateSlotQueue();
 
-    void hateListAdd( BNpcPtr pBNpc );
-    void hateListRemove( BNpcPtr pBNpc );
+    void hateListAdd( const BNpc &bnpc );
+    void hateListRemove( const BNpc &bnpc );
 
-    bool hateListHasEntry( BNpcPtr pBNpc );
+    bool hateListHasEntry( const BNpc &bnpc );
 
-    void sendHateList();
+    const std::map< uint32_t, uint8_t >& getActorIdToHateSlotMap();
 
-    bool actionHasCastTime( uint32_t actionId );
-
-    Sapphire::Entity::ActorPtr lookupTargetById( uint64_t targetId );
+    Sapphire::Entity::GameObjectPtr lookupTargetById( uint64_t targetId );
 
     bool isLogin() const;
 
@@ -849,6 +646,8 @@ namespace Sapphire::Entity
 
     uint32_t getTerritoryId() const;
     void setTerritoryId( uint32_t territoryId );
+
+    uint32_t getPrevTerritoryId() const;
 
     uint8_t getGmRank() const;
 
@@ -868,8 +667,8 @@ namespace Sapphire::Entity
 
     bool isAutoattackOn() const;
 
-    void onMobAggro( BNpcPtr pBNpc );
-    void onMobDeaggro( BNpcPtr pBNpc );
+    void onMobAggro( const BNpc& bnpc );
+    void onMobDeaggro( const BNpc& bnpc );
 
     // Content Finder handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -885,20 +684,31 @@ namespace Sapphire::Entity
 
     void setEorzeaTimeOffset( uint64_t timestamp );
 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
     // Database
     void updateDbAllQuests() const;
 
-    void deleteQuest( uint16_t questId ) const;
+    void deleteDbQuest( uint16_t questId ) const;
 
-    void insertQuest( uint16_t questId, uint8_t index, uint8_t seq ) const;
+    void insertDbQuest( uint16_t questId, uint8_t index, uint8_t seq ) const;
+
+    void insertDbQuest( const World::Quest& quest, uint8_t index ) const;
 
     void updateDbSearchInfo() const;
 
     void updateDbClass() const;
 
-    void insertDbClass( const uint8_t classJobIndex ) const;
+    void insertDbClass( const uint8_t classJobIndex, uint8_t level = 1 ) const;
 
-    void setMarkedForRemoval();
+    void updateDbMonsterNote();
+
+    void updateDbFriendList();
+
+    void updateDbChara() const;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void setMarkedForRemoval( bool removal = true );
 
     bool isMarkedForRemoval() const;
 
@@ -926,46 +736,42 @@ namespace Sapphire::Entity
     using InvSlotPair = std::pair< uint16_t, int8_t >;
     using InvSlotPairVec = std::vector< InvSlotPair >;
 
+    ItemPtr createItem( uint32_t catalogId, uint32_t quantity = 1 );
+
     bool loadInventory();
 
     InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
 
     InvSlotPair getFreeBagSlot();
 
-    ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
-    ItemPtr addItem( ItemPtr itemToAdd, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
+    Sapphire::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
 
-    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+    void moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
 
-    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+    void swapItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
 
-    void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
+    void discardItem( uint16_t fromInventoryId, uint16_t fromSlotId );
 
-    void splitItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot,
+    void splitItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot,
                     uint16_t splitCount );
 
-    void mergeItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+    void mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
 
-    ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
+    ItemPtr getItemAt( uint16_t containerId, uint16_t slotId );
 
-    bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem, bool writeToDb = true );
+    bool updateContainer( uint16_t storageId, uint16_t slotId, ItemPtr pItem );
 
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();
 
     ItemPtr getEquippedWeapon();
-    ItemPtr getEquippedSecondaryWeapon();
 
     /*! return the current amount of currency of type */
     uint32_t getCurrency( Common::CurrencyType type );
 
     void writeInventory( Common::InventoryType type );
 
-    ItemPtr createTempItem( uint32_t catalogId, uint32_t quantity = 1 );
-
-    void updateItemDb( ItemPtr pItem ) const;
-
-    void writeItemDb( ItemPtr pItem ) const;
+    void writeItem( ItemPtr pItem ) const;
 
     void deleteItemDb( ItemPtr pItem ) const;
 
@@ -973,7 +779,7 @@ namespace Sapphire::Entity
     uint32_t getCrystal( Common::CrystalType type );
 
     /*! add amount to the crystal of type */
-    void addCrystal( Common::CrystalType type, uint32_t amount, bool sendLootMessage = false );
+    void addCrystal( Common::CrystalType type, uint32_t amount );
 
     /*! remove amount from the crystals of type */
     void removeCrystal( Common::CrystalType type, uint32_t amount );
@@ -984,53 +790,48 @@ namespace Sapphire::Entity
 
     bool findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location );
 
-    uint8_t getFreeSlotsInBags();
+    uint16_t getFreeSlotsInBags();
 
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
 
-    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType type, uint16_t slotId, bool silent = false );
-
-    // Job UI
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    void gaugeClear();
-    void sendActorGauge();
-    void gaugeSetRaw( uint8_t* pData );
+    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType storageId, uint8_t slotId );
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    void setPosAndNotifyClient( float x, float y, float z, float rot );
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     void sendHuntingLog();
 
-    void updateDbMonsterNote();
-
     void updateHuntingLog( uint16_t id );
 
-    World::SessionPtr getSession();
+    uint64_t getPartyId() const;
+    void setPartyId( uint64_t partyId );
 
-    uint64_t m_lastMoveTime;
-    uint8_t m_lastMoveflag;
+    uint64_t m_lastMoveTime{};
+    uint8_t m_lastMoveflag{};
     bool m_falling;
-    uint16_t m_cfNotifiedContent;
 
-    std::vector< ShopBuyBackEntry >& getBuyBackListForShop( uint32_t shopId );
-    void addBuyBackItemForShop( uint32_t shopId, const ShopBuyBackEntry& entry );
-    void clearBuyBackMap();
+    // todo: sort this requestkey pcsearch mess
+    void setLastPcSearchResult( std::vector< uint32_t > result );
+    std::vector< uint32_t >& getLastPcSearchResult();
+
+    const Common::FFXIVARR_POSITION3& getPrevPos() const;
+    float getPrevRot() const;
 
   private:
-    uint32_t m_lastWrite;
-    uint32_t m_lastPing;
+    /*! queue a packet for the player */
+    void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
 
-    World::SessionPtr m_pSession;
+    using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
+
+    uint64_t m_lastDBWrite;
 
     bool m_bIsLogin;
 
-    uint64_t m_contentId; // This id will be the name of the folder for character settings in "My Games"
+    uint64_t m_characterId; // This id will be the name of the folder for character settings in "My Games"
 
-    uint8_t m_mode;
+    uint8_t m_mode{};
 
     bool m_markedForRemoval;
 
@@ -1038,31 +839,31 @@ namespace Sapphire::Entity
 
     bool m_onEnterEventDone;
 
-    uint32_t m_inventorySequence;
+    uint32_t m_inventorySequence{};
 
     World::Action::ActionPtr m_pQueuedAction;
-
-  private:
-    using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
+    uint64_t m_lastActionTick;
+    float m_recast[80]{};
+    float m_recastMax[80]{};
 
     InventoryMap m_storageMap;
 
-    Common::FFXIVARR_POSITION3 m_prevPos;
-    uint32_t m_prevTerritoryTypeId;
-    uint32_t m_prevTerritoryId;
-    float m_prevRot;
+    Common::FFXIVARR_POSITION3 m_prevPos{};
+    uint32_t m_prevTerritoryTypeId{};
+    uint32_t m_prevTerritoryId{};
+    float m_prevRot{};
 
-    uint8_t m_voice;
+    uint8_t m_voice{};
 
     uint64_t m_modelMainWeapon;
     uint64_t m_modelSubWeapon;
-    uint64_t m_modelSystemWeapon;
+    uint64_t m_modelSystemWeapon{};
 
-    bool m_bNewGame;
+    bool m_bNewGame{};
 
-    uint8_t m_guardianDeity;
-    uint8_t m_birthDay;
-    uint8_t m_birthMonth;
+    uint8_t m_guardianDeity{};
+    uint8_t m_birthDay{};
+    uint8_t m_birthMonth{};
 
     struct RetainerInfo
     {
@@ -1072,82 +873,82 @@ namespace Sapphire::Entity
       bool isActive;
       bool isRename;
       uint8_t status;
-    } m_retainerInfo[8];
+    } m_retainerInfo[8]{};
 
-    uint16_t m_activeTitle;
-    uint8_t m_titleList[48];
-    uint8_t m_howTo[34];
-    uint8_t m_minions[55];
-    uint8_t m_mountGuide[29];
+    uint16_t m_activeTitle{};
+    TitleList m_titleList{};
+    HowToList m_howTo{};
+    MinionList m_minions{};
+    MountList m_mountGuide{};
+    QuestComplete m_questCompleteFlags{};
+    Discovery m_discovery{};
+    AetheryteList m_aetheryte{};
+    UnlockList m_unlocks{};
+    OrchestrionList m_orchestrion{};
+    ClassList m_classArray{};
+    ExpList m_expArray{};
+    StateFlags m_stateFlags{};
+
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
-    uint8_t m_questCompleteFlags[487];
-    uint8_t m_discovery[445];
+
     uint32_t m_playTime;
+    uint8_t m_openingSequence{0};
 
-    uint16_t m_classArray[ Common::CLASSJOB_SLOTS ];
-    uint32_t m_expArray[ Common::CLASSJOB_SLOTS ];
-    uint8_t m_aetheryte[21];
-    uint8_t m_unlocks[64];
-    uint8_t m_orchestrion[40];
-
-    uint8_t m_openingSequence;
-
-    uint16_t m_itemLevel;
+    uint16_t m_itemLevel{0};
     std::map< uint32_t, Event::EventHandlerPtr > m_eventHandlerMap;
 
     std::queue< uint8_t > m_freeHateSlotQueue; // queue with "hate slots" free to be assigned
     std::map< uint32_t, uint8_t > m_actorIdTohateSlotMap;
 
-    std::map< uint32_t, uint8_t > m_questIdToQuestIdx; // quest mapping, quest id to quest container index
-    std::map< uint8_t, uint32_t > m_questIdxToQuestId; // quest mapping, quest container index to questId
-    std::shared_ptr< Common::QuestActive > m_activeQuests[30];
-    int16_t m_questTracking[5];
+    std::array< World::Quest, 30 > m_quests;
+    std::array< int16_t, 5 > m_questTracking{};
 
-    uint8_t m_stateFlags[12];
-    uint8_t m_gmRank;
-    uint16_t zoneId;
-    bool m_gmInvis = false;
 
-    uint8_t m_equipDisplayFlags;
+    uint8_t m_gmRank{};
+    bool m_gmInvis{false};
+
+    uint8_t m_equipDisplayFlags{};
 
     bool m_bInCombat;
     bool m_bLoadingComplete;
     bool m_bAutoattack;
 
-    Common::JobGauge m_gauge;
-
     Common::ZoneingType m_zoningType;
-    uint32_t m_territoryId;
+    uint32_t m_territoryId{};
 
     bool m_bMarkedForZoning;
-    bool m_bNewAdventurer;
+    bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;
+    uint64_t m_onlineStatusCustom;
     std::shared_ptr< QueuedZoning > m_queuedZoneing;
 
     // search info
-    char m_searchMessage[193]; // searchmessage to show in profile
-    uint8_t m_searchSelectRegion; // regions selected to show up in profile
-    uint8_t m_searchSelectClass; // class selected to show up in profile
+    char m_searchMessage[193]{}; // searchmessage to show in profile
+    uint8_t m_searchSelectRegion{}; // regions selected to show up in profile
+    uint8_t m_searchSelectClass{}; // class selected to show up in profile
+
+    // shop info
+    std::deque< std::pair< uint32_t, uint8_t > > m_soldItems;
 
     // housing info
-    Common::LandFlagSet m_landFlags[5];
+    Common::CharaLandData m_charaLandData[2]{};
 
-    Common::ActiveLand m_activeLand;
+    Common::ActiveLand m_activeLand{};
 
     // gc info
-    uint8_t m_gc;
-    uint8_t m_gcRank[3];
+    uint8_t m_gc{};
+    std::array< uint8_t, 3 > m_gcRank{};
 
     // content finder info
-    uint32_t m_cfPenaltyUntil; // unix time
+    uint32_t m_cfPenaltyUntil{}; // unix time
 
-    uint16_t m_companionId;
+    uint16_t m_companionId{};
     uint32_t m_mount;
     uint32_t m_emoteMode;
 
-    Common::PlayerTeleportQuery m_teleportQuery;
+    Common::PlayerTeleportQuery m_teleportQuery{};
 
     struct PlayerDyeingInfo
     {
@@ -1155,15 +956,27 @@ namespace Sapphire::Entity
       uint32_t itemToDyeSlot;
       uint32_t dyeBagContainer;
       uint32_t dyeBagSlot;
-    } m_dyeingInfo;
+    } m_dyeingInfo{};
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
-    std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
-    std::unordered_map< uint32_t, std::vector< ShopBuyBackEntry > > m_shopBuyBackMap;
+    std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries{};
+
+    std::array< uint64_t, 200 > m_friendList{};
+    std::array< uint64_t, 200 > m_friendInviteList{};
+
+    uint64_t m_partyId;
+    std::vector< uint32_t > m_lastPcSearch;
+
+    bool addQuest( const World::Quest& quest );
+
+    void addQuestTracking( uint8_t idx );
+
+    void removeQuestTracking( int8_t idx );
+
+    int8_t getFreeQuestSlot();
+
   };
 
 }
-
-#endif

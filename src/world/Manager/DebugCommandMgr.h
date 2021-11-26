@@ -1,5 +1,4 @@
-#ifndef _GAMECOMMANDHANDLER_H_
-#define _GAMECOMMANDHANDLER_H_
+#pragma once
 
 #include <map>
 #include <Common.h>
@@ -53,13 +52,15 @@ namespace Sapphire::World::Manager
 
     void instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
     void questBattle( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
-    void pc( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
-    void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command) ;
+    void housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void linkshell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
     void script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
+    void contentFinder( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
   };
 
 }
-#endif

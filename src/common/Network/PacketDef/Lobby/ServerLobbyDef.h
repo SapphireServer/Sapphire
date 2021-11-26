@@ -1,72 +1,67 @@
-#ifndef _CORE_NETWORK_PACKETS_LOBBY_SERVER_IPC_H
-#define _CORE_NETWORK_PACKETS_LOBBY_SERVER_IPC_H
+#pragma once
 
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire::Network::Packets::Server {
-
-struct FFXIVIpcRetainerList :
-  FFXIVIpcBasePacket< LobbyRetainerList >
+namespace Sapphire::Network::Packets::LobbyPackets::Server
 {
-  uint8_t padding[0x210];
+
+struct FFXIVIpcSyncReply : FFXIVIpcBasePacket< SyncReply >
+{
+  uint32_t clientTimeValue;
 };
 
-/**
-*/
-struct FFXIVIpcServiceIdInfo :
-  FFXIVIpcBasePacket< LobbyServiceAccountList >
+struct AccountInfo
 {
-  uint64_t seq;
-  uint8_t padding;
-  uint8_t numServiceAccounts;
-  uint8_t u1;
-  uint8_t u2;
-  uint32_t padding1;
-
-  struct
-  {
-    uint32_t id;
-    uint32_t unknown;
-    uint32_t index;
-    char name[0x44];
-  } serviceAccount[8];
+  uint64_t accountId;
+  uint8_t accountIndex;
+  uint8_t accParam1;
+  uint16_t accStauts;
+  char accountName[64];
 };
 
-
-struct FFXIVIpcServerList :
-  FFXIVIpcBasePacket< LobbyServerList >
+struct FFXIVIpcLoginReply : FFXIVIpcBasePacket< LoginReply >
 {
-  uint64_t seq;
-  uint16_t final;
-  uint16_t offset;
-  uint32_t numServers;
-  uint32_t padding;
-  uint32_t padding1;
-
-  struct
-  {
-    uint16_t id;
-    uint16_t index;
-    uint32_t flags;      // 0x02 = World not accepting new characters
-    uint32_t padding1;
-    uint32_t icon;       // 2 = bonus XP star
-    uint32_t padding2;
-    char name[0x40];
-  } server[6];
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint8_t endOfList : 1;
+  uint8_t accountListIndex : 7;
+  uint8_t activeAccountCount;
+  uint8_t regionCode;
+  uint8_t optionParam;
+  uint32_t optionArg;
+  AccountInfo accountArray[8];
 };
 
-struct FFXIVIpcCharList : FFXIVIpcBasePacket< LobbyCharList >
+struct CharacterInfo
 {
-  uint64_t seq;
-  uint8_t counter; // current packet count * 4, count * 4 +1 on last packet.
-  uint8_t numInPacket; // always 2??
-  uint16_t padding;
-  uint8_t unknown1;
-  uint8_t unknown2;
-  uint8_t unknown3;
-  uint8_t unknown4; // 0x80 in case of last packet
-  uint32_t unknown5[7];
+  uint64_t playerId;
+  uint64_t characterId;
+  uint8_t chrIndex;
+  uint8_t chrParam1;
+  uint16_t chrStatus;
+  uint32_t chrParam2;
+  uint16_t worldId;
+  char chrName[32];
+  char worldSetName[32];
+  char graphicData[1030];
+};
+
+struct FFXIVIpcServiceLoginReply : FFXIVIpcBasePacket< ServiceLoginReply >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint8_t endOfList : 1;
+  uint8_t listIndex : 7;
+  uint8_t count;
+  uint16_t optionParam;
+  uint32_t optionArg;
+  uint64_t billParam1;
+  uint64_t billParam2;
+  ///
+  uint64_t billParam1_;
+  uint32_t billParam1__;
+/// ADDED FOR 2.3 ----------
   uint8_t unknown6; // 0x80 in case of last packet
   uint8_t veteranRank;
   uint8_t unknown7;
@@ -74,80 +69,159 @@ struct FFXIVIpcCharList : FFXIVIpcBasePacket< LobbyCharList >
   uint32_t daysSubscribed;
   uint32_t remainingDays;
   uint32_t daysToNextRank;
-  uint16_t maxCharOnWorld;
-  uint16_t unknown8;
-  uint32_t entitledExpansion;
-  uint32_t padding2;
-  uint32_t padding3;
-  uint32_t padding4;
+/// ------------------------
+  uint16_t maxCreateCharacter;
+  uint16_t maxCharacterList;
+  uint64_t unknown8;
+  CharacterInfo chrArray[2];
+};
 
-  struct CharaDetails
+struct FFXIVIpcCharaMakeReply : FFXIVIpcBasePacket< CharaMakeReply >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint8_t endOfList : 1;
+  uint8_t listIndex : 7;
+  uint8_t count;
+  uint16_t optionParam;
+  uint32_t optionArg;
+  CharacterInfo chrArray[2];
+};
+
+struct FFXIVIpcGameLoginReply : FFXIVIpcBasePacket< GameLoginReply >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint32_t ticketId;
+  uint64_t characterId;
+  uint8_t characterIndex;
+  uint8_t operation;
+  uint16_t worldId;
+  char ticketData[64];
+  uint16_t flag;
+  uint16_t frontendPort;
+  char frontendHost[32];
+  char worldSetName[32];
+};
+
+struct FFXIVIpcUpdateRetainerSlotsReply : FFXIVIpcBasePacket< UpdateRetainerSlotsReply >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint16_t optionParam;
+  uint16_t padding;
+  uint32_t optionArg;
+  uint16_t contractedNum;
+  uint16_t activeCharacterNum;
+  uint16_t totalSlotNum;
+  uint16_t freeSlotNum;
+  uint16_t totalRetainerNum;
+  uint16_t activeRetainerNum;
+};
+
+struct worldInfo
+{
+  uint16_t worldId;
+  uint16_t worldIndex;
+  uint8_t worldParam1;
+  uint8_t __padding1;
+  uint8_t __padding2;
+  uint8_t __padding3;
+  uint32_t stat1;
+  uint32_t stat2;
+  uint32_t mode;
+  char worldSetName[32];
+  char displayName[32];
+};
+
+struct FFXIVIpcDistWorldInfo : FFXIVIpcBasePacket< DistWorldInfo >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint8_t endOfList : 1;
+  uint16_t listIndex;
+  uint16_t count;
+  uint16_t optionParam;
+  uint8_t __padding2;
+  uint8_t __padding3;
+  uint32_t optionArg;
+  worldInfo worldArray[6];
+};
+
+struct FFXIVIpcXiCharacterInfo : FFXIVIpcBasePacket< XiCharacterInfo >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint8_t endOfList : 1;
+  uint8_t listIndex : 7;
+  uint8_t count;
+  uint16_t optionParam;
+  uint32_t optionArg;
+
+  struct XiCharacterInfo
   {
-    uint32_t uniqueId;
-    uint32_t padding;
-    uint64_t contentId;
-    uint32_t index;
-    uint32_t padding2;
-    uint16_t serverId;
-    uint16_t serverId1;
-    uint8_t unknown[9];
-    char nameChara[32];
-    char nameServer[32];
-    char nameServer1[32];
-    char charDetailJson[1051];
-  } charaDetails[2];
-
+    uint32_t ffxiId;
+    uint8_t chrIndex;
+    uint8_t worldParam1;
+    uint16_t status;
+    char charactername[32];
+  } characterArray[12];
 };
 
-struct FFXIVIpcEnterWorld : FFXIVIpcBasePacket< LobbyEnterWorld >
+struct RetainerInfo
 {
-  uint64_t seq;
-  uint32_t charId;
-  uint32_t padding;
-  uint64_t contentId;
-  uint32_t padding2;
-  char sid[66];
-  uint16_t port;
-  char host[48];
-  uint64_t padding3;
-  uint64_t padding4;
-};
-
-struct FFXIVIpcCharCreate : FFXIVIpcBasePacket< LobbyCharCreate >
-{
-  uint64_t seq;
-  uint8_t unknown;
-  uint8_t unknown_2;
-  uint8_t type;
-  uint8_t padding;
-  uint32_t unknown_3;
-  uint32_t unknown_4;
-  uint32_t unknown_5;
-  uint64_t unknown_6;
-  uint64_t unknown_61;
-  uint64_t unknown_62;
-  uint64_t unknown_63;
-  uint64_t content_id;
-  uint16_t unknown_7;
-  uint16_t unknown_8;
-  uint32_t unknown_9;
-  uint16_t unknown_10;
-  uint8_t unknown_11[11];
+  uint64_t retainerId;
+  uint64_t ownerId;
+  uint8_t slotID;
+  uint8_t param1;
+  uint16_t retainerStatus;
+  uint32_t param2;
   char name[32];
-  char world[32];
-  char world2[32];
-  uint8_t unknown_12[0x953];
 };
 
-struct FFXIVIpcLobbyError : FFXIVIpcBasePacket< LobbyError >
+struct FFXIVIpcDistRetainerInfo : FFXIVIpcBasePacket< DistRetainerInfo >
 {
-  uint64_t seq;
-  uint32_t error_id;
-  uint32_t param;
-  uint16_t message_id;
-  char message[516];
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  uint8_t endOfList : 1;
+  uint8_t listIndex : 7;
+  uint8_t count;
+  uint16_t optionParam;
+  uint32_t optionArg;
+  uint16_t contractedNum;
+  uint16_t activeCharacterNum;
+  uint16_t totalSlotNum;
+  uint16_t freeSlotNum;
+  uint16_t totalRetainerNum;
+  uint16_t activeRetainerNum;
+  RetainerInfo retainerArray[9];
+};
+
+struct FFXIVIpcDebugNullRepl : FFXIVIpcBasePacket< DebugNullRepl >
+{
+  uint32_t dummyArgument;
+};
+
+struct FFXIVIpcDebugLoginRepl : FFXIVIpcBasePacket< DebugLoginRepl >
+{
+  uint32_t requestNumber;
+  uint32_t ticketNumber;
+  uint16_t flag;
+  uint16_t frontendPort;
+  char frontendHost[32];
+  char worldSetName[32];
+};
+
+struct FFXIVIpcNackReply : FFXIVIpcBasePacket< NackReply >
+{
+  uint32_t requestNumber;
+  uint32_t clientTimeValue;
+  int32_t errorCode;
+  int32_t errorStatus;
+  int16_t errorMessageNo;
+  int16_t messageSize;
+  uint8_t message[512];
 };
 
 }
 
-#endif

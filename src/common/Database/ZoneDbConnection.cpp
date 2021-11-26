@@ -23,7 +23,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// CHARA
   prepareStatement( CHARA_SEL,
-                    "SELECT ContentId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
+                    "SELECT EntityId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
                     "Customize, ModelMainWeapon, ModelSubWeapon, ModelSystemWeapon, "
                     "ModelEquip, EmoteModeType, FirstLoginTime, Language, IsNewGame, "
                     "IsNewAdventurer, TerritoryType, TerritoryId, PosX, PosY, PosZ, PosR, "
@@ -55,12 +55,12 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   prepareStatement( CHARA_SEL_MINIMAL,
                     "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryType, GuardianDeity, "
-                    "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
+                    "Class, EntityId, BirthDay, BirthMonth, EquipDisplayFlags "
                     "FROM charainfo WHERE CharacterId = ?;",
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_INS,
-                    "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
+                    "INSERT INTO charainfo (AccountId, CharacterId, EntityId, Name, Hp, Mp, "
                     "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
                     "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
                     "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
@@ -220,24 +220,39 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                                   "WHERE CharacterId = ?;",
                     CONNECTION_SYNC );
 
-  /// ZONE QUERIES
-  prepareStatement( ZONE_SEL_BNPCTEMPLATES,
-                    "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
-                           "secWeaponModel, aggressionMode, enemyType, pose, "
-                           "modelChara, displayFlags, Look, Models "
-                    "FROM bnpctemplate WHERE 1;",
-                    CONNECTION_BOTH );
+  /// CHARA FRIENDLIST
+  prepareStatement( CHARA_FRIENDLIST_INS,
+                    "INSERT INTO charainfofriendlist ( CharacterId, CharacterIdList, InviteDataList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
 
-  prepareStatement( ZONE_SEL_SPAWNGROUPS,
-                    "SELECT id, bNpcTemplateId, level, maxHp "
-                    "FROM spawngroup "
-                    "WHERE territoryTypeId = ?",
-                    CONNECTION_BOTH );
-  
-  prepareStatement( ZONE_SEL_SPAWNPOINTS,
-                    "SELECT id, x, y, z, r, gimmickId "
-                    "FROM spawnpoint "
-                    "WHERE spawnGroupId = ?",
+  prepareStatement( CHARA_FRIENDLIST_UP, "UPDATE charainfofriendlist "
+                                          " SET CharacterIdList = ?,"
+                                          " InviteDataList = ?"
+                                          " WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
+
+  prepareStatement( CHARA_FRIENDLIST_SEL, "SELECT CharacterIdList, InviteDataList FROM charainfofriendlist "
+                                           "WHERE CharacterId = ?;",
+                     CONNECTION_SYNC );
+
+  /// CHARA LINKSHELL
+  prepareStatement( CHARA_LINKSHELL_INS,
+                    "INSERT INTO infolinkshell ( LinkshellId, MasterCharacterId, CharacterIdList, "
+                    "LinkshellName, LeaderIdList, InviteIdList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, ?, ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
+
+  /// ZONE QUERIES
+  prepareStatement( ZONE_SEL_BNPCS_BY_TERI,
+                    "SELECT bnpcgroup.territoryTypeId, bnpc.TerritoryName, bnpc.name, bnpc.instanceId, bnpc.x, bnpc.y, bnpc.z, bnpc.BaseId, bnpc.PopWeather, "
+                    "bnpc.PopTimeStart, bnpc.PopTimeEnd, bnpc.MoveAI, bnpc.WanderingRange, bnpc.Route, bnpc.EventGroup, bnpc.NameId, bnpc.DropItem, "
+                    "bnpc.SenseRangeRate, bnpc.Level, bnpc.ActiveType, bnpc.PopInterval, bnpc.PopRate, bnpc.PopEvent, bnpc.LinkGroup, bnpc.LinkFamily, bnpc.LinkRange,"
+                    "bnpc.LinkCountLimit, bnpc.NonpopInitZone, bnpc.InvalidRepop, bnpc.LinkParent, bnpc.LinkOverride, bnpc.LinkReply, bnpc.HorizontalPopRange, "
+                    "bnpc.VerticalPopRange, bnpc.BNpcBaseData, bnpc.RepopId, bnpc.BNPCRankId, bnpc.TerritoryRange, bnpc.BoundInstanceID, bnpc.FateLayoutLabelId,"
+                    "bnpc.NormalAI, bnpc.ServerPathId, bnpc.EquipmentID, bnpc.CustomizeID, bnpc.rotation "
+                    "FROM battlenpc as bnpc LEFT JOIN battlenpcgroupmapping AS bnpcgroup "
+                    "ON bnpc.groupid = bnpcgroup.layergroupid where bnpcgroup.territorytypeid = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_UP,

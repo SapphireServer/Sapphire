@@ -6,7 +6,7 @@
 
 #include "Territory/InstanceObjectCache.h"
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
@@ -22,26 +22,27 @@ public:
 
   void inner( Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.param1 == 256 ) // exit
+    if( result.numOfResults == 1 ) // exit
     {
-      player.eventFinish( 1310721, 0 );
-      player.eventFinish( getId(), 1 );
+      eventMgr().eventFinish( player, 1310721, 0 );
+      eventMgr().eventFinish( player, getId(), 1 );
     }
-    else if( result.param1 == 768 ) // teleport to ward
+    else if( result.numOfResults == 2 ) // teleport to ward
     {
-      player.eventFinish( 1310721, 0 );
-      player.eventFinish( getId(), 1 );
+      eventMgr().eventFinish( player, 1310721, 0 );
+      eventMgr().eventFinish( player, getId(), 1 );
 
-      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+      auto& exdData = Common::Service< Data::ExdData >::ref();
       auto& popRange = Common::Service< Sapphire::InstanceObjectCache >::ref();
 
-      auto warp = exdData.get< Sapphire::Data::Warp >( getId() );
+      auto warp = exdData.getRow< Component::Excel::Warp >( getId() );
       if( !warp )
         return;
 
       auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
 
-      auto pPop = popRange.getPopRange( warp->territoryType, warp->popRange );
+      // EXD TODO: This was TerritoryType from warp before...
+      auto pPop = popRange.getPopRange( player.getTerritoryTypeId(), warp->data().PopRange );
 
       if( !pPop )
       {
@@ -52,38 +53,39 @@ public:
         std::cout << "found!!";
       }
 
-      playerMgr.movePlayerToLandDestination( player, warp->popRange, result.param3 );
+      playerMgr.movePlayerToLandDestination( player, warp->data().PopRange, result.getResult( 1 ) );
     }
     else
     {
-      player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341,
-                        std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
+      eventMgr().playScene( player, 1310721, 0, HIDE_HOTBAR, { 1, 341 },
+                            std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
     }
   }
 
   void inner2( Entity::Player& player, uint64_t actorId )
   {
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, 32529,
+    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, { 32529 },
                       [this, actorId]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        player.eventStart( actorId, 1310721, Event::EventHandler::Nest, 1, 0 );
+                        eventMgr().eventStart( player, actorId, 1310721, Event::EventHandler::Nest, 1, 0 );
 
-                        player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341,
-                                          std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
+                        eventMgr().playScene( player, 1310721, 0, HIDE_HOTBAR, { 1, 341 },
+                                              std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
                       } );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+    auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-    auto warp = exdData.get< Sapphire::Data::Warp >( eventId );
+    auto warp = exdData.getRow< Component::Excel::Warp >( eventId );
     if( !warp )
       return;
 
-    player.eventStart( actorId, warp->conditionSuccessEvent, Event::EventHandler::Nest, 0, 0,
-                       std::bind( &WarpTaxi::inner2, this, std::placeholders::_1, std::placeholders::_2 ) );
-    player.playScene( warp->conditionSuccessEvent, 0, HIDE_HOTBAR, 0, 0, 7, nullptr );
+    // EXD TODO: Not sure Warpcondition is correct here
+    eventMgr().eventStart( player, actorId, warp->data().WarpCondition, Event::EventHandler::Nest, 0, 0,
+                           std::bind( &WarpTaxi::inner2, this, std::placeholders::_1, std::placeholders::_2 ) );
+    eventMgr().playScene( player, warp->data().WarpCondition, 0, HIDE_HOTBAR, { 7 }, nullptr );
   }
 };
 

@@ -5,9 +5,12 @@
 #include "Actor/EventObject.h"
 #include "Territory/HousingZone.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/PlayerMgr.h"
 #include "Territory/Land.h"
 
+
 using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 
 class HousingEstateEntrance :
   public Sapphire::ScriptAPI::EventObjectScript
@@ -20,10 +23,10 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, Entity::EventObject& eobj ) override
   {
-    player.playScene( eventId, 0, 0, [this, eobj]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playScene( player, eventId, 0, 0, [this, eobj]( Entity::Player& player, const Event::SceneResult& result )
     {
       // param2 == 1 when player wants to enter house
-      if( result.param2 != 1 )
+      if( result.getResult( 0 ) != 1 )
         return;
 
       auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
@@ -43,12 +46,12 @@ public:
       {
         // an error occurred during event movement
         // lol
-        player.sendLogMessage( 1311 );
-        player.eventFinish( result.eventId, 1 );
+        PlayerMgr::sendLogMessage( player, 1311 );
+        eventMgr().eventFinish( player, result.eventId, 1 );
         return;
       }
 
-      player.eventFinish( result.eventId, 1 );
+      eventMgr().eventFinish( player, result.eventId, 1 );
 
       Common::FFXIVARR_POSITION3 pos {};
 
@@ -78,7 +81,7 @@ public:
           return;
       }
 
-      player.setInstance( internalZone, pos, player.getRot() );
+      player.setInstance( internalZone, pos );
     } );
   }
 };

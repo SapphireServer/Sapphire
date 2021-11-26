@@ -1,31 +1,45 @@
+#include <algorithm>
+#include <iterator>
+
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
+#include <Manager/ChatChannelMgr.h>
 
 #include "Linkshell/Linkshell.h"
 #include "LinkshellMgr.h"
 
+#include "Actor/Player.h"
+
 bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
 
   auto res = db.query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
                          "LinkshellName, LeaderIdList, InviteIdList "
                          "FROM infolinkshell "
                          "ORDER BY LinkshellId ASC;" );
 
-
   while( res->next() )
   {
     uint64_t linkshellId = res->getUInt64( 1 );
-    uint32_t masterId = res->getUInt( 2 );
+    uint64_t masterId = res->getUInt64( 2 );
     std::string name = res->getString( 4 );
 
     auto func = []( std::set< uint64_t >& outList, std::vector< char >& inData )
     {
       if( inData.size() )
       {
-        std::vector< uint64_t > list( inData.size() / 8 );
+        size_t entryCount = inData.size() / 8;
+        std::vector< uint64_t > list( entryCount );
+
+        for( int i = 0; i < entryCount; ++i )
+        {
+          auto val = *reinterpret_cast< const uint64_t* >( &inData[ i * 8 ] );
+          list[ i ] = val;
+        }
+
         outList.insert( list.begin(), list.end() );
       }
     };
@@ -38,21 +52,23 @@ bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
     std::set< uint64_t > leaders;
     std::vector< char > leadersBin;
     leadersBin = res->getBlobVector( 5 );
-    func( members, leadersBin );
+    func( leaders, leadersBin );
 
     std::set< uint64_t > invites;
     std::vector< char > invitesBin;
     invitesBin = res->getBlobVector( 6 );
-    func( members, invitesBin );
+    func( invites, invitesBin );
 
-    auto lsPtr = std::make_shared< Linkshell >( linkshellId, name, masterId, members, leaders, invites );
+    auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::LinkshellChat );
+
+    // TODO: remove shared_ptr, pass references instead
+    auto lsPtr = std::make_shared< Linkshell >( linkshellId, name, chatChannelId, masterId, members, leaders, invites );
     m_linkshellIdMap[ linkshellId ] = lsPtr;
     m_linkshellNameMap[ name ] = lsPtr;
 
   }
 
   return true;
-
 }
 
 Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellByName( const std::string& name )
@@ -71,4 +87,91 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellById(
     return nullptr;
   else
     return it->second;
+}
+
+Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( const std::string& name, Entity::Player& player )
+{
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
+  auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::LinkshellChat );
+
+  uint64_t linkshellId = 1;
+
+  if( !m_linkshellIdMap.empty() )
+  {
+    auto lastIdx = ( --m_linkshellIdMap.end() )->first;
+    linkshellId = lastIdx + 1;
+  }
+
+  uint64_t masterId = player.getCharacterId();
+
+  // TODO: remove this messy set
+
+  std::set< uint64_t > memberSet;
+  std::set< uint64_t > leaderSet;
+  std::set< uint64_t > inviteSet;
+
+  // we add linkshell owner to the list of members
+  memberSet.insert( masterId );
+
+  auto lsPtr = std::make_shared< Linkshell >( linkshellId, name, chatChannelId, masterId, memberSet, leaderSet, inviteSet );
+  m_linkshellIdMap[ linkshellId ] = lsPtr;
+  m_linkshellNameMap[ name ] = lsPtr;
+
+  // TODO: generalize SQL update
+  // TODO: handle player pkt
+
+  // prepare binary data for SQL
+
+  std::vector< uint64_t > members( 128, 0 );
+  std::vector< uint64_t > leaders( 128, 0 );
+  std::vector< uint64_t > invites( 128, 0 );
+
+  // add player entry
+  members[ 0 ] = masterId;
+  
+  std::vector< uint8_t > memVec( sizeof( members ) );
+  memcpy( memVec.data(), members.data(), sizeof( members ) );
+
+  std::vector< uint8_t > leadVec( sizeof( leaders ) );
+  memcpy( leadVec.data(), leaders.data(), sizeof( leaders ) );
+
+  std::vector< uint8_t > invVec( sizeof( invites ) );
+  memcpy( invVec.data(), invites.data(), sizeof( invites ) );
+
+  // TODO: insert in SQL
+
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_LINKSHELL_INS );
+  stmt->setUInt64( 1, linkshellId );
+  stmt->setUInt64( 2, masterId );
+  stmt->setBinary( 3, memVec );
+  stmt->setString( 4, std::string( name ) );
+  stmt->setBinary( 5, leadVec );
+  stmt->setBinary( 6, invVec );
+
+  db.directExecute( stmt );
+
+  return lsPtr;
+}
+
+const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellMgr::getPlayerLinkshells( Entity::Player& player ) const
+{
+  std::vector< Sapphire::LinkshellPtr > lsVec;
+
+  if( !m_linkshellIdMap.empty() )
+  {
+    for( const auto &[ key, value ] : m_linkshellIdMap )
+    {
+      auto& memberList = value->getMemberIdList();
+
+      // find player id in LS member list
+      if( !( memberList.find( player.getCharacterId() ) == memberList.end() ) )
+      {
+        lsVec.emplace_back( value );
+      }
+    }
+  }
+
+  return lsVec;
 }

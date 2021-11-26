@@ -1,10 +1,9 @@
 #ifndef SAPPHIRE_CONNECTION_H
 #define SAPPHIRE_CONNECTION_H
 
+#include <string>
 #include <memory>
 #include <map>
-#include <string>
-
 #include "MysqlCommon.h"
 
 typedef struct st_mysql MYSQL;
@@ -19,18 +18,11 @@ namespace Mysql
    class Connection : public std::enable_shared_from_this< Connection >
    {
    public:
-      Connection( std::shared_ptr< MySqlBase > pBase,
-                  const std::string& hostName,
-                  const std::string& userName,
-                  const std::string& password,
-                  uint16_t port = 3306);
+      Connection( std::shared_ptr< MySqlBase > pBase, const std::string& hostName, const std::string& userName,
+                  const std::string& password, uint16_t port = 3306 );
 
-      Connection( std::shared_ptr< MySqlBase > pBase,
-                  const std::string& hostName,
-                  const std::string& userName,
-                  const std::string& password,
-                  const optionMap& options,
-                  uint16_t port = 3306 );
+      Connection( std::shared_ptr< MySqlBase > pBase, const std::string& hostName, const std::string& userName,
+                  const std::string& password, const optionMap& options, uint16_t port = 3306 );
 
       virtual ~Connection();
 
@@ -79,7 +71,7 @@ namespace Mysql
    private:
       std::shared_ptr< MySqlBase > m_pBase;
       MYSQL* m_pRawCon;
-      bool m_bConnected;
+      bool m_bConnected{};
 
       Connection( const Connection& );
       void operator=( Connection& );

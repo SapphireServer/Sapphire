@@ -3,11 +3,9 @@
 #include "Statement.h"
 #include "PreparedStatement.h"
 #include <mysql.h>
+#include <stdexcept>
 
-#ifdef _MSC_VER
-  // fixes compile error when compiling with vs2019
-  #include <stdexcept>
-#endif
+#include <utility>
 #include <vector>
 
 Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
@@ -15,7 +13,7 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
                                const std::string& userName,
                                const std::string& password,
                                uint16_t port ) :
-    m_pBase( pBase ),
+    m_pBase( std::move( pBase ) ),
     m_bConnected( false )
 {
    m_pRawCon = mysql_init( nullptr );
@@ -32,12 +30,12 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
                                const std::string& password,
                                const optionMap& options,
                                uint16_t port ) :
-    m_pBase( pBase )
+    m_pBase( std::move( pBase ) )
 {
    m_pRawCon = mysql_init( nullptr );
    // Different mysql versions support different options, for now whatever was unsupporter here was commented out
    // but left there.
-   for( auto entry : options )
+   for( const auto& entry : options )
    {
       switch( entry.first )
       {
@@ -113,9 +111,7 @@ Mysql::Connection::Connection( std::shared_ptr< MySqlBase > pBase,
 }
 
 
-Mysql::Connection::~Connection()
-{
-}
+Mysql::Connection::~Connection() = default;
 
 void Mysql::Connection::setOption( enum mysqlOption option, const void *arg )
 {
@@ -159,7 +155,7 @@ std::shared_ptr< Mysql::MySqlBase > Mysql::Connection::getMySqlBase() const
 
 void Mysql::Connection::setAutoCommit( bool autoCommit )
 {
-   auto b = static_cast< my_bool >( autoCommit == true ? 1 : 0 );
+   auto b = static_cast< my_bool >( autoCommit ? 1 : 0 );
    if( mysql_autocommit( m_pRawCon, b ) != 0 )
       throw std::runtime_error( "Connection::setAutoCommit failed!" );
 }
@@ -168,10 +164,10 @@ bool Mysql::Connection::getAutoCommit()
 {
    // TODO: should be replaced with wrapped sql query function once available
    std::string query("SELECT @@autocommit");
-   auto res = mysql_real_query( m_pRawCon, query.c_str(), query.length() );
+   auto res = mysql_real_query( m_pRawCon, query.c_str(), static_cast< unsigned long >( query.length() ) );
 
    if( res != 0 )
-      throw std::runtime_error( "Query failed!" );
+    throw std::runtime_error( "Query failed!" );
 
    auto pRes = mysql_store_result( m_pRawCon );
    auto row = mysql_fetch_row( pRes );
@@ -202,7 +198,7 @@ void Mysql::Connection::rollbackTransaction()
 std::string Mysql::Connection::escapeString( const std::string &inData )
 {
    std::unique_ptr< char[] > buffer( new char[inData.length() * 2 + 1] );
-   if( !buffer.get() )
+   if( !buffer )
       return "";
    unsigned long return_len = mysql_real_escape_string( m_pRawCon, buffer.get(),
                                                         inData.c_str(), static_cast< unsigned long > ( inData.length() ) );
@@ -240,7 +236,7 @@ std::shared_ptr< Mysql::PreparedStatement > Mysql::Connection::prepareStatement(
    if( !stmt )
       throw std::runtime_error( "Could not init prepared statement: " + getError() );
 
-   if( mysql_stmt_prepare( stmt, sql.c_str(), sql.size() ) )
+   if( mysql_stmt_prepare( stmt, sql.c_str(), static_cast< unsigned long >( sql.size() ) ) )
       throw std::runtime_error( "Could not prepare statement: " + getError() );
 
    return std::make_shared< PreparedStatement >( stmt, shared_from_this() );

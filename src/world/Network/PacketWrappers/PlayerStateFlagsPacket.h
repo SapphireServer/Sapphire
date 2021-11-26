@@ -1,11 +1,9 @@
-#ifndef _PLAYERSTATE_H
-#define _PLAYERSTATE_H
-
+#pragma once
 #include <Network/GamePacket.h>
 #include "Actor/Player.h"
 #include "Forwards.h"
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
@@ -17,7 +15,7 @@ namespace Sapphire::Network::Packets::Server
     PlayerStateFlagsPacket( Entity::Player& player ) :
       ZoneChannelPacket< FFXIVIpcPlayerStateFlags >( player.getId(), player.getId() )
     {
-      initialize( player.getStateFlags() );
+      initialize( player.getStateFlags().data() );
     }
 
     PlayerStateFlagsPacket( Entity::Player& player, std::vector< Common::PlayerStateFlag > flags ) :
@@ -48,5 +46,3 @@ namespace Sapphire::Network::Packets::Server
   };
 
 }
-
-#endif /*_PLAYERSTATE_H*/

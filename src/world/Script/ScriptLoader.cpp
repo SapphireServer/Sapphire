@@ -3,9 +3,22 @@
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 #include <Util/Util.h>
-#include "ServerMgr.h"
+#include "WorldServer.h"
+
+#ifdef _WIN32
+#include <Service.h>
+namespace Sapphire::Data
+{
+  class ExdData;
+}
+namespace Sapphire::World::Manager
+{
+  class TerritoryMgr;
+}
+#endif
 
 #include <filesystem>
+#include <Manager/TerritoryMgr.h>
 
 namespace fs = std::filesystem;
 
@@ -98,9 +111,37 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using getScripts = Sapphire::ScriptAPI::ScriptObject** ( * )();
 
 #ifdef _WIN32
-  getScripts func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
+  auto func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
+
+  using win32initFunc = void(*)( std::shared_ptr< Sapphire::Data::ExdData >);
+  using win32initFuncTeri = void(*)( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr >);
+  auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
+  auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
+
+  if( win32init )
+  {
+    auto exdData = Common::Service< Sapphire::Data::ExdData >::get();
+    auto ptr = exdData.lock();
+    win32init( ptr );
+
+  }
+  else
+  {
+    Logger::warn( "did not find a win32init export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initTeri )
+  {
+    auto teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::get();
+    auto tptr = teriMgr.lock();
+    win32initTeri( tptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32init1 export on a windows script target - the server will likely crash!" );
+  }
 #else
-  getScripts func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );
+  auto func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );
 #endif
 
   if( func )

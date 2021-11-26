@@ -1,7 +1,7 @@
-#ifndef SAPPHIRE_ITEMACTION_H
-#define SAPPHIRE_ITEMACTION_H
+#pragma once
 
 #include "Action.h"
+#include <Exd/Structs.h>
 
 namespace Sapphire::Data
 {
@@ -14,7 +14,7 @@ namespace Sapphire::World::Action
   class ItemAction : public Action
   {
   public:
-    ItemAction( Entity::CharaPtr source, uint32_t itemId, Data::ItemActionPtr itemActionData,
+    ItemAction( Entity::CharaPtr source, uint32_t itemId, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData,
                 uint16_t itemSourceSlot, uint16_t itemSourceContainer );
     virtual ~ItemAction() = default;
 
@@ -28,11 +28,9 @@ namespace Sapphire::World::Action
     void handleVFXItem();
 
   private:
-    Sapphire::Data::ItemActionPtr m_itemAction;
+    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > m_itemAction;
 
     uint16_t m_itemSourceSlot;
     uint16_t m_itemSourceContainer;
   };
 }
-
-#endif //SAPPHIRE_ITEMACTION_H

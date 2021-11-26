@@ -1,13 +1,20 @@
 #include <Util/Util.h>
 #include <Logging/Logger.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
+#include <Exd/Structs.h>
 #include <Network/CommonActorControl.h>
-#include <Service.h>
+
 
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
 #include "Actor/Player.h"
+
+#include <Service.h>
+#include "WorldServer.h"
+#include "Session.h"
+#include "Network/GameConnection.h"
+#include "Manager/EventMgr.h"
 
 #include "EventAction.h"
 
@@ -16,7 +23,8 @@ using namespace Sapphire::World;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uint16_t action,
@@ -25,8 +33,8 @@ Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uin
   m_additional = additional;
   m_eventId = eventId;
   m_id = action;
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  m_castTimeMs = exdData.get< Sapphire::Data::EventAction >( action )->castTime * 1000; // TODO: Add security checks.
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  m_castTimeMs = exdData.getRow< Component::Excel::EventAction >( action )->data().Time * 1000; // TODO: Add security checks.
   m_onActionFinishClb = std::move( finishRef );
   m_onActionInterruptClb = std::move( interruptRef );
   m_pSource = std::move( pActor );
@@ -61,6 +69,7 @@ void Action::EventAction::execute()
 
   try
   {
+    auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
     auto pEvent = m_pSource->getAsPlayer()->getEvent( m_eventId );
 
     pEvent->setPlayedScene( false );
@@ -71,7 +80,7 @@ void Action::EventAction::execute()
     auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastStart, 0, m_id );
 
     if( !pEvent->hasPlayedScene() )
-      m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
+      eventMgr.eventFinish( *m_pSource->getAsPlayer(), m_eventId, 1 );
     else
       pEvent->setPlayedScene( false );
 
@@ -97,7 +106,7 @@ void Action::EventAction::interrupt()
 
   try
   {
-
+    auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
     auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 0x04, m_id );
 
     if( m_pSource->isPlayer() )
@@ -109,9 +118,10 @@ void Action::EventAction::interrupt()
       m_pSource->sendToInRangeSet( control );
       m_pSource->sendToInRangeSet( control1 );
 
-      m_pSource->getAsPlayer()->queuePacket( control1 );
-      m_pSource->getAsPlayer()->queuePacket( control );
-      m_pSource->getAsPlayer()->eventFinish( m_eventId, 1 );
+      auto& server = Common::Service< World::WorldServer >::ref();
+      server.queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), { control1, control } );
+
+      eventMgr.eventFinish( *m_pSource->getAsPlayer(), m_eventId, 1 );
 
     }
     else

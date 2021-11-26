@@ -5,9 +5,7 @@
 #include <Network/PacketContainer.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
-#include <Exd/ExdDataGenerated.h>
-
-#include <unordered_map>
+#include <Exd/ExdData.h>
 #include <Service.h>
 
 #include "Network/GameConnection.h"
@@ -15,26 +13,21 @@
 #include "Session.h"
 
 #include "Manager/TerritoryMgr.h"
+#include "Manager/PlayerMgr.h"
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
-#include "Network/PacketWrappers/PingPacket.h"
-#include "Network/PacketWrappers/MoveActorPacket.h"
-#include "Network/PacketWrappers/ChatPacket.h"
-#include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
-#include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include "Network/PacketWrappers/EventStartPacket.h"
-#include "Network/PacketWrappers/EventFinishPacket.h"
-#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
 
-#include "ServerMgr.h"
+#include "WorldServer.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Client;
+using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
@@ -86,25 +79,27 @@ enum GmCommand
   JumpNpc = 0x025F,
 };
 
-void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                    Entity::Player& player )
+void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                          Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand1 >( inPacket );
-  const auto commandId = packet.data().commandId;
-  const auto param1 = packet.data().param1;
-  const auto param2 = packet.data().param2;
-  const auto param3 = packet.data().param3;
-  const auto param4 = packet.data().param4;
-  const auto target = packet.data().target;
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  const auto packet = ZoneChannelPacket< FFXIVIpcGmCommand >( inPacket );
+  const auto commandId = packet.data().Id;
+  const auto param1 = packet.data().Arg0;
+  const auto param2 = packet.data().Arg1;
+  const auto param3 = packet.data().Arg2;
+  const auto param4 = packet.data().Arg3;
+  const auto target = packet.data().Target;
 
   Logger::info( "{0} used GM1 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                 player.getName(), commandId,
                 param1, param2, param3, param4, target );
 
-  Sapphire::Entity::ActorPtr targetActor;
+  Sapphire::Entity::GameObjectPtr targetActor;
 
 
   if( player.getId() == target )
@@ -130,13 +125,13 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Lv:
     {
       targetPlayer->setLevel( static_cast< uint8_t >( param1 ) );
-      player.sendNotice( "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Race:
     {
       targetPlayer->setLookAt( CharaLook::Race, static_cast< uint8_t >( param1 ) );
-      player.sendNotice( "Race for {0} was set to {1}", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Race for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
@@ -152,7 +147,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Tribe:
     {
       targetPlayer->setLookAt( CharaLook::Tribe, static_cast< uint8_t >( param1 ) );
-      player.sendNotice( "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
       for( auto actor : inRange )
@@ -168,7 +163,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Sex:
     {
       targetPlayer->setLookAt( CharaLook::Gender, static_cast< uint8_t >( param1 ) );
-      player.sendNotice( "Sex for {0} was set to ", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Sex for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
       for( auto actor : inRange )
@@ -184,14 +179,14 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Time:
     {
       player.setEorzeaTimeOffset( param2 );
-      player.sendNotice( "Eorzea time offset: {0}", param2 );
+      PlayerMgr::sendServerNotice( player, "Eorzea time offset: {0}", param2 );
       break;
     }
     case GmCommand::Weather:
     {
       targetPlayer->getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
-      player.sendNotice( "Weather in Territory \"{0}\" of {1} set in range.",
-                         targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Weather in Territory \"{0}\" of {1} set in range.",
+                               targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getName());
       break;
     }
     case GmCommand::Call:
@@ -200,41 +195,41 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
         targetPlayer->setZone( player.getZoneId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-      player.sendNotice( "Calling {0}", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName());
       break;
     }
     case GmCommand::Inspect:
     {
-      player.sendNotice( "Name: {0}"
-                         "\nGil: {1}"
-                         "\nTerritory: {2}"
-                         "({3})"
-                         "\nClass: {4}"
-                         "\nLevel: {5}"
-                         "\nExp: {6}"
-                         "\nSearchMessage: {7}"
-                         "\nPlayTime: {8}",
-                         targetPlayer->getName(),
-                         targetPlayer->getCurrency( CurrencyType::Gil ),
-                         targetPlayer->getCurrentTerritory()->getName(),
-                         targetPlayer->getZoneId(),
-                         static_cast< uint8_t >( targetPlayer->getClass() ),
-                         targetPlayer->getLevel(),
-                         targetPlayer->getExp(),
-                         targetPlayer->getSearchMessage(),
-                         targetPlayer->getPlayTime() );
+      PlayerMgr::sendServerNotice( player, "Name: {0}"
+                               "\nGil: {1}"
+                               "\nTerritory: {2}"
+                               "({3})"
+                               "\nClass: {4}"
+                               "\nLevel: {5}"
+                               "\nExp: {6}"
+                               "\nSearchMessage: {7}"
+                               "\nPlayTime: {8}",
+                               targetPlayer->getName(),
+                               targetPlayer->getCurrency( CurrencyType::Gil ),
+                               targetPlayer->getCurrentTerritory()->getName(),
+                               targetPlayer->getZoneId(),
+                               static_cast< uint8_t >( targetPlayer->getClass()),
+                               targetPlayer->getLevel(),
+                               targetPlayer->getExp(),
+                               targetPlayer->getSearchMessage(),
+                               targetPlayer->getPlayTime());
       break;
     }
     case GmCommand::Speed:
     {
-      targetPlayer->queuePacket( makeActorControlSelf( player.getId(), Flee, param1 ) );
-      player.sendNotice( "Speed for {0} was set to {1}", targetPlayer->getName(), param1 );
+      server.queueForPlayer( targetPlayer->getCharacterId(), makeActorControlSelf( player.getId(), Flee, param1 ) );
+      PlayerMgr::sendServerNotice( player, "Speed for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Invis:
     {
       player.setGmInvis( !player.getGmInvis() );
-      player.sendNotice( "Invisibility flag for {0} was toggled to {1}", player.getName(), !player.getGmInvis() );
+      PlayerMgr::sendServerNotice( player, "Invisibility flag for {0} was toggled to {1}", player.getName(), !player.getGmInvis());
 
       for( auto actor : player.getInRangeActors() )
       {
@@ -249,7 +244,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Kill:
     {
       targetActor->getAsChara()->takeDamage( 9999999 );
-      player.sendNotice( "Killed {0}", targetActor->getId() );
+      PlayerMgr::sendServerNotice( player, "Killed {0}", targetActor->getId());
       break;
     }
     case GmCommand::Icon:
@@ -260,16 +255,16 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       statusPacket->data().onlineStatusFlags = param1;
       queueOutPacket( statusPacket );
 
-      auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
-      searchInfoPacket->data().onlineStatusFlags = param1;
-      searchInfoPacket->data().selectRegion = targetPlayer->getSearchSelectRegion();
-      strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
-      targetPlayer->queuePacket( searchInfoPacket );
+      auto searchInfoPacket = makeZonePacket< Server::FFXIVIpcSetProfileResult >( player.getId() );
+      searchInfoPacket->data().OnlineStatus = param1;
+      searchInfoPacket->data().Region = targetPlayer->getSearchSelectRegion();
+      strcpy( searchInfoPacket->data().SearchComment, targetPlayer->getSearchMessage() );
+      server.queueForPlayer( targetPlayer->getCharacterId(), searchInfoPacket );
 
       targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
                                                         static_cast< uint8_t >( player.getOnlineStatus() ) ),
                                       true );
-      player.sendNotice( "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Hp:
@@ -278,7 +273,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       if( chara )
       {
         chara->setHp( param1 );
-        player.sendNotice( "Hp for {0} was set to {1}", chara->getName(), param1 );
+        PlayerMgr::sendServerNotice( player, "Hp for {0} was set to {1}", chara->getName(), param1 );
       }
 
       break;
@@ -286,19 +281,25 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     case GmCommand::Mp:
     {
       targetPlayer->setMp( param1 );
-      player.sendNotice( "Mp for {0} was set to {1}", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Mp for {0} was set to {1}", targetPlayer->getName(), param1 );
+      break;
+    }
+    case GmCommand::Tp:
+    {
+      targetPlayer->setTp( param1 );
+      PlayerMgr::sendServerNotice( player, "Tp for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Gp:
     {
       targetPlayer->setHp( param1 );
-      player.sendNotice( "Gp for {0} was set to {1}", targetPlayer->getName(), param1 );
+      PlayerMgr::sendServerNotice( player, "Gp for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
     case GmCommand::Exp:
     {
       targetPlayer->gainExp( param1 );
-      player.sendNotice( "{0} Exp was added to {1}", param1, targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "{0} Exp was added to {1}", param1, targetPlayer->getName());
       break;
     }
     case GmCommand::Inv:
@@ -308,7 +309,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       else
         targetActor->getAsChara()->setInvincibilityType( Common::InvincibilityType::InvincibilityRefill );
 
-      player.sendNotice( "Invincibility for {0} was switched.", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Invincibility for {0} was switched.", targetPlayer->getName());
       break;
     }
     case GmCommand::Orchestrion:
@@ -320,12 +321,12 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
           for( uint8_t i = 0; i < 255; i++ )
             targetActor->getAsPlayer()->learnSong( i, 0 );
 
-          player.sendNotice( "All Songs for {0} were turned on.", targetPlayer->getName() );
+          PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName());
         }
         else
         {
           targetActor->getAsPlayer()->learnSong( static_cast< uint8_t >( param2 ), 0 );
-          player.sendNotice( "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
+          PlayerMgr::sendServerNotice( player, "Song {0} for {1} was turned on.", param2, targetPlayer->getName());
         }
       }
 
@@ -342,27 +343,18 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
 
       if( ( param1 == 0xcccccccc ) )
       {
-        player.sendUrgent( "Syntaxerror." );
+        PlayerMgr::sendUrgent( player, "Syntaxerror." );
         return;
       }
-      if( param1 <= 0x12 ) // crystal
-      {
-        targetPlayer->addCrystal( static_cast< Common::CrystalType >( param1 ), quantity, true );
-      }
-      else // item
-      {
-        // decode using the epic SE style HQ item id
-        bool isHq = param1 > 1000000;
 
-        if( !targetPlayer->addItem( isHq ? param1 - 1000000 : param1, quantity, isHq, false, true, true ) )
-          player.sendUrgent( "Item #{0} could not be added to inventory.", isHq ? param1 - 1000000 : param1 );
-      }
+      if( !targetPlayer->addItem( param1, quantity ) )
+        PlayerMgr::sendUrgent( player, "Item #{0} could not be added to inventory.", param1 );
       break;
     }
     case GmCommand::Gil:
     {
-      targetPlayer->addCurrency( CurrencyType::Gil, param1, true );
-      player.sendNotice( "Added {0} Gil for {1}", param1, targetPlayer->getName() );
+      targetPlayer->addCurrency( CurrencyType::Gil, param1 );
+      PlayerMgr::sendServerNotice( player, "Added {0} Gil for {1}", param1, targetPlayer->getName());
       break;
     }
     case GmCommand::Collect:
@@ -371,18 +363,19 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
 
       if( gil < param1 )
       {
-        player.sendUrgent( "Player does not have enough Gil({0})", gil );
+        PlayerMgr::sendUrgent( player, "Player does not have enough Gil({0})", gil );
       }
       else
       {
         targetPlayer->removeCurrency( CurrencyType::Gil, param1 );
-        player.sendNotice( "Removed {0} Gil from {1} ({2} before)", param1, targetPlayer->getName(), gil );
+        PlayerMgr::sendServerNotice( player, "Removed {0} Gil from {1} ({2} before)", param1, targetPlayer->getName(), gil );
       }
       break;
     }
     case GmCommand::QuestAccept:
     {
-      targetPlayer->updateQuest( static_cast< uint16_t >( param1 ), 1 );
+      auto quest = World::Quest( static_cast< uint16_t >( param1 ), 1, 0 );
+      targetPlayer->updateQuest( quest );
       break;
     }
     case GmCommand::QuestCancel:
@@ -402,14 +395,17 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     }
     case GmCommand::QuestSequence:
     {
-      targetPlayer->updateQuest( static_cast< uint16_t >( param1 ), static_cast< uint8_t >( param2 ) );
+      auto idx = targetPlayer->getQuestIndex( static_cast< uint16_t >( param1 ) );
+      auto quest = targetPlayer->getQuestByIndex( idx );
+      quest.setSeq( static_cast< uint8_t >( param2 ) );
+      targetPlayer->updateQuest( quest );
       break;
     }
     case GmCommand::GC:
     {
       if( param1 > 3 )
       {
-        player.sendUrgent( "Invalid Grand Company ID: {0}", param1 );
+        PlayerMgr::sendUrgent( player, "Invalid Grand Company ID: {0}", param1 );
         return;
       }
 
@@ -425,7 +421,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
         }
       }
 
-      player.sendNotice( "GC for {0} was set to {1}", targetPlayer->getName(), targetPlayer->getGc() );
+      PlayerMgr::sendServerNotice( player, "GC for {0} was set to {1}", targetPlayer->getName(), targetPlayer->getGc());
       break;
     }
     case GmCommand::GCRank:
@@ -434,13 +430,13 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
 
       if( gcId > 2 )
       {
-        player.sendUrgent( "{0} has an invalid Grand Company ID: {0}", targetPlayer->getName(), gcId );
+        PlayerMgr::sendUrgent( player, "{0} has an invalid Grand Company ID: {0}", targetPlayer->getName(), gcId );
         return;
       }
 
       targetPlayer->setGcRankAt( static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
-      player.sendNotice( "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
-                         targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
+      PlayerMgr::sendServerNotice( player, "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
+                               targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
     }
     case GmCommand::Aetheryte:
@@ -452,12 +448,12 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
           for( uint8_t i = 0; i < 255; i++ )
             targetActor->getAsPlayer()->registerAetheryte( i );
 
-          player.sendNotice( "All Aetherytes for {0} were turned on.", targetPlayer->getName() );
+          PlayerMgr::sendServerNotice( player, "All Aetherytes for {0} were turned on.", targetPlayer->getName());
         }
         else
         {
           targetActor->getAsPlayer()->registerAetheryte( static_cast< uint8_t >( param2 ) );
-          player.sendNotice( "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName() );
+          PlayerMgr::sendServerNotice( player, "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName());
         }
       }
 
@@ -465,9 +461,9 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     }
     case GmCommand::Wireframe:
     {
-      player.queuePacket(
+      server.queueForPlayer( player.getCharacterId(),
         std::make_shared< ActorControlSelfPacket >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
-      player.sendNotice( "Wireframe Rendering for {0} was toggled", player.getName() );
+      PlayerMgr::sendServerNotice( player, "Wireframe Rendering for {0} was toggled", player.getName());
       break;
     }
     case GmCommand::Teri:
@@ -475,7 +471,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       auto& teriMgr = Common::Service< TerritoryMgr >::ref();
       if( auto instance = teriMgr.getTerritoryByGuId( param1 ) )
       {
-        player.sendDebug( "Found instance: {0}, id#{1}", instance->getName(), param1 );
+        PlayerMgr::sendDebug( player, "Found instance: {0}, id#{1}", instance->getName(), param1 );
 
         // if the zone is an instanceContent instance, make sure the player is actually bound to it
         auto pInstance = instance->getAsInstanceContent();
@@ -483,8 +479,8 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
         // pInstance will be nullptr if you're accessing a normal zone via its allocated instance id rather than its zoneid
         if( pInstance && !pInstance->isPlayerBound( player.getId() ) )
         {
-          player.sendUrgent( "Not able to join instance#{0}", param1 );
-          player.sendUrgent( "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
+          PlayerMgr::sendUrgent( player, "Not able to join instance#{0}", param1 );
+          PlayerMgr::sendUrgent( player, "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
           break;
         }
 
@@ -492,41 +488,41 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
       {
-        player.sendUrgent( "Invalid zone {0}", param1 );
+        PlayerMgr::sendUrgent( player, "Invalid zone {0}", param1 );
       }
       else
       {
         auto pZone = teriMgr.getZoneByTerritoryTypeId( param1 );
         if( !pZone )
         {
-          player.sendUrgent( "No zone instance found for {0}", param1 );
+          PlayerMgr::sendUrgent( player, "No zone instance found for {0}", param1 );
           break;
         }
 
         if( !teriMgr.isDefaultTerritory( param1 ) )
         {
-          player.sendUrgent( "{0} is an instanced area - instance ID required to zone in.", pZone->getName() );
+          PlayerMgr::sendUrgent( player, "{0} is an instanced area - instance ID required to zone in.", pZone->getName() );
           break;
         }
 
         bool doTeleport = false;
         uint16_t teleport;
 
-        auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-        auto idList = exdData.getAetheryteIdList();
+        auto& exdData = Common::Service< Data::ExdData >::ref();
+        auto idList = exdData.getIdList< Component::Excel::Aetheryte >();
 
         for( auto i : idList )
         {
-          auto data = exdData.get< Sapphire::Data::Aetheryte >( i );
+          auto data = exdData.getRow< Component::Excel::Aetheryte >( i );
 
           if( !data )
           {
             continue;
           }
 
-          if( data->territory == param1 )
+          if( data->data().TerritoryType == param1 )
           {
-            if( data->isAetheryte )
+            //if( data->data().Telepo )
             {
               doTeleport = true;
               teleport = static_cast< uint16_t >( i );
@@ -544,7 +540,7 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
           targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getPos(), 0 );
         }
 
-        player.sendNotice( "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );
+        PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName());
       }
       break;
     }
@@ -553,27 +549,27 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       // todo: this doesn't kill their session straight away, should do this properly but its good for when you get stuck for now
       targetPlayer->setMarkedForRemoval();
 
-      player.sendNotice( "Kicked {0}", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Kicked {0}", targetPlayer->getName());
 
       break;
     }
     case GmCommand::TeriInfo:
     {
       auto pCurrentZone = player.getCurrentTerritory();
-      player.sendNotice( "ZoneId: {0}"
-                         "\nName: {1}"
-                         "\nInternalName: {2}"
-                         "\nGuId: {3}"
-                         "\nPopCount: {4}"
-                         "\nCurrentWeather: {5}"
-                         "\nNextWeather: {6}",
-                         player.getZoneId(),
-                         pCurrentZone->getName(),
-                         pCurrentZone->getInternalName(),
-                         pCurrentZone->getGuId(),
-                         pCurrentZone->getPopCount(),
-                         static_cast< uint8_t >( pCurrentZone->getCurrentWeather() ),
-                         static_cast< uint8_t >( pCurrentZone->getNextWeather() ) );
+      PlayerMgr::sendServerNotice( player, "ZoneId: {0}"
+                               "\nName: {1}"
+                               "\nInternalName: {2}"
+                               "\nGuId: {3}"
+                               "\nPopCount: {4}"
+                               "\nCurrentWeather: {5}"
+                               "\nNextWeather: {6}",
+                               player.getZoneId(),
+                               pCurrentZone->getName(),
+                               pCurrentZone->getInternalName(),
+                               pCurrentZone->getGuId(),
+                               pCurrentZone->getPopCount(),
+                               static_cast< uint8_t >( pCurrentZone->getCurrentWeather()),
+                               static_cast< uint8_t >( pCurrentZone->getNextWeather()));
       break;
     }
     case GmCommand::Jump:
@@ -584,38 +580,38 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
 
-      player.sendNotice( "Jumping to {0} in range.", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Jumping to {0} in range.", targetPlayer->getName());
       break;
     }
 
     default:
-      player.sendUrgent( "GM1 Command not implemented: {0}", commandId );
+      PlayerMgr::sendUrgent( player, "GM1 Command not implemented: {0}", commandId );
       break;
   }
 
 }
 
-void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                    Entity::Player& player )
+void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                              Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
 
-  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommand2 >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommandName >( inPacket );
 
-  const auto commandId = packet.data().commandId;
-  const auto param1 = packet.data().param1;
-  const auto param2 = packet.data().param2;
-  const auto param3 = packet.data().param3;
-  const auto param4 = packet.data().param4;
-  const auto target = std::string( packet.data().target );
+  const auto commandId = packet.data().Id;
+  const auto param1 = packet.data().Arg0;
+  const auto param2 = packet.data().Arg1;
+  const auto param3 = packet.data().Arg2;
+  const auto param4 = packet.data().Arg3;
+  const auto target = std::string( packet.data().Name );
 
-  Logger::info( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
+  Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                  player.getName(), commandId, param1, param2, param3, param4, target );
 
-  auto targetSession = serverMgr.getSession( target );
+  auto targetSession = server.getSession( target );
   Sapphire::Entity::CharaPtr targetActor;
 
   if( targetSession != nullptr )
@@ -630,7 +626,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
     }
     else
     {
-      player.sendUrgent( "Player {0} not found on this server.", target );
+      PlayerMgr::sendUrgent( player, "Player {0} not found on this server.", target );
       return;
     }
   }
@@ -649,10 +645,12 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       targetPlayer->setStatus( Common::ActorStatus::Idle );
       targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
 
+
+      targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), Appear, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,
                                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );
-      player.sendNotice( "Raised {0}", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Raised {0}", targetPlayer->getName());
       break;
     }
     case GmCommand::Jump:
@@ -667,7 +665,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
         // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         if( targetPlayer->getCurrentInstance() )
         {
-          auto pInstanceContent = targetPlayer->getCurrentInstance()->getAsInstanceContent();
+          auto pInstanceContent = targetPlayer->getCurrentInstance();
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
         }
@@ -676,7 +674,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
                              targetActor->getRot() );
       player.sendZoneInPackets( 0x00, 0x00, 0, 0, false );
-      player.sendNotice( "Jumping to {0}", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Jumping to {0}", targetPlayer->getName());
       break;
     }
     case GmCommand::Call:
@@ -684,7 +682,7 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       // We shouldn't be able to call a player into an instance, only call them out of one
       if( player.getCurrentInstance() )
       {
-        player.sendUrgent( "You are unable to call a player while bound to a battle instance." );
+        PlayerMgr::sendUrgent( player, "You are unable to call a player while bound to a battle instance." );
         return;
       }
       targetPlayer->prepareZoning( player.getZoneId(), true, 1, 0 );
@@ -698,11 +696,11 @@ void Sapphire::Network::GameConnection::gm2Handler( const Packets::FFXIVARR_PACK
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
-      player.sendNotice( "Calling {0}", targetPlayer->getName() );
+      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName());
       break;
     }
     default:
-      player.sendUrgent( "GM2 Command not implemented: {0}", commandId );
+      PlayerMgr::sendUrgent( player, "GM2 Command not implemented: {0}", commandId );
       break;
   }
 

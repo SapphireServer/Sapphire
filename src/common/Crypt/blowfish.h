@@ -1,5 +1,5 @@
-#ifndef _BLOWFISH_H
-#define _BLOWFISH_H
+#pragma once
+
 // blowfish.h     interface file for blowfish.cpp
 // _THE BLOWFISH ENCRYPTION ALGORITHM_
 // by Bruce Schneier
@@ -80,5 +80,4 @@ union aword {
     uint32_t byte2:8;
   } w;
 };
-#endif
 #endif

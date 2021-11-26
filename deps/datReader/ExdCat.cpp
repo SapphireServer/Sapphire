@@ -78,4 +78,15 @@ namespace xiv::exd
     return *( ln_it->second );
   }
 
+  const Exd& Cat::get_data( Language language ) const
+  {
+    auto ln_it = _data.find( language );
+    if( ln_it == _data.end() )
+    {
+      return get_data_ln( Language::none );
+    }
+
+    return *( ln_it->second );
+  }
+
 }

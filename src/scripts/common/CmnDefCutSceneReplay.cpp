@@ -16,13 +16,13 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      if( result.param2 != 0 )
+      if( result.getResult( 0 ) != 0 )
       {
-        Scene00001( player, result.param2 );
+        Scene00001( player, result.getResult( 0 ) );
       }
     };
 
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 1, callback );
+    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, { 1 }, callback );
   }
 
   void Scene00001( Entity::Player& player, uint16_t returnScene )
@@ -32,7 +32,7 @@ public:
       // todo: this is fucked
     };
 
-    player.playScene( getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 1, returnScene, callback );
+    //eventMgr().playScene( player, getId(), 1, 0xFB2EC8F8, { 1 }, returnScene, callback );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

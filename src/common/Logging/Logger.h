@@ -1,8 +1,6 @@
-#ifndef _LOGGER_H
-#define _LOGGER_H 
+#pragma once
 
 #include <string>
-
 #include <spdlog/fmt/fmt.h>
 
 namespace Sapphire
@@ -74,5 +72,3 @@ namespace Sapphire
 
 }
 
-
-#endif

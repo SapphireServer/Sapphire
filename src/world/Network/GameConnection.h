@@ -59,7 +59,7 @@ namespace Sapphire::Network
 
     GameConnection( HivePtr pHive, AcceptorPtr pAcceptor );
 
-    ~GameConnection();
+    ~GameConnection() override;
 
     // overwrite the parents onConnect for our game socket needs
     void onAccept( const std::string& host, uint16_t port ) override;
@@ -76,6 +76,7 @@ namespace Sapphire::Network
     void queueInPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW inPacket );
 
     void queueOutPacket( Packets::FFXIVPacketBasePtr outPacket );
+    void queueOutPacket( std::vector< Packets::FFXIVPacketBasePtr > vector );
 
     void processInQueue();
 
@@ -93,41 +94,47 @@ namespace Sapphire::Network
 
     void injectPacket( const std::string& packetpath, Entity::Player& player );
 
-    DECLARE_HANDLER( initHandler );
+    static const char* zonePacketToString( uint32_t opcode );
 
-    DECLARE_HANDLER( finishLoadingHandler );
+    DECLARE_HANDLER( loginHandler );
 
-    DECLARE_HANDLER( blackListHandler );
+    DECLARE_HANDLER( setLanguageHandler );
 
-    DECLARE_HANDLER( socialListHandler );
+    DECLARE_HANDLER( getBlacklistHandler );
+
+    DECLARE_HANDLER( getCommonlistHandler );
+
+    DECLARE_HANDLER( getCommonlistDetailHandler );
+
+    DECLARE_HANDLER( pcSearchHandler );
+
+    DECLARE_HANDLER( joinChatChannelHandler );
 
     DECLARE_HANDLER( linkshellListHandler );
 
-    DECLARE_HANDLER( playTimeHandler );
+    DECLARE_HANDLER( linkshellJoinHandler );
 
-    DECLARE_HANDLER( pingHandler );
+    DECLARE_HANDLER( syncHandler );
 
-    DECLARE_HANDLER( fcInfoReqHandler );
+    DECLARE_HANDLER( setProfileHandler );
 
-    DECLARE_HANDLER( setSearchInfoHandler );
+    DECLARE_HANDLER( getProfileHandler );
 
-    DECLARE_HANDLER( reqSearchInfoHandler );
-
-    DECLARE_HANDLER( reqExamineSearchCommentHandler );
+    DECLARE_HANDLER( getSearchCommentHandler );
 
     DECLARE_HANDLER( reqExamineFcInfo );
 
-    DECLARE_HANDLER( updatePositionHandler );
+    DECLARE_HANDLER( moveHandler );
 
     DECLARE_HANDLER( chatHandler );
 
-    DECLARE_HANDLER( zoneLineHandler );
+    DECLARE_HANDLER( zoneJumpHandler );
 
-    DECLARE_HANDLER( clientTriggerHandler );
+    DECLARE_HANDLER( commandHandler );
 
-    DECLARE_HANDLER( inventoryModifyHandler );
+    DECLARE_HANDLER( itemOperation );
 
-    DECLARE_HANDLER( discoveryHandler );
+    DECLARE_HANDLER( newDiscoveryHandler );
 
     DECLARE_HANDLER( eventHandlerTalk );
 
@@ -139,35 +146,39 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( eventHandlerEnterTerritory );
 
-    DECLARE_HANDLER( eventHandlerReturn );
+    DECLARE_HANDLER( returnEventSceneHeader );
+    DECLARE_HANDLER( returnEventScene2 );
+    DECLARE_HANDLER( returnEventScene4 );
+    DECLARE_HANDLER( returnEventScene8 );
+    DECLARE_HANDLER( returnEventScene16 );
+    DECLARE_HANDLER( returnEventScene32 );
+    DECLARE_HANDLER( returnEventScene64 );
+    DECLARE_HANDLER( returnEventScene128 );
+    DECLARE_HANDLER( returnEventScene255 );
 
-    DECLARE_HANDLER( eventHandlerShop );
+    DECLARE_HANDLER( startUiEvent );
 
     DECLARE_HANDLER( eventHandlerLinkshell );
 
     DECLARE_HANDLER( logoutHandler );
 
-    DECLARE_HANDLER( cfDutyInfoRequest );
+    DECLARE_HANDLER( cfRequestPenalties );
 
-    DECLARE_HANDLER( cfRegisterDuty );
-
-    DECLARE_HANDLER( cfRegisterRoulette );
+    DECLARE_HANDLER( findContent );
+    DECLARE_HANDLER( find5Contents );
+    DECLARE_HANDLER( findContentAsRandom );
 
     DECLARE_HANDLER( cfDutyAccepted );
 
-    DECLARE_HANDLER( cfCancel );
+    DECLARE_HANDLER( actionRequest );
 
-    DECLARE_HANDLER( actionHandler );
+    DECLARE_HANDLER( selectGroundActionRequest );
 
-    DECLARE_HANDLER( placedActionHandler );
+    DECLARE_HANDLER( gmCommandHandler );
 
-    DECLARE_HANDLER( gm1Handler );
+    DECLARE_HANDLER( gmCommandNameHandler );
 
-    DECLARE_HANDLER( gm2Handler );
-
-    DECLARE_HANDLER( reqEquipDisplayFlagsHandler );
-
-    DECLARE_HANDLER( performNoteHandler );
+    DECLARE_HANDLER( configHandler );
 
     DECLARE_HANDLER( landRenameHandler );
 
@@ -177,25 +188,35 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( tellHandler );
 
+    DECLARE_HANDLER( chatToChannelHandler );
+
     DECLARE_HANDLER( reqPlaceHousingItem );
 
     DECLARE_HANDLER( reqMoveHousingItem );
 
-    DECLARE_HANDLER( housingEditExterior );
-
-    DECLARE_HANDLER( housingEditInterior );
-
-    DECLARE_HANDLER( marketBoardSearch );
+    DECLARE_HANDLER( catalogSearch );
 
     DECLARE_HANDLER( marketBoardRequestItemInfo );
 
     DECLARE_HANDLER( marketBoardRequestItemListings );
 
-    DECLARE_HANDLER( worldInteractionhandler );
+    DECLARE_HANDLER( getFcStatus );
 
-    DECLARE_HANDLER( diveHandler );
+    DECLARE_HANDLER( getFcProfile );
 
-    DECLARE_HANDLER( eventYieldHandler );
+    DECLARE_HANDLER( getRequestItemListHandler );
+
+    DECLARE_HANDLER( cancelFindContent );
+    DECLARE_HANDLER( acceptContent );
+
+    DECLARE_HANDLER( inviteHandler );
+    DECLARE_HANDLER( inviteReplyHandler );
+
+    DECLARE_HANDLER( pcPartyLeaveHandler );
+    DECLARE_HANDLER( pcPartyDisbandHandler );
+    DECLARE_HANDLER( pcPartyKickHandler );
+    DECLARE_HANDLER( pcPartyChangeLeaderHandler );
+
   };
 
 }

@@ -31,7 +31,7 @@ void Sapphire::Cell::init( uint32_t x, uint32_t y, TerritoryPtr pZone )
   m_actors.clear();
 }
 
-void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
+void Sapphire::Cell::addActor( Entity::GameObjectPtr pAct )
 {
   if( pAct->isPlayer() )
     ++m_playerCount;
@@ -39,7 +39,7 @@ void Sapphire::Cell::addActor( Entity::ActorPtr pAct )
   m_actors.insert( pAct );
 }
 
-void Sapphire::Cell::removeActorFromCell( Entity::ActorPtr pAct )
+void Sapphire::Cell::removeActorFromCell( Entity::GameObjectPtr pAct )
 {
   if( pAct->isPlayer() )
     --m_playerCount;
@@ -83,7 +83,7 @@ void Sapphire::Cell::removeActors()
   m_actors.clear();
 
   //This time it's simpler! We just remove everything
-  Entity::ActorPtr pAct; //do this outside the loop!
+  Entity::GameObjectPtr pAct; //do this outside the loop!
   for( auto itr = m_actors.begin(); itr != m_actors.end(); )
   {
     pAct = ( *itr );

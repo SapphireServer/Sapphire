@@ -129,7 +129,7 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-**/ScriptLoader.cpp
+src/scripts/*/ScriptLoader.cpp
 
 # cotire generated files/folders
 cotire/

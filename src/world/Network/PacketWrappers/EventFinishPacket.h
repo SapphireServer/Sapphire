@@ -3,7 +3,7 @@
 
 #include <Network/GamePacket.h>
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
@@ -26,10 +26,10 @@ namespace Sapphire::Network::Packets::Server
                      uint8_t param1,
                      uint32_t param3 )
     {
-      m_data.eventId = eventId;
-      m_data.param1 = param1;
-      m_data.param2 = 1;
-      m_data.param3 = param3;
+      m_data.handlerId = eventId;
+      m_data.event = param1;
+      m_data.result = 1;
+      m_data.eventArg = param3;
 
     };
   };

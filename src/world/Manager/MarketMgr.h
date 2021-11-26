@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_MARKETMGR_H
-#define SAPPHIRE_MARKETMGR_H
+#pragma once
 
 #include "ForwardsZone.h"
 
@@ -54,4 +53,3 @@ namespace Sapphire::World::Manager
 }
 
 
-#endif //SAPPHIRE_MARKETMGR_H

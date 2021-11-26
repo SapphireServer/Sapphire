@@ -7,7 +7,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Network/GamePacket.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Network/CommonNetwork.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketContainer.h>
@@ -19,19 +19,15 @@
 #include "Territory.h"
 #include "InstanceContent.h"
 #include "QuestBattle.h"
-#include "PublicContent.h"
 #include "Manager/TerritoryMgr.h"
 #include "Navi/NaviProvider.h"
 
 #include "Session.h"
 #include "Actor/Chara.h"
-#include "Actor/Actor.h"
+#include "Actor/GameObject.h"
 #include "Actor/BNpc.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
-#include "Actor/SpawnGroup.h"
-#include "Actor/SpawnPoint.h"
-#include "Actor/BNpcTemplate.h"
 
 #include "Action/EffectResult.h"
 
@@ -40,7 +36,7 @@
 #include "Script/ScriptMgr.h"
 
 #include "ForwardsZone.h"
-#include "ServerMgr.h"
+#include "WorldServer.h"
 #include "CellHandler.h"
 
 #include "Manager/RNGMgr.h"
@@ -48,33 +44,33 @@
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-/**
-* \brief
-*/
+#define START_EOBJ_ID 0x400D0000
+#define START_GAMEOBJECT_ID 0x500D0000
+
 Sapphire::Territory::Territory() :
   m_territoryTypeId( 0 ),
   m_guId( 0 ),
   m_currentWeather( Weather::FairSkies ),
   m_weatherOverride( Weather::None ),
   m_lastMobUpdate( 0 ),
-  m_nextEObjId( 0x400D0000 ),
-  m_nextActorId( 0x500D0000 )
+  m_nextEObjId( START_EOBJ_ID ),
+  m_nextActorId( START_GAMEOBJECT_ID )
 {
 }
 
-Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId,
-                                const std::string& internalName, const std::string& placeName ) :
+Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName ) :
   m_currentWeather( Weather::FairSkies ),
-  m_nextEObjId( 0x400D0000 ),
-  m_nextActorId( 0x500D0000 ),
+  m_nextEObjId( START_EOBJ_ID ),
+  m_nextActorId( START_GAMEOBJECT_ID ),
   m_lastUpdate( 0 ),
   m_lastActivityTime( Util::getTimeMs() )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   m_guId = guId;
 
   m_territoryTypeId = territoryTypeId;
@@ -83,11 +79,12 @@ Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId,
   m_lastMobUpdate = 0;
 
   m_weatherOverride = Weather::None;
-  m_territoryTypeInfo = exdData.get< Sapphire::Data::TerritoryType >( territoryTypeId );
-  m_bgPath = m_territoryTypeInfo->bg;
+  m_territoryTypeInfo = exdData.getRow< Component::Excel::TerritoryType >( territoryTypeId );
+  m_bgPath = m_territoryTypeInfo->getString( m_territoryTypeInfo->data().LVB );
 
   loadWeatherRates();
-  loadSpawnGroups();
+
+  loadBNpcs();
 
   m_currentWeather = getNextWeather();
 }
@@ -97,9 +94,10 @@ void Sapphire::Territory::loadWeatherRates()
   if( !m_territoryTypeInfo )
     return;
 
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  uint8_t weatherRateId = m_territoryTypeInfo->weatherRate > exdData.getWeatherRateIdList().size() ?
+  // EXD TODO: this must be different in 2.3
+/*  uint8_t weatherRateId = m_territoryTypeInfo->data().weatherRate > exdData.getWeatherRateIdList().size() ?
                           uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
 
   uint8_t sumPc = 0;
@@ -114,7 +112,7 @@ void Sapphire::Territory::loadWeatherRates()
     sumPc += std::get< uint8_t >( weatherRateFields[ i + 1 ] );
     m_weatherRateMap[ sumPc ] = weatherId;
     i += 2;
-  }
+  }*/
 }
 
 Sapphire::Territory::~Territory() = default;
@@ -123,15 +121,17 @@ bool Sapphire::Territory::init()
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  if( scriptMgr.onZoneInit( shared_from_this() ) )
+  if( scriptMgr.onZoneInit( *this ) )
   {
     // all good
   }
 
   auto& naviMgr = Common::Service< World::Manager::NaviMgr >::ref();
-  naviMgr.setupTerritory( m_territoryTypeInfo->bg );
+  std::string lvb = m_territoryTypeInfo->getString( m_territoryTypeInfo->data().LVB );
 
-  m_pNaviProvider = naviMgr.getNaviProvider( m_territoryTypeInfo->bg );
+  naviMgr.setupTerritory( lvb, m_guId );
+
+  m_pNaviProvider = naviMgr.getNaviProvider( lvb, m_guId );
 
   if( !m_pNaviProvider )
   {
@@ -158,6 +158,7 @@ const Sapphire::FestivalPair& Sapphire::Territory::getCurrentFestival() const
 
 void Sapphire::Territory::setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   m_currentFestival = { festivalId, additionalFestivalId };
 
   for( const auto& playerEntry : m_playerMap )
@@ -165,12 +166,8 @@ void Sapphire::Territory::setCurrentFestival( uint16_t festivalId, uint16_t addi
     auto player = playerEntry.second;
 
     auto enableFestival = makeActorControlSelf( player->getId(), SetFestival, festivalId, additionalFestivalId );
-    playerEntry.second->queuePacket( enableFestival );
+    server.queueForPlayer( playerEntry.second->getCharacterId(), enableFestival );
   }
-}
-
-void Sapphire::Territory::loadCellCache()
-{
 }
 
 Weather Sapphire::Territory::getNextWeather()
@@ -179,7 +176,7 @@ Weather Sapphire::Territory::getNextWeather()
   // Get Eorzea hour for weather start
   uint32_t bell = unixTime / 175;
   // Do the magic 'cause for calculations 16:00 is 0, 00:00 is 8 and 08:00 is 16
-  int32_t increment = ( ( bell + 8 - ( bell % 8 ) ) ) % 24;
+  uint32_t increment = ( ( bell + 8 - ( bell % 8 ) ) ) % 24;
 
   // Take Eorzea days since unix epoch
   uint32_t totalDays = ( unixTime / 4200 );
@@ -203,14 +200,14 @@ Weather Sapphire::Territory::getNextWeather()
   return Weather::FairSkies;
 }
 
-void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
+void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
 {
   float mx = pActor->getPos().x;
   float my = pActor->getPos().z;
   uint32_t cx = getPosX( mx );
   uint32_t cy = getPosY( my );
 
-  Cell* pCell = getCellPtr( cx, cy );
+  CellPtr pCell = getCellPtr( cx, cy );
   if( !pCell )
   {
     pCell = create( cx, cy );
@@ -219,7 +216,7 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
 
   pCell->addActor( pActor );
 
-  pActor->setCell( pCell );
+  pActor->setCellId( { cx, cy } );
 
   uint32_t cellX = getPosX( pActor->getPos().x );
   uint32_t cellY = getPosY( pActor->getPos().z );
@@ -265,11 +262,18 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
     updateCellActivity( cx, cy, 2 );
 
   }
+  else if( pActor->isEventObj() )
+  {
+    auto pEObj = pActor->getAsEventObj();
+
+    m_eventObjects[ pEObj->getId() ] = pEObj;
+  }
 }
 
-void Sapphire::Territory::removeActor( Entity::ActorPtr pActor )
+void Sapphire::Territory::removeActor( Entity::GameObjectPtr pActor )
 {
-  Cell* pCell = pActor->getCellPtr();
+  auto cellId = pActor->getCellId();
+  CellPtr pCell = getCellPtr( cellId.x, cellId.y );
   if( pCell && pCell->hasActor( pActor ) )
     pCell->removeActorFromCell( pActor );
 
@@ -298,6 +302,10 @@ void Sapphire::Territory::removeActor( Entity::ActorPtr pActor )
       m_pNaviProvider->removeAgent( *pActor->getAsChara() );
     m_bNpcMap.erase( pActor->getId() );
   }
+  else if( pActor->isEventObj() )
+  {
+    m_eventObjects.erase( pActor->getId() );
+  }
 
   // remove from lists of other actors
   pActor->removeFromInRange();
@@ -305,25 +313,23 @@ void Sapphire::Territory::removeActor( Entity::ActorPtr pActor )
 
 }
 
-void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
-                                          Network::Packets::FFXIVPacketBasePtr pPacketEntry )
+void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, float range, Network::Packets::FFXIVPacketBasePtr pPacketEntry )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
-  for( auto entry : m_playerMap )
+  for( const auto& entry : m_playerMap )
   {
     auto player = entry.second;
-    float distance = Util::distance( sourcePlayer.getPos().x, sourcePlayer.getPos().y, sourcePlayer.getPos().z,
-                                     player->getPos().x, player->getPos().y, player->getPos().z );
+    float distance = Util::distance( sourcePlayer.getPos(), player->getPos() );
 
     if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
     {
 
-      auto pSession = serverMgr.getSession( player->getId() );
+      auto pSession = server.getSession( player->getId() );
       //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
       if( pSession )
         pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
@@ -331,25 +337,20 @@ void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, uin
   }
 }
 
-void Sapphire::Territory::queuePacketForZone( Entity::Player& sourcePlayer,
-                                         Network::Packets::FFXIVPacketBasePtr pPacketEntry,
-                                         bool forSelf )
+void Sapphire::Territory::queuePacketForZone( Entity::Player& sourcePlayer, Network::Packets::FFXIVPacketBasePtr pPacketEntry, bool forSelf )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   if( teriMgr.isPrivateTerritory( getTerritoryTypeId() ) )
     return;
 
-  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
-  for( auto entry : m_playerMap )
+  for( const auto& entry : m_playerMap )
   {
     auto player = entry.second;
-    if( ( sourcePlayer.getId() != player->getId() ) ||
-        ( ( sourcePlayer.getId() == player->getId() ) && forSelf ) )
+    if( ( sourcePlayer.getId() != player->getId() ) || ( ( sourcePlayer.getId() == player->getId() ) && forSelf ) )
     {
-      auto pSession = serverMgr.getSession( player->getId() );
-      if( pSession )
-        pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
+      server.queueForPlayer( player->getCharacterId(), pPacketEntry );
     }
   }
 }
@@ -430,7 +431,7 @@ void Sapphire::Territory::updateBNpcs( uint64_t tickCount )
   }
 
   // Update loop may move actors from cell to cell, breaking iterator validity
-  std::vector< Entity::BNpcPtr > m_activeBNpc;
+  std::vector< Entity::BNpcPtr > activeBNpc;
 
   for( uint32_t y = 0; y < _sizeY; ++y )
   {
@@ -450,13 +451,13 @@ void Sapphire::Territory::updateBNpcs( uint64_t tickCount )
       for( const auto& actor : cell->m_actors )
       {
         if( actor->isBattleNpc() )
-          m_activeBNpc.push_back( actor->getAsBNpc() );
+          activeBNpc.push_back( actor->getAsBNpc() );
       }
     }
   }
 
   // iterate the cached active bnpcs
-  for( const auto& actor : m_activeBNpc )
+  for( const auto& actor : activeBNpc )
     actor->update( tickCount );
 
 }
@@ -471,15 +472,13 @@ bool Sapphire::Territory::update( uint64_t tickCount )
   //TODO: this should be moved to a updateWeather call and pulled out of updateSessions
   bool changedWeather = checkWeather();
 
-  auto dt = std::difftime( tickCount, m_lastUpdate ) / 1000.f;
+  auto dt = static_cast< float >( std::difftime( tickCount, m_lastUpdate ) / 1000.f );
 
   if( m_pNaviProvider )
     m_pNaviProvider->updateCrowd( dt );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
-
-  updateSpawnPoints();
 
   processEffectResults( tickCount );
 
@@ -493,6 +492,7 @@ bool Sapphire::Territory::update( uint64_t tickCount )
 
 void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeather )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   // update sessions in this zone
   for( auto it = m_playerMap.begin(); it != m_playerMap.end(); ++it )
   {
@@ -508,20 +508,25 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
     // this session is not linked to this area anymore, remove it from zone session list
     if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
     {
+      Logger::debug( "removeActor( pPlayer );" );
       removeActor( pPlayer );
       return;
     }
 
     if( changedWeather )
     {
-      auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherChange >( pPlayer->getId() );
-      weatherChangePacket->data().weatherId = static_cast< uint8_t >( m_currentWeather );
-      weatherChangePacket->data().delay = 5.0f;
-      pPlayer->queuePacket( weatherChangePacket );
+      auto weatherChangePacket = makeZonePacket< FFXIVIpcWeatherId >( pPlayer->getId() );
+      weatherChangePacket->data().WeatherId = static_cast< uint8_t >( m_currentWeather );
+      weatherChangePacket->data().TransitionTime = 5.0f;
+      server.queueForPlayer( pPlayer->getCharacterId(), weatherChangePacket );
     }
 
     // perform session duties
-    pPlayer->getSession()->update();
+    auto playerSession = server.getSession( pPlayer->getCharacterId() );
+    if( playerSession )
+    {
+      playerSession->update();
+    }
 
     // this session is not linked to this area anymore, remove it from zone session list
     if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
@@ -538,7 +543,7 @@ bool Sapphire::Territory::isCellActive( uint32_t x, uint32_t y )
   uint32_t posX;
   uint32_t posY;
 
-  Cell* pCell;
+  CellPtr pCell;
 
   for( posX = startX; posX <= endX; posX++ )
   {
@@ -563,7 +568,7 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
   uint32_t startY = y - radius > 0 ? y - radius : 0;
   uint32_t posX, posY;
 
-  Cell* pCell;
+  CellPtr pCell;
 
   for( posX = startX; posX <= endX; posX++ )
   {
@@ -603,7 +608,7 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
   }
 }
 
-void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
+void Sapphire::Territory::updateActorPosition( Entity::GameObject& actor )
 {
 
   if( actor.getCurrentTerritory() != shared_from_this() )
@@ -618,8 +623,8 @@ void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
     return;
 
   auto pCell = getCellPtr( cellX, cellY );
-
-  auto pOldCell = actor.getCellPtr();
+  auto oldCellId = actor.getCellId();
+  auto pOldCell = getCellPtr( oldCellId.x, oldCellId.y );
   if( !pCell )
   {
     pCell = create( cellX, cellY );
@@ -636,7 +641,7 @@ void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
     }
 
     pCell->addActor( actor.shared_from_this() );
-    actor.setCell( pCell );
+    actor.setCellId( { cellX, cellY } );
     pOldCell = pCell;
 
     // if player we need to update cell activity
@@ -645,7 +650,7 @@ void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
     if( actor.isPlayer() )
     {
       updateCellActivity( cellX, cellY, 2 );
-      if( pOldCell != nullptr )
+      if( pOldCell )
       {
         // only do the second check if theres -/+ 2 difference
         if( abs( ( int32_t ) cellX - ( int32_t ) pOldCell->m_posX ) > 2 ||
@@ -674,7 +679,7 @@ void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
 }
 
 
-void Sapphire::Territory::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell )
+void Sapphire::Territory::updateInRangeSet( Entity::GameObjectPtr pActor, CellPtr pCell )
 {
   if( pCell == nullptr )
     return;
@@ -698,7 +703,10 @@ void Sapphire::Territory::updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell
 
     float distance = Util::distance( pCurAct->getPos(), pActor->getPos() );
 
-    bool isInRange = ( fRange == 0.0f || distance <= fRange );
+    bool isInRange = ( fRange == 0.0f || distance <= fRange ) &&
+                     ( pCurAct->getCurrentTerritory() && pActor->getCurrentTerritory() ) &&
+                     ( pCurAct->getCurrentTerritory()->getGuId() == pActor->getCurrentTerritory()->getGuId() );
+
     bool isInRangeSet = pActor->isInRangeSet( pCurAct );
 
     // Add if range == 0 or distance is withing range.
@@ -735,6 +743,7 @@ void Sapphire::Territory::onLeaveTerritory( Entity::Player& player )
 
 void Sapphire::Territory::onUpdate( uint64_t tickCount )
 {
+  updateSpawnPoints();
   updateBNpcs( tickCount );
 }
 
@@ -760,8 +769,6 @@ void Sapphire::Territory::registerEObj( Entity::EventObjectPtr object )
 
   pushActor( object );
 
-  m_eventObjects[ object->getId() ] = object;
-
   onRegisterEObj( object );
 
   //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
@@ -776,11 +783,6 @@ Sapphire::Entity::EventObjectPtr Sapphire::Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
-Sapphire::Event::DirectorPtr Sapphire::Territory::getAsDirector()
-{
-  return std::dynamic_pointer_cast< Event::Director, Territory >( shared_from_this() );
-}
-
 Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );
@@ -789,11 +791,6 @@ Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 Sapphire::QuestBattlePtr Sapphire::Territory::getAsQuestBattle()
 {
   return std::dynamic_pointer_cast< QuestBattle, Territory >( shared_from_this() );
-}
-
-Sapphire::PublicContentPtr Sapphire::Territory::getAsPublicContent()
-{
-  return std::dynamic_pointer_cast< PublicContent, Territory >( shared_from_this() );
 }
 
 uint32_t Sapphire::Territory::getNextEObjId()
@@ -806,109 +803,47 @@ uint32_t Sapphire::Territory::getNextActorId()
   return ++m_nextActorId;
 }
 
-
 Sapphire::Entity::EventObjectPtr Sapphire::Territory::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
                                                                uint8_t state, FFXIVARR_POSITION3 pos, float scale,
                                                                float rotation )
 {
   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, rotation, name );
   eObj->setScale( scale );
+  eObj->setCurrentZone( shared_from_this() );
+
   registerEObj( eObj );
 
   return eObj;
 }
 
-Sapphire::Data::TerritoryTypePtr Sapphire::Territory::getTerritoryTypeInfo() const
+std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > Sapphire::Territory::getTerritoryTypeInfo() const
 {
   return m_territoryTypeInfo;
 }
 
-bool Sapphire::Territory::loadSpawnGroups()
-{
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNGROUPS );
-  stmt->setUInt( 1, getTerritoryTypeId() );
-  auto res = db.query( stmt );
-
-  while( res->next() )
-  {
-    uint32_t id = res->getUInt( 1 );
-    uint32_t templateId = res->getUInt( 2 );
-    uint32_t level = res->getUInt( 3 );
-    uint32_t maxHp = res->getUInt( 4 );
-
-    m_spawnGroups.emplace_back( id, templateId, level, maxHp );
-
-    Logger::trace( "id: {0}, template: {1}, level: {2}, maxHp: {3}", id, m_spawnGroups.back().getTemplateId(), level, maxHp );
-  }
-
-  res.reset();
-  stmt.reset();
-
-  stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_SPAWNPOINTS );
-  for( auto& group : m_spawnGroups )
-  {
-    stmt->setUInt( 1, group.getId() );
-    auto res = db.query( stmt );
-
-    while( res->next() )
-    {
-      uint32_t id = res->getUInt( 1 );
-      float x = res->getFloat( 2 );
-      float y = res->getFloat( 3 );
-      float z = res->getFloat( 4 );
-      float r = res->getFloat( 5 );
-      uint32_t gimmickId = res->getUInt( 6 );
-
-      group.getSpawnPointList().emplace_back( std::make_shared< Entity::SpawnPoint >( x, y, z, r, gimmickId ) );
-
-      Logger::trace( "id: {0}, x: {1}, y: {2}, z: {3}, gimmickId: {4}", id, x, y, z, gimmickId );
-    }
-  }
-  return false;
-}
-
 void Sapphire::Territory::updateSpawnPoints()
 {
+
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto rng = RNGMgr.getRandGenerator< float >( 0.f, PI * 2 );
 
-  for( auto& group : m_spawnGroups )
+  for( auto& spawn : m_spawnInfo )
   {
-    for( auto& point : group.getSpawnPointList() )
+    if( !spawn.bnpcPtr && ( Util::getTimeSeconds() - spawn.timeOfDeath ) > spawn.infoPtr->PopInterval )
     {
-      if( !point->getLinkedBNpc() && ( Util::getTimeSeconds() - point->getTimeOfDeath() ) > 60 )
-      {
-        auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+      auto& server = Common::Service< World::WorldServer >::ref();
+      auto pBNpc = std::make_shared< Entity::BNpc >( spawn.infoPtr->instanceId, spawn.infoPtr, shared_from_this() );
+      spawn.bnpcPtr = pBNpc;
 
-        auto bNpcTemplate = serverMgr.getBNpcTemplate( group.getTemplateId() );
+      pushActor( pBNpc );
+    }
+    else if( spawn.bnpcPtr && !spawn.bnpcPtr->isAlive() )
+    {
+      spawn.timeOfDeath = Util::getTimeSeconds();
+      spawn.bnpcPtr.reset();
 
-        if( !bNpcTemplate )
-        {
-          //Logger::error( "No template found for templateId#{0}", group.getTemplateId() );
-          continue;
-        }
-
-        auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(),
-                                                       bNpcTemplate,
-                                                       point->getPosX(),
-                                                       point->getPosY(),
-                                                       point->getPosZ(),
-                                                       rng.next(),
-                                                       group.getLevel(),
-                                                       group.getMaxHp(), shared_from_this() );
-        point->setLinkedBNpc( pBNpc );
-
-        pushActor( pBNpc );
-      }
-      else if( point->getLinkedBNpc() && !point->getLinkedBNpc()->isAlive() )
-      {
-        point->setTimeOfDeath( Util::getTimeSeconds() );
-        point->setLinkedBNpc( nullptr );
-      }
     }
   }
-
 }
 
 uint32_t Sapphire::Territory::getNextEffectSequence()
@@ -916,106 +851,23 @@ uint32_t Sapphire::Territory::getNextEffectSequence()
   return m_effectCounter++;
 }
 
-Sapphire::Entity::BNpcPtr
-  Sapphire::Territory::createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
-                                            uint32_t hp, uint16_t nameId, uint32_t directorId,
-                                            uint8_t bnpcType )
+Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto levelData = exdData.get< Sapphire::Data::Level >( levelId );
-  if( !levelData )
+  auto infoPtr = m_bNpcBaseMap.find( levelId );
+  if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
-  if( levelData->type != 9 )
-    return nullptr;
+  auto pBNpc = std::make_shared< Entity::BNpc >( infoPtr->second->instanceId, infoPtr->second, shared_from_this(), hp, bnpcType );
 
-  auto bnpcBaseId = levelData->object;
-
-  auto bnpcBaseData = exdData.get< Sapphire::Data::BNpcBase >( bnpcBaseId );
-  if( !bnpcBaseData )
-    return nullptr;
-
-  //BNpcTemplate( uint32_t id, uint32_t baseId, uint32_t nameId, uint64_t weaponMain, uint64_t weaponSub,
-  //  uint8_t aggressionMode, uint8_t enemyType, uint8_t onlineStatus, uint8_t pose,
-  //  uint16_t modelChara, uint32_t displayFlags, uint32_t* modelEquip,
-  //  uint8_t* customize )
-
-  std::vector< uint8_t > customize( 26 );
-  if( bnpcBaseData->bNpcCustomize != 0 )
-  {
-    auto bnpcCustomizeData = exdData.get< Sapphire::Data::BNpcCustomize >( bnpcBaseData->bNpcCustomize );
-    if( bnpcCustomizeData )
-    {
-      customize[0] = bnpcCustomizeData->race;
-      customize[1] = bnpcCustomizeData->gender;
-      customize[2] = bnpcCustomizeData->bodyType;
-      customize[3] = bnpcCustomizeData->height;
-      customize[4] = bnpcCustomizeData->tribe;
-      customize[5] = bnpcCustomizeData->face;
-      customize[6] = bnpcCustomizeData->hairStyle;
-      customize[7] = bnpcCustomizeData->hairHighlight;
-      customize[8] = bnpcCustomizeData->skinColor;
-      customize[9] = bnpcCustomizeData->eyeHeterochromia;
-      customize[10] = bnpcCustomizeData->hairColor;
-      customize[11] = bnpcCustomizeData->hairHighlightColor;
-      customize[12] = bnpcCustomizeData->facialFeature;
-      customize[13] = bnpcCustomizeData->facialFeatureColor;
-      customize[14] = bnpcCustomizeData->eyebrows;
-      customize[15] = bnpcCustomizeData->eyeColor;
-      customize[16] = bnpcCustomizeData->eyeShape;
-      customize[17] = bnpcCustomizeData->nose;
-      customize[18] = bnpcCustomizeData->jaw;
-      customize[19] = bnpcCustomizeData->mouth;
-      customize[20] = bnpcCustomizeData->lipColor;
-      customize[21] = bnpcCustomizeData->bustOrTone1;
-      customize[22] = bnpcCustomizeData->extraFeature1;
-      customize[23] = bnpcCustomizeData->extraFeature2OrBust;
-      customize[24] = bnpcCustomizeData->facePaint;
-      customize[25] = bnpcCustomizeData->facePaintColor;
-    }
-  }
-
-  std::vector< uint32_t > models( 10 );
-  uint64_t modelMain = 0;
-  uint64_t modeloff = 0;
-  if( bnpcBaseData->npcEquip != 0 )
-  {
-    auto npcEquipData = exdData.get< Sapphire::Data::NpcEquip >( bnpcBaseData->npcEquip );
-    if( npcEquipData )
-    {
-      modelMain = npcEquipData->modelMainHand;
-      modeloff = npcEquipData->modelOffHand;
-
-      models[0] = npcEquipData->modelHead;
-      models[1] = npcEquipData->modelBody;
-      models[2] = npcEquipData->modelHands;
-      models[3] = npcEquipData->modelLegs;
-      models[4] = npcEquipData->modelFeet;
-      models[5] = npcEquipData->modelEars;
-      models[6] = npcEquipData->modelNeck;
-      models[7] = npcEquipData->modelWrists;
-      models[8] = npcEquipData->modelLeftRing;
-      models[9] = npcEquipData->modelRightRing;
-    }
-  }
-
-  auto tmp = std::make_shared< Entity::BNpcTemplate >( 0, bnpcBaseId, nameId, modelMain, modeloff, 1, bnpcType, 0, 4,
-                                                       bnpcBaseData->modelChara, 0, &models[0], &customize[0] );
-
-  auto bnpc = std::make_shared< Entity::BNpc >( getNextActorId(), tmp, levelData->x, levelData->y, levelData->z,
-                                                levelData->yaw, level, hp, shared_from_this() );
-
-  bnpc->setDirectorId( directorId );
-  bnpc->setLevelId( levelId );
-  pushActor( bnpc );
-  return bnpc;
+  pushActor( pBNpc );
+  return pBNpc;
 }
 
-Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByLevelId( uint32_t levelId )
+Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByInstanceId( uint32_t instanceId )
 {
   for( const auto& bnpcIt : m_bNpcMap )
   {
-    if( bnpcIt.second->getLevelId() == levelId )
+    if( bnpcIt.second->getId() == instanceId )
       return bnpcIt.second;
   }
   return nullptr;
@@ -1051,17 +903,80 @@ void Sapphire::Territory::processEffectResults( uint64_t tickCount )
   }
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::Territory::getPlayer( uint32_t charId )
+bool Sapphire::Territory::loadBNpcs()
 {
-  return m_playerMap[ charId ];
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCS_BY_TERI );
+  stmt->setUInt( 1, getTerritoryTypeId() );
+  auto res = db.query( stmt );
+
+  while( res->next() )
+  {
+
+    auto bnpc = std::make_shared< Common::BNPCInstanceObject >();
+
+    bnpc->territoryType = res->getInt( 1 );
+    bnpc->bnpcName = res->getString( 3 );
+    bnpc->instanceId = res->getInt( 4 );
+    bnpc->x = res->getFloat( 5 );
+    bnpc->y = res->getFloat( 6 );
+    bnpc->z = res->getFloat( 7 );
+    bnpc->BaseId = res->getInt( 8 );
+    bnpc->PopWeather = res->getInt( 9 );
+    bnpc->PopTimeStart = res->getInt( 10 );
+    bnpc->PopTimeEnd = res->getInt( 11 );
+    bnpc->MoveAI = res->getInt( 12 );
+    bnpc->WanderingRange = res->getInt( 13 );
+    bnpc->Route = res->getInt( 14 );
+    bnpc->EventGroup = res->getInt( 15 );
+    bnpc->NameId = res->getInt( 16 );
+    bnpc->DropItem = res->getInt( 17 );
+    bnpc->SenseRangeRate = res->getFloat( 18 );
+    bnpc->Level = res->getInt( 19 );
+    bnpc->ActiveType = res->getInt( 20 );
+    bnpc->PopInterval = res->getInt( 21 );
+    bnpc->PopRate = res->getInt( 22 );
+    bnpc->PopEvent = res->getInt( 23 );
+    bnpc->LinkGroup = res->getInt( 24 );
+    bnpc->LinkFamily = res->getInt( 25 );
+    bnpc->LinkRange = res->getInt( 26 );
+    bnpc->LinkCountLimit = res->getInt( 27 );
+    bnpc->NonpopInitZone = res->getInt( 28 );
+    bnpc->InvalidRepop = res->getInt( 29 );
+    bnpc->LinkParent = res->getInt( 30 );
+    bnpc->LinkOverride = res->getInt( 31 );
+    bnpc->LinkReply = res->getInt( 32 );
+    bnpc->HorizontalPopRange = res->getFloat( 33 );
+    bnpc->VerticalPopRange = res->getFloat( 34 );
+    bnpc->BNpcBaseData = res->getInt( 35 );
+    bnpc->RepopId = res->getInt( 36 );
+    bnpc->BNPCRankId = res->getInt( 37 );
+    bnpc->TerritoryRange = res->getInt( 38 );
+    bnpc->BoundInstanceID = res->getInt( 39 );
+    bnpc->FateLayoutLabelId = res->getInt( 40 );
+    bnpc->NormalAI = res->getInt( 41 );
+    bnpc->ServerPathId = res->getInt( 42 );
+    bnpc->EquipmentID = res->getInt( 43 );
+    bnpc->CustomizeID = res->getInt( 44 );
+    bnpc->rotation = res->getFloat( 45 );
+
+    m_bNpcBaseMap[ bnpc->instanceId ] = bnpc;
+
+    SpawnInfo info;
+    info.bnpcPtr = nullptr;
+    info.infoPtr = bnpc;
+    info.lastSpawn = 0;
+    info.timeOfDeath = 0;
+
+    m_spawnInfo.emplace_back( info );
+
+
+  }
+  return true;
 }
 
-void Sapphire::Territory::foreachPlayer( std::function< void( Sapphire::Entity::PlayerPtr player ) > callback )
+void Sapphire::Territory::onEventHandlerOrder( Sapphire::Entity::Player& player, uint32_t arg0, uint32_t arg1,
+                                               uint32_t arg2, uint32_t arg3, uint32_t arg4 )
 {
-  if( !callback )
-    return;
-  for( auto entry : m_playerMap )
-  {
-    callback( entry.second );
-  }
+
 }

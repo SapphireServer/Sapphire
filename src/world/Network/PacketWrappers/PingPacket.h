@@ -5,17 +5,17 @@
 
 #include "Forwards.h"
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
   * @brief The Ping response packet.
   */
-  class PingPacket : public ZoneChannelPacket< FFXIVIpcPing >
+  class PingPacket : public ZoneChannelPacket< FFXIVIpcSync >
   {
   public:
     PingPacket( Entity::Player& player, int32_t inVal ) :
-      ZoneChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
+      ZoneChannelPacket< FFXIVIpcSync >( player.getId(), player.getId() )
     {
       initialize( player, inVal );
     };

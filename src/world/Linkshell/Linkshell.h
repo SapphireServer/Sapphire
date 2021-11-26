@@ -1,5 +1,4 @@
-#ifndef CORE_LINKSHELL_H
-#define CORE_LINKSHELL_H
+#pragma once
 
 #include <Common.h>
 #include <set>
@@ -23,14 +22,17 @@ namespace Sapphire
     std::set< uint64_t > m_leaderIds;
     /*! list of IDs of pending character invites */
     std::set< uint64_t > m_inviteIds;
+    /*! chat channel ID associated with linkshell */
+    uint64_t m_chatChannelId;
 
   public:
     Linkshell( uint64_t id,
-               const std::string& name,
+               std::string  name,
+               uint64_t chatChannelId,
                uint64_t masterId,
-               const std::set< uint64_t >& members,
-               const std::set< uint64_t >& leaders,
-               const std::set< uint64_t >& invites );
+               std::set< uint64_t >  members,
+               std::set< uint64_t >  leaders,
+               std::set< uint64_t >  invites );
 
     uint64_t getId() const;
 
@@ -50,6 +52,8 @@ namespace Sapphire
 
     std::set< uint64_t >& getInviteIdList();
 
+    uint64_t getChatChannel() const;
+
     void addMember( uint64_t memberId );
 
     void removeMember( uint64_t memberId );
@@ -65,4 +69,3 @@ namespace Sapphire
   };
 
 }
-#endif //SAPPHIRE_LINKSHELL_H

@@ -9,14 +9,24 @@
 #include <Network/GamePacket.h>
 
 #include <Database/DatabaseDef.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Service.h>
 
+#include "WorldServer.h"
+#include "Session.h"
+#include "Network/GameConnection.h"
+
+using namespace Sapphire::Common;
+using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::Entity::Player& player,
                                                                      Sapphire::ItemContainerPtr container )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto pSession = server.getSession( player.getCharacterId() );
+
   auto sequence = player.getNextInventorySequence();
   auto pMap = container->getItemMap();
 
@@ -27,48 +37,49 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
 
     if( container->getId() == Common::InventoryType::Currency || container->getId() == Common::InventoryType::Crystal )
     {
-      auto currencyInfoPacket = makeZonePacket< Server::FFXIVIpcCurrencyCrystalInfo >( player.getId() );
-      currencyInfoPacket->data().containerSequence = sequence;
-      currencyInfoPacket->data().catalogId = itM->second->getId();
-      currencyInfoPacket->data().unknown = 1;
-      currencyInfoPacket->data().quantity = itM->second->getStackSize();
-      currencyInfoPacket->data().containerId = container->getId();
-      currencyInfoPacket->data().slot = 0;
+      auto currencyInfoPacket = makeZonePacket< FFXIVIpcGilItem >( player.getId() );
+      currencyInfoPacket->data().contextId = sequence;
+      currencyInfoPacket->data().item.catalogId = itM->second->getId();
+      currencyInfoPacket->data().item.subquarity = 1;
+      currencyInfoPacket->data().item.stack = itM->second->getStackSize();
+      currencyInfoPacket->data().item.storageId = container->getId();
+      currencyInfoPacket->data().item.containerIndex = 0;
 
-      player.queuePacket( currencyInfoPacket );
+      server.queueForPlayer( player.getCharacterId(), currencyInfoPacket );
     }
     else
     {
-      auto itemInfoPacket = makeZonePacket< Server::FFXIVIpcItemInfo >( player.getId() );
-      itemInfoPacket->data().containerSequence = sequence;
-      itemInfoPacket->data().containerId = container->getId();
-      itemInfoPacket->data().slot = itM->first;
-      itemInfoPacket->data().quantity = itM->second->getStackSize();
-      itemInfoPacket->data().catalogId = itM->second->getId();
-      itemInfoPacket->data().condition = itM->second->getDurability();
-      itemInfoPacket->data().spiritBond = itM->second->getSpiritbond();
-      itemInfoPacket->data().reservedFlag = itM->second->getReservedFlag();
-      itemInfoPacket->data().hqFlag = static_cast< uint8_t >( itM->second->isHq() ? 1 : 0 );
-      itemInfoPacket->data().stain = itM->second->getStain();
+      auto itemInfoPacket = makeZonePacket< FFXIVIpcNormalItem >( player.getId() );
+      itemInfoPacket->data().contextId = sequence;
+      itemInfoPacket->data().item.storageId = container->getId();
+      itemInfoPacket->data().item.containerIndex = itM->first;
+      itemInfoPacket->data().item.stack = itM->second->getStackSize();
+      itemInfoPacket->data().item.catalogId = itM->second->getId();
+      itemInfoPacket->data().item.durability = itM->second->getDurability();
+//      itemInfoPacket->data().spiritBond = itM->second->getSpiritbond();
+//      itemInfoPacket->data().reservedFlag = itM->second->getReservedFlag();
+      // todo: not sure if correct flag?
+      itemInfoPacket->data().item.flags = static_cast< uint8_t >( itM->second->isHq() ? 1 : 0 );
+      itemInfoPacket->data().item.stain = itM->second->getStain();
 
-      player.queuePacket( itemInfoPacket );
+      server.queueForPlayer( player.getCharacterId(), itemInfoPacket );
     }
   }
 
-  auto containerInfoPacket = makeZonePacket< Server::FFXIVIpcContainerInfo >( player.getId() );
-  containerInfoPacket->data().containerSequence = sequence;
-  containerInfoPacket->data().numItems = container->getEntryCount();
-  containerInfoPacket->data().containerId = container->getId();
+  auto itemSizePacket = makeZonePacket< FFXIVIpcItemSize >( player.getId() );
+  itemSizePacket->data().contextId = sequence;
+  itemSizePacket->data().size = container->getEntryCount();
+  itemSizePacket->data().storageId = container->getId();
 
-  player.queuePacket( containerInfoPacket );
+  server.queueForPlayer( player.getCharacterId(), itemSizePacket );
 }
 
 Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Player& player,
                                                                       uint32_t catalogId, uint32_t quantity )
 {
-  auto& pExdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& pExdData = Common::Service< Data::ExdData >::ref();
   auto& itemMgr = Common::Service< Manager::ItemMgr >::ref();
-  auto itemInfo = pExdData.get< Sapphire::Data::Item >( catalogId );
+  auto itemInfo = pExdData.getRow< Component::Excel::Item >( catalogId );
 
   if( !itemInfo )
     return nullptr;
@@ -143,15 +154,15 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
 
   stmt->setUInt64( 1, item->getUId() );
 
-  stmt->setDouble( 2, static_cast< double >( pos.x ) );
-  stmt->setDouble( 3, static_cast< double >( pos.y ) );
-  stmt->setDouble( 4, static_cast< double >( pos.z ) );
-  stmt->setDouble( 5, static_cast< double >( rot ) );
+  stmt->setUInt( 2, pos.x );
+  stmt->setUInt( 3, pos.y );
+  stmt->setUInt( 4, pos.z );
+  stmt->setInt( 5, rot );
 
-  stmt->setDouble( 6, static_cast< double >( pos.x ) );
-  stmt->setDouble( 7, static_cast< double >( pos.y ) );
-  stmt->setDouble( 8, static_cast< double >( pos.z ) );
-  stmt->setDouble( 9, static_cast< double >( rot ) );
+  stmt->setUInt( 6, pos.x );
+  stmt->setUInt( 7, pos.y );
+  stmt->setUInt( 8, pos.z );
+  stmt->setInt( 9, rot );
 
   db.execute( stmt );
 }

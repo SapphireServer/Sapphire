@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_EFFECTRESULT_H
-#define SAPPHIRE_EFFECTRESULT_H
+#pragma once
 
 #include <ForwardsZone.h>
 #include <Common.h>
@@ -29,7 +28,7 @@ namespace Sapphire::World::Action
 
     uint64_t getDelay();
 
-    Common::EffectEntry buildEffectEntry() const;
+    Common::CalcResultParam buildEffectEntry() const;
 
     void execute();
 
@@ -48,5 +47,3 @@ namespace Sapphire::World::Action
     Common::ActionEffectResultFlag m_flag;
   };
 }
-
-#endif //SAPPHIRE_EFFECTRESULT_H

@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_ITEMMGR_H
-#define SAPPHIRE_ITEMMGR_H
+#pragma once
 
 #include <Common.h>
 #include "ForwardsZone.h"
@@ -20,10 +19,8 @@ namespace Sapphire::World::Manager
     static bool isOneHandedWeapon( Common::ItemUICategory weaponCategory );
     static bool isArmory( uint16_t containerId );
     static bool isEquipment( uint16_t containerId );
-    static uint16_t getCharaEquipSlotCategoryToArmoryId( Common::EquipSlotCategory slot );
+    static uint16_t getCharaEquipSlotCategoryToArmoryId( uint8_t slotId );
     static Common::ContainerType getContainerType( uint32_t containerId );
   };
 
 }
-
-#endif //SAPPHIRE_ITEMMGR_H

@@ -4,13 +4,15 @@
 #include <Manager/HousingMgr.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/CommonActorControl.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Service.h>
-
+#include <WorldServer.h>
+#include "Manager/PlayerMgr.h"
 
 using namespace Sapphire;
 using namespace Network;
 using namespace Packets;
+using namespace WorldPackets;
 using namespace Server;
 using namespace Sapphire::World::Manager;
 
@@ -26,7 +28,7 @@ public:
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
       // Purchase Land
-      if( result.param2 == 2 )
+      if( result.getResult( 0 ) == 1 )
       {
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();
@@ -36,40 +38,41 @@ public:
         auto& pHouMgr = Common::Service< HousingMgr >::ref();
 
         LandPurchaseResult res = pHouMgr.purchaseLand( player, activeLand.plot,
-                                                        static_cast< uint8_t >( result.param2 ) );
+                                                        static_cast< uint8_t >( result.getResult( 0 ) ) );
 
+        auto& server = Common::Service< World::WorldServer >::ref();
         switch( res )
         {
           case LandPurchaseResult::SUCCESS:
           {
             auto screenMsgPkt = makeActorControlSelf( player.getId(), ActorControl::DutyQuestScreenMsg, m_id, 0x98 );
-            player.queuePacket( screenMsgPkt );
+            server.queueForPlayer( player.getCharacterId(), screenMsgPkt );
 
-            player.sendLogMessage( 0x0D16, pTerritory->getTerritoryTypeInfo()->placeName, activeLand.ward + 1, activeLand.plot + 1 );
+            PlayerMgr::sendLogMessage( player, 0x0D16, pTerritory->getTerritoryTypeInfo()->data().Area, activeLand.ward + 1, activeLand.plot + 1 );
             break;
           }
 
           case LandPurchaseResult::ERR_NOT_ENOUGH_GIL:
           {
-            player.sendLogMessage( 3314 );
+            PlayerMgr::sendLogMessage( player, 3314 );
             break;
           }
 
           case LandPurchaseResult::ERR_NOT_AVAILABLE:
           {
-            player.sendLogMessage( 3312 );
+            PlayerMgr::sendLogMessage( player, 3312 );
             break;
           }
 
           case LandPurchaseResult::ERR_NO_MORE_LANDS_FOR_CHAR:
           {
-            player.sendLogMessage( 3313 );
+            PlayerMgr::sendLogMessage( player, 3313 );
             break;
           }
 
           case LandPurchaseResult::ERR_INTERNAL:
           {
-            player.sendLogMessage( 1995 );
+            PlayerMgr::sendLogMessage( player, 1995 );
             break;
           }
         }
@@ -78,7 +81,7 @@ public:
       return LandPurchaseResult::ERR_INTERNAL;
     };
 
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, callback );
 
   }
 

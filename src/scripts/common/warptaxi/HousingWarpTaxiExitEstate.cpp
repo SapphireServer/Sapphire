@@ -13,11 +13,11 @@ public:
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    player.playScene( eventId, 0, 0, []( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playScene( player, eventId, 0, 0, [ & ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      if( result.param2 == 1 )
+      if( result.getResult( 0 ) == 1 )
       {
-        player.eventFinish( result.eventId, 1 );
+        eventMgr().eventFinish( player, result.eventId, 1 );
         player.exitInstance();
       }
     } );

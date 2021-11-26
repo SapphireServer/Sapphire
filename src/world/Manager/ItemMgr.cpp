@@ -4,7 +4,7 @@
 #include "Inventory/Item.h"
 #include <Network/CommonActorControl.h>
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
@@ -27,56 +27,56 @@ bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 }
 
 
-uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( Common::EquipSlotCategory slot )
+uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
 {
 
-  switch( slot )
+  switch( slotId )
   {
-    case Common::EquipSlotCategory::Head:
+    case Common::CharaHead:
       return Common::ArmoryHead;
 
-    case Common::EquipSlotCategory::Body:
-    case Common::EquipSlotCategory::BodyDisallowHead:
-    case Common::EquipSlotCategory::BodyDisallowHandsLegsFeet:
-    case Common::EquipSlotCategory::BodyDisallowAll:
-    case Common::EquipSlotCategory::BodyDisallowHands:
-    case Common::EquipSlotCategory::BodyDisallowLegsFeet:
+    case Common::CharaBody:
+    case Common::BodyDisallowHead:
+    case Common::BodyDisallowHandsLegsFeet:
+    case Common::BodyDisallowAll:
+    case Common::BodyDisallowHands:
+    case Common::BodyDisallowLegsFeet:
       return Common::ArmoryBody;
 
-    case Common::EquipSlotCategory::Ears:
+    case Common::CharaEars:
       return Common::ArmoryEar;
 
-    case Common::EquipSlotCategory::Feet:
+    case Common::CharaFeet:
       return Common::ArmoryFeet;
 
-    case Common::EquipSlotCategory::Hands:
+    case Common::CharaHands:
       return Common::ArmoryHand;
 
-    case Common::EquipSlotCategory::Legs:
-    case Common::EquipSlotCategory::LegsDisallowFeet:
+    case Common::CharaLegs:
+    case Common::LegsDisallowFeet:
       return Common::ArmoryLegs;
 
-    case Common::EquipSlotCategory::MainHand:
-    case Common::EquipSlotCategory::MainTwoHandedWeapon:
-    //case Common::EquipSlotCategory::MainOrOffHand:
+    case Common::CharaMainHand:
+    case Common::MainTwoHandedWeapon:
+    case Common::MainOrOffHand:
       return Common::ArmoryMain;
 
-    case Common::EquipSlotCategory::OffHand:
+    case Common::CharaOffHand:
       return Common::ArmoryOff;
 
-    case Common::EquipSlotCategory::Ring:
+    case Common::CharaRing:
       return Common::ArmoryRing;
 
-    case Common::EquipSlotCategory::Waist:
+    case Common::CharaWaist:
       return Common::ArmoryWaist;
 
-    case Common::EquipSlotCategory::Wrist:
+    case Common::CharaWrist:
       return Common::ArmoryWrist;
 
-    case Common::EquipSlotCategory::Neck:
+    case Common::CharaNeck:
       return Common::ArmoryNeck;
 
-    case Common::EquipSlotCategory::SoulCrystal:
+    case Common::CharaSoulCrystal:
       return Common::ArmorySoulCrystal;
 
     default:
@@ -116,7 +116,7 @@ bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategor
 
 Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   //  1 catalogId, 2 stack, 3 reservedFlag, 4 signatureId, 5 flags, 6 durability, 7 refine, 8 materia_0, 9 materia_1,
@@ -131,7 +131,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 
   try
   {
-    auto itemInfo = exdData.get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
+    auto itemInfo = exdData.getRow< Component::Excel::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
     ItemPtr pItem = make_Item( uId,

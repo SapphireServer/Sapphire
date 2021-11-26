@@ -1,5 +1,4 @@
-#ifndef _NAVIPROVIDER_H_
-#define _NAVIPROVIDER_H_
+#pragma once
 
 #include <Common.h>
 #include "ForwardsZone.h"
@@ -97,5 +96,3 @@ namespace Sapphire::World::Navi
   };
 
 }
-
-#endif

@@ -1,7 +1,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Network/PacketContainer.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
@@ -27,12 +27,11 @@
 
 #include "StatusEffect/StatusEffect.h"
 
-#include "ServerMgr.h"
+#include "WorldServer.h"
 #include "Session.h"
 #include "Chara.h"
 #include "Player.h"
 #include "BNpc.h"
-#include "BNpcTemplate.h"
 
 #include "Common.h"
 
@@ -40,11 +39,12 @@
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Manager/PlayerMgr.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Sapphire::Entity::BNpc::BNpc() :
@@ -52,29 +52,47 @@ Sapphire::Entity::BNpc::BNpc() :
 {
 }
 
-Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-                              uint8_t level, uint32_t maxHp, TerritoryPtr pZone ) :
+Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone ) :
   Npc( ObjKind::BattleNpc )
 {
   m_id = id;
-  m_modelChara = pTemplate->getModelChara();
-  m_displayFlags = pTemplate->getDisplayFlags();
-  m_pose = pTemplate->getPose();
-  m_aggressionMode = pTemplate->getAggressionMode();
-  m_weaponMain = pTemplate->getWeaponMain();
-  m_weaponSub = pTemplate->getWeaponSub();
-  m_bNpcNameId = pTemplate->getBNpcNameId();
-  m_bNpcBaseId = pTemplate->getBNpcBaseId();
-  m_enemyType = pTemplate->getEnemyType();
-  m_pos.x = posX;
-  m_pos.y = posY;
-  m_pos.z = posZ;
-  m_rot = rot;
-  m_level = level;
+  m_pInfo = pInfo;
+
+  m_aggressionMode = pInfo->ActiveType;
+
+  m_displayFlags = 0;
+  m_weaponMain = 0;
+  m_weaponSub = 0;
+  m_pose = 0;
+
+  m_bNpcNameId = pInfo->NameId;
+  m_bNpcBaseId = pInfo->BaseId;
+
+  m_pos.x = pInfo->x;
+  m_pos.y = pInfo->y;
+  m_pos.z = pInfo->z;
+  m_rot = pInfo->rotation;
+  m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
   m_currentStance = Common::Stance::Passive;
-  m_levelId = 0;
+  m_boundInstanceId = pInfo->BoundInstanceID;
   m_flags = 0;
+  m_rank = pInfo->BNPCRankId;
+
+  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
+    setFlag( Immobile );
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto bNpcBaseData = exdData.getRow< Component::Excel::BNpcBase >( m_bNpcBaseId );
+  if( !bNpcBaseData )
+  {
+    Logger::debug( "BNpcBase#{0} not found in exd data!", m_bNpcBaseId );
+    return;
+  }
+
+  m_modelChara = bNpcBaseData->data().Model;
+  m_enemyType = bNpcBaseData->data().Battalion;
 
   m_class = ClassJob::Adventurer;
 
@@ -85,33 +103,152 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_timeOfDeath = 0;
   m_targetId = Common::INVALID_GAME_OBJECT_ID64;
 
-  m_maxHp = maxHp;
+  m_maxHp = 500;
   m_maxMp = 200;
-  m_hp = maxHp;
+  m_hp = m_maxHp;
   m_mp = 200;
 
   m_state = BNpcState::Idle;
   m_status = ActorStatus::Idle;
 
-  m_baseStats.max_hp = maxHp;
-  m_baseStats.max_mp = 200;
+  max_hp = m_maxHp;
+  max_mp = 200;
 
-  memcpy( m_customize, pTemplate->getCustomize(), sizeof( m_customize ) );
-  memcpy( m_modelEquip, pTemplate->getModelEquip(), sizeof( m_modelEquip ) );
+  memset( m_customize, 0, sizeof( m_customize ) );
+  memset( m_modelEquip, 0, sizeof( m_modelEquip ) );
 
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
 
-  auto bNpcBaseData = exdData.get< Data::BNpcBase >( m_bNpcBaseId );
-  assert( bNpcBaseData );
+  m_radius = bNpcBaseData->data().Scale;
+  if( bNpcBaseData->data().Customize != 0 )
+  {
+    auto bnpcCustom = exdData.getRow< Component::Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
+    if( bnpcCustom )
+    {
+      memcpy( m_customize, reinterpret_cast< char* >( &bnpcCustom->data() ), sizeof( m_customize ) );
+    }
+  }
 
-  m_radius = bNpcBaseData->scale;
+  if( bNpcBaseData->data().Equipment != 0 )
+  {
+    auto bnpcEquip = exdData.getRow< Component::Excel::NpcEquip >( bNpcBaseData->data().Equipment );
+    if( bnpcEquip )
+    {
+      m_weaponMain = bnpcEquip->data().WeaponModel;
+      m_weaponSub = bnpcEquip->data().SubWeaponModel;
+      memcpy( m_modelEquip, reinterpret_cast< char* >( bnpcEquip->data().Equip ), sizeof( m_modelEquip ) );
+    }
+  }
 
-  auto modelChara = exdData.get< Data::ModelChara >( bNpcBaseData->modelChara );
+  auto modelChara = exdData.getRow< Component::Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.get< Data::ModelSkeleton >( modelChara->model );
+    auto modelSkeleton = exdData.getRow< Component::Excel::ModelSkeleton >( modelChara->data().ModelType );
     if( modelSkeleton )
-      m_radius *= modelSkeleton->radius;
+      m_radius *= modelSkeleton->data().Radius;
+  }
+
+  // todo: is this actually good?
+  //m_naviTargetReachedDistance = m_scale * 2.f;
+  m_naviTargetReachedDistance = 4.f;
+
+  calculateStats();
+}
+
+Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone, uint32_t hp, Common::BNpcType type ) :
+  Npc( ObjKind::BattleNpc )
+{
+  m_id = id;
+  m_pInfo = pInfo;
+
+  m_aggressionMode = pInfo->ActiveType;
+
+  m_displayFlags = 0;
+  m_weaponMain = 0;
+  m_weaponSub = 0;
+  m_pose = 0;
+
+  m_bNpcNameId = pInfo->NameId;
+  m_bNpcBaseId = pInfo->BaseId;
+
+  m_pos.x = pInfo->x;
+  m_pos.y = pInfo->y;
+  m_pos.z = pInfo->z;
+  m_rot = pInfo->rotation;
+  m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
+  m_invincibilityType = InvincibilityNone;
+  m_currentStance = Common::Stance::Passive;
+  m_boundInstanceId = pInfo->BoundInstanceID;
+  m_flags = 0;
+  m_rank = pInfo->BNPCRankId;
+
+  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
+    setFlag( Immobile );
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto bNpcBaseData = exdData.getRow< Component::Excel::BNpcBase >( m_bNpcBaseId );
+  if( !bNpcBaseData )
+  {
+    Logger::debug( "BNpcBase#{0} not found in exd data!", m_bNpcBaseId );
+    return;
+  }
+
+  m_modelChara = bNpcBaseData->data().Model;
+  m_enemyType = bNpcBaseData->data().Battalion;
+
+  m_class = ClassJob::Adventurer;
+
+  m_pCurrentTerritory = std::move( pZone );
+
+  m_spawnPos = m_pos;
+
+  m_timeOfDeath = 0;
+  m_targetId = Common::INVALID_GAME_OBJECT_ID64;
+
+  m_maxHp = hp;
+  m_maxMp = 200;
+  m_hp = m_maxHp;
+  m_mp = 200;
+
+  m_state = BNpcState::Idle;
+  m_status = ActorStatus::Idle;
+
+  max_hp = hp;
+  max_mp = 200;
+
+  m_bnpcType = type;
+
+  memset( m_customize, 0, sizeof( m_customize ) );
+  memset( m_modelEquip, 0, sizeof( m_modelEquip ) );
+
+
+  m_radius = bNpcBaseData->data().Scale;
+  if( bNpcBaseData->data().Customize != 0 )
+  {
+    auto bnpcCustom = exdData.getRow< Component::Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
+    if( bnpcCustom )
+    {
+      memcpy( m_customize, reinterpret_cast< char* >( &bnpcCustom->data() ), sizeof( m_customize ) );
+    }
+  }
+
+  if( bNpcBaseData->data().Equipment != 0 )
+  {
+    auto bnpcEquip = exdData.getRow< Component::Excel::NpcEquip >( bNpcBaseData->data().Equipment );
+    if( bnpcEquip )
+    {
+      m_weaponMain = bnpcEquip->data().WeaponModel;
+      m_weaponSub = bnpcEquip->data().SubWeaponModel;
+      memcpy( m_modelEquip, reinterpret_cast< char* >( bnpcEquip->data().Equip ), sizeof( m_modelEquip ) );
+    }
+  }
+
+  auto modelChara = exdData.getRow< Component::Excel::ModelChara >( bNpcBaseData->data().Model );
+  if( modelChara )
+  {
+    auto modelSkeleton = exdData.getRow< Component::Excel::ModelSkeleton >( modelChara->data().ModelType );
+    if( modelSkeleton )
+      m_radius *= modelSkeleton->data().Radius;
   }
 
   // todo: is this actually good?
@@ -171,13 +308,18 @@ uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
 void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
 {
   m_lastRoamTargetReached = Util::getTimeSeconds();
-  pTarget->queuePacket( std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( pTarget->getCharacterId(), std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
 }
 
 void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
-  pTarget->queuePacket( makeActorControlSelf( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  server.queueForPlayer( pTarget->getCharacterId(), makeActorControlSelf( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
@@ -262,7 +404,7 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
 
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, 0x5A );
+  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
   sendToInRangeSet( movePacket );
 }
 
@@ -307,7 +449,7 @@ void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int
   if( pChara->isPlayer() )
   {
     auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( getAsBNpc() );
+    pPlayer->hateListAdd( *this );
   }
 }
 
@@ -339,7 +481,7 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
       if( pChara->isPlayer() )
       {
         PlayerPtr tmpPlayer = pChara->getAsPlayer();
-        tmpPlayer->onMobDeaggro( getAsBNpc() );
+        tmpPlayer->onMobDeaggro( *this );
       }
       return;
     }
@@ -369,12 +511,12 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   m_state = BNpcState::Combat;
 
   sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
+  sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetBattle, 1, 0, 0 ) );
 
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->onMobAggro( getAsBNpc() );
+    tmpPlayer->onMobAggro( *getAsBNpc() );
   }
 
 }
@@ -388,8 +530,8 @@ void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
     sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
-    sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 0, 0, 0 ) );
-    tmpPlayer->onMobDeaggro( getAsBNpc() );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetBattle, 0, 0, 0 ) );
+    tmpPlayer->onMobDeaggro( *this );
   }
 }
 
@@ -475,8 +617,14 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           m_lastRoamTargetReached = Util::getTimeSeconds();
           break;
         }
-
-        m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, 5 );
+        if( m_pInfo->WanderingRange != 0 && getEnemyType() != 0 )
+        {
+          m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, m_pInfo->WanderingRange );
+        }
+        else
+        {
+          m_roamPos = m_spawnPos;
+        }
         m_state = BNpcState::Roaming;
       }
 
@@ -579,6 +727,7 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
 
 void Sapphire::Entity::BNpc::onDeath()
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
   m_state = BNpcState::Dead;
@@ -590,7 +739,10 @@ void Sapphire::Entity::BNpc::onDeath()
     // TODO: handle drops 
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
-      pPlayer->onMobKill( static_cast< uint16_t >( m_bNpcNameId ) );
+    {
+      auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+      playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ) );
+    }
   }
   hateListClear();
 }
@@ -613,10 +765,42 @@ void Sapphire::Entity::BNpc::checkAggro()
 
   CharaPtr pClosestChara = getClosestChara();
 
-  if( pClosestChara && pClosestChara->isAlive() && pClosestChara->isPlayer() )
+  if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() != 0 && pClosestChara->isPlayer() ) )
   {
+
     // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
-    float range = 13.f;
+    float range = 14.f;
+
+    if( pClosestChara->getLevel() > m_level )
+    {
+      auto levelDiff = std::abs( pClosestChara->getLevel() - this->getLevel() );
+
+      if( levelDiff >= 10 )
+        range = 0.f;
+      else
+        range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
+    }
+
+    auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+                                    pClosestChara->getPos().x,
+                                    pClosestChara->getPos().y,
+                                    pClosestChara->getPos().z );
+
+    if( distance < range )
+    {
+      aggro( pClosestChara );
+    }
+  }
+  else if( pClosestChara && pClosestChara->isAlive() && ( getEnemyType() == 0 && pClosestChara->isBattleNpc() ) )
+  {
+    if( getBNpcType() == Common::BNpcType::Friendly )
+    {
+      if( pClosestChara->getAsBNpc()->getBNpcType() == Common::BNpcType::Friendly )
+        return;
+    }
+
+    // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
+    float range = 14.f;
 
     if( pClosestChara->getLevel() > m_level )
     {
@@ -645,16 +829,16 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   m_pOwner = m_pChara;
   if( m_pChara != nullptr )
   {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( m_pChara->getId() );
-    setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId = m_pChara->getId();
+    auto setOwnerPacket = makeZonePacket< FFXIVIpcFirstAttack >( m_pChara->getId() );
+    setOwnerPacket->data().Type = 0x01;
+    setOwnerPacket->data().Id = m_pChara->getId();
     sendToInRangeSet( setOwnerPacket );
   }
   else
   {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
-    setOwnerPacket->data().type = 0x01;
-    setOwnerPacket->data().actorId = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
+    auto setOwnerPacket = makeZonePacket< FFXIVIpcFirstAttack >( getId() );
+    setOwnerPacket->data().Type = 0x01;
+    setOwnerPacket->data().Id = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
     sendToInRangeSet( setOwnerPacket );
   }
 }
@@ -692,15 +876,16 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
+    damage.first = 1;
 
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
+    auto effectPacket = std::make_shared< EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage.first );
-    effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.param0 = static_cast< uint8_t >( damage.second );
-    effectEntry.param2 = 0x71;
-    effectPacket->addEffect( effectEntry );
+    Common::CalcResultParam effectEntry{};
+    effectEntry.Value = static_cast< int16_t >( damage.first );
+    effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
+    effectEntry.Arg0 = static_cast< uint8_t >( damage.second );
+    effectEntry.Arg2 = 0x71;
+    effectPacket->addEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
 
     sendToInRangeSet( effectPacket );
 
@@ -714,31 +899,59 @@ void Sapphire::Entity::BNpc::calculateStats()
   uint8_t level = getLevel();
   uint8_t job = static_cast< uint8_t >( getClass() );
 
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( job );
-  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( level );
+  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( job );
+  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( level );
 
   float base = Math::CalcStats::calculateBaseStat( *this );
 
-  m_baseStats.str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierStrength ) / 100 ) );
-  m_baseStats.dex = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierDexterity ) / 100 ) );
-  m_baseStats.vit = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierVitality ) / 100 ) );
-  m_baseStats.inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierIntelligence ) / 100 ) );
-  m_baseStats.mnd = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierMind ) / 100 ) );
-  //m_baseStats.pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->modifierPiety ) / 100 ) );
+  auto str = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->data().STR ) / 100 ) );
+  auto dex = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->data().DEX ) / 100 ) );
+  auto vit = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->data().VIT ) / 100 ) );
+  auto inte = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->data().INT_ ) / 100 ) );
+  auto mnd = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->data().MND ) / 100 ) );
+  auto pie = static_cast< uint32_t >( base * ( static_cast< float >( classInfo->data().PIE ) / 100 ) );
 
-  m_baseStats.determination = static_cast< uint32_t >( base );
-  m_baseStats.pie = static_cast< uint32_t >( base );
-  m_baseStats.skillSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
-  m_baseStats.spellSpeed = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
-  m_baseStats.accuracy = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
-  m_baseStats.critHitRate = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
-  m_baseStats.attackPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
-  m_baseStats.healingPotMagic = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
-  m_baseStats.tenacity = static_cast< uint32_t >( paramGrowthInfo->baseSpeed );
+  setStatValue( BaseParam::Strength, str );
+  setStatValue( BaseParam::Dexterity, dex );
+  setStatValue( BaseParam::Vitality, vit );
+  setStatValue( BaseParam::Intelligence, inte );
+  setStatValue( BaseParam::Mind, mnd );
+  setStatValue( BaseParam::Piety, pie );
 
-  m_baseStats.attack = m_baseStats.str;
-  m_baseStats.attackPotMagic = m_baseStats.inte;
-  m_baseStats.healingPotMagic = m_baseStats.mnd;
+
+  auto determination = static_cast< uint32_t >( base );
+  auto skillSpeed = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+  auto spellSpeed = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+  auto accuracy = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+  auto critHitRate = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+//  m_baseStats.attackPotMagic = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+//  m_baseStats.healingPotMagic = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+//  auto tenacity = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
+
+  setStatValue( BaseParam::Determination, determination );
+  setStatValue( BaseParam::SkillSpeed, skillSpeed );
+  setStatValue( BaseParam::SpellSpeed, spellSpeed );
+  setStatValue( BaseParam::CriticalHit, critHitRate );
+
+  setStatValue( BaseParam::AttackPower, str );
+  setStatValue( BaseParam::AttackMagicPotency, inte );
+  setStatValue( BaseParam::HealingMagicPotency, mnd );
+
+}
+
+uint32_t Sapphire::Entity::BNpc::getRank() const
+{
+  return m_rank;
+}
+
+uint32_t Sapphire::Entity::BNpc::getBoundInstanceId() const
+{
+  return m_boundInstanceId;
+}
+
+BNpcType Sapphire::Entity::BNpc::getBNpcType() const
+{
+  return m_bnpcType;
 }

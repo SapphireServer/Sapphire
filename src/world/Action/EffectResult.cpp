@@ -15,7 +15,7 @@ EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
   m_value( 0 ),
   m_param0( 0 ),
   m_param1( 0 ),
-  m_type( Common::ActionEffectType::Nothing ),
+  m_type( Common::ActionEffectType::CALC_RESULT_TYPE_NONE ),
   m_param2( 0 ),
   m_flag( Common::ActionEffectResultFlag::None )
 {
@@ -43,7 +43,7 @@ void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severi
   m_value = amount;
   m_flag = flag;
 
-  m_type = Common::ActionEffectType::Damage;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
 }
 
 void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
@@ -52,7 +52,7 @@ void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity
   m_value = amount;
   m_flag = flag;
 
-  m_type = Common::ActionEffectType::Heal;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP;
 }
 
 void EffectResult::restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag )
@@ -60,7 +60,7 @@ void EffectResult::restoreMP( uint32_t amount, Common::ActionEffectResultFlag fl
   m_value = amount;
   m_flag = flag;
 
-  m_type = Common::ActionEffectType::MpGain;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP;
 }
 
 void EffectResult::startCombo( uint16_t actionId )
@@ -68,13 +68,13 @@ void EffectResult::startCombo( uint16_t actionId )
   m_value = actionId;
   m_flag = Common::ActionEffectResultFlag::EffectOnSource;
 
-  m_type = Common::ActionEffectType::StartActionCombo;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO;
 }
 
 void EffectResult::comboSucceed()
 {
   // no EffectOnSource flag on this
-  m_type = Common::ActionEffectType::ComboSucceed;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO_HIT;
 }
 
 void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
@@ -82,7 +82,7 @@ void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
   m_value = statusId;
   m_param2 = param;
 
-  m_type = Common::ActionEffectType::ApplyStatusEffectTarget;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
 }
 
 void EffectResult::mount( uint16_t mountId )
@@ -90,27 +90,20 @@ void EffectResult::mount( uint16_t mountId )
   m_value = mountId;
   m_param0 = 1;
 
-  m_type = Common::ActionEffectType::Mount;
+  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT;
 }
 
-Common::EffectEntry EffectResult::buildEffectEntry() const
+Common::CalcResultParam EffectResult::buildEffectEntry() const
 {
-  Common::EffectEntry entry{};
-  entry.effectType = m_type;
-  if( m_value > 0x0000FFFF )
-  {
-    entry.value = static_cast< uint16_t >( m_value & 0x0000FFFF );
-    entry.extendedValueHighestByte = static_cast< uint8_t >( m_value >> 16 );
-    entry.flags = static_cast< uint8_t >( m_flag ) + static_cast< uint8_t >( Common::ActionEffectResultFlag::ExtendedValue );
-  }
-  else
-  {
-    entry.value = static_cast< uint16_t >( m_value );
-    entry.flags = static_cast< uint8_t >( m_flag );
-  }
-  entry.param0 = m_param0;
-  entry.param1 = m_param1;
-  entry.param2 = m_param2;
+  Common::CalcResultParam entry{};
+
+  // todo: that retarded shit so > u16 max numbers work
+  entry.Value = getValue();
+  entry.Arg0 = m_param0;
+  entry.Arg1 = m_param1;
+  entry.Type = m_type;
+  entry.Arg2 = m_param2;
+  entry.Flag = static_cast< uint8_t >( m_flag );
 
   return entry;
 }
@@ -119,28 +112,28 @@ void EffectResult::execute()
 {
   switch( m_type )
   {
-    case Common::ActionEffectType::Damage:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP:
     {
       m_target->takeDamage( m_value );
       break;
     }
 
-    case Common::ActionEffectType::Heal:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP:
     {
       m_target->heal( m_value );
       break;
     }
 
-    case Common::ActionEffectType::MpGain:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP:
     {
       m_target->restoreMP( m_value );
       break;
     }
 
-    case Common::ActionEffectType::Mount:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT:
     {
       auto pPlayer = m_target->getAsPlayer();
-      pPlayer->mount( m_value );
+      pPlayer->setMount( m_value );
       break;
     }
 

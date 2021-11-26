@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_MANAGER_H
-#define SAPPHIRE_MANAGER_H
+#pragma once
 
 #include "ForwardsZone.h"
 
@@ -22,6 +21,3 @@ namespace Sapphire::World::Manager
   };
 
 }
-
-
-#endif //SAPPHIRE_MANAGER_H

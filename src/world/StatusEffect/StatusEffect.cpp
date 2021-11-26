@@ -1,4 +1,4 @@
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Util/Util.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Logging/Logger.h>
@@ -7,7 +7,7 @@
 #include <Service.h>
 
 #include "Actor/Chara.h"
-#include "Actor/Actor.h"
+#include "Actor/GameObject.h"
 
 #include "Script/ScriptMgr.h"
 
@@ -15,7 +15,7 @@
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+//using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                     uint32_t duration, uint32_t tickRate ) :
@@ -27,9 +27,9 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_tickRate( tickRate ),
   m_lastTick( 0 )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto entry = exdData.get< Sapphire::Data::Status >( id );
-  m_name = entry->name;
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto entry = exdData.getRow< Component::Excel::Status >( id );
+  m_name = entry->getString( entry->data().Text.Name );
 
   std::replace( m_name.begin(), m_name.end(), ' ', '_' );
   std::replace( m_name.begin(), m_name.end(), ':', '_' );

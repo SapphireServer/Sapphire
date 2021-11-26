@@ -155,3 +155,45 @@ void Sapphire::Db::PreparedStatement::setMysqlPS( std::shared_ptr< Mysql::Prepar
 {
   m_stmt = pStmt;
 }
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, bool value )
+{
+  setBool( index, value );
+}
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, uint32_t value )
+{
+  setUInt( index, value );
+}
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, uint64_t value )
+{
+  setUInt64( index, value );
+}
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, int32_t value )
+{
+  setInt( index, value );
+}
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, int64_t value )
+{
+  setInt64( index, value );
+}
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, const std::string& value )
+{
+  setString( index, value );
+}
+
+template<>
+void Sapphire::Db::PreparedStatement::set( uint8_t index, const std::vector< uint8_t >& value )
+{
+  setBinary( index, value );
+}

@@ -11,8 +11,7 @@
 
 using namespace Sapphire;
 
-class ManSea001 :
-  public Sapphire::ScriptAPI::EventScript
+class ManSea001 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
 
@@ -35,10 +34,10 @@ private:
 
   void Scene00000( Entity::Player& player )
   {
-    player.playScene( getId(), 0, 8192,
+    eventMgr().playScene( player, getId(), 0, 8192,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
+                        if( result.getResult( 0 ) == 1 )
                         {
                           player.setOpeningSequence( 2 );
                           Scene00001( player );
@@ -48,43 +47,50 @@ private:
 
   void Scene00001( Entity::Player& player )
   {
-    player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManSea001::Scene00002 ) );
+    eventMgr().playSceneChain( player, getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManSea001::Scene00002 ) );
   }
 
   void Scene00002( Entity::Player& player )
   {
-    player.updateQuest( getId(), SEQ_1 );
-    player.playSceneChain( getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
+    auto pQuest = player.getQuest( getId() );
+    if( !pQuest )
+      return;
+
+    pQuest->setSeq( SEQ_1 );
+    eventMgr().playSceneChain( player, getId(), 2, NONE, bindScene( &ManSea001::Scene00003 ) );
   }
 
   void Scene00003( Entity::Player& player )
   {
-    player.playScene( getId(), 3, NONE,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playScene( player, getId(), 3, NONE,
+      [&](Entity::Player& player, const Event::SceneResult& result)
                       {
-                        player.eventStart( result.actorId, OPENING_EVENT_HANDLER, Event::EventHandler::Nest, 0, 0 );
-                        player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 1, 0 );
+                        eventMgr().eventStart( player, result.actorId, OPENING_EVENT_HANDLER, Event::EventHandler::Nest, 0, 0 );
+                        eventMgr().playScene( player, OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, { 1 } );
                       } );
   }
 
   void Scene00004( Entity::Player& player )
   {
-    player.playScene( getId(), 4, NONE, 0, 0 );
+    eventMgr().playScene( player, getId(), 4, NONE );
   }
 
   void Scene00005( Entity::Player& player )
   {
-    player.playSceneChain( getId(), 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
+    eventMgr().playSceneChain( player, getId(), 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
   }
 
   void Scene00006( Entity::Player& player )
   {
-    player.playScene( getId(), 6, INVIS_OTHER_PC,
+    eventMgr().playScene( player, getId(), 6, INVIS_OTHER_PC,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 )
+                        if( result.getResult( 0 ) == 1 )
                         {
-                          player.updateQuest( getId(), SEQ_FINISH );
+                          auto pQuest = player.getQuest( getId() );
+                          if( !pQuest )
+                            return;
+                          pQuest->setSeq( SEQ_FINISH );
                           player.prepareZoning( player.getZoneId(), true, 1, 0 );
                           player.changePosition( 9, 40, 14, 2 );
                         }
@@ -93,35 +99,35 @@ private:
 
   void Scene00007( Entity::Player& player )
   {
-    player.playScene( getId(), 7, NONE, 0, 0 );
+    eventMgr().playScene( player, getId(), 7, NONE );
   }
 
   void Scene00008( Entity::Player& player )
   {
-    player.playScene( getId(), 8, NONE, 0, 0 );
+    eventMgr().playScene( player, getId(), 8, NONE );
   }
 
   void Scene00009( Entity::Player& player )
   {
-    player.playScene( getId(), 9, NONE, 0, 0 );
+    eventMgr().playScene( player, getId(), 9, NONE );
   }
 
   void Scene00010( Entity::Player& player )
   {
-    player.playScene( getId(), 10, NONE, 0, 0 );
+    eventMgr().playScene( player, getId(), 10, NONE );
   }
 
   void Scene00011( Entity::Player& player )
   {
-    player.playSceneChain( getId(), 11, 0x2c02, 0, 0, bindScene( &ManSea001::Scene00012 ) );
+    eventMgr().playSceneChain( player, getId(), 11, 0x2c02, bindScene( &ManSea001::Scene00012 ) );
   }
 
   void Scene00012( Entity::Player& player )
   {
-    player.playScene( getId(), 12, INVIS_OTHER_PC,
+    eventMgr().playScene( player, getId(), 12, INVIS_OTHER_PC,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
-                        if( result.param2 == 1 ) // finish quest
+                        if( result.getResult( 0 ) == 1 ) // finish quest
                         {
                           if( player.giveQuestRewards( getId(), 0 ) )
                             player.finishQuest( getId() );
@@ -131,25 +137,21 @@ private:
 
   void Scene00013( Entity::Player& player )
   {
-    player.playScene( getId(), 13, NONE, 0, 0 );
+    eventMgr().playScene( player, getId(), 13, NONE );
   }
 
 public:
-  ManSea001() :
-    Sapphire::ScriptAPI::EventScript( 65643 )
+  ManSea001() : Sapphire::ScriptAPI::QuestScript( 65643 )
   {
   }
 
-  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-
-    if( actor == ACTOR0 )
+    if( actorId == ACTOR0 )
       Scene00000( player );
-    else if( actor == ACTOR1 )
+    else if( actorId == ACTOR1 )
       Scene00005( player );
-    else if( actor == ACTOR2 )
+    else if( actorId == ACTOR2 )
       Scene00011( player );
   }
 };

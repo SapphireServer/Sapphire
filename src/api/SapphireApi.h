@@ -1,5 +1,4 @@
-#ifndef _SAPPHIREAPI_H_
-#define _SAPPHIREAPI_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -34,9 +33,9 @@ namespace Sapphire::Api
 
     bool checkNameTaken( std::string name );
 
-    uint32_t getNextCharId();
+    uint32_t getNextEntityId();
 
-    uint64_t getNextContentId();
+    uint64_t getNextCharaId();
 
     int32_t checkSession( const std::string& sId );
 
@@ -46,5 +45,3 @@ namespace Sapphire::Api
 
   };
 }
-
-#endif

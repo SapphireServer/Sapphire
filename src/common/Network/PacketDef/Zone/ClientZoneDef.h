@@ -1,129 +1,289 @@
-#ifndef _CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H
-#define _CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H
+#pragma once
 
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 
-namespace Sapphire::Network::Packets::Client
+namespace Sapphire::Network::Packets::WorldPackets::Client
 {
 
-struct FFXIVIpcGmCommand1 :
-  FFXIVIpcBasePacket< GMCommand1 >
+struct FFXIVIpcGmCommand : FFXIVIpcBasePacket< GMCommand >
 {
-  /* 0000 */ uint32_t commandId;
-  /* 0004 */ uint32_t param1;
-  /* 0008 */ uint32_t param2;
-  /* 000C */ uint32_t param3;
-  /* 0010 */ uint32_t param4;
-  /* 0014 */ uint32_t unknown1;
-  /* 0018 */ uint32_t target;
+  uint32_t Id;
+  uint32_t Arg0;
+  uint32_t Arg1;
+  uint32_t Arg2;
+  uint32_t Arg3;
+  uint64_t Target;
 };
 
-struct FFXIVIpcGmCommand2 :
-  FFXIVIpcBasePacket< GMCommand2 >
+struct FFXIVIpcGmCommandName : FFXIVIpcBasePacket< GMCommandName >
 {
-  /* 0000 */ uint32_t commandId;
-  /* 0004 */ uint32_t param1;
-  /* 0008 */ uint32_t param2;
-  /* 000C */ uint32_t param3;
-  /* 0010 */ uint32_t param4;
-  /* 0014 */ uint16_t worldId;
-  /* 0016 */ char target[0x20];
-  /* 0036 */ uint16_t unknown1;
+  uint32_t Id;
+  uint32_t Arg0;
+  uint32_t Arg1;
+  uint32_t Arg2;
+  uint32_t Arg3;
+  char Name[32];
 };
 
-struct FFXIVIpcClientTrigger :
-  FFXIVIpcBasePacket< ClientTrigger >
+struct FFXIVIpcClientTrigger : FFXIVIpcBasePacket< Command >
 {
-  /* 0000 */ uint16_t commandId;
-  /* 0002 */ uint8_t unk_2[2];
-  /* 0004 */ uint32_t param11;
-  /* 0008 */ uint32_t param12;
-  /* 000C */ uint32_t param2;
-  /* 0010 */ uint32_t param4; // todo: really?
-  /* 0014 */ uint32_t param5;
-  /* 0018 */ uint64_t param3;
+  uint32_t Id;
+  uint32_t Arg0;
+  uint32_t Arg1;
+  uint32_t Arg2;
+  uint32_t Arg3;
+  uint64_t Target;
 };
 
-struct FFXIVIpcUpdatePosition :
-  FFXIVIpcBasePacket< UpdatePositionHandler >
+struct FFXIVIpcUpdatePosition : FFXIVIpcBasePacket< Move >
 {
-  /* 0000 */ float rotation;
-  /* 0004 */ uint8_t animationType;
-  /* 0005 */ uint8_t animationState;
-  /* 0006 */ uint8_t clientAnimationType;
-  /* 0007 */ uint8_t headPosition;
-  /* 0008 */ Common::FFXIVARR_POSITION3 position;
-  /* 000C */ uint8_t unk[ 4 ]; // padding?
+  float dir;
+  float dirBeforeSlip;
+  uint8_t flag;
+  uint8_t flag2;
+  uint8_t flag_unshared;
+  uint8_t __padding1;
+  Common::FFXIVARR_POSITION3 pos;
 };
   
-  struct FFXIVIpcUpdatePositionInstance :
-  FFXIVIpcBasePacket< UpdatePositionInstance >
+struct FFXIVIpcUpdatePositionInstance : FFXIVIpcBasePacket< MovePvP >
 {
-  /* 0000 */ float rotation;
-  /* 0004 */ float interpolateRotation;
-  /* 0008 */ uint32_t flags;
-  /* 000C */ Common::FFXIVARR_POSITION3 position;
-  /* 0018 */ Common::FFXIVARR_POSITION3 interpolatePosition;
-  /* 0024 */ uint32_t unknown;
+    float dir;
+    float predictedDir;
+    float dirBeforeSlip;
+    uint8_t flag;
+    uint8_t flag2;
+    uint8_t flag_unshared;
+    uint8_t __padding1;
+    Common::FFXIVARR_POSITION3 pos;
+    Common::FFXIVARR_POSITION3 predictedPos;
 };
 
-
-struct FFXIVIpcSkillHandler :
-  FFXIVIpcBasePacket< SkillHandler >
+struct FFXIVIpcActionRequest : FFXIVIpcBasePacket< ActionRequest >
 {
-  /* 0000 */ uint8_t pad_0000;
-  /* 0001 */ uint8_t type;
-  /* 0002 */ uint8_t pad_0002[2];
-  /* 0004 */ uint32_t actionId;
-  /* 0008 */ uint16_t sequence;
-  /* 000A */ uint8_t pad_000C[6];
-  /* 0010 */ uint64_t targetId;
-  /* 0018 */ uint16_t itemSourceSlot;
-  /* 001A */ uint16_t itemSourceContainer;
-  /* 001C */ uint32_t unknown;
+  uint8_t ExecProc;
+  uint8_t ActionKind;
+  uint8_t __padding1;
+  uint8_t __padding2;
+  uint32_t ActionKey;
+  uint32_t RequestId;
+  uint16_t Dir;
+  uint16_t DirTarget;
+  uint64_t Target;
+  uint32_t Arg;
 };
 
-struct FFXIVIpcAoESkillHandler :
-  FFXIVIpcBasePacket< AoESkillHandler >
+struct FFXIVIpcSelectGroundActionRequest :  FFXIVIpcBasePacket< SelectGroundActionRequest >
 {
-  /* 0000 */ uint8_t pad_0000;
-  /* 0001 */ uint8_t type;
-  /* 0002 */ uint8_t pad_0002[2];
-  /* 0004 */ uint32_t actionId;
-  /* 0008 */ uint16_t sequence;
-  /* 000A */ uint8_t pad_000C[6];
-  /* 0010 */ Common::FFXIVARR_POSITION3 pos;
-  /* 001C */ uint32_t unknown; // could almost be rotation + 16 bits more padding?
+  uint8_t ExecProc;
+  uint8_t ActionKind;
+  uint8_t __padding1;
+  uint8_t __padding2;
+  uint32_t ActionKey;
+  uint32_t RequestId;
+  uint16_t Dir;
+  uint16_t DirTarget;
+  Common::FFXIVARR_POSITION3 Pos;
 };
 
-struct FFXIVIpcZoneLineHandler :
-  FFXIVIpcBasePacket< ZoneLineHandler >
+struct FFXIVIpcZoneJump : FFXIVIpcBasePacket< ZoneJump >
 {
-  /* 0000 */ uint32_t zoneLineId;
+  uint32_t ExitBox;
+  float X;
+  float Y;
+  float Z;
+  int32_t LandSetIndex;
 };
 
-struct FFXIVIpcDiscoveryHandler :
-  FFXIVIpcBasePacket< DiscoveryHandler >
+struct FFXIVIpcNewDiscovery : FFXIVIpcBasePacket< NewDiscovery >
 {
-  /* 0000 */ uint32_t positionRef;
+    uint32_t LayoutId;
+    float PositionX;
+    float PositionY;
+    float PositionZ;
 };
 
-struct FFXIVIpcEventHandlerReturn :
-  FFXIVIpcBasePacket< ReturnEventHandler >
+template< uint32_t Size >
+struct FFXIVIpcEventHandlerReturnN
 {
-  /* 0000 */ uint32_t eventId;
-  /* 0004 */ uint16_t scene;
-  /* 0006 */ uint16_t param1;
-  /* 0008 */ uint16_t param2;
-  /* 000A */ uint8_t pad_000A[2];
-  /* 000C */ uint16_t param3;
-  /* 000E */ uint8_t pad_000E[2];
-  /* 0010 */ uint16_t param4;
+  uint32_t handlerId;
+  uint16_t sceneId;
+  uint8_t errorCode;
+  uint8_t numOfResults;
+  uint32_t results[Size];
+};
+
+struct FFXIVIpcReturnEventSceneHeader : FFXIVIpcBasePacket< ReturnEventSceneHeader >, FFXIVIpcEventHandlerReturnN< 1 >
+{
+};
+
+struct FFXIVIpcReturnEventScene2 :
+  FFXIVIpcBasePacket< ReturnEventScene2 >,
+  FFXIVIpcEventHandlerReturnN< 2 >
+{
+//  /* 0000 */ uint32_t eventId;
+//  /* 0004 */ uint16_t scene;
+//  /* 0006 */ uint16_t param1;
+//  /* 0008 */ uint16_t param2;
+//  /* 000A */ uint8_t pad_000A[2];
+//  /* 000C */ uint16_t param3;
+//  /* 000E */ uint8_t pad_000E[2];
+//  /* 0010 */ uint16_t param4;
+};
+
+struct FFXIVIpcReturnEventScene4 :
+  FFXIVIpcBasePacket< ReturnEventScene4 >,
+  FFXIVIpcEventHandlerReturnN< 4 >
+{
+};
+
+struct FFXIVIpcReturnEventScene8 :
+  FFXIVIpcBasePacket< ReturnEventScene8 >,
+  FFXIVIpcEventHandlerReturnN< 8 >
+{
+};
+
+struct FFXIVIpcReturnEventScene16 :
+  FFXIVIpcBasePacket< ReturnEventScene16 >,
+  FFXIVIpcEventHandlerReturnN< 16 >
+{
+};
+
+struct FFXIVIpcReturnEventScene32 :
+  FFXIVIpcBasePacket< ReturnEventScene32 >,
+  FFXIVIpcEventHandlerReturnN< 32 >
+{
+};
+
+struct FFXIVIpcReturnEventScene64 :
+  FFXIVIpcBasePacket< ReturnEventScene64 >,
+  FFXIVIpcEventHandlerReturnN< 64 >
+{
+};
+
+struct FFXIVIpcReturnEventScene128 :
+  FFXIVIpcBasePacket< ReturnEventScene128 >,
+  FFXIVIpcEventHandlerReturnN< 128 >
+{
+};
+
+struct FFXIVIpcReturnEventScene255 :
+  FFXIVIpcBasePacket< ReturnEventScene255 >,
+  FFXIVIpcEventHandlerReturnN< 255 >
+{
+};
+
+template< uint32_t Size >
+struct FFXIVIpcYieldEventSceneN
+{
+  uint32_t handlerId;
+  uint16_t sceneId;
+  uint8_t yieldId;
+  uint8_t numOfResults;
+  uint32_t results[Size];
+};
+
+struct FFXIVIpcYieldEventSceneHeader :
+  FFXIVIpcBasePacket< YieldEventSceneHeader >,
+  FFXIVIpcYieldEventSceneN< 1 >
+{
+};
+
+struct FFXIVIpcYieldEventScene2 :
+  FFXIVIpcBasePacket< YieldEventScene2 >,
+  FFXIVIpcYieldEventSceneN< 2 >
+{
+};
+
+struct FFXIVIpcYieldEventScene4 :
+  FFXIVIpcBasePacket< YieldEventScene4 >,
+  FFXIVIpcYieldEventSceneN< 4 >
+{
+};
+
+struct FFXIVIpcYieldEventScene8 :
+  FFXIVIpcBasePacket< YieldEventScene8 >,
+  FFXIVIpcYieldEventSceneN< 8 >
+{
+};
+
+struct FFXIVIpcYieldEventScene16 :
+  FFXIVIpcBasePacket< YieldEventScene16 >,
+  FFXIVIpcYieldEventSceneN< 16 >
+{
+};
+
+struct FFXIVIpcYieldEventScene32 :
+  FFXIVIpcBasePacket< YieldEventScene32 >,
+  FFXIVIpcYieldEventSceneN< 32 >
+{
+};
+
+struct FFXIVIpcYieldEventScene64 :
+  FFXIVIpcBasePacket< YieldEventScene64 >,
+  FFXIVIpcYieldEventSceneN< 64 >
+{
+};
+
+struct FFXIVIpcYieldEventScene128 :
+  FFXIVIpcBasePacket< YieldEventScene128 >,
+  FFXIVIpcYieldEventSceneN< 128 >
+{
+};
+
+struct FFXIVIpcYieldEventScene255 :
+  FFXIVIpcBasePacket< YieldEventScene255 >,
+  FFXIVIpcYieldEventSceneN< 255 >
+{
+};
+
+template< uint32_t Size >
+struct YieldEventSceneStringN
+{
+  uint32_t handlerId;
+  uint16_t sceneId;
+  uint8_t yieldId;
+  char result[Size];
+};
+
+struct FFXIVIpcYieldEventSceneStringHeader :
+  FFXIVIpcBasePacket< YieldEventSceneStringHeader >,
+  YieldEventSceneStringN< 1 >
+{
+};
+
+struct FFXIVIpcYieldEventSceneString8 :
+  FFXIVIpcBasePacket< YieldEventSceneString8 >,
+  YieldEventSceneStringN< 8 >
+{
+};
+
+struct YieldEventSceneString16 :
+  FFXIVIpcBasePacket< YieldEventSceneString16 >,
+  YieldEventSceneStringN< 16 >
+{
+};
+
+struct YieldEventSceneString32 :
+  FFXIVIpcBasePacket< YieldEventSceneString32 >,
+  YieldEventSceneStringN< 32 >
+{
+};
+
+struct FFXIVIpcYieldEventSceneIntAndString :
+  FFXIVIpcBasePacket< YieldEventSceneIntAndString >
+{
+  uint32_t handlerId;
+  uint16_t sceneId;
+  uint8_t yieldId;
+  uint8_t __padding1;
+  uint64_t integer;
+  char str[32];
 };
 
 struct FFXIVIpcEnterTerritoryHandler :
-  FFXIVIpcBasePacket< EnterTeriEventHandler >
+  FFXIVIpcBasePacket< StartEnterTerritoryEvent >
 {
   /* 0000 */ uint32_t eventId;
   /* 0004 */ uint16_t param1;
@@ -131,7 +291,7 @@ struct FFXIVIpcEnterTerritoryHandler :
 };
 
 struct FFXIVIpcEventHandlerOutsideRange :
-  FFXIVIpcBasePacket< OutOfRangeEventHandler >
+  FFXIVIpcBasePacket< StartOutsideRangeEvent >
 {
   /* 0000 */ uint32_t param1;
   /* 0004 */ uint32_t eventId;
@@ -139,7 +299,7 @@ struct FFXIVIpcEventHandlerOutsideRange :
 };
 
 struct FFXIVIpcEventHandlerWithinRange :
-  FFXIVIpcBasePacket< WithinRangeEventHandler >
+  FFXIVIpcBasePacket< StartWithinRangeEvent >
 {
   /* 0000 */ uint32_t param1;
   /* 0004 */ uint32_t eventId;
@@ -147,7 +307,7 @@ struct FFXIVIpcEventHandlerWithinRange :
 };
 
 struct FFXIVIpcEventHandlerEmote :
-  FFXIVIpcBasePacket< EmoteEventHandler >
+  FFXIVIpcBasePacket< StartEmoteEvent >
 {
   /* 0000 */ uint64_t actorId;
   /* 0008 */ uint32_t eventId;
@@ -155,322 +315,300 @@ struct FFXIVIpcEventHandlerEmote :
 };
 
 struct FFXIVIpcEventHandlerTalk :
-  FFXIVIpcBasePacket< TalkEventHandler >
+  FFXIVIpcBasePacket< StartTalkEvent >
 {
   /* 0000 */ uint64_t actorId;
   /* 0008 */ uint32_t eventId;
 };
 
-struct FFXIVIpcPingHandler :
-  FFXIVIpcBasePacket< PingHandler >
+struct ZoneProtoUpClientPos
 {
-  /* 0000 */ uint32_t timestamp; // maybe lol..
+  uint32_t originEntityId;
+  float pos[3];
+  float dir;
 };
 
-struct FFXIVIpcSetSearchInfo :
-  FFXIVIpcBasePacket< SetSearchInfoHandler >
+struct FFXIVIpcPingHandler : FFXIVIpcBasePacket< Sync >
 {
-  union
-  {
-    /* 0000 */ uint64_t status;
-    struct
-    {
-      /* 0000 */ uint32_t status1;
-      /* 0004 */ uint32_t status2;
-    };
-  };
-
-  /* 0008 */ uint8_t pad_0008[9];
-  /* 0011 */ Common::ClientLanguage language;
-  /* 0012 */ char searchComment[193];
+  uint32_t clientTimeValue;
+  ZoneProtoUpClientPos position;
 };
 
-struct FFXIVIpcTellHandler : FFXIVIpcBasePacket< TellReq >
+struct FFXIVIpcFindContent : FFXIVIpcBasePacket< FindContent >
 {
-  uint64_t contentId;
-  uint16_t worldId;
-  uint16_t u0A;
-  uint32_t u0C;
-  uint16_t worldId1;
-  uint8_t preName;
-  /* 0004 */ char targetPCName[32];
-  /* 0024 */ char message[1029];
+  uint16_t territoryType;
+  uint8_t acceptHalfway;
+  uint8_t language;
 };
 
-struct FFXIVIpcChatHandler :
-  FFXIVIpcBasePacket< ChatHandler >
+struct FFXIVIpcFind5Contents : FFXIVIpcBasePacket< Find5Contents >
 {
-  /* 0000 */ uint8_t pad_0000[4];
-  /* 0004 */ uint32_t sourceId;
-  /* 0008 */ uint8_t pad_0008[16];
-  /* 0018 */ Common::ChatType chatType;
-  /* 001A */ char message[1012];
+  uint8_t acceptHalfway;
+  uint8_t language;
+  uint16_t territoryTypes[5];
 };
 
-struct FFXIVIpcPartyChatHandler :
-  FFXIVIpcBasePacket< ChatHandler >
+struct FFXIVIpcAcceptContent : FFXIVIpcBasePacket< AcceptContent >
 {
-  uint64_t unknown;
+  uint8_t accept;
+  uint8_t padding1;
+  uint16_t territoryType;
+  uint64_t territoryId;
+};
+
+struct FFXIVIpcCancelFindContent : FFXIVIpcBasePacket< CancelFindContent >
+{
+  uint8_t cause;
+};
+
+  struct FFXIVIpcFindContentAsRandom : FFXIVIpcBasePacket< FindContentAsRandom >
+{
+  uint8_t randomContentType;
+  uint8_t acceptHalfway;
+  uint8_t language;
+};
+
+struct FFXIVIpcRequestPenalties : FFXIVIpcBasePacket< RequestPenalties >
+{
+  uint8_t value; //TODO: Is this always 0?
+};
+
+
+struct FFXIVIpcSetSearchInfo : FFXIVIpcBasePacket< SetProfile >
+{
+  uint64_t OnlineStatus;
+  uint64_t SelectClassID;
+  uint8_t CurrentSelectClassID;
+  uint8_t Region;
+  char SearchComment[193];
+};
+
+struct FFXIVIpcChatTo : FFXIVIpcBasePacket< ChatTo >
+{
+  uint8_t type;
+  char toName[32];
   char message[1024];
 };
 
-struct FFXIVIpcShopEventHandler :
-  FFXIVIpcBasePacket< ShopEventHandler >
+struct FFXIVIpcChatToChannel : FFXIVIpcBasePacket< ChatToChannel >
+{
+  uint64_t channelID;
+  char message[1024];
+};
+
+struct FFXIVIpcChatHandler : FFXIVIpcBasePacket< ChatHandler >
+{
+  uint32_t clientTimeValue;
+  ZoneProtoUpClientPos position;
+  Common::ChatType chatType;
+  char message[1024];
+};
+
+struct FFXIVIpcJoinChatChannel : FFXIVIpcBasePacket< JoinChatChannel >
+{
+  uint64_t ChannelID;
+};
+
+struct FFXIVIpcLinkshellJoin : FFXIVIpcBasePacket< LinkshellJoin >
+{
+  uint64_t LinkshellID;
+  char MemberCharacterName[32];
+};
+
+struct FFXIVIpcShopEventHandler : FFXIVIpcBasePacket< StartUIEvent >
 {
   /* 0000 */ uint32_t eventId;
   /* 0004 */ uint32_t param;
 };
 
-struct FFXIVIpcLinkshellEventHandler :
-  FFXIVIpcBasePacket< LinkshellEventHandler >
+struct FFXIVIpcClientInventoryItemOperation : FFXIVIpcBasePacket< ClientItemOperation >
 {
-  /* 0000 */ uint32_t eventId;
-  /* 0004 */ uint16_t scene;
-  /* 0006 */ uint8_t pad_0006[1];
-  /* 0007 */ char lsName[21];
+  uint32_t ContextId;
+  uint8_t OperationType;
+  uint8_t __padding1;
+  uint8_t __padding2;
+  uint8_t __padding3;
+  uint32_t SrcActorId;
+  uint32_t SrcStorageId;
+  int16_t SrcContainerIndex;
+  uint8_t __padding4;
+  uint8_t __padding5;
+  uint32_t SrcStack;
+  uint32_t SrcCatalogId;
+  uint32_t DstActorId;
+  uint32_t DstStorageId;
+  int16_t DstContainerIndex;
+  uint8_t __padding6;
+  uint8_t __padding7;
+  uint32_t DstStack;
+  uint32_t DstCatalogId;
 };
 
-struct FFXIVIpcInventoryModifyHandler :
-  FFXIVIpcBasePacket< InventoryModifyHandler >
+struct FFXIVIpcHousingExteriorChange : FFXIVIpcBasePacket< HousingExteriorChange >
 {
-  /* 0000 */ uint32_t seq;
-  /* 0004 */ Common::InventoryOperation action;
-  /* 0006 */ uint8_t pad_0006[6];
-  /* 000C */ uint16_t fromContainer;
-  /* 000E */ uint8_t pad_000E[2];
-  /* 0010 */ uint8_t fromSlot;
-  /* 0011 */ uint8_t pad_0011[15];
-  /* 0020 */ uint16_t toContainer;
-  /* 0022 */ uint8_t pad_0022[2];
-  /* 0024 */ uint8_t toSlot;
-  /* 0025 */ uint8_t pad_0025[3];
-  /* 0028 */ uint32_t splitCount;
+  Common::LandIdent landIdOrIndex;
+  uint8_t RemoveFlags;
+  uint8_t __padding1;
+  uint16_t StorageId[9];
+  int16_t ContainerIndex[9];
 };
 
-struct FFXIVIpcRenameLandHandler :
-  FFXIVIpcBasePacket< LandRenameHandler >
+struct FFXIVIpcHousingPlaceYardItem : FFXIVIpcBasePacket< HousingPlaceYardItem >
 {
-  /* 0000 */ Common::LandIdent ident;
-  /* 0008 */ char houseName[20];
-  /* 0028 */ uint32_t padding;
+  Common::LandIdent landIdOrIndex;
+  uint16_t StorageId;
+  int16_t ContainerIndex;
+  Common::FFXIVARR_POSITION3 Pos;
+  float Rotation;
+  uint32_t UserData;
 };
 
-struct FFXIVIpcHousingUpdateHouseGreeting :
-  FFXIVIpcBasePacket< HousingUpdateHouseGreeting >
+struct FFXIVIpcHousingInteriorChange : FFXIVIpcBasePacket< HousingInteriorChange >
 {
-  /* 0000 */ Common::LandIdent ident;
-  /* 0008 */ char greeting[200];
+  Common::LandIdent landIdOrIndex;
+  uint16_t StorageId[10];
+  int16_t ContainerIndex[10];
 };
 
-struct FFXIVIpcBuildPresetHandler :
-  FFXIVIpcBasePacket< BuildPresetHandler >
-{
-  /* 0000 */ uint32_t itemId;
-  /* 0004 */ uint8_t plotNum;
-  /* 0005 */ char stateString[27];
-};
-
-struct FFXIVIpcSetSharedEstateSettings :
-  FFXIVIpcBasePacket< SetSharedEstateSettings >
-{
-  /* 0000 */ uint64_t char1ContentId;
-  /* 0008 */ uint64_t char2ContentId;
-  /* 0010 */ uint64_t char3ContentId;
-  /* 0018 */ uint8_t char1Permissions;
-  /* 0019 */ uint8_t padding1[0x7];
-  /* 0020 */ uint8_t char2Permissions;
-  /* 0021 */ uint8_t padding2[0x7];
-  /* 0028 */ uint8_t char3Permissions;
-  /* 0029 */ uint8_t padding3[0x7];
-};
-
-struct FFXIVIpcMarketBoardRequestItemListings :
-  FFXIVIpcBasePacket< MarketBoardRequestItemListings >
+struct FFXIVIpcMarketBoardRequestItemListings : FFXIVIpcBasePacket< MarketBoardRequestItemListings >
 {
   /* 0000 */ uint16_t padding1;
   /* 0002 */ uint16_t itemCatalogId;
   /* 0004 */ uint32_t padding2;
 };
 
-struct FFXIVIpcReqPlaceHousingItem :
-  FFXIVIpcBasePacket< ReqPlaceHousingItem >
+struct FFXIVIpcHousingHouseName : FFXIVIpcBasePacket< HousingHouseName >
 {
-  /* 0000 */ uint16_t landId; // 0 when plot 0 or inside an estate
-  /* 0002 */ uint16_t unknown1;
-  /* 0004 */ uint32_t unknown2;
-  /* 0008 */ uint16_t sourceInvContainerId;
-  /* 000A */ uint16_t sourceInvSlotId;
-
-  /* 000C */ Common::FFXIVARR_POSITION3 position;
-  /* 0018 */ float rotation;
-
-  /* 001C */ uint32_t shouldPlaceItem; // 1 if placing an item, 0 if placing in store
-  /* 0020 */ uint32_t unknown4[2]; // always 0 it looks like
+  Common::LandIdent landId;
+  char houseName[20];
 };
 
-struct FFXIVIpcHousingUpdateObjectPosition :
-  FFXIVIpcBasePacket< HousingUpdateObjectPosition >
+struct FFXIVIpcHousingGreeting : FFXIVIpcBasePacket< HousingGreeting >
 {
-  /* 0000 */ Common::LandIdent ident;
-  /* 0008 */ uint16_t slot;
-  /* 000A */ uint16_t unk;
-
-  /* 000C */ Common::FFXIVARR_POSITION3 pos;
-  /* 0018 */ float rotation;
-
-  /* 001C */ uint32_t padding;
+  Common::LandIdent landId;
+  char greeting[193];
 };
 
-struct FFXIVIpcMarketBoardSearch :
-  FFXIVIpcBasePacket< MarketBoardSearch >
+struct FFXIVIpcHousingChangeLayout : FFXIVIpcBasePacket< HousingChangeLayout >
 {
-  /* 0000 */ uint32_t startIdx;
-  /* 0004 */ uint16_t requestId;
-  /* 0006 */ uint8_t itemSearchCategory;
-  /* 0007 */ uint8_t shouldCheckClassJobId; // wat? seems only 1 there at least...
-  /* 0008 */ uint8_t maxEquipLevel;
-  /* 0009 */ uint8_t classJobId;
-  /* 000A */ char searchStr[40];
-  /* 0032 */ uint16_t unk4[43];
+  Common::LandIdent landId;
+  uint8_t storageIndex;
+  uint8_t __padding1;
+  uint8_t __padding2;
+  uint8_t __padding3;
+  float posX;
+  float posY;
+  float posZ;
+  float rotY;
 };
 
-struct FFXIVIpcMarketBoardRequestItemListingInfo :
-  FFXIVIpcBasePacket< MarketBoardRequestItemListingInfo >
+struct FFXIVIpcHousingChangeLayoutMulti : FFXIVIpcBasePacket< HousingChangeLayoutMulti >
+{
+  Common::LandIdent landId;
+  float posXs[10];
+  float posYs[10];
+  float posZs[10];
+  float rotYs[10];
+  uint8_t storageIndex[10];
+};
+
+struct FFXIVIpcCatalogSearch : FFXIVIpcBasePacket< CatalogSearch >
+{
+  uint32_t NextIndex;
+  uint8_t RequestKey;
+  uint8_t Type;
+  uint8_t SearchCategory;
+  uint8_t MinLevel;
+  uint8_t MaxLevel;
+  uint8_t ClassJob;
+  char ItemName[121];
+};
+
+struct FFXIVIpcMarketBoardRequestItemListingInfo : FFXIVIpcBasePacket< MarketBoardRequestItemListingInfo >
 {
   /* 0000 */ uint32_t catalogId;
   /* 0000 */ uint32_t requestId;
 };
 
-struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
-  FFXIVIpcBasePacket< FreeCompanyUpdateShortMessageHandler >
+struct FFXIVIpcConfig : FFXIVIpcBasePacket< Config >
 {
-  char shortMessage[104];
-  uint8_t padding;
-  uint8_t unknown;
-  uint32_t unknown1;
-  uint16_t unknown2;
+  uint16_t flag;
 };
 
-struct FFXIVIpcWorldInteractionHandler :
-  FFXIVIpcBasePacket< WorldInteractionHandler >
+struct FFXIVIpcGetFcProfile : FFXIVIpcBasePacket< GetFcProfile >
 {
-  uint32_t action;
-  uint32_t param1;
-  uint32_t param2;
-  uint32_t param3;
-  uint32_t param4;
-  Common::FFXIVARR_POSITION3 position;
+  uint64_t TargetCharacterID;
+  uint32_t TargetEntityID;
 };
 
-struct FFXIVIpcSocialReqSendHandler :
-  FFXIVIpcBasePacket< SocialReqSendHandler >
+struct FFXIVIpcGetBlacklist : FFXIVIpcBasePacket< GetBlacklist >
 {
-  uint64_t unknown;
-  uint8_t p1;
-  uint8_t p2;
-  uint8_t socialType;
-  char name[32];
-  uint8_t padding[5];
+  uint8_t NextIndex;
+  uint8_t RequestKey;
 };
 
-struct FFXIVIpcSocialResponseHandler :
-  FFXIVIpcBasePacket< SocialResponseHandler >
+/* 60986 */
+struct FFXIVIpcInvite : FFXIVIpcBasePacket< Invite >
 {
-  uint64_t contentId;
-  uint8_t p1;
-  uint8_t p2;
-  uint8_t socialType;
-  uint8_t response;
-  uint32_t unknown;
-};
-
-struct FFXIVIpcPartySetLeaderHandler :
-  FFXIVIpcBasePacket< PartySetLeaderHandler >
-{
-  uint64_t contentId;
-  uint8_t p1;
-  uint8_t p2;
-  char name[32];
-  uint8_t padding[6];
-};
-
-struct FFXIVIpcLeavePartyHandler :
-  FFXIVIpcBasePacket< LeavePartyHandler >
-{
-  uint64_t empty;
-};
-
-struct FFXIVIpcKickPartyMemberHander :
-  FFXIVIpcBasePacket< KickPartyMemberHandler >
-{
-  uint64_t contentId;
-  uint8_t p1;
-  uint8_t p2;
-  char name[32];
-  uint8_t padding[6];
-};
-
-struct FFXIVIpcDisbandPartyHandler :
-  FFXIVIpcBasePacket< DisbandPartyHandler >
-{
-  uint64_t empty;
+  uint8_t AuthType;
+  char TargetName[32];
 };
 
 
-struct FFXIVIpcDive :
-  FFXIVIpcBasePacket< Dive >
+/* 60988 */
+struct FFXIVIpcInviteReply : FFXIVIpcBasePacket< InviteReply >
 {
-  float unknown;
-  Common::FFXIVARR_POSITION3 posTarget;
-  Common::FFXIVARR_POSITION3 posOriginal;
-  uint32_t padding;
+  uint64_t InviteCharacterID;
+  uint8_t AuthType;
+  uint8_t Answer;
 };
 
-struct FFXIVIpcHousingEditExterior :
-  FFXIVIpcBasePacket< HousingEditExterior >
+struct FFXIVIpcGetCommonlist : FFXIVIpcBasePacket< GetCommonlist >
 {
-  uint16_t landId;
-  uint8_t unknown[6];
-  uint8_t removeFlag;
-  uint8_t unknown2;
-  uint16_t container[9];
-  uint16_t slot[9];
-  uint16_t padding;
+  uint64_t CommunityID;
+  uint16_t NextIndex;
+  uint8_t ListType;
+  uint8_t RequestKey;
+  uint8_t RequestParam;
 };
 
-struct FFXIVIpcHousingEditInterior :
-  FFXIVIpcBasePacket< HousingEditInterior >
+struct FFXIVIpcGetCommonlistDetail : FFXIVIpcBasePacket< GetCommonlistDetail >
 {
-  uint64_t unknown;
-  uint16_t container[10];
-  uint16_t slot[10];
+  uint64_t DetailCharacterID;
+  uint64_t CommunityID;
+  uint8_t ListType;
 };
 
-struct FFXIVIpcEventYieldHandler :
-  FFXIVIpcBasePacket< EventYield2Handler >
+struct FFXIVIpcPcSearch : FFXIVIpcBasePacket< PcSearch >
 {
-  uint32_t eventId;
-  uint16_t scene;
-  uint16_t padding;
-  uint64_t unknown;
+  uint64_t ClassID;
+  uint16_t MinLevel;
+  uint16_t MaxLevel;
+  uint64_t GrandCompanyID;
+  uint64_t Region;
+  uint64_t OnlineStatus;
+  uint16_t AreaList[50];
+  char CharacterName[32];
 };
 
-struct FFXIVIpcEventYield16Handler :
-  FFXIVIpcBasePacket< EventYield16Handler >
+struct FFXIVIpcPcPartyLeave : FFXIVIpcBasePacket< PcPartyLeave >
 {
-  uint32_t eventId;
-  uint16_t scene;
-  uint16_t padding;
-  uint32_t params[16];
+  uint32_t Reserve;
 };
 
-struct FFXIVIpcCFCommenceHandler :
-  FFXIVIpcBasePacket< CFCommenceHandler >
+struct FFXIVIpcPcPartyDisband : FFXIVIpcBasePacket< PcPartyDisband >
 {
-  uint8_t param;
-  uint8_t dummy[7];
+  uint32_t Reserve;
+};
+
+struct FFXIVIpcPcPartyKick : FFXIVIpcBasePacket< PcPartyKick >
+{
+  char LeaveCharacterName[32];
+};
+
+struct FFXIVIpcPcPartyChangeLeader : FFXIVIpcBasePacket< PcPartyChangeLeader >
+{
+  char NextLeaderCharacterName[32];
 };
 
 }
-
-#endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H

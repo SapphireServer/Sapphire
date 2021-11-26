@@ -13,16 +13,13 @@ add_custom_target( copy_runtime_files ALL
                      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/config ${CMAKE_BINARY_DIR}/bin/config
                      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/sql ${CMAKE_BINARY_DIR}/bin/sql
                      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/web ${CMAKE_BINARY_DIR}/bin/web
-                     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_BINARY_DIR}/bin/sql_import.sh
-                     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/bin/data/actions
-                     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/deps/ffxiv-actions/actions ${CMAKE_BINARY_DIR}/bin/data/actions )
+                     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/sql_import.sh ${CMAKE_BINARY_DIR}/bin/sql_import.sh )
 
 ######################################
 # Dependencies and compiler settings #
 ######################################
 include( "cmake/paths.cmake" )
 include( "cmake/compiler.cmake" )
-include( "cmake/cotire.cmake" )
 
 ##############################
 #             Git            #
@@ -44,6 +41,7 @@ find_package( MySQL )
 add_subdirectory( "deps/zlib" )
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
+add_subdirectory( "deps/datReaderPs3" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "deps/recastnavigation" )
 

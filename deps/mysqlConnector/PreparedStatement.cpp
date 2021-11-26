@@ -78,7 +78,7 @@ struct LongDataSender
       while( sent < str->length() )
       {
          chunkSize = ( sent + MAX_SEND_LONGDATA_CHUNK > str->length()
-                     ? str->length() - sent
+                     ? static_cast< uint32_t >( str->length() ) - sent
                      : MAX_SEND_LONGDATA_CHUNK );
 
          if( mysql_stmt_send_long_data( m_pStmt, position, str->c_str() + sent, chunkSize ) )

@@ -1,5 +1,4 @@
-#ifndef _ITEM_H_
-#define _ITEM_H_
+#pragma once
 
 #include <Common.h>
 #include "ForwardsZone.h"
@@ -123,5 +122,3 @@ namespace Sapphire
   };
 
 }
-
-#endif

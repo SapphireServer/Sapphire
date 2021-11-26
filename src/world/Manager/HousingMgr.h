@@ -1,6 +1,4 @@
-#ifndef SAPPHIRE_HOUSINGMGR_H
-#define SAPPHIRE_HOUSINGMGR_H
-
+#pragma once
 #include "Forwards.h"
 #include "Territory/HousingZone.h"
 #include <set>
@@ -75,7 +73,7 @@ namespace Sapphire::World::Manager
 
     uint32_t toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const;
     Sapphire::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
-    Sapphire::LandPtr getLandByOwnerId( uint32_t id );
+    Sapphire::LandPtr getLandByOwnerId( uint64_t id );
 
     void sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident );
     void sendLandSignFree( Entity::Player& player, const Common::LandIdent ident );
@@ -165,7 +163,7 @@ namespace Sapphire::World::Manager
      * @param item The item to convert into a YardObject
      * @return The resultant YardObject
      */
-    Common::HousingObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
+    Common::Furniture getYardObjectForItem( Inventory::HousingItemPtr item ) const;
 
 
     void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot,
@@ -180,8 +178,6 @@ namespace Sapphire::World::Manager
     void reqEstateInteriorRemodel( Entity::Player& player );
 
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
-
-    void editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t > slotList, uint8_t removeFlag );
 
   private:
 
@@ -319,5 +315,3 @@ namespace Sapphire::World::Manager
   };
 
 }
-
-#endif // SAPPHIRE_HOUSINGMGR_H

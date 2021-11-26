@@ -12,8 +12,7 @@
 
 using namespace Sapphire;
 
-class ManFst001 :
-  public Sapphire::ScriptAPI::EventScript
+class ManFst001 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
   static constexpr auto SEQ_0 = 0;
@@ -36,73 +35,78 @@ private:
   static constexpr auto OPENING_EVENT_HANDLER = 1245186;
   static constexpr auto SEQ_2_ACTOR1 = 2;
 
-  void Scene00000( Entity::Player& player )
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManFst001::Scene00000Return ) );
+  }
+
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      if( result.param2 == 1 ) // accept quest
-      {
-        player.setOpeningSequence( 2 );
-        Scene00001( player );
-      }
-    };
-
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, callback );
+      player.setOpeningSequence( 2 );
+      Scene00001( quest, player );
+    }
   }
 
-  void Scene00001( Entity::Player& player )
+  void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    player.playSceneChain( getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindScene( &ManFst001::Scene00002 ) );
+    eventMgr().playQuestScene( player, getId(), 1, DISABLE_SKIP | HIDE_HOTBAR | SET_BASE, bindSceneReturn( &ManFst001::Scene00001Return ) );
   }
 
-  void Scene00002( Entity::Player& player )
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    Scene00002( quest, player );
+  }
+
+  void Scene00002( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 2, 0, bindSceneReturn( &ManFst001::Scene00002Return ) );
+  }
+
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    quest.setSeq( SEQ_FINISH );
+
+    eventMgr().eventStart( player, result.actorId, OPENING_EVENT_HANDLER, Event::EventHandler::Nest, 0, 0 );
+    eventMgr().playQuestScene( player, OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA );
+  }
+
+  void Scene00004( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst001::Scene00004Return ) );
+  }
+
+  void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    Scene00005( quest, player );
+  }
+
+  void Scene00005( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 5, INVIS_OTHER_PC, bindSceneReturn( &ManFst001::Scene00005Return ) );
+  }
+
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 )
     {
-      player.updateQuest( getId(), SEQ_FINISH );
-
-      player.eventStart( result.actorId, OPENING_EVENT_HANDLER, Event::EventHandler::Nest, 0, 0 );
-      player.playScene( OPENING_EVENT_HANDLER, 0x1E, HIDE_HOTBAR | NO_DEFAULT_CAMERA, 0, 0 );
-    };
-
-    player.playScene( getId(), 2, 0, 0, 0, callback );
-  }
-
-  void Scene00004( Entity::Player& player )
-  {
-    player.playSceneChain( getId(), 4, FADE_OUT | HIDE_HOTBAR | CONDITION_CUTSCENE | HIDE_UI,
-                           bindScene( &ManFst001::Scene00005 ) );
-  }
-
-  void Scene00005( Entity::Player& player )
-  {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      if( result.param2 == 1 )
-      {
-        if( player.giveQuestRewards( getId(), 0 ) )
-          player.finishQuest( getId() );
-      }
-    };
-
-    player.playScene( getId(), 5, INVIS_OTHER_PC, 0, 0, callback );
+      if( player.giveQuestRewards( getId(), 0 ) )
+        player.finishQuest( getId() );
+    }
   }
 
 public:
-  ManFst001() :
-    Sapphire::ScriptAPI::EventScript( 65575 )
+  ManFst001() : Sapphire::ScriptAPI::QuestScript( 65575 )
   {
   }
 
-  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-
-    if( actor == ACTOR0 )
-      Scene00000( player );
-    else if( actor == ACTOR1 )
-      Scene00004( player );
+    if( actorId == ACTOR0 )
+      Scene00000( quest, player );
+    else if( actorId == ACTOR1 )
+      Scene00004( quest, player );
   }
 };
 

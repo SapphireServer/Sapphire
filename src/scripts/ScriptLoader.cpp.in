@@ -1,5 +1,10 @@
 #include <Script/NativeScriptApi.h>
 
+#ifdef _WIN32
+  #include <memory>
+  #include <Service.h>
+#endif
+
 @ScriptIncludes@
 
 const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
@@ -7,6 +12,28 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 @ScriptNames@
    nullptr
 };
+
+#ifdef _WIN32
+namespace Sapphire::Data
+{
+  class ExdData;
+}
+
+namespace Sapphire::World::Manager
+{
+  class TerritoryMgr;
+}
+
+extern "C" EXPORT void win32initExd( std::shared_ptr< Sapphire::Data::ExdData > exdData )
+{
+  Sapphire::Common::Service< Sapphire::Data::ExdData >::set( exdData );
+}
+
+extern "C" EXPORT void win32initTeri( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > teriMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::TerritoryMgr >::set( teriMgr );
+}
+#endif
 
 extern "C" EXPORT const Sapphire::ScriptAPI::ScriptObject** getScripts()
 {

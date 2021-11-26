@@ -14,7 +14,7 @@ namespace Sapphire::World::Util
   public:
     ActorFilter() = default;
     virtual ~ActorFilter() = default;
-    virtual bool conditionApplies( const Entity::Actor& actor ) = 0;
+    virtual bool conditionApplies( const Entity::GameObject& actor ) = 0;
   };
 
   using ActorFilterPtr = std::shared_ptr< ActorFilter >;
@@ -27,7 +27,7 @@ namespace Sapphire::World::Util
     float m_range;
   public:
     ActorFilterInRange( Common::FFXIVARR_POSITION3 startPos, float range );
-    bool conditionApplies( const Entity::Actor& actor ) override;
+    bool conditionApplies( const Entity::GameObject& actor ) override;
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ namespace Sapphire::World::Util
     uint32_t m_actorId;
   public:
     explicit ActorFilterSingleTarget( uint32_t actorId );
-    bool conditionApplies( const Entity::Actor& actor ) override;
+    bool conditionApplies( const Entity::GameObject& actor ) override;
   };
 }
 
