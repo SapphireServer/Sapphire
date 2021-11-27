@@ -82,11 +82,13 @@ find_path(MYSQL_INCLUDE_DIR
     /usr/local/include
     /usr/local/include/mysql
     /usr/local/mysql/include
-    "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/include"
-    "${PROGRAM_FILES_64}/MySQL/include"
     "${PROGRAM_FILES_64}/MariaDB 10.3/include/mysql"
     "${PROGRAM_FILES_64}/MariaDB 10.4/include/mysql"
     "${PROGRAM_FILES_64}/MariaDB 10.5/include/mysql"
+    "${PROGRAM_FILES_64}/MariaDB 10.6/include/mysql"
+    "${PROGRAM_FILES_64}/MariaDB 10.7/include/mysql"
+    "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/include"
+    "${PROGRAM_FILES_64}/MySQL/include"
     "C:/MySQL/include"
     "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/include"
     "$ENV{ProgramFiles}/MySQL/MySQL Server 5.7/include"
@@ -122,12 +124,14 @@ if( WIN32 )
       libmariadb
     PATHS
       ${MYSQL_ADD_LIBRARIES_PATH}
-      "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/lib"
-      "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/lib/opt"
-      "${PROGRAM_FILES_64}/MySQL/lib"
       "${PROGRAM_FILES_64}/MariaDB 10.3/lib"
       "${PROGRAM_FILES_64}/MariaDB 10.4/lib"
       "${PROGRAM_FILES_64}/MariaDB 10.5/lib"
+      "${PROGRAM_FILES_64}/MariaDB 10.6/include/mysql"
+      "${PROGRAM_FILES_64}/MariaDB 10.7/include/mysql"
+      "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/lib"
+      "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/lib/opt"
+      "${PROGRAM_FILES_64}/MySQL/lib"
       "C:/MySQL/lib/debug"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/lib"
       "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/lib/opt"
@@ -177,12 +181,14 @@ endif( UNIX )
 if( WIN32 )
     find_program(MYSQL_EXECUTABLE mysql
       PATHS
-        "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin"
-        "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin/opt"
-        "${PROGRAM_FILES_64}/MySQL/bin"
         "${PROGRAM_FILES_64}/MariaDB 10.3/bin"
         "${PROGRAM_FILES_64}/MariaDB 10.4/bin"
         "${PROGRAM_FILES_64}/MariaDB 10.5/bin"
+        "${PROGRAM_FILES_64}/MariaDB 10.6/include/mysql"
+        "${PROGRAM_FILES_64}/MariaDB 10.7/include/mysql"
+        "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin"
+        "${PROGRAM_FILES_64}/MySQL/MySQL Server 5.7/bin/opt"
+        "${PROGRAM_FILES_64}/MySQL/bin"
         "C:/MySQL/bin/debug"
         "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/bin"
         "[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.7;Location]/bin/opt"
