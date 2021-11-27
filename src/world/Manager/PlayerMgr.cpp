@@ -332,7 +332,7 @@ void PlayerMgr::sendUrgent( Sapphire::Entity::Player& player, const std::string&
 void PlayerMgr::sendDebug( Sapphire::Entity::Player& player, const std::string& message ) //Grey Text
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, ChatType::ServerDebug, message ) );
+  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, ChatType::SystemMessage, message ) );
 }
 
 void PlayerMgr::sendLogMessage( Sapphire::Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
@@ -340,5 +340,5 @@ void PlayerMgr::sendLogMessage( Sapphire::Entity::Player& player, uint32_t messa
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), ActorControlType::LogMsg, messageId,
-                                                                             param2, param3, param4, param5, param6 ) );
+                                                                                 param2, param3, param4, param5, param6 ) );
 }
