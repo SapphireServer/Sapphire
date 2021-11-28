@@ -41,11 +41,9 @@ jobs:
         submodules: recursive
     - name: Enable Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1.10.0
-    - name: install deps & remove default garbage
+    - name: install deps
       run: |
-        $env:PATH
         choco install --no-progress mariadb ninja
-        choco list --local-only
     - name: cmake init
       run: |
         mkdir build
