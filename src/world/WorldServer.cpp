@@ -145,6 +145,9 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Data::ExdData >::set( pExdData );
 
+//  auto aetherInfo = pExdData->getRow< Component::Excel::ClassJob >( 2 );
+//  auto aetherInfo1 = pExdData->getRow< Component::Excel::ClassJob >( 3 );
+
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;
   loader.addDb( *pDb, m_config.global.database );

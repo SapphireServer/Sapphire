@@ -209,7 +209,6 @@ void PlayerMinimal::saveAsNew()
 
   uint32_t equipModel[10];
   memset( equipModel, 0, 40 );
-  memcpy( modelEquip.data(), equipModel, modelEquip.size() );
 
   uint32_t startZone;
   float x, y, z, o;
@@ -256,49 +255,6 @@ void PlayerMinimal::saveAsNew()
     default:
       break;
   }
-
-  //        "(AccountId, CharacterId, EntityId, Name, Hp, Mp, "
-  //        "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
-  //        "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
-  //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
-  //        "Aetheryte, GMRank, UPDATE_DATE )
-
-  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_INS );
-  stmt->set( 1, m_accountId );
-  stmt->set( 2, m_characterId );
-  stmt->set( 3, m_id );
-
-  stmt->setString( 4, std::string( m_name ) );
-  stmt->setInt( 5, 100 );
-  stmt->setInt( 6, 100 );
-  stmt->setBinary( 7, customize );
-  stmt->setInt( 8, m_voice );
-  stmt->setInt( 9, 1 );
-  stmt->setInt( 10, startZone );
-  stmt->setDouble( 11, x );
-  stmt->setDouble( 12, y );
-  stmt->setDouble( 13, z );
-  stmt->setDouble( 14, o );
-  stmt->setBinary( 15, modelEquip );
-  stmt->setInt( 16, 1 );
-  stmt->setInt( 17, m_guardianDeity );
-  stmt->setInt( 18, m_birthDay );
-  stmt->setInt( 19, m_birthMonth );
-  stmt->setInt( 20, m_class );
-  stmt->setInt( 21, 1 );
-  stmt->setInt( 22, m_class );
-  stmt->setInt( 23, homePoint );
-  stmt->setInt( 24, startTown );
-  stmt->setBinary( 25, discovery );
-  stmt->setBinary( 26, howTo );
-  stmt->setBinary( 27, questComplete );
-  stmt->setBinary( 28, unlocks );
-  stmt->setBinary( 29, questTracking8 );
-  stmt->setBinary( 30, aetherytes );
-  stmt->setInt( 31, m_gmRank );
-  stmt->setBinary( 32, mountGuide );
-  stmt->setBinary( 33, orchestrion );
-  g_charaDb.directExecute( stmt );
 
   // CharacterId, ClassIdx, Exp, Lvl
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
@@ -347,7 +303,7 @@ void PlayerMinimal::saveAsNew()
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SETUP EQUIPMENT / STARTING GEAR
   auto classJobInfo = g_exdData.getRow< Component::Excel::ClassJob >( m_class );
-  uint32_t weaponId = classJobInfo->data().InitWeapon[0];
+  uint32_t weaponId = classJobInfo->data().InitWeapon[ 0 ];
   uint64_t uniqueId = getNextUId64();
 
   uint8_t race = customize[ CharaLook::Race ];
@@ -368,6 +324,19 @@ void PlayerMinimal::saveAsNew()
   hands = raceInfo->data().Hand[ gender ];
   legs = raceInfo->data().Leg[ gender ];
   feet = raceInfo->data().Foot[ gender ];
+
+  auto mainWeaponInfo = g_exdData.getRow< Component::Excel::Item >( weaponId );
+  auto bodyInfo = g_exdData.getRow< Component::Excel::Item >( body );
+  auto handsInfo = g_exdData.getRow< Component::Excel::Item >( hands );
+  auto legsInfo = g_exdData.getRow< Component::Excel::Item >( legs );
+  auto feetInfo = g_exdData.getRow< Component::Excel::Item >( feet );
+
+  uint64_t modelMainWeapon = mainWeaponInfo->data().ModelId;
+
+  equipModel[ GearModelSlot::ModelBody ] = static_cast< uint32_t >( bodyInfo->data().ModelId );
+  equipModel[ GearModelSlot::ModelHands ] = static_cast< uint32_t >( handsInfo->data().ModelId );
+  equipModel[ GearModelSlot::ModelLegs ] = static_cast< uint32_t >( legsInfo->data().ModelId );
+  equipModel[ GearModelSlot::ModelFeet ] = static_cast< uint32_t >( feetInfo->data().ModelId );
 
   insertDbGlobalItem( weaponId, uniqueId );
   insertDbGlobalItem( body, bodyUid );
@@ -398,6 +367,53 @@ void PlayerMinimal::saveAsNew()
                      std::to_string( 0 ) + ", " +
                      std::to_string( 0 ) + ", " +
                      std::to_string( 0 ) + ", NOW());" );
+
+  //        "(AccountId, CharacterId, EntityId, Name, Hp, Mp, "
+  //        "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
+  //        "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
+  //        "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
+  //        "Aetheryte, GMRank, UPDATE_DATE )
+
+
+
+  memcpy( modelEquip.data(), equipModel, modelEquip.size() );
+  auto stmt = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_INS );
+  stmt->set( 1, m_accountId );
+  stmt->set( 2, m_characterId );
+  stmt->set( 3, m_id );
+
+  stmt->setString( 4, std::string( m_name ) );
+  stmt->setInt( 5, 100 );
+  stmt->setInt( 6, 100 );
+  stmt->setBinary( 7, customize );
+  stmt->setInt( 8, m_voice );
+  stmt->setInt( 9, 1 );
+  stmt->setInt( 10, startZone );
+  stmt->setDouble( 11, x );
+  stmt->setDouble( 12, y );
+  stmt->setDouble( 13, z );
+  stmt->setDouble( 14, o );
+  stmt->setBinary( 15, modelEquip );
+  stmt->setInt( 16, 1 );
+  stmt->setInt( 17, m_guardianDeity );
+  stmt->setInt( 18, m_birthDay );
+  stmt->setInt( 19, m_birthMonth );
+  stmt->setInt( 20, m_class );
+  stmt->setInt( 21, 1 );
+  stmt->setInt( 22, m_class );
+  stmt->setInt( 23, homePoint );
+  stmt->setInt( 24, startTown );
+  stmt->setBinary( 25, discovery );
+  stmt->setBinary( 26, howTo );
+  stmt->setBinary( 27, questComplete );
+  stmt->setBinary( 28, unlocks );
+  stmt->setBinary( 29, questTracking8 );
+  stmt->setBinary( 30, aetherytes );
+  stmt->setInt( 31, m_gmRank );
+  stmt->setBinary( 32, mountGuide );
+  stmt->setBinary( 33, orchestrion );
+  stmt->set( 34, modelMainWeapon );
+  g_charaDb.directExecute( stmt );
 
 }
 

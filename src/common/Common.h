@@ -1022,16 +1022,16 @@ namespace Sapphire::Common
 
   enum PlayerStateFlag : uint8_t
   {
-    HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
-    InCombat = 1, // in Combat, locks gearchange/return/teleport
-    Casting = 2,
-    InNpcEvent = 7, // when talking to an npc, locks ui giving "occupied" message
+    HideUILockChar = 16, // as the name suggests, hides the ui and logs the char...
+    InCombat = 17, // in Combat, locks gearchange/return/teleport
+    Casting = 18,
+    InNpcEvent = 23, // when talking to an npc, locks ui giving "occupied" message
 
-    InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
+ //   InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
-    BoundByDuty = 22,
-    BetweenAreas = 33,
-    WatchingCutscene = 46, // this is actually just a dummy, this id is different
+    BoundByDuty = 26,
+    BetweenAreas = 37,
+    WatchingCutscene = 51, // this is actually just a dummy, this id is different
 
 
   };

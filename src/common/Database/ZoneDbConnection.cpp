@@ -64,8 +64,8 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
                     "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
                     "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
-                    "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "
-                    "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
+                    "Aetheryte, GMRank, Mounts, Orchestrion, ModelMainWeapon, UPDATE_DATE ) "
+                    "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_UP_NAME, "UPDATE charainfo SET Name = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
