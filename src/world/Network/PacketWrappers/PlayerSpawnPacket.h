@@ -78,8 +78,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Title = player.getTitle();
       m_data.Voice = player.getVoiceId();
 
-      //m_data.activeMinion = player.getCurrentCompanion();
-      //m_data.activeMinion = 0;
+      m_data.Companion = player.getCurrentCompanion();
+      m_data.Mount.Id = player.getCurrentMount();
 
       m_data.OnlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
 
@@ -90,7 +90,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ObjType = 4;
       if( target.getId() == player.getId() )
       {
-        m_data.Index = 0x00;
+        m_data.Index = 0;
       }
       else
       {
