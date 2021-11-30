@@ -128,7 +128,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       }
 
      // m_data.currentMount = player.getCurrentMount();
-     // m_data.persistentEmote = player.getPersistentEmote();
 
       m_data.MainTarget = player.getTargetId();
       //m_data.type = 1;
