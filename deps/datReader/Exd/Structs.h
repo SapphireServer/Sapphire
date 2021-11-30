@@ -617,6 +617,7 @@ namespace Component::Excel
   struct Emote
   {
     EmoteTextStruct Text;
+    uint32_t Unknown;
     int32_t TimelineID;
     int32_t TimelineID_Begin;
     int32_t TimelineID_End;
