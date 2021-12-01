@@ -432,22 +432,16 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
 
 
-void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                      Entity::Player& player )
+void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   // init handler means this is a login procedure
   player.setIsLogin( true );
   teriMgr.joinWorld( player );
-
-
-
-  //player.sendZonePackets();
 }
 
 
-void Sapphire::Network::GameConnection::getBlacklistHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                             Entity::Player& player )
+void Sapphire::Network::GameConnection::getBlacklistHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGetBlacklist >( inPacket );
   auto& data = packet.data();

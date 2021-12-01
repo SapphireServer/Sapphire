@@ -42,7 +42,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
       m_data.Lv = player.getLevel();
       m_data.GMRank = player.getGmRank();
-      m_data.ModeArgs = player.getPose();
+      m_data.ModeArgs = player.getPersistentEmote();
+      m_data.PoseEmote = player.getPose();
 
       if( player.isDirectorInitialized() )
       {
