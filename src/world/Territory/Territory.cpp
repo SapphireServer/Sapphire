@@ -508,7 +508,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
     // this session is not linked to this area anymore, remove it from zone session list
     if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
     {
-      Logger::debug( "removeActor( pPlayer );" );
+      Logger::debug( "[{}] removeActor( pPlayer );", pPlayer->getId() );
       removeActor( pPlayer );
       return;
     }
@@ -733,12 +733,12 @@ void Sapphire::Territory::updateInRangeSet( Entity::GameObjectPtr pActor, CellPt
 
 void Sapphire::Territory::onPlayerZoneIn( Entity::Player& player )
 {
-  Logger::debug( "Territory::onEnterTerritory: Territory#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
+  Logger::debug( "[{2}] Territory::onEnterTerritory: Territory#{0}|{1}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
 void Sapphire::Territory::onLeaveTerritory( Entity::Player& player )
 {
-  Logger::debug( "Territory::onLeaveTerritory: Territory#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
+  Logger::debug( "[{2}] Territory::onLeaveTerritory: Territory#{0}|{1}", getGuId(), getTerritoryTypeId(), player.getId() );
 }
 
 void Sapphire::Territory::onUpdate( uint64_t tickCount )
