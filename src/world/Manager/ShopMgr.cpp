@@ -5,7 +5,6 @@
 #include <Inventory/Item.h>
 #include <Common.h>
 #include <Service.h>
-#include <Exd/ExdData.h>
 
 using namespace Sapphire;
 
