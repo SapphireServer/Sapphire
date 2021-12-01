@@ -19,32 +19,38 @@ uint16_t Sapphire::World::Quest::getId() const
 
 bool Sapphire::World::Quest::getBitFlag8( uint8_t index )
 {
-  return m_data.a.BitFlag8 & ( 1 << index );
+  uint8_t realIdx = 8 - index;
+  return m_data.a.BitFlag8 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag16( uint8_t index )
 {
-  return m_data.a.BitFlag16 & ( 1 << index );
+  uint8_t realIdx = 8 - index;
+  return m_data.a.BitFlag16 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag24( uint8_t index )
 {
-  return m_data.a.BitFlag24 & ( 1 << index );
+  uint8_t realIdx = 8 - index;
+  return m_data.a.BitFlag24 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag32( uint8_t index )
 {
-  return m_data.a.BitFlag32 & ( 1 << index );
+  uint8_t realIdx = 8 - index;
+  return m_data.a.BitFlag32 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag40( uint8_t index )
 {
-  return m_data.a.BitFlag40 & ( 1 << index );
+  uint8_t realIdx = 8 - index;
+  return m_data.a.BitFlag40 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag48( uint8_t index )
 {
-  return m_data.a.BitFlag48 & ( 1 << index );
+  uint8_t realIdx = 8 - index;
+  return m_data.a.BitFlag48 & ( 1 << realIdx );
 }
 
 uint8_t Sapphire::World::Quest::getUI8A() const
