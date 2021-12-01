@@ -1,6 +1,5 @@
 #include <Actor/Player.h>
 #include <Manager/EventMgr.h>
-#include <Manager/PlayerMgr.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -143,7 +142,7 @@ private:
     eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00001Return ) );
   }
 
-  void Scene00001Return ( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     Scene00002( quest, player );
   }
