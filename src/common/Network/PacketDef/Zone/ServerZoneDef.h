@@ -938,7 +938,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint64_t Crest;
     uint32_t EntityId;
     uint32_t RestPoint;
-    uint16_t Expansion;
+    uint8_t Expansion;
+    uint8_t Unknown8;
     uint8_t Race;
     uint8_t Tribe;
     uint8_t Sex;
@@ -947,9 +948,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t GuardianDeity;
     uint8_t BirthMonth;
     uint8_t Birthday;
-    uint8_t GrandCompany;
-    uint8_t HomePoint;
     uint8_t StartTown;
+    uint8_t HomePoint;
+    uint8_t GrandCompany;
     uint8_t Anima;
     uint8_t Pet;
     uint8_t BuddyRank;

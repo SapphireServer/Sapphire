@@ -40,10 +40,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.GuardianDeity = static_cast< uint8_t >( player.getGuardianDeity() );
       m_data.BirthMonth = player.getBirthMonth();
       m_data.Birthday = player.getBirthDay();
-      // TODO: Support grand company status.
       m_data.StartTown = player.getStartTown();
-      //m_data.gcRank = GCRank::None;
-
       m_data.HomePoint = player.getHomepoint();
       //m_data.pose = player.getPose();
 
@@ -53,7 +50,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       memcpy( m_data.Aetheryte, player.getAetheryteArray().data(), sizeof( m_data.Aetheryte ) );
 
       // Set the class levels and exp.
-      for( uint8_t i = 0; i < 20; i++ )
+      for( uint8_t i = 0; i < 23; i++ )
       {
         m_data.Lv[ i ] = player.getClassArray()[ i ];
         m_data.Exp[ i ] = player.getExpArray()[ i ];
@@ -68,9 +65,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       memcpy( m_data.Discovery16, player.getDiscoveryBitmask().data(), sizeof( m_data.Discovery16 ) + sizeof( m_data.Discovery32 ) );
 
       memcpy( m_data.HowTo, player.getHowToArray().data(), sizeof( m_data.HowTo ) );
-
-      m_data.Anima = 0;
-      m_data.Pet = 0;
 
       // possibly max level or current level
    //   m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
