@@ -579,6 +579,18 @@ struct FFXIVIpcGetCommonlistDetail : FFXIVIpcBasePacket< GetCommonlistDetail >
   uint8_t ListType;
 };
 
+struct FFXIVIpcFriendlistRemove : FFXIVIpcBasePacket< FriendlistRemove >
+{
+  uint64_t TargetCharacterID;
+  char TargetCharacterName[32];
+};
+
+struct FFXIVIpcSetFriendlistGroup : FFXIVIpcBasePacket< SetFriendlistGroup >
+{
+  uint64_t TargetCharacterID;
+  uint8_t group;
+};
+
 struct FFXIVIpcPcSearch : FFXIVIpcBasePacket< PcSearch >
 {
   uint64_t ClassID;

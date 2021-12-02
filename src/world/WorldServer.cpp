@@ -42,6 +42,7 @@
 #include "Manager/ChatChannelMgr.h"
 #include "Manager/QuestMgr.h"
 #include "Manager/PartyMgr.h"
+#include "Manager/FriendListMgr.h"
 
 #include "ContentFinder/ContentFinder.h"
 
@@ -239,6 +240,7 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
   auto pQuestMgr = std::make_shared< Manager::QuestMgr >();
   auto pPartyMgr = std::make_shared< Manager::PartyMgr >();
+  auto pFriendMgr = std::make_shared< Manager::FriendListMgr >();
   auto contentFinder = std::make_shared< ContentFinder >();
 
   Common::Service< DebugCommandMgr >::set( pDebugCom );
@@ -250,6 +252,7 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::RNGMgr >::set( pRNGMgr );
   Common::Service< Manager::QuestMgr >::set( pQuestMgr );
   Common::Service< Manager::PartyMgr >::set( pPartyMgr );
+  Common::Service< Manager::FriendListMgr >::set( pFriendMgr );
   Common::Service< ContentFinder >::set( contentFinder );
 
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
