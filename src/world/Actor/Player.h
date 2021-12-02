@@ -799,6 +799,9 @@ namespace Sapphire::Entity
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    using FriendListIDVec = std::array< uint64_t, 200 >;
+    using FriendListDataVec = std::array< Common::HierarchyData, 200 >;
+
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     void sendHuntingLog();
@@ -807,6 +810,9 @@ namespace Sapphire::Entity
 
     uint64_t getPartyId() const;
     void setPartyId( uint64_t partyId );
+
+    FriendListIDVec& getFriendListID();
+    FriendListDataVec& getFriendListData();
 
     uint64_t m_lastMoveTime{};
     uint8_t m_lastMoveflag{};
@@ -963,8 +969,8 @@ namespace Sapphire::Entity
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries{};
 
-    std::array< uint64_t, 200 > m_friendList{};
-    std::array< uint64_t, 200 > m_friendInviteList{};
+    FriendListIDVec m_friendList{};
+    FriendListDataVec m_friendInviteList{};
 
     uint64_t m_partyId;
     std::vector< uint32_t > m_lastPcSearch;

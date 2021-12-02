@@ -9,8 +9,6 @@
 
 #include "Manager/PartyMgr.h"
 
-#include "Territory/InstanceContent.h"
-
 #include "Network/GameConnection.h"
 
 #include "Session.h"

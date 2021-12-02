@@ -2138,6 +2138,15 @@ void Sapphire::Entity::Player::setPartyId( uint64_t partyId )
   m_partyId = partyId;
 }
 
+Sapphire::Entity::Player::FriendListIDVec& Sapphire::Entity::Player::getFriendListID()
+{
+  return m_friendList;
+}
+Sapphire::Entity::Player::FriendListDataVec& Sapphire::Entity::Player::getFriendListData()
+{
+  return m_friendInviteList;
+}
+
 void Sapphire::Entity::Player::setLastPcSearchResult( std::vector< uint32_t > result )
 {
   m_lastPcSearch = std::move( result );

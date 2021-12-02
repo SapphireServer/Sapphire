@@ -83,6 +83,7 @@ namespace Sapphire::Network::Packets
       PcSearch = 0xEB,
       GetFcJoinRequestComment = 0xEC,
       InviteCancel = 0xED,
+      SetFriendlistGroup = 0xEE,
       LinkshellJoin = 0xF0,
       LinkshellJoinOfficial = 0xF1,
       LinkshellLeave = 0xF2,

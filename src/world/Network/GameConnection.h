@@ -217,6 +217,8 @@ namespace Sapphire::Network
     DECLARE_HANDLER( pcPartyKickHandler );
     DECLARE_HANDLER( pcPartyChangeLeaderHandler );
 
+    DECLARE_HANDLER( friendlistRemoveHandler );
+    DECLARE_HANDLER( setFriendlistGroupHandler );
   };
 
 }

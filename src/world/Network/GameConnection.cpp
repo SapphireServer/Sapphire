@@ -141,6 +141,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( PcPartyKick, "PcPartyKick", &GameConnection::pcPartyKickHandler );
   setZoneHandler( PcPartyChangeLeader, "PcPartyChangeLeader", &GameConnection::pcPartyChangeLeaderHandler );
 
+  setZoneHandler( FriendlistRemove, "FriendlistRemove", &GameConnection::friendlistRemoveHandler );
+  setZoneHandler( SetFriendlistGroup, "SetFriendlistGroup", &GameConnection::setFriendlistGroupHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

@@ -58,12 +58,17 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   /**
   * Structural representation of the packet sent by the server
   * with a list of players ( party list | friend list | search results )
+  * 3.0 Update: 64bit TerritoryID -> 32bit Timestamp, 32bit TerritoryID
   */
   struct PlayerEntry
   {
     uint64_t CharacterID;
-    uint64_t TerritoryID;
-    uint32_t HierarchyID;
+    uint32_t Timestamp;
+    uint32_t TerritoryID;
+    uint8_t HierarchyStatus;
+    uint8_t HierarchyType;
+    uint8_t HierarchyGroup;
+    uint8_t HierarchyUnk;
     uint16_t TerritoryType;
     uint8_t GrandCompanyID;
     uint8_t Region;
@@ -142,6 +147,14 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t Result;
     uint8_t Identity;
     char InviteName[32];
+  };
+
+  struct FFXIVIpcFriendlistRemoveResult : FFXIVIpcBasePacket< FriendlistRemoveResult >
+  {
+    uint64_t RemovedCharacterID;
+    uint32_t Result;
+    uint8_t Identity;
+    char RemovedCharacterName[32];
   };
 
   struct FFXIVIpcGetFcStatusResult : FFXIVIpcBasePacket< GetFcStatusResult >
