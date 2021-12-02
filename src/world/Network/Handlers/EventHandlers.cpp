@@ -287,20 +287,6 @@ void Sapphire::Network::GameConnection::returnEventScene255( const Packets::FFXI
   eventMgr.handleReturnEventScene( player, data.handlerId, data.sceneId, data.errorCode, data.numOfResults, results );
 }
 
-void Sapphire::Network::GameConnection::eventHandlerLinkshell( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
-{
-  auto& server = Common::Service< World::WorldServer >::ref();
-  const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString8 >( inPacket );
-
-  auto linkshellEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
-  linkshellEvent->data().handlerId = packet.data().handlerId;
-  linkshellEvent->data().sceneId = static_cast< uint8_t >( packet.data().sceneId );
-  linkshellEvent->data().numOfArgs = 1;
-  linkshellEvent->data().args[ 0 ] = 0x15a;
-  server.queueForPlayer( player.getCharacterId(), linkshellEvent );
-
-}
-
 void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();

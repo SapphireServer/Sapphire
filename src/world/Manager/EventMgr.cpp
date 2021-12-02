@@ -548,17 +548,17 @@ void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t s
   if( !pEvent )
     return;
 
-  auto linkshellEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
-  linkshellEvent->data().handlerId = eventId;
-  linkshellEvent->data().sceneId = static_cast< uint8_t >( scene );
-  linkshellEvent->data().numOfArgs = values.size();
+  auto resumeEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
+  resumeEvent->data().handlerId = eventId;
+  resumeEvent->data().sceneId = static_cast< uint8_t >( scene );
+  resumeEvent->data().numOfArgs = values.size();
   int i = 0;
   for( auto& val : values )
   {
-    linkshellEvent->data().args[ i++ ] = val;
+    resumeEvent->data().args[ i++ ] = val;
   }
   auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), linkshellEvent );
+  server.queueForPlayer( player.getCharacterId(), resumeEvent );
 }
 
 void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )

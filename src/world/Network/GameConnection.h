@@ -158,8 +158,6 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( startUiEvent );
 
-    DECLARE_HANDLER( eventHandlerLinkshell );
-
     DECLARE_HANDLER( yieldEventString );
 
     DECLARE_HANDLER( logoutHandler );
