@@ -16,6 +16,8 @@
 #include "Manager/ItemMgr.h"
 #include "Quest/Quest.h"
 
+#include "WorldServer.h"
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
@@ -87,6 +89,12 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
   m_bNewGame = res->getBoolean( "IsNewGame" );
   m_bNewAdventurer = res->getBoolean( "IsNewAdventurer" );
   m_openingSequence = res->getUInt8( "OpeningSequence" );
+
+  // check if opening sequence should be skipped
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto skipOpening = server.getConfig().skipOpening;
+  if( m_openingSequence < 2 && skipOpening )
+    m_openingSequence = 2;
 
   m_gc = res->getUInt8( "GrandCompany" );
   m_cfPenaltyUntil = res->getUInt( "CFPenaltyUntil" );
