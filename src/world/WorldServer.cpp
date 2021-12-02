@@ -107,6 +107,7 @@ bool Sapphire::World::WorldServer::loadSettings( int32_t argc, char* argv[] )
   m_config.network.inRangeDistance = configMgr.getValue< float >( "Network", "InRangeDistance", 80.f );
 
   m_config.motd = configMgr.getValue< std::string >( "General", "MotD", "" );
+  m_config.skipOpening = configMgr.getValue( "General", "SkipOpening", false );
 
   m_config.housing.defaultEstateName = configMgr.getValue< std::string >( "Housing", "DefaultEstateName", "Estate #{}" );
 

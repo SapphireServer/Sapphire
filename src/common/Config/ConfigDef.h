@@ -64,6 +64,7 @@ namespace Sapphire::Common::Config
     } navigation;
 
     std::string motd;
+    bool skipOpening;
   };
 
   struct LobbyConfig
