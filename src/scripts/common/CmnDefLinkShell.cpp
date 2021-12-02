@@ -44,8 +44,11 @@ public:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      linkshellMgr().createLinkshell( result.resultString, player );
-      eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a } );
+      auto ls = linkshellMgr().createLinkshell( result.resultString, player );
+      if( !ls )
+        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a } );
+      else
+        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 } );
     };
 
     eventMgr().playScene( player, getId(), 2, 0, callback );
