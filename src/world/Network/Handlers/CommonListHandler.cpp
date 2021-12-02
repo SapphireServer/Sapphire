@@ -58,10 +58,9 @@ void Sapphire::Network::GameConnection::getCommonlistDetailHandler( const Packet
 
   // serialize class data to packet
 
-  // todo: fix 28 (common::classjob count does not match packet size)
   auto classDataArr = pPlayer->getClassArray();
 
-  for( size_t i = 0; i < 28; ++i )
+  for( size_t i = 0; i < Common::CLASSJOB_TOTAL; ++i )
   {
     resultPacket->data().ClassData[ i ].id = static_cast< uint16_t >( i );
     resultPacket->data().ClassData[ i ].level = classDataArr[ i ];
@@ -76,7 +75,8 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
   // TODO: possibly move lambda func to util
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto generateEntries = [&]( const auto& idVec, size_t offset ) -> std::vector< PlayerEntry >
+  // this func paginates any commonlist entry, associating them with online player data and hierarchy ID (optional)
+  auto generateEntries = [&]( const auto& idVec, size_t offset, const std::vector< Common::HierarchyData >& hierarchyVec ) -> std::vector< PlayerEntry >
   {
     std::vector< PlayerEntry > entries;
 
@@ -90,8 +90,8 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       }
 
       auto id = idVec[ i ];
-
       auto pPlayer = server.getPlayer( id );
+      
       if( !pPlayer )
         continue;
         
@@ -101,8 +101,14 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
 
       if( isConnected )
       {
-        entry.TerritoryType = pPlayer->getCurrentTerritory()->getTerritoryTypeId();
-        entry.TerritoryID = pPlayer->getCurrentTerritory()->getTerritoryTypeId();
+        // todo: fix odd teri nullptr on login for friendlist etc
+        auto pTeri = pPlayer->getCurrentTerritory();
+        if( pTeri )
+        {
+          entry.TerritoryType = pPlayer->getCurrentTerritory()->getTerritoryTypeId();
+          entry.TerritoryID = pPlayer->getCurrentTerritory()->getTerritoryTypeId();
+        }
+
         entry.CurrentClassID = static_cast< uint8_t >( pPlayer->getClass() );
         entry.SelectClassID = static_cast< uint8_t >( pPlayer->getSearchSelectClass() );
           
@@ -122,10 +128,20 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       entry.CharacterID = pPlayer->getCharacterId();
       strcpy( entry.CharacterName, pPlayer->getName().c_str() );
 
+      if( hierarchyVec.size() > 0 )
+      {
+        auto hierarchy = hierarchyVec[ i ];
+
+        entry.Timestamp = hierarchy.data.dateAdded;
+        entry.HierarchyStatus = hierarchy.data.status;
+        entry.HierarchyType = hierarchy.data.type;
+        entry.HierarchyGroup = hierarchy.data.group;
+        entry.HierarchyUnk = hierarchy.data.unk;
+      }
+
       entries.emplace_back( entry );
     }
     
-
     return entries;
   };
 
@@ -156,7 +172,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       auto pParty = partyMgr.getParty( player.getPartyId() );
       assert( pParty );
       
-      page = generateEntries( pParty->MemberId, offset );
+      page = generateEntries( pParty->MemberId, offset, {} );
 
       // ensure first entry is the player requesting packet
       for( int i = 0; i < 8; ++i )
@@ -172,32 +188,17 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
     else
     {
       std::vector< uint32_t > soloParty = { player.getId() };
-      page = generateEntries( soloParty, offset );
+      page = generateEntries( soloParty, offset, {} );
     }
   }
   else if( data.ListType == 0x0b )
   { // friend list
- /*   listPacket->data().entries[ 0 ].TerritoryType = player.getCurrentTerritory()->getTerritoryTypeId();
-    listPacket->data().entries[ 0 ].TerritoryID = player.getCurrentTerritory()->getTerritoryTypeId();
-    listPacket->data().entries[ 0 ].CurrentClassID = static_cast< uint8_t >( player.getClass() );
-    listPacket->data().entries[ 0 ].SelectClassID = static_cast< uint8_t >( player.getClass() );
-    listPacket->data().entries[ 0 ].CharacterID = player.getContentId();
-    listPacket->data().entries[ 0 ].CurrentLevel = player.getLevel();
-    listPacket->data().entries[ 0 ].SelectLevel = player.getLevel();
-    listPacket->data().entries[ 0 ].Identity = 1;
+    auto& friendList = player.getFriendListID();
+    auto& friendListData = player.getFriendListData();
 
-    strcpy( listPacket->data().entries[ 0 ].CharacterName, player.getName().c_str() );
+    std::vector< Common::HierarchyData > hierarchyData( friendListData.begin(), friendListData.end() );
 
-    // GC icon
-    listPacket->data().entries[ 0 ].GrandCompanyID = 2;
-    // client language J = 0, E = 1, D = 2, F = 3
-    listPacket->data().entries[ 0 ].Region = 1;
-    // user language settings flag J = 1, E = 2, D = 4, F = 8
-    listPacket->data().entries[ 0 ].SelectRegion = 1 + 2;
-    listPacket->data().entries[ 0 ].OnlineStatus = player.getOnlineStatusMask();
-    listPacket->data().entries[ 0 ].HierarchyID = 0x20;*/
-    offset = 0;
-    isLast = true;
+    page = generateEntries( friendList, offset, hierarchyData );
   }
   else if( data.ListType == 0x0c )
   { // linkshell
@@ -213,13 +214,13 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       std::vector< uint64_t > memberVec;
       std::copy( memberSet.begin(), memberSet.end(), std::back_inserter( memberVec ) );
 
-      page = generateEntries( memberVec, offset );
+      page = generateEntries( memberVec, offset, {} );
     }
   }
   else if( data.ListType == 0x0e )
   { // player search result
     auto queryPlayers = player.getLastPcSearchResult();
-    page = generateEntries( queryPlayers, offset );
+    page = generateEntries( queryPlayers, offset, {} );
   }
 
   // if we didn't manually terminate pagination (party, etc), check if we need to do so

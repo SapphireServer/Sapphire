@@ -470,12 +470,12 @@ void Sapphire::Entity::Player::updateDbFriendList()
   auto stmt = db.getPreparedStatement( Db::CHARA_FRIENDLIST_UP );
 
   std::vector< uint8_t > friendIds( 1600 );
-  std::vector< uint8_t > InviteIds( 1600 );
+  std::vector< uint8_t > inviteIds( 1600 );
 
   memcpy( friendIds.data(), m_friendList.data(), 1600 );
-  memcpy( InviteIds.data(), m_friendInviteList.data(), 1600 );
+  memcpy( inviteIds.data(), m_friendInviteList.data(), 1600 );
   stmt->setBinary( 1, friendIds );
-  stmt->setBinary( 2, InviteIds );
+  stmt->setBinary( 2, inviteIds );
   stmt->setUInt64( 3, m_characterId );
   db.execute( stmt );
 }

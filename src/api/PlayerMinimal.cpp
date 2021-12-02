@@ -268,6 +268,16 @@ void PlayerMinimal::saveAsNew()
   stmtSearchInfo->setUInt64( 1, m_characterId );
   g_charaDb.directExecute( stmtSearchInfo );
 
+  // Friend list related
+  auto stmtFriendList = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_FRIENDLIST_INS );
+  std::vector< uint8_t > friendIds( 1600, 0 );
+  std::vector< uint8_t > inviteIds( 1600, 0 );
+
+  stmtFriendList->setUInt64( 1, m_characterId );
+  stmtFriendList->setBinary( 2, friendIds );
+  stmtFriendList->setBinary( 3, inviteIds );
+  g_charaDb.directExecute( stmtFriendList );
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SET UP INVENTORIES
   createInvDbContainer( InventoryType::Bag0 );

@@ -20,6 +20,7 @@
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/InviteUpdatePacket.h"
 
+#include "Manager/FriendListMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/PlayerMgr.h"
 
@@ -55,7 +56,7 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
 
   switch( packet.data().AuthType )
   {
-    case InviteType::PCPARTY:
+    case HierarchyType::PCPARTY:
     {
       auto inviteResultPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcInviteResult >( player.getId() );
       auto& data = inviteResultPacket->data();
@@ -71,7 +72,7 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
       break;
     }
 
-    case InviteType::FRIENDLIST:
+    case HierarchyType::FRIENDLIST:
     {
       auto inviteResultPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcInviteResult >( player.getId() );
       auto& data = inviteResultPacket->data();
@@ -79,22 +80,31 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
       strcpy( data.TargetName, packet.data().TargetName );
       server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
 
-      auto invitePacket = std::make_shared< InviteUpdatePacket >( player, Common::Util::getTimeSeconds() + 30,
+      auto invitePacket = std::make_shared< InviteUpdatePacket >( player, 0,
                                                                   packet.data().AuthType, 1,
                                                                   InviteUpdateType::NEW_INVITE );
       pSession->getZoneConnection()->queueOutPacket( invitePacket );
 
+      auto& flMgr = Common::Service< FriendListMgr >::ref();
+
+      // add support to adding offline players
+      auto target = server.getPlayer( data.TargetName );
+      if( !target )
+        return;
+
+      flMgr.onInviteCreate( player, *target );
+
       break;
     }
-    case Common::InviteType::AUTOPARTY:
+    case HierarchyType::AUTOPARTY:
       break;
-    case Common::InviteType::FCCREATE:
+    case HierarchyType::FCCREATE:
       break;
-    case Common::InviteType::FREECOMPANY:
+    case HierarchyType::FREECOMPANY:
       break;
-    case Common::InviteType::FCJOINREQUEST:
+    case HierarchyType::FCJOINREQUEST:
       break;
-    case Common::InviteType::PARTYCANCEL:
+    case HierarchyType::PARTYCANCEL:
       break;
   }
 }
@@ -108,19 +118,19 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
   auto pSession = server.getSession( data.InviteCharacterID );
 
-  auto& partyMgr = Common::Service< Sapphire::World::Manager::PartyMgr >::ref();
-
   if( !pSession )
     return;
 
+  auto inviteReplyPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcInviteReplyResult >( player.getId() );
+  auto& inviteReplyData = inviteReplyPacket->data();
+  inviteReplyData.Answer = data.Answer;
+
   switch( data.AuthType )
   {
-    case Common::InviteType::PCPARTY:
+    case HierarchyType::PCPARTY:
     {
-      auto inviteReplyPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcInviteReplyResult >( player.getId() );
-      auto& inviteReplyData = inviteReplyPacket->data();
+      auto& partyMgr = Common::Service< Sapphire::World::Manager::PartyMgr >::ref();
 
-      inviteReplyData.Answer = data.Answer;
       uint8_t result;
       if( data.Answer == InviteReplyType::ACCEPT )
       {
@@ -142,17 +152,41 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
 
       break;
     }
-    case Common::InviteType::FRIENDLIST:
+    case HierarchyType::FRIENDLIST:
+    {
+      auto& flMgr = Common::Service< Sapphire::World::Manager::FriendListMgr >::ref();
+
+      uint8_t result;
+      if( data.Answer == InviteReplyType::ACCEPT )
+      {
+        flMgr.onInviteAccept( player, *pSession->getPlayer() );
+        result = InviteUpdateType::ACCEPT_INVITE;
+      }
+      else
+      {
+        flMgr.onInviteDecline( player, *pSession->getPlayer() );
+        result = InviteUpdateType::REJECT_INVITE;
+      }
+
+      auto inviteUpPacket = std::make_shared< InviteUpdatePacket >( player, 0,
+                                                                    data.AuthType, 1, result );
+      pSession->getZoneConnection()->queueOutPacket( inviteUpPacket );
+
+      inviteReplyData.AuthType = data.AuthType;
+      strcpy( inviteReplyData.InviteCharacterName, pSession->getPlayer()->getName().c_str() );
+      server.queueForPlayer( player.getCharacterId(), inviteReplyPacket );
+
       break;
-    case Common::InviteType::AUTOPARTY:
+    }
+    case HierarchyType::AUTOPARTY:
       break;
-    case Common::InviteType::FCCREATE:
+    case HierarchyType::FCCREATE:
       break;
-    case Common::InviteType::FREECOMPANY:
+    case HierarchyType::FREECOMPANY:
       break;
-    case Common::InviteType::FCJOINREQUEST:
+    case HierarchyType::FCJOINREQUEST:
       break;
-    case Common::InviteType::PARTYCANCEL:
+    case HierarchyType::PARTYCANCEL:
       break;
   }
 }

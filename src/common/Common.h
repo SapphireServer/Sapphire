@@ -24,7 +24,7 @@ namespace Sapphire::Common
   const uint16_t MAX_PLAYER_LEVEL = 80;
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
-  const uint8_t CLASSJOB_TOTAL = 38;
+  const uint8_t CLASSJOB_TOTAL = 33;
   const uint8_t CLASSJOB_SLOTS = 20;
 
   const uint8_t TOWN_COUNT = 6;
@@ -971,7 +971,7 @@ namespace Sapphire::Common
     InvincibilityIgnoreDamage,
   };
 
-  enum InviteType : int32_t
+  enum HierarchyType : uint8_t
   {
     NONE_2 = 0x0,
     PCPARTY = 0x1,
@@ -984,6 +984,14 @@ namespace Sapphire::Common
     MAX_1 = 0xFF,
   };
 
+  enum HierarchyStatus : uint8_t
+  {
+    Invalid = 0,
+    Added = 0x10,
+    SentRequest = 0x20,
+    ReceivedRequest = 0x30
+  };
+
   enum LinkshellHierarchy : int32_t
   {
     NONE_1 = 0x0,
@@ -994,13 +1002,17 @@ namespace Sapphire::Common
     MAX_0 = 0x7,
   };
 
-
-  enum GroupEntryStatus : uint8_t
+  union HierarchyData
   {
-    Invalid = 0,
-    Added = 0x10,
-    SentRequest = 0x20,
-    ReceivedRequest = 0x30
+    uint64_t u64;
+
+    struct HierarchyPackedData {
+      uint32_t dateAdded;
+      uint8_t status;
+      uint8_t type;
+      uint8_t group;
+      uint8_t unk;
+    } data;
   };
 
   /* 61719 */
