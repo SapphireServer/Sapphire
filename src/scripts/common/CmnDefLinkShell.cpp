@@ -42,7 +42,13 @@ public:
   // create linkshell
   void Scene00002( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 2, 0 );
+    auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      linkshellMgr().createLinkshell( result.resultString, player );
+      eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a } );
+    };
+
+    eventMgr().playScene( player, getId(), 2, 0, callback );
   }
 
   // rename linkshell

@@ -160,6 +160,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( eventHandlerLinkshell );
 
+    DECLARE_HANDLER( yieldEventString );
+
     DECLARE_HANDLER( logoutHandler );
 
     DECLARE_HANDLER( cfRequestPenalties );

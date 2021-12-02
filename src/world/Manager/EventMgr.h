@@ -21,6 +21,8 @@ namespace Sapphire::World::Manager
     void handleReturnEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t errorCode,
                                  uint8_t numOfResults, const std::vector< uint32_t >& results );
 
+    void handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString );
+
 
     void checkEvent( Entity::Player& player, uint32_t eventId );
     void eventFinish( Entity::Player& player, uint32_t eventId, uint32_t freePlayer );
@@ -37,6 +39,9 @@ namespace Sapphire::World::Manager
     /*! play a subevent */
     void playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, std::vector< uint32_t > values,
                     Event::EventHandler::SceneReturnCallback eventReturnCallback = nullptr );
+
+    /*! resume a subevent */
+    void resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values );
 
     /*! play a subevent */
     void playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,

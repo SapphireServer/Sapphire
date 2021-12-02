@@ -314,6 +314,40 @@ void Sapphire::World::Manager::EventMgr::handleReturnEventScene( Entity::Player&
   checkEvent( player, eventId );
 }
 
+void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString )
+{
+  std::string eventName = getEventName( eventId );
+
+  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, string: {2} ", eventId, sceneId, resultString );
+
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto pEvent = player.getEvent( eventId );
+
+  if( pEvent )
+  {
+    pEvent->setPlayedScene( false );
+    // try to retrieve a stored callback
+    // if there is one, proceed to call it
+    Event::SceneResult result;
+    result.actorId = pEvent->getActorId();
+    result.eventId = eventId;
+    result.sceneId = sceneId;
+    result.resultString = resultString;
+
+    auto eventCallback = pEvent->getEventReturnCallback();
+    if( eventCallback )
+    {
+      eventCallback( player, result );
+    }
+
+      // we might have a scene chain callback instead so check for that too
+    else if( auto chainCallback = pEvent->getSceneChainCallback() )
+      chainCallback( player );
+
+  }
+
+}
+
 void EventMgr::checkEvent( Sapphire::Entity::Player &player, uint32_t eventId )
 {
   auto pEvent = player.getEvent( eventId );
@@ -506,6 +540,25 @@ void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t sce
   pEvent->getScenePlayParams()->setParams( scene, values );
 
   sendEventPlay( player, eventId, scene, flags );
+}
+
+void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values )
+{
+  auto pEvent = bootstrapSceneEvent( player, eventId, 0 );
+  if( !pEvent )
+    return;
+
+  auto linkshellEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
+  linkshellEvent->data().handlerId = eventId;
+  linkshellEvent->data().sceneId = static_cast< uint8_t >( scene );
+  linkshellEvent->data().numOfArgs = values.size();
+  int i = 0;
+  for( auto& val : values )
+  {
+    linkshellEvent->data().args[ i++ ] = val;
+  }
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( player.getCharacterId(), linkshellEvent );
 }
 
 void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )

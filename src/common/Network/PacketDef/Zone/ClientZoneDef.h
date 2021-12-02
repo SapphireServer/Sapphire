@@ -259,13 +259,13 @@ struct FFXIVIpcYieldEventSceneString8 :
 {
 };
 
-struct YieldEventSceneString16 :
+struct FFXIVIpcYieldEventSceneString16 :
   FFXIVIpcBasePacket< YieldEventSceneString16 >,
   YieldEventSceneStringN< 16 >
 {
 };
 
-struct YieldEventSceneString32 :
+struct FFXIVIpcYieldEventSceneString32 :
   FFXIVIpcBasePacket< YieldEventSceneString32 >,
   YieldEventSceneStringN< 32 >
 {

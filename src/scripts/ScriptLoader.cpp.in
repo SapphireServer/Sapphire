@@ -22,6 +22,7 @@ namespace Sapphire::Data
 namespace Sapphire::World::Manager
 {
   class TerritoryMgr;
+  class LinkshellMgr;
 }
 
 extern "C" EXPORT void win32initExd( std::shared_ptr< Sapphire::Data::ExdData > exdData )
@@ -32,6 +33,10 @@ extern "C" EXPORT void win32initExd( std::shared_ptr< Sapphire::Data::ExdData > 
 extern "C" EXPORT void win32initTeri( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > teriMgr )
 {
   Sapphire::Common::Service< Sapphire::World::Manager::TerritoryMgr >::set( teriMgr );
+}
+extern "C" EXPORT void win32initLinkshell( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > lsMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::LinkshellMgr >::set( lsMgr );
 }
 #endif
 

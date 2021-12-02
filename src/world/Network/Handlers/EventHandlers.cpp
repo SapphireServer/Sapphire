@@ -22,6 +22,7 @@
 #include "Territory/QuestBattle.h"
 
 #include "Session.h"
+#include <Network/PacketDef/ClientIpcs.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -291,12 +292,48 @@ void Sapphire::Network::GameConnection::eventHandlerLinkshell( const Packets::FF
   auto& server = Common::Service< World::WorldServer >::ref();
   const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString8 >( inPacket );
 
-  auto linkshellEvent = makeZonePacket< FFXIVIpcEventLinkshell >( player.getId() );
-  linkshellEvent->data().eventId = packet.data().handlerId;
-  linkshellEvent->data().scene = static_cast< uint8_t >( packet.data().sceneId );
-  linkshellEvent->data().param3 = 1;
-  linkshellEvent->data().unknown1 = 0x15a;
+  auto linkshellEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
+  linkshellEvent->data().handlerId = packet.data().handlerId;
+  linkshellEvent->data().sceneId = static_cast< uint8_t >( packet.data().sceneId );
+  linkshellEvent->data().numOfArgs = 1;
+  linkshellEvent->data().args[ 0 ] = 0x15a;
   server.queueForPlayer( player.getCharacterId(), linkshellEvent );
+
+}
+
+void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  std::string inString;
+
+  uint16_t type = *( ( uint16_t* ) ( &inPacket.data[ 2 ] ) );
+  switch( type )
+  {
+    case Packets::WorldPackets::Client::ClientZoneIpcType::YieldEventSceneString8:
+    {
+      const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString8 >( inPacket );
+      inString = std::string( packet.data().result );
+      break;
+    }
+    case Packets::WorldPackets::Client::ClientZoneIpcType::YieldEventSceneString16:
+    {
+      const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString16 >( inPacket );
+      inString = std::string( packet.data().result );
+      break;
+    }
+    case Packets::WorldPackets::Client::ClientZoneIpcType::YieldEventSceneString32:
+    {
+      const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString32 >( inPacket );
+      inString = std::string( packet.data().result );
+      break;
+    }
+  }
+
+  const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneString8 >( inPacket );
+  auto& data = packet.data();
+  eventMgr.handleReturnStringEventScene( player, data.handlerId, data.sceneId, inString );
 
 }
 

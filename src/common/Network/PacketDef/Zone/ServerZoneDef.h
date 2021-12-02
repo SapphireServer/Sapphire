@@ -1494,17 +1494,13 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   * Structural representation of the packet sent by the server
   * to respond to a linkshell creation event
   */
-  struct FFXIVIpcEventLinkshell : FFXIVIpcBasePacket< ResumeEventScene2 >
+  struct FFXIVIpcResumeEventScene2 : FFXIVIpcBasePacket< ResumeEventScene2 >
   {
-    uint32_t eventId;
-    uint8_t scene;
-    uint8_t param1;
-    uint8_t param2;
-    uint8_t param3;
-    uint32_t unknown1;
-    uint32_t unknown2;
-    uint32_t unknown3;
-    uint32_t unknown4;
+    uint32_t handlerId;
+    uint16_t sceneId;
+    uint8_t resumeId;
+    uint8_t numOfArgs;
+    uint32_t args[4];
   };
 
   /**
@@ -2165,5 +2161,4 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
   {
     ZoneProtoDownMemberPos Member[8];
   };
-
 }

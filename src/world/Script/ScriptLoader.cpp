@@ -113,10 +113,12 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
 #ifdef _WIN32
   auto func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
 
-  using win32initFunc = void(*)( std::shared_ptr< Sapphire::Data::ExdData >);
-  using win32initFuncTeri = void(*)( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr >);
+  using win32initFunc = void(*)( std::shared_ptr< Sapphire::Data::ExdData > );
+  using win32initFuncTeri = void(*)( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > );
+  using win32initFuncLinkshell = void(*)( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > );
   auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
   auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
+  auto win32initLinkshell = reinterpret_cast< win32initFuncLinkshell >( GetProcAddress( handle, "win32initLinkshell" ) );
 
   if( win32init )
   {
@@ -138,7 +140,18 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   }
   else
   {
-    Logger::warn( "did not find a win32init1 export on a windows script target - the server will likely crash!" );
+    Logger::warn( "did not find a win32initTeri export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initLinkshell )
+  {
+    auto linkshellMgr = Common::Service< Sapphire::World::Manager::LinkshellMgr >::get();
+    auto tptr = linkshellMgr.lock();
+    win32initLinkshell( tptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
   }
 #else
   auto func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );

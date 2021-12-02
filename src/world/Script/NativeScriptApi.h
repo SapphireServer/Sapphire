@@ -5,6 +5,7 @@
 #include "ForwardsZone.h"
 #include "Event/EventHandler.h"
 #include "Manager/EventMgr.h"
+#include "Manager/LinkshellMgr.h"
 #include "Service.h"
 
 #ifdef _MSC_VER
@@ -173,6 +174,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::LinkshellMgr& linkshellMgr()
+    {
+      return Common::Service< World::Manager::LinkshellMgr >::ref();
     }
   };
 
