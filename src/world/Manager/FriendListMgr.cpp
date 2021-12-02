@@ -34,8 +34,8 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteCreate( Entity::Player& so
   auto& targetFLData = target.getFriendListData();
 
   // add ID and data to arrays of both players
-  sourceFL[sourceIdx] = target.getCharacterId();
-  targetFL[targetIdx] = source.getCharacterId();
+  sourceFL[ sourceIdx ] = target.getCharacterId();
+  targetFL[ targetIdx ] = source.getCharacterId();
 
 
   Common::HierarchyData hierarchy;
@@ -44,11 +44,11 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteCreate( Entity::Player& so
   hierarchy.data.status = Common::HierarchyStatus::SentRequest; // set type for invite sender
   hierarchy.data.type = Common::HierarchyType::FRIENDLIST;
 
-  sourceFLData[sourceIdx] = hierarchy;
+  sourceFLData[ sourceIdx ] = hierarchy;
 
   // set type for invite receiver
   hierarchy.data.status = Common::HierarchyStatus::ReceivedRequest;
-  targetFLData[targetIdx] = hierarchy;
+  targetFLData[ targetIdx ] = hierarchy;
 
   // force db update for friendlist
   source.updateDbFriendList();
@@ -72,10 +72,10 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteAccept( Entity::Player& so
   auto& sourceFLData = source.getFriendListData();
   auto& targetFLData = target.getFriendListData();
 
-  sourceFLData[sourceIdx].data.status = Common::HierarchyStatus::Added;
-  sourceFLData[sourceIdx].data.type   = Common::HierarchyType::NONE_2;
-  targetFLData[targetIdx].data.status = Common::HierarchyStatus::Added;
-  targetFLData[targetIdx].data.type   = Common::HierarchyType::NONE_2;
+  sourceFLData[ sourceIdx ].data.status = Common::HierarchyStatus::Added;
+  sourceFLData[ sourceIdx ].data.type   = Common::HierarchyType::NONE_2;
+  targetFLData[ targetIdx ].data.status = Common::HierarchyStatus::Added;
+  targetFLData[ targetIdx ].data.type   = Common::HierarchyType::NONE_2;
   
   source.updateDbFriendList();
   target.updateDbFriendList();
@@ -100,11 +100,11 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteDecline( Entity::Player& s
   auto& sourceFLData = source.getFriendListData();
   auto& targetFLData = target.getFriendListData();
 
-  sourceFL[sourceIdx] = 0;
-  targetFL[targetIdx] = 0;
+  sourceFL[ sourceIdx ] = 0;
+  targetFL[ targetIdx ] = 0;
 
-  sourceFLData[sourceIdx].u64 = 0;
-  targetFLData[targetIdx].u64 = 0;
+  sourceFLData[ sourceIdx ].u64 = 0;
+  targetFLData[ targetIdx ].u64 = 0;
 
   source.updateDbFriendList();
   target.updateDbFriendList();
@@ -133,7 +133,7 @@ bool Sapphire::World::Manager::FriendListMgr::onAssignGroup( Entity::Player& sou
 
   auto& sourceFLData = source.getFriendListData();
 
-  sourceFLData[sourceIdx].data.group = group;
+  sourceFLData[ sourceIdx ].data.group = group;
 
   source.updateDbFriendList();
 
