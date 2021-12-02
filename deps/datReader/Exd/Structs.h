@@ -65,7 +65,6 @@ namespace Component::Excel
     int8_t CNT;
     int8_t GEN;
     int8_t DEF;
-    int8_t padding0[2];
   };
 
   /* 33331 */
@@ -94,7 +93,7 @@ namespace Component::Excel
     uint16_t RecastTime;
     uint16_t Action;
     uint16_t Salvage;
-    int16_t BonusValue[6];
+    int16_t BonusValue[7];
     uint8_t Level;
     uint8_t EquipLevel;
     uint8_t EquipPvPRank;
@@ -133,7 +132,7 @@ namespace Component::Excel
     uint8_t ConditionFemale : 1;
     uint8_t ConditionMale : 1;
     uint8_t DisableSameAccount : 1;
-    int8_t padding2[6];
+    int8_t padding2[4];
   };
 
   /* 35156 */
@@ -617,6 +616,7 @@ namespace Component::Excel
   struct Emote
   {
     EmoteTextStruct Text;
+    uint32_t Unknown;
     int32_t TimelineID;
     int32_t TimelineID_Begin;
     int32_t TimelineID_End;

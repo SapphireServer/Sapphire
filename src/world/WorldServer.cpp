@@ -614,8 +614,10 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::syncPlayer( uint64_t c
   // get db last write
   auto dbSync = pPlayer->getLastDBWrite();
 
+
   // db was updated and we lost track of it  - update
-  if( dbSync != lastCacheSync )
+  // @todo for now, always reload the player on login.
+  //if( dbSync != lastCacheSync )
   {
     // clear current maps
     m_playerMapById[ pPlayer->getId() ] = nullptr;

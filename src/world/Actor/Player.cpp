@@ -998,7 +998,12 @@ void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
   Logger::debug( "[{0}] Spawning {1} for {2}", pTarget->getId(), getName(), pTarget->getName() );
 
-  pTarget->queuePacket( std::make_shared< PlayerSpawnPacket >( *this, *pTarget ) );
+  auto spawnPacket = std::make_shared< PlayerSpawnPacket >( *this, *pTarget );
+  FILE *fp;
+  fp = fopen( "spawnPacket1.bin", "wb" );
+  fwrite( spawnPacket->getData().data(), spawnPacket->getData().size(), 1, fp );
+  fclose( fp );
+  pTarget->queuePacket( spawnPacket );
 }
 
 // despawn
@@ -1628,10 +1633,6 @@ void Sapphire::Entity::Player::sendZonePackets()
     queuePacket( contentFinderList );
 
     auto statusPacket = makePlayerSetup( *this );
-    /*FILE *fp;
-    fp = fopen( "statusDump.bin", "wb" );
-    fwrite( statusPacket->getData().data(), statusPacket->getData().size(), 1, fp );
-    fclose( fp );*/
 
     queuePacket( statusPacket );
 

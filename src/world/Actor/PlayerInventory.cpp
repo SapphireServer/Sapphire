@@ -522,7 +522,7 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
     query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem ? currItem->getUId() : 0 );
   }
 
-  query += " WHERE CharacterId = " + std::to_string( getId() );
+  query += " WHERE CharacterId = " + std::to_string( getCharacterId() );
 
   if( storage->isMultiStorage() )
     query += " AND storageId = " + std::to_string( static_cast< uint16_t >( type ) );

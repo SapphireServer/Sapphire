@@ -1,6 +1,7 @@
 #ifndef XIV_UTILS_ZLIB_H
 #define XIV_UTILS_ZLIB_H
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

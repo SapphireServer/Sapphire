@@ -69,19 +69,19 @@ public:
   {
     if( actorId == Actor0 )
     {
-      Scene00000( player );
+      Scene00000( quest, player );
     }
     else if( actorId == Actor1 )
     {
-      Scene00003( player );
+      Scene00003( quest, player );
     }
     else if( actorId == Actor2 )
     {
-      Scene00004( player );
+      Scene00004( quest, player );
     }
     else if( actorId == Actor3 )
     {
-      Scene00008( player );
+      Scene00008( quest, player );
     }
     else if( actorId == Aetheryte0 )
     {
@@ -91,7 +91,7 @@ public:
                                  player.sendEventNotice( 0x050002, 0, 1, 0, 0 );
                                  player.registerAetheryte( 2 );
                                  player.learnAction( Common::UnlockEntry::Return );
-                                 Scene00001( player );
+                                 Scene00001( quest, player );
                                },
                                nullptr, getId() );
     }
@@ -99,7 +99,7 @@ public:
 
 private:
 
-  void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
     if( varIdx == 1 )
     {
@@ -114,141 +114,125 @@ private:
       player.sendEventNotice( getId(), 0, 0, 0, 0 );
     }
 
-    auto pQuest = player.getQuest( getId() );
-    if( !pQuest )
-      return;
-
-    auto QUEST_VAR_ATTUNE = pQuest->getUI8AL();
-    auto QUEST_VAR_CLASS = pQuest->getUI8BH();
-    auto QUEST_VAR_TRADE = pQuest->getUI8BL();
+    auto QUEST_VAR_ATTUNE = quest.getUI8AL();
+    auto QUEST_VAR_CLASS = quest.getUI8BH();
+    auto QUEST_VAR_TRADE = quest.getUI8BL();
 
     if( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
     {
-      pQuest->setSeq( SeqFinish );
+      quest.setSeq( SeqFinish );
     }
   }
 
-  void Scene00000( Entity::Player& player )
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.getResult( 0 ) == 1 ) // accept quest
-                        {
-                          Scene00050( player );
-                        }
-                      } );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00000Return ) );
   }
 
-  void Scene00001( Entity::Player& player )
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().playScene( player, getId(), 1, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        Scene00002( player );
-                      } );
+    if( result.getResult( 0 ) == 1 )
+    {
+      Scene00050( quest, player );
+    }
   }
 
-  void Scene00002( Entity::Player& player )
+  void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 2, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8BL( 1 );
-                        checkQuestCompletion( player, 0 );
-                      } );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00001Return ) );
   }
 
-  void Scene00003( Entity::Player& player )
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().playScene( player, getId(), 3, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8AL( 1 );
-                        checkQuestCompletion( player, 1 );
-                      } );
+    Scene00002( quest, player );
   }
 
-  void Scene00004( Entity::Player& player )
+  void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 4, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.getResult( 0 ) == 1 )
-                        {
-                          Scene00005( player );
-                        }
-                        else
-                          return;
-                      } );
+    eventMgr().playQuestScene( player, getId(), 2, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManWil002::Scene00002Return ) );
   }
 
-  void Scene00005( Entity::Player& player )
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().playScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8CH( 0 );
-                        pQuest->setUI8BH( 1 );
-                        checkQuestCompletion( player, 2 );
-                      } );
+    quest.setUI8BL( 1 );
+    checkQuestCompletion( quest, player, 0 );
   }
 
-  void Scene00006( Entity::Player& player )
+  void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 6, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00003Return ) );
   }
 
-  void Scene00007( Entity::Player& player )
+  void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().playScene( player, getId(), 7, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    quest.setUI8AL( 1 );
+    checkQuestCompletion( quest, player, 1 );
   }
 
-  void Scene00008( Entity::Player& player )
+  void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 8, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.getResult( 0 ) == 1 )
-                        {
-                          if( player.giveQuestRewards( getId(), 0 ) )
-                          {
-                            player.finishQuest( getId() );
-                          }
-                        }
-                      } );
+    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00004Return ) );
   }
 
-  void Scene00050( Entity::Player& player )
+  void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().playScene( player, getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        // on quest accept
-                        pQuest->setSeq( Seq1 );
-                        pQuest->setUI8CH( 1 ); // receive key item
+    if( result.getResult( 0 ) == 1 )
+    {
+      Scene00005( quest, player );
+    }
+  }
 
-                        // teleport to real ul'dah
-                        player.forceZoneing( 130 );
-                      } );
+  void Scene00005( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManWil002::Scene00005Return ) );
+  }
+
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    quest.setUI8CH( 0 );
+    quest.setUI8BH( 1 );
+    checkQuestCompletion( quest, player, 2 );
+  }
+
+  void Scene00006( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR );
+  }
+
+  void Scene00007( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 7, HIDE_HOTBAR );
+  }
+
+  void Scene00008( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 8, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManWil002::Scene00008Return ) );
+  }
+
+  void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 )
+    {
+      if( player.giveQuestRewards( getId(), 0 ) )
+      {
+        player.finishQuest( getId() );
+      }
+    }
+  }
+
+  void Scene00050( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 50, HIDE_HOTBAR, bindSceneReturn( &ManWil002::Scene00050Return ) );
+  }
+
+  void Scene00050Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    // On quest accept
+    quest.setSeq( Seq1 );
+    quest.setUI8CH( 1 ); // Receive key item
+
+    // Teleport to real ul'dah
+    player.forceZoneing( 130 );
   }
 };
 
