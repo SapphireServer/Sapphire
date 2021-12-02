@@ -996,8 +996,7 @@ void Sapphire::Entity::Player::setLookAt( uint8_t index, uint8_t value )
 // spawn this player for pTarget
 void Sapphire::Entity::Player::spawn( Entity::PlayerPtr pTarget )
 {
-  Logger::debug( "[{0}] Spawning {1} for {2}", pTarget->getId(), getName(), pTarget->getName() );
-
+  Logger::debug( "Spawning {0} for {1}", getName(), pTarget->getName() );
   auto spawnPacket = std::make_shared< PlayerSpawnPacket >( *this, *pTarget );
   pTarget->queuePacket( spawnPacket );
 }
