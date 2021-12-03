@@ -120,6 +120,18 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   {
     int16_t ResultCount;
   };
+
+  struct FFXIVIpcLinkshellResult : FFXIVIpcBasePacket< LinkshellResult >
+  {
+    uint64_t LinkshellID;
+    uint64_t TargetCharacterID;
+    uint32_t UpPacketNo;
+    uint32_t Result;
+    uint8_t UpdateStatus;
+    uint8_t Identity;
+    char LinkshellName[32];
+    char TargetName[32];
+  };
   
   struct FFXIVIpcInviteResult : FFXIVIpcBasePacket< InviteResult >
   {

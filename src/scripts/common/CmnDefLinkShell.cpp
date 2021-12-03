@@ -36,7 +36,7 @@ public:
       }
     };
 
-    eventMgr().playScene( player, getId(), 1, 0, callback );
+    eventMgr().playScene( player, getId(), 1, HIDE_HOTBAR | NO_DEFAULT_CAMERA, callback );
   }
 
   // create linkshell
@@ -46,24 +46,31 @@ public:
     {
       auto ls = linkshellMgr().createLinkshell( result.resultString, player );
       if( !ls )
+      {
         eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a } );
+        linkshellMgr().finishLinkshellCreation( result.resultString, 0x15a, player );
+      }
       else
+      {
         eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 } );
+        linkshellMgr().finishLinkshellCreation( result.resultString, 0, player );
+      }
+
     };
 
-    eventMgr().playScene( player, getId(), 2, 0, callback );
+    eventMgr().playScene( player, getId(), 2, HIDE_HOTBAR, callback );
   }
 
   // rename linkshell
   void Scene00003( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 3, 0 );
+    eventMgr().playScene( player, getId(), 3, HIDE_HOTBAR );
   }
 
   // remove linkshell
   void Scene00004( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 4, 0 );
+    eventMgr().playScene( player, getId(), 4, HIDE_HOTBAR );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override

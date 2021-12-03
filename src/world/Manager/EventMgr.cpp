@@ -548,7 +548,6 @@ void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t s
   if( !pEvent )
     return;
 
-  pEvent->setPlayedScene( false );
   pEvent->setEventReturnCallback( nullptr );
   auto resumeEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
   resumeEvent->data().handlerId = eventId;

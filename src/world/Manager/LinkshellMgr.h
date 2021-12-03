@@ -25,6 +25,8 @@ namespace Sapphire::World::Manager
     // create new linkshell entry and insert into db
     LinkshellPtr createLinkshell( const std::string& name, Entity::Player& player );
 
+    void finishLinkshellCreation( const std::string& name, uint32_t result, Entity::Player& player );
+
     // get all linkshells associated with player
     const std::vector< LinkshellPtr > getPlayerLinkshells( Entity::Player& player ) const;
 

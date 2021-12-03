@@ -1,15 +1,32 @@
 #include <algorithm>
 #include <iterator>
 
+#include <Common.h>
+#include <Exd/ExdData.h>
+#include <Util/Util.h>
+#include <Service.h>
+
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
 #include <Manager/ChatChannelMgr.h>
+#include <Network/GamePacket.h>
 
 #include "Linkshell/Linkshell.h"
 #include "LinkshellMgr.h"
 
 #include "Actor/Player.h"
+
+#include "WorldServer.h"
+
+#include <Network/GameConnection.h>
+#include <Network/GamePacket.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+
+using namespace Sapphire::Common;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
+using namespace Sapphire::World::Manager;
 
 bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
 {
@@ -153,6 +170,18 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
   db.directExecute( stmt );
 
   return lsPtr;
+}
+void Sapphire::World::Manager::LinkshellMgr::finishLinkshellCreation( const std::string& name, uint32_t result, Entity::Player& player )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto linkshellResult = makeZonePacket< FFXIVIpcLinkshellResult >( player.getId() );
+  linkshellResult->data().Result = result;
+  linkshellResult->data().UpPacketNo = 1;
+  linkshellResult->data().Identity = 0xFF;
+  strcpy( linkshellResult->data().LinkshellName, name.c_str() );
+  server.queueForPlayer( player.getCharacterId(), linkshellResult );
+
 }
 
 const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellMgr::getPlayerLinkshells( Entity::Player& player ) const
