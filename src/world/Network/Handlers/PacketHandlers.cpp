@@ -184,11 +184,13 @@ void Sapphire::Network::GameConnection::linkshellListHandler( const Packets::FFX
     uint32_t hierarchy = 0;
 
     if( pLs->getMasterId() == player.getCharacterId() )
-      hierarchy = LinkshellHierarchyShifted::Master;
+      hierarchy = Ls::LinkshellHierarchyShifted::Master;
     else if( pLs->getLeaderIdList().count( player.getCharacterId() ) )
-      hierarchy = LinkshellHierarchyShifted::Leader;
+      hierarchy = Ls::LinkshellHierarchyShifted::Leader;
+    else if( pLs->getInviteIdList().count( player.getCharacterId() ) )
+      hierarchy = Ls::LinkshellHierarchyShifted::Invite;
     else
-      hierarchy = LinkshellHierarchyShifted::Member;
+      hierarchy = Ls::LinkshellHierarchyShifted::Member;
 
     linkshellListPacket->data().LinkshellList[ i ].LinkshellID = pLs->getId();
     linkshellListPacket->data().LinkshellList[ i ].ChannelID = pLs->getChatChannel();

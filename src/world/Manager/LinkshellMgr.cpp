@@ -193,9 +193,10 @@ const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellM
     for( const auto &[ key, value ] : m_linkshellIdMap )
     {
       auto& memberList = value->getMemberIdList();
+      auto& inviteList = value->getInviteIdList();
 
       // find player id in LS member list
-      if( !( memberList.find( player.getCharacterId() ) == memberList.end() ) )
+      if( memberList.count( player.getCharacterId() ) || inviteList.count( player.getCharacterId() ) )
       {
         lsVec.emplace_back( value );
       }

@@ -1002,14 +1002,17 @@ namespace Sapphire::Common
     MAX_0 = 0x7,
   };
 
-  enum LinkshellHierarchyShifted : int32_t
+  namespace Ls
   {
-    None1 = 0x0,
-    Master = 0x900,
-    Leader = 0xa00,
-    Member = 0xb00,
-    Invite = 0xc00,
-  };
+    enum LinkshellHierarchyShifted : int32_t
+    {
+      None1 = 0x0,
+      Master = 0x900,
+      Leader = 0xa00,
+      Member = 0xb00,
+      Invite = 0xc00,
+    };
+  }
 
   union HierarchyData
   {
