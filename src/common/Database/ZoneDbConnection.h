@@ -105,6 +105,10 @@ namespace Sapphire::Db
     LAND_INV_UP_ITEMPOS,
     LAND_INV_DEL_ITEMPOS,
 
+    LINKSHELL_SEL_ALL,
+    LINKSHELL_INS,
+    LINKSHELL_UP,
+
 
     MAX_STATEMENTS
   };

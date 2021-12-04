@@ -31,6 +31,7 @@ namespace Sapphire::World::Manager
 
     // initialize all linkshells from db to memory
     bool loadLinkshells();
+    void writeLinkshell( uint64_t lsId );
 
     // create new linkshell entry and insert into db
     LinkshellPtr createLinkshell( const std::string& name, Entity::Player& player );
@@ -41,6 +42,8 @@ namespace Sapphire::World::Manager
     const std::vector< LinkshellPtr > getPlayerLinkshells( Entity::Player& player ) const;
 
     LinkshellPtr getLinkshellById( uint64_t lsId );
+
+
   };
 
 }

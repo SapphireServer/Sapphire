@@ -33,10 +33,8 @@ bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
 
-  auto res = db.query( "SELECT LinkshellId, MasterCharacterId, CharacterIdList, "
-                         "LinkshellName, LeaderIdList, InviteIdList "
-                         "FROM infolinkshell "
-                         "ORDER BY LinkshellId ASC;" );
+  auto query = db.getPreparedStatement( Db::LINKSHELL_SEL_ALL );
+  auto res = db.query( query );
 
   while( res->next() )
   {
@@ -86,6 +84,48 @@ bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
   }
 
   return true;
+}
+
+void LinkshellMgr::writeLinkshell( uint64_t lsId )
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
+  auto ls = getLinkshellById( lsId );
+
+  if( !ls )
+  {
+    Logger::error( "Linkshell {} not found for write!", lsId );
+  }
+
+  auto query = db.getPreparedStatement( Db::LINKSHELL_UP );
+
+  auto& members = ls->getMemberIdList();
+  auto& leaders = ls->getLeaderIdList();
+  auto& invites = ls->getInviteIdList();
+  std::vector< uint64_t > memberVec;
+  std::vector< uint64_t > leaderVec;
+  std::vector< uint64_t > inviteVec;
+
+  std::copy( members.begin(), members.end(), std::back_inserter( memberVec ) );
+  std::copy( leaders.begin(), leaders.end(), std::back_inserter( leaderVec ) );
+  std::copy( invites.begin(), invites.end(), std::back_inserter( inviteVec ) );
+
+  std::vector< uint8_t > memberBin( memberVec.size() * 8 );
+  memcpy( memberBin.data(), memberVec.data(), memberVec.size() * 8 );
+
+  std::vector< uint8_t > leaderBin( leaderVec.size() * 8 );
+  memcpy( leaderBin.data(), leaderVec.data(), leaderVec.size() * 8 );
+
+  std::vector< uint8_t > inviteBin( inviteVec.size() * 8 );
+  memcpy( inviteBin.data(), inviteVec.data(), inviteVec.size() * 8 );
+
+  query->setBinary( 1, memberBin );
+  query->setString( 2, ls->getName() );
+  query->setBinary( 3, leaderBin );
+  query->setBinary( 4, inviteBin );
+  query->setInt64( 5, lsId );
+  db.execute( query );
+
 }
 
 Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellByName( const std::string& name )
@@ -205,3 +245,5 @@ const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellM
 
   return lsVec;
 }
+
+

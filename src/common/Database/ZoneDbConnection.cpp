@@ -319,6 +319,16 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
+  prepareStatement( LINKSHELL_SEL_ALL,
+                    "SELECT LinkshellId, MasterCharacterId, CharacterIdList, LinkshellName, LeaderIdList, InviteIdList "
+                    "FROM infolinkshell "
+                    "ORDER BY LinkshellId ASC;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( LINKSHELL_UP,
+                    "UPDATE infolinkshell SET CharacterIdList = ?, LinkshellName = ?, LeaderIdList = ?, InviteIdList = ? WHERE LinkshellId = ?;",
+                    CONNECTION_BOTH );
+
   /*prepareStatement( LAND_INS,
                     "INSERT INTO land ( LandSetId ) VALUES ( ? );",
                     CONNECTION_BOTH );

@@ -216,6 +216,7 @@ void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFX
     return Logger::warn( "Failed to invite player to linkshell - session/linkshell not found!" );
 
   lsPtr->addInvite( invitedPlayer->getPlayer()->getCharacterId() );
+  lsMgr.writeLinkshell( lsPtr->getId() );
   // TODO: send inv packets
 }
 
