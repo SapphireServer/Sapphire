@@ -38,6 +38,10 @@ namespace Sapphire::World::Manager
 
     void finishLinkshellCreation( const std::string& name, uint32_t result, Entity::Player& player );
 
+    void invitePlayer( const std::string& name, uint64_t linkshellId );
+
+    void sendLinkshellList( Entity::Player& player );
+
     // get all linkshells associated with player
     const std::vector< LinkshellPtr > getPlayerLinkshells( Entity::Player& player ) const;
 

@@ -992,16 +992,6 @@ namespace Sapphire::Common
     ReceivedRequest = 0x30
   };
 
-  enum LinkshellHierarchy : int32_t
-  {
-    NONE_1 = 0x0,
-    MASTER = 0x1,
-    LEADER = 0x2,
-    MEMBER = 0x3,
-    INVITE = 0x4,
-    MAX_0 = 0x7,
-  };
-
   namespace Ls
   {
     enum LinkshellHierarchyShifted : int32_t

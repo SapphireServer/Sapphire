@@ -23,6 +23,8 @@
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
+#include "Session.h"
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
@@ -244,6 +246,52 @@ const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellM
   }
 
   return lsVec;
+}
+
+void LinkshellMgr::invitePlayer( const std::string &name, uint64_t linkshellId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto invitedPlayer = server.getSession( name );
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !invitedPlayer || !lsPtr )
+    return Logger::warn( "Failed to invite player to linkshell - session/linkshell not found!" );
+
+  lsPtr->addInvite( invitedPlayer->getPlayer()->getCharacterId() );
+  writeLinkshell( lsPtr->getId() );
+  sendLinkshellList( *invitedPlayer->getPlayer() );
+}
+
+void LinkshellMgr::sendLinkshellList( Entity::Player& player )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto linkshellListPacket = makeZonePacket< FFXIVIpcGetLinkshellListResult >( player.getId() );
+
+  auto lsVec = getPlayerLinkshells( player );
+
+  for( int i = 0; i < lsVec.size(); ++i )
+  {
+    auto pLs = lsVec[ i ];
+    uint32_t hierarchy = 0;
+
+    if( pLs->getMasterId() == player.getCharacterId() )
+      hierarchy = Ls::LinkshellHierarchyShifted::Master;
+    else if( pLs->getLeaderIdList().count( player.getCharacterId() ) )
+      hierarchy = Ls::LinkshellHierarchyShifted::Leader;
+    else if( pLs->getInviteIdList().count( player.getCharacterId() ) )
+      hierarchy = Ls::LinkshellHierarchyShifted::Invite;
+    else
+      hierarchy = Ls::LinkshellHierarchyShifted::Member;
+
+    linkshellListPacket->data().LinkshellList[ i ].LinkshellID = pLs->getId();
+    linkshellListPacket->data().LinkshellList[ i ].ChannelID = pLs->getChatChannel();
+    linkshellListPacket->data().LinkshellList[ i ].HierarchyID = hierarchy;
+    strcpy( linkshellListPacket->data().LinkshellList[ i ].LinkshellName, pLs->getName().c_str() );
+  }
+
+  server.queueForPlayer( player.getCharacterId(), linkshellListPacket );
 }
 
 

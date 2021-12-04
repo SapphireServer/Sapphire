@@ -168,60 +168,7 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVAR
   }
 }
 
-void Sapphire::Network::GameConnection::linkshellListHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                              Entity::Player& player )
-{
-  auto linkshellListPacket = makeZonePacket< FFXIVIpcGetLinkshellListResult >( player.getId() );
-
-  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& ccMgr = Common::Service< ChatChannelMgr >::ref();
-
-  auto lsVec = lsMgr.getPlayerLinkshells( player );
-
-  for( int i = 0; i < lsVec.size(); ++i )
-  {
-    auto pLs = lsVec[ i ];
-    uint32_t hierarchy = 0;
-
-    if( pLs->getMasterId() == player.getCharacterId() )
-      hierarchy = Ls::LinkshellHierarchyShifted::Master;
-    else if( pLs->getLeaderIdList().count( player.getCharacterId() ) )
-      hierarchy = Ls::LinkshellHierarchyShifted::Leader;
-    else if( pLs->getInviteIdList().count( player.getCharacterId() ) )
-      hierarchy = Ls::LinkshellHierarchyShifted::Invite;
-    else
-      hierarchy = Ls::LinkshellHierarchyShifted::Member;
-
-    linkshellListPacket->data().LinkshellList[ i ].LinkshellID = pLs->getId();
-    linkshellListPacket->data().LinkshellList[ i ].ChannelID = pLs->getChatChannel();
-    linkshellListPacket->data().LinkshellList[ i ].HierarchyID = hierarchy;
-    strcpy( linkshellListPacket->data().LinkshellList[ i ].LinkshellName, pLs->getName().c_str() );
-  }
-
-  queueOutPacket( linkshellListPacket );
-}
-
-void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                              Entity::Player& player )
-{
-  const auto lsJoinPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellJoin >( inPacket );
-
-  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  auto invitedPlayer = server.getSession( lsJoinPacket.data().MemberCharacterName );
-  auto lsPtr = lsMgr.getLinkshellById( lsJoinPacket.data().LinkshellID );
-
-  if( !invitedPlayer || !lsPtr )
-    return Logger::warn( "Failed to invite player to linkshell - session/linkshell not found!" );
-
-  lsPtr->addInvite( invitedPlayer->getPlayer()->getCharacterId() );
-  lsMgr.writeLinkshell( lsPtr->getId() );
-  // TODO: send inv packets
-}
-
-void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                                Entity::Player& player )
+void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto joinChannelPacket = ZoneChannelPacket< Client::FFXIVIpcJoinChatChannel >( inPacket );
   const uint64_t channelIdReq = joinChannelPacket.data().ChannelID;
