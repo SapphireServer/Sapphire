@@ -143,6 +143,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
 
   setZoneHandler( FriendlistRemove, "FriendlistRemove", &GameConnection::friendlistRemoveHandler );
   setZoneHandler( SetFriendlistGroup, "SetFriendlistGroup", &GameConnection::setFriendlistGroupHandler );
+
+  setZoneHandler( LinkshellLeave, "LinkshellLeave", &GameConnection::linkshellLeaveHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

@@ -415,6 +415,49 @@ struct FFXIVIpcLinkshellJoin : FFXIVIpcBasePacket< LinkshellJoin >
   char MemberCharacterName[32];
 };
 
+struct FFXIVIpcLinkshellLeave : FFXIVIpcBasePacket< LinkshellLeave >
+{
+  uint64_t LinkshellID;
+};
+
+struct FFXIVIpcLinkshellJoinOfficial : FFXIVIpcBasePacket< LinkshellJoinOfficial >
+{
+  uint64_t LinkshellID;
+};
+
+struct FFXIVIpcLinkshellChangeMaster : FFXIVIpcBasePacket< LinkshellChangeMaster >
+{
+  uint64_t LinkshellID;
+  uint64_t NextMasterCharacterID;
+  char NextMasterCharacterName[32];
+};
+
+struct FFXIVIpcLinkshellKick : FFXIVIpcBasePacket< LinkshellKick >
+{
+  uint64_t LinkshellID;
+  uint64_t LeaveCharacterID;
+  char LeaveCharacterName[32];
+};
+
+struct FFXIVIpcLinkshellAddLeader : FFXIVIpcBasePacket< LinkshellAddLeader >
+{
+  uint64_t LinkshellID;
+  uint64_t MemberCharacterID;
+  char MemberCharacterName[32];
+};
+
+struct FFXIVIpcLinkshellRemoveLeader : FFXIVIpcBasePacket< LinkshellRemoveLeader >
+{
+  uint64_t LinkshellID;
+  uint64_t MemberCharacterID;
+  char MemberCharacterName[32];
+};
+
+struct FFXIVIpcLinkshellDeclineLeader : FFXIVIpcBasePacket< LinkshellDeclineLeader >
+{
+  uint64_t LinkshellID;
+};
+
 struct FFXIVIpcShopEventHandler : FFXIVIpcBasePacket< StartUIEvent >
 {
   /* 0000 */ uint32_t eventId;

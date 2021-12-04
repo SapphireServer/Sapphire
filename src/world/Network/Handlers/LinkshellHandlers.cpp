@@ -31,3 +31,9 @@ void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFX
   auto charName = std::string( lsJoinPacket.data().MemberCharacterName );
   lsMgr.invitePlayer( charName, lsJoinPacket.data().LinkshellID );
 }
+
+
+void Sapphire::Network::GameConnection::linkshellLeaveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsLeavePacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellLeave >( inPacket );
+}
