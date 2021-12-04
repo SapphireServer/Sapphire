@@ -8,6 +8,16 @@
 namespace Sapphire::World::Manager
 {
 
+  enum Hierarchy : __int32
+  {
+    NONE_1 = 0x0,
+    MASTER = 0x1,
+    LEADER = 0x2,
+    MEMBER = 0x3,
+    INVITE = 0x4,
+    MAX_0 = 0x7,
+  };
+
   class LinkshellMgr
   {
   private:

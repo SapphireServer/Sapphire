@@ -95,7 +95,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       if( !pPlayer )
         continue;
         
-      PlayerEntry entry;
+      PlayerEntry entry{};
       memset( &entry, 0, sizeof( PlayerEntry ) );
       bool isConnected = server.getSession( pPlayer->getCharacterId() ) != nullptr;
 
@@ -128,7 +128,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       entry.CharacterID = pPlayer->getCharacterId();
       strcpy( entry.CharacterName, pPlayer->getName().c_str() );
 
-      if( hierarchyVec.size() > 0 )
+      if( !hierarchyVec.empty() )
       {
         auto hierarchy = hierarchyVec[ i ];
 

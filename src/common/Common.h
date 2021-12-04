@@ -22,7 +22,7 @@ namespace Sapphire::Common
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
   const uint16_t MAX_PLAYER_LEVEL = 60;
-  const uint8_t CURRENT_EXPANSION_ID = 3;
+  const uint8_t CURRENT_EXPANSION_ID = 1;
 
   const uint8_t CLASSJOB_TOTAL = 23;
   const uint8_t CLASSJOB_SLOTS = 23;
@@ -1000,6 +1000,15 @@ namespace Sapphire::Common
     MEMBER = 0x3,
     INVITE = 0x4,
     MAX_0 = 0x7,
+  };
+
+  enum LinkshellHierarchyShifted : int32_t
+  {
+    None1 = 0x0,
+    Master = 0x900,
+    Leader = 0xa00,
+    Member = 0xb00,
+    Invite = 0xc00,
   };
 
   union HierarchyData
