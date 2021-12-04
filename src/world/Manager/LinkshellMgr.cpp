@@ -294,4 +294,31 @@ void LinkshellMgr::sendLinkshellList( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), linkshellListPacket );
 }
 
+void LinkshellMgr::leaveLinkshell( uint64_t lsId, uint64_t characterId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto leavingPlayer = server.getPlayer( characterId );
+  auto lsPtr = getLinkshellById( lsId );
+  if( !leavingPlayer || !lsPtr )
+    return;
 
+  lsPtr->removeMember( characterId );
+  writeLinkshell( lsId );
+
+  sendLinkshellList( *leavingPlayer );
+}
+
+void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
+{
+  auto &server = Common::Service< World::WorldServer >::ref();
+  auto joiningPlayer = server.getPlayer( characterId );
+  auto lsPtr = getLinkshellById( lsId );
+  if( !joiningPlayer || !lsPtr )
+    return;
+
+  lsPtr->addMember( characterId );
+  lsPtr->removeInvite( characterId );
+  writeLinkshell( lsId );
+
+  sendLinkshellList( *joiningPlayer );
+}

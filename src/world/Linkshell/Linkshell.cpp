@@ -74,6 +74,8 @@ void Sapphire::Linkshell::addMember( uint64_t memberId )
 void Sapphire::Linkshell::removeMember( uint64_t memberId )
 {
   m_memberIds.erase( memberId );
+  m_leaderIds.erase( memberId );
+  m_inviteIds.erase( memberId );
 }
 
 void Sapphire::Linkshell::addLeader( uint64_t memberId )

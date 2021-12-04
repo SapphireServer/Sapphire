@@ -36,4 +36,15 @@ void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFX
 void Sapphire::Network::GameConnection::linkshellLeaveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto lsLeavePacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellLeave >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+
+  lsMgr.leaveLinkshell( lsLeavePacket.data().LinkshellID, player.getCharacterId() );
+}
+
+void Sapphire::Network::GameConnection::linkshellJoinOfficialHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsLeavePacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellJoinOfficial >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+
+  lsMgr.joinLinkshell( lsLeavePacket.data().LinkshellID, player.getCharacterId() );
 }

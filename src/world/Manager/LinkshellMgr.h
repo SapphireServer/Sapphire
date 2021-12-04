@@ -47,6 +47,9 @@ namespace Sapphire::World::Manager
 
     LinkshellPtr getLinkshellById( uint64_t lsId );
 
+    void leaveLinkshell( uint64_t lsId, uint64_t characterId );
+    void joinLinkshell( uint64_t lsId, uint64_t characterId );
+
 
   };
 

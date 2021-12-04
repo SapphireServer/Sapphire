@@ -221,6 +221,7 @@ namespace Sapphire::Network
     DECLARE_HANDLER( setFriendlistGroupHandler );
 
     DECLARE_HANDLER( linkshellLeaveHandler );
+    DECLARE_HANDLER( linkshellJoinOfficialHandler );
   };
 
 }
