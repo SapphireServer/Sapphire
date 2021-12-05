@@ -16,11 +16,16 @@
 #include "Territory/QuestBattle.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
+#include "ChatChannelMgr.h"
+#include "LinkshellMgr.h"
+
+#include "Linkshell/Linkshell.h"
 
 #include "Territory/Land.h"
 #include "Territory/House.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
 #include "NaviMgr.h"
+
 
 Sapphire::World::Manager::TerritoryMgr::TerritoryMgr() :
   m_lastInstanceId( 10000 )
@@ -798,6 +803,12 @@ bool Sapphire::World::Manager::TerritoryMgr::joinWorld( Sapphire::Entity::Player
     player.setPos( { 0.0f, 0.0f, 0.0f }, false );
     player.setRot( 0.0f );
   }
+
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
+  auto& linkshellMgr = Common::Service< Manager::LinkshellMgr >::ref();
+  auto lsList = linkshellMgr.getPlayerLinkshells( player );
+  for( auto& ls : lsList )
+    chatChannelMgr.addPlayerToChannel( ls->getChatChannel(), player );
 
   if( !movePlayer( pCurrZone, player ) )
     return false;

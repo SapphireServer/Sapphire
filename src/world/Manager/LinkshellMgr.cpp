@@ -297,6 +297,7 @@ void LinkshellMgr::sendLinkshellList( Entity::Player& player )
 void LinkshellMgr::leaveLinkshell( uint64_t lsId, uint64_t characterId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
   auto leavingPlayer = server.getPlayer( characterId );
   auto lsPtr = getLinkshellById( lsId );
   if( !leavingPlayer || !lsPtr )
@@ -305,12 +306,14 @@ void LinkshellMgr::leaveLinkshell( uint64_t lsId, uint64_t characterId )
   lsPtr->removeMember( characterId );
   writeLinkshell( lsId );
 
+  chatChannelMgr.removePlayerFromChannel( lsPtr->getChatChannel(), *leavingPlayer );
   sendLinkshellList( *leavingPlayer );
 }
 
 void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
 {
   auto &server = Common::Service< World::WorldServer >::ref();
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
   auto joiningPlayer = server.getPlayer( characterId );
   auto lsPtr = getLinkshellById( lsId );
   if( !joiningPlayer || !lsPtr )
@@ -319,6 +322,8 @@ void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
   lsPtr->addMember( characterId );
   lsPtr->removeInvite( characterId );
   writeLinkshell( lsId );
+
+  chatChannelMgr.addPlayerToChannel( lsPtr->getChatChannel(), *joiningPlayer );
 
   sendLinkshellList( *joiningPlayer );
 }
