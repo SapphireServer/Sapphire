@@ -210,9 +210,11 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
     if( lsPtr )
     {
       auto& memberSet = lsPtr->getMemberIdList();
+      auto& inviteSet = lsPtr->getInviteIdList();
 
       std::vector< uint64_t > memberVec;
       std::copy( memberSet.begin(), memberSet.end(), std::back_inserter( memberVec ) );
+      std::copy( inviteSet.begin(), inviteSet.end(), std::back_inserter( memberVec ) );
 
       page = generateEntries( memberVec, offset, {} );
     }
