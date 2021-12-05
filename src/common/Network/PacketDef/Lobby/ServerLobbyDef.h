@@ -72,7 +72,8 @@ struct FFXIVIpcServiceLoginReply : FFXIVIpcBasePacket< ServiceLoginReply >
 /// ------------------------
   uint16_t maxCreateCharacter;
   uint16_t maxCharacterList;
-  uint64_t unknown8;
+  uint32_t entitledExpansion;
+  uint32_t unknown8;
   CharacterInfo chrArray[2];
 };
 

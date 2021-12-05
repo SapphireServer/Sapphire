@@ -194,6 +194,7 @@ void Lobby::GameConnection::serviceLogin( FFXIVARR_PACKET_RAW& packet, uint32_t 
     {
       charListPacket->data().maxCreateCharacter = Common::MAX_CREATE_CHARACTER;
       charListPacket->data().maxCharacterList = Common::MAX_CHARACTER_LIST;
+      charListPacket->data().entitledExpansion = Common::CURRENT_EXPANSION_ID;
       charListPacket->data().endOfList = 1;
     }
 
