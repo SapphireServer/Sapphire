@@ -1013,8 +1013,13 @@ namespace Sapphire::Common
       uint8_t status;
       uint8_t type;
       uint8_t group;
-      uint8_t unk;
+      uint8_t unavailable;
     } data;
+
+    struct Hierarchy32 {
+      uint32_t date;
+      uint32_t rawId;
+    } u32;
   };
 
   /* 61719 */
