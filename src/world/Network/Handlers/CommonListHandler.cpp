@@ -136,7 +136,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
         entry.HierarchyStatus = hierarchy.data.status;
         entry.HierarchyType = hierarchy.data.type;
         entry.HierarchyGroup = hierarchy.data.group;
-        entry.HierarchyUnk = hierarchy.data.unk;
+        entry.HierarchyUnk = hierarchy.data.unavailable;
       }
 
       entries.emplace_back( entry );
