@@ -4,9 +4,12 @@
 #include <stdint.h>
 #include <string>
 #include <functional>
+#include <Network/CommonNetwork.h>
 
 namespace Sapphire::Common::Util
 {
+
+  uint16_t getOpCode( Network::Packets::FFXIVARR_PACKET_RAW& raw );
 
   std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
 

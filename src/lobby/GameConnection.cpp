@@ -23,6 +23,7 @@
 #include "Forwards.h"
 
 using namespace Sapphire;
+using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::LobbyPackets;
 using namespace Sapphire::Network::Packets::LobbyPackets::Server;
@@ -478,9 +479,9 @@ void Lobby::GameConnection::handleGamePacket( Network::Packets::FFXIVARR_PACKET_
   if( m_pSession )
     accountId = m_pSession->getAccountID();
 
-  Logger::info( "[accountId#{0}] OpCode {1}", accountId, *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) );
+  Logger::info( "[accountId#{0}] OpCode {1}", accountId, Util::getOpCode( packet ) );
   
-  switch( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) )
+  switch( Util::getOpCode( packet ) )
   {
     case LoginEx:
     {

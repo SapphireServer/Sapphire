@@ -19,6 +19,12 @@ std::string Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
   return outStr;
 
 }
+
+uint16_t Util::getOpCode( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& raw )
+{
+  return *reinterpret_cast< uint16_t* >( &raw.data[ 2 ] );
+}
+
 std::string Util::toLowerCopy( const std::string& inStr )
 {
   std::string out = inStr;

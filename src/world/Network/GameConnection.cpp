@@ -228,7 +228,7 @@ void Sapphire::Network::GameConnection::queueOutPacket( std::vector< Packets::FF
 
 void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
-  uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
+  uint16_t opcode = Util::getOpCode( pPacket );
   auto it = m_zoneHandlerMap.find( opcode );
 
   if( it != m_zoneHandlerMap.end() )
@@ -259,7 +259,7 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
 
 void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
-  uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
+  uint16_t opcode = Util::getOpCode( pPacket );
   auto it = m_chatHandlerMap.find( opcode );
 
   if( it != m_chatHandlerMap.end() )
