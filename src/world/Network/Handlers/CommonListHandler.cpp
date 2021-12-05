@@ -213,10 +213,37 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       auto& inviteSet = lsPtr->getInviteIdList();
 
       std::vector< uint64_t > memberVec;
+      std::vector< Common::HierarchyData > hierarchyData;
       std::copy( memberSet.begin(), memberSet.end(), std::back_inserter( memberVec ) );
       std::copy( inviteSet.begin(), inviteSet.end(), std::back_inserter( memberVec ) );
 
-      page = generateEntries( memberVec, offset, {} );
+      for( const auto& id : memberVec )
+      {
+        Common::HierarchyData hierarchy;
+        if( lsPtr->getMasterId() == id )
+        {
+          hierarchy.data.type = Ls::LinkshellHierarchy::Master;
+          hierarchy.u32.rawId |= 1ul << 11;
+        }
+        else if( lsPtr->getLeaderIdList().count( id ) )
+        {
+          hierarchy.data.type = Ls::LinkshellHierarchy::Leader;
+          hierarchy.u32.rawId |= 1ul << 11;
+        }
+        else if( lsPtr->getInviteIdList().count( id ) )
+        {
+          hierarchy.data.type = Ls::LinkshellHierarchy::Invite;
+        }
+        else
+        {
+          hierarchy.data.type = Ls::LinkshellHierarchy::Member;
+          hierarchy.u32.rawId |= 1ul << 11;
+        }
+          
+        hierarchyData.push_back( hierarchy );
+      }
+
+      page = generateEntries( memberVec, offset, hierarchyData );
     }
   }
   else if( data.ListType == 0x0e )
