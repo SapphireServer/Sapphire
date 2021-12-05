@@ -994,13 +994,13 @@ namespace Sapphire::Common
 
   namespace Ls
   {
-    enum LinkshellHierarchyShifted : int32_t
+    enum LinkshellHierarchy : int32_t
     {
       None1 = 0x0,
-      Master = 0x900,
-      Leader = 0xa00,
-      Member = 0xb00,
-      Invite = 0xc00,
+      Master = 0x1,
+      Leader = 0x2,
+      Member = 0x3,
+      Invite = 0x4,
     };
   }
 

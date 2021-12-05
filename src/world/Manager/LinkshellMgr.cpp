@@ -152,6 +152,7 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
 {
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
   auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::LinkshellChat );
+  chatChannelMgr.addPlayerToChannel( chatChannelId, player );
 
   uint64_t linkshellId = 1;
 
@@ -271,19 +272,23 @@ void LinkshellMgr::sendLinkshellList( Entity::Player& player )
 
   auto lsVec = getPlayerLinkshells( player );
 
+  uint32_t chatFlag = player.isLogin() ? 0 : 1ul << 11;
+
   for( int i = 0; i < lsVec.size(); ++i )
   {
     auto pLs = lsVec[ i ];
     uint32_t hierarchy = 0;
 
     if( pLs->getMasterId() == player.getCharacterId() )
-      hierarchy = Ls::LinkshellHierarchyShifted::Master;
+      hierarchy = Ls::LinkshellHierarchy::Master << 8;
     else if( pLs->getLeaderIdList().count( player.getCharacterId() ) )
-      hierarchy = Ls::LinkshellHierarchyShifted::Leader;
+      hierarchy = Ls::LinkshellHierarchy::Leader << 8;
     else if( pLs->getInviteIdList().count( player.getCharacterId() ) )
-      hierarchy = Ls::LinkshellHierarchyShifted::Invite;
+      hierarchy = Ls::LinkshellHierarchy::Invite << 8;
     else
-      hierarchy = Ls::LinkshellHierarchyShifted::Member;
+      hierarchy = Ls::LinkshellHierarchy::Member << 8;
+
+    hierarchy |= chatFlag;
 
     linkshellListPacket->data().LinkshellList[ i ].LinkshellID = pLs->getId();
     linkshellListPacket->data().LinkshellList[ i ].ChannelID = pLs->getChatChannel();

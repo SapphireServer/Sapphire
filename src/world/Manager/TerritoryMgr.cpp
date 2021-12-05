@@ -804,12 +804,6 @@ bool Sapphire::World::Manager::TerritoryMgr::joinWorld( Sapphire::Entity::Player
     player.setRot( 0.0f );
   }
 
-  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
-  auto& linkshellMgr = Common::Service< Manager::LinkshellMgr >::ref();
-  auto lsList = linkshellMgr.getPlayerLinkshells( player );
-  for( auto& ls : lsList )
-    chatChannelMgr.addPlayerToChannel( ls->getChatChannel(), player );
-
   if( !movePlayer( pCurrZone, player ) )
     return false;
 

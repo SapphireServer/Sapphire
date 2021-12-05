@@ -249,6 +249,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       player.finishZoning();
       player.setLoadingComplete( true );
+      if( player.isLogin() )
+        player.setIsLogin( false );
       break;
     }
 

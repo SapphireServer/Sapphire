@@ -459,7 +459,6 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   {
     // fire the onLogin Event
     playerMgr.onLogin( player );
-    player.setIsLogin( false );
   }
 
   // spawn the player for himself
