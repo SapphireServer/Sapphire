@@ -8,7 +8,7 @@
 namespace Sapphire::World::Manager
 {
 
-  enum Hierarchy : __int32
+  enum Hierarchy : uint32_t
   {
     NONE_1 = 0x0,
     MASTER = 0x1,
