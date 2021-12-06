@@ -12,6 +12,7 @@
 #include "Session.h"
 #include "Actor/Player.h"
 #include "Manager/LinkshellMgr.h"
+#include <WorldServer.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -27,9 +28,19 @@ void Sapphire::Network::GameConnection::linkshellListHandler( const Packets::FFX
 void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto lsJoinPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellJoin >( inPacket );
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+
   auto charName = std::string( lsJoinPacket.data().MemberCharacterName );
-  lsMgr.invitePlayer( charName, lsJoinPacket.data().LinkshellID );
+  auto invitedPlayer = server.getSession( charName );
+
+  if( !invitedPlayer )
+  {
+    Logger::error( std::string( __FUNCTION__ ) + " requested player \"{}\" not found!", charName );
+    return;
+  }
+
+  lsMgr.invitePlayer( player, *invitedPlayer->getPlayer(), lsJoinPacket.data().LinkshellID );
 }
 
 

@@ -22,6 +22,8 @@
 #include <Network/GameConnection.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/PacketWrappers/LinkshellResultPacket.h>
+#include <Network/PacketDef/ClientIpcs.h>
 
 #include "Session.h"
 
@@ -218,11 +220,7 @@ void Sapphire::World::Manager::LinkshellMgr::finishLinkshellCreation( const std:
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto linkshellResult = makeZonePacket< FFXIVIpcLinkshellResult >( player.getId() );
-  linkshellResult->data().Result = result;
-  linkshellResult->data().UpPacketNo = 1;
-  linkshellResult->data().Identity = 0xFF;
-  strcpy( linkshellResult->data().LinkshellName, name.c_str() );
+  auto linkshellResult = makeLinkshellResult( player, 0, 0, 1, 0, 0, name, "" );
   server.queueForPlayer( player.getCharacterId(), linkshellResult );
 
 }
@@ -249,19 +247,32 @@ const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellM
   return lsVec;
 }
 
-void LinkshellMgr::invitePlayer( const std::string &name, uint64_t linkshellId )
+void LinkshellMgr::invitePlayer( Entity::Player& sourcePlayer, Entity::Player& invitedPlayer, uint64_t linkshellId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto invitedPlayer = server.getSession( name );
   auto lsPtr = getLinkshellById( linkshellId );
 
-  if( !invitedPlayer || !lsPtr )
-    return Logger::warn( "Failed to invite player to linkshell - session/linkshell not found!" );
+  if( !lsPtr )
+    return Logger::warn( "Failed to invite player to linkshell - linkshell not found!" );
 
-  lsPtr->addInvite( invitedPlayer->getPlayer()->getCharacterId() );
+  lsPtr->addInvite( invitedPlayer.getCharacterId() );
   writeLinkshell( lsPtr->getId() );
-  sendLinkshellList( *invitedPlayer->getPlayer() );
+  sendLinkshellList( invitedPlayer );
+
+  auto linkshellInviteResult = makeLinkshellResult( invitedPlayer, 0, 0,
+                                                    WorldPackets::Client::LinkshellJoin, 0,
+                                                    LinkshellResultPacket::UpdateStatus::Target,
+                                                    lsPtr->getName(), sourcePlayer.getName() );
+
+  server.queueForPlayer( invitedPlayer.getCharacterId(), linkshellInviteResult );
+
+  auto linkshellInviteResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+                                                     WorldPackets::Client::LinkshellJoin, 0,
+                                                     LinkshellResultPacket::UpdateStatus::Execute,
+                                                     lsPtr->getName(), invitedPlayer.getName() );
+
+  server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellInviteResult1 );
 }
 
 void LinkshellMgr::sendLinkshellList( Entity::Player& player )
