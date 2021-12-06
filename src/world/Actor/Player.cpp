@@ -1998,14 +1998,14 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     for( auto x = 0; x < 4; ++x )
     {
       auto note1 = pExdData.getRow< Component::Excel::MonsterNoteTarget >( note->data().Target[ x ] );
-      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().Target[ x ] )
+      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
         queuePacket( makeActorControlSelf( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
         logChanged = true;
         sectionChanged = true;
       }
-      if( logEntry.entries[ i - 1 ][ x ] != note->data().Target[ x ] )
+      if( logEntry.entries[ i - 1 ][ x ] != note->data().NeededKills[ x ] )
         sectionComplete = false;
     }
     if( logChanged && sectionComplete && sectionChanged )
