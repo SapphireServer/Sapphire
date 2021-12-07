@@ -164,10 +164,14 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
     linkshellId = lastIdx + 1;
   }
 
+  // check if a linkshell with the same name already exists
+  auto lsIt = m_linkshellNameMap.find( name );
+  if( lsIt != m_linkshellNameMap.end() )
+    return nullptr;
+
   uint64_t masterId = player.getCharacterId();
 
   // TODO: remove this messy set
-
   std::set< uint64_t > memberSet;
   std::set< uint64_t > leaderSet;
   std::set< uint64_t > inviteSet;
