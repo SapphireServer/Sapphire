@@ -25,6 +25,24 @@ void Sapphire::Network::GameConnection::linkshellListHandler( const Packets::FFX
   lsMgr.sendLinkshellList( player );
 }
 
+void Sapphire::Network::GameConnection::linkshellKickHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsKickPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellKick >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto playerPtr = server.getPlayer( lsKickPacket.data().LeaveCharacterID );
+
+  if( !playerPtr )
+  {
+    Logger::error( std::string( __FUNCTION__ ) + " requested player \"{}\" not found!", lsKickPacket.data().LeaveCharacterName );
+    return;
+  }
+
+  lsMgr.kickPlayer( player, *playerPtr, lsKickPacket.data().LinkshellID );
+
+}
+
 void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto lsJoinPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellJoin >( inPacket );
@@ -32,7 +50,7 @@ void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFX
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
 
   auto charName = std::string( lsJoinPacket.data().MemberCharacterName );
-  auto invitedPlayer = server.getSession( charName );
+  auto invitedPlayer = server.getPlayer( charName );
 
   if( !invitedPlayer )
   {
@@ -40,7 +58,7 @@ void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFX
     return;
   }
 
-  lsMgr.invitePlayer( player, *invitedPlayer->getPlayer(), lsJoinPacket.data().LinkshellID );
+  lsMgr.invitePlayer( player, *invitedPlayer, lsJoinPacket.data().LinkshellID );
 }
 
 

@@ -274,6 +274,38 @@ void LinkshellMgr::invitePlayer( Entity::Player& sourcePlayer, Entity::Player& i
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellInviteResult1 );
 }
 
+void LinkshellMgr::kickPlayer( Entity::Player& sourcePlayer, Entity::Player& kickedPlayer, uint64_t linkshellId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
+
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !lsPtr )
+    return Logger::warn( "Failed to kick player from linkshell - linkshell not found!" );
+
+  lsPtr->removeInvite( kickedPlayer.getCharacterId() );
+  lsPtr->removeLeader( kickedPlayer.getCharacterId() );
+  lsPtr->removeMember( kickedPlayer.getCharacterId() );
+  writeLinkshell( lsPtr->getId() );
+  sendLinkshellList( kickedPlayer );
+
+  auto linkshellKickResult = makeLinkshellResult( kickedPlayer, 0, 0,
+                                                    WorldPackets::Client::LinkshellKick, 0,
+                                                    LinkshellResultPacket::UpdateStatus::Target,
+                                                    lsPtr->getName(), sourcePlayer.getName() );
+
+  server.queueForPlayer( kickedPlayer.getCharacterId(), linkshellKickResult );
+
+  auto linkshellKickResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+                                                     WorldPackets::Client::LinkshellKick, 0,
+                                                     LinkshellResultPacket::UpdateStatus::Execute,
+                                                     lsPtr->getName(), kickedPlayer.getName() );
+
+  server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellKickResult1 );
+  chatChannelMgr.removePlayerFromChannel( lsPtr->getChatChannel(), kickedPlayer );
+}
+
 void LinkshellMgr::sendLinkshellList( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();

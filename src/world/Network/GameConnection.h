@@ -111,6 +111,7 @@ namespace Sapphire::Network
     DECLARE_HANDLER( joinChatChannelHandler );
 
     DECLARE_HANDLER( linkshellListHandler );
+    DECLARE_HANDLER( linkshellKickHandler );
 
     DECLARE_HANDLER( linkshellJoinHandler );
 
