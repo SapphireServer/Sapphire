@@ -47,12 +47,12 @@ public:
       auto ls = linkshellMgr().createLinkshell( result.resultString, player );
       if( !ls )
       {
-        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a } );
+        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a }, false );
         linkshellMgr().finishLinkshellCreation( result.resultString, 0x15a, player );
       }
       else
       {
-        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 } );
+        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 }, true );
         linkshellMgr().finishLinkshellCreation( result.resultString, 0, player );
       }
 

@@ -542,13 +542,15 @@ void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t sce
   sendEventPlay( player, eventId, scene, flags );
 }
 
-void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values )
+void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values, bool resetCallback )
 {
   auto pEvent = bootstrapSceneEvent( player, eventId, 0 );
   if( !pEvent )
     return;
 
-  pEvent->setEventReturnCallback( nullptr );
+  if( resetCallback )
+    pEvent->setEventReturnCallback( nullptr );
+
   auto resumeEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
   resumeEvent->data().handlerId = eventId;
   resumeEvent->data().sceneId = static_cast< uint8_t >( scene );

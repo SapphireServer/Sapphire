@@ -41,7 +41,7 @@ namespace Sapphire::World::Manager
                     Event::EventHandler::SceneReturnCallback eventReturnCallback = nullptr );
 
     /*! resume a subevent */
-    void resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values );
+    void resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values, bool resetCallback );
 
     /*! play a subevent */
     void playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,

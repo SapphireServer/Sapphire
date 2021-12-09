@@ -2,8 +2,7 @@
 #include <Actor/Player.h>
 #include <Action/Action.h>
 
-class ActionSprint3 :
-  public Sapphire::ScriptAPI::ActionScript
+class ActionSprint3 : public Sapphire::ScriptAPI::ActionScript
 {
 public:
   ActionSprint3() :

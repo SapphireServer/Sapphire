@@ -152,10 +152,6 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellById(
 
 Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( const std::string& name, Entity::Player& player )
 {
-  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
-  auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::LinkshellChat );
-  chatChannelMgr.addPlayerToChannel( chatChannelId, player );
-
   uint64_t linkshellId = 1;
 
   if( !m_linkshellIdMap.empty() )
@@ -168,6 +164,10 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
   auto lsIt = m_linkshellNameMap.find( name );
   if( lsIt != m_linkshellNameMap.end() )
     return nullptr;
+
+  auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
+  auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::LinkshellChat );
+  chatChannelMgr.addPlayerToChannel( chatChannelId, player );
 
   uint64_t masterId = player.getCharacterId();
 
@@ -187,7 +187,6 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
   // TODO: handle player pkt
 
   // prepare binary data for SQL
-
   std::vector< uint64_t > members( 128, 0 );
   std::vector< uint64_t > leaders( 128, 0 );
   std::vector< uint64_t > invites( 128, 0 );
@@ -204,10 +203,7 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
   std::vector< uint8_t > invVec( sizeof( invites ) );
   memcpy( invVec.data(), invites.data(), sizeof( invites ) );
 
-  // TODO: insert in SQL
-
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_LINKSHELL_INS );
   stmt->setUInt64( 1, linkshellId );
   stmt->setUInt64( 2, masterId );
@@ -220,11 +216,12 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
 
   return lsPtr;
 }
+
 void Sapphire::World::Manager::LinkshellMgr::finishLinkshellCreation( const std::string& name, uint32_t result, Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto linkshellResult = makeLinkshellResult( player, 0, 0, 1, 0, 0, name, "" );
+  auto linkshellResult = makeLinkshellResult( player, 0, 0, 1, result, 0, name, "" );
   server.queueForPlayer( player.getCharacterId(), linkshellResult );
 
 }
@@ -233,18 +230,16 @@ const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellM
 {
   std::vector< Sapphire::LinkshellPtr > lsVec;
 
-  if( !m_linkshellIdMap.empty() )
+  for( const auto &[ key, value ] : m_linkshellIdMap )
   {
-    for( const auto &[ key, value ] : m_linkshellIdMap )
-    {
-      auto& memberList = value->getMemberIdList();
-      auto& inviteList = value->getInviteIdList();
+    auto& memberList = value->getMemberIdList();
+    auto& inviteList = value->getInviteIdList();
 
-      // find player id in LS member list
-      if( memberList.count( player.getCharacterId() ) || inviteList.count( player.getCharacterId() ) )
-      {
-        lsVec.emplace_back( value );
-      }
+    // find player id in LS member or invite list
+    if( memberList.count( player.getCharacterId() ) ||
+        inviteList.count( player.getCharacterId() ) )
+    {
+      lsVec.emplace_back( value );
     }
   }
 
