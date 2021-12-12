@@ -374,3 +374,81 @@ void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
 
   sendLinkshellList( *joiningPlayer );
 }
+
+void LinkshellMgr::addLeader( Sapphire::Entity::Player &sourcePlayer, Sapphire::Entity::Player &newLeaderPlayer, uint64_t linkshellId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !lsPtr )
+    return Logger::warn( "Failed to promote player from linkshell - linkshell not found!" );
+
+  lsPtr->addLeader( newLeaderPlayer.getCharacterId() );
+  writeLinkshell( lsPtr->getId() );
+  sendLinkshellList( newLeaderPlayer );
+
+  auto linkshellResult = makeLinkshellResult( newLeaderPlayer, 0, 0,
+                                              WorldPackets::Client::LinkshellAddLeader, 0,
+                                              LinkshellResultPacket::UpdateStatus::Target,
+                                              lsPtr->getName(), sourcePlayer.getName() );
+
+  server.queueForPlayer( newLeaderPlayer.getCharacterId(), linkshellResult );
+
+  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+                                               WorldPackets::Client::LinkshellAddLeader, 0,
+                                               LinkshellResultPacket::UpdateStatus::Execute,
+                                               lsPtr->getName(), newLeaderPlayer.getName() );
+
+  server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
+}
+
+void LinkshellMgr::declineLeader( Sapphire::Entity::Player &sourcePlayer, uint64_t linkshellId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !lsPtr )
+    return Logger::warn( "Failed to decline leader from linkshell - linkshell not found!" );
+
+  lsPtr->removeLeader( sourcePlayer.getCharacterId() );
+  writeLinkshell( lsPtr->getId() );
+  sendLinkshellList( sourcePlayer );
+
+  auto linkshellResult = makeLinkshellResult( sourcePlayer, 0, 0,
+                                              WorldPackets::Client::LinkshellDeclineLeader, 0,
+                                              LinkshellResultPacket::UpdateStatus::Execute,
+                                              lsPtr->getName(), sourcePlayer.getName() );
+
+  server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult );
+
+}
+
+void LinkshellMgr::removeLeader( Sapphire::Entity::Player &sourcePlayer, Sapphire::Entity::Player &leaderPlayer, uint64_t linkshellId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !lsPtr )
+    return Logger::warn( "Failed to remove leader from linkshell - linkshell not found!" );
+
+  lsPtr->removeLeader( leaderPlayer.getCharacterId() );
+  writeLinkshell( lsPtr->getId() );
+  sendLinkshellList( leaderPlayer );
+
+  auto linkshellResult = makeLinkshellResult( leaderPlayer, 0, 0,
+                                              WorldPackets::Client::LinkshellRemoveLeader, 0,
+                                              LinkshellResultPacket::UpdateStatus::Target,
+                                              lsPtr->getName(), sourcePlayer.getName() );
+
+  server.queueForPlayer( leaderPlayer.getCharacterId(), linkshellResult );
+
+  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+                                               WorldPackets::Client::LinkshellRemoveLeader, 0,
+                                               LinkshellResultPacket::UpdateStatus::Execute,
+                                               lsPtr->getName(), leaderPlayer.getName() );
+
+  server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
+}

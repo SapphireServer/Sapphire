@@ -68,6 +68,10 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( LinkshellJoin, "LinkshellJoin", &GameConnection::linkshellJoinHandler );
   setZoneHandler( LinkshellKick, "LinkshellKick", &GameConnection::linkshellKickHandler );
 
+  setZoneHandler( LinkshellAddLeader, "LinkshellAddLeader", &GameConnection::linkshellAddLeaderHandler );
+  setZoneHandler( LinkshellRemoveLeader, "LinkshellRemoveLeader", &GameConnection::linkshellRemoveLeaderHandler );
+  setZoneHandler( LinkshellDeclineLeader, "LinkshellDeclineLeader", &GameConnection::linkshellDeclineLeaderHandler );
+
   setZoneHandler( ReqExamineFcInfo, "ReqExamineFcInfo", &GameConnection::reqExamineFcInfo );
   setZoneHandler( ZoneJump, "ZoneJump", &GameConnection::zoneJumpHandler );
   setZoneHandler( Command, "Command", &GameConnection::commandHandler );

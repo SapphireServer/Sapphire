@@ -113,6 +113,10 @@ namespace Sapphire::Network
     DECLARE_HANDLER( linkshellListHandler );
     DECLARE_HANDLER( linkshellKickHandler );
 
+    DECLARE_HANDLER( linkshellAddLeaderHandler );
+    DECLARE_HANDLER( linkshellRemoveLeaderHandler );
+    DECLARE_HANDLER( linkshellDeclineLeaderHandler );
+
     DECLARE_HANDLER( linkshellJoinHandler );
 
     DECLARE_HANDLER( syncHandler );

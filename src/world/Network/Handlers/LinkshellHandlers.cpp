@@ -43,6 +43,52 @@ void Sapphire::Network::GameConnection::linkshellKickHandler( const Packets::FFX
 
 }
 
+void Sapphire::Network::GameConnection::linkshellAddLeaderHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsAddLeaderPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellAddLeader >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto playerPtr = server.getPlayer( lsAddLeaderPacket.data().MemberCharacterID );
+
+  if( !playerPtr )
+  {
+    Logger::error( std::string( __FUNCTION__ ) + " requested player \"{}\" not found!", lsAddLeaderPacket.data().MemberCharacterName );
+    return;
+  }
+
+  lsMgr.addLeader( player, *playerPtr, lsAddLeaderPacket.data().LinkshellID );
+
+}
+
+void Sapphire::Network::GameConnection::linkshellRemoveLeaderHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsRemoveLeaderPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellRemoveLeader >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto playerPtr = server.getPlayer( lsRemoveLeaderPacket.data().MemberCharacterID );
+
+  if( !playerPtr )
+  {
+    Logger::error( std::string( __FUNCTION__ ) + " requested player \"{}\" not found!", lsRemoveLeaderPacket.data().MemberCharacterName );
+    return;
+  }
+
+  lsMgr.removeLeader( player, *playerPtr, lsRemoveLeaderPacket.data().LinkshellID );
+
+}
+
+void Sapphire::Network::GameConnection::linkshellDeclineLeaderHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsDeclineLeaderPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellDeclineLeader >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  lsMgr.declineLeader( player, lsDeclineLeaderPacket.data().LinkshellID );
+
+}
+
 void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto lsJoinPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellJoin >( inPacket );

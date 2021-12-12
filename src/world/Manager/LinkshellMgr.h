@@ -41,6 +41,10 @@ namespace Sapphire::World::Manager
     void invitePlayer( Entity::Player& sourcePlayer, Entity::Player& invitedPlayer, uint64_t linkshellId );
     void kickPlayer( Entity::Player& sourcePlayer, Entity::Player& kickedPlayer, uint64_t linkshellId );
 
+    void addLeader( Entity::Player& sourcePlayer, Entity::Player& newLeaderPlayer, uint64_t linkshellId );
+    void removeLeader( Entity::Player& sourcePlayer, Entity::Player& leaderPlayer, uint64_t linkshellId );
+    void declineLeader( Entity::Player& sourcePlayer, uint64_t linkshellId );
+
     void sendLinkshellList( Entity::Player& player );
 
     // get all linkshells associated with player
