@@ -163,6 +163,16 @@ namespace Sapphire::Network
     DECLARE_HANDLER( returnEventScene128 );
     DECLARE_HANDLER( returnEventScene255 );
 
+    DECLARE_HANDLER( yieldEventSceneHeader );
+    DECLARE_HANDLER( yieldEventScene2 );
+    DECLARE_HANDLER( yieldEventScene4 );
+    DECLARE_HANDLER( yieldEventScene8 );
+    DECLARE_HANDLER( yieldEventScene16 );
+    DECLARE_HANDLER( yieldEventScene32 );
+    DECLARE_HANDLER( yieldEventScene64 );
+    DECLARE_HANDLER( yieldEventScene128 );
+    DECLARE_HANDLER( yieldEventScene255 );
+
     DECLARE_HANDLER( startUiEvent );
 
     DECLARE_HANDLER( yieldEventString );

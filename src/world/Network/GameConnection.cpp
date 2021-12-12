@@ -112,6 +112,16 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ReturnEventScene128, "ReturnEventScene128", &GameConnection::returnEventScene128 );
   setZoneHandler( ReturnEventScene255, "ReturnEventScene255", &GameConnection::returnEventScene255 );
 
+  setZoneHandler( YieldEventSceneHeader, "YieldEventSceneHeader", &GameConnection::yieldEventSceneHeader );
+  setZoneHandler( YieldEventScene2, "YieldEventScene2", &GameConnection::yieldEventScene2 );
+  setZoneHandler( YieldEventScene4, "YieldEventScene4", &GameConnection::yieldEventScene4 );
+  setZoneHandler( YieldEventScene8, "YieldEventScene8", &GameConnection::yieldEventScene8 );
+  setZoneHandler( YieldEventScene16, "YieldEventScene16", &GameConnection::yieldEventScene16 );
+  setZoneHandler( YieldEventScene32, "YieldEventScene32", &GameConnection::yieldEventScene32 );
+  setZoneHandler( YieldEventScene64, "YieldEventScene64", &GameConnection::yieldEventScene64 );
+  setZoneHandler( YieldEventScene128, "YieldEventScene128", &GameConnection::yieldEventScene128 );
+  setZoneHandler( YieldEventScene255, "YieldEventScene255", &GameConnection::yieldEventScene255 );
+
   setZoneHandler( StartUIEvent, "StartUIEvent", &GameConnection::startUiEvent );
 
   setZoneHandler( YieldEventSceneString8, "YieldEventSceneString8", &GameConnection::yieldEventString );
