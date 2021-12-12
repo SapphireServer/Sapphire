@@ -218,11 +218,11 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
   return lsPtr;
 }
 
-void Sapphire::World::Manager::LinkshellMgr::finishLinkshellCreation( const std::string& name, uint32_t result, Entity::Player& player )
+void Sapphire::World::Manager::LinkshellMgr::finishLinkshellAction( const std::string& name, uint32_t result, Entity::Player& player, uint8_t action )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto linkshellResult = makeLinkshellResult( player, 0, 0, 1, result, 0, name, "" );
+  auto linkshellResult = makeLinkshellResult( player, 0, 0, action, result, 0, name, "" );
   server.queueForPlayer( player.getCharacterId(), linkshellResult );
 
 }
@@ -481,4 +481,26 @@ void LinkshellMgr::changeMaster( Sapphire::Entity::Player &sourcePlayer, Sapphir
                                                lsPtr->getName(), nextMasterPlayer.getName() );
 
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
+}
+
+bool LinkshellMgr::renameLinkshell( uint64_t linkshellId, const std::string &name, Sapphire::Entity::Player &player )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !lsPtr )
+  {
+    Logger::warn( "Failed to rename linkshell - linkshell not found!" );
+    return false;
+  }
+
+  // can't rename to an already existing name
+  if( getLinkshellByName( name ) )
+    return false;
+
+  lsPtr->setName( name );
+  writeLinkshell( lsPtr->getId() );
+
+  return true;
 }

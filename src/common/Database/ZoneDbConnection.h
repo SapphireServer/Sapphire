@@ -108,6 +108,7 @@ namespace Sapphire::Db
     LINKSHELL_SEL_ALL,
     LINKSHELL_INS,
     LINKSHELL_UP,
+    LINKSHELL_DEL,
 
 
     MAX_STATEMENTS

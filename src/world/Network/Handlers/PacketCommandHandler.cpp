@@ -119,7 +119,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::COMPANION:
     {
-      player.setCompanion( static_cast< uint16_t >( param1 ));
+      player.setCompanion( static_cast< uint16_t >( param1 ) );
       break;
     }
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)

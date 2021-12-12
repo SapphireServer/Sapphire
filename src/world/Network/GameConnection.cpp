@@ -118,6 +118,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( YieldEventSceneString16, "YieldEventSceneString16", &GameConnection::yieldEventString );
   setZoneHandler( YieldEventSceneString32, "YieldEventSceneString32", &GameConnection::yieldEventString );
 
+  setZoneHandler( YieldEventSceneIntAndString, "YieldEventSceneIntAndString", &GameConnection::yieldEventSceneIntAndString );
+
   setZoneHandler( RequestPenalties, "RequestPenalties", &GameConnection::cfRequestPenalties );
   setZoneHandler( FindContent, "FindContent", &GameConnection::findContent );
   setZoneHandler( Find5Contents, "Find5Contents", &GameConnection::find5Contents );

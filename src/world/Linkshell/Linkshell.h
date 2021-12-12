@@ -37,6 +37,7 @@ namespace Sapphire
     uint64_t getId() const;
 
     const std::string& getName() const;
+    void setName( std::string name );
 
     uint64_t getMasterId() const;
 

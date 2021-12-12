@@ -36,7 +36,9 @@ namespace Sapphire::World::Manager
     // create new linkshell entry and insert into db
     LinkshellPtr createLinkshell( const std::string& name, Entity::Player& player );
 
-    void finishLinkshellCreation( const std::string& name, uint32_t result, Entity::Player& player );
+    bool renameLinkshell( uint64_t linkshellId, const std::string& name, Entity::Player& player );
+
+    void finishLinkshellAction( const std::string& name, uint32_t result, Entity::Player& player, uint8_t action );
 
     void invitePlayer( Entity::Player& sourcePlayer, Entity::Player& invitedPlayer, uint64_t linkshellId );
     void kickPlayer( Entity::Player& sourcePlayer, Entity::Player& kickedPlayer, uint64_t linkshellId );

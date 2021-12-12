@@ -103,5 +103,10 @@ void Sapphire::Linkshell::setMasterId( uint64_t masterId )
   m_masterCharacterId = masterId;
 }
 
+void Sapphire::Linkshell::setName( std::string name )
+{
+  m_name = std::move( name );
+}
+
 
 

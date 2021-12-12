@@ -348,6 +348,42 @@ void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t ev
 
 }
 
+void EventMgr::handleReturnIntAndStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString, uint64_t resultInt )
+{
+  std::string eventName = getEventName( eventId );
+
+  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, string: {2}, resultInt: {3}", eventId, sceneId, resultString, resultInt );
+
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto pEvent = player.getEvent( eventId );
+
+  if( pEvent )
+  {
+    pEvent->setPlayedScene( false );
+    // try to retrieve a stored callback
+    // if there is one, proceed to call it
+    Event::SceneResult result;
+    result.actorId = pEvent->getActorId();
+    result.eventId = eventId;
+    result.sceneId = sceneId;
+    result.resultString = resultString;
+    result.intResult = resultInt;
+
+    auto eventCallback = pEvent->getEventReturnCallback();
+    if( eventCallback )
+    {
+      eventCallback( player, result );
+    }
+
+      // we might have a scene chain callback instead so check for that too
+    else if( auto chainCallback = pEvent->getSceneChainCallback() )
+      chainCallback( player );
+
+  }
+
+}
+
+
 void EventMgr::checkEvent( Sapphire::Entity::Player &player, uint32_t eventId )
 {
   auto pEvent = player.getEvent( eventId );

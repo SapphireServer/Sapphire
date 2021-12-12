@@ -166,6 +166,7 @@ namespace Sapphire::Network
     DECLARE_HANDLER( startUiEvent );
 
     DECLARE_HANDLER( yieldEventString );
+    DECLARE_HANDLER( yieldEventSceneIntAndString );
 
     DECLARE_HANDLER( logoutHandler );
 

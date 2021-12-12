@@ -22,6 +22,7 @@ namespace Sapphire::World::Manager
                                  uint8_t numOfResults, const std::vector< uint32_t >& results );
 
     void handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString );
+    void handleReturnIntAndStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString, uint64_t resultInt );
 
 
     void checkEvent( Entity::Player& player, uint32_t eventId );

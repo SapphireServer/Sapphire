@@ -323,6 +323,19 @@ void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVAR
 
 }
 
+void Sapphire::Network::GameConnection::yieldEventSceneIntAndString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto &server = Common::Service< World::WorldServer >::ref();
+  auto &eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  std::string inString;
+  const auto packet = ZoneChannelPacket< FFXIVIpcYieldEventSceneIntAndString >( inPacket );
+  auto& data = packet.data();
+  inString = std::string( data.str );
+
+  eventMgr.handleReturnIntAndStringEventScene( player, data.handlerId, data.sceneId, inString, data.integer );
+}
+
 void Sapphire::Network::GameConnection::startUiEvent( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {

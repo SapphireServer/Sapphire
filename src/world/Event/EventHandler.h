@@ -15,6 +15,7 @@ namespace Sapphire::Event
     uint8_t numOfResults;
     std::vector< uint32_t > results;
     std::string resultString;
+    uint64_t intResult;
 
     uint32_t getResult( uint32_t index ) const;
   };

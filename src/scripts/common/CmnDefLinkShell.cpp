@@ -48,12 +48,12 @@ public:
       if( !ls )
       {
         eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a }, false );
-        linkshellMgr().finishLinkshellCreation( result.resultString, 0x15a, player );
+        linkshellMgr().finishLinkshellAction( result.resultString, 0x15a, player, 1 );
       }
       else
       {
         eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 }, true );
-        linkshellMgr().finishLinkshellCreation( result.resultString, 0, player );
+        linkshellMgr().finishLinkshellAction( result.resultString, 0, player, 1 );
       }
 
     };
@@ -64,7 +64,22 @@ public:
   // rename linkshell
   void Scene00003( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 3, HIDE_HOTBAR );
+    auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      auto ls = linkshellMgr().renameLinkshell( result.intResult, result.resultString, player );
+      if( !ls )
+      {
+        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a }, false );
+        linkshellMgr().finishLinkshellAction( result.resultString, 0x15a, player, 3 );
+      }
+      else
+      {
+        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 }, true );
+        linkshellMgr().finishLinkshellAction( result.resultString, 0, player, 3 );
+      }
+
+    };
+    eventMgr().playScene( player, getId(), 3, HIDE_HOTBAR, callback );
   }
 
   // remove linkshell
