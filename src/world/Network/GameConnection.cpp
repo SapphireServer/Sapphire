@@ -67,7 +67,9 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( GetLinkshellList, "GetLinkshellList", &GameConnection::linkshellListHandler );
   setZoneHandler( LinkshellJoin, "LinkshellJoin", &GameConnection::linkshellJoinHandler );
   setZoneHandler( LinkshellKick, "LinkshellKick", &GameConnection::linkshellKickHandler );
-
+  setZoneHandler( LinkshellLeave, "LinkshellLeave", &GameConnection::linkshellLeaveHandler );
+  setZoneHandler( LinkshellChangeMaster, "LinkshellChangeMaster", &GameConnection::linkshellChangeMasterHandler );
+  setZoneHandler( LinkshellJoinOfficial, "LinkshellJoinOfficial", &GameConnection::linkshellJoinOfficialHandler );
   setZoneHandler( LinkshellAddLeader, "LinkshellAddLeader", &GameConnection::linkshellAddLeaderHandler );
   setZoneHandler( LinkshellRemoveLeader, "LinkshellRemoveLeader", &GameConnection::linkshellRemoveLeaderHandler );
   setZoneHandler( LinkshellDeclineLeader, "LinkshellDeclineLeader", &GameConnection::linkshellDeclineLeaderHandler );
@@ -149,8 +151,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( FriendlistRemove, "FriendlistRemove", &GameConnection::friendlistRemoveHandler );
   setZoneHandler( SetFriendlistGroup, "SetFriendlistGroup", &GameConnection::setFriendlistGroupHandler );
 
-  setZoneHandler( LinkshellLeave, "LinkshellLeave", &GameConnection::linkshellLeaveHandler );
-  setZoneHandler( LinkshellJoinOfficial, "LinkshellJoinOfficial", &GameConnection::linkshellJoinOfficialHandler );
+
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

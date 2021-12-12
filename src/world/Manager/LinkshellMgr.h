@@ -44,6 +44,7 @@ namespace Sapphire::World::Manager
     void addLeader( Entity::Player& sourcePlayer, Entity::Player& newLeaderPlayer, uint64_t linkshellId );
     void removeLeader( Entity::Player& sourcePlayer, Entity::Player& leaderPlayer, uint64_t linkshellId );
     void declineLeader( Entity::Player& sourcePlayer, uint64_t linkshellId );
+    void changeMaster( Entity::Player& sourcePlayer, Entity::Player& nextMasterPlayer, uint64_t linkshellId );
 
     void sendLinkshellList( Entity::Player& player );
 

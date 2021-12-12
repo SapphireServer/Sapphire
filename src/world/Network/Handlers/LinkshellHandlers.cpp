@@ -123,3 +123,21 @@ void Sapphire::Network::GameConnection::linkshellJoinOfficialHandler( const Pack
 
   lsMgr.joinLinkshell( lsLeavePacket.data().LinkshellID, player.getCharacterId() );
 }
+
+void Sapphire::Network::GameConnection::linkshellChangeMasterHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto lsChMasterPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellChangeMaster >( inPacket );
+  auto& lsMgr = Common::Service< LinkshellMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto charName = std::string( lsChMasterPacket.data().NextMasterCharacterName );
+  auto nextMaster = server.getPlayer( charName );
+
+  if( !nextMaster )
+  {
+    Logger::error( std::string( __FUNCTION__ ) + " requested player \"{}\" not found!", charName );
+    return;
+  }
+
+  lsMgr.changeMaster( player, *nextMaster, lsChMasterPacket.data().LinkshellID );
+}

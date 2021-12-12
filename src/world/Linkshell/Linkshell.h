@@ -40,6 +40,8 @@ namespace Sapphire
 
     uint64_t getMasterId() const;
 
+    void setMasterId( uint64_t masterId );
+
     const std::set< uint64_t >& getMemberIdList() const;
 
     std::set< uint64_t >& getMemberIdList();

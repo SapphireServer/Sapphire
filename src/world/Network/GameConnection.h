@@ -112,7 +112,9 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( linkshellListHandler );
     DECLARE_HANDLER( linkshellKickHandler );
-
+    DECLARE_HANDLER( linkshellLeaveHandler );
+    DECLARE_HANDLER( linkshellChangeMasterHandler );
+    DECLARE_HANDLER( linkshellJoinOfficialHandler );
     DECLARE_HANDLER( linkshellAddLeaderHandler );
     DECLARE_HANDLER( linkshellRemoveLeaderHandler );
     DECLARE_HANDLER( linkshellDeclineLeaderHandler );
@@ -225,8 +227,7 @@ namespace Sapphire::Network
     DECLARE_HANDLER( friendlistRemoveHandler );
     DECLARE_HANDLER( setFriendlistGroupHandler );
 
-    DECLARE_HANDLER( linkshellLeaveHandler );
-    DECLARE_HANDLER( linkshellJoinOfficialHandler );
+
   };
 
 }

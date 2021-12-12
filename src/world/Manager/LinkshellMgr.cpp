@@ -127,7 +127,8 @@ void LinkshellMgr::writeLinkshell( uint64_t lsId )
   query->setString( 2, ls->getName() );
   query->setBinary( 3, leaderBin );
   query->setBinary( 4, inviteBin );
-  query->setInt64( 5, lsId );
+  query->setUInt64( 5, ls->getMasterId() );
+  query->setInt64( 6, lsId );
   db.execute( query );
 
 }
@@ -388,14 +389,14 @@ void LinkshellMgr::addLeader( Sapphire::Entity::Player &sourcePlayer, Sapphire::
   writeLinkshell( lsPtr->getId() );
   sendLinkshellList( newLeaderPlayer );
 
-  auto linkshellResult = makeLinkshellResult( newLeaderPlayer, 0, 0,
+  auto linkshellResult = makeLinkshellResult( newLeaderPlayer, lsPtr->getId(), 0,
                                               WorldPackets::Client::LinkshellAddLeader, 0,
                                               LinkshellResultPacket::UpdateStatus::Target,
                                               lsPtr->getName(), sourcePlayer.getName() );
 
   server.queueForPlayer( newLeaderPlayer.getCharacterId(), linkshellResult );
 
-  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, lsPtr->getId(), 0,
                                                WorldPackets::Client::LinkshellAddLeader, 0,
                                                LinkshellResultPacket::UpdateStatus::Execute,
                                                lsPtr->getName(), newLeaderPlayer.getName() );
@@ -416,7 +417,7 @@ void LinkshellMgr::declineLeader( Sapphire::Entity::Player &sourcePlayer, uint64
   writeLinkshell( lsPtr->getId() );
   sendLinkshellList( sourcePlayer );
 
-  auto linkshellResult = makeLinkshellResult( sourcePlayer, 0, 0,
+  auto linkshellResult = makeLinkshellResult( sourcePlayer, lsPtr->getId(), 0,
                                               WorldPackets::Client::LinkshellDeclineLeader, 0,
                                               LinkshellResultPacket::UpdateStatus::Execute,
                                               lsPtr->getName(), sourcePlayer.getName() );
@@ -438,17 +439,46 @@ void LinkshellMgr::removeLeader( Sapphire::Entity::Player &sourcePlayer, Sapphir
   writeLinkshell( lsPtr->getId() );
   sendLinkshellList( leaderPlayer );
 
-  auto linkshellResult = makeLinkshellResult( leaderPlayer, 0, 0,
+  auto linkshellResult = makeLinkshellResult( leaderPlayer, lsPtr->getId(), 0,
                                               WorldPackets::Client::LinkshellRemoveLeader, 0,
                                               LinkshellResultPacket::UpdateStatus::Target,
                                               lsPtr->getName(), sourcePlayer.getName() );
 
   server.queueForPlayer( leaderPlayer.getCharacterId(), linkshellResult );
 
-  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, lsPtr->getId(), 0,
                                                WorldPackets::Client::LinkshellRemoveLeader, 0,
                                                LinkshellResultPacket::UpdateStatus::Execute,
                                                lsPtr->getName(), leaderPlayer.getName() );
+
+  server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
+}
+
+void LinkshellMgr::changeMaster( Sapphire::Entity::Player &sourcePlayer, Sapphire::Entity::Player &nextMasterPlayer, uint64_t linkshellId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto lsPtr = getLinkshellById( linkshellId );
+
+  if( !lsPtr )
+    return Logger::warn( "Failed to change master from linkshell - linkshell not found!" );
+
+  lsPtr->setMasterId( nextMasterPlayer.getCharacterId() );
+  writeLinkshell( lsPtr->getId() );
+  sendLinkshellList( nextMasterPlayer );
+  sendLinkshellList( sourcePlayer );
+
+  auto linkshellResult = makeLinkshellResult( sourcePlayer, lsPtr->getId(), nextMasterPlayer.getCharacterId(),
+                                              WorldPackets::Client::LinkshellChangeMaster, 0,
+                                              LinkshellResultPacket::UpdateStatus::Target,
+                                              lsPtr->getName(), nextMasterPlayer.getName() );
+
+  server.queueForPlayer( nextMasterPlayer.getCharacterId(), linkshellResult );
+
+  auto linkshellResult1 = makeLinkshellResult( sourcePlayer, lsPtr->getId(), nextMasterPlayer.getCharacterId(),
+                                               WorldPackets::Client::LinkshellChangeMaster, 0,
+                                               LinkshellResultPacket::UpdateStatus::Execute,
+                                               lsPtr->getName(), nextMasterPlayer.getName() );
 
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
 }

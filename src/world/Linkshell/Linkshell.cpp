@@ -98,5 +98,10 @@ void Sapphire::Linkshell::removeInvite( uint64_t memberId )
   m_inviteIds.erase( memberId );
 }
 
+void Sapphire::Linkshell::setMasterId( uint64_t masterId )
+{
+  m_masterCharacterId = masterId;
+}
+
 
 

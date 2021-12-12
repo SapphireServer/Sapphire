@@ -326,7 +326,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_SYNC );
 
   prepareStatement( LINKSHELL_UP,
-                    "UPDATE infolinkshell SET CharacterIdList = ?, LinkshellName = ?, LeaderIdList = ?, InviteIdList = ? WHERE LinkshellId = ?;",
+                    "UPDATE infolinkshell SET CharacterIdList = ?, LinkshellName = ?, LeaderIdList = ?, InviteIdList = ?, MasterCharacterId = ? WHERE LinkshellId = ?;",
                     CONNECTION_BOTH );
 
   /*prepareStatement( LAND_INS,
