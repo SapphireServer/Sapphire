@@ -254,6 +254,7 @@ namespace Component::Excel
     uint8_t Town;
     uint8_t PartyBuff;
     uint8_t UIPriority;
+    uint8_t Unknown6;
 
     int8_t MonsterNote;
     int8_t BattleClassIndex;
