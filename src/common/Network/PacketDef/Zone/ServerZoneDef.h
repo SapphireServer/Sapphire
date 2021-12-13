@@ -963,8 +963,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint64_t Crest;
     uint32_t EntityId;
     uint32_t RestPoint;
-    uint8_t Expansion;
     uint8_t Unknown8;
+    uint8_t ExpansionLevel;
     uint8_t Race;
     uint8_t Tribe;
     uint8_t Sex;

@@ -68,7 +68,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
       // possibly max level or current level
    //   m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
-   //   m_data.expansion = Common::CURRENT_EXPANSION_ID;
+      m_data.ExpansionLevel = Common::CURRENT_EXPANSION_ID;
 
       // df stuff
       // todo: actually do this properly
