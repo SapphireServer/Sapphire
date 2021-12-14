@@ -229,11 +229,10 @@ namespace Component::Excel
     int8_t padding0[4];
     uint64_t ModelJobStone;
     Component::Excel::StringOffset EnText;
-    uint32_t Unknown;
-    uint32_t Unknown1;
-    uint32_t Unknown2;
+    uint32_t JobCrystalItemId;
+    uint32_t ARRRelicQuestId;
+    uint32_t ARRFinalJobQuest;
     int32_t InitWeapon[2];
-
     uint16_t Hp;
     uint16_t Mp;
     uint16_t STR;
@@ -244,23 +243,19 @@ namespace Component::Excel
     uint16_t PIE;
     uint16_t Element[6];
     uint16_t LimitBreakAction[3];
-    uint16_t Unknown3;
-    uint16_t Unknown4;
-    uint16_t Unknown5;
+    uint16_t PvpLimitBreakAction[3];
     uint8_t Kind;
+    uint8_t UIPriority;
+    uint8_t Unknown6;
     uint8_t MainClass;
-
     uint8_t Role;
     uint8_t Town;
     uint8_t PartyBuff;
-    uint8_t UIPriority;
-
     int8_t MonsterNote;
-    int8_t BattleClassIndex;
+    int8_t StartingLevel;
     int8_t WorkIndex;
-    uint8_t padding1 : 7;
-    uint8_t IsJob : 1;
-
+    int8_t BattleClassIndex;
+    int8_t CraftingClassIndex;
   };
 
   /* 63507 */
