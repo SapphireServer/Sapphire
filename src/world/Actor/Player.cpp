@@ -398,7 +398,7 @@ void Sapphire::Entity::Player::calculateStats()
   setStatValue( BaseParam::AttackMagicPotency, inte );
   setStatValue( BaseParam::HealingMagicPotency, mnd );
 
-  max_mp = 10000;
+  max_mp = Math::CalcStats::calculateMaxMp( *this );
 
   max_hp = Math::CalcStats::calculateMaxHp( *this );
 
@@ -904,7 +904,6 @@ void Sapphire::Entity::Player::setInCombat( bool mode )
 void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 {
   m_class = classJob;
-  uint8_t level = getLevel();
 
   if( getHp() > getMaxHp() )
     m_hp = getMaxHp();

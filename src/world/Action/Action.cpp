@@ -375,14 +375,13 @@ void Action::Action::execute()
   assert( m_pSource );
 
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
-  /*
-  // TODO: need to be fixed
+
   if( !consumeResources() )
   {
     interrupt();
     return;
   }
-  */
+
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
@@ -685,7 +684,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     {
       auto curMp = m_pSource->getMp();
 
-      auto cost = m_primaryCost * 100;
+      auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
 
       if( curMp < static_cast< uint32_t >( cost ) )
         return false;
