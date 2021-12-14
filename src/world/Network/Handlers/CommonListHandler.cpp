@@ -84,7 +84,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
 
     for( size_t i = offset; i < offset + itemsPerPage; ++i )
     {
-      if( idVec.size() <= offset + i )
+      if( idVec.size() <= i )
       {
         break;
       }

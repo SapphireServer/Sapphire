@@ -99,7 +99,6 @@ CTestTestfile.cmake
 *.cache
 *.dat
 *.suo
-*.pch
 *.ipch
 *.g.cs
 *.g.i.cs
@@ -112,7 +111,6 @@ CTestTestfile.cmake
 *.ilk
 /Sapphire.VC.VC.opendb
 *.user
-*.dat
 *.metagen
 *.ipdb
 *.iobj
@@ -145,3 +143,4 @@ doxygen/*.tmp
 # ignore config directory contents except the default file
 config/*.ini
 !config/config.ini.default
+/CMakeSettings.json
