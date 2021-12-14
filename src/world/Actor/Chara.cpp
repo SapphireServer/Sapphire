@@ -132,7 +132,6 @@ Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
     case ClassJob::Paladin:
     case ClassJob::Warrior:
     case ClassJob::Darkknight:
-    case ClassJob::Gunbreaker:
       return Role::Tank;
 
     case ClassJob::Pugilist:
@@ -141,13 +140,11 @@ Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
     case ClassJob::Dragoon:
     case ClassJob::Rogue:
     case ClassJob::Ninja:
-    case ClassJob::Samurai:
       return Role::Melee;
 
     case ClassJob::Archer:
     case ClassJob::Bard:
     case ClassJob::Machinist:
-    case ClassJob::Dancer:
       return Role::RangedPhysical;
 
     case ClassJob::Conjurer:
@@ -160,8 +157,6 @@ Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
     case ClassJob::Blackmage:
     case ClassJob::Arcanist:
     case ClassJob::Summoner:
-    case ClassJob::Redmage:
-    case ClassJob::Bluemage:
       return Role::RangedMagical;
 
     case ClassJob::Carpenter:

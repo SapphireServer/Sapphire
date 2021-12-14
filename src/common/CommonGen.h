@@ -169,12 +169,7 @@ enum class ClassJob : uint8_t
   Ninja = 30,
   Machinist = 31,
   Darkknight = 32,
-  Astrologian = 33,
-  Samurai = 34,
-  Redmage = 35,
-  Bluemage = 36,
-  Gunbreaker = 37,
-  Dancer = 38,
+  Astrologian = 33
 };
 
 ///////////////////////////////////////////////////////////

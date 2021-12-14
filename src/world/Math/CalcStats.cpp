@@ -18,8 +18,8 @@ using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 using namespace Sapphire::World::Manager;
 
-const int levelTable[81][6] =
-{ 
+const int levelTable[61][6] =
+{
   // MAIN,SUB,DIV,HP,ELMT,THREAT
   { 1, 1, 1, 1, 1, 1 },
   { 20, 56, 56, 86, 52, 2 },
@@ -82,29 +82,6 @@ const int levelTable[81][6] =
   { 215, 351, 755, 2388, 279, 186 },
   { 217, 352, 806, 2492, 280, 200 },
   { 218, 354, 858, 2600, 282, 215 },
-  { 224, 355, 941, 2700, 283, 232 },
-  { 228, 356, 1032, 2800, 284, 250 },
-  { 236, 357, 1133, 2900, 286, 269 },
-  { 244, 358, 1243, 3000, 287, 290 },
-  { 252, 359, 1364, 3100, 288, 313 },
-  { 260, 360, 1497, 3200, 290, 337 },
-  { 268, 361, 1643, 3300, 292, 363 },
-  { 276, 362, 1802, 3400, 293, 392 },
-  { 284, 363, 1978, 3500, 294, 422 },
-  { 292, 364, 2170, 3600, 295, 455 },
-
-  // todo: add proper shbr values - hp/elmt/threat
-  // sub/div added from http://theoryjerks.akhmorning.com/resources/levelmods/
-  { 296, 365, 2263, 3600, 295, 466 },
-  { 300, 366, 2360, 3600, 295, 466 },
-  { 305, 367, 2461, 3600, 295, 466 },
-  { 310, 368, 2566, 3600, 295, 466 },
-  { 315, 370, 2676, 3600, 295, 466 },
-  { 320, 372, 2790, 3600, 295, 466 },
-  { 325, 374, 2910, 3600, 295, 466 },
-  { 330, 376, 3034, 3600, 295, 466 },
-  { 335, 378, 3164, 3600, 295, 466 },
-  { 340, 380, 3300, 3600, 569, 569 },
 };
 
 std::random_device CalcStats::dev;
@@ -166,16 +143,6 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
   uint16_t jobModHp = classInfo->data().Hp;
   float approxBaseHp = 0.0f; // Read above
 
-  // These values are not precise.
-  /*
-  if( level >= 60 )
-    approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
-  else if( level >= 50 )
-    approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
-  else
-    approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
-  */
-  // just use the table at least better than what it was
   approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
@@ -183,6 +150,101 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
 
   return result;
 }
+
+uint32_t CalcStats::calculateMaxMp( Player& player )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( player.getLevel() );
+
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
+
+  float baseStat = calculateBaseStat( player );
+  uint16_t piety = player.getStats()[ static_cast< uint32_t >( Common::BaseParam::Piety ) ];
+  uint16_t pietyScalar = paramGrowthInfo->data().ParamBase;
+  uint16_t jobModMp = classInfo->data().Mp;
+  uint16_t baseMp = paramGrowthInfo->data().Mp;
+
+  uint16_t result = static_cast< uint16_t >( std::floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) *
+                                             jobModMp / 100 );
+
+  return result;
+}
+
+uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
+{
+  auto level = chara.getLevel();
+
+  // each level range is 1-10, 11-20, 21-30, ... therefore:
+  // level 50 should be in the 4th group, not the 5t
+  // dividing by 10 on the border will break this unless we subtract 1
+  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
+
+  float cost = baseCost;
+
+  // thanks to andrew for helping me figure this shit out
+  // played with this some more and it seems to be accurate for everything i've tried
+  switch( levelGroup )
+  {
+    // level 1-10
+    case 0:
+    {
+      // r^2 = 0.9999
+      cost = 0.0952f * level + 0.9467f;
+      break;
+    }
+
+    // level 11-20
+    case 1:
+    {
+      // r^2 = 1
+      cost = 0.19f * level;
+      break;
+    }
+
+    // level 21-30
+    case 2:
+    {
+      // r^2 = 1
+      cost = 0.38f * level - 3.8f;
+      break;
+    }
+
+    // level 31-40
+    case 3:
+    {
+      // r^2 = 1
+      cost = 0.6652f * level - 12.358f;
+      break;
+    }
+
+    // level 41-50
+    case 4:
+    {
+      // r^2 = 1
+      cost = 1.2352f * level - 35.159f;
+      break;
+    }
+
+    // level 51-60
+    case 5:
+    {
+      // r^2 = 1
+      cost = 0.0654f * std::exp( 0.1201f * level );
+      break;
+    }
+
+    default:
+    {
+      return 0;
+    }
+  }
+
+  return static_cast< uint16_t >( std::round( cost * baseCost ) );
+}
+
 
 float CalcStats::blockProbability( const Chara& chara )
 {
