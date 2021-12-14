@@ -143,6 +143,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestScript::onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId )
+  {
+  }
+
   void QuestScript::onBNpcKill( uint32_t nameId, Entity::Player& player )
   {
   }
@@ -160,10 +164,6 @@ namespace Sapphire::ScriptAPI
   }
 
   void QuestScript::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
-  {
-  }
-
-  void QuestScript::onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId )
   {
   }
 

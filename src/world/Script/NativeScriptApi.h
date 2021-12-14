@@ -209,6 +209,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onTalk( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
 
+    virtual void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
+
     virtual void onBNpcKill( uint32_t nameId, Sapphire::Entity::Player& player );
 
     virtual void onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Sapphire::Entity::Player& player );
@@ -218,9 +220,6 @@ namespace Sapphire::ScriptAPI
     virtual void onWithinRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
     virtual void onOutsideRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
-
-    virtual void onEventItem( Sapphire::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime,
-                              uint64_t targetId );
 
     virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                             uint32_t catalogId );

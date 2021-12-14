@@ -26,7 +26,7 @@ using namespace Sapphire;
 
 
 const std::string javaPath("\"C:\\Program Files (x86)\\Java\\jre1.8.0_301\\bin\\java.exe\" -jar unluac_2015_06_13.jar ");
-const std::string gamePath( "F:\\client2.3\\game\\sqpack" );
+const std::string gamePath( "F:\\client3.0\\game\\sqpack" );
 
 const std::string onWithinRangeStr(
   "  void onWithinRange( World::Quest& quest, Entity::Player& player, uint64_t eRangeId, float x, float y, float z ) override\n"
@@ -123,6 +123,15 @@ createScript( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::
   std::vector< std::string > scenes;
   std::vector< std::string > sequences;
   std::vector< std::string > vars;
+  bool hasEventItem = false;
+
+  for( const auto& function : functions )
+  {
+    if( function.find( "GetEventItems" ) != std::string::npos )
+    {
+      hasEventItem = true;
+    }
+  }
   for( auto& entry : additionalList )
   {
     if( entry.find( "OnScene" ) != std::string::npos )
@@ -144,7 +153,7 @@ createScript( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::
   std::size_t splitPos( pQuestData->getString( pQuestData->data().Script ).find( '_' ) );
   std::string className( pQuestData->getString( pQuestData->data().Script ).substr( 0, splitPos ) );
 
-  if( className == "ClsLnc000" )
+  if( className == "SubFst033" )
   {
     className = className;
   }
@@ -370,6 +379,13 @@ createScript( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::
   if( hasEmote )
   {
     scriptEntry += onEmoteStr;
+  }
+
+  if( hasEventItem )
+  {
+    scriptEntry +=  "  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override\n"
+            "  {\n"
+            "  }\n\n" ;
   }
 
   if( !enemy_ids.empty() )

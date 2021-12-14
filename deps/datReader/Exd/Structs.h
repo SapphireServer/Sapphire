@@ -173,6 +173,7 @@ namespace Component::Excel
     InstanceContentTextStruct Text;
     InstanceContentRewardStruct Reward;
     uint8_t Unknown1;
+    uint32_t Unknown2[6];
     uint32_t StartCutscene;
     uint32_t EntranceRect;
     uint32_t TerritoryType;
@@ -182,12 +183,12 @@ namespace Component::Excel
     uint32_t ContentTextStart;
     uint32_t ContentTextEnd;
     int32_t InstanceBuff;
-    int32_t Unknown2;
+    int32_t Unknown3;
     uint16_t Time;
     uint16_t Music;
     uint16_t ClearMusic;
     uint16_t Sortkey;
-    uint8_t Unknown3;
+    uint8_t Unknown4;
     uint8_t Type;
     uint8_t RandomContentType;
     uint8_t RewardType;
@@ -211,7 +212,7 @@ namespace Component::Excel
     uint8_t DifferentiateDPS : 1;
     uint8_t Alliance : 1;
     uint8_t FreeRole : 1;
-    uint8_t Unknown4;
+    uint8_t Unknown5;
   };
 
   /* 63505 */
