@@ -100,8 +100,6 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( setLanguageHandler );
 
-    DECLARE_HANDLER( getBlacklistHandler );
-
     DECLARE_HANDLER( getCommonlistHandler );
 
     DECLARE_HANDLER( getCommonlistDetailHandler );
@@ -238,7 +236,9 @@ namespace Sapphire::Network
     DECLARE_HANDLER( friendlistRemoveHandler );
     DECLARE_HANDLER( setFriendlistGroupHandler );
 
-
+    DECLARE_HANDLER( getBlacklistHandler );
+    DECLARE_HANDLER( blacklistAddHandler );
+    DECLARE_HANDLER( blacklistRemoveHandler );
   };
 
 }

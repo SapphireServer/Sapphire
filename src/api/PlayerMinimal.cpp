@@ -273,10 +273,13 @@ void PlayerMinimal::saveAsNew()
   std::vector< uint8_t > friendIds( 1600, 0 );
   std::vector< uint8_t > inviteIds( 1600, 0 );
 
-  stmtFriendList->setUInt64( 1, m_characterId );
-  stmtFriendList->setBinary( 2, friendIds );
-  stmtFriendList->setBinary( 3, inviteIds );
-  g_charaDb.directExecute( stmtFriendList );
+  // Blacklist related
+  auto stmtBlacklist = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_BLACKLIST_INS );
+  std::vector< uint8_t > blIds( 1600, 0 );
+
+  stmtBlacklist->setUInt64( 1, m_characterId );
+  stmtBlacklist->setBinary( 2, blIds );
+  g_charaDb.directExecute( stmtBlacklist );
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SET UP INVENTORIES

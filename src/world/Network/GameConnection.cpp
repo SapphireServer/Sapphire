@@ -58,7 +58,6 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( SetProfile, "SetProfile", &GameConnection::setProfileHandler );
   setZoneHandler( GetProfile, "GetProfile", &GameConnection::getProfileHandler );
   setZoneHandler( GetSearchComment, "GetSearchComment", &GameConnection::getSearchCommentHandler );
-  setZoneHandler( GetBlacklist, "GetBlacklist", &GameConnection::getBlacklistHandler );
   setZoneHandler( PcSearch, "PcSearch", &GameConnection::pcSearchHandler );
 
   setZoneHandler( GetCommonlist, "GetCommonlist", &GameConnection::getCommonlistHandler );
@@ -163,7 +162,9 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( FriendlistRemove, "FriendlistRemove", &GameConnection::friendlistRemoveHandler );
   setZoneHandler( SetFriendlistGroup, "SetFriendlistGroup", &GameConnection::setFriendlistGroupHandler );
 
-
+  setZoneHandler( GetBlacklist, "GetBlacklist", &GameConnection::getBlacklistHandler );
+  setZoneHandler( BlacklistAdd, "BlacklistAdd", &GameConnection::blacklistAddHandler );
+  setZoneHandler( BlacklistRemove, "BlacklistRemove", &GameConnection::blacklistRemoveHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

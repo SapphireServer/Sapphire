@@ -14,7 +14,7 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteCreate( Entity::Player& so
   auto& targetFL = target.getFriendListID();
 
   // check if player already has been invited or friends
-  if( getEntryIndex( source, target.getCharacterId() ) != -1 )
+  if( isFriend( source, target ) )
   {
     // already invited/friends
     return false;
@@ -138,6 +138,11 @@ bool Sapphire::World::Manager::FriendListMgr::onAssignGroup( Entity::Player& sou
   source.updateDbFriendList();
 
   return true;
+}
+
+bool Sapphire::World::Manager::FriendListMgr::isFriend( Entity::Player& source, Entity::Player& target )
+{
+  return getEntryIndex( source, target.getCharacterId() ) != -1;
 }
 
 ptrdiff_t Sapphire::World::Manager::FriendListMgr::getEntryIndex( Entity::Player& source, uint64_t characterId )

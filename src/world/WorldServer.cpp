@@ -43,6 +43,7 @@
 #include "Manager/QuestMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/FriendListMgr.h"
+#include "Manager/BlacklistMgr.h"
 
 #include "ContentFinder/ContentFinder.h"
 
@@ -241,6 +242,7 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   auto pQuestMgr = std::make_shared< Manager::QuestMgr >();
   auto pPartyMgr = std::make_shared< Manager::PartyMgr >();
   auto pFriendMgr = std::make_shared< Manager::FriendListMgr >();
+  auto pBlacklistMgr = std::make_shared< Manager::BlacklistMgr >();
   auto contentFinder = std::make_shared< ContentFinder >();
 
   Common::Service< DebugCommandMgr >::set( pDebugCom );
@@ -253,6 +255,7 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::QuestMgr >::set( pQuestMgr );
   Common::Service< Manager::PartyMgr >::set( pPartyMgr );
   Common::Service< Manager::FriendListMgr >::set( pFriendMgr );
+  Common::Service< Manager::BlacklistMgr >::set( pBlacklistMgr );
   Common::Service< ContentFinder >::set( contentFinder );
 
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
@@ -558,7 +561,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( uint32_t e
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo WHERE EntityId = " + std::to_string( entityId ) );
-  if( !res->next() )
+  if( !res || !res->next() )
     return nullptr;
 
   uint64_t characterId = res->getUInt64( 1 );
@@ -575,7 +578,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( const std:
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo WHERE Name = " + playerName );
-  if( !res->next() )
+  if( !res || !res->next() )
     return nullptr;
 
   uint64_t characterId = res->getUInt64( 1 );
