@@ -559,7 +559,10 @@ namespace Sapphire::Entity
     bool loadHuntingLog();
 
     /*! load friendlist */
-    bool loadFriendlist();
+    bool loadFriendList();
+
+    /*! load blacklist */
+    bool loadBlacklist();
 
     /*! update latest sync with db */
     bool syncLastDBWrite();
@@ -704,6 +707,8 @@ namespace Sapphire::Entity
 
     void updateDbFriendList();
 
+    void updateDbBlacklist();
+
     void updateDbChara() const;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -801,6 +806,7 @@ namespace Sapphire::Entity
 
     using FriendListIDVec = std::array< uint64_t, 200 >;
     using FriendListDataVec = std::array< Common::HierarchyData, 200 >;
+    using BlacklistIDVec = std::array< uint64_t, 200 >;
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
@@ -813,6 +819,8 @@ namespace Sapphire::Entity
 
     FriendListIDVec& getFriendListID();
     FriendListDataVec& getFriendListData();
+
+    BlacklistIDVec& getBlacklistID();
 
     uint64_t m_lastMoveTime{};
     uint8_t m_lastMoveflag{};
@@ -971,6 +979,8 @@ namespace Sapphire::Entity
 
     FriendListIDVec m_friendList{};
     FriendListDataVec m_friendInviteList{};
+
+    BlacklistIDVec m_blacklist{};
 
     uint64_t m_partyId;
     std::vector< uint32_t > m_lastPcSearch;

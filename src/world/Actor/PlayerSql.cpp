@@ -140,7 +140,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
 
   res->free();
 
-  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() || !loadFriendlist() )
+  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() || !loadFriendList() || !loadBlacklist() )
   {
     Logger::error( "chara#{0} data corrupt!", m_characterId );
   }
@@ -295,6 +295,9 @@ void Sapphire::Entity::Player::updateSql()
 
   ////// FriendList
   updateDbFriendList();
+
+  ////// Blacklist
+  updateDbBlacklist();
 
   ///// Store last write
   syncLastDBWrite();
@@ -480,6 +483,20 @@ void Sapphire::Entity::Player::updateDbFriendList()
   db.execute( stmt );
 }
 
+
+void Sapphire::Entity::Player::updateDbBlacklist()
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
+  auto stmt = db.getPreparedStatement( Db::CHARA_BLACKLIST_UP );
+
+  std::vector< uint8_t > blIds( 1600 );
+
+  memcpy( blIds.data(), m_blacklist.data(), 1600 );
+  stmt->setBinary( 1, blIds );
+  stmt->setUInt64( 2, m_characterId );
+  db.execute( stmt );
+}
 
 void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex, uint8_t level ) const
 {
@@ -680,7 +697,7 @@ bool Sapphire::Entity::Player::loadInventory()
   return true;
 }
 
-bool Sapphire::Entity::Player::loadFriendlist()
+bool Sapphire::Entity::Player::loadFriendList()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_FRIENDLIST_SEL );
@@ -704,6 +721,28 @@ bool Sapphire::Entity::Player::loadFriendlist()
 
   return true;
 }
+
+bool Sapphire::Entity::Player::loadBlacklist()
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_BLACKLIST_SEL );
+  stmt->setUInt64( 1, m_characterId );
+  auto res = db.query( stmt );
+
+  if( !res->next() )
+  {
+    Logger::error( "Failed to load blacklist data for character#{}", m_characterId );
+    return false;
+  }
+
+  auto blacklist = res->getBlobVector( "CharacterIdList" );
+
+  if( !blacklist.empty() )
+    std::memcpy( m_blacklist.data(), blacklist.data(), blacklist.size() );
+
+  return true;
+}
+
 
 bool Sapphire::Entity::Player::syncLastDBWrite()
 {

@@ -236,6 +236,21 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                            "WHERE CharacterId = ?;",
                      CONNECTION_SYNC );
 
+  /// CHARA FRIENDLIST
+  prepareStatement( CHARA_BLACKLIST_INS,
+                    "INSERT INTO charainfoblacklist ( CharacterId, CharacterIdList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, NOW() );",
+                    CONNECTION_SYNC );
+
+  prepareStatement( CHARA_BLACKLIST_UP, "UPDATE charainfoblacklist "
+                                        " SET CharacterIdList = ?"
+                                        " WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
+
+  prepareStatement( CHARA_BLACKLIST_SEL, "SELECT CharacterIdList FROM charainfoblacklist "
+                                          " WHERE CharacterId = ?;",
+                     CONNECTION_SYNC );
+
   /// CHARA LINKSHELL
   prepareStatement( CHARA_LINKSHELL_INS,
                     "INSERT INTO infolinkshell ( LinkshellId, MasterCharacterId, CharacterIdList, "

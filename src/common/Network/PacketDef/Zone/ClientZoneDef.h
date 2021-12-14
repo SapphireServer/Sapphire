@@ -590,6 +590,17 @@ struct FFXIVIpcGetBlacklist : FFXIVIpcBasePacket< GetBlacklist >
   uint8_t RequestKey;
 };
 
+struct FFXIVIpcBlacklistAdd : FFXIVIpcBasePacket< BlacklistAdd >
+{
+  char TargetCharacterName[32];
+};
+
+struct FFXIVIpcBlacklistRemove : FFXIVIpcBasePacket< BlacklistRemove >
+{
+  uint64_t TargetCharacterID;
+  char TargetCharacterName[32];
+};
+
 /* 60986 */
 struct FFXIVIpcInvite : FFXIVIpcBasePacket< Invite >
 {

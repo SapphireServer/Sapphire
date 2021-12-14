@@ -75,16 +75,16 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
   // TODO: possibly move lambda func to util
   auto& server = Common::Service< World::WorldServer >::ref();
 
+  const size_t itemsPerPage = 10;
+
   // this func paginates any commonlist entry, associating them with online player data and hierarchy ID (optional)
   auto generateEntries = [&]( const auto& idVec, size_t offset, const std::vector< Common::HierarchyData >& hierarchyVec ) -> std::vector< PlayerEntry >
   {
     std::vector< PlayerEntry > entries;
 
-    const size_t itemsPerPage = 10;
-
-    for( size_t i = offset; i < offset + 10; ++i )
+    for( size_t i = offset; i < offset + itemsPerPage; ++i )
     {
-      if( idVec.size() <= offset + i )
+      if( idVec.size() <= i )
       {
         break;
       }
@@ -259,7 +259,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
   memcpy( &listPacket->data().entries[ 0 ], page.data(), sizeof( PlayerEntry ) * page.size() );
 
   listPacket->data().Index = offset;
-  listPacket->data().NextIndex = isLast ? 0 : data.NextIndex + 10;
+  listPacket->data().NextIndex = isLast ? 0 : data.NextIndex + itemsPerPage;
 
   queueOutPacket( listPacket );
 }

@@ -35,7 +35,7 @@ void Sapphire::Network::GameConnection::friendlistRemoveHandler( const Packets::
 
   flMgr.onRemoveFriend( player, *target );
 
-  auto replyPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcFriendlistRemoveResult >( player.getId() );
+  auto replyPacket = makeZonePacket< Server::FFXIVIpcFriendlistRemoveResult >( player.getId() );
   auto& replyData = replyPacket->data();
 
   replyData.RemovedCharacterID = target->getCharacterId();

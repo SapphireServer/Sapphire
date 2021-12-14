@@ -98,13 +98,13 @@ Sapphire::Entity::Player::Player() :
   memset( m_classArray.data(), 0, sizeof( m_classArray.data() ) );
   memset( m_expArray.data(), 0, sizeof( m_expArray.data() ) );
 
-  for( uint8_t i = 0; i < 80; i++ )
+  for( uint8_t i = 0; i < 80; ++i )
   {
     m_recast[ i ] = 0.0f;
     m_recastMax[ i ] = 0.0f;
   }
 
-  for( auto & i : m_charaLandData )
+  for( auto& i : m_charaLandData )
   {
     memset( &i, 0xFF, 8 );
     memset( &i.flags, 0, 8 );
@@ -2138,9 +2138,15 @@ Sapphire::Entity::Player::FriendListIDVec& Sapphire::Entity::Player::getFriendLi
 {
   return m_friendList;
 }
+
 Sapphire::Entity::Player::FriendListDataVec& Sapphire::Entity::Player::getFriendListData()
 {
   return m_friendInviteList;
+}
+
+Sapphire::Entity::Player::FriendListIDVec& Sapphire::Entity::Player::getBlacklistID()
+{
+  return m_blacklist;
 }
 
 void Sapphire::Entity::Player::setLastPcSearchResult( std::vector< uint32_t > result )

@@ -388,8 +388,6 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
 }
 
-
-
 void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
@@ -397,24 +395,6 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
   player.setIsLogin( true );
   teriMgr.joinWorld( player );
 }
-
-
-void Sapphire::Network::GameConnection::getBlacklistHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
-{
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGetBlacklist >( inPacket );
-  auto& data = packet.data();
-
-  auto blackListPacket = makeZonePacket< FFXIVIpcGetBlacklistResult >( player.getId() );
-  blackListPacket->data().Index = data.NextIndex;
-  blackListPacket->data().RequestKey = data.RequestKey;
-
-  // TODO: Fill with actual blacklist data
-  //blackListPacket.data().entry[0].contentId = 1;
-  //sprintf( blackListPacket.data().entry[0].name, "Test Test" );
-
-  queueOutPacket( blackListPacket );
-}
-
 
 void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                      Entity::Player& player )
@@ -431,7 +411,6 @@ void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PAC
 
   pSession->setLastPing( Common::Util::getTimeSeconds() );
 }
-
 
 void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
