@@ -16,12 +16,12 @@ namespace Sapphire::World::Manager
 
     bool onGetBlacklistPage( Entity::Player& source, uint8_t key, uint8_t nextIdx );
 
-    bool isBlacklisted( Entity::Player& source, Entity::Player& target ) const;
+    bool isBlacklisted( Entity::Player& source, const Entity::Player& target ) const;
 
    private:
     ptrdiff_t getEntryIndex( Entity::Player& source, uint64_t characterId ) const;
 
-    void sendAddResultPacket( Entity::Player& source, Entity::PlayerPtr pTarget, uint32_t result );
-    void sendRemoveResultPacket( Entity::Player& source, Entity::PlayerPtr pTarget, uint32_t result );
+    void sendAddResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result );
+    void sendRemoveResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result );
   };
 }

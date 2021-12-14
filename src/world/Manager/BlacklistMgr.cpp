@@ -79,8 +79,6 @@ bool Sapphire::World::Manager::BlacklistMgr::onRemoveCharacter( Entity::Player& 
 
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
 
-  uint32_t result = 0;
-
   auto pTarget = server.getPlayer( targetName );
   if( !pTarget )
   {
@@ -166,7 +164,7 @@ bool Sapphire::World::Manager::BlacklistMgr::onGetBlacklistPage( Entity::Player&
   return true;
 }
 
-bool Sapphire::World::Manager::BlacklistMgr::isBlacklisted( Entity::Player& source, Entity::Player& target ) const
+bool Sapphire::World::Manager::BlacklistMgr::isBlacklisted( Entity::Player& source, const Entity::Player& target ) const
 {
   return getEntryIndex( source, target.getCharacterId() ) != -1;
 }
@@ -183,7 +181,7 @@ ptrdiff_t Sapphire::World::Manager::BlacklistMgr::getEntryIndex( Entity::Player&
   return sourceBlIt - std::begin( sourceBL );
 }
 
-void Sapphire::World::Manager::BlacklistMgr::sendAddResultPacket( Entity::Player& source, Entity::PlayerPtr pTarget, uint32_t result )
+void Sapphire::World::Manager::BlacklistMgr::sendAddResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result )
 {
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
 
@@ -204,7 +202,7 @@ void Sapphire::World::Manager::BlacklistMgr::sendAddResultPacket( Entity::Player
   server.queueForPlayer( source.getCharacterId(), resultPacket );
 }
 
-void Sapphire::World::Manager::BlacklistMgr::sendRemoveResultPacket( Entity::Player& source, Entity::PlayerPtr pTarget, uint32_t result )
+void Sapphire::World::Manager::BlacklistMgr::sendRemoveResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result )
 {
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
 
