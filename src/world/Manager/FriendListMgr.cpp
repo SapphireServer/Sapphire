@@ -41,12 +41,13 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteCreate( Entity::Player& so
   Common::HierarchyData hierarchy;
   hierarchy.data.dateAdded = Common::Util::getTimeSeconds();
   hierarchy.data.group = 0;
-  hierarchy.data.status = Common::HierarchyStatus::SentRequest; // set type for invite sender
   hierarchy.data.type = Common::HierarchyType::FRIENDLIST;
 
+  // set hierarchy status for invite sender
+  hierarchy.data.status = Common::HierarchyStatus::SentRequest;
   sourceFLData[ sourceIdx ] = hierarchy;
 
-  // set type for invite receiver
+  // set hierarchy status for invite receiver
   hierarchy.data.status = Common::HierarchyStatus::ReceivedRequest;
   targetFLData[ targetIdx ] = hierarchy;
 
@@ -72,6 +73,7 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteAccept( Entity::Player& so
   auto& sourceFLData = source.getFriendListData();
   auto& targetFLData = target.getFriendListData();
 
+  // currently, type on hierarchy indicates invite type - since it is no longer an invite, set type to NONE
   sourceFLData[ sourceIdx ].data.status = Common::HierarchyStatus::Added;
   sourceFLData[ sourceIdx ].data.type   = Common::HierarchyType::NONE_2;
   targetFLData[ targetIdx ].data.status = Common::HierarchyStatus::Added;
@@ -140,12 +142,12 @@ bool Sapphire::World::Manager::FriendListMgr::onAssignGroup( Entity::Player& sou
   return true;
 }
 
-bool Sapphire::World::Manager::FriendListMgr::isFriend( Entity::Player& source, Entity::Player& target )
+bool Sapphire::World::Manager::FriendListMgr::isFriend( Entity::Player& source, Entity::Player& target ) const
 {
   return getEntryIndex( source, target.getCharacterId() ) != -1;
 }
 
-ptrdiff_t Sapphire::World::Manager::FriendListMgr::getEntryIndex( Entity::Player& source, uint64_t characterId )
+ptrdiff_t Sapphire::World::Manager::FriendListMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
 {
   auto& sourceFL = source.getFriendListID();
   auto sourceInvIt = std::find( std::begin( sourceFL ), std::end( sourceFL ), characterId );

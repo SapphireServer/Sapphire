@@ -19,9 +19,9 @@ namespace Sapphire::World::Manager
     bool onRemoveFriend( Entity::Player& source, Entity::Player& target );
     bool onAssignGroup( Entity::Player& source, Entity::Player& target, uint8_t group );
 
-    bool isFriend( Entity::Player& source, Entity::Player& target );
+    bool isFriend( Entity::Player& source, Entity::Player& target ) const;
 
   private:
-    ptrdiff_t getEntryIndex( Entity::Player& source, uint64_t characterId );
+    ptrdiff_t getEntryIndex( Entity::Player& source, uint64_t characterId ) const;
   };
 }

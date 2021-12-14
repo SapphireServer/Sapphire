@@ -18,19 +18,33 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets;
 
-bool Sapphire::World::Manager::BlacklistMgr::onAddCharacter( Entity::Player& source, Entity::Player& target )
+bool Sapphire::World::Manager::BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& targetName )
 {
   // add target to blacklist
+
+  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+
+  auto pTarget = server.getPlayer( targetName );
+  if( !pTarget )
+  {
+    // target doesn't exist in server player table
+    sendAddResultPacket( source, pTarget, 0x7 );
+    return false;
+  }
+
+  auto& target = *pTarget;
 
   if( source.getCharacterId() == target.getCharacterId() )
   {
     // can't add self to blacklist
+    sendAddResultPacket( source, pTarget, 0x7 );
     return false;
   }
   
   if( isBlacklisted( source, target ) )
   {
     // target already added to blacklist
+    sendAddResultPacket( source, pTarget, 0x7 );
     return false;
   }
 
@@ -49,6 +63,8 @@ bool Sapphire::World::Manager::BlacklistMgr::onAddCharacter( Entity::Player& sou
 
   source.updateDbBlacklist();
 
+  sendAddResultPacket( source, pTarget, 0 );
+
   // check if player is friends with target
   auto& flMgr = Common::Service< Sapphire::World::Manager::FriendListMgr >::ref();
   if( flMgr.isFriend( source, target ) )
@@ -57,15 +73,30 @@ bool Sapphire::World::Manager::BlacklistMgr::onAddCharacter( Entity::Player& sou
   return true;
 }
 
-bool Sapphire::World::Manager::BlacklistMgr::onRemoveCharacter( Entity::Player& source, Entity::Player& target )
+bool Sapphire::World::Manager::BlacklistMgr::onRemoveCharacter( Entity::Player& source, const std::string& targetName )
 {
   // remove target from blacklist
+
+  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+
+  uint32_t result = 0;
+
+  auto pTarget = server.getPlayer( targetName );
+  if( !pTarget )
+  {
+    // target doesn't exist in server player table
+    sendRemoveResultPacket( source, pTarget, 0x7 );
+    return false;
+  }
+
+  auto& target = *pTarget;
 
   auto sourceIdx = getEntryIndex( source, target.getCharacterId() );
   
   if( !isBlacklisted( source, target ) )
   {
     // target not in blacklist
+    sendRemoveResultPacket( source, pTarget, 0x7 );
     return false;
   }
 
@@ -74,13 +105,15 @@ bool Sapphire::World::Manager::BlacklistMgr::onRemoveCharacter( Entity::Player& 
   sourceBL[sourceIdx] = 0;
   source.updateDbBlacklist();
 
+  sendRemoveResultPacket( source, pTarget, 0 );
+
   return true;
 }
 
 bool Sapphire::World::Manager::BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint8_t nextIdx )
 {
   // this function will handle client side indexing and paginate blacklist entries
-  // it'll also be called multiple times sequentially until there are no more valid entries left
+  // it'll also be called multiple times sequentially until there are no more entries left (id == 0)
 
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
 
@@ -133,12 +166,12 @@ bool Sapphire::World::Manager::BlacklistMgr::onGetBlacklistPage( Entity::Player&
   return true;
 }
 
-bool Sapphire::World::Manager::BlacklistMgr::isBlacklisted( Entity::Player& source, Entity::Player& target )
+bool Sapphire::World::Manager::BlacklistMgr::isBlacklisted( Entity::Player& source, Entity::Player& target ) const
 {
   return getEntryIndex( source, target.getCharacterId() ) != -1;
 }
 
-ptrdiff_t Sapphire::World::Manager::BlacklistMgr::getEntryIndex( Entity::Player& source, uint64_t characterId )
+ptrdiff_t Sapphire::World::Manager::BlacklistMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
 {
   auto& sourceBL = source.getBlacklistID();
   auto sourceBlIt = std::find( std::begin( sourceBL ), std::end( sourceBL ), characterId );
@@ -148,4 +181,46 @@ ptrdiff_t Sapphire::World::Manager::BlacklistMgr::getEntryIndex( Entity::Player&
     return -1;
 
   return sourceBlIt - std::begin( sourceBL );
+}
+
+void Sapphire::World::Manager::BlacklistMgr::sendAddResultPacket( Entity::Player& source, Entity::PlayerPtr pTarget, uint32_t result )
+{
+  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+
+  auto resultPacket = makeZonePacket< Server::FFXIVIpcBlacklistAddResult >( source.getId() );
+
+  if( pTarget )
+  {
+    Server::BlacklistCharacter blChar;
+    blChar.CharacterID = pTarget->getCharacterId();
+    strcpy( blChar.CharacterName, pTarget->getName().c_str() );
+
+    resultPacket->data().AddedCharacter = blChar;
+    resultPacket->data().Identity = pTarget->getGender();
+  }
+  
+  resultPacket->data().Result = result;
+
+  server.queueForPlayer( source.getCharacterId(), resultPacket );
+}
+
+void Sapphire::World::Manager::BlacklistMgr::sendRemoveResultPacket( Entity::Player& source, Entity::PlayerPtr pTarget, uint32_t result )
+{
+  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+
+  auto resultPacket = makeZonePacket< Server::FFXIVIpcBlacklistRemoveResult >( source.getId() );
+
+  if( pTarget )
+  {
+    Server::BlacklistCharacter blChar;
+    blChar.CharacterID = pTarget->getCharacterId();
+    strcpy( blChar.CharacterName, pTarget->getName().c_str() );
+
+    resultPacket->data().RemovedCharacter = blChar;
+    resultPacket->data().Identity = pTarget->getGender();
+  }
+  
+  resultPacket->data().Result = result;
+
+  server.queueForPlayer( source.getCharacterId(), resultPacket );
 }
