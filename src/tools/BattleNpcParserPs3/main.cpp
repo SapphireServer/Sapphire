@@ -317,6 +317,7 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
                         std::to_string( pBNpc->data.LinkParent ) + ", " +
                         std::to_string( pBNpc->data.LinkOverride ) + ", " +
                         std::to_string( pBNpc->data.LinkReply ) + ", " +
+                        std::to_string( pBNpc->data.Nonpop ) + ", " +
                         std::to_string( pBNpc->data.HorizontalPopRange ) + ", " +
                         std::to_string( pBNpc->data.VerticalPopRange ) + ", " +
                         std::to_string( pBNpc->data.BNpcBaseData ) + ", " +
@@ -328,12 +329,7 @@ void writeBNPCEntry( std::string& name, std::ofstream& out, LgbEntry* pObj, cons
                         std::to_string( pBNpc->data.NormalAI ) + ", " +
                         std::to_string( pBNpc->data.ServerPathId ) + ", " +
                         std::to_string( pBNpc->data.EquipmentID ) + ", " +
-                        std::to_string( pBNpc->data.CustomizeID ) + ", " +
-                        std::to_string( pBNpc->baseData.TerritoryRange ) + ", " +
-                        std::to_string( pBNpc->baseData.Sense[0] ) + ", " +
-                        std::to_string( pBNpc->baseData.Sense[1] ) + ", " +
-                        std::to_string( pBNpc->baseData.SenseRange[0] ) + ", " +
-                        std::to_string( pBNpc->baseData.SenseRange[1] ) + " " +
+                        std::to_string( pBNpc->data.CustomizeID ) + " " +
                       "\n" );
 
   out.write( outStr.c_str(), outStr.size() );
@@ -380,9 +376,9 @@ int main( int argc, char* argv[] )
 
   std::string data = std::string("GroupId, GroupName, TerritoryName, name, instanceId, x, y, z, Rotation, BaseId, PopWeather, PopTimeStart, PopTimeEnd, MoveAI, WanderingRange, Route, ") +
                      std::string("EventGroup, NameId, DropItem, SenseRangeRate, Level, ActiveType, PopInterval,PopRate, PopEvent, LinkGroup, ") +
-                     std::string("LinkFamily, LinkRange, LinkCountLimit, NonpopInitZone, InvalidRepop, LinkParent, LinkOverride, LinkReply, ") +
+                     std::string("LinkFamily, LinkRange, LinkCountLimit, NonpopInitZone, InvalidRepop, LinkParent, LinkOverride, LinkReply, Nonpop, ") +
                      std::string("HorizontalPopRange, VerticalPopRange, BNpcBaseData, RepopId, BNPCRankId, TerritoryRange, BoundInstanceID, ") +
-                     std::string("FateLayoutLabelId, NormalAI, ServerPathId, EquipmentID, CustomizeID, BaseTeriRange, BaseSenseType1, BaseSenseType2, BaseSenseRange1, BaseSenseRange2 \n");
+                     std::string("FateLayoutLabelId, NormalAI, ServerPathId, EquipmentID, CustomizeID \n");
 
   discoverySql.write( data.c_str(), data.size() );
 

@@ -889,6 +889,7 @@ namespace Sapphire::Common
 
   enum ItemActionType : uint16_t
   {
+    KeyItemAction = 1,
     ItemActionVFX = 852,
     ItemActionVFX2 = 944,
   };

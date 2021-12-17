@@ -959,16 +959,21 @@ bool Sapphire::Territory::loadBNpcs()
     bnpc->EquipmentID = res->getInt( 43 );
     bnpc->CustomizeID = res->getInt( 44 );
     bnpc->rotation = res->getFloat( 45 );
+    bnpc->Nonpop = res->getInt( 46 );
 
     m_bNpcBaseMap[ bnpc->instanceId ] = bnpc;
 
-    SpawnInfo info;
-    info.bnpcPtr = nullptr;
-    info.infoPtr = bnpc;
-    info.lastSpawn = 0;
-    info.timeOfDeath = 0;
+    if( bnpc->Nonpop != 1 )
+    {
+      SpawnInfo info;
+      info.bnpcPtr = nullptr;
+      info.infoPtr = bnpc;
+      info.lastSpawn = 0;
+      info.timeOfDeath = 0;
 
-    m_spawnInfo.emplace_back( info );
+      m_spawnInfo.emplace_back( info );
+    }
+
 
 
   }
