@@ -320,21 +320,33 @@ bool Sapphire::Scripting::ScriptMgr::onEventHandlerTradeReturn( Entity::Player& 
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime, uint64_t targetId )
+bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint64_t targetId )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
-
   std::string eventName = "onEventItem";
   std::string objName = eventMgr.getEventName( eventId );
   PlayerMgr::sendDebug( player, "Calling: {0}.{1} - {2}", objName, eventName, eventId );
 
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
-  if( script )
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    eventMgr.eventStart( player, targetId, eventId, Event::EventHandler::Item, 0, 0 );
-
-    script->onEventItem( player, eventItemId, eventId, castTime, targetId );
-    return true;
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    if( script )
+    {
+      auto questId = static_cast< uint16_t >( eventId );
+      if( player.hasQuest( eventId ) )
+      {
+        World::Quest preQ;
+        auto questIdx = player.getQuestIndex( questId );
+        auto& quest = player.getQuestByIndex( questIdx );
+        preQ = quest;
+        script->onEventItem( quest, player, targetId );
+        if( quest != preQ )
+          player.updateQuest( quest );
+        return true;
+      }
+    }
   }
 
   return false;

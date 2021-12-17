@@ -119,10 +119,9 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void EventScript::onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime,
-                                 uint64_t targetId )
-  {
-  }
+  //void EventScript::onEventItem( Entity::Player& player, Entity::Player& player, uint64_t actorId )
+  //{
+  //}
 
   void EventScript::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                               uint32_t catalogId )
