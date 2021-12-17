@@ -25,6 +25,7 @@ MountAction::MountAction( Sapphire::Entity::CharaPtr source, uint16_t mountId, u
   Action::Action( source, 4, sequence, actionData ),
   m_mountId( mountId )
 {
+  m_actionKind = Common::SkillType::MountSkill;
 }
 
 bool MountAction::preCheck()
@@ -45,7 +46,7 @@ void MountAction::start()
   auto& data = castPacket->data();
 
   data.Action = static_cast< uint16_t >( m_id );
-  data.ActionKind = Common::SkillType::MountSkill;
+  data.ActionKind = m_actionKind;
   data.CastTime = m_castTimeMs / 1000.f;
   data.Target = static_cast< uint32_t >( m_targetId );
   data.BallistaEntityId = 0xE0000000;

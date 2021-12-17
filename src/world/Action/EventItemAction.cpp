@@ -1,4 +1,4 @@
-#include "ItemAction.h"
+#include "EventItemAction.h"
 
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
@@ -7,69 +7,59 @@
 #include <Network/PacketWrappers/EffectPacket.h>
 
 #include "Manager/PlayerMgr.h"
+#include <Service.h>
+#include <Network/CommonActorControl.h>
+#include <WorldServer.h>
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
+#include <Util/UtilMath.h>
+#include <Common.h>
+
 
 using namespace Sapphire;
+using namespace Sapphire::Common;
 using namespace Sapphire::World::Action;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
+using namespace Sapphire::Network::ActorControl;
 
-ItemAction::ItemAction( Sapphire::Entity::CharaPtr source, uint32_t itemId,
-                        std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData, uint16_t itemSourceSlot,
-                        uint16_t itemSourceContainer ) :
-  m_itemAction( std::move( itemActionData ) ),
-  m_itemSourceSlot( itemSourceSlot ),
-  m_itemSourceContainer( itemSourceContainer )
+EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t eventItemId,
+                                  std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > eventItemActionData,
+                                  uint32_t sequence, uint64_t targetId  ) :
+  m_eventItemAction( std::move( eventItemActionData ) )
 {
-  m_id = itemId;
+  m_id = eventItemId;
+  m_eventItem = eventItemId;
   m_pSource = std::move( source );
+  m_sequence = sequence;
+  m_targetId = targetId;
+  m_interruptType = Common::ActionInterruptType::None;
+  m_actionKind = Common::SkillType::EventItem;
 }
 
-void ItemAction::start()
+bool EventItemAction::init()
 {
-  if( !m_pSource->isPlayer() )
-    return;
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto actionInfoPtr = exdData.getRow< Component::Excel::Action >( m_eventItemAction->data().Action );
 
-  // todo: check inv slot for item
-
-  // todo: can we just do this?
-  execute();
+  m_castTimeMs = static_cast< uint32_t >( m_eventItemAction->data().CastTime * 1000 );
+  m_recastTimeMs = static_cast< uint32_t >( actionInfoPtr->data().RecastTime * 100 );
+  m_cooldownGroup = actionInfoPtr->data().RecastGroup;
+  m_id = m_eventItemAction->data().Action;
+  return true;
 }
 
-void ItemAction::execute()
+void EventItemAction::execute()
 {
-  switch( m_itemAction->data().Action )
-  {
-    default:
-    {
-      Manager::PlayerMgr::sendDebug( *getSourceChara()->getAsPlayer(), "ItemAction type {0} not supported.", m_itemAction->data().Action );
-      break;
-    }
-
-    case Common::ItemActionType::ItemActionVFX:
-    case Common::ItemActionType::ItemActionVFX2:
-    {
-      handleVFXItem();
-
-      break;
-    }
-  }
+  Manager::PlayerMgr::sendDebug( *getSourceChara()->getAsPlayer(), "EventItemAction type {0} execute called.", m_eventItemAction->data().Action );
 }
 
-void ItemAction::interrupt()
+void EventItemAction::onStart()
 {
-
 }
 
-void ItemAction::handleVFXItem()
+void EventItemAction::onInterrupt()
 {
-  Common::CalcResultParam effect{};
-  effect.Type = Common::ActionEffectType::CALC_RESULT_TYPE_CHECK_BARRIER;
-  effect.Value = m_itemAction->data().Calcu0Arg[ 0 ];
-
-  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getSourceChara()->getId(), getId() );
-  effectPacket->setTargetActor( getSourceChara()->getId() );
-  effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
-  effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
-  effectPacket->addEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
-
-  m_pSource->sendToInRangeSet( effectPacket, true );
 }

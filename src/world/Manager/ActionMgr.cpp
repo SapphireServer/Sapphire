@@ -3,6 +3,7 @@
 
 #include "Action/Action.h"
 #include "Action/ItemAction.h"
+#include "Action/EventItemAction.h"
 #include "Action/MountAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
@@ -70,6 +71,21 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
                                          itemSourceSlot, itemSourceContainer );
 
   // todo: item actions don't have cast times? if so we can just start it and we're good
+  action->start();
+}
+
+void World::Manager::ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                                       std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > itemActionData,
+                                                       uint32_t sequence, uint64_t targetId )
+{
+  auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetId );
+  action->init();
+
+  if( itemActionData->data().CastTime )
+  {
+    player.setCurrentAction( action );
+  }
+
   action->start();
 }
 

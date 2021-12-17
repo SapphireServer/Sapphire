@@ -11,26 +11,26 @@ namespace Sapphire::Data
 
 namespace Sapphire::World::Action
 {
-  class ItemAction : public Action
+  class EventItemAction : public Action
   {
   public:
-    ItemAction( Entity::CharaPtr source, uint32_t itemId, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData,
-                uint16_t itemSourceSlot, uint16_t itemSourceContainer );
-    virtual ~ItemAction() = default;
+    EventItemAction( Entity::CharaPtr source, uint32_t eventItemId, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > itemActionData,
+                     uint32_t sequence, uint64_t targetId );
 
-    void start() override;
+    virtual ~EventItemAction() = default;
+
+    bool init();
 
     void execute() override;
 
-    void interrupt() override;
+    void onInterrupt() override;
+
+    void onStart() override;
+
 
   private:
-    void handleVFXItem();
-
-  private:
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > m_itemAction;
-
-    uint16_t m_itemSourceSlot;
-    uint16_t m_itemSourceContainer;
+    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > m_eventItemAction;
+    uint32_t m_eventItem;
+    uint32_t m_sequence;
   };
 }

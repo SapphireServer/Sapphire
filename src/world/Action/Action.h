@@ -46,6 +46,9 @@ namespace Sapphire::World::Action
 
     bool isComboAction() const;
 
+    uint8_t getActionKind() const;
+    void setActionKind( uint8_t actionKind );
+
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
      * @return true if they have the required resources
@@ -135,6 +138,9 @@ namespace Sapphire::World::Action
      */
     virtual bool update();
 
+    virtual void onInterrupt();
+    virtual void onStart();
+
   protected:
 
     bool primaryCostCheck( bool subtractCosts );
@@ -147,6 +153,7 @@ namespace Sapphire::World::Action
     bool hasValidLutEntry() const;
 
     uint32_t m_id;
+    uint8_t m_actionKind;
 
     uint16_t m_sequence;
 

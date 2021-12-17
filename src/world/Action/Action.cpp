@@ -55,7 +55,8 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
   m_targetId( 0 ),
   m_startTime( 0 ),
   m_interruptType( Common::ActionInterruptType::None ),
-  m_sequence( sequence )
+  m_sequence( sequence ),
+  m_actionKind( Common::SkillType::Normal )
 {
 }
 
@@ -288,7 +289,7 @@ void Action::Action::start()
 
     data.Action = static_cast< uint16_t >( m_id );
     data.ActionKey = m_id;
-    data.ActionKind = Common::SkillType::Normal;
+    data.ActionKind = m_actionKind;
     data.CastTime = m_castTimeMs / 1000.f;
     data.Target = static_cast< uint32_t >( m_targetId );
 
@@ -313,7 +314,17 @@ void Action::Action::start()
 
   server.queueForPlayer( player->getCharacterId(), actionStartPkt );
 
+  onStart();
+
+  // instantly finish cast if there's no cast time
+  if( !hasCastTime() )
+    execute();
+}
+
+void Action::Action::onStart()
+{
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto player = m_pSource->getAsPlayer();
 
   // check the lut too and see if we have something usable, otherwise cancel the cast
   if( !scriptMgr.onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
@@ -330,9 +341,6 @@ void Action::Action::start()
     return;
   }
 
-  // instantly finish cast if there's no cast time
-  if( !hasCastTime() )
-    execute();
 }
 
 void Action::Action::interrupt()
@@ -366,6 +374,12 @@ void Action::Action::interrupt()
     m_pSource->sendToInRangeSet( control, true );
   }
 
+  onInterrupt();
+
+}
+
+void Action::Action::onInterrupt()
+{
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInterrupt( *this );
 }
@@ -843,4 +857,14 @@ bool Action::Action::hasValidLutEntry() const
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
 {
   return m_effectBuilder;
+}
+
+uint8_t Action::Action::getActionKind() const
+{
+  return m_actionKind;
+}
+
+void Action::Action::setActionKind( uint8_t actionKind )
+{
+  m_actionKind = actionKind;
 }

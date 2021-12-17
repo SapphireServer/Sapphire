@@ -29,6 +29,9 @@ namespace Sapphire::World::Manager
                            std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
 
+    void handleEventItemAction( Entity::Player& player, uint32_t itemId,
+                                std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > itemActionData, uint32_t sequence, uint64_t targetId );
+
     void handleMountAction( Entity::Player& player, uint16_t mountId,
                             std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
 
