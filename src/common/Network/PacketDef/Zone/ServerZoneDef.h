@@ -974,8 +974,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t BirthMonth;
     uint8_t Birthday;
     uint8_t StartTown;
-    uint8_t HomePoint;
     uint8_t GrandCompany;
+    uint8_t HomePoint;
     uint8_t Anima;
     uint8_t Pet;
     uint8_t BuddyRank;
