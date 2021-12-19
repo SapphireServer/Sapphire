@@ -1833,24 +1833,26 @@ namespace Component::Excel
     uint32_t Item[7];
     uint32_t OptionalItem[5];
     uint32_t InstanceContent;
-    uint32_t AllaganTomestoneType;
     uint16_t ExpBonus;
     uint16_t CompanyPointNum;
+    uint16_t System[3];
     uint16_t Action;
-    uint16_t System[4];
-    uint8_t CompanyPointType;
+    uint8_t Action1;
     uint8_t CrystalType[3];
     uint8_t CrystalNum[3];
     uint8_t ItemArrayType;
-    uint8_t ItemNum[6];
-    uint8_t ItemStainId[6];
+    uint8_t ItemNum[7];
+    uint8_t ItemStainId[7];
     uint8_t OptionalItemNum[5];
     uint8_t OptionalItemStainId[5];
+    uint8_t CompanyPointType;
     uint8_t Emote;
+    uint8_t unknown;
     uint8_t GeneralAction[2];
+    uint8_t AllaganTomestoneType;
     uint8_t AllaganTomestoneNum;
     uint8_t BeastReputationValueNum;
-    int8_t padding1[3];
+    uint8_t unknown1[4];
   };
 
   /* 264323 */
