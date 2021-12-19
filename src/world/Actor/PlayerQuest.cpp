@@ -17,7 +17,7 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void Sapphire::Entity::Player::finishQuest( uint16_t questId )
+void Sapphire::Entity::Player::finishQuest( uint16_t questId, uint8_t optionalChoice )
 {
   removeQuest( questId );
 
@@ -183,7 +183,7 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
   uint32_t exp =
     ( questInfo->data().Reward.ExpBonus * paramGrowth->data().EventExpRate * ( 45 + 5 * questInfo->data().ClassLevel ) ) / 100;
 
-  exp = questInfo->data().Reward.ExpBonus;
+  //exp = questInfo->data().Reward.ExpBonus;
 
   //auto rewardItemCount = questInfo->data().Reward.itemReward0.size();
   //uint16_t optionalItemCount = static_cast< uint16_t >( questInfo->itemReward1.size() );

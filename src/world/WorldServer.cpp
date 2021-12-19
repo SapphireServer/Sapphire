@@ -258,8 +258,6 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::BlacklistMgr >::set( pBlacklistMgr );
   Common::Service< ContentFinder >::set( contentFinder );
 
-  auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
-
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
   mainLoop();

@@ -350,10 +350,10 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
                         pPopRange->header.transform.rotation.z,
                         rotation );
 
-      auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
-      preparePacket->data().targetZone = pExitRange->data.destTerritoryType;
+     // auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
+     // preparePacket->data().targetZone = pExitRange->data.destTerritoryType;
 
-      server.queueForPlayer( player.getCharacterId(), preparePacket );
+      //server.queueForPlayer( player.getCharacterId(), preparePacket );
 
     }
   }
@@ -415,8 +415,11 @@ void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PAC
 void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                             Entity::Player& player )
 {
-  auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
-  questMgr.sendQuestsInfo( player );
+  if( player.isLogin() )
+  {
+    auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+    questMgr.sendQuestsInfo( player );
+  }
 
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 

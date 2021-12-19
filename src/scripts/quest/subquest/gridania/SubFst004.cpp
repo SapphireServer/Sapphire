@@ -57,17 +57,17 @@ class SubFst004 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        Scene00000(quest, player);
+        Scene00000( quest, player );
         break;
       }
       case Actor1:
       {
-        Scene00001(quest, player);
+        Scene00001( quest, player );
         break;
       }
       case Actor2:
       {
-        Scene00002(quest, player);
+        Scene00002( quest, player );
         break;
       }
     }
@@ -88,7 +88,7 @@ class SubFst004 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setSeq(Seq1);
+      quest.setSeq( Seq1 );
     }
   }
 
@@ -101,9 +101,9 @@ class SubFst004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.sendEventNotice(getId(), 0, 2, 21002, 0);
-    quest.setUI8BH(1);
-    quest.setSeq(SeqFinish);
+    player.sendEventNotice( getId(), 0, 2, 21002, 0);
+    quest.setUI8BH( 1 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -115,10 +115,10 @@ class SubFst004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if (result.getResult(0) == 1)
-      Scene00100(quest, player);
+    if( result.getResult( 0) == 1)
+      Scene00100( quest, player );
     else
-      Scene00099(quest, player);
+      Scene00099( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -130,7 +130,7 @@ class SubFst004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().playScene(player, getId(), 99, 0, 0);
+    eventMgr().playScene( player, getId(), 99, 0, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
