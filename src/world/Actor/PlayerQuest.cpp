@@ -179,9 +179,8 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
 
   auto paramGrowth = exdData.getRow< Component::Excel::ParamGrow >( questInfo->data().ClassLevel );
 
-  // TODO: use the correct formula, this one is wrong
   uint32_t exp =
-    ( questInfo->data().Reward.ExpBonus * paramGrowth->data().EventExpRate * ( 45 + 5 * questInfo->data().ClassLevel ) ) / 100;
+    ( questInfo->data().Reward.ExpBonus * paramGrowth->data().BaseExp * paramGrowth->data().EventExpRate ) / 100;
 
   //exp = questInfo->data().Reward.ExpBonus;
 

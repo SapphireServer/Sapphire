@@ -831,7 +831,7 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
   else
   {
     setExp( currentExp + amount );
-    Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, currentExp + amount );
+    Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, amount );
   }
 }
 
