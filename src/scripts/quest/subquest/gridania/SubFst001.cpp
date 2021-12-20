@@ -59,6 +59,7 @@ public:
           Scene00000( quest, player );
         else
           Scene00001( quest, player );
+        break;
       }
       case Actor1:
       {
@@ -66,6 +67,7 @@ public:
           Scene00099( quest, player );
         else
           Scene00100( quest, player );
+        break;
       }
     }
   }
