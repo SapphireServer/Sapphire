@@ -146,7 +146,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void QuestScript::onBNpcKill( uint32_t nameId, Entity::Player& player )
+  void QuestScript::onBNpcKill( World::Quest& quest, uint32_t nameId, Entity::Player& player )
   {
   }
 

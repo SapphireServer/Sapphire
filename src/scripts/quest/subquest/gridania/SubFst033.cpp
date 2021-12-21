@@ -98,7 +98,7 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   }
 
-  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, uint32_t npcId, Entity::Player& player ) override
   {
     switch( npcId )
     {

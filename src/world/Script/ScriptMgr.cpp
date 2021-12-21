@@ -365,14 +365,18 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
 
     uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
 
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
       std::string objName = eventMgr.getEventName( questId );
 
       PlayerMgr::sendDebug( player, "Calling: {0}.onBnpcKill nameId#{1}", objName, nameId );
 
-      script->onBNpcKill( nameId, player );
+
+      World::Quest preQ = quest;
+      script->onBNpcKill( quest, nameId, player );
+      if( quest != preQ )
+        player.updateQuest( quest );
     }
   }
 
