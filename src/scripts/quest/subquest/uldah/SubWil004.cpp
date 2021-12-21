@@ -17,40 +17,42 @@ using namespace Sapphire;
 
 class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 {
-  private:
-    // Basic quest information 
-    // Quest vars / flags used
-    // BitFlag8
-    // UI8AH
-    // UI8AL
-    // UI8BH
+private:
+  // Basic quest information
+  // Quest vars / flags used
+  // BitFlag8
+  // UI8AH
+  // UI8AL
+  // UI8BH
 
-    /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1001292
-    /// Countable Num: 2 Seq: 2 Event: 1 Listener: 2000691
-    /// Countable Num: 1 Seq: 255 Event: 8 Listener: 2000691
-    // Steps in this quest ( 0 is before accepting, 
-    // 1 is first, 255 means ready for turning it in
-    enum Sequence : uint8_t
-    {
-      Seq0 = 0,
-      Seq1 = 1,
-      Seq2 = 2,
-      SeqFinish = 255,
-    };
+  /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1001292
+  /// Countable Num: 2 Seq: 2 Event: 1 Listener: 2000691
+  /// Countable Num: 1 Seq: 255 Event: 8 Listener: 2000691
+  // Steps in this quest ( 0 is before accepting,
+  // 1 is first, 255 means ready for turning it in
+  enum Sequence : uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    Seq2 = 2,
+    SeqFinish = 255,
+  };
 
-    // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1001291;
-    static constexpr auto Actor1 = 1001292;
-    static constexpr auto Actor2 = 1003896;
-    static constexpr auto Eobject0 = 2000691;
-    static constexpr auto Eobject1 = 2000692;
-    static constexpr auto Eobject2 = 2000693;
-    static constexpr auto EventActionSearch = 1;
-    static constexpr auto Item0 = 2000137;
+  // Entities found in the script data of the quest
+  static constexpr auto Actor0 = 1001291;
+  static constexpr auto Actor1 = 1001292;
+  static constexpr auto Actor2 = 1003896;
+  static constexpr auto Eobject0 = 2000691;
+  static constexpr auto Eobject1 = 2000692;
+  static constexpr auto Eobject2 = 2000693;
+  static constexpr auto EventActionSearch = 1;
+  static constexpr auto Item0 = 2000137;
 
-  public:
-    SubWil004() : Sapphire::ScriptAPI::QuestScript( 65689 ){}; 
-    ~SubWil004() = default; 
+public:
+  SubWil004() : Sapphire::ScriptAPI::QuestScript( 65689 )
+  {};
+
+  ~SubWil004() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -60,77 +62,77 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        Scene00000(quest, player);
+        Scene00000( quest, player );
         break;
       }
       case Actor1:
       {
-        Scene00001(quest, player);
+        Scene00001( quest, player );
         break;
       }
       case Actor2:
       {
-        Scene00008(quest, player);
+        Scene00008( quest, player );
         break;
       }
       case Eobject0:
       {
-        eventMgr().eventActionStart(player, getId(), 0x01,
-          [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
-          {
-            Scene00003(quest, player);
-          },
-          nullptr, 0);
+        eventMgr().eventActionStart( player, getId(), 0x01,
+                                     [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                     {
+                                       Scene00003( quest, player );
+                                     },
+                                     nullptr, 0 );
         break;
       }
       case Eobject1:
       {
-        eventMgr().eventActionStart(player, getId(), 0x01,
-          [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
-          {
-            Scene00005(quest, player);
-          },
-          nullptr, 0);
+        eventMgr().eventActionStart( player, getId(), 0x01,
+                                     [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                     {
+                                       Scene00005( quest, player );
+                                     },
+                                     nullptr, 0 );
         break;
       }
       case Eobject2:
       {
-        eventMgr().eventActionStart(player, getId(), 0x01,
-          [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
-          {
-            Scene00007(quest, player);
-          },
-          nullptr, 0);
+        eventMgr().eventActionStart( player, getId(), 0x01,
+                                     [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                     {
+                                       Scene00007( quest, player );
+                                     },
+                                     nullptr, 0 );
         break;
       }
     }
   }
 
 
-  private:
+private:
 
 
-    void checkQuestCompletion(World::Quest& quest, Entity::Player& player)
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
+  {
+    auto currentCC = quest.getUI8AL();
+    auto currentQC = quest.getUI8BH();
+
+    eventMgr().sendEventNotice( player, getId(), 1, 3, currentCC + 1, 3 );
+
+    if( currentCC + 1 >= 3 )
     {
-      auto currentCC = quest.getUI8AL();
-      auto currentQC = quest.getUI8BH();
-
-      player.sendEventNotice(getId(), 1, 3, currentCC + 1, 3);
-
-      if (currentCC + 1 >= 3)
-      {
-        quest.setSeq(SeqFinish);
-        quest.setUI8AH(currentCC + 1);
-        quest.setUI8AL(currentCC + 1);
-        quest.setUI8BH(0);
-      }
-      else
-      {
-        quest.setUI8AH(currentCC + 1);
-        quest.setUI8AL(currentCC + 1);
-        quest.setUI8BH(currentQC - 1);
-      }
+      quest.setSeq( SeqFinish );
+      quest.setUI8AH( currentCC + 1 );
+      quest.setUI8AL( currentCC + 1 );
+      quest.setUI8BH( 0 );
     }
+    else
+    {
+      quest.setUI8AH( currentCC + 1 );
+      quest.setUI8AL( currentCC + 1 );
+      quest.setUI8BH( currentQC - 1 );
+    }
+  }
 
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
@@ -145,7 +147,7 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setSeq(Seq1);
+      quest.setSeq( Seq1 );
     }
   }
 
@@ -158,9 +160,9 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq(Seq2);
-    player.sendEventNotice(getId(), 0, 2, 0, 0);
-    quest.setUI8BH(3);
+    quest.setSeq( Seq2 );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, 0, 0 );
+    quest.setUI8BH( 3 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -172,7 +174,7 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00003(quest, player);
+    Scene00003( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -184,8 +186,8 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion(quest, player);
-    quest.setBitFlag8(1, true);
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 1, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -197,7 +199,7 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00005(quest, player);
+    Scene00005( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -209,8 +211,8 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion(quest, player);
-    quest.setBitFlag8(2, true);
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 2, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -222,7 +224,7 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00007(quest, player);
+    Scene00007( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -234,8 +236,8 @@ class SubWil004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    checkQuestCompletion(quest, player);
-    quest.setBitFlag8(3, true);
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 3, true );
   }
 
   //////////////////////////////////////////////////////////////////////

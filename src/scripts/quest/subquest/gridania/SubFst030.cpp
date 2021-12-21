@@ -17,47 +17,49 @@ using namespace Sapphire;
 
 class SubFst030 : public Sapphire::ScriptAPI::QuestScript
 {
-  private:
-    // Basic quest information 
-    // Quest vars / flags used
-    // UI8AL
-    // UI8BH
+private:
+  // Basic quest information
+  // Quest vars / flags used
+  // UI8AL
+  // UI8BH
 
-    /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1000784
-    /// Countable Num: 1 Seq: 2 Event: 1 Listener: 2000146
-    /// Countable Num: 1 Seq: 3 Event: 1 Listener: 1000764
-    /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1000632
-    // Steps in this quest ( 0 is before accepting, 
-    // 1 is first, 255 means ready for turning it in
-    enum Sequence : uint8_t
-    {
-      Seq0 = 0,
-      Seq1 = 1,
-      Seq2 = 2,
-      Seq3 = 3,
-      SeqFinish = 255,
-    };
+  /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1000784
+  /// Countable Num: 1 Seq: 2 Event: 1 Listener: 2000146
+  /// Countable Num: 1 Seq: 3 Event: 1 Listener: 1000764
+  /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1000632
+  // Steps in this quest ( 0 is before accepting,
+  // 1 is first, 255 means ready for turning it in
+  enum Sequence : uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    Seq2 = 2,
+    Seq3 = 3,
+    SeqFinish = 255,
+  };
 
-    // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1000632;
-    static constexpr auto Actor1 = 1000784;
-    static constexpr auto Actor2 = 1000764;
-    static constexpr auto Eobject0 = 2000146;
-    static constexpr auto EventActionGatherShort = 6;
-    static constexpr auto Item0 = 2000140;
-    static constexpr auto Seq0Actor0 = 0;
-    static constexpr auto Seq1Actor1 = 1;
-    static constexpr auto Seq2Eobject0 = 2;
-    static constexpr auto Seq2Eobject0Eventactionno = 99;
-    static constexpr auto Seq2Eobject0Eventactionok = 100;
-    static constexpr auto Seq3Actor2 = 3;
-    static constexpr auto Seq3Actor2Npctradeno = 97;
-    static constexpr auto Seq3Actor2Npctradeok = 98;
-    static constexpr auto Seq4Actor0 = 4;
+  // Entities found in the script data of the quest
+  static constexpr auto Actor0 = 1000632;
+  static constexpr auto Actor1 = 1000784;
+  static constexpr auto Actor2 = 1000764;
+  static constexpr auto Eobject0 = 2000146;
+  static constexpr auto EventActionGatherShort = 6;
+  static constexpr auto Item0 = 2000140;
+  static constexpr auto Seq0Actor0 = 0;
+  static constexpr auto Seq1Actor1 = 1;
+  static constexpr auto Seq2Eobject0 = 2;
+  static constexpr auto Seq2Eobject0Eventactionno = 99;
+  static constexpr auto Seq2Eobject0Eventactionok = 100;
+  static constexpr auto Seq3Actor2 = 3;
+  static constexpr auto Seq3Actor2Npctradeno = 97;
+  static constexpr auto Seq3Actor2Npctradeok = 98;
+  static constexpr auto Seq4Actor0 = 4;
 
-  public:
-    SubFst030() : Sapphire::ScriptAPI::QuestScript( 65709 ){}; 
-    ~SubFst030() = default; 
+public:
+  SubFst030() : Sapphire::ScriptAPI::QuestScript( 65709 )
+  {};
+
+  ~SubFst030() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -67,37 +69,37 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        if (!player.hasQuest(getId()))
-          Scene00000(quest, player);
+        if( !player.hasQuest( getId() ) )
+          Scene00000( quest, player );
         else
-          Scene00004(quest, player);
+          Scene00004( quest, player );
         break;
       }
       case Actor1:
       {
-        Scene00001(quest, player);
+        Scene00001( quest, player );
         break;
       }
       case Actor2:
       {
-        Scene00003(quest, player);
+        Scene00003( quest, player );
         break;
       }
       case Eobject0:
       {
-        eventMgr().eventActionStart(player, getId(), 0x06,
-          [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
-          {
-            Scene00002(quest, player);
-          },
-          nullptr, 0);
+        eventMgr().eventActionStart( player, getId(), 0x06,
+                                     [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                     {
+                                       Scene00002( quest, player );
+                                     },
+                                     nullptr, 0 );
         break;
       }
     }
   }
 
 
-  private:
+private:
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
@@ -111,7 +113,7 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setSeq(Seq1);
+      quest.setSeq( Seq1 );
     }
   }
 
@@ -124,8 +126,8 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq(Seq2);
-    player.sendEventNotice(getId(), 0, 2, 0, 0);
+    quest.setSeq( Seq2 );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, 0, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -137,7 +139,7 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00100(quest, player);
+    Scene00100( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -149,10 +151,10 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if (result.getResult(0) == 1)
-      Scene00098(quest, player);
+    if( result.getResult( 0 ) == 1 )
+      Scene00098( quest, player );
     else
-      Scene00097(quest, player);
+      Scene00097( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -194,8 +196,8 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00098Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq(SeqFinish);
-    player.sendEventNotice(getId(), 2, 2, 0, 0);
+    quest.setSeq( SeqFinish );
+    eventMgr().sendEventNotice( player, getId(), 2, 2, 0, 0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -220,10 +222,10 @@ class SubFst030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq(Seq3);
-    player.sendEventNotice(getId(), 1, 2, 0, 0);
-    quest.setUI8FL(1);
-    quest.setUI8BH(1);
+    quest.setSeq( Seq3 );
+    eventMgr().sendEventNotice( player, getId(), 1, 2, 0, 0 );
+    quest.setUI8FL( 1 );
+    quest.setUI8BH( 1 );
   }
 
 };

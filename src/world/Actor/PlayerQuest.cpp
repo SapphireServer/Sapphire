@@ -142,12 +142,6 @@ void Sapphire::Entity::Player::addQuestTracking( uint8_t idx )
   }
 }
 
-void
-Sapphire::Entity::Player::sendEventNotice( uint32_t questId, int8_t noticeId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 )
-{
-  queuePacket( std::make_shared< Notice2Packet >( getAsPlayer(), questId, noticeId, numOfArgs, var1, var2 ) );
-}
-
 void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
 {
   uint8_t index = questId / 8;

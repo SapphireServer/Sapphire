@@ -8,7 +8,7 @@
 using namespace Sapphire;
 
 class Aetheryte :
-  public Sapphire::ScriptAPI::EventScript
+        public Sapphire::ScriptAPI::EventScript
 {
 private:
   constexpr static auto ACTION_ATTUNE = 0x13;
@@ -22,7 +22,7 @@ private:
 
 public:
   Aetheryte() :
-    Sapphire::ScriptAPI::EventScript( 0x00050000 )
+          Sapphire::ScriptAPI::EventScript( 0x00050000 )
   {
   }
 
@@ -30,7 +30,7 @@ public:
   {
     if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
     {
-      eventMgr().playScene( player, eventId, 2, 0, [this]( Entity::Player& player, const Event::SceneResult& result )
+      eventMgr().playScene( player, eventId, 2, 0, [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
         auto destination = result.getResult( 0 );
         if( result.numOfResults == 1 && destination != 0 )
@@ -42,15 +42,15 @@ public:
     else
     {
       eventMgr().eventActionStart( player, eventId, ACTION_ATTUNE,
-                               [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {
-                                 player.registerAetheryte( eventId & 0xFFFF );
-                                 eventMgr().playScene( player, eventId, 3, 0 );
-                               },
-                               []( Entity::Player& ply, uint32_t evntId, uint64_t additional )
-                               {
+                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                   {
+                                     player.registerAetheryte( eventId & 0xFFFF );
+                                     eventMgr().playScene( player, eventId, 3, 0 );
+                                   },
+                                   []( Entity::Player& ply, uint32_t evntId, uint64_t additional )
+                                   {
 
-                               }, 0 );
+                                   }, 0 );
 
     }
   }
@@ -60,12 +60,12 @@ public:
     if( player.isAetheryteRegistered( eventId & 0xFFFF ) )
     {
       // eventParam4 (or params[1] if using EventPlay8, which is actually used on retail) anything bigger than 1 will show select instance menu item
-      eventMgr().playScene( player, eventId, 0, 1, { 1, 2 }, [this]( Entity::Player& player, const Event::SceneResult& result )
+      eventMgr().playScene( player, eventId, 0, 1, { 1, 2 }, [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
         if( result.numOfResults == 1 ) // set homepoint
         {
           player.setHomepoint( result.eventId & 0xFFFF );
-          player.sendEventNotice( result.eventId, 2, 0xEA, 0, 0 );
+          eventMgr().sendEventNotice( player, result.eventId, 2, 0xEA, 0, 0 );
         }
         else if( result.numOfResults == 2 ) // aethernet access
         {
@@ -90,22 +90,22 @@ public:
     else
     {
       eventMgr().eventActionStart( player, eventId, ACTION_ATTUNE,
-                               [this]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {
-                                 player.registerAetheryte( eventId & 0xFFFF );
+                                   [ this ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                   {
+                                     player.registerAetheryte( eventId & 0xFFFF );
 
-                                 if( player.isActionLearned( Common::UnlockEntry::Teleport ) )
-                                 {
-                                   player.sendEventNotice( eventId, 0, 2, 0, 0 );
-                                 }
-                                 else
-                                 {
-                                   player.sendEventNotice( eventId, 0, 1, 1, 0 );
-                                   player.learnAction( Common::UnlockEntry::Teleport );
-                                 }
-                               },
-                               []( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {}, 0 );
+                                     if( player.isActionLearned( Common::UnlockEntry::Teleport ) )
+                                     {
+                                       eventMgr().sendEventNotice( player, eventId, 0, 2, 0, 0 );
+                                     }
+                                     else
+                                     {
+                                       eventMgr().sendEventNotice( player, eventId, 0, 1, 1, 0 );
+                                       player.learnAction( Common::UnlockEntry::Teleport );
+                                     }
+                                   },
+                                   []( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                   {}, 0 );
     }
   }
 

@@ -582,9 +582,6 @@ namespace Sapphire::Entity
     /*! send the entire inventory sequence */
     void sendInventory();
 
-    /*! send a quest specific message */
-    void sendEventNotice( uint32_t questId, int8_t noticeId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 );
-
     /*! returns true if loading is complete ( 0x69 has been received ) */
     bool isLoadingComplete() const;
 

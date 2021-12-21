@@ -68,14 +68,14 @@ public:
     else if( actorId == Aetheryte0 )
     {
       eventMgr().eventActionStart( player, 0x050002, 0x13,
-                               [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {
-                                 player.sendEventNotice( 0x050002, 0, 1, 0, 0 );
-                                 player.registerAetheryte( 2 );
-                                 player.learnAction( Common::UnlockEntry::Return );
-                                 Scene00002( player );
-                               },
-                               nullptr, getId() );
+                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                   {
+                                     eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
+                                     player.registerAetheryte( 2 );
+                                     player.learnAction( Common::UnlockEntry::Return );
+                                     Scene00002( player );
+                                   },
+                                   nullptr, getId() );
     }
     else if( actorId == Actor1 )
     {
@@ -97,15 +97,15 @@ private:
   {
     if( varIdx == 1 )
     {
-      player.sendEventNotice( getId(), 1, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
     }
     else if( varIdx == 2 )
     {
-      player.sendEventNotice( getId(), 2, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
     }
     else
     {
-      player.sendEventNotice( getId(), 0, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
     }
 
     auto questId = getId();
@@ -127,102 +127,102 @@ private:
   void Scene00000( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.getResult( 0 ) == 1 )
-                        {
-                          Scene00001( player );
-                        }
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            if( result.getResult( 0 ) == 1 )
+                            {
+                              Scene00001( player );
+                            }
+                          } );
   }
 
   void Scene00001( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            auto pQuest = player.getQuest( getId() );
+                            if( !pQuest )
+                              return;
 
-                        pQuest->setSeq( Seq1 );
-                        pQuest->setUI8CH( 1 );
-                      } );
+                            pQuest->setSeq( Seq1 );
+                            pQuest->setUI8CH( 1 );
+                          } );
   }
 
   void Scene00002( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 2, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        Scene00003( player );
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            Scene00003( player );
+                          } );
   }
 
   void Scene00003( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 3, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8BL( 1 );
-                        checkQuestCompletion( player, 0 );
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            auto pQuest = player.getQuest( getId() );
+                            if( !pQuest )
+                              return;
+                            pQuest->setUI8BL( 1 );
+                            checkQuestCompletion( player, 0 );
+                          } );
   }
 
   void Scene00004( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 4, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.getResult( 0 ) == 1 )
-                        {
-                          Scene00005( player );
-                        }
-                        else
-                          return;
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            if( result.getResult( 0 ) == 1 )
+                            {
+                              Scene00005( player );
+                            }
+                            else
+                              return;
+                          } );
   }
 
   void Scene00005( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8CH( 0 );
-                        pQuest->setUI8BH( 1 );
-                        checkQuestCompletion( player, 1 );
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            auto pQuest = player.getQuest( getId() );
+                            if( !pQuest )
+                              return;
+                            pQuest->setUI8CH( 0 );
+                            pQuest->setUI8BH( 1 );
+                            checkQuestCompletion( player, 1 );
+                          } );
   }
 
   void Scene00006( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 6, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8AL( 1 );
-                        checkQuestCompletion( player, 2 );
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            auto pQuest = player.getQuest( getId() );
+                            if( !pQuest )
+                              return;
+                            pQuest->setUI8AL( 1 );
+                            checkQuestCompletion( player, 2 );
+                          } );
   }
 
   void Scene00007( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 7, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.getResult( 0 ) == 1 )
-                        {
-                          player.finishQuest( getId(), result.getResult( 1 ) );
-                        }
-                      } );
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                          {
+                            if( result.getResult( 0 ) == 1 )
+                            {
+                              player.finishQuest( getId(), result.getResult( 1 ) );
+                            }
+                          } );
   }
 };
 

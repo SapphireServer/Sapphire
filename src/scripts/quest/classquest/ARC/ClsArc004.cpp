@@ -143,23 +143,23 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
       }
       case Eobject3:
       {
-        eventMgr().eventActionStart(player, getId(), 0x0A,
-          [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+        eventMgr().eventActionStart( player, getId(), 0x0A,
+          [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
           {
-            Scene00013(quest, player);
-            player.sendEventNotice(getId(), 2, 2, 0, 0);
+            Scene00013( quest, player );
+            eventMgr().sendEventNotice( player, getId(), 2, 2, 0, 0 );
           },
           nullptr, 0);
         break;
       }
       case Eobject4:
       {
-        eventMgr().eventActionStart(player, getId(), 0x01,
-          [&](Entity::Player& player, uint32_t eventId, uint64_t additional)
+        eventMgr().eventActionStart( player, getId(), 0x01,
+          [&]( Entity::Player& player, uint32_t eventId, uint64_t additional )
           {
-            Scene00015(quest, player);
+            Scene00015( quest, player );
           },
-          nullptr, 0);
+          nullptr, 0 );
         break;
       }
     }
@@ -169,20 +169,20 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
   private:
 
 
-    void checkQuestCompletion(World::Quest& quest, Entity::Player& player)
+    void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
     {
       auto currentCC = quest.getUI8AL();
 
-      player.sendEventNotice(getId(), 1, 2, currentCC + 1, 3);
+      eventMgr().sendEventNotice( player, getId(), 1, 2, currentCC + 1, 3 );
 
-      if (currentCC + 1 >= 3)
+      if( currentCC + 1 >= 3 )
       {
-        quest.setSeq(Seq3);
-        quest.setUI8AL(0);
+        quest.setSeq( Seq3 );
+        quest.setUI8AL( 0 );
       }
       else
       {
-        quest.setUI8AL(currentCC + 1);
+        quest.setUI8AL( currentCC + 1 );
       }
     }
 
@@ -199,7 +199,7 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      Scene00001(quest, player);
+      Scene00001( quest, player );
     }
   }
 
@@ -224,8 +224,8 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.sendEventNotice(getId(), 0, 2, 0, 0);
-    quest.setSeq(Seq2);
+    eventMgr().sendEventNotice( player, getId(), 0, 2, 0, 0 );
+    quest.setSeq( Seq2 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -263,8 +263,8 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setBitFlag8(3, true);
-    checkQuestCompletion(quest, player);
+    quest.setBitFlag8( 3, true );
+    checkQuestCompletion( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -384,7 +384,7 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00015Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00016(quest, player);
+    Scene00016( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -396,12 +396,13 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00016Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if (result.getResult(0) == 1) {
-      quest.setSeq(Seq5);
+    if( result.getResult( 0) == 1 )
+    {
+      quest.setSeq( Seq5 );
       auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
-      eventMgr().eventFinish(player, result.eventId, 0);
-      pTeriMgr.createAndJoinQuestBattle(player, Questbattle0);
+      eventMgr().eventFinish( player, result.eventId, 0 );
+      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
     }
   }
 
@@ -426,8 +427,8 @@ class ClsArc004 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00018Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.sendEventNotice(getId(), 4, 2, 0, 0);
-    quest.setSeq(SeqFinish);
+    eventMgr().sendEventNotice( player, getId(), 4, 2, 0, 0 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////

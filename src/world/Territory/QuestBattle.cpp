@@ -177,7 +177,8 @@ void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
 
 void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
 {
-  player.sendEventNotice( getDirectorId(), 0, 2, Util::getTimeSeconds(), 0x0708 );
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  eventMgr.sendEventNotice( player, getDirectorId(), 0, 2, Util::getTimeSeconds(), 0x0708 );
   sendDirectorVars( player );
   player.setDirectorInitialized( true );
 }

@@ -2,7 +2,6 @@
 #define _QUESTMESSAGE_H
 
 #include <Network/GamePacket.h>
-#include "Actor/Player.h"
 #include "Forwards.h"
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
@@ -14,20 +13,19 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   class Notice2Packet : public ZoneChannelPacket< FFXIVIpcNotice2 >
   {
   public:
-    Notice2Packet( Entity::GameObjectPtr pActor, uint32_t questId, int8_t msgId,
-                   uint8_t type = 0, uint32_t var1 = 0, uint32_t var2 = 0 ) :
-      ZoneChannelPacket< FFXIVIpcNotice2 >( pActor->getId(), pActor->getId() )
+    Notice2Packet( uint32_t entityId, uint32_t questId, int8_t msgId, uint8_t numOfArgs = 0, uint32_t var1 = 0, uint32_t var2 = 0 ) :
+      ZoneChannelPacket< FFXIVIpcNotice2 >( entityId, entityId )
     {
-      initialize( questId, msgId, type, var1, var2 );
+      initialize( questId, msgId, numOfArgs, var1, var2 );
     };
 
   private:
-    void initialize( uint32_t questId, int8_t msgId, uint8_t type, uint32_t var1, uint32_t var2 )
+    void initialize( uint32_t questId, int8_t msgId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 )
     {
       m_data.handlerId = questId;
       m_data.noticeId = msgId;
       // todo: not correct
-      m_data.numOfArgs = type;
+      m_data.numOfArgs = numOfArgs;
       m_data.args[0] = var1;
       m_data.args[1] = var2;
     };

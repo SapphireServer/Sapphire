@@ -17,6 +17,7 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventPlayPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/Notice2Packet.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -738,4 +739,11 @@ Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& 
     player.setStateFlag( PlayerStateFlag::WatchingCutscene );
 
   return pEvent;
+}
+
+void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 )
+{
+  auto noticePacket = std::make_shared< Notice2Packet >( player.getId(), questId, noticeId, numOfArgs, var1, var2 );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( player.getCharacterId(), noticePacket );
 }

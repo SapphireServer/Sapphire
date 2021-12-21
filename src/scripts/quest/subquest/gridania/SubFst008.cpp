@@ -104,7 +104,7 @@ private:
   void Scene00001Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
     quest.setUI8BH( 1 );
-    player.sendEventNotice( getId(), 0, 0, 0, 0 );
+    eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
     quest.setSeq( SeqFinish );
   }
 

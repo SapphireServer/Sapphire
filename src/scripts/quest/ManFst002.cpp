@@ -69,11 +69,11 @@ private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
     if( varIdx == 3 )
-      player.sendEventNotice( getId(), 1, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
     else if( varIdx == 2 )
-      player.sendEventNotice( getId(), 2, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
     else
-      player.sendEventNotice( getId(), 0, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
 
     auto var_attuned = quest.getUI8AL();
     auto var_class = quest.getUI8BH();
@@ -199,7 +199,7 @@ public:
       // attune
       auto event = [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
       {
-        player.sendEventNotice( 0x050002, 0, 1, 0, 0 );
+        eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
         player.registerAetheryte( 2 );
         player.learnAction( Common::UnlockEntry::Return );
 

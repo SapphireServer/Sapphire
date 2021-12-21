@@ -17,41 +17,43 @@ using namespace Sapphire;
 
 class SubWil020 : public Sapphire::ScriptAPI::QuestScript
 {
-  private:
-    // Basic quest information 
-    // Quest vars / flags used
-    // BitFlag8
-    // UI8AH
-    // UI8AL
-    // UI8BH
+private:
+  // Basic quest information
+  // Quest vars / flags used
+  // BitFlag8
+  // UI8AH
+  // UI8AL
+  // UI8BH
 
-    /// Countable Num: 8 Seq: 1 Event: 1 Listener: 1001940
-    /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1001937
-    /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1001939
-    // Steps in this quest ( 0 is before accepting, 
-    // 1 is first, 255 means ready for turning it in
-    enum Sequence : uint8_t
-    {
-      Seq0 = 0,
-      Seq1 = 1,
-      SeqFinish = 255,
-    };
+  /// Countable Num: 8 Seq: 1 Event: 1 Listener: 1001940
+  /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1001937
+  /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1001939
+  // Steps in this quest ( 0 is before accepting,
+  // 1 is first, 255 means ready for turning it in
+  enum Sequence : uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    SeqFinish = 255,
+  };
 
-    // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1001685;
-    static constexpr auto Actor1 = 1001940;
-    static constexpr auto Actor2 = 1001937;
-    static constexpr auto Actor3 = 1001939;
-    static constexpr auto Actor4 = 1001942;
-    static constexpr auto Actor5 = 1001949;
-    static constexpr auto Actor6 = 1003902;
-    static constexpr auto Actor7 = 1001914;
-    static constexpr auto Actor8 = 1003899;
-    static constexpr auto Actor9 = 1001945;
+  // Entities found in the script data of the quest
+  static constexpr auto Actor0 = 1001685;
+  static constexpr auto Actor1 = 1001940;
+  static constexpr auto Actor2 = 1001937;
+  static constexpr auto Actor3 = 1001939;
+  static constexpr auto Actor4 = 1001942;
+  static constexpr auto Actor5 = 1001949;
+  static constexpr auto Actor6 = 1003902;
+  static constexpr auto Actor7 = 1001914;
+  static constexpr auto Actor8 = 1003899;
+  static constexpr auto Actor9 = 1001945;
 
-  public:
-    SubWil020() : Sapphire::ScriptAPI::QuestScript( 65929 ){}; 
-    ~SubWil020() = default; 
+public:
+  SubWil020() : Sapphire::ScriptAPI::QuestScript( 65929 )
+  {};
+
+  ~SubWil020() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -62,91 +64,91 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        Scene00000(quest, player);
+        Scene00000( quest, player );
         break;
       }
       case Actor1:
       {
-        if (!quest.getBitFlag8(1))
-          Scene00001(quest, player);
+        if( !quest.getBitFlag8( 1 ) )
+          Scene00001( quest, player );
         else
-          Scene00002(quest, player);
+          Scene00002( quest, player );
         break;
       }
       case Actor2:
       {
-        if (!quest.getBitFlag8(2))
-          Scene00003(quest, player);
+        if( !quest.getBitFlag8( 2 ) )
+          Scene00003( quest, player );
         else
-          Scene00004(quest, player);
+          Scene00004( quest, player );
         break;
       }
       case Actor3:
       {
-        if (!quest.getBitFlag8(3))
-          Scene00005(quest, player);
+        if( !quest.getBitFlag8( 3 ) )
+          Scene00005( quest, player );
         else
-          Scene00006(quest, player);
+          Scene00006( quest, player );
         break;
       }
       case Actor4:
       {
-        if (!quest.getBitFlag8(4))
-          Scene00007(quest, player);
+        if( !quest.getBitFlag8( 4 ) )
+          Scene00007( quest, player );
         else
-          Scene00008(quest, player);
+          Scene00008( quest, player );
         break;
       }
       case Actor5:
       {
-        if (!quest.getBitFlag8(5))
-          Scene00009(quest, player);
+        if( !quest.getBitFlag8( 5 ) )
+          Scene00009( quest, player );
         else
-          Scene00010(quest, player);
+          Scene00010( quest, player );
         break;
       }
       case Actor6:
       {
-        if (!quest.getBitFlag8(6))
-          Scene00011(quest, player);
+        if( !quest.getBitFlag8( 6 ) )
+          Scene00011( quest, player );
         else
-          Scene00012(quest, player);
+          Scene00012( quest, player );
         break;
       }
       case Actor7:
       {
-        if (!quest.getBitFlag8(7))
-          Scene00013(quest, player);
+        if( !quest.getBitFlag8( 7 ) )
+          Scene00013( quest, player );
         else
-          Scene00014(quest, player);
+          Scene00014( quest, player );
         break;
       }
       case Actor8:
       {
-        if (!quest.getBitFlag8(0))
-          Scene00015(quest, player);
+        if( !quest.getBitFlag8( 0 ) )
+          Scene00015( quest, player );
         else
-          Scene00016(quest, player);
+          Scene00016( quest, player );
         break;
       }
       case Actor9:
       {
-        Scene00017(quest, player);
+        Scene00017( quest, player );
         break;
       }
     }
   }
 
 
-  private:
+private:
 
-    void checkQuestProgression(World::Quest& quest, Entity::Player& player)
+  void checkQuestProgression( World::Quest& quest, Entity::Player& player )
+  {
+    if( quest.getUI8AL() == 6 && quest.getUI8BH() == 2 )
     {
-      if (quest.getUI8AL() == 6 && quest.getUI8BH() == 2)
-      {
-        quest.setSeq(SeqFinish);
-      }
+      quest.setSeq( SeqFinish );
     }
+  }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
@@ -160,7 +162,7 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      quest.setSeq(Seq1);
+      quest.setSeq( Seq1 );
     }
   }
 
@@ -175,10 +177,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(1, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 1, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -192,10 +194,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(2, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 2, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -209,10 +211,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(3, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 3, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -226,10 +228,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(4, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 4, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -243,10 +245,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(5, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 5, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -260,10 +262,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(6, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 6, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -277,10 +279,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(7, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 7, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -294,10 +296,10 @@ class SubWil020 : public Sapphire::ScriptAPI::QuestScript
   {
     auto hustCount = quest.getUI8AL();
     hustCount += 1;
-    quest.setUI8AL(hustCount);
-    player.sendEventNotice(getId(), 0, 2, hustCount, 6);
-    quest.setBitFlag8(8, true);
-    checkQuestProgression(quest, player);
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 8, true );
+    checkQuestProgression( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////

@@ -59,7 +59,9 @@ private:
   static constexpr auto UnlockDesion = 14;
 
 public:
-  ManFst003() : Sapphire::ScriptAPI::QuestScript( 65659 ){};
+  ManFst003() : Sapphire::ScriptAPI::QuestScript( 65659 )
+  {};
+
   ~ManFst003() = default;
 
   //////////////////////////////////////////////////////////////////////
@@ -73,14 +75,14 @@ public:
     else if( actorId == Actor1 )
     {
       eventMgr().eventActionStart( player, 0x050002, 0x13,
-                               [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {
-                                 player.sendEventNotice( 0x050002, 0, 1, 0, 0 );
-                                 player.registerAetheryte( 2 );
-                                 player.learnAction( Common::UnlockEntry::Return );
-                                 Scene00051( quest, player );
-                               },
-                               nullptr, quest.getId() );
+                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                   {
+                                     eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
+                                     player.registerAetheryte( 2 );
+                                     player.learnAction( Common::UnlockEntry::Return );
+                                     Scene00051( quest, player );
+                                   },
+                                   nullptr, quest.getId() );
     }
     else if( actorId == Actor2 )
     {
@@ -107,15 +109,15 @@ private:
 
     if( varIdx == 3 )
     {
-      player.sendEventNotice( getId(), 1, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
     }
     else if( varIdx == 2 )
     {
-      player.sendEventNotice( getId(), 2, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
     }
     else
     {
-      player.sendEventNotice( getId(), 0, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
     }
 
     auto QUEST_VAR_ATTUNE = quest.getUI8AL();

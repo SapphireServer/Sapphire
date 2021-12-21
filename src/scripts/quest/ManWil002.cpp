@@ -88,7 +88,7 @@ public:
       eventMgr().eventActionStart( player, 0x050002, 0x13,
                                [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                {
-                                 player.sendEventNotice( 0x050002, 0, 1, 0, 0 );
+                                 eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
                                  player.registerAetheryte( 2 );
                                  player.learnAction( Common::UnlockEntry::Return );
                                  Scene00001( quest, player );
@@ -103,15 +103,15 @@ private:
   {
     if( varIdx == 1 )
     {
-      player.sendEventNotice( getId(), 1, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
     }
     else if( varIdx == 2 )
     {
-      player.sendEventNotice( getId(), 2, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
     }
     else
     {
-      player.sendEventNotice( getId(), 0, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
     }
 
     auto QUEST_VAR_ATTUNE = quest.getUI8AL();
