@@ -32,7 +32,7 @@ void Sapphire::World::Manager::QuestMgr::onUpdateQuest( Entity::Player& player, 
   sendQuestTracker( player );
 }
 
-void Sapphire::World::Manager::QuestMgr::onCompleteQuest( Entity::Player& player, uint16_t questId )
+void Sapphire::World::Manager::QuestMgr::onCompleteQuest( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( player.getId() );
@@ -40,9 +40,11 @@ void Sapphire::World::Manager::QuestMgr::onCompleteQuest( Entity::Player& player
   questFinishPacket->data().flag1 = 1;
   questFinishPacket->data().flag2 = 1;
   server.queueForPlayer( player.getCharacterId(), questFinishPacket );
+
+  giveQuestRewards( player, questId, optionalChoice );
 }
 
-void Sapphire::World::Manager::QuestMgr::onRemoveQuest( Sapphire::Entity::Player &player, uint8_t questIndex )
+void Sapphire::World::Manager::QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto questUpdatePacket = makeZonePacket< FFXIVIpcQuest >( player.getId() );
@@ -52,6 +54,44 @@ void Sapphire::World::Manager::QuestMgr::onRemoveQuest( Sapphire::Entity::Player
   server.queueForPlayer( player.getCharacterId(), questUpdatePacket );
 
   sendQuestTracker( player );
+}
+
+bool Sapphire::World::Manager::QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  uint32_t playerLevel = player.getLevel();
+  auto questInfo = exdData.getRow< Component::Excel::Quest >( static_cast< uint32_t >( Event::EventHandler::EventHandlerType::Quest ) << 16 | questId );
+
+  if( !questInfo )
+    return false;
+  auto paramGrowth = exdData.getRow< Component::Excel::ParamGrow >( questInfo->data().ClassLevel );
+  uint32_t exp = ( questInfo->data().Reward.ExpBonus * paramGrowth->data().BaseExp * paramGrowth->data().EventExpRate ) / 100;
+  uint32_t gilReward = questInfo->data().Reward.Gil;
+
+  // TODO: check if there is room in inventory, else return false;
+  if( exp > 0 )
+    player.gainExp( exp );
+
+  for( uint32_t i = 0; i < 6; i++ )
+  {
+    if( questInfo->data().Reward.Item[ i ] != 0 )
+      player.addItem( questInfo->data().Reward.Item[ i ], questInfo->data().Reward.ItemNum[ i ] );
+  }
+
+  for( uint32_t i = 0; i < 5; i++ )
+  {
+    auto itemId = questInfo->data().Reward.OptionalItem[ i ];
+    if( itemId == optionalChoice )
+    {
+      player.addItem( itemId, questInfo->data().Reward.OptionalItemNum[ i ] );
+      break;
+    }
+  }
+
+  if( gilReward > 0 )
+    player.addCurrency( CurrencyType::Gil, gilReward );
+
+  return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////

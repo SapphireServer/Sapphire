@@ -114,7 +114,7 @@ namespace Sapphire::Entity
     int16_t getQuestTracking( uint8_t index ) const;
 
     /*! finish a given quest */
-    void finishQuest( uint16_t questId, uint8_t optionalChoice = 0 );
+    void finishQuest( uint16_t questId, uint32_t optionalChoice = 0 );
 
     /*! finish a given quest */
     void unfinishQuest( uint16_t questId );
@@ -133,8 +133,6 @@ namespace Sapphire::Entity
 
     /*! set te current opening sequence */
     void setOpeningSequence( uint8_t seq );
-
-    bool giveQuestRewards( uint32_t questId, uint32_t optionalChoice );
 
     std::array< World::Quest, 30 >& getQuestArrayRef();
 

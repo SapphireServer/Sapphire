@@ -238,10 +238,7 @@ private:
   void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )
-      if( player.giveQuestRewards( getId(), 0 ) )
-      {
-        player.finishQuest( getId() );
-      }
+      player.finishQuest( getId(), result.getResult( 1 ) );
   }
 
   //////////////////////////////////////////////////////////////////////

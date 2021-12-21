@@ -15,7 +15,7 @@ namespace Sapphire::World::Manager
     /// Perform required actions for events
     void onUpdateQuest( Entity::Player& player, uint8_t questIndex );
     void onRemoveQuest( Entity::Player& player, uint8_t questIndex );
-    void onCompleteQuest( Entity::Player& player, uint16_t questId );
+    void onCompleteQuest( Entity::Player& player, uint16_t questId, uint32_t optionalChoice = 0 );
 
 
     ////////////////////
@@ -23,6 +23,8 @@ namespace Sapphire::World::Manager
     void sendQuestTracker( Entity::Player& player );
 
     void sendQuestsInfo( Entity::Player& player );
+
+    bool giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice );
 
   };
 

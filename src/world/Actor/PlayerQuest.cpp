@@ -17,12 +17,14 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void Sapphire::Entity::Player::finishQuest( uint16_t questId, uint8_t optionalChoice )
+void Sapphire::Entity::Player::finishQuest( uint16_t questId, uint32_t optionalChoice )
 {
   removeQuest( questId );
 
   auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
-  questMgr.onCompleteQuest( *this, questId );
+
+  //@todo should probably be changed to a bool function in case reward can not be obtained as quests will not complete in that case
+  questMgr.onCompleteQuest( *this, questId, optionalChoice );
 
   updateQuestsCompleted( questId );
 }
@@ -165,56 +167,6 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
   m_questCompleteFlags[ index ] ^= value;
 
-}
-
-bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t optionalChoice )
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint32_t playerLevel = getLevel();
-  auto questInfo = exdData.getRow< Component::Excel::Quest >( questId );
-
-
-  if( !questInfo )
-    return false;
-
-  auto paramGrowth = exdData.getRow< Component::Excel::ParamGrow >( questInfo->data().ClassLevel );
-
-  uint32_t exp =
-    ( questInfo->data().Reward.ExpBonus * paramGrowth->data().BaseExp * paramGrowth->data().EventExpRate ) / 100;
-
-  //exp = questInfo->data().Reward.ExpBonus;
-
-  //auto rewardItemCount = questInfo->data().Reward.itemReward0.size();
-  //uint16_t optionalItemCount = static_cast< uint16_t >( questInfo->itemReward1.size() );
-
-  uint32_t gilReward = questInfo->data().Reward.Gil;
-
-  // TODO: check if there is room in inventory, else return false;
-  if( exp > 0 )
-    gainExp( exp );
-
-
-  for( uint32_t i = 0; i < 6; i++ )
-  {
-    if( questInfo->data().Reward.Item[ i ] != 0 )
-      addItem( questInfo->data().Reward.Item[ i ], questInfo->data().Reward.ItemNum[ i ] );
-  }
-
-  for( uint32_t i = 0; i < 5; i++ )
-  {
-    auto itemId = questInfo->data().Reward.OptionalItem[ i ];
-    if( itemId == optionalChoice )
-    {
-      addItem( itemId, questInfo->data().Reward.OptionalItemNum[ i ] );
-      break;
-    }
-  }
-
-
-  if( gilReward > 0 )
-    addCurrency( CurrencyType::Gil, gilReward );
-
-  return true;
 }
 
 Sapphire::World::Quest& Sapphire::Entity::Player::getQuestByIndex( uint16_t index )

@@ -88,8 +88,7 @@ class SubFst045 : public Sapphire::ScriptAPI::QuestScript
 
     if( result.getResult( 0 ) == 1 )
     {
-      if( player.giveQuestRewards( getId(), 0 ) )
-        player.finishQuest( getId() );
+      player.finishQuest( getId(), result.getResult( 1 ) );
     }
 
   }
