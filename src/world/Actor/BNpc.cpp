@@ -57,6 +57,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 {
   m_id = id;
   m_pInfo = pInfo;
+  m_layoutId = pInfo->instanceId;
 
   m_aggressionMode = pInfo->ActiveType;
 
@@ -159,6 +160,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 {
   m_id = id;
   m_pInfo = pInfo;
+  m_layoutId = pInfo->instanceId;
 
   m_aggressionMode = pInfo->ActiveType;
 
@@ -741,7 +743,7 @@ void Sapphire::Entity::BNpc::onDeath()
     if( pPlayer )
     {
       auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-      playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), m_id );
+      playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), getLayoutId() );
     }
   }
   hateListClear();
@@ -954,4 +956,9 @@ uint32_t Sapphire::Entity::BNpc::getBoundInstanceId() const
 BNpcType Sapphire::Entity::BNpc::getBNpcType() const
 {
   return m_bnpcType;
+}
+
+uint32_t Sapphire::Entity::BNpc::getLayoutId() const
+{
+  return m_layoutId;
 }

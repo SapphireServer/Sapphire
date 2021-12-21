@@ -185,9 +185,13 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
     auto questId = static_cast< uint16_t >( eventId );
     if( player.hasQuest( eventId ) )
     {
+      World::Quest preQ;
       auto questIdx = player.getQuestIndex( questId );
       auto& quest = player.getQuestByIndex( questIdx );
+      preQ = quest;
       script->onTalk( quest, player, actor );
+      if( quest != preQ )
+        player.updateQuest( quest );
     }
     else
     {
@@ -352,7 +356,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t entityId )
+bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t layoutId )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -374,7 +378,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
 
 
       World::Quest preQ = quest;
-      script->onBNpcKill( quest, nameId, entityId, player );
+      script->onBNpcKill( quest, nameId, layoutId, player );
       if( quest != preQ )
         player.updateQuest( quest );
     }

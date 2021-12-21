@@ -103,7 +103,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       // 0x20 == spawn hidden to be displayed by the spawneffect control
       m_data.ActiveType = player.getStance();
 
-      if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() == true )
+      if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() )
       {
         m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }

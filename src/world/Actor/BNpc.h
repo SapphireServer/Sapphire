@@ -125,6 +125,8 @@ namespace Sapphire::Entity
 
     Common::BNpcType getBNpcType() const;
 
+    uint32_t getLayoutId() const;
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -140,6 +142,7 @@ namespace Sapphire::Entity
     uint32_t m_levelId;
     uint32_t m_rank;
     uint32_t m_boundInstanceId;
+    uint32_t m_layoutId;
 
     uint32_t m_flags;
 

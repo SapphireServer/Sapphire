@@ -33,6 +33,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ClassJob = static_cast< uint8_t >( bnpc.getClass() );
       //m_data.ActiveType = static_cast< uint8_t >( bnpc.getStatus() );
 
+      m_data.LayoutId = bnpc.getLayoutId();
       m_data.Hp = bnpc.getHp();
       m_data.Mp = bnpc.getMp();
       m_data.HpMax = bnpc.getMaxHp();
@@ -60,7 +61,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.MainTarget = bnpc.getTargetId();
       // no idea ... m_data.spawnerId = Common::INVALID_GAME_OBJECT_ID64;
       m_data.ParentId = Common::INVALID_GAME_OBJECT_ID;
-      m_data.TriggerId = Common::INVALID_GAME_OBJECT_ID;
+      m_data.TriggerId = 0;
       m_data.ChannelingTarget = Common::INVALID_GAME_OBJECT_ID;
       m_data.OwnerId = Common::INVALID_GAME_OBJECT_ID;
 

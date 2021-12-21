@@ -66,7 +66,7 @@ namespace Sapphire::Scripting
 
     bool onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint64_t targetId );
 
-    bool onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t entityId );
+    bool onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t lyoutId );
 
     bool onEObjHit( Entity::Player& player, uint64_t actorId, uint32_t actionId );
 

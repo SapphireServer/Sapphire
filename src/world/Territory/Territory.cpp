@@ -832,7 +832,7 @@ void Sapphire::Territory::updateSpawnPoints()
     if( !spawn.bnpcPtr && ( Util::getTimeSeconds() - spawn.timeOfDeath ) > spawn.infoPtr->PopInterval )
     {
       auto& server = Common::Service< World::WorldServer >::ref();
-      auto pBNpc = std::make_shared< Entity::BNpc >( spawn.infoPtr->instanceId, spawn.infoPtr, shared_from_this() );
+      auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), spawn.infoPtr, shared_from_this() );
       spawn.bnpcPtr = pBNpc;
 
       pushActor( pBNpc );
@@ -857,7 +857,7 @@ Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
-  auto pBNpc = std::make_shared< Entity::BNpc >( infoPtr->second->instanceId, infoPtr->second, shared_from_this(), hp, bnpcType );
+  auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, shared_from_this(), hp, bnpcType );
 
   pushActor( pBNpc );
   return pBNpc;
@@ -867,7 +867,7 @@ Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByInstanceId( uint32
 {
   for( const auto& bnpcIt : m_bNpcMap )
   {
-    if( bnpcIt.second->getId() == instanceId )
+    if( bnpcIt.second->getLayoutId() == instanceId )
       return bnpcIt.second;
   }
   return nullptr;
