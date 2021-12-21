@@ -207,7 +207,7 @@ void PlayerMgr::onGainExp( Sapphire::Entity::Player& player, uint32_t exp )
   if( exp != 0 )
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), GainExpMsg, static_cast< uint8_t >( player.getClass() ), exp ) );
 
-  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp, static_cast< uint8_t >( player.getClass() ), exp ) );
+  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp, static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
 }
 
 void PlayerMgr::onUnlockOrchestrion( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId )
