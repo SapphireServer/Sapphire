@@ -252,10 +252,10 @@ void PlayerMgr::onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountI
   }
 }
 
-void PlayerMgr::onMobKill( Sapphire::Entity::Player& player, uint16_t nameId )
+void PlayerMgr::onMobKill( Sapphire::Entity::Player& player, uint16_t nameId, uint32_t entityId )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onBNpcKill( player, nameId );
+  scriptMgr.onBNpcKill( player, nameId, entityId );
 
   if( player.isActionLearned( Common::UnlockEntry::HuntingLog ) )
   {

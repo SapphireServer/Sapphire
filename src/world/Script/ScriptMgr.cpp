@@ -352,7 +352,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId )
+bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t entityId )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -374,7 +374,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
 
 
       World::Quest preQ = quest;
-      script->onBNpcKill( quest, nameId, player );
+      script->onBNpcKill( quest, nameId, entityId, player );
       if( quest != preQ )
         player.updateQuest( quest );
     }

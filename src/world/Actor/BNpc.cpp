@@ -741,7 +741,7 @@ void Sapphire::Entity::BNpc::onDeath()
     if( pPlayer )
     {
       auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-      playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ) );
+      playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), m_id );
     }
   }
   hateListClear();

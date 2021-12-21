@@ -390,9 +390,9 @@ createScript( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::
 
   if( !enemy_ids.empty() )
     scriptEntry += std::string(
-      "  void onBNpcKill( uint32_t npcId, Entity::Player& player ) override\n"
+      "  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override\n"
       "  {\n" 
-      "    switch( npcId )\n"
+      "    switch( entityId )\n"
       "    {\n" );
 
   for( auto enemy : enemy_strings )
@@ -406,7 +406,7 @@ createScript( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::
 
   if( !action_ids.empty() )
     actionEntry += std::string(
-      "  void onEObjHit( uint32_t npcId, Entity::Player& player, uint32_t actionId )\n"
+      "  void onEObjHit( World::Quest& quest, uint32_t npcId, Entity::Player& player, uint32_t actionId )\n"
       "  {\n" 
       "    switch( actionId )\n"
       "    {\n" );
