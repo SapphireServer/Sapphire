@@ -181,7 +181,10 @@ void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint1
 
 void Sapphire::Network::GameConnection::onDisconnect()
 {
-  Logger::debug( "[{0}] Disconnect", m_pSession->getId() );
+  if( m_pSession )
+    Logger::debug( "[{0}] Disconnect", m_pSession->getId() );
+  else
+    Logger::debug( "Disconnect of lost session." );
   m_pSession.reset();
 }
 

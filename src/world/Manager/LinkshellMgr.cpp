@@ -233,6 +233,7 @@ const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellM
 
   for( const auto &[ key, value ] : m_linkshellIdMap )
   {
+
     auto& memberList = value->getMemberIdList();
     auto& inviteList = value->getInviteIdList();
 
@@ -258,16 +259,16 @@ void LinkshellMgr::invitePlayer( Entity::Player& sourcePlayer, Entity::Player& i
 
   lsPtr->addInvite( invitedPlayer.getCharacterId() );
   writeLinkshell( lsPtr->getId() );
-  sendLinkshellList( invitedPlayer );
+  //sendLinkshellList( invitedPlayer );
 
-  auto linkshellInviteResult = makeLinkshellResult( invitedPlayer, 0, 0,
+  auto linkshellInviteResult = makeLinkshellResult( invitedPlayer, lsPtr->getId(), 0,
                                                     WorldPackets::Client::LinkshellJoin, 0,
                                                     LinkshellResultPacket::UpdateStatus::Target,
                                                     lsPtr->getName(), sourcePlayer.getName() );
 
   server.queueForPlayer( invitedPlayer.getCharacterId(), linkshellInviteResult );
 
-  auto linkshellInviteResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+  auto linkshellInviteResult1 = makeLinkshellResult( sourcePlayer, lsPtr->getId(), 0,
                                                      WorldPackets::Client::LinkshellJoin, 0,
                                                      LinkshellResultPacket::UpdateStatus::Execute,
                                                      lsPtr->getName(), invitedPlayer.getName() );
@@ -291,14 +292,14 @@ void LinkshellMgr::kickPlayer( Entity::Player& sourcePlayer, Entity::Player& kic
   writeLinkshell( lsPtr->getId() );
   sendLinkshellList( kickedPlayer );
 
-  auto linkshellKickResult = makeLinkshellResult( kickedPlayer, 0, 0,
+  auto linkshellKickResult = makeLinkshellResult( kickedPlayer, lsPtr->getId(), 0,
                                                     WorldPackets::Client::LinkshellKick, 0,
                                                     LinkshellResultPacket::UpdateStatus::Target,
                                                     lsPtr->getName(), sourcePlayer.getName() );
 
   server.queueForPlayer( kickedPlayer.getCharacterId(), linkshellKickResult );
 
-  auto linkshellKickResult1 = makeLinkshellResult( sourcePlayer, 0, 0,
+  auto linkshellKickResult1 = makeLinkshellResult( sourcePlayer, lsPtr->getId(), 0,
                                                      WorldPackets::Client::LinkshellKick, 0,
                                                      LinkshellResultPacket::UpdateStatus::Execute,
                                                      lsPtr->getName(), kickedPlayer.getName() );
