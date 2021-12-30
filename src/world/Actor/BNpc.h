@@ -39,6 +39,19 @@ namespace Sapphire::Entity
     Untargetable = 32,
   };
 
+  const std::array< uint32_t, 50 > BnpcBaseHp =
+          { 44,51, 59, 68, 91,
+            108, 126, 143, 160, 192,
+            217, 243, 268, 293, 319,
+            344, 369, 394, 420, 413,
+            458, 493, 532, 568, 594,
+            641, 677,714, 750, 780,
+            887, 965, 1055, 1142, 1220,
+            1306, 1409, 1515, 1587, 1601,
+            1703, 1789, 1872, 2008, 2112,
+            2180, 2314, 2383, 2501, 2589
+          };
+
   /*!
   \class BNpc
   \brief Base class for all BNpcs
@@ -54,6 +67,8 @@ namespace Sapphire::Entity
     BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone, uint32_t hp, Common::BNpcType type );
 
     virtual ~BNpc() override;
+
+    void init();
 
     void spawn( PlayerPtr pTarget ) override;
     void despawn( PlayerPtr pTarget ) override;

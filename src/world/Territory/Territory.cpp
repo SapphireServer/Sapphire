@@ -41,6 +41,7 @@
 
 #include "Manager/RNGMgr.h"
 #include "Manager/NaviMgr.h"
+#include "Math/CalcStats.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -833,6 +834,7 @@ void Sapphire::Territory::updateSpawnPoints()
     {
       auto& server = Common::Service< World::WorldServer >::ref();
       auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), spawn.infoPtr, shared_from_this() );
+      pBNpc->init();
       spawn.bnpcPtr = pBNpc;
 
       pushActor( pBNpc );

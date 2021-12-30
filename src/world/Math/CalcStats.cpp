@@ -151,6 +151,36 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
   return result;
 }
 
+uint32_t CalcStats::calculateMaxHp( Chara& chara )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
+  // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
+  // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
+
+  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( chara.getLevel() );
+
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
+
+  uint8_t level = chara.getLevel();
+
+  auto vitMod = chara.getBonusStat( Common::BaseParam::Vitality );
+  float baseStat = calculateBaseStat( chara );
+  uint16_t vitStat = static_cast< uint16_t >( chara.getStatValue( Common::BaseParam::Vitality ) ) + static_cast< uint16_t >( vitMod );
+  uint16_t hpMod = paramGrowthInfo->data().ParamBase;
+  uint16_t jobModHp = classInfo->data().Hp;
+  float approxBaseHp = 0.0f; // Read above
+
+  approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
+
+  uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+                                             floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+
+  return result;
+}
+
 uint32_t CalcStats::calculateMaxMp( Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -311,7 +341,8 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
   }
 
   // factors in f(PTC) in order to not lose precision
-  return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
+  //return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
+  return std::floor( aaPotency / 100.f );
 }
 
 float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
@@ -498,7 +529,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  auto innerCalc = std::floor( ( mainVal * primaryStatValue( chara ) / 1000.f ) + weaponDamage );
+  auto innerCalc = std::floor( ( mainVal * static_cast< float >( primaryStatValue( chara ) ) / 1000.f ) + weaponDamage );
 
   return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
 }
@@ -518,12 +549,9 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
 
-  auto ten = 1.f;
-  if( chara.getRole() == Common::Role::Tank )
-    ten = tenacity( chara );
 
   // todo: everything after tenacity
-  auto factor = std::floor( pot * aa * ap * det * ten );
+  auto factor = std::floor( pot * aa * ap * det );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   // todo: traits
@@ -552,14 +580,14 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
-    PlayerMgr::sendDebug( *player, format, pot, aa, ap, det, ten, factor );
+    PlayerMgr::sendDebug( *player, format, pot, aa, ap, det, 1, factor );
   }
   else
   {
   //  Logger::debug( format, pot, aa, ap, det, ten, factor );
   }
 
-  return std::pair( factor, hitType );
+  return std::pair( factor * 3, hitType );
 }
 
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )

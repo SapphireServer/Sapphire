@@ -16,6 +16,7 @@ namespace Sapphire::Math
     static float calculateBaseStat( const Entity::Chara& chara );
 
     static uint32_t calculateMaxHp( Sapphire::Entity::Player& player );
+    static uint32_t calculateMaxHp( Sapphire::Entity::Chara& chara );
 
     static uint32_t calculateMaxMp( Sapphire::Entity::Player& player );
 

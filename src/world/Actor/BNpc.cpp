@@ -95,7 +95,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_modelChara = bNpcBaseData->data().Model;
   m_enemyType = bNpcBaseData->data().Battalion;
 
-  m_class = ClassJob::Adventurer;
+  m_class = ClassJob::Gladiator;
 
   m_pCurrentTerritory = std::move( pZone );
 
@@ -108,6 +108,9 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_maxMp = 200;
   m_hp = m_maxHp;
   m_mp = 200;
+
+  if( m_level <= BnpcBaseHp.size() )
+    m_maxHp = BnpcBaseHp[ m_level - 1 ];
 
   m_state = BNpcState::Idle;
   m_status = ActorStatus::Idle;
@@ -153,6 +156,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_naviTargetReachedDistance = 4.f;
 
   calculateStats();
+
+
 }
 
 Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone, uint32_t hp, Common::BNpcType type ) :
@@ -198,7 +203,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_modelChara = bNpcBaseData->data().Model;
   m_enemyType = bNpcBaseData->data().Battalion;
 
-  m_class = ClassJob::Adventurer;
+  m_class = ClassJob::Gladiator;
 
   m_pCurrentTerritory = std::move( pZone );
 
@@ -961,4 +966,11 @@ BNpcType Sapphire::Entity::BNpc::getBNpcType() const
 uint32_t Sapphire::Entity::BNpc::getLayoutId() const
 {
   return m_layoutId;
+}
+
+void Sapphire::Entity::BNpc::init()
+{
+  m_maxHp = Sapphire::Math::CalcStats::calculateMaxHp( *getAsChara() );
+  m_hp = m_maxHp;
+  max_hp = m_maxHp;
 }
