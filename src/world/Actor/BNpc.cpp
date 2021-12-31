@@ -161,6 +161,10 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   calculateStats();
 
+  if( m_bnpcType == BNpcType::Friendly )
+    m_maxHp *= 5;
+
+  max_hp = m_maxHp;
 
 }
 
@@ -667,7 +671,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
         auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
                                         pHatedActor->getPos().x, pHatedActor->getPos().y, pHatedActor->getPos().z );
 
-        if( !hasFlag( NoDeaggro ) && ( distanceOrig > maxDistanceToOrigin ) )
+        if( !hasFlag( NoDeaggro ) && ( ( distanceOrig > maxDistanceToOrigin ) || distance > 30.0f ) )
         {
           hateListClear();
           changeTarget( INVALID_GAME_OBJECT_ID64 );
