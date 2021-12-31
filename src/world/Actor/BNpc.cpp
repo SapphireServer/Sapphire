@@ -83,6 +83,10 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
     setFlag( Immobile );
 
+  // Striking Dummy
+  if( pInfo->NameId == 541 )
+    m_invincibilityType = Common::InvincibilityRefill;
+
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   auto bNpcBaseData = exdData.getRow< Component::Excel::BNpcBase >( m_bNpcBaseId );
@@ -883,7 +887,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     srand( static_cast< uint32_t >( tick ) );
 
     auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-    damage.first = 1;
+    //damage.first = 1;
 
     auto effectPacket = std::make_shared< EffectPacket >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
