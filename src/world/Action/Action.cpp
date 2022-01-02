@@ -4,6 +4,7 @@
 
 #include <Exd/ExdData.h>
 #include <Util/Util.h>
+#include <Util/UtilMath.h>
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -682,6 +683,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
   switch( m_primaryCostType )
   {
     case Common::ActionPrimaryCostType::TacticsPoints:
+    case Common::ActionPrimaryCostType::TacticsPoints1:
     {
       auto curTp = m_pSource->getTp();
 
@@ -716,7 +718,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     }
 
     default:
-      Logger::debug( "Unknown action cost type: {}", m_primaryCostType );
+      Logger::debug( "Unknown action cost type: {}", static_cast< uint16_t >( m_primaryCostType ) );
       return false;
   }
 }

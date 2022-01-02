@@ -94,6 +94,8 @@ namespace Sapphire::Entity
     /*! Event called on every session iteration */
     void update( uint64_t tickCount ) override;
 
+    void setLastAttack( uint64_t tickCount );
+
     // Quest
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! load data for currently active quests */

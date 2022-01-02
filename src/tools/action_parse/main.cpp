@@ -9,7 +9,8 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
+#include <Exd/Structs.h>
 #include <Logging/Logger.h>
 #include <Common.h>
 
@@ -19,13 +20,12 @@
 
 #include <filesystem>
 
-Sapphire::Data::ExdDataGenerated g_exdData;
-
 namespace fs = std::filesystem;
 
 using namespace Sapphire;
+Sapphire::Data::ExdData g_exdDataGen;
 
-std::string datLocation( "/home/mordred/sqpack" );
+std::string datLocation( "F:\\client3.0\\game\\sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
 struct ActionEntry
@@ -83,12 +83,12 @@ int main( int argc, char* argv[] )
   }
 
   Logger::info( "Setting up EXD data" );
-  if( !g_exdData.init( datLocation ) )
+  if( !g_exdDataGen.init( datLocation ) )
   {
     Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
-  auto idList = g_exdData.getActionIdList();
+  auto idList = g_exdDataGen.getIdList< Component::Excel::Action >();
 
   std::map< uint32_t, ActionEntry > actions;
 
@@ -101,25 +101,31 @@ int main( int argc, char* argv[] )
     if( cursor % 50 == 0 && cursor > 0 )
       Logger::info( "Processing {} actions of {} ({:.2f}%)", cursor, total, done );
 
-    auto action = g_exdData.get< Sapphire::Data::Action >( id );
-    auto actionTransient = g_exdData.get< Sapphire::Data::ActionTransient >( id );
+    auto action = g_exdDataGen.getRow< Component::Excel::Action >( id );
+
+    //auto actionTransient = g_exdData.get< Sapphire::Data::ActionTransient >( id );
     if( action )
     {
-      if( action->classJob == -1 || action->name.empty() )
+      auto& actionData = action->data();
+
+      if( actionData.UseClassJob == -1 || action->getString( actionData.Text.Name ).empty() )
         continue;
 
-      if( action->isPvP )
-        continue;
+      //if( actionData.PvPOnly )
+      //  continue;
 
-      auto classJob = g_exdData.get< Sapphire::Data::ClassJob >( action->classJob );
-      if( !classJob )
-        continue;
+   //   auto classJob = g_exdDataGen.getRow< Component::Excel::ClassJob >( actionData.UseClassJob );
+   //   if( !classJob )
+   //     continue;
 
       // exclude dol/doh
-      if( classJob->classJobCategory == 32 || classJob->classJobCategory == 33 )
-        continue;
+    //  if( classJob->data().CraftingClassIndex > 0 )
+    //    continue;
 
-      auto ac = static_cast< Common::ActionCategory >( action->actionCategory );
+    if( id == 75 )
+      int test = 1;
+
+      auto ac = static_cast< Common::ActionCategory >( actionData.Category );
       if( ac != Common::ActionCategory::Ability &&
           ac != Common::ActionCategory::Autoattack &&
           ac != Common::ActionCategory::Spell &&
@@ -129,11 +135,11 @@ int main( int argc, char* argv[] )
 
       ActionEntry entry{};
 
-      entry.name = action->name;
+      entry.name = action->getString( actionData.Text.Name );
       entry.id = id;
 
-      Logger::info( "  {0} - {1}", id, action->name );
-      std::string desc = actionTransient->description;
+      Logger::info( "  {0} - {1}", id, action->getString( actionData.Text.Name ) );
+      std::string desc = action->getString( actionData.Text.Help );
       stripUnicode( desc );
       desc = std::regex_replace( desc, std::regex( "HI" ), "\n" );
       desc = std::regex_replace( desc, std::regex( "IH" ), "" );

@@ -1173,6 +1173,11 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   Chara::update( tickCount );
 }
 
+void Sapphire::Entity::Player::setLastAttack( uint64_t tickCount )
+{
+  m_lastAttack = tickCount;
+}
+
 void Sapphire::Entity::Player::freePlayerSpawnId( uint32_t actorId )
 {
   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
@@ -1506,12 +1511,12 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
     effectPacket->setAnimationId( 8 );
-    entry.Arg2 = 0x72;
+    //entry.Arg2 = 0x72;
   }
   else
   {
     effectPacket->setAnimationId( 7 );
-    entry.Arg2 = 0x73;
+    //entry.Arg2 = 0x73;
   }
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );

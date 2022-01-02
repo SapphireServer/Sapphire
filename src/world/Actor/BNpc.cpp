@@ -899,7 +899,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     effectEntry.Value = static_cast< int16_t >( damage.first );
     effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
     effectEntry.Arg0 = static_cast< uint8_t >( damage.second );
-    effectEntry.Arg2 = 0x71;
+    //effectEntry.Arg2 = 0x71;
     effectPacket->addEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
 
     sendToInRangeSet( effectPacket );

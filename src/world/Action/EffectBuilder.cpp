@@ -126,6 +126,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     uint64_t* pEffectTargetId;
     
     effectResult->data().ActionKey = m_actionId;
+    effectResult->data().ActionKind = 1;
     effectResult->data().Action = static_cast< uint16_t >( m_actionId );
     effectResult->data().MainTarget = m_sourceChara->getId();
     effectResult->data().DirTarget = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );

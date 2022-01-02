@@ -20,7 +20,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Flag = 0;
       m_data.ActionKey = actionId;
       m_data.Action = static_cast< uint16_t >( actionId );
+      m_data.ActionKind = 1;
 
+      m_data.LockTime = 0.6f;
       m_data.MainTarget = static_cast< uint64_t >( targetId );
 
       m_data.ActionArg = Common::ActionEffectDisplayType::ShowActionName;

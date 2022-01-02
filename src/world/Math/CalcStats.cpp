@@ -587,7 +587,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   //  Logger::debug( format, pot, aa, ap, det, ten, factor );
   }
 
-  return std::pair( factor * 3, hitType );
+  return std::pair( factor, hitType );
 }
 
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )

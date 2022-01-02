@@ -134,6 +134,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
 
     // todo: what do in cases of swiftcast/etc? script callback?
     currentAction->start();
+    player.setLastAttack( Common::Util::getTimeMs() );
   }
 }
 
