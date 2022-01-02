@@ -314,7 +314,7 @@ float CalcStats::criticalHitProbability( const Chara& chara )
 
 float CalcStats::potency( uint16_t potency )
 {
-  return potency / 100.f;
+  return static_cast< float >( potency ) / 100.f;
 }
 
 float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
@@ -342,7 +342,7 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
 
   // factors in f(PTC) in order to not lose precision
   //return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
-  return std::floor( aaPotency / 100.f );
+  return aaPotency / 100.f;
 }
 
 float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
@@ -352,30 +352,54 @@ float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weapo
 
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  uint32_t jobAttribute = 1;
+  uint32_t jobMod = 1;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
+
+  if( !classInfo )
+    return 0.f;
 
   switch( chara.getPrimaryStat() )
   {
     case Common::BaseParam::Intelligence:
     {
-      // todo: wtf did i do here??? healing magic potency/ why ythr fuc?
-      jobAttribute = chara.getStatValue( Common::BaseParam::HealingMagicPotency );
+      jobMod = classInfo->data().INT_;
       break;
     }
     case Common::BaseParam::Mind:
     {
-      jobAttribute = chara.getStatValue( Common::BaseParam::AttackMagicPotency );;
+      jobMod = classInfo->data().MND;
       break;
     }
-
+    case Common::BaseParam::Strength:
+    {
+      jobMod = classInfo->data().STR;
+      break;
+    }
+    case Common::BaseParam::Dexterity:
+    {
+      jobMod = classInfo->data().DEX;
+      break;
+    }
+    case Common::BaseParam::Vitality:
+    {
+      jobMod = classInfo->data().VIT;
+      break;
+    }
+    case Common::BaseParam::Piety:
+    {
+      jobMod = classInfo->data().PIE;
+      break;
+    }
     default:
     {
-      jobAttribute = chara.getStatValue( Common::BaseParam::AttackPower );
+      jobMod = 100;
       break;
     }
   }
 
-  return std::floor( ( ( mainVal * jobAttribute ) / 1000.f ) + weaponDamage );
+  return ( std::floor( mainVal * jobMod / 1000.f ) + weaponDamage );
 }
 
 float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower )
@@ -510,7 +534,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
 {
   // todo: default values for NPCs, not sure what we should have here
   float autoAttackDelay = 2.f;
-  float weaponDamage = 10.f;
+  float dmg = 10.f;
 
   // fetch actual auto attack delay if its a player
   if( chara.isPlayer() )
@@ -523,13 +547,13 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
     assert( pItem );
 
     autoAttackDelay = pItem->getDelay() / 1000.f;
-    weaponDamage = pItem->getWeaponDmg();
+    dmg = pItem->getWeaponDmg();
   }
 
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  auto innerCalc = std::floor( ( mainVal * static_cast< float >( primaryStatValue( chara ) ) / 1000.f ) + weaponDamage );
+  auto innerCalc = weaponDamage( chara, dmg );
 
   return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
 }
