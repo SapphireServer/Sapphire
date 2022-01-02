@@ -716,6 +716,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     }
 
     default:
+      Logger::debug( "Unknown action cost type: {}", m_primaryCostType );
       return false;
   }
 }

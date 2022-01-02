@@ -784,7 +784,7 @@ namespace Sapphire::Common
   {
     None = 0, // ?
     MagicPoints = 3,
-    TacticsPoints = 5,
+    TacticsPoints = 6,
 //    WARGauge = 22,
 //    DRKGauge = 25,
 //    AetherflowStack = 30,
