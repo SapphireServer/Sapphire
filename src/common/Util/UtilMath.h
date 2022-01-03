@@ -21,6 +21,8 @@ namespace Sapphire::Common::Util
 
   float calcAngFrom( float x, float y, float x1, float y1 );
 
+  float trunc( float value, uint8_t digitsToRemain );
+
   uint16_t floatToUInt16( float val );
 
   uint16_t floatToUInt16Rot( float val );

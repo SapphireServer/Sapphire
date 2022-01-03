@@ -7,6 +7,7 @@
 
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
+#include "Util/UtilMath.h"
 
 #include "Inventory/Item.h"
 
@@ -408,8 +409,7 @@ float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  // todo: not sure if its ( ap - mv ) / mv or ( ap - mv ) / dv
-  return std::floor( ( 125.f * ( attackPower - mainVal ) / divVal ) + 100.f ) / 100.f;
+  return Common::Util::trunc( static_cast< float >( attackPower ) / divVal + ( 1.0f - mainVal / divVal ), 2 );
 }
 
 float CalcStats::getPrimaryAttackPower( const Sapphire::Entity::Chara& chara )
@@ -456,7 +456,7 @@ float CalcStats::determination( const Sapphire::Entity::Chara& chara )
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 130.f * ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal + 1000.f ) / 1000.f;
+  return Common::Util::trunc( 1.0f + ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal, 3 );
 }
 
 float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
@@ -575,7 +575,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
 
   // todo: everything after tenacity
-  auto factor = std::floor( pot * aa * ap * det );
+  auto factor = Common::Util::trunc( pot * aa * ap * det, 0 );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   // todo: traits
@@ -624,11 +624,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
 
-  auto ten = 1.f;
-  if( chara.getRole() == Common::Role::Tank )
-    ten = tenacity( chara );
-
-  auto factor = std::floor( pot * wd * ap * det * ten );
+  auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   if( criticalHitProbability( chara ) > range100( rng ) )
@@ -649,15 +645,15 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 
   // todo: buffs
 
-  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {}  = {}";
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
-    PlayerMgr::sendDebug( *player, format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+    PlayerMgr::sendDebug( *player, format, pot, ptc, wd, wepDmg, ap, det, factor );
   }
   else
   {
-    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, factor );
   }
 
   return std::pair( factor, hitType );
