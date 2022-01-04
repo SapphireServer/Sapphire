@@ -67,12 +67,12 @@ float Util::calcAngFrom( float x, float y, float x1, float y1 )
 
 uint16_t Util::floatToUInt16( float val )
 {
-  return static_cast< uint16_t >( ( ( val + 1000.0f ) * 100.0f) * 0.32767501f );
+  return static_cast< uint16_t >( ( ( val + 1000.0f ) * 100.0f ) * 0.32767501f );
 }
 
 uint16_t Util::floatToUInt16Rot( float val )
 {
-  return static_cast< uint16_t >( ( ( ( val + 3.1415927f ) * 100.f) * 103.30219106f ) );
+  return static_cast< uint16_t >( ( ( ( val + 3.1415927f ) * 100.f ) * 103.30219106f ) );
 }
 
 uint8_t Util::floatToUInt8Rot( float val )

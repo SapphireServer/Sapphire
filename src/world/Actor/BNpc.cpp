@@ -150,14 +150,15 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   auto modelChara = exdData.getRow< Component::Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.getRow< Component::Excel::ModelSkeleton >( modelChara->data().ModelType );
+    auto modelSkeleton = exdData.getRow< Component::Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
+    {
       m_radius *= modelSkeleton->data().Radius;
+    }
   }
 
   // todo: is this actually good?
-  //m_naviTargetReachedDistance = m_scale * 2.f;
-  m_naviTargetReachedDistance = 4.f;
+  m_naviTargetReachedDistance = m_radius * 2;
 
   calculateStats();
 
@@ -267,8 +268,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   }
 
   // todo: is this actually good?
-  //m_naviTargetReachedDistance = m_scale * 2.f;
-  m_naviTargetReachedDistance = 4.f;
+  m_naviTargetReachedDistance = m_radius;
 
   calculateStats();
 }
@@ -362,7 +362,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, pos ) < getRadius() + 3.f )
+  if( Util::distance( pos1, pos ) < getNaviTargetReachedDistance() )
   {
     // Reached destination
     face( pos );
@@ -386,26 +386,25 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 
   if( !pNaviProvider )
   {
-    Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentTerritory->getGuId(),
-                   m_pCurrentTerritory->getInternalName() );
+    Logger::error( "No NaviProvider for zone#{0} - {1}", m_pCurrentTerritory->getGuId(), m_pCurrentTerritory->getInternalName() );
     return false;
   }
 
   auto pos1 = pNaviProvider->getMovePos( *this );
 
-  if( Util::distance( pos1, targetChara.getPos() ) <= ( getRadius() + targetChara.getRadius() ) + 3.f )
+  if( Util::distance( pos1, targetChara.getPos() ) <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
   {
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
     sendPositionUpdate();
+    pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
     return true;
   }
 
   m_pCurrentTerritory->updateActorPosition( *this );
-  face( targetChara.getPos() );
+  face( { ( pos1.x - getPos().x ) + pos1.x, 1, (pos1.z - getPos().z ) + pos1.z } );
   setPos( pos1 );
   sendPositionUpdate();
   return false;
@@ -654,17 +653,13 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
       pNaviProvider->updateAgentParameters( *this );
 
-      auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
-                                          m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
+      auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z, m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
 
       if( pHatedActor && !pHatedActor->isAlive() )
       {
         hateListRemove( pHatedActor );
         pHatedActor = hateListGetHighest();
       }
-
-      if( pNaviProvider->syncPosToChara( *this ) )
-        sendPositionUpdate();
 
       if( pHatedActor )
       {
@@ -681,7 +676,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           break;
         }
 
-        if( distance > ( getRadius() + pHatedActor->getRadius() ) )
+        if( distance > ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
         {
           if( hasFlag( Immobile ) )
             break;
@@ -692,7 +687,10 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
           moveTo( *pHatedActor );
         }
 
-        if( distance < ( getRadius() + pHatedActor->getRadius() + 3.f ) )
+        if( pNaviProvider->syncPosToChara( *this ) )
+          sendPositionUpdate();
+
+        if( distance < ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
         {
           if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
             sendPositionUpdate();

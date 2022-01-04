@@ -56,13 +56,12 @@ namespace Sapphire::World::Navi
     static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
 
     void setMoveTarget( Entity::Chara& chara, const Common::FFXIVARR_POSITION3& endPos );
+    void resetMoveTarget( Entity::Chara& chara );
 
     Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
 
     bool isAgentActive( Entity::Chara& chara ) const;
     bool hasTargetState( Entity::Chara& chara ) const;
-
-    void resetMoveTarget( Entity::Chara& chara );
 
     void updateAgentPosition( Entity::Chara& chara );
 

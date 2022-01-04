@@ -24,9 +24,9 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
   m_internalName( internalName )
 {
   // Set defaults
-  m_polyFindRange[ 0 ] = 10;
+  m_polyFindRange[ 0 ] = 20;
   m_polyFindRange[ 1 ] = 20;
-  m_polyFindRange[ 2 ] = 10;
+  m_polyFindRange[ 2 ] = 20;
 }
 
 bool Sapphire::World::Navi::NaviProvider::init()
@@ -355,7 +355,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
     //               iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
-    const float STEP_SIZE = 1.2f;
+    const float STEP_SIZE = 0.5f;
     const float SLOP = 0.15f;
 
     int32_t numSmoothPath = 0;
@@ -620,6 +620,11 @@ void Sapphire::World::Navi::NaviProvider::calcVel( float* vel, const float* pos,
   dtVscale( vel, vel, speed );
 }
 
+void Sapphire::World::Navi::NaviProvider::resetMoveTarget( Entity::Chara& chara )
+{
+  m_pCrowd->resetMoveTarget( chara.getAgentId() );
+}
+
 void Sapphire::World::Navi::NaviProvider::setMoveTarget( Entity::Chara& chara,
                                                          const Sapphire::Common::FFXIVARR_POSITION3& endPos )
 {
@@ -669,11 +674,6 @@ bool Sapphire::World::Navi::NaviProvider::hasTargetState( Entity::Chara& chara )
 {
   const dtCrowdAgent* ag = m_pCrowd->getAgent( chara.getAgentId() );
   return ag->targetState != DT_CROWDAGENT_TARGET_NONE;
-}
-
-void Sapphire::World::Navi::NaviProvider::resetMoveTarget( Entity::Chara& chara )
-{
-  m_pCrowd->resetMoveTarget( chara.getAgentId() );
 }
 
 void Sapphire::World::Navi::NaviProvider::updateAgentPosition( Entity::Chara& chara )
