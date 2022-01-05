@@ -2153,6 +2153,64 @@ Sapphire::Entity::Player::FriendListIDVec& Sapphire::Entity::Player::getBlacklis
   return m_blacklist;
 }
 
+void Sapphire::Entity::Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool ignoreDamage )
+{
+  bool isFalling = m_falling;
+  auto initialPos = m_initialFallPos;
+
+  // update internal values - only use scoped values for old state
+  m_falling = state;
+  m_initialFallPos = pos;
+
+  if( ignoreDamage )
+    return;
+
+  // if the player is currently falling and new state is grounded - calc and apply fall dmg
+  if( isFalling && !state )
+  {
+    // calc height difference
+    auto fallHeight = initialPos.y - pos.y;
+
+    // if we've hit the breakpoint in fall damage (min: 10y)
+    if( fallHeight >= 10.f )
+    {
+      // calculate how much damage to deal out (max. 20y : 100%)
+      float deltaMax = std::min( fallHeight, 20.f );
+
+      // get hp percentage starting from 0.1, increasing to 100% at max height
+      float hpPer = std::min( 0.1f + ( deltaMax - 10.f ) / 10.f, 1.f );
+
+      uint32_t damage = getMaxHp() * hpPer;
+
+      // check if player has aggro - if not, player should "live"
+      if( m_actorIdTohateSlotMap.empty() )
+      {
+        // "trick" client into thinking we took more damage than internally passed to takeDamage, if > playerHp
+        uint32_t surviveDamage = damage;
+
+        if( surviveDamage >= getHp() )
+        {
+          surviveDamage = ( getHp() - 1 );
+        }
+
+        takeDamage( surviveDamage );
+      }
+      else
+      {
+        // no mercy on hated players
+        takeDamage( damage );
+      }
+
+      sendToInRangeSet( makeActorControl( getId(), DmgTakenMsg, damage ), true );
+    }
+  }
+}
+
+bool Sapphire::Entity::Player::isFalling() const
+{
+  return m_falling;
+}
+
 void Sapphire::Entity::Player::setLastPcSearchResult( std::vector< uint32_t > result )
 {
   m_lastPcSearch = std::move( result );
