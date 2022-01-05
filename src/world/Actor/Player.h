@@ -821,7 +821,9 @@ namespace Sapphire::Entity
 
     uint64_t m_lastMoveTime{};
     uint8_t m_lastMoveflag{};
-    bool m_falling;
+
+    void setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool ignoreDamage = false );
+    bool isFalling() const;
 
     // todo: sort this requestkey pcsearch mess
     void setLastPcSearchResult( std::vector< uint32_t > result );
@@ -843,6 +845,10 @@ namespace Sapphire::Entity
     uint64_t m_characterId; // This id will be the name of the folder for character settings in "My Games"
 
     uint8_t m_mode{};
+
+    // falling logic
+    bool m_falling;
+    Common::FFXIVARR_POSITION3 m_initialFallPos{};
 
     bool m_markedForRemoval;
 

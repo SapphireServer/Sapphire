@@ -232,13 +232,10 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
   if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
     player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
 
-  // if no one is in range, don't bother trying to send a position update
-  if( !player.hasInRangeActor() )
-    return;
-
   auto clientAnimationType = data.flag;
   auto animationState = data.flag;
   auto animationType = data.flag2;
+  auto animColType = data.flag2;
   auto headRotation = data.flag_unshared;
   uint8_t orgAnimationType = animationType;
   uint8_t unknownRotation = 0;
@@ -262,33 +259,41 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
   }
   if( animationType & MoveType::Jumping )
   {
-    if( animationState == MoveState::LeaveCollision )
+
+    if( animColType == MoveState::LeaveCollision )
     {
       if( orgAnimationType & clientAnimationType )
         animationType += 0x10;
       else
         animationType += 0x04;
     }
-    if( animationState == MoveState::StartFalling )
-      player.m_falling = true;
-    if( animationState == MoveState::EnterCollision )
+
+    if( animColType == MoveState::LeaveCollision || animColType == MoveState::StartFalling )
     {
-      animationType = 2;
-      player.m_falling = false;
+      player.setFalling( true, { data.pos.x, data.pos.y, data.pos.z } );
     }
   }
 
-  if( player.m_falling )
+  if( animColType == MoveState::EnterCollision )
+  {
+    animationType = 2;
+    player.setFalling( false, { data.pos.x, data.pos.y, data.pos.z } );
+  }
+
+  if( player.isFalling() )
   {
     animationType += 0x10;
     unknownRotation = 0x7F;
   }
 
-
   uint64_t currentTime = Util::getTimeMs();
 
   player.m_lastMoveTime = currentTime;
   player.m_lastMoveflag = animationType;
+
+  // if no one is in range, don't bother trying to send a position update
+  if( !player.hasInRangeActor() )
+    return;
 
   //auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unknownRotation );
   auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, data.flag, data.flag2, animationSpeed, unknownRotation );
