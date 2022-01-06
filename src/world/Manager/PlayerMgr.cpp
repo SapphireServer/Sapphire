@@ -279,11 +279,11 @@ void PlayerMgr::onHateListChanged( Sapphire::Entity::Player& player )
   for( int32_t i = 0; it != actorIdToHateSlotMap.end(); ++it, i++ )
   {
     // TODO: get actual hate values for these
-    hateListPacket->data().List[ i ].Id = it->first;
-    hateListPacket->data().List[ i ].Value = 100;
+    hateListPacket->data().List[ i ].Id = player.getId();
+    hateListPacket->data().List[ i ].Value = 6;
 
     hateRankPacket->data().List[ i ].Id = it->first;
-    hateRankPacket->data().List[ i ].Rate = 1;
+    hateRankPacket->data().List[ i ].Rate = 100;
   }
 
   server.queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );

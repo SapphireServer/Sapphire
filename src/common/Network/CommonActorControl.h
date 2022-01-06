@@ -186,6 +186,7 @@ namespace Sapphire::Network::ActorControl
 
     RelicInfuseMsg = 0x179,
 
+
     /*!
      * Sent as result of an aetherial reduction.
      * param1 = Reduced item ID + 500 000 (idk what this 500 000 is but it's always here no matter what)
@@ -206,6 +207,7 @@ namespace Sapphire::Network::ActorControl
 
     SetTitle = 0x1F4,
 
+    SetHateLetter = 0x1F7,
     SetStatusIcon = 0x1F8,
     LimitBreakGauge = 0x1F9, // Max level, amount, build type (chop sound), lb type(0=pve lb 1=pvp lb)
     SetHomepoint = 0x1FB,

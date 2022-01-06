@@ -5,6 +5,7 @@
 #include <utility>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Network/PacketWrappers/EffectPacket1.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
 
@@ -361,8 +362,9 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   }
 
   auto pos1 = pNaviProvider->getMovePos( *this );
+  auto distance = Util::distance( pos1, pos );
 
-  if( Util::distance( pos1, pos ) < getNaviTargetReachedDistance() )
+  if( distance < getNaviTargetReachedDistance() )
   {
     // Reached destination
     face( pos );
@@ -374,6 +376,10 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 
   m_pCurrentTerritory->updateActorPosition( *this );
   face( pos );
+  if( distance > 2.0f )
+    face( { ( pos.x - pos1.x ) + pos.x, 1.0f, ( pos.z - pos1.z ) + pos.z } );
+  else
+    face( pos );
   setPos( pos1 );
   sendPositionUpdate();
   return false;
@@ -391,8 +397,9 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
   }
 
   auto pos1 = pNaviProvider->getMovePos( *this );
+  auto distance = Util::distance( pos1, targetChara.getPos() );
 
-  if( Util::distance( pos1, targetChara.getPos() ) <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
+  if( distance <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
   {
     // Reached destination
     face( targetChara.getPos() );
@@ -404,7 +411,10 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
   }
 
   m_pCurrentTerritory->updateActorPosition( *this );
-  face( { ( pos1.x - getPos().x ) + pos1.x, 1, (pos1.z - getPos().z ) + pos1.z } );
+  if( distance > 2.0f )
+    face( { ( pos1.x - getPos().x ) + pos1.x, 1.0f, ( pos1.z - getPos().z ) + pos1.z } );
+  else
+    face( targetChara.getPos() );
   setPos( pos1 );
   sendPositionUpdate();
   return false;
@@ -520,12 +530,12 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   m_lastAttack = Util::getTimeMs() + variation;
   hateListUpdate( pChara, 1 );
 
-  changeTarget( pChara->getId() );
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
   sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetBattle, 1, 0, 0 ) );
+
+  changeTarget( pChara->getId() );
 
   if( pChara->isPlayer() )
   {
@@ -854,6 +864,14 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
     setOwnerPacket->data().Id = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
     sendToInRangeSet( setOwnerPacket );
   }
+
+  if( m_pChara != nullptr && m_pChara->isPlayer() )
+  {
+    auto letter = makeActorControl( getId(), ActorControlType::SetHateLetter, 1, getId(), 0 );
+    auto& server = Common::Service< World::WorldServer >::ref();
+    server.queueForPlayer( m_pChara->getAsPlayer()->getCharacterId(), letter );
+  }
+
 }
 
 void Sapphire::Entity::BNpc::setLevelId( uint32_t levelId )
@@ -891,13 +909,16 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
     //damage.first = 1;
 
-    auto effectPacket = std::make_shared< EffectPacket >( getId(), pTarget->getId(), 7 );
+    auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
     Common::CalcResultParam effectEntry{};
     effectEntry.Value = static_cast< int16_t >( damage.first );
     effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-    effectEntry.Arg0 = static_cast< uint8_t >( damage.second );
+    effectEntry.Flag = 128;
+    effectEntry.Arg0 = 3;
+    effectEntry.Arg1 = 7;
     //effectEntry.Arg2 = 0x71;
+    effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
     effectPacket->addEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
 
     sendToInRangeSet( effectPacket );

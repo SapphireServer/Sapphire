@@ -4,6 +4,7 @@
 #include <Actor/Player.h>
 
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Network/PacketWrappers/EffectPacket1.h>
 
 #include <Territory/Territory.h>
 
@@ -171,7 +172,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
 
     auto seq = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
-    auto effectPacket = std::make_shared< EffectPacket >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
+    auto effectPacket = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setSequence( seq, m_sequence );
 

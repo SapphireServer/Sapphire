@@ -35,6 +35,7 @@
 
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/PacketWrappers/EffectPacket.h"
+#include "Network/PacketWrappers/EffectPacket1.h"
 #include "Network/PacketWrappers/InitZonePacket.h"
 #include "Network/PacketWrappers/WarpPacket.h"
 
@@ -1500,24 +1501,28 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
-  auto effectPacket = std::make_shared< EffectPacket >( getId(), pTarget->getId(), 8 );
+  auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
 
   Common::CalcResultParam entry{};
 
   entry.Value = static_cast< int16_t >( damage.first );
   entry.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-  entry.Arg0 = static_cast< uint8_t >( damage.second );
+  entry.Arg0 = 2;
+  entry.Arg1 = 7;
+  entry.Flag = 128;
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
-    effectPacket->setAnimationId( 8 );
+   // effectPacket->setAnimationId( 8 );
     //entry.Arg2 = 0x72;
   }
   else
   {
-    effectPacket->setAnimationId( 7 );
+    //effectPacket->setAnimationId( 7 );
     //entry.Arg2 = 0x73;
   }
+
+  effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addEffect( entry, static_cast< uint64_t >( pTarget->getId() ) );
@@ -2175,10 +2180,10 @@ void Sapphire::Entity::Player::setFalling( bool state, const Common::FFXIVARR_PO
     if( fallHeight >= 10.f )
     {
       // calculate how much damage to deal out (max. 20y : 100%)
-      float deltaMax = std::min( fallHeight, 20.f );
+      float deltaMax = std::min( fallHeight, 30.f );
 
       // get hp percentage starting from 0.1, increasing to 100% at max height
-      float hpPer = std::min( 0.1f + ( deltaMax - 10.f ) / 10.f, 1.f );
+      float hpPer = std::min( 0.1f + ( deltaMax - 10.f ) / 20.f, 1.f );
 
       uint32_t damage = getMaxHp() * hpPer;
 

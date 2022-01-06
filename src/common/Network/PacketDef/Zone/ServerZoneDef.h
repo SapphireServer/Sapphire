@@ -645,7 +645,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint16_t DirTarget;
     uint64_t Target;
     uint32_t BallistaEntityId;
-    Common::CalcResult CalcResult[1];
+    Common::CalcResult CalcResult;
   };
 
   struct MountStruct

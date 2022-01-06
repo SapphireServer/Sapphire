@@ -324,7 +324,7 @@ void Sapphire::Entity::Chara::setStance( Stance stance )
 {
   m_currentStance = stance;
 
-  FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 0 );
+  FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 1 );
   sendToInRangeSet( packet );
 }
 
