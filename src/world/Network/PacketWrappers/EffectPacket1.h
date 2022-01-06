@@ -12,6 +12,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
   class EffectPacket1 : public ZoneChannelPacket< FFXIVIpcActionResult1 >
   {
+  private:
+    uint8_t m_targetEffectCount{0};
+    uint8_t m_sourceEffectCount{0};
   public:
     EffectPacket1( uint64_t sourceId, uint32_t targetId, uint32_t actionId ) :
       ZoneChannelPacket< FFXIVIpcActionResult1 >( static_cast< uint32_t >( sourceId ), targetId )
@@ -31,9 +34,14 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       std::memset( &m_data.CalcResult, 0, sizeof( Common::CalcResult ) );
     }
 
-    void addEffect( const Common::CalcResultParam& effect, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 )
+    void addTargetEffect( const Common::CalcResultParam& effect, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 )
     {
-      std::memcpy( &m_data.CalcResult.CalcResultTg, &effect, sizeof( Common::CalcResultParam ) );
+      std::memcpy( &m_data.CalcResult.CalcResultTg[ m_targetEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
+    }
+
+    void addSourceEffect( const Common::CalcResultParam& effect, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 )
+    {
+      std::memcpy( &m_data.CalcResult.CalcResultCt[ m_sourceEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
     }
 
     void setAnimationId( uint16_t animationId )

@@ -179,7 +179,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     for( int i = 0; i < resultList->size(); i++ )
     {
       auto result = resultList->data()[ i ];
-      effectPacket->addEffect( result->buildEffectEntry(), static_cast< uint64_t >( firstResult->getTarget()->getId() ) );
+      effectPacket->addTargetEffect( result->buildEffectEntry(), static_cast< uint64_t >( firstResult->getTarget()->getId() ) );
       m_sourceChara->getCurrentTerritory()->addEffectResult( std::move( result ) );
     }
 

@@ -919,7 +919,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     effectEntry.Arg1 = 7;
     //effectEntry.Arg2 = 0x71;
     effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
-    effectPacket->addEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
+    effectPacket->addTargetEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
 
     sendToInRangeSet( effectPacket );
 

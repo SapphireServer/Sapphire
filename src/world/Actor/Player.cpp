@@ -1525,7 +1525,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-  effectPacket->addEffect( entry, static_cast< uint64_t >( pTarget->getId() ) );
+  effectPacket->addTargetEffect( entry, static_cast< uint64_t >( pTarget->getId() ) );
 
   sendToInRangeSet( effectPacket, true );
 
