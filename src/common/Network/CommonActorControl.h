@@ -65,7 +65,7 @@ namespace Sapphire::Network::ActorControl
     ToggleActionUnlock = 0x29,
 
     UpdateUiExp = 0x2B,
-    DmgTakenMsg = 0x2D,
+    SetFallDamage = 0x2D,
 
     SetTarget = 0x32,
     ToggleNameHidden = 0x36,

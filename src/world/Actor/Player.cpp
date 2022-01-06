@@ -2206,7 +2206,7 @@ void Sapphire::Entity::Player::setFalling( bool state, const Common::FFXIVARR_PO
         takeDamage( damage );
       }
 
-      sendToInRangeSet( makeActorControl( getId(), DmgTakenMsg, damage ), true );
+      sendToInRangeSet( makeActorControl( getId(), SetFallDamage, damage ), true );
     }
   }
 }
