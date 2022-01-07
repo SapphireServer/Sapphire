@@ -23,7 +23,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   private:
     void initialize( Entity::Player& player, int32_t inVal )
     {
-      m_data.timeInMilliseconds = 0x000014D00000000 + inVal;
+      m_data.clientTimeValue = inVal;
+      m_data.transmissionInterval = 333;
     };
   };
 

@@ -1009,7 +1009,7 @@ void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
   pPlayer->freePlayerSpawnId( getId() );
 
-  pPlayer->queuePacket( makeActorControlSelf( getId(), DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  pPlayer->queuePacket( makeActorControlSelf( getId(), WarpStart, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::GameObjectPtr Sapphire::Entity::Player::lookupTargetById( uint64_t targetId )
@@ -1525,7 +1525,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
   effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-  effectPacket->addTargetEffect( entry, static_cast< uint64_t >( pTarget->getId() ) );
+  effectPacket->addTargetEffect( entry );
 
   sendToInRangeSet( effectPacket, true );
 

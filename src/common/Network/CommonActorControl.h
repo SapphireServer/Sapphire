@@ -117,7 +117,8 @@ namespace Sapphire::Network::ActorControl
 
     TeleportDone = 0xCD,
     TeleportDoneFadeOut = 0xCE,
-    DespawnZoneScreenMsg = 0xCF,
+
+    WarpStart = 0xCF,
 
     InstanceSelectDlg = 0xD2,
     ActorDespawnEffect = 0xD4,

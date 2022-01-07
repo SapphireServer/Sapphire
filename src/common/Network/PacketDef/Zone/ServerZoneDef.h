@@ -12,14 +12,22 @@
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
+  struct ZoneProtoDownServerPos
+  {
+    uint32_t originEntityId;
+    float pos[3];
+    float dir;
+  };
+
   /**
   * Structural representation of the packet sent by the server as response
   * to a ping packet
   */
   struct FFXIVIpcSync : FFXIVIpcBasePacket< SyncReply >
   {
-    /* 0000 */ uint64_t timeInMilliseconds;
-    /* 0008 */ uint8_t unknown_8[0x38];
+    uint32_t clientTimeValue;
+    uint32_t transmissionInterval;
+    ZoneProtoDownServerPos position;
   };
 
   /**
@@ -1641,6 +1649,19 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   {
     /* 0000 */ uint32_t mapPartId;
     /* 0004 */ uint32_t mapId;
+  };
+
+  struct FFXIVIpcMoveTerritory : FFXIVIpcBasePacket< MoveTerritory >
+  {
+    int16_t index;
+    uint8_t territoryType;
+    uint8_t zoneId;
+    uint16_t worldId;
+    uint16_t worldId1;
+    int64_t landSetId;
+    int64_t landId;
+    int64_t landTerritoryId;
+    char worldName[32];
   };
 
   /**

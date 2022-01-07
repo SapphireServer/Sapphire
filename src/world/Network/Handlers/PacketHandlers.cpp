@@ -332,7 +332,7 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
   if( pExitRange )
   {
     auto pPopRange = instanceObjectCache.getPopRange( pExitRange->data.destTerritoryType,
-                                                       pExitRange->data.destInstanceObjectId );
+                                                      pExitRange->data.destInstanceObjectId );
     if( pPopRange )
     {
       targetZone = pExitRange->data.destTerritoryType;
@@ -355,10 +355,19 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
                         pPopRange->header.transform.rotation.z,
                         rotation );
 
-     // auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( player.getId() );
-     // preparePacket->data().targetZone = pExitRange->data.destTerritoryType;
+      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), WarpStart, 0x03, player.getId(), 0x01, targetZone ) );
 
-      //server.queueForPlayer( player.getCharacterId(), preparePacket );
+      auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
+      moveTerritoryPacket->data().index = -1;
+      moveTerritoryPacket->data().territoryType = targetZone;
+      moveTerritoryPacket->data().zoneId = player.getZoneId();
+      moveTerritoryPacket->data().worldId = server.getWorldId();
+      moveTerritoryPacket->data().worldId1 = server.getWorldId();
+      moveTerritoryPacket->data().landId = -1;
+      moveTerritoryPacket->data().landSetId = -1;
+      moveTerritoryPacket->data().landTerritoryId = -1;
+      strcpy( moveTerritoryPacket->data().worldName, "Sapphire" );
+      server.queueForPlayer( player.getCharacterId(), moveTerritoryPacket );
 
     }
   }

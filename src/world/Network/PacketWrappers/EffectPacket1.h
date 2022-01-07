@@ -34,12 +34,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       std::memset( &m_data.CalcResult, 0, sizeof( Common::CalcResult ) );
     }
 
-    void addTargetEffect( const Common::CalcResultParam& effect, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 )
+    void addTargetEffect( const Common::CalcResultParam& effect )
     {
       std::memcpy( &m_data.CalcResult.CalcResultTg[ m_targetEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
     }
 
-    void addSourceEffect( const Common::CalcResultParam& effect, uint64_t targetId = Common::INVALID_GAME_OBJECT_ID64 )
+    void addSourceEffect( const Common::CalcResultParam& effect )
     {
       std::memcpy( &m_data.CalcResult.CalcResultCt[ m_sourceEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
     }

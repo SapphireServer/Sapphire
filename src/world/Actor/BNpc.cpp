@@ -335,7 +335,7 @@ void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
 
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  server.queueForPlayer( pTarget->getCharacterId(), makeActorControlSelf( m_id, DespawnZoneScreenMsg, 0x04, getId(), 0x01 ) );
+  server.queueForPlayer( pTarget->getCharacterId(), makeActorControlSelf( m_id, WarpStart, 0x04, getId(), 0x01 ) );
 }
 
 Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
@@ -919,7 +919,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     effectEntry.Arg1 = 7;
     //effectEntry.Arg2 = 0x71;
     effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
-    effectPacket->addTargetEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
+    effectPacket->addTargetEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
