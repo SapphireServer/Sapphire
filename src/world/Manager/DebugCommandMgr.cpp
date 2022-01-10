@@ -1277,7 +1277,7 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
 //
 //    if ( permissionSet < 5 )
 //    {
-//      auto pZone = player.getCurrentTerritory();
+//      auto pZone = teriMgr.getTerritoryFromGuid( player.getTerritoryId() );
 //      if( terriMgr.isHousingTerritory( pZone->getTerritoryTypeId() ) )
 //      {
 //        auto pHousing = std::dynamic_pointer_cast< HousingZone >( pZone );

@@ -123,10 +123,9 @@ void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& 
 std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const std::vector< Entity::CharaPtr >& targetList )
 {
   auto remainingTargetCount = targetList.size();
-  auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
-
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getZoneByTerritoryTypeId( m_sourceChara->getTerritoryTypeId() );
+  auto globalSequence = zone->getNextEffectSequence();
 
   if( remainingTargetCount > 1 ) // use AoeEffect packets
   {
