@@ -15,6 +15,7 @@
 
 #include "Manager/EventMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
 
@@ -204,8 +205,9 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   // all other types....
 
   // check if the actor is an eobj and call its script if we have one
-  auto zone = player.getCurrentTerritory();
-  if( auto eobj = zone->getEObj( actorId ) )
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto zone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( auto eobj = zone ? zone->getEObj( actorId ) : nullptr )
   {
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getObjectId() );
     if( script )

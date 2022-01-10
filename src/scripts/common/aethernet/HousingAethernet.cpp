@@ -23,9 +23,8 @@ public:
     {
       auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-      auto housingZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
-      if( !housingZone )
-        return;
+      auto housingZoneId = player.getTerritoryTypeId();
+      auto activeLand = player.getActiveLand();
 
       return;
       // param2 is the index starting from 0 inside housingaethernet.exd, but the ID column starts at 0x001E0000........ wtf
@@ -34,7 +33,7 @@ public:
         return;
 
       // check we're teleporting to the same territorytype
-      if( player.getCurrentTerritory()->getTerritoryTypeId() != pHousingAethernet->territoryType )
+      if( player.getTerritoryTypeId() != pHousingAethernet->territoryType )
         return;
 
       // todo: this needs to be done properly and used queued zoning + aethernet animation

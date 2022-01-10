@@ -16,14 +16,14 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   class WarpPacket : public ZoneChannelPacket< FFXIVIpcWarp >
   {
   public:
-    WarpPacket( Entity::Player& player, Common::WARP_TYPE warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation ) :
+    WarpPacket( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation ) :
       ZoneChannelPacket< FFXIVIpcWarp >( player.getId(), player.getId() )
     {
       initialize( player, warpType, targetPos, rotation );
     };
 
   private:
-    void initialize( Entity::Player& player, Common::WARP_TYPE warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation )
+    void initialize( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation )
     {
       m_data.Dir = Sapphire::Common::Util::floatToUInt16Rot( rotation );
       m_data.Type = warpType;

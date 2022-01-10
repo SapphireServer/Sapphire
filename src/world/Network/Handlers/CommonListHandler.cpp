@@ -101,13 +101,8 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
 
       if( isConnected )
       {
-        // todo: fix odd teri nullptr on login for friendlist etc
-        auto pTeri = pPlayer->getCurrentTerritory();
-        if( pTeri )
-        {
-          entry.TerritoryType = pPlayer->getCurrentTerritory()->getTerritoryTypeId();
-          entry.TerritoryID = pPlayer->getCurrentTerritory()->getTerritoryTypeId();
-        }
+        entry.TerritoryType = pPlayer->getTerritoryTypeId();
+        entry.TerritoryID = pPlayer->getTerritoryId();
 
         entry.CurrentClassID = static_cast< uint8_t >( pPlayer->getClass() );
         entry.SelectClassID = static_cast< uint8_t >( pPlayer->getSearchSelectClass() );

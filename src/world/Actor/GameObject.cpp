@@ -67,7 +67,12 @@ void Sapphire::Entity::GameObject::setPos( float x, float y, float z, bool broad
   m_pos.z = z;
 
   if( broadcastUpdate )
-    m_pCurrentTerritory->updateActorPosition( *this );
+  {
+    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+    pZone->updateActorPosition( *this );
+  }
+
 }
 
 void Sapphire::Entity::GameObject::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
@@ -75,7 +80,11 @@ void Sapphire::Entity::GameObject::setPos( const Sapphire::Common::FFXIVARR_POSI
   m_pos = pos;
 
   if( broadcastUpdate )
-    m_pCurrentTerritory->updateActorPosition( *this );
+  {
+    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+    pZone->updateActorPosition( *this );
+  }
 }
 
 float Sapphire::Entity::GameObject::getRot() const
@@ -338,10 +347,30 @@ Sapphire::TerritoryPtr Sapphire::Entity::GameObject::getCurrentTerritory() const
   return m_pCurrentTerritory;
 }
 
+uint32_t Sapphire::Entity::GameObject::getTerritoryTypeId() const
+{
+  return m_territoryTypeId;
+}
+
 /*! \param TerritoryPtr to the zone to be set as current */
 void Sapphire::Entity::GameObject::setCurrentZone( TerritoryPtr currZone )
 {
   m_pCurrentTerritory = currZone;
+}
+
+void Sapphire::Entity::GameObject::setTerritoryTypeId( uint32_t territoryTypeId )
+{
+  m_territoryTypeId = territoryTypeId;
+}
+
+uint32_t Sapphire::Entity::GameObject::getTerritoryId() const
+{
+  return m_territoryId;
+}
+
+void Sapphire::Entity::GameObject::setTerritoryId( uint32_t territoryId )
+{
+  m_territoryId = territoryId;
 }
 
 /*! \return InstanceContentPtr to the current instance, nullptr if not an instance or not set */

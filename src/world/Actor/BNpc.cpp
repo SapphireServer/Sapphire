@@ -102,7 +102,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   m_class = ClassJob::Gladiator;
 
-  m_pCurrentTerritory = std::move( pZone );
+  m_territoryTypeId = pZone->getTerritoryTypeId();
+  m_territoryId = pZone->getGuId();
 
   m_spawnPos = m_pos;
 
@@ -198,6 +199,9 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
 
+  m_territoryTypeId = pZone->getTerritoryTypeId();
+  m_territoryId = pZone->getGuId();
+
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
     setFlag( Immobile );
 
@@ -214,8 +218,6 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_enemyType = bNpcBaseData->data().Battalion;
 
   m_class = ClassJob::Gladiator;
-
-  m_pCurrentTerritory = std::move( pZone );
 
   m_spawnPos = m_pos;
 
@@ -350,14 +352,14 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
+  auto pNaviProvider = pZone->getNaviProvider();
 
   if( !pNaviProvider )
   {
-    Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentTerritory->getGuId(),
-                   m_pCurrentTerritory->getInternalName() );
+    Logger::error( "No NaviProvider for zone#{0} - {1}", pZone->getGuId(), pZone->getInternalName() );
     return false;
   }
 
@@ -374,7 +376,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return true;
   }
 
-  m_pCurrentTerritory->updateActorPosition( *this );
+  pZone->updateActorPosition( *this );
   face( pos );
   if( distance > 2.0f )
     face( { ( pos.x - pos1.x ) + pos.x, 1.0f, ( pos.z - pos1.z ) + pos.z } );
@@ -388,11 +390,14 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 {
 
-  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  auto pNaviProvider = pZone->getNaviProvider();
 
   if( !pNaviProvider )
   {
-    Logger::error( "No NaviProvider for zone#{0} - {1}", m_pCurrentTerritory->getGuId(), m_pCurrentTerritory->getInternalName() );
+    Logger::error( "No NaviProvider for zone#{0} - {1}", pZone->getGuId(), pZone->getInternalName() );
     return false;
   }
 
@@ -410,7 +415,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
     return true;
   }
 
-  m_pCurrentTerritory->updateActorPosition( *this );
+  pZone->updateActorPosition( *this );
   if( distance > 2.0f )
     face( { ( pos1.x - getPos().x ) + pos1.x, 1.0f, ( pos1.z - getPos().z ) + pos1.z } );
   else
@@ -570,10 +575,13 @@ void Sapphire::Entity::BNpc::onTick()
 
 void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 {
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
-  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
+  auto pNaviProvider = pZone->getNaviProvider();
 
   if( !pNaviProvider )
     return;
@@ -896,6 +904,8 @@ void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
 
 void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 {
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   uint64_t tick = Util::getTimeMs();
 
@@ -918,7 +928,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     effectEntry.Arg0 = 3;
     effectEntry.Arg1 = 7;
     //effectEntry.Arg2 = 0x71;
-    effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
+    effectPacket->setSequence( pZone->getNextEffectSequence() );
     effectPacket->addTargetEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );

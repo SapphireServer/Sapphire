@@ -507,7 +507,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
     }
 
     // this session is not linked to this area anymore, remove it from zone session list
-    if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
+    if( pPlayer->getTerritoryId() != m_guId )
     {
       Logger::debug( "[{}] removeActor( pPlayer );", pPlayer->getId() );
       removeActor( pPlayer );
@@ -530,7 +530,7 @@ void Sapphire::Territory::updateSessions( uint64_t tickCount, bool changedWeathe
     }
 
     // this session is not linked to this area anymore, remove it from zone session list
-    if( ( !pPlayer->getCurrentTerritory() ) || ( pPlayer->getCurrentTerritory() != shared_from_this() ) )
+    if( pPlayer->getTerritoryId() != getGuId() )
       return;
   }
 }
@@ -612,7 +612,7 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
 void Sapphire::Territory::updateActorPosition( Entity::GameObject& actor )
 {
 
-  if( actor.getCurrentTerritory() != shared_from_this() )
+  if( actor.getTerritoryTypeId() != getTerritoryTypeId() )
     return;
 
   //actor.checkInRangeActors();
@@ -704,9 +704,7 @@ void Sapphire::Territory::updateInRangeSet( Entity::GameObjectPtr pActor, CellPt
 
     float distance = Util::distance( pCurAct->getPos(), pActor->getPos() );
 
-    bool isInRange = ( fRange == 0.0f || distance <= fRange ) &&
-                     ( pCurAct->getCurrentTerritory() && pActor->getCurrentTerritory() ) &&
-                     ( pCurAct->getCurrentTerritory()->getGuId() == pActor->getCurrentTerritory()->getGuId() );
+    bool isInRange = ( fRange == 0.0f || distance <= fRange );
 
     bool isInRangeSet = pActor->isInRangeSet( pCurAct );
 

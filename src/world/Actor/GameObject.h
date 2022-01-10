@@ -28,8 +28,10 @@ namespace Sapphire::Entity
     uint32_t m_id{};
     /*! Type of the actor */
     Common::ObjKind m_objKind;
-    /*! Id of the zone the actor currently is in */
+    /*! Id of the territory type the actor currently is in */
     uint32_t m_territoryTypeId{};
+    /*! Specific GUId of the zone the actor currently is in */
+    uint32_t m_territoryId{};
     /*! Ptr to the ZoneObj the actor belongs to */
     TerritoryPtr m_pCurrentTerritory;
 
@@ -122,6 +124,12 @@ namespace Sapphire::Entity
     BNpcPtr getAsBNpc();
 
     TerritoryPtr getCurrentTerritory() const;
+
+    uint32_t getTerritoryTypeId() const;
+    void setTerritoryTypeId( uint32_t territoryTypeId );
+
+    uint32_t getTerritoryId() const;
+    void setTerritoryId( uint32_t territoryTypeId );
 
     void setCurrentZone( TerritoryPtr currZone );
 

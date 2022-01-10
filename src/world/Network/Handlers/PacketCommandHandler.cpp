@@ -23,6 +23,7 @@
 #include "WorldServer.h"
 #include "Forwards.h"
 #include <Service.h>
+#include <Manager/TerritoryMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -54,12 +55,13 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
   }
 }
 
-void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                        Entity::Player& player )
+void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
 
   const auto packet = ZoneChannelPacket< FFXIVIpcClientTrigger >( inPacket );
   auto& server = Service< World::WorldServer >::ref();
+  auto& teriMgr = Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   const auto commandId = packet.data().Id;
   const auto param1 = *reinterpret_cast< const uint64_t* >( &packet.data().Arg0 );
@@ -271,12 +273,12 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }*/
     case PacketCommand::DIRECTOR_INIT_RETURN: // Director init finish
     {
-      player.getCurrentTerritory()->onInitDirector( player );
+      pZone->onInitDirector( player );
       break;
     }
     case PacketCommand::SYNC_DIRECTOR: // Director init finish
     {
-      player.getCurrentTerritory()->onDirectorSync( player );
+      pZone->onDirectorSync( player );
       break;
     }
 /*    case PacketCommand::EnterTerritoryEventFinished:// this may still be something else. I think i have seen it elsewhere
@@ -286,7 +288,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }*/
     case PacketCommand::EVENT_HANDLER:
     {
-      player.getCurrentTerritory()->onEventHandlerOrder( player, param11, param12, param2, param3, param4 );
+      pZone->onEventHandlerOrder( player, param11, param12, param2, param3, param4 );
 
       break;
     }
@@ -297,8 +299,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::HOUSING_LOCK_LAND_BY_BUILD:
     {
-      auto zone = player.getCurrentTerritory();
-      auto hZone = std::dynamic_pointer_cast< HousingZone >( zone );
+      auto hZone = std::dynamic_pointer_cast< HousingZone >( pZone );
       if (!hZone)
         return;
 
@@ -338,9 +339,12 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::HOUSING_RELEASE:
     {
       auto& housingMgr = Service< HousingMgr >::ref();
+      auto hZone = std::dynamic_pointer_cast< HousingZone >( pZone );
+      if (!hZone)
+        return;
 
       auto plot = static_cast< uint8_t >( param12 & 0xFF );
-      housingMgr.relinquishLand( player, plot );
+      housingMgr.relinquishLand( player, *hZone, plot );
 
       break;
     }

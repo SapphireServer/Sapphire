@@ -317,11 +317,7 @@ namespace Sapphire::Entity
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
 
-    /*! sets the players territoryTypeId */
-    void setTerritoryTypeId( uint32_t territoryTypeId );
-
     /*! gets the players territoryTypeId */
-    uint32_t getTerritoryTypeId() const;
     uint32_t getPrevTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
@@ -644,9 +640,6 @@ namespace Sapphire::Entity
 
     uint16_t getZoneId() const;
 
-    uint32_t getTerritoryId() const;
-    void setTerritoryId( uint32_t territoryId );
-
     uint32_t getPrevTerritoryId() const;
 
     uint8_t getGmRank() const;
@@ -933,7 +926,6 @@ namespace Sapphire::Entity
     bool m_bAutoattack;
 
     Common::ZoneingType m_zoningType;
-    uint32_t m_territoryId{};
 
     bool m_bMarkedForZoning;
     bool m_bNewAdventurer{};

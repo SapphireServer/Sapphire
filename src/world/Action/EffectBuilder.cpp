@@ -12,6 +12,8 @@
 #include <Util/UtilMath.h>
 
 #include <Logging/Logger.h>
+#include <Manager/TerritoryMgr.h>
+#include <Service.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -105,6 +107,11 @@ void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& 
   Logger::debug( "EffectBuilder result: " );
   Logger::debug( "Targets afflicted: {}", targetList.size() );
 
+  auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+  auto zone = teriMgr.getZoneByTerritoryTypeId( m_sourceChara->getTerritoryTypeId() );
+
+  auto globalSequence = zone ? zone->getNextEffectSequence() : 0;
+
   do // we want to send at least one packet even nothing is hit so other players can see
   {
     auto packet = buildNextEffectPacket( targetList );
@@ -117,6 +124,9 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
 {
   auto remainingTargetCount = targetList.size();
   auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
+
+  auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+  auto zone = teriMgr.getZoneByTerritoryTypeId( m_sourceChara->getTerritoryTypeId() );
 
   if( remainingTargetCount > 1 ) // use AoeEffect packets
   {
@@ -145,8 +155,9 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
         {
           effectPacket->addTargetEffect( effect, result->getTarget()->getId() );
         }
-        
-        m_sourceChara->getCurrentTerritory()->addEffectResult( std::move( result ) );
+
+        zone->addEffectResult( std::move( result ) );
+
       }
 
       actorResultList.clear();
@@ -161,6 +172,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
   }
   else if( remainingTargetCount == 1 ) // use Effect for single target
   {
+
     Logger::debug( " - id: {}", targetList[0]->getId() );
     Logger::debug( "------------------------------------------" );
 
@@ -188,7 +200,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
           effectPacket->addTargetEffect( effect );
         }
         
-        m_sourceChara->getCurrentTerritory()->addEffectResult( std::move( result ) );
+        zone->addEffectResult( std::move( result ) );
       }
 
       actorResultList.clear();

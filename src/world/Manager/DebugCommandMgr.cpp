@@ -151,8 +151,9 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 {
   auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
-
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   std::string subCommand = "";
   std::string params = "";
@@ -270,7 +271,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
     sscanf( params.c_str(), "%d", &weatherId );
 
-    player.getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
+    pCurrentZone->setWeatherOverride( static_cast< Common::Weather >( weatherId ) );
   }
   else if( subCommand == "festival" )
   {
@@ -387,6 +388,8 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   std::string subCommand;
   std::string params = "";
@@ -503,7 +506,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     effectPacket->addTargetEffect( entry, static_cast< uint64_t >( player.getId() ) );
 
-    auto sequence = player.getCurrentTerritory()->getNextEffectSequence();
+    auto sequence = pCurrentZone->getNextEffectSequence();
     effectPacket->setSequence( sequence );
 
 //    effectPacket->setAnimationId( param1 );
@@ -546,11 +549,11 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   if( ( subCommand == "pos" ) )
   {
 
-    int16_t map_id = exdData.getRow< Component::Excel::TerritoryType >( player.getCurrentTerritory()->getTerritoryTypeId() )->data().Map;
+    int16_t map_id = exdData.getRow< Component::Excel::TerritoryType >( player.getTerritoryTypeId() )->data().Map;
 
     PlayerMgr::sendServerNotice( player, "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
                              player.getPos().x, player.getPos().y, player.getPos().z,
-                             player.getRot(), map_id, player.getCurrentTerritory()->getTerritoryTypeId());
+                             player.getRot(), map_id, player.getTerritoryTypeId() );
   }
   else
   {
@@ -784,6 +787,8 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
                                                           std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -890,7 +895,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
       sscanf( params.c_str(), "%d", &mode );
       if( mode < 5 )
       {
-          auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+          auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
           if( !instance )
               return;
 
@@ -899,7 +904,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "todo" )
   {
-      auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+      auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
       if( !instance )
           return;
 
@@ -909,7 +914,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "time" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -922,7 +927,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "fail" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -938,7 +943,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -951,7 +956,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -969,7 +974,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -988,7 +993,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1000,7 +1005,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
 
     sscanf( params.c_str(), "%hhu", &flags );
 
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1008,7 +1013,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1017,7 +1022,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1026,7 +1031,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< InstanceContent >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< InstanceContent >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1051,6 +1056,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
                                                              std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
   std::string cmd( data ), params, subCommand;
   auto cmdPos = cmd.find_first_of( ' ' );
 
@@ -1083,7 +1089,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   else if( subCommand == "complete" )
   {
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1093,7 +1099,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   else if( subCommand == "fail" )
   {
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1133,7 +1139,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     sscanf( params.c_str(), "%d %d", &index, &value );
 
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1146,7 +1152,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%s %hhu", objName, &state );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1164,7 +1170,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1183,7 +1189,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%hhu", &seq );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1195,7 +1201,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
 
     sscanf( params.c_str(), "%hhu", &flags );
 
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1203,7 +1209,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "qte_start" )
   {
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1212,7 +1218,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "event_start" )
   {
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 
@@ -1221,7 +1227,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
   else if( subCommand == "event_end" )
   {
-    auto instance = std::dynamic_pointer_cast< QuestBattle >( player.getCurrentTerritory() );
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pCurrentZone );
     if( !instance )
       return;
 

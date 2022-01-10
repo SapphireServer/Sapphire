@@ -80,8 +80,7 @@ namespace Sapphire
   public:
     Territory();
 
-    Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
-               const std::string& placeName );
+    Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 
     virtual ~Territory();
 

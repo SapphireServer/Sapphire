@@ -156,19 +156,9 @@ uint16_t Sapphire::Entity::Player::getZoneId() const
   return m_territoryTypeId;
 }
 
-uint32_t Sapphire::Entity::Player::getTerritoryId() const
-{
-  return m_territoryId;
-}
-
 uint32_t Sapphire::Entity::Player::getPrevTerritoryId() const
 {
   return m_prevTerritoryId;
-}
-
-void Sapphire::Entity::Player::setTerritoryId( uint32_t territoryId )
-{
-  m_territoryId = territoryId;
 }
 
 uint8_t Sapphire::Entity::Player::getGmRank() const
@@ -507,14 +497,17 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   m_onEnterEventDone = false;
-  if( !teriMgr.movePlayer( zoneId, *this ) )
+
+  auto pZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
+  if( !teriMgr.movePlayer( pZone, *this ) )
   {
     // todo: this will require proper handling, for now just return the player to their previous area
     m_pos = m_prevPos;
     m_rot = m_prevRot;
     m_territoryTypeId = m_prevTerritoryTypeId;
 
-    if( !teriMgr.movePlayer( m_territoryTypeId, *this ) )
+    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( m_territoryTypeId );
+    if( !teriMgr.movePlayer( pZone1, *this ) )
       return;
   }
 }
@@ -538,15 +531,15 @@ bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance )
     return false;
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto currentZone = getCurrentTerritory();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
+    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+    m_prevTerritoryTypeId = pZone->getTerritoryTypeId();
+    m_prevTerritoryId = getTerritoryId();
     m_prevPos = m_pos;
     m_prevRot = m_rot;
-    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
   }
 
   return teriMgr.movePlayer( instance, *this );
@@ -559,15 +552,15 @@ bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance, Common
     return false;
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto currentZone = getCurrentTerritory();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
+    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+    m_prevTerritoryTypeId = pZone->getTerritoryTypeId();
+    m_prevTerritoryId = getTerritoryId();
     m_prevPos = m_pos;
     m_prevRot = m_rot;
-    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
   }
 
   if( teriMgr.movePlayer( instance, *this ) )
@@ -582,8 +575,7 @@ bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance, Common
 bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-
-  auto pZone = getCurrentTerritory();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
   auto pInstance = pZone->getAsInstanceContent();
 
   resetHp();
@@ -597,7 +589,8 @@ bool Sapphire::Entity::Player::exitInstance()
   }
   else
   {
-    if( !teriMgr.movePlayer( m_prevTerritoryTypeId, *this ) )
+    auto pPrevZone = teriMgr.getZoneByTerritoryTypeId( m_prevTerritoryTypeId );
+    if( !teriMgr.movePlayer( pPrevZone, *this ) )
       return false;
   }
 
@@ -1117,7 +1110,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-    if( getCurrentTerritory()->getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
+    if( getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
     {
       performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation );
     }
@@ -1490,6 +1483,9 @@ uint32_t Sapphire::Entity::Player::getPersistentEmote() const
 
 void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 {
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
   pTarget->onActionHostile( getAsChara() );
@@ -1522,7 +1518,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     //entry.Arg2 = 0x73;
   }
 
-  effectPacket->setSequence( getCurrentTerritory()->getNextEffectSequence() );
+  effectPacket->setSequence( pZone->getNextEffectSequence() );
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addTargetEffect( entry );
@@ -1591,16 +1587,6 @@ void Sapphire::Entity::Player::setEorzeaTimeOffset( uint64_t timestamp )
   queuePacket( packet );
 }
 
-void Sapphire::Entity::Player::setTerritoryTypeId( uint32_t territoryTypeId )
-{
-  m_territoryTypeId = territoryTypeId;
-}
-
-uint32_t Sapphire::Entity::Player::getTerritoryTypeId() const
-{
-  return m_territoryTypeId;
-}
-
 uint32_t Sapphire::Entity::Player::getPrevTerritoryTypeId() const
 {
   return m_prevTerritoryTypeId;
@@ -1608,6 +1594,9 @@ uint32_t Sapphire::Entity::Player::getPrevTerritoryTypeId() const
 
 void Sapphire::Entity::Player::sendZonePackets()
 {
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
   auto initPacket = makeZonePacket< FFXIVIpcLogin >( getId() );
   initPacket->data().playerActorId = getId();
   queuePacket( initPacket );
@@ -1664,9 +1653,9 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   sendLandFlags();
 
-  queuePacket( makeInitZone( *this, *getCurrentTerritory() ) );
+  queuePacket( makeInitZone( *this, *pZone ) );
 
-  getCurrentTerritory()->onPlayerZoneIn( *this );
+  pZone->onPlayerZoneIn( *this );
 
   if( isLogin() )
   {

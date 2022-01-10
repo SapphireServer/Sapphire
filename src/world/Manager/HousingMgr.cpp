@@ -24,6 +24,7 @@
 #include "Territory/Housing/HousingInteriorTerritory.h"
 #include "HousingMgr.h"
 #include "EventMgr.h"
+#include "TerritoryMgr.h"
 #include "Territory/Land.h"
 #include "WorldServer.h"
 #include "Territory/House.h"
@@ -370,13 +371,12 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignFree( Entity::Player& pla
   pSession->getZoneConnection()->queueOutPacket( plotPricePacket );
 }
 
-Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state )
+Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand( Entity::Player& player, HousingZone& zone, uint8_t plot, uint8_t state )
 {
-  auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
 
-  auto plotPrice = pHousing->getLand( plot )->getCurrentPrice();
+  auto plotPrice = zone.getLand( plot )->getCurrentPrice();
   auto gilAvailable = player.getCurrency( CurrencyType::Gil );
-  auto pLand = pHousing->getLand( plot );
+  auto pLand = zone.getLand( plot );
 
   if( !pLand )
     return LandPurchaseResult::ERR_INTERNAL;
@@ -413,7 +413,7 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
       //pLand->setLandName( "Private Estate" + std::to_string( pHousing->getWardNum() ) + "-" + std::to_string( plot )   );
       pLand->updateLandDb();
 
-      pHousing->sendLandUpdate( plot );
+      zone.sendLandUpdate( plot );
       return LandPurchaseResult::SUCCESS;
     }
 
@@ -423,16 +423,15 @@ Sapphire::LandPurchaseResult Sapphire::World::Manager::HousingMgr::purchaseLand(
 
 }
 
-bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& player, uint8_t plot )
+bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint8_t plot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
   auto pSession = server.getSession( player.getCharacterId() );
   // TODO: Fix "permissions" being sent incorrectly
   // TODO: Add checks for land state before relinquishing
-  auto pHousing = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
 
-  auto pLand = pHousing->getLand( plot );
+  auto pLand = zone.getLand( plot );
   auto plotMaxPrice = pLand->getCurrentPrice();
 
   // can't relinquish when you are not the owner
@@ -468,7 +467,7 @@ bool Sapphire::World::Manager::HousingMgr::relinquishLand( Entity::Player& playe
   auto screenMsgPkt2 = makeActorControlSelf( player.getId(), ActorControl::LogMsg, 3351, 0x1AA,
                                              pLand->getLandIdent().wardNum + 1, plot + 1 );
   pSession->getZoneConnection()->queueOutPacket( screenMsgPkt2 );
-  pHousing->sendLandUpdate( plot );
+  zone.sendLandUpdate( plot );
 
   return true;
 }
@@ -677,17 +676,12 @@ void Sapphire::World::Manager::HousingMgr::createHouse( Sapphire::HousePtr house
   db.execute( stmt );
 }
 
-void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId )
+void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, uint8_t plotNum, uint32_t presetCatalogId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
 
-  auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
-
-  if( !hZone )
-    return;
-
-  auto pLand = hZone->getLand( plotNum );
+  auto pLand = zone.getLand( plotNum );
   if( !pLand )
     return;
 
@@ -714,7 +708,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   pLand->setStatus( HouseStatus::PrivateEstate );
   pLand->setLandType( LandType::Private );
-  hZone->sendLandUpdate( plotNum );
+  zone.sendLandUpdate( plotNum );
 
   auto pSuccessBuildingPacket = makeActorControl( player.getId(), ActorControl::BuildPresetResponse, plotNum );
 
@@ -730,7 +724,7 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
   player.setLandFlags( LandFlagsSlot::Private, HOUSING_LAND_STATUS::HOUSING_LAND_STATUS_BUILDHOUSE, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
 
-  hZone->registerEstateEntranceEObj( plotNum );
+  zone.registerEstateEntranceEObj( plotNum );
 }
 
 void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )
@@ -855,17 +849,17 @@ Sapphire::Common::LandIdent Sapphire::World::Manager::HousingMgr::clientTriggerP
   return ident;
 }
 
-void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& player, uint16_t inventoryType,
-                                                                uint8_t plotNum )
+void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& player, uint16_t inventoryType, uint8_t plotNum )
 {
   Sapphire::LandPtr targetLand;
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   // plotNum will be 255 in the event that it's an internal zone
   // and we have to switch up our way of getting the LandPtr
   if( plotNum == 255 )
   {
-    auto internalZone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >(
-      player.getCurrentTerritory() );
+    auto internalZone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
     if( !internalZone )
       return;
 
@@ -881,7 +875,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   }
   else
   {
-    auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+    auto zone = std::dynamic_pointer_cast< HousingZone >( pZone );
     if( !zone )
       return;
 
@@ -903,26 +897,22 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
   invMgr.sendInventoryContainer( player, it->second );
 }
 
-const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap&
-  Sapphire::World::Manager::HousingMgr::getLandCacheMap()
+const Sapphire::World::Manager::HousingMgr::LandSetLandCacheMap& Sapphire::World::Manager::HousingMgr::getLandCacheMap()
 {
   return m_landCache;
 }
 
-Sapphire::World::Manager::HousingMgr::LandIdentToInventoryContainerMap&
-  Sapphire::World::Manager::HousingMgr::getEstateInventories()
+Sapphire::World::Manager::HousingMgr::LandIdentToInventoryContainerMap& Sapphire::World::Manager::HousingMgr::getEstateInventories()
 {
   return m_estateInventories;
 }
 
-Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
-  Sapphire::World::Manager::HousingMgr::getEstateInventory( uint64_t ident )
+Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap& Sapphire::World::Manager::HousingMgr::getEstateInventory( uint64_t ident )
 {
   return m_estateInventories[ ident ];
 }
 
-Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap&
-  Sapphire::World::Manager::HousingMgr::getEstateInventory( Sapphire::Common::LandIdent ident )
+Sapphire::World::Manager::HousingMgr::ContainerIdToContainerMap& Sapphire::World::Manager::HousingMgr::getEstateInventory( Sapphire::Common::LandIdent ident )
 {
   auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
 
@@ -962,8 +952,7 @@ void Sapphire::World::Manager::HousingMgr::updateHouseModels( Sapphire::HousePtr
   {
     for( auto& item : intContainer->second->getItemMap() )
     {
-      house->setInteriorModel( static_cast< Common::HouseInteriorSlot >( item.first ),
-                               getItemAdditionalData( item.second->getId() ) );
+      house->setInteriorModel( static_cast< Common::HouseInteriorSlot >( item.first ), getItemAdditionalData( item.second->getId() ) );
     }
   }
   else
@@ -997,6 +986,9 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   // retail process is:
   //  - unlink item from current container
   //  - add it to destination container
@@ -1008,15 +1000,14 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
   bool isOutside = false;
 
   // inside housing territory
-  if( auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
+  if( auto zone = std::dynamic_pointer_cast< HousingZone >( pZone ) )
   {
     land = zone->getLand( static_cast< uint8_t >( landId ) );
 
     isOutside = true;
   }
   // otherwise, inside a house. landId is 0 when inside a plot
-  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >(
-    player.getCurrentTerritory() ) )
+  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone ) )
   {
     // todo: this whole process is retarded and needs to be fixed
     // perhaps maintain a list of estates by ident inside housingmgr?
@@ -1075,19 +1066,20 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     PlayerMgr::sendUrgent( player, "An internal error occurred when placing the item." );
 }
 
-void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity::Player& player, uint16_t landId,
-                                                                uint16_t containerId, uint8_t slotId )
+void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity::Player& player, uint16_t landId, uint16_t containerId, uint8_t slotId )
 {
   LandPtr land;
   bool isOutside = false;
 
-  if( auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+  if( auto zone = std::dynamic_pointer_cast< HousingZone >( pZone ) )
   {
     land = zone->getLand( static_cast< uint8_t >( landId ) );
     isOutside = true;
   }
-  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >(
-    player.getCurrentTerritory() ) )
+  else if( auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone ) )
   {
     // todo: this whole process is retarded and needs to be fixed
     // perhaps maintain a list of estates by ident inside housingmgr?
@@ -1146,9 +1138,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
   }
 }
 
-bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& player,
-                                                              Inventory::HousingItemPtr item,
-                                                              Common::LandIdent ident )
+bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& player, Inventory::HousingItemPtr item, Common::LandIdent ident )
 {
   auto& invMgr = Service< InventoryMgr >::ref();
 
@@ -1171,8 +1161,11 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
   invMgr.saveHousingContainer( ident, container );
   invMgr.updateHousingItemPosition( item );
 
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   // add to zone and spawn
-  auto zone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+  auto zone = std::dynamic_pointer_cast< HousingZone >( pZone );
   assert( zone );
 
   zone->spawnYardObject( static_cast< uint8_t >( ident.landId ), static_cast< uint16_t >( freeSlot ), *item );
@@ -1184,8 +1177,10 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
                                                               Inventory::HousingItemPtr item )
 {
   auto& invMgr = Service< InventoryMgr >::ref();
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
-  auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
+  auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
   assert( zone );
 
   auto ident = zone->getLandIdent();
@@ -1216,7 +1211,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
     invMgr.saveHousingContainer( ident, container );
     invMgr.updateHousingItemPosition( item );
 
-    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
+    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
     assert( zone );
 
     zone->spawnHousingObject( containerIdx, static_cast< uint16_t >( freeSlot ), containerId, item );
@@ -1240,10 +1235,12 @@ Sapphire::Common::Furniture Sapphire::World::Manager::HousingMgr::getYardObjectF
   return obj;
 }
 
-void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sapphire::Entity::Player& player,
-                                                                             bool storeroom )
+void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sapphire::Entity::Player& player, bool storeroom )
 {
-  auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+  auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
   if( !zone )
     return;
 
@@ -1269,9 +1266,8 @@ void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sap
   }
 }
 
-void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& player,
-                                                               Common::LandIdent ident, uint8_t slot,
-                                                               Common::FFXIVARR_POSITION3 pos, float rot )
+void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident,
+                                                               uint8_t slot, Common::FFXIVARR_POSITION3 pos, float rot )
 {
   auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
   auto land = getHousingZoneByLandSetId( landSet )->getLand( static_cast< uint8_t >( ident.landId ) );
@@ -1282,14 +1278,16 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
   if( !hasPermission( player, *land, 0 ) )
     return;
 
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   // todo: what happens when either of these fail? how does the server let the client know that the moment failed
   // as is, if it does fail, the client will be locked and unable to move any item until reentering the territory
-  if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >(
-    player.getCurrentTerritory() ) )
+  if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone ) )
   {
     moveInternalItem( player, ident, *terri, slot, pos, rot );
   }
-  else if( auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
+  else if( auto terri = std::dynamic_pointer_cast< HousingZone >( pZone ) )
   {
     moveExternalItem( player, ident, slot, *terri, pos, rot );
   }
@@ -1387,8 +1385,10 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
                                                                  uint16_t containerId, uint8_t slot,
                                                                  bool sendToStoreroom )
 {
-  if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >(
-    player.getCurrentTerritory() ) )
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+  if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone ) )
   {
     auto ident = terri->getLandIdent();
     auto landSet = toLandSetId( static_cast< uint16_t >( ident.territoryTypeId ), static_cast< uint8_t >( ident.wardNum ) );
@@ -1402,7 +1402,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
 
     removeInternalItem( player, *terri, containerId, slot, sendToStoreroom );
   }
-  else if( auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() ) )
+  else if( auto terri = std::dynamic_pointer_cast< HousingZone >( pZone ) )
   {
     auto land = terri->getLand( static_cast< uint8_t >( plot ) );
     if( !land )
@@ -1594,7 +1594,10 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
 
-  auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
+  auto terri = std::dynamic_pointer_cast< HousingZone >( pZone );
   if( !terri )
     return;
 
@@ -1621,10 +1624,13 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
 
 void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::Entity::Player& player )
 {
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
 
-  auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
+  auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
   if( !terri )
     return;
 

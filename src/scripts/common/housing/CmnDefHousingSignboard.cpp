@@ -8,6 +8,7 @@
 #include <Service.h>
 #include <WorldServer.h>
 #include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 using namespace Sapphire;
 using namespace Network;
@@ -33,12 +34,12 @@ public:
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();
 
-        auto pTerritory = player.getCurrentTerritory();
+        auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+        auto pTerritory = terriMgr.getZoneByTerritoryTypeId( player.getTerritoryTypeId() );
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         auto& pHouMgr = Common::Service< HousingMgr >::ref();
 
-        LandPurchaseResult res = pHouMgr.purchaseLand( player, activeLand.plot,
-                                                        static_cast< uint8_t >( result.getResult( 0 ) ) );
+        LandPurchaseResult res = pHouMgr.purchaseLand( player, *pHousing, activeLand.plot, static_cast< uint8_t >( result.getResult( 0 ) ) );
 
         auto& server = Common::Service< World::WorldServer >::ref();
         switch( res )

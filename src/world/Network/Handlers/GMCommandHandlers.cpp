@@ -79,13 +79,13 @@ enum GmCommand
   JumpNpc = 0x025F,
 };
 
-void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                          Entity::Player& player )
+void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
 
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
   const auto packet = ZoneChannelPacket< FFXIVIpcGmCommand >( inPacket );
   const auto commandId = packet.data().Id;
@@ -96,11 +96,9 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
   const auto target = packet.data().Target;
 
   Logger::info( "{0} used GM1 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
-                player.getName(), commandId,
-                param1, param2, param3, param4, target );
+                player.getName(), commandId, param1, param2, param3, param4, target );
 
   Sapphire::Entity::GameObjectPtr targetActor;
-
 
   if( player.getId() == target )
   {
@@ -118,7 +116,10 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
   if( !targetActor )
     return;
+
   auto targetPlayer = targetActor->getAsPlayer();
+
+  auto pTargetZone = teriMgr.getTerritoryByGuId( targetActor->getTerritoryId() );
 
   switch( commandId )
   {
@@ -184,9 +185,9 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Weather:
     {
-      targetPlayer->getCurrentTerritory()->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
+      pTargetZone->setWeatherOverride( static_cast< Common::Weather >( param1 ) );
       PlayerMgr::sendServerNotice( player, "Weather in Territory \"{0}\" of {1} set in range.",
-                               targetPlayer->getCurrentTerritory()->getName(), targetPlayer->getName());
+                                   pTargetZone->getName(), targetPlayer->getName() );
       break;
     }
     case GmCommand::Call:
@@ -195,7 +196,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         targetPlayer->setZone( player.getZoneId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName());
+      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }
     case GmCommand::Inspect:
@@ -211,13 +212,13 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                "\nPlayTime: {8}",
                                targetPlayer->getName(),
                                targetPlayer->getCurrency( CurrencyType::Gil ),
-                               targetPlayer->getCurrentTerritory()->getName(),
+                               pTargetZone->getName(),
                                targetPlayer->getZoneId(),
-                               static_cast< uint8_t >( targetPlayer->getClass()),
+                               static_cast< uint8_t >( targetPlayer->getClass() ),
                                targetPlayer->getLevel(),
                                targetPlayer->getExp(),
                                targetPlayer->getSearchMessage(),
-                               targetPlayer->getPlayTime());
+                               targetPlayer->getPlayTime() );
       break;
     }
     case GmCommand::Speed:
@@ -354,7 +355,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     case GmCommand::Gil:
     {
       targetPlayer->addCurrency( CurrencyType::Gil, param1 );
-      PlayerMgr::sendServerNotice( player, "Added {0} Gil for {1}", param1, targetPlayer->getName());
+      PlayerMgr::sendServerNotice( player, "Added {0} Gil for {1}", param1, targetPlayer->getName() );
       break;
     }
     case GmCommand::Collect:
@@ -448,12 +449,12 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           for( uint8_t i = 0; i < 255; i++ )
             targetActor->getAsPlayer()->registerAetheryte( i );
 
-          PlayerMgr::sendServerNotice( player, "All Aetherytes for {0} were turned on.", targetPlayer->getName());
+          PlayerMgr::sendServerNotice( player, "All Aetherytes for {0} were turned on.", targetPlayer->getName() );
         }
         else
         {
           targetActor->getAsPlayer()->registerAetheryte( static_cast< uint8_t >( param2 ) );
-          PlayerMgr::sendServerNotice( player, "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName());
+          PlayerMgr::sendServerNotice( player, "Aetheryte {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
 
@@ -540,7 +541,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getPos(), 0 );
         }
 
-        PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName());
+        PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );
       }
       break;
     }
@@ -549,13 +550,12 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       // todo: this doesn't kill their session straight away, should do this properly but its good for when you get stuck for now
       targetPlayer->setMarkedForRemoval();
 
-      PlayerMgr::sendServerNotice( player, "Kicked {0}", targetPlayer->getName());
+      PlayerMgr::sendServerNotice( player, "Kicked {0}", targetPlayer->getName() );
 
       break;
     }
     case GmCommand::TeriInfo:
     {
-      auto pCurrentZone = player.getCurrentTerritory();
       PlayerMgr::sendServerNotice( player, "ZoneId: {0}"
                                "\nName: {1}"
                                "\nInternalName: {2}"
@@ -564,12 +564,12 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                "\nCurrentWeather: {5}"
                                "\nNextWeather: {6}",
                                player.getZoneId(),
-                               pCurrentZone->getName(),
-                               pCurrentZone->getInternalName(),
-                               pCurrentZone->getGuId(),
-                               pCurrentZone->getPopCount(),
-                               static_cast< uint8_t >( pCurrentZone->getCurrentWeather()),
-                               static_cast< uint8_t >( pCurrentZone->getNextWeather()));
+                               pTargetZone->getName(),
+                               pTargetZone->getInternalName(),
+                               pTargetZone->getGuId(),
+                               pTargetZone->getPopCount(),
+                               static_cast< uint8_t >( pTargetZone->getCurrentWeather() ),
+                               static_cast< uint8_t >( pTargetZone->getNextWeather() ) );
       break;
     }
     case GmCommand::Jump:
@@ -591,8 +591,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
 }
 
-void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                              Entity::Player& player )
+void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   if( player.getGmRank() <= 0 )
     return;
@@ -660,7 +659,7 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
       {
         player.exitInstance();
       }
-      if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
+      if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
       {
         // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         if( targetPlayer->getCurrentInstance() )
@@ -669,12 +668,11 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
         }
-        player.setInstance( targetPlayer->getCurrentTerritory()->getGuId() );
+        player.setInstance( targetPlayer->getTerritoryId() );
       }
-      player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-                             targetActor->getRot() );
+      player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRot() );
       player.sendZoneInPackets( 0x00, 0x00, 0, 0, false );
-      PlayerMgr::sendServerNotice( player, "Jumping to {0}", targetPlayer->getName());
+      PlayerMgr::sendServerNotice( player, "Jumping to {0}", targetPlayer->getName() );
       break;
     }
     case GmCommand::Call:
@@ -690,13 +688,13 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
       {
         targetPlayer->exitInstance();
       }
-      if( targetPlayer->getCurrentTerritory()->getGuId() != player.getCurrentTerritory()->getGuId() )
+      if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
       {
-        targetPlayer->setInstance( player.getCurrentTerritory()->getGuId() );
+        targetPlayer->setInstance( player.getTerritoryId() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
-      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName());
+      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }
     default:

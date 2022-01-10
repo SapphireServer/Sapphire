@@ -644,21 +644,15 @@ Sapphire::World::Manager::TerritoryMgr::InstanceIdList
   return idList;
 }
 
-bool Sapphire::World::Manager::TerritoryMgr::movePlayer( uint32_t territoryTypeId, Sapphire::Entity::Player& player )
-{
-  auto pZone = getZoneByTerritoryTypeId( territoryTypeId );
-  if( !pZone )
-    return false;
-  return movePlayer( pZone, player );
-}
-
-bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sapphire::Entity::Player& player )
+bool Sapphire::World::Manager::TerritoryMgr::movePlayer( const TerritoryPtr& pZone, Sapphire::Entity::Player& player )
 {
   if( !pZone )
   {
     Logger::error( "Territory not found on this server." );
     return false;
   }
+
+  auto pPrevZone = getTerritoryByGuId( player.getTerritoryId() );
 
   player.setStateFlag( Common::PlayerStateFlag::BetweenAreas );
 
@@ -672,13 +666,9 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
     if( pHousing )
       player.setTerritoryId( pHousing->getLandSetId() );
   }
-  else if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
-  {
-    player.setTerritoryId( pZone->getGuId() );
-  }
   else
   {
-    player.setTerritoryId( 0 );
+    player.setTerritoryId( pZone->getGuId() );
   }
 
   bool playerLoaded = player.isLoadingComplete();
@@ -686,8 +676,8 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
   // mark character as zoning in progress
   player.setLoadingComplete( false );
 
-  if( playerLoaded && player.getCurrentTerritory() )
-    player.getCurrentTerritory()->removeActor( player.getAsPlayer() );
+  if( playerLoaded && pPrevZone )
+    pPrevZone->removeActor( player.getAsPlayer() );
 
   player.setCurrentZone( pZone );
   pZone->pushActor( player.getAsPlayer() );

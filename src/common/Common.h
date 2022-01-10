@@ -234,7 +234,7 @@ namespace Sapphire::Common
     Enemy = 4,
   };
 
-  enum ACTOR_KIND : int32_t
+  enum ActorKind : int32_t
   {
     ACTOR_KIND_PC = 0x0,
     ACTOR_KIND_NPC = 0x1,
@@ -247,7 +247,7 @@ namespace Sapphire::Common
     ACTOR_KIND_MAX = 0x8,
   };
 
-  enum OBJECT_TYPE : int32_t
+  enum ObjectType : int32_t
   {
     OBJECT_TYPE_CAMERA = 0x0,
     OBJECT_TYPE_CAMERA_MAYA = 0x1,
@@ -263,7 +263,7 @@ namespace Sapphire::Common
     OBJECT_TYPE_COUNT_MAX = 0xB,
   };
 
-  enum WARP_TYPE : uint8_t
+  enum WarpType : uint8_t
   {
     WARP_TYPE_NON = 0x0,
     WARP_TYPE_NORMAL = 0x1,

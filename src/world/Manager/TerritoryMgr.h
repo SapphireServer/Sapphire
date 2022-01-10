@@ -136,9 +136,7 @@ namespace Sapphire::World::Manager
     /*! returns a Zone by landSetId */
     TerritoryPtr getZoneByLandSetId( uint32_t landSetId ) const;
 
-    bool movePlayer( uint32_t territoryTypeId, Entity::Player& pPlayer );
-
-    bool movePlayer( TerritoryPtr, Entity::Player& player );
+    bool movePlayer( const TerritoryPtr&, Entity::Player& player );
 
     /*! returns an instancePtr if the player is still bound to an isntance */
     TerritoryPtr getLinkedInstance( uint32_t playerId ) const;

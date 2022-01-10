@@ -301,8 +301,7 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
 }
 
 void
-Sapphire::Network::GameConnection::configHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                  Entity::Player& player )
+Sapphire::Network::GameConnection::configHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcConfig >( inPacket );
 
@@ -310,8 +309,7 @@ Sapphire::Network::GameConnection::configHandler( const Packets::FFXIVARR_PACKET
   Service< World::Manager::PlayerMgr >::ref().onEquipDisplayFlagsChanged( player );
 }
 
-void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                         Entity::Player& player )
+void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcZoneJump >( inPacket );
   auto& data = packet.data();
@@ -320,7 +318,9 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto tInfo = player.getCurrentTerritory()->getTerritoryTypeInfo();
+
+  auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  auto tInfo = pTeri->getTerritoryTypeInfo();
 
   auto pExitRange = instanceObjectCache.getExitRange( player.getTerritoryTypeId(), exitBoxId );
 
@@ -382,8 +382,10 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
                                                              Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-  auto tInfo = player.getCurrentTerritory()->getTerritoryTypeInfo();
+  auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  auto tInfo = pTeri->getTerritoryTypeInfo();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcNewDiscovery >( inPacket );
   const auto layoutId = packet.data().LayoutId;
 
@@ -435,6 +437,9 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
     questMgr.sendQuestsInfo( player );
   }
 
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
 /*  // TODO: load and save this data instead of hardcoding
@@ -445,7 +450,7 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
   player.queuePacket( gcPacket );*/
 
-  player.getCurrentTerritory()->onFinishLoading( player );
+  pCurrentZone->onFinishLoading( player );
 
   // player is done zoning
   player.setLoadingComplete( true );
@@ -461,7 +466,7 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   player.spawn( player.getAsPlayer() );
 
   // notify the zone of a change in position to force an "inRangeActor" update
-  player.getCurrentTerritory()->updateActorPosition( player );
+  pCurrentZone->updateActorPosition( player );
 }
 
 void Sapphire::Network::GameConnection::pcSearchHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -504,13 +509,15 @@ void Sapphire::Network::GameConnection::pcSearchHandler( const Packets::FFXIVARR
   queueOutPacket( pcSearchResultPacket );
 }
 
-void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                     Entity::Player& player )
+void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& debugCommandMgr = Common::Service< DebugCommandMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcChatHandler >( inPacket );
   auto& data = packet.data();
+
+  auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   if( data.message[ 0 ] == '!' )
   {
@@ -531,7 +538,7 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
       if( player.isActingAsGm() )
         chatPacket->data().type = static_cast< uint16_t >( ChatType::GMSay );
 
-      player.getCurrentTerritory()->queuePacketForRange( player, 50.f, chatPacket );
+      pCurrentZone->queuePacketForRange( player, 50.f, chatPacket );
       break;
     }
     case ChatType::Yell:
@@ -539,7 +546,7 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
       if( player.isActingAsGm() )
         chatPacket->data().type = static_cast< uint16_t >( ChatType::GMYell );
 
-      player.getCurrentTerritory()->queuePacketForRange( player, 6000.f, chatPacket );
+      pCurrentZone->queuePacketForRange( player, 6000.f, chatPacket );
       break;
     }
     case ChatType::Shout:
@@ -547,12 +554,12 @@ void Sapphire::Network::GameConnection::chatHandler( const Packets::FFXIVARR_PAC
       if( player.isActingAsGm() )
         chatPacket->data().type = static_cast< uint16_t >( ChatType::GMShout );
 
-      player.getCurrentTerritory()->queuePacketForRange( player, 6000.f, chatPacket );
+      pCurrentZone->queuePacketForRange( player, 6000.f, chatPacket );
       break;
     }
     default:
     {
-      player.getCurrentTerritory()->queuePacketForRange( player, 50.f, chatPacket );
+      pCurrentZone->queuePacketForRange( player, 50.f, chatPacket );
       break;
     }
   }
