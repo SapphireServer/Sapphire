@@ -562,7 +562,6 @@ void Action::Action::buildEffects()
         if( m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
         {
           m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() );
         }
       }
     }
