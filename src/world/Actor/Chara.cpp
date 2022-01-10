@@ -16,7 +16,7 @@
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
-#include "Network/PacketWrappers/EffectPacket.h"
+#include "Network/PacketWrappers/EffectPacket1.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/Action.h"
@@ -483,7 +483,6 @@ Will have to be extended for ranged attacks.
 */
 void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 {
-
   uint64_t tick = Util::getTimeMs();
 
   // todo: this needs to use the auto attack delay for the equipped weapon
@@ -495,19 +494,19 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 
     auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
 
-    auto effectPacket = std::make_shared< EffectPacket >( getId(), pTarget->getId(), 7 );
+    auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
+
     Common::CalcResultParam effectEntry{};
     effectEntry.Value = static_cast< int16_t >( damage );
     effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
     effectEntry.Arg0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
     effectEntry.Arg2 = 0x71;
-    effectPacket->addEffect( effectEntry, static_cast< uint64_t >( pTarget->getId() ) );
+    effectPacket->addTargetEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
     pTarget->takeDamage( damage );
-
   }
 }
 

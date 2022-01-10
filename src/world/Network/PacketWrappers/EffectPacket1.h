@@ -12,9 +12,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
   class EffectPacket1 : public ZoneChannelPacket< FFXIVIpcActionResult1 >
   {
-  private:
-    uint8_t m_targetEffectCount{0};
-    uint8_t m_sourceEffectCount{0};
   public:
     EffectPacket1( uint64_t sourceId, uint32_t targetId, uint32_t actionId ) :
       ZoneChannelPacket< FFXIVIpcActionResult1 >( static_cast< uint32_t >( sourceId ), targetId )
@@ -76,6 +73,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.RequestId = static_cast< uint32_t >( sourceSequence );
       m_data.ResultId = static_cast< uint32_t>( sequence );
     }
+
+  private:
+    uint8_t m_targetEffectCount{ 0 };
+    uint8_t m_sourceEffectCount{ 0 };
   };
 
 }

@@ -74,5 +74,5 @@ void MountAction::execute()
 
   m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
   m_effectBuilder->mount( m_pSource, m_mountId );
-  m_effectBuilder->buildAndSendPackets();
+  m_effectBuilder->buildAndSendPackets( { m_pSource } );
 }

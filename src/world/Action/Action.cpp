@@ -106,10 +106,11 @@ bool Action::Action::init()
       case Common::ClassJob::Bard:
       case Common::ClassJob::Archer:
         m_range = 25;
-
+        break;
         // anything that isnt ranged
       default:
         m_range = 3;
+        break;
     }
   }
 
@@ -431,7 +432,7 @@ void Action::Action::execute()
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
-  if( !m_actionData->data().ComboContinue )
+  if( m_actionData->data().ComboContinue )
   {
     // potential combo starter or correct combo from last action, must hit something to progress combo
     if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
@@ -512,7 +513,7 @@ void Action::Action::buildEffects()
   if( !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets();
+    m_effectBuilder->buildAndSendPackets( m_hitActors );
     return;
   }
 
@@ -533,14 +534,14 @@ void Action::Action::buildEffects()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
+      m_effectBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
-        m_effectBuilder->comboSucceed( actor );
+        m_effectBuilder->comboSucceed( m_pSource );
         shouldApplyComboSucceedEffect = false;
       }
 
@@ -558,9 +559,9 @@ void Action::Action::buildEffects()
           shouldRestoreMP = false;
         }
 
-        if ( !m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
+        if( m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
         {
-          m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
+          m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
         }
       }
     }
@@ -582,7 +583,7 @@ void Action::Action::buildEffects()
     }
   }
 
-  m_effectBuilder->buildAndSendPackets();
+  m_effectBuilder->buildAndSendPackets( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
   // at this point we're done with it and no longer need it
