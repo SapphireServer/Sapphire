@@ -65,11 +65,11 @@ void ItemAction::handleVFXItem()
   effect.Type = Common::ActionEffectType::CALC_RESULT_TYPE_CHECK_BARRIER;
   effect.Value = m_itemAction->data().Calcu0Arg[ 0 ];
 
-  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getSourceChara()->getId(), getId() );
+  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getId() );
   effectPacket->setTargetActor( getSourceChara()->getId() );
   effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
   effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
-  effectPacket->addEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
+  effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
 
   m_pSource->sendToInRangeSet( effectPacket, true );
 }
