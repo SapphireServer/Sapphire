@@ -638,8 +638,6 @@ namespace Sapphire::Entity
 
     void setIsLogin( bool bIsLogin );
 
-    uint16_t getZoneId() const;
-
     uint32_t getPrevTerritoryId() const;
 
     uint8_t getGmRank() const;

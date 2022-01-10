@@ -16,6 +16,7 @@
 
 #include "Manager/EventMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
 #include "WorldServer.h"
 
 #include "Territory/InstanceContent.h"
@@ -52,7 +53,9 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1}", objName, eventName );
   eventMgr.eventStart( player, actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
-  if( auto instance = player.getCurrentInstance() )
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( auto instance = pZone->getAsInstanceContent() )
   {
     instance->onTalk( player, eventId, actorId );
   }
@@ -147,6 +150,8 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packet
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto& teriMgr = Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   const auto packet = ZoneChannelPacket< FFXIVIpcEnterTerritoryHandler >( inPacket );
 
@@ -160,19 +165,19 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packet
 
   World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1} - {2}", objName, eventName, eventId & 0xFFFF );
 
-  if( auto instance = player.getCurrentInstance() )
+  if( auto instance = pZone->getAsInstanceContent() )
   {
-    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
+    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getTerritoryTypeId() );
     instance->onEnterTerritory( player, eventId, param1, param2 );
   }
-  else if( auto instance = player.getCurrentQuestBattle() )
+  else if( auto qb = pZone->getAsQuestBattle() )
   {
-    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
-    instance->onEnterTerritory( player, eventId, param1, param2 );
+    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getTerritoryTypeId() );
+    qb->onEnterTerritory( player, eventId, param1, param2 );
   }
   else
   {
-    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getZoneId() );
+    eventMgr.eventStart( player, player.getId(), eventId, Event::EventHandler::EnterTerritory, 0, player.getTerritoryTypeId() );
     scriptMgr.onEnterTerritory( player, eventId, param1, param2 );
   }
 

@@ -192,8 +192,8 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Call:
     {
-      if( targetPlayer->getZoneId() != player.getZoneId() )
-        targetPlayer->setZone( player.getZoneId() );
+      if( targetPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
+        targetPlayer->setZone( player.getTerritoryTypeId() );
 
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
@@ -213,7 +213,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                targetPlayer->getName(),
                                targetPlayer->getCurrency( CurrencyType::Gil ),
                                pTargetZone->getName(),
-                               targetPlayer->getZoneId(),
+                               targetPlayer->getTerritoryTypeId(),
                                static_cast< uint8_t >( targetPlayer->getClass() ),
                                targetPlayer->getLevel(),
                                targetPlayer->getExp(),
@@ -563,7 +563,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                "\nPopCount: {4}"
                                "\nCurrentWeather: {5}"
                                "\nNextWeather: {6}",
-                               player.getZoneId(),
+                               player.getTerritoryTypeId(),
                                pTargetZone->getName(),
                                pTargetZone->getInternalName(),
                                pTargetZone->getGuId(),
@@ -597,6 +597,7 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
     return;
 
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommandName >( inPacket );
 
@@ -633,6 +634,9 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
   if( !targetActor )
     return;
 
+  auto pTargetActorTerri = teriMgr.getTerritoryByGuId( targetActor->getTerritoryId() );
+  auto pPlayerTerri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+
   auto targetPlayer = targetActor->getAsPlayer();
 
   switch( commandId )
@@ -654,17 +658,17 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
     }
     case GmCommand::Jump:
     {
-      player.prepareZoning( targetPlayer->getZoneId(), true, 1, 0 );
-      if( player.getCurrentInstance() )
+      player.prepareZoning( targetPlayer->getTerritoryTypeId(), true, 1, 0 );
+      if( pPlayerTerri->getAsInstanceContent() )
       {
         player.exitInstance();
       }
       if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
       {
         // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
-        if( targetPlayer->getCurrentInstance() )
+        auto pInstanceContent = pTargetActorTerri->getAsInstanceContent();
+        if( pInstanceContent )
         {
-          auto pInstanceContent = targetPlayer->getCurrentInstance();
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
         }
@@ -678,13 +682,13 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
     case GmCommand::Call:
     {
       // We shouldn't be able to call a player into an instance, only call them out of one
-      if( player.getCurrentInstance() )
+      if( pPlayerTerri->getAsInstanceContent() )
       {
         PlayerMgr::sendUrgent( player, "You are unable to call a player while bound to a battle instance." );
         return;
       }
-      targetPlayer->prepareZoning( player.getZoneId(), true, 1, 0 );
-      if( targetPlayer->getCurrentInstance() )
+      targetPlayer->prepareZoning( player.getTerritoryTypeId(), true, 1, 0 );
+      if( pTargetActorTerri->getAsInstanceContent() )
       {
         targetPlayer->exitInstance();
       }

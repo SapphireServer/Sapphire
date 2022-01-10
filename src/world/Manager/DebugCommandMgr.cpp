@@ -1043,7 +1043,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
     uint16_t bgmId;
     sscanf( params.c_str(), "%hd", &bgmId );
 
-    if( auto instance = player.getCurrentInstance() )
+    if( auto instance = pCurrentZone->getAsInstanceContent() )
       instance->setCurrentBGM( bgmId );
   }
   else
@@ -1239,7 +1239,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
     uint16_t bgmId;
     sscanf( params.c_str(), "%hd", &bgmId );
 
-    if( auto instance = player.getCurrentInstance() )
+    if( auto instance = pCurrentZone->getAsInstanceContent() )
       instance->setCurrentBGM( bgmId );
   }
   else

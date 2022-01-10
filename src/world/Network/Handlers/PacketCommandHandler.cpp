@@ -43,7 +43,7 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
     auto pTarget = pSession->getPlayer();
     if( pTarget )
     {
-      if( pTarget->isActingAsGm() || pTarget->getZoneId() != player.getZoneId() )
+      if( pTarget->isActingAsGm() || pTarget->getTerritoryTypeId() != player.getTerritoryTypeId() )
       {
         server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::ExamineError ) );
       }

@@ -126,7 +126,7 @@ void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::
 
     if( pPlayer )
     {
-      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+      if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
         return;
 
       // retail sends the requester's id as both (isForSelf)
@@ -155,7 +155,7 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVAR
 
     if( pPlayer )
     {
-      if( pPlayer->isActingAsGm() || pPlayer->getZoneId() != player.getZoneId() )
+      if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
         return;
 
       // retail sends the requester's id as both (isForSelf)
@@ -360,7 +360,7 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
       auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
       moveTerritoryPacket->data().index = -1;
       moveTerritoryPacket->data().territoryType = targetZone;
-      moveTerritoryPacket->data().zoneId = player.getZoneId();
+      moveTerritoryPacket->data().zoneId = player.getTerritoryTypeId();
       moveTerritoryPacket->data().worldId = server.getWorldId();
       moveTerritoryPacket->data().worldId1 = server.getWorldId();
       moveTerritoryPacket->data().landId = -1;

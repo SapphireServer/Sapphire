@@ -373,24 +373,6 @@ void Sapphire::Entity::GameObject::setTerritoryId( uint32_t territoryId )
   m_territoryId = territoryId;
 }
 
-/*! \return InstanceContentPtr to the current instance, nullptr if not an instance or not set */
-Sapphire::InstanceContentPtr Sapphire::Entity::GameObject::getCurrentInstance() const
-{
-  if( m_pCurrentTerritory )
-    return m_pCurrentTerritory->getAsInstanceContent();
-
-  return nullptr;
-}
-
-/*! \return QuestBattlePtr to the current instance, nullptr if not an instance or not set */
-Sapphire::QuestBattlePtr Sapphire::Entity::GameObject::getCurrentQuestBattle() const
-{
-  if( m_pCurrentTerritory )
-    return m_pCurrentTerritory->getAsQuestBattle();
-
-  return nullptr;
-}
-
 /*!
 Get the current cellId of a region the actor is in
 

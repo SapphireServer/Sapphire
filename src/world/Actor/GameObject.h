@@ -133,10 +133,6 @@ namespace Sapphire::Entity
 
     void setCurrentZone( TerritoryPtr currZone );
 
-    InstanceContentPtr getCurrentInstance() const;
-
-    QuestBattlePtr getCurrentQuestBattle() const;
-
     // get the current cell of a region the actor is in
     Common::CellId getCellId() const;
     // set the current cell

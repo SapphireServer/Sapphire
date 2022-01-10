@@ -151,11 +151,6 @@ uint32_t Sapphire::Entity::Player::getMaxMp()
   return max_mp;
 }
 
-uint16_t Sapphire::Entity::Player::getZoneId() const
-{
-  return m_territoryTypeId;
-}
-
 uint32_t Sapphire::Entity::Player::getPrevTerritoryId() const
 {
   return m_prevTerritoryId;
@@ -754,7 +749,7 @@ void Sapphire::Entity::Player::resetDiscovery()
 void Sapphire::Entity::Player::changePosition( float x, float y, float z, float o )
 {
   Common::FFXIVARR_POSITION3 pos{ x, y, z };
-  m_queuedZoneing = std::make_shared< QueuedZoning >( getZoneId(), pos, Util::getTimeMs(), o );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( getTerritoryTypeId(), pos, Util::getTimeMs(), o );
 }
 
 void Sapphire::Entity::Player::learnAction( Common::UnlockEntry unlockId )
@@ -1750,7 +1745,7 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
   if( targetAetheryte )
   {
     auto fromAetheryte = exdData.getRow< Component::Excel::Aetheryte >(
-      exdData.getRow< Component::Excel::TerritoryType >( getZoneId() )->data().Aetheryte );
+      exdData.getRow< Component::Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
 
     // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
     auto cost = static_cast< uint16_t > (

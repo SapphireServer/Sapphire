@@ -401,7 +401,7 @@ void Sapphire::World::Manager::PartyMgr::sendPartyUpdate( Party& party )
     {
       bool isConnected = server.getSession( member->getCharacterId() ) != nullptr;
       // if player is online and in the same zone as current member in party, display more data in partylist
-      bool hasInfo = isConnected && member->getZoneId() == pMember->getZoneId();
+      bool hasInfo = isConnected && member->getTerritoryTypeId() == pMember->getTerritoryTypeId();
 
       if( hasInfo )
       {
