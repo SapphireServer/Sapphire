@@ -407,7 +407,7 @@ namespace Sapphire::Entity
 
     void setCompanion( uint16_t id );
 
-    uint16_t getCurrentCompanion() const;
+    uint8_t getCurrentCompanion() const;
 
     /*! get the current setMount */
     uint8_t getCurrentMount() const;

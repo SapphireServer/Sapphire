@@ -1456,7 +1456,7 @@ void Sapphire::Entity::Player::setCompanion( uint16_t id )
   sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleCompanion, id ), true );
 }
 
-uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
+uint8_t Sapphire::Entity::Player::getCurrentCompanion() const
 {
   return m_companionId;
 }

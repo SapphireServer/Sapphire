@@ -591,7 +591,7 @@ void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t s
   auto resumeEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
   resumeEvent->data().handlerId = eventId;
   resumeEvent->data().sceneId = static_cast< uint8_t >( scene );
-  resumeEvent->data().numOfArgs = values.size();
+  resumeEvent->data().numOfArgs = static_cast< uint8_t >( values.size() );
   int i = 0;
   for( auto& val : values )
   {
