@@ -345,32 +345,32 @@ namespace Component::Excel
     int8_t SelectCorpse;
     int8_t AttackType;
 
-    uint8_t SelectMyPet : 1;
-    uint8_t SelectGround : 1;
-    uint8_t SelectENpc : 1;
-    uint8_t SelectOthers : 1;
-    uint8_t SelectEnemy : 1;
-    uint8_t SelectAlliance : 1;
-    uint8_t SelectParty : 1;
     uint8_t SelectMyself : 1;
+    uint8_t SelectParty : 1;
+    uint8_t SelectAlliance : 1;
+    uint8_t SelectEnemy : 1;
+    uint8_t SelectOthers : 1;
+    uint8_t SelectENpc : 1;
+    uint8_t SelectGround : 1;
+    uint8_t SelectMyPet : 1;
 
-    uint8_t PvPOnly : 1;
-    uint8_t InvalidMove : 1;
-    uint8_t Silence : 1;
-    uint8_t ComboContinue : 1;
-    uint8_t EffectEnemy : 1;
-    uint8_t CheckDir : 1;
-    uint8_t Lay : 1;
     uint8_t SelectPartyPet : 1;
+    uint8_t Lay : 1;
+    uint8_t CheckDir : 1;
+    uint8_t EffectEnemy : 1;
+    uint8_t ComboContinue : 1;
+    uint8_t Silence : 1;
+    uint8_t InvalidMove : 1;
+    uint8_t PvPOnly : 1;
 
-    uint8_t IsTargetLine : 1;
-    uint8_t HideCastBar : 1;
-    uint8_t ForceVFX : 1;
-    uint8_t LogExec : 1;
-    uint8_t LogMiss : 1;
-    uint8_t LogCast : 1;
-    uint8_t IsMove : 1;
     uint8_t IsAvoid : 1;
+    uint8_t IsMove : 1;
+    uint8_t LogCast : 1;
+    uint8_t LogMiss : 1;
+    uint8_t LogExec : 1;
+    uint8_t ForceVFX : 1;
+    uint8_t HideCastBar : 1;
+    uint8_t IsTargetLine : 1;
 
     int8_t padding0;
   };
@@ -667,14 +667,13 @@ namespace Component::Excel
     uint16_t TelepoName;
     uint16_t TransferName;
     uint16_t TerritoryType;
+    uint16_t TextIcon;
     int16_t CostPosX;
     int16_t CostPosY;
     uint8_t Town;
     uint8_t SortKey;
-    uint8_t TextIcon;
-    uint8_t Telepo : 7;
-    uint8_t padding1 : 1;
-    int8_t padding2[2];
+    uint8_t Telepo : 1;
+    uint8_t padding1 : 7;
   };
 
   /* 195176 */

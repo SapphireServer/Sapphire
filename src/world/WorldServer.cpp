@@ -148,6 +148,17 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Data::ExdData >::set( pExdData );
 
+
+  auto idList = pExdData->getIdList< Component::Excel::Aetheryte >();
+
+  for( auto id : idList )
+  {
+    auto aetherInfo = pExdData->getRow< Component::Excel::Aetheryte >( id );
+
+    Logger::info( "id: {0} bool: {1}, padd: {2}", id, aetherInfo->data().Telepo, aetherInfo->data().padding1 );
+  }
+
+
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;
   loader.addDb( *pDb, m_config.global.database );
@@ -418,7 +429,6 @@ Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( uint64_t i
 
   return nullptr;
 }
-
 
 Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( const std::string& playerName )
 {
