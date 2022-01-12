@@ -409,6 +409,7 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   // init handler means this is a login procedure
   player.setIsLogin( true );
+  player.setConnected( true );
   teriMgr.joinWorld( player );
 }
 

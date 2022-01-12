@@ -679,7 +679,6 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( const TerritoryPtr& pZo
   if( playerLoaded && pPrevZone )
     pPrevZone->removeActor( player.getAsPlayer() );
 
-  player.setCurrentZone( pZone );
   pZone->pushActor( player.getAsPlayer() );
 
   // map player to instanceId so it can be tracked.

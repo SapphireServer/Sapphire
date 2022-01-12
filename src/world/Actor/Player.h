@@ -823,6 +823,9 @@ namespace Sapphire::Entity
     const Common::FFXIVARR_POSITION3& getPrevPos() const;
     float getPrevRot() const;
 
+    bool isConnected() const;
+    void setConnected( bool isConnected );
+
   private:
     /*! queue a packet for the player */
     void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
@@ -922,6 +925,8 @@ namespace Sapphire::Entity
     bool m_bInCombat;
     bool m_bLoadingComplete;
     bool m_bAutoattack;
+
+    bool m_bIsConnected;
 
     Common::ZoneingType m_zoningType;
 

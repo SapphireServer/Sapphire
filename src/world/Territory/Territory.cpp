@@ -808,7 +808,6 @@ Sapphire::Entity::EventObjectPtr Sapphire::Territory::registerEObj( const std::s
 {
   auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, rotation, name );
   eObj->setScale( scale );
-  eObj->setCurrentZone( shared_from_this() );
 
   registerEObj( eObj );
 

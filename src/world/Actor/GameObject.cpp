@@ -341,21 +341,9 @@ std::set< Sapphire::Entity::GameObjectPtr > Sapphire::Entity::GameObject::getInR
   return tempInRange;
 }
 
-/*! \return TerritoryPtr to the current zone, nullptr if not set */
-Sapphire::TerritoryPtr Sapphire::Entity::GameObject::getCurrentTerritory() const
-{
-  return m_pCurrentTerritory;
-}
-
 uint32_t Sapphire::Entity::GameObject::getTerritoryTypeId() const
 {
   return m_territoryTypeId;
-}
-
-/*! \param TerritoryPtr to the zone to be set as current */
-void Sapphire::Entity::GameObject::setCurrentZone( TerritoryPtr currZone )
-{
-  m_pCurrentTerritory = currZone;
 }
 
 void Sapphire::Entity::GameObject::setTerritoryTypeId( uint32_t territoryTypeId )

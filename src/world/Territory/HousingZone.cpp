@@ -294,7 +294,6 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 4, land->getMapMarkerPosition(), 0.f, "entrance" );
   eObj->setHousingLink( landId << 8 );
   eObj->setScale( 1.f );
-  eObj->setCurrentZone( shared_from_this() );
 
   registerEObj( eObj );
 

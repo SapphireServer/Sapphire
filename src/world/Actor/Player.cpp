@@ -82,7 +82,8 @@ Sapphire::Entity::Player::Player() :
   m_pQueuedAction( nullptr ),
   m_partyId( 0 ),
   m_onlineStatusCustom( 0 ),
-  m_onlineStatus( 0 )
+  m_onlineStatus( 0 ),
+  m_bIsConnected( false )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -123,10 +124,9 @@ void Sapphire::Entity::Player::unload()
 {
   // do one last update to db
   updateSql();
-  // reset the zone, so the zone handler knows to remove the actor
-  setCurrentZone( nullptr );
   // reset isLogin and loading sequences just in case
   setIsLogin( false );
+  setConnected( false );
   setLoadingComplete( false );
   // unset player for removal
   setMarkedForRemoval( false );
@@ -2229,4 +2229,14 @@ std::optional< Sapphire::World::Quest > Sapphire::Entity::Player::getQuest( uint
 
   auto quest = getQuestByIndex( idx );
   return { quest };
+}
+
+bool Sapphire::Entity::Player::isConnected() const
+{
+  return m_bIsConnected;
+}
+
+void Sapphire::Entity::Player::setConnected( bool isConnected )
+{
+  m_bIsConnected = isConnected;
 }
