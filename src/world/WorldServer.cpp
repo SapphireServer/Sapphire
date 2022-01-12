@@ -293,7 +293,7 @@ void Sapphire::World::WorldServer::mainLoop()
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
   auto& contentFinder = Common::Service< ContentFinder >::ref();
 
   while( isRunning() )
@@ -309,68 +309,57 @@ void Sapphire::World::WorldServer::mainLoop()
 
     contentFinder.update();
 
-    std::lock_guard< std::mutex > lock( m_sessionMutex );
-    for( auto sessionIt : m_sessionMapById )
+    updateSessions( currTime );
+
+    DbKeepAlive( currTime );
+  }
+}
+
+void Sapphire::World::WorldServer::DbKeepAlive( uint32_t currTime )
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  if( currTime - m_lastDBPingTime > 3 )
+  {
+    db.keepAlive();
+    m_lastDBPingTime = currTime;
+  }
+}
+
+void Sapphire::World::WorldServer::updateSessions( uint32_t currTime )
+{
+  std::queue< uint32_t > sessionRemovalQueue;
+  std::lock_guard< std::mutex > lock( m_sessionMutex );
+  for( const auto& [ id, session ] : m_sessionMapById )
+  {
+    if( !session || !session->getPlayer() )
+      continue;
+
+    // if the player is in a zone, let the zone handler take care of his updates, else do it here.
+    if( !session->getPlayer()->isConnected() )
+      session->update();
+
+    auto diff = difftime( currTime, session->getLastDataTime() );
+    auto& player = *session->getPlayer();
+
+    // remove session of players marked for removel ( logoff / kick )
+    if( ( player.isMarkedForRemoval() && diff > 5 ) || diff > 20 )
     {
-      auto session = sessionIt.second;
-      if( session && session->getPlayer() )
-      {
-
-        // if the player is in a zone, let the zone handler take care of his updates
-        // else do it here.
-        if( !session->getPlayer()->isConnected() )
-          session->update();
-
-      }
+      Logger::info( "[{0}] Session removal", session->getId() );
+      session->close();
+      sessionRemovalQueue.push( session->getId() );
     }
+  }
 
-    if( currTime - m_lastDBPingTime > 3 )
+  while( !sessionRemovalQueue.empty() )
+  {
+    auto removalId = sessionRemovalQueue.front();
+    sessionRemovalQueue.pop();
+    auto session = getSession( removalId );
+    if( session )
     {
-      db.keepAlive();
-      m_lastDBPingTime = currTime;
+      m_sessionMapById.erase( removalId );
+      removeSession( *session->getPlayer() );
     }
-
-    auto it = m_sessionMapById.begin();
-    for( ; it != m_sessionMapById.end(); )
-    {
-      auto diff = std::difftime( currTime, it->second->getLastDataTime() );
-
-      auto pPlayer = it->second->getPlayer();
-
-      // remove session of players marked for removel ( logoff / kick )
-      if( pPlayer->isMarkedForRemoval() && diff > 5 )
-      {
-        it->second->close();
-        // if( it->second.unique() )
-        {
-          Logger::info( "[{0}] Session removal", it->second->getId() );
-          it = m_sessionMapById.erase( it );
-          removeSession( pPlayer->getCharacterId() );
-          removeSession( pPlayer->getName() );
-          continue;
-        }
-      }
-
-      // remove sessions that simply timed out
-      if( diff > 20 )
-      {
-        Logger::info( "[{0}] Session time out", it->second->getId() );
-
-        it->second->close();
-        // if( it->second.unique() )
-        {
-          it = m_sessionMapById.erase( it );
-          removeSession( pPlayer->getCharacterId() );
-          removeSession( pPlayer->getName() );
-        }
-      }
-      else
-      {
-        ++it;
-      }
-
-    }
-
   }
 }
 
@@ -378,24 +367,22 @@ bool Sapphire::World::WorldServer::createSession( uint32_t sessionId )
 {
   std::lock_guard< std::mutex > lock( m_sessionMutex );
 
-  const auto session_id_str = std::to_string( sessionId );
+  const auto sessionIdStr = std::to_string( sessionId );
 
-  auto it = m_sessionMapById.find( sessionId );
+  auto pSession = getSession( sessionId );
 
-  if( it != m_sessionMapById.end() )
+  if( pSession )
   {
-    Logger::error( "[{0}] Error creating session", session_id_str );
+    Logger::error( "[{0}] Error creating session, already in list", sessionIdStr );
     return false;
   }
 
-  Logger::info( "[{0}] Creating new session", session_id_str );
+  Logger::info( "[{0}] Creating new session", sessionIdStr );
 
-  std::shared_ptr< Session > newSession( new Session( sessionId ) );
-  
-
+  auto newSession = std::make_shared< Session >( sessionId );
   if( !newSession->loadPlayer() )
   {
-    Logger::error( "[{0}] Error loading player {0}", session_id_str );
+    Logger::error( "[{0}] Error loading player {0}", sessionIdStr );
     return false;
   }
 
@@ -404,7 +391,6 @@ bool Sapphire::World::WorldServer::createSession( uint32_t sessionId )
   m_sessionMapByCharacterId[ newSession->getPlayer()->getCharacterId() ] = newSession;
 
   return true;
-
 }
 
 void Sapphire::World::WorldServer::removeSession( uint32_t sessionId )
@@ -453,14 +439,10 @@ Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( const std:
   return nullptr;
 }
 
-void Sapphire::World::WorldServer::removeSession( const std::string& playerName )
+void Sapphire::World::WorldServer::removeSession( const Entity::Player& player )
 {
-  m_sessionMapByName.erase( playerName );
-}
-
-void Sapphire::World::WorldServer::removeSession( uint64_t characterId )
-{
-  m_sessionMapByCharacterId.erase( characterId );
+  m_sessionMapByName.erase( player.getName() );
+  m_sessionMapByCharacterId.erase( player.getCharacterId() );
 }
 
 bool Sapphire::World::WorldServer::isRunning() const
@@ -468,7 +450,7 @@ bool Sapphire::World::WorldServer::isRunning() const
   return m_bRunning;
 }
 
-std::vector< Sapphire::World::SessionPtr > Sapphire::World::WorldServer::searchSessionByName(const std::string& playerName)
+std::vector< Sapphire::World::SessionPtr > Sapphire::World::WorldServer::searchSessionByName( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 

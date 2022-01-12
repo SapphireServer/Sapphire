@@ -24,8 +24,7 @@ namespace Sapphire::World
     bool createSession( uint32_t sessionId );
 
     void removeSession( uint32_t sessionId );
-    void removeSession( uint64_t characterId );
-    void removeSession( const std::string& playerName );
+    void removeSession( const Entity::Player& player );
 
     World::SessionPtr getSession( uint32_t id );
     World::SessionPtr getSession( uint64_t characterId );
@@ -94,6 +93,9 @@ namespace Sapphire::World
   public:
     std::map< int32_t, BNPCMap >& getBNpcTeriMap();
 
+    void updateSessions( uint32_t currTime );
+
+    void DbKeepAlive( uint32_t currTime );
   };
 
 }
