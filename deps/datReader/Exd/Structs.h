@@ -344,6 +344,7 @@ namespace Component::Excel
     int8_t SelectRange;
     int8_t SelectCorpse;
     int8_t AttackType;
+
     uint8_t SelectMyPet : 1;
     uint8_t SelectGround : 1;
     uint8_t SelectENpc : 1;
@@ -352,6 +353,7 @@ namespace Component::Excel
     uint8_t SelectAlliance : 1;
     uint8_t SelectParty : 1;
     uint8_t SelectMyself : 1;
+
     uint8_t PvPOnly : 1;
     uint8_t InvalidMove : 1;
     uint8_t Silence : 1;
@@ -360,6 +362,7 @@ namespace Component::Excel
     uint8_t CheckDir : 1;
     uint8_t Lay : 1;
     uint8_t SelectPartyPet : 1;
+
     uint8_t IsTargetLine : 1;
     uint8_t HideCastBar : 1;
     uint8_t ForceVFX : 1;
@@ -368,7 +371,8 @@ namespace Component::Excel
     uint8_t LogCast : 1;
     uint8_t IsMove : 1;
     uint8_t IsAvoid : 1;
-    int8_t padding0[1];
+
+    int8_t padding0;
   };
 
   /* 75653 */

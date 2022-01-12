@@ -148,9 +148,6 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Data::ExdData >::set( pExdData );
 
-//  auto aetherInfo = pExdData->getRow< Component::Excel::ClassJob >( 2 );
-//  auto aetherInfo1 = pExdData->getRow< Component::Excel::ClassJob >( 3 );
-
   auto pDb = std::make_shared< Db::DbWorkerPool< Db::ZoneDbConnection > >();
   Sapphire::Db::DbLoader loader;
   loader.addDb( *pDb, m_config.global.database );
@@ -341,7 +338,7 @@ void Sapphire::World::WorldServer::updateSessions( uint32_t currTime )
     auto diff = difftime( currTime, session->getLastDataTime() );
     auto& player = *session->getPlayer();
 
-    // remove session of players marked for removel ( logoff / kick )
+    // remove session of players marked for removal ( logoff / kick )
     if( ( player.isMarkedForRemoval() && diff > 5 ) || diff > 20 )
     {
       Logger::info( "[{0}] Session removal", session->getId() );
@@ -354,12 +351,8 @@ void Sapphire::World::WorldServer::updateSessions( uint32_t currTime )
   {
     auto removalId = sessionRemovalQueue.front();
     sessionRemovalQueue.pop();
-    auto session = getSession( removalId );
-    if( session )
-    {
-      m_sessionMapById.erase( removalId );
+    if( auto session = getSession( removalId ) )
       removeSession( *session->getPlayer() );
-    }
   }
 }
 
@@ -441,6 +434,10 @@ Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( const std:
 
 void Sapphire::World::WorldServer::removeSession( const Entity::Player& player )
 {
+  auto session = getSession( player.getCharacterId() );
+  if( session )
+    m_sessionMapById.erase( session->getId() );
+
   m_sessionMapByName.erase( player.getName() );
   m_sessionMapByCharacterId.erase( player.getCharacterId() );
 }
