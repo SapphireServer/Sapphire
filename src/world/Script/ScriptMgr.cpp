@@ -408,7 +408,7 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
       didCallScript = true;
       std::string objName = eventMgr.getEventName( questId );
 
-      PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}, questId#", objName, actorId, quest.getId() );
+      PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}, questId#{2}", objName, actorId, quest.getId() );
 
       World::Quest preQ = quest;
       script->onEObjHit( quest, player, actorId, actionId );
