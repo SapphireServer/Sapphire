@@ -916,7 +916,7 @@ void Sapphire::Entity::Player::setLevel( uint8_t level )
 void Sapphire::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( classjob ) )->data().WorkIndex;
 
   if( m_classArray[ classJobIndex ] == 0 )
     insertDbClass( classJobIndex, level );
