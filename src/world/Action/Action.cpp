@@ -432,7 +432,7 @@ void Action::Action::execute()
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
-  if( m_actionData->data().ComboContinue )
+  if( !m_actionData->data().ComboContinue )
   {
     // potential combo starter or correct combo from last action, must hit something to progress combo
     if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
@@ -559,7 +559,7 @@ void Action::Action::buildEffects()
           shouldRestoreMP = false;
         }
 
-        if( m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
+        if( !m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
         {
           m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
         }
