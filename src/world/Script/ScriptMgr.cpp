@@ -207,7 +207,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   // check if the actor is an eobj and call its script if we have one
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
-  if( auto eobj = zone ? zone->getEObj( actorId ) : nullptr )
+  if( auto eobj = zone ? zone->getEObj( static_cast< uint32_t >( actorId ) ) : nullptr )
   {
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventObjectScript >( eobj->getObjectId() );
     if( script )

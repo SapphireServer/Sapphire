@@ -830,6 +830,9 @@ void Sapphire::Entity::BNpc::checkAggro()
         return;
     }
 
+    if( getEnemyType() == 0 && pClosestChara->getAsBNpc()->getEnemyType() == 0 )
+      return;
+
     // will use this range if chara level is lower than bnpc, otherwise diminishing equation applies
     float range = 14.f;
 
