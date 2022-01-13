@@ -196,7 +196,7 @@ namespace xivps3::dat
         {
           outputFile->_type = FileType::standard;
 
-          uint32_t number_of_blocks = extract< uint32_t >( m_handle, "number_of_blocks", false );
+          auto number_of_blocks = extract< uint32_t >( m_handle, "number_of_blocks", false );
 
           // Just extract offset infos for the blocks to extract
           std::vector< DatStdFileBlockInfos > std_file_block_infos;
@@ -219,7 +219,7 @@ namespace xivps3::dat
         {
           outputFile->_type = FileType::model;
 
-          DatMdlFileBlockInfos mdlBlockInfo = extract< DatMdlFileBlockInfos >( m_handle );
+          auto mdlBlockInfo = extract< DatMdlFileBlockInfos >( m_handle );
 
           // Getting the block number and read their sizes
           const uint32_t block_count = mdlBlockInfo.block_ids[ ::model_section_count - 1 ] +
@@ -251,7 +251,7 @@ namespace xivps3::dat
           outputFile->_type = FileType::texture;
 
           // Extracts mipmap entries and the block sizes
-          uint32_t sectionCount = extract< uint32_t >( m_handle, "sections_count" );
+          auto sectionCount = extract< uint32_t >( m_handle, "sections_count" );
 
           std::vector< DatTexFileBlockInfos > texBlockInfo;
           extract< DatTexFileBlockInfos >( m_handle, sectionCount, texBlockInfo );
@@ -301,7 +301,7 @@ namespace xivps3::dat
   {
     m_handle.seekg( i_offset );
 
-    DatBlockHeader block_header = extract< DatBlockHeader >( m_handle );
+    auto block_header = extract< DatBlockHeader >( m_handle );
 
     // Resizing the vector to write directly into it
     const uint32_t data_size = o_data.size();
