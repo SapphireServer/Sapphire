@@ -170,7 +170,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void QuestScript::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
+  void QuestScript::onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
   {
   }
 

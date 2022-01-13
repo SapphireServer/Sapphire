@@ -365,7 +365,7 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_
   // loop through all active quests and try to call available onBNpcKill callbacks
   for( size_t i = 0; i < 30; i++ )
   {
-    auto quest = player.getQuestByIndex( static_cast< uint16_t >( i ));
+    auto quest = player.getQuestByIndex( static_cast< uint16_t >( i ) );
     if( quest.getId() == 0 )
       continue;
 
@@ -402,15 +402,18 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
 
     uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
 
-    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( questId );
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
     if( script )
     {
       didCallScript = true;
       std::string objName = eventMgr.getEventName( questId );
 
-      PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}", objName, actorId );
+      PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}, questId#", objName, actorId, quest.getId() );
 
-      script->onEObjHit( player, actorId, actionId );
+      World::Quest preQ = quest;
+      script->onEObjHit( quest, player, actorId, actionId );
+      if( quest != preQ )
+        player.updateQuest( quest );
     }
   }
 
