@@ -7,6 +7,8 @@
 #include <ScriptObject.h>
 #include <Service.h>
 #include "Manager/TerritoryMgr.h"
+//Temporrary because QuestBattles are broken
+#include "Manager/PlayerMgr.h"
 
 // Quest Script: ClsArc005_00071
 // Quest Name: Homecoming
@@ -228,11 +230,13 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
+      //Questbattles be broken
       quest.setSeq( SeqFinish );
-      auto &pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+      Sapphire::World::Manager::PlayerMgr::sendDebug(player, "QuestBattle content is currently broken. The fight has been skipped for you.");
+      /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
-      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
+      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );*/
     }
   }
 

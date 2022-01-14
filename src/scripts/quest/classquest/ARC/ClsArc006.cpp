@@ -7,6 +7,8 @@
 #include <ScriptObject.h>
 #include <Service.h>
 #include "Manager/TerritoryMgr.h"
+//Temporrary because QuestBattles are broken
+#include "Manager/PlayerMgr.h"
 
 // Quest Script: ClsArc006_00076
 // Quest Name: The One that Got Away
@@ -186,11 +188,13 @@ class ClsArc006 : public Sapphire::ScriptAPI::QuestScript
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if (result.getResult(0) == 1) {
+      //QuestBattles don't work atm
       quest.setSeq(Seq2);
-      auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+      Sapphire::World::Manager::PlayerMgr::sendDebug(player, "QuestBattle content is currently broken. The fight has been skipped for you.");
+      /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish(player, result.eventId, 0);
-      pTeriMgr.createAndJoinQuestBattle(player, Questbattle0);
+      pTeriMgr.createAndJoinQuestBattle(player, Questbattle0);*/
     }
   }
 
@@ -308,11 +312,13 @@ class ClsArc006 : public Sapphire::ScriptAPI::QuestScript
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if (result.getResult(0) == 1) {
+      //QuestBattles don't work atm
       quest.setSeq(SeqFinish);
-      auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+      Sapphire::World::Manager::PlayerMgr::sendDebug(player, "QuestBattle content is currently broken. The fight has been skipped for you.");
+      /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish(player, result.eventId, 0);
-      pTeriMgr.createAndJoinQuestBattle(player, Questbattle1);
+      pTeriMgr.createAndJoinQuestBattle(player, Questbattle1);*/
     }
   }
 
