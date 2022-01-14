@@ -2,6 +2,7 @@
 #define XIV_UTILS_ZLIB_H
 
 #include <cstdint>
+#include <cstddef>
 #include <vector>
 
 namespace xivps3::utils::zlib
