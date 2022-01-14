@@ -30,6 +30,8 @@ namespace Sapphire::Network::ActorControl
     DefeatMsg = 0x06,
     GainExpMsg = 0x07,
 
+    ClassJobUpdate = 0x9,
+
     LevelUpEffect = 0x0A,
 
     ExpChainMsg = 0x0C,

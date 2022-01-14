@@ -139,7 +139,7 @@ float Util::trunc( float value, uint8_t digitsToRemain )
   if( digitsToRemain == 0 )
     return std::floor( value );
 
-  float factor = std::powf( 10, digitsToRemain );
+  float factor = std::pow( 10, digitsToRemain );
 
   return std::floor( value * factor ) / factor;
 }

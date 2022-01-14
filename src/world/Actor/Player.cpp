@@ -922,6 +922,8 @@ void Sapphire::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob
     insertDbClass( classJobIndex, level );
 
   m_classArray[ classJobIndex ] = level;
+
+  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::ClassJobUpdate, static_cast< uint8_t >( classjob ), level ) );
 }
 
 void Sapphire::Entity::Player::sendModel()
@@ -1427,6 +1429,18 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
   sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
 }
 
+void Sapphire::Entity::Player::setMaxGearSets( uint8_t amount )
+{
+  m_equippedMannequin = amount;
+
+  queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
+}
+
+uint8_t Sapphire::Entity::Player::getMaxGearSets() const
+{
+  return m_equippedMannequin;
+}
+
 void Sapphire::Entity::Player::setEquipDisplayFlags( uint16_t state )
 {
   m_equipDisplayFlags = static_cast< uint8_t >( state );
@@ -1601,6 +1615,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( isLogin() )
   {
     queuePacket( makeActorControlSelf( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
+    queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )

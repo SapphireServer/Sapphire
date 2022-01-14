@@ -396,6 +396,12 @@ namespace Sapphire::Entity
     /*! send the players title list */
     void sendTitleList();
 
+      /*! set number of gear sets */
+    void setMaxGearSets( uint8_t amount );
+
+    /*! get number of gear sets */
+    uint8_t getMaxGearSets() const;
+
     /*! change gear param state */
     void setEquipDisplayFlags( uint16_t state );
 
@@ -865,6 +871,8 @@ namespace Sapphire::Entity
     float m_prevRot{};
 
     uint8_t m_voice{};
+
+    uint8_t m_equippedMannequin;
 
     uint64_t m_modelMainWeapon;
     uint64_t m_modelSubWeapon;
