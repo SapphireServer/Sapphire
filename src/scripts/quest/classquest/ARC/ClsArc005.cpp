@@ -2,11 +2,11 @@
 // Content needs to be added by hand to make it function
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-#include <Actor/Player.h>
 #include "Manager/EventMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
-#include "Manager/TerritoryMgr.h"
 //Temporrary because QuestBattles are broken
 #include "Manager/PlayerMgr.h"
 
@@ -62,8 +62,7 @@ private:
   static constexpr auto Territorytype0 = 230;
 
 public:
-  ClsArc005() : Sapphire::ScriptAPI::QuestScript( 65607 )
-  {};
+  ClsArc005() : Sapphire::ScriptAPI::QuestScript( 65607 ){};
 
   ~ClsArc005() = default;
 
@@ -73,54 +72,46 @@ public:
   {
     switch( actorId )
     {
-      case Actor0:
-      {
-        if( !player.hasQuest( getId()))
+      case Actor0: {
+        if( !player.hasQuest( getId() ) )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
           Scene00010( quest, player );
 
         break;
       }
-      case Actor1:
-      {
+      case Actor1: {
         if( quest.getSeq() == Seq1 )
           Scene00002( quest, player );
         break;
       }
-      case Actor2:
-      {
+      case Actor2: {
         if( quest.getSeq() == Seq2 )
           Scene00003( quest, player );
         break;
       }
-      case Actor3:
-      {
+      case Actor3: {
         if( quest.getSeq() == Seq4 )
           Scene00006( quest, player );
         break;
       }
-      case Actor4:
-      {
+      case Actor4: {
         break;
       }
-      case Actor5:
-      {
+      case Actor5: {
         break;
       }
-      case Actor6:
-      {
+      case Actor6: {
         break;
       }
-      case Eobject0:
-      {
-        eventMgr().eventActionStart( player, getId(), 0x0A,
-                                     [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional )
-                                     {
-                                       Scene00004( quest, player );
-                                       eventMgr().sendEventNotice( player, getId(), 2, 2, 0, 0 );
-                                     },
-                                     nullptr, 0 );
+      case Eobject0: {
+        eventMgr().eventActionStart(
+                player, getId(), 0x0A,
+                [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {
+                  Scene00004( quest, player );
+                  eventMgr().sendEventNotice( player, getId(), 2, 2, 0, 0 );
+                },
+                nullptr, 0 );
         break;
       }
     }
@@ -139,7 +130,7 @@ private:
 
   void Scene00000Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
-    if( result.getResult( 0 ) == 1 ) // accept quest
+    if( result.getResult( 0 ) == 1 )// accept quest
     {
       Scene00001( quest, player );
     }
@@ -232,7 +223,7 @@ private:
     {
       //Questbattles be broken
       quest.setSeq( SeqFinish );
-      Sapphire::World::Manager::PlayerMgr::sendDebug(player, "QuestBattle content is currently broken. The fight has been skipped for you.");
+      Sapphire::World::Manager::PlayerMgr::sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
@@ -278,9 +269,7 @@ private:
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
-
 };
 
 EXPOSE_SCRIPT( ClsArc005 );
