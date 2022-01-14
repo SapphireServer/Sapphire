@@ -6,6 +6,7 @@
 #include "Event/EventHandler.h"
 #include "Manager/EventMgr.h"
 #include "Manager/LinkshellMgr.h"
+#include "Manager/PlayerMgr.h"
 #include "Service.h"
 
 #ifdef _MSC_VER
@@ -170,6 +171,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
+
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();
@@ -178,6 +180,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::LinkshellMgr& linkshellMgr()
     {
       return Common::Service< World::Manager::LinkshellMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
     }
   };
 
@@ -229,6 +236,11 @@ namespace Sapphire::ScriptAPI
     {
       return Common::Service< World::Manager::EventMgr >::ref();
     }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
   /*!
@@ -244,6 +256,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
     }
   };
 
@@ -286,6 +303,11 @@ namespace Sapphire::ScriptAPI
     {
       return Common::Service< World::Manager::EventMgr >::ref();
     }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
   /*!
@@ -312,6 +334,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
     }
   };
 
