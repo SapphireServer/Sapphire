@@ -1417,7 +1417,6 @@ namespace Component::Excel
   struct EObj
   {
     EObjTextStruct Text;
-    float EventHighAddition;
     uint32_t EventHandler;
     uint16_t SharedGroup;
     uint8_t PopType;
