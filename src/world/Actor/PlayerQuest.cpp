@@ -34,7 +34,12 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
 {
   removeQuestsCompleted( questId );
-  sendQuestInfo();
+
+  auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
+  questFinishPacket->data().questId = questId;
+  questFinishPacket->data().flag1 = 0;
+  questFinishPacket->data().flag2 = 1;
+  queuePacket( questFinishPacket );
 }
 
 void Sapphire::Entity::Player::removeQuest( uint16_t questId )
@@ -1040,7 +1045,8 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
   uint8_t value = 0x80 >> bitIndex;
 
-  m_questCompleteFlags[ index ] ^= value;
+  if( m_questCompleteFlags[ index ] & value )
+    m_questCompleteFlags[ index ] ^= value;
 
   Common::Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 
