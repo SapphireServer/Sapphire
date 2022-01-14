@@ -89,7 +89,7 @@ private:
 
   void Scene00001( World::Quest &quest, Entity::Player &player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | HIDE_UI, bindSceneReturn( &ClsArc998::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | HIDE_UI | DISABLE_SKIP, bindSceneReturn( &ClsArc998::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
@@ -98,6 +98,8 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId() );
+      player.setLevelForClass( 1, Sapphire::Common::ClassJob::Archer );
+      player.setMaxGearSets( player.getMaxGearSets() + 1 );
     }
   }
 };

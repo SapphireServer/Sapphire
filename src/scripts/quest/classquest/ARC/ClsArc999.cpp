@@ -56,7 +56,7 @@ private:
 
   void Scene00000( World::Quest &quest, Entity::Player &player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &ClsArc999::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ClsArc999::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
@@ -64,7 +64,6 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), 0 );
-      player.setLevelForClass( 1, Sapphire::Common::ClassJob::Archer );
     }
   }
 };
