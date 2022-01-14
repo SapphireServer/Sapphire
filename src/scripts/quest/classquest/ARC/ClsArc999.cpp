@@ -40,7 +40,8 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         Scene00000( quest, player );
         break;
       }

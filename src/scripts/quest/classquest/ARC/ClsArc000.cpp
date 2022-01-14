@@ -63,11 +63,13 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         Scene00000( quest, player );
         break;
       }
-      case Actor1: {
+      case Actor1:
+      {
         if( quest.getSeq() == Seq1 )
           Scene00001( quest, player );
         else
@@ -84,7 +86,8 @@ public:
 
     switch( nameId )
     {
-      case Enemy0: {
+      case Enemy0:
+      {
         auto currentKC37 = quest.getUI8AL();
 
         if( currentKC37 + 1 >= 3 )
@@ -100,7 +103,8 @@ public:
 
         break;
       }
-      case Enemy1: {
+      case Enemy1:
+      {
         auto currentKC49 = quest.getUI8BH();
 
         if( currentKC49 + 1 >= 3 )
@@ -116,7 +120,8 @@ public:
 
         break;
       }
-      case Enemy2: {
+      case Enemy2:
+      {
         auto currentKC47 = quest.getUI8BL();
 
         if( currentKC47 + 1 >= 3 )

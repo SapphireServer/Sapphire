@@ -51,12 +51,14 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
         break;
       }
-      case Actor1: {
+      case Actor1:
+      {
         if( quest.getSeq() == SeqFinish )
           Scene00001( quest, player );
         break;

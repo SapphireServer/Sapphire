@@ -76,7 +76,8 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         if( !player.hasQuest( getId() ) )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
@@ -84,46 +85,56 @@ public:
 
         break;
       }
-      case Actor1: {
+      case Actor1:
+      {
         if( quest.getSeq() == Seq1 )
           Scene00002( quest, player );
 
         break;
       }
-      case Actor2: {
+      case Actor2:
+      {
         break;
       }
-      case Actor3: {
+      case Actor3:
+      {
         break;
       }
-      case Actor4: {
+      case Actor4:
+      {
         break;
       }
-      case Actor5: {
+      case Actor5:
+      {
         break;
       }
-      case Actor6: {
+      case Actor6:
+      {
         break;
       }
-      case Actor7: {
+      case Actor7:
+      {
         if( quest.getSeq() == SeqFinish )
           Scene00014( quest, player );
 
         break;
       }
-      case Actor8: {
+      case Actor8:
+      {
         if( quest.getSeq() == SeqFinish )
           Scene00015( quest, player );
 
         break;
       }
-      case Actor9: {
+      case Actor9:
+      {
         if( quest.getSeq() == SeqFinish )
           Scene00016( quest, player );
 
         break;
       }
-      case Eobject1: {
+      case Eobject1:
+      {
         eventMgr().eventActionStart(
                 player, getId(), 0x1B,
                 [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {

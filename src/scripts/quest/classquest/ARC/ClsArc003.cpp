@@ -75,7 +75,8 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         if( !player.hasQuest( getId() ) )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
@@ -85,7 +86,8 @@ public:
 
         break;
       }
-      case Actor1: {
+      case Actor1:
+      {
         if( quest.getSeq() == Seq1 )
         {
           Scene00001( quest, player );
@@ -100,7 +102,8 @@ public:
         }
         break;
       }
-      case Eobject8: {
+      case Eobject8:
+      {
         if( quest.getSeq() == Seq4 )
           Scene00027( quest, player );
         break;
@@ -115,42 +118,50 @@ public:
 
     switch( actor )
     {
-      case Eobject0: {
+      case Eobject0:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00002( quest, player );
         break;
       }
-      case Eobject1: {
+      case Eobject1:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00003( quest, player );
         break;
       }
-      case Eobject2: {
+      case Eobject2:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00004( quest, player );
         break;
       }
-      case Eobject3: {
+      case Eobject3:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00005( quest, player );
         break;
       }
-      case Eobject4: {
+      case Eobject4:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00006( quest, player );
         break;
       }
-      case Eobject5: {
+      case Eobject5:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00007( quest, player );
         break;
       }
-      case Eobject6: {
+      case Eobject6:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00008( quest, player );
         break;
       }
-      case Eobject7: {
+      case Eobject7:
+      {
         eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00009( quest, player );
         break;

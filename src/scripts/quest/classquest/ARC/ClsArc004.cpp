@@ -75,7 +75,8 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         if( !player.hasQuest( getId() ) )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
@@ -83,7 +84,8 @@ public:
 
         break;
       }
-      case Actor1: {
+      case Actor1:
+      {
         if( quest.getSeq() == Seq1 )
           Scene00002( quest, player );
         else if( quest.getSeq() == Seq5 )//Master claims we can't talk with this NPC
@@ -91,23 +93,28 @@ public:
 
         break;
       }
-      case Actor2: {
+      case Actor2:
+      {
         if( quest.getSeq() == Seq5 )
           Scene00020( quest, player );
         break;
       }
-      case Actor3: {
+      case Actor3:
+      {
         if( quest.getSeq() == Seq5 )
           Scene00019( quest, player );
         break;
       }
-      case Actor4: {
+      case Actor4:
+      {
         break;
       }
-      case Actor5: {
+      case Actor5:
+      {
         break;
       }
-      case Eobject0: {
+      case Eobject0:
+      {
         eventMgr().eventActionStart(
                 player, getId(), 0x07,
                 [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {
@@ -116,7 +123,8 @@ public:
                 nullptr, 0 );
         break;
       }
-      case Eobject1: {
+      case Eobject1:
+      {
         eventMgr().eventActionStart(
                 player, getId(), 0x07,
                 [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {
@@ -125,7 +133,8 @@ public:
                 nullptr, 0 );
         break;
       }
-      case Eobject2: {
+      case Eobject2:
+      {
         eventMgr().eventActionStart(
                 player, getId(), 0x07,
                 [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {
@@ -134,7 +143,8 @@ public:
                 nullptr, 0 );
         break;
       }
-      case Eobject3: {
+      case Eobject3:
+      {
         eventMgr().eventActionStart(
                 player, getId(), 0x0A,
                 [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {
@@ -144,7 +154,8 @@ public:
                 nullptr, 0 );
         break;
       }
-      case Eobject4: {
+      case Eobject4:
+      {
         eventMgr().eventActionStart(
                 player, getId(), 0x01,
                 [ & ]( Entity::Player &player, uint32_t eventId, uint64_t additional ) {

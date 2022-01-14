@@ -70,14 +70,16 @@ public:
   {
     switch( actorId )
     {
-      case Actor0: {
+      case Actor0:
+      {
         if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
           Scene00030( quest, player );
         break;
       }
-      case Actor1: {
+      case Actor1:
+      {
         if( quest.getSeq() == Seq1 )
           Scene00001( quest, player );
         else if( quest.getSeq() == Seq3 )
@@ -86,7 +88,8 @@ public:
           Scene00029( quest, player );
         break;
       }
-      case Actor2: {
+      case Actor2:
+      {
         break;
       }
     }
@@ -102,7 +105,8 @@ public:
 
     switch( nameId )
     {
-      case Enemy0: {
+      case Enemy0:
+      {
         if( currentKC39 >= 8 )
         {
           quest.setUI8AL( currentKC39 );
@@ -117,7 +121,8 @@ public:
 
         break;
       }
-      case Enemy1: {
+      case Enemy1:
+      {
         if( currentKC12 >= 8 )
         {
           quest.setUI8BH( currentKC12 );
