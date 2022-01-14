@@ -102,6 +102,8 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
 
   m_gmRank = res->getUInt8( "GMRank" );
 
+  m_equippedMannequin = res->getUInt8( "EquippedMannequin" );
+
   m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
 
   m_pose = res->getUInt8( "Pose" );
@@ -395,7 +397,7 @@ void Sapphire::Entity::Player::updateDbChara() const
   memcpy( orchestrionVec.data(), m_orchestrion.data(), m_orchestrion.size() );
   stmt->setBinary( 42, mountsVec );
 
-  stmt->setInt( 44, 0 ); // EquippedMannequin
+  stmt->setInt( 44, m_equippedMannequin ); // EquippedMannequin
 
   stmt->setInt( 45, 0 ); // DisplayFlags
   std::vector< uint8_t > questCompleteVec( m_questCompleteFlags.size() );
