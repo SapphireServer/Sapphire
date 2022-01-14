@@ -284,6 +284,8 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
 {
   const auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
+  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
   {
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
@@ -293,7 +295,7 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
     {
       auto idx = player.getQuestIndex( eventId );
       auto& quest = player.getQuestByIndex( idx );
-      script->onEmote( quest, actorId, emoteId, player );
+      script->onEmote( quest, actor, emoteId, player );
     }
   }
   else
@@ -301,7 +303,7 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
     if( !script )
       return false;
-    script->onEmote( actorId, eventId, emoteId, player );
+    script->onEmote( actor, eventId, emoteId, player );
   }
 
   return true;

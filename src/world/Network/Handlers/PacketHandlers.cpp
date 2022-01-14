@@ -215,7 +215,7 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
   player.setRot( data.dir );
   player.setPos( { data.pos.x, data.pos.y, data.pos.z } );
 
-  if( player.getCurrentAction() && bPosChanged )
+  if( player.getCurrentAction() && bPosChanged && player.getCurrentAction()->getCastTimeRest() > 500 )
     player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
 
   auto clientAnimationType = data.flag;

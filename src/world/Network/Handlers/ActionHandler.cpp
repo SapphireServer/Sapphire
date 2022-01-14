@@ -75,9 +75,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     {
       auto action = exdData.getRow< Component::Excel::EventItem >( actionId );
       assert( action );
-
       actionMgr.handleEventItemAction( player, actionId, action, sequence, targetId );
-
       break;
     }
 

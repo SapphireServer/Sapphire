@@ -240,7 +240,8 @@ bool Action::Action::update()
 
     player->setLastActionTick( tickCount );
     uint32_t delayMs = 100 - lastTickMs;
-    castTime = ( m_castTimeMs + delayMs ) - 500; //subtract 500ms before the client begin to request actions while casting
+    castTime = ( m_castTimeMs + delayMs ); //subtract 500ms before the client begin to request actions while casting
+    m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) - std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) );
   }
 
   if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > castTime )
@@ -871,4 +872,9 @@ uint8_t Action::Action::getActionKind() const
 void Action::Action::setActionKind( uint8_t actionKind )
 {
   m_actionKind = actionKind;
+}
+
+uint64_t Action::Action::getCastTimeRest() const
+{
+  return m_castTimeRestMs;
 }

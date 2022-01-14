@@ -49,6 +49,8 @@ namespace Sapphire::World::Action
     uint8_t getActionKind() const;
     void setActionKind( uint8_t actionKind );
 
+    uint64_t getCastTimeRest() const;
+
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
      * @return true if they have the required resources
@@ -161,6 +163,7 @@ namespace Sapphire::World::Action
     uint16_t m_primaryCost;
 
     uint64_t m_startTime;
+    uint64_t m_castTimeRestMs;
     uint32_t m_castTimeMs;
     uint32_t m_recastTimeMs;
     uint8_t m_cooldownGroup;

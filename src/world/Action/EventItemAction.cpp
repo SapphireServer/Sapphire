@@ -7,6 +7,8 @@
 #include <Network/PacketWrappers/EffectPacket.h>
 
 #include "Manager/PlayerMgr.h"
+#include "Manager/EventMgr.h"
+
 #include "Script/ScriptMgr.h"
 #include <Service.h>
 #include <Network/CommonActorControl.h>
@@ -56,8 +58,13 @@ void EventItemAction::execute()
 {
   Manager::PlayerMgr::sendDebug( *getSourceChara()->getAsPlayer(), "EventItemAction type {0} execute called.", m_eventItemAction->data().Action );
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  eventMgr.eventStart( *getSourceChara()->getAsPlayer(), m_targetId, m_eventItemAction->data().EventHandler,
+                       Event::EventHandler::ActionResult, 0, 0 );
 
   scriptMgr.onEventItem( *getSourceChara()->getAsPlayer(), m_eventItem, m_eventItemAction->data().EventHandler, m_targetId );
+  eventMgr.checkEvent( *getSourceChara()->getAsPlayer(), m_eventItemAction->data().EventHandler );
 }
 
 void EventItemAction::onStart()
