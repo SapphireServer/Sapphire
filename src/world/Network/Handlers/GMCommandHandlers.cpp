@@ -86,6 +86,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
   auto& server = Common::Service< World::WorldServer >::ref();
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
 
   const auto packet = ZoneChannelPacket< FFXIVIpcGmCommand >( inPacket );
   const auto commandId = packet.data().Id;
@@ -508,8 +509,6 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
         bool doTeleport = false;
         uint16_t teleport;
-
-        auto& exdData = Common::Service< Data::ExdData >::ref();
         auto idList = exdData.getIdList< Component::Excel::Aetheryte >();
 
         for( auto i : idList )
@@ -517,19 +516,15 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           auto data = exdData.getRow< Component::Excel::Aetheryte >( i );
 
           if( !data )
-          {
             continue;
+
+          if( data->data().TerritoryType == param1 && data->data().Telepo )
+          {
+            doTeleport = true;
+            teleport = static_cast< uint16_t >( i );
+            break;
           }
 
-          if( data->data().TerritoryType == param1 )
-          {
-            //if( data->data().Telepo )
-            {
-              doTeleport = true;
-              teleport = static_cast< uint16_t >( i );
-              break;
-            }
-          }
         }
         if( doTeleport )
         {
@@ -646,7 +641,7 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
       targetPlayer->resetHp();
       targetPlayer->resetMp();
       targetPlayer->setStatus( Common::ActorStatus::Idle );
-      targetPlayer->sendZoneInPackets( 0x01, 0x01, 0, 113, true );
+      targetPlayer->sendZoneInPackets( 0x01, true );
 
 
       targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), Appear, 0x01, 0x01, 0, 113 ), true );
@@ -658,7 +653,6 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
     }
     case GmCommand::Jump:
     {
-      player.prepareZoning( targetPlayer->getTerritoryTypeId(), true, 1, 0 );
       if( pPlayerTerri->getAsInstanceContent() )
       {
         player.exitInstance();
@@ -671,11 +665,11 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
         {
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
+          player.setInstance( pInstanceContent );
         }
-        player.setInstance( targetPlayer->getTerritoryId() );
       }
       player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRot() );
-      player.sendZoneInPackets( 0x00, 0x00, 0, 0, false );
+      player.sendZoneInPackets( 0x00, false );
       PlayerMgr::sendServerNotice( player, "Jumping to {0}", targetPlayer->getName() );
       break;
     }
@@ -687,17 +681,16 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
         PlayerMgr::sendUrgent( player, "You are unable to call a player while bound to a battle instance." );
         return;
       }
-      targetPlayer->prepareZoning( player.getTerritoryTypeId(), true, 1, 0 );
       if( pTargetActorTerri->getAsInstanceContent() )
       {
         targetPlayer->exitInstance();
       }
       if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
       {
-        targetPlayer->setInstance( player.getTerritoryId() );
+        targetPlayer->setInstance( pTargetActorTerri->getAsInstanceContent() );
       }
       targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-      targetPlayer->sendZoneInPackets( 0x00, 0x00, 0, 0, false );
+      targetPlayer->sendZoneInPackets( 0x00, false );
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }

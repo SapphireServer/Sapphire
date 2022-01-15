@@ -205,7 +205,7 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      player.learnAction( Sapphire::Common::UnlockEntry::HuntingLog );
+      player.setSystemActionUnlocked( Sapphire::Common::UnlockEntry::HuntingLog );
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }

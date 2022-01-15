@@ -91,7 +91,7 @@ private:
                           if( !pQuest )
                             return;
                           pQuest->setSeq( SEQ_FINISH );
-                          player.prepareZoning( player.getTerritoryTypeId(), true, 1, 0 );
+                          //player.prepareZoning( player.getTerritoryTypeId(), true, 1, 0 );
                           player.changePosition( 9, 40, 14, 2 );
                         }
                       } );

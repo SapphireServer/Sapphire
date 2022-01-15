@@ -506,7 +506,13 @@ namespace Sapphire::Common
     Return = 1,
     Teleport = 4,
     GearSets = 6,
+    MateriaMelding = 11,
+    AdvancedMateriaMelding = 12,
+    MateriaAssimilating = 13,
+    Dye = 14,
+    Glamour = 15,
     HuntingLog = 21,
+    Desynth = 95
   };
 
   enum ContainerType : uint16_t

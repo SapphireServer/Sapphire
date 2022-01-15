@@ -101,7 +101,7 @@ public:
                                      else
                                      {
                                        eventMgr().sendEventNotice( player, eventId, 0, 1, 1, 0 );
-                                       player.learnAction( Common::UnlockEntry::Teleport );
+                                       player.setSystemActionUnlocked( Common::UnlockEntry::Teleport );
                                      }
                                    },
                                    []( Entity::Player& player, uint32_t eventId, uint64_t additional )

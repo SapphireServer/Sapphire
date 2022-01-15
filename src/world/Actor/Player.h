@@ -306,9 +306,6 @@ namespace Sapphire::Entity
     void setZone( uint32_t zoneId );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( uint32_t instanceContentId );
-
-    /*! sets the players instance & initiates zoning process */
     bool setInstance( const TerritoryPtr& instance );
 
     /*! sets the players instance & initiates zoning process */
@@ -377,9 +374,6 @@ namespace Sapphire::Entity
 
     void setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot );
     void dyeItemFromDyeingInfo();
-
-    /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
 
     /*! get player's title list (available titles) */
     TitleList& getTitleList();
@@ -465,7 +459,7 @@ namespace Sapphire::Entity
     void updateHowtosSeen( uint32_t howToId );
 
     /*! learn an action / update the unlock bitmask. */
-    void learnAction( Common::UnlockEntry unlockId );
+    void setSystemActionUnlocked( Common::UnlockEntry unlockId );
 
     /*! learn a song / update the unlock bitmask. */
     void learnSong( uint8_t songId, uint32_t itemId );
@@ -598,7 +592,7 @@ namespace Sapphire::Entity
     /*! return true if the player is marked for zoning */
     bool isMarkedForZoning() const;
 
-    void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
+    void sendZoneInPackets( uint32_t param1, bool pSetStatus );
 
     void finishZoning();
 

@@ -340,7 +340,8 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
                         pPopRange->header.transform.rotation.z,
                         rotation );
 
-      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), WarpStart, 0x03, player.getId(), 0x01, targetZone ) );
+      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), WarpStart,
+                                                                            Common::WarpType::WARP_TYPE_EXIT_RANGE, player.getId(), 0x01, targetZone ) );
 
       auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
       moveTerritoryPacket->data().index = -1;

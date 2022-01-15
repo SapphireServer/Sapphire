@@ -483,12 +483,53 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
     player.queuePacket( controlPacket );*/
 
   }
+  else if( subCommand == "actrls" )
+  {
+
+    // temporary research packet
+
+    uint32_t opcode;
+    uint32_t param1;
+    uint32_t param2;
+    uint32_t param3;
+    uint32_t param4;
+    uint32_t param5;
+    uint32_t param6;
+    uint32_t playerId;
+
+    sscanf( params.c_str(), "%x %x %x %x %x %x %x %x", &opcode, &playerId, &param1,
+            &param2, &param3, &param4, &param5, &param6 );
+
+    PlayerMgr::sendServerNotice( player, "Injecting ACTOR_CONTROL {0}", opcode );
+
+    auto actorControl = makeZonePacket< FFXIVIpcActorControlSelf >( playerId, playerId );
+    actorControl->data().category = static_cast< uint16_t >( opcode );
+    actorControl->data().param1 = param1;
+    actorControl->data().param2 = param2;
+    actorControl->data().param3 = param3;
+    actorControl->data().param4 = param4;
+    actorControl->data().param5 = param5;
+    actorControl->data().param6 = param6;
+    pSession->getZoneConnection()->queueOutPacket( actorControl );
+
+
+    /*sscanf(params.c_str(), "%x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId);
+
+    Network::Packets::Server::ServerNoticePacket noticePacket( player, "Injecting ACTOR_CONTROL " + std::to_string( opcode ) );
+
+    player.queuePacket( noticePacket );
+
+    Network::Packets::Server::ActorControlSelfPacket controlPacket( player, opcode,
+    param1, param2, param3, param4, param5, param6, playerId );
+    player.queuePacket( controlPacket );*/
+
+  }
   else if( subCommand == "unlock" )
   {
     uint32_t id;
 
     sscanf( params.c_str(), "%d", &id );
-    player.learnAction( static_cast< Common::UnlockEntry >( id ) );
+    player.setSystemActionUnlocked( static_cast< Common::UnlockEntry >( id ) );
   }
   else if ( subCommand == "effect")
   {

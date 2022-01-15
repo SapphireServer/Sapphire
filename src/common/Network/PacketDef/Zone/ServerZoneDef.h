@@ -1664,6 +1664,17 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     char worldName[32];
   };
 
+  struct FFXIVIpcMoveInstance : FFXIVIpcBasePacket< MoveInstance >
+  {
+    uint64_t characterId;
+    uint32_t entityId;
+    uint16_t worldId;
+    uint16_t worldId1;
+    uint64_t unknown1;
+    uint64_t unknown2;
+    //TODO... TO BE MAPPED
+  };
+
   /**
   *
   */
@@ -1690,23 +1701,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     struct DailyQuest dailyQuestArray[6];
   };
 
-  /**
-  * Structural representation of the packet sent by the server
-  * prepare zoning, showing screenmessage
-  */
-  struct FFXIVIpcPrepareZoning : FFXIVIpcBasePacket< PrepareZoning >
-  {
-    uint32_t logMessage;
-    uint16_t targetZone;
-    uint16_t animation;
-    uint8_t param4;
-    uint8_t hideChar;
-    uint8_t fadeOut;
-    uint8_t param7;
-    uint8_t fadeOutTime;
-    uint8_t unknown; // this changes whether or not the destination zone's name displays during the loading screen. Seems to always be 9 (=hidden) when going to an instance and certain zones, 0 otherwise.
-    uint16_t padding;
-  };
 
   /**
   * Structural representation of the packet sent by the server
