@@ -499,27 +499,6 @@ void Sapphire::Entity::Player::setZone( uint32_t zoneId )
   }
 }
 
-bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance )
-{
-  m_onEnterEventDone = false;
-  if( !instance )
-    return false;
-
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-
-  // zoning within the same zone won't cause the prev data to be overwritten
-  if( instance->getTerritoryTypeId() != m_territoryTypeId )
-  {
-    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-    m_prevTerritoryTypeId = pZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
-    m_prevPos = m_pos;
-    m_prevRot = m_rot;
-  }
-
-  return teriMgr.movePlayer( instance, *this );
-}
-
 bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance, Common::FFXIVARR_POSITION3 pos )
 {
   m_onEnterEventDone = false;

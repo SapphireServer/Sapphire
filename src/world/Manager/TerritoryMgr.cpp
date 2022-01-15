@@ -731,7 +731,7 @@ void Sapphire::World::Manager::TerritoryMgr::createAndJoinQuestBattle( Entity::P
   if( !qb )
     return;
 
-  player.setInstance( qb );
+  player.setInstance( qb, { 0, 0, 0 } );
 
 }
 

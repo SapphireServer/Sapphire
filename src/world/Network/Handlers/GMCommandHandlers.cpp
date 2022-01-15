@@ -486,7 +486,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           break;
         }
 
-        player.setInstance( instance );
+        player.setInstance( instance, { 0, 0, 0 } );
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
       {
@@ -653,23 +653,26 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
     }
     case GmCommand::Jump:
     {
-      if( pPlayerTerri->getAsInstanceContent() )
-      {
-        player.exitInstance();
-      }
+
       if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
       {
+        if( pPlayerTerri->getAsInstanceContent() )
+          player.exitInstance();
+
         // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
         auto pInstanceContent = pTargetActorTerri->getAsInstanceContent();
         if( pInstanceContent )
         {
           // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
           pInstanceContent->bindPlayer( player.getId() );
-          player.setInstance( pInstanceContent );
+          player.setInstance( pInstanceContent, { targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z } );
         }
       }
-      player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRot() );
-      player.sendZoneInPackets( 0x00, false );
+      else
+      {
+        player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRot() );
+        player.sendZoneInPackets( 0x00, false );
+      }
       PlayerMgr::sendServerNotice( player, "Jumping to {0}", targetPlayer->getName() );
       break;
     }
@@ -681,16 +684,20 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
         PlayerMgr::sendUrgent( player, "You are unable to call a player while bound to a battle instance." );
         return;
       }
-      if( pTargetActorTerri->getAsInstanceContent() )
-      {
-        targetPlayer->exitInstance();
-      }
+
       if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
       {
-        targetPlayer->setInstance( pTargetActorTerri->getAsInstanceContent() );
+        if( pTargetActorTerri->getAsInstanceContent() )
+          targetPlayer->exitInstance();
+
+        targetPlayer->setInstance( pTargetActorTerri->getAsInstanceContent(), { player.getPos().x, player.getPos().y, player.getPos().z } );
       }
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-      targetPlayer->sendZoneInPackets( 0x00, false );
+      else
+      {
+        targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
+        targetPlayer->sendZoneInPackets( 0x00, false );
+      }
+
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }
