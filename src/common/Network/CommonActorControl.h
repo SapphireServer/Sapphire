@@ -278,6 +278,12 @@ namespace Sapphire::Network::ActorControl
     */
     SetMountSpeed = 0x39F,
 
+    /*!
+    * param1 = mount ID
+    * param2 = unlock/lock (1/0)
+    */
+    SetMountBitmask = 0x387,
+
     Dismount = 0x3A1, // updated 4.5
 
     // Duty Recorder

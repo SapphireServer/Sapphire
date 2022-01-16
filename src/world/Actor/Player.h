@@ -464,6 +464,9 @@ namespace Sapphire::Entity
     /*! return a const pointer to the orchestrion bitmask array */
     const OrchestrionList& getOrchestrionBitmask() const;
 
+    /*! unlock a mount */
+    void unlockMount( uint32_t mountId );
+
     /*! return a const pointer to the setMount guide bitmask array */
     MountList& getMountGuideBitmask();
 

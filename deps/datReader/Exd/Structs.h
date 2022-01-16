@@ -1119,7 +1119,6 @@ namespace Component::Excel
     int8_t CNT;
     int8_t GEN;
     int8_t DEF;
-    int8_t padding0[2];
   };
 
   /* 201018 */
@@ -1141,14 +1140,6 @@ namespace Component::Excel
     float RotateSpeed_WOW;
     float RotateSpeed_AutoRun;
     float RotateSpeed_LockOn;
-    float RotateAccel_FFXIVRun;
-    float RotateAccel_FFXIVWalk;
-    float RotateAccel_LockOn;
-    float BattleMoveSpeed_Run;
-    float BattleMoveSpeed_RunLR;
-    float BattleMoveSpeed_Back;
-    float ScaleMale[6];
-    float ScaleFemale[6];
     int32_t Model;
     int32_t EquipHead;
     int32_t EquipBody;
@@ -1157,19 +1148,12 @@ namespace Component::Excel
     uint16_t BGM;
     uint16_t Icon;
     uint16_t Action[2];
-    uint8_t ExitMoveDist;
-    uint8_t ExitMoveSpeed;
-    uint8_t UIPriority;
+    uint16_t unknown[2];
+    uint8_t unknown2[6];
     uint8_t RadiusRate;
-    uint8_t BaseMotionSpeed_Run;
-    uint8_t BaseMotionSpeed_Walk;
-    uint8_t LinkNum;
-    int8_t SaveIndex;
-    uint8_t padding1 : 5;
-    uint8_t ExHotbarEnableConfig : 1;
-    uint8_t IsFloat : 1;
-    uint8_t IsEmote : 1;
-    int8_t padding2[3];
+    uint8_t unknown3[3];
+    int8_t MountOrder;
+    uint8_t unknown4 : 4;
   };
 
   /* 201019 */
