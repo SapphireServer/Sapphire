@@ -51,6 +51,13 @@ void ItemAction::execute()
 
       break;
     }
+
+    case Common::ItemActionType::ItemActionMount:
+    {
+      handleMountItem();
+
+      break;
+    }
   }
 }
 
@@ -72,4 +79,12 @@ void ItemAction::handleVFXItem()
   effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
 
   m_pSource->sendToInRangeSet( effectPacket, true );
+}
+
+void ItemAction::handleMountItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+
+  player->unlockMount( m_itemAction->data().Calcu0Arg[ 0 ] );
+  player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot );
 }

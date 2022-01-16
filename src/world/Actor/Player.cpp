@@ -1158,6 +1158,22 @@ const Sapphire::Entity::Player::UnlockList& Sapphire::Entity::Player::getUnlockB
 const Sapphire::Entity::Player::OrchestrionList& Sapphire::Entity::Player::getOrchestrionBitmask() const
 {
   return m_orchestrion;
+
+}
+
+void Sapphire::Entity::Player::unlockMount( uint32_t mountId )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto mount = exdData.getRow< Component::Excel::Mount >( mountId );
+
+  Logger::debug("Order: {0}", mount->data().MountOrder);
+
+  if ( mount->data().MountOrder == -1 )
+    return;
+
+  m_mountGuide[ mount->data().MountOrder / 8 ] |= ( 1 << ( mount->data().MountOrder % 8 ) );
+
+  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::SetMountBitmask, mount->data().MountOrder, 1 ) );
 }
 
 Sapphire::Entity::Player::MountList& Sapphire::Entity::Player::getMountGuideBitmask()
@@ -1379,6 +1395,9 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
 
 void Sapphire::Entity::Player::setMaxGearSets( uint8_t amount )
 {
+  if (amount == 1)
+    amount = 5;
+
   m_equippedMannequin = amount;
 
   queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );

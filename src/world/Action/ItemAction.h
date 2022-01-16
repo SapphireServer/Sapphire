@@ -27,6 +27,8 @@ namespace Sapphire::World::Action
   private:
     void handleVFXItem();
 
+    void handleMountItem();
+
   private:
     std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > m_itemAction;
 
