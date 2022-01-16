@@ -141,6 +141,7 @@ private:
       quest.setUI8AL( 0 );
       quest.setUI8BH( 0 );
       quest.setUI8BL( 0 );
+      eventMgr().sendEventNotice( player, getId(), 3, 0 );
       quest.setSeq( SeqFinish );
     }
   }

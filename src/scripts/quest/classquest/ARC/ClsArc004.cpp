@@ -7,8 +7,6 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
-//Temporrary because QuestBattles are broken
-#include "Manager/PlayerMgr.h"
 
 // Quest Script: ClsArc004_00070
 // Quest Name: To Catch a Poacher
@@ -399,7 +397,8 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       //QuestBattle weirdness, Plus not being able to talk to that NPC, so we have to skip Seq5 entirely
-      Sapphire::World::Manager::PlayerMgr::sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
+      playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
+      eventMgr().sendEventNotice( player, getId(), 3, 0 );
       quest.setSeq( SeqFinish );
 
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
