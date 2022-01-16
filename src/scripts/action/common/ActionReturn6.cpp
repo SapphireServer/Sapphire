@@ -17,7 +17,7 @@ public:
     if( !action.getSourceChara()->isPlayer() )
       return;
 
-    action.getSourceChara()->getAsPlayer()->returnToHomepoint();
+    action.getSourceChara()->getAsPlayer()->teleport( action.getSourceChara()->getAsPlayer()->getHomepoint(), 3 );
   }
 };
 

@@ -70,9 +70,6 @@ namespace Sapphire::World::Manager
     /*! caches TerritoryType details into m_territoryTypeMap */
     void loadTerritoryTypeDetailCache();
 
-    /*! List of positions for zonelines */
-    void loadTerritoryPositionMap();
-
     bool joinWorld( Entity::Player& player );
 
     /*! returns true if the given territoryTypeId is in fact a valid zone
@@ -126,9 +123,6 @@ namespace Sapphire::World::Manager
     /*! loop for processing territory logic, iterating all existing instances */
     void updateTerritoryInstances( uint64_t tickCount );
 
-    /*! returns a ZonePositionPtr if found, else nullptr */
-    ZonePositionPtr getTerritoryPosition( uint32_t territoryPositionId ) const;
-
     /*! returns a default Zone by territoryTypeId
         TODO: Mind multiple instances?! */
     TerritoryPtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
@@ -170,7 +164,6 @@ namespace Sapphire::World::Manager
     using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToContentFinderCondMap = std::unordered_map< uint16_t, uint16_t >;
     using PlayerIdToInstanceIdMap = std::unordered_map< uint32_t, uint32_t >;
-    using PositionMap = std::unordered_map< int32_t, ZonePositionPtr >;
     using InstanceIdList = std::vector< uint32_t >;
     using LandIdentToTerritoryPtrMap = std::unordered_map< uint64_t, TerritoryPtr >;
 
@@ -191,9 +184,6 @@ namespace Sapphire::World::Manager
 
     /*! flat map for easier lookup of instances by guid */
     InstanceIdToTerritoryPtrMap m_guIdToTerritoryPtrMap;
-
-    /*! map holding positions for zonelines */
-    PositionMap m_territoryPositionMap;
 
     /*! map storing playerIds to instanceIds, used for instanceContent */
     PlayerIdToInstanceIdMap m_playerIdToInstanceMap;

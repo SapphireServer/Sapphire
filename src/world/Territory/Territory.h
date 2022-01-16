@@ -19,9 +19,6 @@
 
 namespace Sapphire
 {
-
-  class ZonePosition;
-
   using FestivalPair = std::pair< uint16_t, uint16_t >;
 
   namespace Data

@@ -21,7 +21,6 @@
 #include "Manager/PartyMgr.h"
 
 #include "Territory/Territory.h"
-#include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
@@ -472,31 +471,6 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
 {
   m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
-}
-
-void Sapphire::Entity::Player::returnToHomepoint()
-{
-  setZoningType( Common::ZoneingType::Return );
-  teleport( getHomepoint(), 3 );
-}
-
-void Sapphire::Entity::Player::setZone( uint32_t zoneId )
-{
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  m_onEnterEventDone = false;
-
-  auto pZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
-  if( !teriMgr.movePlayer( pZone, *this ) )
-  {
-    // todo: this will require proper handling, for now just return the player to their previous area
-    m_pos = m_prevPos;
-    m_rot = m_prevRot;
-    m_territoryTypeId = m_prevTerritoryTypeId;
-
-    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( m_territoryTypeId );
-    if( !teriMgr.movePlayer( pZone1, *this ) )
-      return;
-  }
 }
 
 bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance, Common::FFXIVARR_POSITION3 pos )
@@ -1234,7 +1208,22 @@ void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFX
   m_territoryTypeId = zoneId;
   m_bMarkedForZoning = true;
   setRot( rotation );
-  setZone( zoneId );
+
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  m_onEnterEventDone = false;
+
+  auto pZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
+  if( !teriMgr.movePlayer( pZone, *this ) )
+  {
+    // todo: this will require proper handling, for now just return the player to their previous area
+    m_pos = m_prevPos;
+    m_rot = m_prevRot;
+    m_territoryTypeId = m_prevTerritoryTypeId;
+
+    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( m_territoryTypeId );
+    if( !teriMgr.movePlayer( pZone1, *this ) )
+      return;
+  }
 }
 
 bool Sapphire::Entity::Player::isMarkedForZoning() const

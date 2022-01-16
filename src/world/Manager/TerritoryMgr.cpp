@@ -11,7 +11,6 @@
 #include "Actor/Player.h"
 
 #include "Territory/Territory.h"
-#include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
 #include "TerritoryMgr.h"
@@ -69,7 +68,6 @@ bool Sapphire::World::Manager::TerritoryMgr::init()
   try
   {
     loadTerritoryTypeDetailCache();
-    loadTerritoryPositionMap();
 
     createDefaultTerritories();
     createHousingTerritories();
@@ -493,36 +491,6 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getTerritoryByGuI
     return nullptr;
 
   return it->second;
-}
-
-void Sapphire::World::Manager::TerritoryMgr::loadTerritoryPositionMap()
-{
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto pQR = db.query( "SELECT id, target_zone_id, pos_x, pos_y, pos_z, pos_o, radius FROM zonepositions;" );
-
-  while( pQR->next() )
-  {
-    uint32_t id = pQR->getUInt( 1 );
-    uint32_t targetZoneId = pQR->getUInt( 2 );
-    Common::FFXIVARR_POSITION3 pos{};
-    pos.x = pQR->getFloat( 3 );
-    pos.y = pQR->getFloat( 4 );
-    pos.z = pQR->getFloat( 5 );
-    float posO = pQR->getFloat( 6 );
-    uint32_t radius = pQR->getUInt( 7 );
-
-    m_territoryPositionMap[ id ] = make_ZonePosition( id, targetZoneId, pos, radius, posO );
-  }
-}
-
-Sapphire::ZonePositionPtr Sapphire::World::Manager::TerritoryMgr::getTerritoryPosition( uint32_t territoryPositionId ) const
-{
-  auto it = m_territoryPositionMap.find( territoryPositionId );
-
-  if( it != m_territoryPositionMap.end() )
-    return it->second;
-
-  return nullptr;
 }
 
 Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const

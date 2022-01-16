@@ -237,10 +237,10 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       {
         case ResurrectType::RaiseSpell:
           // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
-          player.returnToHomepoint();
+          player.teleport( player.getHomepoint(), 3 );
           break;
         case ResurrectType::Return:
-          player.returnToHomepoint();
+          player.teleport( player.getHomepoint(), 3 );
           break;
         default:
           break;

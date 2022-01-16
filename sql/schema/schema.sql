@@ -517,17 +517,6 @@ CREATE TABLE `uniqueiddata` (
   PRIMARY KEY(`NextId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `zonepositions` (
-  `id` int(11) NOT NULL,
-  `target_zone_id` int(11) NOT NULL,
-  `pos_x` float NOT NULL,
-  `pos_y` float NOT NULL,
-  `pos_z` float NOT NULL,
-  `pos_o` float NOT NULL,
-  `radius` int(11) NOT NULL DEFAULT '2',
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
-
 CREATE TABLE `landplaceditems` (
 	`ItemId` INT(20) UNSIGNED NOT NULL,
 	`PosX` FLOAT NOT NULL,

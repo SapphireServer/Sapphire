@@ -22,7 +22,7 @@ public:
 
   void inner( Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.numOfResults == 1 ) // exit
+/*    if( result.numOfResults == 1 ) // exit
     {
       eventMgr().eventFinish( player, 1310721, 0 );
       eventMgr().eventFinish( player, getId(), 1 );
@@ -59,24 +59,24 @@ public:
     {
       eventMgr().playScene( player, 1310721, 0, HIDE_HOTBAR, { 1, 341 },
                             std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
-    }
+    }*/
   }
 
   void inner2( Entity::Player& player, uint64_t actorId )
   {
-    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, { 32529 },
+ /*   eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, { 32529 },
                       [this, actorId]( Entity::Player& player, const Event::SceneResult& result )
                       {
                         eventMgr().eventStart( player, actorId, 1310721, Event::EventHandler::Nest, 1, 0 );
 
                         eventMgr().playScene( player, 1310721, 0, HIDE_HOTBAR, { 1, 341 },
                                               std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
-                      } );
+                      } );*/
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
+/*    auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
     auto warp = exdData.getRow< Component::Excel::Warp >( eventId );
     if( !warp )
@@ -85,7 +85,7 @@ public:
     // EXD TODO: Not sure Warpcondition is correct here
     eventMgr().eventStart( player, actorId, warp->data().WarpCondition, Event::EventHandler::Nest, 0, 0,
                            std::bind( &WarpTaxi::inner2, this, std::placeholders::_1, std::placeholders::_2 ) );
-    eventMgr().playScene( player, warp->data().WarpCondition, 0, HIDE_HOTBAR, { 7 }, nullptr );
+    eventMgr().playScene( player, warp->data().WarpCondition, 0, HIDE_HOTBAR, { 7 }, nullptr );*/
   }
 };
 

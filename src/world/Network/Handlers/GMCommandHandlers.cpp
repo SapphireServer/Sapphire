@@ -194,9 +194,9 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     case GmCommand::Call:
     {
       if( targetPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-        targetPlayer->setZone( player.getTerritoryTypeId() );
-
-      targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
+        targetPlayer->performZoning( player.getTerritoryTypeId(), { player.getPos().x, player.getPos().y, player.getPos().z }, player.getRot() );
+      else
+        targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }

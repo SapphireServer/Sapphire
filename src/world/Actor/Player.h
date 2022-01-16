@@ -302,9 +302,6 @@ namespace Sapphire::Entity
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
 
-    /*! sets the players zone, initiating a zoning process */
-    void setZone( uint32_t zoneId );
-
     /*! sets the players instance & initiates zoning process */
     bool setInstance( const Sapphire::TerritoryPtr& instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
 
@@ -315,9 +312,6 @@ namespace Sapphire::Entity
     uint32_t getPrevTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
-
-    /*! return player to preset homepoint */
-    void returnToHomepoint();
 
     /*! change position, sends update too */
     void changePosition( float x, float y, float z, float o );

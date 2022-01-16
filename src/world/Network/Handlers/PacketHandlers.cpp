@@ -22,7 +22,6 @@
 #include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Land.h"
-#include "Territory/ZonePosition.h"
 #include "Territory/House.h"
 #include "Territory/InstanceObjectCache.h"
 
