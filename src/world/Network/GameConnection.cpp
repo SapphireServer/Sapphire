@@ -524,7 +524,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
         auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
         *reinterpret_cast< unsigned int* >( &pe4->data()[ 0 ] ) = id;
-        *reinterpret_cast< unsigned int* >( &pe4->data()[ 4 ] ) = timeStamp;
+        *reinterpret_cast< unsigned int* >( &pe4->data()[ 4 ] ) = Util::getTimeSeconds();
         sendSinglePacket( pe4 );
 
         break;

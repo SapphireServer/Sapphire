@@ -264,19 +264,63 @@ bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, u
 
 bool Sapphire::Scripting::ScriptMgr::onWithinRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
-  if( !script )
-    return false;
-  script->onWithinRange( player, eventId, param1, x, y, z );
+  const auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  if( eventType == Event::EventHandler::EventHandlerType::Quest )
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    if( !script )
+      return false;
+    if( player.hasQuest( eventId ) )
+    {
+      auto idx = player.getQuestIndex( eventId );
+      auto& quest = player.getQuestByIndex( idx );
+      World::Quest preQ = quest;
+      script->onWithinRange( quest, player, eventId, param1, x, y, z );
+      if( quest != preQ )
+        player.updateQuest( quest );
+    }
+  }
+  else
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    if( !script )
+      return false;
+    script->onWithinRange( player, eventId, param1, x, y, z );
+  }
+
   return true;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onOutsideRange( Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
 {
-  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
-  if( !script )
-    return false;
-  script->onOutsideRange( player, eventId, param1, x, y, z );
+  const auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  if( eventType == Event::EventHandler::EventHandlerType::Quest )
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    if( !script )
+      return false;
+    if( player.hasQuest( eventId ) )
+    {
+      auto idx = player.getQuestIndex( eventId );
+      auto& quest = player.getQuestByIndex( idx );
+      World::Quest preQ = quest;
+      script->onOutsideRange( quest, player, eventId, param1, x, y, z );
+      if( quest != preQ )
+        player.updateQuest( quest );
+    }
+  }
+  else
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+    if( !script )
+      return false;
+    script->onOutsideRange( player, eventId, param1, x, y, z );
+  }
+
   return true;
 }
 
@@ -295,7 +339,10 @@ bool Sapphire::Scripting::ScriptMgr::onEmote( Entity::Player& player, uint64_t a
     {
       auto idx = player.getQuestIndex( eventId );
       auto& quest = player.getQuestByIndex( idx );
+      World::Quest preQ = quest;
       script->onEmote( quest, actor, emoteId, player );
+      if( quest != preQ )
+        player.updateQuest( quest );
     }
   }
   else
