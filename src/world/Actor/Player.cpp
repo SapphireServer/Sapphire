@@ -1165,8 +1165,6 @@ void Sapphire::Entity::Player::unlockMount( uint32_t mountId )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto mount = exdData.getRow< Component::Excel::Mount >( mountId );
 
-  Logger::debug("Order: {0}", mount->data().MountOrder);
-
   if ( mount->data().MountOrder == -1 )
     return;
 
