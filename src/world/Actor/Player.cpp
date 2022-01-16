@@ -1158,7 +1158,6 @@ const Sapphire::Entity::Player::UnlockList& Sapphire::Entity::Player::getUnlockB
 const Sapphire::Entity::Player::OrchestrionList& Sapphire::Entity::Player::getOrchestrionBitmask() const
 {
   return m_orchestrion;
-
 }
 
 void Sapphire::Entity::Player::unlockMount( uint32_t mountId )
