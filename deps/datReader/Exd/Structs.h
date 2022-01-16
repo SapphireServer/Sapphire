@@ -1125,9 +1125,9 @@ namespace Component::Excel
   struct Mount
   {
     MountTextStruct Text;
-    StringOffset CallSE;
-    StringOffset CallFalseSE;
-    StringOffset ExitSE;
+    Component::Excel::StringOffset CallSE;
+    Component::Excel::StringOffset CallFalseSE;
+    Component::Excel::StringOffset ExitSE;
     float Slowdown;
     float MoveAccel_Run;
     float MoveAccel_Walk;
