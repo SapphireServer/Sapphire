@@ -7,8 +7,6 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
-//Temporrary because QuestBattles are broken
-#include "Manager/PlayerMgr.h"
 
 // Quest Script: ClsArc006_00076
 // Quest Name: The One that Got Away
@@ -189,9 +187,10 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //QuestBattles don't work atm
+      //TODO: QuestBattles don't work atm
+      playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
+      eventMgr().sendEventNotice( player, getId(), 2, 0 );
       quest.setSeq( Seq2 );
-      Sapphire::World::Manager::PlayerMgr::sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish(player, result.eventId, 0);
@@ -298,9 +297,10 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //QuestBattles don't work atm
+      //TODO: QuestBattles don't work atm
+      playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
+      eventMgr().sendEventNotice( player, getId(), 3, 0 );
       quest.setSeq( SeqFinish );
-      Sapphire::World::Manager::PlayerMgr::sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish(player, result.eventId, 0);

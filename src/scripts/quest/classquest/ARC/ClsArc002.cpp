@@ -619,7 +619,6 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //if (player.giveQuestRewards(getId(), result.getResult(1)))
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }
