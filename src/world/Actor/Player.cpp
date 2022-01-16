@@ -1165,7 +1165,7 @@ void Sapphire::Entity::Player::unlockMount( uint32_t mountId )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto mount = exdData.getRow< Component::Excel::Mount >( mountId );
 
-  if ( mount->data().MountOrder == -1 )
+  if( mount->data().MountOrder == -1 )
     return;
 
   m_mountGuide[ mount->data().MountOrder / 8 ] |= ( 1 << ( mount->data().MountOrder % 8 ) );
@@ -1392,7 +1392,7 @@ void Sapphire::Entity::Player::setTitle( uint16_t titleId )
 
 void Sapphire::Entity::Player::setMaxGearSets( uint8_t amount )
 {
-  if (amount == 1)
+  if( amount == 1 )
     amount = 5;
 
   m_equippedMannequin = amount;
