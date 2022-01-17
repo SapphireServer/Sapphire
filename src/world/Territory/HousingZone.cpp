@@ -28,9 +28,9 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-Sapphire::HousingZone::HousingZone( uint8_t wardNum, uint16_t territoryTypeId, uint32_t guId,
+Sapphire::HousingZone::HousingZone( uint8_t wardNum, uint16_t territoryTypeId,
                                     const std::string& internalName, const std::string& contentName ) :
-  Territory( territoryTypeId, guId, internalName, contentName ),
+  Territory( territoryTypeId, ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum, internalName, contentName ),
   m_wardNum( wardNum ),
   m_territoryTypeId( territoryTypeId ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )

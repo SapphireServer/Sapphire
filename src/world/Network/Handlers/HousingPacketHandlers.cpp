@@ -20,6 +20,7 @@
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Manager/HousingMgr.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "Action/Action.h"
 
@@ -41,14 +42,17 @@ void Sapphire::Network::GameConnection::landRenameHandler( const Packets::FFXIVA
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingHouseName >( inPacket );
 
   auto& housingMgr = Common::Service< HousingMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
   auto landSetId = housingMgr.toLandSetId( packet.data().landId.territoryTypeId, static_cast< uint8_t >( packet.data().landId.wardNum ) );
 
-  auto pZone = housingMgr.getHousingZoneByLandSetId( landSetId );
-  if( !pZone )
+  auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
+  auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
+
+  if( !hZone )
     return;
 
-  auto pLand = pZone->getLand( static_cast< uint8_t >( packet.data().landId.landId ) );
+  auto pLand = hZone->getLand( static_cast< uint8_t >( packet.data().landId.landId ) );
   if( !pLand )
     return;
 

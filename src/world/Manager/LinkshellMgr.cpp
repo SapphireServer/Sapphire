@@ -168,7 +168,7 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
 
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
   auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::LinkshellChat );
-  chatChannelMgr.addPlayerToChannel( chatChannelId, player );
+  chatChannelMgr.addToChannel( chatChannelId, player );
 
   uint64_t masterId = player.getCharacterId();
 
@@ -305,7 +305,7 @@ void LinkshellMgr::kickPlayer( Entity::Player& sourcePlayer, Entity::Player& kic
                                                      lsPtr->getName(), kickedPlayer.getName() );
 
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellKickResult1 );
-  chatChannelMgr.removePlayerFromChannel( lsPtr->getChatChannel(), kickedPlayer );
+  chatChannelMgr.removeFromChannel( lsPtr->getChatChannel(), kickedPlayer );
 }
 
 void LinkshellMgr::sendLinkshellList( Entity::Player& player )
@@ -355,7 +355,7 @@ void LinkshellMgr::leaveLinkshell( uint64_t lsId, uint64_t characterId )
   lsPtr->removeMember( characterId );
   writeLinkshell( lsId );
 
-  chatChannelMgr.removePlayerFromChannel( lsPtr->getChatChannel(), *leavingPlayer );
+  chatChannelMgr.removeFromChannel( lsPtr->getChatChannel(), *leavingPlayer );
   sendLinkshellList( *leavingPlayer );
 }
 
@@ -372,7 +372,7 @@ void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
   lsPtr->removeInvite( characterId );
   writeLinkshell( lsId );
 
-  chatChannelMgr.addPlayerToChannel( lsPtr->getChatChannel(), *joiningPlayer );
+  chatChannelMgr.addToChannel( lsPtr->getChatChannel(), *joiningPlayer );
 
   sendLinkshellList( *joiningPlayer );
 }

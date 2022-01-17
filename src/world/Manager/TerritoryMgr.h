@@ -127,9 +127,6 @@ namespace Sapphire::World::Manager
         TODO: Mind multiple instances?! */
     TerritoryPtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
 
-    /*! returns a Zone by landSetId */
-    TerritoryPtr getZoneByLandSetId( uint32_t landSetId ) const;
-
     bool movePlayer( const TerritoryPtr&, Entity::Player& player );
 
     /*! returns an instancePtr if the player is still bound to an isntance */
@@ -172,9 +169,6 @@ namespace Sapphire::World::Manager
 
     /*! map holding actual instances of default territories */
     TerritoryTypeIdToInstanceMap m_territoryTypeIdToInstanceGuidMap;
-
-    /*! map holding actual instances of default territories */
-    LandSetIdToTerritoryPtrMap m_landSetIdToTerritoryPtrMap;
 
     /*! map holding actual instances of InstanceContent */
     InstanceContentIdToInstanceMap m_instanceContentIdToInstanceMap;

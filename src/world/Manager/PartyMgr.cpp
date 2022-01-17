@@ -59,8 +59,8 @@ void Sapphire::World::Manager::PartyMgr::onJoin( uint32_t joinerId, uint32_t inv
     invitingPlayer.setPartyId( partyId );
     invitingPlayer.addOnlineStatus( Common::OnlineStatus::PartyLeader );
 
-    ccMgr.addPlayerToChannel( party->ChatChannel, invitingPlayer );
-    ccMgr.addPlayerToChannel( party->ChatChannel, inviteePlayer );
+    ccMgr.addToChannel( party->ChatChannel, invitingPlayer );
+    ccMgr.addToChannel( party->ChatChannel, inviteePlayer );
 
     party->MemberId.push_back( invitingPlayer.getId() );
     party->MemberId.push_back( inviteePlayer.getId() );
@@ -75,7 +75,7 @@ void Sapphire::World::Manager::PartyMgr::onJoin( uint32_t joinerId, uint32_t inv
     inviteePlayer.setPartyId( partyId );
     inviteePlayer.addOnlineStatus( Common::OnlineStatus::PartyMember );
 
-    ccMgr.addPlayerToChannel( party->ChatChannel, inviteePlayer );
+    ccMgr.addToChannel( party->ChatChannel, inviteePlayer );
 
     party->MemberId.push_back( inviteePlayer.getId() );
     party->PartyCount++;
@@ -440,6 +440,6 @@ void Sapphire::World::Manager::PartyMgr::removeMember( Sapphire::World::Manager:
 {
   auto& ccMgr = Common::Service< World::Manager::ChatChannelMgr >::ref();
   pMember->setPartyId( 0 );
-  ccMgr.removePlayerFromChannel( party.ChatChannel, *pMember );
+  ccMgr.removeFromChannel( party.ChatChannel, *pMember );
   party.MemberId.erase( std::remove( party.MemberId.begin(), party.MemberId.end(), pMember->getId() ), party.MemberId.end() );
 }

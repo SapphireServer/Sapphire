@@ -254,24 +254,22 @@ bool Sapphire::World::Manager::TerritoryMgr::createHousingTerritories()
 
     for( wardNum = 0; wardNum < wardMaxNum; wardNum++ )
     {
-      uint32_t guid = getNextInstanceId();
+
+      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, territoryInfo->getString( territoryInfo->data().Name ), pPlaceName->getString( pPlaceName->data().Text.SGL ) );
+      pHousingZone->init();
 
       Logger::info( "{0}\t{1}\t{2}\t{3:<10}\tHOUSING\t\t{4}#{5}",
                     territoryTypeId,
-                    guid,
+                    pHousingZone->getLandSetId(),
                     territoryInfo->data().IntendedUse,
                     territoryInfo->getString( territoryInfo->data().Name ),
                     pPlaceName->getString( pPlaceName->data().Text.SGL ),
                     wardNum );
 
-      auto pHousingZone = make_HousingZone( wardNum, territoryTypeId, guid, territoryInfo->getString( territoryInfo->data().Name ), pPlaceName->getString( pPlaceName->data().Text.SGL ) );
-      pHousingZone->init();
-
       InstanceIdToTerritoryPtrMap instanceMap;
-      instanceMap[ guid ] = pHousingZone;
-      m_guIdToTerritoryPtrMap[ guid ] = pHousingZone;
-      m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ][ guid ] = pHousingZone;
-      m_landSetIdToTerritoryPtrMap[ pHousingZone->getLandSetId() ] = pHousingZone;
+      instanceMap[ pHousingZone->getLandSetId() ] = pHousingZone;
+      m_guIdToTerritoryPtrMap[ pHousingZone->getLandSetId() ] = pHousingZone;
+      m_territoryTypeIdToInstanceGuidMap[ territoryTypeId ][ pHousingZone->getLandSetId() ] = pHousingZone;
       m_territorySet.insert( { pHousingZone } );
     }
 
@@ -404,8 +402,8 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousi
   auto& housingMgr = Common::Service< Manager::HousingMgr >::ref();
 
   auto parentZone = std::dynamic_pointer_cast< HousingZone >(
-    getZoneByLandSetId( housingMgr.toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ),
-                                                 static_cast< uint8_t >( landIdent.wardNum ) ) ) );
+    getTerritoryByGuId( housingMgr.toLandSetId( static_cast< uint16_t >( landIdent.territoryTypeId ),
+                                                static_cast< uint8_t >( landIdent.wardNum ) ) ) );
 
   if( !parentZone )
     return nullptr;
@@ -503,14 +501,6 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritor
   return zoneMap->second.begin()->second;
 }
 
-Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByLandSetId( uint32_t landSetId ) const
-{
-  auto zoneMap = m_landSetIdToTerritoryPtrMap.find( landSetId );
-  if( zoneMap == m_landSetIdToTerritoryPtrMap.end() )
-    return nullptr;
-
-  return zoneMap->second;
-}
 
 void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
 {
@@ -728,7 +718,7 @@ bool Sapphire::World::Manager::TerritoryMgr::joinWorld( Sapphire::Entity::Player
   else if( isInternalEstateTerritory( zoneId ) )
   {
     // todo: this needs to go to the area just outside of the plot door
-    pCurrZone = getZoneByLandSetId( player.getPrevTerritoryId() );
+    pCurrZone = getTerritoryByGuId( player.getPrevTerritoryId() );
 
     zoneId = player.getPrevTerritoryTypeId();
     auto prevPos = player.getPrevPos();
@@ -737,7 +727,7 @@ bool Sapphire::World::Manager::TerritoryMgr::joinWorld( Sapphire::Entity::Player
   }
   else if( isHousingTerritory( zoneId ) )
   {
-    pCurrZone = getZoneByLandSetId( player.getTerritoryId() );
+    pCurrZone = getTerritoryByGuId( player.getTerritoryId() );
   }
   else
   {

@@ -509,18 +509,15 @@ bool Sapphire::Entity::Player::exitInstance()
   resetHp();
   resetMp();
 
+  TerritoryPtr pTeri = nullptr;
   // check if housing zone
   if( teriMgr.isHousingTerritory( m_prevTerritoryTypeId ) )
-  {
-    if( !teriMgr.movePlayer( teriMgr.getZoneByLandSetId( m_prevTerritoryId ), *this ) )
-      return false;
-  }
+    pTeri = teriMgr.getTerritoryByGuId( m_prevTerritoryId );
   else
-  {
-    auto pPrevZone = teriMgr.getZoneByTerritoryTypeId( m_prevTerritoryTypeId );
-    if( !teriMgr.movePlayer( pPrevZone, *this ) )
-      return false;
-  }
+    pTeri = teriMgr.getZoneByTerritoryTypeId( m_prevTerritoryTypeId );
+
+  if( !teriMgr.movePlayer( pTeri, *this ) )
+    return false;
 
   m_pos = m_prevPos;
   m_rot = m_prevRot;

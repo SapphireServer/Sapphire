@@ -164,7 +164,7 @@ void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::F
   if( !chatChannelMgr.isChannelValid( joinChannelPacket.data().ChannelID ) )
     return Logger::warn( "Failed to join chat channel - Invalid chat channel specified!" );
 
-  chatChannelMgr.addPlayerToChannel( joinChannelPacket.data().ChannelID, player );
+  chatChannelMgr.addToChannel( joinChannelPacket.data().ChannelID, player );
 
   auto chatChannelResultPacket = makeZonePacket< FFXIVIpcChatChannelResult >( player.getId() );
 
