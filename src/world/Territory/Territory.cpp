@@ -850,14 +850,14 @@ uint32_t Sapphire::Territory::getNextEffectSequence()
   return m_effectCounter++;
 }
 
-Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType )
+Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
 {
   auto infoPtr = m_bNpcBaseMap.find( levelId );
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
   auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, shared_from_this(), hp, bnpcType );
-
+  pBNpc->setTriggerOwnerId( triggerOwnerId );
   pushActor( pBNpc );
   return pBNpc;
 }

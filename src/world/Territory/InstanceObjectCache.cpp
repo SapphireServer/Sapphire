@@ -92,6 +92,10 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
             m_popRangeCache.insert( id, pPopRange );
           }
+          else if( pEntry->getType() == LgbEntryType::SharedGroup6 )
+          {
+
+          }
         }
       }
     }

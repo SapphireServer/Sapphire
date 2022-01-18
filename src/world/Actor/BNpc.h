@@ -87,6 +87,8 @@ namespace Sapphire::Entity
 
     uint8_t getAggressionMode() const;
 
+    uint32_t getTriggerOwnerId() const;
+    void setTriggerOwnerId( uint32_t triggerOwnerId );
 
     float getNaviTargetReachedDistance() const;
 
@@ -159,6 +161,7 @@ namespace Sapphire::Entity
     uint32_t m_rank;
     uint32_t m_boundInstanceId;
     uint32_t m_layoutId;
+    uint32_t m_triggerOwnerId;
 
     uint32_t m_flags;
 

@@ -169,7 +169,7 @@ namespace Sapphire
 
     void registerEObj( Entity::EventObjectPtr object );
 
-    Entity::BNpcPtr createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType );
+    Entity::BNpcPtr createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
 
     Entity::BNpcPtr getActiveBNpcByInstanceId( uint32_t instanceId );
 

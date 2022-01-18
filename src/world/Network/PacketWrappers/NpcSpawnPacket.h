@@ -61,7 +61,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.MainTarget = bnpc.getTargetId();
       // no idea ... m_data.spawnerId = Common::INVALID_GAME_OBJECT_ID64;
       m_data.ParentId = Common::INVALID_GAME_OBJECT_ID;
-      m_data.TriggerId = 0;
+      m_data.TriggerId = bnpc.getTriggerOwnerId();
       m_data.ChannelingTarget = Common::INVALID_GAME_OBJECT_ID;
       m_data.OwnerId = Common::INVALID_GAME_OBJECT_ID;
 

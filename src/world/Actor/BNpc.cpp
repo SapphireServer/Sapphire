@@ -517,6 +517,16 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
   }
 }
 
+uint32_t Sapphire::Entity::BNpc::getTriggerOwnerId() const
+{
+  return m_triggerOwnerId;
+}
+
+void Sapphire::Entity::BNpc::setTriggerOwnerId( uint32_t triggerOwnerId )
+{
+  m_triggerOwnerId = triggerOwnerId;
+}
+
 bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara )
 {
   for( auto& listEntry : m_hateList )
