@@ -75,7 +75,7 @@ public:
     {
       case Actor0:
       {
-        if( !player.hasQuest( getId() ) )
+        if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
           Scene00021( quest, player );
@@ -396,10 +396,13 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //QuestBattle weirdness, Plus not being able to talk to that NPC, so we have to skip Seq5 entirely
+      //TODO: QuestBattles are broken
       playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
       eventMgr().sendEventNotice( player, getId(), 3, 0 );
-      quest.setSeq( SeqFinish );
+      quest.setSeq( Seq5 );
+      quest.setBitFlag8( 1, false );
+      quest.setBitFlag8( 2, false );
+      quest.setBitFlag8( 3, false );
 
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
