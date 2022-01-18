@@ -155,7 +155,6 @@ namespace Sapphire::World::Manager
   private:
     using TerritoryTypeDetailCache = std::unordered_map< uint16_t, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > >;
     using InstanceIdToTerritoryPtrMap = std::unordered_map< uint32_t, TerritoryPtr >;
-    using LandSetIdToTerritoryPtrMap = std::unordered_map< uint32_t, TerritoryPtr >;
     using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using QuestBattleIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;

@@ -509,12 +509,7 @@ bool Sapphire::Entity::Player::exitInstance()
   resetHp();
   resetMp();
 
-  TerritoryPtr pTeri = nullptr;
-  // check if housing zone
-  if( teriMgr.isHousingTerritory( m_prevTerritoryTypeId ) )
-    pTeri = teriMgr.getTerritoryByGuId( m_prevTerritoryId );
-  else
-    pTeri = teriMgr.getZoneByTerritoryTypeId( m_prevTerritoryTypeId );
+  TerritoryPtr pTeri = teriMgr.getTerritoryByGuId( m_prevTerritoryId );
 
   if( !teriMgr.movePlayer( pTeri, *this ) )
     return false;
@@ -1419,7 +1414,7 @@ void Sapphire::Entity::Player::setMount( uint32_t mountId )
   Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *this, m_mount );
 }
 
-void Sapphire::Entity::Player::setCompanion( uint16_t id )
+void Sapphire::Entity::Player::setCompanion( uint8_t id )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 

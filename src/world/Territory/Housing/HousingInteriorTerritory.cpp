@@ -61,7 +61,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 
   auto indoorInitPacket = makeZonePacket< FFXIVIpcInterior >( player.getId() );
 
-  auto landSetId = housingMgr.toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
+  auto landSetId = housingMgr.toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum  );
 
   auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );

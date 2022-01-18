@@ -32,7 +32,6 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum, uint16_t territoryTypeId,
                                     const std::string& internalName, const std::string& contentName ) :
   Territory( territoryTypeId, ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum, internalName, contentName ),
   m_wardNum( wardNum ),
-  m_territoryTypeId( territoryTypeId ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
 {
 
@@ -129,9 +128,7 @@ bool Sapphire::HousingZone::init()
     // setup house
     if( entry.m_houseId )
     {
-      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName,
-                               entry.m_estateComment );
-
+      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
       housingMgr.updateHouseModels( house );
       land->setHouse( house );
     }
@@ -185,7 +182,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
   landsetInitializePacket->data().LandSetId.landId = m_landSetId;
   landsetInitializePacket->data().LandSetId.territoryTypeId = m_territoryTypeId;
   //TODO: get current WorldId
-  landsetInitializePacket->data().LandSetId.worldId = 67;
+  landsetInitializePacket->data().LandSetId.worldId = server.getWorldId();
 
   for( uint8_t i = 0, count = 0; i < 30; ++i, ++count )
   {

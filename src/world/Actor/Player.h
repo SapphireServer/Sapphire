@@ -396,7 +396,7 @@ namespace Sapphire::Entity
     /*! mount the specified setMount and send the packets */
     void setMount( uint32_t mountId );
 
-    void setCompanion( uint16_t id );
+    void setCompanion( uint8_t id );
 
     uint8_t getCurrentCompanion() const;
 
@@ -952,7 +952,7 @@ namespace Sapphire::Entity
     // content finder info
     uint32_t m_cfPenaltyUntil{}; // unix time
 
-    uint16_t m_companionId{};
+    uint8_t m_companionId{};
     uint32_t m_mount;
     uint32_t m_emoteMode;
 

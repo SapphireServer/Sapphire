@@ -44,7 +44,7 @@ void Sapphire::Network::GameConnection::landRenameHandler( const Packets::FFXIVA
   auto& housingMgr = Common::Service< HousingMgr >::ref();
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto landSetId = housingMgr.toLandSetId( packet.data().landId.territoryTypeId, static_cast< uint8_t >( packet.data().landId.wardNum ) );
+  auto landSetId = housingMgr.toLandSetId( packet.data().landId.territoryTypeId, static_cast< int8_t >( packet.data().landId.wardNum ) );
 
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );

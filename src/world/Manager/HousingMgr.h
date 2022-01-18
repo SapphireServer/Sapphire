@@ -71,7 +71,7 @@ namespace Sapphire::World::Manager
 
     bool init();
 
-    uint32_t toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const;
+    uint32_t toLandSetId( int16_t territoryTypeId, int16_t wardId ) const;
     Sapphire::LandPtr getLandByOwnerId( uint64_t id );
 
     void sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident );
