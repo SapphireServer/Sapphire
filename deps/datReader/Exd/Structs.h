@@ -658,6 +658,12 @@ namespace Component::Excel
     int8_t padding0[2];
   };
 
+  struct WeatherRate
+  {
+    int32_t WeatherId[8];
+    uint8_t Rate[8];
+  };
+
   /* 195172 */
   struct Aetheryte
   {
@@ -695,8 +701,8 @@ namespace Component::Excel
     uint8_t BattalionMode;
     uint8_t ExclusiveType;
     uint8_t IntendedUse;
+    uint8_t WeatherRate;
     uint8_t Breath;
-    uint8_t Unknown;
     uint8_t Resident;
     uint8_t Unknown1;
     uint8_t Unknown2;

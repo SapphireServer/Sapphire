@@ -98,22 +98,21 @@ void Sapphire::Territory::loadWeatherRates()
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   // EXD TODO: this must be different in 2.3
-/*  uint8_t weatherRateId = m_territoryTypeInfo->data().weatherRate > exdData.getWeatherRateIdList().size() ?
-                          uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
+  uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate > exdData.getIdList< Component::Excel::WeatherRate >().size() ?
+                          uint8_t{ 0 } : m_territoryTypeInfo->data().WeatherRate;
 
   uint8_t sumPc = 0;
-  auto weatherRateFields = exdData.m_WeatherRateDat.get_row( weatherRateId );
-  for( size_t i = 0; i < 16; )
+  auto weatherRate = exdData.getRow< Component::Excel::WeatherRate >( weatherRateId );
+  for( size_t i = 0; i < 8; ++i )
   {
-    int32_t weatherId = std::get< int32_t >( weatherRateFields[ i ] );
+    int32_t weatherId = weatherRate->data().WeatherId[ i ];
 
     if( weatherId == 0 )
       break;
 
-    sumPc += std::get< uint8_t >( weatherRateFields[ i + 1 ] );
+    sumPc += weatherRate->data().Rate[ i ];
     m_weatherRateMap[ sumPc ] = weatherId;
-    i += 2;
-  }*/
+  }
 }
 
 Sapphire::Territory::~Territory() = default;
