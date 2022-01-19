@@ -775,6 +775,10 @@ void Sapphire::Entity::BNpc::onDeath()
   m_timeOfDeath = Util::getTimeSeconds();
   setOwner( nullptr );
 
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( m_level );
+
   for( auto& pHateEntry : m_hateList )
   {
     // TODO: handle drops 
@@ -783,6 +787,7 @@ void Sapphire::Entity::BNpc::onDeath()
     {
       auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
       playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), getLayoutId() );
+      pPlayer->gainExp( paramGrowthInfo->data().BaseExp );
     }
   }
   hateListClear();

@@ -107,18 +107,12 @@ public:
       }
       case Enemy1:
       {
-        if( currentKC49 >= 3 )
+        if( currentKC49 <= 3 )
         {
           quest.setUI8BH( currentKC49 );
           checkQuestCompletion( quest, player );
           eventMgr().sendEventNotice( player, getId(), 2, 2, currentKC49, 3 );
         }
-        else if( currentKC49 < 3 )
-        {
-          quest.setUI8BH( currentKC49 );
-          eventMgr().sendEventNotice( player, getId(), 2, 2, currentKC49, 3 );
-        }
-
         break;
       }
       case Enemy2:

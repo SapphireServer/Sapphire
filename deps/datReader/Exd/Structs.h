@@ -1808,14 +1808,14 @@ namespace Component::Excel
     uint8_t Event;
     uint8_t ConditionType;
     uint8_t ConditionOperator;
-    uint8_t VisibleCallback : 1;
-    uint8_t ConditionCallback : 1;
-    uint8_t BehaviorCallback : 1;
-    uint8_t ItemCallback : 1;
-    uint8_t TargetingPossibleCallback : 1;
-    uint8_t QualifiedCallback : 1;
-    uint8_t AnnounceCallback : 1;
     uint8_t AcceptCallback : 1;
+    uint8_t AnnounceCallback : 1;
+    uint8_t QualifiedCallback : 1;
+    uint8_t TargetingPossibleCallback : 1;
+    uint8_t ItemCallback : 1;
+    uint8_t BehaviorCallback : 1;
+    uint8_t ConditionCallback : 1;
+    uint8_t VisibleCallback : 1;
   };
 
   /* 264322 */
