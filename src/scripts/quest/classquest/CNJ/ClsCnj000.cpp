@@ -57,7 +57,7 @@ public:
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
-  void onTalk( World::Quest &quest, Entity::Player &player, uint64_t actorId ) override
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
     switch( actorId )
     {
@@ -77,7 +77,7 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest &quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player &player ) override
+  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player ) override
   {
     if( nameId != Enemy0 && nameId != Enemy1 && nameId != Enemy2 )
       return;
@@ -141,7 +141,7 @@ public:
   }
 
 private:
-  void checkQuestCompletion( World::Quest &quest, Entity::Player &player )
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
     auto currentKC37 = quest.getUI8AL();
     auto currentKC49 = quest.getUI8BH();
@@ -159,12 +159,12 @@ private:
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
 
-  void Scene00000( World::Quest &quest, Entity::Player &player )
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &ClsCnj000::Scene00000Return ) );
   }
 
-  void Scene00000Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )// accept quest
     {
@@ -174,12 +174,12 @@ private:
 
   //////////////////////////////////////////////////////////////////////
 
-  void Scene00001( World::Quest &quest, Entity::Player &player )
+  void Scene00001( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | HIDE_UI, bindSceneReturn( &ClsCnj000::Scene00001Return ) );
   }
 
-  void Scene00001Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )//Said yes in the cutscene
     {
@@ -189,12 +189,12 @@ private:
 
   //////////////////////////////////////////////////////////////////////
 
-  void Scene00002( World::Quest &quest, Entity::Player &player )
+  void Scene00002( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 2, NONE, bindSceneReturn( &ClsCnj000::Scene00002Return ) );
   }
 
-  void Scene00002Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
     if( result.getResult( 0 ) == 1 )
