@@ -32,6 +32,343 @@ using namespace Sapphire::Network::Packets::WorldPackets::Client;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
+const char* packetCommandToString( uint16_t commandId )
+{
+  switch( commandId )
+  {
+    case DRAWN_SWORD:
+      return "DRAWN_SWORD";
+    case AUTO_ATTACK:
+      return "DRAWN_SWORD";
+    case TARGET_DECIDE:
+      return "TARGET_DECIDE";
+    case REQUEST_ACTION:
+      return "REQUEST_ACTION";
+    case CANCEL_MOUNT:
+      return "CANCEL_MOUNT";
+    case COMPANION:
+      return "COMPANION";
+    case COMPANION_CANCEL:
+      return "COMPANION_CANCEL";
+    case REQUEST_STATUS_RESET:
+      return "REQUEST_STATUS_RESET";
+    case CANCEL_CAST:
+      return "CANCEL_CAST";
+    case MOUNT_LINK:
+      return "MOUNT_LINK";
+    case UNMOUNT_LINK:
+      return "UNMOUNT_LINK";
+    case BALLISTA_ACCESS:
+      return "BALLISTA_ACCESS";
+    case REVIVE:
+      return "REVIVE";
+    case FINISH_LOADING:
+      return "FINISH_LOADING";
+    case TELEPO_INQUIRY:
+      return "TELEPO_INQUIRY";
+    case TELEPO_INVITATION_ANSWER:
+      return "TELEPO_INVITATION_ANSWER";
+    case TELEPO_CANCEL:
+      return "TELEPO_CANCEL";
+    case RAISE_CANCEL:
+      return "RAISE_CANCEL";
+    case WARP_REPLY:
+      return "WARP_REPLY";
+    case REQUEST_MODE:
+      return "REQUEST_MODE";
+    case PUBLIC_INSTANCE:
+      return "PUBLIC_INSTANCE";
+    case NEWBIE_TELEPO_INQUIRY:
+      return "NEWBIE_TELEPO_INQUIRY";
+    case INSPECT:
+      return "INSPECT";
+    case MARKING:
+      return "MARKING";
+    case ACTIVE_TITLE:
+      return "ACTIVE_TITLE";
+    case TITLE_LIST:
+      return "TITLE_LIST";
+    case BORROW_ACTION:
+      return "BORROW_ACTION";
+    case RANDOM:
+      return "RANDOM";
+    case NAME:
+      return "NAME";
+    case SET_HOWTO:
+      return "SET_HOWTO";
+    case SET_CUTSCENE:
+      return "SET_CUTSCENE";
+    case PHYSICAL_BONUS:
+      return "PHYSICAL_BONUS";
+    case GROUND_MARKING:
+      return "GROUND_MARKING";
+    case CONTENTS_NOTE_REQUEST:
+      return "CONTENTS_NOTE_REQUEST";
+    case BAHAMUTGUIDE_AGREEMENT_CHECK_REPLY:
+      return "BAHAMUTGUIDE_AGREEMENT_CHECK_REPLY";
+    case SET_MARKET_PRICE:
+      return "SET_MARKET_PRICE";
+    case DEPOP_RETAINER:
+      return "DEPOP_RETAINER";
+    case MARKET_EDIT_START:
+      return "MARKET_EDIT_START";
+    case MARKET_EDIT_END:
+      return "MARKET_EDIT_END";
+    case MONSTER_NOTE_RANK_NEW_FLAG:
+      return "MONSTER_NOTE_RANK_NEW_FLAG";
+    case CHANGE_ITEM_COLOR:
+      return "CHANGE_ITEM_COLOR";
+    case LOAD_LEGACY_ITEM:
+      return "LOAD_LEGACY_ITEM";
+    case BRING_OUT_LEGACY_ITEM:
+      return "BRING_OUT_LEGACY_ITEM";
+    case FCCHEST_LOAD:
+      return "FCCHEST_LOAD";
+    case FCCHEST_LOCK:
+      return "FCCHEST_LOCK";
+    case FCCHEST_UNLOCK:
+      return "FCCHEST_UNLOCK";
+    case START_MATERIA_CRAFT:
+      return "START_MATERIA_CRAFT";
+    case PREPARE_MATERIA_CRAFT:
+      return "PREPARE_MATERIA_CRAFT";
+    case CANCEL_MATERIA_CRAFT:
+      return "CANCEL_MATERIA_CRAFT";
+    case ACCEPT_MATERIA_REQUEST:
+      return "ACCEPT_MATERIA_REQUEST";
+    case CANCEL_ATTACH_MATERIA_REQUEST:
+      return "CANCEL_ATTACH_MATERIA_REQUEST";
+    case CHECK_FOR_MATERIA_REQUEST:
+      return "CHECK_FOR_MATERIA_REQUEST";
+    case EXCHANGE_INACTIVE_MATERIA:
+      return "EXCHANGE_INACTIVE_MATERIA";
+    case DECAL_ITEM:
+      return "DECAL_ITEM";
+    case DECAL_MANNEQUIN:
+      return "DECAL_MANNEQUIN";
+    case DECAL_STORAGE_GROUP:
+      return "DECAL_STORAGE_GROUP";
+    case SELL_INACTIVE_MATERIA:
+      return "SELL_INACTIVE_MATERIA";
+    case MATERIA_REQUEST_CLASS_CHANGED:
+      return "MATERIA_REQUEST_CLASS_CHANGED";
+    case ITEM_RESYNC:
+      return "ITEM_RESYNC";
+    case FCCHEST_GIL_DEPOSIT:
+      return "FCCHEST_GIL_DEPOSIT";
+    case FCCHEST_GIL_TAKE:
+      return "FCCHEST_GIL_TAKE";
+    case FCCHEST_LOAD_LOG:
+      return "FCCHEST_LOAD_LOG";
+    case SET_VANITY_PATTERN:
+      return "SET_VANITY_PATTERN";
+    case REQUEST_RETAINER_LIST:
+      return "REQUEST_RETAINER_LIST";
+    case REMOVE_VANITY_PATTERN:
+      return "REMOVE_VANITY_PATTERN";
+    case CABINET_REQUEST:
+      return "CABINET_REQUEST";
+    case CABINET_STORAGE:
+      return "CABINET_STORAGE";
+    case CABINET_TAKEOUT:
+      return "CABINET_TAKEOUT";
+    case SALVAGE:
+      return "SALVAGE";
+    case REQUEST_SALVAGE_SUCCESS_RATE:
+      return "REQUEST_SALVAGE_SUCCESS_RATE";
+    case MOBHUNT_RECEIPT_ORDER:
+      return "MOBHUNT_RECEIPT_ORDER";
+    case MOBHUNT_BREAK_ORDER:
+      return "MOBHUNT_BREAK_ORDER";
+    case EMOTE:
+      return "EMOTE";
+    case EMOTE_WITH_WARP:
+      return "EMOTE_WITH_WARP";
+    case EMOTE_CANCEL:
+      return "EMOTE_CANCEL";
+    case EMOTE_MODE_CANCEL:
+      return "EMOTE_MODE_CANCEL";
+    case EMOTE_MODE_CANCEL_WITH_WARP:
+      return "EMOTE_MODE_CANCEL_WITH_WARP";
+    case POSE_EMOTE_CONFIG:
+      return "POSE_EMOTE_CONFIG";
+    case POSE_EMOTE_WORK:
+      return "POSE_EMOTE_WORK";
+    case POSE_EMOTE_CANCEL:
+      return "POSE_EMOTE_CANCEL";
+    case JUMP_START:
+      return "JUMP_START";
+    case JUMP_LANDING:
+      return "JUMP_LANDING";
+    case GIMMICK_JUMP_END:
+      return "GIMMICK_JUMP_END";
+    case START_CRAFT:
+      return "START_CRAFT";
+    case FISHING:
+      return "FISHING";
+    case PACKET_COMMOND_TRACKING:
+      return "PACKET_COMMOND_TRACKING";
+    case PACKET_COMMOND_JOURNAL_CONFIG:
+      return "PACKET_COMMOND_JOURNAL_CONFIG";
+    case GATHERING_NOTEBOOK_START:
+      return "GATHERING_NOTEBOOK_START";
+    case GATHERING_NOTEBOOK_DIVISION:
+      return "GATHERING_NOTEBOOK_DIVISION";
+    case GATHERING_NOTEBOOK_AREA:
+      return "GATHERING_NOTEBOOK_AREA";
+    case RECIPE_NOTEBOOK_START:
+      return "RECIPE_NOTEBOOK_START";
+    case RECIPE_NOTEBOOK_DIVISION:
+      return "RECIPE_NOTEBOOK_DIVISION";
+    case END_AUTO_CRAFT:
+      return "END_AUTO_CRAFT";
+    case CANCEL_QUEST:
+      return "CANCEL_QUEST";
+    case DIRECTOR_INIT_RETURN:
+      return "DIRECTOR_INIT_RETURN";
+    case CANCEL_GUILDLEVE:
+      return "CANCEL_GUILDLEVE";
+    case RETRY_GUILDLEVE:
+      return "RETRY_GUILDLEVE";
+    case START_GUILDLEVE:
+      return "START_GUILDLEVE";
+    case RETIRE_GUILDLEVE:
+      return "RETIRE_GUILDLEVE";
+    case CHANGE_GUILDLEVE_DIFFICULTY:
+      return "CHANGE_GUILDLEVE_DIFFICULTY";
+    case SYNC_DIRECTOR:
+      return "SYNC_DIRECTOR";
+    case EVENT_HANDLER:
+      return "EVENT_HANDLER";
+    case FATE_START:
+      return "FATE_START";
+    case FATE_INIT_RETURN:
+      return "FATE_INIT_RETURN";
+    case FATE_CREATE_CHARACTER_RETURN:
+      return "FATE_CREATE_CHARACTER_RETURN";
+    case FATE_SYNC_CONTEXT_WORK:
+      return "FATE_SYNC_CONTEXT_WORK";
+    case FATE_LEVEL_SYNC:
+      return "FATE_LEVEL_SYNC";
+    case FATE_INIT_CHARACTER_RETURN:
+      return "FATE_INIT_CHARACTER_RETURN";
+    case ACHIEVEMENT_REQUEST_RATE:
+      return "ACHIEVEMENT_REQUEST_RATE";
+    case ACHIEVEMENT_REQUEST:
+      return "ACHIEVEMENT_REQUEST";
+    case TROPHY_RECEPTION:
+      return "TROPHY_RECEPTION";
+    case TROPHY_ACQUISITION:
+      return "TROPHY_ACQUISITION";
+    case HOUSING_LOCK_LAND_BY_BUILD:
+      return "HOUSING_LOCK_LAND_BY_BUILD";
+    case HOUSING_LOCK_LAND_BY_EXTERIOR:
+      return "HOUSING_LOCK_LAND_BY_EXTERIOR";
+    case HOUSING_LOCK_LAND_BY_INTERIOR:
+      return "HOUSING_LOCK_LAND_BY_INTERIOR";
+    case HOUSING_LOCK_LAND_BY_BREAK:
+      return "HOUSING_LOCK_LAND_BY_BREAK";
+    case HOUSING_UNLOCK_HOUSE:
+      return "HOUSING_UNLOCK_HOUSE";
+    case HOUSING_AUCTION_INFO:
+      return "HOUSING_AUCTION_INFO";
+    case HOUSING_GET_PROFILE:
+      return "HOUSING_GET_PROFILE";
+    case HOUSING_GET_PROFILE_LIST:
+      return "HOUSING_GET_PROFILE_LIST";
+    case HOUSING_RELEASE:
+      return "HOUSING_RELEASE";
+    case HOUSING_BUILD:
+      return "HOUSING_BUILD";
+    case HOUSING_BREAK:
+      return "HOUSING_BREAK";
+    case HOUSING_LOAD_PARTS:
+      return "HOUSING_LOAD_PARTS";
+    case HOUSING_LOAD_ROOM:
+      return "HOUSING_LOAD_ROOM";
+    case HOUSING_LOAD_YARD:
+      return "HOUSING_LOAD_YARD";
+    case HOUSING_UNPLACE:
+      return "HOUSING_UNPLACE";
+    case HOUSING_HOUSE_NAME:
+      return "HOUSING_HOUSE_NAME";
+    case HOUSING_GREETING:
+      return "HOUSING_GREETING";
+    case HOUSING_GREETING_BY_ADDRESS:
+      return "HOUSING_GREETING_BY_ADDRESS";
+    case HOUSING_WELCOME:
+      return "HOUSING_WELCOME";
+    case HOUSING_LOAD_FURNITURE:
+      return "HOUSING_LOAD_FURNITURE";
+    case HOUSING_WARP_TO_SAFE:
+      return "HOUSING_WARP_TO_SAFE";
+    case HOUSING_LAYOUTMODE:
+      return "HOUSING_LAYOUTMODE";
+    case HOUSING_RELEASE_PERSONAL_ROOM:
+      return "HOUSING_RELEASE_PERSONAL_ROOM";
+    case HOUSING_GET_PERSONAL_ROOM_PROFILE_LIST:
+      return "HOUSING_GET_PERSONAL_ROOM_PROFILE_LIST";
+    case HOUSING_GET_PERSONAL_ROOM_PROFILE:
+      return "HOUSING_GET_PERSONAL_ROOM_PROFILE";
+    case HOUSING_GET_BUDDY_STABLE_LIST:
+      return "HOUSING_GET_BUDDY_STABLE_LIST";
+    case HOUSING_TRAIN_BUDDY:
+      return "HOUSING_TRAIN_BUDDY";
+    case HOUSING_FEED_BUDDY:
+      return "HOUSING_FEED_BUDDY";
+    case PVP_LEARN_ACTION:
+      return "PVP_LEARN_ACTION";
+    case PVP_LEARN_ACTION_TRAIT:
+      return "PVP_LEARN_ACTION_TRAIT";
+    case PVP_LEARN_TRAIT:
+      return "PVP_LEARN_TRAIT";
+    case PVP_ACTION:
+      return "PVP_ACTION";
+    case PVP_RESET_REWARD:
+      return "PVP_RESET_REWARD";
+    case DISCARD_TREASURE_MAP:
+      return "DISCARD_TREASURE_MAP";
+    case TREASURE_HUNT_GET_MAP_TIME:
+      return "TREASURE_HUNT_GET_MAP_TIME";
+    case SET_RETAINER_TASK:
+      return "SET_RETAINER_TASK";
+    case CANCEL_RETAINER_TASK:
+      return "CANCEL_RETAINER_TASK";
+    case SET_VENTURE_TUTORIAL_FLAGS:
+      return "SET_VENTURE_TUTORIAL_FLAGS";
+    case SET_RETAINER_FLAGS:
+      return "SET_RETAINER_FLAGS";
+    case RELIC_NOTE_CLEAR:
+      return "RELIC_NOTE_CLEAR";
+    case RELIC_GEM_ABSORB_MATERIA:
+      return "RELIC_GEM_ABSORB_MATERIA";
+    case REPAIR_ITEM:
+      return "REPAIR_ITEM";
+    case REPAIR_ITEM_NPC:
+      return "REPAIR_ITEM_NPC";
+    case REPAIR_STORAGE_GROUP:
+      return "REPAIR_STORAGE_GROUP";
+    case REPAIR_STORAGE_GROUP_NPC:
+      return "REPAIR_STORAGE_GROUP_NPC";
+    case REPAIR_MANNEQUIN:
+      return "REPAIR_MANNEQUIN";
+    case REPAIR_MANNEQUIN_NPC:
+      return "REPAIR_MANNEQUIN_NPC";
+    case BUDDY_ACTION:
+      return "BUDDY_ACTION";
+    case BUDDY_EQUIP:
+      return "BUDDY_EQUIP";
+    case BUDDY_INCREASE_SKILL_LINE:
+      return "BUDDY_INCREASE_SKILL_LINE";
+    case PET_COMMAND:
+      return "PET_COMMAND";
+    case SCREEN_SHOT:
+      return "SCREEN_SHOT";
+    default:
+      return "UNKNOWN";
+  }
+}
+
 void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 {
   using namespace Sapphire;
@@ -72,8 +409,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
   const auto param3 = packet.data().Target;
 
 
-  Logger::debug( "[{0}] Incoming Packet Command: {1:X} ( p1:{2:X} p2:{3:X} p3:{4:X} )",
-                 m_pSession->getId(), commandId, param1, param2, param3 );
+  Logger::debug( "\t\t {5} | {1:X} ( p1:{2:X} p2:{3:X} p3:{4:X} )",
+                 m_pSession->getId(), commandId, param1, param2, param3, packetCommandToString( commandId ) );
 
   //Logger::Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
@@ -121,7 +458,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::COMPANION:
     {
-      player.setCompanion( static_cast< uint16_t >( param1 ) );
+      player.setCompanion( static_cast< uint8_t >( param1 ) );
       break;
     }
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)
@@ -480,7 +817,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
     default:
     {
-      Logger::debug( "[{0}] Unhandled action: {1:04X}", m_pSession->getId(), commandId );
+      Logger::debug( "[{0}] Unhandled Command: {1:04X}", m_pSession->getId(), commandId );
       break;
     }
   }

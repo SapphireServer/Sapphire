@@ -16,7 +16,7 @@ void TaskMgr::update( uint64_t tickCount )
     // is the task ready for execution?
     if( ( tickCount - pTask->getQueueTimeMs() ) >= pTask->getDelayTimeMs() )
     {
-      Logger::info( pTask->toString() );
+      Logger::info( "[TaskMgr] " + pTask->toString() );
       pTask->execute();
       it = m_taskList.erase( it );
     }
