@@ -25,7 +25,8 @@ namespace fs = std::filesystem;
 using namespace Sapphire;
 Sapphire::Data::ExdData g_exdDataGen;
 
-std::string datLocation( "F:\\client3.0\\game\\sqpack" );
+//std::string datLocation( "F:\\client3.0\\game\\sqpack" );
+std::string datLocation( "C:\\Data\\Dev\\ffxiv3.01\\game\\sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
 struct ActionEntry
@@ -39,6 +40,7 @@ struct ActionEntry
   uint32_t rearPotency;
   uint32_t curePotency;
   uint32_t restorePercentage;
+  std::vector< uint32_t > nextCombo{};
 };
 
 bool invalidChar( char c )
@@ -69,6 +71,19 @@ uint32_t stripNonNumerics( std::string& str )
   return std::atoi( str.c_str() );
 }
 
+template< typename T >
+std::string stringVec( const std::vector< T >& vec )
+{
+  if( vec.empty() )
+    return "";
+
+  std::ostringstream oss;
+  std::copy( vec.begin(), vec.end() - 1, std::ostream_iterator< T >( oss, ", " ) );
+  oss << vec.back();
+
+  return oss.str();
+}
+
 int main( int argc, char* argv[] )
 {
 
@@ -91,6 +106,7 @@ int main( int argc, char* argv[] )
   auto idList = g_exdDataGen.getIdList< Component::Excel::Action >();
 
   std::map< uint32_t, ActionEntry > actions;
+  std::map< uint32_t, std::vector< uint32_t > > traversedCombos;
 
   auto total = idList.size();
   int cursor = 0;
@@ -121,9 +137,6 @@ int main( int argc, char* argv[] )
       // exclude dol/doh
     //  if( classJob->data().CraftingClassIndex > 0 )
     //    continue;
-
-    if( id == 75 )
-      int test = 1;
 
       auto ac = static_cast< Common::ActionCategory >( actionData.Category );
       if( ac != Common::ActionCategory::Ability &&
@@ -244,6 +257,8 @@ int main( int argc, char* argv[] )
       }
 
       actions[ id ] = std::move( entry );
+      if( actionData.ComboParent )
+        traversedCombos[ actionData.ComboParent ].push_back( id );
     }
     else
       Logger::warn( "failed to get classjob {}", 1 );
@@ -253,18 +268,26 @@ int main( int argc, char* argv[] )
   Logger::info( "Found {} player actions", actions.size() );
 
   std::string output;
+  Logger::info( std::to_string( traversedCombos.size() ) );
   for( const auto& action : actions )
   {
-    const auto& data = action.second;
+    auto data = action.second;
+    // check if we have combo data to insert
+    if( auto it{ traversedCombos.find( data.id ) }; it != std::end( traversedCombos ) )
+      data.nextCombo = traversedCombos[ data.id ];
 //    Logger::info( " - {:<5} {:<25} pot: {:<4} flank pot: {:<4} front pot: {:<4} rear pot: {:<4} cure pot: {:<4} restore %: {:<4}",
 //                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
 //                  data.curePotency, data.restorePercentage );
 
-    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {}, {} }} }},\n",
+    auto comboStr = stringVec( data.nextCombo );
+    if( !comboStr.empty() )
+      comboStr = " " + comboStr + " ";
+
+    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {}, {}, {{{}}} }} }},\n",
                             data.name, action.first,
                             data.potency, data.comboPotency,
                             data.flankPotency, data.frontPotency, data.rearPotency,
-                            data.curePotency, 0 );
+                            data.curePotency, 0, comboStr );
 
     output += out;
 //    Logger::info( out );

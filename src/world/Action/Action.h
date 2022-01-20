@@ -25,8 +25,8 @@ namespace Sapphire::World::Action
 
     bool init();
 
-    void setPos( Common::FFXIVARR_POSITION3 pos );
-    Common::FFXIVARR_POSITION3 getPos() const;
+    void setPos( const Common::FFXIVARR_POSITION3& pos );
+    const Common::FFXIVARR_POSITION3& getPos() const;
 
     void setTargetId( uint64_t targetId );
     uint64_t getTargetId() const;
@@ -74,6 +74,18 @@ namespace Sapphire::World::Action
      * @return true if action has a cast time
      */
     bool hasCastTime() const;
+
+    /*!
+     * @brief Tests whether the action is an ability/oGCD
+     * @return true if action is an ability
+     */
+    bool isAbility() const;
+
+    /*!
+     * @brief Tests whether the action is a weaponskill
+     * @return true if action is an weaponskill
+     */
+    bool isWeaponskill() const;
 
     /*!
      * @brief Tests if an action is castable by the current source chara
@@ -172,6 +184,7 @@ namespace Sapphire::World::Action
     uint8_t m_xAxisModifier;
     Common::ActionAspect m_aspect;
     Common::CastType m_castType;
+    Common::ActionCategory m_category;
 
     uint32_t m_additionalData;
 

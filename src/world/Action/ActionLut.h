@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <vector>
 
 namespace Sapphire::World::Action
 {
@@ -14,6 +15,7 @@ namespace Sapphire::World::Action
     uint16_t rearPotency;
     uint16_t curePotency;
     uint16_t restoreMPPercentage;
+    std::vector< uint32_t > nextCombo;
   };
 
   class ActionLut

@@ -87,6 +87,7 @@ bool Action::Action::init()
   m_cooldownGroup = m_actionData->data().RecastGroup;
   m_range = m_actionData->data().SelectRange;
   m_effectRange = m_actionData->data().EffectRange;
+  m_category = static_cast< Common::ActionCategory >( m_actionData->data().Category );
   m_castType = static_cast< Common::CastType >( m_actionData->data().EffectType );
   m_aspect = static_cast< Common::ActionAspect >( m_actionData->data().AttackType );
 
@@ -147,12 +148,12 @@ bool Action::Action::init()
   return true;
 }
 
-void Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+void Action::Action::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos )
 {
   m_pos = pos;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Action::Action::getPos() const
+const Sapphire::Common::FFXIVARR_POSITION3& Action::Action::getPos() const
 {
   return m_pos;
 }
@@ -200,6 +201,16 @@ void Action::Action::setCastTime( uint32_t castTime )
 bool Action::Action::hasCastTime() const
 {
   return m_castTimeMs > 0;
+}
+
+bool Action::Action::isAbility() const
+{
+  return m_category == ActionCategory::Ability;
+}
+
+bool Action::Action::isWeaponskill() const
+{
+  return m_category == ActionCategory::Weaponskill;
 }
 
 Sapphire::Entity::CharaPtr Action::Action::getSourceChara() const
@@ -416,7 +427,7 @@ void Action::Action::execute()
   if( isCorrectCombo() )
   {
     auto player = m_pSource->getAsPlayer();
-    Manager::PlayerMgr::sendDebug( *player,"action combo success from action#{0}", player->getLastComboActionId() );
+    Manager::PlayerMgr::sendDebug( *player, "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
   if( !hasClientsideTarget()  )
@@ -430,7 +441,7 @@ void Action::Action::execute()
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
-  if( !m_actionData->data().ComboContinue )
+  if( isWeaponskill() && !m_actionData->data().ComboContinue )
   {
     // potential combo starter or correct combo from last action, must hit something to progress combo
     if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
@@ -557,7 +568,7 @@ void Action::Action::buildEffects()
           shouldRestoreMP = false;
         }
 
-        if( !m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
+        if( !m_lutEntry.nextCombo.empty() ) // if we have a combo action followup
         {
           m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
         }
@@ -660,6 +671,7 @@ void Action::Action::setAdditionalData( uint32_t data )
   m_additionalData = data;
 }
 
+// TODO: write something that can traverse comboparent in action parse
 bool Action::Action::isCorrectCombo() const
 {
   auto lastActionId = m_pSource->getLastComboActionId();
