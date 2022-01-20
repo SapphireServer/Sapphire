@@ -417,21 +417,6 @@ void Sapphire::Territory::updateBNpcs( uint64_t tickCount )
   m_lastMobUpdate = tickCount;
   uint64_t currTime = Common::Util::getTimeSeconds();
 
-  for( const auto& entry : m_bNpcMap )
-  {
-    Entity::BNpcPtr pBNpc = entry.second;
-
-    if( !pBNpc )
-      continue;
-
-    if( !pBNpc->isAlive() )
-      if( currTime - pBNpc->getTimeOfDeath() > 10 )
-      {
-        removeActor( pBNpc );
-        break;
-      }
-  }
-
   // Update loop may move actors from cell to cell, breaking iterator validity
   std::vector< Entity::BNpcPtr > activeBNpc;
 
