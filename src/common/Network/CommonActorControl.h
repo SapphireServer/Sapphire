@@ -63,7 +63,7 @@ namespace Sapphire::Network::ActorControl
 
     SpawnEffect = 0x25,
     ToggleInvisible = 0x26,
-
+    DeadFadeOut = 0x27,
     SetSystemActionUnlocked = 0x29,
 
     UpdateUiExp = 0x2B,

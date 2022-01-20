@@ -43,6 +43,7 @@
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Task/RemoveBNpcTask.h>
+#include <Task/FadeBNpcTask.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
@@ -777,7 +778,9 @@ void Sapphire::Entity::BNpc::onDeath()
   setOwner( nullptr );
 
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-  auto removeTask = std::make_shared< Sapphire::World::RemoveBNpcTask >( 10000, getAsBNpc() );
+  auto fadeTask = std::make_shared< Sapphire::World::FadeBNpcTask >( 10000, getAsBNpc() );
+  auto removeTask = std::make_shared< Sapphire::World::RemoveBNpcTask >( 12000, getAsBNpc() );
+  taskMgr.queueTask( fadeTask );
   taskMgr.queueTask( removeTask );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
