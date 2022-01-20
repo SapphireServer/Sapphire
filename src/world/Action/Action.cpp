@@ -568,7 +568,7 @@ void Action::Action::buildEffects()
           shouldRestoreMP = false;
         }
 
-        if( isWeaponskill() && !m_actionData->data().ComboContinue ) // we need something like m_actionData->hasNextComboAction
+        if( !m_lutEntry.nextCombo.empty() ) // if we have a combo action followup
         {
           m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
         }

@@ -14,6 +14,7 @@ namespace Sapphire::World::Action
     uint16_t rearPotency;
     uint16_t curePotency;
     uint16_t restoreMPPercentage;
+    std::vector< uint32_t > nextCombo;
   };
 
   class ActionLut
