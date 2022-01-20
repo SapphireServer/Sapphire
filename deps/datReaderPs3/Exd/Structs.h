@@ -653,8 +653,8 @@ namespace Component::Excel::Ps3
   struct Aetheryte
   {
     AetheryteTextStruct Text;
+    uint32_t EventHandler;
     uint32_t PopRange[4];
-    int32_t EventHandler;
     uint16_t TelepoName;
     uint16_t TransferName;
     uint16_t TerritoryType;

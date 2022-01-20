@@ -23,7 +23,8 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Territory/Housing/*.cpp
         Util/*.cpp
         Navi/*.cpp
-        Quest/*.cpp)
+        Task/*.cpp
+        Quest/*.cpp )
 
 add_executable( world ${SERVER_SOURCE_FILES} )
 

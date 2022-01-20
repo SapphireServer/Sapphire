@@ -73,7 +73,7 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
     case Event::EventHandler::EventHandlerType::Aetheryte:
     {
       auto aetherInfo = exdData.getRow< Component::Excel::Aetheryte >( eventId & 0xFFFF );
-      if( !aetherInfo->data().Telepo )
+      if( aetherInfo->data().Telepo )
         return "Aetheryte";
       return "Aethernet";
     }

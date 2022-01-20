@@ -334,6 +334,18 @@ struct FFXIVIpcPingHandler : FFXIVIpcBasePacket< Sync >
   ZoneProtoUpClientPos position;
 };
 
+struct FFXIVIpcLoginHandler : FFXIVIpcBasePacket< Login >
+{
+  uint32_t clientTimeValue;
+  uint32_t arg2;
+  uint64_t arg3;
+  uint64_t arg4;
+  int32_t contentFinderStatus;
+  int32_t contentFinderFlags;
+  char name[32];
+  char arg1[48];
+};
+
 struct FFXIVIpcFindContent : FFXIVIpcBasePacket< FindContent >
 {
   uint16_t territoryType;

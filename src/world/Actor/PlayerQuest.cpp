@@ -90,7 +90,7 @@ void Sapphire::Entity::Player::updateQuest( const World::Quest& quest )
     m_quests[ index ] = quest;
     questMgr.onUpdateQuest( *this, index );
   }
-  else
+  else if( quest.getSeq() != 0 )
     addQuest( quest );
 }
 

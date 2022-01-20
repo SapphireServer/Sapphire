@@ -19,9 +19,6 @@
 
 namespace Sapphire
 {
-
-  class ZonePosition;
-
   using FestivalPair = std::pair< uint16_t, uint16_t >;
 
   namespace Data
@@ -124,9 +121,9 @@ namespace Sapphire
 
     Common::Weather getNextWeather();
 
-    void pushActor( Entity::GameObjectPtr pActor );
+    void pushActor( const Entity::GameObjectPtr& pActor );
 
-    void removeActor( Entity::GameObjectPtr pActor );
+    void removeActor( const Entity::GameObjectPtr &pActor );
 
     void updateActorPosition( Entity::GameObject& pActor );
 
@@ -172,7 +169,7 @@ namespace Sapphire
 
     void registerEObj( Entity::EventObjectPtr object );
 
-    Entity::BNpcPtr createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType );
+    Entity::BNpcPtr createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
 
     Entity::BNpcPtr getActiveBNpcByInstanceId( uint32_t instanceId );
 

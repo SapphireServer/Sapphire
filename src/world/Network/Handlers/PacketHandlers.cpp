@@ -22,7 +22,6 @@
 #include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Land.h"
-#include "Territory/ZonePosition.h"
 #include "Territory/House.h"
 #include "Territory/InstanceObjectCache.h"
 
@@ -165,7 +164,7 @@ void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::F
   if( !chatChannelMgr.isChannelValid( joinChannelPacket.data().ChannelID ) )
     return Logger::warn( "Failed to join chat channel - Invalid chat channel specified!" );
 
-  chatChannelMgr.addPlayerToChannel( joinChannelPacket.data().ChannelID, player );
+  chatChannelMgr.addToChannel( joinChannelPacket.data().ChannelID, player );
 
   auto chatChannelResultPacket = makeZonePacket< FFXIVIpcChatChannelResult >( player.getId() );
 
@@ -340,7 +339,8 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
                         pPopRange->header.transform.rotation.z,
                         rotation );
 
-      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), WarpStart, 0x03, player.getId(), 0x01, targetZone ) );
+      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), WarpStart,
+                                                                            Common::WarpType::WARP_TYPE_EXIT_RANGE, player.getId(), 0x01, targetZone ) );
 
       auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
       moveTerritoryPacket->data().index = -1;
@@ -390,6 +390,7 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
 void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcLoginHandler >( inPacket );
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   // init handler means this is a login procedure
   player.setIsLogin( true );

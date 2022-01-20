@@ -10,8 +10,6 @@ class PlayerMgr
   public:
     PlayerMgr() = default;
 
-    void movePlayerToLandDestination( Sapphire::Entity::Player& player, uint32_t landId, uint16_t param = 0 );
-
     void onOnlineStatusChanged( Sapphire::Entity::Player& player, bool updateProfile = true );
 
     void onEquipDisplayFlagsChanged( Sapphire::Entity::Player& player );

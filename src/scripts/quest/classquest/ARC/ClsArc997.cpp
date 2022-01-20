@@ -239,6 +239,7 @@ private:
 
   void Scene00001Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
+    eventMgr().sendEventNotice( player, getId(), 1, 0 );
     quest.setSeq( Seq2 );
   }
 
@@ -531,6 +532,7 @@ private:
 
   void Scene00026Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
+    eventMgr().sendEventNotice( player, getId(), 2, 0 );
     quest.setSeq( Seq4 );
   }
 
@@ -565,6 +567,7 @@ private:
 
   void Scene00029Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
+    eventMgr().sendEventNotice( player, getId(), 5, 0 );
     quest.setSeq( SeqFinish );
   }
 

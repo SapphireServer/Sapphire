@@ -30,8 +30,8 @@ namespace Sapphire::World::Manager
 
     const uint64_t createChatChannel( Common::ChatChannelType type );
 
-    void addPlayerToChannel( uint64_t channelId, Entity::Player& player );
-    void removePlayerFromChannel( uint64_t channelId, Entity::Player& player );
+    void addToChannel( uint64_t channelId, Entity::Player& player );
+    void removeFromChannel( uint64_t channelId, Entity::Player& player );
 
     void sendMessageToChannel( uint64_t channelId, Entity::Player& sender, const std::string& message );
     

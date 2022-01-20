@@ -26,7 +26,6 @@ TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( QuestBattle );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
-TYPE_FORWARD( ZonePosition );
 TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
 
@@ -34,6 +33,7 @@ namespace World
 {
 TYPE_FORWARD( Session );
 TYPE_FORWARD( Quest );
+TYPE_FORWARD( Task );
 }
 
 namespace World::Navi

@@ -29,7 +29,6 @@ namespace Sapphire
   public:
     HousingZone( uint8_t landSetId,
                  uint16_t territoryTypeId,
-                 uint32_t guId,
                  const std::string& internalName,
                  const std::string& contentName );
 
@@ -81,7 +80,6 @@ namespace Sapphire
     LandPtrMap m_landPtrMap;
     uint8_t m_wardNum;
     uint32_t m_landSetId;
-    uint32_t m_territoryTypeId;
 
     YardObjectArray m_yardObjects{};
     YardObjectArrayBoundsArray m_yardObjectArrayBounds;

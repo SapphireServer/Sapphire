@@ -427,7 +427,6 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
-  uint8_t unk1 = 0x3a;
   uint8_t animationType = 2;
 
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
@@ -468,7 +467,7 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
   return nullptr;
 }
 
-void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
+void Sapphire::Entity::BNpc::hateListAdd( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
 {
   auto hateEntry = std::make_shared< HateListEntry >();
   hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
@@ -482,9 +481,9 @@ void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int
   }
 }
 
-void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
+void Sapphire::Entity::BNpc::hateListUpdate( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
 {
-  for( auto listEntry : m_hateList )
+  for( const auto& listEntry : m_hateList )
   {
     if( listEntry->m_pChara == pChara )
     {
@@ -499,9 +498,9 @@ void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, 
   m_hateList.insert( hateEntry );
 }
 
-void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
+void Sapphire::Entity::BNpc::hateListRemove( const Sapphire::Entity::CharaPtr& pChara )
 {
-  for( auto listEntry : m_hateList )
+  for( const auto& listEntry : m_hateList )
   {
     if( listEntry->m_pChara == pChara )
     {
@@ -517,7 +516,17 @@ void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
   }
 }
 
-bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara )
+uint32_t Sapphire::Entity::BNpc::getTriggerOwnerId() const
+{
+  return m_triggerOwnerId;
+}
+
+void Sapphire::Entity::BNpc::setTriggerOwnerId( uint32_t triggerOwnerId )
+{
+  m_triggerOwnerId = triggerOwnerId;
+}
+
+bool Sapphire::Entity::BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
 {
   for( auto& listEntry : m_hateList )
   {
@@ -527,7 +536,7 @@ bool Sapphire::Entity::BNpc::hateListHasActor( Sapphire::Entity::CharaPtr pChara
   return false;
 }
 
-void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
+void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
   auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
@@ -550,7 +559,7 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
 
 }
 
-void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
+void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
 {
   if( !hateListHasActor( pChara ) )
     hateListRemove( pChara );
@@ -765,6 +774,10 @@ void Sapphire::Entity::BNpc::onDeath()
   m_timeOfDeath = Util::getTimeSeconds();
   setOwner( nullptr );
 
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( m_level );
+
   for( auto& pHateEntry : m_hateList )
   {
     // TODO: handle drops 
@@ -773,6 +786,7 @@ void Sapphire::Entity::BNpc::onDeath()
     {
       auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
       playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), getLayoutId() );
+      pPlayer->gainExp( paramGrowthInfo->data().BaseExp );
     }
   }
   hateListClear();
@@ -843,7 +857,7 @@ void Sapphire::Entity::BNpc::checkAggro()
       if( levelDiff >= 10 )
         range = 0.f;
       else
-        range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
+        range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
     }
 
     auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
@@ -858,7 +872,7 @@ void Sapphire::Entity::BNpc::checkAggro()
   }
 }
 
-void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
+void Sapphire::Entity::BNpc::setOwner( const Sapphire::Entity::CharaPtr& m_pChara )
 {
   m_pOwner = m_pChara;
   if( m_pChara != nullptr )
@@ -943,8 +957,8 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 
 void Sapphire::Entity::BNpc::calculateStats()
 {
-  uint8_t level = getLevel();
-  uint8_t job = static_cast< uint8_t >( getClass() );
+  auto level = getLevel();
+  auto job = static_cast< uint8_t >( getClass() );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 

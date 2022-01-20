@@ -45,6 +45,8 @@ namespace Sapphire::Network::Packets
     RegionInfo = 0x0069,
 
     MoveTerritory = 0x006A,
+    MoveInstance = 0x006B,
+
     SetPSNId = 0x0073,
     SetBillingTime = 0x0075,
 
@@ -387,7 +389,6 @@ namespace Sapphire::Network::Packets
     NpcSpawn = 0x00B3, // updated 5.21 hotfix
     InventoryActionAck = 0x01B2, // updated 5.21 hotfix
     UpdateInventorySlot = 0x0213, // updated 5.21 hotfix
-    PrepareZoning = 0x00B6, // updated 5.21 hotfix
   };
   }
 

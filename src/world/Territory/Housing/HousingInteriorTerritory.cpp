@@ -14,6 +14,7 @@
 #include "Actor/GameObject.h"
 #include "Actor/EventObject.h"
 #include "Manager/HousingMgr.h"
+#include "Manager/TerritoryMgr.h"
 #include "WorldServer.h"
 #include "Territory/Land.h"
 #include "Territory/House.h"
@@ -60,8 +61,13 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 
   auto indoorInitPacket = makeZonePacket< FFXIVIpcInterior >( player.getId() );
 
-  auto landSetId = housingMgr.toLandSetId( static_cast< uint16_t >( m_landIdent.territoryTypeId ), static_cast< uint8_t >( m_landIdent.wardNum ) );
-  auto pLand = housingMgr.getHousingZoneByLandSetId( landSetId )->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
+  auto landSetId = housingMgr.toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum  );
+
+  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
+  auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
+  auto pLand = hZone->getLand( static_cast< uint8_t >( m_landIdent.landId ) );
+
   auto pHouse = pLand->getHouse();
 
   for( auto i = 0; i < 10; i++ )

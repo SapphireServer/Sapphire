@@ -7,8 +7,6 @@
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
-//Temporrary because QuestBattles are broken
-#include "Manager/PlayerMgr.h"
 
 // Quest Script: ClsArc005_00071
 // Quest Name: Homecoming
@@ -203,6 +201,7 @@ private:
 
   void Scene00005Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
   {
+    eventMgr().sendEventNotice( player, getId(), 2, 0 );
     quest.setSeq( Seq4 );
   }
 
@@ -229,9 +228,10 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //Questbattles be broken
+      //TODO: Questbattles be broken
+      playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
+      eventMgr().sendEventNotice( player, getId(), 3, 0 );
       quest.setSeq( SeqFinish );
-      Sapphire::World::Manager::PlayerMgr::sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );

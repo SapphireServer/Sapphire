@@ -98,22 +98,21 @@ void Sapphire::Territory::loadWeatherRates()
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   // EXD TODO: this must be different in 2.3
-/*  uint8_t weatherRateId = m_territoryTypeInfo->data().weatherRate > exdData.getWeatherRateIdList().size() ?
-                          uint8_t{ 0 } : m_territoryTypeInfo->weatherRate;
+  uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate > exdData.getIdList< Component::Excel::WeatherRate >().size() ?
+                          uint8_t{ 0 } : m_territoryTypeInfo->data().WeatherRate;
 
   uint8_t sumPc = 0;
-  auto weatherRateFields = exdData.m_WeatherRateDat.get_row( weatherRateId );
-  for( size_t i = 0; i < 16; )
+  auto weatherRate = exdData.getRow< Component::Excel::WeatherRate >( weatherRateId );
+  for( size_t i = 0; i < 8; ++i )
   {
-    int32_t weatherId = std::get< int32_t >( weatherRateFields[ i ] );
+    int32_t weatherId = weatherRate->data().WeatherId[ i ];
 
     if( weatherId == 0 )
       break;
 
-    sumPc += std::get< uint8_t >( weatherRateFields[ i + 1 ] );
+    sumPc += weatherRate->data().Rate[ i ];
     m_weatherRateMap[ sumPc ] = weatherId;
-    i += 2;
-  }*/
+  }
 }
 
 Sapphire::Territory::~Territory() = default;
@@ -138,6 +137,8 @@ bool Sapphire::Territory::init()
   {
     Logger::warn( "No navmesh found for TerritoryType#{}", getTerritoryTypeId() );
   }
+
+  onUpdate( 0 );
 
   return true;
 }
@@ -201,7 +202,7 @@ Weather Sapphire::Territory::getNextWeather()
   return Weather::FairSkies;
 }
 
-void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
+void Sapphire::Territory::pushActor( const Entity::GameObjectPtr& pActor )
 {
   float mx = pActor->getPos().x;
   float my = pActor->getPos().z;
@@ -249,7 +250,7 @@ void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
     pPlayer->setAgentId( agentId );
 
     m_playerMap[ pPlayer->getId() ] = pPlayer;
-    updateCellActivity( cx, cy, 2 );
+    updateCellActivity( cx, cy, 1 );
   }
   else if( pActor->isBattleNpc() )
   {
@@ -260,7 +261,7 @@ void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
     pBNpc->setAgentId( agentId );
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;
-    updateCellActivity( cx, cy, 2 );
+    updateCellActivity( cx, cy, 1 );
 
   }
   else if( pActor->isEventObj() )
@@ -271,7 +272,7 @@ void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
   }
 }
 
-void Sapphire::Territory::removeActor( Entity::GameObjectPtr pActor )
+void Sapphire::Territory::removeActor( const Entity::GameObjectPtr& pActor )
 {
   auto cellId = pActor->getCellId();
   CellPtr pCell = getCellPtr( cellId.x, cellId.y );
@@ -821,15 +822,12 @@ std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType 
 
 void Sapphire::Territory::updateSpawnPoints()
 {
-
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
-  auto rng = RNGMgr.getRandGenerator< float >( 0.f, PI * 2 );
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   for( auto& spawn : m_spawnInfo )
   {
     if( !spawn.bnpcPtr && ( Util::getTimeSeconds() - spawn.timeOfDeath ) > spawn.infoPtr->PopInterval )
     {
-      auto& server = Common::Service< World::WorldServer >::ref();
       auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), spawn.infoPtr, shared_from_this() );
       pBNpc->init();
       spawn.bnpcPtr = pBNpc;
@@ -840,7 +838,6 @@ void Sapphire::Territory::updateSpawnPoints()
     {
       spawn.timeOfDeath = Util::getTimeSeconds();
       spawn.bnpcPtr.reset();
-
     }
   }
 }
@@ -850,14 +847,14 @@ uint32_t Sapphire::Territory::getNextEffectSequence()
   return m_effectCounter++;
 }
 
-Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType )
+Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
 {
   auto infoPtr = m_bNpcBaseMap.find( levelId );
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
   auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, shared_from_this(), hp, bnpcType );
-
+  pBNpc->setTriggerOwnerId( triggerOwnerId );
   pushActor( pBNpc );
   return pBNpc;
 }

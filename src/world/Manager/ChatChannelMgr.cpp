@@ -49,7 +49,7 @@ const uint64_t World::Manager::ChatChannelMgr::createChatChannel( Common::ChatCh
   return cId.ChannelID;
 }
 
-void World::Manager::ChatChannelMgr::addPlayerToChannel( uint64_t channelId, Entity::Player& player )
+void World::Manager::ChatChannelMgr::addToChannel( uint64_t channelId, Entity::Player& player )
 {
   if( !isChannelValid( channelId ) )
   {
@@ -71,7 +71,7 @@ void World::Manager::ChatChannelMgr::addPlayerToChannel( uint64_t channelId, Ent
     m_channels[ channelId ].emplace_back( player.getAsPlayer() );
 }
 
-void World::Manager::ChatChannelMgr::removePlayerFromChannel( uint64_t channelId, Entity::Player& player )
+void World::Manager::ChatChannelMgr::removeFromChannel( uint64_t channelId, Entity::Player& player )
 {
   if( !isChannelValid( channelId ) )
   {

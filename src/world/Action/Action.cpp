@@ -251,7 +251,7 @@ bool Action::Action::update()
 
     player->setLastActionTick( tickCount );
     uint32_t delayMs = 100 - lastTickMs;
-    castTime = ( m_castTimeMs + delayMs ); //subtract 500ms before the client begin to request actions while casting
+    castTime = ( m_castTimeMs + delayMs );
     m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) - std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) );
   }
 
@@ -264,7 +264,7 @@ bool Action::Action::update()
   if( m_pTarget == nullptr && m_targetId != 0 )
   {
     // try to search for the target actor
-    for( auto actor : m_pSource->getInRangeActors( true ) )
+    for( const auto& actor : m_pSource->getInRangeActors( true ) )
     {
       if( actor->getId() == m_targetId )
       {
@@ -274,15 +274,12 @@ bool Action::Action::update()
     }
   }
 
-  if( m_pTarget != nullptr )
+  if( m_pTarget != nullptr && !m_pTarget->isAlive() )
   {
-    if( !m_pTarget->isAlive() )
-    {
-      // interrupt the cast if target died
-      setInterrupted( Common::ActionInterruptType::RegularInterrupt );
-      interrupt();
-      return true;
-    }
+    // interrupt the cast if target died
+    setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+    interrupt();
+    return true;
   }
 
   return false;

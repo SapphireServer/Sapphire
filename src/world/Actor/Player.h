@@ -302,15 +302,6 @@ namespace Sapphire::Entity
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
 
-    /*! sets the players zone, initiating a zoning process */
-    void setZone( uint32_t zoneId );
-
-    /*! sets the players instance & initiates zoning process */
-    bool setInstance( uint32_t instanceContentId );
-
-    /*! sets the players instance & initiates zoning process */
-    bool setInstance( const TerritoryPtr& instance );
-
     /*! sets the players instance & initiates zoning process */
     bool setInstance( const Sapphire::TerritoryPtr& instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
 
@@ -321,9 +312,6 @@ namespace Sapphire::Entity
     uint32_t getPrevTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
-
-    /*! return player to preset homepoint */
-    void returnToHomepoint();
 
     /*! change position, sends update too */
     void changePosition( float x, float y, float z, float o );
@@ -378,9 +366,6 @@ namespace Sapphire::Entity
     void setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot );
     void dyeItemFromDyeingInfo();
 
-    /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
-
     /*! get player's title list (available titles) */
     TitleList& getTitleList();
 
@@ -411,7 +396,7 @@ namespace Sapphire::Entity
     /*! mount the specified setMount and send the packets */
     void setMount( uint32_t mountId );
 
-    void setCompanion( uint16_t id );
+    void setCompanion( uint8_t id );
 
     uint8_t getCurrentCompanion() const;
 
@@ -465,7 +450,7 @@ namespace Sapphire::Entity
     void updateHowtosSeen( uint32_t howToId );
 
     /*! learn an action / update the unlock bitmask. */
-    void learnAction( Common::UnlockEntry unlockId );
+    void setSystemActionUnlocked( Common::UnlockEntry unlockId );
 
     /*! learn a song / update the unlock bitmask. */
     void learnSong( uint8_t songId, uint32_t itemId );
@@ -478,6 +463,9 @@ namespace Sapphire::Entity
 
     /*! return a const pointer to the orchestrion bitmask array */
     const OrchestrionList& getOrchestrionBitmask() const;
+
+    /*! unlock a mount */
+    void unlockMount( uint32_t mountId );
 
     /*! return a const pointer to the setMount guide bitmask array */
     MountList& getMountGuideBitmask();
@@ -598,7 +586,7 @@ namespace Sapphire::Entity
     /*! return true if the player is marked for zoning */
     bool isMarkedForZoning() const;
 
-    void sendZoneInPackets( uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, bool pSetStatus );
+    void sendZoneInPackets( uint32_t param1, bool pSetStatus );
 
     void finishZoning();
 
@@ -964,7 +952,7 @@ namespace Sapphire::Entity
     // content finder info
     uint32_t m_cfPenaltyUntil{}; // unix time
 
-    uint16_t m_companionId{};
+    uint8_t m_companionId{};
     uint32_t m_mount;
     uint32_t m_emoteMode;
 

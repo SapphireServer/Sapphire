@@ -87,6 +87,8 @@ namespace Sapphire::Entity
 
     uint8_t getAggressionMode() const;
 
+    uint32_t getTriggerOwnerId() const;
+    void setTriggerOwnerId( uint32_t triggerOwnerId );
 
     float getNaviTargetReachedDistance() const;
 
@@ -102,13 +104,13 @@ namespace Sapphire::Entity
 
     void hateListClear();
     CharaPtr hateListGetHighest();
-    void hateListAdd( CharaPtr pChara, int32_t hateAmount );
-    void hateListUpdate( CharaPtr pChara, int32_t hateAmount );
-    void hateListRemove( CharaPtr pChara );
-    bool hateListHasActor( CharaPtr pChara );
+    void hateListAdd( const CharaPtr& pChara, int32_t hateAmount );
+    void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
+    void hateListRemove( const CharaPtr& pChara );
+    bool hateListHasActor( const CharaPtr& pChara );
 
-    void aggro( CharaPtr pChara );
-    void deaggro( CharaPtr pChara );
+    void aggro( const CharaPtr& pChara );
+    void deaggro( const CharaPtr& pChara );
 
     void update( uint64_t tickCount ) override;
     void onTick() override;
@@ -126,7 +128,7 @@ namespace Sapphire::Entity
 
     void checkAggro();
 
-    void setOwner( CharaPtr m_pChara );
+    void setOwner( const CharaPtr& m_pChara );
 
     void setLevelId( uint32_t levelId );
     uint32_t getLevelId() const;
@@ -159,6 +161,7 @@ namespace Sapphire::Entity
     uint32_t m_rank;
     uint32_t m_boundInstanceId;
     uint32_t m_layoutId;
+    uint32_t m_triggerOwnerId;
 
     uint32_t m_flags;
 

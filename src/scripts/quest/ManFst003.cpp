@@ -79,7 +79,7 @@ public:
                                    {
                                      eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
                                      player.registerAetheryte( 2 );
-                                     player.learnAction( Common::UnlockEntry::Return );
+                                     player.setSystemActionUnlocked( Common::UnlockEntry::Return );
                                      Scene00051( quest, player );
                                    },
                                    nullptr, quest.getId() );

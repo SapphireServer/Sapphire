@@ -64,7 +64,7 @@ namespace Sapphire::Network::ActorControl
     SpawnEffect = 0x25,
     ToggleInvisible = 0x26,
 
-    ToggleActionUnlock = 0x29,
+    SetSystemActionUnlocked = 0x29,
 
     UpdateUiExp = 0x2B,
     SetFallDamage = 0x2D,
@@ -277,6 +277,12 @@ namespace Sapphire::Network::ActorControl
     * This also has to be sent before mounting finishes for it to take effect
     */
     SetMountSpeed = 0x39F,
+
+    /*!
+    * param1 = mount ID
+    * param2 = unlock/lock (1/0)
+    */
+    SetMountBitmask = 0x387,
 
     Dismount = 0x3A1, // updated 4.5
 

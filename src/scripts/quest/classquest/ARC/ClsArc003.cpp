@@ -549,7 +549,9 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      //Broken QuestBattle
+      //TODO: QuestBattle
+      playerMgr().sendUrgent( player, "QuestBattle content is currently broken. The fight has been skipped for you." );
+      eventMgr().sendEventNotice( player, getId(), 3, 0 );
       quest.setSeq( Seq5 );
 
       /*auto& pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
