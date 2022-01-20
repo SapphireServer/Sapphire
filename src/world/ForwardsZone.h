@@ -33,6 +33,7 @@ namespace World
 {
 TYPE_FORWARD( Session );
 TYPE_FORWARD( Quest );
+TYPE_FORWARD( Task );
 }
 
 namespace World::Navi

@@ -486,16 +486,15 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::getZoneByTerritor
 
 void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
 {
+
   for( auto& zone : m_territorySet )
   {
     zone->update( tickCount );
   }
-
   for( auto& zone : m_instanceZoneSet )
   {
     zone->update( tickCount );
   }
-
   // remove internal house zones with nobody in them
   for( auto it = m_landIdentToTerritoryPtrMap.begin(); it != m_landIdentToTerritoryPtrMap.end(); )
   {

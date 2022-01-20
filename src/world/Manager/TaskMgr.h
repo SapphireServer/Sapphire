@@ -3,9 +3,12 @@
 #include <cstdint>
 #include <string>
 #include <ForwardsZone.h>
+#include <Util/Util.h>
 
 namespace Sapphire::World::Manager
 {
+
+
   struct QueuedWarp
   {
     Common::WarpType m_warpType;
@@ -13,7 +16,8 @@ namespace Sapphire::World::Manager
     uint16_t m_targetZoneId;
     Common::FFXIVARR_POSITION3 m_targetPosition;
     float m_targetRotation;
-    uint64_t m_delayTime;
+    uint64_t m_delayTimeMs;
+    uint64_t m_timeQueuedMs;
 
     QueuedWarp( uint64_t characterId, Common::WarpType warpType, uint16_t targetZoneId,
                 const Common::FFXIVARR_POSITION3& targetPosition, float targetRotation, uint64_t delayTime ) :
@@ -22,25 +26,25 @@ namespace Sapphire::World::Manager
       m_targetZoneId( targetZoneId ),
       m_targetPosition( targetPosition ),
       m_targetRotation( targetRotation ),
-      m_delayTime( delayTime ),
+      m_delayTimeMs( delayTime ),
+      m_timeQueuedMs( Common::Util::getTimeMs() )
     {
     }
   };
 
-  class WarpMgr
+  class TaskMgr
   {
   public:
-    WarpMgr() = default;
+    TaskMgr() = default;
 
     // queue a new warp process to be executed when the delaytime (ms) expired
-    void queueWarp( uint64_t characterId, Common::WarpType warpType, uint16_t targetZoneId,
-                    const Common::FFXIVARR_POSITION3& targetPosition, float targetRotation, uint64_t delayTime );
+    void queueTask( const TaskPtr& pTask );
 
     void update( uint64_t tickCount );
 
   private:
-    uint64_t m_lastTick;
-    std::vector< std::shared_ptr< QueuedWarp > > m_warpQueue;
+    uint64_t m_lastTick{};
+    std::vector< TaskPtr > m_taskList;
 
   };
 

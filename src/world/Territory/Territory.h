@@ -121,9 +121,9 @@ namespace Sapphire
 
     Common::Weather getNextWeather();
 
-    void pushActor( Entity::GameObjectPtr pActor );
+    void pushActor( const Entity::GameObjectPtr& pActor );
 
-    void removeActor( Entity::GameObjectPtr pActor );
+    void removeActor( const Entity::GameObjectPtr &pActor );
 
     void updateActorPosition( Entity::GameObject& pActor );
 

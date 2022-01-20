@@ -20,6 +20,9 @@
 
 #include "Manager/TerritoryMgr.h"
 #include "Manager/LinkshellMgr.h"
+#include "Manager/TaskMgr.h"
+
+#include "Task/TestTask.h"
 
 #include "Script/ScriptMgr.h"
 
@@ -49,9 +52,10 @@
 
 #include "Territory/InstanceObjectCache.h"
 
+using namespace Sapphire::World;
 using namespace Sapphire::World::Manager;
 
-Sapphire::World::WorldServer::WorldServer( const std::string& configName ) :
+WorldServer::WorldServer( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
@@ -59,16 +63,16 @@ Sapphire::World::WorldServer::WorldServer( const std::string& configName ) :
 {
 }
 
-Sapphire::World::WorldServer::~WorldServer()
+WorldServer::~WorldServer()
 {
 }
 
-size_t Sapphire::World::WorldServer::getSessionCount() const
+size_t WorldServer::getSessionCount() const
 {
   return m_sessionMapById.size();
 }
 
-bool Sapphire::World::WorldServer::loadSettings( int32_t argc, char* argv[] )
+bool WorldServer::loadSettings( int32_t argc, char* argv[] )
 {
   auto& configMgr = Common::Service< Common::ConfigMgr >::ref();
 
@@ -119,10 +123,9 @@ bool Sapphire::World::WorldServer::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
-void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
+void WorldServer::run( int32_t argc, char* argv[] )
 {
   using namespace Sapphire;
-  using namespace Sapphire::World;
 
   Logger::init( "log/world" );
 
@@ -188,6 +191,9 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
   Common::Service< Manager::NaviMgr >::set( pNaviMgr );
 
+  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
+  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
+
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
   auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
@@ -235,12 +241,12 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
   auto pEventMgr = std::make_shared< Manager::EventMgr >();
   auto pItemMgr = std::make_shared< Manager::ItemMgr >();
-  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
   auto pQuestMgr = std::make_shared< Manager::QuestMgr >();
   auto pPartyMgr = std::make_shared< Manager::PartyMgr >();
   auto pFriendMgr = std::make_shared< Manager::FriendListMgr >();
   auto pBlacklistMgr = std::make_shared< Manager::BlacklistMgr >();
   auto contentFinder = std::make_shared< ContentFinder >();
+  auto taskMgr = std::make_shared< Manager::TaskMgr >();
 
   Common::Service< DebugCommandMgr >::set( pDebugCom );
   Common::Service< Manager::PlayerMgr >::set( pPlayerMgr );
@@ -248,14 +254,18 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::InventoryMgr >::set( pInventoryMgr );
   Common::Service< Manager::EventMgr >::set( pEventMgr );
   Common::Service< Manager::ItemMgr >::set( pItemMgr );
-  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
   Common::Service< Manager::QuestMgr >::set( pQuestMgr );
   Common::Service< Manager::PartyMgr >::set( pPartyMgr );
   Common::Service< Manager::FriendListMgr >::set( pFriendMgr );
   Common::Service< Manager::BlacklistMgr >::set( pBlacklistMgr );
   Common::Service< ContentFinder >::set( contentFinder );
+  Common::Service< Manager::TaskMgr >::set( taskMgr );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
+
+  taskMgr->queueTask( std::make_shared< Sapphire::World::TestTask >( 10000 ) );
+  taskMgr->queueTask( std::make_shared< Sapphire::World::TestTask >( 5000 ) );
+  taskMgr->queueTask( std::make_shared< Sapphire::World::TestTask >( 2000 ) );
 
   mainLoop();
 
@@ -266,17 +276,17 @@ void Sapphire::World::WorldServer::run( int32_t argc, char* argv[] )
 
 }
 
-uint16_t Sapphire::World::WorldServer::getWorldId() const
+uint16_t WorldServer::getWorldId() const
 {
   return m_worldId;
 }
 
-void Sapphire::World::WorldServer::setWorldId( uint16_t worldId )
+void WorldServer::setWorldId( uint16_t worldId )
 {
   m_worldId = worldId;
 }
 
-void Sapphire::World::WorldServer::printBanner() const
+void WorldServer::printBanner() const
 {
   Logger::info( "===========================================================" );
   Logger::info( "Sapphire Server Project " );
@@ -286,12 +296,14 @@ void Sapphire::World::WorldServer::printBanner() const
   Logger::info( "===========================================================" );
 }
 
-void Sapphire::World::WorldServer::mainLoop()
+void WorldServer::mainLoop()
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   auto& contentFinder = Common::Service< ContentFinder >::ref();
+
+  auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
 
   while( isRunning() )
   {
@@ -300,19 +312,19 @@ void Sapphire::World::WorldServer::mainLoop()
     auto currTime = Common::Util::getTimeSeconds();
     auto tickCount = Common::Util::getTimeMs();
 
+    taskMgr.update( tickCount );
     terriMgr.updateTerritoryInstances( tickCount );
-
     scriptMgr.update();
-
     contentFinder.update();
-
     updateSessions( currTime );
 
     DbKeepAlive( currTime );
+
+
   }
 }
 
-void Sapphire::World::WorldServer::DbKeepAlive( uint32_t currTime )
+void WorldServer::DbKeepAlive( uint32_t currTime )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   if( currTime - m_lastDBPingTime > 3 )
@@ -322,7 +334,7 @@ void Sapphire::World::WorldServer::DbKeepAlive( uint32_t currTime )
   }
 }
 
-void Sapphire::World::WorldServer::updateSessions( uint32_t currTime )
+void WorldServer::updateSessions( uint32_t currTime )
 {
   std::queue< uint32_t > sessionRemovalQueue;
   std::lock_guard< std::mutex > lock( m_sessionMutex );
@@ -356,7 +368,7 @@ void Sapphire::World::WorldServer::updateSessions( uint32_t currTime )
   }
 }
 
-bool Sapphire::World::WorldServer::createSession( uint32_t sessionId )
+bool WorldServer::createSession( uint32_t sessionId )
 {
   std::lock_guard< std::mutex > lock( m_sessionMutex );
 
@@ -386,7 +398,7 @@ bool Sapphire::World::WorldServer::createSession( uint32_t sessionId )
   return true;
 }
 
-void Sapphire::World::WorldServer::removeSession( uint32_t sessionId )
+void WorldServer::removeSession( uint32_t sessionId )
 {
   auto pSession = getSession( sessionId );
   if( !pSession )
@@ -397,7 +409,7 @@ void Sapphire::World::WorldServer::removeSession( uint32_t sessionId )
   m_sessionMapByCharacterId.erase( pSession->getPlayer()->getCharacterId() );
 }
 
-Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( uint32_t id )
+SessionPtr WorldServer::getSession( uint32_t id )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_sessionMapById.find( id );
@@ -408,7 +420,7 @@ Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( uint32_t i
   return nullptr;
 }
 
-Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( uint64_t id )
+SessionPtr WorldServer::getSession( uint64_t id )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_sessionMapByCharacterId.find( id );
@@ -419,7 +431,7 @@ Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( uint64_t i
   return nullptr;
 }
 
-Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( const std::string& playerName )
+SessionPtr WorldServer::getSession( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
@@ -431,7 +443,7 @@ Sapphire::World::SessionPtr Sapphire::World::WorldServer::getSession( const std:
   return nullptr;
 }
 
-void Sapphire::World::WorldServer::removeSession( const Entity::Player& player )
+void WorldServer::removeSession( const Entity::Player& player )
 {
   auto session = getSession( player.getCharacterId() );
   if( session )
@@ -441,16 +453,16 @@ void Sapphire::World::WorldServer::removeSession( const Entity::Player& player )
   m_sessionMapByCharacterId.erase( player.getCharacterId() );
 }
 
-bool Sapphire::World::WorldServer::isRunning() const
+bool WorldServer::isRunning() const
 {
   return m_bRunning;
 }
 
-std::vector< Sapphire::World::SessionPtr > Sapphire::World::WorldServer::searchSessionByName( const std::string& playerName )
+std::vector< SessionPtr > WorldServer::searchSessionByName( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
 
-  std::vector< Sapphire::World::SessionPtr > results{};
+  std::vector< SessionPtr > results{};
 
   for( auto it = m_sessionMapByName.begin(); it != m_sessionMapByName.end(); ++it ) {
     if( it->first.find( playerName ) != std::string::npos ) {
@@ -461,7 +473,7 @@ std::vector< Sapphire::World::SessionPtr > Sapphire::World::WorldServer::searchS
   return results;
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::getPlayer( uint32_t entityId )
+Sapphire::Entity::PlayerPtr WorldServer::getPlayer( uint32_t entityId )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_playerMapById.find( entityId );
@@ -473,7 +485,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::getPlayer( uint32_t en
   return loadPlayer( entityId );
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::getPlayer( uint64_t characterId )
+Sapphire::Entity::PlayerPtr WorldServer::getPlayer( uint64_t characterId )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_playerMapByCharacterId.find( characterId );
@@ -485,7 +497,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::getPlayer( uint64_t ch
   return loadPlayer( characterId );
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::getPlayer( const std::string& playerName )
+Sapphire::Entity::PlayerPtr WorldServer::getPlayer( const std::string& playerName )
 {
   //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_playerMapByName.find( playerName );
@@ -498,7 +510,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::getPlayer( const std::
 }
 
 
-std::string Sapphire::World::WorldServer::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
+std::string WorldServer::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
 {
   if( !forceDbLoad )
   {
@@ -519,7 +531,7 @@ std::string Sapphire::World::WorldServer::getPlayerNameFromDb( uint64_t characte
   return playerName;
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::addPlayer( uint64_t characterId )
+Sapphire::Entity::PlayerPtr WorldServer::addPlayer( uint64_t characterId )
 {
   auto pPlayer = Entity::make_Player();
 
@@ -533,7 +545,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::addPlayer( uint64_t ch
   return pPlayer;
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( uint32_t entityId )
+Sapphire::Entity::PlayerPtr WorldServer::loadPlayer( uint32_t entityId )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo WHERE EntityId = " + std::to_string( entityId ) );
@@ -545,12 +557,12 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( uint32_t e
   return addPlayer( characterId );
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( uint64_t characterId )
+Sapphire::Entity::PlayerPtr WorldServer::loadPlayer( uint64_t characterId )
 {
   return addPlayer( characterId );
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( const std::string& playerName )
+Sapphire::Entity::PlayerPtr WorldServer::loadPlayer( const std::string& playerName )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo WHERE Name = " + playerName );
@@ -562,7 +574,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::loadPlayer( const std:
   return addPlayer( characterId );
 }
 
-bool Sapphire::World::WorldServer::loadPlayers()
+bool WorldServer::loadPlayers()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT CharacterId FROM charainfo" );
@@ -578,7 +590,7 @@ bool Sapphire::World::WorldServer::loadPlayers()
   return true;
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::syncPlayer( uint64_t characterId )
+Sapphire::Entity::PlayerPtr WorldServer::syncPlayer( uint64_t characterId )
 {
   auto pPlayer = getPlayer( characterId );
   if( !pPlayer )
@@ -615,17 +627,17 @@ Sapphire::Entity::PlayerPtr Sapphire::World::WorldServer::syncPlayer( uint64_t c
   return pPlayer;
 }
 
-std::map< int32_t, Sapphire::World::WorldServer::BNPCMap >& Sapphire::World::WorldServer::getBNpcTeriMap()
+std::map< int32_t, WorldServer::BNPCMap >& Sapphire::World::WorldServer::getBNpcTeriMap()
 {
   return m_bNpcTerritoryMap;
 }
 
-Sapphire::Common::Config::WorldConfig& Sapphire::World::WorldServer::getConfig()
+Sapphire::Common::Config::WorldConfig& WorldServer::getConfig()
 {
   return m_config;
 }
 
-void Sapphire::World::WorldServer::queueForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
+void WorldServer::queueForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
 {
   auto pSession = getSession( characterId );
   if( !pSession )
@@ -637,7 +649,7 @@ void Sapphire::World::WorldServer::queueForPlayer( uint64_t characterId, Sapphir
 
 }
 
-void Sapphire::World::WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
+void WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
 {
   auto pSession = getSession( characterId );
   if( !pSession )

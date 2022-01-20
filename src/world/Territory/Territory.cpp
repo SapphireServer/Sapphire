@@ -138,6 +138,8 @@ bool Sapphire::Territory::init()
     Logger::warn( "No navmesh found for TerritoryType#{}", getTerritoryTypeId() );
   }
 
+  onUpdate( 0 );
+
   return true;
 }
 
@@ -200,7 +202,7 @@ Weather Sapphire::Territory::getNextWeather()
   return Weather::FairSkies;
 }
 
-void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
+void Sapphire::Territory::pushActor( const Entity::GameObjectPtr& pActor )
 {
   float mx = pActor->getPos().x;
   float my = pActor->getPos().z;
@@ -248,7 +250,7 @@ void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
     pPlayer->setAgentId( agentId );
 
     m_playerMap[ pPlayer->getId() ] = pPlayer;
-    updateCellActivity( cx, cy, 2 );
+    updateCellActivity( cx, cy, 1 );
   }
   else if( pActor->isBattleNpc() )
   {
@@ -259,7 +261,7 @@ void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
     pBNpc->setAgentId( agentId );
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;
-    updateCellActivity( cx, cy, 2 );
+    updateCellActivity( cx, cy, 1 );
 
   }
   else if( pActor->isEventObj() )
@@ -270,7 +272,7 @@ void Sapphire::Territory::pushActor( Entity::GameObjectPtr pActor )
   }
 }
 
-void Sapphire::Territory::removeActor( Entity::GameObjectPtr pActor )
+void Sapphire::Territory::removeActor( const Entity::GameObjectPtr& pActor )
 {
   auto cellId = pActor->getCellId();
   CellPtr pCell = getCellPtr( cellId.x, cellId.y );
@@ -820,15 +822,12 @@ std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType 
 
 void Sapphire::Territory::updateSpawnPoints()
 {
-
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
-  auto rng = RNGMgr.getRandGenerator< float >( 0.f, PI * 2 );
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   for( auto& spawn : m_spawnInfo )
   {
     if( !spawn.bnpcPtr && ( Util::getTimeSeconds() - spawn.timeOfDeath ) > spawn.infoPtr->PopInterval )
     {
-      auto& server = Common::Service< World::WorldServer >::ref();
       auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), spawn.infoPtr, shared_from_this() );
       pBNpc->init();
       spawn.bnpcPtr = pBNpc;
@@ -839,7 +838,6 @@ void Sapphire::Territory::updateSpawnPoints()
     {
       spawn.timeOfDeath = Util::getTimeSeconds();
       spawn.bnpcPtr.reset();
-
     }
   }
 }

@@ -481,7 +481,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           m_pSession = session;
 
         auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
-        *reinterpret_cast< unsigned int* >( &pe->data()[ 0 ] ) = 0xE0037603;
+        *reinterpret_cast< unsigned int* >( &pe->data()[ 0 ] ) = 0xE0001027;
         *reinterpret_cast< unsigned int* >( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
         sendSinglePacket( pe );
 
@@ -490,6 +490,11 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         {
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
           *reinterpret_cast< unsigned int* >( &pe1->data()[ 0 ] ) = entityId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x20 ] ) = entityId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x24 ] ) = Common::Util::getTimeSeconds();
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x0C ] ) = Common::Util::getTimeSeconds();
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x1C ] ) = Common::Util::getTimeSeconds();
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x18 ] ) = Common::Util::getTimeSeconds();
           sendSinglePacket( pe1 );
           Logger::info( "[{0}] Setting session for world connection", id );
           session->setZoneConnection( pCon );

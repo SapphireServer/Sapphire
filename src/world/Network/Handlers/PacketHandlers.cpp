@@ -390,6 +390,7 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
 void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcLoginHandler >( inPacket );
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   // init handler means this is a login procedure
   player.setIsLogin( true );
