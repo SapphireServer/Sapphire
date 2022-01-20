@@ -41,6 +41,8 @@
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
+#include <Manager/TaskMgr.h>
+#include <Task/RemoveBNpcTask.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
@@ -774,6 +776,9 @@ void Sapphire::Entity::BNpc::onDeath()
   m_timeOfDeath = Util::getTimeSeconds();
   setOwner( nullptr );
 
+  auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+  auto removeTask = std::make_shared< Sapphire::World::RemoveBNpcTask >( 10000, getAsBNpc() );
+  taskMgr.queueTask( removeTask );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( m_level );
