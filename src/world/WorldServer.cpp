@@ -263,10 +263,6 @@ void WorldServer::run( int32_t argc, char* argv[] )
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
-  taskMgr->queueTask( std::make_shared< Sapphire::World::TestTask >( 10000 ) );
-  taskMgr->queueTask( std::make_shared< Sapphire::World::TestTask >( 5000 ) );
-  taskMgr->queueTask( std::make_shared< Sapphire::World::TestTask >( 2000 ) );
-
   mainLoop();
 
   for( auto& thread_entry : thread_list )

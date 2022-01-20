@@ -10,12 +10,13 @@ using namespace Sapphire::World;
 void TaskMgr::update( uint64_t tickCount )
 {
 
-  for( auto it = m_taskList.begin(); it != m_taskList.end();  )
+  for( auto it = m_taskList.begin(); it != m_taskList.end(); )
   {
     auto pTask = *it;
     // is the task ready for execution?
     if( ( tickCount - pTask->getQueueTimeMs() ) >= pTask->getDelayTimeMs() )
     {
+      Logger::info( pTask->toString() );
       pTask->execute();
       it = m_taskList.erase( it );
     }
