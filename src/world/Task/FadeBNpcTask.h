@@ -20,4 +20,10 @@ private:
   Entity::BNpcPtr m_pBNpc;
 };
 
+template< typename... Args >
+std::shared_ptr< FadeBNpcTask > makeFadeBNpcTask( Args... args )
+{
+  return std::make_shared< FadeBNpcTask >( args... );
+}
+
 }

@@ -26,8 +26,6 @@
 #include "Math/CalcBattle.h"
 #include "Math/CalcStats.h"
 
-#include "StatusEffect/StatusEffect.h"
-
 #include "WorldServer.h"
 #include "Session.h"
 #include "Chara.h"
@@ -38,7 +36,6 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/NaviMgr.h>
-#include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
@@ -441,7 +438,6 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
 
 void Sapphire::Entity::BNpc::hateListClear()
 {
-  auto it = m_hateList.begin();
   for( auto& listEntry : m_hateList )
   {
     if( isInRangeSet( listEntry->m_pChara ) )
@@ -531,11 +527,8 @@ void Sapphire::Entity::BNpc::setTriggerOwnerId( uint32_t triggerOwnerId )
 
 bool Sapphire::Entity::BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
 {
-  for( auto& listEntry : m_hateList )
-  {
-    if( listEntry->m_pChara == pChara )
-      return true;
-  }
+  return std::any_of( m_hateList.begin(), m_hateList.end(),
+                      [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
   return false;
 }
 
@@ -748,7 +741,7 @@ void Sapphire::Entity::BNpc::regainHp()
 {
   if( this->m_hp < this->getMaxHp() )
   {
-    auto addHp = static_cast< uint32_t >( this->getMaxHp() * 0.1f + 1 );
+    auto addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
 
     if( this->m_hp + addHp < this->getMaxHp() )
       this->m_hp += addHp;
@@ -771,6 +764,7 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
 void Sapphire::Entity::BNpc::onDeath()
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
   m_state = BNpcState::Dead;
@@ -778,10 +772,8 @@ void Sapphire::Entity::BNpc::onDeath()
   setOwner( nullptr );
 
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-  auto fadeTask = std::make_shared< Sapphire::World::FadeBNpcTask >( 10000, getAsBNpc() );
-  auto removeTask = std::make_shared< Sapphire::World::RemoveBNpcTask >( 12000, getAsBNpc() );
-  taskMgr.queueTask( fadeTask );
-  taskMgr.queueTask( removeTask );
+  taskMgr.queueTask( World::makeFadeBNpcTask( 10000, getAsBNpc() ) );
+  taskMgr.queueTask( World::makeRemoveBNpcTask( 12000, getAsBNpc() ) );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( m_level );
@@ -792,7 +784,6 @@ void Sapphire::Entity::BNpc::onDeath()
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {
-      auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
       playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), getLayoutId() );
       pPlayer->gainExp( paramGrowthInfo->data().BaseExp );
     }
@@ -834,10 +825,7 @@ void Sapphire::Entity::BNpc::checkAggro()
         range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
     }
 
-    auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                    pClosestChara->getPos().x,
-                                    pClosestChara->getPos().y,
-                                    pClosestChara->getPos().z );
+    auto distance = Util::distance( getPos(), pClosestChara->getPos() );
 
     if( distance < range )
     {
@@ -868,10 +856,7 @@ void Sapphire::Entity::BNpc::checkAggro()
         range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
     }
 
-    auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                    pClosestChara->getPos().x,
-                                    pClosestChara->getPos().y,
-                                    pClosestChara->getPos().z );
+    auto distance = Util::distance( getPos(), pClosestChara->getPos() );
 
     if( distance < range )
     {
@@ -883,20 +868,14 @@ void Sapphire::Entity::BNpc::checkAggro()
 void Sapphire::Entity::BNpc::setOwner( const Sapphire::Entity::CharaPtr& m_pChara )
 {
   m_pOwner = m_pChara;
+  auto targetId = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
   if( m_pChara != nullptr )
-  {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcFirstAttack >( m_pChara->getId() );
-    setOwnerPacket->data().Type = 0x01;
-    setOwnerPacket->data().Id = m_pChara->getId();
-    sendToInRangeSet( setOwnerPacket );
-  }
-  else
-  {
-    auto setOwnerPacket = makeZonePacket< FFXIVIpcFirstAttack >( getId() );
-    setOwnerPacket->data().Type = 0x01;
-    setOwnerPacket->data().Id = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
-    sendToInRangeSet( setOwnerPacket );
-  }
+    targetId = m_pChara->getId();
+
+  auto setOwnerPacket = makeZonePacket< FFXIVIpcFirstAttack >( getId() );
+  setOwnerPacket->data().Type = 0x01;
+  setOwnerPacket->data().Id = targetId;
+  sendToInRangeSet( setOwnerPacket );
 
   if( m_pChara != nullptr && m_pChara->isPlayer() )
   {
@@ -989,15 +968,11 @@ void Sapphire::Entity::BNpc::calculateStats()
   setStatValue( BaseParam::Mind, mnd );
   setStatValue( BaseParam::Piety, pie );
 
-
   auto determination = static_cast< uint32_t >( base );
   auto skillSpeed = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
   auto spellSpeed = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
   auto accuracy = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
   auto critHitRate = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
-//  m_baseStats.attackPotMagic = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
-//  m_baseStats.healingPotMagic = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
-//  auto tenacity = static_cast< uint32_t >( paramGrowthInfo->data().ParamBase );
 
   setStatValue( BaseParam::Determination, determination );
   setStatValue( BaseParam::SkillSpeed, skillSpeed );

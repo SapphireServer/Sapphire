@@ -289,10 +289,7 @@ void Sapphire::Entity::Chara::die()
   FFXIVPacketBasePtr packet = makeActorControl( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
   sendToInRangeSet( packet, selfNeedsUpdate );
 
-  // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
-  //       although that might be handled by setting the HP to 1 and doing some script magic
-
-  FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0x20 );
+  FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0 );
   sendToInRangeSet( packet1, selfNeedsUpdate );
 
 }

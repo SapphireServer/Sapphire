@@ -20,4 +20,10 @@ private:
   Entity::BNpcPtr m_pBNpc;
 };
 
+template< typename... Args >
+std::shared_ptr< RemoveBNpcTask > makeRemoveBNpcTask( Args... args )
+{
+  return std::make_shared< RemoveBNpcTask >( args... );
+}
+
 }
