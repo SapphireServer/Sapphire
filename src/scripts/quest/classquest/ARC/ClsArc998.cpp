@@ -47,7 +47,7 @@ public:
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
-  void onTalk( World::Quest &quest, Entity::Player &player, uint64_t actorId ) override
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
     switch( actorId )
     {
@@ -72,12 +72,12 @@ private:
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
 
-  void Scene00000( World::Quest &quest, Entity::Player &player )
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &ClsArc998::Scene00000Return ) );
   }
 
-  void Scene00000Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )// accept quest
     {
@@ -87,12 +87,12 @@ private:
 
   //////////////////////////////////////////////////////////////////////
 
-  void Scene00001( World::Quest &quest, Entity::Player &player )
+  void Scene00001( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | HIDE_UI | DISABLE_SKIP, bindSceneReturn( &ClsArc998::Scene00001Return ) );
   }
 
-  void Scene00001Return( World::Quest &quest, Entity::Player &player, const Event::SceneResult &result )
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
     if( result.getResult( 0 ) == 1 )
