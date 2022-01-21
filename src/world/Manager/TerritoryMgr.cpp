@@ -41,7 +41,7 @@ void Sapphire::World::Manager::TerritoryMgr::loadTerritoryTypeDetailCache()
   {
     auto teri1 = exdData.getRow< Component::Excel::TerritoryType >( id );
 
-    if( !teri1->getString( teri1->data().Name ).empty() )
+    if( !teri1->getString( teri1->data().Name ).empty() && id > 90 )
       m_territoryTypeDetailCacheMap[ id ] = teri1;
   }
 
@@ -205,7 +205,7 @@ bool Sapphire::World::Manager::TerritoryMgr::createDefaultTerritories()
     bool hasNaviMesh = pZone->getNaviProvider() != nullptr;
 
     Logger::info( "{0}\t{1}\t{2}\t{3:<10}\t{4}\t{5}\t{6}",
-                  territoryTypeId,
+                  territoryTypeId < 10 ? std::to_string( territoryTypeId ) + "\t" : std::to_string( territoryTypeId ),
                   guid,
                   territoryData.IntendedUse,
                   territoryInfo->getString( territoryData.Name ),
@@ -660,7 +660,7 @@ void Sapphire::World::Manager::TerritoryMgr::createAndJoinQuestBattle( Entity::P
   if( !qb )
     return;
 
-  player.setInstance( qb, { 0, 0, 0 } );
+  //player.setInstance( qb->getGuId(), { 0, 0, 0 } );
 
 }
 
@@ -669,49 +669,49 @@ bool Sapphire::World::Manager::TerritoryMgr::joinWorld( Sapphire::Entity::Player
 
   TerritoryPtr pCurrZone = nullptr;
 
-  auto zoneId = player.getTerritoryTypeId();
+  auto territoryTypeId = player.getTerritoryTypeId();
 
   // if the zone is an instanceContent zone, we need to actually find the instance
-  if( isInstanceContentTerritory( zoneId ) )
+  if( isInstanceContentTerritory( territoryTypeId ) )
   {
     // try to find an instance actually linked to this player
     pCurrZone = getLinkedInstance( player.getId() );
     // if none found, revert to previous zone and position
     if( !pCurrZone )
     {
-      zoneId = player.getPrevTerritoryTypeId();
+      territoryTypeId = player.getPrevTerritoryTypeId();
       auto prevPos = player.getPrevPos();
       player.setPos( prevPos, false );
       player.setRot( player.getPrevRot() );
-      pCurrZone = getZoneByTerritoryTypeId( zoneId );
+      pCurrZone = getZoneByTerritoryTypeId( territoryTypeId );
     }
   }
-  else if( isInternalEstateTerritory( zoneId ) )
+  else if( isInternalEstateTerritory( territoryTypeId ) )
   {
     // todo: this needs to go to the area just outside of the plot door
     pCurrZone = getTerritoryByGuId( player.getPrevTerritoryId() );
 
-    zoneId = player.getPrevTerritoryTypeId();
+    territoryTypeId = player.getPrevTerritoryTypeId();
     auto prevPos = player.getPrevPos();
     player.setPos( prevPos, false );
     player.setRot( player.getPrevRot() );
   }
-  else if( isHousingTerritory( zoneId ) )
+  else if( isHousingTerritory( territoryTypeId ) )
   {
     pCurrZone = getTerritoryByGuId( player.getTerritoryId() );
   }
   else
   {
-    pCurrZone = getZoneByTerritoryTypeId( zoneId );
+    pCurrZone = getZoneByTerritoryTypeId( territoryTypeId );
   }
 
-  player.setTerritoryTypeId( zoneId );
+  player.setTerritoryTypeId( territoryTypeId );
 
   // TODO: logic for instances needs to be added here
   // see if a valid zone could be found for the character
   if( !pCurrZone )
   {
-    Logger::error( "[{0}] Territory #{1} not found!", player.getCharacterId(), zoneId );
+    Logger::error( "[{0}] Territory #{1} not found!", player.getCharacterId(), territoryTypeId );
     Logger::error( "[{0}] Setting default zone instead", player.getCharacterId() );
 
     // default to new gridania

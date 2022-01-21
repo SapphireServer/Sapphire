@@ -486,7 +486,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           break;
         }
 
-        player.setInstance( instance, { 0, 0, 0 } );
+        //player.setInstance( param1, { 0, 0, 0 } );
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
       {
@@ -649,56 +649,6 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
                                                         static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
                                       true );
       PlayerMgr::sendServerNotice( player, "Raised {0}", targetPlayer->getName());
-      break;
-    }
-    case GmCommand::Jump:
-    {
-
-      if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
-      {
-        if( pPlayerTerri->getAsInstanceContent() )
-          player.exitInstance();
-
-        // Checks if the target player is in an InstanceContent to avoid binding to a Territory or PublicContent
-        auto pInstanceContent = pTargetActorTerri->getAsInstanceContent();
-        if( pInstanceContent )
-        {
-          // Not sure if GMs actually get bound to an instance they jump to on retail. It's mostly here to avoid a crash for now
-          pInstanceContent->bindPlayer( player.getId() );
-          player.setInstance( pInstanceContent, { targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z } );
-        }
-      }
-      else
-      {
-        player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z, targetActor->getRot() );
-        player.sendZoneInPackets( 0x00, false );
-      }
-      PlayerMgr::sendServerNotice( player, "Jumping to {0}", targetPlayer->getName() );
-      break;
-    }
-    case GmCommand::Call:
-    {
-      // We shouldn't be able to call a player into an instance, only call them out of one
-      if( pPlayerTerri->getAsInstanceContent() )
-      {
-        PlayerMgr::sendUrgent( player, "You are unable to call a player while bound to a battle instance." );
-        return;
-      }
-
-      if( targetPlayer->getTerritoryId() != player.getTerritoryId() )
-      {
-        if( pTargetActorTerri->getAsInstanceContent() )
-          targetPlayer->exitInstance();
-
-        targetPlayer->setInstance( pTargetActorTerri->getAsInstanceContent(), { player.getPos().x, player.getPos().y, player.getPos().z } );
-      }
-      else
-      {
-        targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
-        targetPlayer->sendZoneInPackets( 0x00, false );
-      }
-
-      PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }
     default:

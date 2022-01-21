@@ -473,13 +473,38 @@ void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
   m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
 }
 
-bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance, Common::FFXIVARR_POSITION3 pos )
+void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation )
 {
+  m_pos = pos;
+  m_territoryTypeId = zoneId;
+  m_bMarkedForZoning = true;
+  setRot( rotation );
+
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  m_onEnterEventDone = false;
+
+  auto pZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
+  if( !teriMgr.movePlayer( pZone, *this ) )
+  {
+    // todo: this will require proper handling, for now just return the player to their previous area
+    m_pos = m_prevPos;
+    m_rot = m_prevRot;
+    m_territoryTypeId = m_prevTerritoryTypeId;
+
+    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( m_territoryTypeId );
+    if( !teriMgr.movePlayer( pZone1, *this ) )
+      return;
+  }
+}
+
+bool Sapphire::Entity::Player::setInstance( uint32_t territoryId, Common::FFXIVARR_POSITION3 pos )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto instance = teriMgr.getTerritoryByGuId( territoryId );
+
   m_onEnterEventDone = false;
   if( !instance )
     return false;
-
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
@@ -491,20 +516,17 @@ bool Sapphire::Entity::Player::setInstance( const TerritoryPtr& instance, Common
     m_prevRot = m_rot;
   }
 
-  if( teriMgr.movePlayer( instance, *this ) )
-  {
-    m_pos = pos;
-    return true;
-  }
+  if( !teriMgr.movePlayer( instance, *this ) )
+    return false;
 
-  return false;
+  m_pos = pos;
+  return true;
 }
 
 bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-  auto pInstance = pZone->getAsInstanceContent();
 
   resetHp();
   resetMp();
@@ -1205,30 +1227,6 @@ bool Sapphire::Entity::Player::isLoadingComplete() const
 void Sapphire::Entity::Player::setLoadingComplete( bool bComplete )
 {
   m_bLoadingComplete = bComplete;
-}
-
-void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation )
-{
-  m_pos = pos;
-  m_territoryTypeId = zoneId;
-  m_bMarkedForZoning = true;
-  setRot( rotation );
-
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  m_onEnterEventDone = false;
-
-  auto pZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
-  if( !teriMgr.movePlayer( pZone, *this ) )
-  {
-    // todo: this will require proper handling, for now just return the player to their previous area
-    m_pos = m_prevPos;
-    m_rot = m_prevRot;
-    m_territoryTypeId = m_prevTerritoryTypeId;
-
-    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( m_territoryTypeId );
-    if( !teriMgr.movePlayer( pZone1, *this ) )
-      return;
-  }
 }
 
 bool Sapphire::Entity::Player::isMarkedForZoning() const

@@ -303,7 +303,7 @@ namespace Sapphire::Entity
     Common::OnlineStatus getOnlineStatus() const;
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( const Sapphire::TerritoryPtr& instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
+    bool setInstance( uint32_t territoryId, Sapphire::Common::FFXIVARR_POSITION3 pos );
 
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();

@@ -74,12 +74,16 @@ namespace Sapphire
 
     std::vector< World::Action::EffectResultPtr > m_effectResults;
 
+    Common::TerritoryIdent m_ident;
+
   public:
     Territory();
 
     Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 
     virtual ~Territory();
+
+    const Common::TerritoryIdent& getTerritoryIdent() const;
 
     /*! overrides the zone's weather, set to 0 to unlock */
     void setWeatherOverride( Common::Weather weather );

@@ -83,6 +83,7 @@ Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const s
   m_territoryTypeInfo = exdData.getRow< Component::Excel::TerritoryType >( territoryTypeId );
   m_bgPath = m_territoryTypeInfo->getString( m_territoryTypeInfo->data().LVB );
 
+  m_ident.territoryTypeId = territoryTypeId;
   loadWeatherRates();
 
   loadBNpcs();
@@ -965,4 +966,9 @@ void Sapphire::Territory::onEventHandlerOrder( Sapphire::Entity::Player& player,
                                                uint32_t arg2, uint32_t arg3, uint32_t arg4 )
 {
 
+}
+
+const TerritoryIdent& Sapphire::Territory::getTerritoryIdent() const
+{
+  return m_ident;
 }

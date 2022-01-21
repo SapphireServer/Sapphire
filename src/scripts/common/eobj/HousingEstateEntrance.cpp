@@ -82,7 +82,7 @@ public:
           return;
       }
 
-      player.setInstance( internalZone, pos );
+      //player.setInstance( internalZone->getGuId(), pos );
     } );
   }
 };

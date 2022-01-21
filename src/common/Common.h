@@ -1341,6 +1341,17 @@ namespace Sapphire::Common
     int16_t worldId; //06
   };
 
+  union TerritoryIdent
+  {
+    struct
+    {
+      uint16_t instanceId;
+      uint16_t territoryTypeId;
+    };
+
+    uint32_t id;
+  };
+
   struct House
   {
     uint8_t size;
