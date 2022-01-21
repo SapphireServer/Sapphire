@@ -24,9 +24,8 @@ Sapphire::Data::ExdData g_exdDataGen;
 namespace fs = std::filesystem;
 using namespace Sapphire;
 
-
-const std::string javaPath("\"C:\\Program Files (x86)\\Java\\jre1.8.0_301\\bin\\java.exe\" -jar unluac_2015_06_13.jar ");
-const std::string gamePath( "F:\\client3.0\\game\\sqpack" );
+std::string javaPath( "C:\\Program Files (x86)\\Java\\jre1.8.0_301\\bin\\java.exe" );
+std::string gamePath( "F:\\client3.0\\game\\sqpack" );
 
 const std::string onWithinRangeStr(
   "  void onWithinRange( World::Quest& quest, Entity::Player& player, uint64_t eRangeId, float x, float y, float z ) override\n"
@@ -472,26 +471,26 @@ int main( int argc, char** argv )
   Logger::init( "quest_parser" );
 
   bool unluac = false;
-  std::string datLocation( gamePath );
-  
-  // std::string datLocation( "/home/mordred/sqpack" );
+
   if( argc > 1 )
-    datLocation = std::string( argv[ 1 ] );
+    gamePath = std::string( argv[ 1 ] );
   if( argc > 2 )
     unluac = ( bool ) atoi( argv[ 2 ] );
+  if( argc > 3)
+    javaPath = std::string( argv[ 3 ] );
 
   unluac = true;
 
   Logger::info( "Setting up generated EXD data" );
-  if( !g_exdDataGen.init( datLocation ) )
+  if( !g_exdDataGen.init( gamePath ) )
   {
-    std::cout << datLocation << "\n";
+    std::cout << gamePath << "\n";
     Logger::fatal( "Error setting up EXD data " );
     std::cout << "Usage: quest_parser \"path/to/ffxiv/game/sqpack\" <1/0 unluac export toggle>\n";
     return 0;
   }
 
-  xiv::dat::GameData data( datLocation );
+  xiv::dat::GameData data( gamePath );
 
   auto rows = g_exdDataGen.getIdList< Component::Excel::Quest >();
 
@@ -546,7 +545,7 @@ int main( int argc, char** argv )
     if( unluac )
     {
       std::string command =
-        std::string( javaPath ) + "generated/" + questInfo->getString( questInfo->data().Script ) + ".luab" + ">> " +
+        javaPath + " -jar unluac_2015_06_13.jar " + "generated/" + questInfo->getString( questInfo->data().Script ) + ".luab" + ">> " +
         "generated/" + questInfo->getString( questInfo->data().Script ) + ".lua";
       if( system( command.c_str() ) == -1 )
       {
