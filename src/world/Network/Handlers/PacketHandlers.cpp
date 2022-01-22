@@ -359,7 +359,7 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
   PlayerMgr::sendDebug( player, "Walking ZoneLine#{0}", exitBoxId );
 
-  player.performZoning( targetZone, targetPos, rotation );
+  player.performZoning( targetZone, 0, targetPos, rotation );
 }
 
 

@@ -465,25 +465,29 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     setZoningType( Common::ZoneingType::Return );
   }
 
-  m_queuedZoneing = std::make_shared< QueuedZoning >( data.TerritoryType, pos, Util::getTimeMs(), rot );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( data.TerritoryType, 0, pos, Util::getTimeMs(), rot );
 }
 
 void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
 {
-  m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, getPos(), Util::getTimeMs(), 0.f );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, 0, getPos(), Util::getTimeMs(), 0.f );
 }
 
-void Sapphire::Entity::Player::performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation )
+void Sapphire::Entity::Player::performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation )
 {
   m_pos = pos;
-  m_territoryTypeId = zoneId;
   m_bMarkedForZoning = true;
   setRot( rotation );
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   m_onEnterEventDone = false;
 
-  auto pZone = teriMgr.getZoneByTerritoryTypeId( zoneId );
+  TerritoryPtr pZone;
+  if( territoryId != 0 )
+    pZone = teriMgr.getTerritoryByGuId( territoryId );
+  else
+    pZone = teriMgr.getZoneByTerritoryTypeId( territoryTypeId );
+
   if( !teriMgr.movePlayer( pZone, *this ) )
   {
     // todo: this will require proper handling, for now just return the player to their previous area
@@ -516,8 +520,7 @@ bool Sapphire::Entity::Player::setInstance( uint32_t territoryId, Common::FFXIVA
     m_prevRot = m_rot;
   }
 
-  if( !teriMgr.movePlayer( instance, *this ) )
-    return false;
+  m_queuedZoneing = std::make_shared< QueuedZoning >( instance->getTerritoryTypeId(), territoryId, m_pos, Util::getTimeMs(), m_rot );
 
   m_pos = pos;
   return true;
@@ -531,17 +534,12 @@ bool Sapphire::Entity::Player::exitInstance()
   resetHp();
   resetMp();
 
-  TerritoryPtr pTeri = teriMgr.getTerritoryByGuId( m_prevTerritoryId );
-
-  if( !teriMgr.movePlayer( pTeri, *this ) )
-    return false;
-
   m_pos = m_prevPos;
   m_rot = m_prevRot;
   m_territoryTypeId = m_prevTerritoryTypeId;
   m_territoryId = m_prevTerritoryId;
 
-  //m_queuedZoneing = std::make_shared< QueuedZoning >( m_territoryTypeId, m_pos, Util::getTimeMs(), m_rot );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( m_territoryTypeId, getTerritoryId(), m_pos, Util::getTimeMs(), m_rot );
 
   return true;
 }
@@ -696,7 +694,7 @@ void Sapphire::Entity::Player::resetDiscovery()
 void Sapphire::Entity::Player::changePosition( float x, float y, float z, float o )
 {
   Common::FFXIVARR_POSITION3 pos{ x, y, z };
-  m_queuedZoneing = std::make_shared< QueuedZoning >( getTerritoryTypeId(), pos, Util::getTimeMs(), o );
+  m_queuedZoneing = std::make_shared< QueuedZoning >( getTerritoryTypeId(), 0, pos, Util::getTimeMs(), o );
 }
 
 void Sapphire::Entity::Player::setSystemActionUnlocked( Common::UnlockEntry unlockId )
@@ -1054,9 +1052,10 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
   if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
   {
     Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-    if( getTerritoryTypeId() != m_queuedZoneing->m_targetZone )
+    if( getTerritoryTypeId() != m_queuedZoneing->m_targetTerritoryTypeId )
     {
-      performZoning( m_queuedZoneing->m_targetZone, targetPos, m_queuedZoneing->m_targetRotation );
+      Logger::debug( "{}_{}", m_queuedZoneing->m_targetTerritoryTypeId, m_queuedZoneing->m_targetTerritoryId );
+      performZoning( m_queuedZoneing->m_targetTerritoryTypeId, m_queuedZoneing->m_targetTerritoryId, targetPos, m_queuedZoneing->m_targetRotation );
     }
     else
     {

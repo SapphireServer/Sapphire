@@ -194,7 +194,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     case GmCommand::Call:
     {
       if( targetPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-        targetPlayer->performZoning( player.getTerritoryTypeId(), { player.getPos().x, player.getPos().y, player.getPos().z }, player.getRot() );
+        targetPlayer->performZoning( player.getTerritoryTypeId(), player.getTerritoryId(), { player.getPos().x, player.getPos().y, player.getPos().z }, player.getRot() );
       else
         targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
@@ -486,7 +486,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           break;
         }
 
-        //player.setInstance( param1, { 0, 0, 0 } );
+        player.setInstance( param1, { 0, 0, 0 } );
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
       {
@@ -533,7 +533,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         else
         {
           targetPlayer->setPos( targetPlayer->getPos() );
-          targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getPos(), 0 );
+          targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getTerritoryId(), targetPlayer->getPos(), 0 );
         }
 
         PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );

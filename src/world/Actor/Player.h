@@ -20,17 +20,19 @@ namespace Sapphire::Entity
 
   struct QueuedZoning
   {
-    uint16_t m_targetZone;
+    uint16_t m_targetTerritoryTypeId;
+    uint32_t m_targetTerritoryId;
     Common::FFXIVARR_POSITION3 m_targetPosition;
     float m_targetRotation;
     uint64_t m_queueTime;
 
-    QueuedZoning( uint16_t targetZone, const Common::FFXIVARR_POSITION3& targetPosition,
+    QueuedZoning( uint16_t targetZone, uint32_t targetTerritoryId, const Common::FFXIVARR_POSITION3& targetPosition,
                   uint64_t queuedTime, float targetRotation ) :
-      m_targetZone( targetZone ),
-      m_targetPosition( targetPosition ),
-      m_queueTime( queuedTime ),
-      m_targetRotation( targetRotation )
+            m_targetTerritoryTypeId( targetZone ),
+            m_targetTerritoryId( targetTerritoryId ),
+            m_targetPosition( targetPosition ),
+            m_queueTime( queuedTime ),
+            m_targetRotation( targetRotation )
     {
     }
   };
@@ -581,7 +583,7 @@ namespace Sapphire::Entity
     void setLoadingComplete( bool bComplete );
 
     /*! mark this player for zoning, notify worldserver */
-    void performZoning( uint16_t zoneId, const Common::FFXIVARR_POSITION3& pos, float rotation );
+    void performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation );
 
     /*! return true if the player is marked for zoning */
     bool isMarkedForZoning() const;
