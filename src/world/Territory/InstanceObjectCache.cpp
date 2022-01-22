@@ -41,16 +41,20 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     // TODO: it does feel like this needs to be streamlined into the datReader instead of being done here...
     std::string bgLgbPath( path + "/level/bg.lgb" );
     std::string planmapLgbPath( path + "/level/planmap.lgb" );
+    std::string planeventLgbPath( path + "/level/planevent.lgb" );
     std::vector< char > bgSection;
     std::vector< char > planmapSection;
+    std::vector< char > planeventSection;
 
     std::unique_ptr< xiv::dat::File > bgFile;
     std::unique_ptr< xiv::dat::File > planmap_file;
+    std::unique_ptr< xiv::dat::File > planevent_file;
 
     try
     {
       bgFile = exdData.getGameData()->getFile( bgLgbPath );
       planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
+      planevent_file = exdData.getGameData()->getFile( planeventLgbPath );
     }
     catch( std::runtime_error& )
     {
@@ -60,6 +64,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 
     bgSection = bgFile->access_data_sections().at( 0 );
     planmapSection = planmap_file->access_data_sections().at( 0 );
+    planeventSection = planevent_file->access_data_sections().at( 0 );
 
     std::vector< std::string > stringList;
 
@@ -67,8 +72,9 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 
     LGB_FILE bgLgb( &bgSection[ 0 ], "bg" );
     LGB_FILE planmapLgb( &planmapSection[ 0 ], "planmap" );
+    LGB_FILE planeventLgb( &planeventSection[ 0 ], "planevent" );
 
-    std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
+    std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb, planeventLgb };
     uint32_t max_index = 0;
 
     for( const auto& lgb : lgbList )
