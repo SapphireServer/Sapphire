@@ -382,6 +382,9 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   std::string objName = eventMgr.getEventName( eventId );
   PlayerMgr::sendDebug( player, "Calling: {0}.{1} - {2}", objName, eventName, eventId );
 
+  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( targetId ) );
+
   auto eventType = static_cast< uint16_t >( eventId >> 16 );
   auto& exdData = Common::Service< Data::ExdData >::ref();
   if( eventType == Event::EventHandler::EventHandlerType::Quest )
@@ -396,7 +399,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
         auto questIdx = player.getQuestIndex( questId );
         auto& quest = player.getQuestByIndex( questIdx );
         preQ = quest;
-        script->onEventItem( quest, player, targetId );
+        script->onEventItem( quest, player, actor );
         if( quest != preQ )
           player.updateQuest( quest );
         return true;
@@ -443,6 +446,9 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
   bool didCallScript = false;
 
+  auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+
   for( size_t i = 0; i < 30; i++ )
   {
     auto quest = player.getQuestByIndex( static_cast< uint16_t >( i ));
@@ -457,10 +463,10 @@ bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player
       didCallScript = true;
       std::string objName = eventMgr.getEventName( questId );
 
-      PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}, questId#{2}", objName, actorId, quest.getId() );
+      PlayerMgr::sendDebug( player, "Calling: {0}.onEObjHit actorId#{1}, questId#{2}", objName, actor, quest.getId() );
 
       World::Quest preQ = quest;
-      script->onEObjHit( quest, player, actorId, actionId );
+      script->onEObjHit( quest, player, actor, actionId );
       if( quest != preQ )
         player.updateQuest( quest );
     }

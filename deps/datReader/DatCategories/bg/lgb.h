@@ -86,7 +86,7 @@ public:
   };
 };
 
-class LGB_ENPC_ENTRY : public LgbEntry
+struct LGB_ENPC_ENTRY : public LgbEntry
 {
 public:
   ENpcData data;
@@ -100,7 +100,7 @@ public:
   };
 };
 
-class LGB_EOBJ_ENTRY : public LgbEntry
+struct LGB_EOBJ_ENTRY : public LgbEntry
 {
 public:
   EObjData data;

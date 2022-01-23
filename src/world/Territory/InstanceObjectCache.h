@@ -7,6 +7,8 @@
 struct LGB_MAP_RANGE_ENTRY;
 struct LGB_EXIT_RANGE_ENTRY;
 struct LGB_POP_RANGE_ENTRY;
+struct LGB_EOBJ_ENTRY;
+struct LGB_ENPC_ENTRY;
 
 
 namespace Sapphire
@@ -65,6 +67,8 @@ namespace Sapphire
     using MapRangePtr = std::shared_ptr< LGB_MAP_RANGE_ENTRY >;
     using ExitRangePtr = std::shared_ptr< LGB_EXIT_RANGE_ENTRY >;
     using PopRangePtr = std::shared_ptr< LGB_POP_RANGE_ENTRY >;
+    using EObjPtr = std::shared_ptr< LGB_EOBJ_ENTRY >;
+    using ENpcPtr = std::shared_ptr< LGB_ENPC_ENTRY >;
 
     InstanceObjectCache();
     ~InstanceObjectCache() = default;
@@ -72,11 +76,15 @@ namespace Sapphire
     MapRangePtr getMapRange( uint16_t zoneId, uint32_t mapRangeId );
     ExitRangePtr getExitRange( uint16_t zoneId, uint32_t exitRangeId );
     PopRangePtr getPopRange( uint16_t zoneId, uint32_t popRangeId );
+    EObjPtr getEObj( uint32_t eObjId );
+    ENpcPtr getENpc( uint32_t eNpcId );
 
   private:
     ObjectCache< LGB_MAP_RANGE_ENTRY > m_mapRangeCache;
     ObjectCache< LGB_EXIT_RANGE_ENTRY > m_exitRangeCache;
     ObjectCache< LGB_POP_RANGE_ENTRY > m_popRangeCache;
+    ObjectCache< LGB_EOBJ_ENTRY > m_eobjCache;
+    ObjectCache< LGB_ENPC_ENTRY > m_enpcCache;
     std::shared_ptr< Framework > m_pFramework;
 
   };

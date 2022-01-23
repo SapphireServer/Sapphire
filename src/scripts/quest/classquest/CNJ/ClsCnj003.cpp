@@ -216,9 +216,8 @@ public:
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
+  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actor ) override
   {
-    auto actor = eventMgr().mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Eobject0 )
     {
@@ -238,9 +237,8 @@ public:
     }
   }
 
-  void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId ) override
+  void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actor, uint32_t actionId ) override
   {
-    auto actor = eventMgr().mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
     if( actor == Actor3 && actionId == Action0 )
     {

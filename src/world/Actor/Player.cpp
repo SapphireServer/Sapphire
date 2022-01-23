@@ -69,7 +69,6 @@ Sapphire::Entity::Player::Player() :
   m_lastActionTick( 0 ),
   m_bInCombat( false ),
   m_bLoadingComplete( false ),
-  m_bMarkedForZoning( false ),
   m_zoningType( Common::ZoneingType::None ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
@@ -476,7 +475,6 @@ void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
 void Sapphire::Entity::Player::performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation )
 {
   m_pos = pos;
-  m_bMarkedForZoning = true;
   setRot( rotation );
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -1228,11 +1226,6 @@ void Sapphire::Entity::Player::setLoadingComplete( bool bComplete )
   m_bLoadingComplete = bComplete;
 }
 
-bool Sapphire::Entity::Player::isMarkedForZoning() const
-{
-  return m_bMarkedForZoning;
-}
-
 ZoneingType Sapphire::Entity::Player::getZoningType() const
 {
   return m_zoningType;
@@ -1632,7 +1625,6 @@ void Sapphire::Entity::Player::sendZonePackets()
     partyMgr.onMoveZone( *this );
   }
 
-  m_bMarkedForZoning = false;
 }
 
 void Sapphire::Entity::Player::setDirectorInitialized( bool isInitialized )

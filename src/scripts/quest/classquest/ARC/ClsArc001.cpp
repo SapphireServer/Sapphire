@@ -126,40 +126,38 @@ public:
 
   void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId ) override
   {
-    auto actor = eventMgr().mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-
-    switch( actor )
+     switch( actorId )
     {
       case Eobject0:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00001( quest, player );
         break;
       case Eobject1:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00002( quest, player );
         break;
       case Eobject2:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00003( quest, player );
         break;
       case Eobject3:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00004( quest, player );
         break;
       case Eobject4:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00005( quest, player );
         break;
       case Eobject5:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00006( quest, player );
         break;
       case Eobject6:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00007( quest, player );
         break;
       case Eobject7:
-        eventMgr().eventStart( player, actor, getId(), Event::EventHandler::Nest, 0, 0 );
+        eventMgr().eventStart( player, actorId, getId(), Event::EventHandler::Nest, 0, 0 );
         Scene00008( quest, player );
         break;
     }

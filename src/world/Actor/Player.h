@@ -585,9 +585,6 @@ namespace Sapphire::Entity
     /*! mark this player for zoning, notify worldserver */
     void performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation );
 
-    /*! return true if the player is marked for zoning */
-    bool isMarkedForZoning() const;
-
     void sendZoneInPackets( uint32_t param1, bool pSetStatus );
 
     void finishZoning();
@@ -928,7 +925,6 @@ namespace Sapphire::Entity
 
     Common::ZoneingType m_zoningType;
 
-    bool m_bMarkedForZoning;
     bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;
     uint64_t m_onlineStatusCustom;

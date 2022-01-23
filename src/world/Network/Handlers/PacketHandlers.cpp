@@ -197,10 +197,6 @@ void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::F
 
 void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  // if the player is marked for zoning we no longer want to update his pos
-  if( player.isMarkedForZoning() )
-    return;
-
   const auto updatePositionPacket = ZoneChannelPacket< Client::FFXIVIpcUpdatePosition >( inPacket );
   auto& data = updatePositionPacket.data();
 

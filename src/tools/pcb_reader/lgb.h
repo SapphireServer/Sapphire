@@ -178,7 +178,7 @@ struct ENpcData :
   uint8_t unknown1[0x24];
 };
 
-class LGB_ENPC_ENTRY :
+struct LGB_ENPC_ENTRY :
   public LgbEntry
 {
 public:
@@ -202,7 +202,7 @@ struct EObjData :
   uint8_t unknown1[0xC];
 };
 
-class LGB_EOBJ_ENTRY :
+struct LGB_EOBJ_ENTRY :
   public LgbEntry
 {
 public:

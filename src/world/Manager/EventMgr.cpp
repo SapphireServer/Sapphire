@@ -1,5 +1,4 @@
 #include <Common.h>
-#include <Exd/ExdData.h>
 #include <Util/Util.h>
 #include <Service.h>
 
@@ -10,6 +9,10 @@
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
 
+#include <Exd/ExdData.h>
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
@@ -18,6 +21,8 @@
 #include "Network/PacketWrappers/EventPlayPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/Notice2Packet.h"
+
+#include "Territory/InstanceObjectCache.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -217,10 +222,16 @@ std::string Sapphire::World::Manager::EventMgr::getErrorCodeName( uint8_t errorC
 
 uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
+
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto levelInfo = exdData.getRow< Component::Excel::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->data().BaseId;
+  else if( auto pObj = instanceObjectCache.getEObj( eventActorId ) )
+    return pObj->data.eobjId;
+  else if( auto pNpc = instanceObjectCache.getENpc( eventActorId ) )
+    return pNpc->data.enpcId;
 
   return 0;
 }

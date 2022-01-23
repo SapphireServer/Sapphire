@@ -102,6 +102,16 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
           {
 
           }
+          else if( pEntry->getType() == LgbEntryType::EventObject )
+          {
+            auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
+            m_eobjCache.insert( 0, pEObj );
+          }
+          else if( pEntry->getType() == LgbEntryType::EventNpc )
+          {
+            auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+            m_enpcCache.insert( 0, pENpc );
+          }
         }
       }
     }
@@ -131,4 +141,16 @@ Sapphire::InstanceObjectCache::PopRangePtr
   Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
 {
   return m_popRangeCache.get( zoneId, popRangeId );
+}
+
+Sapphire::InstanceObjectCache::EObjPtr
+  Sapphire::InstanceObjectCache::getEObj( uint32_t eObjId )
+{
+  return m_eobjCache.get( 0, eObjId );
+}
+
+Sapphire::InstanceObjectCache::ENpcPtr
+  Sapphire::InstanceObjectCache::getENpc( uint32_t eNpcId )
+{
+  return m_enpcCache.get( 0, eNpcId );
 }

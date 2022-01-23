@@ -196,7 +196,7 @@ public:
   };
 };
 
-class LGB_EOBJ_ENTRY : public LgbEntry
+struct LGB_EOBJ_ENTRY : public LgbEntry
 {
 public:
   EObjData data;
