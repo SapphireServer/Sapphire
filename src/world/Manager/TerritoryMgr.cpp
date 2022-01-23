@@ -711,15 +711,8 @@ bool Sapphire::World::Manager::TerritoryMgr::joinWorld( Sapphire::Entity::Player
   // see if a valid zone could be found for the character
   if( !pCurrZone )
   {
-    Logger::error( "[{0}] Territory #{1} not found!", player.getCharacterId(), territoryTypeId );
-    Logger::error( "[{0}] Setting default zone instead", player.getCharacterId() );
-
-    // default to new gridania
-    // TODO: should probably just abort and mark character as corrupt
-    pCurrZone = getZoneByTerritoryTypeId( 132 );
-
-    player.setPos( { 0.0f, 0.0f, 0.0f }, false );
-    player.setRot( 0.0f );
+    Logger::error( "[{0}] Territory #{1} not found, manual adjustment of territory required!", player.getCharacterId(), territoryTypeId );
+    return false;
   }
 
   if( !movePlayer( pCurrZone, player ) )

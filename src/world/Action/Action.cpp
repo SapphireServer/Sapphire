@@ -26,7 +26,6 @@
 #include <Logging/Logger.h>
 
 #include <Util/ActorFilter.h>
-#include <Util/UtilMath.h>
 #include <Service.h>
 #include "WorldServer.h"
 
@@ -140,7 +139,14 @@ bool Action::Action::init()
   }
   else
   {
-    std::memset( &m_lutEntry, 0, sizeof( ActionEntry ) );
+    m_lutEntry.curePotency = 0;
+    m_lutEntry.restoreMPPercentage = 0;
+    m_lutEntry.potency = 0;
+    m_lutEntry.comboPotency = 0;
+    m_lutEntry.flankPotency = 0;
+    m_lutEntry.rearPotency = 0;
+    m_lutEntry.frontPotency = 0;
+    m_lutEntry.nextCombo.clear();
   }
 
   addDefaultActorFilters();
@@ -252,7 +258,8 @@ bool Action::Action::update()
     player->setLastActionTick( tickCount );
     uint32_t delayMs = 100 - lastTickMs;
     castTime = ( m_castTimeMs + delayMs );
-    m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) - std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) );
+    m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) -
+                       static_cast< uint64_t >( std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) );
   }
 
   if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > castTime )
@@ -301,7 +308,7 @@ void Action::Action::start()
     data.Action = static_cast< uint16_t >( m_id );
     data.ActionKey = m_id;
     data.ActionKind = m_actionKind;
-    data.CastTime = m_castTimeMs / 1000.f;
+    data.CastTime = static_cast< float >( m_castTimeMs ) / 1000.f;
     data.Target = static_cast< uint32_t >( m_targetId );
 
     data.TargetPos[ 0 ] = Common::Util::floatToUInt16( m_pSource->getPos().x );
@@ -321,7 +328,7 @@ void Action::Action::start()
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, m_cooldownGroup, getId(),
                                               m_recastTimeMs / 10 );
 
-  player->setRecastGroup( m_cooldownGroup, m_castTimeMs / 1000.f );
+  player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
 
   server.queueForPlayer( player->getCharacterId(), actionStartPkt );
 
@@ -617,8 +624,8 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
     return false;
 
   // npc actions/non player actions
-  if( m_actionData->data().UseClassJob == -1 /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
-    return false;
+  //if( m_actionData->data().UseClassJob == -1 /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
+  //  return false;
 
   if( player.getLevel() < m_actionData->data().UseClassJob )
     return false;

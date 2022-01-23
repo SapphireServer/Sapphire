@@ -90,7 +90,7 @@ bool Sapphire::World::Manager::ShopMgr::sellGilShopItem( Sapphire::Entity::Playe
   auto inventoryItem = player.getItemAt( container, fromSlot );
 
   // todo: adding stack remove
-  if (quantity > 1)
+  if( quantity > 1 )
     return false;
 
   player.discardItem( ( Sapphire::Common::InventoryType )container, fromSlot );

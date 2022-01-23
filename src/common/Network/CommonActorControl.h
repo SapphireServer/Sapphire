@@ -116,7 +116,7 @@ namespace Sapphire::Network::ActorControl
     ZoneInDefaultPos = 0xC9,
 
     TeleportStart = 0xCB,
-
+    TeleportInvitation = 0xCC,
     TeleportDone = 0xCD,
     TeleportDoneFadeOut = 0xCE,
 

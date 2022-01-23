@@ -166,43 +166,43 @@ namespace Sapphire::World::Action
 
     bool hasValidLutEntry() const;
 
-    uint32_t m_id;
-    uint8_t m_actionKind;
+    uint32_t m_id{};
+    uint8_t m_actionKind{};
 
-    uint16_t m_sequence;
+    uint16_t m_sequence{};
 
     Common::ActionPrimaryCostType m_primaryCostType;
-    uint16_t m_primaryCost;
+    uint16_t m_primaryCost{};
 
-    uint64_t m_startTime;
-    uint64_t m_castTimeRestMs;
-    uint32_t m_castTimeMs;
-    uint32_t m_recastTimeMs;
-    uint8_t m_cooldownGroup;
-    int8_t m_range;
-    uint8_t m_effectRange;
-    uint8_t m_xAxisModifier;
+    uint64_t m_startTime{};
+    uint64_t m_castTimeRestMs{};
+    uint32_t m_castTimeMs{};
+    uint32_t m_recastTimeMs{};
+    uint8_t m_cooldownGroup{};
+    int8_t m_range{};
+    uint8_t m_effectRange{};
+    uint8_t m_xAxisModifier{};
     Common::ActionAspect m_aspect;
     Common::CastType m_castType;
     Common::ActionCategory m_category;
 
-    uint32_t m_additionalData;
+    uint32_t m_additionalData{};
 
     Entity::CharaPtr m_pSource;
     Entity::CharaPtr m_pTarget;
-    uint64_t m_targetId;
+    uint64_t m_targetId{};
 
-    bool m_canTargetSelf;
-    bool m_canTargetParty;
-    bool m_canTargetFriendly;
-    bool m_canTargetHostile;
-    bool m_canTargetDead;
+    bool m_canTargetSelf{};
+    bool m_canTargetParty{};
+    bool m_canTargetFriendly{};
+    bool m_canTargetHostile{};
+    bool m_canTargetDead{};
 
     Common::ActionInterruptType m_interruptType;
 
     std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > m_actionData;
 
-    Common::FFXIVARR_POSITION3 m_pos;
+    Common::FFXIVARR_POSITION3 m_pos{};
 
     EffectBuilderPtr m_effectBuilder;
 
