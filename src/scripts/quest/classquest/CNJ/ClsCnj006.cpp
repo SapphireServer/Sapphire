@@ -239,8 +239,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
@@ -335,8 +334,7 @@ private:
 
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
@@ -431,8 +429,7 @@ private:
 
   void Scene00019Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );

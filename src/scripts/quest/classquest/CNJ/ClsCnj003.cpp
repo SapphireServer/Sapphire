@@ -287,8 +287,7 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy0, 319 /*Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
