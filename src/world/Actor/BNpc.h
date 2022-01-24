@@ -105,6 +105,7 @@ namespace Sapphire::Entity
     void hateListClear();
     CharaPtr hateListGetHighest();
     void hateListAdd( const CharaPtr& pChara, int32_t hateAmount );
+    void hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount );
     void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );

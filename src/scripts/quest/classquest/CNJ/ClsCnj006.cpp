@@ -242,7 +242,8 @@ private:
     auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
-    enemy->hateListAdd( player.getAsPlayer(), 1 );
+    enemy->setTriggerOwnerId( player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
     quest.setBitFlag8( 1, true );
   }
 
@@ -337,7 +338,8 @@ private:
     auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
-    enemy->hateListAdd( player.getAsPlayer(), 1 );
+    enemy->setTriggerOwnerId( player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
     quest.setBitFlag8( 1, true );
   }
 
@@ -432,7 +434,8 @@ private:
     auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
-    enemy->hateListAdd( player.getAsPlayer(), 1 );
+    enemy->setTriggerOwnerId( player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
 
     quest.setBitFlag8( 1, true );
   }
