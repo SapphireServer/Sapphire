@@ -39,6 +39,7 @@
 #include <Manager/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
+#include <Script/ScriptMgr.h>
 #include <Task/RemoveBNpcTask.h>
 #include <Task/FadeBNpcTask.h>
 #include <Task/DelayedEmnityTask.h>
@@ -574,6 +575,13 @@ void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
     sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
     sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetBattle, 0, 0, 0 ) );
     tmpPlayer->onMobDeaggro( *this );
+
+    if( getTriggerOwnerId() == pChara->getId() )
+    {
+      auto pScript = std::make_shared< Scripting::ScriptMgr >();
+      pScript->onTriggerOwnerDeaggro( *pChara->getAsPlayer(), getLayoutId(), getId() );
+    }
+
   }
 }
 

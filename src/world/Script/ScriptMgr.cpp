@@ -410,6 +410,37 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, uint32_t layoutId, uint32_t entityId )
+{
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  // loop through all active quests and try to call available onBNpcKill callbacks
+  for( size_t i = 0; i < 30; i++ )
+  {
+    auto quest = player.getQuestByIndex( static_cast< uint16_t >( i ) );
+    if( quest.getId() == 0 )
+      continue;
+
+    uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
+
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
+    if( script )
+    {
+      std::string objName = eventMgr.getEventName( questId );
+
+      PlayerMgr::sendDebug( player, "Calling: {0}.onTriggerOwnerDeaggro layoutId#{1}", objName, layoutId );
+
+
+      World::Quest preQ = quest;
+      script->onTriggerOwnerDeaggro( quest, layoutId, entityId, player );
+      if( quest != preQ )
+        player.updateQuest( quest );
+    }
+  }
+
+  return true;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t layoutId )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();

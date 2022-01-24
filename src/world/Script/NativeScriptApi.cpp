@@ -150,6 +150,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestScript::onTriggerOwnerDeaggro( World::Quest& quest, uint32_t layoutId, uint32_t entityId, Sapphire::Entity::Player& player )
+  {
+  }
+
   void QuestScript::onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Entity::Player& player )
   {
   }
