@@ -53,7 +53,7 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1}", objName, eventName );
   eventMgr.eventStart( player, actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   if( auto instance = pZone->getAsInstanceContent() )
   {

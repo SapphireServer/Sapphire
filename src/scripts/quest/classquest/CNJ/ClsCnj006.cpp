@@ -239,7 +239,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->hateListAdd( player.getAsPlayer(), 1 );
@@ -334,7 +334,7 @@ private:
 
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->hateListAdd( player.getAsPlayer(), 1 );
@@ -429,7 +429,7 @@ private:
 
   void Scene00019Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->hateListAdd( player.getAsPlayer(), 1 );
@@ -518,10 +518,10 @@ private:
     {
       //TODO: QuestBattle content
 
-      auto pTeriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
+      auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
 
       eventMgr().eventFinish( player, result.eventId, 0 );
-      pTeriMgr.createAndJoinQuestBattle( player, Questbattle0 );
+      teriMgr.createAndJoinQuestBattle( player, Questbattle0 );
     }
   }
 

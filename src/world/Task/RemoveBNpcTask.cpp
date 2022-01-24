@@ -24,7 +24,7 @@ void RemoveBNpcTask::onQueue()
 void RemoveBNpcTask::execute()
 {
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( m_pBNpc->getTerritoryId() );
 
   if( !pZone )

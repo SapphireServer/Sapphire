@@ -63,7 +63,7 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
 
   auto landSetId = housingMgr.toLandSetId( m_landIdent.territoryTypeId, m_landIdent.wardNum  );
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
   auto pLand = hZone->getLand( static_cast< uint8_t >( m_landIdent.landId ) );

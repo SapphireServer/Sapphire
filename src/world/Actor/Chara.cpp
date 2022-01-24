@@ -510,7 +510,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 /*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   int8_t nextSlot = getStatusEffectFreeSlot();

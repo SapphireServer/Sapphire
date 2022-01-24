@@ -817,7 +817,7 @@ uint32_t Sapphire::Entity::Player::getExp() const
 
 void Sapphire::Entity::Player::setExp( uint32_t amount )
 {
-  auto exdData = Common::Service< Data::ExdData >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_expArray[ classJobIndex ] = amount;
 }
@@ -1438,7 +1438,7 @@ uint32_t Sapphire::Entity::Player::getPersistentEmote() const
 
 void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
@@ -1549,7 +1549,7 @@ uint32_t Sapphire::Entity::Player::getPrevTerritoryTypeId() const
 
 void Sapphire::Entity::Player::sendZonePackets()
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   auto initPacket = makeZonePacket< FFXIVIpcLogin >( getId() );

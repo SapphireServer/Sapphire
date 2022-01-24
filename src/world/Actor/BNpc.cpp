@@ -352,7 +352,7 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
 
 bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   auto pNaviProvider = pZone->getNaviProvider();
@@ -390,7 +390,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 {
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   auto pNaviProvider = pZone->getNaviProvider();
@@ -580,7 +580,7 @@ void Sapphire::Entity::BNpc::onTick()
 
 void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   const uint8_t maxDistanceToOrigin = 40;
@@ -908,7 +908,7 @@ void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
 
 void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   uint64_t tick = Util::getTimeMs();

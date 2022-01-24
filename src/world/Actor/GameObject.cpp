@@ -68,7 +68,7 @@ void Sapphire::Entity::GameObject::setPos( float x, float y, float z, bool broad
 
   if( broadcastUpdate )
   {
-    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
     pZone->updateActorPosition( *this );
   }
@@ -81,7 +81,7 @@ void Sapphire::Entity::GameObject::setPos( const Sapphire::Common::FFXIVARR_POSI
 
   if( broadcastUpdate )
   {
-    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
     pZone->updateActorPosition( *this );
   }

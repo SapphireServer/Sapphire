@@ -300,7 +300,7 @@ Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint64
   if( !res->next() )
     return nullptr;
 
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( res->getUInt( 1 ) );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
   if( !hZone )
@@ -317,7 +317,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& pl
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -357,7 +357,7 @@ void Sapphire::World::Manager::HousingMgr::sendLandSignFree( Entity::Player& pla
   player.setActiveLand( static_cast< uint8_t >( ident.landId ), static_cast< uint8_t >( ident.wardNum ) );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -482,7 +482,7 @@ void Sapphire::World::Manager::HousingMgr::sendWardLandInfo( Entity::Player& pla
 
   auto landSetId = toLandSetId( territoryTypeId, wardId );
 
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -546,7 +546,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateGreeting( Entity::Player& p
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -738,7 +738,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateRename( Entity::Player& 
   auto pSession = server.getSession( player.getCharacterId() );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -765,7 +765,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Pl
   auto pSession = server.getSession( player.getCharacterId() );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -791,7 +791,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGreeting( Entity::Pl
 void Sapphire::World::Manager::HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::LandIdent ident, const std::string& greeting )
 {
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -821,7 +821,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   auto pSession = server.getSession( player.getCharacterId() );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-  auto teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -879,7 +879,7 @@ void Sapphire::World::Manager::HousingMgr::sendEstateInventory( Entity::Player& 
     auto ident = internalZone->getLandIdent();
 
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-    auto teriMgr = Common::Service< TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1001,7 +1001,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   // retail process is:
@@ -1029,7 +1029,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceHousingItem( Sapphire::Entity
     auto ident = zone->getLandIdent();
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1090,7 +1090,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
   LandPtr land;
   bool isOutside = false;
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   if( auto zone = std::dynamic_pointer_cast< HousingZone >( pZone ) )
@@ -1105,7 +1105,7 @@ void Sapphire::World::Manager::HousingMgr::reqPlaceItemInStore( Sapphire::Entity
     auto ident = zone->getLandIdent();
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1184,7 +1184,7 @@ bool Sapphire::World::Manager::HousingMgr::placeExternalItem( Entity::Player& pl
   invMgr.saveHousingContainer( ident, container );
   invMgr.updateHousingItemPosition( item );
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   // add to zone and spawn
@@ -1200,7 +1200,7 @@ bool Sapphire::World::Manager::HousingMgr::placeInteriorItem( Entity::Player& pl
                                                               Inventory::HousingItemPtr item )
 {
   auto& invMgr = Service< InventoryMgr >::ref();
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
@@ -1260,7 +1260,7 @@ Sapphire::Common::Furniture Sapphire::World::Manager::HousingMgr::getYardObjectF
 
 void Sapphire::World::Manager::HousingMgr::sendInternalEstateInventoryBatch( Sapphire::Entity::Player& player, bool storeroom )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
@@ -1294,7 +1294,7 @@ void Sapphire::World::Manager::HousingMgr::reqMoveHousingItem( Entity::Player& p
 {
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
   auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
@@ -1411,7 +1411,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
                                                                  uint16_t containerId, uint8_t slot,
                                                                  bool sendToStoreroom )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   if( auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone ) )
@@ -1419,7 +1419,7 @@ void Sapphire::World::Manager::HousingMgr::reqRemoveHousingItem( Sapphire::Entit
     auto ident = terri->getLandIdent();
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1625,7 +1625,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
 
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   auto terri = std::dynamic_pointer_cast< HousingZone >( pZone );
@@ -1655,7 +1655,7 @@ void Sapphire::World::Manager::HousingMgr::reqEstateExteriorRemodel( Sapphire::E
 
 void Sapphire::World::Manager::HousingMgr::reqEstateInteriorRemodel( Sapphire::Entity::Player& player )
 {
-  auto teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   auto& server = Common::Service< World::WorldServer >::ref();

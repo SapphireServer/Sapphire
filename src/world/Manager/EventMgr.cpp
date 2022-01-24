@@ -222,7 +222,6 @@ std::string Sapphire::World::Manager::EventMgr::getErrorCodeName( uint8_t errorC
 
 uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
-
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto levelInfo = exdData.getRow< Component::Excel::Level >( eventActorId );

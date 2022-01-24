@@ -197,6 +197,8 @@ void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::F
 
 void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
+  if( player.hasStateFlag( Common::BetweenAreas ) )
+    return;
   const auto updatePositionPacket = ZoneChannelPacket< Client::FFXIVIpcUpdatePosition >( inPacket );
   auto& data = updatePositionPacket.data();
 
