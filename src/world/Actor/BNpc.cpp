@@ -41,6 +41,7 @@
 #include <Manager/TaskMgr.h>
 #include <Task/RemoveBNpcTask.h>
 #include <Task/FadeBNpcTask.h>
+#include <Task/DelayedEmnityTask.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
@@ -478,6 +479,13 @@ void Sapphire::Entity::BNpc::hateListAdd( const Sapphire::Entity::CharaPtr& pCha
     auto pPlayer = pChara->getAsPlayer();
     pPlayer->hateListAdd( *this );
   }
+}
+
+void Sapphire::Entity::BNpc::hateListAddDelayed( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
+{
+  auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+  auto delayedEmnityTask = std::make_shared< Sapphire::World::DelayedEmnityTask >( 5000, getAsBNpc(), pChara, hateAmount );
+  taskMgr.queueTask( delayedEmnityTask );
 }
 
 void Sapphire::Entity::BNpc::hateListUpdate( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )

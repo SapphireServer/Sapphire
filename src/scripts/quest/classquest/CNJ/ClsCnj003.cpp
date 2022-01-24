@@ -231,7 +231,7 @@ public:
       return;
     else if( entityId == Enemy0 && quest.getSeq() == Seq1 )
     {
-      eventMgr().sendEventNotice( player, getId(), 1, 0 );
+      eventMgr().sendEventNotice( player, getId(), 0, 0 );
       quest.setUI8BH( 0 );
       quest.setSeq( Seq2 );
     }
@@ -290,7 +290,8 @@ private:
     auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
     auto instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
     auto enemy = instance->createBNpcFromInstanceId( Enemy0, 319 /*Find the right value*/, Common::BNpcType::Enemy );
-    enemy->hateListAdd( player.getAsPlayer(), 1 );
+    enemy->setTriggerOwnerId( player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
   }
 
   //////////////////////////////////////////////////////////////////////
