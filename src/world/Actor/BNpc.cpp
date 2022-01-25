@@ -579,7 +579,7 @@ void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
     if( getTriggerOwnerId() == pChara->getId() )
     {
       auto pScript = std::make_shared< Scripting::ScriptMgr >();
-      pScript->onTriggerOwnerDeaggro( *pChara->getAsPlayer(), getLayoutId(), getId() );
+      pScript->onTriggerOwnerDeaggro( *pChara->getAsPlayer(), *getAsBNpc() );
     }
 
   }

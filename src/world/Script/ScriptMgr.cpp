@@ -9,6 +9,7 @@
 #include "Territory/QuestBattle.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
+#include "Actor/BNpc.h"
 #include "WorldServer.h"
 #include "Event/EventHandler.h"
 #include "Action/Action.h"
@@ -410,7 +411,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, uint32_t layoutId, uint32_t entityId )
+bool Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -428,11 +429,11 @@ bool Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& play
     {
       std::string objName = eventMgr.getEventName( questId );
 
-      PlayerMgr::sendDebug( player, "Calling: {0}.onTriggerOwnerDeaggro layoutId#{1}", objName, layoutId );
+      PlayerMgr::sendDebug( player, "Calling: {0}.onTriggerOwnerDeaggro layoutId#{1}", objName, bnpc.getLayoutId() );
 
 
       World::Quest preQ = quest;
-      script->onTriggerOwnerDeaggro( quest, layoutId, entityId, player );
+      script->onTriggerOwnerDeaggro( quest, bnpc, player );
       if( quest != preQ )
         player.updateQuest( quest );
     }

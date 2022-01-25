@@ -220,7 +220,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player );
 
-    virtual void onTriggerOwnerDeaggro( World::Quest& quest, uint32_t layoutId, uint32_t entityId, Sapphire::Entity::Player& player );
+    virtual void onTriggerOwnerDeaggro( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player );
 
     virtual void onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Sapphire::Entity::Player& player );
 
