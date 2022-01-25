@@ -411,7 +411,7 @@ bool Sapphire::Scripting::ScriptMgr::onEventItem( Entity::Player& player, uint32
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc )
+void Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
@@ -431,15 +431,12 @@ bool Sapphire::Scripting::ScriptMgr::onTriggerOwnerDeaggro( Entity::Player& play
 
       PlayerMgr::sendDebug( player, "Calling: {0}.onTriggerOwnerDeaggro layoutId#{1}", objName, bnpc.getLayoutId() );
 
-
       World::Quest preQ = quest;
       script->onTriggerOwnerDeaggro( quest, bnpc, player );
       if( quest != preQ )
         player.updateQuest( quest );
     }
   }
-
-  return true;
 }
 
 bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, uint16_t nameId, uint32_t layoutId )

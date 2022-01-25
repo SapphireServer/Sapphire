@@ -421,8 +421,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     sscanf( params.c_str(), "%d %d %hu", &id, &duration, &param );
 
-    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(),
-                                                   duration, 3000 );
+    auto effect = StatusEffect::make_StatusEffect( id, player.getAsPlayer(), player.getAsPlayer(), duration, 3000 );
     effect->setParam( param );
 
     player.addStatusEffect( effect );
@@ -538,7 +537,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
     auto effectPacket = std::make_shared< EffectPacket >( player.getId(), param1 );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
-    effectPacket->setTargetActor( player.getTargetId() );
+    effectPacket->setTargetActor( static_cast< uint32_t >( player.getTargetId() ) );
 
     Common::CalcResultParam entry{};
     entry.Value = static_cast< int16_t >( param1 );
@@ -563,8 +562,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player,
-                                                     std::shared_ptr< DebugCommand > command )
+void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   std::string subCommand;
@@ -604,8 +602,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 }
 
 void
-Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player,
-                                                         std::shared_ptr< DebugCommand > command )
+Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
