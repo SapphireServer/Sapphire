@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS CharaInfoFriendlist (
+CREATE TABLE IF NOT EXISTS charainfofriendlist (
 	`CharacterId` int(20) NOT NULL,
 	`CharacterIdList` blob,
 	`InviteDataList` blob,
