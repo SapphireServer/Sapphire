@@ -890,6 +890,11 @@ void Action::Action::setActionKind( uint8_t actionKind )
   m_actionKind = actionKind;
 }
 
+void Action::Action::setAggroMultiplier( float aggroMultiplier )
+{
+  m_aggroMultiplier = aggroMultiplier;
+}
+
 uint64_t Action::Action::getCastTimeRest() const
 {
   return m_castTimeRestMs;

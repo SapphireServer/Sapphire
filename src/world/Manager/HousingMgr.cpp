@@ -90,7 +90,7 @@ bool HousingMgr::init()
 
   Logger::debug( "HousingMgr: Checking land counts" );
 
-  uint32_t houseCount = 0;
+  size_t houseCount = 0;
   for( auto& landSet : m_landCache )
   {
     auto count = landSet.second.size();

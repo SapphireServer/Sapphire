@@ -144,18 +144,23 @@ void InventoryMgr::updateHousingItemPosition( Inventory::HousingItemPtr item )
   // ItemId, PosX, PosY, PosZ, Rotation, PosX, PosY, PosZ, Rotation
 
   auto pos = item->getPos();
-  auto rot = item->getRot();
+
+  auto posX = static_cast< uint32_t >( pos.x );
+  auto posY = static_cast< uint32_t >( pos.y );
+  auto posZ = static_cast< uint32_t >( pos.z );
+
+  auto rot = static_cast< int32_t >( item->getRot() );
 
   stmt->setUInt64( 1, item->getUId() );
 
-  stmt->setUInt( 2, pos.x );
-  stmt->setUInt( 3, pos.y );
-  stmt->setUInt( 4, pos.z );
+  stmt->setUInt( 2, posX );
+  stmt->setUInt( 3, posY );
+  stmt->setUInt( 4, posZ );
   stmt->setInt( 5, rot );
 
-  stmt->setUInt( 6, pos.x );
-  stmt->setUInt( 7, pos.y );
-  stmt->setUInt( 8, pos.z );
+  stmt->setUInt( 6, posX );
+  stmt->setUInt( 7, posY );
+  stmt->setUInt( 8, posZ );
   stmt->setInt( 9, rot );
 
   db.execute( stmt );

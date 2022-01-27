@@ -29,6 +29,7 @@
 #include "Network/PacketWrappers/HudParamPacket.h"
 
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include "Territory/InstanceObjectCache.h"
 
 using namespace Sapphire;
@@ -212,6 +213,7 @@ void PlayerMgr::onMobKill( Entity::Player& player, uint16_t nameId, uint32_t lay
 void PlayerMgr::onHateListChanged( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( player.getId() );
   auto hateRankPacket = makeZonePacket< FFXIVIpcHaterList >( player.getId() );
@@ -222,14 +224,28 @@ void PlayerMgr::onHateListChanged( Entity::Player& player )
   
   hateRankPacket->data().Count = static_cast< uint8_t >( actorIdToHateSlotMap.size() );
   auto it = actorIdToHateSlotMap.begin();
-  for( int32_t i = 0; it != actorIdToHateSlotMap.end(); ++it, i++ )
+
+  auto zone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( !zone )
+    return;
+
+  for( int32_t i = 0; it != actorIdToHateSlotMap.end(); ++it, ++i )
   {
-    // TODO: get actual hate values for these
+    auto pBNpc = zone->getActiveBNpcByEntityId( it->first );
+    if( !pBNpc )
+      continue;
+
+    auto hateValue = pBNpc->hateListGetValue( player.getAsChara() );
+    if( hateValue == 0 )
+      continue;
+
+    auto hatePercent = ( hateValue / static_cast< float >( pBNpc->hateListGetHighestValue() ) ) * 100.f;
+
     hateListPacket->data().List[ i ].Id = player.getId();
-    hateListPacket->data().List[ i ].Value = 6;
+    hateListPacket->data().List[ i ].Value = hateValue;
 
     hateRankPacket->data().List[ i ].Id = it->first;
-    hateRankPacket->data().List[ i ].Rate = 100;
+    hateRankPacket->data().List[ i ].Rate = static_cast< uint8_t >( hatePercent );
   }
 
   server.queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );

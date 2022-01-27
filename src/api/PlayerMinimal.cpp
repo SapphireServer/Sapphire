@@ -35,7 +35,7 @@ void PlayerMinimal::load( uint64_t charId )
     return;
 
   m_characterId = charId;
-  m_id = res->getUInt64( "EntityId" );
+  m_id = res->getUInt( "EntityId" );
 
   memset( m_name, 0, 32 );
 

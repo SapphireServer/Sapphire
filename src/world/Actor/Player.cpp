@@ -2127,7 +2127,7 @@ void Sapphire::Entity::Player::setFalling( bool state, const Common::FFXIVARR_PO
       // get hp percentage starting from 0.1, increasing to 100% at max height
       float hpPer = std::min( 0.1f + ( deltaMax - 10.f ) / 20.f, 1.f );
 
-      uint32_t damage = getMaxHp() * hpPer;
+      auto damage = static_cast< uint32_t >( getMaxHp() * hpPer );
 
       // check if player has aggro - if not, player should "live"
       if( m_actorIdTohateSlotMap.empty() )

@@ -206,7 +206,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 
       auto& parts = house->getHouseModels();
 
-      for( auto ii = 0; ii != parts.size(); ii++ )
+      for( auto ii = 0; ii != parts.size(); ++ii )
       {
         landData.patternIds[ ii ] = parts[ ii ].first;
         landData.colors[ ii ] = parts[ ii ].second;
@@ -245,7 +245,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
       auto& parts = house->getHouseModels();
 
-      for( auto i = 0; i != parts.size(); i++ )
+      for( auto i = 0; i != parts.size(); ++i )
       {
         landData.patternIds[ i ] = parts[ i ].first;
         landData.colors[ i ] = parts[ i ].second;

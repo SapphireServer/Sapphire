@@ -618,10 +618,10 @@ namespace Sapphire::Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void initHateSlotQueue();
 
-    void hateListAdd( const BNpc &bnpc );
-    void hateListRemove( const BNpc &bnpc );
+    void hateListAdd( const BNpc& bnpc );
+    void hateListRemove( const BNpc& bnpc );
 
-    bool hateListHasEntry( const BNpc &bnpc );
+    bool hateListHasEntry( const BNpc& bnpc );
 
     const std::map< uint32_t, uint8_t >& getActorIdToHateSlotMap();
 

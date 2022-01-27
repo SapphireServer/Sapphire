@@ -86,5 +86,5 @@ void ItemAction::handleMountItem()
   auto player = getSourceChara()->getAsPlayer();
 
   player->unlockMount( m_itemAction->data().Calcu0Arg[ 0 ] );
-  player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot );
+  player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot );
 }
