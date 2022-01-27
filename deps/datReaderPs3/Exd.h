@@ -55,7 +55,7 @@ namespace xivps3::exd
     const std::vector< Field > get_row( uint32_t id );
 
     template< typename T >
-    std::shared_ptr< Component::Excel::Ps3::ExcelStruct< T > > get_row( uint32_t id )
+    std::shared_ptr< Excel::Ps3::ExcelStruct< T > > get_row( uint32_t id )
     {
       using namespace xivps3::utils;
       auto cacheEntryIt = _idCache.find( id );
@@ -76,7 +76,7 @@ namespace xivps3::exd
       std::vector< char > dataCpy = file_ptr->get_data_sections().front();
       std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
 
-      auto pSheet = std::make_shared< Component::Excel::Ps3::ExcelStruct< T > >();
+      auto pSheet = std::make_shared< Excel::Ps3::ExcelStruct< T > >();
 
       // Get the vector fields for the given record and preallocate it
       auto fields = _data[ id ];

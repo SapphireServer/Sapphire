@@ -439,7 +439,7 @@ void Sapphire::Entity::Player::updateDbClass() const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast<uint8_t>( getClass() ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast<uint8_t>( getClass() ) )->data().WorkIndex;
 
   //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
   auto stmtS = db.getPreparedStatement( Db::CHARA_CLASS_UP );
@@ -609,7 +609,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& itemMgr = Common::Service< World::Manager::ItemMgr >::ref();
 
-  auto itemInfo = exdData.getRow< Component::Excel::Item >( catalogId );
+  auto itemInfo = exdData.getRow< Excel::Item >( catalogId );
 
   if( !itemInfo )
     return nullptr;

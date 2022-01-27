@@ -13,7 +13,7 @@ namespace Sapphire
   public:
 
     Land( uint16_t zoneId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-          std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::HousingLandSet > > info );
+          std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > info );
     virtual ~Land();
     void init( Common::LandType type, Common::HouseSize size, Common::HouseStatus state, uint32_t currentPrice, uint64_t ownerId, uint64_t houseId );
 
@@ -79,7 +79,7 @@ namespace Sapphire
     Common::FFXIVARR_POSITION3 m_mapMarkerPosition;
 
     uint64_t m_ownerId;
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::HousingLandSet > > m_landInfo;
+    std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > m_landInfo;
 
     Sapphire::HousePtr m_pHouse;
 

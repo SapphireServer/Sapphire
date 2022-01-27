@@ -113,7 +113,7 @@ public:
   {
     auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-    auto aetherInfo = exdData.getRow< Component::Excel::Aetheryte >( eventId & 0xFFFF );
+    auto aetherInfo = exdData.getRow< Excel::Aetheryte >( eventId & 0xFFFF );
     if( !aetherInfo )
       return;
 

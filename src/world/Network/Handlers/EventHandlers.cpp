@@ -95,7 +95,7 @@ void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVA
   if( !scriptMgr.onEmote( player, actorId, eventId, static_cast< uint8_t >( emoteId ) ) &&
       eventType == Event::EventHandler::EventHandlerType::Quest )
   {
-    auto questInfo = exdData.getRow< Component::Excel::Quest >( eventId );
+    auto questInfo = exdData.getRow< Excel::Quest >( eventId );
     if( questInfo )
       World::Manager::PlayerMgr::sendUrgent( player, "Quest not implemented: {0}", questInfo->getString( questInfo->data().Text.Name ) );
   }

@@ -40,7 +40,7 @@ void Sapphire::World::ContentFinder::update()
         break;
       case MatchingComplete:
       {
-        auto contentInfo = exdData.getRow< Component::Excel::InstanceContent >( content->getContentId() );
+        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getContentId() );
         for( auto& queuedPlayer : content->m_players )
         {
           uint32_t inProgress = 0; // 0x01 - in progress
@@ -96,12 +96,12 @@ void Sapphire::World::ContentFinder::registerContentRequest( Sapphire::Entity::P
 void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Entity::Player &player, uint32_t randomContentTypeId )
 {
   auto& exdData = Service< Data::ExdData >::ref();
-  auto contentListIds = exdData.getIdList< Component::Excel::InstanceContent >();
+  auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
   std::vector< uint32_t > idList;
 
   for( auto id : contentListIds )
   {
-    auto instanceContent = exdData.getRow< Component::Excel::InstanceContent >( id );
+    auto instanceContent = exdData.getRow< Excel::InstanceContent >( id );
     if( instanceContent->data().RandomContentType == randomContentTypeId )
     {
       if( instanceContent->data().LevelMin <= player.getLevel() )
@@ -120,7 +120,7 @@ void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entit
   auto queuedContent = m_queuedContent[ m_queuedPlayer[ player.getId() ]->getActiveRegisterId() ];
 
   auto& exdData = Service< Data::ExdData >::ref();
-  auto content = exdData.getRow< Component::Excel::InstanceContent >( queuedContent->getContentId() );
+  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentId() );
 
   auto updatePacket = makeUpdateFindContent( player.getId(), content->data().TerritoryType,
                                              CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ) );
@@ -251,7 +251,7 @@ Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFin
       continue;
 
     auto& exdData = Common::Service< Data::ExdData >::ref();
-    auto content = exdData.getRow< Component::Excel::InstanceContent >( contentId );
+    auto content = exdData.getRow< Excel::InstanceContent >( contentId );
     if( !content )
       continue;
 
@@ -316,7 +316,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
   auto& exdData = Service< Data::ExdData >::ref();
 
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
-  auto contentInfo = exdData.getRow< Component::Excel::InstanceContent >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentId() );
+  auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentId() );
 
   // remove the player from the global CF list
   m_queuedPlayer.erase( player.getId() );
@@ -345,7 +345,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
     if( updateRegisterIdSet.count( regId ) == 0 )
       continue;
 
-    auto queuedContentInfo = exdData.getRow< Component::Excel::InstanceContent >( content.second->getContentId() );
+    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( content.second->getContentId() );
     auto& playerList = content.second->m_players;
     for( const auto& pPlayer : playerList )
     {
@@ -400,7 +400,7 @@ Sapphire::World::QueuedContent::QueuedContent( uint32_t registerId, uint32_t con
   m_contentPopTime( 0 )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto content = exdData.getRow< Component::Excel::InstanceContent >( contentId );
+  auto content = exdData.getRow< Excel::InstanceContent >( contentId );
 
 
 }

@@ -173,7 +173,7 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
     auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
     if( !script )
     {
-      auto questInfo = exdData.getRow< Component::Excel::Quest >( eventId );
+      auto questInfo = exdData.getRow< Excel::Quest >( eventId );
       if( questInfo )
       {
         World::Manager::PlayerMgr::sendUrgent( player, "Quest not implemented: {0} ({1})", questInfo->getString( questInfo->data().Text.Name ), eventId );

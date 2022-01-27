@@ -80,7 +80,7 @@ Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const s
   m_lastMobUpdate = 0;
 
   m_weatherOverride = Weather::None;
-  m_territoryTypeInfo = exdData.getRow< Component::Excel::TerritoryType >( territoryTypeId );
+  m_territoryTypeInfo = exdData.getRow< Excel::TerritoryType >( territoryTypeId );
   m_bgPath = m_territoryTypeInfo->getString( m_territoryTypeInfo->data().LVB );
 
   m_ident.territoryTypeId = territoryTypeId;
@@ -98,11 +98,11 @@ void Sapphire::Territory::loadWeatherRates()
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate > exdData.getIdList< Component::Excel::WeatherRate >().size() ?
+  uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate > exdData.getIdList< Excel::WeatherRate >().size() ?
                           uint8_t{ 0 } : m_territoryTypeInfo->data().WeatherRate;
 
   uint8_t sumPc = 0;
-  auto weatherRate = exdData.getRow< Component::Excel::WeatherRate >( weatherRateId );
+  auto weatherRate = exdData.getRow< Excel::WeatherRate >( weatherRateId );
   for( size_t i = 0; i < 8; ++i )
   {
     int32_t weatherId = weatherRate->data().WeatherId[ i ];
@@ -796,7 +796,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::Territory::registerEObj( const std::s
   return eObj;
 }
 
-std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > Sapphire::Territory::getTerritoryTypeInfo() const
+std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > Sapphire::Territory::getTerritoryTypeInfo() const
 {
   return m_territoryTypeInfo;
 }

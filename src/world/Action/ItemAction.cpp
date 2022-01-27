@@ -13,7 +13,7 @@ using namespace Sapphire::World::Action;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 ItemAction::ItemAction( Sapphire::Entity::CharaPtr source, uint32_t itemId,
-                        std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData, uint16_t itemSourceSlot,
+                        std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > itemActionData, uint16_t itemSourceSlot,
                         uint16_t itemSourceContainer ) :
   m_itemAction( std::move( itemActionData ) ),
   m_itemSourceSlot( itemSourceSlot ),

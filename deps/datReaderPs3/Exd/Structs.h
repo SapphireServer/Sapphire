@@ -4,7 +4,7 @@
 #include "Common.h"
 #include <vector>
 
-namespace Component::Excel::Ps3
+namespace Excel::Ps3
 {
 
   template< typename T >
@@ -24,7 +24,7 @@ namespace Component::Excel::Ps3
       return reinterpret_cast< uint8_t* >( &_data );
     };
 
-    const std::string& getString( Component::Excel::Ps3::StringOffset offset )
+    const std::string& getString( Excel::Ps3::StringOffset offset )
     {
       return _strings[ offset.m_offset ];
     };
@@ -56,10 +56,10 @@ namespace Component::Excel::Ps3
   /* 33329 */
   struct ItemTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset Help;
-    Component::Excel::Ps3::StringOffset UIName;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset UIName;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -140,7 +140,7 @@ namespace Component::Excel::Ps3
   /* 35156 */
   struct AddonTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 35157 */
@@ -152,8 +152,8 @@ namespace Component::Excel::Ps3
   /* 35338 */
   struct InstanceContentTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Description;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Description;
   };
 
   /* 35339 */
@@ -218,9 +218,9 @@ namespace Component::Excel::Ps3
   /* 63505 */
   struct ClassJobTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Abbreviation;
-    Component::Excel::Ps3::StringOffset NameFemale;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Abbreviation;
+    Excel::Ps3::StringOffset NameFemale;
   };
 
   /* 63506 */
@@ -229,7 +229,7 @@ namespace Component::Excel::Ps3
     ClassJobTextStruct Text;
     int8_t padding0[4];
     uint64_t ModelJobStone;
-    Component::Excel::Ps3::StringOffset EnText;
+    Excel::Ps3::StringOffset EnText;
     int32_t Kind;
     int32_t InitWeapon[2];
     uint16_t Hp;
@@ -258,8 +258,8 @@ namespace Component::Excel::Ps3
   /* 63507 */
   struct TribeTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset NameFemale;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset NameFemale;
   };
 
   /* 63508 */
@@ -279,7 +279,7 @@ namespace Component::Excel::Ps3
   /* 66076 */
   struct ActionTimeline
   {
-    Component::Excel::Ps3::StringOffset Filename;
+    Excel::Ps3::StringOffset Filename;
     uint8_t Type;
     uint8_t Priority;
     uint8_t Stance;
@@ -302,8 +302,8 @@ namespace Component::Excel::Ps3
   /* 67373 */
   struct ActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 67374 */
@@ -408,10 +408,10 @@ namespace Component::Excel::Ps3
   /* 86192 */
   struct EventItemTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset Help;
-    Component::Excel::Ps3::StringOffset UIName;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset UIName;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -438,7 +438,7 @@ namespace Component::Excel::Ps3
   /* 100766 */
   struct WeatherTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 100767 */
@@ -451,7 +451,7 @@ namespace Component::Excel::Ps3
   /* 139964 */
   struct WeaponTimeline
   {
-    Component::Excel::Ps3::StringOffset File;
+    Excel::Ps3::StringOffset File;
     int16_t NextWeaponTimeline;
     int8_t padding0[2];
   };
@@ -459,7 +459,7 @@ namespace Component::Excel::Ps3
   /* 161452 */
   struct MotionTimeline
   {
-    Component::Excel::Ps3::StringOffset filename;
+    Excel::Ps3::StringOffset filename;
     uint8_t BlendGroup;
     uint8_t padding0 : 5;
     uint8_t IsLipEnable : 1;
@@ -601,7 +601,7 @@ namespace Component::Excel::Ps3
   /* 195168 */
   struct EmoteTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 195169 */
@@ -638,8 +638,8 @@ namespace Component::Excel::Ps3
   /* 195171 */
   struct AetheryteTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -673,8 +673,8 @@ namespace Component::Excel::Ps3
   /* 195176 */
   struct TerritoryType
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset LVB;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset LVB;
     uint32_t EventHandler;
     int32_t RegionIcon;
     int32_t AreaIcon;
@@ -703,7 +703,7 @@ namespace Component::Excel::Ps3
   /* 195177 */
   struct ItemUICategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 195178 */
@@ -732,7 +732,7 @@ namespace Component::Excel::Ps3
   /* 195793 */
   struct HowToTextStruct
   {
-    Component::Excel::Ps3::StringOffset Title;
+    Excel::Ps3::StringOffset Title;
   };
 
   /* 195794 */
@@ -751,8 +751,8 @@ namespace Component::Excel::Ps3
   /* 195795 */
   struct AchievementTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 195796 */
@@ -774,7 +774,7 @@ namespace Component::Excel::Ps3
   /* 200982 */
   struct Jingle
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
   };
 
   /* 200983 */
@@ -798,8 +798,8 @@ namespace Component::Excel::Ps3
   /* 200985 */
   struct GeneralActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 200986 */
@@ -817,8 +817,8 @@ namespace Component::Excel::Ps3
   /* 200987 */
   struct CraftActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 200988 */
@@ -839,8 +839,8 @@ namespace Component::Excel::Ps3
   /* 200989 */
   struct TraitTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 200990 */
@@ -862,8 +862,8 @@ namespace Component::Excel::Ps3
   /* 200991 */
   struct FCRightsTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 200992 */
@@ -895,7 +895,7 @@ namespace Component::Excel::Ps3
   /* 200994 */
   struct MonsterNoteTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 200995 */
@@ -950,8 +950,8 @@ namespace Component::Excel::Ps3
   /* 201001 */
   struct PetActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 201002 */
@@ -969,7 +969,7 @@ namespace Component::Excel::Ps3
   /* 201003 */
   struct EquipSlotCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 201004 */
@@ -992,7 +992,7 @@ namespace Component::Excel::Ps3
   /* 201007 */
   struct MarkerTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 201008 */
@@ -1005,8 +1005,8 @@ namespace Component::Excel::Ps3
   /* 201009 */
   struct BuddyActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 201010 */
@@ -1022,8 +1022,8 @@ namespace Component::Excel::Ps3
   /* 201011 */
   struct MainCommandTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 201012 */
@@ -1040,7 +1040,7 @@ namespace Component::Excel::Ps3
   /* 201013 */
   struct FieldMarkerTextStruct
   {
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 201014 */
@@ -1055,11 +1055,11 @@ namespace Component::Excel::Ps3
   /* 201015 */
   struct CompanionTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset Help;
-    Component::Excel::Ps3::StringOffset Expository;
-    Component::Excel::Ps3::StringOffset Cry;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Expository;
+    Excel::Ps3::StringOffset Cry;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1098,11 +1098,11 @@ namespace Component::Excel::Ps3
   /* 201017 */
   struct MountTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset Help;
-    Component::Excel::Ps3::StringOffset Expository;
-    Component::Excel::Ps3::StringOffset Cry;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Expository;
+    Excel::Ps3::StringOffset Cry;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1116,9 +1116,9 @@ namespace Component::Excel::Ps3
   struct Mount
   {
     MountTextStruct Text;
-    Component::Excel::Ps3::StringOffset CallSE;
-    Component::Excel::Ps3::StringOffset CallFalseSE;
-    Component::Excel::Ps3::StringOffset ExitSE;
+    Excel::Ps3::StringOffset CallSE;
+    Excel::Ps3::StringOffset CallFalseSE;
+    Excel::Ps3::StringOffset ExitSE;
     float Slowdown;
     float MoveAccel_Run;
     float MoveAccel_Walk;
@@ -1165,7 +1165,7 @@ namespace Component::Excel::Ps3
   /* 201019 */
   struct OnlineStatusTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 201020 */
@@ -1182,8 +1182,8 @@ namespace Component::Excel::Ps3
   /* 201021 */
   struct TitleTextStruct
   {
-    Component::Excel::Ps3::StringOffset Male;
-    Component::Excel::Ps3::StringOffset Female;
+    Excel::Ps3::StringOffset Male;
+    Excel::Ps3::StringOffset Female;
     uint8_t padding0 : 7;
     uint8_t Front : 1;
     int8_t padding1[3];
@@ -1198,9 +1198,9 @@ namespace Component::Excel::Ps3
   /* 201023 */
   struct ENpcTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset Title;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset Title;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1232,8 +1232,8 @@ namespace Component::Excel::Ps3
   /* 201026 */
   struct LogFilterTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 201027 */
@@ -1260,9 +1260,9 @@ namespace Component::Excel::Ps3
   /* 201029 */
   struct PlaceNameTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset SWT;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SWT;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1307,7 +1307,7 @@ namespace Component::Excel::Ps3
   /* 201034 */
   struct FCHierarchyTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 201035 */
@@ -1319,7 +1319,7 @@ namespace Component::Excel::Ps3
   /* 201036 */
   struct FCReputationTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 201037 */
@@ -1336,7 +1336,7 @@ namespace Component::Excel::Ps3
   /* 201038 */
   struct TownTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 201039 */
@@ -1372,8 +1372,8 @@ namespace Component::Excel::Ps3
   /* 223113 */
   struct BNpcTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1392,8 +1392,8 @@ namespace Component::Excel::Ps3
   /* 223115 */
   struct EObjTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1422,8 +1422,8 @@ namespace Component::Excel::Ps3
   /* 223117 */
   struct TreasureTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -1451,13 +1451,13 @@ namespace Component::Excel::Ps3
   /* 223119 */
   struct ExportedSG
   {
-    Component::Excel::Ps3::StringOffset SGFilePath;
+    Excel::Ps3::StringOffset SGFilePath;
   };
 
   /* 223120 */
   struct Festival
   {
-    Component::Excel::Ps3::StringOffset name;
+    Excel::Ps3::StringOffset name;
   };
 
   /* 228343 */
@@ -1493,14 +1493,14 @@ namespace Component::Excel::Ps3
   /* 257957 */
   struct WorldTextStruct
   {
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 257958 */
   struct World
   {
     WorldTextStruct Text;
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
     uint8_t UserType;
     uint8_t DCGroup;
     uint8_t padding0 : 7;
@@ -1511,8 +1511,8 @@ namespace Component::Excel::Ps3
   /* 258037 */
   struct GuardianDeityTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 258038 */
@@ -1526,7 +1526,7 @@ namespace Component::Excel::Ps3
   /* 258039 */
   struct MainCommandCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 258040 */
@@ -1553,37 +1553,37 @@ namespace Component::Excel::Ps3
   /* 258043 */
   struct CharaMakeNameTextStruct
   {
-    Component::Excel::Ps3::StringOffset HuM_M_;
-    Component::Excel::Ps3::StringOffset HuM_F_;
-    Component::Excel::Ps3::StringOffset HuM_L_;
-    Component::Excel::Ps3::StringOffset HuH_M_;
-    Component::Excel::Ps3::StringOffset HuH_F_;
-    Component::Excel::Ps3::StringOffset HuH_L_;
-    Component::Excel::Ps3::StringOffset El_M_;
-    Component::Excel::Ps3::StringOffset El_F_;
-    Component::Excel::Ps3::StringOffset ElF_L_;
-    Component::Excel::Ps3::StringOffset ElS_L_;
-    Component::Excel::Ps3::StringOffset MqS_M_;
-    Component::Excel::Ps3::StringOffset MqS_F_;
-    Component::Excel::Ps3::StringOffset MqS_ML_;
-    Component::Excel::Ps3::StringOffset MqS_FL_;
-    Component::Excel::Ps3::StringOffset MqM_M_;
-    Component::Excel::Ps3::StringOffset MqM_F_;
-    Component::Excel::Ps3::StringOffset MqM_L_;
-    Component::Excel::Ps3::StringOffset LaP_MF_;
-    Component::Excel::Ps3::StringOffset LaP_ML_;
-    Component::Excel::Ps3::StringOffset LaP_MR_;
-    Component::Excel::Ps3::StringOffset LaD_MN_;
-    Component::Excel::Ps3::StringOffset LaD_MR_;
-    Component::Excel::Ps3::StringOffset LaD_FN_;
-    Component::Excel::Ps3::StringOffset LaD_FR_;
-    Component::Excel::Ps3::StringOffset RoZ_MF_;
-    Component::Excel::Ps3::StringOffset RoZ_ML_;
-    Component::Excel::Ps3::StringOffset RoZ_FF_;
-    Component::Excel::Ps3::StringOffset RoZ_FL_;
-    Component::Excel::Ps3::StringOffset RoR_F_;
-    Component::Excel::Ps3::StringOffset RoR_ML_;
-    Component::Excel::Ps3::StringOffset RoR_FL_;
+    Excel::Ps3::StringOffset HuM_M_;
+    Excel::Ps3::StringOffset HuM_F_;
+    Excel::Ps3::StringOffset HuM_L_;
+    Excel::Ps3::StringOffset HuH_M_;
+    Excel::Ps3::StringOffset HuH_F_;
+    Excel::Ps3::StringOffset HuH_L_;
+    Excel::Ps3::StringOffset El_M_;
+    Excel::Ps3::StringOffset El_F_;
+    Excel::Ps3::StringOffset ElF_L_;
+    Excel::Ps3::StringOffset ElS_L_;
+    Excel::Ps3::StringOffset MqS_M_;
+    Excel::Ps3::StringOffset MqS_F_;
+    Excel::Ps3::StringOffset MqS_ML_;
+    Excel::Ps3::StringOffset MqS_FL_;
+    Excel::Ps3::StringOffset MqM_M_;
+    Excel::Ps3::StringOffset MqM_F_;
+    Excel::Ps3::StringOffset MqM_L_;
+    Excel::Ps3::StringOffset LaP_MF_;
+    Excel::Ps3::StringOffset LaP_ML_;
+    Excel::Ps3::StringOffset LaP_MR_;
+    Excel::Ps3::StringOffset LaD_MN_;
+    Excel::Ps3::StringOffset LaD_MR_;
+    Excel::Ps3::StringOffset LaD_FN_;
+    Excel::Ps3::StringOffset LaD_FR_;
+    Excel::Ps3::StringOffset RoZ_MF_;
+    Excel::Ps3::StringOffset RoZ_ML_;
+    Excel::Ps3::StringOffset RoZ_FF_;
+    Excel::Ps3::StringOffset RoZ_FL_;
+    Excel::Ps3::StringOffset RoR_F_;
+    Excel::Ps3::StringOffset RoR_ML_;
+    Excel::Ps3::StringOffset RoR_FL_;
   };
 
   /* 258044 */
@@ -1595,9 +1595,9 @@ namespace Component::Excel::Ps3
   /* 258046 */
   struct LobbyTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
-    Component::Excel::Ps3::StringOffset Sub;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Sub;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 258047 */
@@ -1625,7 +1625,7 @@ namespace Component::Excel::Ps3
   /* 258050 */
   struct WorldDCGroupType
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264223 */
@@ -1667,7 +1667,7 @@ namespace Component::Excel::Ps3
   /* 264226 */
   struct ClassJobCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264227 */
@@ -1700,7 +1700,7 @@ namespace Component::Excel::Ps3
   /* 264229 */
   struct HowToPageTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text[3];
+    Excel::Ps3::StringOffset Text[3];
   };
 
   /* 264230 */
@@ -1717,7 +1717,7 @@ namespace Component::Excel::Ps3
   /* 264231 */
   struct Map
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
     float Scale;
     uint32_t DiscoveryFlag;
     int32_t CategoryNameUI;
@@ -1739,8 +1739,8 @@ namespace Component::Excel::Ps3
   /* 264233 */
   struct ContentsNoteTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 264234 */
@@ -1759,7 +1759,7 @@ namespace Component::Excel::Ps3
   /* 264240 */
   struct FCActivityTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 264241 */
@@ -1786,13 +1786,13 @@ namespace Component::Excel::Ps3
   /* 264319 */
   struct QuestTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264320 */
   struct QuestDefineStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
     uint32_t Value;
   };
 
@@ -1852,7 +1852,7 @@ namespace Component::Excel::Ps3
     QuestEventListenerStruct EventListener[64];
     QuestTodoStruct QuestTodo[24];
     QuestRewardStruct Reward;
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
     uint32_t PrevQuest[3];
     uint32_t ExcludeQuest[2];
     uint32_t InstanceContent[3];
@@ -1919,9 +1919,9 @@ namespace Component::Excel::Ps3
   /* 264325 */
   struct ContentRouletteTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Description;
-    Component::Excel::Ps3::StringOffset Contents;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Description;
+    Excel::Ps3::StringOffset Contents;
   };
 
   /* 264326 */
@@ -1946,7 +1946,7 @@ namespace Component::Excel::Ps3
   /* 264329 */
   struct ActionCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264330 */
@@ -1958,8 +1958,8 @@ namespace Component::Excel::Ps3
   /* 264331 */
   struct StatusTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 264332 */
@@ -1993,7 +1993,7 @@ namespace Component::Excel::Ps3
   /* 264333 */
   struct AchievementKindTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264334 */
@@ -2005,7 +2005,7 @@ namespace Component::Excel::Ps3
   /* 264335 */
   struct AchievementCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264336 */
@@ -2022,8 +2022,8 @@ namespace Component::Excel::Ps3
   /* 264337 */
   struct RaceTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset NameFemale;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset NameFemale;
   };
 
   /* 264338 */
@@ -2039,8 +2039,8 @@ namespace Component::Excel::Ps3
   /* 264339 */
   struct BaseParamTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 264340 */
@@ -2062,7 +2062,7 @@ namespace Component::Excel::Ps3
   /* 264342 */
   struct ItemSearchCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264343 */
@@ -2079,7 +2079,7 @@ namespace Component::Excel::Ps3
   /* 264344 */
   struct ItemSearchClassFilterTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264345 */
@@ -2105,7 +2105,7 @@ namespace Component::Excel::Ps3
   /* 264347 */
   struct CompanionMoveTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264348 */
@@ -2117,8 +2117,8 @@ namespace Component::Excel::Ps3
   /* 264349 */
   struct RoleTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset ShortName;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset ShortName;
   };
 
   /* 264350 */
@@ -2131,9 +2131,9 @@ namespace Component::Excel::Ps3
   /* 264351 */
   struct BuddyEquipTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset UIName;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset UIName;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -2204,7 +2204,7 @@ namespace Component::Excel::Ps3
   /* 264358 */
   struct RelicNoteCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 264359 */
@@ -2267,8 +2267,8 @@ namespace Component::Excel::Ps3
   /* 264367 */
   struct GatheringPointNameTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -2287,7 +2287,7 @@ namespace Component::Excel::Ps3
   /* 264369 */
   struct CraftTypeTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264370 */
@@ -2302,7 +2302,7 @@ namespace Component::Excel::Ps3
   /* 264371 */
   struct NotebookDivisionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264372 */
@@ -2318,8 +2318,8 @@ namespace Component::Excel::Ps3
   /* 264373 */
   struct LeveTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Objective;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Objective;
   };
 
   /* 264374 */
@@ -2398,7 +2398,7 @@ namespace Component::Excel::Ps3
   /* 264379 */
   struct ContentTypeTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264380 */
@@ -2412,9 +2412,9 @@ namespace Component::Excel::Ps3
   /* 264381 */
   struct GrandCompanyTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset SWT;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SWT;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -2435,7 +2435,7 @@ namespace Component::Excel::Ps3
   /* 264383 */
   struct HowToCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264384 */
@@ -2447,14 +2447,14 @@ namespace Component::Excel::Ps3
   /* 264385 */
   struct ConfigurationKeyTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 264386 */
   struct ConfigKey
   {
     ConfigurationKeyTextStruct Text;
-    Component::Excel::Ps3::StringOffset Label;
+    Excel::Ps3::StringOffset Label;
     uint8_t Param;
     uint8_t Platform;
     uint8_t Category;
@@ -2481,9 +2481,9 @@ namespace Component::Excel::Ps3
   /* 264389 */
   struct AdventureTextStruct
   {
-    Component::Excel::Ps3::StringOffset TitleText;
-    Component::Excel::Ps3::StringOffset HintText;
-    Component::Excel::Ps3::StringOffset FlavorText;
+    Excel::Ps3::StringOffset TitleText;
+    Excel::Ps3::StringOffset HintText;
+    Excel::Ps3::StringOffset FlavorText;
   };
 
   /* 264390 */
@@ -2524,7 +2524,7 @@ namespace Component::Excel::Ps3
   /* 264393 */
   struct RetainerTaskRandomTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264394 */
@@ -2547,12 +2547,12 @@ namespace Component::Excel::Ps3
   /* 264396 */
   struct FateTextStruct
   {
-    Component::Excel::Ps3::StringOffset TitleText;
-    Component::Excel::Ps3::StringOffset DescriptionText;
-    Component::Excel::Ps3::StringOffset DescriptionText2;
-    Component::Excel::Ps3::StringOffset TodoName1;
-    Component::Excel::Ps3::StringOffset TodoName2;
-    Component::Excel::Ps3::StringOffset TodoName3;
+    Excel::Ps3::StringOffset TitleText;
+    Excel::Ps3::StringOffset DescriptionText;
+    Excel::Ps3::StringOffset DescriptionText2;
+    Excel::Ps3::StringOffset TodoName1;
+    Excel::Ps3::StringOffset TodoName2;
+    Excel::Ps3::StringOffset TodoName3;
   };
 
   /* 264397 */
@@ -2590,7 +2590,7 @@ namespace Component::Excel::Ps3
   /* 264399 */
   struct FCActivityCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264400 */
@@ -2604,7 +2604,7 @@ namespace Component::Excel::Ps3
   /* 264401 */
   struct FCAuthorityTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264402 */
@@ -2619,7 +2619,7 @@ namespace Component::Excel::Ps3
   /* 264403 */
   struct FCAuthorityCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264404 */
@@ -2631,8 +2631,8 @@ namespace Component::Excel::Ps3
   /* 264405 */
   struct CompanyActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Help;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Help;
   };
 
   /* 264406 */
@@ -2657,7 +2657,7 @@ namespace Component::Excel::Ps3
   /* 264408 */
   struct FCProfileTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264409 */
@@ -2671,7 +2671,7 @@ namespace Component::Excel::Ps3
   /* 264410 */
   struct ItemSeriesTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264411 */
@@ -2683,7 +2683,7 @@ namespace Component::Excel::Ps3
   /* 264412 */
   struct ItemSpecialBonusTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 264413 */
@@ -2746,9 +2746,9 @@ namespace Component::Excel::Ps3
   /* 264418 */
   struct BeastTribeTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
-    Component::Excel::Ps3::StringOffset ReputationValue;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset ReputationValue;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -2769,8 +2769,8 @@ namespace Component::Excel::Ps3
   /* 264420 */
   struct BeastReputationRankTextStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -2792,8 +2792,8 @@ namespace Component::Excel::Ps3
   /* 271695 */
   struct HousingPresetNameStruct
   {
-    Component::Excel::Ps3::StringOffset SGL;
-    Component::Excel::Ps3::StringOffset PLR;
+    Excel::Ps3::StringOffset SGL;
+    Excel::Ps3::StringOffset PLR;
     int8_t SGG;
     int8_t PLG;
     int8_t VOW;
@@ -2883,7 +2883,7 @@ namespace Component::Excel::Ps3
   /* 326984 */
   struct Channeling
   {
-    Component::Excel::Ps3::StringOffset File;
+    Excel::Ps3::StringOffset File;
     float WidthScale;
     uint8_t LimitDist;
     int8_t padding0[3];
@@ -2903,7 +2903,7 @@ namespace Component::Excel::Ps3
   /* 326986 */
   struct BNpcState
   {
-    Component::Excel::Ps3::StringOffset Attribute[3];
+    Excel::Ps3::StringOffset Attribute[3];
     float Scale;
     int32_t LoopTimeline;
     uint16_t Idle;
@@ -2945,7 +2945,7 @@ namespace Component::Excel::Ps3
   /* 326989 */
   struct BNpcParts
   {
-    Component::Excel::Ps3::StringOffset Attribute[4];
+    Excel::Ps3::StringOffset Attribute[4];
     float OffsetX[4];
     float OffsetZ[4];
     uint16_t Parts[4];
@@ -3002,7 +3002,7 @@ namespace Component::Excel::Ps3
   /* 326996 */
   struct EventActionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 326997 */
@@ -3020,8 +3020,8 @@ namespace Component::Excel::Ps3
   /* 326998 */
   struct Omen
   {
-    Component::Excel::Ps3::StringOffset Path;
-    Component::Excel::Ps3::StringOffset PathAlly;
+    Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset PathAlly;
     uint8_t Type;
     uint8_t padding0 : 6;
     uint8_t LargeScale : 1;
@@ -3116,13 +3116,13 @@ namespace Component::Excel::Ps3
   /* 342296 */
   struct VFX
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
   };
 
   /* 342297 */
   struct Lockon
   {
-    Component::Excel::Ps3::StringOffset File;
+    Excel::Ps3::StringOffset File;
   };
 
   /* 342298 */
@@ -3137,14 +3137,14 @@ namespace Component::Excel::Ps3
   /* 342313 */
   struct MotionTimelineAdvanceBlend
   {
-    Component::Excel::Ps3::StringOffset MotionTimelineName;
-    Component::Excel::Ps3::StringOffset NextMotionTimelineName;
+    Excel::Ps3::StringOffset MotionTimelineName;
+    Excel::Ps3::StringOffset NextMotionTimelineName;
   };
 
   /* 342406 */
   struct BGM
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
     float DisableRestartResetTime;
     uint8_t Priority;
     uint8_t SpecialMode;
@@ -3244,7 +3244,7 @@ namespace Component::Excel::Ps3
   /* 362339 */
   struct GuildleveAssignmentTalkTextStruct
   {
-    Component::Excel::Ps3::StringOffset Talk[8];
+    Excel::Ps3::StringOffset Talk[8];
   };
 
   /* 362340 */
@@ -3288,7 +3288,7 @@ namespace Component::Excel::Ps3
   /* 362344 */
   struct DefaultTalkTextStruct
   {
-    Component::Excel::Ps3::StringOffset Talk[3];
+    Excel::Ps3::StringOffset Talk[3];
   };
 
   /* 362345 */
@@ -3313,7 +3313,7 @@ namespace Component::Excel::Ps3
   /* 362347 */
   struct CraftLeveTalkTextStruct
   {
-    Component::Excel::Ps3::StringOffset Talk[6];
+    Excel::Ps3::StringOffset Talk[6];
   };
 
   /* 362348 */
@@ -3420,7 +3420,7 @@ namespace Component::Excel::Ps3
   /* 362360 */
   struct QuestBattleDefineStruct
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     uint32_t DefineValue;
   };
 
@@ -3438,14 +3438,14 @@ namespace Component::Excel::Ps3
   /* 362362 */
   struct CustomTalkDefineStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
     uint32_t Value;
   };
 
   /* 362363 */
   struct CustomTalkTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362364 */
@@ -3453,7 +3453,7 @@ namespace Component::Excel::Ps3
   {
     CustomTalkDefineStruct Define[30];
     CustomTalkTextStruct Text;
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
     uint32_t MapIcon;
     uint8_t padding0 : 1;
     uint8_t ListenHousing : 1;
@@ -3482,7 +3482,7 @@ namespace Component::Excel::Ps3
   /* 362366 */
   struct StoryDefineStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
     uint32_t Value;
   };
 
@@ -3500,14 +3500,14 @@ namespace Component::Excel::Ps3
     StoryDefineStruct Define[40];
     StorySequenceStruct Sequence[110];
     StoryVisibleListenerStruct VisibleListener[80];
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
     uint16_t LayerSetTerritoryType[2];
   };
 
   /* 362369 */
   struct CompanyLeveRule
   {
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
     uint16_t Objective;
     uint16_t Help;
   };
@@ -3523,14 +3523,14 @@ namespace Component::Excel::Ps3
   /* 362451 */
   struct AetheryteSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     uint32_t DefineValue;
   };
 
   /* 362452 */
   struct GatheringTypeTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 362453 */
@@ -3544,7 +3544,7 @@ namespace Component::Excel::Ps3
   /* 362454 */
   struct GatheringConditionTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 362455 */
@@ -3556,7 +3556,7 @@ namespace Component::Excel::Ps3
   /* 362456 */
   struct GatheringPointBonusTypeTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 362457 */
@@ -3582,21 +3582,21 @@ namespace Component::Excel::Ps3
   /* 362460 */
   struct QuestSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     int32_t DefineValue;
   };
 
   /* 362461 */
   struct EventSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     uint32_t DefineValue;
   };
 
   /* 362462 */
   struct JournalGenreTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362463 */
@@ -3611,27 +3611,27 @@ namespace Component::Excel::Ps3
   /* 362464 */
   struct LeveSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     int32_t DefineValue;
   };
 
   /* 362465 */
   struct BattleLeveRule
   {
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
   };
 
   /* 362466 */
   struct LeveVfx
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
     int32_t Icon;
   };
 
   /* 362467 */
   struct LeveStringTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362468 */
@@ -3643,13 +3643,13 @@ namespace Component::Excel::Ps3
   /* 362469 */
   struct GatheringLeveRule
   {
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
   };
 
   /* 362470 */
   struct LeveClientTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362471 */
@@ -3682,7 +3682,7 @@ namespace Component::Excel::Ps3
   /* 362475 */
   struct LeveAssignmentTypeTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362476 */
@@ -3698,7 +3698,7 @@ namespace Component::Excel::Ps3
   /* 362477 */
   struct GuildleveEvaluationTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362478 */
@@ -3710,14 +3710,14 @@ namespace Component::Excel::Ps3
   /* 362479 */
   struct OpeningSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     uint32_t DefineValue;
   };
 
   /* 362480 */
   struct StorySystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     uint32_t DefineValue;
   };
 
@@ -3758,20 +3758,20 @@ namespace Component::Excel::Ps3
   /* 362483 */
   struct Cutscene
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
   };
 
   /* 362484 */
   struct DirectorSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     int32_t DefineValue;
   };
 
   /* 362485 */
   struct SE
   {
-    Component::Excel::Ps3::StringOffset Path;
+    Excel::Ps3::StringOffset Path;
   };
 
   /* 362486 */
@@ -3787,7 +3787,7 @@ namespace Component::Excel::Ps3
   /* 362487 */
   struct ChocoboTaxiStandTextStruct
   {
-    Component::Excel::Ps3::StringOffset Destination;
+    Excel::Ps3::StringOffset Destination;
   };
 
   /* 362488 */
@@ -3806,7 +3806,7 @@ namespace Component::Excel::Ps3
   /* 362490 */
   struct GCShopItemCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 362491 */
@@ -3825,14 +3825,14 @@ namespace Component::Excel::Ps3
   /* 362493 */
   struct QuestBattleSystemDefine
   {
-    Component::Excel::Ps3::StringOffset DefineName;
+    Excel::Ps3::StringOffset DefineName;
     uint32_t DefineValue;
   };
 
   /* 363134 */
   struct ContentTalkTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 363135 */
@@ -3898,8 +3898,8 @@ namespace Component::Excel::Ps3
   /* 367152 */
   struct ScenarioTextStruct
   {
-    Component::Excel::Ps3::StringOffset Label;
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Label;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 367156 */
@@ -3911,7 +3911,7 @@ namespace Component::Excel::Ps3
   /* 367157 */
   struct ShopTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 367158 */
@@ -3958,8 +3958,8 @@ namespace Component::Excel::Ps3
   /* 367161 */
   struct WarpTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Question;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Question;
   };
 
   /* 367162 */
@@ -3982,16 +3982,16 @@ namespace Component::Excel::Ps3
   /* 367163 */
   struct WarpLogicDefineStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
     uint32_t Value;
   };
 
   /* 367164 */
   struct WarpLogicTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Yes;
-    Component::Excel::Ps3::StringOffset No;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Yes;
+    Excel::Ps3::StringOffset No;
   };
 
   /* 367165 */
@@ -3999,7 +3999,7 @@ namespace Component::Excel::Ps3
   {
     WarpLogicDefineStruct Define[10];
     WarpLogicTextStruct Text;
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
     uint32_t MapIcon;
     uint8_t padding0 : 7;
     uint8_t AcceptCallback : 1;
@@ -4021,7 +4021,7 @@ namespace Component::Excel::Ps3
   /* 367167 */
   struct SpecialShopTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 367168 */
@@ -4040,7 +4040,7 @@ namespace Component::Excel::Ps3
   /* 367169 */
   struct OpeningDefineStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
     uint32_t Value;
   };
 
@@ -4048,7 +4048,7 @@ namespace Component::Excel::Ps3
   struct Opening
   {
     OpeningDefineStruct Define[40];
-    Component::Excel::Ps3::StringOffset Script;
+    Excel::Ps3::StringOffset Script;
     uint32_t Quest;
   };
 
@@ -4099,7 +4099,7 @@ namespace Component::Excel::Ps3
   /* 370979 */
   struct Buddy
   {
-    Component::Excel::Ps3::StringOffset ActionSE[4];
+    Excel::Ps3::StringOffset ActionSE[4];
     int32_t BaseEquip[3];
     uint8_t Base;
     int8_t padding0[3];
@@ -4118,8 +4118,8 @@ namespace Component::Excel::Ps3
   /* 370981 */
   struct PvPRankTextStruct
   {
-    Component::Excel::Ps3::StringOffset PvPTitleMale[3];
-    Component::Excel::Ps3::StringOffset PvPTitleFemale[3];
+    Excel::Ps3::StringOffset PvPTitleMale[3];
+    Excel::Ps3::StringOffset PvPTitleFemale[3];
   };
 
   /* 370982 */
@@ -4145,7 +4145,7 @@ namespace Component::Excel::Ps3
   /* 370987 */
   struct RecipeElementTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 370988 */
@@ -4163,7 +4163,7 @@ namespace Component::Excel::Ps3
   /* 370990 */
   struct FishParameterTextStruct
   {
-    Component::Excel::Ps3::StringOffset NoteHelp;
+    Excel::Ps3::StringOffset NoteHelp;
   };
 
   /* 370991 */
@@ -4182,7 +4182,7 @@ namespace Component::Excel::Ps3
   /* 370992 */
   struct FishingSpotTextStruct
   {
-    Component::Excel::Ps3::StringOffset SpotName;
+    Excel::Ps3::StringOffset SpotName;
   };
 
   /* 370993 */
@@ -4207,7 +4207,7 @@ namespace Component::Excel::Ps3
   /* 370994 */
   struct JournalCategoryTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 370995 */
@@ -4285,7 +4285,7 @@ namespace Component::Excel::Ps3
   /* 374116 */
   struct CompleteJournalTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Name;
   };
 
   /* 374117 */
@@ -4304,8 +4304,8 @@ namespace Component::Excel::Ps3
   /* 374118 */
   struct LegacyQuestTextStruct
   {
-    Component::Excel::Ps3::StringOffset Name;
-    Component::Excel::Ps3::StringOffset Journal;
+    Excel::Ps3::StringOffset Name;
+    Excel::Ps3::StringOffset Journal;
   };
 
   /* 374119 */
@@ -4425,9 +4425,9 @@ namespace Component::Excel::Ps3
   /* 374133 */
   struct GuildOrderTextStruct
   {
-    Component::Excel::Ps3::StringOffset OperationText;
-    Component::Excel::Ps3::StringOffset OrderText[2];
-    Component::Excel::Ps3::StringOffset SummaryText;
+    Excel::Ps3::StringOffset OperationText;
+    Excel::Ps3::StringOffset OrderText[2];
+    Excel::Ps3::StringOffset SummaryText;
   };
 
   /* 374134 */
@@ -4492,7 +4492,7 @@ namespace Component::Excel::Ps3
   /* 383306 */
   struct BalloonTextStruct
   {
-    Component::Excel::Ps3::StringOffset Message;
+    Excel::Ps3::StringOffset Message;
   };
 
   /* 383307 */
@@ -4528,7 +4528,7 @@ namespace Component::Excel::Ps3
   /* 391161 */
   struct InstanceContentTextDataTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 391162 */
@@ -4547,9 +4547,9 @@ namespace Component::Excel::Ps3
   /* 397676 */
   struct GimmickYesNoTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text1;
-    Component::Excel::Ps3::StringOffset Text2;
-    Component::Excel::Ps3::StringOffset Text3;
+    Excel::Ps3::StringOffset Text1;
+    Excel::Ps3::StringOffset Text2;
+    Excel::Ps3::StringOffset Text3;
   };
 
   /* 397677 */
@@ -4561,7 +4561,7 @@ namespace Component::Excel::Ps3
   /* 397678 */
   struct GimmickBillTextStruct
   {
-    Component::Excel::Ps3::StringOffset Message;
+    Excel::Ps3::StringOffset Message;
   };
 
   /* 397679 */
@@ -4587,7 +4587,7 @@ namespace Component::Excel::Ps3
   /* 399530 */
   struct FateEventTextStruct
   {
-    Component::Excel::Ps3::StringOffset MessageText[8];
+    Excel::Ps3::StringOffset MessageText[8];
   };
 
   /* 399531 */
@@ -4600,7 +4600,7 @@ namespace Component::Excel::Ps3
   /* 399532 */
   struct NpcYellTextStruct
   {
-    Component::Excel::Ps3::StringOffset Text;
+    Excel::Ps3::StringOffset Text;
   };
 
   /* 399533 */

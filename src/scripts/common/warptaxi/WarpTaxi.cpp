@@ -35,7 +35,7 @@ public:
       auto& exdData = Common::Service< Data::ExdData >::ref();
       auto& popRange = Common::Service< Sapphire::InstanceObjectCache >::ref();
 
-      auto warp = exdData.getRow< Component::Excel::Warp >( getId() );
+      auto warp = exdData.getRow< Excel::Warp >( getId() );
       if( !warp )
         return;
 
@@ -78,7 +78,7 @@ public:
   {
 /*    auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-    auto warp = exdData.getRow< Component::Excel::Warp >( eventId );
+    auto warp = exdData.getRow< Excel::Warp >( eventId );
     if( !warp )
       return;
 

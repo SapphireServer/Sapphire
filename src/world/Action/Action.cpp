@@ -48,7 +48,7 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
 }
 
 Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
-                        std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData ) :
+                        std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData ) :
   m_pSource( std::move( caster ) ),
   m_actionData( std::move( actionData ) ),
   m_id( actionId ),
@@ -72,7 +72,7 @@ bool Action::Action::init()
     // need to get actionData
     auto& exdData = Common::Service< Data::ExdData >::ref();
 
-    auto actionData = exdData.getRow< Component::Excel::Action >( m_id );
+    auto actionData = exdData.getRow< Excel::Action >( m_id );
     if( !actionData )
       throw std::runtime_error( "No actiondata found!" );
 
@@ -638,7 +638,7 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
     // check if not a base class action
     auto& exdData = Common::Service< Data::ExdData >::ref();
 
-    auto classJob = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( currentClass ) );
+    auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( currentClass ) );
     if( !classJob )
       return false;
 

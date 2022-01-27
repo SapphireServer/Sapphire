@@ -66,10 +66,10 @@ std::string zoneNameToPath( const std::string& name )
   if( it != g_nameMap.end() )
     return it->second;
 
-  auto teriIdList = g_exdData.getIdList< Component::Excel::TerritoryType >();
+  auto teriIdList = g_exdData.getIdList< Excel::TerritoryType >();
   for( auto teriId : teriIdList )
   {
-    auto teri = g_exdData.getRow< Component::Excel::TerritoryType >( teriId );
+    auto teri = g_exdData.getRow< Excel::TerritoryType >( teriId );
     if( !teri )
       continue;
     
@@ -102,10 +102,10 @@ std::string zoneNameToPath( const std::string& name )
 
 void loadEobjNames()
 {
-  auto nameIdList = g_exdData..getIdList< Component::Excel::EObj >();
+  auto nameIdList = g_exdData..getIdList< Excel::EObj >();
   for( auto id : nameIdList )
   {
-    auto eObjName = g_exdData.getRow< Component::Excel::EObjName >( id );
+    auto eObjName = g_exdData.getRow< Excel::EObjName >( id );
     if( !eObjName )
       continue;
 

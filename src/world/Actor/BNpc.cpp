@@ -92,7 +92,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto bNpcBaseData = exdData.getRow< Component::Excel::BNpcBase >( m_bNpcBaseId );
+  auto bNpcBaseData = exdData.getRow< Excel::BNpcBase >( m_bNpcBaseId );
   if( !bNpcBaseData )
   {
     Logger::debug( "BNpcBase#{0} not found in exd data!", m_bNpcBaseId );
@@ -133,7 +133,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_radius = bNpcBaseData->data().Scale;
   if( bNpcBaseData->data().Customize != 0 )
   {
-    auto bnpcCustom = exdData.getRow< Component::Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
+    auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
     if( bnpcCustom )
     {
       memcpy( m_customize, reinterpret_cast< char* >( &bnpcCustom->data() ), sizeof( m_customize ) );
@@ -142,7 +142,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   if( bNpcBaseData->data().Equipment != 0 )
   {
-    auto bnpcEquip = exdData.getRow< Component::Excel::NpcEquip >( bNpcBaseData->data().Equipment );
+    auto bnpcEquip = exdData.getRow< Excel::NpcEquip >( bNpcBaseData->data().Equipment );
     if( bnpcEquip )
     {
       m_weaponMain = bnpcEquip->data().WeaponModel;
@@ -151,10 +151,10 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
     }
   }
 
-  auto modelChara = exdData.getRow< Component::Excel::ModelChara >( bNpcBaseData->data().Model );
+  auto modelChara = exdData.getRow< Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.getRow< Component::Excel::ModelSkeleton >( modelChara->data().SkeletonId );
+    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
     {
       m_radius *= modelSkeleton->data().Radius;
@@ -209,7 +209,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto bNpcBaseData = exdData.getRow< Component::Excel::BNpcBase >( m_bNpcBaseId );
+  auto bNpcBaseData = exdData.getRow< Excel::BNpcBase >( m_bNpcBaseId );
   if( !bNpcBaseData )
   {
     Logger::debug( "BNpcBase#{0} not found in exd data!", m_bNpcBaseId );
@@ -246,7 +246,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_radius = bNpcBaseData->data().Scale;
   if( bNpcBaseData->data().Customize != 0 )
   {
-    auto bnpcCustom = exdData.getRow< Component::Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
+    auto bnpcCustom = exdData.getRow< Excel::BNpcCustomize >( bNpcBaseData->data().Customize );
     if( bnpcCustom )
     {
       memcpy( m_customize, reinterpret_cast< char* >( &bnpcCustom->data() ), sizeof( m_customize ) );
@@ -255,7 +255,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   if( bNpcBaseData->data().Equipment != 0 )
   {
-    auto bnpcEquip = exdData.getRow< Component::Excel::NpcEquip >( bNpcBaseData->data().Equipment );
+    auto bnpcEquip = exdData.getRow< Excel::NpcEquip >( bNpcBaseData->data().Equipment );
     if( bnpcEquip )
     {
       m_weaponMain = bnpcEquip->data().WeaponModel;
@@ -264,10 +264,10 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
     }
   }
 
-  auto modelChara = exdData.getRow< Component::Excel::ModelChara >( bNpcBaseData->data().Model );
+  auto modelChara = exdData.getRow< Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.getRow< Component::Excel::ModelSkeleton >( modelChara->data().ModelType );
+    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().ModelType );
     if( modelSkeleton )
       m_radius *= modelSkeleton->data().Radius;
   }
@@ -792,7 +792,7 @@ void Sapphire::Entity::BNpc::onDeath()
   taskMgr.queueTask( World::makeRemoveBNpcTask( 12000, getAsBNpc() ) );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( m_level );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( m_level );
 
   for( auto& pHateEntry : m_hateList )
   {
@@ -965,8 +965,8 @@ void Sapphire::Entity::BNpc::calculateStats()
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( job );
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( level );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( job );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( level );
 
   float base = Math::CalcStats::calculateBaseStat( *this );
 

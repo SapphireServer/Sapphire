@@ -178,7 +178,7 @@ std::string PlayerMinimal::getInfoJson()
 
 uint8_t PlayerMinimal::getClassLevel()
 {
-  uint8_t classJobIndex = g_exdData.getRow< Component::Excel::ClassJob >( m_class )->data().WorkIndex;
+  uint8_t classJobIndex = g_exdData.getRow< Excel::ClassJob >( m_class )->data().WorkIndex;
   return static_cast< uint8_t >( m_classMap[ classJobIndex ] );
 }
 
@@ -259,7 +259,7 @@ void PlayerMinimal::saveAsNew()
   // CharacterId, ClassIdx, Exp, Lvl
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
   stmtClass->setUInt64( 1, m_characterId );
-  stmtClass->setInt( 2, g_exdData.getRow< Component::Excel::ClassJob >( m_class )->data().WorkIndex );
+  stmtClass->setInt( 2, g_exdData.getRow< Excel::ClassJob >( m_class )->data().WorkIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, 1 );
   g_charaDb.directExecute( stmtClass );
@@ -320,14 +320,14 @@ void PlayerMinimal::saveAsNew()
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SETUP EQUIPMENT / STARTING GEAR
-  auto classJobInfo = g_exdData.getRow< Component::Excel::ClassJob >( m_class );
+  auto classJobInfo = g_exdData.getRow< Excel::ClassJob >( m_class );
   uint32_t weaponId = classJobInfo->data().InitWeapon[ 0 ];
   uint64_t uniqueId = getNextUId64();
 
   uint8_t race = customize[ CharaLook::Race ];
   uint8_t gender = customize[ CharaLook::Gender ];
 
-  auto raceInfo = g_exdData.getRow< Component::Excel::Race >( race );
+  auto raceInfo = g_exdData.getRow< Excel::Race >( race );
 
   uint32_t body;
   uint32_t hands;
@@ -343,11 +343,11 @@ void PlayerMinimal::saveAsNew()
   legs = raceInfo->data().Leg[ gender ];
   feet = raceInfo->data().Foot[ gender ];
 
-  auto mainWeaponInfo = g_exdData.getRow< Component::Excel::Item >( weaponId );
-  auto bodyInfo = g_exdData.getRow< Component::Excel::Item >( body );
-  auto handsInfo = g_exdData.getRow< Component::Excel::Item >( hands );
-  auto legsInfo = g_exdData.getRow< Component::Excel::Item >( legs );
-  auto feetInfo = g_exdData.getRow< Component::Excel::Item >( feet );
+  auto mainWeaponInfo = g_exdData.getRow< Excel::Item >( weaponId );
+  auto bodyInfo = g_exdData.getRow< Excel::Item >( body );
+  auto handsInfo = g_exdData.getRow< Excel::Item >( hands );
+  auto legsInfo = g_exdData.getRow< Excel::Item >( legs );
+  auto feetInfo = g_exdData.getRow< Excel::Item >( feet );
 
   uint64_t modelMainWeapon = mainWeaponInfo->data().ModelId;
 

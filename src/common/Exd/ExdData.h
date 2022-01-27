@@ -29,7 +29,7 @@ namespace Sapphire::Data
     bool init( const std::string& path );
 
     template< typename T >
-    std::shared_ptr< Component::Excel::ExcelStruct< T > > getRow( uint32_t row, uint32_t subrow = 0 )
+    std::shared_ptr< Excel::ExcelStruct< T > > getRow( uint32_t row, uint32_t subrow = 0 )
     {
       xiv::exd::Exd sheet;
       auto needle = m_sheets.find( typeid( T ) );

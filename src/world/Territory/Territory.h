@@ -62,7 +62,7 @@ namespace Sapphire
 
     FestivalPair m_currentFestival;
 
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > m_territoryTypeInfo;
+    std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > m_territoryTypeInfo;
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
@@ -94,7 +94,7 @@ namespace Sapphire
 
     void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
 
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > getTerritoryTypeInfo() const;
+    std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > getTerritoryTypeInfo() const;
 
     uint64_t getLastActivityTime() const;
 

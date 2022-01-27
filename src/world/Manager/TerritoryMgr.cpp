@@ -34,11 +34,11 @@ TerritoryMgr::TerritoryMgr() :
 void TerritoryMgr::loadTerritoryTypeDetailCache()
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Component::Excel::TerritoryType >();
+  auto idList = exdData.getIdList< Excel::TerritoryType >();
 
   for( auto id : idList )
   {
-    auto teri1 = exdData.getRow< Component::Excel::TerritoryType >( id );
+    auto teri1 = exdData.getRow< Excel::TerritoryType >( id );
 
     if( !teri1->getString( teri1->data().Name ).empty() && id > 90 )
       m_territoryTypeDetailCacheMap[ id ] = teri1;
@@ -79,10 +79,10 @@ uint32_t TerritoryMgr::getNextInstanceId()
   return ++m_lastInstanceId;
 }
 
-Component::Excel::ExcelStructPtr< Component::Excel::TerritoryType > TerritoryMgr::getTerritoryDetail( uint32_t territoryTypeId ) const
+Excel::ExcelStructPtr< Excel::TerritoryType > TerritoryMgr::getTerritoryDetail( uint32_t territoryTypeId ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto teri1 = exdData.getRow< Component::Excel::TerritoryType >( territoryTypeId );
+  auto teri1 = exdData.getRow< Excel::TerritoryType >( territoryTypeId );
   if( !teri1 )
     return nullptr;
 
@@ -160,11 +160,11 @@ bool TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
 uint32_t TerritoryMgr::getInstanceContentId( uint32_t territoryTypeId ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto contentListIds = exdData.getIdList< Component::Excel::InstanceContent >();
+  auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
 
   for( auto id : contentListIds )
   {
-    auto instanceContent = exdData.getRow< Component::Excel::InstanceContent >( id );
+    auto instanceContent = exdData.getRow< Excel::InstanceContent >( id );
     if( instanceContent->data().TerritoryType == territoryTypeId )
     {
       return id;
@@ -188,7 +188,7 @@ bool TerritoryMgr::createDefaultTerritories()
     if( territoryInfo->getString( territoryData.Name ).empty() )
       continue;
 
-    auto pPlaceName = exdData.getRow< Component::Excel::PlaceName >( territoryData.Area );
+    auto pPlaceName = exdData.getRow< Excel::PlaceName >( territoryData.Area );
 
     if( !pPlaceName || pPlaceName->getString( pPlaceName->data().Text.SGL ).empty() || !isDefaultTerritory( territoryTypeId ) )
       continue;
@@ -237,7 +237,7 @@ bool TerritoryMgr::createHousingTerritories()
     if( territoryInfo->getString( territoryInfo->data().Name ).empty() )
       continue;
 
-    auto pPlaceName = exdData.getRow< Component::Excel::PlaceName >( territoryInfo->data().Area );
+    auto pPlaceName = exdData.getRow< Excel::PlaceName >( territoryInfo->data().Area );
 
     if( !pPlaceName || pPlaceName->getString( pPlaceName->data().Text.SGL ).empty() || !isHousingTerritory( territoryTypeId ) )
       continue;
@@ -280,7 +280,7 @@ TerritoryPtr TerritoryMgr::createTerritoryInstance( uint32_t territoryTypeId )
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto pTeri = getTerritoryDetail( territoryTypeId );
-  auto pPlaceName = exdData.getRow< Component::Excel::PlaceName >( pTeri->data().Area );
+  auto pPlaceName = exdData.getRow< Excel::PlaceName >( pTeri->data().Area );
 
   if( !pTeri || !pPlaceName )
     return nullptr;
@@ -302,18 +302,18 @@ TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questBattleId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto pQuestBattleInfo = exdData.getRow< Component::Excel::QuestBattle >( questBattleId );
+  auto pQuestBattleInfo = exdData.getRow< Excel::QuestBattle >( questBattleId );
   if( !pQuestBattleInfo )
     return nullptr;
 
-  auto pQuestInfo = exdData.getRow< Component::Excel::Quest >( pQuestBattleInfo->data().Quest );
+  auto pQuestInfo = exdData.getRow< Excel::Quest >( pQuestBattleInfo->data().Quest );
   if( !pQuestInfo || pQuestInfo->getString( pQuestInfo->data().Text.Name ).empty() )
     return nullptr;
 
-  for( auto& teriId : exdData.getIdList< Component::Excel::TerritoryType >() )
+  for( auto& teriId : exdData.getIdList< Excel::TerritoryType >() )
   {
 
-    auto pTeri = exdData.getRow< Component::Excel::TerritoryType >( teriId );
+    auto pTeri = exdData.getRow< Excel::TerritoryType >( teriId );
     if( !pTeri || pTeri->data().QuestBattle != questBattleId )
       continue;
 
@@ -345,7 +345,7 @@ TerritoryPtr TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto pInstanceContent = exdData.getRow< Component::Excel::InstanceContent >( instanceContentId );
+  auto pInstanceContent = exdData.getRow< Excel::InstanceContent >( instanceContentId );
   if( !pInstanceContent || !isInstanceContentTerritory( pInstanceContent->data().TerritoryType ) )
     return nullptr;
 

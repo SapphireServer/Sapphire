@@ -17,7 +17,7 @@ using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 
 void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                          Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData, Common::FFXIVARR_POSITION3 pos,
+                                          Excel::ExcelStructPtr< Excel::Action > actionData, Common::FFXIVARR_POSITION3 pos,
                                           uint16_t sequence )
 {
   PlayerMgr::sendDebug( player, "got aoe act: {0}", actionData->getString( actionData->data().Text.Name ) );
@@ -40,7 +40,7 @@ void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actio
 }
 
 void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                            Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData, uint64_t targetId, uint16_t sequence )
+                                            Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t sequence )
 {
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
@@ -62,7 +62,7 @@ void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t act
 }
 
 void ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
-                                  Component::Excel::ExcelStructPtr< Component::Excel::ItemAction > itemActionData,
+                                  Excel::ExcelStructPtr< Excel::ItemAction > itemActionData,
                                   uint16_t itemSourceSlot, uint16_t itemSourceContainer )
 {
   PlayerMgr::sendDebug( player, "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
@@ -75,7 +75,7 @@ void ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t ite
 }
 
 void ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
-                                       Component::Excel::ExcelStructPtr< Component::Excel::EventItem > itemActionData,
+                                       Excel::ExcelStructPtr< Excel::EventItem > itemActionData,
                                        uint32_t sequence, uint64_t targetId )
 {
   auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetId );
@@ -90,7 +90,7 @@ void ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_
 }
 
 void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
-                                   Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData, uint64_t targetId,
+                                   Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId,
                                    uint16_t sequence )
 {
   PlayerMgr::sendDebug( player, "setMount: {0}", mountId );
@@ -106,7 +106,7 @@ void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
 }
 
 void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction,
-                                 Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData )
+                                 Excel::ExcelStructPtr< Excel::Action > actionData )
 {
   /*
   //TODO: need to be fixed
@@ -140,7 +140,7 @@ void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr curre
 bool ActionMgr::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto actionInfoPtr = exdData.getRow< Component::Excel::Action >( actionId );
+  auto actionInfoPtr = exdData.getRow< Excel::Action >( actionId );
 
   if( actionInfoPtr->data().ComboContinue )
     return false;

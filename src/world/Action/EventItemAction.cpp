@@ -29,7 +29,7 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t eventItemId,
-                                  std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > eventItemActionData,
+                                  std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > eventItemActionData,
                                   uint32_t sequence, uint64_t targetId  ) :
   m_eventItemAction( std::move( eventItemActionData ) )
 {
@@ -45,7 +45,7 @@ EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t ev
 bool EventItemAction::init()
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto actionInfoPtr = exdData.getRow< Component::Excel::Action >( m_eventItemAction->data().Action );
+  auto actionInfoPtr = exdData.getRow< Excel::Action >( m_eventItemAction->data().Action );
 
   m_castTimeMs = static_cast< uint32_t >( m_eventItemAction->data().CastTime * 1000 );
   m_recastTimeMs = static_cast< uint32_t >( actionInfoPtr->data().RecastTime * 100 );

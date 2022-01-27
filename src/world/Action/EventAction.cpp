@@ -34,7 +34,7 @@ Action::EventAction::EventAction( Entity::CharaPtr pActor, uint32_t eventId, uin
   m_eventId = eventId;
   m_id = action;
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  m_castTimeMs = exdData.getRow< Component::Excel::EventAction >( action )->data().Time * 1000; // TODO: Add security checks.
+  m_castTimeMs = exdData.getRow< Excel::EventAction >( action )->data().Time * 1000; // TODO: Add security checks.
   m_onActionFinishClb = std::move( finishRef );
   m_onActionInterruptClb = std::move( interruptRef );
   m_pSource = std::move( pActor );

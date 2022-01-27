@@ -9,7 +9,7 @@ namespace Sapphire::World::Action
   {
   public:
     MountAction( Entity::CharaPtr source, uint16_t mountId, uint16_t sequence,
-                 std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData );
+                 std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
     virtual ~MountAction() = default;
 
     bool preCheck() override;

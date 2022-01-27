@@ -1,7 +1,7 @@
 #ifndef SAPPHIRE_EXD_COMMON_H
 #define SAPPHIRE_EXD_COMMON_H
 
-namespace Component::Excel::Ps3
+namespace Excel::Ps3
 {
 
   struct ExcelDataRowHeader
@@ -30,8 +30,8 @@ namespace Component::Excel::Ps3
 
 /*  struct LinkList::Holder
   {
-    Common::Component::Excel::LinkList m_begin;
-    Common::Component::Excel::LinkList m_end;
+    Common::Excel::LinkList m_begin;
+    Common::Excel::LinkList m_end;
     uint32_t m_size;
   };*/
 

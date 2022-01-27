@@ -78,7 +78,7 @@ ItemPtr InventoryMgr::createItem( Entity::Player& player, uint32_t catalogId, ui
 {
   auto& pExdData = Common::Service< Data::ExdData >::ref();
   auto& itemMgr = Common::Service< ItemMgr >::ref();
-  auto itemInfo = pExdData.getRow< Component::Excel::Item >( catalogId );
+  auto itemInfo = pExdData.getRow< Excel::Item >( catalogId );
 
   if( !itemInfo )
     return nullptr;

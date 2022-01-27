@@ -219,7 +219,7 @@ Sapphire::Common::OnlineStatus Sapphire::Entity::Player::getOnlineStatus() const
     if( !bit )
       continue;
 
-    auto pOnlineStatus = exdData.getRow< Component::Excel::OnlineStatus >( i );
+    auto pOnlineStatus = exdData.getRow< Excel::OnlineStatus >( i );
     if( !pOnlineStatus )
       continue;
 
@@ -323,9 +323,9 @@ void Sapphire::Entity::Player::calculateStats()
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( job );
-  auto tribeInfo = exdData.getRow< Component::Excel::Tribe >( tribe );
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( level );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( job );
+  auto tribeInfo = exdData.getRow< Excel::Tribe >( tribe );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( level );
 
   float base = Math::CalcStats::calculateBaseStat( *this );
 
@@ -404,7 +404,7 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto aetherData = exdData.getRow< Component::Excel::Aetheryte >( aetheryteId );
+  auto aetherData = exdData.getRow< Excel::Aetheryte >( aetheryteId );
 
   if( !aetherData )
     return;
@@ -433,8 +433,8 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     PlayerMgr::sendDebug( *this, "Teleport: popRange {0} not found in {1}!", data.PopRange[ 0 ], data.TerritoryType );
   }
 
-  auto townPlace = exdData.getRow< Component::Excel::PlaceName >( data.TelepoName );
-  auto aetherytePlace = exdData.getRow< Component::Excel::PlaceName >( data.TransferName );
+  auto townPlace = exdData.getRow< Excel::PlaceName >( data.TelepoName );
+  auto aetherytePlace = exdData.getRow< Excel::PlaceName >( data.TransferName );
 
   PlayerMgr::sendDebug( *this, "Teleport: {0} - {1} ({2})",
                            townPlace->getString( townPlace->data().Text.SGL ),
@@ -617,7 +617,7 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
   int32_t offset;
 
-  auto info = exdData.getRow< Component::Excel::Map >( map_id );
+  auto info = exdData.getRow< Excel::Map >( map_id );
   if( !info )
   {
     PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", map_id );
@@ -638,7 +638,7 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
 
   uint16_t level = getLevel();
 
-  uint32_t exp = ( exdData.getRow< Component::Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
+  uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
 
   gainExp( exp );
 
@@ -744,8 +744,8 @@ void Sapphire::Entity::Player::gainExp( uint32_t amount )
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  uint32_t neededExpToLevel = exdData.getRow< Component::Excel::ParamGrow >( level )->data().NextExp;
-  uint32_t neededExpToLevelPlus1 = exdData.getRow< Component::Excel::ParamGrow >( level + 1 )->data().NextExp;
+  uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
+  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
 
   if( ( currentExp + amount ) >= neededExpToLevel )
   {
@@ -785,7 +785,7 @@ void Sapphire::Entity::Player::sendStatusUpdate()
 uint8_t Sapphire::Entity::Player::getLevel() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
@@ -798,7 +798,7 @@ uint8_t Sapphire::Entity::Player::getLevelSync() const
 uint8_t Sapphire::Entity::Player::getLevelForClass( Common::ClassJob pClass ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( pClass ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( pClass ) )->data().WorkIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
@@ -811,14 +811,14 @@ bool Sapphire::Entity::Player::isClassJobUnlocked( Common::ClassJob classJob ) c
 uint32_t Sapphire::Entity::Player::getExp() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   return m_expArray[ classJobIndex ];
 }
 
 void Sapphire::Entity::Player::setExp( uint32_t amount )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_expArray[ classJobIndex ] = amount;
 }
 
@@ -852,14 +852,14 @@ void Sapphire::Entity::Player::setClassJob( Common::ClassJob classJob )
 void Sapphire::Entity::Player::setLevel( uint8_t level )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_classArray[ classJobIndex ] = level;
 }
 
 void Sapphire::Entity::Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( classjob ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( classjob ) )->data().WorkIndex;
 
   if( m_classArray[ classJobIndex ] == 0 )
     insertDbClass( classJobIndex, level );
@@ -1174,7 +1174,7 @@ const Sapphire::Entity::Player::OrchestrionList& Sapphire::Entity::Player::getOr
 void Sapphire::Entity::Player::unlockMount( uint32_t mountId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto mount = exdData.getRow< Component::Excel::Mount >( mountId );
+  auto mount = exdData.getRow< Excel::Mount >( mountId );
 
   if( mount->data().MountOrder == -1 )
     return;
@@ -1408,7 +1408,7 @@ void Sapphire::Entity::Player::setCompanion( uint8_t id )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto companion = exdData.getRow< Component::Excel::Companion >( id );
+  auto companion = exdData.getRow< Excel::Companion >( id );
   if( !id )
     return;
 
@@ -1698,12 +1698,12 @@ void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   // TODO: only register this action if enough gil is in possession
-  auto targetAetheryte = exdData.getRow< Component::Excel::Aetheryte >( aetheryteId );
+  auto targetAetheryte = exdData.getRow< Excel::Aetheryte >( aetheryteId );
 
   if( targetAetheryte )
   {
-    auto fromAetheryte = exdData.getRow< Component::Excel::Aetheryte >(
-      exdData.getRow< Component::Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
+    auto fromAetheryte = exdData.getRow< Excel::Aetheryte >(
+      exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
 
     // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
     auto cost = static_cast< uint16_t > (
@@ -1892,7 +1892,7 @@ void Sapphire::Entity::Player::sendHuntingLog()
       bool allComplete = true;
       auto monsterNoteId = ( count + 1 ) * 10000 + entry.rank * 10 + i;
 
-      auto monsterNote = exdData.getRow< Component::Excel::MonsterNote >( monsterNoteId );
+      auto monsterNote = exdData.getRow< Excel::MonsterNote >( monsterNoteId );
       if( !monsterNote )
         continue;
 
@@ -1930,7 +1930,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 
   // make sure we get the matching base-class if a job is being used
   auto currentClass = currentClassId;
-  auto classJobInfo = pExdData.getRow< Component::Excel::ClassJob >( currentClass );
+  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( currentClass );
   if( !classJobInfo )
     return;
 
@@ -1940,7 +1940,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
     bool sectionComplete = true;
     bool sectionChanged = false;
     auto monsterNoteId = static_cast< uint32_t >( classJobInfo->data().MainClass * 10000 + logEntry.rank * 10 + i );
-    auto note = pExdData.getRow< Component::Excel::MonsterNote >( monsterNoteId );
+    auto note = pExdData.getRow< Excel::MonsterNote >( monsterNoteId );
 
     // for classes that don't have entries, if the first fails the rest will fail
     if( !note )
@@ -1948,7 +1948,7 @@ void Sapphire::Entity::Player::updateHuntingLog( uint16_t id )
 
     for( auto x = 0; x < 4; ++x )
     {
-      auto note1 = pExdData.getRow< Component::Excel::MonsterNoteTarget >( note->data().Target[ x ] );
+      auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
       if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;

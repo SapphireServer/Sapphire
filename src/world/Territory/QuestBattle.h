@@ -16,7 +16,7 @@ namespace Sapphire
   class QuestBattle : public Event::Director, public Territory
   {
   public:
-    QuestBattle( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::QuestBattle > > pBattleDetails,
+    QuestBattle( std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > pBattleDetails,
                  uint16_t territoryType,
                  uint32_t guId,
                  const std::string& internalName,
@@ -75,7 +75,7 @@ namespace Sapphire
 
     Event::Director::DirectorState getState() const;
 
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::QuestBattle > > getQuestBattleDetails() const;
+    std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > getQuestBattleDetails() const;
 
     uint32_t getQuestBattleId() const;
 
@@ -87,7 +87,7 @@ namespace Sapphire
     Entity::PlayerPtr getPlayerPtr();
 
   private:
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::QuestBattle > > m_pBattleDetails;
+    std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > m_pBattleDetails;
     uint32_t m_questBattleId;
     Event::Director::DirectorState m_state;
 

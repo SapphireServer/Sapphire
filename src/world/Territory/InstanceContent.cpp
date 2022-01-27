@@ -30,7 +30,7 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::InstanceContent > > pInstanceConfiguration,
+Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > pInstanceConfiguration,
                                             uint16_t territoryType,
                                             uint32_t guId,
                                             const std::string& internalName,
@@ -74,7 +74,7 @@ uint32_t Sapphire::InstanceContent::getInstanceContentId() const
   return m_instanceContentId;
 }
 
-std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::InstanceContent > > Sapphire::InstanceContent::getInstanceConfiguration() const
+std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > Sapphire::InstanceContent::getInstanceConfiguration() const
 {
   return m_instanceConfiguration;
 }
@@ -345,7 +345,7 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
     m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto objData = exdData.getRow< Component::Excel::EObj >( object->getObjectId() );
+  auto objData = exdData.getRow< Excel::EObj >( object->getObjectId() );
   if( objData )
   {
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;

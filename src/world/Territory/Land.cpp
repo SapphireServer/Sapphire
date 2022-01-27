@@ -27,7 +27,7 @@
 using namespace Sapphire::Common;
 
 Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-                      std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::HousingLandSet > > info ) :
+                      std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > info ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( Util::getTimeSeconds() + 21600 ),
@@ -65,7 +65,7 @@ void Sapphire::Land::init( Common::LandType type, Common::HouseSize size, Common
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   // EXD TODO: This does not exist in 2.3
-  /*auto info = exdData.getRow< Component::Excel::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
+  /*auto info = exdData.getRow< Excel::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
   if( info )
   {
     m_mapMarkerPosition.x = info->x;

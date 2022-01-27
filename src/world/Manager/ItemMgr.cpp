@@ -134,7 +134,7 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
 
   try
   {
-    auto itemInfo = exdData.getRow< Component::Excel::Item >( itemRes->getUInt( 1 ) );
+    auto itemInfo = exdData.getRow< Excel::Item >( itemRes->getUInt( 1 ) );
     bool isHq = itemRes->getUInt( 3 ) == 1;
 
     ItemPtr pItem = make_Item( uId,

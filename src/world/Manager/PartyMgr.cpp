@@ -361,7 +361,7 @@ void PartyMgr::sendPartyUpdate( Party& party )
 
   for( const auto& member : partyMembers )
   {
-    auto classJob = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( member->getClass() ) );
+    auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( member->getClass() ) );
     if( !classJob )
       continue;
 

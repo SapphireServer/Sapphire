@@ -590,7 +590,7 @@ bool HousingMgr::initHouseModels( Entity::Player& player, LandPtr land, uint32_t
   houseInventory[ Common::InventoryType::HousingExteriorAppearance ] = extContainer;
 
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
-  auto preset = exdData.getRow< Component::Excel::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
+  auto preset = exdData.getRow< Excel::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
   if( !preset )
     return false;
 
@@ -980,7 +980,7 @@ void HousingMgr::updateHouseModels( HousePtr house )
 uint32_t HousingMgr::getItemAdditionalData( uint32_t catalogId )
 {
   auto& pExdData = Common::Service< Data::ExdData >::ref();
-  auto info = pExdData.getRow< Component::Excel::Item >( catalogId );
+  auto info = pExdData.getRow< Excel::Item >( catalogId );
   return info->data().CategoryArg;
 }
 

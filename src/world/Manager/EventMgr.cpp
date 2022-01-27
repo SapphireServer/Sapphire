@@ -48,7 +48,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
   {
     case Event::EventHandler::EventHandlerType::Quest:
     {
-      auto questInfo = exdData.getRow< Component::Excel::Quest >( eventId );
+      auto questInfo = exdData.getRow< Excel::Quest >( eventId );
       if( !questInfo )
         return unknown + "Quest";
 
@@ -59,7 +59,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::CustomTalk:
     {
-      auto customTalkInfo = exdData.getRow< Component::Excel::CustomTalk >( eventId );
+      auto customTalkInfo = exdData.getRow< Excel::CustomTalk >( eventId );
       if( !customTalkInfo )
         return unknown + "CustomTalk";
 
@@ -70,14 +70,14 @@ std::string EventMgr::getEventName( uint32_t eventId )
     }
     case Event::EventHandler::EventHandlerType::Opening:
     {
-      auto openingInfo = exdData.getRow< Component::Excel::Opening >( eventId );
+      auto openingInfo = exdData.getRow< Excel::Opening >( eventId );
       if( openingInfo )
         return openingInfo->getString( openingInfo->data().Script );
       return unknown + "Opening";
     }
     case Event::EventHandler::EventHandlerType::Aetheryte:
     {
-      auto aetherInfo = exdData.getRow< Component::Excel::Aetheryte >( eventId & 0xFFFF );
+      auto aetherInfo = exdData.getRow< Excel::Aetheryte >( eventId & 0xFFFF );
       if( aetherInfo->data().Telepo )
         return "Aetheryte";
       return "Aethernet";
@@ -90,10 +90,10 @@ std::string EventMgr::getEventName( uint32_t eventId )
     case Event::EventHandler::EventHandlerType::QuestBattleDirector:
     {
 
-      auto qbInfo = exdData.getRow< Component::Excel::QuestBattle >( eventId & 0xFFFF );
+      auto qbInfo = exdData.getRow< Excel::QuestBattle >( eventId & 0xFFFF );
       if( !qbInfo )
         return "unknown";
-      auto questInfo = exdData.getRow< Component::Excel::Quest >( qbInfo->data().Quest );
+      auto questInfo = exdData.getRow< Excel::Quest >( qbInfo->data().Quest );
       if( !questInfo )
         return "unknown";
 
@@ -107,7 +107,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Warp:
     {
-      auto warpInfo = exdData.getRow< Component::Excel::Warp >( eventId );
+      auto warpInfo = exdData.getRow< Excel::Warp >( eventId );
       if( warpInfo )
         return "WarpTaxi";
       return unknown + "ChocoboWarp"; //who know
@@ -115,7 +115,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Shop:
     {
-      //auto shopInfo = exdData.getRow< Component::Excel::ShopStruct >( eventId );
+      //auto shopInfo = exdData.getRow< Excel::ShopStruct >( eventId );
 
       return "GilShop" + std::to_string( eventId );
       /*if( shopInfo )
@@ -224,7 +224,7 @@ uint32_t EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto levelInfo = exdData.getRow< Component::Excel::Level >( eventActorId );
+  auto levelInfo = exdData.getRow< Excel::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->data().BaseId;
   else if( auto pObj = instanceObjectCache.getEObj( eventActorId ) )
@@ -546,7 +546,7 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
 
     for( auto it = player.getSoldItems()->cbegin(); it != player.getSoldItems()->cend(); ++it )
     {
-      auto item = exdData.getRow< Component::Excel::Item >( it->first );
+      auto item = exdData.getRow< Excel::Item >( it->first );
       params.push_back( it->first ); //itemCatalogId
       params.push_back( it->second ); //stack
       params.push_back( item->data().Price ); //price

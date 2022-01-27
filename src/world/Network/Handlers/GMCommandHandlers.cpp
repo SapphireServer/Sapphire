@@ -509,11 +509,11 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
         bool doTeleport = false;
         uint16_t teleport;
-        auto idList = exdData.getIdList< Component::Excel::Aetheryte >();
+        auto idList = exdData.getIdList< Excel::Aetheryte >();
 
         for( auto i : idList )
         {
-          auto data = exdData.getRow< Component::Excel::Aetheryte >( i );
+          auto data = exdData.getRow< Excel::Aetheryte >( i );
 
           if( !data )
             continue;

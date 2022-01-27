@@ -18,7 +18,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
 
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Component::Excel::TerritoryType >();
+  auto idList = exdData.getIdList< Excel::TerritoryType >();
 
   size_t count = 0;
   for( const auto& id : idList )
@@ -27,7 +27,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     if( count++ % 10 == 0 )
       std::cout << ".";
 
-    auto territoryType = exdData.getRow< Component::Excel::TerritoryType >( id );
+    auto territoryType = exdData.getRow< Excel::TerritoryType >( id );
     if( !territoryType )
       continue;
 

@@ -17,7 +17,7 @@ namespace Sapphire::World::Action
 
     Action();
     Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence );
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
 
     virtual ~Action();
 
@@ -200,7 +200,7 @@ namespace Sapphire::World::Action
 
     Common::ActionInterruptType m_interruptType;
 
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > m_actionData;
+    std::shared_ptr< Excel::ExcelStruct< Excel::Action > > m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos{};
 

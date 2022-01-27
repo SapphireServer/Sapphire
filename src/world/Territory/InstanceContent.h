@@ -65,7 +65,7 @@ namespace Sapphire
       Ended
     };
 
-    InstanceContent( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::InstanceContent > > pInstanceConfiguration,
+    InstanceContent( std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > pInstanceConfiguration,
                      uint16_t territoryType,
                      uint32_t guId,
                      const std::string& internalName,
@@ -144,7 +144,7 @@ namespace Sapphire
 
     InstanceContentState getState() const;
 
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::InstanceContent > > getInstanceConfiguration() const;
+    std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > getInstanceConfiguration() const;
 
     uint32_t getInstanceContentId() const;
 
@@ -176,7 +176,7 @@ namespace Sapphire
 
     size_t getInstancePlayerCount() const;
   private:
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::InstanceContent > > m_instanceConfiguration;
+    std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > m_instanceConfiguration;
     uint32_t m_instanceContentId;
     InstanceContentState m_state;
     uint16_t m_currentBgm;

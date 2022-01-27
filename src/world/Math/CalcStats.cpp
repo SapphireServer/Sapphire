@@ -129,8 +129,8 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( player.getLevel() );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
@@ -159,8 +159,8 @@ uint32_t CalcStats::calculateMaxHp( Chara& chara )
   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( chara.getLevel() );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
@@ -186,8 +186,8 @@ uint32_t CalcStats::calculateMaxMp( Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( player.getLevel() );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
@@ -356,7 +356,7 @@ float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weapo
   uint32_t jobMod = 1;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
 
   if( !classInfo )
     return 0.f;

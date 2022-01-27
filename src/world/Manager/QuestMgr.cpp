@@ -61,11 +61,11 @@ bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint3
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint32_t playerLevel = player.getLevel();
-  auto questInfo = exdData.getRow< Component::Excel::Quest >( static_cast< uint32_t >( Event::EventHandler::EventHandlerType::Quest ) << 16 | questId );
+  auto questInfo = exdData.getRow< Excel::Quest >( static_cast< uint32_t >( Event::EventHandler::EventHandlerType::Quest ) << 16 | questId );
 
   if( !questInfo )
     return false;
-  auto paramGrowth = exdData.getRow< Component::Excel::ParamGrow >( questInfo->data().ClassLevel );
+  auto paramGrowth = exdData.getRow< Excel::ParamGrow >( questInfo->data().ClassLevel );
   uint32_t exp = ( questInfo->data().Reward.ExpBonus * paramGrowth->data().BaseExp * paramGrowth->data().EventExpRate ) / 100;
   uint32_t gilReward = questInfo->data().Reward.Gil;
 

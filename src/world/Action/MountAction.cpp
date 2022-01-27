@@ -21,7 +21,7 @@ using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Action;
 
 MountAction::MountAction( Sapphire::Entity::CharaPtr source, uint16_t mountId, uint16_t sequence,
-                          std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData ) :
+                          std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData ) :
   Action::Action( source, 4, sequence, actionData ),
   m_mountId( mountId )
 {

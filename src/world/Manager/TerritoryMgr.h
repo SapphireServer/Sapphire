@@ -118,7 +118,7 @@ namespace Sapphire::World::Manager
     TerritoryPtr getTerritoryByGuId( uint32_t guId ) const;
 
     /*! returns the cached detail of a territory, nullptr if not found */
-    Component::Excel::ExcelStructPtr< Component::Excel::TerritoryType > getTerritoryDetail( uint32_t territoryTypeId ) const;
+    Excel::ExcelStructPtr< Excel::TerritoryType > getTerritoryDetail( uint32_t territoryTypeId ) const;
 
     /*! loop for processing territory logic, iterating all existing instances */
     void updateTerritoryInstances( uint64_t tickCount );
@@ -153,7 +153,7 @@ namespace Sapphire::World::Manager
     float getInRangeDistance() const;
 
   private:
-    using TerritoryTypeDetailCache = std::unordered_map< uint16_t, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > >;
+    using TerritoryTypeDetailCache = std::unordered_map< uint16_t, std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > >;
     using InstanceIdToTerritoryPtrMap = std::unordered_map< uint32_t, TerritoryPtr >;
     using TerritoryTypeIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;
     using InstanceContentIdToInstanceMap = std::unordered_map< uint16_t, InstanceIdToTerritoryPtrMap >;

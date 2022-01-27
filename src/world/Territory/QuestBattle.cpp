@@ -34,7 +34,7 @@ using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
 
-Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::QuestBattle > > pBattleDetails,
+Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > pBattleDetails,
                                     uint16_t territoryType, uint32_t guId,
                                     const std::string& internalName, const std::string& contentName,
                                     uint32_t questBattleId ) :
@@ -67,7 +67,7 @@ uint32_t Sapphire::QuestBattle::getQuestBattleId() const
 }
 
 
-std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::QuestBattle > > Sapphire::QuestBattle::getQuestBattleDetails() const
+std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > Sapphire::QuestBattle::getQuestBattleDetails() const
 {
   return m_pBattleDetails;
 }
@@ -231,7 +231,7 @@ void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
     m_eventObjectMap[ object->getName() ] = object;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto objData = exdData.getRow< Component::Excel::EObj >( object->getObjectId() );
+  auto objData = exdData.getRow< Excel::EObj >( object->getObjectId() );
   if( objData )
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
   else

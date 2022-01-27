@@ -15,7 +15,7 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_reservedFlag( 0 )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto itemInfo = exdData.getRow< Component::Excel::Item >( catalogId );
+  auto itemInfo = exdData.getRow< Excel::Item >( catalogId );
 
   m_delayMs = itemInfo->data().AttackInterval;
   m_physicalDmg = itemInfo->data().Damage;

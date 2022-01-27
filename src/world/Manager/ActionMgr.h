@@ -21,23 +21,23 @@ namespace Sapphire::World::Manager
     ~ActionMgr() = default;
 
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                     std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
+                                     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
     void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                   std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
+                                   std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId,
-                           std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData,
+                           std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
 
     void handleEventItemAction( Entity::Player& player, uint32_t itemId,
-                                std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > itemActionData, uint32_t sequence, uint64_t targetId );
+                                std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > itemActionData, uint32_t sequence, uint64_t targetId );
 
     void handleMountAction( Entity::Player& player, uint16_t mountId,
-                            std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
+                            std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
 
     bool actionHasCastTime( uint32_t actionId );
   private:
-    void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData );
+    void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
 
     // item action handlers
     void handleItemActionVFX( Entity::Player& player, uint32_t itemId, uint16_t vfxId );

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Component::Excel
+namespace Excel
 {
 
   struct ExcelDataRowHeader
@@ -29,8 +29,8 @@ namespace Component::Excel
 
 /*  struct LinkList::Holder
   {
-    Common::Component::Excel::LinkList m_begin;
-    Common::Component::Excel::LinkList m_end;
+    Common::Excel::LinkList m_begin;
+    Common::Excel::LinkList m_end;
     uint32_t m_size;
   };*/
 

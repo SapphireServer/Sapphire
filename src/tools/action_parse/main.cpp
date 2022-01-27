@@ -103,7 +103,7 @@ int main( int argc, char* argv[] )
     Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
-  auto idList = g_exdDataGen.getIdList< Component::Excel::Action >();
+  auto idList = g_exdDataGen.getIdList< Excel::Action >();
 
   std::map< uint32_t, ActionEntry > actions;
   std::map< uint32_t, std::vector< uint32_t > > traversedCombos;
@@ -117,7 +117,7 @@ int main( int argc, char* argv[] )
     if( cursor % 50 == 0 && cursor > 0 )
       Logger::info( "Processing {} actions of {} ({:.2f}%)", cursor, total, done );
 
-    auto action = g_exdDataGen.getRow< Component::Excel::Action >( id );
+    auto action = g_exdDataGen.getRow< Excel::Action >( id );
 
     //auto actionTransient = g_exdData.get< Sapphire::Data::ActionTransient >( id );
     if( action )
@@ -130,7 +130,7 @@ int main( int argc, char* argv[] )
       //if( actionData.PvPOnly )
       //  continue;
 
-   //   auto classJob = g_exdDataGen.getRow< Component::Excel::ClassJob >( actionData.UseClassJob );
+   //   auto classJob = g_exdDataGen.getRow< Excel::ClassJob >( actionData.UseClassJob );
    //   if( !classJob )
    //     continue;
 

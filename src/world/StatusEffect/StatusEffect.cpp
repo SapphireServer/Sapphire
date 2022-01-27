@@ -28,7 +28,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_lastTick( 0 )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto entry = exdData.getRow< Component::Excel::Status >( id );
+  auto entry = exdData.getRow< Excel::Status >( id );
   m_name = entry->getString( entry->data().Text.Name );
 
   std::replace( m_name.begin(), m_name.end(), ' ', '_' );

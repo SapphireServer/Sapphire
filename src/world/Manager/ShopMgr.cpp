@@ -12,20 +12,20 @@ using namespace Sapphire::World::Manager;
 void ShopMgr::cacheShop( uint32_t shopId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto itemShopList = exdData.getIdList< Component::Excel::Shop >();
+  auto itemShopList = exdData.getIdList< Excel::Shop >();
   uint8_t count = 0;
   for( auto itemShop : itemShopList )
   {
     if( shopId == itemShop )
     {
-      auto shop = exdData.getRow< Component::Excel::Shop >( itemShop );
+      auto shop = exdData.getRow< Excel::Shop >( itemShop );
       for( auto shopItemId : shop->data().Item )
       {
-        auto shopItem = exdData.getRow< Component::Excel::ShopItem >( shopItemId );
+        auto shopItem = exdData.getRow< Excel::ShopItem >( shopItemId );
         if( !shopItem )
           continue;
 
-        auto item = exdData.getRow< Component::Excel::Item >( shopItem->data().ItemId );
+        auto item = exdData.getRow< Excel::Item >( shopItem->data().ItemId );
         if( !item || item->data().Price == 0 )
           continue;
 
@@ -61,7 +61,7 @@ bool ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto item = exdData.getRow< Component::Excel::Item >( itemId );
+  auto item = exdData.getRow< Excel::Item >( itemId );
   if( !item )
     return false;
 
@@ -82,7 +82,7 @@ bool ShopMgr::sellGilShopItem( Entity::Player& player, uint16_t container, uint8
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto item = exdData.getRow< Component::Excel::Item >( itemId );
+  auto item = exdData.getRow< Excel::Item >( itemId );
   if( !item )
     return false;
 

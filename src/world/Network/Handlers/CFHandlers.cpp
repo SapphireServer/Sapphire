@@ -74,12 +74,12 @@ void Sapphire::Network::GameConnection::find5Contents( const Packets::FFXIVARR_P
     if( packet.data().territoryTypes[ i ] != 0 )
       selectedContent.insert( packet.data().territoryTypes[ i ] );
 
-  auto contentListIds = exdData.getIdList< Component::Excel::InstanceContent >();
+  auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
 
   std::vector< uint32_t > idList;
   for( auto id : contentListIds )
   {
-    auto instanceContent = exdData.getRow< Component::Excel::InstanceContent >( id );
+    auto instanceContent = exdData.getRow< Excel::InstanceContent >( id );
     if( selectedContent.count( instanceContent->data().TerritoryType ) )
     {
       idList.push_back( id );

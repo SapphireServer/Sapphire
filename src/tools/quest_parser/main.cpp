@@ -100,7 +100,7 @@ Container& split(
 }
 
 void
-createScript( std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Quest > >& pQuestData, std::set< std::string >& additionalList, int questId, std::vector< std::string >& functions )
+createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData, std::set< std::string >& additionalList, int questId, std::vector< std::string >& functions )
 {
   std::string header(
     "// This is an automatically generated C++ script template\n"
@@ -492,7 +492,7 @@ int main( int argc, char** argv )
 
   xiv::dat::GameData data( gamePath );
 
-  auto rows = g_exdDataGen.getIdList< Component::Excel::Quest >();
+  auto rows = g_exdDataGen.getIdList< Excel::Quest >();
 
   if( !fs::exists( "./generated" ) )
     fs::create_directory( "./generated" );
@@ -504,7 +504,7 @@ int main( int argc, char** argv )
   for( const auto& row : rows )
   {
     Logger::info( "Generating {0}", row );
-    auto questInfo = g_exdDataGen.getRow< Component::Excel::Quest >( row );
+    auto questInfo = g_exdDataGen.getRow< Excel::Quest >( row );
 
     if( questInfo->getString( questInfo->data().Text.Name ).empty() || questInfo->getString( questInfo->data().Script ).empty() )
     {

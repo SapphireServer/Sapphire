@@ -748,7 +748,7 @@ Sapphire::Common::BaseParam Sapphire::Entity::Chara::getPrimaryStat() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto classJob = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint16_t >( getClass() ) );
+  auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint16_t >( getClass() ) );
   assert( classJob );
 
   return static_cast< Sapphire::Common::BaseParam >( classJob->data().Role );

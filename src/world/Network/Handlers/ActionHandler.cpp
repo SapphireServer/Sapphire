@@ -43,7 +43,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     }
     case Common::SkillType::Normal:
     {
-      auto action = exdData.getRow< Component::Excel::Action >( actionId );
+      auto action = exdData.getRow< Excel::Action >( actionId );
 
       // ignore invalid actions
       if( !action )
@@ -55,14 +55,14 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
     case Common::SkillType::ItemAction:
     {
-      auto item = exdData.getRow< Component::Excel::Item >( actionId );
+      auto item = exdData.getRow< Excel::Item >( actionId );
       if( !item )
         return;
 
       if( item->data().Action == 0 )
         return;
 
-      auto itemAction = exdData.getRow< Component::Excel::ItemAction >( item->data().Action );
+      auto itemAction = exdData.getRow< Excel::ItemAction >( item->data().Action );
       if( !itemAction )
         return;
 
@@ -73,7 +73,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
     case Common::SkillType::EventItem:
     {
-      auto action = exdData.getRow< Component::Excel::EventItem >( actionId );
+      auto action = exdData.getRow< Excel::EventItem >( actionId );
       assert( action );
       actionMgr.handleEventItemAction( player, actionId, action, sequence, targetId );
       break;
@@ -81,7 +81,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
     case Common::SkillType::MountSkill:
     {
-      auto action = exdData.getRow< Component::Excel::Action >( 4 );
+      auto action = exdData.getRow< Excel::Action >( 4 );
       assert( action );
       actionMgr.handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, sequence );
       break;
@@ -114,7 +114,7 @@ void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto action = exdData.getRow< Component::Excel::Action >( actionId );
+  auto action = exdData.getRow< Excel::Action >( actionId );
 
   // ignore invalid actions
   if( !action )

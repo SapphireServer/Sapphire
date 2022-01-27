@@ -371,7 +371,7 @@ int main( int argc, char* argv[] )
     
   }
 
-  auto teriIdList = g_exdDataGen.getIdList< Component::Excel::Ps3::TerritoryType >();
+  auto teriIdList = g_exdDataGen.getIdList< Excel::Ps3::TerritoryType >();
 
 
   std::string data = std::string("GroupId, GroupName, TerritoryName, name, instanceId, x, y, z, Rotation, BaseId, PopWeather, PopTimeStart, PopTimeEnd, MoveAI, WanderingRange, Route, ") +
@@ -386,7 +386,7 @@ int main( int argc, char* argv[] )
   std::set< std::string > zoneNames;
   for( const auto& id : teriIdList )
   {
-    auto row = g_exdDataGen.getRow< Component::Excel::Ps3::TerritoryType >( id );
+    auto row = g_exdDataGen.getRow< Excel::Ps3::TerritoryType >( id );
     if( !row )
       continue;
     std::string zonePath = row->getString( row->data().LVB );
@@ -405,7 +405,7 @@ int main( int argc, char* argv[] )
   }
   for( const auto& name : zoneNames )
   {
-   // auto row = g_exdDataGen.getRow< Component::Excel::TerritoryType >( id );
+   // auto row = g_exdDataGen.getRow< Excel::TerritoryType >( id );
    // if( !row )
    //   continue;
 

@@ -32,8 +32,8 @@ using namespace Sapphire::Entity;
 uint32_t CalcBattle::calculateHealValue( PlayerPtr pPlayer, uint32_t potency, Sapphire::FrameworkPtr pFw )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto classInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = exdData.getRow< Component::Excel::ParamGrow >( pPlayer->getLevel() );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( pPlayer->getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;

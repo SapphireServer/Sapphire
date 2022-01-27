@@ -28,7 +28,7 @@ int main( int argc, char* argv[] )
   auto exdData = Data::ExdData();
   exdData.init( datLocation );
 
-  auto row = exdData.getRow< Component::Excel::ClassJob >( 1 );
+  auto row = exdData.getRow< Excel::ClassJob >( 1 );
 
   return 0;
 }

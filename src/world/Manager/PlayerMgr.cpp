@@ -84,11 +84,11 @@ void PlayerMgr::onSendStats( Entity::Player& player )
   auto& exd = Common::Service< Data::ExdData >::ref();
 
   // todo: this is no doubt slow as shit...
-  auto idList = exd.getIdList< Component::Excel::BaseParam >();
+  auto idList = exd.getIdList< Excel::BaseParam >();
 
   for( const auto id : idList )
   {
-    auto row = exd.getRow< Component::Excel::BaseParam >( id );
+    auto row = exd.getRow< Excel::BaseParam >( id );
     if( !row )
     {
       continue;

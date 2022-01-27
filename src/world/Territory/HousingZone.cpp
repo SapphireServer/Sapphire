@@ -61,7 +61,7 @@ bool Sapphire::HousingZone::init()
     housingIndex = 3;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto info = exdData.getRow< Component::Excel::HousingLandSet >( housingIndex );
+  auto info = exdData.getRow< Excel::HousingLandSet >( housingIndex );
 
   // build yard objects array indices
   int16_t cursor = -1;

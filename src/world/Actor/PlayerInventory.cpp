@@ -112,9 +112,9 @@ void Sapphire::Entity::Player::equipWeapon( const Item& item )
 {
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-  auto itemInfo = exdData.getRow< Component::Excel::Item >( item.getId() );
+  auto itemInfo = exdData.getRow< Excel::Item >( item.getId() );
   auto itemClassJob = itemInfo->data().Class;
-  auto classJobInfo = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto classJobInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto currentParentClass = static_cast< ClassJob >( classJobInfo->data().MainClass );
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
@@ -128,7 +128,7 @@ void Sapphire::Entity::Player::equipSoulCrystal( const Item& item )
 {
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-  auto itemInfo = exdData.getRow< Component::Excel::Item >( item.getId() );
+  auto itemInfo = exdData.getRow< Excel::Item >( item.getId() );
   auto itemClassJob = itemInfo->data().Class;
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
@@ -281,7 +281,7 @@ void Sapphire::Entity::Player::unequipSoulCrystal()
 {
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-  auto currentClassJob = exdData.getRow< Component::Excel::ClassJob >( static_cast< uint32_t >( getClass() ) );
+  auto currentClassJob = exdData.getRow< Excel::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto parentClass = static_cast< ClassJob >( currentClassJob->data().MainClass );
   setClassJob( parentClass );
 }
@@ -567,7 +567,7 @@ bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantit
 Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_t quantity, bool isHq, bool silent, bool canMerge )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto itemInfo = exdData.getRow< Component::Excel::Item >( catalogId );
+  auto itemInfo = exdData.getRow< Excel::Item >( catalogId );
 
   // if item data doesn't exist or it's a blank field
   if( !itemInfo || itemInfo->data().EquipLevel == 0 )

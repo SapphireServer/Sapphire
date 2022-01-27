@@ -28,7 +28,7 @@ public:
 
       return;
       // param2 is the index starting from 0 inside housingaethernet.exd, but the ID column starts at 0x001E0000........ wtf
-      /*auto pHousingAethernet = exdData.getRow< Component::Excel::HousingAethernet >( getId() + result.param2 );
+      /*auto pHousingAethernet = exdData.getRow< Excel::HousingAethernet >( getId() + result.param2 );
       if( !pHousingAethernet )
         return;
 

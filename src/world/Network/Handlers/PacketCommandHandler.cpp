@@ -511,7 +511,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       bool isSilent = param2 == 1;
 
       auto& exdData = Service< Data::ExdData >::ref();
-      auto emoteData = exdData.getRow< Component::Excel::Emote >( emoteId );
+      auto emoteData = exdData.getRow< Excel::Emote >( emoteId );
 
       if( !emoteData )
         return;
