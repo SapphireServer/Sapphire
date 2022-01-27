@@ -583,6 +583,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
           break;
       }
 
+      break;
     }
     case PacketCommand::FINISH_LOADING: // Finish zoning
     {
@@ -637,7 +638,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::HOUSING_LOCK_LAND_BY_BUILD:
     {
       auto hZone = std::dynamic_pointer_cast< HousingZone >( pZone );
-      if (!hZone)
+      if( !hZone )
         return;
 
       player.setActiveLand( static_cast< uint8_t >( param11 ), hZone->getWardNum() );
@@ -677,7 +678,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
       auto hZone = std::dynamic_pointer_cast< HousingZone >( pZone );
-      if (!hZone)
+      if( !hZone )
         return;
 
       auto plot = static_cast< uint8_t >( param12 & 0xFF );

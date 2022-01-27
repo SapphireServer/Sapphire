@@ -499,7 +499,7 @@ int main( int argc, char** argv )
 
   Logger::info( "Export in progress" );
 
-  uint32_t updateInterval = rows.size() / 20;
+  auto updateInterval = rows.size() / 20;
   uint32_t i = 0;
   for( const auto& row : rows )
   {

@@ -4,6 +4,7 @@
 #include <Logging/Logger.h>
 #include <Crypt/base64.h>
 #include <iomanip>
+#include <memory>
 
 #include <nlohmann/json.hpp>
 
@@ -66,7 +67,7 @@ Lobby::LobbySessionPtr Lobby::RestConnector::getSession( char* sId )
 
     if( content.find( "invalid" ) == std::string::npos )
     {
-      LobbySessionPtr pSession( new Lobby::LobbySession() );
+      auto pSession = std::make_shared< Lobby::LobbySession >();
       pSession->setAccountID( json["result"].get< uint32_t >() );
       pSession->setSessionId( sId );
       return pSession;

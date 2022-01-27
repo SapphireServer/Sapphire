@@ -116,7 +116,7 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   const char* ptr = infoJson.c_str() + 50;
 
   std::string lookPart( ptr );
-  int32_t pos = lookPart.find_first_of( "]" );
+  auto pos = lookPart.find_first_of( "]" );
   if( pos != std::string::npos )
   {
     lookPart = lookPart.substr( 0, pos + 1 );
@@ -188,7 +188,7 @@ void SapphireApi::deleteCharacter( std::string name, const uint32_t accountId )
     }
   }
 
-  int32_t id = deletePlayer.getCharacterId();
+  auto id = deletePlayer.getCharacterId();
 
   g_charaDb.execute( "DELETE FROM charainfo WHERE CharacterId = " + std::to_string( id ) + ";" );
   g_charaDb.execute( "DELETE FROM characlass WHERE CharacterId = " + std::to_string( id ) + ";" );
