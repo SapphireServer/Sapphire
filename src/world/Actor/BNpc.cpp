@@ -448,6 +448,40 @@ void Sapphire::Entity::BNpc::hateListClear()
   m_hateList.clear();
 }
 
+uint32_t Sapphire::Entity::BNpc::hateListGetValue( const Sapphire::Entity::CharaPtr& pChara )
+{
+  for( const auto& listEntry : m_hateList )
+  {
+    if( listEntry->m_pChara == pChara )
+    {
+      return listEntry->m_hateAmount;
+    }
+  }
+
+  return 0;
+}
+
+uint32_t Sapphire::Entity::BNpc::hateListGetHighestValue()
+{
+  auto it = m_hateList.begin();
+  uint32_t maxHate = 0;
+  std::shared_ptr< HateListEntry > entry;
+  for( ; it != m_hateList.end(); ++it )
+  {
+    if( ( *it )->m_hateAmount > maxHate )
+    {
+      maxHate = ( *it )->m_hateAmount;
+      entry = *it;
+    }
+  }
+
+  if( entry && maxHate != 0 )
+    return entry->m_hateAmount;
+
+  return 0;
+}
+
+
 Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
 {
   auto it = m_hateList.begin();
@@ -491,19 +525,35 @@ void Sapphire::Entity::BNpc::hateListAddDelayed( const Sapphire::Entity::CharaPt
 
 void Sapphire::Entity::BNpc::hateListUpdate( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
 {
+  bool hasEntry = false;
+
   for( const auto& listEntry : m_hateList )
   {
     if( listEntry->m_pChara == pChara )
     {
       listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
-      return;
+      hasEntry = true;
+      break;
     }
   }
 
-  auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
-  hateEntry->m_pChara = pChara;
-  m_hateList.insert( hateEntry );
+  if( !hasEntry )
+  {
+    auto hateEntry = std::make_shared< HateListEntry >();
+    hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
+    hateEntry->m_pChara = pChara;
+    m_hateList.insert( hateEntry );
+  }
+
+  for( const auto& listEntry : m_hateList )
+  {
+    // update entire hatelist for all players who are on aggro with this bnpc
+    if( pChara->isPlayer() )
+    {
+      auto pPlayer = pChara->getAsPlayer();
+      Service< World::Manager::PlayerMgr >::ref().onHateListChanged( *pPlayer );
+    }
+  }
 }
 
 void Sapphire::Entity::BNpc::hateListRemove( const Sapphire::Entity::CharaPtr& pChara )
@@ -512,8 +562,8 @@ void Sapphire::Entity::BNpc::hateListRemove( const Sapphire::Entity::CharaPtr& p
   {
     if( listEntry->m_pChara == pChara )
     {
-
       m_hateList.erase( listEntry );
+
       if( pChara->isPlayer() )
       {
         PlayerPtr tmpPlayer = pChara->getAsPlayer();
@@ -547,7 +597,6 @@ void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   m_lastAttack = Util::getTimeMs() + variation;
-  hateListUpdate( pChara, 1 );
 
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
@@ -772,6 +821,8 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
 {
   if( !hateListGetHighest() )
     aggro( pSource );
+
+  hateListUpdate( pSource, 1 );
 
   if( !m_pOwner )
     setOwner( pSource );

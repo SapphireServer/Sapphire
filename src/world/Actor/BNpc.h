@@ -103,6 +103,8 @@ namespace Sapphire::Entity
     void setState( BNpcState state );
 
     void hateListClear();
+    uint32_t hateListGetValue( const Sapphire::Entity::CharaPtr& pChara );
+    uint32_t hateListGetHighestValue();
     CharaPtr hateListGetHighest();
     void hateListAdd( const CharaPtr& pChara, int32_t hateAmount );
     void hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount );

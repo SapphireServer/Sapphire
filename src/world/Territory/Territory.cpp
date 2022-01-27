@@ -840,6 +840,15 @@ Sapphire::Entity::BNpcPtr Sapphire::Territory::createBNpcFromInstanceId( uint32_
   return pBNpc;
 }
 
+Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByEntityId( uint32_t entityId )
+{
+  auto it = m_bNpcMap.find( entityId );
+  if( it == m_bNpcMap.end() )
+    return nullptr;
+
+  return it->second;
+}
+
 Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByInstanceId( uint32_t instanceId )
 {
   for( const auto& bnpcIt : m_bNpcMap )

@@ -49,6 +49,8 @@ namespace Sapphire::World::Action
     uint8_t getActionKind() const;
     void setActionKind( uint8_t actionKind );
 
+    void setAggroMultiplier( float aggroMultiplier );
+
     uint64_t getCastTimeRest() const;
 
     /*!
@@ -173,6 +175,8 @@ namespace Sapphire::World::Action
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};
+
+    float m_aggroMultiplier{ 1.f };
 
     uint64_t m_startTime{};
     uint64_t m_castTimeRestMs{};
