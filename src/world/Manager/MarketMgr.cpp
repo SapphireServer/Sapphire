@@ -16,12 +16,13 @@
 #include "Session.h"
 #include "Network/GameConnection.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-bool Sapphire::World::Manager::MarketMgr::init()
+bool MarketMgr::init()
 {
 //  Logger::info( "MarketMgr: warming up marketable item cache..." );
 //
@@ -62,8 +63,7 @@ bool Sapphire::World::Manager::MarketMgr::init()
   return true;
 }
 
-void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Entity::Player& player, uint32_t catalogId,
-                                                                  uint32_t requestId )
+void MarketMgr::requestItemListingInfo( Entity::Player& player, uint32_t catalogId, uint32_t requestId )
 {
 
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -98,10 +98,8 @@ void Sapphire::World::Manager::MarketMgr::requestItemListingInfo( Sapphire::Enti
 }
 
 
-void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& player, uint8_t itemSearchCategory,
-                                                             uint8_t maxEquipLevel, uint8_t classJob,
-                                                             const std::string_view& searchStr, uint32_t requestId,
-                                                             uint32_t startIdx )
+void MarketMgr::searchMarketboard( Entity::Player& player, uint8_t itemSearchCategory,  uint8_t maxEquipLevel, uint8_t classJob,
+                                   const std::string_view& searchStr, uint32_t requestId, uint32_t startIdx )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
@@ -139,14 +137,13 @@ void Sapphire::World::Manager::MarketMgr::searchMarketboard( Entity::Player& pla
   pSession->getZoneConnection()->queueOutPacket( resultPkt );
 }
 
-void Sapphire::World::Manager::MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint16_t catalogId )
+void MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint16_t catalogId )
 {
 
 }
 
-void Sapphire::World::Manager::MarketMgr::findItems( const std::string_view& searchStr, uint8_t itemSearchCat,
-                                                     uint8_t maxEquipLevel, uint8_t classJob,
-                                                     Sapphire::World::Manager::MarketMgr::ItemSearchResultList& resultList )
+void MarketMgr::findItems( const std::string_view& searchStr, uint8_t itemSearchCat, uint8_t maxEquipLevel, uint8_t classJob,
+                           MarketMgr::ItemSearchResultList& resultList )
 {
   for( const auto& item : m_marketItemCache )
   {

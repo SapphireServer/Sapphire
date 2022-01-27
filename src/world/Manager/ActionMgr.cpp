@@ -14,10 +14,11 @@
 #include <Network/PacketWrappers/EffectPacket.h>
 
 using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 
-void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                          std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, Common::FFXIVARR_POSITION3 pos,
-                                                          uint16_t sequence )
+void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                          Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData, Common::FFXIVARR_POSITION3 pos,
+                                          uint16_t sequence )
 {
   PlayerMgr::sendDebug( player, "got aoe act: {0}", actionData->getString( actionData->data().Text.Name ) );
 
@@ -38,9 +39,8 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
   bootstrapAction( player, action, actionData );
 }
 
-void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                            std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, uint64_t targetId,
-                                                            uint16_t sequence )
+void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                            Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData, uint64_t targetId, uint16_t sequence )
 {
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
@@ -61,9 +61,9 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
   bootstrapAction( player, action, actionData );
 }
 
-void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
-                                                  std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::ItemAction > > itemActionData,
-                                                  uint16_t itemSourceSlot, uint16_t itemSourceContainer )
+void ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                  Component::Excel::ExcelStructPtr< Component::Excel::ItemAction > itemActionData,
+                                  uint16_t itemSourceSlot, uint16_t itemSourceContainer )
 {
   PlayerMgr::sendDebug( player, "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
 
@@ -74,9 +74,9 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
   action->start();
 }
 
-void World::Manager::ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
-                                                       std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::EventItem > > itemActionData,
-                                                       uint32_t sequence, uint64_t targetId )
+void ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                       Component::Excel::ExcelStructPtr< Component::Excel::EventItem > itemActionData,
+                                       uint32_t sequence, uint64_t targetId )
 {
   auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetId );
   action->init();
@@ -89,9 +89,9 @@ void World::Manager::ActionMgr::handleEventItemAction( Sapphire::Entity::Player&
   action->start();
 }
 
-void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
-                                                   std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData, uint64_t targetId,
-                                                   uint16_t sequence )
+void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
+                                   Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData, uint64_t targetId,
+                                   uint16_t sequence )
 {
   PlayerMgr::sendDebug( player, "setMount: {0}", mountId );
 
@@ -105,9 +105,8 @@ void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint1
   bootstrapAction( player, action, actionData );
 }
 
-void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
-                                                 Action::ActionPtr currentAction,
-                                                 std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::Action > > actionData )
+void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction,
+                                 Component::Excel::ExcelStructPtr< Component::Excel::Action > actionData )
 {
   /*
   //TODO: need to be fixed
@@ -138,7 +137,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
   }
 }
 
-bool World::Manager::ActionMgr::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
+bool ActionMgr::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionInfoPtr = exdData.getRow< Component::Excel::Action >( actionId );

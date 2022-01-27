@@ -17,10 +17,11 @@
 #include "Actor/Player.h"
 
 using namespace Sapphire::Common;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void Sapphire::World::Manager::QuestMgr::onUpdateQuest( Entity::Player& player, uint8_t questIndex )
+void QuestMgr::onUpdateQuest( Entity::Player& player, uint8_t questIndex )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto quests = player.getQuestArrayRef();
@@ -32,7 +33,7 @@ void Sapphire::World::Manager::QuestMgr::onUpdateQuest( Entity::Player& player, 
   sendQuestTracker( player );
 }
 
-void Sapphire::World::Manager::QuestMgr::onCompleteQuest( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
+void QuestMgr::onCompleteQuest( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( player.getId() );
@@ -44,7 +45,7 @@ void Sapphire::World::Manager::QuestMgr::onCompleteQuest( Entity::Player& player
   giveQuestRewards( player, questId, optionalChoice );
 }
 
-void Sapphire::World::Manager::QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )
+void QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto questUpdatePacket = makeZonePacket< FFXIVIpcQuest >( player.getId() );
@@ -56,7 +57,7 @@ void Sapphire::World::Manager::QuestMgr::onRemoveQuest( Entity::Player &player, 
   sendQuestTracker( player );
 }
 
-bool Sapphire::World::Manager::QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
+bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint32_t playerLevel = player.getLevel();
@@ -96,7 +97,7 @@ bool Sapphire::World::Manager::QuestMgr::giveQuestRewards( Entity::Player& playe
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Sapphire::World::Manager::QuestMgr::sendQuestTracker( Entity::Player& player )
+void QuestMgr::sendQuestTracker( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto trackerPacket = makeZonePacket< FFXIVIpcQuestTracker >( player.getId() );
@@ -113,7 +114,7 @@ void Sapphire::World::Manager::QuestMgr::sendQuestTracker( Entity::Player& playe
   server.queueForPlayer( player.getCharacterId(), trackerPacket );
 }
 
-void Sapphire::World::Manager::QuestMgr::sendQuestsInfo( Sapphire::Entity::Player &player )
+void QuestMgr::sendQuestsInfo( Entity::Player &player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto activeQuestListPacket = makeZonePacket< FFXIVIpcQuests >( player.getId() );

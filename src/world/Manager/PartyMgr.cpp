@@ -18,11 +18,12 @@
 
 #include "Network/PacketWrappers/PcPartyUpdatePacket.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void Sapphire::World::Manager::PartyMgr::onJoin( uint32_t joinerId, uint32_t inviterId )
+void PartyMgr::onJoin( uint32_t joinerId, uint32_t inviterId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto& ccMgr = Common::Service< World::Manager::ChatChannelMgr >::ref();
@@ -90,7 +91,7 @@ void Sapphire::World::Manager::PartyMgr::onJoin( uint32_t joinerId, uint32_t inv
   }
 }
 
-void Sapphire::World::Manager::PartyMgr::onLeave( Sapphire::Entity::Player &leavingPlayer )
+void PartyMgr::onLeave( Sapphire::Entity::Player &leavingPlayer )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -117,7 +118,8 @@ void Sapphire::World::Manager::PartyMgr::onLeave( Sapphire::Entity::Player &leav
     {
       if( member->getId() == leavingPlayer.getId() )
       {
-        member->removeOnlineStatus( { OnlineStatus::PartyMember, OnlineStatus::PartyLeader } );
+        member->removeOnlineStatus( { Common::OnlineStatus::PartyMember,
+                                      Common::OnlineStatus::PartyLeader } );
 
         server.queueForPlayer( leavingPlayer.getCharacterId() , makeZonePacket< FFXIVIpcUpdateParty >( leavingPlayer.getId() ) );
         server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leadingPlayer, nullptr,
@@ -131,7 +133,7 @@ void Sapphire::World::Manager::PartyMgr::onLeave( Sapphire::Entity::Player &leav
           auto pSession = server.getSession( newLeaderId );
           if( !pSession )
             continue;
-          pSession->getPlayer()->addOnlineStatus( OnlineStatus::PartyLeader );
+          pSession->getPlayer()->addOnlineStatus( Common::OnlineStatus::PartyLeader );
           server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer.getAsPlayer(), pSession->getPlayer(),
                                                                                  UpdateStatus::LEAVELEADER_LEAVED_MEMBER, party->PartyCount ) );
         }
@@ -150,7 +152,7 @@ void Sapphire::World::Manager::PartyMgr::onLeave( Sapphire::Entity::Player &leav
   }
 }
 
-void Sapphire::World::Manager::PartyMgr::onDisband( Entity::Player& disbandingPlayer )
+void PartyMgr::onDisband( Entity::Player& disbandingPlayer )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto party = getParty( disbandingPlayer.getPartyId() );
@@ -160,7 +162,7 @@ void Sapphire::World::Manager::PartyMgr::onDisband( Entity::Player& disbandingPl
   for( const auto& member : members )
   {
     removeMember( *party, member );
-    member->removeOnlineStatus( { OnlineStatus::PartyMember, OnlineStatus::PartyLeader } );
+    member->removeOnlineStatus( { Common::OnlineStatus::PartyMember, Common::OnlineStatus::PartyLeader } );
     server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( disbandingPlayer, disbandingPlayer, UpdateStatus::DISBAND, party->PartyCount ),
                                                           makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
   }
@@ -168,14 +170,14 @@ void Sapphire::World::Manager::PartyMgr::onDisband( Entity::Player& disbandingPl
   removeParty( party->PartyID );
 }
 
-void Sapphire::World::Manager::PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
+void PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
 {
   auto party = getParty( movingPlayer.getPartyId() );
   assert( party );
   sendPartyUpdate( *party );
 }
 
-void Sapphire::World::Manager::PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
+void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto party = getParty( disconnectingPlayer.getPartyId() );
@@ -209,7 +211,7 @@ void Sapphire::World::Manager::PartyMgr::onMemberDisconnect( Entity::Player& dis
   sendPartyUpdate( *party );
 }
 
-void Sapphire::World::Manager::PartyMgr::onMemberRejoin( Entity::Player& joiningPlayer )
+void PartyMgr::onMemberRejoin( Entity::Player& joiningPlayer )
 {
   auto party = getParty( joiningPlayer.getPartyId() );
   assert( party );
@@ -217,7 +219,7 @@ void Sapphire::World::Manager::PartyMgr::onMemberRejoin( Entity::Player& joining
   // TODO: do we need a party update here? move zone handler already handles it
 }
 
-void Sapphire::World::Manager::PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader )
+void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto party = getParty( leader.getPartyId() );
@@ -242,7 +244,7 @@ void Sapphire::World::Manager::PartyMgr::onKick( const std::string& kickPlayerNa
       if( kickPlayerName == member->getName() )
       {
         removeMember( *party, member );
-        member->removeOnlineStatus( OnlineStatus::PartyMember );
+        member->removeOnlineStatus( Common::OnlineStatus::PartyMember );
 
         server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( *pLeader, *member, UpdateStatus::KICK_SELF, party->PartyCount ),
                                                               makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
@@ -257,7 +259,7 @@ void Sapphire::World::Manager::PartyMgr::onKick( const std::string& kickPlayerNa
   }
 }
 
-void Sapphire::World::Manager::PartyMgr::onChangeLeader( const std::string& newLeaderName, Entity::Player& oldLeader )
+void PartyMgr::onChangeLeader( const std::string& newLeaderName, Entity::Player& oldLeader )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto party = getParty( oldLeader.getPartyId() );
@@ -274,11 +276,11 @@ void Sapphire::World::Manager::PartyMgr::onChangeLeader( const std::string& newL
   {
     if( memberId == pNewLeader->getId() )
     {
-      pNewLeader->addOnlineStatus( OnlineStatus::PartyLeader );
+      pNewLeader->addOnlineStatus( Common::OnlineStatus::PartyLeader );
       // this is not ideal, probably better to have a function which can add
       // and remove at the same time so packets are only triggered once
-      oldLeader.addOnlineStatus( OnlineStatus::PartyMember );
-      oldLeader.removeOnlineStatus( OnlineStatus::PartyLeader );
+      oldLeader.addOnlineStatus( Common::OnlineStatus::PartyMember );
+      oldLeader.removeOnlineStatus( Common::OnlineStatus::PartyLeader );
 
       party->LeaderId = pNewLeader->getId();
       break;
@@ -297,7 +299,7 @@ void Sapphire::World::Manager::PartyMgr::onChangeLeader( const std::string& newL
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-uint64_t Sapphire::World::Manager::PartyMgr::createParty()
+uint64_t PartyMgr::createParty()
 {
   auto& chatChannelMgr = Common::Service< ChatChannelMgr >::ref();
   auto party = std::make_shared< Party >();
@@ -307,12 +309,12 @@ uint64_t Sapphire::World::Manager::PartyMgr::createParty()
   return party->PartyID;
 }
 
-uint64_t Sapphire::World::Manager::PartyMgr::getNextPartyId()
+uint64_t PartyMgr::getNextPartyId()
 {
   return ++m_maxPartyId;
 }
 
-Sapphire::World::Manager::PartyPtr Sapphire::World::Manager::PartyMgr::getParty( uint64_t partyId )
+PartyPtr PartyMgr::getParty( uint64_t partyId )
 {
   auto it = m_partyIdMap.find( partyId );
   if( it != m_partyIdMap.end() )
@@ -321,9 +323,9 @@ Sapphire::World::Manager::PartyPtr Sapphire::World::Manager::PartyMgr::getParty(
   return nullptr;
 }
 
-std::vector< Sapphire::Entity::PlayerPtr > Sapphire::World::Manager::PartyMgr::getPartyMembers( Party& party )
+std::vector< Entity::PlayerPtr > PartyMgr::getPartyMembers( Party& party )
 {
-  std::vector< Sapphire::Entity::PlayerPtr > members;
+  std::vector< Entity::PlayerPtr > members;
 
   auto& server = Common::Service< World::WorldServer >::ref();
   for( auto& memberId : party.MemberId )
@@ -338,7 +340,7 @@ std::vector< Sapphire::Entity::PlayerPtr > Sapphire::World::Manager::PartyMgr::g
   return members;
 }
 
-Sapphire::Entity::PlayerPtr Sapphire::World::Manager::PartyMgr::getPartyLeader( Party& party )
+Entity::PlayerPtr PartyMgr::getPartyLeader( Party& party )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -350,7 +352,7 @@ Sapphire::Entity::PlayerPtr Sapphire::World::Manager::PartyMgr::getPartyLeader( 
   return pLeader;
 }
 
-void Sapphire::World::Manager::PartyMgr::sendPartyUpdate( Party& party )
+void PartyMgr::sendPartyUpdate( Party& party )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto partyMembers = getPartyMembers( party );
@@ -365,8 +367,8 @@ void Sapphire::World::Manager::PartyMgr::sendPartyUpdate( Party& party )
 
     ZoneProtoDownPartyMember memberEntry;
 
-    memberEntry.ParentEntityId = INVALID_GAME_OBJECT_ID;
-    memberEntry.PetEntityId = INVALID_GAME_OBJECT_ID;
+    memberEntry.ParentEntityId = Common::INVALID_GAME_OBJECT_ID;
+    memberEntry.PetEntityId = Common::INVALID_GAME_OBJECT_ID;
     memberEntry.Hp = member->getHp();
     memberEntry.HpMax = member->getMaxHp();
     memberEntry.Mp = member->getMp();
@@ -419,12 +421,12 @@ void Sapphire::World::Manager::PartyMgr::sendPartyUpdate( Party& party )
   }
 }
 
-void Sapphire::World::Manager::PartyMgr::removeParty( uint64_t partyId )
+void PartyMgr::removeParty( uint64_t partyId )
 {
   m_partyIdMap.erase( partyId );
 }
 
-int8_t Sapphire::World::Manager::PartyMgr::getPartyLeaderIndex( const Sapphire::World::Manager::Party &party )
+int8_t PartyMgr::getPartyLeaderIndex( const Party &party )
 {
   size_t idx = 0;
   for( const auto& memberId : party.MemberId )
@@ -436,7 +438,7 @@ int8_t Sapphire::World::Manager::PartyMgr::getPartyLeaderIndex( const Sapphire::
   return -1;
 }
 
-void Sapphire::World::Manager::PartyMgr::removeMember( Sapphire::World::Manager::Party &party, const Entity::PlayerPtr& pMember )
+void PartyMgr::removeMember( Party &party, const Entity::PlayerPtr& pMember )
 {
   auto& ccMgr = Common::Service< World::Manager::ChatChannelMgr >::ref();
   pMember->setPartyId( 0 );

@@ -14,15 +14,16 @@
 
 #include "WorldServer.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets;
 
-bool Sapphire::World::Manager::BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& targetName )
+bool BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& targetName )
 {
   // add target to blacklist
 
-  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   auto pTarget = server.getPlayer( targetName );
   if( !pTarget )
@@ -66,18 +67,18 @@ bool Sapphire::World::Manager::BlacklistMgr::onAddCharacter( Entity::Player& sou
   sendAddResultPacket( source, pTarget, 0 );
 
   // check if player is friends with target
-  auto& flMgr = Common::Service< Sapphire::World::Manager::FriendListMgr >::ref();
+  auto& flMgr = Common::Service< FriendListMgr >::ref();
   if( flMgr.isFriend( source, target ) )
     flMgr.onRemoveFriend( source, target );
 
   return true;
 }
 
-bool Sapphire::World::Manager::BlacklistMgr::onRemoveCharacter( Entity::Player& source, const std::string& targetName )
+bool BlacklistMgr::onRemoveCharacter( Entity::Player& source, const std::string& targetName )
 {
   // remove target from blacklist
 
-  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   auto pTarget = server.getPlayer( targetName );
   if( !pTarget )
@@ -108,12 +109,12 @@ bool Sapphire::World::Manager::BlacklistMgr::onRemoveCharacter( Entity::Player& 
   return true;
 }
 
-bool Sapphire::World::Manager::BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint8_t nextIdx )
+bool BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint8_t nextIdx )
 {
   // this function will handle client side indexing and paginate blacklist entries
   // it'll also be called multiple times sequentially until there are no more entries left (id == 0)
 
-  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   std::vector< Server::BlacklistCharacter > entries;
 
@@ -164,12 +165,12 @@ bool Sapphire::World::Manager::BlacklistMgr::onGetBlacklistPage( Entity::Player&
   return true;
 }
 
-bool Sapphire::World::Manager::BlacklistMgr::isBlacklisted( Entity::Player& source, const Entity::Player& target ) const
+bool BlacklistMgr::isBlacklisted( Entity::Player& source, const Entity::Player& target ) const
 {
   return getEntryIndex( source, target.getCharacterId() ) != -1;
 }
 
-ptrdiff_t Sapphire::World::Manager::BlacklistMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
+ptrdiff_t BlacklistMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
 {
   auto& sourceBL = source.getBlacklistID();
   auto sourceBlIt = std::find( std::begin( sourceBL ), std::end( sourceBL ), characterId );
@@ -181,9 +182,9 @@ ptrdiff_t Sapphire::World::Manager::BlacklistMgr::getEntryIndex( Entity::Player&
   return sourceBlIt - std::begin( sourceBL );
 }
 
-void Sapphire::World::Manager::BlacklistMgr::sendAddResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result )
+void BlacklistMgr::sendAddResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result )
 {
-  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   auto resultPacket = makeZonePacket< Server::FFXIVIpcBlacklistAddResult >( source.getId() );
 
@@ -202,9 +203,9 @@ void Sapphire::World::Manager::BlacklistMgr::sendAddResultPacket( Entity::Player
   server.queueForPlayer( source.getCharacterId(), resultPacket );
 }
 
-void Sapphire::World::Manager::BlacklistMgr::sendRemoveResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result )
+void BlacklistMgr::sendRemoveResultPacket( Entity::Player& source, const Entity::PlayerPtr pTarget, uint32_t result )
 {
-  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   auto resultPacket = makeZonePacket< Server::FFXIVIpcBlacklistRemoveResult >( source.getId() );
 

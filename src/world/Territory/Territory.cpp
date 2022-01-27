@@ -98,7 +98,6 @@ void Sapphire::Territory::loadWeatherRates()
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  // EXD TODO: this must be different in 2.3
   uint8_t weatherRateId = m_territoryTypeInfo->data().WeatherRate > exdData.getIdList< Component::Excel::WeatherRate >().size() ?
                           uint8_t{ 0 } : m_territoryTypeInfo->data().WeatherRate;
 
@@ -331,11 +330,7 @@ void Sapphire::Territory::queuePacketForRange( Entity::Player& sourcePlayer, flo
 
     if( ( distance < range ) && sourcePlayer.getId() != player->getId() )
     {
-
-      auto pSession = server.getSession( player->getId() );
-      //pPacketEntry->setValAt< uint32_t >( 0x08, player->getId() );
-      if( pSession )
-        pSession->getZoneConnection()->queueOutPacket( pPacketEntry );
+      server.queueForPlayer( player->getCharacterId(), pPacketEntry );
     }
   }
 }
@@ -850,6 +845,16 @@ Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByInstanceId( uint32
   for( const auto& bnpcIt : m_bNpcMap )
   {
     if( bnpcIt.second->getLayoutId() == instanceId )
+      return bnpcIt.second;
+  }
+  return nullptr;
+}
+
+Sapphire::Entity::BNpcPtr Sapphire::Territory::getActiveBNpcByInstanceIdAndTriggerOwner( uint32_t instanceId, uint32_t triggerOwnerId )
+{
+  for( const auto& bnpcIt : m_bNpcMap )
+  {
+    if( bnpcIt.second->getLayoutId() == instanceId && bnpcIt.second->getTriggerOwnerId() == triggerOwnerId )
       return bnpcIt.second;
   }
   return nullptr;

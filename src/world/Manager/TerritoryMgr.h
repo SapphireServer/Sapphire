@@ -118,7 +118,7 @@ namespace Sapphire::World::Manager
     TerritoryPtr getTerritoryByGuId( uint32_t guId ) const;
 
     /*! returns the cached detail of a territory, nullptr if not found */
-    std::shared_ptr< Component::Excel::ExcelStruct< Component::Excel::TerritoryType > > getTerritoryDetail( uint32_t territoryTypeId ) const;
+    Component::Excel::ExcelStructPtr< Component::Excel::TerritoryType > getTerritoryDetail( uint32_t territoryTypeId ) const;
 
     /*! loop for processing territory logic, iterating all existing instances */
     void updateTerritoryInstances( uint64_t tickCount );

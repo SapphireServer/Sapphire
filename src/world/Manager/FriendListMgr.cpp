@@ -8,7 +8,10 @@
 #include "Actor/Player.h"
 #include "FriendListMgr.h"
 
-bool Sapphire::World::Manager::FriendListMgr::onInviteCreate( Entity::Player& source, Entity::Player& target )
+using namespace Sapphire;
+using namespace Sapphire::World::Manager;
+
+bool FriendListMgr::onInviteCreate( Entity::Player& source, Entity::Player& target )
 {
   auto& sourceFL = source.getFriendListID();
   auto& targetFL = target.getFriendListID();
@@ -58,7 +61,7 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteCreate( Entity::Player& so
   return true;
 }
  
-bool Sapphire::World::Manager::FriendListMgr::onInviteAccept( Entity::Player& source, Entity::Player& target )
+bool FriendListMgr::onInviteAccept( Entity::Player& source, Entity::Player& target )
 {
   // accept friend invite
   auto sourceIdx = getEntryIndex( source, target.getCharacterId() );
@@ -84,7 +87,7 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteAccept( Entity::Player& so
   return true;
 }
 
-bool Sapphire::World::Manager::FriendListMgr::onInviteDecline( Entity::Player& source, Entity::Player& target )
+bool FriendListMgr::onInviteDecline( Entity::Player& source, Entity::Player& target )
 {
   // decline friend invite
   auto sourceIdx = getEntryIndex( source, target.getCharacterId() );
@@ -113,7 +116,7 @@ bool Sapphire::World::Manager::FriendListMgr::onInviteDecline( Entity::Player& s
   return true;
 }
 
-bool Sapphire::World::Manager::FriendListMgr::onRemoveFriend( Entity::Player& source, Entity::Player& target )
+bool FriendListMgr::onRemoveFriend( Entity::Player& source, Entity::Player& target )
 {
   // remove friend
   // this not retail accurate - retail only removes source friendlist, but that also makes it more complicated for readding friend
@@ -122,7 +125,7 @@ bool Sapphire::World::Manager::FriendListMgr::onRemoveFriend( Entity::Player& so
   return onInviteDecline( source, target );
 }
 
-bool Sapphire::World::Manager::FriendListMgr::onAssignGroup( Entity::Player& source, Entity::Player& target, uint8_t group )
+bool FriendListMgr::onAssignGroup( Entity::Player& source, Entity::Player& target, uint8_t group )
 {
   // assign group to friend entry (to source only)
   auto sourceIdx = getEntryIndex( source, target.getCharacterId() );
@@ -142,12 +145,12 @@ bool Sapphire::World::Manager::FriendListMgr::onAssignGroup( Entity::Player& sou
   return true;
 }
 
-bool Sapphire::World::Manager::FriendListMgr::isFriend( Entity::Player& source, Entity::Player& target ) const
+bool FriendListMgr::isFriend( Entity::Player& source, Entity::Player& target ) const
 {
   return getEntryIndex( source, target.getCharacterId() ) != -1;
 }
 
-ptrdiff_t Sapphire::World::Manager::FriendListMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
+ptrdiff_t FriendListMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
 {
   auto& sourceFL = source.getFriendListID();
   auto sourceInvIt = std::find( std::begin( sourceFL ), std::end( sourceFL ), characterId );

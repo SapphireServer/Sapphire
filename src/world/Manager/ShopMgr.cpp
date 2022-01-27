@@ -7,8 +7,9 @@
 #include <Service.h>
 
 using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 
-void Sapphire::World::Manager::ShopMgr::cacheShop( uint32_t shopId )
+void ShopMgr::cacheShop( uint32_t shopId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto itemShopList = exdData.getIdList< Component::Excel::Shop >();
@@ -37,7 +38,7 @@ void Sapphire::World::Manager::ShopMgr::cacheShop( uint32_t shopId )
   }
 }
 
-uint32_t Sapphire::World::Manager::ShopMgr::getShopItemPrices( uint32_t shopId, uint8_t index )
+uint32_t ShopMgr::getShopItemPrices( uint32_t shopId, uint8_t index )
 {
   if( index > 40 )
     return 0;
@@ -56,7 +57,7 @@ uint32_t Sapphire::World::Manager::ShopMgr::getShopItemPrices( uint32_t shopId, 
   return 0;
 }
 
-bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
+bool ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -77,7 +78,7 @@ bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& pla
   return true;
 }
 
-bool Sapphire::World::Manager::ShopMgr::sellGilShopItem( Sapphire::Entity::Player& player, uint16_t container, uint8_t fromSlot, uint16_t itemId, uint32_t quantity )
+bool ShopMgr::sellGilShopItem( Entity::Player& player, uint16_t container, uint8_t fromSlot, uint16_t itemId, uint32_t quantity )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -93,7 +94,7 @@ bool Sapphire::World::Manager::ShopMgr::sellGilShopItem( Sapphire::Entity::Playe
   if( quantity > 1 )
     return false;
 
-  player.discardItem( ( Sapphire::Common::InventoryType )container, fromSlot );
+  player.discardItem( ( Common::InventoryType )container, fromSlot );
   player.addSoldItem( itemId, quantity );
 
   player.addCurrency( Common::CurrencyType::Gil, payback );

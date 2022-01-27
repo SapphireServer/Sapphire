@@ -50,7 +50,7 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
 // instanciate and initialize commands
-Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
+DebugCommandMgr::DebugCommandMgr()
 {
   // Push all commands onto the register map ( command name - function - description - required GM level )
   registerCommand( "set", &DebugCommandMgr::set, "Executes SET commands.", 1 );
@@ -72,21 +72,20 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
 }
 
 // clear all loaded commands
-Sapphire::World::Manager::DebugCommandMgr::~DebugCommandMgr()
+DebugCommandMgr::~DebugCommandMgr()
 {
   for( auto it = m_commandMap.begin(); it != m_commandMap.end(); ++it )
     ( *it ).second.reset();
 }
 
 // add a command set to the register map
-void Sapphire::World::Manager::DebugCommandMgr::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr,
-                                                                 const std::string& hText, uint8_t uLevel )
+void DebugCommandMgr::registerCommand( const std::string& n, DebugCommand::pFunc functionPtr, const std::string& hText, uint8_t uLevel )
 {
   m_commandMap[ std::string( n ) ] = std::make_shared< DebugCommand >( n, functionPtr, hText, uLevel );
 }
 
 // try to retrieve the command in question, execute if found
-void Sapphire::World::Manager::DebugCommandMgr::execCommand( char* data, Entity::Player& player )
+void DebugCommandMgr::execCommand( char* data, Entity::Player& player )
 {
 
   // define callback pointer
@@ -133,8 +132,7 @@ void Sapphire::World::Manager::DebugCommandMgr::execCommand( char* data, Entity:
 // Definition of the commands
 ///////////////////////////////////////////////////////////////////////////////////////
 
-void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player& player,
-                                                      std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   PlayerMgr::sendDebug( player, "Registered debug commands:" );
   for( auto cmd : m_commandMap )
@@ -146,8 +144,7 @@ void Sapphire::World::Manager::DebugCommandMgr::help( char* data, Entity::Player
   }
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player& player,
-                                                     std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
@@ -383,8 +380,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
 
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player& player,
-                                                     std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
@@ -562,7 +558,7 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
 
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   std::string subCommand;
@@ -601,8 +597,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
 }
 
-void
-Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::injectPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -611,8 +606,7 @@ Sapphire::World::Manager::DebugCommandMgr::injectPacket( char* data, Entity::Pla
     pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player,
-                                                                  std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -621,8 +615,7 @@ void Sapphire::World::Manager::DebugCommandMgr::injectChatPacket( char* data, En
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Player& player,
-                                                        std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -674,8 +667,7 @@ void Sapphire::World::Manager::DebugCommandMgr::replay( char* data, Entity::Play
 
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Player& player,
-                                                       std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
@@ -724,9 +716,7 @@ void Sapphire::World::Manager::DebugCommandMgr::nudge( char* data, Entity::Playe
   }
 }
 
-void
-Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Player& player,
-                                                       std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::serverInfo( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -735,8 +725,7 @@ Sapphire::World::Manager::DebugCommandMgr::serverInfo( char* data, Entity::Playe
   PlayerMgr::sendDebug( player, "Sessions: {0}", server.getSessionCount() );
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Player& player,
-                                                        std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   std::string subCommand;
@@ -821,8 +810,7 @@ void Sapphire::World::Manager::DebugCommandMgr::script( char* data, Entity::Play
   }
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Player& player,
-                                                          std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -1090,8 +1078,7 @@ void Sapphire::World::Manager::DebugCommandMgr::instance( char* data, Entity::Pl
   }
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity::Player& player,
-                                                             std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -1286,8 +1273,7 @@ void Sapphire::World::Manager::DebugCommandMgr::questBattle( char* data, Entity:
   }
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Player& player,
-                                                         std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::housing( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   std::string cmd( data ), params, subCommand;
@@ -1342,8 +1328,7 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
   }
 }
 
-void Sapphire::World::Manager::DebugCommandMgr::linkshell( char* data, Entity::Player& player,
-                                                           std::shared_ptr< DebugCommand > command )
+void DebugCommandMgr::linkshell( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   std::string cmd( data ), params, subCommand;

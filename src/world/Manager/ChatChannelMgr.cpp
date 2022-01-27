@@ -16,7 +16,7 @@ using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::World::Manager;
 
-const uint64_t World::Manager::ChatChannelMgr::createChatChannel( Common::ChatChannelType type )
+const uint64_t ChatChannelMgr::createChatChannel( Common::ChatChannelType type )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -49,7 +49,7 @@ const uint64_t World::Manager::ChatChannelMgr::createChatChannel( Common::ChatCh
   return cId.ChannelID;
 }
 
-void World::Manager::ChatChannelMgr::addToChannel( uint64_t channelId, Entity::Player& player )
+void ChatChannelMgr::addToChannel( uint64_t channelId, Entity::Player& player )
 {
   if( !isChannelValid( channelId ) )
   {
@@ -71,7 +71,7 @@ void World::Manager::ChatChannelMgr::addToChannel( uint64_t channelId, Entity::P
     m_channels[ channelId ].emplace_back( player.getAsPlayer() );
 }
 
-void World::Manager::ChatChannelMgr::removeFromChannel( uint64_t channelId, Entity::Player& player )
+void ChatChannelMgr::removeFromChannel( uint64_t channelId, Entity::Player& player )
 {
   if( !isChannelValid( channelId ) )
   {
@@ -94,8 +94,7 @@ void World::Manager::ChatChannelMgr::removeFromChannel( uint64_t channelId, Enti
     channelMembers.erase( it );
 }
 
-void World::Manager::ChatChannelMgr::sendMessageToChannel( uint64_t channelId,
-                                                           Entity::Player& sender, const std::string& message )
+void ChatChannelMgr::sendMessageToChannel( uint64_t channelId, Entity::Player& sender, const std::string& message )
 {
   if( !isChannelValid( channelId ) )
   {
@@ -145,12 +144,12 @@ void World::Manager::ChatChannelMgr::sendMessageToChannel( uint64_t channelId,
   }
 }
 
-bool World::Manager::ChatChannelMgr::isChannelValid( uint64_t channelId ) const
+bool ChatChannelMgr::isChannelValid( uint64_t channelId ) const
 {
   return !( m_channels.find( channelId ) == m_channels.end() );
 }
 
-const Data::ChatChannelMembers& World::Manager::ChatChannelMgr::getChatChannel( uint64_t channelId )
+const Data::ChatChannelMembers& ChatChannelMgr::getChatChannel( uint64_t channelId )
 {
   bool channelValid = isChannelValid( channelId );
   assert( channelValid );

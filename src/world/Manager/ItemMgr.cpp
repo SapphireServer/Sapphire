@@ -9,7 +9,10 @@
 #include <Database/DatabaseDef.h>
 #include <Service.h>
 
-bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
+using namespace Sapphire;
+using namespace Sapphire::World::Manager;
+
+bool ItemMgr::isArmory( uint16_t containerId )
 {
   return
     containerId == Common::ArmoryBody ||
@@ -27,7 +30,7 @@ bool Sapphire::World::Manager::ItemMgr::isArmory( uint16_t containerId )
 }
 
 
-uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
+uint16_t ItemMgr::getCharaEquipSlotCategoryToArmoryId( uint8_t slotId )
 {
 
   switch( slotId )
@@ -85,12 +88,12 @@ uint16_t Sapphire::World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId(
 }
 
 
-bool Sapphire::World::Manager::ItemMgr::isEquipment( uint16_t containerId )
+bool ItemMgr::isEquipment( uint16_t containerId )
 {
   return containerId == Common::GearSet0;
 }
 
-bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategory weaponCategory )
+bool ItemMgr::isOneHandedWeapon( Common::ItemUICategory weaponCategory )
 {
   switch( weaponCategory )
   {
@@ -114,7 +117,7 @@ bool Sapphire::World::Manager::ItemMgr::isOneHandedWeapon( Common::ItemUICategor
   }
 }
 
-Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
+ItemPtr ItemMgr::loadItem( uint64_t uId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
@@ -151,7 +154,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
 }
 
 
-Sapphire::Common::ContainerType Sapphire::World::Manager::ItemMgr::getContainerType( uint32_t containerId )
+Common::ContainerType ItemMgr::getContainerType( uint32_t containerId )
 {
   if( containerId < 5 )
   {
@@ -175,7 +178,7 @@ Sapphire::Common::ContainerType Sapphire::World::Manager::ItemMgr::getContainerT
   }
 }
 
-uint32_t Sapphire::World::Manager::ItemMgr::getNextUId()
+uint32_t ItemMgr::getNextUId()
 {
   uint32_t charId = 0;
 

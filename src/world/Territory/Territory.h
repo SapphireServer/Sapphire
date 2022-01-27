@@ -177,6 +177,8 @@ namespace Sapphire
 
     Entity::BNpcPtr getActiveBNpcByInstanceId( uint32_t instanceId );
 
+    Entity::BNpcPtr getActiveBNpcByInstanceIdAndTriggerOwner( uint32_t instanceId, uint32_t triggerOwnerId );
+
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
     InstanceContentPtr getAsInstanceContent();

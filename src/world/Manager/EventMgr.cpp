@@ -32,12 +32,12 @@
 #include "WorldServer.h"
 #include "Actor/Player.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
+std::string EventMgr::getEventName( uint32_t eventId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint16_t eventType = eventId >> 16;
@@ -133,83 +133,83 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
   }
 }
 
-std::string Sapphire::World::Manager::EventMgr::getErrorCodeName( uint8_t errorCode )
+std::string EventMgr::getErrorCodeName( uint8_t errorCode )
 {
   switch ( errorCode )
   {
-    case EventSceneError::EVENT_SCENE_SUCCESS:
+    case Common::EventSceneError::EVENT_SCENE_SUCCESS:
     {
       return "SUCCESS";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_LUA_ERRRUN:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_LUA_ERRRUN:
     {
       return "LUA_ERRRUN";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_LUA_ERRSYNTAX:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_LUA_ERRSYNTAX:
     {
       return "LUA_ERRSYNTAX";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_LUA_ERRMEM:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_LUA_ERRMEM:
     {
       return "LUA_ERRMEM";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_LUA_ERRERR:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_LUA_ERRERR:
     {
       return "LUA_ERRERR";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_USER_CANCEL:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_USER_CANCEL:
     {
       return "USER_CANCEL";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_SERVER_ABORT:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_SERVER_ABORT:
     {
       return "SERVER_ABORT";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_RELOAD:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_RELOAD:
     {
       return "RELOAD";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_LUA_THREAD_BUSY:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_LUA_THREAD_BUSY:
     {
       return "LUA_THREAD_BUSY";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_TARGET_CHANGED:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_TARGET_CHANGED:
     {
       return "TARGET_CHANGED";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_CLIENT_ABORT:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_CLIENT_ABORT:
     {
       return "CLIENT_ABORT";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_TARGET_LOST:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_TARGET_LOST:
     {
       return "TARGET_LOST";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_BEFORE_PLAY:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_BEFORE_PLAY:
     {
       return "BEFORE_PLAY";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_BIND_CHARACTER:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_BIND_CHARACTER:
     {
       return "BIND_CHARACTER";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_TARGET_MOVE:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_TARGET_MOVE:
     {
       return "TARGET_MOVE";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_SCRIPT_NOT_READY:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_SCRIPT_NOT_READY:
     {
       return "SCRIPT_NOT_READY";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_TARGET_WARP:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_TARGET_WARP:
     {
       return "TARGET_WARP";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_BIND_OBJECT:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_BIND_OBJECT:
     {
       return "BIND_OBJECT";
     }
-    case EventSceneError::EVENT_SCENE_ERROR_MAX:
+    case Common::EventSceneError::EVENT_SCENE_ERROR_MAX:
     {
       return "MAX";
     }
@@ -220,7 +220,7 @@ std::string Sapphire::World::Manager::EventMgr::getErrorCodeName( uint8_t errorC
   }
 }
 
-uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
+uint32_t EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -235,8 +235,8 @@ uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t 
   return 0;
 }
 
-void Sapphire::World::Manager::EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t errorCode,
-                                                                 uint8_t numOfResults, const std::vector< uint32_t >& results )
+void EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t errorCode,
+                                       uint8_t numOfResults, const std::vector< uint32_t >& results )
 {
   std::string eventName = getEventName( eventId );
 
@@ -456,13 +456,13 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
     }
   }
 
-  if( player.hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
-    player.unsetStateFlag( PlayerStateFlag::WatchingCutscene );
+  if( player.hasStateFlag( Common::PlayerStateFlag::WatchingCutscene ) )
+    player.unsetStateFlag( Common::PlayerStateFlag::WatchingCutscene );
 
   player.removeEvent( pEvent->getId() );
 
   if( freePlayer == 1 )
-    player.unsetStateFlag( PlayerStateFlag::InNpcEvent );
+    player.unsetStateFlag( Common::PlayerStateFlag::InNpcEvent );
 }
 
 void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventType, uint8_t eventParam1,
@@ -473,9 +473,10 @@ void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t ev
   newEvent->setEventFinishCallback( std::move( callback ) );
   player.addEvent( newEvent );
 
-  player.setStateFlag( PlayerStateFlag::InNpcEvent );
+  player.setStateFlag( Common::PlayerStateFlag::InNpcEvent );
 
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< EventStartPacket >( player.getId(), actorId, eventId, eventType, eventParam1, eventParam2 ) );
+  server.queueForPlayer( player.getCharacterId(), std::make_shared< EventStartPacket >( player.getId(), actorId,
+                                                                                        eventId, eventType, eventParam1, eventParam2 ) );
 
 }
 
@@ -746,7 +747,7 @@ Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& 
   }
 
   if( flags & CONDITION_CUTSCENE )
-    player.setStateFlag( PlayerStateFlag::WatchingCutscene );
+    player.setStateFlag( Common::PlayerStateFlag::WatchingCutscene );
 
   return pEvent;
 }

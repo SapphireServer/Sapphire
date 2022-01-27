@@ -579,9 +579,9 @@ void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
     if( getTriggerOwnerId() == pChara->getId() )
     {
       auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-      scriptMgr.onTriggerOwnerDeaggro( *pChara->getAsPlayer(), *getAsBNpc() );
+      auto bnpc = *getAsBNpc();
+      scriptMgr.onTriggerOwnerDeaggro( *tmpPlayer, bnpc );
     }
-
   }
 }
 

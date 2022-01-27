@@ -29,6 +29,8 @@ namespace Component::Excel
     };
   };
 
+  template< class T >
+  using ExcelStructPtr = std::shared_ptr< Component::Excel::ExcelStruct< T > >;
 
   /////////////////////////////////////////////////////////
 

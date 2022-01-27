@@ -31,13 +31,14 @@
 #include <Actor/Player.h>
 #include "Territory/InstanceObjectCache.h"
 
+using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
-using namespace Sapphire::Common;
 
-void PlayerMgr::onOnlineStatusChanged( Sapphire::Entity::Player& player, bool updateProfile )
+
+void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfile )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -57,7 +58,7 @@ void PlayerMgr::onOnlineStatusChanged( Sapphire::Entity::Player& player, bool up
   player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
-void PlayerMgr::onEquipDisplayFlagsChanged( Sapphire::Entity::Player& player )
+void PlayerMgr::onEquipDisplayFlagsChanged( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   PlayerMgr::sendDebug( player, "EquipDisplayFlag CHANGE: {0}", player.getEquipDisplayFlags() );
@@ -66,7 +67,7 @@ void PlayerMgr::onEquipDisplayFlagsChanged( Sapphire::Entity::Player& player )
   player.sendToInRangeSet( paramPacket, true );
 }
 
-void PlayerMgr::onSendStateFlags( Sapphire::Entity::Player& player, bool updateInRange )
+void PlayerMgr::onSendStateFlags( Entity::Player& player, bool updateInRange )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), std::make_shared< PlayerStateFlagsPacket >( player ) );
@@ -76,7 +77,7 @@ void PlayerMgr::onSendStateFlags( Sapphire::Entity::Player& player, bool updateI
                                         static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
-void PlayerMgr::onSendStats( Sapphire::Entity::Player& player )
+void PlayerMgr::onSendStats( Entity::Player& player )
 {
   std::array< uint32_t, 50 > statParams;
 
@@ -109,7 +110,7 @@ void PlayerMgr::onSendStats( Sapphire::Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), statPacket );
 }
 
-void PlayerMgr::onPlayerStatusUpdate( Sapphire::Entity::Player& player )
+void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -122,22 +123,22 @@ void PlayerMgr::onPlayerStatusUpdate( Sapphire::Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), playerStatusUpdate );
 }
 
-void PlayerMgr::onPlayerHpMpTpChanged( Sapphire::Entity::Player& player )
+void PlayerMgr::onPlayerHpMpTpChanged( Entity::Player& player )
 {
   player.sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( player ), true );
 }
 
-void PlayerMgr::onPlayerItemLevelUpdate( Sapphire::Entity::Player& player )
+void PlayerMgr::onPlayerItemLevelUpdate( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), SetItemLevel, player.getItemLevel(), 0 ) );
 }
 
-void PlayerMgr::onLevelUp( Sapphire::Entity::Player& player )
+void PlayerMgr::onLevelUp( Entity::Player& player )
 {
   player.calculateStats();
   player.sendStats();
-  Service< World::Manager::PlayerMgr >::ref().onPlayerHpMpTpChanged( player );
+  onPlayerHpMpTpChanged( player );
 
   player.sendToInRangeSet( makeHudParam( player ), true );
 
@@ -145,7 +146,7 @@ void PlayerMgr::onLevelUp( Sapphire::Entity::Player& player )
                            player.getLevel(), player.getLevel() - 1 ), true );
 }
 
-void PlayerMgr::onGainExp( Sapphire::Entity::Player& player, uint32_t exp )
+void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -155,18 +156,18 @@ void PlayerMgr::onGainExp( Sapphire::Entity::Player& player, uint32_t exp )
   server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp, static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
 }
 
-void PlayerMgr::onUnlockOrchestrion( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId )
+void PlayerMgr::onUnlockOrchestrion( Entity::Player& player, uint8_t songId, uint32_t itemId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
-void PlayerMgr::onChangeGear( Sapphire::Entity::Player& player )
+void PlayerMgr::onChangeGear( Entity::Player& player )
 {
   player.sendToInRangeSet( std::make_shared< ModelEquipPacket >( player ), true );
 }
 
-void PlayerMgr::onGcUpdate( Sapphire::Entity::Player& player )
+void PlayerMgr::onGcUpdate( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto gcAffPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
@@ -177,7 +178,7 @@ void PlayerMgr::onGcUpdate( Sapphire::Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), gcAffPacket );
 }
 
-void PlayerMgr::onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId )
+void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
 {
   if( mountId != 0 )
   {
@@ -197,7 +198,7 @@ void PlayerMgr::onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountI
   }
 }
 
-void PlayerMgr::onMobKill( Sapphire::Entity::Player& player, uint16_t nameId, uint32_t layoutId )
+void PlayerMgr::onMobKill( Entity::Player& player, uint16_t nameId, uint32_t layoutId )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcKill( player, nameId, layoutId );
@@ -208,7 +209,7 @@ void PlayerMgr::onMobKill( Sapphire::Entity::Player& player, uint16_t nameId, ui
   }
 }
 
-void PlayerMgr::onHateListChanged( Sapphire::Entity::Player& player )
+void PlayerMgr::onHateListChanged( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -234,13 +235,13 @@ void PlayerMgr::onHateListChanged( Sapphire::Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
 }
 
-void PlayerMgr::onChangeClass( Sapphire::Entity::Player &player )
+void PlayerMgr::onChangeClass( Entity::Player &player )
 {
   player.sendToInRangeSet( makeActorControl( player.getId(), ClassJobChange, 0x04 ), true );
   player.sendStatusUpdate();
 }
 
-void PlayerMgr::onLogin( Sapphire::Entity::Player &player )
+void PlayerMgr::onLogin( Entity::Player &player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -261,26 +262,26 @@ void PlayerMgr::onLogin( Sapphire::Entity::Player &player )
 
 
 
-void PlayerMgr::sendServerNotice( Sapphire::Entity::Player& player, const std::string& message ) //Purple Text
+void PlayerMgr::sendServerNotice( Entity::Player& player, const std::string& message ) //Purple Text
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
 
 }
 
-void PlayerMgr::sendUrgent( Sapphire::Entity::Player& player, const std::string& message ) //Red Text
+void PlayerMgr::sendUrgent( Entity::Player& player, const std::string& message ) //Red Text
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, ChatType::ServerUrgent, message ) );
+  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::ServerUrgent, message ) );
 }
 
-void PlayerMgr::sendDebug( Sapphire::Entity::Player& player, const std::string& message ) //Grey Text
+void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) //Grey Text
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, ChatType::SystemMessage, message ) );
+  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::SystemMessage, message ) );
 }
 
-void PlayerMgr::sendLogMessage( Sapphire::Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
+void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
   auto& server = Common::Service< World::WorldServer >::ref();

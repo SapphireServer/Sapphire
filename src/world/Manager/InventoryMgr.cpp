@@ -16,13 +16,13 @@
 #include "Session.h"
 #include "Network/GameConnection.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::Entity::Player& player,
-                                                                     Sapphire::ItemContainerPtr container )
+void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainerPtr container )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
@@ -74,11 +74,10 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
   server.queueForPlayer( player.getCharacterId(), itemSizePacket );
 }
 
-Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Player& player,
-                                                                      uint32_t catalogId, uint32_t quantity )
+ItemPtr InventoryMgr::createItem( Entity::Player& player, uint32_t catalogId, uint32_t quantity )
 {
   auto& pExdData = Common::Service< Data::ExdData >::ref();
-  auto& itemMgr = Common::Service< Manager::ItemMgr >::ref();
+  auto& itemMgr = Common::Service< ItemMgr >::ref();
   auto itemInfo = pExdData.getRow< Component::Excel::Item >( catalogId );
 
   if( !itemInfo )
@@ -93,8 +92,7 @@ Sapphire::ItemPtr Sapphire::World::Manager::InventoryMgr::createItem( Entity::Pl
   return item;
 }
 
-void Sapphire::World::Manager::InventoryMgr::saveHousingContainer( Common::LandIdent ident,
-                                                                   Sapphire::ItemContainerPtr container )
+void InventoryMgr::saveHousingContainer( Common::LandIdent ident, ItemContainerPtr container )
 {
   auto u64ident = *reinterpret_cast< uint64_t* >( &ident );
 
@@ -104,9 +102,7 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainer( Common::LandI
   }
 }
 
-void Sapphire::World::Manager::InventoryMgr::removeItemFromHousingContainer( Sapphire::Common::LandIdent ident,
-                                                                             uint16_t containerId,
-                                                                             uint16_t slotId )
+void InventoryMgr::removeItemFromHousingContainer( Common::LandIdent ident, uint16_t containerId, uint16_t slotId )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -121,9 +117,7 @@ void Sapphire::World::Manager::InventoryMgr::removeItemFromHousingContainer( Sap
   db.directExecute( stmt );
 }
 
-void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t ident,
-                                                                       uint16_t containerId, uint16_t slotId,
-                                                                       uint64_t itemId )
+void InventoryMgr::saveHousingContainerItem( uint64_t ident, uint16_t containerId, uint16_t slotId, uint64_t itemId )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -142,7 +136,7 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainerItem( uint64_t 
   db.directExecute( stmt );
 }
 
-void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire::Inventory::HousingItemPtr item )
+void InventoryMgr::updateHousingItemPosition( Inventory::HousingItemPtr item )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -167,7 +161,7 @@ void Sapphire::World::Manager::InventoryMgr::updateHousingItemPosition( Sapphire
   db.execute( stmt );
 }
 
-void Sapphire::World::Manager::InventoryMgr::removeHousingItemPosition( Sapphire::Inventory::HousingItem& item )
+void InventoryMgr::removeHousingItemPosition( Inventory::HousingItem& item )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -178,7 +172,7 @@ void Sapphire::World::Manager::InventoryMgr::removeHousingItemPosition( Sapphire
   db.directExecute( stmt );
 }
 
-void Sapphire::World::Manager::InventoryMgr::saveItem( Sapphire::Entity::Player& player, Sapphire::ItemPtr item )
+void InventoryMgr::saveItem( Entity::Player& player, ItemPtr item )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_INS );

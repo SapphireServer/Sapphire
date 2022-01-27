@@ -27,12 +27,12 @@
 
 #include "Session.h"
 
-using namespace Sapphire::Common;
+using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-bool Sapphire::World::Manager::LinkshellMgr::loadLinkshells()
+bool LinkshellMgr::loadLinkshells()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
@@ -133,7 +133,7 @@ void LinkshellMgr::writeLinkshell( uint64_t lsId )
 
 }
 
-Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellByName( const std::string& name )
+LinkshellPtr LinkshellMgr::getLinkshellByName( const std::string& name )
 {
   auto it = m_linkshellNameMap.find( name );
   if( it == m_linkshellNameMap.end() )
@@ -142,7 +142,7 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellByNam
     return it->second;
 }
 
-Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellById( uint64_t lsId )
+LinkshellPtr LinkshellMgr::getLinkshellById( uint64_t lsId )
 {
   auto it = m_linkshellIdMap.find( lsId );
   if( it == m_linkshellIdMap.end() )
@@ -151,7 +151,7 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::getLinkshellById(
     return it->second;
 }
 
-Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( const std::string& name, Entity::Player& player )
+LinkshellPtr LinkshellMgr::createLinkshell( const std::string& name, Entity::Player& player )
 {
   uint64_t linkshellId = 1;
 
@@ -218,7 +218,7 @@ Sapphire::LinkshellPtr Sapphire::World::Manager::LinkshellMgr::createLinkshell( 
   return lsPtr;
 }
 
-void Sapphire::World::Manager::LinkshellMgr::finishLinkshellAction( const std::string& name, uint32_t result, Entity::Player& player, uint8_t action )
+void LinkshellMgr::finishLinkshellAction( const std::string& name, uint32_t result, Entity::Player& player, uint8_t action )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -227,9 +227,9 @@ void Sapphire::World::Manager::LinkshellMgr::finishLinkshellAction( const std::s
 
 }
 
-const std::vector< Sapphire::LinkshellPtr > Sapphire::World::Manager::LinkshellMgr::getPlayerLinkshells( Entity::Player& player ) const
+const std::vector< LinkshellPtr > LinkshellMgr::getPlayerLinkshells( Entity::Player& player ) const
 {
-  std::vector< Sapphire::LinkshellPtr > lsVec;
+  std::vector< LinkshellPtr > lsVec;
 
   for( const auto &[ key, value ] : m_linkshellIdMap )
   {
@@ -324,13 +324,13 @@ void LinkshellMgr::sendLinkshellList( Entity::Player& player )
     uint32_t hierarchy = 0;
 
     if( pLs->getMasterId() == player.getCharacterId() )
-      hierarchy = Ls::LinkshellHierarchy::Master << 8;
+      hierarchy = Common::Ls::LinkshellHierarchy::Master << 8;
     else if( pLs->getLeaderIdList().count( player.getCharacterId() ) )
-      hierarchy = Ls::LinkshellHierarchy::Leader << 8;
+      hierarchy = Common::Ls::LinkshellHierarchy::Leader << 8;
     else if( pLs->getInviteIdList().count( player.getCharacterId() ) )
-      hierarchy = Ls::LinkshellHierarchy::Invite << 8;
+      hierarchy = Common::Ls::LinkshellHierarchy::Invite << 8;
     else
-      hierarchy = Ls::LinkshellHierarchy::Member << 8;
+      hierarchy = Common::Ls::LinkshellHierarchy::Member << 8;
 
     hierarchy |= chatFlag;
 
@@ -377,7 +377,7 @@ void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
   sendLinkshellList( *joiningPlayer );
 }
 
-void LinkshellMgr::addLeader( Sapphire::Entity::Player &sourcePlayer, Sapphire::Entity::Player &newLeaderPlayer, uint64_t linkshellId )
+void LinkshellMgr::addLeader( Entity::Player &sourcePlayer, Entity::Player &newLeaderPlayer, uint64_t linkshellId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -405,7 +405,7 @@ void LinkshellMgr::addLeader( Sapphire::Entity::Player &sourcePlayer, Sapphire::
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
 }
 
-void LinkshellMgr::declineLeader( Sapphire::Entity::Player &sourcePlayer, uint64_t linkshellId )
+void LinkshellMgr::declineLeader( Entity::Player &sourcePlayer, uint64_t linkshellId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -427,7 +427,7 @@ void LinkshellMgr::declineLeader( Sapphire::Entity::Player &sourcePlayer, uint64
 
 }
 
-void LinkshellMgr::removeLeader( Sapphire::Entity::Player &sourcePlayer, Sapphire::Entity::Player &leaderPlayer, uint64_t linkshellId )
+void LinkshellMgr::removeLeader( Entity::Player &sourcePlayer, Entity::Player &leaderPlayer, uint64_t linkshellId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -455,7 +455,7 @@ void LinkshellMgr::removeLeader( Sapphire::Entity::Player &sourcePlayer, Sapphir
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
 }
 
-void LinkshellMgr::changeMaster( Sapphire::Entity::Player &sourcePlayer, Sapphire::Entity::Player &nextMasterPlayer, uint64_t linkshellId )
+void LinkshellMgr::changeMaster( Entity::Player &sourcePlayer, Entity::Player &nextMasterPlayer, uint64_t linkshellId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -484,7 +484,7 @@ void LinkshellMgr::changeMaster( Sapphire::Entity::Player &sourcePlayer, Sapphir
   server.queueForPlayer( sourcePlayer.getCharacterId(), linkshellResult1 );
 }
 
-bool LinkshellMgr::renameLinkshell( uint64_t linkshellId, const std::string &name, Sapphire::Entity::Player &player )
+bool LinkshellMgr::renameLinkshell( uint64_t linkshellId, const std::string &name, Entity::Player &player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
