@@ -150,6 +150,17 @@ public:
   };
 };
 
+struct LGB_EVENT_RANGE_ENTRY : public LgbEntry
+{
+public:
+  EventRangeData data;
+
+  LGB_EVENT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
+  {
+    data = *reinterpret_cast< EventRangeData* >( buf + offset );
+  };
+};
+
 struct LGB_GROUP_HEADER
 {
   uint32_t id;
