@@ -47,6 +47,7 @@
 #include "Manager/PartyMgr.h"
 #include "Manager/FriendListMgr.h"
 #include "Manager/BlacklistMgr.h"
+#include "Manager/WarpMgr.h"
 
 #include "ContentFinder/ContentFinder.h"
 
@@ -247,6 +248,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   auto pBlacklistMgr = std::make_shared< Manager::BlacklistMgr >();
   auto contentFinder = std::make_shared< ContentFinder >();
   auto taskMgr = std::make_shared< Manager::TaskMgr >();
+  auto warpMgr = std::make_shared< Manager::WarpMgr >();
 
   Common::Service< DebugCommandMgr >::set( pDebugCom );
   Common::Service< Manager::PlayerMgr >::set( pPlayerMgr );
@@ -260,6 +262,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::BlacklistMgr >::set( pBlacklistMgr );
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
+  Common::Service< Manager::WarpMgr >::set( warpMgr );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 

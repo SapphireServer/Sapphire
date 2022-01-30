@@ -15,7 +15,7 @@
 #include "Territory/QuestBattle.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
-
+#include "WarpMgr.h"
 #include "Linkshell/Linkshell.h"
 
 #include "Territory/Land.h"
@@ -658,8 +658,8 @@ void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint16_t qu
   if( !qb )
     return;
 
-  //player.setInstance( qb->getGuId(), { 0, 0, 0 } );
-
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+  warpMgr.requestMoveTerritory( player, Common::WARP_TYPE_INSTANCE_CONTENT, qb->getGuId(), { 0, 0, 0 }, 0 );
 }
 
 bool TerritoryMgr::joinWorld( Entity::Player& player )

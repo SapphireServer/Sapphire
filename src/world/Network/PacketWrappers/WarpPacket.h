@@ -6,6 +6,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Common.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
@@ -16,14 +17,14 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   class WarpPacket : public ZoneChannelPacket< FFXIVIpcWarp >
   {
   public:
-    WarpPacket( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation ) :
-      ZoneChannelPacket< FFXIVIpcWarp >( player.getId(), player.getId() )
+    WarpPacket( uint32_t playerId, Common::WarpType warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation ) :
+      ZoneChannelPacket< FFXIVIpcWarp >( playerId, playerId )
     {
-      initialize( player, warpType, targetPos, rotation );
+      initialize( warpType, targetPos, rotation );
     };
 
   private:
-    void initialize( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation )
+    void initialize( Common::WarpType warpType, Common::FFXIVARR_POSITION3& targetPos, float rotation )
     {
       m_data.Dir = Sapphire::Common::Util::floatToUInt16Rot( rotation );
       m_data.Type = warpType;

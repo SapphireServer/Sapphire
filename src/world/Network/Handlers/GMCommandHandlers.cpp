@@ -14,6 +14,7 @@
 
 #include "Manager/TerritoryMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/WarpMgr.h"
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 
@@ -471,6 +472,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     case GmCommand::Teri:
     {
       auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+      auto& warpMgr = Common::Service< WarpMgr >::ref();
       if( auto instance = teriMgr.getTerritoryByGuId( param1 ) )
       {
         PlayerMgr::sendDebug( player, "Found instance: {0}, id#{1}", instance->getName(), param1 );
@@ -485,8 +487,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
           PlayerMgr::sendUrgent( player, "Player not bound! ( run !instance bind <instanceId> first ) {0}", param1 );
           break;
         }
-
-        player.setInstance( param1, { 0, 0, 0 } );
+        warpMgr.requestMoveTerritory( player, WarpType::WARP_TYPE_INSTANCE_CONTENT, param1, { 0.f, 0.f, 0.f }, 0.f );
       }
       else if( !teriMgr.isValidTerritory( param1 ) )
       {

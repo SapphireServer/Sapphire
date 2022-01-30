@@ -19,6 +19,7 @@
 #include "Manager/RNGMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/PartyMgr.h"
+#include "Manager/WarpMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -86,7 +87,6 @@ Sapphire::Entity::Player::Player() :
   m_id = 0;
   m_currentStance = Stance::Passive;
   m_onlineStatus = 0;
-  m_queuedZoneing = nullptr;
   m_status = ActorStatus::Idle;
   m_invincibilityType = InvincibilityType::InvincibilityNone;
   m_radius = 1.f;
@@ -402,7 +402,8 @@ void Sapphire::Entity::Player::sendStats()
 void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
 
   auto aetherData = exdData.getRow< Excel::Aetheryte >( aetheryteId );
 
@@ -410,8 +411,6 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
     return;
 
   const auto& data = aetherData->data();
-
-  setStateFlag( PlayerStateFlag::BetweenAreas );
 
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto pop = instanceObjectCache.getPopRange( data.TerritoryType, data.PopRange[ 0 ] );
@@ -441,35 +440,41 @@ void Sapphire::Entity::Player::teleport( uint16_t aetheryteId, uint8_t type )
                            aetherytePlace->getString( aetherytePlace->data().Text.SGL ),
                            data.TerritoryType );
 
+  // if it is a teleport in the same zone, we want to do warp instead of moveTerri
+  bool sameTerritory = getTerritoryTypeId() == data.TerritoryType;
+
+  WarpType warpType;
   // TODO: this should be simplified and a type created in server_common/common.h.
-  if( type == 1 ) // teleport
+  if( type == 1 || type == 2 ) // teleport
   {
-    //prepareZoning( data.TerritoryType, true, 1, 0 ); // TODO: Really?
-    sendToInRangeSet( makeActorControl( getId(), WarpStart, Common::WarpType::WARP_TYPE_TELEPO ), true );
-    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
-    setZoningType( Common::ZoneingType::Teleport );
-  }
-  else if( type == 2 ) // aethernet
-  {
-    //prepareZoning( data.TerritoryType, true, 1, 112 );
-    sendToInRangeSet( makeActorControl( getId(), WarpStart, Common::WarpType::WARP_TYPE_TELEPO ), true );
-    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x04 ) );
+    warpType = WarpType::WARP_TYPE_TELEPO;
     setZoningType( Common::ZoneingType::Teleport );
   }
   else if( type == 3 ) // return
   {
-    //prepareZoning( data.TerritoryType, true, 1, 111 );
-    sendToInRangeSet( makeActorControl( getId(), WarpStart, Common::WarpType::WARP_TYPE_HOME_POINT ), true );
-    sendToInRangeSet( makeActorControl( getId(), ActorDespawnEffect, 0x03 ) );
+    warpType = WarpType::WARP_TYPE_HOME_POINT;
     setZoningType( Common::ZoneingType::Return );
   }
 
-  m_queuedZoneing = std::make_shared< QueuedZoning >( data.TerritoryType, 0, pos, Util::getTimeMs(), rot );
+  if( sameTerritory )
+    warpMgr.requestWarp( *this, warpType, pos, rot );
+  else
+  {
+    auto pTeri = teriMgr.getZoneByTerritoryTypeId( data.TerritoryType );
+    if( !pTeri )
+      return;
+    warpMgr.requestMoveTerritory( *this, warpType, pTeri->getGuId(), pos, rot );
+  }
 }
 
 void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
 {
-  m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, 0, getPos(), Util::getTimeMs(), 0.f );
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+  auto pTeri = teriMgr.getZoneByTerritoryTypeId( zoneId );
+  if( !pTeri )
+    return;
+  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_NORMAL, pTeri->getGuId(), getPos(), getRot() );
 }
 
 void Sapphire::Entity::Player::performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation )
@@ -478,7 +483,7 @@ void Sapphire::Entity::Player::performZoning( uint16_t territoryTypeId, uint32_t
   setRot( rotation );
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  m_onEnterEventDone = false;
+  setOnEnterEventDone( false );
 
   TerritoryPtr pZone;
   if( territoryId != 0 )
@@ -499,35 +504,10 @@ void Sapphire::Entity::Player::performZoning( uint16_t territoryTypeId, uint32_t
   }
 }
 
-bool Sapphire::Entity::Player::setInstance( uint32_t territoryId, Common::FFXIVARR_POSITION3 pos )
-{
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto instance = teriMgr.getTerritoryByGuId( territoryId );
-
-  m_onEnterEventDone = false;
-  if( !instance )
-    return false;
-
-  // zoning within the same zone won't cause the prev data to be overwritten
-  if( instance->getTerritoryTypeId() != m_territoryTypeId )
-  {
-    auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-    m_prevTerritoryTypeId = pZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
-    m_prevPos = m_pos;
-    m_prevRot = m_rot;
-  }
-
-  m_queuedZoneing = std::make_shared< QueuedZoning >( instance->getTerritoryTypeId(), territoryId, m_pos, Util::getTimeMs(), m_rot );
-
-  m_pos = pos;
-  return true;
-}
-
 bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
 
   resetHp();
   resetMp();
@@ -537,7 +517,7 @@ bool Sapphire::Entity::Player::exitInstance()
   m_territoryTypeId = m_prevTerritoryTypeId;
   m_territoryId = m_prevTerritoryId;
 
-  m_queuedZoneing = std::make_shared< QueuedZoning >( m_territoryTypeId, getTerritoryId(), m_pos, Util::getTimeMs(), m_rot );
+  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, m_prevTerritoryId, m_prevPos, m_prevRot );
 
   return true;
 }
@@ -691,8 +671,9 @@ void Sapphire::Entity::Player::resetDiscovery()
 
 void Sapphire::Entity::Player::changePosition( float x, float y, float z, float o )
 {
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
   Common::FFXIVARR_POSITION3 pos{ x, y, z };
-  m_queuedZoneing = std::make_shared< QueuedZoning >( getTerritoryTypeId(), 0, pos, Util::getTimeMs(), o );
+  warpMgr.requestWarp( *this, Common::WARP_TYPE_NORMAL, pos, getRot() );
 }
 
 void Sapphire::Entity::Player::setSystemActionUnlocked( Common::UnlockEntry unlockId )
@@ -1046,24 +1027,6 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
 
 void Sapphire::Entity::Player::update( uint64_t tickCount )
 {
-  // a zoning is pending, lets do it
-  if( m_queuedZoneing && ( tickCount - m_queuedZoneing->m_queueTime ) > 800 )
-  {
-    Common::FFXIVARR_POSITION3 targetPos = m_queuedZoneing->m_targetPosition;
-    if( getTerritoryTypeId() != m_queuedZoneing->m_targetTerritoryTypeId )
-    {
-      Logger::debug( "{}_{}", m_queuedZoneing->m_targetTerritoryTypeId, m_queuedZoneing->m_targetTerritoryId );
-      performZoning( m_queuedZoneing->m_targetTerritoryTypeId, m_queuedZoneing->m_targetTerritoryId, targetPos, m_queuedZoneing->m_targetRotation );
-    }
-    else
-    {
-      setPos( targetPos );
-      sendToInRangeSet( makeWarp( *this, WARP_TYPE_TELEPO, targetPos, m_queuedZoneing->m_targetRotation ), true );
-    }
-    m_queuedZoneing.reset();
-    return;
-  }
-
   if( m_hp <= 0 && m_status != ActorStatus::Dead )
     die();
 
@@ -2197,4 +2160,17 @@ bool Sapphire::Entity::Player::isConnected() const
 void Sapphire::Entity::Player::setConnected( bool isConnected )
 {
   m_bIsConnected = isConnected;
+}
+
+void Sapphire::Entity::Player::updatePrevTerritory()
+{
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+
+  if( teriMgr.isDefaultTerritory( getTerritoryTypeId() ) )
+  {
+    m_prevTerritoryTypeId = getTerritoryTypeId();
+    m_prevTerritoryId = getTerritoryId();
+    m_prevPos = m_pos;
+    m_prevRot = m_rot;
+  }
 }

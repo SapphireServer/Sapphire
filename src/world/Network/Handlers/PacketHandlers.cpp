@@ -50,6 +50,7 @@
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/WarpMgr.h"
 
 #include "Action/Action.h"
 
@@ -337,27 +338,17 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
                         pPopRange->header.transform.rotation.z,
                         rotation );
 
-      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), WarpStart,
-                                                                            Common::WarpType::WARP_TYPE_EXIT_RANGE, player.getId(), 0x01, targetZone ) );
-
-      auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
-      moveTerritoryPacket->data().index = -1;
-      moveTerritoryPacket->data().territoryType = targetZone;
-      moveTerritoryPacket->data().zoneId = player.getTerritoryTypeId();
-      moveTerritoryPacket->data().worldId = server.getWorldId();
-      moveTerritoryPacket->data().worldId1 = server.getWorldId();
-      moveTerritoryPacket->data().landId = -1;
-      moveTerritoryPacket->data().landSetId = -1;
-      moveTerritoryPacket->data().landTerritoryId = -1;
-      strcpy( moveTerritoryPacket->data().worldName, "Sapphire" );
-      server.queueForPlayer( player.getCharacterId(), moveTerritoryPacket );
-
     }
   }
 
   PlayerMgr::sendDebug( player, "Walking ZoneLine#{0}", exitBoxId );
+  auto pTargetTeri = teriMgr.getZoneByTerritoryTypeId( targetZone );
+  if( !pTargetTeri )
+    return;
 
-  player.performZoning( targetZone, 0, targetPos, rotation );
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+  warpMgr.requestMoveTerritory( player, Common::WARP_TYPE_EXIT_RANGE, pTargetTeri->getGuId(), targetPos, rotation );
+
 }
 
 

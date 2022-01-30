@@ -18,25 +18,6 @@
 namespace Sapphire::Entity
 {
 
-  struct QueuedZoning
-  {
-    uint16_t m_targetTerritoryTypeId;
-    uint32_t m_targetTerritoryId;
-    Common::FFXIVARR_POSITION3 m_targetPosition;
-    float m_targetRotation;
-    uint64_t m_queueTime;
-
-    QueuedZoning( uint16_t targetZone, uint32_t targetTerritoryId, const Common::FFXIVARR_POSITION3& targetPosition,
-                  uint64_t queuedTime, float targetRotation ) :
-            m_targetTerritoryTypeId( targetZone ),
-            m_targetTerritoryId( targetTerritoryId ),
-            m_targetPosition( targetPosition ),
-            m_queueTime( queuedTime ),
-            m_targetRotation( targetRotation )
-    {
-    }
-  };
-
   /** Class representing the Player
   *  Inheriting from Actor
   *
@@ -189,13 +170,13 @@ namespace Sapphire::Entity
     /*! return the current amount of crystals of type */
     uint32_t getCrystal( uint8_t type ) const;
 
-    void updateModels( Common::GearSetSlot equipSlotId, const Sapphire::Item& item );
+    void updateModels( Common::GearSetSlot equipSlotId, const Item& item );
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
 
     bool getFreeInventoryContainerSlot( Inventory::InventoryContainerPair& containerPair ) const;
 
-    void insertInventoryItem( Common::InventoryType type, uint16_t slot, const Sapphire::ItemPtr item );
+    void insertInventoryItem( Common::InventoryType type, uint16_t slot, const ItemPtr item );
 
     /*!
     * Collect real item handins from container
@@ -304,14 +285,13 @@ namespace Sapphire::Entity
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
 
-    /*! sets the players instance & initiates zoning process */
-    bool setInstance( uint32_t territoryId, Sapphire::Common::FFXIVARR_POSITION3 pos );
-
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
 
     /*! gets the players territoryTypeId */
     uint32_t getPrevTerritoryTypeId() const;
+
+    void updatePrevTerritory();
 
     void forceZoneing( uint32_t zoneId );
 
@@ -625,7 +605,7 @@ namespace Sapphire::Entity
 
     const std::map< uint32_t, uint8_t >& getActorIdToHateSlotMap();
 
-    Sapphire::Entity::GameObjectPtr lookupTargetById( uint64_t targetId );
+    Entity::GameObjectPtr lookupTargetById( uint64_t targetId );
 
     bool isLogin() const;
 
@@ -730,7 +710,7 @@ namespace Sapphire::Entity
 
     InvSlotPair getFreeBagSlot();
 
-    Sapphire::ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
+    ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
 
     void moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
 
@@ -781,7 +761,7 @@ namespace Sapphire::Entity
     void setActiveLand( uint8_t land, uint8_t ward );
     Common::ActiveLand getActiveLand() const;
 
-    Sapphire::ItemPtr dropInventoryItem( Common::InventoryType storageId, uint8_t slotId );
+    ItemPtr dropInventoryItem( Common::InventoryType storageId, uint8_t slotId );
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -823,7 +803,7 @@ namespace Sapphire::Entity
     /*! queue a packet for the player */
     void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
 
-    using InventoryMap = std::map< uint16_t, Sapphire::ItemContainerPtr >;
+    using InventoryMap = std::map< uint16_t, ItemContainerPtr >;
 
     uint64_t m_lastDBWrite;
 
@@ -928,7 +908,6 @@ namespace Sapphire::Entity
     bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;
     uint64_t m_onlineStatusCustom;
-    std::shared_ptr< QueuedZoning > m_queuedZoneing;
 
     // search info
     char m_searchMessage[193]{}; // searchmessage to show in profile
