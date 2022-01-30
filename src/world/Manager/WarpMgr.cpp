@@ -61,6 +61,37 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
 
 void WarpMgr::finishWarp( Entity::Player& player )
 {
+  WarpType warpType = WarpType::WARP_TYPE_NORMAL;
+  auto it = m_entityIdToWarpInfoMap.find( player.getId() );
+  if( it != m_entityIdToWarpInfoMap.end() )
+    warpType = it->second.m_warpType;
+
+  switch( warpType )
+  {
+    case WarpType::WARP_TYPE_REISE:
+    case WarpType::WARP_TYPE_HOME_POINT:
+    {
+      if( player.getStatus() == Common::ActorStatus::Dead )
+      {
+        player.resetHp();
+        player.resetMp();
+        player.setStatus( Common::ActorStatus::Idle );
+      }
+    }
+  }
+
+  auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, 0, 0, 0 );
+  auto SetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+
+  if( !player.getGmInvis() )
+    player.sendToInRangeSet( zoneInPacket );
+
+  player.sendToInRangeSet( SetStatusPacket, true );
+
+  auto& server = Common::Service< WorldServer >::ref();
+  server.queueForPlayer( player.getCharacterId(), zoneInPacket );
+
+  player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
 
 }
 

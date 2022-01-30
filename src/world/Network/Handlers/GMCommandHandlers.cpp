@@ -648,8 +648,6 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
       targetPlayer->resetHp();
       targetPlayer->resetMp();
       targetPlayer->setStatus( Common::ActorStatus::Idle );
-      targetPlayer->sendZoneInPackets( 0x01, true );
-
 
       targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), Appear, 0x01, 0x01, 0, 113 ), true );
       targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,

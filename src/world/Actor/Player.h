@@ -562,10 +562,6 @@ namespace Sapphire::Entity
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
 
-    void sendZoneInPackets( uint32_t param1, bool pSetStatus );
-
-    void finishZoning();
-
     void sendZonePackets();
 
     Common::ZoneingType getZoningType() const;

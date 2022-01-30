@@ -9,6 +9,7 @@
 
 #include "Territory/Territory.h"
 #include "Manager/HousingMgr.h"
+#include "Manager/WarpMgr.h"
 
 #include "Network/GameConnection.h"
 
@@ -587,7 +588,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::FINISH_LOADING: // Finish zoning
     {
-      player.finishZoning();
+      auto& warpMgr = Service< WarpMgr >::ref();
+      warpMgr.finishWarp( player );
       player.setLoadingComplete( true );
       if( player.isLogin() )
         player.setIsLogin( false );

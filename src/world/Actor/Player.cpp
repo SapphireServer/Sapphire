@@ -1581,55 +1581,6 @@ void Sapphire::Entity::Player::sendTitleList()
   queuePacket( titleListPacket );
 }
 
-void Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, bool shouldSetStatus = false )
-{
-  auto zoneInPacket = makeActorControlSelf( getId(), Appear, param1, 0, 0, 0 );
-  auto SetStatusPacket = makeActorControl( getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-
-  if( !getGmInvis() )
-    sendToInRangeSet( zoneInPacket );
-
-  if( shouldSetStatus )
-    sendToInRangeSet( SetStatusPacket, true );
-
-  queuePacket( zoneInPacket );
-
-  setZoningType( Common::ZoneingType::None );
-  unsetStateFlag( PlayerStateFlag::BetweenAreas );
-}
-
-void Sapphire::Entity::Player::finishZoning()
-{
-  switch( getZoningType() )
-  {
-    case ZoneingType::None:
-      sendZoneInPackets( 0x01 );
-      break;
-
-    case ZoneingType::Teleport:
-      sendZoneInPackets( 0x01 );
-      break;
-
-    case ZoneingType::Return:
-    case ZoneingType::ReturnDead:
-    {
-      if( getStatus() == Common::ActorStatus::Dead )
-      {
-        resetHp();
-        resetMp();
-        setStatus( Common::ActorStatus::Idle );
-        sendZoneInPackets( 0x01, true );
-      }
-      else
-        sendZoneInPackets( 0x01 );
-    }
-      break;
-
-    case ZoneingType::FadeIn:
-      break;
-  }
-}
-
 void Sapphire::Entity::Player::teleportQuery( uint16_t aetheryteId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
