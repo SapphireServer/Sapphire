@@ -101,7 +101,7 @@ void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Co
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& server = Common::Service< WorldServer >::ref();
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, player.getTerritoryTypeId(), 1 ), true );
+  player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, 0, player.getTerritoryTypeId(), 1 ), true );
   player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );
 
   auto& taskMgr = Common::Service< TaskMgr >::ref();

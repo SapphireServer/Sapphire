@@ -134,7 +134,7 @@ struct EObjData : public InstanceObject
 {
   uint32_t eobjId;
   uint32_t levelHierachyId;
-  uint8_t unknown1[0xC];
+  uint8_t unknown1[136];
 };
 
 enum TriggerBoxShape : int32_t

@@ -1413,10 +1413,10 @@ namespace Excel
     uint16_t SharedGroup;
     uint8_t PopType;
     uint8_t Invisibility;
-    uint8_t padding1 : 5;
-    uint8_t EyeCollision : 1;
-    uint8_t DirectorControl : 1;
     uint8_t Target : 1;
+    uint8_t DirectorControl : 1;
+    uint8_t EyeCollision : 1;
+    uint8_t padding1 : 5;
     int8_t padding2[3];
   };
 
