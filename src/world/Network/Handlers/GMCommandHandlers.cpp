@@ -195,7 +195,12 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     case GmCommand::Call:
     {
       if( targetPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-        targetPlayer->performZoning( player.getTerritoryTypeId(), player.getTerritoryId(), { player.getPos().x, player.getPos().y, player.getPos().z }, player.getRot() );
+      {
+        auto& warpMgr = Common::Service< WarpMgr >::ref();
+        warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM,
+                                      player.getTerritoryId(), { player.getPos().x, player.getPos().y, player.getPos().z },
+                                      player.getRot() );
+      }
       else
         targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
@@ -533,8 +538,9 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         }
         else
         {
-          targetPlayer->setPos( targetPlayer->getPos() );
-          targetPlayer->performZoning( static_cast< uint16_t >( param1 ), targetPlayer->getTerritoryId(), targetPlayer->getPos(), 0 );
+          auto& warpMgr = Common::Service< WarpMgr >::ref();
+          warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM,
+                                        targetPlayer->getTerritoryId(), targetPlayer->getPos(), 0 );
         }
 
         PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );

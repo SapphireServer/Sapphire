@@ -562,9 +562,6 @@ namespace Sapphire::Entity
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
 
-    /*! mark this player for zoning, notify worldserver */
-    void performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation );
-
     void sendZoneInPackets( uint32_t param1, bool pSetStatus );
 
     void finishZoning();

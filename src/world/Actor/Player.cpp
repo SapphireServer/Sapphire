@@ -477,33 +477,6 @@ void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
   warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_NORMAL, pTeri->getGuId(), getPos(), getRot() );
 }
 
-void Sapphire::Entity::Player::performZoning( uint16_t territoryTypeId, uint32_t territoryId, const Common::FFXIVARR_POSITION3& pos, float rotation )
-{
-  m_pos = pos;
-  setRot( rotation );
-
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  setOnEnterEventDone( false );
-
-  TerritoryPtr pZone;
-  if( territoryId != 0 )
-    pZone = teriMgr.getTerritoryByGuId( territoryId );
-  else
-    pZone = teriMgr.getZoneByTerritoryTypeId( territoryTypeId );
-
-  if( !teriMgr.movePlayer( pZone, *this ) )
-  {
-    // todo: this will require proper handling, for now just return the player to their previous area
-    m_pos = m_prevPos;
-    m_rot = m_prevRot;
-    m_territoryTypeId = m_prevTerritoryTypeId;
-
-    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( m_territoryTypeId );
-    if( !teriMgr.movePlayer( pZone1, *this ) )
-      return;
-  }
-}
-
 bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
