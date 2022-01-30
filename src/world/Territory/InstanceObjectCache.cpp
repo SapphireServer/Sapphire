@@ -83,6 +83,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       {
         for( const auto& pEntry : group.entries )
         {
+
           if( pEntry->getType() == LgbEntryType::MapRange )
           {
             auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
@@ -112,6 +113,11 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
             m_enpcCache.insert( 0, pENpc );
           }
+          else if( pEntry->getType() == LgbEntryType::EventRange )
+          {
+            auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
+            m_eventRangeCache.insert( 0, pEventRange );
+          }
         }
       }
     }
@@ -119,8 +125,8 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
   std::cout << "\n";
 
   Logger::debug(
-    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {}",
-    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size()
+    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventNpc: {} EventRange: {}",
+    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_enpcCache.size(), m_eventRangeCache.size()
   );
 }
 
@@ -153,4 +159,9 @@ Sapphire::InstanceObjectCache::ENpcPtr
   Sapphire::InstanceObjectCache::getENpc( uint32_t eNpcId )
 {
   return m_enpcCache.get( 0, eNpcId );
+}
+
+Sapphire::InstanceObjectCache::EventRangePtr Sapphire::InstanceObjectCache::getEventRange( uint32_t eventRangeId )
+{
+  return m_eventRangeCache.get( 0, eventRangeId );
 }

@@ -6,12 +6,15 @@
 #include <Exd/ExdData.h>
 #include <Network/CommonActorControl.h>
 #include <Service.h>
-
+#include <datReader/DatCategories/bg/pcb.h>
+#include <datReader/DatCategories/bg/lgb.h>
+#include <datReader/DatCategories/bg/sgb.h>
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
 #include "Script/ScriptMgr.h"
 #include "WorldServer.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
 #include "Manager/EventMgr.h"
 
 #include "Actor/Player.h"
@@ -23,6 +26,8 @@
 #include "Event/EventHandler.h"
 
 #include "InstanceContent.h"
+#include "InstanceObjectCache.h"
+
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -453,10 +458,21 @@ void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& 
   // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
   if( !hasPlayerPreviouslySpawned( player ) )
   {
+    auto& exdData = Common::Service< Data::ExdData >::ref();
+    auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+    auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_instanceContentId );
+
+    auto rect = instanceObjectCache.getEventRange( contentInfo->data().EntranceRect );
+
     if( m_pEntranceEObj != nullptr )
     {
       player.setRot( PI );
       player.setPos( m_pEntranceEObj->getPos() );
+    }
+    else if( rect )
+    {
+      player.setRot( PI );
+      player.setPos( { rect->header.transform.translation.x, rect->header.transform.translation.y, rect->header.transform.translation.z } );
     }
     else
     {
