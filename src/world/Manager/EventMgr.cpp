@@ -228,7 +228,7 @@ uint32_t EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
   if( levelInfo )
     return levelInfo->data().BaseId;
   else if( auto pObj = instanceObjectCache.getEObj( eventActorId ) )
-    return pObj->data.eobjId;
+    return pObj->data.BaseId;
   else if( auto pNpc = instanceObjectCache.getENpc( eventActorId ) )
     return pNpc->data.enpcId;
 
@@ -274,7 +274,6 @@ void EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId,
         World::Quest preQ;
         if( player.hasQuest( eventId ) )
         {
-
           auto questIdx = player.getQuestIndex( questId );
           auto& quest = player.getQuestByIndex( questIdx );
           preQ = quest;
@@ -290,7 +289,6 @@ void EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId,
           if( newQuest != preQ )
             player.updateQuest( newQuest );
         }
-
       }
       else if( auto chainCallback = pEvent->getQuestSceneChainCallback() )
       {

@@ -29,7 +29,7 @@ bool ConfigMgr::loadConfig( const std::string& configName )
     return false;
   }
 
-  m_pInih = std::unique_ptr< INIReader >( new INIReader( configFile.string() ) );
+  m_pInih = std::make_unique< INIReader >( configFile.string() );
 
   if( m_pInih->ParseError() < 0 )
     return false;

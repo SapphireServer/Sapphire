@@ -281,17 +281,17 @@ int main( int argc, char* argv[] )
               uint32_t eobjlevelHierachyId = 0;
 
               auto pEobj = reinterpret_cast< LGB_EOBJ_ENTRY* >( pObj );
-              id = pEobj->data.eobjId;
+              id = pEobj->data.BaseId;
               unknown = pEobj->header.instanceId;
 
-              eobjlevelHierachyId = pEobj->data.levelHierachyId;
+              eobjlevelHierachyId = pEobj->data.BoundInstanceID;
 
               std::string states = "";
               std::string gimmickName = "";
               for( const auto& pEntry1 : group.entries )
               {
                 auto pGObj = pEntry1.get();
-                if( pGObj->getType() == LgbEntryType::Gimmick && pGObj->header.instanceId == pEobj->data.levelHierachyId )
+                if( pGObj->getType() == LgbEntryType::Gimmick && pGObj->header.instanceId == pEobj->data.BoundInstanceID )
                 {
                   auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
                   char* dataSection = nullptr;

@@ -99,9 +99,11 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
             m_popRangeCache.insert( id, pPopRange );
           }
-          else if( pEntry->getType() == LgbEntryType::SharedGroup6 )
+          else if( pEntry->getType() == LgbEntryType::CollisionBox )
           {
+            //auto pEObj = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
 
+            //Logger::debug( "CollisionBox {}", pEntry->header.nameOffset );
           }
           else if( pEntry->getType() == LgbEntryType::EventObject )
           {
