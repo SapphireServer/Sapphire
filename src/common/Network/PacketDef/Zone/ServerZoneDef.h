@@ -1400,6 +1400,49 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
   template< int ArgCount >
+  struct FFXIVIpcBattleTalkN
+  {
+    uint32_t handlerId;
+    uint64_t talkerId;
+    uint8_t kind;
+    uint8_t __padding1;
+    uint8_t __padding2;
+    uint8_t __padding3;
+    uint32_t nameId;
+    uint32_t battleTalkId;
+    uint32_t time;
+    uint8_t numOfArgs;
+    uint8_t __padding4;
+    uint8_t __padding5;
+    uint8_t __padding6;
+    uint32_t args[ArgCount];
+  };
+
+  struct FFXIVIpcBattleTalkHeader :
+    FFXIVIpcBasePacket< BattleTalkHeader >,
+    FFXIVIpcBattleTalkN< 1 >
+  {
+  };
+
+  struct FFXIVIpcBattleTalk2 :
+    FFXIVIpcBasePacket< BattleTalk2 >,
+    FFXIVIpcBattleTalkN< 2 >
+  {
+  };
+
+  struct FFXIVIpcBattleTalk4 :
+    FFXIVIpcBasePacket< BattleTalk4 >,
+    FFXIVIpcBattleTalkN< 4 >
+  {
+  };
+
+  struct FFXIVIpcBattleTalk8 :
+    FFXIVIpcBasePacket< BattleTalk8 >,
+    FFXIVIpcBattleTalkN< 8 >
+  {
+  };
+
+  template< int ArgCount >
   struct FFXIVIpcPlayEventSceneN
   {
     uint64_t actorId;
@@ -1822,6 +1865,8 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint8_t flags;
     uint8_t vars[10];
   };
+
+
 
   struct FFXIVIpcHouseList : FFXIVIpcBasePacket< HouseList >
   {
