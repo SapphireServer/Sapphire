@@ -198,8 +198,10 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
   auto pHousingMgr = std::make_shared< Manager::HousingMgr >();
+  auto warpMgr = std::make_shared< Manager::WarpMgr >();
   Common::Service< Manager::HousingMgr >::set( pHousingMgr );
   Common::Service< Manager::TerritoryMgr >::set( pTeriMgr );
+  Common::Service< Manager::WarpMgr >::set( warpMgr );
 
   auto pScript = std::make_shared< Scripting::ScriptMgr >();
   if( !pScript->init() )
@@ -248,7 +250,6 @@ void WorldServer::run( int32_t argc, char* argv[] )
   auto pBlacklistMgr = std::make_shared< Manager::BlacklistMgr >();
   auto contentFinder = std::make_shared< ContentFinder >();
   auto taskMgr = std::make_shared< Manager::TaskMgr >();
-  auto warpMgr = std::make_shared< Manager::WarpMgr >();
 
   Common::Service< DebugCommandMgr >::set( pDebugCom );
   Common::Service< Manager::PlayerMgr >::set( pPlayerMgr );
@@ -262,7 +263,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::BlacklistMgr >::set( pBlacklistMgr );
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
-  Common::Service< Manager::WarpMgr >::set( warpMgr );
+
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
