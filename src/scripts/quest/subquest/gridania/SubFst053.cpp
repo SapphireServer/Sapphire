@@ -60,6 +60,7 @@ public:
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
+  {
     switch( actorId )
     {
       case Actor0:
