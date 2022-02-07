@@ -19,6 +19,7 @@ namespace Sapphire::World::Manager
 
 #include <filesystem>
 #include <Manager/TerritoryMgr.h>
+#include <Manager/WarpMgr.h>
 
 namespace fs = std::filesystem;
 
@@ -116,9 +117,11 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using win32initFunc = void(*)( std::shared_ptr< Sapphire::Data::ExdData > );
   using win32initFuncTeri = void(*)( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > );
   using win32initFuncLinkshell = void(*)( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > );
+  using win32initFuncWarpMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::WarpMgr > );
   auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
   auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
   auto win32initLinkshell = reinterpret_cast< win32initFuncLinkshell >( GetProcAddress( handle, "win32initLinkshell" ) );
+  auto win32initWarp = reinterpret_cast< win32initFuncWarpMgr >( GetProcAddress( handle, "win32initWarpMgr" ) );
 
   if( win32init )
   {
@@ -148,6 +151,17 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
     auto linkshellMgr = Common::Service< Sapphire::World::Manager::LinkshellMgr >::get();
     auto tptr = linkshellMgr.lock();
     win32initLinkshell( tptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initWarp )
+  {
+    auto warpMgr = Common::Service< Sapphire::World::Manager::WarpMgr >::get();
+    auto wptr = warpMgr.lock();
+    win32initWarp( wptr );
   }
   else
   {

@@ -8,6 +8,7 @@
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/WarpMgr.h"
 #include "Service.h"
 
 #ifdef _MSC_VER
@@ -248,6 +249,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::TerritoryMgr& teriMgr()
     {
       return Common::Service< World::Manager::TerritoryMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
     }
   };
 
