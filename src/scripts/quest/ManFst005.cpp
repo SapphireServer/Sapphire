@@ -2,9 +2,9 @@
 // Content needs to be added by hand to make it function
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-#include <Actor/Player.h>
 #include "Manager/EventMgr.h"
 #include "Manager/TerritoryMgr.h"
+#include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -73,12 +73,12 @@ public:
       Scene00002( quest, player );
     if( actorId == Eobject1 )
     {
-      eventMgr().eventActionStart( player, getId(), EventActionProcessShor,
-                               [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {
-                                 quest.setSeq( SeqFinish );
-                               },
-                               nullptr, getId() );
+      eventMgr().eventActionStart(
+              player, getId(), EventActionProcessShor,
+              [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+                quest.setSeq( SeqFinish );
+              },
+              nullptr, getId() );
     }
   }
 
@@ -103,7 +103,7 @@ private:
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 ) // accept quest
+    if( result.getResult( 0 ) == 1 )// accept quest
     {
       Scene00001( quest, player );
     }
@@ -113,7 +113,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ManFst005::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR | CONDITION_CUTSCENE, bindSceneReturn( &ManFst005::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -130,12 +130,12 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().eventActionStart( player, getId(), EventActionProcessShor,
-                             [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                             {
-                               Scene00003( quest, player );
-                             },
-                             nullptr, getId() );
+    eventMgr().eventActionStart(
+            player, getId(), EventActionProcessShor,
+            [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+              Scene00003( quest, player );
+            },
+            nullptr, getId() );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -171,11 +171,10 @@ private:
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
-                                       HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                       DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
-                                       // todo: wtf is 0x00100000
-                                       DISABLE_CANCEL_EMOTE, bindSceneReturn( &ManFst005::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV | HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE | DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                                           // todo: wtf is 0x00100000
+                                                           DISABLE_CANCEL_EMOTE,
+                               bindSceneReturn( &ManFst005::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -251,7 +250,6 @@ private:
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
   }
-
 };
 
 EXPOSE_SCRIPT( ManFst005 );
