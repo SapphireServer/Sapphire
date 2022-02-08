@@ -86,12 +86,19 @@ public:
 
   void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
   {
-    //TODO: How to play the post-battle cutscene before returning?
-    auto idx = player.getQuestIndex( instance.getQuestId() );
-    if( idx == -1 )
-      return;
-    auto& quest = player.getQuestByIndex( idx );
-    quest.setSeq( 4 );
+    eventMgr().playScene( player, instance.getDirectorId(), 9,
+                          NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                                  HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                                  DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                                  // todo: wtf is 0x00100000
+                                  DISABLE_CANCEL_EMOTE,
+                          [ & ]( Entity::Player& player, const Event::SceneResult& result ) {
+                            auto idx = player.getQuestIndex( instance.getQuestId() );
+                            if( idx == -1 )
+                              return;
+                            auto& quest = player.getQuestByIndex( idx );
+                            quest.setSeq( 4 );
+                          } );
   }
 
   void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
