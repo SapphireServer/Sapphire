@@ -476,6 +476,13 @@ struct FFXIVIpcShopEventHandler : FFXIVIpcBasePacket< StartUIEvent >
   /* 0004 */ uint32_t param;
 };
 
+struct FFXIVIpcStartSayEventHandler : FFXIVIpcBasePacket< StartSayEvent >
+{
+  uint64_t targetId;
+  uint32_t handlerId;
+  uint32_t sayId;
+};
+
 struct FFXIVIpcClientInventoryItemOperation : FFXIVIpcBasePacket< ClientItemOperation >
 {
   uint32_t ContextId;

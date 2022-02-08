@@ -449,6 +449,33 @@ void Sapphire::Network::GameConnection::yieldEventSceneIntAndString( const Packe
   eventMgr.handleReturnIntAndStringEventScene( player, data.handlerId, data.sceneId, inString, data.integer );
 }
 
+void Sapphire::Network::GameConnection::startEventSayHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  const auto packet = ZoneChannelPacket< FFXIVIpcStartSayEventHandler >( inPacket );
+  const auto actorId = packet.data().targetId;
+  const auto eventId = packet.data().handlerId;
+  const auto sayId = packet.data().sayId;
+
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+
+  std::string eventName = "onSay";
+  std::string objName = eventMgr.getEventName( eventId );
+
+  World::Manager::PlayerMgr::sendDebug( player, "Chara: {0} -> {1} \neventId: {2} ({3:08X})",
+                                        actorId, eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ),
+                                        eventId, eventId );
+
+  World::Manager::PlayerMgr::sendDebug( player, "Calling: {0}.{1}", objName, eventName );
+  eventMgr.eventStart( player, actorId, eventId, Event::EventHandler::Say, 0, 0 );
+  scriptMgr.onSay( player, actorId, eventId, sayId );
+
+  eventMgr.checkEvent( player, eventId );
+
+}
+
 void Sapphire::Network::GameConnection::startUiEvent( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                       Entity::Player& player )
 {

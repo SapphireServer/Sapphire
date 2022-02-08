@@ -142,6 +142,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestScript::onSay( World::Quest& quest, Entity::Player& player, uint64_t actorId, uint32_t sayId )
+  {
+  }
+
   void QuestScript::onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId )
   {
   }

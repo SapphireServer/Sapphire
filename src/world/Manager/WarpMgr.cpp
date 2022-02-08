@@ -27,14 +27,14 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType warpType,
                                     uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
-  m_entityIdToWarpInfoMap[ player.getId() ] = { targetTerritoryId, warpType, targetPos, targetRot };
-
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& server = Common::Service< WorldServer >::ref();
 
   auto pTeri = teriMgr.getTerritoryByGuId( targetTerritoryId );
   if( !pTeri )
     return;
+
+  m_entityIdToWarpInfoMap[ player.getId() ] = { targetTerritoryId, warpType, targetPos, targetRot };
 
   player.updatePrevTerritory();
 

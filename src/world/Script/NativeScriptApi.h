@@ -217,6 +217,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onTalk( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
 
+    virtual void onSay( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t sayId );
+
     virtual void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
 
     virtual void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player );

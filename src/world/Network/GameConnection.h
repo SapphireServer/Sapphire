@@ -173,6 +173,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( startUiEvent );
 
+    DECLARE_HANDLER( startEventSayHandler );
+
     DECLARE_HANDLER( yieldEventString );
     DECLARE_HANDLER( yieldEventSceneIntAndString );
 

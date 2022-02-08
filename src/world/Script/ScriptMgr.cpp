@@ -725,3 +725,43 @@ Sapphire::Scripting::ScriptMgr::onDutyComplete( QuestBattle& instance, Sapphire:
 
   return false;
 }
+
+bool Sapphire::Scripting::ScriptMgr::onSay( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t eventId, uint32_t sayId )
+{
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  if( eventType == Event::EventHandler::EventHandlerType::Quest )
+  {
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( eventId );
+    if( !script )
+    {
+      auto questInfo = exdData.getRow< Excel::Quest >( eventId );
+      if( questInfo )
+      {
+        World::Manager::PlayerMgr::sendUrgent( player, "Quest not implemented: {0} ({1})", questInfo->getString( questInfo->data().Text.Name ), eventId );
+        return false;
+      }
+    }
+
+    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
+    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+
+    auto questId = static_cast< uint16_t >( eventId );
+    if( player.hasQuest( eventId ) )
+    {
+      World::Quest preQ;
+      auto questIdx = player.getQuestIndex( questId );
+      auto& quest = player.getQuestByIndex( questIdx );
+      preQ = quest;
+      script->onSay( quest, player, actor, sayId );
+      if( quest != preQ )
+        player.updateQuest( quest );
+    }
+    else
+    {
+      auto newQuest = World::Quest( questId, 0, 0 );
+      script->onSay( newQuest, player, actor, sayId );
+    }
+    return true;
+  }
+}
