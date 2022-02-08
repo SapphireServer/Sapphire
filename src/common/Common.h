@@ -22,20 +22,21 @@ namespace Sapphire::Common
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
-  const uint16_t MAX_PLAYER_LEVEL = 80;
+  const uint16_t MAX_PLAYER_LEVEL = 90;
   const uint8_t CURRENT_EXPANSION_ID = 4;
 
-  const uint8_t CLASSJOB_TOTAL = 38;
+  const uint8_t CLASSJOB_TOTAL = 40;
   const uint8_t CLASSJOB_SLOTS = 30;
 
-  const uint8_t TOWN_COUNT = 6;
+  const uint8_t TOWN_COUNT = 7;
 
   /*!
    * @brief The maximum length (in ms) of a combo before it is canceled/voided.
    *
    * The client has a combo timer of about 12 seconds, with a 0.5 second grace on top for latency considerations.
+   * Changed to 15 seconds in Shadowbringers, then 30 seconds in Endwalker.
    */
-  const uint16_t MAX_COMBO_LENGTH = 12500;
+  const uint16_t MAX_COMBO_LENGTH = 30000;
 
   struct FFXIVARR_POSITION3_U16
   {
