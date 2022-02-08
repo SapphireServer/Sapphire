@@ -7,6 +7,9 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
+#include "Manager/WarpMgr.h"
+#include "Territory/Territory.h"
+
 // Quest Script: ManFst008_00448
 // Quest Name: Festive Endeavors
 // Quest ID: 65984
@@ -38,7 +41,7 @@ private:
   };
 
   // Entities found in the script data of the quest
-  static constexpr auto Actor0 = 1003061;
+  static constexpr auto Actor0 = 1003061;//Lewin
   static constexpr auto Actor1 = 1000423;//Gods' Quiver Bow (Gatekeep)
   static constexpr auto Actor2 = 1000100;//Mother Miounne
   static constexpr auto Actor3 = 1000153;//Beatin <Guildmaster>
@@ -128,9 +131,10 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1) //Yes
+    if( result.getResult( 0 ) == 1 )
     {
-      //TODO: Warp
+      auto instance = teriMgr().createTerritoryInstance( Territorytype0 );
+      warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, instance->getGuId(), { 0.f, 0.5f, 0.f }, -3.1416f );
     }
   }
 

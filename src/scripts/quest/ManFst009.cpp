@@ -8,6 +8,9 @@
 #include <Service.h>
 
 #include <Inventory/Item.h>
+#include <Manager/WarpMgr.h>
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Territory.h"
 
 // Quest Script: ManFst009_00449
 // Quest Name: Renewing the Covenant
@@ -49,7 +52,7 @@ private:
   static constexpr auto Poprange0 = 4106221;
   static constexpr auto Poprange1 = 3877982;
   static constexpr auto Ritem0 = 2651;
-  static constexpr auto Territorytype0 = 205;
+  static constexpr auto Territorytype0 = 205; //Lotus Stand
 
 public:
   ManFst009() : Sapphire::ScriptAPI::QuestScript( 65985 ){};
@@ -162,7 +165,9 @@ private:
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //TODO: Warp to Inn room to wake up
+    auto instance = teriMgr().createTerritoryInstance( 179 );
+    warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, instance->getGuId(), { 0.f, 0.f, 0.f }, 0.f );
+
     eventMgr().sendEventNotice( player, getId(), 0, 0 );
     quest.setSeq( SeqFinish );
   }
@@ -187,7 +192,7 @@ private:
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //You lost the mask!?!?!
+    //Client handles if you can interact with this NPC, so no need to check if the player already has the item.
     player.addItem( Ritem0, 1 );
   }
 
@@ -218,7 +223,8 @@ private:
   {
     if( result.getResult(0) == 1 )
     {
-      //TODO: Warp to Lotus Stand
+      auto instance = teriMgr().createTerritoryInstance( Territorytype0 );
+      warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, instance->getGuId(), { 31.f, 1.6f, 25.5f }, -2.68533f );
     }
   }
 };
