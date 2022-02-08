@@ -19,7 +19,7 @@
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
 
-const int levelTable[81][6] =
+const int levelTable[91][6] =
 { 
   // MAIN,SUB,DIV,HP,ELMT,THREAT
   { 1, 1, 1, 1, 1, 1 },
@@ -96,6 +96,19 @@ const int levelTable[81][6] =
 
   // todo: add proper shbr values - hp/elmt/threat
   // sub/div added from http://theoryjerks.akhmorning.com/resources/levelmods/
+  { 296, 365, 2263, 3600, 295, 466 },
+  { 300, 366, 2360, 3600, 295, 466 },
+  { 305, 367, 2461, 3600, 295, 466 },
+  { 310, 368, 2566, 3600, 295, 466 },
+  { 315, 370, 2676, 3600, 295, 466 },
+  { 320, 372, 2790, 3600, 295, 466 },
+  { 325, 374, 2910, 3600, 295, 466 },
+  { 330, 376, 3034, 3600, 295, 466 },
+  { 335, 378, 3164, 3600, 295, 466 },
+  { 340, 380, 3300, 3600, 569, 569 },
+
+  // todo: add proper endwalker values - hp/elmt/threat
+  // copypasta from shb right now
   { 296, 365, 2263, 3600, 295, 466 },
   { 300, 366, 2360, 3600, 295, 466 },
   { 305, 367, 2461, 3600, 295, 466 },
