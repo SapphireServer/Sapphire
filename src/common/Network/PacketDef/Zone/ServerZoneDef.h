@@ -950,7 +950,7 @@ namespace Sapphire::Network::Packets::Server
     // plain C types for a bit until the packet is actually fixed.
     // makes conversion between different editors easier.
     uint64_t contentId;
-    unsigned int unknown8;
+    uint64_t unknown8;
     unsigned int unknownC;
     unsigned int charId;
     unsigned int restedExp;
@@ -960,7 +960,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned int useBaitCatalogId;
     unsigned int unknown28;
     unsigned short unknownPvp2C;
-    unsigned short unknown3;
+    unsigned short unknown2E;
     unsigned int pvpFrontlineOverallCampaigns;
     unsigned int unknownTimestamp34;
     unsigned int unknownTimestamp38;
@@ -985,7 +985,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char expansion;
     unsigned char unknown76;
     unsigned char unknown77;
-    unsigned char very_unknown;
+    unsigned char unknown78;
     unsigned char race;
     unsigned char tribe;
     unsigned char gender;
@@ -996,7 +996,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char namedayDay;
     unsigned char cityState;
     unsigned char homepoint;
-    unsigned char unknown82;
+    unsigned char unknown83;
     unsigned char petHotBar;
     unsigned char companionRank;
     unsigned char companionStars;
@@ -1004,117 +1004,97 @@ namespace Sapphire::Network::Packets::Server
     unsigned char companionUnk86;
     unsigned char companionColor;
     unsigned char companionFavoFeed;
-    unsigned char unknown89;
-    unsigned char unknown8A[4];
+    unsigned char favAetheryteCount;
+    unsigned char unknown8C[4];
     unsigned char hasRelicBook;
     unsigned char relicBookId;
-    unsigned char unknown90[4];
+    unsigned char sightseeing21to80Unlock;
+    unsigned char sightseeingHeavenswardUnlock;
+    unsigned char unknown94[2];
     unsigned char craftingMasterMask;
-    unsigned char unknown95[9];
-    unsigned char unknown9F[2];
-    unsigned char unknownA1[6];
+    unsigned char unknown97[9];
+    unsigned char unknownA0[2];
+    unsigned char unknownA2[3];
+    unsigned char unknownA5[3];
     unsigned int exp[Common::CLASSJOB_SLOTS];
-    unsigned int unknown108;
     unsigned int pvpTotalExp;
-    unsigned int unknownPvp110;
+    unsigned int unknownPvp124;
     unsigned int pvpExp;
     unsigned int pvpFrontlineOverallRanks[3];
     unsigned short levels[Common::CLASSJOB_SLOTS];
-    /*
-    unsigned short unknown15C[9];
-    unsigned short u1;
-    unsigned short u2;
-    unsigned short unknown112[23];
-    unsigned short fishingRecordsFish[26];
-    unsigned short beastExp[11];
-    unsigned short unknown1EA[5];
+
+    unsigned short unknown178[8];
+    unsigned short fishingRecordsFishId[30];
+    unsigned short fishingRecordsFishLength[30];
+    unsigned short beastExp[14];
+    unsigned short unknown21C[5];
     unsigned short pvpFrontlineWeeklyRanks[3];
-    unsigned short unknownMask1FA[4];
-    unsigned char companionName[21];
-    unsigned char companionDefRank;
-    unsigned char companionAttRank;
-    unsigned char companionHealRank;
-    unsigned char u19[8];
-    unsigned char mountGuideMask[22];
-    unsigned char u19_2;
-    */
-    unsigned char unknown5_55a[178];
+    unsigned short unknownMask22C[7];
     unsigned char companionName[21];
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
     unsigned char mountGuideMask[29];
-    //==
+    unsigned char unknown26F[4];
     char name[32];
-    unsigned char unknownOword[16];
-    unsigned char unknownOw;
+    unsigned char unknown293[16];
+    unsigned char unknown2A3;
     unsigned char unlockBitmask[64];
     unsigned char aetheryte[21];
-    unsigned char discovery[445];
-    unsigned char howto[34];
-    unsigned char minions[55];
+    unsigned char favoriteAetheryteIds[4];
+    unsigned char freeAetheryteId;
+    unsigned char discovery[464];
+    unsigned char howto[35];
+    unsigned char minions[56];
     unsigned char chocoboTaxiMask[10];
-    unsigned char watchedCutscenes[137];
+    unsigned char watchedCutscenes[144];
     unsigned char companionBardingMask[11];
     unsigned char companionEquippedHead;
     unsigned char companionEquippedBody;
     unsigned char companionEquippedLegs;
-    /*
-    unsigned char unknown52A[4];
-    unsigned char unknownMask52E[11];
-    unsigned char fishingGuideMask[105];
-    unsigned char fishingSpotVisited[31];
-    unsigned char unknown59A[27];
-    unsigned char unknown5A9[7];
-    unsigned char beastRank[11];
-    unsigned char unknownPvp5AB[11];
-    unsigned char unknown5B9[5];
-    */
-    unsigned char unknown5_45b[236];
-    //==
+    unsigned char unknown5D1[4];
+    unsigned char unknownMask5D5[11];
+    unsigned char fishingGuideMask[142];
+    unsigned char fishingSpotVisited[38];
+    unsigned char unknown694[34];
+    unsigned char unknown6B6[7];
+    unsigned char unknownPvp6BD[3];
+    unsigned char beastRank[14];
+    unsigned char unknownPvp6CE[12];
     unsigned char pose;
-    /*
-    unsigned char unknown5B91;
-    unsigned char challengeLogComplete[9];
-    unsigned char weaponPose;
-    unsigned char unknownMask673[10];
-    unsigned char unknownMask5DD[28];
+    unsigned char pose2[4];
+    unsigned char unknown6DF[3];
+    unsigned char challengeLogComplete[13];
+    unsigned char unknownMask6EF[8];
+    unsigned char unknownMask6F7[31];
     unsigned char relicCompletion[12];
-    unsigned char sightseeingMask[26];
-    unsigned char huntingMarkMask[55];
-    unsigned char tripleTriadCards[32];
-    unsigned char u12[11];
-    unsigned char u13;
-    unsigned char aetherCurrentMask[22];
-    unsigned char u10[3];
-    */
-    unsigned char unknown5_55b[295];
-    //==
-    unsigned char orchestrionMask[40]; // this field may already be extended, if it is, the beginning bytes are at the end of unknown5_55b
+    unsigned char sightseeingMask[37];
+    unsigned char huntingMarkMask[101];
+    unsigned char tripleTriadCards[43];
+    unsigned char unknown7D7;
+    unsigned char unknown7D8[14];
+    unsigned char unknown7E6[36];
+    unsigned char unknown80A[6];
+    unsigned char orchestrionMask[64];
     unsigned char hallOfNoviceCompletion[3];
     unsigned char animaCompletion[11];
-    unsigned char unknown5_55c[35];
+    unsigned char unknown85E[16];
+    unsigned char unknown86E[4];
+    unsigned char unknown872[14];
+    unsigned char unknown880;
     unsigned char unlockedRaids[28];
     unsigned char unlockedDungeons[18];
     unsigned char unlockedGuildhests[10];
-    /*
-      at least 8 bytes at most 10 bytes in unlockedTrials not confirmed, adjust unlockedPvp so they share a total of 15 bytes and sync with clearedTrials/clearedPvp.
-    */
-    unsigned char unlockedTrials[9];
-    unsigned char unlockedPvp[6];
-    //==
+    unsigned char unlockedTrials[11];
+    unsigned char unlockedPvp[5];
     unsigned char clearedRaids[28];
     unsigned char clearedDungeons[18];
     unsigned char clearedGuildhests[10];
-    unsigned char clearedTrials[9];
-    unsigned char clearedPvp[6];
-    /*
-    unsigned short fishingRecordsFishWeight[26];
-    unsigned int exploratoryMissionNextTimestamp;
-    unsigned char pvpLevel;
-    */
-    unsigned char unknown5_55d[9];
-    //==
+    unsigned char clearedTrials[11];
+    unsigned char clearedPvp[5];
+    unsigned char unknown911[4];
+    unsigned char unknown915[2];
+    unsigned char unknown917[3];
   };
 
 

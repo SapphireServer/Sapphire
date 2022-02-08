@@ -1052,8 +1052,8 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
 
   exp = questInfo->expFactor;
 
-  auto rewardItemCount = questInfo->itemReward0.size();
-  uint16_t optionalItemCount = static_cast< uint16_t >( questInfo->itemReward1.size() );
+  auto rewardItemCount = questInfo->itemReward.size();
+  uint16_t optionalItemCount = static_cast< uint16_t >( questInfo->optionalItemReward.size() );
 
   uint32_t gilReward = questInfo->gilReward;
 
@@ -1065,10 +1065,10 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
   {
     for( uint32_t i = 0; i < rewardItemCount; i++ )
     {
-      auto itemId = questInfo->itemReward0.at( i );
+      auto itemId = questInfo->itemReward.at( i );
       if( itemId > 0 )
       {
-        addItem( itemId, questInfo->itemCountReward0.at( i ), false, false, true, true );
+        addItem( itemId, questInfo->itemCountReward.at( i ), false, false, true, true );
       }
     }
   }
@@ -1077,10 +1077,10 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
   {
     for( uint32_t i = 0; i < optionalItemCount; i++ )
     {
-      auto itemId = questInfo->itemReward1.at( i );
+      auto itemId = questInfo->optionalItemReward.at( i );
       if( itemId > 0 && itemId == optionalChoice )
       {
-        addItem( itemId, questInfo->itemCountReward1.at( i ), false, false, true, true );
+        addItem( itemId, questInfo->optionalItemReward.at( i ), false, false, true, true );
         break;
       }
     }

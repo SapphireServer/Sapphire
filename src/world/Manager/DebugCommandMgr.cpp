@@ -304,6 +304,20 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     terriMgr.disableCurrentFestival();
   }
+  else if(subCommand == "finishallquests")
+  {
+    for (int i = 65536; i < 69637; i++)
+    {
+      player.finishQuest(static_cast<uint16_t>(i));
+    }
+  }
+  else if (subCommand == "unfinishallquests")
+  {
+  for (int i = 65536; i < 69637; i++)
+  {
+    player.unfinishQuest(static_cast<uint16_t>(i));
+  }
+  }
   else if( subCommand == "QuestVar" )
   {
     uint16_t questId;

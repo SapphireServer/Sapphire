@@ -53,7 +53,7 @@ std::vector< std::string > reservedWords
   };
 
 //std::string datLocation( "/home/mordred/sqpack" );
-std::string datLocation( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string datLocation( "D:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
 std::map< uint8_t, std::string > g_typeMap;
 
 
@@ -408,6 +408,8 @@ int main( int argc, char** argv )
 
     auto name = path.stem().string();
 
+    Logger::info("Filename: " + name);
+
     if( std::find( cats.begin(), cats.end(), name ) == cats.end() )
     {
       Logger::warn( "have definition for {} but the sheet doesn't exist", name );
@@ -441,7 +443,7 @@ int main( int argc, char** argv )
   result = std::regex_replace( result, std::regex( "\\IDLISTGETTERS" ), idListGetters );
 
 
-//   g_log.info( result );
+  Logger::info( result );
 
   std::ofstream outH( "ExdDataGenerated.h" );
   outH << result;
@@ -455,7 +457,7 @@ int main( int argc, char** argv )
   outC << result;
   outC.close();
 
-//   g_log.info( result );
+  Logger::info(result);
 
   Logger::info( "done." );
 
