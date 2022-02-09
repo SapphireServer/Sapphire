@@ -73,7 +73,9 @@ public:
     {
       case Actor0:
       {
-        if( quest.getSeq() == Seq2 )
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+        else if( quest.getSeq() == Seq2 )
           Scene00002( quest, player );
         else if( quest.getSeq() == Seq4 )
           Scene00004( quest, player );
