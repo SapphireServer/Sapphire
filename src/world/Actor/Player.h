@@ -1144,7 +1144,7 @@ namespace Sapphire::Entity
     uint32_t m_expArray[ Common::CLASSJOB_SLOTS ];
     uint8_t m_aetheryte[21];
     uint8_t m_unlocks[64];
-    uint8_t m_orchestrion[40]; //[64] in PlayerSetup, but setting it to that value crashes world on login
+    uint8_t m_orchestrion[64]; //[64] in PlayerSetup, but setting it to that value crashes world on login
 
     uint8_t m_openingSequence;
 

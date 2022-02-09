@@ -49,7 +49,7 @@ namespace Sapphire::Network::Packets
     ActorFreeSpawn = 0x0082, // updated 6.08
     InitZone = 0x01EB, // updated 6.08
 
-    EffectResult = 0x0387, // updated 5.58 hotfix
+    EffectResult = 0x00DE, // updated 6.08
     ActorControl = 0x022F, // updated 6.08
     ActorControlSelf = 0x006B, // updated 6.08
     ActorControlTarget = 0x0191, // updated 6.08
@@ -156,8 +156,8 @@ namespace Sapphire::Network::Packets
     ObjectDespawn = 0x0137, // updated 6.08
     UpdateClassInfo = 0x00FE, // updated 6.08
     SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x02C6, // updated 6.08
-    PlayerStats = 0x0295, // updated 5.58 hotfix
+    PlayerSetup = 0x0261, // updated 6.08
+    PlayerStats = 0x02C7, // updated 6.08
     ActorOwner = 0x0261, // updated 6.08
     PlayerStateFlags = 0x03CF, // updated 6.08 (or 0x00CB)
     PlayerClassInfo = 0x025A, // updated 6.08
@@ -172,15 +172,15 @@ namespace Sapphire::Network::Packets
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
     RetainerSaleHistory = 0x0066, // updated 6.08
-    RetainerInformation = 0x022F, // updated 5.58 hotfix
+    RetainerInformation = 0x023B, // updated 6.08
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
     ItemInfo = 0x02A9, // updated 6.08
     ContainerInfo = 0x037A, // updated 6.08
-    InventoryTransactionFinish = 0x0176, // updated 5.58 hotfix
-    InventoryTransaction = 0x027F, // updated 5.58 hotfix
-    CurrencyCrystalInfo = 0x0345, // updated 5.58 hotfix
+    InventoryTransactionFinish = 0x0299, // updated 6.08
+    InventoryTransaction = 0x0382, //updated 6.08
+    CurrencyCrystalInfo = 0x02BE, // updated 6.08 hotfix
 
     InventoryActionAck = 0x008A, // updated 6.08
     UpdateInventorySlot = 0x0375, // updated 6.08
@@ -218,7 +218,7 @@ namespace Sapphire::Network::Packets
     Mount = 0x0373, // updated 6.08
 
     DirectorVars = 0x0138, // updated 6.08
-    SomeDirectorUnk1 = 0x0084, // updated 5.18
+    SomeDirectorUnk1 = 0x00EF, // updated 6.08
     SomeDirectorUnk2 = 0xF0C1, // updated 5.18
     SomeDirectorUnk4 = 0x03DD, // updated 5.58 hotfix
     SomeDirectorUnk8 = 0x028A, // updated 5.18
@@ -241,7 +241,7 @@ namespace Sapphire::Network::Packets
     ShopMessage = 0x0287, // updated 5.58 hotfix
     LootMessage = 0x006C, // updated 6.08
     ResultDialog = 0x0273, // updated 5.58 hotfix
-    DesynthResult = 0x0238, // updated 5.58 hotfix
+    DesynthResult = 0x0143, // updated 6.08
 
     /// Housing //////////////////////////////////////
 
@@ -309,8 +309,8 @@ namespace Sapphire::Network::Packets
     AirshipStatus = 0x01F5, // updated 6.08
     AirshipStatusList = 0x0250, // updated 6.08
     AirshipTimers = 0x0225, // updated 6.08
-    SubmarineExplorationResult = 0x0092, // updated 6.08
-    SubmarineProgressionStatus = 0x0357, // updated 5.58 hotfix
+    SubmarineExplorationResult = 0x00C9, // updated 6.08
+    SubmarineProgressionStatus = 0x0092, // updated 6.08
     SubmarineStatusList = 0x0212, // updated 6.08
     SubmarineTimers = 0x0346, // updated 6.08
   };
@@ -346,7 +346,7 @@ namespace Sapphire::Network::Packets
     DisbandPartyHandler = 0x0276, // updated 5.58 hotfix
 
     SocialListHandler = 0x012A, // updated 6.08
-    SetSearchInfoHandler = 0x01D4, // updated 5.58 hotfix
+    SetSearchInfoHandler = 0x02BB, // updated 6.08
     ReqSearchInfoHandler = 0x014F, // updated 5.58 hotfix
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
@@ -377,8 +377,8 @@ namespace Sapphire::Network::Packets
     ClientTrigger = 0x02F1, // updated 6.08
     DiscoveryHandler = 0x038B, // updated 5.58 hotfix
 
-    PlaceFieldMarkerPreset = 0x026D, // updated 5.58 hotfix
-    PlaceFieldMarker = 0x0371, // updated 5.58 hotfix
+    PlaceFieldMarkerPreset = 0x01FE, // updated 6.08
+    PlaceFieldMarker = 0x0067, // updated 6.08
     SkillHandler = 0x008E, // updated 6.08
     GMCommand1 = 0x0290, // updated 6.08
     GMCommand2 = 0x0203, // updated 6.08
@@ -386,7 +386,7 @@ namespace Sapphire::Network::Packets
 
     UpdatePositionHandler = 0x0147, // updated 6.08
 
-    InventoryModifyHandler = 0x029E, // updated 5.58 hotfix
+    InventoryModifyHandler = 0x0154, // updated 6.08
     
     InventoryEquipRecommendedItems = 0x01C9, // updated 5.58 hotfix
 
@@ -418,7 +418,7 @@ namespace Sapphire::Network::Packets
 
     SetSharedEstateSettings = 0x00D2, // updated 5.58 hotfix
 
-    UpdatePositionInstance = 0x00F8, // updated 5.58 hotfix
+    UpdatePositionInstance = 0x0209, // updated 6.08
 
     PerformNoteHandler = 0x0243, // updated 5.58 hotfix
 
