@@ -43,8 +43,8 @@ namespace Sapphire::Network::Packets
   */
   enum ServerZoneIpcType : uint16_t
   {
-    Ping = 0x02A8, // updated 5.58 hotfix
-    Init = 0x0182, // updated 5.58 hotfix
+    Ping = 0x00FA, // updated 6.08
+    Init = 0x0182, // updated 6.08
 
     ActorFreeSpawn = 0x0082, // updated 6.08
     InitZone = 0x01EB, // updated 6.08
@@ -176,8 +176,8 @@ namespace Sapphire::Network::Packets
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-    ItemInfo = 0x01CC, // updated 5.58 hotfix
-    ContainerInfo = 0x025C, // updated 5.58 hotfix
+    ItemInfo = 0x02A9, // updated 6.08
+    ContainerInfo = 0x037A, // updated 6.08
     InventoryTransactionFinish = 0x0176, // updated 5.58 hotfix
     InventoryTransaction = 0x027F, // updated 5.58 hotfix
     CurrencyCrystalInfo = 0x0345, // updated 5.58 hotfix
@@ -329,8 +329,8 @@ namespace Sapphire::Network::Packets
     CFCancelHandler = 0x02B2, // updated 5.58 hotfix
     CFRegisterDuty = 0x01BD, // updated 5.58 hotfix
     CFRegisterRoulette = 0x037A, // updated 5.58 hotfix
-    PlayTimeHandler = 0x02B7, // updated 5.58 hotfix
-    LogoutHandler = 0x00A0, // updated 5.58 hotfix
+    PlayTimeHandler = 0x0279, // updated 6.08
+    LogoutHandler = 0x0125, // updated 6.08
     CancelLogout = 0x01AC, // updated 5.58 hotfix
     CFDutyInfoHandler = 0xF078, // updated 4.2
 
@@ -380,8 +380,8 @@ namespace Sapphire::Network::Packets
     PlaceFieldMarkerPreset = 0x026D, // updated 5.58 hotfix
     PlaceFieldMarker = 0x0371, // updated 5.58 hotfix
     SkillHandler = 0x008E, // updated 6.08
-    GMCommand1 = 0x0272, // updated 5.58 hotfix
-    GMCommand2 = 0x00E9, // updated 5.58 hotfix
+    GMCommand1 = 0x0290, // updated 6.08
+    GMCommand2 = 0x0203, // updated 6.08
     AoESkillHandler = 0x0152, // updated 5.58 hotfix
 
     UpdatePositionHandler = 0x0147, // updated 6.08
