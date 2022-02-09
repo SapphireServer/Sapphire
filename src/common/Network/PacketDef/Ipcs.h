@@ -156,7 +156,7 @@ namespace Sapphire::Network::Packets
     ObjectDespawn = 0x0137, // updated 6.08
     UpdateClassInfo = 0x00FE, // updated 6.08
     SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    PlayerSetup = 0x02C7, // updated 6.08
+    PlayerSetup = 0x02C6, // updated 6.08
     PlayerStats = 0x0295, // updated 5.58 hotfix
     ActorOwner = 0x0261, // updated 6.08
     PlayerStateFlags = 0x03CF, // updated 6.08 (or 0x00CB)
