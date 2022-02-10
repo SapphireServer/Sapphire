@@ -764,4 +764,5 @@ bool Sapphire::Scripting::ScriptMgr::onSay( Sapphire::Entity::Player& player, ui
     }
     return true;
   }
+  return false;
 }

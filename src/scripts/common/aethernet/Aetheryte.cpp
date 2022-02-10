@@ -94,7 +94,7 @@ public:
                                    {
                                      player.registerAetheryte( eventId & 0xFFFF );
 
-                                     if( player.isActionLearned( Common::UnlockEntry::Teleport ) )
+                                     if( player.hasReward( Common::UnlockEntry::Teleport ) )
                                      {
                                        eventMgr().sendEventNotice( player, eventId, 0, 2, 0, 0 );
                                      }

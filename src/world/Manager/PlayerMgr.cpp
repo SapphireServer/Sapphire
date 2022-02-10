@@ -204,7 +204,7 @@ void PlayerMgr::onMobKill( Entity::Player& player, uint16_t nameId, uint32_t lay
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcKill( player, nameId, layoutId );
 
-  if( player.isActionLearned( Common::UnlockEntry::HuntingLog ) )
+  if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
   {
     player.updateHuntingLog( nameId );
   }

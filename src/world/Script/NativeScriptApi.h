@@ -9,6 +9,8 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Exd/ExdData.h"
+#include "Territory/InstanceObjectCache.h"
 #include "Service.h"
 
 #ifdef _MSC_VER
@@ -173,6 +175,10 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
+    Data::ExdData& exdData()
+    {
+      return Common::Service< Data::ExdData >::ref();
+    }
 
     World::Manager::EventMgr& eventMgr()
     {
@@ -187,6 +193,21 @@ namespace Sapphire::ScriptAPI
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
+
+    Sapphire::InstanceObjectCache& instanceObjectCache()
+    {
+      return Common::Service< Sapphire::InstanceObjectCache >::ref();
+    }
+
+    World::Manager::TerritoryMgr& teriMgr()
+    {
+      return Common::Service< World::Manager::TerritoryMgr >::ref();
     }
   };
 

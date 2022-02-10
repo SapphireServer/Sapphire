@@ -314,30 +314,13 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
   if( pExitRange )
   {
-    auto pPopRange = instanceObjectCache.getPopRange( pExitRange->data.destTerritoryType,
-                                                      pExitRange->data.destInstanceObjectId );
+    auto pPopRange = instanceObjectCache.getPopRangeInfo( pExitRange->data.destInstanceObjectId );
     if( pPopRange )
     {
       targetZone = pExitRange->data.destTerritoryType;
-
-
-      targetPos = Common::FFXIVARR_POSITION3 { pPopRange->header.transform.translation.x,
-                                               pPopRange->header.transform.translation.y,
-                                               pPopRange->header.transform.translation.z };
-
-      targetRot = Common::FFXIVARR_POSITION3 { pPopRange->header.transform.rotation.x,
-                                               pPopRange->header.transform.rotation.y,
-                                               pPopRange->header.transform.rotation.z };
-
-      rotation = Util::eulerToDirection( targetRot );
-
-
-      PlayerMgr::sendDebug( player, "ZoneLine #{0} found. Rotation: {1} {2} {3} - {4}", exitBoxId,
-                        pPopRange->header.transform.rotation.x,
-                        pPopRange->header.transform.rotation.y,
-                        pPopRange->header.transform.rotation.z,
-                        rotation );
-
+      targetPos = pPopRange->m_pos;
+      rotation = pPopRange->m_rotation;
+      PlayerMgr::sendDebug( player, "ZoneLine #{0} found. Rotation: {1}, Zone: #{2} ", exitBoxId, rotation, targetZone );
     }
   }
 

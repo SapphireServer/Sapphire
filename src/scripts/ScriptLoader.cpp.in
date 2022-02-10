@@ -14,6 +14,11 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 };
 
 #ifdef _WIN32
+namespace Sapphire
+{
+  class InstanceObjectCache;
+}
+
 namespace Sapphire::Data
 {
   class ExdData;
@@ -43,6 +48,11 @@ extern "C" EXPORT void win32initLinkshell( std::shared_ptr< Sapphire::World::Man
 extern "C" EXPORT void win32initWarpMgr( std::shared_ptr< Sapphire::World::Manager::WarpMgr > warpMgr )
 {
   Sapphire::Common::Service< Sapphire::World::Manager::WarpMgr >::set( warpMgr );
+}
+
+extern "C" EXPORT void win32initIObjectCache( std::shared_ptr< Sapphire::InstanceObjectCache > ioCache )
+{
+  Sapphire::Common::Service< Sapphire::InstanceObjectCache >::set( ioCache );
 }
 #endif
 

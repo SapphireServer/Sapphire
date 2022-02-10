@@ -13,6 +13,7 @@
 
 #include <Logging/Logger.h>
 #include <Service.h>
+#include <Util/UtilMath.h>
 
 Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
@@ -146,9 +147,9 @@ Sapphire::InstanceObjectCache::ExitRangePtr
 }
 
 Sapphire::InstanceObjectCache::PopRangePtr
-  Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
+  Sapphire::InstanceObjectCache::getPopRange( uint32_t popRangeId )
 {
-  return m_popRangeCache.get( zoneId, popRangeId );
+  return m_popRangeCache.get( 0, popRangeId );
 }
 
 Sapphire::InstanceObjectCache::EObjPtr
@@ -166,4 +167,30 @@ Sapphire::InstanceObjectCache::ENpcPtr
 Sapphire::InstanceObjectCache::EventRangePtr Sapphire::InstanceObjectCache::getEventRange( uint32_t eventRangeId )
 {
   return m_eventRangeCache.get( 0, eventRangeId );
+}
+
+std::shared_ptr< Sapphire::InstanceObjectCache::PopRangeInfo > Sapphire::InstanceObjectCache::getPopRangeInfo( uint32_t popRangeId )
+{
+  auto popRange = getPopRange( popRangeId );
+  if( !popRange )
+    return nullptr;
+
+  auto popInfo = std::make_shared< Sapphire::InstanceObjectCache::PopRangeInfo >();
+
+  popInfo->m_pos = Common::FFXIVARR_POSITION3 { popRange->header.transform.translation.x,
+                                               popRange->header.transform.translation.y,
+                                               popRange->header.transform.translation.z };
+
+  auto targetRot = Common::FFXIVARR_POSITION3 { popRange->header.transform.rotation.x,
+                                                popRange->header.transform.rotation.y,
+                                                popRange->header.transform.rotation.z };
+
+  popInfo->m_rotation = Common::Util::eulerToDirection( targetRot );
+
+  auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
+  auto levelData = exdData.getRow< Excel::Level >( popRangeId );
+  if( levelData )
+    popInfo->m_territoryTypeId = levelData->data().TerritoryType;
+
+  return popInfo;
 }

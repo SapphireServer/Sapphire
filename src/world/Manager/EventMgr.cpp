@@ -109,8 +109,18 @@ std::string EventMgr::getEventName( uint32_t eventId )
     {
       auto warpInfo = exdData.getRow< Excel::Warp >( eventId );
       if( warpInfo )
-        return "WarpTaxi";
-      return unknown + "ChocoboWarp"; //who know
+      {
+        auto warpLogic = exdData.getRow< Excel::WarpLogic >( warpInfo->data().Logic );
+        if( warpLogic )
+        {
+          if( warpLogic->getString( warpLogic->data().Script ).empty() )
+            return "WarpTaxi";
+          else
+            return warpLogic->getString( warpLogic->data().Script );
+        }
+      }
+
+      return unknown + "Warp"; //who know
     }
 
     case Event::EventHandler::EventHandlerType::Shop:

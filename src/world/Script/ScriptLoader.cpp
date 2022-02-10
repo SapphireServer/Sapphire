@@ -7,6 +7,10 @@
 
 #ifdef _WIN32
 #include <Service.h>
+namespace Sapphire
+{
+  class InstanceObjectCache;
+}
 namespace Sapphire::Data
 {
   class ExdData;
@@ -118,10 +122,24 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using win32initFuncTeri = void(*)( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > );
   using win32initFuncLinkshell = void(*)( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > );
   using win32initFuncWarpMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::WarpMgr > );
+  using win32initIObjectCache = void(*)( std::shared_ptr< Sapphire::InstanceObjectCache > );
+
   auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
   auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
   auto win32initLinkshell = reinterpret_cast< win32initFuncLinkshell >( GetProcAddress( handle, "win32initLinkshell" ) );
   auto win32initWarp = reinterpret_cast< win32initFuncWarpMgr >( GetProcAddress( handle, "win32initWarpMgr" ) );
+  auto win32initIObject = reinterpret_cast< win32initIObjectCache >( GetProcAddress( handle, "win32initIObjectCache" ) );
+
+  if( win32initIObject )
+  {
+    auto ioCache = Common::Service< Sapphire::InstanceObjectCache >::get();
+    auto ptr = ioCache.lock();
+    win32initIObject( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initIObjectCache export on a windows script target - the server will likely crash!" );
+  }
 
   if( win32init )
   {

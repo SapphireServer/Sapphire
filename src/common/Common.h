@@ -504,6 +504,7 @@ namespace Sapphire::Common
   enum class UnlockEntry : uint16_t
   {
     Return = 1,
+    InnRoom = 2,
     Teleport = 4,
     GearSets = 6,
     MateriaMelding = 11,

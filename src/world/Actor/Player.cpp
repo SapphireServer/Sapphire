@@ -415,7 +415,7 @@ void Player::teleport( uint16_t aetheryteId, uint8_t type )
   const auto& data = aetherData->data();
 
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-  auto pop = instanceObjectCache.getPopRange( data.TerritoryType, data.PopRange[ 0 ] );
+  auto pop = instanceObjectCache.getPopRangeInfo( data.PopRange[ 0 ] );
 
   Common::FFXIVARR_POSITION3 pos{ 0.f, 0.f, 0.f };
 
@@ -424,10 +424,8 @@ void Player::teleport( uint16_t aetheryteId, uint8_t type )
   if( pop )
   {
     PlayerMgr::sendDebug( *this, "Teleport: popRange {0} found!", data.PopRange[ 0 ] );
-    const auto& transform = pop->header.transform;
-    pos = Common::FFXIVARR_POSITION3{ transform.translation.x, transform.translation.y, transform.translation.z };
-    auto targetRot = Common::FFXIVARR_POSITION3{ transform.rotation.x, transform.rotation.y, transform.rotation.z };
-    rot = Common::Util::eulerToDirection( targetRot );
+    pos = pop->m_pos;
+    rot = pop->m_rotation;
   }
   else
   {
@@ -674,7 +672,7 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
   Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *this, songId, itemId );
 }
 
-bool Player::isActionLearned( Common::UnlockEntry unlockId ) const
+bool Player::hasReward( Common::UnlockEntry unlockId ) const
 {
   uint16_t index;
   uint8_t value;
@@ -1506,7 +1504,7 @@ void Player::sendZonePackets()
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  if( isActionLearned( Common::UnlockEntry::HuntingLog ) )
+  if( hasReward( Common::UnlockEntry::HuntingLog ) )
     sendHuntingLog();
 
   sendStats();
