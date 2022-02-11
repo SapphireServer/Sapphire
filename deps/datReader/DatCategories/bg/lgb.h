@@ -161,35 +161,72 @@ public:
   };
 };
 
+enum LayerSetReferencedType
+{
+  All = 0x0,
+  Include = 0x1,
+  Exclude = 0x2,
+  Undetermined = 0x3,
+};
+
+struct LayerSetReferenced
+{
+  uint32_t LayerSetID;
+};
+
+struct LayerSetReferencedList
+{
+  LayerSetReferencedType ReferencedType;
+  int LayerSets;
+  int LayerSetCount;
+};
+
 struct LGB_GROUP_HEADER
 {
   uint32_t id;
   int32_t groupNameOffset;
   int32_t entriesOffset;
   int32_t entryCount;
-  uint32_t unknown2;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
-  uint32_t unknown10;
+  int8_t ToolModeVisible;
+  int8_t ToolModeReadOnly;
+  int8_t IsBushLayer;
+  int8_t PS3Visible;
+  int32_t LayerSetRef;
+  uint16_t FestivalID;
+  uint16_t FestivalPhaseID;
+  int8_t IsTemporary;
+  int8_t IsHousing;
+  uint16_t VersionMask;
+  uint32_t Reserved;
+  int32_t OBSetReferencedList;
+  int32_t OBSetReferencedList_Count;
+  int32_t OBSetEnableReferencedList;
+  int32_t OBSetEnableReferencedList_Count;
 };
 
 struct LGB_GROUP
 {
   LGB_FILE* parent;
   LGB_GROUP_HEADER header;
+  LayerSetReferencedList layerSetReferencedList;
   std::string name;
   std::vector< std::shared_ptr< LgbEntry > > entries;
+  std::vector< LayerSetReferenced > refs;
 
   LGB_GROUP( char* buf, LGB_FILE* parentStruct, size_t offset )
   {
     parent = parentStruct;
     header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.groupNameOffset );
+
+    layerSetReferencedList = *reinterpret_cast< LayerSetReferencedList* >( buf + offset + header.LayerSetRef );
+
+    if( layerSetReferencedList.LayerSetCount > 0 )
+    {
+      refs.resize( layerSetReferencedList.LayerSetCount );
+      memcpy( (char*)&refs[0], buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
+    }
+
     const auto entriesOffset = offset + header.entriesOffset;
     for( auto i = 0; i < header.entryCount; ++i )
     {
