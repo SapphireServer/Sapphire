@@ -7,24 +7,26 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: ManFst206_00509
-// Quest Name: The Scions of the Seventh Dawn
-// Quest ID: 66045
-// Start NPC: 1001353
-// End NPC: 1005012
+// Quest Script: ManFst207_00510
+// Quest Name: A Wild Rose by Any Other Name
+// Quest ID: 66046
+// Start NPC: 1003783
+// End NPC: 1003929
 
 using namespace Sapphire;
 
-class ManFst206 : public Sapphire::ScriptAPI::QuestScript
+class ManFst207 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
   // Basic quest information
   // Quest vars / flags used
+  // BitFlag8
   // UI8AH
   // UI8AL
+  // UI8BH
 
-  /// Countable Num: 0 Seq: 1 Event: 1 Listener: 1004603
-  /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1005012
+  /// Countable Num: 0 Seq: 1 Event: 1 Listener: 1005015
+  /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1005119
   // Steps in this quest ( 0 is before accepting,
   // 1 is first, 255 means ready for turning it in
   enum Sequence : uint8_t
@@ -35,18 +37,16 @@ private:
   };
 
   // Entities found in the script data of the quest
-  static constexpr auto Actor0 = 1001353;//Momodi
-  static constexpr auto Actor1 = 1004603;//Tataru
-  static constexpr auto Actor2 = 1005012;//Scion of the Seventh Dawn
-  static constexpr auto CutManfst20610 = 80;
-  static constexpr auto CutManfst20620 = 81;
-  static constexpr auto CutManfst20630 = 161;
-  static constexpr auto Poprange0 = 4148347;
-  static constexpr auto UnlockImageRetainer = 19;
+  static constexpr auto Actor0 = 1003783;//Minfilia
+  static constexpr auto Actor1 = 1005015;//Thancred
+  static constexpr auto Actor2 = 1005119;
+  static constexpr auto Actor3 = 1003929;//Isembard
+  static constexpr auto CutManfst20710 = 82;
+  static constexpr auto Seq0Actor0Nq = 50;
 
 public:
-  ManFst206() : Sapphire::ScriptAPI::QuestScript( 66045 ){};
-  ~ManFst206() = default;
+  ManFst207() : Sapphire::ScriptAPI::QuestScript( 66046 ){};
+  ~ManFst207() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -63,12 +63,16 @@ public:
       case Actor1:
       {
         if( quest.getSeq() == Seq1 )
-          Scene00002( quest, player );
+          Scene00001( quest, player );
         else if( quest.getSeq() == SeqFinish )
-          Scene00005( quest, player );
+          Scene00002( quest, player );
         break;
       }
       case Actor2:
+      {
+        break;
+      }
+      case Actor3:
       {
         if( quest.getSeq() == SeqFinish )
           Scene00003( quest, player );
@@ -85,14 +89,14 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &ManFst206::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManFst207::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )// accept quest
     {
-      Scene00001( quest, player );
+      Scene00050( quest, player );
     }
   }
 
@@ -100,32 +104,30 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &ManFst206::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ManFst207::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq( Seq1 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst206::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManFst207::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 0 );
-    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, NONE, bindSceneReturn( &ManFst206::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &ManFst207::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -133,34 +135,21 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      Scene00004( quest, player );
+      player.finishQuest( getId(), result.getResult(1) );
     }
   }
 
   //////////////////////////////////////////////////////////////////////
 
-  void Scene00004( World::Quest& quest, Entity::Player& player )
+  void Scene00050( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst206::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst207::Scene00050Return ) );
   }
 
-  void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  void Scene00050Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //TODO:Unlock Retainers
-
-    player.finishQuest( getId(), result.getResult( 1 ) );
-  }
-
-  //////////////////////////////////////////////////////////////////////
-
-  void Scene00005( World::Quest& quest, Entity::Player& player )
-  {
-    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &ManFst206::Scene00005Return ) );
-  }
-
-  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
-  {
+    quest.setSeq( Seq1 );
   }
 };
 
-EXPOSE_SCRIPT( ManFst206 );
+EXPOSE_SCRIPT( ManFst207 );
