@@ -351,6 +351,7 @@ struct FFXIVIpcFindContent : FFXIVIpcBasePacket< FindContent >
   uint16_t territoryType;
   uint8_t acceptHalfway;
   uint8_t language;
+  uint8_t flags;
 };
 
 struct FFXIVIpcFind5Contents : FFXIVIpcBasePacket< Find5Contents >
