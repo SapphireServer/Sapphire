@@ -547,31 +547,63 @@ void Sapphire::World::Manager::DebugCommandMgr::add( char* data, Entity::Player&
   }
   else if( subCommand == "bnpc" )
   {
-    auto bNpcTemplate = serverMgr.getBNpcTemplate( params );
+    auto bNpcTemplate = serverMgr.getBNpcTemplate(params);
 
-    if( !bNpcTemplate )
+    if (!bNpcTemplate)
     {
-      player.sendNotice( "Template {0} not found in cache!", params );
+      player.sendNotice("Template {0} not found in cache!", params);
       return;
     }
     auto playerZone = player.getCurrentTerritory();
-    auto pBNpc = std::make_shared< Entity::BNpc >( playerZone->getNextActorId(),
-                                                   bNpcTemplate,
-                                                   player.getPos().x,
-                                                   player.getPos().y,
-                                                   player.getPos().z,
-                                                   player.getRot(),
-                                                   1, 1000, playerZone );
+    auto pBNpc = std::make_shared< Entity::BNpc >(playerZone->getNextActorId(),
+      bNpcTemplate,
+      player.getPos().x,
+      player.getPos().y,
+      player.getPos().z,
+      player.getRot(),
+      1, 1000, playerZone);
 
 
 
     //pBNpc->setCurrentZone( playerZone );
     //pBNpc->setPos( player.getPos().x, player.getPos().y, player.getPos().z );
 
-    playerZone->pushActor( pBNpc );
-
-
+    playerZone->pushActor(pBNpc);
   }
+
+  else if (subCommand == "fakeplayer")
+  {
+    auto bNpcTemplate = serverMgr.getBNpcTemplate(params);
+
+    if (!bNpcTemplate)
+    {
+      player.sendNotice("Template {0} not found in cache!", params);
+      return;
+    }
+    auto playerZone = player.getCurrentTerritory();
+    auto pBNpc = std::make_shared< Entity::BNpc >(playerZone->getNextActorId(),
+      bNpcTemplate,
+      player.getPos().x,
+      player.getPos().y,
+      player.getPos().z,
+      player.getRot(),
+      1, 1000, playerZone);
+
+
+
+    //pBNpc->setCurrentZone( playerZone );
+    //pBNpc->setPos( player.getPos().x, player.getPos().y, player.getPos().z );
+
+    playerZone->pushActor(pBNpc);
+  }
+
+  else if (subCommand == "refreshplayer")
+  {
+    Sapphire::Entity::ActorPtr targetActor;
+    targetActor = player.getAsPlayer();
+    targetActor->spawn(player.getAsPlayer());
+  }
+
   else if( subCommand == "op" )
   {
     // temporary research packet

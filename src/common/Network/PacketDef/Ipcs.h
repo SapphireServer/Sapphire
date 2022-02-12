@@ -373,7 +373,7 @@ namespace Sapphire::Network::Packets
     ReqCountdownInitiate = 0x02EC, // updated 5.58 hotfix
     ReqCountdownCancel = 0x0068, // updated 5.58 hotfix
 
-    ZoneLineHandler = 0x008D, // updated 5.58 hotfix
+    ZoneLineHandler = 0x00C3, // updated 5.58 hotfix
     ClientTrigger = 0x02F1, // updated 6.08
     DiscoveryHandler = 0x038B, // updated 5.58 hotfix
 
