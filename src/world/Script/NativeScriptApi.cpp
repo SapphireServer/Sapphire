@@ -232,7 +232,6 @@ namespace Sapphire::ScriptAPI
   }
 
   void InstanceContentScript::onLeaveTerritory( InstanceContent& instance, Entity::Player& player )
-
   {
   }
 
