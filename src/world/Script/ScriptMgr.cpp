@@ -637,6 +637,18 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContent& 
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onInstanceLeaveTerritory( InstanceContent& instance, Entity::Player& player )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+  if( script )
+  {
+    script->onLeaveTerritory( instance, player );
+    return true;
+  }
+
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onPlayerSetup( QuestBattle& instance, Entity::Player& player )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestBattleScript >( instance.getDirectorId() );

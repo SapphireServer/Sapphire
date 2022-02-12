@@ -110,6 +110,9 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
   unbindPlayer( player.getId() );
 
   clearDirector( player );
+
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onInstanceLeaveTerritory( *this, player );
 }
 
 void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )

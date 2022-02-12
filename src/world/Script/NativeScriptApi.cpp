@@ -231,6 +231,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onLeaveTerritory( InstanceContent& instance, Entity::Player& player )
+
+  {
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   QuestBattleScript::QuestBattleScript( uint32_t questBattleId ) :

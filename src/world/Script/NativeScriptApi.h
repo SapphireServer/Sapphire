@@ -336,6 +336,8 @@ namespace Sapphire::ScriptAPI
     virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );
 
+    virtual void onLeaveTerritory( InstanceContent& instance, Entity::Player& player );
+
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();

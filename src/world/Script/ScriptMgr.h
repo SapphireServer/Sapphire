@@ -102,6 +102,8 @@ namespace Sapphire::Scripting
     onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                               uint16_t param2 );
 
+    bool onInstanceLeaveTerritory( InstanceContent& instance, Entity::Player& player );
+
     bool onPlayerSetup( QuestBattle& instance, Entity::Player& player );
 
     bool onInstanceInit( QuestBattle& instance );
