@@ -747,7 +747,7 @@ namespace Sapphire::Entity
 
     uint32_t getNextInventorySequence();
 
-    bool findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location );
+    bool findFirstItemWithId( uint32_t catalogId, Inventory::InventoryContainerPair& location, std::initializer_list< Common::InventoryType > bags = { Common::Bag0, Common::Bag1, Common::Bag2, Common::Bag3 } );
 
     uint16_t getFreeSlotsInBags();
 

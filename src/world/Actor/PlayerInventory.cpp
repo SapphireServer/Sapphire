@@ -1076,15 +1076,15 @@ void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryT
 }
 
 bool Sapphire::Entity::Player::findFirstItemWithId( uint32_t catalogId,
-                                                    Inventory::InventoryContainerPair& location )
+                                                    Inventory::InventoryContainerPair& location, std::initializer_list< InventoryType > bags )
 {
-  for( auto bagId : { Bag0, Bag1, Bag2, Bag3 } )
+  for( auto bagId : bags )
   {
     auto& container = m_storageMap[ bagId ];
 
     for( const auto& item : container->getItemMap() )
     {
-      if( item.second->getId() != catalogId )
+      if( ( item.second && item.second->getId() != catalogId ) || !item.second )
         continue;
 
       location = std::make_pair( bagId, item.first );
