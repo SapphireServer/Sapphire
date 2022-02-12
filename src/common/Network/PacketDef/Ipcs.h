@@ -408,7 +408,7 @@ namespace Sapphire::Network::Packets
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
 
-    ReqEquipDisplayFlagsChange = 0x02A5, // updated 5.58 hotfix
+    ReqEquipDisplayFlagsChange = 0x0252, // updated 6.08
 
     LandRenameHandler = 0x028E, // updated 5.58 hotfix
     HousingUpdateHouseGreeting = 0x0343, // updated 5.58 hotfix
