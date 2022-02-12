@@ -393,13 +393,13 @@ namespace Sapphire::Network::Packets
     ReqPlaceHousingItem = 0x02D4, // updated 5.58 hotfix
     BuildPresetHandler = 0x0223, // updated 5.58 hotfix
 
-    TalkEventHandler = 0x0387, // updated 5.58 hotfix
+    TalkEventHandler = 0x036B, // updated 6.08
     EmoteEventHandler = 0x00B0, // updated 5.58 hotfix
     WithinRangeEventHandler = 0x02B6, // updated 5.58 hotfix
     OutOfRangeEventHandler = 0x03C5, // updated 5.58 hotfix
     EnterTeriEventHandler = 0x01A7, // updated 5.58 hotfix
     ShopEventHandler = 0x0384, // updated 5.58 hotfix
-    ReturnEventHandler = 0x00FA, // updated 5.58 hotfix
+    ReturnEventHandler = 0x008D, // updated 6.08 
     TradeReturnEventHandler = 0x0339, // updated 5.58 hotfix
     TradeReturnEventHandler2 = 0x023C, // updated 5.58 hotfix
     EventYield2Handler = 0x021D, // updated 5.58 hotfix
