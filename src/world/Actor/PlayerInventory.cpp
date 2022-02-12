@@ -1084,7 +1084,7 @@ bool Sapphire::Entity::Player::findFirstItemWithId( uint32_t catalogId,
 
     for( const auto& item : container->getItemMap() )
     {
-      if(( item.second && item.second->getId() != catalogId ) || !item.second )
+      if( ( item.second && item.second->getId() != catalogId ) || !item.second )
         continue;
 
       location = std::make_pair( bagId, item.first );
