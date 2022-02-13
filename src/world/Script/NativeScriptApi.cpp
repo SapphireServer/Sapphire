@@ -222,6 +222,16 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, 
+                                      uint32_t eventId )
+  {
+  }
+
+  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, 
+                                      uint64_t actorId )
+  {
+  }
+
   void InstanceContentScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
   {
   }

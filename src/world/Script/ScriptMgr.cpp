@@ -216,6 +216,16 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
       script->onTalk( eventId, player, *eobj );
       return true;
     }
+
+    if( auto instance = zone->getAsInstanceContent() )
+    {
+      auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
+      if( instanceScript )
+      {
+        instanceScript->onTalk( *instance, player, *eobj, eventId );
+        return true;
+      }
+    }
   }
 
   // check for a direct eventid match first, otherwise default to base type
@@ -233,6 +243,17 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
 
     script->onTalk( eventId, player, actorId );
     return true;
+  }
+
+  // check for instance script
+  if( auto instance = zone->getAsInstanceContent() )
+  {
+    auto instanceScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance->getDirectorId() );
+    if( instanceScript )
+    {
+      instanceScript->onTalk( *instance, player, eventId, actorId );
+      return true;
+    }
   }
 }
 
