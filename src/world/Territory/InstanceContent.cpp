@@ -500,7 +500,7 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
 {
   // todo: handle exit (and maybe shortcut?) behaviour here
 
-  auto it = m_eventIdToObjectMap.find( eventId );
+  /*auto it = m_eventIdToObjectMap.find( eventId );
   if( it == m_eventIdToObjectMap.end() )
     return;
 
@@ -508,7 +508,10 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
     onTalk( player, it->second, getAsInstanceContent(), actorId );
   else
     PlayerMgr::sendDebug( player, "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}",
-                          it->second->getObjectId(), eventId );
+                          it->second->getObjectId(), eventId );*/
+                        
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onTalk( player, actorId, eventId );
 }
 
 void
