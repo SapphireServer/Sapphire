@@ -390,7 +390,7 @@ namespace Sapphire::Network::Packets
     
     InventoryEquipRecommendedItems = 0x01C9, // updated 5.58 hotfix
 
-    ReqPlaceHousingItem = 0x02D4, // updated 5.58 hotfix
+    ReqPlaceHousingItem = 0x0192, // updated 6.08
     BuildPresetHandler = 0x0223, // updated 5.58 hotfix
 
     TalkEventHandler = 0x036B, // updated 6.08
