@@ -397,7 +397,7 @@ namespace Sapphire::Network::Packets
     EmoteEventHandler = 0x00B0, // updated 5.58 hotfix
     WithinRangeEventHandler = 0x02B6, // updated 5.58 hotfix
     OutOfRangeEventHandler = 0x03C5, // updated 5.58 hotfix
-    EnterTeriEventHandler = 0x01A7, // updated 5.58 hotfix
+    EnterTeriEventHandler = 0x03AB, // updated 6.08
     ShopEventHandler = 0x0384, // updated 5.58 hotfix
     ReturnEventHandler = 0x008D, // updated 6.08 
     TradeReturnEventHandler = 0x0339, // updated 5.58 hotfix
@@ -413,8 +413,8 @@ namespace Sapphire::Network::Packets
     LandRenameHandler = 0x028E, // updated 5.58 hotfix
     HousingUpdateHouseGreeting = 0x0343, // updated 5.58 hotfix
     HousingUpdateObjectPosition = 0x012C, // updated 5.58 hotfix
-    HousingEditExterior = 0x027B, // updated 5.58 hotfix
-    HousingEditInterior = 0x02E3, // updated 5.58 hotfix
+    HousingEditExterior = 0x03B6, // updated 6.08
+    HousingEditInterior = 0x0249, // updated 6.08
 
     SetSharedEstateSettings = 0x00D2, // updated 5.58 hotfix
 
