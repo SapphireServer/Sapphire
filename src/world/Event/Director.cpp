@@ -121,3 +121,16 @@ uint8_t Sapphire::Event::Director::getDirectorVar( uint8_t index, bool shiftLeft
 {
   return getDirectorVar( index ) & ( shiftLeft ? 0xF0 : 0x0F );
 }
+
+void Sapphire::Event::Director::setCustomVar( uint32_t index, uint64_t value )
+{
+  m_customVarMap[ index ] = value;
+}
+
+uint64_t Sapphire::Event::Director::getCustomVar( uint32_t index )
+{
+  auto it = m_customVarMap.find( index );
+  if( it != m_customVarMap.end() )
+    return it->second;
+  return 0;
+}
