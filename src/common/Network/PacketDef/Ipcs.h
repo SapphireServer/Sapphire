@@ -375,7 +375,7 @@ namespace Sapphire::Network::Packets
 
     ZoneLineHandler = 0x00C3, // updated 5.58 hotfix
     ClientTrigger = 0x02F1, // updated 6.08
-    DiscoveryHandler = 0x038B, // updated 5.58 hotfix
+    DiscoveryHandler = 0x00D9, // updated 6.08
 
     PlaceFieldMarkerPreset = 0x01FE, // updated 6.08
     PlaceFieldMarker = 0x0067, // updated 6.08
@@ -401,7 +401,7 @@ namespace Sapphire::Network::Packets
     ShopEventHandler = 0x0384, // updated 5.58 hotfix
     ReturnEventHandler = 0x008D, // updated 6.08 
     TradeReturnEventHandler = 0x0339, // updated 5.58 hotfix
-    TradeReturnEventHandler2 = 0x023C, // updated 5.58 hotfix
+    TradeReturnEventHandler2 = 0x0388, // updated 6.08 
     EventYield2Handler = 0x021D, // updated 5.58 hotfix
     EventYield16Handler = 0x0207, // updated 5.58 hotfix
 
