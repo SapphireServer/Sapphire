@@ -3,6 +3,7 @@
 #include <Manager/RNGMgr.h>
 #include <Actor/EventObject.h>
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -165,7 +166,7 @@ public:
                                   nullptr, getId() );
     }
 
-    // TODO: set Seq3
+    // TODO: set Seq3 and SeqFinish
 
     // Pick up key and progress duty
     if( eobj.getName() == "Captainsquarterskey" )
@@ -212,6 +213,10 @@ public:
 
   void onLeaveTerritory( InstanceContent& instance, Entity::Player& player ) override
   {
+    // TODO: Set seq properly once bosses work
+    if( instance.getDirectorVar( 0 ) == Seq4 )
+      instance.setVar( 0, SeqFinish );
+
     if( instance.getDirectorVar( 0 ) != SeqFinish )
       return;
 

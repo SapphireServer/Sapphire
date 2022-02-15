@@ -469,7 +469,10 @@ void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& 
 
     if( m_pEntranceEObj != nullptr )
     {
-      player.setRot( m_pEntranceEObj->getRot() );
+      if( rect )
+        player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
+      else
+        player.setRot( PI );
       player.setPos( m_pEntranceEObj->getPos() );
     }
     else if( rect )
