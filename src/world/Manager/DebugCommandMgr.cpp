@@ -40,6 +40,8 @@
 #include "Manager/LinkshellMgr.h"
 #include "Linkshell/Linkshell.h"
 
+#include "Manager/WarpMgr.h"
+
 #include "WorldServer.h"
 
 #include "Session.h"
@@ -69,6 +71,7 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
   registerCommand( "linkshell", &DebugCommandMgr::linkshell, "Linkshell creation", 1 );
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
+  registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
 }
 
 // clear all loaded commands
@@ -1397,4 +1400,43 @@ void DebugCommandMgr::contentFinder( char *data, Sapphire::Entity::Player &playe
     content->setState( QueuedContentState::MatchingComplete );
   }
 
+}
+
+void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( " " );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+
+  if( ( subCommand == "waking_sands" ) )
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 140 )->getGuId(), { -483.257f, 17.0748f, -386.731f }, 1.61298f );
+  else if( subCommand == "rising_stones" )
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 156 )->getGuId(), { 22.2674f, 21.2527f, -634.261f }, -0.369245f );
+  else if( subCommand == "little_solace" )
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 152 )->getGuId(), { 24.557f, -3.78776f, 212.615f }, 2.59117f );
+  else if( subCommand == "adders_nest" )
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 132 )->getGuId(), {-64.7448f, -0.503434f, 2.21786f }, -2.64096f );
+  else if( subCommand == "hall_of_flames" )
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 130 )->getGuId(), { -129.24f, 4.1f, -93.5221f }, -2.30172f );
+  else
+    PlayerMgr::sendUrgent( player, "{0} is not a valid easyWarp location.", subCommand );
 }
