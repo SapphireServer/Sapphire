@@ -101,6 +101,13 @@ namespace Sapphire::Event
     void setDirectorVar( uint8_t index, uint8_t valueLeft, uint8_t valueRight );
 
     /*!
+     * @brief Sets a value of a custom var
+     * @param index of var to set 
+     * @param value to set
+     */
+    void setCustomVar( uint32_t index, uint64_t value );
+
+    /*!
      * @brief Gets a value of a director var
      * @param index of var to get
      * @return 8 bits of selected index
@@ -114,6 +121,13 @@ namespace Sapphire::Event
      * @return 4 bits of selected index
      */
     uint8_t getDirectorVar( uint8_t index, bool shiftLeft );
+
+    /*!
+     * @brief Gets a value of a custom var
+     * @param index of var to get
+     * @return custom var
+     */
+    uint64_t getCustomVar( uint32_t index );
   private:
     /*! Id of the content of the director */
     uint16_t m_contextId;
@@ -131,6 +145,9 @@ namespace Sapphire::Event
 
     /*! type of the director */
     DirectorType m_type;
+
+    /*! custom vars */
+    std::unordered_map< uint32_t, uint64_t > m_customVarMap;
   };
 
 }

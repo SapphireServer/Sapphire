@@ -2,6 +2,8 @@
 #include <Territory/InstanceContent.h>
 #include <Manager/RNGMgr.h>
 #include <Actor/EventObject.h>
+#include <Actor/Player.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -16,7 +18,23 @@ private:
     Green = 2000215
   };
 
-  Corals coral;
+  enum Variables : uint8_t
+  {
+    Coral,
+    ObtainedKey
+  };
+
+  enum Sequence : uint8_t
+  {
+    Seq1 = 1,
+    Seq2 = 3,
+    Seq3 = 7,
+    Seq4 = 15,
+    SeqFinish = 31
+  };
+
+  static constexpr auto EventActionTouch = 24;
+  static constexpr auto EventActionShort = 15;
 
 public:
   Sastasha() :
@@ -27,9 +45,9 @@ public:
   {
     // Random coral
     auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
-    coral = static_cast< Corals >( RNGMgr.getRandGenerator< float >( Corals::Blue, Corals::Green ).next() );
+    instance.setCustomVar( Coral, static_cast< uint64_t >( RNGMgr.getRandGenerator< float >( Corals::Blue, Corals::Green ).next() ) );
 
-    switch( coral )
+    switch( instance.getCustomVar( Coral ) )
     {
       case Corals::Blue:
         instance.registerEObj( "Bloodymemo", 2000212, 0, 4, { 320.812988f, 47.862450f, -130.776306f }, 0.600000f, -0.898762f );
@@ -42,15 +60,17 @@ public:
         break;
     }
 
-    instance.registerEObj( "unknown_0", 2000211, 0, 4, { 367.827087f, 47.400051f, -226.694305f }, 4.714991f, 0.000432f ); 
-    instance.registerEObj( "sgvf_w_lvd_b0250", 2001504, 4323996, 1, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "unknown_0", 2000211, 0, 4, { 367.827087f, 47.400051f, -226.694305f }, 4.714991f, 0.000432f );
+    // TODO: this should be spawned when entering the boss arena (1)
+    instance.registerEObj( "sgvf_w_lvd_b0250", 2001504, 4323996, 4, { 94.597588f, 26.865030f, -68.584061f }, 1.000000f, 0.000000f ); 
     // States -> vf_bextwall_on (id: 3) vf_bextwall_of (id: 4) 
-    instance.registerEObj( "sgvf_w_lvd_b0249", 2001505, 4323997, 1, { 95.510597f, 26.620729f, -67.853653f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "sgvf_w_lvd_b0249", 2001505, 4323997, 4, { 95.510597f, 26.620729f, -67.853653f }, 1.000000f, 0.000000f ); 
     // States -> vf_line_on (id: 10) vf_line_of (id: 11) 
-    instance.registerEObj( "unknown_1", 2001506, 3653862, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f ); 
+    // TODO: this should be spawned when entering the boss arena (2)
+    //instance.registerEObj( "unknown_1", 2001506, 3653862, 4, { -9.239832f, 24.789940f, 35.778252f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "sgvf_w_lvd_b0094", 2001507, 4035750, 4, { -2.841087f, 23.114571f, 38.090420f }, 0.991760f, 0.000048f ); 
     // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
-    instance.registerEObj( "unknown_2", 2001539, 3653864, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f ); 
+    //instance.registerEObj( "unknown_2", 2001539, 3653864, 4, { -158.560898f, 8.099012f, 214.344803f }, 0.991760f, 0.000048f ); 
     instance.registerEObj( "sgvf_w_lvd_b0094_1", 2001540, 4056793, 4, { -163.598602f, 8.026373f, 214.030106f }, 0.991760f, 0.000048f ); 
     // States -> vf_line_on (id: 12) vf_line_of (id: 13) 
     instance.registerEObj( "sgpl_s1d1_bosswall", 2001508, 4236989, 4, { -303.983612f, 5.576412f, 276.214111f }, 1.000000f, 0.000000f ); 
@@ -62,7 +82,6 @@ public:
     instance.registerEObj( "Bluecoralformation", 2000213, 3668215, 4, { 75.869797f, 35.101421f, -32.537209f }, 0.930753f, 0.000240f ); 
     instance.registerEObj( "Redcoralformation", 2000214, 3668214, 4, { 88.769371f, 31.135691f, -40.869640f }, 0.930753f, 0.000240f ); 
     instance.registerEObj( "Greencoralformation", 2000215, 3668216, 4, { 64.988159f, 33.672821f, -56.690559f }, 0.991789f, 0.000048f ); 
-    instance.registerEObj( "Inconspicuousswitch", 2000216, 3653858, 3, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f ); 
     instance.registerEObj( "Hiddendoor", 2000217, 3653517, 4, { 59.000000f, 32.000000f, -35.000000f }, 1.000000f, -2.007129f ); 
     instance.registerEObj( "Giantclam", 2000222, 4208408, 4, { 181.170303f, 32.104599f, -128.069000f }, 0.991789f, -0.862350f ); 
     // States -> vf_kai_off (id: 4) vf_kai_on (id: 5) vf_kai_pop (id: 6) close_open (id: 7) open_close (id: 8) 
@@ -90,7 +109,6 @@ public:
     instance.registerEObj( "Unnaturalripples_1", 2000406, 3992452, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Unnaturalripples_2", 2000407, 3992449, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f ); 
     instance.registerEObj( "Unnaturalripples_3", 2000408, 3992453, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f ); 
-
   }
 
   void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
@@ -107,36 +125,83 @@ public:
 
     if( eobj.getName() == "Bluecoralformation" || eobj.getName() == "Redcoralformation" || eobj.getName() == "Greencoralformation" )
     {
-      eventMgr().eventActionStart( player, getId(), 15,
-                                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                                  { 
-                                    eobj.setState( 1 );
+      eventMgr().playScene( player, eventId, 1, HIDE_HOTBAR, { 1 }, 
+                            [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                            {
+                              if( result.getResult( 0 ) == 0 )
+                              {
+                                eventMgr().eventActionStart( player, getId(), EventActionTouch,
+                                                            [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                                            { 
+                                                              eobj.setState( 1 );
 
-                                    if( eobj.getObjectId() == coral )
-                                    {
-                                      // TODO: summon boss, do this after boss is defeated
-                                      instance.getEObjByName( "Inconspicuousswitch" )->setState( 0 );
-                                      instance.setVar( 0, 1 );
-                                      Logger::debug( "correct coral!" );
-                                    }
-                                    else
-                                    {
-                                      // TODO: spawn adds
-                                      Logger::debug( "wrong coral!" );
-                                    }
-                                  },
-                                  nullptr, getId() );
+                                                              if( eobj.getObjectId() == instance.getCustomVar( Coral ) )
+                                                              {
+                                                                // TODO: summon boss, do this after boss is defeated
+                                                                instance.registerEObj( "Inconspicuousswitch", 2000216, 3653858, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f ); 
+                                                                instance.setVar( 0, Seq1 );
+                                                                Logger::debug( "correct coral!" );
+                                                              }
+                                                              else
+                                                              {
+                                                                // TODO: spawn adds
+                                                                Logger::debug( "wrong coral!" );
+                                                              }
+                                                            },
+                                                            nullptr, getId() );
+                              }
+                            } );
     }
 
+    // Open the door and progress duty
     if( eobj.getName() == "Inconspicuousswitch" )
     {
-      eventMgr().eventActionStart( player, getId(), 15,
+      eventMgr().eventActionStart( player, getId(), EventActionTouch,
                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                   {
                                     instance.getEObjByName( "Hiddendoor" )->setState( 1 );
                                     eobj.setState( 1 );
+                                    instance.setVar( 0, Seq2 );
                                   },
                                   nullptr, getId() );
+    }
+
+    // TODO: set Seq3 and SeqFinish
+
+    // Pick up key and progress duty
+    if( eobj.getName() == "Captainsquarterskey" )
+    {
+      eventMgr().eventActionStart( player, getId(), EventActionShort,
+                                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                  {
+                                    eobj.setState( 1 );
+                                    instance.setVar( 0, Seq4 );
+                                  },
+                                  nullptr, getId() );
+    }
+
+    // Pick up 2nd key and set variable
+    if( eobj.getName() == "WaveriderGatekey" )
+    {
+      eventMgr().eventActionStart( player, getId(), EventActionShort,
+                                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                  {
+                                    eobj.setState( 1 );
+                                    instance.setCustomVar( ObtainedKey, true );
+                                  },
+                                  nullptr, getId() );
+    }
+
+    // Open the door if the right key has been obtained
+    if( ( eobj.getName() == "Captainsquarters" && instance.getDirectorVar( 0 ) == Seq4 ) || 
+        ( eobj.getName() == "WaveriderGate" && instance.getCustomVar( ObtainedKey ) ) )
+    {
+      eventMgr().eventActionStart( player, getId(), EventActionTouch,
+                            [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                            {
+                              eobj.setState( 1 );
+                            },
+                            nullptr, getId() );
     }
   }
 
@@ -144,6 +209,29 @@ public:
                          uint16_t param2 ) override
   {
 
+  }
+
+  void onLeaveTerritory( InstanceContent& instance, Entity::Player& player ) override
+  {
+    // TODO: Set seq properly once bosses work
+    if( instance.getDirectorVar( 0 ) == Seq4 )
+      instance.setVar( 0, SeqFinish );
+
+    if( instance.getDirectorVar( 0 ) != SeqFinish )
+      return;
+
+    if( auto quest = player.getQuest( 66211 ) )
+      if( quest->getSeq() == 3 )
+      {
+        quest->setSeq( 255 );
+        player.updateQuest( quest.value() );
+      }
+    else if( auto quest = player.getQuest( 65781 ) )
+      if( quest->getSeq() == 3 )
+      {
+        quest->setSeq( 255 );
+        player.updateQuest( quest.value() );
+      }
   }
 
 };
