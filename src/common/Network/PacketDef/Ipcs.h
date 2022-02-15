@@ -375,7 +375,7 @@ namespace Sapphire::Network::Packets
 
     ZoneLineHandler = 0x00C3, // updated 5.58 hotfix
     ClientTrigger = 0x02F1, // updated 6.08
-    DiscoveryHandler = 0x038B, // updated 5.58 hotfix
+    DiscoveryHandler = 0x00D9, // updated 6.08
 
     PlaceFieldMarkerPreset = 0x01FE, // updated 6.08
     PlaceFieldMarker = 0x0067, // updated 6.08
@@ -390,7 +390,7 @@ namespace Sapphire::Network::Packets
     
     InventoryEquipRecommendedItems = 0x01C9, // updated 5.58 hotfix
 
-    ReqPlaceHousingItem = 0x02D4, // updated 5.58 hotfix
+    ReqPlaceHousingItem = 0x0192, // updated 6.08
     BuildPresetHandler = 0x0223, // updated 5.58 hotfix
 
     TalkEventHandler = 0x036B, // updated 6.08
@@ -399,22 +399,24 @@ namespace Sapphire::Network::Packets
     OutOfRangeEventHandler = 0x03C5, // updated 5.58 hotfix
     EnterTeriEventHandler = 0x03AB, // updated 6.08
     ShopEventHandler = 0x0384, // updated 5.58 hotfix
-    ReturnEventHandler = 0x008D, // updated 5.58 hotfix
+
+    ReturnEventHandler = 0x008D, // updated 6.08 
     TradeReturnEventHandler = 0x0116, // updated 6.08
-    TradeReturnEventHandler2 = 0x023C, // updated 5.58 hotfix
+    TradeReturnEventHandler2 = 0x0388, // updated 6.08 
+
     EventYield2Handler = 0x021D, // updated 5.58 hotfix
     EventYield16Handler = 0x0207, // updated 5.58 hotfix
 
     LinkshellEventHandler = 0x016B, // updated 4.5
     LinkshellEventHandler1 = 0x016C, // updated 4.5
 
-    ReqEquipDisplayFlagsChange = 0x02A5, // updated 5.58 hotfix
+    ReqEquipDisplayFlagsChange = 0x0252, // updated 6.08
 
     LandRenameHandler = 0x028E, // updated 5.58 hotfix
     HousingUpdateHouseGreeting = 0x0343, // updated 5.58 hotfix
     HousingUpdateObjectPosition = 0x012C, // updated 5.58 hotfix
-    HousingEditExterior = 0x027B, // updated 5.58 hotfix
-    HousingEditInterior = 0x02E3, // updated 5.58 hotfix
+    HousingEditExterior = 0x03B6, // updated 6.08
+    HousingEditInterior = 0x0249, // updated 6.08
 
     SetSharedEstateSettings = 0x00D2, // updated 5.58 hotfix
 
