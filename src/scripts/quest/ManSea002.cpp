@@ -79,7 +79,7 @@ public:
 
 private:
 
-  void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
     if( varIdx == 1 )
     {
@@ -94,24 +94,20 @@ private:
       eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
     }
 
-    auto pQuest = player.getQuest( getId() );
-    if( !pQuest )
-      return;
-
-    auto QUEST_VAR_ATTUNE = pQuest->getUI8AL();
-    auto QUEST_VAR_CLASS = pQuest->getUI8BH();
-    auto QUEST_VAR_TRADE = pQuest->getUI8BL();
+    auto QUEST_VAR_ATTUNE = quest.getUI8AL();
+    auto QUEST_VAR_CLASS = quest.getUI8BH();
+    auto QUEST_VAR_TRADE = quest.getUI8BL();
 
     if( QUEST_VAR_ATTUNE == 1 && QUEST_VAR_CLASS == 1 && QUEST_VAR_TRADE == 1 )
     {
-      pQuest->setSeq( SEQ_FINISH );
+      quest.setSeq( SEQ_FINISH );
     }
   }
 
   void Scene00000( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
                         if( result.getResult( 0 ) == 1 )
                         {
@@ -122,21 +118,18 @@ private:
 
   void Scene00001( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setSeq( SEQ_1 );
-                        pQuest->setUI8CH( 1 );
+                        quest.setSeq( SEQ_1 );
+                        quest.setUI8CH( 1 );
                       } );
   }
 
   void Scene00002( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 2, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
                         Scene00003( player );
                       } );
@@ -144,21 +137,18 @@ private:
 
   void Scene00003( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 3, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 3, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8BL( 1 );
-                        checkQuestCompletion( player, 0 );
+                        quest.setUI8BL( 1 );
+                        checkQuestCompletion( quest, player, 0 );
                       } );
   }
 
   void Scene00004( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 4, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
                         if( result.getResult( 0 ) == 1 )
                         {
@@ -171,35 +161,29 @@ private:
 
   void Scene00005( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8CH( 0 );
-                        pQuest->setUI8BH( 1 );
-                        checkQuestCompletion( player, 1 );
+                        quest.setUI8CH( 0 );
+                        quest.setUI8BH( 1 );
+                        checkQuestCompletion( quest, player, 1 );
                       } );
   }
 
   void Scene00006( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 6, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
-                        auto pQuest = player.getQuest( getId() );
-                        if( !pQuest )
-                          return;
-                        pQuest->setUI8AL( 1 );
-                        checkQuestCompletion( player, 2 );
+                        quest.setUI8AL( 1 );
+                        checkQuestCompletion( quest, player, 2 );
                       } );
   }
 
   void Scene00007( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 7, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), 7, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ,
+                      [ & ]( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
                       {
                         if( result.getResult( 0 ) == 1 )
                         {
