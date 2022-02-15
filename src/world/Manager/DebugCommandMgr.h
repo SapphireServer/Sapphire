@@ -61,6 +61,8 @@ namespace Sapphire::World::Manager
 
     void contentFinder( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void easyWarp( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
   };
 
 }
