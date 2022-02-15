@@ -80,7 +80,7 @@ namespace Sapphire::Network::Packets
 
     LogMessage = 0x0142, // updated 6.08
 
-    Chat = 0x0148, // updated 56.08
+    Chat = 0x0148, // updated 6.08
     PartyChat = 0x0065,
 
     WorldVisitList = 0xF0FE, // added 4.5
@@ -335,7 +335,7 @@ namespace Sapphire::Network::Packets
     CFDutyInfoHandler = 0xF078, // updated 4.2
 
     SocialReqSendHandler = 0x00D7, // updated 5.58 hotfix
-    SocialResponseHandler = 0x023B, // updated 5.58 hotfix
+    SocialResponseHandler = 0x0193, // updated 6.08
     CreateCrossWorldLS = 0x035D, // updated 5.58 hotfix
 
     ChatHandler = 0x01C8, // updated 6.08
@@ -393,14 +393,14 @@ namespace Sapphire::Network::Packets
     ReqPlaceHousingItem = 0x02D4, // updated 5.58 hotfix
     BuildPresetHandler = 0x0223, // updated 5.58 hotfix
 
-    TalkEventHandler = 0x0387, // updated 5.58 hotfix
+    TalkEventHandler = 0x036B, // updated 6.08
     EmoteEventHandler = 0x00B0, // updated 5.58 hotfix
     WithinRangeEventHandler = 0x02B6, // updated 5.58 hotfix
     OutOfRangeEventHandler = 0x03C5, // updated 5.58 hotfix
-    EnterTeriEventHandler = 0x01A7, // updated 5.58 hotfix
+    EnterTeriEventHandler = 0x03AB, // updated 6.08
     ShopEventHandler = 0x0384, // updated 5.58 hotfix
-    ReturnEventHandler = 0x00FA, // updated 5.58 hotfix
-    TradeReturnEventHandler = 0x0339, // updated 5.58 hotfix
+    ReturnEventHandler = 0x008D, // updated 5.58 hotfix
+    TradeReturnEventHandler = 0x0116, // updated 6.08
     TradeReturnEventHandler2 = 0x023C, // updated 5.58 hotfix
     EventYield2Handler = 0x021D, // updated 5.58 hotfix
     EventYield16Handler = 0x0207, // updated 5.58 hotfix
