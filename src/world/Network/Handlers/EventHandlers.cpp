@@ -154,7 +154,7 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets:
   std::string objName = eventMgr.getEventName( eventId );
   player.sendDebug( "Calling: {0}.{1} - {2} p1: {3}", objName, eventName, eventId, param1 );
 
-  player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
+  player.eventStart( player.getId(), eventId, Event::EventHandler::OutsideRange, 1, param1 );
 
   scriptMgr.onOutsideRange( player, eventId, param1, pos.x, pos.y, pos.z );
 
