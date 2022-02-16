@@ -170,7 +170,6 @@ public:
 
                                                               if( eobj.getObjectId() == instance.getCustomVar( Coral ) )
                                                               {
-                                                                // TODO: summon boss, do this after boss is defeated
                                                                 instance.registerEObj( "Inconspicuousswitch", 2000216, 3653858, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f ); 
                                                                 instance.setVar( 0, Seq1 );
                                                                 instance.sendEventLogMessage( player, instance, 2034, { 0, 0 } );
@@ -205,8 +204,6 @@ public:
                                     nullptr, getId() );
       }
     }
-
-    // TODO: set Seq3 and SeqFinish
 
     // Pick up key and progress duty
     if( eobj.getName() == "Captainsquarterskey" )
@@ -267,10 +264,6 @@ public:
 
   void onLeaveTerritory( InstanceContent& instance, Entity::Player& player ) override
   {
-    // TODO: Set seq properly once bosses work
-    if( instance.getDirectorVar( 0 ) == Seq4 )
-      instance.setVar( 0, SeqFinish );
-
     if( instance.getDirectorVar( 0 ) != SeqFinish )
       return;
 
