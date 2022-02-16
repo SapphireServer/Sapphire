@@ -993,7 +993,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
     if( !obj )
       return;
 
-    obj->setState( state );
+    obj->setPermissionInvisibility( state );
   }
   else if( subCommand == "objflag" )
   {

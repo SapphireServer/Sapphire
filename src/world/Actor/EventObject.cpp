@@ -86,8 +86,6 @@ uint8_t Sapphire::Entity::EventObject::getState() const
 void Sapphire::Entity::EventObject::setState( uint8_t state )
 {
   m_state = state;
-
-  sendToInRangeSet( makeActorControl( getId(), DirectorEObjMod, state ) );
 }
 
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
@@ -144,6 +142,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().EntityId = getId();
   eobjStatePacket->data().Dir = Util::floatToUInt16Rot( getRot() );
   eobjStatePacket->data().OwnerId = getOwnerId();
+  eobjStatePacket->data().PermissionInvisibility = getPermissionInvisibility();
   eobjStatePacket->data().Args = 0xE0;
   eobjStatePacket->data().Args2 = 0; // initial animation state
   eobjStatePacket->data().Args3 = getHousingLink();
@@ -178,6 +177,8 @@ uint8_t Sapphire::Entity::EventObject::getPermissionInvisibility() const
 void Sapphire::Entity::EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
   m_permissionInvisibility = permissionInvisibility;
+
+  sendToInRangeSet( makeActorControl( getId(), DirectorEObjMod, permissionInvisibility ) );
 }
 
 uint32_t Sapphire::Entity::EventObject::getOwnerId() const
