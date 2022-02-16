@@ -45,7 +45,7 @@ namespace Sapphire
 
     void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override;
 
-    void onRegisterEObj( Entity::EventObjectPtr object ) override;
+    void onAddEObj( Entity::EventObjectPtr object ) override;
 
     void onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3,
                               uint32_t arg4 ) override;
