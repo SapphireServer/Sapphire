@@ -40,17 +40,18 @@ namespace Sapphire
       DutyCommence = 0x40000001,
       DutyComplete = 0x40000002,
       SetStringendoMode = 0x40000003,
-      BattleGroundMusic = 0x40000004,
-      InvalidateTodoList = 0x40000005,
-      LoadingScreen = 0x40000007,
-      Forward = 0x40000008,
+      SetDutyTime = 0x40000004,
+      LoadingScreen = 0x40000005,
+      Forward = 0x40000006,
+      BattleGroundMusic = 0x40000007,
+      InvalidateTodoList = 0x40000008,
       VoteState = 0x40000009,
       VoteStart = 0x4000000A,
       VoteResult = 0x4000000B,
       VoteFinish = 0x4000000C,
-      TreasureVoteRefresh = 0x4000000D,
-      SetSharedGroupId = 0x4000000E,
-      FirstTimeNotify = 0x4000000F
+      FirstTimeNotify = 0x4000000D,
+      TreasureVoteRefresh = 0x4000000E,
+      SetSharedGroupId = 0x4000000F,
     };
 
     enum EventHandlerOrderId : uint32_t

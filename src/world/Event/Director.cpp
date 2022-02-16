@@ -2,13 +2,12 @@
 
 #include <Territory/InstanceContent.h>
 
-#include <Network/PacketDef/ServerIpcs.h>
+#include <Network/PacketWrappers/EventLogMessagePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
 
-#include "Network/PacketDef/Zone/ServerZoneDef.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include <Logging/Logger.h>
@@ -20,7 +19,6 @@
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
@@ -49,67 +47,38 @@ uint8_t Sapphire::Event::Director::getSequence() const
   return m_sequence;
 }
 
-void Sapphire::Event::Director::sendEventLogMessage( Sapphire::Entity::Player& player, Sapphire::InstanceContent& instance, uint32_t msgId, std::vector< uint32_t > args ) const
+void Sapphire::Event::Director::sendEventLogMessage( Sapphire::Entity::Player& player, Sapphire::InstanceContent& instance, uint32_t msgId, std::initializer_list< uint32_t > args ) const
 {
+  FFXIVPacketBasePtr packet = nullptr;
+
+  assert( args.size() <= 32 );
+
   if( args.size() == 0 )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcEventLogMessageHeader >( player.getId() );
-    packet->data().handlerId = instance.getDirectorId();
-    packet->data().messageId = msgId;
-    packet->data().numOfArgs = args.size();
-    instance.queuePacketForZone( player, packet, true );
+    packet = std::move( std::make_shared< class EventLogMessageHeader >( player, instance.getDirectorId(), msgId ) );
   }
   else if( args.size() <= 2 )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcEventLogMessage2 >( player.getId() );
-    packet->data().handlerId = instance.getDirectorId();
-    packet->data().messageId = msgId;
-    packet->data().numOfArgs = args.size();
-    std::copy( args.begin(), args.end(), packet->data().args );
-    instance.queuePacketForZone( player, packet, true );
-    Logger::debug( "arg size: {}", packet->data().numOfArgs );
-    Logger::debug(
-      "Dump:\n{0}",
-      Util::binaryToHexDump( const_cast< uint8_t* >( &packet->getContent()[ 0 ] ),
-      static_cast< uint16_t >( packet->getContentSize() ) )
-    );
+    packet = std::move( std::make_shared< class EventLogMessage2 >( player, instance.getDirectorId(), msgId, args ) );
   }
   else if( args.size() <= 4 )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcEventLogMessage4 >( player.getId() );
-    packet->data().handlerId = instance.getDirectorId();
-    packet->data().messageId = msgId;
-    packet->data().numOfArgs = args.size();
-    std::copy( args.begin(), args.end(), packet->data().args );
-    instance.queuePacketForZone( player, packet, true );
+    packet = std::move( std::make_shared< class EventLogMessage4 >( player, instance.getDirectorId(), msgId, args ) );
   }
   else if( args.size() <= 8 )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcEventLogMessage8 >( player.getId() );
-    packet->data().handlerId = instance.getDirectorId();
-    packet->data().messageId = msgId;
-    packet->data().numOfArgs = args.size();
-    std::copy( args.begin(), args.end(), packet->data().args );
-    instance.queuePacketForZone( player, packet, true );
+    packet = std::move( std::make_shared< class EventLogMessage8 >( player, instance.getDirectorId(), msgId, args ) );
   }
   else if( args.size() <= 16 )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcEventLogMessage16 >( player.getId() );
-    packet->data().handlerId = instance.getDirectorId();
-    packet->data().messageId = msgId;
-    packet->data().numOfArgs = args.size();
-    std::copy( args.begin(), args.end(), packet->data().args );
-    instance.queuePacketForZone( player, packet, true );
+    packet = std::move( std::make_shared< class EventLogMessage16 >( player, instance.getDirectorId(), msgId, args ) );
   }
   else if( args.size() <= 32 )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcEventLogMessage32 >( player.getId() );
-    packet->data().handlerId = instance.getDirectorId();
-    packet->data().messageId = msgId;
-    packet->data().numOfArgs = args.size();
-    std::copy( args.begin(), args.end(), packet->data().args );
-    instance.queuePacketForZone( player, packet, true );
+    packet = std::move( std::make_shared< class EventLogMessage32 >( player, instance.getDirectorId(), msgId, args ) );
   }
+
+  instance.queuePacketForZone( player, packet, true );
 }
 
 void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& player ) const
