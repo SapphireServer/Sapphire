@@ -38,9 +38,9 @@ namespace Sapphire
     {
       DEBUG_TimeSync = 0xC0000001,
       DutyCommence = 0x40000001,
-      BattleGroundMusic = 0x40000002,
+      DutyComplete = 0x40000002,
       SetStringendoMode = 0x40000003,
-      DutyComplete = 0x40000004,
+      BattleGroundMusic = 0x40000004,
       InvalidateTodoList = 0x40000005,
       LoadingScreen = 0x40000007,
       Forward = 0x40000008,

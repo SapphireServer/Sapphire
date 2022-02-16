@@ -1,11 +1,20 @@
 #include <ScriptObject.h>
 #include <Territory/InstanceContent.h>
 #include <Manager/RNGMgr.h>
+
 #include <Actor/EventObject.h>
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
 
+#include <WorldServer.h>
+
+#include <Network/GamePacket.h>
+#include <Network/GameConnection.h>
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+
 using namespace Sapphire;
+using namespace Sapphire::Network::Packets;
+using namespace Sapphire::Network::Packets::WorldPackets;
 
 class Sastasha :
   public Sapphire::ScriptAPI::InstanceContentScript
@@ -30,11 +39,16 @@ private:
     Seq2 = 3,
     Seq3 = 7,
     Seq4 = 15,
-    SeqFinish = 31
+    SeqFinish = 255
   };
 
   static constexpr auto EventActionTouch = 24;
   static constexpr auto EventActionShort = 15;
+
+  Entity::BNpcPtr denn;
+  Entity::BNpcPtr madison2;
+  Entity::BNpcPtr madison;
+  Entity::BNpcPtr chopper;
 
 public:
   Sastasha() :
@@ -108,12 +122,31 @@ public:
     instance.registerEObj( "Unnaturalripples", 2000405, 3992454, 4, { -301.973206f, 6.500000f, 300.029388f }, 0.991789f, 0.000048f ); 
     instance.registerEObj( "Unnaturalripples_1", 2000406, 3992452, 4, { -302.037598f, 6.500000f, 336.047302f }, 1.000000f, 0.000000f ); 
     instance.registerEObj( "Unnaturalripples_2", 2000407, 3992449, 4, { -338.036499f, 6.500000f, 300.206512f }, 0.991789f, 0.000048f ); 
-    instance.registerEObj( "Unnaturalripples_3", 2000408, 3992453, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f ); 
+    instance.registerEObj( "Unnaturalripples_3", 2000408, 3992453, 4, { -337.929596f, 6.500000f, 335.975311f }, 1.000000f, 0.000000f );
   }
 
   void onUpdate( InstanceContent& instance, uint64_t tickCount ) override
   {
+    if( madison && !madison->isAlive() )
+    {
+      instance.setVar( 0, Seq3 );
+      instance.getEObjByName( "Rambadedoor" )->setState( 1 );
+      madison2 = instance.createBNpcFromInstanceId( 4035056, 600, Common::BNpcType::Enemy );
+      madison = nullptr;
+    }
 
+    if( madison2 && !madison2->isAlive() )
+    {
+      instance.getEObjByName( "Rambadedoor_1" )->setState( 1 );
+      madison2 = nullptr;
+    }
+
+    if( denn && !denn->isAlive() )
+    {
+      instance.setVar( 0, SeqFinish );
+      instance.sendDutyComplete();
+      denn = nullptr;
+    }
   }
 
   void onTalk( InstanceContent& instance, Entity::Player& player, Entity::EventObject& eobj, uint32_t eventId ) override
@@ -137,10 +170,9 @@ public:
 
                                                               if( eobj.getObjectId() == instance.getCustomVar( Coral ) )
                                                               {
-                                                                // TODO: summon boss, do this after boss is defeated
                                                                 instance.registerEObj( "Inconspicuousswitch", 2000216, 3653858, 4, { 62.907951f, 33.969521f, -31.172279f }, 1.000000f, -1.396264f ); 
                                                                 instance.setVar( 0, Seq1 );
-                                                                Logger::debug( "correct coral!" );
+                                                                instance.sendEventLogMessage( player, instance, 2034, { 0, 0 } );
                                                               }
                                                               else
                                                               {
@@ -156,17 +188,22 @@ public:
     // Open the door and progress duty
     if( eobj.getName() == "Inconspicuousswitch" )
     {
-      eventMgr().eventActionStart( player, getId(), EventActionTouch,
-                                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                                  {
-                                    instance.getEObjByName( "Hiddendoor" )->setState( 1 );
-                                    eobj.setState( 1 );
-                                    instance.setVar( 0, Seq2 );
-                                  },
-                                  nullptr, getId() );
+      if( !chopper )
+        chopper = instance.createBNpcFromInstanceId( 4035011, 400, Common::BNpcType::Enemy );
+      else if( chopper && !chopper->isAlive() )
+      {
+        eventMgr().eventActionStart( player, getId(), EventActionTouch,
+                                    [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                    {
+                                      instance.getEObjByName( "Hiddendoor" )->setState( 1 );
+                                      eobj.setState( 1 );
+                                      instance.setVar( 0, Seq2 );
+                                      instance.sendEventLogMessage( player, instance, 2064, { 0, 0 } );
+                                      madison = instance.createBNpcFromInstanceId( 3988325, 600, Common::BNpcType::Enemy );
+                                    },
+                                    nullptr, getId() );
+      }
     }
-
-    // TODO: set Seq3 and SeqFinish
 
     // Pick up key and progress duty
     if( eobj.getName() == "Captainsquarterskey" )
@@ -175,7 +212,8 @@ public:
                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                   {
                                     eobj.setState( 1 );
-                                    instance.setVar( 0, Seq4 );
+                                    instance.setCustomVar( ObtainedKey, true );
+                                    instance.sendEventLogMessage( player, instance, 2031, { 34432 } );
                                   },
                                   nullptr, getId() );
     }
@@ -187,21 +225,34 @@ public:
                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                   {
                                     eobj.setState( 1 );
-                                    instance.setCustomVar( ObtainedKey, true );
+                                    instance.setVar( 0, Seq4 );
+                                    instance.sendEventLogMessage( player, instance, 2031, { 34433 } );
+                                    denn = instance.createBNpcFromInstanceId( 3978771, 1000, Common::BNpcType::Enemy );
                                   },
                                   nullptr, getId() );
     }
 
     // Open the door if the right key has been obtained
-    if( ( eobj.getName() == "Captainsquarters" && instance.getDirectorVar( 0 ) == Seq4 ) || 
-        ( eobj.getName() == "WaveriderGate" && instance.getCustomVar( ObtainedKey ) ) )
+    if( ( eobj.getName() == "Captainsquarters" && instance.getCustomVar( ObtainedKey ) ) || 
+        ( eobj.getName() == "WaveriderGate" && instance.getDirectorVar( 0 ) == Seq4 ) )
     {
-      eventMgr().eventActionStart( player, getId(), EventActionTouch,
-                            [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+      eventMgr().playScene( player, eventId, 1, HIDE_HOTBAR, { 1 }, 
+                            [ & ]( Entity::Player& player, const Event::SceneResult& result )
                             {
-                              eobj.setState( 1 );
-                            },
-                            nullptr, getId() );
+                              if( result.getResult( 0 ) == 0 )
+                              {
+                                eventMgr().eventActionStart( player, getId(), EventActionTouch,
+                                                      [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
+                                                      {
+                                                        eobj.setState( 1 );
+                                                        if( eobj.getName() == "Captainsquarters" )
+                                                          instance.sendEventLogMessage( player, instance, 2059, { 668 } );
+                                                        else
+                                                          instance.sendEventLogMessage( player, instance, 2059, { 671 } );
+                                                      },
+                                                      nullptr, getId() );
+                              }
+                            } );
     }
   }
 
@@ -213,10 +264,6 @@ public:
 
   void onLeaveTerritory( InstanceContent& instance, Entity::Player& player ) override
   {
-    // TODO: Set seq properly once bosses work
-    if( instance.getDirectorVar( 0 ) == Seq4 )
-      instance.setVar( 0, SeqFinish );
-
     if( instance.getDirectorVar( 0 ) != SeqFinish )
       return;
 
