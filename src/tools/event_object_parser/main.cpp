@@ -193,6 +193,16 @@ void loadAllInstanceContentEntries()
   }
 }
 
+bool invalidChar (char c)
+{
+  return !isprint((unsigned)c);
+}
+
+void stripUnicode(std::string & str)
+{
+  str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());
+}
+
 int main( int argc, char* argv[] )
 {
   auto startTime = std::chrono::system_clock::now();
@@ -358,6 +368,7 @@ int main( int argc, char* argv[] )
               if( eobjNameMap.find( id ) != eobjNameMap.end() )
               {
                 name = eobjNameMap[ id ];
+                stripUnicode( name );
                 std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
                 Common::Util::eraseAllIn( name, remove );
                 name[ 0 ] = toupper( name[ 0 ] );

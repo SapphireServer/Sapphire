@@ -210,11 +210,29 @@ struct SGB_HEADER
   uint32_t unknown54;
 };
 
+enum eCollisionState
+{
+  NoChange = 0x0,
+  On = 0x1,
+  Off = 0x2,
+};
+
+
 struct SGB_STATE_HEADER
 {
   uint32_t id;
   uint32_t nameOffset;
-  char unknown[0x24];
+  int Binders;
+  int BinderCount;
+  int BinaryAssetPath;
+  int Binary;
+  int BinaryCount;
+  uint32_t TimelineID;
+  int8_t AutoPlay;
+  int8_t LoopPlayback;
+  uint8_t Padding00[2];
+  eCollisionState CollisionState;
+  uint32_t Reserved[1];
 };
 
 struct SGB_STATE_ENTRY
