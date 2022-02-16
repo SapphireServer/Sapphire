@@ -154,7 +154,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       sendDutyCommence();
 
       if( m_pEntranceEObj )
-        m_pEntranceEObj->setState( 1 );
+        m_pEntranceEObj->setPermissionInvisibility( 1 );
       m_state = DutyInProgress;
       break;
     }
