@@ -213,7 +213,7 @@ public:
                                   {
                                     eobj.setState( 1 );
                                     instance.setCustomVar( ObtainedKey, true );
-                                    instance.sendEventLogMessage( player, instance, 2031, { 34432 } );
+                                    instance.sendEventLogMessage( player, instance, 2031, { 2000512 } );
                                   },
                                   nullptr, getId() );
     }
@@ -226,7 +226,7 @@ public:
                                   {
                                     eobj.setState( 1 );
                                     instance.setVar( 0, Seq4 );
-                                    instance.sendEventLogMessage( player, instance, 2031, { 34433 } );
+                                    instance.sendEventLogMessage( player, instance, 2031, { 2000513 } );
                                     denn = instance.createBNpcFromInstanceId( 3978771, 1000, Common::BNpcType::Enemy );
                                   },
                                   nullptr, getId() );
