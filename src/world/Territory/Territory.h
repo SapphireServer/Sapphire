@@ -116,7 +116,7 @@ namespace Sapphire
 
     virtual void onUpdate( uint64_t tickCount );
 
-    virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
+    virtual void onAddEObj( Entity::EventObjectPtr object ) {};
 
     virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
@@ -168,10 +168,11 @@ namespace Sapphire
 
     void updateSessions( uint64_t tickCount, bool changedWeather );
 
-    Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
-                                         uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );
+    Entity::EventObjectPtr addEObj( const std::string& name, uint32_t objectId, uint32_t mapLink, uint32_t instanceId,
+                                    uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                    float rotation, uint8_t permissionInv );
 
-    void registerEObj( Entity::EventObjectPtr object );
+    void addEObj( Entity::EventObjectPtr object );
 
     Entity::BNpcPtr createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
 

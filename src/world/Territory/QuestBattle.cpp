@@ -225,7 +225,7 @@ void Sapphire::QuestBattle::endEventCutscene()
   server.queueForPlayer( m_pPlayer->getCharacterId(), makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
 }
 
-void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
+void Sapphire::QuestBattle::onAddEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
@@ -235,7 +235,7 @@ void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
   if( objData )
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Territory " +
+    Logger::error( "InstanceContent::onAddEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }

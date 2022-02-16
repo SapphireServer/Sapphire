@@ -3,21 +3,17 @@
 
 using namespace Sapphire;
 
-class TheBowlofEmbers :
-  public Sapphire::ScriptAPI::InstanceContentScript
+class TheBowlofEmbers : public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
-  TheBowlofEmbers() :
-    Sapphire::ScriptAPI::InstanceContentScript( 20001 )
+  TheBowlofEmbers() : Sapphire::ScriptAPI::InstanceContentScript( 20001 )
   { }
 
   void onInit( InstanceContent& instance ) override
   {
-    instance.registerEObj( "Entrance", 2000182, 4177874, 5, { -16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
+    instance.addEObj( "Entrance", 2000182, 4177874, 4177871, 5, { -16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0); 
     // States -> vf_lock_on (id: 11) vf_lock_of (id: 12) 
-    instance.registerEObj( "Exit", 2000139, 0, 4, { 16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "unknown_0", 2007452, 0, 4, { 0.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f ); 
-    instance.registerEObj( "BladeofLight", 2007454, 0, 4, { 0.000000f, 0.000000f, 11.300000f }, 0.991760f, 0.000048f ); 
+    instance.addEObj( "Exit", 2000139, 0, 4177870, 4, { 16.000000f, 0.000000f, 0.000000f }, 1.000000f, 0.000000f, 0); 
 
   }
 

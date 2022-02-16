@@ -110,7 +110,7 @@ namespace Sapphire
 
     void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override;
 
-    void onRegisterEObj( Entity::EventObjectPtr object ) override;
+    void onAddEObj( Entity::EventObjectPtr object ) override;
 
     void sendSharedGroup( uint32_t sharedGroupId, uint32_t timeIndex );
 
