@@ -1452,6 +1452,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t __padding2;
     uint8_t __padding3;
     uint32_t args[ArgCount];
+    uint32_t unknown_1;
   };
 
   struct FFXIVIpcEventLogMessageHeader : 
