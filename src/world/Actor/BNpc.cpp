@@ -731,6 +731,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       }
 
       checkAggro();
+      break;
     }
 
     case BNpcState::Combat:
@@ -796,6 +797,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
         pNaviProvider->updateAgentParameters( *this );
       }
     }
+    break;
   }
 
 
@@ -832,20 +834,21 @@ void Sapphire::Entity::BNpc::onDeath()
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+
   setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
   m_state = BNpcState::Dead;
   m_timeOfDeath = Util::getTimeSeconds();
   setOwner( nullptr );
 
-  auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
   taskMgr.queueTask( World::makeFadeBNpcTask( 10000, getAsBNpc() ) );
   taskMgr.queueTask( World::makeRemoveBNpcTask( 12000, getAsBNpc() ) );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( m_level );
 
-  for( auto& pHateEntry : m_hateList )
+  for( const auto& pHateEntry : m_hateList )
   {
     // TODO: handle drops 
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
@@ -855,6 +858,7 @@ void Sapphire::Entity::BNpc::onDeath()
       pPlayer->gainExp( paramGrowthInfo->data().BaseExp );
     }
   }
+
   hateListClear();
 }
 

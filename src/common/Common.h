@@ -1499,64 +1499,63 @@ namespace Sapphire::Common
 
   using PlayerStateFlagList = std::vector< PlayerStateFlag >;
 
+  struct BNPCInstanceObject
+  {
+    uint16_t territoryType;
+    std::string bnpcName;
+    uint32_t instanceId;
+    uint32_t nameOffset;
+    float x;
+    float y;
+    float z;
+    float rotation;
+    uint32_t BaseId;
+    uint32_t PopWeather;
+    uint8_t PopTimeStart;
+    uint8_t PopTimeEnd;
+    uint32_t MoveAI;
+    uint8_t WanderingRange;
+    uint8_t Route;
+    uint16_t EventGroup;
+    uint32_t NameId;
+    uint32_t DropItem;
+    float SenseRangeRate;
+    uint16_t Level;
+    uint8_t ActiveType;
+    uint8_t PopInterval;
+    uint8_t PopRate;
+    uint8_t PopEvent;
+    uint8_t LinkGroup;
+    uint8_t LinkFamily;
+    uint8_t LinkRange;
+    uint8_t LinkCountLimit;
+    int8_t NonpopInitZone;
+    int8_t InvalidRepop;
+    int8_t LinkParent;
+    int8_t LinkOverride;
+    int8_t LinkReply;
+    int8_t Nonpop;
+    float HorizontalPopRange;
+    float VerticalPopRange;
+    int32_t BNpcBaseData;
+    uint8_t RepopId;
+    uint8_t BNPCRankId;
+    uint16_t TerritoryRange;
+    uint32_t BoundInstanceID;
+    uint32_t FateLayoutLabelId;
+    uint32_t NormalAI;
+    uint32_t ServerPathId;
+    uint32_t EquipmentID;
+    uint32_t CustomizeID;
+  };
 
-struct BNPCInstanceObject
-{
-  uint16_t territoryType;
-  std::string bnpcName;
-  uint32_t instanceId;
-  uint32_t nameOffset;
-  float x;
-  float y;
-  float z;
-  float rotation;
-  uint32_t BaseId;
-  uint32_t PopWeather;
-  uint8_t PopTimeStart;
-  uint8_t PopTimeEnd;
-  uint32_t MoveAI;
-  uint8_t WanderingRange;
-  uint8_t Route;
-  uint16_t EventGroup;
-  uint32_t NameId;
-  uint32_t DropItem;
-  float SenseRangeRate;
-  uint16_t Level;
-  uint8_t ActiveType;
-  uint8_t PopInterval;
-  uint8_t PopRate;
-  uint8_t PopEvent;
-  uint8_t LinkGroup;
-  uint8_t LinkFamily;
-  uint8_t LinkRange;
-  uint8_t LinkCountLimit;
-  int8_t NonpopInitZone;
-  int8_t InvalidRepop;
-  int8_t LinkParent;
-  int8_t LinkOverride;
-  int8_t LinkReply;
-  int8_t Nonpop;
-  float HorizontalPopRange;
-  float VerticalPopRange;
-  int32_t BNpcBaseData;
-  uint8_t RepopId;
-  uint8_t BNPCRankId;
-  uint16_t TerritoryRange;
-  uint32_t BoundInstanceID;
-  uint32_t FateLayoutLabelId;
-  uint32_t NormalAI;
-  uint32_t ServerPathId;
-  uint32_t EquipmentID;
-  uint32_t CustomizeID;
-};
-
-/*
- * CellId is used to identify a cell in the cell container of a zone
- */
-struct CellId
-{
-  uint32_t x{ 0 };
-  uint32_t y{ 0 };
-};
+  /*
+   * CellId is used to identify a cell in the cell container of a zone
+   */
+  struct CellId
+  {
+    uint32_t x{ 0 };
+    uint32_t y{ 0 };
+  };
 
 }
