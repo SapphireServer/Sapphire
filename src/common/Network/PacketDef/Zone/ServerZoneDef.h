@@ -1443,6 +1443,54 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
   template< int ArgCount >
+  struct FFXIVIpcEventLogMessageN
+  {
+    uint32_t handlerId;
+    uint32_t messageId;
+    uint8_t numOfArgs;
+    uint8_t __padding1;
+    uint8_t __padding2;
+    uint8_t __padding3;
+    uint32_t args[ArgCount];
+  };
+
+  struct FFXIVIpcEventLogMessageHeader : 
+    FFXIVIpcBasePacket< EventLogMessageHeader >,
+    FFXIVIpcEventLogMessageN< 1 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage2 : 
+    FFXIVIpcBasePacket< EventLogMessage2 >,
+    FFXIVIpcEventLogMessageN< 2 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage4 : 
+    FFXIVIpcBasePacket< EventLogMessage4 >,
+    FFXIVIpcEventLogMessageN< 4 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage8 : 
+    FFXIVIpcBasePacket< EventLogMessage8 >,
+    FFXIVIpcEventLogMessageN< 8 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage16 : 
+    FFXIVIpcBasePacket< EventLogMessage16 >,
+    FFXIVIpcEventLogMessageN< 16 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage32 : 
+    FFXIVIpcBasePacket< EventLogMessage32 >,
+    FFXIVIpcEventLogMessageN< 32 >
+  {
+  };
+
+  template< int ArgCount >
   struct FFXIVIpcPlayEventSceneN
   {
     uint64_t actorId;
