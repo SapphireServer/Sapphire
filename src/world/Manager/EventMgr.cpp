@@ -112,6 +112,11 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
       }*/
       //return unknown + "GilShop";
     }
+
+    case Event::EventHandler::EventHandlerType::SwitchTalk:
+    {
+      return "FcTalk";
+    }
     default:
     {
       return unknown;
