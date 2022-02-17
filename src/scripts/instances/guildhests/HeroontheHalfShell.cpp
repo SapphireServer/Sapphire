@@ -3,10 +3,10 @@
 
 using namespace Sapphire;
 
-class HeroontheHalfshell : public Sapphire::ScriptAPI::InstanceContentScript
+class HeroontheHalfShell : public Sapphire::ScriptAPI::InstanceContentScript
 {
 public:
-  HeroontheHalfshell() : Sapphire::ScriptAPI::InstanceContentScript( 10004 )
+  HeroontheHalfShell() : Sapphire::ScriptAPI::InstanceContentScript( 10004 )
   { }
 
   void onInit( InstanceContent& instance ) override
@@ -107,4 +107,4 @@ public:
 
 };
 
-EXPOSE_SCRIPT( HeroontheHalfshell );
+EXPOSE_SCRIPT( HeroontheHalfShell );
