@@ -41,15 +41,7 @@ public:
     if( talkEvent == 0 )
       return;
 
-    eventMgr().eventStart( player, actorId, eventId, Event::EventHandler::EventType::Talk, 0, 0 );
-    eventMgr().eventStart( player, actorId, talkEvent, Event::EventHandler::EventType::Nest, 0, 5 );
-
-    eventMgr().playScene( player, talkEvent, 0, HIDE_HOTBAR | NO_DEFAULT_CAMERA, { 0 }, 
-                          [ & ]( Entity::Player& player, const Event::SceneResult& result ) 
-                          {
-                            eventMgr().eventFinish( player, talkEvent, 1 );
-                            eventMgr().eventFinish( player, eventId, 1 );
-                          } );
+    eventMgr().playScene( player, talkEvent, 0, HIDE_HOTBAR | NO_DEFAULT_CAMERA, { 0 }, nullptr );
   }
 };
 
