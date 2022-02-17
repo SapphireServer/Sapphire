@@ -152,6 +152,16 @@ void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
   m_questCompleteFlags[ index ] |= value;
 }
 
+bool Sapphire::Entity::Player::isQuestCompleted( uint32_t questId )
+{
+  uint8_t index = questId / 8;
+  uint8_t bitIndex = ( questId ) % 8;
+
+  uint8_t value = 0x80 >> bitIndex;
+
+  return m_questCompleteFlags[ index ] & value;
+} 
+
 void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 {
   uint8_t index = questId / 8;

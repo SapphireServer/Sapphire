@@ -136,6 +136,11 @@ std::string EventMgr::getEventName( uint32_t eventId )
       }*/
       //return unknown + "GilShop";
     }
+
+    case Event::EventHandler::EventHandlerType::FcTalk:
+    {
+      return "FcTalk";
+    }
     default:
     {
       return unknown;
