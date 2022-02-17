@@ -78,7 +78,7 @@ private:
   {
     if( result.getResult( 0 ) == 1 )// accept quest
     {
-      Scene00000( quest, player );
+      Scene00001( quest, player );
     }
   }
 
