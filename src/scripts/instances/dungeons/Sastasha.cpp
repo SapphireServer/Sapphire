@@ -29,8 +29,7 @@ private:
 
   enum Variables : uint8_t
   {
-    Coral,
-    ObtainedKey
+    Coral
   };
 
   enum Sequence : uint8_t
@@ -38,7 +37,8 @@ private:
     Seq1 = 1,
     Seq2 = 3,
     Seq3 = 7,
-    Seq4 = 15,
+    Seq4 = 23,
+    Seq5 = 31,
     SeqFinish = 255
   };
 
@@ -210,7 +210,7 @@ public:
                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                   {
                                     eobj.setPermissionInvisibility( 1 );
-                                    instance.setCustomVar( ObtainedKey, true );
+                                    instance.setVar( 0, Seq4 );
                                     instance.sendEventLogMessage( player, instance, 2031, { 2000512 } );
                                   },
                                   nullptr, getId() );
@@ -223,7 +223,7 @@ public:
                                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                   {
                                     eobj.setPermissionInvisibility( 1 );
-                                    instance.setVar( 0, Seq4 );
+                                    instance.setVar( 0, Seq5 );
                                     instance.sendEventLogMessage( player, instance, 2031, { 2000513 } );
                                     denn = instance.createBNpcFromInstanceId( 3978771, 1000, Common::BNpcType::Enemy );
                                   },
@@ -231,8 +231,8 @@ public:
     }
 
     // Open the door if the right key has been obtained
-    if( ( eobj.getName() == "Captainsquarters" && instance.getCustomVar( ObtainedKey ) ) || 
-        ( eobj.getName() == "WaveriderGate" && instance.getDirectorVar( 0 ) == Seq4 ) )
+    if( ( eobj.getName() == "Captainsquarters" && instance.getDirectorVar( 0 ) == Seq4 ) || 
+        ( eobj.getName() == "WaveriderGate" && instance.getDirectorVar( 0 ) == Seq5 ) )
     {
       eventMgr().playScene( player, eventId, 1, HIDE_HOTBAR, { 1 }, 
                             [ & ]( Entity::Player& player, const Event::SceneResult& result )

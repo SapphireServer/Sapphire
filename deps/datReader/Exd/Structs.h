@@ -3339,6 +3339,7 @@ namespace Excel
   struct SwitchTalk
   {
     SwitchTalkCaseStruct TalkCase[16];
+    uint32_t Unknown1;
   };
 
   /* 362351 */
