@@ -44,8 +44,8 @@ private:
   static constexpr auto Actor0 = 1011732;//HORTEFENSE
   static constexpr auto Actor1 = 1011735;//House Valentione Emissary (Limsa)
   static constexpr auto Actor2 = 1011743;//Berndan
-  static constexpr auto Actor3 = 1011745;
-  static constexpr auto Actor4 = 1011747;
+  static constexpr auto Actor3 = 1011745;//Philippe?
+  static constexpr auto Actor4 = 1011747;//Thrydwulf
   static constexpr auto Item0 = 2001558;
   static constexpr auto LocActor0 = 1011742;
   static constexpr auto LocActor1 = 1011796;
@@ -98,10 +98,14 @@ public:
       }
       case Actor3:
       {
+        if( quest.getSeq() == Seq2 )
+          Scene00006( quest, player );
         break;
       }
       case Actor4:
       {
+        if( quest.getSeq() == Seq2 )
+          Scene00008( quest, player );
         break;
       }
     }
@@ -211,6 +215,8 @@ private:
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    eventMgr().sendEventNotice( player, getId(), 1, 0 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -235,8 +241,8 @@ private:
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 )
-      Scene00010( quest, player );
+    eventMgr().sendEventNotice( player, getId(), 1, 0 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////
