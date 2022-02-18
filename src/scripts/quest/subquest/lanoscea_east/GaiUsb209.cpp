@@ -7,38 +7,39 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: FesVlt101_00512
-// Quest Name: Where Did Our Loves Go
-// Quest ID: 66048
-// Start NPC: 1011731
-// End NPC: 1011732
+// Quest Script: GaiUsb209_00840
+// Quest Name: An Offer You Can Refuse
+// Quest ID: 66376
+// Start NPC: 1006305
+// End NPC: 1006305
 
 using namespace Sapphire;
 
-class FesVlt101 : public Sapphire::ScriptAPI::QuestScript
+class GaiUsb209 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
   // Basic quest information
   // Quest vars / flags used
   // UI8AL
 
-  /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1011732
+  /// Countable Num: 0 Seq: 1 Event: 1 Listener: 1006306
+  /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1006305
   // Steps in this quest ( 0 is before accepting,
   // 1 is first, 255 means ready for turning it in
   enum Sequence : uint8_t
   {
     Seq0 = 0,
+    Seq1 = 1,
     SeqFinish = 255,
   };
 
   // Entities found in the script data of the quest
-  static constexpr auto Actor0 = 1011731;//Lisette De Valentione
-  static constexpr auto Actor1 = 1011732;//Hortefense
-  static constexpr auto Quest0 = 66837;
+  static constexpr auto Actor0 = 1006305;//Shamani Lohmani
+  static constexpr auto Actor1 = 1006306;//Byrglaent
 
 public:
-  FesVlt101() : Sapphire::ScriptAPI::QuestScript( 66048 ){};
-  ~FesVlt101() = default;
+  GaiUsb209() : Sapphire::ScriptAPI::QuestScript( 66376 ){};
+  ~GaiUsb209() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -56,7 +57,7 @@ public:
       }
       case Actor1:
       {
-        if( quest.getSeq() == SeqFinish )
+        if( quest.getSeq() == Seq1 )
           Scene00002( quest, player );
         break;
       }
@@ -71,7 +72,7 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &GaiUsb209::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -86,40 +87,42 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &GaiUsb209::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq( SeqFinish );
+    quest.setSeq( Seq1 );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &GaiUsb209::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-    if( result.getResult( 0 ) == 1 )
-    {
-      player.finishQuest( getId() );
-    }
+    eventMgr().sendEventNotice( player, getId(), 0, 0 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &GaiUsb209::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+
+    if( result.getResult( 0 ) == 1 )
+    {
+      player.finishQuest( getId(), result.getResult(1) );
+    }
   }
 };
 
-EXPOSE_SCRIPT( FesVlt101 );
+EXPOSE_SCRIPT( GaiUsb209 );

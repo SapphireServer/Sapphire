@@ -7,22 +7,22 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: FesVlt101_00512
-// Quest Name: Where Did Our Loves Go
-// Quest ID: 66048
-// Start NPC: 1011731
-// End NPC: 1011732
+// Quest Script: GaiUsb007_00814
+// Quest Name: A Modest Proposal
+// Quest ID: 66350
+// Start NPC: 1006266
+// End NPC: 1006279
 
 using namespace Sapphire;
 
-class FesVlt101 : public Sapphire::ScriptAPI::QuestScript
+class GaiUsb007 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
   // Basic quest information
   // Quest vars / flags used
   // UI8AL
 
-  /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1011732
+  /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1006279
   // Steps in this quest ( 0 is before accepting,
   // 1 is first, 255 means ready for turning it in
   enum Sequence : uint8_t
@@ -32,13 +32,12 @@ private:
   };
 
   // Entities found in the script data of the quest
-  static constexpr auto Actor0 = 1011731;//Lisette De Valentione
-  static constexpr auto Actor1 = 1011732;//Hortefense
-  static constexpr auto Quest0 = 66837;
+  static constexpr auto Actor0 = 1006266;//Wheiskaet
+  static constexpr auto Actor1 = 1006279;//Landenel
 
 public:
-  FesVlt101() : Sapphire::ScriptAPI::QuestScript( 66048 ){};
-  ~FesVlt101() = default;
+  GaiUsb007() : Sapphire::ScriptAPI::QuestScript( 66350 ){};
+  ~GaiUsb007() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -50,8 +49,6 @@ public:
       {
         if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
-        else if( quest.getSeq() == SeqFinish )
-          Scene00003( quest, player );
         break;
       }
       case Actor1:
@@ -71,7 +68,7 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &GaiUsb007::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -86,7 +83,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &GaiUsb007::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -98,7 +95,7 @@ private:
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &GaiUsb007::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -109,17 +106,6 @@ private:
       player.finishQuest( getId() );
     }
   }
-
-  //////////////////////////////////////////////////////////////////////
-
-  void Scene00003( World::Quest& quest, Entity::Player& player )
-  {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &FesVlt101::Scene00003Return ) );
-  }
-
-  void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
-  {
-  }
 };
 
-EXPOSE_SCRIPT( FesVlt101 );
+EXPOSE_SCRIPT( GaiUsb007 );
