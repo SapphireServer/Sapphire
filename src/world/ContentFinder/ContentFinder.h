@@ -57,6 +57,7 @@ namespace Sapphire::World
     Common::Role m_role;
     uint8_t m_level;
     bool m_allowInProgress;
+    bool m_acceptedDuty;
     uint8_t m_activeRegisterId;
   };
 
@@ -88,6 +89,12 @@ namespace Sapphire::World
     uint8_t m_attackerCount{};
     uint8_t m_rangeCount{};
 
+    uint8_t m_tankAccepted{};
+    uint8_t m_healerAccepted{};
+    uint8_t m_dpsAccepted{};
+
+    uint8_t m_flags{};
+
     QueuedContentState m_state;
 
     bool m_isInProgress{ false };
@@ -108,18 +115,21 @@ namespace Sapphire::World
 
     void update();
 
-    void registerContentRequest( Entity::Player& player, uint32_t contentId );
+    void registerContentRequest( Entity::Player& player, uint32_t contentId, uint8_t flags );
     void registerContentsRequest( Entity::Player& player, const std::vector< uint32_t >& contentIds );
     void registerRandomContentRequest( Entity::Player& player, uint32_t randomContentTypeId );
 
     QueuedContentPtrList getMatchingContentList( Sapphire::Entity::Player &player, uint32_t contentId );
 
+    void accept( Entity::Player& player );
     void withdraw( Entity::Player& player );
 
     uint32_t getNextRegisterId();
 
     std::shared_ptr< QueuedContent > findContentByRegisterId( uint32_t registerId );
     bool removeContentByRegisterId( uint32_t registerId );
+
+    std::shared_ptr< QueuedContent > findContentByPlayerId( uint32_t playerId );
 
   private:
     uint32_t m_nextRegisterId{ 0 };
@@ -128,7 +138,7 @@ namespace Sapphire::World
 
     void queueForContent( Entity::Player &player, const std::vector< uint32_t >& contentIds );
 
-    void completeRegistration( const Entity::Player &player );
+    void completeRegistration( const Entity::Player &player, uint8_t flags = 0 );
   };
 
 

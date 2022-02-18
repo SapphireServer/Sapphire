@@ -56,7 +56,7 @@ void Sapphire::Network::GameConnection::findContent( const Packets::FFXIVARR_PAC
   if( contentId == 0 )
     return;
 
-  contentFinder.registerContentRequest( player, contentId );
+  contentFinder.registerContentRequest( player, contentId, packet.data().flags );
 
 }
 
@@ -121,6 +121,8 @@ void Sapphire::Network::GameConnection::acceptContent( const Packets::FFXIVARR_P
                         packet.data().accept, packet.data().territoryId, packet.data().territoryType );
   auto& contentFinder = Common::Service< World::ContentFinder >::ref();
 
- if( packet.data().accept == 0 )
-   contentFinder.withdraw( player );
+  if( packet.data().accept )
+    contentFinder.accept( player ); 
+  else
+    contentFinder.withdraw( player );
 }

@@ -6,9 +6,15 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/UpdateFindContentPacket.h"
+#include "Network/PacketWrappers/UpdateContentPacket.h"
 #include "Network/PacketWrappers/NotifyFindContentPacket.h"
 
+#include "Territory/Territory.h"
+#include "Territory/InstanceContent.h"
+
 #include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include "Manager/WarpMgr.h"
 
 #include <WorldServer.h>
 
@@ -46,6 +52,11 @@ void Sapphire::World::ContentFinder::update()
           uint32_t inProgress = 0; // 0x01 - in progress
           uint32_t dutyProgress = 0;
           uint32_t flags = 0; // 0x20 freerole, 0x40 ownrequest, 0x100 random
+
+          // Undersized
+          if( content->m_flags & 0x01 )
+            flags |= 0x20;
+
           auto updatePacket = makeUpdateFindContent( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
                                                      SetResultMatched, inProgress, queuedPlayer->m_classJob, dutyProgress, flags );
           server.queueForPlayer( queuedPlayer->getCharacterId(), updatePacket );
@@ -58,7 +69,34 @@ void Sapphire::World::ContentFinder::update()
       case WaitingForAccept:
         break;
       case Accepted:
+      {
+        auto& terriMgr = Service< TerritoryMgr >::ref();
+        auto& warpMgr = Common::Service< WarpMgr >::ref();
+        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getContentId() );
+        if( auto instance = terriMgr.createInstanceContent( content->getContentId() ) )
+        {
+          auto pInstanceContent = instance->getAsInstanceContent();
+
+          for( auto& queuedPlayer : content->m_players )
+          {
+            auto updatePacket = makeUpdateFindContent( queuedPlayer->getEntityId(), 0x06,
+                                                       SetResultReadyToEnter, 0, queuedPlayer->m_classJob, 0 );
+            server.queueForPlayer( queuedPlayer->getCharacterId(), updatePacket );
+
+            pInstanceContent->bindPlayer( queuedPlayer->getEntityId() );
+            warpMgr.requestMoveTerritory( *server.getPlayer( queuedPlayer->getEntityId() ), WarpType::WARP_TYPE_INSTANCE_CONTENT, pInstanceContent->getGuId(), { 0.f, 0.f, 0.f }, 0.f );
+          
+            auto zonePacket = makeUpdateContent( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
+                                                 0, pInstanceContent->getGuId() );
+            auto zonePacket2 = makeUpdateContent( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType, content->m_partyMemberCount );
+            server.queueForPlayer( queuedPlayer->getCharacterId(), zonePacket );
+            server.queueForPlayer( queuedPlayer->getCharacterId(), zonePacket2 );
+          }
+        }
+
+        content->setState( InProgress );
         break;
+      }
       case InProgress:
         break;
       case InProgressRefill:
@@ -73,10 +111,6 @@ void Sapphire::World::ContentFinder::update()
         }
         break;
     }
-
-
-
-
   }
 
 }
@@ -87,10 +121,10 @@ void Sapphire::World::ContentFinder::registerContentsRequest( Sapphire::Entity::
   completeRegistration( player );
 }
 
-void Sapphire::World::ContentFinder::registerContentRequest( Sapphire::Entity::Player &player, uint32_t contentId )
+void Sapphire::World::ContentFinder::registerContentRequest( Sapphire::Entity::Player &player, uint32_t contentId, uint8_t flags )
 {
   queueForContent( player, { contentId } );
-  completeRegistration( player );
+  completeRegistration( player, flags );
 }
 
 void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Entity::Player &player, uint32_t randomContentTypeId )
@@ -113,7 +147,7 @@ void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Ent
   completeRegistration( player );
 }
 
-void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entity::Player &player )
+void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entity::Player &player, uint8_t flags )
 {
 
   auto& server = Service< WorldServer >::ref();
@@ -122,16 +156,29 @@ void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entit
   auto& exdData = Service< Data::ExdData >::ref();
   auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentId() );
 
-  auto updatePacket = makeUpdateFindContent( player.getId(), content->data().TerritoryType,
-                                             CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ) );
-  server.queueForPlayer( player.getCharacterId(), updatePacket );
-
-  auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 3, queuedContent->m_attackerCount + queuedContent->m_rangeCount,
-                                                   queuedContent->m_healerCount, queuedContent->m_tankCount, 0xff );
-
-  for( auto& queuedPlayer : queuedContent->m_players )
+  // Undersized
+  if( flags & 0x01 )
   {
-    server.queueForPlayer( queuedPlayer->getCharacterId(), statusPacket );
+    auto updatePacket = makeUpdateFindContent( player.getId(), content->data().TerritoryType,
+                                               CompleteRegistration, 0x20, static_cast< uint32_t >( player.getClass() ) );
+    server.queueForPlayer( player.getCharacterId(), updatePacket );
+
+    queuedContent->m_flags = flags;
+    queuedContent->setState( MatchingComplete );
+  }
+  else
+  {
+    auto updatePacket = makeUpdateFindContent( player.getId(), content->data().TerritoryType,
+                                               CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ) );
+    server.queueForPlayer( player.getCharacterId(), updatePacket );
+
+    auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 3, queuedContent->m_attackerCount + queuedContent->m_rangeCount,
+                                                     queuedContent->m_healerCount, queuedContent->m_tankCount, 0xff );
+
+    for( auto& queuedPlayer : queuedContent->m_players )
+    {
+      server.queueForPlayer( queuedPlayer->getCharacterId(), statusPacket );
+    }
   }
 }
 
@@ -310,6 +357,53 @@ Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFin
   return outVec;
 }
 
+void Sapphire::World::ContentFinder::accept( Entity::Player& player )
+{
+  auto& server = Service< WorldServer >::ref();
+  auto& exdData = Service< Data::ExdData >::ref();
+
+  auto queuedPlayer = m_queuedPlayer[ player.getId() ];
+  auto queuedContent = m_queuedContent[ queuedPlayer->getActiveRegisterId() ];
+
+  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentId() );
+
+  // Something has gone quite wrong..
+  if( queuedContent->getState() != WaitingForAccept )
+    return;
+
+  switch( queuedPlayer->getRole() )
+  {
+    case Role::Tank:
+      ++queuedContent->m_tankAccepted;
+      break;
+    case Role::Healer:
+      ++queuedContent->m_healerAccepted;
+      break;
+    case Role::Melee:
+    case Role::RangedMagical:
+    case Role::RangedPhysical:
+      ++queuedContent->m_dpsAccepted;
+      break;
+  }
+
+  Logger::info( "[{2}][ContentFinder] Content accepted, contentId#{0} registerId#{1}",
+                queuedContent->getContentId(), queuedContent->getRegisterId(), player.getId() );
+
+  auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 4, queuedContent->m_dpsAccepted,
+                                                   queuedContent->m_healerAccepted, queuedContent->m_tankAccepted, 0x01 );
+
+  for( auto& pPlayer : queuedContent->m_players )
+  {
+    if( pPlayer->getActiveRegisterId() != queuedContent->getRegisterId() )
+      continue;
+
+    server.queueForPlayer( pPlayer->getCharacterId(), statusPacket );
+  }
+
+  if( ( queuedContent->m_tankAccepted + queuedContent->m_healerAccepted + queuedContent->m_dpsAccepted ) == queuedContent->m_partyMemberCount )
+    queuedContent->setState( Accepted );
+}
+
 void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
 {
   auto& server = Service< WorldServer >::ref();
@@ -369,6 +463,19 @@ std::shared_ptr< Sapphire::World::QueuedContent > Sapphire::World::ContentFinder
   auto it = m_queuedContent.find( registerId );
   if( it != m_queuedContent.end() )
     return it->second;
+  return nullptr;
+}
+
+std::shared_ptr< Sapphire::World::QueuedContent > Sapphire::World::ContentFinder::findContentByPlayerId( uint32_t playerId )
+{
+  auto queuedPlayer = m_queuedPlayer.find( playerId );
+  if( queuedPlayer != m_queuedPlayer.end() )
+  {
+    auto queuedContent = m_queuedContent.find( queuedPlayer->second->getActiveRegisterId() );
+    if( queuedContent != m_queuedContent.end() )
+      return queuedContent->second;
+  }
+
   return nullptr;
 }
 
