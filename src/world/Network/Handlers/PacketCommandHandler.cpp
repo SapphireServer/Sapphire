@@ -449,6 +449,10 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
 
       uint64_t targetId = param1;
+
+      if( targetId == player.getTargetId() || targetId == 0xE0000000 )
+        targetId = 0;
+
       player.changeTarget( targetId );
       break;
     }
