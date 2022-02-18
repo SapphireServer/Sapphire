@@ -617,7 +617,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
       auto item = storage->getItem( slot );
 
       // add any items that are stackable
-      if( canMerge && item && itemInfo->data().Slot > 0 && item->getId() == catalogId )
+      if( canMerge && item && item->getMaxStackSize() > 0 && item->getId() == catalogId )
       {
         uint32_t count = item->getStackSize();
         uint32_t maxStack = item->getMaxStackSize();
