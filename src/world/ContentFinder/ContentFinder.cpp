@@ -466,19 +466,6 @@ std::shared_ptr< Sapphire::World::QueuedContent > Sapphire::World::ContentFinder
   return nullptr;
 }
 
-std::shared_ptr< Sapphire::World::QueuedContent > Sapphire::World::ContentFinder::findContentByPlayerId( uint32_t playerId )
-{
-  auto queuedPlayer = m_queuedPlayer.find( playerId );
-  if( queuedPlayer != m_queuedPlayer.end() )
-  {
-    auto queuedContent = m_queuedContent.find( queuedPlayer->second->getActiveRegisterId() );
-    if( queuedContent != m_queuedContent.end() )
-      return queuedContent->second;
-  }
-
-  return nullptr;
-}
-
 bool Sapphire::World::ContentFinder::removeContentByRegisterId( uint32_t registerId )
 {
   auto it = m_queuedContent.find( registerId );

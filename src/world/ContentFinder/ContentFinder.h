@@ -129,8 +129,6 @@ namespace Sapphire::World
     std::shared_ptr< QueuedContent > findContentByRegisterId( uint32_t registerId );
     bool removeContentByRegisterId( uint32_t registerId );
 
-    std::shared_ptr< QueuedContent > findContentByPlayerId( uint32_t playerId );
-
   private:
     uint32_t m_nextRegisterId{ 0 };
     std::unordered_map< uint32_t, std::shared_ptr< QueuedContent > > m_queuedContent;
