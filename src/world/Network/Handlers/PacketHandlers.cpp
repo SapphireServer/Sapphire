@@ -27,6 +27,8 @@
 
 #include "Linkshell/Linkshell.h"
 
+#include "Inventory/Item.h"
+
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
@@ -38,6 +40,7 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
@@ -51,6 +54,7 @@
 #include "Manager/PartyMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/ItemMgr.h"
 
 #include "Action/Action.h"
 
@@ -627,6 +631,63 @@ void Sapphire::Network::GameConnection::catalogSearch( const Packets::FFXIVARR_P
     data.RequestKey,
     data.NextIndex
   );
+}
+
+// Also used for recommended gear
+void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGearSetEquip >( inPacket );
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  // Loop over all slots
+  for (int slot = 0; slot < 14; slot++ )
+  {
+    const auto fromSlot = packet.data().containerIndex[ slot ];
+    const auto fromContainer = packet.data().storageId[ slot ];
+    
+    if ( fromContainer == Common::GearSet0 )
+      continue;
+
+    const auto fromItem = fromSlot == -1 ? nullptr : player.getItemAt( fromContainer, fromSlot );
+    const auto equippedItem = player.getItemAt( Common::GearSet0, slot );
+    const auto operationType = ( fromItem && !equippedItem ) || ( !fromItem && equippedItem ) ? 
+                                 ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_MOVEITEM : ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_SWAPITEM;
+
+    auto ackPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
+    ackPacket->data().contextId = packet.data().contextId;
+    ackPacket->data().operationType = operationType;
+    server.queueForPlayer( player.getCharacterId(), ackPacket );
+
+    if ( fromItem && equippedItem )
+    {
+      player.swapItem( fromContainer, fromSlot, Common::GearSet0, slot );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, 0 ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
+    }
+    else if ( fromItem && !equippedItem )
+    {
+      player.moveItem( fromContainer, fromSlot, Common::GearSet0, slot );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, 0 ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
+    }
+    else if ( !fromItem && equippedItem )
+    {
+      auto containerId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( equippedItem->getSlot() ) );
+      auto freeSlot = player.getFreeContainerSlot( containerId ).second;
+      player.moveItem( Common::GearSet0, slot, containerId, freeSlot );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeSlot, containerId, *equippedItem, 0 ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, 0 ) );
+    }
+  }
+
+  // Send the inventory
+  //player.sendInventory();
+
+  if( packet.data().contextId < 0xFE )
+  {
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::GearSetEquipMsg, packet.data().contextId ) );
+  }
 }
 
 void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

@@ -705,6 +705,8 @@ namespace Sapphire::Entity
 
     InvSlotPair getFreeBagSlot();
 
+    InvSlotPair getFreeContainerSlot( uint32_t containerId );
+
     ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
 
     void moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );

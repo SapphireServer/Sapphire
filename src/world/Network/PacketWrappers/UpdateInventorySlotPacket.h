@@ -21,6 +21,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       initialize( slot, storageId, item, contextId );
     };
 
+    UpdateInventorySlotPacket( uint32_t playerId, uint16_t slot, uint16_t storageId, uint32_t contextId ) :
+      ZoneChannelPacket< FFXIVIpcNormalItem >( playerId, playerId )
+    {
+      initialize( slot, storageId, contextId );
+    };
+
   private:
     void initialize( uint16_t slot, uint16_t storageId, const Item& item, uint32_t contextId )
     {
@@ -33,6 +39,15 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.item.refine = item.getSpiritbond();
       m_data.item.stain = static_cast< uint8_t >( item.getStain() );
       m_data.item.signatureId = 0;
+    };
+
+    void initialize( uint16_t slot, uint16_t storageId, uint32_t contextId )
+    {
+      m_data.contextId = contextId;
+      m_data.item.storageId = storageId;
+      m_data.item.containerIndex = slot;
+      m_data.item.stack = 0;
+      m_data.item.catalogId = 0;
     };
   };
 

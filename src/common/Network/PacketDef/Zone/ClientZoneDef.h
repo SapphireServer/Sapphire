@@ -587,6 +587,13 @@ struct FFXIVIpcCatalogSearch : FFXIVIpcBasePacket< CatalogSearch >
   char ItemName[121];
 };
 
+struct FFXIVIpcGearSetEquip : FFXIVIpcBasePacket< GearSetEquip >
+{
+  uint32_t contextId;
+  uint16_t storageId[14];
+  int16_t containerIndex[14];
+};
+
 struct FFXIVIpcMarketBoardRequestItemListingInfo : FFXIVIpcBasePacket< MarketBoardRequestItemListingInfo >
 {
   /* 0000 */ uint32_t catalogId;

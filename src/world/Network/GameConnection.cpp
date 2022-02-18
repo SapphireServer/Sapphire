@@ -140,6 +140,9 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::Config, "Config", &GameConnection::configHandler );
 
   setZoneHandler( CatalogSearch, "CatalogSearch", &GameConnection::catalogSearch );
+
+  setZoneHandler( GearSetEquip, "GearSetEquip", &GameConnection::gearSetEquip );
+
   setZoneHandler( MarketBoardRequestItemListingInfo, "MarketBoardRequestItemListingInfo", &GameConnection::marketBoardRequestItemInfo );
   setZoneHandler( MarketBoardRequestItemListings, "MarketBoardRequestItemListings", &GameConnection::marketBoardRequestItemListings );
 
