@@ -93,6 +93,7 @@ namespace Sapphire::Network::ActorControl
     DirectorUpdate = 0x6D,
 
     ItemObtainMsg = 0x75,
+    FateReqFailMsg = 0x76,
     DutyQuestScreenMsg = 0x7B,
 
     ItemObtainIcon = 0x84,

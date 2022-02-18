@@ -214,6 +214,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( catalogSearch );
 
+    DECLARE_HANDLER( gearSetEquip );
+
     DECLARE_HANDLER( marketBoardRequestItemInfo );
 
     DECLARE_HANDLER( marketBoardRequestItemListings );
