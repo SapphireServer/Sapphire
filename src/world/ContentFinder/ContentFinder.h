@@ -57,7 +57,6 @@ namespace Sapphire::World
     Common::Role m_role;
     uint8_t m_level;
     bool m_allowInProgress;
-    bool m_acceptedDuty;
     uint8_t m_activeRegisterId;
   };
 
