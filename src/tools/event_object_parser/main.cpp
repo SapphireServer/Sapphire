@@ -162,6 +162,45 @@ void loadAllInstanceContentEntries()
     name[ 0 ] = toupper( name[ 0 ] );
     contentList.push_back( { contentId, name, tt->getString( tt->data().Name ), type } );
   }
+
+  auto qbIdList = g_exdData.getIdList< Excel::QuestBattle >();
+  for( auto qbId : qbIdList )
+  {
+    uint8_t type = 7;
+    std::string name;
+    auto qb = g_exdData.getRow< Excel::QuestBattle >( qbId );
+    if( !qb )
+      continue;
+
+    auto quest = g_exdData.getRow< Excel::Quest >( qb->data().Quest );
+
+    if( !quest )
+      continue;
+
+    name = quest->getString( quest->data().Text.Name );
+    if( name.empty() )
+      continue;
+    auto i = 0;
+    while( ( i = name.find( ' ' ) ) != std::string::npos )
+      name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
+
+    std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:\"";
+    Common::Util::eraseAllIn( name, remove );
+    name[ 0 ] = toupper( name[ 0 ] );
+
+    contentList.push_back( { qbId, name, fmt::format( "e0{:03d}", qbId + 1 ), type } );
+
+  }
+}
+
+bool invalidChar (char c)
+{
+  return !isprint((unsigned)c);
+}
+
+void stripUnicode(std::string & str)
+{
+  str.erase(remove_if(str.begin(),str.end(), invalidChar), str.end());
 }
 
 int main( int argc, char* argv[] )
@@ -259,6 +298,8 @@ int main( int argc, char* argv[] )
       uint32_t totalGroups = 0;
       uint32_t totalGroupEntries = 0;
       uint32_t count = 0;
+
+      uint8_t permissionInv = 0;
       for( const auto& lgb : lgbList )
       {
         std::map< std::string, uint32_t > nameMap;
@@ -327,6 +368,7 @@ int main( int argc, char* argv[] )
               if( eobjNameMap.find( id ) != eobjNameMap.end() )
               {
                 name = eobjNameMap[ id ];
+                stripUnicode( name );
                 std::string remove = ",★_ '()[]-\xae\x1a\x1\x2\x1f\x1\x3.:";
                 Common::Util::eraseAllIn( name, remove );
                 name[ 0 ] = toupper( name[ 0 ] );
@@ -354,16 +396,17 @@ int main( int argc, char* argv[] )
               if( count1 > 0 )
                 name = name + "_" + std::to_string( count1 );
 
-              eobjects += "    instance.registerEObj( \"" + name + "\", " + std::to_string( id ) +
-                            ", " + std::to_string( eobjlevelHierachyId ) + ", " + std::to_string( state ) +
-                            ", " +
-                            "{ " + std::to_string( pObj->header.transform.translation.x ) + "f, "
+              eobjects += "    instance.addEObj( \"" + name + "\", " + std::to_string( id ) +
+                            ", " + std::to_string( eobjlevelHierachyId ) +
+                            ", " + std::to_string( pObj->header.instanceId ) + ", " + std::to_string( state ) +
+                            ", " + "{ " + std::to_string( pObj->header.transform.translation.x ) + "f, "
                             + std::to_string( pObj->header.transform.translation.y ) + "f, "
-                            + std::to_string( pObj->header.transform.translation.z ) + "f }, " +
-                            std::to_string( pObj->header.transform.scale.x ) + "f, " +
+                            + std::to_string( pObj->header.transform.translation.z ) + "f }, "
+                            + std::to_string( pObj->header.transform.scale.x ) + "f, "
 
                             // the rotation inside the sgbs is the inverse of what the game uses
-                            std::to_string( pObj->header.transform.rotation.y * -1.f ) + "f ); \n" + states;
+                            + std::to_string( pObj->header.transform.rotation.y * -1.f ) + "f"
+                            + ", " + std::to_string( permissionInv ) + "); \n" + states;
             }
           }
         }
@@ -403,7 +446,7 @@ int main( int argc, char* argv[] )
         continue;
 
       std::string instruction;
-      for( int i = 0; i < 149; ++i )
+      for( int i = 0; i < 100; ++i )
       {
         if( qb->getString( qb->data().Define[i].DefineName ).empty() )
           continue;

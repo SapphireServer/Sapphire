@@ -472,6 +472,17 @@ Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeBagSlot()
   return std::make_pair( 0, -1 );
 }
 
+Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeContainerSlot( uint32_t containerId )
+{
+  auto freeSlot = static_cast < int8_t >( m_storageMap[ containerId ]->getFreeSlot() );
+
+  if( freeSlot != -1 )
+      return std::make_pair( containerId, freeSlot );
+
+  // no room in inventory
+  return std::make_pair( 0, -1 );
+}
+
 Sapphire::ItemPtr Sapphire::Entity::Player::getItemAt( uint16_t containerId, uint16_t slotId )
 {
   return m_storageMap[ containerId ]->getItem( slotId );
@@ -587,7 +598,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 
   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
   // EXD TODO: wtf...
-  if( /* No idea what it maps to itemInfo->data().isEquippable && */ getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
+  if( itemInfo->data().Slot > 0 && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
   {
     auto bag = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( itemInfo->data().Slot );
 
@@ -606,7 +617,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
       auto item = storage->getItem( slot );
 
       // add any items that are stackable
-      if( canMerge && item && /*!itemInfo->isEquippable &&*/ item->getId() == catalogId )
+      if( canMerge && item && item->getMaxStackSize() > 0 && item->getId() == catalogId )
       {
         uint32_t count = item->getStackSize();
         uint32_t maxStack = item->getMaxStackSize();
@@ -851,7 +862,9 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint16_t from
       && !World::Manager::ItemMgr::isArmory( fromInventoryId ) )
   {
     updateContainer( fromInventoryId, fromSlotId, nullptr );
-    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( toSlot );
+    auto& exdData = Common::Service< Data::ExdData >::ref();
+    auto itemInfo = exdData.getRow< Excel::Item >( toItem->getId() );
+    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( itemInfo->data().Slot ) );
     fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
   }
 

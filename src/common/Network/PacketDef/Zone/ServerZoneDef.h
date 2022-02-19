@@ -1400,6 +1400,60 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
   template< int ArgCount >
+  struct FFXIVIpcMapMarkerN
+  {
+    uint8_t numOfMarkers;
+    uint8_t __padding1;
+    uint8_t __padding2;
+    uint8_t __padding3;
+    uint32_t iconIds[ArgCount];
+    uint32_t layoutIds[ArgCount];
+    uint32_t handlerIds[ArgCount];
+  };
+
+  struct FFXIVIpcMapMarker2 :
+    FFXIVIpcBasePacket< MapMarker2 >,
+    FFXIVIpcMapMarkerN< 2 >
+  {
+  };
+
+  struct FFXIVIpcMapMarker4 :
+    FFXIVIpcBasePacket< MapMarker4 >,
+    FFXIVIpcMapMarkerN< 4 >
+  {
+  };
+
+  struct FFXIVIpcMapMarker8 :
+    FFXIVIpcBasePacket< MapMarker8 >,
+    FFXIVIpcMapMarkerN< 8 >
+  {
+  };
+
+  struct FFXIVIpcMapMarker16 :
+    FFXIVIpcBasePacket< MapMarker16 >,
+    FFXIVIpcMapMarkerN< 16 >
+  {
+  };
+
+  struct FFXIVIpcMapMarker32 :
+    FFXIVIpcBasePacket< MapMarker32 >,
+    FFXIVIpcMapMarkerN< 32 >
+  {
+  };
+
+  struct FFXIVIpcMapMarker64 :
+    FFXIVIpcBasePacket< MapMarker64 >,
+    FFXIVIpcMapMarkerN< 64 >
+  {
+  };
+
+  struct FFXIVIpcMapMarker128 :
+    FFXIVIpcBasePacket< MapMarker128 >,
+    FFXIVIpcMapMarkerN< 128 >
+  {
+  };
+
+  template< int ArgCount >
   struct FFXIVIpcBattleTalkN
   {
     uint32_t handlerId;
@@ -1439,6 +1493,55 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   struct FFXIVIpcBattleTalk8 :
     FFXIVIpcBasePacket< BattleTalk8 >,
     FFXIVIpcBattleTalkN< 8 >
+  {
+  };
+
+  template< int ArgCount >
+  struct FFXIVIpcEventLogMessageN
+  {
+    uint32_t handlerId;
+    uint32_t messageId;
+    uint8_t numOfArgs;
+    uint8_t __padding1;
+    uint8_t __padding2;
+    uint8_t __padding3;
+    uint32_t args[ArgCount];
+    uint32_t unknown_1;
+  };
+
+  struct FFXIVIpcEventLogMessageHeader : 
+    FFXIVIpcBasePacket< EventLogMessageHeader >,
+    FFXIVIpcEventLogMessageN< 1 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage2 : 
+    FFXIVIpcBasePacket< EventLogMessage2 >,
+    FFXIVIpcEventLogMessageN< 2 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage4 : 
+    FFXIVIpcBasePacket< EventLogMessage4 >,
+    FFXIVIpcEventLogMessageN< 4 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage8 : 
+    FFXIVIpcBasePacket< EventLogMessage8 >,
+    FFXIVIpcEventLogMessageN< 8 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage16 : 
+    FFXIVIpcBasePacket< EventLogMessage16 >,
+    FFXIVIpcEventLogMessageN< 16 >
+  {
+  };
+
+  struct FFXIVIpcEventLogMessage32 : 
+    FFXIVIpcBasePacket< EventLogMessage32 >,
+    FFXIVIpcEventLogMessageN< 32 >
   {
   };
 

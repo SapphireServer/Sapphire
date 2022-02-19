@@ -29,6 +29,12 @@ namespace Sapphire::World::Manager
   class TerritoryMgr;
   class LinkshellMgr;
   class WarpMgr;
+  class RNGMgr;
+}
+
+extern "C" EXPORT void win32initRngMgr( std::shared_ptr< Sapphire::World::Manager::RNGMgr > rngMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::RNGMgr >::set( rngMgr );
 }
 
 extern "C" EXPORT void win32initExd( std::shared_ptr< Sapphire::Data::ExdData > exdData )

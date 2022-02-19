@@ -154,7 +154,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       sendDutyCommence();
 
       if( m_pEntranceEObj )
-        m_pEntranceEObj->setState( 1 );
+        m_pEntranceEObj->setPermissionInvisibility( 1 );
       m_state = DutyInProgress;
       break;
     }
@@ -345,7 +345,7 @@ void Sapphire::InstanceContent::endEventCutscene()
   }
 }
 
-void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
+void Sapphire::InstanceContent::onAddEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
@@ -359,7 +359,7 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
     m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
   }
   else
-    Logger::error( "InstanceContent::onRegisterEObj Territory " +
+    Logger::error( "InstanceContent::onAddEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
 }

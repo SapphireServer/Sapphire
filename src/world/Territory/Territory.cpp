@@ -744,14 +744,14 @@ void Territory::onEnterTerritory( Sapphire::Entity::Player& player, uint32_t eve
 
 }
 
-void Territory::registerEObj( Entity::EventObjectPtr object )
+void Territory::addEObj( Entity::EventObjectPtr object )
 {
   if( !object )
     return;
 
   pushActor( object );
 
-  onRegisterEObj( object );
+  onAddEObj( object );
 
   //Logger::debug( "Registered instance eobj: " + std::to_string( object->getId() ) );
 }
@@ -785,14 +785,14 @@ uint32_t Territory::getNextActorId()
   return ++m_nextActorId;
 }
 
-Entity::EventObjectPtr Territory::registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
-                                                uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
-                                                float rotation )
+Entity::EventObjectPtr Territory::addEObj( const std::string& name, uint32_t objectId, uint32_t mapLink, uint32_t instanceId,
+                                           uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                           float rotation, uint8_t permissionInv )
 {
-  auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, state, pos, rotation, name );
+  auto eObj = Entity::make_EventObject( getNextEObjId(), objectId, mapLink, instanceId, state, pos, rotation, name, permissionInv );
   eObj->setScale( scale );
 
-  registerEObj( eObj );
+  addEObj( eObj );
 
   return eObj;
 }

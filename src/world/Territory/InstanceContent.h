@@ -38,19 +38,20 @@ namespace Sapphire
     {
       DEBUG_TimeSync = 0xC0000001,
       DutyCommence = 0x40000001,
-      BattleGroundMusic = 0x40000002,
+      DutyComplete = 0x40000002,
       SetStringendoMode = 0x40000003,
-      DutyComplete = 0x40000004,
-      InvalidateTodoList = 0x40000005,
-      LoadingScreen = 0x40000007,
-      Forward = 0x40000008,
+      SetDutyTime = 0x40000004,
+      LoadingScreen = 0x40000005,
+      Forward = 0x40000006,
+      BattleGroundMusic = 0x40000007,
+      InvalidateTodoList = 0x40000008,
       VoteState = 0x40000009,
       VoteStart = 0x4000000A,
       VoteResult = 0x4000000B,
       VoteFinish = 0x4000000C,
-      TreasureVoteRefresh = 0x4000000D,
-      SetSharedGroupId = 0x4000000E,
-      FirstTimeNotify = 0x4000000F
+      FirstTimeNotify = 0x4000000D,
+      TreasureVoteRefresh = 0x4000000E,
+      SetSharedGroupId = 0x4000000F,
     };
 
     enum EventHandlerOrderId : uint32_t
@@ -109,7 +110,7 @@ namespace Sapphire
 
     void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override;
 
-    void onRegisterEObj( Entity::EventObjectPtr object ) override;
+    void onAddEObj( Entity::EventObjectPtr object ) override;
 
     void sendSharedGroup( uint32_t sharedGroupId, uint32_t timeIndex );
 

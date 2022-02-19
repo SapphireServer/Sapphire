@@ -18,6 +18,7 @@ namespace Sapphire::Data
 namespace Sapphire::World::Manager
 {
   class TerritoryMgr;
+  class RNGMgr;
 }
 #endif
 
@@ -123,12 +124,25 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using win32initFuncLinkshell = void(*)( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > );
   using win32initFuncWarpMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::WarpMgr > );
   using win32initIObjectCache = void(*)( std::shared_ptr< Sapphire::InstanceObjectCache > );
+  using win32initRngMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::RNGMgr > );
 
   auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
   auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
   auto win32initLinkshell = reinterpret_cast< win32initFuncLinkshell >( GetProcAddress( handle, "win32initLinkshell" ) );
   auto win32initWarp = reinterpret_cast< win32initFuncWarpMgr >( GetProcAddress( handle, "win32initWarpMgr" ) );
   auto win32initIObject = reinterpret_cast< win32initIObjectCache >( GetProcAddress( handle, "win32initIObjectCache" ) );
+  auto win32initRng = reinterpret_cast< win32initRngMgr >( GetProcAddress( handle, "win32initRngMgr" ) );
+
+  if( win32initRng )
+  {
+    auto ioCache = Common::Service< Sapphire::World::Manager::RNGMgr >::get();
+    auto ptr = ioCache.lock();
+    win32initRng( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initRng export on a windows script target - the server will likely crash!" );
+  }
 
   if( win32initIObject )
   {

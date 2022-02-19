@@ -23,15 +23,18 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId,
+Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId,
                                             uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                                            float rotation, const std::string& givenName ) :
+                                            float rotation, const std::string& givenName, uint8_t permissionInv ) :
   Sapphire::Entity::GameObject( ObjKind::EventObj ),
   m_gimmickId( gimmickId ),
+  m_instanceId( instanceId ),
   m_state( initialState ),
   m_objectId( objectId ),
   m_name( givenName ),
-  m_housingLink( 0 )
+  m_housingLink( 0 ),
+  m_permissionInvisibility( permissionInv ),
+  m_ownerId( Common::INVALID_GAME_OBJECT_ID )
 {
   m_id = actorId;
   m_pos.x = pos.x;
@@ -83,8 +86,6 @@ uint8_t Sapphire::Entity::EventObject::getState() const
 void Sapphire::Entity::EventObject::setState( uint8_t state )
 {
   m_state = state;
-
-  sendToInRangeSet( makeActorControl( getId(), DirectorEObjMod, state ) );
 }
 
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
@@ -133,12 +134,17 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().Kind = getObjKind();
   eobjStatePacket->data().Flag = getState();
   eobjStatePacket->data().BaseId = getObjectId();
+  eobjStatePacket->data().LayoutId = getInstanceId();
   eobjStatePacket->data().BindLayoutId = getGimmickId();
+  eobjStatePacket->data().OwnerId = getOwnerId();
   eobjStatePacket->data().Pos = getPos();
   eobjStatePacket->data().Scale = getScale();
   eobjStatePacket->data().EntityId = getId();
   eobjStatePacket->data().Dir = Util::floatToUInt16Rot( getRot() );
-
+  eobjStatePacket->data().OwnerId = getOwnerId();
+  eobjStatePacket->data().PermissionInvisibility = getPermissionInvisibility();
+  eobjStatePacket->data().Args = 0xE0;
+  eobjStatePacket->data().Args2 = 0; // initial animation state
   eobjStatePacket->data().Args3 = getHousingLink();
 
   auto pSession = server.getSession( pTarget->getCharacterId() );
@@ -156,4 +162,26 @@ void Sapphire::Entity::EventObject::despawn( Sapphire::Entity::PlayerPtr pTarget
 const std::string& Sapphire::Entity::EventObject::getName() const
 {
   return m_name;
+}
+
+uint32_t Sapphire::Entity::EventObject::getInstanceId() const
+{
+  return m_instanceId;
+}
+
+uint8_t Sapphire::Entity::EventObject::getPermissionInvisibility() const
+{
+  return m_permissionInvisibility;
+}
+
+void Sapphire::Entity::EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
+{
+  m_permissionInvisibility = permissionInvisibility;
+
+  sendToInRangeSet( makeActorControl( getId(), DirectorEObjMod, permissionInvisibility ) );
+}
+
+uint32_t Sapphire::Entity::EventObject::getOwnerId() const
+{
+  return m_ownerId;
 }

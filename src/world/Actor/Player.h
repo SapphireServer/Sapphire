@@ -107,6 +107,8 @@ namespace Sapphire::Entity
     /*! remove a given quest */
     void removeQuest( uint16_t questId );
 
+    bool isQuestCompleted( uint32_t questId );
+
     /*! add a quest to the completed quests mask */
     void updateQuestsCompleted( uint32_t questId );
 
@@ -702,6 +704,8 @@ namespace Sapphire::Entity
     InvSlotPairVec getSlotsOfItemsInInventory( uint32_t catalogId );
 
     InvSlotPair getFreeBagSlot();
+
+    InvSlotPair getFreeContainerSlot( uint32_t containerId );
 
     ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
 
