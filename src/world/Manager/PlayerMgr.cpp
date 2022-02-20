@@ -62,7 +62,6 @@ void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfil
 void PlayerMgr::onEquipDisplayFlagsChanged( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  PlayerMgr::sendDebug( player, "EquipDisplayFlag CHANGE: {0}", player.getEquipDisplayFlags() );
   auto paramPacket = makeZonePacket< FFXIVIpcConfig >( player.getId() );
   paramPacket->data().flag = player.getEquipDisplayFlags();
   player.sendToInRangeSet( paramPacket, true );
