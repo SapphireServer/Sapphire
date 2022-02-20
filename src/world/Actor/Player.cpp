@@ -1508,6 +1508,7 @@ void Player::sendZonePackets()
     sendHuntingLog();
 
   sendStats();
+  sendStatusUpdate();
 
   // only initialize the UI if the player in fact just logged in.
   if( isLogin() )
