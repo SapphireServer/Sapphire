@@ -53,7 +53,7 @@ bool LinkshellMgr::loadLinkshells()
         size_t entryCount = inData.size() / 8;
         std::vector< uint64_t > list( entryCount );
 
-        for( int i = 0; i < entryCount; ++i )
+        for( uint64_t i = 0; i < entryCount; ++i )
         {
           auto val = *reinterpret_cast< const uint64_t* >( &inData[ i * 8 ] );
           list[ i ] = val;

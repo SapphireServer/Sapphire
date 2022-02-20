@@ -474,7 +474,7 @@ Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeBagSlot()
 
 Sapphire::Entity::Player::InvSlotPair Sapphire::Entity::Player::getFreeContainerSlot( uint32_t containerId )
 {
-  auto freeSlot = static_cast < int8_t >( m_storageMap[ containerId ]->getFreeSlot() );
+  auto freeSlot = static_cast< int8_t >( m_storageMap[ containerId ]->getFreeSlot() );
 
   if( freeSlot != -1 )
       return std::make_pair( containerId, freeSlot );

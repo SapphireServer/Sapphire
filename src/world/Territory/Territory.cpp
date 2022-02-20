@@ -54,6 +54,7 @@ using namespace Sapphire::World::Manager;
 
 Territory::Territory() :
   m_territoryTypeId( 0 ),
+  m_ident(),
   m_guId( 0 ),
   m_currentWeather( Common::Weather::FairSkies ),
   m_weatherOverride( Common::Weather::None ),
@@ -908,7 +909,6 @@ bool Territory::loadBNpcs()
 
   while( res->next() )
   {
-
     auto bnpc = std::make_shared< Common::BNPCInstanceObject >();
 
     bnpc->territoryType = res->getInt( 1 );
@@ -969,8 +969,6 @@ bool Territory::loadBNpcs()
 
       m_spawnInfo.emplace_back( info );
     }
-
-
 
   }
   return true;

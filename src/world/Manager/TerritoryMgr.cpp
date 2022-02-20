@@ -26,7 +26,8 @@ using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 
 TerritoryMgr::TerritoryMgr() :
-  m_lastInstanceId( 10000 )
+  m_lastInstanceId( 10000 ),
+  m_inRangeDistance( 0 )
 {
 
 }

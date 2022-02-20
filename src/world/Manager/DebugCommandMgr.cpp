@@ -45,6 +45,7 @@
 #include "WorldServer.h"
 
 #include "Session.h"
+#include <Manager/RNGMgr.h>
 
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
