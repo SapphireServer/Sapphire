@@ -641,7 +641,7 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
   auto& server = Common::Service< World::WorldServer >::ref();
 
   // Loop over all slots
-  for (int slot = 0; slot < 14; slot++ )
+  for( int slot = 0; slot < 14; ++slot )
   {
     const auto fromSlot = packet.data().containerIndex[ slot ];
     const auto fromContainer = packet.data().storageId[ slot ];
@@ -659,19 +659,19 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
     ackPacket->data().operationType = operationType;
     server.queueForPlayer( player.getCharacterId(), ackPacket );
 
-    if ( fromItem && equippedItem )
+    if( fromItem && equippedItem )
     {
       player.swapItem( fromContainer, fromSlot, Common::GearSet0, slot );
       server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, 0 ) );
       server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
     }
-    else if ( fromItem && !equippedItem )
+    else if( fromItem && !equippedItem )
     {
       player.moveItem( fromContainer, fromSlot, Common::GearSet0, slot );
       server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, 0 ) );
       server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
     }
-    else if ( !fromItem && equippedItem )
+    else if( !fromItem && equippedItem )
     {
       auto containerId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( equippedItem->getSlot() ) );
       auto freeSlot = player.getFreeContainerSlot( containerId ).second;

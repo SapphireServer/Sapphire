@@ -78,7 +78,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
   const size_t itemsPerPage = 10;
 
   // this func paginates any commonlist entry, associating them with online player data and hierarchy ID (optional)
-  auto generateEntries = [&]( const auto& idVec, size_t offset, const std::vector< Common::HierarchyData >& hierarchyVec ) -> std::vector< PlayerEntry >
+  auto generateEntries = [ & ]( const auto& idVec, size_t offset, const std::vector< Common::HierarchyData >& hierarchyVec ) -> std::vector< PlayerEntry >
   {
     std::vector< PlayerEntry > entries;
 

@@ -60,7 +60,8 @@ WorldServer::WorldServer( const std::string& configName ) :
   m_configName( configName ),
   m_bRunning( true ),
   m_lastDBPingTime( 0 ),
-  m_worldId( 67 )
+  m_worldId( 67 ),
+  m_port( 0 )
 {
 }
 

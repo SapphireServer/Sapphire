@@ -7,15 +7,6 @@
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
-    uint64_t ExecuteCharacterID;
-    uint64_t TargetCharacterID;
-    uint8_t ExecuteIdentity;
-    uint8_t TargetIdentity;
-    uint8_t UpdateStatus;
-    uint8_t Count;
-    char ExecuteCharacterName[32];
-    char TargetCharacterName[32];
-
   class PcPartyUpdatePacket : public ZoneChannelPacket< FFXIVIpcPcPartyUpdate >
   {
   public:
