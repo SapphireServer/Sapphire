@@ -26,7 +26,7 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
   m_category = static_cast< Common::ItemUICategory >( itemInfo->data().UICategory );
   m_slot = itemInfo->data().Slot;
-  m_itemLevel = itemInfo->data().EquipLevel;
+  m_itemLevel = itemInfo->data().Level;
   m_maxStackSize = itemInfo->data().StackMax;
   // EXD TODO: Not sure what this maps to
   //m_additionalData = itemInfo->additionalData;
