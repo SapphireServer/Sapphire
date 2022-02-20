@@ -45,6 +45,7 @@
 #include "WorldServer.h"
 
 #include "Session.h"
+#include <Manager/RNGMgr.h>
 
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
@@ -177,6 +178,15 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
   if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
   {
+    auto& rngMgr = Common::Service< RNGMgr >::ref();
+    auto state = rngMgr.getRandGenerator( 0, 10 );
+    auto arr = state.nextCount< 10 >();
+
+    for( auto val : arr )
+    {
+      Logger::info( std::to_string( val ) );
+    }
+
     int32_t posX;
     int32_t posY;
     int32_t posZ;

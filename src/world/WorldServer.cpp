@@ -163,6 +163,9 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::set( pDb );
 
+  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
+  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
+
   Logger::info( "Loading all players" );
   if( !loadPlayers() )
   {
@@ -192,9 +195,6 @@ void WorldServer::run( int32_t argc, char* argv[] )
 
   auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
   Common::Service< Manager::NaviMgr >::set( pNaviMgr );
-
-  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
-  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();
