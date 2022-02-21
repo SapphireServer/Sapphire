@@ -185,10 +185,6 @@ void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
     player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
                       static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
     player.sendToInRangeSet( makeActorControlSelf( player.getId(), 0x39e, 12 ), true ); //?
-
-    auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
-    mountPacket->data().id = mountId;
-    player.sendToInRangeSet( mountPacket, true );
   }
   else
   {
@@ -196,6 +192,10 @@ void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
                       static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
     player.sendToInRangeSet( makeActorControlSelf( player.getId(), ActorControlType::Dismount, 1 ), true );
   }
+
+  auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
+  mountPacket->data().id = mountId;
+  player.sendToInRangeSet( mountPacket, true );
 }
 
 void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
