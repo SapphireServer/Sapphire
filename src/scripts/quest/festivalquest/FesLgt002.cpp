@@ -49,6 +49,10 @@ public:
     {
       case Actor0:
       {
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+        else if( quest.getSeq() == SeqFinish )
+          Scene00002( quest, player );
         break;
       }
     }
