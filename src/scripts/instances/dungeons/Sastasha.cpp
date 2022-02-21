@@ -59,7 +59,7 @@ public:
   {
     // Random coral
     auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
-    instance.setCustomVar( Coral, static_cast< uint64_t >( RNGMgr.getRandGenerator< float >( Corals::Blue, Corals::Green ).next() ) );
+    instance.setCustomVar( Coral, RNGMgr.getRandGenerator< uint32_t >( Corals::Blue, Corals::Green ).next() );
 
     switch( instance.getCustomVar( Coral ) )
     {
