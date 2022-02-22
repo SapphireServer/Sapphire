@@ -167,10 +167,10 @@ private:
     quest.setBitFlag8( 1, true );
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
-    auto enemy0 = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-    auto enemy1 = instance->createBNpcFromInstanceId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-    auto enemy2 = instance->createBNpcFromInstanceId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-    auto enemy3 = instance->createBNpcFromInstanceId( Enemy3, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy0 = instance->createBNpcFromLayoutId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy1 = instance->createBNpcFromLayoutId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy2 = instance->createBNpcFromLayoutId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy3 = instance->createBNpcFromLayoutId( Enemy3, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
 
     enemy0->hateListAddDelayed( player.getAsPlayer(), 1 );
     enemy1->hateListAddDelayed( player.getAsPlayer(), 1 );

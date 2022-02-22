@@ -172,8 +172,8 @@ private:
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
-    auto enemy0 = instance->createBNpcFromInstanceId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-    auto enemy1 = instance->createBNpcFromInstanceId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy0 = instance->createBNpcFromLayoutId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy1 = instance->createBNpcFromLayoutId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
 
     enemy0->hateListAdd( player.getAsPlayer(), 1 );
     enemy1->hateListAdd( player.getAsPlayer(), 1 );

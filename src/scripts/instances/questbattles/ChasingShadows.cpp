@@ -223,9 +223,9 @@ public:
     auto pair3Spawnd = instance.getDirectorVar( SET_3_SPAWNED );
     auto successCalled = instance.getDirectorVar( SUCCESS_CALLED );
 
-    auto boss = instance.getActiveBNpcByInstanceId( INIT_POP_BOSS );
-    auto ida = instance.getActiveBNpcByInstanceId( INIT_P_POP_IDA );
-    auto papa = instance.getActiveBNpcByInstanceId( INIT_P_POP_PAPARIMO );
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_BOSS );
+    auto ida = instance.getActiveBNpcByLayoutId( INIT_P_POP_IDA );
+    auto papa = instance.getActiveBNpcByLayoutId( INIT_P_POP_PAPARIMO );
     auto pPlayer = instance.getPlayerPtr();
 
     uint32_t bossHpPercent = 0;
@@ -244,8 +244,8 @@ public:
     if( pair1Spawnd == 0 && bossHpPercent <= 75 )
     {
       instance.setDirectorVar( SET_1_SPAWNED, 1 );
-      auto a2 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_B_03, 1440, Common::BNpcType::Enemy );
-      auto a3 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_B_04, 1440, Common::BNpcType::Enemy );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_03, 1440, Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_04, 1440, Common::BNpcType::Enemy );
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
 
@@ -254,8 +254,8 @@ public:
       a2->hateListAdd( papa, 10000 );
       a3->hateListAdd( papa, 10000 );
 
-      auto a4 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_A_01, 300, Common::BNpcType::Enemy );
-      auto a5 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_A_02, 300, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_01, 300, Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_02, 300, Common::BNpcType::Enemy );
       a4->setFlag( Entity::NoDeaggro );
       a5->setFlag( Entity::NoDeaggro );
 
@@ -267,8 +267,8 @@ public:
     if( pair2Spawnd == 0 && bossHpPercent <= 50 )
     {
       instance.setDirectorVar( SET_2_SPAWNED, 1 );
-      auto a2 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_B_05, 1440, Common::BNpcType::Enemy );
-      auto a3 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_B_06, 1440, Common::BNpcType::Enemy );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_05, 1440, Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_06, 1440, Common::BNpcType::Enemy );
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
 
@@ -277,8 +277,8 @@ public:
       a2->hateListAdd( papa, 10000 );
       a3->hateListAdd( papa, 10000 );
 
-      auto a4 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_A_03, 300, Common::BNpcType::Enemy );
-      auto a5 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_A_04, 300, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_03, 300, Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_04, 300, Common::BNpcType::Enemy );
       a4->setFlag( Entity::NoDeaggro );
       a5->setFlag( Entity::NoDeaggro );
 
@@ -292,8 +292,8 @@ public:
     {
       instance.setDirectorVar( SET_3_SPAWNED, 1 );
 
-      auto a4 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_A_05, 300, Common::BNpcType::Enemy );
-      auto a5 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_A_06, 300, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_05, 300, Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_A_06, 300, Common::BNpcType::Enemy );
       a4->setFlag( Entity::NoDeaggro );
       a5->setFlag( Entity::NoDeaggro );
 
@@ -336,12 +336,12 @@ public:
 
   void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
   {
-    auto boss = instance.createBNpcFromInstanceId( INIT_POP_BOSS, 21141, Common::BNpcType::Enemy );
-    auto a2 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_B_01, 1440, Common::BNpcType::Enemy );
-    auto a3 = instance.createBNpcFromInstanceId( INIT_POP_ENEMY_B_02, 1440, Common::BNpcType::Enemy );
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_BOSS, 21141, Common::BNpcType::Enemy );
+    auto a2 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_01, 1440, Common::BNpcType::Enemy );
+    auto a3 = instance.createBNpcFromLayoutId( INIT_POP_ENEMY_B_02, 1440, Common::BNpcType::Enemy );
 
-    auto ida = instance.createBNpcFromInstanceId( INIT_P_POP_IDA, 27780, Common::BNpcType::Friendly );
-    auto papa = instance.createBNpcFromInstanceId( INIT_P_POP_PAPARIMO, 27780, Common::BNpcType::Friendly );
+    auto ida = instance.createBNpcFromLayoutId( INIT_P_POP_IDA, 27780, Common::BNpcType::Friendly );
+    auto papa = instance.createBNpcFromLayoutId( INIT_P_POP_PAPARIMO, 27780, Common::BNpcType::Friendly );
     boss->setFlag( Entity::NoDeaggro );
     a2->setFlag( Entity::NoDeaggro );
     a3->setFlag( Entity::NoDeaggro );

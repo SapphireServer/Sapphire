@@ -164,7 +164,7 @@ private:
 
     if( !enemySpawned && quest.getUI8AL() < 1)
     {
-      auto enemy = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+      auto enemy = instance->createBNpcFromLayoutId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
       enemy->hateListAdd( player.getAsPlayer(), 1 );
     }
   }

@@ -196,7 +196,7 @@ private:
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy = instance->createBNpcFromInstanceId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
 

@@ -130,7 +130,7 @@ public:
     {
       instance.setVar( 0, Seq3 );
       instance.getEObjByName( "Rambadedoor" )->setPermissionInvisibility( 7 );
-      madison2 = instance.createBNpcFromInstanceId( 4035056, 600, Common::BNpcType::Enemy );
+      madison2 = instance.createBNpcFromLayoutId( 4035056, 600, Common::BNpcType::Enemy );
       madison = nullptr;
     }
 
@@ -187,7 +187,7 @@ public:
     if( eobj.getName() == "Inconspicuousswitch" )
     {
       if( !chopper )
-        chopper = instance.createBNpcFromInstanceId( 4035011, 400, Common::BNpcType::Enemy );
+        chopper = instance.createBNpcFromLayoutId( 4035011, 400, Common::BNpcType::Enemy );
       else if( chopper && !chopper->isAlive() )
       {
         eventMgr().eventActionStart( player, getId(), EventActionTouch,
@@ -197,7 +197,7 @@ public:
                                       instance.getEObjByName( "Hiddendoor" )->setPermissionInvisibility( 7 );
                                       instance.setVar( 0, Seq2 );
                                       instance.sendEventLogMessage( player, instance, 2064, { 0, 0 } );
-                                      madison = instance.createBNpcFromInstanceId( 3988325, 600, Common::BNpcType::Enemy );
+                                      madison = instance.createBNpcFromLayoutId( 3988325, 600, Common::BNpcType::Enemy );
                                     },
                                     nullptr, getId() );
       }
@@ -225,7 +225,7 @@ public:
                                     eobj.setPermissionInvisibility( 1 );
                                     instance.setVar( 0, Seq5 );
                                     instance.sendEventLogMessage( player, instance, 2031, { 2000513 } );
-                                    denn = instance.createBNpcFromInstanceId( 3978771, 1000, Common::BNpcType::Enemy );
+                                    denn = instance.createBNpcFromLayoutId( 3978771, 1000, Common::BNpcType::Enemy );
                                   },
                                   nullptr, getId() );
     }

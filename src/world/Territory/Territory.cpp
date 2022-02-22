@@ -829,7 +829,7 @@ uint32_t Territory::getNextEffectSequence()
   return m_effectCounter++;
 }
 
-Entity::BNpcPtr Territory::createBNpcFromInstanceId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
+Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
 {
   auto infoPtr = m_bNpcBaseMap.find( levelId );
   if( infoPtr == m_bNpcBaseMap.end() )
@@ -850,7 +850,7 @@ Entity::BNpcPtr Territory::getActiveBNpcByEntityId( uint32_t entityId )
   return it->second;
 }
 
-Entity::BNpcPtr Territory::getActiveBNpcByInstanceId( uint32_t instanceId )
+Entity::BNpcPtr Territory::getActiveBNpcByLayoutId( uint32_t instanceId )
 {
   for( const auto& bnpcIt : m_bNpcMap )
   {
