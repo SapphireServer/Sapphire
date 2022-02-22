@@ -18,18 +18,15 @@ private:
   uint16_t m_posY;
   ActorSet m_actors;
   bool m_bActive;
-  bool m_bLoaded;
-  bool m_bUnloadPending;
 
   uint16_t m_playerCount;
-  TerritoryPtr m_pZone;
 
 public:
   Cell();
 
   ~Cell();
 
-  void init( uint32_t x, uint32_t y, TerritoryPtr pZone );
+  void init( uint32_t x, uint32_t y );
 
   void addActor( Entity::GameObjectPtr pAct );
 
@@ -69,36 +66,7 @@ public:
     return m_bActive;
   }
 
-  bool isLoaded() const
-  {
-    return m_bLoaded;
-  }
-
-  uint32_t getPlayerCount() const
-  {
-    return m_playerCount;
-  }
-
-  bool isUnloadPending() const
-  {
-    return m_bUnloadPending;
-  }
-
-  void setUnloadPending( bool up )
-  {
-    m_bUnloadPending = up;
-  }
-
-  void queueUnloadPending();
-
-  void cancelPendingUnload();
-
   void unload();
-
-  void setPermanentActivity( bool val )
-  {
-    m_bForcedActive = val;
-  }
 
   bool isForcedActive() const
   {

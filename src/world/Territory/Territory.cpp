@@ -214,7 +214,7 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
   if( !pCell )
   {
     pCell = create( cx, cy );
-    pCell->init( cx, cy, shared_from_this() );
+    pCell->init( cx, cy );
   }
 
   pCell->addActor( pActor );
@@ -565,11 +565,9 @@ void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
         if( isCellActive( posX, posY ) )
         {
           pCell = create( posX, posY );
-          pCell->init( posX, posY, shared_from_this() );
+          pCell->init( posX, posY );
 
           pCell->setActivity( true );
-
-          assert( !pCell->isLoaded() );
 
         }
       }
@@ -579,11 +577,6 @@ void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
         if( isCellActive( posX, posY ) && !pCell->isActive() )
         {
           pCell->setActivity( true );
-
-          if( !pCell->isLoaded() )
-          {
-
-          }
         }
         else if( !isCellActive( posX, posY ) && pCell->isActive() )
           pCell->setActivity( false );
@@ -612,7 +605,7 @@ void Territory::updateActorPosition( Entity::GameObject& actor )
   if( !pCell )
   {
     pCell = create( cellX, cellY );
-    pCell->init( cellX, cellY, shared_from_this() );
+    pCell->init( cellX, cellY );
   }
 
   // If object moved cell

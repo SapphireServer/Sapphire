@@ -10,9 +10,7 @@
 
 Sapphire::Cell::Cell() :
   m_bActive( false ),
-  m_bLoaded( false ),
-  m_playerCount( 0 ),
-  m_bUnloadPending( false )
+  m_playerCount( 0 )
 {
   m_bForcedActive = false;
 }
@@ -22,9 +20,8 @@ Sapphire::Cell::~Cell()
   removeActors();
 }
 
-void Sapphire::Cell::init( uint32_t x, uint32_t y, TerritoryPtr pZone )
+void Sapphire::Cell::init( uint32_t x, uint32_t y )
 {
-  m_pZone = pZone;
   m_posX = static_cast< uint16_t >( x );
   m_posY = static_cast< uint16_t >( y );
 
@@ -56,9 +53,6 @@ void Sapphire::Cell::setActivity( bool state )
     //{
 
     //}
-
-    if( m_bUnloadPending )
-      cancelPendingUnload();
 
   }
   else if( m_bActive && !state )
@@ -94,40 +88,17 @@ void Sapphire::Cell::removeActors()
       continue;
     }
 
-    if( m_bUnloadPending )
-    {
-
-    }
-
   }
 
   m_playerCount = 0;
-  m_bLoaded = false;
-}
-
-void Sapphire::Cell::queueUnloadPending()
-{
-  if( m_bUnloadPending )
-    return;
-
-  m_bUnloadPending = true;
-
-}
-
-void Sapphire::Cell::cancelPendingUnload()
-{
-  if( !m_bUnloadPending )
-    return;
 }
 
 void Sapphire::Cell::unload()
 {
 
-  assert( m_bUnloadPending );
   if( m_bActive )
     return;
 
   removeActors();
-  m_bUnloadPending = false;
 }
 
