@@ -4,6 +4,7 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -82,9 +83,9 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    switch( entityId )
+    switch( bnpc.getLayoutId() )
     {
       case Enemy0:
       {
@@ -182,7 +183,7 @@ private:
   {
     quest.setBitFlag8( 1, true );
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy0 = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy0 = instance->createBNpcFromLayoutId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
     enemy0->hateListAdd( player.getAsPlayer(), 1 );
   }
 

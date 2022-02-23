@@ -4,6 +4,7 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -225,11 +226,11 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    if( entityId != Enemy0 )
+    if( bnpc.getLayoutId() != Enemy0 )
       return;
-    else if( entityId == Enemy0 && quest.getSeq() == Seq1 )
+    else if( bnpc.getLayoutId() == Enemy0 && quest.getSeq() == Seq1 )
     {
       eventMgr().sendEventNotice( player, getId(), 0, 0 );
       quest.setUI8BH( 0 );
@@ -288,7 +289,7 @@ private:
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy = instance->createBNpcFromInstanceId( Enemy0, 319 /*Find the right value*/, Common::BNpcType::Enemy );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy0, 319 /*Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
   }

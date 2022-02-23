@@ -4,6 +4,7 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -66,9 +67,9 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    if( nameId != Enemy0 && nameId != Enemy1 && nameId != Enemy2 )
+    if( bnpc.getBNpcNameId() != Enemy0 && bnpc.getBNpcNameId() != Enemy1 && bnpc.getBNpcNameId() != Enemy2 )
       return;
 
 
@@ -76,7 +77,7 @@ public:
     auto currentKC49 = quest.getUI8BH() + 1;
     auto currentKC47 = quest.getUI8BL() + 1;
 
-    switch( nameId )
+    switch( bnpc.getBNpcNameId() )
     {
       case Enemy0:
       {

@@ -4,6 +4,7 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -152,9 +153,9 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    switch( entityId )
+    switch( bnpc.getLayoutId() )
     {
       case Enemy0:
       {
@@ -240,7 +241,7 @@ private:
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy = instance->createBNpcFromInstanceId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
     quest.setBitFlag8( 1, true );
@@ -335,7 +336,7 @@ private:
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy = instance->createBNpcFromInstanceId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
     quest.setBitFlag8( 1, true );
@@ -430,7 +431,7 @@ private:
   void Scene00019Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy = instance->createBNpcFromInstanceId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy2, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
     enemy->setTriggerOwnerId( player.getId() );
     enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
 

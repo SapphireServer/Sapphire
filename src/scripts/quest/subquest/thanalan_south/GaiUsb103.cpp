@@ -4,6 +4,7 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -110,15 +111,15 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    if(nameId == Enemy0)
+    if( bnpc.getBNpcNameId() == Enemy0 )
     {
       quest.setUI8BH( 1 );
       eventMgr().sendEventNotice( player, getId(), 0, 0 );
       quest.setSeq( Seq2 );
     }
-    else if( entityId == Enemy1 )
+    else if( bnpc.getLayoutId() == Enemy1 )
     {
       quest.setUI8BH( 1 );
       eventMgr().sendEventNotice( player, getId(), 2, 0 );
@@ -201,7 +202,7 @@ private:
   {
     quest.setBitFlag8( 1, true );
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemy1 = instance->createBNpcFromInstanceId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy1 = instance->createBNpcFromLayoutId( Enemy1, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
     enemy1->hateListAdd( player.getAsPlayer(), 1 );
   }
 
