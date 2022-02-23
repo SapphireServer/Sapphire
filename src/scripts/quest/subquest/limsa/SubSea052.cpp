@@ -47,7 +47,7 @@ private:
       }
       case 1:
       {
-        if( quest.getUI8AL() < 5 )
+        if( type == EVENT_ON_BNPC_KILL && param1 == 405 && quest.getUI8AL() < 5 )
         {
           quest.setUI8AL( quest.getUI8AL() + 1 );
           eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
