@@ -853,7 +853,7 @@ Entity::BNpcPtr Territory::getActiveBNpcByLayoutId( uint32_t instanceId )
   return nullptr;
 }
 
-Entity::BNpcPtr Territory::getActiveBNpcByInstanceIdAndTriggerOwner( uint32_t instanceId, uint32_t triggerOwnerId )
+Entity::BNpcPtr Territory::getActiveBNpcByLayoutIdAndTriggerOwner( uint32_t instanceId, uint32_t triggerOwnerId )
 {
   for( const auto& bnpcIt : m_bNpcMap )
   {

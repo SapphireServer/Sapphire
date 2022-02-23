@@ -161,7 +161,7 @@ private:
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
-     auto enemySpawned = instance->getActiveBNpcByInstanceIdAndTriggerOwner( Enemy0, player.getId() );
+     auto enemySpawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
 
     if( !enemySpawned && quest.getUI8AL() < 1)
     {

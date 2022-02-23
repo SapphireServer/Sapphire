@@ -176,7 +176,7 @@ private:
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
-    auto enemy0Spawned = instance->getActiveBNpcByInstanceIdAndTriggerOwner( Enemy0, player.getId() );
+    auto enemy0Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
 
     if( !enemy0Spawned )
     {

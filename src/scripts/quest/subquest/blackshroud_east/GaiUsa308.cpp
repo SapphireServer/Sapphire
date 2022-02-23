@@ -281,7 +281,7 @@ private:
   void Scene00012Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
-    auto enemySpawned = instance->getActiveBNpcByInstanceIdAndTriggerOwner( Enemy0, player.getId() );
+    auto enemySpawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
     if( !enemySpawned )
     {
       auto enemy = instance->createBNpcFromLayoutId( Enemy0, 413 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
