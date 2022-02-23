@@ -3,7 +3,9 @@
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
+
 #include <ScriptObject.h>
 #include <Service.h>
 

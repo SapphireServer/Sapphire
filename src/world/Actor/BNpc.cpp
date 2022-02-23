@@ -854,7 +854,7 @@ void Sapphire::Entity::BNpc::onDeath()
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {
-      playerMgr.onMobKill( *pPlayer, static_cast< uint16_t >( m_bNpcNameId ), getLayoutId() );
+      playerMgr.onMobKill( *pPlayer, *this );
       pPlayer->gainExp( paramGrowthInfo->data().BaseExp );
     }
   }

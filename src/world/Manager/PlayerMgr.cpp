@@ -198,14 +198,14 @@ void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
   }
 }
 
-void PlayerMgr::onMobKill( Entity::Player& player, uint16_t nameId, uint32_t layoutId )
+void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onBNpcKill( player, nameId, layoutId );
+  scriptMgr.onBNpcKill( player, bnpc );
 
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
   {
-    player.updateHuntingLog( nameId );
+    player.updateHuntingLog( bnpc.getBNpcNameId() );
   }
 }
 

@@ -4,6 +4,7 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -146,19 +147,19 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    if( quest.getSeq() == Seq1 && entityId == Enemy0 )
+    if( quest.getSeq() == Seq1 && bnpc.getLayoutId() == Enemy0 )
     {
       eventMgr().sendEventNotice( player, getId(), 0, 0 );
       quest.setSeq( Seq2 );
     }
-    else if( quest.getSeq() == Seq3 && entityId == Enemy1 )
+    else if( quest.getSeq() == Seq3 && bnpc.getLayoutId() == Enemy1 )
     {
       eventMgr().sendEventNotice( player, getId(), 2, 0 );
       quest.setSeq( Seq4 );
     }
-    else if( quest.getSeq() == Seq5 && entityId == Enemy2 )
+    else if( quest.getSeq() == Seq5 && bnpc.getLayoutId() == Enemy2 )
     {
       eventMgr().sendEventNotice( player, getId(), 4, 0 );
       quest.setSeq( Seq6 );

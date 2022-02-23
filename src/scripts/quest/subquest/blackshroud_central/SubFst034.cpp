@@ -3,6 +3,7 @@
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
@@ -72,9 +73,9 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
   {
   }
 
-  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    switch( nameId )
+    switch( bnpc.getBNpcNameId() )
     {
       case Enemy0:
       {

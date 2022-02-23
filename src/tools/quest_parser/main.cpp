@@ -24,7 +24,7 @@ Sapphire::Data::ExdData g_exdDataGen;
 namespace fs = std::filesystem;
 using namespace Sapphire;
 
-std::string javaPath( "C:\\Program Files (x86)\\Java\\jre1.8.0_301\\bin\\java.exe" );
+std::string javaPath( "\"C:\\Program Files (x86)\\Java\\jre1.8.0_301\\bin\\java.exe\"" );
 std::string gamePath( "F:\\client3.0\\game\\sqpack" );
 
 const std::string onWithinRangeStr(
@@ -389,9 +389,9 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
 
   if( !enemy_ids.empty() )
     scriptEntry += std::string(
-      "  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override\n"
+      "  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override\n"
       "  {\n" 
-      "    switch( entityId )\n"
+      "    switch( bnpc->getBNpcNameId() )\n"
       "    {\n" );
 
   for( auto enemy : enemy_strings )

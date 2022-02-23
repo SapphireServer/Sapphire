@@ -242,7 +242,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
 
-    virtual void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Sapphire::Entity::Player& player );
+    virtual void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player );
 
     virtual void onTriggerOwnerDeaggro( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player );
 

@@ -38,7 +38,7 @@ class PlayerMgr
 
     void onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId );
 
-    void onMobKill( Sapphire::Entity::Player& player, uint16_t nameId, uint32_t entityId );
+    void onMobKill( Sapphire::Entity::Player& player, Sapphire::Entity::BNpc& bnpc );
 
     void onHateListChanged( Sapphire::Entity::Player& player );
 

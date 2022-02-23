@@ -1,4 +1,5 @@
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
