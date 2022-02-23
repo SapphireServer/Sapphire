@@ -3,7 +3,6 @@
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
 #include "Manager/EventMgr.h"
-#include <Actor/BNpc.h>
 #include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
@@ -37,8 +36,8 @@ private:
 
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1006461;//Cid
-  static constexpr auto Enemy0 = 114;    //Ice Sprite (INCORRECT: 132)
-  static constexpr auto Item0 = 2000732; //Ice Sprit Core (UI8BH)
+  static constexpr auto Enemy0 = 114;//Ice Sprite (INCORRECT: 132)
+  static constexpr auto Item0 = 2000732;//Ice Sprit Core (UI8BH)
   static constexpr auto LocAction1 = 990;
   static constexpr auto LocAction2 = 80;
   static constexpr auto LocAction3 = 81;
@@ -71,9 +70,9 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override
   {
-    switch( bnpc.getBNpcNameId() )
+    switch( nameId )
     {
       case Enemy0:
       {
@@ -143,7 +142,7 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      player.finishQuest( getId(), result.getResult( 1 ) );
+      player.finishQuest( getId(), result.getResult(1) );
     }
   }
 };

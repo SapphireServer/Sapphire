@@ -4,7 +4,6 @@
 
 #include "Manager/EventMgr.h"
 #include <Actor/Player.h>
-#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -123,9 +122,9 @@ public:
     }
   }
 
-  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, uint16_t nameId, uint32_t entityId, Entity::Player& player ) override
   {
-    switch( bnpc.getLayoutId() )
+    switch( entityId )
     {
       case Enemy0:
       case Enemy1:
@@ -201,9 +200,9 @@ private:
 
     if( !enemy0spawned && !enemy1spawned && !enemy2spawned && quest.getUI8BL() < 3 )
     {
-      auto enemy0 = instance->createBNpcFromLayoutId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-      auto enemy1 = instance->createBNpcFromLayoutId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
-      auto enemy2 = instance->createBNpcFromLayoutId( Enemy2, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+      auto enemy0 = instance->createBNpcFromInstanceId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+      auto enemy1 = instance->createBNpcFromInstanceId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+      auto enemy2 = instance->createBNpcFromInstanceId( Enemy2, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
 
       enemy0->hateListAddDelayed( player.getAsPlayer(), 1 );
       enemy1->hateListAddDelayed( player.getAsPlayer(), 1 );
