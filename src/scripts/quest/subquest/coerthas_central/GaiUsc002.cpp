@@ -109,9 +109,9 @@ public:
     {
       auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
-      auto enemy0Spawned = instance->getActiveBNpcByInstanceIdAndTriggerOwner( Enemy0, player.getId() );
-      auto enemy1Spawned = instance->getActiveBNpcByInstanceIdAndTriggerOwner( Enemy1, player.getId() );
-      auto enemy2Spawned = instance->getActiveBNpcByInstanceIdAndTriggerOwner( Enemy2, player.getId() );
+      auto enemy0Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
+      auto enemy1Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() );
+      auto enemy2Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy2, player.getId() );
 
       if( !enemy0Spawned && !enemy1Spawned && !enemy2Spawned && quest.getUI8AL() < 3 )
       {
