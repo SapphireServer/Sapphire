@@ -177,8 +177,8 @@ struct LayerSetReferenced
 struct LayerSetReferencedList
 {
   LayerSetReferencedType ReferencedType;
-  int LayerSets;
-  int LayerSetCount;
+  int32_t LayerSets;
+  int32_t LayerSetCount;
 };
 
 struct LGB_GROUP_HEADER
