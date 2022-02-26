@@ -255,6 +255,14 @@ struct LGB_GROUP
         {
           entries.push_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
         }
+        else if( type == LgbEntryType::EventRange )
+        {
+          entries.push_back( std::make_shared< LGB_EVENT_RANGE_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::PopRange )
+        {
+          entries.push_back( std::make_shared< LGB_POP_RANGE_ENTRY >( buf, entryOffset ) );
+        }
         else if( type == LgbEntryType::MapRange )
         {
           entries.push_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
