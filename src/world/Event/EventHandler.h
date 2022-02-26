@@ -78,8 +78,6 @@ namespace Sapphire::Event
       SwitchTalk = 0x001F,
       Adventure = 0x0020,
       DailyQuestSupply = 0x0021,
-      Adventure = 0x0021,
-      DailyQuestSupply = 0x0022,
       TripleTriad = 0x0023,
       PreHandler = 0x0036,
       ICDirector = 0x8003,
