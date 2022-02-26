@@ -169,7 +169,7 @@ struct ExitRangeData : public InstanceObject
   uint32_t exitType;
   uint16_t zoneId;
   uint16_t destTerritoryType;
-  int index;
+  int32_t index;
   uint32_t destInstanceObjectId;
   uint32_t returnInstanceObjectId;
   float direction;
