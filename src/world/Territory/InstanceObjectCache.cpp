@@ -115,15 +115,19 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
             m_popRangeCache.insert( id, pPopRange );
           }
-          else if( pEntry->getType() == LgbEntryType::EventNpc )
+          else if( pEntry->getType() == LgbEntryType::SharedGroup6 )
           {
-            auto pEventNpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
-            m_eventNpcCache.insert( id, pEventNpc );
+
           }
           else if( pEntry->getType() == LgbEntryType::EventObject )
           {
-            auto pEventObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
-            m_eventObjCache.insert( id, pEventObj );
+            auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
+            m_eobjCache.insert( 0, pEObj );
+          }
+          else if( pEntry->getType() == LgbEntryType::EventNpc )
+          {
+            auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+            m_enpcCache.insert( 0, pENpc );
           }
         }
       }
@@ -132,50 +136,50 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
   std::cout << "\n";
 
   Logger::debug(
-    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} ENpc: {} Eobj: {}",
-    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_eventNpcCache.size(), m_eventObjCache.size()
+    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {}",
+    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size()
   );
 }
 
 
 Sapphire::InstanceObjectCache::MapRangePtr
-  Sapphire::InstanceObjectCache::getMapRange( uint16_t zoneId, uint32_t mapRangeId )
+Sapphire::InstanceObjectCache::getMapRange( uint16_t zoneId, uint32_t mapRangeId )
 {
   return m_mapRangeCache.get( zoneId, mapRangeId );
 }
 
 Sapphire::InstanceObjectCache::ExitRangePtr
-  Sapphire::InstanceObjectCache::getExitRange( uint16_t zoneId, uint32_t exitRangeId )
+Sapphire::InstanceObjectCache::getExitRange( uint16_t zoneId, uint32_t exitRangeId )
 {
   return m_exitRangeCache.get( zoneId, exitRangeId );
 }
 
 Sapphire::InstanceObjectCache::PopRangePtr
-  Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
+Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
 {
   return m_popRangeCache.get( zoneId, popRangeId );
 }
 
-Sapphire::InstanceObjectCache::EventNpcPtr
-  Sapphire::InstanceObjectCache::getEventNpc( uint16_t zoneId, uint32_t eventNpcId )
+Sapphire::InstanceObjectCache::EObjPtr
+Sapphire::InstanceObjectCache::getEObj( uint32_t eObjId )
 {
-  return m_eventNpcCache.get( zoneId, eventNpcId );
+  return m_eobjCache.get( 0, eObjId );
 }
 
-Sapphire::InstanceObjectCache::EventObjPtr
-  Sapphire::InstanceObjectCache::getEventObj( uint16_t zoneId, uint32_t eventObjId )
+Sapphire::InstanceObjectCache::ENpcPtr
+Sapphire::InstanceObjectCache::getENpc( uint32_t eNpcId )
 {
-  return m_eventObjCache.get( zoneId, eventObjId );
+  return m_enpcCache.get( 0, eNpcId );
 }
 
 Sapphire::InstanceObjectCache::EventNpcMapPtr
   Sapphire::InstanceObjectCache::getAllEventNpc( uint16_t zoneId )
 {
-  return m_eventNpcCache.getAll( zoneId );
+  return m_enpcCache.getAll( zoneId );
 }
 
 Sapphire::InstanceObjectCache::EventObjMapPtr
   Sapphire::InstanceObjectCache::getAllEventObj( uint16_t zoneId )
 {
-  return m_eventObjCache.getAll( zoneId );
+  return m_eobjCache.getAll( zoneId );
 }

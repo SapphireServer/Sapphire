@@ -7,8 +7,8 @@
 struct LGB_MAP_RANGE_ENTRY;
 struct LGB_EXIT_RANGE_ENTRY;
 struct LGB_POP_RANGE_ENTRY;
-struct LGB_ENPC_ENTRY;
 struct LGB_EOBJ_ENTRY;
+struct LGB_ENPC_ENTRY;
 
 
 namespace Sapphire
@@ -65,7 +65,7 @@ namespace Sapphire
       }
     }
 
-    uint32_t size() const
+    size_t size() const
     {
       return m_objectCache.size();
     }
@@ -77,11 +77,11 @@ namespace Sapphire
     using MapRangePtr = std::shared_ptr< LGB_MAP_RANGE_ENTRY >;
     using ExitRangePtr = std::shared_ptr< LGB_EXIT_RANGE_ENTRY >;
     using PopRangePtr = std::shared_ptr< LGB_POP_RANGE_ENTRY >;
-    using EventNpcPtr = std::shared_ptr< LGB_ENPC_ENTRY >;
-    using EventObjPtr = std::shared_ptr< LGB_EOBJ_ENTRY >;
+    using EObjPtr = std::shared_ptr< LGB_EOBJ_ENTRY >;
+    using ENpcPtr = std::shared_ptr< LGB_ENPC_ENTRY >;
 
-    using EventNpcMapPtr = std::unordered_map< uint32_t, EventNpcPtr >*;
-    using EventObjMapPtr = std::unordered_map< uint32_t, EventObjPtr >*;
+    using EventNpcMapPtr = std::unordered_map< uint32_t, ENpcPtr >*;
+    using EventObjMapPtr = std::unordered_map< uint32_t, EObjPtr >*;
 
     InstanceObjectCache();
     ~InstanceObjectCache() = default;
@@ -89,8 +89,8 @@ namespace Sapphire
     MapRangePtr getMapRange( uint16_t zoneId, uint32_t mapRangeId );
     ExitRangePtr getExitRange( uint16_t zoneId, uint32_t exitRangeId );
     PopRangePtr getPopRange( uint16_t zoneId, uint32_t popRangeId );
-    EventNpcPtr getEventNpc( uint16_t zoneId, uint32_t eventNpcId );
-    EventObjPtr getEventObj( uint16_t zoneId, uint32_t eventObjId );
+    EObjPtr getEObj( uint32_t eObjId );
+    ENpcPtr getENpc( uint32_t eNpcId );
         
     EventNpcMapPtr getAllEventNpc( uint16_t zoneId );
     EventObjMapPtr getAllEventObj( uint16_t zoneId );
@@ -99,8 +99,8 @@ namespace Sapphire
     ObjectCache< LGB_MAP_RANGE_ENTRY > m_mapRangeCache;
     ObjectCache< LGB_EXIT_RANGE_ENTRY > m_exitRangeCache;
     ObjectCache< LGB_POP_RANGE_ENTRY > m_popRangeCache;
-    ObjectCache< LGB_ENPC_ENTRY > m_eventNpcCache;
-    ObjectCache< LGB_EOBJ_ENTRY > m_eventObjCache;
+    ObjectCache< LGB_EOBJ_ENTRY > m_eobjCache;
+    ObjectCache< LGB_ENPC_ENTRY > m_enpcCache;
     std::shared_ptr< Framework > m_pFramework;
 
   };

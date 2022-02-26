@@ -3,8 +3,16 @@
 #include <Util/Util.h>
 #include <Service.h>
 
+#include <Exd/ExdDataGenerated.h>
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include "EventMgr.h"
 #include "Event/EventHandler.h"
+
+#include "Territory/InstanceObjectCache.h"
+
+#include "Actor/Player.h"
 
 using namespace Sapphire::Common;
 
@@ -113,10 +121,15 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 
 uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto levelInfo = exdData.get< Sapphire::Data::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->object;
+  else if( auto pObj = instanceObjectCache.getEObj( eventActorId ) )
+    return pObj->data.eobjId;
+  else if( auto pNpc = instanceObjectCache.getENpc( eventActorId ) )
+    return pNpc->data.enpcId;
 
   return 0;
 }
