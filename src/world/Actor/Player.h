@@ -434,7 +434,7 @@ namespace Sapphire::Entity
     void updateHowtosSeen( uint32_t howToId );
 
     /*! learn an action / update the unlock bitmask. */
-    void setSystemActionUnlocked( Common::UnlockEntry unlockId );
+    void setRewardFlag( Common::UnlockEntry unlockId );
 
     /*! learn a song / update the unlock bitmask. */
     void learnSong( uint8_t songId, uint32_t itemId );

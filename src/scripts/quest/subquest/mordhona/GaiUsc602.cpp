@@ -224,7 +224,7 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      player.setSystemActionUnlocked( Common::UnlockEntry::EmoteImperialSalute );
+      player.setRewardFlag( Common::UnlockEntry::EmoteImperialSalute );
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }

@@ -528,7 +528,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     uint32_t id;
 
     sscanf( params.c_str(), "%d", &id );
-    player.setSystemActionUnlocked( static_cast< Common::UnlockEntry >( id ) );
+    player.setRewardFlag( static_cast< Common::UnlockEntry >( id ) );
   }
   else if ( subCommand == "effect")
   {

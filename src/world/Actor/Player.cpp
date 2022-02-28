@@ -649,7 +649,7 @@ void Player::changePosition( float x, float y, float z, float o )
   warpMgr.requestWarp( *this, Common::WARP_TYPE_NORMAL, pos, getRot() );
 }
 
-void Player::setSystemActionUnlocked( Common::UnlockEntry unlockId )
+void Player::setRewardFlag( Common::UnlockEntry unlockId )
 {
   uint16_t index;
   uint8_t value;
@@ -658,7 +658,7 @@ void Player::setSystemActionUnlocked( Common::UnlockEntry unlockId )
 
   m_unlocks[ index ] |= value;
 
-  queuePacket( makeActorControlSelf( getId(), SetSystemActionUnlocked, unlock, 1 ) );
+  queuePacket( makeActorControlSelf( getId(), SetRewardFlag, unlock, 1 ) );
 }
 
 void Player::learnSong( uint8_t songId, uint32_t itemId )

@@ -90,7 +90,7 @@ public:
                                {
                                  eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
                                  player.registerAetheryte( 2 );
-                                 player.setSystemActionUnlocked( Common::UnlockEntry::Return );
+                                 player.setRewardFlag( Common::UnlockEntry::Return );
                                  Scene00001( quest, player );
                                },
                                nullptr, getId() );
