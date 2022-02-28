@@ -1443,7 +1443,9 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
   else if( subCommand == "carline_canopy" || subCommand == "gridania_adventurer" )
     warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 132 )->getGuId(), { 43.729f, -7.96559f, 103.965f }, -1.59436f );
   else if( subCommand == "observatorium" )
-    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 155 )->getGuId(), { 224.965f, 221.958f, 301.33f } , -0.0316129f);
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 155 )->getGuId(), { 224.965f, 221.958f, 301.33f }, -0.0316129f );
+  else if( subCommand == "rising_stones" )
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 156 )->getGuId(), { 22.7204f, 21.2639f, -635.704f }, -0.360031f );
   else
     PlayerMgr::sendUrgent( player, "{0} is not a valid easyWarp location.", subCommand );
 }
