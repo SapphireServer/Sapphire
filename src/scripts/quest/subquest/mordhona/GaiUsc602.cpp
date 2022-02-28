@@ -224,7 +224,7 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      //TODO:Reward Imperial Salute?
+      player.setSystemActionUnlocked( Common::UnlockEntry::EmoteImperialSalute );
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }
