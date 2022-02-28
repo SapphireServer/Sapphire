@@ -46,6 +46,7 @@ private:
   static constexpr auto LocSe1 = 42;
   static constexpr auto LocTalkshape1 = 6;
   static constexpr auto Territorytype0 = 212;
+  static constexpr auto AchievementCompleteQuest = 783; //Back form the Wood
 
 public:
   GaiUsa404() : Sapphire::ScriptAPI::QuestScript( 66282 ){};

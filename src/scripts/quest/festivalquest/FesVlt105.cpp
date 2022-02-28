@@ -42,6 +42,7 @@ private:
   static constexpr auto Actor1 = 1011731;//Lisette De Valentionne
   static constexpr auto Actor2 = 1011733;//House Valentione Emissary (Gridania)
   static constexpr auto LocActor0 = 1011799;
+  static constexpr auto AchievementCompleteQuest = 1062; //Love Actually
 
 public:
   FesVlt105() : Sapphire::ScriptAPI::QuestScript( 66083 ){};
