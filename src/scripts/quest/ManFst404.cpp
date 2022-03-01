@@ -66,6 +66,7 @@ private:
   static constexpr auto Territorytype1 = 331;
   static constexpr auto Territorytype2 = 130;
   static constexpr auto UnlockAddNewContentToCf = 3702;
+  static constexpr auto AchievementCompleteQuest = 787; //Free Wing Night
 
 public:
   ManFst404() : Sapphire::ScriptAPI::QuestScript( 66055 ){};

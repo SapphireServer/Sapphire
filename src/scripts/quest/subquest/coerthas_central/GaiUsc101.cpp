@@ -62,6 +62,7 @@ private:
   static constexpr auto Territorytype0 = 132;
   static constexpr auto UnlockAddNewContentToCf = 3702;
   static constexpr auto UnlockImageDungeon = 84;
+  static constexpr auto AchievementCompleteQuest = 786; //History Repeating
 
 public:
   GaiUsc101() : Sapphire::ScriptAPI::QuestScript( 66488 ){};
