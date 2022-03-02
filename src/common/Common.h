@@ -512,6 +512,8 @@ namespace Sapphire::Common
     MateriaAssimilating = 13,
     Dye = 14,
     Glamour = 15,
+    Decipher = 19,
+    Dig = 20,
     HuntingLog = 21,
     EmoteImperialSalute = 23,
     EmoteThrowSnowball = 24,
