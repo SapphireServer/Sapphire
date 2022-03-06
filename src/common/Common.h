@@ -512,22 +512,27 @@ namespace Sapphire::Common
     MateriaAssimilating = 13,
     Dye = 14,
     Glamour = 15,
+    CompanionMenu = 17,
+    Companion = 18,
     Decipher = 19,
     Dig = 20,
     HuntingLog = 21,
     EmoteImperialSalute = 23,
     EmoteThrowSnowball = 24,
+    TreasureHunt = 25,
     EmoteStepDance = 27,
     EmoteHarvestDance = 28,
     EmoteBallDance = 29,
     EmoteMadervilleDance = 30,
+    ChallengeLog = 92,
     Desynth = 95,
+    SightseeingLogMenuItem = 97, //Needs another unlock ID to fill it out? Or relog?
     EmoteBombDance = 98,
     EmoteHuzzah = 225,
     EmoteEmbrace = 229,
     EmoteMostGentlemanly = 244,
+    AetherialReduction = 256,
     EmoteFistBump = 259
-
   };
 
   enum ContainerType : uint16_t
