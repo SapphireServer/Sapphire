@@ -334,7 +334,7 @@ namespace Sapphire::Network::Packets
     CancelLogout = 0x01AC, // updated 5.58 hotfix
     CFDutyInfoHandler = 0xF078, // updated 4.2
 
-    SocialReqSendHandler = 0x00D7, // updated 5.58 hotfix
+    SocialReqSendHandler = 0x021C, // updated 6.08
     SocialResponseHandler = 0x0193, // updated 6.08
     CreateCrossWorldLS = 0x035D, // updated 5.58 hotfix
 

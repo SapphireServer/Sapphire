@@ -1039,13 +1039,13 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown293[16];
     uint8_t unknown2A3;
     uint8_t unlockBitmask[64];
-    uint8_t aetheryte[21];
+    uint8_t aetheryte[26];
     uint8_t favoriteAetheryteIds[4];
     uint8_t freeAetheryteId;
     uint8_t discovery[464];
-    uint8_t howto[35];
+    uint8_t howto[36];
     uint8_t minions[56];
-    uint8_t chocoboTaxiMask[10];
+    uint8_t chocoboTaxiMask[12];
     uint8_t watchedCutscenes[144];
     uint8_t companionBardingMask[11];
     uint8_t companionEquippedHead;
@@ -1072,7 +1072,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t tripleTriadCards[43];
     uint8_t unknown7D7;
     uint8_t unknown7D8[14];
-    uint8_t unknown7E6[36];
+    uint8_t unknown7E6[47];
     uint8_t unknown80A[6];
     uint8_t orchestrionMask[64];
     uint8_t hallOfNoviceCompletion[3];

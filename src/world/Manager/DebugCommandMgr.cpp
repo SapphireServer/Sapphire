@@ -304,19 +304,45 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     terriMgr.disableCurrentFestival();
   }
-  else if(subCommand == "finishallquests")
+  else if (subCommand == "finishallquests")
   {
-    for (int i = 65536; i < 69637; i++)
+    player.sendNotice("Finishing All Quests");
+    for (int i = 65536; i <= 70056; i++)
     {
       player.finishQuest(static_cast<uint16_t>(i));
     }
-  }
+    player.sendNotice("Done");
+    }
   else if (subCommand == "unfinishallquests")
   {
-  for (int i = 65536; i < 69637; i++)
-  {
-    player.unfinishQuest(static_cast<uint16_t>(i));
+    player.sendNotice("Unfinishing All Quests");
+    for (int i = 70056; i >= 65536; i--)
+    {
+      player.unfinishQuest(static_cast<uint16_t>(i));
+    }
+    player.sendNotice("Done");
   }
+  else if (subCommand == "finishuntil")
+  {
+    int32_t id;
+    sscanf(params.c_str(), "%d", &id);
+    player.sendNotice("Finishing Quests Until {0}", id);
+      for (int i = 65536; i <= id; i++)
+      {
+        player.unfinishQuest(static_cast<uint16_t>(i));
+      }
+    player.sendNotice("Done");
+  }
+  else if (subCommand == "unfinishuntil")
+  {
+  int32_t id;
+  sscanf(params.c_str(), "%d", &id);
+  player.sendNotice("Unfinishing Quests Until {0}", id);
+    for (int i = 65536; i <= id; i++)
+    {
+      player.unfinishQuest(static_cast<uint16_t>(i));
+    }
+    player.sendNotice("Done");
   }
   else if( subCommand == "QuestVar" )
   {
@@ -489,6 +515,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   player.eventStart(player.getId(), eventId, Event::EventHandler::Talk, 0, 0);
   player.playScene(eventId, sceneId, inputFlags, param2, param3, nullptr);
   }
+
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );

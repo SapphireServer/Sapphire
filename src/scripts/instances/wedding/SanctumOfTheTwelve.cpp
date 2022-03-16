@@ -694,129 +694,15 @@ public:
     player.playScene( instance.getDirectorId(), 1, HIDE_HOTBAR, 0, 2, 4, callback );
   }
  
-  void onDebug( Entity::Player& player, uint32_t param ) override
+  void onDebug(Entity::Player& player, uint32_t param) override
   {
     auto instance = player.getCurrentPublicContent();
-
-    auto p1 = instance->getPlayer(instance->getCustomVar(1));
-    auto p2 = instance->getPlayer(instance->getCustomVar(2));
-    if (!p1 || !p2)
-    {
-      instance->setSequence(1);
-      instance->foreachPlayer([](auto p)
-        {
-          p->sendUrgent("Failed to start the scene, missing main actors.");
-        });
+    if (!instance || instance->getDirectorId() != getId())
       return;
-    }
-    FFXIVCeremonySetActorAppearance packetData = {};
-    auto qBL = instance->getCustomVar(101);
-    packetData.questBL = qBL;
-    packetData.u1 = 1;
-    if (!(p1->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon))
-    {
-      packetData.actors[0].mainWeaponModel = p1->getModelMainWeapon();
-      packetData.actors[0].secWeaponModel = p1->getModelSubWeapon();
-    }
-    packetData.actors[0].charId = p1->getId();
-    packetData.actors[0].guardianDeity = p1->getGuardianDeity();
-    packetData.actors[0].models[Common::GearModelSlot::ModelHead] = p1->getModelForSlot(Common::GearModelSlot::ModelHead);
-    if ((p1->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFF) == 208)
-    {
-      instance->foreachPlayer([](auto p)
-        {
-          p->sendUrgent("Replacing p1 viel Model");
-        });
-      uint32_t gear = p1->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFFFFFF00;
-      packetData.actors[0].models[Common::GearModelSlot::ModelHead] = gear | 0xC7;
-    }
-    packetData.actors[0].models[Common::GearModelSlot::ModelBody] = p1->getModelForSlot(Common::GearModelSlot::ModelBody);
-    packetData.actors[0].models[Common::GearModelSlot::ModelHands] = p1->getModelForSlot(Common::GearModelSlot::ModelHands);
-    packetData.actors[0].models[Common::GearModelSlot::ModelLegs] = p1->getModelForSlot(Common::GearModelSlot::ModelLegs);
-    packetData.actors[0].models[Common::GearModelSlot::ModelFeet] = p1->getModelForSlot(Common::GearModelSlot::ModelFeet);
-    packetData.actors[0].models[Common::GearModelSlot::ModelNeck] = p1->getModelForSlot(Common::GearModelSlot::ModelNeck);
-    packetData.actors[0].models[Common::GearModelSlot::ModelEar] = p1->getModelForSlot(Common::GearModelSlot::ModelEar);
-    packetData.actors[0].models[Common::GearModelSlot::ModelRing1] = p1->getModelForSlot(Common::GearModelSlot::ModelRing1);
-    packetData.actors[0].models[Common::GearModelSlot::ModelRing2] = p1->getModelForSlot(Common::GearModelSlot::ModelRing2);
-    packetData.actors[0].models[Common::GearModelSlot::ModelWrist] = p1->getModelForSlot(Common::GearModelSlot::ModelWrist);
-    memcpy(packetData.actors[0].look, p1->getLookArray(), sizeof(packetData.actors[0].look));
-    if (!(p2->getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon))
-    {
-      packetData.actors[1].mainWeaponModel = p2->getModelMainWeapon();
-      packetData.actors[1].secWeaponModel = p2->getModelSubWeapon();
-    }
-    packetData.actors[1].charId = p2->getId();
-    packetData.actors[1].guardianDeity = p2->getGuardianDeity();
-    packetData.actors[1].models[Common::GearModelSlot::ModelHead] = p2->getModelForSlot(Common::GearModelSlot::ModelHead);
-    if ((p2->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFF) == 208)
-    {
-      instance->foreachPlayer([](auto p)
-        {
-          p->sendUrgent("Replacing p2 veil Model");
-        });
-      uint32_t gear = p2->getModelForSlot(Common::GearModelSlot::ModelHead) & 0xFFFFFF00;
-      packetData.actors[1].models[Common::GearModelSlot::ModelHead] = gear | 0xC7;
-    }
-    packetData.actors[1].models[Common::GearModelSlot::ModelBody] = p2->getModelForSlot(Common::GearModelSlot::ModelBody);
-    packetData.actors[1].models[Common::GearModelSlot::ModelHands] = p2->getModelForSlot(Common::GearModelSlot::ModelHands);
-    packetData.actors[1].models[Common::GearModelSlot::ModelLegs] = p2->getModelForSlot(Common::GearModelSlot::ModelLegs);
-    packetData.actors[1].models[Common::GearModelSlot::ModelFeet] = p2->getModelForSlot(Common::GearModelSlot::ModelFeet);
-    packetData.actors[1].models[Common::GearModelSlot::ModelNeck] = p2->getModelForSlot(Common::GearModelSlot::ModelNeck);
-    packetData.actors[1].models[Common::GearModelSlot::ModelEar] = p2->getModelForSlot(Common::GearModelSlot::ModelEar);
-    packetData.actors[1].models[Common::GearModelSlot::ModelRing1] = p2->getModelForSlot(Common::GearModelSlot::ModelRing1);
-    packetData.actors[1].models[Common::GearModelSlot::ModelRing2] = p2->getModelForSlot(Common::GearModelSlot::ModelRing2);
-    packetData.actors[1].models[Common::GearModelSlot::ModelWrist] = p2->getModelForSlot(Common::GearModelSlot::ModelWrist);
-    memcpy(packetData.actors[1].look, p2->getLookArray(), sizeof(packetData.actors[1].look));
+    player.sendUrgent("SanctumOfTheTwelve: debug {}", param);
 
-    instance->foreachPlayer([&instance, &packetData, qBL, param](auto p)
-      {
-        auto packet = makeZonePacket< FFXIVCeremonySetActorAppearance >(p->getId());
-        memcpy(&packet->data(), &packetData, sizeof(packetData));
-        p->queuePacket(packet);
-        p->eventStart(p->getId(), instance->getDirectorId(), Event::EventHandler::GameProgress, 1, 1);
-        std::vector< uint32_t > paramList;
-        paramList.push_back(param);
-
-        auto seq3Callback = [&](Entity::Player& player, const Event::SceneResult& result)
-        {
-          //keep everyone in their room for now
-          /*
-          if( player.getId() == instance.getCustomVar( 1 ) )
-          {
-            player.setPosAndNotifyClient( 1.454, 3.12581, -132.7992, -3.14 );
-          }
-          else if( player.getId() == instance.getCustomVar( 2 ) )
-          {
-            player.setPosAndNotifyClient( -1.454, 3.12581, -132.7992, -3.14 );
-          }
-          else
-          {
-            player.setPosAndNotifyClient( 0, 2.64, -119, -3.14 );
-          }
-          */
-          auto v5 = instance->getCustomVar(5);
-          v5--;
-          instance->setCustomVar(5, v5);
-          if (v5 == 0)
-          {
-            instance->setCustomVar(3, 0);
-            instance->setCustomVar(4, 1);
-          }
-        };
-
-        p->playScene16(instance->getDirectorId(), 3, 139469827, 0, paramList, seq3Callback);
-      });
-    instance->setCustomVar(3, 0);
-    instance->setCustomVar(4, 0);
-    instance->setCustomVar(5, instance->getPopCount());
-    instance->setSequence(4);
-
-    if( !instance || instance->getDirectorId() != getId() )
-      return;
-    player.sendUrgent( "SanctumOfTheTwelve: onDebug() Playing cutscene: {}", param );
-
-    //player.eventStart( player.getId(), instance->getDirectorId(), Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
-    //player.directorPlayScene( instance->getDirectorId(), 3, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 1, param );
+    player.eventStart(player.getId(), instance->getDirectorId(), Event::EventHandler::EnterTerritory, 1, player.getZoneId());
+    player.directorPlayScene(instance->getDirectorId(), 3, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 1, param);
   }
  
 };
