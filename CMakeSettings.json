@@ -8,7 +8,7 @@
   "configurations": [
     {
       "name": "x64-Debug",
-      "generator": "Visual Studio 16 2019 Win64",
+      "generator": "Visual Studio 17 2022 Win64",
       "configurationType": "Debug",
       "buildRoot": "${env.BuildDir}\\${name}",
       "cmakeCommandArgs": "-DCMAKE_BUILD_TYPE=\"Debug\"",
