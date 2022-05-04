@@ -66,6 +66,7 @@ namespace Sapphire::Network::Packets
     ActorCast = 0x0163, // Updated 6.11
     ActorMove = 0x0397, // Updated 6.11
     ActorSetPos = 0x0317, // Updated 6.11
+    ActorGauge = 0x02A7, // Updated 6.11
 
     EventPlay = 0x313,    // Updated for 6.11
     EventPlay4 = 0x36D,   // Updated for 6.11
@@ -101,6 +102,11 @@ namespace Sapphire::Network::Packets
 
     UpdateSearchInfo = 0x0334, // Updated 6.11
     ExamineSearchInfo = 0x022B, // Updated 6.11
+
+    // daily quest info -> without them sent,  login will take longer...
+    DailyQuests = 0x0136, // updated 6.08
+    DailyQuestRepeatFlags = 0x0348, // updated 6.08
+
 
     Playtime = 0x009D, // Updated 6.11
     Logout = 0x0109, // updated 6.11
@@ -284,12 +290,9 @@ namespace Sapphire::Network::Packets
     DuelChallenge = 0xF277, // 4.2; this is responsible for opening the ui
     PerformNote = 0x009B, // updated 6.08
 
-    ActorGauge = 0x03B5, // updated 6.08
     DutyGauge = 0x008B, // updated 6.08
 
-    // daily quest info -> without them sent,  login will take longer...
-    DailyQuests = 0x0136, // updated 6.08
-    DailyQuestRepeatFlags = 0x0348, // updated 6.08
+
 
     MapUpdate = 0x0364, // updated 6.08
     MapUpdate4 = 0x0128, // updated 6.08
@@ -327,9 +330,28 @@ namespace Sapphire::Network::Packets
   */
   enum ClientZoneIpcType : uint16_t
   {
-    PingHandler = 0x00B6, // updated 6.11
-    InitHandler = 0x0216, // updated 6.11
-    FinishLoadingHandler = 0x0104, // updated 6.11
+    PingHandler = 0x00B6, // updated 6.11 //testing
+    InitHandler = 0x0216, // updated 6.11 //testing
+    FinishLoadingHandler = 0x0999, // updated 6.11 //testing
+    SocialListHandler = 0x0999, // updated 6.11 //testing
+    BlackListHandler = 0x0999, // updated 6.11 //testing
+    LinkshellListHandler = 0x9999, // updated 6.11 //testing
+    MarketBoardSearch = 0x9999, // updated 5.58 hotfix
+
+    LogoutHandler = 0x02CE, // updated 6.11 //testing
+
+    CancelLogout = 0x01AC, // updated 5.58 hotfix
+
+    UpdatePositionHandler = 0x0187, // Updated 6.11
+    ClientTrigger = 0x0283, // Updated 6.11
+    ChatHandler = 0x0133, // Updated 6.11
+    SetSearchInfoHandler = 0x01F0, // Updated 6.11
+    MarketBoardPurchaseHandler = 0x037C, // Updated 6.11
+    InventoryModifyHandler = 0x0350, // Updated 6.11 (Base offset: 0x0357)
+    UpdatePositionInstance = 0x031E, // Updated 6.11
+    PlaceFieldMarkerPreset = 0x0068, // Updated 6.11
+    PlaceFieldMarker = 0x028F, // Updated 6.11
+    GMCommand1 = 0x0145, // updated 6.11
 
     CFCommenceHandler = 0x0381, // updated 5.58 hotfix
 
@@ -337,35 +359,27 @@ namespace Sapphire::Network::Packets
     CFRegisterDuty = 0x01BD, // updated 5.58 hotfix
     CFRegisterRoulette = 0x037A, // updated 5.58 hotfix
     PlayTimeHandler = 0x0279, // updated 6.08
-    LogoutHandler = 0x0125, // updated 6.08
-    CancelLogout = 0x01AC, // updated 5.58 hotfix
+
     CFDutyInfoHandler = 0xF078, // updated 4.2
 
     SocialReqSendHandler = 0x021C, // updated 6.08
     SocialResponseHandler = 0x0193, // updated 6.08
     CreateCrossWorldLS = 0x035D, // updated 5.58 hotfix
 
-    ChatHandler = 0x0133, // Updated 6.11
     PartyChatHandler = 0x0065,
     PartySetLeaderHandler = 0x036C, // updated 5.58 hotfix
     LeavePartyHandler = 0x019D, // updated 5.58 hotfix
     KickPartyMemberHandler = 0x0262, // updated 5.58 hotfix
     DisbandPartyHandler = 0x0276, // updated 5.58 hotfix
 
-    SocialListHandler = 0x0283, // updated 6.11
-    SetSearchInfoHandler = 0x01F0, // Updated 6.11
     ReqSearchInfoHandler = 0x014F, // updated 5.58 hotfix
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
     ReqRemovePlayerFromBlacklist = 0x00B4, // updated 5.58 hotfix
-    BlackListHandler = 0x023C, // updated 6.11
     PlayerSearchHandler = 0x037D, // updated 5.58 hotfix
-
-    LinkshellListHandler = 0x0082, // updated 6.11
 
     MarketBoardRequestItemListingInfo = 0x00F4, // updated 5.58 hotfix
     MarketBoardRequestItemListings = 0x0122, // updated 5.58 hotfix
-    MarketBoardSearch = 0x0082, // updated 5.58 hotfix
 
     ReqExamineFcInfo = 0x037B, // updated 5.58 hotfix
 
@@ -381,19 +395,14 @@ namespace Sapphire::Network::Packets
     ReqCountdownCancel = 0x0068, // updated 5.58 hotfix
 
     ZoneLineHandler = 0x00C3, // updated 5.58 hotfix
-    ClientTrigger = 0x0283, // Updated 6.11
     DiscoveryHandler = 0x00D9, // updated 6.08
 
-    PlaceFieldMarkerPreset = 0x0068, // Updated 6.11
-    PlaceFieldMarker = 0x028F, // Updated 6.11
-    SkillHandler = 0x008E, // updated 6.08
-    GMCommand1 = 0x0145, // updated 6.11
     GMCommand2 = 0x0203, // updated 6.08
+
+    SkillHandler = 0x008E, // updated 6.08
     AoESkillHandler = 0x0152, // updated 5.58 hotfix
 
-    UpdatePositionHandler = 0x0187, // Updated 6.11
 
-    InventoryModifyHandler = 0x0350, // Updated 6.11
     
     InventoryEquipRecommendedItems = 0x01C9, // updated 5.58 hotfix
 
@@ -426,8 +435,6 @@ namespace Sapphire::Network::Packets
     HousingEditInterior = 0x0249, // updated 6.08
 
     SetSharedEstateSettings = 0x00D2, // updated 5.58 hotfix
-
-    UpdatePositionInstance = 0x031E, // Updated 6.11
 
     PerformNoteHandler = 0x0243, // updated 5.58 hotfix
 
