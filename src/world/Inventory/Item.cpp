@@ -33,6 +33,12 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_defense = itemInfo->defensePhys;
   m_defenseMag = itemInfo->defenseMag;
 
+  for (int i = 0; i < 6; ++i)
+  {
+    m_baseParam[i].baseParam = itemInfo->param[i].baseparam;
+    m_baseParam[i].value = itemInfo->param[i].value;
+  }
+
 }
 
 uint16_t Sapphire::Item::getDefense() const
