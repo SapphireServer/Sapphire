@@ -6409,6 +6409,12 @@ Sapphire::Data::Item::Item(uint32_t row_id, Sapphire::Data::ExdDataGenerated* ex
   isPvP = exdData->getField< bool >(row, 88);
   subStatCategory = exdData->getField< uint8_t >(row, 89);
   isGlamourous = exdData->getField< bool >(row, 90);
+
+  for (int i = 0; i < 6; ++i)
+  {
+    param[i].baseparam = exdData->getField< uint8_t >(row, 59 + i * 2);
+    param[i].value = exdData->getField< int16_t >(row, 60 + i * 2);
+  }
 }
 
 Sapphire::Data::ItemAction::ItemAction(uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData)
