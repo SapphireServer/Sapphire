@@ -47,11 +47,11 @@ namespace Sapphire::Network::Packets
     // Old Definitions that need to be here to compile
     ActorFreeSpawn = 0x0082, // updated 6.08
     ChatBanned = 0xF06B,
-    InitSearchInfo = 0x01BB, // updated 6.08
+    InitSearchInfo = 0x010D, // updated 6.11
 
     /////////////////////////////////////////////////
 
-    Ping = 0x028B, // updated 6.11
+    Ping = 0x10F4, // updated 6.11
     Init = 0x0104, // updated 6.11
 
     InitZone = 0x01F5, // Updated 6.11
@@ -104,8 +104,8 @@ namespace Sapphire::Network::Packets
     ExamineSearchInfo = 0x022B, // Updated 6.11
 
     // daily quest info -> without them sent,  login will take longer...
-    DailyQuests = 0x0136, // updated 6.08
-    DailyQuestRepeatFlags = 0x0348, // updated 6.08
+    DailyQuests = 0x0296, // updated 6.11
+    DailyQuestRepeatFlags = 0x00C0, // updated 6.11
 
 
     Playtime = 0x009D, // Updated 6.11
@@ -119,9 +119,9 @@ namespace Sapphire::Network::Packets
     SocialRequestError = 0xF0AD,
 
     CFRegistered = 0x00A9, // updated 6.08
-    SocialRequestResponse = 0x024D, // updated 6.08
+    SocialRequestResponse = 0x037C, // updated 6.11
     SocialMessage = 0x02B4, // updated 6.08
-    SocialMessage2 = 0x011C, // updated 6.08
+    SocialMessage2 = 0x03CA, // updated 6.11
     CancelAllianceForming = 0xF0C6, // updated 4.2
 
     LogMessage = 0x0142, // updated 6.08
@@ -137,9 +137,9 @@ namespace Sapphire::Network::Packets
 
     ServerNoticeShort = 0x01D7, // updated 6.08
     ServerNotice = 0x036E, // updated 6.08
-    SetOnlineStatus = 0x0308, // updated 6.08
+    SetOnlineStatus = 0x0121, // updated 6.11
 
-    CountdownInitiate = 0x00E1, // updated 6.08
+    CountdownInitiate = 0x9999, // updated 6.08 Overwrites Item Info
     CountdownCancel = 0x0284, // updated 6.08
 
     PlayerAddedToBlacklist = 0x037D, // updated 6.08
@@ -195,7 +195,7 @@ namespace Sapphire::Network::Packets
     ObjectDespawn = 0x0137, // updated 6.08
     SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
     ActorOwner = 0x0261, // updated 6.08
-    PlayerStateFlags = 0x03CF, // updated 6.08 (or 0x00CB)
+    PlayerStateFlags = 0x0367, // updated 6.11
 
     CharaVisualEffect = 0x01D1, // updated 6.08
 
@@ -215,8 +215,8 @@ namespace Sapphire::Network::Packets
     ItemInfo = 0x00E1, // updated 6.11
     ContainerInfo = 0x035D, // Updated 6.11
     InventoryTransactionFinish = 0x00B8, // Updated 6.11
-    InventoryTransaction = 0x0382, //updated 6.08
-    CurrencyCrystalInfo = 0x01E2,
+    InventoryTransaction = 0x009B, //updated 6.11
+    CurrencyCrystalInfo = 0x03AC,// updated 6.11
 
     InventoryActionAck = 0x0190, // Updated 6.11
     UpdateInventorySlot = 0x0322, // Updated 6.11
@@ -330,17 +330,17 @@ namespace Sapphire::Network::Packets
   */
   enum ClientZoneIpcType : uint16_t
   {
-    PingHandler = 0x00B6, // updated 6.11 //testing
-    InitHandler = 0x0216, // updated 6.11 //testing
-    FinishLoadingHandler = 0x0999, // updated 6.11 //testing
-    SocialListHandler = 0x0999, // updated 6.11 //testing
-    BlackListHandler = 0x0999, // updated 6.11 //testing
-    LinkshellListHandler = 0x9999, // updated 6.11 //testing
+    PingHandler = 0x00B6, // updated 6.11 testing
+    InitHandler = 0x0216, // updated 6.11 testing
+    FinishLoadingHandler = 0x0082, // updated 6.11 testing
+    SocialListHandler = 0x0999, // updated 6.11 testing
+    BlackListHandler = 0x0999, // updated 6.11 testing
+    LinkshellListHandler = 0x9999, // updated 6.11 testing
     MarketBoardSearch = 0x9999, // updated 5.58 hotfix
 
-    LogoutHandler = 0x02CE, // updated 6.11 //testing
+    LogoutHandler = 0x02CE, // updated 6.11
 
-    CancelLogout = 0x01AC, // updated 5.58 hotfix
+    CancelLogout = 0x0354, // updated 6.11
 
     UpdatePositionHandler = 0x0187, // Updated 6.11
     ClientTrigger = 0x0283, // Updated 6.11
