@@ -243,7 +243,7 @@ namespace Sapphire::Network::Packets
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
-    WeatherChange = 0x00ED, // updated 6.08
+    WeatherChange = 0x02C6, // updated 6.11
     PlayerTitleList = 0x02C2, // updated 6.08
     Discovery = 0x03A4, // updated 6.08
 
@@ -312,7 +312,7 @@ namespace Sapphire::Network::Packets
     MahjongPlayersInfo = 0xF2C2, // actor id, name, rating and stuff..
     // 2C3 and 2C4 are currently unknown
     MahjongEndRoundDraw = 0x02C5, // self explanatory
-    MahjongEndGame = 0x02C6, // finished oorasu(all-last) round; shows a result screen.
+    MahjongEndGame = 0x9999, // finished oorasu(all-last) round; shows a result screen. Changed to 9999 since a 6.11 packet uses the opcode value in 6.08
 
     /// Airship & Submarine //////////////////////////////////////
     AirshipExplorationResult = 0x0328, // Updated 6.11
