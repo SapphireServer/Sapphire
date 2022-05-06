@@ -45,7 +45,7 @@ namespace Sapphire::Network::Packets
   {
 
     // Old Definitions that need to be here to compile
-    ActorFreeSpawn = 0x0082, // updated 6.08
+    ActorFreeSpawn = 0x00AD, // updated 6.11
     ChatBanned = 0xF06B,
     InitSearchInfo = 0x010D, // updated 6.11
 
@@ -79,16 +79,17 @@ namespace Sapphire::Network::Packets
     EventStart = 0x0217, // Updated 6.11
     EventFinish = 0x0096, // Updated 6.11
 
-    DirectorVars = 0x00C6, // updated 6.11
+    DirectorVars = 0x0306, // updated 6.11 or 0xC6 from my findings
     SomeDirectorUnk1 = 0x00DB, // updated 6.11 or 0xCC, 0x122, 0x1AD, or 0x24F
     SomeDirectorUnk2 = 0xF0C1, // updated 5.18
     SomeDirectorUnk4 = 0x01AD, // Updated 6.11
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
+
     DirectorPopUp = 0x03DF, // updated 5.58 hotfix
     DirectorPopUp4 = 0x019B, // updated 5.58 hotfix
     DirectorPopUp8 = 0x0271, // updated 5.58 hotfix
-
+    ///////// These last 3 are 0x0093, 0x00DA and 0x01CB, but don't know which is which
     ///////////////////////////////////////////////////
 
     PlayerSetup = 0x0312, // Updated 6.11
@@ -110,43 +111,44 @@ namespace Sapphire::Network::Packets
 
     Playtime = 0x009D, // Updated 6.11
     Logout = 0x0109, // updated 6.11
-    CFNotify = 0x0188, // Updated 6.11
+    
+    CFNotify = 0x0188, // updated 6.11
     CFMemberStatus = 0x0079,
-    CFDutyInfo = 0x0188, // updated 6.08
+    CFDutyInfo = 0x0383, // updated 6.11
     CFPlayerInNeed = 0xF07F,
-    CFPreferredRole = 0x02DA, // updated 6.08
-    CFCancel = 0x00EB, // updated 6.08
+    CFPreferredRole = 0x02A0, // updated 6.11
+    CFCancel = 0x0354, // updated 6.11
     SocialRequestError = 0xF0AD,
 
-    CFRegistered = 0x00A9, // updated 6.08
+    CFRegistered = 0x00EF, // updated 6.11
     SocialRequestResponse = 0x037C, // updated 6.11
-    SocialMessage = 0x02B4, // updated 6.08
+    SocialMessage = 0x0239, // updated 6.11
     SocialMessage2 = 0x03CA, // updated 6.11
     CancelAllianceForming = 0xF0C6, // updated 4.2
 
-    LogMessage = 0x0142, // updated 6.08
+    LogMessage = 0x0244, // updated 6.11
 
-    Chat = 0x0148, // updated 6.08
+    Chat = 0x01C7, // updated 6.11
     PartyChat = 0x0065,
 
     WorldVisitList = 0xF0FE, // added 4.5
 
-    SocialList = 0x039C, // updated 6.08
+    SocialList = 0x0138, // updated 6.11
 
-    ExamineSearchComment = 0x02AE, // updated 6.08
+    ExamineSearchComment = 0x03A3, // updated 6.11
 
-    ServerNoticeShort = 0x01D7, // updated 6.08
-    ServerNotice = 0x036E, // updated 6.08
+    ServerNoticeShort = 0x015E, // updated 6.11
+    ServerNotice = 0x01FF, // updated 6.11
     SetOnlineStatus = 0x0121, // updated 6.11
 
-    CountdownInitiate = 0x9999, // updated 6.08 Overwrites Item Info
-    CountdownCancel = 0x0284, // updated 6.08
+    CountdownInitiate = 0x03CB, // updated 6.11
+    CountdownCancel = 0x00F0, // updated 6.11
 
-    PlayerAddedToBlacklist = 0x037D, // updated 6.08
-    PlayerRemovedFromBlacklist = 0x0342, // updated 6.08
-    BlackList = 0x0070, // updated 6.08
+    PlayerAddedToBlacklist = 0x027C, // updated 6.11
+    PlayerRemovedFromBlacklist = 0x0069, // updated 6.11
+    BlackList = 0x02A3, // updated 6.11
 
-    LinkshellList = 0x0304, // updated 6.08
+    LinkshellList = 0x010D, // updated 6.11
 
     MailDeleteRequest = 0xF12B, // updated 5.0
 
@@ -163,10 +165,10 @@ namespace Sapphire::Network::Packets
     MarketBoardItemListing = 0x03AC, // Updated 6.11
     
     CharaFreeCompanyTag = 0x013B, // updated 4.5
-    FreeCompanyBoardMsg = 0x02F1, // updated 6.08
+    FreeCompanyBoardMsg = 0x0276, // updated 6.11
     FreeCompanyInfo = 0x0084, // Updated 6.11
     FreeCompanyDialog = 0x03B8, // Updated 6.11
-    ExamineFreeCompanyInfo = 0x011E, // updated 6.08
+    ExamineFreeCompanyInfo = 0x0197, // updated 6.11
 
     FreeCompanyUpdateShortMessage = 0xF157, // added 5.0
 
@@ -178,36 +180,36 @@ namespace Sapphire::Network::Packets
     AoeEffect16 = 0x0260, // Updated 6.11
     AoeEffect24 = 0x0209, // updated 6.11
     AoeEffect32 = 0x039F, // updated 6.11
-    PersistantEffect = 0x02AF, // updated 6.08
+    PersistantEffect = 0x0299, // updated 6.11
 
-    GCAffiliation = 0x0264, // updated 6.08
+    GCAffiliation = 0x02B0, // updated 6.11
 
     NpcSpawn = 0x02B1, // Updated 6.11
     NpcSpawn2 = 0x0083, // updated 6.11
 
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-    PartyList = 0x03AF, // updated 6.08
-    PartyMessage = 0x0352, // updated 6.08
-    HateRank = 0x03C3, // updated 6.08
-    HateList = 0x032B, // updated 6.08
+    PartyList = 0x026F, // updated 6.11
+    PartyMessage = 0x0222, // updated 6.11
+    HateRank = 0x01C5, // updated 6.11
+    HateList = 0x024C, // updated 6.11
     ObjectSpawn = 0x02D3, // Updated 6.11
-    ObjectDespawn = 0x0137, // updated 6.08
+    ObjectDespawn = 0x024D, // updated 6.11
     SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-    ActorOwner = 0x0261, // updated 6.08
+    ActorOwner = 0x0312, // updated 6.11
     PlayerStateFlags = 0x0367, // updated 6.11
 
-    CharaVisualEffect = 0x01D1, // updated 6.08
+    CharaVisualEffect = 0x010E, // updated 6.11
 
-    InstanceDecorAnimation = 0x0338, // updated 6.08
+    InstanceDecorAnimation = 0x03BC, // updated 6.11
 
-    ModelEquip = 0x00E4, // updated 6.08
-    Examine = 0x03E2, // updated 6.08
-    CharaNameReq = 0x0343, // updated 6.08
+    ModelEquip = 0x017A, // updated 6.11
+    Examine = 0x0305, // updated 6.11
+    CharaNameReq = 0x01E3, // updated 6.11
 
     // nb: see #565 on github
     UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
-    RetainerSaleHistory = 0x0066, // updated 6.08
+    RetainerSaleHistory = 0x0320, // updated 6.11
     RetainerInformation = 0x029B, // Updated 6.11
 
     SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
@@ -221,86 +223,86 @@ namespace Sapphire::Network::Packets
     InventoryActionAck = 0x0190, // Updated 6.11
     UpdateInventorySlot = 0x0322, // Updated 6.11
 
-    HuntingLogEntry = 0x0187, // updated 6.08
+    HuntingLogEntry = 0x0249, // updated 6.11
 
     EventContinue = 0x00B6, // updated 5.58 hotfix
 
     EventLinkshell = 0x1169,
 
-    QuestActiveList = 0x03E0, // updated 6.08
-    QuestUpdate = 0x029B, // updated 6.08
-    QuestCompleteList = 0x0118, // updated 6.08
+    QuestActiveList = 0x0099, // updated 6.11
+    QuestUpdate = 0x03B0, // updated 6.11
+    QuestCompleteList = 0x0310, // updated 6.11
 
-    QuestFinish = 0x015A, // updated 6.08
-    MSQTrackerComplete = 0x00E5, // updated 6.08
+    QuestFinish = 0x039C, // updated 6.11
+    MSQTrackerComplete = 0x0261, // updated 6.11
     MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
     QuestMessage = 0x0220, // updated 5.58 hotfix
 
-    QuestTracker = 0x01FB, // updated 6.08
+    QuestTracker = 0x01BC, // updated 6.11
 
-    Mount = 0x0373, // updated 6.08
+    Mount = 0x0268, // updated 6.11
 
     CFAvailableContents = 0xF1FD, // updated 4.2
 
     WeatherChange = 0x02C6, // updated 6.11
-    PlayerTitleList = 0x02C2, // updated 6.08
-    Discovery = 0x03A4, // updated 6.08
+    PlayerTitleList = 0x006D, // updated 6.11
+    Discovery = 0x0177, // updated 6.11
 
-    EorzeaTimeOffset = 0x0074, // updated 6.08
+    EorzeaTimeOffset = 0x03B1, // updated 6.11
 
-    EquipDisplayFlags = 0x023A, // updated 6.08
+    EquipDisplayFlags = 0x0344, // updated 6.11
 
     MiniCactpotInit = 0x0286, // added 5.31
     ShopMessage = 0x0287, // updated 5.58 hotfix
-    LootMessage = 0x006C, // updated 6.08
+    LootMessage = 0x0396, // updated 6.11
     ResultDialog = 0x0361, // Updated 6.11
     DesynthResult = 0x035A, // Updated 6.11
 
     /// Housing //////////////////////////////////////
 
-    LandSetInitialize = 0x0280, // updated 6.08
-    LandUpdate = 0x03C6, // updated 6.08
-    YardObjectSpawn = 0x01AC, // updated 6.08
-    HousingIndoorInitialize = 0x00E6, // updated 6.08
-    LandPriceUpdate = 0x03CB, // updated 6.08
-    LandInfoSign = 0x0276, // updated 6.08
-    LandRename = 0x0158, // updated 6.08
-    HousingEstateGreeting = 0x029E, // updated 6.08
-    HousingUpdateLandFlagsSlot = 0x01B4, // updated 6.08
-    HousingLandFlags = 0x03DD, // updated 6.08
-    HousingShowEstateGuestAccess = 0x011B, // updated 6.08
+    LandSetInitialize = 0x03E5, // updated 6.11
+    LandUpdate = 0x00D3, // updated 6.11
+    YardObjectSpawn = 0x014B, // updated 6.11
+    HousingIndoorInitialize = 0x00E6, // updated 6.11
+    LandPriceUpdate = 0x00FD, // updated 6.11
+    LandInfoSign = 0x0281, // updated 6.11
+    LandRename = 0x0343, // updated 6.11
+    HousingEstateGreeting = 0x01FE, // updated 6.11
+    HousingUpdateLandFlagsSlot = 0x006B, // updated 6.11
+    HousingLandFlags = 0x0293, // updated 6.11
+    HousingShowEstateGuestAccess = 0x025E, // updated 6.11
 
-    HousingObjectInitialize = 0x02DF, // updated 6.08
-    HousingInternalObjectSpawn = 0x01C2, // updated 6.08
+    HousingObjectInitialize = 0x01B5, // updated 6.11
+    HousingInternalObjectSpawn = 0x006E, // updated 6.11
 
-    HousingWardInfo = 0x0145, // updated 6.08
-    HousingObjectMove = 0x0242, // updated 6.08
+    HousingWardInfo = 0x0343, // updated 6.11
+    HousingObjectMove = 0x02C4, // updated 6.11
 
-    SharedEstateSettingsResponse = 0x02F0, // updated 6.08
+    SharedEstateSettingsResponse = 0x006B, // updated 6.11
 
-    LandUpdateHouseName = 0x0132, // updated 6.08
+    LandUpdateHouseName = 0x0240, // updated 6.11
 
-    LandSetMap = 0x008B, // updated 6.08
+    LandSetMap = 0x03E4, // updated 6.11
 
-    CeremonySetActorAppearance = 0x0222, // updated 6.08
+    CeremonySetActorAppearance = 0x0241, // updated 6.11
 
     //////////////////////////////////////////////////
 
     DuelChallenge = 0xF277, // 4.2; this is responsible for opening the ui
-    PerformNote = 0x009B, // updated 6.08
+    PerformNote = 0x03AA, // updated 6.11
 
-    DutyGauge = 0x008B, // updated 6.08
+    DutyGauge = 0x008B, // updated 6.08 - this opcode seems to be wrong, LandSetMap duplicate
 
 
 
-    MapUpdate = 0x0364, // updated 6.08
-    MapUpdate4 = 0x0128, // updated 6.08
-    MapUpdate8 = 0x0286, // updated 6.08
-    MapUpdate16 = 0x01AA, // updated 6.08
-    MapUpdate32 = 0x0151, // updated 6.08
-    MapUpdate64 = 0x00CD, // updated 6.08
-    MapUpdate128 = 0x017D, // updated 6.08
+    MapUpdate = 0x01FD, // updated 6.11
+    MapUpdate4 = 0x0248, // updated 6.11
+    MapUpdate8 = 0x01F2, // updated 6.11
+    MapUpdate16 = 0x02F6, // updated 6.11
+    MapUpdate32 = 0x03C3, // updated 6.11
+    MapUpdate64 = 0x0162, // updated 6.11
+    MapUpdate128 = 0x0153, // updated 6.11
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
