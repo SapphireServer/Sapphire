@@ -49,6 +49,8 @@ namespace Sapphire::Network::Packets
     ChatBanned = 0xF06B,
     InitSearchInfo = 0x010D, // updated 6.11
 
+    // Definitions that needed to be "changed" (with an F in front) to prevent conflicts
+
     /////////////////////////////////////////////////
 
     Ping = 0x10F4, // updated 6.11
@@ -85,17 +87,17 @@ namespace Sapphire::Network::Packets
     SomeDirectorUnk4 = 0x01AD, // Updated 6.11
     SomeDirectorUnk8 = 0x028A, // updated 5.18
     SomeDirectorUnk16 = 0x028C, // updated 5.18
-
     DirectorPopUp = 0x03DF, // updated 5.58 hotfix
     DirectorPopUp4 = 0x019B, // updated 5.58 hotfix
     DirectorPopUp8 = 0x0271, // updated 5.58 hotfix
-    ///////// These last 3 are 0x0093, 0x00DA and 0x01CB, but don't know which is which
+     ///////// These last 3 are 0x0093, 0x00DA and 0x01CB, but don't know which is which
+
     ///////////////////////////////////////////////////
 
     PlayerSetup = 0x0312, // Updated 6.11
     PlayerStats = 0x0370, // Updated 6.11
     PlayerSpawn = 0x018F, // Updated 6.11
-    PlayerClassInfo = 0x0271, // updated 6.11
+    PlayerClassInfo = 0x025A, // updated 6.11
 
 
     UpdateHpMpTp = 0x028B, // Updated 6.11
@@ -111,7 +113,7 @@ namespace Sapphire::Network::Packets
 
     Playtime = 0x009D, // Updated 6.11
     Logout = 0x0109, // updated 6.11
-    
+
     CFNotify = 0x0188, // updated 6.11
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x0383, // updated 6.11
@@ -120,7 +122,7 @@ namespace Sapphire::Network::Packets
     CFCancel = 0x0354, // updated 6.11
     SocialRequestError = 0xF0AD,
 
-    CFRegistered = 0x00EF, // updated 6.11
+    CFRegistered = 0x00A9, // updated 6.08
     SocialRequestResponse = 0x037C, // updated 6.11
     SocialMessage = 0x0239, // updated 6.11
     SocialMessage2 = 0x03CA, // updated 6.11
@@ -163,7 +165,7 @@ namespace Sapphire::Network::Packets
     MarketBoardItemListingCount = 0x01AC, // Updated 6.11
     MarketBoardItemListingHistory = 0x02E5, // Updated 6.11
     MarketBoardItemListing = 0x03AC, // Updated 6.11
-    
+
     CharaFreeCompanyTag = 0x013B, // updated 4.5
     FreeCompanyBoardMsg = 0x0276, // updated 6.11
     FreeCompanyInfo = 0x0084, // Updated 6.11
@@ -259,72 +261,70 @@ namespace Sapphire::Network::Packets
     ResultDialog = 0x0361, // Updated 6.11
     DesynthResult = 0x035A, // Updated 6.11
 
-    /// Housing //////////////////////////////////////
+      LandSetInitialize = 0x03E5, // updated 6.11
+      LandUpdate = 0x00D3, // updated 6.11
+      YardObjectSpawn = 0x014B, // updated 6.11
+      HousingIndoorInitialize = 0x00E6, // updated 6.11
+      LandPriceUpdate = 0x00FD, // updated 6.11
+      LandInfoSign = 0x0281, // updated 6.11
+      LandRename = 0x0343, // updated 6.11
+      HousingEstateGreeting = 0x01FE, // updated 6.11
+      HousingUpdateLandFlagsSlot = 0x006B, // updated 6.11
+      HousingLandFlags = 0x0293, // updated 6.11
+      HousingShowEstateGuestAccess = 0x025E, // updated 6.11
 
-    LandSetInitialize = 0x03E5, // updated 6.11
-    LandUpdate = 0x00D3, // updated 6.11
-    YardObjectSpawn = 0x014B, // updated 6.11
-    HousingIndoorInitialize = 0x00E6, // updated 6.11
-    LandPriceUpdate = 0x00FD, // updated 6.11
-    LandInfoSign = 0x0281, // updated 6.11
-    LandRename = 0x0343, // updated 6.11
-    HousingEstateGreeting = 0x01FE, // updated 6.11
-    HousingUpdateLandFlagsSlot = 0x006B, // updated 6.11
-    HousingLandFlags = 0x0293, // updated 6.11
-    HousingShowEstateGuestAccess = 0x025E, // updated 6.11
+      HousingObjectInitialize = 0x01B5, // updated 6.11
+      HousingInternalObjectSpawn = 0x006E, // updated 6.11
 
-    HousingObjectInitialize = 0x01B5, // updated 6.11
-    HousingInternalObjectSpawn = 0x006E, // updated 6.11
+      HousingWardInfo = 0x0343, // updated 6.11
+      HousingObjectMove = 0x02C4, // updated 6.11
 
-    HousingWardInfo = 0x0343, // updated 6.11
-    HousingObjectMove = 0x02C4, // updated 6.11
+      SharedEstateSettingsResponse = 0x006B, // updated 6.11
 
-    SharedEstateSettingsResponse = 0x006B, // updated 6.11
+      LandUpdateHouseName = 0x0240, // updated 6.11
 
-    LandUpdateHouseName = 0x0240, // updated 6.11
+      LandSetMap = 0x03E4, // updated 6.11
 
-    LandSetMap = 0x03E4, // updated 6.11
+      CeremonySetActorAppearance = 0x0241, // updated 6.11
 
-    CeremonySetActorAppearance = 0x0241, // updated 6.11
+      //////////////////////////////////////////////////
 
-    //////////////////////////////////////////////////
+      DuelChallenge = 0xF277, // 4.2; this is responsible for opening the ui
+      PerformNote = 0x03AA, // updated 6.11
 
-    DuelChallenge = 0xF277, // 4.2; this is responsible for opening the ui
-    PerformNote = 0x03AA, // updated 6.11
-
-    DutyGauge = 0x008B, // updated 6.08 - this opcode seems to be wrong, LandSetMap duplicate
+      DutyGauge = 0x008B, // updated 6.08 - this opcode seems to be wrong, LandSetMap duplicate
 
 
 
-    MapUpdate = 0x01FD, // updated 6.11
-    MapUpdate4 = 0x0248, // updated 6.11
-    MapUpdate8 = 0x01F2, // updated 6.11
-    MapUpdate16 = 0x02F6, // updated 6.11
-    MapUpdate32 = 0x03C3, // updated 6.11
-    MapUpdate64 = 0x0162, // updated 6.11
-    MapUpdate128 = 0x0153, // updated 6.11
+      MapUpdate = 0x01FD, // updated 6.11
+      MapUpdate4 = 0x0248, // updated 6.11
+      MapUpdate8 = 0x01F2, // updated 6.11
+      MapUpdate16 = 0x02F6, // updated 6.11
+      MapUpdate32 = 0x03C3, // updated 6.11
+      MapUpdate64 = 0x0162, // updated 6.11
+      MapUpdate128 = 0x0153, // updated 6.11
 
-    /// Doman Mahjong //////////////////////////////////////
-    MahjongOpenGui = 0x02A4, // only available in mahjong instance
-    MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
-    MahjongPlayerAction = 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
-    MahjongEndRoundTsumo = 0x02BF, // called tsumo
-    MahjongEndRoundRon = 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
-    MahjongTileDiscard = 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
-    MahjongPlayersInfo = 0xF2C2, // actor id, name, rating and stuff..
-    // 2C3 and 2C4 are currently unknown
-    MahjongEndRoundDraw = 0x02C5, // self explanatory
-    MahjongEndGame = 0x9999, // finished oorasu(all-last) round; shows a result screen. Changed to 9999 since a 6.11 packet uses the opcode value in 6.08
+      /// Doman Mahjong //////////////////////////////////////
+      MahjongOpenGui = 0x02A4, // only available in mahjong instance
+      MahjongNextRound = 0x02BD, // initial hands(baipai), # of riichi(wat), winds, honba, score and stuff
+      MahjongPlayerAction = 0x02BE, // tsumo(as in drawing a tile) called chi/pon/kan/riichi
+      MahjongEndRoundTsumo = 0x02BF, // called tsumo
+      MahjongEndRoundRon = 0x2C0, // called ron or double ron (waiting for action must be flagged from discard packet to call)
+      MahjongTileDiscard = 0x02C1, // giri (discarding a tile.) chi(1)/pon(2)/kan(4)/ron(8) flags etc..
+      MahjongPlayersInfo = 0xF2C2, // actor id, name, rating and stuff..
+      // 2C3 and 2C4 are currently unknown
+      MahjongEndRoundDraw = 0x02C5, // self explanatory
+      MahjongEndGame = 0x9999, // finished oorasu(all-last) round; shows a result screen. Changed to 9999 since a 6.11 packet uses the opcode value in 6.08
 
-    /// Airship & Submarine //////////////////////////////////////
-    AirshipExplorationResult = 0x0328, // Updated 6.11
-    AirshipStatus = 0x011B, // Updated 6.11
-    AirshipStatusList = 0x01B4, // Updated 6.11
-    AirshipTimers = 0x024B, // Updated 6.11
-    SubmarineExplorationResult = 0x00B9, // Updated 6.11
-    SubmarineProgressionStatus = 0x00C7, // Updated 6.11
-    SubmarineStatusList = 0x0236, // Updated 6.11
-    SubmarineTimers = 0x0254, // Updated 6.11
+      /// Airship & Submarine //////////////////////////////////////
+      AirshipExplorationResult = 0x0328, // Updated 6.11
+      AirshipStatus = 0x011B, // Updated 6.11
+      AirshipStatusList = 0x01B4, // Updated 6.11
+      AirshipTimers = 0x024B, // Updated 6.11
+      SubmarineExplorationResult = 0x00B9, // Updated 6.11
+      SubmarineProgressionStatus = 0x00C7, // Updated 6.11
+      SubmarineStatusList = 0x0236, // Updated 6.11
+      SubmarineTimers = 0x0254, // Updated 6.11
   };
 
   /**
@@ -335,9 +335,9 @@ namespace Sapphire::Network::Packets
     PingHandler = 0x00B6, // updated 6.11 testing
     InitHandler = 0x0216, // updated 6.11 testing
     FinishLoadingHandler = 0x0104, // updated 6.11 testing
-    SocialListHandler = 0x0999, // updated 6.11 testing
-    BlackListHandler = 0x0999, // updated 6.11 testing
-    LinkshellListHandler = 0x9999, // updated 6.11 testing
+    SocialListHandler = 0x0214, // updated 6.11 testing
+    BlackListHandler = 0x0082, // updated 6.11 testing
+    LinkshellListHandler = 0x009D, // updated 6.11 testing
     MarketBoardSearch = 0x9999, // updated 5.58 hotfix
 
     LogoutHandler = 0x02CE, // updated 6.11
@@ -405,7 +405,7 @@ namespace Sapphire::Network::Packets
     AoESkillHandler = 0x0152, // updated 5.58 hotfix
 
 
-    
+
     InventoryEquipRecommendedItems = 0x01C9, // updated 5.58 hotfix
 
     ReqPlaceHousingItem = 0x0192, // updated 6.08
