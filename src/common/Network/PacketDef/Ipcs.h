@@ -291,17 +291,17 @@ namespace Sapphire::Network::Packets
     DuelChallenge = 0xF277, // 4.2; this is responsible for opening the ui
     PerformNote = 0x03AA, // updated 6.11
 
-    DutyGauge = 0x008B, // updated 6.08
+    DutyGauge = 0x008B, // updated 6.08 - this opcode seems to be wrong, LandSetMap duplicate
 
 
 
-    MapUpdate = 0x0364, // updated 6.08
-    MapUpdate4 = 0x0128, // updated 6.08
-    MapUpdate8 = 0x0286, // updated 6.08
-    MapUpdate16 = 0x01AA, // updated 6.08
-    MapUpdate32 = 0x0151, // updated 6.08
-    MapUpdate64 = 0x00CD, // updated 6.08
-    MapUpdate128 = 0x017D, // updated 6.08
+    MapUpdate = 0x01FD, // updated 6.11
+    MapUpdate4 = 0x0248, // updated 6.11
+    MapUpdate8 = 0x01F2, // updated 6.11
+    MapUpdate16 = 0x02F6, // updated 6.11
+    MapUpdate32 = 0x03C3, // updated 6.11
+    MapUpdate64 = 0x0162, // updated 6.11
+    MapUpdate128 = 0x0153, // updated 6.11
 
     /// Doman Mahjong //////////////////////////////////////
     MahjongOpenGui = 0x02A4, // only available in mahjong instance
