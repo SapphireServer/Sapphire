@@ -79,8 +79,8 @@ namespace Sapphire::Network::Packets
     EventStart = 0x0217, // Updated 6.11
     EventFinish = 0x0096, // Updated 6.11
 
-    DirectorVars = 0x0138, // updated 6.08
-    SomeDirectorUnk1 = 0x00EF, // updated 6.08
+    DirectorVars = 0x00C6, // updated 6.11
+    SomeDirectorUnk1 = 0x00DB, // updated 6.11 or 0xCC, 0x122, 0x1AD, or 0x24F
     SomeDirectorUnk2 = 0xF0C1, // updated 5.18
     SomeDirectorUnk4 = 0x01AD, // Updated 6.11
     SomeDirectorUnk8 = 0x028A, // updated 5.18
@@ -94,7 +94,7 @@ namespace Sapphire::Network::Packets
     PlayerSetup = 0x0312, // Updated 6.11
     PlayerStats = 0x0370, // Updated 6.11
     PlayerSpawn = 0x018F, // Updated 6.11
-    PlayerClassInfo = 0x0370, // updated 6.11
+    PlayerClassInfo = 0x0271, // updated 6.11
 
 
     UpdateHpMpTp = 0x028B, // Updated 6.11
@@ -110,7 +110,7 @@ namespace Sapphire::Network::Packets
 
     Playtime = 0x009D, // Updated 6.11
     Logout = 0x0109, // updated 6.11
-    CFNotify = 0x01C5, // updated 6.08
+    CFNotify = 0x0188, // Updated 6.11
     CFMemberStatus = 0x0079,
     CFDutyInfo = 0x0188, // updated 6.08
     CFPlayerInNeed = 0xF07F,
@@ -216,7 +216,7 @@ namespace Sapphire::Network::Packets
     ContainerInfo = 0x035D, // Updated 6.11
     InventoryTransactionFinish = 0x00B8, // Updated 6.11
     InventoryTransaction = 0x009B, //updated 6.11
-    CurrencyCrystalInfo = 0x03AC,// updated 6.11
+    CurrencyCrystalInfo = 0x01E2,// updated 6.11
 
     InventoryActionAck = 0x0190, // Updated 6.11
     UpdateInventorySlot = 0x0322, // Updated 6.11
@@ -332,7 +332,7 @@ namespace Sapphire::Network::Packets
   {
     PingHandler = 0x00B6, // updated 6.11 testing
     InitHandler = 0x0216, // updated 6.11 testing
-    FinishLoadingHandler = 0x0082, // updated 6.11 testing
+    FinishLoadingHandler = 0x0104, // updated 6.11 testing
     SocialListHandler = 0x0999, // updated 6.11 testing
     BlackListHandler = 0x0999, // updated 6.11 testing
     LinkshellListHandler = 0x9999, // updated 6.11 testing
