@@ -456,23 +456,24 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcEffectResult : FFXIVIpcBasePacket< EffectResult >
   {
     uint32_t globalSequence;
+    uint32_t unknown1;
     uint32_t actor_id;
     uint32_t current_hp;
     uint32_t max_hp;
     uint16_t current_mp;
-    uint8_t unknown1;
+    uint8_t unknown2;
     uint8_t classId;
     uint8_t shieldPercentage;
     uint8_t entryCount;
-    uint16_t unknown2;
+    uint16_t unknown3;
 
     struct StatusEntry
     {
       uint8_t index; // which position do i display this
-      uint8_t unknown3;
+      uint8_t unknown4;
       uint16_t id;
       uint16_t param;
-      uint16_t unknown4;    // Sort this out (old right half of power/param property)
+      uint16_t unknown5;    // Sort this out (old right half of power/param property)
       float duration;
       uint32_t sourceActorId;
     } statusEntries[4];
@@ -572,7 +573,7 @@ namespace Sapphire::Network::Packets::Server
 
     uint16_t padding_22[3];
 
-    uint8_t effects[8*8];
+    uint8_t effects[65];
 
     uint16_t padding_6A[3];
 
@@ -970,6 +971,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown4C;
     uint16_t unknown50;
     uint16_t unknownPvp52[4];
+    uint16_t pvpSeriesExp;
     uint16_t playerCommendations;
     uint16_t unknown5C;
     uint16_t unknown5E;
@@ -1064,8 +1066,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknownPvp6BD[3];
     uint8_t beastRank[15];
     uint8_t unknownPvp6CE[12];
-    uint8_t pose;
-    uint8_t pose2[6];
+    uint8_t pose[7];
     uint8_t unknown6DF[3];
     uint8_t challengeLogComplete[13];
     uint8_t secretRecipeBookMask[10];
