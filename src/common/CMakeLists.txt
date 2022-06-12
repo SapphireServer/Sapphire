@@ -20,7 +20,8 @@ target_link_libraries( common
                          PUBLIC
                            xivdat
                            mysqlConnector
-                           mysql )
+                           mysql
+                           OodleNet )
 if( UNIX )
   target_link_libraries( common 
                            PUBLIC
@@ -32,6 +33,7 @@ target_include_directories( common
                               PUBLIC
                                 "${CMAKE_CURRENT_SOURCE_DIR}/"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/"
+                                "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/Oodle/"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/asio/asio/include/"
                                 "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/spdlog/include/" )
 

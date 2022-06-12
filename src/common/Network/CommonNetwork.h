@@ -44,7 +44,7 @@ namespace Sapphire::Network::Packets
   * +-------------------------------+---------------+-------+-------+
   * | timestamp                     | size          | cType | count |
   * +---+---+-------+---------------+---------------+-------+-------+
-  * | ? |CMP|   ?   | ?             |
+  * | ? |CMP|   ?   | oodleDcmpSize |
   * +---+---+-------+---------------+
   * (followed by /count/ FFXIVARR_PACKET_SEGMENTs)
   */
@@ -62,9 +62,13 @@ namespace Sapphire::Network::Packets
     /** The number of packet segments that follow. */
     uint16_t count;
     uint8_t unknown_20;
-    /** Indicates if the data segments of this packet are compressed. */
-    uint8_t isCompressed;
-    uint32_t unknown_24;
+    /** Indicates compression method of the data segments of this packet.
+      * 0: none, 1: Zlib, 2: Oodle
+    */
+    uint8_t compressionType;
+    uint16_t unknown_22;
+    /** The size of the packet payload when decompressed, only used if compressionType = Oodle */
+    uint32_t oodleDecompressedSize;
   };
 
   inline std::ostream& operator<<( std::ostream& os, const FFXIVARR_PACKET_HEADER& hdr )
