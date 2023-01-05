@@ -680,7 +680,6 @@ bool Sapphire::Entity::Player::loadInventory()
 
   while( bagRes->next() )
   {
-    Logger::info("Loaded items");
     uint16_t storageId = bagRes->getUInt16( 1 );
     for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
     {
@@ -696,8 +695,6 @@ bool Sapphire::Entity::Player::loadInventory()
       m_storageMap[ storageId ]->getItemMap()[ i - 1 ] = pItem;
     }
   }
-
-  Logger::info(std::to_string(m_characterId));
 
   auto moneyRes = db.query("SELECT storageId, "
     "container_0, container_1, container_2, container_3, container_4, "
