@@ -152,7 +152,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
   // Stats
   m_hp = res->getUInt( "Hp" );
   m_mp = res->getUInt( "Mp" );
-  m_tp = res->getUInt("Tp");
+  m_tp = res->getUInt( "Tp" );
   m_maxHp = getMaxHp();
   m_maxMp = getMaxMp();
 
@@ -168,6 +168,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
     m_bNewGame = false;
     m_hp = getMaxHp();
     m_mp = getMaxMp();
+    m_tp = 1000;
   }
 
   if( m_hp == 0 )
