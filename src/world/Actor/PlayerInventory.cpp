@@ -561,15 +561,15 @@ void Sapphire::Entity::Player::writeCurrencyItem( CurrencyType type )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
-  auto money = m_storageMap[Currency]->getItem(static_cast<uint16_t>(type) - 1)->getStackSize();
+  auto money = m_storageMap[ Currency ]->getItem( static_cast< uint16_t >( type ) - 1 )->getStackSize();
 
   std::string query = "UPDATE charaitemcurrency SET ";
 
-  query += "container_" + std::to_string(static_cast<int16_t>(type) - 1) + " = " + std::to_string(money);
+  query += "container_" + std::to_string( static_cast< int16_t >( type ) - 1 ) + " = " + std::to_string( money );
 
-  query += " WHERE CharacterId = " + std::to_string(getCharacterId()) + ";";
+  query += " WHERE CharacterId = " + std::to_string( getCharacterId() ) + ";";
 
-  db.execute(query);
+  db.execute( query );
 }
 
 void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
