@@ -323,7 +323,7 @@ void Sapphire::Entity::Player::updateDbChara() const
 
   stmt->setInt( 1, getHp() );
   stmt->setInt( 2, getMp() );
-  stmt->setInt( 3, 0 ); // TP
+  stmt->setInt( 3, getTp() ); // TP
   stmt->setInt( 4, 0 ); // GP
   stmt->setInt( 5, 0 ); // Mode
   stmt->setUInt( 6, m_mount ); // Mount

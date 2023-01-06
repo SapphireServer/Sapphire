@@ -736,7 +736,7 @@ namespace Sapphire::Entity
 
     void writeItem( ItemPtr pItem ) const;
 
-    void writeMoney(Common::CurrencyType type);
+    void writeCurrencyItem( Common::CurrencyType type );
 
     void deleteItemDb( ItemPtr pItem ) const;
 

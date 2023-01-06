@@ -531,7 +531,7 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
     if( i > 0 )
       query += ", ";
 
-    query += "container_" + std::to_string( i ) + " = " + std::to_string( currItem ? currItem->getUId() : 0 );
+    query += "container_" + std::to_string( i ) + " = " + std::to_string(  currItem ? currItem->getUId() : 0 );
   }
 
   query += " WHERE CharacterId = " + std::to_string( getCharacterId() );
@@ -557,13 +557,16 @@ void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
   db.directExecute( stmt );
 }
 
-void Sapphire::Entity::Player::writeMoney(CurrencyType type)
+void Sapphire::Entity::Player::writeCurrencyItem( CurrencyType type )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  std::string query = "UPDATE charaitemcurrency SET ";
+
   auto money = m_storageMap[Currency]->getItem(static_cast<uint16_t>(type) - 1)->getStackSize();
 
+  std::string query = "UPDATE charaitemcurrency SET ";
+
   query += "container_" + std::to_string(static_cast<int16_t>(type) - 1) + " = " + std::to_string(money);
+
   query += " WHERE CharacterId = " + std::to_string(getCharacterId()) + ";";
 
   db.execute(query);
