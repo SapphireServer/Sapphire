@@ -301,7 +301,7 @@ void Sapphire::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 
   uint32_t currentAmount = currItem->getStackSize();
   currItem->setStackSize( currentAmount + amount );
-  writeMoney( type );
+  writeCurrencyItem( type );
 
   updateContainer( Currency, slot, currItem );
 
@@ -339,7 +339,7 @@ void Sapphire::Entity::Player::removeCurrency( Common::CurrencyType type, uint32
     currItem->setStackSize( 0 );
   else
     currItem->setStackSize( currentAmount - amount );
-  writeItem( currItem );
+  writeCurrencyItem(type);
 
   auto seq = getNextInventorySequence();
 
