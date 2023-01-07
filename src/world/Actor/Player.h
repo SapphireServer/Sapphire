@@ -736,6 +736,8 @@ namespace Sapphire::Entity
 
     void writeItem( ItemPtr pItem ) const;
 
+    void writeCurrencyItem( Common::CurrencyType type );
+
     void deleteItemDb( ItemPtr pItem ) const;
 
     /*! return the crystal amount of currency of type */

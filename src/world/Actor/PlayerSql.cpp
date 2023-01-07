@@ -152,7 +152,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
   // Stats
   m_hp = res->getUInt( "Hp" );
   m_mp = res->getUInt( "Mp" );
-  m_tp = 0;
+  m_tp = res->getUInt( "Tp" );
   m_maxHp = getMaxHp();
   m_maxMp = getMaxMp();
 
@@ -168,6 +168,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
     m_bNewGame = false;
     m_hp = getMaxHp();
     m_mp = getMaxMp();
+    m_tp = 1000;
   }
 
   if( m_hp == 0 )
@@ -323,7 +324,7 @@ void Sapphire::Entity::Player::updateDbChara() const
 
   stmt->setInt( 1, getHp() );
   stmt->setInt( 2, getMp() );
-  stmt->setInt( 3, 0 ); // TP
+  stmt->setInt( 3, getTp() ); // TP
   stmt->setInt( 4, 0 ); // GP
   stmt->setInt( 5, 0 ); // Mode
   stmt->setUInt( 6, m_mount ); // Mount
@@ -694,6 +695,32 @@ bool Sapphire::Entity::Player::loadInventory()
 
       m_storageMap[ storageId ]->getItemMap()[ i - 1 ] = pItem;
     }
+  }
+
+  auto currencyRes = db.query(fmt::format("SELECT storageId, "
+    "container_0, container_1, container_2, container_3, container_4, "
+    "container_5, container_6, container_7, container_8, container_9, "
+    "container_10, container_11 "
+    "FROM charaitemcurrency " \
+    "WHERE CharacterId = {0} " \
+    "ORDER BY storageId ASC;", std::to_string(m_characterId)));
+
+  while ( currencyRes->next() )
+  {
+    uint16_t storageId = currencyRes->getUInt16( 1 );
+    uint32_t money = currencyRes->getUInt64( 2 );
+
+    auto slot = static_cast< uint8_t >( static_cast< uint8_t >( CurrencyType::Gil ) - 1 );
+    auto currItem = m_storageMap[ Currency ]->getItem( slot );
+
+    if ( !currItem )
+    {
+      // TODO: map currency type to itemid
+      currItem = createItem( 1 );
+      m_storageMap[ Currency ]->setItem( slot, currItem );
+    }
+
+    m_storageMap[ Currency ]->getItem( slot )->setStackSize( money );
   }
 
   return true;
