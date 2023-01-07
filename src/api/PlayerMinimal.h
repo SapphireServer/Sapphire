@@ -159,6 +159,8 @@ namespace Sapphire::Api
 
     void createInvDbContainer( uint16_t slot ) const;
 
+    void createCurrencyDbContainer() const;
+
     uint32_t m_modelEquip[10];
 
     uint64_t getNextUId64() const;

@@ -80,7 +80,7 @@ namespace xiv::exd
       // Get the vector fields for the given record and preallocate it
       auto fields = _data[ id ];
       fields.reserve( member_count );
-      iss.seekg( cacheEntryIt->second.offset + 6 );
+      iss.seekg( static_cast< uint64_t >( cacheEntryIt->second.offset + 6 ) );
 
       iss.read( reinterpret_cast<char*>( &pSheet.get()->_data ), sizeof( T ) );
 
