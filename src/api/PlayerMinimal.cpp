@@ -457,7 +457,7 @@ void PlayerMinimal::createCurrencyDbContainer() const
 {
   auto stmtCreateCurrency = g_charaDb.getPreparedStatement( Db::CHARA_CURRENCYINV_INS );
   stmtCreateCurrency->setUInt64( 1, m_characterId );
-  stmtCreateCurrency->setInt( 2, 2000 );
+  stmtCreateCurrency->setInt( 2, 2000 ); =
   g_charaDb.directExecute( stmtCreateCurrency );
 }
 
