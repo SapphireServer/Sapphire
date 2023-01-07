@@ -6,7 +6,6 @@
 #include <Network/PacketContainer.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
-#include <format>
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
