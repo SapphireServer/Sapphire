@@ -339,7 +339,7 @@ void Sapphire::Entity::Player::removeCurrency( Common::CurrencyType type, uint32
     currItem->setStackSize( 0 );
   else
     currItem->setStackSize( currentAmount - amount );
-  writeCurrencyItem(type);
+  writeCurrencyItem( type );
 
   auto seq = getNextInventorySequence();
 
@@ -563,11 +563,9 @@ void Sapphire::Entity::Player::writeCurrencyItem( CurrencyType type )
 
   auto money = m_storageMap[ Currency ]->getItem( static_cast< uint16_t >( type ) - 1 )->getStackSize();
 
-  std::string query = "UPDATE charaitemcurrency SET ";
-
-  query += "container_" + std::to_string( static_cast< int16_t >( type ) - 1 ) + " = " + std::to_string( money );
-
-  query += " WHERE CharacterId = " + std::to_string( getCharacterId() ) + ";";
+  std::string query = fmt::format(
+    "UPDATE charaitemcurrency SET container_{0} = {1} WHERE CharacterId = {2};",
+    std::to_string( static_cast< int16_t >( type ) - 1 ), std::to_string( money ), std::to_string( getCharacterId() ) );
 
   db.execute( query );
 }

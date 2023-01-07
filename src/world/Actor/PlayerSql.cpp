@@ -6,6 +6,7 @@
 #include <Network/PacketContainer.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
+#include <format>
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
@@ -697,20 +698,20 @@ bool Sapphire::Entity::Player::loadInventory()
     }
   }
 
-  auto currencyRes = db.query("SELECT storageId, "
+  auto currencyRes = db.query(fmt::format("SELECT storageId, "
     "container_0, container_1, container_2, container_3, container_4, "
     "container_5, container_6, container_7, container_8, container_9, "
     "container_10, container_11 "
     "FROM charaitemcurrency " \
-    "WHERE CharacterId =  " + std::to_string(m_characterId) + " " \
-    "ORDER BY storageId ASC;");
+    "WHERE CharacterId = {0} " \
+    "ORDER BY storageId ASC;", std::to_string(m_characterId)));
 
   while ( currencyRes->next() )
   {
     uint16_t storageId = currencyRes->getUInt16( 1 );
     uint32_t money = currencyRes->getUInt64( 2 );
 
-    auto slot = static_cast< uint8_t >( static_cast<uint8_t>( CurrencyType::Gil ) - 1 );
+    auto slot = static_cast< uint8_t >( static_cast< uint8_t >( CurrencyType::Gil ) - 1 );
     auto currItem = m_storageMap[ Currency ]->getItem( slot );
 
     if ( !currItem )
