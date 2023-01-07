@@ -177,9 +177,9 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   /// INVENTORY INFO
-  prepareStatement(CHARA_CURRENCYINV_INS,
+  prepareStatement( CHARA_CURRENCYINV_INS,
                     "INSERT INTO charaitemcurrency ( CharacterId, storageId, idx, UPDATE_DATE ) VALUES ( ?, ?, 0, NOW() );",
-                    CONNECTION_BOTH);
+                    CONNECTION_BOTH );
 
   /// ITEM GLOBAL
   prepareStatement( CHARA_ITEMGLOBAL_INS,
