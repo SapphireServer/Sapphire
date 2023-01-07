@@ -309,7 +309,7 @@ void PlayerMinimal::saveAsNew()
   createInvDbContainer( InventoryType::ArmoryMain );
   createInvDbContainer( InventoryType::ArmorySoulCrystal );
 
-  createInvDbContainer( InventoryType::Currency );
+  createCurrencyDbContainer();
   createInvDbContainer( InventoryType::Crystal );
 
   auto stmtMonsterNote = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_MONSTERNOTE_INS );
@@ -450,6 +450,13 @@ void PlayerMinimal::createInvDbContainer( uint16_t slot ) const
   auto stmtCreateInv = g_charaDb.getPreparedStatement( Db::CHARA_ITEMINV_INS );
   stmtCreateInv->setUInt64( 1, m_characterId );
   stmtCreateInv->setInt( 2, slot );
+  g_charaDb.directExecute( stmtCreateInv );
+}
+
+void PlayerMinimal::createCurrencyDbContainer() const
+{
+  auto stmtCreateInv = g_charaDb.getPreparedStatement( Db::CHARA_CURRENCYINV_INS );
+  stmtCreateInv->setUInt64( 1, m_characterId );
   g_charaDb.directExecute( stmtCreateInv );
 }
 

@@ -176,6 +176,10 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "INSERT INTO charaiteminventory ( CharacterId, storageId, UPDATE_DATE ) VALUES ( ?, ?, NOW() );",
                     CONNECTION_BOTH );
 
+  prepareStatement( CHARA_CURRENCYINV_INS,
+                    "INSERT INTO charaitemcurrency ( CharacterId, storageId, idx, UPDATE_DATE ) VALUES ( ?, 2000, 2, NOW() );",
+                    CONNECTION_BOTH );
+
   /// ITEM GLOBAL
   prepareStatement( CHARA_ITEMGLOBAL_INS,
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
