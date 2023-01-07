@@ -45,7 +45,7 @@ foreach(_scriptDir ${children})
                        MODULE 
                          ${SCRIPT_BUILD_FILES} 
                          "${SCRIPT_INCLUDE_FILES}"
-                         "${_scriptDir}/ScriptLoader.cpp" )
+                         "${_scriptDir}/ScriptLoader.cpp"  "quest/classquest/MAR/ClsMar999.cpp"  "quest/classquest/MAR/ClsMar998.cpp")
 
         target_link_libraries( "script_${_name}" world )
 
