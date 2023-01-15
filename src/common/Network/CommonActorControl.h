@@ -96,6 +96,9 @@ namespace Sapphire::Network::ActorControl
     FateReqFailMsg = 0x76,
     DutyQuestScreenMsg = 0x7B,
 
+    SetContentClearFlag = 0x82,
+    SetContentOpenFlag = 0x83,
+
     ItemObtainIcon = 0x84,
     FateItemFailMsg = 0x85,
     ItemFailMsg = 0x86,

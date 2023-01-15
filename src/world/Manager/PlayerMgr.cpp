@@ -270,7 +270,11 @@ void PlayerMgr::onLogin( Entity::Player &player )
   }
 }
 
-
+void PlayerMgr::onDeath( Entity::Player &player )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onPlayerDeath( player );
+}
 
 
 ////////// Helper ///////////

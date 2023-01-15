@@ -44,6 +44,8 @@ class PlayerMgr
 
     void onLogin( Sapphire::Entity::Player& player );
 
+    void onDeath( Sapphire::Entity::Player& player );
+
     //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

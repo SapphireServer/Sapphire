@@ -1005,7 +1005,10 @@ void Player::unsetStateFlag( Common::PlayerStateFlag flag )
 void Player::update( uint64_t tickCount )
 {
   if( m_hp <= 0 && m_status != ActorStatus::Dead )
+  {
     die();
+    Service< World::Manager::PlayerMgr >::ref().onDeath( *this );
+  }
 
   if( !isAlive() )
     return;

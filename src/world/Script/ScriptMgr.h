@@ -70,6 +70,8 @@ namespace Sapphire::Scripting
 
     bool onBNpcKill( Entity::Player& player, Entity::BNpc& bnpc );
 
+    bool onPlayerDeath( Entity::Player& player );
+
     void onTriggerOwnerDeaggro( Entity::Player& player, Entity::BNpc& bnpc );
 
     bool onEObjHit( Entity::Player& player, uint64_t actorId, uint32_t actionId );

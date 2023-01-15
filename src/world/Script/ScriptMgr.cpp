@@ -491,6 +491,36 @@ bool Sapphire::Scripting::ScriptMgr::onBNpcKill( Entity::Player& player, Entity:
   return true;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onPlayerDeath( Entity::Player& player )
+{
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  // loop through all active quests and try to call available onPlayerDeath callbacks
+  for( size_t i = 0; i < 30; i++ )
+  {
+    auto quest = player.getQuestByIndex( static_cast< uint16_t >( i ) );
+    if( quest.getId() == 0 )
+      continue;
+
+    uint32_t questId = quest.getId() | Event::EventHandler::EventHandlerType::Quest << 16;
+
+    auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::QuestScript >( questId );
+    if( script )
+    {
+      std::string objName = eventMgr.getEventName( questId );
+
+      PlayerMgr::sendDebug( player, "Calling: {0}.onPlayerDeath name: {1}", objName, player.getName() );
+
+      World::Quest preQ = quest;
+      script->onPlayerDeath( quest, player );
+      if( quest != preQ )
+        player.updateQuest( quest );
+    }
+  }
+
+  return true;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
 {
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();

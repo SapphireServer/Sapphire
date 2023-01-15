@@ -182,6 +182,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void QuestScript::onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player )
+  {
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   EventObjectScript::EventObjectScript( uint32_t eobjId ) :

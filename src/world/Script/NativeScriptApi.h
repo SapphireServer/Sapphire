@@ -254,6 +254,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onOutsideRange( World::Quest& quest, Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
+    virtual void onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player );
+
     virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                             uint32_t catalogId );
 
