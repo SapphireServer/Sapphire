@@ -34,7 +34,7 @@ using namespace Sapphire;
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
+std::string gamePath( "H:\\Games\\ffxiv3.05\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
@@ -82,7 +82,7 @@ std::string getEobjSgbPath( uint32_t eobjId )
     return exportedSgMap[ eobjSgbPaths[ eobjId ] ];
 
   auto& eobjCat = eData->get_category( "EObj" );
-  auto eObjExd = static_cast< xiv::exd::Exd >( eobjCat.get_data_ln( xiv::exd::Language::none ) );
+  auto eObjExd = static_cast< xiv::exd::Exd >( eobjCat.get_data_ln( xiv::exd::Language::en ) );
 
   auto& exportedSgCat = eData->get_category( "ExportedSG" );
   auto exportedSgExd = static_cast< xiv::exd::Exd >( exportedSgCat.get_data_ln( xiv::exd::Language::none ) );
@@ -300,6 +300,9 @@ void exportSgbModel( const std::string& sgbFilePath, LgbEntry* pGimmick, Exporte
 
 int main( int argc, char* argv[] )
 {
+  printf("Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" <jobs>\n" \
+    "- <jobs> default is 4, memory usage may increase to multiple GB as this increases. ~3.5GB RAM using 16 jobs.\n");
+
   auto startTime = std::chrono::high_resolution_clock::now();
   auto entryStartTime = std::chrono::high_resolution_clock::now();
 
@@ -319,6 +322,9 @@ int main( int argc, char* argv[] )
   if( argc > 1 )
     gamePath = std::string( argv[ 1 ] );
 
+  if( argc > 2 )
+    nJobs = std::atoi( argv[ 2 ] );
+
   try
   {
     initExd( gamePath );
@@ -326,9 +332,10 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
-    printf( "Unable to initialise EXD!\n Usage: nav_export \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\"\n" );
+    printf( "Unable to initialise EXD!\n" );
     return -1;
   }
+
   ExportMgr exportMgr( nJobs );
   zoneNameToPath( zoneName );
 
@@ -475,17 +482,17 @@ int main( int argc, char* argv[] )
           exportedZone.groups.emplace( group.name, exportedGroup );
         }
       }
+
+      // :(
+      if( zoneCount % nJobs == 0 )
+        pCache->purge();
+
       exportMgr.exportZone( exportedZone, static_cast< ExportFileType >( exportFileType ) );
       exportedZone.groups.clear();
 
       printf( "Built export struct for %s in %lu seconds \n",
         zoneName.c_str(),
         std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
-      //if( zoneCount++ % nJobs == 0 )
-      {
-        exportMgr.restart();
-        pCache->purge();
-      }
     }
     catch( std::exception& e )
     {
