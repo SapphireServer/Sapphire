@@ -36,7 +36,7 @@ private:
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1003988;
   static constexpr auto Actor1 = 1002279;
-  static constexpr auto Actor2 = 1003908; 
+  static constexpr auto Actor2 = 1003908;
   static constexpr auto Actor20 = 1001637;
   static constexpr auto Actor3 = 1001353;
   static constexpr auto Aetheryte0 = 9;
@@ -65,13 +65,9 @@ private:
   static constexpr auto SEQ_0_ACTOR0_LQ = 50;
 
 public:
-  ManWil004() : Sapphire::ScriptAPI::QuestScript( 66106 )
-  {
-  };
+  ManWil004() : Sapphire::ScriptAPI::QuestScript( 66106 ){};
 
-  ~ManWil004()
-  {
-  };
+  ~ManWil004(){};
 
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
@@ -94,20 +90,19 @@ public:
     else if( actorId == Aetheryte0 )
     {
 
-      eventMgr().eventActionStart( player, 0x050002, 0x13,
-                               [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
-                               {
-                                 eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
-                                 player.registerAetheryte( 2 );
-                                 player.setRewardFlag( Common::UnlockEntry::Return );
-                                 Scene00051( quest, player );
-                               },
-                               nullptr, getId() );
+      eventMgr().eventActionStart(
+              player, 0x050002, 0x13,
+              [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+                eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
+                player.registerAetheryte( 2 );
+                player.setRewardFlag( Common::UnlockEntry::Return );
+                Scene00051( quest, player );
+              },
+              nullptr, getId() );
     }
   }
 
 private:
-
   //varIdx refers to the noticeId
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
@@ -143,7 +138,7 @@ private:
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 ) // accept quest
+    if( result.getResult( 0 ) == 1 )// accept quest
       Scene00050( player );
   }
 
@@ -154,7 +149,7 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    Scene00002(player);
+    Scene00002( player );
   }
 
   void Scene00051( World::Quest& quest, Entity::Player& player )
@@ -169,7 +164,7 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setUI8BL(1);
+    quest.setUI8BL( 1 );
     checkQuestCompletion( quest, player, 0 );
   }
 
@@ -180,7 +175,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setUI8AL(1);
+    quest.setUI8AL( 1 );
     checkQuestCompletion( quest, player, 1 );
   }
 
@@ -191,10 +186,11 @@ private:
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if(result.getResult(0) == 1)
+    if( result.getResult( 0 ) == 1 )
     {
       Scene00005( player );
-    } else
+    }
+    else
     {
       return;
     }
@@ -207,15 +203,14 @@ private:
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setUI8CH(0);
-    quest.setUI8BH(1);
+    quest.setUI8CH( 0 );
+    quest.setUI8BH( 1 );
     checkQuestCompletion( quest, player, 2 );
   }
 
   void Scene00008( Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR8, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManWil004::Scene00008Return ) );
-
   }
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -235,7 +230,7 @@ private:
   {
     // on quest accept
     quest.setSeq( Seq1 );
-    quest.setUI8CH( 1 ); // receive key item
+    quest.setUI8CH( 1 );// receive key item
 
     // teleport to real Uldah
     player.forceZoneing( Territorytype0 );
