@@ -803,7 +803,7 @@ void Territory::updateSpawnPoints()
   {
     if( !spawn.bnpcPtr && ( Common::Util::getTimeSeconds() - spawn.timeOfDeath ) > spawn.infoPtr->PopInterval )
     {
-      auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), spawn.infoPtr, shared_from_this() );
+      auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), spawn.infoPtr, *this );
       pBNpc->init();
       spawn.bnpcPtr = pBNpc;
 
