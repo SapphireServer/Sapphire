@@ -714,7 +714,7 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       if( player.collectHandInItems( { Ritem2 } ) )
-        player.finishQuest( getId() );
+        player.finishQuest( getId() ); //TODO: Achievement
     }
   }
 };
