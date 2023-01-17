@@ -1,11 +1,9 @@
 #include "ItemMgr.h"
 
-#include "Inventory/ItemContainer.h"
 #include "Inventory/Item.h"
 #include <Network/CommonActorControl.h>
 
 #include <Exd/ExdData.h>
-#include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
 
@@ -180,7 +178,7 @@ Common::ContainerType ItemMgr::getContainerType( uint32_t containerId )
 
 uint32_t ItemMgr::getNextUId()
 {
-  uint32_t charId = 0;
+  uint32_t charId;
 
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto pQR = db.query( "SELECT MAX(ItemId) FROM charaglobalitem" );

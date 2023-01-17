@@ -7,7 +7,6 @@
 #include <Territory/Territory.h>
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/HousingMgr.h>
 
 #include "Script/ScriptMgr.h"
 #include "WorldServer.h"
@@ -23,14 +22,12 @@
 #include <Network/PacketWrappers/ModelEquipPacket.h>
 #include <Network/PacketWrappers/PlayerStateFlagsPacket.h>
 #include <Network/PacketWrappers/UpdateHpMpTpPacket.h>
-#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
 #include "Network/PacketWrappers/HudParamPacket.h"
 
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
-#include "Territory/InstanceObjectCache.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
@@ -61,7 +58,6 @@ void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfil
 
 void PlayerMgr::onEquipDisplayFlagsChanged( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto paramPacket = makeZonePacket< FFXIVIpcConfig >( player.getId() );
   paramPacket->data().flag = player.getEquipDisplayFlags();
   player.sendToInRangeSet( paramPacket, true );
@@ -80,6 +76,7 @@ void PlayerMgr::onSendStateFlags( Entity::Player& player, bool updateInRange )
 void PlayerMgr::onSendStats( Entity::Player& player )
 {
   std::array< uint32_t, 50 > statParams;
+  std::fill( std::begin( statParams ), std::end( statParams ), 0 );
 
   auto& exd = Common::Service< Data::ExdData >::ref();
 

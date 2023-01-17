@@ -1,12 +1,10 @@
 #include <Common.h>
 #include <Exd/ExdData.h>
-#include <Util/Util.h>
 #include <Service.h>
 
 #include "WorldServer.h"
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Exd/ExdData.h>
 #include <Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
@@ -60,7 +58,6 @@ void QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )
 bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint32_t playerLevel = player.getLevel();
   auto questInfo = exdData.getRow< Excel::Quest >( static_cast< uint32_t >( Event::EventHandler::EventHandlerType::Quest ) << 16 | questId );
 
   if( !questInfo )

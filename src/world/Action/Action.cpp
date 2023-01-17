@@ -42,7 +42,7 @@ using namespace Sapphire::World;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence) :
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence ) :
   Action( std::move( caster ), actionId, sequence, nullptr )
 {
 }
