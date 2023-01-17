@@ -122,8 +122,7 @@ public:
 
   void onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player ) override
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto& instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
     auto enem0 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
     auto enem1 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() );
