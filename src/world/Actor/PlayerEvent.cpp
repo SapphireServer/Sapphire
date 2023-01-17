@@ -1,7 +1,4 @@
-#include <Common.h>
-
 #include <Network/PacketContainer.h>
-#include <Service.h>
 #include <Exd/ExdData.h>
 
 #include <utility>
@@ -70,14 +67,14 @@ void Sapphire::Entity::Player::onTick()
   if( !isAlive() || !isLoadingComplete() )
     return;
 
-  uint32_t addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
-  uint32_t addMp = static_cast< uint32_t >( getMaxMp() * 0.06f + 1 );
+  auto addHp = static_cast< uint32_t >( static_cast< float >( getMaxHp() ) * 0.1f + 1 );
+  auto addMp = static_cast< uint32_t >( static_cast< float >( getMaxMp() ) * 0.06f + 1 );
   uint32_t addTp = 100;
 
   if( !m_actorIdTohateSlotMap.empty() )
   {
-    addHp = static_cast< uint32_t >( getMaxHp() * 0.01f + 1 );
-    addMp = static_cast< uint32_t >( getMaxMp() * 0.02f + 1 );
+    addHp = static_cast< uint32_t >( static_cast< float >( getMaxHp() ) * 0.01f + 1 );
+    addMp = static_cast< uint32_t >( static_cast< float >( getMaxMp() ) * 0.02f + 1 );
     addTp = 60;
   }
 

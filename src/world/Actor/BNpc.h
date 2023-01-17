@@ -64,8 +64,8 @@ namespace Sapphire::Entity
   public:
     BNpc();
 
-    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone );
-    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone, uint32_t hp, Common::BNpcType type );
+    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone );
+    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type );
 
     virtual ~BNpc() override;
 

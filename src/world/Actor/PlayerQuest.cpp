@@ -1,15 +1,11 @@
-#include <Common.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Exd/ExdData.h>
-#include <Network/PacketContainer.h>
 #include <Service.h>
 
-#include "Network/GameConnection.h"
 #include "Network/PacketWrappers/Notice2Packet.h"
 
 #include "Manager/QuestMgr.h"
 
-#include "Session.h"
 #include "Player.h"
 
 
@@ -118,8 +114,7 @@ bool Sapphire::Entity::Player::addQuest( const World::Quest& quest )
 
 int8_t Sapphire::Entity::Player::getFreeQuestSlot()
 {
-  int8_t idx = 0;
-  int result = -1;
+  int8_t result = -1;
   for( int8_t idx = 0; idx < 30; idx++ )
     if( m_quests[ idx ].getId() == 0 )
     {

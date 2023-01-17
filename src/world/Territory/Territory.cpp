@@ -828,7 +828,7 @@ Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t levelId, uint32_t hp
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 
-  auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, shared_from_this(), hp, bnpcType );
+  auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, *this, hp, bnpcType );
   pBNpc->setTriggerOwnerId( triggerOwnerId );
   pushActor( pBNpc );
   return pBNpc;

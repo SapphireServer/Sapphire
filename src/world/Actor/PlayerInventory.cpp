@@ -9,7 +9,6 @@
 #include "Inventory/ItemContainer.h"
 
 #include <Exd/ExdData.h>
-#include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
 
 #include "Actor/Player.h"
@@ -18,7 +17,6 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
-#include "Network/PacketWrappers/ServerNoticePacket.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Manager/InventoryMgr.h"
@@ -438,9 +436,9 @@ void Sapphire::Entity::Player::sendInventory()
 {
   auto& invMgr = Common::Service< World::Manager::InventoryMgr >::ref();
 
-  for( auto it = m_storageMap.begin(); it != m_storageMap.end(); ++it )
+  for( auto& it : m_storageMap )
   {
-    invMgr.sendInventoryContainer( *this, it->second );
+    invMgr.sendInventoryContainer( *this, it.second );
   }
 }
 
@@ -450,7 +448,7 @@ Sapphire::Entity::Player::InvSlotPairVec Sapphire::Entity::Player::getSlotsOfIte
   for( auto i : { Bag0, Bag1, Bag2, Bag3 } )
   {
     auto inv = m_storageMap[ i ];
-    for( auto item : inv->getItemMap() )
+    for( const auto& item : inv->getItemMap() )
     {
       if( item.second && item.second->getId() == catalogId )
         outVec.push_back( std::make_pair( i, static_cast< int8_t >( item.first ) ) );
@@ -1046,7 +1044,7 @@ void Sapphire::Entity::Player::addSoldItem( uint32_t itemId, uint8_t stackSize )
 {
   if( m_soldItems.size() > 10 )
     m_soldItems.pop_back();
-  m_soldItems.push_front( std::make_pair( itemId, stackSize ) );
+  m_soldItems.emplace_front( itemId, stackSize );
 }
 
 std::deque< std::pair< uint32_t, uint8_t > > *Sapphire::Entity::Player::getSoldItems()
@@ -1069,7 +1067,7 @@ bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Inventory::Invento
 
     auto& container = needle->second;
 
-    for( uint8_t idx = 0; idx < container->getMaxSize(); idx++ )
+    for( uint16_t idx = 0; idx < container->getMaxSize(); idx++ )
     {
       auto item = container->getItem( idx );
       if( !item )

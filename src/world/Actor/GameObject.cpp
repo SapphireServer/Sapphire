@@ -2,7 +2,6 @@
 
 #include <Network/PacketContainer.h>
 
-#include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <utility>
 #include <Service.h>
@@ -22,8 +21,6 @@
 #include "Manager/TerritoryMgr.h"
 
 #include "StatusEffect/StatusEffect.h"
-
-#include "Math/CalcBattle.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -244,8 +241,6 @@ void Sapphire::Entity::GameObject::removeFromInRange()
 {
   if( !hasInRangeActor() )
     return;
-
-  Entity::GameObjectPtr pCurAct;
 
   for( auto& pCurAct : m_inRangeActor )
   {

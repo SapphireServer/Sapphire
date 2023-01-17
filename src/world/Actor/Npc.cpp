@@ -1,10 +1,7 @@
 #include <Network/PacketContainer.h>
-#include <Exd/ExdData.h>
 #include "Action/Action.h"
 #include "Territory/Territory.h"
-#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 
-#include "WorldServer.h"
 #include "Player.h"
 #include "Npc.h"
 #include "Common.h"

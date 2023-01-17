@@ -4,9 +4,7 @@
 #include <Exd/ExdData.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
-#include <Network/PacketWrappers/EffectPacket.h>
 #include <Network/PacketWrappers/EffectPacket1.h>
-#include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Logging/Logger.h>
 
 #include "Forwards.h"
@@ -18,24 +16,20 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/NpcSpawnPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Navi/NaviProvider.h"
 
-#include "Math/CalcBattle.h"
 #include "Math/CalcStats.h"
 
 #include "WorldServer.h"
 #include "Session.h"
 #include "Chara.h"
-#include "Player.h"
 #include "BNpc.h"
 
 #include "Common.h"
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/NaviMgr.h>
 #include <Manager/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
@@ -55,7 +49,7 @@ Sapphire::Entity::BNpc::BNpc() :
 {
 }
 
-Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone ) :
+Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone ) :
   Npc( ObjKind::BattleNpc )
 {
   m_id = id;
@@ -104,8 +98,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   m_class = ClassJob::Gladiator;
 
-  m_territoryTypeId = pZone->getTerritoryTypeId();
-  m_territoryId = pZone->getGuId();
+  m_territoryTypeId = zone.getTerritoryTypeId();
+  m_territoryId = zone.getGuId();
 
   m_spawnPos = m_pos;
 
@@ -173,7 +167,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
 }
 
-Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, TerritoryPtr pZone, uint32_t hp, Common::BNpcType type ) :
+Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
   Npc( ObjKind::BattleNpc )
 {
   m_id = id;
@@ -201,8 +195,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
 
-  m_territoryTypeId = pZone->getTerritoryTypeId();
-  m_territoryId = pZone->getGuId();
+  m_territoryTypeId = zone.getTerritoryTypeId();
+  m_territoryId = zone.getGuId();
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
     setFlag( Immobile );
@@ -588,7 +582,6 @@ bool Sapphire::Entity::BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr&
 {
   return std::any_of( m_hateList.begin(), m_hateList.end(),
                       [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
-  return false;
 }
 
 void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
@@ -832,7 +825,6 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
 
 void Sapphire::Entity::BNpc::onDeath()
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
 
@@ -893,7 +885,7 @@ void Sapphire::Entity::BNpc::checkAggro()
       if( levelDiff >= 10 )
         range = 0.f;
       else
-        range = std::max< float >( 0.f, range - std::pow( 1.53f, levelDiff * 0.6f ) );
+        range = std::max< float >( 0.f, range - std::pow( 1.53f, static_cast< float >( levelDiff ) * 0.6f ) );
     }
 
     auto distance = Util::distance( getPos(), pClosestChara->getPos() );

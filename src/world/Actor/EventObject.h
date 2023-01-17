@@ -62,7 +62,7 @@ namespace Sapphire::Entity
     uint32_t m_ownerId;
     uint8_t m_state;
     uint8_t m_permissionInvisibility;
-    float m_scale;
+    float m_scale{};
     std::string m_name;
     TerritoryPtr m_parentInstance;
     OnTalkEventHandler m_onTalkEventHandler;
