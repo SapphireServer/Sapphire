@@ -3,8 +3,6 @@
 #include <Network/GamePacket.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketContainer.h>
-#include <Database/DatabaseDef.h>
-
 #include <datReader/DatCategories/bg/LgbTypes.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
@@ -12,7 +10,6 @@
 
 #include "Network/GameConnection.h"
 
-#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Land.h"
 #include "Territory/House.h"

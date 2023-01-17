@@ -10,7 +10,6 @@
 
 #include "Manager/ActionMgr.h"
 #include "Manager/PlayerMgr.h"
-#include "Manager/EventMgr.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::World::Manager;
@@ -33,7 +32,6 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
-  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   switch( type )
   {

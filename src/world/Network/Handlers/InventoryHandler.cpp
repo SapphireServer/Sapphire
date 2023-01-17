@@ -8,7 +8,6 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 
-#include "Territory/Territory.h"
 #include "Actor/Player.h"
 
 #include "Session.h"

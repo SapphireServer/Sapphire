@@ -1,10 +1,8 @@
 #include <Common.h>
-#include <Logging/Logger.h>
 #include <Exd/ExdData.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketContainer.h>
-#include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
@@ -17,7 +15,6 @@
 #include "Manager/EventMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/TerritoryMgr.h"
-#include "WorldServer.h"
 
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
@@ -39,8 +36,6 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
 
   const auto actorId = packet.data().actorId;
   const auto eventId = packet.data().eventId;
-
-  auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onTalk";
   std::string objName = eventMgr.getEventName( eventId );
@@ -402,7 +397,6 @@ void Sapphire::Network::GameConnection::yieldEventScene255( const Packets::FFXIV
 
 void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   std::string inString;
@@ -438,7 +432,6 @@ void Sapphire::Network::GameConnection::yieldEventString( const Packets::FFXIVAR
 
 void Sapphire::Network::GameConnection::yieldEventSceneIntAndString( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto &server = Common::Service< World::WorldServer >::ref();
   auto &eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
   std::string inString;
@@ -458,8 +451,6 @@ void Sapphire::Network::GameConnection::startEventSayHandler( const Packets::FFX
   const auto actorId = packet.data().targetId;
   const auto eventId = packet.data().handlerId;
   const auto sayId = packet.data().sayId;
-
-  auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onSay";
   std::string objName = eventMgr.getEventName( eventId );
@@ -483,11 +474,7 @@ void Sapphire::Network::GameConnection::startUiEvent( const Packets::FFXIVARR_PA
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   const auto packet = ZoneChannelPacket< FFXIVIpcShopEventHandler >( inPacket );
-
-
   const auto eventId = packet.data().eventId;
-
-  auto eventType = static_cast< uint16_t >( eventId >> 16 );
 
   std::string eventName = "onOpen";
   std::string objName = eventMgr.getEventName( eventId );
