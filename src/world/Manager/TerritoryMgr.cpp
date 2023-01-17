@@ -145,7 +145,8 @@ bool TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
          pTeri->data().IntendedUse == TerritoryIntendedUse::OpenWorld ||
          pTeri->data().IntendedUse == TerritoryIntendedUse::OpeningArea ||
          pTeri->data().IntendedUse == TerritoryIntendedUse::GoldSaucer ||
-         pTeri->data().IntendedUse == TerritoryIntendedUse::ChocoboSquare;
+         pTeri->data().IntendedUse == TerritoryIntendedUse::ChocoboSquare ||
+         pTeri->data().IntendedUse == TerritoryIntendedUse::BeforeTrialDung;
 
 }
 
