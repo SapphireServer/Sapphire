@@ -174,8 +174,7 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto& instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
     bool enemy0Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() ) != nullptr;
     bool enemy1Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() ) != nullptr;
