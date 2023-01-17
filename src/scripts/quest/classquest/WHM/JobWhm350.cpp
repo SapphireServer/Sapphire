@@ -222,7 +222,7 @@ private:
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 0, 0 );
-    //TODO: Show the "Your communion has furthered your potentional as a white mage." message.  Is it that logmessage0 var?
+    playerMgr().sendLogMessage( player, Logmessage0 );
     quest.setSeq( SeqFinish );
   }
 
