@@ -119,7 +119,7 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      //TODO: Unlock Gate Aethernet?
+      player.registerAetheryte(54);
       player.finishQuest( getId() );
     }
   }
