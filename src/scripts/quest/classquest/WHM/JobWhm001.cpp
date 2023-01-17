@@ -8,7 +8,7 @@
 #include <Service.h>
 
 #include "Actor/BNpc.h"
-#include "Inventory/Item.h";
+#include "Inventory/Item.h"
 
 // Quest Script: JobWhm001_01124
 // Quest Name: A Relic Reborn (Thyrus)
