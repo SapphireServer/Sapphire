@@ -328,6 +328,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t Result;
   };
 
+  struct FFXIVIpcAchievement : FFXIVIpcBasePacket< Achievement >
+  {
+    uint8_t complete[256]; // bitmask of achievements, up to 8 * 256 (2048) achvs
+    uint16_t history[5];   // last 5 achievement IDs
+  };
+
   struct ZoneProtoDownLetterBoxAppendItemBase
   {
     uint32_t CatalogID;

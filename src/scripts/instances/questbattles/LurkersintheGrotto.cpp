@@ -1,5 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -16,6 +19,14 @@ private:
   static constexpr auto INIT_P_POP_01 = 4083622;
   static constexpr auto CUT_SCENE_01 = 133;
   static constexpr auto HOW_TO_QIB = 79;
+  static constexpr auto TEXT_YSHTOLA_BATTLETALK_01 = 82;
+
+  enum Variables : uint8_t
+  {
+    SET_1_SPAWNED,
+    SET_2_SPAWNED,
+    SUCCESS_CALLED
+  };
 
 public:
   LurkersintheGrotto() : Sapphire::ScriptAPI::QuestBattleScript( 35 )
@@ -135,15 +146,106 @@ public:
 
   }
 
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( 0 );
+    player.setPos( { -60, 25, -135 } );
+  }
+
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto set1Spawned = instance.getDirectorVar( Variables::SET_1_SPAWNED );
+    auto set2Spawned = instance.getDirectorVar( Variables::SET_2_SPAWNED );
+    auto successCalled = instance.getDirectorVar( Variables::SUCCESS_CALLED );
 
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_BOSS );
+    auto ysthola = instance.getActiveBNpcByLayoutId( INIT_P_POP_01 );
+    auto pPlayer = instance.getPlayerPtr();
+
+    auto bossHp = boss ? boss->getHpPercent() : 0;
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+    if( !set1Spawned && bossHp <= 75 )
+    {
+      auto a1 = instance.createBNpcFromLayoutId( INIT_POP_01_01, 100, Common::BNpcType::Enemy );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_01_02, 100, Common::BNpcType::Enemy );
+
+      a1->setFlag( Entity::NoDeaggro );
+      a2->setFlag( Entity::NoDeaggro );
+
+      a1->hateListAdd( pPlayer, 1 );
+      a2->hateListAdd( pPlayer, 1 );
+
+      instance.setDirectorVar( Variables::SET_1_SPAWNED, true );
+    }
+
+    if( !set2Spawned && bossHp <= 25 )
+    {
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_02_01, 150, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_02_02, 150, Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_02_03, 100, Common::BNpcType::Enemy );
+      auto a6 = instance.createBNpcFromLayoutId( INIT_POP_02_04, 100, Common::BNpcType::Enemy );
+
+      a3->setFlag( Entity::NoDeaggro );
+      a4->setFlag( Entity::NoDeaggro );
+      a5->setFlag( Entity::NoDeaggro );
+      a6->setFlag( Entity::NoDeaggro );
+
+      a3->hateListAdd( pPlayer, 1 );
+      a4->hateListAdd( pPlayer, 1 );
+      a5->hateListAdd( pPlayer, 1 );
+      a6->hateListAdd( pPlayer, 1 );
+
+      instance.setDirectorVar( Variables::SET_2_SPAWNED, true );
+    }
+
+    if( !successCalled && instance.getCountEnemyBNpc() == 0 )
+    {
+      instance.setDirectorVar( Variables::SUCCESS_CALLED, true );
+      instance.success();
+    }
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
+    eventMgr().playScene( player, instance.getDirectorId(), 1,
+                      NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                      HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                      DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                      // todo: wtf is 0x00100000
+                      DISABLE_CANCEL_EMOTE, [ & ]( Entity::Player& player, const Event::SceneResult& result )
+                      {
+                        player.setOnEnterEventDone( true );
+                      } );
+  }
 
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto idx = player.getQuestIndex( instance.getQuestId() );
+    if( idx == -1 )
+      return;
+    auto& quest = player.getQuestByIndex( idx );
+    quest.setSeq( 2 );
+  }
+
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_BOSS, 2000, Common::BNpcType::Enemy );
+    auto ysthola = instance.createBNpcFromLayoutId( INIT_P_POP_01, 27780, Common::BNpcType::Friendly );
+    
+    boss->setFlag( Entity::NoDeaggro );
+    ysthola->setFlag( Entity::NoDeaggro );
+
+    boss->hateListAdd( ysthola, 10000 );
+    boss->hateListAdd( player.getAsPlayer(), 1 );
+
+    ysthola->hateListAdd( boss, 10000 );
   }
 
 };

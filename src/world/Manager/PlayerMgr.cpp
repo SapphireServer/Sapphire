@@ -7,6 +7,7 @@
 #include <Territory/Territory.h>
 
 #include <Manager/TerritoryMgr.h>
+#include <Manager/AchievementMgr.h>
 
 #include "Script/ScriptMgr.h"
 #include "WorldServer.h"
@@ -71,6 +72,37 @@ void PlayerMgr::onSendStateFlags( Entity::Player& player, bool updateInRange )
   if( updateInRange )
     player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
                                         static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
+}
+
+void PlayerMgr::onSendAchievementList( Entity::Player& player )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto achvPacket = makeZonePacket< FFXIVIpcAchievement >( player.getId() );
+  std::memcpy( &achvPacket->data().complete[ 0 ], &player.getAchievementList()[ 0 ], sizeof( &achvPacket->data().complete ) );
+
+  server.queueForPlayer( player.getCharacterId(), achvPacket );
+}
+
+void PlayerMgr::onSendAchievementProgress( Entity::Player& player, uint32_t achievementId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
+
+  auto achvProgress = achvMgr.getAchievementDataById( player, achievementId );
+
+  auto pAchvProgressPacket = makeActorControl( player.getId(), AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
+  server.queueForPlayer( player.getCharacterId(), pAchvProgressPacket );
+}
+
+void PlayerMgr::onUnlockAchievement( Entity::Player& player, uint32_t achievementId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  onSendAchievementList( player );
+
+  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementComplete, achievementId ) );
+  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementObtainMsg, achievementId ) );
 }
 
 void PlayerMgr::onSendStats( Entity::Player& player )
@@ -142,7 +174,22 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
 
   player.sendToInRangeSet( makeActorControl( player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
                            player.getLevel(), player.getLevel() - 1 ), true );
+
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint8_t >( player.getClass() ), player.getLevel() );
 }
+
+void PlayerMgr::onSetLevelForClass( Entity::Player& player, Common::ClassJob classJob )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+
+  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::ClassJobUpdate,
+                                                       static_cast< uint8_t >( classJob ), player.getLevelForClass( classJob ) ) );
+
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint8_t >( classJob ), player.getLevel() );
+}
+
 
 void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 {

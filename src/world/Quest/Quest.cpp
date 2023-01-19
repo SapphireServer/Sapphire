@@ -25,31 +25,31 @@ bool Sapphire::World::Quest::getBitFlag8( uint8_t index )
 
 bool Sapphire::World::Quest::getBitFlag16( uint8_t index )
 {
-  uint8_t realIdx = 8 - index;
+  uint8_t realIdx = 16 - index;
   return m_data.a.BitFlag16 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag24( uint8_t index )
 {
-  uint8_t realIdx = 8 - index;
+  uint8_t realIdx = 24 - index;
   return m_data.a.BitFlag24 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag32( uint8_t index )
 {
-  uint8_t realIdx = 8 - index;
+  uint8_t realIdx = 32 - index;
   return m_data.a.BitFlag32 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag40( uint8_t index )
 {
-  uint8_t realIdx = 8 - index;
+  uint8_t realIdx = 40 - index;
   return m_data.a.BitFlag40 & ( 1 << realIdx );
 }
 
 bool Sapphire::World::Quest::getBitFlag48( uint8_t index )
 {
-  uint8_t realIdx = 8 - index;
+  uint8_t realIdx = 48 - index;
   return m_data.a.BitFlag48 & ( 1 << realIdx );
 }
 
@@ -312,7 +312,6 @@ void Sapphire::World::Quest::setUI32A( uint32_t val )
 void Sapphire::World::Quest::setBitFlag8( uint8_t index, bool val )
 {
   uint8_t realIdx = 8 - index;
-
   if( val )
     m_data.a.BitFlag8 |= ( 1 << realIdx );
   else
@@ -321,8 +320,7 @@ void Sapphire::World::Quest::setBitFlag8( uint8_t index, bool val )
 
 void Sapphire::World::Quest::setBitFlag16( uint8_t index, bool val )
 {
-  uint8_t realIdx = 8 - index;
-
+  uint8_t realIdx = 16 - index;
   if( val )
     m_data.a.BitFlag16 |= ( 1 << realIdx );
   else
@@ -331,8 +329,7 @@ void Sapphire::World::Quest::setBitFlag16( uint8_t index, bool val )
 
 void Sapphire::World::Quest::setBitFlag24( uint8_t index, bool val )
 {
-  uint8_t realIdx = 8 - index;
-
+  uint8_t realIdx = 24 - index;
   if( val )
     m_data.a.BitFlag24 |= ( 1 << realIdx );
   else
@@ -341,8 +338,7 @@ void Sapphire::World::Quest::setBitFlag24( uint8_t index, bool val )
 
 void Sapphire::World::Quest::setBitFlag32( uint8_t index, bool val )
 {
-  uint8_t realIdx = 8 - index;
-
+  uint8_t realIdx = 32 - index;
   if( val )
     m_data.a.BitFlag32 |= ( 1 << realIdx );
   else
@@ -351,8 +347,7 @@ void Sapphire::World::Quest::setBitFlag32( uint8_t index, bool val )
 
 void Sapphire::World::Quest::setBitFlag40( uint8_t index, bool val )
 {
-  uint8_t realIdx = 8 - index;
-
+  uint8_t realIdx = 40 - index;
   if( val )
     m_data.a.BitFlag40 |= ( 1 << realIdx );
   else
@@ -361,8 +356,7 @@ void Sapphire::World::Quest::setBitFlag40( uint8_t index, bool val )
 
 void Sapphire::World::Quest::setBitFlag48( uint8_t index, bool val )
 {
-  uint8_t realIdx = 8 - index;
-
+  uint8_t realIdx = 48 - index;
   if( val )
     m_data.a.BitFlag48 |= ( 1 << realIdx );
   else

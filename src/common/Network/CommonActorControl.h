@@ -235,11 +235,12 @@ namespace Sapphire::Network::ActorControl
 
     ArmoryErrorMsg = 0x201,
 
-    AchievementPopup = 0x203,
+    AchievementSetRate = 0x202,
+    AchievementComplete = 0x203,
     SetCutsceneFlag = 0x204,
 
     LogMsg = 0x205,                 // LogMessage?
-    AchievementMsg = 0x206,
+    AchievementObtainMsg = 0x206,
 
     SetItemLevel = 0x209,
 

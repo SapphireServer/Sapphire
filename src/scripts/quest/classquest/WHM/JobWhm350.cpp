@@ -122,8 +122,7 @@ public:
 
   void onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player ) override
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto& instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
     auto enem0 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
     auto enem1 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() );
@@ -175,8 +174,7 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-    auto& instance = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
 
     bool enemy0Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() ) != nullptr;
     bool enemy1Spawned = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() ) != nullptr;
@@ -222,7 +220,7 @@ private:
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 0, 0 );
-    //TODO: Show the "Your communion has furthered your potentional as a white mage." message.  Is it that logmessage0 var?
+    playerMgr().sendLogMessage( player, Logmessage0 );
     quest.setSeq( SeqFinish );
   }
 
