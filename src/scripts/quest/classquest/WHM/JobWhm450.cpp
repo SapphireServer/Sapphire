@@ -215,7 +215,7 @@ private:
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 0, 0 );//TODO:Item Icon, Cleric's Gloves
-    //TODO: Show "Your Garb is not blessed with the power of A-Towa-Cant." message (Logmessage0?)
+    playerMgr().sendLogMessage( player, Logmessage0 );
     quest.setUI8AL( 1 );
     quest.setUI8CH( 0 );
     checkQuestCompletion( quest, player );
@@ -242,7 +242,7 @@ private:
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 1, 0 );//TODO:Item Icon, Cleric's Culottes
-    //TODO: Show "Your Garb is not blessed with the power of A-Towa-Cant." message (Logmessage0?)
+    playerMgr().sendLogMessage( player, Logmessage0 );
     quest.setUI8BH( 1 );
     quest.setUI8CL( 0 );
     checkQuestCompletion( quest, player );
@@ -269,7 +269,7 @@ private:
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 2, 0 );//TODO:Item Icon, Cleric's Boots
-    //TODO: Show "Your Garb is not blessed with the power of A-Towa-Cant." message (Logmessage0?)
+    playerMgr().sendLogMessage( player, Logmessage0 );
     quest.setUI8BL( 1 );
     quest.setUI8DH( 0 );
     checkQuestCompletion( quest, player );
@@ -437,7 +437,7 @@ private:
   void Scene00021Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 6, 0 );//TODO:Item Icon, Cleric's Circlet
-    //TODO: Show "Your Garb is not blessed with the power of A-Towa-Cant." message (Logmessage0?)
+    playerMgr().sendLogMessage( player, Logmessage0 );
     quest.setSeq( SeqFinish );
     quest.setUI8BH( 0 );
   }
