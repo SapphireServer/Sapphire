@@ -1,8 +1,5 @@
-#include <algorithm>
 #include <iterator>
 
-#include <Logging/Logger.h>
-#include <Service.h>
 #include <Util/Util.h>
 
 #include "Actor/Player.h"

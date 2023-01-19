@@ -137,7 +137,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       PlayerMgr::sendServerNotice( player, "Race for {0} was set to {1}", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
-      for( auto actor : inRange )
+      for( const auto& actor : inRange )
       {
         if( actor->isPlayer() )
         {
@@ -153,7 +153,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       PlayerMgr::sendServerNotice( player, "Tribe for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetPlayer->getInRangeActors();
-      for( auto actor : inRange )
+      for( const auto& actor : inRange )
       {
         if( actor->isPlayer() )
         {
@@ -169,7 +169,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       PlayerMgr::sendServerNotice( player, "Sex for {0} was set to ", targetPlayer->getName(), param1 );
       targetPlayer->spawn( targetPlayer );
       auto inRange = targetActor->getInRangeActors();
-      for( auto actor : inRange )
+      for( const auto& actor : inRange )
       {
         if( actor->isPlayer() )
         {
@@ -239,7 +239,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       player.setGmInvis( !player.getGmInvis() );
       PlayerMgr::sendServerNotice( player, "Invisibility flag for {0} was toggled to {1}", player.getName(), !player.getGmInvis());
 
-      for( auto actor : player.getInRangeActors() )
+      for( const auto& actor : player.getInRangeActors() )
       {
         if( actor->isPlayer() )
         {
@@ -476,7 +476,6 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Teri:
     {
-      auto& teriMgr = Common::Service< TerritoryMgr >::ref();
       auto& warpMgr = Common::Service< WarpMgr >::ref();
       if( auto instance = teriMgr.getTerritoryByGuId( param1 ) )
       {
@@ -538,8 +537,12 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         }
         else
         {
+<<<<<<< HEAD
           auto& warpMgr = Common::Service< WarpMgr >::ref();
           warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM, teriMgr.getZoneByTerritoryTypeId( param1 )->getGuId(), targetPlayer->getPos(), 0 );
+=======
+          warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM, teriMgr.getZoneByTerritoryTypeId( param1 )->getGuId(), targetPlayer->getPos(), 0);
+>>>>>>> 9ae27baf0358be65e19ee0f323f2242de6695f15
         }
 
         PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );

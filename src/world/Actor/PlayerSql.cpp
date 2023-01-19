@@ -3,14 +3,12 @@
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdData.h>
-#include <Network/PacketContainer.h>
 #include <Database/DatabaseDef.h>
 #include <Service.h>
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Territory/Territory.h"
 #include "Inventory/Item.h"
 #include "Inventory/ItemContainer.h"
 #include "Manager/ItemMgr.h"

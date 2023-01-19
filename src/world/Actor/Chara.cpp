@@ -1,6 +1,5 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Network/PacketContainer.h>
 #include <Exd/ExdData.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
@@ -13,7 +12,6 @@
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
@@ -60,7 +58,7 @@ Sapphire::Entity::Chara::~Chara()
 /*! \return the actors name */
 std::string Sapphire::Entity::Chara::getName() const
 {
-  return std::string( m_name );
+  return { m_name };
 }
 
 
@@ -539,7 +537,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   status.Time = static_cast< float >( pEffect->getDuration() ) / 1000;
   status.Id = static_cast< uint16_t >( pEffect->getId() );
   status.Slot = static_cast< uint8_t >( nextSlot );
-  status.SystemParam = pEffect->getParam();
+  status.SystemParam = static_cast< int16_t >( pEffect->getParam() );
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
@@ -585,7 +583,7 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
 
 void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
 {
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
@@ -645,7 +643,7 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
 
   auto statusEffectList = makeZonePacket< FFXIVIpcStatus >( getId() );
   uint8_t slot = 0;
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     float timeLeft = static_cast< float >( effectIt.second->getDuration() -
                                            ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
@@ -663,7 +661,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     uint8_t effectIndex = effectIt.first;
     auto effect = effectIt.second;
@@ -710,7 +708,8 @@ uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
   // initially check for the time passed first, if it's more than the threshold just return 0 for the combo
   // we can hide the implementation detail this way and it just works:tm: for anything that uses it
 
-  if( std::difftime( Util::getTimeMs(), m_lastComboActionTime ) > Common::MAX_COMBO_LENGTH )
+  if( std::difftime( static_cast< time_t >( Util::getTimeMs() ),
+                     static_cast< time_t >( m_lastComboActionTime ) ) > Common::MAX_COMBO_LENGTH )
   {
     return 0;
   }
@@ -791,7 +790,7 @@ void Sapphire::Entity::Chara::onTick()
   uint32_t thisTickDmg = 0;
   uint32_t thisTickHeal = 0;
 
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     auto thisEffect = effectIt.second->getTickEffect();
     switch( thisEffect.first )

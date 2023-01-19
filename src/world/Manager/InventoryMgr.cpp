@@ -30,18 +30,18 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
   auto sequence = player.getNextInventorySequence();
   auto pMap = container->getItemMap();
 
-  for( auto itM = pMap.begin(); itM != pMap.end(); ++itM )
+  for( auto & itM : pMap )
   {
-    if( !itM->second )
+    if( !itM.second )
       return;
 
     if( container->getId() == Common::InventoryType::Currency || container->getId() == Common::InventoryType::Crystal )
     {
       auto currencyInfoPacket = makeZonePacket< FFXIVIpcGilItem >( player.getId() );
       currencyInfoPacket->data().contextId = sequence;
-      currencyInfoPacket->data().item.catalogId = itM->second->getId();
+      currencyInfoPacket->data().item.catalogId = itM.second->getId();
       currencyInfoPacket->data().item.subquarity = 1;
-      currencyInfoPacket->data().item.stack = itM->second->getStackSize();
+      currencyInfoPacket->data().item.stack = itM.second->getStackSize();
       currencyInfoPacket->data().item.storageId = container->getId();
       currencyInfoPacket->data().item.containerIndex = 0;
 
@@ -52,15 +52,15 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
       auto itemInfoPacket = makeZonePacket< FFXIVIpcNormalItem >( player.getId() );
       itemInfoPacket->data().contextId = sequence;
       itemInfoPacket->data().item.storageId = container->getId();
-      itemInfoPacket->data().item.containerIndex = itM->first;
-      itemInfoPacket->data().item.stack = itM->second->getStackSize();
-      itemInfoPacket->data().item.catalogId = itM->second->getId();
-      itemInfoPacket->data().item.durability = itM->second->getDurability();
+      itemInfoPacket->data().item.containerIndex = itM.first;
+      itemInfoPacket->data().item.stack = itM.second->getStackSize();
+      itemInfoPacket->data().item.catalogId = itM.second->getId();
+      itemInfoPacket->data().item.durability = itM.second->getDurability();
 //      itemInfoPacket->data().spiritBond = itM->second->getSpiritbond();
 //      itemInfoPacket->data().reservedFlag = itM->second->getReservedFlag();
       // todo: not sure if correct flag?
-      itemInfoPacket->data().item.flags = static_cast< uint8_t >( itM->second->isHq() ? 1 : 0 );
-      itemInfoPacket->data().item.stain = itM->second->getStain();
+      itemInfoPacket->data().item.flags = static_cast< uint8_t >( itM.second->isHq() ? 1 : 0 );
+      itemInfoPacket->data().item.stain = static_cast< uint8_t >( itM.second->getStain() );
 
       server.queueForPlayer( player.getCharacterId(), itemInfoPacket );
     }

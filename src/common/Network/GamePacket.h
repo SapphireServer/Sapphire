@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <iostream>
 
 #include <sstream>
-#include <time.h>
+#include <ctime>
 
-#include <string.h>
+#include <cstring>
 #include <memory>
 #include <Util/Util.h>
 

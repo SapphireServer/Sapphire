@@ -1,4 +1,3 @@
-#include <Logging/Logger.h>
 #include <Service.h>
 
 #include "TaskMgr.h"
@@ -13,7 +12,6 @@
 #include "Territory/Territory.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/WarpPacket.h"
 #include "Actor/Player.h"
 
 using namespace Sapphire::World::Manager;
@@ -98,8 +96,6 @@ void WarpMgr::finishWarp( Entity::Player& player )
 void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
   m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& server = Common::Service< WorldServer >::ref();
 
   player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, 0, player.getTerritoryTypeId(), 1 ), true );
   player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );

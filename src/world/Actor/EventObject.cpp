@@ -4,7 +4,6 @@
 #include "Actor/Player.h"
 
 #include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 
 #include <Logging/Logger.h>
@@ -13,6 +12,8 @@
 #include <Util/UtilMath.h>
 
 #include <Service.h>
+
+#include <utility>
 #include "WorldServer.h"
 #include "Session.h"
 #include "Network/GameConnection.h"
@@ -70,7 +71,7 @@ Sapphire::Entity::EventObject::OnTalkEventHandler Sapphire::Entity::EventObject:
 
 void Sapphire::Entity::EventObject::setOnTalkHandler( Sapphire::Entity::EventObject::OnTalkEventHandler handler )
 {
-  m_onTalkEventHandler = handler;
+  m_onTalkEventHandler = std::move( handler );
 }
 
 void Sapphire::Entity::EventObject::setGimmickId( uint32_t gimmickId )
@@ -111,7 +112,7 @@ uint32_t Sapphire::Entity::EventObject::getHousingLink() const
 
 void Sapphire::Entity::EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
 {
-  m_parentInstance = instance;
+  m_parentInstance = std::move( instance );
 }
 
 Sapphire::TerritoryPtr Sapphire::Entity::EventObject::getParentInstance() const

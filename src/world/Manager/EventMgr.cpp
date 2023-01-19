@@ -6,7 +6,6 @@
 #include "PlayerMgr.h"
 #include "ShopMgr.h"
 #include "Event/EventHandler.h"
-#include "Event/Director.h"
 #include "Event/EventDefs.h"
 
 #include <Exd/ExdData.h>
@@ -14,8 +13,6 @@
 #include <datReader/DatCategories/bg/lgb.h>
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventPlayPacket.h"
@@ -26,7 +23,6 @@
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
-#include "Territory/QuestBattle.h"
 
 #include "Action/EventAction.h"
 #include "WorldServer.h"
@@ -53,7 +49,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
         return unknown + "Quest";
 
       std::string name = questInfo->getString( questInfo->data().Text.Name );
-      std::size_t pos = name.find_first_of( "_" );
+      std::size_t pos = name.find_first_of( '_' );
 
       return name.substr( 0, pos );
     }
@@ -64,7 +60,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
         return unknown + "CustomTalk";
 
       std::string name = customTalkInfo->getString( customTalkInfo->data().Text.Name );
-      std::size_t pos = name.find_first_of( "_" );
+      std::size_t pos = name.find_first_of( '_' );
 
       return name.substr( 0, pos );
     }
@@ -557,11 +553,11 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
     params[ 1 ] = static_cast< uint32_t >( params.size() - 3 ); //new max item size
     auto& exdData = Common::Service< Data::ExdData >::ref();
 
-    for( auto it = player.getSoldItems()->cbegin(); it != player.getSoldItems()->cend(); ++it )
+    for( auto it : *player.getSoldItems() )
     {
-      auto item = exdData.getRow< Excel::Item >( it->first );
-      params.push_back( it->first ); //itemCatalogId
-      params.push_back( it->second ); //stack
+      auto item = exdData.getRow< Excel::Item >( it.first );
+      params.push_back( it.first ); //itemCatalogId
+      params.push_back( it.second ); //stack
       params.push_back( item->data().Price ); //price
       params.push_back( 0 );//flag isHQ
       params.push_back( 0 );//numOfMateria

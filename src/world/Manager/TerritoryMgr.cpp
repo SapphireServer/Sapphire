@@ -10,7 +10,6 @@
 
 #include "Actor/Player.h"
 
-#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
 #include "TerritoryMgr.h"
@@ -146,7 +145,8 @@ bool TerritoryMgr::isDefaultTerritory( uint32_t territoryTypeId ) const
          pTeri->data().IntendedUse == TerritoryIntendedUse::OpenWorld ||
          pTeri->data().IntendedUse == TerritoryIntendedUse::OpeningArea ||
          pTeri->data().IntendedUse == TerritoryIntendedUse::GoldSaucer ||
-         pTeri->data().IntendedUse == TerritoryIntendedUse::ChocoboSquare;
+         pTeri->data().IntendedUse == TerritoryIntendedUse::ChocoboSquare ||
+         pTeri->data().IntendedUse == TerritoryIntendedUse::BeforeTrialDung;
 
 }
 
@@ -519,9 +519,9 @@ void TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
   }
 
   // remove internal house zones with nobody in them
-  for( auto it = m_questBattleIdToInstanceMap.begin(); it != m_questBattleIdToInstanceMap.end(); ++it )
+  for( auto & it : m_questBattleIdToInstanceMap )
   {
-    for( auto inIt = it->second.begin(); inIt != it->second.end(); )
+    for( auto inIt = it.second.begin(); inIt != it.second.end(); )
     {
       auto zone = std::dynamic_pointer_cast< QuestBattle >( inIt->second );
       if( !zone )
@@ -545,9 +545,9 @@ void TerritoryMgr::updateTerritoryInstances( uint64_t tickCount )
 
   }
 
-  for( auto it = m_instanceContentIdToInstanceMap.begin(); it != m_instanceContentIdToInstanceMap.end(); ++it )
+  for( auto& it : m_instanceContentIdToInstanceMap )
   {
-    for( auto inIt = it->second.begin(); inIt != it->second.end(); )
+    for( auto inIt = it.second.begin(); inIt != it.second.end(); )
     {
       auto zone = std::dynamic_pointer_cast< InstanceContent >( inIt->second );
       if( !zone )
@@ -668,7 +668,7 @@ void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint16_t qu
 bool TerritoryMgr::joinWorld( Entity::Player& player )
 {
 
-  TerritoryPtr pCurrZone = nullptr;
+  TerritoryPtr pCurrZone;
 
   auto territoryTypeId = player.getTerritoryTypeId();
 

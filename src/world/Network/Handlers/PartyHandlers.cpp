@@ -3,7 +3,6 @@
 #include <Network/GamePacket.h>
 
 #include <Network/PacketContainer.h>
-#include <Exd/ExdData.h>
 #include <Service.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 

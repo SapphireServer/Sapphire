@@ -1,7 +1,6 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
-#include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Exd/ExdData.h>
 #include <Service.h>
@@ -44,7 +43,6 @@ void Sapphire::Network::GameConnection::cfRequestPenalties( const Packets::FFXIV
 void Sapphire::Network::GameConnection::findContent( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& contentFinder = Common::Service< World::ContentFinder >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcFindContent >( inPacket );
@@ -62,7 +60,6 @@ void Sapphire::Network::GameConnection::findContent( const Packets::FFXIVARR_PAC
 
 void Sapphire::Network::GameConnection::find5Contents( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& contentFinder = Common::Service< World::ContentFinder >::ref();
 
@@ -70,9 +67,9 @@ void Sapphire::Network::GameConnection::find5Contents( const Packets::FFXIVARR_P
 
   std::set< uint16_t > selectedContent;
 
-  for( std::size_t i = 0; i < 5; ++i )
-    if( packet.data().territoryTypes[ i ] != 0 )
-      selectedContent.insert( packet.data().territoryTypes[ i ] );
+  for( auto territoryType : packet.data().territoryTypes )
+    if( territoryType != 0 )
+      selectedContent.insert( territoryType );
 
   auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
 

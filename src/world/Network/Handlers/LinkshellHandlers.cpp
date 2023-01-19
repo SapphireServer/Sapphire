@@ -83,7 +83,6 @@ void Sapphire::Network::GameConnection::linkshellDeclineLeaderHandler( const Pac
 {
   const auto lsDeclineLeaderPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellDeclineLeader >( inPacket );
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
 
   lsMgr.declineLeader( player, lsDeclineLeaderPacket.data().LinkshellID );
 

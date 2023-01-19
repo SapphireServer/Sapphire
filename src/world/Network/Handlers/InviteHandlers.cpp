@@ -1,10 +1,8 @@
 #include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
-#include <Network/CommonActorControl.h>
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
-#include <Database/DatabaseDef.h>
 
 #include <datReader/DatCategories/bg/LgbTypes.h>
 
@@ -15,7 +13,6 @@
 #include "Session.h"
 
 #include "Territory/Territory.h"
-#include "Territory/Land.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/InviteUpdatePacket.h"
@@ -34,7 +31,6 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::Packets::WorldPackets::Client;
 using namespace Sapphire::Network::Packets::WorldPackets;
-using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
 

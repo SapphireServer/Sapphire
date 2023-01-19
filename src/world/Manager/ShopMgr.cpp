@@ -54,7 +54,6 @@ uint32_t ShopMgr::getShopItemPrices( uint32_t shopId, uint8_t index )
     return getShopItemPrices( shopId, index );
   }
 
-  return 0;
 }
 
 bool ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )

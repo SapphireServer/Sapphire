@@ -31,7 +31,7 @@ namespace Sapphire::World::Manager
       if constexpr( std::is_integral< T >::value )
         return m_intDist( *m_engine );
 
-      return m_fpuDist( *m_engine );
+      return static_cast< T >( m_fpuDist( *m_engine ) );
     }
 
     // returns an array of size nSize with values type T on set ranges, deducing real or integer distribution from given numeric type

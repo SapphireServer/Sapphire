@@ -1,14 +1,11 @@
-#include <algorithm>
 #include <iterator>
 
 #include <Common.h>
 #include <Exd/ExdData.h>
-#include <Util/Util.h>
 #include <Service.h>
 
 #include <Logging/Logger.h>
 #include <Database/DatabaseDef.h>
-#include <Service.h>
 #include <Manager/ChatChannelMgr.h>
 #include <Network/GamePacket.h>
 
@@ -20,7 +17,6 @@
 #include "WorldServer.h"
 
 #include <Network/GameConnection.h>
-#include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/LinkshellResultPacket.h>
 #include <Network/PacketDef/ClientIpcs.h>
@@ -48,7 +44,7 @@ bool LinkshellMgr::loadLinkshells()
 
     auto func = []( std::set< uint64_t >& outList, std::vector< char >& inData )
     {
-      if( inData.size() )
+      if( !inData.empty() )
       {
         size_t entryCount = inData.size() / 8;
         std::vector< uint64_t > list( entryCount );
@@ -128,7 +124,7 @@ void LinkshellMgr::writeLinkshell( uint64_t lsId )
   query->setBinary( 3, leaderBin );
   query->setBinary( 4, inviteBin );
   query->setUInt64( 5, ls->getMasterId() );
-  query->setInt64( 6, lsId );
+  query->setInt64( 6, static_cast< int64_t >( lsId ) );
   db.execute( query );
 
 }
@@ -227,7 +223,7 @@ void LinkshellMgr::finishLinkshellAction( const std::string& name, uint32_t resu
 
 }
 
-const std::vector< LinkshellPtr > LinkshellMgr::getPlayerLinkshells( Entity::Player& player ) const
+std::vector< LinkshellPtr > LinkshellMgr::getPlayerLinkshells( Entity::Player& player ) const
 {
   std::vector< LinkshellPtr > lsVec;
 
@@ -321,7 +317,7 @@ void LinkshellMgr::sendLinkshellList( Entity::Player& player )
   for( int i = 0; i < lsVec.size(); ++i )
   {
     auto pLs = lsVec[ i ];
-    uint32_t hierarchy = 0;
+    uint32_t hierarchy;
 
     if( pLs->getMasterId() == player.getCharacterId() )
       hierarchy = Common::Ls::LinkshellHierarchy::Master << 8;
@@ -486,8 +482,6 @@ void LinkshellMgr::changeMaster( Entity::Player &sourcePlayer, Entity::Player &n
 
 bool LinkshellMgr::renameLinkshell( uint64_t linkshellId, const std::string &name, Entity::Player &player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   auto lsPtr = getLinkshellById( linkshellId );
 
   if( !lsPtr )

@@ -1,7 +1,6 @@
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketContainer.h>
-#include <Exd/ExdData.h>
 #include <Service.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -9,7 +8,6 @@
 
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PartyMgr.h"
-#include "Territory/InstanceContent.h"
 
 #include "Network/GameConnection.h"
 
@@ -19,7 +17,6 @@
 
 #include "Session.h"
 #include "WorldServer.h"
-#include "Forwards.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -214,7 +211,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
 
       for( const auto& id : memberVec )
       {
-        Common::HierarchyData hierarchy;
+        Common::HierarchyData hierarchy{};
         if( lsPtr->getMasterId() == id )
         {
           hierarchy.data.type = Ls::LinkshellHierarchy::Master;

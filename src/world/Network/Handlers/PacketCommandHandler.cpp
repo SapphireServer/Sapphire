@@ -7,7 +7,6 @@
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
-#include "Territory/Territory.h"
 #include "Manager/HousingMgr.h"
 #include "Manager/WarpMgr.h"
 

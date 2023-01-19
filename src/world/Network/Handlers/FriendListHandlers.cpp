@@ -1,9 +1,7 @@
-#include <Common.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
 
 #include <Network/PacketContainer.h>
-#include <Exd/ExdData.h>
 #include <Service.h>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>

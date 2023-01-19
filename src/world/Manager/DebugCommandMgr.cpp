@@ -81,8 +81,8 @@ DebugCommandMgr::DebugCommandMgr()
 // clear all loaded commands
 DebugCommandMgr::~DebugCommandMgr()
 {
-  for( auto it = m_commandMap.begin(); it != m_commandMap.end(); ++it )
-    ( *it ).second.reset();
+  for( auto & it : m_commandMap )
+    it.second.reset();
 }
 
 // add a command set to the register map
@@ -102,7 +102,7 @@ void DebugCommandMgr::execCommand( char* data, Entity::Player& player )
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data );
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part
@@ -142,7 +142,7 @@ void DebugCommandMgr::execCommand( char* data, Entity::Player& player )
 void DebugCommandMgr::help( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   PlayerMgr::sendDebug( player, "Registered debug commands:" );
-  for( auto cmd : m_commandMap )
+  for( const auto& cmd : m_commandMap )
   {
     if( player.getGmRank() >= cmd.second->m_gmLevel )
     {
@@ -159,13 +159,13 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  std::string subCommand = "";
-  std::string params = "";
+  std::string subCommand;
+  std::string params;
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part
@@ -179,7 +179,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
   Logger::debug( "[{0}] subCommand: {1} params: {1}", player.getId(), subCommand, params );
 
-  if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( params != "" ) )
+  if( ( ( subCommand == "pos" ) || ( subCommand == "posr" ) ) && ( !params.empty() ) )
   {
     int32_t posX;
     int32_t posY;
@@ -209,14 +209,14 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     pSession->getZoneConnection()->queueOutPacket( setActorPosPacket );
 
   }
-  else if( ( subCommand == "tele" ) && ( params != "" ) )
+  else if( ( subCommand == "tele" ) && ( !params.empty() ) )
   {
     int32_t aetheryteId;
     sscanf( params.c_str(), "%i", &aetheryteId );
 
     player.teleport( static_cast< uint16_t >( aetheryteId ) );
   }
-  else if( ( subCommand == "discovery" ) && ( params != "" ) )
+  else if( ( subCommand == "discovery" ) && ( !params.empty() ) )
   {
     int32_t map_id;
     int32_t discover_id;
@@ -395,12 +395,12 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   std::string subCommand;
-  std::string params = "";
+  std::string params;
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part
@@ -589,12 +589,12 @@ void DebugCommandMgr::get( char* data, Entity::Player& player, std::shared_ptr< 
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   std::string subCommand;
-  std::string params = "";
+  std::string params;
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part
@@ -647,12 +647,12 @@ void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_pt
   auto& server = Common::Service< World::WorldServer >::ref();
 
   std::string subCommand;
-  std::string params = "";
+  std::string params;
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part
@@ -704,7 +704,7 @@ void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t spos = tmpCommand.find_first_of( " " );
+  std::size_t spos = tmpCommand.find_first_of( ' ' );
 
   auto& pos = player.getPos();
 
@@ -756,12 +756,12 @@ void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_pt
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   std::string subCommand;
-  std::string params = "";
+  std::string params;
 
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part
@@ -798,9 +798,8 @@ void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_pt
       {
         PlayerMgr::sendDebug( player, "Found {0} scripts", scripts.size() );
 
-        for( auto it = scripts.begin(); it != scripts.end(); ++it )
+        for( auto script : scripts )
         {
-          auto script = *it;
           PlayerMgr::sendDebug( player, " - '{0}', num scripts: {1}", script->library_name, script->scripts.size() );
         }
       }
@@ -1434,7 +1433,7 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
   // check if the command has parameters
   std::string tmpCommand = std::string( data + command->getName().length() + 1 );
 
-  std::size_t pos = tmpCommand.find_first_of( " " );
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
 
   if( pos != std::string::npos )
     // command has parameters, grab the first part

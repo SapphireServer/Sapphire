@@ -19,12 +19,9 @@
 #include "Event/EventDefs.h"
 
 #include "TerritoryMgr.h"
-#include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/Housing/HousingInteriorTerritory.h"
-#include "HousingMgr.h"
 #include "EventMgr.h"
-#include "TerritoryMgr.h"
 #include "Territory/Land.h"
 #include "WorldServer.h"
 #include "Territory/House.h"
@@ -245,7 +242,7 @@ void HousingMgr::initLandCache()
 
     auto& containers = getEstateInventory( ident );
 
-    auto makeContainer = [ &containers, this ]( Common::InventoryType type, uint16_t size )
+    auto makeContainer = [ &containers ]( Common::InventoryType type, uint16_t size )
     {
       containers[ type ] = make_ItemContainer( type, size, "houseiteminventory", false, false );
     };
@@ -649,15 +646,15 @@ bool HousingMgr::initHouseModels( Entity::Player& player, LandPtr land, uint32_t
   {
     auto& container = houseInventory[ destContainer.first ];
 
-    for( auto& item : destContainer.second )
+    for( auto& itemIt : destContainer.second )
     {
       // small houses attic is just 0, ignore them
-      if( item.second == 0 )
+      if( itemIt.second == 0 )
         continue;
 
-      auto pItem = invMgr.createItem( player, static_cast< uint32_t >( item.second ) );
+      auto pItem = invMgr.createItem( player, static_cast< uint32_t >( itemIt.second ) );
 
-      container->setItem( static_cast< uint8_t >( item.first ), pItem );
+      container->setItem( static_cast< uint8_t >( itemIt.first ), pItem );
     }
 
     invMgr.saveHousingContainer( land->getLandIdent(), container );
@@ -880,7 +877,6 @@ void HousingMgr::sendEstateInventory( Entity::Player& player, uint16_t inventory
     auto ident = internalZone->getLandIdent();
 
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
-    auto& teriMgr = Common::Service< TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1028,7 +1024,6 @@ void HousingMgr::reqPlaceHousingItem( Entity::Player& player, uint16_t landId, u
     auto ident = zone->getLandIdent();
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    auto& teriMgr = Common::Service< TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1104,7 +1099,6 @@ void HousingMgr::reqPlaceItemInStore( Entity::Player& player, uint16_t landId, u
     auto ident = zone->getLandIdent();
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    auto& teriMgr = Common::Service< TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
@@ -1232,7 +1226,7 @@ bool HousingMgr::placeInteriorItem( Entity::Player& player, Inventory::HousingIt
     invMgr.saveHousingContainer( ident, container );
     invMgr.updateHousingItemPosition( item );
 
-    auto zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
+    zone = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
     assert( zone );
 
     zone->spawnHousingObject( containerIdx, static_cast< uint16_t >( freeSlot ), containerId, item );
@@ -1410,7 +1404,6 @@ void HousingMgr::reqRemoveHousingItem( Entity::Player& player, uint16_t plot, ui
     auto ident = terri->getLandIdent();
     auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
 
-    auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
     auto pTeri = teriMgr.getTerritoryByGuId( landSetId );
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 

@@ -51,7 +51,7 @@ namespace Sapphire::World::Manager
     void sendLinkshellList( Entity::Player& player );
 
     // get all linkshells associated with player
-    const std::vector< LinkshellPtr > getPlayerLinkshells( Entity::Player& player ) const;
+    std::vector< LinkshellPtr > getPlayerLinkshells( Entity::Player& player ) const;
 
     LinkshellPtr getLinkshellById( uint64_t lsId );
 

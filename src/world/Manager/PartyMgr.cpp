@@ -1,6 +1,5 @@
 #include <Common.h>
 #include <Exd/ExdData.h>
-#include <Util/Util.h>
 #include <Service.h>
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -365,7 +364,7 @@ void PartyMgr::sendPartyUpdate( Party& party )
     if( !classJob )
       continue;
 
-    ZoneProtoDownPartyMember memberEntry;
+    ZoneProtoDownPartyMember memberEntry{};
 
     memberEntry.ParentEntityId = Common::INVALID_GAME_OBJECT_ID;
     memberEntry.PetEntityId = Common::INVALID_GAME_OBJECT_ID;
