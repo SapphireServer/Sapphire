@@ -32,20 +32,23 @@
 #include "Territory/HousingZone.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+
 #include "Manager/TerritoryMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/AchievementMgr.h"
+#include "Manager/WarpMgr.h"
+#include "Manager/LinkshellMgr.h"
+#include "Manager/RNGMgr.h"
+
 #include "Event/EventDefs.h"
 #include "ContentFinder/ContentFinder.h"
 
-#include "Manager/LinkshellMgr.h"
 #include "Linkshell/Linkshell.h"
-
-#include "Manager/WarpMgr.h"
 
 #include "WorldServer.h"
 
 #include "Session.h"
-#include <Manager/RNGMgr.h>
+
 
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
@@ -554,11 +557,31 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     pSession->getZoneConnection()->queueOutPacket( effectPacket );
   }
+  else if( subCommand == "achv" )
+  {
+    uint32_t achvId;
+
+    sscanf( params.c_str(), "%u", &achvId );
+
+    auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
+
+    achvMgr.unlockAchievement( player, achvId );
+  }
+  else if( subCommand == "achvGeneral" )
+  {
+    uint32_t achvSubtype;
+    uint32_t progress;
+
+    sscanf( params.c_str(), "%u %u", &achvSubtype, &progress );
+
+    auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
+
+    achvMgr.progressAchievementByType< Common::Achievement::Type::General >( player, achvSubtype, progress );
+  }
   else
   {
     PlayerMgr::sendUrgent( player, "{0} is not a valid ADD command.", subCommand );
   }
-
 
 }
 

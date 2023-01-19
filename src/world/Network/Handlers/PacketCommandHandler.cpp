@@ -600,7 +600,16 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setIsLogin( false );
       break;
     }
-
+    case PacketCommand::ACHIEVEMENT_REQUEST_RATE:
+    {
+      Service< World::Manager::PlayerMgr >::ref().onSendAchievementProgress( player, param11 );
+      break;
+    }
+    case PacketCommand::ACHIEVEMENT_REQUEST:
+    {
+      Service< World::Manager::PlayerMgr >::ref().onSendAchievementList( player );
+      break;
+    }
     case PacketCommand::TELEPO_INQUIRY: // Teleport
     {
 
