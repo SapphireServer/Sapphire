@@ -445,7 +445,7 @@ void Player::teleport( uint16_t aetheryteId, uint8_t type )
   // if it is a teleport in the same zone, we want to do warp instead of moveTerri
   bool sameTerritory = getTerritoryTypeId() == data.TerritoryType;
 
-  WarpType warpType;
+  WarpType warpType = WarpType::WARP_TYPE_NORMAL;
   // TODO: this should be simplified and a type created in server_common/common.h.
   if( type == 1 || type == 2 ) // teleport
   {
@@ -822,7 +822,7 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
   m_classArray[ classJobIndex ] = level;
 
-  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::ClassJobUpdate, static_cast< uint8_t >( classjob ), level ) );
+  Service< World::Manager::PlayerMgr >::ref().onSetLevelForClass( *this, classjob );
 }
 
 void Player::sendModel()
@@ -1311,6 +1311,16 @@ void Player::setTitle( uint16_t titleId )
   m_activeTitle = titleId;
 
   sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
+}
+
+Player::AchievementList& Player::getAchievementList()
+{
+  return m_achievementList;
+}
+
+Player::AchievementDataList& Player::getAchievementDataList()
+{
+  return m_achievementData;
 }
 
 void Player::setMaxGearSets( uint8_t amount )

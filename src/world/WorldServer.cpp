@@ -19,7 +19,6 @@
 #include "Session.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Manager/LinkshellMgr.h"
 #include "Manager/TaskMgr.h"
 
 #include "Task/TestTask.h"
@@ -29,6 +28,7 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include <Service.h>
+#include "Manager/AchievementMgr.h"
 #include "Manager/LinkshellMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/HousingMgr.h"
@@ -185,6 +185,16 @@ void WorldServer::run( int32_t argc, char* argv[] )
     return;
   }
   Common::Service< Manager::LinkshellMgr >::set( pLsMgr );
+
+  auto pAchvMgr = std::make_shared< Manager::AchievementMgr >();
+
+  Logger::info( "AchievementMgr: Caching data" );
+  if( !pAchvMgr->cacheAchievements() )
+  {
+    Logger::fatal( "Unable to cache achievements!" );
+    return;
+  }
+  Common::Service< Manager::AchievementMgr >::set( pAchvMgr );
 
   Logger::info( "Setting up InstanceObjectCache" );
   auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();

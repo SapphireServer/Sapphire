@@ -1000,6 +1000,216 @@ namespace Sapphire::Common
     InvincibilityIgnoreDamage,
   };
 
+  namespace Achievement
+  {
+    enum class Type : uint8_t
+    {
+      None,
+      General,
+      LinkedAchievement,
+      Classjob,
+      Unknown_4,// Materia related? id 304
+      Unknown_5,// Hunt related? id 1259
+      QuestUnk_6,
+      Unknown_7,
+      Unknown_8,// Map discovery related
+      QuestUnk_9,
+      ChocoboRank,
+      PvPRank,
+      WolvesDenMatches,
+      WolvesDenWins,
+      InstanceContent,
+      BeastTribeReputation,
+      Unknown_16,
+      FrontlineMatches,
+      FrontlineWinsGC,
+      FrontlineWinsAll,
+      AetherCurrent,
+    };
+
+    namespace GeneralSubtype
+    {
+      enum AchievementGeneralSubtype : int32_t
+      {
+        EnemyDefeatCount = 11,
+        GilEnemySource = 12,
+        GilLevequestSource = 13,
+        FactionLevequestCompleted = 14,
+        GuildhestCompleted = 15,
+        MateriaAffixCount = 16,
+        SpiritboundMateriaCount = 17,
+        RegionalBattleLevequestCompleted = 18,
+        LocalTradeLevequestCompleted = 19,
+
+        // Legacy subtypes - skipping
+
+        #pragma region Synth 1 -50 Recipes
+        SynthWoodworkingLv01to10Recipes = 23,
+        SynthWoodworkingLv11to20Recipes = 24,
+        SynthWoodworkingLv21to30Recipes = 25,
+        SynthWoodworkingLv31to40Recipes = 26,
+        SynthWoodworkingLv41to50Recipes = 27,
+        SynthSmithingLv01to10Recipes = 28,
+        SynthSmithingLv11to20Recipes = 29,
+        SynthSmithingLv21to30Recipes = 30,
+        SynthSmithingLv31to40Recipes = 31,
+        SynthSmithingLv41to50Recipes = 32,
+        SynthArmorcraftLv01to10Recipes = 33,
+        SynthArmorcraftLv11to20Recipes = 34,
+        SynthArmorcraftLv21to30Recipes = 35,
+        SynthArmorcraftLv31to40Recipes = 36,
+        SynthArmorcraftLv41to50Recipes = 37,
+        SynthGoldsmithingLv01to10Recipes = 38,
+        SynthGoldsmithingLv11to20Recipes = 39,
+        SynthGoldsmithingLv21to30Recipes = 40,
+        SynthGoldsmithingLv31to40Recipes = 41,
+        SynthGoldsmithingLv41to50Recipes = 42,
+        SynthLeatherworkingLv01to10Recipes = 43,
+        SynthLeatherworkingLv11to20Recipes = 44,
+        SynthLeatherworkingLv21to30Recipes = 45,
+        SynthLeatherworkingLv31to40Recipes = 46,
+        SynthLeatherworkingLv41to50Recipes = 47,
+        SynthClothcraftLv01to10Recipes = 48,
+        SynthClothcraftLv11to20Recipes = 49,
+        SynthClothcraftLv21to30Recipes = 50,
+        SynthClothcraftLv31to40Recipes = 51,
+        SynthClothcraftLv41to50Recipes = 52,
+        SynthAlchemyLv01to10Recipes = 53,
+        SynthAlchemyLv11to20Recipes = 54,
+        SynthAlchemyLv21to30Recipes = 55,
+        SynthAlchemyLv31to40Recipes = 56,
+        SynthAlchemyLv41to50Recipes = 57,
+        SynthCookingLv01to10Recipes = 58,
+        SynthCookingLv11to20Recipes = 59,
+        SynthCookingLv21to30Recipes = 60,
+        SynthCookingLv31to40Recipes = 61,
+        SynthCookingLv41to50Recipes = 62,
+        #pragma endregion
+
+        // TODO: Map gathering subtypes 63 to 128
+
+        GCStormSeals = 138,
+        GCSerpentSeals = 139,
+        GCFlameSeals = 140,
+
+        MaelstromLevequestCompleted = 141,
+        TwinAdderLevequestCompleted = 142,
+        ImmortalFlamesLevequestCompleted = 143,
+
+        MaelstromSupplyCompleted = 144,
+        TwinAdderSupplyCompleted = 145,
+        ImmortalFlamesSupplyCompleted = 146,
+
+        MaelstromProvisioningCompleted = 147,
+        TwinAdderProvisioningCompleted = 148,
+        ImmortalFlamesProvisioningCompleted = 149,
+
+        // Legacy subtypes - skipping
+
+        FieldLevequestCompleted = 179,
+        UniqueBattleLevequestCompleted = 180,
+
+        // TODO: Map leve subtypes 181 to 201
+
+        UniqueFishCaughtCount = 202,
+
+        // TODO: Map craft subtypes 203 to 213
+
+        UniqueQuestsCompleted = 214,
+        InstanceContentCompleted = 215,      // Instanced dungeons, raids or trials
+        UniqueInstanceContentCompleted = 216,// Unique instanced dungeons, raids or trials
+
+        BindingCoilCompleted = 217,
+        UniqueGuildhestCompleted = 218,
+        FateCompleted = 219,
+
+        // TODO: Map subtypes 220 to 235
+
+        ChocoboRidePimpedOut = 236,
+
+        MaelstromUniqueLeveCompleted = 238,
+        TwinAdderUniqueLeveCompleted = 239,
+        ImmortalFlamesUniqueLeveCompleted = 240,
+
+        EnlistGCMaelstrom = 241,
+        EnlistGCTwinAdder = 242,
+        EnlistGCImmortalFlames = 243,
+
+        CommendationCount = 244,
+
+        // TODO: Map subtypes 245 to 250
+
+        ResurrectStrangers = 251,
+        SecondCoilCompleted = 266,
+        UniqueBigFishCaught = 267,
+        RetainerVentureCompleted = 268,
+
+        HighLvlDutyPaladinCompleted = 277,
+        HighLvlDutyWarriorCompleted = 278,
+
+        RelicAnimus = 279,
+        RelicNovus = 280,
+
+        HigherGradeMateriaFromTransmutation = 281,
+        ARRSightseeingLogCount = 284,
+
+        InterceptorDroneDefeated = 285,
+        InterceptorNodeDefeated = 286,
+
+        TrainAnotherChocoboCount = 287,
+
+        HuntRankBDefeated = 290,
+        HuntRankADefeated = 291,
+        HuntRankSDefeated = 292,
+
+        LootCofferLeatherMap = 293,
+
+        DesynthesizeItemCount = 294,
+
+        RelicNexus = 347,
+        FinalCoilCompleted = 348,
+        RelicZodiac = 349,
+        RelicZeta = 350,
+
+        TripleTriadUniqueCardCount = 352,
+        TripleTriadNPCDefeatedCount = 353,
+        TripleTriadRouletteWin = 354,
+        TripleTriadTournamentWin = 355,
+
+        MgpGoldSaucerAttractionSource = 356,
+        ChocoboRaceCount = 357,
+        ChocoboRaceWin = 358,
+        ChocoboCovering = 359,
+        ChocoboPedigreeLevel = 360,
+        ChocoboRating = 361,
+
+        FrontlineEnemyDispatched = 362,
+
+        GATECompleted = 363,
+
+        // TODO: Map subtypes 364 to 368
+
+        HighLvlDutyDarkKnightCompleted = 369,
+
+        GordiasCompleted = 370,
+        GordiasSavageCompleted = 371,
+
+        // TODO: Map subtypes 372 to X
+      };
+    }
+  }
+
+  union AchievementDataKey
+  {
+    uint32_t u32;
+
+    struct AchievementPackedKey {
+      uint8_t type;
+      uint16_t subtype;
+      uint8_t padding0;
+    } key;
+  };
+
   enum HierarchyType : uint8_t
   {
     NONE_2 = 0x0,

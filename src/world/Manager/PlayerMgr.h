@@ -22,11 +22,19 @@ class PlayerMgr
 
     void onChangeClass( Sapphire::Entity::Player& player );
 
+    void onSendAchievementList( Sapphire::Entity::Player& player );
+
+    void onSendAchievementProgress( Sapphire::Entity::Player& player, uint32_t achievementId );
+
+    void onUnlockAchievement( Sapphire::Entity::Player& player, uint32_t achievementId );
+
     void onPlayerHpMpTpChanged( Sapphire::Entity::Player& player );
 
     void onPlayerItemLevelUpdate( Sapphire::Entity::Player& player );
 
     void onLevelUp( Sapphire::Entity::Player& player );
+
+    void onSetLevelForClass( Sapphire::Entity::Player& player, Common::ClassJob classJob );
 
     void onGainExp( Sapphire::Entity::Player& player, uint32_t exp );
 

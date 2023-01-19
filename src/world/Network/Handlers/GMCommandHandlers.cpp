@@ -537,7 +537,8 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         }
         else
         {
-          warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM, teriMgr.getZoneByTerritoryTypeId( param1 )->getGuId(), targetPlayer->getPos(), 0);
+          auto& warpMgr = Common::Service< WarpMgr >::ref();
+          warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM, teriMgr.getZoneByTerritoryTypeId( param1 )->getGuId(), targetPlayer->getPos(), 0 );
         }
 
         PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );

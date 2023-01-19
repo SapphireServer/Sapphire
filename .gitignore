@@ -27,6 +27,8 @@ src/tools/bin/generated/*
 build/
 build-*/
 cmake-build-*/
+bin/
+out/
 
 # Prerequisites
 *.d

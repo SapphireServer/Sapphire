@@ -25,6 +25,8 @@ namespace Sapphire::Entity
   class Player : public Chara
   {
   public:
+    using AchievementDataList = std::map< uint32_t, uint32_t >;
+    using AchievementList = std::array< uint8_t, 2048 / 8 >; // up to 2048 achievements
     using TitleList = std::array< uint8_t, 48 >;
     using HowToList = std::array< uint8_t, 34 >;
     using MinionList = std::array< uint8_t, 40 >;
@@ -365,7 +367,13 @@ namespace Sapphire::Entity
     /*! send the players title list */
     void sendTitleList();
 
-      /*! set number of gear sets */
+    /*! get player's achievement list */
+    AchievementList& getAchievementList();
+
+    /*! get player's achievement data list */
+    AchievementDataList& getAchievementDataList();
+
+    /*! set number of gear sets */
     void setMaxGearSets( uint8_t amount );
 
     /*! get number of gear sets */
@@ -860,6 +868,8 @@ namespace Sapphire::Entity
       uint8_t status;
     } m_retainerInfo[8]{};
 
+    AchievementList m_achievementList{};
+    AchievementDataList m_achievementData{};
     uint16_t m_activeTitle{};
     TitleList m_titleList{};
     HowToList m_howTo{};
