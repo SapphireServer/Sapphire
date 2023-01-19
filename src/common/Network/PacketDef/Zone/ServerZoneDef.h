@@ -1122,9 +1122,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t ClassJob;
     uint8_t __padding1;
     uint16_t Lv;
+    uint16_t Lv1;
     uint16_t LvSync;
-    uint8_t __padding2;
-    uint8_t __padding3;
     uint32_t Exp;
     uint32_t RestPoint;
   };

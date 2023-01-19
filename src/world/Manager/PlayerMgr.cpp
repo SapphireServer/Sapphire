@@ -114,6 +114,7 @@ void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
   auto playerStatusUpdate = makeZonePacket< FFXIVIpcPlayerStatusUpdate >( player.getId() );
   playerStatusUpdate->data().ClassJob = static_cast< uint8_t >( player.getClass() );
   playerStatusUpdate->data().Lv = player.getLevel();
+  playerStatusUpdate->data().Lv1 = player.getLevel();
   playerStatusUpdate->data().LvSync = 0; //player.getLevelSync();
   playerStatusUpdate->data().Exp = player.getExp();
 
