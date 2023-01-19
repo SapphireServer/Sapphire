@@ -1705,8 +1705,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   */
   struct FFXIVIpcQuestCompleteList : FFXIVIpcBasePacket< QuestCompleteFlags >
   {
-    uint8_t questCompleteMask[480];
-    uint8_t unknownCompleteMask[80];
+    uint8_t questCompleteMask[310];
+    uint8_t unknownCompleteMask[40];
   };
 
   /**
