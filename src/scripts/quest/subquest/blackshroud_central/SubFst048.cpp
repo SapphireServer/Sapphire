@@ -2,9 +2,9 @@
 // Content needs to be added by hand to make it function
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-#include <Actor/Player.h>
-#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
+#include <Actor/BNpc.h>
+#include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -36,10 +36,10 @@ private:
   };
 
   // Entities found in the script data of the quest
-  static constexpr auto Actor0 = 1000742;
-  static constexpr auto Actor1 = 1000474;
-  static constexpr auto Actor2 = 1000476;
-  static constexpr auto Actor3 = 1000483;
+  static constexpr auto Actor0 = 1000742;//Kukuvachi
+  static constexpr auto Actor1 = 1000474;//Aethelthryth
+  static constexpr auto Actor2 = 1000476;//Leodaire
+  static constexpr auto Actor3 = 1000483;//Bernard
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq1Actor1 = 1;
   static constexpr auto Seq1Actor2 = 2;
@@ -47,8 +47,7 @@ private:
   static constexpr auto Seq2Actor0 = 4;
 
 public:
-  SubFst048() : Sapphire::ScriptAPI::QuestScript( 65911 )
-  {};
+  SubFst048() : Sapphire::ScriptAPI::QuestScript( 65911 ){};
 
   ~SubFst048() = default;
 
@@ -60,7 +59,7 @@ public:
     {
       case Actor0:
       {
-        if( !player.hasQuest( getId() ) )
+        if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
           Scene00004( quest, player );
@@ -113,7 +112,7 @@ private:
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 ) // accept quest
+    if( result.getResult( 0 ) == 1 )// accept quest
     {
       quest.setSeq( Seq1 );
     }
@@ -170,11 +169,9 @@ private:
 
     if( result.getResult( 0 ) == 1 )
     {
-      player.finishQuest( getId(), result.getResult( 1 ) );
+      player.finishQuest( getId() );
     }
-
   }
-
 };
 
 EXPOSE_SCRIPT( SubFst048 );
