@@ -23,7 +23,7 @@ namespace Sapphire::World::Manager
     template < auto AchievementType >
     void progressAchievementByType( Entity::Player& player, int32_t argument, uint32_t progressCount = 1 )
     {
-      progressAchievement< decltype( AchievementType ), AchievementType >( std::move( player ), argument, progressCount );
+      progressAchievement< decltype( AchievementType ), AchievementType >( player, argument, progressCount );
     }
 
     bool hasAchievementUnlocked( Entity::Player& player, uint32_t achievementId );
