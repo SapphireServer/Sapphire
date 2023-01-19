@@ -85,6 +85,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
     player.sendToInRangeSet( zoneInPacket );
 
   player.sendToInRangeSet( SetStatusPacket, true );
+  player.sendStatusUpdate();
 
   auto& server = Common::Service< WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), zoneInPacket );

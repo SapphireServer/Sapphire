@@ -1507,6 +1507,7 @@ void Player::sendZonePackets()
   initPacket->data().playerActorId = getId();
   queuePacket( initPacket );
 
+  sendStatusUpdate();
   sendInventory();
 
   if( isLogin() )

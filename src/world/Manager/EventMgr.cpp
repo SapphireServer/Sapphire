@@ -354,18 +354,62 @@ void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t ev
     result.sceneId = sceneId;
     result.resultString = resultString;
 
-    auto eventCallback = pEvent->getEventReturnCallback();
-    if( eventCallback )
+    if( eventType == Event::EventHandler::EventHandlerType::Quest )
     {
-      eventCallback( player, result );
+      auto questId = static_cast< uint16_t >( eventId );
+      auto eventCallback = pEvent->getQuestEventReturnCallback();
+      if( eventCallback )
+      {
+        World::Quest preQ;
+        if( player.hasQuest( eventId ) )
+        {
+          auto questIdx = player.getQuestIndex( questId );
+          auto& quest = player.getQuestByIndex( questIdx );
+          preQ = quest;
+          eventCallback( quest, player, result );
+          if( quest != preQ )
+            player.updateQuest( quest );
+        }
+        else
+        {
+          auto newQuest = World::Quest( questId, 0, 0 );
+          preQ = newQuest;
+          eventCallback( newQuest, player, result );
+          if( newQuest != preQ )
+            player.updateQuest( newQuest );
+        }
+      }
+      else if( auto chainCallback = pEvent->getQuestSceneChainCallback() )
+      {
+        if( player.hasQuest( eventId ) )
+        {
+          auto questIdx = player.getQuestIndex( questId );
+          auto& quest = player.getQuestByIndex( questIdx );
+          chainCallback( quest, player );
+        }
+        else
+        {
+          auto newQuest = World::Quest( questId, 0, 0 );
+          chainCallback( newQuest, player );
+        }
+      }
     }
+    else
+    {
+      auto eventCallback = pEvent->getEventReturnCallback();
+      if( eventCallback )
+      {
+        eventCallback( player, result );
+      }
 
       // we might have a scene chain callback instead so check for that too
-    else if( auto chainCallback = pEvent->getSceneChainCallback() )
-      chainCallback( player );
+      else if( auto chainCallback = pEvent->getSceneChainCallback() )
+        chainCallback( player );
+    }
 
   }
 
+  checkEvent( player, eventId );
 }
 
 void EventMgr::handleReturnIntAndStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString, uint64_t resultInt )
