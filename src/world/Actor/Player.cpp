@@ -1429,12 +1429,6 @@ void Player::autoAttack( CharaPtr pTarget )
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addTargetEffect( entry );
 
-  Logger::debug(
-          "Dump:\n{0}",
-          Util::binaryToHexDump( const_cast< uint8_t* >( &effectPacket->getData()[0] ),
-                                 static_cast< uint16_t >( effectPacket->getContentSize() ) )
-  );
-
   sendToInRangeSet( effectPacket, true );
 
   pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );

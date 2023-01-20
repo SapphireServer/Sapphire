@@ -84,6 +84,7 @@ namespace Excel
     int32_t RepairItem;
     int32_t MirageItem;
     uint16_t Icon;
+    uint16_t Level;
     uint16_t Trait;
     uint16_t Damage;
     uint16_t MagicDamage;
@@ -96,7 +97,6 @@ namespace Excel
     uint16_t Action;
     uint16_t Salvage;
     int16_t BonusValue[7];
-    uint8_t Level;
     uint8_t EquipLevel;
     uint8_t EquipPvPRank;
     uint8_t Category;
@@ -134,7 +134,6 @@ namespace Excel
     uint8_t ConditionFemale : 1;
     uint8_t ConditionMale : 1;
     uint8_t DisableSameAccount : 1;
-    int8_t padding2[4];
   };
 
   /* 35156 */
@@ -229,12 +228,11 @@ namespace Excel
   struct ClassJob
   {
     ClassJobTextStruct Text;
-    int8_t padding0[4];
-    uint64_t ModelJobStone;
     Excel::StringOffset EnText;
     uint32_t JobCrystalItemId;
     uint32_t ARRRelicQuestId;
     uint32_t ARRFinalJobQuest;
+    uint32_t HWFinalJobQuest;
     int32_t InitWeapon[2];
     uint16_t Hp;
     uint16_t Mp;
@@ -253,12 +251,13 @@ namespace Excel
     uint8_t MainClass;
     uint8_t Role;
     uint8_t Town;
-    uint8_t PartyBuff;
     int8_t MonsterNote;
     int8_t StartingLevel;
+    uint8_t PartyBuff;
     int8_t WorkIndex;
     int8_t BattleClassIndex;
     int8_t CraftingClassIndex;
+    int8_t Unknown7;
   };
 
   /* 63507 */
@@ -698,6 +697,7 @@ namespace Excel
     uint16_t SubRegion;
     uint16_t Area;
     uint16_t Map;
+    uint16_t Unknown4;
     uint16_t BGM;
     uint16_t QuestBattle;
     uint8_t BattalionMode;
@@ -1845,6 +1845,7 @@ namespace Excel
     uint8_t GeneralAction[2];
     uint8_t AllaganTomestoneType;
     uint8_t AllaganTomestoneNum;
+    uint8_t Unknown95E;
     uint8_t BeastReputationValueNum;
     uint8_t unknown1[4];
   };
@@ -1867,6 +1868,7 @@ namespace Excel
     uint32_t Inlay;
     int32_t Mount;
     uint16_t ClassLevel;
+    uint16_t Unknown9A2;
     uint16_t ClassLevel2;
     uint16_t AcquiredReward;
     uint16_t TimeBegin;
@@ -1897,6 +1899,7 @@ namespace Excel
     uint8_t Genre;
     uint8_t IconType;
     uint8_t Quality;
+    uint8_t Unknown9C9;
     uint8_t padding2 : 3;
     uint8_t HideOfferIcon : 1;
     uint8_t Cancellable : 1;
