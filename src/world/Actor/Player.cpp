@@ -1826,17 +1826,18 @@ void Player::updateHuntingLog( uint16_t id )
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
   const auto maxRank = 4;
   auto& pExdData = Common::Service< Data::ExdData >::ref();
-  auto currentClassId = static_cast< uint8_t >( getClass() );
+
+  // make sure we get the matching base-class if a job is being used
+  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) );
+  if( !classJobInfo )
+    return;
+
+  auto currentClassId = classJobInfo->data().MainClass;
 
   auto& logEntry = m_huntingLogEntries[ currentClassId - 1 ];
 
   bool logChanged = false;
 
-  // make sure we get the matching base-class if a job is being used
-  auto currentClass = currentClassId;
-  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( currentClass );
-  if( !classJobInfo )
-    return;
 
   bool allSectionsComplete = true;
   for( int i = 1; i <= 10; ++i )
