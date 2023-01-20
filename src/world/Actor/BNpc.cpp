@@ -991,7 +991,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     Common::CalcResultParam effectEntry{};
     effectEntry.Value = static_cast< int16_t >( damage.first );
     effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-    effectEntry.Flag = 128;
+    //effectEntry.Flag = 128;
     effectEntry.Arg0 = 3;
     effectEntry.Arg1 = 7;
     //effectEntry.Arg2 = 0x71;

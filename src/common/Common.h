@@ -946,8 +946,8 @@ namespace Sapphire::Common
 
   struct CalcResult
   {
-    CalcResultParam CalcResultCt[4];
     CalcResultParam CalcResultTg[4];
+    CalcResultParam CalcResultCt[4];
   };
 
   struct IntegrityStatus

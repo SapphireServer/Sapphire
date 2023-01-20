@@ -1411,7 +1411,7 @@ void Player::autoAttack( CharaPtr pTarget )
   entry.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
   entry.Arg0 = 2;
   entry.Arg1 = 7;
-  entry.Flag = 128;
+  //entry.Flag = 128;
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1428,6 +1428,12 @@ void Player::autoAttack( CharaPtr pTarget )
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addTargetEffect( entry );
+
+  Logger::debug(
+          "Dump:\n{0}",
+          Util::binaryToHexDump( const_cast< uint8_t* >( &effectPacket->getData()[0] ),
+                                 static_cast< uint16_t >( effectPacket->getContentSize() ) )
+  );
 
   sendToInRangeSet( effectPacket, true );
 
