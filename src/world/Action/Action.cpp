@@ -702,6 +702,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
   {
     case Common::ActionPrimaryCostType::TacticsPoints:
     case Common::ActionPrimaryCostType::TacticsPoints1:
+    case Common::ActionPrimaryCostType::Sprint:
     {
       auto curTp = m_pSource->getTp();
 
