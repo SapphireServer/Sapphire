@@ -5,6 +5,7 @@
 #include <set>
 #include <string>
 #include <cstring>
+#include <unordered_map>
 
 #include <filesystem>
 
@@ -24,8 +25,8 @@ Sapphire::Data::ExdData g_exdDataGen;
 namespace fs = std::filesystem;
 using namespace Sapphire;
 
-std::string javaPath( "\"C:\\Program Files (x86)\\Java\\jre1.8.0_301\\bin\\java.exe\"" );
-std::string gamePath( "F:\\client3.0\\game\\sqpack" );
+std::string javaPath("java " );
+std::string gamePath( "H:\\Games\\ffxiv3.05\\game\\sqpack" );
 
 const std::string onWithinRangeStr(
   "  void onWithinRange( World::Quest& quest, Entity::Player& player, uint64_t eRangeId, float x, float y, float z ) override\n"
@@ -38,6 +39,38 @@ const std::string onEmoteStr(
   "  {\n"
   "  }\n\n"
 );
+
+// https://stackoverflow.com/a/9745132
+bool compareNat(const std::string& a, const std::string& b)
+{
+    if (a.empty())
+        return true;
+    if (b.empty())
+        return false;
+    if (std::isdigit(a[0]) && !std::isdigit(b[0]))
+        return true;
+    if (!std::isdigit(a[0]) && std::isdigit(b[0]))
+        return false;
+    if (!std::isdigit(a[0]) && !std::isdigit(b[0]))
+    {
+        if (std::toupper(a[0]) == std::toupper(b[0]))
+            return compareNat(a.substr(1), b.substr(1));
+        return (std::toupper(a[0]) < std::toupper(b[0]));
+    }
+
+    std::istringstream issa(a);
+    std::istringstream issb(b);
+    int ia, ib;
+    issa >> ia;
+    issb >> ib;
+    if (ia != ib)
+        return ia < ib;
+
+    std::string anew, bnew;
+    std::getline(issa, anew);
+    std::getline(issb, bnew);
+    return (compareNat(anew, bnew));
+}
 
 std::string titleCase( const std::string& str )
 {
@@ -99,6 +132,117 @@ Container& split(
   return result;
 }
 
+
+const std::string& getItemNameFromExd( uint32_t id )
+{
+  static std::unordered_map< uint32_t, std::string > itemNames;
+  static std::string invalid;
+
+  if( itemNames.empty() )
+  {
+    auto nameIdList = g_exdDataGen.getIdList< Excel::Item >();
+    for( auto id : nameIdList )
+    {
+      auto itemName = g_exdDataGen.getRow< Excel::Item >( id );
+      if( itemName && !itemName->getString( itemName->data().Text.SGL ).empty() )
+        itemNames[id] = itemName->getString( itemName->data().Text.SGL );
+    }
+  }
+  if( auto name = itemNames.find( id ); name != itemNames.end() )
+    return name->second;
+  
+  return invalid;
+}
+
+const std::string& getActorPosFromLevelExd( uint32_t id )
+{
+  static std::unordered_map< uint32_t, std::string > levelPositions;
+  static std::string invalid;
+
+  if( levelPositions.empty() )
+  {
+    auto levelIdList = g_exdDataGen.getIdList< Excel::Level >();
+    for( auto id : levelIdList )
+    {
+      auto levelRow = g_exdDataGen.getRow< Excel::Level >( id );
+      if( levelRow )
+      {
+        auto assetType = levelRow->data().eAssetType;
+        // enpc, bnpc, eobj
+        if( assetType != 8 && assetType != 9 && assetType != 45 )
+          continue;
+        std::string pos(" ( Pos: ");
+        pos +=
+          std::to_string( levelRow->data().TransX ) + " " +
+          std::to_string( levelRow->data().TransY ) + " " +
+          std::to_string( levelRow->data().TransZ ) + "  " +
+          "Teri: " + std::to_string( levelRow->data().TerritoryType ) + " )";
+        levelPositions.emplace( levelRow->data().BaseId, pos );
+      }
+    }
+  }
+  if( auto pos = levelPositions.find( id ); pos != levelPositions.end() )
+    return pos->second;
+  return invalid;
+}
+
+const std::string& getActorNameFromExd( uint32_t id )
+{
+  static std::unordered_map< uint32_t, std::string > bnpcNames, enpcNames, eobjNames;
+  static std::string invalid;
+
+  // bnpc
+  if( id < 1000000 )
+  {
+    if( bnpcNames.empty() )
+    {
+      auto nameIdList = g_exdDataGen.getIdList< Excel::BNpcName >();
+      for( auto id : nameIdList )
+      {
+        auto BNpcName = g_exdDataGen.getRow< Excel::BNpcName >( id );
+        if( BNpcName && !BNpcName->getString( BNpcName->data().Text.SGL ).empty() )
+          bnpcNames[id] = BNpcName->getString( BNpcName->data().Text.SGL );
+      }
+    }
+    if( auto name = bnpcNames.find( id ); name != bnpcNames.end() )
+      return name->second;
+  }
+  // enpcresident
+  else if( id < 2000000 )
+  {
+    if( enpcNames.empty() )
+    {
+      auto nameIdList = g_exdDataGen.getIdList< Excel::ENpcResident >();
+      for( auto id : nameIdList )
+      {
+        auto eNpcName = g_exdDataGen.getRow< Excel::ENpcResident >( id );
+        if( eNpcName  && !eNpcName->getString( eNpcName->data().Text.SGL ).empty() )
+          enpcNames[id] = eNpcName->getString( eNpcName->data().Text.SGL );
+      }
+    }
+    if( auto name = enpcNames.find( id ); name != enpcNames.end() )
+      return name->second;
+  }
+  // eobj
+  else
+  {
+    if( eobjNames.empty() )
+    {
+      auto nameIdList = g_exdDataGen.getIdList< Excel::EObj >();
+      for( auto id : nameIdList )
+      {
+        auto eObjName = g_exdDataGen.getRow< Excel::EObj >( id );
+        if( eObjName && !eObjName->getString( eObjName->data().Text.SGL ).empty() )
+          eobjNames[id] = eObjName->getString( eObjName->data().Text.SGL );
+      }
+    }
+    if( auto name = eobjNames.find( id ); name != eobjNames.end() )
+      return name->second;
+  }
+  return invalid;
+}
+
+
 void
 createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData, std::set< std::string >& additionalList, int questId, std::vector< std::string >& functions )
 {
@@ -152,11 +296,6 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
   std::size_t splitPos( pQuestData->getString( pQuestData->data().Script ).find( '_' ) );
   std::string className( pQuestData->getString( pQuestData->data().Script ).substr( 0, splitPos ) );
 
-  if( className == "SubFst033" )
-  {
-    className = className;
-  }
-
   std::string todoInfo;
   for( int i = 0; i < 23; ++i )
   {
@@ -181,8 +320,8 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
   std::string rewardString(
           "    if( result.getResult( 0 ) == 1 )\n"
           "    {\n"
-          "      if( player.giveQuestRewards( getId(), 0 ) )\n"
-          "        player.finishQuest( getId() );\n"
+          "      if( player.giveQuestRewards( getId(), 0, result.getResult( 1 ) )\n"
+          "        player.finishQuest( getId(), result.getResult( 1 ) );\n"
           "    }\n"
           );
 
@@ -319,29 +458,43 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
 
     if( !name.empty() )
     {
-      if( titleCaseNoUnderscores(name).substr( 0, 5 ) == "Actor" )
-      {
+      auto nameStripped = titleCaseNoUnderscores( name );
+      if( nameStripped.substr( 0, 5 ) == "Actor" )
         actorList.push_back( titleCaseNoUnderscores( name ) );
+
+      std::transform( nameStripped.begin(), nameStripped.end(), nameStripped.begin(), ::tolower);
+      // comment actor names and positions if possible
+      if( nameStripped.find( "acto" ) != std::string::npos || nameStripped.find( "enemy" ) != std::string::npos
+        || nameStripped.find( "eobj" ) != std::string::npos || nameStripped.find( "npc" ) != std::string::npos )
+      { 
+        script_entities.push_back( name + " = " + std::to_string( pQuestData->data().Define[ ca ].Value ) + "; // " +
+          getActorNameFromExd( pQuestData->data().Define[ca].Value ) + getActorPosFromLevelExd( pQuestData->data().Define[ca].Value ) );
       }
-      script_entities.push_back(
-              name + " = " + std::to_string( pQuestData->data().Define[ ca ].Value ) );
+      // comment item names
+      else if( nameStripped.find( "ritem" ) != std::string::npos )
+      { 
+        script_entities.push_back( name + " = " + std::to_string( pQuestData->data().Define[ ca ].Value ) + "; // " + getItemNameFromExd( pQuestData->data().Define[ca].Value ) );
+      }
+      else
+        script_entities.push_back(
+              name + " = " + std::to_string( pQuestData->data().Define[ ca ].Value ) + ";");
     }
   }
 
 
-  std::sort( script_entities.begin(), script_entities.end() );
+  std::sort( script_entities.begin(), script_entities.end(), compareNat );
   for( auto& entity : script_entities )
   {
     auto name = titleCaseNoUnderscores( entity );
-    sentities += "    static constexpr auto " + name + ";\n";
+    sentities += "    static constexpr auto " + name + "\n";
 
   }
 
   std::string additional = "// Quest Script: " + pQuestData->getString( pQuestData->data().Script ) + "\n";
   additional += "// Quest Name: " + pQuestData->getString( pQuestData->data().Text.Name ) + "\n";
   additional += "// Quest ID: " + std::to_string( questId ) + "\n";
-  additional += "// Start NPC: " + std::to_string( pQuestData->data().Client ) + "\n";
-  additional += "// End NPC: " + std::to_string( pQuestData->data().Finish ) + "\n\n";
+  additional += "// Start NPC: " + std::to_string( pQuestData->data().Client ) + " (" + getActorNameFromExd( pQuestData->data().Client ) + ")\n";
+  additional += "// End NPC: " + std::to_string( pQuestData->data().Finish ) + " (" + getActorNameFromExd( pQuestData->data().Finish ) + ")\n\n";
 
   additional += "using namespace Sapphire;\n\n";
 
@@ -598,7 +751,7 @@ int main( int argc, char** argv )
       offset += static_cast< uint32_t >( entry.size() + 1 );
 
       if( entry.size() > 3
-          && entry.find_first_not_of( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-" ) ==
+          && entry.find_first_not_of( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-" ) ==
              std::string::npos )
       {
         if( entry.find( "SEQ" ) != std::string::npos
