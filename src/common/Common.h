@@ -723,6 +723,7 @@ namespace Sapphire::Common
         uint16_t questId;
         uint8_t sequence;
         uint8_t flags;
+        uint8_t padding1;
         uint8_t vars[6];
       } packed;
 
@@ -731,6 +732,7 @@ namespace Sapphire::Common
         uint16_t questId;
         uint8_t sequence;
         uint8_t flags;
+        uint8_t padding1;
         uint8_t BitFlag48;
         uint8_t BitFlag40;
         uint8_t BitFlag32;
@@ -744,6 +746,7 @@ namespace Sapphire::Common
         uint16_t questId;
         uint8_t sequence;
         uint8_t flags;
+        uint8_t padding1;
         uint8_t UI8AL : 4;
         uint8_t UI8AH : 4;
         uint8_t UI8BL : 4;
@@ -763,6 +766,7 @@ namespace Sapphire::Common
         uint16_t questId;
         uint8_t sequence;
         uint8_t flags;
+        uint8_t padding1;
         uint8_t UI8A;
         uint8_t UI8B;
         uint8_t UI8C;
