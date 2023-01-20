@@ -2,11 +2,14 @@
 // Content needs to be added by hand to make it function
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-#include <Actor/Player.h>
-#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
+#include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
+
+#include "Actor/BNpc.h"
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Territory.h"
 
 // Quest Script: SubFst033_00127
 // Quest Name: Parasite Cleave
@@ -18,98 +21,186 @@ using namespace Sapphire;
 
 class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 {
-  private:
-    // Basic quest information 
-    // Quest vars / flags used
-    // BitFlag8
-    // UI8AH
-    // UI8AL
-    // UI8BH
-    // UI8BL
-    // UI8CH
-    // UI8CL
-    // UI8DH
-    // UI8DL
+private:
+  // Basic quest information
+  // Quest vars / flags used
+  // BitFlag8
+  // UI8AH
+  // UI8AL
+  // UI8BH
+  // UI8BL
+  // UI8CH
+  // UI8CL
+  // UI8DH
+  // UI8DL
 
-    /// Countable Num: 3 Seq: 1 Event: 1 Listener: 2000016
-    /// Countable Num: 1 Seq: 255 Event: 8 Listener: 2000016
-    // Steps in this quest ( 0 is before accepting, 
-    // 1 is first, 255 means ready for turning it in
-    enum Sequence : uint8_t
-    {
-      Seq0 = 0,
-      Seq1 = 1,
-      SeqFinish = 255,
-    };
+  /// Countable Num: 3 Seq: 1 Event: 1 Listener: 2000016
+  /// Countable Num: 1 Seq: 255 Event: 8 Listener: 2000016
+  // Steps in this quest ( 0 is before accepting,
+  // 1 is first, 255 means ready for turning it in
+  enum Sequence : uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    SeqFinish = 255,
+  };
 
-    // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1000461;
-    static constexpr auto Enemy0 = 2114368;
-    static constexpr auto Enemy1 = 2114369;
-    static constexpr auto Enemy2 = 2114370;
-    static constexpr auto Eobject0 = 2000016;
-    static constexpr auto Eobject1 = 2000017;
-    static constexpr auto Eobject2 = 2000018;
-    static constexpr auto Item0 = 2000061;
-    static constexpr auto Seq0Actor0 = 0;
-    static constexpr auto Seq1Eobject0 = 1;
-    static constexpr auto Seq1Eobject0Useitemno = 99;
-    static constexpr auto Seq1Eobject0Useitemok = 100;
-    static constexpr auto Seq1Eobject1 = 2;
-    static constexpr auto Seq1Eobject1Useitemno = 97;
-    static constexpr auto Seq1Eobject1Useitemok = 98;
-    static constexpr auto Seq1Eobject2 = 3;
-    static constexpr auto Seq1Eobject2Useitemno = 95;
-    static constexpr auto Seq1Eobject2Useitemok = 96;
-    static constexpr auto Seq2Actor0 = 4;
+  // Entities found in the script data of the quest
+  static constexpr auto Actor0 = 1000461;//Gabineaux
+  static constexpr auto Enemy0 = 2114368;
+  static constexpr auto Enemy1 = 2114369;
+  static constexpr auto Enemy2 = 2114370;
+  static constexpr auto Eobject0 = 2000016;//Decaying Tree (West)
+  static constexpr auto Eobject1 = 2000017;//Decaying Tree (South)
+  static constexpr auto Eobject2 = 2000018;//Decaying Tree (East)
+  static constexpr auto Item0 = 2000061;
+  static constexpr auto Seq0Actor0 = 0;
+  static constexpr auto Seq1Eobject0 = 1;
+  static constexpr auto Seq1Eobject0Useitemno = 99;
+  static constexpr auto Seq1Eobject0Useitemok = 100;
+  static constexpr auto Seq1Eobject1 = 2;
+  static constexpr auto Seq1Eobject1Useitemno = 97;
+  static constexpr auto Seq1Eobject1Useitemok = 98;
+  static constexpr auto Seq1Eobject2 = 3;
+  static constexpr auto Seq1Eobject2Useitemno = 95;
+  static constexpr auto Seq1Eobject2Useitemok = 96;
+  static constexpr auto Seq2Actor0 = 4;
 
-  public:
-    SubFst033() : Sapphire::ScriptAPI::QuestScript( 65663 ){}; 
-    ~SubFst033() = default; 
+public:
+  SubFst033() : Sapphire::ScriptAPI::QuestScript( 65663 ){};
+  ~SubFst033() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    quest.setBitFlag8( 0, 0 );
-    quest.setBitFlag8( 1, 0 );
-    quest.setBitFlag8( 2, 0 );
-    quest.setUI8AH( 0 );
-    quest.setUI8AL( 0 );
-    quest.setUI8BH( 0 );
-    quest.setUI8BL( 0 );
-    quest.setUI8CH( 0 );
-    quest.setUI8CL( 0 );
-    quest.setUI8DH( 0 );
-    quest.setUI8DL( 1 );
-
-    Scene00000( quest, player );
-
     switch( actorId )
     {
       case Actor0:
       {
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+        else if( quest.getSeq() == SeqFinish )
+          Scene00004( quest, player );
+        break;
+      }
+      case Eobject0:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00001( quest, player );
+        break;
+      }
+      case Eobject1:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00002( quest, player );
+        break;
+      }
+      case Eobject2:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00003( quest, player );
         break;
       }
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
+  void onEventItem(World::Quest& quest, Entity::Player& player, uint64_t actorId) override {
+    if( quest.getSeq() != Seq1 ) return;
 
-  }
-
-  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
-  {
-    switch( bnpc.getLayoutId() )
+    switch( actorId )
     {
-      case Enemy0: { break; }
-      case Enemy1: { break; }
-      case Enemy2: { break; }
+      case Eobject0:
+      {
+        Scene00100( quest, player );
+        break;
+      }
+      case Eobject1:
+      {
+        Scene00098( quest, player );
+        break;
+      }
+      case Eobject2:
+      {
+        Scene00096( quest, player );
+        break;
+      }
     }
   }
 
-  private:
+  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
+  {
+    switch( bnpc.getLayoutId() )
+    {
+      case Enemy0:
+      {
+        quest.setUI8AH( quest.getUI8AH() + 1 );
+        quest.setUI8AL( 1 );
+        checkQuestCompletion( quest, player );
+        break;
+      }
+      case Enemy1:
+      {
+        quest.setUI8AH( quest.getUI8AH() + 1 );
+        quest.setUI8BL( 1 );
+        checkQuestCompletion( quest, player );
+        break;
+      }
+      case Enemy2:
+      {
+        quest.setUI8AH( quest.getUI8AH() + 1 );
+        quest.setUI8CL( 1 );
+        checkQuestCompletion( quest, player );
+        break;
+      }
+    }
+  }
+
+  void onPlayerDeath(World::Quest& quest, Sapphire::Entity::Player& player) override
+  {
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+
+    auto enem0 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy0, player.getId() );
+    auto enem1 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy1, player.getId() );
+    auto enem2 = instance->getActiveBNpcByLayoutIdAndTriggerOwner( Enemy2, player.getId() );
+
+    if (enem0 != nullptr)
+    {
+      instance->removeActor( enem0 );
+      quest.setBitFlag8( 1, false );
+    }
+    if( enem1 != nullptr )
+    {
+      instance->removeActor( enem1 );
+      quest.setBitFlag8( 2, false );
+    }
+    if( enem2 != nullptr )
+    {
+      instance->removeActor( enem2 );
+      quest.setBitFlag8( 3, false );
+    }
+  }
+
+private:
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AH(), 3 );//TODO: Probably needs item icon
+
+    if( quest.getUI8AH() >= 3 )
+    {
+      quest.setSeq( SeqFinish );
+      quest.setUI8AH( 0 );
+      quest.setUI8AL( 0 );
+      quest.setUI8BH( 0 );
+      quest.setUI8BL( 0 );
+      quest.setUI8CH( 0 );
+      quest.setUI8CL( 0 );
+      quest.setUI8DH( 0 );
+      quest.setBitFlag8( 1, false );
+      quest.setBitFlag8( 2, false );
+      quest.setBitFlag8( 3, false );
+    }
+  }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
@@ -121,8 +212,11 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    if( result.getResult( 0 ) == 1 )// accept quest
+    {
+      quest.setUI8DL( 1 );
+      quest.setSeq( Seq1 );
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -134,8 +228,6 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -147,8 +239,6 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -160,8 +250,6 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -174,7 +262,10 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
+    if( result.getResult( 0 ) == 1 )
+    {
+      player.finishQuest( getId(), result.getResult(1) );
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -186,8 +277,6 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00095Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -199,8 +288,11 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00096Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy2, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
 
-
+    quest.setBitFlag8( 3, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -212,8 +304,6 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00097Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -225,8 +315,11 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00098Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy1, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
 
-
+    quest.setBitFlag8( 2, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -238,8 +331,6 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -251,10 +342,12 @@ class SubFst033 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+    auto enemy = instance->createBNpcFromLayoutId( Enemy0, 1220 /*Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    enemy->hateListAddDelayed( player.getAsPlayer(), 1 );
 
-
+    quest.setBitFlag8( 1, true );
   }
-
 };
 
 EXPOSE_SCRIPT( SubFst033 );
