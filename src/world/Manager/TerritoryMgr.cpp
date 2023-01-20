@@ -788,7 +788,14 @@ void Sapphire::World::Manager::TerritoryMgr::createAndJoinQuestBattle( Entity::P
 {
   auto qb = createQuestBattle( questBattleId );
   if( !qb )
-    return;
+  {
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto instanceInfo = exdData.get< Sapphire::Data::InstanceContent >( questBattleId );
+    if( !instanceInfo )
+      return;
+    qb = createInstanceContent( instanceInfo->order );
+    qb->getAsInstanceContent()->bindPlayer( player.getId() );
+  }
 
   player.setInstance( qb );
 
