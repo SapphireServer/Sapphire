@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <cstring>
 
 struct PCB_HEADER
 {
