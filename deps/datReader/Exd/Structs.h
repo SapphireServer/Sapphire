@@ -1131,9 +1131,6 @@ namespace Excel
   struct Mount
   {
     MountTextStruct Text;
-    Excel::StringOffset CallSE;
-    Excel::StringOffset CallFalseSE;
-    Excel::StringOffset ExitSE;
     float Slowdown;
     float MoveAccel_Run;
     float MoveAccel_Walk;
@@ -1159,7 +1156,7 @@ namespace Excel
     uint8_t RadiusRate;
     uint8_t unknown3[3];
     int8_t MountOrder;
-    uint8_t unknown4 : 4;
+    uint8_t unknown4 : 5;
   };
 
   /* 201019 */
