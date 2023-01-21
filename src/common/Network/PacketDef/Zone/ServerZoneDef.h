@@ -76,7 +76,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t HierarchyStatus;
     uint8_t HierarchyType;
     uint8_t HierarchyGroup;
-    uint8_t HierarchyUnk;
+    uint8_t IsDeleted;
     uint16_t TerritoryType;
     uint8_t GrandCompanyID;
     uint8_t Region;
@@ -114,14 +114,16 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint64_t SelectClassID;
     uint64_t CrestID;
     uint8_t ListType;
+
     char SearchComment[193];
     char FreeCompanyName[23];
     uint8_t GrandCompanyRank[3];
+
     struct ClassJobEntry
     {
       uint16_t id;
       uint16_t level;
-    } ClassData[Common::CLASSJOB_TOTAL];
+    } ClassData[34]; // ClassJob::MAX
   };
 
   struct FFXIVIpcPcSearchResult : FFXIVIpcBasePacket< PcSearchResult >

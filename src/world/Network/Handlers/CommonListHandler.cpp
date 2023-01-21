@@ -44,8 +44,8 @@ void Sapphire::Network::GameConnection::getCommonlistDetailHandler( const Packet
   resultPacket->data().ListType = data.ListType;
   resultPacket->data().CommunityID = data.CommunityID;
   resultPacket->data().DetailCharacterID = data.DetailCharacterID;
-  strcpy( resultPacket->data().FreeCompanyName, "ducks" ); // didn't work
-
+  strcpy( resultPacket->data().FreeCompanyName, "Awooga" );
+  
   resultPacket->data().GrandCompanyRank[ 0 ] = pPlayer->getGcRankArray()[0];
   resultPacket->data().GrandCompanyRank[ 1 ] = pPlayer->getGcRankArray()[1];
   resultPacket->data().GrandCompanyRank[ 2 ] = pPlayer->getGcRankArray()[2];
@@ -54,13 +54,11 @@ void Sapphire::Network::GameConnection::getCommonlistDetailHandler( const Packet
   resultPacket->data().SelectClassID = pPlayer->getSearchSelectClass(); // this is probably unused in retail
 
   // serialize class data to packet
-
-  auto classDataArr = pPlayer->getClassArray();
-
-  for( size_t i = 0; i < Common::CLASSJOB_TOTAL; ++i )
+  auto classArrayLen = sizeof( resultPacket->data().ClassData ) / sizeof( resultPacket->data().ClassData[ 0 ] ); 
+  for( size_t i = 1; i < classArrayLen; ++i )
   {
-    resultPacket->data().ClassData[ i ].id = static_cast< uint16_t >( i );
-    resultPacket->data().ClassData[ i ].level = classDataArr[ i ];
+    resultPacket->data().ClassData[ i-1 ].id = static_cast< uint16_t >( i );
+    resultPacket->data().ClassData[ i-1 ].level = static_cast< uint16_t >( pPlayer->getLevelForClass( static_cast< Common::ClassJob >( i ) ) );
   }
 
   queueOutPacket( resultPacket );
@@ -115,6 +113,8 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
         // user language settings flag J = 1, E = 2, D = 4, F = 8
         entry.SelectRegion = pPlayer->getSearchSelectRegion();
         entry.OnlineStatus = pPlayer->getOnlineStatusMask() | pPlayer->getOnlineStatusCustomMask();
+
+        strcpy( entry.FcTag, "Awoo" );
       }
 
       entry.CharacterID = pPlayer->getCharacterId();
@@ -128,7 +128,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
         entry.HierarchyStatus = hierarchy.data.status;
         entry.HierarchyType = hierarchy.data.type;
         entry.HierarchyGroup = hierarchy.data.group;
-        entry.HierarchyUnk = hierarchy.data.unavailable;
+        entry.IsDeleted = hierarchy.data.unavailable;
       }
 
       entries.emplace_back( entry );
@@ -157,6 +157,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
     offset = 0;
     isLast = true;
 
+    
     if( player.getPartyId() != 0 )
     {
       auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
@@ -164,8 +165,18 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       auto pParty = partyMgr.getParty( player.getPartyId() );
       assert( pParty );
       
-      page = generateEntries( pParty->MemberId, offset, {} );
+      std::vector< Common::HierarchyData > hierarchyData;
 
+      for( const auto& id : pParty->MemberId )
+      {
+        Common::HierarchyData hierarchy{};
+        if( pParty->LeaderId == id )
+          hierarchy.data.status = Hierarchy::MASTER;
+
+        hierarchyData.emplace_back( hierarchy );
+      }
+
+      page = generateEntries( pParty->MemberId, offset, hierarchyData );
       // ensure first entry is the player requesting packet
       for( int i = 0; i < 8; ++i )
       {
@@ -175,7 +186,6 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
           break;
         }
       }
-
     }
     else
     {
