@@ -46,7 +46,7 @@ void Sapphire::World::ContentFinder::update()
         break;
       case MatchingComplete:
       {
-        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getContentId() );
+        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getContentFinderId() );
         for( auto& queuedPlayer : content->m_players )
         {
           uint32_t inProgress = 0; // 0x01 - in progress
@@ -72,8 +72,8 @@ void Sapphire::World::ContentFinder::update()
       {
         auto& terriMgr = Service< TerritoryMgr >::ref();
         auto& warpMgr = Common::Service< WarpMgr >::ref();
-        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getContentId() );
-        if( auto instance = terriMgr.createInstanceContent( content->getContentId() ) )
+        auto contentFinderInfo = exdData.getRow< Excel::ContentFinderCondition >( content->getContentFinderId() );
+        if( auto instance = terriMgr.createInstanceContent( content->getContentFinderId() ) )
         {
           auto pInstanceContent = instance->getAsInstanceContent();
 
@@ -85,10 +85,9 @@ void Sapphire::World::ContentFinder::update()
 
             pInstanceContent->bindPlayer( queuedPlayer->getEntityId() );
             warpMgr.requestMoveTerritory( *server.getPlayer( queuedPlayer->getEntityId() ), WarpType::WARP_TYPE_INSTANCE_CONTENT, pInstanceContent->getGuId(), { 0.f, 0.f, 0.f }, 0.f );
-          
-            auto zonePacket = makeUpdateContent( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
-                                                 0, pInstanceContent->getGuId() );
-            auto zonePacket2 = makeUpdateContent( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType, content->m_partyMemberCount );
+
+            auto zonePacket = makeUpdateContent( queuedPlayer->getEntityId(), instance->getTerritoryTypeId(), 0, pInstanceContent->getGuId() );
+            auto zonePacket2 = makeUpdateContent( queuedPlayer->getEntityId(), instance->getTerritoryTypeId(), content->m_partyMemberCount );
             server.queueForPlayer( queuedPlayer->getCharacterId(), zonePacket );
             server.queueForPlayer( queuedPlayer->getCharacterId(), zonePacket2 );
           }
@@ -130,12 +129,12 @@ void Sapphire::World::ContentFinder::registerContentRequest( Sapphire::Entity::P
 void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Entity::Player &player, uint32_t randomContentTypeId )
 {
   auto& exdData = Service< Data::ExdData >::ref();
-  auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
+  auto contentListIds = exdData.getIdList< Excel::ContentFinderCondition >();
   std::vector< uint32_t > idList;
 
   for( auto id : contentListIds )
   {
-    auto instanceContent = exdData.getRow< Excel::InstanceContent >( id );
+    auto instanceContent = exdData.getRow< Excel::ContentFinderCondition >( id );
     if( instanceContent->data().RandomContentType == randomContentTypeId )
     {
       if( instanceContent->data().LevelMin <= player.getLevel() )
@@ -154,7 +153,7 @@ void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entit
   auto queuedContent = m_queuedContent[ m_queuedPlayer[ player.getId() ]->getActiveRegisterId() ];
 
   auto& exdData = Service< Data::ExdData >::ref();
-  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentId() );
+  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentFinderId() );
 
   // Undersized
   if( flags & 0x01 )
@@ -287,18 +286,18 @@ uint32_t Sapphire::World::ContentFinder::getNextRegisterId()
   return ++m_nextRegisterId;
 }
 
-Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFinder::getMatchingContentList( Sapphire::Entity::Player &player, uint32_t contentId )
+Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFinder::getMatchingContentList( Sapphire::Entity::Player &player, uint32_t contentFinderId )
 {
   QueuedContentPtrList outVec;
   for( auto& it : m_queuedContent )
   {
     auto& foundContent = it.second;
-    uint32_t leftContentId = foundContent->getContentId();
-    if( leftContentId != contentId )
+    uint32_t leftContentId = foundContent->getContentFinderId();
+    if( leftContentId != contentFinderId )
       continue;
 
     auto& exdData = Common::Service< Data::ExdData >::ref();
-    auto content = exdData.getRow< Excel::InstanceContent >( contentId );
+    auto content = exdData.getRow< Excel::ContentFinderCondition >( contentFinderId );
     if( !content )
       continue;
 
@@ -309,34 +308,38 @@ Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFin
     if( foundContent->getState() != QueuedContentState::MatchingInProgress )
       continue;
 
+    auto contentMember = exdData.getRow< Excel::ContentMemberType >( content->data().ContentMemberType );
+    if( !contentMember )
+      continue;
+
     // skip if the party is already full
-    if( foundContent->m_partyMemberCount >= content->data().PartyMemberCount )
+    if( foundContent->m_partyMemberCount >= contentMember->data().PartyMemberCount )
       continue;
 
     switch( player.getRole() )
     {
       case Role::Tank:
       {
-        if( content->data().TankCount <= foundContent->m_tankCount )
+        if( contentMember->data().TankCount <= foundContent->m_tankCount )
           continue;
         break;
       }
       case Role::Healer:
       {
-        if( content->data().HealerCount <= foundContent->m_healerCount )
+        if( contentMember->data().HealerCount <= foundContent->m_healerCount )
           continue;
         break;
       }
       case Role::RangedPhysical:
       case Role::RangedMagical:
       {
-        if( content->data().RangeCount <= foundContent->m_rangeCount )
+        if( contentMember->data().RangeCount <= foundContent->m_rangeCount )
           continue;
         break;
       }
       case Role::Melee:
       {
-        if( content->data().AttackerCount <= foundContent->m_attackerCount )
+        if( contentMember->data().AttackerCount <= foundContent->m_attackerCount )
           continue;
         break;
       }
@@ -351,7 +354,7 @@ Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFin
 
   if( outVec.empty() )
   {
-    auto queuedContent = std::make_shared< QueuedContent >( getNextRegisterId(), contentId );
+    auto queuedContent = std::make_shared< QueuedContent >( getNextRegisterId(), contentFinderId );
     outVec.push_back( queuedContent );
   }
   return outVec;
@@ -365,7 +368,7 @@ void Sapphire::World::ContentFinder::accept( Entity::Player& player )
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
   auto queuedContent = m_queuedContent[ queuedPlayer->getActiveRegisterId() ];
 
-  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentId() );
+  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentFinderId() );
 
   // Something has gone quite wrong..
   if( queuedContent->getState() != WaitingForAccept )
@@ -387,7 +390,7 @@ void Sapphire::World::ContentFinder::accept( Entity::Player& player )
   }
 
   Logger::info( "[{2}][ContentFinder] Content accepted, contentId#{0} registerId#{1}",
-                queuedContent->getContentId(), queuedContent->getRegisterId(), player.getId() );
+                queuedContent->getContentFinderId(), queuedContent->getRegisterId(), player.getId() );
 
   auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 4, queuedContent->m_dpsAccepted,
                                                    queuedContent->m_healerAccepted, queuedContent->m_tankAccepted, 0x01 );
@@ -410,7 +413,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
   auto& exdData = Service< Data::ExdData >::ref();
 
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
-  auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentId() );
+  auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentFinderId() );
 
   // remove the player from the global CF list
   m_queuedPlayer.erase( player.getId() );
@@ -426,7 +429,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
     if( content.second->withdrawPlayer( queuedPlayer ) )
     {
       Logger::info( "[{2}] Content withdrawn, contentId#{0} registerId#{1}",
-                    content.second->getContentId(), content.second->getRegisterId(), player.getId() );
+                    content.second->getContentFinderId(), content.second->getRegisterId(), player.getId() );
       updateRegisterIdSet.insert( content.second->getRegisterId() );
     }
   }
@@ -439,7 +442,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
     if( updateRegisterIdSet.count( regId ) == 0 )
       continue;
 
-    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( content.second->getContentId() );
+    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( content.second->getContentFinderId() );
     auto& playerList = content.second->m_players;
     for( const auto& pPlayer : playerList )
     {
@@ -477,9 +480,9 @@ bool Sapphire::World::ContentFinder::removeContentByRegisterId( uint32_t registe
 
 //////////////////////////////////////////////////////////////////////
 
-uint32_t Sapphire::World::QueuedContent::getContentId() const
+uint32_t Sapphire::World::QueuedContent::getContentFinderId() const
 {
-  return m_contentId;
+  return m_contentFinderId;
 }
 
 uint32_t Sapphire::World::QueuedContent::getRegisterId() const
@@ -488,13 +491,13 @@ uint32_t Sapphire::World::QueuedContent::getRegisterId() const
 }
 
 Sapphire::World::QueuedContent::QueuedContent( uint32_t registerId, uint32_t contentId ) :
-  m_registerId( registerId ),
-  m_contentId( contentId ),
-  m_state( QueuedContentState::MatchingInProgress ),
-  m_contentPopTime( 0 )
+        m_registerId( registerId ),
+        m_contentFinderId( contentId ),
+        m_state( QueuedContentState::MatchingInProgress ),
+        m_contentPopTime( 0 )
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto content = exdData.getRow< Excel::InstanceContent >( contentId );
+ // auto& exdData = Common::Service< Data::ExdData >::ref();
+ // auto content = exdData.getRow< Excel::InstanceContent >( contentId );
 
 
 }

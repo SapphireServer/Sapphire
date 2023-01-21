@@ -343,30 +343,37 @@ TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questBattleId )
   return nullptr;
 }
 
-TerritoryPtr TerritoryMgr::createInstanceContent( uint32_t instanceContentId )
+TerritoryPtr TerritoryMgr::createInstanceContent( uint32_t contentFinderId )
 {
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto pInstanceContent = exdData.getRow< Excel::InstanceContent >( instanceContentId );
-  if( !pInstanceContent || !isInstanceContentTerritory( pInstanceContent->data().TerritoryType ) )
+  auto pContentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( contentFinderId );
+  if( !pContentFinderCondition )
+    return nullptr;
+
+  auto pInstanceContent = exdData.getRow< Excel::InstanceContent >( pContentFinderCondition->data().InstanceContentId );
+  if( !pInstanceContent )
     return nullptr;
 
   auto& instanceContentData = pInstanceContent->data();
 
+  if( !isInstanceContentTerritory( instanceContentData.TerritoryType ) )
+    return nullptr;
+
   auto pTeri = getTerritoryDetail( instanceContentData.TerritoryType );
 
-  auto name = pInstanceContent->getString( instanceContentData.Text.Name );
+  auto name = pContentFinderCondition->getString( instanceContentData.Text.Name );
 
   if( !pTeri || name.empty() )
     return nullptr;
 
-  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, name );
+  Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", contentFinderId, name );
 
-  auto pZone = make_InstanceContent( pInstanceContent, instanceContentData.TerritoryType, getNextInstanceId(), " ", name, instanceContentId );
+  auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition, instanceContentData.TerritoryType, getNextInstanceId(), " ", name, contentFinderId );
   pZone->init();
 
-  m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
+  m_instanceContentIdToInstanceMap[ contentFinderId ][ pZone->getGuId() ] = pZone;
   m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
 

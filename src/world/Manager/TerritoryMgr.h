@@ -108,7 +108,7 @@ namespace Sapphire::World::Manager
     /*! creates a new instance for a given territoryTypeId */
     TerritoryPtr createTerritoryInstance( uint32_t territoryTypeId );
 
-    TerritoryPtr createInstanceContent( uint32_t instanceContentId );
+    TerritoryPtr createInstanceContent( uint32_t contentFinderId );
 
     TerritoryPtr createQuestBattle( uint32_t contentFinderConditionId );
 

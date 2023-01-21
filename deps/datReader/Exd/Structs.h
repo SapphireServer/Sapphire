@@ -159,9 +159,15 @@ namespace Excel
   {
     uint32_t BeginnerBonusGil;
     uint32_t BeginnerBonusExp;
+    uint32_t Unknown;
+    uint32_t Unknown1;
+    uint32_t Unknown2;
+    uint32_t Unknown3;
+    uint32_t Unknown4;
+    uint32_t Unknown5;
     uint32_t TotalExp;
     uint32_t TotalGil;
-    uint32_t Unknown;
+    uint32_t Unknown6;
     uint16_t BeginnerBonusA;
     uint16_t ClearA;
     uint16_t ClearB;
@@ -172,9 +178,9 @@ namespace Excel
   struct InstanceContent
   {
     InstanceContentTextStruct Text;
+    InstanceContentTextStruct Text1;
     InstanceContentRewardStruct Reward;
     uint8_t Unknown1;
-    uint32_t Unknown2[6];
     uint32_t StartCutscene;
     uint32_t EntranceRect;
     uint32_t TerritoryType;
@@ -188,24 +194,30 @@ namespace Excel
     uint16_t Time;
     uint16_t Music;
     uint16_t ClearMusic;
+    uint16_t ItemLevelMax;
     uint16_t Sortkey;
-    uint8_t Unknown4;
+    int16_t Unknown6;
     uint8_t Type;
-    uint8_t RandomContentType;
-    uint8_t RewardType;
-    uint8_t FinderPartyCondition;
-    uint8_t LevelMin;
+    uint8_t UnknownType;
     uint8_t LevelMax;
-    uint8_t PartyMemberCount;
-    uint8_t PartyCount;
-    uint8_t TankCount;
-    uint8_t HealerCount;
-    uint8_t AttackerCount;
-    uint8_t RangeCount;
+    uint8_t Unknown7;
+    uint8_t Unknown8;
+  };
+
+  struct ContentFinderCondition
+  {
+    uint16_t InstanceContentId;
     uint8_t ItemLevel;
-    uint8_t ItemLevelMax;
-    uint8_t ProgressMax;
-    int8_t TreasureObtainedFlag;
+    uint8_t Unknown;
+    uint8_t RandomContentType;
+    uint8_t FinderPartyCondition;
+    uint8_t RewardType;
+    uint8_t ContentMemberType;
+
+    uint8_t Unknown1;
+    uint8_t Unknown2;
+    uint8_t LevelMin;
+    uint8_t Unknown3;
     uint8_t padding1 : 2;
     uint8_t DisableHalfwayProgress : 1;
     uint8_t Halfway : 1;
@@ -213,7 +225,42 @@ namespace Excel
     uint8_t DifferentiateDPS : 1;
     uint8_t Alliance : 1;
     uint8_t FreeRole : 1;
-    uint8_t Unknown5;
+    uint8_t Unknown6;
+    uint8_t Unknown7 : 1;
+    uint8_t Unknown8 : 1;
+    uint8_t Unknown9 : 1;
+    uint8_t Unknown10 : 1;
+    uint8_t Unknown11 : 1;
+    uint8_t Unknown12 : 1;
+    uint8_t Unknown13 : 1;
+    uint8_t Unknown14 : 1;
+    uint8_t Unknown15 : 1;
+    uint8_t Unknown16 : 1;
+    uint8_t Unknown17 : 1;
+    uint8_t Unknown18 : 1;
+    uint8_t Unknown19 : 1;
+    uint8_t Unknown20 : 1;
+    uint8_t Unknown21 : 1;
+    uint8_t Unknown22 : 1;
+
+
+  };
+
+  struct ContentMemberType
+  {
+    uint8_t Unknown;
+    uint8_t Unknown1;
+    uint8_t PartyCount;
+    uint8_t PartyMemberCount;
+    uint8_t Unknown2;
+    uint8_t TankCount;
+    uint8_t HealerCount;
+    uint8_t AttackerCount;
+    uint8_t RangeCount;
+    uint8_t Unknown3 : 1;
+    uint8_t Unknown4 : 1;
+    uint8_t Unknown5 : 1;
+    uint8_t padding : 5;
   };
 
   /* 63505 */

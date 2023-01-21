@@ -67,7 +67,7 @@ namespace Sapphire::World
     QueuedContent( uint32_t registerId, uint32_t contentId );
     ~QueuedContent() = default;
     uint32_t getRegisterId() const;
-    uint32_t getContentId() const;
+    uint32_t getContentFinderId() const;
     uint8_t getRoleCount( Sapphire::Common::Role role ) const;
     void queuePlayer( const std::shared_ptr< QueuedPlayer >& pQPlayer );
     bool withdrawPlayer( const std::shared_ptr< QueuedPlayer >& pQPlayer );
@@ -77,7 +77,7 @@ namespace Sapphire::World
 
   private:
     uint32_t m_registerId;
-    uint32_t m_contentId;
+    uint32_t m_contentFinderId;
 
     uint32_t m_contentPopTime;
 

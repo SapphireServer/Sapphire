@@ -36,6 +36,7 @@ using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
 Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > pInstanceConfiguration,
+                                            std::shared_ptr< Excel::ExcelStruct< Excel::ContentFinderCondition > > pContentFinderCondition,
                                             uint16_t territoryType,
                                             uint32_t guId,
                                             const std::string& internalName,
@@ -44,6 +45,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Excel::ExcelStruct<
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::InstanceContent, instanceContentId ),
   m_instanceConfiguration( pInstanceConfiguration ),
+  m_contentFinderCondition( pContentFinderCondition ),
   m_instanceContentId( instanceContentId ),
   m_state( Created ),
   m_pEntranceEObj( nullptr ),
@@ -628,7 +630,10 @@ uint32_t Sapphire::InstanceContent::getOptionFlags()
 {
   uint32_t bitFlag = 0;
 
-  if( m_instanceConfiguration->data().PartyMemberCount == 1 )
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto contentInfo = exdData.getRow< Excel::ContentMemberType >( m_contentFinderCondition->data().ContentMemberType );
+
+  if( contentInfo->data().PartyMemberCount == 1 )
     bitFlag |= 1;
 
   if( getVoteState() )
