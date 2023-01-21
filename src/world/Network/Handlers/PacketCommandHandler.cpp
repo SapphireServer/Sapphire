@@ -574,9 +574,6 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::POSE_EMOTE_CANCEL: // cancel pose
     {
-      player.setPose( static_cast< uint8_t >( param12 ) );
-      auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
-      player.sendToInRangeSet( pSetStatusPacket, true );
       break;
     }
     case PacketCommand::REVIVE: // return dead / accept raise
