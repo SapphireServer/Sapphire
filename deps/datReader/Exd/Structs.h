@@ -207,7 +207,7 @@ namespace Excel
   struct ContentFinderCondition
   {
     uint16_t InstanceContentId;
-    uint8_t ItemLevel;
+    uint16_t ItemLevel;
     uint8_t Unknown;
     uint8_t RandomContentType;
     uint8_t FinderPartyCondition;
@@ -242,6 +242,13 @@ namespace Excel
     uint8_t Unknown20 : 1;
     uint8_t Unknown21 : 1;
     uint8_t Unknown22 : 1;
+    uint8_t Unknown23;
+    uint8_t Unknown24;
+    uint8_t Unknown25;
+    uint8_t Unknown26;
+    uint8_t Unknown27;
+    uint8_t Unknown28;
+
 
 
   };
@@ -261,6 +268,8 @@ namespace Excel
     uint8_t Unknown4 : 1;
     uint8_t Unknown5 : 1;
     uint8_t padding : 5;
+    uint8_t Unknown6;
+    uint8_t Unknown7;
   };
 
   /* 63505 */

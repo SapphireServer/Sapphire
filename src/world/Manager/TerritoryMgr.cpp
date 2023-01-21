@@ -363,7 +363,7 @@ TerritoryPtr TerritoryMgr::createInstanceContent( uint32_t contentFinderId )
 
   auto pTeri = getTerritoryDetail( instanceContentData.TerritoryType );
 
-  auto name = pContentFinderCondition->getString( instanceContentData.Text.Name );
+  auto name = pInstanceContent->getString( instanceContentData.Text.Name );
 
   if( !pTeri || name.empty() )
     return nullptr;
