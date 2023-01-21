@@ -216,7 +216,8 @@ namespace Sapphire::Network::Packets
       CancelLogoutCountdown = 0x264,
       FateDebugCommand = 0x265,
       ContentAction = 0x266,
-      RequestPenalties = 0x267,
+      //RequestPenalties = 0x267,
+      RequestPenalties = 0x2CB,
       Logout = 0x269,
 
       HousingHouseName = 0x026A,

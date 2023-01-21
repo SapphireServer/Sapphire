@@ -153,7 +153,11 @@ void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entit
   auto queuedContent = m_queuedContent[ m_queuedPlayer[ player.getId() ]->getActiveRegisterId() ];
 
   auto& exdData = Service< Data::ExdData >::ref();
-  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentFinderId() );
+  auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( queuedContent->getContentFinderId() );
+  if( !contentFinderCondition )
+    return;
+
+  auto content = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
 
   // Undersized
   if( flags & 0x01 )
@@ -368,7 +372,11 @@ void Sapphire::World::ContentFinder::accept( Entity::Player& player )
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
   auto queuedContent = m_queuedContent[ queuedPlayer->getActiveRegisterId() ];
 
-  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getContentFinderId() );
+  auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( queuedContent->getContentFinderId() );
+  if( !contentFinderCondition )
+    return;
+
+  auto content = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
 
   // Something has gone quite wrong..
   if( queuedContent->getState() != WaitingForAccept )
@@ -413,7 +421,12 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
   auto& exdData = Service< Data::ExdData >::ref();
 
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
-  auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentFinderId() );
+
+  auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentFinderId() );
+  if( !contentFinderCondition )
+    return;
+
+  auto contentInfo = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
 
   // remove the player from the global CF list
   m_queuedPlayer.erase( player.getId() );
@@ -442,7 +455,12 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
     if( updateRegisterIdSet.count( regId ) == 0 )
       continue;
 
-    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( content.second->getContentFinderId() );
+    auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( content.second->getContentFinderId() );
+    if( !contentFinderCondition )
+      return;
+
+    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
+
     auto& playerList = content.second->m_players;
     for( const auto& pPlayer : playerList )
     {
