@@ -665,21 +665,20 @@ namespace Excel
   {
     EmoteTextStruct Text;
     uint32_t Unknown;
-    int32_t TimelineID;
-    int32_t TimelineID_Begin;
-    int32_t TimelineID_End;
-    int32_t TimelineID_GroundSitting;
-    int32_t TimelineID_ChairSitting;
-    int32_t TimelineID_Mounting;
-    int32_t TimelineID_Lying;
-    int32_t TimelineID_Adjust;
     int32_t TextCommand;
+    uint16_t TimelineID;
+    uint16_t TimelineID_Begin;
+    uint16_t TimelineID_End;
+    uint16_t TimelineID_GroundSitting;
+    uint16_t TimelineID_ChairSitting;
+    uint16_t TimelineID_Mounting;
+    uint16_t TimelineID_Lying;
+    uint16_t Unknown1A;
     uint16_t Icon;
     uint16_t Log;
     uint16_t LogSelf;
     uint8_t Category;
     uint8_t Mode;
-    uint8_t UI_Priority;
     uint8_t Reward;
     uint8_t IsLoopEmote : 1;
     uint8_t IsPoseEmote : 1;
@@ -689,7 +688,6 @@ namespace Excel
     uint8_t IsFacial : 1;
     uint8_t IsRotate : 1;
     uint8_t IsEndEmoteMode : 1;
-    int8_t padding0[1];
   };
 
   /* 195171 */
@@ -1180,9 +1178,6 @@ namespace Excel
   struct Mount
   {
     MountTextStruct Text;
-    Excel::StringOffset CallSE;
-    Excel::StringOffset CallFalseSE;
-    Excel::StringOffset ExitSE;
     float Slowdown;
     float MoveAccel_Run;
     float MoveAccel_Walk;
@@ -1208,7 +1203,7 @@ namespace Excel
     uint8_t RadiusRate;
     uint8_t unknown3[3];
     int8_t MountOrder;
-    uint8_t unknown4 : 4;
+    uint8_t unknown4 : 5;
   };
 
   /* 201019 */
@@ -3502,6 +3497,7 @@ namespace Excel
   struct CustomTalkTextStruct
   {
     Excel::StringOffset Name;
+    Excel::StringOffset NpcUnk;
   };
 
   /* 362364 */
@@ -3510,6 +3506,7 @@ namespace Excel
     CustomTalkDefineStruct Define[30];
     CustomTalkTextStruct Text;
     Excel::StringOffset Script;
+    uint32_t UnknownFC;
     uint32_t MapIcon;
     uint8_t padding0 : 1;
     uint8_t ListenHousing : 1;
@@ -3519,7 +3516,7 @@ namespace Excel
     uint8_t ConditionCallback : 1;
     uint8_t AcceptCallback : 1;
     uint8_t ClientEvent : 1;
-    int8_t padding1[3];
+    uint8_t Unknown105: 1;
   };
 
   /* 362365 */
