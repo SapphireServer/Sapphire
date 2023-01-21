@@ -3453,6 +3453,7 @@ namespace Excel
   struct CustomTalkTextStruct
   {
     Excel::StringOffset Name;
+    Excel::StringOffset NpcUnk;
   };
 
   /* 362364 */
@@ -3461,6 +3462,7 @@ namespace Excel
     CustomTalkDefineStruct Define[30];
     CustomTalkTextStruct Text;
     Excel::StringOffset Script;
+    uint32_t UnknownFC;
     uint32_t MapIcon;
     uint8_t padding0 : 1;
     uint8_t ListenHousing : 1;
@@ -3470,7 +3472,7 @@ namespace Excel
     uint8_t ConditionCallback : 1;
     uint8_t AcceptCallback : 1;
     uint8_t ClientEvent : 1;
-    int8_t padding1[3];
+    uint8_t Unknown105: 1;
   };
 
   /* 362365 */
