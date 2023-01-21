@@ -20,12 +20,42 @@ namespace Sapphire::World::Manager
 
     bool cacheAchievements();
 
+    /// <summary>
+    /// progress an achievement by its given properties
+    /// each type has a specific logic for progress, attention should be given to the type being passed
+    /// optional parameter for overriding the amount to increment a given progress by
+    /// 
+    /// example usage for Achievement::Type::General:
+    ///
+    /// To Crush Your Enemies I
+    /// Defeat 100 enemies.
+    ///
+    /// type (col[7]): 1 -> Common::Achievement::Type::General
+    /// subtype (col[8]): 11 -> Common::Achievement::GeneralSubtype::EnemyDefeatCount
+    ///
+    /// progressAchievementByType< Common::Achievement::Type::General >( player, GeneralSubtype::EnemyDefeatCount );
+    ///
+    /// example usage for Achievement::Type::ClassJob:
+    ///
+    /// progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+    /// 
+    /// </summary>
+    /// <typeparam name="AchievementType"></typeparam>
+    /// <param name="player"></param>
+    /// <param name="argument"></param>
+    /// <param name="progressCount"></param>
     template < auto AchievementType >
     void progressAchievementByType( Entity::Player& player, int32_t argument, uint32_t progressCount = 1 )
     {
       progressAchievement< decltype( AchievementType ), AchievementType >( player, argument, progressCount );
     }
 
+    /// <summary>
+    /// check if player has an achievement by its given id
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="achievementId"></param>
+    /// <returns>true/false</returns>
     bool hasAchievementUnlocked( Entity::Player& player, uint32_t achievementId );
 
     void unlockAchievement( Entity::Player& player, uint32_t achievementId );
@@ -50,8 +80,19 @@ namespace Sapphire::World::Manager
     const std::vector< uint32_t >& getAchievementIdByType( Common::Achievement::Type type ) const;
     const std::vector< uint32_t >& getAchievementIdByType( uint32_t type ) const;
 
+    /// <summary>
+    /// get a key for merged achievements (type:subtype) that have progress data
+    /// </summary>
+    /// <param name="achvType"></param>
+    /// <param name="argument"></param>
+    /// <returns>data key for given type:subtype</returns>
     Common::AchievementDataKey getKeyFromType( Common::Achievement::Type achvType, int32_t argument );
 
+    /// <summary>
+    /// parse and unlock achievements linked to a given achievement Id
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="achievementId"></param>
     void handleLinkedAchievementsForId( Entity::Player& player, uint32_t achievementId );
 
     template< typename AchievementTypeT, AchievementTypeT achievementType >
@@ -90,7 +131,7 @@ namespace Sapphire::World::Manager
   }
 
   template<>
-  inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::Classjob >( Entity::Player& player, int32_t classJob, uint32_t level )
+  inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::Classjob >( Entity::Player& player, int32_t classJob, uint32_t unused )
   {
     auto& achvDataList = player.getAchievementDataList();
 
@@ -98,6 +139,8 @@ namespace Sapphire::World::Manager
 
     if( !achvDataList.count( dataKey.u32 ) )
       achvDataList[ dataKey.u32 ] = 0;
+
+    auto level = player.getLevelForClass( static_cast< Common::ClassJob >( classJob ) );
 
     achvDataList[ dataKey.u32 ] = level;
 
