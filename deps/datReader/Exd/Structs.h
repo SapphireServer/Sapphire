@@ -618,21 +618,20 @@ namespace Excel
   {
     EmoteTextStruct Text;
     uint32_t Unknown;
-    int32_t TimelineID;
-    int32_t TimelineID_Begin;
-    int32_t TimelineID_End;
-    int32_t TimelineID_GroundSitting;
-    int32_t TimelineID_ChairSitting;
-    int32_t TimelineID_Mounting;
-    int32_t TimelineID_Lying;
-    int32_t TimelineID_Adjust;
     int32_t TextCommand;
+    uint16_t TimelineID;
+    uint16_t TimelineID_Begin;
+    uint16_t TimelineID_End;
+    uint16_t TimelineID_GroundSitting;
+    uint16_t TimelineID_ChairSitting;
+    uint16_t TimelineID_Mounting;
+    uint16_t TimelineID_Lying;
+    uint16_t Unknown1A;
     uint16_t Icon;
     uint16_t Log;
     uint16_t LogSelf;
     uint8_t Category;
     uint8_t Mode;
-    uint8_t UI_Priority;
     uint8_t Reward;
     uint8_t IsLoopEmote : 1;
     uint8_t IsPoseEmote : 1;
@@ -642,7 +641,6 @@ namespace Excel
     uint8_t IsFacial : 1;
     uint8_t IsRotate : 1;
     uint8_t IsEndEmoteMode : 1;
-    int8_t padding0[1];
   };
 
   /* 195171 */
