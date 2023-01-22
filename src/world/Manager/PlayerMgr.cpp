@@ -215,11 +215,11 @@ void PlayerMgr::onChangeGear( Entity::Player& player )
 void PlayerMgr::onGcUpdate( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto gcAffPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
-  gcAffPacket->data().gcId = player.getGc();
-  gcAffPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
-  gcAffPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
-  gcAffPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
+  auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
+  gcAffPacket->data().ActiveCompanyId = player.getGc();
+  gcAffPacket->data().MaelstromRank = player.getGcRankArray()[ 0 ];
+  gcAffPacket->data().TwinAdderRank = player.getGcRankArray()[ 1 ];
+  gcAffPacket->data().ImmortalFlamesRank = player.getGcRankArray()[ 2 ];
   server.queueForPlayer( player.getCharacterId(), gcAffPacket );
 }
 

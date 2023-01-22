@@ -520,12 +520,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     char shortMessage[104];
   };
 
-  struct FFXIVGCAffiliation : FFXIVIpcBasePacket< GCAffiliation >
-  {
-    uint8_t gcId;
-    uint8_t gcRank[3];
-  };
-
   /**
   * Structural representation of the packet sent by the server
   * add a status effect
@@ -2339,5 +2333,13 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
   struct FFXIVIpcPartyPos : FFXIVIpcBasePacket< PartyPos >
   {
     ZoneProtoDownMemberPos Member[8];
+  };
+
+  struct FFXIVIpcGrandCompany : FFXIVIpcBasePacket< GrandCompany >
+  {
+    uint8_t ActiveCompanyId;
+    uint8_t MaelstromRank;
+    uint8_t TwinAdderRank;
+    uint8_t ImmortalFlamesRank;
   };
 }

@@ -391,16 +391,18 @@ void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PAC
 
 void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   if( player.isLogin() )
   {
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
+    playerMgr.onGcUpdate( player );
   }
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+
 
 /*  // TODO: load and save this data instead of hardcoding
   auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );

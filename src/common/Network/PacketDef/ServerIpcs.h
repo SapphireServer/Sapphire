@@ -141,6 +141,8 @@ namespace Sapphire::Network::Packets
     PartyPos = 0x14C,
     AlliancePos = 0x14D,
 
+    GrandCompany = 0x14F,
+
     Create = 0x0190,
     Delete = 0x0191,
     ActorMove = 0x0192,
