@@ -1938,23 +1938,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t penalties[2];
   };
 
-
-
-
-
-  struct FFXIVIpcCFMemberStatus : FFXIVIpcBasePacket< CFMemberStatus >
-  {
-    uint16_t contentId;
-    uint16_t unknown1;
-    uint8_t status;
-    uint8_t currentTank;
-    uint8_t currentDps;
-    uint8_t currentHealer;
-    uint8_t estimatedTime;
-    uint8_t unknown2[3];
-    uint32_t unknown3;
-  };
-
   /**
   * Structural representation of the packet sent by the server
   * to set the gear show/hide status of a character

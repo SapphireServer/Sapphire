@@ -46,7 +46,7 @@ void Sapphire::World::ContentFinder::update()
         break;
       case MatchingComplete:
       {
-        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getContentFinderId() );
+        auto contentInfo = exdData.getRow< Excel::InstanceContent >( content->getInstanceId() );
         for( auto& queuedPlayer : content->m_players )
         {
           uint32_t inProgress = 0; // 0x01 - in progress
@@ -72,8 +72,8 @@ void Sapphire::World::ContentFinder::update()
       {
         auto& terriMgr = Service< TerritoryMgr >::ref();
         auto& warpMgr = Common::Service< WarpMgr >::ref();
-        auto contentFinderInfo = exdData.getRow< Excel::ContentFinderCondition >( content->getContentFinderId() );
-        if( auto instance = terriMgr.createInstanceContent( content->getContentFinderId() ) )
+        auto contentFinderInfo = exdData.getRow< Excel::ContentFinderCondition >( content->getInstanceId() );
+        if( auto instance = terriMgr.createInstanceContent( content->getInstanceId() ) )
         {
           auto pInstanceContent = instance->getAsInstanceContent();
 
@@ -138,7 +138,7 @@ void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Ent
     if( instanceContent->data().RandomContentType == randomContentTypeId )
     {
       if( instanceContent->data().LevelMin <= player.getLevel() )
-        idList.push_back( id );
+        idList.push_back( instanceContent->data().InstanceContentId );
     }
   }
 
@@ -153,11 +153,8 @@ void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entit
   auto queuedContent = m_queuedContent[ m_queuedPlayer[ player.getId() ]->getActiveRegisterId() ];
 
   auto& exdData = Service< Data::ExdData >::ref();
-  auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( queuedContent->getContentFinderId() );
-  if( !contentFinderCondition )
-    return;
 
-  auto content = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
+  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getInstanceId() );
 
   // Undersized
   if( flags & 0x01 )
@@ -296,7 +293,7 @@ Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFin
   for( auto& it : m_queuedContent )
   {
     auto& foundContent = it.second;
-    uint32_t leftContentId = foundContent->getContentFinderId();
+    uint32_t leftContentId = foundContent->getInstanceId();
     if( leftContentId != contentFinderId )
       continue;
 
@@ -372,11 +369,7 @@ void Sapphire::World::ContentFinder::accept( Entity::Player& player )
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
   auto queuedContent = m_queuedContent[ queuedPlayer->getActiveRegisterId() ];
 
-  auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( queuedContent->getContentFinderId() );
-  if( !contentFinderCondition )
-    return;
-
-  auto content = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
+  auto content = exdData.getRow< Excel::InstanceContent >( queuedContent->getInstanceId() );
 
   // Something has gone quite wrong..
   if( queuedContent->getState() != WaitingForAccept )
@@ -398,7 +391,7 @@ void Sapphire::World::ContentFinder::accept( Entity::Player& player )
   }
 
   Logger::info( "[{2}][ContentFinder] Content accepted, contentId#{0} registerId#{1}",
-                queuedContent->getContentFinderId(), queuedContent->getRegisterId(), player.getId() );
+                queuedContent->getInstanceId(), queuedContent->getRegisterId(), player.getId() );
 
   auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 4, queuedContent->m_dpsAccepted,
                                                    queuedContent->m_healerAccepted, queuedContent->m_tankAccepted, 0x01 );
@@ -422,11 +415,14 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
 
   auto queuedPlayer = m_queuedPlayer[ player.getId() ];
 
-  auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getContentFinderId() );
-  if( !contentFinderCondition )
+  auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getInstanceId() );
+  if( !contentInfo )
+  {
+    Logger::error( "[{2}] Content withdraw failed, contentId#{0} registerId#{1}",
+                   m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getInstanceId(),
+                   m_queuedContent[ queuedPlayer->getActiveRegisterId() ]->getRegisterId(), player.getId() );
     return;
-
-  auto contentInfo = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
+  }
 
   // remove the player from the global CF list
   m_queuedPlayer.erase( player.getId() );
@@ -442,7 +438,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
     if( content.second->withdrawPlayer( queuedPlayer ) )
     {
       Logger::info( "[{2}] Content withdrawn, contentId#{0} registerId#{1}",
-                    content.second->getContentFinderId(), content.second->getRegisterId(), player.getId() );
+                    content.second->getInstanceId(), content.second->getRegisterId(), player.getId() );
       updateRegisterIdSet.insert( content.second->getRegisterId() );
     }
   }
@@ -455,11 +451,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
     if( updateRegisterIdSet.count( regId ) == 0 )
       continue;
 
-    auto contentFinderCondition = exdData.getRow< Excel::ContentFinderCondition >( content.second->getContentFinderId() );
-    if( !contentFinderCondition )
-      return;
-
-    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( contentFinderCondition->data().InstanceContentId );
+    auto queuedContentInfo = exdData.getRow< Excel::InstanceContent >( content.second->getInstanceId() );
 
     auto& playerList = content.second->m_players;
     for( const auto& pPlayer : playerList )
@@ -498,7 +490,7 @@ bool Sapphire::World::ContentFinder::removeContentByRegisterId( uint32_t registe
 
 //////////////////////////////////////////////////////////////////////
 
-uint32_t Sapphire::World::QueuedContent::getContentFinderId() const
+uint32_t Sapphire::World::QueuedContent::getInstanceId() const
 {
   return m_contentFinderId;
 }
