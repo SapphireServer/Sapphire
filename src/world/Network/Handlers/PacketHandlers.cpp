@@ -402,16 +402,6 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
-
-
-/*  // TODO: load and save this data instead of hardcoding
-  auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
-  gcPacket->data().gcId = player.getGc();
-  gcPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
-  gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
-  gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
-  player.queuePacket( gcPacket );*/
-
   pCurrentZone->onFinishLoading( player );
 
   // player is done zoning
