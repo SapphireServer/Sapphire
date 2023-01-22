@@ -354,7 +354,7 @@ namespace Sapphire::Network::Packets
     HousingGetHouseBuddyStableListResult = 0x308,
     HouseTrainBuddyData = 0x309,
 
-    ContentBonus = 0x30C,
+    ContentBonus = 0x311,
 
     FcChestLog = 0x316,
     SalvageResult = 0x317,

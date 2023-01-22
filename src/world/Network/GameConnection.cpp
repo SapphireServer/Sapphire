@@ -130,6 +130,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( YieldEventSceneIntAndString, "YieldEventSceneIntAndString", &GameConnection::yieldEventSceneIntAndString );
 
   setZoneHandler( RequestPenalties, "RequestPenalties", &GameConnection::cfRequestPenalties );
+  setZoneHandler( RequestBonus, "RequestBonus", &GameConnection::requestBonus );
   setZoneHandler( FindContent, "FindContent", &GameConnection::findContent );
   setZoneHandler( Find5Contents, "Find5Contents", &GameConnection::find5Contents );
   setZoneHandler( FindContentAsRandom, "FindContentAsRandom", &GameConnection::findContentAsRandom );

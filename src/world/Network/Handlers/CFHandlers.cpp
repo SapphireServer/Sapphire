@@ -35,7 +35,10 @@ void Sapphire::Network::GameConnection::cfRequestPenalties( const Packets::FFXIV
   }
   dutyInfoPacket->data().penalties[ 0 ] = static_cast< uint8_t >( penaltyMinutes ); //TODO: What is the second array for?
   queueOutPacket( dutyInfoPacket );
+}
 
+void Sapphire::Network::GameConnection::requestBonus( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
   auto inNeedsPacket = makeZonePacket< Server::FFXIVIpcContentBonus >( player.getId() );
   queueOutPacket( inNeedsPacket );
 }

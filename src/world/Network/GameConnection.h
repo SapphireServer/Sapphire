@@ -181,6 +181,7 @@ namespace Sapphire::Network
     DECLARE_HANDLER( logoutHandler );
 
     DECLARE_HANDLER( cfRequestPenalties );
+    DECLARE_HANDLER( requestBonus );
 
     DECLARE_HANDLER( findContent );
     DECLARE_HANDLER( find5Contents );

@@ -1866,7 +1866,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   */
   struct FFXIVIpcUpdateContent : FFXIVIpcBasePacket< UpdateContent >
   {
-    uint32_t territoryType;
+    uint16_t territoryType;
+    uint16_t padding;
     uint32_t kind;
     uint32_t value1;
     uint32_t value2;
@@ -1874,22 +1875,32 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
   struct FFXIVIpcUpdateFindContent : FFXIVIpcBasePacket< UpdateFindContent >
   {
-    uint32_t territoryType;
     uint32_t kind;
     uint32_t value1;
     uint32_t value2;
     uint32_t value3;
     uint32_t value4;
+    uint16_t Unknown;
+    uint16_t territoryType;
+    uint16_t Unknown1;
+    uint16_t Unknown2;
+    uint16_t Unknown3;
+    uint16_t Unknown4;
   };
 
   struct FFXIVIpcNotifyFindContentStatus : FFXIVIpcBasePacket< NotifyFindContentStatus >
   {
-    uint32_t territoryType;
+    uint16_t territoryType;
+    uint16_t padding;
     uint8_t status;
     uint8_t tankRoleCount;
     uint8_t dpsRoleCount;
     uint8_t healerRoleCount;
     uint8_t matchingTime;
+    uint8_t unknown;
+    uint8_t unknown1;
+    uint8_t unknown2;
+    uint8_t unknown3;
   };
 
   /**
