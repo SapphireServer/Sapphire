@@ -1700,7 +1700,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   struct FFXIVIpcQuestCompleteList : FFXIVIpcBasePacket< QuestCompleteFlags >
   {
     uint8_t questCompleteMask[310];
-    uint8_t unknownCompleteMask[40];
+    uint8_t unknownCompleteMask[32];
   };
 
   /**

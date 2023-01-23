@@ -147,25 +147,33 @@ bool Sapphire::HousingZone::init()
   return true;
 }
 
+bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
+{
+  return player.getPos().x < -15000.0f; //ToDo: get correct pos
+}
+
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   Logger::debug( "HousingZone::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
+  auto isInSubdivision = isPlayerSubInstance( player );
 
   uint32_t yardPacketNum;
+  uint32_t yardPacketTotal = 8;
 
   sendLandSet( player );
 
-  for( yardPacketNum = 1; yardPacketNum > 2; yardPacketNum++ )
+  for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
     auto housingObjectInit = makeZonePacket< FFXIVIpcYardObjectList >( player.getId() );
     housingObjectInit->data().PacketIndex = yardPacketNum;
-
     auto yardObjectSize = sizeof( Common::Furniture );
+    housingObjectInit->data().PacketIndex = yardPacketNum;
+    housingObjectInit->data().PacketEnd = yardPacketTotal;
 
-    auto& objects = m_yardObjects[ 0 ];
+    auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
 
     memcpy( &housingObjectInit->data().YardObjects, &objects + ( yardPacketNum * 400 ), yardObjectSize * 400 );
 
