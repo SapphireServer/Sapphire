@@ -37,6 +37,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
       m_data.Hp = player.getHp();
       m_data.Mp = player.getMp();
+      m_data.Tp = player.getTp();
       m_data.HpMax = player.getMaxHp();
       m_data.MpMax = player.getMaxMp();
 
@@ -83,6 +84,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Mount.Id = player.getCurrentMount();
 
       m_data.OnlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
+      m_data.PermissionInvisibility = 0;
+
+      m_data.GrandCompany = player.getGc();
+      m_data.GrandCompanyRank = player.getGcRankArray()[ player.getGc() - 1 ];
 
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;
@@ -102,25 +107,26 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       }
       // 0x20 == spawn hidden to be displayed by the spawneffect control
       m_data.ActiveType = player.getStance();
+      m_data.Flag = 0;
 
       if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() )
       {
-        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
+        m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }
 
       if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideHead )
       {
-        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
+        m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
       }
 
       if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon )
       {
-        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
+        m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
       }
 
       if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::Visor )
       {
-        m_data.ActiveType |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
+        m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
       }
 
       if( !( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideLegacyMark ) )
