@@ -74,7 +74,7 @@ bool AchievementMgr::hasAchievementUnlocked( Entity::Player& player, uint32_t ac
 {
   uint16_t index;
   uint8_t value;
-  Common::Util::valueToFlagByteIndexValue( static_cast< uint16_t >( achievementId ), value, index );
+  Common::Util::valueToFlagByteIndexValue( achievementId, value, index );
 
   return ( player.getAchievementList()[ index ] & value ) != 0;
 }
@@ -138,9 +138,6 @@ void AchievementMgr::handleLinkedAchievementsForId( Entity::Player& player, uint
       bool hasAllAchievements = true;
       for( const auto linkedAchvId : linkedAchv )
       {
-        if( linkedAchvId == 0 )
-          continue;
-
         if( !hasAchievementUnlocked( player, linkedAchvId ) )
         {
           hasAllAchievements = false;

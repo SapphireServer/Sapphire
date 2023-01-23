@@ -119,4 +119,83 @@ namespace Sapphire::World::Manager
       
     }
   }
+
+  template<>
+  inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::Quest >( Entity::Player& player, int32_t questId, uint32_t unused )
+  {
+    auto& achvDataList = player.getAchievementDataList();
+
+    // get achievements that need all achv in args completed
+    const auto questAchvAllList = getAchievementIdByType( Common::Achievement::Type::Quest );
+    // get achievements that need any of the achvs in args completed
+    const auto questAchvAnyList = getAchievementIdByType( Common::Achievement::Type::QuestAny );
+
+    // handle achv type for all quests in args completed
+    for( auto achvId : questAchvAllList )
+    {
+      if( hasAchievementUnlocked( player, achvId ) )
+        continue;
+
+      auto pAchv = getAchievementDetail( achvId );
+
+      auto achvExdData = pAchv->data();
+
+      std::set< uint16_t > linkedQuests{ std::make_move_iterator( std::begin( achvExdData.ConditionArg ) ),
+                                      std::make_move_iterator( std::end( achvExdData.ConditionArg ) ) };
+
+      // clear empty achievement links
+      linkedQuests.erase( 0 );
+
+      // check if passed quest ID is tied to this achievement
+      if( !linkedQuests.count( questId ) )
+        continue;
+
+      // verify if player has all the required quests completed
+      bool hasAllAchievements = true;
+      for( const auto questId : linkedQuests )
+      {
+        if( !player.isQuestCompleted( questId ) )
+        {
+          hasAllAchievements = false;
+          break;
+        }
+      }
+
+      // unlock achievement if all required quests are completed
+      if( hasAllAchievements )
+        unlockAchievement( player, achvId );
+    }
+
+    // handle achv type for all quests in args completed
+    for( auto achvId : questAchvAnyList )
+    {
+      if( hasAchievementUnlocked( player, achvId ) )
+        continue;
+
+      auto pAchv = getAchievementDetail( achvId );
+
+      auto achvExdData = pAchv->data();
+
+      std::set< int32_t > linkedQuests{ std::make_move_iterator( std::begin( achvExdData.ConditionArg ) ),
+                                      std::make_move_iterator( std::end( achvExdData.ConditionArg ) ) };
+
+      // clear empty quest ids
+      linkedQuests.erase( 0 );
+
+      // check if passed quest ID is tied to this achievement
+      if( !linkedQuests.count( questId ) )
+        continue;
+
+      // verify if player has any of the required quests completed
+      bool hasAllAchievements = true;
+      for( const auto questId : linkedQuests )
+      {
+        if( player.isQuestCompleted( questId ) )
+        {
+          unlockAchievement( player, achvId );
+          break;
+        }
+      }
+    }
+  }
 }
