@@ -107,7 +107,7 @@ Player::Player() :
   for( auto& i : m_charaLandData )
   {
     memset( &i, 0xFF, 8 );
-    memset( &i.flags, 0, 8 );
+    memset( &i.landFlags, 0, 8 );
   }
 
   m_objSpawnIndexAllocator.init( MAX_DISPLAYED_EOBJS );
@@ -1729,15 +1729,15 @@ void Player::setLandFlags( uint8_t flagSlot, uint32_t landFlags, Common::LandIde
 
   m_charaLandData[ flagSlot ].landId = ident;
   m_charaLandData[ flagSlot ].landId.worldId = server.getWorldId();
-  m_charaLandData[ flagSlot ].flags = landFlags;
+  m_charaLandData[ flagSlot ].landFlags = landFlags;
 }
 
 void Player::sendLandFlags()
 {
   auto landFlags = makeZonePacket< FFXIVIpcCharaHousing >( getId() );
 
-  landFlags->data().FcLands[ 0 ] = m_charaLandData[ Common::LandFlagsSlot::FreeCompany ];
-  landFlags->data().CharaLands[ 0 ] = m_charaLandData[ Common::LandFlagsSlot::Private ];
+  landFlags->data().FcLands = m_charaLandData[ Common::LandFlagsSlot::FreeCompany ];
+  landFlags->data().CharaLands = m_charaLandData[ Common::LandFlagsSlot::Private ];
 
   queuePacket( landFlags );
 }

@@ -17,6 +17,10 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 namespace Sapphire
 {
   class InstanceObjectCache;
+  namespace World
+  {
+    class WorldServer;
+  }
 }
 
 namespace Sapphire::Data
@@ -30,6 +34,17 @@ namespace Sapphire::World::Manager
   class LinkshellMgr;
   class WarpMgr;
   class RNGMgr;
+  class HousingMgr;
+}
+
+extern "C" EXPORT void win32initServerMgr( std::shared_ptr< Sapphire::World::WorldServer > rngMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::WorldServer >::set( rngMgr );
+}
+
+extern "C" EXPORT void win32initHouMgr( std::shared_ptr< Sapphire::World::Manager::HousingMgr > rngMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::HousingMgr >::set( rngMgr );
 }
 
 extern "C" EXPORT void win32initRngMgr( std::shared_ptr< Sapphire::World::Manager::RNGMgr > rngMgr )

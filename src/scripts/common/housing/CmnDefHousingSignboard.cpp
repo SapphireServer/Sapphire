@@ -29,7 +29,7 @@ public:
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
       // Purchase Land
-      if( result.getResult( 0 ) == 1 )
+      if( result.getResult( 0 ) == 2 )
       {
         auto activeLand = player.getActiveLand();
         auto territoryId = player.getTerritoryId();

@@ -125,6 +125,8 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using win32initFuncWarpMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::WarpMgr > );
   using win32initIObjectCache = void(*)( std::shared_ptr< Sapphire::InstanceObjectCache > );
   using win32initRngMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::RNGMgr > );
+  using win32initHouMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::HousingMgr > );
+  using win32initServerMgr = void(*)( std::shared_ptr< Sapphire::World::WorldServer > );
 
   auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
   auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
@@ -132,6 +134,30 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   auto win32initWarp = reinterpret_cast< win32initFuncWarpMgr >( GetProcAddress( handle, "win32initWarpMgr" ) );
   auto win32initIObject = reinterpret_cast< win32initIObjectCache >( GetProcAddress( handle, "win32initIObjectCache" ) );
   auto win32initRng = reinterpret_cast< win32initRngMgr >( GetProcAddress( handle, "win32initRngMgr" ) );
+  auto win32initHou = reinterpret_cast< win32initHouMgr >( GetProcAddress( handle, "win32initHouMgr" ) );
+  auto win32initServer = reinterpret_cast< win32initServerMgr >( GetProcAddress( handle, "win32initServerMgr" ) );
+
+  if( win32initServer )
+  {
+    auto ioCache = Common::Service< Sapphire::World::WorldServer >::get();
+    auto ptr = ioCache.lock();
+    win32initServer( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initServer export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initHou )
+  {
+    auto ioCache = Common::Service< Sapphire::World::Manager::HousingMgr >::get();
+    auto ptr = ioCache.lock();
+    win32initHou( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initHou export on a windows script target - the server will likely crash!" );
+  }
 
   if( win32initRng )
   {

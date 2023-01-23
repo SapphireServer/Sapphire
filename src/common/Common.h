@@ -1591,9 +1591,12 @@ namespace Sapphire::Common
     uint8_t status;
     uint8_t flags;
     uint8_t __padding1;
-    uint64_t fcCrestId;
-    uint8_t patternIds[9];
-    uint8_t colors[9];
+    uint32_t fcCrestId;
+    uint32_t fcCrestId1;
+    uint8_t unknown1[4];
+    uint8_t patternIds[8];
+    uint8_t colors[8];
+    uint8_t unknown2[8];
   };
 
   struct Furniture
@@ -1608,7 +1611,8 @@ namespace Sapphire::Common
   struct CharaLandData
   {
     LandIdent landId;
-    uint8_t flags;
+    uint32_t landFlags;
+    uint32_t unkown1;
   };
 
   struct SimpleProfile

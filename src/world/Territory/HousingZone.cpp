@@ -191,7 +191,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
   landsetInitializePacket->data().LandSetId.territoryTypeId = m_territoryTypeId;
   //TODO: get current WorldId
   landsetInitializePacket->data().LandSetId.worldId = server.getWorldId();
-
+  landsetInitializePacket->data().Subdivision = 1;
   for( uint8_t i = 0, count = 0; i < 30; ++i, ++count )
   {
     auto pLand = getLand( i );

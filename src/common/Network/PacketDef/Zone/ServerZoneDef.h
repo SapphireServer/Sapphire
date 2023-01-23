@@ -1970,6 +1970,8 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
   struct FFXIVIpcHouseList : FFXIVIpcBasePacket< HouseList >
   {
     Common::LandIdent LandSetId;
+    uint32_t Subdivision;
+    uint32_t unknown1;
     Common::House Houses[30];
   };
 
@@ -2052,11 +2054,11 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
 
   struct FFXIVIpcCharaHousing : FFXIVIpcBasePacket< CharaHousing >
   {
-    Common::CharaLandData FcLands[1];
-    uint8_t __padding1;
-    uint8_t __padding2;
-    uint8_t __padding3;
-    Common::CharaLandData CharaLands[1];
+    Common::CharaLandData FcLands;
+    Common::CharaLandData CharaLands;
+    Common::CharaLandData apartment;
+    Common::CharaLandData sharedHouse[2];
+    Common::CharaLandData unknownHouse;
   };
 
   struct FFXIVIpcHousingWelcome : FFXIVIpcBasePacket< HousingWelcome >
