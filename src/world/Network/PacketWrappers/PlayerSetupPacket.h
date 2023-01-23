@@ -58,6 +58,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
     //  memcpy( m_data.orchestrionMask, player.getOrchestrionBitmask(), sizeof( m_data.orchestrionMask ) );
 
+      memcpy( m_data.Companion, player.getMinionGuideBitmask().data(), sizeof( m_data.Companion ) );
+
       memcpy( m_data.MountList, player.getMountGuideBitmask().data(), sizeof( m_data.MountList ) );
 
       memcpy( m_data.Reward, player.getUnlockBitmask().data(), sizeof( m_data.Reward ) );

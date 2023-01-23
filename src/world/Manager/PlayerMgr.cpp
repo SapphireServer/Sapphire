@@ -223,6 +223,11 @@ void PlayerMgr::onGcUpdate( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), gcAffPacket );
 }
 
+void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
+{
+  player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::ToggleCompanion, companionId ), true );
+}
+
 void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
 {
   if( mountId != 0 )

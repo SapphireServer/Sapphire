@@ -129,6 +129,9 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
   auto titleList = res->getBlobVector( "TitleList" );
   memcpy( reinterpret_cast< char* >( m_titleList.data() ), titleList.data(), titleList.size() );
 
+  auto minionGuide = res->getBlobVector( "Minions" );
+  memcpy( reinterpret_cast< char* >( m_minionGuide.data() ), minionGuide.data(), minionGuide.size() );
+
   auto mountGuide = res->getBlobVector( "Mounts" );
   memcpy( reinterpret_cast< char* >( m_mountGuide.data() ), mountGuide.data(), mountGuide.size() );
 
@@ -384,8 +387,8 @@ void Sapphire::Entity::Player::updateDbChara() const
   memcpy( howToVec.data(), m_howTo.data(), m_howTo.size() );
   stmt->setBinary( 40, howToVec );
 
-  std::vector< uint8_t > minionsVec( sizeof( m_minions ) );
-  memcpy( minionsVec.data(), m_minions.data(), m_minions.size() );
+  std::vector< uint8_t > minionsVec( sizeof( m_minionGuide ) );
+  memcpy( minionsVec.data(), m_minionGuide.data(), m_minionGuide.size() );
   stmt->setBinary( 41, minionsVec );
 
   std::vector< uint8_t > mountsVec( sizeof( m_mountGuide ) );

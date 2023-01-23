@@ -465,6 +465,11 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.setCompanion( static_cast< uint8_t >( param1 ) );
       break;
     }
+    case PacketCommand::COMPANION_CANCEL:
+    {
+      player.setCompanion( 0 );
+      break;
+    }
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)
     {
       // todo: check if status can be removed by client from exd

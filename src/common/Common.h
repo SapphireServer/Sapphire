@@ -922,6 +922,7 @@ namespace Sapphire::Common
   {
     KeyItemAction = 1,
     ItemActionVFX = 852,
+    ItemActionCompanion = 853,
     ItemActionVFX2 = 944,
     ItemActionMount = 1322,
   };

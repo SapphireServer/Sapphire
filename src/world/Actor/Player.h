@@ -459,6 +459,12 @@ namespace Sapphire::Entity
     /*! unlock a mount */
     void unlockMount( uint32_t mountId );
 
+    /*! unlock a companion */
+    void unlockCompanion( uint32_t companionId );
+
+    /*! return a const pointer to the minion guide bitmask array */
+    MinionList& getMinionGuideBitmask();
+
     /*! return a const pointer to the setMount guide bitmask array */
     MountList& getMountGuideBitmask();
 
@@ -873,7 +879,7 @@ namespace Sapphire::Entity
     uint16_t m_activeTitle{};
     TitleList m_titleList{};
     HowToList m_howTo{};
-    MinionList m_minions{};
+    MinionList m_minionGuide{};
     MountList m_mountGuide{};
     QuestComplete m_questCompleteFlags{};
     Discovery m_discovery{};

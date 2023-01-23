@@ -27,6 +27,8 @@ namespace Sapphire::World::Action
   private:
     void handleVFXItem();
 
+    void handleCompanionItem();
+
     void handleMountItem();
 
   private:
