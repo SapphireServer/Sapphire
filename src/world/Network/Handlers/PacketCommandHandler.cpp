@@ -594,7 +594,6 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       auto& warpMgr = Service< WarpMgr >::ref();
       warpMgr.finishWarp( player );
       player.setLoadingComplete( true );
-      Service< World::Manager::PlayerMgr >::ref().onEquipDisplayFlagsChanged( player );
       if( player.isLogin() )
         player.setIsLogin( false );
       break;
