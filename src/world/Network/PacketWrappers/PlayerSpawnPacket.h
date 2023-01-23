@@ -87,7 +87,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.PermissionInvisibility = 0;
 
       m_data.GrandCompany = player.getGc();
-      m_data.GrandCompanyRank = player.getGcRankArray()[ player.getGc() - 1 ];
+      if( m_data.GrandCompany > 0 )
+        m_data.GrandCompanyRank = player.getGcRankArray()[ player.getGc() - 1 ];
 
       //m_data.u23 = 0x04;
       //m_data.u24 = 256;

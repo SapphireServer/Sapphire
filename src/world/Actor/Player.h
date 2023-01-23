@@ -31,7 +31,7 @@ namespace Sapphire::Entity
     using HowToList = std::array< uint8_t, 34 >;
     using MinionList = std::array< uint8_t, 40 >;
     using MountList = std::array< uint8_t, 22 >;
-    using QuestComplete = std::array< uint8_t, 350 >;
+    using QuestComplete = std::array< uint8_t, 342 >;
     using Discovery = std::array< uint8_t, 400 >;
     using AetheryteList = std::array< uint8_t, 21 >;
     using UnlockList = std::array< uint8_t, 64 >;
