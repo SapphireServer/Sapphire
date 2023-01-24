@@ -2024,6 +2024,7 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint32_t Like;
     uint8_t Welcome;
     uint8_t Size;
+    uint8_t Padding;
     char Name[23];
     char Greeting[193];
     char OwnerName[31];
@@ -2058,7 +2059,6 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     Common::CharaLandData CharaLands;
     Common::CharaLandData apartment;
     Common::CharaLandData sharedHouse[2];
-    Common::CharaLandData unknownHouse;
   };
 
   struct FFXIVIpcHousingWelcome : FFXIVIpcBasePacket< HousingWelcome >

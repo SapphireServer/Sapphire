@@ -1621,7 +1621,8 @@ namespace Sapphire::Common
   {
     uint32_t price;
     uint8_t status;
-    uint8_t fcTag[7];
+    uint8_t name[32];
+    uint8_t padding[3];
   };
 
   struct HousingLayout
