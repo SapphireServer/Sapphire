@@ -81,6 +81,8 @@ void WarpMgr::finishWarp( Entity::Player& player )
   auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, 0, 0, 0 );
   auto SetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
+  player.setZoningType( Common::ZoneingType::None );
+
   if( !player.getGmInvis() )
     player.sendToInRangeSet( zoneInPacket );
 
