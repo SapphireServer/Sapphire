@@ -85,6 +85,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
       m_data.OnlineStatus = static_cast< uint8_t >( player.getOnlineStatus() );
       m_data.PermissionInvisibility = 0;
+      m_data.PermissionInvisibility1 = 0;
 
       m_data.GrandCompany = player.getGc();
       if( m_data.GrandCompany > 0 )

@@ -722,8 +722,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint16_t MpMax;
     uint16_t NormalAI;
     uint8_t OnlineStatus;
-    uint8_t __padding1;
     uint8_t PermissionInvisibility;
+    uint8_t PermissionInvisibility1; // makes player invisible too
     uint8_t FirstAttackType;
     uint64_t FirstAttackId;
     uint8_t LinkReply;
@@ -733,10 +733,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t LinkFamily;
     uint8_t LinkParent;
     uint8_t PoseEmote;
-    uint8_t __padding2;
+    uint8_t __padding1;
     uint16_t Flag;
+    uint8_t __padding2;
     uint8_t __padding3;
-    uint8_t __padding4;
     Common::StatusWork Status[30];
     MountStruct Mount;
     uint8_t Name[32];
@@ -744,7 +744,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t Equipment[10];
     float Pos[3];
     uint8_t FreeCompanyTag[6];
-    uint8_t PartsState[4];
+    uint8_t PartsState[3];
     uint8_t State[3];
   };
 
