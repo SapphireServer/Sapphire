@@ -189,9 +189,10 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
   landsetInitializePacket->data().LandSetId.wardNum = m_wardNum;
   landsetInitializePacket->data().LandSetId.landId = m_landSetId;
   landsetInitializePacket->data().LandSetId.territoryTypeId = m_territoryTypeId;
-  //TODO: get current WorldId
   landsetInitializePacket->data().LandSetId.worldId = server.getWorldId();
-  landsetInitializePacket->data().Subdivision = 1;
+
+  auto isInSubdivision = isPlayerSubInstance( player );
+  landsetInitializePacket->data().Subdivision = isInSubdivision ? 2 : 1;
   for( uint8_t i = 0, count = 0; i < 30; ++i, ++count )
   {
     auto pLand = getLand( i );
@@ -202,6 +203,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
     landData.size = pLand->getSize();
     landData.status = pLand->getStatus();
     landData.flags = pLand->getSharing();
+    landData.fcCrestId = 1;
     /* //disbaled until we managed fc's
     landData.fcCrestId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();

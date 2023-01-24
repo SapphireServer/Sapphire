@@ -1593,9 +1593,9 @@ namespace Sapphire::Common
     uint8_t status;
     uint8_t flags;
     uint8_t __padding1;
+    uint8_t unknown1[4];
     uint32_t fcCrestId;
     uint32_t fcCrestId1;
-    uint8_t unknown1[4];
     uint8_t patternIds[8];
     uint8_t colors[8];
     uint8_t unknown2[8];
