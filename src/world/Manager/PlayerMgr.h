@@ -44,6 +44,8 @@ class PlayerMgr
 
     void onGcUpdate( Sapphire::Entity::Player& player );
 
+    void onCompanionUpdate( Entity::Player& player, uint8_t companionId );
+
     void onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId );
 
     void onMobKill( Sapphire::Entity::Player& player, Sapphire::Entity::BNpc& bnpc );

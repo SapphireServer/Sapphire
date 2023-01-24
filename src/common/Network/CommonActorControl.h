@@ -148,6 +148,8 @@ namespace Sapphire::Network::ActorControl
 
     Emote = 0x122,
     EmoteInterrupt = 0x123,
+    EmoteModeInterrupt = 0x124,
+    EmoteModeInterruptNonImmediate = 0x125,
 
     SetPose = 0x127,
 

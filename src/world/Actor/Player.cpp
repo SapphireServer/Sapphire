@@ -1125,6 +1125,28 @@ void Player::unlockMount( uint32_t mountId )
   queuePacket( makeActorControlSelf( getId(), Network::ActorControl::SetMountBitmask, mount->data().MountOrder, 1 ) );
 }
 
+void Player::unlockCompanion( uint32_t companionId )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto companion = exdData.getRow< Excel::Companion >( companionId );
+
+  //if( companion->data(). == -1 )
+  //  return;
+  
+  uint16_t index;
+  uint8_t value;
+  Util::valueToFlagByteIndexValue( companionId, value, index );
+
+  m_minionGuide[ index ] |= value;
+
+  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::LearnCompanion, companionId, 1 ) );
+}
+
+Player::MinionList& Player::getMinionGuideBitmask()
+{
+  return m_minionGuide;
+}
+
 Player::MountList& Player::getMountGuideBitmask()
 {
   return m_mountGuide;
@@ -1369,7 +1391,8 @@ void Player::setCompanion( uint8_t id )
     return;
 
   m_companionId = id;
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleCompanion, id ), true );
+
+  Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( *this, m_companionId );
 }
 
 uint8_t Player::getCurrentCompanion() const

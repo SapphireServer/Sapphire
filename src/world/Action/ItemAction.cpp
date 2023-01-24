@@ -58,6 +58,13 @@ void ItemAction::execute()
 
       break;
     }
+
+    case Common::ItemActionType::ItemActionCompanion:
+    {
+      handleCompanionItem();
+
+      break;
+    }
   }
 }
 
@@ -79,6 +86,15 @@ void ItemAction::handleVFXItem()
   effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
 
   m_pSource->sendToInRangeSet( effectPacket, true );
+}
+
+void ItemAction::handleCompanionItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+
+  Logger::debug( "Companion arg: {0}", m_itemAction->data().Calcu0Arg[ 0 ] );
+
+  player->unlockCompanion( m_itemAction->data().Calcu0Arg[ 0 ] );
 }
 
 void ItemAction::handleMountItem()

@@ -32,7 +32,7 @@ namespace Sapphire::Entity
     using HowToList = std::array< uint8_t, 34 >;
     using MinionList = std::array< uint8_t, 40 >;
     using MountList = std::array< uint8_t, 22 >;
-    using QuestComplete = std::array< uint8_t, 350 >;
+    using QuestComplete = std::array< uint8_t, 342 >;
     using Discovery = std::array< uint8_t, 400 >;
     using AetheryteList = std::array< uint8_t, 21 >;
     using UnlockList = std::array< uint8_t, 64 >;
@@ -463,6 +463,12 @@ namespace Sapphire::Entity
     /*! unlock a mount */
     void unlockMount( uint32_t mountId );
 
+    /*! unlock a companion */
+    void unlockCompanion( uint32_t companionId );
+
+    /*! return a const pointer to the minion guide bitmask array */
+    MinionList& getMinionGuideBitmask();
+
     /*! return a const pointer to the setMount guide bitmask array */
     MountList& getMountGuideBitmask();
 
@@ -878,7 +884,7 @@ namespace Sapphire::Entity
     uint16_t m_activeTitle{};
     TitleList m_titleList{};
     HowToList m_howTo{};
-    MinionList m_minions{};
+    MinionList m_minionGuide{};
     MountList m_mountGuide{};
     QuestComplete m_questCompleteFlags{};
     Discovery m_discovery{};

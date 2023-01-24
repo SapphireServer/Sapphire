@@ -15,6 +15,7 @@
 #include "Network/PacketWrappers/InspectPacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
 
 #include "Action/Action.h"
 
@@ -465,6 +466,11 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.setCompanion( static_cast< uint8_t >( param1 ) );
       break;
     }
+    case PacketCommand::COMPANION_CANCEL:
+    {
+      player.setCompanion( 0 );
+      break;
+    }
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)
     {
       // todo: check if status can be removed by client from exd
@@ -548,15 +554,21 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::EmoteInterrupt ) );
       break;
     }
- /*   case PacketCommand::PersistentEmoteCancel: // cancel persistent emote
-    {
-      player.setPersistentEmote( 0 );
-      player.emoteInterrupt();
-      player.setStatus( ActorStatus::Idle );
-      auto pSetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) );
-      player.sendToInRangeSet( pSetStatusPacket );
+    case PacketCommand::EMOTE_MODE_CANCEL:
+    { 
+      if( player.getPersistentEmote() > 0 )
+      {
+        auto movePacket = std::make_shared< MoveActorPacket >( player, player.getRot(), 2, 0, 0, 0x5A / 4 );
+        player.sendToInRangeSet( movePacket );
+
+        player.setPersistentEmote( 0 );
+        player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::EmoteModeInterrupt ) );
+        player.setStatus( ActorStatus::Idle );
+
+        player.sendToInRangeSet( makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) ) );
+      }
       break;
-    }*/
+    }
     case PacketCommand::POSE_EMOTE_CONFIG: // change pose
     case PacketCommand::POSE_EMOTE_WORK: // reapply pose
     {
@@ -567,9 +579,6 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::POSE_EMOTE_CANCEL: // cancel pose
     {
-      player.setPose( static_cast< uint8_t >( param12 ) );
-      auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
-      player.sendToInRangeSet( pSetStatusPacket, true );
       break;
     }
     case PacketCommand::REVIVE: // return dead / accept raise

@@ -816,6 +816,7 @@ namespace Sapphire::Common
     MagicPoints = 3,
     TacticsPoints = 5,
     TacticsPoints1 = 6,
+    Sprint = 18,
 //    WARGauge = 22,
 //    DRKGauge = 25,
 //    AetherflowStack = 30,
@@ -922,6 +923,7 @@ namespace Sapphire::Common
   {
     KeyItemAction = 1,
     ItemActionVFX = 852,
+    ItemActionCompanion = 853,
     ItemActionVFX2 = 944,
     ItemActionMount = 1322,
   };
