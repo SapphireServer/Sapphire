@@ -27,6 +27,7 @@ namespace Sapphire::Entity
   public:
     using AchievementDataList = std::map< uint32_t, uint32_t >;
     using AchievementList = std::array< uint8_t, 2048 / 8 >; // up to 2048 achievements
+    using AchievementHistory = std::array< uint16_t, 5 >;
     using TitleList = std::array< uint8_t, 48 >;
     using HowToList = std::array< uint8_t, 34 >;
     using MinionList = std::array< uint8_t, 40 >;
@@ -372,6 +373,9 @@ namespace Sapphire::Entity
 
     /*! get player's achievement data list */
     AchievementDataList& getAchievementDataList();
+
+    /*! get player's achievement data history */
+    AchievementHistory& getAchievementHistory();
 
     /*! set number of gear sets */
     void setMaxGearSets( uint8_t amount );
@@ -870,6 +874,7 @@ namespace Sapphire::Entity
 
     AchievementList m_achievementList{};
     AchievementDataList m_achievementData{};
+    AchievementHistory m_achievementHistory{};
     uint16_t m_activeTitle{};
     TitleList m_titleList{};
     HowToList m_howTo{};

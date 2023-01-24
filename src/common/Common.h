@@ -1014,10 +1014,10 @@ namespace Sapphire::Common
       Classjob,
       Unknown_4,// Materia related? id 304
       Unknown_5,// Hunt related? id 1259
-      QuestUnk_6,
+      Quest, // Quests that need all required args met
       Unknown_7,
       Unknown_8,// Map discovery related
-      QuestUnk_9,
+      QuestAny,// Quests that need any required args met
       ChocoboRank,
       PvPRank,
       WolvesDenMatches,

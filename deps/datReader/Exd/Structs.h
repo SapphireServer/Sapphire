@@ -838,9 +838,10 @@ namespace Excel
     uint16_t Priority;
     uint8_t Category;
     uint8_t Point;
+    int8_t UnknownConditional; // previously 2.3~3.05 padding0[0]
     uint8_t ConditionType;
     uint8_t Detail;
-    int8_t padding0[2];
+    int8_t padding0;
   };
 
   /* 200982 */

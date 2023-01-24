@@ -57,6 +57,13 @@ void AchievementMgr::unlockAchievement( Entity::Player& player, uint32_t achieve
 
   player.getAchievementList()[ index ] |= value;
 
+  // handle player achievement history
+  // todo: verify retail behavior due to client copying the last achievement unlocked
+  /* auto& achvHistory = player.getAchievementHistory();
+
+  std::rotate( achvHistory.rbegin(), achvHistory.rbegin() + 1, achvHistory.rend() );
+  achvHistory[ 0 ] = achievementId;*/
+
   // fire packets
   Common::Service< World::Manager::PlayerMgr >::ref().onUnlockAchievement( player, achievementId );
 
@@ -74,7 +81,7 @@ bool AchievementMgr::hasAchievementUnlocked( Entity::Player& player, uint32_t ac
 {
   uint16_t index;
   uint8_t value;
-  Common::Util::valueToFlagByteIndexValue( static_cast< uint16_t >( achievementId ), value, index );
+  Common::Util::valueToFlagByteIndexValue( achievementId, value, index );
 
   return ( player.getAchievementList()[ index ] & value ) != 0;
 }
@@ -138,9 +145,6 @@ void AchievementMgr::handleLinkedAchievementsForId( Entity::Player& player, uint
       bool hasAllAchievements = true;
       for( const auto linkedAchvId : linkedAchv )
       {
-        if( linkedAchvId == 0 )
-          continue;
-
         if( !hasAchievementUnlocked( player, linkedAchvId ) )
         {
           hasAllAchievements = false;

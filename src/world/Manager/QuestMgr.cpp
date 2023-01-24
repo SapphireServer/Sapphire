@@ -11,6 +11,7 @@
 #include "Network/PacketWrappers/Notice2Packet.h"
 
 #include "QuestMgr.h"
+#include "AchievementMgr.h"
 
 #include "Actor/Player.h"
 
@@ -41,6 +42,9 @@ void QuestMgr::onCompleteQuest( Entity::Player& player, uint16_t questId, uint32
   server.queueForPlayer( player.getCharacterId(), questFinishPacket );
 
   giveQuestRewards( player, questId, optionalChoice );
+
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Quest >( player, questId );
 }
 
 void QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )

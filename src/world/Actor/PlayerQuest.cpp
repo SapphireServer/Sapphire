@@ -19,10 +19,10 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId, uint32_t optionalC
 
   auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
 
+  updateQuestsCompleted( questId );
+
   //@todo should probably be changed to a bool function in case reward can not be obtained as quests will not complete in that case
   questMgr.onCompleteQuest( *this, questId, optionalChoice );
-
-  updateQuestsCompleted( questId );
 }
 
 void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
