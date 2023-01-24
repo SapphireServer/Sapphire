@@ -1323,6 +1323,11 @@ Player::AchievementDataList& Player::getAchievementDataList()
   return m_achievementData;
 }
 
+Player::AchievementHistory& Player::getAchievementHistory()
+{
+  return m_achievementHistory;
+}
+
 void Player::setMaxGearSets( uint8_t amount )
 {
   if( amount == 1 )

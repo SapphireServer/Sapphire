@@ -79,7 +79,8 @@ void PlayerMgr::onSendAchievementList( Entity::Player& player )
   auto& server = Common::Service< World::WorldServer >::ref();
 
   auto achvPacket = makeZonePacket< FFXIVIpcAchievement >( player.getId() );
-  std::memcpy( &achvPacket->data().complete[ 0 ], &player.getAchievementList()[ 0 ], sizeof( &achvPacket->data().complete ) );
+  std::memcpy( &achvPacket->data().complete[ 0 ], &player.getAchievementList()[ 0 ], sizeof( achvPacket->data().complete ) );
+  std::memcpy( &achvPacket->data().history[ 0 ], &player.getAchievementHistory()[ 0 ], sizeof( achvPacket->data().history ) );
 
   server.queueForPlayer( player.getCharacterId(), achvPacket );
 }

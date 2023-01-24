@@ -57,6 +57,13 @@ void AchievementMgr::unlockAchievement( Entity::Player& player, uint32_t achieve
 
   player.getAchievementList()[ index ] |= value;
 
+  // handle player achievement history
+  // todo: verify retail behavior due to client copying the last achievement unlocked
+  /* auto& achvHistory = player.getAchievementHistory();
+
+  std::rotate( achvHistory.rbegin(), achvHistory.rbegin() + 1, achvHistory.rend() );
+  achvHistory[ 0 ] = achievementId;*/
+
   // fire packets
   Common::Service< World::Manager::PlayerMgr >::ref().onUnlockAchievement( player, achievementId );
 
