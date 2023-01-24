@@ -1282,14 +1282,14 @@ const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
-  queuePacket( makeActorControl( getId(), SetBattle, 1 ) );
+  queuePacket( makeActorControl( getId(), SetBattle, 1, 0, 0 ) );
 }
 
 void Player::onMobDeaggro( const BNpc& bnpc )
 {
   hateListRemove( bnpc );
   if( m_actorIdTohateSlotMap.empty() )
-    queuePacket( makeActorControl( getId(), SetBattle ) );
+    queuePacket( makeActorControl( getId(), SetBattle, 0, 0, 0 ) );
 }
 
 bool Player::isLogin() const
