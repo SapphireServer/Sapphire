@@ -177,7 +177,7 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
                            player.getLevel(), player.getLevel() - 1 ), true );
 
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint8_t >( player.getClass() ), player.getLevel() );
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
 }
 
 void PlayerMgr::onSetLevelForClass( Entity::Player& player, Common::ClassJob classJob )
@@ -188,7 +188,7 @@ void PlayerMgr::onSetLevelForClass( Entity::Player& player, Common::ClassJob cla
   server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::ClassJobUpdate,
                                                        static_cast< uint8_t >( classJob ), player.getLevelForClass( classJob ) ) );
 
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint8_t >( classJob ), player.getLevel() );
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( classJob ) );
 }
 
 
