@@ -160,6 +160,7 @@ namespace Sapphire::Network::Packets
       TreasureCheckCommand = 0x1B4,
       SelectLootAction = 0x1B5,
       OpenTreasureWithKey = 0x1B6,
+      BuildPresetHandler = 0x1B7,
 
       StartTalkEvent = 0x01C2,
       StartEmoteEvent = 0x01C3,

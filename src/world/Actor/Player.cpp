@@ -1791,8 +1791,9 @@ void Player::sendLandFlagsSlot( Common::LandFlagsSlot slot )
       return;
   }
 
-  landFlags->data().Flags = static_cast< uint32_t >( type );
-  landFlags->data().LandId = m_charaLandData[ slot ].landId;
+  landFlags->data().Index = static_cast< uint32_t >( type );
+  landFlags->data().LandData.landId = m_charaLandData[ slot ].landId;
+  landFlags->data().LandData.landFlags = m_charaLandData[ slot ].landFlags;
 
   queuePacket( landFlags );
 }

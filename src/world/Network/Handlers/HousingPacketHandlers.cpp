@@ -73,10 +73,13 @@ void Sapphire::Network::GameConnection::landRenameHandler( const Packets::FFXIVA
 void Sapphire::Network::GameConnection::buildPresetHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {
-  //const auto packet = ZoneChannelPacket< Client::FFXIVIpcBuildPresetHandler >( inPacket );
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcBuildPresetHandler >( inPacket );
 
-  //auto& housingMgr = Common::Service< HousingMgr >::ref();
-  //housingMgr.buildPresetEstate( player, packet.data().plotNum, packet.data().itemId );
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
+  housingMgr.buildPresetEstate( player, *hZone, packet.data().plotNum, packet.data().itemId );
 }
 
 void Sapphire::Network::GameConnection::housingUpdateGreetingHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,

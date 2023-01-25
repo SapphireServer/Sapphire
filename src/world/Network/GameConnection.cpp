@@ -89,7 +89,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
 
   setZoneHandler( ClientItemOperation, "ItemOperation", &GameConnection::itemOperation );
 
-  //setZoneHandler( BuildPresetHandler, "BuildPresetHandler", &GameConnection::buildPresetHandler );
+  setZoneHandler( BuildPresetHandler, "BuildPresetHandler", &GameConnection::buildPresetHandler );
   setZoneHandler( ClientZoneIpcType::HousingHouseName, "HousingHouseName", &GameConnection::landRenameHandler );
   setZoneHandler( ClientZoneIpcType::HousingGreeting, "HousingUpdateHouseGreeting", &GameConnection::housingUpdateGreetingHandler );
   setZoneHandler( HousingPlaceYardItem, "HousingPlaceYardItem", &GameConnection::reqPlaceHousingItem );

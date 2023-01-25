@@ -546,6 +546,13 @@ struct FFXIVIpcHousingHouseName : FFXIVIpcBasePacket< HousingHouseName >
   char houseName[20];
 };
 
+struct FFXIVIpcBuildPresetHandler : FFXIVIpcBasePacket< BuildPresetHandler >
+{
+  /* 0000 */ uint32_t itemId;
+  /* 0004 */ uint8_t plotNum;
+  /* 0005 */ char stateString[27];
+};
+
 struct FFXIVIpcHousingGreeting : FFXIVIpcBasePacket< HousingGreeting >
 {
   Common::LandIdent landId;
