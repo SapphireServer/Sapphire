@@ -1596,9 +1596,8 @@ namespace Sapphire::Common
     uint32_t fcId;
     uint32_t fcCrestId;
     uint32_t fcCrestId1;
-    uint8_t patternIds[8];
+    uint16_t patternIds[8];
     uint8_t colors[8];
-    uint8_t unknown2[8];
   };
 
   struct Furniture
