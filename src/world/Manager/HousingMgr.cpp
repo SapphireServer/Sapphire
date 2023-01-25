@@ -266,8 +266,8 @@ void HousingMgr::initLandCache()
     makeContainer( Common::InventoryType::HousingExteriorStoreroom, entry.m_maxPlacedExternalItems );
 
     // fixed containers
-    makeContainer( Common::InventoryType::HousingInteriorAppearance, 10 );
-    makeContainer( Common::InventoryType::HousingExteriorAppearance, 9 );
+    makeContainer( Common::InventoryType::HousingInteriorAppearance, 20 );
+    makeContainer( Common::InventoryType::HousingExteriorAppearance, 20 );
 
   }
 }
@@ -702,6 +702,7 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
   if( !initHouseModels( player, pLand, presetCatalogId ) )
   {
     pLand->setHouse( nullptr );
+    Logger::error( "House failed building because of initHouseModels failed" );
     return;
   }
 
@@ -727,7 +728,7 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
   player.setLandFlags( Common::LandFlagsSlot::Private, Common::HOUSING_LAND_STATUS::HOUSING_LAND_STATUS_BUILDHOUSE, ident );
   player.sendLandFlagsSlot( Common::LandFlagsSlot::Private );
 
-  zone.registerEstateEntranceEObj( plotNum );
+  //zone.registerEstateEntranceEObj( plotNum );
 }
 
 void HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )

@@ -92,7 +92,10 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
 void Sapphire::ItemContainer::setItem( uint16_t slotId, ItemPtr pItem )
 {
   if( slotId > m_size )
+  {
+    Logger::error( "Unable to place item {}, {} exceeds max size of {}", pItem->getId(), slotId, m_size );
     return;
+  }
 
   m_itemMap[ slotId ] = pItem;
 }

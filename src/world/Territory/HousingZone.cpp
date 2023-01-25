@@ -299,7 +299,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   assert( land );
 
   auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 0, 4, land->getMapMarkerPosition(), 0.f, "entrance", 0 );
-  eObj->setHousingLink( landId << 8 );
+  eObj->setHousingLink( static_cast< uint32_t >( landId ) << 8 );
   eObj->setScale( 1.f );
 
   addEObj( eObj );
