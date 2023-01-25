@@ -138,8 +138,8 @@ bool Sapphire::HousingZone::init()
     m_landPtrMap[ entry.m_landId ] = land;
 
     // TODO: Fixme
-  //  if( entry.m_houseId > 0 )
-  //    registerEstateEntranceEObj( entry.m_landId );
+    if( entry.m_houseId > 0 )
+      registerEstateEntranceEObj( entry.m_landId );
 
     updateYardObjects( land->getLandIdent() );
   }

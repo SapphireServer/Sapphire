@@ -80,8 +80,8 @@ bool HousingMgr::init()
   Logger::info( "HousingMgr: Caching housing land init data" );
   //LAND_SEL_ALL
 
-  // 18 wards per territory, 4 territories
-  m_landCache.reserve( 18 * 4 );
+  // 12 wards per territory, 2 territories
+  m_landCache.reserve( 12 * 2 );
 
   initLandCache();
 
@@ -115,7 +115,7 @@ bool HousingMgr::loadEstateInventories()
 {
   Logger::info( "HousingMgr: Loading inventories for estates" );
 
-/*  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
   auto stmt = db.getPreparedStatement( Db::LAND_INV_SEL_ALL );
   auto res = db.query( stmt );
@@ -166,7 +166,7 @@ bool HousingMgr::loadEstateInventories()
     itemCount++;
   }
 
-  Logger::debug( "HousingMgr: Loaded {0} inventory items", itemCount );*/
+  Logger::debug( "HousingMgr: Loaded {0} inventory items", itemCount );
 
   return true;
 }
