@@ -22,8 +22,8 @@ namespace Sapphire::Common
   const int32_t INVALID_GAME_OBJECT_ID = 0xE0000000;
   const uint64_t INVALID_GAME_OBJECT_ID64 = 0xE0000000;
 
-  const uint16_t MAX_PLAYER_LEVEL = 80;
-  const uint8_t CURRENT_EXPANSION_ID = 3;
+  const uint16_t MAX_PLAYER_LEVEL = 90;
+  const uint8_t CURRENT_EXPANSION_ID = 4;
 
   const uint8_t CLASSJOB_TOTAL = 38;
   const uint8_t CLASSJOB_SLOTS = 30;
