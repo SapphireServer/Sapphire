@@ -99,7 +99,7 @@ namespace Sapphire::Network::Packets
     SetOnlineStatus = 0x324, // updated 6.30h
 
     CountdownInitiate = 0x3b1, // updated 6.30h
-    CountdownInitiate = 0x3b1, // updated 6.30h
+    CountdownCancel = 0xb6, // updated 6.30h
 
     PlayerAddedToBlacklist = 0x399, // updated 6.30h
     PlayerRemovedFromBlacklist = 0x1dc, // updated 6.30h
