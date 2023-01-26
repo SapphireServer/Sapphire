@@ -1710,6 +1710,22 @@ void HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
   if( !terri )
     return;
 
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto pSession = server.getSession( player.getCharacterId() );
+
+  auto pLand = terri->getLand( plot );
+  if( !pLand )
+    return;
+
+  // can't remove when you are not the owner
+  // TODO: actually use permissions here for FC houses
+  if( !hasPermission( player, *pLand, 0 ) )
+  {
+    auto msgPkt = makeActorControlSelf( player.getId(), ActorControl::LogMsg, 3305, 0 );
+    pSession->getZoneConnection()->queueOutPacket( msgPkt );
+    return;
+  }
+
   auto land = terri->getLand( static_cast< uint8_t >( plot ) );
   if( !land || !land->getHouse() )
     return;
