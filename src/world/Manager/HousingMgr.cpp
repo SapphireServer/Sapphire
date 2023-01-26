@@ -1755,6 +1755,4 @@ void Sapphire::World::Manager::HousingMgr::removeHouse( Entity::Player& player, 
   terri->removeEstateEntranceEObj( plot );
 
   // missing reply for ClientTrigger RequestEstateHallRemoval
-
-  return;
 }

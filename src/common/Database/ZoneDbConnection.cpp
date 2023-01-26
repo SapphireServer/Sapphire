@@ -258,7 +258,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( HOUSING_HOUSE_DEL,
-                    "DELETE from house WHERE HouseId = ?;",
+                    "DELETE FROM house WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_ALL,
