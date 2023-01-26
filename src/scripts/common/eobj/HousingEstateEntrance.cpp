@@ -6,6 +6,7 @@
 #include "Territory/HousingZone.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/PlayerMgr.h"
+#include <Manager/WarpMgr.h>
 #include "Territory/Land.h"
 
 
@@ -37,7 +38,7 @@ public:
         return;
 
       Common::LandIdent ident;
-      ident.landId = eobj.getHousingLink() >> 8;
+      ident.landId = eobj.getHousingLink();
       ident.territoryTypeId = zone->getTerritoryTypeId();
       ident.wardNum = zone->getWardNum();
       ident.worldId = 67;
@@ -82,7 +83,8 @@ public:
           return;
       }
 
-      //player.setInstance( internalZone->getGuId(), pos );
+      warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, internalZone->getGuId(), pos, 0.f );
+
     } );
   }
 };

@@ -301,6 +301,11 @@ namespace Sapphire::ScriptAPI
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
     }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
   };
 
   /*!

@@ -298,9 +298,8 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto land = getLand( landId );
   assert( land );
 
-  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 0, 4, FFXIVARR_POSITION3{ 0, 10, 0 }, 0.f, "entrance", 0 );
-  eObj->setHousingLink( static_cast< uint32_t >( landId ) << 8 );
-  eObj->setGimmickId( static_cast< uint32_t >( landId ) << 8 );
+  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 0, 0, FFXIVARR_POSITION3{ 0, 10, 0 }, 0.f, "entrance", 0 );
+  eObj->setHousingLink( static_cast< uint32_t >( landId ) );
   eObj->setScale( 1.f );
 
   addEObj( eObj );
