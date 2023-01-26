@@ -178,6 +178,8 @@ namespace Sapphire::World::Manager
 
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
 
+    void removeHouse( Entity::Player& player, uint16_t plot );
+
   private:
 
     Inventory::HousingItemPtr getHousingItemFromPlayer( Entity::Player& player, Common::InventoryType type, uint8_t slot );
@@ -268,6 +270,15 @@ namespace Sapphire::World::Manager
      * @param house The house to create in the house table
      */
     void createHouse( HousePtr house ) const;
+
+    /*!
+     * @brief Deletes a house
+     *
+     * Any other changes will be covered by the usual saving logic and can be safely ignored here.
+     *
+     * @param house The house to create in the house table
+     */
+    void deleteHouse( HousePtr house ) const;
 
     /*!
      * @brief Gets the next available house id

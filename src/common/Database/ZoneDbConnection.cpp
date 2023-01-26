@@ -291,6 +291,10 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ? WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
+  prepareStatement( HOUSING_HOUSE_DEL,
+                    "DELETE from house WHERE HouseId = ?;",
+                    CONNECTION_BOTH );
+
   prepareStatement( LAND_INV_SEL_ALL,
                     "SELECT houseiteminventory.*, charaglobalitem.catalogId, charaglobalitem.stain, charaglobalitem.CharacterId, "
                     "landplaceditems.PosX, landplaceditems.PosY, landplaceditems.PosZ, landplaceditems.Rotation "

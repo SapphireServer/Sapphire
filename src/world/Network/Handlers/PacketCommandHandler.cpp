@@ -763,6 +763,14 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
       break;
     }
+    case PacketCommand::HOUSING_LOCK_LAND_BY_BREAK:
+    {
+      auto& housingMgr = Service< HousingMgr >::ref();
+      housingMgr.removeHouse( player, static_cast< uint16_t >( param11 ) );
+
+      break;
+    }
+
 /*    case PacketCommand::RequestLandInventory:
     {
       uint8_t plot = ( param12 & 0xFF );

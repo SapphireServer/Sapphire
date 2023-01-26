@@ -52,6 +52,7 @@ namespace Sapphire
     Sapphire::LandPtr getLand( uint8_t id );
 
     Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
+    void removeEstateEntranceEObj( uint8_t landId );
 
     void updateYardObjects( Common::LandIdent ident );
     void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItem& item );

@@ -680,6 +680,14 @@ void HousingMgr::createHouse( Sapphire::HousePtr house ) const
   db.execute( stmt );
 }
 
+void HousingMgr::deleteHouse( Sapphire::HousePtr house ) const
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::HOUSING_HOUSE_DEL );
+  stmt->setUInt( 1, house->getId() );
+  db.execute( stmt );
+}
+
 void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, uint8_t plotNum, uint32_t presetCatalogId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -1690,4 +1698,68 @@ Inventory::HousingItemPtr HousingMgr::getHousingItemFromPlayer( Entity::Player& 
     return nullptr;
 
   return Inventory::make_HousingItem( tmpItem->getUId(), tmpItem->getId() );
+}
+
+void HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( !pZone )
+    return;
+  auto terri = std::dynamic_pointer_cast< HousingZone >( pZone );
+  if( !terri )
+    return;
+
+  auto land = terri->getLand( static_cast< uint8_t >( plot ) );
+  if( !land || !land->getHouse() )
+    return;
+
+  if( !hasPermission( player, *land, 0 ) )
+    return;
+
+  auto& interiorContainer = getEstateInventory( land->getLandIdent() )[ Common::InventoryType::HousingInteriorAppearance ];
+  auto& invMgr = Common::Service< InventoryMgr >::ref();
+
+  std::unordered_map< Common::InventoryType, ItemContainerPtr > changedContainerSet = {};
+
+  for( int i = 0; i < interiorContainer->getMaxSize(); i++ )
+  {
+    auto item = interiorContainer->getItem( i );
+    if( !item )
+      continue;
+
+    Inventory::InventoryContainerPair freeSlotPair;
+    auto freeContainer = getFreeEstateInventorySlot( land->getLandIdent(), freeSlotPair, m_internalStoreroomContainers );
+    if ( !freeContainer )
+    {
+      // not sure what to do
+      interiorContainer->removeItem( i, true );
+    }
+    else
+    {
+      interiorContainer->removeItem( i, false );
+      freeContainer->setItem( freeSlotPair.second , item );
+      changedContainerSet[ freeSlotPair.first ] = freeContainer;
+    }
+  }
+
+  invMgr.sendInventoryContainer( player, interiorContainer );
+  invMgr.saveHousingContainer( land->getLandIdent(), interiorContainer );
+  for( auto entry : changedContainerSet )
+  {
+    invMgr.sendInventoryContainer( player, entry.second );
+    invMgr.saveHousingContainer( land->getLandIdent(), entry.second );
+  }
+
+  deleteHouse( land->getHouse() );
+  land->setHouse( nullptr );
+
+  land->setStatus( Common::HouseStatus::Sold );
+  land->updateLandDb();
+  terri->sendLandUpdate( plot );
+
+  player.setLandFlags( Common::LandFlagsSlot::Private, 0, land->getLandIdent() );
+
+  terri->removeEstateEntranceEObj( plot );
+  return;
 }

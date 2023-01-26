@@ -98,6 +98,8 @@ void InventoryMgr::saveHousingContainer( Common::LandIdent ident, ItemContainerP
 
   for( auto& item : container->getItemMap() )
   {
+    if( !item.second )
+      continue;
     saveHousingContainerItem( u64ident, container->getId(), item.first, item.second->getUId() );
   }
 }

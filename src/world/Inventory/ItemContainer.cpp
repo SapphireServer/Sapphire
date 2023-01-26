@@ -86,6 +86,9 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
     return nullptr;
   }
 
+  if( m_itemMap.find( slotId ) == m_itemMap.end() )
+    return nullptr;
+
   return m_itemMap[ slotId ];
 }
 
