@@ -76,6 +76,8 @@ namespace Sapphire
 
     Common::TerritoryIdent m_ident;
 
+    float m_inRangeDistance;
+
   public:
     Territory();
 
@@ -122,6 +124,8 @@ namespace Sapphire
 
     virtual void onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint32_t arg1, uint32_t arg2,
                                       uint32_t arg3, uint32_t arg4 );
+
+    virtual float getInRangeDistance();
 
     Common::Weather getNextWeather();
 

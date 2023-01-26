@@ -76,7 +76,7 @@ namespace Sapphire
      */
     using YardObjectArrayBoundsArray = std::array< YardObjectArrayBoundsPair, 60 >;
 
-    const uint32_t m_landSetMax = 18;
+    const uint32_t m_landSetMax = 12;
     LandPtrMap m_landPtrMap;
     uint8_t m_wardNum;
     uint32_t m_landSetId;

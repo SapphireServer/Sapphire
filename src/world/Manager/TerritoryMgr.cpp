@@ -25,8 +25,7 @@ using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 
 TerritoryMgr::TerritoryMgr() :
-  m_lastInstanceId( 10000 ),
-  m_inRangeDistance( 0 )
+  m_lastInstanceId( 10000 )
 {
 
 }
@@ -65,11 +64,6 @@ bool TerritoryMgr::init()
     Logger::fatal( "Caught exception during territory init: {}", ex.what() );
     return false;
   }
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto& cfg = server.getConfig();
-
-  m_inRangeDistance = cfg.network.inRangeDistance;
 
   return true;
 }
@@ -655,11 +649,6 @@ void TerritoryMgr::setCurrentFestival( uint16_t festivalId, uint16_t additionalF
 void TerritoryMgr::disableCurrentFestival()
 {
   setCurrentFestival( 0 );
-}
-
-float TerritoryMgr::getInRangeDistance() const
-{
-  return m_inRangeDistance;
 }
 
 void TerritoryMgr::createAndJoinQuestBattle( Entity::Player& player, uint16_t questBattleId )

@@ -69,7 +69,8 @@ Territory::Territory( uint16_t territoryTypeId, uint32_t guId, const std::string
   m_nextEObjId( START_EOBJ_ID ),
   m_nextActorId( START_GAMEOBJECT_ID ),
   m_lastUpdate( 0 ),
-  m_lastActivityTime( Common::Util::getTimeMs() )
+  m_lastActivityTime( Common::Util::getTimeMs() ),
+  m_inRangeDistance( 80.f )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -656,6 +657,11 @@ void Territory::updateActorPosition( Entity::GameObject& actor )
   }
 }
 
+float Territory::getInRangeDistance()
+{
+  return m_inRangeDistance;
+}
+
 
 void Territory::updateInRangeSet( Entity::GameObjectPtr pActor, CellPtr pCell )
 {
@@ -669,7 +675,7 @@ void Territory::updateInRangeSet( Entity::GameObjectPtr pActor, CellPtr pCell )
 
   auto iter = pCell->m_actors.begin();
 
-  float fRange = teriMgr.getInRangeDistance();
+  float fRange = getInRangeDistance();
   int32_t count = 0;
   while( iter != pCell->m_actors.end() )
   {

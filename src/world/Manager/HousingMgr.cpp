@@ -578,13 +578,13 @@ bool HousingMgr::initHouseModels( Entity::Player& player, LandPtr land, uint32_t
   auto itemMax = land->getInventoryItemMax();
 
   // type, maxSize, tableName, isMultiStorage
-  auto intContainer = make_ItemContainer( Common::InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true );
-  auto extContainer = make_ItemContainer( Common::InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true );
+ // auto intContainer = make_ItemContainer( Common::InventoryType::HousingInteriorAppearance, itemMax.second, "houseiteminventory", true );
+ // auto extContainer = make_ItemContainer( Common::InventoryType::HousingExteriorAppearance, itemMax.first, "houseiteminventory", true );
 
   // add containers to inv collection
   auto& houseInventory = getEstateInventory( house->getLandIdent() );
-  houseInventory[ Common::InventoryType::HousingInteriorAppearance ] = intContainer;
-  houseInventory[ Common::InventoryType::HousingExteriorAppearance ] = extContainer;
+  houseInventory[ Common::InventoryType::HousingInteriorAppearance ];// = intContainer;
+  houseInventory[ Common::InventoryType::HousingExteriorAppearance ];// = extContainer;
 
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
   auto preset = exdData.getRow< Excel::HousingPreset >( getItemAdditionalData( presetCatalogId ) );
@@ -728,7 +728,7 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
   player.setLandFlags( Common::LandFlagsSlot::Private, Common::HOUSING_LAND_STATUS::HOUSING_LAND_STATUS_BUILDHOUSE, ident );
   player.sendLandFlagsSlot( Common::LandFlagsSlot::Private );
 
-  //zone.registerEstateEntranceEObj( plotNum );
+  zone.registerEstateEntranceEObj( plotNum );
 }
 
 void HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )
