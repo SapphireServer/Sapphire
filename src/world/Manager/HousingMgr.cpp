@@ -1730,9 +1730,6 @@ void HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
   if( !land || !land->getHouse() )
     return;
 
-  if( !hasPermission( player, *land, 0 ) )
-    return;
-
   auto& interiorContainer = getEstateInventory( land->getLandIdent() )[ Common::InventoryType::HousingInteriorAppearance ];
   auto& invMgr = Common::Service< InventoryMgr >::ref();
 
