@@ -1,18 +1,19 @@
 #ifndef __OODLE2NET_H__
 #define __OODLE2NET_H__
+#include <stdint.h>
 
-extern "C" intptr_t __stdcall OodleNetwork1_Shared_Size( int32_t htbits );
+extern "C" intptr_t  OodleNetwork1_Shared_Size( int32_t htbits );
 
-extern "C" intptr_t __stdcall OodleNetwork1UDP_State_Size();
+extern "C" intptr_t  OodleNetwork1UDP_State_Size();
 
-extern "C" void __stdcall OodleNetwork1_Shared_SetWindow(
+extern "C" void  OodleNetwork1_Shared_SetWindow(
   void* shared,
   int32_t htbits,
   const void* window,
   int32_t windowSize
 );
 
-extern "C" void __stdcall OodleNetwork1UDP_Train(
+extern "C" void OodleNetwork1UDP_Train(
   void* state,
   const void* shared,
   const void** trainingPacketPointers,
@@ -20,7 +21,7 @@ extern "C" void __stdcall OodleNetwork1UDP_Train(
   int32_t numTrainingPackets
 );
 
-extern "C" bool __stdcall OodleNetwork1UDP_Decode(
+extern "C" bool OodleNetwork1UDP_Decode(
   void* state,
   const void* shared,
   const void* enc,
