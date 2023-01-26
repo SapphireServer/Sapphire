@@ -475,6 +475,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
+    case ClientTriggerType::RequestEstateHallRemoval:
+    {
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
+
+      housingMgr.removeHouse( player, static_cast< uint16_t >( param11 ) );
+
+      break;
+    }
     case ClientTriggerType::UpdateEstateGuestAccess:
     {
       auto canTeleport = ( param2 & 0xFF ) == 1;

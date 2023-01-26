@@ -662,6 +662,14 @@ void Sapphire::World::Manager::HousingMgr::createHouse( Sapphire::HousePtr house
   db.execute( stmt );
 }
 
+void Sapphire::World::Manager::HousingMgr::deleteHouse( Sapphire::HousePtr house ) const
+{
+  auto& db = Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::HOUSING_HOUSE_DEL );
+  stmt->setUInt( 1, house->getId() );
+  db.execute( stmt );
+}
+
 void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId )
 {
   auto hZone = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
@@ -702,12 +710,10 @@ void Sapphire::World::Manager::HousingMgr::buildPresetEstate( Entity::Player& pl
 
   pLand->updateLandDb();
 
-  // start house built event - disabled because it fucks your audio device
+  // start house built event
   // CmnDefHousingBuildHouse_00149
-  //player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
-  //player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
-  // instead we do a fake zone to unlock the client
-  Common::Service< TerritoryMgr >::ref().movePlayer( player.getCurrentTerritory(), player.getAsPlayer() );
+  player.eventStart( player.getId(), 0x000B0095, Event::EventHandler::EventType::Housing, 1, 1 );
+  player.playScene( 0x000B0095, 0, static_cast< uint32_t >( SET_BASE | HIDE_HOTBAR ) , 0, 1, plotNum, nullptr );
 
   player.setLandFlags( LandFlagsSlot::Private, EstateBuilt, ident );
   player.sendLandFlagsSlot( LandFlagsSlot::Private );
@@ -1688,4 +1694,65 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
   {
     terri->sendLandUpdate( landIdent.landId );
   }
+}
+
+void Sapphire::World::Manager::HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
+{
+  auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+  if( !terri )
+    return;
+
+  auto land = terri->getLand( static_cast< uint8_t >( plot ) );
+  if( !land || !land->getHouse() )
+    return;
+
+  if( !hasPermission( player, *land, 0 ) )
+    return;
+
+  auto& interiorContainer = getEstateInventory( land->getLandIdent() )[ InventoryType::HousingInteriorAppearance ];
+  auto& invMgr = Service< InventoryMgr >::ref();
+
+  std::unordered_map< InventoryType, ItemContainerPtr > changedContainerSet = {};
+
+  for( int i = 0; i < interiorContainer->getMaxSize(); i++ )
+  {
+    auto item = interiorContainer->getItem( i );
+    if( !item )
+      continue;
+
+    Inventory::InventoryContainerPair freeSlotPair;
+    auto freeContainer = getFreeEstateInventorySlot( land->getLandIdent(), freeSlotPair, m_internalStoreroomContainers );
+    if ( !freeContainer )
+    {
+      // not sure what to do
+      interiorContainer->removeItem( i, true );
+    }
+    else
+    {
+      interiorContainer->removeItem( i, false );
+      freeContainer->setItem( freeSlotPair.second , item );
+      changedContainerSet[ freeSlotPair.first ] = freeContainer;
+    }
+  }
+
+  invMgr.sendInventoryContainer( player, interiorContainer );
+  invMgr.saveHousingContainer( land->getLandIdent(), interiorContainer );
+  for( auto entry : changedContainerSet )
+  {
+    invMgr.sendInventoryContainer( player, entry.second );
+    invMgr.saveHousingContainer( land->getLandIdent(), entry.second );
+  }
+
+  deleteHouse( land->getHouse() );
+  land->setHouse( nullptr );
+
+  land->setStatus( HouseStatus::Sold );
+  land->updateLandDb();
+  terri->sendLandUpdate( plot );
+
+  player.setLandFlags( LandFlagsSlot::Private, 0, land->getLandIdent() );
+
+  terri->removeEstateEntranceEObj( plot );
+
+  // missing reply for ClientTrigger RequestEstateHallRemoval
 }
