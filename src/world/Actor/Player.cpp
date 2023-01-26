@@ -2135,7 +2135,7 @@ void Player::updatePrevTerritory()
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
-  if( teriMgr.isDefaultTerritory( getTerritoryTypeId() ) )
+  if( teriMgr.isDefaultTerritory( getTerritoryTypeId() ) || teriMgr.isHousingTerritory( getTerritoryTypeId() ) )
   {
     m_prevTerritoryTypeId = getTerritoryTypeId();
     m_prevTerritoryId = getTerritoryId();

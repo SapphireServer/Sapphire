@@ -6,7 +6,6 @@
 #include "Territory/HousingZone.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/PlayerMgr.h"
-#include <Manager/WarpMgr.h>
 #include "Territory/Land.h"
 
 
@@ -37,9 +36,9 @@ public:
       if( !zone )
         return;
 
-      Common::LandIdent ident;
-      ident.landId = eobj.getHousingLink();
-      ident.territoryTypeId = zone->getTerritoryTypeId();
+      Common::LandIdent ident{};
+      ident.landId = static_cast< int16_t >( eobj.getHousingLink() );
+      ident.territoryTypeId = static_cast< int16_t >( zone->getTerritoryTypeId() );
       ident.wardNum = zone->getWardNum();
       ident.worldId = 67;
 
@@ -55,7 +54,7 @@ public:
 
       eventMgr().eventFinish( player, result.eventId, 1 );
 
-      Common::FFXIVARR_POSITION3 pos {};
+      Common::FFXIVARR_POSITION3 pos;
 
       auto land = zone->getLand( eobj.getHousingLink() >> 8 );
       if( !land )
