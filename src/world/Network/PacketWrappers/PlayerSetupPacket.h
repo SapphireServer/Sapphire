@@ -45,7 +45,7 @@ namespace Sapphire::Network::Packets::Server
       //m_data.gcRank = GCRank::None;
 
       m_data.homepoint = player.getHomepoint();
-      m_data.pose = player.getPose();
+      m_data.pose[0] = player.getPose();
 
       memset( &m_data.name[ 0 ], 0, sizeof( m_data.name ) );
       strcpy( &m_data.name[ 0 ], player.getName().c_str() );
