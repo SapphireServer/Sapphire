@@ -183,6 +183,8 @@ namespace Sapphire::World::Manager
 
     void editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t > slotList, uint8_t removeFlag );
 
+    void removeHouse( Entity::Player& player, uint16_t plot );
+    
   private:
 
     Inventory::HousingItemPtr getHousingItemFromPlayer( Entity::Player& player, Common::InventoryType type, uint8_t slot );
@@ -273,6 +275,8 @@ namespace Sapphire::World::Manager
      * @param house The house to create in the house table
      */
     void createHouse( HousePtr house ) const;
+
+    void deleteHouse( HousePtr house ) const;
 
     /*!
      * @brief Gets the next available house id

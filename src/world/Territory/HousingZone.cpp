@@ -321,6 +321,23 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   return eObj;
 }
 
+void Sapphire::HousingZone::removeEstateEntranceEObj( uint8_t landId )
+{
+  auto land = getLand( landId );
+  assert( land );
+
+  for( auto entry : m_eventObjects )
+  {
+    auto eObj = entry.second;
+    if( eObj->getHousingLink() == landId << 8 )
+    {
+      removeActor( eObj );
+      m_eventObjects.erase( entry.first );
+      break;
+    }
+  }
+}
+
 void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident )
 {
   auto& housingMgr = Common::Service< World::Manager::HousingMgr >::ref();
