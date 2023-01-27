@@ -58,7 +58,7 @@ struct ActionEntry
   StatusEffect statuses;
 };
 
-void to_json(nlohmann::ordered_json& j, const StatusEntry& statusEntry)
+void to_json( nlohmann::ordered_json& j, const StatusEntry& statusEntry )
 {
   j = nlohmann::ordered_json{
     { "id", statusEntry.id },
@@ -66,7 +66,7 @@ void to_json(nlohmann::ordered_json& j, const StatusEntry& statusEntry)
   };
 }
 
-void to_json(nlohmann::ordered_json& j, const ActionEntry& action)
+void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
 {
   j = nlohmann::ordered_json{
     { "name", action.name },
@@ -323,7 +323,7 @@ int main( int argc, char* argv[] )
   }
 
   std::ofstream outH( "actions/player.json" );
-  outH << std::setw(2) << output << std::endl;
+  outH << std::setw( 2 ) << output << std::endl;
   outH.close();
 
   return 0;
