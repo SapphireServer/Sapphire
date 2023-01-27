@@ -1,6 +1,7 @@
 #include "ActionMgr.h"
 #include "PlayerMgr.h"
 
+#include "Action/ActionLutData.h"
 #include "Action/Action.h"
 #include "Action/ItemAction.h"
 #include "Action/EventItemAction.h"
@@ -15,6 +16,11 @@
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
+
+bool ActionMgr::cacheActionLut()
+{
+  return Action::ActionLutData::cacheActions();
+}
 
 void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
                                           Excel::ExcelStructPtr< Excel::Action > actionData, Common::FFXIVARR_POSITION3 pos,

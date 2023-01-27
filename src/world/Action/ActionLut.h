@@ -2,10 +2,25 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <string>
 #include <vector>
 
 namespace Sapphire::World::Action
 {
+  using StatusModifier = std::unordered_map< std::string, uint16_t >;
+
+  struct StatusEntry
+  {
+    uint16_t id;
+    StatusModifier modifiers;
+  };
+
+  struct StatusEffect
+  {
+    std::vector< StatusEntry > caster;
+    std::vector< StatusEntry > target;
+  };
+
   struct ActionEntry
   {
     uint16_t potency;
@@ -16,6 +31,7 @@ namespace Sapphire::World::Action
     uint16_t curePotency;
     uint16_t restoreMPPercentage;
     std::vector< uint32_t > nextCombo;
+    StatusEffect statuses;
   };
 
   class ActionLut

@@ -28,6 +28,8 @@
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
 
+#include "Action/ActionLutData.h"
+
 #include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
 #include "Territory/InstanceContent.h"
@@ -76,6 +78,7 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "linkshell", &DebugCommandMgr::linkshell, "Linkshell creation", 1 );
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
+  registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
 }
 
 // clear all loaded commands
@@ -1470,4 +1473,43 @@ void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, st
     warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_GM, terriMgr.getZoneByTerritoryTypeId( 156 )->getGuId(), { 22.7204f, 21.2639f, -635.704f }, -0.360031f );
   else
     PlayerMgr::sendUrgent( player, "{0} is not a valid easyWarp location.", subCommand );
+}
+
+void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  if( subCommand == "actions" )
+  {
+    if( Action::ActionLutData::reloadActions() )
+    {
+      PlayerMgr::sendDebug( player, "Successfully reloaded actions." );
+    }
+    else
+    {
+      PlayerMgr::sendDebug( player, "There was an error reloading actions." );
+    }
+  }
+  else
+  {
+    PlayerMgr::sendDebug( player, "Unknown sub command." );
+  }
 }

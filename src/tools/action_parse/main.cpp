@@ -9,10 +9,12 @@
 #include <iostream>
 #include <cctype>
 #include <set>
+#include <string>
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
 #include <Logging/Logger.h>
 #include <Common.h>
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 #include <streambuf>
@@ -29,6 +31,18 @@ Sapphire::Data::ExdData g_exdDataGen;
 std::string datLocation( "C:\\Data\\Dev\\ffxiv3.01\\game\\sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
+struct StatusEntry
+{
+  uint16_t id;
+  std::unordered_map< std::string, uint16_t > modifiers;
+};
+
+struct StatusEffect
+{
+  std::vector< StatusEntry > caster;
+  std::vector< StatusEntry > target;
+};
+
 struct ActionEntry
 {
   uint32_t id;
@@ -41,7 +55,36 @@ struct ActionEntry
   uint32_t curePotency;
   uint32_t restorePercentage;
   std::vector< uint32_t > nextCombo{};
+  StatusEffect statuses;
 };
+
+void to_json(nlohmann::ordered_json& j, const StatusEntry& statusEntry)
+{
+  j = nlohmann::ordered_json{
+    { "id", statusEntry.id },
+    { "modifiers", statusEntry.modifiers }
+  };
+}
+
+void to_json(nlohmann::ordered_json& j, const ActionEntry& action)
+{
+  j = nlohmann::ordered_json{
+    { "name", action.name },
+    { "potency", action.potency },
+    { "comboPotency", action.comboPotency },
+    { "flankPotency", action.flankPotency },
+    { "frontPotency", action.frontPotency },
+    { "rearPotency", action.rearPotency },
+    { "curePotency", action.curePotency },
+    { "restorePercentage", action.restorePercentage },
+    { "nextCombo", action.nextCombo },
+    { "statuses", {
+        { "caster", action.statuses.caster },
+        { "target", action.statuses.target },
+      }
+    }
+  };
+}
 
 bool invalidChar( char c )
 {
@@ -88,9 +131,6 @@ int main( int argc, char* argv[] )
 {
 
   Logger::init( "action_parse" );
-
-  if( !fs::exists( "ActionLutData.cpp.tmpl" ) )
-    throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
 
   if( argc == 2 )
   {
@@ -267,7 +307,7 @@ int main( int argc, char* argv[] )
   // dump entries
   Logger::info( "Found {} player actions", actions.size() );
 
-  std::string output;
+  nlohmann::ordered_json output;
   Logger::info( std::to_string( traversedCombos.size() ) );
   for( const auto& action : actions )
   {
@@ -279,29 +319,11 @@ int main( int argc, char* argv[] )
 //                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
 //                  data.curePotency, data.restorePercentage );
 
-    auto comboStr = stringVec( data.nextCombo );
-    if( !comboStr.empty() )
-      comboStr = " " + comboStr + " ";
-
-    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {}, {}, {{{}}} }} }},\n",
-                            data.name, action.first,
-                            data.potency, data.comboPotency,
-                            data.flankPotency, data.frontPotency, data.rearPotency,
-                            data.curePotency, 0, comboStr );
-
-    output += out;
-//    Logger::info( out );
+    output[ std::to_string(action.first) ] = data;
   }
 
-  std::ifstream ifs( "ActionLutData.cpp.tmpl" );
-
-  std::string actionTmpl( ( std::istreambuf_iterator< char >( ifs ) ),
-                            std::istreambuf_iterator< char >() );
-
-  auto result = std::regex_replace( actionTmpl, std::regex( "%INSERT_GARBAGE%" ), output );
-
-  std::ofstream outH( "ActionLutData.cpp" );
-  outH << result;
+  std::ofstream outH( "actions/player.json" );
+  outH << std::setw(2) << output << std::endl;
   outH.close();
 
   return 0;

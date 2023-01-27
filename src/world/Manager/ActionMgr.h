@@ -20,6 +20,8 @@ namespace Sapphire::World::Manager
     ActionMgr() = default;
     ~ActionMgr() = default;
 
+    bool cacheActionLut();
+
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
                                      std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
     void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,

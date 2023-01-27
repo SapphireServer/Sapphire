@@ -12,4 +12,3 @@ if (UNIX)
 else()
   target_link_libraries( action_parse common xivdat mysql zlib)
 endif()
-
