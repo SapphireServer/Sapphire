@@ -891,8 +891,7 @@ namespace Sapphire::Common
     CriticalHitPowerPercent = 1012,
     CriticalHitResiliencePercent = 1013,
     CriticalHitPercent = 1014,
-    EnmityPercent = 1015,
-    EnmityReductionPercent = 1016,
+    EnmityPercent = 1015
   };
 
   enum struct ActionAspect : uint8_t

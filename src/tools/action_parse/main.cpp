@@ -31,10 +31,16 @@ Sapphire::Data::ExdData g_exdDataGen;
 std::string datLocation( "C:\\Data\\Dev\\ffxiv3.01\\game\\sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
 
+struct StatusModifier
+{
+  Common::ParamModifier modifier;
+  int32_t value;
+};
+
 struct StatusEntry
 {
   uint16_t id;
-  std::unordered_map< std::string, uint16_t > modifiers;
+  std::vector< StatusModifier > modifiers;
 };
 
 struct StatusEffect
@@ -57,6 +63,14 @@ struct ActionEntry
   std::vector< uint32_t > nextCombo{};
   StatusEffect statuses;
 };
+
+void to_json( nlohmann::ordered_json& j, const StatusModifier& statusModifier)
+{
+  j = nlohmann::ordered_json{
+    { "modifier", statusModifier.modifier },
+    { "value", statusModifier.value }
+  };
+}
 
 void to_json( nlohmann::ordered_json& j, const StatusEntry& statusEntry )
 {

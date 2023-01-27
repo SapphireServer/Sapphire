@@ -1,4 +1,5 @@
 #include "ActionLut.h"
+#include "Common.h"
 #include <nlohmann/json.hpp>
 
 namespace Sapphire::World::Action
@@ -8,7 +9,25 @@ namespace Sapphire::World::Action
     public:
       static bool cacheActions();
       static bool reloadActions();
+
+      static std::unordered_map< std::string, Common::ParamModifier > m_modifierStringMap;
   };
+
+  inline void from_json( const nlohmann::json& j, StatusModifier& statusModifier )
+  {
+    auto stringKey = j.at( "modifier" ).get< std::string >();
+    j.at( "value" ).get_to( statusModifier.value );
+
+    auto enumKey = ActionLutData::m_modifierStringMap.find( stringKey );
+    if( enumKey != ActionLutData::m_modifierStringMap.end() )
+    {
+      statusModifier.modifier = enumKey->second;
+    }
+    else
+    {
+      statusModifier.modifier = Common::ParamModifier::None;
+    }
+  }
 
   inline void from_json( const nlohmann::json& j, StatusEntry& statusEntry )
   {
