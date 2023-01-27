@@ -77,8 +77,8 @@ namespace Sapphire::World::Manager
     AchievementKeyCache m_achievementKeyCacheMap;
 
     std::shared_ptr< Excel::ExcelStruct< Excel::Achievement > > getAchievementDetail( uint32_t achvId ) const;
-    const std::vector< uint32_t >& getAchievementIdByType( Common::Achievement::Type type ) const;
-    const std::vector< uint32_t >& getAchievementIdByType( uint32_t type ) const;
+    std::vector< uint32_t > getAchievementIdByType( Common::Achievement::Type type ) const;
+    std::vector< uint32_t > getAchievementIdByType( uint32_t type ) const;
 
     /// <summary>
     /// get a key for merged achievements (type:subtype) that have progress data
@@ -125,7 +125,7 @@ namespace Sapphire::World::Manager
 
       auto achvExdData = pAchv->data();
 
-      if( achvExdData.ConditionArg[ 1 ] <= achvDataList[ dataKey.u32 ] )
+      if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvDataList[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );
     }
   }
@@ -157,9 +157,8 @@ namespace Sapphire::World::Manager
 
       auto achvExdData = pAchv->data();
 
-      if( achvExdData.ConditionArg[ 1 ] <= achvDataList[ dataKey.u32 ] )
+      if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvDataList[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );
-      
     }
   }
 

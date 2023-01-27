@@ -16,6 +16,11 @@ namespace Sapphire::Data
   using InstanceContentPtr = std::shared_ptr< InstanceContent >;
 }
 
+namespace Sapphire
+{
+  class Territory;
+}
+
 namespace Sapphire::World::Manager
 {
   /*!
@@ -132,7 +137,7 @@ namespace Sapphire::World::Manager
         TODO: Mind multiple instances?! */
     TerritoryPtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
 
-    bool movePlayer( const TerritoryPtr&, Entity::Player& player );
+    bool movePlayer( Sapphire::Territory& teri, Entity::Player& player );
 
     /*! returns an instancePtr if the player is still bound to an isntance */
     TerritoryPtr getLinkedInstance( uint32_t playerId ) const;

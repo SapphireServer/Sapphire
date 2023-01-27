@@ -98,6 +98,8 @@ namespace Sapphire::World::Manager
 
     void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
 
+    void sendLandFlagsSlot( Entity::Player& player, Common::LandFlagsSlot slot );
+    void sendLandFlags( Entity::Player& player );
     /*!
      * @brief Updates the cached models on a house from the relevant apperance inventories.
      * Does not send the subsequent update to clients.

@@ -169,12 +169,12 @@ Common::AchievementDataKey AchievementMgr::getKeyFromType( Common::Achievement::
   return dataKey;
 }
 
-const std::vector< uint32_t >& AchievementMgr::getAchievementIdByType( Common::Achievement::Type type ) const
+std::vector< uint32_t > AchievementMgr::getAchievementIdByType( Common::Achievement::Type type ) const
 {
   return getAchievementIdByType( static_cast< uint32_t >( type ) );
 }
 
-const std::vector< uint32_t >& AchievementMgr::getAchievementIdByType( uint32_t type ) const
+std::vector< uint32_t > AchievementMgr::getAchievementIdByType( uint32_t type ) const
 {
   auto it = m_achievementKeyCacheMap.find( type );
 

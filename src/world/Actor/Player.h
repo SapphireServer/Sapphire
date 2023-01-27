@@ -582,8 +582,6 @@ namespace Sapphire::Entity
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
 
-    void sendZonePackets();
-
     Common::ZoneingType getZoningType() const;
 
     void setZoningType( Common::ZoneingType zoneingType );
@@ -603,9 +601,6 @@ namespace Sapphire::Entity
     // Housing Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     void setLandFlags( uint8_t permissionSet, uint32_t landFlags, Common::LandIdent ident );
-
-    void sendLandFlags();
-    void sendLandFlagsSlot( Common::LandFlagsSlot slot );
 
     // Player Battle Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -816,6 +811,8 @@ namespace Sapphire::Entity
     bool isConnected() const;
     void setConnected( bool isConnected );
 
+    const Common::CharaLandData& getCharaLandData( Common::LandFlagsSlot slot ) const;
+
   private:
     /*! queue a packet for the player */
     void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
@@ -939,6 +936,8 @@ namespace Sapphire::Entity
 
     // housing info
     Common::CharaLandData m_charaLandData[2]{};
+
+  private:
 
     Common::ActiveLand m_activeLand{};
 
