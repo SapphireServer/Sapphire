@@ -118,7 +118,7 @@ int main( int argc, char** argv )
   result += generateEnum( "ActionCategory", 0, "uint8_t" );
   result += generateEnum( "BaseParam", 1, "uint8_t" );
   result += generateEnum( "BeastReputationRank", 1, "uint8_t" );
-  result += generateEnum( "BeastTribe", 11, "uint8_t" );
+  result += generateEnum( "BeastTribe", 9, "uint8_t" );
   result += generateEnum( "ClassJob", 0, "uint8_t" );
   result += generateEnum( "ContentType", 0, "uint8_t" );
   result += generateEnum( "EmoteCategory", 0, "uint8_t" );
@@ -127,7 +127,7 @@ int main( int argc, char** argv )
   result += generateEnum( "GuardianDeity", 0, "uint8_t" );
   result += generateEnum( "ItemUICategory", 0, "uint8_t" );
   result += generateEnum( "ItemSearchCategory", 0, "uint8_t" );
-  result += generateEnum( "OnlineStatus", 2, "uint8_t" );
+  result += generateEnum( "OnlineStatus", 3, "uint8_t" );
   result += generateEnum( "Race", 1, "uint8_t" );
   result += generateEnum( "Tribe", 0, "uint8_t" );
   result += generateEnum( "Town", 0, "uint8_t" );

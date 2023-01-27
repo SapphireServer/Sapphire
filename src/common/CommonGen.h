@@ -800,9 +800,9 @@ namespace Sapphire::Common {
       Vacuity = 171,
       Vacuity1 = 172,
       Vacuity2 = 173,
-      //2 = 174,
-      //3 = 175,
-      //4 = 176,
+      DimensionalDisruption4 = 174,
+      DimensionalDisruption5 = 175,
+      DimensionalDisruption6 = 176,
    };
 
    ///////////////////////////////////////////////////////////
