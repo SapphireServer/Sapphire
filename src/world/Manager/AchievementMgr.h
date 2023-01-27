@@ -58,10 +58,8 @@ namespace Sapphire::World::Manager
     /// <returns>true/false</returns>
     bool hasAchievementUnlocked( Entity::Player& player, uint32_t achievementId );
 
-    void unlockAchievement( Entity::Player& player, uint32_t achievementId );
-
     /// <summary>
-    /// get a pair of current progress and maximum count for a given achievement ID
+    /// get a pair of current progress and maximum count for a given achievement id
     /// </summary>
     /// <param name="player"></param>
     /// <param name="achievementId"></param>
@@ -76,6 +74,7 @@ namespace Sapphire::World::Manager
     AchievementDetailCache m_achievementDetailCacheMap;
     AchievementKeyCache m_achievementKeyCacheMap;
 
+    // cache fetch functions
     std::shared_ptr< Excel::ExcelStruct< Excel::Achievement > > getAchievementDetail( uint32_t achvId ) const;
     std::vector< uint32_t > getAchievementIdByType( Common::Achievement::Type type ) const;
     std::vector< uint32_t > getAchievementIdByType( uint32_t type ) const;
@@ -89,11 +88,19 @@ namespace Sapphire::World::Manager
     Common::AchievementDataKey getKeyFromType( Common::Achievement::Type achvType, int32_t argument );
 
     /// <summary>
-    /// parse and unlock achievements linked to a given achievement Id
+    /// parse and unlock achievements linked to a given achievement id
     /// </summary>
     /// <param name="player"></param>
     /// <param name="achievementId"></param>
     void handleLinkedAchievementsForId( Entity::Player& player, uint32_t achievementId );
+
+    /// <summary>
+    /// internal use: unlock achievement in the player achievement unlock flagmask, from a given id
+    /// progressAchievement should be used instead, due to certain achievements using progress data
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="achievementId"></param>
+    void unlockAchievement( Entity::Player& player, uint32_t achievementId );
 
     template< typename AchievementTypeT, AchievementTypeT achievementType >
     inline void progressAchievement( Entity::Player& player, int32_t argument, uint32_t progressCount );
@@ -103,14 +110,16 @@ namespace Sapphire::World::Manager
   template<>
   inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::General >( Entity::Player& player, int32_t subtype, uint32_t progressCount )
   {
-    auto& achvDataList = player.getAchievementDataList();
+    auto achvData = player.getAchievementData();
 
     auto dataKey = getKeyFromType( Common::Achievement::Type::General, subtype );
 
-    if( !achvDataList.count( dataKey.u32 ) )
-      achvDataList[ dataKey.u32 ] = 0;
+    if( !achvData.progressData.count( dataKey.u32 ) )
+      achvData.progressData[ dataKey.u32 ] = 0;
 
-    achvDataList[ dataKey.u32 ] += progressCount;
+    achvData.progressData[ dataKey.u32 ] += progressCount;
+
+    player.setAchievementData( achvData );
 
     const auto achvIdList = getAchievementIdByType( dataKey.u32 );
 
@@ -125,7 +134,7 @@ namespace Sapphire::World::Manager
 
       auto achvExdData = pAchv->data();
 
-      if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvDataList[ dataKey.u32 ] ) )
+      if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvData.progressData[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );
     }
   }
@@ -133,16 +142,16 @@ namespace Sapphire::World::Manager
   template<>
   inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::Classjob >( Entity::Player& player, int32_t classJob, uint32_t unused )
   {
-    auto& achvDataList = player.getAchievementDataList();
+    auto achvData = player.getAchievementData();
 
     auto dataKey = getKeyFromType( Common::Achievement::Type::Classjob, classJob );
 
-    if( !achvDataList.count( dataKey.u32 ) )
-      achvDataList[ dataKey.u32 ] = 0;
+    if( !achvData.progressData.count( dataKey.u32 ) )
+      achvData.progressData[ dataKey.u32 ] = 0;
 
     auto level = player.getLevelForClass( static_cast< Common::ClassJob >( classJob ) );
 
-    achvDataList[ dataKey.u32 ] = level;
+    achvData.progressData[ dataKey.u32 ] = level;
 
     const auto achvIdList = getAchievementIdByType( dataKey.u32 );
 
@@ -157,7 +166,7 @@ namespace Sapphire::World::Manager
 
       auto achvExdData = pAchv->data();
 
-      if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvDataList[ dataKey.u32 ] ) )
+      if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvData.progressData[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );
     }
   }
@@ -165,7 +174,7 @@ namespace Sapphire::World::Manager
   template<>
   inline void AchievementMgr::progressAchievement< Common::Achievement::Type, Common::Achievement::Type::Quest >( Entity::Player& player, int32_t questId, uint32_t unused )
   {
-    auto& achvDataList = player.getAchievementDataList();
+    auto& achvDataList = player.getAchievementData().progressData;
 
     // get achievements that need all achv in args completed
     const auto questAchvAllList = getAchievementIdByType( Common::Achievement::Type::Quest );

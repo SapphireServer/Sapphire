@@ -560,16 +560,6 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     pSession->getZoneConnection()->queueOutPacket( effectPacket );
   }
-  else if( subCommand == "achv" )
-  {
-    uint32_t achvId;
-
-    sscanf( params.c_str(), "%u", &achvId );
-
-    auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
-
-    achvMgr.unlockAchievement( player, achvId );
-  }
   else if( subCommand == "achvGeneral" )
   {
     uint32_t achvSubtype;

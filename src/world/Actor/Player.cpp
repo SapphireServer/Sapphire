@@ -1335,19 +1335,14 @@ void Player::setTitle( uint16_t titleId )
   sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
 }
 
-Player::AchievementList& Player::getAchievementList()
-{
-  return m_achievementList;
-}
-
-Player::AchievementDataList& Player::getAchievementDataList()
+const Player::AchievementData& Player::getAchievementData() const
 {
   return m_achievementData;
 }
 
-Player::AchievementHistory& Player::getAchievementHistory()
+void Player::setAchievementData( const Player::AchievementData& achievementData )
 {
-  return m_achievementHistory;
+  m_achievementData = achievementData;
 }
 
 void Player::setMaxGearSets( uint8_t amount )
