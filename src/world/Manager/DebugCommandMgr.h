@@ -63,6 +63,8 @@ namespace Sapphire::World::Manager
 
     void easyWarp( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void hotReload( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
   };
 
 }

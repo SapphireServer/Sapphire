@@ -201,6 +201,13 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Sapphire::InstanceObjectCache >::set( pInstanceObjCache );
 
   auto pActionMgr = std::make_shared< Manager::ActionMgr >();
+
+  Logger::info( "ActionMgr: Caching action LUT" );
+  if( !pActionMgr->cacheActionLut() )
+  {
+    Logger::fatal( "Unable to cache actions!" );
+    return;
+  }
   Common::Service< Manager::ActionMgr >::set( pActionMgr );
 
   auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
