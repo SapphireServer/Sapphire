@@ -2004,11 +2004,11 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
 
   struct FFXIVIpcInterior : FFXIVIpcBasePacket< Interior >
   {
-    uint8_t Window;
-    uint8_t WindowColor;
-    uint8_t Door;
-    uint8_t DoorColor;
-    uint16_t Interior[10];
+    uint16_t Window;
+    uint16_t WindowColor;
+    uint16_t Door;
+    uint16_t DoorColor;
+    uint32_t Interior[10];
   };
 
   struct FFXIVIpcHousingAuction : FFXIVIpcBasePacket< HousingAuction >
@@ -2073,18 +2073,30 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
   struct FFXIVIpcFurnitureListS : FFXIVIpcBasePacket< FurnitureListS >
   {
     Common::LandIdent LandId;
+    int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
+    uint8_t packetNum;
+    uint8_t packetTotal;
+    uint8_t u2; //Outdoor 0 / Indoor 100(?)
     Common::Furniture Furnitures[100];
   };
 
   struct FFXIVIpcFurnitureListM : FFXIVIpcBasePacket< FurnitureListM >
   {
     Common::LandIdent LandId;
+    int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
+    uint8_t packetNum;
+    uint8_t packetTotal;
+    uint8_t u2; //Outdoor 0 / Indoor 100(?)
     Common::Furniture Furnitures[150];
   };
 
   struct FFXIVIpcFurnitureListL : FFXIVIpcBasePacket< FurnitureListL >
   {
     Common::LandIdent LandId;
+    int8_t u1; //Outdoor -1 / Indoor 0 - probably indicator
+    uint8_t packetNum;
+    uint8_t packetTotal;
+    uint8_t u2; //Outdoor 0 / Indoor 100(?)
     Common::Furniture Furnitures[200];
   };
 

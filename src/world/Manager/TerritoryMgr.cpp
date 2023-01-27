@@ -15,6 +15,7 @@
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
 #include "WarpMgr.h"
+#include "PlayerMgr.h"
 #include "Linkshell/Linkshell.h"
 
 #include "Territory/Land.h"
@@ -585,13 +586,9 @@ TerritoryMgr::InstanceIdList TerritoryMgr::getInstanceContentIdList( uint16_t in
   return idList;
 }
 
-bool TerritoryMgr::movePlayer( const TerritoryPtr& pZone, Entity::Player& player )
+bool TerritoryMgr::movePlayer( Sapphire::Territory& teri, Entity::Player& player )
 {
-  if( !pZone )
-  {
-    Logger::error( "Territory not found on this server." );
-    return false;
-  }
+  auto& playerMgr = Common::Service< Manager::PlayerMgr >::ref();
 
   auto pPrevZone = getTerritoryByGuId( player.getTerritoryId() );
 
@@ -599,8 +596,8 @@ bool TerritoryMgr::movePlayer( const TerritoryPtr& pZone, Entity::Player& player
 
   player.initSpawnIdQueue();
 
-  player.setTerritoryTypeId( pZone->getTerritoryTypeId() );
-  player.setTerritoryId( pZone->getGuId() );
+  player.setTerritoryTypeId( teri.getTerritoryTypeId() );
+  player.setTerritoryId( teri.getGuId() );
 
   bool playerLoaded = player.isLoadingComplete();
 
@@ -610,13 +607,13 @@ bool TerritoryMgr::movePlayer( const TerritoryPtr& pZone, Entity::Player& player
   if( playerLoaded && pPrevZone )
     pPrevZone->removeActor( player.getAsPlayer() );
 
-  pZone->pushActor( player.getAsPlayer() );
+  teri.pushActor( player.getAsPlayer() );
 
   // map player to instanceId so it can be tracked.
-  m_playerIdToInstanceMap[ player.getId() ] = pZone->getGuId();
+  m_playerIdToInstanceMap[ player.getId() ] = teri.getGuId();
 
-  pZone->onBeforePlayerZoneIn( player );
-  player.sendZonePackets();
+  teri.onBeforePlayerZoneIn( player );
+  playerMgr.onZone( player );
 
   return true;
 }
@@ -712,7 +709,7 @@ bool TerritoryMgr::joinWorld( Entity::Player& player )
     return false;
   }
 
-  if( !movePlayer( pCurrZone, player ) )
+  if( !movePlayer( *pCurrZone, player ) )
     return false;
 
   return true;

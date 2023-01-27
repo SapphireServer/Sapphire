@@ -1526,86 +1526,6 @@ uint32_t Player::getPrevTerritoryTypeId() const
   return m_prevTerritoryTypeId;
 }
 
-void Player::sendZonePackets()
-{
-  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-
-  auto initPacket = makeZonePacket< FFXIVIpcLogin >( getId() );
-  initPacket->data().playerActorId = getId();
-  queuePacket( initPacket );
-
-  sendInventory();
-
-  if( isLogin() )
-  {
-    queuePacket( makeActorControlSelf( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );
-    queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
-  }
-
-  // set flags, will be reset automatically by zoning ( only on client side though )
-  //setStateFlag( PlayerStateFlag::BetweenAreas );
-  //setStateFlag( PlayerStateFlag::BetweenAreas1 );
-
-  if( hasReward( Common::UnlockEntry::HuntingLog ) )
-    sendHuntingLog();
-
-  sendStats();
-
-  // only initialize the UI if the player in fact just logged in.
-  if( isLogin() )
-  {
-    auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( getId() );
-    std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
-
-    queuePacket( contentFinderList );
-
-    auto statusPacket = makePlayerSetup( *this );
-
-    queuePacket( statusPacket );
-
-    Service< World::Manager::PlayerMgr >::ref().onPlayerStatusUpdate( *this );
-
-    sendItemLevel();
-
-    clearSoldItems();
-  }
-
-  auto& housingMgr = Common::Service< HousingMgr >::ref();
-  if( Sapphire::LandPtr pLand = housingMgr.getLandByOwnerId( getCharacterId() ) )
-  {
-    uint32_t state = 0;
-    if( pLand->getHouse() )
-    {
-      state |= LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_HOUSE;
-
-      // todo: remove this, debug for now
-      state |= LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_AETHERYTE;
-    }
-
-    setLandFlags( LandFlagsSlot::Private, state, pLand->getLandIdent() );
-  }
-
-  sendLandFlags();
-
-  queuePacket( makeInitZone( *this, *pZone ) );
-
-  pZone->onPlayerZoneIn( *this );
-
-  if( isLogin() )
-  {
-    queuePacket( makeZonePacket< FFXIVIpcQuestRepeatFlags >( getId() ) );
-    queuePacket( makeZonePacket< FFXIVIpcDailyQuests >( getId() ) );
-  }
-
-  if( getPartyId() != 0 )
-  {
-    auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-    partyMgr.onMoveZone( *this );
-  }
-
-}
-
 void Player::setDirectorInitialized( bool isInitialized )
 {
   m_directorInitialized = isInitialized;
@@ -1758,44 +1678,6 @@ void Player::setLandFlags( uint8_t flagSlot, uint32_t landFlags, Common::LandIde
   m_charaLandData[ flagSlot ].landId = ident;
   m_charaLandData[ flagSlot ].landId.worldId = server.getWorldId();
   m_charaLandData[ flagSlot ].landFlags = landFlags;
-}
-
-void Player::sendLandFlags()
-{
-  auto landFlags = makeZonePacket< FFXIVIpcCharaHousing >( getId() );
-
-  landFlags->data().FcLands = m_charaLandData[ Common::LandFlagsSlot::FreeCompany ];
-  landFlags->data().CharaLands = m_charaLandData[ Common::LandFlagsSlot::Private ];
-
-  queuePacket( landFlags );
-}
-
-void Player::sendLandFlagsSlot( Common::LandFlagsSlot slot )
-{
-  auto landFlags = makeZonePacket< FFXIVIpcCharaHousingLandData >( getId() );
-
-  LandType type;
-
-  switch( slot )
-  {
-    case LandFlagsSlot::Private:
-      type = LandType::Private;
-      break;
-
-    case LandFlagsSlot::FreeCompany:
-      type = LandType::FreeCompany;
-      break;
-
-    default:
-      // todo: other/unsupported land types
-      return;
-  }
-
-  landFlags->data().Index = static_cast< uint32_t >( type );
-  landFlags->data().LandData.landId = m_charaLandData[ slot ].landId;
-  landFlags->data().LandData.landFlags = m_charaLandData[ slot ].landFlags;
-
-  queuePacket( landFlags );
 }
 
 Sapphire::Common::HuntingLogEntry& Player::getHuntingLogEntry( uint8_t index )
@@ -2142,4 +2024,9 @@ void Player::updatePrevTerritory()
     m_prevPos = m_pos;
     m_prevRot = m_rot;
   }
+}
+
+const CharaLandData& Entity::Player::getCharaLandData( Common::LandFlagsSlot slot ) const
+{
+  return m_charaLandData[ slot ];
 }

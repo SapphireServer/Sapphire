@@ -39,13 +39,19 @@ void MoveTerritoryTask::execute()
   if( m_warpInfo.m_targetTerritoryId != 0 )
     pZone = teriMgr.getTerritoryByGuId( m_warpInfo.m_targetTerritoryId );
 
-  if( !teriMgr.movePlayer( pZone, *pPlayer ) )
+  if( !pZone )
+  {
+    Logger::error( "Territory typeId#{} not found!", m_warpInfo.m_targetTerritoryId );
+    return;
+  }
+
+  if( !teriMgr.movePlayer( *pZone, *pPlayer ) )
   {
     // todo: this will require proper handling, for now just return the player to their previous area
     pPlayer->setPos( pPlayer->getPrevPos(), false );
 
     auto pZone1 = teriMgr.getZoneByTerritoryTypeId( pPlayer->getPrevTerritoryTypeId() );
-    if( !teriMgr.movePlayer( pZone1, *pPlayer ) )
+    if( !teriMgr.movePlayer( *pZone1, *pPlayer ) )
       return;
   }
 }

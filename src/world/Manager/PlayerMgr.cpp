@@ -5,9 +5,12 @@
 #include <Exd/ExdData.h>
 
 #include <Territory/Territory.h>
+#include <Territory/Land.h>
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/AchievementMgr.h>
+#include <Manager/PartyMgr.h>
+#include <Manager/HousingMgr.h>
 
 #include "Script/ScriptMgr.h"
 #include "WorldServer.h"
@@ -20,7 +23,9 @@
 #include <Network/PacketWrappers/ActorControlPacket.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
+#include "Network/PacketWrappers/InitZonePacket.h"
 #include <Network/PacketWrappers/ModelEquipPacket.h>
+#include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include <Network/PacketWrappers/PlayerStateFlagsPacket.h>
 #include <Network/PacketWrappers/UpdateHpMpTpPacket.h>
 #include "Network/PacketWrappers/ServerNoticePacket.h"
@@ -132,11 +137,10 @@ void PlayerMgr::onSendStats( Entity::Player& player )
     statParams[ row->data().PacketIndex ] = player.getStatValue( static_cast< Common::BaseParam >( id ) );
   }
 
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   auto statPacket = makeZonePacket< FFXIVIpcBaseParam >( player.getId() );
   memcpy( statPacket->data().Param, statParams.data(), sizeof( uint32_t ) * statParams.size() );
 
+  auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), statPacket );
 }
 
@@ -317,7 +321,7 @@ void PlayerMgr::onLogin( Entity::Player &player )
   std::string msg;
   while( std::getline( ss, msg, ';' ) )
   {
-    PlayerMgr::sendServerNotice( player, msg );
+    sendServerNotice( player, msg );
   }
 }
 
@@ -327,6 +331,93 @@ void PlayerMgr::onDeath( Entity::Player &player )
   scriptMgr.onPlayerDeath( player );
 }
 
+void PlayerMgr::onZone( Sapphire::Entity::Player& player )
+{
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( !pZone )
+  {
+    Logger::error( "Territory GuID#{} not found!", player.getTerritoryId() );
+    return;
+  }
+  auto& teri = *pZone;
+
+  auto initPacket = makeZonePacket< FFXIVIpcLogin >( player.getId() );
+  initPacket->data().playerActorId = player.getId();
+
+  server.queueForPlayer( player.getCharacterId(), initPacket );
+
+  player.sendInventory();
+
+  if( player.isLogin() )
+  {
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetCharaGearParamUI, player.getEquipDisplayFlags(), 1 ) );
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
+  }
+
+  // set flags, will be reset automatically by zoning ( only on client side though )
+  //setStateFlag( PlayerStateFlag::BetweenAreas );
+  //setStateFlag( PlayerStateFlag::BetweenAreas1 );
+
+  if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
+    player.sendHuntingLog();
+
+  player.sendStats();
+
+  // only initialize the UI if the player in fact just logged in.
+  if( player.isLogin() )
+  {
+    auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
+    std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
+
+    server.queueForPlayer( player.getCharacterId(), { contentFinderList, makePlayerSetup( player ) } );
+
+    onPlayerStatusUpdate( player );
+
+    player.sendItemLevel();
+
+    player.clearSoldItems();
+  }
+
+  if( Sapphire::LandPtr pLand = housingMgr.getLandByOwnerId( player.getCharacterId() ) )
+  {
+    uint32_t state = 0;
+    if( pLand->getHouse() )
+    {
+      state |= Common::LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_HOUSE;
+
+      // todo: remove this, debug for now
+      state |= Common::LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_AETHERYTE;
+    }
+
+    player.setLandFlags( Common::LandFlagsSlot::Private, state, pLand->getLandIdent() );
+  }
+
+  housingMgr.sendLandFlags( player );
+
+  server.queueForPlayer( player.getCharacterId(), makeInitZone( player, teri ) );
+
+  teri.onPlayerZoneIn( player );
+
+  if( player.isLogin() )
+  {
+    server.queueForPlayer( player.getCharacterId(),
+                           {
+                             makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() ),
+                             makeZonePacket< FFXIVIpcDailyQuests >( player.getId() )
+                           } );
+  }
+
+  if( player.getPartyId() != 0 )
+  {
+    partyMgr.onMoveZone( player );
+  }
+
+}
 
 ////////// Helper ///////////
 
