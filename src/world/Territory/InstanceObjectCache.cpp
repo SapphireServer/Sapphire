@@ -97,6 +97,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
           }
           else if( pEntry->getType() == LgbEntryType::PopRange )
           {
+
             auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
             m_popRangeCache.insert( id, pPopRange );
           }

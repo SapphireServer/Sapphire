@@ -19,9 +19,13 @@
 #include "Inventory/ItemContainer.h"
 #include "WorldServer.h"
 
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include "Forwards.h"
 #include "HousingZone.h"
 #include "Manager/HousingMgr.h"
+#include "InstanceObjectCache.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -34,7 +38,6 @@ Sapphire::HousingZone::HousingZone( uint8_t wardNum, uint16_t territoryTypeId,
   m_wardNum( wardNum ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
 {
-  m_inRangeDistance = 3000;
 }
 
 bool Sapphire::HousingZone::init()
@@ -57,8 +60,6 @@ bool Sapphire::HousingZone::init()
     housingIndex = 1;
   else if( m_territoryTypeId == 341 )
     housingIndex = 2;
-  else if( m_territoryTypeId == 641 )
-    housingIndex = 3;
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto info = exdData.getRow< Excel::HousingLandSet >( housingIndex );
@@ -298,7 +299,34 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto land = getLand( landId );
   assert( land );
 
-  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 0, 0, FFXIVARR_POSITION3{ 0, 10, 0 }, 0.f, "entrance", 0 );
+  int housingIndex;
+  if( m_territoryTypeId == 339 )
+    housingIndex = 0;
+  else if( m_territoryTypeId == 340 )
+    housingIndex = 1;
+  else if( m_territoryTypeId == 341 )
+    housingIndex = 2;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto info = exdData.getRow< Excel::HousingLandSet >( housingIndex );
+
+  auto landInfo = info->_data.Lands[ landId ];
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+
+  FFXIVARR_POSITION3 pos{ 0, 10, 0 };
+  auto eObjInfo = instanceObjectCache.getEObj( landInfo.SignboardEObj );
+  if( eObjInfo )
+  {
+    pos.x = eObjInfo->data.transform.translation.x;
+    pos.y = eObjInfo->data.transform.translation.y;
+    pos.z = eObjInfo->data.transform.translation.z;
+  }
+  else
+  {
+    Logger::error( "No position could be determined for housing entrance!" );
+  }
+
+  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 0, 0, pos, 0.f, "entrance", 0 );
   eObj->setHousingLink( static_cast< uint32_t >( landId ) );
   eObj->setScale( 1.f );
 
