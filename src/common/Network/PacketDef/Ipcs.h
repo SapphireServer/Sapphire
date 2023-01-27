@@ -360,7 +360,7 @@ namespace Sapphire::Network::Packets
 
     SocialListHandler = 0x0200,              // updated 6.31
     SetSearchInfoHandler = 0x035C,           // updated 6.31
-    ReqSearchInfoHandler = 0x014F,           // updated 5.58 hotfix
+    ReqSearchInfoHandler = 0x02A6,           // updated 6.31
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
     ReqRemovePlayerFromBlacklist = 0x00B4, // updated 5.58 hotfix
@@ -386,15 +386,15 @@ namespace Sapphire::Network::Packets
     ReqCountdownInitiate = 0x01FF, // updated 6.31
     ReqCountdownCancel = 0x0140,   // updated 6.31
 
-    ZoneLineHandler = 0x01EC,  // updated 6.30h
+    ZoneLineHandler = 0x01E6,  // updated 6.31
     ClientTrigger = 0x0165,    // updated 6.31
     DiscoveryHandler = 0x038B, // updated 5.58 hotfix
 
     PlaceFieldMarkerPreset = 0x204, // updated 6.30h
     PlaceFieldMarker = 0x38e,       // updated 6.30h
     SkillHandler = 0x0383,          // updated 6.31
-    GMCommand1 = 0x0182,            // updated 6.30h
-    GMCommand2 = 0x02AD,            // updated 6.30h
+    GMCommand1 = 0x026E,            // updated 6.31
+    GMCommand2 = 0x012C,            // updated 6.31
     AoESkillHandler = 0x0152,       // updated 5.58 hotfix
 
     UpdatePositionHandler = 0x00EE, // updated 6.31
@@ -406,26 +406,26 @@ namespace Sapphire::Network::Packets
     ReqPlaceHousingItem = 0x02D4, // updated 5.58 hotfix
     BuildPresetHandler = 0x0223,  // updated 5.58 hotfix
 
-    TalkEventHandler = 0x0384,         // updated 6.30h
+    TalkEventHandler = 0x02E9,         // updated 6.31
     EmoteEventHandler = 0x00B0,        // updated 5.58 hotfix
     WithinRangeEventHandler = 0x02B6,  // updated 5.58 hotfix
-    OutOfRangeEventHandler = 0x03C5,   // updated 5.58 hotfix
-    EnterTeriEventHandler = 0x0332,    // updated 6.30h
+    OutOfRangeEventHandler = 0x01CC,   // updated 6.31
+    EnterTeriEventHandler = 0x01ED,    // updated 6.31
     ShopEventHandler = 0x0384,         // updated 5.58 hotfix
-    ReturnEventHandler = 0x0383,       // updated 6.30h
-    TradeReturnEventHandler = 0x0398,  // updated 6.30h
+    ReturnEventHandler = 0x010D,       // updated 6.31
+    TradeReturnEventHandler = 0x03C1,  // updated 6.31
     TradeReturnEventHandler2 = 0x023C, // updated 5.58 hotfix
     EventYield2Handler = 0x021D,       // updated 5.58 hotfix
     EventYield16Handler = 0x0207,      // updated 5.58 hotfix
 
     LinkshellEventHandler = 0x9999,  // unknown
-    LinkshellEventHandler1 = 0x9999,  // unknown
+    LinkshellEventHandler1 = 0x9999, // unknown
 
     ReqEquipDisplayFlagsChange = 0x03BC, // updated 6.30h
 
     LandRenameHandler = 0x028E,           // updated 5.58 hotfix
     HousingUpdateHouseGreeting = 0x0343,  // updated 5.58 hotfix
-    HousingUpdateObjectPosition = 0x012C, // updated 5.58 hotfix
+    HousingUpdateObjectPosition = 0x9999, // unknown
     HousingEditExterior = 0x027B,         // updated 5.58 hotfix
     HousingEditInterior = 0x02E3,         // updated 5.58 hotfix
 
