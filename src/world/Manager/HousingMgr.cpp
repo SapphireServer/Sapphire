@@ -1759,7 +1759,8 @@ void HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
   land->updateLandDb();
   terri->sendLandUpdate( plot );
 
-  player.setLandFlags( Common::LandFlagsSlot::Private, 0, land->getLandIdent() );
+  player.setLandFlags( Common::LandFlagsSlot::Private, Common::HOUSING_LAND_STATUS::HOUSING_LAND_STATUS_NOINIT, land->getLandIdent() );
+  sendLandFlagsSlot( player, Common::LandFlagsSlot::Private );
 
   terri->removeEstateEntranceEObj( plot );
   return;
