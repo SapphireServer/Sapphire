@@ -5,6 +5,7 @@
 #include "TerritoryMgr.h"
 
 #include <WorldServer.h>
+#include <Logging/Logger.h>
 
 #include "Task/MoveTerritoryTask.h"
 #include "Task/WarpTask.h"
@@ -30,7 +31,10 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
 
   auto pTeri = teriMgr.getTerritoryByGuId( targetTerritoryId );
   if( !pTeri )
+  {
+    Logger::error( "Unable to find target territory instance {}", targetTerritoryId );
     return;
+  }
 
   m_entityIdToWarpInfoMap[ player.getId() ] = { targetTerritoryId, warpType, targetPos, targetRot };
 
