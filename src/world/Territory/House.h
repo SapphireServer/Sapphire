@@ -1,6 +1,4 @@
-#ifndef SAPPHIRE_HOUSE_H
-#define SAPPHIRE_HOUSE_H
-
+#pragma once
 #include "Forwards.h"
 #include <Common.h>
 #include <set>
@@ -62,5 +60,3 @@ namespace Sapphire
   };
 
 }
-
-#endif // SAPPHIRE_HOUSE_H

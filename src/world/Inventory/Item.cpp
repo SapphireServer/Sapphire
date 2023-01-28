@@ -29,7 +29,7 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_itemLevel = itemInfo->data().Level;
   m_maxStackSize = itemInfo->data().StackMax;
   // EXD TODO: Not sure what this maps to
-  //m_additionalData = itemInfo->additionalData;
+  m_additionalData = itemInfo->data().CategoryArg;
   m_blockRate = itemInfo->data().ShieldBlockRate;
   m_block = itemInfo->data().ShieldRate;
   m_defense = itemInfo->data().Defense;

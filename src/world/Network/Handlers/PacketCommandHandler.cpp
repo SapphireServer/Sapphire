@@ -736,7 +736,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
       break;
     }*/
-   case PacketCommand::HOUSING_LAYOUTMODE:
+   case PacketCommand::HOUSING_WARP_TO_SAFE:
     {
       // close ui
       if( param11 == 1 )

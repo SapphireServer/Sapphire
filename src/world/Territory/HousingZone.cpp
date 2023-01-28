@@ -176,7 +176,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
     auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
 
-    memcpy( &housingObjectInit->data().YardObjects, &objects + ( yardPacketNum * 400 ), yardObjectSize * 400 );
+    memcpy( &housingObjectInit->data().YardObjects, &objects + ( yardPacketNum * 100 ), yardObjectSize * 100 );
 
     server.queueForPlayer( player.getCharacterId(), housingObjectInit );
   }
@@ -269,7 +269,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
 void Sapphire::HousingZone::onUpdate( uint64_t tickCount )
 {
-  for( auto pLandItr : m_landPtrMap )
+  for( const auto& pLandItr : m_landPtrMap )
   {
     pLandItr.second->update( tickCount );
   }
