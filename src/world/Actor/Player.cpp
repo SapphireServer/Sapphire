@@ -1676,7 +1676,7 @@ void Player::setLandFlags( uint8_t flagSlot, uint32_t landFlags, Common::LandIde
   auto& server = Common::Service< World::WorldServer >::ref();
 
   m_charaLandData[ flagSlot ].landId = ident;
-  m_charaLandData[ flagSlot ].landId.worldId = server.getWorldId();
+  m_charaLandData[ flagSlot ].landId.worldId = static_cast< int16_t >( server.getWorldId() );
   m_charaLandData[ flagSlot ].landFlags = landFlags;
 }
 

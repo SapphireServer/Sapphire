@@ -101,9 +101,10 @@ void Sapphire::World::Territory::Housing::HousingInteriorTerritory::onPlayerZone
     }
     case HouseSize::HOUSE_SIZE_L:
     {
-            auto objectInitPacket = makeZonePacket< FFXIVIpcFurnitureListL >( player.getId() );
+      auto objectInitPacket = makeZonePacket< FFXIVIpcFurnitureListL >( player.getId() );
       memcpy( &objectInitPacket->data().LandId, &m_landIdent, sizeof( Common::LandIdent ) );
       memcpy( &objectInitPacket->data().Furnitures, m_housingObjects.data(), sizeof( Common::Furniture ) * 200 );
+      server.queueForPlayer( player.getCharacterId(), objectInitPacket );
       break;
     }
   }

@@ -56,7 +56,7 @@ public:
 
       Common::FFXIVARR_POSITION3 pos;
 
-      auto land = zone->getLand( eobj.getHousingLink() >> 8 );
+      auto land = zone->getLand( eobj.getHousingLink() );
       if( !land )
         return;
 
