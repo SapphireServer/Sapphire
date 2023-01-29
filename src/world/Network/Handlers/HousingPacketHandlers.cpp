@@ -99,12 +99,6 @@ void Sapphire::Network::GameConnection::reqPlaceHousingItem( const Packets::FFXI
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingPlaceYardItem >( inPacket );
   const auto& data = packet.data();
 
-  Logger::debug(
-          "Dump:\n{0}",
-          Util::binaryToHexDump( const_cast< uint8_t* >( &inPacket.data[ 0 ] ),
-                                 static_cast< uint16_t >( inPacket.segHdr.size - 0x10 ) )
-  );
-
   if( data.UserData == 1 )
   {
     housingMgr.reqPlaceHousingItem( player, data.landIdOrIndex.landId, data.StorageId, static_cast< uint8_t >( data.ContainerIndex ),
