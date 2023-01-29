@@ -127,9 +127,9 @@ void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::
       return;
 
     // retail sends the requester's id as both (isForSelf)
-    auto searchInfoPacket = makeZonePacket< FFXIVIpcExamineSearchComment >( player.getId() );
-    searchInfoPacket->data().charId = targetId;
-    strcpy( searchInfoPacket->data().searchComment, pPlayer->getSearchMessage() );
+    auto searchInfoPacket = makeZonePacket< FFXIVIpcGetSearchCommentResult >( player.getId() );
+    searchInfoPacket->data().TargetEntityID = targetId;
+    strcpy( searchInfoPacket->data().SearchComment, pPlayer->getSearchMessage() );
     server.queueForPlayer( player.getCharacterId(), searchInfoPacket );
   }
 }
@@ -150,8 +150,8 @@ void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVAR
       return;
 
     // retail sends the requester's id as both (isForSelf)
-    auto examineFcInfoPacket = makeZonePacket< FFXIVIpcExamineFreeCompanyInfo >( player.getId() );
-    examineFcInfoPacket->data().charId = targetId;
+    auto examineFcInfoPacket = makeZonePacket< FFXIVIpcGetFcProfileResult >( player.getId() );
+    examineFcInfoPacket->data().TargetEntityID = targetId;
     // todo: populate with fc info
 
     server.queueForPlayer( player.getCharacterId(), examineFcInfoPacket );

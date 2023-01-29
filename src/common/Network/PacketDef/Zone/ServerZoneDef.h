@@ -199,28 +199,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t IsChestLock;
   };
 
-  struct FFXIVIpcExamineSearchInfo : FFXIVIpcBasePacket< ExamineSearchInfo >
-  {
-    uint32_t unknown;
-    uint16_t unknown1;
-    uint16_t unknown2;
-    char padding[16];
-    uint32_t unknown3;
-    uint16_t unknown4;
-    uint16_t unknown5;
-    uint16_t unknown6;
-    uint8_t worldId;
-    char searchMessage[193];
-    char fcName[24];
-    uint8_t unknown7;
-    uint16_t padding1;
-    struct ClassJobEntry
-    {
-      uint16_t id;
-      uint16_t level;
-    } levelEntries[Common::CLASSJOB_TOTAL];
-  };
-
   struct FFXIVIpcSetProfileResult : FFXIVIpcBasePacket< SetProfileResult >
   {
     uint64_t OnlineStatus;
@@ -240,13 +218,16 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     char SearchComment[193];
   };
 
-  struct FFXIVIpcExamineSearchComment : FFXIVIpcBasePacket< ExamineSearchComment >
+  struct FFXIVIpcGetSearchCommentResult : FFXIVIpcBasePacket< GetSearchCommentResult >
   {
-    uint32_t charId;
-    // packet only has 196 bytes after the charid
-    // likely utf8
-    char searchComment[195];
-    char padding;
+    uint32_t TargetEntityID;
+    char SearchComment[193];
+  };
+
+  struct FFXIVIpcGetCharacterNameResult : FFXIVIpcBasePacket< GetCharacterNameResult >
+  {
+    uint64_t CharacterID;
+    char CharacterName[32];
   };
 
   /**
@@ -402,60 +383,44 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t SupportCount;
   };
 
-  struct FFFXIVIpcMarketBoardItemListingCount : FFXIVIpcBasePacket< MarketBoardItemListingCount >
+  struct FFFXIVIpcItemSearchResult : FFXIVIpcBasePacket< ItemSearchResult >
   {
-    uint32_t itemCatalogId;
-    uint32_t unknown1; // does some shit if nonzero
-    uint16_t requestId;
-    uint16_t quantity; // high/low u8s read separately?
-    uint32_t unknown3;
+    uint32_t CatalogID;
+    uint32_t Result;
+    uint8_t SubQuality;
+    uint8_t MateriaCount;
+    uint8_t Count;
   };
 
-  struct FFXIVIpcMarketBoardItemListing : FFXIVIpcBasePacket< MarketBoardItemListing >
+  struct ZoneProtoDownItemSearchData
   {
-    struct ItemListing // 152 bytes each
-    {
-      uint64_t listingId;
-      uint64_t retainerId;
-      uint64_t retainerOwnerId;
-      uint64_t artisanId;
-      uint32_t pricePerUnit;
-      uint32_t totalTax;
-      uint32_t itemQuantity;
-      uint32_t itemId;
-      uint16_t lastReviewTime;
-      uint16_t containerId;
-      uint32_t slotId;
-      uint16_t durability;
-      uint16_t spiritBond;
-      /**
-       * auto materiaId = (i & 0xFF0) >> 4;
-       * auto index = i & 0xF;
-       * auto leftover = i >> 8;
-       */
-      uint16_t materiaValue[5];
-      uint16_t padding1;
-      uint32_t padding2;
-      char retainerName[32];
-      char playerName[32];
-      bool hq;
-      uint8_t materiaCount;
-      uint8_t onMannequin;
-      Common::Town marketCity;
-      uint16_t dyeId;
-      uint16_t padding3;
-      uint32_t padding4;
-    } listing[10]; // Multiple packets are sent if there are more than 10 search results.
-    uint8_t listingIndexEnd;
-    uint8_t listingIndexStart;
-    uint16_t requestId;
-    char padding7[16];
-    uint8_t unknown13;
-    uint16_t padding8;
-    uint8_t unknown14;
-    uint64_t padding9;
-    uint32_t unknown15;
-    uint32_t padding10;
+    uint64_t ItemID;
+    uint64_t SellRetainerID;
+    uint64_t OwnerCharacterID;
+    uint64_t SignatureID;
+    uint32_t SellPrice;
+    uint32_t BuyTax;
+    uint32_t Stack;
+    uint32_t CatalogID;
+    uint32_t SellRealDate;
+    uint16_t StorageID;
+    uint16_t ContainerIndex;
+    uint16_t Durability;
+    uint16_t Refine;
+    uint16_t Materia[8];
+    char SellRetainerName[32];
+    uint8_t SubQuality;
+    uint8_t MateriaCount;
+    uint8_t RegisterMarket;
+    uint8_t Stain;
+  };
+
+  struct FFXIVIpcGetItemSearchListResult : FFXIVIpcBasePacket< GetItemSearchListResult >
+  {
+    ZoneProtoDownItemSearchData ItemSearchList[10];
+    uint8_t NextIndex;
+    uint8_t Index;
+    uint8_t RequestKey;
   };
 
   struct ZoneProtoDownItemHistoryData
@@ -490,34 +455,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t Index;
     uint8_t RequestKey;
     uint8_t Type;
-  };
-
-  struct FFXIVIpcExamineFreeCompanyInfo : FFXIVIpcBasePacket< ExamineFreeCompanyInfo >
-  {
-    char unknown[0x20]; // likely fc allegiance/icon/housing info etc
-    uint32_t charId;
-    uint32_t fcTimeCreated;
-    char unknown2[0x10];
-    uint16_t unknown3;
-    char fcName[0x14]; // 20 char limit
-    uint16_t padding;
-    char fcTag[0x05]; // 5 char tag limit
-    uint16_t padding2; // null terminator?
-    char fcLeader[0x20]; // leader name (32 bytes)
-    char fcSlogan[192]; // source: https://ffxiv.gamerescape.com/wiki/Free_Company (packet cap confirms this size also)
-    char padding3; // null terminator?
-    char fcEstateProfile[20]; // todo: size needs confirmation
-    uint32_t padding4;
-  };
-
-  struct FFXIVIpcFreeCompanyUpdateShortMessage : FFXIVIpcBasePacket< FreeCompanyUpdateShortMessage >
-  {
-    uint32_t unknown;
-    uint16_t unknown1;
-    uint16_t unknown2;
-    uint32_t unknown3;
-    uint32_t unknown5;
-    char shortMessage[104];
   };
 
   /**
@@ -746,85 +683,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t FreeCompanyTag[6];
     uint8_t PartsState[3];
     uint8_t State[3];
-  };
-
-  /**
-  * Structural representation of the packet sent by the server
-  * to spawn an actor
-  */
-  struct FFXIVIpcNpcSpawn : FFXIVIpcBasePacket< NpcSpawn >
-  {
-    uint32_t gimmickId; // needs to be existing in the map, mob will snap to it
-    uint8_t u2b;
-    uint8_t u2ab;
-    uint8_t gmRank;
-    uint8_t u3b;
-
-    uint8_t aggressionMode; // 1 passive, 2 aggressive
-    uint8_t onlineStatus;
-    uint8_t u3c;
-    uint8_t pose;
-
-    uint32_t u4;
-
-    uint64_t targetId;
-    uint32_t u6;
-    uint32_t u7;
-    uint64_t mainWeaponModel;
-    uint64_t secWeaponModel;
-    uint64_t craftToolModel;
-
-    uint32_t u14;
-    uint32_t u15;
-    uint32_t bNPCBase;
-    uint32_t bNPCName;
-    uint32_t levelId;
-    uint32_t u19;
-    uint32_t directorId;
-    uint32_t spawnerId;
-    uint32_t parentActorId;
-    uint32_t hPMax;
-    uint32_t hPCurr;
-    uint32_t displayFlags;
-    uint16_t fateID;
-    uint16_t mPCurr;
-    uint16_t unknown1; // 0
-    uint16_t unknown2; // 0 or pretty big numbers > 30000
-    uint16_t modelChara;
-    uint16_t rotation;
-    uint16_t activeMinion;
-    uint8_t spawnIndex;
-    uint8_t state;
-    uint8_t persistantEmote;
-    uint8_t modelType;
-    uint8_t subtype;
-    uint8_t voice;
-    uint16_t u25c;
-    uint8_t enemyType;
-    uint8_t level;
-    uint8_t classJob;
-    uint8_t u26d;
-    uint16_t u27a;
-    uint8_t currentMount;
-    uint8_t mountHead;
-    uint8_t mountBody;
-    uint8_t mountFeet;
-    uint8_t mountColor;
-    uint8_t scale;
-    uint16_t elementalLevel; // Eureka
-    uint16_t element; // Eureka
-    Common::StatusWork effect[30];
-    Common::FFXIVARR_POSITION3 pos;
-    uint32_t models[10];
-    char name[32];
-    uint8_t look[26];
-    char fcTag[6];
-    uint32_t unk30;
-    uint32_t unk31;
-    uint8_t bNPCPartSlot;
-    uint8_t unk32;
-    uint16_t unk33;
-    uint32_t unk34;
   };
 
   /**
@@ -1326,49 +1184,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t dstCatalogId;
   };
 
-
-  struct FFXIVIpcInventoryActionAck : FFXIVIpcBasePacket< InventoryActionAck >
-  {
-    uint32_t sequence;
-    uint16_t type;
-    uint16_t padding;
-    uint32_t padding1;
-    uint32_t padding2;
-  };
-
-
-  /**
-  * Structural representation of the packet sent by the server
-  * to update a slot in the inventory
-  */
-  struct FFXIVIpcUpdateInventorySlot : FFXIVIpcBasePacket< UpdateInventorySlot >
-  {
-    uint32_t sequence;
-    uint32_t unknown;
-    uint16_t containerId;
-    uint16_t slot;
-    uint32_t quantity;
-    uint32_t catalogId;
-    uint32_t reservedFlag;
-    uint64_t signatureId;
-    uint16_t hqFlag;
-    uint16_t condition;
-    uint16_t spiritBond;
-    uint16_t color;
-    uint32_t glamourCatalogId;
-    uint16_t materia1;
-    uint16_t materia2;
-    uint16_t materia3;
-    uint16_t materia4;
-    uint16_t materia5;
-    uint8_t buffer1;
-    uint8_t buffer2;
-    uint8_t buffer3;
-    uint8_t buffer4;
-    uint8_t buffer5;
-    uint8_t padding;
-    uint32_t unknown10;
-  };
 
   /**
   * Structural representation of the packet sent by the server

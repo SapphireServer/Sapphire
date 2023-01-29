@@ -378,19 +378,6 @@ namespace Sapphire::Network::Packets
     FinishContentMatchToClient = 0x338,
     UnMountLink = 0x33E,
 
-    ///////////////////////////////////////////////////
-//    CFNotify = 0x0241, // updated 5.21
-    CFMemberStatus = 0x0079,
-    ExamineSearchInfo = 0x032B, // updated 5.21 hotfix
-    ExamineSearchComment = 0x0102, // updated 4.1
-    MarketBoardItemListingCount = 0x030A,
-    MarketBoardItemListing = 0x023E,
-    ExamineFreeCompanyInfo = 0x013E, // updated 4.5
-    FreeCompanyUpdateShortMessage = 0x0157, // added 5.0
-    GCAffiliation = 0x016F, // updated 5.0
-    NpcSpawn = 0x00B3, // updated 5.21 hotfix
-    InventoryActionAck = 0x01B2, // updated 5.21 hotfix
-    UpdateInventorySlot = 0x0213, // updated 5.21 hotfix
   };
   }
 

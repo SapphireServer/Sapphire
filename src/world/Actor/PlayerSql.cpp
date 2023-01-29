@@ -709,7 +709,7 @@ bool Sapphire::Entity::Player::loadInventory()
   while ( currencyRes->next() )
   {
     uint16_t storageId = currencyRes->getUInt16( 1 );
-    uint32_t money = currencyRes->getUInt64( 2 );
+    uint32_t money = currencyRes->getUInt( 2 );
 
     auto slot = static_cast< uint8_t >( static_cast< uint8_t >( CurrencyType::Gil ) - 1 );
     auto currItem = m_storageMap[ Currency ]->getItem( slot );

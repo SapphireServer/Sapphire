@@ -65,10 +65,10 @@ void MarketMgr::requestItemListingInfo( Entity::Player& player, uint32_t catalog
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pSession = server.getSession( player.getCharacterId() );
 
-  auto countPkt = makeZonePacket< FFFXIVIpcMarketBoardItemListingCount >( player.getId() );
-  countPkt->data().quantity = 1 << 8;
-  countPkt->data().itemCatalogId = catalogId;
-  countPkt->data().requestId = requestId;
+  auto countPkt = makeZonePacket< FFFXIVIpcItemSearchResult >( player.getId() );
+  countPkt->data().Count = 1 << 8;
+  countPkt->data().CatalogID = catalogId;
+  countPkt->data().Result = requestId;
 
   pSession->getZoneConnection()->queueOutPacket( countPkt );
 
