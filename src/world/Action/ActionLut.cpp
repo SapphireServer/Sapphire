@@ -1,6 +1,7 @@
 #include <cassert>
 #include "ActionLut.h"
 
+using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
 bool ActionLut::validEntryExists( uint16_t actionId )

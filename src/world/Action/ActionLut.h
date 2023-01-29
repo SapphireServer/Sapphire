@@ -4,15 +4,20 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include "Common.h"
 
 namespace Sapphire::World::Action
 {
-  using StatusModifier = std::unordered_map< std::string, uint16_t >;
+  struct StatusModifier
+  {
+    Common::ParamModifier modifier;
+    int32_t value;
+  };
 
   struct StatusEntry
   {
     uint16_t id;
-    StatusModifier modifiers;
+    std::vector< StatusModifier > modifiers;
   };
 
   struct StatusEffect
