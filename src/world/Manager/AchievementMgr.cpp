@@ -48,14 +48,16 @@ bool AchievementMgr::cacheAchievements()
 void AchievementMgr::unlockAchievement( Entity::Player& player, uint32_t achievementId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto achvData = exdData.getRow< Excel::Achievement >( achievementId );
+  auto achvExd = exdData.getRow< Excel::Achievement >( achievementId );
 
   // set flag on mask format expected by client
   uint16_t index;
   uint8_t value;
   Common::Util::valueToFlagByteIndexValue( achievementId, value, index );
 
-  player.getAchievementList()[ index ] |= value;
+  auto achvData = player.getAchievementData();
+  achvData.unlockList[ index ] |= value;
+  player.setAchievementData( achvData );
 
   // handle player achievement history
   // todo: verify retail behavior due to client copying the last achievement unlocked
@@ -68,7 +70,7 @@ void AchievementMgr::unlockAchievement( Entity::Player& player, uint32_t achieve
   Common::Service< World::Manager::PlayerMgr >::ref().onUnlockAchievement( player, achievementId );
 
   // check and add title to player
-  auto achvTitleId = achvData->data().Title;
+  auto achvTitleId = achvExd->data().Title;
   if( achvTitleId != 0 )
   {
     player.addTitle( achvTitleId );
@@ -83,19 +85,19 @@ bool AchievementMgr::hasAchievementUnlocked( Entity::Player& player, uint32_t ac
   uint8_t value;
   Common::Util::valueToFlagByteIndexValue( achievementId, value, index );
 
-  return ( player.getAchievementList()[ index ] & value ) != 0;
+  return ( player.getAchievementData().unlockList[ index ] & value ) != 0;
 }
 
 std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::Player& player, uint32_t achievementId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto& achvDataList = player.getAchievementDataList();
-  auto achvExdData = exdData.getRow< Excel::Achievement >( achievementId )->data();
-  auto achvType = static_cast< Common::Achievement::Type >( achvExdData.ConditionType );
+  auto achvDataList = player.getAchievementData().progressData;
+  auto achvExd = exdData.getRow< Excel::Achievement >( achievementId )->data();
+  auto achvType = static_cast< Common::Achievement::Type >( achvExd.ConditionType );
 
   // get paired type:subtype key for stored data
-  auto dataKey = getKeyFromType( achvType, achvExdData.ConditionArg[ 0 ] );
+  auto dataKey = getKeyFromType( achvType, achvExd.ConditionArg[ 0 ] );
 
   // get achievement progress data, if it exists (otherwise pass 0)
   uint32_t currProg = 0;
@@ -103,7 +105,7 @@ std::pair< uint32_t, uint32_t > AchievementMgr::getAchievementDataById( Entity::
     currProg = achvDataList[ dataKey.u32 ];
 
   // get maximum progress for given achievement, as required by client
-  uint32_t maxProg = static_cast< uint32_t >( achvExdData.ConditionArg[ 1 ] );
+  uint32_t maxProg = static_cast< uint32_t >( achvExd.ConditionArg[ 1 ] );
 
   // cap maximum progress display to maximum progress
   return { std::min( currProg, maxProg ), maxProg };
