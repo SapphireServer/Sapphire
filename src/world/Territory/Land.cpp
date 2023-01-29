@@ -62,16 +62,6 @@ void Sapphire::Land::init( Common::LandType type, Common::HouseSize size, Common
   m_state = state;
   m_currentPrice = currentPrice;
   m_ownerId = ownerId;
-
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  // EXD TODO: This does not exist in 2.3
-  /*auto info = exdData.getRow< Excel::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
-  if( info )
-  {
-    m_mapMarkerPosition.x = info->x;
-    m_mapMarkerPosition.y = info->y;
-    m_mapMarkerPosition.z = info->z;
-  }*/
 }
 
 uint32_t Sapphire::Land::getCurrentPrice() const

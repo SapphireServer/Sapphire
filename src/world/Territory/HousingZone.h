@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_HOUSINGZONE_H
-#define SAPPHIRE_HOUSINGZONE_H
+#pragma once
 
 #include "Territory.h"
 #include "Forwards.h"
@@ -62,7 +61,9 @@ namespace Sapphire
 
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
-    using YardObjectArray = std::array< Common::Furniture, 800 >;
+
+    /*! @brief global storage for all yard items in the ward */
+    using YardObjectArray = std::array< Common::Furniture, 1200 >;
 
     /*!
      * @brief Maps the start and end index of the yard object array for a specific plot
@@ -87,4 +88,3 @@ namespace Sapphire
   };
 
 }
-#endif //SAPPHIRE_HOUSINGZONE_H

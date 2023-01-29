@@ -166,17 +166,14 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 
   sendLandSet( player );
 
+  auto yardObjectSize = sizeof( Common::Furniture );
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
     auto housingObjectInit = makeZonePacket< FFXIVIpcYardObjectList >( player.getId() );
     housingObjectInit->data().PacketIndex = yardPacketNum;
-    auto yardObjectSize = sizeof( Common::Furniture );
-    housingObjectInit->data().PacketIndex = yardPacketNum;
-    housingObjectInit->data().PacketEnd = yardPacketTotal;
+    auto& objects = m_yardObjects;
 
-    auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
-
-    memcpy( &housingObjectInit->data().YardObjects, &objects + ( yardPacketNum * 100 ), yardObjectSize * 100 );
+    memcpy( &housingObjectInit->data().YardObjects, &objects[ yardPacketNum * 400 ], yardObjectSize * 400 );
 
     server.queueForPlayer( player.getCharacterId(), housingObjectInit );
   }
@@ -363,11 +360,13 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
 
   for( const auto& item : yardContainer->getItemMap() )
   {
+
     auto housingItem = std::dynamic_pointer_cast< Inventory::HousingItem >( item.second );
     assert( housingItem );
 
     auto idx = item.first + arrayBounds.first;
     m_yardObjects[ idx ] = housingMgr.getYardObjectForItem( housingItem );
+    Logger::debug( "Loading yard item {} {}", item.second->getId(), idx );
   }
 }
 
