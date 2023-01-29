@@ -179,6 +179,18 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     char RemovedCharacterName[32];
   };
 
+  struct FFXIVIpcFreeCompanyResult : FFXIVIpcBasePacket< FreeCompanyResult >
+  {
+    uint64_t FreeCompanyID;
+    uint64_t TargetCharacterID;
+    uint32_t Type;
+    uint32_t Result;
+    uint8_t UpdateStatus;
+    uint8_t Identity;
+    char FreeCompanyName[46];
+    char TargetName[32];
+  };
+
   struct FFXIVIpcGetFcStatusResult : FFXIVIpcBasePacket< GetFcStatusResult >
   {
     uint64_t FreeCompanyID;
@@ -2045,8 +2057,32 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     uint8_t Index;
   };
 
-  struct FFXIVIpcGetFcProfileResult :
-    FFXIVIpcBasePacket< GetFcProfileResult >
+  struct FcInviteCharacter
+  {
+    uint64_t CharacterID;
+    uint64_t OnlineStatus;
+    uint8_t GrandCompanyID;
+    uint8_t Region;
+    uint8_t SelectRegion;
+    uint8_t Identity;
+    char CharacterName[32];
+    uint8_t GrandCompanyRank[3];
+  };
+
+  struct FFXIVIpcGetFcInviteListResult : FFXIVIpcBasePacket< GetFcInviteListResult >
+  {
+    uint64_t FreeCompanyID;
+    uint64_t CrestID;
+    uint32_t CreateDate;
+    uint8_t GrandCompanyID;
+    char FcTag[7];
+    FcInviteCharacter MasterCharacter;
+    uint8_t __padding1;
+    FcInviteCharacter InviteCharacter[3];
+    char FreeCompanyName[22];
+  };
+
+  struct FFXIVIpcGetFcProfileResult : FFXIVIpcBasePacket< GetFcProfileResult >
   {
     uint64_t TargetCharacterID;
     uint64_t FreeCompanyID;
@@ -2070,6 +2106,114 @@ struct FFXIVIpcEorzeaTimeOffset : FFXIVIpcBasePacket< TimeOffset >
     char MasterCharacterName[32];
     char CompanyMotto[193];
     char HouseName[23];
+  };
+
+  struct FFXIVIpcGetFcHeaderResult : FFXIVIpcBasePacket< GetFcHeaderResult >
+  {
+    uint64_t FreeCompanyID;
+    uint64_t CrestID;
+    uint64_t FcPoint;
+    uint64_t FcCredit;
+    uint32_t Reputation;
+    uint32_t NextPoint;
+    uint32_t CurrentPoint;
+    uint16_t TotalMemberCount;
+    uint16_t OnlineMemberCount;
+    uint8_t GrandCompanyID;
+    uint8_t FcRank;
+    char FreeCompanyName[22];
+    char FcTag[7];
+  };
+
+  struct FFXIVIpcGetCompanyBoardResult : FFXIVIpcBasePacket< GetCompanyBoardResult >
+  {
+    uint8_t Type;
+    char CompanyBoard[193];
+  };
+
+  struct FcHierarchy
+  {
+    uint64_t AuthorityList;
+    uint16_t Count;
+    uint8_t SortNo;
+    char HierarchyName[46];
+  };
+
+  struct FFXIVIpcGetFcHierarchyResult : FFXIVIpcBasePacket< GetFcHierarchyResult >
+  {
+    char MasterCharacterName[32];
+    FcHierarchy FcHierarchyList[16];
+  };
+
+  struct FcActivityList
+  {
+    uint64_t ID;
+    uint32_t Date;
+    uint32_t Param;
+    uint16_t Type;
+    uint8_t Sex;
+    char CharacterName[32];
+    char HierarchyName[46];
+  };
+
+  struct FFXIVIpcGetFcActivityListResult : FFXIVIpcBasePacket< GetFcActivityListResult >
+  {
+    uint16_t NextIndex;
+    uint8_t Index;
+    uint8_t RequestKey;
+    FcActivityList ActivityList[5];
+  };
+
+  struct FcHierarchyLite
+  {
+    uint64_t AuthorityList;
+    uint16_t Count;
+    uint8_t SortNo;
+  };
+
+  struct FFXIVIpcGetFcHierarchyLiteResult : FFXIVIpcBasePacket< GetFcHierarchyLiteResult >
+  {
+    FcHierarchyLite FcHierarchyList[16];
+  };
+
+  struct FFXIVIpcGetCompanyMottoResult : FFXIVIpcBasePacket< GetCompanyMottoResult >
+  {
+    uint16_t FcActivity;
+    uint16_t FcRole;
+    uint8_t Type;
+    uint8_t FcActiveTimeFlag;
+    uint8_t FcJoinRequestFlag;
+    uint8_t JoinRequestCount;
+    char CompanyMotto[193];
+  };
+
+  struct FFXIVIpcGetFcParamsResult : FFXIVIpcBasePacket< GetFcParamsResult >
+  {
+    uint64_t CharacterID;
+    uint64_t FcPoint;
+    uint64_t FcCredit;
+    uint64_t FcCreditAccumu;
+    uint32_t CreateDate;
+    uint32_t NextPoint;
+    uint32_t CurrentPoint;
+    uint32_t Reputation[3];
+    uint8_t FcRank;
+  };
+
+  struct FFXIVIpcGetFcActionResult : FFXIVIpcBasePacket< GetFcActionResult >
+  {
+    uint64_t CharacterID;
+    uint32_t ActiveActionList[3];
+    uint32_t ActiveActionLeftTime[3];
+    uint32_t StockActionList[15];
+  };
+
+  struct FFXIVIpcGetFcMemoResult : FFXIVIpcBasePacket< GetFcMemoResult >
+  {
+    uint64_t CharacterID;
+    uint32_t UIParam;
+    uint32_t UpdateDate;
+    char FcMemo[97];
   };
 
   struct FFXIVIpcFreeCompany : FFXIVIpcBasePacket< FreeCompany >
