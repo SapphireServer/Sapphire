@@ -366,7 +366,6 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
 
     auto idx = item.first + arrayBounds.first;
     m_yardObjects[ idx ] = housingMgr.getYardObjectForItem( housingItem );
-    Logger::debug( "Loading yard item {} {}", item.second->getId(), idx );
   }
 }
 

@@ -25,7 +25,7 @@ Sapphire::Data::ExdData g_exdDataGen;
 namespace fs = std::filesystem;
 using namespace Sapphire;
 
-std::string javaPath("java " );
+std::string javaPath("C:\\java.exe " );
 std::string gamePath( "F:\\Client3.3\\game\\sqpack" );
 
 const std::string onWithinRangeStr(
@@ -663,7 +663,7 @@ int main( int argc, char** argv )
     outputFile1.write( &section[ 0 ], section.size() );
     outputFile1.close();
     std::vector< std::string > functions;
-    if( false )
+    if( unluac )
     {
       std::string command =
         javaPath + " -jar unluac_2015_06_13.jar " + "generated/" + questInfo->getString( questInfo->data().Script ) + ".luab" + ">> " +

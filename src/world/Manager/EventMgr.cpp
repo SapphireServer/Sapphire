@@ -59,7 +59,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
       if( !customTalkInfo )
         return unknown + "CustomTalk";
 
-      std::string name = customTalkInfo->getString( customTalkInfo->data().Text.Name );
+      std::string name = customTalkInfo->getString( customTalkInfo->data().Script );
       std::size_t pos = name.find_first_of( '_' );
 
       return name.substr( 0, pos );

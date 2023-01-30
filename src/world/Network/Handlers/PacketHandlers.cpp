@@ -702,6 +702,17 @@ void Sapphire::Network::GameConnection::marketBoardRequestItemListings( const Pa
 
 void Sapphire::Network::GameConnection::getFcStatus( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
+  //Todo implement proper FC handling
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto fcResultPacket = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
+  fcResultPacket->data().FreeCompanyID = 0;
+  fcResultPacket->data().AuthorityList = 0;
+  fcResultPacket->data().HierarchyType = 0;
+  fcResultPacket->data().GrandCompanyID = 0;
+  fcResultPacket->data().FcRank = 0;
+  fcResultPacket->data().CrestID = 0;
+  fcResultPacket->data().CharaFcParam = 1;
+  server.queueForPlayer( player.getCharacterId(), fcResultPacket );
 
 }
 

@@ -152,6 +152,12 @@ namespace Sapphire::ScriptAPI
     {
       return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
     }
+    template< typename Ret, class Obj >
+    inline std::function< void( Entity::Player& player, const Event::SceneResult& result ) >
+    bindSceneReturn( Ret ( Obj::*f )( Entity::Player& player, const Event::SceneResult& result ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1, std::placeholders::_2 );
+    }
 
   public:
     explicit EventScript( uint32_t eventId );
