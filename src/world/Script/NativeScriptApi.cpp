@@ -132,6 +132,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void EventScript::onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t resultInt )
+  {
+    eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0 } );
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   QuestScript::QuestScript( uint32_t eventId ) : ScriptObject( eventId, typeid( QuestScript ).hash_code() )
@@ -188,8 +193,7 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  EventObjectScript::EventObjectScript( uint32_t eobjId ) :
-    ScriptObject( eobjId, typeid( EventObjectScript ).hash_code() )
+  EventObjectScript::EventObjectScript( uint32_t eobjId ) : ScriptObject( eobjId, typeid( EventObjectScript ).hash_code() )
   {
   }
 

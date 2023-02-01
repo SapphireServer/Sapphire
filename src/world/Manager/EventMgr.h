@@ -21,6 +21,13 @@ namespace Sapphire::World::Manager
     void handleReturnEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t errorCode,
                                  uint8_t numOfResults, const std::vector< uint32_t >& results );
 
+    void handleYieldEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+                                uint8_t numOfResults, const std::vector< uint32_t >& results );
+
+    void handleYieldStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId, const std::string& resultString );
+    void handleYieldStringIntEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+                                         const std::string& resultString, uint64_t resultInt );
+
     void handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString );
     void handleReturnIntAndStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString, uint64_t resultInt );
 
@@ -42,7 +49,7 @@ namespace Sapphire::World::Manager
                     Event::EventHandler::SceneReturnCallback eventReturnCallback = nullptr );
 
     /*! resume a subevent */
-    void resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values, bool resetCallback );
+    void resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint8_t yieldId, std::vector< uint32_t > values );
 
     /*! play a subevent */
     void playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags,

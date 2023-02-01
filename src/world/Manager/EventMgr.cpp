@@ -17,6 +17,7 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventPlayPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
+#include "Network/PacketWrappers/EventResumePacket.h"
 #include "Network/PacketWrappers/Notice2Packet.h"
 
 #include "Territory/InstanceObjectCache.h"
@@ -27,6 +28,7 @@
 #include "Action/EventAction.h"
 #include "WorldServer.h"
 #include "Actor/Player.h"
+#include <Script/ScriptMgr.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
@@ -332,6 +334,58 @@ void EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId,
   }
 
   checkEvent( player, eventId );
+}
+
+void EventMgr::handleYieldEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+                                      uint8_t numOfResults, const std::vector< uint32_t >& results )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  std::string eventName = getEventName( eventId );
+
+  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, resumeId: {2} numArgs: {3}",
+                        eventId, sceneId, resumeId, numOfResults );
+
+  uint8_t index = 0;
+  for( auto r : results )
+  {
+    PlayerMgr::sendDebug( player, "arg#{0}: {1} ({1:08X})", index++, r );
+  }
+
+  std::string tmp{};
+  if( !scriptMgr.onYield( player, eventId, sceneId, resumeId, tmp, 0 ) )
+  {
+    PlayerMgr::sendDebug( player, "Yield not implemented in script, sending default" );
+  }
+
+}
+
+void EventMgr::handleYieldStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId, const std::string& resultString )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  std::string eventName = getEventName( eventId );
+
+  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, resumeId: {2} resultString: {3}",
+                        eventId, sceneId, resumeId, resultString );
+
+  if( !scriptMgr.onYield( player, eventId, sceneId, resumeId, resultString, 0 ) )
+  {
+    PlayerMgr::sendDebug( player, "Yield not implemented in script, sending default" );
+  }
+}
+
+void EventMgr::handleYieldStringIntEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+                                               const std::string& resultString, uint64_t resultInt )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  std::string eventName = getEventName( eventId );
+
+  PlayerMgr::sendDebug( player, "eventId: {0} ({0:08X}) scene: {1}, resumeId: {2} resultString: {3} resultInt: {4}",
+                        eventId, sceneId, resumeId, resultString, resultInt );
+
+  if( !scriptMgr.onYield( player, eventId, sceneId, resumeId, resultString, resultInt ) )
+  {
+    PlayerMgr::sendDebug( player, "Yield not implemented in script, sending default" );
+  }
 }
 
 void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, const std::string& resultString )
@@ -643,26 +697,32 @@ void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t sce
   sendEventPlay( player, eventId, scene, flags );
 }
 
-void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, std::vector< uint32_t > values, bool resetCallback )
+void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint8_t yieldId, std::vector< uint32_t > values )
 {
-  auto pEvent = bootstrapSceneEvent( player, eventId, 0 );
-  if( !pEvent )
-    return;
+  FFXIVPacketBasePtr pPacket = nullptr;
+  size_t paramCount = values.size();
 
-  if( resetCallback )
-    pEvent->setEventReturnCallback( nullptr );
+  assert( paramCount <= 255 );
 
-  auto resumeEvent = makeZonePacket< FFXIVIpcResumeEventScene2 >( player.getId() );
-  resumeEvent->data().handlerId = eventId;
-  resumeEvent->data().sceneId = static_cast< uint8_t >( scene );
-  resumeEvent->data().numOfArgs = static_cast< uint8_t >( values.size() );
-  int i = 0;
-  for( auto& val : values )
-  {
-    resumeEvent->data().args[ i++ ] = val;
-  }
+  if( paramCount < 2 )
+    pPacket = std::move( std::make_shared< EventResume2Packet >( player, eventId, scene, yieldId, values ) );
+  else if( paramCount < 4 )
+    pPacket = std::move( std::make_shared< EventResume4Packet >( player, eventId, scene, yieldId, values ) );
+  else if( paramCount < 8 )
+    pPacket = std::move( std::make_shared< EventResume8Packet >( player, eventId, scene, yieldId, values ) );
+  else if( paramCount < 16 )
+    pPacket = std::move( std::make_shared< EventResume16Packet >( player, eventId, scene, yieldId, values ) );
+  else if( paramCount < 32 )
+    pPacket = std::move( std::make_shared< EventResume32Packet >( player, eventId, scene, yieldId, values ) );
+  else if( paramCount < 64 )
+    pPacket = std::move( std::make_shared< EventResume64Packet >( player, eventId, scene, yieldId, values ) );
+  else if( paramCount < 128 )
+    pPacket = std::move( std::make_shared< EventResume128Packet >( player, eventId, scene, yieldId, values ) );
+  else if ( paramCount < 255 )
+    pPacket = std::move( std::make_shared< EventResume255Packet >( player, eventId, scene, yieldId, values ) );
+
   auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), resumeEvent );
+  server.queueForPlayer( player.getCharacterId(), pPacket );
 }
 
 void EventMgr::playScene( Entity::Player& player, uint32_t eventId, uint32_t scene, uint32_t flags, Event::EventHandler::SceneReturnCallback eventCallback )
@@ -750,37 +810,21 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
   assert( paramCount <= 255 );
 
   if( paramCount < 2 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket2 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if( paramCount < 4 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket4 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if( paramCount < 8 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket8 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if( paramCount < 16 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket16 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if( paramCount < 32 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket32 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if( paramCount < 64 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket64 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if( paramCount < 128 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket128 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
   else if ( paramCount < 255 )
-  {
     pPacket = std::move( std::make_shared< EventPlayPacket255 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  }
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), pPacket );

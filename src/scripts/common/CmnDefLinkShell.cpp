@@ -42,44 +42,13 @@ public:
   // create linkshell
   void Scene00002( Entity::Player& player )
   {
-    auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      auto ls = linkshellMgr().createLinkshell( result.resultString, player );
-      if( !ls )
-      {
-        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a }, false );
-        linkshellMgr().finishLinkshellAction( result.resultString, 0x15a, player, 1 );
-      }
-      else
-      {
-        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 }, true );
-        linkshellMgr().finishLinkshellAction( result.resultString, 0, player, 1 );
-      }
-
-    };
-
-    eventMgr().playScene( player, getId(), 2, HIDE_HOTBAR, callback );
+    eventMgr().playScene( player, getId(), 2, HIDE_HOTBAR );
   }
 
   // rename linkshell
   void Scene00003( Entity::Player& player )
   {
-    auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      auto ls = linkshellMgr().renameLinkshell( result.intResult, result.resultString, player );
-      if( !ls )
-      {
-        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0x15a }, false );
-        linkshellMgr().finishLinkshellAction( result.resultString, 0x15a, player, 3 );
-      }
-      else
-      {
-        eventMgr().resumeScene( player, result.eventId, result.sceneId, { 0 }, true );
-        linkshellMgr().finishLinkshellAction( result.resultString, 0, player, 3 );
-      }
-
-    };
-    eventMgr().playScene( player, getId(), 3, HIDE_HOTBAR, callback );
+    eventMgr().playScene( player, getId(), 3, HIDE_HOTBAR );
   }
 
   // remove linkshell
@@ -92,6 +61,34 @@ public:
   {
     Scene00001( player );
   }
+
+  void onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t resultInt ) override
+  {
+    auto errorCode = 0u;
+    switch( sceneId )
+    {
+      case 2:
+      {
+        auto ls = linkshellMgr().createLinkshell( resultString, player );
+        if( !ls )
+          errorCode = 0x15a;
+
+        eventMgr().resumeScene( player, eventId, sceneId, yieldId, { errorCode } );
+        linkshellMgr().finishLinkshellAction( resultString, errorCode, player, 1 );
+        break;
+      }
+      case 3:
+      {
+        auto ls = linkshellMgr().renameLinkshell( resultInt, resultString, player );
+        if( !ls )
+          errorCode = 0x15a;
+        eventMgr().resumeScene( player, eventId, sceneId, yieldId, { errorCode } );
+        linkshellMgr().finishLinkshellAction( resultString, errorCode, player, 3 );
+        break;
+      }
+    }
+  }
+
 };
 
 EXPOSE_SCRIPT( CmnDefLinkShell );

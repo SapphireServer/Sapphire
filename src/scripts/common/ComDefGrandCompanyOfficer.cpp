@@ -7,46 +7,45 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Script: ComDefFreeCompany_00076
+// Script: ComDefGrandCompanyOfficer_00073
 // Event Name: Small Talk
-// Event ID: 720972
+// Event ID: 720969
 using namespace Sapphire;
 
-class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
+class ComDefGrandCompanyOfficer : public Sapphire::ScriptAPI::EventScript
 {
   private:
     // Basic event information 
     // Entities found in the script data of the event
-    static constexpr auto FcErrGeneral = 4070;
-    static constexpr auto FcHierarchyMaster = 0;
+    static constexpr auto GcLeveUnlock = 1616;
+    static constexpr auto GcRank08 = 8;
+    static constexpr auto GcRankMax = 9;
+    static constexpr auto GcRankRewardDeliverly = 6;
+    static constexpr auto GcRankRewardGcchange = 9;
+    static constexpr auto GcRankRewardLv30Leve = 5;
+    static constexpr auto GcRankRewardLv45Leve = 8;
+    static constexpr auto GcTransferUnlock = 1617;
     static constexpr auto GrandCompanyInvalid = 0;
     static constexpr auto ImmortalFlames = 3;
-    static constexpr auto InfoErrorFcrename = 3064;
-    static constexpr auto InfoErrorGil = 3021;
-    static constexpr auto InfoErrorSameName = 3051;
-    static constexpr auto InfoErrorStringEnd = 3110;
-    static constexpr auto InfoErrorStringStart = 3022;
+    static constexpr auto LogmsgGcTransferCfError = 3151;
     static constexpr auto Maelstrom = 1;
-    static constexpr auto NpcOfGridania = 1002395;
-    static constexpr auto NpcOfLimsa = 1003247;
-    static constexpr auto NpcOfUldah = 1002392;
+    static constexpr auto NpcOfGridania = 1002394;
+    static constexpr auto NpcOfLimsa = 1002388;
+    static constexpr auto NpcOfUldah = 1002391;
     static constexpr auto OrderOfTwinAdder = 2;
+    static constexpr auto ProcurementMission = 720971;
+    static constexpr auto ScreenImageBooty = 70;
+    static constexpr auto ScreenImageLeve = 71;
 
   public:
-    ComDefFreeCompany() : Sapphire::ScriptAPI::EventScript( 720972 ){}; 
-    ~ComDefFreeCompany() = default; 
+    ComDefGrandCompanyOfficer() : Sapphire::ScriptAPI::EventScript( 720969 ){}; 
+    ~ComDefGrandCompanyOfficer() = default; 
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
     Scene00000( player );
-  }
-
-  void onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t resultInt ) override
-  {
-    if( yieldId == 0x11 )
-      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 3, 2, 7,  2149548032, 118598, 1, 0, 1, 1, 1 } );
   }
 
 
@@ -57,20 +56,18 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00000( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ComDefFreeCompany::Scene00000Return ) );
+    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00000Return ) );
   }
 
   void Scene00000Return( Entity::Player& player, const Event::SceneResult& result )
   {
-
-    //Scene00001( player );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00001( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ComDefFreeCompany::Scene00001Return ) );
+    eventMgr().playScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00001Return ) );
   }
 
   void Scene00001Return( Entity::Player& player, const Event::SceneResult& result )
@@ -81,7 +78,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00002( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 2, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00002Return ) );
+    eventMgr().playScene( player, getId(), 2, NONE, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00002Return ) );
   }
 
   void Scene00002Return( Entity::Player& player, const Event::SceneResult& result )
@@ -92,7 +89,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00003( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 3, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00003Return ) );
+    eventMgr().playScene( player, getId(), 3, NONE, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00003Return ) );
   }
 
   void Scene00003Return( Entity::Player& player, const Event::SceneResult& result )
@@ -103,7 +100,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00004( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 4, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00004Return ) );
+    eventMgr().playScene( player, getId(), 4, NONE, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00004Return ) );
   }
 
   void Scene00004Return( Entity::Player& player, const Event::SceneResult& result )
@@ -114,7 +111,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00005( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 5, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00005Return ) );
+    eventMgr().playScene( player, getId(), 5, FADE_OUT | HIDE_UI, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00005Return ) );
   }
 
   void Scene00005Return( Entity::Player& player, const Event::SceneResult& result )
@@ -125,7 +122,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00006( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 6, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00006Return ) );
+    eventMgr().playScene( player, getId(), 6, FADE_OUT | HIDE_UI, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00006Return ) );
   }
 
   void Scene00006Return( Entity::Player& player, const Event::SceneResult& result )
@@ -136,7 +133,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00007( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 7, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00007Return ) );
+    eventMgr().playScene( player, getId(), 7, NONE, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00007Return ) );
   }
 
   void Scene00007Return( Entity::Player& player, const Event::SceneResult& result )
@@ -147,13 +144,35 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00008( Entity::Player& player )
   {
-    eventMgr().playScene( player, getId(), 8, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00008Return ) );
+    eventMgr().playScene( player, getId(), 8, FADE_OUT | HIDE_UI, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00008Return ) );
   }
 
   void Scene00008Return( Entity::Player& player, const Event::SceneResult& result )
   {
   }
 
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00009( Entity::Player& player )
+  {
+    eventMgr().playScene( player, getId(), 9, FADE_OUT | HIDE_UI, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00009Return ) );
+  }
+
+  void Scene00009Return( Entity::Player& player, const Event::SceneResult& result )
+  {
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00010( Entity::Player& player )
+  {
+    eventMgr().playScene( player, getId(), 10, FADE_OUT | HIDE_UI, bindSceneReturn( &ComDefGrandCompanyOfficer::Scene00010Return ) );
+  }
+
+  void Scene00010Return( Entity::Player& player, const Event::SceneResult& result )
+  {
+  }
+
 };
 
-EXPOSE_SCRIPT( ComDefFreeCompany );
+EXPOSE_SCRIPT( ComDefGrandCompanyOfficer );

@@ -5,8 +5,7 @@
 
 using namespace Sapphire;
 
-class FcTalk :
-  public Sapphire::ScriptAPI::EventScript
+class FcTalk : public Sapphire::ScriptAPI::EventScript
 {
 public:
   FcTalk() :

@@ -259,6 +259,35 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onYield( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId,
+                                              const std::string& resultString, uint64_t resultInt )
+{
+  auto eventType = static_cast< uint16_t >( eventId >> 16 );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  if( eventType == Event::EventHandler::EventHandlerType::Quest )
+  {
+    Logger::error( "Yield unimplemented for EventHandlerType::Quest!" );
+    return false;
+  }
+
+  // check for a direct eventid match first, otherwise default to base type
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+  if( script )
+  {
+    script->onYield( eventId, sceneId, resumeId, player, resultString, resultInt );
+    return true;
+  }
+  else
+  {
+    script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId & 0xFFFF0000 );
+    if( !script )
+      return false;
+
+    script->onYield( eventId, sceneId, resumeId, player, resultString, resultInt );
+    return true;
+  }
+}
+
 bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   const auto eventType = static_cast< uint16_t >( eventId >> 16 );

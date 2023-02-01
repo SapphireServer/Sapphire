@@ -181,6 +181,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
+    virtual void onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t returnInt );
+
     Data::ExdData& exdData()
     {
       return Common::Service< Data::ExdData >::ref();
@@ -262,8 +264,7 @@ namespace Sapphire::ScriptAPI
 
     virtual void onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player );
 
-    virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
-                                            uint32_t catalogId );
+    virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
 
     virtual void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 

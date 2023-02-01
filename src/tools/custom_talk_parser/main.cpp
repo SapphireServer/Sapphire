@@ -465,7 +465,7 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::CustomTalk > >& pQuest
   scriptEntry += "  //////////////////////////////////////////////////////////////////////\n  // Event Handlers\n";
 
   scriptEntry +=
-  "  void onTalk( Entity::Player& player, uint64_t actorId ) override\n"
+  "  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override\n"
   "  {\n" ;
   if( !actorList.empty() )
   {

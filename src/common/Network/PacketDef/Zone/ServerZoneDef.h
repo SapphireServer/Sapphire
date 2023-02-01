@@ -1240,47 +1240,13 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t handlerIds[ArgCount];
   };
 
-  struct FFXIVIpcMapMarker2 :
-    FFXIVIpcBasePacket< MapMarker2 >,
-    FFXIVIpcMapMarkerN< 2 >
-  {
-  };
-
-  struct FFXIVIpcMapMarker4 :
-    FFXIVIpcBasePacket< MapMarker4 >,
-    FFXIVIpcMapMarkerN< 4 >
-  {
-  };
-
-  struct FFXIVIpcMapMarker8 :
-    FFXIVIpcBasePacket< MapMarker8 >,
-    FFXIVIpcMapMarkerN< 8 >
-  {
-  };
-
-  struct FFXIVIpcMapMarker16 :
-    FFXIVIpcBasePacket< MapMarker16 >,
-    FFXIVIpcMapMarkerN< 16 >
-  {
-  };
-
-  struct FFXIVIpcMapMarker32 :
-    FFXIVIpcBasePacket< MapMarker32 >,
-    FFXIVIpcMapMarkerN< 32 >
-  {
-  };
-
-  struct FFXIVIpcMapMarker64 :
-    FFXIVIpcBasePacket< MapMarker64 >,
-    FFXIVIpcMapMarkerN< 64 >
-  {
-  };
-
-  struct FFXIVIpcMapMarker128 :
-    FFXIVIpcBasePacket< MapMarker128 >,
-    FFXIVIpcMapMarkerN< 128 >
-  {
-  };
+  struct FFXIVIpcMapMarker2 : FFXIVIpcBasePacket< MapMarker2 >, FFXIVIpcMapMarkerN< 2 > {};
+  struct FFXIVIpcMapMarker4 : FFXIVIpcBasePacket< MapMarker4 >, FFXIVIpcMapMarkerN< 4 > {};
+  struct FFXIVIpcMapMarker8 : FFXIVIpcBasePacket< MapMarker8 >, FFXIVIpcMapMarkerN< 8 > {};
+  struct FFXIVIpcMapMarker16 : FFXIVIpcBasePacket< MapMarker16 >, FFXIVIpcMapMarkerN< 16 > {};
+  struct FFXIVIpcMapMarker32 : FFXIVIpcBasePacket< MapMarker32 >, FFXIVIpcMapMarkerN< 32 > {};
+  struct FFXIVIpcMapMarker64 : FFXIVIpcBasePacket< MapMarker64 >, FFXIVIpcMapMarkerN< 64 > {};
+  struct FFXIVIpcMapMarker128 : FFXIVIpcBasePacket< MapMarker128 >, FFXIVIpcMapMarkerN< 128 > {};
 
   template< int ArgCount >
   struct FFXIVIpcBattleTalkN
@@ -1301,29 +1267,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t args[ArgCount];
   };
 
-  struct FFXIVIpcBattleTalkHeader :
-    FFXIVIpcBasePacket< BattleTalkHeader >,
-    FFXIVIpcBattleTalkN< 1 >
-  {
-  };
-
-  struct FFXIVIpcBattleTalk2 :
-    FFXIVIpcBasePacket< BattleTalk2 >,
-    FFXIVIpcBattleTalkN< 2 >
-  {
-  };
-
-  struct FFXIVIpcBattleTalk4 :
-    FFXIVIpcBasePacket< BattleTalk4 >,
-    FFXIVIpcBattleTalkN< 4 >
-  {
-  };
-
-  struct FFXIVIpcBattleTalk8 :
-    FFXIVIpcBasePacket< BattleTalk8 >,
-    FFXIVIpcBattleTalkN< 8 >
-  {
-  };
+  struct FFXIVIpcBattleTalkHeader : FFXIVIpcBasePacket< BattleTalkHeader >, FFXIVIpcBattleTalkN< 1 > {};
+  struct FFXIVIpcBattleTalk2 : FFXIVIpcBasePacket< BattleTalk2 >, FFXIVIpcBattleTalkN< 2 > {};
+  struct FFXIVIpcBattleTalk4 : FFXIVIpcBasePacket< BattleTalk4 >, FFXIVIpcBattleTalkN< 4 > {};
+  struct FFXIVIpcBattleTalk8 : FFXIVIpcBasePacket< BattleTalk8 >, FFXIVIpcBattleTalkN< 8 > {};
 
   template< int ArgCount >
   struct FFXIVIpcEventLogMessageN
@@ -1338,41 +1285,32 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t unknown_1;
   };
 
-  struct FFXIVIpcEventLogMessageHeader : 
-    FFXIVIpcBasePacket< EventLogMessageHeader >,
-    FFXIVIpcEventLogMessageN< 1 >
+  struct FFXIVIpcEventLogMessageHeader : FFXIVIpcBasePacket< EventLogMessageHeader >, FFXIVIpcEventLogMessageN< 1 > {};
+  struct FFXIVIpcEventLogMessage2 : FFXIVIpcBasePacket< EventLogMessage2 >, FFXIVIpcEventLogMessageN< 2 > {};
+  struct FFXIVIpcEventLogMessage4 : FFXIVIpcBasePacket< EventLogMessage4 >, FFXIVIpcEventLogMessageN< 4 > {};
+  struct FFXIVIpcEventLogMessage8 : FFXIVIpcBasePacket< EventLogMessage8 >, FFXIVIpcEventLogMessageN< 8 > {};
+  struct FFXIVIpcEventLogMessage16 : FFXIVIpcBasePacket< EventLogMessage16 >, FFXIVIpcEventLogMessageN< 16 > {};
+  struct FFXIVIpcEventLogMessage32 : FFXIVIpcBasePacket< EventLogMessage32 >, FFXIVIpcEventLogMessageN< 32 > {};
+
+  template< int ArgCount >
+  struct FFXIVIpcUpdateEventSceneN
   {
+    uint32_t handlerId;
+    uint16_t sceneId;
+    uint8_t numOfArgs;
+    uint8_t __padding1;
+    uint32_t args[ArgCount];
   };
 
-  struct FFXIVIpcEventLogMessage2 : 
-    FFXIVIpcBasePacket< EventLogMessage2 >,
-    FFXIVIpcEventLogMessageN< 2 >
-  {
-  };
-
-  struct FFXIVIpcEventLogMessage4 : 
-    FFXIVIpcBasePacket< EventLogMessage4 >,
-    FFXIVIpcEventLogMessageN< 4 >
-  {
-  };
-
-  struct FFXIVIpcEventLogMessage8 : 
-    FFXIVIpcBasePacket< EventLogMessage8 >,
-    FFXIVIpcEventLogMessageN< 8 >
-  {
-  };
-
-  struct FFXIVIpcEventLogMessage16 : 
-    FFXIVIpcBasePacket< EventLogMessage16 >,
-    FFXIVIpcEventLogMessageN< 16 >
-  {
-  };
-
-  struct FFXIVIpcEventLogMessage32 : 
-    FFXIVIpcBasePacket< EventLogMessage32 >,
-    FFXIVIpcEventLogMessageN< 32 >
-  {
-  };
+  struct FFXIVIpcUpdateEventSceneHeader : FFXIVIpcBasePacket< UpdateEventSceneHeader >, FFXIVIpcUpdateEventSceneN< 1 > {};
+  struct FFXIVIpcUpdateEventScene2 : FFXIVIpcBasePacket< UpdateEventScene2 >, FFXIVIpcUpdateEventSceneN< 2 > {};
+  struct FFXIVIpcUpdateEventScene4 : FFXIVIpcBasePacket< UpdateEventScene4 >, FFXIVIpcUpdateEventSceneN< 4 > {};
+  struct FFXIVIpcUpdateEventScene8 : FFXIVIpcBasePacket< UpdateEventScene8 >, FFXIVIpcUpdateEventSceneN< 8 > {};
+  struct FFXIVIpcUpdateEventScene16 : FFXIVIpcBasePacket< UpdateEventScene16 >, FFXIVIpcUpdateEventSceneN< 16 > {};
+  struct FFXIVIpcUpdateEventScene32 : FFXIVIpcBasePacket< UpdateEventScene32 >, FFXIVIpcUpdateEventSceneN< 32 > {};
+  struct FFXIVIpcUpdateEventScene64 : FFXIVIpcBasePacket< UpdateEventScene64 >, FFXIVIpcUpdateEventSceneN< 64 > {};
+  struct FFXIVIpcUpdateEventScene128 : FFXIVIpcBasePacket< UpdateEventScene128 >, FFXIVIpcUpdateEventSceneN< 128 > {};
+  struct FFXIVIpcUpdateEventScene255 : FFXIVIpcBasePacket< UpdateEventScene255 >, FFXIVIpcUpdateEventSceneN< 255 > {};
 
   template< int ArgCount >
   struct FFXIVIpcPlayEventSceneN
@@ -1391,59 +1329,15 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   * Structural representation of the packet sent by the server
   * to play an event
   */
-  struct FFXIVIpcPlayEventSceneHeader :
-    FFXIVIpcBasePacket< EventPlayHeader >,
-    FFXIVIpcPlayEventSceneN< 1 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene2 :
-    FFXIVIpcBasePacket< EventPlay2 >,
-    FFXIVIpcPlayEventSceneN< 2 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene4 :
-    FFXIVIpcBasePacket< EventPlay4 >,
-    FFXIVIpcPlayEventSceneN< 4 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene8 :
-    FFXIVIpcBasePacket< EventPlay8 >,
-    FFXIVIpcPlayEventSceneN< 8 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene16 :
-    FFXIVIpcBasePacket< EventPlay16 >,
-    FFXIVIpcPlayEventSceneN< 16 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene32 :
-    FFXIVIpcBasePacket< EventPlay32 >,
-    FFXIVIpcPlayEventSceneN< 32 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene64 :
-    FFXIVIpcBasePacket< EventPlay64 >,
-    FFXIVIpcPlayEventSceneN< 64 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene128:
-    FFXIVIpcBasePacket< EventPlay128 >,
-    FFXIVIpcPlayEventSceneN< 128 >
-  {
-  };
-
-  struct FFXIVIpcPlayEventScene255:
-    FFXIVIpcBasePacket< EventPlay255 >,
-    FFXIVIpcPlayEventSceneN< 255 >
-  {
-  };
+  struct FFXIVIpcPlayEventSceneHeader : FFXIVIpcBasePacket< EventPlayHeader >, FFXIVIpcPlayEventSceneN< 1 > {};
+  struct FFXIVIpcPlayEventScene2 : FFXIVIpcBasePacket< EventPlay2 >, FFXIVIpcPlayEventSceneN< 2 > {};
+  struct FFXIVIpcPlayEventScene4 : FFXIVIpcBasePacket< EventPlay4 >, FFXIVIpcPlayEventSceneN< 4 > {};
+  struct FFXIVIpcPlayEventScene8 : FFXIVIpcBasePacket< EventPlay8 >, FFXIVIpcPlayEventSceneN< 8 > {};
+  struct FFXIVIpcPlayEventScene16 : FFXIVIpcBasePacket< EventPlay16 >, FFXIVIpcPlayEventSceneN< 16 > {};
+  struct FFXIVIpcPlayEventScene32 : FFXIVIpcBasePacket< EventPlay32 >, FFXIVIpcPlayEventSceneN< 32 > {};
+  struct FFXIVIpcPlayEventScene64 : FFXIVIpcBasePacket< EventPlay64 >, FFXIVIpcPlayEventSceneN< 64 > {};
+  struct FFXIVIpcPlayEventScene128 : FFXIVIpcBasePacket< EventPlay128 >, FFXIVIpcPlayEventSceneN< 128 > {};
+  struct FFXIVIpcPlayEventScene255 : FFXIVIpcBasePacket< EventPlay255 >, FFXIVIpcPlayEventSceneN< 255 > {};
 
   /**
   * Structural representation of the packet sent by the server
@@ -1478,25 +1372,25 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t eventArg;
   };
 
-  struct FFXIVIpcEventPlay255 :
-    FFXIVIpcBasePacket< EventPlay255 >,
-    FFXIVIpcPlayEventSceneN< 255 >
-  {
-  };
-
-
-  /**
-  * Structural representation of the packet sent by the server
-  * to respond to a linkshell creation event
-  */
-  struct FFXIVIpcResumeEventScene2 : FFXIVIpcBasePacket< ResumeEventScene2 >
+  template< int ArgCount >
+  struct FFXIVIpcResumeEventSceneN
   {
     uint32_t handlerId;
     uint16_t sceneId;
     uint8_t resumeId;
     uint8_t numOfArgs;
-    uint32_t args[4];
+    uint32_t args[ArgCount];
   };
+
+  struct FFXIVIpcResumeEventSceneHeader : FFXIVIpcBasePacket< ResumeEventSceneHeader >, FFXIVIpcResumeEventSceneN< 1 > {};
+  struct FFXIVIpcResumeEventScene2 : FFXIVIpcBasePacket< ResumeEventScene2 >, FFXIVIpcResumeEventSceneN< 2 > {};
+  struct FFXIVIpcResumeEventScene4 : FFXIVIpcBasePacket< ResumeEventScene4 >, FFXIVIpcResumeEventSceneN< 4 > {};
+  struct FFXIVIpcResumeEventScene8 : FFXIVIpcBasePacket< ResumeEventScene8 >, FFXIVIpcResumeEventSceneN< 8 > {};
+  struct FFXIVIpcResumeEventScene16 : FFXIVIpcBasePacket< ResumeEventScene16 >, FFXIVIpcResumeEventSceneN< 16 > {};
+  struct FFXIVIpcResumeEventScene32 : FFXIVIpcBasePacket< ResumeEventScene32 >, FFXIVIpcResumeEventSceneN< 32 > {};
+  struct FFXIVIpcResumeEventScene64 : FFXIVIpcBasePacket< ResumeEventScene64 >, FFXIVIpcResumeEventSceneN< 64 > {};
+  struct FFXIVIpcResumeEventScene128 : FFXIVIpcBasePacket< ResumeEventScene128 >, FFXIVIpcResumeEventSceneN< 128 > {};
+  struct FFXIVIpcResumeEventScene255 : FFXIVIpcBasePacket< ResumeEventScene255 >, FFXIVIpcResumeEventSceneN< 255 > {};
 
   /**
   * Structural representation of the packet sent by the server
@@ -1553,11 +1447,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t args[Size];
   };
 
-  struct FFXIVIpcNoticeHeader :
-    FFXIVIpcBasePacket< NoticeHeader >,
-    FFXIVIpcNoticeN< 1 >
-  {
-  };
 
   /*!
    * Structural representation of the packet sent by the server
@@ -1566,35 +1455,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
    * type 1 icon
    * type 5 status
    */
-  struct FFXIVIpcNotice2 :
-    FFXIVIpcBasePacket< Notice2 >,
-    FFXIVIpcNoticeN< 2 >
-  {
-  };
-
-  struct FFXIVIpcNotice4 :
-    FFXIVIpcBasePacket< Notice4 >,
-    FFXIVIpcNoticeN< 4 >
-  {
-  };
-
-  struct FFXIVIpcNotice8 :
-    FFXIVIpcBasePacket< Notice8 >,
-    FFXIVIpcNoticeN< 8 >
-  {
-  };
-
-  struct FFXIVIpcNotice16 :
-    FFXIVIpcBasePacket< Notice16 >,
-    FFXIVIpcNoticeN< 16 >
-  {
-  };
-
-  struct FFXIVIpcNotice32 :
-    FFXIVIpcBasePacket< Notice32 >,
-    FFXIVIpcNoticeN< 32 >
-  {
-  };
+  struct FFXIVIpcNoticeHeader : FFXIVIpcBasePacket< NoticeHeader >, FFXIVIpcNoticeN< 1 > {};
+  struct FFXIVIpcNotice2 : FFXIVIpcBasePacket< Notice2 >, FFXIVIpcNoticeN< 2 > {};
+  struct FFXIVIpcNotice4 : FFXIVIpcBasePacket< Notice4 >, FFXIVIpcNoticeN< 4 > {};
+  struct FFXIVIpcNotice8 : FFXIVIpcBasePacket< Notice8 >, FFXIVIpcNoticeN< 8 > {};
+  struct FFXIVIpcNotice16 : FFXIVIpcBasePacket< Notice16 >, FFXIVIpcNoticeN< 16 > {};
+  struct FFXIVIpcNotice32 : FFXIVIpcBasePacket< Notice32 >, FFXIVIpcNoticeN< 32 > {};
 
   struct FFXIVIpcQuestTracker : FFXIVIpcBasePacket< Tracking >
   {

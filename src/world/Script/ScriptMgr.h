@@ -56,6 +56,8 @@ namespace Sapphire::Scripting
 
     bool onTalk( Entity::Player& player, uint64_t actorId, uint32_t eventId );
 
+    bool onYield( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId, const std::string& resultString, uint64_t resultInt );
+
     bool onSay( Entity::Player& player, uint64_t actorId, uint32_t eventId, uint32_t sayId );
 
     bool onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
