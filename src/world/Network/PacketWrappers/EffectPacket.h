@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_EFFECTPACKET_H
-#define SAPPHIRE_EFFECTPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -97,5 +96,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif //SAPPHIRE_EFFECTPACKET_H

@@ -22,7 +22,7 @@ struct FFXIVChatFrom : FFXIVIpcBasePacket< ChatFrom >
 * Structural representation of the packet sent by the server as
 * message from a chat channel that the player is associated to
 */
-struct FFXIVChatToChannel : FFXIVIpcBasePacket< Chat >
+struct FFXIVChatToChannel : FFXIVIpcBasePacket< ChatToChannel >
 {
   uint64_t channelID;
   uint64_t speakerCharacterID;

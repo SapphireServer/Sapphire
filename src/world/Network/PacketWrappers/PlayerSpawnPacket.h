@@ -1,5 +1,4 @@
-#ifndef _PLAYERSPAWN_H
-#define _PLAYERSPAWN_H
+#pragma once
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/GamePacket.h>
@@ -161,5 +160,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_PlayerSpawn_H*/

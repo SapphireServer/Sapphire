@@ -1,5 +1,4 @@
-#ifndef _CORE_NETWORK_PACKETS_EXAMINEPACKET_H
-#define _CORE_NETWORK_PACKETS_EXAMINEPACKET_H
+#pragma once
 
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/GamePacket.h>
@@ -8,7 +7,6 @@
 #include "Forwards.h"
 #include "Inventory/Item.h"
 #include "StatusEffect/StatusEffect.h"
-
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
@@ -87,5 +85,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_CORE_NETWORK_PACKETS_EXAMINEPACKET_H*/

@@ -1,5 +1,4 @@
-#ifndef _MODELEQUIPPACKET_H
-#define _MODELEQUIPPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include "Actor/Player.h"
@@ -41,5 +40,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_MODELEQUIPPACKET_H*/

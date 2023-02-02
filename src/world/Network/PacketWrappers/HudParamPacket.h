@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Network/GamePacket.h>
-
 #include "Forwards.h"
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
@@ -37,4 +36,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     return std::make_shared< HudParamPacket >( args... );
   }
 }
-

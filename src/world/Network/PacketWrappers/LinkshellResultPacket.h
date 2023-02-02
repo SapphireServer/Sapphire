@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Network/GamePacket.h>
-
 #include "Forwards.h"
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
@@ -49,4 +48,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     return std::make_shared< LinkshellResultPacket >( args... );
   }
 }
-

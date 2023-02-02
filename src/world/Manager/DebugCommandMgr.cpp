@@ -536,7 +536,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     sscanf( params.c_str(), "%d", &id );
     player.setRewardFlag( static_cast< Common::UnlockEntry >( id ) );
   }
-  else if ( subCommand == "effect")
+  else if( subCommand == "effect" )
   {
     uint16_t param1;
     sscanf( params.c_str(), "%hu", &param1 );

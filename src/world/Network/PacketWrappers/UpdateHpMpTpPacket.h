@@ -1,5 +1,4 @@
-#ifndef _UPDATEHPMPTP_H
-#define _UPDATEHPMPTP_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Actor/Chara.h>
@@ -31,5 +30,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_UPDATEHPMPTP_H*/

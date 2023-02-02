@@ -1,5 +1,4 @@
-#ifndef _EVENTFINISH_H
-#define _EVENTFINISH_H
+#pragma once
 
 #include <Network/GamePacket.h>
 
@@ -35,5 +34,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_EVENTFINISH_H*/
