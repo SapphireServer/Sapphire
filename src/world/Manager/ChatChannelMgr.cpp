@@ -1,8 +1,5 @@
 #include <Network/PacketWrappers/ChatToChannelPacket.h>
 #include <Logging/Logger.h>
-#include <Network/CommonNetwork.h>
-#include <Network/GamePacket.h>
-#include <Network/PacketDef/Chat/ServerChatDef.h>
 #include <Service.h>
 
 #include "ChatChannelMgr.h"
