@@ -123,16 +123,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
 
     case Event::EventHandler::EventHandlerType::Shop:
     {
-      //auto shopInfo = exdData.getRow< Excel::ShopStruct >( eventId );
-
       return "GilShop" + std::to_string( eventId );
-      /*if( shopInfo )
-      {
-        if( shopInfo->name.empty() || shopInfo->name == " " )
-          return "GilShop" + std::to_string( eventId );
-        return shopInfo->name;
-      }*/
-      //return unknown + "GilShop";
     }
 
     case Event::EventHandler::EventHandlerType::SwitchTalk:

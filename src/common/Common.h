@@ -1403,6 +1403,15 @@ namespace Sapphire::Common
     Completed = 8,
   };
 
+  enum struct FreeCompanyStatus : uint8_t
+  {
+    Invalid = 0x0,
+    InviteStart = 0x1,
+    InviteComplete = 0x2,
+    Normal= 0x3,
+    Freeze = 0x4,
+  };
+
   enum struct ChatType : uint16_t
   {
     LogKindError,

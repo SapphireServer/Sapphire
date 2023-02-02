@@ -45,8 +45,35 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t resultInt ) override
   {
-    if( yieldId == 0x11 )
-      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 3, 2, 7,  2149548032, 118598, 1, 0, 1, 1, 1 } );
+    if( sceneId == 0 )
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0,  0, 0, 0, 0, 1, 1, 1 } );
+    else if( sceneId == 5 )
+    {
+      /*
+       *   GetFcStatusResult
+            {
+              uint64_t FreeCompanyID;
+              uint64_t AuthorityList;
+              uint64_t ChannelID;
+              uint64_t CrestID;
+              uint64_t CharaFcState;
+              uint64_t CharaFcParam;
+              uint16_t Param;
+              uint8_t FcStatus;
+              uint8_t GrandCompanyID;
+              uint8_t HierarchyType;
+              uint8_t FcRank;
+              uint8_t IsCrest;
+              uint8_t IsDecal;
+              uint8_t IsFcAction;
+              uint8_t IsChestExt1;
+              uint8_t IsChestLock;
+            };*/
+      // { 3, 1, 3, 1234567290, 2444,   1, 0, 1, 1, 1, 0, 0, 0, 0, 0 } valid fc
+      // { 3, 2, 7, 1234567890, 111223, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0 } valid fc
+      // { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } not in company yet and able to get a petition
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
+    }
   }
 
 
@@ -62,8 +89,10 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   void Scene00000Return( Entity::Player& player, const Event::SceneResult& result )
   {
-
-    //Scene00001( player );
+    if( result.getResult( 0 ) == 1 )
+      Scene00001( player );
+    else if( result.getResult( 0 ) == 5 )
+      Scene00005( player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -79,6 +108,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   //////////////////////////////////////////////////////////////////////
 
+  // disband fc
   void Scene00002( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 2, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00002Return ) );
@@ -90,6 +120,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   //////////////////////////////////////////////////////////////////////
 
+  //change fc state
   void Scene00003( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 3, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00003Return ) );
@@ -101,6 +132,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   //////////////////////////////////////////////////////////////////////
 
+  // submit petition
   void Scene00004( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 4, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00004Return ) );
