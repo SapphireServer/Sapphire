@@ -1,5 +1,4 @@
-#ifndef _CHATPACKET_H
-#define _CHATPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -33,5 +32,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_CHATPACKET_H*/

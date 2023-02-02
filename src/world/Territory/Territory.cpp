@@ -60,7 +60,8 @@ Territory::Territory() :
   m_weatherOverride( Common::Weather::None ),
   m_lastMobUpdate( 0 ),
   m_nextEObjId( START_EOBJ_ID ),
-  m_nextActorId( START_GAMEOBJECT_ID )
+  m_nextActorId( START_GAMEOBJECT_ID ),
+  m_inRangeDistance( 80.f )
 {
 }
 

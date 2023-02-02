@@ -1,5 +1,4 @@
-#ifndef _CORE_NETWORK_PACKETS_PINGPACKET_H
-#define _CORE_NETWORK_PACKETS_PINGPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 
@@ -29,5 +28,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-
-#endif /*_CORE_NETWORK_PACKETS_CPINGPACKET_H*/

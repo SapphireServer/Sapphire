@@ -1,5 +1,4 @@
-#ifndef _CORE_NETWORK_PACKETS_INITUIPACKET_H
-#define _CORE_NETWORK_PACKETS_INITUIPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -90,5 +89,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     return std::make_shared< PlayerSetupPacket >( args... );
   }
 }
-
-#endif /*_CORE_NETWORK_PACKETS_CINITUIPACKET_H*/

@@ -1,5 +1,4 @@
-#ifndef _EVENTSTART_H
-#define _EVENTSTART_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include "Forwards.h"
@@ -41,4 +40,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
 }
-#endif /*_EVENTSTART_H*/

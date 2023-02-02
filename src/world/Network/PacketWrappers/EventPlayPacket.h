@@ -1,5 +1,4 @@
-#ifndef _EVENTPLAY_H
-#define _EVENTPLAY_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Actor/Player.h>
@@ -339,5 +338,3 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     };
   };
 }
-
-#endif /*_EVENTPLAY_H*/

@@ -41,7 +41,7 @@ namespace Sapphire::Network::Packets
   {
     SyncReply = 0x0065,
     LoginReply = 0x0066,
-    Chat = 0x0067,
+    ChatToChannel = 0x0067,
     RegionInfo = 0x0069,
 
     MoveTerritory = 0x006A,

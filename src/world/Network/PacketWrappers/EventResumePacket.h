@@ -1,4 +1,5 @@
 #pragma once
+
 #include <Network/GamePacket.h>
 #include <Actor/Player.h>
 #include <Event/EventHandler.h>

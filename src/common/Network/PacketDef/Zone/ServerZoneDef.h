@@ -45,7 +45,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   * Structural representation of the packet sent by the server
   * carrying chat messages
   */
-  struct FFXIVIpcChat : FFXIVIpcBasePacket< Chat >
+  struct FFXIVIpcChat : FFXIVIpcBasePacket< ChatToChannel >
   {
     uint16_t type;
     uint8_t __padding1;

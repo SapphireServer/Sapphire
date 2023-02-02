@@ -1,3 +1,4 @@
+#include <Network/PacketWrappers/ChatToChannelPacket.h>
 #include <Logging/Logger.h>
 #include <Network/CommonNetwork.h>
 #include <Network/GamePacket.h>
@@ -65,10 +66,10 @@ void ChatChannelMgr::addToChannel( uint64_t channelId, Entity::Player& player )
   }
 
   auto& channelMembers = m_channels[ channelId ];
-  auto pPlayer = player.getAsPlayer();
+  auto id = player.getId();
 
-  if( std::find( channelMembers.begin(), channelMembers.end(), pPlayer ) == channelMembers.end() )
-    m_channels[ channelId ].emplace_back( player.getAsPlayer() );
+  if( std::find( channelMembers.begin(), channelMembers.end(), id ) == channelMembers.end() )
+    m_channels[ channelId ].emplace_back( id );
 }
 
 void ChatChannelMgr::removeFromChannel( uint64_t channelId, Entity::Player& player )
@@ -87,9 +88,9 @@ void ChatChannelMgr::removeFromChannel( uint64_t channelId, Entity::Player& play
   }
 
   auto& channelMembers = m_channels[ channelId ];
-  auto pPlayer = player.getAsPlayer();
+  auto id = player.getId();
 
-  auto it = std::find( channelMembers.begin(), channelMembers.end(), pPlayer );
+  auto it = std::find( channelMembers.begin(), channelMembers.end(), id );
   if( it != channelMembers.end() )
     channelMembers.erase( it );
 }
@@ -112,34 +113,26 @@ void ChatChannelMgr::sendMessageToChannel( uint64_t channelId, Entity::Player& s
   auto& channelMembers = m_channels[ channelId ];
 
   auto& server = Common::Service< World::WorldServer >::ref();
+
   // send message to all players in chat channel
-  for( const auto& pPlayer : channelMembers )
+  for( const auto id : channelMembers )
   {
     // skip sender from getting their own message
-    if( pPlayer->getId() == sender.getId() )
+    if( id == sender.getId() )
       continue;
 
-    auto pSession = server.getSession( pPlayer->getCharacterId() );
+    auto pSession = server.getSession( id );
 
+    // check if player is online to recv message
     if( !pSession )
     {
-      Logger::error( std::string( __FUNCTION__ ) + ": Session not found for player#{}", pPlayer->getCharacterId() );
       continue;
     }
 
+    auto pPlayer = server.getPlayer( id );
+
     // prepare message packet, associating message and sender info with channel data
-    auto chatToChannelPacket = makeChatPacket< Server::FFXIVChatToChannel >( pPlayer->getId() );
-
-    strcpy( chatToChannelPacket->data().message, message.c_str() );
-    strcpy( chatToChannelPacket->data().speakerName, sender.getName().c_str() );
-
-    chatToChannelPacket->data().channelID = channelId;
-
-    chatToChannelPacket->data().speakerCharacterID = sender.getCharacterId();
-    chatToChannelPacket->data().speakerEntityID = sender.getId();
-
-    chatToChannelPacket->data().type = 0; // player message type (eg. GM, etc)
-
+    auto chatToChannelPacket = std::make_shared< Packets::Server::ChatToChannelPacket >( *pPlayer, sender, channelId, message );
     pSession->getChatConnection()->queueOutPacket( chatToChannelPacket );
   }
 }

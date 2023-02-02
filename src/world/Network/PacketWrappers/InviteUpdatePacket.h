@@ -6,7 +6,6 @@
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
 {
-
   class InviteUpdatePacket : public ZoneChannelPacket< FFXIVIpcInviteUpdate >
   {
   public:
@@ -28,5 +27,4 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       strcpy( m_data.InviteName, player.getName().c_str() );
     };
   };
-
 }

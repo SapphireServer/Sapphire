@@ -6,7 +6,7 @@
 
 namespace Sapphire::Data
 {
-  using ChatChannelMembers = std::vector< Entity::PlayerPtr >;
+  using ChatChannelMembers = std::vector< uint32_t >;
 
   union ChatChannel
   {
