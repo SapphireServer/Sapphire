@@ -115,6 +115,10 @@ namespace Sapphire::Db
     LINKSHELL_UP,
     LINKSHELL_DEL,
 
+    FC_SEL_ALL,
+    FC_INS,
+    FC_UP,
+    FC_DEL,
 
     MAX_STATEMENTS
   };

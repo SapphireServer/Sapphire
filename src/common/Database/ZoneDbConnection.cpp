@@ -356,25 +356,29 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "DELETE FROM infolinkshell WHERE LinkshellId = ?;",
                     CONNECTION_BOTH );
 
-  /*prepareStatement( LAND_INS,
-                    "INSERT INTO land ( LandSetId ) VALUES ( ? );",
+  prepareStatement( FC_SEL_ALL,
+                    "SELECT FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint, CrestId, CreateDate, GrandCompanyID, "
+                    "       ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList "
+                    "FROM freecompany "
+                    "ORDER BY FreeCompanyId ASC;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( FC_INS,
+                    "INSERT INTO freecompany ( FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint,"
+                    "                          ReputationList, CrestId, CreateDate, GrandCompanyID, FcStatus, FcBoard, FcMotto ) VALUES ( ?, ?, ?, ?, ?, ?, ?,"
+                    "                        ?, ?, ?, ?, ?, ?, ?, ? );",
                     CONNECTION_BOTH );
 
-  prepareStatement( LAND_SEL,
-                    "SELECT LandSetId, Size, houseState, iconColor, iconAddIcon, fcId, fcIcon, fcIconColor, exteriorRoof, "
-                    "exteriorWall, exteriorWindow, exteriorDoor, otherFloorWall, otherFloorFlooring, basementWall, "
-                    "gardenSign, colorSlot_0, colorSlot_1, colorSlot_2, colorSlot_3, colorSlot_4, colorSlot_5, "
-                    "colorSlot_6, colorSlot_7, ownerPlayerId, nextDrop, dropCount, currentPrice "
-                    "FROM land WHERE LandSetId = ?;",
+  prepareStatement( FC_UP,
+                    "UPDATE freecompany SET MasterCharacterId = ?, FcName = ?, FcTag = ?, FcCredit = ?, FcCreditAccumu = ?,"
+                    "                       FcRank = ?, FcPoint = ?, ReputationList = ?, CrestId = ?,"
+                    "                       CreateDate = ?, GrandCompanyID = ?, FcStatus = ?, FcBoard = ?, "
+                    "                       FcMotto = ?, ActiveActionList = ?, , ActiveActionLeftTimeList = ?, StockActionList = ? "
+                    " WHERE FreeCompanyId = ?;",
                     CONNECTION_BOTH );
 
-  prepareStatement( LAND_UP,
-                    "UPDATE land SET Size = ?, houseState = ?, iconColor = ?, iconAddIcon = ?, fcId = ?, "
-                    "fcIcon = ?, fcIconColor = ?, exteriorRoof = ?, exteriorWall = ?, exteriorWindow = ?, "
-                    "exteriorDoor = ?, otherFloorWall = ?, otherFloorFlooring = ?, basementWall = ?, gardenSign = ?, "
-                    "colorSlot_0 = ?, colorSlot_1 = ?, colorSlot_2 = ?, colorSlot_3 = ?, colorSlot_4 = ?, "
-                    "colorSlot_5 = ?, colorSlot_6 = ?, colorSlot_7 = ?, ownerPlayerId = ?, nextDrop = ?, "
-                    "dropCount = ?, currentPrice = ?"
-                    " WHERE LandSetId = ?;",
-                    CONNECTION_BOTH );*/
+  prepareStatement( FC_DEL,
+                    "DELETE FROM freecompany WHERE FreeCompanyId = ?;",
+                    CONNECTION_BOTH );
+
 }
