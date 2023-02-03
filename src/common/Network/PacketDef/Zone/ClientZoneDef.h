@@ -349,6 +349,8 @@ struct FFXIVIpcLoginHandler : FFXIVIpcBasePacket< Login >
 struct FFXIVIpcFindContent : FFXIVIpcBasePacket< FindContent >
 {
   uint16_t territoryType;
+  uint8_t unknown1;
+  uint8_t unknown2; // 0xC2(?)
   uint8_t acceptHalfway;
   uint8_t language;
   uint8_t flags;
