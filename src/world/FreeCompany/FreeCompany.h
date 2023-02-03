@@ -3,6 +3,7 @@
 #include <Common.h>
 #include <set>
 #include <string>
+#include <array>
 
 namespace Sapphire
 {
@@ -33,7 +34,7 @@ namespace Sapphire
     /*! Current grand company of the fc */
     uint8_t m_gc;
     /*! Grand company reputation array */
-    uint64_t m_gcReputation[ 3 ];
+    std::array< uint64_t, 3 > m_gcReputation;
     /*! Status of the Company, Common::FreeCompanyStatus */
     Common::FreeCompanyStatus m_status;
     /*! Fc board text */
@@ -43,11 +44,11 @@ namespace Sapphire
     /*! Fc Version, unsure what this is used for */
     uint32_t m_fcVersion;
     /*! List of active actions */
-    uint64_t m_activeActionId[ 3 ];
+    std::array< uint64_t, 3 > m_activeActionId;
     /*! List of remaining action times */
-    uint64_t m_activeActionTimeLeft[ 3 ];
+    std::array< uint64_t, 3 > m_activeActionTimeLeft;
     /*! List of actions in stock */
-    uint64_t m_actionStock[ 15 ];
+    std::array< uint64_t, 15 > m_actionStock;
 
     /*! ID list of all members */
     std::set< uint64_t > m_memberIds;
@@ -112,9 +113,9 @@ namespace Sapphire
     uint32_t getFcVersion() const;
     void setFcVersion( uint32_t version );
 
-    const uint64_t* getActiveActionIdArr() const;
-    const uint64_t* getActiveActionTimeLeftArr() const;
-    const uint64_t* getActionStockArr() const;
+    const std::array< uint64_t, 3 >& getActiveActionIdArr() const;
+    const std::array< uint64_t, 3 >& getActiveActionTimeLeftArr() const;
+    const std::array< uint64_t, 15 >& getActionStockArr() const;
 
     const std::set< uint64_t >& getMemberIdList() const;
     std::set< uint64_t >& getMemberIdList();

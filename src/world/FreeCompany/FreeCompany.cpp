@@ -176,17 +176,17 @@ void Sapphire::FreeCompany::setFcVersion( uint32_t version )
   m_fcVersion = version;
 }
 
-const uint64_t *Sapphire::FreeCompany::getActiveActionIdArr() const
+const std::array< uint64_t, 3 >& Sapphire::FreeCompany::getActiveActionIdArr() const
 {
   return m_activeActionId;
 }
 
-const uint64_t *Sapphire::FreeCompany::getActiveActionTimeLeftArr() const
+const std::array< uint64_t, 3 >& Sapphire::FreeCompany::getActiveActionTimeLeftArr() const
 {
   return m_activeActionTimeLeft;
 }
 
-const uint64_t *Sapphire::FreeCompany::getActionStockArr() const
+const std::array< uint64_t, 15 >& Sapphire::FreeCompany::getActionStockArr() const
 {
   return m_actionStock;
 }
