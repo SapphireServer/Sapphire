@@ -358,23 +358,23 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   prepareStatement( FC_SEL_ALL,
                     "SELECT FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint, CrestId, CreateDate, GrandCompanyID, "
-                    "       ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList "
+                            "ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList "
                     "FROM freecompany "
                     "ORDER BY FreeCompanyId ASC;",
                     CONNECTION_SYNC );
 
   prepareStatement( FC_INS,
                     "INSERT INTO freecompany ( FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint,"
-                    "                          ReputationList, CrestId, CreateDate, GrandCompanyID, FcStatus, FcBoard, FcMotto ) VALUES ( ?, ?, ?, ?, ?, ?, ?,"
-                    "                        ?, ?, ?, ?, ?, ?, ?, ? );",
+                                "ReputationList, CrestId, CreateDate, GrandCompanyID, FcStatus, FcBoard, FcMotto ) VALUES ( ?, ?, ?, ?, ?, ?, ?,"
+                                "?, ?, ?, ?, ?, ?, ?, ? );",
                     CONNECTION_BOTH );
 
   prepareStatement( FC_UP,
                     "UPDATE freecompany SET MasterCharacterId = ?, FcName = ?, FcTag = ?, FcCredit = ?, FcCreditAccumu = ?,"
-                    "                       FcRank = ?, FcPoint = ?, ReputationList = ?, CrestId = ?,"
-                    "                       CreateDate = ?, GrandCompanyID = ?, FcStatus = ?, FcBoard = ?, "
-                    "                       FcMotto = ?, ActiveActionList = ?, , ActiveActionLeftTimeList = ?, StockActionList = ? "
-                    " WHERE FreeCompanyId = ?;",
+                            "FcRank = ?, FcPoint = ?, ReputationList = ?, CrestId = ?,"
+                            "CreateDate = ?, GrandCompanyID = ?, FcStatus = ?, FcBoard = ?, "
+                            "FcMotto = ?, ActiveActionList = ?, ActiveActionLeftTimeList = ?, StockActionList = ? "
+                            "WHERE FreeCompanyId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( FC_DEL,
