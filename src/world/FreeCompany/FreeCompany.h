@@ -62,9 +62,7 @@ namespace Sapphire
                  std::string name,
                  std::string tag,
                  uint64_t masterId,
-                 uint64_t chatChannelId,
-                 std::set< uint64_t > members,
-                 std::set< uint64_t > invites );
+                 uint64_t chatChannelId );
 
     uint64_t getId() const;
 

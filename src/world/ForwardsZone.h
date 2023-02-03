@@ -28,6 +28,7 @@ TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
+TYPE_FORWARD( FreeCompany );
 
 namespace World
 {

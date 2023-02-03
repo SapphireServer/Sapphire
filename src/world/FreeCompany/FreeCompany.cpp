@@ -2,15 +2,12 @@
 
 #include <utility>
 
-Sapphire::FreeCompany::FreeCompany( uint64_t id, std::string name, std::string tag, uint64_t masterId, uint64_t chatChannelId, std::set< uint64_t > members,
-                                    std::set< uint64_t > invites ) :
+Sapphire::FreeCompany::FreeCompany( uint64_t id, std::string name, std::string tag, uint64_t masterId, uint64_t chatChannelId ) :
   m_id( id ),
   m_name( std::move( name ) ),
   m_tag( std::move( tag ) ),
   m_chatChannelId( chatChannelId ),
-  m_masterCharacterId( masterId ),
-  m_memberIds( std::move( members ) ),
-  m_inviteIds( std::move( invites ) )
+  m_masterCharacterId( masterId )
 {
 
 }
