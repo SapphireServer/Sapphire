@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS FreeCompany (
+CREATE TABLE IF NOT EXISTS freecompany (
 FreeCompanyId int(20) NOT NULL, 
 MasterCharacterId int(20), 
 MasterCharacterName VARCHAR(32), 
