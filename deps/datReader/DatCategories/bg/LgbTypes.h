@@ -132,12 +132,14 @@ struct ENpcData : public InstanceObject
 
 struct EObjData : public InstanceObject
 {
-  uint32_t eobjId;
-  uint32_t levelHierachyId;
-  uint8_t unknown1[0xC];
+  uint32_t BaseId;
+  uint32_t BoundInstanceID;
+  uint32_t LinkedInstanceID;
+  uint32_t Reserved1;
+  uint32_t Reserved2;
 };
 
-enum TriggerBoxShape : uint32_t
+enum TriggerBoxShape : int32_t
 {
   TriggerBoxShapeBox = 0x1,
   TriggerBoxShapeSphere = 0x2,
@@ -156,13 +158,18 @@ struct TriggerBoxInstanceObject
   uint32_t reserved;
 };
 
+struct EventRangeData : public InstanceObject
+{
+  TriggerBoxInstanceObject triggerBox;
+};
+
 struct ExitRangeData : public InstanceObject
 {
   TriggerBoxInstanceObject triggerBoxType;
   uint32_t exitType;
   uint16_t zoneId;
   uint16_t destTerritoryType;
-  int index;
+  int32_t index;
   uint32_t destInstanceObjectId;
   uint32_t returnInstanceObjectId;
   float direction;

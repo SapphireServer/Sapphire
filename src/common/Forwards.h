@@ -1,5 +1,4 @@
-#ifndef COMMON_FORWARDS_H
-#define COMMON_FORWARDS_H
+#pragma once
 
 #include <memory>
 
@@ -32,5 +31,3 @@ namespace Sapphire::Network::Packets
   using GamePacketPtr = std::shared_ptr< GamePacket >;
   using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
 }
-
-#endif

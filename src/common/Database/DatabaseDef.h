@@ -1,5 +1,4 @@
-#ifndef _DATABASEDEF_H
-#define _DATABASEDEF_H
+#pragma once
 
 #include <MySqlConnector.h>
 #include "Database/DbLoader.h"
@@ -9,4 +8,3 @@
 
 extern Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
-#endif

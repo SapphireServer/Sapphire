@@ -1,6 +1,4 @@
-#ifndef CONNECTION_H_
-#define CONNECTION_H_
-
+#pragma once
 //-----------------------------------------------------------------------------
 
 #include <asio.hpp>
@@ -59,7 +57,7 @@ namespace Sapphire::Network
 
     void handleSend( const asio::error_code& error, std::list< std::vector< uint8_t > >::iterator itr );
 
-    void handleRecv( const asio::error_code& error, int32_t actual_bytes );
+    void handleRecv( const asio::error_code& error, size_t actual_bytes );
 
 
   private:
@@ -157,4 +155,3 @@ namespace Sapphire::Network
   }
 
 }
-#endif

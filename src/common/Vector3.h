@@ -1,5 +1,4 @@
-#ifndef _VECTOR3_H_
-#define _VECTOR3_H_
+#pragma once
 
 namespace Sapphire::Common
 {
@@ -10,6 +9,18 @@ namespace Sapphire::Common
     float z;
     inline bool operator == ( const FFXIVARR_POSITION3& target ) const;
   };
-}
 
-#endif
+  struct Vector3
+  {
+    float x;
+    float y;
+    float z;
+    float reserve;
+    inline bool operator == ( const Vector3& target ) const;
+  };
+
+  struct Matrix33
+  {
+    float m[ 3 ][ 3 ];
+  };
+}

@@ -1,6 +1,4 @@
-#ifndef SAPPHIRE_HOUSINGMGR_H
-#define SAPPHIRE_HOUSINGMGR_H
-
+#pragma once
 #include "Forwards.h"
 #include "Territory/HousingZone.h"
 #include <set>
@@ -73,13 +71,12 @@ namespace Sapphire::World::Manager
 
     bool init();
 
-    uint32_t toLandSetId( uint16_t territoryTypeId, uint8_t wardId ) const;
-    Sapphire::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
-    Sapphire::LandPtr getLandByOwnerId( uint32_t id );
+    uint32_t toLandSetId( int16_t territoryTypeId, int16_t wardId ) const;
+    Sapphire::LandPtr getLandByOwnerId( uint64_t id );
 
     void sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident );
     void sendLandSignFree( Entity::Player& player, const Common::LandIdent ident );
-    LandPurchaseResult purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state );
+    LandPurchaseResult purchaseLand( Entity::Player& player, HousingZone& zone, uint8_t plot, uint8_t state );
 
     /*!
      * @brief Converts param1 of a client trigger into a Common::LandIndent
@@ -88,9 +85,9 @@ namespace Sapphire::World::Manager
 
     void sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint16_t territoryTypeId );
 
-    bool relinquishLand( Entity::Player& player, uint8_t plot );
+    bool relinquishLand( Entity::Player& player, HousingZone& zone, uint8_t plot );
 
-    void buildPresetEstate( Entity::Player& player, uint8_t plotNum, uint32_t presetCatalogId );
+    void buildPresetEstate( Entity::Player& player, HousingZone& zone, uint8_t plotNum, uint32_t presetCatalogId );
 
     void requestEstateRename( Entity::Player& player, const Common::LandIdent ident );
 
@@ -101,6 +98,8 @@ namespace Sapphire::World::Manager
 
     void sendEstateGreeting( Entity::Player& player, const Common::LandIdent ident );
 
+    void sendLandFlagsSlot( Entity::Player& player, Common::LandFlagsSlot slot );
+    void sendLandFlags( Entity::Player& player );
     /*!
      * @brief Updates the cached models on a house from the relevant apperance inventories.
      * Does not send the subsequent update to clients.
@@ -165,7 +164,7 @@ namespace Sapphire::World::Manager
      * @param item The item to convert into a YardObject
      * @return The resultant YardObject
      */
-    Common::HousingObject getYardObjectForItem( Inventory::HousingItemPtr item ) const;
+    Common::Furniture getYardObjectForItem( Inventory::HousingItemPtr item ) const;
 
 
     void reqMoveHousingItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot,
@@ -181,7 +180,7 @@ namespace Sapphire::World::Manager
 
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
 
-    void editAppearance( bool isInterior, Sapphire::Entity::Player& player, const Common::LandIdent landIdent, std::vector< uint16_t > containerList, std::vector< uint8_t > slotList, uint8_t removeFlag );
+    void removeHouse( Entity::Player& player, uint16_t plot );
 
     void removeHouse( Entity::Player& player, uint16_t plot );
     
@@ -279,6 +278,15 @@ namespace Sapphire::World::Manager
     void deleteHouse( HousePtr house ) const;
 
     /*!
+     * @brief Deletes a house
+     *
+     * Any other changes will be covered by the usual saving logic and can be safely ignored here.
+     *
+     * @param house The house to create in the house table
+     */
+    void deleteHouse( HousePtr house ) const;
+
+    /*!
      * @brief Gets the next available house id
      * @return The next available house id
      */
@@ -323,5 +331,3 @@ namespace Sapphire::World::Manager
   };
 
 }
-
-#endif // SAPPHIRE_HOUSINGMGR_H

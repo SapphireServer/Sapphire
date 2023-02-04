@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_OPERATION_H
-#define SAPPHIRE_OPERATION_H
+#pragma once
 
 namespace Mysql
 {
@@ -46,4 +45,3 @@ namespace Sapphire::Db
   };
 }
 
-#endif //SAPPHIRE_OPERATION_H

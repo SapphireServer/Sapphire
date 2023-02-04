@@ -1,5 +1,4 @@
-#ifndef CLIENT_HTTP_HPP
-#define	CLIENT_HTTP_HPP
+#pragma once
 
 #include <asio.hpp>
 
@@ -398,4 +397,3 @@ namespace SimpleWeb
     };
 }
 
-#endif	/* CLIENT_HTTP_HPP */

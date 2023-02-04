@@ -70,9 +70,9 @@ namespace xiv::utils::bparse
     xiv::utils::bparse::reorder( i_struct.size );
     xiv::utils::bparse::reorder( i_struct.entry_type );
     xiv::utils::bparse::reorder( i_struct.total_uncompressed_size );
-    for( int32_t i = 0; i < 0x2; ++i )
+    for( unsigned int & i : i_struct.unknown )
     {
-      xiv::utils::bparse::reorder( i_struct.unknown[ i ] );
+      xiv::utils::bparse::reorder( i );
     }
   }
 
@@ -81,9 +81,9 @@ namespace xiv::utils::bparse
   {
     xiv::utils::bparse::reorder( i_struct.offset );
     xiv::utils::bparse::reorder( i_struct.size );
-    for( int32_t i = 0; i < 0x4; ++i )
+    for( unsigned int & i : i_struct.unknown )
     {
-      xiv::utils::bparse::reorder( i_struct.unknown[ i ] );
+      xiv::utils::bparse::reorder( i );
     }
     xiv::utils::bparse::reorder( i_struct.block_hash );
   }
@@ -109,29 +109,29 @@ namespace xiv::utils::bparse
   inline void reorder< xiv::dat::DatMdlFileBlockInfos >( xiv::dat::DatMdlFileBlockInfos& i_struct )
   {
     xiv::utils::bparse::reorder( i_struct.unknown1 );
-    for( auto i = 0; i < ::model_section_count; ++i )
+    for( unsigned int& uncompressed_size : i_struct.uncompressed_sizes )
     {
-      xiv::utils::bparse::reorder( i_struct.uncompressed_sizes[ i ] );
+      xiv::utils::bparse::reorder( uncompressed_size );
     }
-    for( auto i = 0; i < ::model_section_count; ++i )
+    for( unsigned int& compressed_size : i_struct.compressed_sizes )
     {
-      xiv::utils::bparse::reorder( i_struct.compressed_sizes[ i ] );
+      xiv::utils::bparse::reorder( compressed_size );
     }
-    for( auto i = 0; i < ::model_section_count; ++i )
+    for( unsigned int& offset : i_struct.offsets )
     {
-      xiv::utils::bparse::reorder( i_struct.offsets[ i ] );
+      xiv::utils::bparse::reorder( offset );
     }
-    for( auto i = 0; i < ::model_section_count; ++i )
+    for( unsigned short& block_id : i_struct.block_ids )
     {
-      xiv::utils::bparse::reorder( i_struct.block_ids[ i ] );
+      xiv::utils::bparse::reorder( block_id );
     }
-    for( auto i = 0; i < ::model_section_count; ++i )
+    for( unsigned short& block_count : i_struct.block_counts )
     {
-      xiv::utils::bparse::reorder( i_struct.block_counts[ i ] );
+      xiv::utils::bparse::reorder( block_count );
     }
-    for( auto i = 0; i < 0x2; ++i )
+    for( unsigned int &i : i_struct.unknown2 )
     {
-      xiv::utils::bparse::reorder( i_struct.unknown2[ i ] );
+      xiv::utils::bparse::reorder( i );
     }
   }
 
@@ -160,9 +160,7 @@ namespace xiv::dat
     isBlockValid( block_record.offset, block_record.size, block_record.block_hash );
   }
 
-  Dat::~Dat()
-  {
-  }
+  Dat::~Dat() = default;
 
   std::unique_ptr< File > Dat::getFile( uint32_t i_offset )
   {
@@ -184,7 +182,7 @@ namespace xiv::dat
         {
           outputFile->_type = FileType::standard;
 
-          uint32_t number_of_blocks = extract< uint32_t >( m_handle, "number_of_blocks" );
+          auto number_of_blocks = extract< uint32_t >( m_handle, "number_of_blocks" );
 
           // Just extract offset infos for the blocks to extract
           std::vector< DatStdFileBlockInfos > std_file_block_infos;
@@ -207,7 +205,7 @@ namespace xiv::dat
         {
           outputFile->_type = FileType::model;
 
-          DatMdlFileBlockInfos mdlBlockInfo = extract< DatMdlFileBlockInfos >( m_handle );
+          auto mdlBlockInfo = extract< DatMdlFileBlockInfos >( m_handle );
 
           // Getting the block number and read their sizes
           const uint32_t block_count = mdlBlockInfo.block_ids[ ::model_section_count - 1 ] +
@@ -239,7 +237,7 @@ namespace xiv::dat
           outputFile->_type = FileType::texture;
 
           // Extracts mipmap entries and the block sizes
-          uint32_t sectionCount = extract< uint32_t >( m_handle, "sections_count" );
+          auto sectionCount = extract< uint32_t >( m_handle, "sections_count" );
 
           std::vector< DatTexFileBlockInfos > texBlockInfo;
           extract< DatTexFileBlockInfos >( m_handle, sectionCount, texBlockInfo );
@@ -289,10 +287,10 @@ namespace xiv::dat
   {
     m_handle.seekg( i_offset );
 
-    DatBlockHeader block_header = extract< DatBlockHeader >( m_handle );
+    auto block_header = extract< DatBlockHeader >( m_handle );
 
     // Resizing the vector to write directly into it
-    const uint32_t data_size = o_data.size();
+    const auto data_size = o_data.size();
     o_data.resize( data_size + block_header.uncompressed_size );
 
     // 32000 in compressed_size means it is not compressed so take uncompressed_size
@@ -307,10 +305,10 @@ namespace xiv::dat
       std::vector< char > temp_buffer( block_header.compressed_size );
       m_handle.read( temp_buffer.data(), block_header.compressed_size );
 
-      utils::zlib::no_header_decompress( reinterpret_cast<uint8_t*>(temp_buffer.data()),
+      utils::zlib::no_header_decompress( reinterpret_cast< uint8_t* >( temp_buffer.data() ),
                                          temp_buffer.size(),
-                                         reinterpret_cast<uint8_t*>(o_data.data() + data_size),
-                                         block_header.uncompressed_size );
+                                         reinterpret_cast< uint8_t* >( o_data.data() + data_size ),
+                                         static_cast< size_t >( block_header.uncompressed_size ) );
     }
   }
 

@@ -19,6 +19,12 @@ std::string Util::binaryToHexString( uint8_t* pBinData, uint16_t size )
   return outStr;
 
 }
+
+uint16_t Util::getOpCode( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& raw )
+{
+  return *reinterpret_cast< uint16_t* >( &raw.data[ 2 ] );
+}
+
 std::string Util::toLowerCopy( const std::string& inStr )
 {
   std::string out = inStr;
@@ -124,12 +130,12 @@ uint64_t Util::getTimeMs()
 uint32_t Util::getTimeSeconds()
 {
   auto currClock = std::chrono::system_clock::now();
-  return std::chrono::time_point_cast< std::chrono::seconds >( currClock ).time_since_epoch().count();
+  return static_cast< uint32_t >( std::chrono::time_point_cast< std::chrono::seconds >( currClock ).time_since_epoch().count() );
 }
 
 uint64_t Util::getEorzeanTimeStamp()
 {
-  return static_cast< uint64_t >( getTimeSeconds() * 20.571428571428573 );
+  return static_cast< uint64_t >( getTimeSeconds() * 20.571428571428573f );
 }
 
 void Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex )

@@ -1,5 +1,4 @@
-#ifndef _SESSION_H_
-#define _SESSION_H_
+#pragma once
 
 #include <stdint.h>
 #include <string>
@@ -14,7 +13,7 @@ namespace Sapphire::Api
   private:
     uint32_t m_ip;
     uint32_t m_accountId;
-    uint8_t m_sessionId[56];
+    char m_sessionId[ 64 ];
 
   public:
     std::string newCharName;
@@ -25,7 +24,7 @@ namespace Sapphire::Api
 
     uint32_t getIp() const;
 
-    void setSessionId( uint8_t* sessionId );
+    void setSessionId( const char* sessionId );
 
     void setIp( uint32_t ip );
 
@@ -36,5 +35,3 @@ namespace Sapphire::Api
   };
 
 }
-
-#endif

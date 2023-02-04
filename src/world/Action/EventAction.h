@@ -1,5 +1,4 @@
-#ifndef _EVENTACTION_H_
-#define _EVENTACTION_H_
+#pragma once
 
 #include <Common.h>
 
@@ -34,5 +33,3 @@ private:
 };
 
 }
-
-#endif

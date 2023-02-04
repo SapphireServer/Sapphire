@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_STATEMENTTASK_H
-#define SAPPHIRE_STATEMENTTASK_H
+#pragma once
 
 #include <string>
 #include "Operation.h"
@@ -40,6 +39,3 @@ namespace Sapphire::Db
   };
 
 }
-
-
-#endif //SAPPHIRE_STATEMENTTASK_H

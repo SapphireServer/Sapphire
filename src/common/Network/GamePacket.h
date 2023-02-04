@@ -1,18 +1,17 @@
-#ifndef _GAMEPACKET_H
-#define _GAMEPACKET_H
+#pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <iostream>
 
 #include <sstream>
-#include <time.h>
+#include <ctime>
 
-#include <string.h>
+#include <cstring>
 #include <memory>
 #include <Util/Util.h>
 
 #include "CommonNetwork.h"
-#include "PacketDef/Ipcs.h"
+#include "PacketDef/ServerIpcs.h"
 
 namespace Sapphire::Network::Packets
 {
@@ -23,13 +22,13 @@ namespace Sapphire::Network::Packets
   class FFXIVIpcPacket;
 
   template< class T >
-  using ZoneChannelPacket = FFXIVIpcPacket< T, ServerZoneIpcType >;
+  using ZoneChannelPacket = FFXIVIpcPacket< T, WorldPackets::Server::ServerZoneIpcType >;
 
   template< class T >
   using ChatChannelPacket = FFXIVIpcPacket< T, ServerChatIpcType >;
 
   template< class T >
-  using LobbyChannelPacket = FFXIVIpcPacket< T, ServerLobbyIpcType >;
+  using LobbyChannelPacket = FFXIVIpcPacket< T, LobbyPackets::ServerLobbyIpcType >;
 
 
   template< class T, typename... Args >
@@ -200,7 +199,7 @@ namespace Sapphire::Network::Packets
       memcpy( &m_data, &rawPacket.data[ 0 ] + ipcHdrSize, copySize );
 
       memset( &m_ipcHdr, 0, ipcHdrSize );
-      m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
+      m_ipcHdr.type = static_cast< WorldPackets::Server::ServerZoneIpcType >( m_data._ServerIpcType );
     }
 
     size_t getContentSize() override
@@ -256,7 +255,7 @@ namespace Sapphire::Network::Packets
       memset( &m_data, 0, sizeof( T ) );
 
       // The IPC type itself.
-      m_ipcHdr.type = static_cast< ServerZoneIpcType >( m_data._ServerIpcType );
+      m_ipcHdr.type = static_cast< WorldPackets::Server::ServerZoneIpcType >( m_data._ServerIpcType );
       m_ipcHdr.timestamp = Common::Util::getTimeSeconds();
       m_segHdr.size = sizeof( T ) + sizeof( FFXIVARR_IPC_HEADER ) + sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
     };
@@ -330,5 +329,3 @@ namespace Sapphire::Network::Packets
   };
 
 }
-
-#endif

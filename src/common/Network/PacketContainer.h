@@ -1,5 +1,4 @@
-#ifndef _PacketContainer_H_
-#define _PacketContainer_H_
+#pragma once
 
 #include <vector>
 
@@ -35,5 +34,3 @@ namespace Sapphire::Network::Packets
   };
 
 }
-
-#endif

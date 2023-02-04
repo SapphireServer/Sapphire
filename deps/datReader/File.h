@@ -1,5 +1,4 @@
-#ifndef XIV_DAT_FILE_H
-#define XIV_DAT_FILE_H
+#pragma once
 
 #include <vector>
 
@@ -45,4 +44,3 @@ namespace xiv::dat
   };
 }
 
-#endif // XIV_DAT_FILE_H

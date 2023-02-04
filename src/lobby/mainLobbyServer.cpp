@@ -2,7 +2,7 @@
 
 #include <Util/CrashHandler.h>
 
-[[maybe_unused]] Sapphire::Common::Util::CrashHandler crashHandler;
+Sapphire::Common::Util::CrashHandler crashHandler;
 
 Sapphire::Lobby::ServerLobby g_serverLobby( "lobby.ini" );
 

@@ -1,6 +1,7 @@
 #ifndef LOBBY_PACKET_CONTAINER_H_
 #define LOBBY_PACKET_CONTAINER_H_
 
+#include <array>
 #include <vector>
 #include <string.h>
 
@@ -34,7 +35,7 @@ namespace Sapphire::Network::Packets
 
     std::vector< FFXIVPacketBasePtr > m_entryList;
 
-    uint8_t m_dataBuf[0x2000];
+    std::array< uint8_t, 0x2000 > m_dataBuf{ 0 };
 
   };
 

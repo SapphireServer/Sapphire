@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS bnpctemplate;
+DROP TABLE IF EXISTS spawnpoint;
+DROP TABLE IF EXISTS spawngroup;

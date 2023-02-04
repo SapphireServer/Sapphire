@@ -1,121 +1,102 @@
 #include "ShopMgr.h"
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Actor/Player.h>
+#include <Inventory/Item.h>
 #include <Common.h>
 #include <Service.h>
-#include <Network/GamePacket.h>
-#include <Network/PacketDef/Zone/ServerZoneDef.h>
-
-#include "Inventory/Item.h"
-#include "Inventory/ItemContainer.h"
 
 using namespace Sapphire;
-using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::World::Manager;
 
-bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
+void ShopMgr::cacheShop( uint32_t shopId )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto itemShopList = exdData.getIdList< Excel::Shop >();
+  uint8_t count = 0;
+  for( auto itemShop : itemShopList )
+  {
+    if( shopId == itemShop )
+    {
+      auto shop = exdData.getRow< Excel::Shop >( itemShop );
+      for( auto shopItemId : shop->data().Item )
+      {
+        auto shopItem = exdData.getRow< Excel::ShopItem >( shopItemId );
+        if( !shopItem )
+          continue;
 
-  auto gilShopItem = exdData.get< Data::GilShopItem >( shopId, itemId );
-  if( !gilShopItem )
-    return false;
+        auto item = exdData.getRow< Excel::Item >( shopItem->data().ItemId );
+        if( !item || item->data().Price == 0 )
+          continue;
 
-  auto item = exdData.get< Data::Item >( gilShopItem->item );
+        m_shopItemPrices[ shopId ][ count ] = item->data().Price;
+        count++;
+      }
+      Logger::debug( "ShopMgr: cached itemShop {0} with {1} items", shopId, count );
+      break;
+    }
+  }
+}
+
+uint32_t ShopMgr::getShopItemPrices( uint32_t shopId, uint8_t index )
+{
+  if( index > 40 )
+    return 0;
+
+  auto it = m_shopItemPrices.find( shopId );
+  if( it != m_shopItemPrices.end() )
+  {
+    return it->second[ index ];
+  }
+  else
+  {
+    cacheShop( shopId );
+    return getShopItemPrices( shopId, index );
+  }
+
+}
+
+bool ShopMgr::purchaseGilShopItem( Entity::Player& player, uint32_t shopId, uint16_t itemId, uint32_t quantity )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto item = exdData.getRow< Excel::Item >( itemId );
   if( !item )
     return false;
 
-  auto price = item->priceMid * quantity;
+  auto price = item->data().Price * quantity;
 
   if( player.getCurrency( Common::CurrencyType::Gil ) < price )
     return false;
 
-  if( !player.addItem( gilShopItem->item, quantity ) )
+  if( !player.addItem( itemId, quantity ) )
     return false;
 
   player.removeCurrency( Common::CurrencyType::Gil, price );
 
-  auto packet = makeZonePacket< FFXIVIpcShopMessage >( player.getId() );
-  packet->data().shopId = shopId;
-  packet->data().msgType = 1687;
-  packet->data().unknown2 = 3;
-  packet->data().itemId = gilShopItem->item;
-  packet->data().amount = quantity;
-  packet->data().price = price;
-  packet->data().unknown6 = 0;
-  packet->data().unknown7 = 0;
-  player.queuePacket( packet );
-
   return true;
 }
 
-bool Sapphire::World::Manager::ShopMgr::shopSellItem( Sapphire::Entity::Player& player, uint32_t shopId, uint16_t containerId, uint16_t slotId )
+bool ShopMgr::sellGilShopItem( Entity::Player& player, uint16_t container, uint8_t fromSlot, uint16_t itemId, uint32_t quantity )
 {
-  auto item = player.getItemAt( containerId, slotId );
-  if( item )
-  {
-    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-    auto itemData = exdData.get< Data::Item >( item->getId() );
-    if( itemData && !itemData->isIndisposable )
-    {
-      auto value = itemData->priceLow * item->getStackSize();
-      player.dropInventoryItem( static_cast< Common::InventoryType >( containerId ), slotId );
-      player.addCurrency( Common::CurrencyType::Gil, value );
-      Entity::ShopBuyBackEntry entry =
-      {
-        item,
-        item->getStackSize(),
-        itemData->priceLow
-      };
-      player.addBuyBackItemForShop( shopId, entry );
-      auto packet = makeZonePacket< FFXIVIpcShopMessage >( player.getId() );
-      packet->data().shopId = shopId;
-      packet->data().msgType = 1688;
-      packet->data().unknown2 = 3;
-      packet->data().itemId = item->getId();
-      packet->data().amount = item->getStackSize();
-      packet->data().price = value;
-      packet->data().unknown6 = 0;
-      packet->data().unknown7 = 0;
-      player.queuePacket( packet );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
 
-      return true;
-    }
-  }
-  return false;
-}
+  auto item = exdData.getRow< Excel::Item >( itemId );
+  if( !item )
+    return false;
 
-bool Sapphire::World::Manager::ShopMgr::shopBuyBack( Sapphire::Entity::Player& player, uint32_t shopId, uint16_t index )
-{
-  auto& buyBackList = player.getBuyBackListForShop( shopId );
-  if( buyBackList.size() > index )
-  {
-    auto& entry = buyBackList[ index ];
-    auto originalStack = entry.item->getStackSize();
-    auto price = entry.pricePerItem * originalStack;
-    if( player.getCurrency( Common::CurrencyType::Gil ) < price )
-      return false;
+  auto payback = ( item->data().Price ) * quantity;
 
-    if( !player.addItem( entry.item ) )
-      return false;
+  auto inventoryItem = player.getItemAt( container, fromSlot );
 
-    player.removeCurrency( Common::CurrencyType::Gil, price );
+  // todo: adding stack remove
+  if( quantity > 1 )
+    return false;
 
-    buyBackList.erase( buyBackList.begin() + index );
+  player.discardItem( ( Common::InventoryType )container, fromSlot );
+  player.addSoldItem( itemId, quantity );
 
-    auto packet = makeZonePacket< FFXIVIpcShopMessage >( player.getId() );
-    packet->data().shopId = shopId;
-    packet->data().msgType = 1689;
-    packet->data().unknown2 = 3;
-    packet->data().itemId = entry.item->getId();
-    packet->data().amount = originalStack;
-    packet->data().price = price;
-    packet->data().unknown6 = 0;
-    packet->data().unknown7 = 0;
-    player.queuePacket( packet );
+  player.addCurrency( Common::CurrencyType::Gil, payback );
 
-    return true;
-  }
-  return false;
+  return true;
 }

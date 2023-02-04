@@ -13,133 +13,162 @@
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
-#include "Manager/DebugCommandMgr.h"
-
 #include "GameConnection.h"
-#include "ServerMgr.h"
+#include "WorldServer.h"
 #include "Session.h"
 #include "Forwards.h"
 
+#include "Manager/PlayerMgr.h"
+
 using namespace Sapphire::Common;
+using namespace Sapphire::World::Manager;
+using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets;
+using namespace Sapphire::Network::Packets::WorldPackets::Client;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
                                                    Sapphire::Network::AcceptorPtr pAcceptor ) :
-  Connection( pHive ),
-  m_pAcceptor( pAcceptor ),
+  Connection( std::move( pHive ) ),
+  m_pAcceptor( std::move( pAcceptor ) ),
   m_conType( ConnectionType::None )
 {
   auto setZoneHandler = [ = ]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
   {
     m_zoneHandlerMap[ opcode ] = pHandler;
-    m_zoneHandlerStrMap[ opcode ] = handlerName;
+    m_zoneHandlerStrMap[ opcode ] = std::move( handlerName );
   };
 
   auto setChatHandler = [ = ]( uint16_t opcode, std::string handlerName, GameConnection::Handler pHandler )
   {
     m_chatHandlerMap[ opcode ] = pHandler;
-    m_chatHandlerStrMap[ opcode ] = handlerName;
+    m_chatHandlerStrMap[ opcode ] = std::move( handlerName );
   };
 
-  setZoneHandler( ClientZoneIpcType::PingHandler, "PingHandler", &GameConnection::pingHandler );
-  setZoneHandler( ClientZoneIpcType::InitHandler, "InitHandler", &GameConnection::initHandler );
-  setZoneHandler( ClientZoneIpcType::ChatHandler, "ChatHandler", &GameConnection::chatHandler );
+  setZoneHandler( Sync, "syncHandler", &GameConnection::syncHandler );
+  setZoneHandler( ClientZoneIpcType::Login, "loginHandler", &GameConnection::loginHandler );
+  setZoneHandler( ChatHandler, "ChatHandler", &GameConnection::chatHandler );
+  setZoneHandler( JoinChatChannel, "JoinChatChannel", &GameConnection::joinChatChannelHandler );
 
-  setZoneHandler( ClientZoneIpcType::FinishLoadingHandler, "FinishLoadingHandler",
-                  &GameConnection::finishLoadingHandler );
+  setZoneHandler( SetLanguage, "SetLanguage", &GameConnection::setLanguageHandler );
 
-  setZoneHandler( ClientZoneIpcType::PlayTimeHandler, "PlayTimeHandler", &GameConnection::playTimeHandler );
-  setZoneHandler( ClientZoneIpcType::LogoutHandler, "LogoutHandler", &GameConnection::logoutHandler );
+  setZoneHandler( StartLogoutCountdown, "StartLogoutCountdown", &GameConnection::logoutHandler );
 
-  setZoneHandler( ClientZoneIpcType::SocialListHandler, "SocialListHandler", &GameConnection::socialListHandler );
-  setZoneHandler( ClientZoneIpcType::SetSearchInfoHandler, "SetSearchInfoHandler",
-                  &GameConnection::setSearchInfoHandler );
-  setZoneHandler( ClientZoneIpcType::ReqSearchInfoHandler, "ReqSearchInfoHandler",
-                  &GameConnection::reqSearchInfoHandler );
-  setZoneHandler( ClientZoneIpcType::ReqExamineSearchCommentHandler, "ReqExamineSearchCommentHandler",
-                  &GameConnection::reqExamineSearchCommentHandler );
-  setZoneHandler( ClientZoneIpcType::BlackListHandler, "BlackListHandler", &GameConnection::blackListHandler );
+  setZoneHandler( SetProfile, "SetProfile", &GameConnection::setProfileHandler );
+  setZoneHandler( GetProfile, "GetProfile", &GameConnection::getProfileHandler );
+  setZoneHandler( GetSearchComment, "GetSearchComment", &GameConnection::getSearchCommentHandler );
+  setZoneHandler( PcSearch, "PcSearch", &GameConnection::pcSearchHandler );
 
-  setZoneHandler( ClientZoneIpcType::LinkshellListHandler, "LinkshellListHandler",
-                  &GameConnection::linkshellListHandler );
+  setZoneHandler( GetCommonlist, "GetCommonlist", &GameConnection::getCommonlistHandler );
+  setZoneHandler( GetCommonlistDetail, "GetCommonlistDetail", &GameConnection::getCommonlistDetailHandler );
 
-  setZoneHandler( ClientZoneIpcType::FcInfoReqHandler, "FcInfoReqHandler", &GameConnection::fcInfoReqHandler );
-  setZoneHandler( ClientZoneIpcType::ReqExamineFcInfo, "ReqExamineFcInfo", &GameConnection::reqExamineFcInfo );
-  setZoneHandler( ClientZoneIpcType::ZoneLineHandler, "ZoneLineHandler", &GameConnection::zoneLineHandler );
-  setZoneHandler( ClientZoneIpcType::ClientTrigger, "ClientTrigger", &GameConnection::clientTriggerHandler );
+  setZoneHandler( GetLinkshellList, "GetLinkshellList", &GameConnection::linkshellListHandler );
+  setZoneHandler( LinkshellJoin, "LinkshellJoin", &GameConnection::linkshellJoinHandler );
+  setZoneHandler( LinkshellKick, "LinkshellKick", &GameConnection::linkshellKickHandler );
+  setZoneHandler( LinkshellLeave, "LinkshellLeave", &GameConnection::linkshellLeaveHandler );
+  setZoneHandler( LinkshellChangeMaster, "LinkshellChangeMaster", &GameConnection::linkshellChangeMasterHandler );
+  setZoneHandler( LinkshellJoinOfficial, "LinkshellJoinOfficial", &GameConnection::linkshellJoinOfficialHandler );
+  setZoneHandler( LinkshellAddLeader, "LinkshellAddLeader", &GameConnection::linkshellAddLeaderHandler );
+  setZoneHandler( LinkshellRemoveLeader, "LinkshellRemoveLeader", &GameConnection::linkshellRemoveLeaderHandler );
+  setZoneHandler( LinkshellDeclineLeader, "LinkshellDeclineLeader", &GameConnection::linkshellDeclineLeaderHandler );
 
-  setZoneHandler( ClientZoneIpcType::DiscoveryHandler, "DiscoveryHandler", &GameConnection::discoveryHandler );
+  setZoneHandler( ReqExamineFcInfo, "ReqExamineFcInfo", &GameConnection::reqExamineFcInfo );
+  setZoneHandler( ZoneJump, "ZoneJump", &GameConnection::zoneJumpHandler );
+  setZoneHandler( Command, "Command", &GameConnection::commandHandler );
 
-  setZoneHandler( ClientZoneIpcType::SkillHandler, "ActionHandler", &GameConnection::actionHandler );
-  setZoneHandler( ClientZoneIpcType::AoESkillHandler, "AoESkillHandler", &GameConnection::placedActionHandler );
+  setZoneHandler( NewDiscovery, "NewDiscovery", &GameConnection::newDiscoveryHandler );
 
-  setZoneHandler( ClientZoneIpcType::GMCommand1, "GMCommand1", &GameConnection::gm1Handler );
-  setZoneHandler( ClientZoneIpcType::GMCommand2, "GMCommand2", &GameConnection::gm2Handler );
+  setZoneHandler( ActionRequest, "ActionRequest", &GameConnection::actionRequest );
+  setZoneHandler( SelectGroundActionRequest, "SelectGroundActionRequest", &GameConnection::selectGroundActionRequest );
 
-  setZoneHandler( ClientZoneIpcType::UpdatePositionHandler, "UpdatePositionHandler",
-                  &GameConnection::updatePositionHandler );
+  setZoneHandler( GMCommand, "GMCommand", &GameConnection::gmCommandHandler );
+  setZoneHandler( GMCommandName, "GMCommandName", &GameConnection::gmCommandNameHandler );
 
-  setZoneHandler( ClientZoneIpcType::InventoryModifyHandler, "InventoryModifyHandler",
-                  &GameConnection::inventoryModifyHandler );
+  setZoneHandler( Move, "Move", &GameConnection::moveHandler );
 
-  setZoneHandler( ClientZoneIpcType::BuildPresetHandler, "BuildPresetHandler", &GameConnection::buildPresetHandler );
-  setZoneHandler( ClientZoneIpcType::LandRenameHandler, "LandRenameHandler", &GameConnection::landRenameHandler );
-  setZoneHandler( ClientZoneIpcType::HousingUpdateHouseGreeting, "HousingUpdateHouseGreeting",
-                  &GameConnection::housingUpdateGreetingHandler );
-  setZoneHandler( ClientZoneIpcType::ReqPlaceHousingItem, "ReqPlaceHousingItem", &GameConnection::reqPlaceHousingItem );
-  setZoneHandler( ClientZoneIpcType::HousingUpdateObjectPosition, "HousingUpdateObjectPosition",
-                  &GameConnection::reqMoveHousingItem );
-  setZoneHandler( ClientZoneIpcType::HousingEditExterior, "HousingEditExterior", &GameConnection::housingEditExterior );
-  setZoneHandler( ClientZoneIpcType::HousingEditInterior, "HousingEditInterior", &GameConnection::housingEditInterior );
+  setZoneHandler( ClientItemOperation, "ItemOperation", &GameConnection::itemOperation );
 
-  setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
-  setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
-  setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandlerWithinRange",
-                  &GameConnection::eventHandlerWithinRange );
-  setZoneHandler( ClientZoneIpcType::OutOfRangeEventHandler, "EventHandlerOutsideRange",
-                  &GameConnection::eventHandlerOutsideRange );
-  setZoneHandler( ClientZoneIpcType::EnterTeriEventHandler, "EventHandlerEnterTeri",
-                  &GameConnection::eventHandlerEnterTerritory );
+  setZoneHandler( BuildPresetHandler, "BuildPresetHandler", &GameConnection::buildPresetHandler );
+  setZoneHandler( ClientZoneIpcType::HousingHouseName, "HousingHouseName", &GameConnection::landRenameHandler );
+  setZoneHandler( ClientZoneIpcType::HousingGreeting, "HousingUpdateHouseGreeting", &GameConnection::housingUpdateGreetingHandler );
+  setZoneHandler( HousingPlaceYardItem, "HousingPlaceYardItem", &GameConnection::reqPlaceHousingItem );
+  setZoneHandler( HousingExteriorChange, "HousingExteriorChange", &GameConnection::reqMoveHousingItem );
 
-  setZoneHandler( ClientZoneIpcType::ReturnEventHandler, "ReturnEventHandler", &GameConnection::eventHandlerReturn );
-  setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler, "TradeReturnEventHandler",
-                  &GameConnection::eventHandlerReturn );
-  setZoneHandler( ClientZoneIpcType::TradeReturnEventHandler2, "TradeReturnEventHandler2", &GameConnection::eventHandlerReturn );
-  setZoneHandler( ClientZoneIpcType::EventYield2Handler, "EventYield2Handler", &GameConnection::eventYieldHandler );
-  setZoneHandler( ClientZoneIpcType::EventYield16Handler, "EventYield16Handler", &GameConnection::eventYieldHandler );
+  setZoneHandler( StartTalkEvent, "StartTalkEvent", &GameConnection::eventHandlerTalk );
+  setZoneHandler( StartEmoteEvent, "StartEmoteEvent", &GameConnection::eventHandlerEmote );
+  setZoneHandler( StartWithinRangeEvent, "StartWithinRangeEvent", &GameConnection::eventHandlerWithinRange );
+  setZoneHandler( StartOutsideRangeEvent, "StartOutsideRangeEvent", &GameConnection::eventHandlerOutsideRange );
+  setZoneHandler( StartEnterTerritoryEvent, "StartEnterTerritoryEvent", &GameConnection::eventHandlerEnterTerritory );
 
-  setZoneHandler( ClientZoneIpcType::ShopEventHandler, "ShopEventHandler",
-                  &GameConnection::eventHandlerShop );
+  setZoneHandler( ReturnEventSceneHeader, "ReturnEventSceneHeader", &GameConnection::returnEventSceneHeader );
+  setZoneHandler( ReturnEventScene2, "ReturnEventScene2", &GameConnection::returnEventScene2 );
+  setZoneHandler( ReturnEventScene4, "ReturnEventScene4", &GameConnection::returnEventScene4 );
+  setZoneHandler( ReturnEventScene8, "ReturnEventScene8", &GameConnection::returnEventScene8 );
+  setZoneHandler( ReturnEventScene16, "ReturnEventScene16", &GameConnection::returnEventScene16 );
+  setZoneHandler( ReturnEventScene32, "ReturnEventScene32", &GameConnection::returnEventScene32 );
+  setZoneHandler( ReturnEventScene64, "ReturnEventScene64", &GameConnection::returnEventScene64 );
+  setZoneHandler( ReturnEventScene128, "ReturnEventScene128", &GameConnection::returnEventScene128 );
+  setZoneHandler( ReturnEventScene255, "ReturnEventScene255", &GameConnection::returnEventScene255 );
 
-  setZoneHandler( ClientZoneIpcType::LinkshellEventHandler, "LinkshellEventHandler",
-                  &GameConnection::eventHandlerLinkshell );
+  setZoneHandler( YieldEventSceneHeader, "YieldEventSceneHeader", &GameConnection::yieldEventSceneHeader );
+  setZoneHandler( YieldEventScene2, "YieldEventScene2", &GameConnection::yieldEventScene2 );
+  setZoneHandler( YieldEventScene4, "YieldEventScene4", &GameConnection::yieldEventScene4 );
+  setZoneHandler( YieldEventScene8, "YieldEventScene8", &GameConnection::yieldEventScene8 );
+  setZoneHandler( YieldEventScene16, "YieldEventScene16", &GameConnection::yieldEventScene16 );
+  setZoneHandler( YieldEventScene32, "YieldEventScene32", &GameConnection::yieldEventScene32 );
+  setZoneHandler( YieldEventScene64, "YieldEventScene64", &GameConnection::yieldEventScene64 );
+  setZoneHandler( YieldEventScene128, "YieldEventScene128", &GameConnection::yieldEventScene128 );
+  setZoneHandler( YieldEventScene255, "YieldEventScene255", &GameConnection::yieldEventScene255 );
 
-  setZoneHandler( ClientZoneIpcType::LinkshellEventHandler1, "LinkshellEventHandler1",
-                  &GameConnection::eventHandlerLinkshell );
+  setZoneHandler( StartUIEvent, "StartUIEvent", &GameConnection::startUiEvent );
 
-  setZoneHandler( ClientZoneIpcType::CFDutyInfoHandler, "CFDutyInfoRequest", &GameConnection::cfDutyInfoRequest );
-  setZoneHandler( ClientZoneIpcType::CFRegisterDuty, "CFRegisterDuty", &GameConnection::cfRegisterDuty );
-  setZoneHandler( ClientZoneIpcType::CFRegisterRoulette, "CFRegisterRoulette", &GameConnection::cfRegisterRoulette );
-  setZoneHandler( ClientZoneIpcType::CFCommenceHandler, "CFDutyAccepted", &GameConnection::cfDutyAccepted );
-  //setZoneHandler( ClientZoneIpcType::CFCancelHandler, "CFCancel", &GameConnection::cfCancel );
+  setZoneHandler( YieldEventSceneString8, "YieldEventSceneString8", &GameConnection::yieldEventString );
+  setZoneHandler( YieldEventSceneString16, "YieldEventSceneString16", &GameConnection::yieldEventString );
+  setZoneHandler( YieldEventSceneString32, "YieldEventSceneString32", &GameConnection::yieldEventString );
 
-  setZoneHandler( ClientZoneIpcType::ReqEquipDisplayFlagsChange, "ReqEquipDisplayFlagsChange",
-                  &GameConnection::reqEquipDisplayFlagsHandler );
+  setZoneHandler( YieldEventSceneIntAndString, "YieldEventSceneIntAndString", &GameConnection::yieldEventSceneIntAndString );
 
-  setZoneHandler( ClientZoneIpcType::PerformNoteHandler, "PerformNoteHandler", &GameConnection::performNoteHandler );
+  setZoneHandler( RequestPenalties, "RequestPenalties", &GameConnection::cfRequestPenalties );
+  setZoneHandler( RequestBonus, "RequestBonus", &GameConnection::requestBonus );
+  setZoneHandler( FindContent, "FindContent", &GameConnection::findContent );
+  setZoneHandler( Find5Contents, "Find5Contents", &GameConnection::find5Contents );
+  setZoneHandler( FindContentAsRandom, "FindContentAsRandom", &GameConnection::findContentAsRandom );
+  setZoneHandler( CFCommenceHandler, "CFDutyAccepted", &GameConnection::cfDutyAccepted );
+  setZoneHandler( CancelFindContent, "CancelFindContent", &GameConnection::cancelFindContent );
+  setZoneHandler( AcceptContent, "AcceptContent", &GameConnection::acceptContent );
 
-  setZoneHandler( ClientZoneIpcType::MarketBoardSearch, "MarketBoardSearch", &GameConnection::marketBoardSearch );
-  setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListingInfo, "MarketBoardRequestItemListingInfo",
-                  &GameConnection::marketBoardRequestItemInfo );
-  setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListings, "MarketBoardRequestItemListings",
-                  &GameConnection::marketBoardRequestItemListings );
+  setZoneHandler( ClientZoneIpcType::Config, "Config", &GameConnection::configHandler );
 
-  setZoneHandler( ClientZoneIpcType::WorldInteractionHandler, "WorldInteractionHandler", &GameConnection::worldInteractionhandler );
-  setZoneHandler( ClientZoneIpcType::Dive, "Dive", &GameConnection::diveHandler );
+  setZoneHandler( CatalogSearch, "CatalogSearch", &GameConnection::catalogSearch );
 
-  setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
+  setZoneHandler( GearSetEquip, "GearSetEquip", &GameConnection::gearSetEquip );
 
+  setZoneHandler( MarketBoardRequestItemListingInfo, "MarketBoardRequestItemListingInfo", &GameConnection::marketBoardRequestItemInfo );
+  setZoneHandler( MarketBoardRequestItemListings, "MarketBoardRequestItemListings", &GameConnection::marketBoardRequestItemListings );
+
+  setChatHandler( ClientChatIpcType::ChatTo, "ChatTo", &GameConnection::tellHandler );
+  setChatHandler( ClientChatIpcType::ChatToChannel, "ChatToChannel", &GameConnection::chatToChannelHandler );
+
+  setZoneHandler( GetFcStatus, "GetFcStatus", &GameConnection::getFcStatus );
+  setZoneHandler( GetFcProfile, "GetFcProfile", &GameConnection::getFcProfile );
+
+  setZoneHandler( GetRequestItemList, "GetRequestItemList", &GameConnection::getRequestItemListHandler );
+
+  setZoneHandler( Invite, "Invite", &GameConnection::inviteHandler );
+  setZoneHandler( InviteReply, "InviteReply", &GameConnection::inviteReplyHandler );
+
+  setZoneHandler( PcPartyLeave, "PcPartyLeave", &GameConnection::pcPartyLeaveHandler );
+  setZoneHandler( PcPartyDisband, "PcPartyDisband", &GameConnection::pcPartyDisbandHandler );
+  setZoneHandler( PcPartyKick, "PcPartyKick", &GameConnection::pcPartyKickHandler );
+  setZoneHandler( PcPartyChangeLeader, "PcPartyChangeLeader", &GameConnection::pcPartyChangeLeaderHandler );
+
+  setZoneHandler( FriendlistRemove, "FriendlistRemove", &GameConnection::friendlistRemoveHandler );
+  setZoneHandler( SetFriendlistGroup, "SetFriendlistGroup", &GameConnection::setFriendlistGroupHandler );
+
+  setZoneHandler( GetBlacklist, "GetBlacklist", &GameConnection::getBlacklistHandler );
+  setZoneHandler( BlacklistAdd, "BlacklistAdd", &GameConnection::blacklistAddHandler );
+  setZoneHandler( BlacklistRemove, "BlacklistRemove", &GameConnection::blacklistRemoveHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;
@@ -150,14 +179,17 @@ void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint1
 {
   GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
   m_pAcceptor->accept( connection );
-  Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
+  Logger::info( "Connect from {0}:{1}", m_socket.remote_endpoint().address().to_string(), m_socket.remote_endpoint().port() );
 }
 
 
 void Sapphire::Network::GameConnection::onDisconnect()
 {
-  Logger::debug( "GameConnection DISCONNECT" );
-  m_pSession = nullptr;
+  if( m_pSession )
+    Logger::debug( "[{0}] Disconnect", m_pSession->getId() );
+  else
+    Logger::debug( "Disconnect of lost session." );
+  m_pSession.reset();
 }
 
 void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
@@ -212,9 +244,17 @@ void Sapphire::Network::GameConnection::queueOutPacket( Sapphire::Network::Packe
   m_outQueue.push( outPacket );
 }
 
+void Sapphire::Network::GameConnection::queueOutPacket( std::vector< Packets::FFXIVPacketBasePtr > vector )
+{
+  for( auto& packet : vector )
+  {
+    m_outQueue.push( packet );
+  }
+}
+
 void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
-  uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
+  uint16_t opcode = Util::getOpCode( pPacket );
   auto it = m_zoneHandlerMap.find( opcode );
 
   if( it != m_zoneHandlerMap.end() )
@@ -222,23 +262,30 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
     auto itStr = m_zoneHandlerStrMap.find( opcode );
     std::string name = itStr != m_zoneHandlerStrMap.end() ? itStr->second : "unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
-    if( opcode != PingHandler && opcode != UpdatePositionHandler )
-      Logger::debug( "[{0}] Handling World IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
+    if( opcode != Sync && opcode != Client::Move )
+      Logger::debug( "[{0}] Zone IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );
 
     ( this->*( it->second ) )( pPacket, *m_pSession->getPlayer() );
   }
   else
   {
-    Logger::debug( "[{0}] Undefined World IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
+    auto packetName = zonePacketToString( opcode );
+    auto player = m_pSession->getPlayer();
+    PlayerMgr::sendUrgent( *player, "Unimplemented zone IPC: {} ({:04X}) len: {}", packetName, opcode, pPacket.data.size() );
 
-    Logger::debug( "Dump:\n{0}", Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
-                                                       static_cast< uint16_t >( pPacket.segHdr.size) ) );
+    Logger::debug( "[{}] Unimplemented World IPC : {} ({:04X})", m_pSession->getId(), packetName, opcode );
+
+    Logger::debug(
+      "Dump:\n{0}",
+      Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
+      static_cast< uint16_t >( pPacket.segHdr.size - 0x10 ) )
+    );
   }
 }
 
 void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
-  uint16_t opcode = *reinterpret_cast< uint16_t* >( &pPacket.data[ 0x02 ] );
+  uint16_t opcode = Util::getOpCode( pPacket );
   auto it = m_chatHandlerMap.find( opcode );
 
   if( it != m_chatHandlerMap.end() )
@@ -254,6 +301,12 @@ void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Pac
   else
   {
     Logger::debug( "[{0}] Undefined Chat IPC : Unknown ( {1:04X} )", m_pSession->getId(), opcode );
+
+    Logger::debug(
+      "Dump:\n{0}",
+      Util::binaryToHexDump( const_cast< uint8_t* >( &pPacket.data[ 0 ] ),
+        static_cast< uint16_t >( pPacket.segHdr.size ) )
+    );
   }
 }
 
@@ -301,7 +354,7 @@ void Sapphire::Network::GameConnection::processOutQueue()
   if( m_outQueue.size() < 1 )
     return;
 
-  int32_t totalSize = 0;
+  size_t totalSize = 0;
 
   // create a new packet container
   PacketContainer pRP = PacketContainer( m_pSession->getId() );
@@ -346,7 +399,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   fp = fopen( packetpath.c_str(), "rb" );
   if( fp == nullptr )
   {
-    player.sendDebug( "Packet {0} not found!", packetpath );
+    PlayerMgr::sendDebug( player, "Packet {0} not found!", packetpath );
     return;
   }
 
@@ -356,7 +409,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
   rewind( fp );
   if( fread( packet, sizeof( char ), size, fp ) != size )
   {
-    player.sendDebug( "Packet {0} did not read full size: {1}", packetpath, size );
+    PlayerMgr::sendDebug( player, "Packet {0} did not read full size: {1}", packetpath, size );
     return;
   }
   fclose( fp );
@@ -374,6 +427,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
     else
       memcpy( packet + k + 0x08, &tmpId, 4 );
 
+
     uint16_t pSize = *reinterpret_cast< uint16_t* >( packet + k );
     // queue packet to the session
     if( pSize == 0 )
@@ -388,7 +442,7 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
 void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                                        const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
-  auto& serverMgr = Common::Service< World::ServerMgr >::ref();
+  auto& server = Common::Service< World::WorldServer >::ref();
 
   // if a session is set, update the last time it recieved a game packet
   if( m_pSession )
@@ -401,25 +455,25 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
       case SEGMENTTYPE_SESSIONINIT:
       {
         char* id = reinterpret_cast< char* >( &( inPacket.data[ 4 ] ) );
-        uint32_t playerId = std::stoul( id );
+        uint32_t entityId = std::stoul( id );
         auto pCon = std::static_pointer_cast< GameConnection, Connection >( shared_from_this() );
 
         // try to retrieve the session for this id
-        auto session = serverMgr.getSession( playerId );
+        auto session = server.getSession( entityId );
 
         if( !session )
         {
           Logger::info( "[{0}] Session not registered, creating", id );
           // return;
-          if( !serverMgr.createSession( playerId ) )
+          if( !server.createSession( entityId ) )
           {
             disconnect();
             return;
           }
-          session = serverMgr.getSession( playerId );
+          session = server.getSession( entityId );
         }
           //TODO: Catch more things in lobby and send real errors
-        else if( !session->isValid() || ( session->getPlayer() && session->getPlayer()->getLastPing() != 0 ) )
+        else if( !session->isValid() || ( session->getPlayer() && session->getLastPing() != 0 ) )
         {
           Logger::error( "[{0}] Session INVALID, disconnecting", id );
           disconnect();
@@ -431,7 +485,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
           m_pSession = session;
 
         auto pe = std::make_shared< FFXIVRawPacket >( 0x07, 0x18, 0, 0 );
-        *reinterpret_cast< unsigned int* >( &pe->data()[ 0 ] ) = 0xE0037603;
+        *reinterpret_cast< unsigned int* >( &pe->data()[ 0 ] ) = 0xE0001027;
         *reinterpret_cast< unsigned int* >( &pe->data()[ 4 ] ) = Common::Util::getTimeSeconds();
         sendSinglePacket( pe );
 
@@ -439,7 +493,12 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         if( ipcHeader.connectionType == ConnectionType::Zone )
         {
           auto pe1 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
-          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0 ] ) = playerId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0 ] ) = entityId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x20 ] ) = entityId;
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x24 ] ) = Common::Util::getTimeSeconds();
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x0C ] ) = Common::Util::getTimeSeconds();
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x1C ] ) = Common::Util::getTimeSeconds();
+          *reinterpret_cast< unsigned int* >( &pe1->data()[ 0x18 ] ) = Common::Util::getTimeSeconds();
           sendSinglePacket( pe1 );
           Logger::info( "[{0}] Setting session for world connection", id );
           session->setZoneConnection( pCon );
@@ -448,10 +507,10 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         else if( ipcHeader.connectionType == ConnectionType::Chat )
         {
           auto pe2 = std::make_shared< FFXIVRawPacket >( 0x02, 0x38, 0, 0 );
-          *reinterpret_cast< unsigned int* >( &pe2->data()[ 0 ] ) = playerId;
+          *reinterpret_cast< unsigned int* >( &pe2->data()[ 0 ] ) = entityId;
           sendSinglePacket( pe2 );
 
-          auto pe3 = std::make_shared< FFXIVRawPacket >( 0x03, 0x28, playerId, playerId );
+          auto pe3 = std::make_shared< FFXIVRawPacket >( 0x03, 0x28, entityId, entityId );
           *reinterpret_cast< unsigned short* >( &pe3->data()[ 2 ] ) = 0x02;
           sendSinglePacket( pe3 );
 
@@ -474,7 +533,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
 
         auto pe4 = std::make_shared< FFXIVRawPacket >( 0x08, 0x18, 0, 0 );
         *reinterpret_cast< unsigned int* >( &pe4->data()[ 0 ] ) = id;
-        *reinterpret_cast< unsigned int* >( &pe4->data()[ 4 ] ) = timeStamp;
+        *reinterpret_cast< unsigned int* >( &pe4->data()[ 4 ] ) = Util::getTimeSeconds();
         sendSinglePacket( pe4 );
 
         break;
@@ -484,6 +543,556 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
         break;
       }
     }
+
+  }
+}
+
+const char* Sapphire::Network::GameConnection::zonePacketToString( uint32_t opcode )
+{
+  switch( opcode )
+  {
+    default:
+      return "unknown client IPC";
+
+    case Sync:
+      return "Sync";
+
+    case ClientZoneIpcType::Login:
+      return "Login";
+
+    case ChatHandler:
+      return "ChatHandler";
+
+    case SetLanguage:
+      return "SetLanguage";
+
+    case Invite:
+      return "Invite";
+
+    case InviteReply:
+      return "InviteReply";
+
+    case GetCommonlist:
+      return "GetCommonlist";
+
+    case GetCommonlistDetail:
+      return "GetCommonlistDetail";
+
+    case SetProfile:
+      return "SetProfile";
+
+    case GetProfile:
+      return "GetProfile";
+
+    case GetSearchComment:
+      return "GetSearchComment";
+
+    case PartyRecruitAdd:
+      return "PartyRecruitAdd";
+
+    case JoinChatChannel:
+      return "JoinChatChannel";
+
+    case LeaveChatChannel:
+      return "LeaveChatChannel";
+
+    case PartyRecruitRemove:
+      return "PartyRecruitRemove";
+
+    case PartyRecruitSearch:
+      return "PartyRecruitSearch";
+
+    case GetRecruitSearchList:
+      return "GetRecruitSearchList";
+
+    case GetRecruitDetail:
+      return "GetRecruitDetail";
+
+    case InviteReplyRecruitParty:
+      return "InviteReplyRecruitParty";
+
+    case PartyRecruitEdit:
+      return "PartyRecruitEdit";
+
+    case GetPurposeLevel:
+      return "GetPurposeLevel";
+
+    case AddRequestItem:
+      return "AddRequestItem";
+
+    case RemoveRequestItem:
+      return "RemoveRequestItem";
+
+    case PcPartyLeave:
+      return "PcPartyLeave";
+
+    case PcPartyDisband:
+      return "PcPartyDisband";
+
+    case PcPartyKick:
+      return "PcPartyKick";
+
+    case PcPartyChangeLeader:
+      return "PcPartyChangeLeader";
+
+    case GetRequestItem:
+      return "GetRequestItem";
+
+    case BlacklistAdd:
+      return "BlacklistAdd";
+
+    case BlacklistRemove:
+      return "BlacklistRemove";
+
+    case GetBlacklist:
+      return "GetBlacklist";
+
+    case GetRequestItemList:
+      return "GetRequestItemList";
+
+    case SendReadyCheck:
+      return "SendReadyCheck";
+
+    case FriendlistRemove:
+      return "FriendlistRemove";
+
+    case ReplyReadyCheck:
+      return "ReplyReadyCheck";
+
+    case GetPartyRecruitCount:
+      return "GetPartyRecruitCount";
+
+    case FcAddJoinRequest:
+      return "FcAddJoinRequest";
+
+    case FcRemoveJoinRequest:
+      return "FcRemoveJoinRequest";
+
+    case PcSearch:
+      return "PcSearch";
+
+    case GetFcJoinRequestComment:
+      return "GetFcJoinRequestComment";
+
+    case InviteCancel:
+      return "InviteCancel";
+
+    case LinkshellJoin:
+      return "LinkshellJoin";
+
+    case LinkshellJoinOfficial:
+      return "LinkshellJoinOfficial";
+
+    case LinkshellLeave:
+      return "LinkshellLeave";
+
+    case LinkshellChangeMaster:
+      return "LinkshellChangeMaster";
+
+    case LinkshellKick:
+      return "LinkshellKick";
+
+    case GetLinkshellList:
+      return "GetLinkshellList";
+
+    case LinkshellAddLeader:
+      return "LinkshellAddLeader";
+
+    case LinkshellRemoveLeader:
+      return "LinkshellRemoveLeader";
+
+    case LinkshellDeclineLeader:
+      return "LinkshellDeclineLeader";
+
+    case LetterSendMessage:
+      return "LetterSendMessage";
+
+    case LetterRemoveMessage:
+      return "LetterRemoveMessage";
+
+    case GetLetterMessage:
+      return "GetLetterMessage";
+
+    case GetLetterMessageDetail:
+      return "GetLetterMessageDetail";
+
+    case LetterMoveAppendItem:
+      return "LetterMoveAppendItem";
+
+    case CheckGiftMail:
+      return "CheckGiftMail";
+
+    case ItemSearch:
+      return "ItemSearch";
+
+    case GetItemSearchList:
+      return "GetItemSearchList";
+
+    case GetRetainerList:
+      return "GetRetainerList";
+
+    case BuyMarketRetainer:
+      return "BuyMarketRetainer";
+
+    case GetRetainerSalesHistory:
+      return "GetRetainerSalesHistory";
+
+    case CatalogSearch:
+      return "CatalogSearch";
+
+    case FreeCompanyLeave:
+      return "FreeCompanyLeave";
+
+    case FreeCompanyKick:
+      return "FreeCompanyKick";
+
+    case FcSetHierarchyName:
+      return "FcSetHierarchyName";
+
+    case FcSetAuthorityList:
+      return "FcSetAuthorityList";
+
+    case FcMoveHierarchyMember:
+      return "FcMoveHierarchyMember";
+
+    case FcAddHierarchy:
+      return "FcAddHierarchy";
+
+    case FcRemoveHierarchy:
+      return "FcRemoveHierarchy";
+
+    case FcSortHierarchy:
+      return "FcSortHierarchy";
+
+    case GetFcStatus:
+      return "GetFcStatus";
+
+    case FcForceDisband:
+      return "FcForceDisband";
+
+    case GetFcInviteList:
+      return "GetFcInviteList";
+
+    case GetFcProfile:
+      return "GetFcProfile";
+
+    case GetFcHeader:
+      return "GetFcHeader";
+
+    case SetCompanyBoard:
+      return "SetCompanyBoard";
+
+    case GetCompanyBoard:
+      return "GetCompanyBoard";
+
+    case GetFcHierarchy:
+      return "GetFcHierarchy";
+
+    case FcChangeMaster:
+      return "FcChangeMaster";
+
+    case GetFcActivityList:
+      return "GetFcActivityList";
+
+    case SetCompanyMotto:
+      return "SetCompanyMotto";
+
+    case GetCompanyMotto:
+      return "GetCompanyMotto";
+
+    case GetFcParams:
+      return "GetFcParams";
+
+    case SetCrestID:
+      return "SetCrestID";
+
+    case BuyFcAction:
+      return "BuyFcAction";
+
+    case FcActionCommand:
+      return "FcActionCommand";
+
+    case GetFcAction:
+      return "GetFcAction";
+
+    case SetFcMemo:
+      return "SetFcMemo";
+
+    case GetFcMemo:
+      return "GetFcMemo";
+
+    case InfoGMCommand:
+      return "InfoGMCommand";
+
+    case DebugInfoCommand:
+      return "DebugInfoCommand";
+
+    case RequestSyncTag:
+      return "RequestSyncTag";
+
+    case ZoneJump:
+      return "ZoneJump";
+
+    case Command:
+      return "Command";
+
+    case PhysicalBonus:
+      return "PhysicalBonus";
+
+    case NewDiscovery:
+      return "NewDiscovery";
+
+    case TargetPosCommand:
+      return "TargetPosCommand";
+
+    case ActionRequest:
+      return "ActionRequest";
+
+    case GMCommand:
+      return "GMCommand";
+
+    case GMCommandName:
+      return "GMCommandName";
+
+    case SelectGroundActionRequest:
+      return "SelectGroundActionRequest";
+
+    case Move:
+      return "Move";
+
+    case GMCommandBuddyName:
+      return "GMCommandBuddyName";
+
+    case GMCommandNameBuddyName:
+      return "GMCommandNameBuddyName";
+
+    case RequestStorageItems:
+      return "RequestStorageItems";
+
+    case ExchangeAttachedInactiveMateria:
+      return "ExchangeAttachedInactiveMateria";
+
+    case RetainerCustomize:
+      return "RetainerCustomize";
+
+    case ClientItemOperation:
+      return "ClientItemOperation";
+
+    case GearSetEquip:
+      return "GearSetEquip";
+
+    case HousingExteriorChange:
+      return "HousingExteriorChange";
+
+    case HousingPlaceYardItem:
+      return "HousingPlaceYardItem";
+
+    case HousingInteriorChange:
+      return "HousingInteriorChange";
+
+    case ClientZoneIpcType::TradeCommand:
+      return "TradeCommand";
+
+    case TreasureCheckCommand:
+      return "TreasureCheckCommand";
+
+    case SelectLootAction:
+      return "SelectLootAction";
+
+    case OpenTreasureWithKey:
+      return "OpenTreasureWithKey";
+
+    case StartTalkEvent:
+      return "StartTalkEvent";
+
+    case StartEmoteEvent:
+      return "StartEmoteEvent";
+
+    case StartWithinRangeEvent:
+      return "StartWithinRangeEvent";
+
+    case StartOutsideRangeEvent:
+      return "StartOutsideRangeEvent";
+
+    case StartEnterTerritoryEvent:
+      return "StartEnterTerritoryEvent";
+
+    case StartActionResultEvent:
+      return "StartActionResultEvent";
+
+    case StartUIEvent:
+      return "StartUIEvent";
+
+    case StartSayEvent:
+      return "StartSayEvent";
+
+    case ReturnEventSceneHeader:
+      return "ReturnEventSceneHeader";
+
+    case ReturnEventScene2:
+      return "ReturnEventScene2";
+
+    case ReturnEventScene4:
+      return "ReturnEventScene4";
+
+    case ReturnEventScene8:
+      return "ReturnEventScene8";
+
+    case ReturnEventScene16:
+      return "ReturnEventScene16";
+
+    case ReturnEventScene32:
+      return "ReturnEventScene32";
+
+    case ReturnEventScene64:
+      return "ReturnEventScene64";
+
+    case ReturnEventScene128:
+      return "ReturnEventScene128";
+
+    case ReturnEventScene255:
+      return "ReturnEventScene255";
+
+    case YieldEventSceneHeader:
+      return "YieldEventSceneHeader";
+
+    case YieldEventScene2:
+      return "YieldEventScene2";
+
+    case YieldEventScene4:
+      return "YieldEventScene4";
+
+    case YieldEventScene8:
+      return "YieldEventScene8";
+
+    case YieldEventScene16:
+      return "YieldEventScene16";
+
+    case YieldEventScene32:
+      return "YieldEventScene32";
+
+    case YieldEventScene64:
+      return "YieldEventScene64";
+
+    case YieldEventScene128:
+      return "YieldEventScene128";
+
+    case YieldEventScene255:
+      return "YieldEventScene255";
+
+    case YieldEventSceneStringHeader:
+      return "YieldEventSceneStringHeader";
+
+    case YieldEventSceneString8:
+      return "YieldEventSceneString8";
+
+    case YieldEventSceneString16:
+      return "YieldEventSceneString16";
+
+    case YieldEventSceneString32:
+      return "YieldEventSceneString32";
+
+    case YieldEventSceneIntAndString:
+      return "YieldEventSceneIntAndString";
+
+    case ClientZoneIpcType::DebugNull:
+      return "DebugNull";
+
+    case DebugCommand:
+      return "DebugCommand";
+
+    case DebugBnpcControl:
+      return "DebugBnpcControl";
+
+    case DebugMessage:
+      return "DebugMessage";
+
+    case FindContent:
+      return "FindContent";
+
+    case DebugFinishContent:
+      return "DebugFinishContent";
+
+    case AcceptContent:
+      return "AcceptContent";
+
+    case CancelFindContent:
+      return "CancelFindContent";
+
+    case Find5Contents:
+      return "Find5Contents";
+
+    case ClientZoneIpcType::FindContentAsRandom:
+      return "FindContentAsRandom";
+
+    case ChocoboTaxiPathEnd:
+      return "ChocoboTaxiPathEnd";
+
+    case ChocoboTaxiSetStep:
+      return "ChocoboTaxiSetStep";
+
+    case ChocoboTaxiUnmount:
+      return "ChocoboTaxiUnmount";
+
+    case ClientZoneIpcType::Config:
+      return "Config";
+
+    case StartLogoutCountdown:
+      return "StartLogoutCountdown";
+
+    case ClientZoneIpcType::CancelLogoutCountdown:
+      return "CancelLogoutCountdown";
+
+    case FateDebugCommand:
+      return "FateDebugCommand";
+
+    case ContentAction:
+      return "ContentAction";
+
+    case RequestPenalties:
+      return "RequestPenalties";
+
+    case Logout:
+      return "Logout";
+
+    case ClientZoneIpcType::HousingHouseName:
+      return "HousingHouseName";
+
+    case ClientZoneIpcType::HousingGreeting:
+      return "HousingGreeting";
+
+    case HousingChangeLayout:
+      return "HousingChangeLayout";
+
+    case VoteKickStart:
+      return "VoteKickStart";
+
+    case MVPRequest:
+      return "MVPRequest";
+
+    case HousingChangeLayoutMulti:
+      return "HousingChangeLayoutMulti";
+
+    case ConfusionApproachEnd:
+      return "ConfusionApproachEnd";
+
+    case ConfusionTurnEnd:
+      return "ConfusionTurnEnd";
+
+    case MovePvP:
+      return "MovePvP";
+
+    case CFCommenceHandler:
+      return "CFCommenceHandler";
+
+    case MarketBoardRequestItemListingInfo:
+      return "MarketBoardRequestItemListingInfo";
+
+    case MarketBoardRequestItemListings:
+      return "MarketBoardRequestItemListings";
+
+    case ReqExamineFcInfo:
+      return "ReqExamineFcInfo";
 
   }
 }

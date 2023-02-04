@@ -28,7 +28,17 @@ namespace Sapphire::Lobby
     uint8_t m_encKey[0x10];
 
     // base key, the encryption key is generated from this
-    uint8_t m_baseKey[0x2C];
+    union
+    {
+      struct {
+        uint32_t magic;
+        uint32_t key;
+        uint32_t version;
+        char keyPhrase[ 0x20 ];
+      };
+      uint8_t rawKey[ 0x2C ];
+    } m_baseKey;
+
 
     bool m_bEncryptionInitialized;
 
@@ -56,15 +66,19 @@ namespace Sapphire::Lobby
 
     void onError( const asio::error_code& error ) override;
 
-    void sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId );
+    void sendError( uint32_t requestNumber, uint32_t clientTimeValue, uint32_t errorCode, uint16_t messageId, uint32_t tmpId );
 
-    void getCharList( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void serviceLogin( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    void enterWorld( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    void gameLogin( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    bool sendServiceAccountList( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    bool login( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
 
-    bool createOrModifyChar( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+    bool charaMake( Network::Packets::FFXIVARR_PACKET_RAW& packet, uint32_t tmpId );
+
+    void debugLogin( Network::Packets::FFXIVARR_PACKET_RAW &packet, uint32_t tmpId );
+
+    void debugLogin2( Network::Packets::FFXIVARR_PACKET_RAW & packet, uint32_t tmpId );
 
     void handlePackets( const Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                         const std::vector< Network::Packets::FFXIVARR_PACKET_RAW >& packetData );

@@ -1,6 +1,7 @@
 #ifndef _CELLHANDLER_H
 #define _CELLHANDLER_H
 #include <cassert>
+#include <array>
 
 #define TilesCount 32
 #define TileSize 325.0f
@@ -26,13 +27,13 @@ public:
 
   ~CellHandler();
 
-  T* getCellPtr( uint32_t x, uint32_t y );
+  std::shared_ptr< T > getCellPtr( uint32_t x, uint32_t y );
 
-  T* getCellByCoords( float x, float y );
+  std::shared_ptr< T > getCellByCoords( float x, float y );
 
-  T* create( uint32_t x, uint32_t y );
+  std::shared_ptr< T > create( uint32_t x, uint32_t y );
 
-  T* createByCoords( float x, float y );
+  std::shared_ptr< T > createByCoords( float x, float y );
 
   void remove( uint32_t x, uint32_t y );
 
@@ -49,7 +50,7 @@ protected:
   void _init();
 
 
-  T*** m_pCells;
+  std::array< std::array< std::shared_ptr< T >, _sizeY >, _sizeX > m_pCells;
 
 };
 
@@ -64,65 +65,32 @@ CellHandler< T >::CellHandler()
 template< class T >
 void CellHandler< T >::_init()
 {
-  m_pCells = new T** [_sizeX];
-
-  assert( m_pCells );
-  for( uint32_t i = 0; i < _sizeX; i++ )
-  {
-    m_pCells[ i ] = nullptr;
-  }
-
 }
 
 template< class T >
 CellHandler< T >::~CellHandler()
 {
-  if( m_pCells )
-  {
-    for( uint32_t i = 0; i < _sizeX; i++ )
-    {
-      if( !m_pCells[ i ] )
-      {
-        continue;
-      }
 
-      for( uint32_t j = 0; j < _sizeY; j++ )
-      {
-        if( m_pCells[ i ][ j ] )
-        {
-          delete m_pCells[ i ][ j ];
-        }
-      }
-      delete[] m_pCells[ i ];
-    }
-    delete[] m_pCells;
-  }
 }
 
 template< class T >
-T* CellHandler< T >::create( uint32_t x, uint32_t y )
+std::shared_ptr< T > CellHandler< T >::create( uint32_t x, uint32_t y )
 {
   if( x >= _sizeX || y >= _sizeY )
   {
     return nullptr;
   }
 
-  if( !m_pCells[ x ] )
+  if( !m_pCells[ x ][ y ] )
   {
-    m_pCells[ x ] = new T* [_sizeY];
-    memset( m_pCells[ x ], 0, sizeof( T* ) * _sizeY );
+    m_pCells[ x ][ y ] = std::make_shared< T >();
   }
 
-  assert( m_pCells[ x ][ y ] == nullptr );
-
-  T* cls = new T;
-  m_pCells[ x ][ y ] = cls;
-
-  return cls;
+  return  m_pCells[ x ][ y ];
 }
 
 template< class T >
-T* CellHandler< T >::createByCoords( float x, float y )
+std::shared_ptr< T > CellHandler< T >::createByCoords( float x, float y )
 {
   return create( getPosX( x ), getPosY( y ) );
 }
@@ -135,32 +103,20 @@ void CellHandler< T >::remove( uint32_t x, uint32_t y )
     return;
   }
 
-  if( !m_pCells[ x ] )
-  {
-    return;
-  }
-
   assert( m_pCells[ x ][ y ] != nullptr );
 
-  T* cls = m_pCells[ x ][ y ];
-  m_pCells[ x ][ y ] = nullptr;
+  m_pCells[ x ][ y ].reset();
 
-  delete cls;
 }
 
 template< class T >
-T* CellHandler< T >::getCellPtr( uint32_t x, uint32_t y )
+std::shared_ptr< T > CellHandler< T >::getCellPtr( uint32_t x, uint32_t y )
 {
-  if( !m_pCells[ x ] )
-  {
-    return nullptr;
-  }
-
   return m_pCells[ x ][ y ];
 }
 
 template< class T >
-T* CellHandler< T >::getCellByCoords( float x, float y )
+std::shared_ptr< T > CellHandler< T >::getCellByCoords( float x, float y )
 {
   return getCellPtr( getPosX( x ), getPosY( y ) );
 }

@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ubuntu:
+    strategy:
+      fail-fast: false
+      matrix:
+        buildType: [RelWithDebInfo, Debug]
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: install deps
+      run: sudo apt install -y ninja-build libmariadb-dev zlib1g-dev mariadb-server
+    - name: cmake
+      run: |
+        mkdir build 
+        cd build
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.buildType }}
+    - name: build sapphire
+      run: cd build && ninja
+
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        buildType: [RelWithDebInfo, Debug]
+        
+    runs-on: windows-2019
+      
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+    - name: Enable Developer Command Prompt
+      uses: ilammy/msvc-dev-cmd@v1.10.0
+    - name: install deps
+      run: |
+        choco install --no-progress mariadb ninja
+    - name: cmake init
+      run: |
+        mkdir build
+        cd build
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_CXX_COMPILER=cl -DCMAKE_C_COMPILER=cl
+    - name: build sapphire
+      run: cd build && ninja

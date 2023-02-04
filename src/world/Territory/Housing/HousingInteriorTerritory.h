@@ -32,6 +32,6 @@ namespace Sapphire::World::Territory::Housing
   private:
     Common::LandIdent m_landIdent;
 
-    std::array< Sapphire::Common::HousingObject, 400 > m_housingObjects;
+    std::array< Sapphire::Common::Furniture, 200 > m_housingObjects;
   };
 }

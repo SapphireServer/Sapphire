@@ -27,8 +27,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <iostream>
 #include <sstream>
+#include <mysql.h>
 
-typedef struct st_mysql_field  MYSQL_FIELD;
+//using  MYSQL_FIELD = st_mysql_field;
 #ifndef UL64
 #ifdef _WIN32
 #define UL64(x) x##ui64

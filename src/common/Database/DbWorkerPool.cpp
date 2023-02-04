@@ -185,13 +185,13 @@ uint32_t Sapphire::Db::DbWorkerPool< T >::openConnections( InternalIndex type, u
 }
 
 template< class T >
-unsigned long Sapphire::Db::DbWorkerPool< T >::escapeString( char* to, const char* from, unsigned long length )
+unsigned long Sapphire::Db::DbWorkerPool< T >::escapeString( char* to, const char* from, size_t length )
 {
   if( !to || !from || !length )
     return 0;
 
   return mysql_real_escape_string(
-    m_connections[ IDX_SYNCH ].front()->getConnection()->getRawCon(), to, from, length );
+    m_connections[ IDX_SYNCH ].front()->getConnection()->getRawCon(), to, from, static_cast< unsigned long >( length ) );
 }
 
 template< class T >

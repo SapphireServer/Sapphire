@@ -1,5 +1,5 @@
 #include "InstanceObjectCache.h"
-#include "Exd/ExdDataGenerated.h"
+#include "Exd/ExdData.h"
 
 #include <datReader/DatCategories/bg/pcb.h>
 #include <datReader/DatCategories/bg/lgb.h>
@@ -13,12 +13,13 @@
 
 #include <Logging/Logger.h>
 #include <Service.h>
+#include <Util/UtilMath.h>
 
 Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
 
-  auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
-  auto idList = exdData.getTerritoryTypeIdList();
+  auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
+  auto idList = exdData.getIdList< Excel::TerritoryType >();
 
   size_t count = 0;
   for( const auto& id : idList )
@@ -27,11 +28,11 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     if( count++ % 10 == 0 )
       std::cout << ".";
 
-    auto territoryType = exdData.get< Sapphire::Data::TerritoryType >( id );
+    auto territoryType = exdData.getRow< Excel::TerritoryType >( id );
     if( !territoryType )
       continue;
 
-    auto path = territoryType->bg;
+    auto path = territoryType->getString( territoryType->data().LVB );
 
     if( path.empty() )
       continue;
@@ -42,16 +43,13 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     std::string bgLgbPath( path + "/level/bg.lgb" );
     std::string planmapLgbPath( path + "/level/planmap.lgb" );
     std::string planeventLgbPath( path + "/level/planevent.lgb" );
-    std::string plannerLgbPath( path + "/level/planner.lgb" );
     std::vector< char > bgSection;
     std::vector< char > planmapSection;
     std::vector< char > planeventSection;
-    std::vector< char > plannerSection;
 
     std::unique_ptr< xiv::dat::File > bgFile;
     std::unique_ptr< xiv::dat::File > planmap_file;
     std::unique_ptr< xiv::dat::File > planevent_file;
-    std::unique_ptr< xiv::dat::File > planner_file;
 
     try
     {
@@ -77,21 +75,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     LGB_FILE planmapLgb( &planmapSection[ 0 ], "planmap" );
     LGB_FILE planeventLgb( &planeventSection[ 0 ], "planevent" );
 
-    std::vector< LGB_FILE > lgbList;
-
-    try
-    {      
-      planner_file = exdData.getGameData()->getFile( plannerLgbPath );
-      plannerSection = planner_file->access_data_sections().at( 0 );
-      LGB_FILE plannerLgb( &plannerSection[ 0 ], "planner" );
-
-      lgbList = { bgLgb, planmapLgb, planeventLgb, plannerLgb };
-    }
-    catch( std::runtime_error& )
-    {
-      lgbList = { bgLgb, planmapLgb, planeventLgb };
-    }
-
+    std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb, planeventLgb };
     uint32_t max_index = 0;
 
     for( const auto& lgb : lgbList )
@@ -100,6 +84,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       {
         for( const auto& pEntry : group.entries )
         {
+
           if( pEntry->getType() == LgbEntryType::MapRange )
           {
             auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
@@ -112,18 +97,30 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
           }
           else if( pEntry->getType() == LgbEntryType::PopRange )
           {
+
             auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
             m_popRangeCache.insert( id, pPopRange );
           }
-          else if( pEntry->getType() == LgbEntryType::EventNpc )
+          else if( pEntry->getType() == LgbEntryType::CollisionBox )
           {
-            auto pEventNpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
-            m_eventNpcCache.insert( id, pEventNpc );
+            //auto pEObj = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+
+            //Logger::debug( "CollisionBox {}", pEntry->header.nameOffset );
           }
           else if( pEntry->getType() == LgbEntryType::EventObject )
           {
-            auto pEventObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
-            m_eventObjCache.insert( id, pEventObj );
+            auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
+            m_eobjCache.insert( 0, pEObj );
+          }
+          else if( pEntry->getType() == LgbEntryType::EventNpc )
+          {
+            auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+            m_enpcCache.insert( 0, pENpc );
+          }
+          else if( pEntry->getType() == LgbEntryType::EventRange )
+          {
+            auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
+            m_eventRangeCache.insert( 0, pEventRange );
           }
         }
       }
@@ -132,8 +129,8 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
   std::cout << "\n";
 
   Logger::debug(
-    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} ENpc: {} Eobj: {}",
-    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_eventNpcCache.size(), m_eventObjCache.size()
+    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventNpc: {} EventRange: {}",
+    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_enpcCache.size(), m_eventRangeCache.size()
   );
 }
 
@@ -151,31 +148,50 @@ Sapphire::InstanceObjectCache::ExitRangePtr
 }
 
 Sapphire::InstanceObjectCache::PopRangePtr
-  Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
+  Sapphire::InstanceObjectCache::getPopRange( uint32_t popRangeId )
 {
-  return m_popRangeCache.get( zoneId, popRangeId );
+  return m_popRangeCache.get( 0, popRangeId );
 }
 
-Sapphire::InstanceObjectCache::EventNpcPtr
-  Sapphire::InstanceObjectCache::getEventNpc( uint16_t zoneId, uint32_t eventNpcId )
+Sapphire::InstanceObjectCache::EObjPtr
+  Sapphire::InstanceObjectCache::getEObj( uint32_t eObjId )
 {
-  return m_eventNpcCache.get( zoneId, eventNpcId );
+  return m_eobjCache.get( 0, eObjId );
 }
 
-Sapphire::InstanceObjectCache::EventObjPtr
-  Sapphire::InstanceObjectCache::getEventObj( uint16_t zoneId, uint32_t eventObjId )
+Sapphire::InstanceObjectCache::ENpcPtr
+  Sapphire::InstanceObjectCache::getENpc( uint32_t eNpcId )
 {
-  return m_eventObjCache.get( zoneId, eventObjId );
+  return m_enpcCache.get( 0, eNpcId );
 }
 
-Sapphire::InstanceObjectCache::EventNpcMapPtr
-  Sapphire::InstanceObjectCache::getAllEventNpc( uint16_t zoneId )
+Sapphire::InstanceObjectCache::EventRangePtr Sapphire::InstanceObjectCache::getEventRange( uint32_t eventRangeId )
 {
-  return m_eventNpcCache.getAll( zoneId );
+  return m_eventRangeCache.get( 0, eventRangeId );
 }
 
-Sapphire::InstanceObjectCache::EventObjMapPtr
-  Sapphire::InstanceObjectCache::getAllEventObj( uint16_t zoneId )
+std::shared_ptr< Sapphire::InstanceObjectCache::PopRangeInfo > Sapphire::InstanceObjectCache::getPopRangeInfo( uint32_t popRangeId )
 {
-  return m_eventObjCache.getAll( zoneId );
+  auto popRange = getPopRange( popRangeId );
+  if( !popRange )
+    return nullptr;
+
+  auto popInfo = std::make_shared< Sapphire::InstanceObjectCache::PopRangeInfo >();
+
+  popInfo->m_pos = Common::FFXIVARR_POSITION3 { popRange->header.transform.translation.x,
+                                               popRange->header.transform.translation.y,
+                                               popRange->header.transform.translation.z };
+
+  auto targetRot = Common::FFXIVARR_POSITION3 { popRange->header.transform.rotation.x,
+                                                popRange->header.transform.rotation.y,
+                                                popRange->header.transform.rotation.z };
+
+  popInfo->m_rotation = Common::Util::eulerToDirection( targetRot );
+
+  auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
+  auto levelData = exdData.getRow< Excel::Level >( popRangeId );
+  if( levelData )
+    popInfo->m_territoryTypeId = levelData->data().TerritoryType;
+
+  return popInfo;
 }

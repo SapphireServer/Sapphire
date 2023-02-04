@@ -1,5 +1,4 @@
-#ifndef XIV_UTILS_CRC32_H
-#define XIV_UTILS_CRC32_H
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -22,4 +21,3 @@ namespace xiv::utils::crc32
 
 }
 
-#endif // XIV_UTILS_CRC32_H

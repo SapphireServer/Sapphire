@@ -31,8 +31,15 @@
 #include <mutex>
 
 #include <functional>
+
+ // fucking filesystem
+#if _MSC_VER >= 1925
 #include <filesystem>
 namespace ci { namespace fs = std::filesystem; }
+#else
+#include <experimental/filesystem>
+namespace ci { namespace fs = std::experimental::filesystem; }
+#endif
 
 //! Exception for when Watchdog can't locate a file or parse the wildcard
 class WatchedFileSystemExc : public std::exception {
@@ -319,7 +326,7 @@ protected:
       std::string                                                               mFilter;
       std::function<void(const ci::fs::path&)>                                  mCallback;
       std::function<void(const std::vector<ci::fs::path>&)>                     mListCallback;
-      std::map< std::string, std::filesystem::file_time_type >    mModificationTimes;
+      std::map< std::string, ci::fs::file_time_type >    mModificationTimes;
    };
 
    std::mutex                      mMutex;

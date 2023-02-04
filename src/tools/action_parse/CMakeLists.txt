@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required( VERSION 3.0.2 )
 cmake_policy(SET CMP0015 NEW)
 project(Tool_ActionParse)
 
@@ -12,4 +12,3 @@ if (UNIX)
 else()
   target_link_libraries( action_parse common xivdat mysql zlib)
 endif()
-

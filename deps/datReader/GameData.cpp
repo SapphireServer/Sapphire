@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include <map>
+#include <utility>
 #include <zlib/zlib.h>
 
 #include "bparse.h"
@@ -49,8 +50,8 @@ std::unordered_map< uint32_t, std::string > categoryIdToNameMap =
 
 namespace xiv::dat
 {
-  GameData::GameData( const std::filesystem::path& path ) try :
-    m_path( path )
+  GameData::GameData( std::filesystem::path path ) try :
+    m_path( std::move( path ) )
   {
     int maxExLevel = 0;
 
@@ -273,8 +274,8 @@ namespace xiv::dat
     std::string filenamePart = pathLower.substr( lastSlashPos + 1 );
 
     // Get the crc32 values from zlib, to compensate the final XOR 0xFFFFFFFF that isnot done in the exe we just reXOR
-    dirHash = crc32( 0, reinterpret_cast<const uint8_t*>( dirPart.data() ), dirPart.size() ) ^ 0xFFFFFFFF;
-    filenameHash = crc32( 0, reinterpret_cast<const uint8_t*>( filenamePart.data() ), filenamePart.size() ) ^ 0xFFFFFFFF;
+    dirHash = crc32( 0, reinterpret_cast< const uint8_t* >( dirPart.data() ), static_cast< uInt >( dirPart.size() ) ) ^ 0xFFFFFFFF;
+    filenameHash = crc32( 0, reinterpret_cast< const uint8_t* >( filenamePart.data() ), static_cast< uInt >( filenamePart.size() ) ) ^ 0xFFFFFFFF;
   }
 
   void GameData::createCategory( uint32_t catNum )

@@ -8,68 +8,69 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 
-#include "Territory/Territory.h"
-#include "Territory/ZonePosition.h"
-
-#include "Manager/DebugCommandMgr.h"
 #include "Actor/Player.h"
 
 #include "Session.h"
-#include "ServerMgr.h"
+#include "WorldServer.h"
+#include <Service.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Client;
 
-void Sapphire::Network::GameConnection::inventoryModifyHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                                Entity::Player& player )
+void Sapphire::Network::GameConnection::itemOperation( const Packets::FFXIVARR_PACKET_RAW& inPacket,
+                                                       Entity::Player& player )
 {
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcInventoryModifyHandler >( inPacket );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  const auto packet = ZoneChannelPacket< FFXIVIpcClientInventoryItemOperation >( inPacket );
 
-  const auto action = packet.data().action;
-  const auto splitCount = packet.data().splitCount;
+  const auto operationType = packet.data().OperationType;
+  const auto splitCount = packet.data().SrcStack;
 
-  const auto fromSlot = packet.data().fromSlot;
-  const auto fromContainer = packet.data().fromContainer;
-  const auto toSlot = packet.data().toSlot;
-  const auto toContainer = packet.data().toContainer;
+  const auto fromSlot = packet.data().SrcContainerIndex;
+  const auto fromContainer = packet.data().SrcStorageId;
+  const auto toSlot = packet.data().DstContainerIndex;
+  const auto toContainer = packet.data().DstStorageId;
 
-  auto ackPacket = makeZonePacket< Server::FFXIVIpcInventoryActionAck >( player.getId() );
-  ackPacket->data().sequence = packet.data().seq;
-  ackPacket->data().type = 7;
-  player.queuePacket( ackPacket );
+  const auto contextId = packet.data().ContextId;
 
-  Logger::debug( "InventoryAction: {0}", action );
+  auto ackPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
+  ackPacket->data().contextId = contextId;
+  ackPacket->data().operationType = operationType;
+  server.queueForPlayer( player.getCharacterId(), ackPacket );
+
+  Logger::debug( "OperationType: {0}", operationType );
 
   // TODO: other inventory operations need to be implemented
-  switch( action )
+  switch( operationType )
   {
 
-    case InventoryOperation::Discard: // discard item action
+    case Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM: // discard item action
     {
       player.discardItem( fromContainer, fromSlot );
     }
       break;
 
-    case InventoryOperation::Move: // move item action
+    case Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_MOVEITEM: // move item action
     {
       player.moveItem( fromContainer, fromSlot, toContainer, toSlot );
     }
       break;
 
-    case InventoryOperation::Swap: // swap item action
+    case ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_SWAPITEM: // swap item action
     {
       player.swapItem( fromContainer, fromSlot, toContainer, toSlot );
     }
       break;
 
-    case InventoryOperation::Merge: // merge stack action
+    case ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_MERGEITEM: // merge stack action
     {
       player.mergeItem( fromContainer, fromSlot, toContainer, toSlot );
     }
       break;
 
-    case InventoryOperation::Split: // split stack action
+    case ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_SPLITITEM: // split stack action
     {
       player.splitItem( fromContainer, fromSlot, toContainer, toSlot, splitCount );
     }

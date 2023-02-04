@@ -1,10 +1,9 @@
-#ifndef _CHARA_H_
-#define _CHARA_H_
+#pragma once
 
 #include <Common.h>
 
 #include "Forwards.h"
-#include "Actor.h"
+#include "GameObject.h"
 #include <set>
 #include <map>
 #include <queue>
@@ -18,56 +17,18 @@ namespace Sapphire::Entity
   \brief Base class for all animate actors
 
   */
-  class Chara : public Actor
+  class Chara : public GameObject
   {
+  private:
+    // array size for baseparam + bonuses arrays, 80 to have some spare room.
+    constexpr static uint32_t STAT_ARRAY_SIZE = 80;
+
   public:
-    struct ActorStats
-    {
-      uint32_t max_mp = 0;
-      uint32_t max_hp = 0;
 
-      uint32_t str = 0;
-      uint32_t dex = 0;
-      uint32_t vit = 0;
-      uint32_t inte = 0;
-      uint32_t mnd = 0;
-      uint32_t pie = 0;
+    using ActorStatsArray = std::array< uint32_t, STAT_ARRAY_SIZE >;
 
-      uint32_t tenacity = 0;
-      uint32_t attack = 0;
-      uint32_t defense = 0;
-      uint32_t accuracy = 0;
-      uint32_t spellSpeed = 0;
-      uint32_t magicDefense = 0;
-      uint32_t critHitRate = 0;
-      uint32_t resistSlash = 0;
-      uint32_t resistPierce = 0;
-      uint32_t resistBlunt = 0;
-      uint32_t attackPotMagic = 0;
-      uint32_t healingPotMagic = 0;
-      uint32_t determination = 0;
-      uint32_t skillSpeed = 0;
-
-      uint32_t resistSlow = 0;
-      uint32_t resistSilence = 0;
-      uint32_t resistBlind = 0;
-      uint32_t resistPoison = 0;
-      uint32_t resistStun = 0;
-      uint32_t resistSleep = 0;
-      uint32_t resistBind = 0;
-      uint32_t resistHeavy = 0;
-
-      uint32_t resistFire = 0;
-      uint32_t resistIce = 0;
-      uint32_t resistWind = 0;
-      uint32_t resistEarth = 0;
-      uint32_t resistLightning = 0;
-      uint32_t resistWater = 0;
-
-    } m_baseStats;
-
-    // array for bonuses, 80 to have some spare room.
-    std::array< uint32_t, 80 > m_bonusStats;
+    ActorStatsArray m_baseStats;
+    ActorStatsArray m_bonusStats;
 
   protected:
     char m_name[34];
@@ -93,6 +54,10 @@ namespace Sapphire::Entity
     uint16_t m_tp;
     /*! Current GP of the actor */
     uint16_t m_gp;
+    /*! max mp of the actor */
+    uint32_t max_mp = 0;
+    /*! max hp of the actor */
+    uint32_t max_hp = 0;
     /*! Additional look info of the actor */
     uint8_t m_customize[26];
     /*! Additional model info */
@@ -188,9 +153,15 @@ namespace Sapphire::Entity
 
     void setStance( Common::Stance stance );
 
-    ActorStats getStats() const;
+    const ActorStatsArray& getStats() const;
 
     uint32_t getStatValue( Common::BaseParam baseParam ) const;
+
+    float getStatValueFloat( Common::BaseParam baseParam ) const;
+
+    uint32_t getBonusStat( Common::BaseParam baseParam ) const;
+
+    void setStatValue( Common::BaseParam baseParam, uint32_t value );
 
     uint32_t getHp() const;
 
@@ -275,8 +246,6 @@ namespace Sapphire::Entity
     uint32_t getLastComboActionId() const;
     void setLastComboActionId( uint32_t actionId );
 
-    uint32_t getBonusStat( Common::BaseParam bonus ) const;
-
     uint32_t getDirectorId() const;
     void setDirectorId( uint32_t directorId );
 
@@ -290,4 +259,3 @@ namespace Sapphire::Entity
   };
 
 }
-#endif

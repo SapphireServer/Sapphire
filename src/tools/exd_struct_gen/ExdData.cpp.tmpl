@@ -23,7 +23,7 @@ void Sapphire::Data::ExdDataGenerated::loadIdList( xiv::exd::Exd& data, std::set
 
   for( auto row : pDataRows )
   {
-    uint32_t id = row.first.rowId;
+    uint32_t id = row.first;
     outIdList.insert( id );
   }
 }

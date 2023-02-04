@@ -12,15 +12,16 @@
 
 using namespace Sapphire;
 
-class ManFst002 : public Sapphire::ScriptAPI::EventScript
+class ManFst002 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
 
-  static constexpr auto SEQ_0 = 0;
-  static constexpr auto SEQ_1 = 1;
-  static constexpr auto SEQ_2 = 2;
-  static constexpr auto SEQ_FINISH = 255;
-  //this.SEQ_OFFER = ?;
+  enum Sequence : uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    SeqFinish = 255,
+  };
 
   // Quest rewards
   static constexpr auto RewardExpFactor = 100;
@@ -65,160 +66,155 @@ private:
   static constexpr auto UNLOCK_DESION = 14;
 
 
-  void checkQuestCompletion( Entity::Player& player, uint32_t varIdx )
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
     if( varIdx == 3 )
-      player.sendQuestMessage( getId(), 1, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
     else if( varIdx == 2 )
-      player.sendQuestMessage( getId(), 2, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
     else
-      player.sendQuestMessage( getId(), 0, 0, 0, 0 );
+      eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
 
-    auto var_attuned = player.getQuestUI8AL( static_cast< uint16_t >( getId() ) );
-    auto var_class = player.getQuestUI8BH( static_cast< uint16_t >( getId() ) );
-    auto var_trade = player.getQuestUI8BL( static_cast< uint16_t >( getId() ) );
+    auto var_attuned = quest.getUI8AL();
+    auto var_class = quest.getUI8BH();
+    auto var_trade = quest.getUI8BL();
 
     if( var_attuned == 1 && var_class == 1 && var_trade == 1 )
-      player.updateQuest( getId(), SEQ_FINISH );
+      quest.setSeq( SeqFinish );
   }
 
-  void Scene00000( Entity::Player& player )
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    eventMgr().playQuestScene( player, getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, bindSceneReturn( &ManFst002::Scene00000Return ) );
+  }
+
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 ) // accept quest
+      Scene00050( quest, player );
+  }
+
+  void Scene00001( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR1, 0x0EFB, bindSceneReturn( &ManFst002::Scene00001Return ) );
+  }
+
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    quest.setUI8AL( 1 );
+    checkQuestCompletion( quest, player, 0 );
+  }
+
+  void Scene00002( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR2, NONE, bindSceneReturn( &ManFst002::Scene00002Return ) );
+  }
+
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    quest.setUI8BH( 1 );
+    checkQuestCompletion( quest, player, 3 );
+  }
+
+  void Scene00003( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR3, NONE, bindSceneReturn( &ManFst002::Scene00003Return ) );
+  }
+
+  void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 )
+      Scene00100( quest, player );
+    else
+      Scene00099( quest, player );
+  }
+
+  void Scene00004( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playScene( player, getId(), SEQ_1_ACTOR0, NONE );
+  }
+
+  void Scene00005( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002::Scene00005Return ) );
+  }
+
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 ) // finish quest
     {
-      if( result.param2 == 1 ) // accept quest
-        Scene00050( player );
-    };
-
-    player.playScene( getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, 0, 0, callback );
+      player.finishQuest( getId(), result.getResult( 1 ) );
+    }
   }
 
-  void Scene00001( Entity::Player& player )
+  void Scene00050( World::Quest& quest, Entity::Player& player )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      player.setQuestUI8AL( getId(), 1 );
-      checkQuestCompletion( player, 0 );
-    };
-
-    player.playScene( getId(), SEQ_1_ACTOR1, 0x0EFB, 0, 0, callback );
+    eventMgr().playQuestScene( player, getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002::Scene00050Return ) );
   }
 
-  void Scene00002( Entity::Player& player )
+  void Scene00050Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      player.setQuestUI8BH( getId(), 1 );
-      checkQuestCompletion( player, 3 );
-    };
+    // on quest accept
+    quest.setSeq( Seq1 );
+    quest.setUI8CH( 1 ); // receive key item
 
-    player.playScene( getId(), SEQ_1_ACTOR2, NONE, 0, 0, callback );
+    // teleport to real gridania
+    player.forceZoneing( TERRITORYTYPE0 );
   }
 
-  void Scene00003( Entity::Player& player )
+  void Scene00051( World::Quest& quest, Entity::Player& player )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      if( result.param2 == 1 )
-        Scene00100( player );
-      else
-        Scene00099( player );
-    };
-
-    player.playScene( getId(), SEQ_1_ACTOR3, NONE, 0, 0, callback );
+    eventMgr().playQuestSceneChain( player, getId(), SEQ_1_ACTOR1_WAIT, NONE, bindQuestScene( &ManFst002::Scene00001 ) );
   }
 
-  void Scene00004( Entity::Player& player )
+  void Scene00099( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), SEQ_1_ACTOR0, NONE, 0, 0 );
+    eventMgr().playQuestSceneChain( player, getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, bindQuestScene( &ManFst002::Scene00005 ) );
   }
 
-  void Scene00005( Entity::Player& player )
+  void Scene00100( World::Quest& quest, Entity::Player& player )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      if( result.param2 == 1 ) // finish quest
-      {
-        if( player.giveQuestRewards( getId(), 0 ) )
-          player.finishQuest( getId() );
-      }
-    };
-
-    player.playScene( getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, bindSceneReturn( &ManFst002::Scene00100Return ) );
   }
 
-  void Scene00050( Entity::Player& player )
+  void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      // on quest accept
-      player.updateQuest( getId(), SEQ_1 );
-      player.setQuestUI8CH( getId(), 1 ); // receive key item
-
-      // teleport to real gridania
-      player.forceZoneing( TERRITORYTYPE0 );
-    };
-
-    player.playScene( getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, 0, 0, callback );
-  }
-
-  void Scene00051( Entity::Player& player )
-  {
-    player.playSceneChain( getId(), SEQ_1_ACTOR1_WAIT, NONE, bindScene( &ManFst002::Scene00001 ) );
-  }
-
-  void Scene00099( Entity::Player& player )
-  {
-    player.playSceneChain( getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, bindScene( &ManFst002::Scene00005 ) );
-  }
-
-  void Scene00100( Entity::Player& player )
-  {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
-    {
-      player.setQuestUI8CH( getId(), 0 ); // remove traded key item
-      player.setQuestUI8BL( getId(), 1 );
-
-      checkQuestCompletion( player, 2 );
-    };
-
-    player.playScene( getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, 0, 0, callback );
+    quest.setUI8CH( 0 ); // remove traded key item
+    quest.setUI8BL( 1 );
+    checkQuestCompletion( quest, player, 2 );
   }
 
 public:
-  ManFst002() :
-    Sapphire::ScriptAPI::EventScript( 65621 )
+  ManFst002() : Sapphire::ScriptAPI::QuestScript( 65621 )
   {
   }
 
-  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-    if( actor == ACTOR0 )
-      Scene00000( player );
-    else if( actor == ACTOR1 )
+    if( actorId == ACTOR0 )
+      Scene00000( quest, player );
+    else if( actorId == ACTOR1 )
     {
       // attune
       auto event = [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
       {
-        player.sendQuestMessage( 0x050002, 0, 1, 0, 0 );
+        eventMgr().sendEventNotice( player, 0x050002, 0, 1, 0, 0 );
         player.registerAetheryte( 2 );
-        player.learnAction( 1 );
+        player.setRewardFlag( Common::UnlockEntry::Return );
 
-        Scene00051( player );
+        Scene00051( quest, player );
       };
 
-      player.eventActionStart( 0x050002, 0x13, event, nullptr, 0x050002 );
+      eventMgr().eventActionStart( player, 0x050002, 0x13, event, nullptr, 0x050002 );
 
     }
-    else if( actor == ACTOR2 )
-      Scene00002( player );
-    else if( actor == ACTOR3 )
-      Scene00003( player );
-    else if( actor == ACTOR4 )
-      Scene00005( player );
+    else if( actorId == ACTOR2 )
+      Scene00002( quest, player );
+    else if( actorId == ACTOR3 )
+      Scene00003( quest, player );
+    else if( actorId == ACTOR4 )
+      Scene00005( quest, player );
   }
 };
 

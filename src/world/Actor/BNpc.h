@@ -1,5 +1,4 @@
-#ifndef _BNPC_H_
-#define _BNPC_H_
+#pragma once
 
 #include <Common.h>
 
@@ -40,6 +39,20 @@ namespace Sapphire::Entity
     Untargetable = 32,
   };
 
+  const std::array< uint32_t, 50 > BnpcBaseHp =
+  {
+    44,51, 59, 68, 91,
+    108, 126, 143, 160, 192,
+    217, 243, 268, 293, 319,
+    344, 369, 394, 420, 413,
+    458, 493, 532, 568, 594,
+    641, 677,714, 750, 780,
+    887, 965, 1055, 1142, 1220,
+    1306, 1409, 1515, 1587, 1601,
+    1703, 1789, 1872, 2008, 2112,
+    2180, 2314, 2383, 2501, 2589
+  };
+
   /*!
   \class BNpc
   \brief Base class for all BNpcs
@@ -50,10 +63,13 @@ namespace Sapphire::Entity
 
   public:
     BNpc();
-    BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX, float posY, float posZ, float rot,
-          uint8_t level, uint32_t maxHp, TerritoryPtr pZone );
+
+    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone );
+    BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type );
 
     virtual ~BNpc() override;
+
+    void init();
 
     void spawn( PlayerPtr pTarget ) override;
     void despawn( PlayerPtr pTarget ) override;
@@ -71,6 +87,8 @@ namespace Sapphire::Entity
 
     uint8_t getAggressionMode() const;
 
+    uint32_t getTriggerOwnerId() const;
+    void setTriggerOwnerId( uint32_t triggerOwnerId );
 
     float getNaviTargetReachedDistance() const;
 
@@ -85,14 +103,17 @@ namespace Sapphire::Entity
     void setState( BNpcState state );
 
     void hateListClear();
+    uint32_t hateListGetValue( const Sapphire::Entity::CharaPtr& pChara );
+    uint32_t hateListGetHighestValue();
     CharaPtr hateListGetHighest();
-    void hateListAdd( CharaPtr pChara, int32_t hateAmount );
-    void hateListUpdate( CharaPtr pChara, int32_t hateAmount );
-    void hateListRemove( CharaPtr pChara );
-    bool hateListHasActor( CharaPtr pChara );
+    void hateListAdd( const CharaPtr& pChara, int32_t hateAmount );
+    void hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount );
+    void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
+    void hateListRemove( const CharaPtr& pChara );
+    bool hateListHasActor( const CharaPtr& pChara );
 
-    void aggro( CharaPtr pChara );
-    void deaggro( CharaPtr pChara );
+    void aggro( const CharaPtr& pChara );
+    void deaggro( const CharaPtr& pChara );
 
     void update( uint64_t tickCount ) override;
     void onTick() override;
@@ -110,15 +131,22 @@ namespace Sapphire::Entity
 
     void checkAggro();
 
-    void setOwner( CharaPtr m_pChara );
+    void setOwner( const CharaPtr& m_pChara );
 
     void setLevelId( uint32_t levelId );
     uint32_t getLevelId() const;
+    uint32_t getBoundInstanceId() const;
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
 
     void calculateStats() override;
+
+    uint32_t getRank() const;
+
+    Common::BNpcType getBNpcType() const;
+
+    uint32_t getLayoutId() const;
 
   private:
     uint32_t m_bNpcBaseId;
@@ -133,10 +161,18 @@ namespace Sapphire::Entity
     uint32_t m_displayFlags;
     uint8_t m_level;
     uint32_t m_levelId;
+    uint32_t m_rank;
+    uint32_t m_boundInstanceId;
+    uint32_t m_layoutId;
+    uint32_t m_triggerOwnerId;
 
     uint32_t m_flags;
 
+    Common::BNpcType m_bnpcType;
+
     float m_naviTargetReachedDistance;
+
+    std::shared_ptr< Common::BNPCInstanceObject > m_pInfo;
 
     uint32_t m_timeOfDeath;
     uint32_t m_lastRoamTargetReached;
@@ -157,4 +193,3 @@ namespace Sapphire::Entity
   };
 
 }
-#endif

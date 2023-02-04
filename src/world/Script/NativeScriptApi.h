@@ -2,8 +2,16 @@
 #define NATIVE_SCRIPT_API
 
 #include <string>
-#include <Event/EventHandler.h>
 #include "ForwardsZone.h"
+#include "Event/EventHandler.h"
+#include "Manager/EventMgr.h"
+#include "Manager/LinkshellMgr.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include "Manager/WarpMgr.h"
+#include "Exd/ExdData.h"
+#include "Territory/InstanceObjectCache.h"
+#include "Service.h"
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
@@ -144,6 +152,12 @@ namespace Sapphire::ScriptAPI
     {
       return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
     }
+    template< typename Ret, class Obj >
+    inline std::function< void( Entity::Player& player, const Event::SceneResult& result ) >
+    bindSceneReturn( Ret ( Obj::*f )( Entity::Player& player, const Event::SceneResult& result ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1, std::placeholders::_2 );
+    }
 
   public:
     explicit EventScript( uint32_t eventId );
@@ -156,21 +170,123 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEnterTerritory( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
-    virtual void onWithinRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1,float x, float y, float z );
+    virtual void onWithinRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
     virtual void onOutsideRange( Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
 
-    virtual void onEventItem( Sapphire::Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime,
-                              uint64_t targetId );
+    //virtual void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId );
 
     virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                             uint32_t catalogId );
 
     virtual void onEObjHit( Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
-    virtual void onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param );
+    virtual void onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t returnInt );
 
-    virtual Event::EventHandler::QuestAvailability getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId );
+    Data::ExdData& exdData()
+    {
+      return Common::Service< Data::ExdData >::ref();
+    }
+
+    World::Manager::EventMgr& eventMgr()
+    {
+      return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::LinkshellMgr& linkshellMgr()
+    {
+      return Common::Service< World::Manager::LinkshellMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
+
+    Sapphire::InstanceObjectCache& instanceObjectCache()
+    {
+      return Common::Service< Sapphire::InstanceObjectCache >::ref();
+    }
+
+    World::Manager::TerritoryMgr& teriMgr()
+    {
+      return Common::Service< World::Manager::TerritoryMgr >::ref();
+    }
+  };
+
+  class QuestScript : public ScriptObject
+  {
+  protected:
+    template< typename Ret, class Obj >
+    inline std::function< void( Sapphire::Entity::Player& ) > bindScene( Ret ( Obj::*f )( Sapphire::Entity::Player& ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1 );
+    }
+
+    template< typename Ret, class Obj >
+    inline std::function< void( World::Quest&, Sapphire::Entity::Player& ) > bindQuestScene( Ret ( Obj::*f )( World::Quest&, Sapphire::Entity::Player& ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1, std::placeholders::_2 );
+    }
+
+    template< typename Ret, class Obj >
+    inline std::function< void( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result ) >
+      bindSceneReturn( Ret ( Obj::*f )( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result ) )
+    {
+      return std::bind( f, static_cast< Obj* >( this ), std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 );
+    }
+
+  public:
+    explicit QuestScript( uint32_t eventId );
+
+    virtual void onTalk( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
+
+    virtual void onSay( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t sayId );
+
+    virtual void onEventItem( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId );
+
+    virtual void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player );
+
+    virtual void onTriggerOwnerDeaggro( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player );
+
+    virtual void onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Sapphire::Entity::Player& player );
+
+    virtual void onEnterTerritory( World::Quest& quest, Sapphire::Entity::Player& player, uint16_t param1, uint16_t param2 );
+
+    virtual void onWithinRange( World::Quest& quest, Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+
+    virtual void onOutsideRange( World::Quest& quest, Sapphire::Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z );
+
+    virtual void onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player );
+
+    virtual void onEventHandlerTradeReturn( Sapphire::Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId );
+
+    virtual void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
+
+    World::Manager::EventMgr& eventMgr()
+    {
+      return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::TerritoryMgr& teriMgr()
+    {
+      return Common::Service< World::Manager::TerritoryMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
   };
 
   /*!
@@ -182,6 +298,21 @@ namespace Sapphire::ScriptAPI
     explicit EventObjectScript( uint32_t eobjId );
 
     virtual void onTalk( uint32_t eventId, Sapphire::Entity::Player& player, Entity::EventObject& eobj );
+
+    World::Manager::EventMgr& eventMgr()
+    {
+      return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
   };
 
   /*!
@@ -214,10 +345,26 @@ namespace Sapphire::ScriptAPI
 
     virtual void onInit( Sapphire::InstanceContent& instance );
 
+    virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, uint32_t eventId );
+
+    virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId );
+
     virtual void onUpdate( Sapphire::InstanceContent& instance, uint64_t tickCount );
 
     virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );
+
+    virtual void onLeaveTerritory( InstanceContent& instance, Entity::Player& player );
+
+    World::Manager::EventMgr& eventMgr()
+    {
+      return Common::Service< World::Manager::EventMgr >::ref();
+    }
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
   /*!
@@ -240,23 +387,16 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEnterTerritory( Sapphire::QuestBattle& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );
-  };
 
-  class PublicContentScript : public ScriptObject
-  {
-  public:
-    explicit PublicContentScript( uint32_t contentId );
+    World::Manager::EventMgr& eventMgr()
+    {
+      return Common::Service< World::Manager::EventMgr >::ref();
+    }
 
-    virtual void onInit( Sapphire::PublicContent& instance );
-
-    virtual void onUpdate( Sapphire::PublicContent& instance, uint64_t tickCount );
-
-    virtual void onPlayerZoneIn( Sapphire::PublicContent& instance, Sapphire::Entity::Player& player );
-
-    virtual void onLeaveTerritory( Sapphire::PublicContent& instance, Sapphire::Entity::Player& player );
-
-    virtual void onEnterTerritory( Sapphire::PublicContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
-      uint16_t param1, uint16_t param2 );
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
 }

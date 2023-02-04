@@ -6,8 +6,3 @@ std::string xiv::utils::bparse::extract_cstring( std::istream& i_stream, const s
    std::getline( i_stream, temp_str, '\0' );
    return temp_str;
 }
-
-std::string xiv::utils::bparse::extract_cstring( std::vector< char >& data, uint32_t pos )
-{
-  return &data[ pos ];
-}

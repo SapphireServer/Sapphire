@@ -1,6 +1,7 @@
 #include <string>
 #include <typeinfo>
 #include <typeindex>
+#include <Event/EventHandler.h>
 #include "NativeScriptApi.h"
 #include <cassert>
 
@@ -90,8 +91,7 @@ namespace Sapphire::ScriptAPI
 
   ///////////////////////////////////////////////////////////////////
 
-  EventScript::EventScript( uint32_t eventId ) :
-    ScriptObject( eventId, typeid( EventScript ).hash_code() )
+  EventScript::EventScript( uint32_t eventId ) : ScriptObject( eventId, typeid( EventScript ).hash_code() )
   {
   }
 
@@ -119,10 +119,9 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void EventScript::onEventItem( Entity::Player& player, uint32_t eventItemId, uint32_t eventId, uint32_t castTime,
-                                 uint64_t targetId )
-  {
-  }
+  //void EventScript::onEventItem( Entity::Player& player, Entity::Player& player, uint64_t actorId )
+  //{
+  //}
 
   void EventScript::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param,
                                               uint32_t catalogId )
@@ -133,19 +132,68 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void EventScript::onEventYield( Sapphire::Entity::Player& player, uint16_t scene, std::vector< uint32_t > param )
+  void EventScript::onYield( uint32_t eventId, uint16_t sceneId, uint8_t yieldId, Entity::Player& player, const std::string& resultString, uint64_t resultInt )
   {
-  }
-
-  Event::EventHandler::QuestAvailability EventScript::getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId )
-  {
-    return Event::EventHandler::QuestAvailability::Available;
+    eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0 } );
   }
 
   ///////////////////////////////////////////////////////////////////
 
-  EventObjectScript::EventObjectScript( uint32_t eobjId ) :
-    ScriptObject( eobjId, typeid( EventObjectScript ).hash_code() )
+  QuestScript::QuestScript( uint32_t eventId ) : ScriptObject( eventId, typeid( QuestScript ).hash_code() )
+  {
+  }
+
+  void QuestScript::onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId )
+  {
+  }
+
+  void QuestScript::onSay( World::Quest& quest, Entity::Player& player, uint64_t actorId, uint32_t sayId )
+  {
+  }
+
+  void QuestScript::onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId )
+  {
+  }
+
+  void QuestScript::onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player )
+  {
+  }
+
+  void QuestScript::onTriggerOwnerDeaggro( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player )
+  {
+  }
+
+  void QuestScript::onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Entity::Player& player )
+  {
+  }
+
+  void QuestScript::onEnterTerritory( World::Quest& quest, Entity::Player& player, uint16_t param1, uint16_t param2 )
+  {
+  }
+
+  void QuestScript::onWithinRange( World::Quest& quest, Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
+  {
+  }
+
+  void QuestScript::onOutsideRange( World::Quest& quest, Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
+  {
+  }
+
+  void QuestScript::onEventHandlerTradeReturn( Entity::Player& player, uint32_t eventId, uint16_t subEvent, uint16_t param, uint32_t catalogId )
+  {
+  }
+
+  void QuestScript::onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId )
+  {
+  }
+
+  void QuestScript::onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player )
+  {
+  }
+
+  ///////////////////////////////////////////////////////////////////
+
+  EventObjectScript::EventObjectScript( uint32_t eobjId ) : ScriptObject( eobjId, typeid( EventObjectScript ).hash_code() )
   {
   }
 
@@ -182,12 +230,26 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, 
+                                      uint32_t eventId )
+  {
+  }
+
+  void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, 
+                                      uint64_t actorId )
+  {
+  }
+
   void InstanceContentScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
   {
   }
 
   void InstanceContentScript::onEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId,
                                                 uint16_t param1, uint16_t param2 )
+  {
+  }
+
+  void InstanceContentScript::onLeaveTerritory( InstanceContent& instance, Entity::Player& player )
   {
   }
 
@@ -221,32 +283,6 @@ namespace Sapphire::ScriptAPI
 
   void QuestBattleScript::onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId,
                                             uint16_t param1, uint16_t param2 )
-  {
-  }
-
-  PublicContentScript::PublicContentScript( uint32_t contentId ) :
-    ScriptObject( uint32_t{ 0x8004 } << 16 | contentId, typeid( PublicContentScript ).hash_code() )
-  {
-  }
-
-  void PublicContentScript::onInit( PublicContent& instance )
-  {
-  }
-
-  void PublicContentScript::onUpdate( PublicContent& instance, uint64_t tickCount )
-  {
-  }
-
-  void PublicContentScript::onPlayerZoneIn( PublicContent& instance, Entity::Player& player )
-  {
-  }
-
-  void PublicContentScript::onLeaveTerritory( PublicContent& instance, Entity::Player& player )
-  {
-  }
-
-  void PublicContentScript::onEnterTerritory( PublicContent& instance, Entity::Player& player, uint32_t eventId,
-    uint16_t param1, uint16_t param2 )
   {
   }
 

@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_DBWORKER_H
-#define SAPPHIRE_DBWORKER_H
+#pragma once
 
 #include <atomic>
 #include <thread>
@@ -34,4 +33,3 @@ namespace Sapphire::Db
   };
 }
 
-#endif //SAPPHIRE_DBWORKER_H

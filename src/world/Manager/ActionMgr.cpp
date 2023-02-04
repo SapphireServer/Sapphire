@@ -1,23 +1,32 @@
 #include "ActionMgr.h"
+#include "PlayerMgr.h"
 
+#include "Action/ActionLutData.h"
 #include "Action/Action.h"
 #include "Action/ItemAction.h"
+#include "Action/EventItemAction.h"
 #include "Action/MountAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
-#include <Exd/ExdDataGenerated.h>
+#include <Service.h>
+#include <Exd/ExdData.h>
 
 #include <Network/PacketWrappers/EffectPacket.h>
 
 using namespace Sapphire;
+using namespace Sapphire::World::Manager;
 
-void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                          Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos,
-                                                          uint16_t sequence )
+bool ActionMgr::cacheActionLut()
 {
-  player.sendDebug( "got aoe act: {0}", actionData->name );
+  return Action::ActionLutData::cacheActions();
+}
 
+void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                          Excel::ExcelStructPtr< Excel::Action > actionData, Common::FFXIVARR_POSITION3 pos,
+                                          uint16_t sequence )
+{
+  PlayerMgr::sendDebug( player, "got aoe act: {0}", actionData->getString( actionData->data().Text.Name ) );
 
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
@@ -26,19 +35,18 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
   if( !action->init() )
     return;
 
-  if( !actionData->targetArea )
+  if( !actionData->data().EffectRange )
   {
     // not an action that has an aoe, cancel it
     action->interrupt();
     return;
   }
 
-  bootstrapAction( player, action, *actionData );
+  bootstrapAction( player, action, actionData );
 }
 
-void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                                            Data::ActionPtr actionData, uint64_t targetId,
-                                                            uint16_t sequence )
+void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                            Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t sequence )
 {
   auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
 
@@ -50,20 +58,20 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
     return;
 
   // cancel any aoe actions casted with this packet
-  if( actionData->targetArea )
+  if( actionData->data().EffectRange )
   {
     action->interrupt();
     return;
   }
 
-  bootstrapAction( player, action, *actionData );
+  bootstrapAction( player, action, actionData );
 }
 
-void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
-                                                  Data::ItemActionPtr itemActionData,
-                                                  uint16_t itemSourceSlot, uint16_t itemSourceContainer )
+void ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                  Excel::ExcelStructPtr< Excel::ItemAction > itemActionData,
+                                  uint16_t itemSourceSlot, uint16_t itemSourceContainer )
 {
-  player.sendDebug( "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
+  PlayerMgr::sendDebug( player, "got item act: {0}, slot: {1}, container: {2}", itemId, itemSourceSlot, itemSourceContainer );
 
   auto action = Action::make_ItemAction( player.getAsChara(), itemId, itemActionData,
                                          itemSourceSlot, itemSourceContainer );
@@ -72,11 +80,26 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
   action->start();
 }
 
-void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
-                                                   Data::ActionPtr actionData, uint64_t targetId,
-                                                   uint16_t sequence )
+void ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                       Excel::ExcelStructPtr< Excel::EventItem > itemActionData,
+                                       uint32_t sequence, uint64_t targetId )
 {
-  player.sendDebug( "mount: {0}", mountId );
+  auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetId );
+  action->init();
+
+  if( itemActionData->data().CastTime )
+  {
+    player.setCurrentAction( action );
+  }
+
+  action->start();
+}
+
+void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
+                                   Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId,
+                                   uint16_t sequence )
+{
+  PlayerMgr::sendDebug( player, "setMount: {0}", mountId );
 
   auto action = Action::make_MountAction( player.getAsPlayer(), mountId, sequence, actionData );
 
@@ -85,23 +108,25 @@ void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint1
   if( !action->init() )
     return;
 
-  bootstrapAction( player, action, *actionData );
+  bootstrapAction( player, action, actionData );
 }
 
-void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
-                                                 Action::ActionPtr currentAction,
-                                                 Data::Action& actionData )
+void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction,
+                                 Excel::ExcelStructPtr< Excel::Action > actionData )
 {
+  /*
+  //TODO: need to be fixed
   if( !currentAction->preCheck() )
   {
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
   }
+  */
 
   if( player.getCurrentAction() )
   {
-    player.sendDebug( "Skill queued: {0}", currentAction->getId() );
+    PlayerMgr::sendDebug( player, "Skill queued: {0}", currentAction->getId() );
     player.setQueuedAction( currentAction );
   }
   else
@@ -114,5 +139,17 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
 
     // todo: what do in cases of swiftcast/etc? script callback?
     currentAction->start();
+    player.setLastAttack( Common::Util::getTimeMs() );
   }
+}
+
+bool ActionMgr::actionHasCastTime( uint32_t actionId ) //TODO: Add logic for special cases
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto actionInfoPtr = exdData.getRow< Excel::Action >( actionId );
+
+  if( actionInfoPtr->data().ComboContinue )
+    return false;
+
+  return actionInfoPtr->data().CastTime != 0;
 }

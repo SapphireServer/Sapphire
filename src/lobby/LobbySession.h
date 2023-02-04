@@ -16,28 +16,28 @@ namespace Sapphire::Lobby
   private:
     uint32_t m_IP;
     uint32_t m_accountID;
-    uint8_t m_sessionId[56];
+    char m_sessionId[ 64 ];
+    uint8_t m_charaIndex;
 
   public:
     std::string newCharName;
 
-    LobbySession( void );
-
-    ~LobbySession( void );
+    LobbySession() = default;
+    ~LobbySession() = default;
 
     uint32_t getIP()
     {
       return m_IP;
     }
 
-    uint8_t* getSessionId()
+    char* getSessionId()
     {
       return m_sessionId;
     }
 
-    void setSessionId( uint8_t* sessionId )
+    void setSessionId( char* sessionId )
     {
-      memcpy( m_sessionId, sessionId, 56 );
+      memcpy( m_sessionId, sessionId, sizeof( m_sessionId ) );
     }
 
     void setIP( uint32_t iP )
@@ -53,6 +53,15 @@ namespace Sapphire::Lobby
     void setAccountID( uint32_t iD )
     {
       m_accountID = iD;
+    }
+    void setCharaIndex( uint8_t index )
+    {
+      m_charaIndex = index;
+    }
+
+    uint8_t getCharaIndex()
+    {
+      return m_charaIndex;
     }
 
   };

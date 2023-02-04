@@ -1,5 +1,4 @@
-#ifndef XIV_UTILS_CONV_H
-#define XIV_UTILS_CONV_H
+#pragma once
 
 #include <cstdint>
 #include <vector>
@@ -12,4 +11,3 @@ namespace xiv::utils::conv
   float ubyte2float( const uint8_t i_value );
 }
 
-#endif // XIV_UTILS_CONV_H

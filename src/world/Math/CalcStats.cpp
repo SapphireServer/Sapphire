@@ -1,22 +1,26 @@
 #include <cmath>
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Common.h>
 #include <Logging/Logger.h>
 #include <Service.h>
 
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
+#include "Util/UtilMath.h"
 
 #include "Inventory/Item.h"
 
 #include "CalcStats.h"
 
+#include "Manager/PlayerMgr.h"
+
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
+using namespace Sapphire::World::Manager;
 
-const int levelTable[81][6] =
-{ 
+const int levelTable[61][6] =
+{
   // MAIN,SUB,DIV,HP,ELMT,THREAT
   { 1, 1, 1, 1, 1, 1 },
   { 20, 56, 56, 86, 52, 2 },
@@ -79,29 +83,6 @@ const int levelTable[81][6] =
   { 215, 351, 755, 2388, 279, 186 },
   { 217, 352, 806, 2492, 280, 200 },
   { 218, 354, 858, 2600, 282, 215 },
-  { 224, 355, 941, 2700, 283, 232 },
-  { 228, 356, 1032, 2800, 284, 250 },
-  { 236, 357, 1133, 2900, 286, 269 },
-  { 244, 358, 1243, 3000, 287, 290 },
-  { 252, 359, 1364, 3100, 288, 313 },
-  { 260, 360, 1497, 3200, 290, 337 },
-  { 268, 361, 1643, 3300, 292, 363 },
-  { 276, 362, 1802, 3400, 293, 392 },
-  { 284, 363, 1978, 3500, 294, 422 },
-  { 292, 364, 2170, 3600, 295, 455 },
-
-  // todo: add proper shbr values - hp/elmt/threat
-  // sub/div added from http://theoryjerks.akhmorning.com/resources/levelmods/
-  { 296, 365, 2263, 3600, 295, 466 },
-  { 300, 366, 2360, 3600, 295, 466 },
-  { 305, 367, 2461, 3600, 295, 466 },
-  { 310, 368, 2566, 3600, 295, 466 },
-  { 315, 370, 2676, 3600, 295, 466 },
-  { 320, 372, 2790, 3600, 295, 466 },
-  { 325, 374, 2910, 3600, 295, 466 },
-  { 330, 376, 3034, 3600, 295, 466 },
-  { 335, 378, 3164, 3600, 295, 466 },
-  { 340, 380, 3300, 3600, 569, 569 },
 };
 
 std::random_device CalcStats::dev;
@@ -141,38 +122,28 @@ float CalcStats::calculateBaseStat( const Chara& chara )
 // Leggerless' HP Formula
 // ROUNDDOWN(JobModHP * (BaseHP / 100)) + ROUNDDOWN(VitHPMod / 100 * (VIT - BaseDET))
 
-uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
+uint32_t CalcStats::calculateMaxHp( Player& player )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
   // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
   // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
   // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
 
-  auto classInfo = exdData.get< Sapphire::Data::ClassJob >( static_cast< uint8_t >( pPlayer->getClass() ) );
-  auto paramGrowthInfo = exdData.get< Sapphire::Data::ParamGrow >( pPlayer->getLevel() );
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getLevel() );
 
   if( !classInfo || !paramGrowthInfo )
     return 0;
 
-  uint8_t level = pPlayer->getLevel();
+  uint8_t level = player.getLevel();
 
-  auto vitMod = pPlayer->getBonusStat( Common::BaseParam::Vitality );
-  float baseStat = calculateBaseStat( *pPlayer );
-  uint16_t vitStat = static_cast< uint16_t >( pPlayer->getStats().vit ) + static_cast< uint16_t >( vitMod );
-  uint16_t hpMod = paramGrowthInfo->hpModifier;
-  uint16_t jobModHp = classInfo->modifierHitPoints;
+  auto vitMod = player.getBonusStat( Common::BaseParam::Vitality );
+  float baseStat = calculateBaseStat( player );
+  uint16_t vitStat = static_cast< uint16_t >( player.getStatValue( Common::BaseParam::Vitality ) ) + static_cast< uint16_t >( vitMod );
+  uint16_t hpMod = paramGrowthInfo->data().ParamBase;
+  uint16_t jobModHp = classInfo->data().Hp;
   float approxBaseHp = 0.0f; // Read above
 
-  // These values are not precise.
-  /*
-  if( level >= 60 )
-    approxBaseHp = static_cast< float >( 2600 + ( level - 60 ) * 100 );
-  else if( level >= 50 )
-    approxBaseHp = 1700 + ( ( level - 50 ) * ( 1700 * 1.04325f ) );
-  else
-    approxBaseHp = paramGrowthInfo->mpModifier * 0.7667f;
-  */
-  // just use the table at least better than what it was
   approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
   uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
@@ -180,6 +151,131 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
 
   return result;
 }
+
+uint32_t CalcStats::calculateMaxHp( Chara& chara )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  // TODO: Replace ApproxBaseHP with something that can get us an accurate BaseHP.
+  // Is there any way to pull reliable BaseHP without having to manually use a pet for every level, and using the values from a table?
+  // More info here: https://docs.google.com/spreadsheets/d/1de06KGT0cNRUvyiXNmjNgcNvzBCCQku7jte5QxEQRbs/edit?usp=sharing
+
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( chara.getLevel() );
+
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
+
+  uint8_t level = chara.getLevel();
+
+  auto vitMod = chara.getBonusStat( Common::BaseParam::Vitality );
+  float baseStat = calculateBaseStat( chara );
+  uint16_t vitStat = static_cast< uint16_t >( chara.getStatValue( Common::BaseParam::Vitality ) ) + static_cast< uint16_t >( vitMod );
+  uint16_t hpMod = paramGrowthInfo->data().ParamBase;
+  uint16_t jobModHp = classInfo->data().Hp;
+  float approxBaseHp = 0.0f; // Read above
+
+  approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
+
+  uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+                                             floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+
+  return result;
+}
+
+uint32_t CalcStats::calculateMaxMp( Player& player )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( player.getLevel() );
+
+  if( !classInfo || !paramGrowthInfo )
+    return 0;
+
+  float baseStat = calculateBaseStat( player );
+  uint16_t piety = player.getStats()[ static_cast< uint32_t >( Common::BaseParam::Piety ) ];
+  uint16_t pietyScalar = paramGrowthInfo->data().ParamBase;
+  uint16_t jobModMp = classInfo->data().Mp;
+  uint16_t baseMp = paramGrowthInfo->data().Mp;
+
+  uint16_t result = static_cast< uint16_t >( std::floor( floor( piety - baseStat ) * ( pietyScalar / 100 ) + baseMp ) *
+                                             jobModMp / 100 );
+
+  return result;
+}
+
+uint16_t CalcStats::calculateMpCost( const Sapphire::Entity::Chara& chara, uint16_t baseCost )
+{
+  auto level = chara.getLevel();
+
+  // each level range is 1-10, 11-20, 21-30, ... therefore:
+  // level 50 should be in the 4th group, not the 5t
+  // dividing by 10 on the border will break this unless we subtract 1
+  auto levelGroup = std::max< uint8_t >( level - 1, 1 ) / 10;
+
+  float cost = baseCost;
+
+  // thanks to andrew for helping me figure this shit out
+  // played with this some more and it seems to be accurate for everything i've tried
+  switch( levelGroup )
+  {
+    // level 1-10
+    case 0:
+    {
+      // r^2 = 0.9999
+      cost = 0.0952f * level + 0.9467f;
+      break;
+    }
+
+    // level 11-20
+    case 1:
+    {
+      // r^2 = 1
+      cost = 0.19f * level;
+      break;
+    }
+
+    // level 21-30
+    case 2:
+    {
+      // r^2 = 1
+      cost = 0.38f * level - 3.8f;
+      break;
+    }
+
+    // level 31-40
+    case 3:
+    {
+      // r^2 = 1
+      cost = 0.6652f * level - 12.358f;
+      break;
+    }
+
+    // level 41-50
+    case 4:
+    {
+      // r^2 = 1
+      cost = 1.2352f * level - 35.159f;
+      break;
+    }
+
+    // level 51-60
+    case 5:
+    {
+      // r^2 = 1
+      cost = 0.0654f * std::exp( 0.1201f * level );
+      break;
+    }
+
+    default:
+    {
+      return 0;
+    }
+  }
+
+  return static_cast< uint16_t >( std::round( cost * baseCost ) );
+}
+
 
 float CalcStats::blockProbability( const Chara& chara )
 {
@@ -195,7 +291,7 @@ float CalcStats::directHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float dhRate = chara.getStatValue( Common::BaseParam::DirectHitRate );
+  auto dhRate = chara.getStatValueFloat( Common::BaseParam::Accuracy );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -208,7 +304,7 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float chRate = chara.getStatValue( Common::BaseParam::CriticalHit );
+  auto chRate = chara.getStatValueFloat( Common::BaseParam::CriticalHit );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -219,7 +315,7 @@ float CalcStats::criticalHitProbability( const Chara& chara )
 
 float CalcStats::potency( uint16_t potency )
 {
-  return potency / 100.f;
+  return static_cast< float >( potency ) / 100.f;
 }
 
 float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
@@ -246,7 +342,8 @@ float CalcStats::autoAttackPotency( const Sapphire::Entity::Chara& chara )
   }
 
   // factors in f(PTC) in order to not lose precision
-  return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
+  //return std::floor( aaPotency / 3.f * autoAttackDelay ) / 100.f;
+  return aaPotency / 100.f;
 }
 
 float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weaponDamage )
@@ -256,29 +353,54 @@ float CalcStats::weaponDamage( const Sapphire::Entity::Chara& chara, float weapo
 
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  uint32_t jobAttribute = 1;
+  uint32_t jobMod = 1;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto classInfo = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( chara.getClass() ) );
+
+  if( !classInfo )
+    return 0.f;
 
   switch( chara.getPrimaryStat() )
   {
     case Common::BaseParam::Intelligence:
     {
-      jobAttribute = baseStats.healingPotMagic;
+      jobMod = classInfo->data().INT_;
       break;
     }
     case Common::BaseParam::Mind:
     {
-      jobAttribute = baseStats.attackPotMagic;
+      jobMod = classInfo->data().MND;
       break;
     }
-
+    case Common::BaseParam::Strength:
+    {
+      jobMod = classInfo->data().STR;
+      break;
+    }
+    case Common::BaseParam::Dexterity:
+    {
+      jobMod = classInfo->data().DEX;
+      break;
+    }
+    case Common::BaseParam::Vitality:
+    {
+      jobMod = classInfo->data().VIT;
+      break;
+    }
+    case Common::BaseParam::Piety:
+    {
+      jobMod = classInfo->data().PIE;
+      break;
+    }
     default:
     {
-      jobAttribute = baseStats.attack;
+      jobMod = 100;
       break;
     }
   }
 
-  return std::floor( ( ( mainVal * jobAttribute ) / 1000.f ) + weaponDamage );
+  return ( std::floor( mainVal * jobMod / 1000.f ) + weaponDamage );
 }
 
 float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower )
@@ -287,8 +409,7 @@ float CalcStats::calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  // todo: not sure if its ( ap - mv ) / mv or ( ap - mv ) / dv
-  return std::floor( ( 125.f * ( attackPower - mainVal ) / divVal ) + 100.f ) / 100.f;
+  return Common::Util::trunc( static_cast< float >( attackPower ) / divVal + ( 1.0f - mainVal / divVal ), 2 );
 }
 
 float CalcStats::getPrimaryAttackPower( const Sapphire::Entity::Chara& chara )
@@ -335,7 +456,7 @@ float CalcStats::determination( const Sapphire::Entity::Chara& chara )
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 130.f * ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal + 1000.f ) / 1000.f;
+  return Common::Util::trunc( 1.0f + ( chara.getStatValue( Common::BaseParam::Determination ) - mainVal ) / divVal, 3 );
 }
 
 float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
@@ -345,7 +466,7 @@ float CalcStats::tenacity( const Sapphire::Entity::Chara& chara )
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
-  return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::Tenacity ) - subVal ) / divVal + 1000.f ) / 1000.f;
+  return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::Parry ) - subVal ) / divVal + 1000.f ) / 1000.f;
 }
 
 float CalcStats::speed( const Sapphire::Entity::Chara& chara )
@@ -413,7 +534,7 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
 {
   // todo: default values for NPCs, not sure what we should have here
   float autoAttackDelay = 2.f;
-  float weaponDamage = 10.f;
+  float dmg = 10.f;
 
   // fetch actual auto attack delay if its a player
   if( chara.isPlayer() )
@@ -426,13 +547,13 @@ float CalcStats::autoAttack( const Sapphire::Entity::Chara& chara )
     assert( pItem );
 
     autoAttackDelay = pItem->getDelay() / 1000.f;
-    weaponDamage = pItem->getWeaponDmg();
+    dmg = pItem->getWeaponDmg();
   }
 
   auto level = chara.getLevel();
   auto mainVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::MAIN ] );
 
-  auto innerCalc = std::floor( ( mainVal * primaryStatValue( chara ) / 1000.f ) + weaponDamage );
+  auto innerCalc = weaponDamage( chara, dmg );
 
   return std::floor( innerCalc * ( autoAttackDelay / 3.f ) );
 }
@@ -452,12 +573,9 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
 
-  auto ten = 1.f;
-  if( chara.getRole() == Common::Role::Tank )
-    ten = tenacity( chara );
 
   // todo: everything after tenacity
-  auto factor = std::floor( pot * aa * ap * det * ten );
+  auto factor = Common::Util::trunc( pot * aa * ap * det, 0 );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   // todo: traits
@@ -486,11 +604,11 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
-    player->sendDebug( format, pot, aa, ap, det, ten, factor );
+    PlayerMgr::sendDebug( *player, format, pot, aa, ap, det, 1, factor );
   }
   else
   {
-    Logger::debug( format, pot, aa, ap, det, ten, factor );
+  //  Logger::debug( format, pot, aa, ap, det, ten, factor );
   }
 
   return std::pair( factor, hitType );
@@ -506,11 +624,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
 
-  auto ten = 1.f;
-  if( chara.getRole() == Common::Role::Tank )
-    ten = tenacity( chara );
-
-  auto factor = std::floor( pot * wd * ap * det * ten );
+  auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
   if( criticalHitProbability( chara ) > range100( rng ) )
@@ -531,15 +645,15 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 
   // todo: buffs
 
-  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {} ten: {} = {}";
+  constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {}  = {}";
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
-    player->sendDebug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+    PlayerMgr::sendDebug( *player, format, pot, ptc, wd, wepDmg, ap, det, factor );
   }
   else
   {
-    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, ten, factor );
+    Logger::debug( format, pot, ptc, wd, wepDmg, ap, det, factor );
   }
 
   return std::pair( factor, hitType );

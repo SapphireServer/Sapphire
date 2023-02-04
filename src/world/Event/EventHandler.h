@@ -1,5 +1,4 @@
-#ifndef _EVENT_H
-#define _EVENT_H
+#pragma once
 
 #include "ForwardsZone.h"
 
@@ -8,12 +7,42 @@ namespace Sapphire::Event
 
   struct SceneResult
   {
+  public:
     uint64_t actorId;
     uint32_t eventId;
-    uint16_t param1;
-    uint16_t param2;
-    uint16_t param3;
-    uint16_t param4;
+    uint16_t sceneId;
+    uint8_t errorCode;
+    uint8_t numOfResults;
+    std::vector< uint32_t > results;
+    std::string resultString;
+    uint64_t intResult;
+
+    uint32_t getResult( uint32_t index ) const;
+  };
+
+  struct QuestSceneResult
+  {
+  public:
+    uint64_t actorId;
+    uint32_t eventId;
+    uint16_t sceneId;
+    uint8_t errorCode;
+    uint8_t numOfResults;
+    std::vector< uint32_t > results;
+
+    uint32_t getResult( uint32_t index ) const;
+  };
+
+  using SceneParams = std::unordered_map< uint16_t, std::vector< uint32_t > >;
+
+  struct ScenePlayParam
+  {
+  public:
+    SceneParams params;
+
+    void setParam( uint16_t sceneId, uint32_t value );
+    void setParams( uint16_t sceneId, std::vector< uint32_t > values );
+    std::vector< uint32_t > *getParams( uint16_t sceneId );
   };
 
   class EventHandler
@@ -45,7 +74,7 @@ namespace Sapphire::Event
       TableGame = 24,
     };
 
-    enum class EventHandlerType : uint16_t
+    enum EventHandlerType : uint16_t
     {
       Quest = 0x0001,
       Warp = 0x0002,
@@ -54,7 +83,7 @@ namespace Sapphire::Event
       Aetheryte = 0x0005,
       GuildLeveAssignment = 0x0006,
       DefaultTalk = 0x0009,
-      Craft = 0x000A,
+      Crafting = 0x000A,
       CustomTalk = 0x000B,
       CompanyLeveOfficer = 0x000C,
       Array = 0x000D,
@@ -65,7 +94,7 @@ namespace Sapphire::Event
       ChocoboTaxiStand = 0x0012,
       Opening = 0x0013,
       ExitRange = 0x0014,
-      Fishing = 0x0015,
+      Fish = 0x0015,
       GCShop = 0x0016,
       GuildOrderGuide = 0x0017,
       GuildOrderOfficer = 0x0018,
@@ -75,25 +104,17 @@ namespace Sapphire::Event
       BahamutGuide = 0x001C,
       InstanceContentGuide = 0x001D,
       HousingAethernet = 0x001E,
-      FcTalk = 0x001F,
-      Adventure = 0x0021,
-      DailyQuestSupply = 0x0022,
-      TripleTriad = 0x0023,
-      PreHandler = 0x0036,
+      SwitchTalk = 0x001F,
+      Adventure = 0x0020,
+      DailyQuestSupply = 0x0021,
       ICDirector = 0x8003,
-      PublicContentDirector = 0x8004,
       QuestBattleDirector = 0x8006,
     };
 
-    enum class QuestAvailability : uint8_t
-    {
-      Invisible,
-      Available,
-      Locked
-    };
-
     using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;
+    using QuestSceneReturnCallback = std::function< void( World::Quest&, Entity::Player&, const SceneResult& ) >;
     using SceneChainCallback = std::function< void( Entity::Player& ) >;
+    using QuestSceneChainCallback = std::function< void( World::Quest&, Entity::Player& ) >;
     using EventFinishCallback = std::function< void( Entity::Player&, uint64_t ) >;
 
     EventHandler( uint64_t actorId, uint32_t eventId, EventType eventType, uint32_t eventParam );
@@ -122,9 +143,17 @@ namespace Sapphire::Event
 
     void setEventReturnCallback( SceneReturnCallback callback );
 
+    QuestSceneReturnCallback getQuestEventReturnCallback() const;
+
+    void setQuestEventReturnCallback( QuestSceneReturnCallback callback );
+
     SceneChainCallback getSceneChainCallback() const;
 
     void setSceneChainCallback( SceneChainCallback callback );
+
+    QuestSceneChainCallback getQuestSceneChainCallback() const;
+
+    void setQuestSceneChainCallback( QuestSceneChainCallback callback );
 
     EventFinishCallback getEventFinishCallback() const;
 
@@ -134,6 +163,8 @@ namespace Sapphire::Event
 
     void removeNestedEvent();
 
+    ScenePlayParam *getScenePlayParams();
+
   protected:
     uint64_t m_actorId;
     uint32_t m_eventId;
@@ -141,12 +172,14 @@ namespace Sapphire::Event
     uint16_t m_type;
     uint8_t m_eventType;
     uint32_t m_eventParam;
+    ScenePlayParam m_scenePlayParams;
     EventHandlerPtr m_pNestedEvent;
     bool m_playedScene;
     SceneReturnCallback m_returnCallback;
     SceneChainCallback m_chainCallback;
+    QuestSceneChainCallback m_questChainCallback;
     EventFinishCallback m_finishCallback;
+    QuestSceneReturnCallback m_questReturnCallback;
   };
 
 }
-#endif

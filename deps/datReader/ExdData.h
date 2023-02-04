@@ -1,12 +1,12 @@
-#ifndef XIV_EXD_EXDDATA_H
-#define XIV_EXD_EXDDATA_H
+#pragma once
 
 #include <unordered_map>
+#include <string>
 #include <memory>
+#include <vector>
 #include <mutex>
 
 #include <filesystem>
-#include <vector>
 
 namespace xiv
 {
@@ -54,5 +54,3 @@ namespace xiv
 
    }
 }
-
-#endif // XIV_EXD_EXDDATA_H

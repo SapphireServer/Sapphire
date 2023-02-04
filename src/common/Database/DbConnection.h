@@ -1,5 +1,4 @@
-#ifndef _SAPPHIRE_DBCONNECTION_H
-#define _SAPPHIRE_DBCONNECTION_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -106,4 +105,3 @@ namespace Sapphire::Db
 
 }
 
-#endif

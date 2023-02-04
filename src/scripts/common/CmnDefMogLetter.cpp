@@ -19,7 +19,7 @@ public:
 
   void Scene00000( Entity::Player& player )
   {
-    player.playScene( getId(), 0, 0,
+    eventMgr().playScene( player, getId(), 0, 0,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                       } );

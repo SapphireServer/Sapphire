@@ -1,5 +1,4 @@
-#ifndef _CALCBATTLE_H
-#define _CALCBATTLE_H
+#pragma once
 
 #include <Common.h>
 #include "Forwards.h"
@@ -16,4 +15,3 @@ namespace Sapphire::Math
 
 }
 
-#endif

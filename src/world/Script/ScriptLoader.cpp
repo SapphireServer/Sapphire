@@ -3,9 +3,28 @@
 #include <Logging/Logger.h>
 #include <Config/ConfigMgr.h>
 #include <Util/Util.h>
-#include "ServerMgr.h"
+#include "WorldServer.h"
+
+#ifdef _WIN32
+#include <Service.h>
+namespace Sapphire
+{
+  class InstanceObjectCache;
+}
+namespace Sapphire::Data
+{
+  class ExdData;
+}
+namespace Sapphire::World::Manager
+{
+  class TerritoryMgr;
+  class RNGMgr;
+}
+#endif
 
 #include <filesystem>
+#include <Manager/TerritoryMgr.h>
+#include <Manager/WarpMgr.h>
 
 namespace fs = std::filesystem;
 
@@ -98,9 +117,116 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using getScripts = Sapphire::ScriptAPI::ScriptObject** ( * )();
 
 #ifdef _WIN32
-  getScripts func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
+  auto func = reinterpret_cast< getScripts >( GetProcAddress( handle, "getScripts" ) );
+
+  using win32initFunc = void(*)( std::shared_ptr< Sapphire::Data::ExdData > );
+  using win32initFuncTeri = void(*)( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > );
+  using win32initFuncLinkshell = void(*)( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > );
+  using win32initFuncWarpMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::WarpMgr > );
+  using win32initIObjectCache = void(*)( std::shared_ptr< Sapphire::InstanceObjectCache > );
+  using win32initRngMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::RNGMgr > );
+  using win32initHouMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::HousingMgr > );
+  using win32initServerMgr = void(*)( std::shared_ptr< Sapphire::World::WorldServer > );
+
+  auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
+  auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
+  auto win32initLinkshell = reinterpret_cast< win32initFuncLinkshell >( GetProcAddress( handle, "win32initLinkshell" ) );
+  auto win32initWarp = reinterpret_cast< win32initFuncWarpMgr >( GetProcAddress( handle, "win32initWarpMgr" ) );
+  auto win32initIObject = reinterpret_cast< win32initIObjectCache >( GetProcAddress( handle, "win32initIObjectCache" ) );
+  auto win32initRng = reinterpret_cast< win32initRngMgr >( GetProcAddress( handle, "win32initRngMgr" ) );
+  auto win32initHou = reinterpret_cast< win32initHouMgr >( GetProcAddress( handle, "win32initHouMgr" ) );
+  auto win32initServer = reinterpret_cast< win32initServerMgr >( GetProcAddress( handle, "win32initServerMgr" ) );
+
+  if( win32initServer )
+  {
+    auto ioCache = Common::Service< Sapphire::World::WorldServer >::get();
+    auto ptr = ioCache.lock();
+    win32initServer( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initServer export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initHou )
+  {
+    auto ioCache = Common::Service< Sapphire::World::Manager::HousingMgr >::get();
+    auto ptr = ioCache.lock();
+    win32initHou( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initHou export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initRng )
+  {
+    auto ioCache = Common::Service< Sapphire::World::Manager::RNGMgr >::get();
+    auto ptr = ioCache.lock();
+    win32initRng( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initRng export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initIObject )
+  {
+    auto ioCache = Common::Service< Sapphire::InstanceObjectCache >::get();
+    auto ptr = ioCache.lock();
+    win32initIObject( ptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initIObjectCache export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32init )
+  {
+    auto exdData = Common::Service< Sapphire::Data::ExdData >::get();
+    auto ptr = exdData.lock();
+    win32init( ptr );
+
+  }
+  else
+  {
+    Logger::warn( "did not find a win32init export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initTeri )
+  {
+    auto teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::get();
+    auto tptr = teriMgr.lock();
+    win32initTeri( tptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initTeri export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initLinkshell )
+  {
+    auto linkshellMgr = Common::Service< Sapphire::World::Manager::LinkshellMgr >::get();
+    auto tptr = linkshellMgr.lock();
+    win32initLinkshell( tptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initWarp )
+  {
+    auto warpMgr = Common::Service< Sapphire::World::Manager::WarpMgr >::get();
+    auto wptr = warpMgr.lock();
+    win32initWarp( wptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
+  }
 #else
-  getScripts func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );
+  auto func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );
 #endif
 
   if( func )

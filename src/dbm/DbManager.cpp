@@ -5,14 +5,21 @@
 #include <streambuf>
 #include <sstream>
 #include <Logging/Logger.h>
-#include <filesystem>
 
 #include <common/Util/Util.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
 
+// fucking filesystem
+#if _MSC_VER >= 1925
+#include <filesystem>
 namespace fs = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
+
 
 DbManager::DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port ) :
   m_host( host ),
@@ -106,7 +113,11 @@ bool DbManager::performAction()
 {
   bool result = false;
   execute( " SET autocommit = 0 " );
-  m_pConnection->beginTransaction();
+
+  if( m_mode != Mode::MIGRATE )
+  {
+    m_pConnection->beginTransaction();
+  }
 
   switch( m_mode )
   {
@@ -128,10 +139,14 @@ bool DbManager::performAction()
     case Mode::CLEAN_CHARS:
       break;
   }
-  if( !result )
-    m_pConnection->rollbackTransaction();
-  else
-    m_pConnection->commitTransaction();
+
+  if( m_mode != Mode::MIGRATE )
+  {
+    if( !result )
+      m_pConnection->rollbackTransaction();
+    else
+      m_pConnection->commitTransaction();
+  }
 
   return result;
 }
@@ -419,29 +434,51 @@ bool DbManager::modeMigrate()
     {
       Logger::info( "Applying migration: {}", path.filename().string() );
 
+      m_pConnection->beginTransaction();
+
       std::ifstream mFile( path.string() );
       if( !mFile.is_open() )
       {
         m_lastError = "File " + path.string() + " does not exist!";
         return false;
       }
-      std::string sql( ( std::istreambuf_iterator< char >( mFile ) ),
-                       ( std::istreambuf_iterator< char >( ) ) );
+      std::string content( ( std::istreambuf_iterator< char >( mFile ) ),
+                           ( std::istreambuf_iterator< char >( ) ) );
 
-      try
+      std::string delimiter = ";";
+
+      size_t pos = 0;
+      std::string token;
+      while( ( pos = content.find( delimiter ) ) != std::string::npos )
       {
-        auto stmt = m_pConnection->createStatement();
-        stmt->executeQuery( sql );
-      }
-      catch( std::runtime_error& e )
-      {
-        m_lastError = e.what();
-        return false;
+        token = content.substr( 0, pos );
+        size_t pos1 = token.find_first_not_of( "\r\n" );
+        token = token.substr( pos1, token.size() );
+        size_t pos2 = token.find_first_of( "\r\n" );
+
+        try
+        {
+          auto stmt = m_pConnection->createStatement();
+          stmt->executeQuery( token );
+        }
+        catch( std::runtime_error& e )
+        {
+          m_lastError = e.what();
+          m_pConnection->rollbackTransaction();
+          return false;
+        }
+
+        content.erase( 0, pos + delimiter.length() );
       }
 
       // insert into migrations table
       if( !execute( fmt::format( "INSERT INTO __Migration (`MigrationName`) VALUES ('{}');", path.filename().string() ) ) )
+      {
+        m_pConnection->rollbackTransaction();
         return false;
+      }
+
+      m_pConnection->commitTransaction();
     }
   }
 

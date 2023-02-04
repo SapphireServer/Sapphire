@@ -1,5 +1,5 @@
 #include "ActorFilter.h"
-#include "Actor/Actor.h"
+#include "Actor/GameObject.h"
 #include "Util/Util.h"
 #include "Util/UtilMath.h"
 
@@ -11,7 +11,7 @@ Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_
 {
 }
 
-bool Sapphire::World::Util::ActorFilterInRange::conditionApplies( const Entity::Actor& actor )
+bool Sapphire::World::Util::ActorFilterInRange::conditionApplies( const Entity::GameObject& actor )
 {
   return Sapphire::Common::Util::distance( m_startPos, actor.getPos() ) <= m_range;
 }
@@ -23,7 +23,7 @@ Sapphire::World::Util::ActorFilterSingleTarget::ActorFilterSingleTarget( uint32_
 {
 }
 
-bool Sapphire::World::Util::ActorFilterSingleTarget::conditionApplies( const Sapphire::Entity::Actor& actor )
+bool Sapphire::World::Util::ActorFilterSingleTarget::conditionApplies( const Sapphire::Entity::GameObject& actor )
 {
   return actor.getId() == m_actorId;
 }

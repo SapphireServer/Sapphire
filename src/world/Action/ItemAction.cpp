@@ -1,15 +1,19 @@
 #include "ItemAction.h"
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
+#include <Exd/Structs.h>
 
 #include <Actor/Player.h>
 #include <Network/PacketWrappers/EffectPacket.h>
 
+#include "Manager/PlayerMgr.h"
+
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 ItemAction::ItemAction( Sapphire::Entity::CharaPtr source, uint32_t itemId,
-                        Sapphire::Data::ItemActionPtr itemActionData, uint16_t itemSourceSlot,
+                        std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > itemActionData, uint16_t itemSourceSlot,
                         uint16_t itemSourceContainer ) :
   m_itemAction( std::move( itemActionData ) ),
   m_itemSourceSlot( itemSourceSlot ),
@@ -32,11 +36,11 @@ void ItemAction::start()
 
 void ItemAction::execute()
 {
-  switch( m_itemAction->type )
+  switch( m_itemAction->data().Action )
   {
     default:
     {
-      getSourceChara()->getAsPlayer()->sendDebug( "ItemAction type {0} not supported.", m_itemAction->type );
+      Manager::PlayerMgr::sendDebug( *getSourceChara()->getAsPlayer(), "ItemAction type {0} not supported.", m_itemAction->data().Action );
       break;
     }
 
@@ -44,6 +48,20 @@ void ItemAction::execute()
     case Common::ItemActionType::ItemActionVFX2:
     {
       handleVFXItem();
+
+      break;
+    }
+
+    case Common::ItemActionType::ItemActionMount:
+    {
+      handleMountItem();
+
+      break;
+    }
+
+    case Common::ItemActionType::ItemActionCompanion:
+    {
+      handleCompanionItem();
 
       break;
     }
@@ -57,16 +75,32 @@ void ItemAction::interrupt()
 
 void ItemAction::handleVFXItem()
 {
-  Common::EffectEntry effect{};
-  effect.effectType = Common::ActionEffectType::VFX;
-  effect.value = m_itemAction->data[ 0 ];
+  Common::CalcResultParam effect{};
+  effect.Type = Common::ActionEffectType::CALC_RESULT_TYPE_CHECK_BARRIER;
+  effect.Value = m_itemAction->data().Calcu0Arg[ 0 ];
 
-  auto effectPacket = std::make_shared< Network::Packets::Server::EffectPacket >( getSourceChara()->getId(),
-                                                                                  getSourceChara()->getId(), getId() );
+  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getId() );
   effectPacket->setTargetActor( getSourceChara()->getId() );
   effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
   effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
-  effectPacket->addEffect( effect );
+  effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
 
   m_pSource->sendToInRangeSet( effectPacket, true );
+}
+
+void ItemAction::handleCompanionItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+
+  Logger::debug( "Companion arg: {0}", m_itemAction->data().Calcu0Arg[ 0 ] );
+
+  player->unlockCompanion( m_itemAction->data().Calcu0Arg[ 0 ] );
+}
+
+void ItemAction::handleMountItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+
+  player->unlockMount( m_itemAction->data().Calcu0Arg[ 0 ] );
+  player->discardItem( m_itemSourceContainer, m_itemSourceSlot );
 }

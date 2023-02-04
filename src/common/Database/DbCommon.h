@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_DBCOMMON_H
-#define SAPPHIRE_DBCOMMON_H
+#pragma once
 
 #include <string>
 
@@ -17,4 +16,3 @@ namespace Sapphire::Db
   };
 }
 
-#endif //SAPPHIRE_DBCOMMON_H

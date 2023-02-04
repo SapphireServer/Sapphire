@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_DBWORKERPOOL_H
-#define SAPPHIRE_DBWORKERPOOL_H
+#pragma once
 
 #include <array>
 #include <string>
@@ -75,7 +74,7 @@ namespace Sapphire::Db
   private:
     uint32_t openConnections( InternalIndex type, uint8_t numConnections );
 
-    unsigned long escapeString( char* to, const char* from, unsigned long length );
+    unsigned long escapeString( char* to, const char* from, size_t length );
 
     void enqueue( std::shared_ptr< Operation > op );
 
@@ -92,4 +91,3 @@ namespace Sapphire::Db
 
 }
 
-#endif //SAPPHIRE_DBWORKERPOOL_H

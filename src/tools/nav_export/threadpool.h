@@ -41,7 +41,7 @@ public:
   }
 
   template< class Func, class Ret = std::result_of_t< Func&() > >
-  std::future< Ret > queue( Func&& f )
+  std::future< Ret > queue( Func&& f, bool waitForWorker = false )
   {
     std::packaged_task< Ret() > task( std::forward< Func >( f ) );
     auto ret = task.get_future();
@@ -50,6 +50,12 @@ public:
       m_pendingJobs.emplace_back( std::move( task ) );
     }
     m_cv.notify_one();
+
+    if( waitForWorker )
+    {
+      std::unique_lock lock( m_mutex );
+      m_cv2.wait( lock, [&]() { return m_pendingJobs.size() <= m_workers.size(); } );
+    }
     return ret;
   }
 
@@ -95,12 +101,13 @@ private:
         return;
       }
       func();
+      m_cv2.notify_all();
     }
   }
 
   bool m_runFlag{ true };
   std::mutex m_mutex;
-  std::condition_variable m_cv;
+  std::condition_variable m_cv, m_cv2;
   std::deque< std::packaged_task< void() > > m_pendingJobs;
   std::vector< std::future< void > > m_workers;
 };

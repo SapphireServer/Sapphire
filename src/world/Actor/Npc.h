@@ -1,5 +1,4 @@
-#ifndef _NPC_H_
-#define _NPC_H_
+#pragma once
 
 #include <Common.h>
 
@@ -28,4 +27,3 @@ namespace Sapphire::Entity
   };
 
 }
-#endif

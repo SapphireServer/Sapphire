@@ -14,7 +14,7 @@ public:
 
   void Scene00000( Entity::Player& player )
   {
-    player.playScene( getId(), 0, HIDE_HOTBAR,
+    eventMgr().playScene( player, getId(), 0, HIDE_HOTBAR,
                       [ & ]( Entity::Player& player, const Event::SceneResult& result )
                       {
                       } );

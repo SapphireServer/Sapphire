@@ -1,5 +1,4 @@
-#ifndef _NAVIPROVIDER_H_
-#define _NAVIPROVIDER_H_
+#pragma once
 
 #include <Common.h>
 #include "ForwardsZone.h"
@@ -57,13 +56,12 @@ namespace Sapphire::World::Navi
     static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
 
     void setMoveTarget( Entity::Chara& chara, const Common::FFXIVARR_POSITION3& endPos );
+    void resetMoveTarget( Entity::Chara& chara );
 
     Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
 
     bool isAgentActive( Entity::Chara& chara ) const;
     bool hasTargetState( Entity::Chara& chara ) const;
-
-    void resetMoveTarget( Entity::Chara& chara );
 
     void updateAgentPosition( Entity::Chara& chara );
 
@@ -97,5 +95,3 @@ namespace Sapphire::World::Navi
   };
 
 }
-
-#endif

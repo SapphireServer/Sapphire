@@ -3,7 +3,7 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
 #include <Database/DatabaseDef.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
@@ -11,33 +11,33 @@
 #include <Service.h>
 
 #include "Actor/Player.h"
-#include "Actor/Actor.h"
+#include "Actor/GameObject.h"
 #include "Actor/EventObject.h"
 #include "Land.h"
 #include "House.h"
 #include "Inventory/HousingItem.h"
 #include "Inventory/ItemContainer.h"
+#include "WorldServer.h"
+
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
 
 #include "Forwards.h"
 #include "HousingZone.h"
 #include "Manager/HousingMgr.h"
+#include "InstanceObjectCache.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-Sapphire::HousingZone::HousingZone( uint8_t wardNum,
-                                    uint16_t territoryTypeId,
-                                    uint32_t guId,
-                                    const std::string& internalName,
-                                    const std::string& contentName ) :
-  Territory( territoryTypeId, guId, internalName, contentName ),
+Sapphire::HousingZone::HousingZone( uint8_t wardNum, uint16_t territoryTypeId,
+                                    const std::string& internalName, const std::string& contentName ) :
+  Territory( territoryTypeId, ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum, internalName, contentName ),
   m_wardNum( wardNum ),
-  m_territoryTypeId( territoryTypeId ),
   m_landSetId( ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardNum )
 {
-
 }
 
 bool Sapphire::HousingZone::init()
@@ -60,19 +60,17 @@ bool Sapphire::HousingZone::init()
     housingIndex = 1;
   else if( m_territoryTypeId == 341 )
     housingIndex = 2;
-  else if( m_territoryTypeId == 641 )
-    housingIndex = 3;
 
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto info = exdData.get< Sapphire::Data::HousingLandSet >( housingIndex );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto info = exdData.getRow< Excel::HousingLandSet >( housingIndex );
 
   // build yard objects array indices
   int16_t cursor = -1;
   uint16_t index = 0;
-  for( const auto size : info->plotSize )
+  for( const auto entry : info->data().Lands )
   {
     uint16_t itemMax = 0;
-    switch( size )
+    switch( entry.Size )
     {
       case 0:
         itemMax = 20;
@@ -104,12 +102,12 @@ bool Sapphire::HousingZone::init()
   }
 
   // zero out the yard obj arrays so we don't leak memory like SE does :^)
-  Common::HousingObject obj {};
-  memset( &obj, 0x0, sizeof( Common::HousingObject ) );
+  Common::Furniture obj {};
+  memset( &obj, 0x0, sizeof( Common::Furniture ) );
 
   for( auto& arr : m_yardObjects )
   {
-    arr.fill( obj );
+    memcpy( &arr, &m_yardObjects, sizeof( Common::Furniture ) );
   }
 
   auto& housingMgr = Common::Service< World::Manager::HousingMgr >::ref();
@@ -131,9 +129,7 @@ bool Sapphire::HousingZone::init()
     // setup house
     if( entry.m_houseId )
     {
-      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName,
-                               entry.m_estateComment );
-
+      auto house = make_House( entry.m_houseId, m_landSetId, land->getLandIdent(), entry.m_estateName, entry.m_estateComment );
       housingMgr.updateHouseModels( house );
       land->setHouse( house );
     }
@@ -142,6 +138,7 @@ bool Sapphire::HousingZone::init()
 
     m_landPtrMap[ entry.m_landId ] = land;
 
+    // TODO: Fixme
     if( entry.m_houseId > 0 )
       registerEstateEntranceEObj( entry.m_landId );
 
@@ -151,75 +148,65 @@ bool Sapphire::HousingZone::init()
   return true;
 }
 
+bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
+{
+  return player.getPos().x < -15000.0f; //ToDo: get correct pos
+}
+
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   Logger::debug( "HousingZone::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
-  auto isInSubdivision = isPlayerSubInstance( player ) ? true : false;
+  auto isInSubdivision = isPlayerSubInstance( player );
 
   uint32_t yardPacketNum;
   uint32_t yardPacketTotal = 8;
 
   sendLandSet( player );
 
+  auto yardObjectSize = sizeof( Common::Furniture );
   for( yardPacketNum = 0; yardPacketNum < yardPacketTotal; yardPacketNum++ )
   {
-    auto housingObjectInit = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
-    memset( &housingObjectInit->data().landIdent, 0xFF, sizeof( Common::LandIdent ) );
-    housingObjectInit->data().u1 = 0xFF;
-    housingObjectInit->data().packetNum = yardPacketNum;
-    housingObjectInit->data().packetTotal = yardPacketTotal;
+    auto housingObjectInit = makeZonePacket< FFXIVIpcYardObjectList >( player.getId() );
+    housingObjectInit->data().PacketIndex = yardPacketNum;
+    auto& objects = m_yardObjects;
 
-    auto yardObjectSize = sizeof( Common::HousingObject );
+    memcpy( &housingObjectInit->data().YardObjects, &objects[ yardPacketNum * 400 ], yardObjectSize * 400 );
 
-    auto& objects = m_yardObjects[ isInSubdivision ? 1 : 0 ];
-
-    memcpy( &housingObjectInit->data().object, objects.data() + ( yardPacketNum * 100 ), yardObjectSize * 100 );
-
-    player.queuePacket( housingObjectInit );
+    server.queueForPlayer( player.getCharacterId(), housingObjectInit );
   }
-
-  auto landSetMap = makeZonePacket< FFXIVIpcLandSetMap >( player.getId() );
-  landSetMap->data().subdivision = isInSubdivision ? 1 : 2;
-
-  uint8_t startIndex = isInSubdivision ? 30 : 0;
-
-  for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); i++, count++ )
-  {
-    landSetMap->data().landInfo[ count ].status = 1;
-  }
-
-  player.queuePacket( landSetMap );
-
 }
 
 void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 {
-  auto landsetInitializePacket = makeZonePacket< FFXIVIpcLandSetInitialize >( player.getId() );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto landsetInitializePacket = makeZonePacket< FFXIVIpcHouseList >( player.getId() );
 
-  landsetInitializePacket->data().landIdent.wardNum = m_wardNum;
-  //landsetInitializePacket->data().landIdent.landSetId = m_landSetId;
-  landsetInitializePacket->data().landIdent.territoryTypeId = m_territoryTypeId;
-  //TODO: get current WorldId
-  landsetInitializePacket->data().landIdent.worldId = 67;
-  landsetInitializePacket->data().subInstance = !isPlayerSubInstance( player ) ? 1 : 2;
+  landsetInitializePacket->data().LandSetId.wardNum = m_wardNum;
+  landsetInitializePacket->data().LandSetId.landId = m_landSetId;
+  landsetInitializePacket->data().LandSetId.territoryTypeId = m_territoryTypeId;
+  landsetInitializePacket->data().LandSetId.worldId = server.getWorldId();
 
-  uint8_t startIndex = !isPlayerSubInstance( player ) ? 0 : 30;
-
-  for( uint8_t i = startIndex, count = 0; i < ( startIndex + 30 ); ++i, ++count )
+  auto isInSubdivision = isPlayerSubInstance( player );
+  landsetInitializePacket->data().Subdivision = isInSubdivision ? 2 : 1;
+  for( uint8_t i = 0, count = 0; i < 30; ++i, ++count )
   {
     auto pLand = getLand( i );
 
     // todo: move this and sendLandUpdate building logic to its own function
-    auto& landData = landsetInitializePacket->data().land[ count ];
+    auto& landData = landsetInitializePacket->data().Houses[ count ];
 
-    landData.plotSize = pLand->getSize();
-    landData.houseState = pLand->getStatus();
-    landData.iconAddIcon = pLand->getSharing();
-    landData.fcId = pLand->getFcId();
+    landData.size = pLand->getSize();
+    landData.status = pLand->getStatus();
+    landData.flags = pLand->getSharing();
+    landData.fcCrestId = 1;
+    /* //disbaled until we managed fc's
+    landData.fcCrestId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
     landData.fcIconColor = pLand->getFcColor();
+    */
 
     if( auto house = pLand->getHouse() )
     {
@@ -227,36 +214,38 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
 
       auto& parts = house->getHouseModels();
 
-      for( auto i = 0; i != parts.size(); i++ )
+      for( auto ii = 0; ii != parts.size(); ++ii )
       {
-        landData.housePart[ i ] = parts[ i ].first;
-        landData.houseColour[ i ] = parts[ i ].second;
+        landData.patternIds[ ii ] = parts[ ii ].first;
+        landData.colors[ ii ] = parts[ ii ].second;
       }
     }
   }
 
-  player.queuePacket( landsetInitializePacket );
+  server.queueForPlayer( player.getCharacterId(), landsetInitializePacket );
 }
 
 void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto pLand = getLand( landId );
   for( const auto& playerIt : m_playerMap )
   {
     auto pPlayer = playerIt.second;
 
-    auto landUpdatePacket = makeZonePacket< FFXIVIpcLandUpdate >( pPlayer->getId() );
-    landUpdatePacket->data().landIdent.landId = landId;
+    auto landUpdatePacket = makeZonePacket< FFXIVIpcHouse >( pPlayer->getId() );
+    landUpdatePacket->data().Block = landId;
 
-    auto& landData = landUpdatePacket->data().land;
+    auto& landData = landUpdatePacket->data().House;
 
-    landData.plotSize = pLand->getSize();
-    landData.houseState = pLand->getStatus();
-    landData.iconAddIcon = pLand->getSharing();
+    landData.size = pLand->getSize();
+    landData.status = pLand->getStatus();
+    landData.flags = pLand->getSharing();
+    /*
     landData.fcId = pLand->getFcId();
     landData.fcIcon = pLand->getFcIcon();
     landData.fcIconColor = pLand->getFcColor();
-
+    */
 
     if( auto house = pLand->getHouse() )
     {
@@ -264,25 +253,20 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
       auto& parts = house->getHouseModels();
 
-      for( auto i = 0; i != parts.size(); i++ )
+      for( auto i = 0; i != parts.size(); ++i )
       {
-        landData.housePart[ i ] = parts[ i ].first;
-        landData.houseColour[ i ] = parts[ i ].second;
+        landData.patternIds[ i ] = parts[ i ].first;
+        landData.colors[ i ] = parts[ i ].second;
       }
     }
 
-    pPlayer->queuePacket( landUpdatePacket );
+    server.queueForPlayer( pPlayer->getCharacterId(), landUpdatePacket );
   }
-}
-
-bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
-{
-  return player.getPos().x < -15000.0f; //ToDo: get correct pos
 }
 
 void Sapphire::HousingZone::onUpdate( uint64_t tickCount )
 {
-  for( auto pLandItr : m_landPtrMap )
+  for( const auto& pLandItr : m_landPtrMap )
   {
     pLandItr.second->update( tickCount );
   }
@@ -312,11 +296,38 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   auto land = getLand( landId );
   assert( land );
 
-  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 4, land->getMapMarkerPosition(), 0.f, "entrance" );
-  eObj->setHousingLink( landId << 8 );
+  int housingIndex;
+  if( m_territoryTypeId == 339 )
+    housingIndex = 0;
+  else if( m_territoryTypeId == 340 )
+    housingIndex = 1;
+  else if( m_territoryTypeId == 341 )
+    housingIndex = 2;
+
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto info = exdData.getRow< Excel::HousingLandSet >( housingIndex );
+
+  auto landInfo = info->_data.Lands[ landId ];
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+
+  FFXIVARR_POSITION3 pos{ 0, 10, 0 };
+  auto eObjInfo = instanceObjectCache.getEObj( landInfo.SignboardEObj );
+  if( eObjInfo )
+  {
+    pos.x = eObjInfo->data.transform.translation.x;
+    pos.y = eObjInfo->data.transform.translation.y;
+    pos.z = eObjInfo->data.transform.translation.z;
+  }
+  else
+  {
+    Logger::error( "No position could be determined for housing entrance!" );
+  }
+
+  auto eObj = Entity::make_EventObject( getNextEObjId(), 2002737, 0, 0, 0, pos, 0.f, "entrance", 0 );
+  eObj->setHousingLink( static_cast< uint32_t >( landId ) );
   eObj->setScale( 1.f );
 
-  registerEObj( eObj );
+  addEObj( eObj );
 
   return eObj;
 }
@@ -329,7 +340,7 @@ void Sapphire::HousingZone::removeEstateEntranceEObj( uint8_t landId )
   for( auto entry : m_eventObjects )
   {
     auto eObj = entry.second;
-    if( eObj->getHousingLink() == landId << 8 )
+    if( eObj->getHousingLink() == static_cast< uint32_t >( landId ) << 8 )
     {
       removeActor( eObj );
       m_eventObjects.erase( entry.first );
@@ -346,58 +357,60 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
   auto yardContainer = landStorage[ InventoryType::HousingExteriorPlacedItems ];
 
   auto arrayBounds = m_yardObjectArrayBounds[ ident.landId ];
-  auto yardMapIndex = ident.landId <= 29 ? 0 : 1;
 
   for( const auto& item : yardContainer->getItemMap() )
   {
+
     auto housingItem = std::dynamic_pointer_cast< Inventory::HousingItem >( item.second );
     assert( housingItem );
 
     auto idx = item.first + arrayBounds.first;
-    m_yardObjects[ yardMapIndex ][ idx ] = housingMgr.getYardObjectForItem( housingItem );
+    m_yardObjects[ idx ] = housingMgr.getYardObjectForItem( housingItem );
   }
 }
 
 void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, Inventory::HousingItem& item )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto bounds = m_yardObjectArrayBounds[ landId ];
   auto offset = bounds.first + slotId;
 
-  Common::HousingObject obj {};
+  Common::Furniture obj {};
 
-  obj.itemId = item.getAdditionalData();
-  obj.rotation = item.getRot();
+  obj.patternId = item.getAdditionalData();
+  obj.dir = Util::floatToUInt16Rot( item.getRot() );
 
-  obj.pos = item.getPos();
+  obj.pos[ 0 ] = Util::floatToUInt16( item.getPos().x );
+  obj.pos[ 1 ] = Util::floatToUInt16( item.getPos().y );
+  obj.pos[ 2 ] = Util::floatToUInt16( item.getPos().z );
 
   // link obj
-  auto yardMapIndex = landId <= 29 ? 0 : 1;
-  m_yardObjects[ yardMapIndex ][ offset ] = obj;
+  m_yardObjects[ offset ] = obj;
 
   // spawn obj in zone
   for( const auto& player : m_playerMap )
   {
-    auto packet = makeZonePacket< Server::FFXIVIpcYardObjectSpawn >( player.second->getId() );
+    auto packet = makeZonePacket< FFXIVIpcYardObject >( player.second->getId() );
 
-    packet->data().landId = landId;
-    packet->data().objectArray = static_cast< uint8_t >( slotId );
-    packet->data().object = obj;
+    packet->data().YardObject = obj;
 
-    player.second->queuePacket( packet );
+    server.queueForPlayer( player.second->getCharacterId(), packet );
   }
 }
 
 void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, uint16_t slot, uint16_t landId,
                                                  Inventory::HousingItem& item )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto bounds = m_yardObjectArrayBounds[ landId ];
   auto offset = bounds.first + slot;
-  auto yardMapIndex = landId <= 29 ? 0 : 1;
 
-  auto& obj = m_yardObjects[ yardMapIndex ][ offset ];
+  auto& obj = m_yardObjects[ offset ];
 
-  obj.rotation = item.getRot();
-  obj.pos = item.getPos();
+  obj.dir = Util::floatToUInt16( item.getRot() );
+  obj.pos[ 0 ] = Util::floatToUInt16( item.getPos().x );
+  obj.pos[ 1 ] = Util::floatToUInt16( item.getPos().y );
+  obj.pos[ 2 ] = Util::floatToUInt16( item.getPos().z );
 
   for( const auto& player : m_playerMap )
   {
@@ -405,32 +418,33 @@ void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, u
     if( player.second->getId() == sourcePlayer.getId() )
       continue;
 
-    auto packet = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
+    auto packet = makeZonePacket< FFXIVIpcHousingObjectTransform >( player.second->getId() );
 
-    packet->data().itemRotation = item.getRot();
-    packet->data().pos = item.getPos();
+    packet->data().Dir = Util::floatToUInt16( item.getRot() );
+    packet->data().Pos[ 0 ] = Util::floatToUInt16( item.getPos().x );
+    packet->data().Pos[ 1 ] = Util::floatToUInt16( item.getPos().y );
+    packet->data().Pos[ 2 ] = Util::floatToUInt16( item.getPos().z );
 
-    packet->data().landId = landId;
-    packet->data().objectArray = slot;
+    packet->data().UserData1 = static_cast< uint8_t >( landId );
+    packet->data().UserData2 = static_cast< uint8_t >( slot );
 
-    player.second->queuePacket( packet );
+    server.queueForPlayer( player.second->getCharacterId(), packet );
   }
 }
 
 void Sapphire::HousingZone::despawnYardObject( uint16_t landId, uint16_t slot )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto bounds = m_yardObjectArrayBounds[ landId ];
   auto offset = bounds.first + slot;
-  auto yardMapIndex = landId <= 29 ? 0 : 1;
 
-  memset( &m_yardObjects[ yardMapIndex ][ offset ], 0x00, sizeof( Common::HousingObject ) );
+  memset( &m_yardObjects[ offset ], 0x00, sizeof( Common::Furniture ) );
 
   for( const auto& player : m_playerMap )
   {
     auto param = ( landId << 16 ) | slot;
-    auto pkt = Server::makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem,
-                                             param );
+    auto pkt = makeActorControlSelf( player.second->getId(), Network::ActorControl::RemoveExteriorHousingItem, param );
 
-    player.second->queuePacket( pkt );
+    server.queueForPlayer( player.second->getCharacterId(), pkt );
   }
 }

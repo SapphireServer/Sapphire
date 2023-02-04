@@ -1,21 +1,21 @@
-#ifndef _UPDATEHPMPTP_H
-#define _UPDATEHPMPTP_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Actor/Chara.h>
 #include "Forwards.h"
 
-namespace Sapphire::Network::Packets::Server
+#include <Network/PacketDef/Zone/ServerZoneDef.h>
+
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
   * @brief The Ping response packet.
   */
-  class UpdateHpMpTpPacket : public ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >
+  class UpdateHpMpTpPacket : public ZoneChannelPacket< FFXIVIpcResting >
   {
   public:
-    UpdateHpMpTpPacket( Entity::Chara& actor ) :
-      ZoneChannelPacket< FFXIVIpcUpdateHpMpTp >( actor.getId(), actor.getId() )
+    UpdateHpMpTpPacket( Entity::Chara& actor ) : ZoneChannelPacket< FFXIVIpcResting >( actor.getId(), actor.getId() )
     {
       initialize( actor );
     };
@@ -23,12 +23,10 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Chara& actor )
     {
-      m_data.hp = actor.getHp();
-      m_data.mp = actor.getMp();
-      m_data.tp = actor.getTp();
+      m_data.Hp = actor.getHp();
+      m_data.Mp = actor.getMp();
+      m_data.Tp = actor.getTp();
     };
   };
 
 }
-
-#endif /*_UPDATEHPMPTP_H*/

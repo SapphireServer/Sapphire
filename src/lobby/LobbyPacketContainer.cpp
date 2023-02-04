@@ -15,7 +15,7 @@ LobbyPacketContainer::LobbyPacketContainer( uint8_t* encKey )
 
   m_encKey = encKey;
 
-  memset( m_dataBuf, 0, 0x1570 );
+  memset( m_dataBuf.data(), 0, 0x1570 );
 }
 
 LobbyPacketContainer::~LobbyPacketContainer()
@@ -25,14 +25,14 @@ LobbyPacketContainer::~LobbyPacketContainer()
 
 void LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
 {
-  memcpy( m_dataBuf + m_header.size, &pEntry->getData()[ 0 ], pEntry->getSize() );
+  memcpy( m_dataBuf.data() + m_header.size, &pEntry->getData()[ 0 ], pEntry->getSize() );
 
   // encryption key is set, we want to encrypt this packet
   if( m_encKey != nullptr )
   {
     BlowFish blowfish;
     blowfish.initialize( m_encKey, 0x10 );
-    blowfish.Encode( m_dataBuf + m_header.size + 0x10, m_dataBuf + m_header.size + 0x10, pEntry->getSize() - 0x10 );
+    blowfish.Encode( m_dataBuf.data() + m_header.size + 0x10, m_dataBuf.data() + m_header.size + 0x10, pEntry->getSize() - 0x10 );
   }
 
   m_header.size += pEntry->getSize();
@@ -51,6 +51,8 @@ uint8_t* LobbyPacketContainer::getRawData( bool addstuff )
     m_header.unknown_0 = 0xff41a05252;
     m_header.timestamp = Common::Util::getTimeMs();
   }
-  memcpy( m_dataBuf, &m_header, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
-  return m_dataBuf;
+
+  memcpy( m_dataBuf.data(), &m_header, sizeof( Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER ) );
+
+  return m_dataBuf.data();
 }

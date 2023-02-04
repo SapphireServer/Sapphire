@@ -202,7 +202,7 @@ struct EObjData :
   uint8_t unknown1[0xC];
 };
 
-class LGB_EOBJ_ENTRY :
+struct LGB_EOBJ_ENTRY :
   public LgbEntry
 {
 public:

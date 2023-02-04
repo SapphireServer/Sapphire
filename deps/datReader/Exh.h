@@ -1,5 +1,4 @@
-#ifndef XIV_EXD_EXH_H
-#define XIV_EXD_EXH_H
+#pragma once
 
 #include <map>
 
@@ -7,8 +6,7 @@
 
 namespace xiv::exd
 {
-  enum class DataType :
-    uint16_t
+  enum class DataType : uint16_t
   {
     string = 0,
     boolean = 1,
@@ -98,8 +96,7 @@ namespace xiv
   namespace exd
   {
 
-    enum Language :
-      uint16_t;
+    enum Language : uint16_t;
 
     // Header file for exd data
     class Exh
@@ -132,4 +129,3 @@ namespace xiv
   }
 }
 
-#endif // XIV_EXD_EXH_H
