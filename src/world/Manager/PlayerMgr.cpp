@@ -182,6 +182,8 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
   player.sendToInRangeSet( makeActorControl( player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
                            player.getLevel(), player.getLevel() - 1 ), true );
 
+  onPlayerStatusUpdate( player );
+
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
 }
