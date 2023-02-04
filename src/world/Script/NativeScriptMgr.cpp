@@ -81,6 +81,8 @@ namespace Sapphire::Scripting
 
   void NativeScriptMgr::queueScriptReload( const std::string& name )
   {
+    std::scoped_lock lock( m_mutex );
+
     auto info = m_loader.getScriptInfo( name );
     if( !info )
       return;
@@ -91,7 +93,6 @@ namespace Sapphire::Scripting
     if( !unloadScript( info ) )
       return;
 
-    std::scoped_lock lock( m_mutex );
     m_scriptLoadQueue.push( libPath );
   }
 

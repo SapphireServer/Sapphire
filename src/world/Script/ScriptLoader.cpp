@@ -75,7 +75,8 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
   fs::path dest( cacheDir /= f.filename().string() );
 
   // make sure the module has finished building before trying to copy it
-  if( fs::exists( f.string() + "_LOCK" ) )
+  const std::string readyFile( ( f.parent_path() / f.stem() ).string() + "_LOCK" );
+  if( fs::exists( readyFile ) )
     return nullptr;
 
   try
@@ -112,7 +113,6 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
   info->library_path = f.string();
 
   m_scriptMap.insert( std::make_pair( f.stem().string(), info ) );
-
   return info;
 }
 
