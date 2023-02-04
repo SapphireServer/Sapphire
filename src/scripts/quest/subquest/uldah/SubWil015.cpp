@@ -48,12 +48,15 @@ public:
   // Event Handlers
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    switch( actorId )
+    if( actorId == Actor0 )
     {
-      case Actor0:
+      if( quest.getSeq() == Seq0 )
       {
         Scene00000( quest, player );
-        break;
+      }
+      else
+      {
+        Scene00002( quest, player );
       }
     }
   }
@@ -62,14 +65,12 @@ public:
   {
     if( quest.getSeq() != Seq1 ) return;
 
-    quest.setUI8AL( quest.getUI8AL() + 1); //increases the counter
-    eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 5 );
-    Sapphire::World::Manager::PlayerMgr::sendDebug( player, "UI8BH: {0} UI8AL: {1}", quest.getUI8BH(), quest.getUI8AL() );
-    //increase UI8BH by 1
-//    if( actorId == Enemy0 )
-//    {
-//      quest.setUI8BH( quest.getUI8BH() + 1 );
-//    }
+    quest.setUI8AL( quest.getUI8AL() + 1 );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
+    if( quest.getUI8AL() >= 5 )
+    {
+      quest.setSeq( SeqFinish );
+    }
   }
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
@@ -78,18 +79,11 @@ public:
       return;
     else
     {
-      quest.setUI8BH( quest.getUI8BH() + 1 ); //adds to key items
-      onEventItem(quest,player,0);
-
-//      auto currentKillCount = quest.getUI8AL();
-//      if( currentKillCount < 6 )
-//      {
-//        quest.setUI8AL( 1 );
-//        player.addItem(Item0, 1, false, false, true);
-//        quest.setUI8BH( quest.getUI8BH() + 1 );
-//        eventMgr().sendEventNotice( player, getId(), 1, 2, currentKillCount + 1, 6 );
-////        quest.setUI8AL( currentKillCount + 1 );
-//      }
+      if( quest.getUI8BH() <= 5 )
+      {
+        quest.setUI8BH( quest.getUI8BH() + 1 );//adds to key items
+        onEventItem( quest, player, 0 );
+      }
     }
   }
 
@@ -116,7 +110,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    //inventory trade scene
+    //talking scene
     eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubWil015::Scene00001Return ) );
   }
 
@@ -128,13 +122,16 @@ private:
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
+    //inventory scene
     eventMgr().playQuestScene( player, getId(), 2, NONE, bindSceneReturn( &SubWil015::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //if obtained all items
-    //Scene00003(quest, player);
+    if( result.getResult( 0 ) == 1 )
+    {
+      Scene00003( quest, player );
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -151,6 +148,10 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );//calls into questMgr().giveQuestRewards
+    }
+    else
+    {
+      Scene00004( quest, player );
     }
   }
 
