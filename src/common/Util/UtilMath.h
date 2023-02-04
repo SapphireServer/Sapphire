@@ -25,6 +25,8 @@ namespace Sapphire::Common::Util
 
   uint16_t floatToUInt16Rot( float val );
 
+  float floatFromUInt16Rot( uint16_t rot );
+
   uint8_t floatToUInt8Rot( float val );
 
   template < typename T >

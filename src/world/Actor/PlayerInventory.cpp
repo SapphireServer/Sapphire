@@ -580,9 +580,9 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
   bool foundFreeSlot = false;
 
   std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
-
+  sendDebug( "adding item: {}, equipSlotCategory: {}, stackSize: {}", itemToAdd->getId(), itemInfo->equipSlotCategory, itemInfo->stackSize );
   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
-  if( itemInfo->isEquippable && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
+  if( itemInfo->equipSlotCategory > 0 && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
   {
     auto bag = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( itemInfo->equipSlotCategory ) );
 
@@ -601,7 +601,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( ItemPtr itemToAdd, bool sil
       auto item = storage->getItem( slot );
 
       // add any items that are stackable
-      if( canMerge && item && !itemInfo->isEquippable && item->getId() == itemToAdd->getId() )
+      if( canMerge && item && item->getMaxStackSize() > 1 && item->getId() == itemToAdd->getId() )
       {
         uint32_t count = item->getStackSize();
         uint32_t maxStack = item->getMaxStackSize();
@@ -739,7 +739,7 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
     sendStatusEffectUpdate(); // send if any equip is changed
 }
 
-bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem )
+bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem, bool writeToDb )
 {
   auto containerType = World::Manager::ItemMgr::getContainerType( storageId );
 
@@ -752,7 +752,8 @@ bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slot
     case Bag:
     case CurrencyCrystal:
     {
-      writeInventory( static_cast< InventoryType >( storageId ) );
+      if( writeToDb )
+        writeInventory( static_cast< InventoryType >( storageId ) );
       break;
     }
 
@@ -767,7 +768,8 @@ bool Sapphire::Entity::Player::updateContainer( uint16_t storageId, uint8_t slot
       else
         unequipItem( static_cast< GearSetSlot >( slotId ), pItem, true );
 
-      writeInventory( static_cast< InventoryType >( storageId ) );
+      if( writeToDb )
+        writeInventory( static_cast< InventoryType >( storageId ) );
       break;
     }
     default:
@@ -804,7 +806,7 @@ void Sapphire::Entity::Player::splitItem( uint16_t fromInventoryId, uint8_t from
 
   fromItem->setStackSize( fromItem->getStackSize() - itemCount );
 
-  updateContainer( fromInventoryId, fromSlotId, fromItem );
+  updateContainer( fromInventoryId, fromSlotId, fromItem, fromInventoryId != toInventoryId );
   updateContainer( toInventoryId, toSlot, newItem );
 
   updateItemDb( fromItem );
@@ -835,7 +837,7 @@ void Sapphire::Entity::Player::mergeItem( uint16_t fromInventoryId, uint8_t from
   {
     fromItem->setStackSize( stackOverflow );
     updateItemDb( fromItem );
-    updateContainer( fromInventoryId, fromSlotId, fromItem );
+    updateContainer( fromInventoryId, fromSlotId, fromItem, fromInventoryId != toInventoryId );
   }
 
 
@@ -862,14 +864,16 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
       && !World::Manager::ItemMgr::isArmory( fromInventoryId ) )
   {
     updateContainer( fromInventoryId, fromSlotId, nullptr );
-    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( toSlot ) );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto itemInfo = exdData.get< Sapphire::Data::Item >( toItem->getId() );
+    fromInventoryId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( itemInfo->equipSlotCategory ) );
     fromSlotId = static_cast < uint8_t >( m_storageMap[ fromInventoryId ]->getFreeSlot() );
   }
 
   auto containerTypeFrom = World::Manager::ItemMgr::getContainerType( fromInventoryId );
   auto containerTypeTo = World::Manager::ItemMgr::getContainerType( toInventoryId );
 
-  updateContainer( toInventoryId, toSlot, fromItem );
+  updateContainer( toInventoryId, toSlot, fromItem, fromInventoryId != toInventoryId );
   updateContainer( fromInventoryId, fromSlotId, toItem );
 
   if( static_cast< InventoryType >( toInventoryId ) == GearSet0 ||
@@ -937,6 +941,11 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
 Sapphire::ItemPtr Sapphire::Entity::Player::getEquippedWeapon()
 {
   return m_storageMap[ GearSet0 ]->getItem( GearSetSlot::MainHand );
+}
+
+Sapphire::ItemPtr Sapphire::Entity::Player::getEquippedSecondaryWeapon()
+{
+	return m_storageMap[ InventoryType::GearSet0 ]->getItem( GearSetSlot::OffHand );
 }
 
 uint8_t Sapphire::Entity::Player::getFreeSlotsInBags()

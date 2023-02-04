@@ -186,6 +186,9 @@ bool Sapphire::Entity::Player::load( uint32_t charId, World::SessionPtr pSession
   auto titleList = res->getBlobVector( "TitleList" );
   memcpy( reinterpret_cast< char* >( m_titleList ), titleList.data(), titleList.size() );
 
+  auto minions = res->getBlobVector( "Minions" );
+  memcpy( reinterpret_cast< char* >( m_minions ), minions.data(), minions.size() );
+
   auto mountGuide = res->getBlobVector( "Mounts" );
   memcpy( reinterpret_cast< char* >( m_mountGuide ), mountGuide.data(), mountGuide.size() );
 

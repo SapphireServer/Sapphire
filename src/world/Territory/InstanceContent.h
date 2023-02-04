@@ -28,7 +28,7 @@ namespace Sapphire
                      uint32_t guId,
                      const std::string& internalName,
                      const std::string& contentName,
-                     uint32_t instanceContentId );
+                     uint32_t instanceContentId, uint16_t contentFinderConditionId = 0 );
 
     virtual ~InstanceContent();
 

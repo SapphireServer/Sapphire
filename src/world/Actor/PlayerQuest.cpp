@@ -7,6 +7,8 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/QuestMessagePacket.h"
 
+#include "Manager/MapMgr.h"
+
 #include "Session.h"
 
 using namespace Sapphire::Common;
@@ -17,8 +19,6 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 {
   int8_t idx = getQuestIndex( questId );
 
-  removeQuest( questId );
-
   auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
   questFinishPacket->data().questId = questId;
   questFinishPacket->data().flag1 = 1;
@@ -26,6 +26,7 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
   queuePacket( questFinishPacket );
 
   updateQuestsCompleted( questId );
+  removeQuest( questId );
 
   //sendQuestTracker(); already sent in removeQuest()
 }
@@ -33,7 +34,12 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId )
 void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
 {
   removeQuestsCompleted( questId );
-  sendQuestInfo();
+
+  auto questFinishPacket = makeZonePacket< FFXIVIpcQuestFinish >( getId() );
+  questFinishPacket->data().questId = questId;
+  questFinishPacket->data().flag1 = 0;
+  questFinishPacket->data().flag2 = 1;
+  queuePacket( questFinishPacket );
 }
 
 void Sapphire::Entity::Player::removeQuest( uint16_t questId )
@@ -42,6 +48,11 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
 
   if( ( idx != -1 ) && ( m_activeQuests[ idx ] != nullptr ) )
   {
+    std::shared_ptr< QuestActive > pQuest = m_activeQuests[ idx ];
+    m_activeQuests[ idx ].reset();
+
+    Common::Service< World::Manager::MapMgr >::ref().updateQuests( *this );
+
     auto questUpdatePacket = makeZonePacket< FFXIVIpcQuestUpdate >( getId() );
     questUpdatePacket->data().slot = static_cast< uint8_t >( idx );
     questUpdatePacket->data().questInfo.c.questId = 0;
@@ -53,9 +64,6 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
       if( m_questTracking[ ii ] == idx )
         m_questTracking[ ii ] = -1;
     }
-
-    std::shared_ptr< QuestActive > pQuest = m_activeQuests[ idx ];
-    m_activeQuests[ idx ].reset();
 
     m_questIdToQuestIdx.erase( questId );
     m_questIdxToQuestId.erase( idx );
@@ -916,6 +924,8 @@ void Sapphire::Entity::Player::updateQuest( uint16_t questId, uint8_t sequence )
     m_questIdToQuestIdx[ questId ] = idx;
     m_questIdxToQuestId[ idx ] = questId;
 
+    Common::Service< World::Manager::MapMgr >::ref().updateQuests( *this );
+
     auto questUpdatePacket = makeZonePacket< FFXIVIpcQuestUpdate >( getId() );
     questUpdatePacket->data().slot = idx;
     questUpdatePacket->data().questInfo = *pNewQuest;
@@ -1013,6 +1023,11 @@ Sapphire::Entity::Player::sendQuestMessage( uint32_t questId, int8_t msgId, uint
 }
 
 
+bool Sapphire::Entity::Player::isQuestCompleted( uint16_t questId )
+{
+  return ( m_questCompleteFlags[ questId / 8 ] & ( 0x80 >> ( questId % 8 ) ) );
+}
+
 void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
 {
   uint16_t index = questId / 8;
@@ -1030,7 +1045,10 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
   uint8_t value = 0x80 >> bitIndex;
 
-  m_questCompleteFlags[ index ] ^= value;
+  if( m_questCompleteFlags[ index ] & value )
+    m_questCompleteFlags[ index ] ^= value;
+
+  Common::Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 
 }
 

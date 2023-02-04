@@ -74,6 +74,13 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
       name[ 0 ] = toupper( name[ 0 ] );
       return name;
     }
+    case Event::EventHandler::EventHandlerType::PublicContentDirector:
+    {
+      auto pcInfo = exdData.get< Sapphire::Data::PublicContent >( eventId & 0x0000FFFF );
+      if( !pcInfo )
+        return "unknown";
+      return pcInfo->name;
+    }
 
 
     case Event::EventHandler::EventHandlerType::Warp:

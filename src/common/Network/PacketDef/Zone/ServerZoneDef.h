@@ -680,6 +680,7 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unk; // == 0
     uint16_t modelChara;
     uint16_t rotation;
+    uint16_t currentMount;
     uint16_t activeMinion;
     uint8_t spawnIndex;
     uint8_t state;
@@ -693,24 +694,20 @@ namespace Sapphire::Network::Packets::Server
     uint8_t classJob;
     uint8_t u26d;
     uint16_t u27a;
-    uint8_t currentMount;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-
-    //uint32_t elementalLevel; one of these two field changed to 16bit
-    //uint32_t element;
     uint8_t elementData[6];
-
+    uint8_t unknown5_5[3];
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
-    uint32_t unk30;
+    uint32_t unk30[2];
   };
 
   /**
@@ -753,9 +750,10 @@ namespace Sapphire::Network::Packets::Server
     uint32_t displayFlags;
     uint16_t fateID;
     uint16_t mPCurr;
-    uint16_t unknown1; // 0
-    uint16_t unknown2; // 0 or pretty big numbers > 30000
+    uint16_t unknown1;
+    uint16_t unknown2;
     uint16_t modelChara;
+    uint16_t currentMount;
     uint16_t rotation;
     uint16_t activeMinion;
     uint8_t spawnIndex;
@@ -770,14 +768,13 @@ namespace Sapphire::Network::Packets::Server
     uint8_t classJob;
     uint8_t u26d;
     uint16_t u27a;
-    uint8_t currentMount;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
-    uint16_t elementalLevel; // Eureka
-    uint16_t element; // Eureka
+    uint8_t elemental[6];
+    uint8_t unknown5_5[3];
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
@@ -789,7 +786,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t bNPCPartSlot;
     uint8_t unk32;
     uint16_t unk33;
-    uint32_t unk34;
+    uint32_t unk34[2];
   };
 
   /**
@@ -930,13 +927,13 @@ namespace Sapphire::Network::Packets::Server
     //Current instance can be confirmed at any time using the /instance text command." ( 7B F8 69 )
 
     uint8_t unknown5;
+    uint32_t unknown7;
     uint32_t unknown8;
-    uint16_t festivalId;
-    uint16_t additionalFestivalId;
     uint32_t unknown9;
     uint32_t unknown10;
-    uint32_t unknown11;
-    uint32_t unknown12[4];
+    uint32_t festivalId;
+    uint32_t unknown12[3];
+    uint32_t additionalFestivalId;
     uint32_t unknown13[3];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t unknown14[3];
@@ -1041,13 +1038,12 @@ namespace Sapphire::Network::Packets::Server
     unsigned char mountGuideMask[22];
     unsigned char u19_2;
     */
-    unsigned char unknown5_3a[176];
+    unsigned char unknown5_55a[178];
     unsigned char companionName[21];
     unsigned char companionDefRank;
     unsigned char companionAttRank;
     unsigned char companionHealRank;
-    unsigned char mountGuideMask[23];
-    unsigned char maybeReservedMountSlots;
+    unsigned char mountGuideMask[29];
     //==
     char name[32];
     unsigned char unknownOword[16];
@@ -1056,10 +1052,10 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetheryte[21];
     unsigned char discovery[445];
     unsigned char howto[34];
-    unsigned char minions[51];
+    unsigned char minions[55];
     unsigned char chocoboTaxiMask[10];
-    unsigned char watchedCutscenes[131];
-    unsigned char companionBardingMask[10];
+    unsigned char watchedCutscenes[137];
+    unsigned char companionBardingMask[11];
     unsigned char companionEquippedHead;
     unsigned char companionEquippedBody;
     unsigned char companionEquippedLegs;
@@ -1074,7 +1070,7 @@ namespace Sapphire::Network::Packets::Server
     unsigned char unknownPvp5AB[11];
     unsigned char unknown5B9[5];
     */
-    unsigned char unknown5_3c[234];
+    unsigned char unknown5_45b[236];
     //==
     unsigned char pose;
     /*
@@ -1092,28 +1088,32 @@ namespace Sapphire::Network::Packets::Server
     unsigned char aetherCurrentMask[22];
     unsigned char u10[3];
     */
-    unsigned char unknown5_3d[292];
+    unsigned char unknown5_55b[295];
     //==
-    unsigned char orchestrionMask[40];
+    unsigned char orchestrionMask[40]; // this field may already be extended, if it is, the beginning bytes are at the end of unknown5_55b
     unsigned char hallOfNoviceCompletion[3];
     unsigned char animaCompletion[11];
-    unsigned char unknown5_3e[33];
+    unsigned char unknown5_55c[35];
     unsigned char unlockedRaids[28];
     unsigned char unlockedDungeons[18];
     unsigned char unlockedGuildhests[10];
-    unsigned char unlockedTrials[9]; // 5.35 trial:pvp either 9:5 or 8:6 not confirmed
-    unsigned char unlockedPvp[5];
+    /*
+      at least 8 bytes at most 10 bytes in unlockedTrials not confirmed, adjust unlockedPvp so they share a total of 15 bytes and sync with clearedTrials/clearedPvp.
+    */
+    unsigned char unlockedTrials[9];
+    unsigned char unlockedPvp[6];
+    //==
     unsigned char clearedRaids[28];
     unsigned char clearedDungeons[18];
     unsigned char clearedGuildhests[10];
     unsigned char clearedTrials[9];
-    unsigned char clearedPvp[5];
+    unsigned char clearedPvp[6];
     /*
     unsigned short fishingRecordsFishWeight[26];
     unsigned int exploratoryMissionNextTimestamp;
     unsigned char pvpLevel;
     */
-    unsigned char padding2[8];
+    unsigned char unknown5_55d[9];
     //==
   };
 
@@ -1437,6 +1437,20 @@ namespace Sapphire::Network::Packets::Server
     uint8_t padding1[3];
     uint32_t param5;
     uint8_t unknown[8];
+  };
+
+  struct FFXIVIpcEventPlay16 : FFXIVIpcBasePacket< EventPlay16 >
+  {
+    uint64_t actorId;
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t padding;
+    uint32_t flags;
+    uint32_t param3;
+    uint8_t paramSize;
+    uint8_t padding1[3];
+    uint32_t param[16];
+    uint32_t padding2;
   };
 
   template< int ArgCount >
@@ -1835,7 +1849,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t bNPCName;
     uint32_t textId;
     uint32_t popupTimeMs;
-    uint32_t pad3[4];
+    uint32_t param[6];
   };
 
 
@@ -1847,7 +1861,7 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFXIVIpcPerformNote : FFXIVIpcBasePacket< PerformNote >
   {
-    uint8_t data[32];
+    uint8_t data[16];
   };
 
   struct FFXIVIpcHousingUpdateLandFlagsSlot : FFXIVIpcBasePacket< HousingUpdateLandFlagsSlot >
@@ -2237,6 +2251,97 @@ namespace Sapphire::Network::Packets::Server
     char leaderName[32];
     char memberName[32];
     uint8_t padding[3];
+  };
+
+  struct FFXIVIpcEventContinue : FFXIVIpcBasePacket< EventContinue >
+  {
+    uint32_t eventId;
+    uint16_t scene;
+    uint16_t unknown;
+    uint64_t unknown2;
+  };
+
+  struct FFXIVDirectorUnk4 : FFXIVIpcBasePacket< SomeDirectorUnk4 >
+  {
+    uint32_t param[4];
+    uint64_t unknown;
+  };
+
+  struct FFXIVCeremonySetActorAppearance : FFXIVIpcBasePacket< CeremonySetActorAppearance >
+  {
+    uint8_t u1;
+    uint8_t questBL;
+    uint16_t padding1;
+    uint32_t u3;
+    struct
+    {
+      uint64_t mainWeaponModel;
+      uint64_t secWeaponModel;
+      uint64_t craftToolModel;
+      uint32_t c_u6;
+      uint32_t c_u7;
+      uint32_t charId;
+      uint16_t u4;
+      uint16_t guardianDeity;
+      uint32_t u5;
+      uint32_t models[10];
+      uint8_t look[26];
+      uint16_t padding3;
+    } actors[2];
+  };
+
+  //For quests this is only used for pre-accepted ones. Accepted quests are getting handled by the client.
+  template< int ArgCount >
+  struct FFXIVIpcMapUpdateN
+  {
+    uint8_t entryCount;
+    uint8_t padding[ 3 ];
+    uint32_t iconIds[ ArgCount ];
+    uint32_t levelIds[ ArgCount ];
+    uint32_t eventIds[ ArgCount ]; // possible event ids for this: Quest, GuildLeveAssignment, GuildOrderGuide, TripleTriad, CustomTalk, PreHandler
+    uint8_t additionalData[ ArgCount ]; // use unknown
+  };
+
+  struct FFXIVIpcMapUpdate :
+    FFXIVIpcBasePacket< MapUpdate >,
+    FFXIVIpcMapUpdateN< 2 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate4 :
+    FFXIVIpcBasePacket< MapUpdate4 >,
+    FFXIVIpcMapUpdateN< 4 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate8 :
+    FFXIVIpcBasePacket< MapUpdate8 >,
+    FFXIVIpcMapUpdateN< 8 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate16 :
+    FFXIVIpcBasePacket< MapUpdate16 >,
+    FFXIVIpcMapUpdateN< 16 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate32 :
+    FFXIVIpcBasePacket< MapUpdate32 >,
+    FFXIVIpcMapUpdateN< 32 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate64 :
+    FFXIVIpcBasePacket< MapUpdate64 >,
+    FFXIVIpcMapUpdateN< 64 >
+  {
+  };
+
+  struct FFXIVIpcMapUpdate128 :
+    FFXIVIpcBasePacket< MapUpdate128 >,
+    FFXIVIpcMapUpdateN< 128 >
+  {
   };
 }
 

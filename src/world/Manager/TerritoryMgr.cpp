@@ -13,6 +13,7 @@
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "TerritoryMgr.h"
 #include "HousingMgr.h"
 
@@ -301,7 +302,28 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
   if( !pQuestBattleInfo )
     return nullptr;
 
-  auto pQuestInfo = exdData.get< Sapphire::Data::Quest >( pQuestBattleInfo->quest );
+  auto eventId = pQuestBattleInfo->quest;
+  auto eventType = static_cast< Event::EventHandler::EventHandlerType >( eventId >> 16 );
+  switch( eventType )
+  {
+    case Event::EventHandler::EventHandlerType::Array:
+    {
+      auto eventArray = exdData.get< Sapphire::Data::ArrayEventHandler >( eventId );
+      if( eventArray )
+      {
+        for( int i = 0; i < eventArray->data.size(); i++ )
+        {
+          auto nextId = eventArray->data[ i ];
+          if( nextId == 0 )
+            break;
+          eventId = nextId;
+        }
+      }
+      break;
+    }
+  }
+
+  auto pQuestInfo = exdData.get< Sapphire::Data::Quest >( eventId );
   if( !pQuestInfo )
     return nullptr;
 
@@ -316,7 +338,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createQuestBattle
   Logger::debug( "Starting instance for QuestBattle id: {0} ({1})", questBattleId, pQuestInfo->name );
 
   auto pZone = make_QuestBattle( pQuestBattleInfo, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                 pTeri->name, pQuestInfo->name, questBattleId );
+    pTeri->name, pQuestInfo->name, questBattleId, contentFinderConditionId );
   pZone->init();
 
   m_questBattleIdToInstanceMap[ questBattleId ][ pZone->getGuId() ] = pZone;
@@ -350,10 +372,72 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createInstanceCon
   Logger::debug( "Starting instance for InstanceContent id: {0} ({1})", instanceContentId, pContentFinderCondition->name );
 
   auto pZone = make_InstanceContent( pInstanceContent, pContentFinderCondition->territoryType, getNextInstanceId(),
-                                     pTeri->name, pContentFinderCondition->name, instanceContentId );
+    pTeri->name, pContentFinderCondition->name, instanceContentId, contentFinderConditionId );
   pZone->init();
 
   m_instanceContentIdToInstanceMap[ instanceContentId ][ pZone->getGuId() ] = pZone;
+  m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
+  m_instanceZoneSet.insert( pZone );
+
+  return pZone;
+}
+
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint32_t contentFinderConditionId )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+
+  auto pContentFinderCondition = exdData.get< Sapphire::Data::ContentFinderCondition >( contentFinderConditionId );
+  if( !pContentFinderCondition )
+    return nullptr;
+  auto contentId = pContentFinderCondition->content;
+
+  auto pPublicContent = exdData.get< Sapphire::Data::PublicContent >( contentId );
+  if( !pPublicContent )
+    return nullptr;
+
+  auto pTeri = getTerritoryDetail( pContentFinderCondition->territoryType );
+
+  if( !pTeri || pContentFinderCondition->name.empty() )
+    return nullptr;
+
+  Logger::debug( "Starting instance for PublicContent id: {0} ({1})", contentId, pContentFinderCondition->name );
+
+  auto pZone = make_PublicContent( pPublicContent, pContentFinderCondition->territoryType, getNextInstanceId(),
+    pTeri->name, pContentFinderCondition->name, contentId, contentFinderConditionId );
+  pZone->init();
+
+  m_publicContentIdToInstanceMap[ contentId ][ pZone->getGuId() ] = pZone;
+  m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
+  m_instanceZoneSet.insert( pZone );
+
+  return pZone;
+}
+
+Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::createPublicContent( uint16_t contentId, uint16_t territoryId )
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+
+  auto pPublicContent = exdData.get< Sapphire::Data::PublicContent >( contentId );
+  if( !pPublicContent )
+    return nullptr;
+
+  if( pPublicContent->contentFinderCondition > 0 )
+  {
+    Logger::warn( "the public content {} has a ContentFinderCondition value of {}, create the instance using it instead.", contentId, pPublicContent->contentFinderCondition );
+    return nullptr;
+  }
+
+  auto pTeri = getTerritoryDetail( territoryId );
+
+  if( !pTeri )
+    return nullptr;
+
+  Logger::debug( "Starting instance for PublicContent id: {0} ({1})", contentId, pPublicContent->name );
+
+  auto pZone = make_PublicContent( pPublicContent, territoryId, getNextInstanceId(), pTeri->name, pPublicContent->name, contentId, 0 );
+  pZone->init();
+
+  m_publicContentIdToInstanceMap[ contentId ][ pZone->getGuId() ] = pZone;
   m_guIdToTerritoryPtrMap[ pZone->getGuId() ] = pZone;
   m_instanceZoneSet.insert( pZone );
 
@@ -444,10 +528,20 @@ bool Sapphire::World::Manager::TerritoryMgr::removeTerritoryInstance( uint32_t g
   m_instanceZoneSet.erase( pZone );
   m_territorySet.erase( pZone );
 
-  if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
+  if( pZone->getAsInstanceContent() )
   {
     auto instance = std::dynamic_pointer_cast< InstanceContent >( pZone );
     m_instanceContentIdToInstanceMap[ instance->getInstanceContentId() ].erase( pZone->getGuId() );
+  }
+  else if( pZone->getAsPublicContent() )
+  {
+    auto instance = std::dynamic_pointer_cast< PublicContent >( pZone );
+    m_publicContentIdToInstanceMap[ instance->getContentId() ].erase( pZone->getGuId() );
+  }
+  else if( pZone->getAsQuestBattle() )
+  {
+    auto instance = std::dynamic_pointer_cast< QuestBattle >( pZone );
+    m_questBattleIdToInstanceMap[ instance->getQuestBattleId() ].erase( pZone->getGuId() );
   }
   else
     m_territoryTypeIdToInstanceGuidMap[ pZone->getTerritoryTypeId() ].erase( pZone->getGuId() );
@@ -540,6 +634,7 @@ void Sapphire::World::Manager::TerritoryMgr::updateTerritoryInstances( uint64_t 
 
       // remove zone from maps
       m_territorySet.erase( zone );
+      m_guIdToTerritoryPtrMap.erase( zone->getGuId() );
       it = m_landIdentToTerritoryPtrMap.erase( it );
     }
     else
@@ -615,7 +710,7 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
     if( pHousing )
       pPlayer->setTerritoryId( pHousing->getLandSetId() );
   }
-  else if( isInstanceContentTerritory( pZone->getTerritoryTypeId() ) )
+  else if( pZone->getAsInstanceContent() || pZone->getAsQuestBattle() || pZone->getAsPublicContent() )
   {
     pPlayer->setTerritoryId( pZone->getGuId() );
   }
@@ -627,14 +722,27 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
   // mark character as zoning in progress
   pPlayer->setLoadingComplete( false );
 
+  bool zoneChanged = true;
   if( pPlayer->getLastPing() != 0 && pPlayer->getCurrentTerritory() )
-    pPlayer->getCurrentTerritory()->removeActor( pPlayer );
+  {
+    zoneChanged = pPlayer->getCurrentTerritory()->getGuId() != pZone->getGuId();
+    if( zoneChanged )
+      pPlayer->getCurrentTerritory()->removeActor( pPlayer );
+  }
 
-  pPlayer->setCurrentZone( pZone );
-  pZone->pushActor( pPlayer );
+  if( zoneChanged )
+  {
+    pPlayer->setCurrentZone( pZone );
+    pZone->pushActor( pPlayer );
 
-  // map player to instanceId so it can be tracked.
-  m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+    // map player to instanceId so it can be tracked.
+    m_playerIdToInstanceMap[ pPlayer->getId() ] = pZone->getGuId();
+  }
+  else
+  {
+    pPlayer->removeFromInRange();
+    pPlayer->clearInRangeSet();
+  }
 
   pPlayer->sendZonePackets();
 

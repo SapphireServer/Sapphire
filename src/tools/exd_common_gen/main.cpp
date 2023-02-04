@@ -42,7 +42,7 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
   for( auto row : rows )
   {
     auto& fields = row.second;
-    uint32_t id = row.first;
+    uint32_t id = row.first.rowId;
 
     std::string value;
     try

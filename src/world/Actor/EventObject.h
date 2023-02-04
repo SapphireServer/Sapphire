@@ -13,7 +13,7 @@ namespace Sapphire::Entity
                  Common::FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName = "none" );
 
     using OnTalkEventHandler = std::function< void( Entity::Player&, Entity::EventObjectPtr,
-                                                    TerritoryPtr, uint64_t ) >;
+                                                    TerritoryPtr, uint32_t, uint64_t ) >;
 
     uint32_t getGimmickId() const;
 

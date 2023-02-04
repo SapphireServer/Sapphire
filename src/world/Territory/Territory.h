@@ -166,9 +166,13 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
+    Event::DirectorPtr getAsDirector();
+
     InstanceContentPtr getAsInstanceContent();
 
     QuestBattlePtr getAsQuestBattle();
+
+    PublicContentPtr getAsPublicContent();
 
     void updateSpawnPoints();
 
@@ -179,6 +183,10 @@ namespace Sapphire
     void addEffectResult( World::Action::EffectResultPtr result );
 
     void processEffectResults( uint64_t tickCount );
+
+    Entity::PlayerPtr getPlayer( uint32_t charId );
+
+    void foreachPlayer( std::function< void( Entity::PlayerPtr player ) > callback );
   };
 
 }

@@ -181,6 +181,10 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( reqMoveHousingItem );
 
+    DECLARE_HANDLER( housingEditExterior );
+
+    DECLARE_HANDLER( housingEditInterior );
+
     DECLARE_HANDLER( marketBoardSearch );
 
     DECLARE_HANDLER( marketBoardRequestItemInfo );
@@ -190,6 +194,8 @@ namespace Sapphire::Network
     DECLARE_HANDLER( worldInteractionhandler );
 
     DECLARE_HANDLER( diveHandler );
+
+    DECLARE_HANDLER( eventYieldHandler );
   };
 
 }
