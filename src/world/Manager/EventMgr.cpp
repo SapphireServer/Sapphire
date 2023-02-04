@@ -628,9 +628,10 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
     auto& shopMgr = Common::Service< ShopMgr >::ref();
     std::vector< uint32_t > params = std::vector< uint32_t >();
 
+    params.push_back( 201 ); //unknown
     params.push_back( 1 ); //command id
     params.push_back( 40 ); //max items for sell
-    params.push_back( 1 ); //flag
+    params.push_back( 0 ); //flag
     uint8_t index;
     for( index = 0; index < 40; index++ )
     {
@@ -639,7 +640,7 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
       else
         break;
     }
-    params[ 1 ] = static_cast< uint32_t >( params.size() - 3 ); //new max item size
+    params[ 2 ] = static_cast< uint32_t >( params.size() - 4 ); //new max item size
     auto& exdData = Common::Service< Data::ExdData >::ref();
 
     for( auto it : *player.getSoldItems() )
