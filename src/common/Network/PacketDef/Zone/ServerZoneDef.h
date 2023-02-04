@@ -907,10 +907,10 @@ namespace Sapphire::Network::Packets::Server
   {
     uint16_t serverId;
     uint16_t zoneId;
-    uint16_t unknown1;
+    uint16_t zoneIndex;
     uint16_t contentfinderConditionId;
-    uint32_t unknown3;
-    uint32_t unknown4;
+    uint32_t layerSetId;
+    uint32_t layoutId;
     uint8_t weatherId;
     uint8_t bitmask;
     uint8_t bitmask1;

@@ -137,7 +137,7 @@ public:
   };
 
   LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+    LgbEntry( buf, offset )
   {
     header = *reinterpret_cast<BgPartsData*>( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -162,7 +162,7 @@ public:
   std::string gimmickFileName;
 
   LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+    LgbEntry( buf, offset )
   {
     header = *reinterpret_cast<GimmickData*>( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -178,7 +178,7 @@ struct ENpcData :
   uint8_t unknown1[0x24];
 };
 
-class LGB_ENPC_ENTRY :
+struct LGB_ENPC_ENTRY :
   public LgbEntry
 {
 public:
@@ -186,7 +186,7 @@ public:
   std::string name;
 
   LGB_ENPC_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+    LgbEntry( buf, offset )
   {
     header = *reinterpret_cast< ENpcData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -202,7 +202,7 @@ struct EObjData :
   uint8_t unknown1[0xC];
 };
 
-class LGB_EOBJ_ENTRY :
+struct LGB_EOBJ_ENTRY :
   public LgbEntry
 {
 public:
@@ -210,7 +210,7 @@ public:
   std::string name;
 
   LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+    LgbEntry( buf, offset )
   {
     header = *reinterpret_cast< EObjData* >( buf + offset );
     //std::cout << "\t " << header.eobjId << " " << name << " unknown: " << header.unknown << "\n";
@@ -234,7 +234,7 @@ public:
   std::string name;
 
   LGB_MAP_RANGE_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+    LgbEntry( buf, offset )
   {
     header = *reinterpret_cast< MapRangeData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -254,7 +254,7 @@ struct LGB_COLLISION_BOX_ENTRY :
   std::string name;
 
   LGB_COLLISION_BOX_ENTRY( char* buf, uint32_t offset ) :
-          LgbEntry( buf, offset )
+    LgbEntry( buf, offset )
   {
     header = *reinterpret_cast< LGB_COLLISION_BOX_HEADER* >( buf + offset );
     header.type = LgbEntryType::CollisionBox;
@@ -366,7 +366,7 @@ struct LGB_FILE
 {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
-  
+
   LGB_FILE( char* buf )
   {
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
