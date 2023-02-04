@@ -5,7 +5,8 @@ file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 message("exec: ${EXECUTABLE_OUTPUT_PATH}")
 
-set(SCRIPT_LIB_DIR "${EXECUTABLE_OUTPUT_PATH}/compiledscripts/" )
+set(SCRIPT_POSTBUILD_DIR "${EXECUTABLE_OUTPUT_PATH}/compiledscripts/")
+set(SCRIPT_LIB_DIR "${EXECUTABLE_OUTPUT_PATH}/tmp/compiledscripts/" )
 set(EXECUTABLE_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(LIBRARY_OUTPUT_PATH "${SCRIPT_LIB_DIR}")
 set(RUNTIME_OUTPUT_DIRECTORY "${SCRIPT_LIB_DIR}")
@@ -55,15 +56,27 @@ foreach(_scriptDir ${children})
 
         configure_file("${CMAKE_CURRENT_SOURCE_DIR}/ScriptLoader.cpp.in" "${_scriptDir}/ScriptLoader.cpp")
 
+        set(ScriptTargetName "script_${_name}")
 
+        # Copy the modules over once they're built. Prevent watchdog from trying to reload partially written files.
         if(MSVC)
             add_custom_command(TARGET "script_${_name}" POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.lib"
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.ilk"
+                COMMAND ${CMAKE_COMMAND} -E copy "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll_LOCK
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll
+                COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll_LOCK
+            )
+        else()
+            add_custom_command(TARGET "script_${_name}" POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${ScriptTargetName}> ${SCRIPT_POSTBUILD_DIR}_LOCK
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ScriptTargetName}> ${SCRIPT_POSTBUILD_DIR}
+                COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}$<TARGET_FILE_NAME:${ScriptTargetName}>_LOCK
             )
         endif()
 
+        unset(ScriptTargetName)
         unset(ScriptIncludes)
         unset(ScriptNames)
     endif()

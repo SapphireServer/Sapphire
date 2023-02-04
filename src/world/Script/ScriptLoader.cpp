@@ -74,6 +74,10 @@ Sapphire::Scripting::ScriptInfo* Sapphire::Scripting::ScriptLoader::loadModule( 
   fs::create_directories( cacheDir );
   fs::path dest( cacheDir /= f.filename().string() );
 
+  // make sure the module has finished building before trying to copy it
+  if( fs::exists( f.string() + "_LOCK" ) )
+    return nullptr;
+
   try
   {
     fs::copy_file( f, dest, fs::copy_options::overwrite_existing );

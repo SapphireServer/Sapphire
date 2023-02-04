@@ -9,6 +9,8 @@ namespace Sapphire::Scripting
 
   bool NativeScriptMgr::loadScript( const std::string& path )
   {
+    std::scoped_lock lock( m_mutex );
+
     auto module = m_loader.loadModule( path );
     if( !module )
       return false;
@@ -47,11 +49,15 @@ namespace Sapphire::Scripting
 
   const std::string NativeScriptMgr::getModuleExtension()
   {
+    std::scoped_lock lock( m_mutex );
+
     return m_loader.getModuleExtension();
   }
 
   bool NativeScriptMgr::unloadScript( const std::string& name )
   {
+    std::scoped_lock lock( m_mutex );
+
     auto info = m_loader.getScriptInfo( name );
     if( !info )
       return false;
@@ -61,6 +67,8 @@ namespace Sapphire::Scripting
 
   bool NativeScriptMgr::unloadScript( ScriptInfo* info )
   {
+    std::scoped_lock lock( m_mutex );
+
     for( auto& script : info->scripts )
     {
       m_scripts[ script->getType() ].erase( script->getId() );
@@ -83,11 +91,14 @@ namespace Sapphire::Scripting
     if( !unloadScript( info ) )
       return;
 
+    std::scoped_lock lock( m_mutex );
     m_scriptLoadQueue.push( libPath );
   }
 
   void NativeScriptMgr::processLoadQueue()
   {
+    std::scoped_lock lock( m_mutex );
+
     std::vector< std::string > deferredLoads;
 
     while( !m_scriptLoadQueue.empty() )
@@ -110,11 +121,15 @@ namespace Sapphire::Scripting
 
   void NativeScriptMgr::findScripts( std::set< Sapphire::Scripting::ScriptInfo* >& scripts, const std::string& search )
   {
+    std::scoped_lock lock( m_mutex );
+
     return m_loader.findScripts( scripts, search );
   }
 
   bool NativeScriptMgr::isModuleLoaded( const std::string& name )
   {
+    std::scoped_lock lock( m_mutex );
+
     return m_loader.isModuleLoaded( name );
   }
 
