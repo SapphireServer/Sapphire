@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <set>
 #include <queue>
+#include <mutex>
 
 #include "ScriptLoader.h"
 
@@ -28,6 +29,8 @@ namespace Sapphire::Scripting
      * @brief The queue that scripts to be reloaded are placed into.
      */
     std::queue< std::string > m_scriptLoadQueue;
+
+    std::recursive_mutex m_mutex;
 
     /*!
      * @brief Used to unload a script
