@@ -4,6 +4,7 @@
 #include "Territory.h"
 #include "Event/Director.h"
 #include "Forwards.h"
+#include <Exd/Structs.h>
 
 namespace Sapphire::Data
 {
@@ -15,7 +16,7 @@ namespace Sapphire
   class QuestBattle : public Event::Director, public Territory
   {
   public:
-    QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle > pBattleDetails,
+    QuestBattle( std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > pBattleDetails,
                  uint16_t territoryType,
                  uint32_t guId,
                  const std::string& internalName,
@@ -44,7 +45,10 @@ namespace Sapphire
 
     void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 ) override;
 
-    void onRegisterEObj( Entity::EventObjectPtr object ) override;
+    void onAddEObj( Entity::EventObjectPtr object ) override;
+
+    void onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint32_t arg1, uint32_t arg2, uint32_t arg3,
+                              uint32_t arg4 ) override;
 
     void onEnterSceneFinish( Entity::Player& player );
 
@@ -52,7 +56,7 @@ namespace Sapphire
 
     void setSequence( uint8_t value );
 
-    void setBranch( uint8_t value );
+    void setFlags( uint8_t value );
 
     void startQte();
 
@@ -71,7 +75,7 @@ namespace Sapphire
 
     Event::Director::DirectorState getState() const;
 
-    std::shared_ptr< Sapphire::Data::QuestBattle > getQuestBattleDetails() const;
+    std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > getQuestBattleDetails() const;
 
     uint32_t getQuestBattleId() const;
 
@@ -83,7 +87,7 @@ namespace Sapphire
     Entity::PlayerPtr getPlayerPtr();
 
   private:
-    std::shared_ptr< Sapphire::Data::QuestBattle > m_pBattleDetails;
+    std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > m_pBattleDetails;
     uint32_t m_questBattleId;
     Event::Director::DirectorState m_state;
 

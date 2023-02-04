@@ -54,7 +54,7 @@ public:
 
   void onInit( QuestBattle& instance ) override
   {
-    instance.registerEObj( "unknown_0", 2006981, 5656867, 4, { 0.000000f, 0.000000f, -15.851080f }, 1.000000f, 0.000000f ); 
+    instance.addEObj( "unknown_0", 2002618, 5656867, 5836327, 4, { 0.000000f, 0.000000f, -15.851080f }, 1.000000f, 0.000000f, 0); 
 
   }
 

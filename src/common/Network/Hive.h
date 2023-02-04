@@ -1,5 +1,4 @@
-#ifndef HIVE_H_
-#define HIVE_H_
+#pragma once
 
 #include <asio.hpp>
 #include <atomic>
@@ -51,4 +50,3 @@ namespace Sapphire::Network
   };
 
 }
-#endif

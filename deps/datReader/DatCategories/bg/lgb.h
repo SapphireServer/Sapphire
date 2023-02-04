@@ -34,10 +34,10 @@ public:
     memset( &header, 0, sizeof( header ) );
   };
 
-  LgbEntry( char* buf, uint32_t offset )
+  LgbEntry( char* buf, size_t offset )
   {
     m_buf = buf;
-    m_offset = offset;
+    m_offset = static_cast< uint32_t >( offset );
     header = *reinterpret_cast< InstanceObject* >( buf + offset );
   };
 
@@ -60,11 +60,9 @@ public:
   std::string modelFileName;
   std::string collisionFileName;
 
-  LGB_BGPARTS_ENTRY()
-  {
-  };
+  LGB_BGPARTS_ENTRY() = default;
 
-  LGB_BGPARTS_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_BGPARTS_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< BgPartsData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -80,7 +78,7 @@ public:
   std::string name;
   std::string gimmickFileName;
 
-  LGB_GIMMICK_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_GIMMICK_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< GimmickData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -88,13 +86,13 @@ public:
   };
 };
 
-class LGB_ENPC_ENTRY : public LgbEntry
+struct LGB_ENPC_ENTRY : public LgbEntry
 {
 public:
   ENpcData data;
   std::string name;
 
-  LGB_ENPC_ENTRY( char* buf, uint32_t offset ) :
+  LGB_ENPC_ENTRY( char* buf, size_t offset ) :
     LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ENpcData* >( buf + offset );
@@ -102,13 +100,13 @@ public:
   };
 };
 
-class LGB_EOBJ_ENTRY : public LgbEntry
+struct LGB_EOBJ_ENTRY : public LgbEntry
 {
 public:
   EObjData data;
   std::string name;
 
-  LGB_EOBJ_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_EOBJ_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< EObjData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -121,7 +119,7 @@ public:
   MapRangeData data;
   std::string name;
 
-  LGB_MAP_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_MAP_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< MapRangeData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -134,7 +132,7 @@ public:
   ExitRangeData data;
   std::string name;
 
-  LGB_EXIT_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_EXIT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ExitRangeData* >( buf + offset );
     name = std::string( buf + offset + header.nameOffset );
@@ -146,10 +144,41 @@ struct LGB_POP_RANGE_ENTRY : public LgbEntry
 public:
   PopRangeData data;
 
-  LGB_POP_RANGE_ENTRY( char* buf, uint32_t offset ) : LgbEntry( buf, offset )
+  LGB_POP_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< PopRangeData* >( buf + offset );
   };
+};
+
+struct LGB_EVENT_RANGE_ENTRY : public LgbEntry
+{
+public:
+  EventRangeData data;
+
+  LGB_EVENT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
+  {
+    data = *reinterpret_cast< EventRangeData* >( buf + offset );
+  };
+};
+
+enum LayerSetReferencedType
+{
+  All = 0x0,
+  Include = 0x1,
+  Exclude = 0x2,
+  Undetermined = 0x3,
+};
+
+struct LayerSetReferenced
+{
+  uint32_t LayerSetID;
+};
+
+struct LayerSetReferencedList
+{
+  LayerSetReferencedType ReferencedType;
+  int32_t LayerSets;
+  int32_t LayerSetCount;
 };
 
 struct LGB_GROUP_HEADER
@@ -158,29 +187,46 @@ struct LGB_GROUP_HEADER
   int32_t groupNameOffset;
   int32_t entriesOffset;
   int32_t entryCount;
-  uint32_t unknown2;
-  uint32_t unknown3;
-  uint32_t unknown4;
-  uint32_t unknown5;
-  uint32_t unknown6;
-  uint32_t unknown7;
-  uint32_t unknown8;
-  uint32_t unknown9;
-  uint32_t unknown10;
+  int8_t ToolModeVisible;
+  int8_t ToolModeReadOnly;
+  int8_t IsBushLayer;
+  int8_t PS3Visible;
+  int32_t LayerSetRef;
+  uint16_t FestivalID;
+  uint16_t FestivalPhaseID;
+  int8_t IsTemporary;
+  int8_t IsHousing;
+  uint16_t VersionMask;
+  uint32_t Reserved;
+  int32_t OBSetReferencedList;
+  int32_t OBSetReferencedList_Count;
+  int32_t OBSetEnableReferencedList;
+  int32_t OBSetEnableReferencedList_Count;
 };
 
 struct LGB_GROUP
 {
   LGB_FILE* parent;
   LGB_GROUP_HEADER header;
+  LayerSetReferencedList layerSetReferencedList;
   std::string name;
   std::vector< std::shared_ptr< LgbEntry > > entries;
+  std::vector< LayerSetReferenced > refs;
 
-  LGB_GROUP( char* buf, LGB_FILE* parentStruct, uint32_t offset )
+  LGB_GROUP( char* buf, LGB_FILE* parentStruct, size_t offset )
   {
     parent = parentStruct;
     header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
     name = std::string( buf + offset + header.groupNameOffset );
+
+    layerSetReferencedList = *reinterpret_cast< LayerSetReferencedList* >( buf + offset + header.LayerSetRef );
+
+    if( layerSetReferencedList.LayerSetCount > 0 )
+    {
+      refs.resize( layerSetReferencedList.LayerSetCount );
+      memcpy( (char*)&refs[0], buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
+    }
+
     const auto entriesOffset = offset + header.entriesOffset;
     for( auto i = 0; i < header.entryCount; ++i )
     {
@@ -208,6 +254,14 @@ struct LGB_GROUP
         else if( type == LgbEntryType::ExitRange )
         {
           entries.push_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::EventRange )
+        {
+          entries.push_back( std::make_shared< LGB_EVENT_RANGE_ENTRY >( buf, entryOffset ) );
+        }
+        else if( type == LgbEntryType::PopRange )
+        {
+          entries.push_back( std::make_shared< LGB_POP_RANGE_ENTRY >( buf, entryOffset ) );
         }
         else if( type == LgbEntryType::MapRange )
         {
@@ -257,7 +311,7 @@ struct LGB_FILE
       throw std::runtime_error( "Invalid LGB file!" );
 
     constexpr auto baseOffset = sizeof( header );
-    for( auto i = 0; i < header.groupCount; ++i )
+    for( size_t i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
       const auto group = LGB_GROUP( buf, this, groupOffset );

@@ -6,10 +6,15 @@
 #include <Logging/Logger.h>
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Lobby/ServerLobbyDef.h>
+#include <Network/PacketDef/Lobby/ClientLobbyDef.h>
 #include <Network/GamePacketParser.h>
 #include <Crypt/md5.h>
 #include <Crypt/blowfish.h>
 #include <Config/ConfigMgr.h>
+
+#include <utility>
+
+#include <utility>
 
 #include "ServerLobby.h"
 #include "RestConnector.h"
@@ -18,16 +23,19 @@
 #include "Forwards.h"
 
 using namespace Sapphire;
+using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::LobbyPackets;
+using namespace Sapphire::Network::Packets::LobbyPackets::Server;
+
 
 extern Lobby::ServerLobby g_serverLobby;
 extern Lobby::RestConnector g_restConnector;
 
 Lobby::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                Sapphire::Network::AcceptorPtr pAcceptor ) :
-  Sapphire::Network::Connection( pHive ),
-  m_pAcceptor( pAcceptor ),
+                                       Sapphire::Network::AcceptorPtr pAcceptor ) :
+  Sapphire::Network::Connection( std::move( pHive ) ),
+  m_pAcceptor( std::move( pAcceptor ) ),
   m_bEncryptionInitialized( false )
 {
 }
@@ -44,7 +52,7 @@ void Lobby::GameConnection::onAccept( const std::string& host, uint16_t port )
   auto connection = make_GameConnection( m_hive, m_pAcceptor );
   m_pAcceptor->accept( connection );
 
-  Logger::info( "Connect from {0}", m_socket.remote_endpoint().address().to_string() );
+  Logger::info( "Connect from {0}:{1}", m_socket.remote_endpoint().address().to_string(), m_socket.remote_endpoint().port() );
 }
 
 
@@ -97,168 +105,190 @@ void Lobby::GameConnection::onError( const asio::error_code& error )
 }
 
 void
-Lobby::GameConnection::sendError( uint64_t sequence, uint32_t errorcode, uint16_t messageId, uint32_t tmpId )
+Lobby::GameConnection::sendError( uint32_t requestNumber, uint32_t clientTimeValue,
+                                  uint32_t errorCode, uint16_t messageId, uint32_t tmpId )
 {
-  auto errorPacket = makeLobbyPacket< FFXIVIpcLobbyError >( tmpId );
-  errorPacket->data().seq = sequence;
-  errorPacket->data().error_id = errorcode;
-  errorPacket->data().message_id = messageId;
+  auto errorPacket = makeLobbyPacket< FFXIVIpcNackReply >( tmpId );
+  errorPacket->data().requestNumber = requestNumber;
+  errorPacket->data().clientTimeValue = clientTimeValue;
+  errorPacket->data().errorCode = errorCode;
+  errorPacket->data().errorMessageNo = messageId;
 
   LobbyPacketContainer pRP( m_encKey );
   pRP.addPacket( errorPacket );
   sendPacket( pRP );
 }
 
-void Lobby::GameConnection::getCharList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+void Lobby::GameConnection::serviceLogin( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
-  uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
-  Logger::info( "Sequence [{0}]", sequence );
+  auto serviceLoginPacket = LobbyChannelPacket< Client::FFXIVIpcServiceLogin >( packet );
+  uint32_t requestNumber = serviceLoginPacket.data().requestNumber;
+  uint32_t clientTimeValue = serviceLoginPacket.data().clientTimeValue;
 
-  Logger::info( "[{0}] ReqCharList", m_pSession->getAccountID() );
+  //Logger::info( "requestNumber [{0}]", requestNumber );
+  Logger::info( "[accountId#{0}] ReqCharList", m_pSession->getAccountID() );
   LobbyPacketContainer pRP( m_encKey );
 
-  auto serverListPacket = makeLobbyPacket< FFXIVIpcServerList >( tmpId );
-  serverListPacket->data().seq = 1;
-  serverListPacket->data().offset = 0;
-  serverListPacket->data().numServers = 1;
-  serverListPacket->data().server[ 0 ].id = g_serverLobby.getConfig().global.general.worldID;
-  serverListPacket->data().server[ 0 ].index = 0;
-  serverListPacket->data().final = 1;
-  strcpy( serverListPacket->data().server[ 0 ].name, g_serverLobby.getConfig().worldName.c_str() );
+  auto serverListPacket = makeLobbyPacket< FFXIVIpcDistWorldInfo >( tmpId );
+  serverListPacket->data().requestNumber = requestNumber;
+  serverListPacket->data().clientTimeValue = clientTimeValue;
+  serverListPacket->data().listIndex = 0;
+  serverListPacket->data().endOfList = 1;
+  serverListPacket->data().count = 1;
+  serverListPacket->data().worldArray[ 0 ].worldId = g_serverLobby.getConfig().global.general.worldID;
+  serverListPacket->data().worldArray[ 0 ].worldIndex = 0;
+  strcpy( serverListPacket->data().worldArray[ 0 ].displayName, g_serverLobby.getConfig().worldName.c_str() );
+  strcpy( serverListPacket->data().worldArray[ 0 ].worldSetName, g_serverLobby.getConfig().worldName.c_str() );
   pRP.addPacket( serverListPacket );
 
-  auto retainerListPacket = makeLobbyPacket< FFXIVIpcRetainerList >( tmpId );
-  retainerListPacket->data().padding[ 8 ] = 1;
+  auto retainerListPacket = makeLobbyPacket< FFXIVIpcDistRetainerInfo >( tmpId );
+  retainerListPacket->data().endOfList = 1;
   pRP.addPacket( retainerListPacket );
 
   sendPacket( pRP );
 
-  auto charList = g_restConnector.getCharList( ( char* ) m_pSession->getSessionId() );
+  auto charList = g_restConnector.getCharList( m_pSession->getSessionId() );
 
-  uint32_t charIndex = 0;
+  int32_t charIndex = -1;
+  uint8_t usedCharaIndex = 0;
 
   for( uint8_t i = 0; i < 4; i++ )
   {
-    auto charListPacket = makeLobbyPacket< FFXIVIpcCharList >( tmpId );
-    charListPacket->data().seq = sequence;
-    charListPacket->data().numInPacket = 2;
-    charListPacket->data().counter = i * 4;
+    auto charListPacket = makeLobbyPacket< FFXIVIpcServiceLoginReply >( tmpId );
+    charListPacket->data().requestNumber = requestNumber;
+    charListPacket->data().clientTimeValue = clientTimeValue;
+    charListPacket->data().listIndex = i * 2;
+    charListPacket->data().count = 2;
 
-    for( uint8_t j = 0; j < 2; j++ )
+    for( auto& j : charListPacket->data().chrArray )
     {
-      if( charIndex < charList.size() && charList.size() != 0 )
-      {
-        FFXIVIpcCharList::CharaDetails details;
-        memset( &details, 0, sizeof( FFXIVIpcCharList::CharaDetails ) );
+      CharacterInfo details{};
+      memset( &details, 0, sizeof( CharacterInfo ) );
+      details.chrIndex = ++charIndex;
 
-        auto& charEntry = charList[ charIndex ];
-        details.uniqueId = std::get< 1 >( charEntry );
-        details.contentId = std::get< 2 >( charEntry );
-        details.serverId = g_serverLobby.getConfig().global.general.worldID;
-        details.serverId1 = g_serverLobby.getConfig().global.general.worldID;
-        details.index = charIndex;
-        strcpy( details.charDetailJson, std::get< 3 >( charEntry ).c_str() );
-        strcpy( details.nameChara, std::get< 0 >( charEntry ).c_str() );
-        strcpy( details.nameServer, g_serverLobby.getConfig().worldName.c_str() );
-        strcpy( details.nameServer1, g_serverLobby.getConfig().worldName.c_str() );
+      if( charList.empty() || charIndex >= charList.size() )
+        continue;
 
-        charListPacket->data().charaDetails[ j ] = details;
+      usedCharaIndex = charIndex;
 
-        Logger::debug( "[{0}] {1} - {2} - {3} - {4} - {5}",
-                       charIndex,
-                       details.index,
-                       std::get< 0 >( charEntry ),
-                       std::get< 1 >( charEntry ),
-                       std::get< 2 >( charEntry ),
-                       std::get< 3 >( charEntry ) );
-      }
-      charIndex++;
+      auto& charEntry = charList[ charIndex ];
+      details.characterId = std::get< 2 >( charEntry );
+      details.playerId = std::get< 1 >( charEntry );
+      details.worldId = g_serverLobby.getConfig().global.general.worldID;
+
+      strcpy( details.graphicData, std::get< 3 >( charEntry ).c_str() );
+      strcpy( details.chrName, std::get< 0 >( charEntry ).c_str() );
+      strcpy( details.worldSetName, g_serverLobby.getConfig().worldName.c_str() );
+
+      /*Logger::debug( "[{0}] {1} - {2} - {3} - {4} - {5}",
+                     charIndex,
+                     details.chrIndex,
+                     std::get< 0 >( charEntry ),
+                     std::get< 1 >( charEntry ),
+                     std::get< 2 >( charEntry ),
+                     std::get< 3 >( charEntry ) );*/
+
+      j = details;
     }
 
-
-    // TODO: Eventually move to account info storage
     if( i == 3 )
     {
+      charListPacket->data().maxCreateCharacter = Common::MAX_CREATE_CHARACTER;
+      charListPacket->data().maxCharacterList = Common::MAX_CHARACTER_LIST;
       charListPacket->data().entitledExpansion = Common::CURRENT_EXPANSION_ID;
-      charListPacket->data().maxCharOnWorld = 25;
-      charListPacket->data().unknown8 = 8;
-      charListPacket->data().veteranRank = 12;
-      charListPacket->data().counter = ( i * 4 ) + 1;
-      charListPacket->data().unknown4 = 128;
+      charListPacket->data().endOfList = 1;
     }
-    LobbyPacketContainer pRP( m_encKey );
-    pRP.addPacket( charListPacket );
-    sendPacket( pRP );
 
+    m_pSession->setCharaIndex( usedCharaIndex );
+
+    LobbyPacketContainer pRP1( m_encKey );
+    pRP1.addPacket( charListPacket );
+    sendPacket( pRP1 );
   }
 }
 
-void Lobby::GameConnection::enterWorld( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+void Lobby::GameConnection::gameLogin( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
-  uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
-  Logger::info( "Sequence [{0}]", sequence );
+  auto serviceLoginPacket = LobbyChannelPacket< Client::FFXIVIpcGameLogin >( packet );
+  uint32_t requestNumber = serviceLoginPacket.data().requestNumber;
+  uint32_t clientTimeValue = serviceLoginPacket.data().clientTimeValue;
 
-  Logger::info( "[{0}] ReqEnterWorld", m_pSession->getAccountID() );
+  //Logger::info( "requestNumber [{0}]", requestNumber );
 
-  uint64_t lookupId = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x18 );
+  uint64_t characterId = serviceLoginPacket.data().characterId;
+  uint64_t playerId = serviceLoginPacket.data().playerId;
+  uint8_t characterIndex = serviceLoginPacket.data().characterIndex;
+  uint8_t operation = serviceLoginPacket.data().operation;
 
-  uint32_t logInCharId = -1;
+  Logger::info( "[accountId#{0}] GameLogin: characterId#{1} playerId#{2}", m_pSession->getAccountID(), characterId, playerId );
+
+  uint64_t ticketId = -1;
   std::string logInCharName;
-  auto charList = g_restConnector.getCharList( ( char* ) m_pSession->getSessionId() );
-  for( uint32_t i = 0; i < charList.size(); i++ )
-  {
-    uint64_t thisContentId = std::get< 2 >( charList[ i ] );
+  auto charList = g_restConnector.getCharList( m_pSession->getSessionId() );
 
-    if( thisContentId == lookupId )
+  for( auto& listEntry : charList )
+  {
+    uint64_t thisContentId = std::get< 2 >( listEntry );
+
+    if( thisContentId == characterId )
     {
-      logInCharId = std::get< 1 >( charList[ i ] );
-      logInCharName = std::get< 0 >( charList[ i ] );
+      ticketId = std::get< 1 >( listEntry );
+      logInCharName = std::get< 0 >( listEntry );
       break;
     }
   }
 
-  if( logInCharId == -1 )
+  if( ticketId == -1 )
     return;
 
-  Logger::info( "[{0}] Logging in as {1} ({2})", m_pSession->getAccountID(), logInCharName, logInCharId );
+  Logger::info( "[accountId#{0}] Logging in as {1} ticketId ({2})", m_pSession->getAccountID(), logInCharName, ticketId );
 
   LobbyPacketContainer pRP( m_encKey );
 
-  auto enterWorldPacket = makeLobbyPacket< FFXIVIpcEnterWorld >( tmpId );
-  enterWorldPacket->data().contentId = lookupId;
-  enterWorldPacket->data().seq = sequence;
-  strcpy( enterWorldPacket->data().host, g_serverLobby.getConfig().global.network.zoneHost.c_str() );
-  enterWorldPacket->data().port = g_serverLobby.getConfig().global.network.zonePort;
-  enterWorldPacket->data().charId = logInCharId;
-  memcpy( enterWorldPacket->data().sid, m_pSession->getSessionId(), 66 );
+  auto enterWorldPacket = makeLobbyPacket< FFXIVIpcGameLoginReply >( tmpId );
+  enterWorldPacket->data().characterId = characterId;
+  enterWorldPacket->data().characterIndex = characterIndex;
+  enterWorldPacket->data().requestNumber = requestNumber;
+  enterWorldPacket->data().clientTimeValue = clientTimeValue;
+  strcpy( enterWorldPacket->data().frontendHost, g_serverLobby.getConfig().global.network.zoneHost.c_str() );
+  enterWorldPacket->data().frontendPort = g_serverLobby.getConfig().global.network.zonePort;
+  enterWorldPacket->data().ticketId = static_cast< uint32_t >( ticketId );
+  enterWorldPacket->data().operation = operation;
+  enterWorldPacket->data().worldId = g_serverLobby.getConfig().global.general.worldID;
+  memcpy( enterWorldPacket->data().ticketData, m_pSession->getSessionId(), sizeof( enterWorldPacket->data().ticketData ) );
   pRP.addPacket( enterWorldPacket );
   sendPacket( pRP );
 }
 
-bool Lobby::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+bool Lobby::GameConnection::login( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
-  LobbySessionPtr pSession = g_serverLobby.getSession( ( char* ) &packet.data[ 0 ] + 0x22 );
+  auto loginPacket = LobbyChannelPacket< Client::FFXIVIpcLogin >( packet );
+  LobbySessionPtr pSession = g_serverLobby.getSession( loginPacket.data().sessionId );
 
-  if( g_serverLobby.getConfig().allowNoSessionConnect && pSession == nullptr )
+  Logger::info( "Login request from session: {0}", loginPacket.data().sessionId );
+  Logger::info( "Client version: {0}", loginPacket.data().version );
+
+  if( g_serverLobby.getConfig().allowNoSessionConnect && !pSession )
   {
     auto session = make_LobbySession();
     session->setAccountID( 0 );
-    session->setSessionId( ( uint8_t* ) &packet.data[ 0 ] + 0x22 );
+    session->setSessionId( loginPacket.data().sessionId );
     pSession = session;
-    Logger::info( "Allowed connection with no session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x22 ) );
+    Logger::info( "Allowed connection with no session: {0}", loginPacket.data().sessionId );
   }
 
-  if( pSession != nullptr )
+  if( pSession )
   {
     Logger::info( "Found session linked to accountId: {0}", pSession->getAccountID() );
     m_pSession = pSession;
 
-    auto serviceIdInfoPacket = makeLobbyPacket< FFXIVIpcServiceIdInfo >( tmpId );
-    sprintf( serviceIdInfoPacket->data().serviceAccount[ 0 ].name, "FINAL FANTASY XIV" );
-    serviceIdInfoPacket->data().numServiceAccounts = 1;
-    serviceIdInfoPacket->data().u1 = 3;
-    serviceIdInfoPacket->data().u2 = 0x99;
-    serviceIdInfoPacket->data().serviceAccount[ 0 ].id = 0x002E4A2B;
+    auto serviceIdInfoPacket = makeLobbyPacket< FFXIVIpcLoginReply >( tmpId );
+    serviceIdInfoPacket->data().activeAccountCount = 1;
+    serviceIdInfoPacket->data().regionCode = 3;
+    serviceIdInfoPacket->data().optionParam = 0x99;
+    serviceIdInfoPacket->data().accountArray[ 0 ].accountIndex = 1;
+    serviceIdInfoPacket->data().accountArray[ 0 ].accountId = 0x002E4A2B;
+    sprintf( serviceIdInfoPacket->data().accountArray[ 0 ].accountName, "%s", Common::SERVICE_ACCOUNT_DEFAULT_NAME.c_str() );
 
     LobbyPacketContainer pRP( m_encKey );
     pRP.addPacket( serviceIdInfoPacket );
@@ -266,32 +296,35 @@ bool Lobby::GameConnection::sendServiceAccountList( FFXIVARR_PACKET_RAW& packet,
   }
   else
   {
-    Logger::info( "Could not retrieve session: {0}", std::string( ( char* ) &packet.data[ 0 ] + 0x22 ) );
-    sendError( 1, 5006, 13001, tmpId );
+    Logger::info( "Could not retrieve session: {0}", loginPacket.data().sessionId );
+    sendError( 1, 0, 5006, 13001, tmpId );
 
     return true;
   }
   return false;
 }
 
-bool Lobby::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+bool Lobby::GameConnection::charaMake( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
 {
-  uint64_t sequence = *reinterpret_cast< uint64_t* >( &packet.data[ 0 ] + 0x10 );
-  uint8_t type = *reinterpret_cast< uint8_t* >( &packet.data[ 0 ] + 0x29 );
-  Logger::info( "Sequence [{0}]", sequence );
-  Logger::info( "Type [{0}]", type );
+  auto charaMakePacket = LobbyChannelPacket< Client::FFXIVIpcCharaMake >( packet );
 
-  Logger::info( "[{0}] ReqCharCreate", m_pSession->getAccountID() );
+  uint32_t requestNumber = charaMakePacket.data().requestNumber;
+  uint32_t clientTimeValue = charaMakePacket.data().clientTimeValue;
+  Client::CharacterOperation characterOperation = charaMakePacket.data().operation;
+  //Logger::info( "requestNumber [{0}]", requestNumber );
+  Logger::info( "Character Operation [{0}]", characterOperation );
 
-  std::string name;
-  uint32_t newId = g_restConnector.getNextCharId();
-  uint64_t newContentId = g_restConnector.getNextContentId();
+  uint64_t characterId = charaMakePacket.data().characterId;
+  uint64_t playerId = charaMakePacket.data().playerId;
+  uint8_t characterIndex = charaMakePacket.data().characterIndex;
 
-  if( type == 1 ) //Character creation name check
+  Logger::info( "[accountId#{0}] ReqCharCreate", m_pSession->getAccountID() );
+
+  if( characterOperation == Client::CharacterOperation::CHARAOPE_RESERVENAME ) //Character creation name check
   {
-    name = std::string( ( char* ) &packet.data[ 0 ] + 0x2C );
+    std::string name = std::string( charaMakePacket.data().chracterName );
 
-    Logger::info( "[{0}] Type 1: {1}", m_pSession->getAccountID(), name );
+    Logger::info( "[accountId#{0}] Character Operation CHARAOPE_RESERVENAME: {1}", m_pSession->getAccountID(), name );
 
     LobbyPacketContainer pRP( m_encKey );
 
@@ -299,72 +332,80 @@ bool Lobby::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& packet, uin
 
     if( g_restConnector.checkNameTaken( m_pSession->newCharName ) )
     {
-      sendError( sequence, 3074, 13004, tmpId );
+      sendError( requestNumber, clientTimeValue, 3074, 13004, tmpId );
       return true;
     }
+    uint64_t newContentId = g_restConnector.getNextContentId();
 
-    auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
-    charCreatePacket->data().content_id = newContentId;
-    strcpy( charCreatePacket->data().name, name.c_str() );
-    strcpy( charCreatePacket->data().world, g_serverLobby.getConfig().worldName.c_str() );
-    charCreatePacket->data().type = 1;
-    charCreatePacket->data().seq = sequence;
-    charCreatePacket->data().unknown = 1;
-    charCreatePacket->data().unknown_2 = 1;
-    charCreatePacket->data().unknown_7 = 1;
-    charCreatePacket->data().unknown_8 = 1;
+    auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharaMakeReply >( tmpId );
+    charCreatePacket->data().chrArray[0].characterId = newContentId;
+    charCreatePacket->data().chrArray[0].chrIndex = m_pSession->getCharaIndex() + 1; 
+    charCreatePacket->data().chrArray[0].worldId = g_serverLobby.getConfig().global.general.worldID;
+    strcpy( charCreatePacket->data().chrArray[0].chrName, m_pSession->newCharName.c_str() );
+    strcpy( charCreatePacket->data().chrArray[0].worldSetName, g_serverLobby.getConfig().worldName.c_str() );
+    charCreatePacket->data().optionParam = Client::CharacterOperation::CHARAOPE_RESERVENAME;
+    charCreatePacket->data().requestNumber = requestNumber;
+    charCreatePacket->data().clientTimeValue = clientTimeValue;
+    charCreatePacket->data().endOfList = 1;
+    charCreatePacket->data().count = 1;
     pRP.addPacket( charCreatePacket );
     sendPacket( pRP );
   }
-  else if( type == 2 ) //Character creation finalize
+  else if( characterOperation == Client::CharacterOperation::CHARAOPE_MAKECHARA ) //Character creation finalize
   {
-    std::string charDetails( ( char* ) &packet.data[ 0 ] + 0x4C );
-    Logger::info( "[{0}] Type 2: {1}", m_pSession->getAccountID(), charDetails );
+    std::string charDetails( charaMakePacket.data().charaMakeData );
+    Logger::info( "[accountId#{0}] Character Operation CHARAOPE_MAKECHARA: {1}", m_pSession->getAccountID(), charDetails );
 
-    if( g_restConnector.createCharacter( ( char* ) m_pSession->getSessionId(), m_pSession->newCharName, charDetails ) !=
+    if( g_restConnector.createCharacter( m_pSession->getSessionId(), m_pSession->newCharName, charDetails ) !=
         -1 )
     {
       LobbyPacketContainer pRP( m_encKey );
 
-      auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
-      charCreatePacket->data().content_id = newContentId;
-      strcpy( charCreatePacket->data().name, name.c_str() );
-      strcpy( charCreatePacket->data().world, g_serverLobby.getConfig().worldName.c_str() );
-      strcpy( charCreatePacket->data().world2, g_serverLobby.getConfig().worldName.c_str() );
-      charCreatePacket->data().type = 2;
-      charCreatePacket->data().seq = sequence;
-      charCreatePacket->data().unknown = 1;
-      charCreatePacket->data().unknown_2 = 1;
-      charCreatePacket->data().unknown_7 = 1;
-      charCreatePacket->data().unknown_8 = 1;
+      uint8_t newCharaIndex = m_pSession->getCharaIndex() + 1;
+
+      uint32_t newId = g_restConnector.getNextCharId();
+      m_pSession->setCharaIndex( newCharaIndex );
+
+      Logger::info( "[accountId#{0}] index {1} charaterId {2}", m_pSession->getAccountID(), newCharaIndex, characterId );
+      Logger::info( "[accountId#{0}] index {1} playerId {2}", m_pSession->getAccountID(), newCharaIndex, newId );
+
+      auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharaMakeReply >( tmpId );
+      charCreatePacket->data().chrArray[0].playerId = characterId;
+      charCreatePacket->data().chrArray[0].chrIndex = newCharaIndex;
+      charCreatePacket->data().chrArray[0].characterId = characterId;
+      charCreatePacket->data().chrArray[0].worldId = g_serverLobby.getConfig().global.general.worldID;
+      strcpy( charCreatePacket->data().chrArray[0].chrName, m_pSession->newCharName.c_str() );
+      strcpy( charCreatePacket->data().chrArray[0].worldSetName, g_serverLobby.getConfig().worldName.c_str() );
+      charCreatePacket->data().optionParam = Client::CharacterOperation::CHARAOPE_MAKECHARA;
+      charCreatePacket->data().requestNumber = requestNumber;
+      charCreatePacket->data().clientTimeValue = clientTimeValue;
+      charCreatePacket->data().endOfList = 1;
+      charCreatePacket->data().count = 1;
       pRP.addPacket( charCreatePacket );
       sendPacket( pRP );
     }
     else
     {
-      sendError( sequence, 5006, 13001, tmpId );
+      sendError( requestNumber, clientTimeValue, 5006, 13001, tmpId );
     }
   }
-  else if( type == 4 ) //Character delete
+  else if( characterOperation == Client::CharacterOperation::CHARAOPE_DELETECHARA ) //Character delete
   {
-    name = std::string( ( char* ) &packet.data[ 0 ] + 0x2C );
-    Logger::info( "[{0}] Type 4: {1}", m_pSession->getAccountID(), name );
+    std::string name = std::string( charaMakePacket.data().chracterName );
+    Logger::info( "[accountId#{0}] Character Operation CHARAOPE_DELETECHARA: {1}", m_pSession->getAccountID(), name );
 
 
-    if( g_restConnector.deleteCharacter( ( char* ) m_pSession->getSessionId(), name ) )
+    if( g_restConnector.deleteCharacter( m_pSession->getSessionId(), name ) )
     {
 
-      auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharCreate >( tmpId );
-      //charCreatePacket->data().content_id = deletePlayer.getContentId();
-      charCreatePacket->data().content_id = 0;
-      strcpy( charCreatePacket->data().name, name.c_str() );
-      strcpy( charCreatePacket->data().world, g_serverLobby.getConfig().worldName.c_str() );
-      charCreatePacket->data().type = 4;
-      charCreatePacket->data().seq = sequence;
-      charCreatePacket->data().unknown = 1;
-      charCreatePacket->data().unknown_2 = 1;
-      charCreatePacket->data().unknown_7 = 1;
-      charCreatePacket->data().unknown_8 = 1;
+      auto charCreatePacket = makeLobbyPacket< FFXIVIpcCharaMakeReply >( tmpId );
+      strcpy( charCreatePacket->data().chrArray[0].chrName, name.c_str() );
+      strcpy( charCreatePacket->data().chrArray[0].worldSetName, g_serverLobby.getConfig().worldName.c_str() );
+      charCreatePacket->data().optionParam = Client::CharacterOperation::CHARAOPE_DELETECHARA;
+      charCreatePacket->data().requestNumber = requestNumber;
+      charCreatePacket->data().clientTimeValue = clientTimeValue;
+      charCreatePacket->data().endOfList = 1;
+      charCreatePacket->data().count = 1;
 
       LobbyPacketContainer pRP( m_encKey );
       pRP.addPacket( charCreatePacket );
@@ -372,52 +413,113 @@ bool Lobby::GameConnection::createOrModifyChar( FFXIVARR_PACKET_RAW& packet, uin
     }
     else
     {
-      sendError( sequence, 5006, 13001, tmpId );
+      sendError( requestNumber, clientTimeValue, 5006, 13001, tmpId );
     }
   }
   else
   {
-    Logger::error( "[{0}] Unknown Character Creation Type: {1}", m_pSession->getAccountID(), type );
+    Logger::error( "[accountId#{0}] Unhandled Character Operation: {1}", m_pSession->getAccountID(), characterOperation );
   }
   return false;
 }
 
+void Lobby::GameConnection::debugLogin( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+{
+  auto debugLoginPacket = LobbyChannelPacket< Client::FFXIVIpcDebugLogin >( packet );
+
+  uint32_t requestNumber = debugLoginPacket.data().requestNumber;
+
+  //Logger::info( "requestNumber [{0}]", requestNumber );
+
+  Logger::info( "[accountId#{0}] {1} DebugLogin", m_pSession->getAccountID(), debugLoginPacket.data().ticketNumber );
+
+  auto debugLoginReplPacket = makeLobbyPacket< FFXIVIpcDebugLoginRepl >( tmpId );
+
+  debugLoginReplPacket->data().requestNumber = requestNumber;
+  //TODO: Why is the client sending the wrong ticket number? Find out why (for now just set to 1 so it grabs the one out of the config)
+  debugLoginReplPacket->data().ticketNumber = 1;
+  debugLoginReplPacket->data().frontendPort = g_serverLobby.getConfig().global.network.zonePort;
+  strcpy( debugLoginReplPacket->data().frontendHost, g_serverLobby.getConfig().global.network.zoneHost.c_str() );
+  strcpy( debugLoginReplPacket->data().worldSetName, g_serverLobby.getConfig().worldName.c_str() );
+
+  LobbyPacketContainer pRP( m_encKey );
+  pRP.addPacket( debugLoginReplPacket );
+  sendPacket( pRP );
+}
+
+void Lobby::GameConnection::debugLogin2( FFXIVARR_PACKET_RAW& packet, uint32_t tmpId )
+{
+  auto debugLoginPacket = LobbyChannelPacket< Client::FFXIVIpcDebugLogin2 >( packet );
+
+  uint32_t requestNumber = debugLoginPacket.data().requestNumber;
+
+  //Logger::info( "requestNumber [{0}]", requestNumber );
+
+  Logger::info( "[accountId#{0}] {1} DebugLogin2", m_pSession->getAccountID(), debugLoginPacket.data().ticketNumber );
+
+  auto debugLoginReplPacket = makeLobbyPacket< FFXIVIpcDebugLoginRepl >(tmpId);
+
+  debugLoginReplPacket->data().requestNumber = requestNumber;
+  //TODO: Why is the client sending the wrong ticket number? Find out why (for now just set to 1 so it grabs the one out of the config)
+  debugLoginReplPacket->data().ticketNumber = 1;
+  debugLoginReplPacket->data().frontendPort = g_serverLobby.getConfig().global.network.zonePort;
+  strcpy( debugLoginReplPacket->data().frontendHost, g_serverLobby.getConfig().global.network.zoneHost.c_str() );
+  strcpy( debugLoginReplPacket->data().worldSetName, g_serverLobby.getConfig().worldName.c_str() );
+
+  LobbyPacketContainer pRP( m_encKey );
+  pRP.addPacket( debugLoginReplPacket );
+  sendPacket( pRP );
+}
+
 void Lobby::GameConnection::handleGamePacket( Network::Packets::FFXIVARR_PACKET_RAW& packet )
 {
-
   uint32_t tmpId = packet.segHdr.target_actor;
 
-  Logger::info( "OpCode [{0}]", *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) );
+  uint32_t accountId = 0;
+  if( m_pSession )
+    accountId = m_pSession->getAccountID();
+
+  Logger::info( "[accountId#{0}] OpCode {1}", accountId, Util::getOpCode( packet ) );
   
-  switch( *reinterpret_cast< uint16_t* >( &packet.data[ 2 ] ) )
+  switch( Util::getOpCode( packet ) )
   {
-    case ClientVersionInfo:
+    case LoginEx:
     {
       // todo: validate client version based on sha1 or gamever/bootver
-      sendServiceAccountList( packet, tmpId );
+      login( packet, tmpId );
     }
     break;
 
-    case ReqCharList:
+    case ServiceLogin:
     {
-      getCharList( packet, tmpId );
+      serviceLogin( packet, tmpId );
     }
     break;
 
-    case ReqEnterWorld:
+    case GameLogin:
     {
-      enterWorld( packet, tmpId );
+      gameLogin( packet, tmpId );
     }
     break;
 
-    case ReqCharCreate:
+    case CharaMake:
     {
-      createOrModifyChar( packet, tmpId );
+      charaMake( packet, tmpId );
     }
     break;
 
+    case DebugLogin:
+    {
+      debugLogin( packet, tmpId );
+    }
+    break;
+
+    case DebugLogin2:
+    {
+      debugLogin2( packet, tmpId );
+    }
+    break;
   }
-
 }
 
 void Lobby::GameConnection::sendPacket( LobbyPacketContainer& pLpc )
@@ -440,28 +542,23 @@ void Lobby::GameConnection::sendPackets( Network::Packets::PacketContainer* pPac
 void Lobby::GameConnection::sendSinglePacket( FFXIVPacketBasePtr pPacket )
 {
   PacketContainer pRP = PacketContainer();
-  pRP.addPacket( pPacket );
+  pRP.addPacket( std::move( pPacket ) );
   sendPackets( &pRP );
 }
 
 void Lobby::GameConnection::generateEncryptionKey( uint32_t key, const std::string& keyPhrase )
 {
-  memset( m_baseKey, 0, 0x2C );
-  m_baseKey[ 0 ] = 0x78;
-  m_baseKey[ 1 ] = 0x56;
-  m_baseKey[ 2 ] = 0x34;
-  m_baseKey[ 3 ] = 0x12;
-  memcpy( m_baseKey + 0x04, &key, 4 );
-  m_baseKey[ 8 ] = 0x88;
-  m_baseKey[ 9 ] = 0x13;
-  memcpy( ( char* ) m_baseKey + 0x0C, keyPhrase.c_str(), keyPhrase.size() );
-  Common::Util::md5( m_baseKey, m_encKey, 0x2C );
+  std::memset( m_baseKey.rawKey, 0, sizeof( m_baseKey ) );
+  m_baseKey.magic = 0x12345678;
+  m_baseKey.key = key;
+  m_baseKey.version = Common::FFXIV_ENC_VERSION;
+  std::memcpy( m_baseKey.keyPhrase, keyPhrase.c_str(), keyPhrase.size() );
+  Common::Util::md5( m_baseKey.rawKey, m_encKey, sizeof( m_baseKey ) );
 }
 
 void Lobby::GameConnection::handlePackets( const Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
                                            const std::vector< Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
-
   for( auto inPacket : packetData )
   {
 
@@ -495,7 +592,10 @@ void Lobby::GameConnection::handlePackets( const Network::Packets::FFXIVARR_PACK
 
       case SEGMENTTYPE_IPC: // game packet
       {
-        Logger::info( "GamePacket [{0}]", inPacket.segHdr.type );
+        uint32_t accountId = 0;
+        if( m_pSession )
+          accountId = m_pSession->getAccountID();
+        Logger::info( "[accountId#{0}] GamePacket {1}", accountId, inPacket.segHdr.type );
         handleGamePacket( inPacket );
         break;
       }

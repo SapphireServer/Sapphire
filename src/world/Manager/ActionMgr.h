@@ -1,7 +1,7 @@
-#ifndef SAPPHIRE_ACTIONMGR_H
-#define SAPPHIRE_ACTIONMGR_H
+#pragma once
 
 #include "ForwardsZone.h"
+#include <Exd/Structs.h>
 
 namespace Sapphire::Data
 {
@@ -20,23 +20,28 @@ namespace Sapphire::World::Manager
     ActionMgr() = default;
     ~ActionMgr() = default;
 
-    void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                     Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
-    void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                   Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
+    bool cacheActionLut();
 
-    void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
+    void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
+    void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+                                   std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
+
+    void handleItemAction( Entity::Player& player, uint32_t itemId,
+                           std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
 
-    void handleMountAction( Entity::Player& player, uint16_t mountId,
-                            Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
+    void handleEventItemAction( Entity::Player& player, uint32_t itemId,
+                                std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > itemActionData, uint32_t sequence, uint64_t targetId );
 
+    void handleMountAction( Entity::Player& player, uint16_t mountId,
+                            std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
+
+    bool actionHasCastTime( uint32_t actionId );
   private:
-    void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, Data::Action& actionData );
+    void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
 
     // item action handlers
     void handleItemActionVFX( Entity::Player& player, uint32_t itemId, uint16_t vfxId );
   };
 }
-
-#endif //SAPPHIRE_ACTIONMGR_H

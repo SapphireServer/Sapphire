@@ -2,6 +2,7 @@
 #include "DbWorker.h"
 #include <MySqlConnector.h>
 #include "Logging/Logger.h"
+#include <cassert>
 
 #include "PreparedStatement.h"
 

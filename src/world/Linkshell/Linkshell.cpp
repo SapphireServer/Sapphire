@@ -1,17 +1,17 @@
 #include "Linkshell.h"
 
-Sapphire::Linkshell::Linkshell( uint64_t id,
-                            const std::string& name,
-                            uint64_t masterId,
-                            const std::set< uint64_t >& members,
-                            const std::set< uint64_t >& leaders,
-                            const std::set< uint64_t >& invites ) :
+#include <utility>
+
+Sapphire::Linkshell::Linkshell( uint64_t id, std::string name, uint64_t chatChannelId,
+                                uint64_t masterId, std::set< uint64_t >  members, std::set< uint64_t >  leaders,
+                                std::set< uint64_t >  invites ) :
   m_linkshellId( id ),
-  m_name( name ),
+  m_name( std::move( name ) ),
+  m_chatChannelId( chatChannelId ),
   m_masterCharacterId( masterId ),
-  m_memberIds( members ),
-  m_leaderIds( leaders ),
-  m_inviteIds( invites )
+  m_memberIds( std::move( members ) ),
+  m_leaderIds( std::move( leaders ) ),
+  m_inviteIds( std::move( invites ) )
 {
 
 }
@@ -61,6 +61,11 @@ std::set< uint64_t >& Sapphire::Linkshell::getInviteIdList()
   return m_inviteIds;
 }
 
+uint64_t Sapphire::Linkshell::getChatChannel() const
+{
+  return m_chatChannelId;
+}
+
 void Sapphire::Linkshell::addMember( uint64_t memberId )
 {
   m_memberIds.insert( memberId );
@@ -69,6 +74,8 @@ void Sapphire::Linkshell::addMember( uint64_t memberId )
 void Sapphire::Linkshell::removeMember( uint64_t memberId )
 {
   m_memberIds.erase( memberId );
+  m_leaderIds.erase( memberId );
+  m_inviteIds.erase( memberId );
 }
 
 void Sapphire::Linkshell::addLeader( uint64_t memberId )
@@ -89,6 +96,16 @@ void Sapphire::Linkshell::addInvite( uint64_t memberId )
 void Sapphire::Linkshell::removeInvite( uint64_t memberId )
 {
   m_inviteIds.erase( memberId );
+}
+
+void Sapphire::Linkshell::setMasterId( uint64_t masterId )
+{
+  m_masterCharacterId = masterId;
+}
+
+void Sapphire::Linkshell::setName( std::string name )
+{
+  m_name = std::move( name );
 }
 
 

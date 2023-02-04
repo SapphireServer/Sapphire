@@ -1,8 +1,14 @@
 #include "ConfigMgr.h"
 #include <iostream>
-#include <filesystem>
+#include <fstream>
 
+#if _MSC_VER >= 1925
+#include <filesystem>
 namespace fs = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -23,7 +29,7 @@ bool ConfigMgr::loadConfig( const std::string& configName )
     return false;
   }
 
-  m_pInih = std::unique_ptr< INIReader >( new INIReader( configFile.string() ) );
+  m_pInih = std::make_unique< INIReader >( configFile.string() );
 
   if( m_pInih->ParseError() < 0 )
     return false;

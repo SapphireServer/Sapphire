@@ -1,10 +1,9 @@
-#ifndef _PLAYERMINIMAL_H
-#define _PLAYERMINIMAL_H
+#pragma once
 
 #include <map>
-#include <cstdint>
+#include <stdint.h>
 #include <string>
-#include <cstring>
+#include <string.h> // c string functions
 
 namespace Sapphire::Api
 {
@@ -20,7 +19,7 @@ namespace Sapphire::Api
     void write();
 
     // load player from db, by id
-    void load( uint32_t charId );
+    void load( uint64_t charId );
 
     void saveAsNew();
 
@@ -28,7 +27,6 @@ namespace Sapphire::Api
 
     uint8_t getClassLevel();
 
-    // return the id of the actor
     uint32_t getId() const
     {
       return m_id;
@@ -39,14 +37,14 @@ namespace Sapphire::Api
       m_id = id;
     }
 
-    void setContentId( uint64_t id )
+    void setCharacterId( uint64_t id )
     {
-      m_contentId = id;
+      m_characterId = id;
     }
 
-    uint64_t getContentId() const
+    uint64_t getCharacterId() const
     {
-      return m_contentId;
+      return m_characterId;
     }
 
 
@@ -161,6 +159,8 @@ namespace Sapphire::Api
 
     void createInvDbContainer( uint16_t slot ) const;
 
+    void createCurrencyDbContainer() const;
+
     uint32_t m_modelEquip[10];
 
     uint64_t getNextUId64() const;
@@ -168,7 +168,7 @@ namespace Sapphire::Api
   private:
     uint32_t m_accountId;
     uint32_t m_id;
-    uint64_t m_contentId;
+    uint64_t m_characterId;
 
     uint8_t m_guardianDeity;
     uint8_t m_birthMonth;
@@ -199,4 +199,3 @@ namespace Sapphire::Api
   };
 
 }
-#endif

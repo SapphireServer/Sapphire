@@ -23,7 +23,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   /// CHARA
   prepareStatement( CHARA_SEL,
-                    "SELECT ContentId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
+                    "SELECT EntityId, Name, Hp, Mp, Tp, Gp, Mode, Mount, InvincibleGM, Voice, "
                     "Customize, ModelMainWeapon, ModelSubWeapon, ModelSystemWeapon, "
                     "ModelEquip, EmoteModeType, FirstLoginTime, Language, IsNewGame, "
                     "IsNewAdventurer, TerritoryType, TerritoryId, PosX, PosY, PosZ, PosR, "
@@ -55,17 +55,17 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   prepareStatement( CHARA_SEL_MINIMAL,
                     "SELECT Name, Customize, ModelMainWeapon, ModelSubWeapon, ModelEquip, TerritoryType, GuardianDeity, "
-                    "Class, ContentId, BirthDay, BirthMonth, EquipDisplayFlags "
+                    "Class, EntityId, BirthDay, BirthMonth, EquipDisplayFlags "
                     "FROM charainfo WHERE CharacterId = ?;",
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_INS,
-                    "INSERT INTO charainfo (AccountId, CharacterId, ContentId, Name, Hp, Mp, "
+                    "INSERT INTO charainfo (AccountId, CharacterId, EntityId, Name, Hp, Mp, "
                     "Customize, Voice, IsNewGame, TerritoryType, PosX, PosY, PosZ, PosR, ModelEquip, "
                     "IsNewAdventurer, GuardianDeity, Birthday, BirthMonth, Class, Status, FirstClass, "
                     "HomePoint, StartTown, Discovery, HowTo, QuestCompleteFlags, Unlocks, QuestTracking, "
-                    "Aetheryte, GMRank, Mounts, Orchestrion, UPDATE_DATE ) "
-                    "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
+                    "Aetheryte, GMRank, Mounts, Orchestrion, ModelMainWeapon, UPDATE_DATE ) "
+                    "VALUES ( ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW() );",
                     CONNECTION_SYNC );
 
   prepareStatement( CHARA_UP_NAME, "UPDATE charainfo SET Name = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
@@ -176,6 +176,10 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "INSERT INTO charaiteminventory ( CharacterId, storageId, UPDATE_DATE ) VALUES ( ?, ?, NOW() );",
                     CONNECTION_BOTH );
 
+  prepareStatement( CHARA_CURRENCYINV_INS,
+                    "INSERT INTO charaitemcurrency ( CharacterId, storageId, idx, UPDATE_DATE ) VALUES ( ?, 2000, 2, NOW() );",
+                    CONNECTION_BOTH );
+
   /// ITEM GLOBAL
   prepareStatement( CHARA_ITEMGLOBAL_INS,
                     "INSERT INTO charaglobalitem ( CharacterId, ItemId, catalogId, stack, UPDATE_DATE ) VALUES ( ?, ?, ?, ?, NOW() );",
@@ -220,24 +224,54 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                                   "WHERE CharacterId = ?;",
                     CONNECTION_SYNC );
 
-  /// ZONE QUERIES
-  prepareStatement( ZONE_SEL_BNPCTEMPLATES,
-                    "SELECT Id, Name, bNPCBaseId, bNPCNameId, mainWeaponModel, "
-                           "secWeaponModel, aggressionMode, enemyType, pose, "
-                           "modelChara, displayFlags, Look, Models "
-                    "FROM bnpctemplate WHERE 1;",
-                    CONNECTION_BOTH );
+  /// CHARA FRIENDLIST
+  prepareStatement( CHARA_FRIENDLIST_INS,
+                    "INSERT INTO charainfofriendlist ( CharacterId, CharacterIdList, InviteDataList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
 
-  prepareStatement( ZONE_SEL_SPAWNGROUPS,
-                    "SELECT id, bNpcTemplateId, level, maxHp "
-                    "FROM spawngroup "
-                    "WHERE territoryTypeId = ?",
-                    CONNECTION_BOTH );
-  
-  prepareStatement( ZONE_SEL_SPAWNPOINTS,
-                    "SELECT id, x, y, z, r, gimmickId "
-                    "FROM spawnpoint "
-                    "WHERE spawnGroupId = ?",
+  prepareStatement( CHARA_FRIENDLIST_UP, "UPDATE charainfofriendlist "
+                                          " SET CharacterIdList = ?,"
+                                          " InviteDataList = ?"
+                                          " WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
+
+  prepareStatement( CHARA_FRIENDLIST_SEL, "SELECT CharacterIdList, InviteDataList FROM charainfofriendlist "
+                                           "WHERE CharacterId = ?;",
+                     CONNECTION_SYNC );
+
+  /// CHARA FRIENDLIST
+  prepareStatement( CHARA_BLACKLIST_INS,
+                    "INSERT INTO charainfoblacklist ( CharacterId, CharacterIdList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, NOW() );",
+                    CONNECTION_SYNC );
+
+  prepareStatement( CHARA_BLACKLIST_UP, "UPDATE charainfoblacklist "
+                                        " SET CharacterIdList = ?"
+                                        " WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
+
+  prepareStatement( CHARA_BLACKLIST_SEL, "SELECT CharacterIdList FROM charainfoblacklist "
+                                          " WHERE CharacterId = ?;",
+                     CONNECTION_SYNC );
+
+  /// CHARA LINKSHELL
+  prepareStatement( CHARA_LINKSHELL_INS,
+                    "INSERT INTO infolinkshell ( LinkshellId, MasterCharacterId, CharacterIdList, "
+                    "LinkshellName, LeaderIdList, InviteIdList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, ?, ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
+
+  /// ZONE QUERIES
+  prepareStatement( ZONE_SEL_BNPCS_BY_TERI,
+                    "SELECT bnpcgroup.territoryTypeId, bnpc.TerritoryName, bnpc.name, bnpc.instanceId, bnpc.x, bnpc.y, bnpc.z, bnpc.BaseId, bnpc.PopWeather, "
+                    "bnpc.PopTimeStart, bnpc.PopTimeEnd, bnpc.MoveAI, bnpc.WanderingRange, bnpc.Route, bnpc.EventGroup, bnpc.NameId, bnpc.DropItem, "
+                    "bnpc.SenseRangeRate, bnpc.Level, bnpc.ActiveType, bnpc.PopInterval, bnpc.PopRate, bnpc.PopEvent, bnpc.LinkGroup, bnpc.LinkFamily, bnpc.LinkRange,"
+                    "bnpc.LinkCountLimit, bnpc.NonpopInitZone, bnpc.InvalidRepop, bnpc.LinkParent, bnpc.LinkOverride, bnpc.LinkReply, bnpc.HorizontalPopRange, "
+                    "bnpc.VerticalPopRange, bnpc.BNpcBaseData, bnpc.RepopId, bnpc.BNPCRankId, bnpc.TerritoryRange, bnpc.BoundInstanceID, bnpc.FateLayoutLabelId,"
+                    "bnpc.NormalAI, bnpc.ServerPathId, bnpc.EquipmentID, bnpc.CustomizeID, bnpc.rotation, bnpc.Nonpop "
+                    "FROM battlenpc as bnpc LEFT JOIN battlenpcgroupmapping AS bnpcgroup "
+                    "ON bnpc.groupid = bnpcgroup.layergroupid where bnpcgroup.territorytypeid = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_UP,
@@ -255,6 +289,10 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
 
   prepareStatement( HOUSING_HOUSE_UP,
                     "UPDATE house SET BuildTime = ?, Aetheryte = ?, Comment = ?, HouseName = ?, Endorsements = ? WHERE HouseId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( HOUSING_HOUSE_DEL,
+                    "DELETE from house WHERE HouseId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( LAND_INV_SEL_ALL,
@@ -304,25 +342,43 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
-  /*prepareStatement( LAND_INS,
-                    "INSERT INTO land ( LandSetId ) VALUES ( ? );",
+  prepareStatement( LINKSHELL_SEL_ALL,
+                    "SELECT LinkshellId, MasterCharacterId, CharacterIdList, LinkshellName, LeaderIdList, InviteIdList "
+                    "FROM infolinkshell "
+                    "ORDER BY LinkshellId ASC;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( LINKSHELL_UP,
+                    "UPDATE infolinkshell SET CharacterIdList = ?, LinkshellName = ?, LeaderIdList = ?, InviteIdList = ?, MasterCharacterId = ? WHERE LinkshellId = ?;",
                     CONNECTION_BOTH );
 
-  prepareStatement( LAND_SEL,
-                    "SELECT LandSetId, Size, houseState, iconColor, iconAddIcon, fcId, fcIcon, fcIconColor, exteriorRoof, "
-                    "exteriorWall, exteriorWindow, exteriorDoor, otherFloorWall, otherFloorFlooring, basementWall, "
-                    "gardenSign, colorSlot_0, colorSlot_1, colorSlot_2, colorSlot_3, colorSlot_4, colorSlot_5, "
-                    "colorSlot_6, colorSlot_7, ownerPlayerId, nextDrop, dropCount, currentPrice "
-                    "FROM land WHERE LandSetId = ?;",
+  prepareStatement( LINKSHELL_DEL,
+                    "DELETE FROM infolinkshell WHERE LinkshellId = ?;",
                     CONNECTION_BOTH );
 
-  prepareStatement( LAND_UP,
-                    "UPDATE land SET Size = ?, houseState = ?, iconColor = ?, iconAddIcon = ?, fcId = ?, "
-                    "fcIcon = ?, fcIconColor = ?, exteriorRoof = ?, exteriorWall = ?, exteriorWindow = ?, "
-                    "exteriorDoor = ?, otherFloorWall = ?, otherFloorFlooring = ?, basementWall = ?, gardenSign = ?, "
-                    "colorSlot_0 = ?, colorSlot_1 = ?, colorSlot_2 = ?, colorSlot_3 = ?, colorSlot_4 = ?, "
-                    "colorSlot_5 = ?, colorSlot_6 = ?, colorSlot_7 = ?, ownerPlayerId = ?, nextDrop = ?, "
-                    "dropCount = ?, currentPrice = ?"
-                    " WHERE LandSetId = ?;",
-                    CONNECTION_BOTH );*/
+  prepareStatement( FC_SEL_ALL,
+                    "SELECT FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint, CrestId, CreateDate, GrandCompanyID, "
+                            "ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList "
+                    "FROM freecompany "
+                    "ORDER BY FreeCompanyId ASC;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( FC_INS,
+                    "INSERT INTO freecompany ( FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint,"
+                                "ReputationList, CrestId, CreateDate, GrandCompanyID, FcStatus, FcBoard, FcMotto ) VALUES ( ?, ?, ?, ?, ?, ?, ?,"
+                                "?, ?, ?, ?, ?, ?, ?, ? );",
+                    CONNECTION_BOTH );
+
+  prepareStatement( FC_UP,
+                    "UPDATE freecompany SET MasterCharacterId = ?, FcName = ?, FcTag = ?, FcCredit = ?, FcCreditAccumu = ?,"
+                            "FcRank = ?, FcPoint = ?, ReputationList = ?, CrestId = ?,"
+                            "CreateDate = ?, GrandCompanyID = ?, FcStatus = ?, FcBoard = ?, "
+                            "FcMotto = ?, ActiveActionList = ?, ActiveActionLeftTimeList = ?, StockActionList = ? "
+                            "WHERE FreeCompanyId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( FC_DEL,
+                    "DELETE FROM freecompany WHERE FreeCompanyId = ?;",
+                    CONNECTION_BOTH );
+
 }

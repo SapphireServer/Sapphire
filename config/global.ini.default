@@ -11,7 +11,7 @@ AsyncThreads = 2
 ServerSecret = default
 DataPath = C:\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack
 WorldID = 67
-DefaultGMRank = 255
+DefaultGMRank = 90
 LogLevel = 1
 LogFilter = 0
 

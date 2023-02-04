@@ -4,24 +4,28 @@ cmake_policy( SET CMP0015 NEW )
 project( world )
 
 file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        *.c*
-        Actor/*.c*
-        Action/*.c*
-        DebugCommand/*.c*
-        Event/*.c*
-        Inventory/*.c*
-        Linkshell/*.c*
-        Manager/*.c*
-        Math/*.c*
-        Network/*.c*
-        Network/Handlers/*.c*
-        Network/PacketWrappers/*.c*
-        Script/*.c*
-        StatusEffect/*.c*
-        Territory/*.c*
-        Territory/Housing/*.c*
-        Util/*.c*
-        Navi/*.c*)
+        *.cpp
+        Actor/*.cpp
+        Action/*.cpp
+        ContentFinder/*.cpp
+        DebugCommand/*.cpp
+        Event/*.cpp
+        FreeCompany/*.cpp
+        Inventory/*.cpp
+        Linkshell/*.cpp
+        Manager/*.cpp
+        Math/*.cpp
+        Network/*.cpp
+        Network/Handlers/*.cpp
+        Network/PacketWrappers/*.cpp
+        Script/*.cpp
+        StatusEffect/*.cpp
+        Territory/*.cpp
+        Territory/Housing/*.cpp
+        Util/*.cpp
+        Navi/*.cpp
+        Task/*.cpp
+        Quest/*.cpp )
 
 add_executable( world ${SERVER_SOURCE_FILES} )
 
@@ -41,6 +45,3 @@ target_include_directories( world
                                     Detour )
 
 
-if( UNIX )
-    cotire( world )
-endif()

@@ -1,5 +1,7 @@
 #include <cmath>
 #include "UtilMath.h"
+#include "Common.h"
+#include <cmath>
 
 using namespace Sapphire::Common;
 
@@ -65,15 +67,79 @@ float Util::calcAngFrom( float x, float y, float x1, float y1 )
 
 uint16_t Util::floatToUInt16( float val )
 {
-  return static_cast< uint16_t >( 0x8000 + val * 32.767f );
+  return static_cast< uint16_t >( ( ( val + 1000.0f ) * 100.0f ) * 0.32767501f );
 }
 
 uint16_t Util::floatToUInt16Rot( float val )
 {
-  return static_cast< uint16_t >( 0x8000 * ( ( val + PI ) ) / PI );
+  return static_cast< uint16_t >( ( ( ( val + 3.1415927f ) * 100.f ) * 103.30219106f ) );
 }
 
 uint8_t Util::floatToUInt8Rot( float val )
 {
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
+}
+
+FFXIVARR_POSITION3 Util::transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix )
+{
+  FFXIVARR_POSITION3 dst{};
+
+  dst.x = vector.z * matrix.m[ 2 ][ 0 ] + vector.x * matrix.m[ 0 ][ 0 ] + vector.y * matrix.m[ 1 ][ 0 ];
+  dst.y = vector.z * matrix.m[ 2 ][ 1 ] + vector.x * matrix.m[ 0 ][ 1 ] + vector.y * matrix.m[ 1 ][ 1 ];
+  dst.z = vector.z * matrix.m[ 2 ][ 2 ] + vector.x * matrix.m[ 0 ][ 2 ] + vector.y * matrix.m[ 1 ][ 2 ];
+
+
+  return dst;
+}
+
+float Util::eulerToDirection( const FFXIVARR_POSITION3 &euler )
+{
+  Matrix33 matrix;
+
+  auto sinZ = sinf( euler.z );
+  auto cosZ = cosf( euler.z );
+  auto sinY = sinf( euler.y );
+  auto cosY = cosf( euler.y );
+  auto sinX = sinf( euler.x );
+  auto cosX = cosf( euler.x );
+
+  matrix.m[0][0] = cosZ * cosY;
+  matrix.m[0][1] = sinZ * cosX;
+  matrix.m[0][2] = sinZ * sinX + ( -cosZ * sinY ) * cosX;
+
+  matrix.m[1][0] = -sinZ * cosY;
+  matrix.m[1][1] = cosZ * cosX + ( -sinZ * sinY * sinX );
+  matrix.m[1][2] = cosZ * sinX + sinZ * sinY * cosX;
+
+  matrix.m[2][0] = sinY;
+  matrix.m[2][1] = -cosY * sinX;
+  matrix.m[2][2] = cosY * cosX;
+
+  FFXIVARR_POSITION3 AXIS_Z{ 0.0f, 0.0f, 1.0f };
+  auto result = transform( AXIS_Z, matrix );
+
+  auto squared = result.z * result.z + result.x * result.x;
+  auto v1{0.0f};
+  auto v2{0.0f};
+
+  if( squared > 0.00000011920929f )
+  {
+    auto ret = sqrtf( squared );
+    ret = -( ( squared * ret ) * ret - 1.0f ) * ( 0.5f * ret ) + ret;
+    ret = -( ( squared * ret ) * ret - 1.0f ) * ( 0.5f * ret ) + ret;
+    v1 = result.z * ( -( ( ( squared * ret ) * ret ) - 1.0f ) * ( 0.5f * ret ) + ret );
+    v2 = result.x * ( -( ( ( squared * ret ) * ret ) - 1.0f ) * ( 0.5f * ret ) + ret );
+  }
+
+  return atan2f( v2, v1 );
+}
+
+float Util::trunc( float value, uint8_t digitsToRemain )
+{
+  if( digitsToRemain == 0 )
+    return std::floor( value );
+
+  auto factor = static_cast< float >( std::pow( 10.f, digitsToRemain ) );
+
+  return std::floor( value * factor ) / factor;
 }

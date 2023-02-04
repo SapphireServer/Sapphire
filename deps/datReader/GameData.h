@@ -1,8 +1,10 @@
-#ifndef XIV_DAT_GAMEDATA_H
-#define XIV_DAT_GAMEDATA_H
+#pragma once
 
-#include <memory>
 #include <unordered_map>
+#include <string>
+#include <memory>
+#include <vector>
+#include <stdint.h>
 #include <mutex>
 
 #include <filesystem>
@@ -20,7 +22,7 @@ namespace xiv::dat
   {
   public:
     // This should be the path in which the .index/.datX files are located
-    GameData( const std::filesystem::path& path );
+    GameData( std::filesystem::path path );
 
     ~GameData();
 
@@ -89,4 +91,3 @@ namespace xiv::dat
 
 }
 
-#endif // XIV_DAT_GAMEDATA_H

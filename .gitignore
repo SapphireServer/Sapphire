@@ -27,6 +27,8 @@ src/tools/bin/generated/*
 build/
 build-*/
 cmake-build-*/
+bin/
+out/
 
 # Prerequisites
 *.d
@@ -99,7 +101,6 @@ CTestTestfile.cmake
 *.cache
 *.dat
 *.suo
-*.pch
 *.ipch
 *.g.cs
 *.g.i.cs
@@ -112,7 +113,6 @@ CTestTestfile.cmake
 *.ilk
 /Sapphire.VC.VC.opendb
 *.user
-*.dat
 *.metagen
 *.ipdb
 *.iobj
@@ -129,7 +129,7 @@ src/common/Version\.cpp
 .mtime_cache
 
 # generated script loader files
-**/ScriptLoader.cpp
+src/scripts/*/ScriptLoader.cpp
 
 # cotire generated files/folders
 cotire/
@@ -145,3 +145,4 @@ doxygen/*.tmp
 # ignore config directory contents except the default file
 config/*.ini
 !config/config.ini.default
+/CMakeSettings.json

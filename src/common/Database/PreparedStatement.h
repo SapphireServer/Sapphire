@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_PREPAREDSTATEMENT_H
-#define SAPPHIRE_PREPAREDSTATEMENT_H
+#pragma once
 
 #include <stdint.h>
 #include <vector>
@@ -51,6 +50,9 @@ namespace Sapphire::Db
 
     ~PreparedStatement();
 
+    template< typename T >
+    void set( uint8_t index, T value );
+
     void setBool( uint8_t index, bool value );
 
     void setUInt( uint8_t index, uint32_t value );
@@ -85,6 +87,3 @@ namespace Sapphire::Db
     PreparedStatement& operator=( PreparedStatement const& right ) = delete;
   };
 }
-
-
-#endif //SAPPHIRE_PREPAREDSTATEMENT_H

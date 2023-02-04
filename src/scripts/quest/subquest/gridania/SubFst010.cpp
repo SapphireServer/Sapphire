@@ -1,9 +1,12 @@
+// This is an automatically generated C++ script template
+// Content needs to be added by hand to make it function
+// In order for this script to be loaded, move it to the correct folder in <root>/scripts/
+
 #include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
-
-using namespace Sapphire;
 
 // Quest Script: SubFst010_00001
 // Quest Name: A Good Adventurer Is Hard to Find
@@ -11,58 +14,84 @@ using namespace Sapphire;
 // Start NPC: 1000146
 // End NPC: 1000195
 
-class SubFst010 :
-  public Sapphire::ScriptAPI::EventScript
+using namespace Sapphire;
+
+class SubFst010 : public Sapphire::ScriptAPI::QuestScript
 {
-private:
-  static constexpr auto SEQ_0 = 0;
-  static constexpr auto SEQ_FINISH = 255;
-  static constexpr auto ACTOR0 = 1000146;
-  static constexpr auto ACTOR1 = 1000195;
-  static constexpr auto SEQ_0_ACTOR0 = 0;
-  static constexpr auto SEQ_1_ACTOR1 = 1;
+  private:
+    // Basic quest information 
+    // Quest vars / flags used
+    // UI8AL
 
-  void Scene00000( Entity::Player& player )
-  {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1000195
+    // Steps in this quest ( 0 is before accepting, 
+    // 1 is first, 255 means ready for turning it in
+    enum Sequence : uint8_t
     {
-      if( result.param2 == 1 ) // accept quest
-        player.updateQuest( getId(), SEQ_FINISH );
+      Seq0 = 0,
+      SeqFinish = 255,
     };
 
-    player.playScene( getId(), 0, NONE, callback );
-  }
+    // Entities found in the script data of the quest
+    static constexpr auto Actor0 = 1000146;
+    static constexpr auto Actor1 = 1000195;
+    static constexpr auto Seq0Actor0 = 0;
+    static constexpr auto Seq1Actor1 = 1;
 
-  void Scene00001( Entity::Player& player )
+  public:
+    SubFst010() : Sapphire::ScriptAPI::QuestScript( 65537 ){}; 
+    ~SubFst010() = default; 
+
+  //////////////////////////////////////////////////////////////////////
+  // Event Handlers
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    auto callback = [ & ]( Entity::Player& player, const Event::SceneResult& result )
+    if (actorId == Actor0)
     {
-      if( result.param2 == 1 ) // finish quest
-      {
-        if( player.giveQuestRewards( getId(), 0 ) )
-          player.finishQuest( getId() );
-      }
-    };
-
-    player.playScene( getId(), 1, NONE, callback );
+      Scene00000(quest, player);
+    }
+    else if (actorId == Actor1)
+    {
+      Scene00001(quest, player);
+    }
   }
 
-public:
-  SubFst010() :
-    Sapphire::ScriptAPI::EventScript( 65537 )
+
+  private:
+  //////////////////////////////////////////////////////////////////////
+  // Available Scenes in this quest, not necessarly all are used
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00000( World::Quest& quest, Entity::Player& player )
   {
+    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubFst010::Scene00000Return ) );
   }
 
-  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-
-    if( actor == ACTOR0 )
-      Scene00000( player );
-    else if( actor == ACTOR1 )
-      Scene00001( player );
+    if( result.getResult( 0 ) == 1 ) // accept quest
+    {
+      quest.setSeq( SeqFinish );
+    }
   }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00001( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubFst010::Scene00001Return ) );
+  }
+
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+    if( result.getResult( 0 ) == 1 )
+    {
+      player.finishQuest( getId(), result.getResult( 1 ) );
+    }
+
+  }
+
 };
 
 EXPOSE_SCRIPT( SubFst010 );

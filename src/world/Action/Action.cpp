@@ -2,8 +2,9 @@
 
 #include <Inventory/Item.h>
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Util/Util.h>
+#include <Util/UtilMath.h>
 #include "Script/ScriptMgr.h"
 
 #include <Math/CalcStats.h>
@@ -13,6 +14,10 @@
 
 #include "Territory/Territory.h"
 
+#include "Manager/PlayerMgr.h"
+
+#include "Session.h"
+#include "Network/GameConnection.h"
 #include <Network/CommonActorControl.h>
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
@@ -21,14 +26,15 @@
 #include <Logging/Logger.h>
 
 #include <Util/ActorFilter.h>
-#include <Util/UtilMath.h>
 #include <Service.h>
+#include "WorldServer.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World;
 
@@ -36,20 +42,21 @@ using namespace Sapphire::World;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence) :
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence ) :
   Action( std::move( caster ), actionId, sequence, nullptr )
 {
 }
 
 Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
-                        Data::ActionPtr actionData ) :
+                        std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData ) :
   m_pSource( std::move( caster ) ),
   m_actionData( std::move( actionData ) ),
   m_id( actionId ),
   m_targetId( 0 ),
   m_startTime( 0 ),
   m_interruptType( Common::ActionInterruptType::None ),
-  m_sequence( sequence )
+  m_sequence( sequence ),
+  m_actionKind( Common::SkillType::Normal )
 {
 }
 
@@ -63,49 +70,52 @@ bool Action::Action::init()
   if( !m_actionData )
   {
     // need to get actionData
-    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto& exdData = Common::Service< Data::ExdData >::ref();
 
-    auto actionData = exdData.get< Data::Action >( m_id );
-    assert( actionData );
+    auto actionData = exdData.getRow< Excel::Action >( m_id );
+    if( !actionData )
+      throw std::runtime_error( "No actiondata found!" );
 
     m_actionData = actionData;
   }
 
   m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_sequence );
 
-  m_castTimeMs = static_cast< uint32_t >( m_actionData->cast100ms * 100 );
-  m_recastTimeMs = static_cast< uint32_t >( m_actionData->recast100ms * 100 );
-  m_cooldownGroup = m_actionData->cooldownGroup;
-  m_range = m_actionData->range;
-  m_effectRange = m_actionData->effectRange;
-  m_castType = static_cast< Common::CastType >( m_actionData->castType );
-  m_aspect = static_cast< Common::ActionAspect >( m_actionData->aspect );
+  m_castTimeMs = static_cast< uint32_t >( m_actionData->data().CastTime * 100 );
+  m_recastTimeMs = static_cast< uint32_t >( m_actionData->data().RecastTime * 100 );
+  m_cooldownGroup = m_actionData->data().RecastGroup;
+  m_range = m_actionData->data().SelectRange;
+  m_effectRange = m_actionData->data().EffectRange;
+  m_category = static_cast< Common::ActionCategory >( m_actionData->data().Category );
+  m_castType = static_cast< Common::CastType >( m_actionData->data().EffectType );
+  m_aspect = static_cast< Common::ActionAspect >( m_actionData->data().AttackType );
 
   // todo: move this to bitset
-  m_canTargetSelf = m_actionData->canTargetSelf;
-  m_canTargetParty = m_actionData->canTargetParty;
-  m_canTargetFriendly = m_actionData->canTargetFriendly;
-  m_canTargetHostile = m_actionData->canTargetHostile;
+  m_canTargetSelf = m_actionData->data().SelectMyself;
+  m_canTargetParty = m_actionData->data().SelectParty;
+  m_canTargetFriendly = m_actionData->data().SelectAlliance;
+  m_canTargetHostile = m_actionData->data().SelectEnemy;
   // todo: this one doesn't look right based on whats in that col, probably has shifted
-  m_canTargetDead = m_actionData->canTargetDead;
+  m_canTargetDead = m_actionData->data().SelectCorpse;
 
   // a default range is set by the game for the class/job
   if( m_range == -1 )
   {
-    switch( static_cast< Common::ClassJob >( m_actionData->classJob ) )
+    switch( static_cast< Common::ClassJob >( m_actionData->data().UseClassJob ) )
     {
       case Common::ClassJob::Bard:
       case Common::ClassJob::Archer:
         m_range = 25;
-
+        break;
         // anything that isnt ranged
       default:
         m_range = 3;
+        break;
     }
   }
 
-  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->primaryCostType );
-  m_primaryCost = m_actionData->primaryCostValue;
+  m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->data().CostType );
+  m_primaryCost = m_actionData->data().CostValue;
 
   /*if( !m_actionData->targetArea )
   {
@@ -129,7 +139,14 @@ bool Action::Action::init()
   }
   else
   {
-    std::memset( &m_lutEntry, 0, sizeof( ActionEntry ) );
+    m_lutEntry.curePotency = 0;
+    m_lutEntry.restoreMPPercentage = 0;
+    m_lutEntry.potency = 0;
+    m_lutEntry.comboPotency = 0;
+    m_lutEntry.flankPotency = 0;
+    m_lutEntry.rearPotency = 0;
+    m_lutEntry.frontPotency = 0;
+    m_lutEntry.nextCombo.clear();
   }
 
   addDefaultActorFilters();
@@ -137,12 +154,12 @@ bool Action::Action::init()
   return true;
 }
 
-void Action::Action::setPos( Sapphire::Common::FFXIVARR_POSITION3 pos )
+void Action::Action::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos )
 {
   m_pos = pos;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3 Action::Action::getPos() const
+const Sapphire::Common::FFXIVARR_POSITION3& Action::Action::getPos() const
 {
   return m_pos;
 }
@@ -192,6 +209,16 @@ bool Action::Action::hasCastTime() const
   return m_castTimeMs > 0;
 }
 
+bool Action::Action::isAbility() const
+{
+  return m_category == ActionCategory::Ability;
+}
+
+bool Action::Action::isWeaponskill() const
+{
+  return m_category == ActionCategory::Weaponskill;
+}
+
 Sapphire::Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
@@ -215,8 +242,27 @@ bool Action::Action::update()
   }
 
   uint64_t tickCount = Common::Util::getTimeMs();
+  uint32_t castTime = m_castTimeMs;
 
-  if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > m_castTimeMs )
+  if( auto player = m_pSource->getAsPlayer() )
+  {
+    uint64_t lastActionTick = player->getLastActionTick();
+    uint32_t lastTickMs = 0;
+    if( lastActionTick > 0 )
+    {
+      lastTickMs = static_cast< uint32_t >( std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( lastActionTick ) ) );
+      if( lastTickMs > 100 ) //max 100ms
+        lastTickMs = 100;
+    }
+
+    player->setLastActionTick( tickCount );
+    uint32_t delayMs = 100 - lastTickMs;
+    castTime = ( m_castTimeMs + delayMs );
+    m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) -
+                       static_cast< uint64_t >( std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) );
+  }
+
+  if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > castTime )
   {
     execute();
     return true;
@@ -225,7 +271,7 @@ bool Action::Action::update()
   if( m_pTarget == nullptr && m_targetId != 0 )
   {
     // try to search for the target actor
-    for( auto actor : m_pSource->getInRangeActors( true ) )
+    for( const auto& actor : m_pSource->getInRangeActors( true ) )
     {
       if( actor->getId() == m_targetId )
       {
@@ -235,15 +281,12 @@ bool Action::Action::update()
     }
   }
 
-  if( m_pTarget != nullptr )
+  if( m_pTarget != nullptr && !m_pTarget->isAlive() )
   {
-    if( !m_pTarget->isAlive() )
-    {
-      // interrupt the cast if target died
-      setInterrupted( Common::ActionInterruptType::RegularInterrupt );
-      interrupt();
-      return true;
-    }
+    // interrupt the cast if target died
+    setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+    interrupt();
+    return true;
   }
 
   return false;
@@ -252,28 +295,26 @@ bool Action::Action::update()
 void Action::Action::start()
 {
   assert( m_pSource );
-
+  auto& server = Common::Service< World::WorldServer >::ref();
   m_startTime = Common::Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
 
   if( hasCastTime() )
   {
-    auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( getId() );
+    auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( m_pSource->getId() );
     auto& data = castPacket->data();
 
-    data.action_id = static_cast< uint16_t >( m_id );
-    data.skillType = Common::SkillType::Normal;
-    data.unknown_1 = m_id;
-    // This is used for the cast bar above the target bar of the caster.
-    data.cast_time = m_castTimeMs / 1000.f;
-    data.target_id = static_cast< uint32_t >( m_targetId );
+    data.Action = static_cast< uint16_t >( m_id );
+    data.ActionKey = m_id;
+    data.ActionKind = m_actionKind;
+    data.CastTime = static_cast< float >( m_castTimeMs ) / 1000.f;
+    data.Target = static_cast< uint32_t >( m_targetId );
 
-    auto pos = m_pSource->getPos();
-    data.posX = Common::Util::floatToUInt16( pos.x );
-    data.posY = Common::Util::floatToUInt16( pos.y );
-    data.posZ = Common::Util::floatToUInt16( pos.z );
-    data.rotation = Common::Util::floatToUInt16Rot( m_pSource->getRot() );
+    data.TargetPos[ 0 ] = Common::Util::floatToUInt16( m_pSource->getPos().x );
+    data.TargetPos[ 1 ] = Common::Util::floatToUInt16( m_pSource->getPos().y );
+    data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pSource->getPos().z );
+    data.Dir = m_pSource->getRot();
 
     m_pSource->sendToInRangeSet( castPacket, true );
 
@@ -282,13 +323,26 @@ void Action::Action::start()
       player->setStateFlag( PlayerStateFlag::Casting );
     }
   }
-
+  
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
-  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(),
+  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, m_cooldownGroup, getId(),
                                               m_recastTimeMs / 10 );
-  player->queuePacket( actionStartPkt );
 
+  player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
+
+  server.queueForPlayer( player->getCharacterId(), actionStartPkt );
+
+  onStart();
+
+  // instantly finish cast if there's no cast time
+  if( !hasCastTime() )
+    execute();
+}
+
+void Action::Action::onStart()
+{
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto player = m_pSource->getAsPlayer();
 
   // check the lut too and see if we have something usable, otherwise cancel the cast
   if( !scriptMgr.onStart( *this ) && !ActionLut::validEntryExists( static_cast< uint16_t >( getId() ) ) )
@@ -298,16 +352,13 @@ void Action::Action::start()
 
     if( player )
     {
-      player->sendUrgent( "Action not implemented, missing script/lut entry for action#{0}", getId() );
+      Manager::PlayerMgr::sendUrgent( *player, "Action not implemented, missing script/lut entry for action#{0}", getId() );
       player->setCurrentAction( nullptr );
     }
 
     return;
   }
 
-  // instantly finish cast if there's no cast time
-  if( !hasCastTime() )
-    execute();
 }
 
 void Action::Action::interrupt()
@@ -323,6 +374,7 @@ void Action::Action::interrupt()
 
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
+    player->setLastActionTick( 0 );
     player->unsetStateFlag( PlayerStateFlag::Casting );
   }
 
@@ -340,6 +392,12 @@ void Action::Action::interrupt()
     m_pSource->sendToInRangeSet( control, true );
   }
 
+  onInterrupt();
+
+}
+
+void Action::Action::onInterrupt()
+{
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInterrupt( *this );
 }
@@ -349,11 +407,13 @@ void Action::Action::execute()
   assert( m_pSource );
 
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
+
   if( !consumeResources() )
   {
     interrupt();
     return;
   }
+
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
@@ -366,6 +426,7 @@ void Action::Action::execute()
 
     if( auto player = m_pSource->getAsPlayer() )
     {
+      player->setLastActionTick( 0 );
       player->unsetStateFlag( PlayerStateFlag::Casting );
     }
   }
@@ -373,8 +434,7 @@ void Action::Action::execute()
   if( isCorrectCombo() )
   {
     auto player = m_pSource->getAsPlayer();
-
-    player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
+    Manager::PlayerMgr::sendDebug( *player, "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
   if( !hasClientsideTarget()  )
@@ -388,7 +448,7 @@ void Action::Action::execute()
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
-  if( !m_actionData->preservesCombo )
+  if( isWeaponskill() && !m_actionData->data().ComboContinue )
   {
     // potential combo starter or correct combo from last action, must hit something to progress combo
     if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
@@ -460,7 +520,7 @@ void Action::Action::buildEffects()
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
-      player->sendUrgent( "missing lut entry for action#{}", getId() );
+      Manager::PlayerMgr::sendUrgent( *player, "missing lut entry for action#{}", getId() );
     }
 
     return;
@@ -469,16 +529,16 @@ void Action::Action::buildEffects()
   if( !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets(); 
+    m_effectBuilder->buildAndSendPackets( m_hitActors );
     return;
   }
 
   // no script exists but we have a valid lut entry
   if( auto player = getSourceChara()->getAsPlayer() )
   {
-    player->sendDebug( "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
-                       m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
-                       m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
+    Manager::PlayerMgr::sendDebug( *player, "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
+                                   m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
+                                   m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
   }
 
   // when aoe, these effects are in the target whatever is hit first
@@ -490,14 +550,14 @@ void Action::Action::buildEffects()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_effectBuilder->damage( actor, actor, dmg.first, dmg.second );
+      m_effectBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
-        m_effectBuilder->comboSucceed( actor );
+        m_effectBuilder->comboSucceed( m_pSource );
         shouldApplyComboSucceedEffect = false;
       }
 
@@ -515,9 +575,9 @@ void Action::Action::buildEffects()
           shouldRestoreMP = false;
         }
 
-        if ( !m_actionData->preservesCombo ) // we need something like m_actionData->hasNextComboAction
+        if( !m_lutEntry.nextCombo.empty() ) // if we have a combo action followup
         {
-          m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
+          m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
         }
       }
     }
@@ -539,10 +599,11 @@ void Action::Action::buildEffects()
     }
   }
 
-  m_effectBuilder->buildAndSendPackets();
+  m_effectBuilder->buildAndSendPackets( m_hitActors );
 
+  // TODO: disabled, reset kills our queued actions
   // at this point we're done with it and no longer need it
-  m_effectBuilder.reset();
+  // m_effectBuilder.reset();
 }
 
 bool Action::Action::preCheck()
@@ -563,29 +624,29 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
     return false;
 
   // npc actions/non player actions
-  if( m_actionData->classJob == -1 && !m_actionData->isRoleAction )
-    return false;
+  //if( m_actionData->data().UseClassJob == -1 /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
+  //  return false;
 
-  if( player.getLevel() < m_actionData->classJobLevel )
+  if( player.getLevel() < m_actionData->data().UseClassJob )
     return false;
 
   auto currentClass = player.getClass();
-  auto actionClass = static_cast< Common::ClassJob >( m_actionData->classJob );
+  auto actionClass = static_cast< Common::ClassJob >( m_actionData->data().UseClassJob );
 
-  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass && !m_actionData->isRoleAction )
+  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
   {
     // check if not a base class action
-    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto& exdData = Common::Service< Data::ExdData >::ref();
 
-    auto classJob = exdData.get< Data::ClassJob >( static_cast< uint8_t >( currentClass ) );
+    auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( currentClass ) );
     if( !classJob )
       return false;
 
-    if( classJob->classJobParent != m_actionData->classJob )
+    if( classJob->data().MainClass != m_actionData->data().UseClassJob )
       return false;
   }
 
-  if( !m_actionData->canTargetSelf && getTargetId() == m_pSource->getId() )
+  if( !m_actionData->data().SelectMyself && getTargetId() == m_pSource->getId() )
     return false;
 
   // todo: does this need to check for party/alliance stuff or it's just same type?
@@ -617,6 +678,7 @@ void Action::Action::setAdditionalData( uint32_t data )
   m_additionalData = data;
 }
 
+// TODO: write something that can traverse comboparent in action parse
 bool Action::Action::isCorrectCombo() const
 {
   auto lastActionId = m_pSource->getLastComboActionId();
@@ -626,12 +688,12 @@ bool Action::Action::isCorrectCombo() const
     return false;
   }
 
-  return m_actionData->actionCombo == lastActionId;
+  return m_actionData->data().ComboParent == lastActionId;
 }
 
 bool Action::Action::isComboAction() const
 {
-  return m_actionData->actionCombo != 0;
+  return m_actionData->data().ComboParent != 0;
 }
 
 bool Action::Action::primaryCostCheck( bool subtractCosts )
@@ -639,6 +701,8 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
   switch( m_primaryCostType )
   {
     case Common::ActionPrimaryCostType::TacticsPoints:
+    case Common::ActionPrimaryCostType::TacticsPoints1:
+    case Common::ActionPrimaryCostType::Sprint:
     {
       auto curTp = m_pSource->getTp();
 
@@ -655,7 +719,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     {
       auto curMp = m_pSource->getMp();
 
-      auto cost = m_primaryCost * 100;
+      auto cost = Math::CalcStats::calculateMpCost( *m_pSource, m_primaryCost );
 
       if( curMp < static_cast< uint32_t >( cost ) )
         return false;
@@ -673,6 +737,7 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
     }
 
     default:
+      Logger::debug( "Unknown action cost type: {}", static_cast< uint16_t >( m_primaryCostType ) );
       return false;
   }
 }
@@ -713,10 +778,10 @@ bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& ac
 
   if( auto player = m_pSource->getAsPlayer() )
   {
-    player->sendDebug( "Hit {} actors with {} filters", actors.size(), m_actorFilters.size() );
+    Manager::PlayerMgr::sendDebug( *player, "Hit {} actors with {} filters", actors.size(), m_actorFilters.size() );
     for( const auto& actor : actors )
     {
-      player->sendDebug( "hit actor#{}", actor->getId() );
+      Manager::PlayerMgr::sendDebug( *player, "hit actor#{}", actor->getId() );
     }
   }
 
@@ -766,7 +831,7 @@ void Action::Action::addDefaultActorFilters()
   }
 }
 
-bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
+bool Action::Action::preFilterActor( Sapphire::Entity::GameObject& actor ) const
 {
   auto kind = actor.getObjKind();
   auto chara = actor.getAsChara();
@@ -814,4 +879,24 @@ bool Action::Action::hasValidLutEntry() const
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
 {
   return m_effectBuilder;
+}
+
+uint8_t Action::Action::getActionKind() const
+{
+  return m_actionKind;
+}
+
+void Action::Action::setActionKind( uint8_t actionKind )
+{
+  m_actionKind = actionKind;
+}
+
+void Action::Action::setAggroMultiplier( float aggroMultiplier )
+{
+  m_aggroMultiplier = aggroMultiplier;
+}
+
+uint64_t Action::Action::getCastTimeRest() const
+{
+  return m_castTimeRestMs;
 }

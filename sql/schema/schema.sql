@@ -9,36 +9,6 @@ CREATE TABLE `accounts` (
    UNIQUE KEY `accountname` (`account_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `bnpctemplate` (
-  `Id` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(32) NOT NULL,
-  `bNPCBaseId` int(10) DEFAULT NULL,
-  `bNPCNameId` int(10) NOT NULL,
-  `mainWeaponModel` bigint(20) DEFAULT NULL,
-  `secWeaponModel` bigint(20) DEFAULT NULL,
-  `aggressionMode` int(3) DEFAULT NULL,
-  `enemyType` int(3) DEFAULT NULL,
-  `pose` int(3) DEFAULT NULL,
-  `modelChara` int(5) DEFAULT NULL,
-  `displayFlags` int(10) DEFAULT NULL,
-  `Look` binary(26) DEFAULT NULL,
-  `Models` binary(40) DEFAULT NULL,
-   PRIMARY KEY (`Id`),
-   KEY `templatename` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `spawnpoint` (
-  `id` int(11) NOT NULL  AUTO_INCREMENT,
-  `spawnGroupId` int(11) NOT NULL,
-  `x` float NOT NULL,
-  `y` float NOT NULL,
-  `z` float NOT NULL,
-  `r` float NOT NULL,
-  `gimmickId` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `spawngroupidx` (`spawnGroupId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 CREATE TABLE `charainfo` (
   `AccountId` int(11) NOT NULL,
   `CharacterId` int(20) NOT NULL,
@@ -540,32 +510,12 @@ CREATE TABLE `houseiteminventory` (
 	INDEX `landIdent` (`LandIdent`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE `spawngroup` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `territoryTypeId` int(5) NOT NULL,
-  `bNpcTemplateId` int(10) NOT NULL,
-  `level` int(3) NOT NULL,
-  `maxHp` int(10) NOT NULL,
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 CREATE TABLE `uniqueiddata` (
   `NextId` int(20) NOT NULL AUTO_INCREMENT,
   `IdName` varchar(16) DEFAULT 'NOT SET',
   `UPDATE_DATE` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(`NextId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `zonepositions` (
-  `id` int(11) NOT NULL,
-  `target_zone_id` int(11) NOT NULL,
-  `pos_x` float NOT NULL,
-  `pos_y` float NOT NULL,
-  `pos_z` float NOT NULL,
-  `pos_o` float NOT NULL,
-  `radius` int(11) NOT NULL DEFAULT '2',
-  PRIMARY KEY(`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 CREATE TABLE `landplaceditems` (
 	`ItemId` INT(20) UNSIGNED NOT NULL,

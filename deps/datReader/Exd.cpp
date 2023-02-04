@@ -60,7 +60,7 @@ namespace xiv::exd
 
 
     // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
+    const uint32_t member_count = static_cast< uint32_t >( _exh->get_members().size() );
     for( auto& file_ptr : _files )
     {
       // Get a stream
@@ -95,7 +95,7 @@ namespace xiv::exd
       throw std::runtime_error( "Id not found: " + std::to_string( id ) );
 
     // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
+    const uint32_t member_count = static_cast< uint32_t >( _exh->get_members().size() );
     auto& file_ptr = cacheEntryIt->second.file;
 
     std::vector< char > dataCpy = file_ptr->get_data_sections().front();
@@ -194,7 +194,7 @@ namespace xiv::exd
       throw std::runtime_error( "Id not found: " + std::to_string( id ) );
 
     // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
+    const uint32_t member_count =  static_cast< uint32_t >( _exh->get_members().size() );
     auto& file_ptr = cacheEntryIt->second.file;
 
     std::vector< char > dataCpy = file_ptr->get_data_sections().front();
@@ -282,7 +282,7 @@ namespace xiv::exd
   const std::map< uint32_t, std::vector< Field>>& Exd::get_rows()
   {
     // Iterates over all the files
-    const uint32_t member_count = _exh->get_members().size();
+    const uint32_t member_count =  static_cast< uint32_t >( _exh->get_members().size() );
     for( auto& file_ptr : _files )
     {
       // Get a stream

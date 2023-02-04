@@ -9,9 +9,12 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <Exd/ExdDataGenerated.h>
+#include <string>
+#include <Exd/ExdData.h>
+#include <Exd/Structs.h>
 #include <Logging/Logger.h>
 #include <Common.h>
+#include <nlohmann/json.hpp>
 
 #include <fstream>
 #include <streambuf>
@@ -19,14 +22,32 @@
 
 #include <filesystem>
 
-Sapphire::Data::ExdDataGenerated g_exdData;
-
 namespace fs = std::filesystem;
 
 using namespace Sapphire;
+Sapphire::Data::ExdData g_exdDataGen;
 
-std::string datLocation( "/home/mordred/sqpack" );
+//std::string datLocation( "F:\\client3.0\\game\\sqpack" );
+std::string datLocation( "C:\\Data\\Dev\\ffxiv3.01\\game\\sqpack" );
 //const std::string datLocation( "/mnt/c/Program Files (x86)/Steam/steamapps/common/FINAL FANTASY XIV Online/game/sqpack" );
+
+struct StatusModifier
+{
+  Common::ParamModifier modifier;
+  int32_t value;
+};
+
+struct StatusEntry
+{
+  uint16_t id;
+  std::vector< StatusModifier > modifiers;
+};
+
+struct StatusEffect
+{
+  std::vector< StatusEntry > caster;
+  std::vector< StatusEntry > target;
+};
 
 struct ActionEntry
 {
@@ -39,7 +60,45 @@ struct ActionEntry
   uint32_t rearPotency;
   uint32_t curePotency;
   uint32_t restorePercentage;
+  std::vector< uint32_t > nextCombo{};
+  StatusEffect statuses;
 };
+
+void to_json( nlohmann::ordered_json& j, const StatusModifier& statusModifier)
+{
+  j = nlohmann::ordered_json{
+    { "modifier", statusModifier.modifier },
+    { "value", statusModifier.value }
+  };
+}
+
+void to_json( nlohmann::ordered_json& j, const StatusEntry& statusEntry )
+{
+  j = nlohmann::ordered_json{
+    { "id", statusEntry.id },
+    { "modifiers", statusEntry.modifiers }
+  };
+}
+
+void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
+{
+  j = nlohmann::ordered_json{
+    { "name", action.name },
+    { "potency", action.potency },
+    { "comboPotency", action.comboPotency },
+    { "flankPotency", action.flankPotency },
+    { "frontPotency", action.frontPotency },
+    { "rearPotency", action.rearPotency },
+    { "curePotency", action.curePotency },
+    { "restorePercentage", action.restorePercentage },
+    { "nextCombo", action.nextCombo },
+    { "statuses", {
+        { "caster", action.statuses.caster },
+        { "target", action.statuses.target },
+      }
+    }
+  };
+}
 
 bool invalidChar( char c )
 {
@@ -69,13 +128,23 @@ uint32_t stripNonNumerics( std::string& str )
   return std::atoi( str.c_str() );
 }
 
+template< typename T >
+std::string stringVec( const std::vector< T >& vec )
+{
+  if( vec.empty() )
+    return "";
+
+  std::ostringstream oss;
+  std::copy( vec.begin(), vec.end() - 1, std::ostream_iterator< T >( oss, ", " ) );
+  oss << vec.back();
+
+  return oss.str();
+}
+
 int main( int argc, char* argv[] )
 {
 
   Logger::init( "action_parse" );
-
-  if( !fs::exists( "ActionLutData.cpp.tmpl" ) )
-    throw std::runtime_error( "ActionLut.cpp.tmpl is missing in working directory" );
 
   if( argc == 2 )
   {
@@ -83,14 +152,15 @@ int main( int argc, char* argv[] )
   }
 
   Logger::info( "Setting up EXD data" );
-  if( !g_exdData.init( datLocation ) )
+  if( !g_exdDataGen.init( datLocation ) )
   {
     Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
-  auto idList = g_exdData.getActionIdList();
+  auto idList = g_exdDataGen.getIdList< Excel::Action >();
 
   std::map< uint32_t, ActionEntry > actions;
+  std::map< uint32_t, std::vector< uint32_t > > traversedCombos;
 
   auto total = idList.size();
   int cursor = 0;
@@ -101,25 +171,28 @@ int main( int argc, char* argv[] )
     if( cursor % 50 == 0 && cursor > 0 )
       Logger::info( "Processing {} actions of {} ({:.2f}%)", cursor, total, done );
 
-    auto action = g_exdData.get< Sapphire::Data::Action >( id );
-    auto actionTransient = g_exdData.get< Sapphire::Data::ActionTransient >( id );
+    auto action = g_exdDataGen.getRow< Excel::Action >( id );
+
+    //auto actionTransient = g_exdData.get< Sapphire::Data::ActionTransient >( id );
     if( action )
     {
-      if( action->classJob == -1 || action->name.empty() )
+      auto& actionData = action->data();
+
+      if( actionData.UseClassJob == -1 || action->getString( actionData.Text.Name ).empty() )
         continue;
 
-      if( action->isPvP )
-        continue;
+      //if( actionData.PvPOnly )
+      //  continue;
 
-      auto classJob = g_exdData.get< Sapphire::Data::ClassJob >( action->classJob );
-      if( !classJob )
-        continue;
+   //   auto classJob = g_exdDataGen.getRow< Excel::ClassJob >( actionData.UseClassJob );
+   //   if( !classJob )
+   //     continue;
 
       // exclude dol/doh
-      if( classJob->classJobCategory == 32 || classJob->classJobCategory == 33 )
-        continue;
+    //  if( classJob->data().CraftingClassIndex > 0 )
+    //    continue;
 
-      auto ac = static_cast< Common::ActionCategory >( action->actionCategory );
+      auto ac = static_cast< Common::ActionCategory >( actionData.Category );
       if( ac != Common::ActionCategory::Ability &&
           ac != Common::ActionCategory::Autoattack &&
           ac != Common::ActionCategory::Spell &&
@@ -129,11 +202,11 @@ int main( int argc, char* argv[] )
 
       ActionEntry entry{};
 
-      entry.name = action->name;
+      entry.name = action->getString( actionData.Text.Name );
       entry.id = id;
 
-      Logger::info( "  {0} - {1}", id, action->name );
-      std::string desc = actionTransient->description;
+      Logger::info( "  {0} - {1}", id, action->getString( actionData.Text.Name ) );
+      std::string desc = action->getString( actionData.Text.Help );
       stripUnicode( desc );
       desc = std::regex_replace( desc, std::regex( "HI" ), "\n" );
       desc = std::regex_replace( desc, std::regex( "IH" ), "" );
@@ -238,6 +311,8 @@ int main( int argc, char* argv[] )
       }
 
       actions[ id ] = std::move( entry );
+      if( actionData.ComboParent )
+        traversedCombos[ actionData.ComboParent ].push_back( id );
     }
     else
       Logger::warn( "failed to get classjob {}", 1 );
@@ -246,33 +321,23 @@ int main( int argc, char* argv[] )
   // dump entries
   Logger::info( "Found {} player actions", actions.size() );
 
-  std::string output;
+  nlohmann::ordered_json output;
+  Logger::info( std::to_string( traversedCombos.size() ) );
   for( const auto& action : actions )
   {
-    const auto& data = action.second;
+    auto data = action.second;
+    // check if we have combo data to insert
+    if( auto it{ traversedCombos.find( data.id ) }; it != std::end( traversedCombos ) )
+      data.nextCombo = traversedCombos[ data.id ];
 //    Logger::info( " - {:<5} {:<25} pot: {:<4} flank pot: {:<4} front pot: {:<4} rear pot: {:<4} cure pot: {:<4} restore %: {:<4}",
 //                  action.first, data.name, data.potency, data.flankPotency, data.frontPotency, data.rearPotency,
 //                  data.curePotency, data.restorePercentage );
 
-    auto out = fmt::format( "  // {}\n  {{ {}, {{ {}, {}, {}, {}, {}, {}, {} }} }},\n",
-                            data.name, action.first,
-                            data.potency, data.comboPotency,
-                            data.flankPotency, data.frontPotency, data.rearPotency,
-                            data.curePotency, 0 );
-
-    output += out;
-//    Logger::info( out );
+    output[ std::to_string(action.first) ] = data;
   }
 
-  std::ifstream ifs( "ActionLutData.cpp.tmpl" );
-
-  std::string actionTmpl( ( std::istreambuf_iterator< char >( ifs ) ),
-                            std::istreambuf_iterator< char >() );
-
-  auto result = std::regex_replace( actionTmpl, std::regex( "%INSERT_GARBAGE%" ), output );
-
-  std::ofstream outH( "ActionLutData.cpp" );
-  outH << result;
+  std::ofstream outH( "actions/player.json" );
+  outH << std::setw( 2 ) << output << std::endl;
   outH.close();
 
   return 0;

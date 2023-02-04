@@ -1,23 +1,18 @@
-#include <set>
-#include <string.h>
-
-#include <Logging/Logger.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Database/DatabaseDef.h>
-#include <Database/ZoneDbConnection.h>
 
 #include "House.h"
 
 #include <unordered_map>
+#include <utility>
 #include <Service.h>
 
-Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, const std::string& estateName,
-                        const std::string& estateComment ) :
+Sapphire::House::House( uint32_t houseId, uint32_t landSetId, Common::LandIdent ident, std::string estateName, std::string estateComment ) :
   m_houseId( houseId ),
   m_landSetId( landSetId ),
   m_landIdent( ident ),
-  m_estateName( estateName ),
-  m_estateComment( estateComment )
+  m_estateName( std::move( estateName ) ),
+  m_estateComment( std::move( estateComment ) )
 {
   m_interiorModelCache.fill( 0 );
   m_exteriorModelCache.fill( std::make_pair( 0, 0 ) );

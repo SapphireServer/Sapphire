@@ -1,10 +1,12 @@
-#include <Actor/Player.h>
-#include <Manager/EventMgr.h>
-#include <ScriptObject.h>
-#include <ctime>
-#include <Service.h>
+// This is an automatically generated C++ script template
+// Content needs to be added by hand to make it function
+// In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-using namespace Sapphire;
+#include <Actor/Player.h>
+#include <Actor/BNpc.h>
+#include "Manager/EventMgr.h"
+#include <ScriptObject.h>
+#include <Service.h>
 
 // Quest Script: SubWil007_00167
 // Quest Name: With Open Arms
@@ -12,27 +14,28 @@ using namespace Sapphire;
 // Start NPC: 1007621
 // End NPC: 1007621
 
-class SubWil007 :
-  public Sapphire::ScriptAPI::EventScript
+using namespace Sapphire;
+
+class SubWil007 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
   // Basic quest information
   // Quest vars / flags used
-  // GetQuestBitFlag8
-  // GetQuestUI8AL
+  // BitFlag8
+  // UI8AL
 
-  enum Sequence :
-    uint8_t
+  /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1007621
+  /// Countable Num: 5 Seq: 2 Event: 2 Listener: 1007621
+  /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1001297
+  // Steps in this quest ( 0 is before accepting,
+  // 1 is first, 255 means ready for turning it in
+  enum Sequence : uint8_t
   {
     Seq0 = 0,
     Seq1 = 1,
     Seq2 = 2,
     SeqFinish = 255,
   };
-
-  // Quest rewards
-  static constexpr auto RewardExpFactor = 50;
-  static constexpr auto RewardGil = 102;
 
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1007621;
@@ -44,290 +47,371 @@ private:
   static constexpr auto FirstQuest = 66130;
 
 public:
-  SubWil007() :
-    Sapphire::ScriptAPI::EventScript( 65703 )
-  {
-  };
+  SubWil007() : Sapphire::ScriptAPI::QuestScript( 65703 )
+  {};
 
-  ~SubWil007()
-  {
-  };
+  ~SubWil007() = default;
 
-  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+  //////////////////////////////////////////////////////////////////////
+  // Event Handlers
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
-
-    if( actor == Actor0 && !player.hasQuest( getId() ) )
+    switch( actorId )
     {
-      Scene00000( player );
-    }
-    if( actor == Actor0 && player.getQuestSeq( getId() ) == SeqFinish )
-    {
-      Scene00020( player );
-    }
-    else if( actor == Actor1 )
-    {
-      Scene00005( player );
-    }
-    else if( actor == Actor2 )
-    {
-      Scene00008( player );
-    }
-    else if( actor == Actor3 )
-    {
-      Scene00011( player );
-    }
-    else if( actor == Actor4 )
-    {
-      Scene00014( player );
-    }
-    else if( actor == Actor5 )
-    {
-      Scene00017( player );
+      case Actor0:
+      {
+        if( !player.hasQuest( getId() ) )
+          Scene00000( quest, player );
+        else if( quest.getSeq() == SeqFinish )
+          Scene00020( quest, player );
+        break;
+      }
+      case Actor1:
+      {
+        Scene00005( quest, player );
+        break;
+      }
+      case Actor2:
+      {
+        Scene00008( quest, player );
+        break;
+      }
+      case Actor3:
+      {
+        Scene00011( quest, player );
+        break;
+      }
+      case Actor4:
+      {
+        Scene00014( quest, player );
+        break;
+      }
+      case Actor5:
+      {
+        Scene00017( quest, player );
+        break;
+      }
     }
   }
 
-  void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Entity::Player& player ) override
+  void onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Entity::Player& player ) override
   {
-    auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-    auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
+    if( emoteId != 41 )
+      return;
 
-    if( actor == Actor0 && emoteId == 41 && player.getQuestSeq( getId() ) == Seq1 )
+    if( actorId == Actor0 && quest.getSeq() == Seq1 )
     {
-      Scene00003( player );
+      Scene00003( quest, player );
     }
-    else if( actor == Actor1 && emoteId == 41 && player.getQuestSeq( getId() ) == Seq2 )
+    else if( actorId == Actor1 && quest.getSeq() == Seq2 )
     {
-      Scene00006( player );
+      Scene00006( quest, player );
     }
-    else if( actor == Actor2 && emoteId == 41 && player.getQuestSeq( getId() ) == Seq2 )
+    else if( actorId == Actor2 && quest.getSeq() == Seq2 )
     {
-      Scene00009( player );
+      Scene00009( quest, player );
     }
-    else if( actor == Actor3 && emoteId == 41 && player.getQuestSeq( getId() ) == Seq2 )
+    else if( actorId == Actor3 && quest.getSeq() == Seq2 )
     {
-      Scene00012( player );
+      Scene00012( quest, player );
     }
-    else if( actor == Actor4 && emoteId == 41 && player.getQuestSeq( getId() ) == Seq2 )
+    else if( actorId == Actor4 && quest.getSeq() == Seq2 )
     {
-      Scene00015( player );
+      Scene00015( quest, player );
     }
-    else if( actor == Actor5 && emoteId == 41 && player.getQuestSeq( getId() ) == Seq2 )
+    else if( actorId == Actor5 && quest.getSeq() == Seq2 )
     {
-      Scene00018( player );
+      Scene00018( quest, player );
     }
   }
+
 
 private:
 
-  void checkQuestCompletion( Entity::Player& player )
+
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    auto currentQC = player.getQuestUI8AL( getId() ) + 1;
+    auto currentQC = quest.getUI8AL() + 1;
 
     if( currentQC >= 5 )
     {
-      player.updateQuest( getId(), SeqFinish );
-      player.sendQuestMessage( getId(), 1, 2, currentQC, 5 );
+      quest.setSeq( SeqFinish );
+      eventMgr().sendEventNotice( player, getId(), 1, 2, currentQC, 5 );
     }
     else
     {
-      player.setQuestUI8AL( getId(), currentQC );
-      player.sendQuestMessage( getId(), 1, 2, currentQC, 5 );
+      quest.setUI8AL( currentQC );
+      eventMgr().sendEventNotice( player, getId(), 1, 2, currentQC, 5 );
+    }
+  }
+  //////////////////////////////////////////////////////////////////////
+  // Available Scenes in this quest, not necessarly all are used
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00000( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00000Return ) );
+  }
+
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 ) // accept quest
+    {
+      Scene00001( quest, player );
     }
   }
 
-  void Scene00000( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 0, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.param2 == 1 )
-                        {
-                          Scene00001( player );
-                        }
-                      } );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00001Return ) );
   }
 
-  void Scene00001( Entity::Player& player )
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 1, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        player.updateQuest( getId(), Seq1 );
-                      } );
+    quest.setSeq( Seq1 );
   }
 
-  void Scene00002( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 2, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00002Return ) );
   }
 
-  void Scene00003( Entity::Player& player )
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 3, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        player.updateQuest( getId(), Seq2 );
-                        player.sendQuestMessage( getId(), 0, 1, 0, 0 );
-                      } );
+    //Empty
   }
 
-  void Scene00004( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 4, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00003Return ) );
   }
 
-  void Scene00005( Entity::Player& player )
+  void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 5, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    quest.setSeq( Seq2 );
+    eventMgr().sendEventNotice( player, getId(), 0, 1, 0, 0 );
   }
 
-  void Scene00006( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 6, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 1, true );
-                      } );
+    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00004Return ) );
   }
 
-  void Scene00007( Entity::Player& player )
+  void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 7, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    //Empty
   }
 
-  void Scene00008( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 8, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00005Return ) );
   }
 
-  void Scene00009( Entity::Player& player )
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 9, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 2, true );
-                      } );
+    //Empty
   }
 
-  void Scene00010( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00006( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 10, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00006Return ) );
   }
 
-  void Scene00011( Entity::Player& player )
+  void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 11, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 1, true );
   }
 
-  void Scene00012( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00007( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 12, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 3, true );
-                      } );
+    eventMgr().playQuestScene( player, getId(), 7, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00007Return ) );
   }
 
-  void Scene00013( Entity::Player& player )
+  void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 13, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    //Empty
   }
 
-  void Scene00014( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00008( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 14, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 8, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00008Return ) );
   }
 
-  void Scene00015( Entity::Player& player )
+  void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 15, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 4, true );
-                      } );
+    //Empty
   }
 
-  void Scene00016( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00009( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 16, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    eventMgr().playQuestScene( player, getId(), 9, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00009Return ) );
   }
 
-  void Scene00017( Entity::Player& player )
+  void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 17, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 2, true );
   }
 
-  void Scene00018( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00010( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 18, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        checkQuestCompletion( player );
-                        player.setQuestBitFlag8( getId(), 5, true );
-                      } );
+    eventMgr().playQuestScene( player, getId(), 10, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00010Return ) );
   }
 
-  void Scene00019( Entity::Player& player )
+  void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.playScene( getId(), 19, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                      } );
+    //Empty
   }
 
-  void Scene00020( Entity::Player& player )
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00011( World::Quest& quest, Entity::Player& player )
   {
-    player.playScene( getId(), 20, HIDE_HOTBAR,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.param2 == 1 )
-                        {
-                          if( player.giveQuestRewards( getId(), 0 ) )
-                          {
-                            player.finishQuest( getId() );
-                          }
-                        }
-                      } );
+    eventMgr().playQuestScene( player, getId(), 11, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00011Return ) );
   }
+
+  void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    //Empty
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00012( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 12, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00012Return ) );
+  }
+
+  void Scene00012Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 3, true );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00013( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 13, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00013Return ) );
+  }
+
+  void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    //Empty
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00014( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 14, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00014Return ) );
+  }
+
+  void Scene00014Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    //Empty
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00015( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 15, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00015Return ) );
+  }
+
+  void Scene00015Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 4, true );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00016( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 16, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00016Return ) );
+  }
+
+  void Scene00016Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    //Empty
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00017( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 17, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00017Return ) );
+  }
+
+  void Scene00017Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    //Empty
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00018( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 18, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00018Return ) );
+  }
+
+  void Scene00018Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    checkQuestCompletion( quest, player );
+    quest.setBitFlag8( 5, true );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00019( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 19, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00019Return ) );
+  }
+
+  void Scene00019Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    //Empty
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00020( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 20, HIDE_HOTBAR, bindSceneReturn( &SubWil007::Scene00020Return ) );
+  }
+
+  void Scene00020Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+    if( result.getResult( 0 ) == 1 )
+    {
+      player.finishQuest( getId(), result.getResult( 1 ) );
+    }
+
+  }
+
 };
 
 EXPOSE_SCRIPT( SubWil007 );

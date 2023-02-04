@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_HOUSINGZONE_H
-#define SAPPHIRE_HOUSINGZONE_H
+#pragma once
 
 #include "Territory.h"
 #include "Forwards.h"
@@ -29,7 +28,6 @@ namespace Sapphire
   public:
     HousingZone( uint8_t landSetId,
                  uint16_t territoryTypeId,
-                 uint32_t guId,
                  const std::string& internalName,
                  const std::string& contentName );
 
@@ -53,6 +51,7 @@ namespace Sapphire
     Sapphire::LandPtr getLand( uint8_t id );
 
     Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
+    void removeEstateEntranceEObj( uint8_t landId );
 
     void updateYardObjects( Common::LandIdent ident );
     void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItem& item );
@@ -62,8 +61,9 @@ namespace Sapphire
 
   private:
     using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
-    using YardObjectArray = std::array< Common::HousingObject, 800 >;
-    using YardObjectSubdivisionArray = std::array< YardObjectArray, 2 >;
+
+    /*! @brief global storage for all yard items in the ward */
+    using YardObjectArray = std::array< Common::Furniture, 1200 >;
 
     /*!
      * @brief Maps the start and end index of the yard object array for a specific plot
@@ -78,15 +78,13 @@ namespace Sapphire
      */
     using YardObjectArrayBoundsArray = std::array< YardObjectArrayBoundsPair, 60 >;
 
-    const uint32_t m_landSetMax = 18;
+    const uint32_t m_landSetMax = 12;
     LandPtrMap m_landPtrMap;
     uint8_t m_wardNum;
     uint32_t m_landSetId;
-    uint32_t m_territoryTypeId;
 
-    YardObjectSubdivisionArray m_yardObjects;
+    YardObjectArray m_yardObjects{};
     YardObjectArrayBoundsArray m_yardObjectArrayBounds;
   };
 
 }
-#endif //SAPPHIRE_HOUSINGZONE_H

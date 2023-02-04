@@ -1,9 +1,9 @@
-#ifndef SAPPHIRE_NAVIMGR_H
-#define SAPPHIRE_NAVIMGR_H
+#pragma once
 
 #include "ForwardsZone.h"
 
 #include <array>
+#include <tuple>
 
 namespace Sapphire::World::Manager
 {
@@ -13,15 +13,14 @@ namespace Sapphire::World::Manager
     NaviMgr() = default;
     virtual ~NaviMgr() = default;
 
-    bool setupTerritory( const std::string& bgPath );
-    Navi::NaviProviderPtr getNaviProvider( const std::string& bgPath );
+    bool setupTerritory( const std::string& bgPath, uint32_t guid );
+    Navi::NaviProviderPtr getNaviProvider( const std::string& bgPath, uint32_t guid );
 
   private:
     std::string getBgName( const std::string& bgPath );
 
-    std::unordered_map< std::string, Navi::NaviProviderPtr > m_naviProviderTerritoryMap;
+    std::unordered_map< uint32_t, Navi::NaviProviderPtr > m_naviProviderTerritoryMap;
   };
 
 }
 
-#endif // SAPPHIRE_NAVIMGR_H

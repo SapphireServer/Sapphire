@@ -1,12 +1,11 @@
-#ifndef _CHATPACKET_H
-#define _CHATPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
@@ -24,12 +23,12 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player, Common::ChatType chatType, const std::string& msg )
     {
-      m_data.chatType = chatType;
-      strcpy( m_data.name, player.getName().c_str() );
-      strcpy( m_data.msg, msg.c_str() );
+      m_data.type = static_cast< uint16_t >( chatType );
+      m_data.characterId = player.getCharacterId();
+      m_data.entityId = player.getId();
+      strcpy( reinterpret_cast< char* >( m_data.speakerName ), player.getName().c_str() );
+      strcpy( reinterpret_cast< char* >( m_data.message ), msg.c_str() );
     };
   };
 
 }
-
-#endif /*_CHATPACKET_H*/

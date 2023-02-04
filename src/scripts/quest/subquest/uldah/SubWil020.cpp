@@ -1,10 +1,12 @@
-#include <Actor/Player.h>
-#include <Manager/EventMgr.h>
-#include <ScriptObject.h>
-#include <ctime>
-#include <Service.h>
+// This is an automatically generated C++ script template
+// Content needs to be added by hand to make it function
+// In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-using namespace Sapphire;
+#include <Actor/Player.h>
+#include <Actor/BNpc.h>
+#include "Manager/EventMgr.h"
+#include <ScriptObject.h>
+#include <Service.h>
 
 // Quest Script: SubWil020_00393
 // Quest Name: Vox Populi
@@ -12,391 +14,519 @@ using namespace Sapphire;
 // Start NPC: 1001685
 // End NPC: 1001945
 
-class SubWil020 : public Sapphire::ScriptAPI::EventScript
+using namespace Sapphire;
+
+class SubWil020 : public Sapphire::ScriptAPI::QuestScript
 {
-   private:
-      // Basic quest information 
-      // Quest vars / flags used
-      // GetQuestBitFlag8
-      // GetQuestUI8AH
-      // GetQuestUI8AL
-      // GetQuestUI8BH
+private:
+  // Basic quest information
+  // Quest vars / flags used
+  // BitFlag8
+  // UI8AH
+  // UI8AL
+  // UI8BH
 
-      // Steps in this quest ( 0 is before accepting, 
-      // 1 is first, 255 means ready for turning it in
-      enum Sequence : uint8_t
+  /// Countable Num: 8 Seq: 1 Event: 1 Listener: 1001940
+  /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1001937
+  /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1001939
+  // Steps in this quest ( 0 is before accepting,
+  // 1 is first, 255 means ready for turning it in
+  enum Sequence : uint8_t
+  {
+    Seq0 = 0,
+    Seq1 = 1,
+    SeqFinish = 255,
+  };
+
+  // Entities found in the script data of the quest
+  static constexpr auto Actor0 = 1001685;
+  static constexpr auto Actor1 = 1001940;
+  static constexpr auto Actor2 = 1001937;
+  static constexpr auto Actor3 = 1001939;
+  static constexpr auto Actor4 = 1001942;
+  static constexpr auto Actor5 = 1001949;
+  static constexpr auto Actor6 = 1003902;
+  static constexpr auto Actor7 = 1001914;
+  static constexpr auto Actor8 = 1003899;
+  static constexpr auto Actor9 = 1001945;
+
+public:
+  SubWil020() : Sapphire::ScriptAPI::QuestScript( 65929 )
+  {};
+
+  ~SubWil020() = default;
+
+  //////////////////////////////////////////////////////////////////////
+  // Event Handlers
+  void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
+  {
+    //Some of these feel wrong
+    switch( actorId )
+    {
+      case Actor0:
       {
-         Seq0 = 0,
-         Seq1 = 1,
-         SeqFinish = 255,
-      };
-
-      // Quest rewards 
-      static constexpr auto RewardExpFactor = 55;
-      static constexpr auto RewardGil = 109;
-
-      // Entities found in the script data of the quest
-      static constexpr auto Actor0 = 1001685;
-      static constexpr auto Actor1 = 1001940;
-      static constexpr auto Actor2 = 1001937;
-      static constexpr auto Actor3 = 1001939;
-      static constexpr auto Actor4 = 1001942;
-      static constexpr auto Actor5 = 1001949;
-      static constexpr auto Actor6 = 1003902;
-      static constexpr auto Actor7 = 1001914;
-      static constexpr auto Actor8 = 1003899;
-      static constexpr auto Actor9 = 1001945;
-
-   public:
-      SubWil020() : EventScript( 65929 ) {};
-      ~SubWil020() {};
-
-      void checkQuestProgression( Entity::Player& player )
-      {
-        if( player.getQuestUI8AL( getId() ) == 6 && player.getQuestUI8BH( getId() ) == 2 )
-        {
-          player.updateQuest( getId(), SeqFinish );
-        }
+        Scene00000( quest, player );
+        break;
       }
+      case Actor1:
+      {
+        if( !quest.getBitFlag8( 1 ) )
+          Scene00001( quest, player );
+        else
+          Scene00002( quest, player );
+        break;
+      }
+      case Actor2:
+      {
+        if( !quest.getBitFlag8( 2 ) )
+          Scene00003( quest, player );
+        else
+          Scene00004( quest, player );
+        break;
+      }
+      case Actor3:
+      {
+        if( !quest.getBitFlag8( 3 ) )
+          Scene00005( quest, player );
+        else
+          Scene00006( quest, player );
+        break;
+      }
+      case Actor4:
+      {
+        if( !quest.getBitFlag8( 4 ) )
+          Scene00007( quest, player );
+        else
+          Scene00008( quest, player );
+        break;
+      }
+      case Actor5:
+      {
+        if( !quest.getBitFlag8( 5 ) )
+          Scene00009( quest, player );
+        else
+          Scene00010( quest, player );
+        break;
+      }
+      case Actor6:
+      {
+        if( !quest.getBitFlag8( 6 ) )
+          Scene00011( quest, player );
+        else
+          Scene00012( quest, player );
+        break;
+      }
+      case Actor7:
+      {
+        if( !quest.getBitFlag8( 7 ) )
+          Scene00013( quest, player );
+        else
+          Scene00014( quest, player );
+        break;
+      }
+      case Actor8:
+      {
+        if( !quest.getBitFlag8( 0 ) )
+          Scene00015( quest, player );
+        else
+          Scene00016( quest, player );
+        break;
+      }
+      case Actor9:
+      {
+        Scene00017( quest, player );
+        break;
+      }
+    }
+  }
 
-   //////////////////////////////////////////////////////////////////////
-   // Event Handlers
-   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
-   {
-     auto& pEventMgr = Common::Service< World::Manager::EventMgr >::ref();
-     auto actor = pEventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) );
 
-     /*player.setQuestUI8BH( getId(), 0 );
-     player.setQuestUI8AL( getId(), 0 );
-     player.setQuestBitFlag8( getId(), 0, false );
-     player.setQuestBitFlag8( getId(), 1, false );
-     player.setQuestBitFlag8( getId(), 2, false );
-     player.setQuestBitFlag8( getId(), 3, false );
-     player.setQuestBitFlag8( getId(), 4, false );
-     player.setQuestBitFlag8( getId(), 5, false );
-     player.setQuestBitFlag8( getId(), 6, false );
-     player.setQuestBitFlag8( getId(), 7, false );
-     player.setQuestBitFlag8( getId(), 8, false );*/
+private:
 
-     if( actor == Actor0 )
-     {
-       Scene00000( player );
-     }
-     else if( actor == Actor1 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 1 ) )
-         Scene00001( player );
-       else
-         Scene00002( player );
-     }
-     else if( actor == Actor2 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 2 ) )
-         Scene00002( player );
-       else
-         Scene00003( player );
-     }
-     else if( actor == Actor3 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 3 ) )
-         Scene00005( player );
-       else
-         Scene00006( player );
-     }
-     else if( actor == Actor4 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 4 ) )
-         Scene00007( player );
-       else
-         Scene00008( player );
-     }
-     else if( actor == Actor5 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 5 ) )
-         Scene00009( player );
-       else
-         Scene00010( player );
-     }
-     else if( actor == Actor6 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 6 ) )
-         Scene00011( player );
-       else
-         Scene00012( player );
-     }
-     else if( actor == Actor7 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 7 ) )
-         Scene00013( player );
-       else
-         Scene00014( player );
-     }
-     else if( actor == Actor8 )
-     {
-       if( !player.getQuestBitFlag8( getId(), 0 ) )
-         Scene00015( player );
-       else
-         Scene00016( player );
-     }
-     else if( actor == Actor9 )
-     {
-       Scene00017( player );
-     }
-   }
+  void checkQuestProgression( World::Quest& quest, Entity::Player& player )
+  {
+    if( quest.getUI8AL() == 6 && quest.getUI8BH() == 2 )
+    {
+      quest.setSeq( SeqFinish );
+    }
+  }
+  //////////////////////////////////////////////////////////////////////
+  // Available Scenes in this quest, not necessarly all are used
+  //////////////////////////////////////////////////////////////////////
 
-   private:
-   //////////////////////////////////////////////////////////////////////
-   // Available Scenes in this quest, not necessarly all are used
-   void Scene00000( Entity::Player& player )
-   {
-      player.playScene( getId(), 0, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          if( result.param2 == 1 )
-                          {
-                            player.updateQuest( getId(), Seq1 );
-                          }
-                        } );
-   }
+  void Scene00000( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubWil020::Scene00000Return ) );
+  }
 
-   void Scene00001( Entity::Player& player )
-   {
-      player.playScene( getId(), 1, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto hustCount = player.getQuestUI8AL( getId() );
-                          hustCount += 1;
-                          player.setQuestUI8AL( getId(), hustCount );
-                          player.sendQuestMessage( getId(), 0, 2, hustCount, 6 );
-                          player.setQuestBitFlag8( getId(), 1, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    if( result.getResult( 0 ) == 1 ) // accept quest
+    {
+      quest.setSeq( Seq1 );
+    }
+  }
 
-   void Scene00002( Entity::Player& player )
-   {
-      player.playScene( getId(), 2, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto hustCount = player.getQuestUI8AL( getId() );
-                          hustCount += 1;
-                          player.setQuestUI8AL( getId(), hustCount );
-                          player.sendQuestMessage( getId(), 0, 2, hustCount, 6 );
-                          player.setQuestBitFlag8( getId(), 2, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00003( Entity::Player& player )
-   {
-      player.playScene( getId(), 3, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto hustCount = player.getQuestUI8AL( getId() );
-                          hustCount += 1;
-                          player.setQuestUI8AL( getId(), hustCount );
-                          player.sendQuestMessage( getId(), 0, 2, hustCount, 6 );
-                          player.setQuestBitFlag8( getId(), 3, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  void Scene00001( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubWil020::Scene00001Return ) );
+  }
 
-   void Scene00004( Entity::Player& player )
-   {
-      player.playScene( getId(), 4, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto hustCount = player.getQuestUI8AL( getId() );
-                          hustCount += 1;
-                          player.setQuestUI8AL( getId(), hustCount );
-                          player.sendQuestMessage( getId(), 0, 2, hustCount, 6 );
-                          player.setQuestBitFlag8( getId(), 4, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 1, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00005( Entity::Player& player )
-   {
-      player.playScene( getId(), 5, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto hustCount = player.getQuestUI8AL( getId() );
-                          hustCount += 1;
-                          player.setQuestUI8AL( getId(), hustCount );
-                          player.sendQuestMessage( getId(), 0, 2, hustCount, 6 );
-                          player.setQuestBitFlag8( getId(), 5, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00006( Entity::Player& player )
-   {
-      player.playScene( getId(), 6, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto hustCount = player.getQuestUI8AL( getId() );
-                          hustCount += 1;
-                          player.setQuestUI8AL( getId(), hustCount );
-                          player.sendQuestMessage( getId(), 0, 2, hustCount, 6 );
-                          player.setQuestBitFlag8( getId(), 6, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  void Scene00002( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 2, NONE, bindSceneReturn( &SubWil020::Scene00002Return ) );
+  }
 
-   void Scene00007( Entity::Player& player )
-   {
-      player.playScene( getId(), 7, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto thalCount = player.getQuestUI8BH( getId() );
-                          thalCount += 1;
-                          player.setQuestUI8BH( getId(), thalCount );
-                          player.sendQuestMessage( getId(), 1, 2, thalCount, 2 );
-                          player.setQuestBitFlag8( getId(), 7, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 2, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00008( Entity::Player& player )
-   {
-      player.playScene( getId(), 8, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          auto thalCount = player.getQuestUI8BH( getId() );
-                          thalCount += 1;
-                          player.setQuestUI8BH( getId(), thalCount );
-                          player.sendQuestMessage( getId(), 1, 2, thalCount, 2 );
-                          player.setQuestBitFlag8( getId(), 8, true );
-                          checkQuestProgression( player );
-                        } );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00009( Entity::Player& player )
-   {
-      player.playScene( getId(), 9, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00003( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 3, NONE, bindSceneReturn( &SubWil020::Scene00003Return ) );
+  }
 
-   void Scene00010( Entity::Player& player )
-   {
-      player.playScene( getId(), 10, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 3, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00011( Entity::Player& player )
-   {
-      player.playScene( getId(), 11, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00012( Entity::Player& player )
-   {
-      player.playScene( getId(), 12, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00004( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &SubWil020::Scene00004Return ) );
+  }
 
-   void Scene00013( Entity::Player& player )
-   {
-      player.playScene( getId(), 13, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 4, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00014( Entity::Player& player )
-   {
-      player.playScene( getId(), 14, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00015( Entity::Player& player )
-   {
-      player.playScene( getId(), 15, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00005( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 5, NONE, bindSceneReturn( &SubWil020::Scene00005Return ) );
+  }
 
-   void Scene00016( Entity::Player& player )
-   {
-      player.playScene( getId(), 16, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 5, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00017( Entity::Player& player )
-   {
-      player.playScene( getId(), 17, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {
-                          if( result.param2 == 1 )
-                          {
-                            if( player.giveQuestRewards( getId(), 0 ) )
-                            {
-                              player.finishQuest( getId() );
-                            }
-                          }
-                        } );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00018( Entity::Player& player )
-   {
-      player.playScene( getId(), 18, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00006( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 6, NONE, bindSceneReturn( &SubWil020::Scene00006Return ) );
+  }
 
-   void Scene00019( Entity::Player& player )
-   {
-      player.playScene( getId(), 19, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 6, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00020( Entity::Player& player )
-   {
-      player.playScene( getId(), 20, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00021( Entity::Player& player )
-   {
-      player.playScene( getId(), 21, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00007( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 7, NONE, bindSceneReturn( &SubWil020::Scene00007Return ) );
+  }
 
-   void Scene00022( Entity::Player& player )
-   {
-      player.playScene( getId(), 22, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 7, true );
+    checkQuestProgression( quest, player );
+  }
 
-   void Scene00023( Entity::Player& player )
-   {
-      player.playScene( getId(), 23, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  //////////////////////////////////////////////////////////////////////
 
-   void Scene00024( Entity::Player& player )
-   {
-      player.playScene( getId(), 24, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00008( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 8, NONE, bindSceneReturn( &SubWil020::Scene00008Return ) );
+  }
 
-   void Scene00025( Entity::Player& player )
-   {
-      player.playScene( getId(), 25, NONE,
-                        [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                        {} );
-   }
+  void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+    auto hustCount = quest.getUI8AL();
+    hustCount += 1;
+    quest.setUI8AL( hustCount );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hustCount, 6 );
+    quest.setBitFlag8( 8, true );
+    checkQuestProgression( quest, player );
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00009( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 9, NONE, bindSceneReturn( &SubWil020::Scene00009Return ) );
+  }
+
+  void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00010( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 10, NONE, bindSceneReturn( &SubWil020::Scene00010Return ) );
+  }
+
+  void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00011( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 11, NONE, bindSceneReturn( &SubWil020::Scene00011Return ) );
+  }
+
+  void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00012( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 12, NONE, bindSceneReturn( &SubWil020::Scene00012Return ) );
+  }
+
+  void Scene00012Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00013( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 13, NONE, bindSceneReturn( &SubWil020::Scene00013Return ) );
+  }
+
+  void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00014( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 14, NONE, bindSceneReturn( &SubWil020::Scene00014Return ) );
+  }
+
+  void Scene00014Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00015( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 15, NONE, bindSceneReturn( &SubWil020::Scene00015Return ) );
+  }
+
+  void Scene00015Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00016( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 16, NONE, bindSceneReturn( &SubWil020::Scene00016Return ) );
+  }
+
+  void Scene00016Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00017( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 17, NONE, bindSceneReturn( &SubWil020::Scene00017Return ) );
+  }
+
+  void Scene00017Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+    if( result.getResult( 0 ) == 1 )
+    {
+      player.finishQuest( getId(), result.getResult( 1 ) );
+    }
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00018( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 18, NONE, bindSceneReturn( &SubWil020::Scene00018Return ) );
+  }
+
+  void Scene00018Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00019( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 19, NONE, bindSceneReturn( &SubWil020::Scene00019Return ) );
+  }
+
+  void Scene00019Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00020( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 20, NONE, bindSceneReturn( &SubWil020::Scene00020Return ) );
+  }
+
+  void Scene00020Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00021( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 21, NONE, bindSceneReturn( &SubWil020::Scene00021Return ) );
+  }
+
+  void Scene00021Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00022( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 22, NONE, bindSceneReturn( &SubWil020::Scene00022Return ) );
+  }
+
+  void Scene00022Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00023( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 23, NONE, bindSceneReturn( &SubWil020::Scene00023Return ) );
+  }
+
+  void Scene00023Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00024( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 24, NONE, bindSceneReturn( &SubWil020::Scene00024Return ) );
+  }
+
+  void Scene00024Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
+  void Scene00025( World::Quest& quest, Entity::Player& player )
+  {
+    eventMgr().playQuestScene( player, getId(), 25, NONE, bindSceneReturn( &SubWil020::Scene00025Return ) );
+  }
+
+  void Scene00025Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
+  {
+
+
+  }
 
 };
 

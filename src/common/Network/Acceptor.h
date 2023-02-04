@@ -1,5 +1,4 @@
-#ifndef ACCEPTOR_H_
-#define ACCEPTOR_H_
+#pragma once
 
 #include <asio.hpp>
 #include <atomic>
@@ -83,4 +82,3 @@ namespace Sapphire::Network
   };
 
 }
-#endif

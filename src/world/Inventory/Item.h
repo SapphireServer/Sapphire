@@ -1,5 +1,4 @@
-#ifndef _ITEM_H_
-#define _ITEM_H_
+#pragma once
 
 #include <Common.h>
 #include "ForwardsZone.h"
@@ -66,6 +65,8 @@ namespace Sapphire
 
     uint16_t getItemLevel() const;
 
+    uint8_t getSlot() const;
+
     uint32_t getMaxStackSize() const;
 
     uint16_t getDurability() const;
@@ -106,6 +107,7 @@ namespace Sapphire
     uint16_t m_weaponDmg;
     float m_autoAttackDmg;
     uint16_t m_itemLevel;
+    uint8_t m_slot;
     uint16_t m_durability;
     uint16_t m_stain;
     uint16_t m_spiritBond;
@@ -123,5 +125,3 @@ namespace Sapphire
   };
 
 }
-
-#endif

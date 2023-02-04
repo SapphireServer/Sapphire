@@ -1,9 +1,9 @@
-#ifndef _CORE_NETWORK_PACKETS_COMMON_H
-#define _CORE_NETWORK_PACKETS_COMMON_H
+#pragma once
 
 #include <iostream>
 #include <vector>
-#include "PacketDef/Ipcs.h"
+#include "PacketDef/ServerIpcs.h"
+#include "PacketDef/ClientIpcs.h"
 
 namespace Sapphire::Network::Packets
 {
@@ -180,4 +180,3 @@ namespace Sapphire::Network::Packets
 
 }
 
-#endif /*_CORE_NETWORK_PACKETS_COMMON_H*/

@@ -1,5 +1,4 @@
-#ifndef _MD52_H
-#define _MD52_H
+#pragma once
 
 #include <stdint.h>
 
@@ -45,6 +44,3 @@ namespace Sapphire::Common::Util
 
 }
 
-
-
-#endif /* md5.h */

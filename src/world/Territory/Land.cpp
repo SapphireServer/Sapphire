@@ -4,7 +4,7 @@
 #include <Logging/Logger.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Database/DatabaseDef.h>
 
 #include <MySqlBase.h>
@@ -27,7 +27,7 @@
 using namespace Sapphire::Common;
 
 Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId, uint32_t landSetId,
-                      Sapphire::Data::HousingLandSetPtr info ) :
+                      std::shared_ptr< Excel::ExcelStruct< Excel::HousingLandSet > > info ) :
   m_currentPrice( 0 ),
   m_minPrice( 0 ),
   m_nextDrop( Util::getTimeSeconds() + 21600 ),
@@ -47,8 +47,9 @@ Sapphire::Land::Land( uint16_t territoryTypeId, uint8_t wardNum, uint8_t landId,
   m_landIdent.wardNum = wardNum;
   m_landIdent.worldId = 67; // todo: fix this
 
-  m_minPrice = m_landInfo->minPrice[ m_landIdent.landId ];
-  m_maxPrice = m_landInfo->initialPrice[ m_landIdent.landId ];
+  // EXD TODO: minprice needs to be something else...
+  m_minPrice = m_landInfo->data().Lands[m_landIdent.landId].InitPrice/10;
+  m_maxPrice = m_landInfo->data().Lands[m_landIdent.landId].InitPrice;
 }
 
 Sapphire::Land::~Land() = default;
@@ -61,15 +62,6 @@ void Sapphire::Land::init( Common::LandType type, Common::HouseSize size, Common
   m_state = state;
   m_currentPrice = currentPrice;
   m_ownerId = ownerId;
-
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto info = exdData.get< Sapphire::Data::HousingMapMarkerInfo >( m_landIdent.territoryTypeId, m_landIdent.landId );
-  if( info )
-  {
-    m_mapMarkerPosition.x = info->x;
-    m_mapMarkerPosition.y = info->y;
-    m_mapMarkerPosition.z = info->z;
-  }
 }
 
 uint32_t Sapphire::Land::getCurrentPrice() const

@@ -1,5 +1,5 @@
 #include <Common.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <CommonGen.h>
 #include <Service.h>
 
@@ -14,29 +14,31 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_spiritBond( 0 ),
   m_reservedFlag( 0 )
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto itemInfo = exdData.get< Sapphire::Data::Item >( catalogId );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto itemInfo = exdData.getRow< Excel::Item >( catalogId );
 
-  m_delayMs = itemInfo->delayms;
-  m_physicalDmg = itemInfo->damagePhys;
-  m_magicalDmg = itemInfo->damageMag;
-  m_model1 = itemInfo->modelMain;
-  m_model2 = itemInfo->modelSub;
+  m_delayMs = itemInfo->data().AttackInterval;
+  m_physicalDmg = itemInfo->data().Damage;
+  m_magicalDmg = itemInfo->data().MagicDamage;
+  m_model1 = itemInfo->data().ModelId;
+  m_model2 = itemInfo->data().SubModelId;
   m_weaponDmg = ( m_physicalDmg != 0 ) ? m_physicalDmg : m_magicalDmg;
   m_autoAttackDmg = static_cast< float >( m_weaponDmg * m_delayMs ) / 3000;
-  m_category = static_cast< Common::ItemUICategory >( itemInfo->itemUICategory );
-  m_itemLevel = itemInfo->levelItem;
-  m_maxStackSize = itemInfo->stackSize;
-  m_additionalData = itemInfo->additionalData;
-  m_blockRate = itemInfo->blockRate;
-  m_block = itemInfo->block;
-  m_defense = itemInfo->defensePhys;
-  m_defenseMag = itemInfo->defenseMag;
+  m_category = static_cast< Common::ItemUICategory >( itemInfo->data().UICategory );
+  m_slot = itemInfo->data().Slot;
+  m_itemLevel = itemInfo->data().Level;
+  m_maxStackSize = itemInfo->data().StackMax;
+  // EXD TODO: Not sure what this maps to
+  m_additionalData = itemInfo->data().CategoryArg;
+  m_blockRate = itemInfo->data().ShieldBlockRate;
+  m_block = itemInfo->data().ShieldRate;
+  m_defense = itemInfo->data().Defense;
+  m_defenseMag = itemInfo->data().MagicDefense;
 
   for( int i = 0; i < 6; ++i )
   {
-    m_baseParam[i].baseParam = itemInfo->param[i].baseparam;
-    m_baseParam[i].value = itemInfo->param[i].value;
+    m_baseParam[i].baseParam = itemInfo->data().BonusType[ i ];
+    m_baseParam[i].value = itemInfo->data().BonusValue[ i ];
   }
 }
 
@@ -73,6 +75,11 @@ uint16_t Sapphire::Item::getMagicalDmg() const
 uint16_t Sapphire::Item::getItemLevel() const
 {
   return m_itemLevel;
+}
+
+uint8_t Sapphire::Item::getSlot() const
+{
+  return m_slot;
 }
 
 uint16_t Sapphire::Item::getWeaponDmg() const

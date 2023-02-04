@@ -3,9 +3,11 @@
 #include <Logging/Logger.h>
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Network/CommonActorControl.h>
 #include <Service.h>
+
+#include <utility>
 
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
@@ -14,30 +16,31 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
-#include "Actor/BNpcTemplate.h"
 
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
-
+#include "WorldServer.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/EventMgr.h"
 #include "Event/EventHandler.h"
 
 #include "QuestBattle.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
-Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Sapphire::Data::QuestBattle > pBattleDetails,
-                                    uint16_t territoryType,
-                                    uint32_t guId,
-                                    const std::string& internalName,
-                                    const std::string& contentName,
+
+Sapphire::QuestBattle::QuestBattle( std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > pBattleDetails,
+                                    uint16_t territoryType, uint32_t guId,
+                                    const std::string& internalName, const std::string& contentName,
                                     uint32_t questBattleId ) :
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
   Director( Event::Director::QuestBattle, questBattleId ),
-  m_pBattleDetails( pBattleDetails ),
+  m_pBattleDetails( std::move( pBattleDetails ) ),
   m_questBattleId( questBattleId ),
   m_state( Created ),
   m_instanceCommenceTime( 0 )
@@ -50,8 +53,10 @@ bool Sapphire::QuestBattle::init()
   if( !Territory::init() )
     return false;
 
+  //loadBNpcs();
+
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceInit( getAsQuestBattle() );
+  scriptMgr.onInstanceInit( *this );
 
   return true;
 }
@@ -61,7 +66,8 @@ uint32_t Sapphire::QuestBattle::getQuestBattleId() const
   return m_questBattleId;
 }
 
-Sapphire::Data::ExdDataGenerated::QuestBattlePtr Sapphire::QuestBattle::getQuestBattleDetails() const
+
+std::shared_ptr< Excel::ExcelStruct< Excel::QuestBattle > > Sapphire::QuestBattle::getQuestBattleDetails() const
 {
   return m_pBattleDetails;
 }
@@ -90,8 +96,9 @@ void Sapphire::QuestBattle::onLeaveTerritory( Entity::Player& player )
 
 void Sapphire::QuestBattle::onEnterSceneFinish( Entity::Player& player )
 {
-  player.eventStart( player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
-  player.playScene( getDirectorId(), 60000, 0x40000 /*unmapped*/ );
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  eventMgr.eventStart( player, player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+  eventMgr.playScene( player, getDirectorId(),  60000, 0, { 0x40000 /*unmapped*/ } );
   setSequence( 2 );
 }
 
@@ -127,7 +134,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
       scriptMgr.onDutyCommence( *this, *m_pPlayer );
 
       m_state = DutyInProgress;
-      m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->timeLimit * 60u );
+      m_instanceExpireTime = Util::getTimeSeconds() + ( m_pBattleDetails->data().LimitTime * 60u );
       break;
     }
 
@@ -158,7 +165,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
     }
   }
 
-  scriptMgr.onInstanceUpdate( getAsQuestBattle(), tickCount );
+  scriptMgr.onInstanceUpdate( *this, tickCount );
 
   m_lastUpdate = tickCount;
 }
@@ -170,86 +177,21 @@ void Sapphire::QuestBattle::onFinishLoading( Entity::Player& player )
 
 void Sapphire::QuestBattle::onInitDirector( Entity::Player& player )
 {
-  player.sendQuestMessage( getDirectorId(), 0, 2, Util::getTimeSeconds(), 0x0708 );
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+  eventMgr.sendEventNotice( player, getDirectorId(), 0, 2, Util::getTimeSeconds(), 0x0708 );
   sendDirectorVars( player );
   player.setDirectorInitialized( true );
 }
 
 void Sapphire::QuestBattle::onDirectorSync( Entity::Player& player )
 {
-  player.queuePacket( makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), DirectorUpdate, 0x00110001, 0x80000000, 1 ) );
 }
 
 void Sapphire::QuestBattle::setVar( uint8_t index, uint8_t value )
 {
-  if( index > 19 )
-    return;
-
-  switch( index )
-  {
-    case 0:
-      setDirectorUI8AL( value );
-      break;
-    case 1:
-      setDirectorUI8AH( value );
-      break;
-    case 2:
-      setDirectorUI8BL( value );
-      break;
-    case 3:
-      setDirectorUI8BH( value );
-      break;
-    case 4:
-      setDirectorUI8CL( value );
-      break;
-    case 5:
-      setDirectorUI8CH( value );
-      break;
-    case 6:
-      setDirectorUI8DL( value );
-      break;
-    case 7:
-      setDirectorUI8DH( value );
-      break;
-    case 8:
-      setDirectorUI8EL( value );
-      break;
-    case 9:
-      setDirectorUI8EH( value );
-      break;
-    case 10:
-      setDirectorUI8FL( value );
-      break;
-    case 11:
-      setDirectorUI8FH( value );
-      break;
-    case 12:
-      setDirectorUI8GL( value );
-      break;
-    case 13:
-      setDirectorUI8GH( value );
-      break;
-    case 14:
-      setDirectorUI8HL( value );
-      break;
-    case 15:
-      setDirectorUI8HH( value );
-      break;
-    case 16:
-      setDirectorUI8IL( value );
-      break;
-    case 17:
-      setDirectorUI8IH( value );
-      break;
-    case 18:
-      setDirectorUI8JL( value );
-      break;
-    case 19:
-      setDirectorUI8JH( value );
-      break;
-
-  }
-
+  setDirectorVar( index, value );
   sendDirectorVars( *m_pPlayer );
 }
 
@@ -259,41 +201,49 @@ void Sapphire::QuestBattle::setSequence( uint8_t value )
   sendDirectorVars( *m_pPlayer );
 }
 
-void Sapphire::QuestBattle::setBranch( uint8_t value )
+void Sapphire::QuestBattle::setFlags( uint8_t value )
 {
-  setDirectorBranch( value );
+  setDirectorFlags( value );
   sendDirectorVars( *m_pPlayer );
 }
 
 void Sapphire::QuestBattle::startQte()
 {
-  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( m_pPlayer->getCharacterId(), makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x8000000A ) );
 }
 
 void Sapphire::QuestBattle::startEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( m_pPlayer->getCharacterId(), makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000008 ) );
 }
 
 void Sapphire::QuestBattle::endEventCutscene()
 {
-  m_pPlayer->queuePacket( makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( m_pPlayer->getCharacterId(), makeActorControlSelf( m_pPlayer->getId(), DirectorUpdate, getDirectorId(), 0x80000009 ) );
 }
 
-void Sapphire::QuestBattle::onRegisterEObj( Entity::EventObjectPtr object )
+void Sapphire::QuestBattle::onAddEObj( Entity::EventObjectPtr object )
 {
   if( object->getName() != "none" )
     m_eventObjectMap[ object->getName() ] = object;
 
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-  auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto objData = exdData.getRow< Excel::EObj >( object->getObjectId() );
   if( objData )
-    // todo: data should be renamed to eventId
-    m_eventIdToObjectMap[ objData->data ] = object;
+    m_eventIdToObjectMap[ objData->data().EventHandler ] = object;
   else
-    Logger::error( "InstanceContent::onRegisterEObj Territory " +
+    Logger::error( "InstanceContent::onAddEObj Territory " +
                    m_internalName + ": No EObj data found for EObj with ID: " +
                    std::to_string( object->getObjectId() ) );
+}
+
+void Sapphire::QuestBattle::onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint32_t arg1, uint32_t arg2,
+                                                 uint32_t arg3, uint32_t arg4 )
+{
+
 }
 
 Sapphire::Event::Director::DirectorState Sapphire::QuestBattle::getState() const
@@ -310,6 +260,8 @@ void Sapphire::QuestBattle::onBeforePlayerZoneIn( Sapphire::Entity::Player& play
   scriptMgr.onPlayerSetup( *this, player );
 
   player.resetObjSpawnIndex();
+
+  player.setDirectorId( getDirectorId() );
 }
 
 Sapphire::Entity::EventObjectPtr Sapphire::QuestBattle::getEObjByName( const std::string& name )
@@ -332,15 +284,15 @@ void Sapphire::QuestBattle::onTalk( Sapphire::Entity::Player& player, uint32_t e
   if( auto onTalkHandler = it->second->getOnTalkHandler() )
     onTalkHandler( player, it->second, getAsQuestBattle(), actorId );
   else
-    player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
-                      it->second->getObjectId(), eventId );
+    PlayerMgr::sendDebug( player, "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}",
+                          it->second->getObjectId(), eventId );
 }
 
 void
 Sapphire::QuestBattle::onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onInstanceEnterTerritory( getAsQuestBattle(), player, eventId, param1, param2 );
+  scriptMgr.onInstanceEnterTerritory( *this, player, eventId, param1, param2 );
 }
 
 void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
@@ -354,20 +306,21 @@ void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
 
 void Sapphire::QuestBattle::success()
 {
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
   //m_state = DutyFinished;
-  m_pPlayer->eventStart( m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
-  m_pPlayer->playScene( getDirectorId(), 60001, 0x40000,
+  eventMgr.eventStart( *m_pPlayer, m_pPlayer->getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+  eventMgr.playScene( *m_pPlayer, getDirectorId(), 60001, 0x40000,
     [ & ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      player.eventFinish( getDirectorId(), 1 );
-      player.eventStart( player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
-      player.playScene( getDirectorId(), 6, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
+      eventMgr.eventFinish( player, getDirectorId(), 1 );
+      eventMgr.eventStart( player, player.getId(), getDirectorId(), Event::EventHandler::GameProgress, 1, 0 );
+      eventMgr.playScene( player, getDirectorId(), 6, HIDE_HOTBAR | NO_DEFAULT_CAMERA,
                         [ & ]( Entity::Player& player, const Event::SceneResult& result )
                         {
-                          player.eventFinish( getDirectorId(), 1 );
+                          eventMgr.eventFinish( player, getDirectorId(), 1 );
 
                           auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-                          scriptMgr.onDutyComplete( getAsQuestBattle(), *m_pPlayer );
+                          scriptMgr.onDutyComplete( *this, *m_pPlayer );
 
                           player.exitInstance();
                         } );
@@ -382,7 +335,7 @@ void Sapphire::QuestBattle::fail()
 
 uint32_t Sapphire::QuestBattle::getQuestId() const
 {
-  return m_pBattleDetails->quest;
+  return m_pBattleDetails->data().Quest;
 }
 
 uint32_t Sapphire::QuestBattle::getCountEnemyBNpc()

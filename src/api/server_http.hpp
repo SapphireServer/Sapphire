@@ -1,5 +1,4 @@
-#ifndef SERVER_HTTP_HPP
-#define	SERVER_HTTP_HPP
+#pragma once
 
 #include <asio.hpp>
 
@@ -304,7 +303,7 @@ namespace SimpleWeb {
                 size_t path_end;
                 if((path_end=line.find(' ', method_end+1))!=std::string::npos) {
                     request->method=line.substr(0, method_end);
-                    request->path=line.substr(method_end+2, path_end-method_end-2);
+                    request->path=line.substr(method_end+1, path_end-method_end-1);
 
                     size_t protocol_end;
                     if((protocol_end=line.find('/', path_end+1))!=std::string::npos) {
@@ -451,4 +450,3 @@ namespace SimpleWeb {
         }
     };
 }
-#endif	/* SERVER_HTTP_HPP */

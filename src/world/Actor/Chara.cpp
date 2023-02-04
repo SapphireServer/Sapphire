@@ -1,7 +1,6 @@
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
-#include <Network/PacketContainer.h>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <utility>
 #include <Network/CommonActorControl.h>
 #include <Service.h>
@@ -13,14 +12,13 @@
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
-#include "Network/PacketWrappers/EffectPacket.h"
+#include "Network/PacketWrappers/EffectPacket1.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/Action.h"
-#include "ServerMgr.h"
+#include "WorldServer.h"
 #include "Session.h"
 #include "Math/CalcStats.h"
 #include "Chara.h"
@@ -30,11 +28,11 @@
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
-using namespace Sapphire::Network::Packets::Server;
+using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
 Sapphire::Entity::Chara::Chara( ObjKind type ) :
-  Actor( type ),
+  GameObject( type ),
   m_pose( 0 ),
   m_targetId( INVALID_GAME_OBJECT_ID64 ),
   m_directorId( 0 ),
@@ -60,7 +58,7 @@ Sapphire::Entity::Chara::~Chara()
 /*! \return the actors name */
 std::string Sapphire::Entity::Chara::getName() const
 {
-  return std::string( m_name );
+  return { m_name };
 }
 
 
@@ -71,7 +69,7 @@ Sapphire::Common::Stance Sapphire::Entity::Chara::getStance() const
 }
 
 /*! \return actor stats */
-Sapphire::Entity::Chara::ActorStats Sapphire::Entity::Chara::getStats() const
+const Sapphire::Entity::Chara::ActorStatsArray& Sapphire::Entity::Chara::getStats() const
 {
   return m_baseStats;
 }
@@ -132,7 +130,6 @@ Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
     case ClassJob::Paladin:
     case ClassJob::Warrior:
     case ClassJob::Darkknight:
-    case ClassJob::Gunbreaker:
       return Role::Tank;
 
     case ClassJob::Pugilist:
@@ -141,13 +138,11 @@ Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
     case ClassJob::Dragoon:
     case ClassJob::Rogue:
     case ClassJob::Ninja:
-    case ClassJob::Samurai:
       return Role::Melee;
 
     case ClassJob::Archer:
     case ClassJob::Bard:
     case ClassJob::Machinist:
-    case ClassJob::Dancer:
       return Role::RangedPhysical;
 
     case ClassJob::Conjurer:
@@ -160,8 +155,6 @@ Sapphire::Common::Role Sapphire::Entity::Chara::getRole() const
     case ClassJob::Blackmage:
     case ClassJob::Arcanist:
     case ClassJob::Summoner:
-    case ClassJob::Redmage:
-    case ClassJob::Bluemage:
       return Role::RangedMagical;
 
     case ClassJob::Carpenter:
@@ -205,13 +198,13 @@ bool Sapphire::Entity::Chara::isAlive() const
 /*! \return max hp for the actor */
 uint32_t Sapphire::Entity::Chara::getMaxHp() const
 {
-  return m_baseStats.max_hp;
+  return max_hp;
 }
 
 /*! \return max mp for the actor */
 uint32_t Sapphire::Entity::Chara::getMaxMp() const
 {
-  return m_baseStats.max_mp;
+  return max_mp;
 }
 
 /*! \return reset hp to current max hp */
@@ -294,10 +287,7 @@ void Sapphire::Entity::Chara::die()
   FFXIVPacketBasePtr packet = makeActorControl( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
   sendToInRangeSet( packet, selfNeedsUpdate );
 
-  // TODO: not all actor show the death animation when they die, some quest npcs might just despawn
-  //       although that might be handled by setting the HP to 1 and doing some script magic
-
-  FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0x20 );
+  FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0 );
   sendToInRangeSet( packet1, selfNeedsUpdate );
 
 }
@@ -329,7 +319,7 @@ void Sapphire::Entity::Chara::setStance( Stance stance )
 {
   m_currentStance = stance;
 
-  FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 0 );
+  FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 1 );
   sendToInRangeSet( packet );
 }
 
@@ -477,11 +467,6 @@ void Sapphire::Entity::Chara::setCurrentAction( Sapphire::World::Action::ActionP
   m_pCurrentAction = std::move( pAction );
 }
 
-uint32_t Sapphire::Entity::Chara::getBonusStat( Common::BaseParam bonus ) const
-{
-  return m_bonusStats[ static_cast< uint8_t >( bonus ) ];
-}
-
 /*!
 Autoattack prototype implementation
 TODO: move the check if the autoAttack can be performed to the callee
@@ -489,11 +474,10 @@ also rename autoAttack to autoAttack as that is more elaborate
 On top of that, this only solves attacks from melee classes.
 Will have to be extended for ranged attacks.
 
-\param ActorPtr the autoAttack is performed on
+\param GameObjectPtr the autoAttack is performed on
 */
 void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 {
-
   uint64_t tick = Util::getTimeMs();
 
   // todo: this needs to use the auto attack delay for the equipped weapon
@@ -505,25 +489,28 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 
     auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
 
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
+    auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage );
-    effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.param0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
-    effectEntry.param2 = 0x71;
-    effectPacket->addEffect( effectEntry );
+
+    Common::CalcResultParam effectEntry{};
+    effectEntry.Value = static_cast< int16_t >( damage );
+    effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
+    effectEntry.Arg0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
+    effectEntry.Arg2 = 0x71;
+    effectPacket->addTargetEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
     pTarget->takeDamage( damage );
-
   }
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
 void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 {
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
   int8_t nextSlot = getStatusEffectFreeSlot();
   // if there is no slot left, do not add the effect
   if( nextSlot == -1 )
@@ -532,23 +519,25 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
 
-  auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
+  auto statusEffectAdd = makeZonePacket< FFXIVIpcActionIntegrity >( getId() );
 
-  statusEffectAdd->data().globalSequence = getCurrentTerritory()->getNextEffectSequence();
-  statusEffectAdd->data().actor_id = pEffect->getTargetActorId();
-  statusEffectAdd->data().current_hp = getHp();
-  statusEffectAdd->data().current_mp = static_cast< uint16_t >( getMp() );
-  statusEffectAdd->data().max_hp = getMaxHp();
-  statusEffectAdd->data().classId = static_cast< uint8_t >( getClass() );
-  statusEffectAdd->data().entryCount = 1;
+  statusEffectAdd->data().ResultId = pZone->getNextEffectSequence();
+  statusEffectAdd->data().Target = pEffect->getTargetActorId();
+  statusEffectAdd->data().Hp = getHp();
+  statusEffectAdd->data().Mp = static_cast< uint16_t >( getMp() );
+  statusEffectAdd->data().Tp = static_cast< uint16_t >( getTp() );
+  statusEffectAdd->data().HpMax = getMaxHp();
+  statusEffectAdd->data().MpMax = static_cast< uint16_t >( getMaxMp() );
+  statusEffectAdd->data().ClassJob = static_cast< uint8_t >( getClass() );
+  statusEffectAdd->data().StatusCount = 1;
 
-  auto& status = statusEffectAdd->data().statusEntries[0];
+  auto& status = statusEffectAdd->data().Status[ 0 ];
 
-  status.sourceActorId = pEffect->getSrcActorId();
-  status.duration = static_cast< float >( pEffect->getDuration() ) / 1000;
-  status.id = static_cast< uint16_t >( pEffect->getId() );
-  status.index = static_cast< uint8_t >( nextSlot );
-  status.param = pEffect->getParam();
+  status.Source = pEffect->getSrcActorId();
+  status.Time = static_cast< float >( pEffect->getDuration() ) / 1000;
+  status.Id = static_cast< uint16_t >( pEffect->getId() );
+  status.Slot = static_cast< uint8_t >( nextSlot );
+  status.SystemParam = static_cast< int16_t >( pEffect->getParam() );
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );
 }
@@ -594,7 +583,7 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
 
 void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
 {
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
@@ -652,22 +641,15 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   uint64_t currentTimeMs = Util::getTimeMs();
 
 
-  auto statusEffectList = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
-  statusEffectList->data().classId = static_cast< uint8_t >( getClass() );
-  statusEffectList->data().level = getLevel();
-  statusEffectList->data().level1 = getLevel();
-  statusEffectList->data().current_hp = getHp();
-  statusEffectList->data().current_mp = getMp();
-  statusEffectList->data().max_hp = getMaxHp();
-  statusEffectList->data().max_mp = getMaxMp();
+  auto statusEffectList = makeZonePacket< FFXIVIpcStatus >( getId() );
   uint8_t slot = 0;
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     float timeLeft = static_cast< float >( effectIt.second->getDuration() -
                                            ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
-    statusEffectList->data().effect[ slot ].duration = timeLeft;
-    statusEffectList->data().effect[ slot ].effect_id = effectIt.second->getId();
-    statusEffectList->data().effect[ slot ].sourceActorId = effectIt.second->getSrcActorId();
+    statusEffectList->data().effect[ slot ].Time = timeLeft;
+    statusEffectList->data().effect[ slot ].Id = effectIt.second->getId();
+    statusEffectList->data().effect[ slot ].Source = effectIt.second->getSrcActorId();
     slot++;
   }
 
@@ -679,7 +661,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     uint8_t effectIndex = effectIt.first;
     auto effect = effectIt.second;
@@ -726,7 +708,8 @@ uint32_t Sapphire::Entity::Chara::getLastComboActionId() const
   // initially check for the time passed first, if it's more than the threshold just return 0 for the combo
   // we can hide the implementation detail this way and it just works:tm: for anything that uses it
 
-  if( std::difftime( Util::getTimeMs(), m_lastComboActionTime ) > Common::MAX_COMBO_LENGTH )
+  if( std::difftime( static_cast< time_t >( Util::getTimeMs() ),
+                     static_cast< time_t >( m_lastComboActionTime ) ) > Common::MAX_COMBO_LENGTH )
   {
     return 0;
   }
@@ -762,147 +745,44 @@ float Sapphire::Entity::Chara::getRadius() const
 
 Sapphire::Common::BaseParam Sapphire::Entity::Chara::getPrimaryStat() const
 {
-  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
 
-  auto classJob = exdData.get< Data::ClassJob >( static_cast< uint16_t >( getClass() ) );
+  auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint16_t >( getClass() ) );
   assert( classJob );
 
-  return static_cast< Sapphire::Common::BaseParam >( classJob->primaryStat );
+  return static_cast< Sapphire::Common::BaseParam >( classJob->data().Role );
 }
 
 uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam baseParam ) const
 {
-  uint32_t value = 0;
+  auto index = static_cast< uint32_t >( baseParam );
+  assert( index < m_baseStats.size() );
 
-  switch( baseParam )
-  {
-    case Common::BaseParam::Strength:
-    {
-      value = m_baseStats.str;
-      break;
-    }
+  return m_baseStats[ index ] + m_bonusStats[ index ];
+}
 
-    case Common::BaseParam::Dexterity:
-    {
-      value = m_baseStats.dex;
-      break;
-    }
+float Sapphire::Entity::Chara::getStatValueFloat( Common::BaseParam baseParam ) const
+{
+  auto index = static_cast< uint32_t >( baseParam );
+  assert( index < m_baseStats.size() );
 
-    case Common::BaseParam::Vitality:
-    {
-      value = m_baseStats.vit;
-      break;
-    }
+  return static_cast< float >( m_baseStats[ index ] + m_bonusStats[ index ] );
+}
 
-    case Common::BaseParam::Intelligence:
-    {
-      value = m_baseStats.inte;
-      break;
-    }
+uint32_t Sapphire::Entity::Chara::getBonusStat( Sapphire::Common::BaseParam baseParam ) const
+{
+  auto index = static_cast< uint32_t >( baseParam );
+  assert( index < m_bonusStats.size() );
 
-    case Common::BaseParam::Mind:
-    {
-      value = m_baseStats.mnd;
-      break;
-    }
+  return m_bonusStats[ index ];
+}
 
-    case Common::BaseParam::Piety:
-    {
-      value = m_baseStats.pie;
-      break;
-    }
+void Sapphire::Entity::Chara::setStatValue( Common::BaseParam baseParam, uint32_t value )
+{
+  auto index = static_cast< uint32_t >( baseParam );
+  assert( index < m_baseStats.size() );
 
-    case Common::BaseParam::Determination:
-    {
-      value = m_baseStats.determination;
-      break;
-    }
-
-    case Common::BaseParam::HP:
-    {
-      value = m_baseStats.max_hp;
-      break;
-    }
-
-    case Common::BaseParam::MP:
-    {
-      value = m_baseStats.max_mp;
-      break;
-    }
-
-    case Common::BaseParam::AttackPower:
-    {
-      auto primaryStat = getPrimaryStat();
-
-      // everything else uses str for atk power except for brd/rogue/etc who use dex
-      if( primaryStat == Common::BaseParam::Dexterity )
-      {
-        return getStatValue( primaryStat );
-      }
-
-      return getStatValue( Common::BaseParam::Strength );
-    }
-
-    case Common::BaseParam::AttackMagicPotency:
-    {
-      value = m_baseStats.attackPotMagic;
-      break;
-    }
-
-    case Common::BaseParam::HealingMagicPotency:
-    {
-      value = m_baseStats.healingPotMagic;
-      break;
-    }
-
-    case Common::BaseParam::SkillSpeed:
-    {
-      value = m_baseStats.skillSpeed;
-      break;
-    }
-
-    case Common::BaseParam::SpellSpeed:
-    {
-      value = m_baseStats.spellSpeed;
-      break;
-    }
-
-    case Common::BaseParam::CriticalHit:
-    {
-      value = m_baseStats.critHitRate;
-      break;
-    }
-
-    case Common::BaseParam::Defense:
-    {
-      value = m_baseStats.defense;
-      break;
-    }
-
-    case Common::BaseParam::MagicDefense:
-    {
-      value = m_baseStats.magicDefense;
-      break;
-    }
-
-    case Common::BaseParam::Tenacity:
-    {
-      value = m_baseStats.tenacity;
-      break;
-    }
-
-    // todo: not sure if this is right?
-    case Common::BaseParam::DirectHitRate:
-    {
-      value = m_baseStats.accuracy;
-      break;
-    }
-
-    default:
-      break;
-  }
-
-  return value + getBonusStat( baseParam );
+  m_baseStats[ index ] = value;
 }
 
 void Sapphire::Entity::Chara::onTick()
@@ -910,7 +790,7 @@ void Sapphire::Entity::Chara::onTick()
   uint32_t thisTickDmg = 0;
   uint32_t thisTickHeal = 0;
 
-  for( auto effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     auto thisEffect = effectIt.second->getTickEffect();
     switch( thisEffect.first )
@@ -933,13 +813,13 @@ void Sapphire::Entity::Chara::onTick()
   {
     takeDamage( thisTickDmg );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
+                                        static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP), thisTickDmg ), true );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickHeal );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::Heal ), thisTickHeal ), true );
+                                        static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP ), thisTickHeal ), true );
   }
 }

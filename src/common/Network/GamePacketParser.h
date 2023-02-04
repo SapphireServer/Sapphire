@@ -1,5 +1,4 @@
-#ifndef _GAMEPACKETPARSER_H
-#define _GAMEPACKETPARSER_H
+#pragma once
 
 #include "CommonNetwork.h"
 
@@ -45,5 +44,3 @@ namespace Sapphire::Network::Packets
   bool checkSegmentHeader( const FFXIVARR_PACKET_SEGMENT_HEADER& header );
 
 }
-
-#endif

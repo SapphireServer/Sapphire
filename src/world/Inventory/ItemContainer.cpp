@@ -9,7 +9,7 @@
 #include "Forwards.h"
 #include "ItemContainer.h"
 
-Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint8_t maxSize, const std::string& tableName,
+Sapphire::ItemContainer::ItemContainer( uint16_t storageId, uint16_t maxSize, const std::string& tableName,
                                         bool isMultiStorage, bool isPersistentStorage ) :
   m_id( storageId ),
   m_size( maxSize ),
@@ -30,12 +30,12 @@ uint16_t Sapphire::ItemContainer::getId() const
   return m_id;
 }
 
-uint8_t Sapphire::ItemContainer::getEntryCount() const
+uint16_t Sapphire::ItemContainer::getEntryCount() const
 {
-  return static_cast< uint8_t >( m_itemMap.size() );
+  return static_cast< uint16_t >( m_itemMap.size() );
 }
 
-void Sapphire::ItemContainer::removeItem( uint8_t slotId, bool removeFromDb )
+void Sapphire::ItemContainer::removeItem( uint16_t slotId, bool removeFromDb )
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto it = m_itemMap.find( slotId );
@@ -65,7 +65,7 @@ const Sapphire::ItemMap& Sapphire::ItemContainer::getItemMap() const
   return m_itemMap;
 }
 
-int8_t Sapphire::ItemContainer::getFreeSlot()
+int16_t Sapphire::ItemContainer::getFreeSlot()
 {
   for( uint16_t slotId = 0; slotId < m_size; slotId++ )
   {
@@ -77,7 +77,7 @@ int8_t Sapphire::ItemContainer::getFreeSlot()
   return -1;
 }
 
-Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint8_t slotId )
+Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint16_t slotId )
 {
 
   if( ( slotId > m_size ) )
@@ -85,21 +85,30 @@ Sapphire::ItemPtr Sapphire::ItemContainer::getItem( uint8_t slotId )
     Logger::error( "Slot out of range {0}", slotId );
     return nullptr;
   }
+  
+  if( m_itemMap.find( slotId ) == m_itemMap.end() )
+    return nullptr;
+
+  if( m_itemMap.find( slotId ) == m_itemMap.end() )
+    return nullptr;
 
   return m_itemMap[ slotId ];
 }
 
-void Sapphire::ItemContainer::setItem( uint8_t slotId, ItemPtr pItem )
+void Sapphire::ItemContainer::setItem( uint16_t slotId, ItemPtr pItem )
 {
   if( slotId > m_size )
+  {
+    Logger::error( "Unable to place item {}, {} exceeds max size of {}", pItem->getId(), slotId, m_size );
     return;
+  }
 
   m_itemMap[ slotId ] = pItem;
 }
 
-uint8_t Sapphire::ItemContainer::getMaxSize() const
+uint16_t Sapphire::ItemContainer::getMaxSize() const
 {
-  return m_size;
+  return m_size > 65536 ? 65536 : m_size;
 }
 
 std::string Sapphire::ItemContainer::getTableName() const

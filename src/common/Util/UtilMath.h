@@ -21,6 +21,8 @@ namespace Sapphire::Common::Util
 
   float calcAngFrom( float x, float y, float x1, float y1 );
 
+  float trunc( float value, uint8_t digitsToRemain );
+
   uint16_t floatToUInt16( float val );
 
   uint16_t floatToUInt16Rot( float val );
@@ -39,6 +41,9 @@ namespace Sapphire::Common::Util
     return val;
   }
 
+  FFXIVARR_POSITION3 transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix );
+
+  float eulerToDirection( const FFXIVARR_POSITION3& euler );
 }
 
 #endif

@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_SERVICE_H
-#define SAPPHIRE_SERVICE_H
+#pragma once
 
 #include <memory>
 #include <utility>
@@ -111,5 +110,3 @@ namespace Sapphire::Common
     inline static std::shared_ptr< SvcType > service = nullptr;
   };
 }
-
-#endif //SAPPHIRE_SERVICE_H

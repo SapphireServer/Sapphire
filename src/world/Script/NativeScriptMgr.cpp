@@ -2,7 +2,7 @@
 
 #include <Crypt/md5.h>
 #include <Service.h>
-#include "ServerMgr.h"
+#include "WorldServer.h"
 
 namespace Sapphire::Scripting
 {
@@ -120,9 +120,9 @@ namespace Sapphire::Scripting
 
   NativeScriptMgr::NativeScriptMgr()
   {
-    auto& serverMgr = Common::Service< Sapphire::World::ServerMgr >::ref();
+    auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
 
-    m_loader.setCachePath( serverMgr.getConfig().scripts.cachePath );
+    m_loader.setCachePath( server.getConfig().scripts.cachePath );
   }
 
 

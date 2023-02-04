@@ -31,7 +31,7 @@ private:
   {
     auto callback = [ this ]( Entity::Player& player, const Event::SceneResult& result )
     {
-      auto questionAnswer = result.param2;
+      auto questionAnswer = result.getResult( 0 );
 
       uint16_t itemId = 0;
 
@@ -63,25 +63,25 @@ private:
       Scene00001( player );
     };
 
-    player.playScene( getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
+    eventMgr().playScene( player, getId(), 0, NO_DEFAULT_CAMERA | INVIS_ENPC |
                                   CONDITION_CUTSCENE | HIDE_UI |
                                   HIDE_HOTBAR | SILENT_ENTER_TERRI_ENV | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
-                                  DISABLE_SKIP | DISABLE_STEALTH, 0, 1, callback );
+                                  DISABLE_SKIP | DISABLE_STEALTH, { 1 }, callback );
   }
 
   void Scene00001( Entity::Player& player )
   {
-    player.playScene( getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
+    eventMgr().playScene( player, getId(), 1, NO_DEFAULT_CAMERA | HIDE_HOTBAR );
   }
 
   void Scene00020( Entity::Player& player )
   {
-    player.playScene( getId(), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 1 );
+    eventMgr().playScene( player, getId(), 20, NO_DEFAULT_CAMERA | HIDE_HOTBAR, { 1 } );
   }
 
   void Scene00030( Entity::Player& player )
   {
-    player.playScene( getId(), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR, 0, 0 );
+    eventMgr().playScene( player, getId(), 30, NO_DEFAULT_CAMERA | HIDE_HOTBAR );
   }
 
   void Scene00040( Entity::Player& player )
@@ -95,7 +95,7 @@ private:
       }
     };
 
-    player.playScene( getId(), 40, 1, 2, 1, callback );
+    eventMgr().playScene( player, getId(), 40, 0, { 1, 2, 1 }, callback );
   }
 
 public:

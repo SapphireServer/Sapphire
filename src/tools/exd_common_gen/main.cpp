@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Logging/Logger.h>
 #include <algorithm>
 #include <Util/Util.h>
@@ -16,7 +16,7 @@
 
 #include <fstream>
 
-Sapphire::Data::ExdDataGenerated g_exdData;
+Sapphire::Data::ExdData g_exdData;
 
 using namespace Sapphire;
 

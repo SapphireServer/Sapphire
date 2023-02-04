@@ -1,5 +1,4 @@
-#ifndef SAPPHIRE_DBLOADER_H
-#define SAPPHIRE_DBLOADER_H
+#pragma once
 
 #include <stdint.h>
 #include <functional>
@@ -47,4 +46,3 @@ namespace Sapphire::Db
   };
 }
 
-#endif //SAPPHIRE_DBLOADER_H

@@ -9,12 +9,12 @@
 
 #define TYPE_FORWARD( x ) \
 class x; \
-typedef std::shared_ptr< x > x ## Ptr; \
-typedef std::unique_ptr< x > x ## UPtr; \
+using x ## Ptr = std::shared_ptr< x >; \
+using x ## UPtr = std::unique_ptr< x >; \
 template< typename...Args > \
 x ## Ptr make_ ## x( Args &&...args ) { \
 return std::make_shared< x >( std::forward< Args >( args ) ... ); }\
-typedef std::vector< x > x ## PtrList;
+using x ## PtrList = std::vector< x >;
 
 namespace Sapphire
 {
@@ -26,13 +26,15 @@ TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( QuestBattle );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
-TYPE_FORWARD( ZonePosition );
 TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
+TYPE_FORWARD( FreeCompany );
 
 namespace World
 {
 TYPE_FORWARD( Session );
+TYPE_FORWARD( Quest );
+TYPE_FORWARD( Task );
 }
 
 namespace World::Navi
@@ -65,14 +67,11 @@ TYPE_FORWARD( StatusEffectContainer );
 
 namespace Entity
 {
-TYPE_FORWARD( Actor );
+TYPE_FORWARD( GameObject );
 TYPE_FORWARD( Chara );
 TYPE_FORWARD( Player );
 TYPE_FORWARD( EventObject );
-TYPE_FORWARD( BNpcTemplate );
 TYPE_FORWARD( BNpc );
-TYPE_FORWARD( SpawnPoint );
-TYPE_FORWARD( SpawnGroup );
 }
 
 namespace Event
@@ -86,6 +85,7 @@ namespace World::Action
 TYPE_FORWARD( Action );
 TYPE_FORWARD( EventAction );
 TYPE_FORWARD( ItemAction );
+TYPE_FORWARD( EventItemAction );
 TYPE_FORWARD( MountAction );
 TYPE_FORWARD( EffectBuilder );
 TYPE_FORWARD( EffectResult );

@@ -1,21 +1,20 @@
-#ifndef _CORE_NETWORK_PACKETS_PINGPACKET_H
-#define _CORE_NETWORK_PACKETS_PINGPACKET_H
+#pragma once
 
 #include <Network/GamePacket.h>
 
 #include "Forwards.h"
 
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
   * @brief The Ping response packet.
   */
-  class PingPacket : public ZoneChannelPacket< FFXIVIpcPing >
+  class PingPacket : public ZoneChannelPacket< FFXIVIpcSync >
   {
   public:
     PingPacket( Entity::Player& player, int32_t inVal ) :
-      ZoneChannelPacket< FFXIVIpcPing >( player.getId(), player.getId() )
+      ZoneChannelPacket< FFXIVIpcSync >( player.getId(), player.getId() )
     {
       initialize( player, inVal );
     };
@@ -23,10 +22,9 @@ namespace Sapphire::Network::Packets::Server
   private:
     void initialize( Entity::Player& player, int32_t inVal )
     {
-      m_data.timeInMilliseconds = 0x000014D00000000 + inVal;
+      m_data.clientTimeValue = inVal;
+      m_data.transmissionInterval = 333;
     };
   };
 
 }
-
-#endif /*_CORE_NETWORK_PACKETS_CPINGPACKET_H*/

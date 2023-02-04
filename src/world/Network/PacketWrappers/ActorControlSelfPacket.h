@@ -1,12 +1,10 @@
-#ifndef _ACTORCONTROL143_H
-#define _ACTORCONTROL143_H
+#pragma once
 
 #include <Network/GamePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include "Forwards.h"
 
-
-namespace Sapphire::Network::Packets::Server
+namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
@@ -49,5 +47,3 @@ namespace Sapphire::Network::Packets::Server
   }
 
 }
-
-#endif /*_ACTORCONTROL143_H*/

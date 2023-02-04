@@ -1,6 +1,4 @@
-#ifndef XIV_UTILS_BPARSE_H
-#define XIV_UTILS_BPARSE_H
-
+#pragma once
 #include <type_traits>
 #include <iomanip>
 #include <sstream>
@@ -31,7 +29,7 @@ namespace xiv::utils::bparse
   template< typename StructType >
   void read( std::istream& i_stream, StructType& i_struct )
   {
-    static_assert( std::is_pod< StructType >::value, "StructType must be a POD to be able to use read." );
+    static_assert( std::is_trivially_copyable< StructType >::value, "StructType must be a POD to be able to use read." );
     i_stream.read( reinterpret_cast<char*>( &i_struct ), sizeof( StructType ) );
   }
 
@@ -97,5 +95,3 @@ namespace xiv::utils::bparse
   std::string extract_cstring( std::istream& i_stream, const std::string& i_name );
 
 }
-
-#endif // XIV_UTILS_BPARSE_H

@@ -4,20 +4,25 @@
 #include <Util/Util.h>
 #include <Network/PacketContainer.h>
 #include <Logging/Logger.h>
+#include <Service.h>
 
 #include "Network/GameConnection.h"
 #include "Actor/Player.h"
+#include "WorldServer.h"
+#include "Manager/PlayerMgr.h"
 
 #include "Session.h"
 
+using namespace Sapphire::World::Manager;
 namespace fs = std::filesystem;
 
-Sapphire::World::Session::Session( uint32_t sessionId ) :
-  m_sessionId( sessionId ),
+Sapphire::World::Session::Session( uint32_t entityId ) :
+  m_entityId( entityId ),
   m_lastDataTime( Common::Util::getTimeSeconds() ),
   m_lastSqlTime( Common::Util::getTimeSeconds() ),
   m_isValid( false ),
-  m_isReplaying( false )
+  m_isReplaying( false ),
+  m_lastPing( 0 )
 {
 }
 
@@ -43,22 +48,23 @@ Sapphire::Network::GameConnectionPtr Sapphire::World::Session::getChatConnection
   return m_pChatConnection;
 }
 
-
 bool Sapphire::World::Session::loadPlayer()
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
 
-  m_pPlayer = Entity::make_Player();
+  m_isValid = false;
 
-  if( !m_pPlayer->load( m_sessionId, shared_from_this() ) )
-  {
-    m_isValid = false;
+  m_pPlayer = server.getPlayer( m_entityId );
+
+  if( !m_pPlayer )
     return false;
-  }
+
+  // check and sync player data on login
+  if( !server.syncPlayer( m_pPlayer->getCharacterId() ) )
+    return false;
 
   m_isValid = true;
-
   return true;
-
 }
 
 void Sapphire::World::Session::close()
@@ -72,17 +78,13 @@ void Sapphire::World::Session::close()
   // remove the session from the player
   if( m_pPlayer )
   {
-    m_pPlayer->clearBuyBackMap();
-    // do one last update to db
-    m_pPlayer->updateSql();
-    // reset the zone, so the zone handler knows to remove the actor
-    m_pPlayer->setCurrentZone( nullptr );
+    m_pPlayer->unload();
   }
 }
 
 uint32_t Sapphire::World::Session::getId() const
 {
-  return m_sessionId;
+  return m_entityId;
 }
 
 int64_t Sapphire::World::Session::getLastDataTime() const
@@ -114,7 +116,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
 {
   if( !fs::exists( path ) )
   {
-    getPlayer()->sendDebug( "Couldn't find folder." );
+    PlayerMgr::sendDebug( *getPlayer(), "Couldn't find folder." );
     return;
   }
 
@@ -151,7 +153,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
     Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
   }
 
-  getPlayer()->sendDebug( "Registered {0} sets for replay" ), m_replayCache.size();
+  PlayerMgr::sendDebug( *getPlayer(), "Registered {0} sets for replay" ), m_replayCache.size();
   m_isReplaying = true;
 }
 
@@ -188,7 +190,7 @@ void Sapphire::World::Session::sendReplayInfo()
   else
     message += " is idle";
 
-  getPlayer()->sendDebug( message );
+  PlayerMgr::sendDebug( *getPlayer(), message );
 }
 
 void Sapphire::World::Session::update()
@@ -225,3 +227,12 @@ Sapphire::Entity::PlayerPtr Sapphire::World::Session::getPlayer() const
   return m_pPlayer;
 }
 
+void Sapphire::World::Session::setLastPing( uint32_t ping )
+{
+  m_lastPing = ping;
+}
+
+uint32_t Sapphire::World::Session::getLastPing() const
+{
+  return m_lastPing;
+}

@@ -1,10 +1,31 @@
-#ifndef SAPPHIRE_ACTIONLUT_H
-#define SAPPHIRE_ACTIONLUT_H
+#pragma once
 
+#include <cstdint>
 #include <unordered_map>
+#include <string>
+#include <vector>
+#include "Common.h"
 
 namespace Sapphire::World::Action
 {
+  struct StatusModifier
+  {
+    Common::ParamModifier modifier;
+    int32_t value;
+  };
+
+  struct StatusEntry
+  {
+    uint16_t id;
+    std::vector< StatusModifier > modifiers;
+  };
+
+  struct StatusEffect
+  {
+    std::vector< StatusEntry > caster;
+    std::vector< StatusEntry > target;
+  };
+
   struct ActionEntry
   {
     uint16_t potency;
@@ -14,6 +35,8 @@ namespace Sapphire::World::Action
     uint16_t rearPotency;
     uint16_t curePotency;
     uint16_t restoreMPPercentage;
+    std::vector< uint32_t > nextCombo;
+    StatusEffect statuses;
   };
 
   class ActionLut
@@ -27,5 +50,3 @@ namespace Sapphire::World::Action
     static Lut m_actionLut;
   };
 }
-
-#endif //SAPPHIRE_ACTIONLUT_H

@@ -13,14 +13,12 @@
 #include <map>
 #include <memory>
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+#include <Exd/Structs.h>
 
 namespace Sapphire
 {
-
-  class ZonePosition;
-
   using FestivalPair = std::pair< uint16_t, uint16_t >;
 
   namespace Data
@@ -28,6 +26,14 @@ namespace Sapphire
     struct InstanceContent;
     struct TerritoryType;
   }
+
+  struct SpawnInfo
+  {
+    std::shared_ptr< Entity::BNpc > bnpcPtr;
+    std::shared_ptr< Common::BNPCInstanceObject > infoPtr;
+    uint32_t lastSpawn;
+    uint32_t timeOfDeath;
+  };
 
   class Territory : public CellHandler< Cell >, public std::enable_shared_from_this< Territory >
   {
@@ -39,40 +45,47 @@ namespace Sapphire
     std::string m_internalName;
     std::string m_bgPath;
 
-    std::unordered_map< int32_t, Entity::PlayerPtr > m_playerMap;
-    std::unordered_map< int32_t, Entity::BNpcPtr > m_bNpcMap;
-    std::unordered_map< int32_t, Entity::EventObjectPtr > m_eventObjects;
+    std::unordered_map< uint32_t, Entity::PlayerPtr > m_playerMap;
+    std::unordered_map< uint32_t, Entity::BNpcPtr > m_bNpcMap;
+    std::unordered_map< uint32_t, Entity::EventObjectPtr > m_eventObjects;
+
+    std::unordered_map< uint32_t, std::shared_ptr< Common::BNPCInstanceObject > > m_bNpcBaseMap;
 
     Common::Weather m_currentWeather;
     Common::Weather m_weatherOverride;
     std::map< uint8_t, int32_t > m_weatherRateMap;
 
-    int64_t m_lastMobUpdate;
-    int64_t m_lastUpdate;
+    uint64_t m_lastMobUpdate;
+    uint64_t m_lastUpdate{};
 
-    uint64_t m_lastActivityTime;
+    uint64_t m_lastActivityTime{};
 
     FestivalPair m_currentFestival;
 
-    std::shared_ptr< Data::TerritoryType > m_territoryTypeInfo;
+    std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > m_territoryTypeInfo;
 
     uint32_t m_nextEObjId;
     uint32_t m_nextActorId;
 
-    std::vector< Entity::SpawnGroup > m_spawnGroups;
+    std::vector< SpawnInfo > m_spawnInfo;
 
-    uint32_t m_effectCounter;
+    uint32_t m_effectCounter{};
     std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
     std::vector< World::Action::EffectResultPtr > m_effectResults;
 
+    Common::TerritoryIdent m_ident;
+
+    float m_inRangeDistance;
+
   public:
     Territory();
 
-    Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName,
-               const std::string& placeName );
+    Territory( uint16_t territoryTypeId, uint32_t guId, const std::string& internalName, const std::string& placeName );
 
     virtual ~Territory();
+
+    const Common::TerritoryIdent& getTerritoryIdent() const;
 
     /*! overrides the zone's weather, set to 0 to unlock */
     void setWeatherOverride( Common::Weather weather );
@@ -83,13 +96,11 @@ namespace Sapphire
 
     void setCurrentFestival( uint16_t festivalId, uint16_t additionalFestivalId = 0 );
 
-    std::shared_ptr< Data::TerritoryType > getTerritoryTypeInfo() const;
+    std::shared_ptr< Excel::ExcelStruct< Excel::TerritoryType > > getTerritoryTypeInfo() const;
 
     uint64_t getLastActivityTime() const;
 
     virtual bool init();
-
-    virtual void loadCellCache();
 
     virtual uint32_t getTerritoryTypeId() const;
 
@@ -107,25 +118,30 @@ namespace Sapphire
 
     virtual void onUpdate( uint64_t tickCount );
 
-    virtual void onRegisterEObj( Entity::EventObjectPtr object ) {};
+    virtual void onAddEObj( Entity::EventObjectPtr object ) {};
 
     virtual void onEnterTerritory( Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
+    virtual void onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint32_t arg1, uint32_t arg2,
+                                      uint32_t arg3, uint32_t arg4 );
+
+    virtual float getInRangeDistance();
+
     Common::Weather getNextWeather();
 
-    void pushActor( Entity::ActorPtr pActor );
+    void pushActor( const Entity::GameObjectPtr& pActor );
 
-    void removeActor( Entity::ActorPtr pActor );
+    void removeActor( const Entity::GameObjectPtr &pActor );
 
-    void updateActorPosition( Entity::Actor& pActor );
+    void updateActorPosition( Entity::GameObject& pActor );
 
     bool isCellActive( uint32_t x, uint32_t y );
 
     void updateCellActivity( uint32_t x, uint32_t y, int32_t radius );
 
-    void updateInRangeSet( Entity::ActorPtr pActor, Cell* pCell );
+    void updateInRangeSet( Entity::GameObjectPtr pActor, CellPtr pCell );
 
-    void queuePacketForRange( Entity::Player& sourcePlayer, uint32_t range,
+    void queuePacketForRange( Entity::Player& sourcePlayer, float range,
                               Network::Packets::FFXIVPacketBasePtr pPacketEntry );
 
     void queuePacketForZone( Entity::Player& sourcePlayer, Network::Packets::FFXIVPacketBasePtr pPacketEntry,
@@ -147,22 +163,28 @@ namespace Sapphire
 
     void loadWeatherRates();
 
-    bool loadSpawnGroups();
+    bool loadBNpcs();
 
     bool checkWeather();
-    void updateBNpcs( uint64_t tickCount );
+    virtual void updateBNpcs( uint64_t tickCount );
 
     bool update( uint64_t tickCount );
 
     void updateSessions( uint64_t tickCount, bool changedWeather );
 
-    Entity::EventObjectPtr registerEObj( const std::string& name, uint32_t objectId, uint32_t mapLink,
-                                         uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale, float rotation );
+    Entity::EventObjectPtr addEObj( const std::string& name, uint32_t objectId, uint32_t mapLink, uint32_t instanceId,
+                                    uint8_t state, Common::FFXIVARR_POSITION3 pos, float scale,
+                                    float rotation, uint8_t permissionInv );
 
-    void registerEObj( Entity::EventObjectPtr object );
-    Entity::BNpcPtr createBNpcFromLevelEntry( uint32_t levelId, uint8_t level, uint8_t type,
-                                              uint32_t hp, uint16_t nameId, uint32_t directorId, uint8_t bnpcType );
-    Entity::BNpcPtr getActiveBNpcByLevelId( uint32_t levelId );
+    void addEObj( Entity::EventObjectPtr object );
+
+    Entity::BNpcPtr createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
+
+    Entity::BNpcPtr getActiveBNpcByEntityId( uint32_t entityId );
+
+    Entity::BNpcPtr getActiveBNpcByLayoutId( uint32_t instanceId );
+
+    Entity::BNpcPtr getActiveBNpcByLayoutIdAndTriggerOwner( uint32_t instanceId, uint32_t triggerOwnerId );
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 

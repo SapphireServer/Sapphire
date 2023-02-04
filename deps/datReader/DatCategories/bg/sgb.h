@@ -136,7 +136,7 @@ struct SGB_MODEL_ENTRY : public SGB_GROUP_ENTRY
   std::string modelFileName;
   std::string collisionFileName;
 
-  SGB_MODEL_ENTRY( char* buf, uint32_t offset, SgbGroupEntryType type )
+  SGB_MODEL_ENTRY( char* buf, size_t offset, SgbGroupEntryType type )
   {
     this->type = type;
     header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
@@ -210,11 +210,29 @@ struct SGB_HEADER
   uint32_t unknown54;
 };
 
+enum eCollisionState
+{
+  NoChange = 0x0,
+  On = 0x1,
+  Off = 0x2,
+};
+
+
 struct SGB_STATE_HEADER
 {
   uint32_t id;
   uint32_t nameOffset;
-  char unknown[0x24];
+  int Binders;
+  int BinderCount;
+  int BinaryAssetPath;
+  int Binary;
+  int BinaryCount;
+  uint32_t TimelineID;
+  int8_t AutoPlay;
+  int8_t LoopPlayback;
+  uint8_t Padding00[2];
+  eCollisionState CollisionState;
+  uint32_t Reserved[1];
 };
 
 struct SGB_STATE_ENTRY
@@ -258,7 +276,7 @@ struct SGB_FILE
       if( stateCount > 0 )
       {
         stateCount = stateCount;
-        for( int i = 0; i < stateCount; ++i )
+        for( size_t i = 0; i < stateCount; ++i )
         {
           auto state = SGB_STATE_ENTRY( buf + baseOffset + header.statesOffset + 8 + i * sizeof( SGB_STATE_HEADER ) );
           stateEntries.push_back( state );

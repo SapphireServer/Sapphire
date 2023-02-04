@@ -5,8 +5,9 @@
 #include <datReader/DatCategories/bg/lgb.h>
 
 #include "Territory/InstanceObjectCache.h"
+#include "Territory/Territory.h"
 
-#include <Exd/ExdDataGenerated.h>
+#include <Exd/ExdData.h>
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
@@ -16,74 +17,38 @@ class WarpTaxi : public Sapphire::ScriptAPI::EventScript
 {
 public:
   WarpTaxi() :
-    Sapphire::ScriptAPI::EventScript( 0x0002005a )
+    Sapphire::ScriptAPI::EventScript( 0x00020000 )
   {
-  }
-
-  void inner( Entity::Player& player, const Event::SceneResult& result )
-  {
-    if( result.param1 == 256 ) // exit
-    {
-      player.eventFinish( 1310721, 0 );
-      player.eventFinish( getId(), 1 );
-    }
-    else if( result.param1 == 768 ) // teleport to ward
-    {
-      player.eventFinish( 1310721, 0 );
-      player.eventFinish( getId(), 1 );
-
-      auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
-      auto& popRange = Common::Service< Sapphire::InstanceObjectCache >::ref();
-
-      auto warp = exdData.get< Sapphire::Data::Warp >( getId() );
-      if( !warp )
-        return;
-
-      auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-
-      auto pPop = popRange.getPopRange( warp->territoryType, warp->popRange );
-
-      if( !pPop )
-      {
-        std::cout << "not found...";
-      }
-      else
-      {
-        std::cout << "found!!";
-      }
-
-      playerMgr.movePlayerToLandDestination( player, warp->popRange, result.param3 );
-    }
-    else
-    {
-      player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341,
-                        std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
-    }
-  }
-
-  void inner2( Entity::Player& player, uint64_t actorId )
-  {
-    player.playScene( getId(), 0, HIDE_HOTBAR, 0, 0, 32529,
-                      [this, actorId]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        player.eventStart( actorId, 1310721, Event::EventHandler::Nest, 1, 0 );
-
-                        player.playScene( 1310721, 0, HIDE_HOTBAR, 0, 1, 341,
-                                          std::bind( &WarpTaxi::inner, this, std::placeholders::_1, std::placeholders::_2 ) );
-                      } );
   }
 
   void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
   {
-    auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
+   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
 
-    auto warp = exdData.get< Sapphire::Data::Warp >( eventId );
+    auto warp = exdData.getRow< Excel::Warp >( eventId );
     if( !warp )
       return;
 
-    player.eventStart( actorId, warp->conditionSuccessEvent, Event::EventHandler::Nest, 0, 0,
-                       std::bind( &WarpTaxi::inner2, this, std::placeholders::_1, std::placeholders::_2 ) );
-    player.playScene( warp->conditionSuccessEvent, 0, HIDE_HOTBAR, 0, 0, 7, nullptr );
+    auto qualifiedPreResult = [ this ]( Entity::Player& player, const Event::SceneResult& result )
+    {
+      //eventMgr().playScene( player, result.eventId, 1, HIDE_HOTBAR, { 1 }, nullptr );
+      if( result.getResult( 0 ) == 1 && result.errorCode != Common::EventSceneError::EVENT_SCENE_ERROR_LUA_ERRRUN )
+      {
+        auto warp = this->exdData().getRow< Excel::Warp >( result.eventId );
+        if( warp )
+        {
+          auto popRangeInfo = instanceObjectCache().getPopRangeInfo( warp->data().PopRange );
+          if( popRangeInfo )
+          {
+            auto pTeri = teriMgr().getZoneByTerritoryTypeId( popRangeInfo->m_territoryTypeId );
+            warpMgr().requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
+                                            pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
+          }
+        }
+      }
+    };
+
+    eventMgr().playScene( player, eventId, 0, HIDE_HOTBAR, { 1 }, qualifiedPreResult );
   }
 };
 

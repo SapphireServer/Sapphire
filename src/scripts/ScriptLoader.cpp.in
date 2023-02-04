@@ -1,5 +1,10 @@
 #include <Script/NativeScriptApi.h>
 
+#ifdef _WIN32
+  #include <memory>
+  #include <Service.h>
+#endif
+
 @ScriptIncludes@
 
 const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
@@ -7,6 +12,70 @@ const Sapphire::ScriptAPI::ScriptObject* ptrs[] =
 @ScriptNames@
    nullptr
 };
+
+#ifdef _WIN32
+namespace Sapphire
+{
+  class InstanceObjectCache;
+  namespace World
+  {
+    class WorldServer;
+  }
+}
+
+namespace Sapphire::Data
+{
+  class ExdData;
+}
+
+namespace Sapphire::World::Manager
+{
+  class TerritoryMgr;
+  class LinkshellMgr;
+  class WarpMgr;
+  class RNGMgr;
+  class HousingMgr;
+}
+
+extern "C" EXPORT void win32initServerMgr( std::shared_ptr< Sapphire::World::WorldServer > rngMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::WorldServer >::set( rngMgr );
+}
+
+extern "C" EXPORT void win32initHouMgr( std::shared_ptr< Sapphire::World::Manager::HousingMgr > rngMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::HousingMgr >::set( rngMgr );
+}
+
+extern "C" EXPORT void win32initRngMgr( std::shared_ptr< Sapphire::World::Manager::RNGMgr > rngMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::RNGMgr >::set( rngMgr );
+}
+
+extern "C" EXPORT void win32initExd( std::shared_ptr< Sapphire::Data::ExdData > exdData )
+{
+  Sapphire::Common::Service< Sapphire::Data::ExdData >::set( exdData );
+}
+
+extern "C" EXPORT void win32initTeri( std::shared_ptr< Sapphire::World::Manager::TerritoryMgr > teriMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::TerritoryMgr >::set( teriMgr );
+}
+extern "C" EXPORT void win32initLinkshell( std::shared_ptr< Sapphire::World::Manager::LinkshellMgr > lsMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::LinkshellMgr >::set( lsMgr );
+}
+
+extern "C" EXPORT void win32initWarpMgr( std::shared_ptr< Sapphire::World::Manager::WarpMgr > warpMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::WarpMgr >::set( warpMgr );
+}
+
+extern "C" EXPORT void win32initIObjectCache( std::shared_ptr< Sapphire::InstanceObjectCache > ioCache )
+{
+  Sapphire::Common::Service< Sapphire::InstanceObjectCache >::set( ioCache );
+}
+#endif
 
 extern "C" EXPORT const Sapphire::ScriptAPI::ScriptObject** getScripts()
 {

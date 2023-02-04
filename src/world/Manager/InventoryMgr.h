@@ -1,6 +1,4 @@
-#ifndef SAPPHIRE_INVENTORYMGR_H
-#define SAPPHIRE_INVENTORYMGR_H
-
+#pragma once
 #include "ForwardsZone.h"
 
 namespace Sapphire::World::Manager
@@ -91,5 +89,3 @@ namespace Sapphire::World::Manager
   };
 
 }
-
-#endif //SAPPHIRE_INVENTORYMGR_H

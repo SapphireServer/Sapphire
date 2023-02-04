@@ -4,9 +4,12 @@
 #include <stdint.h>
 #include <string>
 #include <functional>
+#include <Network/CommonNetwork.h>
 
 namespace Sapphire::Common::Util
 {
+
+  uint16_t getOpCode( Network::Packets::FFXIVARR_PACKET_RAW& raw );
 
   std::string binaryToHexString( uint8_t* pBinData, uint16_t size );
 
@@ -37,8 +40,8 @@ namespace Sapphire::Common::Util
   template< class T >
   inline void hashCombine( std::size_t& seed, const T& v )
   {
-      std::hash< T > hasher;
-      seed ^= hasher( v ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
+    std::hash< T > hasher;
+    seed ^= hasher( v ) + 0x9e3779b9 + ( seed << 6 ) + ( seed >> 2 );
   }
 
 }
