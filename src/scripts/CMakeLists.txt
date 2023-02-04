@@ -64,15 +64,15 @@ foreach(_scriptDir ${children})
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.exp"
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.lib"
                 COMMAND ${CMAKE_COMMAND} -E remove "${SCRIPT_LIB_DIR}/script_${_name}.ilk"
-                COMMAND ${CMAKE_COMMAND} -E copy "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll_LOCK
+                COMMAND ${CMAKE_COMMAND} -E copy "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SCRIPT_LIB_DIR}/script_${_name}.dll" ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll
-                COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}.dll_LOCK
+                COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
             )
         else()
             add_custom_command(TARGET "script_${_name}" POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${ScriptTargetName}> ${SCRIPT_POSTBUILD_DIR}_LOCK
+                COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${ScriptTargetName}> ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${ScriptTargetName}> ${SCRIPT_POSTBUILD_DIR}
-                COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}$<TARGET_FILE_NAME:${ScriptTargetName}>_LOCK
+                COMMAND ${CMAKE_COMMAND} -E remove ${SCRIPT_POSTBUILD_DIR}${ScriptTargetName}_LOCK
             )
         endif()
 
