@@ -35,6 +35,7 @@ namespace Sapphire::World::Manager
   class WarpMgr;
   class RNGMgr;
   class HousingMgr;
+  class FreeCompanyMgr;
 }
 
 extern "C" EXPORT void win32initServerMgr( std::shared_ptr< Sapphire::World::WorldServer > rngMgr )
@@ -74,6 +75,10 @@ extern "C" EXPORT void win32initWarpMgr( std::shared_ptr< Sapphire::World::Manag
 extern "C" EXPORT void win32initIObjectCache( std::shared_ptr< Sapphire::InstanceObjectCache > ioCache )
 {
   Sapphire::Common::Service< Sapphire::InstanceObjectCache >::set( ioCache );
+}
+extern "C" EXPORT void win32initFc( std::shared_ptr< Sapphire::World::Manager::FreeCompanyMgr > fcMgr )
+{
+  Sapphire::Common::Service< Sapphire::World::Manager::FreeCompanyMgr >::set( fcMgr );
 }
 #endif
 

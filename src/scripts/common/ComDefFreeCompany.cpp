@@ -3,7 +3,9 @@
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
 #include <Actor/Player.h>
+#include "FreeCompany/FreeCompany.h"
 #include "Manager/EventMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -47,8 +49,12 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
   {
     if( sceneId == 0 )
       eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0,  0, 0, 0, 0, 1, 1, 1 } );
-    else if( sceneId == 5 )
+    else if( sceneId == 5 && yieldId == 17 )
     {
+
+    //  auto& pFcMgr = Common::Service< Sapphire::World::Manager::FreeCompanyMgr >::ref();
+    //  auto pFc = pFcMgr.createFreeCompany( resultString, resultString, player );
+    //  pFcMgr.writeFreeCompany( pFc->getId() );
       /*
        *   GetFcStatusResult
             {
@@ -72,6 +78,13 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
       // { 3, 1, 3, 1234567290, 2444,   1, 0, 1, 1, 1, 0, 0, 0, 0, 0 } valid fc
       // { 3, 2, 7, 1234567890, 111223, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0 } valid fc
       // { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0 } not in company yet and able to get a petition
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
+    }
+    else if( sceneId == 5 && yieldId == 18 )
+    {
+      auto& pFcMgr = Common::Service< Sapphire::World::Manager::FreeCompanyMgr >::ref();
+      auto pFc = pFcMgr.createFreeCompany( resultString, resultString, player );
+      pFcMgr.writeFreeCompany( pFc->getId() );
       eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
     }
   }

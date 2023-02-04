@@ -48,6 +48,7 @@
 #include "Manager/FriendListMgr.h"
 #include "Manager/BlacklistMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 
 #include "ContentFinder/ContentFinder.h"
 
@@ -185,6 +186,15 @@ void WorldServer::run( int32_t argc, char* argv[] )
     return;
   }
   Common::Service< Manager::LinkshellMgr >::set( pLsMgr );
+
+  auto pFcMgr = std::make_shared< Manager::FreeCompanyMgr >();
+  Logger::info( "FreeCompanyMgr: Caching free companies" );
+  if( !pFcMgr->loadFreeCompanies() )
+  {
+    Logger::fatal( "Unable to load free companies!" );
+    return;
+  }
+  Common::Service< Manager::FreeCompanyMgr >::set( pFcMgr );
 
   auto pAchvMgr = std::make_shared< Manager::AchievementMgr >();
 

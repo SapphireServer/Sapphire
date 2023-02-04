@@ -19,6 +19,7 @@ namespace Sapphire::World::Manager
 {
   class TerritoryMgr;
   class RNGMgr;
+  class FreeCompanyMgr;
 }
 #endif
 
@@ -131,6 +132,7 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   using win32initRngMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::RNGMgr > );
   using win32initHouMgr = void(*)( std::shared_ptr< Sapphire::World::Manager::HousingMgr > );
   using win32initServerMgr = void(*)( std::shared_ptr< Sapphire::World::WorldServer > );
+  using win32initFuncFc = void(*)( std::shared_ptr< Sapphire::World::Manager::FreeCompanyMgr > );
 
   auto win32init = reinterpret_cast< win32initFunc >( GetProcAddress( handle, "win32initExd" ) );
   auto win32initTeri = reinterpret_cast< win32initFuncTeri >( GetProcAddress( handle, "win32initTeri" ) );
@@ -140,6 +142,7 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   auto win32initRng = reinterpret_cast< win32initRngMgr >( GetProcAddress( handle, "win32initRngMgr" ) );
   auto win32initHou = reinterpret_cast< win32initHouMgr >( GetProcAddress( handle, "win32initHouMgr" ) );
   auto win32initServer = reinterpret_cast< win32initServerMgr >( GetProcAddress( handle, "win32initServerMgr" ) );
+  auto win32initFc = reinterpret_cast< win32initFuncFc >( GetProcAddress( handle, "win32initFc" ) );
 
   if( win32initServer )
   {
@@ -217,6 +220,17 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   else
   {
     Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
+  }
+
+  if( win32initFc )
+  {
+    auto fcMgr = Common::Service< Sapphire::World::Manager::FreeCompanyMgr >::get();
+    auto fcptr = fcMgr.lock();
+    win32initFc( fcptr );
+  }
+  else
+  {
+    Logger::warn( "did not find a win32initFc export on a windows script target - the server will likely crash!" );
   }
 
   if( win32initWarp )
