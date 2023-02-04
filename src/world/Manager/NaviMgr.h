@@ -4,6 +4,7 @@
 #include "ForwardsZone.h"
 
 #include <array>
+#include <string>
 
 namespace Sapphire::World::Manager
 {
