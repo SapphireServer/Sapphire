@@ -181,8 +181,6 @@ namespace Sapphire::World::Manager
     bool hasPermission( Entity::Player& player, Land& land, uint32_t permission );
 
     void removeHouse( Entity::Player& player, uint16_t plot );
-
-    void removeHouse( Entity::Player& player, uint16_t plot );
     
   private:
 
@@ -274,8 +272,6 @@ namespace Sapphire::World::Manager
      * @param house The house to create in the house table
      */
     void createHouse( HousePtr house ) const;
-
-    void deleteHouse( HousePtr house ) const;
 
     /*!
      * @brief Deletes a house
