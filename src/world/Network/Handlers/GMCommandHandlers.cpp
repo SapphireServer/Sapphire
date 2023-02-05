@@ -471,7 +471,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     {
       server.queueForPlayer( player.getCharacterId(),
         std::make_shared< ActorControlSelfPacket >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
-      PlayerMgr::sendServerNotice( player, "Wireframe Rendering for {0} was toggled", player.getName());
+      PlayerMgr::sendServerNotice( player, "Wireframe Rendering for {0} was toggled", player.getName() );
       break;
     }
     case GmCommand::Teri:
