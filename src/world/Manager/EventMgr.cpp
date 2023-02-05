@@ -18,7 +18,7 @@
 #include "Network/PacketWrappers/EventPlayPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/EventResumePacket.h"
-#include "Network/PacketWrappers/Notice2Packet.h"
+#include "Network/PacketWrappers/EventNoticePacket.h"
 
 #include "Territory/InstanceObjectCache.h"
 
@@ -843,7 +843,31 @@ Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& 
 
 void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, uint8_t numOfArgs, uint32_t var1, uint32_t var2 )
 {
-  auto noticePacket = std::make_shared< Notice2Packet >( player.getId(), questId, noticeId, numOfArgs, var1, var2 );
+  std::vector< uint32_t > args{ var1, var2 };
+  auto noticePacket = std::make_shared< EventNotice2Packet >( player, questId, noticeId, args );
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), noticePacket );
+}
+
+void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, std::vector< uint32_t > args )
+{
+  FFXIVPacketBasePtr pPacket = nullptr;
+  size_t paramCount = args.size();
+
+  assert( paramCount <= 32 );
+
+  if( paramCount < 2 )
+    pPacket = std::move( std::make_shared< EventNotice2Packet >( player, questId, noticeId, args ) );
+  else if( paramCount < 4 )
+    pPacket = std::move( std::make_shared< EventNotice4Packet >( player, questId, noticeId, args ) );
+  else if( paramCount < 8 )
+    pPacket = std::move( std::make_shared< EventNotice8Packet >( player, questId, noticeId, args ) );
+  else if( paramCount < 16 )
+    pPacket = std::move( std::make_shared< EventNotice16Packet >( player, questId, noticeId, args ) );
+  else if( paramCount < 32 )
+    pPacket = std::move( std::make_shared< EventNotice32Packet >( player, questId, noticeId, args ) );
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( player.getCharacterId(), pPacket );
+
 }

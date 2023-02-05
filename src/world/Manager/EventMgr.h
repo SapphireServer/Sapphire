@@ -73,6 +73,7 @@ namespace Sapphire::World::Manager
     bool sendEventPlay( Entity::Player& player, uint32_t eventid, uint32_t scene, uint32_t flags );
 
     void sendEventNotice( Entity::Player& player, uint32_t eventId, int8_t noticeId, uint8_t numOfArgs = 0, uint32_t var1 = 0, uint32_t var2 = 0 );
+    void sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, std::vector< uint32_t > args = {} );
 
     /*! setup the event and return a ptr to it */
     Event::EventHandlerPtr bootstrapSceneEvent( Entity::Player& player, uint32_t eventId, uint32_t flags );
