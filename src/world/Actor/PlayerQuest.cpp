@@ -2,8 +2,6 @@
 #include <Exd/ExdData.h>
 #include <Service.h>
 
-#include "Network/PacketWrappers/Notice2Packet.h"
-
 #include "Manager/QuestMgr.h"
 
 #include "Player.h"

@@ -244,6 +244,8 @@ namespace Sapphire::Network
     DECLARE_HANDLER( getBlacklistHandler );
     DECLARE_HANDLER( blacklistAddHandler );
     DECLARE_HANDLER( blacklistRemoveHandler );
+
+    DECLARE_HANDLER( getFcInviteListHandler );
   };
 
 }

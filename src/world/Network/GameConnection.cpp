@@ -169,6 +169,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( GetBlacklist, "GetBlacklist", &GameConnection::getBlacklistHandler );
   setZoneHandler( BlacklistAdd, "BlacklistAdd", &GameConnection::blacklistAddHandler );
   setZoneHandler( BlacklistRemove, "BlacklistRemove", &GameConnection::blacklistRemoveHandler );
+
+  setZoneHandler( GetFcInviteList, "GetFcInviteList", &GameConnection::getFcInviteListHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

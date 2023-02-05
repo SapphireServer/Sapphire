@@ -8,7 +8,6 @@
 #include <Network/PacketContainer.h>
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/Notice2Packet.h"
 
 #include "QuestMgr.h"
 #include "AchievementMgr.h"

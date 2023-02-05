@@ -197,8 +197,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint64_t AuthorityList;
     uint64_t ChannelID;
     uint64_t CrestID;
-    uint64_t CharaFcState;
-    uint64_t CharaFcParam;
+    uint32_t CharaFcState;
+    uint32_t CharaFcParam;
     uint16_t Param;
     uint8_t FcStatus;
     uint8_t GrandCompanyID;

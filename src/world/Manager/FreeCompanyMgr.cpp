@@ -18,7 +18,7 @@
 
 #include <Network/GameConnection.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-//#include <Network/PacketWrappers/FreeCompanyResultPacket.h>
+
 #include <Network/PacketDef/ClientIpcs.h>
 
 #include "Session.h"
@@ -59,7 +59,7 @@ bool FreeCompanyMgr::loadFreeCompanies()
 
     auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::FreeCompanyChat );
 
-    auto fcPtr = std::make_shared< FreeCompany >( fcId, name, tag, chatChannelId, masterId );
+    auto fcPtr = std::make_shared< FreeCompany >( fcId, name, tag, masterId, chatChannelId );
     m_fcIdMap[ fcId ] = fcPtr;
     m_fcNameMap[ name ] = fcPtr;
 
@@ -164,9 +164,11 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
 
   uint32_t createDate = Common::Util::getTimeSeconds();
 
-  auto fcPtr = std::make_shared< FreeCompany >( freeCompanyId, name, tag, chatChannelId, masterId );
+  auto fcPtr = std::make_shared< FreeCompany >( freeCompanyId, name, tag, masterId, chatChannelId );
   fcPtr->setCreateDate( createDate );
   fcPtr->setGrandCompany( player.getGc() );
+  fcPtr->setFcStatus( Common::FreeCompanyStatus::InviteStart );
+  fcPtr->setRank( 1 );
   m_fcIdMap[ freeCompanyId ] = fcPtr;
   m_fcNameMap[ name ] = fcPtr;
 
@@ -196,6 +198,30 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
   return fcPtr;
 }
 
+void FreeCompanyMgr::sendFreeCompanyStatus( Entity::Player& player )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto fcStatusResult = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
+
+  auto playerFc = getPlayerFreeCompany( player );
+  if( !playerFc )
+    return;
+
+  fcStatusResult->data().AuthorityList = 0;
+  fcStatusResult->data().ChannelID = playerFc->getChatChannel();
+  fcStatusResult->data().Param = 2; // this appears to control which packets are requested afterwards
+  fcStatusResult->data().CharaFcParam = 0;
+  fcStatusResult->data().CrestID = playerFc->getCrest();
+  fcStatusResult->data().FcRank = playerFc->getRank();
+  fcStatusResult->data().FcStatus = static_cast< uint8_t >( playerFc->getFcStatus() );
+  fcStatusResult->data().FreeCompanyID = playerFc->getId();
+  fcStatusResult->data().GrandCompanyID = playerFc->getGrandCompany();
+
+  server.queueForPlayer( player.getCharacterId(), fcStatusResult );
+
+}
+
 void FreeCompanyMgr::finishFreeCompanyAction( const std::string& name, uint32_t result, Entity::Player& player, uint8_t action )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -204,11 +230,12 @@ void FreeCompanyMgr::finishFreeCompanyAction( const std::string& name, uint32_t 
 
 FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( Entity::Player& player ) const
 {
-
   for( const auto &[ key, value ] : m_fcIdMap )
   {
-
+    if( value->getMasterId() == player.getCharacterId() )
+    {
+      return value;
+    }
   }
-
   return nullptr;
 }

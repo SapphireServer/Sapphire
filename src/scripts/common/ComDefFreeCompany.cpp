@@ -82,10 +82,24 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
     }
     else if( sceneId == 5 && yieldId == 18 )
     {
+      // resultstring contains name and tag delimited by '|'
+      std::size_t splitPos( resultString.find( '|' ) );
+      std::string fcName( resultString.substr( 0, splitPos ) );
+      std::string fcTag( resultString.substr( splitPos + 1 ) );
+
       auto& pFcMgr = Common::Service< Sapphire::World::Manager::FreeCompanyMgr >::ref();
-      auto pFc = pFcMgr.createFreeCompany( resultString, resultString, player );
+      auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+      auto pFc = pFcMgr.createFreeCompany( fcName, fcTag, player );
+      // if no fc is returned, the name has been taken already
+      if( !pFc )
+      {
+        playerMgr.sendLogMessage( player, 3051 );
+        eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 3051 } );
+        return;
+      }
       pFcMgr.writeFreeCompany( pFc->getId() );
-      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0 } );
+      pFcMgr.sendFreeCompanyStatus( player );
     }
   }
 

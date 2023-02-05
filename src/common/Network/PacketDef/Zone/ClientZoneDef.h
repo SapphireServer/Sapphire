@@ -713,4 +713,14 @@ struct FFXIVIpcPcPartyChangeLeader : FFXIVIpcBasePacket< PcPartyChangeLeader >
   char NextLeaderCharacterName[32];
 };
 
+struct FFXIVIpcGetFcInviteList : FFXIVIpcBasePacket< GetFcInviteList >
+{
+  uint32_t Reserve;
+};
+
+struct FFXIVIpcGetFcHierarchy : FFXIVIpcBasePacket< GetFcHierarchy >
+{
+  uint8_t ListType;
+};
+
 }

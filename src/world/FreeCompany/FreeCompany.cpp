@@ -188,6 +188,11 @@ const std::array< uint64_t, 15 >& Sapphire::FreeCompany::getActionStockArr() con
   return m_actionStock;
 }
 
+uint64_t Sapphire::FreeCompany::getChatChannel() const
+{
+  return m_chatChannelId;
+}
+
 
 
 
