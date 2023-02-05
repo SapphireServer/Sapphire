@@ -2,6 +2,7 @@
 
 #include "Action/Action.h"
 #include "Action/ItemAction.h"
+#include "Action/EventItemAction.h"
 #include "Action/MountAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
@@ -72,6 +73,20 @@ void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& play
   action->start();
 }
 
+void World::Manager::ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId, Data::EventItemPtr itemActionData, uint32_t sequence, uint64_t targetId )
+{
+  auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetId );
+  if( !action->init() )
+    return;
+  if( itemActionData->castTime )
+  {
+    player.setCurrentAction( action );
+  }
+
+  action->start();
+}
+
+
 void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
                                                    Data::ActionPtr actionData, uint64_t targetId,
                                                    uint16_t sequence )
@@ -94,6 +109,7 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
 {
   if( !currentAction->preCheck() )
   {
+    player.sendDebug( "preCheck failed" );
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;

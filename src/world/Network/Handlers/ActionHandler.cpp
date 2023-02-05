@@ -67,6 +67,14 @@ void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_P
       break;
     }
 
+    case Common::SkillType::EventItem:
+    {
+      auto action = exdData.get< Data::EventItem >( actionId );
+      assert( action );
+      actionMgr.handleEventItemAction( player, actionId, action, sequence, targetId );
+      break;
+    }
+
     case Common::SkillType::MountSkill:
     {
       auto action = exdData.get< Data::Action >( 4 );

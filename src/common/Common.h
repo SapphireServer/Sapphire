@@ -78,6 +78,60 @@ namespace Sapphire::Common
     Enemy = 4,
   };
 
+  enum ActorKind : int32_t
+  {
+    ACTOR_KIND_PC = 0x0,
+    ACTOR_KIND_NPC = 0x1,
+    ACTOR_KIND_RETAINER = 0x2,
+    ACTOR_KIND_BATTLE = 0x3,
+    ACTOR_KIND_BATTLE_FRIEND = 0x4,
+    ACTOR_KIND_OBJECT = 0x5,
+    ACTOR_KIND_TREASURE = 0x6,
+    ACTOR_KIND_GATHERING = 0x7,
+    ACTOR_KIND_MAX = 0x8,
+  };
+
+  enum ObjectType : int32_t
+  {
+    OBJECT_TYPE_CAMERA = 0x0,
+    OBJECT_TYPE_CAMERA_MAYA = 0x1,
+    OBJECT_TYPE_LIGHT = 0x2,
+    OBJECT_TYPE_PLAYER = 0x3,
+    OBJECT_TYPE_WEAPON = 0x4,
+    OBJECT_TYPE_MONSTER = 0x5,
+    OBJECT_TYPE_TERRAIN = 0x6,
+    OBJECT_TYPE_BG_OBJECT = 0x7,
+    OBJECT_TYPE_ENV_LOCATION = 0x8,
+    OBJECT_TYPE_ENV_SPACE = 0x9,
+    OBJECT_TYPE_VFX_OBJECT = 0xA,
+    OBJECT_TYPE_COUNT_MAX = 0xB,
+  };
+
+  enum WarpType : uint8_t
+  {
+    WARP_TYPE_NON = 0x0,
+    WARP_TYPE_NORMAL = 0x1,
+    WARP_TYPE_NORMAL_POS = 0x2,
+    WARP_TYPE_EXIT_RANGE = 0x3,
+    WARP_TYPE_TELEPO = 0x4,
+    WARP_TYPE_REISE = 0x5,
+    WARP_TYPE_ = 0x6,
+    WARP_TYPE_DESION = 0x7,
+    WARP_TYPE_HOME_POINT = 0x8,
+    WARP_TYPE_RENTAL_CHOCOBO = 0x9,
+    WARP_TYPE_CHOCOBO_TAXI = 0xA,
+    WARP_TYPE_INSTANCE_CONTENT = 0xB,
+    WARP_TYPE_REJECT = 0xC,
+    WARP_TYPE_CONTENT_END_RETURN = 0xD,
+    WARP_TYPE_TOWN_TRANSLATE = 0xE,
+    WARP_TYPE_GM = 0xF,
+    WARP_TYPE_LOGIN = 0x10,
+    WARP_TYPE_LAYER_SET = 0x11,
+    WARP_TYPE_EMOTE = 0x12,
+    WARP_TYPE_HOUSING_TELEPO = 0x13,
+    WARP_TYPE_DEBUG = 0x14,
+  };
+
   enum ObjKind : uint8_t
   {
     None = 0x00,
@@ -649,6 +703,7 @@ namespace Sapphire::Common
      * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
+    Provoke = 24,
     StartActionCombo = 27, // shifted one up from 5.18
     ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,
@@ -893,6 +948,7 @@ namespace Sapphire::Common
   {
     Normal = 0x1,
     ItemAction = 0x2,
+    EventItem = 0x3,
     MountSkill = 0xD,
   };
 

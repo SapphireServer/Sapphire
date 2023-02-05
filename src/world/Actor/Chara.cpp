@@ -529,8 +529,8 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   if( nextSlot == -1 )
     return;
 
-  pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
+  pEffect->applyStatus();
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcEffectResult >( getId() );
 
@@ -864,6 +864,12 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
     case Common::BaseParam::SpellSpeed:
     {
       value = m_baseStats.spellSpeed;
+      break;
+    }
+
+    case Common::BaseParam::Haste:
+    {
+      value = m_baseStats.haste;
       break;
     }
 

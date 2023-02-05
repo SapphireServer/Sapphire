@@ -298,17 +298,20 @@ void Sapphire::Network::GameConnection::eventYieldHandler( const Packets::FFXIVA
   auto pParam = reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 + 8 ] );
   
   std::vector< uint32_t > param;
+  auto paramSize = 0;
 
   switch( opcode )
   {
-    case EventYield16Handler:
-    {
-      for( int i = 0; i < 16; i++ )
-      {
-        param.push_back( pParam[ i ] );
-      }
+    case EventYield2Handler:
+      paramSize = 2;
       break;
-    }
+    case EventYield16Handler:
+      paramSize = 16;
+      break;
+  }
+  for( int i = 0; i < paramSize; i++ )
+  {
+    param.push_back( pParam[ i ] );
   }
 
   std::string eventName = "onEventYield";

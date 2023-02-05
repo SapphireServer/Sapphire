@@ -87,6 +87,7 @@ namespace World::Action
 TYPE_FORWARD( Action );
 TYPE_FORWARD( EventAction );
 TYPE_FORWARD( ItemAction );
+TYPE_FORWARD( EventItemAction );
 TYPE_FORWARD( MountAction );
 TYPE_FORWARD( EffectBuilder );
 TYPE_FORWARD( EffectResult );

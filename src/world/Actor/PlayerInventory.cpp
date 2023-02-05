@@ -704,7 +704,14 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 {
   if( catalogId == 0 )
     return nullptr;
+  if( catalogId > 1000000 )
+  {
+    catalogId -= 1000000;
+    isHq = true;
+  }
   auto item = createTempItem( catalogId, quantity );
+  if( !item )
+    return false;
   item->setHq( isHq );
   return addItem( item, silent, canMerge, sendLootMessage );
 }

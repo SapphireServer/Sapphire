@@ -452,7 +452,7 @@ struct FFXIVIpcEventYieldHandler :
   uint32_t eventId;
   uint16_t scene;
   uint16_t padding;
-  uint64_t unknown;
+  uint32_t params[2];
 };
 
 struct FFXIVIpcEventYield16Handler :
@@ -468,7 +468,7 @@ struct FFXIVIpcCFCommenceHandler :
   FFXIVIpcBasePacket< CFCommenceHandler >
 {
   uint8_t param;
-  uint8_t dummy[7];
+  uint8_t padding[7];
 };
 
 }
