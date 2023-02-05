@@ -16,6 +16,9 @@
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
 
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
@@ -33,6 +36,7 @@
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
 #include "Territory/PublicContent.h"
+#include "Territory/InstanceObjectCache.h"
 #include "Manager/TerritoryMgr.h"
 #include "Event/EventDefs.h"
 
@@ -303,6 +307,76 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   else if( subCommand == "festivaldisable" )
   {
     terriMgr.disableCurrentFestival();
+  }
+  else if( subCommand == "QuestVar" )
+  {
+    uint16_t questId;
+    uint8_t index;
+    uint8_t value;
+    sscanf( params.c_str(), "%hu %hhu %hhu", &questId, &index, &value );
+    switch( index )
+    {
+      case 1:
+      {
+        player.setQuestUI8AH( questId, value );
+        break;
+      }
+      case 2:
+      {
+        player.setQuestUI8AL( questId, value );
+        break;
+      }
+      case 3:
+      {
+        player.setQuestUI8BH( questId, value );
+        break;
+      }
+      case 4:
+      {
+        player.setQuestUI8BL( questId, value );
+        break;
+      }
+      case 5:
+      {
+        player.setQuestUI8CH( questId, value );
+        break;
+      }
+      case 6:
+      {
+        player.setQuestUI8CL( questId, value );
+        break;
+      }
+      case 7:
+      {
+        player.setQuestUI8DH( questId, value );
+        break;
+      }
+      case 8:
+      {
+        player.setQuestUI8DL( questId, value );
+        break;
+      }
+      case 9:
+      {
+        player.setQuestUI8EH( questId, value );
+        break;
+      }
+      case 10:
+      {
+        player.setQuestUI8EL( questId, value );
+        break;
+      }
+      case 11:
+      {
+        player.setQuestUI8FH( questId, value );
+        break;
+      }
+      case 12:
+      {
+        player.setQuestUI8FL( questId, value );
+        break;
+      }
+    }
   }
   else if( subCommand == "BitFlag" )
   {
@@ -602,6 +676,18 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
       player.sendNotice( "Public content info:\nContentId: {}, DirectorId: {}\nSequence: {}, Branch: {}",
         instance->getContentId(), instance->getDirectorId(), instance->getSequence(),
         instance->getBranch() );
+    }
+  }
+  else if( ( subCommand == "poprange" ) )
+  {
+    uint32_t id, param;
+    sscanf( params.c_str(), "%u", &id );
+
+    auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+    auto pPopRange = instanceObjectCache.getPopRange( player.getCurrentTerritory()->getTerritoryTypeId(), id );
+    if( pPopRange )
+    {
+      player.sendNotice( "x:{}, y:{}, z:{}", pPopRange->header.transform.translation.x, pPopRange->header.transform.translation.y, pPopRange->header.transform.translation.z );
     }
   }
   else
