@@ -2,6 +2,7 @@
 #define SAPPHIRE_INSTANCEOBJECT_H
 
 #include "Actor.h"
+#include <string>
 
 namespace Sapphire::Entity
 {
