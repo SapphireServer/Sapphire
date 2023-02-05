@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.3.0
       with:
         submodules: recursive
     - name: install deps
@@ -36,7 +36,7 @@ jobs:
     runs-on: windows-2019
       
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3.3.0
       with:
         submodules: recursive
     - name: Enable Developer Command Prompt
