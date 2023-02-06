@@ -137,7 +137,7 @@ struct EObjData : public InstanceObject
   uint8_t unknown1[0xC];
 };
 
-enum TriggerBoxShape : uint32_t
+enum TriggerBoxShape : int32_t
 {
   TriggerBoxShapeBox = 0x1,
   TriggerBoxShapeSphere = 0x2,
@@ -156,13 +156,18 @@ struct TriggerBoxInstanceObject
   uint32_t reserved;
 };
 
+struct EventRangeData : public InstanceObject
+{
+  TriggerBoxInstanceObject triggerBox;
+};
+
 struct ExitRangeData : public InstanceObject
 {
   TriggerBoxInstanceObject triggerBoxType;
   uint32_t exitType;
   uint16_t zoneId;
   uint16_t destTerritoryType;
-  int index;
+  int32_t index;
   uint32_t destInstanceObjectId;
   uint32_t returnInstanceObjectId;
   float direction;

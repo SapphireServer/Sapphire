@@ -41,16 +41,23 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     // TODO: it does feel like this needs to be streamlined into the datReader instead of being done here...
     std::string bgLgbPath( path + "/level/bg.lgb" );
     std::string planmapLgbPath( path + "/level/planmap.lgb" );
+    std::string planeventLgbPath( path + "/level/planevent.lgb" );
+    std::string plannerLgbPath( path + "/level/planner.lgb" );
     std::vector< char > bgSection;
     std::vector< char > planmapSection;
+    std::vector< char > planeventSection;
+    std::vector< char > plannerSection;
 
     std::unique_ptr< xiv::dat::File > bgFile;
     std::unique_ptr< xiv::dat::File > planmap_file;
+    std::unique_ptr< xiv::dat::File > planevent_file;
+    std::unique_ptr< xiv::dat::File > planner_file;
 
     try
     {
       bgFile = exdData.getGameData()->getFile( bgLgbPath );
       planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
+      planevent_file = exdData.getGameData()->getFile( planeventLgbPath );
     }
     catch( std::runtime_error& )
     {
@@ -60,6 +67,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 
     bgSection = bgFile->access_data_sections().at( 0 );
     planmapSection = planmap_file->access_data_sections().at( 0 );
+    planeventSection = planevent_file->access_data_sections().at( 0 );
 
     std::vector< std::string > stringList;
 
@@ -67,8 +75,23 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 
     LGB_FILE bgLgb( &bgSection[ 0 ], "bg" );
     LGB_FILE planmapLgb( &planmapSection[ 0 ], "planmap" );
+    LGB_FILE planeventLgb( &planeventSection[ 0 ], "planevent" );
 
-    std::vector< LGB_FILE > lgbList{ bgLgb, planmapLgb };
+    std::vector< LGB_FILE > lgbList;
+
+    try
+    {      
+      planner_file = exdData.getGameData()->getFile( plannerLgbPath );
+      plannerSection = planner_file->access_data_sections().at( 0 );
+      LGB_FILE plannerLgb( &plannerSection[ 0 ], "planner" );
+
+      lgbList = { bgLgb, planmapLgb, planeventLgb, plannerLgb };
+    }
+    catch( std::runtime_error& )
+    {
+      lgbList = { bgLgb, planmapLgb, planeventLgb };
+    }
+
     uint32_t max_index = 0;
 
     for( const auto& lgb : lgbList )
@@ -77,6 +100,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       {
         for( const auto& pEntry : group.entries )
         {
+
           if( pEntry->getType() == LgbEntryType::MapRange )
           {
             auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
@@ -92,6 +116,25 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
             m_popRangeCache.insert( id, pPopRange );
           }
+          else if( pEntry->getType() == LgbEntryType::SharedGroup6 )
+          {
+
+          }
+          else if( pEntry->getType() == LgbEntryType::EventObject )
+          {
+            auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
+            m_eobjCache.insert( 0, pEObj );
+          }
+          else if( pEntry->getType() == LgbEntryType::EventNpc )
+          {
+            auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+            m_enpcCache.insert( 0, pENpc );
+          }
+          else if( pEntry->getType() == LgbEntryType::EventRange )
+          {
+            auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
+            m_eventRangeCache.insert( 0, pEventRange );
+          }
         }
       }
     }
@@ -99,26 +142,55 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
   std::cout << "\n";
 
   Logger::debug(
-    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {}",
-    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size()
+    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventNpc: {} EventRange: {}",
+    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_enpcCache.size(), m_eventRangeCache.size()
   );
 }
 
 
 Sapphire::InstanceObjectCache::MapRangePtr
-  Sapphire::InstanceObjectCache::getMapRange( uint16_t zoneId, uint32_t mapRangeId )
+Sapphire::InstanceObjectCache::getMapRange( uint16_t zoneId, uint32_t mapRangeId )
 {
   return m_mapRangeCache.get( zoneId, mapRangeId );
 }
 
 Sapphire::InstanceObjectCache::ExitRangePtr
-  Sapphire::InstanceObjectCache::getExitRange( uint16_t zoneId, uint32_t exitRangeId )
+Sapphire::InstanceObjectCache::getExitRange( uint16_t zoneId, uint32_t exitRangeId )
 {
   return m_exitRangeCache.get( zoneId, exitRangeId );
 }
 
 Sapphire::InstanceObjectCache::PopRangePtr
-  Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
+Sapphire::InstanceObjectCache::getPopRange( uint16_t zoneId, uint32_t popRangeId )
 {
   return m_popRangeCache.get( zoneId, popRangeId );
+}
+
+Sapphire::InstanceObjectCache::EObjPtr
+Sapphire::InstanceObjectCache::getEObj( uint32_t eObjId )
+{
+  return m_eobjCache.get( 0, eObjId );
+}
+
+Sapphire::InstanceObjectCache::ENpcPtr
+Sapphire::InstanceObjectCache::getENpc( uint32_t eNpcId )
+{
+  return m_enpcCache.get( 0, eNpcId );
+}
+
+Sapphire::InstanceObjectCache::EventRangePtr Sapphire::InstanceObjectCache::getEventRange( uint32_t eventRangeId )
+{
+  return m_eventRangeCache.get( 0, eventRangeId );
+}
+
+Sapphire::InstanceObjectCache::EventNpcMapPtr
+  Sapphire::InstanceObjectCache::getAllEventNpc( uint16_t zoneId )
+{
+  return m_enpcCache.getAll( zoneId );
+}
+
+Sapphire::InstanceObjectCache::EventObjMapPtr
+  Sapphire::InstanceObjectCache::getAllEventObj( uint16_t zoneId )
+{
+  return m_eobjCache.getAll( zoneId );
 }

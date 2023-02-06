@@ -109,7 +109,9 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       else
         player.setAutoattack( false );
 
-      player.sendToInRangeSet( makeActorControl( player.getId(), 1, param11, 1 ) );
+      // the client seems to ignore source actor of this packet and always set auto-attack on itself. causing everyone on screen take their weapons out
+      player.queuePacket( makeActorControl( player.getId(), 1, param11, 1 ) );
+      //player.sendToInRangeSet( makeActorControl( player.getId(), 1, param11, 1 ) );
 
       break;
     }
@@ -475,6 +477,14 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
 
       break;
     }
+    case ClientTriggerType::RequestEstateHallRemoval:
+    {
+      auto& housingMgr = Common::Service< HousingMgr >::ref();
+
+      housingMgr.removeHouse( player, static_cast< uint16_t >( param11 ) );
+
+      break;
+    }
     case ClientTriggerType::UpdateEstateGuestAccess:
     {
       auto canTeleport = ( param2 & 0xFF ) == 1;
@@ -494,7 +504,39 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       player.sendDebug( "event battle p1: {0}, p11: {1}, p12: {2}, p2: {3}, p3: {4}, p4: {5}, p5: {6}", param1, param11, param12, param2, param3, param4, param5 );
       break;
     }
-
+    case ClientTriggerType::CutscenePlayed:
+    {
+      player.sendDebug( "cutscene: {}", param1 );
+      break;
+    }
+    case ClientTriggerType::OpenPerformInstrumentUI:
+    {
+      //param11 = instrument, 0 = end
+      player.sendDebug( "perform: {}", param11 );
+      if( param11 == 0 )
+      {
+        player.sendToInRangeSet( makeActorControl( player.getId(), ActorControl::SetStatus, 1, 0, 0, 0 ), true );
+        player.unsetStateFlag( PlayerStateFlag::Performing );
+      }
+      else
+      {
+        player.sendToInRangeSet( makeActorControl( player.getId(), ActorControl::SetStatus, 16, param11, 0, 0 ), true );
+        player.setStateFlag( PlayerStateFlag::Performing );
+      }
+      break;
+    }
+    case ClientTriggerType::CameraMode:
+    {
+      if( param11 == 1 )
+      {
+        player.setOnlineStatusMask( player.getOnlineStatusMask() | 0x0000000000040000 );
+      }
+      else
+      {
+        player.setOnlineStatusMask( player.getOnlineStatusMask() & 0xFFFFFFFFFFFBFFFF );
+      }
+      break;
+    }
     default:
     {
       Logger::debug( "[{0}] Unhandled action: {1:04X}", m_pSession->getId(), commandId );

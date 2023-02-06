@@ -6,10 +6,15 @@
 #include <Exd/ExdDataGenerated.h>
 #include <Network/CommonActorControl.h>
 #include <Service.h>
-
+#include <datReader/DatCategories/bg/pcb.h>
+#include <datReader/DatCategories/bg/lgb.h>
+#include <datReader/DatCategories/bg/sgb.h>
 #include "Event/Director.h"
 #include "Event/EventDefs.h"
 #include "Script/ScriptMgr.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
+#include "Manager/EventMgr.h"
 
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
@@ -21,6 +26,8 @@
 #include "Event/EventHandler.h"
 
 #include "InstanceContent.h"
+#include "InstanceObjectCache.h"
+
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -32,9 +39,9 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Sapphire::Data::Ins
                                             uint32_t guId,
                                             const std::string& internalName,
                                             const std::string& contentName,
-                                            uint32_t instanceContentId ) :
+                                            uint32_t instanceContentId, uint16_t contentFinderConditionId ) :
   Territory( static_cast< uint16_t >( territoryType ), guId, internalName, contentName ),
-  Director( Event::Director::InstanceContent, instanceContentId ),
+  Director( Event::Director::InstanceContent, instanceContentId, contentFinderConditionId ),
   m_instanceConfiguration( pInstanceConfiguration ),
   m_instanceContentId( instanceContentId ),
   m_state( Created ),
@@ -80,11 +87,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   // mark player as "bound by duty"
   player.setStateFlag( PlayerStateFlag::BoundByDuty );
 
-  // if the instance was not started yet, director init is sent on enter event.
-  // else it will be sent on finish loading.
-  if( m_state == Created )
-    sendDirectorInit( player );
-
+  sendDirectorInit( player );
 }
 
 void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
@@ -164,7 +167,6 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
 void Sapphire::InstanceContent::onFinishLoading( Entity::Player& player )
 {
-  sendDirectorInit( player );
 }
 
 void Sapphire::InstanceContent::onInitDirector( Entity::Player& player )
@@ -310,6 +312,8 @@ void Sapphire::InstanceContent::onRegisterEObj( Entity::EventObjectPtr object )
     m_eventObjectMap[ object->getName() ] = object;
   if( object->getObjectId() == 2000182 ) // start
     m_pEntranceEObj = object;
+  if( m_pEntranceEObj == nullptr && object->getName() == "Entrance" )
+    m_pEntranceEObj = object;
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto objData = exdData.get< Sapphire::Data::EObj >( object->getObjectId() );
@@ -342,10 +346,21 @@ void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& 
   // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
   if( !hasPlayerPreviouslySpawned( player ) )
   {
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+    auto contentInfo = exdData.get< Data::InstanceContent >( m_instanceContentId );
+
+    auto rect = instanceObjectCache.getEventRange( contentInfo->lGBEventRange );
+
     if( m_pEntranceEObj != nullptr )
     {
       player.setRot( PI );
       player.setPos( m_pEntranceEObj->getPos() );
+    }
+    else if( rect )
+    {
+      player.setRot( PI );
+      player.setPos( { rect->header.transform.translation.x, rect->header.transform.translation.y, rect->header.transform.translation.z } );
     }
     else
     {
@@ -375,7 +390,7 @@ void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32
     return;
 
   if( auto onTalk = it->second->getOnTalkHandler() )
-    onTalk( player, it->second, getAsInstanceContent(), actorId );
+    onTalk( player, it->second, getAsInstanceContent(), eventId, actorId );
   else
     player.sendDebug( "No onTalk handler found for interactable eobj with EObjID#{0}, eventId#{1}  ",
                       it->second->getObjectId(), eventId );

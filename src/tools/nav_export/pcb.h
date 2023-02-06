@@ -104,7 +104,7 @@ struct PCB_FILE
     bool isgroup = true;
     while( isgroup )
     {
-      PCB_BLOCK_ENTRY block_entry;
+      PCB_BLOCK_ENTRY block_entry{0};
       memcpy( &block_entry.header, data + offset, sizeof( block_entry.header ) );
       isgroup = block_entry.header.type == 0x30;
   
@@ -117,10 +117,10 @@ struct PCB_FILE
       }
       else
       {
-        /*   printf( "\tnum_v16: %i, num_indices: %i, num_vertices: %i\n\n",
+        /*printf( "\tnum_v16: %i, num_indices: %i, num_vertices: %i\n\n",
                    block_entry.header.num_v16, block_entry.header.num_indices, block_entry.header.num_vertices );*/
         int doffset = sizeof( block_entry.header ) + offset;
-        uint16_t block_size = sizeof( block_entry.header ) +
+        uint32_t block_size = sizeof( block_entry.header ) +
                               block_entry.header.num_vertices * 3 * 4 +
                               block_entry.header.num_v16 * 6 +
                               block_entry.header.num_indices * 6;

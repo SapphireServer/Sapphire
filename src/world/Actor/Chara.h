@@ -9,6 +9,7 @@
 #include <map>
 #include <queue>
 #include <array>
+#include <string>
 
 namespace Sapphire::Entity
 {
@@ -47,6 +48,7 @@ namespace Sapphire::Entity
       uint32_t healingPotMagic = 0;
       uint32_t determination = 0;
       uint32_t skillSpeed = 0;
+      uint32_t haste = 0;
 
       uint32_t resistSlow = 0;
       uint32_t resistSilence = 0;

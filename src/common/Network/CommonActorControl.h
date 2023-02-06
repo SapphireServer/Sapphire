@@ -111,6 +111,8 @@ namespace Sapphire::Network::ActorControl
 
     ScreenFadeOut = 0xAA,
 
+    CeremonyDecoration = 0xB9,
+
     ZoneIn = 0xC8,
     ZoneInDefaultPos = 0xC9,
 
@@ -213,7 +215,19 @@ namespace Sapphire::Network::ActorControl
     SetFavorite = 0x1FC,
     LearnTeleport = 0x1FD,
 
-    OpenRecommendationGuide = 0x200,
+    /*!
+     * param1 = event type bitmask
+     *          1 = Quest
+     *          2 = GuildLeveAssignment
+     *          4 = GuildOrderGuide
+     *          8 = TripleTriad
+     *          16 = CustomTalk
+     *          32 = PreHandler
+     */
+    BeginMapUpdate = 0x1FF,
+    FinishMapUpdate = 0x200,
+
+    //OpenRecommendationGuide = 0x200,
     ArmoryErrorMsg = 0x201,
 
     AchievementPopup = 0x203,
@@ -364,10 +378,11 @@ namespace Sapphire::Network::ActorControl
     TitleList = 0x12F,
 
     UpdatedSeenHowTos = 0x133,
+    CutscenePlayed = 0x134, // param1 = cutscene id
     AllotAttribute = 0x135,
 
     ClearFieldMarkers = 0x13A,
-    CameraMode = 0x13B, // param12, 1 = camera mode enable, 0 = disable
+    CameraMode = 0x13B, // param11, 1 = enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,
 

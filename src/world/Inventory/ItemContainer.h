@@ -2,6 +2,7 @@
 #define _ITEMCONTAINER_H_
 
 #include <map>
+#include <string>
 #include <Common.h>
 #include "ForwardsZone.h"
 

@@ -111,6 +111,8 @@ namespace Sapphire::Entity
     void playSceneChain( uint32_t eventId, uint32_t scene, uint32_t flags,
                          Event::EventHandler::SceneChainCallback sceneChainCallback );
 
+    void playScene16( uint32_t eventId, uint32_t scene, uint32_t flags, uint32_t param3, std::vector< uint32_t > paramList, Event::EventHandler::SceneReturnCallback eventReturnCallback );
+
     /*! setup the event and return a ptr to it */
     Event::EventHandlerPtr bootstrapSceneEvent( uint32_t eventId, uint32_t flags );
 
@@ -191,6 +193,8 @@ namespace Sapphire::Entity
 
     /*! remove a given quest */
     void removeQuest( uint16_t questId );
+
+    bool isQuestCompleted( uint16_t questId );
 
     /*! add a quest to the completed quests mask */
     void updateQuestsCompleted( uint32_t questId );
@@ -490,7 +494,7 @@ namespace Sapphire::Entity
     bool setInstance( TerritoryPtr instance );
 
     /*! sets the players instance & initiates zoning process */
-    bool setInstance( Sapphire::TerritoryPtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos );
+    bool setInstance( Sapphire::TerritoryPtr instance, Sapphire::Common::FFXIVARR_POSITION3 pos, float rot );
 
     /*! returns the player to their position before zoning into an instance */
     bool exitInstance();
@@ -547,7 +551,7 @@ namespace Sapphire::Entity
     void dyeItemFromDyeingInfo();
 
     /*! prepares zoning / fades out the screen */
-    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0 );
+    void prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime = 0, uint16_t animation = 0, uint8_t param4 = 0, uint8_t param7 = 0, uint8_t unknown = 0 );
 
     /*! get player's title list (available titles) */
     uint8_t* getTitleList();
@@ -584,7 +588,7 @@ namespace Sapphire::Entity
     uint16_t getCurrentCompanion() const;
 
     /*! get the current mount */
-    uint8_t getCurrentMount() const;
+    uint16_t getCurrentMount() const;
 
     /*! set current persistent emote */
     void setPersistentEmote( uint32_t emoteId );
@@ -642,7 +646,7 @@ namespace Sapphire::Entity
     void learnSong( uint8_t songId, uint32_t itemId );
 
     /*! check if an action is already unlocked in the bitmask. */
-    bool isActionLearned( uint8_t actionId ) const;
+    bool isActionLearned( uint32_t actionId ) const;
 
     /*! return a const pointer to the unlock bitmask array */
     const uint8_t* getUnlockBitmask() const;
@@ -652,6 +656,8 @@ namespace Sapphire::Entity
 
     /*! return a const pointer to the mount guide bitmask array */
     const uint8_t* getMountGuideBitmask() const;
+
+    const bool hasMount( uint32_t mountId ) const;
 
     bool checkAction() override;
 
@@ -942,12 +948,13 @@ namespace Sapphire::Entity
 
     ItemPtr getItemAt( uint16_t containerId, uint8_t slotId );
 
-    bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem );
+    bool updateContainer( uint16_t storageId, uint8_t slotId, ItemPtr pItem, bool writeToDb = true );
 
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();
 
     ItemPtr getEquippedWeapon();
+    ItemPtr getEquippedSecondaryWeapon();
 
     /*! return the current amount of currency of type */
     uint32_t getCurrency( Common::CurrencyType type );
@@ -992,6 +999,8 @@ namespace Sapphire::Entity
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    void setPosAndNotifyClient( float x, float y, float z, float rot );
+
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
     void sendHuntingLog();
@@ -1005,6 +1014,7 @@ namespace Sapphire::Entity
     uint64_t m_lastMoveTime;
     uint8_t m_lastMoveflag;
     bool m_falling;
+    uint16_t m_cfNotifiedContent;
 
     std::vector< ShopBuyBackEntry >& getBuyBackListForShop( uint32_t shopId );
     void addBuyBackItemForShop( uint32_t shopId, const ShopBuyBackEntry& entry );
@@ -1067,8 +1077,8 @@ namespace Sapphire::Entity
     uint16_t m_activeTitle;
     uint8_t m_titleList[48];
     uint8_t m_howTo[34];
-    uint8_t m_minions[40];
-    uint8_t m_mountGuide[22];
+    uint8_t m_minions[55];
+    uint8_t m_mountGuide[29];
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
@@ -1076,8 +1086,8 @@ namespace Sapphire::Entity
     uint8_t m_discovery[445];
     uint32_t m_playTime;
 
-    uint16_t m_classArray[28];
-    uint32_t m_expArray[28];
+    uint16_t m_classArray[ Common::CLASSJOB_SLOTS ];
+    uint32_t m_expArray[ Common::CLASSJOB_SLOTS ];
     uint8_t m_aetheryte[21];
     uint8_t m_unlocks[64];
     uint8_t m_orchestrion[40];

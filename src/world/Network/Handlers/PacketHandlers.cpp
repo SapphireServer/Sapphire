@@ -21,6 +21,7 @@
 
 #include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
+#include "Territory/Housing/HousingInteriorTerritory.h"
 #include "Territory/Land.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/House.h"
@@ -386,15 +387,18 @@ void Sapphire::Network::GameConnection::pingHandler( const Packets::FFXIVARR_PAC
 void Sapphire::Network::GameConnection::finishLoadingHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                               Entity::Player& player )
 {
-  player.sendQuestInfo();
+  if( player.isLogin() )
+  {
+    player.sendQuestInfo();
 
-  // TODO: load and save this data instead of hardcoding
-  auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
-  gcPacket->data().gcId = player.getGc();
-  gcPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
-  gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
-  gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
-  player.queuePacket( gcPacket );
+    // TODO: load and save this data instead of hardcoding
+    auto gcPacket = makeZonePacket< FFXIVGCAffiliation >( player.getId() );
+    gcPacket->data().gcId = player.getGc();
+    gcPacket->data().gcRank[ 0 ] = player.getGcRankArray()[ 0 ];
+    gcPacket->data().gcRank[ 1 ] = player.getGcRankArray()[ 1 ];
+    gcPacket->data().gcRank[ 2 ] = player.getGcRankArray()[ 2 ];
+    player.queuePacket( gcPacket );
+  }
 
   player.getCurrentTerritory()->onFinishLoading( player );
 
@@ -607,7 +611,7 @@ void Sapphire::Network::GameConnection::performNoteHandler( const Packets::FFXIV
                                                             Entity::Player& player )
 {
   auto performPacket = makeZonePacket< FFXIVIpcPerformNote >( player.getId() );
-  memcpy( &performPacket->data().data[ 0 ], &inPacket.data[ 0x10 ], 32 );
+  memcpy( &performPacket->data().data[ 0 ], &inPacket.data[ 0x10 ], 16 );
   player.sendToInRangeSet( performPacket );
 }
 
@@ -695,6 +699,9 @@ void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXI
 {
   auto& housingMgr = Common::Service< HousingMgr >::ref();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingEditExterior >( inPacket );
+  auto terri = std::dynamic_pointer_cast< HousingZone >( player.getCurrentTerritory() );
+  if( !terri )
+    return;
 
   std::vector< uint16_t > containerList;
   std::vector< uint8_t > slotList;
@@ -705,7 +712,27 @@ void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXI
     slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
   }
 
-  housingMgr.editExterior( player, packet.data().landId, containerList, slotList, packet.data().removeFlag );
+  housingMgr.editAppearance( false, player, terri->getLand( packet.data().landId )->getLandIdent(), containerList, slotList, packet.data().removeFlag );
+}
+
+void Sapphire::Network::GameConnection::housingEditInterior( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& housingMgr = Common::Service< HousingMgr >::ref();
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingEditInterior >( inPacket );
+  auto terri = std::dynamic_pointer_cast< World::Territory::Housing::HousingInteriorTerritory >( player.getCurrentTerritory() );
+  if( !terri )
+    return;
+  
+  std::vector< uint16_t > containerList;
+  std::vector< uint8_t > slotList;
+  for( int i = 0; i < 10; i++ )
+  {
+    auto container = packet.data().container[i];
+    containerList.push_back( container );
+    slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
+  }
+
+  housingMgr.editAppearance( true, player, terri->getLandIdent(), containerList, slotList, 0 );
 }
 
 void Sapphire::Network::GameConnection::marketBoardSearch( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -763,12 +790,12 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
           break;
 
         player.setPos( packet.data().position );
+        player.setRot( Util::floatFromUInt16Rot( param4 ) );
         if( emote == 0x32 && player.hasInRangeActor() )
         {
           auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
           setpos->data().r16 = param4;
           setpos->data().waitForLoad = 18;
-          setpos->data().unknown1 = 1;
           setpos->data().x = packet.data().position.x;
           setpos->data().y = packet.data().position.y;
           setpos->data().z = packet.data().position.z;
@@ -798,7 +825,6 @@ void Sapphire::Network::GameConnection::worldInteractionhandler( const Packets::
           auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
           setpos->data().r16 = param2;
           setpos->data().waitForLoad = 18;
-          setpos->data().unknown1 = 2;
           setpos->data().x = packet.data().position.x;
           setpos->data().y = packet.data().position.y;
           setpos->data().z = packet.data().position.z;

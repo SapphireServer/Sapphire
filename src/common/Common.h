@@ -6,6 +6,7 @@
 
 #include "CommonGen.h"
 #include "Vector3.h"
+#include "Network/PacketDef/Ipcs.h"
 
 // +---------------------------------------------------------------------------
 // The following enumerations are structures to require their type be included.
@@ -25,7 +26,7 @@ namespace Sapphire::Common
   const uint8_t CURRENT_EXPANSION_ID = 3;
 
   const uint8_t CLASSJOB_TOTAL = 38;
-  const uint8_t CLASSJOB_SLOTS = 28;
+  const uint8_t CLASSJOB_SLOTS = 30;
 
   const uint8_t TOWN_COUNT = 6;
 
@@ -51,11 +52,11 @@ namespace Sapphire::Common
 
   enum InventoryOperation : uint16_t
   {
-    Discard = 0x013C,
-    Move = 0x013D,
-    Swap = 0x013E,
-    Split = 0x013F,
-    Merge = 0x0141,
+    Discard = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 7,
+    Move = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 8,
+    Swap = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 9,
+    Split = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 10,
+    Merge = Network::Packets::ClientZoneIpcType::InventoryModifyHandler + 12
   };
 
   enum ClientLanguage : uint8_t
@@ -75,6 +76,60 @@ namespace Sapphire::Common
   {
     Friendly = 0,
     Enemy = 4,
+  };
+
+  enum ActorKind : int32_t
+  {
+    ACTOR_KIND_PC = 0x0,
+    ACTOR_KIND_NPC = 0x1,
+    ACTOR_KIND_RETAINER = 0x2,
+    ACTOR_KIND_BATTLE = 0x3,
+    ACTOR_KIND_BATTLE_FRIEND = 0x4,
+    ACTOR_KIND_OBJECT = 0x5,
+    ACTOR_KIND_TREASURE = 0x6,
+    ACTOR_KIND_GATHERING = 0x7,
+    ACTOR_KIND_MAX = 0x8,
+  };
+
+  enum ObjectType : int32_t
+  {
+    OBJECT_TYPE_CAMERA = 0x0,
+    OBJECT_TYPE_CAMERA_MAYA = 0x1,
+    OBJECT_TYPE_LIGHT = 0x2,
+    OBJECT_TYPE_PLAYER = 0x3,
+    OBJECT_TYPE_WEAPON = 0x4,
+    OBJECT_TYPE_MONSTER = 0x5,
+    OBJECT_TYPE_TERRAIN = 0x6,
+    OBJECT_TYPE_BG_OBJECT = 0x7,
+    OBJECT_TYPE_ENV_LOCATION = 0x8,
+    OBJECT_TYPE_ENV_SPACE = 0x9,
+    OBJECT_TYPE_VFX_OBJECT = 0xA,
+    OBJECT_TYPE_COUNT_MAX = 0xB,
+  };
+
+  enum WarpType : uint8_t
+  {
+    WARP_TYPE_NON = 0x0,
+    WARP_TYPE_NORMAL = 0x1,
+    WARP_TYPE_NORMAL_POS = 0x2,
+    WARP_TYPE_EXIT_RANGE = 0x3,
+    WARP_TYPE_TELEPO = 0x4,
+    WARP_TYPE_REISE = 0x5,
+    WARP_TYPE_ = 0x6,
+    WARP_TYPE_DESION = 0x7,
+    WARP_TYPE_HOME_POINT = 0x8,
+    WARP_TYPE_RENTAL_CHOCOBO = 0x9,
+    WARP_TYPE_CHOCOBO_TAXI = 0xA,
+    WARP_TYPE_INSTANCE_CONTENT = 0xB,
+    WARP_TYPE_REJECT = 0xC,
+    WARP_TYPE_CONTENT_END_RETURN = 0xD,
+    WARP_TYPE_TOWN_TRANSLATE = 0xE,
+    WARP_TYPE_GM = 0xF,
+    WARP_TYPE_LOGIN = 0x10,
+    WARP_TYPE_LAYER_SET = 0x11,
+    WARP_TYPE_EMOTE = 0x12,
+    WARP_TYPE_HOUSING_TELEPO = 0x13,
+    WARP_TYPE_DEBUG = 0x14,
   };
 
   enum ObjKind : uint8_t
@@ -161,44 +216,27 @@ namespace Sapphire::Common
 
   enum class EquipSlotCategory : uint8_t
   {
-    // main slots
-
-    CharaMainHand = 0,
-    CharaOffHand = 1,
-    CharaHead = 2,
-    CharaBody = 3,
-    CharaHands = 4,
-    CharaWaist = 5,
-    CharaLegs = 6,
-    CharaFeet = 7,
-    CharaEars = 8,
-    CharaNeck = 9,
-    CharaWrist = 10,
-    CharaRing = 11,
-    CharaSoulCrystal = 12,
-
-    /* following slots not seem to exist any more.
-       when multi-slot gear is moved into equipment slot, normal slot listed above is used.
-       client will move any incompatible gears into armory but no InventoryModifiyHandler is sent.
-       server need to move those silently in order to sync with client.
-    */
-    
-    /*! Cannot equip gear to offhand slot */
-      //MainTwoHandedWeapon = 13,
-    /*! Can be equipped in either main or offhand slot */
-      //MainOrOffHand = 14, // unused
-    /*! Cannot equip gear to head */
-      //BodyDisallowHead = 15,
-    /*! Cannot equip gear to hands, legs and feet slots */
-      //BodyDisallowHandsLegsFeet = 16,
-    /*! Cannot equip gear to feet slot */
-      //LegsDisallowFeet = 18,
-    /*! Cannot equp gear to head, hands, legs, feet slots */
-      //BodyDisallowAll = 19,
-    /*! Cannot equip gear to hands slot */
-      //BodyDisallowHands = 20,
-    /*! Cannot equip gear to legs & feet slots */
-      //BodyDisallowLegsFeet = 21,
+    MainHand = 1,
+    OffHand = 2,
+    Head = 3,
+    Body = 4,
+    Hands = 5,
+    Waist = 6,
+    Legs = 7,
+    Feet = 8,
+    Ears = 9,
+    Neck = 10,
+    Wrist = 11,
+    Ring = 12,
+    MainTwoHandedWeapon = 13,
+    //MainOrOffHand = 14, // unused
+    BodyDisallowHead = 15,
+    BodyDisallowHandsLegsFeet = 16,
+    SoulCrystal = 17,
+    LegsDisallowFeet = 18,
+    BodyDisallowAll = 19,
+    BodyDisallowHands = 20,
+    BodyDisallowLegsFeet = 21,
   };
 
   enum InventoryType : uint16_t
@@ -665,6 +703,7 @@ namespace Sapphire::Common
      * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
+    Provoke = 24,
     StartActionCombo = 27, // shifted one up from 5.18
     ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
     Knockback = 33,
@@ -773,6 +812,7 @@ namespace Sapphire::Common
 
     BetweenAreas = 24,
     BoundByDuty = 28,
+    Performing = 40,
     WatchingCutscene = 50, // this is actually just a dummy, this id is different
 
 
@@ -908,6 +948,7 @@ namespace Sapphire::Common
   {
     Normal = 0x1,
     ItemAction = 0x2,
+    EventItem = 0x3,
     MountSkill = 0xD,
   };
 
@@ -1263,9 +1304,6 @@ namespace Sapphire::Common
     GetGil = 9, // p1: gil
     EmptyCoffer = 11, // seems like no param
   };
-
-  using PlayerStateFlagList = std::vector< PlayerStateFlag >;
-
 }
 
 #endif

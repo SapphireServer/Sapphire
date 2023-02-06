@@ -24,6 +24,7 @@ TYPE_FORWARD( HousingZone );
 TYPE_FORWARD( House );
 TYPE_FORWARD( InstanceContent );
 TYPE_FORWARD( QuestBattle );
+TYPE_FORWARD( PublicContent );
 TYPE_FORWARD( Item );
 TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( ZonePosition );
@@ -86,6 +87,7 @@ namespace World::Action
 TYPE_FORWARD( Action );
 TYPE_FORWARD( EventAction );
 TYPE_FORWARD( ItemAction );
+TYPE_FORWARD( EventItemAction );
 TYPE_FORWARD( MountAction );
 TYPE_FORWARD( EffectBuilder );
 TYPE_FORWARD( EffectResult );

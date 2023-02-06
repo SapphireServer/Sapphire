@@ -19,11 +19,14 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
 {
   auto sequence = player.getNextInventorySequence();
   auto pMap = container->getItemMap();
+  uint32_t itemCount = 0;
 
   for( auto itM = pMap.begin(); itM != pMap.end(); ++itM )
   {
     if( !itM->second )
-      return;
+      continue;
+
+    itemCount++;
 
     if( container->getId() == Common::InventoryType::Currency || container->getId() == Common::InventoryType::Crystal )
     {
@@ -57,7 +60,7 @@ void Sapphire::World::Manager::InventoryMgr::sendInventoryContainer( Sapphire::E
 
   auto containerInfoPacket = makeZonePacket< Server::FFXIVIpcContainerInfo >( player.getId() );
   containerInfoPacket->data().containerSequence = sequence;
-  containerInfoPacket->data().numItems = container->getEntryCount();
+  containerInfoPacket->data().numItems = itemCount;
   containerInfoPacket->data().containerId = container->getId();
 
   player.queuePacket( containerInfoPacket );
@@ -89,6 +92,9 @@ void Sapphire::World::Manager::InventoryMgr::saveHousingContainer( Common::LandI
 
   for( auto& item : container->getItemMap() )
   {
+    if( !item.second )
+      continue;
+
     saveHousingContainerItem( u64ident, container->getId(), item.first, item.second->getUId() );
   }
 }

@@ -10,6 +10,9 @@ namespace Sapphire::Data
 
   struct ItemAction;
   using ItemActionPtr = std::shared_ptr< ItemAction >;
+
+  struct EventItem;
+  using EventItemPtr = std::shared_ptr< EventItem >;
 }
 
 namespace Sapphire::World::Manager
@@ -27,6 +30,8 @@ namespace Sapphire::World::Manager
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
+
+    void handleEventItemAction( Entity::Player& player, uint32_t itemId, Data::EventItemPtr itemActionData, uint32_t sequence, uint64_t targetId );
 
     void handleMountAction( Entity::Player& player, uint16_t mountId,
                             Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );

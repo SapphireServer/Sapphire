@@ -438,6 +438,39 @@ struct FFXIVIpcHousingEditExterior :
   uint16_t padding;
 };
 
+struct FFXIVIpcHousingEditInterior :
+  FFXIVIpcBasePacket< HousingEditInterior >
+{
+  uint64_t unknown;
+  uint16_t container[10];
+  uint16_t slot[10];
+};
+
+struct FFXIVIpcEventYieldHandler :
+  FFXIVIpcBasePacket< EventYield2Handler >
+{
+  uint32_t eventId;
+  uint16_t scene;
+  uint16_t padding;
+  uint32_t params[2];
+};
+
+struct FFXIVIpcEventYield16Handler :
+  FFXIVIpcBasePacket< EventYield16Handler >
+{
+  uint32_t eventId;
+  uint16_t scene;
+  uint16_t padding;
+  uint32_t params[16];
+};
+
+struct FFXIVIpcCFCommenceHandler :
+  FFXIVIpcBasePacket< CFCommenceHandler >
+{
+  uint8_t param;
+  uint8_t padding[7];
+};
+
 }
 
 #endif //_CORE_NETWORK_PACKETS_ZONE_CLIENT_IPC_H

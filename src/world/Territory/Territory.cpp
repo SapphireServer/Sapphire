@@ -19,6 +19,7 @@
 #include "Territory.h"
 #include "InstanceContent.h"
 #include "QuestBattle.h"
+#include "PublicContent.h"
 #include "Manager/TerritoryMgr.h"
 #include "Navi/NaviProvider.h"
 
@@ -213,7 +214,7 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
   if( !pCell )
   {
     pCell = create( cx, cy );
-    pCell->init( cx, cy, shared_from_this() );
+    pCell->init( cx, cy );
   }
 
   pCell->addActor( pActor );
@@ -268,12 +269,7 @@ void Sapphire::Territory::pushActor( Entity::ActorPtr pActor )
 
 void Sapphire::Territory::removeActor( Entity::ActorPtr pActor )
 {
-  float mx = pActor->getPos().x;
-  float my = pActor->getPos().z;
-  uint32_t cx = getPosX( mx );
-  uint32_t cy = getPosY( my );
-
-  Cell* pCell = getCellPtr( cx, cy );
+  Cell* pCell = pActor->getCellPtr();
   if( pCell && pCell->hasActor( pActor ) )
     pCell->removeActorFromCell( pActor );
 
@@ -580,11 +576,9 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
         if( isCellActive( posX, posY ) )
         {
           pCell = create( posX, posY );
-          pCell->init( posX, posY, shared_from_this() );
+          pCell->init( posX, posY );
 
           pCell->setActivity( true );
-
-          assert( !pCell->isLoaded() );
 
         }
       }
@@ -594,11 +588,6 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
         if( isCellActive( posX, posY ) && !pCell->isActive() )
         {
           pCell->setActivity( true );
-
-          if( !pCell->isLoaded() )
-          {
-
-          }
         }
         else if( !isCellActive( posX, posY ) && pCell->isActive() )
           pCell->setActivity( false );
@@ -627,7 +616,7 @@ void Sapphire::Territory::updateActorPosition( Entity::Actor& actor )
   if( !pCell )
   {
     pCell = create( cellX, cellY );
-    pCell->init( cellX, cellY, shared_from_this() );
+    pCell->init( cellX, cellY );
   }
 
   // If object moved cell
@@ -780,6 +769,11 @@ Sapphire::Entity::EventObjectPtr Sapphire::Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Sapphire::Event::DirectorPtr Sapphire::Territory::getAsDirector()
+{
+  return std::dynamic_pointer_cast< Event::Director, Territory >( shared_from_this() );
+}
+
 Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );
@@ -788,6 +782,11 @@ Sapphire::InstanceContentPtr Sapphire::Territory::getAsInstanceContent()
 Sapphire::QuestBattlePtr Sapphire::Territory::getAsQuestBattle()
 {
   return std::dynamic_pointer_cast< QuestBattle, Territory >( shared_from_this() );
+}
+
+Sapphire::PublicContentPtr Sapphire::Territory::getAsPublicContent()
+{
+  return std::dynamic_pointer_cast< PublicContent, Territory >( shared_from_this() );
 }
 
 uint32_t Sapphire::Territory::getNextEObjId()
@@ -1042,5 +1041,20 @@ void Sapphire::Territory::processEffectResults( uint64_t tickCount )
     effect->execute();
 
     it = m_effectResults.erase( it );
+  }
+}
+
+Sapphire::Entity::PlayerPtr Sapphire::Territory::getPlayer( uint32_t charId )
+{
+  return m_playerMap[ charId ];
+}
+
+void Sapphire::Territory::foreachPlayer( std::function< void( Sapphire::Entity::PlayerPtr player ) > callback )
+{
+  if( !callback )
+    return;
+  for( auto entry : m_playerMap )
+  {
+    callback( entry.second );
   }
 }

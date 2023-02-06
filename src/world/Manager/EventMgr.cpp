@@ -3,8 +3,16 @@
 #include <Util/Util.h>
 #include <Service.h>
 
+#include <Exd/ExdDataGenerated.h>
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include "EventMgr.h"
 #include "Event/EventHandler.h"
+
+#include "Territory/InstanceObjectCache.h"
+
+#include "Actor/Player.h"
 
 using namespace Sapphire::Common;
 
@@ -74,6 +82,13 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
       name[ 0 ] = toupper( name[ 0 ] );
       return name;
     }
+    case Event::EventHandler::EventHandlerType::PublicContentDirector:
+    {
+      auto pcInfo = exdData.get< Sapphire::Data::PublicContent >( eventId & 0x0000FFFF );
+      if( !pcInfo )
+        return "unknown";
+      return pcInfo->name;
+    }
 
 
     case Event::EventHandler::EventHandlerType::Warp:
@@ -97,6 +112,11 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
       }*/
       //return unknown + "GilShop";
     }
+
+    case Event::EventHandler::EventHandlerType::SwitchTalk:
+    {
+      return "FcTalk";
+    }
     default:
     {
       return unknown;
@@ -106,10 +126,15 @@ std::string Sapphire::World::Manager::EventMgr::getEventName( uint32_t eventId )
 
 uint32_t Sapphire::World::Manager::EventMgr::mapEventActorToRealActor( uint32_t eventActorId )
 {
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   auto levelInfo = exdData.get< Sapphire::Data::Level >( eventActorId );
   if( levelInfo )
     return levelInfo->object;
+  else if( auto pObj = instanceObjectCache.getEObj( eventActorId ) )
+    return pObj->data.eobjId;
+  else if( auto pNpc = instanceObjectCache.getENpc( eventActorId ) )
+    return pNpc->data.enpcId;
 
   return 0;
 }

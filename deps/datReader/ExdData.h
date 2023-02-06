@@ -6,6 +6,7 @@
 #include <mutex>
 
 #include <filesystem>
+#include <vector>
 
 namespace xiv
 {

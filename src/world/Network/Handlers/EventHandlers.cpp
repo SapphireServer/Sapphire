@@ -23,6 +23,7 @@
 
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 
 #include "Session.h"
 
@@ -56,6 +57,14 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
   player.eventStart( actorId, eventId, Event::EventHandler::Talk, 0, 0 );
 
   if( auto instance = player.getCurrentInstance() )
+  {
+    instance->onTalk( player, eventId, actorId );
+  }
+  else if( auto instance = player.getCurrentQuestBattle() )
+  {
+    instance->onTalk( player, eventId, actorId );
+  }
+  else if( auto instance = player.getCurrentPublicContent() )
   {
     instance->onTalk( player, eventId, actorId );
   }
@@ -145,7 +154,7 @@ void Sapphire::Network::GameConnection::eventHandlerOutsideRange( const Packets:
   std::string objName = eventMgr.getEventName( eventId );
   player.sendDebug( "Calling: {0}.{1} - {2} p1: {3}", objName, eventName, eventId, param1 );
 
-  player.eventStart( player.getId(), eventId, Event::EventHandler::WithinRange, 1, param1 );
+  player.eventStart( player.getId(), eventId, Event::EventHandler::OutsideRange, 1, param1 );
 
   scriptMgr.onOutsideRange( player, eventId, param1, pos.x, pos.y, pos.z );
 
@@ -176,6 +185,11 @@ void Sapphire::Network::GameConnection::eventHandlerEnterTerritory( const Packet
     instance->onEnterTerritory( player, eventId, param1, param2 );
   }
   else if( auto instance = player.getCurrentQuestBattle() )
+  {
+    player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
+    instance->onEnterTerritory( player, eventId, param1, param2 );
+  }
+  else if( auto instance = player.getCurrentPublicContent() )
   {
     player.eventStart( player.getId(), eventId, Event::EventHandler::EnterTerritory, 1, player.getZoneId() );
     instance->onEnterTerritory( player, eventId, param1, param2 );
@@ -273,5 +287,42 @@ void Sapphire::Network::GameConnection::eventHandlerShop( const Packets::FFXIVAR
   scriptMgr.onTalk( player, player.getId(), eventId );
 }
 
+void Sapphire::Network::GameConnection::eventYieldHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
+  auto opcode = *reinterpret_cast< const uint16_t* >( &inPacket.data[ 2 ] );
+  auto eventId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 + 0 ] );
+  auto scene = *reinterpret_cast< const uint16_t* >( &inPacket.data[ 0x10 + 4 ] );
+  auto pParam = reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 + 8 ] );
+  
+  std::vector< uint32_t > param;
+  auto paramSize = 0;
+
+  switch( opcode )
+  {
+    case EventYield2Handler:
+      paramSize = 2;
+      break;
+    case EventYield16Handler:
+      paramSize = 16;
+      break;
+  }
+  for( int i = 0; i < paramSize; i++ )
+  {
+    param.push_back( pParam[ i ] );
+  }
+
+  std::string eventName = "onEventYield";
+  std::string objName = eventMgr.getEventName( eventId );
+  player.sendDebug( "Calling: {0}.{1} - {2} scene: {3}", objName, eventName, eventId, scene );
+
+  scriptMgr.onEventYield( player, eventId, scene, param );
+
+  auto response = makeZonePacket< FFXIVIpcEventContinue >( player.getId() );
+  response->data().eventId = eventId;
+  response->data().scene = scene;
+  player.queuePacket( response );
+}
 

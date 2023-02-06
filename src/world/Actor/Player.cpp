@@ -19,10 +19,13 @@
 #include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
+#include "Manager/MapMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/ZonePosition.h"
 #include "Territory/InstanceContent.h"
+#include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Territory/Land.h"
 
@@ -81,7 +84,8 @@ Sapphire::Entity::Player::Player() :
   m_directorInitialized( false ),
   m_onEnterEventDone( false ),
   m_falling( false ),
-  m_pQueuedAction( nullptr )
+  m_pQueuedAction( nullptr ),
+  m_cfNotifiedContent( 0 )
 {
   m_id = 0;
   m_currentStance = Stance::Passive;
@@ -239,13 +243,16 @@ uint64_t Sapphire::Entity::Player::getOnlineStatusMask() const
   return m_onlineStatus;
 }
 
-void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation )
+void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation, uint8_t param4, uint8_t param7, uint8_t unknown )
 {
   auto preparePacket = makeZonePacket< FFXIVIpcPrepareZoning >( getId() );
   preparePacket->data().targetZone = targetZone;
   preparePacket->data().fadeOutTime = fadeOutTime;
   preparePacket->data().animation = animation;
   preparePacket->data().fadeOut = static_cast< uint8_t >( fadeOut ? 1 : 0 );
+  preparePacket->data().param4 = param4;
+  preparePacket->data().param7 = param7;
+  preparePacket->data().unknown = unknown;
   queuePacket( preparePacket );
 }
 
@@ -280,6 +287,7 @@ void Sapphire::Entity::Player::calculateStats()
   m_baseStats.pie = static_cast< uint32_t >( base );
   m_baseStats.skillSpeed = paramGrowthInfo->baseSpeed;
   m_baseStats.spellSpeed = paramGrowthInfo->baseSpeed;
+  m_baseStats.haste = 100;
   m_baseStats.accuracy = paramGrowthInfo->baseSpeed;
   m_baseStats.critHitRate = paramGrowthInfo->baseSpeed;
   m_baseStats.attackPotMagic = paramGrowthInfo->baseSpeed;
@@ -332,7 +340,7 @@ void Sapphire::Entity::Player::sendStats()
   statPacket->data().healingMagicPotency = getStatValue( Common::BaseParam::HealingMagicPotency );
   statPacket->data().skillSpeed = getStatValue( Common::BaseParam::SkillSpeed );
   statPacket->data().spellSpeed = getStatValue( Common::BaseParam::SpellSpeed );
-  statPacket->data().haste = 100;
+  statPacket->data().haste = getStatValue( Common::BaseParam::Haste );
   statPacket->data().criticalHit = getStatValue( Common::BaseParam::CriticalHit );
   statPacket->data().defense = getStatValue( Common::BaseParam::Defense );
   statPacket->data().magicDefense = getStatValue( Common::BaseParam::MagicDefense );
@@ -468,7 +476,7 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
   return teriMgr.movePlayer( instance, getAsPlayer() );
 }
 
-bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos )
+bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIVARR_POSITION3 pos, float rot )
 {
   m_onEnterEventDone = false;
   if( !instance )
@@ -486,10 +494,16 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIV
     m_prevTerritoryId = getTerritoryId();
   }
 
+  m_pos = pos;
+  m_rot = rot;
   if( teriMgr.movePlayer( instance, getAsPlayer() ) )
   {
-    m_pos = pos;
     return true;
+  }
+  else
+  {
+    m_pos = m_prevPos;
+    m_rot= m_prevRot;
   }
 
   return false;
@@ -499,8 +513,18 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto pZone = getCurrentTerritory();
-  auto pInstance = pZone->getAsInstanceContent();
+  auto d = getCurrentTerritory()->getAsDirector();
+  if( d && d->getContentFinderConditionId() > 0 )
+  {
+    auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+    p->data().param[0] = d->getDirectorId();
+    p->data().param[1] = 1534;
+    p->data().param[2] = 1;
+    p->data().param[3] = d->getContentFinderConditionId();
+    queuePacket( p );
+
+    prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
+  }
 
   resetHp();
   resetMp();
@@ -708,7 +732,7 @@ void Sapphire::Entity::Player::learnSong( uint8_t songId, uint32_t itemId )
   queuePacket( makeActorControlSelf( getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
-bool Sapphire::Entity::Player::isActionLearned( uint8_t actionId ) const
+bool Sapphire::Entity::Player::isActionLearned( uint32_t actionId ) const
 {
   uint16_t index;
   uint8_t value;
@@ -1160,7 +1184,7 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
                               actor->getPos().x, actor->getPos().y, actor->getPos().z ) <= range )
           {
 
-            if( ( tickCount - m_lastAttack ) > mainWeap->getDelay() )
+            if( ( tickCount - m_lastAttack ) > ( static_cast< float >( mainWeap->getDelay() ) * ( getStatValue( Common::BaseParam::Haste ) / 100.0f ) ) )
             {
               m_lastAttack = tickCount;
               autoAttack( actor->getAsChara() );
@@ -1262,6 +1286,17 @@ const uint8_t* Sapphire::Entity::Player::getOrchestrionBitmask() const
 const uint8_t* Sapphire::Entity::Player::getMountGuideBitmask() const
 {
   return m_mountGuide;
+}
+
+const bool Sapphire::Entity::Player::hasMount( uint32_t mountId ) const
+{
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto mount = exdData.get< Data::Mount >( mountId );
+
+  if( mount->order == -1 || mount->modelChara == 0 )
+    return false;
+
+  return m_mountGuide[ mount->order / 8 ] & ( 1 << ( mount->order % 8 ) );
 }
 
 uint64_t Sapphire::Entity::Player::getContentId() const
@@ -1591,7 +1626,7 @@ uint16_t Sapphire::Entity::Player::getCurrentCompanion() const
   return m_companionId;
 }
 
-uint8_t Sapphire::Entity::Player::getCurrentMount() const
+uint16_t Sapphire::Entity::Player::getCurrentMount() const
 {
   return m_mount;
 }
@@ -1751,14 +1786,14 @@ void Sapphire::Entity::Player::sendZonePackets()
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
-    sendHuntingLog();
-
   sendStats();
 
   // only initialize the UI if the player in fact just logged in.
   if( isLogin() )
   {
+    if( isActionLearned( static_cast< uint8_t >( Common::UnlockEntry::HuntingLog ) ) )
+      sendHuntingLog();
+
     auto contentFinderList = makeZonePacket< FFXIVIpcCFAvailableContents >( getId() );
 
     for( auto i = 0; i < sizeof( contentFinderList->data().contents ); i++ )
@@ -1808,6 +1843,12 @@ void Sapphire::Entity::Player::sendZonePackets()
   initZonePacket->data().pos.x = getPos().x;
   initZonePacket->data().pos.y = getPos().y;
   initZonePacket->data().pos.z = getPos().z;
+  if( auto d = getCurrentTerritory()->getAsDirector() )
+  {
+    initZonePacket->data().contentfinderConditionId = d->getContentFinderConditionId();
+    initZonePacket->data().bitmask = 0xFF;
+    initZonePacket->data().bitmask1 = 0x2A;
+  }
   queuePacket( initZonePacket );
 
   getCurrentTerritory()->onPlayerZoneIn( *this );
@@ -1862,6 +1903,8 @@ Sapphire::Entity::Player::sendZoneInPackets( uint32_t param1, uint32_t param2 = 
 
   setZoningType( Common::ZoneingType::None );
   unsetStateFlag( PlayerStateFlag::BetweenAreas );
+  
+  Common::Service< MapMgr >::ref().updateAll( *this );
 }
 
 void Sapphire::Entity::Player::finishZoning()

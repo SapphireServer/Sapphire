@@ -16,6 +16,9 @@
 #include "DebugCommand/DebugCommand.h"
 #include "DebugCommandMgr.h"
 
+#include <datReader/DatCategories/bg/LgbTypes.h>
+#include <datReader/DatCategories/bg/lgb.h>
+
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
@@ -32,6 +35,8 @@
 #include "Territory/HousingZone.h"
 #include "Territory/InstanceContent.h"
 #include "Territory/QuestBattle.h"
+#include "Territory/PublicContent.h"
+#include "Territory/InstanceObjectCache.h"
 #include "Manager/TerritoryMgr.h"
 #include "Event/EventDefs.h"
 
@@ -60,6 +65,8 @@ Sapphire::World::Manager::DebugCommandMgr::DebugCommandMgr()
   registerCommand( "script", &DebugCommandMgr::script, "Server script utilities.", 1 );
   registerCommand( "instance", &DebugCommandMgr::instance, "Instance utilities", 1 );
   registerCommand( "questbattle", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
+  registerCommand( "pc", &DebugCommandMgr::pc, "Public content utilities", 1 );
+  registerCommand( "publiccontent", &DebugCommandMgr::pc, "Public content utilities", 1 );
   registerCommand( "qb", &DebugCommandMgr::questBattle, "Quest battle utilities", 1 );
   registerCommand( "housing", &DebugCommandMgr::housing, "Housing utilities", 1 );
 }
@@ -226,22 +233,14 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     if( player.getLevelForClass( static_cast< Common::ClassJob > ( id ) ) == 0 )
     {
       player.setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
-      player.setClassJob( static_cast< Common::ClassJob > ( id ) );
-      player.sendModel();
-      player.sendItemLevel();
-      player.calculateStats();
-      player.sendStats();
-      player.sendStatusEffectUpdate();
-      player.sendStatusUpdate();
     }
-    else
-      player.setClassJob( static_cast< Common::ClassJob > ( id ) );
-      player.sendModel();
-      player.sendItemLevel();
-      player.calculateStats();
-      player.sendStats();
-      player.sendStatusEffectUpdate();
-      player.sendStatusUpdate();
+    player.setClassJob( static_cast< Common::ClassJob > ( id ) );
+    player.sendModel();
+    player.sendItemLevel();
+    player.calculateStats();
+    player.sendStats();
+    player.sendStatusEffectUpdate();
+    player.sendStatusUpdate();
   }
   else if( subCommand == "cfpenalty" )
   {
@@ -308,6 +307,76 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   else if( subCommand == "festivaldisable" )
   {
     terriMgr.disableCurrentFestival();
+  }
+  else if( subCommand == "QuestVar" )
+  {
+    uint16_t questId;
+    uint8_t index;
+    uint8_t value;
+    sscanf( params.c_str(), "%hu %hhu %hhu", &questId, &index, &value );
+    switch( index )
+    {
+      case 1:
+      {
+        player.setQuestUI8AH( questId, value );
+        break;
+      }
+      case 2:
+      {
+        player.setQuestUI8AL( questId, value );
+        break;
+      }
+      case 3:
+      {
+        player.setQuestUI8BH( questId, value );
+        break;
+      }
+      case 4:
+      {
+        player.setQuestUI8BL( questId, value );
+        break;
+      }
+      case 5:
+      {
+        player.setQuestUI8CH( questId, value );
+        break;
+      }
+      case 6:
+      {
+        player.setQuestUI8CL( questId, value );
+        break;
+      }
+      case 7:
+      {
+        player.setQuestUI8DH( questId, value );
+        break;
+      }
+      case 8:
+      {
+        player.setQuestUI8DL( questId, value );
+        break;
+      }
+      case 9:
+      {
+        player.setQuestUI8EH( questId, value );
+        break;
+      }
+      case 10:
+      {
+        player.setQuestUI8EL( questId, value );
+        break;
+      }
+      case 11:
+      {
+        player.setQuestUI8FH( questId, value );
+        break;
+      }
+      case 12:
+      {
+        player.setQuestUI8FL( questId, value );
+        break;
+      }
+    }
   }
   else if( subCommand == "BitFlag" )
   {
@@ -591,9 +660,35 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
 
     int16_t map_id = exdData.get< Sapphire::Data::TerritoryType >( player.getCurrentTerritory()->getTerritoryTypeId() )->map;
 
-    player.sendNotice( "Pos:\n {0}\n {1}\n {2}\n {3}\n MapId: {4}\n ZoneId:{5}",
+    player.sendNotice( "Pos: x: {0}, y: {1}, z: {2}, r: {3}\n MapId: {4}, ZoneId:{5}, Weather:{6}, Festival:{7}, {8}",
                        player.getPos().x, player.getPos().y, player.getPos().z,
-                       player.getRot(), map_id, player.getCurrentTerritory()->getTerritoryTypeId() );
+                       player.getRot(), map_id, player.getCurrentTerritory()->getTerritoryTypeId(),
+                       static_cast< uint8_t >( player.getCurrentTerritory()->getCurrentWeather() ), player.getCurrentTerritory()->getCurrentFestival().first,
+                       player.getCurrentTerritory()->getCurrentFestival().second );
+    if( auto instance = player.getCurrentInstance() )
+    {
+      player.sendNotice( "Instance info:\nContentId: {}, DirectorId: {}\nSequence: {}, Branch: {}, BGM: {}",
+        instance->getInstanceContentId(), instance->getDirectorId(), instance->getSequence(),
+        instance->getBranch(), instance->getCurrentBGM() );
+    }
+    else if( auto instance = player.getCurrentPublicContent() )
+    {
+      player.sendNotice( "Public content info:\nContentId: {}, DirectorId: {}\nSequence: {}, Branch: {}",
+        instance->getContentId(), instance->getDirectorId(), instance->getSequence(),
+        instance->getBranch() );
+    }
+  }
+  else if( ( subCommand == "poprange" ) )
+  {
+    uint32_t id, param;
+    sscanf( params.c_str(), "%u", &id );
+
+    auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+    auto pPopRange = instanceObjectCache.getPopRange( player.getCurrentTerritory()->getTerritoryTypeId(), id );
+    if( pPopRange )
+    {
+      player.sendNotice( "x:{}, y:{}, z:{}", pPopRange->header.transform.translation.x, pPopRange->header.transform.translation.y, pPopRange->header.transform.translation.z );
+    }
   }
   else
   {
@@ -1288,5 +1383,139 @@ void Sapphire::World::Manager::DebugCommandMgr::housing( char* data, Entity::Pla
   else
   {
     player.sendDebug( "Unknown sub command." );
+  }
+}
+
+void Sapphire::World::Manager::DebugCommandMgr::pc( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  std::string cmd( data ), params, subCommand;
+  auto cmdPos = cmd.find_first_of( ' ' );
+
+  if( cmdPos != std::string::npos )
+  {
+    params = cmd.substr( cmdPos + 1 );
+
+    auto p = params.find_first_of( ' ' );
+
+    if( p != std::string::npos )
+    {
+      subCommand = params.substr( 0, p );
+      params = params.substr( subCommand.length() + 1 );
+    }
+    else
+      subCommand = params;
+  }
+
+  if( subCommand == "create" || subCommand == "cr" )
+  {
+    uint32_t contentFinderConditionId;
+    sscanf( params.c_str(), "%d", &contentFinderConditionId );
+
+    auto instance = terriMgr.createPublicContent( contentFinderConditionId );
+    if( instance )
+      player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
+    else
+      player.sendDebug( "Failed to create instance with id#{0}", contentFinderConditionId );
+  }
+  else if ( subCommand == "create2" || subCommand == "cr2" )
+  {
+    uint16_t contentId, terriId;
+    sscanf( params.c_str(), "%hu %hu", &contentId, &terriId );
+
+    auto instance = terriMgr.createPublicContent( contentId, terriId );
+    if( instance )
+      player.sendDebug( "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
+    else
+      player.sendDebug( "Failed to create instance with id#{0}, territory#{1}. Server console output may contain additional info.", contentId, terriId );
+  }
+  else if( subCommand == "remove" || subCommand == "rm" )
+  {
+    uint32_t terriId;
+    sscanf( params.c_str(), "%d", &terriId );
+
+    if( terriMgr.removeTerritoryInstance( terriId ) )
+      player.sendDebug( "Removed instance with id#{0}", terriId );
+    else
+      player.sendDebug( "Failed to remove instance with id#{0}", terriId );
+  }
+  else if( subCommand == "return" || subCommand == "ret" )
+  {
+    player.exitInstance();
+  }
+  else if( subCommand == "set" )
+  {
+    uint32_t index;
+    uint32_t value;
+    sscanf( params.c_str(), "%d %d", &index, &value );
+
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    instance->setVar( static_cast< uint8_t >( index ), static_cast< uint8_t >( value ) );
+  }
+  else if( subCommand == "seq" )
+  {
+    uint8_t seq;
+
+    sscanf( params.c_str(), "%hhu", &seq );
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    instance->setSequence( seq );
+  }
+  else if( subCommand == "branch" )
+  {
+    uint8_t branch;
+
+    sscanf( params.c_str(), "%hhu", &branch );
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    instance->setBranch( branch );
+  }
+  else if( subCommand == "objstate" )
+  {
+    char objName[128];
+    uint8_t state;
+
+    sscanf( params.c_str(), "%s %hhu", objName, &state );
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+      return;
+
+    obj->setState( state );
+  }
+  else if( subCommand == "objflag" )
+  {
+    char objName[256];
+    uint32_t state1;
+    uint32_t state2;
+
+    sscanf( params.c_str(), "%s %i %i", objName, &state1, &state2 );
+
+    auto instance = std::dynamic_pointer_cast< PublicContent >( player.getCurrentTerritory() );
+    if( !instance )
+      return;
+
+    auto obj = instance->getEObjByName( objName );
+    if( !obj )
+    {
+      player.sendDebug( "No eobj found." );
+      return;
+    }
+
+    obj->setAnimationFlag( state1, state2 );
   }
 }

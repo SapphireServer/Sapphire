@@ -37,7 +37,7 @@ public:
 
       if( exportFileTypes & ExportFileType::Navmesh )
         NavmeshExporter::exportZone( zone );
-    } );
+    }, true );
   }
 
   void waitForTasks()

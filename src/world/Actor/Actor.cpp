@@ -351,11 +351,20 @@ Sapphire::InstanceContentPtr Sapphire::Entity::Actor::getCurrentInstance() const
   return nullptr;
 }
 
-/*! \return QuestBattlePtr to the current instance, nullptr if not an instance or not set */
+/*! \return QuestBattlePtr to the current instance, nullptr if not a quest battle or not set */
 Sapphire::QuestBattlePtr Sapphire::Entity::Actor::getCurrentQuestBattle() const
 {
   if( m_pCurrentTerritory )
     return m_pCurrentTerritory->getAsQuestBattle();
+
+  return nullptr;
+}
+
+/*! \return PublicContentPtr to the current instance, nullptr if not a public content or not set */
+Sapphire::PublicContentPtr Sapphire::Entity::Actor::getCurrentPublicContent() const
+{
+  if( m_pCurrentTerritory )
+    return m_pCurrentTerritory->getAsPublicContent();
 
   return nullptr;
 }
