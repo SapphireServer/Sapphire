@@ -849,7 +849,7 @@ void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t
   server.queueForPlayer( player.getCharacterId(), noticePacket );
 }
 
-void EventMgr::sendEventNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, std::vector< uint32_t > args )
+void EventMgr::sendNotice( Entity::Player& player, uint32_t questId, int8_t noticeId, std::vector< uint32_t > args )
 {
   FFXIVPacketBasePtr pPacket = nullptr;
   size_t paramCount = args.size();
