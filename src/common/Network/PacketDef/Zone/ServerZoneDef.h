@@ -1344,7 +1344,10 @@ namespace Sapphire::Network::Packets::Server
     uint32_t catalogId;
     uint32_t someActorId;
     int32_t targetStorageId;
-    uint32_t padding3[3];
+    uint16_t targetSlotId;
+    uint16_t padding3;
+    uint32_t targetStackSize;
+    uint32_t targetCatalogId;
   };
 
 

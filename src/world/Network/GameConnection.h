@@ -196,6 +196,8 @@ namespace Sapphire::Network
     DECLARE_HANDLER( diveHandler );
 
     DECLARE_HANDLER( eventYieldHandler );
+
+    DECLARE_HANDLER( inventoryEquipRecommendedItemsHandler );
   };
 
 }

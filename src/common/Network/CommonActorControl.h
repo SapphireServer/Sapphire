@@ -31,6 +31,8 @@ namespace Sapphire::Network::ActorControl
     DefeatMsg = 0x06,
     GainExpMsg = 0x07,
 
+    ClassJobUpdate = 0x9,
+
     LevelUpEffect = 0x0A,
 
     ExpChainMsg = 0x0C,
@@ -263,18 +265,20 @@ namespace Sapphire::Network::ActorControl
     HuntingLogSectionFinish = 0x21F,
     HuntingLogRankFinish = 0x220,
 
-    SetMaxGearSets = 0x230,
-
     SetCharaGearParamUI = 0x260,
     ToggleWireframeRendering = 0x261,
 
     ExamineError = 0x2BF,
+
+    SetMaxGearSets = 0x320,
 
     GearSetEquipMsg = 0x321,
 
     SetBait = 0x325, // param1: bait ID
 
     SetFestival = 0x386, // param1: festival.exd index
+
+    SetMountBitmask = 0x387, // param1: mount ID, param2: unlock/lock (1/0)
 
     ToggleOrchestrionUnlock = 0x396,
 

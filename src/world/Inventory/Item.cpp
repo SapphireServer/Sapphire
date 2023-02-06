@@ -32,6 +32,7 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_block = itemInfo->block;
   m_defense = itemInfo->defensePhys;
   m_defenseMag = itemInfo->defenseMag;
+  m_equipSlotCategory = itemInfo->equipSlotCategory;
 
   for( int i = 0; i < 6; ++i )
   {
@@ -179,6 +180,11 @@ void Sapphire::Item::setStain( uint16_t stain )
 uint32_t Sapphire::Item::getAdditionalData() const
 {
   return m_additionalData;
+}
+
+uint8_t Sapphire::Item::getEquipSlotCategory() const
+{
+  return m_equipSlotCategory;
 }
 
 uint16_t Sapphire::Item::getSpiritbond() const

@@ -47,12 +47,41 @@ void ItemAction::execute()
 
       break;
     }
+
+    case Common::ItemActionType::ItemActionMount:
+    {
+      handleMountItem();
+
+      break;
+    }
+
+    case Common::ItemActionType::ItemActionOrchestrion:
+    {
+      handleOrchestrionItem();
+
+      break;
+    }
   }
 }
 
 void ItemAction::interrupt()
 {
 
+}
+
+void ItemAction::handleMountItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+  player->unlockMount( m_itemAction->data[ 0 ] );
+  player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot, false );
+}
+
+void ItemAction::handleOrchestrionItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+  //player->learnSong( m_itemAction->data[ 0 ], m_itemAction->data[ 1 ] );
+  //player->dropInventoryItem ( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot, false );
+  player->sendUrgent( "orchestrion is not aligned correctly, handleOrchestrionItem() disabled until PlayerSetup fully fixed." );
 }
 
 void ItemAction::handleVFXItem()
