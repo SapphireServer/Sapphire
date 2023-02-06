@@ -75,7 +75,7 @@ namespace Sapphire::Network::Packets::Server
 
       // df stuff
       // todo: actually do this properly
-  //      m_data.unknown70[4] = 1; // enable df
+      //      m_data.unknown70[4] = 1; // enable df
 
       // enable all raids/guildhests/dungeons
       memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
@@ -83,6 +83,15 @@ namespace Sapphire::Network::Packets::Server
       memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
       memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
+
+      // uncomment to enable custom unlocks
+
+      // everything
+      //memset( &m_data.unknownOword[ 0 ], 0xFF, reinterpret_cast< uint64_t >( &m_data.unknown5_55c ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
+      // or select options below
+      //memset( m_data.unlockBitmask, 0xFF, sizeof( m_data.unlockBitmask ) );
+      //memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
+      //memset( m_data.minions, 0xFF, sizeof( m_data.minions ) );
     };
   };
 
