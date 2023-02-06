@@ -195,6 +195,8 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
 
   db.directExecute( stmt );
 
+  sendFreeCompanyResult( player, freeCompanyId, FreeCompanyMgr::ResultType::Create, 2, 0, FreeCompanyMgr::UpdateStatus::Execute );
+
   return fcPtr;
 }
 
@@ -222,12 +224,6 @@ void FreeCompanyMgr::sendFreeCompanyStatus( Entity::Player& player )
 
 }
 
-void FreeCompanyMgr::finishFreeCompanyAction( const std::string& name, uint32_t result, Entity::Player& player, uint8_t action )
-{
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-}
-
 FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( Entity::Player& player ) const
 {
   for( const auto &[ key, value ] : m_fcIdMap )
@@ -238,4 +234,84 @@ FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( Entity::Player& player ) co
     }
   }
   return nullptr;
+}
+
+void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
+{
+  auto fc = getPlayerFreeCompany( player );
+  if( !fc )
+    return;
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto inviteListPacket = makeZonePacket< FFXIVIpcGetFcInviteListResult >( player.getId() );
+  inviteListPacket->data().GrandCompanyID = fc->getGrandCompany();
+  inviteListPacket->data().FreeCompanyID = fc->getId();
+  std::strcpy( inviteListPacket->data().FcTag, fc->getTag().c_str() );
+  std::strcpy( inviteListPacket->data().FreeCompanyName, fc->getName().c_str() );
+
+  // fill master character data
+  auto masterCharacter = server.getPlayer( fc->getMasterId() );
+  if( !masterCharacter )
+    Logger::error( "FreeCompanyMgr: Unable to look up master character#{}!", fc->getMasterId() );
+
+  inviteListPacket->data().MasterCharacter.GrandCompanyID = masterCharacter->getGc();
+  inviteListPacket->data().MasterCharacter.CharacterID = masterCharacter->getCharacterId();
+  strcpy( inviteListPacket->data().MasterCharacter.CharacterName, masterCharacter->getName().c_str() );
+  inviteListPacket->data().MasterCharacter.SelectRegion = masterCharacter->getSearchSelectRegion();
+  inviteListPacket->data().MasterCharacter.OnlineStatus = masterCharacter->getOnlineStatusMask();
+  inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 0 ] = masterCharacter->getGcRankArray()[ 0 ];
+  inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 1 ] = masterCharacter->getGcRankArray()[ 1 ];
+  inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 2 ] = masterCharacter->getGcRankArray()[ 2 ];
+
+  // todo - fill invite characters
+
+  server.queueForPlayer( player.getCharacterId(), inviteListPacket );
+}
+
+void FreeCompanyMgr::sendFreeCompanyResult( Entity::Player& player, uint64_t fcId, ResultType resultType, uint64_t target, uint32_t result,
+                                            FreeCompanyMgr::UpdateStatus updateStatus )
+{
+  auto fc = getFreeCompanyById( fcId );
+  if( !fc )
+    return;
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto fcResult = makeZonePacket< FFXIVIpcFreeCompanyResult >( player.getId() );
+  auto& fcResultData = fcResult->data();
+  fcResultData.FreeCompanyID = fcId;
+  std::strcpy( fcResultData.FreeCompanyName, fc->getName().c_str() );
+  std::strcpy( fcResultData.TargetName, fc->getName().c_str() );
+  fcResultData.Result = result;
+  fcResultData.TargetCharacterID = target;
+  fcResultData.Type = resultType;
+  fcResultData.UpdateStatus = updateStatus;
+
+  server.queueForPlayer( player.getCharacterId(), fcResult );
+}
+
+
+void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
+{
+  auto fc = getPlayerFreeCompany( player );
+  auto fcResultPacket = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
+  auto& resultData = fcResultPacket->data();
+  resultData.CharaFcParam = 1;
+
+  if( fc )
+  {
+    resultData.FreeCompanyID = fc->getId();
+    resultData.AuthorityList = 0;
+    resultData.HierarchyType = 0;
+    resultData.GrandCompanyID = fc->getGrandCompany();
+    resultData.FcRank = fc->getRank();
+    resultData.CrestID = fc->getCrest();
+    resultData.FcStatus = static_cast< uint8_t >( fc->getFcStatus() );
+    resultData.ChannelID = fc->getChatChannel();
+    resultData.CharaFcParam = 0;
+  }
+
+  auto& server = Common::Service< World::WorldServer >::ref();
+  server.queueForPlayer( player.getCharacterId(), fcResultPacket );
 }

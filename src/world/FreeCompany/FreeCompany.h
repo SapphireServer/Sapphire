@@ -4,6 +4,7 @@
 #include <set>
 #include <string>
 #include <array>
+#include <optional>
 
 namespace Sapphire
 {
@@ -56,6 +57,8 @@ namespace Sapphire
     std::set< uint64_t > m_inviteIds;
     /*! chat channel ID associated with fc */
     uint64_t m_chatChannelId;
+    /*! List of players on petition list */
+    std::array< uint64_t, 3 > m_inviteList;
 
   public:
     FreeCompany( uint64_t id,

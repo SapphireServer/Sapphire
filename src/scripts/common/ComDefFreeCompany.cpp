@@ -13,6 +13,8 @@
 // Event Name: Small Talk
 // Event ID: 720972
 using namespace Sapphire;
+using namespace Sapphire::World;
+using namespace Sapphire::World::Manager;
 
 class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 {
@@ -97,7 +99,6 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
         eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 3051 } );
         return;
       }
-      pFcMgr.writeFreeCompany( pFc->getId() );
       eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0 } );
       pFcMgr.sendFreeCompanyStatus( player );
     }

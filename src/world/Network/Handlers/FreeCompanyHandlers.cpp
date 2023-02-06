@@ -25,26 +25,47 @@ using namespace Sapphire::World::Manager;
 void Sapphire::Network::GameConnection::getFcInviteListHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& fcMgr = Common::Service< FreeCompanyMgr >::ref();
+  fcMgr.sendFcInviteList( player );
+}
 
-  auto fc = fcMgr.getPlayerFreeCompany( player );
-  if( !fc )
-    return;
+void Sapphire::Network::GameConnection::getFcStatus( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& fcMgr = Common::Service< FreeCompanyMgr >::ref();
+  fcMgr.sendFcStatus( player );
+}
 
-  auto inviteListPacket = makeZonePacket< FFXIVIpcGetFcInviteListResult >( player.getId() );
-  inviteListPacket->data().GrandCompanyID = fc->getGrandCompany();
-  inviteListPacket->data().FreeCompanyID = fc->getId();
-  std::strcpy( inviteListPacket->data().FcTag, fc->getTag().c_str() );
-  std::strcpy( inviteListPacket->data().FreeCompanyName, fc->getName().c_str() );
-  inviteListPacket->data().MasterCharacter.GrandCompanyID = player.getGc();
-  inviteListPacket->data().MasterCharacter.CharacterID = player.getCharacterId();
-  strcpy( inviteListPacket->data().MasterCharacter.CharacterName, player.getName().c_str() );
-  inviteListPacket->data().MasterCharacter.SelectRegion = player.getSearchSelectRegion();
-  inviteListPacket->data().MasterCharacter.OnlineStatus = player.getOnlineStatusMask();
-  inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 0 ] = player.getGcRankArray()[ 0 ];
-  inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 1 ] = player.getGcRankArray()[ 1 ];
-  inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 2 ] = player.getGcRankArray()[ 2 ];
+void Sapphire::Network::GameConnection::getFcProfile( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGetFcProfile >( inPacket );
 
   auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), inviteListPacket );
+
+  auto resultPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcGetFcProfileResult >( player.getId() );
+  resultPacket->data().TargetCharacterID = packet.data().TargetCharacterID;
+  resultPacket->data().TargetEntityID = packet.data().TargetEntityID;
+
+  // haha test code
+  resultPacket->data().FreeCompanyID = 1;
+  resultPacket->data().CrestID = 0x0001000100010001;
+  resultPacket->data().LandID = Common::INVALID_GAME_OBJECT_ID64;
+  resultPacket->data().OnlineMemberCount = 69;
+  resultPacket->data().TotalMemberCount = 420;
+  resultPacket->data().JoinRequestCount = 69;
+  resultPacket->data().FcRank = 1;
+  resultPacket->data().FcStatus = 1;
+  resultPacket->data().FcRole = 1;
+  resultPacket->data().FcActivity = 1;
+  resultPacket->data().GrandCompanyID = 1;
+  resultPacket->data().CreateDate = 1587305592;
+  resultPacket->data().Reputation = 500;
+  resultPacket->data().FcActiveTimeFlag = 0xFF;
+  resultPacket->data().FcJoinRequestFlag = 0xFF;
+  strcpy( resultPacket->data().MasterCharacterName, "Biggus Dickus" );
+  strcpy( resultPacket->data().FcTag, "Wang" );
+  strcpy( resultPacket->data().FreeCompanyName, "Test FC" );
+  strcpy( resultPacket->data().CompanyMotto, "nobody here but us chickens" );
+
+
+  server.queueForPlayer( player.getCharacterId(), resultPacket );
 
 }

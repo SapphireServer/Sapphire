@@ -700,57 +700,6 @@ void Sapphire::Network::GameConnection::marketBoardRequestItemListings( const Pa
   marketMgr.requestItemListings( player, packet.data().itemCatalogId );
 }
 
-void Sapphire::Network::GameConnection::getFcStatus( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
-{
-  //Todo implement proper FC handling
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto fcResultPacket = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
-  fcResultPacket->data().FreeCompanyID = 0;
-  fcResultPacket->data().AuthorityList = 0;
-  fcResultPacket->data().HierarchyType = 0;
-  fcResultPacket->data().GrandCompanyID = 0;
-  fcResultPacket->data().FcRank = 0;
-  fcResultPacket->data().CrestID = 0;
-  fcResultPacket->data().CharaFcParam = 1;
-  server.queueForPlayer( player.getCharacterId(), fcResultPacket );
-
-}
-
-void Sapphire::Network::GameConnection::getFcProfile( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
-{
-  const auto packet = ZoneChannelPacket< Client::FFXIVIpcGetFcProfile >( inPacket );
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  auto resultPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcGetFcProfileResult >( player.getId() );
-  resultPacket->data().TargetCharacterID = packet.data().TargetCharacterID;
-  resultPacket->data().TargetEntityID = packet.data().TargetEntityID;
-
-  // haha test code
-  resultPacket->data().FreeCompanyID = 1;
-  resultPacket->data().CrestID = 0x0001000100010001;
-  resultPacket->data().LandID = Common::INVALID_GAME_OBJECT_ID64;
-  resultPacket->data().OnlineMemberCount = 69;
-  resultPacket->data().TotalMemberCount = 420;
-  resultPacket->data().JoinRequestCount = 69;
-  resultPacket->data().FcRank = 1;
-  resultPacket->data().FcStatus = 1;
-  resultPacket->data().FcRole = 1;
-  resultPacket->data().FcActivity = 1;
-  resultPacket->data().GrandCompanyID = 1;
-  resultPacket->data().CreateDate = 1587305592;
-  resultPacket->data().Reputation = 500;
-  resultPacket->data().FcActiveTimeFlag = 0xFF;
-  resultPacket->data().FcJoinRequestFlag = 0xFF;
-  strcpy( resultPacket->data().MasterCharacterName, "Biggus Dickus" );
-  strcpy( resultPacket->data().FcTag, "Wang" );
-  strcpy( resultPacket->data().FreeCompanyName, "Test FC" );
-  strcpy( resultPacket->data().CompanyMotto, "nobody here but us chickens" );
-
-
-  server.queueForPlayer( player.getCharacterId(), resultPacket );
-
-}
 
 void Sapphire::Network::GameConnection::getRequestItemListHandler( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
