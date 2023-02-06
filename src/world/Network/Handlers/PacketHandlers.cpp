@@ -972,7 +972,7 @@ void Sapphire::Network::GameConnection::inventoryEquipRecommendedItemsHandler( c
       {
         for( int i = Common::Bag0; i <= Common::Bag3; i++ )
         {
-          freeContainerSlot = player.getFreeContainerSlot( Common::Bag0 );
+          freeContainerSlot = player.getFreeContainerSlot( i );
           if( freeContainerSlot.second > 0 )
             break;
         }
@@ -981,6 +981,7 @@ void Sapphire::Network::GameConnection::inventoryEquipRecommendedItemsHandler( c
         else
         {
           player.sendUrgent( "No free inventory space to swap out item at container:{}, slot{}", Common::GearSet0, slot );
+          continue;
         }
       }
       player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeContainerSlot.second, freeContainerSlot.first, *equippedItem, 0 ) );
