@@ -348,6 +348,9 @@ namespace Sapphire::Entity
     /*! send player ilvl */
     void sendItemLevel();
 
+    /*! calculate player ilvl */
+    void calculateItemLevel();
+
     /*! get the current main hand model */
     uint64_t getModelMainWeapon() const;
 
@@ -403,6 +406,9 @@ namespace Sapphire::Entity
 
     /*! sets the exp of the currently active class / job */
     void setExp( uint32_t amount );
+
+    /*! sets the exp of the specified class / job */
+    void setExp( uint8_t classId, uint32_t amount );
 
     /*! adds exp to the currently active class / job */
     void gainExp( uint32_t amount );
@@ -573,6 +579,12 @@ namespace Sapphire::Entity
     /*! change gear param state */
     void setEquipDisplayFlags( uint8_t state );
 
+    /*! set number of gear sets */
+    void setEquippedMannequin( uint8_t amount );
+
+    /*! get number of gear sets */
+    uint8_t getEquippedMannequin() const;
+
     /*! get gear param state */
     uint8_t getEquipDisplayFlags() const;
 
@@ -656,6 +668,8 @@ namespace Sapphire::Entity
 
     /*! return a const pointer to the mount guide bitmask array */
     const uint8_t* getMountGuideBitmask() const;
+
+    void unlockMount( uint32_t mountId );
 
     const bool hasMount( uint32_t mountId ) const;
 
@@ -743,6 +757,9 @@ namespace Sapphire::Entity
 
     /*! send the entire inventory sequence */
     void sendInventory();
+
+    /* send only the gear inventory */
+    void sendGearInventory();
 
     /*! send active quest list */
     void sendQuestInfo();
@@ -896,7 +913,7 @@ namespace Sapphire::Entity
 
     void updateDbClass() const;
 
-    void insertDbClass( const uint8_t classJobIndex ) const;
+    void insertDbClass( const uint8_t classJobIndex, const uint8_t classJobLevel = 1 ) const;
 
     void setMarkedForRemoval();
 
@@ -932,12 +949,14 @@ namespace Sapphire::Entity
 
     InvSlotPair getFreeBagSlot();
 
+    InvSlotPair getFreeContainerSlot( uint32_t containerId );
+
     ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
     ItemPtr addItem( ItemPtr itemToAdd, bool silent = false, bool canMerge = true, bool sendLootMessage = false );
 
-    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+    void moveItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, bool sendUpdate = true );
 
-    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot );
+    void swapItem( uint16_t fromInventoryId, uint8_t fromSlotId, uint16_t toInventoryId, uint8_t toSlot, bool sendUpdate = true );
 
     void discardItem( uint16_t fromInventoryId, uint8_t fromSlotId );
 
@@ -1053,6 +1072,8 @@ namespace Sapphire::Entity
     float m_prevRot;
 
     uint8_t m_voice;
+
+    uint8_t m_equippedMannequin;
 
     uint64_t m_modelMainWeapon;
     uint64_t m_modelSubWeapon;

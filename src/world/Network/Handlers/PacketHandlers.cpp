@@ -38,6 +38,7 @@
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
 #include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/EventMgr.h"
@@ -45,8 +46,10 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/HousingMgr.h"
 #include "Manager/RNGMgr.h"
+#include "Manager/ItemMgr.h"
 
 #include "Action/Action.h"
+#include "Inventory/Item.h"
 
 #include "Session.h"
 #include "ServerMgr.h"
@@ -928,4 +931,85 @@ void Sapphire::Network::GameConnection::diveHandler( const Packets::FFXIVARR_PAC
   setPos->data().waitForLoad = 25;
   setPos->data().unknown1 = 0;
   player.queuePacket( setPos ); // need delay, same as above.
+}
+
+// Also used for gearsets
+void Sapphire::Network::GameConnection::inventoryEquipRecommendedItemsHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packet = ZoneChannelPacket< Client::FFXIVInventoryEquipRecommendedItemsHandler >( inPacket );
+
+  // Loop over all slots
+  for (int slot = 0; slot < 14; slot++ )
+  {
+    const auto fromSlot = packet.data().containerIndex[ slot ];
+    const auto fromContainer = packet.data().storageId[ slot ];
+    
+    if ( fromContainer == Common::GearSet0 )
+      continue;
+
+    const auto fromItem = fromSlot == -1 ? nullptr : player.getItemAt( fromContainer, fromSlot );
+    const auto equippedItem = player.getItemAt( Common::GearSet0, slot );
+
+    if ( fromItem && equippedItem )
+    {
+      player.swapItem( fromContainer, fromSlot, Common::GearSet0, slot, slot == 0 || slot == 13 );
+      player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, 0 ) );
+      player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
+    }
+    else if ( fromItem && !equippedItem )
+    {
+      player.moveItem( fromContainer, fromSlot, Common::GearSet0, slot, slot == 0 || slot == 13 );
+      player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, 0 ) );
+      player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
+    }
+    else if ( !fromItem && equippedItem )
+    {
+      auto containerId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( equippedItem->getEquipSlotCategory() ) );
+      auto freeContainerSlot = player.getFreeContainerSlot( containerId );
+      if( freeContainerSlot.second > 0 )
+        player.moveItem( Common::GearSet0, slot, freeContainerSlot.first, freeContainerSlot.second, slot == 0 || slot == 13 );
+      else
+      {
+        for( int i = Common::Bag0; i <= Common::Bag3; i++ )
+        {
+          freeContainerSlot = player.getFreeContainerSlot( i );
+          if( freeContainerSlot.second > 0 )
+            break;
+        }
+        if( freeContainerSlot.second > 0 )
+          player.moveItem( Common::GearSet0, slot, freeContainerSlot.first, freeContainerSlot.second, slot == 0 || slot == 13 );
+        else
+        {
+          player.sendUrgent( "No free inventory space to swap out item at container:{}, slot{}", Common::GearSet0, slot );
+          continue;
+        }
+      }
+      player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeContainerSlot.second, freeContainerSlot.first, *equippedItem, 0 ) );
+      player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, 0 ) );
+    }
+  }
+
+  // Send the gear inventory
+  player.sendGearInventory();
+
+  // Send the player stats
+  player.sendStats();
+
+  // Send the player model
+  player.sendModel();
+
+  // Send the item level
+  player.calculateItemLevel();
+  player.sendItemLevel();
+
+  // Send status effect update
+  player.sendStatusEffectUpdate();
+
+  if( packet.data().contextId < 0xFE ) // >= 0xFE are not geaesets
+  {
+    auto actorControl2 = makeZonePacket< FFXIVIpcActorControlSelf >( player.getId(), player.getId() );
+    actorControl2->data().category = static_cast< uint16_t >( Network::ActorControl::GearSetEquipMsg );
+    actorControl2->data().param1 = packet.data().contextId;
+    player.queuePacket( actorControl2 );
+  }
 }

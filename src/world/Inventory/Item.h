@@ -76,6 +76,8 @@ namespace Sapphire
 
     uint32_t getAdditionalData() const;
 
+    uint8_t getEquipSlotCategory() const;
+
     void setSpiritbond( uint16_t spiritbond );
     uint16_t getSpiritbond() const;
 
@@ -117,6 +119,7 @@ namespace Sapphire
     uint32_t m_defenseMag;
 
     uint32_t m_additionalData;
+    uint8_t m_equipSlotCategory;
 
     BaseParamStruct m_baseParam[6];
 
