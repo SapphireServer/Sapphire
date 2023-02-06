@@ -456,9 +456,15 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
-    auto pPacket = makeZonePacket< FFXIVIpcCharaVisualEffect >( player.getId() );
-    pPacket->data().id = id;
-    player.queuePacket( pPacket );
+    for( auto actor : player.getInRangeActors() )
+    {
+      if( actor->getId() == player.getTargetId() )
+      {
+        actor->getAsChara()->setVisualEffect( id );
+        return;
+      }
+    }
+    player.setVisualEffect( id );
   }
   else
   {
