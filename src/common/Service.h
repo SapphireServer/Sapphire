@@ -11,8 +11,16 @@
 namespace Sapphire::Common
 {
   /**
-   * @brief Replacement of Sapphire's Service locator which is not working when compiling under Visual Studio, keeping its api.
-   */
+  * @brief Service locator, nothing more.
+  *
+  * A service locator can be used to do what it promises: locate services.<br/>
+  * Usually service locators are tightly bound to the services they expose and
+  * thus it's hard to define a general purpose class to do that. This template
+  * based implementation tries to fill the gap and to get rid of the burden of
+  * defining a different specific locator for each application.
+  *
+  * Implementaion of the Service locator is replaced with a workaround for Visual Studio, api unchanged.
+  */
 
   class ServiceContainer
   {
