@@ -55,6 +55,9 @@ namespace Sapphire
 
     std::set< uint64_t >& getInviteIdList();
 
+    /*! return a combined list of members and leaders */
+    std::vector< uint64_t > getAllMemberIds();
+
     uint64_t getChatChannel() const;
 
     void addMember( uint64_t memberId );

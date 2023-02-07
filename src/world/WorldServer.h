@@ -4,6 +4,7 @@
 
 #include <mutex>
 #include <map>
+#include <set>
 #include "ForwardsZone.h"
 #include <Config/ConfigDef.h>
 
@@ -52,6 +53,9 @@ namespace Sapphire::World
 
     void queueForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
     void queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets );
+
+    void queueForLinkshell( uint64_t lsId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList = {} );
+    void queueForFreeCompany( uint64_t fcId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList = {} );
 
     Entity::PlayerPtr addPlayer( uint64_t characterId );
 

@@ -193,6 +193,16 @@ uint64_t Sapphire::FreeCompany::getChatChannel() const
   return m_chatChannelId;
 }
 
+const std::set< uint64_t >& Sapphire::FreeCompany::getMemberIdList() const
+{
+  return m_memberIds;
+}
+
+std::set< uint64_t >& Sapphire::FreeCompany::getMemberIdList()
+{
+  return m_memberIds;
+}
+
 
 
 

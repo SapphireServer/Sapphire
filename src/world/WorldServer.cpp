@@ -25,6 +25,9 @@
 
 #include "Script/ScriptMgr.h"
 
+#include "Linkshell/Linkshell.h"
+#include "FreeCompany/FreeCompany.h"
+
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 #include <Service.h>
@@ -689,4 +692,44 @@ void WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::N
     {
       pZoneCon->queueOutPacket( packet );
     }
+}
+
+void WorldServer::queueForLinkshell( uint64_t lsId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList )
+{
+  auto lsMgr = Common::Service< Manager::LinkshellMgr >::ref();
+
+  auto ls = lsMgr.getLinkshellById( lsId );
+  if( !ls )
+    return;
+
+  auto members = ls->getAllMemberIds();
+
+  for( const auto& memberId : members )
+  {
+    if( exceptionCharIdList.count( memberId ) )
+      continue;
+
+    queueForPlayer( memberId, pPacket );
+  }
+
+}
+
+void WorldServer::queueForFreeCompany( uint64_t fcId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList )
+{
+  auto fcMgr = Common::Service< Manager::FreeCompanyMgr >::ref();
+
+  auto fc = fcMgr.getFreeCompanyById( fcId );
+  if( !fc )
+    return;
+
+  auto members = fc->getMemberIdList();
+
+  for( const auto& memberId : members )
+  {
+    if( exceptionCharIdList.count( memberId ) )
+      continue;
+
+    queueForPlayer( memberId, pPacket );
+  }
+
 }

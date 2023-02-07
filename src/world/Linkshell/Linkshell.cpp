@@ -108,5 +108,13 @@ void Sapphire::Linkshell::setName( std::string name )
   m_name = std::move( name );
 }
 
+std::vector< uint64_t > Sapphire::Linkshell::getAllMemberIds()
+{
+  std::vector< uint64_t > allMembers( m_leaderIds.size() + m_memberIds.size() );
+  allMembers.insert( allMembers.end(), m_leaderIds.begin(), m_leaderIds.end() );
+  allMembers.insert( allMembers.end(), m_memberIds.begin(), m_memberIds.end() );
+  return allMembers;
+}
+
 
 
