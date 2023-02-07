@@ -491,13 +491,22 @@ namespace Excel
   {
     EventItemTextStruct Text;
     uint32_t EventHandler;
-    int32_t CastTimeline;
-    int32_t Timeline;
     uint16_t Icon;
     uint16_t Action;
     uint8_t StackMax;
     uint8_t CastTime;
-    int8_t padding1[2];
+    uint8_t CastTimeLine;
+    uint8_t Timeline;
+  };
+
+  struct EventItemCastTimeLine
+  {
+    uint32_t CastTimeline;
+  };
+
+  struct EventItemTimeLine
+  {
+    uint32_t Timeline;
   };
 
   /* 100766 */
