@@ -22,7 +22,7 @@ namespace Sapphire::World::Manager
     enum ResultType : int32_t
     {
       Create = 0x1,
-      LEave = 0x2,
+      Leave = 0x2,
       Kick = 0x3,
       Disband = 0x4,
       SetHierarchyName = 0x5,
@@ -32,7 +32,7 @@ namespace Sapphire::World::Manager
       RemoveHierarchy = 0x9,
       SortHierarchy = 0xA,
       CreateComplete = 0xB,
-      ForceDistband = 0xC,
+      ForceDisband = 0xC,
       SetCompanyBoard = 0xD,
       ChangeMaster = 0xE,
       FcLogin = 0xF,
@@ -40,7 +40,7 @@ namespace Sapphire::World::Manager
       RenameCreate = 0x11,
       Rename = 0x12,
       RenameTag = 0x13,
-      FcRankUo = 0x14,
+      FcRankUp = 0x14,
       FcReputationUp = 0x15,
       MoveGrandCompany = 0x16,
       MoveGcComplete = 0x17,
