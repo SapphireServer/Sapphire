@@ -11,6 +11,7 @@
 #include <Manager/AchievementMgr.h>
 #include <Manager/PartyMgr.h>
 #include <Manager/HousingMgr.h>
+#include <Manager/FreeCompanyMgr.h>
 
 #include "Script/ScriptMgr.h"
 #include "WorldServer.h"
@@ -341,6 +342,7 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   auto& housingMgr = Common::Service< HousingMgr >::ref();
   auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
 
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   if( !pZone )
@@ -420,6 +422,8 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   {
     partyMgr.onMoveZone( player );
   }
+
+  fcMgr.onFcLogin( player.getCharacterId() );
 
 }
 

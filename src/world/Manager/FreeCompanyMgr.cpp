@@ -18,7 +18,7 @@
 
 #include <Network/GameConnection.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-
+#include <Network/PacketWrappers/FreeCompanyResultPacket.h>
 #include <Network/PacketDef/ClientIpcs.h>
 
 #include "Session.h"
@@ -161,6 +161,7 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
   chatChannelMgr.addToChannel( chatChannelId, player );
 
   uint64_t masterId = player.getCharacterId();
+  Logger::debug( "MasterID# {}", masterId );
 
   uint32_t createDate = Common::Util::getTimeSeconds();
 
@@ -195,7 +196,14 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
 
   db.directExecute( stmt );
 
-  sendFreeCompanyResult( player, freeCompanyId, FreeCompanyMgr::ResultType::Create, 2, 0, FreeCompanyMgr::UpdateStatus::Execute );
+  auto& server = Common::Service< World::WorldServer >::ref();
+
+  auto fcResult = makeFcResult( player, freeCompanyId,
+                                2, FreeCompanyResultPacket::ResultType::Create,
+                                0, FreeCompanyResultPacket::UpdateStatus::Execute,
+                                fcPtr->getName(), fcPtr->getTag() );
+
+  server.queueForPlayer( player.getCharacterId(), fcResult );
 
   return fcPtr;
 }
@@ -269,29 +277,6 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), inviteListPacket );
 }
 
-void FreeCompanyMgr::sendFreeCompanyResult( Entity::Player& player, uint64_t fcId, ResultType resultType, uint64_t target, uint32_t result,
-                                            FreeCompanyMgr::UpdateStatus updateStatus )
-{
-  auto fc = getFreeCompanyById( fcId );
-  if( !fc )
-    return;
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  auto fcResult = makeZonePacket< FFXIVIpcFreeCompanyResult >( player.getId() );
-  auto& fcResultData = fcResult->data();
-  fcResultData.FreeCompanyID = fcId;
-  std::strcpy( fcResultData.FreeCompanyName, fc->getName().c_str() );
-  std::strcpy( fcResultData.TargetName, fc->getName().c_str() );
-  fcResultData.Result = result;
-  fcResultData.TargetCharacterID = target;
-  fcResultData.Type = resultType;
-  fcResultData.UpdateStatus = updateStatus;
-
-  server.queueForPlayer( player.getCharacterId(), fcResult );
-}
-
-
 void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
 {
   auto fc = getPlayerFreeCompany( player );
@@ -314,4 +299,25 @@ void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), fcResultPacket );
+}
+
+void FreeCompanyMgr::onFcLogin( uint64_t characterId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto player = server.getPlayer( characterId );
+  if( !player )
+    return;
+
+  auto fc = getPlayerFreeCompany( *player );
+  if( !fc )
+    return;
+
+  auto fcResult = makeFcResult( *player, fc->getId(),
+                                2, FreeCompanyResultPacket::ResultType::FcLogin,
+                                0, FreeCompanyResultPacket::UpdateStatus::Execute,
+                                fc->getName(), fc->getTag() );
+
+  server.queueForPlayer( player->getCharacterId(), fcResult );
+
+  // todo - send packet to rest of fc members
 }
