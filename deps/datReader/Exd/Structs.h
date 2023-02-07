@@ -491,13 +491,13 @@ namespace Excel
   {
     EventItemTextStruct Text;
     uint32_t EventHandler;
-    int32_t CastTimeline;
-    int32_t Timeline;
     uint16_t Icon;
     uint16_t Action;
     uint8_t StackMax;
+    uint8_t padding0[1];
     uint8_t CastTime;
-    int8_t padding1[2];
+    uint8_t Timeline;
+    int32_t CastTimeline;
   };
 
   /* 100766 */
