@@ -173,7 +173,7 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
 
   if( !m_fcIdMap.empty() )
   {
-    auto lastIdx = ( --m_fcIdMap.end() )->first;
+    auto lastIdx = ( std::prev( m_fcIdMap.end() ) )->first;
     freeCompanyId = lastIdx + 1;
   }
 
