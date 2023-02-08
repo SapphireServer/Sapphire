@@ -267,16 +267,14 @@ void FreeCompanyMgr::sendFreeCompanyStatus( Entity::Player& player )
 
 }
 
-FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( Entity::Player& player ) const
+FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( Entity::Player& player )
 {
-  for( const auto &[ key, value ] : m_fcIdMap )
-  {
-    if( value->getMasterId() == player.getCharacterId() )
-    {
-      return value;
-    }
-  }
+  auto it = m_charaIdToFcIdMap.find( player.getCharacterId() );
+  if( it != m_charaIdToFcIdMap.end() )
+    return getFreeCompanyById( it->second );
+
   return nullptr;
+
 }
 
 void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )

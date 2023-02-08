@@ -49,7 +49,7 @@ namespace Sapphire::World::Manager
     void sendFreeCompanyStatus( Entity::Player& player );
 
     // get fc associated with player
-    FreeCompanyPtr getPlayerFreeCompany( Entity::Player& player ) const;
+    FreeCompanyPtr getPlayerFreeCompany( Entity::Player& player );
     FreeCompanyPtr getFreeCompanyById( uint64_t fcId );
     FreeCompanyPtr getFreeCompanyByName( const std::string& name );
 
