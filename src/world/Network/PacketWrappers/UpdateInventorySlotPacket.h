@@ -15,22 +15,22 @@ namespace Sapphire::Network::Packets::Server
   class UpdateInventorySlotPacket : public ZoneChannelPacket< FFXIVIpcUpdateInventorySlot >
   {
   public:
-    UpdateInventorySlotPacket( uint32_t playerId, uint8_t slot, uint16_t storageId, const Item& item ) :
+    UpdateInventorySlotPacket( uint32_t playerId, uint8_t slot, uint16_t storageId, const Item& item, uint32_t sequence = 0 ) :
       ZoneChannelPacket< FFXIVIpcUpdateInventorySlot >( playerId, playerId )
     {
-      initialize( slot, storageId, item );
+      initialize( slot, storageId, item, sequence );
     };
 
-    UpdateInventorySlotPacket( uint32_t playerId, uint8_t slot, uint16_t storageId ) :
+    UpdateInventorySlotPacket( uint32_t playerId, uint8_t slot, uint16_t storageId, uint32_t sequence = 0 ) :
       ZoneChannelPacket< FFXIVIpcUpdateInventorySlot >( playerId, playerId )
     {
-      initialize( slot, storageId );
+      initialize( slot, storageId, sequence );
     };
 
   private:
-    void initialize( uint8_t slot, uint16_t storageId, const Item& item )
+    void initialize( uint8_t slot, uint16_t storageId, const Item& item, uint32_t sequence )
     {
-      m_data.sequence = 0;
+      m_data.sequence = sequence;
       m_data.containerId = storageId;
       m_data.slot = slot;
       m_data.quantity = item.getStackSize();
@@ -54,9 +54,9 @@ namespace Sapphire::Network::Packets::Server
       //uint8_t buffer5;
     };
 
-    void initialize( uint8_t slot, uint16_t storageId )
+    void initialize( uint8_t slot, uint16_t storageId, uint32_t sequence )
     {
-      m_data.sequence = 0;
+      m_data.sequence = sequence;
       m_data.containerId = storageId;
       m_data.slot = slot;
       m_data.quantity = 0;
