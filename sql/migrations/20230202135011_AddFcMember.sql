@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS FcMember (
+CREATE TABLE IF NOT EXISTS fcmember (
 FreeCompanyId int(20) UNSIGNED, 
 FcMemberId int(20) UNSIGNED, 
 HierarchyType int(3), 
@@ -7,8 +7,8 @@ LastLogout int(11),
 PRIMARY KEY (`FreeCompanyId`,`FcMemberId`),
 KEY `index` (`FcMemberId`) )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS FcHierarchy (
-FreeCompanyId int(20), 
+CREATE TABLE IF NOT EXISTS fchierarchy (
+FreeCompanyId int(20),
 SortNo int(3), 
 HierarchyName VARCHAR(46), 
 AuthorityList int(20), 
