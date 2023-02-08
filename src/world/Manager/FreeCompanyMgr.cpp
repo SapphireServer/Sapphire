@@ -221,13 +221,7 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
   stmt->setString( 15, std::string( "" ) );
   db.directExecute( stmt );
 
-  /*! FreeCompanyId, FcMemberId, HierarchyType, LastLogout */
-  stmt = db.getPreparedStatement( Db::ZoneDbStatements::FC_MEMBERS_INS );
-  stmt->setUInt64( 1, freeCompanyId );
-  stmt->setUInt64( 2, masterId );
-  stmt->setUInt( 3, 0 );
-  stmt->setUInt( 4, createDate );
-  db.directExecute( stmt );
+  dbInsertMember( freeCompanyId, masterId, 0 );
 
   fcPtr->addMember( masterId, 0, createDate );
 
@@ -249,7 +243,7 @@ void FreeCompanyMgr::sendFreeCompanyStatus( Entity::Player& player )
 
   auto fcStatusResult = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
 
-  auto playerFc = getPlayerFreeCompany( player );
+  auto playerFc = getPlayerFreeCompany( player.getCharacterId() );
   if( !playerFc )
     return;
 
@@ -267,19 +261,18 @@ void FreeCompanyMgr::sendFreeCompanyStatus( Entity::Player& player )
 
 }
 
-FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( Entity::Player& player )
+FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( uint64_t characterId )
 {
-  auto it = m_charaIdToFcIdMap.find( player.getCharacterId() );
+  auto it = m_charaIdToFcIdMap.find( characterId );
   if( it != m_charaIdToFcIdMap.end() )
     return getFreeCompanyById( it->second );
 
   return nullptr;
-
 }
 
 void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
 {
-  auto fc = getPlayerFreeCompany( player );
+  auto fc = getPlayerFreeCompany( player.getCharacterId() );
   if( !fc )
     return;
 
@@ -308,7 +301,7 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
   uint8_t idx = 0;
   for( auto& entry : fc->getMemberIdList() )
   {
-    if( entry == 0 )
+    if( entry == 0 || entry == fc->getMasterId() )
       continue;
 
     auto signee = server.getPlayer( entry );
@@ -327,7 +320,7 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
 
 void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
 {
-  auto fc = getPlayerFreeCompany( player );
+  auto fc = getPlayerFreeCompany( player.getCharacterId() );
   auto fcResultPacket = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
   auto& resultData = fcResultPacket->data();
   resultData.CharaFcParam = 1;
@@ -356,7 +349,7 @@ void FreeCompanyMgr::onFcLogin( uint64_t characterId )
   if( !player )
     return;
 
-  auto fc = getPlayerFreeCompany( *player );
+  auto fc = getPlayerFreeCompany( player->getCharacterId() );
   if( !fc )
     return;
 
@@ -374,4 +367,34 @@ void FreeCompanyMgr::onFcLogin( uint64_t characterId )
 void FreeCompanyMgr::onSignPetition( Entity::Player& source, Entity::Player& target )
 {
 
+  auto fc = getPlayerFreeCompany( target.getCharacterId() );
+  if( !fc )
+    return;
+
+  addMember( fc->getId(), source.getCharacterId() );
+  // todo - send fcresult packets
+
+}
+
+void FreeCompanyMgr::addMember( uint64_t fcId, uint64_t memberId )
+{
+  auto pFc = getFreeCompanyById( fcId );
+  if( !pFc )
+    return;
+
+  dbInsertMember( fcId, memberId, 0 );
+  pFc->addMember( memberId, 0, 0 );
+}
+
+void FreeCompanyMgr::dbInsertMember( uint64_t fcId, uint64_t characterId, uint8_t hierarchyId )
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
+  /*! FreeCompanyId, FcMemberId, HierarchyType, LastLogout */
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::FC_MEMBERS_INS );
+  stmt->setUInt64( 1, fcId );
+  stmt->setUInt64( 2, characterId );
+  stmt->setUInt( 3, hierarchyId );
+  stmt->setUInt( 4, 0 );
+  db.directExecute( stmt );
 }

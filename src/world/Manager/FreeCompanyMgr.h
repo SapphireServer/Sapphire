@@ -32,6 +32,8 @@ namespace Sapphire::World::Manager
 
     bool renameFreeCompany( uint64_t fcId, const std::string& name, const std::string& tag, Entity::Player& player );
 
+    void addMember( uint64_t fcId, uint64_t memberId );
+
     //void sendFreeCompanyResult( Entity::Player& player, uint64_t fcId, ResultType resultType, uint64_t target,
     //                            uint32_t result, UpdateStatus updateStatus, std::string targetName );
 
@@ -48,8 +50,10 @@ namespace Sapphire::World::Manager
 
     void sendFreeCompanyStatus( Entity::Player& player );
 
+    void dbInsertMember( uint64_t fcId, uint64_t characterId, uint8_t hierarchyId );
+
     // get fc associated with player
-    FreeCompanyPtr getPlayerFreeCompany( Entity::Player& player );
+    FreeCompanyPtr getPlayerFreeCompany( uint64_t characterId );
     FreeCompanyPtr getFreeCompanyById( uint64_t fcId );
     FreeCompanyPtr getFreeCompanyByName( const std::string& name );
 

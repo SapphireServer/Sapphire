@@ -97,7 +97,7 @@ void Sapphire::Network::GameConnection::inviteHandler( const FFXIVARR_PACKET_RAW
       strcpy( data.TargetName, packet.data().TargetName );
       server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
 
-      auto invitePacket = makeInviteUpdatePacket( player, 1, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
+      auto invitePacket = makeInviteUpdatePacket( player, Common::Util::getTimeSeconds() + 300, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
       server.queueForPlayer( pTargetPlayer->getCharacterId(), invitePacket );
       break;
     }
@@ -109,7 +109,7 @@ void Sapphire::Network::GameConnection::inviteHandler( const FFXIVARR_PACKET_RAW
       strcpy( data.TargetName, packet.data().TargetName );
       server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
 
-      auto invitePacket = makeInviteUpdatePacket( player, 1, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
+      auto invitePacket = makeInviteUpdatePacket( player, Common::Util::getTimeSeconds() + 300, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
       server.queueForPlayer( pTargetPlayer->getCharacterId(), invitePacket );
       break;
     }
@@ -198,7 +198,7 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
       {
         result = InviteUpdateType::REJECT_INVITE;
       }
-      auto inviteUpPacket = makeInviteUpdatePacket( player, 0, data.AuthType, 1, result );
+      auto inviteUpPacket = makeInviteUpdatePacket( player, Common::Util::getTimeSeconds() + 300, data.AuthType, 1, result );
       server.queueForPlayer( pPlayer->getCharacterId(), inviteUpPacket );
 
       inviteReplyData.AuthType = data.AuthType;
