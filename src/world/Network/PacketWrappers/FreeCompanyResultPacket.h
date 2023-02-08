@@ -75,16 +75,16 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       Member = 0xC,
     };
 
-    FreeCompanyResultPacket( Entity::Player& player, uint64_t fcId, uint64_t targetId,
+    FreeCompanyResultPacket( Entity::Player& player, uint64_t fcId, uint64_t arg,
                              ResultType type, uint32_t result, UpdateStatus updateStatus, const std::string& fcName, const std::string& targetName ) :
 
       ZoneChannelPacket< FFXIVIpcFreeCompanyResult >( player.getId(), player.getId() )
     {
-      initialize( player, fcId, targetId, type, result, updateStatus, fcName, targetName );
+      initialize( player, fcId, arg, type, result, updateStatus, fcName, targetName );
     };
 
   private:
-    void initialize( Entity::Player& player, uint64_t fcId, uint64_t targetId,
+    void initialize( Entity::Player& player, uint64_t fcId, uint64_t arg,
                      ResultType type, uint32_t result, UpdateStatus updateStatus, const std::string& fcName, const std::string& targetName )
     {
       m_data.FreeCompanyID = fcId;
@@ -92,7 +92,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Type = static_cast< uint32_t >( type );
       m_data.Result = result;
       m_data.UpdateStatus = updateStatus;
-      m_data.TargetCharacterID = targetId;
+      m_data.Arg = arg;
       strcpy( m_data.FreeCompanyName, fcName.c_str() );
       strcpy( m_data.TargetName, targetName.c_str() );
     };

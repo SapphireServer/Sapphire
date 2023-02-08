@@ -13,13 +13,13 @@ namespace Sapphire::World::Manager
   class FreeCompanyMgr
   {
   private:
-    std::map< uint64_t, FreeCompanyPtr > m_fcIdMap;
-    std::map< std::string, FreeCompanyPtr > m_fcNameMap;
+    std::unordered_map< uint64_t, FreeCompanyPtr > m_fcIdMap;
+    std::unordered_map< std::string, FreeCompanyPtr > m_fcNameMap;
 
-    FreeCompanyPtr getFcByName( const std::string& name );
+    /*! map used for easy lookup of char id to fc id */
+    std::unordered_map< uint64_t, uint64_t > m_charaIdToFcIdMap;
 
   public:
-
 
     FreeCompanyMgr() = default;
 
@@ -50,13 +50,14 @@ namespace Sapphire::World::Manager
 
     // get fc associated with player
     FreeCompanyPtr getPlayerFreeCompany( Entity::Player& player ) const;
-
     FreeCompanyPtr getFreeCompanyById( uint64_t fcId );
+    FreeCompanyPtr getFreeCompanyByName( const std::string& name );
 
    // void leaveLinkshell( uint64_t lsId, uint64_t characterId );
    // void joinLinkshell( uint64_t lsId, uint64_t characterId );
 
     void onFcLogin( uint64_t characterId );
+    void onSignPetition( Entity::Player& source, Entity::Player& target );
 
   };
 

@@ -102,6 +102,12 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
       eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0 } );
       pFcMgr.sendFreeCompanyStatus( player );
     }
+    else if( sceneId == 6 && yieldId == 17 )
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
+    else if( sceneId == 7 && yieldId == 17 )
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
+    else if( sceneId == 8 && yieldId == 17 )
+      eventMgr().resumeScene( player, eventId, sceneId, yieldId, { 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 } );
   }
 
 
@@ -194,6 +200,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   //////////////////////////////////////////////////////////////////////
 
+  // set tag
   void Scene00007( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 7, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00007Return ) );
@@ -205,6 +212,7 @@ class ComDefFreeCompany : public Sapphire::ScriptAPI::EventScript
 
   //////////////////////////////////////////////////////////////////////
 
+  // fc rename
   void Scene00008( Entity::Player& player )
   {
     eventMgr().playScene( player, getId(), 8, NONE, bindSceneReturn( &ComDefFreeCompany::Scene00008Return ) );

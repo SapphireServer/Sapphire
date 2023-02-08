@@ -5,6 +5,7 @@
 #include <string>
 #include <array>
 #include <optional>
+#include <unordered_map>
 
 namespace Sapphire
 {
@@ -57,8 +58,19 @@ namespace Sapphire
     std::set< uint64_t > m_inviteIds;
     /*! chat channel ID associated with fc */
     uint64_t m_chatChannelId;
-    /*! List of players on petition list */
-    std::array< uint64_t, 3 > m_inviteList;
+    /*! pending invites, not yet accepted or declined */
+    std::set< uint64_t > m_pendingInviteIds;
+
+    struct FcMember
+    {
+      uint64_t characterId;
+      uint8_t hierarchyId;
+      uint32_t lastLogout;
+    };
+
+    /*! member details such as hierarchy mapping */
+    std::unordered_map< uint64_t, FcMember > m_memberDetails;
+
 
   public:
     FreeCompany( uint64_t id,
@@ -126,7 +138,7 @@ namespace Sapphire
 
     uint64_t getChatChannel() const;
 
-    void addMember( uint64_t memberId );
+    void addMember( uint64_t memberId, uint8_t hierarchyId, uint32_t lastLogout );
 
     void removeMember( uint64_t memberId );
 

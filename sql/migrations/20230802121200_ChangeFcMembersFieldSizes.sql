@@ -1,0 +1,2 @@
+ALTER TABLE `fcmember` CHANGE `FreeCompanyId` `FreeCompanyId` BIGINT(20) UNSIGNED NOT NULL; 
+ALTER TABLE `fcmember` CHANGE `FcMemberId` `FcMemberId` BIGINT(20) UNSIGNED NOT NULL; 

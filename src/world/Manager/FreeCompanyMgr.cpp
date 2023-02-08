@@ -74,6 +74,31 @@ bool FreeCompanyMgr::loadFreeCompanies()
 
   }
 
+  for( auto& [ fcId, fcPtr ] : m_fcIdMap )
+  {
+    auto fc = getFreeCompanyById( fcId );
+
+    if( !fc )
+    {
+      Logger::error( "FreeCompany {} not found for member initialisation!", fcId );
+      continue;
+    }
+    /* FcMemberId, HierarchyType, LastLogout */
+    auto queryMember = db.getPreparedStatement( Db::FC_MEMBERS_SEL_FC );
+    queryMember->setUInt64( 1, fcId );
+    auto resMember = db.query( queryMember );
+    while( resMember->next() )
+    {
+      uint64_t characterId = resMember->getUInt64( 1 );
+      uint8_t hierarchyId = resMember->getUInt8( 2 );
+      uint32_t lastLogout = resMember->getUInt( 3 );
+
+      fcPtr->addMember( characterId, hierarchyId, lastLogout );
+      m_charaIdToFcIdMap[ characterId ] = fcId;
+
+    }
+  }
+
   return true;
 }
 
@@ -86,6 +111,7 @@ void FreeCompanyMgr::writeFreeCompany( uint64_t fcId )
   if( !fc )
   {
     Logger::error( "FreeCompany {} not found for write!", fcId );
+    return;
   }
 
   auto query = db.getPreparedStatement( Db::FC_UP );
@@ -123,7 +149,7 @@ void FreeCompanyMgr::writeFreeCompany( uint64_t fcId )
 
 }
 
-FreeCompanyPtr FreeCompanyMgr::getFcByName( const std::string& name )
+FreeCompanyPtr FreeCompanyMgr::getFreeCompanyByName( const std::string& name )
 {
   auto it = m_fcNameMap.find( name );
   if( it == m_fcNameMap.end() )
@@ -161,7 +187,7 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
   chatChannelMgr.addToChannel( chatChannelId, player );
 
   uint64_t masterId = player.getCharacterId();
-  Logger::debug( "MasterID# {}", masterId );
+  m_charaIdToFcIdMap[ masterId ] = freeCompanyId;
 
   uint32_t createDate = Common::Util::getTimeSeconds();
 
@@ -193,8 +219,17 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
   stmt->setUInt( 13, static_cast< uint8_t >( Common::FreeCompanyStatus::InviteStart ) );
   stmt->setString( 14, std::string( "" ) );
   stmt->setString( 15, std::string( "" ) );
-
   db.directExecute( stmt );
+
+  /*! FreeCompanyId, FcMemberId, HierarchyType, LastLogout */
+  stmt = db.getPreparedStatement( Db::ZoneDbStatements::FC_MEMBERS_INS );
+  stmt->setUInt64( 1, freeCompanyId );
+  stmt->setUInt64( 2, masterId );
+  stmt->setUInt( 3, 0 );
+  stmt->setUInt( 4, createDate );
+  db.directExecute( stmt );
+
+  fcPtr->addMember( masterId, 0, createDate );
 
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -267,12 +302,27 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
   inviteListPacket->data().MasterCharacter.CharacterID = masterCharacter->getCharacterId();
   strcpy( inviteListPacket->data().MasterCharacter.CharacterName, masterCharacter->getName().c_str() );
   inviteListPacket->data().MasterCharacter.SelectRegion = masterCharacter->getSearchSelectRegion();
-  inviteListPacket->data().MasterCharacter.OnlineStatus = masterCharacter->getOnlineStatusMask();
+  inviteListPacket->data().MasterCharacter.OnlineStatus = static_cast< uint64_t >( masterCharacter->getOnlineStatus() );
   inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 0 ] = masterCharacter->getGcRankArray()[ 0 ];
   inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 1 ] = masterCharacter->getGcRankArray()[ 1 ];
   inviteListPacket->data().MasterCharacter.GrandCompanyRank[ 2 ] = masterCharacter->getGcRankArray()[ 2 ];
 
-  // todo - fill invite characters
+  uint8_t idx = 0;
+  for( auto& entry : fc->getMemberIdList() )
+  {
+    if( entry == 0 )
+      continue;
+
+    auto signee = server.getPlayer( entry );
+    if( !signee )
+      continue;
+
+    inviteListPacket->data().InviteCharacter[ idx ].CharacterID = signee->getCharacterId();
+    strcpy( inviteListPacket->data().InviteCharacter[ idx ].CharacterName, signee->getName().c_str() );
+    inviteListPacket->data().InviteCharacter[ idx ].SelectRegion = signee->getSearchSelectRegion();
+    inviteListPacket->data().InviteCharacter[ idx ].OnlineStatus = static_cast< uint64_t >( masterCharacter->getOnlineStatus() );
+    idx++;
+  }
 
   server.queueForPlayer( player.getCharacterId(), inviteListPacket );
 }
@@ -312,12 +362,18 @@ void FreeCompanyMgr::onFcLogin( uint64_t characterId )
   if( !fc )
     return;
 
-  auto fcResult = makeFcResult( *player, fc->getId(),
-                                2, FreeCompanyResultPacket::ResultType::FcLogin,
+  uint64_t onlinePlayers = 1;
+  auto fcResult = makeFcResult( *player, fc->getId(), onlinePlayers,
+                                FreeCompanyResultPacket::ResultType::FcLogin,
                                 0, FreeCompanyResultPacket::UpdateStatus::Execute,
                                 fc->getName(), fc->getTag() );
 
   server.queueForPlayer( player->getCharacterId(), fcResult );
 
   // todo - send packet to rest of fc members
+}
+
+void FreeCompanyMgr::onSignPetition( Entity::Player& source, Entity::Player& target )
+{
+
 }

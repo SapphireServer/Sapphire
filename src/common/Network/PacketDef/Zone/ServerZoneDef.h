@@ -182,7 +182,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   struct FFXIVIpcFreeCompanyResult : FFXIVIpcBasePacket< FreeCompanyResult >
   {
     uint64_t FreeCompanyID;
-    uint64_t TargetCharacterID;
+    uint64_t Arg;
     uint32_t Type;
     uint32_t Result;
     uint8_t UpdateStatus;

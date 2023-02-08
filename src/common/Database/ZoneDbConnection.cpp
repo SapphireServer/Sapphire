@@ -381,4 +381,29 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "DELETE FROM freecompany WHERE FreeCompanyId = ?;",
                     CONNECTION_BOTH );
 
+  prepareStatement( FC_MEMBERS_SEL_ALL,
+                    "SELECT FreeCompanyId, FcMemberId, HierarchyType, LastLogout "
+                    "FROM fcmember "
+                    "ORDER BY FreeCompanyId ASC;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( FC_MEMBERS_SEL_FC,
+                    "SELECT FcMemberId, HierarchyType, LastLogout "
+                    "FROM fcmember "
+                    "WHERE FreeCompanyId = ?;",
+                    CONNECTION_SYNC );
+
+  prepareStatement( FC_MEMBERS_INS,
+                    "INSERT INTO fcmember ( FreeCompanyId, FcMemberId, HierarchyType, LastLogout ) VALUES ( ?, ?, ?, ? );",
+                    CONNECTION_BOTH );
+
+  prepareStatement( FC_MEMBERS_UP,
+                    "UPDATE fcmember SET HierarchyType = ?, LastLogout = ? "
+                    "WHERE FcMemberId = ?;",
+                    CONNECTION_BOTH );
+
+  prepareStatement( FC_DEL,
+                    "DELETE FROM fcmember WHERE FcMemberId = ?;",
+                    CONNECTION_BOTH );
+
 }

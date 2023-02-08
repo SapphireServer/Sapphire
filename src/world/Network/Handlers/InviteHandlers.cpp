@@ -20,6 +20,7 @@
 #include "Manager/FriendListMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 
 #include "Action/Action.h"
 
@@ -34,8 +35,7 @@ using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::World::Manager;
 
 
-void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                       Entity::Player& player )
+void Sapphire::Network::GameConnection::inviteHandler( const FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInvite >( inPacket );
 
@@ -45,9 +45,9 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
   std::string name( packet.data().TargetName );
 
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
-  auto pSession = server.getSession( name );
+  auto pTargetPlayer = server.getPlayer( name );
 
-  if( !pSession )
+  if( !pTargetPlayer )
     return;
 
   switch( packet.data().AuthType )
@@ -60,27 +60,22 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
       strcpy( data.TargetName, packet.data().TargetName );
       server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
 
-      auto invitePacket = std::make_shared< InviteUpdatePacket >( player, Common::Util::getTimeSeconds() + 30,
-                                                                  packet.data().AuthType, 1,
-                                                                  InviteUpdateType::NEW_INVITE );
-      pSession->getZoneConnection()->queueOutPacket( invitePacket );
+      auto invitePacket = makeInviteUpdatePacket( player, Common::Util::getTimeSeconds() + 30, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
+      server.queueForPlayer( pTargetPlayer->getCharacterId(), invitePacket );
 
       break;
     }
 
     case HierarchyType::FRIENDLIST:
     {
-      auto inviteResultPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcInviteResult >( player.getId() );
+      auto inviteResultPacket = makeZonePacket< FFXIVIpcInviteResult >( player.getId() );
       auto& data = inviteResultPacket->data();
       data.AuthType = packet.data().AuthType;
       strcpy( data.TargetName, packet.data().TargetName );
       server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
 
-      auto invitePacket = std::make_shared< InviteUpdatePacket >( player, 0,
-                                                                  packet.data().AuthType, 1,
-                                                                  InviteUpdateType::NEW_INVITE );
-      pSession->getZoneConnection()->queueOutPacket( invitePacket );
-
+      auto invitePacket = makeInviteUpdatePacket( player, 0, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
+      server.queueForPlayer( pTargetPlayer->getCharacterId(), invitePacket );
       auto& flMgr = Common::Service< FriendListMgr >::ref();
 
       // add support to adding offline players
@@ -95,9 +90,29 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
     case HierarchyType::AUTOPARTY:
       break;
     case HierarchyType::FCCREATE:
+    {
+      auto inviteResultPacket = makeZonePacket< FFXIVIpcInviteResult >( player.getId() );
+      auto& data = inviteResultPacket->data();
+      data.AuthType = packet.data().AuthType;
+      strcpy( data.TargetName, packet.data().TargetName );
+      server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
+
+      auto invitePacket = makeInviteUpdatePacket( player, 1, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
+      server.queueForPlayer( pTargetPlayer->getCharacterId(), invitePacket );
       break;
+    }
     case HierarchyType::FREECOMPANY:
+    {
+      auto inviteResultPacket = makeZonePacket< FFXIVIpcInviteResult >( player.getId() );
+      auto& data = inviteResultPacket->data();
+      data.AuthType = packet.data().AuthType;
+      strcpy( data.TargetName, packet.data().TargetName );
+      server.queueForPlayer( player.getCharacterId(), inviteResultPacket );
+
+      auto invitePacket = makeInviteUpdatePacket( player, 1, packet.data().AuthType, 1, InviteUpdateType::NEW_INVITE );
+      server.queueForPlayer( pTargetPlayer->getCharacterId(), invitePacket );
       break;
+    }
     case HierarchyType::FCJOINREQUEST:
       break;
     case HierarchyType::PARTYCANCEL:
@@ -105,19 +120,18 @@ void Sapphire::Network::GameConnection::inviteHandler( const Sapphire::Network::
   }
 }
 
-void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKET_RAW& inPacket,
-                                                            Entity::Player& player )
+void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInviteReply >( inPacket );
   const auto& data = packet.data();
 
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
-  auto pSession = server.getSession( data.InviteCharacterID );
+  auto pPlayer = server.getPlayer( data.InviteCharacterID );
 
-  if( !pSession )
+  if( !pPlayer )
     return;
 
-  auto inviteReplyPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcInviteReplyResult >( player.getId() );
+  auto inviteReplyPacket = makeZonePacket< FFXIVIpcInviteReplyResult >( player.getId() );
   auto& inviteReplyData = inviteReplyPacket->data();
   inviteReplyData.Answer = data.Answer;
 
@@ -125,51 +139,45 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
   {
     case HierarchyType::PCPARTY:
     {
-      auto& partyMgr = Common::Service< Sapphire::World::Manager::PartyMgr >::ref();
+      auto& partyMgr = Common::Service< PartyMgr >::ref();
 
-      uint8_t result;
+      uint8_t result = InviteUpdateType::REJECT_INVITE;
       if( data.Answer == InviteReplyType::ACCEPT )
       {
-        partyMgr.onJoin( player.getId(), pSession->getPlayer()->getId() );
+        partyMgr.onJoin( player.getId(), pPlayer->getId() );
         result = InviteUpdateType::ACCEPT_INVITE;
       }
-      else
-      {
-        result = InviteUpdateType::REJECT_INVITE;
-      }
 
-      auto inviteUpPacket = std::make_shared< InviteUpdatePacket >( player, Common::Util::getTimeSeconds() + 30,
-                                                                    data.AuthType, 1, result );
-      pSession->getZoneConnection()->queueOutPacket( inviteUpPacket );
+      auto inviteUpPacket = makeInviteUpdatePacket( player, Common::Util::getTimeSeconds() + 30, data.AuthType, 1, result );
+      server.queueForPlayer( pPlayer->getCharacterId(), inviteUpPacket );
 
       inviteReplyData.AuthType = data.AuthType;
-      strcpy( inviteReplyData.InviteCharacterName, pSession->getPlayer()->getName().c_str() );
+      strcpy( inviteReplyData.InviteCharacterName, pPlayer->getName().c_str() );
       server.queueForPlayer( player.getCharacterId(), inviteReplyPacket );
 
       break;
     }
     case HierarchyType::FRIENDLIST:
     {
-      auto& flMgr = Common::Service< Sapphire::World::Manager::FriendListMgr >::ref();
+      auto& flMgr = Common::Service< FriendListMgr >::ref();
 
       uint8_t result;
       if( data.Answer == InviteReplyType::ACCEPT )
       {
-        flMgr.onInviteAccept( player, *pSession->getPlayer() );
+        flMgr.onInviteAccept( player, *pPlayer );
         result = InviteUpdateType::ACCEPT_INVITE;
       }
       else
       {
-        flMgr.onInviteDecline( player, *pSession->getPlayer() );
+        flMgr.onInviteDecline( player, *pPlayer );
         result = InviteUpdateType::REJECT_INVITE;
       }
 
-      auto inviteUpPacket = std::make_shared< InviteUpdatePacket >( player, 0,
-                                                                    data.AuthType, 1, result );
-      pSession->getZoneConnection()->queueOutPacket( inviteUpPacket );
+      auto inviteUpPacket = makeInviteUpdatePacket( player, 0, data.AuthType, 1, result );
+      server.queueForPlayer( pPlayer->getCharacterId(), inviteUpPacket );
 
       inviteReplyData.AuthType = data.AuthType;
-      strcpy( inviteReplyData.InviteCharacterName, pSession->getPlayer()->getName().c_str() );
+      strcpy( inviteReplyData.InviteCharacterName, pPlayer->getName().c_str() );
       server.queueForPlayer( player.getCharacterId(), inviteReplyPacket );
 
       break;
@@ -177,7 +185,27 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
     case HierarchyType::AUTOPARTY:
       break;
     case HierarchyType::FCCREATE:
+    {
+
+      auto& fcMgr = Common::Service< FreeCompanyMgr >::ref();
+      uint8_t result;
+      if( data.Answer == InviteReplyType::ACCEPT )
+      {
+        fcMgr.onSignPetition( player, *pPlayer );
+        result = InviteUpdateType::ACCEPT_INVITE;
+      }
+      else
+      {
+        result = InviteUpdateType::REJECT_INVITE;
+      }
+      auto inviteUpPacket = makeInviteUpdatePacket( player, 0, data.AuthType, 1, result );
+      server.queueForPlayer( pPlayer->getCharacterId(), inviteUpPacket );
+
+      inviteReplyData.AuthType = data.AuthType;
+      strcpy( inviteReplyData.InviteCharacterName, pPlayer->getName().c_str() );
+      server.queueForPlayer( player.getCharacterId(), inviteReplyPacket );
       break;
+    }
     case HierarchyType::FREECOMPANY:
       break;
     case HierarchyType::FCJOINREQUEST:

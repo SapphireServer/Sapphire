@@ -120,6 +120,12 @@ namespace Sapphire::Db
     FC_UP,
     FC_DEL,
 
+    FC_MEMBERS_SEL_ALL,
+    FC_MEMBERS_SEL_FC,
+    FC_MEMBERS_INS,
+    FC_MEMBERS_UP,
+    FC_MEMBERS_DEL,
+
     MAX_STATEMENTS
   };
 

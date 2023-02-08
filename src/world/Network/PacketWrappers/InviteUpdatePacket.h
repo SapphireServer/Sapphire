@@ -27,4 +27,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       strcpy( m_data.InviteName, player.getName().c_str() );
     };
   };
+
+  template< typename... Args >
+  std::shared_ptr< InviteUpdatePacket > makeInviteUpdatePacket( Args... args )
+  {
+    return std::make_shared< InviteUpdatePacket >( args... );
+  }
 }
