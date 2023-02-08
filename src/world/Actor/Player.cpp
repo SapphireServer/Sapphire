@@ -1624,13 +1624,19 @@ void Player::dyeItemFromDyeingInfo()
   if( !itemToDye || !dyeToUse )
     return;
 
-  uint32_t stainColorID = dyeToUse->getAdditionalData();
-  itemToDye->setStain( stainColorID );
+  if( !removeItem( dyeToUse->getId() ) )
+    return;
 
-  // TODO: subtract/remove dye used
+  uint32_t stainColorID = dyeToUse->getAdditionalData();
+  bool shouldDye = stainColorID != 0;
+  bool invalidateGearSet = stainColorID != itemToDye->getStain();
+  itemToDye->setStain( stainColorID );
 
   insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
   writeItem( itemToDye );
+
+  auto dyePkt = makeActorControlSelf( getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
+  queuePacket( dyePkt );
 }
 
 void Player::resetObjSpawnIndex()
