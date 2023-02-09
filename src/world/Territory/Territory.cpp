@@ -830,9 +830,9 @@ uint32_t Territory::getNextEffectSequence()
   return m_effectCounter++;
 }
 
-Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
+Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
 {
-  auto infoPtr = m_bNpcBaseMap.find( levelId );
+  auto infoPtr = m_bNpcBaseMap.find( layoutId );
   if( infoPtr == m_bNpcBaseMap.end() )
     return nullptr;
 

@@ -26,6 +26,7 @@
 #include "Territory/InstanceContent.h"
 
 #include "Action/EventAction.h"
+#include "Action/EventItemAction.h"
 #include "WorldServer.h"
 #include "Actor/Player.h"
 #include <Script/ScriptMgr.h>
@@ -118,7 +119,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
         }
       }
 
-      return unknown + "Warp"; //who know
+      return unknown + "Warp";//who know
     }
 
     case Event::EventHandler::EventHandlerType::Shop:
@@ -139,7 +140,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
 
 std::string EventMgr::getErrorCodeName( uint8_t errorCode )
 {
-  switch ( errorCode )
+  switch( errorCode )
   {
     case Common::EventSceneError::EVENT_SCENE_SUCCESS:
     {
@@ -321,7 +322,6 @@ void EventMgr::handleReturnEventScene( Entity::Player& player, uint32_t eventId,
       else if( auto chainCallback = pEvent->getSceneChainCallback() )
         chainCallback( player );
     }
-
   }
 
   checkEvent( player, eventId );
@@ -347,7 +347,6 @@ void EventMgr::handleYieldEventScene( Entity::Player& player, uint32_t eventId, 
   {
     PlayerMgr::sendDebug( player, "Yield not implemented in script, sending default" );
   }
-
 }
 
 void EventMgr::handleYieldStringEventScene( Entity::Player& player, uint32_t eventId, uint16_t sceneId, uint8_t resumeId, const std::string& resultString )
@@ -451,7 +450,6 @@ void EventMgr::handleReturnStringEventScene( Entity::Player& player, uint32_t ev
       else if( auto chainCallback = pEvent->getSceneChainCallback() )
         chainCallback( player );
     }
-
   }
 
   checkEvent( player, eventId );
@@ -484,16 +482,14 @@ void EventMgr::handleReturnIntAndStringEventScene( Entity::Player& player, uint3
       eventCallback( player, result );
     }
 
-      // we might have a scene chain callback instead so check for that too
+    // we might have a scene chain callback instead so check for that too
     else if( auto chainCallback = pEvent->getSceneChainCallback() )
       chainCallback( player );
-
   }
-
 }
 
 
-void EventMgr::checkEvent( Sapphire::Entity::Player &player, uint32_t eventId )
+void EventMgr::checkEvent( Sapphire::Entity::Player& player, uint32_t eventId )
 {
   auto pEvent = player.getEvent( eventId );
 
@@ -575,7 +571,6 @@ void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t ev
 
   server.queueForPlayer( player.getCharacterId(), std::make_shared< EventStartPacket >( player.getId(), actorId,
                                                                                         eventId, eventType, eventParam1, eventParam2 ) );
-
 }
 
 void EventMgr::eventActionStart( Entity::Player& player, uint32_t eventId, uint32_t action,
@@ -605,15 +600,23 @@ void EventMgr::eventActionStart( Entity::Player& player, uint32_t eventId, uint3
   pEventAction->start();
 }
 
-void EventMgr::eventItemActionStart( Entity::Player& player, uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
-                                     World::Action::ActionCallback interruptCallback, uint64_t additional )
+void EventMgr::eventItemActionStart( Entity::Player& player, uint32_t eventId, uint32_t action,
+                                     uint32_t sequence, uint64_t targetId )
 {
-//  Action::ActionPtr pEventItemAction = Action::make_EventItemAction( getAsChara(), eventId, action,
-//                                                                     finishCallback, interruptCallback, additional );
-//
-//  setCurrentAction( pEventItemAction );
-//
-//  pEventItemAction->onStart();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto eventItemData = exdData.getRow< Excel::EventItem >( action );
+  if( !eventItemData )
+  {
+    Logger::error( "Could not find eventItem #{0}", action );
+    return;
+  }
+
+  auto pEventItemAction = World::Action::make_EventItemAction( player.getAsChara(), eventId, exdData.getRow< Excel::EventItem >( action ), sequence, targetId );
+
+  player.setCurrentAction( pEventItemAction );
+
+  pEventItemAction->onStart();
 }
 
 
@@ -623,15 +626,15 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
   if( !pEvent )
     return;
 
-  if( param1 == 0 ) //list items
+  if( param1 == 0 )//list items
   {
     auto& shopMgr = Common::Service< ShopMgr >::ref();
     std::vector< uint32_t > params = std::vector< uint32_t >();
 
-    params.push_back( 201 ); //unknown
-    params.push_back( 1 ); //command id
+    params.push_back( 201 );//unknown
+    params.push_back( 1 );  //command id
     params.push_back( 40 ); //max items for sell
-    params.push_back( 0 ); //flag
+    params.push_back( 0 );  //flag
     uint8_t index;
     for( index = 0; index < 40; index++ )
     {
@@ -640,27 +643,27 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
       else
         break;
     }
-    params[ 2 ] = static_cast< uint32_t >( params.size() - 4 ); //new max item size
+    params[ 2 ] = static_cast< uint32_t >( params.size() - 4 );//new max item size
     auto& exdData = Common::Service< Data::ExdData >::ref();
 
     for( auto it : *player.getSoldItems() )
     {
       auto item = exdData.getRow< Excel::Item >( it.first );
-      params.push_back( it.first ); //itemCatalogId
-      params.push_back( it.second ); //stack
-      params.push_back( item->data().Price ); //price
-      params.push_back( 0 );//flag isHQ
-      params.push_back( 0 );//numOfMateria
-      params.push_back( eventId ); //shopId
+      params.push_back( it.first );          //itemCatalogId
+      params.push_back( it.second );         //stack
+      params.push_back( item->data().Price );//price
+      params.push_back( 0 );                 //flag isHQ
+      params.push_back( 0 );                 //numOfMateria
+      params.push_back( eventId );           //shopId
 
       params.push_back( 0 );//signatureId
       params.push_back( 0 );//signatureId
 
       params.push_back( ( 1000 << 16 ) + 1000 );//durability + refine
-      params.push_back( 0 );//stain
-      params.push_back( 0 );//pattern
+      params.push_back( 0 );                    //stain
+      params.push_back( 0 );                    //pattern
 
-      for( uint8_t slot = 0; slot < 5; slot++ ) //materia
+      for( uint8_t slot = 0; slot < 5; slot++ )//materia
       {
         params.push_back( 0 );
       }
@@ -668,9 +671,8 @@ void EventMgr::playGilShop( Entity::Player& player, uint32_t eventId, uint32_t f
 
     playScene( player, eventId, 40, flags, params, std::move( eventCallback ) );
   }
-  else if( param1 == 2 ) //sell item
+  else if( param1 == 2 )//sell item
   {
-
   }
 }
 
@@ -710,7 +712,7 @@ void EventMgr::resumeScene( Entity::Player& player, uint32_t eventId, uint32_t s
     pPacket = std::move( std::make_shared< EventResume64Packet >( player, eventId, scene, yieldId, values ) );
   else if( paramCount < 128 )
     pPacket = std::move( std::make_shared< EventResume128Packet >( player, eventId, scene, yieldId, values ) );
-  else if ( paramCount < 255 )
+  else if( paramCount < 255 )
     pPacket = std::move( std::make_shared< EventResume255Packet >( player, eventId, scene, yieldId, values ) );
 
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -815,7 +817,7 @@ bool EventMgr::sendEventPlay( Entity::Player& player, uint32_t eventId, uint32_t
     pPacket = std::move( std::make_shared< EventPlayPacket64 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
   else if( paramCount < 128 )
     pPacket = std::move( std::make_shared< EventPlayPacket128 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
-  else if ( paramCount < 255 )
+  else if( paramCount < 255 )
     pPacket = std::move( std::make_shared< EventPlayPacket255 >( player, pEvent->getActorId(), pEvent->getId(), scene, flags ) );
 
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -869,5 +871,4 @@ void EventMgr::sendNotice( Entity::Player& player, uint32_t questId, int8_t noti
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), pPacket );
-
 }
