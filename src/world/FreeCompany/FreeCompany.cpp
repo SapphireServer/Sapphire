@@ -203,16 +203,17 @@ std::set< uint64_t >& Sapphire::FreeCompany::getMemberIdList()
   return m_memberIds;
 }
 
-void Sapphire::FreeCompany::addInvite( uint64_t memberId )
-{
-
-}
-
 void Sapphire::FreeCompany::addMember( uint64_t memberId, uint8_t hierarchyId, uint32_t lastLogout )
 {
   FcMember member{ memberId, hierarchyId, lastLogout };
   m_memberDetails[ memberId ] = member;
   m_memberIds.insert( memberId );
+}
+
+void Sapphire::FreeCompany::removeMember( uint64_t memberId )
+{
+  m_memberDetails.erase( memberId );
+  m_memberIds.erase( memberId );
 }
 
 void Sapphire::FreeCompany::setChatChannel( uint64_t chatChannelId )

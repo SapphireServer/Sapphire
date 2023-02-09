@@ -249,26 +249,63 @@ void FreeCompanyMgr::onFcLogin( uint64_t characterId )
   if( !fc )
     return;
 
-  uint64_t onlinePlayers = 1;
-  auto fcResult = makeFcResult( *player, fc->getId(), onlinePlayers,
-                                FreeCompanyResultPacket::ResultType::FcLogin,
-                                0, FreeCompanyResultPacket::UpdateStatus::Execute,
-                                fc->getName(), fc->getTag() );
+  m_onlinePlayers++;
+  auto fcResultSelf = makeFcResult( *player, fc->getId(), m_onlinePlayers,
+                                    FreeCompanyResultPacket::ResultType::FcLogin,
+                                    0, FreeCompanyResultPacket::UpdateStatus::Execute,
+                                    fc->getName(), fc->getTag() );
 
-  server.queueForPlayer( player->getCharacterId(), fcResult );
+  server.queueForPlayer( player->getCharacterId(), fcResultSelf );
 
-  // todo - send packet to rest of fc members
+  auto fcResultOthers = makeFcResult( *player, fc->getId(), m_onlinePlayers,
+                                      FreeCompanyResultPacket::ResultType::FcLogin,
+                                      0, FreeCompanyResultPacket::UpdateStatus::Member,
+                                      fc->getName(), player->getName() );
+
+  server.queueForFreeCompany( fc->getId(), fcResultOthers, { characterId } );
+}
+
+void FreeCompanyMgr::onFcLogout( uint64_t characterId )
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto player = server.getPlayer( characterId );
+  if( !player )
+    return;
+
+  auto fc = getPlayerFreeCompany( player->getCharacterId() );
+  if( !fc )
+    return;
+
+  m_onlinePlayers--;
+  auto fcResultOthers = makeFcResult( *player, fc->getId(), m_onlinePlayers,
+                                      FreeCompanyResultPacket::ResultType::FcLogout,
+                                      0, FreeCompanyResultPacket::UpdateStatus::Member,
+                                      fc->getName(), player->getName() );
+
+  server.queueForFreeCompany( fc->getId(), fcResultOthers, { characterId } );
 }
 
 void FreeCompanyMgr::onSignPetition( Entity::Player& source, Entity::Player& target )
 {
-
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto fc = getPlayerFreeCompany( target.getCharacterId() );
   if( !fc )
     return;
 
   addMember( fc->getId(), source.getCharacterId() );
-  // todo - send fcresult packets
+  auto fcResultSelf = makeFcResult( source, fc->getId(), m_onlinePlayers,
+                                    FreeCompanyResultPacket::ResultType::FcCreateAccept,
+                                    0, FreeCompanyResultPacket::UpdateStatus::Execute,
+                                    fc->getName(), fc->getTag() );
+
+  server.queueForPlayer( source.getCharacterId(), fcResultSelf );
+
+  auto fcResultOthers = makeFcResult( source, fc->getId(), m_onlinePlayers,
+                                      FreeCompanyResultPacket::ResultType::FcCreateAccept,
+                                      0, FreeCompanyResultPacket::UpdateStatus::Member,
+                                      fc->getName(), source.getName() );
+
+  server.queueForFreeCompany( fc->getId(), fcResultOthers, { source.getCharacterId() } );
 
 }
 
@@ -278,6 +315,7 @@ void FreeCompanyMgr::addMember( uint64_t fcId, uint64_t memberId )
   if( !pFc )
     return;
 
+  m_charaIdToFcIdMap[ memberId ] = fcId;
   dbInsertMember( fcId, memberId, 0 );
   pFc->addMember( memberId, 0, 0 );
 }

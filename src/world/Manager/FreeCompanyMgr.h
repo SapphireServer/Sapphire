@@ -21,6 +21,7 @@ namespace Sapphire::World::Manager
     std::unordered_map< uint64_t, uint64_t > m_charaIdToFcIdMap;
 
     uint64_t m_maxFcId{ 0 };
+    uint32_t m_onlinePlayers{ 0 };
 
   public:
 
@@ -68,6 +69,7 @@ namespace Sapphire::World::Manager
    // void joinLinkshell( uint64_t lsId, uint64_t characterId );
 
     void onFcLogin( uint64_t characterId );
+    void onFcLogout( uint64_t characterId );
     void onSignPetition( Entity::Player& source, Entity::Player& target );
 
   };

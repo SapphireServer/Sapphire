@@ -140,12 +140,8 @@ namespace Sapphire
     void setChatChannel( uint64_t chatChannelId );
 
     void addMember( uint64_t memberId, uint8_t hierarchyId, uint32_t lastLogout );
-
     void removeMember( uint64_t memberId );
 
-    void addInvite( uint64_t memberId );
-
-    void removeInvite( uint64_t memberId );
 
 
   };
