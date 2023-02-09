@@ -26,7 +26,7 @@ void Sapphire::Network::GameConnection::itemOperation( const Packets::FFXIVARR_P
   const auto packet = ZoneChannelPacket< FFXIVIpcClientInventoryItemOperation >( inPacket );
 
   const auto operationType = packet.data().OperationType;
-  const auto splitCount = packet.data().SrcStack;
+  const auto splitCount = packet.data().DstStack;
 
   const auto fromSlot = packet.data().SrcContainerIndex;
   const auto fromContainer = packet.data().SrcStorageId;
