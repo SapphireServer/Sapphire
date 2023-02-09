@@ -56,6 +56,9 @@ bool FreeCompanyMgr::loadFreeCompanies()
     std::string board = res->getString( 14 );
     std::string motto = res->getString( 15 );
 
+    if( m_maxFcId < fcId )
+      m_maxFcId = fcId;
+
 
     auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::FreeCompanyChat );
 
@@ -169,13 +172,7 @@ FreeCompanyPtr FreeCompanyMgr::getFreeCompanyById( uint64_t fcId )
 
 FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const std::string& tag, Entity::Player& player )
 {
-  uint64_t freeCompanyId = 1;
-
-  if( !m_fcIdMap.empty() )
-  {
-    auto lastIdx = ( --m_fcIdMap.end() )->first;
-    freeCompanyId = lastIdx + 1;
-  }
+  uint64_t freeCompanyId = ++m_maxFcId;
 
   // check if a fc with the same name already exists
   auto lsIt = m_fcNameMap.find( name );
@@ -329,13 +326,14 @@ void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
   {
     resultData.FreeCompanyID = fc->getId();
     resultData.AuthorityList = 0;
-    resultData.HierarchyType = 0;
+    resultData.HierarchyType = player.getCharacterId() == fc->getMasterId() ? 0 : 1;
     resultData.GrandCompanyID = fc->getGrandCompany();
     resultData.FcRank = fc->getRank();
     resultData.CrestID = fc->getCrest();
     resultData.FcStatus = static_cast< uint8_t >( fc->getFcStatus() );
     resultData.ChannelID = fc->getChatChannel();
-    resultData.CharaFcParam = 0;
+    //resultData.CharaFcParam = 1;
+    //resultData.CharaFcState = 1;
   }
 
   auto& server = Common::Service< World::WorldServer >::ref();

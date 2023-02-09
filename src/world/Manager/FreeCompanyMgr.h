@@ -19,6 +19,8 @@ namespace Sapphire::World::Manager
     /*! map used for easy lookup of char id to fc id */
     std::unordered_map< uint64_t, uint64_t > m_charaIdToFcIdMap;
 
+    uint64_t m_maxFcId{ 0 };
+
   public:
 
     FreeCompanyMgr() = default;
