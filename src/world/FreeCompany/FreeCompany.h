@@ -12,6 +12,13 @@ namespace Sapphire
 
   class FreeCompany
   {
+  public:
+    struct FcMember
+    {
+      uint64_t characterId;
+      uint8_t hierarchyId;
+      uint32_t lastLogout;
+    };
   private:
     /*! unique ID of the fc */
     uint64_t m_id;
@@ -60,13 +67,6 @@ namespace Sapphire
     uint64_t m_chatChannelId;
     /*! pending invites, not yet accepted or declined */
     std::set< uint64_t > m_pendingInviteIds;
-
-    struct FcMember
-    {
-      uint64_t characterId;
-      uint8_t hierarchyId;
-      uint32_t lastLogout;
-    };
 
     /*! member details such as hierarchy mapping */
     std::unordered_map< uint64_t, FcMember > m_memberDetails;
@@ -137,6 +137,7 @@ namespace Sapphire
     std::set< uint64_t >& getInviteIdList();
 
     uint64_t getChatChannel() const;
+    void setChatChannel( uint64_t chatChannelId );
 
     void addMember( uint64_t memberId, uint8_t hierarchyId, uint32_t lastLogout );
 
@@ -145,6 +146,7 @@ namespace Sapphire
     void addInvite( uint64_t memberId );
 
     void removeInvite( uint64_t memberId );
+
 
   };
 

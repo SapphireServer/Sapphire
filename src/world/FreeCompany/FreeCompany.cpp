@@ -215,5 +215,10 @@ void Sapphire::FreeCompany::addMember( uint64_t memberId, uint8_t hierarchyId, u
   m_memberIds.insert( memberId );
 }
 
+void Sapphire::FreeCompany::setChatChannel( uint64_t chatChannelId )
+{
+  m_chatChannelId = chatChannelId;
+}
+
 
 

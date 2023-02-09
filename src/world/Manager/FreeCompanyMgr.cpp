@@ -30,75 +30,25 @@ using namespace Sapphire::World::Manager;
 
 bool FreeCompanyMgr::loadFreeCompanies()
 {
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
 
-  auto query = db.getPreparedStatement( Db::FC_SEL_ALL );
-  auto res = db.query( query );
+  auto fcList = dbSelectFcsAll();
 
-  /* FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint, CrestId, CreateDate, GrandCompanyID, "
-                    "       ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList */
-  while( res->next() )
+  for( const auto& fcPtr : fcList )
   {
-    uint64_t fcId = res->getUInt64( 1 );
-    uint64_t masterId = res->getUInt64( 2 );
-    std::string name = res->getString( 3 );
-    std::string tag = res->getString( 4 );
-    uint64_t credit = res->getUInt64( 5 );
-    uint64_t creditAcc = res->getUInt64( 6 );
-    uint8_t rank = res->getUInt8( 7 );
-    uint64_t points = res->getUInt64( 8 );
-    uint64_t crestId = res->getUInt64( 9 );
-    uint32_t creationDate = res->getUInt( 10 );
-    uint8_t gcId = res->getUInt8( 11 );
-    auto reputationListVec = res->getBlobVector( 12 );
-    uint8_t status = res->getUInt8( 13 );
-    std::string board = res->getString( 14 );
-    std::string motto = res->getString( 15 );
-
-    if( m_maxFcId < fcId )
-      m_maxFcId = fcId;
-
+    if( m_maxFcId < fcPtr->getId() )
+      m_maxFcId = fcPtr->getId();
 
     auto chatChannelId = chatChannelMgr.createChatChannel( Common::ChatChannelType::FreeCompanyChat );
+    fcPtr->setChatChannel( chatChannelId );
+    m_fcIdMap[ fcPtr->getId() ] = fcPtr;
+    m_fcNameMap[ fcPtr->getName() ] = fcPtr;
 
-    auto fcPtr = std::make_shared< FreeCompany >( fcId, name, tag, masterId, chatChannelId );
-    m_fcIdMap[ fcId ] = fcPtr;
-    m_fcNameMap[ name ] = fcPtr;
-
-    fcPtr->setCredit( credit );
-    fcPtr->setCreditAccumulated( creditAcc );
-    fcPtr->setRank( rank );
-    fcPtr->setPoints( points );
-    fcPtr->setCrest( crestId );
-    fcPtr->setCreateDate( creationDate );
-    fcPtr->setGrandCompany( gcId );
-    fcPtr->setFcStatus( static_cast< Common::FreeCompanyStatus >( status ) );
-
-  }
-
-  for( auto& [ fcId, fcPtr ] : m_fcIdMap )
-  {
-    auto fc = getFreeCompanyById( fcId );
-
-    if( !fc )
+    auto members = dbSelectMembersByFc( fcPtr->getId() );
+    for( const auto& member : members )
     {
-      Logger::error( "FreeCompany {} not found for member initialisation!", fcId );
-      continue;
-    }
-    /* FcMemberId, HierarchyType, LastLogout */
-    auto queryMember = db.getPreparedStatement( Db::FC_MEMBERS_SEL_FC );
-    queryMember->setUInt64( 1, fcId );
-    auto resMember = db.query( queryMember );
-    while( resMember->next() )
-    {
-      uint64_t characterId = resMember->getUInt64( 1 );
-      uint8_t hierarchyId = resMember->getUInt8( 2 );
-      uint32_t lastLogout = resMember->getUInt( 3 );
-
-      fcPtr->addMember( characterId, hierarchyId, lastLogout );
-      m_charaIdToFcIdMap[ characterId ] = fcId;
-
+      fcPtr->addMember( member.characterId, member.hierarchyId, member.lastLogout );
+      m_charaIdToFcIdMap[ member.characterId ] = fcPtr->getId();
     }
   }
 
@@ -107,49 +57,15 @@ bool FreeCompanyMgr::loadFreeCompanies()
 
 void FreeCompanyMgr::writeFreeCompany( uint64_t fcId )
 {
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-
   auto fc = getFreeCompanyById( fcId );
 
   if( !fc )
   {
-    Logger::error( "FreeCompany {} not found for write!", fcId );
+    Logger::error( "FreeCompanyMgr: FreeCompany {} not found for write!", fcId );
     return;
   }
 
-  auto query = db.getPreparedStatement( Db::FC_UP );
-
-  /*  MasterCharacterId = ?, FcName = ?, FcTag = ?, FcCredit = ?, FcCreditAccumu = ?,
-   *  FcRank = ?, FcPoint = ?, ReputationList = ?, CrestId = ?,"
-   *  CreateDate = ?, GrandCompanyID = ?, FcStatus = ?, FcBoard = ?, "
-   *  FcMotto = ?, ActiveActionList = ?, , ActiveActionLeftTimeList = ?, StockActionList = ? "
-   */
-
-  query->setUInt64( 1, fc->getMasterId() );
-  query->setString( 2, fc->getName() );
-  query->setString( 3, fc->getTag() );
-  query->setUInt64( 4, fc->getCredit() );
-  query->setUInt64( 5, fc->getCreditAccumulated() );
-  query->setUInt( 6, fc->getRank() );
-  query->setUInt64( 7, fc->getPoints() );
-  std::vector< uint8_t > repList( 24 );
-  query->setBinary( 8, repList );
-  query->setUInt64( 9, fc->getCrest() );
-  query->setUInt( 10, fc->getCreateDate() );
-  query->setUInt( 11, fc->getGrandCompany() );
-  query->setUInt( 12, static_cast< uint8_t >( fc->getFcStatus() ) );
-  query->setString( 13, fc->getFcBoard() );
-  query->setString( 14, fc->getFcMotto() );
-  std::vector< uint8_t > activeActionList( 24 );
-  query->setBinary( 15, activeActionList );
-  std::vector< uint8_t > activeActionLeftTimeList( 24 );
-  query->setBinary( 16, activeActionLeftTimeList );
-  std::vector< uint8_t > stockActionList( 120 );
-  query->setBinary( 17, stockActionList );
-
-  query->setInt64( 18, static_cast< int64_t >( fc->getId() ) );
-  db.execute( query );
-
+  dbUpdateFc( *fc );
 }
 
 FreeCompanyPtr FreeCompanyMgr::getFreeCompanyByName( const std::string& name )
@@ -196,28 +112,7 @@ FreeCompanyPtr FreeCompanyMgr::createFreeCompany( const std::string& name, const
   m_fcIdMap[ freeCompanyId ] = fcPtr;
   m_fcNameMap[ name ] = fcPtr;
 
-  //FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint,
-  //ReputationList, CrestId, CreateDate, GrandCompanyID, FcStatus, FcBoard, FcMotto
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::FC_INS );
-  stmt->setUInt64( 1, freeCompanyId );
-  stmt->setUInt64( 2, masterId );
-  stmt->setString( 3, std::string( name ) );
-  stmt->setString( 4, std::string( tag ) );
-  stmt->setUInt64( 5, 0 );
-  stmt->setUInt64( 6, 0 );
-  stmt->setUInt( 7, 1 );
-  stmt->setUInt64( 8, 0 );
-  std::vector< uint8_t > rep( 24 );
-  stmt->setBinary( 9, rep );
-  stmt->setUInt64( 10, 0 );
-  stmt->setUInt( 11, createDate );
-  stmt->setUInt( 12, fcPtr->getGrandCompany() );
-  stmt->setUInt( 13, static_cast< uint8_t >( Common::FreeCompanyStatus::InviteStart ) );
-  stmt->setString( 14, std::string( "" ) );
-  stmt->setString( 15, std::string( "" ) );
-  db.directExecute( stmt );
-
+  dbInsertFc( *fcPtr );
   dbInsertMember( freeCompanyId, masterId, 0 );
 
   fcPtr->addMember( masterId, 0, createDate );
@@ -395,4 +290,135 @@ void FreeCompanyMgr::dbInsertMember( uint64_t fcId, uint64_t characterId, uint8_
   stmt->setUInt( 3, hierarchyId );
   stmt->setUInt( 4, 0 );
   db.directExecute( stmt );
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+/// DB Related functions
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+void FreeCompanyMgr::dbInsertFc( const FreeCompany& fc )
+{
+  //FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint,
+  //ReputationList, CrestId, CreateDate, GrandCompanyID, FcStatus, FcBoard, FcMotto
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::FC_INS );
+  stmt->setUInt64( 1, fc.getId() );
+  stmt->setUInt64( 2, fc.getMasterId() );
+  stmt->setString( 3, fc.getName() );
+  stmt->setString( 4, fc.getTag() );
+  stmt->setUInt64( 5, 0 );
+  stmt->setUInt64( 6, 0 );
+  stmt->setUInt( 7, 1 );
+  stmt->setUInt64( 8, 0 );
+  std::vector< uint8_t > rep( 24 );
+  stmt->setBinary( 9, rep );
+  stmt->setUInt64( 10, 0 );
+  stmt->setUInt( 11, Common::Util::getTimeSeconds() );
+  stmt->setUInt( 12, fc.getGrandCompany() );
+  stmt->setUInt( 13, static_cast< uint8_t >( Common::FreeCompanyStatus::InviteStart ) );
+  stmt->setString( 14, std::string( "" ) );
+  stmt->setString( 15, std::string( "" ) );
+  db.directExecute( stmt );
+}
+
+void FreeCompanyMgr::dbUpdateFc( const FreeCompany& fc )
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto query = db.getPreparedStatement( Db::FC_UP );
+
+  /*  MasterCharacterId = ?, FcName = ?, FcTag = ?, FcCredit = ?, FcCreditAccumu = ?,
+   *  FcRank = ?, FcPoint = ?, ReputationList = ?, CrestId = ?,"
+   *  CreateDate = ?, GrandCompanyID = ?, FcStatus = ?, FcBoard = ?, "
+   *  FcMotto = ?, ActiveActionList = ?, , ActiveActionLeftTimeList = ?, StockActionList = ? "
+   */
+
+  query->setUInt64( 1, fc.getMasterId() );
+  query->setString( 2, fc.getName() );
+  query->setString( 3, fc.getTag() );
+  query->setUInt64( 4, fc.getCredit() );
+  query->setUInt64( 5, fc.getCreditAccumulated() );
+  query->setUInt( 6, fc.getRank() );
+  query->setUInt64( 7, fc.getPoints() );
+  std::vector< uint8_t > repList( 24 );
+  query->setBinary( 8, repList );
+  query->setUInt64( 9, fc.getCrest() );
+  query->setUInt( 10, fc.getCreateDate() );
+  query->setUInt( 11, fc.getGrandCompany() );
+  query->setUInt( 12, static_cast< uint8_t >( fc.getFcStatus() ) );
+  query->setString( 13, fc.getFcBoard() );
+  query->setString( 14, fc.getFcMotto() );
+  std::vector< uint8_t > activeActionList( 24 );
+  query->setBinary( 15, activeActionList );
+  std::vector< uint8_t > activeActionLeftTimeList( 24 );
+  query->setBinary( 16, activeActionLeftTimeList );
+  std::vector< uint8_t > stockActionList( 120 );
+  query->setBinary( 17, stockActionList );
+
+  query->setInt64( 18, static_cast< int64_t >( fc.getId() ) );
+  db.execute( query );
+
+}
+
+std::vector< FreeCompanyPtr > FreeCompanyMgr::dbSelectFcsAll()
+{
+  std::vector< FreeCompanyPtr > fcList;
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto query = db.getPreparedStatement( Db::FC_SEL_ALL );
+  auto res = db.query( query );
+
+  /* FreeCompanyId, MasterCharacterId, FcName, FcTag, FcCredit, FcCreditAccumu, FcRank, FcPoint, CrestId, CreateDate, GrandCompanyID, "
+                    "       ReputationList, FcStatus, FcBoard, FcMotto, ActiveActionList, ActiveActionLeftTimeList, StockActionList */
+  while( res->next() )
+  {
+    uint64_t fcId = res->getUInt64( 1 );
+    uint64_t masterId = res->getUInt64( 2 );
+    std::string name = res->getString( 3 );
+    std::string tag = res->getString( 4 );
+    uint64_t credit = res->getUInt64( 5 );
+    uint64_t creditAcc = res->getUInt64( 6 );
+    uint8_t rank = res->getUInt8( 7 );
+    uint64_t points = res->getUInt64( 8 );
+    uint64_t crestId = res->getUInt64( 9 );
+    uint32_t creationDate = res->getUInt( 10 );
+    uint8_t gcId = res->getUInt8( 11 );
+    auto reputationListVec = res->getBlobVector( 12 );
+    uint8_t status = res->getUInt8( 13 );
+    std::string board = res->getString( 14 );
+    std::string motto = res->getString( 15 );
+
+    auto fcPtr = std::make_shared< FreeCompany >( fcId, name, tag, masterId, 0 );
+    fcPtr->setCredit( credit );
+    fcPtr->setCreditAccumulated( creditAcc );
+    fcPtr->setRank( rank );
+    fcPtr->setPoints( points );
+    fcPtr->setCrest( crestId );
+    fcPtr->setCreateDate( creationDate );
+    fcPtr->setGrandCompany( gcId );
+    fcPtr->setFcStatus( static_cast< Common::FreeCompanyStatus >( status ) );
+    fcPtr->setFcBoard( board );
+    fcPtr->setFcMotto( motto );
+    fcList.push_back( fcPtr );
+  }
+  return fcList;
+}
+
+std::vector< FreeCompany::FcMember > FreeCompanyMgr::dbSelectMembersByFc( uint64_t fcId )
+{
+  std::vector< FreeCompany::FcMember > memberList;
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
+  /* FcMemberId, HierarchyType, LastLogout */
+  auto queryMember = db.getPreparedStatement( Db::FC_MEMBERS_SEL_FC );
+  queryMember->setUInt64( 1, fcId );
+  auto resMember = db.query( queryMember );
+  while( resMember->next() )
+  {
+    struct FreeCompany::FcMember member;
+    member.characterId = resMember->getUInt64( 1 );
+    member.hierarchyId = resMember->getUInt8( 2 );
+    member.lastLogout = resMember->getUInt( 3 );
+    memberList.push_back( member );
+  }
+  return memberList;
 }

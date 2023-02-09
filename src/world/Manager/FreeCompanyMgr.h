@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include "ForwardsZone.h"
+#include "FreeCompany/FreeCompany.h"
 
 namespace Sapphire::World::Manager
 {
@@ -53,6 +54,10 @@ namespace Sapphire::World::Manager
     void sendFreeCompanyStatus( Entity::Player& player );
 
     void dbInsertMember( uint64_t fcId, uint64_t characterId, uint8_t hierarchyId );
+    void dbInsertFc( const FreeCompany& fc );
+    void dbUpdateFc( const FreeCompany& fc );
+    std::vector< FreeCompanyPtr > dbSelectFcsAll();
+    std::vector< FreeCompany::FcMember > dbSelectMembersByFc( uint64_t fcId );
 
     // get fc associated with player
     FreeCompanyPtr getPlayerFreeCompany( uint64_t characterId );
