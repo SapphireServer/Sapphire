@@ -179,7 +179,10 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
   // fill master character data
   auto masterCharacter = server.getPlayer( fc->getMasterId() );
   if( !masterCharacter )
+  {
     Logger::error( "FreeCompanyMgr: Unable to look up master character#{}!", fc->getMasterId() );
+    return;
+  }
 
   inviteListPacket->data().MasterCharacter.GrandCompanyID = masterCharacter->getGc();
   inviteListPacket->data().MasterCharacter.CharacterID = masterCharacter->getCharacterId();
