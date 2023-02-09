@@ -357,6 +357,9 @@ namespace Sapphire::Entity
     void setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot );
     void dyeItemFromDyeingInfo();
 
+    void setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour );
+    void glamourItemFromGlamouringInfo();
+
     /*! get player's title list (available titles) */
     TitleList& getTitleList();
 
@@ -967,6 +970,15 @@ namespace Sapphire::Entity
       uint32_t dyeBagContainer;
       uint32_t dyeBagSlot;
     } m_dyeingInfo{};
+
+    struct PlayerGlamouringInfo
+    {
+      uint32_t itemToGlamourContainer;
+      uint32_t itemToGlamourSlot;
+      uint32_t glamourBagContainer;
+      uint32_t glamourBagSlot;
+      bool shouldGlamour;
+    } m_glamouringInfo{};
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

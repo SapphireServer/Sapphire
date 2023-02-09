@@ -37,6 +37,8 @@ namespace Sapphire
 
     Common::ItemUICategory getCategory() const;
 
+    void setGlamModelIds();
+
     void setModelIds( uint64_t model1, uint64_t model2 );
 
     uint64_t getModelId1() const;
@@ -75,6 +77,9 @@ namespace Sapphire
     uint16_t getStain() const;
     void setStain( uint16_t stain );
 
+    uint32_t getPattern() const;
+    void setPattern( uint32_t pattern );
+
     uint32_t getAdditionalData() const;
 
     void setSpiritbond( uint16_t spiritbond );
@@ -99,6 +104,9 @@ namespace Sapphire
     uint64_t m_model1;
     uint64_t m_model2;
 
+    uint64_t m_glamModel1;
+    uint64_t m_glamModel2;
+
     bool m_isHq;
 
     uint16_t m_delayMs;
@@ -110,6 +118,7 @@ namespace Sapphire
     uint8_t m_slot;
     uint16_t m_durability;
     uint16_t m_stain;
+    uint32_t m_pattern;
     uint16_t m_spiritBond;
     uint32_t m_reservedFlag;
 

@@ -184,6 +184,10 @@ const char* packetCommandToString( uint16_t commandId )
       return "MOBHUNT_BREAK_ORDER";
     case DYE_ITEM:
       return "DYE_ITEM";
+    case GLAMOUR_ITEM:
+      return "GLAMOUR_ITEM";
+    case GLAMOUR_DISPEL:
+      return "GLAMOUR_DISPEL";
     case EMOTE:
       return "EMOTE";
     case EMOTE_WITH_WARP:
@@ -633,6 +637,16 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       // param2 = dye bag container
       // param4 = dye bag slot
       player.setDyeingInfo( param11, param12, param2, param4 );
+      break;
+    }
+    case PacketCommand::GLAMOUR_ITEM:
+    {
+      player.setGlamouringInfo( param11, param12, param2, param4, true );
+      break;
+    }
+    case PacketCommand::GLAMOUR_DISPEL:
+    {
+      player.setGlamouringInfo( param11, param12, param2, param4, false );
       break;
     }
     case PacketCommand::DIRECTOR_INIT_RETURN: // Director init finish

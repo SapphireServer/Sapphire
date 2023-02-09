@@ -37,6 +37,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.item.flags = static_cast< uint8_t >( item.isHq() ? 1 : 0 );
       m_data.item.refine = item.getSpiritbond();
       m_data.item.stain = static_cast< uint8_t >( item.getStain() );
+      m_data.item.pattern = item.getPattern();
       m_data.item.durability = item.getDurability();
       m_data.item.signatureId = 0;
     };

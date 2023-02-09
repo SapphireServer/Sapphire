@@ -61,6 +61,7 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
       // todo: not sure if correct flag?
       itemInfoPacket->data().item.flags = static_cast< uint8_t >( itM.second->isHq() ? 1 : 0 );
       itemInfoPacket->data().item.stain = static_cast< uint8_t >( itM.second->getStain() );
+      itemInfoPacket->data().item.pattern = itM.second->getPattern();
 
       server.queueForPlayer( player.getCharacterId(), itemInfoPacket );
     }

@@ -549,6 +549,8 @@ namespace Sapphire::Network::ActorControl
       MOBHUNT_RECEIPT_ORDER = 0x1B3,
       MOBHUNT_BREAK_ORDER = 0x1B4,
       DYE_ITEM = 0x1B5,
+      GLAMOUR_ITEM = 0x1BA,
+      GLAMOUR_DISPEL = 0x1BB,
       EMOTE = 0x1F4,
       EMOTE_WITH_WARP = 0x1F5,
       EMOTE_CANCEL = 0x1F6,
