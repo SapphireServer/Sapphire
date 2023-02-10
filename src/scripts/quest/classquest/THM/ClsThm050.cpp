@@ -24,9 +24,9 @@ private:
   // Basic quest information
   // Quest vars / flags used
   // BitFlag8 - removes the wait destination
-  // UI8AL - I think this is everything completed?
-  // UI8BH - gives 1 dried fish
-  // UI8BL - gives vulture meat
+  // UI8AL - is everything completed?
+  // UI8BH - #dried fish
+  // UI8BL - #vulture meat
 
   /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1001709
   /// Countable Num: 1 Seq: 2 Event: 1 Listener: 2001468
@@ -128,12 +128,11 @@ public:
 
   void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    switch( actorId )
+    if( actorId == fishDestinationEObject )
     {
-      case fishDestinationEObject:
-        eventMgr().sendEventNotice( player, getId(), 1 );
-        quest.setUI8BH( 0 );
-        quest.setSeq( Seq3 );
+      eventMgr().sendEventNotice( player, getId(), 1 );
+      quest.setUI8BH( 0 );
+      quest.setSeq( Seq3 );
     }
   }
 
@@ -154,7 +153,6 @@ public:
 
   void onPlayerDeath( World::Quest& quest, Sapphire::Entity::Player& player ) override
   {
-    //doesn't trigger
     if( quest.getSeq() == Seq3 )
     {
       auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
@@ -218,7 +216,7 @@ private:
 
   //////////////////////////////////////////////////////////////////////
 
-  // does nothing?
+  // does nothing
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 3, NONE, bindSceneReturn( &ClsThm050::Scene00003Return ) );
@@ -230,7 +228,7 @@ private:
 
   //////////////////////////////////////////////////////////////////////
 
-  // does nothing?
+  // does nothing
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &ClsThm050::Scene00004Return ) );
