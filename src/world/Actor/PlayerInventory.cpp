@@ -227,8 +227,10 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
   auto baseParams = item.getBaseParams();
   for( auto i = 0; i < 6; ++i )
   {
-    if( baseParams[ i ].baseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
-      m_bonusStats[ baseParams[ i ].baseParam ] += baseParams[ i ].value;
+    auto itemBaseParam = baseParams[ i ].baseParam;
+    auto itemBaseVal = baseParams[ i ].value;
+    if( itemBaseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
+      m_bonusStats[ itemBaseParam ] += itemBaseVal;
   }
 
   m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] += item.getDefense();
@@ -257,8 +259,10 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
   auto baseParams = item.getBaseParams();
   for( auto i = 0; i < 6; ++i )
   {
-    if( baseParams[ i ].baseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
-      m_bonusStats[ baseParams[ i ].baseParam ] -= baseParams[ i ].value;
+    auto itemBaseParam = baseParams[ i ].baseParam;
+    auto itemBaseVal = baseParams[ i ].value;
+    if( itemBaseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
+      m_bonusStats[ itemBaseParam ] -= itemBaseVal;
   }
 
   m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] -= item.getDefense();

@@ -774,6 +774,8 @@ uint32_t Sapphire::Entity::Chara::getBonusStat( Sapphire::Common::BaseParam base
   auto index = static_cast< uint32_t >( baseParam );
   assert( index < m_bonusStats.size() );
 
+  if( isPlayer() )
+    auto val = m_bonusStats[ index ];
   return m_bonusStats[ index ];
 }
 

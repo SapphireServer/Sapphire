@@ -117,7 +117,6 @@ void WarpMgr::finishWarp( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), zoneInPacket );
 
   playerMgr.onUnsetStateFlag( player, PlayerStateFlag::BetweenAreas );
-
 }
 
 void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteId, uint8_t teleportType )

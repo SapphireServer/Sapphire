@@ -167,7 +167,11 @@ void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
 
 void PlayerMgr::onPlayerHpMpTpChanged( Entity::Player& player )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
+
   player.sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( player ), true );
+  auto hudParamPacket = makeHudParam( player );
+  server.queueForPlayer( player.getCharacterId(), hudParamPacket );
 }
 
 void PlayerMgr::onPlayerItemLevelUpdate( Entity::Player& player )
