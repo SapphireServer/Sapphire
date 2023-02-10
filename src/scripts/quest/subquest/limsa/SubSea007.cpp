@@ -159,12 +159,10 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId() );
     }
-
   }
 
 };
