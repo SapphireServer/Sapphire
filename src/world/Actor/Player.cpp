@@ -131,7 +131,11 @@ void Player::unload()
   setLoadingComplete( false );
   // unset player for removal
   setMarkedForRemoval( false );
+  // send updates to mgrs
+  if( getPartyId() != 0 )
+    partyMgr.onMemberDisconnect( *this );
 
+  fcMgr.onFcLogout( getCharacterId() );
   syncLastDBWrite();
 }
 

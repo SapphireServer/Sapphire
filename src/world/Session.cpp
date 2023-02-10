@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <time.h>
 
 #include <Util/Util.h>
 #include <Network/PacketContainer.h>
@@ -77,9 +78,6 @@ void Sapphire::World::Session::close()
   // remove the session from the player
   if( m_pPlayer )
   {
-    auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-    playerMgr.onLogout( *m_pPlayer );
-
     m_pPlayer->unload();
   }
 }
@@ -118,7 +116,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
 {
   if( !fs::exists( path ) )
   {
-    PlayerMgr::sendDebug( *getPlayer(), "Couldn't find folder {}.", path );
+    PlayerMgr::sendDebug( *getPlayer(), "Couldn't find folder." );
     return;
   }
 
@@ -131,11 +129,11 @@ void Sapphire::World::Session::startReplay( const std::string& path )
   {
     // Get the filename of the current element
     auto fileName = it->path().filename().string();
-    auto unixTime = std::stoull( fileName.substr( 0, 14 ) );
+    auto unixTime = std::stoull( fileName.substr( 0, 14 ).c_str() );
 
     if( unixTime > 1000000000 )
     {
-      loadedSets.emplace_back( unixTime, it->path().string() );
+      loadedSets.push_back( std::tuple< uint64_t, std::string >( unixTime, it->path().string() ) );
     }
   }
 
@@ -149,7 +147,8 @@ void Sapphire::World::Session::startReplay( const std::string& path )
 
   for( auto set : loadedSets )
   {
-    m_replayCache.emplace_back( Common::Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) );
+    m_replayCache.push_back( std::tuple< uint64_t, std::string >(
+      Common::Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) ) );
 
     Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
   }
@@ -178,7 +177,7 @@ void Sapphire::World::Session::processReplay()
     at++;
   }
 
-  if( m_replayCache.empty() )
+  if( m_replayCache.size() == 0 )
     m_isReplaying = false;
 }
 
