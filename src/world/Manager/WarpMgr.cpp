@@ -80,6 +80,8 @@ void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Co
 
 void WarpMgr::finishWarp( Entity::Player& player )
 {
+  auto& playerMgr = Common::Service< PlayerMgr >::ref();
+
   WarpType warpType = WarpType::WARP_TYPE_NORMAL;
   auto it = m_entityIdToWarpInfoMap.find( player.getId() );
   if( it != m_entityIdToWarpInfoMap.end() )
@@ -100,19 +102,19 @@ void WarpMgr::finishWarp( Entity::Player& player )
   }
 
   auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, 0, 0, 0 );
-  auto SetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+  auto setStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
   player.setZoningType( Common::ZoningType::None );
 
   if( !player.getGmInvis() )
     player.sendToInRangeSet( zoneInPacket );
 
-  player.sendToInRangeSet( SetStatusPacket, true );
+  player.sendToInRangeSet( setStatusPacket, true );
 
   auto& server = Common::Service< WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), zoneInPacket );
 
-  player.unsetStateFlag( PlayerStateFlag::BetweenAreas );
+  playerMgr.onUnsetStateFlag( player, PlayerStateFlag::BetweenAreas );
 
 }
 
@@ -120,7 +122,6 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
 
   auto aetherData = exdData.getRow< Excel::Aetheryte >( aetheryteId );
 
@@ -172,17 +173,18 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
   }
   else if( teleportType == 4 ) // return
   {
-    warpType = WarpType::WARP_TYPE_HOME_POINT;
+    warpType = WarpType::WARP_TYPE_REISE;
     player.setZoningType( Common::ZoningType::ReturnDead );
   }
 
   if( sameTerritory )
-    warpMgr.requestWarp( player, warpType, pos, rot );
+    requestWarp( player, warpType, pos, rot );
   else
   {
     auto pTeri = teriMgr.getZoneByTerritoryTypeId( data.TerritoryType );
     if( !pTeri )
       return;
-    warpMgr.requestMoveTerritory( player, warpType, pTeri->getGuId(), pos, rot );
+
+    requestMoveTerritory( player, warpType, pTeri->getGuId(), pos, rot );
   }
 }
