@@ -182,6 +182,8 @@ const char* packetCommandToString( uint16_t commandId )
       return "MOBHUNT_RECEIPT_ORDER";
     case MOBHUNT_BREAK_ORDER:
       return "MOBHUNT_BREAK_ORDER";
+    case DYE_ITEM:
+      return "DYE_ITEM";
     case EMOTE:
       return "EMOTE";
     case EMOTE_WITH_WARP:
@@ -624,7 +626,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.teleportQuery( static_cast< uint16_t >( param11 ) );
       break;
     }
-  /*  case PacketCommand::DyeItem: // Dye item
+    case PacketCommand::DYE_ITEM: // Dye item
     {
       // param11 = item to dye container
       // param12 = item to dye slot
@@ -632,7 +634,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       // param4 = dye bag slot
       player.setDyeingInfo( param11, param12, param2, param4 );
       break;
-    }*/
+    }
     case PacketCommand::DIRECTOR_INIT_RETURN: // Director init finish
     {
       pZone->onInitDirector( player );

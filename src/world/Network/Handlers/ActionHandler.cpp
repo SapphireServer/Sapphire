@@ -47,7 +47,12 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       if( !action )
         return;
 
-      actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
+      auto category = static_cast< Common::ActionCategory >( action->data().Category );
+
+      if( category  == Common::ActionCategory::ItemManipulation )
+        actionMgr.handleItemManipulationAction( player, actionId, action, sequence );
+      else
+        actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
       break;
     }
 
