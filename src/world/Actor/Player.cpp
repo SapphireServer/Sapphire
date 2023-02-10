@@ -20,6 +20,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -120,6 +121,8 @@ Player::~Player() = default;
 
 void Player::unload()
 {
+  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
   // do one last update to db
   updateSql();
   // reset isLogin and loading sequences just in case
@@ -130,11 +133,9 @@ void Player::unload()
   setMarkedForRemoval( false );
   // send updates to mgrs
   if( getPartyId() != 0 )
-  {
-    auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
     partyMgr.onMemberDisconnect( *this );
-  }
 
+  fcMgr.onFcLogout( getCharacterId() );
   syncLastDBWrite();
 }
 
