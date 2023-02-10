@@ -274,8 +274,6 @@ void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
 
 void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
 {
-  Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( player, mountId );
-
   if( mountId != 0 )
   {
     player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
@@ -364,6 +362,17 @@ void PlayerMgr::onLogin( Entity::Player& player )
   {
     sendServerNotice( player, msg );
   }
+}
+
+void PlayerMgr::onLogout( Entity::Player &player )
+{
+  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
+  // send updates to mgrs
+  if( player.getPartyId() != 0 )
+    partyMgr.onMemberDisconnect( player );
+
+  fcMgr.onFcLogout( player.getCharacterId() );
 }
 
 void PlayerMgr::onDeath( Entity::Player& player )

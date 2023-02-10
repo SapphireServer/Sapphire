@@ -57,6 +57,7 @@ class PlayerMgr
     void onHateListChanged( Sapphire::Entity::Player& player );
 
     void onLogin( Sapphire::Entity::Player& player );
+    void onLogout( Sapphire::Entity::Player& player );
 
     void onDeath( Sapphire::Entity::Player& player );
 
