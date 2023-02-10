@@ -6,6 +6,7 @@
 #include "Action/ItemAction.h"
 #include "Action/EventItemAction.h"
 #include "Action/MountAction.h"
+#include "Action/ItemManipulationAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
@@ -43,6 +44,19 @@ void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actio
   }
 
   bootstrapAction( player, action, actionData );
+}
+
+void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t actionId,
+                                    Excel::ExcelStructPtr< Excel::Action > actionData, uint16_t sequence )
+{
+  auto action = Action::make_ItemManipulationAction( player.getAsPlayer(), actionId, sequence, actionData, 2500 ); // todo: maybe the delay can be retrieved from data
+
+  player.setCurrentAction( action );
+
+  if( !action->init() )
+    return;
+
+  action->start();
 }
 
 void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
