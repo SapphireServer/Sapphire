@@ -6,14 +6,20 @@
 
 #include <WorldServer.h>
 #include <Logging/Logger.h>
+#include <Exd/ExdData.h>
 
 #include "Task/MoveTerritoryTask.h"
 #include "Task/WarpTask.h"
+
 #include <Network/CommonActorControl.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
+#include <Network/PacketWrappers/ActorControlPacket.h>
+
+#include <Manager/PlayerMgr.h>
+
 #include "Territory/Territory.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
-#include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Actor/Player.h"
+#include <Territory/InstanceObjectCache.h>
 
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::World;
@@ -42,7 +48,7 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
 
   player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, pTeri->getTerritoryTypeId() ), true );
   player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );
-  player.setStateFlag( PlayerStateFlag::BetweenAreas );
+  Common::Service< PlayerMgr >::ref().onSetStateFlag( player, PlayerStateFlag::BetweenAreas );
 
   auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
   moveTerritoryPacket->data().index = -1;
@@ -59,6 +65,17 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
   // create warp task
   auto& taskMgr = Common::Service< TaskMgr >::ref();
   taskMgr.queueTask( makeMoveTerritoryTask( player, warpType, targetTerritoryId, targetPos, targetRot, 2000 ) );
+}
+
+void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
+{
+  m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
+
+  player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, 0, player.getTerritoryTypeId(), 1 ), true );
+  player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );
+
+  auto& taskMgr = Common::Service< TaskMgr >::ref();
+  taskMgr.queueTask( makeWarpTask( player, warpType, targetPos, targetRot, 1000 ) );
 }
 
 void WarpMgr::finishWarp( Entity::Player& player )
@@ -85,7 +102,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
   auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, 0, 0, 0 );
   auto SetStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
-  player.setZoningType( Common::ZoneingType::None );
+  player.setZoningType( Common::ZoningType::None );
 
   if( !player.getGmInvis() )
     player.sendToInRangeSet( zoneInPacket );
@@ -99,13 +116,73 @@ void WarpMgr::finishWarp( Entity::Player& player )
 
 }
 
-void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
+void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteId, uint8_t teleportType )
 {
-  m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, 0, player.getTerritoryTypeId(), 1 ), true );
-  player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );
+  auto aetherData = exdData.getRow< Excel::Aetheryte >( aetheryteId );
 
-  auto& taskMgr = Common::Service< TaskMgr >::ref();
-  taskMgr.queueTask( makeWarpTask( player, warpType, targetPos, targetRot, 1000 ) );
+  if( !aetherData )
+    return;
+
+  const auto& data = aetherData->data();
+
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+  auto pop = instanceObjectCache.getPopRangeInfo( data.PopRange[ 0 ] );
+
+  Common::FFXIVARR_POSITION3 pos{ 0.f, 0.f, 0.f };
+
+  float rot = 0.f;
+
+  if( pop )
+  {
+    PlayerMgr::sendDebug( player, "Teleport: popRange {0} found!", data.PopRange[ 0 ] );
+    pos = pop->m_pos;
+    rot = pop->m_rotation;
+  }
+  else
+  {
+    PlayerMgr::sendDebug( player, "Teleport: popRange {0} not found in {1}!", data.PopRange[ 0 ], data.TerritoryType );
+  }
+
+  auto townPlace = exdData.getRow< Excel::PlaceName >( data.TelepoName );
+  auto aetherytePlace = exdData.getRow< Excel::PlaceName >( data.TransferName );
+
+  PlayerMgr::sendDebug( player, "Teleport: {0} - {1} ({2})",
+                           townPlace->getString( townPlace->data().Text.SGL ),
+                           aetherytePlace->getString( aetherytePlace->data().Text.SGL ),
+                           data.TerritoryType );
+
+  // if it is a teleport in the same zone, we want to do warp instead of moveTerri
+  bool sameTerritory = player.getTerritoryTypeId() == data.TerritoryType;
+
+  WarpType warpType = WarpType::WARP_TYPE_NORMAL;
+  // TODO: should teleport type be a separate enum?
+  if( teleportType == 1 || teleportType == 2 ) // teleport
+  {
+    warpType = WarpType::WARP_TYPE_TELEPO;
+    player.setZoningType( Common::ZoningType::Teleport );
+  }
+  else if( teleportType == 3 ) // return
+  {
+    warpType = WarpType::WARP_TYPE_HOME_POINT;
+    player.setZoningType( Common::ZoningType::Return );
+  }
+  else if( teleportType == 4 ) // return
+  {
+    warpType = WarpType::WARP_TYPE_HOME_POINT;
+    player.setZoningType( Common::ZoningType::ReturnDead );
+  }
+
+  if( sameTerritory )
+    warpMgr.requestWarp( player, warpType, pos, rot );
+  else
+  {
+    auto pTeri = teriMgr.getZoneByTerritoryTypeId( data.TerritoryType );
+    if( !pTeri )
+      return;
+    warpMgr.requestMoveTerritory( player, warpType, pTeri->getGuId(), pos, rot );
+  }
 }

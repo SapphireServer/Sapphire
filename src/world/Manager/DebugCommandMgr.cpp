@@ -217,7 +217,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     int32_t aetheryteId;
     sscanf( params.c_str(), "%i", &aetheryteId );
 
-    player.teleport( static_cast< uint16_t >( aetheryteId ) );
+    Common::Service< WarpMgr >::ref().requestPlayerTeleport( player, static_cast< uint16_t >( aetheryteId ), 1 );
   }
   else if( ( subCommand == "discovery" ) && ( !params.empty() ) )
   {

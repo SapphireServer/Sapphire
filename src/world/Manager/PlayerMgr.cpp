@@ -231,12 +231,28 @@ void PlayerMgr::onChangeGear( Entity::Player& player )
 void PlayerMgr::onGcUpdate( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+
   auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
   gcAffPacket->data().ActiveCompanyId = player.getGc();
   gcAffPacket->data().MaelstromRank = player.getGcRankArray()[ 0 ];
   gcAffPacket->data().TwinAdderRank = player.getGcRankArray()[ 1 ];
   gcAffPacket->data().ImmortalFlamesRank = player.getGcRankArray()[ 2 ];
+
   server.queueForPlayer( player.getCharacterId(), gcAffPacket );
+}
+
+void PlayerMgr::onSetGc( Entity::Player& player, uint8_t gc )
+{
+  player.setGc( gc );
+
+  onGcUpdate( player );
+}
+
+void PlayerMgr::onSetGcRank( Entity::Player& player, uint8_t gc, uint8_t rank )
+{
+  player.setGcRankAt( gc, rank );
+
+  onGcUpdate( player );
 }
 
 void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
@@ -326,13 +342,13 @@ void PlayerMgr::onHateListChanged( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
 }
 
-void PlayerMgr::onChangeClass( Entity::Player &player )
+void PlayerMgr::onChangeClass( Entity::Player& player )
 {
   player.sendToInRangeSet( makeActorControl( player.getId(), ClassJobChange, 0x04 ), true );
-  player.sendStatusUpdate();
+  onPlayerHpMpTpChanged( player );
 }
 
-void PlayerMgr::onLogin( Entity::Player &player )
+void PlayerMgr::onLogin( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -346,7 +362,7 @@ void PlayerMgr::onLogin( Entity::Player &player )
   }
 }
 
-void PlayerMgr::onDeath( Entity::Player &player )
+void PlayerMgr::onDeath( Entity::Player& player )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onPlayerDeath( player );

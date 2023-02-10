@@ -44,6 +44,10 @@ class PlayerMgr
 
     void onGcUpdate( Sapphire::Entity::Player& player );
 
+    void onSetGc( Sapphire::Entity::Player& player, uint8_t gc );
+
+    void onSetGcRank( Sapphire::Entity::Player& player, uint8_t gc, uint8_t rank );
+
     void onCompanionUpdate( Entity::Player& player, uint8_t companionId );
 
     void onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId );

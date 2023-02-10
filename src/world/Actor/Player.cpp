@@ -70,7 +70,7 @@ Player::Player() :
   m_lastActionTick( 0 ),
   m_bInCombat( false ),
   m_bLoadingComplete( false ),
-  m_zoningType( Common::ZoneingType::None ),
+  m_zoningType( Common::ZoningType::None ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
   m_mount( 0 ),
@@ -403,72 +403,6 @@ void Player::sendStats()
   Service< World::Manager::PlayerMgr >::ref().onSendStats( *this );
 }
 
-void Player::teleport( uint16_t aetheryteId, uint8_t type )
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-
-  auto aetherData = exdData.getRow< Excel::Aetheryte >( aetheryteId );
-
-  if( !aetherData )
-    return;
-
-  const auto& data = aetherData->data();
-
-  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-  auto pop = instanceObjectCache.getPopRangeInfo( data.PopRange[ 0 ] );
-
-  Common::FFXIVARR_POSITION3 pos{ 0.f, 0.f, 0.f };
-
-  float rot = 0.f;
-
-  if( pop )
-  {
-    PlayerMgr::sendDebug( *this, "Teleport: popRange {0} found!", data.PopRange[ 0 ] );
-    pos = pop->m_pos;
-    rot = pop->m_rotation;
-  }
-  else
-  {
-    PlayerMgr::sendDebug( *this, "Teleport: popRange {0} not found in {1}!", data.PopRange[ 0 ], data.TerritoryType );
-  }
-
-  auto townPlace = exdData.getRow< Excel::PlaceName >( data.TelepoName );
-  auto aetherytePlace = exdData.getRow< Excel::PlaceName >( data.TransferName );
-
-  PlayerMgr::sendDebug( *this, "Teleport: {0} - {1} ({2})",
-                           townPlace->getString( townPlace->data().Text.SGL ),
-                           aetherytePlace->getString( aetherytePlace->data().Text.SGL ),
-                           data.TerritoryType );
-
-  // if it is a teleport in the same zone, we want to do warp instead of moveTerri
-  bool sameTerritory = getTerritoryTypeId() == data.TerritoryType;
-
-  WarpType warpType = WarpType::WARP_TYPE_NORMAL;
-  // TODO: this should be simplified and a type created in server_common/common.h.
-  if( type == 1 || type == 2 ) // teleport
-  {
-    warpType = WarpType::WARP_TYPE_TELEPO;
-    setZoningType( Common::ZoneingType::Teleport );
-  }
-  else if( type == 3 ) // return
-  {
-    warpType = WarpType::WARP_TYPE_HOME_POINT;
-    setZoningType( Common::ZoneingType::Return );
-  }
-
-  if( sameTerritory )
-    warpMgr.requestWarp( *this, warpType, pos, rot );
-  else
-  {
-    auto pTeri = teriMgr.getZoneByTerritoryTypeId( data.TerritoryType );
-    if( !pTeri )
-      return;
-    warpMgr.requestMoveTerritory( *this, warpType, pTeri->getGuId(), pos, rot );
-  }
-}
-
 void Player::forceZoneing( uint32_t zoneId )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -733,6 +667,7 @@ void Player::levelUp()
 
 void Player::sendStatusUpdate()
 {
+  // todo: overrides are funky
   Service< World::Manager::PlayerMgr >::ref().onPlayerHpMpTpChanged( *this );
 }
 
@@ -924,15 +859,11 @@ void Player::setVoiceId( uint8_t voiceId )
 void Player::setGc( uint8_t gc )
 {
   m_gc = gc;
-
-  Service< World::Manager::PlayerMgr >::ref().onGcUpdate( *this );
 }
 
 void Player::setGcRankAt( uint8_t index, uint8_t rank )
 {
   m_gcRank[ index ] = rank;
-
-  Service< World::Manager::PlayerMgr >::ref().onGcUpdate( *this );
 }
 
 const Player::StateFlags& Player::getStateFlags() const
@@ -1134,12 +1065,12 @@ void Player::setLoadingComplete( bool bComplete )
   m_bLoadingComplete = bComplete;
 }
 
-ZoneingType Player::getZoningType() const
+ZoningType Player::getZoningType() const
 {
   return m_zoningType;
 }
 
-void Player::setZoningType( Common::ZoneingType zoneingType )
+void Player::setZoningType( Common::ZoningType zoneingType )
 {
   m_zoningType = zoneingType;
 }
@@ -1552,7 +1483,8 @@ void Player::dyeItemFromDyeingInfo()
   uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
   uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
 
-  sendStateFlags(); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+  Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+
   auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
   auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
 

@@ -583,14 +583,15 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::REVIVE: // return dead / accept raise
     {
+      auto& warpMgr = Service< WarpMgr >::ref();
       switch( static_cast < ResurrectType >( param1 ) )
       {
         case ResurrectType::RaiseSpell:
           // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
-          player.teleport( player.getHomepoint(), 3 );
+          warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 5 );
           break;
         case ResurrectType::Return:
-          player.teleport( player.getHomepoint(), 3 );
+          warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 4 );
           break;
         default:
           break;

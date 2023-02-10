@@ -347,9 +347,6 @@ namespace Sapphire::Entity
 
     uint64_t getFullOnlineStatusMask() const;
 
-    /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
-    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
-
     /*! query teleport of a specified type */
     void teleportQuery( uint16_t aetheryteId );
 
@@ -574,9 +571,6 @@ namespace Sapphire::Entity
     /*! send current models ( equipment ) */
     void sendModel();
 
-    /*! send active state flags */
-    void sendStateFlags( bool updateInRange = true );
-
     /*! send status update */
     void sendStatusUpdate() override;
 
@@ -589,9 +583,9 @@ namespace Sapphire::Entity
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
 
-    Common::ZoneingType getZoningType() const;
+    Common::ZoningType getZoningType() const;
 
-    void setZoningType( Common::ZoneingType zoneingType );
+    void setZoningType( Common::ZoningType zoneingType );
 
     void setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const char* searchMessage );
 
@@ -926,7 +920,7 @@ namespace Sapphire::Entity
 
     bool m_bIsConnected;
 
-    Common::ZoneingType m_zoningType;
+    Common::ZoningType m_zoningType;
 
     bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;

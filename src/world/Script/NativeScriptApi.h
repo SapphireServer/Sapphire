@@ -138,6 +138,11 @@ namespace Sapphire::ScriptAPI
     virtual void onExecute( Sapphire::World::Action::Action& action );
 
     virtual void onInterrupt( Sapphire::World::Action::Action& action );
+
+    World::Manager::WarpMgr& warpMgr()
+    {
+      return Common::Service< World::Manager::WarpMgr >::ref();
+    }
   };
 
   /*!
