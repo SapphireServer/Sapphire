@@ -139,15 +139,16 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
 
   auto vitMod = player.getBonusStat( Common::BaseParam::Vitality );
   float baseStat = calculateBaseStat( player );
-  uint16_t vitStat = static_cast< uint16_t >( player.getStatValue( Common::BaseParam::Vitality ) ) + static_cast< uint16_t >( vitMod );
+  auto baseParamVit = player.getStatValue( Common::BaseParam::Vitality );
+  auto vitStat = player.getStatValue( Common::BaseParam::Vitality ) + vitMod;
   uint16_t hpMod = paramGrowthInfo->data().ParamBase;
   uint16_t jobModHp = classInfo->data().Hp;
   float approxBaseHp = 0.0f; // Read above
 
   approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
-  uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
-                                             floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+  auto result = static_cast< uint32_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+                                         floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
   return result;
 }
@@ -176,7 +177,7 @@ uint32_t CalcStats::calculateMaxHp( Chara& chara )
 
   approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
-  uint16_t result = static_cast< uint16_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
+  auto result = static_cast< uint32_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
                                              floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
 
   return result;

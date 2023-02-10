@@ -16,26 +16,27 @@ public:
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    auto player = action.getSourceChara()->getAsPlayer();
+    auto pPlayer = action.getSourceChara()->getAsPlayer();
 
-    if( !player )
+    if( !pPlayer )
       return;
 
-    auto teleportQuery = player->getTeleportQuery();
+    auto teleportQuery = pPlayer->getTeleportQuery();
 
-    if( player->getCurrency( Common::CurrencyType::Gil ) < teleportQuery.cost ||
+    if( pPlayer->getCurrency( Common::CurrencyType::Gil ) < teleportQuery.cost ||
         teleportQuery.targetAetheryte == 0 )
     {
       action.interrupt();
       return;
     }
 
-    player->removeCurrency( Common::CurrencyType::Gil, teleportQuery.cost );
+    pPlayer->removeCurrency( Common::CurrencyType::Gil, teleportQuery.cost );
 
-    player->setZoningType( Common::ZoneingType::Teleport );
-    player->teleport( teleportQuery.targetAetheryte );
+    pPlayer->setZoningType( Common::ZoningType::Teleport );
 
-    player->clearTeleportQuery();
+    warpMgr().requestPlayerTeleport( *pPlayer, teleportQuery.targetAetheryte, 1 );
+
+    pPlayer->clearTeleportQuery();
   }
 };
 

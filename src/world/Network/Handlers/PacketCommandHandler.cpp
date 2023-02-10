@@ -460,17 +460,17 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::CANCEL_MOUNT:
     {
-      player.setMount( 0 );
+      Service< World::Manager::PlayerMgr >::ref().onMountUpdate( player, 0 );
       break;
     }
     case PacketCommand::COMPANION:
     {
-      player.setCompanion( static_cast< uint8_t >( param1 ) );
+      Common::Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( player, static_cast< uint8_t >( param1 ) );
       break;
     }
     case PacketCommand::COMPANION_CANCEL:
     {
-      player.setCompanion( 0 );
+      Common::Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( player, 0 );
       break;
     }
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)
@@ -585,14 +585,15 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::REVIVE: // return dead / accept raise
     {
+      auto& warpMgr = Service< WarpMgr >::ref();
       switch( static_cast < ResurrectType >( param1 ) )
       {
         case ResurrectType::RaiseSpell:
           // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
-          player.teleport( player.getHomepoint(), 3 );
+          warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 5 );
           break;
         case ResurrectType::Return:
-          player.teleport( player.getHomepoint(), 3 );
+          warpMgr.requestPlayerTeleport( player, player.getHomepoint(), 4 );
           break;
         default:
           break;

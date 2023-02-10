@@ -2,6 +2,8 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 #include <Action/Action.h>
+#include <Manager/PlayerMgr.h>
+#include <Service.h>
 
 class ActionReturn6 :
   public Sapphire::ScriptAPI::ActionScript
@@ -17,7 +19,9 @@ public:
     if( !action.getSourceChara()->isPlayer() )
       return;
 
-    action.getSourceChara()->getAsPlayer()->teleport( action.getSourceChara()->getAsPlayer()->getHomepoint(), 3 );
+    auto pPlayer = action.getSourceChara()->getAsPlayer();
+
+    warpMgr().requestPlayerTeleport( *pPlayer, pPlayer->getHomepoint(), 3 );
   }
 };
 

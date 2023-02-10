@@ -44,6 +44,10 @@ class PlayerMgr
 
     void onGcUpdate( Sapphire::Entity::Player& player );
 
+    void onSetGc( Sapphire::Entity::Player& player, uint8_t gc );
+
+    void onSetGcRank( Sapphire::Entity::Player& player, uint8_t gc, uint8_t rank );
+
     void onCompanionUpdate( Entity::Player& player, uint8_t companionId );
 
     void onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId );
@@ -57,6 +61,12 @@ class PlayerMgr
     void onDeath( Sapphire::Entity::Player& player );
 
     void onZone( Sapphire::Entity::Player& player );
+
+    void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
+
+    void onSetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag );
+
+    void onUnsetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag );
 
     //////////// Helpers
 

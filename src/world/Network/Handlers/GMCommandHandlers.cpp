@@ -327,14 +327,14 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         if( param2 == 0 )
         {
           for( uint8_t i = 0; i < 255; i++ )
-            targetActor->getAsPlayer()->learnSong( i, 0 );
+            Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *targetPlayer, i, 0 );
 
-          PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName());
+          PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName() );
         }
         else
         {
-          targetActor->getAsPlayer()->learnSong( static_cast< uint8_t >( param2 ), 0 );
-          PlayerMgr::sendServerNotice( player, "Song {0} for {1} was turned on.", param2, targetPlayer->getName());
+          Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *targetPlayer, static_cast< uint8_t >( param2 ), 0 );
+          PlayerMgr::sendServerNotice( player, "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
 
@@ -417,7 +417,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         return;
       }
 
-      targetPlayer->setGc( static_cast< uint8_t >( param1 ) );
+      Service< World::Manager::PlayerMgr >::ref().onSetGc( player, static_cast< uint8_t >( param1 ) );
 
       // if we're changing them to a GC, check if they have a rank and if not, set it to the lowest rank
       if( param1 > 0 )
@@ -442,7 +442,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         return;
       }
 
-      targetPlayer->setGcRankAt( static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
+      Service< World::Manager::PlayerMgr >::ref().onSetGcRank( player, static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
       PlayerMgr::sendServerNotice( player, "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
                                targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
@@ -533,7 +533,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         }
         if( doTeleport )
         {
-          player.teleport( teleport );
+          warpMgr.requestPlayerTeleport( player, teleport, 1 );
         }
         else
         {

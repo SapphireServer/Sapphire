@@ -7,7 +7,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
-  * @brief The Ping response packet.
+  * @brief HUD stats packet.
   */
   class HudParamPacket : public ZoneChannelPacket< FFXIVIpcHudParam >
   {

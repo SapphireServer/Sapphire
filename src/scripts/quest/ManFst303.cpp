@@ -101,8 +101,8 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.setGc( OrderOfTwinAdder );
-    player.setGcRankAt( OrderOfTwinAdder, 1 );
+    playerMgr().onSetGc( player, OrderOfTwinAdder );
+    playerMgr().onSetGcRank( player, OrderOfTwinAdder, 1 );
     Scene00002( quest, player );
   }
 
