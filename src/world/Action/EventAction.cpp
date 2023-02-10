@@ -4,9 +4,12 @@
 #include <Exd/Structs.h>
 #include <Network/CommonActorControl.h>
 
+#include <Manager/PlayerMgr.h>
+#include <Manager/EventMgr.h>
 
-#include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include <Network/PacketWrappers/ActorControlPacket.h>
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
+#include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
 
@@ -14,7 +17,6 @@
 #include "WorldServer.h"
 #include "Session.h"
 #include "Network/GameConnection.h"
-#include "Manager/EventMgr.h"
 
 #include "EventAction.h"
 
@@ -54,9 +56,11 @@ void Action::EventAction::start()
 
   if( m_pSource->isPlayer() )
   {
+    auto pPlayer = m_pSource->getAsPlayer();
+
     m_pSource->sendToInRangeSet( control, true );
-    if( m_pSource->getAsPlayer()->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
-      m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::InNpcEvent );
+    if( pPlayer->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
+      Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::InNpcEvent );
   }
   else
     m_pSource->sendToInRangeSet( control );

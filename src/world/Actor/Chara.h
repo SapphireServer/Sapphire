@@ -27,8 +27,8 @@ namespace Sapphire::Entity
 
     using ActorStatsArray = std::array< uint32_t, STAT_ARRAY_SIZE >;
 
-    ActorStatsArray m_baseStats;
-    ActorStatsArray m_bonusStats;
+    ActorStatsArray m_baseStats{ 0 };
+    ActorStatsArray m_bonusStats{ 0 };
 
   protected:
     char m_name[34];

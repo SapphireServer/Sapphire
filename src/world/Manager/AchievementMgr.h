@@ -132,7 +132,7 @@ namespace Sapphire::World::Manager
       if( !pAchv )
         continue;
 
-      auto achvExdData = pAchv->data();
+      auto& achvExdData = pAchv->data();
 
       if( achvExdData.ConditionArg[ 1 ] <= static_cast< int32_t >( achvData.progressData[ dataKey.u32 ] ) )
         unlockAchievement( player, achvId );

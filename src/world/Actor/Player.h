@@ -83,6 +83,10 @@ namespace Sapphire::Entity
     /*! Event called on every session iteration */
     void update( uint64_t tickCount ) override;
 
+    /*! get last attack tick for player */
+    uint64_t getLastAttack() const;
+
+    /*! set last attack tick for player */
     void setLastAttack( uint64_t tickCount );
 
     // Quest
@@ -343,9 +347,6 @@ namespace Sapphire::Entity
 
     uint64_t getFullOnlineStatusMask() const;
 
-    /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
-    void teleport( uint16_t aetheryteId, uint8_t type = 1 );
-
     /*! query teleport of a specified type */
     void teleportQuery( uint16_t aetheryteId );
 
@@ -418,7 +419,7 @@ namespace Sapphire::Entity
     /*! check if aetheryte is already registered */
     bool isAetheryteRegistered( uint8_t aetheryteId ) const;
 
-    /*! return a const pointer to the aetheryte unlock bitmask array */
+    /*! return aetheryte mask */
     uint8_t getAetheryteMaskAt( uint8_t index ) const;
 
     /*! return a pointer to the aetheryte unlock bitmask array */
@@ -433,13 +434,13 @@ namespace Sapphire::Entity
     /*! discover subarea subid fo map map_id, also send udpate packet */
     void discover( int16_t map_id, int16_t sub_id );
 
-    /*! return a pointer to the discovery bitmask array */
+    /*! return a reference to the discovery bitmask array */
     Discovery& getDiscoveryBitmask();
 
     /*! helper/debug function to reset all discovered areas */
     void resetDiscovery();
 
-    /*! get a pointer to the howto bitmask array */
+    /*! get a reference to the howto bitmask array */
     HowToList& getHowToArray();
 
     /*! update bitmask for how-to's seen */
@@ -454,11 +455,14 @@ namespace Sapphire::Entity
     /*! check if an action is already unlocked in the bitmask. */
     bool hasReward( Common::UnlockEntry unlockId ) const;
 
-    /*! return a const pointer to the unlock bitmask array */
+    /*! return a const reference to the unlock bitmask array */
     const UnlockList& getUnlockBitmask() const;
 
-    /*! return a const pointer to the orchestrion bitmask array */
+    /*! return a const reference to the orchestrion bitmask array */
     const OrchestrionList& getOrchestrionBitmask() const;
+
+    /*! set orchestrion bitmask array */
+    void setOrchestrionBitmask( const OrchestrionList& orchestrion );
 
     /*! unlock a mount */
     void unlockMount( uint32_t mountId );
@@ -466,10 +470,10 @@ namespace Sapphire::Entity
     /*! unlock a companion */
     void unlockCompanion( uint32_t companionId );
 
-    /*! return a const pointer to the minion guide bitmask array */
+    /*! return a reference to the minion guide bitmask array */
     MinionList& getMinionGuideBitmask();
 
-    /*! return a const pointer to the setMount guide bitmask array */
+    /*! return a reference to the setMount guide bitmask array */
     MountList& getMountGuideBitmask();
 
     bool checkAction() override;
@@ -567,9 +571,6 @@ namespace Sapphire::Entity
     /*! send current models ( equipment ) */
     void sendModel();
 
-    /*! send active state flags */
-    void sendStateFlags( bool updateInRange = true );
-
     /*! send status update */
     void sendStatusUpdate() override;
 
@@ -582,9 +583,9 @@ namespace Sapphire::Entity
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
 
-    Common::ZoneingType getZoningType() const;
+    Common::ZoningType getZoningType() const;
 
-    void setZoningType( Common::ZoneingType zoneingType );
+    void setZoningType( Common::ZoningType zoneingType );
 
     void setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const char* searchMessage );
 
@@ -722,6 +723,8 @@ namespace Sapphire::Entity
 
     ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
 
+    bool removeItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false );
+
     void moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
 
     void swapItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
@@ -739,6 +742,10 @@ namespace Sapphire::Entity
 
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();
+
+
+    /*! calculate bonus stats from gear */
+    void calculateBonusStats();
 
     ItemPtr getEquippedWeapon();
 
@@ -919,7 +926,7 @@ namespace Sapphire::Entity
 
     bool m_bIsConnected;
 
-    Common::ZoneingType m_zoningType;
+    Common::ZoningType m_zoningType;
 
     bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;

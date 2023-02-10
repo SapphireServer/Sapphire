@@ -396,7 +396,7 @@ private:
   {
     eventMgr().sendEventNotice( player, getId(), 3, 0 );
     quest.setSeq( Seq5 );
-    player.setMount( Mount0 );
+    playerMgr().onMountUpdate( player, Mount0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -490,7 +490,7 @@ private:
 
   void Scene00017Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.setMount( Mount0 );
+    playerMgr().onMountUpdate( player, Mount0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -562,7 +562,7 @@ private:
 
   void Scene00023Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.setMount( Mount0 );
+    playerMgr().onMountUpdate( player, Mount0 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -611,7 +611,7 @@ private:
     {
       eventMgr().sendEventNotice( player, getId(), 6, 0 );
       quest.setSeq( Seq8 );
-      player.setMount( 0 );
+      playerMgr().onMountUpdate( player, 0 );
     }
   }
 
@@ -646,7 +646,7 @@ private:
 
   void Scene00030Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.setMount( Mount0 );
+    playerMgr().onMountUpdate( player, Mount0 );
   }
 
   //////////////////////////////////////////////////////////////////////

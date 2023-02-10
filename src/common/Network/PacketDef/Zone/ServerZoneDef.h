@@ -1145,6 +1145,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     ZoneProtoDownNormalItem item;
   };
 
+  struct FFXIVIpcUpdateItem : FFXIVIpcBasePacket< UpdateItem >
+  {
+    uint32_t contextId;
+    ZoneProtoDownNormalItem item;
+  };
+
   struct FFXIVIpcItemSize : FFXIVIpcBasePacket< ItemSize >
   {
     uint32_t contextId;

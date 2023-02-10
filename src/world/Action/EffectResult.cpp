@@ -2,6 +2,9 @@
 
 #include <Util/Util.h>
 
+#include <Service.h>
+#include <Manager/PlayerMgr.h>
+
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
 
@@ -133,7 +136,7 @@ void EffectResult::execute()
     case Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT:
     {
       auto pPlayer = m_target->getAsPlayer();
-      pPlayer->setMount( m_value );
+      Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *pPlayer, m_value );
       break;
     }
 

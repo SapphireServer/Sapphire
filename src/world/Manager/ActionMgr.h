@@ -22,6 +22,9 @@ namespace Sapphire::World::Manager
 
     bool cacheActionLut();
 
+    void handleItemManipulationAction( Entity::Player& player, uint32_t actionId,
+                             Excel::ExcelStructPtr< Excel::Action > actionData, uint16_t sequence );
+
     void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
                                      std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t sequence );
     void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,

@@ -224,16 +224,6 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
 
   updateModels( equipSlotId, item );
 
-  auto baseParams = item.getBaseParams();
-  for( auto i = 0; i < 6; ++i )
-  {
-    if( baseParams[ i ].baseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
-      m_bonusStats[ baseParams[ i ].baseParam ] += baseParams[ i ].value;
-  }
-
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] += item.getDefense();
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] += item.getDefenseMag();
-
   calculateStats();
   if( sendUpdate )
   {
@@ -253,16 +243,6 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
   if ( equipSlotId == SoulCrystal )
     unequipSoulCrystal();
-
-  auto baseParams = item.getBaseParams();
-  for( auto i = 0; i < 6; ++i )
-  {
-    if( baseParams[ i ].baseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
-      m_bonusStats[ baseParams[ i ].baseParam ] -= baseParams[ i ].value;
-  }
-
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] -= item.getDefense();
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] -= item.getDefenseMag();
 
   calculateStats();
 
@@ -720,6 +700,54 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
   return item;
 }
 
+bool Sapphire::Entity::Player::removeItem( uint32_t catalogId, uint32_t quantity, bool isHq )
+{
+  std::vector< uint16_t > bags = { Bag0, Bag1, Bag2, Bag3 };
+
+  for( auto bag : bags )
+  {
+    auto storage = m_storageMap[ bag ];
+
+    for( uint16_t slot = 0; slot < storage->getMaxSize(); slot++ )
+    {
+      if( quantity == 0 )
+        break;
+
+      auto item = storage->getItem( slot );
+
+      // remove any matching items
+      if( item && item->getId() == catalogId )
+      {
+        uint32_t count = item->getStackSize();
+        uint32_t maxStack = item->getMaxStackSize();
+
+        // check slot is same quality
+        if( item->isHq() != isHq )
+          continue;
+
+        // update stack
+        int32_t newStackSize = count - quantity;
+        if( newStackSize <= 0 )
+        {
+          quantity = std::abs( newStackSize );
+          discardItem( bag, slot );
+        }
+        else
+        {
+          quantity = 0;
+          item->setStackSize( newStackSize );
+          
+          insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( bag ), slot, item );
+
+          writeItem( item );          
+        }
+      }
+    }
+  }
+
+  return quantity == 0;
+}
+
 void
 Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot )
 {
@@ -950,6 +978,38 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
   m_itemLevel = ilvl;
   return ilvl;
 }
+
+void Sapphire::Entity::Player::calculateBonusStats()
+{
+  m_bonusStats.fill( 0 );
+
+  auto gearSetMap = m_storageMap[ GearSet0 ]->getItemMap();
+
+  auto it = gearSetMap.begin();
+
+  while( it != gearSetMap.end() )
+  {
+    auto pItem = it->second;
+
+    if( pItem && pItem->getCategory() != Common::ItemUICategory::SoulCrystal )
+    {
+      auto baseParams = pItem->getBaseParams();
+      for( auto i = 0; i < 6; ++i )
+      {
+        auto itemBaseParam = baseParams[ i ].baseParam;
+        auto itemBaseVal = baseParams[ i ].value;
+        if( itemBaseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
+          m_bonusStats[ itemBaseParam ] += itemBaseVal;
+      }
+
+      m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] += pItem->getDefense();
+      m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] += pItem->getDefenseMag();
+    }
+
+    it++;
+  }
+}
+
 
 Sapphire::ItemPtr Sapphire::Entity::Player::getEquippedWeapon()
 {

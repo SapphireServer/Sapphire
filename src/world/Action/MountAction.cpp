@@ -2,17 +2,19 @@
 
 #include <Exd/ExdData.h>
 
-#include "Actor/Player.h"
+#include <Actor/Player.h>
 
+#include <Manager/PlayerMgr.h>
+
+#include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include <Network/PacketWrappers/ActorControlSelfPacket.h>
 
 #include <Service.h>
 #include <Util/UtilMath.h>
 
 #include "WorldServer.h"
 #include "Session.h"
-#include "Network/GameConnection.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
@@ -59,20 +61,19 @@ void MountAction::start()
 
   m_pSource->sendToInRangeSet( castPacket, true );
 
-  player->setStateFlag( Common::PlayerStateFlag::Casting );
+  Common::Service< World::Manager::PlayerMgr >::ref().onSetStateFlag( *player, Common::PlayerStateFlag::Casting );
 
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), actionStartPkt );
-
 }
 
 void MountAction::execute()
 {
   assert( m_pSource );
 
-  m_pSource->getAsPlayer()->unsetStateFlag( Common::PlayerStateFlag::Casting );
+  Common::Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *m_pSource->getAsPlayer(), Common::PlayerStateFlag::Casting );
   m_effectBuilder->mount( m_pSource, m_mountId );
   m_effectBuilder->buildAndSendPackets( { m_pSource } );
 }
