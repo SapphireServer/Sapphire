@@ -670,8 +670,6 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
   Util::valueToFlagByteIndexValue( songId, value, index );
 
   m_orchestrion[ index ] |= value;
-
-  Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *this, songId, itemId );
 }
 
 bool Player::hasReward( Common::UnlockEntry unlockId ) const
@@ -955,7 +953,6 @@ bool Player::hasStateFlag( Common::PlayerStateFlag flag ) const
 
 void Player::setStateFlag( Common::PlayerStateFlag flag )
 {
-  auto prevOnlineStatus = getOnlineStatus();
   auto iFlag = static_cast< int32_t >( flag );
 
   uint16_t index;
@@ -963,30 +960,12 @@ void Player::setStateFlag( Common::PlayerStateFlag flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_stateFlags[ index ] |= value;
-
-  auto newOnlineStatus = getOnlineStatus();
-  sendStateFlags( prevOnlineStatus != newOnlineStatus );
-}
-
-void Player::setStateFlags( std::vector< Common::PlayerStateFlag > flags )
-{
-  for( const auto& flag : flags )
-  {
-    setStateFlag( flag );
-  }
-}
-
-void Player::sendStateFlags( bool updateInRange )
-{
-  Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *this, updateInRange );
 }
 
 void Player::unsetStateFlag( Common::PlayerStateFlag flag )
 {
   if( !hasStateFlag( flag ) )
     return;
-
-  auto prevOnlineStatus = getOnlineStatus();
 
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -995,58 +974,19 @@ void Player::unsetStateFlag( Common::PlayerStateFlag flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_stateFlags[ index ] ^= value;
-  
-  auto newOnlineStatus = getOnlineStatus();
-  sendStateFlags( prevOnlineStatus != newOnlineStatus );
 }
 
 void Player::update( uint64_t tickCount )
 {
-  if( m_hp <= 0 && m_status != ActorStatus::Dead )
-  {
-    die();
-    Service< World::Manager::PlayerMgr >::ref().onDeath( *this );
-  }
-
-  if( !isAlive() )
-    return;
-
-  m_lastUpdate = tickCount;
-
-  if( !checkAction() )
-  {
-    if( m_targetId && m_currentStance == Common::Stance::Active && isAutoattackOn() )
-    {
-      auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-
-      // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-      for( const auto& actor : m_inRangeActor )
-      {
-        if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
-        {
-          auto chara = actor->getAsChara();
-
-          // default autoattack range
-          float range = 3.f + chara->getRadius() + getRadius() * 0.5f;
-
-          // default autoattack range for ranged classes
-          if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
-            range = 25.f + chara->getRadius() + getRadius() * 0.5f;
-
-          if( Util::distance( getPos(), actor->getPos() ) <= range )
-          {
-            if( ( tickCount - m_lastAttack ) > mainWeap->getDelay() )
-            {
-              m_lastAttack = tickCount;
-              autoAttack( actor->getAsChara() );
-            }
-          }
-        }
-      }
-    }
-  }
+  // todo: better way to handle this override chara update
+  Service< World::Manager::PlayerMgr >::ref().onUpdate( *this, tickCount );
 
   Chara::update( tickCount );
+}
+
+uint64_t Player::getLastAttack() const
+{
+  return m_lastAttack;
 }
 
 void Player::setLastAttack( uint64_t tickCount )
@@ -1110,6 +1050,11 @@ const Player::UnlockList& Player::getUnlockBitmask() const
 const Player::OrchestrionList& Player::getOrchestrionBitmask() const
 {
   return m_orchestrion;
+}
+
+void Player::setOrchestrionBitmask( const Player::OrchestrionList& orchestrion )
+{
+  m_orchestrion = orchestrion;
 }
 
 void Player::unlockMount( uint32_t mountId )
@@ -1373,21 +1318,11 @@ uint8_t Player::getEquipDisplayFlags() const
 void Player::setMount( uint32_t mountId )
 {
   m_mount = mountId;
-
-  Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *this, m_mount );
 }
 
 void Player::setCompanion( uint8_t id )
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  auto companion = exdData.getRow< Excel::Companion >( id );
-  if( !id )
-    return;
-
   m_companionId = id;
-
-  Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( *this, m_companionId );
 }
 
 uint8_t Player::getCurrentCompanion() const

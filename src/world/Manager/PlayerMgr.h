@@ -58,6 +58,12 @@ class PlayerMgr
 
     void onZone( Sapphire::Entity::Player& player );
 
+    void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
+
+    void onSetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag );
+
+    void onUnsetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag );
+
     //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

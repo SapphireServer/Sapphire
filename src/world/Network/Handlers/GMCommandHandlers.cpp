@@ -327,14 +327,14 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         if( param2 == 0 )
         {
           for( uint8_t i = 0; i < 255; i++ )
-            targetActor->getAsPlayer()->learnSong( i, 0 );
+            Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *targetPlayer, i, 0 );
 
-          PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName());
+          PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName() );
         }
         else
         {
-          targetActor->getAsPlayer()->learnSong( static_cast< uint8_t >( param2 ), 0 );
-          PlayerMgr::sendServerNotice( player, "Song {0} for {1} was turned on.", param2, targetPlayer->getName());
+          Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *targetPlayer, static_cast< uint8_t >( param2 ), 0 );
+          PlayerMgr::sendServerNotice( player, "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
 

@@ -13,8 +13,8 @@
 #include <Manager/HousingMgr.h>
 #include <Manager/FreeCompanyMgr.h>
 
-#include "Script/ScriptMgr.h"
-#include "WorldServer.h"
+#include <Script/ScriptMgr.h>
+#include <WorldServer.h>
 #include <Common.h>
 
 #include <Network/PacketContainer.h>
@@ -23,18 +23,22 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/PacketWrappers/ActorControlPacket.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
-#include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include "Network/PacketWrappers/InitZonePacket.h"
+#include <Network/PacketWrappers/ActorControlTargetPacket.h>
+#include <Network/PacketWrappers/InitZonePacket.h>
 #include <Network/PacketWrappers/ModelEquipPacket.h>
-#include "Network/PacketWrappers/PlayerSetupPacket.h"
+#include <Network/PacketWrappers/PlayerSetupPacket.h>
 #include <Network/PacketWrappers/PlayerStateFlagsPacket.h>
 #include <Network/PacketWrappers/UpdateHpMpTpPacket.h>
-#include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/ChatPacket.h"
-#include "Network/PacketWrappers/HudParamPacket.h"
+#include <Network/PacketWrappers/ServerNoticePacket.h>
+#include <Network/PacketWrappers/ChatPacket.h>
+#include <Network/PacketWrappers/HudParamPacket.h>
 
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
+
+#include <Inventory/Item.h>
+
+#include <Util/UtilMath.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
@@ -213,6 +217,8 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 
 void PlayerMgr::onUnlockOrchestrion( Entity::Player& player, uint8_t songId, uint32_t itemId )
 {
+  player.learnSong( songId, itemId );
+
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
@@ -235,11 +241,21 @@ void PlayerMgr::onGcUpdate( Entity::Player& player )
 
 void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
 {
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto companion = exdData.getRow< Excel::Companion >( companionId );
+  if( !companion )
+    return;
+
+  player.setCompanion( companionId );
+
   player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::ToggleCompanion, companionId ), true );
 }
 
 void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
 {
+  Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( player, mountId );
+
   if( mountId != 0 )
   {
     player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
@@ -425,6 +441,73 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
 
   fcMgr.onFcLogin( player.getCharacterId() );
 
+}
+
+void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
+{
+  if( player.getHp() <= 0 && player.getStatus() != Common::ActorStatus::Dead )
+  {
+    player.die();
+    onDeath( player );
+  }
+
+  if( !player.isAlive() )
+    return;
+
+  if( !player.checkAction() )
+  {
+    if( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() )
+    {
+      auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
+
+      // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
+      for( const auto& actor : player.getInRangeActors() )
+      {
+        if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() && mainWeap )
+        {
+          auto chara = actor->getAsChara();
+
+          // default autoattack range
+          float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+          // default autoattack range for ranged classes
+          auto classJob = player.getClass();
+
+          if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+            range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+          if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
+          {
+            if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
+            {
+              player.setLastAttack( tickCount );
+              player.autoAttack( actor->getAsChara() );
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+void PlayerMgr::onSetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag )
+{
+  auto prevOnlineStatus = player.getOnlineStatus();
+
+  player.setStateFlag( flag );
+
+  auto newOnlineStatus = player.getOnlineStatus();
+  onSendStateFlags( player, prevOnlineStatus != newOnlineStatus );
+}
+
+void PlayerMgr::onUnsetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag )
+{
+  auto prevOnlineStatus = player.getOnlineStatus();
+
+  player.unsetStateFlag( flag );
+
+  auto newOnlineStatus = player.getOnlineStatus();
+  onSendStateFlags( player, prevOnlineStatus != newOnlineStatus );
 }
 
 ////////// Helper ///////////
