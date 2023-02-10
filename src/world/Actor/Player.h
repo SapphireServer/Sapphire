@@ -741,6 +741,10 @@ namespace Sapphire::Entity
     /*! calculate and return player ilvl based off equipped gear */
     uint16_t calculateEquippedGearItemLevel();
 
+
+    /*! calculate bonus stats from gear */
+    void calculateBonusStats();
+
     ItemPtr getEquippedWeapon();
 
     /*! return the current amount of currency of type */

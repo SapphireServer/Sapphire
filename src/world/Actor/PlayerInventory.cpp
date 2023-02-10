@@ -224,18 +224,6 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
 
   updateModels( equipSlotId, item );
 
-  auto baseParams = item.getBaseParams();
-  for( auto i = 0; i < 6; ++i )
-  {
-    auto itemBaseParam = baseParams[ i ].baseParam;
-    auto itemBaseVal = baseParams[ i ].value;
-    if( itemBaseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
-      m_bonusStats[ itemBaseParam ] += itemBaseVal;
-  }
-
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] += item.getDefense();
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] += item.getDefenseMag();
-
   calculateStats();
   if( sendUpdate )
   {
@@ -255,18 +243,6 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
   if ( equipSlotId == SoulCrystal )
     unequipSoulCrystal();
-
-  auto baseParams = item.getBaseParams();
-  for( auto i = 0; i < 6; ++i )
-  {
-    auto itemBaseParam = baseParams[ i ].baseParam;
-    auto itemBaseVal = baseParams[ i ].value;
-    if( itemBaseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
-      m_bonusStats[ itemBaseParam ] -= itemBaseVal;
-  }
-
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] -= item.getDefense();
-  m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] -= item.getDefenseMag();
 
   calculateStats();
 
@@ -954,6 +930,38 @@ uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
   m_itemLevel = ilvl;
   return ilvl;
 }
+
+void Sapphire::Entity::Player::calculateBonusStats()
+{
+  m_bonusStats.fill( 0 );
+
+  auto gearSetMap = m_storageMap[ GearSet0 ]->getItemMap();
+
+  auto it = gearSetMap.begin();
+
+  while( it != gearSetMap.end() )
+  {
+    auto pItem = it->second;
+
+    if( pItem && pItem->getCategory() != Common::ItemUICategory::SoulCrystal )
+    {
+      auto baseParams = pItem->getBaseParams();
+      for( auto i = 0; i < 6; ++i )
+      {
+        auto itemBaseParam = baseParams[ i ].baseParam;
+        auto itemBaseVal = baseParams[ i ].value;
+        if( itemBaseParam != static_cast< uint8_t >( Common::BaseParam::None ) )
+          m_bonusStats[ itemBaseParam ] += itemBaseVal;
+      }
+
+      m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::Defense ) ] += pItem->getDefense();
+      m_bonusStats[ static_cast< uint8_t >( Common::BaseParam::MagicDefense ) ] += pItem->getDefenseMag();
+    }
+
+    it++;
+  }
+}
+
 
 Sapphire::ItemPtr Sapphire::Entity::Player::getEquippedWeapon()
 {

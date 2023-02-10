@@ -317,6 +317,8 @@ void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& stat
 
 void Player::calculateStats()
 {
+  calculateBonusStats();
+
   uint8_t tribe = getLookAt( Common::CharaLook::Tribe );
   uint8_t level = getLevel();
   auto job = static_cast< uint8_t >( getClass() );
