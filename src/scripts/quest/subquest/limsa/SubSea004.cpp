@@ -104,7 +104,6 @@ private:
         quest.setUI8CH( 1 );
       }
     }
-      
   }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
@@ -121,8 +120,6 @@ private:
     {
       Scene00001( quest, player );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -208,7 +205,6 @@ private:
     {
       player.finishQuest( getId() );
     }
-
   }
 
 };

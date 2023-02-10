@@ -90,8 +90,6 @@ class SubSea003 : public Sapphire::ScriptAPI::QuestScript
       quest.setUI8BH( 1 );
       quest.setSeq( Seq1 );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -131,12 +129,10 @@ class SubSea003 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId() );
     }
-
   }
 
 };
