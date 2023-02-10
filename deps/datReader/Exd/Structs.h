@@ -498,7 +498,7 @@ namespace Excel
     uint8_t CastTime;
     uint8_t CastTimeLine;
     uint8_t Timeline;
-    int8_t padding1[3];
+    uint8_t padding1[3];
   };
 
   struct EventItemCastTimeLine
