@@ -54,7 +54,7 @@ class SubSea003 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        if( !player.hasQuest( getId() ) )
+        if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
           Scene00003( quest, player );
