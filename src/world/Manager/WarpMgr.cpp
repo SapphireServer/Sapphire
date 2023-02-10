@@ -87,6 +87,8 @@ void WarpMgr::finishWarp( Entity::Player& player )
   if( it != m_entityIdToWarpInfoMap.end() )
     warpType = it->second.m_warpType;
 
+  uint32_t vfxType = 0; // seems to only be used for raise animation?
+
   switch( warpType )
   {
     case WarpType::WARP_TYPE_REISE:
@@ -97,13 +99,13 @@ void WarpMgr::finishWarp( Entity::Player& player )
         player.resetHp();
         player.resetMp();
         player.setStatus( Common::ActorStatus::Idle );
+        vfxType = 1;
       }
     }
   }
 
-  auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, 0, 0, 0 );
+  auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, vfxType, 0, 0 );
   auto setStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-
   player.setZoningType( Common::ZoningType::None );
 
   if( !player.getGmInvis() )

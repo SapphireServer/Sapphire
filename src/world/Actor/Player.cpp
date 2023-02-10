@@ -1797,7 +1797,7 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
     // if we've hit the breakpoint in fall damage (min: 10y)
     if( fallHeight >= 10.f )
     {
-      // calculate how much damage to deal out (max. 20y : 100%)
+      // calculate how much damage to deal out (max. 30y : 100%)
       float deltaMax = std::min( fallHeight, 30.f );
 
       // get hp percentage starting from 0.1, increasing to 100% at max height
