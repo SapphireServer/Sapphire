@@ -320,7 +320,7 @@ void Action::Action::start()
 
     if( player )
     {
-      player->setStateFlag( PlayerStateFlag::Casting );
+      Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *player, PlayerStateFlag::Casting );
     }
   }
   
@@ -368,14 +368,14 @@ void Action::Action::interrupt()
   // things that aren't players don't care about cooldowns and state flags
   if( m_pSource->isPlayer() )
   {
-    auto player = m_pSource->getAsPlayer();
+    auto pPlayer = m_pSource->getAsPlayer();
 
     // todo: reset cooldown for actual player
 
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
-    player->setLastActionTick( 0 );
-    player->unsetStateFlag( PlayerStateFlag::Casting );
+    pPlayer->setLastActionTick( 0 );
+    Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::Casting );
   }
 
   if( hasCastTime() )
@@ -424,10 +424,10 @@ void Action::Action::execute()
                                             0x219, m_id, m_id, m_id, m_id );
     m_pSource->sendToInRangeSet( control, true );*/
 
-    if( auto player = m_pSource->getAsPlayer() )
+    if( auto pPlayer = m_pSource->getAsPlayer(); pPlayer )
     {
-      player->setLastActionTick( 0 );
-      player->unsetStateFlag( PlayerStateFlag::Casting );
+      pPlayer->setLastActionTick( 0 );
+      Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::Casting );
     }
   }
 

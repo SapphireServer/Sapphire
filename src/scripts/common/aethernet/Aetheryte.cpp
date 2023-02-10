@@ -35,7 +35,7 @@ public:
         auto destination = result.getResult( 0 );
         if( result.numOfResults == 1 && destination != 0 )
         {
-          player.teleport( destination, 2 );
+          warpMgr().requestPlayerTeleport( player, destination, 2 );
         }
       } );
     }
@@ -73,7 +73,7 @@ public:
           auto data = result.getResult( 1 );
           if( cmd == 4 && data != 0 )
           {
-            player.teleport( data, 2 );
+            warpMgr().requestPlayerTeleport( player, data, 2 );
           }
           else if( cmd == 2 ) // register favored destination
           {

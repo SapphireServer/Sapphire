@@ -20,6 +20,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -70,7 +71,7 @@ Player::Player() :
   m_lastActionTick( 0 ),
   m_bInCombat( false ),
   m_bLoadingComplete( false ),
-  m_zoningType( Common::ZoneingType::None ),
+  m_zoningType( Common::ZoningType::None ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
   m_mount( 0 ),
@@ -120,6 +121,8 @@ Player::~Player() = default;
 
 void Player::unload()
 {
+  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
   // do one last update to db
   updateSql();
   // reset isLogin and loading sequences just in case
@@ -128,12 +131,6 @@ void Player::unload()
   setLoadingComplete( false );
   // unset player for removal
   setMarkedForRemoval( false );
-  // send updates to mgrs
-  if( getPartyId() != 0 )
-  {
-    auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-    partyMgr.onMemberDisconnect( *this );
-  }
 
   syncLastDBWrite();
 }
@@ -317,6 +314,8 @@ void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& stat
 
 void Player::calculateStats()
 {
+  calculateBonusStats();
+
   uint8_t tribe = getLookAt( Common::CharaLook::Tribe );
   uint8_t level = getLevel();
   auto job = static_cast< uint8_t >( getClass() );
@@ -401,72 +400,6 @@ bool Player::isAutoattackOn() const
 void Player::sendStats()
 {
   Service< World::Manager::PlayerMgr >::ref().onSendStats( *this );
-}
-
-void Player::teleport( uint16_t aetheryteId, uint8_t type )
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-
-  auto aetherData = exdData.getRow< Excel::Aetheryte >( aetheryteId );
-
-  if( !aetherData )
-    return;
-
-  const auto& data = aetherData->data();
-
-  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-  auto pop = instanceObjectCache.getPopRangeInfo( data.PopRange[ 0 ] );
-
-  Common::FFXIVARR_POSITION3 pos{ 0.f, 0.f, 0.f };
-
-  float rot = 0.f;
-
-  if( pop )
-  {
-    PlayerMgr::sendDebug( *this, "Teleport: popRange {0} found!", data.PopRange[ 0 ] );
-    pos = pop->m_pos;
-    rot = pop->m_rotation;
-  }
-  else
-  {
-    PlayerMgr::sendDebug( *this, "Teleport: popRange {0} not found in {1}!", data.PopRange[ 0 ], data.TerritoryType );
-  }
-
-  auto townPlace = exdData.getRow< Excel::PlaceName >( data.TelepoName );
-  auto aetherytePlace = exdData.getRow< Excel::PlaceName >( data.TransferName );
-
-  PlayerMgr::sendDebug( *this, "Teleport: {0} - {1} ({2})",
-                           townPlace->getString( townPlace->data().Text.SGL ),
-                           aetherytePlace->getString( aetherytePlace->data().Text.SGL ),
-                           data.TerritoryType );
-
-  // if it is a teleport in the same zone, we want to do warp instead of moveTerri
-  bool sameTerritory = getTerritoryTypeId() == data.TerritoryType;
-
-  WarpType warpType = WarpType::WARP_TYPE_NORMAL;
-  // TODO: this should be simplified and a type created in server_common/common.h.
-  if( type == 1 || type == 2 ) // teleport
-  {
-    warpType = WarpType::WARP_TYPE_TELEPO;
-    setZoningType( Common::ZoneingType::Teleport );
-  }
-  else if( type == 3 ) // return
-  {
-    warpType = WarpType::WARP_TYPE_HOME_POINT;
-    setZoningType( Common::ZoneingType::Return );
-  }
-
-  if( sameTerritory )
-    warpMgr.requestWarp( *this, warpType, pos, rot );
-  else
-  {
-    auto pTeri = teriMgr.getZoneByTerritoryTypeId( data.TerritoryType );
-    if( !pTeri )
-      return;
-    warpMgr.requestMoveTerritory( *this, warpType, pTeri->getGuId(), pos, rot );
-  }
 }
 
 void Player::forceZoneing( uint32_t zoneId )
@@ -670,8 +603,6 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
   Util::valueToFlagByteIndexValue( songId, value, index );
 
   m_orchestrion[ index ] |= value;
-
-  Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *this, songId, itemId );
 }
 
 bool Player::hasReward( Common::UnlockEntry unlockId ) const
@@ -735,6 +666,7 @@ void Player::levelUp()
 
 void Player::sendStatusUpdate()
 {
+  // todo: overrides are funky
   Service< World::Manager::PlayerMgr >::ref().onPlayerHpMpTpChanged( *this );
 }
 
@@ -926,15 +858,11 @@ void Player::setVoiceId( uint8_t voiceId )
 void Player::setGc( uint8_t gc )
 {
   m_gc = gc;
-
-  Service< World::Manager::PlayerMgr >::ref().onGcUpdate( *this );
 }
 
 void Player::setGcRankAt( uint8_t index, uint8_t rank )
 {
   m_gcRank[ index ] = rank;
-
-  Service< World::Manager::PlayerMgr >::ref().onGcUpdate( *this );
 }
 
 const Player::StateFlags& Player::getStateFlags() const
@@ -955,7 +883,6 @@ bool Player::hasStateFlag( Common::PlayerStateFlag flag ) const
 
 void Player::setStateFlag( Common::PlayerStateFlag flag )
 {
-  auto prevOnlineStatus = getOnlineStatus();
   auto iFlag = static_cast< int32_t >( flag );
 
   uint16_t index;
@@ -963,30 +890,12 @@ void Player::setStateFlag( Common::PlayerStateFlag flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_stateFlags[ index ] |= value;
-
-  auto newOnlineStatus = getOnlineStatus();
-  sendStateFlags( prevOnlineStatus != newOnlineStatus );
-}
-
-void Player::setStateFlags( std::vector< Common::PlayerStateFlag > flags )
-{
-  for( const auto& flag : flags )
-  {
-    setStateFlag( flag );
-  }
-}
-
-void Player::sendStateFlags( bool updateInRange )
-{
-  Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *this, updateInRange );
 }
 
 void Player::unsetStateFlag( Common::PlayerStateFlag flag )
 {
   if( !hasStateFlag( flag ) )
     return;
-
-  auto prevOnlineStatus = getOnlineStatus();
 
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -995,58 +904,19 @@ void Player::unsetStateFlag( Common::PlayerStateFlag flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_stateFlags[ index ] ^= value;
-  
-  auto newOnlineStatus = getOnlineStatus();
-  sendStateFlags( prevOnlineStatus != newOnlineStatus );
 }
 
 void Player::update( uint64_t tickCount )
 {
-  if( m_hp <= 0 && m_status != ActorStatus::Dead )
-  {
-    die();
-    Service< World::Manager::PlayerMgr >::ref().onDeath( *this );
-  }
-
-  if( !isAlive() )
-    return;
-
-  m_lastUpdate = tickCount;
-
-  if( !checkAction() )
-  {
-    if( m_targetId && m_currentStance == Common::Stance::Active && isAutoattackOn() )
-    {
-      auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-
-      // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-      for( const auto& actor : m_inRangeActor )
-      {
-        if( actor->getId() == m_targetId && actor->getAsChara()->isAlive() && mainWeap )
-        {
-          auto chara = actor->getAsChara();
-
-          // default autoattack range
-          float range = 3.f + chara->getRadius() + getRadius() * 0.5f;
-
-          // default autoattack range for ranged classes
-          if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
-            range = 25.f + chara->getRadius() + getRadius() * 0.5f;
-
-          if( Util::distance( getPos(), actor->getPos() ) <= range )
-          {
-            if( ( tickCount - m_lastAttack ) > mainWeap->getDelay() )
-            {
-              m_lastAttack = tickCount;
-              autoAttack( actor->getAsChara() );
-            }
-          }
-        }
-      }
-    }
-  }
+  // todo: better way to handle this override chara update
+  Service< World::Manager::PlayerMgr >::ref().onUpdate( *this, tickCount );
 
   Chara::update( tickCount );
+}
+
+uint64_t Player::getLastAttack() const
+{
+  return m_lastAttack;
 }
 
 void Player::setLastAttack( uint64_t tickCount )
@@ -1110,6 +980,11 @@ const Player::UnlockList& Player::getUnlockBitmask() const
 const Player::OrchestrionList& Player::getOrchestrionBitmask() const
 {
   return m_orchestrion;
+}
+
+void Player::setOrchestrionBitmask( const Player::OrchestrionList& orchestrion )
+{
+  m_orchestrion = orchestrion;
 }
 
 void Player::unlockMount( uint32_t mountId )
@@ -1189,12 +1064,12 @@ void Player::setLoadingComplete( bool bComplete )
   m_bLoadingComplete = bComplete;
 }
 
-ZoneingType Player::getZoningType() const
+ZoningType Player::getZoningType() const
 {
   return m_zoningType;
 }
 
-void Player::setZoningType( Common::ZoneingType zoneingType )
+void Player::setZoningType( Common::ZoningType zoneingType )
 {
   m_zoningType = zoneingType;
 }
@@ -1373,21 +1248,11 @@ uint8_t Player::getEquipDisplayFlags() const
 void Player::setMount( uint32_t mountId )
 {
   m_mount = mountId;
-
-  Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *this, m_mount );
 }
 
 void Player::setCompanion( uint8_t id )
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  auto companion = exdData.getRow< Excel::Companion >( id );
-  if( !id )
-    return;
-
   m_companionId = id;
-
-  Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( *this, m_companionId );
 }
 
 uint8_t Player::getCurrentCompanion() const
@@ -1617,20 +1482,27 @@ void Player::dyeItemFromDyeingInfo()
   uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
   uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
 
-  sendStateFlags(); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+  Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+
   auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
   auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
 
   if( !itemToDye || !dyeToUse )
     return;
 
-  uint32_t stainColorID = dyeToUse->getAdditionalData();
-  itemToDye->setStain( stainColorID );
+  if( !removeItem( dyeToUse->getId() ) )
+    return;
 
-  // TODO: subtract/remove dye used
+  uint32_t stainColorID = dyeToUse->getAdditionalData();
+  bool shouldDye = stainColorID != 0;
+  bool invalidateGearSet = stainColorID != itemToDye->getStain();
+  itemToDye->setStain( stainColorID );
 
   insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
   writeItem( itemToDye );
+
+  auto dyePkt = makeActorControlSelf( getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
+  queuePacket( dyePkt );
 }
 
 void Player::resetObjSpawnIndex()
@@ -1930,7 +1802,7 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
     // if we've hit the breakpoint in fall damage (min: 10y)
     if( fallHeight >= 10.f )
     {
-      // calculate how much damage to deal out (max. 20y : 100%)
+      // calculate how much damage to deal out (max. 30y : 100%)
       float deltaMax = std::min( fallHeight, 30.f );
 
       // get hp percentage starting from 0.1, increasing to 100% at max height

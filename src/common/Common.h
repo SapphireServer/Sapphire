@@ -587,7 +587,7 @@ namespace Sapphire::Common
     WaterCluster = 0x12
   };
 
-  enum struct ZoneingType : uint8_t
+  enum struct ZoningType : uint8_t
   {
     None = 1,
     Teleport = 2,

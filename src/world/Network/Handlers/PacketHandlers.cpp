@@ -55,6 +55,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Manager/ItemMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 
 #include "Action/Action.h"
 
@@ -368,10 +369,11 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLoginHandler >( inPacket );
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  // init handler means this is a login procedure
+  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
   player.setIsLogin( true );
   player.setConnected( true );
   teriMgr.joinWorld( player );
+  fcMgr.onFcLogin( player.getCharacterId() );
 }
 
 void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

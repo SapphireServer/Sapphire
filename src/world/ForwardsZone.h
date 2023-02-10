@@ -87,6 +87,7 @@ TYPE_FORWARD( EventAction );
 TYPE_FORWARD( ItemAction );
 TYPE_FORWARD( EventItemAction );
 TYPE_FORWARD( MountAction );
+TYPE_FORWARD( ItemManipulationAction );
 TYPE_FORWARD( EffectBuilder );
 TYPE_FORWARD( EffectResult );
 

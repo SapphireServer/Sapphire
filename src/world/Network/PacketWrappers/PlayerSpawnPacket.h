@@ -110,7 +110,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ActiveType = player.getStance();
       m_data.Flag = 0;
 
-      if( player.getZoningType() != Common::ZoneingType::None || player.getGmInvis() )
+      if( player.getZoningType() != Common::ZoningType::None || player.getGmInvis() )
       {
         m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }
