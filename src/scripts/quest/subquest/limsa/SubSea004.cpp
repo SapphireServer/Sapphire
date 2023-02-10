@@ -102,9 +102,6 @@ private:
       {
         quest.setSeq( SeqFinish );
         quest.setUI8CH( 1 );
-        //quest.setUI8AL( 0 );
-        //quest.setUI8BH( 0 );
-        //quest.setUI8BL( 0 );
       }
     }
       
