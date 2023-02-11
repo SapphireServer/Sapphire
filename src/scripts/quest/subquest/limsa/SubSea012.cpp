@@ -41,7 +41,7 @@ private:
   static constexpr auto Actor0 = 1003601;
   static constexpr auto Actor1 = 1001024;
   static constexpr auto Actor2 = 1000972;
-  static constexpr auto Enemy0 = 324;
+  static constexpr auto Enemy0 = 563;
   static constexpr auto Item0 = 2000454;
 
 public:
@@ -82,9 +82,14 @@ public:
     quest.setUI8AL( currentKC );
 
     if( currentKC >= 4 )
+    {
+      eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC + 1, 4 );
       quest.setSeq( SeqFinish );
+    }
     else
+    {
       eventMgr().sendEventNotice( player, getId(), 1, 2, currentKC, 4 );
+    }
   }
 
 private:
@@ -126,6 +131,7 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    eventMgr().sendEventNotice( player, getId(), 0, 0 );
     quest.setSeq( Seq2 );
   }
 
