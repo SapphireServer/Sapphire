@@ -31,9 +31,9 @@ void WarpTask::execute()
   auto pPlayer = server.getPlayer( m_playerId );
   if( !pPlayer )
     return;
-
-  pPlayer->setPos( m_warpInfo.m_targetPos, false );
+  
   pPlayer->sendToInRangeSet( makeWarp( pPlayer->getId(), m_warpInfo.m_warpType, m_warpInfo.m_targetPos, m_warpInfo.m_targetRot ), true );
+  pPlayer->setPos( m_warpInfo.m_targetPos, false );
 }
 
 std::string WarpTask::toString()

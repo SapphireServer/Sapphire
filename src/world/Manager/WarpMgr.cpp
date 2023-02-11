@@ -45,34 +45,18 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
   m_entityIdToWarpInfoMap[ player.getId() ] = { targetTerritoryId, warpType, targetPos, targetRot };
 
   player.updatePrevTerritory();
-
-  player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, pTeri->getTerritoryTypeId() ), true );
-  player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );
-  Common::Service< PlayerMgr >::ref().onSetStateFlag( player, PlayerStateFlag::BetweenAreas );
-
-  auto moveTerritoryPacket = makeZonePacket< FFXIVIpcMoveTerritory >( player.getId() );
-  moveTerritoryPacket->data().index = -1;
-  moveTerritoryPacket->data().territoryType = pTeri->getTerritoryTypeId();
-  moveTerritoryPacket->data().zoneId = player.getTerritoryTypeId();
-  moveTerritoryPacket->data().worldId = server.getWorldId();
-  moveTerritoryPacket->data().worldId1 = server.getWorldId();
-  moveTerritoryPacket->data().landId = -1;
-  moveTerritoryPacket->data().landSetId = -1;
-  moveTerritoryPacket->data().landTerritoryId = -1;
-  strcpy( moveTerritoryPacket->data().worldName, "Sapphire" );
-  server.queueForPlayer( player.getCharacterId(), moveTerritoryPacket );
-
+  
   // create warp task
   auto& taskMgr = Common::Service< TaskMgr >::ref();
-  taskMgr.queueTask( makeMoveTerritoryTask( player, warpType, targetTerritoryId, targetPos, targetRot, 2000 ) );
+  taskMgr.queueTask( makeMoveTerritoryTask( player, warpType, targetTerritoryId, targetPos, targetRot, 1000 ) );
 }
 
 void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
   m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), WarpStart, warpType, 1, 0, player.getTerritoryTypeId(), 1 ), true );
-  player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType ) );
+  player.sendToInRangeSet( makeActorControlSelf( player.getId(), WarpStart, warpType, warpType, 0, player.getTerritoryTypeId(), 1 ), true );
+  player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType, player.getTerritoryTypeId() ) );
 
   auto& taskMgr = Common::Service< TaskMgr >::ref();
   taskMgr.queueTask( makeWarpTask( player, warpType, targetPos, targetRot, 1000 ) );
@@ -87,34 +71,36 @@ void WarpMgr::finishWarp( Entity::Player& player )
   if( it != m_entityIdToWarpInfoMap.end() )
     warpType = it->second.m_warpType;
 
-  uint32_t vfxType = 0; // seems to only be used for raise animation?
+  bool raiseAnim = player.getStatus() == Common::ActorStatus::Dead ? 1 : 0;
 
   switch( warpType )
   {
     case WarpType::WARP_TYPE_REISE:
     case WarpType::WARP_TYPE_HOME_POINT:
+    case WarpType::WARP_TYPE_EXIT_RANGE:
     {
       if( player.getStatus() == Common::ActorStatus::Dead )
       {
         player.resetHp();
         player.resetMp();
         player.setStatus( Common::ActorStatus::Idle );
-        vfxType = 1;
       }
     }
   }
 
-  auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpType, vfxType, 0, 0 );
+  auto warpFinishAnim = warpType - 1;
+
+  auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpFinishAnim, raiseAnim, 0, 0 );
   auto setStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
   player.setZoningType( Common::ZoningType::None );
 
   if( !player.getGmInvis() )
     player.sendToInRangeSet( zoneInPacket );
 
-  player.sendToInRangeSet( setStatusPacket, true );
-
   auto& server = Common::Service< WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), zoneInPacket );
+
+  player.sendToInRangeSet( setStatusPacket, true );
 
   playerMgr.onUnsetStateFlag( player, PlayerStateFlag::BetweenAreas );
 }
@@ -169,12 +155,12 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
   }
   else if( teleportType == 3 ) // return
   {
-    warpType = WarpType::WARP_TYPE_HOME_POINT;
+    warpType = WarpType::WARP_TYPE_EXIT_RANGE;
     player.setZoningType( Common::ZoningType::Return );
   }
-  else if( teleportType == 4 ) // return
+  else if( teleportType == 4 ) // return dead
   {
-    warpType = WarpType::WARP_TYPE_REISE;
+    warpType = WarpType::WARP_TYPE_EXIT_RANGE;
     player.setZoningType( Common::ZoningType::ReturnDead );
   }
 
