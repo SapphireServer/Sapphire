@@ -493,8 +493,8 @@ namespace Excel
     uint32_t EventHandler;
     uint16_t Icon;
     uint16_t Action;
-    uint8_t StackMax;
     uint8_t Unknown;
+    uint8_t StackMax;
     uint8_t CastTime;
     uint8_t CastTimeLine;
     uint8_t Timeline;
