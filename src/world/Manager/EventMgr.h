@@ -39,8 +39,7 @@ namespace Sapphire::World::Manager
     void eventActionStart( Entity::Player& player, uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
                            World::Action::ActionCallback interruptCallback, uint64_t additional );
     /*! start an event item action */
-    void eventItemActionStart( Entity::Player& player, uint32_t eventId, uint32_t action, World::Action::ActionCallback finishCallback,
-                               World::Action::ActionCallback interruptCallback, uint64_t additional );
+    void eventItemActionStart( Entity::Player& player, uint32_t eventId, uint32_t action, uint32_t sequence, uint64_t targetId );
 
     void playGilShop( Entity::Player& player, uint32_t eventId, uint32_t flags, uint32_t param1, Event::EventHandler::SceneReturnCallback eventCallback );
 

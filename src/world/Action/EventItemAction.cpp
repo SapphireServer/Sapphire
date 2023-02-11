@@ -1,22 +1,19 @@
 #include "EventItemAction.h"
+#include <Network/CommonActorControl.h>
 
 #include <Exd/ExdData.h>
 #include <Exd/Structs.h>
 
 #include <Actor/Player.h>
-#include <Network/PacketWrappers/EffectPacket.h>
 
-#include "Manager/PlayerMgr.h"
 #include "Manager/EventMgr.h"
+#include "Manager/PlayerMgr.h"
 
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Script/ScriptMgr.h"
 #include <Service.h>
-#include <Network/CommonActorControl.h>
-#include <WorldServer.h>
-#include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
-#include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include <Util/UtilMath.h>
+
 #include <Common.h>
 
 
@@ -30,8 +27,7 @@ using namespace Sapphire::Network::ActorControl;
 
 EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t eventItemId,
                                   std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > eventItemActionData,
-                                  uint32_t sequence, uint64_t targetId  ) :
-  m_eventItemAction( std::move( eventItemActionData ) )
+                                  uint32_t sequence, uint64_t targetId ) : m_eventItemAction( std::move( eventItemActionData ) )
 {
   m_id = eventItemId;
   m_eventItem = eventItemId;
@@ -56,21 +52,24 @@ bool EventItemAction::init()
 
 void EventItemAction::execute()
 {
-  Manager::PlayerMgr::sendDebug( *getSourceChara()->getAsPlayer(), "EventItemAction type {0} execute called.", m_eventItemAction->data().Action );
+  Sapphire::Entity::PlayerPtr pPlayer = m_pSource->getAsPlayer();
+  if( !pPlayer )
+  {
+    return;
+  }
+  Manager::PlayerMgr::sendDebug( *pPlayer, "EventItemAction type {0} execute called.", m_eventItemAction->data().Action );
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
-  eventMgr.eventStart( *getSourceChara()->getAsPlayer(), m_targetId, m_eventItemAction->data().EventHandler,
+  eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler,
                        Event::EventHandler::ActionResult, 0, 0 );
 
-  scriptMgr.onEventItem( *getSourceChara()->getAsPlayer(), m_eventItem, m_eventItemAction->data().EventHandler, m_targetId );
-  eventMgr.checkEvent( *getSourceChara()->getAsPlayer(), m_eventItemAction->data().EventHandler );
+  scriptMgr.onEventItem( *pPlayer, m_eventItem, m_eventItemAction->data().EventHandler, m_targetId );
+  eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
 }
 
 void EventItemAction::onStart()
 {
-}
-
-void EventItemAction::onInterrupt()
-{
+  m_startTime = Common::Util::getTimeMs();
 }

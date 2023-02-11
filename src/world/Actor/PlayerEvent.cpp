@@ -9,6 +9,8 @@
 #include "WorldServer.h"
 
 #include "Action/EventAction.h"
+#include "Manager/PlayerMgr.h"
+#include "Service.h"
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -52,7 +54,7 @@ void Sapphire::Entity::Player::removeEvent( uint32_t eventId )
 
 void Sapphire::Entity::Player::onDeath()
 {
-
+  Service< World::Manager::PlayerMgr >::ref().onDeath( *this );
 }
 
 // TODO: slightly ugly here and way too static. Needs too be done properly

@@ -23,8 +23,6 @@ namespace Sapphire::World::Action
 
     void execute() override;
 
-    void onInterrupt() override;
-
     void onStart() override;
 
 
