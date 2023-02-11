@@ -474,7 +474,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     actorControl->data().param2 = param2;
     actorControl->data().param3 = param3;
     actorControl->data().param4 = param4;
-    pSession->getZoneConnection()->queueOutPacket( actorControl );
+    player.sendToInRangeSet( actorControl, true );
 
 
     /*sscanf(params.c_str(), "%x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId);

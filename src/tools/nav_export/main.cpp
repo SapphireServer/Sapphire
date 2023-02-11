@@ -34,7 +34,7 @@ using namespace Sapphire;
 // garbage to ignore models
 bool noObj = false;
 
-std::string gamePath( "H:\\Games\\ffxiv3.05\\game\\sqpack" );
+std::string gamePath( "C:\\Data\\Dev\\ffxiv3.35\\game\\sqpack" );
 std::unordered_map< uint16_t, std::string > zoneNameMap;
 std::map< std::string, std::string > exportedTeriMap;
 
@@ -311,7 +311,7 @@ int main( int argc, char* argv[] )
 
   bool generateNavmesh = true;
   bool dumpAllZones = true;
-  int nJobs = 4;
+  int nJobs = std::thread::hardware_concurrency();
 
   int exportFileType = 0;
   if( !noObj )
