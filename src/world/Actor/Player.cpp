@@ -690,6 +690,11 @@ uint8_t Player::getLevelForClass( Common::ClassJob pClass ) const
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
+Common::ClassJob Player::getFirstClass() const
+{
+  return m_firstClass;
+}
+
 bool Player::isClassJobUnlocked( Common::ClassJob classJob ) const
 {
   // todo: need to properly check if a job is unlocked, at the moment we just check the class array which will return true for every job if the base class is unlocked
@@ -1503,6 +1508,68 @@ void Player::dyeItemFromDyeingInfo()
 
   auto dyePkt = makeActorControlSelf( getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
   queuePacket( dyePkt );
+}
+
+void Player::setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour )
+{
+  m_glamouringInfo.itemToGlamourContainer = itemToGlamourContainer;
+  m_glamouringInfo.itemToGlamourSlot = itemToGlamourSlot;
+  m_glamouringInfo.glamourBagContainer = glamourBagContainer;
+  m_glamouringInfo.glamourBagSlot = glamourBagSlot;
+  m_glamouringInfo.shouldGlamour = shouldGlamour;
+}
+
+void Player::glamourItemFromGlamouringInfo()
+{
+  auto& playerMgr = Service< World::Manager::PlayerMgr >::ref();
+
+  uint32_t itemToGlamourContainer = m_glamouringInfo.itemToGlamourContainer;
+  uint32_t itemToGlamourSlot = m_glamouringInfo.itemToGlamourSlot;
+  uint32_t glamourBagContainer = m_glamouringInfo.glamourBagContainer;
+  uint32_t glamourBagSlot = m_glamouringInfo.glamourBagSlot;
+  bool shouldGlamour = m_glamouringInfo.shouldGlamour;
+
+  playerMgr.onSendStateFlags( *this, true );
+
+  auto itemToGlamour = getItemAt( itemToGlamourContainer, itemToGlamourSlot );
+  auto glamourToUse = getItemAt( glamourBagContainer, glamourBagSlot );
+  //auto prismToUse = getItemAt( glamourBagContainer, glamourBagSlot );
+
+  if( !itemToGlamour )
+    return;
+
+  //if( !removeItem( prismToUse->getId() ) )
+  //  return;
+
+  uint32_t patternID = itemToGlamour->getPattern();
+  bool invalidateGearSet = shouldGlamour ? patternID != glamourToUse->getId() : true;
+
+  if( shouldGlamour )
+  {
+    itemToGlamour->setPattern( glamourToUse->getId() );
+    itemToGlamour->setStain( glamourToUse->getStain() );
+  }
+  else
+  {
+    itemToGlamour->setPattern( 0 );
+    itemToGlamour->setStain( 0 );
+  }
+
+  itemToGlamour->setGlamModelIds();
+
+  insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToGlamourContainer ), static_cast< uint16_t >( itemToGlamourSlot ), itemToGlamour );
+  writeItem( itemToGlamour );
+
+  if( shouldGlamour )
+  {
+    auto castGlamPkt = makeActorControlSelf( getId(), GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
+    queuePacket( castGlamPkt );
+  }
+  else
+  {
+    auto dispelGlamPkt = makeActorControlSelf( getId(), GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
+    queuePacket( dispelGlamPkt );
+  }
 }
 
 void Player::resetObjSpawnIndex()

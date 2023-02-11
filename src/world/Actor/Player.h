@@ -214,6 +214,9 @@ namespace Sapphire::Entity
     /*! returns the level of the provided class / job */
     uint8_t getLevelForClass( Common::ClassJob pClass ) const;
 
+    /*! \return the first class of the player */
+    Common::ClassJob getFirstClass() const;
+
     /*! returns if the classjob is unlocked */
     bool isClassJobUnlocked( Common::ClassJob classJob ) const;
 
@@ -356,6 +359,9 @@ namespace Sapphire::Entity
 
     void setDyeingInfo( uint32_t itemToDyeContainer, uint32_t itemToDyeSlot, uint32_t dyeBagContainer, uint32_t dyeBagSlot );
     void dyeItemFromDyeingInfo();
+
+    void setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour );
+    void glamourItemFromGlamouringInfo();
 
     /*! get player's title list (available titles) */
     TitleList& getTitleList();
@@ -898,6 +904,8 @@ namespace Sapphire::Entity
     ExpList m_expArray{};
     StateFlags m_stateFlags{};
 
+    Common::ClassJob m_firstClass{};
+
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
@@ -967,6 +975,15 @@ namespace Sapphire::Entity
       uint32_t dyeBagContainer;
       uint32_t dyeBagSlot;
     } m_dyeingInfo{};
+
+    struct PlayerGlamouringInfo
+    {
+      uint32_t itemToGlamourContainer;
+      uint32_t itemToGlamourSlot;
+      uint32_t glamourBagContainer;
+      uint32_t glamourBagSlot;
+      bool shouldGlamour;
+    } m_glamouringInfo{};
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;

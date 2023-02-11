@@ -141,7 +141,9 @@ ItemPtr ItemMgr::loadItem( uint64_t uId )
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
     pItem->setStain( itemRes->getUInt16( 13 ) );
+    pItem->setPattern( itemRes->getUInt( 14 ) );
     pItem->setDurability( itemRes->getInt16( 6 ) );
+    pItem->setGlamModelIds();
 
     return pItem;
   }

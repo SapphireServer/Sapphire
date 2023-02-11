@@ -26,6 +26,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.LvSync = 0; //player.getLevelSync();
       m_data.Hp = player.getHp();
       m_data.Mp = player.getMp();
+      m_data.Tp = player.getTp();
       m_data.HpMax = player.getMaxHp();
       m_data.MpMax = player.getMaxMp();;
     };

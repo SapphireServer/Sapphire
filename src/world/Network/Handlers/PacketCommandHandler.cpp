@@ -184,6 +184,10 @@ const char* packetCommandToString( uint16_t commandId )
       return "MOBHUNT_BREAK_ORDER";
     case DYE_ITEM:
       return "DYE_ITEM";
+    case GLAMOUR_ITEM:
+      return "GLAMOUR_ITEM";
+    case GLAMOUR_DISPEL:
+      return "GLAMOUR_DISPEL";
     case EMOTE:
       return "EMOTE";
     case EMOTE_WITH_WARP:
@@ -413,8 +417,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
   const auto param3 = packet.data().Target;
 
 
-  Logger::debug( "\t\t {5} | {1:X} ( p1:{2:X} p2:{3:X} p3:{4:X} )",
-                 m_pSession->getId(), commandId, param1, param2, param3, packetCommandToString( commandId ) );
+  Logger::debug( "\t\t {8} | {1:X} ( p1:{2:X} p11:{3:X} p12:{4:X} p2:{5:X} p3:{6:X} p4:{7:X} )",
+                 m_pSession->getId(), commandId, param1, param11, param12, param2, param3, param4, packetCommandToString( commandId ) );
 
   //Logger::Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
@@ -633,6 +637,16 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       // param2 = dye bag container
       // param4 = dye bag slot
       player.setDyeingInfo( param11, param12, param2, param4 );
+      break;
+    }
+    case PacketCommand::GLAMOUR_ITEM:
+    {
+      player.setGlamouringInfo( param11, param12, param2, param4, true );
+      break;
+    }
+    case PacketCommand::GLAMOUR_DISPEL:
+    {
+      player.setGlamouringInfo( param11, param12, param2, param4, false );
       break;
     }
     case PacketCommand::DIRECTOR_INIT_RETURN: // Director init finish

@@ -132,6 +132,23 @@ Sapphire::Common::ItemUICategory Sapphire::Item::getCategory() const
   return m_category;
 }
 
+void Sapphire::Item::setGlamModelIds()
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  if( m_pattern != 0 )
+  {
+    auto itemInfo = exdData.getRow< Excel::Item >( m_pattern );
+    m_glamModel1 = itemInfo->data().ModelId;
+    m_glamModel2 = itemInfo->data().SubModelId;
+  }
+  else
+  {
+    m_glamModel1 = 0;
+    m_glamModel2 = 0;
+  }
+}
+
 void Sapphire::Item::setModelIds( uint64_t model1, uint64_t model2 )
 {
   m_model1 = model1;
@@ -140,12 +157,12 @@ void Sapphire::Item::setModelIds( uint64_t model1, uint64_t model2 )
 
 uint64_t Sapphire::Item::getModelId1() const
 {
-  return m_model1;
+  return m_pattern != 0 ? m_glamModel1 : m_model1;
 }
 
 uint64_t Sapphire::Item::getModelId2() const
 {
-  return m_model2;
+  return m_pattern != 0 ? m_glamModel2 : m_model2;
 }
 
 bool Sapphire::Item::isHq() const
@@ -181,6 +198,16 @@ uint16_t Sapphire::Item::getStain() const
 void Sapphire::Item::setStain( uint16_t stain )
 {
   m_stain = stain;
+}
+
+uint32_t Sapphire::Item::getPattern() const
+{
+  return m_pattern;
+}
+
+void Sapphire::Item::setPattern( uint32_t pattern )
+{
+  m_pattern = pattern;
 }
 
 uint32_t Sapphire::Item::getAdditionalData() const

@@ -529,8 +529,9 @@ void Sapphire::Entity::Player::writeItem( Sapphire::ItemPtr pItem ) const
   stmt->setInt( 1, pItem->getStackSize() );
   stmt->setInt( 2, pItem->getDurability() );
   stmt->setInt( 3, pItem->getStain() );
+  stmt->setInt( 4, pItem->getPattern() );
 
-  stmt->setInt64( 4, pItem->getUId() );
+  stmt->setInt64( 5, pItem->getUId() );
 
   db.directExecute( stmt );
 }

@@ -34,7 +34,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Tribe = player.getLookAt( Common::CharaLook::Tribe );
       m_data.Sex = player.getLookAt( Common::CharaLook::Gender );
       m_data.ClassJob = static_cast< uint8_t >( player.getClass() );
-      m_data.FirstClass = static_cast< uint8_t >( player.getClass() );
+      m_data.FirstClass = static_cast< uint8_t >( player.getFirstClass() );
       //m_data.maxLevel = player.getLevel();
       m_data.GuardianDeity = static_cast< uint8_t >( player.getGuardianDeity() );
       m_data.BirthMonth = player.getBirthMonth();

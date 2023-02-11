@@ -275,7 +275,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_UP,
-                    "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ? WHERE ItemId = ?;",
+                    "UPDATE charaglobalitem SET stack = ?, durability = ?, stain = ?, pattern = ? WHERE ItemId = ?;",
                     CONNECTION_BOTH );
 
   prepareStatement( CHARA_ITEMGLOBAL_DELETE,
