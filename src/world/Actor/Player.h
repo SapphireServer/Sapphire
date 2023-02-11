@@ -214,6 +214,9 @@ namespace Sapphire::Entity
     /*! returns the level of the provided class / job */
     uint8_t getLevelForClass( Common::ClassJob pClass ) const;
 
+    /*! \return the first class of the player */
+    Common::ClassJob getFirstClass() const;
+
     /*! returns if the classjob is unlocked */
     bool isClassJobUnlocked( Common::ClassJob classJob ) const;
 
@@ -900,6 +903,8 @@ namespace Sapphire::Entity
     ClassList m_classArray{};
     ExpList m_expArray{};
     StateFlags m_stateFlags{};
+
+    Common::ClassJob m_firstClass{};
 
     uint8_t m_homePoint;
     uint8_t m_startTown;

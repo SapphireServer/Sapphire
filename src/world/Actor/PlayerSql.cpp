@@ -78,6 +78,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
 
   m_class = static_cast< ClassJob >( res->getUInt( "Class" ) );
   m_homePoint = res->getUInt8( "Homepoint" );
+  m_firstClass = static_cast< ClassJob >( res->getUInt( "FirstClass" ) );
 
   // Additional data
   m_voice = res->getUInt8( "Voice" );

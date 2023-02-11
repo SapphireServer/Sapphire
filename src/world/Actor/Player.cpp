@@ -690,6 +690,11 @@ uint8_t Player::getLevelForClass( Common::ClassJob pClass ) const
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
+Common::ClassJob Player::getFirstClass() const
+{
+  return m_firstClass;
+}
+
 bool Player::isClassJobUnlocked( Common::ClassJob classJob ) const
 {
   // todo: need to properly check if a job is unlocked, at the moment we just check the class array which will return true for every job if the base class is unlocked
