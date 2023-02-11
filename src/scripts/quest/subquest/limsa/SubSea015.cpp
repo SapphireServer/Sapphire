@@ -78,8 +78,6 @@ class SubSea015 : public Sapphire::ScriptAPI::QuestScript
     {
       Scene00001( quest, player );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
