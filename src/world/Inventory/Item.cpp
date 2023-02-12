@@ -12,7 +12,10 @@ Sapphire::Item::Item( uint64_t uId, uint32_t catalogId, bool isHq ) :
   m_stain( 0 ),
   m_durability( 30000 ),
   m_spiritBond( 0 ),
-  m_reservedFlag( 0 )
+  m_reservedFlag( 0 ),
+  m_pattern( 0 ),
+  m_glamModel1( 0 ),
+  m_glamModel2( 0 )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto itemInfo = exdData.getRow< Excel::Item >( catalogId );
