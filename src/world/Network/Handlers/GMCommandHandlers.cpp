@@ -22,6 +22,7 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 
+#include "Manager/QuestMgr.h"
 #include "WorldServer.h"
 
 using namespace Sapphire::Common;
@@ -129,6 +130,8 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     {
       targetPlayer->setLevel( static_cast< uint8_t >( param1 ) );
       PlayerMgr::sendServerNotice( player, "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
+      auto playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+      playerMgr.onLevelUp(player);
       break;
     }
     case GmCommand::Race:
@@ -399,6 +402,8 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     case GmCommand::QuestIncomplete:
     {
       targetPlayer->unfinishQuest( static_cast< uint16_t >( param1 ) );
+      auto questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+      questMgr.sendQuestTracker(*targetPlayer);
       break;
     }
     case GmCommand::QuestSequence:
