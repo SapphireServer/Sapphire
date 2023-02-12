@@ -387,6 +387,9 @@ namespace Sapphire::Entity
     /*! set number of gear sets */
     void setMaxGearSets( uint8_t amount );
 
+    /*! add a gear set */
+    void addGearSet();
+
     /*! get number of gear sets */
     uint8_t getMaxGearSets() const;
 

@@ -1227,12 +1227,23 @@ void Player::setAchievementData( const Player::AchievementData& achievementData 
 
 void Player::setMaxGearSets( uint8_t amount )
 {
-  if( amount == 1 )
-    amount = 5;
-
   m_equippedMannequin = amount;
 
   queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
+}
+
+void Player::addGearSet()
+{
+  uint8_t amount = 1;
+
+  if( getMaxGearSets() == 0 )
+  {
+    // unlock 5 gearsets the first time
+    amount = 5;
+    setRewardFlag( UnlockEntry::GearSets );
+  }
+
+  setMaxGearSets( getMaxGearSets() + amount );
 }
 
 uint8_t Player::getMaxGearSets() const
