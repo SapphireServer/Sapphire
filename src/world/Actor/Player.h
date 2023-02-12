@@ -583,6 +583,9 @@ namespace Sapphire::Entity
     /*! send the entire inventory sequence */
     void sendInventory();
 
+    /*! send the gear inventory */
+    void sendGearInventory();
+
     /*! returns true if loading is complete ( 0x69 has been received ) */
     bool isLoadingComplete() const;
 
