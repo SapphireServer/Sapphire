@@ -472,7 +472,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   struct IntegrityStatus {
     
     uint8_t Slot;
-    uint8_t paddingmaybe;
+    uint8_t __padding1;
     uint16_t Id;
     int16_t SystemParam;
     uint8_t __padding2;
@@ -501,7 +501,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t StatusCount;
     uint8_t unknown_E0;
     IntegrityStatus Status[4];
-    uint32_t unk_1;
+    uint32_t __padding3;
   };
 
   /**
