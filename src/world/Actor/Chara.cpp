@@ -544,7 +544,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   status.Source = pEffect->getSrcActorId();
   status.Time = static_cast< float >( pEffect->getDuration() ) / 1000;
   status.Id = static_cast< uint16_t >( pEffect->getId() );
-  status.Slot = static_cast< uint8_t >( nextSlot + 1 );
+  status.Slot = static_cast< uint8_t >( nextSlot );
   status.SystemParam = static_cast< int16_t >( pEffect->getParam() );
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );
