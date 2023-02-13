@@ -335,7 +335,7 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
     return;
 
   auto& warpMgr = Common::Service< WarpMgr >::ref();
-  warpMgr.requestMoveTerritory( player, Common::WARP_TYPE_EXIT_RANGE, pTargetTeri->getGuId(), targetPos, rotation );
+  warpMgr.requestMoveTerritory( player, Common::WARP_TYPE_NORMAL_POS, pTargetTeri->getGuId(), targetPos, rotation );
 
 }
 

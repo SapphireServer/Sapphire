@@ -839,9 +839,10 @@ bool Action::Action::preFilterActor( Sapphire::Entity::GameObject& actor ) const
   // todo: are there any server side eobjs that players can hit?
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
-  
-  if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
-    return false;
+
+  // todo: evaluate other actions that can hit condition (eg. sprint)
+  /* if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
+    return false;*/
   
   if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
     return false;

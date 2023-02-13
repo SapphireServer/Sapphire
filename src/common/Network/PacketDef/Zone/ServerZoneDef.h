@@ -470,6 +470,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   };
 
   struct IntegrityStatus {
+    
     uint8_t Slot;
     uint8_t __padding1;
     uint16_t Id;
@@ -478,7 +479,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t __padding3;
     float Time;
     uint32_t Source;
-    uint8_t unknown_3_2;
   };
 
   /**
@@ -499,8 +499,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint32_t HpMax;
     uint16_t MpMax;
     uint8_t StatusCount;
-    uint8_t __padding3;
+    uint8_t unknown_E0;
     IntegrityStatus Status[4];
+    uint32_t __padding3;
   };
 
   /**
@@ -550,14 +551,15 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
   /**
   * Structural representation of the packet sent by the server
-  * to update HP / MP / TP
+  * to update HP / MP / TP / GP
   */
   struct FFXIVIpcResting : FFXIVIpcBasePacket< Resting >
   {
-    /* 0000 */ uint32_t Hp;
-    /* 0004 */ uint16_t Mp;
-    /* 0006 */ uint16_t Tp;
-    /* 0008 */ uint16_t Gp;
+    uint32_t Hp;
+    uint16_t Mp;
+    uint16_t Tp;
+    uint16_t Gp;
+    uint32_t Unknown_3_2;
   };
 
   struct FFXIVIpcRecastGroup : FFXIVIpcBasePacket< RecastGroup >
@@ -617,6 +619,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint64_t Target;
     uint32_t BallistaEntityId;
     Common::CalcResult CalcResult;
+    uint32_t __padding2;
   };
 
   struct MountStruct
