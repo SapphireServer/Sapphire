@@ -103,13 +103,12 @@ public:
 
   void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    if( bnpc.getLayoutId() != Enemy0 && bnpc.getLayoutId() != Enemy1 )
+    if( bnpc.getBNpcNameId() != Enemy0 && bnpc.getBNpcNameId() != Enemy1 )
       return;
 
     auto currentKC39 = quest.getUI8AL() + 1;
     auto currentKC12 = quest.getUI8BH() + 1;
-
-    switch( bnpc.getLayoutId() )
+    switch( bnpc.getBNpcNameId() )
     {
       case Enemy0:
       {
@@ -569,7 +568,7 @@ private:
 
   void Scene00026Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //Empty
+    quest.setSeq( Seq4 );
   }
 
   //////////////////////////////////////////////////////////////////////
