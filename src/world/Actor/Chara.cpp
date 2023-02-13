@@ -530,13 +530,21 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   statusEffectAdd->data().MpMax = static_cast< uint16_t >( getMaxMp() );
   statusEffectAdd->data().ClassJob = static_cast< uint8_t >( getClass() );
   statusEffectAdd->data().StatusCount = 1;
+  statusEffectAdd->data().unknown_E0 = 0xE0;
+
+  // set all status sources to u32 invalid game obj
+  // todo: chara status effect map should be filled instead, since hudparam also uses invalid gameobj
+  for( int i = 0; i < 4; ++i )
+  {
+    statusEffectAdd->data().Status[ i ].Source = INVALID_GAME_OBJECT_ID;
+  }
 
   auto& status = statusEffectAdd->data().Status[ 0 ];
 
   status.Source = pEffect->getSrcActorId();
   status.Time = static_cast< float >( pEffect->getDuration() ) / 1000;
   status.Id = static_cast< uint16_t >( pEffect->getId() );
-  status.Slot = static_cast< uint8_t >( nextSlot );
+  status.Slot = static_cast< uint8_t >( nextSlot + 1 );
   status.SystemParam = static_cast< int16_t >( pEffect->getParam() );
 
   sendToInRangeSet( statusEffectAdd, isPlayer() );

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Network/GamePacket.h>
+#include <StatusEffect/StatusEffect.h>
+#include <Util/Util.h>
 #include "Forwards.h"
 
 namespace Sapphire::Network::Packets::WorldPackets::Server
@@ -28,7 +30,20 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.Mp = player.getMp();
       m_data.Tp = player.getTp();
       m_data.HpMax = player.getMaxHp();
-      m_data.MpMax = player.getMaxMp();;
+      m_data.MpMax = player.getMaxMp();
+
+      auto statusMap = player.getStatusEffectMap();
+
+      int i = 0;
+      for( const auto& [ key, val ] : statusMap )
+      {
+        m_data.effect[ i ].Id = val->getId();
+        m_data.effect[ i ].Source = val->getSrcActorId();
+        m_data.effect[ i ].SystemParam = val->getParam();
+        m_data.effect[ i ].Time = ( val->getDuration() - ( Common::Util::getTimeMs() - val->getStartTimeMs() ) ) / 1000.f;
+
+        i++;
+      }
     };
   };
   template< typename... Args >
