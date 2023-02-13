@@ -1048,18 +1048,6 @@ namespace Sapphire::Common
     CalcResultParam CalcResultCt[4];
   };
 
-  struct IntegrityStatus
-  {
-    uint8_t Slot;
-    uint8_t __padding1;
-    uint16_t Id;
-    int16_t SystemParam;
-    uint8_t __padding2;
-    uint8_t __padding3;
-    float Time;
-    uint32_t Source;
-  };
-
   enum class ActionCollisionType : uint8_t
   {
     None,

@@ -469,6 +469,18 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t Type;
   };
 
+  struct IntegrityStatus {
+    uint8_t Slot;
+    uint8_t __padding1;
+    uint16_t Id;
+    int16_t SystemParam;
+    uint8_t __padding2;
+    uint8_t __padding3;
+    float Time;
+    uint32_t Source;
+    uint8_t unknown_3_2;
+  };
+
   /**
   * Structural representation of the packet sent by the server
   * add a status effect
@@ -488,7 +500,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint16_t MpMax;
     uint8_t StatusCount;
     uint8_t __padding3;
-    Common::IntegrityStatus Status[4];
+    IntegrityStatus Status[4];
   };
 
   /**
