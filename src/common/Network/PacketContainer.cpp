@@ -26,13 +26,13 @@ void Network::Packets::PacketContainer::addPacket( Network::Packets::FFXIVPacket
 {
   m_entryList.push_back( entry );
 
-  m_ipcHdr.size += static_cast< uint32_t >( entry->getSize() );
+  m_ipcHdr.size += static_cast< uint32_t >( entry->getAlignedSize() );
   m_ipcHdr.count++;
 }
 
 void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& sendBuffer )
 {
-  std::vector< uint8_t > tempBuffer( m_ipcHdr.size );
+  std::vector< uint8_t > tempBuffer( m_ipcHdr.size, 0 );
   memset( &tempBuffer[ 0 ], 0, m_ipcHdr.size );
 
   using namespace std::chrono;
@@ -43,13 +43,8 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
   m_ipcHdr.timestamp = tick;
   m_ipcHdr.unknown_20 = 1;
 
-  memcpy( &tempBuffer[ 0 ], &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
-
   auto it = m_entryList.begin();
   std::size_t offset = 0;
-
-  if( m_entryList.size() > 1 )
-    offset = 0;
 
   for( ; it != m_entryList.end(); ++it )
   {
@@ -60,13 +55,23 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
       pPacket->setTargetActor( m_segmentTargetOverride );
     }
 
+    // get aligned and original packet data size for offset and copy
+    auto packetAlignedSize = pPacket->getAlignedSize();
+    auto packetOriginalSize = pPacket->getSize();
+
+    // set packet size in seg header to aligned size
+    pPacket->setSize( packetAlignedSize );
+
+    // copy packet data into buffer
     auto data = pPacket->getData();
-    memcpy( &tempBuffer[ 0 ] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[ 0 ], pPacket->getSize() );
-    offset += pPacket->getSize();
+    memcpy( &tempBuffer[ 0 ] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[ 0 ], packetOriginalSize );
+
+    offset += packetAlignedSize;
   }
 
-  sendBuffer.assign( &tempBuffer[ 0 ], &tempBuffer[ 0 ] + m_ipcHdr.size );
+  memcpy( &tempBuffer[ 0 ], &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
 
+  sendBuffer.assign( &tempBuffer[ 0 ], &tempBuffer[ 0 ] + m_ipcHdr.size );
 }
 
 std::string Network::Packets::PacketContainer::toString()

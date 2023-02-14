@@ -90,11 +90,6 @@ namespace Sapphire::Network::Packets
       setTargetActor( targetActorId );
     }
 
-    std::size_t getSize() const
-    {
-      return m_segHdr.size;
-    }
-
     virtual std::vector< uint8_t > getData() const
     {
       return {};
@@ -104,6 +99,7 @@ namespace Sapphire::Network::Packets
     /** The segment header */
     FFXIVARR_PACKET_SEGMENT_HEADER m_segHdr;
     uint16_t m_segmentType;
+    std::size_t m_alignedSize;
 
   public:
     virtual size_t getContentSize()
@@ -122,6 +118,33 @@ namespace Sapphire::Network::Packets
     uint16_t getSegmentType() const
     {
       return m_segmentType;
+    }
+
+    /**
+    * @brief gets current packet size
+    * @return packet size in bytes
+    */
+    std::size_t getSize() const
+    {
+      return m_segHdr.size;
+    }
+
+    /**
+    * @brief gets aligned packet size
+    * @return packet size in bytes, to 8 byte %
+    */
+    std::size_t getAlignedSize() const
+    {
+      return m_alignedSize;
+    }
+
+    /**
+    * @brief sets current packet size
+    * @param packet size in bytes
+    */
+    void setSize( std::size_t packetSize )
+    {
+      m_segHdr.size = packetSize;
     }
 
     /**
@@ -169,6 +192,8 @@ namespace Sapphire::Network::Packets
       // The size must be the sum of the segment header and the content
       m_segHdr.size = static_cast< uint32_t >( sizeof( FFXIVARR_PACKET_SEGMENT_HEADER ) + getContentSize() );
       m_segHdr.type = getSegmentType();
+
+      m_alignedSize = m_segHdr.size + ( m_segHdr.size % 8 );
     }
 
   };
@@ -200,6 +225,8 @@ namespace Sapphire::Network::Packets
 
       memset( &m_ipcHdr, 0, ipcHdrSize );
       m_ipcHdr.type = static_cast< WorldPackets::Server::ServerZoneIpcType >( m_data._ServerIpcType );
+
+      m_alignedSize = m_segHdr.size + ( m_segHdr.size % 8 );
     }
 
     size_t getContentSize() override
@@ -258,6 +285,7 @@ namespace Sapphire::Network::Packets
       m_ipcHdr.type = static_cast< WorldPackets::Server::ServerZoneIpcType >( m_data._ServerIpcType );
       m_ipcHdr.timestamp = Common::Util::getTimeSeconds();
       m_segHdr.size = sizeof( T ) + sizeof( FFXIVARR_IPC_HEADER ) + sizeof( FFXIVARR_PACKET_SEGMENT_HEADER );
+      m_alignedSize = m_segHdr.size + ( m_segHdr.size % 8 );
     };
 
   protected:
@@ -278,6 +306,7 @@ namespace Sapphire::Network::Packets
     {
       initialize();
       m_segHdr.size = size;
+      m_alignedSize = m_segHdr.size + ( m_segHdr.size % 8 );
     };
 
     FFXIVRawPacket( char* data, uint16_t size ) :
@@ -287,6 +316,7 @@ namespace Sapphire::Network::Packets
 
       memcpy( &m_data[ 0 ], data + segmentHdrSize, size - segmentHdrSize );
       memcpy( &m_segHdr, data, segmentHdrSize );
+      m_alignedSize = m_segHdr.size + ( m_segHdr.size % 8 );
     }
 
     size_t getContentSize() override
