@@ -52,6 +52,7 @@
 #include "Manager/BlacklistMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Manager/FreeCompanyMgr.h"
+#include "Manager/MapMgr.h"
 
 #include "ContentFinder/ContentFinder.h"
 
@@ -222,6 +223,16 @@ void WorldServer::run( int32_t argc, char* argv[] )
     return;
   }
   Common::Service< Manager::ActionMgr >::set( pActionMgr );
+
+  auto pMapMgr = std::make_shared< Manager::MapMgr >();
+
+  Logger::info( "MapMgr: Caching quests" );
+  if( !pMapMgr->loadQuests() )
+  {
+    Logger::fatal( "Unable to cache quests!" );
+    return;
+  }
+  Common::Service< Manager::MapMgr >::set( pMapMgr );
 
   auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
   Common::Service< Manager::NaviMgr >::set( pNaviMgr );

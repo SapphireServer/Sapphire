@@ -273,6 +273,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onEObjHit( World::Quest& quest, Sapphire::Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
+    virtual Event::EventHandler::QuestAvailability getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId );
+
     World::Manager::EventMgr& eventMgr()
     {
       return Common::Service< World::Manager::EventMgr >::ref();

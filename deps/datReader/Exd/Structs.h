@@ -1738,8 +1738,7 @@ namespace Excel
   struct ClassJobCategory
   {
     ClassJobCategoryTextStruct Text;
-    bool ClassJob[31];
-    int8_t padding0[1];
+    bool ClassJob[34];
   };
 
   /* 264228 */

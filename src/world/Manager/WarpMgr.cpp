@@ -16,6 +16,7 @@
 #include <Network/PacketWrappers/ActorControlPacket.h>
 
 #include <Manager/PlayerMgr.h>
+#include <Manager/MapMgr.h>
 
 #include "Territory/Territory.h"
 #include "Actor/Player.h"
@@ -103,6 +104,8 @@ void WarpMgr::finishWarp( Entity::Player& player )
   player.sendToInRangeSet( setStatusPacket, true );
 
   playerMgr.onUnsetStateFlag( player, PlayerStateFlag::BetweenAreas );
+
+  Common::Service< MapMgr >::ref().updateAll( player );
 }
 
 void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteId, uint8_t teleportType )

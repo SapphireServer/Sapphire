@@ -3,6 +3,7 @@
 #include <Service.h>
 
 #include "Manager/QuestMgr.h"
+#include "Manager/MapMgr.h"
 
 #include "Player.h"
 
@@ -41,11 +42,13 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
   }
 
   auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+  auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
 
   m_quests[ idx ] = World::Quest();
   removeQuestTracking( idx );
   deleteDbQuest( questId );
 
+  mapMgr.updateQuests( *this );
   questMgr.onRemoveQuest( *this, idx );
 
 }
@@ -77,11 +80,13 @@ int8_t Sapphire::Entity::Player::getQuestIndex( uint16_t questId )
 void Sapphire::Entity::Player::updateQuest( const World::Quest& quest )
 {
   auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+  auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
 
   if( hasQuest( quest.getId() ) )
   {
     uint8_t index = getQuestIndex( quest.getId() );
     m_quests[ index ] = quest;
+    mapMgr.updateQuests( *this );
     questMgr.onUpdateQuest( *this, index );
   }
   else if( quest.getSeq() != 0 )
@@ -99,12 +104,14 @@ bool Sapphire::Entity::Player::addQuest( const World::Quest& quest )
   }
 
   auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+  auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
 
   m_quests[ idx ] = quest;
 
   insertDbQuest( quest, idx );
   addQuestTracking( idx );
 
+  mapMgr.updateQuests( *this );
   questMgr.onUpdateQuest( *this, idx );
 
   return true;
@@ -164,6 +171,7 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
   m_questCompleteFlags[ index ] ^= value;
 
+  Common::Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 Sapphire::World::Quest& Sapphire::Entity::Player::getQuestByIndex( uint16_t index )

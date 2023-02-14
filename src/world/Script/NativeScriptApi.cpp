@@ -191,6 +191,11 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  Event::EventHandler::QuestAvailability QuestScript::getQuestAvailability( Sapphire::Entity::Player& player, uint32_t eventId )
+  {
+    return Event::EventHandler::QuestAvailability::Available;
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   EventObjectScript::EventObjectScript( uint32_t eobjId ) : ScriptObject( eobjId, typeid( EventObjectScript ).hash_code() )

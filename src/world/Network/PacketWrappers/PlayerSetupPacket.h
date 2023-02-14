@@ -49,7 +49,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       memcpy( m_data.Aetheryte, player.getAetheryteArray().data(), sizeof( m_data.Aetheryte ) );
 
       // Set the class levels and exp.
-      for( uint8_t i = 0; i < Common::CLASSJOB_TOTAL; ++i )
+      for( uint8_t i = 0; i < 23; ++i )
       {
         m_data.Lv[ i ] = player.getClassArray()[ i ];
         m_data.Exp[ i ] = player.getExpArray()[ i ];
