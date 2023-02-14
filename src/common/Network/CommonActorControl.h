@@ -92,7 +92,8 @@ namespace Sapphire::Network::ActorControl
 
     DirectorUpdate = 0x6D,
 
-    ItemObtainMsg = 0x75,
+    SetFateState = 0x74,
+    ObtainFateItem = 0x75,
     FateReqFailMsg = 0x76,
     DutyQuestScreenMsg = 0x7B,
 
@@ -105,8 +106,11 @@ namespace Sapphire::Network::ActorControl
     ActionLearnMsg1 = 0x87,
 
     FreeEventPos = 0x8A,
+    MoveType = 0x8E, // 1 == pvp, 0 == normal
 
     DailyQuestSeed = 0x90, // param1 = the daily quest seed
+
+    SetFateProgress = 0x9B,
 
     SetBGM = 0xA1,
 
@@ -119,10 +123,10 @@ namespace Sapphire::Network::ActorControl
     Appear = 0xC8,
     ZoneInDefaultPos = 0xC9,
 
-    TeleportStart = 0xCB,
-    TeleportInvitation = 0xCC,
-    TeleportDone = 0xCD,
-    TeleportDoneFadeOut = 0xCE,
+    OnExecuteTelepo = 0xCB,
+    OnInvitationTelepo = 0xCC,
+    OnExecuteTelepoAction = 0xCD,
+    TownTranslate = 0xCE,
 
     WarpStart = 0xCF,
 
@@ -284,6 +288,8 @@ namespace Sapphire::Network::ActorControl
     SetBait = 0x325, // param1: bait ID
 
     SetFestival = 0x386, // param1: festival.exd index
+
+    SetCycleTimes = 0x38B,
 
     ToggleOrchestrionUnlock = 0x396,
 

@@ -256,14 +256,6 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
     player.setCFPenaltyMinutes( static_cast< uint32_t >( minutes ) );
   }
-  else if( subCommand == "eorzeatime" )
-  {
-    uint64_t timestamp;
-    sscanf( params.c_str(), "%" SCNu64, &timestamp );
-
-    player.setEorzeaTimeOffset( timestamp );
-    PlayerMgr::sendServerNotice( player, "Eorzea time offset: {0}", timestamp );
-  }
   else if( subCommand == "setMount" )
   {
     int32_t id;

@@ -698,9 +698,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t LinkParent;
     uint8_t PoseEmote;
     uint8_t __padding1;
-    uint16_t Flag;
-    uint8_t __padding2;
-    uint8_t __padding3;
+    uint32_t Flag;
     Common::StatusWork Status[30];
     MountStruct Mount;
     uint8_t Name[32];
@@ -869,8 +867,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t BirthMonth;
     uint8_t Birthday;
     uint8_t StartTown;
-    uint8_t GrandCompany;
     uint8_t HomePoint;
+    uint8_t GrandCompany;
     uint8_t Pet;
     uint8_t BuddyRank;
     uint8_t BuddyRankExceeded;
@@ -1019,9 +1017,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t Penalty;
     uint8_t Login;
     uint8_t __padding1;
+    uint16_t Lv1;
     uint16_t Lv;
-    uint8_t __padding2;
-    uint8_t __padding3;
     uint32_t BorrowAction[10];
     uint8_t PhysicalBonus[6];
   };
@@ -1560,7 +1557,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t update;
     uint8_t __padding1;
     uint8_t __padding2;
-    struct DailyQuest dailyQuestArray[6];
+    struct DailyQuest dailyQuestArray[12];
   };
 
 

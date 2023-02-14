@@ -4610,8 +4610,7 @@ namespace Excel
   /* 390890 */
   struct Permission
   {
-    bool Flag[58];
-    int8_t padding0[2];
+    bool Flag[80];
   };
 
   /* 391161 */

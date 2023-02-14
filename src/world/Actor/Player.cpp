@@ -1315,7 +1315,6 @@ void Player::autoAttack( CharaPtr pTarget )
   entry.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
   entry.Arg0 = 2;
   entry.Arg1 = 7;
-  //entry.Flag = 128;
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
   {
@@ -1441,7 +1440,7 @@ void Player::teleportQuery( uint16_t aetheryteId )
 
     bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
     // TODO: figure out what param1 really does
-    queuePacket( makeActorControlSelf( getId(), TeleportStart, insufficientGil ? 2 : 0, aetheryteId ) );
+    queuePacket( makeActorControlSelf( getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId ) );
 
     if( !insufficientGil )
     {

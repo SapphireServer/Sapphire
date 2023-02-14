@@ -406,6 +406,17 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
 
   if( player.isLogin() )
   {
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x169, 0 ) ); // unknown
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x54, 0 ) ); // something treasure map related?
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x23D, 0 ) ); // unknown
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 0 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 1 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 2 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 3 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 4 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 5 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 6 ) ); // SalvageSkill
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 7 ) ); // SalvageSkill
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetCharaGearParamUI, player.getEquipDisplayFlags(), 1 ) );
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
   }
@@ -417,19 +428,32 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
     player.sendHuntingLog();
 
-  player.sendStats();
+  if( player.isLogin() )
+  {
+    player.sendItemLevel();
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x39, 0 ) ); // unknown
+    server.queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
+  }
 
+  player.sendStats();
+  player.sendRecastGroups();
+
+  auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
+  classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
+  classInfo->data().Lv = player.getLevel();
+  classInfo->data().Lv1 = player.getLevel();
+  if( player.isLogin() )
+    classInfo->data().Login = 1;
+  server.queueForPlayer( player.getCharacterId(), classInfo );
+
+  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), 0x112, 0x24 ) ); // unknown
   // only initialize the UI if the player in fact just logged in.
   if( player.isLogin() )
   {
     auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
     std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
 
-    server.queueForPlayer( player.getCharacterId(), { contentFinderList, makePlayerSetup( player ) } );
-
-    onPlayerStatusUpdate( player );
-
-    player.sendItemLevel();
+    server.queueForPlayer( player.getCharacterId(), contentFinderList );
 
     player.clearSoldItems();
   }
