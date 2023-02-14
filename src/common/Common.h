@@ -556,8 +556,8 @@ namespace Sapphire::Common
     WolfMark = 0x07,
     TomestoneSold = 0x08,
     AlliedSeal = 0x09,
-    TomestonePoet = 0x0A,
-    Mgp = 0x0B,
+    Mgp = 0x0A,
+    TomestonePoet = 0x0B,
     TomestoneLaw = 0x0C,
     TomestoneEso = 0x0D,
     TomestoneLore = 0x0E

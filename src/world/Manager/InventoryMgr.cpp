@@ -46,7 +46,7 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
       currencyInfoPacket->data().item.subquarity = 1;
       currencyInfoPacket->data().item.stack = itM.second->getStackSize();
       currencyInfoPacket->data().item.storageId = container->getId();
-      currencyInfoPacket->data().item.containerIndex = 0;
+      currencyInfoPacket->data().item.containerIndex = itM.first;
 
       server.queueForPlayer( player.getCharacterId(), currencyInfoPacket );
     }

@@ -182,6 +182,8 @@ namespace Sapphire::Entity
     /*! return the current amount of crystals of type */
     uint32_t getCrystal( uint8_t type ) const;
 
+    uint32_t currencyTypeToItem( Common::CurrencyType type ) const;
+
     void updateModels( Common::GearSetSlot equipSlotId, const Item& item );
 
     Common::GearModelSlot equipSlotToModelSlot( Common::GearSetSlot slot );
