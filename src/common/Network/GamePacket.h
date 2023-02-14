@@ -90,11 +90,6 @@ namespace Sapphire::Network::Packets
       setTargetActor( targetActorId );
     }
 
-    std::size_t getSize() const
-    {
-      return m_segHdr.size;
-    }
-
     virtual std::vector< uint8_t > getData() const
     {
       return {};
@@ -122,6 +117,24 @@ namespace Sapphire::Network::Packets
     uint16_t getSegmentType() const
     {
       return m_segmentType;
+    }
+
+    /**
+    * @brief gets current packet size
+    * @return packet size in bytes
+    */
+    std::size_t getSize() const
+    {
+      return m_segHdr.size;
+    }
+
+    /**
+    * @brief sets current packet size
+    * @param packet size in bytes
+    */
+    void setSize( std::size_t packetSize )
+    {
+      m_segHdr.size = packetSize;
     }
 
     /**

@@ -43,13 +43,8 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
   m_ipcHdr.timestamp = tick;
   m_ipcHdr.unknown_20 = 1;
 
-  memcpy( &tempBuffer[ 0 ], &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
-
   auto it = m_entryList.begin();
   std::size_t offset = 0;
-
-  if( m_entryList.size() > 1 )
-    offset = 0;
 
   for( ; it != m_entryList.end(); ++it )
   {
@@ -60,13 +55,32 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
       pPacket->setTargetActor( m_segmentTargetOverride );
     }
 
+    auto validPacketDataSize = pPacket->getSize();
+
+    // check if packet is 8 byte aligned
+    auto alignCheck = validPacketDataSize % 8;
+    if( alignCheck != 0 )
+    {
+      // pad packet to boundary
+      // resize is expensive
+      tempBuffer.resize( tempBuffer.size() + alignCheck, 0 );
+
+      pPacket->setSize( validPacketDataSize + alignCheck );
+    }
+
+    // copy packet data into buffer
     auto data = pPacket->getData();
-    memcpy( &tempBuffer[ 0 ] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[ 0 ], pPacket->getSize() );
-    offset += pPacket->getSize();
+    memcpy( &tempBuffer[ 0 ] + sizeof( FFXIVARR_PACKET_HEADER ) + offset, &data[ 0 ], validPacketDataSize );
+
+    offset += validPacketDataSize + alignCheck;
   }
 
-  sendBuffer.assign( &tempBuffer[ 0 ], &tempBuffer[ 0 ] + m_ipcHdr.size );
+  // buffer has possibly been resized for alignment
+  m_ipcHdr.size = tempBuffer.size();
 
+  memcpy( &tempBuffer[ 0 ], &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
+
+  sendBuffer.assign( &tempBuffer[ 0 ], &tempBuffer[ 0 ] + m_ipcHdr.size );
 }
 
 std::string Network::Packets::PacketContainer::toString()
