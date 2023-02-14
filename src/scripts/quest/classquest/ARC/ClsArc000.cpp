@@ -145,18 +145,18 @@ public:
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
-    if( varIdx == 1 )
-      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
-    else if( varIdx == 2 )
-      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
-    else
-      eventMgr().sendEventNotice( player, getId(), 3, 0, 0, 0 );
-
     auto QUEST_ONKILL_37 = quest.getUI8AL();
     auto QUEST_ONKILL_49 = quest.getUI8BH();
     auto QUEST_ONKILL_47 = quest.getUI8BL();
 
-    if( QUEST_ONKILL_37 >= 3 && QUEST_ONKILL_49 >= 3 && QUEST_ONKILL_47 >= 3 )
+    if( varIdx == 1 && QUEST_ONKILL_37 <= 3 )
+      eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
+    else if( varIdx == 2 && QUEST_ONKILL_49 <= 3 )
+      eventMgr().sendEventNotice( player, getId(), 2, 0, 0, 0 );
+    else if( varIdx == 3 && QUEST_ONKILL_47 <= 3 )
+      eventMgr().sendEventNotice( player, getId(), 3, 0, 0, 0 );
+
+    if( QUEST_ONKILL_37 + 1 >= 3 && QUEST_ONKILL_49 + 1 >= 3 && QUEST_ONKILL_47 + 1 >= 3 )
     {
       quest.setSeq( SeqFinish );
     }
