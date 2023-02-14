@@ -387,6 +387,9 @@ namespace Sapphire::Entity
     /*! set number of gear sets */
     void setMaxGearSets( uint8_t amount );
 
+    /*! add a gear set */
+    void addGearSet();
+
     /*! get number of gear sets */
     uint8_t getMaxGearSets() const;
 
@@ -582,6 +585,9 @@ namespace Sapphire::Entity
 
     /*! send the entire inventory sequence */
     void sendInventory();
+
+    /*! send the gear inventory */
+    void sendGearInventory();
 
     /*! returns true if loading is complete ( 0x69 has been received ) */
     bool isLoadingComplete() const;

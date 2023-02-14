@@ -214,7 +214,7 @@ private:
   {
     //TODO: Unlock Skill
     player.finishQuest( getId() );
-    player.setMaxGearSets( player.getMaxGearSets() + 1 );
+    player.addGearSet();
   }
 };
 

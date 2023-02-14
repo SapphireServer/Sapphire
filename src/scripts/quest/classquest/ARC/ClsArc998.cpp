@@ -100,7 +100,7 @@ private:
     {
       player.finishQuest( getId() );
       player.setLevelForClass( 1, Sapphire::Common::ClassJob::Archer );
-      player.setMaxGearSets( player.getMaxGearSets() + 1 );
+      player.addGearSet();
     }
   }
 };

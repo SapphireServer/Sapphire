@@ -101,7 +101,7 @@ private:
       //TODO:Unlock gathering log? Maybe?
       player.finishQuest( getId() );
       player.setLevelForClass( 1, Sapphire::Common::ClassJob::Botanist );
-      player.setMaxGearSets( player.getMaxGearSets() + 1 );
+      player.addGearSet();
     }
   }
 };

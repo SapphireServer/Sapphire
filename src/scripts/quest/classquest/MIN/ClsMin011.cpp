@@ -100,7 +100,7 @@ private:
       //TODO:Unlock gathering log?
       player.finishQuest( getId() );
       player.setLevelForClass( 1, Sapphire::Common::ClassJob::Miner );
-      player.setMaxGearSets( player.getMaxGearSets() + 1 );
+      player.addGearSet();
     }
   }
 };

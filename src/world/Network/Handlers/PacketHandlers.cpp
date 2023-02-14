@@ -631,8 +631,10 @@ void Sapphire::Network::GameConnection::catalogSearch( const Packets::FFXIVARR_P
 void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGearSetEquip >( inPacket );
+  const auto contextId = packet.data().contextId;
 
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< PlayerMgr >::ref();
 
   // Loop over all slots
   for( int slot = 0; slot < 14; ++slot )
@@ -645,43 +647,49 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
 
     const auto fromItem = fromSlot == -1 ? nullptr : player.getItemAt( fromContainer, fromSlot );
     const auto equippedItem = player.getItemAt( Common::GearSet0, slot );
-    const auto operationType = ( fromItem && !equippedItem ) || ( !fromItem && equippedItem ) ? 
-                                 ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_MOVEITEM : ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_SWAPITEM;
-
-    auto ackPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
-    ackPacket->data().contextId = packet.data().contextId;
-    ackPacket->data().operationType = operationType;
-    server.queueForPlayer( player.getCharacterId(), ackPacket );
 
     if( fromItem && equippedItem )
     {
       player.swapItem( fromContainer, fromSlot, Common::GearSet0, slot );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, 0 ) );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, contextId ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, contextId ) );
     }
     else if( fromItem && !equippedItem )
     {
       player.moveItem( fromContainer, fromSlot, Common::GearSet0, slot );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, 0 ) );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, contextId ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, contextId ) );
     }
     else if( !fromItem && equippedItem )
     {
       auto containerId = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( static_cast< Common::EquipSlotCategory >( equippedItem->getSlot() ) );
-      auto freeSlot = player.getFreeContainerSlot( containerId ).second;
-      player.moveItem( Common::GearSet0, slot, containerId, freeSlot );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeSlot, containerId, *equippedItem, 0 ) );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, 0 ) );
+      auto freeContainerSlot = player.getFreeContainerSlot( containerId );
+      if( freeContainerSlot.second > -1 )
+        player.moveItem( Common::GearSet0, slot, freeContainerSlot.first, freeContainerSlot.second );
+      else
+      {
+        // TODO: show too little inventory space error
+        // TODO: the gearset handler shouldn't equip -anything- if there's ever too little inventory space
+        continue;
+      }
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeContainerSlot.second, freeContainerSlot.first, *equippedItem, contextId ) );
+      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, contextId ) );
     }
   }
 
-  // Send the inventory
-  //player.sendInventory();
+  // Send the gear inventory
+  player.sendGearInventory();
 
   if( packet.data().contextId < 0xFE )
   {
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::GearSetEquipMsg, packet.data().contextId ) );
   }
+
+  auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
+  invTransFinPacket->data().contextId = contextId;
+  invTransFinPacket->data().operationId = contextId;
+  invTransFinPacket->data().operationType = ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
+  server.queueForPlayer( player.getCharacterId(), invTransFinPacket );
 }
 
 void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

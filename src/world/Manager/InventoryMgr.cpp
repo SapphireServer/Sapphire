@@ -29,11 +29,14 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
 
   auto sequence = player.getNextInventorySequence();
   auto pMap = container->getItemMap();
+  uint32_t itemCount = 0;
 
   for( auto & itM : pMap )
   {
     if( !itM.second )
-      return;
+      continue;
+
+    itemCount++;
 
     if( container->getId() == Common::InventoryType::Currency || container->getId() == Common::InventoryType::Crystal )
     {
@@ -69,7 +72,7 @@ void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainer
 
   auto itemSizePacket = makeZonePacket< FFXIVIpcItemSize >( player.getId() );
   itemSizePacket->data().contextId = sequence;
-  itemSizePacket->data().size = container->getEntryCount();
+  itemSizePacket->data().size = itemCount;
   itemSizePacket->data().storageId = container->getId();
 
   server.queueForPlayer( player.getCharacterId(), itemSizePacket );

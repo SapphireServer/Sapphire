@@ -422,6 +422,13 @@ void Sapphire::Entity::Player::sendInventory()
   }
 }
 
+void Sapphire::Entity::Player::sendGearInventory()
+{
+  auto& invMgr = Common::Service< World::Manager::InventoryMgr >::ref();
+
+  invMgr.sendInventoryContainer( *this, m_storageMap[ GearSet0 ] );
+}
+
 Sapphire::Entity::Player::InvSlotPairVec Sapphire::Entity::Player::getSlotsOfItemsInInventory( uint32_t catalogId )
 {
   InvSlotPairVec outVec;
