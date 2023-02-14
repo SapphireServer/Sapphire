@@ -55,9 +55,11 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
       pPacket->setTargetActor( m_segmentTargetOverride );
     }
 
+    // get aligned and original packet data size for offset and copy
     auto packetAlignedSize = pPacket->getAlignedSize();
     auto packetOriginalSize = pPacket->getSize();
 
+    // set packet size in seg header to aligned size
     pPacket->setSize( packetAlignedSize );
 
     // copy packet data into buffer
@@ -66,9 +68,6 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
 
     offset += packetAlignedSize;
   }
-
-  // buffer has possibly been resized for alignment
-  m_ipcHdr.size = tempBuffer.size();
 
   memcpy( &tempBuffer[ 0 ], &m_ipcHdr, sizeof( FFXIVARR_PACKET_HEADER ) );
 
