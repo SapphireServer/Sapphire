@@ -202,7 +202,11 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpcData = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId )->data().EventHandler;
+    auto eNpc = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId );
+    if( !eNpc )
+      continue;
+
+    auto eNpcData = eNpc->data().EventHandler;
 
     for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
     {
