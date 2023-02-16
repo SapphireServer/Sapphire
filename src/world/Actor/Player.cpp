@@ -620,10 +620,14 @@ bool Player::hasMount( uint32_t mountId ) const
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto mount = exdData.getRow< Excel::Mount >( mountId );
 
-  if( mount->data().MountOrder == -1 || mount->data().Model == 0 )
+  if( !mount || mount->data().MountOrder == -1 || mount->data().Model == 0 )
     return false;
 
-  return m_mountGuide[ mount->data().MountOrder / 8 ] & ( 1 << ( mount->data().MountOrder % 8 ) );
+  uint16_t index;
+  uint8_t value;
+  Util::valueToFlagByteIndexValue( mount->data().MountOrder, value, index );
+
+  return m_mountGuide[ index ] & value;
 }
 
 void Player::gainExp( uint32_t amount )
