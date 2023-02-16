@@ -51,7 +51,7 @@ std::string EventMgr::getEventName( uint32_t eventId )
       if( !questInfo )
         return unknown + "Quest";
 
-      std::string name = questInfo->getString( questInfo->data().Text.Name );
+      std::string name = questInfo->getString( questInfo->data().Script );
       std::size_t pos = name.find_first_of( '_' );
 
       return name.substr( 0, pos );

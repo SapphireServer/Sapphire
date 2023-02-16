@@ -891,12 +891,12 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint16_t DailyQuestLastAcceptTime;
     uint8_t DailyQuestSeed;
     uint8_t TreasureObtainedFlag;
-    uint8_t RelicKey;
-    uint8_t RelicNoteKey;
     uint8_t AdventureNotePhase;
     uint8_t RetainerCount;
     uint8_t Unknown4;
     uint8_t __padding5;
+    uint8_t RelicKey;
+    uint8_t RelicNoteKey;
     uint32_t Frontline01MatchCount;
     uint16_t Frontline01WeeklyMatchCount;
     uint8_t Unknown1[10];
@@ -928,9 +928,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
     uint8_t IsFishCatched[61];
     uint8_t IsSpotVisited[25];
-    uint8_t __padding6;
     uint16_t ListFishId[18];
     uint16_t ListFishSize[18];
+    uint8_t __padding6;
     uint32_t PvPPoint[3];
     uint8_t PvPRank[3];
     uint8_t PvPSkillPoint[3];
@@ -944,9 +944,11 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint16_t CycleTime[2];
     uint8_t PoseEmoteType[5];
     uint8_t __padding_;
-    uint8_t Unknown[5];
-    uint8_t SystemFlag[2];
+    uint8_t Unknown;
     uint8_t ContentsNoteComplete[6];
+    uint8_t SecretRecipeAcquireFlags[4];
+    uint8_t SystemFlag[2];
+
     uint8_t GuildOrderClassClearFlags[28];
     uint8_t Unknown2[5];
     uint8_t RelicNoteCount[10];
@@ -957,7 +959,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t MobHuntOrderState[3];
     uint8_t MobHuntKillsCount[29];
     uint8_t TripleTriadAcquireFlags[20];
-    uint8_t SecretRecipeAcquireFlags[2];
+
 
     uint8_t padding[100];
   };
