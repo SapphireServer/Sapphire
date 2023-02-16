@@ -544,7 +544,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     effectPacket->addTargetEffect( entry, static_cast< uint64_t >( player.getId() ) );
 
-    auto sequence = pCurrentZone->getNextEffectSequence();
+    auto sequence = pCurrentZone->getNextEffectResultId();
     effectPacket->setSequence( sequence );
 
 //    effectPacket->setAnimationId( param1 );

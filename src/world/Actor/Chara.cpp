@@ -407,8 +407,6 @@ void Sapphire::Entity::Chara::takeDamage( uint32_t damage )
   }
   else
     m_hp -= damage;
-
-  sendStatusUpdate();
 }
 
 /*!
@@ -521,7 +519,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcActionIntegrity >( getId() );
 
-  statusEffectAdd->data().ResultId = pZone->getNextEffectSequence();
+  statusEffectAdd->data().ResultId = pZone->getNextEffectResultId();
   statusEffectAdd->data().Target = pEffect->getTargetActorId();
   statusEffectAdd->data().Hp = getHp();
   statusEffectAdd->data().Mp = static_cast< uint16_t >( getMp() );

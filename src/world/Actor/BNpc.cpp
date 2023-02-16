@@ -37,6 +37,7 @@
 #include <Task/RemoveBNpcTask.h>
 #include <Task/FadeBNpcTask.h>
 #include <Task/DelayedEmnityTask.h>
+#include <Task/ActionIntegrityTask.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
@@ -995,12 +996,16 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     effectEntry.Arg0 = 3;
     effectEntry.Arg1 = 7;
     //effectEntry.Arg2 = 0x71;
-    effectPacket->setSequence( pZone->getNextEffectSequence() );
+    auto resultId = pZone->getNextEffectResultId();
+    effectPacket->setSequence( resultId );
     effectPacket->addTargetEffect( effectEntry );
 
     sendToInRangeSet( effectPacket );
 
     pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
+
+    auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+    taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
 
   }
 }

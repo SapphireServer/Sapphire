@@ -417,7 +417,7 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 5 ) ); // SalvageSkill
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 6 ) ); // SalvageSkill
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 7 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetCharaGearParamUI, player.getEquipDisplayFlags(), 1 ) );
+    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetConfigFlags, player.getEquipDisplayFlags(), 1 ) );
     server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
   }
 
@@ -425,13 +425,11 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
-    player.sendHuntingLog();
+  player.sendHuntingLog();
 
   if( player.isLogin() )
   {
     player.sendItemLevel();
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x39, 0 ) ); // unknown
     server.queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
   }
 

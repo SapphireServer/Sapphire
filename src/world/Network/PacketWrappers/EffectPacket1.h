@@ -74,6 +74,11 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.ResultId = static_cast< uint32_t>( sequence );
     }
 
+    void setResultId( uint32_t resultId )
+    {
+      m_data.ResultId = static_cast< uint32_t>( resultId );
+    }
+
   private:
     uint8_t m_targetEffectCount{ 0 };
     uint8_t m_sourceEffectCount{ 0 };

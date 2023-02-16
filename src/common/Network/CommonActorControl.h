@@ -276,13 +276,14 @@ namespace Sapphire::Network::ActorControl
     HuntingLogSectionFinish = 0x21F,
     HuntingLogRankFinish = 0x220,
 
-    SetMaxGearSets = 0x320,
 
-    SetCharaGearParamUI = 0x260,
+
+    SetConfigFlags = 0x260,
     ToggleWireframeRendering = 0x261,
 
     ExamineError = 0x2BF,
 
+    SetMaxGearSets = 0x320,
     GearSetEquipMsg = 0x321,
 
     SetBait = 0x325, // param1: bait ID

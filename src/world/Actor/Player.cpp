@@ -44,6 +44,9 @@
 
 #include "WorldServer.h"
 
+#include <Manager/TaskMgr.h>
+#include <Task/ActionIntegrityTask.h>
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -1327,7 +1330,8 @@ void Player::autoAttack( CharaPtr pTarget )
     //entry.Arg2 = 0x73;
   }
 
-  effectPacket->setSequence( pZone->getNextEffectSequence() );
+  auto resultId = pZone->getNextEffectResultId();
+  effectPacket->setResultId( resultId );
 
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addTargetEffect( entry );
@@ -1335,6 +1339,9 @@ void Player::autoAttack( CharaPtr pTarget )
   sendToInRangeSet( effectPacket, true );
 
   pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );
+
+  auto& taskMgr = Common::Service< TaskMgr >::ref();
+  taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
 }
 
 

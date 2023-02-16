@@ -194,7 +194,7 @@ namespace Sapphire
 
     void updateSpawnPoints();
 
-    uint32_t getNextEffectSequence();
+    uint32_t getNextEffectResultId();
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
 

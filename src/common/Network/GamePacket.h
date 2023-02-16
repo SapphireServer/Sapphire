@@ -144,7 +144,7 @@ namespace Sapphire::Network::Packets
     */
     void setSize( std::size_t packetSize )
     {
-      m_segHdr.size = packetSize;
+      m_segHdr.size = static_cast< uint32_t >( packetSize );
     }
 
     /**

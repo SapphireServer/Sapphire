@@ -111,6 +111,8 @@ namespace Sapphire::Entity
 
     std::set< GameObjectPtr > getInRangeActors( bool includeSelf = false );
 
+    std::set< uint64_t > getInRangePlayerIds( bool includeSelf = false );
+
     ////////////////////////////////////////////////////
 
     CharaPtr getAsChara();

@@ -149,9 +149,10 @@ void Sapphire::World::Session::startReplay( const std::string& path )
 
   for( auto set : loadedSets )
   {
-    m_replayCache.emplace_back( Common::Util::getTimeMs() + ( std::get< 0 >( set ) - startTime ), std::get< 1 >( set ) );
+    uint64_t setTime = std::get< 0 >( set );
+    m_replayCache.emplace_back( Common::Util::getTimeMs() + ( ( setTime - startTime ) / 1 ), std::get< 1 >( set ) );
 
-    Logger::info( "Registering {0} for {1}", std::get< 1 >( set ), std::get< 0 >( set ) - startTime );
+    Logger::info( "Registering {0} for {1}, oldTime {2}", std::get< 1 >( set ), setTime - startTime, setTime );
   }
 
   PlayerMgr::sendDebug( *getPlayer(), "Registered {0} sets for replay" ), m_replayCache.size();
@@ -167,15 +168,19 @@ void Sapphire::World::Session::stopReplay()
 void Sapphire::World::Session::processReplay()
 {
   int at = 0;
+  test:
   for( const auto& set : m_replayCache )
   {
-    if( std::get< 0 >( set ) <= Common::Util::getTimeMs() )
+    if( (std::get< 0 >( set ) ) <= Common::Util::getTimeMs() )
     {
       m_pZoneConnection->injectPacket( std::get< 1 >( set ), *getPlayer().get() );
       m_replayCache.erase( m_replayCache.begin() + at );
-      //g_framework.getLogger().info( "Sent for " + std::to_string( std::get< 0 >( set ) ) + ", left: " + std::to_string( m_replayCache.size() ) );
+
+      Logger::info( "Sent for {0}, left: {1}", std::get< 1 >( set ), std::to_string( m_replayCache.size() ) );
+      goto test;
     }
     at++;
+
   }
 
   if( m_replayCache.empty() )

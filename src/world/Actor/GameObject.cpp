@@ -336,6 +336,18 @@ std::set< Sapphire::Entity::GameObjectPtr > Sapphire::Entity::GameObject::getInR
   return tempInRange;
 }
 
+std::set< uint64_t > Sapphire::Entity::GameObject::getInRangePlayerIds( bool includeSelf )
+{
+  std::set< uint64_t > playerIds;
+  for( auto& player : m_inRangePlayers )
+    playerIds.insert( player->getCharacterId() );
+
+  if( isPlayer() && includeSelf )
+    playerIds.insert( getAsPlayer()->getCharacterId() );
+
+  return playerIds;
+}
+
 uint32_t Sapphire::Entity::GameObject::getTerritoryTypeId() const
 {
   return m_territoryTypeId;

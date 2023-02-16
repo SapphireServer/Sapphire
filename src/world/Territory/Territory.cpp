@@ -825,7 +825,7 @@ void Territory::updateSpawnPoints()
   }
 }
 
-uint32_t Territory::getNextEffectSequence()
+uint32_t Territory::getNextEffectResultId()
 {
   return m_effectCounter++;
 }

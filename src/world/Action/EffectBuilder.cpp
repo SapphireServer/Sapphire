@@ -15,6 +15,9 @@
 #include <Manager/TerritoryMgr.h>
 #include <Service.h>
 
+#include <Manager/TaskMgr.h>
+#include <Task/ActionIntegrityTask.h>
+
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 using namespace Sapphire::Network::Packets;
@@ -110,7 +113,7 @@ void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& 
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getZoneByTerritoryTypeId( m_sourceChara->getTerritoryTypeId() );
 
-  auto globalSequence = zone ? zone->getNextEffectSequence() : 0;
+  auto globalSequence = zone ? zone->getNextEffectResultId() : 0;
 
   do // we want to send at least one packet even nothing is hit so other players can see
   {
@@ -125,13 +128,13 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
   auto remainingTargetCount = targetList.size();
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( m_sourceChara->getTerritoryId() );
-  auto globalSequence = zone->getNextEffectSequence();
+  auto resultId = zone->getNextEffectResultId();
 
   if( remainingTargetCount > 1 ) // use AoeEffect packets
   {
     auto effectPacket = std::make_shared< EffectPacket >( m_sourceChara->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    effectPacket->setSequence( globalSequence, m_sequence );
+    effectPacket->setSequence( resultId, m_sequence );
     effectPacket->setTargetActor( targetList[ 0 ]->getId() );
 
     uint8_t targetIndex = 0;
@@ -153,6 +156,8 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
         else
         {
           effectPacket->addTargetEffect( effect, result->getTarget()->getId() );
+          auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+          taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, result->getTarget(), 1000 ) );
         }
 
         zone->addEffectResult( std::move( result ) );
@@ -177,7 +182,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
 
     auto effectPacket = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    effectPacket->setSequence( globalSequence, m_sequence );
+    effectPacket->setSequence( resultId, m_sequence );
 
     for( auto it = m_actorEffectsMap.begin(); it != m_actorEffectsMap.end(); )
     {
@@ -197,6 +202,8 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
         else
         {
           effectPacket->addTargetEffect( effect );
+          auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+          taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, result->getTarget(), 1000 ) );
         }
         
         zone->addEffectResult( std::move( result ) );
@@ -221,7 +228,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
     effectPacket->data().DirTarget = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
     effectPacket->data().Flag = Common::ActionEffectDisplayType::HideActionName;
     effectPacket->data().RequestId = m_sequence;
-    effectPacket->data().ResultId = globalSequence;
+    effectPacket->data().ResultId = resultId;
 
     m_actorEffectsMap.clear();
 
