@@ -123,17 +123,17 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
           else if( pEntry->getType() == LgbEntryType::EventObject )
           {
             auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
-            m_eobjCache.insert( 0, pEObj );
+            m_eobjCache.insert( id, pEObj );
           }
           else if( pEntry->getType() == LgbEntryType::EventNpc )
           {
             auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
-            m_enpcCache.insert( 0, pENpc );
+            m_enpcCache.insert( id, pENpc );
           }
           else if( pEntry->getType() == LgbEntryType::EventRange )
           {
             auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
-            m_eventRangeCache.insert( 0, pEventRange );
+            m_eventRangeCache.insert( id, pEventRange );
           }
         }
       }
