@@ -55,140 +55,136 @@ void MapMgr::updateAll( Entity::Player& player )
   EventSet mapData;
 
   auto eventNpcs = objectCache.getAllENpc( player.getTerritoryTypeId() );
-  if( eventNpcs )
+  if( !eventNpcs )
+    return;
+  
+  for( const auto& eventNpc : *eventNpcs )
   {
-    for( const auto& eventNpc : *eventNpcs )
+    auto eNpc = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId );
+    if( !eNpc )
+      continue;
+
+    auto eNpcData = eNpc->data().EventHandler;
+    for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
     {
-      auto eNpc = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId );
-      if( eNpc )
+      auto npcData = eNpcData[ npcEvent ].EventHandler;
+
+      if( npcData == 0 )
+        continue; // Some npcs have data gaps, so we have to iterate through the entire array
+
+      EventData eventData;
+      eventData.layoutId = npcData;
+      eventData.handlerId = eventNpc.first;
+    
+      auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
+
+      switch( eventHandlerType )
       {
-        auto eNpcData = eNpc->data().EventHandler;
-        for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
+        case EventHandler::EventHandlerType::Quest:
         {
-          auto npcData = eNpcData[ npcEvent ].EventHandler;
+          auto& quest = m_quests[ npcData ]->data();
 
-          if( npcData == 0 )
-            continue; // Some npcs have data gaps, so we have to iterate through the entire array
-
-          EventData eventData;
-          eventData.layoutId = npcData;
-          eventData.handlerId = eventNpc.first;
-        
-          auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
-
-          switch( eventHandlerType )
+          if( quest.Client == eventNpc.second->data.enpcId )
           {
-            case EventHandler::EventHandlerType::Quest:
+            insertQuest( player, npcData, eventNpc.first, mapData );
+          }
+          break;
+        }
+        case EventHandler::EventHandlerType::GuildLeveAssignment:
+        {
+          if( player.hasReward( static_cast< Common::UnlockEntry >( 5 ) ) )
+          {
+            auto& guildLeve = exdData.getRow< Excel::GuildleveAssignment >( npcData )->data();
+
+            eventData.iconId = exdData.getRow< Excel::EventIconType >( 5 )->data().MapAvailable + 1;
+
+            if( player.isQuestCompleted( guildLeve.UnlockQuest ) ||
+                ( ( guildLeve.NeedGrandCompanyRank > 0 || npcData == 393217 || npcData == 393223 || npcData == 393225 ) && // Leve npc locations: Bentbranch / Horizon / Swiftperch
+                ( player.isQuestCompleted( 220 ) || player.isQuestCompleted( 687 ) || player.isQuestCompleted( 693 ) ) ) )
             {
-              auto& quest = m_quests[ npcData ]->data();
-
-              if( quest.Client == eventNpc.second->data.enpcId )
+              if( guildLeve.NeedGrandCompanyRank > 0 && player.getGc() != 0 )
               {
-                insertQuest( player, npcData, eventNpc.first, mapData );
-              }
-              break;
-            }
-            case EventHandler::EventHandlerType::GuildLeveAssignment:
-            {
-              if( player.hasReward( static_cast< Common::UnlockEntry >( 5 ) ) )
-              {
-                auto& guildLeve = exdData.getRow< Excel::GuildleveAssignment >( npcData )->data();
-
-                eventData.iconId = exdData.getRow< Excel::EventIconType >( 5 )->data().MapAvailable + 1;
-
-                if( player.isQuestCompleted( guildLeve.UnlockQuest ) ||
-                    ( ( guildLeve.NeedGrandCompanyRank > 0 || npcData == 393217 || npcData == 393223 || npcData == 393225 ) && // Leve npc locations: Bentbranch / Horizon / Swiftperch
-                    ( player.isQuestCompleted( 220 ) || player.isQuestCompleted( 687 ) || player.isQuestCompleted( 693 ) ) ) )
+                for( int8_t i = 0; i < 3; i++ )
                 {
-                  if( guildLeve.NeedGrandCompanyRank > 0 )
-                  {
-                    if( player.getGc() != 0 )
-                    {
-                      for( int8_t i = 0; i < 3; i++ )
-                      {
-                        if( player.getGcRankArray()[ i ] >= guildLeve.NeedGrandCompanyRank )
-                        {
-                          mapData.insert( eventData );
-                          break;
-                        }
-                      }
-                    }
-                  }
-                  else
+                  if( player.getGcRankArray()[ i ] >= guildLeve.NeedGrandCompanyRank )
                   {
                     mapData.insert( eventData );
+                    break;
                   }
                 }
               }
-              break;
-            }
-            case EventHandler::EventHandlerType::CustomTalk:
-            {
-              // Include only the beginner arena icon yet. There a few other ones, that aren't referenced in the game files (Some examples are: The Triple Triad Tournament npc which has multiple icons and the ocean fishing icon)
-              if( npcData == 721223 )
+              else
               {
-                auto customTalk = exdData.getRow< Excel::CustomTalk >( npcData )->data();
-                
-                eventData.iconId = customTalk.MapIcon;
-                
                 mapData.insert( eventData );
               }
-              break;
-            }  
-            case EventHandler::EventHandlerType::GuildOrderGuide:
-            {
-              if( player.hasReward( static_cast< Common::UnlockEntry>( 7 ) ) )
-              {
-                eventData.iconId = exdData.getRow< Excel::EventIconType >( 6 )->data().MapAvailable + 1;
-                
-                mapData.insert( eventData );
-              }
-              break;
-            }
-            case EventHandler::EventHandlerType::TripleTriad:
-            {
-              if( npcData == 2293771 ) // Triple Triad Master npc for now only
-              {
-                eventData.iconId = exdData.getRow< Excel::EventIconType >( 7 )->data().MapAvailable + 1;
-                
-                mapData.insert( eventData );
-              }
-              break;
             }
           }
+          break;
+        }
+        case EventHandler::EventHandlerType::CustomTalk:
+        {
+          // Include only the beginner arena icon yet. There a few other ones, that aren't referenced in the game files (Some examples are: The Triple Triad Tournament npc which has multiple icons and the ocean fishing icon)
+          if( npcData == 721223 )
+          {
+            auto customTalk = exdData.getRow< Excel::CustomTalk >( npcData )->data();
+            
+            eventData.iconId = customTalk.MapIcon;
+            
+            mapData.insert( eventData );
+          }
+          break;
+        }  
+        case EventHandler::EventHandlerType::GuildOrderGuide:
+        {
+          if( player.hasReward( static_cast< Common::UnlockEntry>( 7 ) ) )
+          {
+            eventData.iconId = exdData.getRow< Excel::EventIconType >( 6 )->data().MapAvailable + 1;
+            
+            mapData.insert( eventData );
+          }
+          break;
+        }
+        case EventHandler::EventHandlerType::TripleTriad:
+        {
+          if( npcData == 2293771 ) // Triple Triad Master npc for now only
+          {
+            eventData.iconId = exdData.getRow< Excel::EventIconType >( 7 )->data().MapAvailable + 1;
+            
+            mapData.insert( eventData );
+          }
+          break;
         }
       }
     }
   }
   
   auto eventObjs = objectCache.getAllEObj( player.getTerritoryTypeId() );
-  if( eventObjs )
+  if( !eventObjs )
+    return;
+
+  for( const auto& eventObj : *eventObjs )
   {
-    for( const auto& eventObj : *eventObjs )
+    auto eObj = exdData.getRow< Excel::EObj >( eventObj.second->data.BaseId );
+    if( !eObj )
+      return;
+
+    auto eObjData = eObj->data();
+    EventData eventData;
+    eventData.handlerId = eObjData.EventHandler;
+    eventData.layoutId = eventObj.first;
+    
+    auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( eObjData.EventHandler >> 16 );
+
+    if( eventHandlerType == EventHandler::EventHandlerType::Quest )
     {
-      auto eObj = exdData.getRow< Excel::EObj >( eventObj.second->data.BaseId );
-      if( eObj )
+      auto& quest = m_quests[ eObjData.EventHandler ]->data();
+
+      if( quest.Client == eventObj.second->data.BaseId )
       {
-        auto eObjData = eObj->data();
-        EventData eventData;
-        eventData.handlerId = eObjData.EventHandler;
-        eventData.layoutId = eventObj.first;
-        
-        auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( eObjData.EventHandler >> 16 );
-
-        if( eventHandlerType == EventHandler::EventHandlerType::Quest )
-        {
-          auto& quest = m_quests[ eObjData.EventHandler ]->data();
-
-          if( quest.Client == eventObj.second->data.BaseId )
-          {
-            insertQuest( player, eObjData.EventHandler, eventObj.first, mapData );
-          }
-        }
+        insertQuest( player, eObjData.EventHandler, eventObj.first, mapData );
       }
     }
   }
-
   
   sendPackets( player, mapData, All );
 }
@@ -201,62 +197,62 @@ void MapMgr::updateQuests( Entity::Player& player )
   EventSet mapData;
 
   auto eventNpcs = objectCache.getAllENpc( player.getTerritoryTypeId() );
-  if( eventNpcs )
+  if( !eventNpcs )
+    return;
+
+  for( const auto& eventNpc : *eventNpcs )
   {
-    for( const auto& eventNpc : *eventNpcs )
+    auto eNpcData = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId )->data().EventHandler;
+
+    for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
     {
-      auto eNpcData = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId )->data().EventHandler;
+      auto npcData = eNpcData[ npcEvent ].EventHandler;
 
-      for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
+      if( npcData == 0 )
+        continue; // Some npcs have data gaps, so we have to iterate through the entire array
+
+      EventData eventData;
+      eventData.handlerId = npcData;
+      eventData.layoutId = eventNpc.first;
+      
+      auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
+
+      if( eventHandlerType == EventHandler::EventHandlerType::Quest )
       {
-        auto npcData = eNpcData[ npcEvent ].EventHandler;
+        auto& quest = m_quests[ npcData ]->data();
 
-        if( npcData == 0 )
-          continue; // Some npcs have data gaps, so we have to iterate through the entire array
-
-        EventData eventData;
-        eventData.handlerId = npcData;
-        eventData.layoutId = eventNpc.first;
-        
-        auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( npcData >> 16 );
-
-        if( eventHandlerType == EventHandler::EventHandlerType::Quest )
+        if( quest.Client == eventNpc.second->data.enpcId )
         {
-          auto& quest = m_quests[ npcData ]->data();
-
-          if( quest.Client == eventNpc.second->data.enpcId )
-          {
-            insertQuest( player, npcData, eventNpc.first, mapData );
-          }
+          insertQuest( player, npcData, eventNpc.first, mapData );
         }
       }
     }
   }
 
   auto eventObjs = objectCache.getAllEObj( player.getTerritoryTypeId() );
-  if( eventObjs )
+  if( !eventObjs )
+    return;
+
+  for( const auto& eventObj : *eventObjs )
   {
-    for( const auto& eventObj : *eventObjs )
+    auto eObj = exdData.getRow< Excel::EObj >( eventObj.second->data.BaseId );
+    if( !eObj )
+      return;
+
+    auto eObjData = eObj->data();
+    EventData eventData;
+    eventData.handlerId = eObjData.EventHandler;
+    eventData.layoutId = eventObj.first;
+  
+    auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( eObjData.EventHandler >> 16 );
+
+    if( eventHandlerType == EventHandler::EventHandlerType::Quest )
     {
-      auto eObj = exdData.getRow< Excel::EObj >( eventObj.second->data.BaseId );
-      if( eObj )
+      auto& quest = m_quests[ eObjData.EventHandler ]->data();
+
+      if( quest.Client == eventObj.second->data.BaseId )
       {
-        auto eObjData = eObj->data();
-        EventData eventData;
-        eventData.handlerId = eObjData.EventHandler;
-        eventData.layoutId = eventObj.first;
-      
-        auto eventHandlerType = static_cast< EventHandler::EventHandlerType >( eObjData.EventHandler >> 16 );
-
-        if( eventHandlerType == EventHandler::EventHandlerType::Quest )
-        {
-          auto& quest = m_quests[ eObjData.EventHandler ]->data();
-
-          if( quest.Client == eventObj.second->data.BaseId )
-          {
-            insertQuest( player, eObjData.EventHandler, eventObj.first, mapData );
-          }
-        }
+        insertQuest( player, eObjData.EventHandler, eventObj.first, mapData );
       }
     }
   }
@@ -276,27 +272,23 @@ void MapMgr::insertQuest( Entity::Player& player, uint32_t questId, uint32_t lay
     auto script = scriptMgr.getNativeScriptHandler().getScript< Sapphire::ScriptAPI::QuestScript >( questId );
 
     // Just don't show quests on map, that aren't implemented yet
-    if( script )
-    {                        
-      EventData eventData;
-      eventData.handlerId = questId;
-      eventData.layoutId = layoutId;
+    if( !script )
+      return;
+             
+    EventData eventData;
+    eventData.handlerId = questId;
+    eventData.layoutId = layoutId;
 
-      auto eventState = script->getQuestAvailability( player, questId );
+    auto eventState = script->getQuestAvailability( player, questId );
 
-      if( eventState == Event::EventHandler::QuestAvailability::Available || eventState == Event::EventHandler::QuestAvailability::Locked )
-      {
-        if( eventState == Event::EventHandler::QuestAvailability::Available && isQuestAvailable( player, questId, quest ) )
-        {
-          eventData.iconId = exdData.getRow< Excel::EventIconType >( quest.IconType )->data().MapAvailable + 1 + quest.Repeatable;
-        }
-        else
-        {
-          eventData.iconId = exdData.getRow< Excel::EventIconType >( quest.IconType )->data().MapInvalid + 1 + quest.Repeatable;
-        }
+    if( eventState == Event::EventHandler::QuestAvailability::Available || eventState == Event::EventHandler::QuestAvailability::Locked )
+    {
+      if( eventState == Event::EventHandler::QuestAvailability::Available && isQuestAvailable( player, questId, quest ) )
+        eventData.iconId = exdData.getRow< Excel::EventIconType >( quest.IconType )->data().MapAvailable + 1 + quest.Repeatable;
+      else
+        eventData.iconId = exdData.getRow< Excel::EventIconType >( quest.IconType )->data().MapInvalid + 1 + quest.Repeatable;
 
-        mapData.insert( eventData );
-      }
+      mapData.insert( eventData );
     }
   }
 }
@@ -307,11 +299,8 @@ bool MapMgr::isQuestAvailable( Entity::Player& player, uint32_t questId, Excel::
 
   if( quest.GrandCompany || quest.GrandCompanyRank )
   {
-    if( quest.GrandCompany != player.getGc() )
-    {
-      if( quest.GrandCompanyRank > player.getGcRankArray()[ player.getGc() - 1 ] )
-        return false;
-    }
+    if( quest.GrandCompany != player.getGc() && quest.GrandCompanyRank > player.getGcRankArray()[ player.getGc() - 1 ] )
+      return false;
   }  
 
   if( quest.InstanceContentOperator == 1 )
@@ -388,32 +377,20 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   }
 
   // Was this really ever used?
-  if( quest.StartTown )
-  {
-    if( quest.StartTown != player.getStartTown() )
-      return false;
-  }
+  if( quest.StartTown && quest.StartTown != player.getStartTown() )
+    return false;
 
   if( Common::CURRENT_EXPANSION_ID < quest.Expansion )
     return false;
 
-  if( quest.Mount )
-  {
-    if( !player.hasMount( quest.Mount ) )
-      return false;
-  }
+  if( quest.Mount && !player.hasMount( quest.Mount ) )
+    return false;
 
-  if( quest.GrandCompany )
-  {
-    if( quest.GrandCompany != player.getGc() )
-      return false;
-  }
+  if( quest.GrandCompany && quest.GrandCompany != player.getGc() )
+    return false;
 
-  if( quest.Header != 0 )
-  {
-    if( !player.hasReward( static_cast< Common::UnlockEntry >( quest.Header ) ) )
-      return false;
-  }
+  if( quest.Header != 0 && !player.hasReward( static_cast< Common::UnlockEntry >( quest.Header ) ) )
+    return false;
 
   if( quest.PrevQuestOperator == 1 )
   {
@@ -514,6 +491,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
       return false;
   }
 
+  // TODO: I think this changed in 3.x to be for all relics, more research is needed.
   for( int32_t i = 0; i < Common::CLASSJOB_TOTAL; i++ )
   {
     auto classJob = exdData.getRow< Excel::ClassJob >( i );
@@ -541,6 +519,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   if( quest.DeliveryQuest )
     return false;
 
+  // TODO: dunno if 3.x has this, have to check
   /*if( player.getQuestSeq( questId ) == 0 )
   {
     auto& questAccept = exdData.getRow< Excel::QuestAcceptAdditionCondition >( questId );
