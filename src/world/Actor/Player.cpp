@@ -21,6 +21,7 @@
 #include "Manager/PartyMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Manager/FreeCompanyMgr.h"
+#include "Manager/MapMgr.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -617,6 +618,21 @@ bool Player::hasReward( Common::UnlockEntry unlockId ) const
   return ( m_unlocks[ index ] & value ) != 0;
 }
 
+bool Player::hasMount( uint32_t mountId ) const
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto mount = exdData.getRow< Excel::Mount >( mountId );
+
+  if( !mount || mount->data().MountOrder == -1 || mount->data().Model == 0 )
+    return false;
+
+  uint16_t index;
+  uint8_t value;
+  Util::valueToFlagByteIndexValue( mount->data().MountOrder, value, index );
+
+  return m_mountGuide[ index ] & value;
+}
+
 void Player::gainExp( uint32_t amount )
 {
   uint32_t currentExp = getExp();
@@ -665,6 +681,7 @@ void Player::levelUp()
   setLevel( getLevel() + 1 );
 
   Service< World::Manager::PlayerMgr >::ref().onLevelUp( *this );
+  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::sendStatusUpdate()
@@ -743,6 +760,7 @@ void Player::setClassJob( Common::ClassJob classJob )
 
   Service< World::Manager::PlayerMgr >::ref().onPlayerStatusUpdate( *this );
   Service< World::Manager::PlayerMgr >::ref().onChangeClass( *this );
+  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevel( uint8_t level )

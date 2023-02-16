@@ -107,8 +107,16 @@ namespace Sapphire::Event
       SwitchTalk = 0x001F,
       Adventure = 0x0020,
       DailyQuestSupply = 0x0021,
+      TripleTriad = 0x0023,
       ICDirector = 0x8003,
       QuestBattleDirector = 0x8006,
+    };
+
+    enum class QuestAvailability : uint8_t
+    {
+      Invisible,
+      Available,
+      Locked
     };
 
     using SceneReturnCallback = std::function< void( Entity::Player&, const SceneResult& ) >;

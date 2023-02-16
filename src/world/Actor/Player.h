@@ -464,6 +464,9 @@ namespace Sapphire::Entity
     /*! check if an action is already unlocked in the bitmask. */
     bool hasReward( Common::UnlockEntry unlockId ) const;
 
+    /*! check if a mount is already unlocked in the bitmask. */
+    bool hasMount( uint32_t mountId ) const;
+
     /*! return a const reference to the unlock bitmask array */
     const UnlockList& getUnlockBitmask() const;
 

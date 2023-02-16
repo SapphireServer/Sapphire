@@ -41,6 +41,16 @@ namespace Sapphire
       return nullptr;
     }
 
+    ObjectMap* getAll( uint16_t zoneId )
+    {
+      auto it = m_objectCache.find( zoneId );
+      if( it != m_objectCache.end() )
+      {
+        return &it->second;
+      }
+      return nullptr;
+    }
+
     void insert( uint16_t zoneId, std::shared_ptr< T > entry )
     {
       if( m_objectCache.find( zoneId ) == m_objectCache.end() )
@@ -76,6 +86,9 @@ namespace Sapphire
     using ENpcPtr = std::shared_ptr< LGB_ENPC_ENTRY >;
     using EventRangePtr = std::shared_ptr< LGB_EVENT_RANGE_ENTRY >;
 
+    using EObjMapPtr = std::unordered_map< uint32_t, EObjPtr >*;
+    using ENpcMapPtr = std::unordered_map< uint32_t, ENpcPtr >*;
+
     struct PopRangeInfo
     {
       Common::FFXIVARR_POSITION3 m_pos;
@@ -95,6 +108,10 @@ namespace Sapphire
 
     EObjPtr getEObj( uint32_t eObjId );
     ENpcPtr getENpc( uint32_t eNpcId );
+
+    EObjMapPtr getAllEObj( uint16_t zoneId );
+    ENpcMapPtr getAllENpc( uint16_t zoneId );
+
     EventRangePtr getEventRange( uint32_t eventRangeId );
 
   private:

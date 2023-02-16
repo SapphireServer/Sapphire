@@ -1738,8 +1738,7 @@ namespace Excel
   struct ClassJobCategory
   {
     ClassJobCategoryTextStruct Text;
-    bool ClassJob[31];
-    int8_t padding0[1];
+    bool ClassJob[34];
   };
 
   /* 264228 */
@@ -1902,15 +1901,13 @@ namespace Excel
     uint8_t ItemStainId[7];
     uint8_t OptionalItemNum[5];
     uint8_t OptionalItemStainId[5];
-    uint8_t CompanyPointType;
     uint8_t Emote;
-    uint8_t unknown;
     uint8_t GeneralAction[2];
+    uint8_t CompanyPointType;
     uint8_t AllaganTomestoneType;
     uint8_t AllaganTomestoneNum;
-    uint8_t Unknown95E;
     uint8_t BeastReputationValueNum;
-    uint8_t unknown1[4];
+    uint8_t unknown[6];
   };
 
   /* 264323 */
@@ -1927,27 +1924,28 @@ namespace Excel
     uint32_t InstanceContent[3];
     uint32_t Client;
     uint32_t Finish;
-    uint32_t Header;
+    uint32_t Image;
     uint32_t Inlay;
     int32_t Mount;
     uint16_t ClassLevel;
     uint16_t Unknown9A2;
     uint16_t ClassLevel2;
-    uint16_t AcquiredReward;
+    uint16_t Header;
     uint16_t TimeBegin;
     uint16_t TimeEnd;
     uint16_t BeastReputationValue;
     uint16_t ClientBehavior;
     uint16_t Area;
     uint16_t Sort;
+    uint8_t Expansion;
     uint8_t ClassJob;
     uint8_t QuestLevelOffset;
     uint8_t ClassJob2;
     uint8_t PrevQuestOperator;
     uint8_t ExcludeQuestOperator;
     uint8_t StartTown;
-    uint8_t FirstClassOperator;
-    uint8_t FirstClass;
+    uint8_t ClassJobUnlockFlag;
+    uint8_t ClassJobUnlock;
     uint8_t GrandCompany;
     uint8_t GrandCompanyRank;
     uint8_t InstanceContentOperator;
@@ -1956,20 +1954,20 @@ namespace Excel
     uint8_t FestivalPhaseEnd;
     uint8_t BeastTribe;
     uint8_t BeastReputationRank;
+    uint8_t DeliveryQuest;
     uint8_t RepeatCycle;
     uint8_t RepeatFlag;
     uint8_t ExpClass;
     uint8_t Genre;
+    uint8_t Unknown9CA;
     uint8_t IconType;
-    uint8_t Quality;
-    uint8_t Unknown9C9;
+    uint8_t Type;
     uint8_t padding2 : 3;
     uint8_t HideOfferIcon : 1;
     uint8_t Cancellable : 1;
     uint8_t Introduction : 1;
     uint8_t Repeatable : 1;
     uint8_t House : 1;
-    int8_t padding3[3];
   };
 
   /* 264324 */
@@ -3328,10 +3326,11 @@ namespace Excel
   /* 362341 */
   struct EventIconType
   {
-    uint32_t Announce;
-    uint32_t Map;
+    uint32_t NpcAvailable;
+    uint32_t MapAvailable;
+    uint32_t NpcInvalid;
+    uint32_t MapInvalid;
     uint8_t Num;
-    int8_t padding0[3];
   };
 
   /* 362342 */
