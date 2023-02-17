@@ -24,9 +24,11 @@
 #include "Chara.h"
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/MgrUtil.h"
 #include "Common.h"
 
 using namespace Sapphire::Common;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
@@ -285,10 +287,10 @@ void Sapphire::Entity::Chara::die()
   bool selfNeedsUpdate = isPlayer();
 
   FFXIVPacketBasePtr packet = makeActorControl( m_id, SetStatus, static_cast< uint8_t >( ActorStatus::Dead ) );
-  sendToInRangeSet( packet, selfNeedsUpdate );
+  server().queueForPlayers( getInRangePlayerIds( selfNeedsUpdate ), packet );
 
   FFXIVPacketBasePtr packet1 = makeActorControl( m_id, DeathAnimation, 0, 0, 0, 0 );
-  sendToInRangeSet( packet1, selfNeedsUpdate );
+  server().queueForPlayers( getInRangePlayerIds( selfNeedsUpdate ), packet1 );
 
 }
 
@@ -320,7 +322,7 @@ void Sapphire::Entity::Chara::setStance( Stance stance )
   m_currentStance = stance;
 
   FFXIVPacketBasePtr packet = makeActorControl( m_id, ToggleWeapon, stance, 1 );
-  sendToInRangeSet( packet );
+  server().queueForPlayers( getInRangePlayerIds(), packet );
 }
 
 /*!
@@ -365,7 +367,7 @@ void Sapphire::Entity::Chara::changeTarget( uint64_t targetId )
 {
   setTargetId( targetId );
   FFXIVPacketBasePtr packet = makeActorControlTarget( m_id, SetTarget, 0, 0, 0, 0, targetId );
-  sendToInRangeSet( packet );
+  server().queueForPlayers( getInRangePlayerIds(), packet );
 }
 
 /*!
@@ -450,7 +452,7 @@ so players can have their own version and we can abolish the param.
 void Sapphire::Entity::Chara::sendStatusUpdate()
 {
   FFXIVPacketBasePtr packet = std::make_shared< UpdateHpMpTpPacket >( *this );
-  sendToInRangeSet( packet );
+  server().queueForPlayers( getInRangePlayerIds(), packet );
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */
@@ -497,7 +499,7 @@ void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
     effectEntry.Arg2 = 0x71;
     effectPacket->addTargetEffect( effectEntry );
 
-    sendToInRangeSet( effectPacket );
+    server().queueForPlayers( getInRangePlayerIds(), effectPacket );
 
     pTarget->takeDamage( damage );
   }
@@ -545,7 +547,7 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   status.Slot = static_cast< uint8_t >( nextSlot );
   status.SystemParam = static_cast< int16_t >( pEffect->getParam() );
 
-  sendToInRangeSet( statusEffectAdd, isPlayer() );
+  server().queueForPlayers( getInRangePlayerIds( isPlayer() ), statusEffectAdd );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
@@ -610,7 +612,7 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+  server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), StatusEffectLose, pEffect->getId() ) );
 
   m_statusEffectMap.erase( effectSlotId );
 
@@ -659,8 +661,7 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
     slot++;
   }
 
-  sendToInRangeSet( statusEffectList, isPlayer() );
-
+  server().queueForPlayers( getInRangePlayerIds( isPlayer() ), statusEffectList );
 }
 
 void Sapphire::Entity::Chara::updateStatusEffects()
@@ -818,14 +819,16 @@ void Sapphire::Entity::Chara::onTick()
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
-    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP), thisTickDmg ), true );
+    server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), HPFloatingText, 0,
+                                                                                   static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP ),
+                                                                                   thisTickDmg ) );
   }
 
   if( thisTickHeal != 0 )
   {
     heal( thisTickHeal );
-    sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
-                                        static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP ), thisTickHeal ), true );
+    server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), HPFloatingText, 0,
+                                                                                   static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP ),
+                                                                                   thisTickHeal ) );
   }
 }

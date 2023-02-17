@@ -11,6 +11,7 @@
 #include "WorldServer.h"
 #include "Session.h"
 #include "Network/GameConnection.h"
+#include "Manager/MgrUtil.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
@@ -61,16 +62,12 @@ bool MarketMgr::init()
 
 void MarketMgr::requestItemListingInfo( Entity::Player& player, uint32_t catalogId, uint32_t requestId )
 {
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
-
   auto countPkt = makeZonePacket< FFFXIVIpcItemSearchResult >( player.getId() );
   countPkt->data().Count = 1 << 8;
   countPkt->data().CatalogID = catalogId;
   countPkt->data().Result = requestId;
 
-  pSession->getZoneConnection()->queueOutPacket( countPkt );
+  server().queueForPlayer( player.getCharacterId(), countPkt );
 
   auto historyPkt = makeZonePacket< FFXIVIpcGetItemHistoryResult >( player.getId() );
   historyPkt->data().CatalogID = catalogId;
@@ -90,16 +87,13 @@ void MarketMgr::requestItemListingInfo( Entity::Player& player, uint32_t catalog
     strcpy( listing.BuyCharacterName, name.c_str() );
   }
 
-  pSession->getZoneConnection()->queueOutPacket( historyPkt );
+  server().queueForPlayer( player.getCharacterId(), historyPkt );
 }
 
 
 void MarketMgr::searchMarketboard( Entity::Player& player, uint8_t itemSearchCategory,  uint8_t maxEquipLevel, uint8_t classJob,
                                    const std::string_view& searchStr, uint32_t requestId, uint32_t startIdx )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
-
   ItemSearchResultList resultList;
   findItems( searchStr, itemSearchCategory, maxEquipLevel, classJob, resultList );
 
@@ -130,7 +124,7 @@ void MarketMgr::searchMarketboard( Entity::Player& player, uint8_t itemSearchCat
   else
     resultPkt->data().NextIndex = startIdx + 20;
 
-  pSession->getZoneConnection()->queueOutPacket( resultPkt );
+  server().queueForPlayer( player.getCharacterId(), resultPkt );
 }
 
 void MarketMgr::requestItemListings( Sapphire::Entity::Player& player, uint16_t catalogId )

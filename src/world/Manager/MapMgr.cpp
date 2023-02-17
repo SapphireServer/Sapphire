@@ -606,7 +606,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   if( mapData.size() <= 2 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker2 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 
@@ -615,7 +615,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   else if( mapData.size() <= 4 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker4 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 
@@ -624,7 +624,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   else if( mapData.size() <= 8 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker8 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 
@@ -633,7 +633,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   else if( mapData.size() <= 16 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker16 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 
@@ -642,7 +642,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   else if( mapData.size() <= 32 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker32 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 
@@ -651,7 +651,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   else if( mapData.size() <= 64 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker64 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 
@@ -660,7 +660,7 @@ void MapMgr::sendPackets( Entity::Player& player, EventSet& mapData, UpdateMode 
   else if( mapData.size() <= 128 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapMarker128 >( player.getId() );
-    mapUpdatePacket->data().numOfMarkers = mapData.size();
+    mapUpdatePacket->data().numOfMarkers = static_cast< uint8_t >( mapData.size() );
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().layoutIds, mapUpdatePacket->data().handlerIds );
 

@@ -19,13 +19,13 @@
 
 #include "Action/Action.h"
 
-
 #include "Session.h"
 #include "WorldServer.h"
 #include "Forwards.h"
 #include <Service.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/PlayerMgr.h>
+#include <Manager/RNGMgr.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -404,7 +404,6 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 {
 
   const auto packet = ZoneChannelPacket< FFXIVIpcClientTrigger >( inPacket );
-  auto& server = Service< World::WorldServer >::ref();
   auto& teriMgr = Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -433,9 +432,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setStance( Stance::Passive );
         player.setAutoattack( false );
       }
-
-      player.sendToInRangeSet( makeActorControl( player.getId(), 0, param11, 1 ) );
-
+      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 0, param11, 1 ) );
       break;
     }
     case PacketCommand::AUTO_ATTACK:  // Toggle auto-attack
@@ -448,7 +445,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       else
         player.setAutoattack( false );
 
-      player.sendToInRangeSet( makeActorControl( player.getId(), 1, param11, 1 ) );
+      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 1, param11, 1 ) );
 
       break;
     }
@@ -517,7 +514,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::SET_CUTSCENE:
     {
-      server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::SetCutsceneFlag, param11, 1 ) );
+      server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::SetCutsceneFlag, param11, 1 ) );
       break;
     }
     case PacketCommand::EMOTE: // emote
@@ -532,7 +529,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       if( !emoteData )
         return;
 
-      player.sendToInRangeSet( makeActorControlTarget( player.getId(), ActorControlType::Emote, emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
+      server().queueForPlayers( player.getInRangePlayerIds(),
+                                makeActorControlTarget( player.getId(), ActorControlType::Emote, emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
 
       bool isPersistent = emoteData->data().Mode != 0;
 
@@ -543,9 +541,9 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setPersistentEmote( emoteData->data().Mode );
         player.setStatus( ActorStatus::EmoteMode );
 
-        player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
-                                                          static_cast< uint8_t >( ActorStatus::EmoteMode ),
-                                                         emoteData->data().IsEndEmoteMode ? 1 : 0 ), true );
+        server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ActorControlType::SetStatus,
+                                                                                        static_cast< uint8_t >( ActorStatus::EmoteMode ),
+                                                                                        emoteData->data().IsEndEmoteMode ? 1 : 0 ) );
       }
 
       if( emoteData->data().IsAvailableWhenDrawn )
@@ -557,7 +555,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::EMOTE_CANCEL: // emote
     {
-      player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::EmoteInterrupt ) );
+      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), ActorControlType::EmoteInterrupt ) );
       break;
     }
     case PacketCommand::EMOTE_MODE_CANCEL:
@@ -565,13 +563,12 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       if( player.getPersistentEmote() > 0 )
       {
         auto movePacket = std::make_shared< MoveActorPacket >( player, player.getRot(), 2, 0, 0, 0x5A / 4 );
-        player.sendToInRangeSet( movePacket );
-
         player.setPersistentEmote( 0 );
-        player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::EmoteModeInterrupt ) );
         player.setStatus( ActorStatus::Idle );
 
-        player.sendToInRangeSet( makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) ) );
+        server().queueForPlayers( player.getInRangePlayerIds(), movePacket );
+        server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), ActorControlType::EmoteModeInterrupt ) );
+        server().queueForPlayers( player.getInRangePlayerIds(),  makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) ) );
       }
       break;
     }
@@ -580,7 +577,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       player.setPose( static_cast< uint8_t >( param12 ) );
       auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
-      player.sendToInRangeSet( pSetStatusPacket, true );
+      server().queueForPlayers( player.getInRangePlayerIds( true ), pSetStatusPacket );
       break;
     }
     case PacketCommand::POSE_EMOTE_CANCEL: // cancel pose
@@ -684,7 +681,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       player.setActiveLand( static_cast< uint8_t >( param11 ), hZone->getWardNum() );
 
       auto pShowBuildPresetUIPacket = makeActorControl( player.getId(), ShowBuildPresetUI, param11 );
-      server.queueForPlayer( player.getCharacterId(), pShowBuildPresetUIPacket );
+      server().queueForPlayer( player.getCharacterId(), pShowBuildPresetUIPacket );
 
       break;
     }
@@ -765,7 +762,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       uint8_t plot = ( param12 & 0xFF );
       auto pShowHousingItemUIPacket = makeActorControl( player.getId(), ShowHousingItemUI, 0, plot );
 
-      server.queueForPlayer( player.getCharacterId(), pShowHousingItemUIPacket );
+      server().queueForPlayer( player.getCharacterId(), pShowHousingItemUIPacket );
 
       //TODO: show item housing container
 

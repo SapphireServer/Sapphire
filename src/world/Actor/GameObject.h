@@ -93,8 +93,6 @@ namespace Sapphire::Entity
 
     CharaPtr getClosestChara();
 
-    void sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf = false );
-
     // add an actor to in range set
     void addInRangeActor( GameObjectPtr pActor );
 

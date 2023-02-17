@@ -17,9 +17,11 @@
 #include "WorldServer.h"
 #include "Session.h"
 #include "Network/GameConnection.h"
+#include "Manager/MgrUtil.h"
 
 
 using namespace Sapphire::Common;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
@@ -91,13 +93,8 @@ void Sapphire::Entity::EventObject::setState( uint8_t state )
 
 void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   for( const auto& player : m_inRangePlayers )
-  {
-    auto pSession = server.getSession( player->getCharacterId() );
-    pSession->getZoneConnection()->queueOutPacket( makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
-  }
+    server().queueForPlayer( player->getCharacterId(), makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
 }
 
 void Sapphire::Entity::EventObject::setHousingLink( uint32_t housingLink )

@@ -13,6 +13,7 @@
 
 #include <Logging/Logger.h>
 #include <Manager/TerritoryMgr.h>
+#include <Manager/MgrUtil.h>
 #include <Service.h>
 
 #include <Manager/TaskMgr.h>
@@ -20,6 +21,7 @@
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
@@ -118,7 +120,7 @@ void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& 
   do // we want to send at least one packet even nothing is hit so other players can see
   {
     auto packet = buildNextEffectPacket( targetList );
-    m_sourceChara->sendToInRangeSet( packet, true );
+    server().queueForPlayers( m_sourceChara->getInRangePlayerIds( true ), packet );
   }
   while( !m_actorEffectsMap.empty() );
 }

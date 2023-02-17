@@ -41,6 +41,7 @@
 #include "Manager/WarpMgr.h"
 #include "Manager/LinkshellMgr.h"
 #include "Manager/RNGMgr.h"
+#include "Manager/MgrUtil.h"
 
 #include "Event/EventDefs.h"
 #include "ContentFinder/ContentFinder.h"
@@ -384,8 +385,6 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 
 void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -466,7 +465,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     actorControl->data().param2 = param2;
     actorControl->data().param3 = param3;
     actorControl->data().param4 = param4;
-    player.sendToInRangeSet( actorControl, true );
+    server().queueForPlayers( player.getInRangePlayerIds( true ), actorControl );
 
 
     /*sscanf(params.c_str(), "%x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId);
@@ -507,8 +506,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     actorControl->data().param4 = param4;
     actorControl->data().param5 = param5;
     actorControl->data().param6 = param6;
-    pSession->getZoneConnection()->queueOutPacket( actorControl );
-
+    server().queueForPlayer( player.getCharacterId(), actorControl );
 
     /*sscanf(params.c_str(), "%x %x %x %x %x %x %x", &opcode, &param1, &param2, &param3, &param4, &param5, &param6, &playerId);
 
@@ -550,7 +548,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 //    effectPacket->setAnimationId( param1 );
 //    effectPacket->setEffectFlags( 0 );
 
-    pSession->getZoneConnection()->queueOutPacket( effectPacket );
+    server().queueForPlayer( player.getCharacterId(), effectPacket );
   }
   else if( subCommand == "achvGeneral" )
   {
@@ -681,9 +679,6 @@ void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_pt
 
 void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
-  auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
-
   std::string subCommand;
 
   // check if the command has parameters
@@ -724,7 +719,7 @@ void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
     setActorPosPacket->data().Dir = Common::Util::floatToUInt16Rot( player.getRot() );
-    pSession->getZoneConnection()->queueOutPacket( setActorPosPacket );
+    server().queueForPlayer( player.getCharacterId(), setActorPosPacket );
   }
 }
 

@@ -6,10 +6,10 @@
 
 #include <Manager/PlayerMgr.h>
 #include <Manager/EventMgr.h>
+#include <Manager/MgrUtil.h>
 
 #include <Network/PacketWrappers/ActorControlPacket.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
-#include <Network/CommonActorControl.h>
 
 #include "Actor/Player.h"
 
@@ -22,6 +22,7 @@
 
 using namespace Sapphire;
 using namespace Sapphire::World;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
 using namespace Sapphire::Network::Packets;
@@ -58,12 +59,13 @@ void Action::EventAction::start()
   {
     auto pPlayer = m_pSource->getAsPlayer();
 
-    m_pSource->sendToInRangeSet( control, true );
+    server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
+
     if( pPlayer->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
       Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::InNpcEvent );
   }
   else
-    m_pSource->sendToInRangeSet( control );
+    server().queueForPlayers( m_pSource->getInRangePlayerIds(), control );
 }
 
 void Action::EventAction::execute()
@@ -91,10 +93,10 @@ void Action::EventAction::execute()
     if( m_pSource->isPlayer() )
     {
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied2 );
-      m_pSource->sendToInRangeSet( control, true );
+      server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
     }
     else
-      m_pSource->sendToInRangeSet( control );
+      server().queueForPlayers( m_pSource->getInRangePlayerIds(), control );
   }
   catch( std::exception& e )
   {
@@ -119,17 +121,13 @@ void Action::EventAction::interrupt()
 
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::NoCombat );
       //m_pSource->getAsPlayer()->unsetStateFlag( PlayerStateFlag::Occupied1 );
-      m_pSource->sendToInRangeSet( control );
-      m_pSource->sendToInRangeSet( control1 );
-
-      auto& server = Common::Service< World::WorldServer >::ref();
-      server.queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), { control1, control } );
+      server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
+      server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control1 );
 
       eventMgr.eventFinish( *m_pSource->getAsPlayer(), m_eventId, 1 );
-
     }
     else
-      m_pSource->sendToInRangeSet( control );
+      server().queueForPlayers( m_pSource->getInRangePlayerIds(), control );
 
     if( m_onActionInterruptClb )
       m_onActionInterruptClb( *m_pSource->getAsPlayer(), m_eventId, m_additional );

@@ -296,35 +296,6 @@ void Sapphire::Entity::GameObject::clearInRangeSet()
   m_inRangeBNpc.clear();
 }
 
-/*!
-Send a packet to all players in range, potentially to self if set and is player
-
-\param GamePacketPtr to send
-\param bool should be send to self?
-*/
-void Sapphire::Entity::GameObject::sendToInRangeSet( Network::Packets::FFXIVPacketBasePtr pPacket, bool bToSelf )
-{
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  if( bToSelf && isPlayer() )
-  {
-    server.queueForPlayer( getAsPlayer()->getCharacterId(), pPacket );
-  }
-
-  if( m_inRangePlayers.empty() )
-    return;
-
-  pPacket->setSourceActor( m_id );
-
-  for( const auto& pCurAct : m_inRangePlayers )
-  {
-    assert( pCurAct );
-    // it might be that the player DC'd in which case the session would be invalid
-    // TODO: copy packet to a new unique_ptr then move ownership
-    server.queueForPlayer( pCurAct->getCharacterId(), pPacket );
-  }
-}
-
 /*! \return list of actors currently in range */
 std::set< Sapphire::Entity::GameObjectPtr > Sapphire::Entity::GameObject::getInRangeActors( bool includeSelf )
 {
