@@ -688,7 +688,15 @@ void WorldServer::queueForPlayer( uint64_t characterId, Sapphire::Network::Packe
   auto pZoneCon = pSession->getZoneConnection();
   if( pZoneCon )
     pZoneCon->queueOutPacket( pPacket );
+}
 
+void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
+{
+  if( characterIds.empty() )
+    return;
+
+  for( auto& characterId : characterIds )
+    queueForPlayer( characterId, pPacket );
 }
 
 void WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
@@ -702,6 +710,15 @@ void WorldServer::queueForPlayer( uint64_t characterId, std::vector< Sapphire::N
     for( auto& packet : packets )
     {
       pZoneCon->queueOutPacket( packet );
+    }
+}
+
+void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets )
+{
+  for( auto& characterId : characterIds )
+    for( auto& packet : packets )
+    {
+      queueForPlayer( characterId, packet );
     }
 }
 

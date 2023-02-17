@@ -310,8 +310,6 @@ namespace Sapphire::Entity
 
     void updatePrevTerritory();
 
-    void forceZoneing( uint32_t zoneId );
-
     /*! change position, sends update too */
     void changePosition( float x, float y, float z, float o );
 
@@ -838,9 +836,6 @@ namespace Sapphire::Entity
     const Common::CharaLandData& getCharaLandData( Common::LandFlagsSlot slot ) const;
 
   private:
-    /*! queue a packet for the player */
-    void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
-
     using InventoryMap = std::map< uint16_t, ItemContainerPtr >;
 
     uint64_t m_lastDBWrite;

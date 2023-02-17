@@ -1,10 +1,8 @@
 #include "MountAction.h"
-
-#include <Exd/ExdData.h>
-
 #include <Actor/Player.h>
 
 #include <Manager/PlayerMgr.h>
+#include <Manager/MgrUtil.h>
 
 #include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
@@ -21,6 +19,7 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Action;
+using namespace Sapphire::World::Manager;
 
 MountAction::MountAction( Sapphire::Entity::CharaPtr source, uint16_t mountId, uint16_t sequence,
                           std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData ) :
@@ -58,15 +57,12 @@ void MountAction::start()
   data.TargetPos[ 1 ] = Common::Util::floatToUInt16( pos.y );
   data.TargetPos[ 2 ] = Common::Util::floatToUInt16( pos.z );
   data.Dir = m_pSource->getRot();
-
-  m_pSource->sendToInRangeSet( castPacket, true );
+  server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), castPacket );
 
   Common::Service< World::Manager::PlayerMgr >::ref().onSetStateFlag( *player, Common::PlayerStateFlag::Casting );
 
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), actionStartPkt );
+  server().queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), actionStartPkt );
 }
 
 void MountAction::execute()

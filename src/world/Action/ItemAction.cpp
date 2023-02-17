@@ -7,9 +7,11 @@
 #include <Network/PacketWrappers/EffectPacket.h>
 
 #include "Manager/PlayerMgr.h"
+#include "Manager/MgrUtil.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 ItemAction::ItemAction( Sapphire::Entity::CharaPtr source, uint32_t itemId,
@@ -84,8 +86,7 @@ void ItemAction::handleVFXItem()
   effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
   effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
   effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
-
-  m_pSource->sendToInRangeSet( effectPacket, true );
+  server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), effectPacket );
 }
 
 void ItemAction::handleCompanionItem()

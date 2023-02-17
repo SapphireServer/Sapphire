@@ -32,6 +32,15 @@ namespace Sapphire::World::Manager
     /// <param name="targetRot"></param>
     void requestMoveTerritory( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot );
 
+
+    /// <summary>
+    /// request to move a player to specified territorytype with given WarpType, position will be the same as before
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="warpType"></param>
+    /// <param name="targetTerritoryId"></param>
+    void requestMoveTerritory( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId );
+
     /// <summary>
     /// handle player state pre-warp and tells client to warp player
     /// </summary>

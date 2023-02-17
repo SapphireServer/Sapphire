@@ -148,8 +148,7 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
   eobjStatePacket->data().Args2 = 0; // initial animation state
   eobjStatePacket->data().Args3 = getHousingLink();
 
-  auto pSession = server.getSession( pTarget->getCharacterId() );
-  pSession->getZoneConnection()->queueOutPacket( eobjStatePacket );
+  server.queueForPlayer( pTarget->getCharacterId(), eobjStatePacket );
 }
 
 
@@ -178,8 +177,9 @@ uint8_t Sapphire::Entity::EventObject::getPermissionInvisibility() const
 void Sapphire::Entity::EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
   m_permissionInvisibility = permissionInvisibility;
-
-  sendToInRangeSet( makeActorControl( getId(), DirectorEObjMod, permissionInvisibility ) );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto inRangePlayerIds = getInRangePlayerIds();
+  server.queueForPlayers( inRangePlayerIds, makeActorControl( getId(), DirectorEObjMod, permissionInvisibility ) );
 }
 
 uint32_t Sapphire::Entity::EventObject::getOwnerId() const

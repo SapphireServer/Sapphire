@@ -225,7 +225,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), landsetInitializePacket );
 }
 
-void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
+void Sapphire::HousingZone::sendLandUpdate( uint16_t landId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto pLand = getLand( landId );
@@ -282,7 +282,7 @@ uint32_t Sapphire::HousingZone::getLandSetId() const
   return m_landSetId;
 }
 
-Sapphire::LandPtr Sapphire::HousingZone::getLand( uint8_t id )
+Sapphire::LandPtr Sapphire::HousingZone::getLand( uint16_t id )
 {
   auto it = m_landPtrMap.find( id );
   if( it == m_landPtrMap.end() )
@@ -291,7 +291,7 @@ Sapphire::LandPtr Sapphire::HousingZone::getLand( uint8_t id )
   return it->second;
 }
 
-Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEObj( uint8_t landId )
+Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEObj( uint16_t landId )
 {
   auto land = getLand( landId );
   assert( land );
@@ -332,7 +332,7 @@ Sapphire::Entity::EventObjectPtr Sapphire::HousingZone::registerEstateEntranceEO
   return eObj;
 }
 
-void Sapphire::HousingZone::removeEstateEntranceEObj( uint8_t landId )
+void Sapphire::HousingZone::removeEstateEntranceEObj( uint16_t landId )
 {
   auto land = getLand( landId );
   assert( land );
@@ -369,7 +369,7 @@ void Sapphire::HousingZone::updateYardObjects( Sapphire::Common::LandIdent ident
   }
 }
 
-void Sapphire::HousingZone::spawnYardObject( uint8_t landId, uint16_t slotId, Inventory::HousingItem& item )
+void Sapphire::HousingZone::spawnYardObject( uint16_t landId, uint16_t slotId, Inventory::HousingItem& item )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto bounds = m_yardObjectArrayBounds[ landId ];

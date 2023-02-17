@@ -17,8 +17,9 @@
 
 #include <Manager/PlayerMgr.h>
 #include <Manager/MapMgr.h>
+#include <Manager/MgrUtil.h>
+#include "WorldServer.h"
 
-#include "Territory/Territory.h"
 #include "Actor/Player.h"
 #include <Territory/InstanceObjectCache.h>
 
@@ -34,7 +35,6 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
                                     uint32_t targetTerritoryId, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& server = Common::Service< WorldServer >::ref();
 
   auto pTeri = teriMgr.getTerritoryByGuId( targetTerritoryId );
   if( !pTeri )
@@ -52,12 +52,19 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
   taskMgr.queueTask( makeMoveTerritoryTask( player, warpType, targetTerritoryId, targetPos, targetRot, 1000 ) );
 }
 
+void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId )
+{
+  requestMoveTerritory( player, warpType, targetTerritoryId, player.getPos(), player.getRot() );
+}
+
 void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
   m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
 
-  player.sendToInRangeSet( makeActorControlSelf( player.getId(), WarpStart, warpType, warpType, 0, player.getTerritoryTypeId(), 1 ), true );
-  player.sendToInRangeSet( makeActorControl( player.getId(), ActorDespawnEffect, warpType, player.getTerritoryTypeId() ) );
+  server().queueForPlayers( player.getInRangePlayerIds( true ),
+                            makeActorControlSelf( player.getId(), WarpStart, warpType, warpType, 0, player.getTerritoryTypeId(), 1 ) );
+  server().queueForPlayers( player.getInRangePlayerIds(),
+                            makeActorControl( player.getId(), ActorDespawnEffect, warpType, player.getTerritoryTypeId() ) );
 
   auto& taskMgr = Common::Service< TaskMgr >::ref();
   taskMgr.queueTask( makeWarpTask( player, warpType, targetPos, targetRot, 1000 ) );
@@ -96,12 +103,10 @@ void WarpMgr::finishWarp( Entity::Player& player )
   player.setZoningType( Common::ZoningType::None );
 
   if( !player.getGmInvis() )
-    player.sendToInRangeSet( zoneInPacket );
+    server().queueForPlayers( player.getInRangePlayerIds(), zoneInPacket );
 
-  auto& server = Common::Service< WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), zoneInPacket );
-
-  player.sendToInRangeSet( setStatusPacket, true );
+  server().queueForPlayer( player.getCharacterId(), zoneInPacket );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), setStatusPacket );
 
   playerMgr.onUnsetStateFlag( player, PlayerStateFlag::BetweenAreas );
 
@@ -142,9 +147,9 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
   auto aetherytePlace = exdData.getRow< Excel::PlaceName >( data.TransferName );
 
   PlayerMgr::sendDebug( player, "Teleport: {0} - {1} ({2})",
-                           townPlace->getString( townPlace->data().Text.SGL ),
-                           aetherytePlace->getString( aetherytePlace->data().Text.SGL ),
-                           data.TerritoryType );
+                        townPlace->getString( townPlace->data().Text.SGL ),
+                        aetherytePlace->getString( aetherytePlace->data().Text.SGL ),
+                        data.TerritoryType );
 
   // if it is a teleport in the same zone, we want to do warp instead of moveTerri
   bool sameTerritory = player.getTerritoryTypeId() == data.TerritoryType;

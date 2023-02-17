@@ -369,7 +369,7 @@ void HousingMgr::sendLandSignFree( Entity::Player& player, const Common::LandIde
   server.queueForPlayer( player.getCharacterId(), plotPricePacket );
 }
 
-LandPurchaseResult HousingMgr::purchaseLand( Entity::Player& player, HousingZone& zone, uint8_t plot, uint8_t state )
+LandPurchaseResult HousingMgr::purchaseLand( Entity::Player& player, HousingZone& zone, uint16_t plot, uint8_t state )
 {
 
   auto plotPrice = zone.getLand( plot )->getCurrentPrice();
@@ -1182,7 +1182,7 @@ bool HousingMgr::placeExternalItem( Entity::Player& player, Inventory::HousingIt
   auto zone = std::dynamic_pointer_cast< HousingZone >( pZone );
   assert( zone );
 
-  zone->spawnYardObject( static_cast< uint8_t >( ident.landId ), static_cast< uint16_t >( freeSlot ), *item );
+  zone->spawnYardObject( ident.landId, static_cast< uint16_t >( freeSlot ), *item );
 
   return true;
 }
@@ -1567,7 +1567,7 @@ bool HousingMgr::removeExternalItem( Entity::Player& player, HousingZone& terri,
   }
 
   if( shouldDespawnItem )
-    terri.despawnYardObject( static_cast< uint16_t >( land.getLandIdent().landId ), slotId );
+    terri.despawnYardObject( land.getLandIdent().landId, slotId );
 
   return true;
 }

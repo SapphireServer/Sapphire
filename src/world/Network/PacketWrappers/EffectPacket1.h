@@ -41,9 +41,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       std::memcpy( &m_data.CalcResult.CalcResultCt[ m_sourceEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
     }
 
-    void setAnimationId( uint16_t animationId )
+    void setActionId( uint16_t actionId )
     {
-      m_data.Action = animationId;
+      m_data.Action = actionId;
     }
 
     void setDisplayType( Common::ActionEffectDisplayType displayType )

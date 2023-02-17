@@ -45,15 +45,7 @@ void ActionIntegrityTask::execute()
   data.ResultId = m_resultId;
   data.Target = m_pTarget->getId();
 
-
-  for( auto& charId : inRangePlayers )
-  {
-    auto pPlayer = server.getPlayer( charId );
-    Logger::debug( "Sending to {}", charId );
-    integrityPacket->setTargetActor( pPlayer->getId() );
-
-    server.queueForPlayer( charId, integrityPacket );
-  }
+  server.queueForPlayers( inRangePlayers, integrityPacket );
 
 }
 

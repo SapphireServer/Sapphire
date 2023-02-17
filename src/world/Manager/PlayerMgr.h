@@ -2,6 +2,7 @@
 
 #include "ForwardsZone.h"
 #include <spdlog/fmt/fmt.h>
+#include "MgrUtil.h"
 
 namespace Sapphire::World::Manager
 {

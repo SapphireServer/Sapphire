@@ -233,7 +233,7 @@ private:
     quest.setUI8CH( 1 );// receive key item
 
     // teleport to real Uldah
-    player.forceZoneing( Territorytype0 );
+    warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0 );
   }
 };
 

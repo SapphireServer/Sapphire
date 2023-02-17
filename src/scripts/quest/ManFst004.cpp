@@ -230,7 +230,7 @@ private:
     quest.setSeq( Seq1 );
     quest.setUI8CH( 1 ); // receive key item
     // event is done, need to teleport to real zone.
-    player.forceZoneing( Territorytype0 );
+    warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0 );
   }
 
   //////////////////////////////////////////////////////////////////////

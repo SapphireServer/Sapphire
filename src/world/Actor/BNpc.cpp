@@ -33,6 +33,7 @@
 #include <Manager/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
+#include <Manager/MgrUtil.h>
 #include <Script/ScriptMgr.h>
 #include <Task/RemoveBNpcTask.h>
 #include <Task/FadeBNpcTask.h>
@@ -44,6 +45,7 @@ using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
+using namespace Sapphire::World::Manager;
 
 Sapphire::Entity::BNpc::BNpc() :
   Npc( ObjKind::BattleNpc )
@@ -430,7 +432,7 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
     animationType = 0;
 
   auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
-  sendToInRangeSet( movePacket );
+  server().queueForPlayers( getInRangePlayerIds(), movePacket );
 }
 
 void Sapphire::Entity::BNpc::hateListClear()
@@ -595,7 +597,7 @@ void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetBattle, 1, 0, 0 ) );
+  server().queueForPlayers( getInRangePlayerIds(), makeActorControl( getId(), ActorControlType::SetBattle, 1, 0, 0 ) );
 
   changeTarget( pChara->getId() );
 
@@ -615,8 +617,8 @@ void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
-    sendToInRangeSet( makeActorControl( getId(), ActorControlType::SetBattle, 0, 0, 0 ) );
+    server().queueForPlayers( getInRangePlayerIds(), makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
+    server().queueForPlayers( getInRangePlayerIds(), makeActorControl( getId(), ActorControlType::SetBattle, 0, 0, 0 ) );
     tmpPlayer->onMobDeaggro( *this );
 
     if( getTriggerOwnerId() == pChara->getId() )
@@ -939,13 +941,12 @@ void Sapphire::Entity::BNpc::setOwner( const Sapphire::Entity::CharaPtr& m_pChar
   auto setOwnerPacket = makeZonePacket< FFXIVIpcFirstAttack >( getId() );
   setOwnerPacket->data().Type = 0x01;
   setOwnerPacket->data().Id = targetId;
-  sendToInRangeSet( setOwnerPacket );
+  server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
 
   if( m_pChara != nullptr && m_pChara->isPlayer() )
   {
     auto letter = makeActorControl( getId(), ActorControlType::SetHateLetter, 1, getId(), 0 );
-    auto& server = Common::Service< World::WorldServer >::ref();
-    server.queueForPlayer( m_pChara->getAsPlayer()->getCharacterId(), letter );
+    server().queueForPlayer( m_pChara->getAsPlayer()->getCharacterId(), letter );
   }
 
 }
@@ -999,14 +1000,12 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
     auto resultId = pZone->getNextEffectResultId();
     effectPacket->setSequence( resultId );
     effectPacket->addTargetEffect( effectEntry );
-
-    sendToInRangeSet( effectPacket );
+    server().queueForPlayers( getInRangePlayerIds(), effectPacket );
 
     pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
 
     auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
     taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
-
   }
 }
 

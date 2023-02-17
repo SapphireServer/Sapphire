@@ -22,10 +22,12 @@
 #include "Manager/InventoryMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/MgrUtil.h"
 
 #include <Service.h>
 
 using namespace Sapphire::Common;
+using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
@@ -330,14 +332,14 @@ void Sapphire::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
 
-  queuePacket( invUpdate );
+  server().queueForPlayer( getCharacterId(), invUpdate );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = seq;
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
 
-  queuePacket( invTransFinPacket );
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
 }
 
 void Sapphire::Entity::Player::removeCurrency( Common::CurrencyType type, uint32_t amount )
@@ -364,13 +366,13 @@ void Sapphire::Entity::Player::removeCurrency( Common::CurrencyType type, uint32
   invUpdate->data().srcContainerIndex = static_cast< int16_t >( type ) - 1;
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invUpdate );
+  server().queueForPlayer( getCharacterId(), invUpdate );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = seq;
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invTransFinPacket );
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
 }
 
 
@@ -403,15 +405,14 @@ void Sapphire::Entity::Player::addCrystal( Common::CrystalType type, uint32_t am
   invUpdate->data().srcEntity = getId();
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invUpdate );
+  server().queueForPlayer( getCharacterId(), invUpdate );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = seq;
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invTransFinPacket );
-
-  queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, static_cast< uint8_t >( type ) + 1, amount ) );
 }
 
 void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t amount )
@@ -439,13 +440,13 @@ void Sapphire::Entity::Player::removeCrystal( Common::CrystalType type, uint32_t
   invUpdate->data().srcEntity = getId();
   invUpdate->data().srcCatalogId = currItem->getId();
   invUpdate->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invUpdate );
+  server().queueForPlayer( getCharacterId(), invUpdate );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = seq;
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invTransFinPacket );
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
 }
 
 void Sapphire::Entity::Player::sendInventory()
@@ -681,18 +682,18 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
         auto seq = getNextInventorySequence();
 
         auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, bag, *item, seq );
-        queuePacket( slotUpdate );
+        server().queueForPlayer( getCharacterId(), slotUpdate );
 
         auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
         invTransFinPacket->data().contextId = seq;
         invTransFinPacket->data().operationId = seq;
         invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-        queuePacket( invTransFinPacket );
+        server().queueForPlayer( getCharacterId(), invTransFinPacket );
 
         // return existing stack if we have no overflow - items fit into a preexisting stack
         if( quantity == 0 )
         {
-          queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+          server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
           return item;
         }
 
@@ -730,15 +731,14 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
     invTransPacket->data().dstStack = item->getStackSize();
     invTransPacket->data().dstContainerIndex = freeBagSlot.second;
     invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_CREATEITEM;
-    queuePacket( invTransPacket );
+    server().queueForPlayer( getCharacterId(), invTransPacket );
 
     auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
     invTransFinPacket->data().contextId = seq;
     invTransFinPacket->data().operationId = seq;
     invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_CREATEITEM;
-    queuePacket( invTransFinPacket );
-
-    queuePacket( makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
+    server().queueForPlayer( getCharacterId(), invTransFinPacket );
+    server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), ItemObtainIcon, catalogId, originalQuantity ) );
   }
 
   return item;
@@ -982,13 +982,13 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint16_t f
   invTransPacket->data().srcStack = fromItem->getStackSize();
   invTransPacket->data().srcContainerIndex = fromSlotId;
   invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  queuePacket( invTransPacket );
+  server().queueForPlayer( getCharacterId(), invTransPacket );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = sequence;
   invTransFinPacket->data().operationId = sequence;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  queuePacket( invTransFinPacket );
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
 }
 
 uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
@@ -1133,13 +1133,13 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
   invTransPacket->data().dstStack = item->getStackSize();
   invTransPacket->data().dstContainerIndex = slotId;
   invTransPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  queuePacket( invTransPacket );
+  server().queueForPlayer( getCharacterId(), invTransPacket );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = seq;
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_DELETEITEM;
-  queuePacket( invTransFinPacket );
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
 
   return item;
 }
@@ -1193,14 +1193,13 @@ void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryT
   auto seq = getNextInventorySequence();
 
   auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, type, *item, seq );
-  queuePacket( slotUpdate );
+  server().queueForPlayer( getCharacterId(), slotUpdate );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( getId() );
   invTransFinPacket->data().contextId = seq;
   invTransFinPacket->data().operationId = seq;
   invTransFinPacket->data().operationType = Common::ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  queuePacket( invTransFinPacket );
-
+  server().queueForPlayer( getCharacterId(), invTransFinPacket );
 }
 
 bool Sapphire::Entity::Player::findFirstItemWithId( uint32_t catalogId,

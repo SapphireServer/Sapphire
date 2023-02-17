@@ -31,8 +31,12 @@ void WarpTask::execute()
   auto pPlayer = server.getPlayer( m_playerId );
   if( !pPlayer )
     return;
-  
-  pPlayer->sendToInRangeSet( makeWarp( pPlayer->getId(), m_warpInfo.m_warpType, m_warpInfo.m_targetPos, m_warpInfo.m_targetRot ), true );
+
+  auto inRangePlayerIds = pPlayer->getInRangePlayerIds();
+  auto warpPacket = makeWarp( pPlayer->getId(), m_warpInfo.m_warpType, m_warpInfo.m_targetPos, m_warpInfo.m_targetRot );
+  server.queueForPlayers( inRangePlayerIds, warpPacket );
+  server.queueForPlayer( pPlayer->getCharacterId(), warpPacket );
+
   pPlayer->setPos( m_warpInfo.m_targetPos, false );
 }
 

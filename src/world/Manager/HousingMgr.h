@@ -76,7 +76,7 @@ namespace Sapphire::World::Manager
 
     void sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident );
     void sendLandSignFree( Entity::Player& player, const Common::LandIdent ident );
-    LandPurchaseResult purchaseLand( Entity::Player& player, HousingZone& zone, uint8_t plot, uint8_t state );
+    LandPurchaseResult purchaseLand( Entity::Player& player, HousingZone& zone, uint16_t plot, uint8_t state );
 
     /*!
      * @brief Converts param1 of a client trigger into a Common::LandIndent

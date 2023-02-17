@@ -46,7 +46,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     {
       m_data.handlerId = directorId;
       m_data.messageId = msgId;
-      m_data.numOfArgs = args.size();
+      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
       std::copy( args.begin(), args.end(), m_data.args );
     };
   };
@@ -64,7 +64,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     {
       m_data.handlerId = directorId;
       m_data.messageId = msgId;
-      m_data.numOfArgs = args.size();
+      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
       std::copy( args.begin(), args.end(), m_data.args );
     };
   };
@@ -82,7 +82,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     {
       m_data.handlerId = directorId;
       m_data.messageId = msgId;
-      m_data.numOfArgs = args.size();
+      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
       std::copy( args.begin(), args.end(), m_data.args );
     };
   };
@@ -100,7 +100,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     {
       m_data.handlerId = directorId;
       m_data.messageId = msgId;
-      m_data.numOfArgs = args.size();
+      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
       std::copy( args.begin(), args.end(), m_data.args );
     };
   };
@@ -118,7 +118,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     {
       m_data.handlerId = directorId;
       m_data.messageId = msgId;
-      m_data.numOfArgs = args.size();
+      m_data.numOfArgs = static_cast< uint8_t >( args.size() );
       std::copy( args.begin(), args.end(), m_data.args );
     };
   };

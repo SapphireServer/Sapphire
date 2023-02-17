@@ -56,6 +56,7 @@
 #include "Manager/WarpMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/FreeCompanyMgr.h"
+#include "Manager/MgrUtil.h"
 
 #include "Action/Action.h"
 
@@ -100,8 +101,8 @@ void Sapphire::Network::GameConnection::setProfileHandler( const Packets::FFXIVA
   strcpy( searchInfoPacket->data().SearchComment, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                             static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), SetStatusIcon,
+                                                                                  static_cast< uint8_t >( player.getOnlineStatus() ) ) );
 }
 
 void Sapphire::Network::GameConnection::getProfileHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -115,10 +116,8 @@ void Sapphire::Network::GameConnection::getProfileHandler( const Packets::FFXIVA
 
 void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto pPlayer = server.getPlayer( targetId );
+  auto pPlayer = server().getPlayer( targetId );
 
   Logger::debug( "getSearchCommentHandler: {0}", targetId );
 
@@ -131,33 +130,26 @@ void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::
     auto searchInfoPacket = makeZonePacket< FFXIVIpcGetSearchCommentResult >( player.getId() );
     searchInfoPacket->data().TargetEntityID = targetId;
     strcpy( searchInfoPacket->data().SearchComment, pPlayer->getSearchMessage() );
-    server.queueForPlayer( player.getCharacterId(), searchInfoPacket );
+    server().queueForPlayer( player.getCharacterId(), searchInfoPacket );
   }
 }
 
 void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto pPlayer = server.getPlayer( targetId );
+  auto pPlayer = server().getPlayer( targetId );
 
   Logger::debug( "reqExamineFcInfo: {0}", targetId );
 
-  if( pPlayer )
-  {
-    if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-      return;
+  if( !pPlayer || pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
+    return;
 
-    // retail sends the requester's id as both (isForSelf)
-    auto examineFcInfoPacket = makeZonePacket< FFXIVIpcGetFcProfileResult >( player.getId() );
-    examineFcInfoPacket->data().TargetEntityID = targetId;
-    // todo: populate with fc info
+  // retail sends the requester's id as both (isForSelf)
+  auto examineFcInfoPacket = makeZonePacket< FFXIVIpcGetFcProfileResult >( player.getId() );
+  examineFcInfoPacket->data().TargetEntityID = targetId;
+  // todo: populate with fc info
 
-    server.queueForPlayer( player.getCharacterId(), examineFcInfoPacket );
-  }
-
+  server().queueForPlayer( player.getCharacterId(), examineFcInfoPacket );
 }
 
 void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -173,31 +165,18 @@ void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::F
   chatChannelMgr.addToChannel( joinChannelPacket.data().ChannelID, player );
 
   auto chatChannelResultPacket = makeZonePacket< FFXIVIpcChatChannelResult >( player.getId() );
-
   chatChannelResultPacket->data().ChannelID = channelIdReq;
   chatChannelResultPacket->data().TargetCharacterID = player.getId();
   chatChannelResultPacket->data().CommunityID = player.getCharacterId();
   chatChannelResultPacket->data().UpPacketNo = 0; // todo: define behavior
   chatChannelResultPacket->data().Result = 0; // todo: define behavior
-
   queueOutPacket( chatChannelResultPacket );
 
   auto joinChannelResultPacket = makeChatPacket< Packets::Server::FFXIVJoinChannelResult >( player.getId() );
-
   joinChannelResultPacket->data().channelID = channelIdReq;
   joinChannelResultPacket->data().characterID = player.getId();
   joinChannelResultPacket->data().result = 0;
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
-
-  if( !pSession )
-  {
-    Logger::error( std::string( __FUNCTION__ ) + ": Session not found for player#{}", player.getCharacterId() );
-    return;
-  }
-
-  pSession->getChatConnection()->queueOutPacket( joinChannelResultPacket );
+  queueOutPacket( joinChannelResultPacket );
 }
 
 
@@ -286,7 +265,7 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
 
   //auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unknownRotation );
   auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, data.flag, data.flag2, animationSpeed, unknownRotation );
-  player.sendToInRangeSet( movePacket );
+  server().queueForPlayers( player.getInRangePlayerIds(), movePacket );
 }
 
 void Sapphire::Network::GameConnection::configHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -305,7 +284,6 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
 
   auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   auto tInfo = pTeri->getTerritoryTypeInfo();
@@ -342,7 +320,6 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
 
 void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
   auto pTeri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -359,7 +336,7 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
     auto discoveryPacket = makeZonePacket< FFXIVIpcDiscoveryReply >( player.getId() );
     discoveryPacket->data().mapId = tInfo->data().Map;
     discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
-    server.queueForPlayer( player.getCharacterId(), discoveryPacket );
+    server().queueForPlayer( player.getCharacterId(), discoveryPacket );
     player.discover( tInfo->data().Map, pRefInfo->data.discoveryIndex );
   }
 
@@ -378,13 +355,12 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
 
 void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcPingHandler >( inPacket );
   auto& data = packet.data();
 
   queueOutPacket( std::make_shared< WorldPackets::Server::PingPacket >( player, data.clientTimeValue ) );
 
-  auto pSession = server.getSession( player.getCharacterId() );
+  auto pSession = server().getSession( player.getCharacterId() );
   if( !pSession )
     return;
 
@@ -633,9 +609,6 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGearSetEquip >( inPacket );
   const auto contextId = packet.data().contextId;
 
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto& playerMgr = Common::Service< PlayerMgr >::ref();
-
   // Loop over all slots
   for( int slot = 0; slot < 14; ++slot )
   {
@@ -651,14 +624,14 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
     if( fromItem && equippedItem )
     {
       player.swapItem( fromContainer, fromSlot, Common::GearSet0, slot );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, contextId ) );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, contextId ) );
+      server().queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, contextId ) );
+      server().queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, contextId ) );
     }
     else if( fromItem && !equippedItem )
     {
       player.moveItem( fromContainer, fromSlot, Common::GearSet0, slot );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, contextId ) );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, contextId ) );
+      server().queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, contextId ) );
+      server().queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, contextId ) );
     }
     else if( !fromItem && equippedItem )
     {
@@ -672,8 +645,8 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
         // TODO: the gearset handler shouldn't equip -anything- if there's ever too little inventory space
         continue;
       }
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeContainerSlot.second, freeContainerSlot.first, *equippedItem, contextId ) );
-      server.queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, contextId ) );
+      server().queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), freeContainerSlot.second, freeContainerSlot.first, *equippedItem, contextId ) );
+      server().queueForPlayer( player.getCharacterId(), std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, contextId ) );
     }
   }
 
@@ -682,14 +655,14 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
 
   if( packet.data().contextId < 0xFE )
   {
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::GearSetEquipMsg, packet.data().contextId ) );
+    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::GearSetEquipMsg, packet.data().contextId ) );
   }
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
   invTransFinPacket->data().contextId = contextId;
   invTransFinPacket->data().operationId = contextId;
   invTransFinPacket->data().operationType = ITEM_OPERATION_TYPE::ITEM_OPERATION_TYPE_UPDATEITEM;
-  server.queueForPlayer( player.getCharacterId(), invTransFinPacket );
+  server().queueForPlayer( player.getCharacterId(), invTransFinPacket );
 }
 
 void Sapphire::Network::GameConnection::marketBoardRequestItemInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

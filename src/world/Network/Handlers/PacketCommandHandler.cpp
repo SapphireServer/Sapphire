@@ -666,7 +666,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }*/
     case PacketCommand::EVENT_HANDLER:
     {
-      pZone->onEventHandlerOrder( player, param11, param12, param2, param3, param4 );
+      pZone->onEventHandlerOrder( player, param11, param12, param2, static_cast< uint32_t >( param3 ), param4 );
 
       break;
     }

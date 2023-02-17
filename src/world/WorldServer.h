@@ -52,7 +52,9 @@ namespace Sapphire::World
     std::string getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad = false );
 
     void queueForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
+    void queueForPlayers( const std::set< uint64_t >& characterIds, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
     void queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets );
+    void queueForPlayers(  const std::set< uint64_t >& characterIds, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets );
 
     void queueForLinkshell( uint64_t lsId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList = {} );
     void queueForFreeCompany( uint64_t fcId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket, std::set< uint64_t > exceptionCharIdList = {} );

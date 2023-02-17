@@ -244,7 +244,7 @@ private:
                         pQuest->setUI8CH( 1 ); // receive key item
 
                         // teleport to real ul'dah
-                        player.forceZoneing( 130 );
+                        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, 130 );
                       } );
   }
 };

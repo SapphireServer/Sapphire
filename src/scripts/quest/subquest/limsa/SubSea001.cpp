@@ -218,7 +218,7 @@ private:
       {
         quest.setSeq( Seq2 );
         player.changePosition( 10, 21, 13, -2 );
-        player.forceZoneing( Territorytype0 ); //Teleport to real Limsa
+        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0 );
       }
     }
     else

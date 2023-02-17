@@ -14,7 +14,7 @@
 #include <Manager/FreeCompanyMgr.h>
 
 #include <Script/ScriptMgr.h>
-#include <WorldServer.h>
+#include <Worldserver.h>
 #include <Common.h>
 
 #include <Network/PacketContainer.h>
@@ -49,11 +49,9 @@ using namespace Sapphire::Network::ActorControl;
 
 void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfile )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
   statusPacket->data().onlineStatusFlags = player.getFullOnlineStatusMask();
-  server.queueForPlayer( player.getCharacterId(), statusPacket );
+  server().queueForPlayer( player.getCharacterId(), statusPacket );
 
   if( updateProfile )
   {
@@ -61,61 +59,58 @@ void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfil
     searchInfoPacket->data().OnlineStatus = player.getFullOnlineStatusMask();
     searchInfoPacket->data().Region = player.getSearchSelectRegion();
     strcpy( searchInfoPacket->data().SearchComment, player.getSearchMessage());
-    server.queueForPlayer( player.getCharacterId(), searchInfoPacket );
+    server().queueForPlayer( player.getCharacterId(), searchInfoPacket );
   }
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ),
+                            makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ) );
 }
 
 void PlayerMgr::onEquipDisplayFlagsChanged( Entity::Player& player )
 {
   auto paramPacket = makeZonePacket< FFXIVIpcConfig >( player.getId() );
   paramPacket->data().flag = player.getEquipDisplayFlags();
-  player.sendToInRangeSet( paramPacket, true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), paramPacket );
 }
 
 void PlayerMgr::onSendStateFlags( Entity::Player& player, bool updateInRange )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< PlayerStateFlagsPacket >( player ) );
+
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< PlayerStateFlagsPacket >( player ) );
 
   if( updateInRange )
-    player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                        static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
+    server().queueForPlayers( player.getInRangePlayerIds( true ),
+                              makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ) );
 }
 
 void PlayerMgr::onSendAchievementList( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   auto achvData = player.getAchievementData();
 
   auto achvPacket = makeZonePacket< FFXIVIpcAchievement >( player.getId() );
   std::memcpy( &achvPacket->data().complete[ 0 ], &achvData.unlockList[ 0 ], sizeof( achvPacket->data().complete ) );
   std::memcpy( &achvPacket->data().history[ 0 ], &achvData.history[ 0 ], sizeof( achvPacket->data().history ) );
 
-  server.queueForPlayer( player.getCharacterId(), achvPacket );
+  server().queueForPlayer( player.getCharacterId(), achvPacket );
 }
 
 void PlayerMgr::onSendAchievementProgress( Entity::Player& player, uint32_t achievementId )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
+
   auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
 
   auto achvProgress = achvMgr.getAchievementDataById( player, achievementId );
 
   auto pAchvProgressPacket = makeActorControl( player.getId(), AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
-  server.queueForPlayer( player.getCharacterId(), pAchvProgressPacket );
+  server().queueForPlayer( player.getCharacterId(), pAchvProgressPacket );
 }
 
 void PlayerMgr::onUnlockAchievement( Entity::Player& player, uint32_t achievementId )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   onSendAchievementList( player );
 
-  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementComplete, achievementId ) );
-  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementObtainMsg, achievementId ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementComplete, achievementId ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementObtainMsg, achievementId ) );
 }
 
 void PlayerMgr::onSendStats( Entity::Player& player )
@@ -146,15 +141,11 @@ void PlayerMgr::onSendStats( Entity::Player& player )
 
   auto statPacket = makeZonePacket< FFXIVIpcBaseParam >( player.getId() );
   memcpy( statPacket->data().Param, statParams.data(), sizeof( uint32_t ) * statParams.size() );
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), statPacket );
+  server().queueForPlayer( player.getCharacterId(), statPacket );
 }
 
 void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   auto playerStatusUpdate = makeZonePacket< FFXIVIpcPlayerStatusUpdate >( player.getId() );
   playerStatusUpdate->data().ClassJob = static_cast< uint8_t >( player.getClass() );
   playerStatusUpdate->data().Lv = player.getLevel();
@@ -162,22 +153,19 @@ void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
   playerStatusUpdate->data().LvSync = 0; //player.getLevelSync();
   playerStatusUpdate->data().Exp = player.getExp();
 
-  server.queueForPlayer( player.getCharacterId(), playerStatusUpdate );
+  server().queueForPlayer( player.getCharacterId(), playerStatusUpdate );
 }
 
 void PlayerMgr::onPlayerHpMpTpChanged( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  player.sendToInRangeSet( std::make_shared< UpdateHpMpTpPacket >( player ), true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< UpdateHpMpTpPacket >( player ) );
   auto hudParamPacket = makeHudParam( player );
-  server.queueForPlayer( player.getCharacterId(), hudParamPacket );
+  server().queueForPlayer( player.getCharacterId(), hudParamPacket );
 }
 
 void PlayerMgr::onPlayerItemLevelUpdate( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), SetItemLevel, player.getItemLevel(), 0 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), SetItemLevel, player.getItemLevel(), 0 ) );
 }
 
 void PlayerMgr::onLevelUp( Entity::Player& player )
@@ -186,10 +174,11 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
   player.sendStats();
   onPlayerHpMpTpChanged( player );
 
-  player.sendToInRangeSet( makeHudParam( player ), true );
+  auto inRangePlayerIds = player.getInRangePlayerIds( true );
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
-                           player.getLevel(), player.getLevel() - 1 ), true );
+  server().queueForPlayers( inRangePlayerIds, makeHudParam( player ) );
+  server().queueForPlayers( inRangePlayerIds, makeActorControl( player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
+                                                              player.getLevel(), player.getLevel() - 1 ) );
 
   onPlayerStatusUpdate( player );
 
@@ -199,11 +188,10 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
 
 void PlayerMgr::onSetLevelForClass( Entity::Player& player, Common::ClassJob classJob )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
 
-  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::ClassJobUpdate,
-                                                       static_cast< uint8_t >( classJob ), player.getLevelForClass( classJob ) ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::ClassJobUpdate,
+                                                      static_cast< uint8_t >( classJob ), player.getLevelForClass( classJob ) ) );
 
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( classJob ) );
 }
@@ -211,38 +199,34 @@ void PlayerMgr::onSetLevelForClass( Entity::Player& player, Common::ClassJob cla
 
 void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
 
   if( exp != 0 )
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), GainExpMsg, static_cast< uint8_t >( player.getClass() ), exp ) );
+    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), GainExpMsg, static_cast< uint8_t >( player.getClass() ), exp ) );
 
-  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp, static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp, static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
 }
 
 void PlayerMgr::onUnlockOrchestrion( Entity::Player& player, uint8_t songId, uint32_t itemId )
 {
   player.learnSong( songId, itemId );
 
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
 void PlayerMgr::onChangeGear( Entity::Player& player )
 {
-  player.sendToInRangeSet( std::make_shared< ModelEquipPacket >( player ), true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< ModelEquipPacket >( player ) );
 }
 
 void PlayerMgr::onGcUpdate( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
   auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
   gcAffPacket->data().ActiveCompanyId = player.getGc();
   gcAffPacket->data().MaelstromRank = player.getGcRankArray()[ 0 ];
   gcAffPacket->data().TwinAdderRank = player.getGcRankArray()[ 1 ];
   gcAffPacket->data().ImmortalFlamesRank = player.getGcRankArray()[ 2 ];
 
-  server.queueForPlayer( player.getCharacterId(), gcAffPacket );
+  server().queueForPlayer( player.getCharacterId(), gcAffPacket );
 }
 
 void PlayerMgr::onSetGc( Entity::Player& player, uint8_t gc )
@@ -268,28 +252,29 @@ void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
     return;
 
   player.setCompanion( companionId );
-
-  player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::ToggleCompanion, companionId ), true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ActorControlType::ToggleCompanion, companionId ) );
 }
 
 void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
 {
+
+  auto inRangePlayerIds = player.getInRangePlayerIds( true );
   if( mountId != 0 )
   {
-    player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
-                      static_cast< uint8_t >( Common::ActorStatus::Mounted ) ), true );
-    player.sendToInRangeSet( makeActorControlSelf( player.getId(), 0x39e, 12 ), true ); //?
+    server().queueForPlayers( inRangePlayerIds,
+                            makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) ) );
+    server().queueForPlayers( inRangePlayerIds, makeActorControlSelf( player.getId(), 0x39e, 12 ) );
   }
   else
   {
-    player.sendToInRangeSet( makeActorControl( player.getId(), ActorControlType::SetStatus,
-                      static_cast< uint8_t >( Common::ActorStatus::Idle ) ), true );
-    player.sendToInRangeSet( makeActorControlSelf( player.getId(), ActorControlType::Dismount, 1 ), true );
+    server().queueForPlayers( inRangePlayerIds,
+                            makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) ) );
+    server().queueForPlayers( inRangePlayerIds, makeActorControlSelf( player.getId(), ActorControlType::Dismount, 1 ) );
   }
 
   auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
   mountPacket->data().id = mountId;
-  player.sendToInRangeSet( mountPacket, true );
+  server().queueForPlayers( inRangePlayerIds, mountPacket );
 }
 
 void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
@@ -305,7 +290,6 @@ void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
 
 void PlayerMgr::onHateListChanged( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( player.getId() );
@@ -341,20 +325,18 @@ void PlayerMgr::onHateListChanged( Entity::Player& player )
     hateRankPacket->data().List[ i ].Rate = static_cast< uint8_t >( hatePercent );
   }
 
-  server.queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
+  server().queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
 }
 
 void PlayerMgr::onChangeClass( Entity::Player& player )
 {
-  player.sendToInRangeSet( makeActorControl( player.getId(), ClassJobChange, 0x04 ), true );
+  server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ClassJobChange, 0x04 ) );
   onPlayerHpMpTpChanged( player );
 }
 
 void PlayerMgr::onLogin( Entity::Player& player )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  auto motd = server.getConfig().motd;
+  auto motd = server().getConfig().motd;
 
   std::istringstream ss( motd );
   std::string msg;
@@ -386,8 +368,6 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& housingMgr = Common::Service< HousingMgr >::ref();
   auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
-
 
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   if( !pZone )
@@ -400,25 +380,14 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   auto initPacket = makeZonePacket< FFXIVIpcLogin >( player.getId() );
   initPacket->data().playerActorId = player.getId();
 
-  server.queueForPlayer( player.getCharacterId(), initPacket );
+  server().queueForPlayer( player.getCharacterId(), initPacket );
 
   player.sendInventory();
 
   if( player.isLogin() )
   {
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x169, 0 ) ); // unknown
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x54, 0 ) ); // something treasure map related?
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x23D, 0 ) ); // unknown
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 0 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 1 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 2 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 3 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 4 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 5 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 6 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), 0x16F, 7 ) ); // SalvageSkill
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetConfigFlags, player.getEquipDisplayFlags(), 1 ) );
-    server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
+    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetConfigFlags, player.getEquipDisplayFlags(), 1 ) );
+    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
@@ -430,7 +399,7 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   if( player.isLogin() )
   {
     player.sendItemLevel();
-    server.queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
+    server().queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
   }
 
   player.sendStats();
@@ -442,16 +411,16 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   classInfo->data().Lv1 = player.getLevel();
   if( player.isLogin() )
     classInfo->data().Login = 1;
-  server.queueForPlayer( player.getCharacterId(), classInfo );
+  server().queueForPlayer( player.getCharacterId(), classInfo );
 
-  server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), 0x112, 0x24 ) ); // unknown
+  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), 0x112, 0x24 ) ); // unknown
   // only initialize the UI if the player in fact just logged in.
   if( player.isLogin() )
   {
     auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
     std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
 
-    server.queueForPlayer( player.getCharacterId(), contentFinderList );
+    server().queueForPlayer( player.getCharacterId(), contentFinderList );
 
     player.clearSoldItems();
   }
@@ -472,17 +441,17 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
 
   housingMgr.sendLandFlags( player );
 
-  server.queueForPlayer( player.getCharacterId(), makeInitZone( player, teri ) );
+  server().queueForPlayer( player.getCharacterId(), makeInitZone( player, teri ) );
 
   teri.onPlayerZoneIn( player );
 
   if( player.isLogin() )
   {
-    server.queueForPlayer( player.getCharacterId(),
-                           {
-                             makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() ),
-                             makeZonePacket< FFXIVIpcDailyQuests >( player.getId() )
-                           } );
+    server().queueForPlayer( player.getCharacterId(),
+                             {
+                               makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() ),
+                               makeZonePacket< FFXIVIpcDailyQuests >( player.getId() )
+                             } );
   }
 
   if( player.getPartyId() != 0 )
@@ -503,35 +472,32 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   if( !player.isAlive() )
     return;
 
-  if( !player.checkAction() )
+  if( !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
   {
-    if( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() )
+    auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
+
+    // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
+    for( const auto& actor : player.getInRangeActors() )
     {
-      auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-
-      // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-      for( const auto& actor : player.getInRangeActors() )
+      if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() && mainWeap )
       {
-        if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() && mainWeap )
+        auto chara = actor->getAsChara();
+
+        // default autoattack range
+        float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+        // default autoattack range for ranged classes
+        auto classJob = player.getClass();
+
+        if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+          range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+        if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
         {
-          auto chara = actor->getAsChara();
-
-          // default autoattack range
-          float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-          // default autoattack range for ranged classes
-          auto classJob = player.getClass();
-
-          if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
-            range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-          if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
+          if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
           {
-            if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
-            {
-              player.setLastAttack( tickCount );
-              player.autoAttack( actor->getAsChara() );
-            }
+            player.setLastAttack( tickCount );
+            player.autoAttack( actor->getAsChara() );
           }
         }
       }
@@ -561,31 +527,24 @@ void PlayerMgr::onUnsetStateFlag( Sapphire::Entity::Player& player, Common::Play
 
 ////////// Helper ///////////
 
-
-
 void PlayerMgr::sendServerNotice( Entity::Player& player, const std::string& message ) //Purple Text
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
-
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
 }
 
 void PlayerMgr::sendUrgent( Entity::Player& player, const std::string& message ) //Red Text
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::ServerUrgent, message ) );
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::ServerUrgent, message ) );
 }
 
 void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) //Grey Text
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::SystemMessage, message ) );
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::SystemMessage, message ) );
 }
 
 void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), ActorControlType::LogMsg, messageId,
-                                                                                 param2, param3, param4, param5, param6 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), ActorControlType::LogMsg, messageId,
+                                                                            param2, param3, param4, param5, param6 ) );
 }

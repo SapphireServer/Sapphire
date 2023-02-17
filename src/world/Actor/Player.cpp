@@ -22,6 +22,7 @@
 #include "Manager/WarpMgr.h"
 #include "Manager/FreeCompanyMgr.h"
 #include "Manager/MapMgr.h"
+#include "Manager/MgrUtil.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -406,16 +407,6 @@ void Player::sendStats()
   Service< World::Manager::PlayerMgr >::ref().onSendStats( *this );
 }
 
-void Player::forceZoneing( uint32_t zoneId )
-{
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-  auto pTeri = teriMgr.getZoneByTerritoryTypeId( zoneId );
-  if( !pTeri )
-    return;
-  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_NORMAL, pTeri->getGuId(), getPos(), getRot() );
-}
-
 bool Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -482,7 +473,7 @@ void Player::registerAetheryte( uint8_t aetheryteId )
   Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
   m_aetheryte[ index ] |= value;
-  queuePacket( makeActorControlSelf( getId(), LearnTeleport, aetheryteId, 1 ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), LearnTeleport, aetheryteId, 1 ) );
 }
 
 bool Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -597,7 +588,7 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
 
   m_unlocks[ index ] |= value;
 
-  queuePacket( makeActorControlSelf( getId(), SetRewardFlag, unlock, 1 ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), SetRewardFlag, unlock, 1 ) );
 }
 
 void Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -845,7 +836,7 @@ void Player::spawn( Entity::PlayerPtr pTarget )
 {
   Logger::debug( "Spawning {0} for {1}", getName(), pTarget->getName() );
   auto spawnPacket = std::make_shared< PlayerSpawnPacket >( *this, *pTarget );
-  pTarget->queuePacket( spawnPacket );
+  server().queueForPlayer( pTarget->getCharacterId(), spawnPacket );
 }
 
 // despawn
@@ -855,8 +846,7 @@ void Player::despawn( Entity::PlayerPtr pTarget )
   Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
-
-  pPlayer->queuePacket( makeActorControlSelf( getId(), WarpStart, 0x04, getId(), 0x01 ) );
+  server().queueForPlayer( pTarget->getCharacterId(), makeActorControlSelf( getId(), WarpStart, 0x04, getId(), 0x01 ) );
 }
 
 GameObjectPtr Player::lookupTargetById( uint64_t targetId )
@@ -961,7 +951,7 @@ void Player::freePlayerSpawnId( uint32_t actorId )
   auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
   freeActorSpawnPacket->data().actorId = actorId;
   freeActorSpawnPacket->data().spawnId = spawnId;
-  queuePacket( freeActorSpawnPacket );
+  server().queueForPlayer( getCharacterId(), freeActorSpawnPacket );
 }
 
 Player::AetheryteList& Player::getAetheryteArray()
@@ -973,8 +963,7 @@ Player::AetheryteList& Player::getAetheryteArray()
 void Player::setHomepoint( uint8_t aetheryteId )
 {
   m_homePoint = aetheryteId;
-
-  queuePacket( makeActorControlSelf( getId(), SetHomepoint, aetheryteId ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), SetHomepoint, aetheryteId ) );
 }
 
 /*! get homepoint */
@@ -1023,7 +1012,7 @@ void Player::unlockMount( uint32_t mountId )
 
   m_mountGuide[ mount->data().MountOrder / 8 ] |= ( 1 << ( mount->data().MountOrder % 8 ) );
 
-  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::SetMountBitmask, mount->data().MountOrder, 1 ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), Network::ActorControl::SetMountBitmask, mount->data().MountOrder, 1 ) );
 }
 
 void Player::unlockCompanion( uint32_t companionId )
@@ -1040,7 +1029,7 @@ void Player::unlockCompanion( uint32_t companionId )
 
   m_minionGuide[ index ] |= value;
 
-  queuePacket( makeActorControlSelf( getId(), Network::ActorControl::LearnCompanion, companionId, 1 ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), Network::ActorControl::LearnCompanion, companionId, 1 ) );
 }
 
 Player::MinionList& Player::getMinionGuideBitmask()
@@ -1071,13 +1060,6 @@ uint8_t Player::getGc() const
 const std::array< uint8_t, 3 >& Player::getGcRankArray() const
 {
   return m_gcRank;
-}
-
-void Player::queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket )
-{
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  server.queueForPlayer( getCharacterId(), std::move( pPacket ) );
 }
 
 bool Player::isLoadingComplete() const
@@ -1183,14 +1165,14 @@ const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
-  queuePacket( makeActorControl( getId(), SetBattle, 1, 0, 0 ) );
+  server().queueForPlayer( getCharacterId(), makeActorControl( getId(), SetBattle, 1, 0, 0 ) );
 }
 
 void Player::onMobDeaggro( const BNpc& bnpc )
 {
   hateListRemove( bnpc );
   if( m_actorIdTohateSlotMap.empty() )
-    queuePacket( makeActorControl( getId(), SetBattle, 0, 0, 0 ) );
+    server().queueForPlayer( getCharacterId(), makeActorControl( getId(), SetBattle, 0, 0, 0 ) );
 }
 
 bool Player::isLogin() const
@@ -1232,8 +1214,7 @@ void Player::setTitle( uint16_t titleId )
     return;
 
   m_activeTitle = titleId;
-
-  sendToInRangeSet( makeActorControl( getId(), SetTitle, titleId ), true );
+  server().queueForPlayers( getInRangePlayerIds( true ), makeActorControl( getId(), SetTitle, titleId ) );
 }
 
 const Player::AchievementData& Player::getAchievementData() const
@@ -1250,7 +1231,7 @@ void Player::setMaxGearSets( uint8_t amount )
 {
   m_equippedMannequin = amount;
 
-  queuePacket( makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
+  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
 }
 
 void Player::addGearSet()
@@ -1338,23 +1319,14 @@ void Player::autoAttack( CharaPtr pTarget )
   entry.Arg1 = 7;
 
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
-  {
-   // effectPacket->setAnimationId( 8 );
-    //entry.Arg2 = 0x72;
-  }
-  else
-  {
-    //effectPacket->setAnimationId( 7 );
-    //entry.Arg2 = 0x73;
-  }
+    effectPacket->setActionId( 8 );
 
   auto resultId = pZone->getNextEffectResultId();
   effectPacket->setResultId( resultId );
-
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addTargetEffect( entry );
 
-  sendToInRangeSet( effectPacket, true );
+  server().queueForPlayers( getInRangePlayerIds( true ), effectPacket );
 
   pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );
 
@@ -1418,7 +1390,7 @@ void Player::setEorzeaTimeOffset( uint64_t timestamp )
   packet->data().timestamp = timestamp;
 
   // Send to single player
-  queuePacket( packet );
+  server().queueForPlayer( getCharacterId(), packet );
 }
 
 uint32_t Player::getPrevTerritoryTypeId() const
@@ -1441,7 +1413,7 @@ void Player::sendTitleList()
   auto titleListPacket = makeZonePacket< FFXIVIpcTitleList >( getId() );
   memcpy( titleListPacket->data().TitleFlagsArray, getTitleList().data(), sizeof( titleListPacket->data().TitleFlagsArray ) );
 
-  queuePacket( titleListPacket );
+  server().queueForPlayer( getCharacterId(), titleListPacket );
 }
 
 void Player::teleportQuery( uint16_t aetheryteId )
@@ -1465,7 +1437,7 @@ void Player::teleportQuery( uint16_t aetheryteId )
 
     bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
     // TODO: figure out what param1 really does
-    queuePacket( makeActorControlSelf( getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId ) );
+    server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId ) );
 
     if( !insufficientGil )
     {
@@ -1542,7 +1514,7 @@ void Player::dyeItemFromDyeingInfo()
   writeItem( itemToDye );
 
   auto dyePkt = makeActorControlSelf( getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
-  queuePacket( dyePkt );
+  server().queueForPlayer( getCharacterId(), dyePkt );
 }
 
 void Player::setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour )
@@ -1598,12 +1570,12 @@ void Player::glamourItemFromGlamouringInfo()
   if( shouldGlamour )
   {
     auto castGlamPkt = makeActorControlSelf( getId(), GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
-    queuePacket( castGlamPkt );
+    server().queueForPlayer( getCharacterId(), castGlamPkt );
   }
   else
   {
     auto dispelGlamPkt = makeActorControlSelf( getId(), GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
-    queuePacket( dispelGlamPkt );
+    server().queueForPlayer( getCharacterId(), dispelGlamPkt );
   }
 }
 
@@ -1622,7 +1594,7 @@ void Player::freeObjSpawnIndexForActorId( uint32_t actorId )
 
   auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcDeleteObject >( getId() );
   freeObjectSpawnPacket->data().Index = spawnId;
-  queuePacket( freeObjectSpawnPacket );
+  server().queueForPlayer( getCharacterId(), freeObjectSpawnPacket );
 }
 
 bool Player::isObjSpawnIndexValid( uint8_t index )
@@ -1695,7 +1667,7 @@ void Player::sendHuntingLog()
     memcpy( huntPacket->data().killCount, entry.entries, sizeof( entry.entries ) );
     huntPacket->data().completeFlags = completionFlag;
     ++count;
-    queuePacket( huntPacket );
+    server().queueForPlayer( getCharacterId(), huntPacket );
   }
 }
 
@@ -1735,7 +1707,7 @@ void Player::updateHuntingLog( uint16_t id )
       if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
-        queuePacket( makeActorControlSelf( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
+        server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
         logChanged = true;
         sectionChanged = true;
       }
@@ -1744,7 +1716,7 @@ void Player::updateHuntingLog( uint16_t id )
     }
     if( logChanged && sectionComplete && sectionChanged )
     {
-      queuePacket( makeActorControlSelf( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
+      server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
       gainExp( note->data().RewardExp );
     }
     if( !sectionComplete )
@@ -1754,13 +1726,13 @@ void Player::updateHuntingLog( uint16_t id )
   }
   if( logChanged && allSectionsComplete )
   {
-    queuePacket( makeActorControlSelf( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
+    server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
     gainExp( rankRewards[ logEntry.rank ] );
     if( logEntry.rank < 4 )
     {
       logEntry.rank++;
       memset( logEntry.entries, 0, 40 );
-      queuePacket( makeActorControlSelf( getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 ) );
+      server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 ) );
     }
   }
 
@@ -1816,7 +1788,7 @@ void Player::sendRecastGroups()
   auto recastGroupPaket = makeZonePacket< FFXIVIpcRecastGroup >( getId() );
   memcpy( &recastGroupPaket->data().Recast, &m_recast, sizeof( m_recast ) );
   memcpy( &recastGroupPaket->data().RecastMax, &m_recastMax, sizeof( m_recastMax ) );
-  queuePacket( recastGroupPaket );
+  server().queueForPlayer( getCharacterId(), recastGroupPaket );
 }
 
 void Player::resetRecastGroups()
@@ -1931,7 +1903,7 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
         takeDamage( damage );
       }
 
-      sendToInRangeSet( makeActorControl( getId(), SetFallDamage, damage ), true );
+      server().queueForPlayers( getInRangePlayerIds( true ), makeActorControl( getId(), SetFallDamage, damage ) );
     }
   }
 }

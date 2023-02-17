@@ -39,7 +39,7 @@ namespace Sapphire
     void onUpdate( uint64_t tickCount ) override;
 
     void sendLandSet( Entity::Player& player );
-    void sendLandUpdate( uint8_t landId );
+    void sendLandUpdate( uint16_t landId );
     bool isPlayerSubInstance( Entity::Player& player );
 
     bool onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId );
@@ -48,19 +48,19 @@ namespace Sapphire
     uint8_t getWardNum() const;
 
     uint32_t getLandSetId() const;
-    Sapphire::LandPtr getLand( uint8_t id );
+    Sapphire::LandPtr getLand( uint16_t id );
 
-    Entity::EventObjectPtr registerEstateEntranceEObj( uint8_t landId );
-    void removeEstateEntranceEObj( uint8_t landId );
+    Entity::EventObjectPtr registerEstateEntranceEObj( uint16_t landId );
+    void removeEstateEntranceEObj( uint16_t landId );
 
     void updateYardObjects( Common::LandIdent ident );
-    void spawnYardObject( uint8_t landId, uint16_t slotId, Sapphire::Inventory::HousingItem& item );
+    void spawnYardObject( uint16_t landId, uint16_t slotId, Sapphire::Inventory::HousingItem& item );
     void updateYardObjectPos( Entity::Player& sourcePlayer, uint16_t slot, uint16_t landId,
                                   Inventory::HousingItem& item );
     void despawnYardObject( uint16_t landId, uint16_t slot );
 
   private:
-    using LandPtrMap = std::unordered_map< uint8_t, Sapphire::LandPtr >;
+    using LandPtrMap = std::unordered_map< uint16_t, Sapphire::LandPtr >;
 
     /*! @brief global storage for all yard items in the ward */
     using YardObjectArray = std::array< Common::Furniture, 1200 >;

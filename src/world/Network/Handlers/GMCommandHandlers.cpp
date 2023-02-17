@@ -15,6 +15,7 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/MgrUtil.h"
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
 
@@ -86,7 +87,6 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
   if( player.getGmRank() <= 0 )
     return;
 
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -233,7 +233,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Speed:
     {
-      server.queueForPlayer( targetPlayer->getCharacterId(), makeActorControlSelf( player.getId(), Flee, param1 ) );
+      server().queueForPlayer( targetPlayer->getCharacterId(), makeActorControlSelf( player.getId(), Flee, param1 ) );
       PlayerMgr::sendServerNotice( player, "Speed for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
@@ -270,11 +270,10 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       searchInfoPacket->data().OnlineStatus = param1;
       searchInfoPacket->data().Region = targetPlayer->getSearchSelectRegion();
       strcpy( searchInfoPacket->data().SearchComment, targetPlayer->getSearchMessage() );
-      server.queueForPlayer( targetPlayer->getCharacterId(), searchInfoPacket );
+      server().queueForPlayer( targetPlayer->getCharacterId(), searchInfoPacket );
 
-      targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                                        static_cast< uint8_t >( player.getOnlineStatus() ) ),
-                                      true );
+      server().queueForPlayers( targetPlayer->getInRangePlayerIds( true ), makeActorControl( player.getId(), SetStatusIcon,
+                                                                           static_cast< uint8_t >( player.getOnlineStatus() ) ) );
       PlayerMgr::sendServerNotice( player, "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
@@ -449,7 +448,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
       Service< World::Manager::PlayerMgr >::ref().onSetGcRank( player, static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
       PlayerMgr::sendServerNotice( player, "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
-                               targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
+                                   targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
     }
     case GmCommand::Aetheryte:
@@ -474,7 +473,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Wireframe:
     {
-      server.queueForPlayer( player.getCharacterId(),
+      server().queueForPlayer( player.getCharacterId(),
         std::make_shared< ActorControlSelfPacket >( player.getId(), ActorControlType::ToggleWireframeRendering ) );
       PlayerMgr::sendServerNotice( player, "Wireframe Rendering for {0} was toggled", player.getName() );
       break;
@@ -601,7 +600,6 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
   if( player.getGmRank() <= 0 )
     return;
 
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGmCommandName >( inPacket );
@@ -616,7 +614,7 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
   Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                  player.getName(), commandId, param1, param2, param3, param4, target );
 
-  auto targetSession = server.getSession( target );
+  auto targetSession = server().getSession( target );
   Sapphire::Entity::CharaPtr targetActor;
 
   if( targetSession != nullptr )
@@ -652,10 +650,10 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
       targetPlayer->resetMp();
       targetPlayer->setStatus( Common::ActorStatus::Idle );
 
-      targetPlayer->sendToInRangeSet( makeActorControlSelf( player.getId(), Appear, 0x01, 0x01, 0, 113 ), true );
-      targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatus,
-                                                        static_cast< uint8_t >( Common::ActorStatus::Idle ) ),
-                                      true );
+      server().queueForPlayers( targetPlayer->getInRangePlayerIds( true ), makeActorControlSelf( player.getId(), Appear, 0x01, 0x01, 0, 113 ) );
+      server().queueForPlayers( targetPlayer->getInRangePlayerIds( true ), makeActorControl( player.getId(), SetStatus,
+                                                                           static_cast< uint8_t >( Common::ActorStatus::Idle ) ) );
+
       PlayerMgr::sendServerNotice( player, "Raised {0}", targetPlayer->getName());
       break;
     }

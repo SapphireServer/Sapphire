@@ -15,6 +15,7 @@
 #include "Territory/Territory.h"
 
 #include "Manager/PlayerMgr.h"
+#include "Manager/MgrUtil.h"
 
 #include "Session.h"
 #include "Network/GameConnection.h"
@@ -37,6 +38,7 @@ using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World;
+using namespace Sapphire::World::Manager;
 
 
 Action::Action::Action() = default;
@@ -295,7 +297,6 @@ bool Action::Action::update()
 void Action::Action::start()
 {
   assert( m_pSource );
-  auto& server = Common::Service< World::WorldServer >::ref();
   m_startTime = Common::Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
@@ -316,21 +317,21 @@ void Action::Action::start()
     data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pSource->getPos().z );
     data.Dir = m_pSource->getRot();
 
-    m_pSource->sendToInRangeSet( castPacket, true );
+    server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), castPacket );
 
     if( player )
     {
-      Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *player, PlayerStateFlag::Casting );
+      player->setStateFlag( PlayerStateFlag::Casting );
+      Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *player, true );
     }
   }
   
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
-  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, m_cooldownGroup, getId(),
-                                              m_recastTimeMs / 10 );
+  auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, m_cooldownGroup, getId(), m_recastTimeMs / 10 );
 
   player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
 
-  server.queueForPlayer( player->getCharacterId(), actionStartPkt );
+  server().queueForPlayer( player->getCharacterId(), actionStartPkt );
 
   onStart();
 
@@ -389,7 +390,7 @@ void Action::Action::interrupt()
     auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt,
                                      0x219, 1, m_id, interruptEffect );
 
-    m_pSource->sendToInRangeSet( control, true );
+    server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
   }
 
   onInterrupt();
@@ -419,11 +420,6 @@ void Action::Action::execute()
 
   if( hasCastTime() )
   {
-    // todo: what's this?
-    /*auto control = ActorControlSelfPacket( m_pTarget->getId(), ActorControlType::Unk7,
-                                            0x219, m_id, m_id, m_id, m_id );
-    m_pSource->sendToInRangeSet( control, true );*/
-
     if( auto pPlayer = m_pSource->getAsPlayer(); pPlayer )
     {
       pPlayer->setLastActionTick( 0 );
