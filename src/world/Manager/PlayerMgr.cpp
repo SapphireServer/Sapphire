@@ -14,7 +14,7 @@
 #include <Manager/FreeCompanyMgr.h>
 
 #include <Script/ScriptMgr.h>
-#include <Worldserver.h>
+#include <WorldServer.h>
 #include <Common.h>
 
 #include <Network/PacketContainer.h>
