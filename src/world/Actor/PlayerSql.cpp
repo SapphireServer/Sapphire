@@ -710,19 +710,23 @@ bool Sapphire::Entity::Player::loadInventory()
   while ( currencyRes->next() )
   {
     uint16_t storageId = currencyRes->getUInt16( 1 );
-    uint32_t money = currencyRes->getUInt( 2 );
-
-    auto slot = static_cast< uint8_t >( static_cast< uint8_t >( CurrencyType::Gil ) - 1 );
-    auto currItem = m_storageMap[ Currency ]->getItem( slot );
-
-    if ( !currItem )
+    for( uint32_t i = 1; i <= m_storageMap[ storageId ]->getMaxSize(); i++ )
     {
-      // TODO: map currency type to itemid
-      currItem = createItem( 1 );
-      m_storageMap[ Currency ]->setItem( slot, currItem );
-    }
+      uint32_t money = currencyRes->getUInt( i + 1 );
+      auto slot = i - 1;
+      auto currItem = m_storageMap[ Currency ]->getItem( slot );
 
-    m_storageMap[ Currency ]->getItem( slot )->setStackSize( money );
+      if( money == 0 )
+        continue;
+
+      if( !currItem )
+      {
+        currItem = createItem( currencyTypeToItem( static_cast< Common::CurrencyType >( i ) ) );
+        m_storageMap[ Currency ]->setItem( slot, currItem );
+      }
+
+      m_storageMap[ Currency ]->getItem( slot )->setStackSize( money );
+    }
   }
 
   return true;

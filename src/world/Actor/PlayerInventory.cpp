@@ -264,6 +264,43 @@ void Sapphire::Entity::Player::unequipSoulCrystal()
   setClassJob( parentClass );
 }
 
+uint32_t Sapphire::Entity::Player::currencyTypeToItem( Common::CurrencyType type ) const
+{
+  switch( type )
+  {
+    case Common::CurrencyType::Gil:
+      return 1;
+    case Common::CurrencyType::StormSeal:
+      return 20;
+    case Common::CurrencyType::SerpentSeal:
+      return 21;
+    case Common::CurrencyType::FlameSeal:
+      return 22;
+    case Common::CurrencyType::TomestonePhilo:
+      return 23;
+    case Common::CurrencyType::TomestoneMytho:
+      return 24;
+    case Common::CurrencyType::WolfMark:
+      return 25;
+    case Common::CurrencyType::TomestoneSold:
+      return 26;
+    case Common::CurrencyType::AlliedSeal:
+      return 27;
+    case Common::CurrencyType::Mgp:
+      return 29;
+    case Common::CurrencyType::TomestonePoet:
+      return 28;
+    case Common::CurrencyType::TomestoneLaw:
+      return 30;
+    case Common::CurrencyType::TomestoneEso:
+      return 31;
+    case Common::CurrencyType::TomestoneLore:
+      return 32;
+    default:
+      return 0;
+  }
+}
+
 // TODO: these next functions are so similar that they could likely be simplified
 void Sapphire::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 {
@@ -272,8 +309,7 @@ void Sapphire::Entity::Player::addCurrency( CurrencyType type, uint32_t amount )
 
   if( !currItem )
   {
-    // TODO: map currency type to itemid
-    currItem = createItem( 1 );
+    currItem = createItem( currencyTypeToItem( type ) );
     m_storageMap[ Currency ]->setItem( slot, currItem );
   }
 
