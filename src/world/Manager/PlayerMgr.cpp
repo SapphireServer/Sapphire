@@ -12,6 +12,7 @@
 #include <Manager/PartyMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/FreeCompanyMgr.h>
+#include <Manager/QuestMgr.h>
 
 #include <Script/ScriptMgr.h>
 #include <WorldServer.h>
@@ -397,29 +398,25 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   player.sendHuntingLog();
 
   if( player.isLogin() )
-  {
-    player.sendItemLevel();
     server().queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
-  }
 
-  player.sendStats();
   player.sendRecastGroups();
-
-  auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
-  classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
-  classInfo->data().Lv = player.getLevel();
-  classInfo->data().Lv1 = player.getLevel();
-  if( player.isLogin() )
-    classInfo->data().Login = 1;
-  server().queueForPlayer( player.getCharacterId(), classInfo );
-
-  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), 0x112, 0x24 ) ); // unknown
-  // only initialize the UI if the player in fact just logged in.
+  player.sendStats();
+  player.sendItemLevel();
   if( player.isLogin() )
   {
+    auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
+    classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
+    classInfo->data().Lv = player.getLevel();
+    classInfo->data().Lv1 = player.getLevel();
+    if( player.isLogin() )
+      classInfo->data().Login = 1;
+    server().queueForPlayer( player.getCharacterId(), classInfo );
+
+    server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), 0x112, 0x24 ) ); // unknown
+
     auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
     std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
-
     server().queueForPlayer( player.getCharacterId(), contentFinderList );
 
     player.clearSoldItems();
@@ -449,9 +446,13 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
   {
     server().queueForPlayer( player.getCharacterId(),
                              {
-                               makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() ),
-                               makeZonePacket< FFXIVIpcDailyQuests >( player.getId() )
+                               makeZonePacket< FFXIVIpcDailyQuests >( player.getId() ),
+                               makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() )
                              } );
+
+    auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+    questMgr.sendQuestsInfo( player );
+    onGcUpdate( player );
   }
 
   if( player.getPartyId() != 0 )

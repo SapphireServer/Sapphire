@@ -1444,6 +1444,11 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t unknownCompleteMask[32];
   };
 
+  struct FFXIVIpcLegacyQuestCompleteList : FFXIVIpcBasePacket< LegacyQuestCompleteFlags >
+  {
+    uint8_t completeFlagArray[40];
+  };
+
   /**
   * Structural representation of the packet sent by the server
   * to finish a quest
