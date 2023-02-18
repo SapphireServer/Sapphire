@@ -25,7 +25,18 @@ namespace Sapphire::Common
   const uint8_t CURRENT_EXPANSION_ID = 1;
 
   const uint8_t CLASSJOB_TOTAL = 34;
-  const uint8_t CLASSJOB_SLOTS = 23;
+
+  const uint16_t ARRSIZE_CLASSJOB = 23u;
+  const uint16_t ARRSIZE_TITLELIST = 48u;
+  const uint16_t ARRSIZE_HOWTO = 32u;
+  const uint16_t ARRSIZE_MINIONS = 28u;
+  const uint16_t ARRSIZE_MOUNTS = 9u;
+  const uint16_t ARRSIZE_DISCOVERY = 400u;
+  const uint16_t ARRSIZE_QUESTCOMPLETE = 342u;
+  const uint16_t ARRSIZE_AETHERYTES = 12u;
+  const uint16_t ARRSIZE_UNLOCKS = 64u;
+  const uint16_t ARRSIZE_ORCHESTRION = 40u;
+  const uint16_t ARRSIZE_MONSTERNOTE = 12u;
 
   const uint8_t TOWN_COUNT = 6;
 

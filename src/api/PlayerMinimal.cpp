@@ -89,7 +89,7 @@ std::string PlayerMinimal::getInfoJson()
 
   // class levels
   auto levelsArray = nlohmann::json();
-  for( int i = 0; i < Common::CLASSJOB_SLOTS; ++i )
+  for( int i = 0; i < Common::ARRSIZE_CLASSJOB; ++i )
   {
     // these must be strings
     levelsArray.push_back( std::to_string( m_classMap[ i ] ) );
@@ -186,16 +186,16 @@ void PlayerMinimal::saveAsNew()
 {
 
   std::vector< uint8_t > customize( 26 );
-  std::vector< uint8_t > howTo( 33 );
-  std::vector< uint8_t > aetherytes( 16 );
-  std::vector< uint8_t > discovery( 421 );
-  std::vector< uint8_t > questComplete( 342 );
-  std::vector< uint8_t > unlocks( 64 );
-  std::vector< uint8_t > mountGuide( 15 );
-  std::vector< uint8_t > orchestrion( 40 );
+  std::vector< uint8_t > howTo( Common::ARRSIZE_HOWTO );
+  std::vector< uint8_t > aetherytes( Common::ARRSIZE_AETHERYTES );
+  std::vector< uint8_t > discovery( Common::ARRSIZE_DISCOVERY );
+  std::vector< uint8_t > questComplete( Common::ARRSIZE_QUESTCOMPLETE );
+  std::vector< uint8_t > unlocks( Common::ARRSIZE_UNLOCKS );
+  std::vector< uint8_t > mountGuide( Common::ARRSIZE_MOUNTS );
+  std::vector< uint8_t > orchestrion( Common::ARRSIZE_ORCHESTRION );
   std::vector< uint8_t > modelEquip( 40 );
   std::vector< uint8_t > questTracking8( 10 );
-  std::vector< uint8_t > monsterNote( 41 );
+  std::vector< uint8_t > monsterNote( sizeof( Common::HuntingLogEntry ) );
   std::vector< int16_t > questTracking = { -1, -1, -1, -1, -1 };
 
   memset( questComplete.data(), 0, questComplete.size() );
@@ -314,7 +314,7 @@ void PlayerMinimal::saveAsNew()
 
   auto stmtMonsterNote = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_MONSTERNOTE_INS );
   stmtMonsterNote->setUInt64( 1, m_characterId );
-  for( uint8_t i = 1; i <= 12; ++i )
+  for( uint8_t i = 1; i <= Common::ARRSIZE_MONSTERNOTE; ++i )
     stmtMonsterNote->setBinary( i + 1, monsterNote );
   g_charaDb.directExecute( stmtMonsterNote );
 

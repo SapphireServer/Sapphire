@@ -25,19 +25,19 @@ namespace Sapphire::Entity
   class Player : public Chara
   {
   public:
-    using TitleList = std::array< uint8_t, 48 >;
-    using HowToList = std::array< uint8_t, 34 >;
-    using MinionList = std::array< uint8_t, 40 >;
-    using MountList = std::array< uint8_t, 22 >;
-    using QuestComplete = std::array< uint8_t, 342 >;
-    using Discovery = std::array< uint8_t, 400 >;
-    using AetheryteList = std::array< uint8_t, 21 >;
-    using UnlockList = std::array< uint8_t, 64 >;
-    using OrchestrionList = std::array< uint8_t, 40 >;
+    using TitleList = std::array< uint8_t, Common::ARRSIZE_TITLELIST >;
+    using HowToList = std::array< uint8_t, Common::ARRSIZE_HOWTO >;
+    using MinionList = std::array< uint8_t, Common::ARRSIZE_MINIONS >;
+    using MountList = std::array< uint8_t, Common::ARRSIZE_MOUNTS >;
+    using QuestComplete = std::array< uint8_t, Common::ARRSIZE_QUESTCOMPLETE >;
+    using Discovery = std::array< uint8_t, Common::ARRSIZE_DISCOVERY >;
+    using AetheryteList = std::array< uint8_t, Common::ARRSIZE_AETHERYTES >;
+    using UnlockList = std::array< uint8_t, Common::ARRSIZE_UNLOCKS >;
+    using OrchestrionList = std::array< uint8_t, Common::ARRSIZE_ORCHESTRION >;
     using StateFlags = std::array< uint8_t, 12 >;
 
-    using ClassList = std::array< uint16_t, 28 >;
-    using ExpList = std::array< uint32_t, 28 >;
+    using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
+    using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
 
     struct AchievementData {
       std::array< uint8_t, 2048 / 8 > unlockList;
@@ -994,7 +994,7 @@ namespace Sapphire::Entity
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
-    std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries{};
+    std::array< Common::HuntingLogEntry, Common::ARRSIZE_MONSTERNOTE > m_huntingLogEntries{};
 
     FriendListIDVec m_friendList{};
     FriendListDataVec m_friendInviteList{};

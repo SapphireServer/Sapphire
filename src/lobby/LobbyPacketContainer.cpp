@@ -32,10 +32,10 @@ void LobbyPacketContainer::addPacket( FFXIVPacketBasePtr pEntry )
   {
     BlowFish blowfish;
     blowfish.initialize( m_encKey, 0x10 );
-    blowfish.Encode( m_dataBuf.data() + m_header.size + 0x10, m_dataBuf.data() + m_header.size + 0x10, pEntry->getSize() - 0x10 );
+    blowfish.Encode( m_dataBuf.data() + m_header.size + 0x10, m_dataBuf.data() + m_header.size + 0x10, static_cast< uint32_t >( pEntry->getSize() ) - 0x10 );
   }
 
-  m_header.size += pEntry->getSize();
+  m_header.size += static_cast< uint32_t >( pEntry->getSize() );
   m_header.count++;
 }
 

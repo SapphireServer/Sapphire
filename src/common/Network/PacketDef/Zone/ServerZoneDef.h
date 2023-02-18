@@ -816,7 +816,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
    */
   struct FFXIVIpcTitleList : FFXIVIpcBasePacket< TitleList >
   {
-    uint8_t TitleFlagsArray[32];
+    uint8_t TitleFlagsArray[48];
   };
 
   /**
