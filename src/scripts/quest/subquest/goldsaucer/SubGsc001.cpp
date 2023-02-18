@@ -194,7 +194,7 @@ private:
       {
         player.finishQuest( getId(), result.getResult( 1 ) );
         eventMgr().eventFinish( player, result.eventId, 1 );
-        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getZoneByTerritoryTypeId( 144 )->getGuId(), { -34.5, 0.64, 100 }, -1.58 );
+        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 144 )->getGuId(), { -34.5, 0.64, 100 }, -1.58 );
       }
     };
     eventMgr().playQuestScene( player, getId(), 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, callback );

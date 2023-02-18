@@ -159,7 +159,7 @@ private:
     quest.setUI8CH( 1 ); // receive key item
 
     // teleport to real gridania
-    warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, TERRITORYTYPE0 );
+    warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, TERRITORYTYPE0 );
   }
 
   void Scene00051( World::Quest& quest, Entity::Player& player )

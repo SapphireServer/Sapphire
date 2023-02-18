@@ -35,7 +35,7 @@ public:
         auto territoryId = player.getTerritoryId();
 
         auto& terriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-        auto pTerritory = terriMgr.getZoneByTerritoryTypeId( player.getTerritoryTypeId() );
+        auto pTerritory = terriMgr.getTerritoryByTypeId( player.getTerritoryTypeId() );
         auto pHousing = std::dynamic_pointer_cast< HousingZone >( pTerritory );
         auto& pHouMgr = Common::Service< HousingMgr >::ref();
 

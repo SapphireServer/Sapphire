@@ -57,6 +57,20 @@ void WarpMgr::requestMoveTerritory( Entity::Player& player, Common::WarpType war
   requestMoveTerritory( player, warpType, targetTerritoryId, player.getPos(), player.getRot() );
 }
 
+void WarpMgr::requestMoveTerritoryType( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryTypeId )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+
+  auto pTeri = teriMgr.getTerritoryByTypeId( targetTerritoryTypeId );
+  if( !pTeri )
+  {
+    Logger::error( "Unable to find target territory instance for type {}", targetTerritoryTypeId );
+    return;
+  }
+
+  requestMoveTerritory( player, warpType, pTeri->getGuId() );
+}
+
 void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
   m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
@@ -176,7 +190,7 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
     requestWarp( player, warpType, pos, rot );
   else
   {
-    auto pTeri = teriMgr.getZoneByTerritoryTypeId( data.TerritoryType );
+    auto pTeri = teriMgr.getTerritoryByTypeId( data.TerritoryType );
     if( !pTeri )
       return;
 

@@ -135,7 +135,7 @@ namespace Sapphire::World::Manager
 
     /*! returns a default Zone by territoryTypeId
         TODO: Mind multiple instances?! */
-    TerritoryPtr getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const;
+    TerritoryPtr getTerritoryByTypeId( uint32_t territoryTypeId ) const;
 
     bool movePlayer( Sapphire::Territory& teri, Entity::Player& player );
 

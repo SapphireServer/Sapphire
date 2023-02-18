@@ -477,7 +477,7 @@ TerritoryPtr TerritoryMgr::getTerritoryByGuId( uint32_t guId ) const
   return it->second;
 }
 
-TerritoryPtr TerritoryMgr::getZoneByTerritoryTypeId( uint32_t territoryTypeId ) const
+TerritoryPtr TerritoryMgr::getTerritoryByTypeId( uint32_t territoryTypeId ) const
 {
   auto zoneMap = m_territoryTypeIdToInstanceGuidMap.find( territoryTypeId );
   if( zoneMap == m_territoryTypeIdToInstanceGuidMap.end() )
@@ -677,7 +677,7 @@ bool TerritoryMgr::joinWorld( Entity::Player& player )
       auto prevPos = player.getPrevPos();
       player.setPos( prevPos, false );
       player.setRot( player.getPrevRot() );
-      pCurrZone = getZoneByTerritoryTypeId( territoryTypeId );
+      pCurrZone = getTerritoryByTypeId( territoryTypeId );
     }
   }
   else if( isInternalEstateTerritory( territoryTypeId ) )
@@ -696,7 +696,7 @@ bool TerritoryMgr::joinWorld( Entity::Player& player )
   }
   else
   {
-    pCurrZone = getZoneByTerritoryTypeId( territoryTypeId );
+    pCurrZone = getTerritoryByTypeId( territoryTypeId );
   }
 
   player.setTerritoryTypeId( territoryTypeId );

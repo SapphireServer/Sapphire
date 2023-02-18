@@ -229,7 +229,7 @@ private:
   {
     quest.setSeq( Seq1 );
     quest.setUI8CH( 1 );
-    warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, 132 );
+    warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, 132 );
   }
 
   //////////////////////////////////////////////////////////////////////

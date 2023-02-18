@@ -308,7 +308,7 @@ void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR
   }
 
   PlayerMgr::sendDebug( player, "Walking ZoneLine#{0}", exitBoxId );
-  auto pTargetTeri = teriMgr.getZoneByTerritoryTypeId( targetZone );
+  auto pTargetTeri = teriMgr.getTerritoryByTypeId( targetZone );
   if( !pTargetTeri )
     return;
 

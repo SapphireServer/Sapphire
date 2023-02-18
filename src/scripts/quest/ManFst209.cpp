@@ -587,7 +587,7 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      auto dest = teriMgr().getZoneByTerritoryTypeId( Territorytype1 );
+      auto dest = teriMgr().getTerritoryByTypeId( Territorytype1 );
       warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, dest->getGuId(), { -53.4502f, -24.0946f, -567.494f }, -0.550531f );//Manual Pos
     }
   }
@@ -735,7 +735,7 @@ private:
   {
     if( result.getResult( 0 ) == 1 )
     {
-      auto dest = teriMgr().getZoneByTerritoryTypeId( Territorytype1 );
+      auto dest = teriMgr().getTerritoryByTypeId( Territorytype1 );
       warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, dest->getGuId(), { -53.4502f, -24.0946f, -567.494f }, -0.550531f );//Manual Pos
     }
   }

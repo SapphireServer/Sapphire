@@ -355,7 +355,7 @@ private:
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto dest = teriMgr().getZoneByTerritoryTypeId( Territorytype2 );
+    auto dest = teriMgr().getTerritoryByTypeId( Territorytype2 );
     warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, dest->getGuId(), { -11.86f, 92.f, 17.f }, -1.95f );
     quest.setSeq( Seq4 );
     eventMgr().sendEventNotice( player, getId(), 2, 0 );
@@ -629,7 +629,7 @@ private:
 
   void Scene00030Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    auto dest = teriMgr().getZoneByTerritoryTypeId( Territorytype3 );
+    auto dest = teriMgr().getTerritoryByTypeId( Territorytype3 );
     warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, dest->getGuId(), { -44.14f, 84.f, -0.47f }, 1.3f );
     quest.setSeq( Seq8 );
     eventMgr().sendEventNotice( player, getId(), 2, 0 );

@@ -503,7 +503,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       }
       else
       {
-        auto pZone = teriMgr.getZoneByTerritoryTypeId( param1 );
+        auto pZone = teriMgr.getTerritoryByTypeId( param1 );
         if( !pZone )
         {
           PlayerMgr::sendUrgent( player, "No zone instance found for {0}", param1 );
@@ -542,7 +542,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         else
         {
           auto& warpMgr = Common::Service< WarpMgr >::ref();
-          warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM, teriMgr.getZoneByTerritoryTypeId( param1 )->getGuId(), targetPlayer->getPos(), 0 );
+          warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM, teriMgr.getTerritoryByTypeId( param1 )->getGuId(), targetPlayer->getPos(), 0 );
         }
 
         PlayerMgr::sendServerNotice( player, "{0} was warped to zone {1}", targetPlayer->getName(), param1, pZone->getName() );

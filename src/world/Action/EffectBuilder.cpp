@@ -113,7 +113,7 @@ void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& 
   Logger::debug( "Targets afflicted: {}", targetList.size() );
 
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-  auto zone = teriMgr.getZoneByTerritoryTypeId( m_sourceChara->getTerritoryTypeId() );
+  auto zone = teriMgr.getTerritoryByTypeId( m_sourceChara->getTerritoryTypeId() );
 
   auto globalSequence = zone ? zone->getNextEffectResultId() : 0;
 

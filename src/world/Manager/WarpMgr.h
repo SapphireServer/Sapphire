@@ -23,7 +23,7 @@ namespace Sapphire::World::Manager
     WarpMgr() = default;
 
     /// <summary>
-    /// request to move a player to specified territorytype and position, with given WarpType
+    /// request to move a player to specified territory guid and position, with given WarpType
     /// </summary>
     /// <param name="player"></param>
     /// <param name="warpType"></param>
@@ -34,12 +34,20 @@ namespace Sapphire::World::Manager
 
 
     /// <summary>
-    /// request to move a player to specified territorytype with given WarpType, position will be the same as before
+    /// request to move a player to specified territory guid with given WarpType, position will be the same as before
     /// </summary>
     /// <param name="player"></param>
     /// <param name="warpType"></param>
     /// <param name="targetTerritoryId"></param>
     void requestMoveTerritory( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryId );
+
+    /// <summary>
+    /// request to move a player to specified territory type with given WarpType, position will be the same as before
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="warpType"></param>
+    /// <param name="targetTerritoryTypeId"></param>
+    void requestMoveTerritoryType( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryTypeId );
 
     /// <summary>
     /// handle player state pre-warp and tells client to warp player

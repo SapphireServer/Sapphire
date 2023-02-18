@@ -40,7 +40,7 @@ public:
           auto popRangeInfo = instanceObjectCache().getPopRangeInfo( warp->data().PopRange );
           if( popRangeInfo )
           {
-            auto pTeri = teriMgr().getZoneByTerritoryTypeId( popRangeInfo->m_territoryTypeId );
+            auto pTeri = teriMgr().getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
             warpMgr().requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
                                             pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
           }

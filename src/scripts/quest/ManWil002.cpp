@@ -229,7 +229,7 @@ private:
     quest.setUI8CH( 1 ); // Receive key item
 
     // Teleport to real ul'dah
-    warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, 130 );
+    warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, 130 );
   }
 };
 

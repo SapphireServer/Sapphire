@@ -133,7 +133,7 @@ private:
 
     if( popRangeInfo )
     {
-      auto pTeri = teriMgr().getZoneByTerritoryTypeId( popRangeInfo->m_territoryTypeId );
+      auto pTeri = teriMgr().getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
       warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
     }
   }

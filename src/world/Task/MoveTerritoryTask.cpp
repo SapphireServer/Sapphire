@@ -82,7 +82,7 @@ void MoveTerritoryTask::execute()
     // todo: this will require proper handling, for now just return the player to their previous area
     pPlayer->setPos( pPlayer->getPrevPos(), false );
 
-    auto pZone1 = teriMgr.getZoneByTerritoryTypeId( pPlayer->getPrevTerritoryTypeId() );
+    auto pZone1 = teriMgr.getTerritoryByTypeId( pPlayer->getPrevTerritoryTypeId() );
     if( !teriMgr.movePlayer( *pZone1, *pPlayer ) )
       return;
   }

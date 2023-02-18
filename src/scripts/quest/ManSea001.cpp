@@ -198,7 +198,7 @@ private:
         quest.setBitFlag8( 1, true );
         checkProgressSeq1( quest, player );
         eventMgr().eventFinish( player, result.eventId, 1 );
-        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getZoneByTerritoryTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
+        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
       }
     };
     eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, callback );
@@ -246,7 +246,7 @@ private:
       if( result.errorCode == 0 || ( result.numOfResults > 0 && result.getResult( 0 ) == 1 ) )
       {
         eventMgr().eventFinish( player, result.eventId, 1 );
-        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getZoneByTerritoryTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
+        warpMgr().requestMoveTerritory( player, Common::WarpType::WARP_TYPE_NORMAL, teriMgr().getTerritoryByTypeId( 181 )->getGuId(), { 9.0f, 40.0f, 14.0f }, 0.0f );
       }
     };
     eventMgr().playQuestScene( player, getId(), 13, HIDE_HOTBAR, callback );
