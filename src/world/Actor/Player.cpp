@@ -3,8 +3,6 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdData.h>
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
 
 #include <cmath>
 #include <utility>
@@ -14,7 +12,6 @@
 #include "Player.h"
 #include "BNpc.h"
 
-#include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
 #include "Manager/PlayerMgr.h"
@@ -23,18 +20,15 @@
 #include "Manager/FreeCompanyMgr.h"
 #include "Manager/MapMgr.h"
 #include "Manager/MgrUtil.h"
+#include "Manager/ActionMgr.h"
 
-#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
-#include "Territory/InstanceObjectCache.h"
-#include "Territory/Land.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketContainer.h"
 #include "Network/CommonActorControl.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
-#include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
@@ -76,7 +70,6 @@ Player::Player() :
   m_lastActionTick( 0 ),
   m_bInCombat( false ),
   m_bLoadingComplete( false ),
-  m_zoningType( Common::ZoningType::None ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
   m_mount( 0 ),
@@ -409,18 +402,12 @@ void Player::sendStats()
 
 bool Player::exitInstance()
 {
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& warpMgr = Common::Service< WarpMgr >::ref();
 
   resetHp();
   resetMp();
 
-  m_pos = m_prevPos;
-  m_rot = m_prevRot;
-  m_territoryTypeId = m_prevTerritoryTypeId;
-  m_territoryId = m_prevTerritoryId;
-
-  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, m_prevTerritoryId, m_prevPos, m_prevRot );
+  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, getPrevTerritoryId(), getPrevPos(), getPrevRot() );
 
   return true;
 }
@@ -570,13 +557,6 @@ void Player::setNewAdventurer( bool state )
 void Player::resetDiscovery()
 {
   memset( m_discovery.data(), 0, m_discovery.size() );
-}
-
-void Player::changePosition( float x, float y, float z, float o )
-{
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-  Common::FFXIVARR_POSITION3 pos{ x, y, z };
-  warpMgr.requestWarp( *this, Common::WARP_TYPE_NORMAL, pos, getRot() );
 }
 
 void Player::setRewardFlag( Common::UnlockEntry unlockId )
@@ -1072,16 +1052,6 @@ void Player::setLoadingComplete( bool bComplete )
   m_bLoadingComplete = bComplete;
 }
 
-ZoningType Player::getZoningType() const
-{
-  return m_zoningType;
-}
-
-void Player::setZoningType( Common::ZoningType zoneingType )
-{
-  m_zoningType = zoneingType;
-}
-
 void Player::setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const char* searchMessage )
 {
   m_searchSelectRegion = selectRegion;
@@ -1296,16 +1266,18 @@ uint32_t Player::getPersistentEmote() const
 void Player::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
   pTarget->onActionHostile( getAsChara() );
-  //uint64_t tick = Util::getTimeMs();
-  //srand(static_cast< uint32_t >(tick));
 
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
+
+  //actionMgr.handleTargetedPlayerAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
 
   auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
@@ -1840,7 +1812,7 @@ void Player::setPartyId( uint64_t partyId )
   m_partyId = partyId;
 }
 
-Player::FriendListIDVec& Player::getFriendListID()
+Player::FriendListIDVec& Player::getFriendListId()
 {
   return m_friendList;
 }
@@ -1850,7 +1822,7 @@ Player::FriendListDataVec& Player::getFriendListData()
   return m_friendInviteList;
 }
 
-Player::FriendListIDVec& Player::getBlacklistID()
+Player::FriendListIDVec& Player::getBlacklistId()
 {
   return m_blacklist;
 }

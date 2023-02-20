@@ -32,8 +32,6 @@ public:
 
     pPlayer->removeCurrency( Common::CurrencyType::Gil, teleportQuery.cost );
 
-    pPlayer->setZoningType( Common::ZoningType::Teleport );
-
     warpMgr().requestPlayerTeleport( *pPlayer, teleportQuery.targetAetheryte, 1 );
 
     pPlayer->clearTeleportQuery();

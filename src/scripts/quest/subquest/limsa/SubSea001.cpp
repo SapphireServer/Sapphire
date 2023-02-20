@@ -217,8 +217,7 @@ private:
       if( result.getResult( 0 ) == 1 )
       {
         quest.setSeq( Seq2 );
-        player.changePosition( 10, 21, 13, -2 );
-        warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0 );
+        warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0, { 10, 21, 13 }, -2.f );
       }
     }
     else

@@ -310,9 +310,6 @@ namespace Sapphire::Entity
 
     void updatePrevTerritory();
 
-    /*! change position, sends update too */
-    void changePosition( float x, float y, float z, float o );
-
     /*! return the characterId */
     uint64_t getCharacterId() const;
 
@@ -598,10 +595,6 @@ namespace Sapphire::Entity
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
 
-    Common::ZoningType getZoningType() const;
-
-    void setZoningType( Common::ZoningType zoneingType );
-
     void setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const char* searchMessage );
 
     const char* getSearchMessage() const;
@@ -812,10 +805,10 @@ namespace Sapphire::Entity
     uint64_t getPartyId() const;
     void setPartyId( uint64_t partyId );
 
-    FriendListIDVec& getFriendListID();
+    FriendListIDVec& getFriendListId();
     FriendListDataVec& getFriendListData();
 
-    BlacklistIDVec& getBlacklistID();
+    BlacklistIDVec& getBlacklistId();
 
     uint64_t m_lastMoveTime{};
     uint8_t m_lastMoveflag{};
@@ -939,8 +932,6 @@ namespace Sapphire::Entity
     bool m_bAutoattack;
 
     bool m_bIsConnected;
-
-    Common::ZoningType m_zoningType;
 
     bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;

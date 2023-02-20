@@ -59,7 +59,7 @@ bool BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& ta
   }
 
   // add target ID to blacklist
-  auto& sourceBL = source.getBlacklistID();
+  auto& sourceBL = source.getBlacklistId();
   sourceBL[sourceIdx] = target.getCharacterId();
 
   source.updateDbBlacklist();
@@ -100,7 +100,7 @@ bool BlacklistMgr::onRemoveCharacter( Entity::Player& source, const std::string&
   }
 
   // set target slot to 0
-  auto& sourceBL = source.getBlacklistID();
+  auto& sourceBL = source.getBlacklistId();
   sourceBL[sourceIdx] = 0;
   source.updateDbBlacklist();
 
@@ -124,7 +124,7 @@ bool BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint
   // get array offset/last page sent from client packet
   auto offset = nextIdx;
 
-  auto& idVec = source.getBlacklistID();
+  auto& idVec = source.getBlacklistId();
 
   for( size_t i = offset; i < offset + itemsPerPage; ++i )
   {
@@ -172,7 +172,7 @@ bool BlacklistMgr::isBlacklisted( Entity::Player& source, const Entity::Player& 
 
 ptrdiff_t BlacklistMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
 {
-  auto& sourceBL = source.getBlacklistID();
+  auto& sourceBL = source.getBlacklistId();
   auto sourceBlIt = std::find( std::begin( sourceBL ), std::end( sourceBL ), characterId );
 
   // not found

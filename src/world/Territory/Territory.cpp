@@ -882,7 +882,6 @@ void Territory::addEffectResult( World::Action::EffectResultPtr result )
 }
 
 void Territory::processEffectResults( uint64_t tickCount )
-
 {
   // todo: move this to generic territory/instance delay wrapper cause it might be useful scheduling other things
   for( auto it = m_effectResults.begin(); it != m_effectResults.end(); )

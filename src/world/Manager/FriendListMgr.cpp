@@ -10,8 +10,8 @@ using namespace Sapphire::World::Manager;
 
 bool FriendListMgr::onInviteCreate( Entity::Player& source, Entity::Player& target )
 {
-  auto& sourceFL = source.getFriendListID();
-  auto& targetFL = target.getFriendListID();
+  auto& sourceFL = source.getFriendListId();
+  auto& targetFL = target.getFriendListId();
 
   // check if player already has been invited or friends
   if( isFriend( source, target ) )
@@ -96,8 +96,8 @@ bool FriendListMgr::onInviteDecline( Entity::Player& source, Entity::Player& tar
     return false;
   }
 
-  auto& sourceFL = source.getFriendListID();
-  auto& targetFL = target.getFriendListID();
+  auto& sourceFL = source.getFriendListId();
+  auto& targetFL = target.getFriendListId();
 
   auto& sourceFLData = source.getFriendListData();
   auto& targetFLData = target.getFriendListData();
@@ -149,7 +149,7 @@ bool FriendListMgr::isFriend( Entity::Player& source, Entity::Player& target ) c
 
 ptrdiff_t FriendListMgr::getEntryIndex( Entity::Player& source, uint64_t characterId ) const
 {
-  auto& sourceFL = source.getFriendListID();
+  auto& sourceFL = source.getFriendListId();
   auto sourceInvIt = std::find( std::begin( sourceFL ), std::end( sourceFL ), characterId );
 
   // not found
