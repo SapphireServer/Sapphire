@@ -15,6 +15,7 @@
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
+#include "Network/PacketWrappers/HudParamPacket.h"
 
 #include "StatusEffect/StatusEffect.h"
 #include "Action/Action.h"
@@ -616,7 +617,10 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
 
   m_statusEffectMap.erase( effectSlotId );
 
-  sendStatusEffectUpdate();
+  if( isPlayer() )
+    server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsPlayer() ) );
+  else if( isBattleNpc() )
+    server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsBNpc() ) );
 }
 
 std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectMap() const
