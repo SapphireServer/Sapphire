@@ -592,7 +592,7 @@ bool TerritoryMgr::movePlayer( Sapphire::Territory& teri, Entity::Player& player
 
   auto pPrevZone = getTerritoryByGuId( player.getTerritoryId() );
 
-  player.setStateFlag( Common::PlayerStateFlag::BetweenAreas );
+  player.setCondition( Common::PlayerCondition::BetweenAreas );
 
   player.initSpawnIdQueue();
 
@@ -613,7 +613,7 @@ bool TerritoryMgr::movePlayer( Sapphire::Territory& teri, Entity::Player& player
   m_playerIdToInstanceMap[ player.getId() ] = teri.getGuId();
 
   teri.onBeforePlayerZoneIn( player );
-  playerMgr.onZone( player );
+  playerMgr.onMoveZone( player );
 
   return true;
 }

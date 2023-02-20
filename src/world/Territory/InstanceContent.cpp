@@ -99,7 +99,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   }
 
   // mark player as "bound by duty"
-  Common::Service< World::Manager::PlayerMgr >::ref().onSetStateFlag( player, PlayerStateFlag::BoundByDuty );
+  Common::Service< World::Manager::PlayerMgr >::ref().setCondition( player, PlayerCondition::BoundByDuty );
 
   sendDirectorInit( player );
 }
@@ -140,7 +140,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         auto player = it->second;
         if( !player->isLoadingComplete() ||
             !player->isDirectorInitialized() ||
-            player->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
+            player->hasStateFlag( PlayerCondition::WatchingCutscene ) )
           return;
       }
 
@@ -614,7 +614,7 @@ void Sapphire::InstanceContent::clearDirector( Entity::Player& player )
 
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
-  Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( player, PlayerStateFlag::BoundByDuty );
+  Service< World::Manager::PlayerMgr >::ref().removeCondition( player, PlayerCondition::BoundByDuty );
 }
 
 uint32_t Sapphire::InstanceContent::getExpireValue()

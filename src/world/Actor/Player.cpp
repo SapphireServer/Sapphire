@@ -93,7 +93,7 @@ Player::Player() :
   memset( m_name, 0, sizeof( m_name ) );
   memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
   std::fill( std::begin( m_questTracking ), std::end( m_questTracking ), 0 );
-  std::fill( std::begin( m_stateFlags ), std::end( m_stateFlags ), 0 );
+  std::fill( std::begin( m_condition ), std::end( m_condition ), 0 );
   std::fill( std::begin( m_classArray ), std::end( m_classArray ), 0 );
   std::fill( std::begin( m_expArray ), std::end( m_expArray ), 0 );
 
@@ -397,7 +397,7 @@ bool Player::isAutoattackOn() const
 
 void Player::sendStats()
 {
-  Service< World::Manager::PlayerMgr >::ref().onSendStats( *this );
+  Service< World::Manager::PlayerMgr >::ref().onStatsChanged( *this );
 }
 
 bool Player::exitInstance()
@@ -730,7 +730,7 @@ void Player::setClassJob( Common::ClassJob classJob )
   m_tp = 0;
 
   Service< World::Manager::PlayerMgr >::ref().onPlayerStatusUpdate( *this );
-  Service< World::Manager::PlayerMgr >::ref().onChangeClass( *this );
+  Service< World::Manager::PlayerMgr >::ref().onClassChanged( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
@@ -756,7 +756,7 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
 void Player::sendModel()
 {
-  Service< World::Manager::PlayerMgr >::ref().onChangeGear( *this );
+  Service< World::Manager::PlayerMgr >::ref().onGearChanged( *this );
 }
 
 uint32_t Player::getModelForSlot( Common::GearModelSlot slot )
@@ -863,10 +863,10 @@ void Player::setGcRankAt( uint8_t index, uint8_t rank )
 
 const Player::StateFlags& Player::getStateFlags() const
 {
-  return m_stateFlags;
+  return m_condition;
 }
 
-bool Player::hasStateFlag( Common::PlayerStateFlag flag ) const
+bool Player::hasStateFlag( Common::PlayerCondition flag ) const
 {
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -874,10 +874,10 @@ bool Player::hasStateFlag( Common::PlayerStateFlag flag ) const
   uint8_t value;
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-  return ( m_stateFlags[ index ] & value ) != 0;
+  return ( m_condition[ index ] & value ) != 0;
 }
 
-void Player::setStateFlag( Common::PlayerStateFlag flag )
+void Player::setCondition( Common::PlayerCondition flag )
 {
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -885,10 +885,10 @@ void Player::setStateFlag( Common::PlayerStateFlag flag )
   uint8_t value;
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-  m_stateFlags[ index ] |= value;
+  m_condition[ index ] |= value;
 }
 
-void Player::unsetStateFlag( Common::PlayerStateFlag flag )
+void Player::removeCondition( Common::PlayerCondition flag )
 {
   if( !hasStateFlag( flag ) )
     return;
@@ -899,7 +899,7 @@ void Player::unsetStateFlag( Common::PlayerStateFlag flag )
   uint8_t value;
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-  m_stateFlags[ index ] ^= value;
+  m_condition[ index ] ^= value;
 }
 
 void Player::update( uint64_t tickCount )
@@ -1408,7 +1408,6 @@ void Player::teleportQuery( uint16_t aetheryteId )
     cost = std::min< uint16_t >( 999, cost );
 
     bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
-    // TODO: figure out what param1 really does
     server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId ) );
 
     if( !insufficientGil )
@@ -1466,7 +1465,7 @@ void Player::dyeItemFromDyeingInfo()
   uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
   uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
 
-  Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+  Service< World::Manager::PlayerMgr >::ref().onConditionChanged( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
 
   auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
   auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
@@ -1508,7 +1507,7 @@ void Player::glamourItemFromGlamouringInfo()
   uint32_t glamourBagSlot = m_glamouringInfo.glamourBagSlot;
   bool shouldGlamour = m_glamouringInfo.shouldGlamour;
 
-  playerMgr.onSendStateFlags( *this, true );
+  playerMgr.onConditionChanged( *this, true );
 
   auto itemToGlamour = getItemAt( itemToGlamourContainer, itemToGlamourSlot );
   auto glamourToUse = getItemAt( glamourBagContainer, glamourBagSlot );
@@ -1903,17 +1902,6 @@ const FFXIVARR_POSITION3& Player::getPrevPos() const
 float Player::getPrevRot() const
 {
   return m_prevRot;
-}
-
-std::optional< Sapphire::World::Quest > Player::getQuest( uint32_t questId )
-{
-  if( !hasQuest( questId ) )
-    return std::nullopt;
-
-  auto idx = getQuestIndex( questId );
-
-  auto quest = getQuestByIndex( idx );
-  return { quest };
 }
 
 bool Player::isConnected() const

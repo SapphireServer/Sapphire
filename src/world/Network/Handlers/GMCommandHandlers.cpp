@@ -422,7 +422,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         return;
       }
 
-      Service< World::Manager::PlayerMgr >::ref().onSetGc( player, static_cast< uint8_t >( param1 ) );
+      Service< World::Manager::PlayerMgr >::ref().setGrandCompany( player, static_cast< uint8_t >( param1 ) );
 
       // if we're changing them to a GC, check if they have a rank and if not, set it to the lowest rank
       if( param1 > 0 )
@@ -447,7 +447,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         return;
       }
 
-      Service< World::Manager::PlayerMgr >::ref().onSetGcRank( player, static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
+      Service< World::Manager::PlayerMgr >::ref().setGrandCompanyRank( player, static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
       PlayerMgr::sendServerNotice( player, "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
                                    targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;

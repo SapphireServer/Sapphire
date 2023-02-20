@@ -529,16 +529,16 @@ namespace Sapphire::Entity
     const StateFlags& getStateFlags() const;
 
     /* set a specified state flag */
-    void setStateFlag( Common::PlayerStateFlag flag );
+    void setCondition( Common::PlayerCondition flag );
 
     /* set a specified state flag */
-    void setStateFlags( std::vector< Common::PlayerStateFlag > flags );
+    void setStateFlags( std::vector< Common::PlayerCondition > flags );
 
     /* check if a specified flag is set */
-    bool hasStateFlag( Common::PlayerStateFlag flag ) const;
+    bool hasStateFlag( Common::PlayerCondition flag ) const;
 
     /* reset a specified flag */
-    void unsetStateFlag( Common::PlayerStateFlag flag );
+    void removeCondition( Common::PlayerCondition flag );
 
     /*! return the userlevel */
     uint8_t getUserLevel() const;
@@ -901,7 +901,7 @@ namespace Sapphire::Entity
     OrchestrionList m_orchestrion{};
     ClassList m_classArray{};
     ExpList m_expArray{};
-    StateFlags m_stateFlags{};
+    StateFlags m_condition{};
 
     Common::ClassJob m_firstClass{};
 

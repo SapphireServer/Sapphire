@@ -613,12 +613,12 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::ACHIEVEMENT_REQUEST_RATE:
     {
-      Service< World::Manager::PlayerMgr >::ref().onSendAchievementProgress( player, param11 );
+      Service< World::Manager::PlayerMgr >::ref().onAchievementProgressChanged( player, param11 );
       break;
     }
     case PacketCommand::ACHIEVEMENT_REQUEST:
     {
-      Service< World::Manager::PlayerMgr >::ref().onSendAchievementList( player );
+      Service< World::Manager::PlayerMgr >::ref().onAchievementListChanged( player );
       break;
     }
     case PacketCommand::TELEPO_INQUIRY: // Teleport

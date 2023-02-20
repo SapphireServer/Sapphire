@@ -992,7 +992,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   * Structural representation of the packet sent by the server
   * to set a players state
   */
-  struct FFXIVIpcPlayerStateFlags : FFXIVIpcBasePacket< Condition >
+  struct FFXIVIpcCondition : FFXIVIpcBasePacket< Condition >
   {
     uint8_t flags[12];
     uint32_t padding;

@@ -550,13 +550,13 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
     }
   }
 
-  if( player.hasStateFlag( Common::PlayerStateFlag::WatchingCutscene ) )
-    Common::Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( player, Common::PlayerStateFlag::WatchingCutscene );
+  if( player.hasStateFlag( Common::PlayerCondition::WatchingCutscene ) )
+    Common::Service< World::Manager::PlayerMgr >::ref().removeCondition( player, Common::PlayerCondition::WatchingCutscene );
 
   player.removeEvent( pEvent->getId() );
 
   if( freePlayer == 1 )
-    Common::Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( player, Common::PlayerStateFlag::InNpcEvent );
+    Common::Service< World::Manager::PlayerMgr >::ref().removeCondition( player, Common::PlayerCondition::InNpcEvent );
 }
 
 void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t eventId, Event::EventHandler::EventType eventType, uint8_t eventParam1,
@@ -567,7 +567,7 @@ void EventMgr::eventStart( Entity::Player& player, uint64_t actorId, uint32_t ev
   newEvent->setEventFinishCallback( std::move( callback ) );
   player.addEvent( newEvent );
 
-  Common::Service< World::Manager::PlayerMgr >::ref().onSetStateFlag( player, Common::PlayerStateFlag::InNpcEvent );
+  Common::Service< World::Manager::PlayerMgr >::ref().setCondition( player, Common::PlayerCondition::InNpcEvent );
 
   server.queueForPlayer( player.getCharacterId(), std::make_shared< EventStartPacket >( player.getId(), actorId,
                                                                                         eventId, eventType, eventParam1, eventParam2 ) );
@@ -838,7 +838,7 @@ Sapphire::Event::EventHandlerPtr EventMgr::bootstrapSceneEvent( Entity::Player& 
   }
 
   if( flags & CONDITION_CUTSCENE )
-    Common::Service< World::Manager::PlayerMgr >::ref().onSetStateFlag( player, Common::PlayerStateFlag::WatchingCutscene );
+    Common::Service< World::Manager::PlayerMgr >::ref().setCondition( player, Common::PlayerCondition::WatchingCutscene );
 
   return pEvent;
 }

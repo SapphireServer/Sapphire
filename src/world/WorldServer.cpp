@@ -367,8 +367,6 @@ void WorldServer::mainLoop()
     updateSessions( currTime );
 
     DbKeepAlive( currTime );
-
-
   }
 }
 
@@ -401,6 +399,9 @@ void WorldServer::updateSessions( uint32_t currTime )
     // remove session of players marked for removal ( logoff / kick )
     if( ( player.isMarkedForRemoval() && diff > 5 ) || diff > 20 )
     {
+      player.removeOnlineStatus( Common::OnlineStatus::Online );
+      player.addOnlineStatus( Common::OnlineStatus::Offline );
+
       Logger::info( "[{0}] Session removal", session->getId() );
       session->close();
       sessionRemovalQueue.push( session->getId() );

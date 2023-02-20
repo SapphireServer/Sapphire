@@ -12,7 +12,7 @@
 
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ServerNoticePacket.h"
-#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/ConditionPacket.h"
 
 #include "ContentFinder/ContentFinder.h"
 

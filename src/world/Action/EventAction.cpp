@@ -61,8 +61,8 @@ void Action::EventAction::start()
 
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
 
-    if( pPlayer->hasStateFlag( PlayerStateFlag::InNpcEvent ) )
-      Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::InNpcEvent );
+    if( pPlayer->hasStateFlag( PlayerCondition::InNpcEvent ) )
+      Service< World::Manager::PlayerMgr >::ref().removeCondition( *pPlayer, PlayerCondition::InNpcEvent );
   }
   else
     server().queueForPlayers( m_pSource->getInRangePlayerIds(), control );

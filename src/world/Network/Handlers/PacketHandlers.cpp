@@ -39,7 +39,7 @@
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/EventStartPacket.h"
 #include "Network/PacketWrappers/EventFinishPacket.h"
-#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/ConditionPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
@@ -523,7 +523,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
 
   auto pTargetPlayer = pSession->getPlayer();
 
-  if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BetweenAreas ) )
+  if( pTargetPlayer->hasStateFlag( PlayerCondition::BetweenAreas ) )
   {
     // send error for player between areas
     // TODO: implement me
@@ -538,7 +538,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
     return;
   }
 
-  if( pTargetPlayer->hasStateFlag( PlayerStateFlag::BoundByDuty ) && !player.isActingAsGm() )
+  if( pTargetPlayer->hasStateFlag( PlayerCondition::BoundByDuty ) && !player.isActingAsGm() )
   {
     auto boundPacket = makeChatPacket< Packets::Server::FFXIVRecvFinderStatus >( player.getId() );
     strcpy( boundPacket->data().toName, data.toName );

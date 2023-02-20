@@ -1379,7 +1379,7 @@ namespace Sapphire::Common
     REJECT_INVITE = 0x05,
   };
 
-  enum PlayerStateFlag : uint8_t
+  enum PlayerCondition : uint8_t
   {
     HideUILockChar = 1, // as the name suggests, hides the ui and logs the char...
     InCombat = 2, // in Combat, locks gearchange/return/teleport
@@ -1839,7 +1839,7 @@ namespace Sapphire::Common
     Gatherer
   };
 
-  using PlayerStateFlagList = std::vector< PlayerStateFlag >;
+  using PlayerStateFlagList = std::vector< PlayerCondition >;
 
   struct BNPCInstanceObject
   {

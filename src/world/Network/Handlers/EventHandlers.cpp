@@ -6,7 +6,7 @@
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
 
 #include "Network/GameConnection.h"
-#include "Network/PacketWrappers/PlayerStateFlagsPacket.h"
+#include "Network/PacketWrappers/ConditionPacket.h"
 
 #include "Script/ScriptMgr.h"
 
