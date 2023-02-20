@@ -182,7 +182,7 @@ void Sapphire::Network::GameConnection::joinChatChannelHandler( const Packets::F
 
 void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  if( player.hasStateFlag( Common::BetweenAreas ) )
+  if( player.hasCondition( Common::BetweenAreas ) )
     return;
   const auto updatePositionPacket = ZoneChannelPacket< Client::FFXIVIpcUpdatePosition >( inPacket );
   auto& data = updatePositionPacket.data();
@@ -523,7 +523,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
 
   auto pTargetPlayer = pSession->getPlayer();
 
-  if( pTargetPlayer->hasStateFlag( PlayerCondition::BetweenAreas ) )
+  if( pTargetPlayer->hasCondition( PlayerCondition::BetweenAreas ) )
   {
     // send error for player between areas
     // TODO: implement me
@@ -538,7 +538,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
     return;
   }
 
-  if( pTargetPlayer->hasStateFlag( PlayerCondition::BoundByDuty ) && !player.isActingAsGm() )
+  if( pTargetPlayer->hasCondition( PlayerCondition::BoundByDuty ) && !player.isActingAsGm() )
   {
     auto boundPacket = makeChatPacket< Packets::Server::FFXIVRecvFinderStatus >( player.getId() );
     strcpy( boundPacket->data().toName, data.toName );

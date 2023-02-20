@@ -34,7 +34,7 @@ namespace Sapphire::Entity
     using AetheryteList = std::array< uint8_t, Common::ARRSIZE_AETHERYTES >;
     using UnlockList = std::array< uint8_t, Common::ARRSIZE_UNLOCKS >;
     using OrchestrionList = std::array< uint8_t, Common::ARRSIZE_ORCHESTRION >;
-    using StateFlags = std::array< uint8_t, 12 >;
+    using Condition = std::array< uint8_t, 12 >;
 
     using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
     using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
@@ -526,16 +526,16 @@ namespace Sapphire::Entity
     // Player State Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /* return a const pointer to the state flag array */
-    const StateFlags& getStateFlags() const;
+    const Condition& getConditions() const;
 
     /* set a specified state flag */
     void setCondition( Common::PlayerCondition flag );
 
     /* set a specified state flag */
-    void setStateFlags( std::vector< Common::PlayerCondition > flags );
+    void setConditions( std::vector< Common::PlayerCondition > flags );
 
     /* check if a specified flag is set */
-    bool hasStateFlag( Common::PlayerCondition flag ) const;
+    bool hasCondition( Common::PlayerCondition flag ) const;
 
     /* reset a specified flag */
     void removeCondition( Common::PlayerCondition flag );
@@ -901,7 +901,7 @@ namespace Sapphire::Entity
     OrchestrionList m_orchestrion{};
     ClassList m_classArray{};
     ExpList m_expArray{};
-    StateFlags m_condition{};
+    Condition m_condition{};
 
     Common::ClassJob m_firstClass{};
 

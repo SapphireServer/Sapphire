@@ -861,12 +861,12 @@ void Player::setGcRankAt( uint8_t index, uint8_t rank )
   m_gcRank[ index ] = rank;
 }
 
-const Player::StateFlags& Player::getStateFlags() const
+const Player::Condition& Player::getConditions() const
 {
   return m_condition;
 }
 
-bool Player::hasStateFlag( Common::PlayerCondition flag ) const
+bool Player::hasCondition( Common::PlayerCondition flag ) const
 {
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -890,7 +890,7 @@ void Player::setCondition( Common::PlayerCondition flag )
 
 void Player::removeCondition( Common::PlayerCondition flag )
 {
-  if( !hasStateFlag( flag ) )
+  if( !hasCondition( flag ) )
     return;
 
   auto iFlag = static_cast< int32_t >( flag );

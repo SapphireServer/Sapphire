@@ -17,7 +17,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     ConditionPacket( Entity::Player& player ) :
       ZoneChannelPacket< FFXIVIpcCondition >( player.getId(), player.getId() )
     {
-      initialize( player.getStateFlags().data() );
+      initialize( player.getConditions().data() );
     }
 
     ConditionPacket( Entity::Player& player, std::vector< Common::PlayerCondition > flags ) :

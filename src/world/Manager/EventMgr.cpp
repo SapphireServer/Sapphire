@@ -550,7 +550,7 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
     }
   }
 
-  if( player.hasStateFlag( Common::PlayerCondition::WatchingCutscene ) )
+  if( player.hasCondition( Common::PlayerCondition::WatchingCutscene ) )
     Common::Service< World::Manager::PlayerMgr >::ref().removeCondition( player, Common::PlayerCondition::WatchingCutscene );
 
   player.removeEvent( pEvent->getId() );

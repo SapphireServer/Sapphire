@@ -140,7 +140,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         auto player = it->second;
         if( !player->isLoadingComplete() ||
             !player->isDirectorInitialized() ||
-            player->hasStateFlag( PlayerCondition::WatchingCutscene ) )
+                player->hasCondition( PlayerCondition::WatchingCutscene ) )
           return;
       }
 

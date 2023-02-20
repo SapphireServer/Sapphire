@@ -118,7 +118,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
       if( !m_pPlayer->isLoadingComplete() ||
           !m_pPlayer->isDirectorInitialized() ||
           !m_pPlayer->isOnEnterEventDone() ||
-          m_pPlayer->hasStateFlag( PlayerCondition::WatchingCutscene ) )
+          m_pPlayer->hasCondition( PlayerCondition::WatchingCutscene ) )
         return;
 
       if( m_instanceCommenceTime == 0 )
