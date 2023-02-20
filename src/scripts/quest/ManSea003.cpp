@@ -138,8 +138,6 @@ private:
     }
   }
 
-  //////////////////////////////////////////////////////////////////////
-
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 1, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManSea003::Scene00001Return ) );
@@ -151,9 +149,6 @@ private:
     quest.setUI8CH( 1 );
   }
 
-  //////////////////////////////////////////////////////////////////////
-
-
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManSea003::Scene00002Return ) );
@@ -163,8 +158,6 @@ private:
   {
     Scene00003( quest, player );
   }
-
-  //////////////////////////////////////////////////////////////////////
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
@@ -176,8 +169,6 @@ private:
     quest.setUI8BL( 1 );
     checkQuestCompletion( quest, player, 1 );
   }
-
-  //////////////////////////////////////////////////////////////////////
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
@@ -194,8 +185,6 @@ private:
       return;
   }
 
-  //////////////////////////////////////////////////////////////////////
-
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManSea003::Scene00005Return ) );
@@ -208,8 +197,6 @@ private:
     checkQuestCompletion( quest, player, 1 );
   }
 
-  //////////////////////////////////////////////////////////////////////
-
   void Scene00006( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR, bindSceneReturn( &ManSea003::Scene00006Return ) );
@@ -220,8 +207,6 @@ private:
     quest.setUI8AL( 1 );
     checkQuestCompletion( quest, player, 2 );
   }
-
-  //////////////////////////////////////////////////////////////////////
 
   void Scene00007( World::Quest& quest, Entity::Player& player )
   {
