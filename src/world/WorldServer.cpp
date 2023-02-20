@@ -349,10 +349,16 @@ void WorldServer::mainLoop()
 
   while( isRunning() )
   {
-    std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+    auto tickCount = Common::Util::getTimeMs();
+
+    if( tickCount - m_lastServerTick < 300 )
+    {
+      std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+      continue;
+    }
+    m_lastServerTick = tickCount;
 
     auto currTime = Common::Util::getTimeSeconds();
-    auto tickCount = Common::Util::getTimeMs();
 
     taskMgr.update( tickCount );
     terriMgr.updateTerritoryInstances( tickCount );

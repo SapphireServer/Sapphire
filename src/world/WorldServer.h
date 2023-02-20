@@ -74,6 +74,7 @@ namespace Sapphire::World
     uint16_t m_port;
     std::string m_ip;
     int64_t m_lastDBPingTime;
+    uint64_t m_lastServerTick{ 0 };
     bool m_bRunning;
     uint16_t m_worldId;
 
