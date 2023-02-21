@@ -29,16 +29,6 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-void FreeCompanyMgr::handleEvent( const Common::EventSystem::Event& e )
-{
-  if( e.type() == Common::EventSystem::LoginEvent::descriptor )
-  {
-    const Common::EventSystem::LoginEvent& loginEvent = static_cast< const Common::EventSystem::LoginEvent& >( e );
-    onFcLogin( loginEvent.characterId );
-  }
-
-}
-
 bool FreeCompanyMgr::loadFreeCompanies()
 {
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
@@ -249,10 +239,13 @@ void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
   server.queueForPlayer( player.getCharacterId(), fcResultPacket );
 }
 
-void FreeCompanyMgr::onFcLogin( uint64_t characterId )
+void FreeCompanyMgr::onFcLogin( const Common::EventSystem::Event& e )
 {
+  Logger::debug( "{}", __FUNCTION__  );
+  const auto& loginEvent = static_cast< const Common::EventSystem::LoginEvent& >( e );
+
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto player = server.getPlayer( characterId );
+  auto player = server.getPlayer( loginEvent.characterId );
   if( !player )
     return;
 
@@ -273,13 +266,14 @@ void FreeCompanyMgr::onFcLogin( uint64_t characterId )
                                       0, FreeCompanyResultPacket::UpdateStatus::Member,
                                       fc->getName(), player->getName() );
 
-  server.queueForFreeCompany( fc->getId(), fcResultOthers, { characterId } );
+  server.queueForFreeCompany( fc->getId(), fcResultOthers, { loginEvent.characterId } );
 }
 
-void FreeCompanyMgr::onFcLogout( uint64_t characterId )
+void FreeCompanyMgr::onFcLogout( const Common::EventSystem::Event& e )
 {
+  const auto& logoutEvent = static_cast< const Common::EventSystem::LogoutEvent& >( e );
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto player = server.getPlayer( characterId );
+  auto player = server.getPlayer( logoutEvent.characterId );
   if( !player )
     return;
 
@@ -293,7 +287,7 @@ void FreeCompanyMgr::onFcLogout( uint64_t characterId )
                                       0, FreeCompanyResultPacket::UpdateStatus::Member,
                                       fc->getName(), player->getName() );
 
-  server.queueForFreeCompany( fc->getId(), fcResultOthers, { characterId } );
+  server.queueForFreeCompany( fc->getId(), fcResultOthers, { logoutEvent.characterId } );
 }
 
 void FreeCompanyMgr::onSignPetition( Entity::Player& source, Entity::Player& target )

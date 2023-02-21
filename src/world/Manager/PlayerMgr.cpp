@@ -49,17 +49,6 @@ using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-void PlayerMgr::handleEvent( const Common::EventSystem::Event& e )
-{
-  if( e.type() == Common::EventSystem::LoginEvent::descriptor )
-  {
-    const Common::EventSystem::LoginEvent& loginEvent = static_cast< const Common::EventSystem::LoginEvent& >( e );
-    auto player = server().getPlayer( loginEvent.characterId );
-    onLogin( *player );
-  }
-
-}
-
 void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfile )
 {
   auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
@@ -349,8 +338,11 @@ void PlayerMgr::onClassChanged( Entity::Player& player )
   onPlayerHpMpTpChanged( player );
 }
 
-void PlayerMgr::onLogin( Entity::Player& player )
+void PlayerMgr::onLogin( const Common::EventSystem::Event& e )
 {
+  Logger::debug( "{}", __FUNCTION__  );
+  const auto& loginEvent = dynamic_cast< const Common::EventSystem::LoginEvent& >( e );
+  auto player = *server().getPlayer( loginEvent.characterId );
   auto motd = server().getConfig().motd;
 
   std::istringstream ss( motd );
@@ -361,15 +353,15 @@ void PlayerMgr::onLogin( Entity::Player& player )
   }
 }
 
-void PlayerMgr::onLogout( Entity::Player &player )
+void PlayerMgr::onLogout( const Common::EventSystem::Event& e )
 {
+  const auto& logoutEvent = dynamic_cast< const Common::EventSystem::LogoutEvent& >( e );
+  auto player = *server().getPlayer( logoutEvent.characterId );
+
   auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
   // send updates to mgrs
   if( player.getPartyId() != 0 )
     partyMgr.onMemberDisconnect( player );
-
-  fcMgr.onFcLogout( player.getCharacterId() );
 }
 
 void PlayerMgr::onDeath( Entity::Player& player )

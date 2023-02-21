@@ -6,11 +6,12 @@
 #include "ForwardsZone.h"
 #include "FreeCompany/FreeCompany.h"
 #include <Event/Observer.h>
+#include <Event/EventDefinitions/EventDefinitions.h>
 
 namespace Sapphire::World::Manager
 {
 
-  class FreeCompanyMgr : public Common::EventSystem::EventObserver
+  class FreeCompanyMgr
   {
   private:
     std::unordered_map< uint64_t, FreeCompanyPtr > m_fcIdMap;
@@ -25,8 +26,6 @@ namespace Sapphire::World::Manager
   public:
 
     FreeCompanyMgr() = default;
-
-    void handleEvent( const Common::EventSystem::Event& e );
 
     // initialize all fcs from db to memory
     bool loadFreeCompanies();
@@ -69,8 +68,11 @@ namespace Sapphire::World::Manager
    // void leaveLinkshell( uint64_t lsId, uint64_t characterId );
    // void joinLinkshell( uint64_t lsId, uint64_t characterId );
 
-    void onFcLogin( uint64_t characterId );
-    void onFcLogout( uint64_t characterId );
+    /// Events
+    void onFcLogin( const Common::EventSystem::Event& e );
+    void onFcLogout( const Common::EventSystem::Event& e );
+    ///
+
     void onSignPetition( Entity::Player& source, Entity::Player& target );
 
   };

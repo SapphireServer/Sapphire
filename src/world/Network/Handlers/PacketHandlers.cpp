@@ -353,7 +353,6 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
   player.setIsLogin( true );
   player.setConnected( true );
   teriMgr.joinWorld( player );
-  fcMgr.onFcLogin( player.getCharacterId() );
 }
 
 void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

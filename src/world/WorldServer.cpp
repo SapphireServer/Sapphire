@@ -312,8 +312,15 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
 
-  dispatcher->subscribe( Common::EventSystem::LoginEvent::descriptor, std::bind( &Manager::PlayerMgr::handleEvent, pPlayerMgr, std::placeholders::_1 ) );
-  dispatcher->subscribe( Common::EventSystem::LoginEvent::descriptor, std::bind( &Manager::FreeCompanyMgr::handleEvent, pFcMgr, std::placeholders::_1 ) );
+  using namespace Common;
+  using namespace Manager;
+  using namespace std::placeholders;
+
+  dispatcher->subscribe( EventSystem::LoginEvent::descriptor, std::bind( &PlayerMgr::onLogin, pPlayerMgr, _1 ) );
+  dispatcher->subscribe( EventSystem::LoginEvent::descriptor, std::bind( &FreeCompanyMgr::onFcLogin, pFcMgr, _1 ) );
+
+  dispatcher->subscribe( EventSystem::LogoutEvent::descriptor, std::bind( &PlayerMgr::onLogout, pPlayerMgr, _1 ) );
+  dispatcher->subscribe( EventSystem::LogoutEvent::descriptor, std::bind( &FreeCompanyMgr::onFcLogout, pFcMgr, _1 ) );
 
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
@@ -411,6 +418,8 @@ void WorldServer::updateSessions( uint32_t currTime )
       player.removeOnlineStatus( Common::OnlineStatus::Online );
       player.addOnlineStatus( Common::OnlineStatus::Offline );
 
+      auto dispatcher = Common::Service< Common::EventSystem::EventDispatcher >::ref();
+      dispatcher.emit( Common::EventSystem::LogoutEvent( player.getCharacterId() ) );
       Logger::info( "[{0}] Session removal", session->getId() );
       session->close();
       sessionRemovalQueue.push( session->getId() );
@@ -545,7 +554,6 @@ Sapphire::Entity::PlayerPtr WorldServer::getPlayer( uint32_t entityId )
 
 Sapphire::Entity::PlayerPtr WorldServer::getPlayer( uint64_t characterId )
 {
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
   auto it = m_playerMapByCharacterId.find( characterId );
 
   if( it != m_playerMapByCharacterId.end() )

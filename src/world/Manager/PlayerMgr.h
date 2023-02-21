@@ -3,16 +3,14 @@
 #include "ForwardsZone.h"
 #include <spdlog/fmt/fmt.h>
 #include "MgrUtil.h"
-#include <Event/Observer.h>
+#include <Event/Event.h>
 
 namespace Sapphire::World::Manager
 {
-  class PlayerMgr : public Common::EventSystem::EventObserver
+  class PlayerMgr
   {
   public:
     PlayerMgr() = default;
-
-    void handleEvent( const Common::EventSystem::Event& e );
 
     void onOnlineStatusChanged( Sapphire::Entity::Player& player, bool updateProfile = true );
 
@@ -42,8 +40,11 @@ namespace Sapphire::World::Manager
 
     void onHateListChanged( Sapphire::Entity::Player& player );
 
-    void onLogin( Sapphire::Entity::Player& player );
-    void onLogout( Sapphire::Entity::Player& player );
+    /// Events
+    void onLogin( const Common::EventSystem::Event& e );
+    void onLogout( const Common::EventSystem::Event& e );
+    ///
+
     void onDeath( Sapphire::Entity::Player& player );
     void onMoveZone( Sapphire::Entity::Player& player );
 

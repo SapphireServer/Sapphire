@@ -77,9 +77,6 @@ void Sapphire::World::Session::close()
   // remove the session from the player
   if( m_pPlayer )
   {
-    auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-    playerMgr.onLogout( *m_pPlayer );
-
     m_pPlayer->unload();
   }
 }
