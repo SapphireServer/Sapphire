@@ -62,9 +62,7 @@ void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uin
 
 std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
-  auto thisTick = m_currTickEffect;
-  m_currTickEffect = std::make_pair( 0, 0 );
-  return thisTick;
+  return m_currTickEffect;
 }
 
 void Sapphire::StatusEffect::StatusEffect::onTick()
