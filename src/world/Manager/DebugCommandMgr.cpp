@@ -541,9 +541,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     entry.Arg0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
 
     effectPacket->addTargetEffect( entry, static_cast< uint64_t >( player.getId() ) );
-
-    auto sequence = pCurrentZone->getNextEffectResultId();
-    effectPacket->setSequence( sequence );
+    effectPacket->setResultId( pCurrentZone->getNextEffectResultId() );
 
     server().queueForPlayer( player.getCharacterId(), effectPacket );
   }

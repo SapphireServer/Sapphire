@@ -28,7 +28,7 @@
 #include <Network/PacketWrappers/InitZonePacket.h>
 #include <Network/PacketWrappers/ModelEquipPacket.h>
 #include <Network/PacketWrappers/PlayerSetupPacket.h>
-#include <Network/PacketWrappers/PlayerStateFlagsPacket.h>
+#include <Network/PacketWrappers/ConditionPacket.h>
 #include <Network/PacketWrappers/UpdateHpMpTpPacket.h>
 #include <Network/PacketWrappers/ServerNoticePacket.h>
 #include <Network/PacketWrappers/ChatPacket.h>
@@ -74,17 +74,17 @@ void PlayerMgr::onEquipDisplayFlagsChanged( Entity::Player& player )
   server().queueForPlayers( player.getInRangePlayerIds( true ), paramPacket );
 }
 
-void PlayerMgr::onSendStateFlags( Entity::Player& player, bool updateInRange )
+void PlayerMgr::onConditionChanged( Entity::Player& player, bool updateInRange )
 {
 
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< PlayerStateFlagsPacket >( player ) );
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ConditionPacket >( player ) );
 
   if( updateInRange )
     server().queueForPlayers( player.getInRangePlayerIds( true ),
                               makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ) );
 }
 
-void PlayerMgr::onSendAchievementList( Entity::Player& player )
+void PlayerMgr::onAchievementListChanged( Entity::Player& player )
 {
   auto achvData = player.getAchievementData();
 
@@ -95,7 +95,7 @@ void PlayerMgr::onSendAchievementList( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), achvPacket );
 }
 
-void PlayerMgr::onSendAchievementProgress( Entity::Player& player, uint32_t achievementId )
+void PlayerMgr::onAchievementProgressChanged( Entity::Player& player, uint32_t achievementId )
 {
 
   auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
@@ -108,15 +108,15 @@ void PlayerMgr::onSendAchievementProgress( Entity::Player& player, uint32_t achi
 
 void PlayerMgr::onUnlockAchievement( Entity::Player& player, uint32_t achievementId )
 {
-  onSendAchievementList( player );
+  onAchievementListChanged( player );
 
   server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementComplete, achievementId ) );
   server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementObtainMsg, achievementId ) );
 }
 
-void PlayerMgr::onSendStats( Entity::Player& player )
+void PlayerMgr::onStatsChanged( Entity::Player& player )
 {
-  std::array< uint32_t, 50 > statParams;
+  std::array< uint32_t, 50 > statParams{};
   std::fill( std::begin( statParams ), std::end( statParams ), 0 );
 
   auto& exd = Common::Service< Data::ExdData >::ref();
@@ -192,7 +192,7 @@ void PlayerMgr::onSetLevelForClass( Entity::Player& player, Common::ClassJob cla
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
 
   server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::ClassJobUpdate,
-                                                      static_cast< uint8_t >( classJob ), player.getLevelForClass( classJob ) ) );
+                                                                          static_cast< uint8_t >( classJob ), player.getLevelForClass( classJob ) ) );
 
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( classJob ) );
 }
@@ -202,9 +202,11 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 {
 
   if( exp != 0 )
-    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), GainExpMsg, static_cast< uint8_t >( player.getClass() ), exp ) );
+    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), GainExpMsg,
+                                                                            static_cast< uint8_t >( player.getClass() ), exp ) );
 
-  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp, static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp,
+                                                                          static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
 }
 
 void PlayerMgr::onUnlockOrchestrion( Entity::Player& player, uint8_t songId, uint32_t itemId )
@@ -214,12 +216,12 @@ void PlayerMgr::onUnlockOrchestrion( Entity::Player& player, uint8_t songId, uin
   server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
 }
 
-void PlayerMgr::onChangeGear( Entity::Player& player )
+void PlayerMgr::onGearChanged( Entity::Player& player )
 {
   server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< ModelEquipPacket >( player ) );
 }
 
-void PlayerMgr::onGcUpdate( Entity::Player& player )
+void PlayerMgr::onGrandCompanyChanged( Entity::Player& player )
 {
   auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
   gcAffPacket->data().ActiveCompanyId = player.getGc();
@@ -230,18 +232,18 @@ void PlayerMgr::onGcUpdate( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), gcAffPacket );
 }
 
-void PlayerMgr::onSetGc( Entity::Player& player, uint8_t gc )
+void PlayerMgr::setGrandCompany( Entity::Player& player, uint8_t gc )
 {
   player.setGc( gc );
 
-  onGcUpdate( player );
+  onGrandCompanyChanged( player );
 }
 
-void PlayerMgr::onSetGcRank( Entity::Player& player, uint8_t gc, uint8_t rank )
+void PlayerMgr::setGrandCompanyRank( Entity::Player& player, uint8_t gc, uint8_t rank )
 {
   player.setGcRankAt( gc, rank );
 
-  onGcUpdate( player );
+  onGrandCompanyChanged( player );
 }
 
 void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
@@ -329,7 +331,7 @@ void PlayerMgr::onHateListChanged( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
 }
 
-void PlayerMgr::onChangeClass( Entity::Player& player )
+void PlayerMgr::onClassChanged( Entity::Player& player )
 {
   server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ClassJobChange, 0x04 ) );
   onPlayerHpMpTpChanged( player );
@@ -364,7 +366,7 @@ void PlayerMgr::onDeath( Entity::Player& player )
   scriptMgr.onPlayerDeath( player );
 }
 
-void PlayerMgr::onZone( Sapphire::Entity::Player& player )
+void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& housingMgr = Common::Service< HousingMgr >::ref();
@@ -452,7 +454,7 @@ void PlayerMgr::onZone( Sapphire::Entity::Player& player )
 
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
-    onGcUpdate( player );
+    onGrandCompanyChanged( player );
   }
 
   if( player.getPartyId() != 0 )
@@ -506,24 +508,24 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   }
 }
 
-void PlayerMgr::onSetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag )
+void PlayerMgr::setCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag )
 {
   auto prevOnlineStatus = player.getOnlineStatus();
 
-  player.setStateFlag( flag );
+  player.setCondition( flag );
 
   auto newOnlineStatus = player.getOnlineStatus();
-  onSendStateFlags( player, prevOnlineStatus != newOnlineStatus );
+  onConditionChanged( player, prevOnlineStatus != newOnlineStatus );
 }
 
-void PlayerMgr::onUnsetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag )
+void PlayerMgr::removeCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag )
 {
   auto prevOnlineStatus = player.getOnlineStatus();
 
-  player.unsetStateFlag( flag );
+  player.removeCondition( flag );
 
   auto newOnlineStatus = player.getOnlineStatus();
-  onSendStateFlags( player, prevOnlineStatus != newOnlineStatus );
+  onConditionChanged( player, prevOnlineStatus != newOnlineStatus );
 }
 
 ////////// Helper ///////////

@@ -80,7 +80,7 @@ void Sapphire::QuestBattle::onPlayerZoneIn( Entity::Player& player )
   m_pPlayer = player.getAsPlayer();
 
   // mark player as "bound by duty"
-  player.setStateFlag( PlayerStateFlag::BoundByDuty );
+  player.setCondition( PlayerCondition::BoundByDuty );
 
   sendDirectorInit( player );
 
@@ -118,7 +118,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
       if( !m_pPlayer->isLoadingComplete() ||
           !m_pPlayer->isDirectorInitialized() ||
           !m_pPlayer->isOnEnterEventDone() ||
-          m_pPlayer->hasStateFlag( PlayerStateFlag::WatchingCutscene ) )
+          m_pPlayer->hasCondition( PlayerCondition::WatchingCutscene ) )
         return;
 
       if( m_instanceCommenceTime == 0 )
@@ -301,7 +301,7 @@ void Sapphire::QuestBattle::clearDirector( Entity::Player& player )
 
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
-  player.unsetStateFlag( PlayerStateFlag::BoundByDuty );
+  player.removeCondition( PlayerCondition::BoundByDuty );
 }
 
 void Sapphire::QuestBattle::success()

@@ -34,7 +34,7 @@ namespace Sapphire::Entity
     using AetheryteList = std::array< uint8_t, Common::ARRSIZE_AETHERYTES >;
     using UnlockList = std::array< uint8_t, Common::ARRSIZE_UNLOCKS >;
     using OrchestrionList = std::array< uint8_t, Common::ARRSIZE_ORCHESTRION >;
-    using StateFlags = std::array< uint8_t, 12 >;
+    using Condition = std::array< uint8_t, 12 >;
 
     using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
     using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
@@ -310,9 +310,6 @@ namespace Sapphire::Entity
 
     void updatePrevTerritory();
 
-    /*! change position, sends update too */
-    void changePosition( float x, float y, float z, float o );
-
     /*! return the characterId */
     uint64_t getCharacterId() const;
 
@@ -529,19 +526,19 @@ namespace Sapphire::Entity
     // Player State Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /* return a const pointer to the state flag array */
-    const StateFlags& getStateFlags() const;
+    const Condition& getConditions() const;
 
     /* set a specified state flag */
-    void setStateFlag( Common::PlayerStateFlag flag );
+    void setCondition( Common::PlayerCondition flag );
 
     /* set a specified state flag */
-    void setStateFlags( std::vector< Common::PlayerStateFlag > flags );
+    void setConditions( std::vector< Common::PlayerCondition > flags );
 
     /* check if a specified flag is set */
-    bool hasStateFlag( Common::PlayerStateFlag flag ) const;
+    bool hasCondition( Common::PlayerCondition flag ) const;
 
     /* reset a specified flag */
-    void unsetStateFlag( Common::PlayerStateFlag flag );
+    void removeCondition( Common::PlayerCondition flag );
 
     /*! return the userlevel */
     uint8_t getUserLevel() const;
@@ -597,10 +594,6 @@ namespace Sapphire::Entity
 
     /*! set the loading complete bool */
     void setLoadingComplete( bool bComplete );
-
-    Common::ZoningType getZoningType() const;
-
-    void setZoningType( Common::ZoningType zoneingType );
 
     void setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const char* searchMessage );
 
@@ -812,10 +805,10 @@ namespace Sapphire::Entity
     uint64_t getPartyId() const;
     void setPartyId( uint64_t partyId );
 
-    FriendListIDVec& getFriendListID();
+    FriendListIDVec& getFriendListId();
     FriendListDataVec& getFriendListData();
 
-    BlacklistIDVec& getBlacklistID();
+    BlacklistIDVec& getBlacklistId();
 
     uint64_t m_lastMoveTime{};
     uint8_t m_lastMoveflag{};
@@ -908,7 +901,7 @@ namespace Sapphire::Entity
     OrchestrionList m_orchestrion{};
     ClassList m_classArray{};
     ExpList m_expArray{};
-    StateFlags m_stateFlags{};
+    Condition m_condition{};
 
     Common::ClassJob m_firstClass{};
 
@@ -939,8 +932,6 @@ namespace Sapphire::Entity
     bool m_bAutoattack;
 
     bool m_bIsConnected;
-
-    Common::ZoningType m_zoningType;
 
     bool m_bNewAdventurer{};
     uint64_t m_onlineStatus;

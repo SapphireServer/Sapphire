@@ -68,15 +68,14 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       FFXIVPacketBase::setTargetActor( targetId );
     }
 
-    void setSequence( uint32_t sequence, uint16_t sourceSequence = 0 )
+    void setRequestId( uint16_t requestId )
     {
-      m_data.RequestId = static_cast< uint32_t >( sourceSequence );
-      m_data.ResultId = static_cast< uint32_t>( sequence );
+      m_data.RequestId = static_cast< uint32_t >( requestId );
     }
 
     void setResultId( uint32_t resultId )
     {
-      m_data.ResultId = static_cast< uint32_t>( resultId );
+      m_data.ResultId = static_cast< uint32_t >( resultId );
     }
 
   private:

@@ -156,8 +156,7 @@ bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
 void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  Logger::debug( "HousingZone::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}",
-                 getGuId(), getTerritoryTypeId(), player.getId() );
+  Logger::debug( "HousingZone::onPlayerZoneIn: Territory#{0}|{1}, Entity#{2}", getGuId(), getTerritoryTypeId(), player.getId() );
 
   auto isInSubdivision = isPlayerSubInstance( player );
 
@@ -185,8 +184,8 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
   auto landsetInitializePacket = makeZonePacket< FFXIVIpcHouseList >( player.getId() );
 
   landsetInitializePacket->data().LandSetId.wardNum = m_wardNum;
-  landsetInitializePacket->data().LandSetId.landId = m_landSetId;
-  landsetInitializePacket->data().LandSetId.territoryTypeId = m_territoryTypeId;
+  landsetInitializePacket->data().LandSetId.landId = static_cast< uint16_t >( m_landSetId );
+  landsetInitializePacket->data().LandSetId.territoryTypeId = static_cast< uint16_t >( m_territoryTypeId );
   landsetInitializePacket->data().LandSetId.worldId = server.getWorldId();
 
   auto isInSubdivision = isPlayerSubInstance( player );
@@ -337,7 +336,7 @@ void Sapphire::HousingZone::removeEstateEntranceEObj( uint16_t landId )
   auto land = getLand( landId );
   assert( land );
 
-  for( auto entry : m_eventObjects )
+  for( const auto& entry : m_eventObjects )
   {
     auto eObj = entry.second;
     if( eObj->getHousingLink() == static_cast< uint32_t >( landId ) << 8 )

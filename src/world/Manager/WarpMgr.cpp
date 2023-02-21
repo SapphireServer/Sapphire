@@ -71,6 +71,21 @@ void WarpMgr::requestMoveTerritoryType( Entity::Player& player, Common::WarpType
   requestMoveTerritory( player, warpType, pTeri->getGuId() );
 }
 
+void WarpMgr::requestMoveTerritoryType( Entity::Player& player, Common::WarpType warpType, uint32_t targetTerritoryTypeId,
+                                        Common::FFXIVARR_POSITION3 targetPos, float targetRot )
+{
+  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
+
+  auto pTeri = teriMgr.getTerritoryByTypeId( targetTerritoryTypeId );
+  if( !pTeri )
+  {
+    Logger::error( "Unable to find target territory instance for type {}", targetTerritoryTypeId );
+    return;
+  }
+
+  requestMoveTerritory( player, warpType, pTeri->getGuId(), player.getPos(), player.getRot() );
+}
+
 void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Common::FFXIVARR_POSITION3 targetPos, float targetRot )
 {
   m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
@@ -114,7 +129,6 @@ void WarpMgr::finishWarp( Entity::Player& player )
 
   auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpFinishAnim, raiseAnim, 0, 0 );
   auto setStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-  player.setZoningType( Common::ZoningType::None );
 
   if( !player.getGmInvis() )
     server().queueForPlayers( player.getInRangePlayerIds(), zoneInPacket );
@@ -122,7 +136,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), zoneInPacket );
   server().queueForPlayers( player.getInRangePlayerIds( true ), setStatusPacket );
 
-  playerMgr.onUnsetStateFlag( player, PlayerStateFlag::BetweenAreas );
+  playerMgr.removeCondition( player, PlayerCondition::BetweenAreas );
 
   Common::Service< MapMgr >::ref().updateAll( player );
 }
@@ -173,17 +187,14 @@ void WarpMgr::requestPlayerTeleport( Entity::Player& player, uint16_t aetheryteI
   if( teleportType == 1 || teleportType == 2 ) // teleport
   {
     warpType = WarpType::WARP_TYPE_TELEPO;
-    player.setZoningType( Common::ZoningType::Teleport );
   }
   else if( teleportType == 3 ) // return
   {
     warpType = WarpType::WARP_TYPE_EXIT_RANGE;
-    player.setZoningType( Common::ZoningType::Return );
   }
   else if( teleportType == 4 ) // return dead
   {
     warpType = WarpType::WARP_TYPE_EXIT_RANGE;
-    player.setZoningType( Common::ZoningType::ReturnDead );
   }
 
   if( sameTerritory )

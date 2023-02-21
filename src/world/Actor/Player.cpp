@@ -3,8 +3,6 @@
 #include <Util/UtilMath.h>
 #include <Logging/Logger.h>
 #include <Exd/ExdData.h>
-#include <datReader/DatCategories/bg/LgbTypes.h>
-#include <datReader/DatCategories/bg/lgb.h>
 
 #include <cmath>
 #include <utility>
@@ -14,7 +12,6 @@
 #include "Player.h"
 #include "BNpc.h"
 
-#include "Manager/HousingMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/RNGMgr.h"
 #include "Manager/PlayerMgr.h"
@@ -23,18 +20,15 @@
 #include "Manager/FreeCompanyMgr.h"
 #include "Manager/MapMgr.h"
 #include "Manager/MgrUtil.h"
+#include "Manager/ActionMgr.h"
 
-#include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
-#include "Territory/InstanceObjectCache.h"
-#include "Territory/Land.h"
 
 #include "Network/GameConnection.h"
 #include "Network/PacketContainer.h"
 #include "Network/CommonActorControl.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
-#include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
@@ -76,7 +70,6 @@ Player::Player() :
   m_lastActionTick( 0 ),
   m_bInCombat( false ),
   m_bLoadingComplete( false ),
-  m_zoningType( Common::ZoningType::None ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
   m_mount( 0 ),
@@ -100,7 +93,7 @@ Player::Player() :
   memset( m_name, 0, sizeof( m_name ) );
   memset( m_searchMessage, 0, sizeof( m_searchMessage ) );
   std::fill( std::begin( m_questTracking ), std::end( m_questTracking ), 0 );
-  std::fill( std::begin( m_stateFlags ), std::end( m_stateFlags ), 0 );
+  std::fill( std::begin( m_condition ), std::end( m_condition ), 0 );
   std::fill( std::begin( m_classArray ), std::end( m_classArray ), 0 );
   std::fill( std::begin( m_expArray ), std::end( m_expArray ), 0 );
 
@@ -404,23 +397,17 @@ bool Player::isAutoattackOn() const
 
 void Player::sendStats()
 {
-  Service< World::Manager::PlayerMgr >::ref().onSendStats( *this );
+  Service< World::Manager::PlayerMgr >::ref().onStatsChanged( *this );
 }
 
 bool Player::exitInstance()
 {
-  auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto& warpMgr = Common::Service< WarpMgr >::ref();
 
   resetHp();
   resetMp();
 
-  m_pos = m_prevPos;
-  m_rot = m_prevRot;
-  m_territoryTypeId = m_prevTerritoryTypeId;
-  m_territoryId = m_prevTerritoryId;
-
-  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, m_prevTerritoryId, m_prevPos, m_prevRot );
+  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, getPrevTerritoryId(), getPrevPos(), getPrevRot() );
 
   return true;
 }
@@ -570,13 +557,6 @@ void Player::setNewAdventurer( bool state )
 void Player::resetDiscovery()
 {
   memset( m_discovery.data(), 0, m_discovery.size() );
-}
-
-void Player::changePosition( float x, float y, float z, float o )
-{
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-  Common::FFXIVARR_POSITION3 pos{ x, y, z };
-  warpMgr.requestWarp( *this, Common::WARP_TYPE_NORMAL, pos, getRot() );
 }
 
 void Player::setRewardFlag( Common::UnlockEntry unlockId )
@@ -750,7 +730,7 @@ void Player::setClassJob( Common::ClassJob classJob )
   m_tp = 0;
 
   Service< World::Manager::PlayerMgr >::ref().onPlayerStatusUpdate( *this );
-  Service< World::Manager::PlayerMgr >::ref().onChangeClass( *this );
+  Service< World::Manager::PlayerMgr >::ref().onClassChanged( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
@@ -776,7 +756,7 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
 void Player::sendModel()
 {
-  Service< World::Manager::PlayerMgr >::ref().onChangeGear( *this );
+  Service< World::Manager::PlayerMgr >::ref().onGearChanged( *this );
 }
 
 uint32_t Player::getModelForSlot( Common::GearModelSlot slot )
@@ -881,12 +861,12 @@ void Player::setGcRankAt( uint8_t index, uint8_t rank )
   m_gcRank[ index ] = rank;
 }
 
-const Player::StateFlags& Player::getStateFlags() const
+const Player::Condition& Player::getConditions() const
 {
-  return m_stateFlags;
+  return m_condition;
 }
 
-bool Player::hasStateFlag( Common::PlayerStateFlag flag ) const
+bool Player::hasCondition( Common::PlayerCondition flag ) const
 {
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -894,10 +874,10 @@ bool Player::hasStateFlag( Common::PlayerStateFlag flag ) const
   uint8_t value;
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-  return ( m_stateFlags[ index ] & value ) != 0;
+  return ( m_condition[ index ] & value ) != 0;
 }
 
-void Player::setStateFlag( Common::PlayerStateFlag flag )
+void Player::setCondition( Common::PlayerCondition flag )
 {
   auto iFlag = static_cast< int32_t >( flag );
 
@@ -905,12 +885,12 @@ void Player::setStateFlag( Common::PlayerStateFlag flag )
   uint8_t value;
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-  m_stateFlags[ index ] |= value;
+  m_condition[ index ] |= value;
 }
 
-void Player::unsetStateFlag( Common::PlayerStateFlag flag )
+void Player::removeCondition( Common::PlayerCondition flag )
 {
-  if( !hasStateFlag( flag ) )
+  if( !hasCondition( flag ) )
     return;
 
   auto iFlag = static_cast< int32_t >( flag );
@@ -919,7 +899,7 @@ void Player::unsetStateFlag( Common::PlayerStateFlag flag )
   uint8_t value;
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
-  m_stateFlags[ index ] ^= value;
+  m_condition[ index ] ^= value;
 }
 
 void Player::update( uint64_t tickCount )
@@ -1070,16 +1050,6 @@ bool Player::isLoadingComplete() const
 void Player::setLoadingComplete( bool bComplete )
 {
   m_bLoadingComplete = bComplete;
-}
-
-ZoningType Player::getZoningType() const
-{
-  return m_zoningType;
-}
-
-void Player::setZoningType( Common::ZoningType zoneingType )
-{
-  m_zoningType = zoneingType;
 }
 
 void Player::setSearchInfo( uint8_t selectRegion, uint8_t selectClass, const char* searchMessage )
@@ -1296,16 +1266,18 @@ uint32_t Player::getPersistentEmote() const
 void Player::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
   pTarget->onActionHostile( getAsChara() );
-  //uint64_t tick = Util::getTimeMs();
-  //srand(static_cast< uint32_t >(tick));
 
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
+
+  //actionMgr.handleTargetedPlayerAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
 
   auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
@@ -1436,7 +1408,6 @@ void Player::teleportQuery( uint16_t aetheryteId )
     cost = std::min< uint16_t >( 999, cost );
 
     bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
-    // TODO: figure out what param1 really does
     server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId ) );
 
     if( !insufficientGil )
@@ -1494,7 +1465,7 @@ void Player::dyeItemFromDyeingInfo()
   uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
   uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
 
-  Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
+  Service< World::Manager::PlayerMgr >::ref().onConditionChanged( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
 
   auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
   auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
@@ -1536,7 +1507,7 @@ void Player::glamourItemFromGlamouringInfo()
   uint32_t glamourBagSlot = m_glamouringInfo.glamourBagSlot;
   bool shouldGlamour = m_glamouringInfo.shouldGlamour;
 
-  playerMgr.onSendStateFlags( *this, true );
+  playerMgr.onConditionChanged( *this, true );
 
   auto itemToGlamour = getItemAt( itemToGlamourContainer, itemToGlamourSlot );
   auto glamourToUse = getItemAt( glamourBagContainer, glamourBagSlot );
@@ -1840,7 +1811,7 @@ void Player::setPartyId( uint64_t partyId )
   m_partyId = partyId;
 }
 
-Player::FriendListIDVec& Player::getFriendListID()
+Player::FriendListIDVec& Player::getFriendListId()
 {
   return m_friendList;
 }
@@ -1850,7 +1821,7 @@ Player::FriendListDataVec& Player::getFriendListData()
   return m_friendInviteList;
 }
 
-Player::FriendListIDVec& Player::getBlacklistID()
+Player::FriendListIDVec& Player::getBlacklistId()
 {
   return m_blacklist;
 }
@@ -1931,17 +1902,6 @@ const FFXIVARR_POSITION3& Player::getPrevPos() const
 float Player::getPrevRot() const
 {
   return m_prevRot;
-}
-
-std::optional< Sapphire::World::Quest > Player::getQuest( uint32_t questId )
-{
-  if( !hasQuest( questId ) )
-    return std::nullopt;
-
-  auto idx = getQuestIndex( questId );
-
-  auto quest = getQuestByIndex( idx );
-  return { quest };
 }
 
 bool Player::isConnected() const

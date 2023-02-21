@@ -6,7 +6,7 @@
 
 namespace Sapphire::World::Manager
 {
-class PlayerMgr
+  class PlayerMgr
   {
   public:
     PlayerMgr() = default;
@@ -15,17 +15,7 @@ class PlayerMgr
 
     void onEquipDisplayFlagsChanged( Sapphire::Entity::Player& player );
 
-    void onSendStateFlags( Sapphire::Entity::Player& player, bool updateInRange );
-
-    void onSendStats( Sapphire::Entity::Player& player );
-
     void onPlayerStatusUpdate( Sapphire::Entity::Player& player );
-
-    void onChangeClass( Sapphire::Entity::Player& player );
-
-    void onSendAchievementList( Sapphire::Entity::Player& player );
-
-    void onSendAchievementProgress( Sapphire::Entity::Player& player, uint32_t achievementId );
 
     void onUnlockAchievement( Sapphire::Entity::Player& player, uint32_t achievementId );
 
@@ -41,14 +31,6 @@ class PlayerMgr
 
     void onUnlockOrchestrion( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId );
 
-    void onChangeGear( Sapphire::Entity::Player& player );
-
-    void onGcUpdate( Sapphire::Entity::Player& player );
-
-    void onSetGc( Sapphire::Entity::Player& player, uint8_t gc );
-
-    void onSetGcRank( Sapphire::Entity::Player& player, uint8_t gc, uint8_t rank );
-
     void onCompanionUpdate( Entity::Player& player, uint8_t companionId );
 
     void onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId );
@@ -59,18 +41,25 @@ class PlayerMgr
 
     void onLogin( Sapphire::Entity::Player& player );
     void onLogout( Sapphire::Entity::Player& player );
-
     void onDeath( Sapphire::Entity::Player& player );
-
-    void onZone( Sapphire::Entity::Player& player );
+    void onMoveZone( Sapphire::Entity::Player& player );
 
     void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
 
-    void onSetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag );
+    void onConditionChanged( Sapphire::Entity::Player& player, bool updateInRange );
+    void onStatsChanged( Sapphire::Entity::Player& player );
+    void onAchievementListChanged( Sapphire::Entity::Player& player );
+    void onAchievementProgressChanged( Sapphire::Entity::Player& player, uint32_t achievementId );
+    void onGearChanged( Sapphire::Entity::Player& player );
+    void onGrandCompanyChanged( Sapphire::Entity::Player& player );
+    void onClassChanged( Sapphire::Entity::Player& player );
 
-    void onUnsetStateFlag( Sapphire::Entity::Player& player, Common::PlayerStateFlag flag );
+    void setCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag );
+    void removeCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag );
+    void setGrandCompany( Sapphire::Entity::Player& player, uint8_t gc );
+    void setGrandCompanyRank( Sapphire::Entity::Player& player, uint8_t gc, uint8_t rank );
 
-    //////////// Helpers
+  //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );
     template< typename... Args >

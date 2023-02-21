@@ -89,6 +89,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto& warpMgr = Common::Service< World::Manager::WarpMgr >::ref();
 
   const auto packet = ZoneChannelPacket< FFXIVIpcGmCommand >( inPacket );
   const auto commandId = packet.data().Id;
@@ -201,11 +202,11 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
       {
         auto& warpMgr = Common::Service< WarpMgr >::ref();
         warpMgr.requestMoveTerritory( *targetPlayer, WarpType::WARP_TYPE_GM,
-                                      player.getTerritoryId(), { player.getPos().x, player.getPos().y, player.getPos().z },
-                                      player.getRot() );
+                                      player.getTerritoryId(), player.getPos(), player.getRot() );
       }
       else
-        targetPlayer->changePosition( player.getPos().x, player.getPos().y, player.getPos().z, player.getRot() );
+        warpMgr.requestMoveTerritory( *targetPlayer, Common::WarpType::WARP_TYPE_NORMAL, player.getTerritoryId(),
+                                      player.getPos(), player.getRot() );
       PlayerMgr::sendServerNotice( player, "Calling {0}", targetPlayer->getName() );
       break;
     }
@@ -421,7 +422,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         return;
       }
 
-      Service< World::Manager::PlayerMgr >::ref().onSetGc( player, static_cast< uint8_t >( param1 ) );
+      Service< World::Manager::PlayerMgr >::ref().setGrandCompany( player, static_cast< uint8_t >( param1 ) );
 
       // if we're changing them to a GC, check if they have a rank and if not, set it to the lowest rank
       if( param1 > 0 )
@@ -446,7 +447,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         return;
       }
 
-      Service< World::Manager::PlayerMgr >::ref().onSetGcRank( player, static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
+      Service< World::Manager::PlayerMgr >::ref().setGrandCompanyRank( player, static_cast< uint8_t >( gcId ), static_cast< uint8_t >( param1 ) );
       PlayerMgr::sendServerNotice( player, "GC Rank for {0} for GC {1} was set to {2}", targetPlayer->getName(), targetPlayer->getGc(),
                                    targetPlayer->getGcRankArray()[ targetPlayer->getGc() - 1 ] );
       break;
@@ -578,13 +579,10 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Jump:
     {
-
+      // todo - what was the intention here?
       auto inRange = player.getInRangeActors();
-
-      player.changePosition( targetActor->getPos().x, targetActor->getPos().y, targetActor->getPos().z,
-                             targetActor->getRot() );
-
-      PlayerMgr::sendServerNotice( player, "Jumping to {0} in range.", targetPlayer->getName());
+      warpMgr.requestWarp( player, WarpType::WARP_TYPE_GM, targetActor->getPos(), targetActor->getRot() );
+      PlayerMgr::sendServerNotice( player, "Jumping to {0} in range.", targetPlayer->getName() );
       break;
     }
 

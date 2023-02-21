@@ -112,11 +112,6 @@ void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& 
   Logger::debug( "EffectBuilder result: " );
   Logger::debug( "Targets afflicted: {}", targetList.size() );
 
-  auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
-  auto zone = teriMgr.getTerritoryByTypeId( m_sourceChara->getTerritoryTypeId() );
-
-  auto globalSequence = zone ? zone->getNextEffectResultId() : 0;
-
   do // we want to send at least one packet even nothing is hit so other players can see
   {
     auto packet = buildNextEffectPacket( targetList );
@@ -136,7 +131,8 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
   {
     auto effectPacket = std::make_shared< EffectPacket >( m_sourceChara->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    effectPacket->setSequence( resultId, m_sequence );
+    effectPacket->setRequestId( m_sequence );
+    effectPacket->setResultId( resultId );
     effectPacket->setTargetActor( targetList[ 0 ]->getId() );
 
     uint8_t targetIndex = 0;
@@ -184,7 +180,8 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
 
     auto effectPacket = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    effectPacket->setSequence( resultId, m_sequence );
+    effectPacket->setRequestId( m_sequence );
+    effectPacket->setResultId( resultId );
 
     for( auto it = m_actorEffectsMap.begin(); it != m_actorEffectsMap.end(); )
     {

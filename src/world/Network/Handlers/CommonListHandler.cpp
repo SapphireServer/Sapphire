@@ -195,7 +195,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
   }
   else if( data.ListType == 0x0b )
   { // friend list
-    auto& friendList = player.getFriendListID();
+    auto& friendList = player.getFriendListId();
     auto& friendListData = player.getFriendListData();
 
     std::vector< Common::HierarchyData > hierarchyData( friendListData.begin(), friendListData.end() );

@@ -59,7 +59,7 @@ void MountAction::start()
   data.Dir = m_pSource->getRot();
   server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), castPacket );
 
-  Common::Service< World::Manager::PlayerMgr >::ref().onSetStateFlag( *player, Common::PlayerStateFlag::Casting );
+  Common::Service< World::Manager::PlayerMgr >::ref().setCondition( *player, Common::PlayerCondition::Casting );
 
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
   server().queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), actionStartPkt );
@@ -69,7 +69,7 @@ void MountAction::execute()
 {
   assert( m_pSource );
 
-  Common::Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *m_pSource->getAsPlayer(), Common::PlayerStateFlag::Casting );
+  Common::Service< World::Manager::PlayerMgr >::ref().removeCondition( *m_pSource->getAsPlayer(), Common::PlayerCondition::Casting );
   m_effectBuilder->mount( m_pSource, m_mountId );
   m_effectBuilder->buildAndSendPackets( { m_pSource } );
 }

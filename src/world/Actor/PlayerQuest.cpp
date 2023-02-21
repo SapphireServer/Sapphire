@@ -117,6 +117,17 @@ bool Sapphire::Entity::Player::addQuest( const World::Quest& quest )
   return true;
 }
 
+std::optional< Sapphire::World::Quest > Sapphire::Entity::Player::getQuest( uint32_t questId )
+{
+  if( !hasQuest( questId ) )
+    return std::nullopt;
+
+  auto idx = getQuestIndex( questId );
+
+  auto quest = getQuestByIndex( idx );
+  return { quest };
+}
+
 int8_t Sapphire::Entity::Player::getFreeQuestSlot()
 {
   int8_t result = -1;

@@ -321,8 +321,8 @@ void Action::Action::start()
 
     if( player )
     {
-      player->setStateFlag( PlayerStateFlag::Casting );
-      Service< World::Manager::PlayerMgr >::ref().onSendStateFlags( *player, true );
+      player->setCondition( PlayerCondition::Casting );
+      Service< World::Manager::PlayerMgr >::ref().onConditionChanged( *player, true );
     }
   }
   
@@ -376,7 +376,7 @@ void Action::Action::interrupt()
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     pPlayer->setLastActionTick( 0 );
-    Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::Casting );
+    Service< World::Manager::PlayerMgr >::ref().removeCondition( *pPlayer, PlayerCondition::Casting );
   }
 
   if( hasCastTime() )
@@ -423,7 +423,7 @@ void Action::Action::execute()
     if( auto pPlayer = m_pSource->getAsPlayer(); pPlayer )
     {
       pPlayer->setLastActionTick( 0 );
-      Service< World::Manager::PlayerMgr >::ref().onUnsetStateFlag( *pPlayer, PlayerStateFlag::Casting );
+      Service< World::Manager::PlayerMgr >::ref().removeCondition( *pPlayer, PlayerCondition::Casting );
     }
   }
 
