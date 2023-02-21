@@ -398,7 +398,18 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 83,
+          "duration": 20000,
+          "modifiers": [
+            {
+              "modifier": "DefensePercent",
+              "value": 20
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
@@ -414,7 +425,18 @@
     "nextCombo": [],
     "statuses": {
       "caster": [],
-      "target": []
+      "target": [
+        {
+          "id": 244,
+          "duration": 30000,
+          "modifiers": [
+            {
+              "modifier": "TickDamage",
+              "value": 20
+            }
+          ]
+        }
+      ]
     }
   },
   "34": {
@@ -493,7 +515,18 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 86,
+          "duration": 20000,
+          "modifiers": [
+            {
+              "modifier": "AttackPowerPercent",
+              "value": 50
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
@@ -523,7 +556,18 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 87,
+          "duration": 20000,
+          "modifiers": [
+            {
+              "modifier": "HPPercent",
+              "value": 20
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
@@ -2454,7 +2498,38 @@
     "nextCombo": [],
     "statuses": {
       "caster": [],
-      "target": []
+      "target": [
+        {
+          "id": 180,
+          "duration": 24000,
+          "modifiers": [
+            {
+              "modifier": "TickDamage",
+              "value": 35
+            }
+          ]
+        },
+        {
+          "id": 191,
+          "duration": 24000,
+          "modifiers": [
+            {
+              "modifier": "HealingRecoveryPercent",
+              "value": -20
+            }
+          ]
+        },
+        {
+          "id": 240,
+          "duration": 24000,
+          "modifiers": [
+            {
+              "modifier": "HeavyPercent",
+              "value": 40
+            }
+          ]
+        }
+      ]
     }
   },
   "169": {
