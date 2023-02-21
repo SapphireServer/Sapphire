@@ -313,6 +313,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::TaskMgr >::set( taskMgr );
 
   dispatcher->subscribe( Common::EventSystem::LoginEvent::descriptor, std::bind( &Manager::PlayerMgr::handleEvent, pPlayerMgr, std::placeholders::_1 ) );
+  dispatcher->subscribe( Common::EventSystem::LoginEvent::descriptor, std::bind( &Manager::FreeCompanyMgr::handleEvent, pFcMgr, std::placeholders::_1 ) );
 
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
