@@ -64,6 +64,9 @@
 #include "WorldServer.h"
 #include "Forwards.h"
 
+#include <Event/EventDispatcher.h>
+#include <Event/EventDefinitions/EventDefinitions.h>
+
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
@@ -370,7 +373,7 @@ void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PAC
 void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-
+  auto& eventDispatcher = Common::Service< Common::EventSystem::EventDispatcher >::ref();
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -382,8 +385,9 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   // if this is a login event
   if( player.isLogin() )
   {
+    eventDispatcher.emit( EventSystem::LoginEvent( player.getCharacterId() ) );
     // fire the onLogin Event
-    playerMgr.onLogin( player );
+    //playerMgr.onLogin( player );
   }
 
   // spawn the player for himself

@@ -5,13 +5,12 @@
 #include <vector>
 #include "ForwardsZone.h"
 #include "FreeCompany/FreeCompany.h"
+#include <Event/Observer.h>
 
 namespace Sapphire::World::Manager
 {
 
-
-
-  class FreeCompanyMgr
+  class FreeCompanyMgr : public Common::EventSystem::EventObserver
   {
   private:
     std::unordered_map< uint64_t, FreeCompanyPtr > m_fcIdMap;
@@ -26,6 +25,8 @@ namespace Sapphire::World::Manager
   public:
 
     FreeCompanyMgr() = default;
+
+    void handleEvent( const Common::EventSystem::Event& e );
 
     // initialize all fcs from db to memory
     bool loadFreeCompanies();

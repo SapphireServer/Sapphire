@@ -54,6 +54,9 @@
 #include "Manager/FreeCompanyMgr.h"
 #include "Manager/MapMgr.h"
 
+#include <Event/EventDispatcher.h>
+#include <Event/EventDefinitions/EventDefinitions.h>
+
 #include "ContentFinder/ContentFinder.h"
 
 #include "Territory/InstanceObjectCache.h"
@@ -181,8 +184,11 @@ void WorldServer::run( int32_t argc, char* argv[] )
   auto pChatChannelMgr = std::make_shared< Manager::ChatChannelMgr >();
   Common::Service< Manager::ChatChannelMgr >::set( pChatChannelMgr );
 
-  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >();
+  auto dispatcher = std::make_shared< Common::EventSystem::EventDispatcher >();
+  Logger::info( "EventDispatcher: Setup of event dispatcher" );
+  Common::Service< Common::EventSystem::EventDispatcher >::set( dispatcher );
 
+  auto pLsMgr = std::make_shared< Manager::LinkshellMgr >();
   Logger::info( "LinkshellMgr: Caching linkshells" );
   if( !pLsMgr->loadLinkshells() )
   {
@@ -305,6 +311,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< Manager::BlacklistMgr >::set( pBlacklistMgr );
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
+
+  dispatcher->subscribe( Common::EventSystem::LoginEvent::descriptor, std::bind( &Manager::PlayerMgr::handleEvent, pPlayerMgr, std::placeholders::_1 ) );
 
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );

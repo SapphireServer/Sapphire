@@ -438,7 +438,7 @@ namespace Sapphire::Entity
     uint8_t getHomepoint() const;
 
     /*! discover subarea subid fo map map_id, also send udpate packet */
-    void discover( int16_t map_id, int16_t sub_id );
+    void discover( int16_t mapId, int16_t subId );
 
     /*! return a reference to the discovery bitmask array */
     Discovery& getDiscoveryBitmask();

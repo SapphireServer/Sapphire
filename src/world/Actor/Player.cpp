@@ -477,20 +477,16 @@ Player::Discovery& Player::getDiscoveryBitmask()
   return m_discovery;
 }
 
-void Player::discover( int16_t map_id, int16_t sub_id )
+void Player::discover( int16_t mapId, int16_t subId )
 {
-  // map.exd field 12 -> index in one of the two discovery sections, if field 15 is false, need to use 2nd section
-  // section 1 starts at 0 - 2 bytes each
-  // section to starts at 320 - 4 bytes long
-
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   int32_t offset;
 
-  auto info = exdData.getRow< Excel::Map >( map_id );
+  auto info = exdData.getRow< Excel::Map >( mapId );
   if( !info )
   {
-    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", map_id );
+    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", mapId );
     return;
   }
 
@@ -499,15 +495,15 @@ void Player::discover( int16_t map_id, int16_t sub_id )
   else
     offset = 320 + 4 * info->data().DiscoveryIndex;
 
-  int32_t index = offset + sub_id / 8;
-  uint8_t bitIndex = sub_id % 8;
+  uint16_t index;
+  uint8_t bitIndex;
+  uint8_t value;
 
-  uint8_t value = 1 << bitIndex;
+  Util::valueToFlagByteIndexValue( subId, value, index );
 
-  m_discovery[ index ] |= value;
+  m_discovery[ index + offset ] |= value;
 
   uint16_t level = getLevel();
-
   uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
 
   gainExp( exp );
@@ -517,8 +513,7 @@ void Player::discover( int16_t map_id, int16_t sub_id )
   uint32_t discoveredAreas;
   if( info->data().IsUint16Discovery )
   {
-    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) |
-                        m_discovery[ offset ];
+    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) | m_discovery[ offset ];
   }
   else
   {

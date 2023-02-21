@@ -22,11 +22,22 @@
 #include <Network/PacketDef/ClientIpcs.h>
 
 #include "Session.h"
+#include <Event/EventDefinitions/EventDefinitions.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
+
+void FreeCompanyMgr::handleEvent( const Common::EventSystem::Event& e )
+{
+  if( e.type() == Common::EventSystem::LoginEvent::descriptor )
+  {
+    const Common::EventSystem::LoginEvent& loginEvent = static_cast< const Common::EventSystem::LoginEvent& >( e );
+    onFcLogin( loginEvent.characterId );
+  }
+
+}
 
 bool FreeCompanyMgr::loadFreeCompanies()
 {

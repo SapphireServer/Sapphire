@@ -7,6 +7,7 @@ file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Crypt/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Database/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Exd/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Event/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Logging/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Network/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Network/PacketDef/*.cpp"

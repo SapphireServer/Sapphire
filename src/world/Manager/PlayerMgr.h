@@ -3,13 +3,16 @@
 #include "ForwardsZone.h"
 #include <spdlog/fmt/fmt.h>
 #include "MgrUtil.h"
+#include <Event/Observer.h>
 
 namespace Sapphire::World::Manager
 {
-  class PlayerMgr
+  class PlayerMgr : public Common::EventSystem::EventObserver
   {
   public:
     PlayerMgr() = default;
+
+    void handleEvent( const Common::EventSystem::Event& e );
 
     void onOnlineStatusChanged( Sapphire::Entity::Player& player, bool updateProfile = true );
 

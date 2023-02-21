@@ -41,12 +41,24 @@
 
 #include <Util/UtilMath.h>
 
+#include <Event/EventDefinitions/EventDefinitions.h>
+
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
+void PlayerMgr::handleEvent( const Common::EventSystem::Event& e )
+{
+  if( e.type() == Common::EventSystem::LoginEvent::descriptor )
+  {
+    const Common::EventSystem::LoginEvent& loginEvent = static_cast< const Common::EventSystem::LoginEvent& >( e );
+    auto player = server().getPlayer( loginEvent.characterId );
+    onLogin( *player );
+  }
+
+}
 
 void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfile )
 {
