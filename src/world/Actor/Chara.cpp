@@ -602,11 +602,11 @@ void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
   }
 }
 
-void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
+std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
-    return;
+    return pEffectIt;
 
   statusEffectFreeSlot( effectSlotId );
 
@@ -615,12 +615,14 @@ void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
 
   server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), StatusEffectLose, pEffect->getId() ) );
 
-  m_statusEffectMap.erase( effectSlotId );
+  auto it = m_statusEffectMap.erase( pEffectIt );
 
   if( isPlayer() )
     server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsPlayer() ) );
   else if( isBattleNpc() )
     server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsBNpc() ) );
+
+  return it;
 }
 
 std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectMap() const
@@ -672,10 +674,10 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-  for( const auto& effectIt : m_statusEffectMap )
+  for( auto effectIt = m_statusEffectMap.begin(); effectIt != m_statusEffectMap.end(); )
   {
-    uint8_t effectIndex = effectIt.first;
-    auto effect = effectIt.second;
+    uint8_t effectIndex = effectIt->first;
+    auto effect = effectIt->second;
 
     uint64_t lastTick = effect->getLastTickMs();
     uint64_t startTime = effect->getStartTimeMs();
@@ -683,12 +685,9 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     uint32_t tickRate = effect->getTickRate();
 
     if( duration > 0 && ( currentTimeMs - startTime ) > duration )
-    {
-      // remove status effect
-      removeStatusEffect( effectIndex );
-      // break because removing invalidates iterators
-      break;
-    }
+      effectIt = removeStatusEffect( effectIndex );
+    else
+      ++effectIt;
 
     if( ( currentTimeMs - lastTick ) > tickRate )
     {
