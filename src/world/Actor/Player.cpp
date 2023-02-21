@@ -136,12 +136,12 @@ void Player::unload()
 // TODO: add a proper calculation based on race / job / level / gear
 uint32_t Player::getMaxHp()
 {
-  return max_hp;
+  return m_maxHp;
 }
 
 uint32_t Player::getMaxMp()
 {
-  return max_mp;
+  return m_maxMp;
 }
 
 uint32_t Player::getPrevTerritoryId() const
@@ -373,15 +373,15 @@ void Player::calculateStats()
 
   setStatValue( BaseParam::PiercingResistance, 0 );
 
-  max_mp = Math::CalcStats::calculateMaxMp( *this );
+  m_maxMp = Math::CalcStats::calculateMaxMp( *this );
 
-  max_hp = Math::CalcStats::calculateMaxHp( *this );
+  m_maxHp = Math::CalcStats::calculateMaxHp( *this );
 
-  if( m_mp > max_mp )
-    m_mp = max_mp;
+  if( m_mp > m_maxMp )
+    m_mp = m_maxMp;
 
-  if( m_hp > max_hp )
-    m_hp = max_hp;
+  if( m_hp > m_maxHp )
+    m_hp = m_maxHp;
 }
 
 

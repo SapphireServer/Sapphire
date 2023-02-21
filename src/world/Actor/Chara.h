@@ -54,10 +54,6 @@ namespace Sapphire::Entity
     uint16_t m_tp;
     /*! Current GP of the actor */
     uint16_t m_gp;
-    /*! max mp of the actor */
-    uint32_t max_mp = 0;
-    /*! max hp of the actor */
-    uint32_t max_hp = 0;
     /*! Additional look info of the actor */
     uint8_t m_customize[26];
     /*! Additional model info */

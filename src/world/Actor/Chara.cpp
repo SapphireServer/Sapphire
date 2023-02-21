@@ -200,13 +200,13 @@ bool Sapphire::Entity::Chara::isAlive() const
 /*! \return max hp for the actor */
 uint32_t Sapphire::Entity::Chara::getMaxHp() const
 {
-  return max_hp;
+  return m_maxHp;
 }
 
 /*! \return max mp for the actor */
 uint32_t Sapphire::Entity::Chara::getMaxMp() const
 {
-  return max_mp;
+  return m_maxMp;
 }
 
 /*! \return reset hp to current max hp */

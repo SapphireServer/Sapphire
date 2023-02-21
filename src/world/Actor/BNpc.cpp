@@ -120,9 +120,6 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   m_state = BNpcState::Idle;
   m_status = ActorStatus::Idle;
 
-  max_hp = m_maxHp;
-  max_mp = 200;
-
   memset( m_customize, 0, sizeof( m_customize ) );
   memset( m_modelEquip, 0, sizeof( m_modelEquip ) );
 
@@ -165,8 +162,6 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   if( m_bnpcType == BNpcType::Friendly )
     m_maxHp *= 5;
-
-  max_hp = m_maxHp;
 
 }
 
@@ -230,9 +225,6 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
   m_state = BNpcState::Idle;
   m_status = ActorStatus::Idle;
-
-  max_hp = hp;
-  max_mp = 200;
 
   m_bnpcType = type;
 
@@ -1074,5 +1066,4 @@ void Sapphire::Entity::BNpc::init()
 {
   m_maxHp = Sapphire::Math::CalcStats::calculateMaxHp( *getAsChara() );
   m_hp = m_maxHp;
-  max_hp = m_maxHp;
 }
