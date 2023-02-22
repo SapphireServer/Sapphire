@@ -347,9 +347,11 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLoginHandler >( inPacket );
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   player.setIsLogin( true );
   player.setConnected( true );
   teriMgr.joinWorld( player );
+  playerMgr.onLogin( player );
   fcMgr.onFcLogin( player.getCharacterId() );
 }
 
@@ -382,8 +384,7 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   // if this is a login event
   if( player.isLogin() )
   {
-    // fire the onLogin Event
-    playerMgr.onLogin( player );
+    playerMgr.sendLoginMessage( player );
   }
 
   // spawn the player for himself

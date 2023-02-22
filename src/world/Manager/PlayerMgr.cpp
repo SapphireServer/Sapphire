@@ -337,7 +337,7 @@ void PlayerMgr::onClassChanged( Entity::Player& player )
   onPlayerHpMpTpChanged( player );
 }
 
-void PlayerMgr::onLogin( Entity::Player& player )
+void PlayerMgr::sendLoginMessage( Entity::Player& player )
 {
   auto motd = server().getConfig().motd;
 
@@ -349,15 +349,16 @@ void PlayerMgr::onLogin( Entity::Player& player )
   }
 }
 
+void PlayerMgr::onLogin( Entity::Player &player )
+{
+
+}
+
 void PlayerMgr::onLogout( Entity::Player &player )
 {
   auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
   // send updates to mgrs
-  if( player.getPartyId() != 0 )
-    partyMgr.onMemberDisconnect( player );
-
-  fcMgr.onFcLogout( player.getCharacterId() );
+  partyMgr.onMemberDisconnect( player );
 }
 
 void PlayerMgr::onDeath( Entity::Player& player )
@@ -455,11 +456,6 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
     onGrandCompanyChanged( player );
-  }
-
-  if( player.getPartyId() != 0 )
-  {
-    partyMgr.onMoveZone( player );
   }
 
 }

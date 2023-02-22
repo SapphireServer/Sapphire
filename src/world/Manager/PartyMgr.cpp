@@ -171,6 +171,8 @@ void PartyMgr::onDisband( Entity::Player& disbandingPlayer )
 
 void PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
 {
+  if( movingPlayer.getPartyId() == 0 )
+    return;
   auto party = getParty( movingPlayer.getPartyId() );
   assert( party );
   sendPartyUpdate( *party );
@@ -178,6 +180,9 @@ void PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
 
 void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
 {
+  if( disconnectingPlayer.getPartyId() == 0 )
+    return;
+
   auto& server = Common::Service< World::WorldServer >::ref();
   auto party = getParty( disconnectingPlayer.getPartyId() );
   assert( party );

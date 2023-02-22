@@ -9,6 +9,7 @@
 #include "Actor/Player.h"
 #include "WorldServer.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/FreeCompanyMgr.h"
 
 #include "Session.h"
 
@@ -78,8 +79,9 @@ void Sapphire::World::Session::close()
   if( m_pPlayer )
   {
     auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+    auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
     playerMgr.onLogout( *m_pPlayer );
-
+    fcMgr.onFcLogout( m_pPlayer->getCharacterId() );
     m_pPlayer->unload();
   }
 }
