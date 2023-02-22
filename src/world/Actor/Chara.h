@@ -106,7 +106,7 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    void removeStatusEffect( uint8_t effectSlotId );
+    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId );
 
     void removeSingleStatusEffectById( uint32_t id );
 
