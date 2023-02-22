@@ -101,7 +101,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubSea014::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -116,7 +116,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubSea014::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -128,7 +128,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, NONE, bindSceneReturn( &SubSea014::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -141,7 +141,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, NONE, bindSceneReturn( &SubSea014::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -154,7 +154,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &SubSea014::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -167,7 +167,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, NONE, bindSceneReturn( &SubSea014::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -180,7 +180,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00006( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 6, NONE, bindSceneReturn( &SubSea014::Scene00006Return ) );
+    eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00006Return ) );
   }
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -193,7 +193,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00007( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 7, NONE, bindSceneReturn( &SubSea014::Scene00007Return ) );
+    eventMgr().playQuestScene( player, getId(), 7, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00007Return ) );
   }
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -206,7 +206,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00008( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 8, NONE, bindSceneReturn( &SubSea014::Scene00008Return ) );
+    eventMgr().playQuestScene( player, getId(), 8, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00008Return ) );
   }
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -219,7 +219,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00009( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 9, NONE, bindSceneReturn( &SubSea014::Scene00009Return ) );
+    eventMgr().playQuestScene( player, getId(), 9, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00009Return ) );
   }
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -232,7 +232,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00010( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 10, NONE, bindSceneReturn( &SubSea014::Scene00010Return ) );
+    eventMgr().playQuestScene( player, getId(), 10, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00010Return ) );
   }
 
   void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -245,7 +245,7 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00011( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 11, NONE, bindSceneReturn( &SubSea014::Scene00011Return ) );
+    eventMgr().playQuestScene( player, getId(), 11, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00011Return ) );
   }
 
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
