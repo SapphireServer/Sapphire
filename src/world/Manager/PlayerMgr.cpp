@@ -355,13 +355,9 @@ void PlayerMgr::onLogin( const Common::EventSystem::Event& e )
 
 void PlayerMgr::onLogout( const Common::EventSystem::Event& e )
 {
+  Logger::debug( "{}", __FUNCTION__  );
   const auto& logoutEvent = dynamic_cast< const Common::EventSystem::LogoutEvent& >( e );
   auto player = *server().getPlayer( logoutEvent.characterId );
-
-  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-  // send updates to mgrs
-  if( player.getPartyId() != 0 )
-    partyMgr.onMemberDisconnect( player );
 }
 
 void PlayerMgr::onDeath( Entity::Player& player )
@@ -461,11 +457,7 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
     onGrandCompanyChanged( player );
   }
 
-  if( player.getPartyId() != 0 )
-  {
-    partyMgr.onMoveZone( player );
-  }
-
+  partyMgr.onMoveZone( player );
 }
 
 void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )

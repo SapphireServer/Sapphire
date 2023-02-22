@@ -63,6 +63,7 @@
 
 using namespace Sapphire::World;
 using namespace Sapphire::World::Manager;
+using namespace Sapphire::Common::EventSystem;
 
 WorldServer::WorldServer( const std::string& configName ) :
   m_configName( configName ),
@@ -312,16 +313,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
 
-  using namespace Common;
-  using namespace Manager;
-  using namespace std::placeholders;
-
-  dispatcher->subscribe( EventSystem::LoginEvent::descriptor, std::bind( &PlayerMgr::onLogin, pPlayerMgr, _1 ) );
-  dispatcher->subscribe( EventSystem::LoginEvent::descriptor, std::bind( &FreeCompanyMgr::onFcLogin, pFcMgr, _1 ) );
-
-  dispatcher->subscribe( EventSystem::LogoutEvent::descriptor, std::bind( &PlayerMgr::onLogout, pPlayerMgr, _1 ) );
-  dispatcher->subscribe( EventSystem::LogoutEvent::descriptor, std::bind( &FreeCompanyMgr::onFcLogout, pFcMgr, _1 ) );
-
+  setupEvents();
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
@@ -331,6 +323,35 @@ void WorldServer::run( int32_t argc, char* argv[] )
   {
     thread_entry.join();
   }
+
+}
+
+void WorldServer::setupEvents()
+{
+  Logger::info( "Setting up events" );
+
+  auto& playerMgr = Common::Service< Manager::PlayerMgr >::ref();
+  auto& partyMgr = Common::Service< Manager::PartyMgr >::ref();
+  auto& fcMgr = Common::Service< Manager::FreeCompanyMgr >::ref();
+
+  auto& dispatcher = Common::Service< EventDispatcher >::ref();
+
+  using namespace Common;
+  using namespace Manager;
+  using namespace std::placeholders;
+
+  dispatcher.subscribe( LoginEvent::descriptor,
+                        {
+                          BIND_EVENT( &PlayerMgr::onLogin, &playerMgr ),
+                          BIND_EVENT( &FreeCompanyMgr::onFcLogin, &fcMgr )
+                        } );
+
+  dispatcher.subscribe( LogoutEvent::descriptor,
+                        {
+                          BIND_EVENT( &PlayerMgr::onLogout, &playerMgr ),
+                          BIND_EVENT( &FreeCompanyMgr::onFcLogout, &fcMgr ),
+                          BIND_EVENT( &PartyMgr::onMemberLogout, &partyMgr )
+                        } );
 
 }
 
@@ -419,7 +440,7 @@ void WorldServer::updateSessions( uint32_t currTime )
       player.addOnlineStatus( Common::OnlineStatus::Offline );
 
       auto dispatcher = Common::Service< Common::EventSystem::EventDispatcher >::ref();
-      dispatcher.emit( Common::EventSystem::LogoutEvent( player.getCharacterId() ) );
+      dispatcher.emit( Common::EventSystem::LogoutEvent( player.getCharacterId(), !player.isMarkedForRemoval() ) );
       Logger::info( "[{0}] Session removal", session->getId() );
       session->close();
       sessionRemovalQueue.push( session->getId() );

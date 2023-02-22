@@ -171,15 +171,27 @@ void PartyMgr::onDisband( Entity::Player& disbandingPlayer )
 
 void PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
 {
+  if( movingPlayer.getPartyId() == 0 )
+    return;
   auto party = getParty( movingPlayer.getPartyId() );
   assert( party );
   sendPartyUpdate( *party );
 }
 
-void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
+void PartyMgr::onMemberLogout( const Common::EventSystem::Event& e )
 {
+  Logger::debug( "{}", __FUNCTION__  );
+  const auto& logoutEvent = dynamic_cast< const Common::EventSystem::LogoutEvent& >( e );
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto party = getParty( disconnectingPlayer.getPartyId() );
+  auto pMember = server.getPlayer( logoutEvent.characterId );
+
+  if( !pMember )
+    return;
+
+  if( pMember->getPartyId() == 0 )
+    return;
+
+  auto party = getParty( pMember->getPartyId() );
   assert( party );
   auto members = getPartyMembers( *party );
   auto pLeader = getPartyLeader( *party );
@@ -203,8 +215,8 @@ void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
   for( const auto& member : members )
   {
     // TODO: 2nd argument here makes it automatically send passing leadership message
-    server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( disconnectingPlayer, UpdateStatus::OFFLINE_MEMBER, party->PartyCount ),
-                                                          makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
+    server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( *pMember, UpdateStatus::OFFLINE_MEMBER, party->PartyCount ),
+                                                       makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
   }
 
   sendPartyUpdate( *party );

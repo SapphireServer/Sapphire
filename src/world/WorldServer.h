@@ -47,6 +47,8 @@ namespace Sapphire::World
 
     void printBanner() const;
 
+    void setupEvents();
+
     bool loadSettings( int32_t argc, char* argv[] );
 
     std::string getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad = false );

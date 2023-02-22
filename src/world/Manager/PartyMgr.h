@@ -7,6 +7,8 @@
 #include <set>
 #include <unordered_map>
 
+#include <Event/EventDefinitions/EventDefinitions.h>
+
 namespace Sapphire::World::Manager
 {
 
@@ -56,7 +58,8 @@ namespace Sapphire::World::Manager
     void onKick( const std::string& kickPlayerName, Entity::Player& leader );
     void onChangeLeader( const std::string& newLeaderName, Entity::Player& oldLeader );
 
-    void onMemberDisconnect( Entity::Player& disconnectingPlayer );
+    void onMemberLogout( const Common::EventSystem::Event& e );
+
     void onMemberRejoin( Entity::Player& joiningPlayer );
 
     void onJoinBuddy( Entity::Player& buddyOwner, Party& party );

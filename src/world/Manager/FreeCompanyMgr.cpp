@@ -271,6 +271,7 @@ void FreeCompanyMgr::onFcLogin( const Common::EventSystem::Event& e )
 
 void FreeCompanyMgr::onFcLogout( const Common::EventSystem::Event& e )
 {
+  Logger::debug( "{}", __FUNCTION__  );
   const auto& logoutEvent = static_cast< const Common::EventSystem::LogoutEvent& >( e );
   auto& server = Common::Service< World::WorldServer >::ref();
   auto player = server.getPlayer( logoutEvent.characterId );

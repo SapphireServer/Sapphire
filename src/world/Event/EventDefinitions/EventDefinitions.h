@@ -9,11 +9,9 @@ namespace Sapphire::Common::EventSystem
   {
   public:
     static constexpr DescriptorType descriptor = "LoginEvent";
-    virtual DescriptorType type() const { return descriptor; }
+    DescriptorType type() const override { return descriptor; }
 
-    LoginEvent( uint64_t charId ) : characterId( charId ) {};
-    virtual ~LoginEvent() = default;
-
+    explicit LoginEvent( uint64_t charId ) : characterId( charId ) {};
 
     uint64_t characterId;
   };
@@ -22,13 +20,12 @@ namespace Sapphire::Common::EventSystem
   {
   public:
     static constexpr DescriptorType descriptor = "LogoutEvent";
-    virtual DescriptorType type() const { return descriptor; }
+    DescriptorType type() const override { return descriptor; }
 
-    LogoutEvent( uint64_t charId ) : characterId( charId ) {};
-    virtual ~LogoutEvent() = default;
-
+    LogoutEvent( uint64_t charId, bool disconnect ) : characterId( charId ), isDisconnect( disconnect ) {};
 
     uint64_t characterId;
+    bool isDisconnect;
   };
 
 }

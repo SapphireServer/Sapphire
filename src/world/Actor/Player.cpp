@@ -496,7 +496,6 @@ void Player::discover( int16_t mapId, int16_t subId )
     offset = 320 + 4 * info->data().DiscoveryIndex;
 
   uint16_t index;
-  uint8_t bitIndex;
   uint8_t value;
 
   Util::valueToFlagByteIndexValue( subId, value, index );

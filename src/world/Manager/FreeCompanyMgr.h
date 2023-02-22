@@ -5,7 +5,6 @@
 #include <vector>
 #include "ForwardsZone.h"
 #include "FreeCompany/FreeCompany.h"
-#include <Event/Observer.h>
 #include <Event/EventDefinitions/EventDefinitions.h>
 
 namespace Sapphire::World::Manager
