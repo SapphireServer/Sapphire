@@ -93,9 +93,8 @@ void ItemAction::handleCompanionItem()
 {
   auto player = getSourceChara()->getAsPlayer();
 
-  Logger::debug( "Companion arg: {0}", m_itemAction->data().Calcu0Arg[ 0 ] );
-
   player->unlockCompanion( m_itemAction->data().Calcu0Arg[ 0 ] );
+  player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot );
 }
 
 void ItemAction::handleMountItem()
@@ -103,5 +102,5 @@ void ItemAction::handleMountItem()
   auto player = getSourceChara()->getAsPlayer();
 
   player->unlockMount( m_itemAction->data().Calcu0Arg[ 0 ] );
-  player->discardItem( m_itemSourceContainer, m_itemSourceSlot );
+  player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), m_itemSourceSlot );
 }
