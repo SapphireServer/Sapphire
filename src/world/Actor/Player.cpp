@@ -119,8 +119,6 @@ Player::~Player() = default;
 
 void Player::unload()
 {
-  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-  auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
   // do one last update to db
   updateSql();
   // reset isLogin and loading sequences just in case
@@ -655,10 +653,10 @@ void Player::levelUp()
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
-void Player::sendStatusUpdate()
+void Player::sendHudParam()
 {
   // todo: overrides are funky
-  Service< World::Manager::PlayerMgr >::ref().onPlayerHpMpTpChanged( *this );
+  Service< World::Manager::PlayerMgr >::ref().onHudParamChanged( *this );
 }
 
 uint8_t Player::getLevel() const
@@ -729,7 +727,7 @@ void Player::setClassJob( Common::ClassJob classJob )
 
   m_tp = 0;
 
-  Service< World::Manager::PlayerMgr >::ref().onPlayerStatusUpdate( *this );
+  Service< World::Manager::PlayerMgr >::ref().sendStatusUpdate( *this );
   Service< World::Manager::PlayerMgr >::ref().onClassChanged( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }

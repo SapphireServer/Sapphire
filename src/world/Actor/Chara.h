@@ -223,7 +223,7 @@ namespace Sapphire::Entity
 
     virtual uint8_t getLevel() const;
 
-    virtual void sendStatusUpdate();
+    virtual void sendHudParam();
 
     virtual void takeDamage( uint32_t damage );
 

@@ -13,7 +13,7 @@
 #include "Network/GameConnection.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include "Network/PacketWrappers/UpdateHpMpTpPacket.h"
+#include "Network/PacketWrappers/RestingPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
 #include "Network/PacketWrappers/HudParamPacket.h"
 
@@ -214,42 +214,36 @@ uint32_t Sapphire::Entity::Chara::getMaxMp() const
 void Sapphire::Entity::Chara::resetHp()
 {
   m_hp = getMaxHp();
-  sendStatusUpdate();
 }
 
 /*! \return reset mp to current max mp */
 void Sapphire::Entity::Chara::resetMp()
 {
   m_mp = getMaxMp();
-  sendStatusUpdate();
 }
 
 /*! \param hp amount to set ( caps to maxHp ) */
 void Sapphire::Entity::Chara::setHp( uint32_t hp )
 {
   m_hp = hp < getMaxHp() ? hp : getMaxHp();
-  sendStatusUpdate();
 }
 
 /*! \param mp amount to set ( caps to maxMp ) */
 void Sapphire::Entity::Chara::setMp( uint32_t mp )
 {
   m_mp = mp < getMaxMp() ? mp : getMaxMp();
-  sendStatusUpdate();
 }
 
 /*! \param gp amount to set*/
 void Sapphire::Entity::Chara::setGp( uint32_t gp )
 {
   m_gp = static_cast< uint16_t >( gp );
-  sendStatusUpdate();
 }
 
 /*! \param tp amount to set*/
 void Sapphire::Entity::Chara::setTp( uint32_t tp )
 {
   m_tp = static_cast< uint16_t >( tp );
-  sendStatusUpdate();
 }
 
 /*! \param type invincibility type to set */
@@ -427,8 +421,6 @@ void Sapphire::Entity::Chara::heal( uint32_t amount )
   }
   else
     m_hp += amount;
-
-  sendStatusUpdate();
 }
 
 void Sapphire::Entity::Chara::restoreMP( uint32_t amount )
@@ -439,8 +431,6 @@ void Sapphire::Entity::Chara::restoreMP( uint32_t amount )
   }
   else
     m_mp += amount;
-
-  sendStatusUpdate();
 }
 
 /*!
@@ -450,10 +440,10 @@ so players can have their own version and we can abolish the param.
 
 \param true if the update should also be sent to the actor ( player ) himself
 */
-void Sapphire::Entity::Chara::sendStatusUpdate()
+void Sapphire::Entity::Chara::sendHudParam()
 {
-  FFXIVPacketBasePtr packet = std::make_shared< UpdateHpMpTpPacket >( *this );
-  server().queueForPlayers( getInRangePlayerIds(), packet );
+  FFXIVPacketBasePtr packet = makeHudParam( *this );
+  server().queueForPlayers( getInRangePlayerIds( isPlayer() ), packet );
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */

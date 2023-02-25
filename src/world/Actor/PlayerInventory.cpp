@@ -99,13 +99,12 @@ void Sapphire::Entity::Player::initInventory()
   setupContainer( HandIn, 10, "", true, false );
 
   loadInventory();
-
+  calculateItemLevel();
 }
 
 void Sapphire::Entity::Player::sendItemLevel()
 {
-  calculateEquippedGearItemLevel();
-  Service< World::Manager::PlayerMgr >::ref().onPlayerItemLevelUpdate( *this );
+  Service< World::Manager::PlayerMgr >::ref().sendItemLevel( *this );
 }
 
 void Sapphire::Entity::Player::equipWeapon( const Item& item )
@@ -227,12 +226,13 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
   updateModels( equipSlotId, item );
 
   calculateStats();
+  calculateItemLevel();
   if( sendUpdate )
   {
     sendModel();
     sendItemLevel();
     sendStats();
-    sendStatusUpdate();
+    sendHudParam();
   }
 }
 
@@ -247,13 +247,14 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
     unequipSoulCrystal();
 
   calculateStats();
+  calculateItemLevel();
 
   if( sendUpdate )
   {
     sendModel();
     sendItemLevel();
     sendStats();
-    sendStatusUpdate();
+    sendHudParam();
   }
 }
 
@@ -991,7 +992,7 @@ void Sapphire::Entity::Player::discardItem( uint16_t fromInventoryId, uint16_t f
   server().queueForPlayer( getCharacterId(), invTransFinPacket );
 }
 
-uint16_t Sapphire::Entity::Player::calculateEquippedGearItemLevel()
+uint16_t Sapphire::Entity::Player::calculateItemLevel()
 {
   uint32_t iLvlResult = 0;
 

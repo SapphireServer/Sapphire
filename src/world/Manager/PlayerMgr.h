@@ -15,13 +15,15 @@ namespace Sapphire::World::Manager
 
     void onEquipDisplayFlagsChanged( Sapphire::Entity::Player& player );
 
-    void onPlayerStatusUpdate( Sapphire::Entity::Player& player );
+    void sendStatusUpdate( Sapphire::Entity::Player& player );
 
     void onUnlockAchievement( Sapphire::Entity::Player& player, uint32_t achievementId );
 
-    void onPlayerHpMpTpChanged( Sapphire::Entity::Player& player );
+    void onHudParamChanged( Sapphire::Entity::Player& player );
 
-    void onPlayerItemLevelUpdate( Sapphire::Entity::Player& player );
+    void onRestingTick( Sapphire::Entity::Player& player );
+
+    void sendItemLevel( Sapphire::Entity::Player& player );
 
     void onLevelUp( Sapphire::Entity::Player& player );
 
@@ -53,7 +55,7 @@ namespace Sapphire::World::Manager
     void onAchievementListChanged( Sapphire::Entity::Player& player );
     void onAchievementProgressChanged( Sapphire::Entity::Player& player, uint32_t achievementId );
     void onGearChanged( Sapphire::Entity::Player& player );
-    void onGrandCompanyChanged( Sapphire::Entity::Player& player );
+    void sendGrandCompany( Sapphire::Entity::Player& player );
     void onClassChanged( Sapphire::Entity::Player& player );
 
     void setCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag );

@@ -581,7 +581,7 @@ namespace Sapphire::Entity
     void sendModel();
 
     /*! send status update */
-    void sendStatusUpdate() override;
+    void sendHudParam() override;
 
     /*! send the entire inventory sequence */
     void sendInventory();
@@ -749,7 +749,7 @@ namespace Sapphire::Entity
     bool updateContainer( uint16_t storageId, uint16_t slotId, ItemPtr pItem );
 
     /*! calculate and return player ilvl based off equipped gear */
-    uint16_t calculateEquippedGearItemLevel();
+    uint16_t calculateItemLevel();
 
 
     /*! calculate bonus stats from gear */
@@ -1003,6 +1003,7 @@ namespace Sapphire::Entity
 
     int8_t getFreeQuestSlot();
 
+    bool performResting();
   };
 
 }

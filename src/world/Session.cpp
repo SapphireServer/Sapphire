@@ -10,6 +10,7 @@
 #include "WorldServer.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/FreeCompanyMgr.h"
+#include "Manager/PartyMgr.h"
 
 #include "Session.h"
 
@@ -80,8 +81,10 @@ void Sapphire::World::Session::close()
   {
     auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
     auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
+    auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
     playerMgr.onLogout( *m_pPlayer );
     fcMgr.onFcLogout( m_pPlayer->getCharacterId() );
+    partyMgr.onMemberDisconnect( *m_pPlayer );
     m_pPlayer->unload();
   }
 }

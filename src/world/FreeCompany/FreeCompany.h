@@ -142,8 +142,6 @@ namespace Sapphire
     void addMember( uint64_t memberId, uint8_t hierarchyId, uint32_t lastLogout );
     void removeMember( uint64_t memberId );
 
-
-
   };
 
 }

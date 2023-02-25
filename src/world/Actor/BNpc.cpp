@@ -627,7 +627,7 @@ void Sapphire::Entity::BNpc::onTick()
   Chara::onTick();
   if( m_state == BNpcState::Retreat )
   {
-    regainHp();
+    restHp();
   }
 }
 
@@ -792,19 +792,19 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   Chara::update( tickCount );
 }
 
-void Sapphire::Entity::BNpc::regainHp()
+void Sapphire::Entity::BNpc::restHp()
 {
-  if( this->m_hp < this->getMaxHp() )
+  if( m_hp < getMaxHp() )
   {
     auto addHp = static_cast< uint32_t >( getMaxHp() * 0.1f + 1 );
 
-    if( this->m_hp + addHp < this->getMaxHp() )
-      this->m_hp += addHp;
+    if( m_hp + addHp < getMaxHp() )
+      m_hp += addHp;
     else
-      this->m_hp = this->getMaxHp();
+      m_hp = getMaxHp();
   }
 
-  this->sendStatusUpdate();
+  sendHudParam();
 }
 
 void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )

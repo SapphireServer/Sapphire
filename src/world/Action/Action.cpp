@@ -521,6 +521,7 @@ void Action::Action::buildEffects()
 
     return;
   }
+  Service< World::Manager::PlayerMgr >::ref().onHudParamChanged( *m_pSource->getAsPlayer() );
 
   if( !hasLutEntry || m_hitActors.empty() )
   {

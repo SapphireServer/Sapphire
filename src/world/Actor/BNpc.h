@@ -127,7 +127,7 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
-    void regainHp();
+    void restHp();
 
     void checkAggro();
 

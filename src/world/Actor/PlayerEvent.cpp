@@ -11,6 +11,7 @@
 #include "Action/EventAction.h"
 #include "Manager/PlayerMgr.h"
 #include "Service.h"
+#include <Network/PacketWrappers/RestingPacket.h>
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -64,11 +65,18 @@ void Sapphire::Entity::Player::onTick()
   // add 3 seconds to total play time
   m_playTime += 3;
 
-  bool sendUpdate = false;
-
   if( !isAlive() || !isLoadingComplete() )
     return;
 
+  bool sendUpdate = performResting();
+
+  if( sendUpdate )
+    server().queueForPlayers( getInRangePlayerIds( true ), std::make_shared< RestingPacket >( *this ) );
+}
+
+bool Sapphire::Entity::Player::performResting()
+{
+  bool sendUpdate = false;
   auto addHp = static_cast< uint32_t >( static_cast< float >( getMaxHp() ) * 0.1f + 1 );
   auto addMp = static_cast< uint32_t >( static_cast< float >( getMaxMp() ) * 0.06f + 1 );
   uint32_t addTp = 100;
@@ -111,7 +119,5 @@ void Sapphire::Entity::Player::onTick()
 
     sendUpdate = true;
   }
-
-  if( sendUpdate )
-    sendStatusUpdate();
+  return sendUpdate;
 }

@@ -4,21 +4,17 @@
 
 #include <Exd/ExdData.h>
 
-#include <Territory/Territory.h>
 #include <Territory/Land.h>
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/AchievementMgr.h>
 #include <Manager/PartyMgr.h>
 #include <Manager/HousingMgr.h>
-#include <Manager/FreeCompanyMgr.h>
 #include <Manager/QuestMgr.h>
 
 #include <Script/ScriptMgr.h>
-#include <WorldServer.h>
 #include <Common.h>
 
-#include <Network/PacketContainer.h>
 #include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -29,7 +25,7 @@
 #include <Network/PacketWrappers/ModelEquipPacket.h>
 #include <Network/PacketWrappers/PlayerSetupPacket.h>
 #include <Network/PacketWrappers/ConditionPacket.h>
-#include <Network/PacketWrappers/UpdateHpMpTpPacket.h>
+#include <Network/PacketWrappers/RestingPacket.h>
 #include <Network/PacketWrappers/ServerNoticePacket.h>
 #include <Network/PacketWrappers/ChatPacket.h>
 #include <Network/PacketWrappers/HudParamPacket.h>
@@ -145,7 +141,7 @@ void PlayerMgr::onStatsChanged( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), statPacket );
 }
 
-void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
+void PlayerMgr::sendStatusUpdate( Entity::Player& player )
 {
   auto playerStatusUpdate = makeZonePacket< FFXIVIpcPlayerStatusUpdate >( player.getId() );
   playerStatusUpdate->data().ClassJob = static_cast< uint8_t >( player.getClass() );
@@ -157,14 +153,18 @@ void PlayerMgr::onPlayerStatusUpdate( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), playerStatusUpdate );
 }
 
-void PlayerMgr::onPlayerHpMpTpChanged( Entity::Player& player )
+void PlayerMgr::onHudParamChanged( Entity::Player& player )
 {
-  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< UpdateHpMpTpPacket >( player ) );
   auto hudParamPacket = makeHudParam( player );
   server().queueForPlayer( player.getCharacterId(), hudParamPacket );
 }
 
-void PlayerMgr::onPlayerItemLevelUpdate( Entity::Player& player )
+void PlayerMgr::onRestingTick( Entity::Player& player )
+{
+  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< RestingPacket >( player ) );
+}
+
+void PlayerMgr::sendItemLevel( Entity::Player& player )
 {
   server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), SetItemLevel, player.getItemLevel(), 0 ) );
 }
@@ -173,15 +173,15 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
 {
   player.calculateStats();
   player.sendStats();
-  onPlayerHpMpTpChanged( player );
+  player.sendHudParam();
 
   auto inRangePlayerIds = player.getInRangePlayerIds( true );
 
   server().queueForPlayers( inRangePlayerIds, makeHudParam( player ) );
   server().queueForPlayers( inRangePlayerIds, makeActorControl( player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
-                                                              player.getLevel(), player.getLevel() - 1 ) );
+                                                                player.getLevel(), player.getLevel() - 1 ) );
 
-  onPlayerStatusUpdate( player );
+  sendStatusUpdate( player );
 
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
@@ -221,7 +221,7 @@ void PlayerMgr::onGearChanged( Entity::Player& player )
   server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< ModelEquipPacket >( player ) );
 }
 
-void PlayerMgr::onGrandCompanyChanged( Entity::Player& player )
+void PlayerMgr::sendGrandCompany( Entity::Player& player )
 {
   auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
   gcAffPacket->data().ActiveCompanyId = player.getGc();
@@ -235,15 +235,13 @@ void PlayerMgr::onGrandCompanyChanged( Entity::Player& player )
 void PlayerMgr::setGrandCompany( Entity::Player& player, uint8_t gc )
 {
   player.setGc( gc );
-
-  onGrandCompanyChanged( player );
+  sendGrandCompany( player );
 }
 
 void PlayerMgr::setGrandCompanyRank( Entity::Player& player, uint8_t gc, uint8_t rank )
 {
   player.setGcRankAt( gc, rank );
-
-  onGrandCompanyChanged( player );
+  sendGrandCompany( player );
 }
 
 void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
@@ -265,13 +263,13 @@ void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
   if( mountId != 0 )
   {
     server().queueForPlayers( inRangePlayerIds,
-                            makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) ) );
+                              makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) ) );
     server().queueForPlayers( inRangePlayerIds, makeActorControlSelf( player.getId(), 0x39e, 12 ) );
   }
   else
   {
     server().queueForPlayers( inRangePlayerIds,
-                            makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) ) );
+                              makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) ) );
     server().queueForPlayers( inRangePlayerIds, makeActorControlSelf( player.getId(), ActorControlType::Dismount, 1 ) );
   }
 
@@ -334,7 +332,7 @@ void PlayerMgr::onHateListChanged( Entity::Player& player )
 void PlayerMgr::onClassChanged( Entity::Player& player )
 {
   server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ClassJobChange, 0x04 ) );
-  onPlayerHpMpTpChanged( player );
+  onHudParamChanged( player );
 }
 
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
@@ -351,14 +349,10 @@ void PlayerMgr::sendLoginMessage( Entity::Player& player )
 
 void PlayerMgr::onLogin( Entity::Player &player )
 {
-
 }
 
 void PlayerMgr::onLogout( Entity::Player &player )
 {
-  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
-  // send updates to mgrs
-  partyMgr.onMemberDisconnect( player );
 }
 
 void PlayerMgr::onDeath( Entity::Player& player )
@@ -405,7 +399,7 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
   player.sendRecastGroups();
   player.sendStats();
-  player.sendItemLevel();
+  sendItemLevel( player );
   if( player.isLogin() )
   {
     auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
@@ -455,7 +449,7 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
-    onGrandCompanyChanged( player );
+    sendGrandCompany( player );
   }
 
 }
@@ -471,33 +465,31 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   if( !player.isAlive() )
     return;
 
-  if( !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
+  auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
+  if( mainWeap && !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
   {
-    auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-
     // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
     for( const auto& actor : player.getInRangeActors() )
     {
-      if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() && mainWeap )
+      if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
+        continue;
+      auto chara = actor->getAsChara();
+
+      // default autoattack range
+      float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+      // default autoattack range for ranged classes
+      auto classJob = player.getClass();
+
+      if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+        range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+      if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
       {
-        auto chara = actor->getAsChara();
-
-        // default autoattack range
-        float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-        // default autoattack range for ranged classes
-        auto classJob = player.getClass();
-
-        if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
-          range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-        if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
+        if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
         {
-          if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
-          {
-            player.setLastAttack( tickCount );
-            player.autoAttack( actor->getAsChara() );
-          }
+          player.setLastAttack( tickCount );
+          player.autoAttack( actor->getAsChara() );
         }
       }
     }
