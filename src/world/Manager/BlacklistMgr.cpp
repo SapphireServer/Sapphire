@@ -11,6 +11,7 @@
 #include "Actor/Player.h"
 #include "BlacklistMgr.h"
 #include "FriendListMgr.h"
+#include "PlayerMgr.h"
 
 #include "WorldServer.h"
 
@@ -22,10 +23,9 @@ using namespace Sapphire::Network::Packets::WorldPackets;
 bool BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& targetName )
 {
   // add target to blacklist
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  auto pTarget = server.getPlayer( targetName );
+  auto pTarget = playerMgr.getPlayer( targetName );
   if( !pTarget )
   {
     // target doesn't exist in server player table
@@ -77,10 +77,9 @@ bool BlacklistMgr::onAddCharacter( Entity::Player& source, const std::string& ta
 bool BlacklistMgr::onRemoveCharacter( Entity::Player& source, const std::string& targetName )
 {
   // remove target from blacklist
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  auto pTarget = server.getPlayer( targetName );
+  auto pTarget = playerMgr.getPlayer( targetName );
   if( !pTarget )
   {
     // target doesn't exist in server player table
@@ -115,6 +114,7 @@ bool BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint
   // it'll also be called multiple times sequentially until there are no more entries left (id == 0)
 
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   std::vector< Server::BlacklistCharacter > entries;
 
@@ -134,7 +134,7 @@ bool BlacklistMgr::onGetBlacklistPage( Entity::Player& source, uint8_t key, uint
     }
 
     auto id = idVec[ i ];
-    auto pPlayer = server.getPlayer( id );
+    auto pPlayer = playerMgr.getPlayer( id );
       
     if( !pPlayer )
       continue;

@@ -52,16 +52,17 @@ Sapphire::Network::GameConnectionPtr Sapphire::World::Session::getChatConnection
 bool Sapphire::World::Session::loadPlayer()
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   m_isValid = false;
 
-  m_pPlayer = server.getPlayer( m_entityId );
+  m_pPlayer = playerMgr.getPlayer( m_entityId );
 
   if( !m_pPlayer )
     return false;
 
   // check and sync player data on login
-  if( !server.syncPlayer( m_pPlayer->getCharacterId() ) )
+  if( !playerMgr.syncPlayer( m_pPlayer->getCharacterId() ) )
     return false;
 
   m_isValid = true;

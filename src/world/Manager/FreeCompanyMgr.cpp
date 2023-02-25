@@ -11,6 +11,7 @@
 
 #include "FreeCompany/FreeCompany.h"
 #include "FreeCompanyMgr.h"
+#include "PlayerMgr.h"
 
 #include "Actor/Player.h"
 
@@ -164,6 +165,7 @@ FreeCompanyPtr FreeCompanyMgr::getPlayerFreeCompany( uint64_t characterId )
 
 void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
 {
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto fc = getPlayerFreeCompany( player.getCharacterId() );
   if( !fc )
     return;
@@ -177,7 +179,7 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
   std::strcpy( inviteListPacket->data().FreeCompanyName, fc->getName().c_str() );
 
   // fill master character data
-  auto masterCharacter = server.getPlayer( fc->getMasterId() );
+  auto masterCharacter = playerMgr.getPlayer( fc->getMasterId() );
   if( !masterCharacter )
   {
     Logger::error( "FreeCompanyMgr: Unable to look up master character#{}!", fc->getMasterId() );
@@ -199,7 +201,7 @@ void FreeCompanyMgr::sendFcInviteList( Entity::Player& player )
     if( entry == 0 || entry == fc->getMasterId() )
       continue;
 
-    auto signee = server.getPlayer( entry );
+    auto signee = playerMgr.getPlayer( entry );
     if( !signee )
       continue;
 
@@ -241,7 +243,8 @@ void FreeCompanyMgr::sendFcStatus( Entity::Player& player )
 void FreeCompanyMgr::onFcLogin( uint64_t characterId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto player = server.getPlayer( characterId );
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto player = playerMgr.getPlayer( characterId );
   if( !player )
     return;
 
@@ -268,7 +271,8 @@ void FreeCompanyMgr::onFcLogin( uint64_t characterId )
 void FreeCompanyMgr::onFcLogout( uint64_t characterId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto player = server.getPlayer( characterId );
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto player = playerMgr.getPlayer( characterId );
   if( !player )
     return;
 

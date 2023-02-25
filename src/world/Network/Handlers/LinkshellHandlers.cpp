@@ -12,6 +12,7 @@
 #include "Session.h"
 #include "Actor/Player.h"
 #include "Manager/LinkshellMgr.h"
+#include "Manager/PlayerMgr.h"
 #include <WorldServer.h>
 
 using namespace Sapphire::Common;
@@ -29,9 +30,9 @@ void Sapphire::Network::GameConnection::linkshellKickHandler( const Packets::FFX
 {
   const auto lsKickPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellKick >( inPacket );
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto playerPtr = server.getPlayer( lsKickPacket.data().LeaveCharacterID );
+  auto playerPtr = playerMgr.getPlayer( lsKickPacket.data().LeaveCharacterID );
 
   if( !playerPtr )
   {
@@ -47,9 +48,9 @@ void Sapphire::Network::GameConnection::linkshellAddLeaderHandler( const Packets
 {
   const auto lsAddLeaderPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellAddLeader >( inPacket );
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto playerPtr = server.getPlayer( lsAddLeaderPacket.data().MemberCharacterID );
+  auto playerPtr = playerMgr.getPlayer( lsAddLeaderPacket.data().MemberCharacterID );
 
   if( !playerPtr )
   {
@@ -65,9 +66,9 @@ void Sapphire::Network::GameConnection::linkshellRemoveLeaderHandler( const Pack
 {
   const auto lsRemoveLeaderPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellRemoveLeader >( inPacket );
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto playerPtr = server.getPlayer( lsRemoveLeaderPacket.data().MemberCharacterID );
+  auto playerPtr = playerMgr.getPlayer( lsRemoveLeaderPacket.data().MemberCharacterID );
 
   if( !playerPtr )
   {
@@ -91,11 +92,11 @@ void Sapphire::Network::GameConnection::linkshellDeclineLeaderHandler( const Pac
 void Sapphire::Network::GameConnection::linkshellJoinHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto lsJoinPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellJoin >( inPacket );
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
 
   auto charName = std::string( lsJoinPacket.data().MemberCharacterName );
-  auto invitedPlayer = server.getPlayer( charName );
+  auto invitedPlayer = playerMgr.getPlayer( charName );
 
   if( !invitedPlayer )
   {
@@ -127,10 +128,10 @@ void Sapphire::Network::GameConnection::linkshellChangeMasterHandler( const Pack
 {
   const auto lsChMasterPacket = ZoneChannelPacket< Client::FFXIVIpcLinkshellChangeMaster >( inPacket );
   auto& lsMgr = Common::Service< LinkshellMgr >::ref();
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   auto charName = std::string( lsChMasterPacket.data().NextMasterCharacterName );
-  auto nextMaster = server.getPlayer( charName );
+  auto nextMaster = playerMgr.getPlayer( charName );
 
   if( !nextMaster )
   {

@@ -11,6 +11,7 @@
 
 #include "Linkshell/Linkshell.h"
 #include "LinkshellMgr.h"
+#include "PlayerMgr.h"
 
 #include "Actor/Player.h"
 
@@ -343,7 +344,8 @@ void LinkshellMgr::leaveLinkshell( uint64_t lsId, uint64_t characterId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
-  auto leavingPlayer = server.getPlayer( characterId );
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto leavingPlayer = playerMgr.getPlayer( characterId );
   auto lsPtr = getLinkshellById( lsId );
   if( !leavingPlayer || !lsPtr )
     return;
@@ -359,7 +361,8 @@ void LinkshellMgr::joinLinkshell( uint64_t lsId, uint64_t characterId )
 {
   auto &server = Common::Service< World::WorldServer >::ref();
   auto& chatChannelMgr = Common::Service< Manager::ChatChannelMgr >::ref();
-  auto joiningPlayer = server.getPlayer( characterId );
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto joiningPlayer = playerMgr.getPlayer( characterId );
   auto lsPtr = getLinkshellById( lsId );
   if( !joiningPlayer || !lsPtr )
     return;

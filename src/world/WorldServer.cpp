@@ -171,8 +171,9 @@ void WorldServer::run( int32_t argc, char* argv[] )
   auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
   Common::Service< Manager::RNGMgr >::set( pRNGMgr );
 
+  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   Logger::info( "Loading all players" );
-  if( !loadPlayers() )
+  if( !pPlayerMgr->loadPlayers() )
   {
     Logger::fatal( "Failed to load players!" );
     return;
@@ -281,7 +282,6 @@ void WorldServer::run( int32_t argc, char* argv[] )
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
 
   auto pDebugCom = std::make_shared< DebugCommandMgr >();
-  auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   auto pShopMgr = std::make_shared< Manager::ShopMgr >();
   auto pInventoryMgr = std::make_shared< Manager::InventoryMgr >();
   auto pEventMgr = std::make_shared< Manager::EventMgr >();
@@ -520,160 +520,6 @@ std::vector< SessionPtr > WorldServer::searchSessionByName( const std::string& p
   }
   
   return results;
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::getPlayer( uint32_t entityId )
-{
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapById.find( entityId );
-
-  if( it != m_playerMapById.end() )
-    return ( it->second );
-
-  // not found (new character?) - we'll load from DB and hope it's there
-  return loadPlayer( entityId );
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::getPlayer( uint64_t characterId )
-{
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapByCharacterId.find( characterId );
-
-  if( it != m_playerMapByCharacterId.end() )
-    return ( it->second );
-
-  // not found (new character?) - we'll load from DB and hope it's there
-  return loadPlayer( characterId );
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::getPlayer( const std::string& playerName )
-{
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-  auto it = m_playerMapByName.find( playerName );
-
-  if( it != m_playerMapByName.end() )
-    return ( it->second );
-
-  // not found (new character?) - we'll load from DB and hope it's there
-  return loadPlayer( playerName );
-}
-
-
-std::string WorldServer::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
-{
-  if( !forceDbLoad )
-  {
-    auto it = m_playerMapByCharacterId.find( characterId );
-
-    if( it != m_playerMapByCharacterId.end() )
-      return ( it->second->getName() );
-  }
-
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
-
-  if( !res->next() )
-    return "Unknown";
-
-  std::string playerName = res->getString( 1 );
-
-  return playerName;
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::addPlayer( uint64_t characterId )
-{
-  auto pPlayer = Entity::make_Player();
-
-  if( !pPlayer->loadFromDb( characterId ) )
-    return nullptr;
-
-  m_playerMapById[ pPlayer->getId() ] = pPlayer;
-  m_playerMapByCharacterId[ pPlayer->getCharacterId() ] = pPlayer;
-  m_playerMapByName[ pPlayer->getName() ] = pPlayer;
-
-  return pPlayer;
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::loadPlayer( uint32_t entityId )
-{
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto res = db.query( "SELECT CharacterId FROM charainfo WHERE EntityId = " + std::to_string( entityId ) );
-  if( !res || !res->next() )
-    return nullptr;
-
-  uint64_t characterId = res->getUInt64( 1 );
-
-  return addPlayer( characterId );
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::loadPlayer( uint64_t characterId )
-{
-  return addPlayer( characterId );
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::loadPlayer( const std::string& playerName )
-{
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto res = db.query( "SELECT CharacterId FROM charainfo WHERE Name = " + playerName );
-  if( !res || !res->next() )
-    return nullptr;
-
-  uint64_t characterId = res->getUInt64( 1 );
-
-  return addPlayer( characterId );
-}
-
-bool WorldServer::loadPlayers()
-{
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto res = db.query( "SELECT CharacterId FROM charainfo" );
-
-  // no players or failed
-  while( res->next() )
-  {
-    uint64_t characterId = res->getUInt64( 1 );
-    if( !addPlayer( characterId ) )
-      return false;
-  }
-
-  return true;
-}
-
-Sapphire::Entity::PlayerPtr WorldServer::syncPlayer( uint64_t characterId )
-{
-  auto pPlayer = getPlayer( characterId );
-  if( !pPlayer )
-    return nullptr;
-
-  // get our cached last db write
-  auto lastCacheSync = pPlayer->getLastDBWrite();
-
-  // update this player's last db write
-  if( !pPlayer->syncLastDBWrite() )
-    return nullptr;
-
-  // get db last write
-  auto dbSync = pPlayer->getLastDBWrite();
-
-
-  // db was updated and we lost track of it  - update
-  // @todo for now, always reload the player on login.
-  //if( dbSync != lastCacheSync )
-  {
-    // clear current maps
-    m_playerMapById[ pPlayer->getId() ] = nullptr;
-    m_playerMapByName[ pPlayer->getName() ] = nullptr;
-    m_playerMapByCharacterId[ pPlayer->getCharacterId() ] = nullptr;
-
-    if( !pPlayer->loadFromDb( characterId ) )
-      return nullptr;
-
-    m_playerMapById[ pPlayer->getId() ] = pPlayer;
-    m_playerMapByCharacterId[ pPlayer->getCharacterId() ] = pPlayer;
-    m_playerMapByName[ pPlayer->getName() ] = pPlayer;
-  }
-
-  return pPlayer;
 }
 
 std::map< int32_t, WorldServer::BNPCMap >& Sapphire::World::WorldServer::getBNpcTeriMap()

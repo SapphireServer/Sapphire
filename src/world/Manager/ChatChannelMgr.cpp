@@ -3,6 +3,7 @@
 #include <Service.h>
 
 #include "ChatChannelMgr.h"
+#include "PlayerMgr.h"
 
 #include "Actor/Player.h"
 #include "WorldServer.h"
@@ -110,6 +111,7 @@ void ChatChannelMgr::sendMessageToChannel( uint64_t channelId, Entity::Player& s
   auto& channelMembers = m_channels[ channelId ];
 
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   // send message to all players in chat channel
   for( const auto id : channelMembers )
@@ -126,7 +128,7 @@ void ChatChannelMgr::sendMessageToChannel( uint64_t channelId, Entity::Player& s
       continue;
     }
 
-    auto pPlayer = server.getPlayer( id );
+    auto pPlayer = playerMgr.getPlayer( id );
 
     // prepare message packet, associating message and sender info with channel data
     auto chatToChannelPacket = std::make_shared< Packets::Server::ChatToChannelPacket >( *pPlayer, sender, channelId, message );

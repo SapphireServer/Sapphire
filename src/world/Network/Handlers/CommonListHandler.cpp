@@ -8,6 +8,7 @@
 
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PartyMgr.h"
+#include "Manager/PlayerMgr.h"
 
 #include "Network/GameConnection.h"
 
@@ -26,15 +27,14 @@ using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-void Sapphire::Network::GameConnection::getCommonlistDetailHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                              Entity::Player& player )
+void Sapphire::Network::GameConnection::getCommonlistDetailHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcGetCommonlistDetail >( inPacket );
   auto& data = packet.data();
 
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto pPlayer = server.getPlayer( data.DetailCharacterID );
+  auto pPlayer = playerMgr.getPlayer( data.DetailCharacterID );
 
   if( !pPlayer )
     return;
@@ -69,7 +69,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
 {
   // TODO: possibly move lambda func to util
   auto& server = Common::Service< World::WorldServer >::ref();
-
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   const size_t itemsPerPage = 10;
 
   // this func paginates any commonlist entry, associating them with online player data and hierarchy ID (optional)
@@ -85,7 +85,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
       }
 
       auto id = idVec[ i ];
-      auto pPlayer = server.getPlayer( id );
+      auto pPlayer = playerMgr.getPlayer( id );
       
       if( !pPlayer )
         continue;

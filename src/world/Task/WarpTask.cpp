@@ -7,6 +7,7 @@
 #include <Network/PacketWrappers/WarpPacket.h>
 
 #include <Manager/TerritoryMgr.h>
+#include <Manager/PlayerMgr.h>
 
 using namespace Sapphire::World;
 using namespace Sapphire::World::Manager;
@@ -28,7 +29,8 @@ void WarpTask::onQueue()
 void WarpTask::execute()
 {
   auto& server = Common::Service< WorldServer >::ref();
-  auto pPlayer = server.getPlayer( m_playerId );
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto pPlayer = playerMgr.getPlayer( m_playerId );
   if( !pPlayer )
     return;
 

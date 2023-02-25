@@ -15,6 +15,9 @@
 #include <Script/ScriptMgr.h>
 #include <Common.h>
 
+#include <Database/ZoneDbConnection.h>
+#include <Database/DbWorkerPool.h>
+
 #include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -42,6 +45,163 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
+
+
+Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint32_t entityId )
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapById.find( entityId );
+
+  if( it != m_playerMapById.end() )
+    return ( it->second );
+
+  // not found (new character?) - we'll load from DB and hope it's there
+  return loadPlayer( entityId );
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( uint64_t characterId )
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapByCharacterId.find( characterId );
+
+  if( it != m_playerMapByCharacterId.end() )
+    return ( it->second );
+
+  // not found (new character?) - we'll load from DB and hope it's there
+  return loadPlayer( characterId );
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( const std::string& playerName )
+{
+  //std::lock_guard<std::mutex> lock( m_sessionMutex );
+  auto it = m_playerMapByName.find( playerName );
+
+  if( it != m_playerMapByName.end() )
+    return ( it->second );
+
+  // not found (new character?) - we'll load from DB and hope it's there
+  return loadPlayer( playerName );
+}
+
+
+std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
+{
+  if( !forceDbLoad )
+  {
+    auto it = m_playerMapByCharacterId.find( characterId );
+
+    if( it != m_playerMapByCharacterId.end() )
+      return ( it->second->getName() );
+  }
+
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
+
+  if( !res->next() )
+    return "Unknown";
+
+  std::string playerName = res->getString( 1 );
+
+  return playerName;
+}
+
+
+Sapphire::Entity::PlayerPtr PlayerMgr::addPlayer( uint64_t characterId )
+{
+  auto pPlayer = Entity::make_Player();
+
+  if( !pPlayer->loadFromDb( characterId ) )
+    return nullptr;
+
+  m_playerMapById[ pPlayer->getId() ] = pPlayer;
+  m_playerMapByCharacterId[ pPlayer->getCharacterId() ] = pPlayer;
+  m_playerMapByName[ pPlayer->getName() ] = pPlayer;
+
+  return pPlayer;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( uint32_t entityId )
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto res = db.query( "SELECT CharacterId FROM charainfo WHERE EntityId = " + std::to_string( entityId ) );
+  if( !res || !res->next() )
+    return nullptr;
+
+  uint64_t characterId = res->getUInt64( 1 );
+
+  return addPlayer( characterId );
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( uint64_t characterId )
+{
+  return addPlayer( characterId );
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::loadPlayer( const std::string& playerName )
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto res = db.query( "SELECT CharacterId FROM charainfo WHERE Name = " + playerName );
+  if( !res || !res->next() )
+    return nullptr;
+
+  uint64_t characterId = res->getUInt64( 1 );
+
+  return addPlayer( characterId );
+}
+
+bool PlayerMgr::loadPlayers()
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto res = db.query( "SELECT CharacterId FROM charainfo" );
+
+  // no players or failed
+  while( res->next() )
+  {
+    uint64_t characterId = res->getUInt64( 1 );
+    if( !addPlayer( characterId ) )
+      return false;
+  }
+
+  return true;
+}
+
+Sapphire::Entity::PlayerPtr PlayerMgr::syncPlayer( uint64_t characterId )
+{
+  auto pPlayer = getPlayer( characterId );
+  if( !pPlayer )
+    return nullptr;
+
+  // get our cached last db write
+  auto lastCacheSync = pPlayer->getLastDBWrite();
+
+  // update this player's last db write
+  if( !pPlayer->syncLastDBWrite() )
+    return nullptr;
+
+  // get db last write
+  auto dbSync = pPlayer->getLastDBWrite();
+
+
+  // db was updated and we lost track of it  - update
+  // @todo for now, always reload the player on login.
+  //if( dbSync != lastCacheSync )
+  {
+    // clear current maps
+    m_playerMapById[ pPlayer->getId() ] = nullptr;
+    m_playerMapByName[ pPlayer->getName() ] = nullptr;
+    m_playerMapByCharacterId[ pPlayer->getCharacterId() ] = nullptr;
+
+    if( !pPlayer->loadFromDb( characterId ) )
+      return nullptr;
+
+    m_playerMapById[ pPlayer->getId() ] = pPlayer;
+    m_playerMapByCharacterId[ pPlayer->getCharacterId() ] = pPlayer;
+    m_playerMapByName[ pPlayer->getName() ] = pPlayer;
+  }
+
+  return pPlayer;
+}
+
 
 
 void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfile )

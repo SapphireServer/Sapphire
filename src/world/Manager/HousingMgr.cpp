@@ -310,7 +310,7 @@ LandPtr HousingMgr::getLandByOwnerId( uint64_t id )
 void HousingMgr::sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   player.setActiveLand( static_cast< uint8_t >( ident.landId ), static_cast< uint8_t >( ident.wardNum ) );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
@@ -341,7 +341,7 @@ void HousingMgr::sendLandSignOwned( Entity::Player& player, const Common::LandId
 
   uint64_t characterId = land->getOwnerId();
 
-  std::string playerName = server.getPlayerNameFromDb( characterId );
+  std::string playerName = playerMgr.getPlayerNameFromDb( characterId );
 
   memcpy( &landInfoSignPacket->data().OwnerName, playerName.c_str(), playerName.size() );
 

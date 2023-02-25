@@ -7,6 +7,7 @@
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 
 #include "Manager/FriendListMgr.h"
+#include "Manager/PlayerMgr.h"
 
 #include "Network/GameConnection.h"
 
@@ -26,8 +27,9 @@ void Sapphire::Network::GameConnection::friendlistRemoveHandler( const Packets::
 
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
   auto& flMgr = Common::Service< Sapphire::World::Manager::FriendListMgr >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
-  auto target = server.getPlayer( data.TargetCharacterID );
+  auto target = playerMgr.getPlayer( data.TargetCharacterID );
   if( !target )
     return;
 
@@ -50,10 +52,10 @@ void Sapphire::Network::GameConnection::setFriendlistGroupHandler( const Packets
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcSetFriendlistGroup >( inPacket );
   const auto& data = packet.data();
 
-  auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& flMgr = Common::Service< Sapphire::World::Manager::FriendListMgr >::ref();
 
-  auto target = server.getPlayer( data.TargetCharacterID );
+  auto target = playerMgr.getPlayer( data.TargetCharacterID );
   if( !target )
     return;
 

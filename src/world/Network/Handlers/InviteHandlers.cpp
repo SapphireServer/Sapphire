@@ -44,8 +44,9 @@ void Sapphire::Network::GameConnection::inviteHandler( const FFXIVARR_PACKET_RAW
 
   std::string name( packet.data().TargetName );
 
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
-  auto pTargetPlayer = server.getPlayer( name );
+  auto pTargetPlayer = playerMgr.getPlayer( name );
 
   if( !pTargetPlayer )
     return;
@@ -79,7 +80,7 @@ void Sapphire::Network::GameConnection::inviteHandler( const FFXIVARR_PACKET_RAW
       auto& flMgr = Common::Service< FriendListMgr >::ref();
 
       // add support to adding offline players
-      auto target = server.getPlayer( data.TargetName );
+      auto target = playerMgr.getPlayer( data.TargetName );
       if( !target )
         return;
 
@@ -125,8 +126,9 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcInviteReply >( inPacket );
   const auto& data = packet.data();
 
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& server = Common::Service< Sapphire::World::WorldServer >::ref();
-  auto pPlayer = server.getPlayer( data.InviteCharacterID );
+  auto pPlayer = playerMgr.getPlayer( data.InviteCharacterID );
 
   if( !pPlayer )
     return;

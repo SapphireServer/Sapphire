@@ -10,6 +10,7 @@
 #include "PartyMgr.h"
 #include "WorldServer.h"
 #include "ChatChannelMgr.h"
+#include "PlayerMgr.h"
 
 #include "Session.h"
 
@@ -266,9 +267,10 @@ void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader
 void PartyMgr::onChangeLeader( const std::string& newLeaderName, Entity::Player& oldLeader )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto party = getParty( oldLeader.getPartyId() );
 
-  auto pNewLeader = server.getPlayer( newLeaderName );
+  auto pNewLeader = playerMgr.getPlayer( newLeaderName );
 
   if( !pNewLeader )
   {
@@ -331,13 +333,13 @@ std::vector< Entity::PlayerPtr > PartyMgr::getPartyMembers( Party& party )
 {
   std::vector< Entity::PlayerPtr > members;
 
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   for( auto& memberId : party.MemberId )
   {
     if( memberId == 0 )
       continue;
 
-    auto pPlayer = server.getPlayer( memberId );
+    auto pPlayer = playerMgr.getPlayer( memberId );
 
     members.push_back( pPlayer );
   }
@@ -346,12 +348,12 @@ std::vector< Entity::PlayerPtr > PartyMgr::getPartyMembers( Party& party )
 
 Entity::PlayerPtr PartyMgr::getPartyLeader( Party& party )
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   if( party.LeaderId == 0 )
     return nullptr;
 
-  auto pLeader = server.getPlayer( party.LeaderId );
+  auto pLeader = playerMgr.getPlayer( party.LeaderId );
 
   return pLeader;
 }

@@ -84,7 +84,7 @@ void Sapphire::World::ContentFinder::update()
             server.queueForPlayer( queuedPlayer->getCharacterId(), updatePacket );
 
             pInstanceContent->bindPlayer( queuedPlayer->getEntityId() );
-            warpMgr.requestMoveTerritory( *server.getPlayer( queuedPlayer->getEntityId() ), WarpType::WARP_TYPE_INSTANCE_CONTENT, pInstanceContent->getGuId(), { 0.f, 0.f, 0.f }, 0.f );
+            warpMgr.requestMoveTerritory( *playerMgr().getPlayer( queuedPlayer->getEntityId() ), WarpType::WARP_TYPE_INSTANCE_CONTENT, pInstanceContent->getGuId(), { 0.f, 0.f, 0.f }, 0.f );
 
             auto zonePacket = makeUpdateContent( queuedPlayer->getEntityId(), instance->getTerritoryTypeId(), 0, pInstanceContent->getGuId() );
             auto zonePacket2 = makeUpdateContent( queuedPlayer->getEntityId(), instance->getTerritoryTypeId(), content->m_partyMemberCount );

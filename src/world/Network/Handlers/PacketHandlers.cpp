@@ -6,7 +6,6 @@
 #include <Logging/Logger.h>
 #include <Network/PacketContainer.h>
 #include <Network/PacketDef/Chat/ServerChatDef.h>
-#include <Database/DatabaseDef.h>
 #include <Util/Util.h>
 
 #include <datReader/DatCategories/bg/LgbTypes.h>
@@ -14,44 +13,27 @@
 
 #include <unordered_map>
 #include <Network/PacketDef/Zone/ClientZoneDef.h>
-#include <Logging/Logger.h>
 #include <Service.h>
 
 #include "Network/GameConnection.h"
 
 #include "Territory/Territory.h"
-#include "Territory/HousingZone.h"
-#include "Territory/Land.h"
-#include "Territory/House.h"
 #include "Territory/InstanceObjectCache.h"
 
-#include "Linkshell/Linkshell.h"
-
-#include "Inventory/Item.h"
 
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PingPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/ChatPacket.h"
-#include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include "Network/PacketWrappers/EventStartPacket.h"
-#include "Network/PacketWrappers/EventFinishPacket.h"
-#include "Network/PacketWrappers/ConditionPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 
 #include "Manager/DebugCommandMgr.h"
-#include "Manager/EventMgr.h"
 #include "Manager/MarketMgr.h"
 #include "Manager/TerritoryMgr.h"
-#include "Manager/HousingMgr.h"
-#include "Manager/RNGMgr.h"
 #include "Manager/ChatChannelMgr.h"
-#include "Manager/QuestMgr.h"
-#include "Manager/LinkshellMgr.h"
-#include "Manager/PartyMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Manager/ItemMgr.h"
@@ -117,7 +99,7 @@ void Sapphire::Network::GameConnection::getProfileHandler( const Packets::FFXIVA
 void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x10 ] );
-  auto pPlayer = server().getPlayer( targetId );
+  auto pPlayer = playerMgr().getPlayer( targetId );
 
   Logger::debug( "getSearchCommentHandler: {0}", targetId );
 
@@ -137,7 +119,7 @@ void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::
 void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   auto targetId = *reinterpret_cast< const uint32_t* >( &inPacket.data[ 0x18 ] );
-  auto pPlayer = server().getPlayer( targetId );
+  auto pPlayer = playerMgr().getPlayer( targetId );
 
   Logger::debug( "reqExamineFcInfo: {0}", targetId );
 
@@ -273,7 +255,7 @@ void Sapphire::Network::GameConnection::configHandler( const Packets::FFXIVARR_P
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcConfig >( inPacket );
 
   player.setEquipDisplayFlags( packet.data().flag );
-  Service< World::Manager::PlayerMgr >::ref().onEquipDisplayFlagsChanged( player );
+  PlayerMgr().onEquipDisplayFlagsChanged( player );
 }
 
 void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -347,11 +329,10 @@ void Sapphire::Network::GameConnection::loginHandler( const Packets::FFXIVARR_PA
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcLoginHandler >( inPacket );
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& fcMgr = Common::Service< World::Manager::FreeCompanyMgr >::ref();
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   player.setIsLogin( true );
   player.setConnected( true );
   teriMgr.joinWorld( player );
-  playerMgr.onLogin( player );
+  playerMgr().onLogin( player );
   fcMgr.onFcLogin( player.getCharacterId() );
 }
 
@@ -371,7 +352,6 @@ void Sapphire::Network::GameConnection::syncHandler( const Packets::FFXIVARR_PAC
 
 void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -384,7 +364,7 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
   // if this is a login event
   if( player.isLogin() )
   {
-    playerMgr.sendLoginMessage( player );
+    playerMgr().sendLoginMessage( player );
   }
 
   // spawn the player for himself

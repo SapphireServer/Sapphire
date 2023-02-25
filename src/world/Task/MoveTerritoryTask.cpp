@@ -36,7 +36,8 @@ void MoveTerritoryTask::onQueue()
 void MoveTerritoryTask::execute()
 {
   auto& server = Common::Service< WorldServer >::ref();
-  auto pPlayer = server.getPlayer( m_playerId );
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
+  auto pPlayer = playerMgr.getPlayer( m_playerId );
   if( !pPlayer )
     return;
 

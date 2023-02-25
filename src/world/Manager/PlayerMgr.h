@@ -11,6 +11,17 @@ namespace Sapphire::World::Manager
   public:
     PlayerMgr() = default;
 
+    std::string getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad = false );
+    Entity::PlayerPtr getPlayer( uint32_t entityId );
+    Entity::PlayerPtr getPlayer( uint64_t characterId );
+    Entity::PlayerPtr getPlayer( const std::string& playerName );
+    Entity::PlayerPtr addPlayer( uint64_t characterId );
+    Entity::PlayerPtr loadPlayer( uint32_t entityId );
+    Entity::PlayerPtr loadPlayer( uint64_t characterId );
+    Entity::PlayerPtr loadPlayer( const std::string& playerName );
+    bool loadPlayers();
+    Entity::PlayerPtr syncPlayer( uint64_t characterId );
+
     void onOnlineStatusChanged( Sapphire::Entity::Player& player, bool updateProfile = true );
 
     void onEquipDisplayFlagsChanged( Sapphire::Entity::Player& player );
@@ -90,5 +101,11 @@ namespace Sapphire::World::Manager
     static void sendLogMessage( Sapphire::Entity::Player& player, uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0,
                                 uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
 
+  private:
+    std::map< uint32_t, Entity::PlayerPtr > m_playerMapById;
+    std::map< uint64_t, Entity::PlayerPtr > m_playerMapByCharacterId;
+    std::map< std::string, Entity::PlayerPtr > m_playerMapByName;
   };
+
+
 }
