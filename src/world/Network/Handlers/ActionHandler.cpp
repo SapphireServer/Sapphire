@@ -25,8 +25,8 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
   const auto actionId = packet.data().ActionKey;
   const auto sequence = packet.data().RequestId;
   const auto targetId = packet.data().Target;
-  const auto itemSourceSlot = packet.data().Arg & 0xFFFF0000;
-  const auto itemSourceContainer = packet.data().Arg & 0x0000FFFF;
+  const auto itemSourceSlot = packet.data().Arg & 0x0000FFFF;
+  const auto itemSourceContainer = packet.data().Arg & 0xFFFF0000;
 
   PlayerMgr::sendDebug( player, "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
 
