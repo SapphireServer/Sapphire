@@ -399,22 +399,16 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 
 void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
-
   const auto packet = ZoneChannelPacket< FFXIVIpcClientTrigger >( inPacket );
   auto& teriMgr = Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  const auto& data = packet.data();
 
-  const auto commandId = packet.data().Id;
-  const auto param1 = *reinterpret_cast< const uint64_t* >( &packet.data().Arg0 );
-  const auto param11 = packet.data().Arg0;
-  const auto param12 = packet.data().Arg1;
-  const auto param2 = packet.data().Arg2;
-  const auto param4 = packet.data().Arg3;
-  const auto param3 = packet.data().Target;
-
+  const auto commandId = data.Id;
+  const auto arg0arg1 = *reinterpret_cast< const uint64_t* >( &packet.data().Arg0 );
 
   Logger::debug( "\t\t {8} | {1:X} ( p1:{2:X} p11:{3:X} p12:{4:X} p2:{5:X} p3:{6:X} p4:{7:X} )",
-                 m_pSession->getId(), commandId, param1, param11, param12, param2, param3, param4, packetCommandToString( commandId ) );
+                 m_pSession->getId(), commandId, arg0arg1, data.Arg0, data.Arg1, data.Arg2, data.Target, data.Arg3, packetCommandToString( commandId ) );
 
   //Logger::Log(LoggingSeverity::debug, "[" + std::to_string(m_pSession->getId()) + "] " + pInPacket->toString());
 
@@ -422,19 +416,19 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
   {
     case PacketCommand::DRAWN_SWORD:  // Toggle sheathe
     {
-      if( param11 == 1 )
+      if( data.Arg0 == 1 )
         player.setStance( Stance::Active );
       else
       {
         player.setStance( Stance::Passive );
         player.setAutoattack( false );
       }
-      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 0, param11, 1 ) );
+      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 0, data.Arg0, 1 ) );
       break;
     }
     case PacketCommand::AUTO_ATTACK:  // Toggle auto-attack
     {
-      if( param11 == 1 )
+      if( data.Arg0 == 1 )
       {
         player.setAutoattack( true );
         player.setStance( Stance::Active );
@@ -442,13 +436,13 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       else
         player.setAutoattack( false );
 
-      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 1, param11, 1 ) );
+      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 1, data.Arg0, 1 ) );
 
       break;
     }
     case PacketCommand::TARGET_DECIDE: // Change target
     {
-      uint64_t targetId = param1;
+      uint64_t targetId = arg0arg1;
 
       if( targetId == player.getTargetId() || targetId == Common::INVALID_GAME_OBJECT_ID )
         targetId = 0;
@@ -463,7 +457,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::COMPANION:
     {
-      Common::Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( player, static_cast< uint8_t >( param1 ) );
+      Common::Service< World::Manager::PlayerMgr >::ref().onCompanionUpdate( player, static_cast< uint8_t >( data.Arg0 ) );
       break;
     }
     case PacketCommand::COMPANION_CANCEL:
@@ -474,7 +468,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)
     {
       // todo: check if status can be removed by client from exd
-      player.removeSingleStatusEffectById( static_cast< uint32_t >( param1 ) );
+      player.removeSingleStatusEffectById( data.Arg0 );
       break;
     }
     case PacketCommand::CANCEL_CAST:
@@ -485,7 +479,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::INSPECT:
     {
-      uint32_t targetId = param11;
+      uint32_t targetId = data.Arg0;
       examineHandler( player, targetId );
       break;
     }
@@ -495,7 +489,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::ACTIVE_TITLE: // Set player title
     {
-      player.setTitle( static_cast< uint16_t >( param1 ) );
+      player.setTitle( static_cast< uint16_t >( data.Arg0 ) );
       break;
     }
     case PacketCommand::TITLE_LIST: // Get title list
@@ -505,20 +499,20 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::SET_HOWTO: // Update howtos seen
     {
-      uint32_t howToId = param11;
+      uint32_t howToId = data.Arg0;
       player.updateHowtosSeen( howToId );
       break;
     }
     case PacketCommand::SET_CUTSCENE:
     {
-      server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::SetCutsceneFlag, param11, 1 ) );
+      server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::SetCutsceneFlag, data.Arg0, 1 ) );
       break;
     }
     case PacketCommand::EMOTE: // emote
     {
       uint64_t targetId = player.getTargetId();
-      uint32_t emoteId = param11;
-      bool isSilent = param2 == 1;
+      uint32_t emoteId = data.Arg0;
+      bool isSilent = data.Arg2 == 1;
 
       auto& exdData = Service< Data::ExdData >::ref();
       auto emoteData = exdData.getRow< Excel::Emote >( emoteId );
@@ -572,8 +566,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::POSE_EMOTE_CONFIG: // change pose
     case PacketCommand::POSE_EMOTE_WORK: // reapply pose
     {
-      player.setPose( static_cast< uint8_t >( param12 ) );
-      auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, param11, param12 );
+      player.setPose( static_cast< uint8_t >( data.Arg1 ) );
+      auto pSetStatusPacket = makeActorControl( player.getId(), SetPose, data.Arg0, data.Arg1 );
       server().queueForPlayers( player.getInRangePlayerIds( true ), pSetStatusPacket );
       break;
     }
@@ -584,7 +578,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::REVIVE: // return dead / accept raise
     {
       auto& warpMgr = Service< WarpMgr >::ref();
-      switch( static_cast < ResurrectType >( param1 ) )
+      switch( static_cast < ResurrectType >( data.Arg0 ) )
       {
         case ResurrectType::RaiseSpell:
           // todo: handle raise case (set position to raiser, apply weakness status, set hp/mp/tp as well as packet)
@@ -610,7 +604,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::ACHIEVEMENT_REQUEST_RATE:
     {
-      Service< World::Manager::PlayerMgr >::ref().onAchievementProgressChanged( player, param11 );
+      Service< World::Manager::PlayerMgr >::ref().onAchievementProgressChanged( player, data.Arg0 );
       break;
     }
     case PacketCommand::ACHIEVEMENT_REQUEST:
@@ -621,26 +615,26 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::TELEPO_INQUIRY: // Teleport
     {
 
-      player.teleportQuery( static_cast< uint16_t >( param11 ) );
+      player.teleportQuery( static_cast< uint16_t >( data.Arg0 ) );
       break;
     }
     case PacketCommand::DYE_ITEM: // Dye item
     {
-      // param11 = item to dye container
-      // param12 = item to dye slot
-      // param2 = dye bag container
-      // param4 = dye bag slot
-      player.setDyeingInfo( param11, param12, param2, param4 );
+      // data.Arg0 = item to dye container
+      // data.Arg1 = item to dye slot
+      // data.Arg2 = dye bag container
+      // data.Arg3 = dye bag slot
+      player.setDyeingInfo( data.Arg0, data.Arg1, data.Arg2, data.Arg3 );
       break;
     }
     case PacketCommand::GLAMOUR_ITEM:
     {
-      player.setGlamouringInfo( param11, param12, param2, param4, true );
+      player.setGlamouringInfo( data.Arg0, data.Arg1, data.Arg2, data.Arg3, true );
       break;
     }
     case PacketCommand::GLAMOUR_DISPEL:
     {
-      player.setGlamouringInfo( param11, param12, param2, param4, false );
+      player.setGlamouringInfo( data.Arg0, data.Arg1, data.Arg2, data.Arg3, false );
       break;
     }
     case PacketCommand::DIRECTOR_INIT_RETURN: // Director init finish
@@ -660,13 +654,13 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }*/
     case PacketCommand::EVENT_HANDLER:
     {
-      pZone->onEventHandlerOrder( player, param11, param12, param2, static_cast< uint32_t >( param3 ), param4 );
+      pZone->onEventHandlerOrder( player, data.Arg0, data.Arg1, data.Arg2, static_cast< uint32_t >( data.Target ), data.Arg3 );
 
       break;
     }
     case PacketCommand::CANCEL_QUEST:
     {
-      player.removeQuest( static_cast< uint16_t >( param1 ) );
+      player.removeQuest( static_cast< uint16_t >( data.Arg0 ) );
       break;
     }
     case PacketCommand::HOUSING_LOCK_LAND_BY_BUILD:
@@ -675,9 +669,9 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       if( !hZone )
         return;
 
-      player.setActiveLand( static_cast< uint8_t >( param11 ), hZone->getWardNum() );
+      player.setActiveLand( static_cast< uint8_t >( data.Arg0 ), hZone->getWardNum() );
 
-      auto pShowBuildPresetUIPacket = makeActorControl( player.getId(), ShowBuildPresetUI, param11 );
+      auto pShowBuildPresetUIPacket = makeActorControl( player.getId(), ShowBuildPresetUI, data.Arg0 );
       server().queueForPlayer( player.getCharacterId(), pShowBuildPresetUIPacket );
 
       break;
@@ -686,7 +680,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( data.Arg0, data.Arg1 );
       housingMgr.sendLandSignFree( player, ident );
 
       break;
@@ -695,7 +689,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12, false );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( data.Arg0, data.Arg1, false );
       housingMgr.sendLandSignOwned( player, ident );
 
       break;
@@ -704,7 +698,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      housingMgr.sendWardLandInfo( player, static_cast< uint8_t >( param12 ), static_cast< uint8_t >( param11 ) );
+      housingMgr.sendWardLandInfo( player, static_cast< uint8_t >( data.Arg1 ), static_cast< uint8_t >( data.Arg0 ) );
 
       break;
     }
@@ -715,7 +709,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       if( !hZone )
         return;
 
-      auto plot = static_cast< uint8_t >( param12 & 0xFF );
+      auto plot = static_cast< uint8_t >( data.Arg1 & 0xFF );
       housingMgr.relinquishLand( player, *hZone, plot );
 
       break;
@@ -724,7 +718,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( data.Arg0, data.Arg1 );
       housingMgr.requestEstateRename( player, ident );
 
       break;
@@ -733,7 +727,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( data.Arg0, data.Arg1 );
       housingMgr.requestEstateEditGreeting( player, ident );
 
       break;
@@ -742,7 +736,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( data.Arg0, data.Arg1 );
       housingMgr.requestEstateEditGuestAccess( player, ident );
 
       break;
@@ -750,13 +744,13 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
    case PacketCommand::HOUSING_WARP_TO_SAFE:
     {
       // close ui
-      if( param11 == 1 )
+      if( data.Arg0 == 1 )
         break;
 
-      // param12 is 0 when inside a house
+      // data.Arg1 is 0 when inside a house
 
-      uint8_t ward = ( param12 >> 16 ) & 0xFF;
-      uint8_t plot = ( param12 & 0xFF );
+      uint8_t ward = ( data.Arg1 >> 16 ) & 0xFF;
+      uint8_t plot = ( data.Arg1 & 0xFF );
       auto pShowHousingItemUIPacket = makeActorControl( player.getId(), ShowHousingItemUI, 0, plot );
 
       server().queueForPlayer( player.getCharacterId(), pShowHousingItemUIPacket );
@@ -769,7 +763,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto ident = housingMgr.clientTriggerParamsToLandIdent( param11, param12 );
+      auto ident = housingMgr.clientTriggerParamsToLandIdent( data.Arg0, data.Arg1 );
       housingMgr.sendEstateGreeting( player, ident );
 
       break;
@@ -777,19 +771,19 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::HOUSING_LOCK_LAND_BY_BREAK:
     {
       auto& housingMgr = Service< HousingMgr >::ref();
-      housingMgr.removeHouse( player, static_cast< uint16_t >( param11 ) );
+      housingMgr.removeHouse( player, static_cast< uint16_t >( data.Arg0 ) );
 
       break;
     }
 
 /*    case PacketCommand::RequestLandInventory:
     {
-      uint8_t plot = ( param12 & 0xFF );
+      uint8_t plot = ( data.Arg1 & 0xFF );
 
       auto& housingMgr = Service< HousingMgr >::ref();
 
       uint16_t inventoryType = InventoryType::HousingExteriorPlacedItems;
-      if( param2 == 1 )
+      if( data.Arg2 == 1 )
         inventoryType = InventoryType::HousingExteriorStoreroom;
 
       housingMgr.sendEstateInventory( player, inventoryType, plot );
@@ -814,11 +808,11 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     {
       auto& housingMgr = Service< HousingMgr >::ref();
 
-      auto slot = param4 & 0xFF;
-      auto sendToStoreroom = ( param4 >> 16 ) != 0;
+      auto slot = data.Arg3 & 0xFF;
+      auto sendToStoreroom = ( data.Arg3 >> 16 ) != 0;
 
       //player, plot, containerId, slot, sendToStoreroom
-      housingMgr.reqRemoveHousingItem( player, static_cast< uint16_t >( param12 ), static_cast< uint16_t >( param2 ), static_cast< uint8_t >( slot ), sendToStoreroom );
+      housingMgr.reqRemoveHousingItem( player, static_cast< uint16_t >( data.Arg1 ), static_cast< uint16_t >( data.Arg2 ), static_cast< uint8_t >( slot ), sendToStoreroom );
 
       break;
     }
@@ -840,10 +834,10 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::UpdateEstateGuestAccess:
     {
-      auto canTeleport = ( param2 & 0xFF ) == 1;
-      auto unk1 = ( param2 >> 8 & 0xFF ) == 1; // todo: related to fc? or unused?
-      auto privateEstateAccess = ( param2 >> 16 & 0xFF ) == 1;
-      auto unk = ( param2 >> 24 & 0xFF ) == 1; // todo: related to fc? or unused?
+      auto canTeleport = ( data.Arg2 & 0xFF ) == 1;
+      auto unk1 = ( data.Arg2 >> 8 & 0xFF ) == 1; // todo: related to fc? or unused?
+      auto privateEstateAccess = ( data.Arg2 >> 16 & 0xFF ) == 1;
+      auto unk = ( data.Arg2 >> 24 & 0xFF ) == 1; // todo: related to fc? or unused?
 
       player.sendDebug( "can teleport: {0}, unk: {1}, privateEstateAccess: {2}, unk: {3}",
                         canTeleport, unk1, privateEstateAccess, unk );
@@ -851,10 +845,10 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::RequestEventBattle:
     {
-      auto packet = makeActorControlSelf( player.getId(), ActorControl::EventBattleDialog, 0, param12, param2 );
+      auto packet = makeActorControlSelf( player.getId(), ActorControl::EventBattleDialog, 0, data.Arg1, data.Arg2 );
       player.queuePacket( packet );
 
-      player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", param12, param2 );
+      player.sendDebug( "event battle level sync: {0}, ilevel sync?: {1}", data.Arg1, data.Arg2 );
       break;
     }*/
 
