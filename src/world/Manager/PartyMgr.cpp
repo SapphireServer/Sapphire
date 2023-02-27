@@ -23,22 +23,13 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void PartyMgr::onJoin( uint32_t joinerId, uint32_t inviterId )
+void PartyMgr::onJoin( Entity::Player& joiner, Entity::Player& inviter )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   auto& ccMgr = Common::Service< World::Manager::ChatChannelMgr >::ref();
 
-  auto pInvitee = server.getSession( joinerId );
-  auto pInviter = server.getSession( inviterId );
-
-  if( !pInvitee || !pInviter )
-  {
-    Logger::error( "Joining player or inviter is null!!" );
-    return;
-  }
-
-  auto& inviteePlayer = *pInvitee->getPlayer();
-  auto& invitingPlayer = *pInviter->getPlayer();
+  auto& inviteePlayer = joiner;
+  auto& invitingPlayer = inviter;
 
   if( inviteePlayer.getPartyId() != 0 )
   {
@@ -130,17 +121,17 @@ void PartyMgr::onLeave( Sapphire::Entity::Player &leavingPlayer )
         if( leavingPlayer.getId() == party->LeaderId )
         {
           newLeaderId = party->MemberId[ 0 ];
-          auto pSession = server.getSession( newLeaderId );
-          if( !pSession )
+          auto pPlayer = playerMgr().getPlayer( newLeaderId );
+          if( !pPlayer || !pPlayer->isConnected() )
             continue;
-          pSession->getPlayer()->addOnlineStatus( Common::OnlineStatus::PartyLeader );
-          server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer.getAsPlayer(), pSession->getPlayer(),
-                                                                                 UpdateStatus::LEAVELEADER_LEAVED_MEMBER, party->PartyCount ) );
+          pPlayer->addOnlineStatus( Common::OnlineStatus::PartyLeader );
+          server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer.getAsPlayer(), pPlayer,
+                                                                              UpdateStatus::LEAVELEADER_LEAVED_MEMBER, party->PartyCount ) );
         }
         else
         {
           server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( leavingPlayer.getAsPlayer(), nullptr,
-                                                                                 UpdateStatus::LEAVE_MEMBER, party->PartyCount ) );
+                                                                              UpdateStatus::LEAVE_MEMBER, party->PartyCount ) );
 
         }
       }
@@ -194,8 +185,7 @@ void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
 
   for( const auto& member : members )
   {
-    bool isConnected = server.getSession( member->getCharacterId() ) != nullptr;
-    if( isConnected )
+    if( member->isConnected() )
     {
       anyMembersOnline = true;
       break;
@@ -227,12 +217,13 @@ void PartyMgr::onMemberRejoin( Entity::Player& joiningPlayer )
 void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto party = getParty( leader.getPartyId() );
   assert( party );
   auto pLeader = getPartyLeader( *party );
   auto members = getPartyMembers( *party );
-  auto pKickedSession = server.getSession( kickPlayerName );
-  if( !pKickedSession )
+  auto pKickedPlayer = playerMgr.getPlayer( kickPlayerName );
+  if( !pKickedPlayer )
   {
     Logger::error( "Target player for kicking not found (\"{t}\")", kickPlayerName );
     return;
@@ -252,11 +243,11 @@ void PartyMgr::onKick( const std::string& kickPlayerName, Entity::Player& leader
         member->removeOnlineStatus( Common::OnlineStatus::PartyMember );
 
         server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( *pLeader, *member, UpdateStatus::KICK_SELF, party->PartyCount ),
-                                                              makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
+                                                           makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
       }
       else
       {
-        server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( *pKickedSession->getPlayer(), UpdateStatus::KICK_MEMBER, party->PartyCount ) );
+        server.queueForPlayer( member->getCharacterId(), makePcPartyUpdate( *pKickedPlayer, UpdateStatus::KICK_MEMBER, party->PartyCount ) );
       }
     }
     party->PartyCount--;
@@ -407,7 +398,7 @@ void PartyMgr::sendPartyUpdate( Party& party )
 
     for( const auto& member : partyMembers )
     {
-      bool isConnected = server.getSession( member->getCharacterId() ) != nullptr;
+      bool isConnected = member->isConnected();
       // if player is online and in the same zone as current member in party, display more data in partylist
       bool hasInfo = isConnected && member->getTerritoryTypeId() == pMember->getTerritoryTypeId();
 

@@ -380,24 +380,21 @@ const char* packetCommandToString( uint16_t commandId )
 void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
 {
   using namespace Sapphire;
+  auto pPlayer = playerMgr().getPlayer( targetId );
 
-  auto& server = Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( targetId );
-  if( pSession )
+  if( !pPlayer )
+    return;
+
+  if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
   {
-    auto pTarget = pSession->getPlayer();
-    if( pTarget )
-    {
-      if( pTarget->isActingAsGm() || pTarget->getTerritoryTypeId() != player.getTerritoryTypeId() )
-      {
-        server.queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::ExamineError ) );
-      }
-      else
-      {
-        server.queueForPlayer( player.getCharacterId(), std::make_shared< InspectPacket >( player, pTarget ) );
-      }
-    }
+    server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::ExamineError ) );
   }
+  else
+  {
+    server().queueForPlayer( player.getCharacterId(), std::make_shared< InspectPacket >( player, pPlayer ) );
+  }
+
+
 }
 
 void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -568,7 +565,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
         server().queueForPlayers( player.getInRangePlayerIds(), movePacket );
         server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), ActorControlType::EmoteModeInterrupt ) );
-        server().queueForPlayers( player.getInRangePlayerIds(),  makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) ) );
+        server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) ) );
       }
       break;
     }

@@ -51,7 +51,6 @@ Sapphire::Network::GameConnectionPtr Sapphire::World::Session::getChatConnection
 
 bool Sapphire::World::Session::loadPlayer()
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
 
   m_isValid = false;

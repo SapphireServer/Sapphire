@@ -83,6 +83,18 @@ Sapphire::Entity::PlayerPtr PlayerMgr::getPlayer( const std::string& playerName 
   return loadPlayer( playerName );
 }
 
+std::vector< Sapphire::Entity::PlayerPtr > PlayerMgr::searchPlayersByName( const std::string& playerName )
+{
+  std::vector< Sapphire::Entity::PlayerPtr > results{};
+
+  for( auto& it : m_playerMapByName )
+  {
+    if( it.first.find( playerName ) != std::string::npos )
+      results.push_back( it.second );
+  }
+  return results;
+}
+
 
 std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
 {

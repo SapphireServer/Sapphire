@@ -15,6 +15,7 @@ namespace Sapphire::World::Manager
     Entity::PlayerPtr getPlayer( uint32_t entityId );
     Entity::PlayerPtr getPlayer( uint64_t characterId );
     Entity::PlayerPtr getPlayer( const std::string& playerName );
+    std::vector< Entity::PlayerPtr > searchPlayersByName( const std::string& playerName );
     Entity::PlayerPtr addPlayer( uint64_t characterId );
     Entity::PlayerPtr loadPlayer( uint32_t entityId );
     Entity::PlayerPtr loadPlayer( uint64_t characterId );

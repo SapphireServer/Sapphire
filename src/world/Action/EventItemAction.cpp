@@ -54,17 +54,13 @@ void EventItemAction::execute()
 {
   Sapphire::Entity::PlayerPtr pPlayer = m_pSource->getAsPlayer();
   if( !pPlayer )
-  {
     return;
-  }
+
   Manager::PlayerMgr::sendDebug( *pPlayer, "EventItemAction type {0} execute called.", m_eventItemAction->data().Action );
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
-  eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler,
-                       Event::EventHandler::ActionResult, 0, 0 );
-
+  eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler, Event::EventHandler::ActionResult, 0, 0 );
   scriptMgr.onEventItem( *pPlayer, m_eventItem, m_eventItemAction->data().EventHandler, m_targetId );
   eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
 }

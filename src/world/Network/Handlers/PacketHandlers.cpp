@@ -390,17 +390,17 @@ void Sapphire::Network::GameConnection::pcSearchHandler( const Packets::FFXIVARR
 
   // on lastName, client automatically adds a space to first character - no need to manually add space
 
-  auto queryPlayers = server.searchSessionByName( queryName );
+  auto queryPlayers = playerMgr().searchPlayersByName( queryName );
 
   // store result in player - we don't map out query keys to data yet
   std::vector< uint32_t > entityIdVec;
 
-  for( const auto& pSession : queryPlayers )
+  for( const auto& pPlayer : queryPlayers )
   {
-    if( !pSession )
+    if( !pPlayer || !pPlayer->isConnected() )
       continue;
 
-    entityIdVec.emplace_back( pSession->getPlayer()->getId() );
+    entityIdVec.emplace_back( pPlayer->getId() );
   }
 
   player.setLastPcSearchResult( entityIdVec );
@@ -492,17 +492,16 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
 
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto pSession = server.getSession( data.toName );
 
-  if( !pSession )
+  auto pTargetPlayer = playerMgr().getPlayer( data.toName );
+
+  if( !pTargetPlayer || pTargetPlayer->isConnected() )
   {
     auto tellErrPacket = makeZonePacket< Packets::Server::FFXIVIpcTellNotFound >( player.getId() );
     strcpy( tellErrPacket->data().toName, data.toName );
     sendSinglePacket( tellErrPacket );
     return;
   }
-
-  auto pTargetPlayer = pSession->getPlayer();
 
   if( pTargetPlayer->hasCondition( PlayerCondition::BetweenAreas ) )
   {
@@ -512,12 +511,6 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
   }
 
   auto pSessionSource = server.getSession( player.getCharacterId() );
-
-  if( !pSession )
-  {
-    Logger::error( std::string( __FUNCTION__ ) + ": Session not found for player#{}", player.getCharacterId() );
-    return;
-  }
 
   if( pTargetPlayer->hasCondition( PlayerCondition::BoundByDuty ) && !player.isActingAsGm() )
   {
@@ -545,7 +538,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
     tellPacket->data().type |= ChatFromType::GmTellMsg; //TODO: Is there an enum for this? or is it only GM?
   }
 
-  pSession->getChatConnection()->queueOutPacket( tellPacket );
+  server.getSession( pTargetPlayer->getCharacterId() )->getChatConnection()->queueOutPacket( tellPacket );
 }
 
 void Sapphire::Network::GameConnection::chatToChannelHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

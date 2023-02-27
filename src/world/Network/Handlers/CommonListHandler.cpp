@@ -92,7 +92,7 @@ void Sapphire::Network::GameConnection::getCommonlistHandler( const Packets::FFX
         
       PlayerEntry entry{};
       memset( &entry, 0, sizeof( PlayerEntry ) );
-      bool isConnected = server.getSession( pPlayer->getCharacterId() ) != nullptr;
+      bool isConnected = pPlayer->isConnected();
 
       if( isConnected )
       {

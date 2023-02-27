@@ -612,12 +612,12 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
   Logger::debug( "{0} used GM2 commandId: {1}, params: {2}, {3}, {4}, {5}, target: {6}",
                  player.getName(), commandId, param1, param2, param3, param4, target );
 
-  auto targetSession = server().getSession( target );
+  auto targetPlayer = playerMgr().getPlayer( target );
   Sapphire::Entity::CharaPtr targetActor;
 
-  if( targetSession != nullptr )
+  if( targetPlayer != nullptr )
   {
-    targetActor = targetSession->getPlayer();
+    targetActor = targetPlayer;
   }
   else
   {
@@ -637,8 +637,6 @@ void Sapphire::Network::GameConnection::gmCommandNameHandler( const Packets::FFX
 
   auto pTargetActorTerri = teriMgr.getTerritoryByGuId( targetActor->getTerritoryId() );
   auto pPlayerTerri = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
-
-  auto targetPlayer = targetActor->getAsPlayer();
 
   switch( commandId )
   {

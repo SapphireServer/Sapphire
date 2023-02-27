@@ -49,7 +49,7 @@ namespace Sapphire::World::Manager
     PartyMgr() = default;
 
     /// Perform required actions for events
-    void onJoin( uint32_t joinerId, uint32_t inviterId );
+    void onJoin( Entity::Player& joiner, Entity::Player& inviter );
     void onLeave( Entity::Player& leavingPlayer );
     void onMoveZone( Entity::Player& movingPlayer );
     void onDisband( Entity::Player& disbandingPlayer );

@@ -472,8 +472,6 @@ void HousingMgr::sendWardLandInfo( Entity::Player& player, uint8_t wardId, uint1
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto pSession = server.getSession( player.getCharacterId() );
-
   auto landSetId = toLandSetId( territoryTypeId, wardId );
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -680,7 +678,6 @@ void HousingMgr::deleteHouse( Sapphire::HousePtr house ) const
 void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, uint8_t plotNum, uint32_t presetCatalogId )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto pLand = zone.getLand( plotNum );
   if( !pLand )
@@ -731,7 +728,6 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
 void HousingMgr::requestEstateRename( Entity::Player& player, const Common::LandIdent ident )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -758,7 +754,6 @@ void HousingMgr::requestEstateRename( Entity::Player& player, const Common::Land
 void HousingMgr::requestEstateEditGreeting( Entity::Player& player, const Common::LandIdent ident )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -814,7 +809,6 @@ void HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::Lan
 void HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, const Common::LandIdent ident )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto landSetId = toLandSetId( ident.territoryTypeId, ident.wardNum );
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
@@ -993,7 +987,6 @@ void HousingMgr::reqPlaceHousingItem( Entity::Player& player, uint16_t landId, u
                                       Common::FFXIVARR_POSITION3 pos, float rotation )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -1312,7 +1305,6 @@ bool HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ide
                                    Common::FFXIVARR_POSITION3 pos, float rot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto containerIdx = static_cast< uint16_t >( slot / 50 );
   auto slotIdx = slot % 50;
@@ -1359,7 +1351,6 @@ bool HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ide
 bool HousingMgr::moveExternalItem( Entity::Player& player, Common::LandIdent ident, uint8_t slot, HousingZone& terri, Common::FFXIVARR_POSITION3 pos, float rot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto land = terri.getLand( static_cast< uint8_t >( ident.landId ) );
 
@@ -1599,7 +1590,6 @@ ItemContainerPtr HousingMgr::getFreeEstateInventorySlot( Common::LandIdent ident
 void HousingMgr::reqEstateExteriorRemodel( Entity::Player& player, uint16_t plot )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -1635,7 +1625,6 @@ void HousingMgr::reqEstateInteriorRemodel( Entity::Player& player )
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto terri = std::dynamic_pointer_cast< Territory::Housing::HousingInteriorTerritory >( pZone );
   if( !terri )
@@ -1699,7 +1688,6 @@ void HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
     return;
 
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto pLand = terri->getLand( plot );
   if( !pLand )

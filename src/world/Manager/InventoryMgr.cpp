@@ -25,7 +25,6 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 void InventoryMgr::sendInventoryContainer( Entity::Player& player, ItemContainerPtr container )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
 
   auto sequence = player.getNextInventorySequence();
   auto pMap = container->getItemMap();

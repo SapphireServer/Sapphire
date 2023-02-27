@@ -441,7 +441,6 @@ bool WorldServer::createSession( uint32_t sessionId )
   }
 
   m_sessionMapById[ sessionId ] = newSession;
-  m_sessionMapByName[ newSession->getPlayer()->getName() ] = newSession;
   m_sessionMapByCharacterId[ newSession->getPlayer()->getCharacterId() ] = newSession;
 
   return true;
@@ -454,7 +453,6 @@ void WorldServer::removeSession( uint32_t sessionId )
     return;
 
   m_sessionMapById.erase( sessionId );
-  m_sessionMapByName.erase( pSession->getPlayer()->getName() );
   m_sessionMapByCharacterId.erase( pSession->getPlayer()->getCharacterId() );
 }
 
@@ -480,51 +478,15 @@ SessionPtr WorldServer::getSession( uint64_t id )
   return nullptr;
 }
 
-SessionPtr WorldServer::getSession( const std::string& playerName )
-{
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-
-  auto it = m_sessionMapByName.find( playerName );
-
-  if( it != m_sessionMapByName.end() )
-    return ( it->second );
-
-  return nullptr;
-}
-
 void WorldServer::removeSession( const Entity::Player& player )
 {
-  auto session = getSession( player.getCharacterId() );
-  if( session )
-    m_sessionMapById.erase( session->getId() );
-
-  m_sessionMapByName.erase( player.getName() );
+  m_sessionMapById.erase( player.getId() );
   m_sessionMapByCharacterId.erase( player.getCharacterId() );
 }
 
 bool WorldServer::isRunning() const
 {
   return m_bRunning;
-}
-
-std::vector< SessionPtr > WorldServer::searchSessionByName( const std::string& playerName )
-{
-  //std::lock_guard<std::mutex> lock( m_sessionMutex );
-
-  std::vector< SessionPtr > results{};
-
-  for( auto it = m_sessionMapByName.begin(); it != m_sessionMapByName.end(); ++it ) {
-    if( it->first.find( playerName ) != std::string::npos ) {
-      results.push_back( it->second );
-    }
-  }
-  
-  return results;
-}
-
-std::map< int32_t, WorldServer::BNPCMap >& Sapphire::World::WorldServer::getBNpcTeriMap()
-{
-  return m_bNpcTerritoryMap;
 }
 
 Sapphire::Common::Config::WorldConfig& WorldServer::getConfig()

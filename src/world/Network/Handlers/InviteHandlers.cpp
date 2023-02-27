@@ -146,7 +146,7 @@ void Sapphire::Network::GameConnection::inviteReplyHandler( const FFXIVARR_PACKE
       uint8_t result = InviteUpdateType::REJECT_INVITE;
       if( data.Answer == InviteReplyType::ACCEPT )
       {
-        partyMgr.onJoin( player.getId(), pPlayer->getId() );
+        partyMgr.onJoin( player, *pPlayer );
         result = InviteUpdateType::ACCEPT_INVITE;
       }
 

@@ -492,8 +492,7 @@ void Territory::updateSessions( uint64_t tickCount, bool changedWeather )
     }
 
     // this session is not linked to this area anymore, remove it from zone session list
-    // TODO: Retrieving the session is expensive, try to find a better method of removing invalid actors
-    if( pPlayer->getTerritoryId() != m_guId || !server.getSession( pPlayer->getId() ) )
+    if( pPlayer->getTerritoryId() != m_guId || !pPlayer->isConnected() )
     {
       Logger::debug( "[{}] removeActor( pPlayer );", pPlayer->getId() );
       removeActor( pPlayer );

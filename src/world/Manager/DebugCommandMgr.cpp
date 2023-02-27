@@ -158,7 +158,6 @@ void DebugCommandMgr::help( char* data, Entity::Player& player, std::shared_ptr<
 void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
-  auto pSession = server.getSession( player.getCharacterId() );
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -210,8 +209,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     setActorPosPacket->data().x = player.getPos().x;
     setActorPosPacket->data().y = player.getPos().y;
     setActorPosPacket->data().z = player.getPos().z;
-    pSession->getZoneConnection()->queueOutPacket( setActorPosPacket );
-
+    server.queueForPlayer( player.getCharacterId(), setActorPosPacket );
   }
   else if( ( subCommand == "tele" ) && ( !params.empty() ) )
   {
@@ -229,12 +227,12 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     auto discoveryPacket = makeZonePacket< FFXIVIpcDiscoveryReply >( player.getId() );
     discoveryPacket->data().mapId = static_cast< uint32_t >( map_id );
     discoveryPacket->data().mapPartId = static_cast< uint32_t >( discover_id );
-    pSession->getZoneConnection()->queueOutPacket( discoveryPacket );
+    server.queueForPlayer( player.getCharacterId(), discoveryPacket );
   }
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    pSession->getZoneConnection()->queueOutPacket( std::make_shared< PlayerSetupPacket >( player ) );
+    server.queueForPlayer( player.getCharacterId(), std::make_shared< PlayerSetupPacket >( player ) );
   }
   else if( subCommand == "classjob" )
   {
@@ -365,7 +363,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     auto fcPacket = makeZonePacket< FFXIVIpcFreeCompany >( player.getId() );
     fcPacket->data().Crest = 0x0001000100010001;
     strcpy( fcPacket->data().Tag, "Wang" );
-    pSession->getZoneConnection()->queueOutPacket( fcPacket );
+    server.queueForPlayer( player.getCharacterId(), fcPacket );
 
     auto fcResultPacket = makeZonePacket< FFXIVIpcGetFcStatusResult >( player.getId() );
     fcResultPacket->data().FreeCompanyID = 1;
@@ -374,7 +372,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     fcResultPacket->data().GrandCompanyID = 1;
     fcResultPacket->data().FcRank = 8;
     fcResultPacket->data().CrestID = 0x0001000100010001;
-    pSession->getZoneConnection()->queueOutPacket( fcResultPacket );
+    server.queueForPlayer( player.getCharacterId(), fcResultPacket );
   }
   else
   {
@@ -606,7 +604,7 @@ void DebugCommandMgr::injectPacket( char* data, Entity::Player& player, std::sha
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto pSession = server.getSession( player.getId() );
+  auto pSession = server.getSession( player.getCharacterId() );
   if( pSession )
     pSession->getZoneConnection()->injectPacket( data + 7, player );
 }
@@ -615,7 +613,7 @@ void DebugCommandMgr::injectChatPacket( char* data, Entity::Player& player, std:
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto pSession = server.getSession( player.getId() );
+  auto pSession = server.getSession( player.getCharacterId() );
   if( pSession )
     pSession->getChatConnection()->injectPacket( data + 8, player );
 }
@@ -648,19 +646,19 @@ void DebugCommandMgr::replay( char* data, Entity::Player& player, std::shared_pt
 
   if( subCommand == "start" )
   {
-    auto pSession = server.getSession( player.getId() );
+    auto pSession = server.getSession( player.getCharacterId() );
     if( pSession )
       pSession->startReplay( params );
   }
   else if( subCommand == "stop" )
   {
-    auto pSession = server.getSession( player.getId() );
+    auto pSession = server.getSession( player.getCharacterId() );
     if( pSession )
       pSession->stopReplay();
   }
   else if( subCommand == "info" )
   {
-    auto pSession = server.getSession( player.getId() );
+    auto pSession = server.getSession( player.getCharacterId() );
     if( pSession )
       pSession->sendReplayInfo();
   }
