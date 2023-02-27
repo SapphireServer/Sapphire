@@ -510,13 +510,11 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
     return;
   }
 
-  auto pSessionSource = server.getSession( player.getCharacterId() );
-
   if( pTargetPlayer->hasCondition( PlayerCondition::BoundByDuty ) && !player.isActingAsGm() )
   {
     auto boundPacket = makeChatPacket< Packets::Server::FFXIVRecvFinderStatus >( player.getId() );
     strcpy( boundPacket->data().toName, data.toName );
-    pSessionSource->getChatConnection()->queueOutPacket( boundPacket );
+    server.queueChatForPlayer( player.getCharacterId(), boundPacket );
     return;
   }
 
@@ -524,7 +522,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
   {
     auto busyPacket = makeChatPacket< Packets::Server::FFXIVRecvBusyStatus >( player.getId() );
     strcpy( busyPacket->data().toName, data.toName );
-    pSessionSource->getChatConnection()->queueOutPacket( busyPacket );
+    server.queueChatForPlayer( player.getCharacterId(), busyPacket );
     return;
   }
 
@@ -537,8 +535,7 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
   {
     tellPacket->data().type |= ChatFromType::GmTellMsg; //TODO: Is there an enum for this? or is it only GM?
   }
-
-  server.getSession( pTargetPlayer->getCharacterId() )->getChatConnection()->queueOutPacket( tellPacket );
+  server.queueChatForPlayer( pTargetPlayer->getCharacterId(), tellPacket );
 }
 
 void Sapphire::Network::GameConnection::chatToChannelHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

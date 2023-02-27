@@ -9,8 +9,6 @@
 #include <Network/GamePacketParser.h>
 #include <Service.h>
 
-#include "Territory/Territory.h"
-
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 
 #include "GameConnection.h"
@@ -28,8 +26,7 @@ using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::Packets::WorldPackets::Client;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pHive,
-                                                   Sapphire::Network::AcceptorPtr pAcceptor ) :
+GameConnection::GameConnection( Sapphire::Network::HivePtr pHive, Sapphire::Network::AcceptorPtr pAcceptor ) :
   Connection( std::move( pHive ) ),
   m_pAcceptor( std::move( pAcceptor ) ),
   m_conType( ConnectionType::None )
@@ -173,28 +170,28 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( GetFcInviteList, "GetFcInviteList", &GameConnection::getFcInviteListHandler );
 }
 
-Sapphire::Network::GameConnection::~GameConnection() = default;
+GameConnection::~GameConnection() = default;
 
 
 // overwrite the parents onConnect for our game socket needs
-void Sapphire::Network::GameConnection::onAccept( const std::string& host, uint16_t port )
+void GameConnection::onAccept( const std::string& host, uint16_t port )
 {
-  GameConnectionPtr connection( new GameConnection( m_hive, m_pAcceptor ) );
+  auto connection = std::make_shared< GameConnection >( m_hive, m_pAcceptor );
   m_pAcceptor->accept( connection );
   Logger::info( "Connect from {0}:{1}", m_socket.remote_endpoint().address().to_string(), m_socket.remote_endpoint().port() );
 }
 
 
-void Sapphire::Network::GameConnection::onDisconnect()
+void GameConnection::onDisconnect()
 {
   if( m_pSession )
-    Logger::debug( "[{0}] Disconnect", m_pSession->getId() );
+    Logger::debug( "[{0}] Disconnect {1}:{2}\"", m_pSession->getId() );
   else
     Logger::debug( "Disconnect of lost session." );
   m_pSession.reset();
 }
 
-void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
+void GameConnection::onRecv( std::vector< uint8_t >& buffer )
 {
   m_packets.insert( std::end( m_packets ), std::begin( buffer ), std::end( buffer ) );
   // This is assumed packet always start with valid FFXIVARR_PACKET_HEADER for now.
@@ -213,8 +210,7 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
 
   // Dissect packet list
   std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
-  const auto packetResult = Packets::getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
-                                                 packetHeader, packetList );
+  const auto packetResult = Packets::getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ), packetHeader, packetList );
 
   if( packetResult == Incomplete )
     return;
@@ -231,22 +227,22 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
   m_packets.clear();
 }
 
-void Sapphire::Network::GameConnection::onError( const asio::error_code& error )
+void GameConnection::onError( const asio::error_code& error )
 {
   Logger::debug( "GameConnection ERROR: {0}", error.message() );
 }
 
-void Sapphire::Network::GameConnection::queueInPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW inPacket )
+void GameConnection::queueInPacket( Packets::FFXIVARR_PACKET_RAW inPacket )
 {
-  m_inQueue.push( inPacket );
+  m_inQueue.push( std::move( inPacket ) );
 }
 
-void Sapphire::Network::GameConnection::queueOutPacket( Sapphire::Network::Packets::FFXIVPacketBasePtr outPacket )
+void GameConnection::queueOutPacket( Packets::FFXIVPacketBasePtr outPacket )
 {
-  m_outQueue.push( outPacket );
+  m_outQueue.push( std::move( outPacket ) );
 }
 
-void Sapphire::Network::GameConnection::queueOutPacket( std::vector< Packets::FFXIVPacketBasePtr > vector )
+void GameConnection::queueOutPacket( std::vector< Packets::FFXIVPacketBasePtr > vector )
 {
   for( auto& packet : vector )
   {
@@ -254,7 +250,7 @@ void Sapphire::Network::GameConnection::queueOutPacket( std::vector< Packets::FF
   }
 }
 
-void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
+void GameConnection::handleZonePacket( Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
   uint16_t opcode = Util::getOpCode( pPacket );
   auto it = m_zoneHandlerMap.find( opcode );
@@ -285,7 +281,7 @@ void Sapphire::Network::GameConnection::handleZonePacket( Sapphire::Network::Pac
   }
 }
 
-void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
+void GameConnection::handleChatPacket( Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
   uint16_t opcode = Util::getOpCode( pPacket );
   auto it = m_chatHandlerMap.find( opcode );
@@ -312,18 +308,18 @@ void Sapphire::Network::GameConnection::handleChatPacket( Sapphire::Network::Pac
   }
 }
 
-void Sapphire::Network::GameConnection::handlePacket( Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& pPacket )
+void GameConnection::handlePacket( Packets::FFXIVARR_PACKET_RAW& pPacket )
 {
   if( !m_pSession )
     return;
 
   switch( m_conType )
   {
-    case Network::ConnectionType::Zone:
+    case ConnectionType::Zone:
       handleZonePacket( pPacket );
       break;
 
-    case Network::ConnectionType::Chat:
+    case ConnectionType::Chat:
       handleChatPacket( pPacket );
       break;
 
@@ -333,7 +329,7 @@ void Sapphire::Network::GameConnection::handlePacket( Sapphire::Network::Packets
 
 }
 
-void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* pPacket )
+void GameConnection::sendPackets( Packets::PacketContainer* pPacket )
 {
   std::vector< uint8_t > sendBuffer;
 
@@ -341,7 +337,7 @@ void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* p
   send( sendBuffer );
 }
 
-void Sapphire::Network::GameConnection::processInQueue()
+void GameConnection::processInQueue()
 {
   // handle the incoming game packets
   while( m_inQueue.size() )
@@ -351,7 +347,7 @@ void Sapphire::Network::GameConnection::processInQueue()
   }
 }
 
-void Sapphire::Network::GameConnection::processOutQueue()
+void GameConnection::processOutQueue()
 {
   if( m_outQueue.size() < 1 )
     return;
@@ -383,14 +379,14 @@ void Sapphire::Network::GameConnection::processOutQueue()
 
 }
 
-void Sapphire::Network::GameConnection::sendSinglePacket( Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
+void GameConnection::sendSinglePacket( Packets::FFXIVPacketBasePtr pPacket )
 {
   PacketContainer pRP = PacketContainer();
-  pRP.addPacket( pPacket );
+  pRP.addPacket( std::move( pPacket ) );
   sendPackets( &pRP );
 }
 
-void Sapphire::Network::GameConnection::injectPacket( const std::string& packetpath, Sapphire::Entity::Player& player )
+void GameConnection::injectPacket( const std::string& packetpath, Entity::Player& player )
 {
 
   char packet[ 0x11570 ];
@@ -435,14 +431,13 @@ void Sapphire::Network::GameConnection::injectPacket( const std::string& packetp
     if( pSize == 0 )
       return;
 
-    queueOutPacket( FFXIVPacketBasePtr( new FFXIVRawPacket( packet + k, pSize ) ) );
+    queueOutPacket( std::make_shared< FFXIVRawPacket >( packet + k, pSize ) );
 
     k += ( pSize );
   }
 }
 
-void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::Packets::FFXIVARR_PACKET_HEADER& ipcHeader,
-                                                       const std::vector< Sapphire::Network::Packets::FFXIVARR_PACKET_RAW >& packetData )
+void GameConnection::handlePackets( const Packets::FFXIVARR_PACKET_HEADER& ipcHeader, const std::vector< Packets::FFXIVARR_PACKET_RAW >& packetData )
 {
   auto& server = Common::Service< World::WorldServer >::ref();
 
@@ -553,7 +548,7 @@ void Sapphire::Network::GameConnection::handlePackets( const Sapphire::Network::
   }
 }
 
-const char* Sapphire::Network::GameConnection::zonePacketToString( uint32_t opcode )
+const char* GameConnection::zonePacketToString( uint32_t opcode )
 {
   switch( opcode )
   {

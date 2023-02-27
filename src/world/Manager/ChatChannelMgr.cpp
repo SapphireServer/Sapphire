@@ -120,19 +120,15 @@ void ChatChannelMgr::sendMessageToChannel( uint64_t channelId, Entity::Player& s
     if( id == sender.getId() )
       continue;
 
-    auto pSession = server.getSession( id );
+    auto pPlayer = playerMgr.getPlayer( id );
 
     // check if player is online to recv message
-    if( !pSession )
-    {
+    if( !pPlayer->isConnected() )
       continue;
-    }
-
-    auto pPlayer = playerMgr.getPlayer( id );
 
     // prepare message packet, associating message and sender info with channel data
     auto chatToChannelPacket = std::make_shared< Packets::Server::ChatToChannelPacket >( *pPlayer, sender, channelId, message );
-    pSession->getChatConnection()->queueOutPacket( chatToChannelPacket );
+    server.queueChatForPlayer( pPlayer->getCharacterId(), chatToChannelPacket );
   }
 }
 

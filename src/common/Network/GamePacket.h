@@ -296,8 +296,7 @@ namespace Sapphire::Network::Packets
   };
 
 
-  class FFXIVRawPacket :
-    public FFXIVPacketBase
+  class FFXIVRawPacket : public FFXIVPacketBase
   {
   public:
     FFXIVRawPacket( uint16_t type, uint32_t size, uint32_t sourceActorId, uint32_t targetActorId ) :

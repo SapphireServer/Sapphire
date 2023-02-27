@@ -505,6 +505,17 @@ void WorldServer::queueForPlayer( uint64_t characterId, Sapphire::Network::Packe
     pZoneCon->queueOutPacket( pPacket );
 }
 
+void WorldServer::queueChatForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
+{
+  auto pSession = getSession( characterId );
+  if( !pSession )
+    return;
+
+  auto pChatCon = pSession->getChatConnection();
+  if( pChatCon )
+    pChatCon->queueOutPacket( pPacket );
+}
+
 void WorldServer::queueForPlayers( const std::set< uint64_t >& characterIds, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket )
 {
   if( characterIds.empty() )

@@ -44,6 +44,7 @@ namespace Sapphire::World
     bool loadSettings( int32_t argc, char* argv[] );
 
     void queueForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
+    void queueChatForPlayer( uint64_t characterId, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
     void queueForPlayers( const std::set< uint64_t >& characterIds, Sapphire::Network::Packets::FFXIVPacketBasePtr pPacket );
     void queueForPlayer( uint64_t characterId, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets );
     void queueForPlayers(  const std::set< uint64_t >& characterIds, std::vector< Sapphire::Network::Packets::FFXIVPacketBasePtr > packets );
