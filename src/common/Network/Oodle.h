@@ -2,7 +2,7 @@
 #define _OODLE_H
 
 #include <vector>
-#include <cstdint>
+
 #include <oodle2net.h>
 
 namespace Sapphire::Network
