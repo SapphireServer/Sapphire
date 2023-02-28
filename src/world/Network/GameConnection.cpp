@@ -289,7 +289,7 @@ void GameConnection::handleChatPacket( Packets::FFXIVARR_PACKET_RAW& pPacket )
   if( it != m_chatHandlerMap.end() )
   {
     auto itStr = m_chatHandlerStrMap.find( opcode );
-    std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "unknown";
+    std::string name = itStr != m_chatHandlerStrMap.end() ? itStr->second : "Unknown";
     // dont display packet notification if it is a ping or pos update, don't want the spam
 
     Logger::debug( "[{0}] Handling Chat IPC : {1} ( {2:04X} )", m_pSession->getId(), name, opcode );

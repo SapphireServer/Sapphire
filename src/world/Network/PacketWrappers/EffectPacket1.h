@@ -75,7 +75,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 
     void setResultId( uint32_t resultId )
     {
-      m_data.ResultId = static_cast< uint32_t >( resultId );
+      m_data.ResultId = resultId;
     }
 
   private:

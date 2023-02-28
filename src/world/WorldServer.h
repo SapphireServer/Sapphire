@@ -16,7 +16,7 @@ namespace Sapphire::World
   public:
     WorldServer( const std::string& configName );
 
-    ~WorldServer();
+    ~WorldServer() = default;
 
     using WorldConfigPtr = std::shared_ptr< Sapphire::Common::Config::WorldConfig >;
 

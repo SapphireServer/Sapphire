@@ -23,12 +23,12 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
   const auto type = packet.data().ActionKind;
   const auto actionId = packet.data().ActionKey;
-  const auto sequence = packet.data().RequestId;
+  const auto requestId = packet.data().RequestId;
   const auto targetId = packet.data().Target;
   const auto itemSourceSlot = packet.data().Arg & 0x0000FFFF;
   const auto itemSourceContainer = packet.data().Arg & 0xFFFF0000;
 
-  PlayerMgr::sendDebug( player, "Skill type: {0}, sequence: {1}, actionId: {2}, targetId: {3}", type, sequence, actionId, targetId );
+  PlayerMgr::sendDebug( player, "Skill type: {0}, requestId: {1}, actionId: {2}, targetId: {3}", type, requestId, actionId, targetId );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
@@ -50,9 +50,9 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       auto category = static_cast< Common::ActionCategory >( action->data().Category );
 
       if( category  == Common::ActionCategory::ItemManipulation )
-        actionMgr.handleItemManipulationAction( player, actionId, action, sequence );
+        actionMgr.handleItemManipulationAction( player, actionId, action, requestId );
       else
-        actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
+        actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, requestId );
       break;
     }
 
@@ -78,7 +78,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     {
       auto action = exdData.getRow< Excel::EventItem >( actionId );
       assert( action );
-      actionMgr.handleEventItemAction( player, actionId, action, sequence, targetId );
+      actionMgr.handleEventItemAction( player, actionId, action, requestId, targetId );
       break;
     }
 
@@ -86,7 +86,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     {
       auto action = exdData.getRow< Excel::Action >( 4 );
       assert( action );
-      actionMgr.handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, sequence );
+      actionMgr.handleMountAction( player, static_cast< uint16_t >( actionId ), action, targetId, requestId );
       break;
     }
   }

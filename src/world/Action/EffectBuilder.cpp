@@ -25,10 +25,10 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence ) :
+EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t requestId ) :
   m_sourceChara( std::move( source ) ),
   m_actionId( actionId ),
-  m_sequence( sequence )
+  m_requestId( requestId )
 {
 
 }
@@ -131,7 +131,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
   {
     auto effectPacket = std::make_shared< EffectPacket >( m_sourceChara->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    effectPacket->setRequestId( m_sequence );
+    effectPacket->setRequestId( m_requestId );
     effectPacket->setResultId( resultId );
     effectPacket->setTargetActor( targetList[ 0 ]->getId() );
 
@@ -144,7 +144,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
       for( auto i = 0; i < actorResultList.size(); ++i )
       {
         auto result = actorResultList.data()[ i ];
-        auto effect = result->buildEffectEntry();
+        auto effect = result->getCalcResultParam();
 
         // if effect result is a source/caster effect
         if( result->getTarget() == m_sourceChara )
@@ -180,7 +180,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
 
     auto effectPacket = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    effectPacket->setRequestId( m_sequence );
+    effectPacket->setRequestId( m_requestId );
     effectPacket->setResultId( resultId );
 
     for( auto it = m_actorEffectsMap.begin(); it != m_actorEffectsMap.end(); )
@@ -191,7 +191,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
       for( auto i = 0; i < actorResultList.size(); ++i )
       {
         auto result = actorResultList.data()[ i ];
-        auto effect = result->buildEffectEntry();
+        auto effect = result->getCalcResultParam();
 
         // if effect result is a source/caster effect
         if( result->getTarget() == m_sourceChara )
@@ -226,7 +226,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
     effectPacket->data().MainTarget = static_cast< uint64_t >( m_sourceChara->getId() );
     effectPacket->data().DirTarget = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
     effectPacket->data().Flag = Common::ActionEffectDisplayType::HideActionName;
-    effectPacket->data().RequestId = m_sequence;
+    effectPacket->data().RequestId = m_requestId;
     effectPacket->data().ResultId = resultId;
 
     m_actorEffectsMap.clear();

@@ -44,12 +44,12 @@ using namespace Sapphire::World::Manager;
 Action::Action::Action() = default;
 Action::Action::~Action() = default;
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence ) :
-  Action( std::move( caster ), actionId, sequence, nullptr )
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId ) :
+  Action( std::move( caster ), actionId, requestId, nullptr )
 {
 }
 
-Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence,
+Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId,
                         std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData ) :
   m_pSource( std::move( caster ) ),
   m_actionData( std::move( actionData ) ),
@@ -57,7 +57,7 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t seq
   m_targetId( 0 ),
   m_startTime( 0 ),
   m_interruptType( Common::ActionInterruptType::None ),
-  m_sequence( sequence ),
+  m_requestId( requestId ),
   m_actionKind( Common::SkillType::Normal )
 {
 }
@@ -81,7 +81,7 @@ bool Action::Action::init()
     m_actionData = actionData;
   }
 
-  m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_sequence );
+  m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_requestId );
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->data().CastTime * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->data().RecastTime * 100 );

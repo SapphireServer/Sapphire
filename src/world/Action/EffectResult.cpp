@@ -14,25 +14,19 @@ using namespace Sapphire::World::Action;
 
 EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
   m_target( std::move( target ) ),
-  m_delayMs( runAfter ),
-  m_value( 0 ),
-  m_param0( 0 ),
-  m_param1( 0 ),
-  m_type( Common::ActionEffectType::CALC_RESULT_TYPE_NONE ),
-  m_param2( 0 ),
-  m_flag( Common::ActionEffectResultFlag::None )
+  m_delayMs( runAfter )
 {
-
+  m_result.Arg0 = 0;
+  m_result.Arg1 = 0;
+  m_result.Arg2 = 0;
+  m_result.Value = 0;
+  m_result.Flag = static_cast< uint8_t >( Common::ActionEffectResultFlag::None );
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_NONE;
 }
 
 Entity::CharaPtr EffectResult::getTarget() const
 {
   return m_target;
-}
-
-uint32_t EffectResult::getValue() const
-{
-  return m_value;
 }
 
 uint64_t EffectResult::getDelay()
@@ -42,101 +36,85 @@ uint64_t EffectResult::getDelay()
 
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  m_param0 = static_cast< uint8_t >( severity );
-  m_value = amount;
-  m_flag = flag;
-
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
+  m_result.Arg0 = static_cast< uint8_t >( severity );
+  m_result.Value = static_cast< int16_t >( amount );
+  m_result.Flag = static_cast< uint8_t >( flag );
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
 }
 
 void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
-  m_param1 = static_cast< uint8_t >( severity );
-  m_value = amount;
-  m_flag = flag;
-
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP;
+  m_result.Arg1 = static_cast< uint8_t >( severity );
+  m_result.Value = static_cast< int16_t >( amount );
+  m_result.Flag = static_cast< uint8_t >( flag );
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP;
 }
 
 void EffectResult::restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag )
 {
-  m_value = amount;
-  m_flag = flag;
-
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP;
+  m_result.Value = static_cast< int16_t >( amount );
+  m_result.Flag = static_cast< uint8_t >( flag );
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP;
 }
 
 void EffectResult::startCombo( uint16_t actionId )
 {
-  m_value = actionId;
-  m_flag = Common::ActionEffectResultFlag::EffectOnSource;
-
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO;
+  m_result.Value = static_cast< int16_t >( actionId );
+  m_result.Flag = static_cast< uint8_t >( Common::ActionEffectResultFlag::EffectOnSource );
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO;
 }
 
 void EffectResult::comboSucceed()
 {
   // no EffectOnSource flag on this
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO_HIT;
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO_HIT;
 }
 
 void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
 {
-  m_value = statusId;
-  m_param2 = param;
-
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
+  m_result.Value = static_cast< int16_t >( statusId );
+  m_result.Arg2 = param;
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
 }
 
 void EffectResult::mount( uint16_t mountId )
 {
-  m_value = mountId;
-  m_param0 = 1;
-
-  m_type = Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT;
+  m_result.Value = static_cast< int16_t >( mountId );
+  m_result.Arg0 = 1;
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT;
 }
 
-Common::CalcResultParam EffectResult::buildEffectEntry() const
+const Common::CalcResultParam& EffectResult::getCalcResultParam() const
 {
-  Common::CalcResultParam entry{};
-
-  // todo: that retarded shit so > u16 max numbers work
-  entry.Value = getValue();
-  entry.Arg0 = m_param0;
-  entry.Arg1 = m_param1;
-  entry.Type = m_type;
-  entry.Arg2 = m_param2;
-  entry.Flag = static_cast< uint8_t >( m_flag );
-
-  return entry;
+  return m_result;
 }
 
 void EffectResult::execute()
 {
-  switch( m_type )
+  switch( m_result.Type )
   {
     case Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP:
     {
-      m_target->takeDamage( m_value );
+      m_target->takeDamage( m_result.Value );
       break;
     }
 
     case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP:
     {
-      m_target->heal( m_value );
+      m_target->heal( m_result.Value );
       break;
     }
 
     case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP:
     {
-      m_target->restoreMP( m_value );
+      m_target->restoreMP( m_result.Value );
       break;
     }
 
     case Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT:
     {
       auto pPlayer = m_target->getAsPlayer();
-      Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *pPlayer, m_value );
+      Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *pPlayer, m_result.Value );
       break;
     }
 

@@ -70,10 +70,6 @@ WorldServer::WorldServer( const std::string& configName ) :
 {
 }
 
-WorldServer::~WorldServer()
-{
-}
-
 size_t WorldServer::getSessionCount() const
 {
   return m_sessionMapById.size();
@@ -389,12 +385,13 @@ void WorldServer::updateSessions( uint32_t currTime )
     if( !session || !session->getPlayer() )
       continue;
 
+    auto& player = *session->getPlayer();
+
     // if the player is in a zone, let the zone handler take care of his updates, else do it here.
-    if( !session->getPlayer()->isConnected() )
+    if( !player.isConnected() )
       session->update();
 
     auto diff = difftime( currTime, session->getLastDataTime() );
-    auto& player = *session->getPlayer();
 
     // remove session of players marked for removal ( logoff / kick )
     if( ( player.isMarkedForRemoval() && diff > 5 ) || diff > 20 )

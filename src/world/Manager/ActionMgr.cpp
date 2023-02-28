@@ -60,9 +60,9 @@ void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t a
 }
 
 void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                            Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t sequence )
+                                            Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t requestId )
 {
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
+  auto action = Action::make_Action( player.getAsPlayer(), actionId, requestId, actionData );
 
   action->setTargetId( targetId );
 

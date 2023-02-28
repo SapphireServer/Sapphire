@@ -16,8 +16,8 @@ namespace Sapphire::World::Action
   public:
 
     Action();
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence );
-    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t sequence, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId );
+    Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
 
     virtual ~Action();
 
@@ -171,7 +171,7 @@ namespace Sapphire::World::Action
     uint32_t m_id{};
     uint8_t m_actionKind{};
 
-    uint16_t m_sequence{};
+    uint16_t m_requestId{};
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};

@@ -16,14 +16,14 @@ using namespace Sapphire;
 using namespace Sapphire::World::Action;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-ItemManipulationAction::ItemManipulationAction( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence,
-                            std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint32_t delayTime ) :
+ItemManipulationAction::ItemManipulationAction( Entity::CharaPtr source, uint32_t actionId, uint16_t requestId,
+                                                std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint32_t delayTime ) :
   m_delayTimeMs( delayTime )
 {
   m_id = actionId;
   m_pSource = std::move( source );
   m_actionData = std::move( actionData );
-  m_sequence = sequence;
+  m_requestId = requestId;
 }
 
 void ItemManipulationAction::start()

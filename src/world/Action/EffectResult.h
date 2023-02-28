@@ -24,11 +24,9 @@ namespace Sapphire::World::Action
 
     Entity::CharaPtr getTarget() const;
 
-    uint32_t getValue() const;
-
     uint64_t getDelay();
 
-    Common::CalcResultParam buildEffectEntry() const;
+    const Common::CalcResultParam& getCalcResultParam() const;
 
     void execute();
 
@@ -37,13 +35,7 @@ namespace Sapphire::World::Action
 
     Entity::CharaPtr m_target;
 
-    Common::ActionEffectType m_type;
+    Common::CalcResultParam m_result;
 
-    uint8_t m_param0;
-    uint8_t m_param1;
-    uint8_t m_param2;
-
-    uint32_t m_value;
-    Common::ActionEffectResultFlag m_flag;
   };
 }
