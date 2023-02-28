@@ -1529,13 +1529,27 @@ namespace Sapphire::Common
     Visor = 0x40,
   };
 
-  enum SkillType : uint8_t
+  enum ActionKind : uint8_t
   {
-    Normal = 0x1,
-    ItemAction = 0x2,
-    EventItem = 0x3,
-    MountSkill = 0xD,
+    ACTION_KIND_NOTHING = 0x0,
+    ACTION_KIND_NORMAL = 0x1,
+    ACTION_KIND_ITEM = 0x2,
+    ACTION_KIND_EVENT_ITEM = 0x3,
+    ACTION_KIND_EVENT_ACTION = 0x4,
+    ACTION_KIND_GENERAL = 0x5,
+    ACTION_KIND_BUDDY = 0x6,
+    ACTION_KIND_COMMAND = 0x7,
+    ACTION_KIND_COMPANION = 0x8,
+    ACTION_KIND_CRAFT = 0x9,
+    ACTION_KIND_FISHING = 0xA,
+    ACTION_KIND_PET = 0xB,
+    ACTION_KIND_COMPANY_ACTION = 0xC,
+    ACTION_KIND_MOUNT = 0xD,
+    ACTION_KIND_PVP_ACTION = 0xE,
+    ACTION_KIND_FIELD_MARKER = 0xF,
   };
+
+
 
   enum HouseExteriorSlot
   {

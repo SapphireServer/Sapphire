@@ -27,15 +27,15 @@ using namespace Sapphire::Network::ActorControl;
 
 EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t eventItemId,
                                   std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > eventItemActionData,
-                                  uint32_t sequence, uint64_t targetId ) : m_eventItemAction( std::move( eventItemActionData ) )
+                                  uint32_t requestId, uint64_t targetId ) : m_eventItemAction( std::move( eventItemActionData ) )
 {
   m_id = eventItemId;
   m_eventItem = eventItemId;
   m_pSource = std::move( source );
-  m_sequence = sequence;
+  m_requestId = requestId;
   m_targetId = targetId;
   m_interruptType = Common::ActionInterruptType::None;
-  m_actionKind = Common::SkillType::EventItem;
+  m_actionKind = Common::ActionKind::ACTION_KIND_EVENT_ITEM;
 }
 
 bool EventItemAction::init()

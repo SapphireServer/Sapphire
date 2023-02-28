@@ -469,8 +469,8 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t Type;
   };
 
-  struct IntegrityStatus {
-    
+  struct IntegrityStatus
+  {
     uint8_t Slot;
     uint8_t __padding1;
     uint16_t Id;
@@ -599,6 +599,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t TargetCount;
     uint32_t BallistaEntityId;
     Common::CalcResult CalcResult[16];
+    uint32_t Padding;
     uint64_t Target[16];
     uint16_t TargetPos[3];
   };

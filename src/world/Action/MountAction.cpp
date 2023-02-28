@@ -26,7 +26,7 @@ MountAction::MountAction( Sapphire::Entity::CharaPtr source, uint16_t mountId, u
   Action::Action( source, 4, sequence, actionData ),
   m_mountId( mountId )
 {
-  m_actionKind = Common::SkillType::MountSkill;
+  m_actionKind = Common::ActionKind::ACTION_KIND_MOUNT;
 }
 
 bool MountAction::preCheck()
@@ -58,8 +58,7 @@ void MountAction::start()
   data.TargetPos[ 2 ] = Common::Util::floatToUInt16( pos.z );
   data.Dir = m_pSource->getRot();
   server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), castPacket );
-
-  Common::Service< World::Manager::PlayerMgr >::ref().setCondition( *player, Common::PlayerCondition::Casting );
+  playerMgr().setCondition( *player, Common::PlayerCondition::Casting );
 
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
   server().queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), actionStartPkt );

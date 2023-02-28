@@ -15,11 +15,11 @@ namespace Sapphire::World::Action
 
   public:
 
-    Action();
+    Action() = default;
     Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId );
     Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
 
-    virtual ~Action();
+    virtual ~Action() = default;
 
     uint32_t getId() const;
 

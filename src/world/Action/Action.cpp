@@ -41,9 +41,6 @@ using namespace Sapphire::World;
 using namespace Sapphire::World::Manager;
 
 
-Action::Action::Action() = default;
-Action::Action::~Action() = default;
-
 Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t requestId ) :
   Action( std::move( caster ), actionId, requestId, nullptr )
 {
@@ -58,7 +55,7 @@ Action::Action::Action( Entity::CharaPtr caster, uint32_t actionId, uint16_t req
   m_startTime( 0 ),
   m_interruptType( Common::ActionInterruptType::None ),
   m_requestId( requestId ),
-  m_actionKind( Common::SkillType::Normal )
+  m_actionKind( Common::ActionKind::ACTION_KIND_NORMAL )
 {
 }
 
@@ -798,18 +795,14 @@ void Action::Action::addDefaultActorFilters()
     case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
-
       addActorFilter( filter );
-
       break;
     }
 
     case Common::CastType::CircularAOE:
     {
       auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
-
       addActorFilter( filter );
-
       break;
     }
 

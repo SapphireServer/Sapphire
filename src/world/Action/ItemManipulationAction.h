@@ -9,7 +9,7 @@ namespace Sapphire::World::Action
   {
   public:
     ItemManipulationAction( Entity::CharaPtr source, uint32_t actionId, uint16_t requestId,
-                  std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint32_t delayTime );
+                            std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint32_t delayTime );
     virtual ~ItemManipulationAction() = default;
 
     void start() override;

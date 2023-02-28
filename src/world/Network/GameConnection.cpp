@@ -185,7 +185,7 @@ void GameConnection::onAccept( const std::string& host, uint16_t port )
 void GameConnection::onDisconnect()
 {
   if( m_pSession )
-    Logger::debug( "[{0}] Disconnect {1}:{2}\"", m_pSession->getId() );
+    Logger::debug( "[{0}] Disconnected", m_pSession->getId() );
   else
     Logger::debug( "Disconnect of lost session." );
   m_pSession.reset();

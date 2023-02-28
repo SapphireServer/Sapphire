@@ -39,7 +39,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
     {
       PlayerMgr::sendDebug( player, "Skill type {0} not supported. Defaulting to normal action", type );
     }
-    case Common::SkillType::Normal:
+    case Common::ActionKind::ACTION_KIND_NORMAL:
     {
       auto action = exdData.getRow< Excel::Action >( actionId );
 
@@ -56,7 +56,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       break;
     }
 
-    case Common::SkillType::ItemAction:
+    case Common::ActionKind::ACTION_KIND_ITEM:
     {
       auto item = exdData.getRow< Excel::Item >( actionId );
       if( !item )
@@ -74,7 +74,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       break;
     }
 
-    case Common::SkillType::EventItem:
+    case Common::ActionKind::ACTION_KIND_EVENT_ITEM:
     {
       auto action = exdData.getRow< Excel::EventItem >( actionId );
       assert( action );
@@ -82,7 +82,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       break;
     }
 
-    case Common::SkillType::MountSkill:
+    case Common::ActionKind::ACTION_KIND_MOUNT:
     {
       auto action = exdData.getRow< Excel::Action >( 4 );
       assert( action );
@@ -95,25 +95,24 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
 
 }
 
-void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket,
-                                                             Entity::Player& player )
+void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 {
   const auto packet = ZoneChannelPacket< FFXIVIpcSelectGroundActionRequest >( inPacket );
 
   const auto type = packet.data().ActionKind;
   const auto actionId = packet.data().ActionKey;
-  const auto sequence = packet.data().RequestId;
+  const auto requestId = packet.data().RequestId;
   const auto pos = packet.data().Pos;
 
   // todo: find out if there are any other action types which actually use this handler
-  if( type != Common::SkillType::Normal )
+  if( type != Common::ActionKind::ACTION_KIND_NORMAL )
   {
     PlayerMgr::sendDebug( player, "Skill type {0} not supported by aoe action handler!", type );
     return;
   }
 
   PlayerMgr::sendDebug( player, "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
-                    type, sequence, actionId, pos.x, pos.y, pos.z );
+                        type, requestId, actionId, pos.x, pos.y, pos.z );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -124,5 +123,5 @@ void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets
     return;
 
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
-  actionMgr.handlePlacedPlayerAction( player, actionId, action, pos, sequence );
+  actionMgr.handlePlacedPlayerAction( player, actionId, action, pos, requestId );
 }
