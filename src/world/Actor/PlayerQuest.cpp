@@ -1091,6 +1091,14 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
     }
   }
 
+  auto isHq = false;
+  if (optionalChoice > 1000000)
+  {
+    optionalChoice -= 1000000;
+    isHq = true;
+  }
+
+
   if( optionalItemCount > 0 )
   {
     for( uint32_t i = 0; i < optionalItemCount; i++ )
@@ -1098,7 +1106,7 @@ bool Sapphire::Entity::Player::giveQuestRewards( uint32_t questId, uint32_t opti
       auto itemId = questInfo->optionalItemReward.at( i );
       if( itemId > 0 && itemId == optionalChoice )
       {
-        addItem( itemId, questInfo->optionalItemCountReward.at( i ), false, false, true, true );
+        addItem( itemId, questInfo->optionalItemCountReward.at( i ), isHq, false, true, true );
         break;
       }
     }
