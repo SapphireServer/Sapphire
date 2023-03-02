@@ -176,7 +176,7 @@ bool Sapphire::Entity::Player::isActingAsGm() const
 {
   auto status = getOnlineStatus();
   return status == OnlineStatus::GameMaster || status == OnlineStatus::GameMaster1 ||
-         status == OnlineStatus::GameMaster2;
+         status == OnlineStatus::GameQA;
 }
 
 uint8_t Sapphire::Entity::Player::getMode() const

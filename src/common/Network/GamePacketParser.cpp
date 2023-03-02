@@ -1,7 +1,9 @@
 #include "CommonNetwork.h"
 #include "GamePacketParser.h"
+#include "Oodle.h"
 
 #include <string.h>   // memcpy
+#include <Logging/Logger.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Network::Packets;
@@ -49,9 +51,50 @@ PacketParseResult Network::Packets::getPackets( const std::vector< uint8_t >& bu
                                                           std::vector< FFXIVARR_PACKET_RAW >& packets )
 {
   // sanity check: check there's enough bytes in the buffer
-  const auto bytesExpected = packetHeader.size - sizeof( struct FFXIVARR_PACKET_HEADER );
+  auto bytesExpected = packetHeader.size - sizeof( struct FFXIVARR_PACKET_HEADER );
   if( buffer.size() - offset < bytesExpected )
     return Incomplete;
+
+  std::vector< uint8_t > decompBuf;
+
+  // check compression, do decompress if Oodle/Zlib
+  if( packetHeader.compressionType == Oodle )
+  {
+    std::vector< uint8_t > inBuf;
+    inBuf.assign( buffer.begin() + sizeof( struct FFXIVARR_PACKET_HEADER ), buffer.end() );
+
+    std::vector< uint8_t > outBuf;
+    outBuf.resize( packetHeader.oodleDecompressedSize );
+
+    auto _oodle = Network::Oodle();
+    bool oodleSuccess = _oodle.oodleDecode( inBuf, bytesExpected, outBuf, packetHeader.oodleDecompressedSize );
+
+    if( !oodleSuccess )
+    {
+      Logger::warn( "Oodle decompression failed." );
+      return Malformed;
+    }
+
+    bytesExpected = packetHeader.oodleDecompressedSize;
+
+    decompBuf.assign( buffer.begin(), buffer.begin() + sizeof( struct FFXIVARR_PACKET_HEADER ) );
+    decompBuf.insert( decompBuf.end(), outBuf.begin(), outBuf.end() );
+  }
+
+  else if( packetHeader.compressionType == Zlib )
+  {
+    // to do(?): Zlib decompression should go here,
+    // but I don't think the client ever sends Zlib packets? So it may not be needed
+  }
+
+  else if( packetHeader.compressionType == NoCompression )
+    decompBuf.assign( buffer.begin(), buffer.end() );
+
+  else
+  {
+    Logger::warn( "Unknown packet compression type: {}", packetHeader.compressionType );
+    return Malformed;
+  }
 
   // Loop each message
   uint32_t count = 0;
@@ -61,7 +104,7 @@ PacketParseResult Network::Packets::getPackets( const std::vector< uint8_t >& bu
     FFXIVARR_PACKET_RAW rawPacket;
 
     // Copy ipc packet message
-    const auto packetResult = getPacket( buffer, offset + bytesProcessed, rawPacket );
+    const auto packetResult = getPacket( decompBuf, offset + bytesProcessed, rawPacket );
     if( packetResult != Success )
       return packetResult;
 
