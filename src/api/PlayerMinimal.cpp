@@ -87,6 +87,9 @@ std::string PlayerMinimal::getInfoJson()
   // DisplayName
   c.push_back( getName() );
 
+  // Unknown
+  c.push_back( "36" );
+
   // class levels
   auto levelsArray = nlohmann::json();
   for( int i = 0; i < Common::CLASSJOB_SLOTS; ++i )
