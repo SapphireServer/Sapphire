@@ -153,12 +153,12 @@ bool Action::Action::init()
   return true;
 }
 
-void Action::Action::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos )
+void Action::Action::setPos( const Common::FFXIVARR_POSITION3& pos )
 {
   m_pos = pos;
 }
 
-const Sapphire::Common::FFXIVARR_POSITION3& Action::Action::getPos() const
+const Common::FFXIVARR_POSITION3& Action::Action::getPos() const
 {
   return m_pos;
 }
@@ -218,7 +218,7 @@ bool Action::Action::isWeaponskill() const
   return m_category == ActionCategory::Weaponskill;
 }
 
-Sapphire::Entity::CharaPtr Action::Action::getSourceChara() const
+Entity::CharaPtr Action::Action::getSourceChara() const
 {
   return m_pSource;
 }
@@ -319,7 +319,7 @@ void Action::Action::start()
     if( player )
     {
       player->setCondition( PlayerCondition::Casting );
-      Service< World::Manager::PlayerMgr >::ref().onConditionChanged( *player, true );
+      playerMgr().onConditionChanged( *player, true );
     }
   }
   
@@ -373,7 +373,7 @@ void Action::Action::interrupt()
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     pPlayer->setLastActionTick( 0 );
-    Service< World::Manager::PlayerMgr >::ref().removeCondition( *pPlayer, PlayerCondition::Casting );
+    playerMgr().removeCondition( *pPlayer, PlayerCondition::Casting );
   }
 
   if( hasCastTime() )
@@ -384,8 +384,7 @@ void Action::Action::interrupt()
 
     // Note: When cast interrupt from taking too much damage, set the last value to 1.
     // This enables the cast interrupt effect.
-    auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt,
-                                     0x219, 1, m_id, interruptEffect );
+    auto control = makeActorControl( m_pSource->getId(), ActorControlType::CastInterrupt, 0x219, 1, m_id, interruptEffect );
 
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
   }
@@ -420,7 +419,7 @@ void Action::Action::execute()
     if( auto pPlayer = m_pSource->getAsPlayer(); pPlayer )
     {
       pPlayer->setLastActionTick( 0 );
-      Service< World::Manager::PlayerMgr >::ref().removeCondition( *pPlayer, PlayerCondition::Casting );
+      playerMgr().removeCondition( *pPlayer, PlayerCondition::Casting );
     }
   }
 
@@ -518,7 +517,7 @@ void Action::Action::buildEffects()
 
     return;
   }
-  Service< World::Manager::PlayerMgr >::ref().onHudParamChanged( *m_pSource->getAsPlayer() );
+  playerMgr().onHudParamChanged( *m_pSource->getAsPlayer() );
 
   if( !hasLutEntry || m_hitActors.empty() )
   {
@@ -821,7 +820,7 @@ void Action::Action::addDefaultActorFilters()
   }
 }
 
-bool Action::Action::preFilterActor( Sapphire::Entity::GameObject& actor ) const
+bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
 {
   auto kind = actor.getObjKind();
   auto chara = actor.getAsChara();
@@ -846,12 +845,12 @@ bool Action::Action::preFilterActor( Sapphire::Entity::GameObject& actor ) const
   return true;
 }
 
-std::vector< Sapphire::Entity::CharaPtr >& Action::Action::getHitCharas()
+std::vector< Entity::CharaPtr >& Action::Action::getHitCharas()
 {
   return m_hitActors;
 }
 
-Sapphire::Entity::CharaPtr Action::Action::getHitChara()
+Entity::CharaPtr Action::Action::getHitChara()
 {
   if( !m_hitActors.empty() )
   {

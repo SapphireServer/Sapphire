@@ -203,7 +203,8 @@ Common::OnlineStatus Player::getOnlineStatus() const
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   uint32_t statusDisplayOrder = 0xFF14;
-  auto applicableStatus = static_cast< uint32_t >( OnlineStatus::Online );
+  auto applicableStatus = isConnected() ? static_cast< uint32_t >( OnlineStatus::Online ) : static_cast< uint32_t >( OnlineStatus::Offline );
+
 
   for( uint32_t i = 0; i < std::numeric_limits< decltype( m_onlineStatus ) >::digits; ++i )
   {
