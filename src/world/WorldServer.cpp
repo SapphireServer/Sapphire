@@ -126,6 +126,28 @@ bool WorldServer::loadSettings( int32_t argc, char* argv[] )
   return true;
 }
 
+std::string readFileToString( const std::string& filename )
+{
+  // Open the file for reading
+  std::ifstream file( filename );
+
+  // Check if the file was opened successfully
+  if( !file )
+  {
+    throw std::runtime_error( "Failed to open file" );
+  }
+
+  // Read the contents of the file into a string
+  std::string fileContents( ( std::istreambuf_iterator< char >( file ) ),
+                              std::istreambuf_iterator< char >() );
+
+  // Close the file
+  file.close();
+
+  // Return the file contents as a string
+  return fileContents;
+}
+
 void WorldServer::run( int32_t argc, char* argv[] )
 {
   using namespace Sapphire;
@@ -146,6 +168,23 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Logger::info( "Setting up generated EXD data" );
   auto pExdData = std::make_shared< Data::ExdData >();
   auto dataPath = m_config.global.general.dataPath;
+
+  try
+  {
+    auto verPath = dataPath + "/../ffxivgame.ver";
+    auto verString = readFileToString( verPath );
+    if( verString != m_config.global.general.dataVersion )
+    {
+      Logger::fatal( "Sqpack version {} does not match expected version {}!", verString, m_config.global.general.dataVersion );
+      return;
+    }
+  }
+  catch ( const std::exception& e )
+  {
+    Logger::fatal( e.what() );
+    return;
+  }
+
   if( !pExdData->init( dataPath ) )
   {
     Logger::fatal( "Error setting up generated EXD data. Make sure that DataPath is set correctly in global.ini" );
