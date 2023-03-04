@@ -257,6 +257,7 @@ namespace Sapphire::Network::Packets
 
     LandSetInitialize = 0x69, // updated 6.31h
     LandUpdate = 0x32a, // updated 6.31h
+    LandAvailability = 0x8f, // updated 6.31h
     YardObjectSpawn = 0x183, // updated 6.31h
     HousingIndoorInitialize = 0x206, // updated 6.31h
     LandPriceUpdate = 0x330, // updated 6.31h

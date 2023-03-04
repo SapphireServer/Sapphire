@@ -77,6 +77,8 @@ namespace Sapphire::World::Manager
     Sapphire::Data::HousingZonePtr getHousingZoneByLandSetId( uint32_t id );
     Sapphire::LandPtr getLandByOwnerId( uint32_t id );
 
+    void sendLandAvailability( Entity::Player& player, const Common::ActiveLand activeLand );
+
     void sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident );
     void sendLandSignFree( Entity::Player& player, const Common::LandIdent ident );
     LandPurchaseResult purchaseLand( Entity::Player& player, uint8_t plot, uint8_t state );

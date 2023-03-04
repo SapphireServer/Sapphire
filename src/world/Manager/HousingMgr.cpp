@@ -307,6 +307,16 @@ Sapphire::LandPtr Sapphire::World::Manager::HousingMgr::getLandByOwnerId( uint32
   return hZone->getLand( static_cast< uint8_t >( res->getUInt( 2 ) ) );
 }
 
+void Sapphire::World::Manager::HousingMgr::sendLandAvailability( Entity::Player& player, Common::ActiveLand activeLand )
+{
+  // to do: make these properties of the land database
+  auto landAvailabilityPacket = makeZonePacket< FFXIVIpcLandAvailability >( player.getId() );
+  landAvailabilityPacket->data().sellMode = Common::LandSellMode::FirstComeFirstServed;
+  landAvailabilityPacket->data().availableTo = Common::LandAvailableTo::Private;
+  landAvailabilityPacket->data().lotteryStatus = Common::LandLotteryStatus::FirstComeFirstServed;
+  player.queuePacket( landAvailabilityPacket );
+}
+
 void Sapphire::World::Manager::HousingMgr::sendLandSignOwned( Entity::Player& player, const Common::LandIdent ident )
 {
   auto& serverMgr = Common::Service< World::ServerMgr >::ref();

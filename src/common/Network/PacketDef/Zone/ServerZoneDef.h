@@ -1902,6 +1902,26 @@ namespace Sapphire::Network::Packets::Server
     uint32_t timeLeft;
   };
 
+  /**
+  * Sent when the client clicks a housing placard
+  * to indicate if the plot is available to FCs or private housing or both,
+  * lottery or first-come-first-served, and lottery status/results
+  */
+  struct FFXIVIpcLandAvailability : FFXIVIpcBasePacket< LandAvailability >
+  {
+    Common::LandSellMode sellMode;
+    Common::LandAvailableTo availableTo;
+    Common::LandLotteryStatus lotteryStatus;
+    Common::LandLotteryPlayerResult lotteryPlayerResult;
+    uint32_t lotteryUpdateTime;
+    uint32_t refundExpiryTime;
+    uint32_t lotteryEntries;
+    uint32_t lotteryWinningNumber;
+    uint32_t lotteryPlayerNumber;
+    uint32_t refundAmount;
+    uint32_t unknown;
+  };
+
   struct FFXIVIpcLandInfoSign : FFXIVIpcBasePacket< LandInfoSign >
   {
     Common::LandIdent landIdent;

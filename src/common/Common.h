@@ -1015,6 +1015,38 @@ namespace Sapphire::Common
     UNKNOWN_3 = 0x10,
   };
 
+  enum class LandSellMode : uint8_t
+  {
+    Unavailable,
+    FirstComeFirstServed,
+    Lottery,
+  };
+
+  enum class LandAvailableTo : uint8_t
+  {
+    All,
+    FreeCompany,
+    Private,
+  };
+
+  enum class LandLotteryStatus : uint8_t
+  {
+    FirstComeFirstServed,
+    Available,
+    Results,
+    Unavailable,
+  };
+
+  enum class LandLotteryPlayerResult : uint8_t
+  {
+    NoEntry,
+    Entered,
+    Winner,
+    WinnerForfeit,
+    Loser,
+    RefundExpired,
+  };
+
   struct LandIdent
   {
     int16_t landId; //00
