@@ -77,8 +77,8 @@ bool Sapphire::World::Manager::HousingMgr::init()
   Logger::info( "HousingMgr: Caching housing land init data" );
   //LAND_SEL_ALL
 
-  // 18 wards per territory, 4 territories
-  m_landCache.reserve( 18 * 4 );
+  // 18 wards per territory, 5 territories
+  m_landCache.reserve( 18 * 5 );
 
   initLandCache();
 

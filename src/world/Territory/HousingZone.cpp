@@ -62,7 +62,7 @@ bool Sapphire::HousingZone::init()
     housingIndex = 2;
   else if( m_territoryTypeId == 641 )
     housingIndex = 3;
-  else if (m_territoryTypeId == 979 )
+  else if( m_territoryTypeId == 979 )
     housingIndex = 4;
 
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();

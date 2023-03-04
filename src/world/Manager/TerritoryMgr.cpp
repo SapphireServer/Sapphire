@@ -502,6 +502,10 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousi
       territoryTypeId = 649;
       break;
 
+    case 979: // Empyreum
+      territoryTypeId = 980;
+      break;
+
     default:
       return nullptr;
   }
