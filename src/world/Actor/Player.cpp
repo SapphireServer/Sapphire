@@ -102,7 +102,7 @@ Sapphire::Entity::Player::Player() :
   memset( m_classArray, 0, sizeof( m_classArray ) );
   memset( m_expArray, 0, sizeof( m_expArray ) );
 
-  for ( uint8_t i = 0; i < 5; i++ )
+  for ( uint8_t i = 0; i < 6; i++ )
   {
     memset( &m_landFlags[i], 0xFF, 8 );
     memset( &m_landFlags[i].landFlags, 0, 8 );
@@ -2126,9 +2126,10 @@ void Sapphire::Entity::Player::sendLandFlags()
 
   landFlags->data().freeCompanyHouse = m_landFlags[ Common::LandFlagsSlot::FreeCompany ];
   landFlags->data().privateHouse = m_landFlags[ Common::LandFlagsSlot::Private ];
-  landFlags->data().apartment = m_landFlags[ Common::LandFlagsSlot::Apartment ];
+  landFlags->data().freeCompanyChambers = m_landFlags[ Common::LandFlagsSlot::FreeCompanyChambers ];
   landFlags->data().sharedHouse[ 0 ] = m_landFlags[ Common::LandFlagsSlot::SharedHouse1 ];
   landFlags->data().sharedHouse[ 1 ] = m_landFlags[ Common::LandFlagsSlot::SharedHouse2 ];
+  landFlags->data().apartment = m_landFlags[ Common::LandFlagsSlot::Apartment ];
 
   queuePacket( landFlags );
 }

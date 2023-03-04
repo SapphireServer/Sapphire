@@ -993,9 +993,10 @@ namespace Sapphire::Common
   {
     FreeCompany,
     Private,
-    Apartment,
+    FreeCompanyChambers,
     SharedHouse1,
-    SharedHouse2
+    SharedHouse2,
+    Apartment
   };
 
   enum class LandType : uint8_t

@@ -1153,7 +1153,7 @@ namespace Sapphire::Entity
     uint8_t m_searchSelectClass; // class selected to show up in profile
 
     // housing info
-    Common::LandFlagSet m_landFlags[5];
+    Common::LandFlagSet m_landFlags[6];
 
     Common::ActiveLand m_activeLand;
 

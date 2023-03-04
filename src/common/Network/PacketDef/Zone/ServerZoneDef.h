@@ -1868,11 +1868,11 @@ namespace Sapphire::Network::Packets::Server
     uint64_t unknown1;
     Common::LandFlagSet privateHouse; // 24
     uint64_t unknown2;
-    Common::LandFlagSet apartment; // 48
+    Common::LandFlagSet freeCompanyChambers; // 48
     uint64_t unknown3;
     Common::LandFlagSet sharedHouse[2]; //72
     uint64_t unknown4;
-    Common::LandFlagSet unknownHouse;
+    Common::LandFlagSet apartment;
     uint64_t unknown5;
   };
 
