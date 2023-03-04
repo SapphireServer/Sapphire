@@ -279,7 +279,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
 
 bool Sapphire::HousingZone::isPlayerSubInstance( Entity::Player& player )
 {
-  return player.getPos().x < -15000.0f; //ToDo: get correct pos
+  return player.getPos().x < -400.0f && player.getPos().z < -400.0f; //ToDo: get correct pos
 }
 
 void Sapphire::HousingZone::onUpdate( uint64_t tickCount )
