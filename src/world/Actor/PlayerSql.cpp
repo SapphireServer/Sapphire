@@ -144,7 +144,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
 
   res->free();
 
-  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() || !loadFriendList() || !loadBlacklist() )
+  if( !loadActiveQuests() || !loadClassData() || !loadSearchInfo() || !loadHuntingLog() || !loadFriendList() || !loadBlacklist() || !loadAchievements() )
   {
     Logger::error( "chara#{0} data corrupt!", m_characterId );
   }
@@ -210,6 +210,49 @@ bool Sapphire::Entity::Player::loadActiveQuests()
 
   return true;
 
+}
+
+bool Sapphire::Entity::Player::loadAchievements()
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_ACHIEV_SEL );
+
+  stmt->setUInt64( 1, m_characterId );
+  auto res = db.query( stmt );
+
+  while( res->next() )
+  {
+    auto unlock = res->getBlobVector( "UnlockList" );
+    auto progressData = res->getBlobVector( "ProgressData" );
+    auto history = res->getBlobVector( "HistoryList" );
+
+    // todo: throw this in util (used in LS etc)
+    auto func = []( std::unordered_map< uint32_t, uint32_t >& outData, std::vector< char >& inData )
+    {
+      if( !inData.empty() )
+      {
+        size_t entryCount = inData.size() / sizeof( uint32_t );
+        
+
+        for( auto i = 0; i < entryCount; ++i )
+        {
+          auto key = *reinterpret_cast< const uint32_t* >( &inData[ i * 4 ] );
+          i += 1;
+          auto val = *reinterpret_cast< const uint32_t* >( &inData[ i * 4 ] );
+          outData[ key ] = val;
+        }
+      }
+    };
+
+    std::unordered_map< uint32_t, uint32_t > progressMap;
+    func( progressMap, progressData );
+    
+    memcpy( reinterpret_cast< char* >( m_achievementData.unlockList.data() ), unlock.data(), unlock.size() );
+    m_achievementData.progressData = progressMap;
+    memcpy( reinterpret_cast< char* >( m_achievementData.history.data() ), history.data(), history.size() );
+  }
+
+  return true;
 }
 
 bool Sapphire::Entity::Player::loadClassData()
@@ -304,6 +347,9 @@ void Sapphire::Entity::Player::updateSql()
   ////// Blacklist
   updateDbBlacklist();
 
+  ////// Achievement
+  updateDbAchievement();
+
   ///// Store last write
   syncLastDBWrite();
 }
@@ -377,63 +423,61 @@ void Sapphire::Entity::Player::updateDbChara() const
   std::vector< uint8_t > titleListVec( sizeof( m_titleList ) );
   stmt->setBinary( 37, titleListVec );
 
-  std::vector< uint8_t > achievementVec( 16 );
-  stmt->setBinary( 38, achievementVec );
 
   std::vector< uint8_t > aetheryteVec( m_aetheryte.size() );
   memcpy( aetheryteVec.data(), m_aetheryte.data(), m_aetheryte.size() );
-  stmt->setBinary( 39, aetheryteVec );
+  stmt->setBinary( 38, aetheryteVec );
 
   std::vector< uint8_t > howToVec( sizeof( m_howTo ) );
   memcpy( howToVec.data(), m_howTo.data(), m_howTo.size() );
-  stmt->setBinary( 40, howToVec );
+  stmt->setBinary( 39, howToVec );
 
   std::vector< uint8_t > minionsVec( sizeof( m_minionGuide ) );
   memcpy( minionsVec.data(), m_minionGuide.data(), m_minionGuide.size() );
-  stmt->setBinary( 41, minionsVec );
+  stmt->setBinary( 40, minionsVec );
 
   std::vector< uint8_t > mountsVec( sizeof( m_mountGuide ) );
   memcpy( mountsVec.data(), m_mountGuide.data(), m_mountGuide.size() );
-  stmt->setBinary( 42, mountsVec );
+  stmt->setBinary( 41, mountsVec );
 
   std::vector< uint8_t > orchestrionVec( m_orchestrion.size() );
   memcpy( orchestrionVec.data(), m_orchestrion.data(), m_orchestrion.size() );
-  stmt->setBinary( 42, mountsVec );
+  stmt->setBinary( 42, orchestrionVec );
 
-  stmt->setInt( 44, m_equippedMannequin ); // EquippedMannequin
+  stmt->setInt( 43, m_equippedMannequin ); // EquippedMannequin
 
-  stmt->setInt( 45, 0 ); // DisplayFlags
+  stmt->setInt( 44, 0 ); // DisplayFlags
   std::vector< uint8_t > questCompleteVec( m_questCompleteFlags.size() );
   memcpy( questCompleteVec.data(), m_questCompleteFlags.data(), m_questCompleteFlags.size() );
-  stmt->setBinary( 46, questCompleteVec );
+  stmt->setBinary( 45, questCompleteVec );
 
-  stmt->setInt( 47, m_openingSequence );
+  stmt->setInt( 46, m_openingSequence );
 
   std::vector< uint8_t > questTrackerVec( sizeof( m_questTracking ) );
   memcpy( questTrackerVec.data(), m_questTracking.data(), sizeof( m_questTracking ) );
-  stmt->setBinary( 48, questTrackerVec );
+  stmt->setBinary( 47, questTrackerVec );
 
-  stmt->setInt( 49, m_gc ); // DisplayFlags
+  stmt->setInt( 48, m_gc ); // DisplayFlags
 
-  stmt->setBinary( 50, { m_gcRank[ 0 ], m_gcRank[ 1 ], m_gcRank[ 2 ] } );
+  stmt->setBinary( 49, { m_gcRank[ 0 ], m_gcRank[ 1 ], m_gcRank[ 2 ] } );
 
   std::vector< uint8_t > discoveryVec( m_discovery.size() );
   memcpy( discoveryVec.data(), m_discovery.data(), m_discovery.size() );
-  stmt->setBinary( 51, discoveryVec );
+  stmt->setBinary( 50, discoveryVec );
 
-  stmt->setInt( 52, m_gmRank );
+  stmt->setInt( 51, m_gmRank );
 
-  stmt->setInt( 53, m_equipDisplayFlags );
+  stmt->setInt( 52, m_equipDisplayFlags );
 
   std::vector< uint8_t > unlockVec( m_unlocks.size() );
   memcpy( unlockVec.data(), m_unlocks.data(), m_unlocks.size() );
-  stmt->setBinary( 54, unlockVec );
+  stmt->setBinary( 53, unlockVec );
 
-  stmt->setInt( 55, m_cfPenaltyUntil );
+  stmt->setInt( 54, m_cfPenaltyUntil );
 
-  stmt->setInt( 56, m_pose );
+  stmt->setInt( 55, m_pose );
 
-  stmt->setUInt64( 57, m_characterId );
+  stmt->setUInt64( 56, m_characterId );
 
   db.execute( stmt );
 }
@@ -502,6 +546,36 @@ void Sapphire::Entity::Player::updateDbBlacklist()
   stmt->setUInt64( 2, m_characterId );
   db.execute( stmt );
 }
+
+void Sapphire::Entity::Player::updateDbAchievement()
+{
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+
+  auto stmt = db.getPreparedStatement( Db::CHARA_ACHIEV_UP );
+
+  std::vector< int > flattenMap( m_achievementData.progressData.size() * 2 );
+
+  for( const auto& [ key, val ] : m_achievementData.progressData )
+  {
+    flattenMap.push_back( key );
+    flattenMap.push_back( val );
+  }
+
+  std::vector< uint8_t > unlockList( sizeof( uint8_t ) * m_achievementData.unlockList.size() );
+  std::vector< uint8_t > progressList( sizeof( uint32_t ) * flattenMap.size() );
+  std::vector< uint8_t > history( sizeof( uint16_t ) * m_achievementData.history.size() );
+
+  memcpy( unlockList.data(), m_achievementData.unlockList.data(), unlockList.size() );
+  memcpy( progressList.data(), flattenMap.data(), progressList.size() );
+  memcpy( history.data(), m_achievementData.history.data(), history.size() );
+
+  stmt->setBinary( 1, unlockList );
+  stmt->setBinary( 2, progressList );
+  stmt->setBinary( 3, history );
+  stmt->setUInt64( 4, m_characterId );
+  db.execute( stmt );
+}
+
 
 void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex, uint8_t level ) const
 {

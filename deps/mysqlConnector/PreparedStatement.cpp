@@ -393,7 +393,7 @@ bool Mysql::PreparedStatement::execute()
 
 bool Mysql::PreparedStatement::execute( const std::string &sql )
 {
-   throw std::runtime_error("PreparedStatement::execute( const std::string &sql ) Not implemented");
+   throw std::runtime_error( "PreparedStatement::execute( const std::string &sql ) Not implemented" );
    return false;
 }
 
@@ -485,7 +485,7 @@ void Mysql::PreparedStatement::setInt( uint32_t parameterIndex, int32_t value )
 void Mysql::PreparedStatement::setUInt( uint32_t parameterIndex, uint32_t value )
 {
    if( parameterIndex == 0 || parameterIndex > m_paramCount )
-      throw std::runtime_error( "PreparedStatement::setInt: invalid 'parameterIndex'" );
+      throw std::runtime_error( "PreparedStatement::setUInt: invalid 'parameterIndex'" );
    --parameterIndex;
 
    {
@@ -546,7 +546,7 @@ void Mysql::PreparedStatement::setInt64( uint32_t parameterIndex, int64_t value 
 void Mysql::PreparedStatement::setUInt64( uint32_t parameterIndex, uint64_t value )
 {
    if( parameterIndex == 0 || parameterIndex > m_paramCount )
-      throw std::runtime_error( "PreparedStatement::setInt64: invalid 'parameterIndex'" );
+      throw std::runtime_error( "PreparedStatement::setUInt64: invalid 'parameterIndex'" );
    --parameterIndex;
 
    {

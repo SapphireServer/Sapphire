@@ -286,6 +286,19 @@ void PlayerMinimal::saveAsNew()
   stmtBlacklist->setBinary( 2, blIds );
   g_charaDb.directExecute( stmtBlacklist );
 
+  // Achievement related
+  auto stmtAchv = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_ACHIEV_INS );
+  std::vector< uint8_t > unlock( 2048 / 8, 0 );
+  std::vector< uint8_t > progressData( 8, 0 );
+  std::vector< uint8_t > history( 5 * 4, 0 );
+
+  stmtAchv->setUInt64( 1, m_characterId );
+  stmtAchv->setBinary( 2, unlock );
+  stmtAchv->setBinary( 3, progressData );
+  stmtAchv->setBinary( 4, history );
+  g_charaDb.directExecute( stmtAchv );
+
+
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /// SET UP INVENTORIES
   createInvDbContainer( InventoryType::Bag0 );
