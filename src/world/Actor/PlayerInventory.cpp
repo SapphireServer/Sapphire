@@ -18,6 +18,7 @@
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
+#include <Network/Util/PlayerUtil.h>
 
 #include "Manager/InventoryMgr.h"
 #include "Manager/ItemMgr.h"
@@ -231,8 +232,8 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
   {
     sendModel();
     sendItemLevel();
-    sendStats();
-    sendHudParam();
+    Network::Util::Player::sendBaseParams( *this );
+    Network::Util::Player::sendHudParam( *this );
   }
 }
 
@@ -253,8 +254,8 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
   {
     sendModel();
     sendItemLevel();
-    sendStats();
-    sendHudParam();
+    Network::Util::Player::sendBaseParams( *this );
+    Network::Util::Player::sendHudParam( *this );
   }
 }
 
@@ -635,7 +636,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
 
   // add the related armoury bag to the applicable bags and try and fill a free slot there before falling back to regular inventory
   // EXD TODO: wtf...
-  if( itemInfo->data().Slot > 0 && getEquipDisplayFlags() & StoreNewItemsInArmouryChest )
+  if( itemInfo->data().Slot > 0 && getConfigFlags() & StoreNewItemsInArmouryChest )
   {
     auto bag = World::Manager::ItemMgr::getCharaEquipSlotCategoryToArmoryId( itemInfo->data().Slot );
 

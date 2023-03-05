@@ -3,12 +3,10 @@
 #include <Action/Action.h>
 #include <Inventory/Item.h>
 
-class ActionGlamour2471 :
-  public Sapphire::ScriptAPI::ActionScript
+class ActionGlamour2471 : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionGlamour2471() :
-    Sapphire::ScriptAPI::ActionScript( 2471 )
+  ActionGlamour2471() : Sapphire::ScriptAPI::ActionScript( 2471 )
   {
   }
 

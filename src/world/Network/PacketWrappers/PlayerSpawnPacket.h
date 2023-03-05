@@ -115,22 +115,22 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
         m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::Invisible );
       }
 
-      if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideHead )
+      if( player.getConfigFlags() & Sapphire::Common::EquipDisplayFlags::HideHead )
       {
         m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::HideHead );
       }
 
-      if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon )
+      if( player.getConfigFlags() & Sapphire::Common::EquipDisplayFlags::HideWeapon )
       {
         m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::HideWeapon );
       }
 
-      if( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::Visor )
+      if( player.getConfigFlags() & Sapphire::Common::EquipDisplayFlags::Visor )
       {
         m_data.Flag |= static_cast< uint16_t >( Common::DisplayFlags::Visor );
       }
 
-      if( !( player.getEquipDisplayFlags() & Sapphire::Common::EquipDisplayFlags::HideLegacyMark ) )
+      if( !( player.getConfigFlags() & Sapphire::Common::EquipDisplayFlags::HideLegacyMark ) )
       {
         m_data.Customize[ 0xC ] = m_data.Customize[ 0xC ] | 1 << 7;
       }

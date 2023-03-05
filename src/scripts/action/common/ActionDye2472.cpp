@@ -3,12 +3,10 @@
 #include <Action/Action.h>
 #include <Inventory/Item.h>
 
-class ActionDye2472 :
-  public Sapphire::ScriptAPI::ActionScript
+class ActionDye2472 : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionDye2472() :
-    Sapphire::ScriptAPI::ActionScript( 2472 )
+  ActionDye2472() : Sapphire::ScriptAPI::ActionScript( 2472 )
   {
   }
 

@@ -254,8 +254,8 @@ void Sapphire::Network::GameConnection::configHandler( const Packets::FFXIVARR_P
 {
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcConfig >( inPacket );
 
-  player.setEquipDisplayFlags( packet.data().flag );
-  PlayerMgr().onEquipDisplayFlagsChanged( player );
+  player.setConfigFlags( packet.data().flag );
+
 }
 
 void Sapphire::Network::GameConnection::zoneJumpHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

@@ -5,12 +5,10 @@
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
-class ActionReturn6 :
-  public Sapphire::ScriptAPI::ActionScript
+class ActionReturn6 : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionReturn6() :
-    Sapphire::ScriptAPI::ActionScript( 6 )
+  ActionReturn6() : Sapphire::ScriptAPI::ActionScript( 6 )
   {
   }
 

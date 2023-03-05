@@ -16,6 +16,7 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
+#include "Network/Util/PlayerUtil.h"
 
 #include "Action/Action.h"
 
@@ -492,7 +493,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::TITLE_LIST: // Get title list
     {
-      player.sendTitleList();
+      Network::Util::Player::sendTitleList( player );
       break;
     }
     case PacketCommand::SET_HOWTO: // Update howtos seen

@@ -34,6 +34,8 @@
 #include "Network/PacketWrappers/EffectPacket1.h"
 #include "Network/PacketWrappers/InitZonePacket.h"
 
+#include "Network/Util/PlayerUtil.h"
+
 #include "Action/Action.h"
 
 #include "Math/CalcStats.h"
@@ -261,7 +263,7 @@ void Player::addOnlineStatus( OnlineStatus status )
 
   setOnlineStatusMask( newFlags );
 
-  Service< World::Manager::PlayerMgr >::ref().onOnlineStatusChanged( *this, false );
+  Network::Util::Player::sendOnlineStatus( *this );
 }
 
 void Player::addOnlineStatus( const std::vector< Common::OnlineStatus >& status )
@@ -275,7 +277,7 @@ void Player::addOnlineStatus( const std::vector< Common::OnlineStatus >& status 
 
   setOnlineStatusMask( newFlags );
 
-  Service< World::Manager::PlayerMgr >::ref().onOnlineStatusChanged( *this, false );
+  Network::Util::Player::sendOnlineStatus( *this );
 }
 
 void Player::removeOnlineStatus( OnlineStatus status )
@@ -289,7 +291,7 @@ void Player::removeOnlineStatus( OnlineStatus status )
   setOnlineStatusMask( newFlags );
   setOnlineStatusCustomMask( newFlagsCustom );
 
-  Service< World::Manager::PlayerMgr >::ref().onOnlineStatusChanged( *this, false );
+  Network::Util::Player::sendOnlineStatus( *this );
 }
 
 void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& status )
@@ -306,7 +308,7 @@ void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& stat
   setOnlineStatusMask( newFlags );
   setOnlineStatusCustomMask( newFlagsCustom );
 
-  Service< World::Manager::PlayerMgr >::ref().onOnlineStatusChanged( *this, false );
+  Network::Util::Player::sendOnlineStatus( *this );
 }
 
 void Player::calculateStats()
@@ -394,11 +396,6 @@ bool Player::isAutoattackOn() const
   return m_bAutoattack;
 }
 
-void Player::sendStats()
-{
-  Service< World::Manager::PlayerMgr >::ref().onStatsChanged( *this );
-}
-
 bool Player::exitInstance()
 {
   auto& warpMgr = Common::Service< WarpMgr >::ref();
@@ -459,7 +456,7 @@ void Player::registerAetheryte( uint8_t aetheryteId )
   Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
   m_aetheryte[ index ] |= value;
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), LearnTeleport, aetheryteId, 1 ) );
+  Network::Util::Player::sendActorControlSelf( *this, LearnTeleport, aetheryteId, 1 );
 }
 
 bool Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -476,48 +473,43 @@ Player::Discovery& Player::getDiscoveryBitmask()
   return m_discovery;
 }
 
-void Player::discover( int16_t map_id, int16_t sub_id )
+void Player::discover( int16_t mapId, int16_t subId )
 {
-  // map.exd field 12 -> index in one of the two discovery sections, if field 15 is false, need to use 2nd section
-  // section 1 starts at 0 - 2 bytes each
-  // section to starts at 320 - 4 bytes long
-
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
   int32_t offset;
 
-  auto info = exdData.getRow< Excel::Map >( map_id );
+  auto info = exdData.getRow< Excel::Map >( mapId );
   if( !info )
   {
-    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", map_id );
+    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", mapId );
     return;
   }
 
-  if( info->data().IsUint16Discovery )
-    offset = 2 * info->data().DiscoveryIndex;
+  const auto& mapData = info->data();
+
+  if( mapData.IsUint16Discovery )
+    offset = 2 * mapData.DiscoveryIndex;
   else
-    offset = 320 + 4 * info->data().DiscoveryIndex;
+    offset = 320 + 4 * mapData.DiscoveryIndex;
 
-  int32_t index = offset + sub_id / 8;
-  uint8_t bitIndex = sub_id % 8;
+  uint16_t index;
+  uint8_t value;
+  Util::valueToFlagByteIndexValue( subId, value, index );
 
-  uint8_t value = 1 << bitIndex;
-
-  m_discovery[ index ] |= value;
+  m_discovery[ offset + index ] |= value;
 
   uint16_t level = getLevel();
 
   uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
-
   gainExp( exp );
 
   // gain 10x additional EXP if entire map is completed
-  uint32_t mask = info->data().DiscoveryFlag;
+  uint32_t mask = mapData.DiscoveryFlag;
   uint32_t discoveredAreas;
   if( info->data().IsUint16Discovery )
   {
-    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) |
-                        m_discovery[ offset ];
+    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) | m_discovery[ offset ];
   }
   else
   {
@@ -567,7 +559,7 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
 
   m_unlocks[ index ] |= value;
 
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), SetRewardFlag, unlock, 1 ) );
+  Network::Util::Player::sendActorControlSelf( *this, SetRewardFlag, unlock, 1 );
 }
 
 void Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -629,18 +621,19 @@ void Player::gainExp( uint32_t amount )
     amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelPlus1 ?
              neededExpToLevelPlus1 - 1 :
              ( currentExp + amount - neededExpToLevel );
+
     if( level + 1 >= Common::MAX_PLAYER_LEVEL )
       amount = 0;
 
     setExp( amount );
-    Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, amount );
     levelUp();
   }
   else
   {
     setExp( currentExp + amount );
-    Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, amount );
   }
+
+  Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, amount );
 }
 
 void Player::levelUp()
@@ -652,12 +645,6 @@ void Player::levelUp()
 
   Service< World::Manager::PlayerMgr >::ref().onLevelUp( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
-}
-
-void Player::sendHudParam()
-{
-  // todo: overrides are funky
-  Service< World::Manager::PlayerMgr >::ref().onHudParamChanged( *this );
 }
 
 uint8_t Player::getLevel() const
@@ -673,10 +660,10 @@ uint8_t Player::getLevelSync() const
   return getLevel();
 }
 
-uint8_t Player::getLevelForClass( Common::ClassJob pClass ) const
+uint8_t Player::getLevelForClass( Common::ClassJob classJobId ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( pClass ) )->data().WorkIndex;
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( classJobId ) )->data().WorkIndex;
   return static_cast< uint8_t >( m_classArray[ classJobIndex ] );
 }
 
@@ -728,8 +715,9 @@ void Player::setClassJob( Common::ClassJob classJob )
 
   m_tp = 0;
 
-  Service< World::Manager::PlayerMgr >::ref().sendStatusUpdate( *this );
-  Service< World::Manager::PlayerMgr >::ref().onClassChanged( *this );
+  Network::Util::Player::sendStatusUpdate( *this );
+  server().queueForPlayers( getInRangePlayerIds( true ), makeActorControl( getId(), ClassJobChange, 0x04 ) );
+  Network::Util::Player::sendHudParam( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
@@ -825,7 +813,7 @@ void Player::despawn( Entity::PlayerPtr pTarget )
   Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
-  server().queueForPlayer( pTarget->getCharacterId(), makeActorControlSelf( getId(), WarpStart, 0x04, getId(), 0x01 ) );
+  Network::Util::Player::sendActorControlSelf( *this, WarpStart, 4, getId(), 1 );
 }
 
 GameObjectPtr Player::lookupTargetById( uint64_t targetId )
@@ -850,14 +838,18 @@ void Player::setVoiceId( uint8_t voiceId )
   m_voice = voiceId;
 }
 
-void Player::setGc( uint8_t gc )
+void Player::setGrandCompany( uint8_t gc )
 {
   m_gc = gc;
+  if( m_gcRank[ gc ] == 0 )
+    m_gcRank[ gc ] = 1;
+  Network::Util::Player::sendGrandCompany( *this );
 }
 
-void Player::setGcRankAt( uint8_t index, uint8_t rank )
+void Player::setGrandCompanyRankAt( uint8_t index, uint8_t rank )
 {
   m_gcRank[ index ] = rank;
+  Network::Util::Player::sendGrandCompany( *this );
 }
 
 const Player::Condition& Player::getConditions() const
@@ -942,7 +934,7 @@ Player::AetheryteList& Player::getAetheryteArray()
 void Player::setHomepoint( uint8_t aetheryteId )
 {
   m_homePoint = aetheryteId;
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), SetHomepoint, aetheryteId ) );
+  Network::Util::Player::sendActorControlSelf( *this, SetHomepoint, aetheryteId );
 }
 
 /*! get homepoint */
@@ -991,7 +983,7 @@ void Player::unlockMount( uint32_t mountId )
 
   m_mountGuide[ mount->data().MountOrder / 8 ] |= ( 1 << ( mount->data().MountOrder % 8 ) );
 
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), Network::ActorControl::SetMountBitmask, mount->data().MountOrder, 1 ) );
+  Network::Util::Player::sendActorControlSelf( *this, SetMountBitmask, mount->data().MountOrder, 1 );
 }
 
 void Player::unlockCompanion( uint32_t companionId )
@@ -1008,7 +1000,7 @@ void Player::unlockCompanion( uint32_t companionId )
 
   m_minionGuide[ index ] |= value;
 
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), Network::ActorControl::LearnCompanion, companionId, 1 ) );
+  Network::Util::Player::sendActorControlSelf( *this, LearnCompanion, companionId, 1 );
 }
 
 Player::MinionList& Player::getMinionGuideBitmask()
@@ -1199,8 +1191,7 @@ void Player::setAchievementData( const Player::AchievementData& achievementData 
 void Player::setMaxGearSets( uint8_t amount )
 {
   m_equippedMannequin = amount;
-
-  server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), SetMaxGearSets, m_equippedMannequin ) );
+  Network::Util::Player::sendActorControlSelf( *this, SetMaxGearSets, m_equippedMannequin );
 }
 
 void Player::addGearSet()
@@ -1222,14 +1213,15 @@ uint8_t Player::getMaxGearSets() const
   return m_equippedMannequin;
 }
 
-void Player::setEquipDisplayFlags( uint16_t state )
+void Player::setConfigFlags( uint16_t state )
 {
-  m_equipDisplayFlags = static_cast< uint8_t >( state );
+  m_configFlags = static_cast< uint8_t >( state );
+  Network::Util::Player::sendConfigFlags( *this );
 }
 
-uint8_t Player::getEquipDisplayFlags() const
+uint8_t Player::getConfigFlags() const
 {
-  return m_equipDisplayFlags;
+  return m_configFlags;
 }
 
 void Player::setMount( uint32_t mountId )
@@ -1379,46 +1371,38 @@ bool Player::isDirectorInitialized() const
   return m_directorInitialized;
 }
 
-void Player::sendTitleList()
-{
-  auto titleListPacket = makeZonePacket< FFXIVIpcTitleList >( getId() );
-  memcpy( titleListPacket->data().TitleFlagsArray, getTitleList().data(), sizeof( titleListPacket->data().TitleFlagsArray ) );
-
-  server().queueForPlayer( getCharacterId(), titleListPacket );
-}
-
 void Player::teleportQuery( uint16_t aetheryteId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   // TODO: only register this action if enough gil is in possession
   auto targetAetheryte = exdData.getRow< Excel::Aetheryte >( aetheryteId );
 
-  if( targetAetheryte )
+  if( !targetAetheryte )
+   return;
+
+  auto fromAetheryte = exdData.getRow< Excel::Aetheryte >( exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
+
+  // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
+  auto cost = static_cast< uint16_t > (
+    ( std::sqrt( std::pow( fromAetheryte->data().CostPosX - targetAetheryte->data().CostPosX, 2 ) +
+                 std::pow( fromAetheryte->data().CostPosY - targetAetheryte->data().CostPosY, 2 ) ) / 2 ) + 100 );
+
+  // cap at 999 gil
+  cost = std::min< uint16_t >( 999, cost );
+
+  bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
+  Network::Util::Player::sendActorControlSelf( *this, OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId );
+
+  if( !insufficientGil )
   {
-    auto fromAetheryte = exdData.getRow< Excel::Aetheryte >(
-      exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
-
-    // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-    auto cost = static_cast< uint16_t > (
-      ( std::sqrt( std::pow( fromAetheryte->data().CostPosX - targetAetheryte->data().CostPosX, 2 ) +
-                   std::pow( fromAetheryte->data().CostPosY - targetAetheryte->data().CostPosY, 2 ) ) / 2 ) + 100 );
-
-    // cap at 999 gil
-    cost = std::min< uint16_t >( 999, cost );
-
-    bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
-    server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId ) );
-
-    if( !insufficientGil )
-    {
-      m_teleportQuery.targetAetheryte = aetheryteId;
-      m_teleportQuery.cost = cost;
-    }
-    else
-    {
-      clearTeleportQuery();
-    }
+    m_teleportQuery.targetAetheryte = aetheryteId;
+    m_teleportQuery.cost = cost;
   }
+  else
+  {
+    clearTeleportQuery();
+  }
+
 }
 
 Sapphire::Common::PlayerTeleportQuery Player::getTeleportQuery() const
@@ -1483,8 +1467,7 @@ void Player::dyeItemFromDyeingInfo()
   insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
   writeItem( itemToDye );
 
-  auto dyePkt = makeActorControlSelf( getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
-  server().queueForPlayer( getCharacterId(), dyePkt );
+  Network::Util::Player::sendActorControlSelf( *this, DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
 }
 
 void Player::setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour )
@@ -1538,15 +1521,9 @@ void Player::glamourItemFromGlamouringInfo()
   writeItem( itemToGlamour );
 
   if( shouldGlamour )
-  {
-    auto castGlamPkt = makeActorControlSelf( getId(), GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
-    server().queueForPlayer( getCharacterId(), castGlamPkt );
-  }
+    Network::Util::Player::sendActorControlSelf( *this, GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
   else
-  {
-    auto dispelGlamPkt = makeActorControlSelf( getId(), GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
-    server().queueForPlayer( getCharacterId(), dispelGlamPkt );
-  }
+    Network::Util::Player::sendActorControlSelf( *this, GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
 }
 
 void Player::resetObjSpawnIndex()
@@ -1597,50 +1574,6 @@ Sapphire::Common::HuntingLogEntry& Player::getHuntingLogEntry( uint8_t index )
   return m_huntingLogEntries[ index ];
 }
 
-void Player::sendHuntingLog()
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  uint8_t count = 0;
-  for( const auto& entry : m_huntingLogEntries )
-  {
-    uint64_t completionFlag = 0;
-    auto huntPacket = makeZonePacket< FFXIVIpcMonsterNoteCategory >( getId() );
-
-    huntPacket->data().contextId = -1;
-    huntPacket->data().currentRank = entry.rank;
-    huntPacket->data().categoryIndex = count;
-
-    for( int i = 1; i <= 10; ++i )
-    {
-      auto index0 = i - 1;
-      bool allComplete = true;
-      auto monsterNoteId = ( count + 1 ) * 10000 + entry.rank * 10 + i;
-
-      auto monsterNote = exdData.getRow< Excel::MonsterNote >( monsterNoteId );
-      if( !monsterNote )
-        continue;
-
-      const auto huntEntry = entry.entries[ index0 ];
-      for( int x = 0; x < 3; ++x )
-      {
-        if( ( huntEntry[ x ] == monsterNote->data().NeededKills[ x ] ) && monsterNote->data().NeededKills[ x ] != 0 )
-          completionFlag |= ( 1ull << ( index0 * 5 + x ) );
-        else if( monsterNote->data().NeededKills[ x ] != 0 )
-          allComplete = false;
-      }
-
-      if( allComplete )
-        completionFlag |= ( 1ull << ( index0 * 5 + 4 ) );
-
-    }
-
-    memcpy( huntPacket->data().killCount, entry.entries, sizeof( entry.entries ) );
-    huntPacket->data().completeFlags = completionFlag;
-    ++count;
-    server().queueForPlayer( getCharacterId(), huntPacket );
-  }
-}
-
 void Player::updateHuntingLog( uint16_t id )
 {
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
@@ -1677,7 +1610,7 @@ void Player::updateHuntingLog( uint16_t id )
       if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
-        server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] ) );
+        Network::Util::Player::sendActorControlSelf( *this, HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
         logChanged = true;
         sectionChanged = true;
       }
@@ -1686,7 +1619,7 @@ void Player::updateHuntingLog( uint16_t id )
     }
     if( logChanged && sectionComplete && sectionChanged )
     {
-      server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 ) );
+      Network::Util::Player::sendActorControlSelf( *this, HuntingLogSectionFinish, monsterNoteId, i, 0 );
       gainExp( note->data().RewardExp );
     }
     if( !sectionComplete )
@@ -1696,18 +1629,18 @@ void Player::updateHuntingLog( uint16_t id )
   }
   if( logChanged && allSectionsComplete )
   {
-    server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogRankFinish, 4, 0, 0 ) );
+    Network::Util::Player::sendActorControlSelf( *this, HuntingLogRankFinish, 4 );
     gainExp( rankRewards[ logEntry.rank ] );
     if( logEntry.rank < 4 )
     {
       logEntry.rank++;
       memset( logEntry.entries, 0, 40 );
-      server().queueForPlayer( getCharacterId(), makeActorControlSelf( getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 ) );
+      Network::Util::Player::sendActorControlSelf( *this, HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
     }
   }
 
   if( logChanged )
-    sendHuntingLog();
+    Network::Util::Player::sendHuntingLog( *this );
 }
 
 void Player::setActiveLand( uint8_t land, uint8_t ward )
@@ -1779,19 +1712,14 @@ bool Player::checkAction()
   if( m_pCurrentAction->update() )
   {
     if( m_pCurrentAction->isInterrupted() && m_pCurrentAction->getInterruptType() != Common::ActionInterruptType::DamageInterrupt )
-    {
-      // we moved (or whatever not damage interrupt) so we don't want to execute queued cast
       m_pQueuedAction = nullptr;
-    }
     m_pCurrentAction = nullptr;
 
     if( hasQueuedAction() )
     {
       PlayerMgr::sendDebug( *this, "Queued skill start: {0}", m_pQueuedAction->getId() );
       if( m_pQueuedAction->hasCastTime() )
-      {
         setCurrentAction( m_pQueuedAction );
-      }
       m_pQueuedAction->start();
       m_pQueuedAction = nullptr;
     }

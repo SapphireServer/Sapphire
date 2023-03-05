@@ -5,8 +5,7 @@
 class ActionSprint3 : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionSprint3() :
-    Sapphire::ScriptAPI::ActionScript( 3 )
+  ActionSprint3() : Sapphire::ScriptAPI::ActionScript( 3 )
   {
   }
 
