@@ -78,7 +78,7 @@ public:
           return;
       }
 
-      player.setInstance( internalZone, pos, player.getRot() );
+      player.setInstance( internalZone, pos, 3.14f );
     } );
   }
 };

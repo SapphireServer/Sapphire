@@ -993,9 +993,10 @@ namespace Sapphire::Common
   {
     FreeCompany,
     Private,
-    Apartment,
+    FreeCompanyChambers,
     SharedHouse1,
-    SharedHouse2
+    SharedHouse2,
+    Apartment
   };
 
   enum class LandType : uint8_t
@@ -1012,6 +1013,38 @@ namespace Sapphire::Common
     UNKNOWN_1 = 0x4,
     UNKNOWN_2 = 0x8,
     UNKNOWN_3 = 0x10,
+  };
+
+  enum class LandSellMode : uint8_t
+  {
+    Unavailable,
+    FirstComeFirstServed,
+    Lottery,
+  };
+
+  enum class LandAvailableTo : uint8_t
+  {
+    All,
+    FreeCompany,
+    Private,
+  };
+
+  enum class LandLotteryStatus : uint8_t
+  {
+    FirstComeFirstServed,
+    Available,
+    Results,
+    Unavailable,
+  };
+
+  enum class LandLotteryPlayerResult : uint8_t
+  {
+    NoEntry,
+    Entered,
+    Winner,
+    WinnerForfeit,
+    Loser,
+    RefundExpired,
   };
 
   struct LandIdent
