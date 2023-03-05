@@ -27,8 +27,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     };
 
   private:
-    void initialize( uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4,
-                     uint32_t param5 )
+    void initialize( uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4, uint32_t param5 )
     {
       m_data.padding = 0;
       m_data.category = category;

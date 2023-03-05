@@ -32,6 +32,7 @@
 #include <Network/PacketWrappers/ServerNoticePacket.h>
 #include <Network/PacketWrappers/ChatPacket.h>
 #include <Network/PacketWrappers/HudParamPacket.h>
+#include <Network/Util/PlayerUtil.h>
 
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
@@ -214,34 +215,6 @@ Sapphire::Entity::PlayerPtr PlayerMgr::syncPlayer( uint64_t characterId )
   return pPlayer;
 }
 
-
-
-void PlayerMgr::onOnlineStatusChanged( Entity::Player& player, bool updateProfile )
-{
-  auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
-  statusPacket->data().onlineStatusFlags = player.getFullOnlineStatusMask();
-  server().queueForPlayer( player.getCharacterId(), statusPacket );
-
-  if( updateProfile )
-  {
-    auto searchInfoPacket = makeZonePacket< FFXIVIpcSetProfileResult >( player.getId());
-    searchInfoPacket->data().OnlineStatus = player.getFullOnlineStatusMask();
-    searchInfoPacket->data().Region = player.getSearchSelectRegion();
-    strcpy( searchInfoPacket->data().SearchComment, player.getSearchMessage());
-    server().queueForPlayer( player.getCharacterId(), searchInfoPacket );
-  }
-
-  server().queueForPlayers( player.getInRangePlayerIds( true ),
-                            makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ) );
-}
-
-void PlayerMgr::onEquipDisplayFlagsChanged( Entity::Player& player )
-{
-  auto paramPacket = makeZonePacket< FFXIVIpcConfig >( player.getId() );
-  paramPacket->data().flag = player.getEquipDisplayFlags();
-  server().queueForPlayers( player.getInRangePlayerIds( true ), paramPacket );
-}
-
 void PlayerMgr::onConditionChanged( Entity::Player& player, bool updateInRange )
 {
 
@@ -282,55 +255,6 @@ void PlayerMgr::onUnlockAchievement( Entity::Player& player, uint32_t achievemen
   server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementObtainMsg, achievementId ) );
 }
 
-void PlayerMgr::onStatsChanged( Entity::Player& player )
-{
-  std::array< uint32_t, 50 > statParams{};
-  std::fill( std::begin( statParams ), std::end( statParams ), 0 );
-
-  auto& exd = Common::Service< Data::ExdData >::ref();
-
-  // todo: this is no doubt slow as shit...
-  auto idList = exd.getIdList< Excel::BaseParam >();
-
-  for( const auto id : idList )
-  {
-    auto row = exd.getRow< Excel::BaseParam >( id );
-    if( !row )
-    {
-      continue;
-    }
-
-    if( row->data().PacketIndex < 0 )
-    {
-      continue;
-    }
-
-    statParams[ row->data().PacketIndex ] = player.getStatValue( static_cast< Common::BaseParam >( id ) );
-  }
-
-  auto statPacket = makeZonePacket< FFXIVIpcBaseParam >( player.getId() );
-  memcpy( statPacket->data().Param, statParams.data(), sizeof( uint32_t ) * statParams.size() );
-  server().queueForPlayer( player.getCharacterId(), statPacket );
-}
-
-void PlayerMgr::sendStatusUpdate( Entity::Player& player )
-{
-  auto playerStatusUpdate = makeZonePacket< FFXIVIpcPlayerStatusUpdate >( player.getId() );
-  playerStatusUpdate->data().ClassJob = static_cast< uint8_t >( player.getClass() );
-  playerStatusUpdate->data().Lv = player.getLevel();
-  playerStatusUpdate->data().Lv1 = player.getLevel();
-  playerStatusUpdate->data().LvSync = 0; //player.getLevelSync();
-  playerStatusUpdate->data().Exp = player.getExp();
-
-  server().queueForPlayer( player.getCharacterId(), playerStatusUpdate );
-}
-
-void PlayerMgr::onHudParamChanged( Entity::Player& player )
-{
-  auto hudParamPacket = makeHudParam( player );
-  server().queueForPlayer( player.getCharacterId(), hudParamPacket );
-}
-
 void PlayerMgr::onRestingTick( Entity::Player& player )
 {
   server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< RestingPacket >( player ) );
@@ -344,8 +268,8 @@ void PlayerMgr::sendItemLevel( Entity::Player& player )
 void PlayerMgr::onLevelUp( Entity::Player& player )
 {
   player.calculateStats();
-  player.sendStats();
-  player.sendHudParam();
+  Network::Util::Player::sendBaseParams( player );
+  Network::Util::Player::sendHudParam( player );
 
   auto inRangePlayerIds = player.getInRangePlayerIds( true );
 
@@ -353,7 +277,7 @@ void PlayerMgr::onLevelUp( Entity::Player& player )
   server().queueForPlayers( inRangePlayerIds, makeActorControl( player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
                                                                 player.getLevel(), player.getLevel() - 1 ) );
 
-  sendStatusUpdate( player );
+  Network::Util::Player::sendStatusUpdate( player );
 
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
@@ -393,29 +317,6 @@ void PlayerMgr::onGearChanged( Entity::Player& player )
   server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< ModelEquipPacket >( player ) );
 }
 
-void PlayerMgr::sendGrandCompany( Entity::Player& player )
-{
-  auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
-  gcAffPacket->data().ActiveCompanyId = player.getGc();
-  gcAffPacket->data().MaelstromRank = player.getGcRankArray()[ 0 ];
-  gcAffPacket->data().TwinAdderRank = player.getGcRankArray()[ 1 ];
-  gcAffPacket->data().ImmortalFlamesRank = player.getGcRankArray()[ 2 ];
-
-  server().queueForPlayer( player.getCharacterId(), gcAffPacket );
-}
-
-void PlayerMgr::setGrandCompany( Entity::Player& player, uint8_t gc )
-{
-  player.setGc( gc );
-  sendGrandCompany( player );
-}
-
-void PlayerMgr::setGrandCompanyRank( Entity::Player& player, uint8_t gc, uint8_t rank )
-{
-  player.setGcRankAt( gc, rank );
-  sendGrandCompany( player );
-}
-
 void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -425,7 +326,7 @@ void PlayerMgr::onCompanionUpdate( Entity::Player& player, uint8_t companionId )
     return;
 
   player.setCompanion( companionId );
-  server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ActorControlType::ToggleCompanion, companionId ) );
+  Network::Util::Player::sendActorControl( player.getInRangePlayerIds( true ), player, ToggleCompanion, companionId );
 }
 
 void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
@@ -434,15 +335,13 @@ void PlayerMgr::onMountUpdate( Entity::Player& player, uint32_t mountId )
   auto inRangePlayerIds = player.getInRangePlayerIds( true );
   if( mountId != 0 )
   {
-    server().queueForPlayers( inRangePlayerIds,
-                              makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) ) );
-    server().queueForPlayers( inRangePlayerIds, makeActorControlSelf( player.getId(), 0x39e, 12 ) );
+    Network::Util::Player::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) );
+    Network::Util::Player::sendActorControlSelf( inRangePlayerIds, player, 0x39e, 12 );
   }
   else
   {
-    server().queueForPlayers( inRangePlayerIds,
-                              makeActorControl( player.getId(), ActorControlType::SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) ) );
-    server().queueForPlayers( inRangePlayerIds, makeActorControlSelf( player.getId(), ActorControlType::Dismount, 1 ) );
+    Network::Util::Player::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+    Network::Util::Player::sendActorControlSelf( inRangePlayerIds, player, Dismount, 1 );
   }
 
   auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
@@ -501,12 +400,6 @@ void PlayerMgr::onHateListChanged( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
 }
 
-void PlayerMgr::onClassChanged( Entity::Player& player )
-{
-  server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ClassJobChange, 0x04 ) );
-  onHudParamChanged( player );
-}
-
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
 {
   auto motd = server().getConfig().motd;
@@ -556,7 +449,7 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
   if( player.isLogin() )
   {
-    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetConfigFlags, player.getEquipDisplayFlags(), 1 ) );
+    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetConfigFlags, player.getConfigFlags(), 1 ) );
     server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
   }
 
@@ -564,13 +457,13 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  player.sendHuntingLog();
+  Network::Util::Player::sendHuntingLog( player );
 
   if( player.isLogin() )
     server().queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
 
   player.sendRecastGroups();
-  player.sendStats();
+  Network::Util::Player::sendBaseParams( player );
   sendItemLevel( player );
   if( player.isLogin() )
   {
@@ -621,7 +514,7 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
-    sendGrandCompany( player );
+    Network::Util::Player::sendGrandCompany( player );
   }
 
 }

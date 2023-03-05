@@ -103,7 +103,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
 
   m_equippedMannequin = res->getUInt8( "EquippedMannequin" );
 
-  m_equipDisplayFlags = res->getUInt8( "EquipDisplayFlags" );
+  m_configFlags = res->getUInt8( "EquipDisplayFlags" );
 
   m_pose = res->getUInt8( "Pose" );
 
@@ -423,7 +423,7 @@ void Sapphire::Entity::Player::updateDbChara() const
 
   stmt->setInt( 52, m_gmRank );
 
-  stmt->setInt( 53, m_equipDisplayFlags );
+  stmt->setInt( 53, m_configFlags );
 
   std::vector< uint8_t > unlockVec( m_unlocks.size() );
   memcpy( unlockVec.data(), m_unlocks.data(), m_unlocks.size() );

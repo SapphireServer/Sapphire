@@ -16,6 +16,7 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Manager/*.cpp
         Math/*.cpp
         Network/*.cpp
+        Network/Util/*.cpp
         Network/Handlers/*.cpp
         Network/PacketWrappers/*.cpp
         Script/*.cpp

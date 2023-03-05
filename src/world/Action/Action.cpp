@@ -23,6 +23,7 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
+#include "Network/Util/PlayerUtil.h"
 
 #include <Logging/Logger.h>
 
@@ -517,7 +518,8 @@ void Action::Action::buildEffects()
 
     return;
   }
-  playerMgr().onHudParamChanged( *m_pSource->getAsPlayer() );
+
+  Network::Util::Player::sendHudParam( *m_pSource->getAsPlayer() );
 
   if( !hasLutEntry || m_hitActors.empty() )
   {

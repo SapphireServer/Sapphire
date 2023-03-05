@@ -214,7 +214,7 @@ namespace Sapphire::Entity
     uint8_t getLevelSync() const;
 
     /*! returns the level of the provided class / job */
-    uint8_t getLevelForClass( Common::ClassJob pClass ) const;
+    uint8_t getLevelForClass( Common::ClassJob classJobId ) const;
 
     /*! \return the first class of the player */
     Common::ClassJob getFirstClass() const;
@@ -288,10 +288,10 @@ namespace Sapphire::Entity
     void setVoiceId( uint8_t voiceId );
 
     /*! set the grand company */
-    void setGc( uint8_t gc );
+    void setGrandCompany( uint8_t gc );
 
     /*! set the grand company rank */
-    void setGcRankAt( uint8_t index, uint8_t rank );
+    void setGrandCompanyRankAt( uint8_t index, uint8_t rank );
 
     /*! returns true if the player is currently in combat */
     bool isInCombat() const;
@@ -372,9 +372,6 @@ namespace Sapphire::Entity
     /*! change player's active title */
     void setTitle( uint16_t titleId );
 
-    /*! send the players title list */
-    void sendTitleList();
-
     /*! get player's achievement data */
     const AchievementData& getAchievementData() const;
 
@@ -391,10 +388,10 @@ namespace Sapphire::Entity
     uint8_t getMaxGearSets() const;
 
     /*! change gear param state */
-    void setEquipDisplayFlags( uint16_t state );
+    void setConfigFlags( uint16_t state );
 
     /*! get gear param state */
-    uint8_t getEquipDisplayFlags() const;
+    uint8_t getConfigFlags() const;
 
     /*! mount the specified setMount and send the packets */
     void setMount( uint32_t mountId );
@@ -413,9 +410,6 @@ namespace Sapphire::Entity
     uint32_t getPersistentEmote() const;
 
     void calculateStats() override;
-
-    void sendStats();
-
 
     // Aetheryte / Action / Attribute bitmasks
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -438,7 +432,7 @@ namespace Sapphire::Entity
     uint8_t getHomepoint() const;
 
     /*! discover subarea subid fo map map_id, also send udpate packet */
-    void discover( int16_t map_id, int16_t sub_id );
+    void discover( int16_t mapId, int16_t subId );
 
     /*! return a reference to the discovery bitmask array */
     Discovery& getDiscoveryBitmask();
@@ -579,9 +573,6 @@ namespace Sapphire::Entity
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! send current models ( equipment ) */
     void sendModel();
-
-    /*! send status update */
-    void sendHudParam() override;
 
     /*! send the entire inventory sequence */
     void sendInventory();
@@ -730,22 +721,13 @@ namespace Sapphire::Entity
     InvSlotPair getFreeContainerSlot( uint32_t containerId );
 
     ItemPtr addItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false, bool slient = false, bool canMerge = true );
-
     bool removeItem( uint32_t catalogId, uint32_t quantity = 1, bool isHq = false );
-
     void moveItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
-
     void swapItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
-
     void discardItem( uint16_t fromInventoryId, uint16_t fromSlotId );
-
-    void splitItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot,
-                    uint16_t splitCount );
-
+    void splitItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot, uint16_t splitCount );
     void mergeItem( uint16_t fromInventoryId, uint16_t fromSlotId, uint16_t toInventoryId, uint16_t toSlot );
-
     ItemPtr getItemAt( uint16_t containerId, uint16_t slotId );
-
     bool updateContainer( uint16_t storageId, uint16_t slotId, ItemPtr pItem );
 
     /*! calculate and return player ilvl based off equipped gear */
@@ -797,8 +779,6 @@ namespace Sapphire::Entity
     using BlacklistIDVec = std::array< uint64_t, 200 >;
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
-
-    void sendHuntingLog();
 
     void updateHuntingLog( uint16_t id );
 
@@ -925,7 +905,7 @@ namespace Sapphire::Entity
     uint8_t m_gmRank{};
     bool m_gmInvis{false};
 
-    uint8_t m_equipDisplayFlags{};
+    uint8_t m_configFlags{};
 
     bool m_bInCombat;
     bool m_bLoadingComplete;

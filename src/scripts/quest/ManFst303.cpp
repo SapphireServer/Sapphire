@@ -101,8 +101,7 @@ private:
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    playerMgr().setGrandCompany( player, OrderOfTwinAdder );
-    playerMgr().setGrandCompanyRank( player, OrderOfTwinAdder, 1 );
+    player.setGrandCompany( OrderOfTwinAdder );
     Scene00002( quest, player );
   }
 
