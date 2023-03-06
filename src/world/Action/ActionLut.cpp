@@ -15,7 +15,8 @@ bool ActionLut::validEntryExists( uint16_t actionId )
 
   // if all of the fields are 0, it's not 'valid' due to parse error or no useful data in the tooltip
   return entry.potency != 0 || entry.comboPotency != 0 || entry.flankPotency != 0 || entry.frontPotency != 0 ||
-         entry.rearPotency != 0 || entry.curePotency != 0;
+         entry.rearPotency != 0 || entry.curePotency != 0 ||
+         entry.statuses.caster.size() > 0 || entry.statuses.target.size() > 0;
 }
 
 const ActionEntry& ActionLut::getEntry( uint16_t actionId )

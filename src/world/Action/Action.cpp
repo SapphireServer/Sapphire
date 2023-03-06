@@ -864,7 +864,8 @@ Entity::CharaPtr Action::Action::getHitChara()
 bool Action::Action::hasValidLutEntry() const
 {
   return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
-    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
+    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0 ||
+    m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0;
 }
 
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()
