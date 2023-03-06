@@ -103,11 +103,6 @@ void Sapphire::Entity::Player::initInventory()
   calculateItemLevel();
 }
 
-void Sapphire::Entity::Player::sendItemLevel()
-{
-  Service< World::Manager::PlayerMgr >::ref().sendItemLevel( *this );
-}
-
 void Sapphire::Entity::Player::equipWeapon( const Item& item )
 {
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
@@ -230,8 +225,8 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
   calculateItemLevel();
   if( sendUpdate )
   {
-    sendModel();
-    sendItemLevel();
+    Network::Util::Player::sendEquip( *this );
+    Network::Util::Player::sendActorControl( *this, SetItemLevel, getItemLevel() );
     Network::Util::Player::sendBaseParams( *this );
     Network::Util::Player::sendHudParam( *this );
   }
@@ -252,8 +247,8 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
   if( sendUpdate )
   {
-    sendModel();
-    sendItemLevel();
+    Network::Util::Player::sendEquip( *this );
+    Network::Util::Player::sendActorControl( *this, SetItemLevel, getItemLevel() );
     Network::Util::Player::sendBaseParams( *this );
     Network::Util::Player::sendHudParam( *this );
   }

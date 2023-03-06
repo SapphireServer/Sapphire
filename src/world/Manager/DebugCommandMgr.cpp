@@ -260,8 +260,8 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     int32_t id;
     sscanf( params.c_str(), "%d", &id );
 
-    Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( player, 0 );
-    Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( player, id );
+    player.setMount( 0 );
+    player.setMount( id );
   }
   else if( subCommand == "weatheroverride" || subCommand == "wo" )
   {

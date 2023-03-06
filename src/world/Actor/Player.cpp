@@ -21,6 +21,7 @@
 #include "Manager/MapMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/ActionMgr.h"
+#include "Manager/AchievementMgr.h"
 
 #include "Territory/InstanceContent.h"
 
@@ -716,7 +717,7 @@ void Player::setClassJob( Common::ClassJob classJob )
   m_tp = 0;
 
   Network::Util::Player::sendStatusUpdate( *this );
-  server().queueForPlayers( getInRangePlayerIds( true ), makeActorControl( getId(), ClassJobChange, 0x04 ) );
+  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, ClassJobChange, 4 );
   Network::Util::Player::sendHudParam( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
@@ -738,12 +739,10 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
   m_classArray[ classJobIndex ] = level;
 
-  Service< World::Manager::PlayerMgr >::ref().onSetLevelForClass( *this, classjob );
-}
+  Network::Util::Player::sendActorControlSelf( *this, ClassJobUpdate, static_cast< uint8_t >( classjob ), getLevelForClass( classjob ) );
 
-void Player::sendModel()
-{
-  Service< World::Manager::PlayerMgr >::ref().onGearChanged( *this );
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( classjob ) );
 }
 
 uint32_t Player::getModelForSlot( Common::GearModelSlot slot )
@@ -877,6 +876,22 @@ void Player::setCondition( Common::PlayerCondition flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_condition[ index ] |= value;
+  Network::Util::Player::sendCondition( *this );
+}
+
+void Player::setConditions( const std::vector< Common::PlayerCondition >& flags )
+{
+  for( auto flag : flags )
+  {
+    auto iFlag = static_cast< int32_t >( flag );
+
+    uint16_t index;
+    uint8_t value;
+    Util::valueToFlagByteIndexValue( iFlag, value, index );
+
+    m_condition[ index ] |= value;
+  }
+  Network::Util::Player::sendCondition( *this );
 }
 
 void Player::removeCondition( Common::PlayerCondition flag )
@@ -891,6 +906,7 @@ void Player::removeCondition( Common::PlayerCondition flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_condition[ index ] ^= value;
+  Network::Util::Player::sendCondition( *this );
 }
 
 void Player::update( uint64_t tickCount )
@@ -919,10 +935,7 @@ void Player::freePlayerSpawnId( uint32_t actorId )
   if( spawnId == m_actorSpawnIndexAllocator.getAllocFailId() )
     return;
 
-  auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( getId() );
-  freeActorSpawnPacket->data().actorId = actorId;
-  freeActorSpawnPacket->data().spawnId = spawnId;
-  server().queueForPlayer( getCharacterId(), freeActorSpawnPacket );
+  Network::Util::Player::sendDeletePlayer( *this, actorId, spawnId );
 }
 
 Player::AetheryteList& Player::getAetheryteArray()
@@ -1090,7 +1103,7 @@ void Player::hateListAdd( const BNpc& bnpc )
     uint8_t hateId = m_freeHateSlotQueue.front();
     m_freeHateSlotQueue.pop();
     m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
-    Service< World::Manager::PlayerMgr >::ref().onHateListChanged( *this );
+    Network::Util::Player::sendHateList( *this );
   }
 }
 
@@ -1105,8 +1118,7 @@ void Player::hateListRemove( const BNpc& bnpc )
       uint8_t hateSlot = it->second;
       m_freeHateSlotQueue.push( hateSlot );
       m_actorIdTohateSlotMap.erase( it );
-      Service< World::Manager::PlayerMgr >::ref().onHateListChanged( *this );
-
+      Network::Util::Player::sendHateList( *this );
       return;
     }
   }
@@ -1126,14 +1138,14 @@ const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
-  server().queueForPlayer( getCharacterId(), makeActorControl( getId(), SetBattle, 1, 0, 0 ) );
+  Network::Util::Player::sendActorControl( *this, SetBattle, 1 );
 }
 
 void Player::onMobDeaggro( const BNpc& bnpc )
 {
   hateListRemove( bnpc );
   if( m_actorIdTohateSlotMap.empty() )
-    server().queueForPlayer( getCharacterId(), makeActorControl( getId(), SetBattle, 0, 0, 0 ) );
+    Network::Util::Player::sendActorControl( *this, SetBattle, 0 );
 }
 
 bool Player::isLogin() const
@@ -1175,7 +1187,7 @@ void Player::setTitle( uint16_t titleId )
     return;
 
   m_activeTitle = titleId;
-  server().queueForPlayers( getInRangePlayerIds( true ), makeActorControl( getId(), SetTitle, titleId ) );
+  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, SetTitle, titleId );
 }
 
 const Player::AchievementData& Player::getAchievementData() const
@@ -1227,11 +1239,20 @@ uint8_t Player::getConfigFlags() const
 void Player::setMount( uint32_t mountId )
 {
   m_mount = mountId;
+  Network::Util::Player::sendMount( *this );
 }
 
 void Player::setCompanion( uint8_t id )
 {
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto companion = exdData.getRow< Excel::Companion >( id );
+  if( !companion )
+    return;
+
   m_companionId = id;
+
+  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, ToggleCompanion, id );
 }
 
 uint8_t Player::getCurrentCompanion() const
@@ -1448,8 +1469,7 @@ void Player::dyeItemFromDyeingInfo()
   uint32_t dyeBagContainer = m_dyeingInfo.dyeBagContainer;
   uint32_t dyeBagSlot = m_dyeingInfo.dyeBagSlot;
 
-  Service< World::Manager::PlayerMgr >::ref().onConditionChanged( *this, true ); // Retail sends all 0s to unlock player after a dye? Possibly not setting a flag when the action is started in the backend..?
-
+  setCondition( Common::PlayerCondition::None1 );
   auto itemToDye = getItemAt( itemToDyeContainer, itemToDyeSlot );
   auto dyeToUse = getItemAt( dyeBagContainer, dyeBagSlot );
 
@@ -1489,7 +1509,7 @@ void Player::glamourItemFromGlamouringInfo()
   uint32_t glamourBagSlot = m_glamouringInfo.glamourBagSlot;
   bool shouldGlamour = m_glamouringInfo.shouldGlamour;
 
-  playerMgr.onConditionChanged( *this, true );
+  Network::Util::Player::sendCondition( *this );
 
   auto itemToGlamour = getItemAt( itemToGlamourContainer, itemToGlamourSlot );
   auto glamourToUse = getItemAt( glamourBagContainer, glamourBagSlot );
@@ -1539,9 +1559,7 @@ void Player::freeObjSpawnIndexForActorId( uint32_t actorId )
   if( spawnId == m_objSpawnIndexAllocator.getAllocFailId() )
     return;
 
-  auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcDeleteObject >( getId() );
-  freeObjectSpawnPacket->data().Index = spawnId;
-  server().queueForPlayer( getCharacterId(), freeObjectSpawnPacket );
+  Network::Util::Player::sendDeleteObject( *this, spawnId );
 }
 
 bool Player::isObjSpawnIndexValid( uint8_t index )
@@ -1686,12 +1704,14 @@ float Player::getRecastGroup( uint8_t index ) const
   return m_recast[ index ];
 }
 
-void Player::sendRecastGroups()
+const std::array< float, 80 >& Player::getRecastGroups() const
 {
-  auto recastGroupPaket = makeZonePacket< FFXIVIpcRecastGroup >( getId() );
-  memcpy( &recastGroupPaket->data().Recast, &m_recast, sizeof( m_recast ) );
-  memcpy( &recastGroupPaket->data().RecastMax, &m_recastMax, sizeof( m_recastMax ) );
-  server().queueForPlayer( getCharacterId(), recastGroupPaket );
+  return m_recast;
+}
+
+const std::array< float, 80 >& Player::getRecastGroupsMax() const
+{
+  return m_recastMax;
 }
 
 void Player::resetRecastGroups()
@@ -1701,7 +1721,7 @@ void Player::resetRecastGroups()
     m_recast[ i ] = 0.0f;
     m_recastMax[ i ] = 0.0f;
   }
-  sendRecastGroups();
+  Network::Util::Player::sendRecastGroups( *this );
 }
 
 bool Player::checkAction()
@@ -1800,8 +1820,7 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
         // no mercy on hated players
         takeDamage( damage );
       }
-
-      server().queueForPlayers( getInRangePlayerIds( true ), makeActorControl( getId(), SetFallDamage, damage ) );
+      Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, SetFallDamage, damage );
     }
   }
 }

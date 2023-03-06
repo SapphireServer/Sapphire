@@ -41,14 +41,13 @@ void MoveTerritoryTask::execute()
   if( !pPlayer )
     return;
 
-  auto inRangePlayerIds = pPlayer->getInRangePlayerIds();
+  auto inRangePlayerIds = pPlayer->getInRangePlayerIds( true );
 
   auto warpStart = makeActorControlSelf( pPlayer->getId(), WarpStart, m_warpInfo.m_warpType, 1, 0, m_warpInfo.m_targetTerritoryId, 1 );
   server.queueForPlayers( inRangePlayerIds, warpStart );
-  server.queueForPlayer( pPlayer->getCharacterId(), warpStart );
   server.queueForPlayers( inRangePlayerIds, makeActorControl( pPlayer->getId(), ActorDespawnEffect, m_warpInfo.m_warpType, m_warpInfo.m_targetTerritoryId ) );
 
-  Common::Service< PlayerMgr >::ref().setCondition( *pPlayer, Common::PlayerCondition::BetweenAreas );
+  pPlayer->setCondition( Common::PlayerCondition::BetweenAreas );
 
   auto moveTerritoryPacket = makeZonePacket< WorldPackets::Server::FFXIVIpcMoveTerritory >( pPlayer->getId() );
   moveTerritoryPacket->data().index = -1;

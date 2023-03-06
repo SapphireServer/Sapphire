@@ -99,7 +99,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   }
 
   // mark player as "bound by duty"
-  Common::Service< World::Manager::PlayerMgr >::ref().setCondition( player, PlayerCondition::BoundByDuty );
+  player.setCondition( PlayerCondition::BoundByDuty );
 
   sendDirectorInit( player );
 }
@@ -614,7 +614,7 @@ void Sapphire::InstanceContent::clearDirector( Entity::Player& player )
 
   player.setDirectorInitialized( false );
   // remove "bound by duty" state
-  Service< World::Manager::PlayerMgr >::ref().removeCondition( player, PlayerCondition::BoundByDuty );
+  player.removeCondition( PlayerCondition::BoundByDuty );
 }
 
 uint32_t Sapphire::InstanceContent::getExpireValue()

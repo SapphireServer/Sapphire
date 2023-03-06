@@ -320,7 +320,6 @@ void Action::Action::start()
     if( player )
     {
       player->setCondition( PlayerCondition::Casting );
-      playerMgr().onConditionChanged( *player, true );
     }
   }
   
@@ -374,7 +373,7 @@ void Action::Action::interrupt()
     // reset state flag
     //player->unsetStateFlag( PlayerStateFlag::Occupied1 );
     pPlayer->setLastActionTick( 0 );
-    playerMgr().removeCondition( *pPlayer, PlayerCondition::Casting );
+    pPlayer->removeCondition( PlayerCondition::Casting );
   }
 
   if( hasCastTime() )
@@ -420,7 +419,7 @@ void Action::Action::execute()
     if( auto pPlayer = m_pSource->getAsPlayer(); pPlayer )
     {
       pPlayer->setLastActionTick( 0 );
-      playerMgr().removeCondition( *pPlayer, PlayerCondition::Casting );
+      pPlayer->removeCondition( PlayerCondition::Casting );
     }
   }
 

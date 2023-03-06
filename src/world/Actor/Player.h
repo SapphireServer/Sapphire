@@ -155,9 +155,6 @@ namespace Sapphire::Entity
     /*! get player ilvl */
     uint16_t getItemLevel() const;
 
-    /*! send player ilvl */
-    void sendItemLevel();
-
     /*! get the current main hand model */
     uint64_t getModelMainWeapon() const;
 
@@ -492,8 +489,8 @@ namespace Sapphire::Entity
     void setRecastGroup( uint8_t index, float time );
 
     float getRecastGroup( uint8_t index ) const;
-
-    void sendRecastGroups();
+    const std::array< float, 80 >& Player::getRecastGroups() const;
+    const std::array< float, 80 >& Player::getRecastGroupsMax() const;
 
     void resetRecastGroups();
 
@@ -526,7 +523,7 @@ namespace Sapphire::Entity
     void setCondition( Common::PlayerCondition flag );
 
     /* set a specified state flag */
-    void setConditions( std::vector< Common::PlayerCondition > flags );
+    void setConditions( const std::vector< Common::PlayerCondition >& flags );
 
     /* check if a specified flag is set */
     bool hasCondition( Common::PlayerCondition flag ) const;
@@ -571,9 +568,6 @@ namespace Sapphire::Entity
 
     // Player Network Handling
     //////////////////////////////////////////////////////////////////////////////////////////////////////
-    /*! send current models ( equipment ) */
-    void sendModel();
-
     /*! send the entire inventory sequence */
     void sendInventory();
 
@@ -833,8 +827,8 @@ namespace Sapphire::Entity
 
     World::Action::ActionPtr m_pQueuedAction;
     uint64_t m_lastActionTick;
-    float m_recast[80]{};
-    float m_recastMax[80]{};
+    std::array< float, 80 > m_recast{};
+    std::array< float, 80 > m_recastMax{};
 
     InventoryMap m_storageMap;
 

@@ -3,6 +3,9 @@
 #include <Exd/ExdData.h>
 
 #include <Manager/MgrUtil.h>
+#include <Manager/TerritoryMgr.h>
+
+#include <Territory/Territory.h>
 
 #include <Network/CommonActorControl.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
@@ -10,6 +13,8 @@
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/PacketWrappers/ActorControlTargetPacket.h>
 #include <Network/PacketWrappers/HudParamPacket.h>
+#include <Network/PacketWrappers/ModelEquipPacket.h>
+#include <Network/PacketWrappers/ConditionPacket.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
@@ -157,6 +162,99 @@ void Util::Player::sendGrandCompany( Entity::Player& player )
   gcAffPacket->data().MaelstromRank = player.getGcRankArray()[ 0 ];
   gcAffPacket->data().TwinAdderRank = player.getGcRankArray()[ 1 ];
   gcAffPacket->data().ImmortalFlamesRank = player.getGcRankArray()[ 2 ];
-
   server().queueForPlayer( player.getCharacterId(), gcAffPacket );
+}
+
+void Util::Player::sendDeletePlayer( Entity::Player& player, uint32_t actorId, uint8_t spawnIndex )
+{
+  auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( player.getId() );
+  freeActorSpawnPacket->data().actorId = actorId;
+  freeActorSpawnPacket->data().spawnId = spawnIndex;
+  server().queueForPlayer( player.getCharacterId(), freeActorSpawnPacket );
+}
+
+void Util::Player::sendDeleteObject( Entity::Player& player, uint8_t spawnIndex )
+{
+  auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcDeleteObject >( player.getId() );
+  freeObjectSpawnPacket->data().Index = spawnIndex;
+  server().queueForPlayer( player.getCharacterId(), freeObjectSpawnPacket );
+}
+
+void Util::Player::sendHateList( Entity::Player& player )
+{
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+
+  auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( player.getId() );
+  auto hateRankPacket = makeZonePacket< FFXIVIpcHaterList >( player.getId() );
+
+  auto actorIdToHateSlotMap = player.getActorIdToHateSlotMap();
+
+  hateListPacket->data().Count = static_cast< uint8_t >( actorIdToHateSlotMap.size() );
+
+  hateRankPacket->data().Count = static_cast< uint8_t >( actorIdToHateSlotMap.size() );
+  auto it = actorIdToHateSlotMap.begin();
+
+  auto zone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( !zone )
+    return;
+
+  for( int32_t i = 0; it != actorIdToHateSlotMap.end(); ++it, ++i )
+  {
+    auto pBNpc = zone->getActiveBNpcByEntityId( it->first );
+    if( !pBNpc )
+      continue;
+
+    auto hateValue = pBNpc->hateListGetValue( player.getAsChara() );
+    if( hateValue == 0 )
+      continue;
+
+    auto hatePercent = ( hateValue / static_cast< float >( pBNpc->hateListGetHighestValue() ) ) * 100.f;
+
+    hateListPacket->data().List[ i ].Id = player.getId();
+    hateListPacket->data().List[ i ].Value = hateValue;
+
+    hateRankPacket->data().List[ i ].Id = it->first;
+    hateRankPacket->data().List[ i ].Rate = static_cast< uint8_t >( hatePercent );
+  }
+
+  server().queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
+}
+
+void Util::Player::sendMount( Entity::Player& player )
+{
+  auto mountId = player.getCurrentMount();
+  auto inRangePlayerIds = player.getInRangePlayerIds( true );
+  if( mountId != 0 )
+  {
+    Network::Util::Player::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) );
+    Network::Util::Player::sendActorControlSelf( inRangePlayerIds, player, 0x39e, 12 );
+  }
+  else
+  {
+    Network::Util::Player::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+    Network::Util::Player::sendActorControlSelf( inRangePlayerIds, player, Dismount, 1 );
+  }
+  auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
+  mountPacket->data().id = mountId;
+  server().queueForPlayers( inRangePlayerIds, mountPacket );
+}
+
+void Util::Player::sendEquip( Entity::Player& player )
+{
+  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< ModelEquipPacket >( player ) );
+}
+
+void Util::Player::sendCondition( Entity::Player& player )
+{
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ConditionPacket >( player ) );
+}
+
+void Util::Player::sendRecastGroups( Entity::Player& player )
+{
+  const auto& recastGroups = player.getRecastGroups();
+  const auto& recastGroupsMax = player.getRecastGroupsMax();
+  auto recastGroupPaket = makeZonePacket< FFXIVIpcRecastGroup >( player.getId() );
+  memcpy( &recastGroupPaket->data().Recast, recastGroups.data(), recastGroups.size() * sizeof( float ) );
+  memcpy( &recastGroupPaket->data().RecastMax, recastGroupsMax.data(), recastGroupsMax.size() * sizeof( float ) );
+  server().queueForPlayer( player.getCharacterId(), recastGroupPaket );
 }

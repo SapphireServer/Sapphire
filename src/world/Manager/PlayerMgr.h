@@ -27,23 +27,13 @@ namespace Sapphire::World::Manager
 
     void onRestingTick( Sapphire::Entity::Player& player );
 
-    void sendItemLevel( Sapphire::Entity::Player& player );
-
     void onLevelUp( Sapphire::Entity::Player& player );
-
-    void onSetLevelForClass( Sapphire::Entity::Player& player, Common::ClassJob classJob );
 
     void onGainExp( Sapphire::Entity::Player& player, uint32_t exp );
 
     void onUnlockOrchestrion( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId );
 
-    void onCompanionUpdate( Entity::Player& player, uint8_t companionId );
-
-    void onMountUpdate( Sapphire::Entity::Player& player, uint32_t mountId );
-
     void onMobKill( Sapphire::Entity::Player& player, Sapphire::Entity::BNpc& bnpc );
-
-    void onHateListChanged( Sapphire::Entity::Player& player );
 
     void sendLoginMessage( Sapphire::Entity::Player& player );
 
@@ -53,14 +43,8 @@ namespace Sapphire::World::Manager
     void onMoveZone( Sapphire::Entity::Player& player );
 
     void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
-
-    void onConditionChanged( Sapphire::Entity::Player& player, bool updateInRange );
     void onAchievementListChanged( Sapphire::Entity::Player& player );
     void onAchievementProgressChanged( Sapphire::Entity::Player& player, uint32_t achievementId );
-    void onGearChanged( Sapphire::Entity::Player& player );
-
-    void setCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag );
-    void removeCondition( Sapphire::Entity::Player& player, Common::PlayerCondition flag );
 
   //////////// Helpers
 

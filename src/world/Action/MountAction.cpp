@@ -58,7 +58,7 @@ void MountAction::start()
   data.TargetPos[ 2 ] = Common::Util::floatToUInt16( pos.z );
   data.Dir = m_pSource->getRot();
   server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), castPacket );
-  playerMgr().setCondition( *player, Common::PlayerCondition::Casting );
+  player->setCondition( Common::PlayerCondition::Casting );
 
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), m_recastTimeMs / 10 );
   server().queueForPlayer( m_pSource->getAsPlayer()->getCharacterId(), actionStartPkt );
@@ -68,7 +68,7 @@ void MountAction::execute()
 {
   assert( m_pSource );
 
-  Common::Service< World::Manager::PlayerMgr >::ref().removeCondition( *m_pSource->getAsPlayer(), Common::PlayerCondition::Casting );
+  m_pSource->getAsPlayer()->removeCondition( Common::PlayerCondition::Casting );
   m_effectBuilder->mount( m_pSource, m_mountId );
   m_effectBuilder->buildAndSendPackets( { m_pSource } );
 }

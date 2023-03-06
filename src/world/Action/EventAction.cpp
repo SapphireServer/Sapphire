@@ -62,7 +62,7 @@ void Action::EventAction::start()
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
 
     if( pPlayer->hasCondition( PlayerCondition::InNpcEvent ) )
-      Service< World::Manager::PlayerMgr >::ref().removeCondition( *pPlayer, PlayerCondition::InNpcEvent );
+      pPlayer->removeCondition( PlayerCondition::InNpcEvent );
   }
   else
     server().queueForPlayers( m_pSource->getInRangePlayerIds(), control );

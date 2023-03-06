@@ -136,7 +136,7 @@ void WarpMgr::finishWarp( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), zoneInPacket );
   server().queueForPlayers( player.getInRangePlayerIds( true ), setStatusPacket );
 
-  playerMgr.removeCondition( player, PlayerCondition::BetweenAreas );
+  player.removeCondition( PlayerCondition::BetweenAreas );
 
   Common::Service< MapMgr >::ref().updateAll( player );
 }

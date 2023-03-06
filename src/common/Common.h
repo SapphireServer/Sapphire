@@ -1381,6 +1381,7 @@ namespace Sapphire::Common
 
   enum PlayerCondition : uint8_t
   {
+    None1 = 0,
     HideUILockChar = 1, // as the name suggests, hides the ui and logs the char...
     InCombat = 2, // in Combat, locks gearchange/return/teleport
     Casting = 3,

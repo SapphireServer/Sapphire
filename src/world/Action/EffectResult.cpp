@@ -114,7 +114,7 @@ void EffectResult::execute()
     case Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT:
     {
       auto pPlayer = m_target->getAsPlayer();
-      Common::Service< World::Manager::PlayerMgr >::ref().onMountUpdate( *pPlayer, m_result.Value );
+      pPlayer->setMount( m_result.Value );
       break;
     }
 

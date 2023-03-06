@@ -452,17 +452,17 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::CANCEL_MOUNT:
     {
-      playerMgr().onMountUpdate( player, 0 );
+      player.setMount( 0 );
       break;
     }
     case PacketCommand::COMPANION:
     {
-      playerMgr().onCompanionUpdate( player, static_cast< uint8_t >( data.Arg0 ) );
+      player.setCompanion( static_cast< uint8_t >( data.Arg0 ) );
       break;
     }
     case PacketCommand::COMPANION_CANCEL:
     {
-      playerMgr().onCompanionUpdate( player, 0 );
+      player.setCompanion( 0 );
       break;
     }
     case PacketCommand::REQUEST_STATUS_RESET: // Remove status (clicking it off)
