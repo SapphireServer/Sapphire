@@ -9,6 +9,7 @@
 #include <map>
 #include <queue>
 #include <array>
+#include <numeric>
 
 namespace Sapphire::Entity
 {
