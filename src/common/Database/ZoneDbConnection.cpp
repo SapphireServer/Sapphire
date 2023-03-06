@@ -29,7 +29,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "IsNewAdventurer, TerritoryType, TerritoryId, PosX, PosY, PosZ, PosR, "
                     "OTerritoryType, OTerritoryId, OPosX, OPosY, OPosZ, OPosR, GuardianDeity, "
                     "BirthDay, BirthMonth, Class, Status, TotalPlayTime, FirstClass, HomePoint, "
-                    "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, Achievement, "
+                    "FavoritePoint, RestPoint, StartTown, ActiveTitle, TitleList, "
                     "Aetheryte, HowTo, Minions, Mounts, Orchestrion, EquippedMannequin, ConfigFlags, "
                     "QuestCompleteFlags, OpeningSequence, QuestTracking, GrandCompany, "
                     "GrandCompanyRank, Discovery, GMRank, EquipDisplayFlags, Unlocks, CFPenaltyUntil, "
@@ -46,7 +46,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "TerritoryType = ?, TerritoryId = ?, PosX = ?, PosY = ?, PosZ = ?, PosR = ?, "
                     "OTerritoryType = ?, OTerritoryId = ?, OPosX = ?, OPosY = ?, OPosZ = ?, OPosR = ?, "
                     "Class = ?, Status = ?, TotalPlayTime = ?, HomePoint = ?, FavoritePoint = ?, RestPoint = ?, "
-                    "ActiveTitle = ?, TitleList = ?, Achievement = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, Orchestrion = ?, "
+                    "ActiveTitle = ?, TitleList = ?, Aetheryte = ?, HowTo = ?, Minions = ?, Mounts = ?, Orchestrion = ?, "
                     "EquippedMannequin = ?, ConfigFlags = ?, QuestCompleteFlags = ?, OpeningSequence = ?, "
                     "QuestTracking = ?, GrandCompany = ?, GrandCompanyRank = ?, Discovery = ?, GMRank = ?, EquipDisplayFlags = ?, Unlocks = ?, "
                     "CFPenaltyUntil = ?, Pose = ? WHERE CharacterId = ?;",
@@ -107,8 +107,6 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     CONNECTION_ASYNC );
   prepareStatement( CHARA_UP_TITLE, "UPDATE charainfo SET ActiveTitle = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
   prepareStatement( CHARA_UP_TITLELIST, "UPDATE charainfo SET TitleList = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
-  prepareStatement( CHARA_UP_ACHIEVEMENTS, "UPDATE charainfo SET Achievement = ? WHERE CharacterId = ?;",
-                    CONNECTION_ASYNC );
   prepareStatement( CHARA_UP_AETHERYTE, "UPDATE charainfo SET Aetheryte = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
   prepareStatement( CHARA_UP_HOWTO, "UPDATE charainfo SET HowTo = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
   prepareStatement( CHARA_UP_MINIONS, "UPDATE charainfo SET Minions = ? WHERE CharacterId = ?;", CONNECTION_ASYNC );
@@ -224,6 +222,24 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                                   "WHERE CharacterId = ?;",
                     CONNECTION_SYNC );
 
+  /// CHARA ACHIEVEMENT
+  prepareStatement( CHARA_ACHIEV_INS,
+                    "INSERT INTO charainfoachievement ( CharacterId, UnlockList, ProgressData, HistoryList, UPDATE_DATE ) "
+                    " VALUES ( ?, ?, ?, ?, NOW() );",
+                    CONNECTION_SYNC );
+
+  prepareStatement( CHARA_ACHIEV_UP, "UPDATE charainfoachievement "
+                                         " SET UnlockList = ?,"
+                                         " ProgressData = ?,"
+                                         " HistoryList = ?"
+                                         " WHERE CharacterId = ?;",
+                    CONNECTION_ASYNC );
+
+  prepareStatement( CHARA_ACHIEV_SEL, "SELECT UnlockList, ProgressData, HistoryList FROM charainfoachievement "
+                                          "WHERE CharacterId = ?;",
+                    CONNECTION_SYNC );
+
+
   /// CHARA FRIENDLIST
   prepareStatement( CHARA_FRIENDLIST_INS,
                     "INSERT INTO charainfofriendlist ( CharacterId, CharacterIdList, InviteDataList, UPDATE_DATE ) "
@@ -240,7 +256,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                                            "WHERE CharacterId = ?;",
                      CONNECTION_SYNC );
 
-  /// CHARA FRIENDLIST
+  /// CHARA BLACKLIST
   prepareStatement( CHARA_BLACKLIST_INS,
                     "INSERT INTO charainfoblacklist ( CharacterId, CharacterIdList, UPDATE_DATE ) "
                     " VALUES ( ?, ?, NOW() );",

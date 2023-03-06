@@ -545,6 +545,9 @@ namespace Sapphire::Entity
     /*! unload player from logout */
     void unload();
 
+    /*! load achievement data */
+    bool loadAchievements();
+
     /*! load active class data */
     bool loadClassData();
 
@@ -671,6 +674,8 @@ namespace Sapphire::Entity
     void updateDbFriendList();
 
     void updateDbBlacklist();
+
+    void updateDbAchievement();
 
     void updateDbChara() const;
 
