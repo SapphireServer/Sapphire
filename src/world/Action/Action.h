@@ -105,7 +105,7 @@ namespace Sapphire::World::Action
 
     EffectBuilderPtr getEffectbuilder();
 
-    void buildEffects();
+    void handleAction();
 
     /*!
      * @brief Adds an actor filter to this action.

@@ -431,7 +431,7 @@ void Action::Action::execute()
 
   if( !hasClientsideTarget()  )
   {
-    buildEffects();
+    handleAction();
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
@@ -501,7 +501,7 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
   return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
 }
 
-void Action::Action::buildEffects()
+void Action::Action::handleAction()
 {
   snapshotAffectedActors( m_hitActors );
 
