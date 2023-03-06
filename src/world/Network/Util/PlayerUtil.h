@@ -31,6 +31,23 @@ namespace Sapphire::Network::Util::Player
 
   void sendRecastGroups( Entity::Player& player );
 
+  void sendAchievementList( Entity::Player& player );
+
+  void sendRestingUpdate( Entity::Player& player );
+
+  void sendLogin( Entity::Player& player );
+
+  void sendPlayerSetup( Entity::Player& player );
+
+  void sendChangeClass( Entity::Player& player );
+
+  void sendContentAttainFlags( Entity::Player& player );
+
+  void sendInitZone( Entity::Player& player );
+
+  void sendDailyQuests( Entity::Player& player );
+  void sendQuestRepeatFlags( Entity::Player& player );
+
   void sendActorControlSelf( Entity::Player& player, uint16_t category, uint32_t param1 = 0, uint32_t param2 = 0, uint32_t param3 = 0,
                              uint32_t param4 = 0, uint32_t param5 = 0 );
 

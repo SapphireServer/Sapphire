@@ -9,6 +9,7 @@
 
 #include "Manager/HousingMgr.h"
 #include "Manager/WarpMgr.h"
+#include "Manager/AchievementMgr.h"
 
 #include "Network/GameConnection.h"
 
@@ -600,12 +601,15 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::ACHIEVEMENT_REQUEST_RATE:
     {
-      playerMgr().onAchievementProgressChanged( player, data.Arg0 );
+      auto achievementId = data.Arg0;
+      auto& achvMgr = Common::Service< AchievementMgr >::ref();
+      auto achvProgress = achvMgr.getAchievementDataById( player, achievementId );
+      Network::Util::Player::sendActorControl( player, AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
       break;
     }
     case PacketCommand::ACHIEVEMENT_REQUEST:
     {
-      playerMgr().onAchievementListChanged( player );
+      Network::Util::Player::sendAchievementList( player );
       break;
     }
     case PacketCommand::TELEPO_INQUIRY: // Teleport

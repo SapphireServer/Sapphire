@@ -15,6 +15,9 @@
 #include <Network/PacketWrappers/HudParamPacket.h>
 #include <Network/PacketWrappers/ModelEquipPacket.h>
 #include <Network/PacketWrappers/ConditionPacket.h>
+#include <Network/PacketWrappers/RestingPacket.h>
+#include <Network/PacketWrappers/PlayerSetupPacket.h>
+#include <Network/PacketWrappers/InitZonePacket.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
@@ -257,4 +260,71 @@ void Util::Player::sendRecastGroups( Entity::Player& player )
   memcpy( &recastGroupPaket->data().Recast, recastGroups.data(), recastGroups.size() * sizeof( float ) );
   memcpy( &recastGroupPaket->data().RecastMax, recastGroupsMax.data(), recastGroupsMax.size() * sizeof( float ) );
   server().queueForPlayer( player.getCharacterId(), recastGroupPaket );
+}
+
+void Util::Player::sendAchievementList( Entity::Player& player )
+{
+  auto achvData = player.getAchievementData();
+  auto achvPacket = makeZonePacket< FFXIVIpcAchievement >( player.getId() );
+  std::memcpy( &achvPacket->data().complete[ 0 ], &achvData.unlockList[ 0 ], sizeof( achvPacket->data().complete ) );
+  std::memcpy( &achvPacket->data().history[ 0 ], &achvData.history[ 0 ], sizeof( achvPacket->data().history ) );
+  server().queueForPlayer( player.getCharacterId(), achvPacket );
+}
+
+void Util::Player::sendRestingUpdate( Entity::Player& player )
+{
+  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< RestingPacket >( player ) );
+}
+
+void Util::Player::sendLogin( Entity::Player& player )
+{
+  auto initPacket = makeZonePacket< FFXIVIpcLogin >( player.getId() );
+  initPacket->data().playerActorId = player.getId();
+  server().queueForPlayer( player.getCharacterId(), initPacket );
+}
+
+void Util::Player::sendPlayerSetup( Entity::Player& player )
+{
+  server().queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
+}
+
+void Util::Player::sendChangeClass( Entity::Player& player )
+{
+  auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
+  classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
+  classInfo->data().Lv = player.getLevel();
+  classInfo->data().Lv1 = player.getLevel();
+  classInfo->data().Login = player.isLogin() ? 1 : 0;
+  server().queueForPlayer( player.getCharacterId(), classInfo );
+}
+
+void Util::Player::sendContentAttainFlags( Entity::Player& player )
+{
+  // todo - fill with actual data from player
+  auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
+  std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
+  server().queueForPlayer( player.getCharacterId(), contentFinderList );
+}
+
+void Util::Player::sendInitZone( Entity::Player& player )
+{
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
+  if( !pZone )
+  {
+    Logger::error( "Territory GuID#{} not found!", player.getTerritoryId() );
+    return;
+  }
+  auto& teri = *pZone;
+  server().queueForPlayer( player.getCharacterId(), makeInitZone( player, teri ) );
+}
+
+void Util::Player::sendDailyQuests( Entity::Player& player )
+{
+  server().queueForPlayer( player.getCharacterId(), makeZonePacket< FFXIVIpcDailyQuests >( player.getId() ) );
+}
+
+void Util::Player::sendQuestRepeatFlags( Entity::Player& player )
+{
+  server().queueForPlayer( player.getCharacterId(), makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() ) );
 }

@@ -570,6 +570,8 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
   Util::valueToFlagByteIndexValue( songId, value, index );
 
   m_orchestrion[ index ] |= value;
+
+  Network::Util::Player::sendActorControlSelf( *this, ToggleOrchestrionUnlock, songId, 1, itemId );
 }
 
 bool Player::hasReward( Common::UnlockEntry unlockId ) const
@@ -599,14 +601,14 @@ bool Player::hasMount( uint32_t mountId ) const
 void Player::gainExp( uint32_t amount )
 {
   uint32_t currentExp = getExp();
-
   uint16_t level = getLevel();
+  auto currentClass = static_cast< uint8_t >( getClass() );
 
   if( level >= Common::MAX_PLAYER_LEVEL )
   {
     setExp( 0 );
     if( currentExp != 0 )
-      Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, 0 );
+      Network::Util::Player::sendActorControlSelf( *this, UpdateUiExp, currentClass, 0 );
 
     return;
   }
@@ -619,9 +621,7 @@ void Player::gainExp( uint32_t amount )
   if( ( currentExp + amount ) >= neededExpToLevel )
   {
     // levelup
-    amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelPlus1 ?
-             neededExpToLevelPlus1 - 1 :
-             ( currentExp + amount - neededExpToLevel );
+    amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + amount - neededExpToLevel );
 
     if( level + 1 >= Common::MAX_PLAYER_LEVEL )
       amount = 0;
@@ -630,11 +630,10 @@ void Player::gainExp( uint32_t amount )
     levelUp();
   }
   else
-  {
     setExp( currentExp + amount );
-  }
 
-  Service< World::Manager::PlayerMgr >::ref().onGainExp( *this, amount );
+  Network::Util::Player::sendActorControlSelf( *this, GainExpMsg, currentClass, amount );
+  Network::Util::Player::sendActorControlSelf( *this, UpdateUiExp, currentClass, getExp() );
 }
 
 void Player::levelUp()
@@ -643,8 +642,10 @@ void Player::levelUp()
   m_mp = getMaxMp();
 
   setLevel( getLevel() + 1 );
+  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
 
-  Service< World::Manager::PlayerMgr >::ref().onLevelUp( *this );
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
@@ -727,6 +728,11 @@ void Player::setLevel( uint8_t level )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_classArray[ classJobIndex ] = level;
+
+  calculateStats();
+  Network::Util::Player::sendBaseParams( *this );
+  Network::Util::Player::sendHudParam( *this );
+  Network::Util::Player::sendStatusUpdate( *this );
 }
 
 void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )

@@ -2,10 +2,12 @@
 #include <Util/Util.h>
 
 #include "AchievementMgr.h"
-#include "PlayerMgr.h"
+#include <Network/Util/PlayerUtil.h>
+#include <Network/CommonActorControl.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Network;
+using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::World::Manager;
 
@@ -67,7 +69,9 @@ void AchievementMgr::unlockAchievement( Entity::Player& player, uint32_t achieve
 
   // fire packets
   player.setAchievementData( achvData );
-  Common::Service< World::Manager::PlayerMgr >::ref().onUnlockAchievement( player, achievementId );
+  Network::Util::Player::sendAchievementList( player );
+  Network::Util::Player::sendActorControl( player, AchievementComplete, achievementId );
+  Network::Util::Player::sendActorControl( player, AchievementObtainMsg, achievementId );
 
   // check and add title to player
   auto achvTitleId = achvExd->data().Title;

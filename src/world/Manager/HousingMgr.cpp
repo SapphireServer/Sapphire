@@ -1786,6 +1786,20 @@ void HousingMgr::sendLandFlagsSlot( Entity::Player& player, Common::LandFlagsSlo
 
 void HousingMgr::sendLandFlags( Entity::Player& player )
 {
+  if( Sapphire::LandPtr pLand = getLandByOwnerId( player.getCharacterId() ) )
+  {
+    uint32_t state = 0;
+    if( pLand->getHouse() )
+    {
+      state |= Common::LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_HOUSE;
+
+      // todo: remove this, debug for now
+      state |= Common::LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_AETHERYTE;
+    }
+
+    player.setLandFlags( Common::LandFlagsSlot::Private, state, pLand->getLandIdent() );
+  }
+
   auto landFlags = makeZonePacket< FFXIVIpcCharaHousing >( player.getId() );
 
   landFlags->data().FcLands = player.getCharaLandData( Common::LandFlagsSlot::FreeCompany );

@@ -131,8 +131,6 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     {
       targetPlayer->setLevel( static_cast< uint8_t >( param1 ) );
       PlayerMgr::sendServerNotice( player, "Level for {0} was set to {1}", targetPlayer->getName(), param1 );
-      auto playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
-      playerMgr.onLevelUp(player);
       break;
     }
     case GmCommand::Race:
@@ -330,13 +328,13 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         if( param2 == 0 )
         {
           for( uint8_t i = 0; i < 255; i++ )
-            Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *targetPlayer, i, 0 );
+            targetPlayer->learnSong( i, 0 );
 
           PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName() );
         }
         else
         {
-          Service< World::Manager::PlayerMgr >::ref().onUnlockOrchestrion( *targetPlayer, static_cast< uint8_t >( param2 ), 0 );
+          targetPlayer->learnSong( static_cast< uint8_t >( param2 ), 0 );
           PlayerMgr::sendServerNotice( player, "Song {0} for {1} was turned on.", param2, targetPlayer->getName() );
         }
       }
