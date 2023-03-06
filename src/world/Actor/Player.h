@@ -511,7 +511,7 @@ namespace Sapphire::Entity
     /*! gets the players territoryTypeId */
     uint32_t getTerritoryTypeId() const;
 
-    void forceZoneing( uint32_t zoneId );
+    void forceZoneing( uint32_t zoneId = 0, float x = FLT_MAX, float y = FLT_MAX, float z = FLT_MAX, float r = FLT_MAX, bool showZoneName = false );
 
     /*! return player to preset homepoint */
     void returnToHomepoint();
@@ -1015,6 +1015,48 @@ namespace Sapphire::Entity
     void gaugeClear();
     void sendActorGauge();
     void gaugeSetRaw( uint8_t* pData );
+
+    void gaugeWarSetIb( uint8_t value );
+    uint8_t gaugeWarGetIb();
+
+    void gaugePldSetOath( uint8_t value );
+    uint8_t gaugePldGetOath();
+
+    uint8_t gaugeWhmGetLily();
+    uint8_t gaugeWhmGetBloodLily();
+    void gaugeWhmSetLilies( uint8_t liles, uint8_t bloodLilies );
+    void gaugeWhmSetLilyTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeWhmGetLilyTimer();
+
+    void gaugeDrkSetBlood( uint8_t value );
+    uint8_t gaugeDrkGetBlood();
+    void gaugeDrkSetDarkArts( bool value );
+    bool gaugeDrkGetDarkArts();
+    void gaugeDrkSetDarkSideTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrkGetDarkSideTimer();
+    void gaugeDrkSetShadowTimer( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrkGetShadowTimer();
+
+    void gaugeGnbSetAmmo( uint8_t value );
+    uint8_t gaugeGnbGetAmmo();
+    void gaugeGnbSetComboStep( uint8_t value );
+    uint8_t gaugeGnbGetComboStep();
+
+    void gaugeDrgSetDragonTimer ( uint16_t value, bool sendPacket = false );
+    uint16_t gaugeDrgGetDragonTimer();
+    void gaugeDrgSetDragonState ( Sapphire::Common::DrgState value );
+    bool gaugeDrgGetDragonState( Common::DrgState state );
+    Common::DrgState gaugeDrgGetDragonStateRaw();
+    void Sapphire::Entity::Player::gaugeDrgSetEyes( uint8_t value );
+    uint8_t Sapphire::Entity::Player::gaugeDrgGetEyes();
+
+    void gaugeSamSetKenki( uint8_t value );
+    uint8_t gaugeSamGetKenki();
+    void gaugeSamSetSen( Common::SamSen type, bool value );
+    void gaugeSamSetSen( Common::SamSen value );
+    bool gaugeSamGetSen( Common::SamSen type );
+    Common::SamSen gaugeSamGetSenRaw();
+    bool gaugeSamHasAnySen();
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 

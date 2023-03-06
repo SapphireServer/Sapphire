@@ -679,9 +679,14 @@ void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
   m_flags |= flag;
 }
 
+/*!
+TODO: this only solves attacks from melee classes.
+Will have to be extended for ranged attacks.
+
+\param ActorPtr the autoAttack is performed on
+*/
 void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
 {
-
   uint64_t tick = Util::getTimeMs();
 
   // todo: this needs to use the auto attack delay for the equipped weapon
@@ -689,23 +694,20 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
   {
     pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
-    srand( static_cast< uint32_t >( tick ) );
 
-    auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
+    auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+    auto actionData = exdData.get< Data::Action >( 7 );
+    assert( actionData );
+    auto action = World::Action::make_Action( getAsChara(), 7, 0, actionData );
 
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage.first );
-    effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.param0 = static_cast< uint8_t >( damage.second );
-    effectEntry.param2 = 0x71;
-    effectPacket->addEffect( effectEntry );
+    action->setTargetId( pTarget->getId() );
+    action->setPos( getPos() );
+    action->setAutoAttack();
 
-    sendToInRangeSet( effectPacket );
-
-    pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
-
+    if( action->init() )
+    {
+      action->start();
+    }
   }
 }
 

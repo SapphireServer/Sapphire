@@ -6,6 +6,7 @@
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
 #include "EffectBuilder.h"
+#include "StatusEffect/StatusEffect.h"
 
 namespace Sapphire::Data
 {
@@ -40,7 +41,6 @@ namespace Sapphire::World::Action
 
     bool isInterrupted() const;
     Common::ActionInterruptType getInterruptType() const;
-    void setInterrupted( Common::ActionInterruptType type );
 
     uint32_t getCastTime() const;
     void setCastTime( uint32_t castTime );
@@ -51,6 +51,14 @@ namespace Sapphire::World::Action
     bool isCorrectCombo() const;
 
     bool isComboAction() const;
+
+    void setAlwaysCombo();
+
+    void setAutoAttack();
+
+    void disableGenericHandler();
+
+    bool checkActionBonusRequirement();
 
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
@@ -118,6 +126,22 @@ namespace Sapphire::World::Action
      */
     Entity::CharaPtr getHitChara();
 
+    Data::ActionPtr getActionData();
+    ActionEntry& getActionEntry();
+    float getAnimationLock();
+
+    void setPrimaryCost( Common::ActionPrimaryCostType type, uint16_t cost );
+
+    bool isPhysical() const;
+    bool isMagical() const;
+    bool isGCD() const;
+    bool isWeaponSkill() const;
+    uint64_t getExecutionDelay() const;
+
+    static bool isAttackTypePhysical( Common::AttackType attackType );
+    static bool isAttackTypeMagical( Common::AttackType attackType );
+    static ActionTypeFilter getActionTypeFilterFromAttackType( AttackType attackType );
+
     /*!
      * @brief Starts the cast. Finishes it immediately if there is no cast time (weaponskills).
      */
@@ -133,7 +157,7 @@ namespace Sapphire::World::Action
      *
      * m_interruptType will have the reason why the action was interrupted (eg. damage, movement, ...)
      */
-    virtual void interrupt();
+    virtual void interrupt( Common::ActionInterruptType type = Common::ActionInterruptType::RegularInterrupt );
 
     /*!
      * @brief Called on each player update tick
@@ -180,6 +204,9 @@ namespace Sapphire::World::Action
     bool m_canTargetFriendly;
     bool m_canTargetHostile;
     bool m_canTargetDead;
+    bool m_isAutoAttack;
+    bool m_disableGenericHandler;
+    bool m_shouldAlwaysCombo;
 
     Common::ActionInterruptType m_interruptType;
 

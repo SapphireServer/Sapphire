@@ -1103,6 +1103,73 @@ namespace Sapphire::Common
     Gatherer
   };
 
+  enum class StatusEffectType : uint32_t
+  {
+    Invalid = 0,
+    DamageMultiplier = 1,
+    DamageReceiveMultiplier = 2,
+    Hot = 3,
+    Dot = 4,
+    HealReceiveMultiplier = 5,
+    HealCastMultiplier = 6,
+    CritDHRateBonus = 7,
+    DamageReceiveTrigger = 8,
+    DamageDealtTrigger = 9,
+    Shield = 10,
+    MPRestore = 11,
+    Haste = 12,
+    InstantCast = 13,
+    BlockParryRateBonus = 14,
+    MPRestorePerGCD = 15,
+    AlwaysCombo = 16,
+    PotencyMultiplier = 17,
+  };
+
+  enum class ActionTypeFilter : int32_t
+  {
+    Unknown = 0,
+    Physical = 1,
+    Magical = 2,
+    Slashing = 4,
+    Piercing = 8,
+    Blunt = 16,
+    All = 255
+  };
+
+  enum class CritDHBonusFilter : int32_t
+  {
+    None = 0,
+    Damage = 1,
+    Heal = 2,
+    All = 255,
+  };
+
+  enum class StatusEffectTriggerResult : int32_t
+  {
+    None = 0,
+    ReflectDamage = 1,
+    AbsorbHP = 2,
+  };
+
+  enum ActionBonusEffect : uint8_t
+  {
+    NoBonus = 0,
+    CritBonus = 1,
+    DHBonus = 2,
+    GainMPPercentage = 4,
+    GainJobResource = 8,
+    SelfHeal = 16,
+    DamageFallOff = 32,
+    GainJobTimer = 64,
+  };
+
+  enum ActionBonusEffectRequirement : uint8_t
+  {
+    NoRequirement = 0,
+    RequireCorrectCombo = 1,
+    RequireCorrectPositional = 2,
+  };
+
   enum class AstCardType : uint8_t
   {
     None = 0,
@@ -1224,7 +1291,7 @@ namespace Sapphire::Common
     {
       uint8_t ammo;
       uint8_t unused;
-      uint16_t maxTimerDuration;
+      uint16_t maxTimerDuration; // what is this?
       uint8_t ammoComboStep;
     } gnb;
     struct

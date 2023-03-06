@@ -9,17 +9,30 @@ using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
 
-EffectResult::EffectResult( Entity::CharaPtr target, uint64_t runAfter ) :
+EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, uint64_t runAfter ) :
   m_target( std::move( target ) ),
+  m_source( std::move( source ) ),
   m_delayMs( runAfter ),
+  m_type( Common::ActionEffectType::Nothing ),
   m_value( 0 ),
+  m_statusDuration( 0 ),
   m_param0( 0 ),
   m_param1( 0 ),
-  m_type( Common::ActionEffectType::Nothing ),
   m_param2( 0 ),
-  m_flag( Common::ActionEffectResultFlag::None )
+  m_flag( Common::ActionEffectResultFlag::None ),
+  m_pPreBuiltStatusEffect( nullptr )
 {
 
+}
+
+EffectResult::EffectResult( Entity::CharaPtr target, uint64_t delayMs ) :
+  EffectResult::EffectResult( std::move( target ), nullptr, delayMs )
+{
+}
+
+Entity::CharaPtr EffectResult::getSource() const
+{
+  return m_source;
 }
 
 Entity::CharaPtr EffectResult::getTarget() const
@@ -37,6 +50,13 @@ uint64_t EffectResult::getDelay()
   return m_delayMs;
 }
 
+void EffectResult::dodge( Common::ActionEffectResultFlag flag )
+{
+  m_flag = flag;
+
+  m_type = Common::ActionEffectType::Miss;
+}
+
 void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
 {
   m_param0 = static_cast< uint8_t >( severity );
@@ -44,6 +64,24 @@ void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severi
   m_flag = flag;
 
   m_type = Common::ActionEffectType::Damage;
+}
+
+void EffectResult::blockedDamage( uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag )
+{
+  m_value = amount;
+  m_flag = flag;
+  m_param2 = rate;
+
+  m_type = Common::ActionEffectType::BlockedDamage;
+}
+
+void EffectResult::parriedDamage( uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag )
+{
+  m_value = amount;
+  m_flag = flag;
+  m_param2 = rate;
+
+  m_type = Common::ActionEffectType::ParriedDamage;
 }
 
 void EffectResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
@@ -77,12 +115,29 @@ void EffectResult::comboSucceed()
   m_type = Common::ActionEffectType::ComboSucceed;
 }
 
-void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
+void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param )
 {
   m_value = statusId;
+  m_statusDuration = duration;
   m_param2 = param;
 
   m_type = Common::ActionEffectType::ApplyStatusEffectTarget;
+}
+
+void EffectResult::applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect )
+{
+  m_value = pStatusEffect->getId();
+  m_param2 = pStatusEffect->getParam();
+  m_pPreBuiltStatusEffect = std::move( pStatusEffect );
+
+  m_type = Common::ActionEffectType::ApplyStatusEffectTarget;
+}
+
+void EffectResult::statusNoEffect( uint16_t statusId )
+{
+  m_value = statusId;
+
+  m_type = Common::ActionEffectType::StatusNoEffect;
 }
 
 void EffectResult::mount( uint16_t mountId )
@@ -91,6 +146,11 @@ void EffectResult::mount( uint16_t mountId )
   m_param0 = 1;
 
   m_type = Common::ActionEffectType::Mount;
+}
+
+void Sapphire::World::Action::EffectResult::provoke()
+{
+  m_type = Common::ActionEffectType::Provoke;
 }
 
 Common::EffectEntry EffectResult::buildEffectEntry() const
@@ -110,7 +170,7 @@ Common::EffectEntry EffectResult::buildEffectEntry() const
   }
   entry.param0 = m_param0;
   entry.param1 = m_param1;
-  entry.param2 = m_param2;
+  entry.param2 = static_cast< uint8_t >( m_param2 );
 
   return entry;
 }
@@ -120,6 +180,8 @@ void EffectResult::execute()
   switch( m_type )
   {
     case Common::ActionEffectType::Damage:
+    case Common::ActionEffectType::BlockedDamage:
+    case Common::ActionEffectType::ParriedDamage:
     {
       m_target->takeDamage( m_value );
       break;
@@ -134,6 +196,38 @@ void EffectResult::execute()
     case Common::ActionEffectType::MpGain:
     {
       m_target->restoreMP( m_value );
+      break;
+    }
+
+    case Common::ActionEffectType::ApplyStatusEffectTarget:
+    case Common::ActionEffectType::ApplyStatusEffectSource:
+    {
+      //refreshing old buff
+      for( auto const& entry : m_target->getStatusEffectMap() )
+      {
+        auto statusEffect = entry.second;
+        if( statusEffect->getId() == m_value && statusEffect->getSrcActorId() == m_source->getId() )
+        {
+          if( m_pPreBuiltStatusEffect )
+          {
+            statusEffect->refresh( m_pPreBuiltStatusEffect->getEffectEntry() );
+          }
+          else
+          {
+            statusEffect->refresh();
+          }
+          m_target->sendStatusEffectUpdate();
+          return;
+        }
+      }
+
+      if( m_pPreBuiltStatusEffect )
+      {
+        m_target->addStatusEffect( m_pPreBuiltStatusEffect );
+      }
+      else
+        m_target->addStatusEffectById( m_value, m_statusDuration, *m_source, m_param2 );
+
       break;
     }
 

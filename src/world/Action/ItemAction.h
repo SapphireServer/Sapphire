@@ -22,7 +22,7 @@ namespace Sapphire::World::Action
 
     void execute() override;
 
-    void interrupt() override;
+    void interrupt( Common::ActionInterruptType type = Common::ActionInterruptType::RegularInterrupt ) override;
 
   private:
     void handleVFXItem();
