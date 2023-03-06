@@ -489,8 +489,8 @@ namespace Sapphire::Entity
     void setRecastGroup( uint8_t index, float time );
 
     float getRecastGroup( uint8_t index ) const;
-    const std::array< float, 80 >& Player::getRecastGroups() const;
-    const std::array< float, 80 >& Player::getRecastGroupsMax() const;
+    const std::array< float, 80 >& getRecastGroups() const;
+    const std::array< float, 80 >& getRecastGroupsMax() const;
 
     void resetRecastGroups();
 
