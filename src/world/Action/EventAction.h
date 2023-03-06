@@ -22,7 +22,7 @@ public:
 
   void execute() override;
 
-  void interrupt() override;
+  void interrupt( Common::ActionInterruptType type = Common::ActionInterruptType::RegularInterrupt ) override;
 
 private:
   uint32_t m_eventId;

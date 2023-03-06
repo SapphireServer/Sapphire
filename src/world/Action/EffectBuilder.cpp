@@ -19,16 +19,10 @@ using namespace Sapphire::Network::Packets;
 EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t sequence ) :
   m_sourceChara( std::move( source ) ),
   m_actionId( actionId ),
+  m_animationLock( 0.6f ),
   m_sequence( sequence )
 {
 
-}
-
-uint64_t EffectBuilder::getResultDelayMs()
-{
-  // todo: actually figure this retarded shit out
-
-  return Common::Util::getTimeMs() + 850;
 }
 
 void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr result )
@@ -49,24 +43,45 @@ void EffectBuilder::moveToResultList( Entity::CharaPtr& chara, EffectResultPtr r
   it->second->push_back( std::move( result ) );
 }
 
-void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( healingTarget, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( healingTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->heal( amount, severity, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
-void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
+void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
+  EffectResultPtr nextResult = make_EffectResult( restoringTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->restoreMP( amount, flag );
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectBuilder::dodge( Entity::CharaPtr& effectTarget, Entity::CharaPtr& dodgingTarget, Common::ActionEffectResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( damagingTarget, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( dodgingTarget, 0 );
+  nextResult->dodge( flag );
+  moveToResultList( effectTarget, nextResult );
+}
+
+void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->damage( amount, severity, flag );
+  moveToResultList( effectTarget, nextResult );
+}
+
+void EffectBuilder::blockedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->blockedDamage( amount, rate, flag );
+  moveToResultList( effectTarget, nextResult );
+}
+
+void EffectBuilder::parriedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->parriedDamage( amount, rate, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
@@ -84,25 +99,51 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint16_t param, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, param );
+  EffectResultPtr nextResult = make_EffectResult( target, source, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->applyStatusEffect( statusId, duration, param );
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, getResultDelayMs() );
+  EffectResultPtr nextResult = make_EffectResult( target, source, Common::Util::getTimeMs() + resultDelayMs );
+  nextResult->applyStatusEffect( pStatusEffect );
+  moveToResultList( target, nextResult );
+}
+
+void EffectBuilder::statusNoEffect( Entity::CharaPtr& target, uint16_t statusId )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  nextResult->statusNoEffect( statusId );
+  moveToResultList( target, nextResult );
+}
+
+void EffectBuilder::mount( Entity::CharaPtr& target, uint16_t mountId, uint64_t resultDelayMs )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, Common::Util::getTimeMs() + resultDelayMs );
   nextResult->mount( mountId );
   moveToResultList( target, nextResult );
+}
+
+void Sapphire::World::Action::EffectBuilder::provoke( Entity::CharaPtr& target )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  nextResult->provoke();
+  moveToResultList( target, nextResult );
+}
+
+void EffectBuilder::setAnimationLock( float animationLock )
+{
+  m_animationLock = animationLock;
 }
 
 void EffectBuilder::buildAndSendPackets()
 {
   auto targetCount = m_resolvedEffects.size();
-  Logger::debug( "EffectBuilder result: " );
-  Logger::debug( "Targets afflicted: {}", targetCount );
+  //Logger::debug( "EffectBuilder result: " );
+  //Logger::debug( "Targets afflicted: {}", targetCount );
 
   auto globalSequence = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
@@ -183,6 +224,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     pHeader->effectCount = static_cast< uint8_t >( remainingTargetCount > packetSize ? packetSize : remainingTargetCount );
     pHeader->sourceSequence = m_sequence;
     pHeader->globalSequence = globalSequence;
+    pHeader->animationLockTime = m_animationLock;
 
     uint8_t targetIndex = 0;
     for( auto it = m_resolvedEffects.begin(); it != m_resolvedEffects.end(); )
@@ -191,7 +233,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
       assert( !resultList->empty() );
       auto firstResult = resultList->data()[ 0 ];
       pEffectTargetId[ targetIndex ] = firstResult->getTarget()->getId();
-      Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
+      //Logger::debug( " - id: {}", pEffectTargetId[ targetIndex ] );
 
       for( auto i = 0; i < resultList->size(); i++ )
       {
@@ -220,13 +262,14 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     auto resultList = m_resolvedEffects.begin()->second;
     assert( !resultList->empty() );
     auto firstResult = resultList->data()[ 0 ];
-    Logger::debug( " - id: {}", firstResult->getTarget()->getId() );
+    //Logger::debug( " - id: {}", firstResult->getTarget()->getId() );
 
     auto seq = m_sourceChara->getCurrentTerritory()->getNextEffectSequence();
 
     auto effectPacket = std::make_shared< Server::EffectPacket >( m_sourceChara->getId(), firstResult->getTarget()->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setSequence( seq, m_sequence );
+    effectPacket->data().animationLockTime = m_animationLock;
 
     for( int i = 0; i < resultList->size(); i++ )
     {
@@ -254,6 +297,7 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( uint32_
     effectPacket->data().effectCount = 0;
     effectPacket->data().sourceSequence = m_sequence;
     effectPacket->data().globalSequence = globalSequence;
+    effectPacket->data().animationLockTime = m_animationLock;
 
     return effectPacket;
   }

@@ -76,11 +76,23 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void ActionScript::onBeforePreCheck( Sapphire::World::Action::Action& action )
+  {
+  }
+
   void ActionScript::onStart( Sapphire::World::Action::Action& action )
   {
   }
 
   void ActionScript::onExecute( Sapphire::World::Action::Action& action )
+  {
+  }
+
+  void ActionScript::onBeforeBuildEffect( Sapphire::World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter )
+  {
+  }
+
+  void ActionScript::onAfterBuildEffect( Sapphire::World::Action::Action& action )
   {
   }
 

@@ -391,8 +391,6 @@ uint8_t Sapphire::Entity::Chara::getLevel() const
 Let an actor take damage and perform necessary steps
 according to resulting hp, propagates new hp value to players
 in range
-TODO: eventually this needs to distinguish between physical and
-magical dmg and take status effects into account
 
 \param amount of damage to be taken
 */
@@ -483,43 +481,8 @@ uint32_t Sapphire::Entity::Chara::getBonusStat( Common::BaseParam bonus ) const
   return m_bonusStats[ static_cast< uint8_t >( bonus ) ];
 }
 
-/*!
-Autoattack prototype implementation
-TODO: move the check if the autoAttack can be performed to the callee
-also rename autoAttack to autoAttack as that is more elaborate
-On top of that, this only solves attacks from melee classes.
-Will have to be extended for ranged attacks.
-
-\param ActorPtr the autoAttack is performed on
-*/
 void Sapphire::Entity::Chara::autoAttack( CharaPtr pTarget )
 {
-
-  uint64_t tick = Util::getTimeMs();
-
-  // todo: this needs to use the auto attack delay for the equipped weapon
-  if( ( tick - m_lastAttack ) > 2500 )
-  {
-    pTarget->onActionHostile( getAsChara() );
-    m_lastAttack = tick;
-    srand( static_cast< uint32_t >( tick ) );
-
-    auto damage = static_cast< uint16_t >( 10 + rand() % 12 );
-
-    auto effectPacket = std::make_shared< Server::EffectPacket >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::EffectEntry effectEntry{};
-    effectEntry.value = static_cast< int16_t >( damage );
-    effectEntry.effectType = ActionEffectType::Damage;
-    effectEntry.param0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
-    effectEntry.param2 = 0x71;
-    effectPacket->addEffect( effectEntry );
-
-    sendToInRangeSet( effectPacket );
-
-    pTarget->takeDamage( damage );
-
-  }
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
@@ -551,28 +514,49 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   status.index = static_cast< uint8_t >( nextSlot );
   status.param = pEffect->getParam();
 
-  sendToInRangeSet( statusEffectAdd, isPlayer() );
+  float totalShieldValue = 0;
+  for( auto effectIt : m_statusEffectMap )
+  {
+    auto statusEffect = effectIt.second;
+    totalShieldValue += statusEffect->getEffectEntry().getRemainingShield();
+  }
+
+  if( totalShieldValue > 0 )
+  {
+    totalShieldValue /= getMaxHp();
+    totalShieldValue *= 100;
+    statusEffectAdd->data().shieldPercentage = static_cast< uint8_t >( std::min( 255.0f, totalShieldValue ) );
+  }
+
+  sendToInRangeSet( statusEffectAdd, true );
+  sendStatusEffectUpdate(); // although client buff displays correctly without this but retail sends it so we do it as well
 }
 
-/*! \param StatusEffectPtr to be applied to the actor */
-void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
+void Sapphire::Entity::Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param, bool sendActorControl )
 {
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
   effect->setParam( param );
+  if( sendActorControl )
+  {
+    auto p = makeActorControl( getId(), Network::ActorControl::StatusEffectGain, id, 0, 0, 0 );
+    sendToInRangeSet( p, true );
+  }
   addStatusEffect( effect );
 }
 
-/*! \param StatusEffectPtr to be applied to the actor */
-void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
-                                                             uint16_t param )
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param, bool sendActorControl )
 {
-  if( hasStatusEffect( id ) )
+  if( getStatusEffectById( id ).second )
     return;
 
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
   effect->setParam( param );
+  if( sendActorControl )
+  {
+    auto p = makeActorControl( getId(), Network::ActorControl::StatusEffectGain, id, 0, 0, 0 );
+    sendToInRangeSet( p, true );
+  }
   addStatusEffect( effect );
-
 }
 
 int8_t Sapphire::Entity::Chara::getStatusEffectFreeSlot()
@@ -593,34 +577,35 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
   m_statusEffectFreeSlotQueue.push( slotId );
 }
 
-void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
+void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id, bool sendStatusList )
 {
   for( auto effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
-      removeStatusEffect( effectIt.first );
+      removeStatusEffect( effectIt.first, sendStatusList );
       break;
     }
   }
 }
 
-void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
+void Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendStatusList )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
     return;
 
-  statusEffectFreeSlot( effectSlotId );
-
   auto pEffect = pEffectIt->second;
-  pEffect->removeStatus();
 
-  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), isPlayer() );
+  statusEffectFreeSlot( effectSlotId );
 
   m_statusEffectMap.erase( effectSlotId );
 
-  sendStatusEffectUpdate();
+  pEffect->removeStatus();
+
+  sendToInRangeSet( makeActorControl( getId(), StatusEffectLose, pEffect->getId() ), true );
+  if( sendStatusList )
+    sendStatusEffectUpdate();
 }
 
 std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectMap() const
@@ -652,7 +637,6 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-
   auto statusEffectList = makeZonePacket< FFXIVIpcStatusEffectList >( getId() );
   statusEffectList->data().classId = static_cast< uint8_t >( getClass() );
   statusEffectList->data().level = getLevel();
@@ -662,18 +646,56 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
   statusEffectList->data().max_hp = getMaxHp();
   statusEffectList->data().max_mp = getMaxMp();
   uint8_t slot = 0;
+  float totalShieldValue = 0;
   for( auto effectIt : m_statusEffectMap )
   {
-    float timeLeft = static_cast< float >( effectIt.second->getDuration() -
-                                           ( currentTimeMs - effectIt.second->getStartTimeMs() ) ) / 1000;
+    auto statusEffect = effectIt.second;
+    totalShieldValue += statusEffect->getEffectEntry().getRemainingShield();
+
+    float timeLeft = static_cast< float >( statusEffect->getDuration() -
+                                           ( currentTimeMs - statusEffect->getStartTimeMs() ) ) / 1000;
     statusEffectList->data().effect[ slot ].duration = timeLeft;
-    statusEffectList->data().effect[ slot ].effect_id = effectIt.second->getId();
-    statusEffectList->data().effect[ slot ].sourceActorId = effectIt.second->getSrcActorId();
+    statusEffectList->data().effect[ slot ].effect_id = statusEffect->getId();
+    statusEffectList->data().effect[ slot ].param = statusEffect->getParam();
+    statusEffectList->data().effect[ slot ].sourceActorId = statusEffect->getSrcActorId();
     slot++;
   }
 
-  sendToInRangeSet( statusEffectList, isPlayer() );
+  if( totalShieldValue > 0 )
+  {
+    totalShieldValue /= getMaxHp();
+    totalShieldValue *= 100;
+    statusEffectList->data().shieldPercentage = static_cast< uint8_t >( std::min( 255.0f, totalShieldValue ) );
+  }
 
+  sendToInRangeSet( statusEffectList, true );
+}
+
+void Sapphire::Entity::Chara::sendShieldUpdate()
+{
+  auto pPacket = makeZonePacket< FFXIVIpcEffectResult >( getId() );
+
+  pPacket->data().actor_id = getId();
+  pPacket->data().current_hp = getHp();
+  pPacket->data().current_mp = static_cast< uint16_t >( getMp() );
+  pPacket->data().max_hp = getMaxHp();
+  pPacket->data().classId = static_cast< uint8_t >( getClass() );
+
+  float totalShieldValue = 0;
+  for( auto effectIt : m_statusEffectMap )
+  {
+    auto statusEffect = effectIt.second;
+    totalShieldValue += statusEffect->getEffectEntry().getRemainingShield();
+  }
+
+  if( totalShieldValue > 0 )
+  {
+    totalShieldValue /= getMaxHp();
+    totalShieldValue *= 100;
+    pPacket->data().shieldPercentage = static_cast< uint8_t >( std::min( 255.0f, totalShieldValue ) );
+  }
+
+  sendToInRangeSet( pPacket, true );
 }
 
 void Sapphire::Entity::Chara::updateStatusEffects()
@@ -690,7 +712,7 @@ void Sapphire::Entity::Chara::updateStatusEffects()
     uint32_t duration = effect->getDuration();
     uint32_t tickRate = effect->getTickRate();
 
-    if( duration > 0 && ( currentTimeMs - startTime ) > duration )
+    if( effect->isMarkedToRemove() || ( duration > 0 && ( currentTimeMs - startTime ) > duration ) )
     {
       // remove status effect
       removeStatusEffect( effectIndex );
@@ -706,9 +728,16 @@ void Sapphire::Entity::Chara::updateStatusEffects()
   }
 }
 
-bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
+std::pair< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::Chara::getStatusEffectById( uint32_t id )
 {
-  return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
+  for( auto effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getId() == id && !effectIt.second->isMarkedToRemove() )
+    {
+      return std::make_pair( effectIt.first, effectIt.second );
+    }
+  }
+  return std::make_pair( 0, nullptr );
 }
 
 int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
@@ -871,6 +900,10 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
     case Common::BaseParam::Haste:
     {
       value = m_baseStats.haste;
+      for( auto const& statusIt : m_statusEffectMap )
+      {
+        value -= statusIt.second->getEffectEntry().getHasteBonus();
+      }
       break;
     }
 
@@ -910,6 +943,40 @@ uint32_t Sapphire::Entity::Chara::getStatValue( Sapphire::Common::BaseParam base
   }
 
   return value + getBonusStat( baseParam );
+}
+
+float Sapphire::Entity::Chara::applyShieldProtection( float damage )
+{
+  float remainingDamage = damage;
+  bool shieldChanged = false;
+
+  for( auto const& entry : getStatusEffectMap() )
+  {
+    auto status = entry.second;
+    auto effectEntry = status->getEffectEntry();
+
+    if( effectEntry.getType() == Sapphire::Common::StatusEffectType::Shield )
+    {
+      shieldChanged = true;
+      if( remainingDamage < effectEntry.getRemainingShield() )
+      {
+        effectEntry.setRemainingShield( effectEntry.getRemainingShield() - static_cast< int32_t >( remainingDamage ) );
+        status->replaceEffectEntry( effectEntry );
+        remainingDamage = 0;
+        break;
+      }
+      else
+      {
+        remainingDamage -= effectEntry.getRemainingShield();
+        status->markToRemove();
+      }
+    }
+  }
+
+  if( shieldChanged )
+    sendShieldUpdate();
+
+  return remainingDamage;
 }
 
 uint32_t Sapphire::Entity::Chara::getVisualEffect()
@@ -957,7 +1024,9 @@ void Sapphire::Entity::Chara::onTick()
 
   if( thisTickDmg != 0 )
   {
-    takeDamage( thisTickDmg );
+    thisTickDmg = applyShieldProtection( thisTickDmg );
+    if( thisTickDmg > 0 )
+      takeDamage( thisTickDmg );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
                                         static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
   }

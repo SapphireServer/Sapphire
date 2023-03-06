@@ -3,7 +3,11 @@
 
 #include <string>
 #include <Event/EventHandler.h>
+#include "Manager/EventMgr.h"
+#include "Manager/PlayerMgr.h"
+#include "Manager/TerritoryMgr.h"
 #include "ForwardsZone.h"
+#include <Service.h>
 
 #ifdef _MSC_VER
 #define EXPORT __declspec( dllexport )
@@ -125,9 +129,15 @@ namespace Sapphire::ScriptAPI
   public:
     explicit ActionScript( uint32_t actionId );
 
+    virtual void onBeforePreCheck( Sapphire::World::Action::Action& action );
+
     virtual void onStart( Sapphire::World::Action::Action& action );
 
     virtual void onExecute( Sapphire::World::Action::Action& action );
+
+    virtual void onBeforeBuildEffect( Sapphire::World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter );
+
+    virtual void onAfterBuildEffect( Sapphire::World::Action::Action& action );
 
     virtual void onInterrupt( Sapphire::World::Action::Action& action );
   };

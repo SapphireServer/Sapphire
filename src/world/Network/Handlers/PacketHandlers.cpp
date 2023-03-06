@@ -91,18 +91,11 @@ void Sapphire::Network::GameConnection::setSearchInfoHandler( const Packets::FFX
     // mark player as new adventurer
     player.setNewAdventurer( true );
 
-  auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
-  statusPacket->data().onlineStatusFlags = status;
-  queueOutPacket( statusPacket );
-
   auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
   searchInfoPacket->data().onlineStatusFlags = status;
   searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
   strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
-
-  player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                             static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Network::GameConnection::reqSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -184,7 +177,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( const Packets::FF
                                                                Entity::Player& player )
 {
   // if the player is marked for zoning we no longer want to update his pos
-  if( player.isMarkedForZoning() )
+  if( player.isMarkedForZoning() || !player.isLoadingComplete() )
     return;
 
   const auto updatePositionPacket = ZoneChannelPacket< Client::FFXIVIpcUpdatePosition >( inPacket );
@@ -200,7 +193,7 @@ void Sapphire::Network::GameConnection::updatePositionHandler( const Packets::FF
   player.setPos( updatePositionPacket.data().position );
 
   if( ( player.getCurrentAction() != nullptr ) && bPosChanged )
-    player.getCurrentAction()->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+    player.getCurrentAction()->interrupt();
 
   // if no one is in range, don't bother trying to send a position update
   if( !player.hasInRangeActor() )
@@ -416,6 +409,7 @@ void Sapphire::Network::GameConnection::finishLoadingHandler( const Packets::FFX
     player.setIsLogin( false );
   }
 
+  player.setVisualEffect( 0, false );
   // spawn the player for himself
   player.spawn( player.getAsPlayer() );
 

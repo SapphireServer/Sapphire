@@ -7,6 +7,8 @@
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
 
+#include "StatusEffect/StatusEffect.h"
+
 #include <Exd/ExdDataGenerated.h>
 
 #include <Network/PacketWrappers/EffectPacket.h>
@@ -107,6 +109,14 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
+  for( const auto& statusIt : player.getStatusEffectMap() )
+  {
+    statusIt.second->onBeforeActionStart( currentAction.get() );
+  }
+
+  if( currentAction->isInterrupted() )
+    return;
+  
   if( !currentAction->preCheck() )
   {
     player.sendDebug( "preCheck failed" );

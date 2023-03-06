@@ -1,37 +1,39 @@
 #ifndef _CALCSTATS_H
 #define _CALCSTATS_H
 
-#include <random>
 #include <Common.h>
 #include "Forwards.h"
+#include "Manager/RNGMgr.h"
 
 namespace Sapphire::Math
 {
+  using namespace Sapphire::World::Manager;
 
   class CalcStats
   {
   public:
-    static const uint32_t AUTO_ATTACK_POTENCY = 110;
-    static const uint32_t RANGED_AUTO_ATTACK_POTENCY = 100;
-
     static float calculateBaseStat( const Entity::Chara& chara );
 
     static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
+
+    static float dodgeProbability( const Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates the probability of a block happening
      */
     static float blockProbability( const Sapphire::Entity::Chara& chara );
 
+    static float parryProbability( const Sapphire::Entity::Chara& chara );
+
     /*!
      * @brief Calculates the probability of a direct hit happening
      */
-    static float directHitProbability( const Sapphire::Entity::Chara& chara );
+    static float directHitProbability( const Sapphire::Entity::Chara& chara, Sapphire::Common::CritDHBonusFilter filter );
 
     /*!
      * @brief Calculates the probability of a critical hit happening
      */
-    static float criticalHitProbability( const Sapphire::Entity::Chara& chara );
+    static float criticalHitProbability( const Sapphire::Entity::Chara& chara, Sapphire::Common::CritDHBonusFilter filter );
 
     /*!
      * @brief Calculates the contribution of potency to damage output.
@@ -40,7 +42,7 @@ namespace Sapphire::Math
      */
     static float potency( uint16_t potency );
 
-    static float autoAttackPotency( const Sapphire::Entity::Chara& chara );
+    static float autoAttackPotency( const Sapphire::Entity::Chara& chara, uint32_t aaPotency );
 
     /*!
      * @brief Weapon damage is the contribution the weapon's damage rating
@@ -63,6 +65,8 @@ namespace Sapphire::Math
     static float magicAttackPower( const Sapphire::Entity::Chara& chara );
 
     static float healingMagicPower( const Sapphire::Entity::Chara& chara );
+
+    static float getWeaponDamage( Sapphire::Entity::CharaPtr chara );
 
     /*!
      * @brief Calculates determinations contribution to damage and healing output.
@@ -116,6 +120,8 @@ namespace Sapphire::Math
      */
     static float blockStrength( const Sapphire::Entity::Chara& chara );
 
+    static float parryStrength( const Sapphire::Entity::Chara& chara );
+
     static float autoAttack( const Sapphire::Entity::Chara& chara );
 
     /*!
@@ -129,13 +135,33 @@ namespace Sapphire::Math
 
     ////////////////////////////////////////////
 
-    static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara );
+    static float calcDamageBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+    static float calcHealBaseOnPotency( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
-    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+    static std::pair< float, Common::ActionHitSeverityType > calcAutoAttackDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc );
+
+    static std::pair< float, Common::ActionHitSeverityType > calcActionDamage( World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
+
+    static float applyDamageReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalDamage, Common::ActionTypeFilter typeFilter );
+
+    static float applyHealingReceiveMultiplier( const Sapphire::Entity::Chara& chara, float originalHeal );
+
+    static std::pair< float, Common::ActionHitSeverityType > calcActionHealing( World::Action::Action* pAction, const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
+
+    static std::pair< float, Sapphire::Common::ActionHitSeverityType > calcDamageReflect( Sapphire::Entity::CharaPtr pCharaAttacker, Sapphire::Entity::CharaPtr pCharaVictim, float damage, Sapphire::Common::ActionTypeFilter filter );
+
+    static float calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage );
+
+    static bool calcDodge( const Sapphire::Entity::Chara& chara );
+
+    static float calcBlock( const Sapphire::Entity::Chara& chara, float damage );
+
+    static float calcParry( const Sapphire::Entity::Chara& chara, float damage );
+
+    static float getRandomNumber0To100();
   private:
 
     /*!
@@ -145,9 +171,7 @@ namespace Sapphire::Math
      */
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
-    static std::random_device dev;
-    static std::mt19937 rng;
-    static std::uniform_int_distribution< std::mt19937::result_type > range100;
+    static std::unique_ptr< RandGenerator< float > > rnd;
   };
 
 }

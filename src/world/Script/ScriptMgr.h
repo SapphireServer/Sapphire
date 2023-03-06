@@ -71,11 +71,17 @@ namespace Sapphire::Scripting
 
     bool onEObjHit( Entity::Player& player, uint64_t actorId, uint32_t actionId );
 
+    bool onBeforePreCheck( World::Action::Action& action );
+
     bool onStart( World::Action::Action& action );
 
     bool onInterrupt( World::Action::Action& action );
 
     bool onExecute( World::Action::Action& action );
+
+    bool onBeforeBuildEffect( World::Action::Action& action, uint8_t victimCounter, uint8_t validVictimCounter );
+
+    bool onAfterBuildEffect( World::Action::Action& action );
 
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
 
