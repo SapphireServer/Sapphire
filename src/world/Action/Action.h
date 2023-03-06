@@ -107,6 +107,8 @@ namespace Sapphire::World::Action
 
     void handleAction();
 
+    void handleStatusEffects();
+
     /*!
      * @brief Adds an actor filter to this action.
      * @param filter The ptr to the ActorFilter to add
