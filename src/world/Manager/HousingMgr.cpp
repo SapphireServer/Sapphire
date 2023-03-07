@@ -1371,7 +1371,7 @@ bool HousingMgr::moveExternalItem( Entity::Player& player, Common::LandIdent ide
   terri.updateYardObjectPos( player, slot, static_cast< uint16_t >( ident.landId ), *item );
 
   uint32_t param1 = static_cast< uint32_t >( ( ident.landId << 16 ) | Common::InventoryType::HousingExteriorPlacedItems );
-  Network::Util::Packet::sendActorControlSelf( player, ActorControl::HousingItemMoveConfirm, param1, slot ) );
+  Network::Util::Packet::sendActorControlSelf( player, ActorControl::HousingItemMoveConfirm, param1, slot );
 
   return true;
 }
