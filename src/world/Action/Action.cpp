@@ -504,6 +504,7 @@ void Action::Action::buildEffects()
   }
 
   uint8_t victimCounter = 0, validVictimCounter = 0;
+  Entity::CharaPtr firstValidVictim = nullptr;
 
   for( auto& actor : m_hitActors )
   {
@@ -696,6 +697,7 @@ void Action::Action::buildEffects()
           }
         }
         validVictimCounter++;
+        firstValidVictim = actor;
       }
     }
 
@@ -716,7 +718,12 @@ void Action::Action::buildEffects()
   if( m_lutEntry.selfStatus != 0 )
   {
     if( !isComboAction() || isCorrectCombo() )
-      m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam, getExecutionDelay() );
+    {
+      if( firstValidVictim )
+        m_effectBuilder->applyStatusEffect( firstValidVictim, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam, getExecutionDelay(), true );
+      else
+        m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam, getExecutionDelay() );
+    }
   }
 
   scriptMgr.onBeforeBuildEffect( *this, victimCounter, validVictimCounter );
