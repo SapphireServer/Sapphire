@@ -105,6 +105,8 @@ namespace Sapphire::World::Action
 
     EffectBuilderPtr getEffectbuilder();
 
+    void applyStatusEffectSelf( uint16_t statusId, uint8_t param = 0 );
+
     void handleAction();
 
     void handleStatusEffects();

@@ -501,6 +501,14 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
   return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
 }
 
+void Action::Action::applyStatusEffectSelf( uint16_t statusId, uint8_t param )
+{
+  if( m_hitActors.size() > 0 )
+    getEffectbuilder()->applyStatusEffect( m_hitActors[ 0 ], statusId, param, true );
+  else
+    getEffectbuilder()->applyStatusEffect( m_pSource, statusId, param );
+}
+
 void Action::Action::handleAction()
 {
   snapshotAffectedActors( m_hitActors );
@@ -613,10 +621,7 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      if( m_hitActors.size() > 0 )
-        getEffectbuilder()->applyStatusEffect( m_hitActors[ 0 ], status.id, 0, true );
-      else
-        getEffectbuilder()->applyStatusEffect( m_pSource, status.id, 0 );
+      applyStatusEffectSelf( status.id );
       m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
     }
   }
