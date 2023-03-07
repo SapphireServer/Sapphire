@@ -39,6 +39,8 @@ std::string generateEnum( const std::string& exd, int8_t nameIndex, const std::s
   auto access = g_exdData.setupDatAccess( exd, lang );
   auto rows = access.get_rows();
 
+  Logger::info( "Generating data for Sheet: {0}", exd);
+
   for( auto row : rows )
   {
     auto& fields = row.second;
@@ -105,6 +107,9 @@ int main( int argc, char** argv )
     Logger::fatal( "Error setting up EXD data " );
     return 1;
   }
+
+  Logger::info( "Generating structs, this may take several minutes..." );
+  Logger::info( "Go grab a coffee..." );
 
   std::string result = "#ifndef _COMMON_GEN_H_\n#define _COMMON_GEN_H_\n";
 
