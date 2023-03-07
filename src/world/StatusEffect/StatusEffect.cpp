@@ -55,12 +55,12 @@ Sapphire::StatusEffect::StatusEffect::~StatusEffect()
 {
 }
 
-void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uint32_t param )
+void Sapphire::StatusEffect::StatusEffect::registerTickEffect( ParamModifier type, uint32_t param )
 {
   m_currTickEffect = std::make_pair( type, param );
 }
 
-std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
+std::pair< ParamModifier, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
   return m_currTickEffect;
 }
@@ -98,6 +98,10 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
     // TODO: ticks
     if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
       m_targetActor->addModifier( mod.modifier, mod.value );
+    else if( mod.modifier == Common::ParamModifier::TickDamage )
+      registerTickEffect( mod.modifier, mod.value );
+    else if( mod.modifier == Common::ParamModifier::TickHeal )
+      registerTickEffect( mod.modifier, mod.value );
   }
 
   m_targetActor->calculateStats();

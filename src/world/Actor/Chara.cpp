@@ -851,13 +851,13 @@ void Sapphire::Entity::Chara::onTick()
     auto thisEffect = effectIt.second->getTickEffect();
     switch( thisEffect.first )
     {
-      case 1:
+      case Common::ParamModifier::TickDamage:
       {
         thisTickDmg += thisEffect.second;
         break;
       }
 
-      case 2:
+      case Common::ParamModifier::TickHeal:
       {
         thisTickHeal += thisEffect.second;
         break;
