@@ -241,7 +241,7 @@ Sapphire::ScriptAPI::ScriptObject** Sapphire::Scripting::ScriptLoader::getScript
   }
   else
   {
-    Logger::warn( "did not find a win32initLinkshell export on a windows script target - the server will likely crash!" );
+    Logger::warn( "did not find a win32initWarp export on a windows script target - the server will likely crash!" );
   }
 #else
   auto func = reinterpret_cast< getScripts >( dlsym( handle, "getScripts" ) );

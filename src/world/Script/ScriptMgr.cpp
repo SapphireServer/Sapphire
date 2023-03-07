@@ -683,10 +683,17 @@ bool Sapphire::Scripting::ScriptMgr::onZoneInit( const Territory& zone )
 
 bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
 {
+  auto instId = instance.getDirectorId();
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+
   if( script )
   {
     script->onInit( instance );
+
+    auto arenaScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceArenaScript >( instance.getDirectorId() );
+    if( arenaScript )
+      arenaScript->onInit( instance );
+
     return true;
   }
 
@@ -700,6 +707,10 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance
   if( script )
   {
     script->onUpdate( instance, tickCount );
+
+    auto arenaScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceArenaScript >( instance.getDirectorId() );
+    if( arenaScript )
+      arenaScript->onUpdate( instance, tickCount );
     return true;
   }
 
