@@ -614,7 +614,7 @@ void Action::Action::handleStatusEffects()
     for( auto& status : m_lutEntry.statuses.caster )
     {
       if( m_hitActors.size() > 0 )
-        getEffectbuilder()->applyStatusEffect( m_pSource, status.id, 0, true );
+        getEffectbuilder()->applyStatusEffect( m_hitActors[ 0 ], status.id, 0, true );
       else
         getEffectbuilder()->applyStatusEffect( m_pSource, status.id, 0 );
       m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
