@@ -82,7 +82,7 @@ std::string getEobjSgbPath( uint32_t eobjId )
     return exportedSgMap[ eobjSgbPaths[ eobjId ] ];
 
   auto& eobjCat = eData->get_category( "EObj" );
-  auto eObjExd = static_cast< xiv::exd::Exd >( eobjCat.get_data_ln( xiv::exd::Language::en ) );
+  auto eObjExd = static_cast< xiv::exd::Exd >( eobjCat.get_data_ln( xiv::exd::Language::none ) );
 
   auto& exportedSgCat = eData->get_category( "ExportedSG" );
   auto exportedSgExd = static_cast< xiv::exd::Exd >( exportedSgCat.get_data_ln( xiv::exd::Language::none ) );
