@@ -29,6 +29,7 @@
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
+#include "Network/Util/PacketUtil.h"
 
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/MarketMgr.h"
@@ -83,8 +84,7 @@ void Sapphire::Network::GameConnection::setProfileHandler( const Packets::FFXIVA
   strcpy( searchInfoPacket->data().SearchComment, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
 
-  server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), SetStatusIcon,
-                                                                                  static_cast< uint8_t >( player.getOnlineStatus() ) ) );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player, SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) );
 }
 
 void Sapphire::Network::GameConnection::getProfileHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -236,7 +236,7 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
     unknownRotation = 0x7F;
   }
 
-  uint64_t currentTime = Util::getTimeMs();
+  uint64_t currentTime = Common::Util::getTimeMs();
 
   player.m_lastMoveTime = currentTime;
   player.m_lastMoveflag = animationType;

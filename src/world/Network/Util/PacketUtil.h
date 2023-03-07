@@ -5,7 +5,7 @@
 #include <Actor/Player.h>
 #include "Forwards.h"
 
-namespace Sapphire::Network::Util::Player
+namespace Sapphire::Network::Util::Packet
 {
   void sendConfigFlags( Entity::Player& player );
   void sendOnlineStatus( Entity::Player& player );
@@ -48,6 +48,10 @@ namespace Sapphire::Network::Util::Player
   void sendDailyQuests( Entity::Player& player );
   void sendQuestRepeatFlags( Entity::Player& player );
 
+  void sendServerNotice( Entity::Player& player, const std::string& message );
+
+  void sendChat( Entity::Player& player, Common::ChatType chatType, const std::string& message );
+
   void sendActorControlSelf( Entity::Player& player, uint16_t category, uint32_t param1 = 0, uint32_t param2 = 0, uint32_t param3 = 0,
                              uint32_t param4 = 0, uint32_t param5 = 0 );
 
@@ -59,4 +63,9 @@ namespace Sapphire::Network::Util::Player
   void sendActorControl( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1 = 0, uint32_t param2 = 0,
                          uint32_t param3 = 0, uint32_t param4 = 0 );
 
+  void sendActorControlTarget( Entity::Player& player, uint16_t category, uint32_t param1 = 0, uint32_t param2 = 0, uint32_t param3 = 0,
+                               uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
+
+  void sendActorControlTarget( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1 = 0,
+                               uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
 }

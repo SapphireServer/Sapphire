@@ -17,7 +17,7 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
-#include "Network/Util/PlayerUtil.h"
+#include "Network/Util/PacketUtil.h"
 
 #include "Action/Action.h"
 
@@ -388,15 +388,9 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
     return;
 
   if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-  {
-    server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::ExamineError ) );
-  }
+    Network::Util::Packet::sendActorControl( player, ExamineError );
   else
-  {
     server().queueForPlayer( player.getCharacterId(), std::make_shared< InspectPacket >( player, pPlayer ) );
-  }
-
-
 }
 
 void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -424,7 +418,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setStance( Stance::Passive );
         player.setAutoattack( false );
       }
-      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 0, data.Arg0, 1 ) );
+      Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player, ToggleWeapon, data.Arg0, 1 );
       break;
     }
     case PacketCommand::AUTO_ATTACK:  // Toggle auto-attack
@@ -437,7 +431,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       else
         player.setAutoattack( false );
 
-      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), 1, data.Arg0, 1 ) );
+      Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player, AutoAttack, data.Arg0, 1 );
 
       break;
     }
@@ -494,7 +488,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::TITLE_LIST: // Get title list
     {
-      Network::Util::Player::sendTitleList( player );
+      Network::Util::Packet::sendTitleList( player );
       break;
     }
     case PacketCommand::SET_HOWTO: // Update howtos seen
@@ -504,7 +498,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::SET_CUTSCENE:
     {
-      server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ActorControlType::SetCutsceneFlag, data.Arg0, 1 ) );
+      Network::Util::Packet::sendActorControl( player, SetCutsceneFlag, data.Arg0, 1 );
       break;
     }
     case PacketCommand::EMOTE: // emote
@@ -519,8 +513,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       if( !emoteData )
         return;
 
-      server().queueForPlayers( player.getInRangePlayerIds(),
-                                makeActorControlTarget( player.getId(), ActorControlType::Emote, emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
+      Network::Util::Packet::sendActorControlTarget( player.getInRangePlayerIds(), player, Emote, emoteId, 0, isSilent ? 1 : 0, 0, targetId );
 
       bool isPersistent = emoteData->data().Mode != 0;
 
@@ -531,9 +524,8 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setPersistentEmote( emoteData->data().Mode );
         player.setStatus( ActorStatus::EmoteMode );
 
-        server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), ActorControlType::SetStatus,
-                                                                                        static_cast< uint8_t >( ActorStatus::EmoteMode ),
-                                                                                        emoteData->data().IsEndEmoteMode ? 1 : 0 ) );
+        Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player, SetStatus, static_cast< uint8_t >( ActorStatus::EmoteMode ),
+                                                 emoteData->data().IsEndEmoteMode ? 1 : 0  );
       }
 
       if( emoteData->data().IsAvailableWhenDrawn )
@@ -545,7 +537,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::EMOTE_CANCEL: // emote
     {
-      server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), ActorControlType::EmoteInterrupt ) );
+      Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player, EmoteModeInterrupt );
       break;
     }
     case PacketCommand::EMOTE_MODE_CANCEL:
@@ -556,8 +548,9 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
         player.setStatus( ActorStatus::Idle );
 
         server().queueForPlayers( player.getInRangePlayerIds(), std::make_shared< MoveActorPacket >( player, player.getRot(), 2, 0, 0, 0x5A / 4 ) );
-        server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), ActorControlType::EmoteModeInterrupt ) );
-        server().queueForPlayers( player.getInRangePlayerIds(), makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) ) );
+
+        Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player, EmoteModeInterrupt );
+        Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player, SetStatus, static_cast< uint8_t >( ActorStatus::Idle ) );
       }
       break;
     }
@@ -565,7 +558,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     case PacketCommand::POSE_EMOTE_WORK: // reapply pose
     {
       player.setPose( static_cast< uint8_t >( data.Arg1 ) );
-      server().queueForPlayers( player.getInRangePlayerIds( true ), makeActorControl( player.getId(), SetPose, data.Arg0, data.Arg1 ) );
+      Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player, SetPose, data.Arg0, data.Arg1 );
       break;
     }
     case PacketCommand::POSE_EMOTE_CANCEL: // cancel pose
@@ -604,12 +597,12 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       auto achievementId = data.Arg0;
       auto& achvMgr = Common::Service< AchievementMgr >::ref();
       auto achvProgress = achvMgr.getAchievementDataById( player, achievementId );
-      Network::Util::Player::sendActorControl( player, AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
+      Network::Util::Packet::sendActorControl( player, AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
       break;
     }
     case PacketCommand::ACHIEVEMENT_REQUEST:
     {
-      Network::Util::Player::sendAchievementList( player );
+      Network::Util::Packet::sendAchievementList( player );
       break;
     }
     case PacketCommand::TELEPO_INQUIRY: // Teleport
@@ -670,7 +663,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
       player.setActiveLand( static_cast< uint8_t >( data.Arg0 ), hZone->getWardNum() );
 
-      server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ShowBuildPresetUI, data.Arg0 ) );
+      Network::Util::Packet::sendActorControl( player, ShowBuildPresetUI, data.Arg0 );
       break;
     }
     case PacketCommand::HOUSING_AUCTION_INFO:
@@ -748,8 +741,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
       uint8_t ward = ( data.Arg1 >> 16 ) & 0xFF;
       uint8_t plot = ( data.Arg1 & 0xFF );
-      server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), ShowHousingItemUI, 0, plot ) );
-
+      Network::Util::Packet::sendActorControl( player, ShowHousingItemUI, 0, plot );
       //TODO: show item housing container
 
       break;

@@ -18,7 +18,7 @@
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/NpcSpawnPacket.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
-#include "Network/Util/PlayerUtil.h"
+#include "Network/Util/PacketUtil.h"
 
 #include "Navi/NaviProvider.h"
 
@@ -542,7 +542,7 @@ void Sapphire::Entity::BNpc::hateListUpdate( const Sapphire::Entity::CharaPtr& p
     if( pChara->isPlayer() )
     {
       auto pPlayer = pChara->getAsPlayer();
-      Network::Util::Player::sendHateList( *pPlayer );
+      Network::Util::Packet::sendHateList( *pPlayer );
     }
   }
 }

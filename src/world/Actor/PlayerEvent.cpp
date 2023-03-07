@@ -12,7 +12,9 @@
 #include "Manager/PlayerMgr.h"
 #include "Service.h"
 #include <Network/PacketWrappers/RestingPacket.h>
+#include <Network/Util/PacketUtil.h>
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
@@ -71,7 +73,7 @@ void Sapphire::Entity::Player::onTick()
   bool sendUpdate = performResting();
 
   if( sendUpdate )
-    server().queueForPlayers( getInRangePlayerIds( true ), std::make_shared< RestingPacket >( *this ) );
+    Network::Util::Packet::sendRestingUpdate( *this );
 }
 
 bool Sapphire::Entity::Player::performResting()

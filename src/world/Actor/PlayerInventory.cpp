@@ -18,7 +18,7 @@
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/UpdateInventorySlotPacket.h"
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/Util/PlayerUtil.h>
+#include <Network/Util/PacketUtil.h>
 
 #include "Manager/InventoryMgr.h"
 #include "Manager/ItemMgr.h"
@@ -225,10 +225,10 @@ void Sapphire::Entity::Player::equipItem( Common::GearSetSlot equipSlotId, Item&
   calculateItemLevel();
   if( sendUpdate )
   {
-    Network::Util::Player::sendEquip( *this );
-    Network::Util::Player::sendActorControl( *this, SetItemLevel, getItemLevel() );
-    Network::Util::Player::sendBaseParams( *this );
-    Network::Util::Player::sendHudParam( *this );
+    Network::Util::Packet::sendEquip( *this );
+    Network::Util::Packet::sendActorControl( *this, SetItemLevel, getItemLevel() );
+    Network::Util::Packet::sendBaseParams( *this );
+    Network::Util::Packet::sendHudParam( *this );
   }
 }
 
@@ -247,10 +247,10 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
   if( sendUpdate )
   {
-    Network::Util::Player::sendEquip( *this );
-    Network::Util::Player::sendActorControl( *this, SetItemLevel, getItemLevel() );
-    Network::Util::Player::sendBaseParams( *this );
-    Network::Util::Player::sendHudParam( *this );
+    Network::Util::Packet::sendEquip( *this );
+    Network::Util::Packet::sendActorControl( *this, SetItemLevel, getItemLevel() );
+    Network::Util::Packet::sendBaseParams( *this );
+    Network::Util::Packet::sendHudParam( *this );
   }
 }
 
