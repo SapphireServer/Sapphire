@@ -500,7 +500,18 @@
       45
     ],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 85,
+          "duration": 24000,
+          "modifiers": [
+            {
+              "modifier": "AttackPowerPercent",
+              "value": 20
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
