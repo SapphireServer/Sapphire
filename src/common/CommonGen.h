@@ -498,7 +498,7 @@ namespace Sapphire::Common {
       ReapersArms = 88,
       SagesArms = 89,
       RegistrableMiscellany = 90,
-      /*1 = 91,
+      /* 1 = 91,
       2 = 92,
       3 = 93,
       4 = 94,
@@ -507,7 +507,7 @@ namespace Sapphire::Common {
       7 = 97,
       8 = 98,
       9 = 99,
-      10 = 100,*/
+      10 = 100, */
    };
 
    ///////////////////////////////////////////////////////////
@@ -611,11 +611,11 @@ namespace Sapphire::Common {
       Gridania = 2,
       Uldah = 3,
       Ishgard = 4,
-      // = 5,
-      //1 = 6,
+      /*  = 5,
+      1 = 6, */
       Kugane = 7,
-      //2 = 8,
-      //3 = 9,
+      /* 2 = 8,
+      3 = 9, */
       Crystarium = 10,
       //4 = 11,
       OldSharlayan = 12,
@@ -783,9 +783,9 @@ namespace Sapphire::Common {
       Polarization3 = 154,
       Polarization4 = 155,
       Projection = 156,
-      Pandæmonium = 157,
-      Pandæmonium1 = 158,
-      Pandæmonium2 = 159,
+      PandÃ¦monium = 157,
+      PandÃ¦monium1 = 158,
+      PandÃ¦monium2 = 159,
       Ultimatum = 160,
       Inevitability = 161,
       Transcendence = 162,
@@ -817,7 +817,7 @@ namespace Sapphire::Common {
       Tavern = 5,
       Eatery = 6,
       ImmersiveExperience = 7,
-      Café = 8,
+      CafÃ© = 8,
       Aquarium = 9,
       Sanctum = 10,
       Venue = 11,

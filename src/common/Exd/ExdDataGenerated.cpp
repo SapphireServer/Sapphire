@@ -6822,7 +6822,7 @@ Sapphire::Data::Leve::Leve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
   name = exdData->getField< std::string >( row, 0 );
   description = exdData->getField< std::string >( row, 1 );
   leveClient = exdData->getField< int32_t >( row, 2 );
-  leveAssignmentType = exdData->getField< uint8_t >( row, 3 );
+  leveAssignmentType = exdData->getField< int32_t >( row, 4 );
   town = exdData->getField< int32_t >( row, 5 );
   classJobLevel = exdData->getField< uint16_t >( row, 6 );
   timeLimit = exdData->getField< uint8_t >( row, 7 );
@@ -6830,6 +6830,7 @@ Sapphire::Data::Leve::Leve( uint32_t row_id, Sapphire::Data::ExdDataGenerated* e
   evaluation = exdData->getField< int32_t >( row, 9 );
   placeNameStart = exdData->getField< int32_t >( row, 10 );
   placeNameIssued = exdData->getField< int32_t >( row, 11 );
+  fishingSpot = exdData->getField< uint16_t >( row, 12 );
   classJobCategory = exdData->getField< uint8_t >( row, 15 );
   journalGenre = exdData->getField< uint32_t >( row, 16 );
   placeNameStartZone = exdData->getField< int32_t >( row, 18 );
@@ -10259,6 +10260,7 @@ Sapphire::Data::QuestClassJobSupply::QuestClassJobSupply( uint32_t row_id, uint3
 Sapphire::Data::QuestDefineClient::QuestDefineClient( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData )
 {
   auto row = exdData->m_QuestDefineClientDat.get_row( row_id, subRow );
+  target = exdData->getField< uint32_t >( row, 1 );
 }
 
 Sapphire::Data::QuestDerivedClass::QuestDerivedClass( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData )

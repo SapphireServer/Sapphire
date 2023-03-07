@@ -5717,7 +5717,7 @@ struct Leve
   std::string name;
   std::string description;
   int32_t leveClient;
-  uint8_t leveAssignmentType;
+  int32_t leveAssignmentType;
   int32_t town;
   uint16_t classJobLevel;
   uint8_t timeLimit;
@@ -5725,6 +5725,7 @@ struct Leve
   int32_t evaluation;
   int32_t placeNameStart;
   int32_t placeNameIssued;
+  uint16_t fishingSpot;
   uint8_t classJobCategory;
   uint32_t journalGenre;
   int32_t placeNameStartZone;
@@ -7407,6 +7408,7 @@ struct QuestClassJobSupply
 
 struct QuestDefineClient
 {
+  uint32_t target;
 
   QuestDefineClient( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
