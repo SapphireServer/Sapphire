@@ -533,8 +533,6 @@ void Action::Action::handleAction()
     Manager::PlayerMgr::sendDebug( *player, "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
                                    m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
                                    m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
-    if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
-      handleStatusEffects();
   }
 
   // when aoe, these effects are in the target whatever is hit first
@@ -595,6 +593,9 @@ void Action::Action::handleAction()
     }
   }
 
+  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
+    handleStatusEffects();
+
   m_effectBuilder->buildAndSendPackets( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
@@ -604,12 +605,18 @@ void Action::Action::handleAction()
 
 void Action::Action::handleStatusEffects()
 {
+  if( isComboAction() && !isCorrectCombo() )
+    return;
+
   // handle caster statuses
   if( m_lutEntry.statuses.caster.size() > 0 )
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      getEffectbuilder()->applyStatusEffect( m_pSource, status.id, 0 );
+      if( m_hitActors.size() > 0 )
+        getEffectbuilder()->applyStatusEffect( m_pSource, status.id, 0, true );
+      else
+        getEffectbuilder()->applyStatusEffect( m_pSource, status.id, 0 );
       m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
     }
   }
