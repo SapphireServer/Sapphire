@@ -69,7 +69,7 @@ namespace Sapphire
     size_t size() const
     {
       size_t size = 0;
-      for( auto& it = m_objectCache.begin(); it != m_objectCache.end(); ++it )
+      for( auto it = m_objectCache.begin(); it != m_objectCache.end(); ++it )
         size += it->second.size();
 
       return size;

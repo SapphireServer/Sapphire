@@ -735,7 +735,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::addItem( uint32_t catalogId, uint32_
   }
   auto item = createTempItem( catalogId, quantity );
   if( !item )
-    return false;
+    return nullptr;
   item->setHq( isHq );
   return addItem( item, silent, canMerge, sendLootMessage );
 }
