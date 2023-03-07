@@ -696,8 +696,9 @@ void Action::Action::buildEffects()
             }
           }
         }
+        if( validVictimCounter == 0 )
+          firstValidVictim = actor;
         validVictimCounter++;
-        firstValidVictim = actor;
       }
     }
 
