@@ -307,35 +307,38 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   if( !player.isAlive() )
     return;
 
-  auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-  if( mainWeap && !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
+  checkAutoAttack( player, tickCount );
+}
+
+void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
+{
+  auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
+  if( !mainWeap || !player.isAutoattackOn() || player.checkAction() || !player.getTargetId() || player.getStance() != Common::Active )
+    return;
+
+  for( const auto& actor : player.getInRangeActors() )
   {
-    // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-    for( const auto& actor : player.getInRangeActors() )
+    if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
+      continue;
+    auto chara = actor->getAsChara();
+
+    // default autoattack range
+    float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    // default autoattack range for ranged classes
+    auto classJob = player.getClass();
+
+    if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+      range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    if( ( Common::Util::distance( player.getPos(), actor->getPos() ) <= range ) &&
+        ( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() ) )
     {
-      if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
-        continue;
-      auto chara = actor->getAsChara();
-
-      // default autoattack range
-      float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      // default autoattack range for ranged classes
-      auto classJob = player.getClass();
-
-      if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
-        range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
-      {
-        if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
-        {
-          player.setLastAttack( tickCount );
-          player.autoAttack( actor->getAsChara() );
-        }
-      }
+      player.setLastAttack( tickCount );
+      player.autoAttack( actor->getAsChara() );
     }
   }
+
 }
 
 

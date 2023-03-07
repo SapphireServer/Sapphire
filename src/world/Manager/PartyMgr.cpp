@@ -200,7 +200,7 @@ void PartyMgr::onMemberDisconnect( Entity::Player& disconnectingPlayer )
   {
     // TODO: 2nd argument here makes it automatically send passing leadership message
     server.queueForPlayer( member->getCharacterId(), { makePcPartyUpdate( disconnectingPlayer, UpdateStatus::OFFLINE_MEMBER, party->PartyCount ),
-                                                          makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
+                                                       makeZonePacket< FFXIVIpcUpdateParty >( member->getId() ) } );
   }
 
   sendPartyUpdate( *party );

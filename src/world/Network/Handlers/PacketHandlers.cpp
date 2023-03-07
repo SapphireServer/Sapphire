@@ -103,17 +103,15 @@ void Sapphire::Network::GameConnection::getSearchCommentHandler( const Packets::
 
   Logger::debug( "getSearchCommentHandler: {0}", targetId );
 
-  if( pPlayer )
-  {
-    if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-      return;
+  if( !pPlayer || pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
+    return;
 
-    // retail sends the requester's id as both (isForSelf)
-    auto searchInfoPacket = makeZonePacket< FFXIVIpcGetSearchCommentResult >( player.getId() );
-    searchInfoPacket->data().TargetEntityID = targetId;
-    strcpy( searchInfoPacket->data().SearchComment, pPlayer->getSearchMessage() );
-    server().queueForPlayer( player.getCharacterId(), searchInfoPacket );
-  }
+  // retail sends the requester's id as both (isForSelf)
+  auto searchInfoPacket = makeZonePacket< FFXIVIpcGetSearchCommentResult >( player.getId() );
+  searchInfoPacket->data().TargetEntityID = targetId;
+  strcpy( searchInfoPacket->data().SearchComment, pPlayer->getSearchMessage() );
+  server().queueForPlayer( player.getCharacterId(), searchInfoPacket );
+
 }
 
 void Sapphire::Network::GameConnection::reqExamineFcInfo( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -313,14 +311,14 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
 
   PlayerMgr::sendDebug( player, "Discovery ref pos id#{0}", layoutId );
 
-  if( pRefInfo )
-  {
-    auto discoveryPacket = makeZonePacket< FFXIVIpcDiscoveryReply >( player.getId() );
-    discoveryPacket->data().mapId = tInfo->data().Map;
-    discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
-    server().queueForPlayer( player.getCharacterId(), discoveryPacket );
-    player.discover( tInfo->data().Map, pRefInfo->data.discoveryIndex );
-  }
+  if( !pRefInfo )
+    return;
+
+  auto discoveryPacket = makeZonePacket< FFXIVIpcDiscoveryReply >( player.getId() );
+  discoveryPacket->data().mapId = tInfo->data().Map;
+  discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
+  server().queueForPlayer( player.getCharacterId(), discoveryPacket );
+  player.discover( tInfo->data().Map, pRefInfo->data.discoveryIndex );
 
 }
 
@@ -363,9 +361,7 @@ void Sapphire::Network::GameConnection::setLanguageHandler( const Packets::FFXIV
 
   // if this is a login event
   if( player.isLogin() )
-  {
     playerMgr().sendLoginMessage( player );
-  }
 
   // spawn the player for himself
   player.spawn( player.getAsPlayer() );
@@ -619,9 +615,7 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
   player.sendGearInventory();
 
   if( packet.data().contextId < 0xFE )
-  {
-    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::GearSetEquipMsg, packet.data().contextId ) );
-  }
+    Network::Util::Packet::sendActorControlSelf( player, GearSetEquipMsg, packet.data().contextId );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
   invTransFinPacket->data().contextId = contextId;

@@ -65,6 +65,8 @@ namespace Sapphire::World::Manager
     std::map< uint32_t, Entity::PlayerPtr > m_playerMapById;
     std::map< uint64_t, Entity::PlayerPtr > m_playerMapByCharacterId;
     std::map< std::string, Entity::PlayerPtr > m_playerMapByName;
+
+    void checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const;
   };
 
 
