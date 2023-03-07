@@ -698,7 +698,13 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 
 bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
 {
-  return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
+  for( const auto& [ key, val ] : m_statusEffectMap )
+  {
+    if( val->getId() == id )
+      return true;
+  }
+
+  return false;
 }
 
 int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
