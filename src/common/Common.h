@@ -917,7 +917,8 @@ namespace Sapphire::Common
     SlashingResistancePercent = 1027,
     PiercingResistancePercent = 1028,
     BluntResistancePercent = 1029,
-    ProjectileResistancePercent = 1030
+    ProjectileResistancePercent = 1030,
+    ParryPercent = 1031
   };
 
   enum struct ActionAspect : uint8_t
