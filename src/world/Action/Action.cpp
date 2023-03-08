@@ -31,6 +31,8 @@
 #include <Service.h>
 #include "WorldServer.h"
 
+#include "Job/Warrior.h"
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -604,6 +606,8 @@ void Action::Action::handleAction()
   if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
     handleStatusEffects();
 
+  handleJobAction();
+
   m_effectBuilder->buildAndSendPackets( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
@@ -639,6 +643,18 @@ void Action::Action::handleStatusEffects()
 
       if( actor->getStatusEffectMap().size() > 0 )
         actor->onActionHostile( m_pSource );
+    }
+  }
+}
+
+void Action::Action::handleJobAction()
+{
+  switch( m_pSource->getClass() )
+  {
+    case ClassJob::Warrior:
+    {
+      Warrior::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
     }
   }
 }
