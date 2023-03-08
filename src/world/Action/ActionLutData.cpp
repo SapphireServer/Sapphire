@@ -88,7 +88,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 3540, { 0, 0, 0, 0, 0, 0, 0, 727, 0, 0, 0, 0, 0 } },
 
   //Clemency, クレメンシー
-  { 3541, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //has heal: potency 1200
+  { 3541, { 0, 0, 0, 1200, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Royal Authority, ロイヤルアソリティ
   //has damage: potency 100, combo potency 550, directional potency 0
@@ -3545,4 +3546,15 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
   //Shifu, 士風: Haste, 13%
   { 1299, { 12, 13, 0, 0, 0 } },
 
+  //Hallowed Ground, インビンシブル: Invulnerable
+  { 82, { 18, 0, 0, 0, 0 } },
+
+  //Superbolide, ボーライド: Invulnerable
+  { 1838, { 18, 0, 0, 0, 0 } },
+
+  //Holmgang, ホルムギャング: CannotDie
+  { 409, { 19, 0, 0, 0, 0 } },
+
+  //Walking Dead, ウォーキングデッド: CannotDie
+  { 811, { 19, 0, 0, 0, 0 } },
 };

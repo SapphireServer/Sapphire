@@ -45,6 +45,8 @@ namespace Sapphire::World::Action
 
     void provoke( Entity::CharaPtr& target );
 
+    void invulnerable( Entity::CharaPtr& target, uint16_t status = 0 );
+
     void buildAndSendPackets();
 
   private:

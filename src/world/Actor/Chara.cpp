@@ -396,6 +396,12 @@ in range
 */
 void Sapphire::Entity::Chara::takeDamage( uint32_t damage )
 {
+  if( hasInvulnerableEffect() )
+    return;
+
+  if( hasCannotDieEffect() )
+    damage = std::min( damage, m_hp - 1 );
+
   if( damage >= m_hp )
   {
     switch( m_invincibilityType )
@@ -414,10 +420,11 @@ void Sapphire::Entity::Chara::takeDamage( uint32_t damage )
         break;
     }
   }
-  else
+  else if ( damage > 0 )
+  {
     m_hp -= damage;
-
-  sendStatusUpdate();
+    sendStatusUpdate();
+  }
 }
 
 /*!
@@ -997,6 +1004,27 @@ void Sapphire::Entity::Chara::sendVisualEffect()
   pPacket->data().id = m_effect;
   sendToInRangeSet( pPacket, true );
 }
+
+bool Sapphire::Entity::Chara::hasInvulnerableEffect() const
+{
+  for( auto effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getEffectEntry().getType() == StatusEffectType::Invulnerable )
+      return true;
+  }
+  return false;
+}
+
+bool Sapphire::Entity::Chara::hasCannotDieEffect() const
+{
+  for( auto effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getEffectEntry().getType() == StatusEffectType::CannotDie )
+      return true;
+  }
+  return false;
+}
+
 
 void Sapphire::Entity::Chara::onTick()
 {

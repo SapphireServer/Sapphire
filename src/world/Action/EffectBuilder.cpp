@@ -134,6 +134,13 @@ void Sapphire::World::Action::EffectBuilder::provoke( Entity::CharaPtr& target )
   moveToResultList( target, nextResult );
 }
 
+void Sapphire::World::Action::EffectBuilder::invulnerable( Entity::CharaPtr& target, uint16_t status )
+{
+  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  nextResult->invulnerable( status );
+  moveToResultList( target, nextResult );
+}
+
 void EffectBuilder::setAnimationLock( float animationLock )
 {
   m_animationLock = animationLock;

@@ -155,6 +155,13 @@ void Sapphire::World::Action::EffectResult::provoke()
   m_type = Common::ActionEffectType::Provoke;
 }
 
+void Sapphire::World::Action::EffectResult::invulnerable( uint16_t status )
+{
+  m_value = status;
+
+  m_type = Common::ActionEffectType::Invulnerable;
+}
+
 Common::EffectEntry EffectResult::buildEffectEntry() const
 {
   Common::EffectEntry entry{};

@@ -31,6 +31,7 @@ namespace Sapphire::World::Action
     void statusNoEffect( uint16_t statusId );
     void mount( uint16_t mountId );
     void provoke();
+    void invulnerable( uint16_t status );
 
     Entity::CharaPtr getSource() const;
     Entity::CharaPtr getTarget() const;
