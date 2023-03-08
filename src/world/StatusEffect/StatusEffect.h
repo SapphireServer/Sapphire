@@ -2,6 +2,7 @@
 #define _STATUSEFFECT_H_
 
 #include "Forwards.h"
+#include "Action/ActionLut.h"
 
 namespace Sapphire {
 namespace StatusEffect {
@@ -10,6 +11,9 @@ namespace StatusEffect {
 class StatusEffect
 {
 public:
+  StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate );
+
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, uint32_t tickRate );
 
@@ -41,9 +45,9 @@ public:
 
   void setParam( uint16_t param );
 
-  void registerTickEffect( uint8_t type, uint32_t param );
+  void registerTickEffect( Common::ParamModifier type, uint32_t param );
 
-  std::pair< uint8_t, uint32_t > getTickEffect();
+  std::pair< Common::ParamModifier, uint32_t > getTickEffect();
 
   const std::string& getName() const;
 
@@ -57,8 +61,8 @@ private:
   uint64_t m_lastTick;
   uint16_t m_param;
   std::string m_name;
-  std::pair< uint8_t, uint32_t > m_currTickEffect;
-
+  std::pair< Common::ParamModifier, uint32_t > m_currTickEffect;
+  std::vector< World::Action::StatusModifier > m_modifiers;
 };
 
 }

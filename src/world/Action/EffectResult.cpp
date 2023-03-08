@@ -70,11 +70,13 @@ void EffectResult::comboSucceed()
   m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO_HIT;
 }
 
-void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param )
+void EffectResult::applyStatusEffect( uint16_t statusId, uint8_t param, bool forSelf )
 {
   m_result.Value = static_cast< int16_t >( statusId );
   m_result.Arg2 = param;
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
+  if( forSelf )
+    m_result.Flag = static_cast< uint8_t >( Common::ActionEffectResultFlag::EffectOnSource );
+  m_result.Type = forSelf ? Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME : Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
 }
 
 void EffectResult::mount( uint16_t mountId )

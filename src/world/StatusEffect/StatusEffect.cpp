@@ -18,11 +18,19 @@ using namespace Sapphire::Network::Packets;
 //using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                                                    uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate ) :
+  StatusEffect( id, sourceActor, targetActor, duration, tickRate )
+{
+  m_modifiers = std::move( modifiers );
+}
+
+Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                     uint32_t duration, uint32_t tickRate ) :
   m_id( id ),
   m_sourceActor( sourceActor ),
   m_targetActor( targetActor ),
   m_duration( duration ),
+  m_modifiers( 0 ),
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 )
@@ -47,16 +55,14 @@ Sapphire::StatusEffect::StatusEffect::~StatusEffect()
 {
 }
 
-void Sapphire::StatusEffect::StatusEffect::registerTickEffect( uint8_t type, uint32_t param )
+void Sapphire::StatusEffect::StatusEffect::registerTickEffect( ParamModifier type, uint32_t param )
 {
   m_currTickEffect = std::make_pair( type, param );
 }
 
-std::pair< uint8_t, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
+std::pair< ParamModifier, uint32_t > Sapphire::StatusEffect::StatusEffect::getTickEffect()
 {
-  auto thisTick = m_currTickEffect;
-  m_currTickEffect = std::make_pair( 0, 0 );
-  return thisTick;
+  return m_currTickEffect;
 }
 
 void Sapphire::StatusEffect::StatusEffect::onTick()
@@ -87,6 +93,19 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
   m_startTime = Util::getTimeMs();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
+  for( const auto& mod : m_modifiers )
+  {
+    // TODO: ticks
+    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
+      m_targetActor->addModifier( mod.modifier, mod.value );
+    else if( mod.modifier == Common::ParamModifier::TickDamage )
+      registerTickEffect( mod.modifier, mod.value );
+    else if( mod.modifier == Common::ParamModifier::TickHeal )
+      registerTickEffect( mod.modifier, mod.value );
+  }
+
+  m_targetActor->calculateStats();
+
   // this is only right when an action is being used by the player
   // else you probably need to use an actorcontrol
 
@@ -111,6 +130,15 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  for( const auto& mod : m_modifiers )
+  {
+    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
+      m_targetActor->delModifier( mod.modifier, mod.value );
+  }
+
+  m_targetActor->calculateStats();
+
   scriptMgr.onStatusTimeOut( m_targetActor, m_id );
 }
 

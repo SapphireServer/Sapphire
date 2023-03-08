@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Common.h>
+#include "Action/ActionLut.h"
 
 #include "Forwards.h"
 #include "GameObject.h"
@@ -8,6 +9,7 @@
 #include <map>
 #include <queue>
 #include <array>
+#include <numeric>
 
 namespace Sapphire::Entity
 {
@@ -26,9 +28,12 @@ namespace Sapphire::Entity
   public:
 
     using ActorStatsArray = std::array< uint32_t, STAT_ARRAY_SIZE >;
+    using ActorModifiersMap = std::unordered_map< Common::ParamModifier, std::vector< int32_t > >;
 
     ActorStatsArray m_baseStats{ 0 };
     ActorStatsArray m_bonusStats{ 0 };
+
+    ActorModifiersMap m_modifiers{ 0 };
 
   protected:
     char m_name[34];
@@ -133,9 +138,9 @@ namespace Sapphire::Entity
 
     // add a status effect by id
     void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
-
     // add a status effect by id if it doesn't exist
     void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, std::vector< World::Action::StatusModifier >& modifiers, uint16_t param = 0 );
 
     // remove a status effect by id
     void removeSingleStatusEffectFromId( uint32_t id );
@@ -158,6 +163,12 @@ namespace Sapphire::Entity
     uint32_t getBonusStat( Common::BaseParam baseParam ) const;
 
     void setStatValue( Common::BaseParam baseParam, uint32_t value );
+
+    float getModifier( Common::ParamModifier paramModifier ) const;
+
+    void addModifier( Common::ParamModifier paramModifier, int32_t value );
+
+    void delModifier( Common::ParamModifier paramModifier, int32_t value );
 
     uint32_t getHp() const;
 

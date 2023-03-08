@@ -93,10 +93,10 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
   addResultToActor( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param, bool forSelf )
 {
   EffectResultPtr nextResult = make_EffectResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, param );
+  nextResult->applyStatusEffect( statusId, param, forSelf );
   addResultToActor( target, nextResult );
 }
 

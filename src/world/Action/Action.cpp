@@ -431,7 +431,7 @@ void Action::Action::execute()
 
   if( !hasClientsideTarget()  )
   {
-    buildEffects();
+    handleAction();
   }
   else if( auto player = m_pSource->getAsPlayer() )
   {
@@ -501,7 +501,15 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
   return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
 }
 
-void Action::Action::buildEffects()
+void Action::Action::applyStatusEffectSelf( uint16_t statusId, uint8_t param )
+{
+  if( m_hitActors.size() > 0 )
+    getEffectbuilder()->applyStatusEffect( m_hitActors[ 0 ], statusId, param, true );
+  else
+    getEffectbuilder()->applyStatusEffect( m_pSource, statusId, param );
+}
+
+void Action::Action::handleAction()
 {
   snapshotAffectedActors( m_hitActors );
 
@@ -593,11 +601,46 @@ void Action::Action::buildEffects()
     }
   }
 
+  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
+    handleStatusEffects();
+
   m_effectBuilder->buildAndSendPackets( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
   // at this point we're done with it and no longer need it
   // m_effectBuilder.reset();
+}
+
+void Action::Action::handleStatusEffects()
+{
+  if( isComboAction() && !isCorrectCombo() )
+    return;
+
+  // handle caster statuses
+  if( m_lutEntry.statuses.caster.size() > 0 )
+  {
+    for( auto& status : m_lutEntry.statuses.caster )
+    {
+      applyStatusEffectSelf( status.id );
+      m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
+    }
+  }
+
+  // handle hit actor statuses
+  if( m_lutEntry.statuses.target.size() > 0 && m_hitActors.size() > 0 )
+  {
+    for( auto& actor : m_hitActors )
+    {
+      for( auto& status : m_lutEntry.statuses.target )
+      {
+        getEffectbuilder()->applyStatusEffect( actor, status.id, 0 );
+        actor->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
+      }
+
+      if( actor->getStatusEffectMap().size() > 0 )
+        actor->onActionHostile( m_pSource );
+    }
+  }
 }
 
 bool Action::Action::preCheck()
@@ -864,7 +907,8 @@ Entity::CharaPtr Action::Action::getHitChara()
 bool Action::Action::hasValidLutEntry() const
 {
   return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
-    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
+    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0 ||
+    m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0;
 }
 
 Action::EffectBuilderPtr Action::Action::getEffectbuilder()

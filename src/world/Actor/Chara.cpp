@@ -5,7 +5,6 @@
 #include <Network/CommonActorControl.h>
 #include <Service.h>
 
-
 #include "Forwards.h"
 
 #include "Territory/Territory.h"
@@ -26,6 +25,7 @@
 #include "Player.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
+#include "Manager/PlayerMgr.h"
 #include "Common.h"
 
 using namespace Sapphire::Common;
@@ -559,7 +559,17 @@ void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_
   auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
   effect->setParam( param );
   addStatusEffect( effect );
+}
 
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
+                                                             std::vector< World::Action::StatusModifier >& modifiers, uint16_t param )
+{
+  if( hasStatusEffect( id ) )
+    return;
+
+  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, modifiers, 3000 );
+  effect->setParam( param );
+  addStatusEffect( effect );
 }
 
 int8_t Sapphire::Entity::Chara::getStatusEffectFreeSlot()
@@ -644,7 +654,6 @@ void Sapphire::Entity::Chara::sendStatusEffectUpdate()
 {
   uint64_t currentTimeMs = Util::getTimeMs();
 
-
   auto statusEffectList = makeZonePacket< FFXIVIpcStatus >( getId() );
   uint8_t slot = 0;
   for( const auto& effectIt : m_statusEffectMap )
@@ -689,7 +698,13 @@ void Sapphire::Entity::Chara::updateStatusEffects()
 
 bool Sapphire::Entity::Chara::hasStatusEffect( uint32_t id )
 {
-  return m_statusEffectMap.find( id ) != m_statusEffectMap.end();
+  for( const auto& [ key, val ] : m_statusEffectMap )
+  {
+    if( val->getId() == id )
+      return true;
+  }
+
+  return false;
 }
 
 int64_t Sapphire::Entity::Chara::getLastUpdateTime() const
@@ -785,6 +800,47 @@ void Sapphire::Entity::Chara::setStatValue( Common::BaseParam baseParam, uint32_
   m_baseStats[ index ] = value;
 }
 
+float Sapphire::Entity::Chara::getModifier( Common::ParamModifier paramModifier ) const
+{
+  if( m_modifiers.find( paramModifier ) == m_modifiers.end() )
+    return paramModifier >= Common::ParamModifier::StrengthPercent ? 1.0f : 0;
+
+  auto& mod = m_modifiers.at( paramModifier );
+  if( paramModifier >= Common::ParamModifier::StrengthPercent )
+  {
+    auto valPercent = 1.0f;
+    for( const auto val : mod )
+      valPercent *= 1.0f + ( val / 100.0f );
+    return valPercent;
+  }
+  else
+  {
+    return std::accumulate( mod.begin(), mod.end(), 0 );
+  }
+}
+
+void Sapphire::Entity::Chara::addModifier( Common::ParamModifier paramModifier, int32_t value )
+{
+  m_modifiers[ paramModifier ].push_back( value );
+
+  if( auto pPlayer = this->getAsPlayer(); pPlayer )
+    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ), getModifier( paramModifier ) );
+}
+
+void Sapphire::Entity::Chara::delModifier( Common::ParamModifier paramModifier, int32_t value )
+{
+  assert( m_modifiers.count( paramModifier ) != 0 );
+  auto& mod = m_modifiers.at( paramModifier );
+
+  mod.erase( std::remove( mod.begin(), mod.end(), value ), mod.end() );
+
+  if( mod.size() == 0 )
+    m_modifiers.erase( paramModifier );
+
+  if( auto pPlayer = this->getAsPlayer(); pPlayer )
+    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ), getModifier( paramModifier ) );
+}
+
 void Sapphire::Entity::Chara::onTick()
 {
   uint32_t thisTickDmg = 0;
@@ -795,13 +851,13 @@ void Sapphire::Entity::Chara::onTick()
     auto thisEffect = effectIt.second->getTickEffect();
     switch( thisEffect.first )
     {
-      case 1:
+      case Common::ParamModifier::TickDamage:
       {
         thisTickDmg += thisEffect.second;
         break;
       }
 
-      case 2:
+      case Common::ParamModifier::TickHeal:
       {
         thisTickHeal += thisEffect.second;
         break;
@@ -809,12 +865,18 @@ void Sapphire::Entity::Chara::onTick()
     }
   }
 
+  // TODO: don't really like how this is handled
+  // TODO: calculate actual damage from potency
   if( thisTickDmg != 0 )
   {
     takeDamage( thisTickDmg );
     server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), HPFloatingText, 0,
                                                                                    static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP ),
                                                                                    thisTickDmg ) );
+    if( isPlayer() )
+      server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsPlayer() ) );
+    else if( isBattleNpc() )
+      server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsBNpc() ) );
   }
 
   if( thisTickHeal != 0 )
@@ -823,5 +885,9 @@ void Sapphire::Entity::Chara::onTick()
     server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), HPFloatingText, 0,
                                                                                    static_cast< uint8_t >( ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP ),
                                                                                    thisTickHeal ) );
+    if( isPlayer() )
+      server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsPlayer() ) );
+    else if( isBattleNpc() )
+      server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeHudParam( *getAsBNpc() ) );
   }
 }
