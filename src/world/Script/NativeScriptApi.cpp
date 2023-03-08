@@ -290,28 +290,5 @@ namespace Sapphire::ScriptAPI
                                             uint16_t param1, uint16_t param2 )
   {
   }
-
-  ///////////////////////////////////////////////////////////////////
-
-  InstanceArenaScript::InstanceArenaScript( uint32_t instanceContentId ) : ScriptObject( uint32_t{ 0x8003 } << 16 | instanceContentId, typeid( InstanceArenaScript ).hash_code() )
-  {
-  }
-
-  void InstanceArenaScript::onInit( InstanceContent& instance )
-  {
-  }
-
-  void InstanceArenaScript::onUpdate( InstanceContent& instance, uint64_t tickCount )
-  {
-  }
-
-  void InstanceArenaScript::onReset( InstanceContent& instance )
-  {
-  }
-
-  void InstanceArenaScript::onBattleStart( InstanceContent& instance )
-  {
-  }
-
 }
 

@@ -405,49 +405,6 @@ namespace Sapphire::ScriptAPI
       return Common::Service< World::Manager::PlayerMgr >::ref();
     }
   };
-
-  /*!
-  * @brief The base class for any scripts that implement behaviour related to a generic arena
-  */
-  class ArenaScript : public ScriptObject
-  {
-  public:
-    explicit ArenaScript( uint32_t battleId );
-
-    virtual void onInit( Sapphire::Territory& instance );
-
-    virtual void onUpdate( Sapphire::Territory& instance, uint64_t tickCount );
-
-    virtual void onReset( Sapphire::Territory& instance );
-
-    World::Manager::PlayerMgr& playerMgr()
-    {
-      return Common::Service< World::Manager::PlayerMgr >::ref();
-    }
-  };
-
-  /*!
-  * @brief The base class for any scripts that implement behaviour related to an instance arena
-  */
-  class InstanceArenaScript : public ScriptObject
-  {
-  public:
-    explicit InstanceArenaScript( uint32_t instanceContentId );
-
-    virtual void onInit( Sapphire::InstanceContent& instance );
-
-    virtual void onUpdate( Sapphire::InstanceContent& instance, uint64_t tickCount );
-
-    virtual void onReset( Sapphire::InstanceContent& instance );
-
-    virtual void onBattleStart( Sapphire::InstanceContent& instance );
-
-    World::Manager::PlayerMgr& playerMgr()
-    {
-      return Common::Service< World::Manager::PlayerMgr >::ref();
-    }
-  };
-
 }
 
 #endif
