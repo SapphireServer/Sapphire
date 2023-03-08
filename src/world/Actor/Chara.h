@@ -28,12 +28,9 @@ namespace Sapphire::Entity
   public:
 
     using ActorStatsArray = std::array< uint32_t, STAT_ARRAY_SIZE >;
-    using ActorModifiersMap = std::unordered_map< Common::ParamModifier, std::vector< int32_t > >;
 
     ActorStatsArray m_baseStats{ 0 };
     ActorStatsArray m_bonusStats{ 0 };
-
-    ActorModifiersMap m_modifiers{ 0 };
 
   protected:
     char m_name[34];
@@ -131,6 +128,8 @@ namespace Sapphire::Entity
 
     std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
 
+    Sapphire::StatusEffect::StatusEffectPtr getStatusEffectById( uint32_t id ) const;
+
     void sendStatusEffectUpdate();
 
     /*! return a const pointer to the look array */
@@ -168,10 +167,6 @@ namespace Sapphire::Entity
     void setStatValue( Common::BaseParam baseParam, uint32_t value );
 
     float getModifier( Common::ParamModifier paramModifier ) const;
-
-    void addModifier( Common::ParamModifier paramModifier, int32_t value );
-
-    void delModifier( Common::ParamModifier paramModifier, int32_t value );
 
     uint32_t getHp() const;
 

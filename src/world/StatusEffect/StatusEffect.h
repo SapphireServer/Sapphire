@@ -21,6 +21,14 @@ public:
 
   void onTick();
 
+  std::unordered_map< Common::ParamModifier, int32_t >& getModifiers();
+
+  void setModifiers( std::vector< World::Action::StatusModifier > modifiers );
+
+  void setModifier( Common::ParamModifier paramModifier, int32_t value );
+
+  void delModifier( Common::ParamModifier paramModifier );
+
   void applyStatus();
 
   void removeStatus();
@@ -62,7 +70,7 @@ private:
   uint16_t m_param;
   std::string m_name;
   std::pair< Common::ParamModifier, uint32_t > m_currTickEffect;
-  std::vector< World::Action::StatusModifier > m_modifiers;
+  std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
 };
 
 }

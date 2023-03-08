@@ -643,6 +643,17 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > Sapphire::Entity::C
   return m_statusEffectMap;
 }
 
+Sapphire::StatusEffect::StatusEffectPtr Sapphire::Entity::Chara::getStatusEffectById( uint32_t id ) const
+{
+  for( const auto& effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getId() == id )
+      return effectIt.second;
+  }
+
+  return nullptr;
+}
+
 const uint8_t* Sapphire::Entity::Chara::getLookArray() const
 {
   return m_customize;
@@ -815,45 +826,23 @@ void Sapphire::Entity::Chara::setStatValue( Common::BaseParam baseParam, uint32_
 
 float Sapphire::Entity::Chara::getModifier( Common::ParamModifier paramModifier ) const
 {
-  if( m_modifiers.find( paramModifier ) == m_modifiers.end() )
-    return paramModifier >= Common::ParamModifier::StrengthPercent ? 1.0f : 0;
+  auto result = paramModifier >= Common::ParamModifier::StrengthPercent ? 1.0f : 0;
 
-  auto& mod = m_modifiers.at( paramModifier );
-  if( paramModifier >= Common::ParamModifier::StrengthPercent )
+  for( const auto& [ key, status ] : m_statusEffectMap )
   {
-    auto valPercent = 1.0f;
-    for( const auto val : mod )
-      valPercent *= 1.0f + ( val / 100.0f );
-    return valPercent;
+    for( const auto& [ mod, val ] : status->getModifiers() )
+    {
+      if( mod != paramModifier )
+        continue;
+
+      if( paramModifier >= Common::ParamModifier::StrengthPercent )
+        result *= 1.0f + ( val / 100.0f );
+      else
+        result += val;
+    }
   }
-  else
-  {
-    return std::accumulate( mod.begin(), mod.end(), 0 );
-  }
-}
 
-void Sapphire::Entity::Chara::addModifier( Common::ParamModifier paramModifier, int32_t value )
-{
-  m_modifiers[ paramModifier ].push_back( value );
-
-  if( auto pPlayer = this->getAsPlayer(); pPlayer )
-    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ), getModifier( paramModifier ) );
-}
-
-void Sapphire::Entity::Chara::delModifier( Common::ParamModifier paramModifier, int32_t value )
-{
-  if( m_modifiers.find( paramModifier ) == m_modifiers.end() )
-    return;
-
-  auto& mod = m_modifiers.at( paramModifier );
-
-  mod.erase( std::remove( mod.begin(), mod.end(), value ), mod.end() );
-
-  if( mod.size() == 0 )
-    m_modifiers.erase( paramModifier );
-
-  if( auto pPlayer = this->getAsPlayer(); pPlayer )
-    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ), getModifier( paramModifier ) );
+  return result;
 }
 
 void Sapphire::Entity::Chara::onTick()

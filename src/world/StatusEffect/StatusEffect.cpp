@@ -6,13 +6,17 @@
 #include <algorithm>
 #include <Service.h>
 
+#include "Manager/PlayerMgr.h"
+
 #include "Actor/Chara.h"
+#include "Actor/Player.h"
 #include "Actor/GameObject.h"
 
 #include "Script/ScriptMgr.h"
 
 #include "StatusEffect.h"
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 //using namespace Sapphire::Network::Packets::WorldPackets::Server;
@@ -21,7 +25,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
                                                     uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
-  m_modifiers = std::move( modifiers );
+  setModifiers( modifiers );
 }
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
@@ -88,21 +92,49 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
   return m_param;
 }
 
-void Sapphire::StatusEffect::StatusEffect::applyStatus()
+std::unordered_map< Common::ParamModifier, int32_t >& Sapphire::StatusEffect::StatusEffect::getModifiers()
 {
-  m_startTime = Util::getTimeMs();
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  return m_modifiers;
+}
 
-  for( const auto& mod : m_modifiers )
+void Sapphire::StatusEffect::StatusEffect::setModifiers( std::vector< World::Action::StatusModifier > modifiers )
+{
+  for( const auto& mod : modifiers )
   {
-    // TODO: ticks
     if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
-      m_targetActor->addModifier( mod.modifier, mod.value );
+      setModifier( mod.modifier, mod.value );
     else if( mod.modifier == Common::ParamModifier::TickDamage )
       registerTickEffect( mod.modifier, mod.value );
     else if( mod.modifier == Common::ParamModifier::TickHeal )
       registerTickEffect( mod.modifier, mod.value );
   }
+}
+
+void Sapphire::StatusEffect::StatusEffect::setModifier( Common::ParamModifier paramModifier, int32_t value )
+{
+  m_modifiers[ paramModifier ] = value;
+
+  if( auto pPlayer = m_targetActor->getAsPlayer(); pPlayer )
+    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ),
+                                                                   pPlayer->getModifier( paramModifier ) );
+}
+
+void Sapphire::StatusEffect::StatusEffect::delModifier( Common::ParamModifier paramModifier )
+{
+  if( m_modifiers.find( paramModifier ) == m_modifiers.end() )
+    return;
+
+  m_modifiers.erase( paramModifier );
+
+  if( auto pPlayer = m_targetActor->getAsPlayer(); pPlayer )
+    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ),
+                                                                   pPlayer->getModifier( paramModifier ) );
+}
+
+void Sapphire::StatusEffect::StatusEffect::applyStatus()
+{
+  m_startTime = Util::getTimeMs();
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
   m_targetActor->calculateStats();
 
@@ -131,11 +163,7 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  for( const auto& mod : m_modifiers )
-  {
-    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
-      m_targetActor->delModifier( mod.modifier, mod.value );
-  }
+  m_modifiers.clear();
 
   m_targetActor->calculateStats();
 

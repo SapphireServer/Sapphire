@@ -3,6 +3,7 @@
 #include <Actor/Player.h>
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
+#include <StatusEffect/StatusEffect.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -21,7 +22,8 @@ public:
     if( !pPlayer )
       return;
 
-    pPlayer->delModifier( Common::ParamModifier::DamageDealtPercent, -25 );
+    if( auto status = pPlayer->getStatusEffectById( Defiance ); status )
+      status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
     action.applyStatusEffectSelf( Unchained );
     pPlayer->addStatusEffectByIdIfNotExist( Unchained, 20000, *pPlayer->getAsChara() );
