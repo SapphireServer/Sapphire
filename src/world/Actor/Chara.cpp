@@ -592,7 +592,7 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
 
 void Sapphire::Entity::Chara::replaceSingleStatusEffectById( uint32_t id )
 {
-    for( const auto& effectIt : m_statusEffectMap )
+  for( const auto& effectIt : m_statusEffectMap )
   {
     if( effectIt.second->getId() == id )
     {
