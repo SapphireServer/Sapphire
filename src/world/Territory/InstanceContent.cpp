@@ -28,6 +28,8 @@
 #include "InstanceContent.h"
 #include "InstanceObjectCache.h"
 
+#include <Encounter/InstanceContent/IfritNormal.h>
+
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -66,6 +68,11 @@ bool Sapphire::InstanceContent::init()
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceInit( *this );
+
+  // todo: every fight is now ifrit
+  m_pEncounter = std::make_shared< IfritEncounterFight >( std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() ) );
+
+  m_pEncounter->init();
 
   return true;
 }
@@ -137,10 +144,10 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         if( it == m_playerMap.end() )
           return;
 
-        auto player = it->second;
-        if( !player->isLoadingComplete() ||
-            !player->isDirectorInitialized() ||
-                player->hasCondition( PlayerCondition::WatchingCutscene ) )
+        auto pPlayer = it->second;
+        if( !pPlayer->isLoadingComplete() ||
+            !pPlayer->isDirectorInitialized() ||
+                pPlayer->hasCondition( PlayerCondition::WatchingCutscene ) )
           return;
       }
 
@@ -158,12 +165,20 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       if( m_pEntranceEObj )
         m_pEntranceEObj->setPermissionInvisibility( 1 );
       m_state = DutyInProgress;
+
+      // todo: also yucky, should be init
+      m_pEncounter->reset();
       break;
     }
 
 
     case DutyReset:
+    {
+      // todo: revive players if trial/enclosed raid arena, add reset timer
+      m_instanceCommenceTime = 0;
+      m_state = Created;
       break;
+    }
 
     case DutyInProgress:
     {
@@ -178,6 +193,9 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         m_instanceTerminate = true;
 
       updateBNpcs( tickCount );
+
+      if( m_pEncounter->getEncounterFightStatus() == EncounterFightStatus::FAIL )
+        m_state = DutyReset;
       break;
     }
 
@@ -214,6 +232,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceUpdate( *this, tickCount );
+
+  m_pEncounter->update( tickCount );
 
   m_lastUpdate = tickCount;
 }
