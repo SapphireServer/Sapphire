@@ -18,7 +18,7 @@ namespace Sapphire
 
     void init() override
     {
-      Logger::info( "ifrit FAN CLUB GEOcities <blink>EUNUCH ONLY</blink>" );
+      Logger::info( "stage 2 init" );
     }
 
     void update( uint64_t deltaTime ) override
@@ -55,7 +55,7 @@ namespace Sapphire
 
     void init() override
     {
-      Logger::info( "ifrit FAN CLUB GEOcities <blink>EUNUCH ONLY</blink>" );
+      Logger::info( "stage 1 init" );
     }
 
     void update( uint64_t deltaTime ) override
@@ -76,7 +76,7 @@ namespace Sapphire
         m_pEncounter->addState( ifritTwoState );
       }
 
-      if( timeElapsedMs > 10000 )
+      if( timeElapsedMs > 12000 )
       {
         pIfrit->hateListGetHighest()->die();
       }
