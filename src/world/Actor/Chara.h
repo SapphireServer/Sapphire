@@ -240,6 +240,10 @@ namespace Sapphire::Entity
 
     void die();
 
+    bool hasInvulnerableEffect() const;
+
+    bool hasCannotDieEffect() const;
+
     Common::ActorStatus getStatus() const;
 
     void setStatus( Common::ActorStatus status );

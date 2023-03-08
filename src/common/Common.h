@@ -691,22 +691,20 @@ namespace Sapphire::Common
     Unknown_0 = 9,
     MpLoss = 10,
     MpGain = 11,
-    TpLoss = 12,
-    //TpGain = 13, // everything below shifted one up since 5.2
-    GpGain = 13,
-    ApplyStatusEffectTarget = 14,
-    ApplyStatusEffectSource = 15, // effect entry on target but buff applies to source, like storm's eye
+    //TpLoss = 12, // these don't seem to have any effect now
+    //TpGain = 13, 
+    //GpGain = 14, 
+    ApplyStatusEffectTarget = 14, // CALC_RESULT_TYPE_SET_STATUS
+    ApplyStatusEffectSource = 15, // CALC_RESULT_TYPE_SET_STATUS_ME
+    StatusLoss = 16,
+    StatusLoss2 = 17, // different flying text
+    StatusLoss3 = 18, // looks the same as 16
     StatusNoEffect = 20,
-    /*!
-     * @brief Tells the client that it should show combo indicators on actions.
-     *
-     * @param flags Required to be 128, doesn't show combo rings on hotbars otherwise
-     * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
-     */
+    // hate related effects here
     Provoke = 24,
     StartActionCombo = 27,
-    ComboSucceed = 28,  // two more values inserted between this and Mount since 5.2
-    Knockback = 33,
+    ComboSucceed = 28,
+    //Knockback = 33,
     Mount = 40,
     VFX = 59, // links to VFX sheet
   };
@@ -1123,6 +1121,8 @@ namespace Sapphire::Common
     MPRestorePerGCD = 15,
     AlwaysCombo = 16,
     PotencyMultiplier = 17,
+    Invulnerable = 18,
+    CannotDie = 19,
   };
 
   enum class ActionTypeFilter : int32_t
