@@ -56,6 +56,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Excel::ExcelStruct<
   m_currentBgm( pInstanceConfiguration->data().Music ),
   m_instanceExpireTime( Util::getTimeSeconds() + 300 ),
   m_instanceTerminateTime( 0 ),
+  m_instanceResetTime( 0 ),
   m_instanceTerminate( false )
 {
 
@@ -166,8 +167,6 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         m_pEntranceEObj->setPermissionInvisibility( 1 );
       m_state = DutyInProgress;
 
-      // todo: also yucky, should be init
-      m_pEncounter->reset();
       break;
     }
 
@@ -175,8 +174,37 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
     case DutyReset:
     {
       // todo: revive players if trial/enclosed raid arena, add reset timer
-      m_instanceCommenceTime = 0;
-      m_state = Created;
+      if( m_instanceResetTime == 0 )
+      {
+        //sendDutyReset();
+        m_instanceResetTime = tickCount + 3000;
+        m_pEncounter->reset();
+        for( const auto& playerIt : m_playerMap )
+        {
+          movePlayerToEntrance( *playerIt.second );
+        }
+        if( m_pEntranceEObj )
+          m_pEntranceEObj->setPermissionInvisibility( 0 );
+        return;
+      }
+      else if( tickCount < m_instanceResetTime )
+        return;
+
+      auto& server = Common::Service< World::WorldServer >::ref();
+      for( const auto& playerIt : m_playerMap )
+      {
+        auto player = playerIt.second;
+        auto zoneInPacket = makeActorControlSelf( player->getId(), Appear, 0x3, 0, 0, 0 );
+        auto setStatusPacket = makeActorControl( player->getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+
+        server.queueForPlayer( player->getCharacterId(), zoneInPacket );
+        server.queueForPlayers( player->getInRangePlayerIds( true ), setStatusPacket );
+      }
+
+      m_pEntranceEObj->setPermissionInvisibility( 1 );
+      sendForward();
+      
+      m_state = DutyInProgress;
       break;
     }
 
@@ -441,6 +469,17 @@ void Sapphire::InstanceContent::sendForward()
   }
 }
 
+void Sapphire::InstanceContent::sendDutyReset()
+{
+  auto& server = Common::Service< World::WorldServer >::ref();
+  for( const auto& playerIt : m_playerMap )
+  {
+    auto player = playerIt.second;
+    server.queueForPlayer( player->getCharacterId(), makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(),
+                                                                           DirectorEventId::LoadingScreen, 3000 ) );
+  }
+}
+
 void Sapphire::InstanceContent::sendVoteState()
 {
   auto& server = Common::Service< World::WorldServer >::ref();
@@ -474,6 +513,34 @@ Sapphire::InstanceContent::InstanceContentState Sapphire::InstanceContent::getSt
   return m_state;
 }
 
+void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& player )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
+  auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_instanceContentId );
+
+  auto rect = instanceObjectCache.getEventRange( contentInfo->data().EntranceRect );
+
+  if( m_pEntranceEObj != nullptr )
+  {
+    if( rect )
+      player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
+    else
+      player.setRot( PI );
+    player.setPos( m_pEntranceEObj->getPos() );
+  }
+  else if( rect )
+  {
+    player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
+    player.setPos( { rect->header.transform.translation.x, rect->header.transform.translation.y, rect->header.transform.translation.z } );
+  }
+  else
+  {
+    player.setRot( PI );
+    player.setPos( { 0.f, 0.f, 0.f } );
+  }
+}
+
 void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& player )
 {
   // remove any players from the instance who aren't bound on zone in
@@ -483,30 +550,7 @@ void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& 
   // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
   if( !hasPlayerPreviouslySpawned( player ) )
   {
-    auto& exdData = Common::Service< Data::ExdData >::ref();
-    auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();
-    auto contentInfo = exdData.getRow< Excel::InstanceContent >( m_instanceContentId );
-
-    auto rect = instanceObjectCache.getEventRange( contentInfo->data().EntranceRect );
-
-    if( m_pEntranceEObj != nullptr )
-    {
-      if( rect )
-        player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
-      else
-        player.setRot( PI );
-      player.setPos( m_pEntranceEObj->getPos() );
-    }
-    else if( rect )
-    {
-      player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
-      player.setPos( { rect->header.transform.translation.x, rect->header.transform.translation.y, rect->header.transform.translation.z } );
-    }
-    else
-    {
-      player.setRot( PI );
-      player.setPos( { 0.f, 0.f, 0.f } );
-    }
+    movePlayerToEntrance( player );
   }
 
   player.resetObjSpawnIndex();
