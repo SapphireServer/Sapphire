@@ -507,8 +507,8 @@ void Sapphire::Entity::Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEf
   if( nextSlot == -1 )
     return;
 
-  pEffect->applyStatus();
   m_statusEffectMap[ nextSlot ] = pEffect;
+  pEffect->applyStatus();
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcActionIntegrity >( getId() );
 

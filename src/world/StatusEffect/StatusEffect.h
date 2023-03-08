@@ -70,6 +70,7 @@ private:
   uint16_t m_param;
   std::string m_name;
   std::pair< Common::ParamModifier, uint32_t > m_currTickEffect;
+  std::vector< World::Action::StatusModifier > m_statusModifiers;
   std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
 };
 

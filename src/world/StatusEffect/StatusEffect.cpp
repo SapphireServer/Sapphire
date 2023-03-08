@@ -25,7 +25,7 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
                                                     uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
-  setModifiers( modifiers );
+  m_statusModifiers = std::move( modifiers );
 }
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
@@ -97,19 +97,6 @@ std::unordered_map< Common::ParamModifier, int32_t >& Sapphire::StatusEffect::St
   return m_modifiers;
 }
 
-void Sapphire::StatusEffect::StatusEffect::setModifiers( std::vector< World::Action::StatusModifier > modifiers )
-{
-  for( const auto& mod : modifiers )
-  {
-    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
-      setModifier( mod.modifier, mod.value );
-    else if( mod.modifier == Common::ParamModifier::TickDamage )
-      registerTickEffect( mod.modifier, mod.value );
-    else if( mod.modifier == Common::ParamModifier::TickHeal )
-      registerTickEffect( mod.modifier, mod.value );
-  }
-}
-
 void Sapphire::StatusEffect::StatusEffect::setModifier( Common::ParamModifier paramModifier, int32_t value )
 {
   m_modifiers[ paramModifier ] = value;
@@ -135,6 +122,16 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  for( const auto& mod : m_statusModifiers )
+  {
+    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
+      setModifier( mod.modifier, mod.value );
+    else if( mod.modifier == Common::ParamModifier::TickDamage )
+      registerTickEffect( mod.modifier, mod.value );
+    else if( mod.modifier == Common::ParamModifier::TickHeal )
+      registerTickEffect( mod.modifier, mod.value );
+  }
 
   m_targetActor->calculateStats();
 
