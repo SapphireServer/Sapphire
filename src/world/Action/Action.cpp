@@ -31,6 +31,8 @@
 #include <Service.h>
 #include "WorldServer.h"
 
+#include "Job/Warrior.h"
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -515,8 +517,9 @@ void Action::Action::handleAction()
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto hasLutEntry = hasValidLutEntry();
+  auto hasScript = scriptMgr.onExecute( *this );
 
-  if( !scriptMgr.onExecute( *this ) && !hasLutEntry )
+  if( !hasScript && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
@@ -526,9 +529,12 @@ void Action::Action::handleAction()
     return;
   }
 
+  if( !hasScript )
+    m_enableGenericHandler = true;
+
   Network::Util::Player::sendHudParam( *m_pSource->getAsPlayer() );
 
-  if( !hasLutEntry || m_hitActors.empty() )
+  if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_effectBuilder->buildAndSendPackets( m_hitActors );
@@ -604,6 +610,8 @@ void Action::Action::handleAction()
   if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
     handleStatusEffects();
 
+  handleJobAction();
+
   m_effectBuilder->buildAndSendPackets( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
@@ -639,6 +647,18 @@ void Action::Action::handleStatusEffects()
 
       if( actor->getStatusEffectMap().size() > 0 )
         actor->onActionHostile( m_pSource );
+    }
+  }
+}
+
+void Action::Action::handleJobAction()
+{
+  switch( m_pSource->getClass() )
+  {
+    case ClassJob::Warrior:
+    {
+      Warrior::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
     }
   }
 }
@@ -763,6 +783,17 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
 
       if( subtractCosts )
         m_pSource->setMp( curMp - static_cast< uint32_t >( cost ) );
+
+      return true;
+    }
+
+    case Common::ActionPrimaryCostType::StatusEffect:
+    {
+      if( !m_pSource->hasStatusEffect( m_primaryCost ) )
+        return false;
+
+      if( subtractCosts )
+        m_pSource->removeSingleStatusEffectById( m_primaryCost );
 
       return true;
     }
@@ -934,4 +965,9 @@ void Action::Action::setAggroMultiplier( float aggroMultiplier )
 uint64_t Action::Action::getCastTimeRest() const
 {
   return m_castTimeRestMs;
+}
+
+void Action::Action::enableGenericHandler()
+{
+  m_enableGenericHandler = true;
 }

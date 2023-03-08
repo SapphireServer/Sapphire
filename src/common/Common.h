@@ -910,7 +910,14 @@ namespace Sapphire::Common
     CriticalHitPowerPercent = 1020,
     CriticalHitResiliencePercent = 1021,
     CriticalHitPercent = 1022,
-    EnmityPercent = 1023
+    EnmityPercent = 1023,
+    DamageDealtPercent = 1024,
+    DamageTakenPercent = 1025,
+    HealingMagicRecoveryPercent = 1026,
+    SlashingResistancePercent = 1027,
+    PiercingResistancePercent = 1028,
+    BluntResistancePercent = 1029,
+    ProjectileResistancePercent = 1030
   };
 
   enum struct ActionAspect : uint8_t
@@ -931,6 +938,7 @@ namespace Sapphire::Common
     MagicPoints = 3,
     TacticsPoints = 5,
     TacticsPoints1 = 6,
+    StatusEffect = 10,
     Sprint = 18,
 //    WARGauge = 22,
 //    DRKGauge = 25,
