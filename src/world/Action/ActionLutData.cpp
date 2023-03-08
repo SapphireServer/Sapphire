@@ -108,7 +108,14 @@ std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifi
   { "CriticalHitPowerPercent", Common::ParamModifier::CriticalHitPowerPercent },
   { "CriticalHitResiliencePercent", Common::ParamModifier::CriticalHitResiliencePercent },
   { "CriticalHitPercent", Common::ParamModifier::CriticalHitPercent },
-  { "EnmityPercent", Common::ParamModifier::EnmityPercent }
+  { "EnmityPercent", Common::ParamModifier::EnmityPercent },
+  { "DamageDealtPercent", Common::ParamModifier::DamageDealtPercent },
+  { "DamageTakenPercent", Common::ParamModifier::DamageTakenPercent },
+  { "HealingMagicRecoveryPercent", Common::ParamModifier::HealingMagicRecoveryPercent },
+  { "SlashingResistancePercent", Common::ParamModifier::SlashingResistancePercent },
+  { "PiercingResistancePercent", Common::ParamModifier::PiercingResistancePercent },
+  { "BluntResistancePercent", Common::ParamModifier::BluntResistancePercent },
+  { "ProjectileResistancePercent", Common::ParamModifier::ProjectileResistancePercent },
 };
 
 bool ActionLutData::cacheActions()

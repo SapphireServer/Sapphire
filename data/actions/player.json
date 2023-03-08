@@ -506,7 +506,7 @@
           "duration": 24000,
           "modifiers": [
             {
-              "modifier": "AttackPowerPercent",
+              "modifier": "DamageDealtPercent",
               "value": 20
             }
           ]
@@ -698,7 +698,34 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 91,
+          "duration": 0,
+          "modifiers": [
+            {
+              "modifier": "HPPercent",
+              "value": 25
+            },
+            {
+              "modifier": "DamageDealtPercent",
+              "value": -25
+            },
+            {
+              "modifier": "HealingRecoveryPercent",
+              "value": 20
+            },
+            {
+              "modifier": "AccuracyPercent",
+              "value": 5
+            },
+            {
+              "modifier": "EnmityPercent",
+              "value": 20
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
