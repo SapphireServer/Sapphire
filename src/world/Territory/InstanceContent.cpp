@@ -57,6 +57,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Excel::ExcelStruct<
   m_instanceExpireTime( Util::getTimeSeconds() + 300 ),
   m_instanceTerminateTime( 0 ),
   m_instanceResetTime( 0 ),
+  m_instanceResetFinishTime( 0 ),
   m_instanceTerminate( false )
 {
 
@@ -178,29 +179,41 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       {
         //sendDutyReset();
         m_instanceResetTime = tickCount + 3000;
+        
+        return;
+      }
+
+      if( m_instanceResetFinishTime == 0 )
+      {
+        m_instanceResetFinishTime = tickCount + 3000;
         m_pEncounter->reset();
+
+        auto& server = Common::Service< World::WorldServer >::ref();
         for( const auto& playerIt : m_playerMap )
         {
-          movePlayerToEntrance( *playerIt.second );
+          auto pPlayer = playerIt.second;
+
+          pPlayer->resetHp();
+          pPlayer->resetMp();
+          pPlayer->setStatus( Common::ActorStatus::Idle );
+
+          movePlayerToEntrance( *pPlayer );
+          auto zoneInPacket = makeActorControlSelf( pPlayer->getId(), Appear, 0x3, 0, 0, 0 );
+          auto setStatusPacket = makeActorControl( pPlayer->getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+
+          server.queueForPlayer( pPlayer->getCharacterId(), zoneInPacket );
+          server.queueForPlayers( pPlayer->getInRangePlayerIds( true ), setStatusPacket );
         }
+
         if( m_pEntranceEObj )
           m_pEntranceEObj->setPermissionInvisibility( 0 );
+
         return;
       }
       else if( tickCount < m_instanceResetTime )
         return;
 
-      auto& server = Common::Service< World::WorldServer >::ref();
-      for( const auto& playerIt : m_playerMap )
-      {
-        auto player = playerIt.second;
-        auto zoneInPacket = makeActorControlSelf( player->getId(), Appear, 0x3, 0, 0, 0 );
-        auto setStatusPacket = makeActorControl( player->getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-
-        server.queueForPlayer( player->getCharacterId(), zoneInPacket );
-        server.queueForPlayers( player->getInRangePlayerIds( true ), setStatusPacket );
-      }
-
+      
       m_pEntranceEObj->setPermissionInvisibility( 1 );
       sendForward();
       
