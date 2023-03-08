@@ -842,7 +842,9 @@ void Sapphire::Entity::Chara::addModifier( Common::ParamModifier paramModifier, 
 
 void Sapphire::Entity::Chara::delModifier( Common::ParamModifier paramModifier, int32_t value )
 {
-  assert( m_modifiers.count( paramModifier ) != 0 );
+  if( m_modifiers.find( paramModifier ) == m_modifiers.end() )
+    return;
+
   auto& mod = m_modifiers.at( paramModifier );
 
   mod.erase( std::remove( mod.begin(), mod.end(), value ), mod.end() );
