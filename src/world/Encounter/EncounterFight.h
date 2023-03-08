@@ -18,6 +18,7 @@ namespace Sapphire
     bool m_bShouldFinish{ false };
     StateStackPtr m_stateStack;
     std::shared_ptr< EncounterFight > m_pEncounter;
+    uint64_t m_startTime{ 0 };
 
   public:
     EncounterState( std::shared_ptr< EncounterFight > pEncounter ) :
@@ -29,7 +30,7 @@ namespace Sapphire
     bool shouldFinish() { return m_bShouldFinish; };
 
     virtual void init() = 0;
-    virtual void update( double deltaTime ) = 0;
+    virtual void update( uint64_t deltaTime ) = 0;
 
     virtual void finish() = 0;
   };
@@ -53,7 +54,7 @@ namespace Sapphire
 
     virtual void init() = 0;
     virtual void start() = 0;
-    virtual void update( double deltaTime ) = 0;
+    virtual void update( uint64_t deltaTime ) = 0;
     virtual void reset() = 0;
 
     virtual void addState( EncounterState::EncounterStatePtr pState, bool initState = true ) = 0;
@@ -64,6 +65,7 @@ namespace Sapphire
     virtual EncounterFightStatus getEncounterFightStatus() const = 0;
 
   protected:
+    uint64_t m_startTime{ 0 };
     EncounterState::StateStackPtr m_stateStack;
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
