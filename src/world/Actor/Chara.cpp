@@ -562,7 +562,7 @@ void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_
 }
 
 void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
-                                                             std::vector< World::Action::StatusModifier >& modifiers, uint16_t param )
+                                                             std::vector< World::Action::StatusModifier > modifiers, uint16_t param )
 {
   if( hasStatusEffect( id ) )
     return;
@@ -590,6 +590,18 @@ void Sapphire::Entity::Chara::statusEffectFreeSlot( uint8_t slotId )
   m_statusEffectFreeSlotQueue.push( slotId );
 }
 
+void Sapphire::Entity::Chara::replaceSingleStatusEffectById( uint32_t id )
+{
+    for( const auto& effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getId() == id )
+    {
+      removeStatusEffect( effectIt.first, false );
+      break;
+    }
+  }
+}
+
 void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
 {
   for( const auto& effectIt : m_statusEffectMap )
@@ -602,7 +614,7 @@ void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
   }
 }
 
-std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId )
+std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Sapphire::Entity::Chara::removeStatusEffect( uint8_t effectSlotId, bool sendOrder )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -613,7 +625,8 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Sapphire:
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), StatusEffectLose, pEffect->getId() ) );
+  if( sendOrder )
+    server().queueForPlayers( getInRangePlayerIds( isPlayer() ), makeActorControl( getId(), StatusEffectLose, pEffect->getId() ) );
 
   auto it = m_statusEffectMap.erase( pEffectIt );
 

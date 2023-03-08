@@ -111,7 +111,9 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId );
+    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId, bool sendOrder = true );
+
+    void replaceSingleStatusEffectById( uint32_t id );
 
     void removeSingleStatusEffectById( uint32_t id );
 
@@ -140,7 +142,8 @@ namespace Sapphire::Entity
     void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
     // add a status effect by id if it doesn't exist
     void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
-    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, std::vector< World::Action::StatusModifier >& modifiers, uint16_t param = 0 );
+    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, std::vector< World::Action::StatusModifier > modifiers,
+                                        uint16_t param = 0 );
 
     // remove a status effect by id
     void removeSingleStatusEffectFromId( uint32_t id );
