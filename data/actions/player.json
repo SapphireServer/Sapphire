@@ -712,7 +712,7 @@
               "value": -25
             },
             {
-              "modifier": "HealingRecoveryPercent",
+              "modifier": "HealingMagicRecoveryPercent",
               "value": 20
             },
             {
