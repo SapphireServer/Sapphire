@@ -758,7 +758,12 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 97,
+          "duration": 30000
+        }
+      ],
       "target": []
     }
   },
