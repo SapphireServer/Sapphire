@@ -518,7 +518,7 @@ void Action::Action::buildEffects()
     return;
   }
 
-  Network::Util::Packet::sendHudParam( *m_pSource->getAsPlayer() );
+  Network::Util::Packet::sendHudParam( *m_pSource );
 
   if( !hasLutEntry || m_hitActors.empty() )
   {

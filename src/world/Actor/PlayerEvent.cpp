@@ -6,31 +6,30 @@
 #include "Actor/Player.h"
 
 #include "Territory/Territory.h"
-#include "WorldServer.h"
 
 #include "Action/EventAction.h"
 #include "Manager/PlayerMgr.h"
 #include "Service.h"
-#include <Network/PacketWrappers/RestingPacket.h>
 #include <Network/Util/PacketUtil.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
+using namespace Sapphire::Entity;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-void Sapphire::Entity::Player::addEvent( Event::EventHandlerPtr pEvent )
+void Player::addEvent( Event::EventHandlerPtr pEvent )
 {
   m_eventHandlerMap[ pEvent->getId() ] = pEvent;
 }
 
-std::map< uint32_t, Sapphire::Event::EventHandlerPtr >& Sapphire::Entity::Player::getEventListRef()
+std::map< uint32_t, Event::EventHandlerPtr >& Player::getEventListRef()
 {
   return m_eventHandlerMap;
 }
 
-Sapphire::Event::EventHandlerPtr Sapphire::Entity::Player::getEvent( uint32_t eventId ) const
+Event::EventHandlerPtr Player::getEvent( uint32_t eventId ) const
 {
   auto it = m_eventHandlerMap.find( eventId );
   if( it != m_eventHandlerMap.end() )
@@ -39,12 +38,12 @@ Sapphire::Event::EventHandlerPtr Sapphire::Entity::Player::getEvent( uint32_t ev
   return nullptr;
 }
 
-size_t Sapphire::Entity::Player::getEventCount()
+size_t Player::getEventCount()
 {
   return m_eventHandlerMap.size();
 }
 
-void Sapphire::Entity::Player::removeEvent( uint32_t eventId )
+void Player::removeEvent( uint32_t eventId )
 {
   auto it = m_eventHandlerMap.find( eventId );
   if( it != m_eventHandlerMap.end() )
@@ -55,13 +54,13 @@ void Sapphire::Entity::Player::removeEvent( uint32_t eventId )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void Sapphire::Entity::Player::onDeath()
+void Player::onDeath()
 {
   Service< World::Manager::PlayerMgr >::ref().onDeath( *this );
 }
 
 // TODO: slightly ugly here and way too static. Needs too be done properly
-void Sapphire::Entity::Player::onTick()
+void Player::onTick()
 {
   Chara::onTick();
   // add 3 seconds to total play time
@@ -76,7 +75,7 @@ void Sapphire::Entity::Player::onTick()
     Network::Util::Packet::sendRestingUpdate( *this );
 }
 
-bool Sapphire::Entity::Player::performResting()
+bool Player::performResting()
 {
   bool sendUpdate = false;
   auto addHp = static_cast< uint32_t >( static_cast< float >( getMaxHp() ) * 0.1f + 1 );

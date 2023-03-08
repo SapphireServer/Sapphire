@@ -5,17 +5,19 @@
 #include <Network/PacketWrappers/EventLogMessagePacket.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/CommonActorControl.h>
+#include "Network/PacketWrappers/ActorControlPacket.h"
+#include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/GameConnection.h"
+#include "Network/Util/PacketUtil.h"
 
 #include "Actor/Player.h"
 
-#include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include <Logging/Logger.h>
 
 #include <Service.h>
 #include "WorldServer.h"
 #include "Session.h"
-#include "Network/GameConnection.h"
+
 
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
@@ -83,8 +85,7 @@ void Sapphire::Event::Director::sendEventLogMessage( Sapphire::Entity::Player& p
 
 void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& player ) const
 {
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), DirectorClear, m_directorId ) );
+  Network::Util::Packet::sendActorControlSelf( player, DirectorClear, m_directorId );
 }
 
 void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& player ) const
@@ -102,8 +103,7 @@ void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& play
 void Sapphire::Event::Director::sendDirectorInit( Sapphire::Entity::Player& player ) const
 {
   Logger::debug( "[{}] directorInit: directorId#{}, contextId#{}", player.getId(), m_directorId, m_contextId );
-  auto& server = Common::Service< World::WorldServer >::ref();
-  server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), DirectorInit, m_directorId, m_contextId ) );
+  Network::Util::Packet::sendActorControlSelf( player, DirectorInit, m_directorId, m_contextId );
 }
 
 Sapphire::Event::Director::DirectorType Sapphire::Event::Director::getType() const

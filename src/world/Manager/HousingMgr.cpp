@@ -289,7 +289,6 @@ uint32_t HousingMgr::toLandSetId( int16_t territoryTypeId, int16_t wardId ) cons
   return ( static_cast< uint32_t >( territoryTypeId ) << 16 ) | wardId;
 }
 
-
 LandPtr HousingMgr::getLandByOwnerId( uint64_t id )
 {
 
@@ -405,7 +404,7 @@ LandPurchaseResult HousingMgr::purchaseLand( Entity::Player& player, HousingZone
       pLand->setStatus( Common::HouseStatus::Sold );
       pLand->setLandType( Common::LandType::Private );
 
-      player.setLandFlags( Common::LandFlagsSlot::Private, 0x00, pLand->getLandIdent() );
+      player.setLandFlags( Common::LandFlagsSlot::Private, 0, pLand->getLandIdent() );
 
       sendLandFlagsSlot( player, Common::LandFlagsSlot::Private );
 
@@ -433,7 +432,7 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
 
   // can't relinquish when you are not the owner
   // TODO: actually use permissions here for FC houses
-  if( !hasPermission( player, *pLand, 0 ) )
+  if( !pLand || !hasPermission( player, *pLand, 0 ) )
   {
     Network::Util::Packet::sendActorControlSelf( player, ActorControl::LogMsg, 3304 );
     return false;
@@ -455,7 +454,7 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
 
   Common::LandIdent ident { 0xFF, 0xFF, 0xFF, 0xFF };
 
-  player.setLandFlags( Common::LandFlagsSlot::Private, 0x00, ident );
+  player.setLandFlags( Common::LandFlagsSlot::Private, 0, ident );
 
   sendLandFlagsSlot( player, Common::LandFlagsSlot::Private );
 
@@ -676,10 +675,7 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
   auto& server = Common::Service< World::WorldServer >::ref();
 
   auto pLand = zone.getLand( plotNum );
-  if( !pLand )
-    return;
-
-  if( !hasPermission( player, *pLand, 0 ) )
+  if( !pLand || !hasPermission( player, *pLand, 0 ) )
     return;
 
   // create house
@@ -784,10 +780,7 @@ void HousingMgr::updateEstateGreeting( Entity::Player& player, const Common::Lan
     return;
 
   auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
-  if( !land )
-    return;
-
-  if( !hasPermission( player, *land, 0 ) )
+  if( !land || !hasPermission( player, *land, 0 ) )
     return;
 
   auto house = land->getHouse();
@@ -813,10 +806,7 @@ void HousingMgr::requestEstateEditGuestAccess( Entity::Player& player, const Com
     return;
 
   auto land = hZone->getLand( ident.landId );
-  if( !land )
-    return;
-
-  if( !hasPermission( player, *land, 0 ) )
+  if( !land || !hasPermission( player, *land, 0 ) )
     return;
 
   auto packet = makeZonePacket< FFXIVIpcHousingWelcome >( player.getId() );
@@ -880,10 +870,7 @@ void HousingMgr::sendEstateInventory( Entity::Player& player, uint16_t inventory
     targetLand = zone->getLand( plotNum );
   }
 
-  if( !targetLand )
-    return;
-
-  if( !hasPermission( player, *targetLand, 0 ) )
+  if( !targetLand || !hasPermission( player, *targetLand, 0 ) )
     return;
 
   auto& containers = getEstateInventory( targetLand->getLandIdent() );
@@ -1018,10 +1005,7 @@ void HousingMgr::reqPlaceHousingItem( Entity::Player& player, uint16_t landId, u
   else
     return;
 
-  if( !land )
-    return;
-
-  if( !hasPermission( player, *land, 0 ) )
+  if( !land || !hasPermission( player, *land, 0 ) )
     return;
 
   // todo: check item position and make sure it's not outside the plot
@@ -1275,10 +1259,7 @@ void HousingMgr::reqMoveHousingItem( Entity::Player& player, Common::LandIdent i
   auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
   auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
 
-  if( !land )
-    return;
-
-  if( !hasPermission( player, *land, 0 ) )
+  if( !land || !hasPermission( player, *land, 0 ) )
     return;
 
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -1347,8 +1328,7 @@ bool HousingMgr::moveExternalItem( Entity::Player& player, Common::LandIdent ide
   auto& server = Common::Service< World::WorldServer >::ref();
 
   auto land = terri.getLand( static_cast< uint8_t >( ident.landId ) );
-
-  if( !hasPermission( player, *land, 0 ) )
+  if( !land || !hasPermission( player, *land, 0 ) )
     return false;
 
   auto& containers = getEstateInventory( ident );
@@ -1390,11 +1370,7 @@ void HousingMgr::reqRemoveHousingItem( Entity::Player& player, uint16_t plot, ui
     auto hZone = std::dynamic_pointer_cast< HousingZone >( pTeri );
 
     auto land = hZone->getLand( static_cast< uint8_t >( ident.landId ) );
-
-    if( !land )
-      return;
-
-    if( !hasPermission( player, *land, 0 ) )
+    if( !land || !hasPermission( player, *land, 0 ) )
       return;
 
     removeInternalItem( player, *terri, containerId, slot, sendToStoreroom );
@@ -1402,10 +1378,7 @@ void HousingMgr::reqRemoveHousingItem( Entity::Player& player, uint16_t plot, ui
   else if( auto terri = std::dynamic_pointer_cast< HousingZone >( pZone ) )
   {
     auto land = terri->getLand( static_cast< uint8_t >( plot ) );
-    if( !land )
-      return;
-
-    if( !hasPermission( player, *land, 0 ) )
+    if( !land || !hasPermission( player, *land, 0 ) )
       return;
 
     auto containerType = static_cast< Common::InventoryType >( containerId );

@@ -69,10 +69,10 @@ void Util::Packet::sendBaseParams( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), statPacket );
 }
 
-void Util::Packet::sendHudParam( Entity::Player& player )
+void Util::Packet::sendHudParam( Entity::Chara& source )
 {
-  auto hudParamPacket = makeHudParam( player );
-  server().queueForPlayer( player.getCharacterId(), hudParamPacket );
+  auto hudParamPacket = makeHudParam( source );
+  server().queueForPlayers( source.getInRangePlayerIds( source.isPlayer() ), hudParamPacket );
 }
 
 void Util::Packet::sendStatusUpdate( Entity::Player& player )
@@ -136,10 +136,10 @@ void Util::Packet::sendActorControlSelf( Entity::Player& player, uint16_t catego
   server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), category, param1, param2, param3, param4, param5 ) );
 }
 
-void Util::Packet::sendActorControlSelf( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1,
+void Util::Packet::sendActorControlSelf( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
                                          uint32_t param2, uint32_t param3, uint32_t param4, uint32_t param5 )
 {
-  server().queueForPlayers( characterIds, makeActorControlSelf( player.getId(), category, param1, param2, param3, param4, param5 ) );
+  server().queueForPlayers( characterIds, makeActorControlSelf( srcId, category, param1, param2, param3, param4, param5 ) );
 }
 
 void Util::Packet::sendActorControl( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4 )
@@ -147,10 +147,10 @@ void Util::Packet::sendActorControl( Entity::Player& player, uint16_t category, 
   server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), category, param1, param2, param3, param4 ) );
 }
 
-void Util::Packet::sendActorControl( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1,
+void Util::Packet::sendActorControl( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
                                      uint32_t param2, uint32_t param3, uint32_t param4 )
 {
-  server().queueForPlayers( characterIds, makeActorControl( player.getId(), category, param1, param2, param3, param4 ) );
+  server().queueForPlayers( characterIds, makeActorControl( srcId, category, param1, param2, param3, param4 ) );
 }
 
 void Util::Packet::sendActorControlTarget( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
@@ -159,10 +159,10 @@ void Util::Packet::sendActorControlTarget( Entity::Player& player, uint16_t cate
   server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), category, param1, param2, param3, param4, param5, param6 ) );
 }
 
-void Util::Packet::sendActorControlTarget( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1,
+void Util::Packet::sendActorControlTarget( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
                                            uint32_t param2, uint32_t param3, uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  server().queueForPlayers( characterIds, makeActorControlTarget( player.getId(), category, param1, param2, param3, param4, param5, param6 ) );
+  server().queueForPlayers( characterIds, makeActorControlTarget( srcId, category, param1, param2, param3, param4, param5, param6 ) );
 }
 
 void Util::Packet::sendTitleList( Entity::Player& player )
@@ -243,13 +243,13 @@ void Util::Packet::sendMount( Entity::Player& player )
   auto inRangePlayerIds = player.getInRangePlayerIds( true );
   if( mountId != 0 )
   {
-    Network::Util::Packet::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) );
-    Network::Util::Packet::sendActorControlSelf( inRangePlayerIds, player, 0x39e, 12 );
+    Network::Util::Packet::sendActorControl( inRangePlayerIds, player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) );
+    Network::Util::Packet::sendActorControlSelf( inRangePlayerIds, player.getId(), 0x39e, 12 );
   }
   else
   {
-    Network::Util::Packet::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-    Network::Util::Packet::sendActorControlSelf( inRangePlayerIds, player, Dismount, 1 );
+    Network::Util::Packet::sendActorControl( inRangePlayerIds, player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+    Network::Util::Packet::sendActorControlSelf( inRangePlayerIds, player.getId(), Dismount, 1 );
   }
   auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
   mountPacket->data().id = mountId;

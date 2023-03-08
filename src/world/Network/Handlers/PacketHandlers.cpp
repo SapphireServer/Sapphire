@@ -84,7 +84,7 @@ void Sapphire::Network::GameConnection::setProfileHandler( const Packets::FFXIVA
   strcpy( searchInfoPacket->data().SearchComment, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
 
-  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player, SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) );
 }
 
 void Sapphire::Network::GameConnection::getProfileHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )

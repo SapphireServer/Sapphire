@@ -642,7 +642,7 @@ void Player::levelUp()
   m_mp = getMaxMp();
 
   setLevel( getLevel() + 1 );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), *this, LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
 
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
@@ -718,7 +718,7 @@ void Player::setClassJob( Common::ClassJob classJob )
   m_tp = 0;
 
   Network::Util::Packet::sendStatusUpdate( *this );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), *this, ClassJobChange, 4 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), ClassJobChange, 4 );
   Network::Util::Packet::sendHudParam( *this );
   Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
@@ -1193,7 +1193,7 @@ void Player::setTitle( uint16_t titleId )
     return;
 
   m_activeTitle = titleId;
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), *this, SetTitle, titleId );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetTitle, titleId );
 }
 
 const Player::AchievementData& Player::getAchievementData() const
@@ -1258,7 +1258,7 @@ void Player::setCompanion( uint8_t id )
 
   m_companionId = id;
 
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), *this, ToggleCompanion, id );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), ToggleCompanion, id );
 }
 
 uint8_t Player::getCurrentCompanion() const
@@ -1826,7 +1826,7 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
         // no mercy on hated players
         takeDamage( damage );
       }
-      Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), *this, SetFallDamage, damage );
+      Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetFallDamage, damage );
     }
   }
 }

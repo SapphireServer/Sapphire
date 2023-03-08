@@ -43,19 +43,19 @@
 #include <Task/ActionIntegrityTask.h>
 #include <Service.h>
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
+using namespace Sapphire::Entity;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 using namespace Sapphire::World::Manager;
 
-Sapphire::Entity::BNpc::BNpc() :
-  Npc( ObjKind::BattleNpc )
+BNpc::BNpc() : Npc( ObjKind::BattleNpc )
 {
 }
 
-Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone ) :
-  Npc( ObjKind::BattleNpc )
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone ) : Npc( ObjKind::BattleNpc )
 {
   m_id = id;
   m_pInfo = pInfo;
@@ -167,7 +167,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
 
 }
 
-Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
+BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, const Territory& zone, uint32_t hp, Common::BNpcType type ) :
   Npc( ObjKind::BattleNpc )
 {
   m_id = id;
@@ -269,54 +269,54 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstance
   calculateStats();
 }
 
-Sapphire::Entity::BNpc::~BNpc() = default;
+BNpc::~BNpc() = default;
 
-uint8_t Sapphire::Entity::BNpc::getAggressionMode() const
+uint8_t BNpc::getAggressionMode() const
 {
   return m_aggressionMode;
 }
 
-float Sapphire::Entity::BNpc::getNaviTargetReachedDistance() const
+float BNpc::getNaviTargetReachedDistance() const
 {
   return m_naviTargetReachedDistance;
 }
 
-uint8_t Sapphire::Entity::BNpc::getEnemyType() const
+uint8_t BNpc::getEnemyType() const
 {
   return m_enemyType;
 }
 
-uint64_t Sapphire::Entity::BNpc::getWeaponMain() const
+uint64_t BNpc::getWeaponMain() const
 {
   return m_weaponMain;
 }
 
-uint64_t Sapphire::Entity::BNpc::getWeaponSub() const
+uint64_t BNpc::getWeaponSub() const
 {
   return m_weaponSub;
 }
 
-uint16_t Sapphire::Entity::BNpc::getModelChara() const
+uint16_t BNpc::getModelChara() const
 {
   return m_modelChara;
 }
 
-uint8_t Sapphire::Entity::BNpc::getLevel() const
+uint8_t BNpc::getLevel() const
 {
   return m_level;
 }
 
-uint32_t Sapphire::Entity::BNpc::getBNpcBaseId() const
+uint32_t BNpc::getBNpcBaseId() const
 {
   return m_bNpcBaseId;
 }
 
-uint32_t Sapphire::Entity::BNpc::getBNpcNameId() const
+uint32_t BNpc::getBNpcNameId() const
 {
   return m_bNpcNameId;
 }
 
-void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
+void BNpc::spawn( PlayerPtr pTarget )
 {
   m_lastRoamTargetReached = Util::getTimeSeconds();
 
@@ -324,26 +324,23 @@ void Sapphire::Entity::BNpc::spawn( PlayerPtr pTarget )
   server.queueForPlayer( pTarget->getCharacterId(), std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
 }
 
-void Sapphire::Entity::BNpc::despawn( PlayerPtr pTarget )
+void BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
-
-  auto& server = Common::Service< World::WorldServer >::ref();
-
-  server.queueForPlayer( pTarget->getCharacterId(), makeActorControlSelf( m_id, WarpStart, 0x04, getId(), 0x01 ) );
+  Network::Util::Packet::sendActorControl( *pTarget, WarpStart, 4, getId(), 1 );
 }
 
-Sapphire::Entity::BNpcState Sapphire::Entity::BNpc::getState() const
+BNpcState BNpc::getState() const
 {
   return m_state;
 }
 
-void Sapphire::Entity::BNpc::setState( BNpcState state )
+void BNpc::setState( BNpcState state )
 {
   m_state = state;
 }
 
-bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
+bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -380,7 +377,7 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   return false;
 }
 
-bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
+bool BNpc::moveTo( const Chara& targetChara )
 {
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
@@ -418,7 +415,7 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
   return false;
 }
 
-void Sapphire::Entity::BNpc::sendPositionUpdate()
+void BNpc::sendPositionUpdate()
 {
   uint8_t animationType = 2;
 
@@ -429,7 +426,7 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
   server().queueForPlayers( getInRangePlayerIds(), movePacket );
 }
 
-void Sapphire::Entity::BNpc::hateListClear()
+void BNpc::hateListClear()
 {
   for( auto& listEntry : m_hateList )
   {
@@ -439,7 +436,7 @@ void Sapphire::Entity::BNpc::hateListClear()
   m_hateList.clear();
 }
 
-uint32_t Sapphire::Entity::BNpc::hateListGetValue( const Sapphire::Entity::CharaPtr& pChara )
+uint32_t BNpc::hateListGetValue( const Sapphire::Entity::CharaPtr& pChara )
 {
   for( const auto& listEntry : m_hateList )
   {
@@ -452,7 +449,7 @@ uint32_t Sapphire::Entity::BNpc::hateListGetValue( const Sapphire::Entity::Chara
   return 0;
 }
 
-uint32_t Sapphire::Entity::BNpc::hateListGetHighestValue()
+uint32_t BNpc::hateListGetHighestValue()
 {
   auto it = m_hateList.begin();
   uint32_t maxHate = 0;
@@ -473,7 +470,7 @@ uint32_t Sapphire::Entity::BNpc::hateListGetHighestValue()
 }
 
 
-Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
+CharaPtr BNpc::hateListGetHighest()
 {
   auto it = m_hateList.begin();
   uint32_t maxHate = 0;
@@ -493,7 +490,7 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
   return nullptr;
 }
 
-void Sapphire::Entity::BNpc::hateListAdd( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
+void BNpc::hateListAdd( const CharaPtr& pChara, int32_t hateAmount )
 {
   auto hateEntry = std::make_shared< HateListEntry >();
   hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
@@ -507,14 +504,14 @@ void Sapphire::Entity::BNpc::hateListAdd( const Sapphire::Entity::CharaPtr& pCha
   }
 }
 
-void Sapphire::Entity::BNpc::hateListAddDelayed( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
+void BNpc::hateListAddDelayed( const CharaPtr& pChara, int32_t hateAmount )
 {
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-  auto delayedEmnityTask = std::make_shared< Sapphire::World::DelayedEmnityTask >( 5000, getAsBNpc(), pChara, hateAmount );
+  auto delayedEmnityTask = std::make_shared< World::DelayedEmnityTask >( 5000, getAsBNpc(), pChara, hateAmount );
   taskMgr.queueTask( delayedEmnityTask );
 }
 
-void Sapphire::Entity::BNpc::hateListUpdate( const Sapphire::Entity::CharaPtr& pChara, int32_t hateAmount )
+void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
 {
   bool hasEntry = false;
 
@@ -547,7 +544,7 @@ void Sapphire::Entity::BNpc::hateListUpdate( const Sapphire::Entity::CharaPtr& p
   }
 }
 
-void Sapphire::Entity::BNpc::hateListRemove( const Sapphire::Entity::CharaPtr& pChara )
+void BNpc::hateListRemove( const CharaPtr& pChara )
 {
   for( const auto& listEntry : m_hateList )
   {
@@ -565,23 +562,23 @@ void Sapphire::Entity::BNpc::hateListRemove( const Sapphire::Entity::CharaPtr& p
   }
 }
 
-uint32_t Sapphire::Entity::BNpc::getTriggerOwnerId() const
+uint32_t BNpc::getTriggerOwnerId() const
 {
   return m_triggerOwnerId;
 }
 
-void Sapphire::Entity::BNpc::setTriggerOwnerId( uint32_t triggerOwnerId )
+void BNpc::setTriggerOwnerId( uint32_t triggerOwnerId )
 {
   m_triggerOwnerId = triggerOwnerId;
 }
 
-bool Sapphire::Entity::BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
+bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
 {
   return std::any_of( m_hateList.begin(), m_hateList.end(),
                       [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
 }
 
-void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
+void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
   auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
@@ -591,7 +588,7 @@ void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
-  server().queueForPlayers( getInRangePlayerIds(), makeActorControl( getId(), ActorControlType::SetBattle, 1, 0, 0 ) );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle, 1 );
 
   changeTarget( pChara->getId() );
 
@@ -603,7 +600,7 @@ void Sapphire::Entity::BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 
 }
 
-void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
+void BNpc::deaggro( const CharaPtr& pChara )
 {
   if( !hateListHasActor( pChara ) )
     hateListRemove( pChara );
@@ -611,8 +608,8 @@ void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
   if( pChara->isPlayer() )
   {
     PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    server().queueForPlayers( getInRangePlayerIds(), makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
-    server().queueForPlayers( getInRangePlayerIds(), makeActorControl( getId(), ActorControlType::SetBattle, 0, 0, 0 ) );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
     tmpPlayer->onMobDeaggro( *this );
 
     if( getTriggerOwnerId() == pChara->getId() )
@@ -624,7 +621,7 @@ void Sapphire::Entity::BNpc::deaggro( const Sapphire::Entity::CharaPtr& pChara )
   }
 }
 
-void Sapphire::Entity::BNpc::onTick()
+void BNpc::onTick()
 {
   Chara::onTick();
   if( m_state == BNpcState::Retreat )
@@ -633,7 +630,7 @@ void Sapphire::Entity::BNpc::onTick()
   }
 }
 
-void Sapphire::Entity::BNpc::update( uint64_t tickCount )
+void BNpc::update( uint64_t tickCount )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -794,7 +791,7 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   Chara::update( tickCount );
 }
 
-void Sapphire::Entity::BNpc::restHp()
+void BNpc::restHp()
 {
   if( m_hp < getMaxHp() )
   {
@@ -809,7 +806,7 @@ void Sapphire::Entity::BNpc::restHp()
   sendHudParam();
 }
 
-void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource )
+void BNpc::onActionHostile( CharaPtr pSource )
 {
   if( !hateListGetHighest() )
     aggro( pSource );
@@ -820,7 +817,7 @@ void Sapphire::Entity::BNpc::onActionHostile( Sapphire::Entity::CharaPtr pSource
     setOwner( pSource );
 }
 
-void Sapphire::Entity::BNpc::onDeath()
+void BNpc::onDeath()
 {
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
@@ -851,17 +848,17 @@ void Sapphire::Entity::BNpc::onDeath()
   hateListClear();
 }
 
-uint32_t Sapphire::Entity::BNpc::getTimeOfDeath() const
+uint32_t BNpc::getTimeOfDeath() const
 {
   return m_timeOfDeath;
 }
 
-void Sapphire::Entity::BNpc::setTimeOfDeath( uint32_t timeOfDeath )
+void BNpc::setTimeOfDeath( uint32_t timeOfDeath )
 {
   m_timeOfDeath = timeOfDeath;
 }
 
-void Sapphire::Entity::BNpc::checkAggro()
+void BNpc::checkAggro()
 {
   // passive mobs should ignore players unless aggro'd
   if( m_aggressionMode == 1 )
@@ -925,7 +922,7 @@ void Sapphire::Entity::BNpc::checkAggro()
   }
 }
 
-void Sapphire::Entity::BNpc::setOwner( const Sapphire::Entity::CharaPtr& m_pChara )
+void BNpc::setOwner( const CharaPtr& m_pChara )
 {
   m_pOwner = m_pChara;
   auto targetId = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
@@ -937,35 +934,32 @@ void Sapphire::Entity::BNpc::setOwner( const Sapphire::Entity::CharaPtr& m_pChar
   setOwnerPacket->data().Id = targetId;
   server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
 
-  if( m_pChara != nullptr && m_pChara->isPlayer() )
-  {
-    auto letter = makeActorControl( getId(), ActorControlType::SetHateLetter, 1, getId(), 0 );
-    server().queueForPlayer( m_pChara->getAsPlayer()->getCharacterId(), letter );
-  }
+  if( m_pChara && m_pChara->isPlayer() )
+    Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), SetHateLetter, 1, getId(), 0 );
 
 }
 
-void Sapphire::Entity::BNpc::setLevelId( uint32_t levelId )
+void BNpc::setLevelId( uint32_t levelId )
 {
   m_levelId = levelId;
 }
 
-uint32_t Sapphire::Entity::BNpc::getLevelId() const
+uint32_t BNpc::getLevelId() const
 {
   return m_levelId;
 }
 
-bool Sapphire::Entity::BNpc::hasFlag( uint32_t flag ) const
+bool BNpc::hasFlag( uint32_t flag ) const
 {
   return m_flags & flag;
 }
 
-void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
+void BNpc::setFlag( uint32_t flag )
 {
   m_flags |= flag;
 }
 
-void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
+void BNpc::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
@@ -1001,7 +995,7 @@ void Sapphire::Entity::BNpc::autoAttack( CharaPtr pTarget )
   }
 }
 
-void Sapphire::Entity::BNpc::calculateStats()
+void BNpc::calculateStats()
 {
   auto level = getLevel();
   auto job = static_cast< uint8_t >( getClass() );
@@ -1044,28 +1038,28 @@ void Sapphire::Entity::BNpc::calculateStats()
 
 }
 
-uint32_t Sapphire::Entity::BNpc::getRank() const
+uint32_t BNpc::getRank() const
 {
   return m_rank;
 }
 
-uint32_t Sapphire::Entity::BNpc::getBoundInstanceId() const
+uint32_t BNpc::getBoundInstanceId() const
 {
   return m_boundInstanceId;
 }
 
-BNpcType Sapphire::Entity::BNpc::getBNpcType() const
+BNpcType BNpc::getBNpcType() const
 {
   return m_bnpcType;
 }
 
-uint32_t Sapphire::Entity::BNpc::getLayoutId() const
+uint32_t BNpc::getLayoutId() const
 {
   return m_layoutId;
 }
 
-void Sapphire::Entity::BNpc::init()
+void BNpc::init()
 {
-  m_maxHp = Sapphire::Math::CalcStats::calculateMaxHp( *getAsChara() );
+  m_maxHp = Math::CalcStats::calculateMaxHp( *getAsChara() );
   m_hp = m_maxHp;
 }
