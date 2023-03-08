@@ -182,6 +182,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         
         return;
       }
+      else if( tickCount < m_instanceResetTime )
+        return;
 
       if( m_instanceResetFinishTime == 0 )
       {
@@ -210,7 +212,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
         return;
       }
-      else if( tickCount < m_instanceResetTime )
+      else if( tickCount < m_instanceResetFinishTime )
         return;
 
       
