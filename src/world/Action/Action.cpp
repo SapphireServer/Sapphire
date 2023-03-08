@@ -517,8 +517,9 @@ void Action::Action::handleAction()
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto hasLutEntry = hasValidLutEntry();
+  auto hasScript = scriptMgr.onExecute( *this );
 
-  if( !scriptMgr.onExecute( *this ) && !hasLutEntry )
+  if( !hasScript && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
     {
@@ -528,9 +529,12 @@ void Action::Action::handleAction()
     return;
   }
 
+  if( !hasScript )
+    m_enableGenericHandler = true;
+
   Network::Util::Player::sendHudParam( *m_pSource->getAsPlayer() );
 
-  if( !hasLutEntry || m_hitActors.empty() )
+  if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_effectBuilder->buildAndSendPackets( m_hitActors );
@@ -961,4 +965,9 @@ void Action::Action::setAggroMultiplier( float aggroMultiplier )
 uint64_t Action::Action::getCastTimeRest() const
 {
   return m_castTimeRestMs;
+}
+
+void Action::Action::enableGenericHandler()
+{
+  m_enableGenericHandler = true;
 }
