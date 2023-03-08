@@ -95,6 +95,20 @@ namespace Sapphire
 
     void update( double deltaTime ) override
     {
+      // todo: better way to start fights here..
+
+      auto ifrit = getBNpc( IfritNormalData::IFRIT );
+
+      if( ifrit; ifrit->hateListGetHighestValue() != 0 && m_status == EncounterFightStatus::IDLE )
+      {
+        start();
+      }
+
+      if( m_status == EncounterFightStatus::ACTIVE && ifrit && !ifrit->hateListGetHighest()->isAlive() )
+      {
+        m_status = EncounterFightStatus::FAIL;
+      }
+      
       if( m_stateStack; !m_stateStack->empty() )
       {
         if( m_stateStack->top()->shouldFinish() )
@@ -110,7 +124,13 @@ namespace Sapphire
     void reset() override
     {
       auto boss = m_pInstance->getActiveBNpcByLayoutId( IfritNormalData::IFRIT );
-      m_pInstance->removeActor( boss );
+      if( boss )
+      {
+        removeBNpc( IfritNormalData::IFRIT );
+        m_pInstance->removeActor( boss );
+        
+      }
+      
 
       init();
     }
@@ -130,6 +150,11 @@ namespace Sapphire
       auto bnpc = m_bnpcs.find( layoutId );
       if( bnpc != std::end( m_bnpcs ) )
         return bnpc->second;
+    }
+
+    void removeBNpc( uint32_t layoutId ) override
+    {
+       m_bnpcs.erase( layoutId );
     }
   };
 }

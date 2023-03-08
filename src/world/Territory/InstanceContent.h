@@ -5,6 +5,7 @@
 #include "Event/Director.h"
 #include "Forwards.h"
 #include <Exd/Structs.h>
+#include <memory>
 
 namespace Sapphire
 {
@@ -214,6 +215,8 @@ namespace Sapphire
 
     // the players which are bound to the instance, regardless of inside or offline
     std::set< uint32_t > m_boundPlayerIds;
+
+    EncounterFightPtr m_pEncounter;
   };
 
 }

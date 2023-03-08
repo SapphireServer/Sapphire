@@ -58,6 +58,7 @@ namespace Sapphire
 
     virtual void addState( EncounterState::EncounterStatePtr pState, bool initState = true ) = 0;
     virtual void addBNpc( Entity::BNpcPtr pBNpc ) = 0;
+    virtual void removeBNpc( uint32_t layoutId ) = 0;
     virtual Entity::BNpcPtr getBNpc( uint32_t layoutId ) = 0;
 
     virtual EncounterFightStatus getEncounterFightStatus() const = 0;
