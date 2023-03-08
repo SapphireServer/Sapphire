@@ -122,6 +122,8 @@ namespace Sapphire
 
     void sendDutyCommence();
 
+    void sendDutyReset();
+
     void sendForward();
 
     void sendDutyFailed( bool force );
@@ -192,6 +194,8 @@ namespace Sapphire
     bool isTerminationReady() const;
 
     size_t getInstancePlayerCount() const;
+
+    void movePlayerToEntrance( Entity::Player& player );
   private:
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > m_instanceConfiguration;
     std::shared_ptr< Excel::ExcelStruct< Excel::ContentFinderCondition > > m_contentFinderCondition;
@@ -203,6 +207,7 @@ namespace Sapphire
     uint32_t m_instanceExpireTime;
     uint64_t m_instanceTerminateTime;
     uint64_t m_instanceCommenceTime;
+    uint64_t m_instanceResetTime;
 
     bool m_voteState;
     bool m_instanceTerminate;
