@@ -687,10 +687,6 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
   {
     script->onInit( instance );
 
-    auto arenaScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceArenaScript >( instance.getDirectorId() );
-    if( arenaScript )
-      arenaScript->onInit( instance );
-
     return true;
   }
 
@@ -705,9 +701,6 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance
   {
     script->onUpdate( instance, tickCount );
 
-    auto arenaScript = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceArenaScript >( instance.getDirectorId() );
-    if( arenaScript )
-      arenaScript->onUpdate( instance, tickCount );
     return true;
   }
 
