@@ -67,6 +67,6 @@ namespace Sapphire
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
     InstanceContentPtr m_pInstance;
-    EncounterFightStatus m_status;
+    EncounterFightStatus m_status{ EncounterFightStatus::IDLE };
   };
 }

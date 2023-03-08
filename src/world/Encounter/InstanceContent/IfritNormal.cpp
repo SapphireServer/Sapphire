@@ -64,6 +64,8 @@ namespace Sapphire
 
     void init() override
     {
+      m_status = EncounterFightStatus::IDLE;
+
       m_stateStack = std::make_shared< EncounterState::StateStack >();
 
       // todo: i don't like this
@@ -87,6 +89,8 @@ namespace Sapphire
     {
       auto ifritInitState = std::make_shared< IfritStateOne >( shared_from_this() );
       addState( ifritInitState );
+
+      m_status = EncounterFightStatus::ACTIVE;
     }
 
     void update( double deltaTime ) override
