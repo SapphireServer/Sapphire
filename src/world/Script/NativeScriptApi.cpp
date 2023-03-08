@@ -290,6 +290,5 @@ namespace Sapphire::ScriptAPI
                                             uint16_t param1, uint16_t param2 )
   {
   }
-
 }
 

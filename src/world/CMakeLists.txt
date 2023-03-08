@@ -9,24 +9,26 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         Action/*.cpp
         ContentFinder/*.cpp
         DebugCommand/*.cpp
+        Encounter/*.cpp
+        Encounter/InstanceContent/*.cpp
         Event/*.cpp
         FreeCompany/*.cpp
         Inventory/*.cpp
         Linkshell/*.cpp
         Manager/*.cpp
         Math/*.cpp
+        Navi/*.cpp
         Network/*.cpp
         Network/Util/*.cpp
         Network/Handlers/*.cpp
         Network/PacketWrappers/*.cpp
+        Quest/*.cpp
         Script/*.cpp
         StatusEffect/*.cpp
+        Task/*.cpp
         Territory/*.cpp
         Territory/Housing/*.cpp
-        Util/*.cpp
-        Navi/*.cpp
-        Task/*.cpp
-        Quest/*.cpp )
+        Util/*.cpp )
 
 add_executable( world ${SERVER_SOURCE_FILES} )
 
