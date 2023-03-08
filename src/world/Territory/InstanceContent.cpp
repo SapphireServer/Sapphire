@@ -177,7 +177,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       // todo: revive players if trial/enclosed raid arena, add reset timer
       if( m_instanceResetTime == 0 )
       {
-        //sendDutyReset();
+        sendDutyReset();
         m_instanceResetTime = tickCount + 3000;
         
         return;
@@ -187,7 +187,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
       if( m_instanceResetFinishTime == 0 )
       {
-        m_instanceResetFinishTime = tickCount + 3000;
+        m_instanceResetFinishTime = tickCount + 5000;
         m_pEncounter->reset();
 
         auto& server = Common::Service< World::WorldServer >::ref();
@@ -202,6 +202,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
           movePlayerToEntrance( *pPlayer );
           auto zoneInPacket = makeActorControlSelf( pPlayer->getId(), Appear, 0x3, 0, 0, 0 );
           auto setStatusPacket = makeActorControl( pPlayer->getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+          
 
           server.queueForPlayer( pPlayer->getCharacterId(), zoneInPacket );
           server.queueForPlayers( pPlayer->getInRangePlayerIds( true ), setStatusPacket );
