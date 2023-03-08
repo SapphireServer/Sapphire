@@ -8,28 +8,6 @@ namespace Sapphire
     static constexpr int IFRIT = 4126276;
     static constexpr int HELLFIRE = 0;
   };
-  class IfritStateOne : public EncounterState
-  {
-  public:
-    IfritStateOne( EncounterFightPtr pEncounter ) : EncounterState( pEncounter )
-    {
-    }
-
-    void init() override
-    {
-      Logger::info( "ifrit FAN CLUB GEOcities <blink>EUNUCH ONLY</blink>" );
-    }
-
-    void update( double deltaTime ) override
-    {
-      auto pIfrit = m_pEncounter->getBNpc( IfritNormalData::IFRIT );
-    }
-
-    void finish() override
-    {
-
-    }
-  };
 
   class IfritStateTwo : public EncounterState
   {
@@ -43,16 +21,72 @@ namespace Sapphire
       Logger::info( "ifrit FAN CLUB GEOcities <blink>EUNUCH ONLY</blink>" );
     }
 
-    void update( double deltaTime ) override
+    void update( uint64_t deltaTime ) override
     {
+      if( m_startTime == 0 )
+        m_startTime = deltaTime;
+
+      auto timeElapsedMs = deltaTime - m_startTime;
+
       auto pIfrit = m_pEncounter->getBNpc( IfritNormalData::IFRIT );
+
+      pIfrit->setRot( pIfrit->getRot() - .2f );
+      pIfrit->sendPositionUpdate();
+
+      if( timeElapsedMs > 5000 )
+      {
+        m_bShouldFinish = true;
+      }
     }
 
     void finish() override
     {
+      Logger::info( "stage 2 done, going back to stage 1" );
     }
   };
 
+
+  class IfritStateOne : public EncounterState
+  {
+  public:
+    IfritStateOne( EncounterFightPtr pEncounter ) : EncounterState( pEncounter )
+    {
+    }
+
+    void init() override
+    {
+      Logger::info( "ifrit FAN CLUB GEOcities <blink>EUNUCH ONLY</blink>" );
+    }
+
+    void update( uint64_t deltaTime ) override
+    {
+      if( m_startTime == 0 )
+        m_startTime = deltaTime;
+
+      auto timeElapsedMs = deltaTime - m_startTime;
+
+      auto pIfrit = m_pEncounter->getBNpc( IfritNormalData::IFRIT );
+
+      pIfrit->setRot( pIfrit->getRot() + .2f );
+      pIfrit->sendPositionUpdate();
+
+      if( timeElapsedMs > 5000 )
+      {
+        auto ifritTwoState = std::make_shared< IfritStateTwo >( m_pEncounter );
+        m_pEncounter->addState( ifritTwoState );
+      }
+
+      if( timeElapsedMs > 10000 )
+      {
+        pIfrit->hateListGetHighest()->die();
+      }
+    }
+
+    void finish() override
+    {
+
+    }
+  };
 
   class IfritEncounterFight : public EncounterFight
   {
@@ -65,6 +99,7 @@ namespace Sapphire
     void init() override
     {
       m_status = EncounterFightStatus::IDLE;
+      m_startTime = 0;
 
       m_stateStack = std::make_shared< EncounterState::StateStack >();
 
@@ -93,7 +128,7 @@ namespace Sapphire
       m_status = EncounterFightStatus::ACTIVE;
     }
 
-    void update( double deltaTime ) override
+    void update( uint64_t deltaTime ) override
     {
       // todo: better way to start fights here..
 
@@ -101,6 +136,7 @@ namespace Sapphire
 
       if( ifrit; ifrit->hateListGetHighestValue() != 0 && m_status == EncounterFightStatus::IDLE )
       {
+        m_startTime = deltaTime;
         start();
       }
 
@@ -108,7 +144,7 @@ namespace Sapphire
       {
         m_status = EncounterFightStatus::FAIL;
       }
-      
+
       if( m_stateStack; !m_stateStack->empty() )
       {
         if( m_stateStack->top()->shouldFinish() )
@@ -150,6 +186,8 @@ namespace Sapphire
       auto bnpc = m_bnpcs.find( layoutId );
       if( bnpc != std::end( m_bnpcs ) )
         return bnpc->second;
+
+      return nullptr;
     }
 
     void removeBNpc( uint32_t layoutId ) override
