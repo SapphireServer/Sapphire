@@ -208,6 +208,7 @@ namespace Sapphire
     uint64_t m_instanceTerminateTime;
     uint64_t m_instanceCommenceTime;
     uint64_t m_instanceResetTime;
+    uint64_t m_instanceResetFinishTime;
 
     bool m_voteState;
     bool m_instanceTerminate;
