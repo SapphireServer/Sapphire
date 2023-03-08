@@ -692,11 +692,11 @@ namespace Sapphire::Common
     MpLoss = 10,
     MpGain = 11,
     TpLoss = 12,
-    TpGain = 13,
-    GpGain = 14,
-    ApplyStatusEffectTarget = 15,
-    ApplyStatusEffectSource = 16, // effect entry on target but buff applies to source, like storm's eye
-    StatusNoEffect = 20, // shifted one up from 5.18
+    //TpGain = 13, // everything below shifted one up since 5.2
+    GpGain = 13,
+    ApplyStatusEffectTarget = 14,
+    ApplyStatusEffectSource = 15, // effect entry on target but buff applies to source, like storm's eye
+    StatusNoEffect = 20,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
@@ -704,10 +704,10 @@ namespace Sapphire::Common
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
     Provoke = 24,
-    StartActionCombo = 27, // shifted one up from 5.18
-    ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
+    StartActionCombo = 27,
+    ComboSucceed = 28,  // two more values inserted between this and Mount since 5.2
     Knockback = 33,
-    Mount = 40, // shifted one down from 5.18
+    Mount = 40,
     VFX = 59, // links to VFX sheet
   };
 

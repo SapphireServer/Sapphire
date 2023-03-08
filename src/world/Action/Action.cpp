@@ -504,6 +504,7 @@ void Action::Action::buildEffects()
   }
 
   uint8_t victimCounter = 0, validVictimCounter = 0;
+  Entity::CharaPtr firstValidVictim = nullptr;
 
   for( auto& actor : m_hitActors )
   {
@@ -576,9 +577,7 @@ void Action::Action::buildEffects()
         else
           m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100 );
 
-        auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first,
-          attackType == Common::AttackType::Physical ? Common::ActionTypeFilter::Physical :
-          ( attackType == Common::AttackType::Magical ? Common::ActionTypeFilter::Magical : Common::ActionTypeFilter::Unknown ) );
+        auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first, getActionTypeFilterFromAttackType( attackType ) );
         if( reflectDmg.first > 0 )
         {
           m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected, getExecutionDelay() + victimCounter * 100 );
@@ -624,7 +623,7 @@ void Action::Action::buildEffects()
           }
         }
 
-        if( validVictimCounter == 0 )
+        if( validVictimCounter == 0 ) // effects only apply once if aoe, on first valid target (can be single target action as well)
         {
           if( isCorrectCombo() )
             m_effectBuilder->comboSucceed( actor );
@@ -697,6 +696,8 @@ void Action::Action::buildEffects()
             }
           }
         }
+        if( validVictimCounter == 0 )
+          firstValidVictim = actor;
         validVictimCounter++;
       }
     }
@@ -718,7 +719,12 @@ void Action::Action::buildEffects()
   if( m_lutEntry.selfStatus != 0 )
   {
     if( !isComboAction() || isCorrectCombo() )
-      m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam );
+    {
+      if( firstValidVictim )
+        m_effectBuilder->applyStatusEffect( firstValidVictim, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam, getExecutionDelay(), true );
+      else
+        m_effectBuilder->applyStatusEffect( m_pSource, m_pSource, m_lutEntry.selfStatus, m_lutEntry.selfStatusDuration, m_lutEntry.selfStatusParam, getExecutionDelay() );
+    }
   }
 
   scriptMgr.onBeforeBuildEffect( *this, victimCounter, validVictimCounter );
