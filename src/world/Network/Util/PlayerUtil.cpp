@@ -291,10 +291,12 @@ void Util::Player::sendPlayerSetup( Entity::Player& player )
 void Util::Player::sendChangeClass( Entity::Player& player )
 {
   auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
+  auto& borrowAction = player.getBorrowAction();
   classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
   classInfo->data().Lv = player.getLevel();
   classInfo->data().Lv1 = player.getLevel();
   classInfo->data().Login = player.isLogin() ? 1 : 0;
+  memcpy( &classInfo->data().BorrowAction[ 0 ], borrowAction.data(), borrowAction.size() * 4 );
   server().queueForPlayer( player.getCharacterId(), classInfo );
 }
 

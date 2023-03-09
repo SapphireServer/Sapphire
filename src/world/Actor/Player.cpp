@@ -563,6 +563,22 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
   Network::Util::Player::sendActorControlSelf( *this, SetRewardFlag, unlock, 1 );
 }
 
+void Player::setBorrowAction( uint8_t slot, uint32_t action )
+{
+  if( slot > Common::ARRSIZE_BORROWACTION )
+    return;
+
+  auto& borrowAction = getBorrowAction();
+  borrowAction[ slot ] = action;
+}
+
+Player::BorrowAction& Player::getBorrowAction()
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast<uint8_t>( getClass() ) )->data().WorkIndex;
+  return m_borrowActions[ classJobIndex ];
+}
+
 void Player::learnSong( uint8_t songId, uint32_t itemId )
 {
   uint16_t index;

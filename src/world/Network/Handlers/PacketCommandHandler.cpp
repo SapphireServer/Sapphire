@@ -497,6 +497,11 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       Network::Util::Player::sendTitleList( player );
       break;
     }
+    case PacketCommand::BORROW_ACTION:
+    {
+      player.setBorrowAction( static_cast< uint8_t >( data.Arg1 ), data.Arg2 );
+      break;
+    }
     case PacketCommand::SET_HOWTO: // Update howtos seen
     {
       player.updateHowtosSeen( data.Arg0 );

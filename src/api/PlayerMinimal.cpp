@@ -256,12 +256,14 @@ void PlayerMinimal::saveAsNew()
       break;
   }
 
-  // CharacterId, ClassIdx, Exp, Lvl
+  // CharacterId, ClassIdx, Exp, Lvl, BorrowAction
   auto stmtClass = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_INS );
   stmtClass->setUInt64( 1, m_characterId );
   stmtClass->setInt( 2, g_exdData.getRow< Excel::ClassJob >( m_class )->data().WorkIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, 1 );
+  std::vector< uint8_t > borrowActionVec( Common::ARRSIZE_BORROWACTION * 4 );
+  stmtClass->setBinary( 5, borrowActionVec );
   g_charaDb.directExecute( stmtClass );
 
   auto stmtSearchInfo = g_charaDb.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEARCHINFO_INS );

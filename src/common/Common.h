@@ -37,6 +37,7 @@ namespace Sapphire::Common
   const uint16_t ARRSIZE_UNLOCKS = 64u;
   const uint16_t ARRSIZE_ORCHESTRION = 40u;
   const uint16_t ARRSIZE_MONSTERNOTE = 12u;
+  const uint16_t ARRSIZE_BORROWACTION = 10u;
 
   const uint8_t TOWN_COUNT = 6;
 

@@ -1,0 +1,1 @@
+ALTER TABLE `characlass` ADD `BorrowAction` binary(40) DEFAULT NULL NULL AFTER `Lvl`;
