@@ -70,21 +70,25 @@ namespace Sapphire
       pIfrit->setRot( pIfrit->getRot() + .2f );
       pIfrit->sendPositionUpdate();
 
+      if( timeElapsedMs > 10000 )
+      {
+        m_bShouldFinish = true;
+        return;
+      }
+
       if( timeElapsedMs > 5000 )
       {
         auto ifritTwoState = std::make_shared< IfritStateTwo >( m_pEncounter );
         m_pEncounter->addState( ifritTwoState );
       }
-
-      if( timeElapsedMs > 12000 )
-      {
-        pIfrit->hateListGetHighest()->die();
-      }
     }
 
     void finish() override
     {
+      Logger::info( "stage 1 finish - enrage" );
 
+      auto pIfrit = m_pEncounter->getBNpc( IfritNormalData::IFRIT );
+      pIfrit->hateListGetHighest()->die();
     }
   };
 
@@ -152,8 +156,9 @@ namespace Sapphire
           m_stateStack->top()->finish();
           m_stateStack->pop();
         }
-          
-        m_stateStack->top()->update( deltaTime );
+
+        if( !m_stateStack->empty() )
+          m_stateStack->top()->update( deltaTime );
       }
     }
 
@@ -166,7 +171,6 @@ namespace Sapphire
         m_pInstance->removeActor( boss );
         
       }
-      
 
       init();
     }
