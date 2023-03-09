@@ -23,8 +23,6 @@ public:
 
   std::unordered_map< Common::ParamModifier, int32_t >& getModifiers();
 
-  void setModifiers( std::vector< World::Action::StatusModifier > modifiers );
-
   void setModifier( Common::ParamModifier paramModifier, int32_t value );
 
   void delModifier( Common::ParamModifier paramModifier );
