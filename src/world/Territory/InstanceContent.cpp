@@ -16,7 +16,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/EventMgr.h"
-
+#include "Manager/WarpMgr.h"
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
@@ -29,6 +29,7 @@
 #include "InstanceObjectCache.h"
 
 #include <Encounter/InstanceContent/IfritNormal.h>
+#include <Task/MoveTerritoryTask.h>
 
 
 using namespace Sapphire::Common;
@@ -118,7 +119,7 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
   Logger::debug( "InstanceContent::onLeaveTerritory: Territory#{0}|{1}, Entity#{2}",
                  getGuId(), getTerritoryTypeId(), player.getId() );
 
-  unbindPlayer( player.getId() );
+  //unbindPlayer( player.getId() );
 
   clearDirector( player );
 
@@ -190,6 +191,9 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         m_instanceResetFinishTime = tickCount + 5000;
         m_pEncounter->reset();
 
+        std::vector< Entity::PlayerPtr > playerList;
+
+        auto& warpMgr = Common::Service< WarpMgr >::ref();
         auto& server = Common::Service< World::WorldServer >::ref();
         for( const auto& playerIt : m_playerMap )
         {
@@ -200,12 +204,13 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
           pPlayer->setStatus( Common::ActorStatus::Idle );
 
           movePlayerToEntrance( *pPlayer );
-          auto zoneInPacket = makeActorControlSelf( pPlayer->getId(), Appear, 0x3, 0, 0, 0 );
-          auto setStatusPacket = makeActorControl( pPlayer->getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-          
 
-          server.queueForPlayer( pPlayer->getCharacterId(), zoneInPacket );
-          server.queueForPlayers( pPlayer->getInRangePlayerIds( true ), setStatusPacket );
+          playerList.push_back( pPlayer );
+        }
+
+        for( const auto& pPlayer : playerList )
+        {
+          warpMgr.requestMoveTerritory( *pPlayer, WarpType::WARP_TYPE_INSTANCE_CONTENT, getGuId(), pPlayer->getPos(), pPlayer->getRot() );
         }
 
         if( m_pEntranceEObj )
@@ -216,11 +221,23 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       else if( tickCount < m_instanceResetFinishTime )
         return;
 
-      
+      for( const auto& playerIt : m_playerMap )
+      {
+        auto pPlayer = playerIt.second;
+
+        if( !pPlayer->isLoadingComplete() ||
+            !pPlayer->isDirectorInitialized() ||
+            pPlayer->hasCondition( PlayerCondition::WatchingCutscene ) )
+          return;
+      }
+
       m_pEntranceEObj->setPermissionInvisibility( 1 );
       sendForward();
       
       m_state = DutyInProgress;
+
+      m_instanceResetTime = 0;
+      m_instanceResetFinishTime = 0;
       break;
     }
 
@@ -542,7 +559,7 @@ void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& 
     if( rect )
       player.setRot( Util::eulerToDirection( { rect->header.transform.rotation.x, rect->header.transform.rotation.y, rect->header.transform.rotation.z } ) );
     else
-      player.setRot( PI );
+      player.setRot( PI - PI / 2 );
     player.setPos( m_pEntranceEObj->getPos() );
   }
   else if( rect )
@@ -552,7 +569,7 @@ void Sapphire::InstanceContent::movePlayerToEntrance( Sapphire::Entity::Player& 
   }
   else
   {
-    player.setRot( PI );
+    player.setRot( PI - PI / 2 );
     player.setPos( { 0.f, 0.f, 0.f } );
   }
 }
