@@ -434,7 +434,7 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
   // TODO: actually use permissions here for FC houses
   if( !pLand || !hasPermission( player, *pLand, 0 ) )
   {
-    Network::Util::Packet::sendActorControlSelf( player, ActorControl::LogMsg, 3304 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::LogMsg, 3304 );
     return false;
   }
 
@@ -442,7 +442,7 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
   // TODO: additionally check for yard items
   if( pLand->getHouse() )
   {
-    Network::Util::Packet::sendActorControlSelf( player, ActorControl::LogMsg, 3315 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::LogMsg, 3315 );
     return false;
   }
 
@@ -458,7 +458,7 @@ bool HousingMgr::relinquishLand( Entity::Player& player, HousingZone& zone, uint
 
   sendLandFlagsSlot( player, Common::LandFlagsSlot::Private );
 
-  Network::Util::Packet::sendActorControlSelf( player, ActorControl::LogMsg, 3351, 0x1AA, pLand->getLandIdent().wardNum + 1, plot + 1 );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::LogMsg, 3351, 0x1AA, pLand->getLandIdent().wardNum + 1, plot + 1 );
   zone.sendLandUpdate( plot );
   return true;
 }
@@ -700,7 +700,7 @@ void HousingMgr::buildPresetEstate( Entity::Player& player, HousingZone& zone, u
   pLand->setLandType( Common::LandType::Private );
   zone.sendLandUpdate( plotNum );
 
-  Network::Util::Packet::sendActorControl( player, ActorControl::BuildPresetResponse, plotNum );
+  Network::Util::Packet::sendActorControl( player, player.getId(), ActorControl::BuildPresetResponse, plotNum );
 
   pLand->updateLandDb();
 
@@ -1043,7 +1043,7 @@ void HousingMgr::reqPlaceHousingItem( Entity::Player& player, uint16_t landId, u
     status = placeInteriorItem( player, item );
 
   if( status )
-    Network::Util::Packet::sendActorControlSelf( player, 0x3f3 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), 0x3f3 );
   else
     PlayerMgr::sendUrgent( player, "An internal error occurred when placing the item." );
 }
@@ -1318,7 +1318,7 @@ bool HousingMgr::moveInternalItem( Entity::Player& player, Common::LandIdent ide
   // send confirmation to player
   uint32_t param1 = static_cast< uint32_t >( ( ident.landId << 16 ) | containerId );
 
-  Network::Util::Packet::sendActorControlSelf( player, ActorControl::HousingItemMoveConfirm, param1, slotIdx );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::HousingItemMoveConfirm, param1, slotIdx );
 
   return true;
 }
@@ -1351,7 +1351,7 @@ bool HousingMgr::moveExternalItem( Entity::Player& player, Common::LandIdent ide
   terri.updateYardObjectPos( player, slot, static_cast< uint16_t >( ident.landId ), *item );
 
   uint32_t param1 = static_cast< uint32_t >( ( ident.landId << 16 ) | Common::InventoryType::HousingExteriorPlacedItems );
-  Network::Util::Packet::sendActorControlSelf( player, ActorControl::HousingItemMoveConfirm, param1, slot );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::HousingItemMoveConfirm, param1, slot );
 
   return true;
 }
@@ -1581,7 +1581,7 @@ void HousingMgr::reqEstateExteriorRemodel( Entity::Player& player, uint16_t plot
 
   invMgr.sendInventoryContainer( player, it->second );
 
-  Network::Util::Packet::sendActorControlSelf( player, ActorControl::ShowEstateExternalAppearanceUI, plot );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::ShowEstateExternalAppearanceUI, plot );
 }
 
 void HousingMgr::reqEstateInteriorRemodel( Entity::Player& player )
@@ -1618,7 +1618,7 @@ void HousingMgr::reqEstateInteriorRemodel( Entity::Player& player )
 
   invMgr.sendInventoryContainer( player, it->second );
 
-  Network::Util::Packet::sendActorControlSelf( player, ActorControl::ShowEstateInternalAppearanceUI );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::ShowEstateInternalAppearanceUI );
 }
 
 bool HousingMgr::hasPermission( Entity::Player& player, Sapphire::Land& land, uint32_t permission )
@@ -1661,7 +1661,7 @@ void HousingMgr::removeHouse( Entity::Player& player, uint16_t plot )
   // TODO: actually use permissions here for FC houses
   if( !hasPermission( player, *pLand, 0 ) )
   {
-    Network::Util::Packet::sendActorControlSelf( player, ActorControl::LogMsg, 3305 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControl::LogMsg, 3305 );
     return;
   }
 

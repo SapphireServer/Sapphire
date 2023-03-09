@@ -85,7 +85,7 @@ void Sapphire::Event::Director::sendEventLogMessage( Sapphire::Entity::Player& p
 
 void Sapphire::Event::Director::sendDirectorClear( Sapphire::Entity::Player& player ) const
 {
-  Network::Util::Packet::sendActorControlSelf( player, DirectorClear, m_directorId );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), DirectorClear, m_directorId );
 }
 
 void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& player ) const
@@ -103,7 +103,7 @@ void Sapphire::Event::Director::sendDirectorVars( Sapphire::Entity::Player& play
 void Sapphire::Event::Director::sendDirectorInit( Sapphire::Entity::Player& player ) const
 {
   Logger::debug( "[{}] directorInit: directorId#{}, contextId#{}", player.getId(), m_directorId, m_contextId );
-  Network::Util::Packet::sendActorControlSelf( player, DirectorInit, m_directorId, m_contextId );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), DirectorInit, m_directorId, m_contextId );
 }
 
 Sapphire::Event::Director::DirectorType Sapphire::Event::Director::getType() const

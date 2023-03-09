@@ -254,8 +254,8 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
   if( player.isLogin() )
   {
-    Network::Util::Packet::sendActorControlSelf( player, SetConfigFlags, player.getConfigFlags(), 1 );
-    Network::Util::Packet::sendActorControlSelf( player, SetMaxGearSets, player.getMaxGearSets() );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetConfigFlags, player.getConfigFlags(), 1 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetMaxGearSets, player.getMaxGearSets() );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
@@ -269,11 +269,11 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 
   Network::Util::Packet::sendRecastGroups( player );
   Network::Util::Packet::sendBaseParams( player );
-  Network::Util::Packet::sendActorControl( player, SetItemLevel, player.getItemLevel() );
+  Network::Util::Packet::sendActorControl( player, player.getId(), SetItemLevel, player.getItemLevel() );
   if( player.isLogin() )
   {
     Network::Util::Packet::sendChangeClass( player );
-    Network::Util::Packet::sendActorControl( player, 0x112, 0x24 ); // unknown
+    Network::Util::Packet::sendActorControl( player, player.getId(), 0x112, 0x24 ); // unknown
     Network::Util::Packet::sendContentAttainFlags( player );
     player.clearSoldItems();
   }
@@ -362,5 +362,5 @@ void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) 
 void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  Network::Util::Packet::sendActorControlTarget( player, LogMsg, messageId, param2, param3, param4, param5, param6 );
+  Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }

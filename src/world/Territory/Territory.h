@@ -72,7 +72,7 @@ namespace Sapphire
     uint32_t m_effectCounter{};
     std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
-    std::vector< World::Action::EffectResultPtr > m_effectResults;
+    std::vector< World::Action::ActionResultPtr > m_actionResults;
 
     Common::TerritoryIdent m_ident;
 
@@ -198,9 +198,9 @@ namespace Sapphire
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
 
-    void addEffectResult( World::Action::EffectResultPtr result );
+    void addActionResult( World::Action::ActionResultPtr result );
 
-    void processEffectResults( uint64_t tickCount );
+    void processActionResults( uint64_t tickCount );
   };
 
 }

@@ -615,7 +615,7 @@ void Sapphire::Network::GameConnection::gearSetEquip( const Packets::FFXIVARR_PA
   player.sendGearInventory();
 
   if( packet.data().contextId < 0xFE )
-    Network::Util::Packet::sendActorControlSelf( player, GearSetEquipMsg, packet.data().contextId );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), GearSetEquipMsg, packet.data().contextId );
 
   auto invTransFinPacket = makeZonePacket< FFXIVIpcItemOperationBatch >( player.getId() );
   invTransFinPacket->data().contextId = contextId;

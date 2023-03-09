@@ -29,7 +29,7 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
-#include "Action/EffectResult.h"
+#include "Action/ActionResult.h"
 
 #include "Network/GameConnection.h"
 
@@ -466,7 +466,7 @@ bool Territory::update( uint64_t tickCount )
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
 
-  processEffectResults( tickCount );
+  processActionResults( tickCount );
 
   if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
@@ -875,15 +875,15 @@ std::shared_ptr< World::Navi::NaviProvider > Territory::getNaviProvider()
   return m_pNaviProvider;
 }
 
-void Territory::addEffectResult( World::Action::EffectResultPtr result )
+void Territory::addActionResult( World::Action::ActionResultPtr result )
 {
-  m_effectResults.emplace_back( std::move( result ) );
+  m_actionResults.emplace_back( std::move( result ) );
 }
 
-void Territory::processEffectResults( uint64_t tickCount )
+void Territory::processActionResults( uint64_t tickCount )
 {
   // todo: move this to generic territory/instance delay wrapper cause it might be useful scheduling other things
-  for( auto it = m_effectResults.begin(); it != m_effectResults.end(); )
+  for( auto it = m_actionResults.begin(); it != m_actionResults.end(); )
   {
     auto effect = *it;
 
@@ -895,7 +895,7 @@ void Territory::processEffectResults( uint64_t tickCount )
 
     effect->execute();
 
-    it = m_effectResults.erase( it );
+    it = m_actionResults.erase( it );
   }
 }
 

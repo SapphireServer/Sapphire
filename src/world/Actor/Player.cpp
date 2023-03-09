@@ -457,7 +457,7 @@ void Player::registerAetheryte( uint8_t aetheryteId )
   Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
   m_aetheryte[ index ] |= value;
-  Network::Util::Packet::sendActorControlSelf( *this, LearnTeleport, aetheryteId, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), LearnTeleport, aetheryteId, 1 );
 }
 
 bool Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -560,7 +560,7 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
 
   m_unlocks[ index ] |= value;
 
-  Network::Util::Packet::sendActorControlSelf( *this, SetRewardFlag, unlock, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetRewardFlag, unlock, 1 );
 }
 
 void Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -571,7 +571,7 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
 
   m_orchestrion[ index ] |= value;
 
-  Network::Util::Packet::sendActorControlSelf( *this, ToggleOrchestrionUnlock, songId, 1, itemId );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), ToggleOrchestrionUnlock, songId, 1, itemId );
 }
 
 bool Player::hasReward( Common::UnlockEntry unlockId ) const
@@ -608,7 +608,7 @@ void Player::gainExp( uint32_t amount )
   {
     setExp( 0 );
     if( currentExp != 0 )
-      Network::Util::Packet::sendActorControlSelf( *this, UpdateUiExp, currentClass, 0 );
+      Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, 0 );
 
     return;
   }
@@ -632,8 +632,8 @@ void Player::gainExp( uint32_t amount )
   else
     setExp( currentExp + amount );
 
-  Network::Util::Packet::sendActorControlSelf( *this, GainExpMsg, currentClass, amount );
-  Network::Util::Packet::sendActorControlSelf( *this, UpdateUiExp, currentClass, getExp() );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), GainExpMsg, currentClass, amount );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, getExp() );
 }
 
 void Player::levelUp()
@@ -745,7 +745,7 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
   m_classArray[ classJobIndex ] = level;
 
-  Network::Util::Packet::sendActorControlSelf( *this, ClassJobUpdate, static_cast< uint8_t >( classjob ), getLevelForClass( classjob ) );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), ClassJobUpdate, static_cast< uint8_t >( classjob ), getLevelForClass( classjob ) );
 
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( classjob ) );
@@ -818,7 +818,7 @@ void Player::despawn( Entity::PlayerPtr pTarget )
   Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
-  Network::Util::Packet::sendActorControlSelf( *this, WarpStart, 4, getId(), 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), WarpStart, 4, getId(), 1 );
 }
 
 GameObjectPtr Player::lookupTargetById( uint64_t targetId )
@@ -953,7 +953,7 @@ Player::AetheryteList& Player::getAetheryteArray()
 void Player::setHomepoint( uint8_t aetheryteId )
 {
   m_homePoint = aetheryteId;
-  Network::Util::Packet::sendActorControlSelf( *this, SetHomepoint, aetheryteId );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetHomepoint, aetheryteId );
 }
 
 /*! get homepoint */
@@ -1002,7 +1002,7 @@ void Player::unlockMount( uint32_t mountId )
 
   m_mountGuide[ mount->data().MountOrder / 8 ] |= ( 1 << ( mount->data().MountOrder % 8 ) );
 
-  Network::Util::Packet::sendActorControlSelf( *this, SetMountBitmask, mount->data().MountOrder, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetMountBitmask, mount->data().MountOrder, 1 );
 }
 
 void Player::unlockCompanion( uint32_t companionId )
@@ -1019,7 +1019,7 @@ void Player::unlockCompanion( uint32_t companionId )
 
   m_minionGuide[ index ] |= value;
 
-  Network::Util::Packet::sendActorControlSelf( *this, LearnCompanion, companionId, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), LearnCompanion, companionId, 1 );
 }
 
 Player::MinionList& Player::getMinionGuideBitmask()
@@ -1144,14 +1144,14 @@ const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
-  Network::Util::Packet::sendActorControl( *this, SetBattle, 1 );
+  Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 1 );
 }
 
 void Player::onMobDeaggro( const BNpc& bnpc )
 {
   hateListRemove( bnpc );
   if( m_actorIdTohateSlotMap.empty() )
-    Network::Util::Packet::sendActorControl( *this, SetBattle, 0 );
+    Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 0 );
 }
 
 bool Player::isLogin() const
@@ -1209,7 +1209,7 @@ void Player::setAchievementData( const Player::AchievementData& achievementData 
 void Player::setMaxGearSets( uint8_t amount )
 {
   m_equippedMannequin = amount;
-  Network::Util::Packet::sendActorControlSelf( *this, SetMaxGearSets, m_equippedMannequin );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetMaxGearSets, m_equippedMannequin );
 }
 
 void Player::addGearSet()
@@ -1418,7 +1418,7 @@ void Player::teleportQuery( uint16_t aetheryteId )
   cost = std::min< uint16_t >( 999, cost );
 
   bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
-  Network::Util::Packet::sendActorControlSelf( *this, OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId );
 
   if( !insufficientGil )
   {
@@ -1493,7 +1493,7 @@ void Player::dyeItemFromDyeingInfo()
   insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
   writeItem( itemToDye );
 
-  Network::Util::Packet::sendActorControlSelf( *this, DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
 }
 
 void Player::setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour )
@@ -1547,9 +1547,9 @@ void Player::glamourItemFromGlamouringInfo()
   writeItem( itemToGlamour );
 
   if( shouldGlamour )
-    Network::Util::Packet::sendActorControlSelf( *this, GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
+    Network::Util::Packet::sendActorControlSelf( *this, getId(), GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
   else
-    Network::Util::Packet::sendActorControlSelf( *this, GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
+    Network::Util::Packet::sendActorControlSelf( *this, getId(), GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
 }
 
 void Player::resetObjSpawnIndex()
@@ -1634,7 +1634,7 @@ void Player::updateHuntingLog( uint16_t id )
       if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
       {
         logEntry.entries[ i - 1 ][ x ]++;
-        Network::Util::Packet::sendActorControlSelf( *this, HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
+        Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
         logChanged = true;
         sectionChanged = true;
       }
@@ -1643,7 +1643,7 @@ void Player::updateHuntingLog( uint16_t id )
     }
     if( logChanged && sectionComplete && sectionChanged )
     {
-      Network::Util::Packet::sendActorControlSelf( *this, HuntingLogSectionFinish, monsterNoteId, i, 0 );
+      Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 );
       gainExp( note->data().RewardExp );
     }
     if( !sectionComplete )
@@ -1653,13 +1653,13 @@ void Player::updateHuntingLog( uint16_t id )
   }
   if( logChanged && allSectionsComplete )
   {
-    Network::Util::Packet::sendActorControlSelf( *this, HuntingLogRankFinish, 4 );
+    Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogRankFinish, 4 );
     gainExp( rankRewards[ logEntry.rank ] );
     if( logEntry.rank < 4 )
     {
       logEntry.rank++;
       memset( logEntry.entries, 0, 40 );
-      Network::Util::Packet::sendActorControlSelf( *this, HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
+      Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
     }
   }
 

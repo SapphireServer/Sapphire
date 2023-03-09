@@ -229,7 +229,7 @@ void Player::equipItem( Common::GearSetSlot equipSlotId, Item& item, bool sendUp
   if( sendUpdate )
   {
     Network::Util::Packet::sendEquip( *this );
-    Network::Util::Packet::sendActorControl( *this, SetItemLevel, getItemLevel() );
+    Network::Util::Packet::sendActorControl( *this, getId(), SetItemLevel, getItemLevel() );
     Network::Util::Packet::sendBaseParams( *this );
     Network::Util::Packet::sendHudParam( *this );
   }
@@ -251,7 +251,7 @@ void Player::unequipItem( Common::GearSetSlot equipSlotId, Item& item, bool send
   if( sendUpdate )
   {
     Network::Util::Packet::sendEquip( *this );
-    Network::Util::Packet::sendActorControl( *this, SetItemLevel, getItemLevel() );
+    Network::Util::Packet::sendActorControl( *this, getId(), SetItemLevel, getItemLevel() );
     Network::Util::Packet::sendBaseParams( *this );
     Network::Util::Packet::sendHudParam( *this );
   }

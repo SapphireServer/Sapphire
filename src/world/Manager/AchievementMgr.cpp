@@ -70,8 +70,8 @@ void AchievementMgr::unlockAchievement( Entity::Player& player, uint32_t achieve
   // fire packets
   player.setAchievementData( achvData );
   Network::Util::Packet::sendAchievementList( player );
-  Network::Util::Packet::sendActorControl( player, AchievementComplete, achievementId );
-  Network::Util::Packet::sendActorControl( player, AchievementObtainMsg, achievementId );
+  Network::Util::Packet::sendActorControl( player, player.getId(), AchievementComplete, achievementId );
+  Network::Util::Packet::sendActorControl( player, player.getId(), AchievementObtainMsg, achievementId );
 
   // check and add title to player
   auto achvTitleId = achvExd->data().Title;

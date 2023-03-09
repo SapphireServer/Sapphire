@@ -130,10 +130,10 @@ void Util::Packet::sendHuntingLog( Entity::Player& player )
   }
 }
 
-void Util::Packet::sendActorControlSelf( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
+void Util::Packet::sendActorControlSelf( Entity::Player& player, uint32_t srcId, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
                                          uint32_t param4, uint32_t param5 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), category, param1, param2, param3, param4, param5 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( srcId, category, param1, param2, param3, param4, param5 ) );
 }
 
 void Util::Packet::sendActorControlSelf( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
@@ -142,9 +142,9 @@ void Util::Packet::sendActorControlSelf( const std::set< uint64_t >& characterId
   server().queueForPlayers( characterIds, makeActorControlSelf( srcId, category, param1, param2, param3, param4, param5 ) );
 }
 
-void Util::Packet::sendActorControl( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4 )
+void Util::Packet::sendActorControl( Entity::Player& player, uint32_t srcId, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), category, param1, param2, param3, param4 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControl( srcId, category, param1, param2, param3, param4 ) );
 }
 
 void Util::Packet::sendActorControl( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
@@ -153,10 +153,10 @@ void Util::Packet::sendActorControl( const std::set< uint64_t >& characterIds, u
   server().queueForPlayers( characterIds, makeActorControl( srcId, category, param1, param2, param3, param4 ) );
 }
 
-void Util::Packet::sendActorControlTarget( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
+void Util::Packet::sendActorControlTarget( Entity::Player& player, uint32_t srcId, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
                                            uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), category, param1, param2, param3, param4, param5, param6 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( srcId, category, param1, param2, param3, param4, param5, param6 ) );
 }
 
 void Util::Packet::sendActorControlTarget( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,

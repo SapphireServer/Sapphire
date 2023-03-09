@@ -1,5 +1,5 @@
-#include "EffectBuilder.h"
-#include "EffectResult.h"
+#include "ActionResultBuilder.h"
+#include "ActionResult.h"
 
 #include <Actor/Player.h>
 
@@ -25,32 +25,33 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-EffectBuilder::EffectBuilder( Entity::CharaPtr source, uint32_t actionId, uint16_t requestId ) :
+ActionResultBuilder::ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, uint32_t resultId, uint16_t requestId ) :
   m_sourceChara( std::move( source ) ),
   m_actionId( actionId ),
+  m_resultId( resultId ),
   m_requestId( requestId )
 {
 
 }
 
-uint64_t EffectBuilder::getResultDelayMs()
+uint64_t ActionResultBuilder::getResultDelayMs()
 {
   // todo: actually figure this retarded shit out
 
   return Common::Util::getTimeMs() + 850;
 }
 
-void EffectBuilder::addResultToActor( Entity::CharaPtr& chara, EffectResultPtr result )
+void ActionResultBuilder::addResultToActor( Entity::CharaPtr& chara, ActionResultPtr result )
 {
-  auto it = m_actorEffectsMap.find( chara->getId() );
-  if( it == m_actorEffectsMap.end() )
+  auto it = m_actorResultsMap.find( chara->getId() );
+  if( it == m_actorResultsMap.end() )
   {
     // create a new one
-    auto resultList = std::vector< EffectResultPtr >();
+    auto resultList = std::vector< ActionResultPtr >();
 
     resultList.push_back( std::move( result ) );
 
-    m_actorEffectsMap[ chara->getId() ] = resultList;
+    m_actorResultsMap[ chara->getId() ] = resultList;
 
     return;
   }
@@ -58,112 +59,107 @@ void EffectBuilder::addResultToActor( Entity::CharaPtr& chara, EffectResultPtr r
   it->second.push_back( std::move( result ) );
 }
 
-void EffectBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( healingTarget, getResultDelayMs() );
+  ActionResultPtr nextResult = make_ActionResult( healingTarget, getResultDelayMs() );
   nextResult->heal( amount, severity, flag );
   addResultToActor( effectTarget, nextResult );
 }
 
-void EffectBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionEffectResultFlag flag )
+void ActionResultBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
+  ActionResultPtr nextResult = make_ActionResult( restoringTarget, getResultDelayMs() ); // restore mp source actor
   nextResult->restoreMP( amount, flag );
   addResultToActor( target, nextResult );
 }
 
-void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag )
 {
-  EffectResultPtr nextResult = make_EffectResult( damagingTarget, getResultDelayMs() );
+  ActionResultPtr nextResult = make_ActionResult( damagingTarget, getResultDelayMs() );
   nextResult->damage( amount, severity, flag );
   addResultToActor( damagingTarget, nextResult );
 }
 
-void EffectBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
+void ActionResultBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target, 0 );
   nextResult->startCombo( actionId );
   addResultToActor( target, nextResult );
 }
 
-void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
+void ActionResultBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target, 0 );
   nextResult->comboSucceed();
   addResultToActor( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target, 0 );
   nextResult->applyStatusEffect( statusId, param );
   addResultToActor( target, nextResult );
 }
 
-void EffectBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
+void ActionResultBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
 {
-  EffectResultPtr nextResult = make_EffectResult( target, getResultDelayMs() );
+  ActionResultPtr nextResult = make_ActionResult( target, getResultDelayMs() );
   nextResult->mount( mountId );
   addResultToActor( target, nextResult );
 }
 
-void EffectBuilder::buildAndSendPackets( const std::vector< Entity::CharaPtr >& targetList )
+void ActionResultBuilder::sendActionResults( const std::vector< Entity::CharaPtr >& targetList )
 {
   Logger::debug( "EffectBuilder result: " );
   Logger::debug( "Targets afflicted: {}", targetList.size() );
 
   do // we want to send at least one packet even nothing is hit so other players can see
   {
-    auto packet = buildNextEffectPacket( targetList );
+    auto packet = createActionResultPacket( targetList );
     server().queueForPlayers( m_sourceChara->getInRangePlayerIds( true ), packet );
   }
-  while( !m_actorEffectsMap.empty() );
+  while( !m_actorResultsMap.empty() );
 }
 
-std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const std::vector< Entity::CharaPtr >& targetList )
+std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket( const std::vector< Entity::CharaPtr >& targetList )
 {
   auto remainingTargetCount = targetList.size();
+  auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( m_sourceChara->getTerritoryId() );
-  auto resultId = zone->getNextEffectResultId();
 
   if( remainingTargetCount > 1 ) // use AoeEffect packets
   {
-    auto effectPacket = std::make_shared< EffectPacket >( m_sourceChara->getId(), m_actionId );
+    auto effectPacket = std::make_shared< EffectPacket >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setRequestId( m_requestId );
-    effectPacket->setResultId( resultId );
-    effectPacket->setTargetActor( targetList[ 0 ]->getId() );
+    effectPacket->setResultId( m_resultId );
 
     uint8_t targetIndex = 0;
-    for( auto it = m_actorEffectsMap.begin(); it != m_actorEffectsMap.end(); )
+    for( auto it = m_actorResultsMap.begin(); it != m_actorResultsMap.end(); )
     {
       // get all effect results for an actor
       auto actorResultList = it->second;
 
-      for( auto i = 0; i < actorResultList.size(); ++i )
+      for( auto& result : actorResultList )
       {
-        auto result = actorResultList.data()[ i ];
         auto effect = result->getCalcResultParam();
 
         // if effect result is a source/caster effect
         if( result->getTarget() == m_sourceChara )
-        {
           effectPacket->addSourceEffect( effect );
-        }
         else
         {
           effectPacket->addTargetEffect( effect, result->getTarget()->getId() );
-          auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-          taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, result->getTarget(), 1000 ) );
+          taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( m_resultId, result->getTarget(), 1000 ) );
         }
 
-        zone->addEffectResult( std::move( result ) );
+        zone->addActionResult( std::move( result ) );
 
       }
 
       actorResultList.clear();
-      it = m_actorEffectsMap.erase( it );
+      it = m_actorResultsMap.erase( it );
       targetIndex++;
 
       if( targetIndex == 15 )
@@ -181,38 +177,34 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
     auto effectPacket = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     effectPacket->setRequestId( m_requestId );
-    effectPacket->setResultId( resultId );
+    effectPacket->setResultId( m_resultId );
 
-    for( auto it = m_actorEffectsMap.begin(); it != m_actorEffectsMap.end(); )
+    for( auto it = m_actorResultsMap.begin(); it != m_actorResultsMap.end(); )
     {
       // get all effect results for an actor
       auto actorResultList = it->second;
 
-      for( auto i = 0; i < actorResultList.size(); ++i )
+      for( auto& result : actorResultList )
       {
-        auto result = actorResultList.data()[ i ];
         auto effect = result->getCalcResultParam();
 
         // if effect result is a source/caster effect
         if( result->getTarget() == m_sourceChara )
-        {
           effectPacket->addSourceEffect( effect );
-        }
         else
         {
           effectPacket->addTargetEffect( effect );
-          auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-          taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, result->getTarget(), 1000 ) );
+          taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( m_resultId, result->getTarget(), 1000 ) );
         }
-        
-        zone->addEffectResult( std::move( result ) );
+
+        zone->addActionResult( std::move( result ) );
       }
 
       actorResultList.clear();
-      it = m_actorEffectsMap.erase( it );
+      it = m_actorResultsMap.erase( it );
     }
 
-    m_actorEffectsMap.clear();
+    m_actorResultsMap.clear();
 
     return effectPacket;
   }
@@ -227,9 +219,9 @@ std::shared_ptr< FFXIVPacketBase > EffectBuilder::buildNextEffectPacket( const s
     effectPacket->data().DirTarget = Common::Util::floatToUInt16Rot( m_sourceChara->getRot() );
     effectPacket->data().Flag = Common::ActionEffectDisplayType::HideActionName;
     effectPacket->data().RequestId = m_requestId;
-    effectPacket->data().ResultId = resultId;
+    effectPacket->data().ResultId = m_resultId;
 
-    m_actorEffectsMap.clear();
+    m_actorResultsMap.clear();
 
     return effectPacket;
   }

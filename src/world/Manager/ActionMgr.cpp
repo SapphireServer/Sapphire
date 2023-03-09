@@ -65,7 +65,6 @@ void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t act
   auto action = Action::make_Action( player.getAsPlayer(), actionId, requestId, actionData );
 
   action->setTargetId( targetId );
-
   action->setPos( player.getPos() );
 
   if( !action->init() )
@@ -147,9 +146,7 @@ void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr curre
   {
     // if we have a cast time we want to associate the action with the player so update is called
     if( currentAction->hasCastTime() )
-    {
       player.setCurrentAction( currentAction );
-    }
 
     // todo: what do in cases of swiftcast/etc? script callback?
     currentAction->start();

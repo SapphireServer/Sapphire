@@ -9,14 +9,14 @@ namespace Sapphire::World::Action
    * @brief A container for the computed result of an effect on a single actor. Used to apply damage/healing dealt
    * at a later point in time.
    */
-  class EffectResult
+  class ActionResult
   {
   public:
-    explicit EffectResult( Entity::CharaPtr target, uint64_t delayMs );
+    explicit ActionResult( Entity::CharaPtr target, uint64_t delayMs );
 
-    void damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
-    void heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
-    void restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
+    void damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
+    void heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
+    void restoreMP( uint32_t amount, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
     void applyStatusEffect( uint16_t statusId, uint8_t param );

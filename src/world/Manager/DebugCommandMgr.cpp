@@ -529,9 +529,8 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     uint16_t param1;
     sscanf( params.c_str(), "%hu", &param1 );
 
-    auto effectPacket = std::make_shared< EffectPacket >( player.getId(), param1 );
+    auto effectPacket = std::make_shared< EffectPacket >( player.getId(), static_cast< uint32_t >( player.getTargetId() ), param1 );
     effectPacket->setRotation( Common::Util::floatToUInt16Rot( player.getRot() ) );
-    effectPacket->setTargetActor( static_cast< uint32_t >( player.getTargetId() ) );
 
     Common::CalcResultParam entry{};
     entry.Value = static_cast< int16_t >( param1 );

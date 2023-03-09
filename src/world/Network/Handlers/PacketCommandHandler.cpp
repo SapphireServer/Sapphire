@@ -388,7 +388,7 @@ void examineHandler( Sapphire::Entity::Player& player, uint32_t targetId )
     return;
 
   if( pPlayer->isActingAsGm() || pPlayer->getTerritoryTypeId() != player.getTerritoryTypeId() )
-    Network::Util::Packet::sendActorControl( player, ExamineError );
+    Network::Util::Packet::sendActorControl( player, player.getId(), ExamineError );
   else
     server().queueForPlayer( player.getCharacterId(), std::make_shared< InspectPacket >( player, pPlayer ) );
 }
@@ -498,7 +498,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::SET_CUTSCENE:
     {
-      Network::Util::Packet::sendActorControl( player, SetCutsceneFlag, data.Arg0, 1 );
+      Network::Util::Packet::sendActorControl( player, player.getId(), SetCutsceneFlag, data.Arg0, 1 );
       break;
     }
     case PacketCommand::EMOTE: // emote
@@ -597,7 +597,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
       auto achievementId = data.Arg0;
       auto& achvMgr = Common::Service< AchievementMgr >::ref();
       auto achvProgress = achvMgr.getAchievementDataById( player, achievementId );
-      Network::Util::Packet::sendActorControl( player, AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
+      Network::Util::Packet::sendActorControl( player, player.getId(), AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
       break;
     }
     case PacketCommand::ACHIEVEMENT_REQUEST:
@@ -663,7 +663,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
       player.setActiveLand( static_cast< uint8_t >( data.Arg0 ), hZone->getWardNum() );
 
-      Network::Util::Packet::sendActorControl( player, ShowBuildPresetUI, data.Arg0 );
+      Network::Util::Packet::sendActorControl( player, player.getId(), ShowBuildPresetUI, data.Arg0 );
       break;
     }
     case PacketCommand::HOUSING_AUCTION_INFO:
@@ -741,7 +741,7 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
 
       uint8_t ward = ( data.Arg1 >> 16 ) & 0xFF;
       uint8_t plot = ( data.Arg1 & 0xFF );
-      Network::Util::Packet::sendActorControl( player, ShowHousingItemUI, 0, plot );
+      Network::Util::Packet::sendActorControl( player, player.getId(), ShowHousingItemUI, 0, plot );
       //TODO: show item housing container
 
       break;

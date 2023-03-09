@@ -327,7 +327,7 @@ void BNpc::spawn( PlayerPtr pTarget )
 void BNpc::despawn( PlayerPtr pTarget )
 {
   pTarget->freePlayerSpawnId( getId() );
-  Network::Util::Packet::sendActorControl( *pTarget, WarpStart, 4, getId(), 1 );
+  Network::Util::Packet::sendActorControlSelf( *pTarget, getId(), WarpStart, 4, getId(), 1 );
 }
 
 BNpcState BNpc::getState() const
@@ -935,7 +935,7 @@ void BNpc::setOwner( const CharaPtr& m_pChara )
   server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
 
   if( m_pChara && m_pChara->isPlayer() )
-    Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), SetHateLetter, 1, getId(), 0 );
+    Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
 
 }
 
