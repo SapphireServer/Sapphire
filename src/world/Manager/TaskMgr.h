@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <queue>
 #include <ForwardsZone.h>
 #include <Util/Util.h>
 
@@ -45,6 +46,7 @@ namespace Sapphire::World::Manager
   private:
     uint64_t m_lastTick{};
     std::vector< TaskPtr > m_taskList;
+    std::queue< TaskPtr > m_deferredTasks;
 
   };
 

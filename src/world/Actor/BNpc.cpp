@@ -983,7 +983,7 @@ void BNpc::autoAttack( CharaPtr pTarget )
     effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
     effectEntry.Arg0 = 3;
     effectEntry.Arg1 = 7;
-    auto resultId = pZone->getNextEffectResultId();
+    auto resultId = pZone->getNextActionResultId();
     effectPacket->setResultId( resultId );
     effectPacket->addTargetEffect( effectEntry );
     server().queueForPlayers( getInRangePlayerIds(), effectPacket );
@@ -991,7 +991,7 @@ void BNpc::autoAttack( CharaPtr pTarget )
     pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
 
     auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-    taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
+    //taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
   }
 }
 

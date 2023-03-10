@@ -1311,7 +1311,7 @@ void Player::autoAttack( CharaPtr pTarget )
   if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
     effectPacket->setActionId( 8 );
 
-  auto resultId = pZone->getNextEffectResultId();
+  auto resultId = pZone->getNextActionResultId();
   effectPacket->setResultId( resultId );
   effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
   effectPacket->addTargetEffect( entry );
@@ -1321,7 +1321,7 @@ void Player::autoAttack( CharaPtr pTarget )
   pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );
 
   auto& taskMgr = Common::Service< TaskMgr >::ref();
-  taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
+  //taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
 }
 
 

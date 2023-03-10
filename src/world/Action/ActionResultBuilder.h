@@ -34,8 +34,6 @@ namespace Sapphire::World::Action
   private:
     void addResultToActor( Entity::CharaPtr& chara, ActionResultPtr result );
 
-    uint64_t getResultDelayMs();
-
     Network::Packets::FFXIVPacketBasePtr createActionResultPacket( const std::vector< Entity::CharaPtr >& targetList );
 
   private:
@@ -44,7 +42,7 @@ namespace Sapphire::World::Action
     uint32_t m_resultId;
 
     Entity::CharaPtr m_sourceChara;
-    std::unordered_map< uint32_t, std::vector< ActionResultPtr > > m_actorResultsMap;
+    std::unordered_map< Entity::CharaPtr, std::vector< ActionResultPtr > > m_actorResultsMap;
   };
 
 }

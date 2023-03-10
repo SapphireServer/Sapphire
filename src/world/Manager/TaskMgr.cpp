@@ -9,27 +9,32 @@ using namespace Sapphire::World;
 
 void TaskMgr::update( uint64_t tickCount )
 {
-
-  for( auto it = m_taskList.begin(); it != m_taskList.end(); )
+  std::vector< TaskPtr > tmpTaskList;
+  for( const auto& pTask : m_taskList )
   {
-    auto pTask = *it;
     // is the task ready for execution?
     if( ( tickCount - pTask->getQueueTimeMs() ) >= pTask->getDelayTimeMs() )
     {
       Logger::info( "[TaskMgr] " + pTask->toString() );
       pTask->execute();
-      it = m_taskList.erase( it );
     }
     else
-      ++it;
+      tmpTaskList.push_back( pTask );
   }
 
+  m_taskList = tmpTaskList;
   m_lastTick = tickCount;
 
+  while( !m_deferredTasks.empty() )
+  {
+    auto pTask = m_deferredTasks.front();
+    m_deferredTasks.pop();
+    m_taskList.push_back( pTask );
+  }
 }
 
 void TaskMgr::queueTask( const TaskPtr& pTask )
 {
   pTask->onQueue();
-  m_taskList.push_back( pTask );
+  m_deferredTasks.push( pTask );
 }

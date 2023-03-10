@@ -14,10 +14,12 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-ActionIntegrityTask::ActionIntegrityTask( uint32_t resultId, Entity::CharaPtr pTarget, uint64_t delayTime ) : Task( delayTime )
+ActionIntegrityTask::ActionIntegrityTask( uint32_t resultId, Entity::CharaPtr pTarget, Action::ActionResultList& results, uint64_t delayTime ) : Task( delayTime )
 {
+  Logger::debug( "Constructor called {} {} {}", resultId, pTarget->getId(), results.size() );
   m_resultId = resultId;
   m_pTarget = std::move( pTarget );
+  m_results = results;
 }
 
 void ActionIntegrityTask::onQueue()
@@ -27,12 +29,21 @@ void ActionIntegrityTask::onQueue()
 
 void ActionIntegrityTask::execute()
 {
+  if( !m_pTarget )
+    return;
+
   auto& server = Common::Service< WorldServer >::ref();
 
   auto inRangePlayers = m_pTarget->getInRangePlayerIds( true );
 
   if( inRangePlayers.empty() )
     return;
+
+  for( auto& actionResult : m_results )
+  {
+    if( actionResult && actionResult->getTarget() && actionResult->getTarget()->isAlive() )
+      actionResult->execute();
+  }
 
   auto integrityPacket = makeZonePacket< FFXIVIpcActionIntegrity >( 0 );
   auto& data = integrityPacket->data();
@@ -51,7 +62,7 @@ void ActionIntegrityTask::execute()
 
 std::string ActionIntegrityTask::toString()
 {
-  return fmt::format( "ActionIntegrityTask: ResultId#{}, TargetId#{}, ElapsedTimeMs: {}", m_resultId, m_pTarget->getId(), getDelayTimeMs() );
+  return fmt::format( "ActionIntegrityTask: ResultId#{}, TargetId#{}, ElapsedTimeMs: {}", m_resultId, m_pTarget ? m_pTarget->getId() : 0, getDelayTimeMs() );
 }
 
 

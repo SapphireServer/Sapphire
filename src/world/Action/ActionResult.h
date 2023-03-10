@@ -38,4 +38,6 @@ namespace Sapphire::World::Action
     Common::CalcResultParam m_result;
 
   };
+
+  using ActionResultList = std::vector< ActionResultPtr >;
 }

@@ -86,7 +86,7 @@ bool Action::Action::init()
   }
   auto teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( m_pSource->getTerritoryId() );
-  m_resultId = zone->getNextEffectResultId();
+  m_resultId = zone->getNextActionResultId();
 
   m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_resultId, m_requestId );
 
@@ -461,13 +461,9 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
 
     auto role = player->getRole();
     if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
       wepDmg = item->getMagicalDmg();
-    }
     else
-    {
       wepDmg = item->getPhysicalDmg();
-    }
   }
 
   return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
@@ -484,13 +480,9 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
 
     auto role = player->getRole();
     if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
       wepDmg = item->getMagicalDmg();
-    }
     else
-    {
       wepDmg = item->getPhysicalDmg();
-    }
   }
 
   return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
@@ -562,9 +554,7 @@ void Action::Action::buildActionResults()
         }
 
         if( !m_lutEntry.nextCombo.empty() ) // if we have a combo action followup
-        {
           m_actionResultBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
-        }
       }
     }
     else if( m_lutEntry.curePotency > 0 )

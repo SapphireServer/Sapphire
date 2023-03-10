@@ -504,7 +504,7 @@ void Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 
   auto statusEffectAdd = makeZonePacket< FFXIVIpcActionIntegrity >( getId() );
 
-  statusEffectAdd->data().ResultId = pZone->getNextEffectResultId();
+  statusEffectAdd->data().ResultId = pZone->getNextActionResultId();
   statusEffectAdd->data().Target = pEffect->getTargetActorId();
   statusEffectAdd->data().Hp = getHp();
   statusEffectAdd->data().Mp = static_cast< uint16_t >( getMp() );

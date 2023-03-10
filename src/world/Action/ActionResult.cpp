@@ -91,6 +91,9 @@ const Common::CalcResultParam& ActionResult::getCalcResultParam() const
 
 void ActionResult::execute()
 {
+  if( !m_target )
+    return;
+
   switch( m_result.Type )
   {
     case Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP:
