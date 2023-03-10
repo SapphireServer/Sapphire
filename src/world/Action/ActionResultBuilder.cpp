@@ -115,27 +115,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( m_sourceChara->getTerritoryId() );
 
-  if( targetCount == 0 )
-  {
-    auto actionResult = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), m_sourceChara->getId(), m_actionId );
-    actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
-    actionResult->setRequestId( m_requestId );
-    actionResult->setResultId( m_resultId );
-    actionResult->setEffectFlags( Common::ActionEffectDisplayType::HideActionName );
-    if( !m_actorResultsMap.empty() )
-      taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, m_sourceChara, m_actorResultsMap.begin()->second, 0 ) );
-
-    for( auto& result : m_actorResultsMap.begin()->second )
-    {
-      auto effect = result->getCalcResultParam();
-      if( result->getTarget() == m_sourceChara )
-        actionResult->addSourceEffect( effect );
-    }
-
-    m_actorResultsMap.clear();
-    return actionResult;
-  }
-  else if( targetCount > 1 ) // use AoeEffect packets
+  if( targetCount > 1 ) // use AoeEffect packets
   {
     auto actionResult = std::make_shared< EffectPacket >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
@@ -159,9 +139,6 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
         else
           actionResult->addTargetEffect( effect, result->getTarget()->getId() );
       }
-
-      //actorResultList.clear();
-      //it = m_actorResultsMap.erase( it );
       targetIndex++;
 
       if( targetIndex == 15 )
@@ -172,7 +149,8 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
   }
   else  // use Effect for single target
   {
-    auto actionResult = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
+    uint32_t mainTargetId = targetList.empty() ? m_sourceChara->getId() : targetList[ 0 ]->getId();
+    auto actionResult = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), mainTargetId, m_actionId );
     actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
@@ -193,9 +171,6 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
         else
           actionResult->addTargetEffect( effect );
       }
-
-      //actorResultList.clear();
-      //it = m_actorResultsMap.erase( it );
     }
 
     m_actorResultsMap.clear();
