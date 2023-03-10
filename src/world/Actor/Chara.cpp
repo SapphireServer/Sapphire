@@ -500,37 +500,8 @@ void Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
     return;
 
   pEffect->applyStatus();
+  pEffect->setSlot( nextSlot );
   m_statusEffectMap[ nextSlot ] = pEffect;
-
-  auto statusEffectAdd = makeZonePacket< FFXIVIpcActionIntegrity >( getId() );
-
-  statusEffectAdd->data().ResultId = pZone->getNextActionResultId();
-  statusEffectAdd->data().Target = pEffect->getTargetActorId();
-  statusEffectAdd->data().Hp = getHp();
-  statusEffectAdd->data().Mp = static_cast< uint16_t >( getMp() );
-  statusEffectAdd->data().Tp = static_cast< uint16_t >( getTp() );
-  statusEffectAdd->data().HpMax = getMaxHp();
-  statusEffectAdd->data().MpMax = static_cast< uint16_t >( getMaxMp() );
-  statusEffectAdd->data().ClassJob = static_cast< uint8_t >( getClass() );
-  statusEffectAdd->data().StatusCount = 1;
-  statusEffectAdd->data().unknown_E0 = 0xE0;
-
-  // set all status sources to u32 invalid game obj
-  // todo: chara status effect map should be filled instead, since hudparam also uses invalid gameobj
-  for( int i = 0; i < 4; ++i )
-  {
-    statusEffectAdd->data().Status[ i ].Source = INVALID_GAME_OBJECT_ID;
-  }
-
-  auto& status = statusEffectAdd->data().Status[ 0 ];
-
-  status.Source = pEffect->getSrcActorId();
-  status.Time = static_cast< float >( pEffect->getDuration() ) / 1000;
-  status.Id = static_cast< uint16_t >( pEffect->getId() );
-  status.Slot = static_cast< uint8_t >( nextSlot );
-  status.SystemParam = static_cast< int16_t >( pEffect->getParam() );
-
-  server().queueForPlayers( getInRangePlayerIds( isPlayer() ), statusEffectAdd );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */

@@ -28,6 +28,7 @@ public:
   uint32_t getTickRate() const;
 
   uint32_t getSrcActorId() const;
+  Entity::CharaPtr getSrcActor() const;
 
   uint32_t getTargetActorId() const;
 
@@ -47,6 +48,9 @@ public:
 
   const std::string& getName() const;
 
+  uint8_t getSlot() const;
+  void setSlot( uint8_t slot );
+
 private:
   uint32_t m_id;
   Entity::CharaPtr m_sourceActor;
@@ -57,6 +61,7 @@ private:
   uint64_t m_lastTick;
   uint16_t m_param;
   std::string m_name;
+  uint8_t m_slot;
   std::pair< uint8_t, uint32_t > m_currTickEffect;
 
 };

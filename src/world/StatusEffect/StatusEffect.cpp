@@ -72,6 +72,11 @@ uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
   return m_sourceActor->getId();
 }
 
+Sapphire::Entity::CharaPtr Sapphire::StatusEffect::StatusEffect::getSrcActor() const
+{
+  return m_sourceActor;
+}
+
 uint32_t Sapphire::StatusEffect::StatusEffect::getTargetActorId() const
 {
   return m_targetActor->getId();
@@ -86,25 +91,6 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-
-  // this is only right when an action is being used by the player
-  // else you probably need to use an actorcontrol
-
-  //GamePacketNew< FFXIVIpcEffect > effectPacket( m_sourceActor->getId() );
-  //effectPacket.data().targetId = m_sourceActor->getId();
-  //effectPacket.data().actionAnimationId = 3;
-  //effectPacket.data().unknown_3 = 1;
-  //effectPacket.data().actionTextId = 3;
-  //effectPacket.data().unknown_5 = 1;
-  //effectPacket.data().unknown_6 = 321;
-  //effectPacket.data().rotation = ( uint16_t ) ( 0x8000 * ( ( m_sourceActor->getPos().getR() + 3.1415926 ) ) / 3.1415926 );
-  //effectPacket.data().effectTargetId = m_sourceActor->getId();
-  //effectPacket.data().effects[4].unknown_1 = 17;
-  //effectPacket.data().effects[4].bonusPercent = 30;
-  //effectPacket.data().effects[4].param1 = m_id;
-  //effectPacket.data().effects[4].unknown_5 = 0x80;
-  //m_sourceActor->sendToInRangeSet( effectPacket, true );
-
   scriptMgr.onStatusReceive( m_targetActor, m_id );
 }
 
@@ -152,4 +138,14 @@ void Sapphire::StatusEffect::StatusEffect::setParam( uint16_t param )
 const std::string& Sapphire::StatusEffect::StatusEffect::getName() const
 {
   return m_name;
+}
+
+uint8_t Sapphire::StatusEffect::StatusEffect::getSlot() const
+{
+  return m_slot;
+}
+
+void Sapphire::StatusEffect::StatusEffect::setSlot( uint8_t slot )
+{
+  m_slot = slot;
 }

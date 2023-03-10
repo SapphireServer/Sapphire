@@ -19,7 +19,7 @@ namespace Sapphire::World::Action
     void restoreMP( uint32_t amount, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
-    void applyStatusEffect( uint16_t statusId, uint8_t param );
+    void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride );
     void mount( uint16_t mountId );
 
     Entity::CharaPtr getTarget() const;
@@ -27,6 +27,7 @@ namespace Sapphire::World::Action
     uint64_t getDelay();
 
     const Common::CalcResultParam& getCalcResultParam() const;
+    const Sapphire::StatusEffect::StatusEffectPtr getStatusEffect() const;
 
     void execute();
 
@@ -36,6 +37,9 @@ namespace Sapphire::World::Action
     Entity::CharaPtr m_target;
 
     Common::CalcResultParam m_result;
+
+    bool m_bOverrideStatus { false };
+    Sapphire::StatusEffect::StatusEffectPtr m_pStatus;
 
   };
 

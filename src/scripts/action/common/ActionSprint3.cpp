@@ -17,10 +17,7 @@ public:
       return;
 
     uint32_t duration = ( sourceChara->getAsPlayer()->getTp() / 50 ) * 1000;
-
-    action.getActionResultBuilder()->applyStatusEffect( sourceChara, 50, 30 );
-
-    sourceChara->getAsPlayer()->addStatusEffectByIdIfNotExist( 50, duration, *sourceChara, 30 );
+    action.getActionResultBuilder()->applyStatusEffect( sourceChara, 50, duration, 30, false );
     sourceChara->getAsPlayer()->setTp( 0 );
   }
 };

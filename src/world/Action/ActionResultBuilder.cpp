@@ -81,10 +81,10 @@ void ActionResultBuilder::comboSucceed( Entity::CharaPtr& target )
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint8_t param )
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, param );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, shouldOverride );
   addResultToActor( target, nextResult );
 }
 
@@ -122,6 +122,8 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
     actionResult->setEffectFlags( Common::ActionEffectDisplayType::HideActionName );
+    if( !m_actorResultsMap.empty() )
+      taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, m_sourceChara, m_actorResultsMap.begin()->second, 300 ) );
     m_actorResultsMap.clear();
     return actionResult;
   }

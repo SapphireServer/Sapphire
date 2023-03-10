@@ -7,6 +7,7 @@
 
 #include "Actor/Chara.h"
 #include "Actor/Player.h"
+#include "StatusEffect/StatusEffect.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -70,11 +71,15 @@ void ActionResult::comboSucceed()
   m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO_HIT;
 }
 
-void ActionResult::applyStatusEffect( uint16_t statusId, uint8_t param )
+void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride )
 {
-  m_result.Value = static_cast< int16_t >( statusId );
+  m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
   m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
+
+  m_bOverrideStatus = shouldOverride;
+  m_pStatus = StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, 3000 );
+  m_pStatus->setParam( param );
 }
 
 void ActionResult::mount( uint16_t mountId )
@@ -87,6 +92,11 @@ void ActionResult::mount( uint16_t mountId )
 const Common::CalcResultParam& ActionResult::getCalcResultParam() const
 {
   return m_result;
+}
+
+const StatusEffect::StatusEffectPtr ActionResult::getStatusEffect() const
+{
+  return m_pStatus;
 }
 
 void ActionResult::execute()
@@ -111,6 +121,15 @@ void ActionResult::execute()
     case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP:
     {
       m_target->restoreMP( m_result.Value );
+      break;
+    }
+
+    case Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS:
+    {
+      if( !m_bOverrideStatus )
+        m_target->addStatusEffectByIdIfNotExist( m_pStatus->getId(), m_pStatus->getDuration(), *m_pStatus->getSrcActor(), m_pStatus->getParam() );
+      else
+        m_target->addStatusEffectById( m_pStatus->getId(), m_pStatus->getDuration(), *m_pStatus->getSrcActor(), m_pStatus->getParam() );
       break;
     }
 
