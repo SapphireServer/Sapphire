@@ -123,7 +123,15 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
     actionResult->setResultId( m_resultId );
     actionResult->setEffectFlags( Common::ActionEffectDisplayType::HideActionName );
     if( !m_actorResultsMap.empty() )
-      taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, m_sourceChara, m_actorResultsMap.begin()->second, 300 ) );
+      taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, m_sourceChara, m_actorResultsMap.begin()->second, 0 ) );
+
+    for( auto& result : m_actorResultsMap.begin()->second )
+    {
+      auto effect = result->getCalcResultParam();
+      if( result->getTarget() == m_sourceChara )
+        actionResult->addSourceEffect( effect );
+    }
+
     m_actorResultsMap.clear();
     return actionResult;
   }

@@ -17,7 +17,6 @@ using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 ActionIntegrityTask::ActionIntegrityTask( uint32_t resultId, Entity::CharaPtr pTarget, Action::ActionResultList& results, uint64_t delayTime ) : Task( delayTime )
 {
-  Logger::debug( "Constructor called {} {} {}", resultId, pTarget->getId(), results.size() );
   m_resultId = resultId;
   m_pTarget = std::move( pTarget );
   m_results = results;
