@@ -28,6 +28,7 @@
 #include "Script/ScriptMgr.h"
 #include "Script/NativeScriptMgr.h"
 
+#include "Actor/Actor.h"
 #include "Actor/EventObject.h"
 #include "Actor/BNpc.h"
 
@@ -38,6 +39,7 @@
 #include "Territory/PublicContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/ActionMgr.h"
 #include "Event/EventDefs.h"
 
 #include "ServerMgr.h"
@@ -466,6 +468,28 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
     }
     player.setVisualEffect( id );
   }
+  else if( subCommand == "bnpccast" || subCommand == "bcast" )
+  {
+    if( auto target = player.lookupTargetById( player.getTargetId() ) )
+    {
+      if( auto bnpc = target->getAsBNpc() )
+      {
+        int32_t id;
+        sscanf( params.c_str(), "%d", &id );
+        auto actionData = Common::Service< Data::ExdDataGenerated >::ref().get< Data::Action >( id );
+        if ( !actionData )
+          return;
+        if( !actionData->targetArea && bnpc->getTargetId() != 0 && bnpc->getTargetId() != INVALID_GAME_OBJECT_ID64 )
+        {
+          Service< World::Manager::ActionMgr >::ref().handleTargetedAction( *bnpc, id, actionData, bnpc->getTargetId(), 0 );
+        }
+        else if ( actionData->targetArea )
+        {
+          Service< World::Manager::ActionMgr >::ref().handlePlacedAction( *bnpc, id, actionData, player.getPos(), 0 );
+        }
+      }
+    }
+  }
   else
   {
     player.sendUrgent( "{0} is not a valid SET command.", subCommand );
@@ -694,6 +718,17 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
     if( pPopRange )
     {
       player.sendNotice( "x:{}, y:{}, z:{}", pPopRange->header.transform.translation.x, pPopRange->header.transform.translation.y, pPopRange->header.transform.translation.z );
+    }
+  }
+  else if ( ( subCommand == "targetinfo" ) || ( subCommand == "tinfo" ) || subCommand == "ti" )
+  {
+    if( auto target = player.lookupTargetById( player.getTargetId() ) )
+    {
+      if( auto bnpc = target->getAsBNpc() )
+      {
+        player.sendNotice( "BNpcBaseId: {}, BNpcNameId, {}", bnpc->getBNpcBaseId(), bnpc->getBNpcNameId() );
+      }
+      //else if
     }
   }
   else

@@ -1035,14 +1035,16 @@ void Sapphire::Entity::Player::despawn( Entity::PlayerPtr pTarget )
 
 Sapphire::Entity::ActorPtr Sapphire::Entity::Player::lookupTargetById( uint64_t targetId )
 {
-  ActorPtr targetActor;
+  if( targetId == 0 || targetId == INVALID_GAME_OBJECT_ID64 )
+    return nullptr;
+  
   auto inRange = getInRangeActors( true );
   for( auto actor : inRange )
   {
     if( actor->getId() == targetId )
-      targetActor = actor;
+      return actor;
   }
-  return targetActor;
+  return nullptr;
 }
 
 void Sapphire::Entity::Player::setLastPing( uint32_t ping )

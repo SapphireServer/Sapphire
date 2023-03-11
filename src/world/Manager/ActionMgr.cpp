@@ -22,6 +22,10 @@ void World::Manager::ActionMgr::handlePlacedAction( Entity::Chara& chara, uint32
   if( auto player = chara.getAsPlayer() )
     player->sendDebug( "got aoe act: {0}", actionData->name );
 
+  if( !actionData )
+  {
+    actionData = Common::Service< Data::ExdDataGenerated >::ref().get< Data::Action >( actionId );
+  }
 
   auto action = Action::make_Action( chara.getAsChara(), actionId, sequence, actionData );
 
