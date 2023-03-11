@@ -45,6 +45,11 @@ uint32_t EffectResult::getValue() const
   return m_value;
 }
 
+Common::ActionEffectType Sapphire::World::Action::EffectResult::getType() const
+{
+  return m_type;
+}
+
 uint64_t EffectResult::getDelay()
 {
   return m_delayMs;
