@@ -45,7 +45,7 @@ void Sapphire::Network::GameConnection::actionHandler( const Packets::FFXIVARR_P
       if( !action )
         return;
 
-      actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, sequence );
+      actionMgr.handleTargetedAction( player, actionId, action, targetId, sequence );
       break;
     }
 
@@ -117,5 +117,5 @@ void Sapphire::Network::GameConnection::placedActionHandler( const Packets::FFXI
     return;
 
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
-  actionMgr.handlePlacedPlayerAction( player, actionId, action, pos, sequence );
+  actionMgr.handlePlacedAction( player, actionId, action, pos, sequence );
 }

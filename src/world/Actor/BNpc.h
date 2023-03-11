@@ -117,6 +117,7 @@ namespace Sapphire::Entity
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
+    void unsetFlag( uint32_t flag );
 
     void calculateStats() override;
 

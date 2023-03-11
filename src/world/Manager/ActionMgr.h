@@ -23,9 +23,9 @@ namespace Sapphire::World::Manager
     ActionMgr() = default;
     ~ActionMgr() = default;
 
-    void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
+    void handleTargetedAction( Entity::Chara& chara, uint32_t actionId,
                                      Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
-    void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+    void handlePlacedAction( Entity::Chara& chara, uint32_t actionId,
                                    Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, Data::ItemActionPtr itemActionData,
@@ -37,7 +37,7 @@ namespace Sapphire::World::Manager
                             Data::ActionPtr actionData, uint64_t targetId, uint16_t sequence );
 
   private:
-    void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, Data::Action& actionData );
+    void bootstrapAction( Entity::Chara& chara, Action::ActionPtr currentAction, Data::Action& actionData );
 
     // item action handlers
     void handleItemActionVFX( Entity::Player& player, uint32_t itemId, uint16_t vfxId );

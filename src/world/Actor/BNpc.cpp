@@ -40,6 +40,7 @@
 #include <Manager/NaviMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Manager/ActionMgr.h>
 #include <Service.h>
 
 using namespace Sapphire::Common;
@@ -407,6 +408,13 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
   const uint8_t maxDistanceToOrigin = 40;
   const uint32_t roamTick = 20;
 
+  if( getCurrentAction() && getCurrentAction()->hasCastTime() )
+  {
+    if( m_pCurrentAction->update() )
+      m_pCurrentAction = nullptr;
+    return;
+  }
+
   auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
   if( !pNaviProvider )
@@ -485,66 +493,63 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
     case BNpcState::Combat:
     {
-      auto pHatedActor = hateListGetHighest();
-      if( !pHatedActor )
-        return;
-
       pNaviProvider->updateAgentParameters( *this );
 
       auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
                                           m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
 
-      if( pHatedActor && !pHatedActor->isAlive() )
+      auto pHatedActor = hateListGetHighest();
+
+      while( pHatedActor && !pHatedActor->isAlive() )
       {
         hateListRemove( pHatedActor );
         pHatedActor = hateListGetHighest();
       }
 
+      if( !pHatedActor )
+      {
+        hateListClear();
+        changeTarget( INVALID_GAME_OBJECT_ID64 );
+        setStance( Stance::Passive );
+        setOwner( nullptr );
+        m_state = BNpcState::Retreat;
+        return;
+      }
+
       if( pNaviProvider->syncPosToChara( *this ) )
         sendPositionUpdate();
 
-      if( pHatedActor )
+      auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
+        pHatedActor->getPos().x, pHatedActor->getPos().y, pHatedActor->getPos().z );
+
+      if( !hasFlag( NoDeaggro ) && ( distanceOrig > maxDistanceToOrigin ) )
       {
-        auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                        pHatedActor->getPos().x, pHatedActor->getPos().y, pHatedActor->getPos().z );
-
-        if( !hasFlag( NoDeaggro ) && ( distanceOrig > maxDistanceToOrigin ) )
-        {
-          hateListClear();
-          changeTarget( INVALID_GAME_OBJECT_ID64 );
-          setStance( Stance::Passive );
-          setOwner( nullptr );
-          m_state = BNpcState::Retreat;
-          break;
-        }
-
-        if( distance > ( getRadius() + pHatedActor->getRadius() ) )
-        {
-          if( hasFlag( Immobile ) )
-            break;
-
-          if( pNaviProvider )
-            pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
-
-          moveTo( *pHatedActor );
-        }
-
-        if( distance < ( getRadius() + pHatedActor->getRadius() + 3.f ) )
-        {
-          if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
-            sendPositionUpdate();
-
-          // in combat range. ATTACK!
-          autoAttack( pHatedActor );
-        }
-      }
-      else
-      {
+        hateListClear();
         changeTarget( INVALID_GAME_OBJECT_ID64 );
         setStance( Stance::Passive );
-        //setOwner( nullptr );
+        setOwner( nullptr );
         m_state = BNpcState::Retreat;
-        pNaviProvider->updateAgentParameters( *this );
+        break;
+      }
+
+      if( distance > ( getRadius() + pHatedActor->getRadius() ) )
+      {
+        if( hasFlag( Immobile ) )
+          break;
+
+        if( pNaviProvider )
+          pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
+
+        moveTo( *pHatedActor );
+      }
+
+      if( distance < ( getRadius() + pHatedActor->getRadius() + 3.f ) )
+      {
+        if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
+          sendPositionUpdate();
+
+        // in combat range. ATTACK!
+        autoAttack( pHatedActor );
       }
     }
   }
@@ -653,7 +658,7 @@ void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
   else
   {
     auto setOwnerPacket = makeZonePacket< FFXIVIpcActorOwner >( getId() );
-    setOwnerPacket->data().type = 0x01;
+    setOwnerPacket->data().type = 0x00;
     setOwnerPacket->data().actorId = static_cast< uint32_t >( INVALID_GAME_OBJECT_ID );
     sendToInRangeSet( setOwnerPacket );
   }
@@ -677,6 +682,11 @@ bool Sapphire::Entity::BNpc::hasFlag( uint32_t flag ) const
 void Sapphire::Entity::BNpc::setFlag( uint32_t flag )
 {
   m_flags |= flag;
+}
+
+void Sapphire::Entity::BNpc::unsetFlag( uint32_t flag )
+{
+  m_flags = m_flags & ( 0xFFFFFFFF - flag );
 }
 
 /*!
