@@ -36,6 +36,7 @@
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>
+#include <Manager/ActionMgr.h>
 #include <Script/ScriptMgr.h>
 #include <Task/RemoveBNpcTask.h>
 #include <Task/FadeBNpcTask.h>
@@ -643,6 +644,8 @@ void BNpc::update( uint64_t tickCount )
   if( !pNaviProvider )
     return;
 
+  checkAction();
+
   switch( m_state )
   {
     case BNpcState::Dead:
@@ -803,7 +806,7 @@ void BNpc::restHp()
       m_hp = getMaxHp();
   }
 
-  sendHudParam();
+  Network::Util::Packet::sendHudParam( *this );
 }
 
 void BNpc::onActionHostile( CharaPtr pSource )
@@ -963,6 +966,8 @@ void BNpc::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdData >::ref();
 
   uint64_t tick = Util::getTimeMs();
 
@@ -972,26 +977,7 @@ void BNpc::autoAttack( CharaPtr pTarget )
     pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
-
-    auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-    //damage.first = 1;
-
-    auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
-    effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-    Common::CalcResultParam effectEntry{};
-    effectEntry.Value = static_cast< int16_t >( damage.first );
-    effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-    effectEntry.Arg0 = 3;
-    effectEntry.Arg1 = 7;
-    auto resultId = pZone->getNextActionResultId();
-    effectPacket->setResultId( resultId );
-    effectPacket->addTargetEffect( effectEntry );
-    server().queueForPlayers( getInRangePlayerIds(), effectPacket );
-
-    pTarget->takeDamage( static_cast< uint16_t >( damage.first ) );
-
-    auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
-    //taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
+    actionMgr.handleTargetedAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
   }
 }
 

@@ -923,16 +923,6 @@ void Player::update( uint64_t tickCount )
   Chara::update( tickCount );
 }
 
-uint64_t Player::getLastAttack() const
-{
-  return m_lastAttack;
-}
-
-void Player::setLastAttack( uint64_t tickCount )
-{
-  m_lastAttack = tickCount;
-}
-
 void Player::freePlayerSpawnId( uint32_t actorId )
 {
   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
@@ -1295,9 +1285,9 @@ void Player::autoAttack( CharaPtr pTarget )
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
-  //actionMgr.handleTargetedPlayerAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
+  actionMgr.handleTargetedAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
 
-  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
+/*  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
 
   auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
 
@@ -1320,7 +1310,7 @@ void Player::autoAttack( CharaPtr pTarget )
 
   pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );
 
-  auto& taskMgr = Common::Service< TaskMgr >::ref();
+  auto& taskMgr = Common::Service< TaskMgr >::ref();*/
   //taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
 }
 

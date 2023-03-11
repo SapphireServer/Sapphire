@@ -71,8 +71,12 @@ void Util::Packet::sendBaseParams( Entity::Player& player )
 
 void Util::Packet::sendHudParam( Entity::Chara& source )
 {
-  auto hudParamPacket = makeHudParam( source );
-  server().queueForPlayers( source.getInRangePlayerIds( source.isPlayer() ), hudParamPacket );
+  if( source.isPlayer() )
+    server().queueForPlayers( source.getInRangePlayerIds( true ), makeHudParam( *source.getAsPlayer() ) );
+  else if( source.isBattleNpc() )
+    server().queueForPlayers( source.getInRangePlayerIds( false ), makeHudParam( *source.getAsBNpc() ) );
+  else
+    server().queueForPlayers( source.getInRangePlayerIds( false ), makeHudParam( source ) );
 }
 
 void Util::Packet::sendStatusUpdate( Entity::Player& player )

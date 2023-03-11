@@ -52,7 +52,7 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       if( category  == Common::ActionCategory::ItemManipulation )
         actionMgr.handleItemManipulationAction( player, actionId, action, requestId );
       else
-        actionMgr.handleTargetedPlayerAction( player, actionId, action, targetId, requestId );
+        actionMgr.handleTargetedAction( player, actionId, action, targetId, requestId );
       break;
     }
 

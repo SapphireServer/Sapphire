@@ -59,13 +59,13 @@ void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t a
   action->start();
 }
 
-void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                            Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t requestId )
+void ActionMgr::handleTargetedAction( Entity::Chara& src, uint32_t actionId,
+                                      Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t requestId )
 {
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, requestId, actionData );
+  auto action = Action::make_Action( src.getAsChara(), actionId, requestId, actionData );
 
   action->setTargetId( targetId );
-  action->setPos( player.getPos() );
+  action->setPos( src.getPos() );
 
   if( !action->init() )
     return;
@@ -77,7 +77,7 @@ void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t act
     return;
   }
 
-  bootstrapAction( player, action, actionData );
+  bootstrapAction( src, action, actionData );
 }
 
 void ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
@@ -124,7 +124,7 @@ void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
   bootstrapAction( player, action, actionData );
 }
 
-void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction,
+void ActionMgr::bootstrapAction( Entity::Chara& src, Action::ActionPtr currentAction,
                                  Excel::ExcelStructPtr< Excel::Action > actionData )
 {
   /*
@@ -137,20 +137,25 @@ void ActionMgr::bootstrapAction( Entity::Player& player, Action::ActionPtr curre
   }
   */
 
-  if( player.getCurrentAction() )
+  if( src.getCurrentAction() )
   {
-    PlayerMgr::sendDebug( player, "Skill queued: {0}", currentAction->getId() );
-    player.setQueuedAction( currentAction );
+    if( src.isPlayer() )
+    {
+      auto& player = *src.getAsPlayer();
+      PlayerMgr::sendDebug( player, "Skill queued: {0}", currentAction->getId() );
+      player.setQueuedAction( currentAction );
+    }
+
   }
   else
   {
     // if we have a cast time we want to associate the action with the player so update is called
     if( currentAction->hasCastTime() )
-      player.setCurrentAction( currentAction );
+      src.setCurrentAction( currentAction );
 
     // todo: what do in cases of swiftcast/etc? script callback?
     currentAction->start();
-    player.setLastAttack( Common::Util::getTimeMs() );
+    src.setLastAttack( Common::Util::getTimeMs() );
   }
 }
 

@@ -285,6 +285,16 @@ void Chara::die()
   Network::Util::Packet::sendActorControl( getInRangePlayerIds( selfNeedsUpdate ), getId(), DeathAnimation );
 }
 
+uint64_t Chara::getLastAttack() const
+{
+  return m_lastAttack;
+}
+
+void Chara::setLastAttack( uint64_t tickCount )
+{
+  m_lastAttack = tickCount;
+}
+
 /*!
 Calculates and sets the rotation to look towards a specified
 position
@@ -424,18 +434,6 @@ void Chara::restoreMP( uint32_t amount )
   }
   else
     m_mp += amount;
-}
-
-/*!
-Send an HpMpTp update to players in range ( and potentially to self )
-TODO: poor naming, should be changed. Status is not HP. Also should be virtual
-so players can have their own version and we can abolish the param.
-
-\param true if the update should also be sent to the actor ( player ) himself
-*/
-void Chara::sendHudParam()
-{
-  Network::Util::Packet::sendHudParam( *this );
 }
 
 /*! \return ActionPtr of the currently registered action, or nullptr */

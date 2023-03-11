@@ -333,9 +333,11 @@ void Action::Action::start()
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, m_cooldownGroup, getId(), m_recastTimeMs / 10 );
 
-  player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
-
-  server().queueForPlayer( player->getCharacterId(), actionStartPkt );
+  if( player )
+  {
+    player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
+    server().queueForPlayer( player->getCharacterId(), actionStartPkt );
+  }
 
   onStart();
 
@@ -369,7 +371,6 @@ void Action::Action::onStart()
 void Action::Action::interrupt()
 {
   assert( m_pSource );
-
   // things that aren't players don't care about cooldowns and state flags
   if( m_pSource->isPlayer() )
   {
@@ -409,7 +410,6 @@ void Action::Action::onInterrupt()
 void Action::Action::execute()
 {
   assert( m_pSource );
-
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
   if( !consumeResources() )
   {
@@ -464,6 +464,10 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
       wepDmg = item->getMagicalDmg();
     else
       wepDmg = item->getPhysicalDmg();
+
+    // is auto attack
+    if( getId() == 7 || getId() == 8 )
+      return Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer() );
   }
 
   return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
@@ -574,7 +578,6 @@ void Action::Action::buildActionResults()
       shouldRestoreMP = false;
     }
   }
-
   m_actionResultBuilder->sendActionResults( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions

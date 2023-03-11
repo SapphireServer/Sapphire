@@ -203,6 +203,10 @@ namespace Sapphire::Entity
 
     void die();
 
+    uint64_t getLastAttack() const;
+
+    void setLastAttack( uint64_t tickCount );
+
     Common::ActorStatus getStatus() const;
 
     void setStatus( Common::ActorStatus status );
@@ -222,8 +226,6 @@ namespace Sapphire::Entity
     virtual void changeTarget( uint64_t targetId );
 
     virtual uint8_t getLevel() const;
-
-    virtual void sendHudParam();
 
     virtual void takeDamage( uint32_t damage );
 
