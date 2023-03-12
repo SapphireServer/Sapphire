@@ -56,6 +56,8 @@ namespace Sapphire::World::Action
     uint64_t getCastTimeRest() const;
 
     void enableGenericHandler();
+    
+    std::shared_ptr< Excel::ExcelStruct< Excel::Action > > getActionData() const;
 
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)

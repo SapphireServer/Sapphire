@@ -1302,33 +1302,8 @@ void Player::autoAttack( CharaPtr pTarget )
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
-  actionMgr.handleTargetedAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
+  actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );
 
-/*  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-
-  auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
-
-  Common::CalcResultParam entry{};
-
-  entry.Value = static_cast< int16_t >( damage.first );
-  entry.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-  entry.Arg0 = 2;
-  entry.Arg1 = 7;
-
-  if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
-    effectPacket->setActionId( 8 );
-
-  auto resultId = pZone->getNextActionResultId();
-  effectPacket->setResultId( resultId );
-  effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-  effectPacket->addTargetEffect( entry );
-
-  server().queueForPlayers( getInRangePlayerIds( true ), effectPacket );
-
-  pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );
-
-  auto& taskMgr = Common::Service< TaskMgr >::ref();*/
-  //taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
 }
 
 

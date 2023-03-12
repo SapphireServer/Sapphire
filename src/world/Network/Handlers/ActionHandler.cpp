@@ -50,9 +50,9 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       auto category = static_cast< Common::ActionCategory >( action->data().Category );
 
       if( category  == Common::ActionCategory::ItemManipulation )
-        actionMgr.handleItemManipulationAction( player, actionId, action, requestId );
+        actionMgr.handleItemManipulationAction( player, actionId, requestId );
       else
-        actionMgr.handleTargetedAction( player, actionId, action, targetId, requestId );
+        actionMgr.handleTargetedAction( player, actionId, targetId, requestId );
       break;
     }
 
@@ -111,7 +111,7 @@ void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets
     return;
   }
 
-  PlayerMgr::sendDebug( player, "Skill type: {0}, sequence: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
+  PlayerMgr::sendDebug( player, "Skill type: {0}, requestId: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
                         type, requestId, actionId, pos.x, pos.y, pos.z );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -123,5 +123,5 @@ void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets
     return;
 
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
-  actionMgr.handlePlacedPlayerAction( player, actionId, action, pos, requestId );
+  actionMgr.handlePlacedAction( player, actionId, pos, requestId );
 }

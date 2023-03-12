@@ -982,7 +982,7 @@ void BNpc::autoAttack( CharaPtr pTarget )
     pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
-    actionMgr.handleTargetedAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
+    actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );
   }
 }
 
@@ -1051,16 +1051,12 @@ uint32_t BNpc::getLayoutId() const
 
 void BNpc::init()
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
   m_maxHp = Math::CalcStats::calculateMaxHp( *getAsChara() );
   m_hp = m_maxHp;
 
   //setup a test gambit
-  auto testGambitRule = std::make_shared< AI::GambitRule >( std::make_shared< AI::TopHateTargetCondition >(),
-                                                            Action::make_Action( getAsChara(), 88, 0, exdData.getRow< Excel::Action >( 88 ) ), 5000 );
-
-  auto testGambitRule1 = std::make_shared< AI::GambitRule >( std::make_shared< AI::HPSelfPctLessThan >( 50 ),
-                                                             Action::make_Action( getAsChara(), 120, 0, exdData.getRow< Excel::Action >( 120 ) ), 5000 );
+  auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
+  auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThan( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
 
   m_gambits.push_back( testGambitRule );
   m_gambits.push_back( testGambitRule1 );
@@ -1068,7 +1064,6 @@ void BNpc::init()
 
 void BNpc::processGambits( uint64_t tickCount )
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
   for( auto& gambitRule : m_gambits )
   {
@@ -1081,8 +1076,8 @@ void BNpc::processGambits( uint64_t tickCount )
         continue;
 
       gambitRule->setLastExecutionMs( tickCount );
-      actionMgr.handleTargetedAction( *this, gambitRule->getActionPtr()->getId(), exdData.getRow< Excel::Action >( gambitRule->getActionPtr()->getId() ),
-                                      gambitRule->getGambitTargetCondition()->getTarget()->getId(), 0 );
+      actionMgr.handleTargetedAction( *this, gambitRule->getActionPtr()->getId(), gambitRule->getGambitTargetCondition()->getTarget()->getId(), 0 );
+      break;
     }
 
   }
