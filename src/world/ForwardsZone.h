@@ -47,6 +47,12 @@ namespace World::Territory::Housing
 TYPE_FORWARD( HousingInteriorTerritory );
 }
 
+namespace World::AI
+{
+  TYPE_FORWARD( GambitTargetCondition );
+  TYPE_FORWARD( GambitRule );
+}
+
 namespace Inventory
 {
 using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
