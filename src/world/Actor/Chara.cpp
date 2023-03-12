@@ -503,41 +503,18 @@ void Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
+void Chara::addStatusEffectById( StatusEffect::StatusEffectPtr pStatus )
 {
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
-  effect->setParam( param );
-  addStatusEffect( effect );
-}
-
-void Chara::addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source,
-                                 std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, uint16_t param )
-{
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, modifiers, flag, 3000 );
-  effect->setParam( param );
-  addStatusEffect( effect );
+  addStatusEffect( pStatus );
 }
 
 /*! \param StatusEffectPtr to be applied to the actor */
-void Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param )
+void Chara::addStatusEffectByIdIfNotExist( StatusEffect::StatusEffectPtr pStatus )
 {
-  if( hasStatusEffect( id ) )
+  if( hasStatusEffect( pStatus->getId() ) )
     return;
 
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, 3000 );
-  effect->setParam( param );
-  addStatusEffect( effect );
-}
-
-void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
-                                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, uint16_t param )
-{
-  if( hasStatusEffect( id ) )
-    return;
-
-  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, modifiers, flag, 3000 );
-  effect->setParam( param );
-  addStatusEffect( effect );
+  addStatusEffect( pStatus );
 }
 
 int8_t Chara::getStatusEffectFreeSlot()

@@ -663,7 +663,10 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // lol just for testing
-  auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );
+  float det = chara.getStatValue( Common::BaseParam::Determination );
+  float mnd = chara.getStatValue( Common::BaseParam::Mind );
+
+  auto factor = std::floor( ( wepDmg * ( mnd / 200 ) + ( det / 10 ) ) * ( ptc / 100 ) * 1.3f );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
 
   if( criticalHitProbability( chara ) > range100( rng ) )
