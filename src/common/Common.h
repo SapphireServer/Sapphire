@@ -922,6 +922,23 @@ namespace Sapphire::Common
     ParryPercent = 1031
   };
 
+  enum class StatusEffectFlag : uint32_t
+  {
+    BuffCategory = 1,
+    DebuffCategory = 2,
+    Permanent = 4,
+    IsGaze = 8,
+    Transfiguration = 16,
+    CanDispel = 32,
+    LockActions = 64,
+    LockControl = 128,
+    LockMovement = 256,
+    Invisibilty = 512,
+    CanStatusOff = 1024,
+    FcBuff = 2048,
+    RemoveOnSuccessfulHit = 4096
+  };
+
   enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected

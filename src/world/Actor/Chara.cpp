@@ -572,6 +572,17 @@ void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_
   addStatusEffect( effect );
 }
 
+void Sapphire::Entity::Chara::addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source,
+                                                             World::Action::StatusEntry& statusEntry, uint16_t param )
+{
+  if( hasStatusEffect( id ) )
+    return;
+
+  auto effect = StatusEffect::make_StatusEffect( id, source.getAsChara(), getAsChara(), duration, statusEntry, 3000 );
+  effect->setParam( param );
+  addStatusEffect( effect );
+}
+
 int8_t Sapphire::Entity::Chara::getStatusEffectFreeSlot()
 {
   int8_t freeEffectSlot = -1;
@@ -611,6 +622,17 @@ void Sapphire::Entity::Chara::removeSingleStatusEffectById( uint32_t id )
       removeStatusEffect( effectIt.first );
       break;
     }
+  }
+}
+
+void Sapphire::Entity::Chara::removeStatusEffectByFlag( Common::StatusEffectFlag flag )
+{
+  for( auto effectIt = m_statusEffectMap.begin(); effectIt != m_statusEffectMap.end(); )
+  {
+    if( effectIt->second->getFlag() & static_cast< uint32_t >( flag ) )
+      effectIt = removeStatusEffect( effectIt->first );
+    else
+      ++effectIt;
   }
 }
 

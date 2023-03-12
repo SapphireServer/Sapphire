@@ -629,7 +629,7 @@
   },
   "44": {
     "name": "Vengeance",
-    "potency": 50,
+    "potency": 0,
     "comboPotency": 0,
     "flankPotency": 0,
     "frontPotency": 0,
@@ -638,7 +638,18 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 89,
+          "duration": 20000,
+          "modifiers": [
+            {
+              "modifier": "ReflectPhysical",
+              "value": 50
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
@@ -1263,7 +1274,19 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 116,
+          "duration": 10000,
+          "flag": 4096,
+          "modifiers": [
+            {
+              "modifier": "CriticalHitPercent",
+              "value": 100
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },

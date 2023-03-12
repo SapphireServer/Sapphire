@@ -29,6 +29,14 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
 }
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                                                    uint32_t duration, World::Action::StatusEntry& statusEntry, uint32_t tickRate ) :
+  StatusEffect( id, sourceActor, targetActor, duration, tickRate )
+{
+  m_statusModifiers = statusEntry.modifiers;
+  m_flag |= statusEntry.flag;
+}
+
+Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                     uint32_t duration, uint32_t tickRate ) :
   m_id( id ),
   m_sourceActor( sourceActor ),
@@ -37,7 +45,8 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_modifiers( 0 ),
   m_startTime( 0 ),
   m_tickRate( tickRate ),
-  m_lastTick( 0 )
+  m_lastTick( 0 ),
+  m_flag( 0 )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto entry = exdData.getRow< Excel::Status >( id );
@@ -52,6 +61,15 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   Util::eraseAll( m_name, '-' );
   Util::eraseAll( m_name, '(' );
   Util::eraseAll( m_name, ')' );
+
+  m_flag |= entry->data().Category;
+  m_flag |= static_cast< uint32_t >( entry->data().Forever ) << static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+  m_flag |= static_cast< uint32_t >( entry->data().CanOff ) << static_cast< uint32_t >( Common::StatusEffectFlag::CanStatusOff );
+  m_flag |= static_cast< uint32_t >( entry->data().NotAction ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockActions );
+  m_flag |= static_cast< uint32_t >( entry->data().NotControl ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockControl );
+  m_flag |= static_cast< uint32_t >( entry->data().NotMove ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockMovement );
+  m_flag |= static_cast< uint32_t >( entry->data().NotLookAt ) << static_cast< uint32_t >( Common::StatusEffectFlag::IsGaze );
+  m_flag |= static_cast< uint32_t >( entry->data().FcAction ) << static_cast< uint32_t >( Common::StatusEffectFlag::FcBuff );
 }
 
 
@@ -190,6 +208,16 @@ uint64_t Sapphire::StatusEffect::StatusEffect::getLastTickMs() const
 uint64_t Sapphire::StatusEffect::StatusEffect::getStartTimeMs() const
 {
   return m_startTime;
+}
+
+uint32_t Sapphire::StatusEffect::StatusEffect::getFlag() const
+{
+  return m_flag;
+}
+
+void Sapphire::StatusEffect::StatusEffect::setFlag( uint32_t flag )
+{
+  m_flag = flag;
 }
 
 void Sapphire::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )

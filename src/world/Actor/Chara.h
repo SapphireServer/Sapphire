@@ -114,6 +114,8 @@ namespace Sapphire::Entity
 
     void removeSingleStatusEffectById( uint32_t id );
 
+    void removeStatusEffectByFlag( Common::StatusEffectFlag flag );
+
     void updateStatusEffects();
 
     bool hasStatusEffect( uint32_t id );
@@ -142,6 +144,8 @@ namespace Sapphire::Entity
     // add a status effect by id if it doesn't exist
     void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
     void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, std::vector< World::Action::StatusModifier > modifiers,
+                                        uint16_t param = 0 );
+    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, World::Action::StatusEntry& statusEntry,
                                         uint16_t param = 0 );
 
     // remove a status effect by id

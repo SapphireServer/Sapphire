@@ -88,6 +88,7 @@ bool Action::Action::init()
   m_cooldownGroup = m_actionData->data().RecastGroup;
   m_range = m_actionData->data().SelectRange;
   m_effectRange = m_actionData->data().EffectRange;
+  m_effectWidth = m_actionData->data().EffectWidth;
   m_category = static_cast< Common::ActionCategory >( m_actionData->data().Category );
   m_castType = static_cast< Common::CastType >( m_actionData->data().EffectType );
   m_aspect = static_cast< Common::ActionAspect >( m_actionData->data().AttackType );
@@ -119,7 +120,7 @@ bool Action::Action::init()
   m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->data().CostType );
   m_primaryCost = m_actionData->data().CostValue;
 
-  /*if( !m_actionData->targetArea )
+  if( !m_actionData->data().SelectGround )
   {
     // override pos to target position
     // todo: this is kinda dirty
@@ -131,7 +132,7 @@ bool Action::Action::init()
         break;
       }
     }
-  }*/
+  }
 
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
 
@@ -607,10 +608,16 @@ void Action::Action::handleAction()
     }
   }
 
-  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
-    handleStatusEffects();
+  // If we hit an enemy
+  if( m_hitActors.size() > 0 && getHitChara()->getObjKind() != m_pSource->getObjKind() )
+  {
+    m_pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
+  }
 
   handleJobAction();
+
+  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
+    handleStatusEffects();
 
   m_effectBuilder->buildAndSendPackets( m_hitActors );
 
@@ -630,7 +637,7 @@ void Action::Action::handleStatusEffects()
     for( auto& status : m_lutEntry.statuses.caster )
     {
       applyStatusEffectSelf( status.id );
-      m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
+      m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status );
     }
   }
 
@@ -642,7 +649,7 @@ void Action::Action::handleStatusEffects()
       for( auto& status : m_lutEntry.statuses.target )
       {
         getEffectbuilder()->applyStatusEffect( actor, status.id, 0 );
-        actor->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status.modifiers );
+        actor->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status );
       }
 
       if( actor->getStatusEffectMap().size() > 0 )
@@ -866,7 +873,6 @@ void Action::Action::addDefaultActorFilters()
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
-    case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
       addActorFilter( filter );

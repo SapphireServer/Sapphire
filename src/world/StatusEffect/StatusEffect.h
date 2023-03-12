@@ -15,6 +15,9 @@ public:
                 uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate );
 
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
+                uint32_t duration, World::Action::StatusEntry& statusEntry, uint32_t tickRate );
+
+  StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, uint32_t tickRate );
 
   ~StatusEffect();
@@ -47,9 +50,13 @@ public:
 
   uint16_t getParam() const;
 
+  uint32_t getFlag() const;
+
   void setLastTick( uint64_t lastTick );
 
   void setParam( uint16_t param );
+
+  void setFlag( uint32_t flag );
 
   void registerTickEffect( Common::ParamModifier type, uint32_t param );
 
@@ -66,6 +73,7 @@ private:
   uint32_t m_tickRate;
   uint64_t m_lastTick;
   uint16_t m_param;
+  uint32_t m_flag;
   std::string m_name;
   std::pair< Common::ParamModifier, uint32_t > m_currTickEffect;
   std::vector< World::Action::StatusModifier > m_statusModifiers;
