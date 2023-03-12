@@ -71,13 +71,6 @@ void ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t act
   if( !action->init() )
     return;
 
-  // cancel any aoe actions casted with this packet
-  if( actionData->data().EffectRange )
-  {
-    action->interrupt();
-    return;
-  }
-
   bootstrapAction( player, action, actionData );
 }
 

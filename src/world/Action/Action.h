@@ -193,6 +193,7 @@ namespace Sapphire::World::Action
     uint8_t m_cooldownGroup{};
     int8_t m_range{};
     uint8_t m_effectRange{};
+    uint8_t m_effectWidth{};
     uint8_t m_xAxisModifier{};
     Common::ActionAspect m_aspect;
     Common::CastType m_castType;

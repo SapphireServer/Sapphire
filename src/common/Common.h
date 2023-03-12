@@ -1872,8 +1872,8 @@ namespace Sapphire::Common
   {
     SingleTarget = 1,
     CircularAOE = 2,
-    Type3 = 3, // another single target? no idea how to call it
-    RectangularAOE = 4,
+    RectangularAOE = 3,
+    ConeAOE = 4,
     CircularAoEPlaced = 7
   };
 
