@@ -33,6 +33,8 @@ namespace Sapphire::World::Action
   {
     j.at( "id" ).get_to( statusEntry.id );
     j.at( "duration" ).get_to( statusEntry.duration );
+    if( j.contains( "flag" ) )
+      j.at( "flag" ).get_to( statusEntry.flag );
     if( j.contains( "modifiers" ) )
       j.at( "modifiers" ).get_to( statusEntry.modifiers );
   }
