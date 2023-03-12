@@ -733,6 +733,7 @@ void Player::setClassJob( Common::ClassJob classJob )
 
   m_tp = 0;
 
+  Network::Util::Player::sendChangeClass( *this );
   Network::Util::Player::sendStatusUpdate( *this );
   Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, ClassJobChange, 4 );
   Network::Util::Player::sendHudParam( *this );
