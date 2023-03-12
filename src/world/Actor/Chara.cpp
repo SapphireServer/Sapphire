@@ -365,7 +365,7 @@ Change the current target and propagate to in range players
 void Chara::changeTarget( uint64_t targetId )
 {
   setTargetId( targetId );
-  Network::Util::Packet::sendActorControlTarget( getInRangePlayerIds(), getId(), ToggleWeapon, SetTarget, 0, 0, 0, 0, targetId );
+  Network::Util::Packet::sendActorControlTarget( getInRangePlayerIds(), getId(), SetTarget, 0, 0, 0, 0, targetId );
 }
 
 /*!

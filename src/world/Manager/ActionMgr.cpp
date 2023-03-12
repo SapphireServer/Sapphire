@@ -23,18 +23,19 @@ bool ActionMgr::cacheActionLut()
   return Action::ActionLutData::cacheActions();
 }
 
-void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                          Excel::ExcelStructPtr< Excel::Action > actionData, Common::FFXIVARR_POSITION3 pos,
-                                          uint16_t sequence )
+void ActionMgr::handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::FFXIVARR_POSITION3 pos, uint16_t requestId )
 {
-  PlayerMgr::sendDebug( player, "got aoe act: {0}", actionData->getString( actionData->data().Text.Name ) );
-
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
+  auto action = Action::make_Action( chara.getAsChara(), actionId, requestId );
 
   action->setPos( pos );
 
   if( !action->init() )
     return;
+
+  auto actionData = action->getActionData();
+
+  if( chara.isPlayer() )
+    PlayerMgr::sendDebug( *chara.getAsPlayer(), "got aoe act: {0}", actionData->getString( actionData->data().Text.Name ) );
 
   if( !actionData->data().EffectRange )
   {
@@ -43,13 +44,12 @@ void ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actio
     return;
   }
 
-  bootstrapAction( player, action, actionData );
+  bootstrapAction( chara, action, actionData );
 }
 
-void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t actionId,
-                                    Excel::ExcelStructPtr< Excel::Action > actionData, uint16_t sequence )
+void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t actionId,  uint16_t sequence )
 {
-  auto action = Action::make_ItemManipulationAction( player.getAsPlayer(), actionId, sequence, actionData, 2500 ); // todo: maybe the delay can be retrieved from data
+  auto action = Action::make_ItemManipulationAction( player.getAsPlayer(), actionId, sequence, nullptr, 2500 ); // todo: maybe the delay can be retrieved from data
 
   player.setCurrentAction( action );
 
@@ -59,16 +59,17 @@ void ActionMgr::handleItemManipulationAction( Entity::Player& player, uint32_t a
   action->start();
 }
 
-void ActionMgr::handleTargetedAction( Entity::Chara& src, uint32_t actionId,
-                                      Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId, uint16_t requestId )
+void ActionMgr::handleTargetedAction( Entity::Chara& src, uint32_t actionId, uint64_t targetId, uint16_t requestId )
 {
-  auto action = Action::make_Action( src.getAsChara(), actionId, requestId, actionData );
+  auto action = Action::make_Action( src.getAsChara(), actionId, requestId );
 
   action->setTargetId( targetId );
   action->setPos( src.getPos() );
 
   if( !action->init() )
     return;
+
+  auto actionData = action->getActionData();
 
   // cancel any aoe actions casted with this packet
   if( actionData->data().EffectRange )

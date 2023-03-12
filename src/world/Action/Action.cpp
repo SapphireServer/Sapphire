@@ -71,6 +71,11 @@ uint32_t Action::Action::getResultId() const
   return m_resultId;
 }
 
+std::shared_ptr< Excel::ExcelStruct< Excel::Action > > Action::Action::getActionData() const
+{
+  return m_actionData;
+}
+
 bool Action::Action::init()
 {
   if( !m_actionData )

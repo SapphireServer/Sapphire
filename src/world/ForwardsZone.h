@@ -50,6 +50,9 @@ TYPE_FORWARD( HousingInteriorTerritory );
 namespace World::AI
 {
   TYPE_FORWARD( GambitTargetCondition );
+  TYPE_FORWARD( TopHateTargetCondition );
+  TYPE_FORWARD( HPSelfPctLessThan );
+
   TYPE_FORWARD( GambitRule );
 }
 
