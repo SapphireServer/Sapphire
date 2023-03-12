@@ -179,7 +179,8 @@ private:
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.addStatusEffectById( Status0, 0, player, Transformation0 );
+    // todo - fix status effect without action?
+    //player.addStatusEffectById( Status0, 0, player, Transformation0 );
     eventMgr().sendEventNotice( player, getId(), 0, 0 );
     quest.setSeq( Seq2 );
   }
