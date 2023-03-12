@@ -172,6 +172,26 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void BattleNpcScript::onInit( Entity::BNpc& bnpc )
+  {
+  }
+
+  void BattleNpcScript::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
+  {
+  }
+
+  void BattleNpcScript::onHateListAdd( Entity::BNpc& bnpc, Entity::Chara& target )
+  {
+  }
+
+  void BattleNpcScript::onHateListRemove( Entity::BNpc& bnpc, Entity::Chara& target )
+  {
+  }
+
+  void BattleNpcScript::onDeath( Entity::BNpc& bnpc )
+  {
+  }
+
   ///////////////////////////////////////////////////////////////////
 
   ZoneScript::ZoneScript( uint32_t zoneId ) :

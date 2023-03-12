@@ -9,6 +9,7 @@
 #include "Territory/QuestBattle.h"
 #include "Territory/PublicContent.h"
 #include "Actor/Player.h"
+#include "Actor/BNpc.h"
 #include "Actor/EventObject.h"
 #include "ServerMgr.h"
 #include "Event/EventHandler.h"
@@ -647,6 +648,66 @@ bool Sapphire::Scripting::ScriptMgr::onPublicContentEnterTerritory( PublicConten
   if( script )
   {
     script->onEnterTerritory( *instance, player, eventId, param1, param2 );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onBNpcInit( Entity::BNpc& bnpc )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::BattleNpcScript >( bnpc.getBNpcBaseId() );
+  if( script )
+  {
+    script->onInit( bnpc );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onBNpcUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::BattleNpcScript >( bnpc.getBNpcBaseId() );
+  if( script )
+  {
+    script->onUpdate( bnpc, tickCount );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onBNpcHateListAdd( Entity::BNpc& bnpc, Entity::Chara& target )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::BattleNpcScript >( bnpc.getBNpcBaseId() );
+  if( script )
+  {
+    script->onHateListAdd( bnpc, target );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onBNpcHateListRemove( Entity::BNpc& bnpc, Entity::Chara& target )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::BattleNpcScript >( bnpc.getBNpcBaseId() );
+  if( script )
+  {
+    script->onHateListRemove( bnpc, target );
+    return true;
+  }
+
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onBNpcDeath( Entity::BNpc& bnpc )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::BattleNpcScript >( bnpc.getBNpcBaseId() );
+  if( script )
+  {
+    script->onDeath( bnpc );
     return true;
   }
 

@@ -33,6 +33,7 @@
 #include "Player.h"
 #include "BNpc.h"
 #include "BNpcTemplate.h"
+#include "Script/ScriptMgr.h"
 
 #include "Common.h"
 
@@ -120,6 +121,8 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_naviTargetReachedDistance = 4.f;
 
   calculateStats();
+  auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
+  scriptMgr.onBNpcInit( *this );
 }
 
 Sapphire::Entity::BNpc::~BNpc() = default;
@@ -255,6 +258,15 @@ bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
   return false;
 }
 
+void Sapphire::Entity::BNpc::stopMoving()
+{
+  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
+  if( !pNaviProvider )
+    return;
+  sendPositionUpdate();
+  pNaviProvider->updateAgentPosition( *this );
+}
+
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
   uint8_t unk1 = 0x3a;
@@ -269,13 +281,14 @@ void Sapphire::Entity::BNpc::sendPositionUpdate()
 
 void Sapphire::Entity::BNpc::hateListClear()
 {
-  auto it = m_hateList.begin();
-  for( auto& listEntry : m_hateList )
+  if( m_hateList.empty() )
+    return;
+
+  auto hateListCopy = m_hateList;
+  for( auto& listEntry : hateListCopy )
   {
-    if( isInRangeSet( listEntry->m_pChara ) )
-      deaggro( listEntry->m_pChara );
+    deaggro( listEntry->m_pChara );
   }
-  m_hateList.clear();
 }
 
 Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
@@ -298,25 +311,11 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::BNpc::hateListGetHighest()
   return nullptr;
 }
 
-void Sapphire::Entity::BNpc::hateListAdd( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
-{
-  auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
-  hateEntry->m_pChara = pChara;
-
-  m_hateList.insert( hateEntry );
-  if( pChara->isPlayer() )
-  {
-    auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( getAsBNpc() );
-  }
-}
-
-void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
+void Sapphire::Entity::BNpc::hateListAddOrUpdate( Sapphire::Entity::CharaPtr pChara, int32_t hateAmount )
 {
   for( auto listEntry : m_hateList )
   {
-    if( listEntry->m_pChara == pChara )
+    if( listEntry->m_pChara->getId() == pChara->getId() )
     {
       listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
       return;
@@ -327,21 +326,29 @@ void Sapphire::Entity::BNpc::hateListUpdate( Sapphire::Entity::CharaPtr pChara, 
   hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
   hateEntry->m_pChara = pChara;
   m_hateList.insert( hateEntry );
+  if( pChara->isPlayer() )
+  {
+    auto pPlayer = pChara->getAsPlayer();
+    pPlayer->hateListAdd( getAsBNpc() );
+  }
+  auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
+  scriptMgr.onBNpcHateListAdd( *this, *pChara );
 }
 
 void Sapphire::Entity::BNpc::hateListRemove( Sapphire::Entity::CharaPtr pChara )
 {
   for( auto listEntry : m_hateList )
   {
-    if( listEntry->m_pChara == pChara )
+    if( listEntry->m_pChara->getId() == pChara->getId() )
     {
-
       m_hateList.erase( listEntry );
       if( pChara->isPlayer() )
       {
         PlayerPtr tmpPlayer = pChara->getAsPlayer();
         tmpPlayer->onMobDeaggro( getAsBNpc() );
       }
+      auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
+      scriptMgr.onBNpcHateListRemove( *this, *pChara );
       return;
     }
   }
@@ -363,34 +370,28 @@ void Sapphire::Entity::BNpc::aggro( Sapphire::Entity::CharaPtr pChara )
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   m_lastAttack = Util::getTimeMs() + variation;
-  hateListUpdate( pChara, 1 );
 
   changeTarget( pChara->getId() );
   setStance( Stance::Active );
   m_state = BNpcState::Combat;
 
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
-  sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
-
-  if( pChara->isPlayer() )
+  if( m_hateList.empty() )
   {
-    PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->onMobAggro( getAsBNpc() );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 1, 1, 0 ) );
+    sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 1, 0, 0 ) );
   }
 
+  hateListAddOrUpdate( pChara, 1 );
 }
 
 void Sapphire::Entity::BNpc::deaggro( Sapphire::Entity::CharaPtr pChara )
 {
-  if( !hateListHasActor( pChara ) )
-    hateListRemove( pChara );
+  hateListRemove( pChara );
 
-  if( pChara->isPlayer() )
+  if( m_hateList.empty() )
   {
-    PlayerPtr tmpPlayer = pChara->getAsPlayer();
     sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleWeapon, 0, 1, 1 ) );
     sendToInRangeSet( makeActorControl( getId(), ActorControlType::ToggleAggro, 0, 0, 0 ) );
-    tmpPlayer->onMobDeaggro( getAsBNpc() );
   }
 }
 
@@ -405,15 +406,24 @@ void Sapphire::Entity::BNpc::onTick()
 
 void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 {
-  const uint8_t maxDistanceToOrigin = 40;
-  const uint32_t roamTick = 20;
-
   if( getCurrentAction() && getCurrentAction()->hasCastTime() )
   {
     if( m_pCurrentAction->update() )
       m_pCurrentAction = nullptr;
     return;
   }
+
+  auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
+  if( !scriptMgr.onBNpcUpdate( *this, tickCount ) )
+    doDefaultBNpcUpdate( tickCount );
+  
+  Chara::update( tickCount );
+}
+
+void Sapphire::Entity::BNpc::doDefaultBNpcUpdate( uint64_t tickCount )
+{
+  const uint8_t maxDistanceToOrigin = 40;
+  const uint32_t roamTick = 20;
 
   auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
 
@@ -490,13 +500,14 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
 
       checkAggro();
     }
+    break;
 
     case BNpcState::Combat:
     {
       pNaviProvider->updateAgentParameters( *this );
 
       auto distanceOrig = Util::distance( getPos().x, getPos().y, getPos().z,
-                                          m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
+        m_spawnPos.x, m_spawnPos.y,  m_spawnPos.z );
 
       auto pHatedActor = hateListGetHighest();
 
@@ -553,9 +564,6 @@ void Sapphire::Entity::BNpc::update( uint64_t tickCount )
       }
     }
   }
-
-
-  Chara::update( tickCount );
 }
 
 void Sapphire::Entity::BNpc::regainHp()
@@ -589,6 +597,9 @@ void Sapphire::Entity::BNpc::onDeath()
   m_state = BNpcState::Dead;
   m_timeOfDeath = Util::getTimeSeconds();
   setOwner( nullptr );
+
+  auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
+  scriptMgr.onBNpcDeath( *this );
 
   for( auto& pHateEntry : m_hateList )
   {
@@ -647,6 +658,8 @@ void Sapphire::Entity::BNpc::checkAggro()
 
 void Sapphire::Entity::BNpc::setOwner( Sapphire::Entity::CharaPtr m_pChara )
 {
+  if( ( !m_pOwner && !m_pChara ) || ( m_pOwner && m_pChara && m_pOwner->getId() == m_pChara->getId() ) )
+    return;
   m_pOwner = m_pChara;
   if( m_pChara != nullptr )
   {
@@ -754,4 +767,17 @@ void Sapphire::Entity::BNpc::calculateStats()
   m_baseStats.attack = m_baseStats.str;
   m_baseStats.attackPotMagic = m_baseStats.inte;
   m_baseStats.healingPotMagic = m_baseStats.mnd;
+}
+
+void Sapphire::Entity::BNpc::setCustomVar( uint32_t varId, uint64_t value )
+{
+  m_customVarMap[ varId ] = value;
+}
+
+uint64_t Sapphire::Entity::BNpc::getCustomVar( uint32_t varId )
+{
+  auto it = m_customVarMap.find( varId );
+  if( it != m_customVarMap.end() )
+    return it->second;
+  return 0;
 }

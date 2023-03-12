@@ -201,6 +201,16 @@ namespace Sapphire::ScriptAPI
   {
   public:
     explicit BattleNpcScript( uint32_t npcId );
+
+    virtual void onInit( Entity::BNpc& bnpc );
+
+    virtual void onUpdate( Entity::BNpc& bnpc, uint64_t tickCount );
+
+    virtual void onHateListAdd( Entity::BNpc& bnpc, Entity::Chara& target );
+
+    virtual void onHateListRemove( Entity::BNpc& bnpc, Entity::Chara& target );
+
+    virtual void onDeath( Entity::BNpc& bnpc );
   };
 
   /*!
