@@ -6,7 +6,7 @@
 #include "Action/MountAction.h"
 #include "Script/ScriptMgr.h"
 #include "Actor/Player.h"
-
+#include "Service.h"
 #include "StatusEffect/StatusEffect.h"
 
 #include <Exd/ExdDataGenerated.h>
@@ -15,14 +15,19 @@
 
 using namespace Sapphire;
 
-void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
+void World::Manager::ActionMgr::handlePlacedAction( Entity::Chara& chara, uint32_t actionId,
                                                           Data::ActionPtr actionData, Common::FFXIVARR_POSITION3 pos,
                                                           uint16_t sequence )
 {
-  player.sendDebug( "got aoe act: {0}", actionData->name );
+  if( auto player = chara.getAsPlayer() )
+    player->sendDebug( "got aoe act: {0}", actionData->name );
 
+  if( !actionData )
+  {
+    actionData = Common::Service< Data::ExdDataGenerated >::ref().get< Data::Action >( actionId );
+  }
 
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
+  auto action = Action::make_Action( chara.getAsChara(), actionId, sequence, actionData );
 
   action->setPos( pos );
 
@@ -36,18 +41,30 @@ void World::Manager::ActionMgr::handlePlacedPlayerAction( Entity::Player& player
     return;
   }
 
-  bootstrapAction( player, action, *actionData );
+  bootstrapAction( chara, action, *actionData );
 }
 
-void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
+void World::Manager::ActionMgr::handleTargetedAction( Entity::Chara& chara, uint32_t actionId,
                                                             Data::ActionPtr actionData, uint64_t targetId,
                                                             uint16_t sequence )
 {
-  auto action = Action::make_Action( player.getAsPlayer(), actionId, sequence, actionData );
+  if( !actionData )
+  {
+    actionData = Common::Service< Data::ExdDataGenerated >::ref().get< Data::Action >( actionId );
+  }
+
+  if( !actionData )
+  {
+    if( auto player = chara.getAsPlayer() )
+      player->sendUrgent( "Cannot find action {}.", actionId );
+    return;
+  }
+
+  auto action = Action::make_Action( chara.getAsChara(), actionId, sequence, actionData );
 
   action->setTargetId( targetId );
 
-  action->setPos( player.getPos() );
+  action->setPos( chara.getPos() );
 
   if( !action->init() )
     return;
@@ -59,7 +76,7 @@ void World::Manager::ActionMgr::handleTargetedPlayerAction( Entity::Player& play
     return;
   }
 
-  bootstrapAction( player, action, *actionData );
+  bootstrapAction( chara, action, *actionData );
 }
 
 void World::Manager::ActionMgr::handleItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
@@ -105,11 +122,11 @@ void World::Manager::ActionMgr::handleMountAction( Entity::Player& player, uint1
   bootstrapAction( player, action, *actionData );
 }
 
-void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
+void World::Manager::ActionMgr::bootstrapAction( Entity::Chara& chara,
                                                  Action::ActionPtr currentAction,
                                                  Data::Action& actionData )
 {
-  for( const auto& statusIt : player.getStatusEffectMap() )
+  for( const auto& statusIt : chara.getStatusEffectMap() )
   {
     statusIt.second->onBeforeActionStart( currentAction.get() );
   }
@@ -119,23 +136,25 @@ void World::Manager::ActionMgr::bootstrapAction( Entity::Player& player,
   
   if( !currentAction->preCheck() )
   {
-    player.sendDebug( "preCheck failed" );
     // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
   }
 
-  if( player.getCurrentAction() )
+  if( chara.getCurrentAction() )
   {
-    player.sendDebug( "Skill queued: {0}", currentAction->getId() );
-    player.setQueuedAction( currentAction );
+    if( auto player = chara.getAsPlayer() )
+    {
+      player->sendDebug( "Skill queued: {0}", currentAction->getId() );
+      player->setQueuedAction( currentAction );
+    }
   }
   else
   {
     // if we have a cast time we want to associate the action with the player so update is called
     if( currentAction->hasCastTime() )
     {
-      player.setCurrentAction( currentAction );
+      chara.setCurrentAction( currentAction );
     }
 
     // todo: what do in cases of swiftcast/etc? script callback?

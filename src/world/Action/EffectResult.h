@@ -37,7 +37,7 @@ namespace Sapphire::World::Action
     Entity::CharaPtr getTarget() const;
 
     uint32_t getValue() const;
-
+    Common::ActionEffectType getType() const;
     uint64_t getDelay();
 
     Common::EffectEntry buildEffectEntry() const;

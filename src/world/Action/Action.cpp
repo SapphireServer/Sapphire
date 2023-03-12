@@ -401,7 +401,7 @@ void Action::Action::execute()
   assert( m_pSource );
 
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
-  if( !consumeResources() )
+  if( m_pSource->getAsPlayer() && !consumeResources() )
   {
     interrupt();
     return;
@@ -420,13 +420,6 @@ void Action::Action::execute()
     {
       player->unsetStateFlag( PlayerStateFlag::Casting );
     }
-  }
-
-  if( isCorrectCombo() )
-  {
-    auto player = m_pSource->getAsPlayer();
-
-    player->sendDebug( "action combo success from action#{0}", player->getLastComboActionId() );
   }
 
   if( !hasClientsideTarget()  )
@@ -638,14 +631,11 @@ void Action::Action::buildEffects()
           if( isCorrectCombo() )
             m_effectBuilder->comboSucceed( actor );
 
-          if( m_isAutoAttack && m_pSource->isPlayer() )
+          if( m_isAutoAttack && player )
           {
-            if( auto player = m_pSource->getAsPlayer() )
+            if( player->getClass() == Common::ClassJob::Paladin )
             {
-              if( player->getClass() == Common::ClassJob::Paladin )
-              {
-                player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
-              }
+              player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
             }
           }
 
@@ -655,7 +645,7 @@ void Action::Action::buildEffects()
               m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.getMPGainPercentage() / 100, Common::ActionEffectResultFlag::EffectOnSource );
           }
 
-          if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource )
+          if( ( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource ) && player )
           {
             if( checkActionBonusRequirement() )
             {
@@ -686,7 +676,7 @@ void Action::Action::buildEffects()
             }
           }
 
-          if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobTimer )
+          if( ( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobTimer ) && player )
           {
             if( checkActionBonusRequirement() )
             {

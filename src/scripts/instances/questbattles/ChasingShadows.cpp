@@ -84,10 +84,10 @@ public:
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
 
-      a2->hateListAdd( ida, 10000 );
-      a3->hateListAdd( ida, 10000 );
-      a2->hateListAdd( papa, 10000 );
-      a3->hateListAdd( papa, 10000 );
+      a2->hateListAddOrUpdate( ida, 10000 );
+      a3->hateListAddOrUpdate( ida, 10000 );
+      a2->hateListAddOrUpdate( papa, 10000 );
+      a3->hateListAddOrUpdate( papa, 10000 );
 
 
       auto a4 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_01, 5, 0, 300, 937,
@@ -98,8 +98,8 @@ public:
       a5->setFlag( Entity::NoDeaggro );
 
       auto pPlayer = instance.getPlayerPtr();
-      a4->hateListAdd( pPlayer, 1 );
-      a5->hateListAdd( pPlayer, 1 );
+      a4->hateListAddOrUpdate( pPlayer, 1 );
+      a5->hateListAddOrUpdate( pPlayer, 1 );
     }
 
     if( pair2Spawnd == 0 && bossHpPercent <= 50 )
@@ -112,10 +112,10 @@ public:
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
 
-      a2->hateListAdd( ida, 10000 );
-      a3->hateListAdd( ida, 10000 );
-      a2->hateListAdd( papa, 10000 );
-      a3->hateListAdd( papa, 10000 );
+      a2->hateListAddOrUpdate( ida, 10000 );
+      a3->hateListAddOrUpdate( ida, 10000 );
+      a2->hateListAddOrUpdate( papa, 10000 );
+      a3->hateListAddOrUpdate( papa, 10000 );
 
       auto a4 = instance.createBNpcFromLevelEntry( INIT_POP_ENEMY_A_03, 5, 0, 300, 937,
                                                    instance.getDirectorId(), Common::BNpcType::Enemy );
@@ -125,8 +125,8 @@ public:
       a5->setFlag( Entity::NoDeaggro );
 
       auto pPlayer = instance.getPlayerPtr();
-      a4->hateListAdd( pPlayer, 1 );
-      a5->hateListAdd( pPlayer, 1 );
+      a4->hateListAddOrUpdate( pPlayer, 1 );
+      a5->hateListAddOrUpdate( pPlayer, 1 );
 
     }
 
@@ -142,8 +142,8 @@ public:
       a5->setFlag( Entity::NoDeaggro );
 
       auto pPlayer = instance.getPlayerPtr();
-      a4->hateListAdd( pPlayer, 1 );
-      a5->hateListAdd( pPlayer, 1 );
+      a4->hateListAddOrUpdate( pPlayer, 1 );
+      a5->hateListAddOrUpdate( pPlayer, 1 );
     }
 
     if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
@@ -189,24 +189,24 @@ public:
     a3->setFlag( Entity::NoDeaggro );
     a4->setFlag( Entity::NoDeaggro );
     a5->setFlag( Entity::NoDeaggro );
-    a1->hateListAdd( a4, 10000 );
-    a1->hateListAdd( a5, 10000 );
+    a1->hateListAddOrUpdate( a4, 10000 );
+    a1->hateListAddOrUpdate( a5, 10000 );
 
-    a2->hateListAdd( player.getAsPlayer(), 1 );
-    a2->hateListAdd( a4, 10000 );
-    a2->hateListAdd( a5, 10000 );
+    a2->hateListAddOrUpdate( player.getAsPlayer(), 1 );
+    a2->hateListAddOrUpdate( a4, 10000 );
+    a2->hateListAddOrUpdate( a5, 10000 );
 
-    a3->hateListAdd( player.getAsPlayer(), 1 );
-    a3->hateListAdd( a4, 10000 );
-    a3->hateListAdd( a5, 10000 );
+    a3->hateListAddOrUpdate( player.getAsPlayer(), 1 );
+    a3->hateListAddOrUpdate( a4, 10000 );
+    a3->hateListAddOrUpdate( a5, 10000 );
 
-    a4->hateListAdd( a1, 10000 );
-    a4->hateListAdd( a2, 9999 );
-    a4->hateListAdd( a3, 9999 );
+    a4->hateListAddOrUpdate( a1, 10000 );
+    a4->hateListAddOrUpdate( a2, 9999 );
+    a4->hateListAddOrUpdate( a3, 9999 );
 
-    a5->hateListAdd( a1, 10000 );
-    a5->hateListAdd( a2, 9999 );
-    a5->hateListAdd( a3, 9999 );
+    a5->hateListAddOrUpdate( a1, 10000 );
+    a5->hateListAddOrUpdate( a2, 9999 );
+    a5->hateListAddOrUpdate( a3, 9999 );
   }
 
 };

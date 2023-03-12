@@ -130,6 +130,16 @@ namespace Sapphire::Scripting
 
     bool onPublicContentEnterTerritory( PublicContentPtr instance, Entity::Player& player, uint32_t eventId, uint16_t param1, uint16_t param2 );
 
+    bool onBNpcInit( Entity::BNpc& bnpc );
+
+    bool onBNpcUpdate( Entity::BNpc& bnpc, uint64_t tickCount );
+
+    bool onBNpcHateListAdd( Entity::BNpc& bnpc, Entity::Chara& target );
+
+    bool onBNpcHateListRemove( Entity::BNpc& bnpc, Entity::Chara& target );
+
+    bool onBNpcDeath( Entity::BNpc& bnpc );
+
     bool loadDir( const std::string& dirname, std::set< std::string >& files, const std::string& ext );
 
     NativeScriptMgr& getNativeScriptHandler();
