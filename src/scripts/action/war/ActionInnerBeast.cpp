@@ -30,13 +30,11 @@ public:
       status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
     auto dmg = action.calcDamage( Potency );
-    action.getEffectbuilder()->damage( pSource, pTarget, dmg.first, dmg.second );
-    action.getEffectbuilder()->heal( pTarget, pSource, dmg.first, Common::ActionHitSeverityType::NormalHeal,
-                                     Common::ActionEffectResultFlag::EffectOnSource );
+    action.getActionResultBuilder()->damage( pSource, pTarget, dmg.first, dmg.second );
+    action.getActionResultBuilder()->heal( pTarget, pSource, dmg.first, Common::ActionHitSeverityType::NormalHeal,
+                                           Common::ActionResultFlag::EffectOnSource );
 
-    action.applyStatusEffectSelf( InnerBeast );
-    pPlayer->addStatusEffectByIdIfNotExist( InnerBeast, 15000, *pSource, 
-                                            { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
+    action.applyStatusEffectSelf( InnerBeast, 15000, false, { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
     
     if( !pPlayer->hasStatusEffect( Unchained ) )
     {

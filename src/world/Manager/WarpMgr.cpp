@@ -14,6 +14,7 @@
 #include <Network/CommonActorControl.h>
 #include <Network/PacketWrappers/ActorControlSelfPacket.h>
 #include <Network/PacketWrappers/ActorControlPacket.h>
+#include <Network/Util/PacketUtil.h>
 
 #include <Manager/PlayerMgr.h>
 #include <Manager/MapMgr.h>
@@ -90,10 +91,8 @@ void WarpMgr::requestWarp( Entity::Player& player, Common::WarpType warpType, Co
 {
   m_entityIdToWarpInfoMap[ player.getId() ] = { 0, warpType, targetPos, targetRot };
 
-  server().queueForPlayers( player.getInRangePlayerIds( true ),
-                            makeActorControlSelf( player.getId(), WarpStart, warpType, warpType, 0, player.getTerritoryTypeId(), 1 ) );
-  server().queueForPlayers( player.getInRangePlayerIds(),
-                            makeActorControl( player.getId(), ActorDespawnEffect, warpType, player.getTerritoryTypeId() ) );
+  Network::Util::Packet::sendActorControlSelf( player.getInRangePlayerIds( true ), player.getId(), WarpStart, warpType, warpType, 0, player.getTerritoryTypeId(), 1 );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds(), player.getId(), ActorDespawnEffect, warpType, player.getTerritoryTypeId() );
 
   auto& taskMgr = Common::Service< TaskMgr >::ref();
   taskMgr.queueTask( makeWarpTask( player, warpType, targetPos, targetRot, 1000 ) );
@@ -127,14 +126,11 @@ void WarpMgr::finishWarp( Entity::Player& player )
 
   auto warpFinishAnim = warpType - 1;
 
-  auto zoneInPacket = makeActorControlSelf( player.getId(), Appear, warpFinishAnim, raiseAnim, 0, 0 );
-  auto setStatusPacket = makeActorControl( player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-
   if( !player.getGmInvis() )
-    server().queueForPlayers( player.getInRangePlayerIds(), zoneInPacket );
+    Network::Util::Packet::sendActorControlSelf( player.getInRangePlayerIds(), player.getId(), Appear, warpFinishAnim, raiseAnim );
 
-  server().queueForPlayer( player.getCharacterId(), zoneInPacket );
-  server().queueForPlayers( player.getInRangePlayerIds( true ), setStatusPacket );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), Appear, warpFinishAnim, raiseAnim );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
 
   player.removeCondition( PlayerCondition::BetweenAreas );
 

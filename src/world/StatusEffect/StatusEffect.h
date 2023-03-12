@@ -12,10 +12,7 @@ class StatusEffect
 {
 public:
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate );
-
-  StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                uint32_t duration, World::Action::StatusEntry& statusEntry, uint32_t tickRate );
+                uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate );
 
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, uint32_t tickRate );
@@ -41,6 +38,7 @@ public:
   uint32_t getTickRate() const;
 
   uint32_t getSrcActorId() const;
+  Entity::CharaPtr getSrcActor() const;
 
   uint32_t getTargetActorId() const;
 
@@ -51,6 +49,8 @@ public:
   uint16_t getParam() const;
 
   uint32_t getFlag() const;
+
+  std::vector< World::Action::StatusModifier > getStatusModifiers() const;
 
   void setLastTick( uint64_t lastTick );
 
@@ -63,6 +63,9 @@ public:
   std::pair< Common::ParamModifier, uint32_t > getTickEffect();
 
   const std::string& getName() const;
+
+  uint8_t getSlot() const;
+  void setSlot( uint8_t slot );
 
 private:
   uint32_t m_id;
@@ -78,6 +81,8 @@ private:
   std::pair< Common::ParamModifier, uint32_t > m_currTickEffect;
   std::vector< World::Action::StatusModifier > m_statusModifiers;
   std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
+  uint8_t m_slot;
+
 };
 
 }

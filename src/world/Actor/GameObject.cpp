@@ -23,41 +23,42 @@
 #include "StatusEffect/StatusEffect.h"
 
 using namespace Sapphire::Common;
+using namespace Sapphire::Entity;
 using namespace Sapphire::Network::Packets;
 //using namespace Sapphire::Network::Packets::Server;
 
-Sapphire::Entity::GameObject::GameObject( ObjKind type ) :
+GameObject::GameObject( ObjKind type ) :
   m_objKind( type )
 {
 
 }
 
-uint32_t Sapphire::Entity::GameObject::getId() const
+uint32_t GameObject::getId() const
 {
   return m_id;
 }
 
-void Sapphire::Entity::GameObject::setId( uint32_t id )
+void GameObject::setId( uint32_t id )
 {
   m_id = id;
 }
 
-Sapphire::Common::ObjKind Sapphire::Entity::GameObject::getObjKind() const
+ObjKind GameObject::getObjKind() const
 {
   return m_objKind;
 }
 
-Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::GameObject::getPos()
+FFXIVARR_POSITION3& GameObject::getPos()
 {
   return m_pos;
 }
 
-const Sapphire::Common::FFXIVARR_POSITION3& Sapphire::Entity::GameObject::getPos() const
+const FFXIVARR_POSITION3& GameObject::getPos() const
 {
   return m_pos;
 }
 
-void Sapphire::Entity::GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
+void GameObject::setPos( float x, float y, float z, bool broadcastUpdate )
 {
   m_pos.x = x;
   m_pos.y = y;
@@ -72,7 +73,7 @@ void Sapphire::Entity::GameObject::setPos( float x, float y, float z, bool broad
 
 }
 
-void Sapphire::Entity::GameObject::setPos( const Sapphire::Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+void GameObject::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
 {
   m_pos = pos;
 
@@ -84,92 +85,92 @@ void Sapphire::Entity::GameObject::setPos( const Sapphire::Common::FFXIVARR_POSI
   }
 }
 
-float Sapphire::Entity::GameObject::getRot() const
+float GameObject::getRot() const
 {
   return m_rot;
 }
 
-void Sapphire::Entity::GameObject::setRot( float rot )
+void GameObject::setRot( float rot )
 {
   m_rot = rot;
 }
 
-bool Sapphire::Entity::GameObject::isChara() const
+bool GameObject::isChara() const
 {
   return isPlayer() || isBattleNpc() || isEventNpc() || isRetainer() || isCompanion();
 }
 
-bool Sapphire::Entity::GameObject::isPlayer() const
+bool GameObject::isPlayer() const
 {
   return m_objKind == ObjKind::Player;
 }
 
-bool Sapphire::Entity::GameObject::isEventNpc() const
+bool GameObject::isEventNpc() const
 {
   return m_objKind == ObjKind::EventNpc;
 }
 
-bool Sapphire::Entity::GameObject::isBattleNpc() const
+bool GameObject::isBattleNpc() const
 {
   return m_objKind == ObjKind::BattleNpc;
 }
 
-bool Sapphire::Entity::GameObject::isRetainer() const
+bool GameObject::isRetainer() const
 {
   return m_objKind == ObjKind::Retainer;
 }
 
-bool Sapphire::Entity::GameObject::isCompanion() const
+bool GameObject::isCompanion() const
 {
   return m_objKind == ObjKind::Companion;
 }
 
-bool Sapphire::Entity::GameObject::isEventObj() const
+bool GameObject::isEventObj() const
 {
   return m_objKind == ObjKind::EventObj;
 }
 
-bool Sapphire::Entity::GameObject::isHousingEventObj() const
+bool GameObject::isHousingEventObj() const
 {
   return m_objKind == ObjKind::Housing;
 }
 
-bool Sapphire::Entity::GameObject::isAetheryte() const
+bool GameObject::isAetheryte() const
 {
   return m_objKind == ObjKind::Aetheryte;
 }
 
 
 /*! \return pointer to this instance as GameObjectPtr */
-Sapphire::Entity::CharaPtr Sapphire::Entity::GameObject::getAsChara()
+CharaPtr GameObject::getAsChara()
 {
   if( !isChara() )
     return nullptr;
-  return std::dynamic_pointer_cast< Entity::Chara, Entity::GameObject >( shared_from_this() );
+  return std::dynamic_pointer_cast< Chara, GameObject >( shared_from_this() );
 }
 
 /*! \return pointer to this instance as PlayerPtr */
-Sapphire::Entity::PlayerPtr Sapphire::Entity::GameObject::getAsPlayer()
+PlayerPtr GameObject::getAsPlayer()
 {
   if( !isPlayer() )
     return nullptr;
-  return std::dynamic_pointer_cast< Entity::Player, Entity::GameObject >( shared_from_this() );
+  return std::dynamic_pointer_cast< Player, GameObject >( shared_from_this() );
 }
 
 /*! \return pointer to this instance as EventObjPtr */
-Sapphire::Entity::EventObjectPtr Sapphire::Entity::GameObject::getAsEventObj()
+EventObjectPtr GameObject::getAsEventObj()
 {
   if( !isEventObj() )
     return nullptr;
-  return std::dynamic_pointer_cast< Entity::EventObject, Entity::GameObject >( shared_from_this() );
+  return std::dynamic_pointer_cast< EventObject, GameObject >( shared_from_this() );
 }
 
 /*! \return pointer to this instance as BNpcPtr */
-Sapphire::Entity::BNpcPtr Sapphire::Entity::GameObject::getAsBNpc()
+BNpcPtr GameObject::getAsBNpc()
 {
   if( !isBattleNpc() )
     return nullptr;
-  return std::dynamic_pointer_cast< Entity::BNpc, Entity::GameObject >( shared_from_this() );
+  return std::dynamic_pointer_cast< BNpc, GameObject >( shared_from_this() );
 }
 
 /*!
@@ -178,7 +179,7 @@ but also to the global actor map
 
 \param GameObjectPtr to add
 */
-void Sapphire::Entity::GameObject::addInRangeActor( GameObjectPtr pActor )
+void GameObject::addInRangeActor( GameObjectPtr pActor )
 {
 
   // if this is null, something went wrong
@@ -211,7 +212,7 @@ but also to the global actor map
 
 \param GameObjectPtr to remove
 */
-void Sapphire::Entity::GameObject::removeInRangeActor( GameObject& actor )
+void GameObject::removeInRangeActor( GameObject& actor )
 {
   // call virtual event
   onRemoveInRangeActor( actor );
@@ -232,12 +233,12 @@ void Sapphire::Entity::GameObject::removeInRangeActor( GameObject& actor )
 }
 
 /*! \return true if there is at least one actor in the in range set */
-bool Sapphire::Entity::GameObject::hasInRangeActor() const
+bool GameObject::hasInRangeActor() const
 {
   return ( !m_inRangeActor.empty() );
 }
 
-void Sapphire::Entity::GameObject::removeFromInRange()
+void GameObject::removeFromInRange()
 {
   if( !hasInRangeActor() )
     return;
@@ -255,14 +256,14 @@ check if a given actor is in the actors in range set
 \param GameObjectPtr to be checked for
 \return true if the actor was found
 */
-bool Sapphire::Entity::GameObject::isInRangeSet( GameObjectPtr pActor ) const
+bool GameObject::isInRangeSet( GameObjectPtr pActor ) const
 {
   return !( m_inRangeActor.find( pActor ) == m_inRangeActor.end() );
 }
 
 
 /*! \return GameObjectPtr of the closest actor in range, if none, nullptr */
-Sapphire::Entity::CharaPtr Sapphire::Entity::GameObject::getClosestChara()
+CharaPtr GameObject::getClosestChara()
 {
   if( m_inRangeActor.empty() )
     // no actors in range, don't bother
@@ -275,8 +276,7 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::GameObject::getClosestChara()
 
   for( const auto& pCurAct : m_inRangeActor )
   {
-    float distance = Util::distance( getPos().x, getPos().y, getPos().z,
-                                     pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z );
+    float distance = Util::distance( getPos().x, getPos().y, getPos().z, pCurAct->getPos().x, pCurAct->getPos().y, pCurAct->getPos().z );
 
     if( distance < minDistance )
     {
@@ -289,7 +289,7 @@ Sapphire::Entity::CharaPtr Sapphire::Entity::GameObject::getClosestChara()
 }
 
 /*! Clear the whole in range set, this does no cleanup */
-void Sapphire::Entity::GameObject::clearInRangeSet()
+void GameObject::clearInRangeSet()
 {
   m_inRangeActor.clear();
   m_inRangePlayers.clear();
@@ -297,7 +297,7 @@ void Sapphire::Entity::GameObject::clearInRangeSet()
 }
 
 /*! \return list of actors currently in range */
-std::set< Sapphire::Entity::GameObjectPtr > Sapphire::Entity::GameObject::getInRangeActors( bool includeSelf )
+std::set< GameObjectPtr > GameObject::getInRangeActors( bool includeSelf )
 {
   auto tempInRange = m_inRangeActor;
 
@@ -307,7 +307,7 @@ std::set< Sapphire::Entity::GameObjectPtr > Sapphire::Entity::GameObject::getInR
   return tempInRange;
 }
 
-std::set< uint64_t > Sapphire::Entity::GameObject::getInRangePlayerIds( bool includeSelf )
+std::set< uint64_t > GameObject::getInRangePlayerIds( bool includeSelf )
 {
   std::set< uint64_t > playerIds;
   for( auto& player : m_inRangePlayers )
@@ -319,22 +319,22 @@ std::set< uint64_t > Sapphire::Entity::GameObject::getInRangePlayerIds( bool inc
   return playerIds;
 }
 
-uint32_t Sapphire::Entity::GameObject::getTerritoryTypeId() const
+uint32_t GameObject::getTerritoryTypeId() const
 {
   return m_territoryTypeId;
 }
 
-void Sapphire::Entity::GameObject::setTerritoryTypeId( uint32_t territoryTypeId )
+void GameObject::setTerritoryTypeId( uint32_t territoryTypeId )
 {
   m_territoryTypeId = territoryTypeId;
 }
 
-uint32_t Sapphire::Entity::GameObject::getTerritoryId() const
+uint32_t GameObject::getTerritoryId() const
 {
   return m_territoryId;
 }
 
-void Sapphire::Entity::GameObject::setTerritoryId( uint32_t territoryId )
+void GameObject::setTerritoryId( uint32_t territoryId )
 {
   m_territoryId = territoryId;
 }
@@ -344,7 +344,7 @@ Get the current cellId of a region the actor is in
 
 \return CellId
 */
-Sapphire::Common::CellId Sapphire::Entity::GameObject::getCellId() const
+CellId GameObject::getCellId() const
 {
   return m_cellId;
 }
@@ -354,7 +354,7 @@ Set the current cellId the actor is in
 
 \param CellId for the cell to be set
 */
-void Sapphire::Entity::GameObject::setCellId( Common::CellId cellId )
+void GameObject::setCellId( CellId cellId )
 {
   m_cellId = cellId;
 }

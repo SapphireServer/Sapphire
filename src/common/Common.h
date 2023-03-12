@@ -1053,7 +1053,7 @@ namespace Sapphire::Common
     CritDirectHitDamage = 3
   };
 
-  enum class ActionEffectResultFlag : uint8_t
+  enum class ActionResultFlag : uint8_t
   {
     None = 0,
     Absorbed = 0x04,

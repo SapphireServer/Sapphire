@@ -47,6 +47,12 @@ namespace World::Territory::Housing
 TYPE_FORWARD( HousingInteriorTerritory );
 }
 
+namespace World::AI
+{
+  TYPE_FORWARD( GambitTargetCondition );
+  TYPE_FORWARD( GambitRule );
+}
+
 namespace Inventory
 {
 using InventoryContainerPair = std::pair< Common::InventoryType, uint8_t >;
@@ -88,8 +94,8 @@ TYPE_FORWARD( ItemAction );
 TYPE_FORWARD( EventItemAction );
 TYPE_FORWARD( MountAction );
 TYPE_FORWARD( ItemManipulationAction );
-TYPE_FORWARD( EffectBuilder );
-TYPE_FORWARD( EffectResult );
+TYPE_FORWARD( ActionResultBuilder );
+TYPE_FORWARD( ActionResult );
 
 using ActionCallback = std::function< void( Entity::Player&, uint32_t, uint64_t ) >;
 }

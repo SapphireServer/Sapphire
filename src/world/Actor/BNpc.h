@@ -3,6 +3,7 @@
 #include <Common.h>
 
 #include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Chara.h"
 #include "Npc.h"
 #include <set>
@@ -148,6 +149,8 @@ namespace Sapphire::Entity
 
     uint32_t getLayoutId() const;
 
+    void processGambits( uint64_t tickCount );
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -189,6 +192,7 @@ namespace Sapphire::Entity
     Common::FFXIVARR_POSITION3 m_naviTarget;
 
     CharaPtr m_pOwner;
+    std::vector< World::AI::GambitRulePtr > m_gambits;
 
   };
 

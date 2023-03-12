@@ -4,7 +4,7 @@
 #include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
-#include "EffectBuilder.h"
+#include "ActionResultBuilder.h"
 #include "Exd/Structs.h"
 
 namespace Sapphire::World::Action
@@ -22,6 +22,8 @@ namespace Sapphire::World::Action
     virtual ~Action() = default;
 
     uint32_t getId() const;
+
+    uint32_t getResultId() const;
 
     bool init();
 
@@ -105,11 +107,14 @@ namespace Sapphire::World::Action
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
 
-    EffectBuilderPtr getEffectbuilder();
+    ActionResultBuilderPtr getActionResultBuilder();
 
-    void applyStatusEffectSelf( uint16_t statusId, uint8_t param = 0 );
+    void applyStatusEffectSelf( StatusEntry& statusEntry, bool shouldOverride, uint8_t param = 0 );
 
-    void handleAction();
+    void applyStatusEffectSelf( uint16_t statusId, int32_t duration, bool shouldOverride,
+                                std::vector< StatusModifier > modifiers = {}, uint8_t param = 0 );
+
+    void buildActionResults();
 
     void handleStatusEffects();
 
@@ -180,6 +185,7 @@ namespace Sapphire::World::Action
     uint8_t m_actionKind{};
 
     uint16_t m_requestId{};
+    uint32_t m_resultId{};
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};
@@ -218,7 +224,7 @@ namespace Sapphire::World::Action
 
     Common::FFXIVARR_POSITION3 m_pos{};
 
-    EffectBuilderPtr m_effectBuilder;
+    ActionResultBuilderPtr m_actionResultBuilder;
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;

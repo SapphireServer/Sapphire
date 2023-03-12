@@ -72,8 +72,6 @@ namespace Sapphire
     uint32_t m_effectCounter{};
     std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
-    std::vector< World::Action::EffectResultPtr > m_effectResults;
-
     Common::TerritoryIdent m_ident;
 
     float m_inRangeDistance;
@@ -194,13 +192,9 @@ namespace Sapphire
 
     void updateSpawnPoints();
 
-    uint32_t getNextEffectResultId();
+    uint32_t getNextActionResultId();
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
-
-    void addEffectResult( World::Action::EffectResultPtr result );
-
-    void processEffectResults( uint64_t tickCount );
   };
 
 }

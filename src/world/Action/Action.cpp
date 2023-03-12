@@ -16,6 +16,7 @@
 
 #include "Manager/PlayerMgr.h"
 #include "Manager/MgrUtil.h"
+#include "Manager/TerritoryMgr.h"
 
 #include "Session.h"
 #include "Network/GameConnection.h"
@@ -23,7 +24,7 @@
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
-#include "Network/Util/PlayerUtil.h"
+#include "Network/Util/PacketUtil.h"
 
 #include <Logging/Logger.h>
 
@@ -67,6 +68,11 @@ uint32_t Action::Action::getId() const
   return m_id;
 }
 
+uint32_t Action::Action::getResultId() const
+{
+  return m_resultId;
+}
+
 bool Action::Action::init()
 {
   if( !m_actionData )
@@ -80,8 +86,11 @@ bool Action::Action::init()
 
     m_actionData = actionData;
   }
+  auto teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto zone = teriMgr.getTerritoryByGuId( m_pSource->getTerritoryId() );
+  m_resultId = zone->getNextActionResultId();
 
-  m_effectBuilder = make_EffectBuilder( m_pSource, getId(), m_requestId );
+  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_resultId, m_requestId );
 
   m_castTimeMs = static_cast< uint32_t >( m_actionData->data().CastTime * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->data().RecastTime * 100 );
@@ -108,9 +117,9 @@ bool Action::Action::init()
     {
       case Common::ClassJob::Bard:
       case Common::ClassJob::Archer:
+      case Common::ClassJob::Machinist:
         m_range = 25;
         break;
-        // anything that isnt ranged
       default:
         m_range = 3;
         break;
@@ -244,34 +253,34 @@ bool Action::Action::update()
     // todo: check if the target is still in range
   }
 
-  uint64_t tickCount = Common::Util::getTimeMs();
-  uint32_t castTime = m_castTimeMs;
+  auto tickCount = static_cast< time_t >( Common::Util::getTimeMs() );
+  auto startTime = static_cast< time_t >( m_startTime );
+  uint64_t castTime = m_castTimeMs;
 
   if( auto player = m_pSource->getAsPlayer() )
   {
-    uint64_t lastActionTick = player->getLastActionTick();
+    auto lastActionTick = static_cast< time_t >( player->getLastActionTick() );
     uint32_t lastTickMs = 0;
     if( lastActionTick > 0 )
     {
-      lastTickMs = static_cast< uint32_t >( std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( lastActionTick ) ) );
+      lastTickMs = static_cast< uint32_t >( std::difftime( tickCount, lastActionTick ) );
       if( lastTickMs > 100 ) //max 100ms
         lastTickMs = 100;
     }
 
     player->setLastActionTick( tickCount );
-    uint32_t delayMs = 100 - lastTickMs;
+    uint64_t delayMs = 100 - lastTickMs;
     castTime = ( m_castTimeMs + delayMs );
-    m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) -
-                       static_cast< uint64_t >( std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) );
+    m_castTimeRestMs = static_cast< uint64_t >( m_castTimeMs ) - static_cast< uint64_t >( std::difftime( tickCount, startTime ) );
   }
 
-  if( !hasCastTime() || std::difftime( static_cast< time_t >( tickCount ), static_cast< time_t >( m_startTime ) ) > castTime )
+  if( !hasCastTime() || std::difftime( tickCount, startTime ) > castTime )
   {
     execute();
     return true;
   }
 
-  if( m_pTarget == nullptr && m_targetId != 0 )
+  if( !m_pTarget && m_targetId != 0 )
   {
     // try to search for the target actor
     for( const auto& actor : m_pSource->getInRangeActors( true ) )
@@ -284,7 +293,7 @@ bool Action::Action::update()
     }
   }
 
-  if( m_pTarget != nullptr && !m_pTarget->isAlive() )
+  if( m_pTarget && !m_pTarget->isAlive() )
   {
     // interrupt the cast if target died
     setInterrupted( Common::ActionInterruptType::RegularInterrupt );
@@ -318,20 +327,20 @@ void Action::Action::start()
     data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pSource->getPos().z );
     data.Dir = m_pSource->getRot();
 
-    server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), castPacket );
+    server().queueForPlayers( m_pSource->getInRangePlayerIds( m_pSource->isPlayer() ), castPacket );
 
     if( player )
-    {
       player->setCondition( PlayerCondition::Casting );
-    }
   }
   
   // todo: m_recastTimeMs needs to be adjusted for player sks/sps
   auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, m_cooldownGroup, getId(), m_recastTimeMs / 10 );
 
-  player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
-
-  server().queueForPlayer( player->getCharacterId(), actionStartPkt );
+  if( player )
+  {
+    player->setRecastGroup( m_cooldownGroup, static_cast< float >( m_castTimeMs ) / 1000.f );
+    server().queueForPlayer( player->getCharacterId(), actionStartPkt );
+  }
 
   onStart();
 
@@ -365,7 +374,6 @@ void Action::Action::onStart()
 void Action::Action::interrupt()
 {
   assert( m_pSource );
-
   // things that aren't players don't care about cooldowns and state flags
   if( m_pSource->isPlayer() )
   {
@@ -405,25 +413,20 @@ void Action::Action::onInterrupt()
 void Action::Action::execute()
 {
   assert( m_pSource );
-
   // subtract costs first, if somehow the caster stops meeting those requirements cancel the cast
-
   if( !consumeResources() )
   {
     interrupt();
     return;
   }
 
-
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  if( hasCastTime() )
+  if( hasCastTime() && m_pSource->isPlayer() )
   {
-    if( auto pPlayer = m_pSource->getAsPlayer(); pPlayer )
-    {
-      pPlayer->setLastActionTick( 0 );
-      pPlayer->removeCondition( PlayerCondition::Casting );
-    }
+    auto pPlayer = m_pSource->getAsPlayer();
+    pPlayer->setLastActionTick( 0 );
+    pPlayer->removeCondition( PlayerCondition::Casting );
   }
 
   if( isCorrectCombo() )
@@ -433,13 +436,9 @@ void Action::Action::execute()
   }
 
   if( !hasClientsideTarget()  )
-  {
-    handleAction();
-  }
+    buildActionResults();
   else if( auto player = m_pSource->getAsPlayer() )
-  {
     scriptMgr.onEObjHit( *player, m_targetId, getId() );
-  }
 
   // set currently casted action as the combo action if it interrupts a combo
   // ignore it otherwise (ogcds, etc.)
@@ -447,13 +446,9 @@ void Action::Action::execute()
   {
     // potential combo starter or correct combo from last action, must hit something to progress combo
     if( !m_hitActors.empty() && ( !isComboAction() || isCorrectCombo() ) )
-    {
       m_pSource->setLastComboActionId( getId() );
-    }
     else // clear last combo action if the combo breaks
-    {
       m_pSource->setLastComboActionId( 0 );
-    }
   }
 }
 
@@ -469,13 +464,13 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
 
     auto role = player->getRole();
     if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
       wepDmg = item->getMagicalDmg();
-    }
     else
-    {
       wepDmg = item->getPhysicalDmg();
-    }
+
+    // is auto attack
+    if( getId() == 7 || getId() == 8 )
+      return Math::CalcStats::calcAutoAttackDamage( *m_pSource->getAsPlayer() );
   }
 
   return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
@@ -492,27 +487,34 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
 
     auto role = player->getRole();
     if( role == Common::Role::RangedMagical || role == Common::Role::Healer )
-    {
       wepDmg = item->getMagicalDmg();
-    }
     else
-    {
       wepDmg = item->getPhysicalDmg();
-    }
   }
 
   return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
 }
 
-void Action::Action::applyStatusEffectSelf( uint16_t statusId, uint8_t param )
+void Action::Action::applyStatusEffectSelf( StatusEntry& statusEntry, bool shouldOverride, uint8_t param )
 {
   if( m_hitActors.size() > 0 )
-    getEffectbuilder()->applyStatusEffect( m_hitActors[ 0 ], statusId, param, true );
+    getActionResultBuilder()->applyStatusEffect( m_hitActors[ 0 ], statusEntry.id, statusEntry.duration, param,
+                                                 statusEntry.modifiers, statusEntry.flag, shouldOverride, true );
   else
-    getEffectbuilder()->applyStatusEffect( m_pSource, statusId, param );
+    getActionResultBuilder()->applyStatusEffect( m_pSource, statusEntry.id, statusEntry.duration, param,
+                                                 statusEntry.modifiers, statusEntry.flag, shouldOverride );
 }
 
-void Action::Action::handleAction()
+void Action::Action::applyStatusEffectSelf( uint16_t statusId, int32_t duration, bool shouldOverride,
+                                            std::vector< StatusModifier > modifiers, uint8_t param )
+{
+  if( m_hitActors.size() > 0 )
+    getActionResultBuilder()->applyStatusEffect( m_hitActors[ 0 ], statusId, duration, param, modifiers, shouldOverride, true );
+  else
+    getActionResultBuilder()->applyStatusEffect( m_pSource, statusId, duration, param, modifiers, shouldOverride );
+}
+
+void Action::Action::buildActionResults()
 {
   snapshotAffectedActors( m_hitActors );
 
@@ -523,22 +525,19 @@ void Action::Action::handleAction()
   if( !hasScript && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
-    {
       Manager::PlayerMgr::sendUrgent( *player, "missing lut entry for action#{}", getId() );
-    }
-
     return;
   }
 
   if( !hasScript )
     m_enableGenericHandler = true;
 
-  Network::Util::Player::sendHudParam( *m_pSource->getAsPlayer() );
+  Network::Util::Packet::sendHudParam( *m_pSource );
 
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_effectBuilder->buildAndSendPackets( m_hitActors );
+    m_actionResultBuilder->sendActionResults( {} );
     return;
   }
 
@@ -559,14 +558,14 @@ void Action::Action::handleAction()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_effectBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
+      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
       if( dmg.first > 0 )
         actor->onActionHostile( m_pSource );
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
-        m_effectBuilder->comboSucceed( m_pSource );
+        m_actionResultBuilder->comboSucceed( m_pSource );
         shouldApplyComboSucceedEffect = false;
       }
 
@@ -575,35 +574,33 @@ void Action::Action::handleAction()
         if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
           auto heal = calcHealing( m_lutEntry.curePotency );
-          m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
+          m_actionResultBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionResultFlag::EffectOnSource );
         }
 
         if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
         {
-          m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+          m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
           shouldRestoreMP = false;
         }
 
         if( !m_lutEntry.nextCombo.empty() ) // if we have a combo action followup
-        {
-          m_effectBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
-        }
+          m_actionResultBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
       }
     }
     else if( m_lutEntry.curePotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.curePotency );
-      m_effectBuilder->heal( actor, actor, heal.first, heal.second );
+      m_actionResultBuilder->heal( actor, actor, heal.first, heal.second );
 
       if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
-        m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+        m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
         shouldRestoreMP = false;
       }
     }
     else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
     {
-      m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionEffectResultFlag::EffectOnSource );
+      m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
       shouldRestoreMP = false;
     }
   }
@@ -619,7 +616,7 @@ void Action::Action::handleAction()
   if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
     handleStatusEffects();
 
-  m_effectBuilder->buildAndSendPackets( m_hitActors );
+  m_actionResultBuilder->sendActionResults( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
   // at this point we're done with it and no longer need it
@@ -636,8 +633,7 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      applyStatusEffectSelf( status.id );
-      m_pSource->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status );
+      applyStatusEffectSelf( status, true );
     }
   }
 
@@ -648,8 +644,7 @@ void Action::Action::handleStatusEffects()
     {
       for( auto& status : m_lutEntry.statuses.target )
       {
-        getEffectbuilder()->applyStatusEffect( actor, status.id, 0 );
-        actor->addStatusEffectByIdIfNotExist( status.id, status.duration, *m_pSource, status );
+        getActionResultBuilder()->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, true );
       }
 
       if( actor->getStatusEffectMap().size() > 0 )
@@ -748,9 +743,7 @@ bool Action::Action::isCorrectCombo() const
   auto lastActionId = m_pSource->getLastComboActionId();
 
   if( lastActionId == 0 )
-  {
     return false;
-  }
 
   return m_actionData->data().ComboParent == lastActionId;
 }
@@ -934,10 +927,7 @@ std::vector< Entity::CharaPtr >& Action::Action::getHitCharas()
 Entity::CharaPtr Action::Action::getHitChara()
 {
   if( !m_hitActors.empty() )
-  {
     return m_hitActors.at( 0 );
-  }
-
   return nullptr;
 }
 
@@ -948,9 +938,9 @@ bool Action::Action::hasValidLutEntry() const
     m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0;
 }
 
-Action::EffectBuilderPtr Action::Action::getEffectbuilder()
+Action::ActionResultBuilderPtr Action::Action::getActionResultBuilder()
 {
-  return m_effectBuilder;
+  return m_actionResultBuilder;
 }
 
 uint8_t Action::Action::getActionKind() const
