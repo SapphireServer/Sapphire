@@ -127,9 +127,9 @@ void ActionResult::execute()
     case Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS:
     {
       if( !m_bOverrideStatus )
-        m_target->addStatusEffectByIdIfNotExist( m_pStatus->getId(), m_pStatus->getDuration(), *m_pStatus->getSrcActor(), m_pStatus->getParam() );
+        m_target->addStatusEffectByIdIfNotExist( m_pStatus );
       else
-        m_target->addStatusEffectById( m_pStatus->getId(), m_pStatus->getDuration(), *m_pStatus->getSrcActor(), m_pStatus->getParam() );
+        m_target->addStatusEffectById( m_pStatus );
       break;
     }
 
