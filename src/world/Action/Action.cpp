@@ -513,7 +513,7 @@ void Action::Action::applyStatusEffectSelf( StatusEntry& statusEntry, bool shoul
 void Action::Action::applyStatusEffectSelf( uint16_t statusId, int32_t duration, bool shouldOverride,
                                             std::vector< StatusModifier > modifiers, uint8_t param )
 {
-  if( m_hitActors.size() > 0 )
+  if( m_hitActors.size() > 0 && m_hitActors[ 0 ]->getObjKind() != m_pSource->getObjKind() )
     getActionResultBuilder()->applyStatusEffect( m_hitActors[ 0 ], statusId, duration, param, modifiers, shouldOverride, true );
   else
     getActionResultBuilder()->applyStatusEffect( m_pSource, statusId, duration, param, modifiers, shouldOverride );
