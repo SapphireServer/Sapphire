@@ -547,38 +547,6 @@ void Sapphire::Entity::Player::writeInventory( InventoryType type )
   db.execute( query );
 }
 
-void Sapphire::Entity::Player::updateItemDb( Sapphire::ItemPtr pItem ) const
-{
-  if( pItem->getUId() == 0 )
-    writeItemDb( pItem );
-
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
-
-  // todo: add more fields
-  stmt->setInt( 1, pItem->getStackSize() );
-  stmt->setInt( 2, pItem->getDurability() );
-  stmt->setInt( 3, pItem->getStain() );
-
-  stmt->setInt64( 4, pItem->getUId() );
-
-  db.directExecute( stmt );
-}
-
-void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
-{
-  if( item->getUId() == 0 )
-    return;
-
-  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
-
-  stmt->setInt64( 1, item->getUId() );
-
-  db.directExecute( stmt );
-}
-
-
 bool Sapphire::Entity::Player::isObtainable( uint32_t catalogId, uint8_t quantity )
 {
   return true;
