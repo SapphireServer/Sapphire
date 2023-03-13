@@ -107,7 +107,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
 }
 
 void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
-                            uint32_t flag, bool shouldOverride )
+                                          uint32_t flag, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
