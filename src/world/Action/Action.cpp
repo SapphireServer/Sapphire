@@ -500,25 +500,6 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing
   return Math::CalcStats::calcActionHealing( *m_pSource, potency, wepDmg );
 }
 
-void Action::Action::applyStatusEffectSelf( StatusEntry& statusEntry, bool shouldOverride, uint8_t param )
-{
-  if( m_hitActors.size() > 0 )
-    getActionResultBuilder()->applyStatusEffect( m_hitActors[ 0 ], statusEntry.id, statusEntry.duration, param,
-                                                 statusEntry.modifiers, statusEntry.flag, shouldOverride, true );
-  else
-    getActionResultBuilder()->applyStatusEffect( m_pSource, statusEntry.id, statusEntry.duration, param,
-                                                 statusEntry.modifiers, statusEntry.flag, shouldOverride );
-}
-
-void Action::Action::applyStatusEffectSelf( uint16_t statusId, int32_t duration, bool shouldOverride,
-                                            std::vector< StatusModifier > modifiers, uint8_t param )
-{
-  if( m_hitActors.size() > 0 && m_hitActors[ 0 ]->getObjKind() != m_pSource->getObjKind() )
-    getActionResultBuilder()->applyStatusEffect( m_hitActors[ 0 ], statusId, duration, param, modifiers, shouldOverride, true );
-  else
-    getActionResultBuilder()->applyStatusEffect( m_pSource, statusId, duration, param, modifiers, shouldOverride );
-}
-
 void Action::Action::buildActionResults()
 {
   snapshotAffectedActors( m_hitActors );
@@ -638,7 +619,7 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      applyStatusEffectSelf( status, true );
+      getActionResultBuilder()->applyStatusEffectSelf( status.id, status.duration, 0, status.modifiers, status.flag, true );
     }
   }
 

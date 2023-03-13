@@ -111,11 +111,6 @@ namespace Sapphire::World::Action
 
     ActionResultBuilderPtr getActionResultBuilder();
 
-    void applyStatusEffectSelf( StatusEntry& statusEntry, bool shouldOverride, uint8_t param = 0 );
-
-    void applyStatusEffectSelf( uint16_t statusId, int32_t duration, bool shouldOverride,
-                                std::vector< StatusModifier > modifiers = {}, uint8_t param = 0 );
-
     void buildActionResults();
 
     void handleStatusEffects();

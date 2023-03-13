@@ -295,7 +295,7 @@ private:
 
   void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    player.addStatusEffectById( Status0, 0, player, Transformation0 );
+  //  player.addStatusEffectById( Status0, 0, player, Transformation0 );
   }
 
   //////////////////////////////////////////////////////////////////////

@@ -34,7 +34,7 @@ public:
     action.getActionResultBuilder()->heal( pTarget, pSource, dmg.first, Common::ActionHitSeverityType::NormalHeal,
                                            Common::ActionResultFlag::EffectOnSource );
 
-    action.applyStatusEffectSelf( InnerBeast, 15000, false, { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
+    action.getActionResultBuilder()->applyStatusEffectSelf( InnerBeast, 15000, 0, { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
     
     if( !pPlayer->hasStatusEffect( Unchained ) )
     {

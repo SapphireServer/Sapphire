@@ -81,20 +81,34 @@ void ActionResultBuilder::comboSucceed( Entity::CharaPtr& target )
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride, bool forSelf )
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, shouldOverride, forSelf );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, shouldOverride );
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag,
-                                             bool shouldOverride, bool forSelf )
+                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, shouldOverride, forSelf );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, shouldOverride );
   addResultToActor( target, nextResult );
+}
+
+void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
+{
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, 0 );
+  nextResult->applyStatusEffectSelf( statusId, duration, param, shouldOverride );
+  addResultToActor( m_sourceChara, nextResult );
+}
+
+void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
+                            uint32_t flag = 0, bool shouldOverride )
+{
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, 0 );
+  nextResult->applyStatusEffectSelf( statusId, duration, param, modifiers, flag, shouldOverride );
+  addResultToActor( m_sourceChara, nextResult );
 }
 
 void ActionResultBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
@@ -175,7 +189,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
       for( auto& result : actorResultList )
       {
         auto effect = result->getCalcResultParam();
-        if( result->getTarget() == m_sourceChara )
+        if( result->getTarget() == m_sourceChara && result->getCalcResultParam().Type != Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME )
           actionResult->addSourceEffect( effect );
         else
           actionResult->addTargetEffect( effect );

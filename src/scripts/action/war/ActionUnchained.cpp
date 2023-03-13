@@ -25,7 +25,7 @@ public:
     if( auto status = pPlayer->getStatusEffectById( Defiance ); status )
       status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
-    action.applyStatusEffectSelf( Unchained, 20000, false );
+    action.getActionResultBuilder()->applyStatusEffectSelf( Unchained, 20000, 0 );
   }
 };
 

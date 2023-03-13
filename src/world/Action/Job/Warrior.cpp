@@ -60,6 +60,6 @@ void Warrior::handleWrath( Entity::Player& player, Action& action )
 
   if( !player.hasStatusEffect( Infuriated ) )
   {
-    action.applyStatusEffectSelf( effectToApply, 30000, false, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
+    action.getActionResultBuilder()->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } }, 0, false );
   }
 }

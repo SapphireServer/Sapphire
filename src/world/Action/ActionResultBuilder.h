@@ -26,11 +26,13 @@ namespace Sapphire::World::Action
 
     void comboSucceed( Entity::CharaPtr& target );
 
-    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false, bool forSelf = false );
-    
+    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false );
     void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                            std::vector< World::Action::StatusModifier > modifiers, uint32_t flag = 0, bool shouldOverride = false, bool forSelf = false );
-    
+                            std::vector< World::Action::StatusModifier > modifiers, uint32_t flag = 0, bool shouldOverride = false );
+    void applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false );
+    void applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
+                                uint32_t flag = 0, bool shouldOverride = false );
+
     void mount( Entity::CharaPtr& target, uint16_t mountId );
 
     void sendActionResults( const std::vector< Entity::CharaPtr >& targetList );
