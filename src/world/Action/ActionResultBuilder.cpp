@@ -124,19 +124,17 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
 
   if( targetCount > 1 ) // use AoeEffect packets
   {
-    auto actionResult = std::make_shared< EffectPacket >( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
+    auto actionResult = makeEffectPacket( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
     actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
 
     uint8_t targetIndex = 0;
-    for( auto it = m_actorResultsMap.begin(); it != m_actorResultsMap.end(); ++it )
+    for( auto& [ actor, actorResultList ] : m_actorResultsMap )
     {
-      // get all effect results for an actor
-      auto actorResultList = it->second;
 
-      if( it->first )
-        taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, it->first, actorResultList, 300 ) );
+      if( actor )
+        taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, actor, actorResultList, 300 ) );
 
       for( auto& result : actorResultList )
       {
@@ -157,23 +155,21 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
   else  // use Effect for single target
   {
     uint32_t mainTargetId = targetList.empty() ? m_sourceChara->getId() : targetList[ 0 ]->getId();
-    auto actionResult = std::make_shared< EffectPacket1 >( m_sourceChara->getId(), mainTargetId, m_actionId );
+    auto actionResult = makeEffectPacket1( m_sourceChara->getId(), mainTargetId, m_actionId );
     actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
 
-    for( auto it = m_actorResultsMap.begin(); it != m_actorResultsMap.end(); ++it )
+    for( auto& [ actor, actorResultList ] : m_actorResultsMap )
     {
-      // get all effect results for an actor
-      auto actorResultList = it->second;
-
-      if( it->first )
-        taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, it->first, actorResultList, 300 ) );
+      if( actor )
+        taskMgr.queueTask( World::makeActionIntegrityTask( m_resultId, actor, actorResultList, 300 ) );
 
       for( auto& result : actorResultList )
       {
         auto effect = result->getCalcResultParam();
-        if( result->getTarget() == m_sourceChara && result->getCalcResultParam().Type != Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME )
+        if( result->getTarget() == m_sourceChara &&
+            result->getCalcResultParam().Type != Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME )
           actionResult->addSourceEffect( effect );
         else
           actionResult->addTargetEffect( effect );
