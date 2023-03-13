@@ -52,7 +52,8 @@ void ActionIntegrityTask::execute()
     if( actionResult && actionResult->getTarget() )
       actionResult->execute();
 
-    if( actionResult->getCalcResultParam().Type == Common::CALC_RESULT_TYPE_SET_STATUS )
+    if( ( actionResult->getCalcResultParam().Type == Common::CALC_RESULT_TYPE_SET_STATUS ) ||
+        ( actionResult->getCalcResultParam().Type == Common::CALC_RESULT_TYPE_SET_STATUS_ME ) )
     {
       auto& status = data.Status[ statusIdx++ ];
       auto pEffect = actionResult->getStatusEffect();

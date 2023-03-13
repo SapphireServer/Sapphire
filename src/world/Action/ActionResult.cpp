@@ -82,6 +82,17 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
   m_pStatus->setParam( param );
 }
 
+void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, bool shouldOverride )
+{
+  m_result.Value = static_cast< int16_t >( id );
+  m_result.Arg2 = param;
+  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME;
+
+  m_bOverrideStatus = shouldOverride;
+  m_pStatus = StatusEffect::make_StatusEffect( id, m_target, m_target, duration, 3000 );
+  m_pStatus->setParam( param );
+}
+
 void ActionResult::mount( uint16_t mountId )
 {
   m_result.Value = static_cast< int16_t >( mountId );
@@ -125,6 +136,7 @@ void ActionResult::execute()
     }
 
     case Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME:
     {
       if( !m_bOverrideStatus )
         m_target->addStatusEffectByIdIfNotExist( m_pStatus );
