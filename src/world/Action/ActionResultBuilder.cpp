@@ -95,7 +95,6 @@ void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t dur
   addResultToActor( m_sourceChara, nextResult );
 }
 
-
 void ActionResultBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
 {
   ActionResultPtr nextResult = make_ActionResult( target, 0 );
