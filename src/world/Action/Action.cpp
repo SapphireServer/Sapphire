@@ -1124,7 +1124,6 @@ void Action::Action::addDefaultActorFilters()
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
-    case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
 
@@ -1134,6 +1133,7 @@ void Action::Action::addDefaultActorFilters()
     }
 
     case Common::CastType::CircularAOE:
+    case Common::CastType::ConeAOE:
     {
       auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
 
