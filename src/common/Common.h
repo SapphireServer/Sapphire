@@ -1084,7 +1084,7 @@ namespace Sapphire::Common
   {
     SingleTarget = 1,
     CircularAOE = 2,
-    Type3 = 3, // another single target? no idea how to call it
+    ConeAOE = 3,
     RectangularAOE = 4,
     CircularAoEPlaced = 7
   };
@@ -1372,6 +1372,12 @@ namespace Sapphire::Common
     LootRolled = 7, // p1: actorId, p2: itemId, p3: amount
     GetGil = 9, // p1: gil
     EmptyCoffer = 11, // seems like no param
+  };
+
+  enum ItemFlag
+  {
+    FlagNone = 0,
+    FlagHq = 1,
   };
 }
 

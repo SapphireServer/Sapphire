@@ -573,17 +573,24 @@ void Action::Action::buildEffects()
 
       if( dmg.first > 0 )
       {
+        auto attackTypeEffect = m_actionData->attackType;
+        if( attackTypeEffect == -1 )
+        {
+          //maybe set it base on job?
+          attackTypeEffect = 0;
+        }
+
         dmg.first = actor->applyShieldProtection( dmg.first );
         if( blocked > 0 )
-          m_effectBuilder->blockedDamage( actor, actor, dmg.first, static_cast< uint16_t >( blocked / originalDamage * 100 ) , dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100 );
+          m_effectBuilder->blockedDamage( actor, actor, dmg.first, static_cast< uint16_t >( blocked / originalDamage * 100 ), attackTypeEffect, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100 );
         else if (parried > 0 )
-          m_effectBuilder->parriedDamage( actor, actor, dmg.first, static_cast< uint16_t >( parried / originalDamage * 100 ), dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100  );
+          m_effectBuilder->parriedDamage( actor, actor, dmg.first, static_cast< uint16_t >( parried / originalDamage * 100 ), attackTypeEffect, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100  );
         else
-          m_effectBuilder->damage( actor, actor, dmg.first, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100 );
+          m_effectBuilder->damage( actor, actor, dmg.first, attackTypeEffect, dmg.second, dmg.first == 0 ? Common::ActionEffectResultFlag::Absorbed : Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100 );
         auto reflectDmg = Math::CalcStats::calcDamageReflect( m_pSource, actor, dmg.first, getActionTypeFilterFromAttackType( attackType ) );
         if( reflectDmg.first > 0 )
         {
-          m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, reflectDmg.second, Common::ActionEffectResultFlag::Reflected, getExecutionDelay() + victimCounter * 100 );
+          m_effectBuilder->damage( actor, m_pSource, reflectDmg.first, attackTypeEffect, reflectDmg.second, Common::ActionEffectResultFlag::Reflected, getExecutionDelay() + victimCounter * 100 );
         }
 
         auto absorb = Math::CalcStats::calcAbsorbHP( m_pSource, dmg.first );
@@ -1124,7 +1131,6 @@ void Action::Action::addDefaultActorFilters()
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
-    case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
 
@@ -1134,6 +1140,7 @@ void Action::Action::addDefaultActorFilters()
     }
 
     case Common::CastType::CircularAOE:
+    case Common::CastType::ConeAOE:
     {
       auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
 
@@ -1269,7 +1276,10 @@ bool Action::Action::isWeaponSkill() const
 
 bool Action::Action::isAttackTypePhysical( Common::AttackType attackType )
 {
-  return attackType == Common::AttackType::Physical;
+  return attackType == Common::AttackType::Physical ||
+    attackType == Common::AttackType::Slashing ||
+    attackType == Common::AttackType::Piercing ||
+    attackType == Common::AttackType::Blunt;
 }
 
 bool Action::Action::isAttackTypeMagical( Common::AttackType attackType )

@@ -16,14 +16,14 @@ namespace Sapphire::Math
 
     static uint32_t calculateMaxHp( Sapphire::Entity::PlayerPtr pPlayer );
 
-    static float dodgeProbability( const Sapphire::Entity::Chara& chara );
+    static float dodgeProbability( Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates the probability of a block happening
      */
-    static float blockProbability( const Sapphire::Entity::Chara& chara );
+    static float blockProbability( Sapphire::Entity::Chara& chara );
 
-    static float parryProbability( const Sapphire::Entity::Chara& chara );
+    static float parryProbability( Sapphire::Entity::Chara& chara );
 
     /*!
      * @brief Calculates the probability of a direct hit happening
@@ -155,11 +155,11 @@ namespace Sapphire::Math
 
     static float calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage );
 
-    static bool calcDodge( const Sapphire::Entity::Chara& chara );
+    static bool calcDodge( Sapphire::Entity::Chara& chara );
 
-    static float calcBlock( const Sapphire::Entity::Chara& chara, float damage );
+    static float calcBlock( Sapphire::Entity::Chara& chara, float damage );
 
-    static float calcParry( const Sapphire::Entity::Chara& chara, float damage );
+    static float calcParry( Sapphire::Entity::Chara& chara, float damage );
 
     static float getRandomNumber0To100();
   private:

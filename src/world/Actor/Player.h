@@ -136,7 +136,7 @@ namespace Sapphire::Entity
 
     void checkEvent( uint32_t eventId );
 
-
+    bool canBlock() override;
 
     // Events
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -340,7 +340,7 @@ namespace Sapphire::Entity
     void equipSoulCrystal( ItemPtr pItem, bool updateClass );
 
     /*! unequip a soul crystal, returning to the base class*/
-    void unequipSoulCrystal( ItemPtr pItem );
+    void unequipSoulCrystal();
 
     /*! get player ilvl */
     uint16_t getItemLevel() const;

@@ -250,6 +250,8 @@ namespace Sapphire::Entity
 
     virtual void autoAttack( CharaPtr pTarget );
 
+    virtual bool canBlock();
+
     virtual void onDeath() {};
 
     virtual void onDamageTaken( Chara& pSource ) {};

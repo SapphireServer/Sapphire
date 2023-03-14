@@ -22,14 +22,14 @@ namespace Sapphire::World::Action
 
     void dodge( Entity::CharaPtr& effectTarget, Entity::CharaPtr& dodgingTarget, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
 
-    void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount,
-                 Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage,
+    void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint8_t attackType,
+                 Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage, 
                  Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
 
-    void blockedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate,
+    void blockedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, uint8_t attackType,
                         Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
 
-    void parriedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate,
+    void parriedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, uint8_t attackType,
                         Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None, uint64_t resultDelayMs = 600 );
      
     void startCombo( Entity::CharaPtr& target, uint16_t actionId );

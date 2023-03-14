@@ -64,24 +64,24 @@ void EffectBuilder::dodge( Entity::CharaPtr& effectTarget, Entity::CharaPtr& dod
   moveToResultList( effectTarget, nextResult );
 }
 
-void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+void EffectBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint8_t attackType, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
   EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
-  nextResult->damage( amount, severity, flag );
+  nextResult->damage( amount, severity, attackType, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
-void EffectBuilder::blockedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+void EffectBuilder::blockedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, uint8_t attackType, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
   EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
-  nextResult->blockedDamage( amount, rate, flag );
+  nextResult->blockedDamage( amount, rate, attackType, flag );
   moveToResultList( effectTarget, nextResult );
 }
 
-void EffectBuilder::parriedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
+void EffectBuilder::parriedDamage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, uint16_t rate, uint8_t attackType, Common::ActionEffectResultFlag flag, uint64_t resultDelayMs )
 {
   EffectResultPtr nextResult = make_EffectResult( damagingTarget, Common::Util::getTimeMs() + resultDelayMs );
-  nextResult->parriedDamage( amount, rate, flag );
+  nextResult->parriedDamage( amount, rate, attackType, flag );
   moveToResultList( effectTarget, nextResult );
 }
 

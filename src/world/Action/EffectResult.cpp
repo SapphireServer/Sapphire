@@ -62,28 +62,31 @@ void EffectResult::dodge( Common::ActionEffectResultFlag flag )
   m_type = Common::ActionEffectType::Miss;
 }
 
-void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionEffectResultFlag flag )
+void EffectResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, uint8_t attackType, Common::ActionEffectResultFlag flag )
 {
   m_param0 = static_cast< uint8_t >( severity );
+  m_param1 = attackType;
   m_value = amount;
   m_flag = flag;
 
   m_type = Common::ActionEffectType::Damage;
 }
 
-void EffectResult::blockedDamage( uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag )
+void EffectResult::blockedDamage( uint32_t amount, uint16_t rate, uint8_t attackType, Common::ActionEffectResultFlag flag )
 {
   m_value = amount;
   m_flag = flag;
+  m_param1 = attackType;
   m_param2 = rate;
 
   m_type = Common::ActionEffectType::BlockedDamage;
 }
 
-void EffectResult::parriedDamage( uint32_t amount, uint16_t rate, Common::ActionEffectResultFlag flag )
+void EffectResult::parriedDamage( uint32_t amount, uint16_t rate, uint8_t attackType, Common::ActionEffectResultFlag flag )
 {
   m_value = amount;
   m_flag = flag;
+  m_param1 = attackType;
   m_param2 = rate;
 
   m_type = Common::ActionEffectType::ParriedDamage;

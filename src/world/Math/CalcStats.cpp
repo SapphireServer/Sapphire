@@ -183,14 +183,16 @@ uint32_t CalcStats::calculateMaxHp( PlayerPtr pPlayer )
   return result;
 }
 
-float CalcStats::dodgeProbability( const Sapphire::Entity::Chara& chara )
+float CalcStats::dodgeProbability( Sapphire::Entity::Chara& chara )
 {
   // dummy value: 5% for players.
   return chara.isPlayer() ? 5 : 0;
 }
 
-float CalcStats::blockProbability( const Chara& chara )
+float CalcStats::blockProbability( Chara& chara )
 {
+  if( !chara.canBlock() )
+    return 0;
   auto level = chara.getLevel();
   auto blockRate = static_cast< float >( chara.getStatValue( Common::BaseParam::BlockRate ) );
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
@@ -205,7 +207,7 @@ float CalcStats::blockProbability( const Chara& chara )
   return result;
 }
 
-float CalcStats::parryProbability( const Sapphire::Entity::Chara& chara )
+float CalcStats::parryProbability( Sapphire::Entity::Chara& chara )
 {
   // dummy value: 10% for players.
   float result = chara.isPlayer() ? 10 : 0;
@@ -844,7 +846,7 @@ float CalcStats::calcAbsorbHP( Sapphire::Entity::CharaPtr pChara, float damage )
   return result;
 }
 
-bool CalcStats::calcDodge( const Sapphire::Entity::Chara& chara )
+bool CalcStats::calcDodge( Sapphire::Entity::Chara& chara )
 {
   if( dodgeProbability( chara ) > getRandomNumber0To100() )
   {
@@ -853,7 +855,7 @@ bool CalcStats::calcDodge( const Sapphire::Entity::Chara& chara )
   return false;
 }
 
-float CalcStats::calcBlock( const Sapphire::Entity::Chara& chara, float damage )
+float CalcStats::calcBlock( Sapphire::Entity::Chara& chara, float damage )
 {
   if( blockProbability( chara ) > getRandomNumber0To100() )
   {
@@ -862,7 +864,7 @@ float CalcStats::calcBlock( const Sapphire::Entity::Chara& chara, float damage )
   return 0;
 }
 
-float CalcStats::calcParry( const Sapphire::Entity::Chara& chara, float damage )
+float CalcStats::calcParry( Sapphire::Entity::Chara& chara, float damage )
 {
   if( parryProbability( chara ) > getRandomNumber0To100() )
   {
