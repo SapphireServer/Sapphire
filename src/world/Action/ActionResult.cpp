@@ -37,18 +37,18 @@ uint64_t ActionResult::getDelay()
 
 void ActionResult::damage( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag )
 {
-  m_result.Arg0 = static_cast< uint8_t >( severity );
+  //m_result.Arg0 = static_cast< uint8_t >( severity );
   m_result.Value = static_cast< int16_t >( amount );
   m_result.Flag = static_cast< uint8_t >( flag );
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
+  m_result.Type = severity == Common::ActionHitSeverityType::CritDamage ? Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_DAMAGE_HP : Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
 }
 
 void ActionResult::heal( uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag )
 {
-  m_result.Arg1 = static_cast< uint8_t >( severity );
+  //m_result.Arg1 = static_cast< uint8_t >( severity );
   m_result.Value = static_cast< int16_t >( amount );
   m_result.Flag = static_cast< uint8_t >( flag );
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP;
+  m_result.Type = severity == Common::ActionHitSeverityType::CritHeal ? Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_RECOVER_HP : Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP;
 }
 
 void ActionResult::restoreMP( uint32_t amount, Common::ActionResultFlag flag )
@@ -119,12 +119,14 @@ void ActionResult::execute()
   switch( m_result.Type )
   {
     case Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_DAMAGE_HP:
     {
       m_target->takeDamage( m_result.Value );
       break;
     }
 
     case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP:
+    case Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_RECOVER_HP:
     {
       m_target->heal( m_result.Value );
       break;

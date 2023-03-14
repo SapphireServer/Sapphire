@@ -85,9 +85,7 @@ const int levelTable[61][6] =
   { 218, 354, 858, 2600, 282, 215 },
 };
 
-std::random_device CalcStats::dev;
-std::mt19937 CalcStats::rng( dev() );
-std::uniform_int_distribution< std::mt19937::result_type > CalcStats::range100( 0, 99 );
+std::unique_ptr< RandGenerator< float > > CalcStats::rnd = nullptr;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -285,19 +283,6 @@ float CalcStats::blockProbability( const Chara& chara )
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
-}
-
-float CalcStats::directHitProbability( const Chara& chara )
-{
-  const auto& baseStats = chara.getStats();
-  auto level = chara.getLevel();
-
-  auto dhRate = chara.getStatValueFloat( Common::BaseParam::Accuracy );
-
-  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
-  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
-
-  return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
 }
 
 float CalcStats::criticalHitProbability( const Chara& chara )
@@ -583,21 +568,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   factor = std::floor( factor * speed( chara ) );
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
-  {
-    factor *= 1.25f;
-    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
-                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
-                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
-  }
-
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   // todo: buffs
 
@@ -628,21 +605,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
-  {
-    factor *= 1.25f;
-    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
-                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
-                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
-  }
-
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   // todo: buffs
 
@@ -669,13 +638,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto factor = std::floor( ( wepDmg * ( mnd / 200 ) + ( det / 10 ) ) * ( ptc / 100 ) * 1.3f );
   Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
   }
 
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   return std::pair( factor, hitType );
 }
@@ -683,4 +652,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 {
   return chara.getStatValue( chara.getPrimaryStat() );
+}
+
+float CalcStats::getRandomNumber0To100()
+{
+  if( !rnd )
+  {
+    rnd = std::make_unique< RandGenerator< float > >( Common::Service< RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
+  }
+  return rnd->next();
 }
