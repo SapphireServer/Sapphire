@@ -650,15 +650,58 @@ void Sapphire::Entity::Player::writeItemDb( Sapphire::ItemPtr pItem ) const
     auto& itemMgr = Common::Service< World::Manager::ItemMgr >::ref();
 
     uint8_t flags = 0;
+    if( pItem->isHq() )
+      flags |= Common::ItemFlag::FlagHq;
     pItem->setUId( itemMgr.getNextUId() );
-    std::string sql = "INSERT INTO charaglobalitem ( CharacterId, itemId, catalogId, stack, flags ) VALUES ( " +
+    std::string sql = "INSERT INTO charaglobalitem ( CharacterId, itemId, reservedFlag, catalogId, stack, flags ) VALUES ( " +
                       std::to_string( getId() ) + ", " +
                       std::to_string( pItem->getUId() ) + ", " +
+                      std::to_string( pItem->getReservedFlag() ) + ", " +
                       std::to_string( pItem->getId() ) + ", " +
                       std::to_string( pItem->getStackSize() ) + ", " +
                       std::to_string( flags ) + ");";
     db.directExecute( sql );
   }
+}
+
+void Sapphire::Entity::Player::updateItemDb( Sapphire::ItemPtr pItem ) const
+{
+  if( pItem->getUId() == 0 )
+  {
+    writeItemDb( pItem );
+    return;
+  }
+
+  uint8_t flags = 0;
+  if( pItem->isHq() )
+    flags |= Common::ItemFlag::FlagHq;
+
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_UP );
+
+  // todo: add more fields
+  stmt->setInt( 1, pItem->getStackSize() );
+  stmt->setInt( 2, pItem->getDurability() );
+  stmt->setInt( 3, flags );
+  stmt->setInt( 4, pItem->getReservedFlag() );
+  stmt->setInt( 5, pItem->getStain() );
+
+  stmt->setInt64( 6, pItem->getUId() );
+
+  db.directExecute( stmt );
+}
+
+void Sapphire::Entity::Player::deleteItemDb( Sapphire::ItemPtr item ) const
+{
+  if( item->getUId() == 0 )
+    return;
+
+  auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
+  auto stmt = db.getPreparedStatement( Db::CHARA_ITEMGLOBAL_DELETE );
+
+  stmt->setInt64( 1, item->getUId() );
+
+  db.directExecute( stmt );
 }
 
 bool Sapphire::Entity::Player::loadInventory()

@@ -1373,6 +1373,12 @@ namespace Sapphire::Common
     GetGil = 9, // p1: gil
     EmptyCoffer = 11, // seems like no param
   };
+
+  enum ItemFlag
+  {
+    FlagNone = 0,
+    FlagHq = 1,
+  };
 }
 
 #endif
