@@ -397,6 +397,7 @@ namespace Excel
     uint8_t UseClassJob;
     uint8_t Init;
     uint8_t Omen;
+    uint8_t Unknown;
     int8_t Learn;
     int8_t SelectRange;
     int8_t SelectCorpse;

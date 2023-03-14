@@ -549,7 +549,7 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+std::pair< float, Sapphire::Common::ActionEffectType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
@@ -562,7 +562,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   // todo: everything after tenacity
   auto factor = Common::Util::trunc( pot * aa * ap * det, 0 );
-  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+  Sapphire::Common::ActionEffectType hitType = Sapphire::Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
 
   // todo: traits
 
@@ -571,7 +571,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
-    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+    hitType = Sapphire::Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_DAMAGE_HP;
   }
 
   factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
@@ -592,7 +592,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionEffectType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
@@ -603,12 +603,12 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto det = determination( chara );
 
   auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
-  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+  Sapphire::Common::ActionEffectType hitType = Sapphire::Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
 
   if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
-    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+    hitType = Sapphire::Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_DAMAGE_HP;
   }
 
   factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
@@ -629,19 +629,20 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::ActionEffectType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // lol just for testing
   float det = chara.getStatValue( Common::BaseParam::Determination );
   float mnd = chara.getStatValue( Common::BaseParam::Mind );
 
   auto factor = std::floor( ( wepDmg * ( mnd / 200 ) + ( det / 10 ) ) * ( ptc / 100 ) * 1.3f );
-  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
+
+  Sapphire::Common::ActionEffectType hitType = Sapphire::Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP;
 
   if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
-    hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
+    hitType = Sapphire::Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_RECOVER_HP;
   }
 
   factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );

@@ -10,6 +10,7 @@
 
 #include <Util/Util.h>
 #include <Util/UtilMath.h>
+#include <Exd/ExdData.h>
 
 #include <Logging/Logger.h>
 #include <Manager/TerritoryMgr.h>
@@ -46,58 +47,62 @@ void ActionResultBuilder::addResultToActor( Entity::CharaPtr& chara, ActionResul
   it->second.push_back( std::move( result ) );
 }
 
-void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag )
+void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionEffectType hitType, Common::ActionResultFlag flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( healingTarget, 0 );
-  nextResult->heal( amount, severity, flag );
+  ActionResultPtr nextResult = make_ActionResult( healingTarget );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto actionData = exdData.getRow< Excel::Action >( m_actionId );
+  nextResult->heal( amount, hitType, std::abs( actionData->data().AttackType ), flag );
   addResultToActor( effectTarget, nextResult );
 }
 
 void ActionResultBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionResultFlag flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( restoringTarget, 0 ); // restore mp source actor
+  ActionResultPtr nextResult = make_ActionResult( restoringTarget ); // restore mp source actor
   nextResult->restoreMP( amount, flag );
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionHitSeverityType severity, Common::ActionResultFlag flag )
+void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionEffectType hitType, Common::ActionResultFlag flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( damagingTarget, 0 );
-  nextResult->damage( amount, severity, flag );
+  ActionResultPtr nextResult = make_ActionResult( damagingTarget );
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto actionData = exdData.getRow< Excel::Action >( m_actionId );
+  nextResult->damage( amount, hitType, std::abs( actionData->data().AttackType ), flag );
   addResultToActor( damagingTarget, nextResult );
 }
 
 void ActionResultBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  ActionResultPtr nextResult = make_ActionResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target );
   nextResult->startCombo( actionId );
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  ActionResultPtr nextResult = make_ActionResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target );
   nextResult->comboSucceed();
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
-  ActionResultPtr nextResult = make_ActionResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target );
   nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, shouldOverride );
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
-  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, 0 );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara );
   nextResult->applyStatusEffectSelf( statusId, duration, param, shouldOverride );
   addResultToActor( m_sourceChara, nextResult );
 }
 
 void ActionResultBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
 {
-  ActionResultPtr nextResult = make_ActionResult( target, 0 );
+  ActionResultPtr nextResult = make_ActionResult( target );
   nextResult->mount( mountId );
   addResultToActor( target, nextResult );
 }

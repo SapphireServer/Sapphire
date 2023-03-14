@@ -11,14 +11,14 @@ namespace Sapphire::World::Action
     ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, uint32_t resultId, uint16_t requestId );
 
     void heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount,
-               Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalHeal,
+               Common::ActionEffectType hitType = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP,
                Common::ActionResultFlag flag = Common::ActionResultFlag::None );
 
     void restoreMP( Entity::CharaPtr& effectTarget, Entity::CharaPtr& restoringTarget, uint32_t amount,
                     Common::ActionResultFlag flag = Common::ActionResultFlag::None );
 
     void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount,
-                 Common::ActionHitSeverityType severity = Common::ActionHitSeverityType::NormalDamage,
+                 Common::ActionEffectType hitType = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP,
                  Common::ActionResultFlag flag = Common::ActionResultFlag::None );
 
     void startCombo( Entity::CharaPtr& target, uint16_t actionId );
