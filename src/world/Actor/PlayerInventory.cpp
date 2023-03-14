@@ -148,9 +148,9 @@ void Sapphire::Entity::Player::equipSoulCrystal( ItemPtr pItem, bool updateJob )
 
 void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapphire::ItemPtr& pItem, bool updateClass )
 {
-  uint64_t model = pItem->getModelId1();
-  uint64_t model2 = pItem->getModelId2();
-  uint64_t stain = pItem->getStain();
+  uint64_t model = pItem ? pItem->getModelId1() : 0;
+  uint64_t model2 = pItem ? pItem->getModelId2() : 0;
+  uint64_t stain = pItem ? pItem->getStain() : 0;
 
   switch( equipSlotId )
   {
@@ -172,7 +172,10 @@ void Sapphire::Entity::Player::updateModels( GearSetSlot equipSlotId, const Sapp
       break;
 
     case SoulCrystal:
-      equipSoulCrystal( pItem, updateClass );
+      if( pItem )
+        equipSoulCrystal( pItem, updateClass );
+      else
+        unequipSoulCrystal();
       break;
 
     case Waist:
@@ -265,14 +268,11 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
 
   if( sendUpdate )
   {
+    updateModels( equipSlotId, nullptr, true );
     sendModel();
-
     m_itemLevel = calculateEquippedGearItemLevel();
     sendItemLevel();
   }
-
-  if ( equipSlotId == SoulCrystal )
-    unequipSoulCrystal( pItem );
 
   auto baseParams = pItem->getBaseParams();
   for( auto i = 0; i < 6; ++i )
@@ -293,7 +293,7 @@ void Sapphire::Entity::Player::unequipItem( Common::GearSetSlot equipSlotId, Ite
   }
 }
 
-void Sapphire::Entity::Player::unequipSoulCrystal( ItemPtr pItem )
+void Sapphire::Entity::Player::unequipSoulCrystal()
 {
   auto& exdData = Common::Service< Sapphire::Data::ExdDataGenerated >::ref();
 
@@ -716,7 +716,19 @@ Sapphire::Entity::Player::moveItem( uint16_t fromInventoryId, uint8_t fromSlotId
   auto& itemMap = m_storageMap[ fromInventoryId ]->getItemMap();
 
   if( tmpItem == nullptr )
+  {
+    sendUrgent( "trying to move EMPTY item from [container{}, slot{}] to [container{}, slot{}], potential client desync, no action is performed.",
+      fromInventoryId, fromSlotId, toInventoryId, toSlot );
     return;
+  }
+
+  if( auto target = m_storageMap[ toInventoryId ]->getItem( toSlot ) )
+  {
+    sendUrgent( "trying to move item from [container{}, slot{}] to NON-EMPTY [container{}, slot{}], potential client desync, swapItem is performed instead.",
+      fromInventoryId, fromSlotId, toInventoryId, toSlot );
+    swapItem( fromInventoryId, fromSlotId, toInventoryId, toSlot, sendUpdate );
+    return;
+  }
 
   itemMap[ fromSlotId ].reset();
 
@@ -853,8 +865,28 @@ void Sapphire::Entity::Player::swapItem( uint16_t fromInventoryId, uint8_t fromS
   auto toItem = m_storageMap[ toInventoryId ]->getItem( toSlot );
   auto& itemMap = m_storageMap[ fromInventoryId ]->getItemMap();
 
-  if( fromItem == nullptr || toItem == nullptr )
+  if( fromItem == nullptr && toItem == nullptr )
+  {
+    sendUrgent( "trying to swap TWO EMPTY ITEMS from [container{}, slot{}] to [container{}, slot{}], potential client desync, no action is performed.",
+      fromInventoryId, fromSlotId, toInventoryId, toSlot );
     return;
+  }
+
+  if( fromItem != nullptr && toItem == nullptr )
+  {
+    sendUrgent( "trying to swap item from [container{}, slot{}] to EMPTY [container{}, slot{}], potential client desync, moveItem is performed instead.",
+      fromInventoryId, fromSlotId, toInventoryId, toSlot );
+    moveItem( fromInventoryId, fromSlotId, toInventoryId, toSlot, sendUpdate );
+    return;
+  }
+
+  if( fromItem == nullptr && toItem != nullptr )
+  {
+    sendUrgent( "trying to swap EMPTY item from [container{}, slot{}] to [container{}, slot{}], potential client desync, moveItem is performed instead.",
+      fromInventoryId, fromSlotId, toInventoryId, toSlot );
+    moveItem( toInventoryId, toSlot, fromInventoryId, fromSlotId, sendUpdate ); // we are moving the non-empty toSlot back to fromSlot.
+    return;
+  }
 
   // An item is being moved from bag0-3 to equippment, meaning
   // the swapped out item will be placed in the matching armory.
