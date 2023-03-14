@@ -793,6 +793,10 @@ void Sapphire::Entity::Chara::setAgentId( uint32_t agentId )
   m_agentId = agentId;
 }
 
+bool Sapphire::Entity::Chara::canBlock()
+{
+  return false;
+}
 
 float Sapphire::Entity::Chara::getRadius() const
 {

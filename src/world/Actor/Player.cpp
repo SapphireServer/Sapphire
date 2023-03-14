@@ -2420,6 +2420,16 @@ void Sapphire::Entity::Player::clearBuyBackMap()
   m_shopBuyBackMap.clear();
 }
 
+bool Sapphire::Entity::Player::canBlock()
+{
+  if( auto item = getEquippedSecondaryWeapon() )
+  {
+    if( item->getCategory() == ItemUICategory::Shield )
+      return true;
+  }
+  return false;
+}
+
 void Sapphire::Entity::Player::gaugeClear()
 {
   std::memset( &m_gauge, 0, sizeof( m_gauge ) );
