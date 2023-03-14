@@ -1,11 +1,12 @@
 #pragma once
 
-#include <random>
 #include <Common.h>
 #include "Forwards.h"
+#include "Manager/RNGMgr.h"
 
 namespace Sapphire::Math
 {
+  using namespace Sapphire::World::Manager;
 
   class CalcStats
   {
@@ -151,9 +152,8 @@ namespace Sapphire::Math
      */
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
-    static std::random_device dev;
-    static std::mt19937 rng;
-    static std::uniform_int_distribution< std::mt19937::result_type > range100;
+    static float getRandomNumber0To100();
+    static std::unique_ptr< RandGenerator< float > > rnd;
   };
 
 }
