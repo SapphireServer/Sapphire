@@ -287,19 +287,6 @@ float CalcStats::blockProbability( const Chara& chara )
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
 }
 
-float CalcStats::directHitProbability( const Chara& chara )
-{
-  const auto& baseStats = chara.getStats();
-  auto level = chara.getLevel();
-
-  auto dhRate = chara.getStatValueFloat( Common::BaseParam::Accuracy );
-
-  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
-  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
-
-  return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
-}
-
 float CalcStats::criticalHitProbability( const Chara& chara )
 {
   const auto& baseStats = chara.getStats();
@@ -589,14 +576,6 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
-  {
-    factor *= 1.25f;
-    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
-                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
-                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
-  }
-
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
 
   // todo: buffs
@@ -632,14 +611,6 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   {
     factor *= criticalHitBonus( chara );
     hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
-  }
-
-  if( directHitProbability( chara ) > range100( rng ) )
-  {
-    factor *= 1.25f;
-    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
-                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
-                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
   }
 
   factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );

@@ -35,11 +35,6 @@ namespace Sapphire::Math
     static float blockProbability( const Sapphire::Entity::Chara& chara );
 
     /*!
-     * @brief Calculates the probability of a direct hit happening
-     */
-    static float directHitProbability( const Sapphire::Entity::Chara& chara );
-
-    /*!
      * @brief Calculates the probability of a critical hit happening
      */
     static float criticalHitProbability( const Sapphire::Entity::Chara& chara );
