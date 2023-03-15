@@ -47,6 +47,8 @@ namespace Sapphire::World
 
     void update();
 
+    void processOutQueue();
+
     bool isValid() const;
 
     Entity::PlayerPtr getPlayer() const;

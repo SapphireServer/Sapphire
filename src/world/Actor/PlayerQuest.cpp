@@ -7,16 +7,18 @@
 
 #include "Player.h"
 
-
+using namespace Sapphire;
 using namespace Sapphire::Common;
+using namespace Sapphire::Entity;
+using namespace Sapphire::World;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-void Sapphire::Entity::Player::finishQuest( uint16_t questId, uint32_t optionalChoice )
+void Player::finishQuest( uint16_t questId, uint32_t optionalChoice )
 {
   removeQuest( questId );
 
-  auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
 
   updateQuestsCompleted( questId );
 
@@ -24,14 +26,14 @@ void Sapphire::Entity::Player::finishQuest( uint16_t questId, uint32_t optionalC
   questMgr.onCompleteQuest( *this, questId, optionalChoice );
 }
 
-void Sapphire::Entity::Player::unfinishQuest( uint16_t questId )
+void Player::unfinishQuest( uint16_t questId )
 {
   removeQuestsCompleted( questId );
-  auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
+  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
   questMgr.sendQuestsInfo( *this );
 }
 
-void Sapphire::Entity::Player::removeQuest( uint16_t questId )
+void Player::removeQuest( uint16_t questId )
 {
   int8_t idx = getQuestIndex( questId );
 
@@ -41,8 +43,8 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
     return;
   }
 
-  auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
-  auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
+  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
+  auto& mapMgr = Common::Service< Manager::MapMgr >::ref();
 
   m_quests[ idx ] = World::Quest();
   removeQuestTracking( idx );
@@ -53,7 +55,7 @@ void Sapphire::Entity::Player::removeQuest( uint16_t questId )
 
 }
 
-void Sapphire::Entity::Player::removeQuestTracking( int8_t idx )
+void Player::removeQuestTracking( int8_t idx )
 {
   for( int32_t ii = 0; ii < 5; ii++ )
   {
@@ -62,12 +64,12 @@ void Sapphire::Entity::Player::removeQuestTracking( int8_t idx )
   }
 }
 
-bool Sapphire::Entity::Player::hasQuest( uint32_t questId )
+bool Player::hasQuest( uint32_t questId )
 {
   return ( getQuestIndex( static_cast< uint16_t >( questId ) ) > -1 );
 }
 
-int8_t Sapphire::Entity::Player::getQuestIndex( uint16_t questId )
+int8_t Player::getQuestIndex( uint16_t questId )
 {
   for( size_t pos = 0; pos < 30; ++pos )
   {
@@ -77,7 +79,7 @@ int8_t Sapphire::Entity::Player::getQuestIndex( uint16_t questId )
   return -1;
 }
 
-void Sapphire::Entity::Player::updateQuest( const World::Quest& quest )
+void Player::updateQuest( const World::Quest& quest )
 {
   auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
   auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
@@ -93,7 +95,7 @@ void Sapphire::Entity::Player::updateQuest( const World::Quest& quest )
     addQuest( quest );
 }
 
-bool Sapphire::Entity::Player::addQuest( const World::Quest& quest )
+bool Player::addQuest( const World::Quest& quest )
 {
   int8_t idx = getFreeQuestSlot();
 
@@ -103,8 +105,8 @@ bool Sapphire::Entity::Player::addQuest( const World::Quest& quest )
     return false;
   }
 
-  auto& questMgr = Common::Service< World::Manager::QuestMgr >::ref();
-  auto& mapMgr = Common::Service< World::Manager::MapMgr >::ref();
+  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
+  auto& mapMgr = Common::Service< Manager::MapMgr >::ref();
 
   m_quests[ idx ] = quest;
 
@@ -117,7 +119,7 @@ bool Sapphire::Entity::Player::addQuest( const World::Quest& quest )
   return true;
 }
 
-std::optional< Sapphire::World::Quest > Sapphire::Entity::Player::getQuest( uint32_t questId )
+std::optional< World::Quest > Player::getQuest( uint32_t questId )
 {
   if( !hasQuest( questId ) )
     return std::nullopt;
@@ -128,7 +130,7 @@ std::optional< Sapphire::World::Quest > Sapphire::Entity::Player::getQuest( uint
   return { quest };
 }
 
-int8_t Sapphire::Entity::Player::getFreeQuestSlot()
+int8_t Player::getFreeQuestSlot()
 {
   int8_t result = -1;
   for( int8_t idx = 0; idx < 30; idx++ )
@@ -141,7 +143,7 @@ int8_t Sapphire::Entity::Player::getFreeQuestSlot()
   return result;
 }
 
-void Sapphire::Entity::Player::addQuestTracking( uint8_t idx )
+void Player::addQuestTracking( uint8_t idx )
 {
   for( int32_t ii = 0; ii < 5; ii++ )
   {
@@ -153,7 +155,7 @@ void Sapphire::Entity::Player::addQuestTracking( uint8_t idx )
   }
 }
 
-void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
+void Player::updateQuestsCompleted( uint32_t questId )
 {
   uint8_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
@@ -163,7 +165,7 @@ void Sapphire::Entity::Player::updateQuestsCompleted( uint32_t questId )
   m_questCompleteFlags[ index ] |= value;
 }
 
-bool Sapphire::Entity::Player::isQuestCompleted( uint32_t questId )
+bool Player::isQuestCompleted( uint32_t questId )
 {
   uint8_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
@@ -173,7 +175,7 @@ bool Sapphire::Entity::Player::isQuestCompleted( uint32_t questId )
   return m_questCompleteFlags[ index ] & value;
 } 
 
-void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
+void Player::removeQuestsCompleted( uint32_t questId )
 {
   uint8_t index = questId / 8;
   uint8_t bitIndex = ( questId ) % 8;
@@ -182,27 +184,27 @@ void Sapphire::Entity::Player::removeQuestsCompleted( uint32_t questId )
 
   m_questCompleteFlags[ index ] ^= value;
 
-  Common::Service< World::Manager::MapMgr >::ref().updateQuests( *this );
+  Common::Service< Manager::MapMgr >::ref().updateQuests( *this );
 }
 
-Sapphire::World::Quest& Sapphire::Entity::Player::getQuestByIndex( uint16_t index )
+World::Quest& Player::getQuestByIndex( uint16_t index )
 {
   return m_quests[ index ];
 }
 
-std::array< Sapphire::World::Quest, 30 >& Sapphire::Entity::Player::getQuestArrayRef()
+std::array< World::Quest, 30 >& Player::getQuestArrayRef()
 {
   return m_quests;
 }
 
-int16_t Sapphire::Entity::Player::getQuestTracking( uint8_t index ) const
+int16_t Player::getQuestTracking( uint8_t index ) const
 {
   if( index < 0 || index >= 5 )
     return -1;
   return m_questTracking[ index ];
 }
 
-Sapphire::Entity::Player::QuestComplete& Sapphire::Entity::Player::getQuestCompleteFlags()
+Player::QuestComplete& Player::getQuestCompleteFlags()
 {
   return m_questCompleteFlags;
 }

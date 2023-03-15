@@ -38,6 +38,7 @@ namespace Sapphire::Entity
 
     using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
     using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
+    using BorrowAction = std::array< uint32_t, Common::ARRSIZE_BORROWACTION >;
 
     struct AchievementData {
       std::array< uint8_t, 2048 / 8 > unlockList;
@@ -82,12 +83,6 @@ namespace Sapphire::Entity
 
     /*! Event called on every session iteration */
     void update( uint64_t tickCount ) override;
-
-    /*! get last attack tick for player */
-    uint64_t getLastAttack() const;
-
-    /*! set last attack tick for player */
-    void setLastAttack( uint64_t tickCount );
 
     // Quest
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -445,6 +440,10 @@ namespace Sapphire::Entity
 
     /*! learn an action / update the unlock bitmask. */
     void setRewardFlag( Common::UnlockEntry unlockId );
+
+    void setBorrowAction( uint8_t slot, uint32_t action );
+
+    BorrowAction& getBorrowAction();
 
     /*! learn a song / update the unlock bitmask. */
     void learnSong( uint8_t songId, uint32_t itemId );
@@ -965,6 +964,8 @@ namespace Sapphire::Entity
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
     std::array< Common::HuntingLogEntry, Common::ARRSIZE_MONSTERNOTE > m_huntingLogEntries{};
+
+    std::array< BorrowAction, Common::ARRSIZE_CLASSJOB > m_borrowActions{};
 
     FriendListIDVec m_friendList{};
     FriendListDataVec m_friendInviteList{};

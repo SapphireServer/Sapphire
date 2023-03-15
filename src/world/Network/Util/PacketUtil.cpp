@@ -1,4 +1,4 @@
-#include "PlayerUtil.h"
+#include "PacketUtil.h"
 
 #include <Exd/ExdData.h>
 
@@ -18,23 +18,25 @@
 #include <Network/PacketWrappers/RestingPacket.h>
 #include <Network/PacketWrappers/PlayerSetupPacket.h>
 #include <Network/PacketWrappers/InitZonePacket.h>
+#include <Network/PacketWrappers/ServerNoticePacket.h>
+#include <Network/PacketWrappers/ChatPacket.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network;
-using namespace Sapphire::Network::Util::Player;
+using namespace Sapphire::Network::Util::Packet;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-void Util::Player::sendConfigFlags( Entity::Player& player )
+void Util::Packet::sendConfigFlags( Entity::Player& player )
 {
   auto paramPacket = makeZonePacket< FFXIVIpcConfig >( player.getId() );
   paramPacket->data().flag = player.getConfigFlags();
   server().queueForPlayers( player.getInRangePlayerIds( true ), paramPacket );
 }
 
-void Util::Player::sendOnlineStatus( Entity::Player& player )
+void Util::Packet::sendOnlineStatus( Entity::Player& player )
 {
   auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
   statusPacket->data().onlineStatusFlags = player.getFullOnlineStatusMask();
@@ -44,7 +46,7 @@ void Util::Player::sendOnlineStatus( Entity::Player& player )
                             makeActorControl( player.getId(), SetStatusIcon, static_cast< uint8_t >( player.getOnlineStatus() ) ) );
 }
 
-void Util::Player::sendBaseParams( Entity::Player& player )
+void Util::Packet::sendBaseParams( Entity::Player& player )
 {
   std::array< uint32_t, 50 > statParams{};
   std::fill( std::begin( statParams ), std::end( statParams ), 0 );
@@ -67,13 +69,17 @@ void Util::Player::sendBaseParams( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), statPacket );
 }
 
-void Util::Player::sendHudParam( Entity::Player& player )
+void Util::Packet::sendHudParam( Entity::Chara& source )
 {
-  auto hudParamPacket = makeHudParam( player );
-  server().queueForPlayer( player.getCharacterId(), hudParamPacket );
+  if( source.isPlayer() )
+    server().queueForPlayers( source.getInRangePlayerIds( true ), makeHudParam( *source.getAsPlayer() ) );
+  else if( source.isBattleNpc() )
+    server().queueForPlayers( source.getInRangePlayerIds( false ), makeHudParam( *source.getAsBNpc() ) );
+  else
+    server().queueForPlayers( source.getInRangePlayerIds( false ), makeHudParam( source ) );
 }
 
-void Util::Player::sendStatusUpdate( Entity::Player& player )
+void Util::Packet::sendStatusUpdate( Entity::Player& player )
 {
   auto playerStatusUpdate = makeZonePacket< FFXIVIpcPlayerStatusUpdate >( player.getId() );
   playerStatusUpdate->data().ClassJob = static_cast< uint8_t >( player.getClass() );
@@ -85,7 +91,7 @@ void Util::Player::sendStatusUpdate( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), playerStatusUpdate );
 }
 
-void Util::Player::sendHuntingLog( Entity::Player& player )
+void Util::Packet::sendHuntingLog( Entity::Player& player )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   for( auto entryCount = 0; entryCount < Common::ARRSIZE_MONSTERNOTE; ++entryCount )
@@ -128,37 +134,49 @@ void Util::Player::sendHuntingLog( Entity::Player& player )
   }
 }
 
-void Util::Player::sendActorControlSelf( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
+void Util::Packet::sendActorControlSelf( Entity::Player& player, uint32_t srcId, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
                                          uint32_t param4, uint32_t param5 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), category, param1, param2, param3, param4, param5 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( srcId, category, param1, param2, param3, param4, param5 ) );
 }
 
-void Util::Player::sendActorControlSelf( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1,
+void Util::Packet::sendActorControlSelf( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
                                          uint32_t param2, uint32_t param3, uint32_t param4, uint32_t param5 )
 {
-  server().queueForPlayers( characterIds, makeActorControlSelf( player.getId(), category, param1, param2, param3, param4, param5 ) );
+  server().queueForPlayers( characterIds, makeActorControlSelf( srcId, category, param1, param2, param3, param4, param5 ) );
 }
 
-void Util::Player::sendActorControl( Entity::Player& player, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4 )
+void Util::Packet::sendActorControl( Entity::Player& player, uint32_t srcId, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), category, param1, param2, param3, param4 ) );
+  server().queueForPlayer( player.getCharacterId(), makeActorControl( srcId, category, param1, param2, param3, param4 ) );
 }
 
-void Util::Player::sendActorControl( const std::set< uint64_t >& characterIds, Entity::Player& player, uint16_t category, uint32_t param1,
+void Util::Packet::sendActorControl( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
                                      uint32_t param2, uint32_t param3, uint32_t param4 )
 {
-  server().queueForPlayers( characterIds, makeActorControl( player.getId(), category, param1, param2, param3, param4 ) );
+  server().queueForPlayers( characterIds, makeActorControl( srcId, category, param1, param2, param3, param4 ) );
 }
 
-void Util::Player::sendTitleList( Entity::Player& player )
+void Util::Packet::sendActorControlTarget( Entity::Player& player, uint32_t srcId, uint16_t category, uint32_t param1, uint32_t param2, uint32_t param3,
+                                           uint32_t param4, uint32_t param5, uint32_t param6 )
+{
+  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( srcId, category, param1, param2, param3, param4, param5, param6 ) );
+}
+
+void Util::Packet::sendActorControlTarget( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1,
+                                           uint32_t param2, uint32_t param3, uint32_t param4, uint32_t param5, uint32_t param6 )
+{
+  server().queueForPlayers( characterIds, makeActorControlTarget( srcId, category, param1, param2, param3, param4, param5, param6 ) );
+}
+
+void Util::Packet::sendTitleList( Entity::Player& player )
 {
   auto titleListPacket = makeZonePacket< FFXIVIpcTitleList >( player.getId() );
   memcpy( titleListPacket->data().TitleFlagsArray, player.getTitleList().data(), sizeof( titleListPacket->data().TitleFlagsArray ) );
   server().queueForPlayer( player.getCharacterId(), titleListPacket );
 }
 
-void Util::Player::sendGrandCompany( Entity::Player& player )
+void Util::Packet::sendGrandCompany( Entity::Player& player )
 {
   auto gcAffPacket = makeZonePacket< FFXIVIpcGrandCompany >( player.getId() );
   gcAffPacket->data().ActiveCompanyId = player.getGc();
@@ -168,7 +186,7 @@ void Util::Player::sendGrandCompany( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), gcAffPacket );
 }
 
-void Util::Player::sendDeletePlayer( Entity::Player& player, uint32_t actorId, uint8_t spawnIndex )
+void Util::Packet::sendDeletePlayer( Entity::Player& player, uint32_t actorId, uint8_t spawnIndex )
 {
   auto freeActorSpawnPacket = makeZonePacket< FFXIVIpcActorFreeSpawn >( player.getId() );
   freeActorSpawnPacket->data().actorId = actorId;
@@ -176,14 +194,14 @@ void Util::Player::sendDeletePlayer( Entity::Player& player, uint32_t actorId, u
   server().queueForPlayer( player.getCharacterId(), freeActorSpawnPacket );
 }
 
-void Util::Player::sendDeleteObject( Entity::Player& player, uint8_t spawnIndex )
+void Util::Packet::sendDeleteObject( Entity::Player& player, uint8_t spawnIndex )
 {
   auto freeObjectSpawnPacket = makeZonePacket< FFXIVIpcDeleteObject >( player.getId() );
   freeObjectSpawnPacket->data().Index = spawnIndex;
   server().queueForPlayer( player.getCharacterId(), freeObjectSpawnPacket );
 }
 
-void Util::Player::sendHateList( Entity::Player& player )
+void Util::Packet::sendHateList( Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
 
@@ -211,7 +229,7 @@ void Util::Player::sendHateList( Entity::Player& player )
     if( hateValue == 0 )
       continue;
 
-    auto hatePercent = ( hateValue / static_cast< float >( pBNpc->hateListGetHighestValue() ) ) * 100.f;
+    auto hatePercent = ( static_cast< float >( hateValue ) / static_cast< float >( pBNpc->hateListGetHighestValue() ) ) * 100.f;
 
     hateListPacket->data().List[ i ].Id = player.getId();
     hateListPacket->data().List[ i ].Value = hateValue;
@@ -223,36 +241,36 @@ void Util::Player::sendHateList( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), { hateListPacket, hateRankPacket } );
 }
 
-void Util::Player::sendMount( Entity::Player& player )
+void Util::Packet::sendMount( Entity::Player& player )
 {
   auto mountId = player.getCurrentMount();
   auto inRangePlayerIds = player.getInRangePlayerIds( true );
   if( mountId != 0 )
   {
-    Network::Util::Player::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) );
-    Network::Util::Player::sendActorControlSelf( inRangePlayerIds, player, 0x39e, 12 );
+    Network::Util::Packet::sendActorControl( inRangePlayerIds, player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Mounted ) );
+    Network::Util::Packet::sendActorControlSelf( inRangePlayerIds, player.getId(), 0x39e, 12 );
   }
   else
   {
-    Network::Util::Player::sendActorControl( inRangePlayerIds, player, SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
-    Network::Util::Player::sendActorControlSelf( inRangePlayerIds, player, Dismount, 1 );
+    Network::Util::Packet::sendActorControl( inRangePlayerIds, player.getId(), SetStatus, static_cast< uint8_t >( Common::ActorStatus::Idle ) );
+    Network::Util::Packet::sendActorControlSelf( inRangePlayerIds, player.getId(), Dismount, 1 );
   }
   auto mountPacket = makeZonePacket< FFXIVIpcMount >( player.getId() );
   mountPacket->data().id = mountId;
   server().queueForPlayers( inRangePlayerIds, mountPacket );
 }
 
-void Util::Player::sendEquip( Entity::Player& player )
+void Util::Packet::sendEquip( Entity::Player& player )
 {
   server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< ModelEquipPacket >( player ) );
 }
 
-void Util::Player::sendCondition( Entity::Player& player )
+void Util::Packet::sendCondition( Entity::Player& player )
 {
   server().queueForPlayer( player.getCharacterId(), std::make_shared< ConditionPacket >( player ) );
 }
 
-void Util::Player::sendRecastGroups( Entity::Player& player )
+void Util::Packet::sendRecastGroups( Entity::Player& player )
 {
   const auto& recastGroups = player.getRecastGroups();
   const auto& recastGroupsMax = player.getRecastGroupsMax();
@@ -262,7 +280,7 @@ void Util::Player::sendRecastGroups( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), recastGroupPaket );
 }
 
-void Util::Player::sendAchievementList( Entity::Player& player )
+void Util::Packet::sendAchievementList( Entity::Player& player )
 {
   auto achvData = player.getAchievementData();
   auto achvPacket = makeZonePacket< FFXIVIpcAchievement >( player.getId() );
@@ -271,34 +289,36 @@ void Util::Player::sendAchievementList( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), achvPacket );
 }
 
-void Util::Player::sendRestingUpdate( Entity::Player& player )
+void Util::Packet::sendRestingUpdate( Entity::Player& player )
 {
   server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< RestingPacket >( player ) );
 }
 
-void Util::Player::sendLogin( Entity::Player& player )
+void Util::Packet::sendLogin( Entity::Player& player )
 {
   auto initPacket = makeZonePacket< FFXIVIpcLogin >( player.getId() );
   initPacket->data().playerActorId = player.getId();
   server().queueForPlayer( player.getCharacterId(), initPacket );
 }
 
-void Util::Player::sendPlayerSetup( Entity::Player& player )
+void Util::Packet::sendPlayerSetup( Entity::Player& player )
 {
   server().queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
 }
 
-void Util::Player::sendChangeClass( Entity::Player& player )
+void Util::Packet::sendChangeClass( Entity::Player& player )
 {
   auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
+  auto& borrowAction = player.getBorrowAction();
   classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
   classInfo->data().Lv = player.getLevel();
   classInfo->data().Lv1 = player.getLevel();
   classInfo->data().Login = player.isLogin() ? 1 : 0;
+  memcpy( &classInfo->data().BorrowAction[ 0 ], borrowAction.data(), borrowAction.size() * 4 );
   server().queueForPlayer( player.getCharacterId(), classInfo );
 }
 
-void Util::Player::sendContentAttainFlags( Entity::Player& player )
+void Util::Packet::sendContentAttainFlags( Entity::Player& player )
 {
   // todo - fill with actual data from player
   auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
@@ -306,7 +326,7 @@ void Util::Player::sendContentAttainFlags( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), contentFinderList );
 }
 
-void Util::Player::sendInitZone( Entity::Player& player )
+void Util::Packet::sendInitZone( Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
@@ -319,12 +339,22 @@ void Util::Player::sendInitZone( Entity::Player& player )
   server().queueForPlayer( player.getCharacterId(), makeInitZone( player, teri ) );
 }
 
-void Util::Player::sendDailyQuests( Entity::Player& player )
+void Util::Packet::sendDailyQuests( Entity::Player& player )
 {
   server().queueForPlayer( player.getCharacterId(), makeZonePacket< FFXIVIpcDailyQuests >( player.getId() ) );
 }
 
-void Util::Player::sendQuestRepeatFlags( Entity::Player& player )
+void Util::Packet::sendQuestRepeatFlags( Entity::Player& player )
 {
   server().queueForPlayer( player.getCharacterId(), makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() ) );
+}
+
+void Util::Packet::sendServerNotice( Entity::Player& player, const std::string& message )
+{
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
+}
+
+void Util::Packet::sendChat( Entity::Player& player, Common::ChatType chatType, const std::string& message )
+{
+  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, chatType, message ) );
 }

@@ -7,8 +7,6 @@
 #include <Territory/Land.h>
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/AchievementMgr.h>
-#include <Manager/PartyMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/QuestMgr.h>
 
@@ -18,18 +16,8 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 
-#include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
-#include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketWrappers/ActorControlPacket.h>
-#include <Network/PacketWrappers/ActorControlSelfPacket.h>
-#include <Network/PacketWrappers/ActorControlTargetPacket.h>
-#include <Network/PacketWrappers/InitZonePacket.h>
-#include <Network/PacketWrappers/PlayerSetupPacket.h>
-#include <Network/PacketWrappers/ServerNoticePacket.h>
-#include <Network/PacketWrappers/ChatPacket.h>
-#include <Network/PacketWrappers/HudParamPacket.h>
-#include <Network/Util/PlayerUtil.h>
+#include <Network/Util/PacketUtil.h>
 
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
@@ -218,9 +206,7 @@ void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
   scriptMgr.onBNpcKill( player, bnpc );
 
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
-  {
     player.updateHuntingLog( bnpc.getBNpcNameId() );
-  }
 }
 
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
@@ -262,48 +248,48 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
   }
   auto& teri = *pZone;
 
-  Network::Util::Player::sendLogin( player );
+  Network::Util::Packet::sendLogin( player );
 
   player.sendInventory();
 
   if( player.isLogin() )
   {
-    Network::Util::Player::sendActorControlSelf( player, SetConfigFlags, player.getConfigFlags(), 1 );
-    Network::Util::Player::sendActorControlSelf( player, SetMaxGearSets, player.getMaxGearSets() );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetConfigFlags, player.getConfigFlags(), 1 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetMaxGearSets, player.getMaxGearSets() );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  Network::Util::Player::sendHuntingLog( player );
+  Network::Util::Packet::sendHuntingLog( player );
 
   if( player.isLogin() )
-    Network::Util::Player::sendPlayerSetup( player );
+    Network::Util::Packet::sendPlayerSetup( player );
 
-  Network::Util::Player::sendRecastGroups( player );
-  Network::Util::Player::sendBaseParams( player );
-  Network::Util::Player::sendActorControl( player, SetItemLevel, player.getItemLevel() );
+  Network::Util::Packet::sendRecastGroups( player );
+  Network::Util::Packet::sendBaseParams( player );
+  Network::Util::Packet::sendActorControl( player, player.getId(), SetItemLevel, player.getItemLevel() );
   if( player.isLogin() )
   {
-    Network::Util::Player::sendChangeClass( player );
-    Network::Util::Player::sendActorControl( player, 0x112, 0x24 ); // unknown
-    Network::Util::Player::sendContentAttainFlags( player );
+    Network::Util::Packet::sendChangeClass( player );
+    Network::Util::Packet::sendActorControl( player, player.getId(), 0x112, 0x24 ); // unknown
+    Network::Util::Packet::sendContentAttainFlags( player );
     player.clearSoldItems();
   }
 
   housingMgr.sendLandFlags( player );
 
-  Network::Util::Player::sendInitZone( player );
+  Network::Util::Packet::sendInitZone( player );
 
   if( player.isLogin() )
   {
-    Network::Util::Player::sendDailyQuests( player );
-    Network::Util::Player::sendQuestRepeatFlags( player );
+    Network::Util::Packet::sendDailyQuests( player );
+    Network::Util::Packet::sendQuestRepeatFlags( player );
 
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
-    Network::Util::Player::sendGrandCompany( player );
+    Network::Util::Packet::sendGrandCompany( player );
   }
 
   teri.onPlayerZoneIn( player );
@@ -321,35 +307,38 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   if( !player.isAlive() )
     return;
 
-  auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-  if( mainWeap && !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
+  checkAutoAttack( player, tickCount );
+}
+
+void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
+{
+  auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
+  if( !mainWeap || !player.isAutoattackOn() || player.checkAction() || !player.getTargetId() || player.getStance() != Common::Active )
+    return;
+
+  for( const auto& actor : player.getInRangeActors() )
   {
-    // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-    for( const auto& actor : player.getInRangeActors() )
+    if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
+      continue;
+    auto chara = actor->getAsChara();
+
+    // default autoattack range
+    float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    // default autoattack range for ranged classes
+    auto classJob = player.getClass();
+
+    if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+      range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    if( ( Common::Util::distance( player.getPos(), actor->getPos() ) <= range ) &&
+        ( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() ) )
     {
-      if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
-        continue;
-      auto chara = actor->getAsChara();
-
-      // default autoattack range
-      float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      // default autoattack range for ranged classes
-      auto classJob = player.getClass();
-
-      if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
-        range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
-      {
-        if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
-        {
-          player.setLastAttack( tickCount );
-          player.autoAttack( actor->getAsChara() );
-        }
-      }
+      player.setLastAttack( tickCount );
+      player.autoAttack( actor->getAsChara() );
     }
   }
+
 }
 
 
@@ -357,22 +346,21 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 
 void PlayerMgr::sendServerNotice( Entity::Player& player, const std::string& message ) //Purple Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
+  Network::Util::Packet::sendServerNotice( player, message );
 }
 
 void PlayerMgr::sendUrgent( Entity::Player& player, const std::string& message ) //Red Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::ServerUrgent, message ) );
+  Network::Util::Packet::sendChat( player, Common::ChatType::ServerUrgent, message );
 }
 
 void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) //Grey Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::SystemMessage, message ) );
+  Network::Util::Packet::sendChat( player, Common::ChatType::SystemMessage, message );
 }
 
 void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), ActorControlType::LogMsg, messageId,
-                                                                            param2, param3, param4, param5, param6 ) );
+  Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }

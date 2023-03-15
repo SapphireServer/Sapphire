@@ -6,22 +6,28 @@
 #include <algorithm>
 #include <Service.h>
 
+#include "Manager/PlayerMgr.h"
+
 #include "Actor/Chara.h"
+#include "Actor/Player.h"
 #include "Actor/GameObject.h"
 
 #include "Script/ScriptMgr.h"
 
 #include "StatusEffect.h"
 
+using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 //using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                    uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t tickRate ) :
+                                                    uint32_t duration,std::vector< World::Action::StatusModifier >& modifiers,
+                                                    uint32_t flag, uint32_t tickRate ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
-  m_modifiers = std::move( modifiers );
+  m_statusModifiers = std::move( modifiers );
+  m_flag = flag;
 }
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
@@ -33,7 +39,8 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_modifiers( 0 ),
   m_startTime( 0 ),
   m_tickRate( tickRate ),
-  m_lastTick( 0 )
+  m_lastTick( 0 ),
+  m_flag( 0 )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto entry = exdData.getRow< Excel::Status >( id );
@@ -48,6 +55,15 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   Util::eraseAll( m_name, '-' );
   Util::eraseAll( m_name, '(' );
   Util::eraseAll( m_name, ')' );
+
+  m_flag |= entry->data().Category;
+  m_flag |= static_cast< uint32_t >( entry->data().Forever ) << static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+  m_flag |= static_cast< uint32_t >( entry->data().CanOff ) << static_cast< uint32_t >( Common::StatusEffectFlag::CanStatusOff );
+  m_flag |= static_cast< uint32_t >( entry->data().NotAction ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockActions );
+  m_flag |= static_cast< uint32_t >( entry->data().NotControl ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockControl );
+  m_flag |= static_cast< uint32_t >( entry->data().NotMove ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockMovement );
+  m_flag |= static_cast< uint32_t >( entry->data().NotLookAt ) << static_cast< uint32_t >( Common::StatusEffectFlag::IsGaze );
+  m_flag |= static_cast< uint32_t >( entry->data().FcAction ) << static_cast< uint32_t >( Common::StatusEffectFlag::FcBuff );
 }
 
 
@@ -78,6 +94,11 @@ uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
   return m_sourceActor->getId();
 }
 
+Sapphire::Entity::CharaPtr Sapphire::StatusEffect::StatusEffect::getSrcActor() const
+{
+  return m_sourceActor;
+}
+
 uint32_t Sapphire::StatusEffect::StatusEffect::getTargetActorId() const
 {
   return m_targetActor->getId();
@@ -88,16 +109,41 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
   return m_param;
 }
 
+std::unordered_map< Common::ParamModifier, int32_t >& Sapphire::StatusEffect::StatusEffect::getModifiers()
+{
+  return m_modifiers;
+}
+
+void Sapphire::StatusEffect::StatusEffect::setModifier( Common::ParamModifier paramModifier, int32_t value )
+{
+  m_modifiers[ paramModifier ] = value;
+
+  if( auto pPlayer = m_targetActor->getAsPlayer(); pPlayer )
+    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ),
+                                                                   pPlayer->getModifier( paramModifier ) );
+}
+
+void Sapphire::StatusEffect::StatusEffect::delModifier( Common::ParamModifier paramModifier )
+{
+  if( m_modifiers.find( paramModifier ) == m_modifiers.end() )
+    return;
+
+  m_modifiers.erase( paramModifier );
+
+  if( auto pPlayer = m_targetActor->getAsPlayer(); pPlayer )
+    Common::Service< World::Manager::PlayerMgr >::ref().sendDebug( *pPlayer, "Modifier: {}, value: {}", static_cast< int32_t >( paramModifier ),
+                                                                   pPlayer->getModifier( paramModifier ) );
+}
+
 void Sapphire::StatusEffect::StatusEffect::applyStatus()
 {
   m_startTime = Util::getTimeMs();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  for( const auto& mod : m_modifiers )
+  for( const auto& mod : m_statusModifiers )
   {
-    // TODO: ticks
     if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
-      m_targetActor->addModifier( mod.modifier, mod.value );
+      setModifier( mod.modifier, mod.value );
     else if( mod.modifier == Common::ParamModifier::TickDamage )
       registerTickEffect( mod.modifier, mod.value );
     else if( mod.modifier == Common::ParamModifier::TickHeal )
@@ -106,24 +152,6 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
 
   m_targetActor->calculateStats();
 
-  // this is only right when an action is being used by the player
-  // else you probably need to use an actorcontrol
-
-  //GamePacketNew< FFXIVIpcEffect > effectPacket( m_sourceActor->getId() );
-  //effectPacket.data().targetId = m_sourceActor->getId();
-  //effectPacket.data().actionAnimationId = 3;
-  //effectPacket.data().unknown_3 = 1;
-  //effectPacket.data().actionTextId = 3;
-  //effectPacket.data().unknown_5 = 1;
-  //effectPacket.data().unknown_6 = 321;
-  //effectPacket.data().rotation = ( uint16_t ) ( 0x8000 * ( ( m_sourceActor->getPos().getR() + 3.1415926 ) ) / 3.1415926 );
-  //effectPacket.data().effectTargetId = m_sourceActor->getId();
-  //effectPacket.data().effects[4].unknown_1 = 17;
-  //effectPacket.data().effects[4].bonusPercent = 30;
-  //effectPacket.data().effects[4].param1 = m_id;
-  //effectPacket.data().effects[4].unknown_5 = 0x80;
-  //m_sourceActor->sendToInRangeSet( effectPacket, true );
-
   scriptMgr.onStatusReceive( m_targetActor, m_id );
 }
 
@@ -131,11 +159,7 @@ void Sapphire::StatusEffect::StatusEffect::removeStatus()
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  for( const auto& mod : m_modifiers )
-  {
-    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
-      m_targetActor->delModifier( mod.modifier, mod.value );
-  }
+  m_modifiers.clear();
 
   m_targetActor->calculateStats();
 
@@ -167,6 +191,21 @@ uint64_t Sapphire::StatusEffect::StatusEffect::getStartTimeMs() const
   return m_startTime;
 }
 
+uint32_t Sapphire::StatusEffect::StatusEffect::getFlag() const
+{
+  return m_flag;
+}
+
+std::vector< World::Action::StatusModifier > Sapphire::StatusEffect::StatusEffect::getStatusModifiers() const
+{
+  return m_statusModifiers;
+}
+
+void Sapphire::StatusEffect::StatusEffect::setFlag( uint32_t flag )
+{
+  m_flag = flag;
+}
+
 void Sapphire::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )
 {
   m_lastTick = lastTick;
@@ -180,4 +219,14 @@ void Sapphire::StatusEffect::StatusEffect::setParam( uint16_t param )
 const std::string& Sapphire::StatusEffect::StatusEffect::getName() const
 {
   return m_name;
+}
+
+uint8_t Sapphire::StatusEffect::StatusEffect::getSlot() const
+{
+  return m_slot;
+}
+
+void Sapphire::StatusEffect::StatusEffect::setSlot( uint8_t slot )
+{
+  m_slot = slot;
 }

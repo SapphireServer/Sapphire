@@ -204,26 +204,34 @@ void Sapphire::World::Session::sendReplayInfo()
   PlayerMgr::sendDebug( *getPlayer(), message );
 }
 
+void Sapphire::World::Session::processOutQueue()
+{
+  if( !m_pZoneConnection )
+    return;
+
+  m_pZoneConnection->processOutQueue();
+}
+
 void Sapphire::World::Session::update()
 {
   if( m_isReplaying )
     processReplay();
 
-  if( m_pZoneConnection )
+  if( !m_pZoneConnection )
+    return;
+
+  m_pZoneConnection->processInQueue();
+
+  // SESSION LOGIC
+  m_pPlayer->update( Common::Util::getTimeMs() );
+
+  if( Common::Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
   {
-    m_pZoneConnection->processInQueue();
-
-    // SESSION LOGIC
-    m_pPlayer->update( Common::Util::getTimeMs() );
-
-    if( Common::Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
-    {
-      updateLastSqlTime();
-      m_pPlayer->updateSql();
-    }
-
-    m_pZoneConnection->processOutQueue();
+    updateLastSqlTime();
+    m_pPlayer->updateSql();
   }
+
+  m_pZoneConnection->processOutQueue();
 
   if( m_pChatConnection )
   {

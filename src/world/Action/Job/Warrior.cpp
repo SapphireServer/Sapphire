@@ -30,32 +30,36 @@ void Warrior::onAction( Entity::Player& player, Action& action )
 void Warrior::handleWrath( Entity::Player& player, Action& action )
 {
   auto effectToApply = Wrath;
+  auto parry = 2;
   auto asChara = player.getAsChara();
 
   if( player.hasStatusEffect( Wrath ) )
   {
     player.replaceSingleStatusEffectById( Wrath );
     effectToApply = WrathII;
+    parry += 2;
   }
   else if( player.hasStatusEffect( WrathII ) )
   {
     player.replaceSingleStatusEffectById( WrathII );
     effectToApply = WrathIII;
+    parry += 2;
   }
   else if( player.hasStatusEffect( WrathIII ) )
   {
     player.replaceSingleStatusEffectById( WrathIII );
     effectToApply = WrathIV;
+    parry += 2;
   }
   else if( player.hasStatusEffect( WrathIV ) )
   {
     player.replaceSingleStatusEffectById( WrathIV );
     effectToApply = Infuriated;
+    parry += 2;
   }
 
   if( !player.hasStatusEffect( Infuriated ) )
   {
-    action.applyStatusEffectSelf( effectToApply );
-    player.addStatusEffectByIdIfNotExist( effectToApply, 30000, *asChara );
+    action.getActionResultBuilder()->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } }, 0, false );
   }
 }

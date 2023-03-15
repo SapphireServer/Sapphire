@@ -29,7 +29,7 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
-#include "Action/EffectResult.h"
+#include "Action/ActionResult.h"
 
 #include "Network/GameConnection.h"
 
@@ -466,8 +466,6 @@ bool Territory::update( uint64_t tickCount )
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
 
-  processEffectResults( tickCount );
-
   if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
 
@@ -824,7 +822,7 @@ void Territory::updateSpawnPoints()
   }
 }
 
-uint32_t Territory::getNextEffectResultId()
+uint32_t Territory::getNextActionResultId()
 {
   return m_effectCounter++;
 }
@@ -873,30 +871,6 @@ Entity::BNpcPtr Territory::getActiveBNpcByLayoutIdAndTriggerOwner( uint32_t inst
 std::shared_ptr< World::Navi::NaviProvider > Territory::getNaviProvider()
 {
   return m_pNaviProvider;
-}
-
-void Territory::addEffectResult( World::Action::EffectResultPtr result )
-{
-  m_effectResults.emplace_back( std::move( result ) );
-}
-
-void Territory::processEffectResults( uint64_t tickCount )
-{
-  // todo: move this to generic territory/instance delay wrapper cause it might be useful scheduling other things
-  for( auto it = m_effectResults.begin(); it != m_effectResults.end(); )
-  {
-    auto effect = *it;
-
-    if( tickCount < effect->getDelay() )
-    {
-      ++it;
-      continue;
-    }
-
-    effect->execute();
-
-    it = m_effectResults.erase( it );
-  }
 }
 
 bool Territory::loadBNpcs()

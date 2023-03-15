@@ -40,7 +40,7 @@ void ItemManipulationAction::execute()
 {
   assert( m_pSource );
 
-  m_effectBuilder->buildAndSendPackets( m_hitActors );
+  m_actionResultBuilder->sendActionResults( m_hitActors );
 }
 
 void ItemManipulationAction::onFinish()

@@ -4,7 +4,7 @@
 #include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
-#include "EffectBuilder.h"
+#include "ActionResultBuilder.h"
 #include "Exd/Structs.h"
 
 namespace Sapphire::World::Action
@@ -22,6 +22,8 @@ namespace Sapphire::World::Action
     virtual ~Action() = default;
 
     uint32_t getId() const;
+
+    uint32_t getResultId() const;
 
     bool init();
 
@@ -54,6 +56,8 @@ namespace Sapphire::World::Action
     uint64_t getCastTimeRest() const;
 
     void enableGenericHandler();
+    
+    std::shared_ptr< Excel::ExcelStruct< Excel::Action > > getActionData() const;
 
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
@@ -105,11 +109,9 @@ namespace Sapphire::World::Action
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
 
-    EffectBuilderPtr getEffectbuilder();
+    ActionResultBuilderPtr getActionResultBuilder();
 
-    void applyStatusEffectSelf( uint16_t statusId, uint8_t param = 0 );
-
-    void handleAction();
+    void buildActionResults();
 
     void handleStatusEffects();
 
@@ -180,6 +182,7 @@ namespace Sapphire::World::Action
     uint8_t m_actionKind{};
 
     uint16_t m_requestId{};
+    uint32_t m_resultId{};
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};
@@ -193,6 +196,7 @@ namespace Sapphire::World::Action
     uint8_t m_cooldownGroup{};
     int8_t m_range{};
     uint8_t m_effectRange{};
+    uint8_t m_effectWidth{};
     uint8_t m_xAxisModifier{};
     Common::ActionAspect m_aspect;
     Common::CastType m_castType;
@@ -217,7 +221,7 @@ namespace Sapphire::World::Action
 
     Common::FFXIVARR_POSITION3 m_pos{};
 
-    EffectBuilderPtr m_effectBuilder;
+    ActionResultBuilderPtr m_actionResultBuilder;
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;

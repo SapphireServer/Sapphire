@@ -116,6 +116,7 @@ std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifi
   { "PiercingResistancePercent", Common::ParamModifier::PiercingResistancePercent },
   { "BluntResistancePercent", Common::ParamModifier::BluntResistancePercent },
   { "ProjectileResistancePercent", Common::ParamModifier::ProjectileResistancePercent },
+  { "ParryPercent", Common::ParamModifier::ParryPercent }
 };
 
 bool ActionLutData::cacheActions()

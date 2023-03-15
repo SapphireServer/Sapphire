@@ -2,6 +2,7 @@
 #include <ScriptObject.h>
 #include <Actor/Player.h>
 #include <Action/CommonAction.h>
+#include <StatusEffect/StatusEffect.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -15,8 +16,8 @@ public:
 
   void onExpire( Entity::Chara& actor ) override
   {
-    if( actor.hasStatusEffect( Defiance ) )
-      actor.addModifier( Common::ParamModifier::DamageDealtPercent, -25 );
+    if( auto status = actor.getStatusEffectById( Defiance ); status )
+      status->setModifier( Common::ParamModifier::DamageDealtPercent, -25 );
   }
 };
 
