@@ -78,7 +78,7 @@ void ItemAction::interrupt()
 void ItemAction::handleVFXItem()
 {
   Common::CalcResultParam effect{};
-  effect.Type = Common::ActionEffectType::CALC_RESULT_TYPE_CHECK_BARRIER;
+  effect.Type = Common::CalcResultType::TypeCheckBarrier;
   effect.Value = m_itemAction->data().Calcu0Arg[ 0 ];
 
   auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getSourceChara()->getId(), getId() );

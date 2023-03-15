@@ -14,8 +14,8 @@ namespace Sapphire::World::Action
   public:
     explicit ActionResult( Entity::CharaPtr target );
 
-    void damage( uint32_t amount, Common::ActionEffectType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
-    void heal( uint32_t amount, Common::ActionEffectType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
+    void damage( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
+    void heal( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void restoreMP( uint32_t amount, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();

@@ -21,7 +21,7 @@ ActionResult::ActionResult( Entity::CharaPtr target ) :
   m_result.Arg2 = 0;
   m_result.Value = 0;
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::None );
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_NONE;
+  m_result.Type = Common::CalcResultType::TypeNone;
 }
 
 Entity::CharaPtr ActionResult::getTarget() const
@@ -29,7 +29,7 @@ Entity::CharaPtr ActionResult::getTarget() const
   return m_target;
 }
 
-void ActionResult::damage( uint32_t amount, Common::ActionEffectType hitType, uint8_t hitEffect, Common::ActionResultFlag flag )
+void ActionResult::damage( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag )
 {
   m_result.Arg0 = hitEffect;
   m_result.Value = static_cast< int16_t >( amount );
@@ -37,7 +37,7 @@ void ActionResult::damage( uint32_t amount, Common::ActionEffectType hitType, ui
   m_result.Type = hitType;
 }
 
-void ActionResult::heal( uint32_t amount, Common::ActionEffectType hitType, uint8_t hitEffect, Common::ActionResultFlag flag )
+void ActionResult::heal( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag )
 {
   m_result.Arg0 = hitEffect;
   m_result.Value = static_cast< int16_t >( amount );
@@ -49,27 +49,27 @@ void ActionResult::restoreMP( uint32_t amount, Common::ActionResultFlag flag )
 {
   m_result.Value = static_cast< int16_t >( amount );
   m_result.Flag = static_cast< uint8_t >( flag );
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP;
+  m_result.Type = Common::CalcResultType::TypeRecoverMp;
 }
 
 void ActionResult::startCombo( uint16_t actionId )
 {
   m_result.Value = static_cast< int16_t >( actionId );
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::EffectOnSource );
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO;
+  m_result.Type = Common::CalcResultType::TypeCombo;
 }
 
 void ActionResult::comboSucceed()
 {
   // no EffectOnSource flag on this
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_COMBO_HIT;
+  m_result.Type = Common::CalcResultType::TypeComboHit;
 }
 
 void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
+  m_result.Type = Common::CalcResultType::TypeSetStatus;
 
   m_bOverrideStatus = shouldOverride;
   m_pStatus = StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, 3000 );
@@ -80,7 +80,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME;
+  m_result.Type = Common::CalcResultType::TypeSetStatusMe;
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::EffectOnSource );
 
   m_bOverrideStatus = shouldOverride;
@@ -92,7 +92,7 @@ void ActionResult::mount( uint16_t mountId )
 {
   m_result.Value = static_cast< int16_t >( mountId );
   m_result.Arg0 = 1;
-  m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT;
+  m_result.Type = Common::CalcResultType::TypeMount;
 }
 
 const Common::CalcResultParam& ActionResult::getCalcResultParam() const
@@ -112,28 +112,28 @@ void ActionResult::execute()
 
   switch( m_result.Type )
   {
-    case Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP:
-    case Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_DAMAGE_HP:
+    case Common::CalcResultType::TypeDamageHp:
+    case Common::CalcResultType::TypeCriticalDamageHp:
     {
       m_target->takeDamage( m_result.Value );
       break;
     }
 
-    case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP:
-    case Common::ActionEffectType::CALC_RESULT_TYPE_CRITICAL_RECOVER_HP:
+    case Common::CalcResultType::TypeRecoverHp:
+    case Common::CalcResultType::TypeCriticalRecoverHp:
     {
       m_target->heal( m_result.Value );
       break;
     }
 
-    case Common::ActionEffectType::CALC_RESULT_TYPE_RECOVER_MP:
+    case Common::CalcResultType::TypeRecoverMp:
     {
       m_target->restoreMP( m_result.Value );
       break;
     }
 
-    case Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS:
-    case Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME:
+    case Common::CalcResultType::TypeSetStatus:
+    case Common::CalcResultType::TypeSetStatusMe:
     {
       if( !m_bOverrideStatus )
         m_target->addStatusEffectByIdIfNotExist( m_pStatus );
@@ -142,7 +142,7 @@ void ActionResult::execute()
       break;
     }
 
-    case Common::ActionEffectType::CALC_RESULT_TYPE_MOUNT:
+    case Common::CalcResultType::TypeMount:
     {
       auto pPlayer = m_target->getAsPlayer();
       pPlayer->setMount( m_result.Value );

@@ -47,7 +47,7 @@ void ActionResultBuilder::addResultToActor( Entity::CharaPtr& chara, ActionResul
   it->second.push_back( std::move( result ) );
 }
 
-void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::ActionEffectType hitType, Common::ActionResultFlag flag )
+void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
   ActionResultPtr nextResult = make_ActionResult( healingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -63,7 +63,7 @@ void ActionResultBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr&
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::ActionEffectType hitType, Common::ActionResultFlag flag )
+void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
   ActionResultPtr nextResult = make_ActionResult( damagingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -174,7 +174,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
       {
         auto effect = result->getCalcResultParam();
         if( result->getTarget() == m_sourceChara &&
-            result->getCalcResultParam().Type != Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS_ME )
+            result->getCalcResultParam().Type != Common::CalcResultType::TypeSetStatusMe )
           actionResult->addSourceEffect( effect );
         else
           actionResult->addTargetEffect( effect );
