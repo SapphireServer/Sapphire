@@ -18,20 +18,19 @@ namespace Sapphire::World::AI
   class GambitTargetCondition
   {
   public:
-    GambitTargetCondition( GambitTargetType targetType ) : m_targetType( targetType ) {};
+    GambitTargetCondition() = default;
     virtual ~GambitTargetCondition() = default;
 
     virtual bool isConditionMet( Sapphire::Entity::BNpc& src ) { return false; };
     Sapphire::Entity::CharaPtr getTarget() const { return m_pTarget; };
   protected:
-    GambitTargetType m_targetType;
     Sapphire::Entity::CharaPtr m_pTarget;
   };
 
   class TopHateTargetCondition : public GambitTargetCondition
   {
   public:
-    TopHateTargetCondition() : GambitTargetCondition( PlayerAndAlly ) {};
+    TopHateTargetCondition() = default;
 
     bool isConditionMet( Sapphire::Entity::BNpc& src ) override
     {
@@ -45,12 +44,12 @@ namespace Sapphire::World::AI
     };
   };
 
-  class HPSelfPctLessThan : public GambitTargetCondition
+  class HPSelfPctLessThanTargetCondition : public GambitTargetCondition
   {
   public:
-    HPSelfPctLessThan( uint8_t pct ) : GambitTargetCondition( Self ), m_HpPct( pct ) {};
+    HPSelfPctLessThanTargetCondition( uint8_t pct ) : m_HpPct( pct ) {};
 
-    virtual bool isConditionMet( Sapphire::Entity::BNpc& src )
+    bool isConditionMet( Sapphire::Entity::BNpc& src ) override
     {
       if( src.getHpPercent() < m_HpPct )
       {

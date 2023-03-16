@@ -1056,7 +1056,7 @@ void BNpc::init()
 
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
-  auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThan( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
+  auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
 
   m_gambits.push_back( testGambitRule );
   m_gambits.push_back( testGambitRule1 );
