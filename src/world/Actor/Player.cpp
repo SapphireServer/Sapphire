@@ -1871,6 +1871,10 @@ void Sapphire::Entity::Player::sendZonePackets()
 
   sendInventory();
 
+  setTargetId( INVALID_GAME_OBJECT_ID64 );
+  setStance( Common::Stance::Passive );
+  setAutoattack( false );
+
   if( isLogin() )
   {
     queuePacket( makeActorControlSelf( getId(), SetCharaGearParamUI, m_equipDisplayFlags, 1 ) );

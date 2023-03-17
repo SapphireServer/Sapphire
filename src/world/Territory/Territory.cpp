@@ -539,6 +539,7 @@ bool Sapphire::Territory::isCellActive( uint32_t x, uint32_t y )
   uint32_t posY;
 
   Cell* pCell;
+  uint32_t time = Common::Util::getTimeSeconds();
 
   for( posX = startX; posX <= endX; posX++ )
   {
@@ -546,7 +547,7 @@ bool Sapphire::Territory::isCellActive( uint32_t x, uint32_t y )
     {
       pCell = getCellPtr( posX, posY );
 
-      if( pCell && ( pCell->hasPlayers() || pCell->isForcedActive() ) )
+      if( pCell && ( pCell->hasPlayers() || pCell->isForcedActive() || ( time - pCell->getLastActiveTime() ) < 20 ) )
         return true;
     }
   }
@@ -577,13 +578,13 @@ void Sapphire::Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t ra
         {
           pCell = create( posX, posY );
           pCell->init( posX, posY );
-
           pCell->setActivity( true );
-
+          pCell->setLastActiveTime( Common::Util::getTimeSeconds() );
         }
       }
       else
       {
+        pCell->setLastActiveTime( Common::Util::getTimeSeconds() );
         //Cell is now active
         if( isCellActive( posX, posY ) && !pCell->isActive() )
         {

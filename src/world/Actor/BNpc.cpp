@@ -511,7 +511,7 @@ void Sapphire::Entity::BNpc::doDefaultBNpcUpdate( uint64_t tickCount )
 
       auto pHatedActor = hateListGetHighest();
 
-      while( pHatedActor && !pHatedActor->isAlive() )
+      while( pHatedActor && ( !pHatedActor->isAlive() || getCurrentTerritory()->getGuId() != pHatedActor->getCurrentTerritory()->getGuId() ) )
       {
         hateListRemove( pHatedActor );
         pHatedActor = hateListGetHighest();
