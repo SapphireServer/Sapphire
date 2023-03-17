@@ -54,6 +54,11 @@ namespace World::AI
   TYPE_FORWARD( HPSelfPctLessThanTargetCondition );
 
   TYPE_FORWARD( GambitRule );
+
+  TYPE_FORWARD( FsmCondition );
+  TYPE_FORWARD( FsmState );
+  TYPE_FORWARD( FsmTransition );
+  TYPE_FORWARD( Fsm );
 }
 
 namespace Inventory

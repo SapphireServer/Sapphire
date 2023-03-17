@@ -649,6 +649,8 @@ void BNpc::update( uint64_t tickCount )
   if( !pNaviProvider )
     return;
 
+  Chara::update( tickCount );
+
   if( !checkAction() )
     processGambits( tickCount );
 
@@ -740,63 +742,61 @@ void BNpc::update( uint64_t tickCount )
 
       auto distanceOrig = Common::Util::distance( getPos(), m_spawnPos );
 
-      if( pHatedActor && !pHatedActor->isAlive() )
+      if( !pHatedActor->isAlive() || getTerritoryId() != pHatedActor->getTerritoryId() )
       {
         hateListRemove( pHatedActor );
         pHatedActor = hateListGetHighest();
       }
 
-      if( pHatedActor )
-      {
-        auto distance = Common::Util::distance( getPos(), pHatedActor->getPos() );
-
-        if( !hasFlag( NoDeaggro ) && ( ( distanceOrig > maxDistanceToOrigin ) || distance > 30.0f ) )
-        {
-          hateListClear();
-          changeTarget( INVALID_GAME_OBJECT_ID64 );
-          setStance( Stance::Passive );
-          setOwner( nullptr );
-          m_state = BNpcState::Retreat;
-          break;
-        }
-
-        if( distance > ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
-        {
-          if( hasFlag( Immobile ) )
-            break;
-
-          if( pNaviProvider )
-            pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
-
-          moveTo( *pHatedActor );
-        }
-
-        if( pNaviProvider->syncPosToChara( *this ) )
-          sendPositionUpdate();
-
-        if( distance < ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
-        {
-          if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
-            sendPositionUpdate();
-
-          // in combat range. ATTACK!
-          autoAttack( pHatedActor );
-        }
-      }
-      else
+      if( !pHatedActor )
       {
         changeTarget( INVALID_GAME_OBJECT_ID64 );
         setStance( Stance::Passive );
         //setOwner( nullptr );
         m_state = BNpcState::Retreat;
         pNaviProvider->updateAgentParameters( *this );
+        break;
       }
+
+      auto distance = Common::Util::distance( getPos(), pHatedActor->getPos() );
+
+      if( !hasFlag( NoDeaggro ) && ( ( distanceOrig > maxDistanceToOrigin ) || distance > 30.0f ) )
+      {
+        hateListClear();
+        changeTarget( INVALID_GAME_OBJECT_ID64 );
+        setStance( Stance::Passive );
+        setOwner( nullptr );
+        m_state = BNpcState::Retreat;
+        break;
+      }
+
+      if( distance > ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
+      {
+        if( hasFlag( Immobile ) )
+          break;
+
+        if( pNaviProvider )
+          pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
+
+        moveTo( *pHatedActor );
+      }
+
+      if( pNaviProvider->syncPosToChara( *this ) )
+        sendPositionUpdate();
+
+      if( distance < ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
+      {
+        if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
+          sendPositionUpdate();
+
+        // in combat range. ATTACK!
+        autoAttack( pHatedActor );
+      }
+
     }
     break;
   }
 
-
-  Chara::update( tickCount );
 }
 
 void BNpc::restHp()
