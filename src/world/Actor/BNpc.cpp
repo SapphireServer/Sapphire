@@ -47,6 +47,13 @@
 #include <Action/Action.h>
 #include <AI/GambitRule.h>
 #include <AI/GambitTargetCondition.h>
+#include <AI/Fsm/StateMachine.h>
+#include <AI/Fsm/Condition.h>
+#include <AI/Fsm/StateIdle.h>
+#include <AI/Fsm/StateRoam.h>
+#include <AI/Fsm/StateCombat.h>
+#include <AI/Fsm/StateRetreat.h>
+#include <AI/Fsm/StateDead.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World;
@@ -88,8 +95,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_flags = 0;
   m_rank = pInfo->BNPCRankId;
 
-  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
-    setFlag( Immobile );
+
 
   // Striking Dummy
   if( pInfo->NameId == 541 )
@@ -106,6 +112,9 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
   m_modelChara = bNpcBaseData->data().Model;
   m_enemyType = bNpcBaseData->data().Battalion;
+
+  if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 || m_enemyType == 0 )
+    setFlag( Immobile );
 
   m_class = ClassJob::Gladiator;
 
@@ -324,7 +333,7 @@ uint32_t BNpc::getBNpcNameId() const
 
 void BNpc::spawn( PlayerPtr pTarget )
 {
-  m_lastRoamTargetReached = Common::Util::getTimeSeconds();
+  m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( pTarget->getCharacterId(), std::make_shared< NpcSpawnPacket >( *this, *pTarget ) );
@@ -638,165 +647,8 @@ void BNpc::onTick()
 
 void BNpc::update( uint64_t tickCount )
 {
-  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
-  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
-
-  const uint8_t maxDistanceToOrigin = 40;
-  const uint32_t roamTick = 20;
-
-  auto pNaviProvider = pZone->getNaviProvider();
-
-  if( !pNaviProvider )
-    return;
-
   Chara::update( tickCount );
-
-  if( !checkAction() )
-    processGambits( tickCount );
-
-  switch( m_state )
-  {
-    case BNpcState::Dead:
-    case BNpcState::JustDied:
-      return;
-
-    case BNpcState::Retreat:
-    {
-      setInvincibilityType( InvincibilityType::InvincibilityIgnoreDamage );
-
-      if( pNaviProvider )
-        pNaviProvider->setMoveTarget( *this, m_spawnPos );
-
-      if( moveTo( m_spawnPos ) )
-      {
-        setInvincibilityType( InvincibilityType::InvincibilityNone );
-
-        // retail doesn't seem to roam straight after retreating
-        // todo: perhaps requires more investigation?
-        m_lastRoamTargetReached = Common::Util::getTimeSeconds();
-
-        // resetHp
-        setHp( getMaxHp() );
-
-        m_state = BNpcState::Idle;
-        setOwner( nullptr );
-      }
-    }
-    break;
-
-    case BNpcState::Roaming:
-    {
-
-      if( pNaviProvider )
-        pNaviProvider->setMoveTarget( *this, m_roamPos );
-
-      if( moveTo( m_roamPos ) )
-      {
-        m_lastRoamTargetReached = Common::Util::getTimeSeconds();
-        m_state = BNpcState::Idle;
-      }
-
-      checkAggro();
-    }
-    break;
-
-    case BNpcState::Idle:
-    {
-      auto pHatedActor = hateListGetHighest();
-      if( pHatedActor )
-        aggro( pHatedActor );
-
-      if( pNaviProvider->syncPosToChara( *this ) )
-        sendPositionUpdate();
-
-      if( !hasFlag( Immobile ) && ( Common::Util::getTimeSeconds() - m_lastRoamTargetReached > roamTick ) )
-      {
-
-        if( !pNaviProvider )
-        {
-          m_lastRoamTargetReached = Common::Util::getTimeSeconds();
-          break;
-        }
-        if( m_pInfo->WanderingRange != 0 && getEnemyType() != 0 )
-        {
-          m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, m_pInfo->WanderingRange );
-        }
-        else
-        {
-          m_roamPos = m_spawnPos;
-        }
-        m_state = BNpcState::Roaming;
-      }
-
-      checkAggro();
-      break;
-    }
-
-    case BNpcState::Combat:
-    {
-      auto pHatedActor = hateListGetHighest();
-      if( !pHatedActor )
-        return;
-
-      pNaviProvider->updateAgentParameters( *this );
-
-      auto distanceOrig = Common::Util::distance( getPos(), m_spawnPos );
-
-      if( !pHatedActor->isAlive() || getTerritoryId() != pHatedActor->getTerritoryId() )
-      {
-        hateListRemove( pHatedActor );
-        pHatedActor = hateListGetHighest();
-      }
-
-      if( !pHatedActor )
-      {
-        changeTarget( INVALID_GAME_OBJECT_ID64 );
-        setStance( Stance::Passive );
-        //setOwner( nullptr );
-        m_state = BNpcState::Retreat;
-        pNaviProvider->updateAgentParameters( *this );
-        break;
-      }
-
-      auto distance = Common::Util::distance( getPos(), pHatedActor->getPos() );
-
-      if( !hasFlag( NoDeaggro ) && ( ( distanceOrig > maxDistanceToOrigin ) || distance > 30.0f ) )
-      {
-        hateListClear();
-        changeTarget( INVALID_GAME_OBJECT_ID64 );
-        setStance( Stance::Passive );
-        setOwner( nullptr );
-        m_state = BNpcState::Retreat;
-        break;
-      }
-
-      if( distance > ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
-      {
-        if( hasFlag( Immobile ) )
-          break;
-
-        if( pNaviProvider )
-          pNaviProvider->setMoveTarget( *this, pHatedActor->getPos() );
-
-        moveTo( *pHatedActor );
-      }
-
-      if( pNaviProvider->syncPosToChara( *this ) )
-        sendPositionUpdate();
-
-      if( distance < ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
-      {
-        if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
-          sendPositionUpdate();
-
-        // in combat range. ATTACK!
-        autoAttack( pHatedActor );
-      }
-
-    }
-    break;
-  }
-
+  m_fsm->update( *this, tickCount );
 }
 
 void BNpc::restHp()
@@ -1054,12 +906,41 @@ void BNpc::init()
   m_maxHp = Math::CalcStats::calculateMaxHp( *getAsChara() );
   m_hp = m_maxHp;
 
+  m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
+
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
 
   m_gambits.push_back( testGambitRule );
   m_gambits.push_back( testGambitRule1 );
+
+  using namespace AI::Fsm;
+  m_fsm = make_StateMachine();
+  auto stateIdle = make_StateIdle();
+  auto stateCombat = make_StateCombat();
+  auto stateDead = make_StateDead();
+  if( !hasFlag( Immobile ) )
+  {
+    auto stateRoam = make_StateRoam();
+    stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
+    stateRoam->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+    stateRoam->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+    stateRoam->addTransition( stateDead, make_IsDeadCondition() );
+    m_fsm->addState( stateRoam );
+  }
+  stateIdle->addTransition( stateCombat, make_HateListHasEntriesCondition() );
+  stateCombat->addTransition( stateIdle, make_HateListEmptyCondition() );
+  stateIdle->addTransition( stateDead, make_IsDeadCondition() );
+  stateCombat->addTransition( stateDead, make_IsDeadCondition() );
+  m_fsm->addState( stateIdle );
+  if( !hasFlag( NoDeaggro ) )
+  {
+    auto stateRetreat = make_StateRetreat();
+    stateCombat->addTransition( stateRetreat, make_SpawnPointDistanceGtMaxDistanceCondition() );
+    stateRetreat->addTransition( stateIdle, make_RoamTargetReachedCondition() );
+  }
+  m_fsm->setCurrentState( stateIdle );
 }
 
 void BNpc::processGambits( uint64_t tickCount )
@@ -1081,4 +962,44 @@ void BNpc::processGambits( uint64_t tickCount )
     }
 
   }
+}
+
+uint32_t BNpc::getLastRoamTargetReachedTime() const
+{
+  return m_lastRoamTargetReachedTime;
+}
+
+void BNpc::setLastRoamTargetReachedTime( uint32_t time )
+{
+  m_lastRoamTargetReachedTime = time;
+}
+
+std::shared_ptr< Common::BNPCInstanceObject > BNpc::getInstanceObjectInfo() const
+{
+  return m_pInfo;
+}
+
+void BNpc::setRoamTargetReached( bool reached )
+{
+  m_roamTargetReached = reached;
+}
+
+bool BNpc::isRoamTargetReached() const
+{
+  return m_roamTargetReached;
+}
+
+void BNpc::setRoamTargetPos( const FFXIVARR_POSITION3& targetPos )
+{
+  m_roamPos = targetPos;
+}
+
+const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
+{
+  return m_roamPos;
+}
+
+const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
+{
+  return m_spawnPos;
 }

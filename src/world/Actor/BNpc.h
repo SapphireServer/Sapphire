@@ -151,6 +151,19 @@ namespace Sapphire::Entity
 
     void processGambits( uint64_t tickCount );
 
+    uint32_t getLastRoamTargetReachedTime() const;
+    void setLastRoamTargetReachedTime( uint32_t time );
+
+    std::shared_ptr< Common::BNPCInstanceObject > getInstanceObjectInfo() const;
+
+    void setRoamTargetReached( bool reached );
+    bool isRoamTargetReached() const;
+
+    void setRoamTargetPos( const Common::FFXIVARR_POSITION3& targetPos );
+
+    const Common::FFXIVARR_POSITION3& getRoamTargetPos() const;
+    const Common::FFXIVARR_POSITION3& getSpawnPos() const;
+
   private:
     uint32_t m_bNpcBaseId;
     uint32_t m_bNpcNameId;
@@ -178,7 +191,8 @@ namespace Sapphire::Entity
     std::shared_ptr< Common::BNPCInstanceObject > m_pInfo;
 
     uint32_t m_timeOfDeath;
-    uint32_t m_lastRoamTargetReached;
+    uint32_t m_lastRoamTargetReachedTime;
+    bool m_roamTargetReached{ false };
 
     Common::FFXIVARR_POSITION3 m_spawnPos;
     Common::FFXIVARR_POSITION3 m_roamPos;
@@ -193,6 +207,8 @@ namespace Sapphire::Entity
 
     CharaPtr m_pOwner;
     std::vector< World::AI::GambitRulePtr > m_gambits;
+
+    std::shared_ptr< World::AI::Fsm::StateMachine > m_fsm;
 
   };
 
