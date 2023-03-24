@@ -54,6 +54,9 @@ namespace World::AI
   TYPE_FORWARD( HPSelfPctLessThanTargetCondition );
 
   TYPE_FORWARD( GambitRule );
+  TYPE_FORWARD( GambitPack );
+  TYPE_FORWARD( GambitTimeLinePack );
+  TYPE_FORWARD( GambitRuleSetPack );
 }
 
 namespace World::AI::Fsm
