@@ -78,12 +78,11 @@ void ItemAction::interrupt()
 void ItemAction::handleVFXItem()
 {
   Common::CalcResultParam effect{};
-  effect.Type = Common::ActionEffectType::CALC_RESULT_TYPE_CHECK_BARRIER;
+  effect.Type = Common::CalcResultType::TypeCheckBarrier;
   effect.Value = m_itemAction->data().Calcu0Arg[ 0 ];
 
-  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getId() );
-  effectPacket->setTargetActor( getSourceChara()->getId() );
-  effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
+  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getSourceChara()->getId(), getId() );
+  effectPacket->setActionId( Common::ItemActionType::ItemActionVFX );
   effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
   effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
   server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), effectPacket );

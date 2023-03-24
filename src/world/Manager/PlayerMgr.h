@@ -23,16 +23,6 @@ namespace Sapphire::World::Manager
     bool loadPlayers();
     Entity::PlayerPtr syncPlayer( uint64_t characterId );
 
-    void onUnlockAchievement( Sapphire::Entity::Player& player, uint32_t achievementId );
-
-    void onRestingTick( Sapphire::Entity::Player& player );
-
-    void onLevelUp( Sapphire::Entity::Player& player );
-
-    void onGainExp( Sapphire::Entity::Player& player, uint32_t exp );
-
-    void onUnlockOrchestrion( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId );
-
     void onMobKill( Sapphire::Entity::Player& player, Sapphire::Entity::BNpc& bnpc );
 
     void sendLoginMessage( Sapphire::Entity::Player& player );
@@ -43,8 +33,6 @@ namespace Sapphire::World::Manager
     void onMoveZone( Sapphire::Entity::Player& player );
 
     void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
-    void onAchievementListChanged( Sapphire::Entity::Player& player );
-    void onAchievementProgressChanged( Sapphire::Entity::Player& player, uint32_t achievementId );
 
   //////////// Helpers
 
@@ -77,6 +65,8 @@ namespace Sapphire::World::Manager
     std::map< uint32_t, Entity::PlayerPtr > m_playerMapById;
     std::map< uint64_t, Entity::PlayerPtr > m_playerMapByCharacterId;
     std::map< std::string, Entity::PlayerPtr > m_playerMapByName;
+
+    void checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const;
   };
 
 

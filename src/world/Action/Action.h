@@ -4,7 +4,7 @@
 #include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
-#include "EffectBuilder.h"
+#include "ActionResultBuilder.h"
 #include "Exd/Structs.h"
 
 namespace Sapphire::World::Action
@@ -22,6 +22,8 @@ namespace Sapphire::World::Action
     virtual ~Action() = default;
 
     uint32_t getId() const;
+
+    uint32_t getResultId() const;
 
     bool init();
 
@@ -52,6 +54,8 @@ namespace Sapphire::World::Action
     void setAggroMultiplier( float aggroMultiplier );
 
     uint64_t getCastTimeRest() const;
+
+    std::shared_ptr< Excel::ExcelStruct< Excel::Action > > getActionData() const;
 
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
@@ -103,9 +107,9 @@ namespace Sapphire::World::Action
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
 
-    EffectBuilderPtr getEffectbuilder();
+    ActionResultBuilderPtr getActionResultBuilder();
 
-    void buildEffects();
+    void buildActionResults();
 
     /*!
      * @brief Adds an actor filter to this action.
@@ -118,9 +122,9 @@ namespace Sapphire::World::Action
      */
     void addDefaultActorFilters();
 
-    std::pair< uint32_t, Common::ActionHitSeverityType > calcDamage( uint32_t potency );
+    std::pair< uint32_t, Common::CalcResultType > calcDamage( uint32_t potency );
 
-    std::pair< uint32_t, Common::ActionHitSeverityType > calcHealing( uint32_t potency );
+    std::pair< uint32_t, Common::CalcResultType > calcHealing( uint32_t potency );
 
 
     std::vector< Entity::CharaPtr >& getHitCharas();
@@ -172,6 +176,7 @@ namespace Sapphire::World::Action
     uint8_t m_actionKind{};
 
     uint16_t m_requestId{};
+    uint32_t m_resultId{};
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};
@@ -208,7 +213,7 @@ namespace Sapphire::World::Action
 
     Common::FFXIVARR_POSITION3 m_pos{};
 
-    EffectBuilderPtr m_effectBuilder;
+    ActionResultBuilderPtr m_actionResultBuilder;
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;

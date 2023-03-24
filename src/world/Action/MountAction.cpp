@@ -69,6 +69,6 @@ void MountAction::execute()
   assert( m_pSource );
 
   m_pSource->getAsPlayer()->removeCondition( Common::PlayerCondition::Casting );
-  m_effectBuilder->mount( m_pSource, m_mountId );
-  m_effectBuilder->buildAndSendPackets( { m_pSource } );
+  m_actionResultBuilder->mount( m_pSource, m_mountId );
+  m_actionResultBuilder->sendActionResults( { m_pSource } );
 }

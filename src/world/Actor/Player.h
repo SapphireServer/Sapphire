@@ -83,12 +83,6 @@ namespace Sapphire::Entity
     /*! Event called on every session iteration */
     void update( uint64_t tickCount ) override;
 
-    /*! get last attack tick for player */
-    uint64_t getLastAttack() const;
-
-    /*! set last attack tick for player */
-    void setLastAttack( uint64_t tickCount );
-
     // Quest
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! load data for currently active quests */
@@ -489,8 +483,8 @@ namespace Sapphire::Entity
     void setRecastGroup( uint8_t index, float time );
 
     float getRecastGroup( uint8_t index ) const;
-    const std::array< float, 80 >& Player::getRecastGroups() const;
-    const std::array< float, 80 >& Player::getRecastGroupsMax() const;
+    const std::array< float, 80 >& getRecastGroups() const;
+    const std::array< float, 80 >& getRecastGroupsMax() const;
 
     void resetRecastGroups();
 

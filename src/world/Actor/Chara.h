@@ -132,10 +132,10 @@ namespace Sapphire::Entity
     const uint32_t* getModelArray() const;
 
     // add a status effect by id
-    void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectById( StatusEffect::StatusEffectPtr pStatus );
 
     // add a status effect by id if it doesn't exist
-    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectByIdIfNotExist( StatusEffect::StatusEffectPtr pStatus );
 
     // remove a status effect by id
     void removeSingleStatusEffectFromId( uint32_t id );
@@ -203,6 +203,10 @@ namespace Sapphire::Entity
 
     void die();
 
+    uint64_t getLastAttack() const;
+
+    void setLastAttack( uint64_t tickCount );
+
     Common::ActorStatus getStatus() const;
 
     void setStatus( Common::ActorStatus status );
@@ -222,8 +226,6 @@ namespace Sapphire::Entity
     virtual void changeTarget( uint64_t targetId );
 
     virtual uint8_t getLevel() const;
-
-    virtual void sendHudParam();
 
     virtual void takeDamage( uint32_t damage );
 

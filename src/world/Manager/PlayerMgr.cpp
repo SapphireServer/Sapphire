@@ -7,8 +7,6 @@
 #include <Territory/Land.h>
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/AchievementMgr.h>
-#include <Manager/PartyMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/QuestMgr.h>
 
@@ -18,20 +16,8 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 
-#include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
-#include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketWrappers/ActorControlPacket.h>
-#include <Network/PacketWrappers/ActorControlSelfPacket.h>
-#include <Network/PacketWrappers/ActorControlTargetPacket.h>
-#include <Network/PacketWrappers/InitZonePacket.h>
-#include <Network/PacketWrappers/PlayerSetupPacket.h>
-#include <Network/PacketWrappers/ConditionPacket.h>
-#include <Network/PacketWrappers/RestingPacket.h>
-#include <Network/PacketWrappers/ServerNoticePacket.h>
-#include <Network/PacketWrappers/ChatPacket.h>
-#include <Network/PacketWrappers/HudParamPacket.h>
-#include <Network/Util/PlayerUtil.h>
+#include <Network/Util/PacketUtil.h>
 
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
@@ -212,85 +198,13 @@ Sapphire::Entity::PlayerPtr PlayerMgr::syncPlayer( uint64_t characterId )
   return pPlayer;
 }
 
-void PlayerMgr::onAchievementListChanged( Entity::Player& player )
-{
-  auto achvData = player.getAchievementData();
-
-  auto achvPacket = makeZonePacket< FFXIVIpcAchievement >( player.getId() );
-  std::memcpy( &achvPacket->data().complete[ 0 ], &achvData.unlockList[ 0 ], sizeof( achvPacket->data().complete ) );
-  std::memcpy( &achvPacket->data().history[ 0 ], &achvData.history[ 0 ], sizeof( achvPacket->data().history ) );
-
-  server().queueForPlayer( player.getCharacterId(), achvPacket );
-}
-
-void PlayerMgr::onAchievementProgressChanged( Entity::Player& player, uint32_t achievementId )
-{
-
-  auto& achvMgr = Common::Service< Manager::AchievementMgr >::ref();
-
-  auto achvProgress = achvMgr.getAchievementDataById( player, achievementId );
-
-  auto pAchvProgressPacket = makeActorControl( player.getId(), AchievementSetRate, achievementId, achvProgress.first, achvProgress.second );
-  server().queueForPlayer( player.getCharacterId(), pAchvProgressPacket );
-}
-
-void PlayerMgr::onUnlockAchievement( Entity::Player& player, uint32_t achievementId )
-{
-  onAchievementListChanged( player );
-
-  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementComplete, achievementId ) );
-  server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), AchievementObtainMsg, achievementId ) );
-}
-
-void PlayerMgr::onRestingTick( Entity::Player& player )
-{
-  server().queueForPlayers( player.getInRangePlayerIds( true ), std::make_shared< RestingPacket >( player ) );
-}
-
-void PlayerMgr::onLevelUp( Entity::Player& player )
-{
-  player.calculateStats();
-  Network::Util::Player::sendBaseParams( player );
-  Network::Util::Player::sendHudParam( player );
-
-  auto inRangePlayerIds = player.getInRangePlayerIds( true );
-
-  Network::Util::Player::sendActorControl( inRangePlayerIds, player, LevelUpEffect, static_cast< uint8_t >( player.getClass() ),
-                                           player.getLevel(), player.getLevel() - 1 );
-
-  Network::Util::Player::sendStatusUpdate( player );
-
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
-}
-
-void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
-{
-
-  if( exp != 0 )
-    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), GainExpMsg,
-                                                                            static_cast< uint8_t >( player.getClass() ), exp ) );
-
-  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), UpdateUiExp,
-                                                                          static_cast< uint8_t >( player.getClass() ), player.getExp() ) );
-}
-
-void PlayerMgr::onUnlockOrchestrion( Entity::Player& player, uint8_t songId, uint32_t itemId )
-{
-  player.learnSong( songId, itemId );
-
-  server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId ) );
-}
-
 void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcKill( player, bnpc );
 
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
-  {
     player.updateHuntingLog( bnpc.getBNpcNameId() );
-  }
 }
 
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
@@ -323,7 +237,6 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto& housingMgr = Common::Service< HousingMgr >::ref();
-  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
 
   auto pZone = teriMgr.getTerritoryByGuId( player.getTerritoryId() );
   if( !pZone )
@@ -333,82 +246,51 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
   }
   auto& teri = *pZone;
 
-  auto initPacket = makeZonePacket< FFXIVIpcLogin >( player.getId() );
-  initPacket->data().playerActorId = player.getId();
-
-  server().queueForPlayer( player.getCharacterId(), initPacket );
+  Network::Util::Packet::sendLogin( player );
 
   player.sendInventory();
 
   if( player.isLogin() )
   {
-    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetConfigFlags, player.getConfigFlags(), 1 ) );
-    server().queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), SetMaxGearSets, player.getMaxGearSets() ) );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetConfigFlags, player.getConfigFlags(), 1 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetMaxGearSets, player.getMaxGearSets() );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  Network::Util::Player::sendHuntingLog( player );
+  Network::Util::Packet::sendHuntingLog( player );
 
   if( player.isLogin() )
-    server().queueForPlayer( player.getCharacterId(), makePlayerSetup( player ) );
+    Network::Util::Packet::sendPlayerSetup( player );
 
-  Network::Util::Player::sendRecastGroups( player );
-  Network::Util::Player::sendBaseParams( player );
-  Network::Util::Player::sendActorControl( player, SetItemLevel, player.getItemLevel() );
+  Network::Util::Packet::sendRecastGroups( player );
+  Network::Util::Packet::sendBaseParams( player );
+  Network::Util::Packet::sendActorControl( player, player.getId(), SetItemLevel, player.getItemLevel() );
   if( player.isLogin() )
   {
-    auto classInfo = makeZonePacket< FFXIVIpcChangeClass >( player.getId() );
-    classInfo->data().ClassJob = static_cast< uint8_t >( player.getClass() );
-    classInfo->data().Lv = player.getLevel();
-    classInfo->data().Lv1 = player.getLevel();
-    if( player.isLogin() )
-      classInfo->data().Login = 1;
-    server().queueForPlayer( player.getCharacterId(), classInfo );
-
-    server().queueForPlayer( player.getCharacterId(), makeActorControl( player.getId(), 0x112, 0x24 ) ); // unknown
-
-    auto contentFinderList = makeZonePacket< FFXIVIpcContentAttainFlags >( player.getId() );
-    std::memset( &contentFinderList->data(), 0xFF, sizeof( contentFinderList->data() ) );
-    server().queueForPlayer( player.getCharacterId(), contentFinderList );
-
+    Network::Util::Packet::sendChangeClass( player );
+    Network::Util::Packet::sendActorControl( player, player.getId(), 0x112, 0x24 ); // unknown
+    Network::Util::Packet::sendContentAttainFlags( player );
     player.clearSoldItems();
-  }
-
-  if( Sapphire::LandPtr pLand = housingMgr.getLandByOwnerId( player.getCharacterId() ) )
-  {
-    uint32_t state = 0;
-    if( pLand->getHouse() )
-    {
-      state |= Common::LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_HOUSE;
-
-      // todo: remove this, debug for now
-      state |= Common::LandFlags::CHARA_HOUSING_LAND_DATA_FLAG_AETHERYTE;
-    }
-
-    player.setLandFlags( Common::LandFlagsSlot::Private, state, pLand->getLandIdent() );
   }
 
   housingMgr.sendLandFlags( player );
 
-  server().queueForPlayer( player.getCharacterId(), makeInitZone( player, teri ) );
-
-  teri.onPlayerZoneIn( player );
+  Network::Util::Packet::sendInitZone( player );
 
   if( player.isLogin() )
   {
-    server().queueForPlayer( player.getCharacterId(),
-                             {
-                               makeZonePacket< FFXIVIpcDailyQuests >( player.getId() ),
-                               makeZonePacket< FFXIVIpcQuestRepeatFlags >( player.getId() )
-                             } );
+    Network::Util::Packet::sendDailyQuests( player );
+    Network::Util::Packet::sendQuestRepeatFlags( player );
 
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
-    Network::Util::Player::sendGrandCompany( player );
+    Network::Util::Packet::sendGrandCompany( player );
   }
+
+  teri.onPlayerZoneIn( player );
 
 }
 
@@ -423,35 +305,38 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   if( !player.isAlive() )
     return;
 
-  auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-  if( mainWeap && !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
+  checkAutoAttack( player, tickCount );
+}
+
+void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
+{
+  auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
+  if( !mainWeap || !player.isAutoattackOn() || player.checkAction() || !player.getTargetId() || player.getStance() != Common::Active )
+    return;
+
+  for( const auto& actor : player.getInRangeActors() )
   {
-    // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-    for( const auto& actor : player.getInRangeActors() )
+    if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
+      continue;
+    auto chara = actor->getAsChara();
+
+    // default autoattack range
+    float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    // default autoattack range for ranged classes
+    auto classJob = player.getClass();
+
+    if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+      range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    if( ( Common::Util::distance( player.getPos(), actor->getPos() ) <= range ) &&
+        ( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() ) )
     {
-      if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
-        continue;
-      auto chara = actor->getAsChara();
-
-      // default autoattack range
-      float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      // default autoattack range for ranged classes
-      auto classJob = player.getClass();
-
-      if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
-        range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
-      {
-        if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
-        {
-          player.setLastAttack( tickCount );
-          player.autoAttack( actor->getAsChara() );
-        }
-      }
+      player.setLastAttack( tickCount );
+      player.autoAttack( actor->getAsChara() );
     }
   }
+
 }
 
 
@@ -459,22 +344,21 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 
 void PlayerMgr::sendServerNotice( Entity::Player& player, const std::string& message ) //Purple Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
+  Network::Util::Packet::sendServerNotice( player, message );
 }
 
 void PlayerMgr::sendUrgent( Entity::Player& player, const std::string& message ) //Red Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::ServerUrgent, message ) );
+  Network::Util::Packet::sendChat( player, Common::ChatType::ServerUrgent, message );
 }
 
 void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) //Grey Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::SystemMessage, message ) );
+  Network::Util::Packet::sendChat( player, Common::ChatType::SystemMessage, message );
 }
 
 void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), ActorControlType::LogMsg, messageId,
-                                                                            param2, param3, param4, param5, param6 ) );
+  Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }
