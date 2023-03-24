@@ -303,8 +303,6 @@ int main( int argc, char* argv[] )
       if( cursor % 50 == 0 && cursor > 0 )
         Logger::info( "Processing {} classjobs of {} ({:.2f}%)", cursor, total, done );
 
-      auto classJob = g_exdDataGen.getRow< Excel::ClassJob >( id );
-
       if( classJob )
       {
         auto& classJobData = classJob->data();
