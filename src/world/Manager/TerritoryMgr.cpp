@@ -35,14 +35,12 @@ TerritoryMgr::TerritoryMgr() :
 void TerritoryMgr::loadTerritoryTypeDetailCache()
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Excel::TerritoryType >();
+  auto teriList = exdData.getRows< Excel::TerritoryType >();
 
-  for( auto id : idList )
+  for( const auto& [ id, teri ] : teriList )
   {
-    auto teri1 = exdData.getRow< Excel::TerritoryType >( id );
-
-    if( !teri1->getString( teri1->data().Name ).empty() && id > 90 )
-      m_territoryTypeDetailCacheMap[ id ] = teri1;
+    if( !teri->getString( teri->data().Name ).empty() && id > 90 )
+      m_territoryTypeDetailCacheMap[ id ] = teri;
   }
 
 }
@@ -158,11 +156,10 @@ bool TerritoryMgr::isHousingTerritory( uint32_t territoryTypeId ) const
 uint32_t TerritoryMgr::getInstanceContentId( uint32_t territoryTypeId ) const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
+  auto contentFinderList = exdData.getRows< Excel::InstanceContent >();
 
-  for( auto id : contentListIds )
+  for( const auto& [ id, instanceContent ] : contentFinderList )
   {
-    auto instanceContent = exdData.getRow< Excel::InstanceContent >( id );
     if( instanceContent->data().TerritoryType == territoryTypeId )
     {
       return id;
@@ -306,10 +303,10 @@ TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questBattleId )
   if( !pQuestInfo || pQuestInfo->getString( pQuestInfo->data().Text.Name ).empty() )
     return nullptr;
 
-  for( auto& teriId : exdData.getIdList< Excel::TerritoryType >() )
-  {
+  auto teriList = exdData.getRows< Excel::TerritoryType >();
 
-    auto pTeri = exdData.getRow< Excel::TerritoryType >( teriId );
+  for( const auto& [ teriId, pTeri ] : teriList )
+  {
     if( !pTeri || pTeri->data().QuestBattle != questBattleId )
       continue;
 
@@ -329,8 +326,6 @@ TerritoryPtr TerritoryMgr::createQuestBattle( uint32_t questBattleId )
     m_instanceZoneSet.insert( pZone );
 
     return pZone;
-
-
   }
 
   return nullptr;

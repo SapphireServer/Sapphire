@@ -157,21 +157,19 @@ int main( int argc, char* argv[] )
     Logger::fatal( "Error setting up EXD data " );
     return 0;
   }
-  auto idList = g_exdDataGen.getIdList< Excel::Action >();
+  auto actionList = g_exdDataGen.getRows< Excel::Action >();
 
   std::map< uint32_t, ActionEntry > actions;
   std::map< uint32_t, std::vector< uint32_t > > traversedCombos;
 
-  auto total = idList.size();
+  auto total = actionList.size();
   int cursor = 0;
 
-  for( auto id : idList )
+  for( const auto& [ id, action ] : actionList )
   {
     auto done = ( cursor++ / static_cast< float >( total ) ) * 100.f;
     if( cursor % 50 == 0 && cursor > 0 )
       Logger::info( "Processing {} actions of {} ({:.2f}%)", cursor, total, done );
-
-    auto action = g_exdDataGen.getRow< Excel::Action >( id );
 
     //auto actionTransient = g_exdData.get< Sapphire::Data::ActionTransient >( id );
     if( action )

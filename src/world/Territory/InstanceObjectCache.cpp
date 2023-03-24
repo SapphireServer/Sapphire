@@ -20,25 +20,19 @@
 
 Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
-
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Excel::TerritoryType >();
+  auto teriList = exdData.getRows< Excel::TerritoryType >();
 
   size_t count = 0;
-  std::for_each( std::execution::seq, idList.begin(), idList.end() , [ & ]( int id )
-  {
+  for( const auto& [ id, territoryType ] : teriList ) {
     // show some loading indication...
     if( count++ % 10 == 0 )
       std::cout << ".";
 
-    auto territoryType = exdData.getRow< Excel::TerritoryType >( id );
-    if( !territoryType )
-      return;
-
     auto path = territoryType->getString( territoryType->data().LVB );
 
     if( path.empty() )
-      return;
+      continue;
 
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
 
@@ -62,7 +56,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       if( exdData.getGameData()->doesFileExist( bgLgbPath ) )
         bgFile = exdData.getGameData()->getFile( bgLgbPath );
       else
-        return;
+        continue;
 
       planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
       planevent_file = exdData.getGameData()->getFile( planeventLgbPath );
@@ -70,7 +64,7 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     catch( std::runtime_error& )
     {
       // ignore files that aren't found
-      return;
+      continue;
     }
 
     bgSection = bgFile->access_data_sections().at( 0 );
@@ -159,7 +153,9 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
         }
       }
     }
-  } );
+  }
+
+  std::cout << std::endl;
 
   Logger::debug(
     "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventObj: {} EventNpc: {} EventRange: {}",

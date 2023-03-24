@@ -52,15 +52,13 @@ void Util::Packet::sendBaseParams( Entity::Player& player )
   std::fill( std::begin( statParams ), std::end( statParams ), 0 );
 
   auto& exd = Common::Service< Data::ExdData >::ref();
-  auto idList = exd.getIdList< Excel::BaseParam >();
+  auto baseParamList = exd.getRows< Excel::BaseParam >();
 
-  for( const auto id : idList )
+  for( const auto& [ id, row ] : baseParamList )
   {
-    auto row = exd.getRow< Excel::BaseParam >( id );
-    if( !row )
+    if( !row || row->data().PacketIndex < 0 )
       continue;
-    if( row->data().PacketIndex < 0 )
-      continue;
+
     statParams[ row->data().PacketIndex ] = player.getStatValue( static_cast< Common::BaseParam >( id ) );
   }
 
