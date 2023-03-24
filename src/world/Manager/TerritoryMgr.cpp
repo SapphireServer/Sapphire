@@ -77,12 +77,11 @@ uint32_t TerritoryMgr::getNextInstanceId()
 
 Excel::ExcelStructPtr< Excel::TerritoryType > TerritoryMgr::getTerritoryDetail( uint32_t territoryTypeId ) const
 {
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto teri1 = exdData.getRow< Excel::TerritoryType >( territoryTypeId );
-  if( !teri1 )
+  auto it = m_territoryTypeDetailCacheMap.find( territoryTypeId );
+  if( it == m_territoryTypeDetailCacheMap.end() )
     return nullptr;
 
-  return teri1;
+  return it->second;
 }
 
 bool TerritoryMgr::isInstanceContentTerritory( uint32_t territoryTypeId ) const
@@ -197,8 +196,6 @@ bool TerritoryMgr::createDefaultTerritories()
     auto pZone = make_Territory( territoryTypeId, guid, territoryInfo->getString( territoryData.Name ),
                                                  pPlaceName->getString( pPlaceName->data().Text.SGL ) );
     pZone->init();
-
-    std::string bgPath = territoryInfo->getString( territoryData.LVB );
 
     bool hasNaviMesh = pZone->getNaviProvider() != nullptr;
 
