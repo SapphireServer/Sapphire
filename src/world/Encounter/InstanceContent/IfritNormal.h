@@ -24,6 +24,7 @@ namespace Sapphire
 
       // todo: i don't like this
       auto boss = m_pInstance->createBNpcFromLayoutId( NPC_IFRIT, VAL_IFRIT_HP, Common::BNpcType::Enemy );
+      boss->init();
       addBNpc( boss );
     }
 
