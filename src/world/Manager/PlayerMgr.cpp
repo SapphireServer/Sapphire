@@ -81,7 +81,6 @@ std::vector< Sapphire::Entity::PlayerPtr > PlayerMgr::searchPlayersByName( const
   return results;
 }
 
-
 std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
 {
   if( !forceDbLoad )
@@ -96,13 +95,12 @@ std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLo
   auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
 
   if( !res->next() )
-    return "Unknown";
+    return "Obtaining Signature";
 
   std::string playerName = res->getString( 1 );
 
   return playerName;
 }
-
 
 Sapphire::Entity::PlayerPtr PlayerMgr::addPlayer( uint64_t characterId )
 {
