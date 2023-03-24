@@ -227,6 +227,8 @@ struct LGB_GROUP
       memcpy( (char*)&refs[0], buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
     }
 
+    entries.reserve( header.entryCount );
+
     const auto entriesOffset = offset + header.entriesOffset;
     for( auto i = 0; i < header.entryCount; ++i )
     {
@@ -235,41 +237,53 @@ struct LGB_GROUP
       try
       {
         const auto type = *reinterpret_cast< LgbEntryType* >( buf + entryOffset );
-        if( type == LgbEntryType::BgParts )
+        switch( type )
         {
-          entries.emplace_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::Gimmick )
-        {
-          entries.emplace_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventNpc )
-        {
-          entries.emplace_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventObject )
-        {
-          entries.emplace_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::ExitRange )
-        {
-          entries.emplace_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::EventRange )
-        {
-          entries.emplace_back( std::make_shared< LGB_EVENT_RANGE_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::PopRange )
-        {
-          entries.emplace_back( std::make_shared< LGB_POP_RANGE_ENTRY >( buf, entryOffset ) );
-        }
-        else if( type == LgbEntryType::MapRange )
-        {
-          entries.emplace_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
-        }
-        else
-        {
-          entries.emplace_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
+          case LgbEntryType::BgParts:
+          {
+            entries.emplace_back( std::make_shared< LGB_BGPARTS_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::Gimmick:
+          {
+            entries.emplace_back( std::make_shared< LGB_GIMMICK_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::EventNpc:
+          {
+            entries.emplace_back( std::make_shared< LGB_ENPC_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::EventObject:
+          {
+            entries.emplace_back( std::make_shared< LGB_EOBJ_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::ExitRange:
+          {
+            entries.emplace_back( std::make_shared< LGB_EXIT_RANGE_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::EventRange:
+          {
+            entries.emplace_back( std::make_shared< LGB_EVENT_RANGE_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::PopRange:
+          {
+            entries.emplace_back( std::make_shared< LGB_POP_RANGE_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          case LgbEntryType::MapRange:
+          {
+            entries.emplace_back( std::make_shared< LGB_MAP_RANGE_ENTRY >( buf, entryOffset ) );
+            break;
+          }
+          default:
+          {
+            entries.emplace_back( std::make_shared< LgbEntry >( buf, entryOffset ) );
+            break;
+          }
         }
       }
       catch( std::exception& e )
