@@ -46,6 +46,7 @@
 
 #include <Action/Action.h>
 #include <AI/GambitRule.h>
+#include <AI/GambitPack.h>
 #include <AI/GambitTargetCondition.h>
 #include <AI/Fsm/StateMachine.h>
 #include <AI/Fsm/Condition.h>
@@ -598,6 +599,11 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
+  if( m_pGambitPack && m_pGambitPack->getAsTimeLine() )
+  {
+    m_pGambitPack->getAsTimeLine()->start();
+  }
+
   m_lastAttack = Common::Util::getTimeMs() + variation;
 
   setStance( Stance::Active );
@@ -911,9 +917,22 @@ void BNpc::init()
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
+/*
+  auto gambitPack = AI::make_GambitRuleSetPack();
+  gambitPack->addRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
+  gambitPack->addRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 10000 );
+  m_pGambitPack = gambitPack;
+*/
 
-  m_gambits.push_back( testGambitRule );
-  m_gambits.push_back( testGambitRule1 );
+  auto gambitPack = AI::make_GambitTimeLinePack( -1 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 2 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 89, 0 ), 4 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 90, 0 ), 6 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 91, 0 ), 8 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 92, 0 ), 10 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 81, 0 ), 12 );
+  gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
+  m_pGambitPack = gambitPack;
 
   using namespace AI::Fsm;
   m_fsm = make_StateMachine();
@@ -945,23 +964,8 @@ void BNpc::init()
 
 void BNpc::processGambits( uint64_t tickCount )
 {
-  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
-  for( auto& gambitRule : m_gambits )
-  {
-    if( !gambitRule->isEnabled() )
-      continue;
-
-    if( ( tickCount - gambitRule->getLastExecutionMs() ) > gambitRule->getCoolDown() )
-    {
-      if( !gambitRule->getGambitTargetCondition()->isConditionMet( *this ) )
-        continue;
-
-      gambitRule->setLastExecutionMs( tickCount );
-      actionMgr.handleTargetedAction( *this, gambitRule->getActionPtr()->getId(), gambitRule->getGambitTargetCondition()->getTarget()->getId(), 0 );
-      break;
-    }
-
-  }
+  m_tp = 1000;
+  m_pGambitPack->update( *this, tickCount );
 }
 
 uint32_t BNpc::getLastRoamTargetReachedTime() const

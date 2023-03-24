@@ -206,7 +206,7 @@ namespace Sapphire::Entity
     Common::FFXIVARR_POSITION3 m_naviTarget;
 
     CharaPtr m_pOwner;
-    std::vector< World::AI::GambitRulePtr > m_gambits;
+    World::AI::GambitPackPtr m_pGambitPack;
 
     std::shared_ptr< World::AI::Fsm::StateMachine > m_fsm;
 
