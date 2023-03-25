@@ -506,19 +506,14 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
         bool doTeleport = false;
         uint16_t teleport;
-        auto idList = exdData.getIdList< Excel::Aetheryte >();
+        auto aetheryteList = exdData.getRows< Excel::Aetheryte >();
 
-        for( auto i : idList )
+        for( const auto& [ id, data ] : aetheryteList )
         {
-          auto data = exdData.getRow< Excel::Aetheryte >( i );
-
-          if( !data )
-            continue;
-
           if( data->data().TerritoryType == param1 && data->data().Telepo )
           {
             doTeleport = true;
-            teleport = static_cast< uint16_t >( i );
+            teleport = static_cast< uint16_t >( id );
             break;
           }
 

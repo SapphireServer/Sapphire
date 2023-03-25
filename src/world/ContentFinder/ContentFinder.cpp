@@ -131,12 +131,11 @@ void World::ContentFinder::registerContentRequest( Entity::Player &player, uint3
 void World::ContentFinder::registerRandomContentRequest( Entity::Player &player, uint32_t randomContentTypeId )
 {
   auto& exdData = Service< Data::ExdData >::ref();
-  auto contentListIds = exdData.getIdList< Excel::ContentFinderCondition >();
+  auto contentFinderList = exdData.getRows< Excel::ContentFinderCondition >();
   std::vector< uint32_t > idList;
 
-  for( auto id : contentListIds )
+  for( const auto& [ id, instanceContent ] : contentFinderList )
   {
-    auto instanceContent = exdData.getRow< Excel::ContentFinderCondition >( id );
     if( instanceContent->data().RandomContentType == randomContentTypeId )
     {
       if( instanceContent->data().LevelMin <= player.getLevel() )

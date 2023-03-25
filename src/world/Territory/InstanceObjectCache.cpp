@@ -11,26 +11,23 @@
 #include <ExdCat.h>
 #include <Exd.h>
 
+#include <algorithm>
+#include <execution>
+
 #include <Logging/Logger.h>
 #include <Service.h>
 #include <Util/UtilMath.h>
 
 Sapphire::InstanceObjectCache::InstanceObjectCache()
 {
-
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Excel::TerritoryType >();
+  auto teriList = exdData.getRows< Excel::TerritoryType >();
 
   size_t count = 0;
-  for( const auto& id : idList )
-  {
+  for( const auto& [ id, territoryType ] : teriList ) {
     // show some loading indication...
     if( count++ % 10 == 0 )
       std::cout << ".";
-
-    auto territoryType = exdData.getRow< Excel::TerritoryType >( id );
-    if( !territoryType )
-      continue;
 
     auto path = territoryType->getString( territoryType->data().LVB );
 
@@ -56,7 +53,11 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 
     try
     {
-      bgFile = exdData.getGameData()->getFile( bgLgbPath );
+      if( exdData.getGameData()->doesFileExist( bgLgbPath ) )
+        bgFile = exdData.getGameData()->getFile( bgLgbPath );
+      else
+        continue;
+
       planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
       planevent_file = exdData.getGameData()->getFile( planeventLgbPath );
     }
@@ -101,49 +102,60 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       {
         for( const auto& pEntry : group.entries )
         {
+          switch( pEntry->getType() )
+          {
+            case LgbEntryType::MapRange:
+            {
+              auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
+              m_mapRangeCache.insert( id, pMapRange );
 
-          if( pEntry->getType() == LgbEntryType::MapRange )
-          {
-            auto pMapRange = std::reinterpret_pointer_cast< LGB_MAP_RANGE_ENTRY >( pEntry );
-            m_mapRangeCache.insert( id, pMapRange );
-          }
-          else if( pEntry->getType() == LgbEntryType::ExitRange )
-          {
-            auto pExitRange = std::reinterpret_pointer_cast< LGB_EXIT_RANGE_ENTRY >( pEntry );
-            m_exitRangeCache.insert( id, pExitRange );
-          }
-          else if( pEntry->getType() == LgbEntryType::PopRange )
-          {
+              break;
+            }
+            case LgbEntryType::ExitRange:
+            {
+              auto pExitRange = std::reinterpret_pointer_cast< LGB_EXIT_RANGE_ENTRY >( pEntry );
+              m_exitRangeCache.insert( id, pExitRange );
 
-            auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
-            m_popRangeCache.insert( id, pPopRange );
-          }
-          else if( pEntry->getType() == LgbEntryType::CollisionBox )
-          {
-            //auto pEObj = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+              break;
+            }
+            case LgbEntryType::PopRange:
+            {
+              auto pPopRange = std::reinterpret_pointer_cast< LGB_POP_RANGE_ENTRY >( pEntry );
+              m_popRangeCache.insert( id, pPopRange );
+              break;
+            }
+            case LgbEntryType::CollisionBox:
+            {
+              //auto pEObj = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
 
-            //Logger::debug( "CollisionBox {}", pEntry->header.nameOffset );
-          }
-          else if( pEntry->getType() == LgbEntryType::EventObject )
-          {
-            auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
-            m_eobjCache.insert( id, pEObj );
-          }
-          else if( pEntry->getType() == LgbEntryType::EventNpc )
-          {
-            auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
-            m_enpcCache.insert( id, pENpc );
-          }
-          else if( pEntry->getType() == LgbEntryType::EventRange )
-          {
-            auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
-            m_eventRangeCache.insert( 0, pEventRange );
+              //Logger::debug( "CollisionBox {}", pEntry->header.nameOffset );
+              break;
+            }
+            case LgbEntryType::EventObject:
+            {
+              auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
+              m_eobjCache.insert( id, pEObj );
+              break;
+            }
+            case LgbEntryType::EventNpc:
+            {
+              auto pENpc = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
+              m_enpcCache.insert( id, pENpc );
+              break;
+            }
+            case LgbEntryType::EventRange:
+            {
+              auto pEventRange = std::reinterpret_pointer_cast< LGB_EVENT_RANGE_ENTRY >( pEntry );
+              m_eventRangeCache.insert( 0, pEventRange );
+              break;
+            }
           }
         }
       }
     }
   }
-  std::cout << "\n";
+
+  std::cout << std::endl;
 
   Logger::debug(
     "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventObj: {} EventNpc: {} EventRange: {}",

@@ -14,12 +14,10 @@ using namespace Sapphire::World::Manager;
 bool AchievementMgr::cacheAchievements()
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Excel::Achievement >();
+  auto achvDat = exdData.getRows< Excel::Achievement >();
 
-  for( auto id : idList )
+  for( const auto& [ id, achvExdData ] : achvDat )
   {
-    auto achvExdData = exdData.getRow< Excel::Achievement >( id );
-
     uint32_t key = achvExdData->data().ConditionType;
     auto achvType = static_cast< Common::Achievement::Type >( key );
 
