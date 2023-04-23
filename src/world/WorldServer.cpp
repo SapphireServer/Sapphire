@@ -145,8 +145,8 @@ std::string readFileToString( const std::string& filename )
   file.close();
 
   // Remove all newlines from the file contents
-  fileContents.erase(std::remove(fileContents.begin(), fileContents.end(), '\n'), fileContents.end());
-  fileContents.erase(std::remove(fileContents.begin(), fileContents.end(), '\r'), fileContents.end());
+  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\n' ), fileContents.end() );
+  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\r' ), fileContents.end() );
 
 
   // Return the file contents as a string
