@@ -34,7 +34,7 @@ namespace Sapphire::Data
     template< typename T >
     std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > > getRows();
 
-    std::shared_ptr< xiv::dat::GameData > ExdData::getGameData()
+    std::shared_ptr< xiv::dat::GameData > getGameData()
     {
       return m_data;
     }
@@ -51,7 +51,7 @@ namespace Sapphire::Data
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
   };
 
-  template< typename T >
+template< typename T >
   std::string ExdData::getSheetName()
   {
     auto origName = std::string( typeid( T ).name() );
@@ -87,7 +87,7 @@ namespace Sapphire::Data
   {
     try
     {
-      return getSheet< T >().get_row< T >( row );
+      return getSheet< T >().template get_row< T >( row );
     } catch( const std::runtime_error& ex )
     {
       Logger::error( "Error fetching row from sheet {}: {}", getSheetName< T >(), ex.what() );
@@ -111,7 +111,7 @@ namespace Sapphire::Data
   template< typename T >
   std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > > ExdData::getRows()
   {
-    return getSheet< T >().get_sheet_rows< T >();
+    return getSheet< T >().template get_sheet_rows< T >();
   }
 
 }// namespace Sapphire::Data
