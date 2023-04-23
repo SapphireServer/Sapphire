@@ -51,21 +51,45 @@ namespace Sapphire::Data
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
   };
 
-template< typename T >
+  template< typename T >
   std::string ExdData::getSheetName()
   {
     auto origName = std::string( typeid( T ).name() );
+
 #if _WIN32
     auto pos = origName.find_last_of( ':' );
-    return pos != std::string::npos ? origName.substr( pos + 1 ) : "[something_fucking_died]";
+    if( pos != std::string::npos )
+    {
+      return origName.substr( pos + 1 );
+    }
+    else
+    {
+      throw std::runtime_error( "Failed to extract the sheet name" );
+    }
 #else
+    static std::unordered_map< std::type_index, std::string > demangle_cache;
+    auto type = typeid( T );
+    auto it = demangle_cache.find( type );
+    if( it != demangle_cache.end() )
+    {
+      return it->second;
+    }
+
     int status = -4;
     char* res = abi::__cxa_demangle( origName.c_str(), nullptr, nullptr, &status );
-    std::string demangledName = ( status == 0 ) ? res : origName;
-    auto pos = demangledName.find_last_of( ':' );
-    if( pos != std::string::npos ) demangledName = demangledName.substr( pos + 1 );
-    free( res );
-    return demangledName;
+    if( status == 0 )
+    {
+      std::string demangledName = res;
+      auto pos = demangledName.find_last_of( ':' );
+      if( pos != std::string::npos ) demangledName = demangledName.substr( pos + 1 );
+      demangle_cache[ type ] = demangledName;
+      free( res );
+      return demangledName;
+    }
+    else
+    {
+      throw std::runtime_error( "Failed to demangle the type name" );
+    }
 #endif
   }
 
