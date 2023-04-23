@@ -1,9 +1,8 @@
-#ifndef XIV_DAT_CAT_H
-#define XIV_DAT_CAT_H
+#pragma once
 
+#include <filesystem>
 #include <memory>
 #include <vector>
-#include <filesystem>
 
 namespace xiv::dat
 {
@@ -60,9 +59,8 @@ namespace xiv::dat
     std::unique_ptr< Index > m_index;
 
     // The .datXs such as dat nb X => m_dats[X]
-    std::vector< std::unique_ptr< Dat>> m_dats;
+    std::vector< std::unique_ptr< Dat > > m_dats;
   };
     
 }
 
-#endif // XIV_DAT_CAT_H

@@ -1,8 +1,8 @@
 #include "zlib.h"
-#include <string>
 #include <stdexcept>
-#include <zlib/zlib.h>
+#include <string>
 #include <vector>
+#include <zlib/zlib.h>
 
 namespace xiv::utils::zlib
 {
@@ -18,13 +18,13 @@ namespace xiv::utils::zlib
 
     if( ret != Z_OK )
     {
-      throw std::runtime_error( "Error at zlib uncompress: " + std::to_string( ret ) );
+      throw std::runtime_error( "Error at zlib compress: " + std::to_string( ret ) );
     }
 
     out.resize( out_size );
   }
 
-  void no_header_decompress( uint8_t* in, size_t in_size, uint8_t* out, size_t out_size )
+  void no_header_decompress( const uint8_t* in, size_t in_size, uint8_t* out, size_t out_size )
   {
     z_stream strm;
     strm.zalloc = Z_NULL;
@@ -41,7 +41,7 @@ namespace xiv::utils::zlib
     }
 
     // Set pointers to the right addresses
-    strm.next_in = in;
+    strm.next_in = const_cast< uint8_t* >( in );
     strm.avail_out = static_cast< uInt >( out_size );
     strm.next_out = out;
 
@@ -56,4 +56,4 @@ namespace xiv::utils::zlib
     inflateEnd( &strm );
   }
 
-}
+}// namespace xiv::utils::zlib

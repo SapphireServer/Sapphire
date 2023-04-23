@@ -5,6 +5,13 @@
 #include <unordered_map>
 #include <Common.h>
 
+#include <GameData.h>
+#include <File.h>
+#include <DatCat.h>
+#include <ExdData.h>
+#include <ExdCat.h>
+#include <Exd.h>
+
 struct LGB_MAP_RANGE_ENTRY;
 struct LGB_EXIT_RANGE_ENTRY;
 struct LGB_POP_RANGE_ENTRY;
@@ -99,12 +106,13 @@ namespace Sapphire
     InstanceObjectCache();
     ~InstanceObjectCache() = default;
 
+    std::unique_ptr< xiv::dat::File > loadFile( const std::string& filePath ) const;
+
     MapRangePtr getMapRange( uint16_t zoneId, uint32_t mapRangeId );
     ExitRangePtr getExitRange( uint16_t zoneId, uint32_t exitRangeId );
     PopRangePtr getPopRange( uint32_t popRangeId );
 
     std::shared_ptr< PopRangeInfo > getPopRangeInfo( uint32_t popRangeId );
-
 
     EObjPtr getEObj( uint32_t eObjId );
     ENpcPtr getENpc( uint32_t eNpcId );

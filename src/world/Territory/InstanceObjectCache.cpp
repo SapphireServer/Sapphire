@@ -4,12 +4,6 @@
 #include <datReader/DatCategories/bg/pcb.h>
 #include <datReader/DatCategories/bg/lgb.h>
 #include <datReader/DatCategories/bg/sgb.h>
-#include <GameData.h>
-#include <File.h>
-#include <DatCat.h>
-#include <ExdData.h>
-#include <ExdCat.h>
-#include <Exd.h>
 
 #include <algorithm>
 #include <execution>
@@ -23,28 +17,14 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
   auto teriList = exdData.getRows< Excel::TerritoryType >();
 
-  size_t count = 0;
-  for( const auto& [ id, territoryType ] : teriList ) {
-    // show some loading indication...
-    if( count++ % 10 == 0 )
-      std::cout << ".";
-
+  for( const auto& [ id, territoryType ] : teriList )
+  {
     auto path = territoryType->getString( territoryType->data().LVB );
 
     if( path.empty() )
       continue;
 
     path = std::string( "bg/" ) + path.substr( 0, path.find( "/level/" ) );
-
-    // TODO: it does feel like this needs to be streamlined into the datReader instead of being done here...
-    std::string bgLgbPath( path + "/level/bg.lgb" );
-    std::string planmapLgbPath( path + "/level/planmap.lgb" );
-    std::string planeventLgbPath( path + "/level/planevent.lgb" );
-    std::string plannerLgbPath( path + "/level/planner.lgb" );
-    std::vector< char > bgSection;
-    std::vector< char > planmapSection;
-    std::vector< char > planeventSection;
-    std::vector< char > plannerSection;
 
     std::unique_ptr< xiv::dat::File > bgFile;
     std::unique_ptr< xiv::dat::File > planmap_file;
@@ -53,46 +33,39 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
 
     try
     {
-      if( exdData.getGameData()->doesFileExist( bgLgbPath ) )
-        bgFile = exdData.getGameData()->getFile( bgLgbPath );
+      if( exdData.getGameData()->doesFileExist( path + "/level/bg.lgb" ) )
+        bgFile = loadFile( path + "/level/bg.lgb" );
       else
         continue;
 
-      planmap_file = exdData.getGameData()->getFile( planmapLgbPath );
-      planevent_file = exdData.getGameData()->getFile( planeventLgbPath );
-    }
-    catch( std::runtime_error& )
+      planmap_file = loadFile( path + "/level/planmap.lgb" );
+      planevent_file = loadFile( path + "/level/planevent.lgb" );
+    } catch( std::runtime_error& )
     {
-      // ignore files that aren't found
       continue;
     }
 
-    bgSection = bgFile->access_data_sections().at( 0 );
-    planmapSection = planmap_file->access_data_sections().at( 0 );
-    planeventSection = planevent_file->access_data_sections().at( 0 );
+    std::vector< char > bgSection( bgFile->access_data_sections().at( 0 ) );
+    std::vector< char > planmapSection( planmap_file->access_data_sections().at( 0 ) );
+    std::vector< char > planeventSection( planevent_file->access_data_sections().at( 0 ) );
 
-    std::vector< std::string > stringList;
-
-    uint32_t offset1 = 0x20;
-
-    LGB_FILE bgLgb( &bgSection[ 0 ], "bg" );
-    LGB_FILE planmapLgb( &planmapSection[ 0 ], "planmap" );
-    LGB_FILE planeventLgb( &planeventSection[ 0 ], "planevent" );
-
-    uint32_t max_index = 0;
+    LGB_FILE bgLgb( bgSection.data(), "bg" );
+    LGB_FILE planmapLgb( planmapSection.data(), "planmap" );
+    LGB_FILE planeventLgb( planeventSection.data(), "planevent" );
 
     std::vector< LGB_FILE > lgbList;
 
     try
     {
-      planner_file = exdData.getGameData()->getFile( plannerLgbPath );
-      plannerSection = planner_file->access_data_sections().at( 0 );
-      LGB_FILE plannerLgb( &plannerSection[ 0 ], "planner" );
+      planner_file = loadFile( path + "/level/planner.lgb" );
+      std::vector< char > plannerSection( planner_file->access_data_sections().at( 0 ) );
+      LGB_FILE plannerLgb( plannerSection.data(), "planner" );
 
+      lgbList.reserve( 4 );
       lgbList = { bgLgb, planmapLgb, planeventLgb, plannerLgb };
-    }
-    catch( std::runtime_error& )
+    } catch( std::runtime_error& )
     {
+      lgbList.reserve( 3 );
       lgbList = { bgLgb, planmapLgb, planeventLgb };
     }
 
@@ -126,9 +99,6 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             }
             case LgbEntryType::CollisionBox:
             {
-              //auto pEObj = std::reinterpret_pointer_cast< LGB_ENPC_ENTRY >( pEntry );
-
-              //Logger::debug( "CollisionBox {}", pEntry->header.nameOffset );
               break;
             }
             case LgbEntryType::EventObject:
@@ -155,14 +125,20 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     }
   }
 
-  std::cout << std::endl;
-
   Logger::debug(
-    "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventObj: {} EventNpc: {} EventRange: {}",
-    m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_eobjCache.size(), m_enpcCache.size(), m_eventRangeCache.size()
-  );
+          "InstanceObjectCache Cached: MapRange: {} ExitRange: {} PopRange: {} EventObj: {} EventNpc: {} EventRange: {}",
+          m_mapRangeCache.size(), m_exitRangeCache.size(), m_popRangeCache.size(), m_eobjCache.size(), m_enpcCache.size(),
+          m_eventRangeCache.size() );
 }
 
+std::unique_ptr< xiv::dat::File > Sapphire::InstanceObjectCache::loadFile( const std::string& filePath ) const
+{
+  auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
+  if( exdData.getGameData()->doesFileExist( filePath ) )
+    return exdData.getGameData()->getFile( filePath );
+
+  throw std::runtime_error( "File not found: " + filePath );
+}
 
 Sapphire::InstanceObjectCache::MapRangePtr
   Sapphire::InstanceObjectCache::getMapRange( uint16_t zoneId, uint32_t mapRangeId )
