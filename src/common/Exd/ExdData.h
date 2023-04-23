@@ -68,7 +68,7 @@ namespace Sapphire::Data
     }
 #else
     static std::unordered_map< std::type_index, std::string > demangle_cache;
-    auto type = typeid( T );
+    auto type = std::type_index( typeid( T ) );
     auto it = demangle_cache.find( type );
     if( it != demangle_cache.end() )
     {
