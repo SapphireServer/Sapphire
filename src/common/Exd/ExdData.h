@@ -47,6 +47,7 @@ namespace Sapphire::Data
     xiv::exd::Exd& getSheet();
 
     std::unordered_map< std::type_index, xiv::exd::Exd > m_sheets;
+    std::unordered_map< std::type_index, std::string > m_name_cache;
     std::shared_ptr< xiv::dat::GameData > m_data;
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
   };
@@ -54,27 +55,28 @@ namespace Sapphire::Data
   template< typename T >
   std::string ExdData::getSheetName()
   {
+    auto type = std::type_index( typeid( T ) );
+    auto it = m_name_cache.find( type );
+    if( it != m_name_cache.end() )
+    {
+      return it->second;
+    }
+
     auto origName = std::string( typeid( T ).name() );
 
 #if _WIN32
     auto pos = origName.find_last_of( ':' );
     if( pos != std::string::npos )
     {
-      return origName.substr( pos + 1 );
+      std::string sheetName = origName.substr( pos + 1 );
+      m_name_cache[ type ] = sheetName;
+      return sheetName;
     }
     else
     {
       throw std::runtime_error( "Failed to extract the sheet name" );
     }
 #else
-    static std::unordered_map< std::type_index, std::string > demangle_cache;
-    auto type = std::type_index( typeid( T ) );
-    auto it = demangle_cache.find( type );
-    if( it != demangle_cache.end() )
-    {
-      return it->second;
-    }
-
     int status = -4;
     char* res = abi::__cxa_demangle( origName.c_str(), nullptr, nullptr, &status );
     if( status == 0 )
@@ -82,7 +84,7 @@ namespace Sapphire::Data
       std::string demangledName = res;
       auto pos = demangledName.find_last_of( ':' );
       if( pos != std::string::npos ) demangledName = demangledName.substr( pos + 1 );
-      demangle_cache[ type ] = demangledName;
+      m_name_cache[ type ] = demangledName;
       free( res );
       return demangledName;
     }
