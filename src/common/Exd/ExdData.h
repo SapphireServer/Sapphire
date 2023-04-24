@@ -48,6 +48,8 @@ namespace Sapphire::Data
 
     std::unordered_map< std::type_index, xiv::exd::Exd > m_sheets;
     std::unordered_map< std::type_index, std::string > m_name_cache;
+    std::unordered_map< std::type_index, std::vector< uint32_t > > m_idListCache;
+    std::unordered_map< std::type_index, std::unordered_map< uint32_t, std::shared_ptr< void > > > m_rowsCache;
     std::shared_ptr< xiv::dat::GameData > m_data;
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
   };
@@ -127,17 +129,36 @@ namespace Sapphire::Data
   template< typename T >
   std::vector< uint32_t > ExdData::getIdList()
   {
+    auto type = std::type_index( typeid( T ) );
+    auto it = m_idListCache.find( type );
+    if( it != m_idListCache.end() )
+    {
+      return it->second;
+    }
+
     auto sheet = getSheet< T >();
     auto rows = sheet.get_rows();
     std::vector< uint32_t > ids;
+    ids.reserve( rows.size() );
     for( const auto& row : rows ) ids.push_back( row.first );
+
+    m_idListCache[ type ] = ids;
     return ids;
   }
 
   template< typename T >
   std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > > ExdData::getRows()
   {
-    return getSheet< T >().template get_sheet_rows< T >();
+    auto type = std::type_index( typeid( T ) );
+    auto it = m_rowsCache.find( type );
+    if( it != m_rowsCache.end() )
+    {
+      return *reinterpret_cast< std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > >* >( &it->second );
+    }
+
+    auto rows = getSheet< T >().template get_sheet_rows< T >();
+    m_rowsCache[ type ] = *reinterpret_cast< std::unordered_map< uint32_t, std::shared_ptr< void > >* >( &rows );
+    return rows;
   }
 
 }// namespace Sapphire::Data

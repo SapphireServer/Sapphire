@@ -19,7 +19,6 @@ struct LGB_EOBJ_ENTRY;
 struct LGB_ENPC_ENTRY;
 struct LGB_EVENT_RANGE_ENTRY;
 
-
 namespace Sapphire
 {
   class Framework;

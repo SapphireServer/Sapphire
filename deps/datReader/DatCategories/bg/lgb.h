@@ -1,5 +1,4 @@
-#ifndef _LGB_H
-#define _LGB_H
+#pragma once
 
 #include <cstring>
 #include <memory>
@@ -46,28 +45,25 @@ public:
     return header.type;
   };
 
-  virtual ~LgbEntry()
-  {
-  };
+  virtual ~LgbEntry(){};
 };
-
 
 class LGB_BGPARTS_ENTRY : public LgbEntry
 {
 public:
   BgPartsData data;
-  std::string name;
-  std::string modelFileName;
-  std::string collisionFileName;
+  std::string_view name;
+  std::string_view modelFileName;
+  std::string_view collisionFileName;
 
   LGB_BGPARTS_ENTRY() = default;
 
   LGB_BGPARTS_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< BgPartsData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + data.modelFileOffset );
-    collisionFileName = std::string( buf + offset + data.collisionFileOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
+    modelFileName = std::string_view( buf + offset + data.modelFileOffset );
+    collisionFileName = std::string_view( buf + offset + data.collisionFileOffset );
   };
 };
 
@@ -75,72 +71,66 @@ class LGB_GIMMICK_ENTRY : public LgbEntry
 {
 public:
   GimmickData data;
-  std::string name;
-  std::string gimmickFileName;
+  std::string_view name;
+  std::string_view gimmickFileName;
 
   LGB_GIMMICK_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< GimmickData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    gimmickFileName = std::string( buf + offset + data.gimmickFileOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
+    gimmickFileName = std::string_view( buf + offset + data.gimmickFileOffset );
   };
 };
 
-struct LGB_ENPC_ENTRY : public LgbEntry
-{
+struct LGB_ENPC_ENTRY : public LgbEntry {
 public:
   ENpcData data;
-  std::string name;
+  std::string_view name;
 
-  LGB_ENPC_ENTRY( char* buf, size_t offset ) :
-    LgbEntry( buf, offset )
+  LGB_ENPC_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ENpcData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
   };
 };
 
-struct LGB_EOBJ_ENTRY : public LgbEntry
-{
+struct LGB_EOBJ_ENTRY : public LgbEntry {
 public:
   EObjData data;
-  std::string name;
+  std::string_view name;
 
   LGB_EOBJ_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< EObjData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
   };
 };
 
-struct LGB_MAP_RANGE_ENTRY : public LgbEntry
-{
+struct LGB_MAP_RANGE_ENTRY : public LgbEntry {
 public:
   MapRangeData data;
-  std::string name;
+  std::string_view name;
 
   LGB_MAP_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< MapRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
   };
 };
 
-struct LGB_EXIT_RANGE_ENTRY : public LgbEntry
-{
+struct LGB_EXIT_RANGE_ENTRY : public LgbEntry {
 public:
   ExitRangeData data;
-  std::string name;
+  std::string_view name;
 
   LGB_EXIT_RANGE_ENTRY( char* buf, size_t offset ) : LgbEntry( buf, offset )
   {
     data = *reinterpret_cast< ExitRangeData* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
   };
 };
 
-struct LGB_POP_RANGE_ENTRY : public LgbEntry
-{
+struct LGB_POP_RANGE_ENTRY : public LgbEntry {
 public:
   PopRangeData data;
 
@@ -150,8 +140,7 @@ public:
   };
 };
 
-struct LGB_EVENT_RANGE_ENTRY : public LgbEntry
-{
+struct LGB_EVENT_RANGE_ENTRY : public LgbEntry {
 public:
   EventRangeData data;
 
@@ -224,7 +213,7 @@ struct LGB_GROUP
     if( layerSetReferencedList.LayerSetCount > 0 )
     {
       refs.resize( layerSetReferencedList.LayerSetCount );
-      memcpy( (char*)&refs[0], buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
+      std::memcpy( refs.data(), buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
     }
 
     entries.reserve( header.entryCount );
@@ -307,8 +296,7 @@ struct LGB_FILE_HEADER
   int32_t groupCount;
 };
 
-struct LGB_FILE
-{
+struct LGB_FILE {
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
   std::string m_name;
@@ -325,11 +313,11 @@ struct LGB_FILE
       throw std::runtime_error( "Invalid LGB file!" );
 
     constexpr auto baseOffset = sizeof( header );
+    groups.reserve( header.groupCount );
     for( size_t i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
-      const auto group = LGB_GROUP( buf, this, groupOffset );
-      groups.push_back( group );
+      groups.emplace_back( buf, this, groupOffset );
     }
   };
 };
@@ -368,4 +356,3 @@ std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
 }
 #endif
 */
-#endif

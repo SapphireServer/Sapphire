@@ -337,7 +337,7 @@ int main( int argc, char* argv[] )
                   auto pGObjR = reinterpret_cast< LGB_GIMMICK_ENTRY* >( pGObj );
                   char* dataSection = nullptr;
 
-                  auto file = g_gameData->getFile( pGObjR->gimmickFileName );
+                  auto file = g_gameData->getFile( std::string( pGObjR->gimmickFileName ) );
                   auto sections = file->get_data_sections();
                   dataSection = &sections.at( 0 )[ 0 ];
                   auto sgbFile = SGB_FILE( &dataSection[ 0 ] );

@@ -45,9 +45,18 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
       continue;
     }
 
-    std::vector< char > bgSection( bgFile->access_data_sections().at( 0 ) );
-    std::vector< char > planmapSection( planmap_file->access_data_sections().at( 0 ) );
-    std::vector< char > planeventSection( planevent_file->access_data_sections().at( 0 ) );
+    std::vector< char > bgSection;
+    bgSection.reserve( bgFile->access_data_sections().at( 0 ).size() );
+    bgSection.assign( bgFile->access_data_sections().at( 0 ).begin(), bgFile->access_data_sections().at( 0 ).end() );
+
+    std::vector< char > planmapSection;
+    planmapSection.reserve( planmap_file->access_data_sections().at( 0 ).size() );
+    planmapSection.assign( planmap_file->access_data_sections().at( 0 ).begin(), planmap_file->access_data_sections().at( 0 ).end() );
+
+    std::vector< char > planeventSection;
+    planeventSection.reserve( planevent_file->access_data_sections().at( 0 ).size() );
+    planeventSection.assign( planevent_file->access_data_sections().at( 0 ).begin(), planevent_file->access_data_sections().at( 0 ).end() );
+
 
     LGB_FILE bgLgb( bgSection.data(), "bg" );
     LGB_FILE planmapLgb( planmapSection.data(), "planmap" );
@@ -58,15 +67,24 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
     try
     {
       planner_file = loadFile( path + "/level/planner.lgb" );
-      std::vector< char > plannerSection( planner_file->access_data_sections().at( 0 ) );
+
+      std::vector< char > plannerSection;
+      plannerSection.reserve( planner_file->access_data_sections().at( 0 ).size() );
+      plannerSection.assign( planner_file->access_data_sections().at( 0 ).begin(), planner_file->access_data_sections().at( 0 ).end() );
+
       LGB_FILE plannerLgb( plannerSection.data(), "planner" );
 
       lgbList.reserve( 4 );
-      lgbList = { bgLgb, planmapLgb, planeventLgb, plannerLgb };
+      lgbList.emplace_back( bgLgb );
+      lgbList.emplace_back( planmapLgb );
+      lgbList.emplace_back( planeventLgb );
+      lgbList.emplace_back( plannerLgb );
     } catch( std::runtime_error& )
     {
       lgbList.reserve( 3 );
-      lgbList = { bgLgb, planmapLgb, planeventLgb };
+      lgbList.emplace_back( bgLgb );
+      lgbList.emplace_back( planmapLgb );
+      lgbList.emplace_back( planeventLgb );
     }
 
     for( const auto& lgb : lgbList )
