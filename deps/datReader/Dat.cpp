@@ -283,7 +283,7 @@ namespace xiv::dat
     return outputFile;
   }
 
-void Dat::extractBlock( uint32_t i_offset, std::vector< char >& o_data )
+  void Dat::extractBlock( uint32_t i_offset, std::vector< char >& o_data )
   {
     m_handle.seekg( i_offset );
 
