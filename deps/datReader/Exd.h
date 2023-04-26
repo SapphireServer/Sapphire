@@ -1,18 +1,18 @@
 #pragma once
 
-#include <memory>
 #include <map>
+#include <memory>
 #include <unordered_map>
 
 #include <variant>
 
-#include "File.h"
 #include "Exd/Common.h"
 #include "Exd/Structs.h"
+#include "Exh.h"
+#include "File.h"
+#include "bparse.h"
 #include "stream.h"
 #include <fstream>
-#include "Exh.h"
-#include "bparse.h"
 
 namespace xiv::exd
 {
@@ -27,7 +27,7 @@ namespace xiv::exd
     uint32_t id;
     uint32_t offset;
   };
-}
+}// namespace xiv::exd
 
 namespace xiv::utils::bparse
 {
@@ -63,16 +63,16 @@ namespace xiv::exd
 
   // Field type containing all the possible types in the data files
   using Field = std::variant<
-    std::string,
-    bool,
-    int8_t,
-    uint8_t,
-    int16_t,
-    uint16_t,
-    int32_t,
-    uint32_t,
-    float,
-    uint64_t >;
+          std::string,
+          bool,
+          int8_t,
+          uint8_t,
+          int16_t,
+          uint16_t,
+          int32_t,
+          uint32_t,
+          float,
+          uint64_t >;
 
   struct ExdCacheEntry
   {
@@ -86,13 +86,11 @@ namespace xiv::exd
   public:
     // i_exh: the header
     // i_files: the multiple exd files
-    Exd()
-    {
-    }
+    Exd() = default;
 
-    Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File>>& i_files );
+    Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File > >& i_files );
 
-    ~Exd();
+    ~Exd() = default;
 
     // Get a row by its id
     const std::vector< Field > get_row( uint32_t id );
@@ -107,9 +105,8 @@ namespace xiv::exd
 
       if( sizeof( T ) != _exh->get_header().data_offset )
       {
-        throw std::runtime_error(
-          "the struct size (" + std::to_string( sizeof( T ) ) + ") doesn't match the size in the header (" +
-          std::to_string( _exh->get_header().data_offset ) + ")!" );
+        throw std::runtime_error( "the struct size (" + std::to_string( sizeof( T ) ) + ") doesn't match the size in the header (" +
+                std::to_string( _exh->get_header().data_offset ) + ")!" );
       }
 
       // Iterates over all the files
@@ -126,7 +123,7 @@ namespace xiv::exd
       fields.reserve( member_count );
       iss.seekg( cacheEntryIt->second.offset + 6 );
 
-      iss.read( reinterpret_cast<char*>( &pSheet.get()->_data ), sizeof( T ) );
+      iss.read( reinterpret_cast< char* >( &pSheet.get()->_data ), sizeof( T ) );
 
       int stringCount = 0;
       for( auto& member_entry : _exh->get_exh_members() )
@@ -148,7 +145,7 @@ namespace xiv::exd
               std::string value = utils::bparse::extract_cstring( iss, "string" );
               auto it = pSheet->_strings.insert( pSheet->_strings.end(), value );
               *reinterpret_cast< uint32_t* >( pSheet->ptr() + member_entry.offset ) =
-                static_cast< uint32_t >( std::distance( pSheet->_strings.begin(), it ) );
+                      static_cast< uint32_t >( std::distance( pSheet->_strings.begin(), it ) );
             }
             break;
 
@@ -166,46 +163,46 @@ namespace xiv::exd
 
 
           case DataType::int16:
-            {
-              int16_t value = bparse::extract< int16_t >( iss, "int16_t", false );
-              *reinterpret_cast< int16_t* >( pSheet->ptr() + member_entry.offset ) = value;
-            }
-            break;
+          {
+            int16_t value = bparse::extract< int16_t >( iss, "int16_t", false );
+            *reinterpret_cast< int16_t* >( pSheet->ptr() + member_entry.offset ) = value;
+          }
+          break;
 
           case DataType::uint16:
-            {
-              uint16_t value = bparse::extract< uint16_t >( iss, "uint16_t", false );
-              *reinterpret_cast< uint16_t* >( pSheet->ptr() + member_entry.offset ) = value;
-            }
-            break;
+          {
+            uint16_t value = bparse::extract< uint16_t >( iss, "uint16_t", false );
+            *reinterpret_cast< uint16_t* >( pSheet->ptr() + member_entry.offset ) = value;
+          }
+          break;
 
           case DataType::int32:
-            {
-              int32_t value = bparse::extract< int32_t >( iss, "int32_t", false );
-              *reinterpret_cast< int32_t* >( pSheet->ptr() + member_entry.offset ) = value;
-            }
-            break;
+          {
+            int32_t value = bparse::extract< int32_t >( iss, "int32_t", false );
+            *reinterpret_cast< int32_t* >( pSheet->ptr() + member_entry.offset ) = value;
+          }
+          break;
 
           case DataType::uint32:
-            {
-              uint32_t value = bparse::extract< uint32_t >( iss, "uint32_t", false );
-              *reinterpret_cast< uint32_t* >( pSheet->ptr() + member_entry.offset ) = value;
-            }
-            break;
+          {
+            uint32_t value = bparse::extract< uint32_t >( iss, "uint32_t", false );
+            *reinterpret_cast< uint32_t* >( pSheet->ptr() + member_entry.offset ) = value;
+          }
+          break;
 
           case DataType::float32:
-            {
-              float value = bparse::extract< float >( iss, "float", false );
-              *reinterpret_cast< float* >( pSheet->ptr() + member_entry.offset ) = value;
-            }
-            break;
+          {
+            float value = bparse::extract< float >( iss, "float", false );
+            *reinterpret_cast< float* >( pSheet->ptr() + member_entry.offset ) = value;
+          }
+          break;
 
           case DataType::uint64:
-            {
-              uint64_t value = bparse::extract< uint64_t >( iss, "uint64_t", false );
-              *reinterpret_cast< uint64_t* >( pSheet->ptr() + member_entry.offset ) = value;
-            }
-            break;
+          {
+            uint64_t value = bparse::extract< uint64_t >( iss, "uint64_t", false );
+            *reinterpret_cast< uint64_t* >( pSheet->ptr() + member_entry.offset ) = value;
+          }
+          break;
 
           default:
             auto type = static_cast< uint16_t >( member_entry.type );
@@ -221,7 +218,6 @@ namespace xiv::exd
       }
 
       return pSheet;
-
     }
 
     // Get a row by its id and sub-row
@@ -237,7 +233,7 @@ namespace xiv::exd
       std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > > sheets;
 
       // Iterates over all the files
-      const uint32_t member_count =  static_cast< uint32_t >( _exh->get_members().size() );
+      const uint32_t member_count = static_cast< uint32_t >( _exh->get_members().size() );
       for( auto& file_ptr : _files )
       {
         // Get a stream
@@ -270,7 +266,7 @@ namespace xiv::exd
           fields.reserve( member_count );
           iss.seekg( cacheEntryIt->second.offset + 6 );
 
-          iss.read( reinterpret_cast<char*>( &pSheet.get()->_data ), sizeof( T ) );
+          iss.read( reinterpret_cast< char* >( &pSheet.get()->_data ), sizeof( T ) );
 
           int stringCount = 0;
           for( auto& member_entry : _exh->get_exh_members() )
@@ -292,7 +288,7 @@ namespace xiv::exd
                   std::string value = xiv::utils::bparse::extract_cstring( iss, "string" );
                   auto it = pSheet->_strings.insert( pSheet->_strings.end(), value );
                   *reinterpret_cast< uint32_t* >( pSheet->ptr() + member_entry.offset ) =
-                    static_cast< uint32_t >( std::distance( pSheet->_strings.begin(), it ) );
+                          static_cast< uint32_t >( std::distance( pSheet->_strings.begin(), it ) );
                 }
                 break;
 
@@ -310,46 +306,46 @@ namespace xiv::exd
 
 
               case DataType::int16:
-                {
-                  int16_t value = xiv::utils::bparse::extract< int16_t >( iss, "int16_t", false );
-                  *reinterpret_cast< int16_t* >( pSheet->ptr() + member_entry.offset ) = value;
-                }
-                break;
+              {
+                int16_t value = xiv::utils::bparse::extract< int16_t >( iss, "int16_t", false );
+                *reinterpret_cast< int16_t* >( pSheet->ptr() + member_entry.offset ) = value;
+              }
+              break;
 
               case DataType::uint16:
-                {
-                  uint16_t value = xiv::utils::bparse::extract< uint16_t >( iss, "uint16_t", false );
-                  *reinterpret_cast< uint16_t* >( pSheet->ptr() + member_entry.offset ) = value;
-                }
-                break;
+              {
+                uint16_t value = xiv::utils::bparse::extract< uint16_t >( iss, "uint16_t", false );
+                *reinterpret_cast< uint16_t* >( pSheet->ptr() + member_entry.offset ) = value;
+              }
+              break;
 
               case DataType::int32:
-                {
-                  int32_t value = xiv::utils::bparse::extract< int32_t >( iss, "int32_t", false );
-                  *reinterpret_cast< int32_t* >( pSheet->ptr() + member_entry.offset ) = value;
-                }
-                break;
+              {
+                int32_t value = xiv::utils::bparse::extract< int32_t >( iss, "int32_t", false );
+                *reinterpret_cast< int32_t* >( pSheet->ptr() + member_entry.offset ) = value;
+              }
+              break;
 
               case DataType::uint32:
-                {
-                  uint32_t value = xiv::utils::bparse::extract< uint32_t >( iss, "uint32_t", false );
-                  *reinterpret_cast< uint32_t* >( pSheet->ptr() + member_entry.offset ) = value;
-                }
-                break;
+              {
+                uint32_t value = xiv::utils::bparse::extract< uint32_t >( iss, "uint32_t", false );
+                *reinterpret_cast< uint32_t* >( pSheet->ptr() + member_entry.offset ) = value;
+              }
+              break;
 
               case DataType::float32:
-                {
-                  float value = xiv::utils::bparse::extract< float >( iss, "float", false );
-                  *reinterpret_cast< float* >( pSheet->ptr() + member_entry.offset ) = value;
-                }
-                break;
+              {
+                float value = xiv::utils::bparse::extract< float >( iss, "float", false );
+                *reinterpret_cast< float* >( pSheet->ptr() + member_entry.offset ) = value;
+              }
+              break;
 
               case DataType::uint64:
-                {
-                  uint64_t value = xiv::utils::bparse::extract< uint64_t >( iss, "uint64_t", false );
-                  *reinterpret_cast< uint64_t* >( pSheet->ptr() + member_entry.offset ) = value;
-                }
-                break;
+              {
+                uint64_t value = xiv::utils::bparse::extract< uint64_t >( iss, "uint64_t", false );
+                *reinterpret_cast< uint64_t* >( pSheet->ptr() + member_entry.offset ) = value;
+              }
+              break;
 
               default:
                 auto type = static_cast< uint16_t >( member_entry.type );
@@ -379,5 +375,4 @@ namespace xiv::exd
     std::map< uint32_t, ExdCacheEntry > _idCache;
   };
 
-}
-
+}// namespace xiv::exd

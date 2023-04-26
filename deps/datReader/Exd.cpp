@@ -9,11 +9,10 @@ using xiv::utils::bparse::extract;
 
 namespace xiv::exd
 {
-  Exd::Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File>>& i_files )
+  Exd::Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File > >& i_files )
   {
     _exh = i_exh;
     _files = i_files;
-
 
     // Iterates over all the files
     const uint32_t member_count = static_cast< uint32_t >( _exh->get_members().size() );
@@ -29,8 +28,6 @@ namespace xiv::exd
 
       // Preallocate and extract the record_indices
       const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndexData );
-      std::vector< ExdRecordIndexData > record_indices;
-      record_indices.reserve( record_count );
       for( uint32_t i = 0; i < record_count; ++i )
       {
         auto recordIndex = extract< ExdRecordIndexData >( iss );
@@ -39,25 +36,22 @@ namespace xiv::exd
     }
   }
 
-  Exd::~Exd()
+const std::vector< Field > Exd::get_row( uint32_t id, uint32_t subRow )
   {
-  }
-
-  const std::vector< Field > Exd::get_row( uint32_t id, uint32_t subRow )
-  {
-
+    // Check if id is in the cache
     auto cacheEntryIt = _idCache.find( id );
     if( cacheEntryIt == _idCache.end() )
       throw std::runtime_error( "Id not found: " + std::to_string( id ) );
 
-    // Iterates over all the files
+    // Retrieve the corresponding file
     const uint32_t member_count = static_cast< uint32_t >( _exh->get_members().size() );
     auto& file_ptr = cacheEntryIt->second.file;
 
+    // Create a string from the data section and use it to initialize an input string stream
     std::vector< char > dataCpy = file_ptr->get_data_sections().front();
     std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
 
-    // Get the vector fields for the given record and preallocate it
+    // Retrieve the vector fields for the given record and preallocate it
     auto fields = _data[ id ];
     fields.reserve( member_count );
     iss.seekg( cacheEntryIt->second.offset + 6 );
@@ -69,10 +63,10 @@ namespace xiv::exd
 
     int offset = cacheEntryIt->second.offset + 6 + ( subRow * _exh->get_header().data_offset + 2 * ( subRow + 1 ) );
 
+    // Iterate over the member entries and extract the corresponding data
     for( auto& member_entry : _exh->get_exh_members() )
     {
-      // Seek to the position of the member to extract.
-      // 6 is because we have uint32_t/uint16_t at the start of each record
+      // Seek to the position of the member to extract
       iss.seekg( offset + member_entry.offset );
 
       // Switch depending on the type to extract

@@ -7,30 +7,23 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/sinks/daily_file_sink.h>
 
-// #include <iostream>
-#if _MSC_VER >= 1925
 #include <filesystem>
 namespace fs = std::filesystem;
-#else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
-
 
 void Sapphire::Logger::init( const std::string& logPath )
 {
-  auto pos = logPath.find_last_of( fs::path::preferred_separator );
+  fs::path log_file_path(logPath);
+  fs::path log_directory = log_file_path.parent_path();
 
-  if( pos != std::string::npos )
+  if( !log_directory.empty() )
   {
-    std::string realPath = logPath.substr( 0, pos );
-    fs::create_directories( realPath );
+    fs::create_directories(log_directory);
   }
 
   spdlog::init_thread_pool( 8192, 1 );
 
   auto stdout_sink = std::make_shared< spdlog::sinks::stdout_color_sink_mt >();
-  auto daily_sink = std::make_shared< spdlog::sinks::daily_file_sink_mt >( logPath + ".log", 0, 0 );
+  auto daily_sink = std::make_shared< spdlog::sinks::daily_file_sink_mt >( log_file_path.string() + ".log", 0, 0 );
 
   std::vector< spdlog::sink_ptr > sinks { stdout_sink, daily_sink };
 

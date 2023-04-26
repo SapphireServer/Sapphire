@@ -1,66 +1,57 @@
 #pragma once
 
 #include <memory>
-#include <thread>
 #include <mutex>
 #include <queue>
-#include <algorithm>
 #include <utility>
 
 namespace Sapphire::Common::Util
 {
-
+  // The LockedQueue class template is a thread-safe wrapper around std::queue.
+  // It ensures that only one thread can access the underlying queue at a time
+  // by using a std::mutex for synchronization.
   template< class T >
   class LockedQueue
   {
   public:
-    LockedQueue();
+    LockedQueue() = default;
+    ~LockedQueue() = default;
 
-    ~LockedQueue();
+    // Returns the size of the queue in a thread-safe manner.
+    // Locks the mutex before accessing the queue and unlocks it after
+    // the operation is complete.
+    std::size_t size() const;
 
+    // Removes the front element from the queue and returns it
+    // in a thread-safe manner. If the queue is empty, it returns
+    // a default-constructed object of type T.
+    // Locks the mutex before accessing the queue and unlocks it after
+    // the operation is complete.
     T pop();
 
-    //we can pass this in by reference, instead of copying
-    void push( const T object );
+    // Adds an object to the end of the queue, using a const reference.
+    // The object is copied into the queue in a thread-safe manner.
+    // Locks the mutex before accessing the queue and unlocks it after
+    // the operation is complete.
+    void push( const T& object );
 
-    //we can pass this in by reference
-    //this will push it onto the queue, and swap the object
-    // with a default-constructed T at the same time.
-    void push_swap( T& object );
-
-    void push_reset( T& object );
-
-
-    std::size_t size();
-
+    // Adds an object to the end of the queue, using an rvalue reference.
+    // The object is moved into the queue in a thread-safe manner.
+    // Locks the mutex before accessing the queue and unlocks it after
+    // the operation is complete.
+    void push( T&& object );
 
   protected:
     std::queue< T > m_queue;
-    std::mutex m_mutex;
-
+    mutable std::mutex m_mutex;// Make mutex mutable to be used in const member functions
   };
 
   template< class T >
-  LockedQueue< T >::LockedQueue()
-  {
-
-  }
-
-  template< class T >
-  std::size_t LockedQueue< T >::size()
+  std::size_t LockedQueue< T >::size() const
   {
     std::lock_guard< std::mutex > lock( m_mutex );
     return m_queue.size();
   }
-
-
-  template< class T >
-  LockedQueue< T >::~LockedQueue()
-  {
-
-
-  }
-
 
   template< class T >
   T LockedQueue< T >::pop()
@@ -72,58 +63,24 @@ namespace Sapphire::Common::Util
       return T();
     }
 
-    T result = m_queue.front();
-
+    T result = std::move( m_queue.front() );
     m_queue.pop();
 
     return result;
   }
 
   template< class T >
-  void LockedQueue< T >::push( const T object )
+  void LockedQueue< T >::push( const T& object )
   {
     std::lock_guard< std::mutex > lock( m_mutex );
     m_queue.push( object );
   }
 
   template< class T >
-  void LockedQueue< T >::push_swap( T& object )
+  void LockedQueue< T >::push( T&& object )
   {
     std::lock_guard< std::mutex > lock( m_mutex );
-
-    m_queue.push( object );
-
-    T default_ctored_object = T();
-    //this is a special swap that will do a legit naive swap normally,
-    // except if there exists a function called T::swap(), which is
-    // specialized and possibly faster.
-    std::swap( object, default_ctored_object );
-
-
-
-    //default_ctored_object is now the value of object, and it will go out
-    // of scope here. In the case that T is a shared_ptr of some kind,
-    // this will allow that the object on the queue is the *last* shared_ptr
-    // in existance by the time this function returns.
-
+    m_queue.emplace( std::forward< T >( object ) );
   }
 
-  template< class T >
-  void LockedQueue< T >::push_reset( T& object )
-  {
-    std::lock_guard< std::mutex > lock( m_mutex );
-
-    m_queue.push( object );
-
-    T default_ctored_object = T();
-
-    object.reset();
-
-    //default_ctored_object is now the value of object, and it will go out
-    // of scope here. In the case that T is a shared_ptr of some kind,
-    // this will allow that the object on the queue is the *last* shared_ptr
-    // in existance by the time this function returns.
-
-  }
-
-}
+}// namespace Sapphire::Common::Util

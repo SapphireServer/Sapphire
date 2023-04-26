@@ -180,14 +180,28 @@ void WorldServer::run( int32_t argc, char* argv[] )
     auto verString = readFileToString( verPath );
     if( verString != m_config.global.general.dataVersion )
     {
-      Logger::fatal( "Sqpack version {} does not match expected version {}!", verString, m_config.global.general.dataVersion );
-      return;
+      Logger::warn( "Sqpack version {} does not match expected version {}!", verString, m_config.global.general.dataVersion );
+
+      std::string response;
+      do
+      {
+        Logger::warn( "Continuing with mismatched versions may cause unexpected behavior, and you will not receive support. Continue at your own risk." );
+        Logger::warn( "Do you wish to continue? (yes/no): " );
+        std::cin >> response;
+        std::transform( response.begin(), response.end(), response.begin(), ::tolower );
+      } while( response != "yes" && response != "no" );
+
+      if( response == "no" )
+      {
+        return;
+      }
     }
   }
-  catch ( const std::exception& e )
+  catch( const std::exception& e )
   {
-    Logger::fatal( e.what() );
-    return;
+    Logger::warn( "Failed to retrieve the server's SqPack version. Supported server version is: {}", m_config.global.general.dataVersion );
+    Logger::warn( "Ensure the server data version is configured correctly before seeking help or creating an issue." );
+    Logger::warn( "Reason: {}", e.what() );
   }
 
   if( !pExdData->init( dataPath ) )

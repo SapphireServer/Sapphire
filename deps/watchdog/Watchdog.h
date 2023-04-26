@@ -32,14 +32,10 @@
 
 #include <functional>
 
- // fucking filesystem
-#if _MSC_VER >= 1925
+
 #include <filesystem>
 namespace ci { namespace fs = std::filesystem; }
-#else
-#include <experimental/filesystem>
-namespace ci { namespace fs = std::experimental::filesystem; }
-#endif
+
 
 //! Exception for when Watchdog can't locate a file or parse the wildcard
 class WatchedFileSystemExc : public std::exception {

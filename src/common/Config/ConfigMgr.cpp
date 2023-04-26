@@ -2,13 +2,8 @@
 #include <iostream>
 #include <fstream>
 
-#if _MSC_VER >= 1925
 #include <filesystem>
 namespace fs = std::filesystem;
-#else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
 
 using namespace Sapphire;
 using namespace Sapphire::Common;

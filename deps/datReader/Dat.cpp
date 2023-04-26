@@ -276,37 +276,61 @@ namespace xiv::dat
 
         default:
           throw std::runtime_error(
-            "Invalid entry_type: " + std::to_string( static_cast<uint32_t>(file_header.entry_type) ) );
+            "Invalid entry_type: " + std::to_string( static_cast< uint32_t >( file_header.entry_type ) ) );
       }
     }
 
     return outputFile;
   }
 
-  void Dat::extractBlock( uint32_t i_offset, std::vector< char >& o_data )
+void Dat::extractBlock( uint32_t i_offset, std::vector< char >& o_data )
   {
     m_handle.seekg( i_offset );
 
+    if( !m_handle.good() )
+    {
+      throw std::runtime_error( "Failed to set stream position." );
+    }
+
     auto block_header = extract< DatBlockHeader >( m_handle );
 
-    // Resizing the vector to write directly into it
+    if( !m_handle.good() )
+    {
+      throw std::runtime_error( "Failed to read block header." );
+    }
+
+    // Reserving space in the output vector to avoid reallocations
     const auto data_size = o_data.size();
-    o_data.resize( data_size + block_header.uncompressed_size );
+    o_data.reserve( data_size + block_header.uncompressed_size );
 
     // 32000 in compressed_size means it is not compressed so take uncompressed_size
     if( block_header.compressed_size == 32000 )
     {
       m_handle.read( o_data.data() + data_size, block_header.uncompressed_size );
+
+      if( !m_handle.good() )
+      {
+        throw std::runtime_error( "Failed to read uncompressed data." );
+      }
+
+      o_data.resize( data_size + block_header.uncompressed_size );
     }
     else
     {
       // If it is compressed use zlib
       // Read the data to be decompressed
-      std::vector< char > temp_buffer( block_header.compressed_size );
-      m_handle.read( temp_buffer.data(), block_header.compressed_size );
+      auto temp_buffer = std::make_unique< char[] >( block_header.compressed_size );
+      m_handle.read( temp_buffer.get(), block_header.compressed_size );
 
-      utils::zlib::no_header_decompress( reinterpret_cast< uint8_t* >( temp_buffer.data() ),
-                                         temp_buffer.size(),
+      if( !m_handle.good() )
+      {
+        throw std::runtime_error( "Failed to read compressed data." );
+      }
+
+      o_data.resize( data_size + block_header.uncompressed_size );
+
+      utils::zlib::no_header_decompress( reinterpret_cast< uint8_t* >( temp_buffer.get() ),
+                                         block_header.compressed_size,
                                          reinterpret_cast< uint8_t* >( o_data.data() + data_size ),
                                          static_cast< size_t >( block_header.uncompressed_size ) );
     }

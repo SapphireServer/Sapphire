@@ -61,5 +61,5 @@ namespace xiv
          std::map<Language, std::unique_ptr<Exd>> _data;
       };
 
-   }
-}
+   }// namespace exd
+}// namespace xiv

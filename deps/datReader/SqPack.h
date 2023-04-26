@@ -1,5 +1,4 @@
-#ifndef XIV_DAT_SQPACK_H
-#define XIV_DAT_SQPACK_H
+#pragma once
 
 #include <fstream>
 
@@ -15,7 +14,7 @@ namespace xiv::dat
     uint8_t hash[0x14];
     uint32_t padding[0xB];
   };
-}
+}// namespace xiv::dat
 
 namespace xiv::utils::bparse
 {
@@ -31,7 +30,7 @@ namespace xiv::utils::bparse
       xiv::utils::bparse::reorder( i_struct.padding[ i ] );
     }
   }
-};
+};// namespace xiv::utils::bparse
 
 namespace xiv::dat
 {
@@ -53,6 +52,4 @@ namespace xiv::dat
     std::ifstream m_handle;
   };
 
-}
-
-#endif // XIV_DAT_SQPACK_H
+}// namespace xiv::dat

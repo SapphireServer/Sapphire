@@ -9,12 +9,12 @@ using xiv::utils::bparse::extract;
 
 namespace xiv::exd
 {
-
   Exh::Exh( const dat::File& i_file )
   {
     // Get a stream from the file
     std::vector< char > dataCpy = i_file.get_data_sections().front();
-    std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
+    std::string dataStr( dataCpy.begin(), dataCpy.end() );
+    std::istringstream iss( std::move( dataStr ) );
 
     // Extract header and skip to member definitions
     _header = extract< ExhHeader >( iss );
@@ -41,10 +41,6 @@ namespace xiv::exd
     {
       _languages.emplace_back( Language( extract< uint16_t >( iss, "language" ) ) );
     }
-  }
-
-  Exh::~Exh()
-  {
   }
 
   const ExhHeader& Exh::get_header() const

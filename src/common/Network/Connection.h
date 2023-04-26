@@ -148,9 +148,9 @@ namespace Sapphire::Network
       acceptor->accept( connection );
       return connection;
     }
-    catch( std::runtime_error e )
+    catch( ... )
     {
-      throw;
+      throw std::runtime_error( "Failed to add server to hive" );
     }
   }
 

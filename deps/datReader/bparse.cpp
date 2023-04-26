@@ -2,7 +2,12 @@
 
 std::string xiv::utils::bparse::extract_cstring( std::istream& i_stream, const std::string& i_name )
 {
-   std::string temp_str;
-   std::getline( i_stream, temp_str, '\0' );
-   return temp_str;
+  // Using a stringstream and reading character by character avoids this issue and ensures all input is processed correctly.
+  std::stringstream ss;
+  char c;
+  while( i_stream.get( c ) && c != '\0' )
+  {
+    ss << c;
+  }
+  return ss.str();
 }

@@ -86,24 +86,29 @@ struct matrix4
     return ret;
   }
 
+  // Multiplies two 4x4 matrices and returns the result
   matrix4 operator*( const matrix4& rhs ) const
   {
     matrix4 ret;
-    for( unsigned int i = 0; i < 4; i++ )
+
+    // Iterate through each row of the resulting matrix
+    for( unsigned int row = 0; row < 4; row++ )
     {
-      ret( i, 0 ) =
-        ( *this )( i, 0 ) * rhs( 0, 0 ) + ( *this )( i, 1 ) * rhs( 1, 0 ) + ( *this )( i, 2 ) * rhs( 2, 0 ) +
-        ( *this )( i, 3 ) * rhs( 3, 0 );
-      ret( i, 1 ) =
-        ( *this )( i, 0 ) * rhs( 0, 1 ) + ( *this )( i, 1 ) * rhs( 1, 1 ) + ( *this )( i, 2 ) * rhs( 2, 1 ) +
-        ( *this )( i, 3 ) * rhs( 3, 1 );
-      ret( i, 2 ) =
-        ( *this )( i, 0 ) * rhs( 0, 2 ) + ( *this )( i, 1 ) * rhs( 1, 2 ) + ( *this )( i, 2 ) * rhs( 2, 2 ) +
-        ( *this )( i, 3 ) * rhs( 3, 2 );
-      ret( i, 3 ) =
-        ( *this )( i, 0 ) * rhs( 0, 3 ) + ( *this )( i, 1 ) * rhs( 1, 3 ) + ( *this )( i, 2 ) * rhs( 2, 3 ) +
-        ( *this )( i, 3 ) * rhs( 3, 3 );
+      // Iterate through each column of the resulting matrix
+      for( unsigned int col = 0; col < 4; col++ )
+      {
+        // Calculate the value for the current cell by summing the product of the corresponding row and column elements
+        float value = 0;
+        for( unsigned int k = 0; k < 4; k++ )
+        {
+          value += ( *this )( row, k ) * rhs( k, col );
+        }
+
+        // Assign the calculated value to the corresponding cell of the resulting matrix
+        ret( row, col ) = value;
+      }
     }
+
     return ret;
   }
 };

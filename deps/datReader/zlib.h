@@ -1,5 +1,4 @@
-#ifndef XIV_UTILS_ZLIB_H
-#define XIV_UTILS_ZLIB_H
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -12,6 +11,4 @@ namespace xiv::utils::zlib
 
   void no_header_decompress( const uint8_t* in, size_t in_size, uint8_t* out, size_t out_size );
 
-}
-
-#endif // XIV_UTILS_ZLIB_H
+} // namespace xiv::utils::zlib

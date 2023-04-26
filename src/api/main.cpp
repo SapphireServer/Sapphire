@@ -31,15 +31,8 @@
 #include <Util/CrashHandler.h>
 
 
-// fucking filesystem
-#if _MSC_VER >= 1925
 #include <filesystem>
 namespace fs = std::filesystem;
-#else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
-
 
 Sapphire::Common::Util::CrashHandler crashHandler;
 

@@ -89,5 +89,4 @@ namespace xiv::dat
     std::unordered_map< uint32_t, std::unique_ptr< std::mutex>> m_catCreationMutexes;
   };
 
-}
-
+}// namespace xiv::dat

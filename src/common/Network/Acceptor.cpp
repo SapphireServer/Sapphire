@@ -1,15 +1,13 @@
-#include "Hive.h"
 #include "Acceptor.h"
 #include "Connection.h"
-
+#include "Hive.h"
 
 using namespace Sapphire;
 
-Network::Acceptor::Acceptor( HivePtr hive ) :
-  m_hive( hive ),
-  m_acceptor( hive->getService() ),
-  m_io_strand( hive->getService() ),
-  m_error_state( 0 )
+Network::Acceptor::Acceptor( HivePtr hive ) : m_hive( hive ),
+                                              m_acceptor( hive->getService() ),
+                                              m_io_strand( hive->getService() ),
+                                              m_error_state( 0 )
 {
 }
 
@@ -77,7 +75,10 @@ void Network::Acceptor::handleAccept( const asio::error_code& error, ConnectionP
 
 void Network::Acceptor::stop()
 {
-
+  // Cancel all operations and close the acceptor
+  asio::error_code ec;
+  m_acceptor.cancel( ec );
+  m_acceptor.close( ec );
 }
 
 void Network::Acceptor::accept( ConnectionPtr connection )
@@ -97,13 +98,15 @@ void Network::Acceptor::listen( const std::string& host, const uint16_t& port )
     m_acceptor.set_option( asio::ip::tcp::acceptor::reuse_address( false ) );
     m_acceptor.bind( endpoint );
     m_acceptor.listen( asio::socket_base::max_connections );
-  }
-  catch( ... )
+  } catch( const asio::system_error& ex )
   {
-    // this should not happen
-    assert( true );
+    // Call the onError function to handle the error
+    onError( ex.code() );
+  } catch( ... )
+  {
+    // Call the onError function with a generic error code
+    onError( asio::error::operation_aborted );
   }
-
 }
 
 Network::HivePtr Network::Acceptor::getHive()
@@ -114,6 +117,11 @@ Network::HivePtr Network::Acceptor::getHive()
 asio::ip::tcp::acceptor& Network::Acceptor::getAcceptor()
 {
   return m_acceptor;
+}
+
+asio::strand& Network::Acceptor::getStrand()
+{
+  return m_io_strand;
 }
 
 bool Network::Acceptor::hasError()

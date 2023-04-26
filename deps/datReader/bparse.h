@@ -7,14 +7,62 @@
 namespace xiv::utils::bparse
 {
 
-  // Internal macro for byteswapping
-  template< int N >
-  void byteswap_impl( char (& bytes)[N] )
+  // Helper struct for compile-time unrolling of byteswap
+  template< int N, bool Unroll >
+  struct byteswap_impl_helper
   {
-    for( auto p = std::begin( bytes ), end = std::end( bytes ) - 1; p < end; ++p, --end )
+    static void swap( char ( &bytes )[ N ], int start )
     {
-      std::swap( *p, *end );
+      // Intentionally left empty. This specialization should never be used.
     }
+  };
+
+  // Specialization of byteswap_impl_helper for compile-time unrolling (true)
+  template< int N >
+  struct byteswap_impl_helper< N, true >
+  {
+    static void swap( char ( &bytes )[ N ], int start )
+    {
+      // Swap pairs of bytes recursively, unrolling the loop at compile-time
+      if constexpr( N >= 2 )
+      {
+        std::swap( bytes[ start ], bytes[ N - start - 1 ] );
+        if constexpr( N >= 4 )
+        {
+          std::swap( bytes[ start + 1 ], bytes[ N - start - 2 ] );
+          if constexpr( N >= 6 )
+          {
+            std::swap( bytes[ start + 2 ], bytes[ N - start - 3 ] );
+            if constexpr( N >= 8 )
+            {
+              std::swap( bytes[ start + 3 ], bytes[ N - start - 4 ] );
+            }
+          }
+        }
+      }
+    }
+  };
+
+  template< int N >
+  struct byteswap_impl_helper< N, false >
+  {
+    static void swap( char ( &bytes )[ N ], int start )
+    {
+      // Swap pairs of bytes using a loop
+      for( auto p = std::begin( bytes ), end = std::end( bytes ) - 1; p < end;
+           ++p, --end )
+      {
+        std::swap( *p, *end );
+      }
+    }
+  };
+
+  template< int N >
+  void byteswap_impl( char ( &bytes )[ N ] )
+  {
+    // Decide whether to use compile-time unrolling or loop-based swapping
+    constexpr bool Unroll = N <= 8;
+    byteswap_impl_helper< N, Unroll >::swap( bytes, 0 );
   }
 
   // byteswapping any type (no pointers to array)
@@ -91,7 +139,6 @@ namespace xiv::utils::bparse
     }
   }
 
-  // For cstrings
   std::string extract_cstring( std::istream& i_stream, const std::string& i_name );
 
 }

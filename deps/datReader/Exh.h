@@ -44,46 +44,47 @@ namespace xiv::exd
     uint32_t start_id;
     uint32_t count_id;
   };
-};
+};// namespace xiv::exd
 
-namespace xiv::utils::bparse {
-template<>
-inline void reorder< xiv::exd::ExhHeader >( xiv::exd::ExhHeader& i_struct )
+namespace xiv::utils::bparse
 {
-  for( int32_t i = 0; i < 0x4; ++i )
+  template<>
+  inline void reorder< xiv::exd::ExhHeader >( xiv::exd::ExhHeader& i_struct )
   {
-    xiv::utils::bparse::reorder( i_struct.magic[ i ] );
+    for( int32_t i = 0; i < 0x4; ++i )
+    {
+      xiv::utils::bparse::reorder( i_struct.magic[ i ] );
+    }
+    i_struct.unknown = xiv::utils::bparse::byteswap( i_struct.unknown );
+    xiv::utils::bparse::reorder( i_struct.unknown );
+    i_struct.data_offset = xiv::utils::bparse::byteswap( i_struct.data_offset );
+    xiv::utils::bparse::reorder( i_struct.data_offset );
+    i_struct.field_count = xiv::utils::bparse::byteswap( i_struct.field_count );
+    xiv::utils::bparse::reorder( i_struct.field_count );
+    i_struct.exd_count = xiv::utils::bparse::byteswap( i_struct.exd_count );
+    xiv::utils::bparse::reorder( i_struct.exd_count );
+    i_struct.language_count = xiv::utils::bparse::byteswap( i_struct.language_count );
+    xiv::utils::bparse::reorder( i_struct.language_count );
   }
-  i_struct.unknown = xiv::utils::bparse::byteswap( i_struct.unknown );
-  xiv::utils::bparse::reorder( i_struct.unknown );
-  i_struct.data_offset = xiv::utils::bparse::byteswap( i_struct.data_offset );
-  xiv::utils::bparse::reorder( i_struct.data_offset );
-  i_struct.field_count = xiv::utils::bparse::byteswap( i_struct.field_count );
-  xiv::utils::bparse::reorder( i_struct.field_count );
-  i_struct.exd_count = xiv::utils::bparse::byteswap( i_struct.exd_count );
-  xiv::utils::bparse::reorder( i_struct.exd_count );
-  i_struct.language_count = xiv::utils::bparse::byteswap( i_struct.language_count );
-  xiv::utils::bparse::reorder( i_struct.language_count );
-}
 
-template<>
-inline void reorder< xiv::exd::ExhMember >( xiv::exd::ExhMember& i_struct )
-{
-  i_struct.type = xiv::utils::bparse::byteswap( i_struct.type );
-  xiv::utils::bparse::reorder( i_struct.type );
-  i_struct.offset = xiv::utils::bparse::byteswap( i_struct.offset );
-  xiv::utils::bparse::reorder( i_struct.offset );
-}
+  template<>
+  inline void reorder< xiv::exd::ExhMember >( xiv::exd::ExhMember& i_struct )
+  {
+    i_struct.type = xiv::utils::bparse::byteswap( i_struct.type );
+    xiv::utils::bparse::reorder( i_struct.type );
+    i_struct.offset = xiv::utils::bparse::byteswap( i_struct.offset );
+    xiv::utils::bparse::reorder( i_struct.offset );
+  }
 
-template<>
-inline void reorder< xiv::exd::ExhExdDef >( xiv::exd::ExhExdDef& i_struct )
-{
-  i_struct.start_id = xiv::utils::bparse::byteswap( i_struct.start_id );
-  xiv::utils::bparse::reorder( i_struct.start_id );
-  i_struct.count_id = xiv::utils::bparse::byteswap( i_struct.count_id );
-  xiv::utils::bparse::reorder( i_struct.count_id );
-}
-};
+  template<>
+  inline void reorder< xiv::exd::ExhExdDef >( xiv::exd::ExhExdDef& i_struct )
+  {
+    i_struct.start_id = xiv::utils::bparse::byteswap( i_struct.start_id );
+    xiv::utils::bparse::reorder( i_struct.start_id );
+    i_struct.count_id = xiv::utils::bparse::byteswap( i_struct.count_id );
+    xiv::utils::bparse::reorder( i_struct.count_id );
+  }
+};// namespace xiv::utils::bparse
 
 namespace xiv
 {
@@ -105,16 +106,21 @@ namespace xiv
       // The header file
       Exh( const dat::File& i_file );
 
-      ~Exh();
+      ~Exh() = default;
 
+      // Returns a const reference to the ExhHeader object
       const ExhHeader& get_header() const;
 
+      // Returns a const reference to a vector of ExhExdDef objects
       const std::vector< ExhExdDef >& get_exd_defs() const;
 
+      // Returns a const reference to a vector of Language enums
       const std::vector< Language >& get_languages() const;
 
+      // Returns a const reference to a map of ExhMember objects, indexed by their offset
       const std::map< uint32_t, ExhMember >& get_members() const;
 
+      // Returns a const reference to a vector of ExhMember objects
       const std::vector< ExhMember >& get_exh_members() const;
 
     protected:
@@ -126,6 +132,5 @@ namespace xiv
       std::vector< Language > _languages;
     };
 
-  }
-}
-
+  }// namespace exd
+}// namespace xiv::exd

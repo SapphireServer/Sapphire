@@ -38,16 +38,16 @@ namespace xiv::dat
     // Retrieve a file from the category given its hashes
     std::unique_ptr< File > getFile( uint32_t dir_hash, uint32_t filename_hash ) const;
 
-
+    // Returns whether a file exists in the Cat based on the given directory and filename hashes
     bool doesFileExist( uint32_t dir_hash, uint32_t filename_hash ) const;
 
+    // Returns whether a directory exists in the Cat based on the given directory hash
     bool doesDirExist( uint32_t dir_hash ) const;
 
-
-    // Returns thename of the category
+    // Returns the name of the Cat object
     const std::string& getName() const;
 
-    // Returns the number of the category
+    // Returns the category number of the Cat object
     uint32_t getCatNum() const;
 
   protected:

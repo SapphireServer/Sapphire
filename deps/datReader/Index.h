@@ -1,5 +1,4 @@
-#ifndef XIV_DAT_INDEX_H
-#define XIV_DAT_INDEX_H
+#pragma once
 
 #include "SqPack.h"
 
@@ -58,6 +57,4 @@ namespace xiv::dat
     HashTable m_hashTable;
   };
     
-}
-
-#endif // XIV_DAT_INDEX_H
+}// namespace xiv::dat

@@ -1,5 +1,5 @@
 #include "conv.h"
-#include <cstring>// for memcpy
+#include <cstring>
 
 namespace xiv::utils::conv
 {
@@ -23,7 +23,7 @@ namespace xiv::utils::conv
     t1 |= t2;                 // Re-insert sign bit
 
     float result;
-    memcpy( &result, &t1, sizeof( float ) );// Convert uint32_t to float using memcpy
+    memcpy( &result, &t1, sizeof( float ) );
     return result;
   }
 

@@ -1,5 +1,4 @@
-#ifndef _SGB_H
-#define _SGB_H
+#pragma once
 
 #include <cstring>
 #include <memory>
@@ -132,24 +131,24 @@ struct SGB_MODEL_ENTRY : public SGB_GROUP_ENTRY
 {
   SGB_MODEL_HEADER header;
   SgbGroupEntryType type;
-  std::string name;
-  std::string modelFileName;
-  std::string collisionFileName;
+  std::string_view name;
+  std::string_view modelFileName;
+  std::string_view collisionFileName;
 
   SGB_MODEL_ENTRY( char* buf, size_t offset, SgbGroupEntryType type )
   {
     this->type = type;
     header = *reinterpret_cast< SGB_MODEL_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
-    modelFileName = std::string( buf + offset + header.modelFileOffset );
-    collisionFileName = std::string( buf + offset + header.collisionFileOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
+    modelFileName = std::string_view( buf + offset + header.modelFileOffset );
+    collisionFileName = std::string_view( buf + offset + header.collisionFileOffset );
   }
 };
 
 struct SGB_GROUP
 {
   SGB_GROUP_HEADER header;
-  std::string name;
+  std::string_view name;
   SGB_FILE* parent;
   std::vector< std::shared_ptr< SGB_GROUP_ENTRY > > entries;
 
@@ -157,23 +156,32 @@ struct SGB_GROUP
   {
     parent = file;
     header = *reinterpret_cast< SGB_GROUP_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.nameOffset );
+    name = std::string_view( buf + offset + header.nameOffset );
 
     auto entriesOffset = offset + sizeof( header );
+
+    entries.reserve( header.entryCount );
 
     for( auto i = 0; i < header.entryCount; ++i )
     {
       auto entryOffset = entriesOffset + *reinterpret_cast< uint32_t* >( buf + ( entriesOffset + ( i * 4 ) ) );
       if( entryOffset > fileSize )
         throw std::runtime_error( "SGB_GROUP entry offset was larger than SGB file size!" );
+
       auto type = *reinterpret_cast< uint32_t* >( buf + entryOffset );
-      if( type == SgbGroupEntryType::Model || type == SgbGroupEntryType::Gimmick )
+
+      switch( type )
       {
-        entries.push_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset, ( SgbGroupEntryType )type ) );
-      }
-      else
-      {
-        // std::cout << "\t\tUnknown SGB entry! Group: " << name << " type: " << type << " index: " << i << " entryOffset: " << entryOffset << "\n";
+        case SgbGroupEntryType::Model:
+        case SgbGroupEntryType::Gimmick:
+        {
+          entries.emplace_back( std::make_shared< SGB_MODEL_ENTRY >( buf, entryOffset, ( SgbGroupEntryType ) type ) );
+          break;
+        }
+        default:
+        {
+          break;
+        }
       }
     }
   }
@@ -268,27 +276,28 @@ struct SGB_FILE
 
     try
     {
+      entries.reserve( 2 );
+
       auto group = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.sharedOffset );
-      entries.push_back( group );
+      entries.emplace_back( group );
       auto group2 = SGB_GROUP( buf, this, header.fileSize, baseOffset + header.offset1C );
-      entries.push_back( group2 );
+      entries.emplace_back( group2 );
+
       uint32_t stateCount = *reinterpret_cast< uint32_t* >( buf + baseOffset + header.statesOffset + 4 );
       if( stateCount > 0 )
       {
-        stateCount = stateCount;
+        stateEntries.reserve( stateCount );
+
         for( size_t i = 0; i < stateCount; ++i )
         {
           auto state = SGB_STATE_ENTRY( buf + baseOffset + header.statesOffset + 8 + i * sizeof( SGB_STATE_HEADER ) );
-          stateEntries.push_back( state );
-          std::cout << state.name << "\n";
+          stateEntries.emplace_back( state );
         }
       }
     }
     catch( std::exception& e )
     {
-      std::cout << e.what() << "\n";
+      throw std::runtime_error( std::string( "Failed to load SGB file: " ) + e.what() );
     }
   };
 };
-
-#endif // !_SGB_H

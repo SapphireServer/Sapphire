@@ -56,7 +56,8 @@ bool Sapphire::Scripting::ScriptMgr::init()
   std::set< std::string > files;
   auto& server = Common::Service< World::WorldServer >::ref();
 
-  auto status = loadDir( server.getConfig().scripts.path, files, m_nativeScriptMgr->getModuleExtension() );
+  fs::path script_path( server.getConfig().scripts.path );
+  auto status = loadDir( script_path.string(), files, m_nativeScriptMgr->getModuleExtension() );
 
   if( !status )
   {
@@ -67,13 +68,13 @@ bool Sapphire::Scripting::ScriptMgr::init()
   uint32_t scriptsFound = 0;
   uint32_t scriptsLoaded = 0;
 
-  for( auto itr = files.begin(); itr != files.end(); ++itr )
+  for( const auto& file_path_str : files )
   {
-    auto& path = *itr;
+    fs::path file_path( file_path_str );
 
     scriptsFound++;
 
-    if( m_nativeScriptMgr->loadScript( path ) )
+    if( m_nativeScriptMgr->loadScript( file_path.string() ) )
       scriptsLoaded++;
   }
 

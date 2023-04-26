@@ -122,15 +122,14 @@ std::string Util::binaryToHexDump( uint8_t* pBinData, uint16_t size )
 
 uint64_t Util::getTimeMs()
 {
-  std::chrono::milliseconds epoch = std::chrono::duration_cast< std::chrono::milliseconds >
-    ( std::chrono::system_clock::now().time_since_epoch() );
+  const auto epoch = std::chrono::duration_cast< std::chrono::milliseconds >( std::chrono::steady_clock::now().time_since_epoch() );
   return epoch.count();
 }
 
 uint32_t Util::getTimeSeconds()
 {
-  auto currClock = std::chrono::system_clock::now();
-  return static_cast< uint32_t >( std::chrono::time_point_cast< std::chrono::seconds >( currClock ).time_since_epoch().count() );
+  const auto currClock = std::chrono::steady_clock::now();
+  return static_cast< uint32_t >( std::chrono::duration_cast< std::chrono::seconds >( currClock.time_since_epoch() ).count() );
 }
 
 uint64_t Util::getEorzeanTimeStamp()
@@ -140,18 +139,17 @@ uint64_t Util::getEorzeanTimeStamp()
 
 void Util::valueToFlagByteIndexValue( uint32_t inVal, uint8_t& outVal, uint16_t& outIndex )
 {
-  uint32_t id = inVal;
+  const uint32_t id = inVal;
   outIndex = id / 8;
-  uint8_t bitIndex = id % 8;
+  const uint8_t bitIndex = id % 8;
 
   outVal = 1 << bitIndex;
 }
 
-
 std::string Util::fmtUtcTime( const std::string& fmt )
 {
-  auto t = std::time( nullptr );
-  auto tm = std::gmtime( &t );
+  const auto t = std::time( nullptr );
+  const auto tm = std::gmtime( &t );
 
   std::stringstream ss;
 

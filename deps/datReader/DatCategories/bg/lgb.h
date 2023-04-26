@@ -82,7 +82,8 @@ public:
   };
 };
 
-struct LGB_ENPC_ENTRY : public LgbEntry {
+struct LGB_ENPC_ENTRY : public LgbEntry
+{
 public:
   ENpcData data;
   std::string_view name;
@@ -94,7 +95,8 @@ public:
   };
 };
 
-struct LGB_EOBJ_ENTRY : public LgbEntry {
+struct LGB_EOBJ_ENTRY : public LgbEntry
+{
 public:
   EObjData data;
   std::string_view name;
@@ -106,7 +108,8 @@ public:
   };
 };
 
-struct LGB_MAP_RANGE_ENTRY : public LgbEntry {
+struct LGB_MAP_RANGE_ENTRY : public LgbEntry
+{
 public:
   MapRangeData data;
   std::string_view name;
@@ -118,7 +121,8 @@ public:
   };
 };
 
-struct LGB_EXIT_RANGE_ENTRY : public LgbEntry {
+struct LGB_EXIT_RANGE_ENTRY : public LgbEntry
+{
 public:
   ExitRangeData data;
   std::string_view name;
@@ -130,7 +134,8 @@ public:
   };
 };
 
-struct LGB_POP_RANGE_ENTRY : public LgbEntry {
+struct LGB_POP_RANGE_ENTRY : public LgbEntry
+{
 public:
   PopRangeData data;
 
@@ -140,7 +145,8 @@ public:
   };
 };
 
-struct LGB_EVENT_RANGE_ENTRY : public LgbEntry {
+struct LGB_EVENT_RANGE_ENTRY : public LgbEntry
+{
 public:
   EventRangeData data;
 
@@ -198,7 +204,7 @@ struct LGB_GROUP
   LGB_FILE* parent;
   LGB_GROUP_HEADER header;
   LayerSetReferencedList layerSetReferencedList;
-  std::string name;
+  std::string_view name;
   std::vector< std::shared_ptr< LgbEntry > > entries;
   std::vector< LayerSetReferenced > refs;
 
@@ -206,19 +212,32 @@ struct LGB_GROUP
   {
     parent = parentStruct;
     header = *reinterpret_cast< LGB_GROUP_HEADER* >( buf + offset );
-    name = std::string( buf + offset + header.groupNameOffset );
+    name = std::string_view( buf + offset + header.groupNameOffset );
 
+    // Initialize the layerSetReferencedList from the buffer and offset
     layerSetReferencedList = *reinterpret_cast< LayerSetReferencedList* >( buf + offset + header.LayerSetRef );
 
+    // Check if there are any layer set references to initialize
     if( layerSetReferencedList.LayerSetCount > 0 )
     {
-      refs.resize( layerSetReferencedList.LayerSetCount );
-      std::memcpy( refs.data(), buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets, layerSetReferencedList.LayerSetCount * sizeof( LayerSetReferenced ) );
+      // Reserve memory for layer set references
+      refs.reserve( layerSetReferencedList.LayerSetCount );
+
+      // Iterate through each layer set reference and construct LayerSetReferenced objects from the buffer
+      for( size_t i = 0; i < layerSetReferencedList.LayerSetCount; ++i )
+      {
+        LayerSetReferenced ref = *reinterpret_cast< LayerSetReferenced* >( buf + offset + header.LayerSetRef + layerSetReferencedList.LayerSets + i * sizeof( LayerSetReferenced ) );
+        refs.emplace_back( ref );
+      }
     }
 
+    // Reserve memory for entries
     entries.reserve( header.entryCount );
 
+    // Calculate the offset for entries
     const auto entriesOffset = offset + header.entriesOffset;
+
+    // Iterate through each entry and construct the appropriate objects (not shown in the code snippet)
     for( auto i = 0; i < header.entryCount; ++i )
     {
       const auto entryOffset = entriesOffset + *reinterpret_cast< int32_t* >( buf + ( entriesOffset + i * 4 ) );
@@ -277,7 +296,7 @@ struct LGB_GROUP
       }
       catch( std::exception& e )
       {
-        std::cout << name << " " << e.what() << std::endl;
+        throw e;
       }
     }
   };
@@ -296,63 +315,38 @@ struct LGB_FILE_HEADER
   int32_t groupCount;
 };
 
-struct LGB_FILE {
+struct LGB_FILE
+{
   LGB_FILE_HEADER header;
   std::vector< LGB_GROUP > groups;
   std::string m_name;
 
+  // Constructor that initializes an LGB_FILE object from a buffer and a name
   LGB_FILE( char* buf, const std::string& name ) : LGB_FILE( buf )
   {
     m_name = name;
   }
 
+  // Constructor that initializes an LGB_FILE object from a buffer
   LGB_FILE( char* buf )
   {
+    // Reinterpret the buffer as an LGB_FILE_HEADER pointer and dereference it
     header = *reinterpret_cast< LGB_FILE_HEADER* >( buf );
+
+    // Check for a valid file header
     if( strncmp( &header.magic[ 0 ], "LGB1", 4 ) != 0 || strncmp( &header.magic2[ 0 ], "LGP1", 4 ) != 0 )
+    {
       throw std::runtime_error( "Invalid LGB file!" );
+    }
 
     constexpr auto baseOffset = sizeof( header );
-    groups.reserve( header.groupCount );
+    groups.reserve( header.groupCount );// Reserve memory for the groups
+
+    // Iterate through each group and construct LGB_GROUP objects from the buffer
     for( size_t i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
       groups.emplace_back( buf, this, groupOffset );
     }
-  };
+  }
 };
-
-/*
-#if __cplusplus >= 201703L
-#include <experimental/filesystem>
-std::map<std::string, LGB_FILE> getLgbFiles( const std::string& dir )
-{
-   namespace fs = std::experimental::filesystem;
-   std::map<std::string, LGB_FILE> fileMap;
-   for( const auto& path : fs::recursive_directory_iterator( dir ) )
-   {
-      if( path.path().extension() == ".lgb" )
-      {
-         const auto& strPath = path.path().string();
-         auto f = fopen( strPath.c_str(), "rb" );
-         fseek( f, 0, SEEK_END );
-         const auto size = ftell( f );
-         std::vector<char> bytes( size );
-         rewind( f );
-         fread( bytes.data(), 1, size, f );
-         fclose( f );
-         try
-         {
-            LGB_FILE lgbFile( bytes.data() );
-            fileMap.insert( std::make_pair( strPath, lgbFile ) );
-         }
-         catch( std::exception& e )
-         {
-            std::cout << "Unable to load " << strPath << std::endl;
-         }
-      }
-   }
-   return fileMap;
-}
-#endif
-*/
