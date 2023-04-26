@@ -642,11 +642,6 @@ void Player::levelUp()
   m_mp = getMaxMp();
 
   setLevel( getLevel() + 1 );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
-
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 uint8_t Player::getLevel() const
@@ -733,6 +728,11 @@ void Player::setLevel( uint8_t level )
   Network::Util::Packet::sendBaseParams( *this );
   Network::Util::Packet::sendHudParam( *this );
   Network::Util::Packet::sendStatusUpdate( *this );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
+
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
+  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
