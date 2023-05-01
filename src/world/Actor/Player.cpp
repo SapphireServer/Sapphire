@@ -1134,6 +1134,7 @@ const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
+  setCondition( PlayerCondition::InCombat );
   Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 1 );
 }
 
@@ -1141,7 +1142,10 @@ void Player::onMobDeaggro( const BNpc& bnpc )
 {
   hateListRemove( bnpc );
   if( m_actorIdTohateSlotMap.empty() )
+  {
+    removeCondition( PlayerCondition::InCombat );
     Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 0 );
+  }
 }
 
 bool Player::isLogin() const
