@@ -337,10 +337,10 @@ namespace Sapphire::Network::Packets
    */
   enum ClientZoneIpcType : uint16_t
   {
-    PingHandler = 0x0273, // updated 6.31h
+    PingHandler = 0x032A, // updated 6.38
     InitHandler = 0x0090, // updated 6.38
 
-    FinishLoadingHandler = 0x032d, // updated 6.31h
+    FinishLoadingHandler = 0x037B, // updated 6.38
 
     CFCommenceHandler = 0x0381, // updated 5.58h
 
@@ -379,7 +379,7 @@ namespace Sapphire::Network::Packets
     MarketBoardSearch = 0x0082,                 // updated 5.58h
     MarketBoardPurchaseHandler = 0x0397,        // updated 6.38
 
-    ReqExamineFcInfo = 0x037B, // updated 5.58h
+    ReqExamineFcInfo = 0xF37B, // updated 5.58h (prepended F. Conflicts with FinishLoadingHandler 6.38)
 
     FcInfoReqHandler = 0x9999, // unknown
 
@@ -410,14 +410,14 @@ namespace Sapphire::Network::Packets
     ReqPlaceHousingItem = 0x02D4, // updated 5.58h
     BuildPresetHandler = 0x0223,  // updated 5.58h
 
-    TalkEventHandler = 0x0205,         // updated 6.31h
+    TalkEventHandler = 0x02C4,         // updated 6.38
     EmoteEventHandler = 0x00B0,        // updated 5.58h
     WithinRangeEventHandler = 0x02B6,  // updated 5.58h
     OutOfRangeEventHandler = 0x00b4,   // updated 6.31h
-    EnterTeriEventHandler = 0x014e,    // updated 6.31h
+    EnterTeriEventHandler = 0x018F,    // updated 6.38
     ShopEventHandler = 0x0384,         // updated 5.58h
-    ReturnEventHandler = 0x0119,       // updated 6.31h
-    TradeReturnEventHandler = 0x0100,  // updated 6.31h
+    ReturnEventHandler = 0x0268,       // updated 6.38
+    TradeReturnEventHandler = 0x00FB,  // updated 6.38
     TradeReturnEventHandler2 = 0x023C, // updated 5.58h
     EventYield2Handler = 0x021D,       // updated 5.58h
     EventYield16Handler = 0x0207,      // updated 5.58h
@@ -451,7 +451,7 @@ namespace Sapphire::Network::Packets
   enum ServerChatIpcType : uint16_t
   {
     Tell = 0x0064,              // updated for sb
-    PublicContentTell = 0x00FB, // added 4.5, this is used when receiving a /tell in PublicContent instances such as Eureka or Bozja
+    PublicContentTell = 0xF0FB, // added 4.5, this is used when receiving a /tell in PublicContent instances such as Eureka or Bozja (prepended F conflicts with TradeReturnEventHandler 6.38)
     TellErrNotFound = 0x0066,
 
     FreeCompanyEvent = 0x012C, // added 5.0
