@@ -8,6 +8,7 @@
 #include <map>
 
 #include "ForwardsZone.h"
+#include "Network/Oodle.h"
 
 #define DECLARE_HANDLER( x ) void x( const Sapphire::Network::Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
 
@@ -53,6 +54,7 @@ namespace Sapphire::Network
     Common::Util::LockedQueue< Network::Packets::FFXIVARR_PACKET_RAW > m_inQueue;
     Common::Util::LockedQueue< Packets::FFXIVPacketBasePtr > m_outQueue;
     std::vector< uint8_t > m_packets;
+    OodlePtr m_pOodle;
 
   public:
     ConnectionType m_conType;

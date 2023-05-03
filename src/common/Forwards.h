@@ -2,6 +2,7 @@
 #define COMMON_FORWARDS_H
 
 #include <memory>
+#include "Network/Oodle.h"
 
 namespace Sapphire
 {
@@ -23,6 +24,7 @@ namespace Sapphire::Network
   using HivePtr = std::shared_ptr< Hive >;
   using AcceptorPtr = std::shared_ptr< Acceptor >;
   using ConnectionPtr = std::shared_ptr< Connection >;
+  using OodlePtr = std::unique_ptr< Network::Oodle >;
 }
 
 namespace Sapphire::Network::Packets

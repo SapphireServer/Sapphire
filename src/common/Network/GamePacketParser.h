@@ -2,6 +2,7 @@
 #define _GAMEPACKETPARSER_H
 
 #include "CommonNetwork.h"
+#include "Oodle.h"
 
 namespace Sapphire::Network::Packets
 {
@@ -40,7 +41,8 @@ namespace Sapphire::Network::Packets
   /// Buffer with given offset must be pointing to end of FFXIVARR_PACKET_HEADER data.
   PacketParseResult getPackets( const std::vector< uint8_t >& buffer, const uint32_t offset,
                                 const FFXIVARR_PACKET_HEADER& header,
-                                std::vector< Packets::FFXIVARR_PACKET_RAW >& packets );
+                                std::vector< Packets::FFXIVARR_PACKET_RAW >& packets,
+                                Network::Oodle* oodle);
 
   /// Read single packet from the buffer with given offset.
   /// Buffer with an offset must be pointing to start of FFXIVARR_PACKET_SEGMENT_HEADER data.

@@ -7,6 +7,7 @@
 #include "CommonNetwork.h"
 #include "GamePacket.h"
 #include "Forwards.h"
+#include "Oodle.h"
 
 namespace Sapphire::Network::Packets
 {
@@ -27,7 +28,7 @@ namespace Sapphire::Network::Packets
 
     std::string toString();
 
-    void fillSendBuffer( std::vector< uint8_t >& sendBuffer );
+    void fillSendBuffer( std::vector< uint8_t >& sendBuffer, Network::Oodle* oodle );
 
   private:
     uint32_t m_segmentTargetOverride;

@@ -73,7 +73,7 @@ void Lobby::GameConnection::onRecv( std::vector< uint8_t >& buffer )
   // Dissect packet list
   std::vector< FFXIVARR_PACKET_RAW > packetList;
   const auto packetResult = getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
-                                        packetHeader, packetList );
+                                        packetHeader, packetList, nullptr );
 
   if( packetResult == Incomplete )
     return;
@@ -433,7 +433,7 @@ void Lobby::GameConnection::sendPackets( Network::Packets::PacketContainer* pPac
 {
   std::vector< uint8_t > sendBuffer;
 
-  pPacket->fillSendBuffer( sendBuffer );
+  pPacket->fillSendBuffer( sendBuffer, nullptr );
   send( sendBuffer );
 }
 

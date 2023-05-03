@@ -42,6 +42,8 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
     m_chatHandlerStrMap[ opcode ] = handlerName;
   };
 
+  m_pOodle = std::make_unique<Oodle>();
+
   setZoneHandler( ClientZoneIpcType::PingHandler, "PingHandler", &GameConnection::pingHandler );
   setZoneHandler( ClientZoneIpcType::InitHandler, "InitHandler", &GameConnection::initHandler );
   setZoneHandler( ClientZoneIpcType::ChatHandler, "ChatHandler", &GameConnection::chatHandler );
@@ -182,7 +184,7 @@ void Sapphire::Network::GameConnection::onRecv( std::vector< uint8_t >& buffer )
   // Dissect packet list
   std::vector< Packets::FFXIVARR_PACKET_RAW > packetList;
   const auto packetResult = Packets::getPackets( m_packets, sizeof( struct FFXIVARR_PACKET_HEADER ),
-                                                 packetHeader, packetList );
+                                                 packetHeader, packetList, m_pOodle.get());
 
   if( packetResult == Incomplete )
     return;
@@ -284,7 +286,7 @@ void Sapphire::Network::GameConnection::sendPackets( Packets::PacketContainer* p
 {
   std::vector< uint8_t > sendBuffer;
 
-  pPacket->fillSendBuffer( sendBuffer );
+  pPacket->fillSendBuffer( sendBuffer, nullptr);
   send( sendBuffer );
 }
 

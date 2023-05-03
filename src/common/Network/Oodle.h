@@ -22,6 +22,7 @@ namespace Sapphire::Network
 
     void oodleInit();
     bool oodleDecode( const std::vector< uint8_t > &enc, uint32_t encSize, std::vector< uint8_t > &dec, uint32_t decSize );
+    intptr_t oodleEncode( const std::vector< uint8_t > &raw, uint32_t rawSize, std::vector< uint8_t > &enc );
   };
 }
 
