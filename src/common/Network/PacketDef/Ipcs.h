@@ -348,7 +348,7 @@ namespace Sapphire::Network::Packets
     CFRegisterDuty = 0x01BD,     // updated 5.58h
     CFRegisterRoulette = 0x037A, // updated 5.58h
     PlayTimeHandler = 0x02B7,    // updated 5.58h
-    LogoutHandler = 0x0387,      // updated 6.31h
+    LogoutHandler = 0x02E5,      // updated 6.38
     CancelLogout = 0x01e3,       // updated 6.31h
     CFDutyInfoHandler = 0xF078,  // updated 4.2
 
@@ -397,8 +397,8 @@ namespace Sapphire::Network::Packets
     DiscoveryHandler = 0x038B, // updated 5.58h
 
     SkillHandler = 0x0133,          // updated 6.31h
-    GMCommand1 = 0x0278,            // updated 6.31h
-    GMCommand2 = 0x03d8,            // updated 6.31h
+    GMCommand1 = 0x0273,            // updated 6.38
+    GMCommand2 = 0x0328,            // updated 6.38
     AoESkillHandler = 0x0152,       // updated 5.58h
 
     UpdatePositionHandler = 0x025F, // updated 6.38
