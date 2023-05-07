@@ -1,5 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -100,15 +103,126 @@ public:
     instance.addEObj( "Millioncornseedling", 2001255, 0, 3927161, 4, { -320.576813f, 25.833500f, -527.550171f }, 0.961304f, -0.384837f, 0); 
 
   }
+  enum vars
+  {
+    SET_1_SPAWNED,
+    SET_2_SPAWNED,
+    SUCCESS_CALLED,
+  };
+
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( -71.03f );
+    player.setPos( { 198.303f, 14.244f, 538.248f } );
+  }
 
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto pair1Spawnd = instance.getDirectorVar( SET_1_SPAWNED );
+    auto pair2Spawnd = instance.getDirectorVar( SET_2_SPAWNED );
+    auto successCalled = instance.getDirectorVar( SUCCESS_CALLED );
+
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_BOSS );
+    auto thancred = instance.getActiveBNpcByLayoutId( INIT_P_POP_01 );
+    auto pPlayer = instance.getPlayerPtr();
+
+    uint32_t bossHpPercent = 0;
+    if( boss )
+      bossHpPercent = boss->getHpPercent();
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+    if (!thancred)
+      return;
+
+    if( pair1Spawnd == 0 && bossHpPercent <= 70 )
+    {
+      instance.setDirectorVar( SET_1_SPAWNED, 1 );
+      auto a2 = instance.createBNpcFromLayoutId(INIT_POP_01_01, 1440, Common::BNpcType::Enemy);
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_01_02, 1440, Common::BNpcType::Enemy );
+      a2->setFlag( Entity::NoDeaggro );
+      a3->setFlag( Entity::NoDeaggro );
+
+      auto pPlayer = instance.getPlayerPtr();
+      a2->hateListAdd( pPlayer, 1 );
+      a3->hateListAdd( pPlayer, 1 );
+
+      thancred->hateListAdd( a2, 9999 );
+      thancred->hateListAdd( a3, 9999 );
+    }
+
+    if( pair2Spawnd == 0 && bossHpPercent <= 40 )
+    {
+      instance.setDirectorVar( SET_2_SPAWNED, 1 );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_02_01, 1440, Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_02_02, 1440, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_02_03, 1440, Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_02_04, 1440, Common::BNpcType::Enemy );
+      a2->setFlag( Entity::NoDeaggro );
+      a3->setFlag( Entity::NoDeaggro );
+      a4->setFlag( Entity::NoDeaggro );
+      a5->setFlag( Entity::NoDeaggro );
+
+      auto pPlayer = instance.getPlayerPtr();
+      a2->hateListAdd( pPlayer, 1 );
+      a3->hateListAdd( pPlayer, 1 );
+      a4->hateListAdd( pPlayer, 1 );
+      a5->hateListAdd( pPlayer, 1 );
+
+      thancred->hateListAdd( a2, 9999 );
+      thancred->hateListAdd( a3, 9999 );
+      thancred->hateListAdd( a4, 9999 );
+      thancred->hateListAdd( a5, 9999 );
+    }
+
+    if( instance.getCountEnemyBNpc() == 0 && successCalled == 0 )
+    {
+      instance.setDirectorVar( SUCCESS_CALLED, 1 );
+      instance.success();
+      return;
+    }
 
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
+    eventMgr().playScene( player, instance.getDirectorId(), 1,
+                          NO_DEFAULT_CAMERA | CONDITION_CUTSCENE | SILENT_ENTER_TERRI_ENV |
+                          HIDE_HOTBAR | SILENT_ENTER_TERRI_BGM | SILENT_ENTER_TERRI_SE |
+                          DISABLE_STEALTH | 0x00100000 | LOCK_HUD | LOCK_HOTBAR |
+                          // todo: wtf is 0x00100000
+                          DISABLE_CANCEL_EMOTE, [ & ]( Entity::Player& player, const Event::SceneResult& result ) {
+                            player.setOnEnterEventDone( true );
+                          } );
+  }
+
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto idx = player.getQuestIndex( instance.getQuestId() );
+    if( idx == -1 )
+      return;
+    auto& quest = player.getQuestByIndex( idx );
+    quest.setSeq( 2 );
+  }
+
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    // TODO: Change to correct HP values
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_BOSS, 10571, Common::BNpcType::Enemy );
+    auto thancred = instance.createBNpcFromLayoutId( INIT_P_POP_01, 27780, Common::BNpcType::Friendly );
+
+    boss->setFlag( Entity::NoDeaggro );
+    thancred->setFlag( Entity::NoDeaggro );
+
+    boss->hateListAdd( thancred, 10000 );
+    boss->hateListAdd( player.getAsPlayer(), 1 );
+
+    thancred->hateListAdd( boss, 10000 );
 
   }
 
