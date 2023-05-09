@@ -145,6 +145,7 @@ private:
   {
     eventMgr().sendEventNotice( player, getId(), 0, 0 );
     quest.setUI8AL( 1 );
+    quest.setBitFlag8( 1, true );
     checkQuestCompletion( quest, player, 1 );
   }
 
@@ -159,6 +160,7 @@ private:
   {
     eventMgr().sendEventNotice( player, getId(), 1, 0 );
     quest.setUI8BH( 1 );
+    quest.setBitFlag8( 2, true );
     checkQuestCompletion( quest, player, 1 );
   }
 
@@ -173,6 +175,7 @@ private:
   {
     eventMgr().sendEventNotice( player, getId(), 2, 0 );
     quest.setUI8BL( 1 );
+    quest.setBitFlag8( 3, true );
     checkQuestCompletion( quest, player, 1 );
   }
 

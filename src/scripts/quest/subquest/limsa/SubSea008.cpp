@@ -45,6 +45,7 @@ class SubSea008 : public Sapphire::ScriptAPI::QuestScript
     static constexpr auto Actor2 = 1000938; // Ginnade ( Pos: -4.651690 45.018398 -241.815002  Teri: 128 )
     static constexpr auto Actor3 = 1000947; // Lyngsath ( Pos: -54.642601 43.991699 -151.201996  Teri: 128 )
     static constexpr auto Item0 = 2000451;
+    static constexpr auto Item0Icon = 25919;
 
   public:
     SubSea008() : Sapphire::ScriptAPI::QuestScript( 65654 ){}; 
@@ -58,7 +59,8 @@ class SubSea008 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        Scene00000( quest, player );
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
         break;
       }
       case Actor1:
@@ -71,12 +73,14 @@ class SubSea008 : public Sapphire::ScriptAPI::QuestScript
       }
       case Actor2:
       {
-        Scene00003( quest, player );
+        if( quest.getSeq() == Seq2 )
+          Scene00003( quest, player );
         break;
       }
       case Actor3:
       {
-        Scene00005( quest, player );
+        if( quest.getSeq() == Seq2 )
+          Scene00005( quest, player );
         break;
       }
     }
@@ -137,7 +141,7 @@ private:
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setUI8BL( 1 );
-    eventMgr().sendEventNotice( player, getId(), 0, 0 ); //TODO: add item icon
+    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
     quest.setSeq( Seq2 );
   }
 
@@ -167,6 +171,7 @@ private:
   {
     eventMgr().sendEventNotice( player, getId(), 1, 0 );
     quest.setUI8AL( 1 );
+    quest.setBitFlag8( 1, true );
     checkQuestCompletion( quest, player, 1 );
 
   }
@@ -197,6 +202,7 @@ private:
   {
     eventMgr().sendEventNotice( player, getId(), 2, 0 );
     quest.setUI8BH( 1 );
+    quest.setBitFlag8( 2, true );
     checkQuestCompletion( quest, player, 1 );
   }
 
