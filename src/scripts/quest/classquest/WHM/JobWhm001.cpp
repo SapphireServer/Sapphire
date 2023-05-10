@@ -13,7 +13,7 @@
 // Quest Script: JobWhm001_01124
 // Quest Name: A Relic Reborn (Thyrus)
 // Quest ID: 66660
-// Start NPC: 1003075
+// Start NPC: 1003075a
 // End NPC: 1003075
 
 using namespace Sapphire;
@@ -101,6 +101,8 @@ private:
   static constexpr auto Item4 = 2001029;
   static constexpr auto Item5 = 2001038;
   static constexpr auto Item6 = 2001047;
+  static constexpr auto Item0Icon = 21003;
+  static constexpr auto Item3Icon = 26002;
   static constexpr auto LocAction0 = 858;
   static constexpr auto LocAction1 = 995;
   static constexpr auto LocAction2 = 936;
@@ -109,6 +111,7 @@ private:
   static constexpr auto Ritem0 = 2049;//Madman's Whispering Rod
   static constexpr auto Ritem1 = 2046;//Unfinished Thyrus
   static constexpr auto Ritem2 = 6267;//Radz-at-Han Quenching Oil
+  static constexpr auto Ritem1Icon = 32627;
 
 public:
   JobWhm001() : Sapphire::ScriptAPI::QuestScript( 66660 ){};
@@ -327,7 +330,7 @@ private:
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setUI8BH( 1 );
-    eventMgr().sendEventNotice( player, getId(), 0, 0 );//TODO:Item Icon
+    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
     quest.setSeq( Seq2 );
   }
 
@@ -469,7 +472,7 @@ private:
 
   void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 7, 0 );//TODO: Item Icon
+    eventMgr().sendNotice( player, getId(), 7, { Item3Icon } );
     quest.setSeq( Seq9 );
     quest.setUI8BH( 1 );
   }
@@ -497,7 +500,7 @@ private:
   void Scene00015Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setUI8BH( 0 );
-    eventMgr().sendEventNotice( player, getId(), 8, 0 );//TODO: Item Icon?
+    eventMgr().sendNotice( player, getId(), 8, { Ritem1Icon } );
     player.addItem( Ritem1 );
     quest.setSeq( Seq10 );
   }
