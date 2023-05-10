@@ -142,8 +142,8 @@ public:
     if( pair1Spawnd == 0 && bossHpPercent <= 70 )
     {
       instance.setDirectorVar( SET_1_SPAWNED, 1 );
-      auto a2 = instance.createBNpcFromLayoutId(INIT_POP_01_01, 1440, Common::BNpcType::Enemy);
-      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_01_02, 1440, Common::BNpcType::Enemy );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_01_01, 1440 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_01_02, 1440 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
 
@@ -158,10 +158,10 @@ public:
     if( pair2Spawnd == 0 && bossHpPercent <= 40 )
     {
       instance.setDirectorVar( SET_2_SPAWNED, 1 );
-      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_02_01, 1440, Common::BNpcType::Enemy );
-      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_02_02, 1440, Common::BNpcType::Enemy );
-      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_02_03, 1440, Common::BNpcType::Enemy );
-      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_02_04, 1440, Common::BNpcType::Enemy );
+      auto a2 = instance.createBNpcFromLayoutId( INIT_POP_02_01, 1440 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+      auto a3 = instance.createBNpcFromLayoutId( INIT_POP_02_02, 1440 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+      auto a4 = instance.createBNpcFromLayoutId( INIT_POP_02_03, 1440 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+      auto a5 = instance.createBNpcFromLayoutId( INIT_POP_02_04, 1440 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
       a2->setFlag( Entity::NoDeaggro );
       a3->setFlag( Entity::NoDeaggro );
       a4->setFlag( Entity::NoDeaggro );
@@ -213,8 +213,8 @@ public:
   void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
   {
     // TODO: Change to correct HP values
-    auto boss = instance.createBNpcFromLayoutId( INIT_POP_BOSS, 10571, Common::BNpcType::Enemy );
-    auto thancred = instance.createBNpcFromLayoutId( INIT_P_POP_01, 27780, Common::BNpcType::Friendly );
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_BOSS, 10571 /*TODO: Find the right value*/, Common::BNpcType::Enemy );
+    auto thancred = instance.createBNpcFromLayoutId( INIT_P_POP_01, 27780 /*TODO: Find the right value*/, Common::BNpcType::Friendly );
 
     boss->setFlag( Entity::NoDeaggro );
     thancred->setFlag( Entity::NoDeaggro );

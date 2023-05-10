@@ -42,6 +42,7 @@ class SubWil070 : public Sapphire::ScriptAPI::QuestScript
     static constexpr auto Actor3 = 1001465; // Solid Trunk ( Pos: -90.043503 -11.398500 -53.666000  Teri: 141 )
     static constexpr auto Actor4 = 1001466; // Ricard ( Pos: -89.735001 -11.350000 -51.539902  Teri: 141 )
     static constexpr auto Item0 = 2000234;
+    static constexpr auto Item0Icon = 26153;
     static constexpr auto Seq0Actor0 = 0;
     static constexpr auto Seq1Actor1 = 1;
     static constexpr auto Seq1Actor2 = 2;
@@ -110,7 +111,7 @@ class SubWil070 : public Sapphire::ScriptAPI::QuestScript
       if (quest.getUI8AL() == 4)
         quest.setSeq( SeqFinish );
       }
-      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 4 ); // TODO: Add item icon (Oily Order Slip)
+      eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 4, Item0Icon } );
     }
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used

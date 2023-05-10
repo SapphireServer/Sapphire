@@ -55,6 +55,8 @@ private:
   static constexpr auto EventActionSearch = 1;
   static constexpr auto Item0 = 2000669;
   static constexpr auto Item1 = 2000929;
+  static constexpr auto Item0Icon = 27241;
+  static constexpr auto Item1Icon = 22301;
 
 public:
   GaiUsb406() : Sapphire::ScriptAPI::QuestScript( 66398 ){};
@@ -143,7 +145,11 @@ private:
   {
     if( quest.getSeq() == Seq1 )
     {
-      eventMgr().sendEventNotice( player, getId(), type, 2, ( type == 0 ) ? quest.getUI8AL() : quest.getUI8BH(), 3 ); //TODO: Item Icons
+      if( type == 0 )
+        eventMgr().sendNotice( player, getId(), type, { quest.getUI8AL(), 3, Item1Icon } );
+      else
+        eventMgr().sendNotice( player, getId(), type, { quest.getUI8BH(), 3, Item0Icon } );
+
       if( quest.getUI8BL() >= 3 && quest.getUI8CH() >= 3 )
       {
         quest.setUI8BH( quest.getUI8BL() );
