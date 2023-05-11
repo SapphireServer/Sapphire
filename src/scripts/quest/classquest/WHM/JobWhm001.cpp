@@ -13,7 +13,7 @@
 // Quest Script: JobWhm001_01124
 // Quest Name: A Relic Reborn (Thyrus)
 // Quest ID: 66660
-// Start NPC: 1003075a
+// Start NPC: 1003075
 // End NPC: 1003075
 
 using namespace Sapphire;
