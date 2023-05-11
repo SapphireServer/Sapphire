@@ -2,20 +2,21 @@
 // Content needs to be added by hand to make it function
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
-#include <Actor/Player.h>
 #include "Manager/EventMgr.h"
+#include <Actor/Player.h>
+#include <Actor/BNpc.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: SubSea007_00117
-// Quest Name: A Thousand Words
-// Quest ID: 65653
-// Start NPC: 1001537 (Latisha)
-// End NPC: 1000957 (R'sushmo)
+// Quest Script: SubWil062_00305
+// Quest Name: Until a Quieter Time
+// Quest ID: 65841
+// Start NPC: 1001541 (Roger)
+// End NPC: 1001447 (Warin)
 
 using namespace Sapphire;
 
-class SubSea007 : public Sapphire::ScriptAPI::QuestScript
+class SubWil062 : public Sapphire::ScriptAPI::QuestScript
 {
   private:
     // Basic quest information 
@@ -23,29 +24,27 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
     // UI8AL
     // UI8BH
 
-    /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1000957
-    /// Countable Num: 1 Seq: 2 Event: 1 Listener: 1000937
-    /// Countable Num: 0 Seq: 255 Event: 1 Listener: 1000957
+    /// Countable Num: 8 Seq: 1 Event: 9 Listener: 432
+    /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1001447
     // Steps in this quest ( 0 is before accepting, 
     // 1 is first, 255 means ready for turning it in
     enum Sequence : uint8_t
     {
       Seq0 = 0,
       Seq1 = 1,
-      Seq2 = 2,
       SeqFinish = 255,
     };
 
     // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1001537; // Latisha ( Pos: -58.854099 42.282700 -164.050003  Teri: 128 )
-    static constexpr auto Actor1 = 1000957; // R'sushmo ( Pos: -49.240898 43.991699 -146.380005  Teri: 128 )
-    static constexpr auto Actor2 = 1000937; // Godebert ( Pos: -12.222500 44.998798 -251.850006  Teri: 128 )
-    static constexpr auto Item0 = 2000455;
-    static constexpr auto Item0Icon = 25906;
+    static constexpr auto Actor0 = 1001541; // Roger ( Pos: -99.395401 -11.380900 -41.723999  Teri: 141 )
+    static constexpr auto Actor1 = 1001447; // Warin ( Pos: -32.639099 -1.033260 -148.485992  Teri: 141 )
+    static constexpr auto Enemy0 = 294; // Antling Worker
+    static constexpr auto Item0 = 2000168;
+    static constexpr auto Item0Icon = 22205;
 
   public:
-    SubSea007() : Sapphire::ScriptAPI::QuestScript( 65653 ){}; 
-    ~SubSea007() = default; 
+    SubWil062() : Sapphire::ScriptAPI::QuestScript( 65841 ){}; 
+    ~SubWil062() = default; 
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -55,20 +54,14 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
-        Scene00000( quest, player );
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
         break;
       }
       case Actor1:
       {
-        if( quest.getSeq() == Seq1 )
+        if( quest.getSeq() == SeqFinish )
           Scene00002( quest, player );
-        else
-          Scene00005( quest, player );
-        break;
-      }
-      case Actor2:
-      {
-        Scene00003( quest, player );
         break;
       }
     }
@@ -78,6 +71,20 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
   {
   }
 
+  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
+  {
+    if( bnpc.getBNpcNameId() != Enemy0 )
+      return;
+
+    unsigned currentKC = quest.getUI8AL() + 1;
+    quest.setUI8BH( currentKC );
+    quest.setUI8AL( currentKC );
+
+    if( currentKC >= 5 )
+      quest.setSeq( SeqFinish );
+
+    eventMgr().sendNotice( player, getId(), 0, { currentKC, 5, Item0Icon } );
+  }
 
   private:
   //////////////////////////////////////////////////////////////////////
@@ -86,14 +93,15 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &SubSea007::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &SubWil062::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      Scene00001( quest, player );
+      quest.setUI8AL( 0 );
+      quest.setSeq( Seq1 );
     }
   }
 
@@ -101,71 +109,61 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &SubSea007::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubWil062::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq( Seq1 );
+
+
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &SubSea007::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &SubWil062::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
-    quest.setUI8BH( 1 );
-    quest.setSeq( Seq2 );
+    if( result.getResult( 0 ) == 1 )
+    {
+      quest.setUI8BH( 0 );
+      Scene00003( quest, player );
+    }
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &SubSea007::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &SubWil062::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+
     if( result.getResult( 0 ) == 1 )
     {
-      Scene00004( quest, player );
+      player.finishQuest( getId(), result.getResult( 1 ) );
     }
+
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &SubSea007::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &SubWil062::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 1, 0 );
-    quest.setSeq( SeqFinish );
-  }
 
-  //////////////////////////////////////////////////////////////////////
 
-  void Scene00005( World::Quest& quest, Entity::Player& player )
-  {
-    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &SubSea007::Scene00005Return ) );
-  }
-
-  void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
-  {
-    if( result.getResult( 0 ) == 1 )
-    {
-      player.finishQuest( getId() );
-    }
   }
 
 };
 
-EXPOSE_SCRIPT( SubSea007 );
+EXPOSE_SCRIPT( SubWil062 );

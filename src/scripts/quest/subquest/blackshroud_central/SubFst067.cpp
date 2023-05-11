@@ -53,6 +53,7 @@ private:
   static constexpr auto Eventrange0 = 3841476;
   static constexpr auto EventActionSearch = 1;
   static constexpr auto Item0 = 2000192;
+  static constexpr auto Item0Icon = 22627;
 
 public:
   SubFst067() : Sapphire::ScriptAPI::QuestScript( 65919 ){};
@@ -182,7 +183,7 @@ public:
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 3 );//TODO: Item Icon
+    eventMgr().sendNotice( player, getId(), 1, { quest.getUI8AL(), 3, Item0Icon } );
     if( quest.getUI8AL() >= 3 )
     {
       quest.setUI8AL( 0 );

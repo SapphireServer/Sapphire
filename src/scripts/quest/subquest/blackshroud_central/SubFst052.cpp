@@ -45,6 +45,8 @@ private:
   static constexpr auto Enemy0 = 54;//Hornet Swarm (INCORRECT: 57)
   static constexpr auto Item0 = 2000099;
   static constexpr auto Item1 = 2000094;
+  static constexpr auto Item0Icon = 22623;
+  static constexpr auto Item1Icon = 24403;
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq2Actor0 = 1;
   static constexpr auto Seq2Actor0Npctradeno = 99;
@@ -88,7 +90,7 @@ public:
       {
         quest.setUI8BH( quest.getUI8BH() + 1 );
         quest.setUI8AL( quest.getUI8AL() + 1 );
-        eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 4 );//TODO: Probably needs item icon
+        eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 4, Item0Icon } ); // item Icon 2 missing
 
         if( quest.getUI8AL() >= 4 )
         {

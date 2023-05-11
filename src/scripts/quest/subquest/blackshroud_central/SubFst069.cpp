@@ -39,6 +39,7 @@ private:
   static constexpr auto Eobject0 = 2000685;//Well-worn Fishing Rod
   static constexpr auto EventActionSearch = 1;
   static constexpr auto Item0 = 2000185;
+  static constexpr auto Item0Icon = 38201;
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq1Eobject0 = 1;
   static constexpr auto Seq1Eobject0Eventactionno = 99;
@@ -169,7 +170,7 @@ private:
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 0 );//TODO: Probably Item Icon
+    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
     quest.setUI8BH( 1 );
     quest.setSeq( SeqFinish );
   }

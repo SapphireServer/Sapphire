@@ -61,6 +61,8 @@ private:
   static constexpr auto EventActionSearch = 1;
   static constexpr auto Item0 = 2000963;
   static constexpr auto Item1 = 2000965;
+  static constexpr auto Item0Icon = 22614;
+  static constexpr auto Item1Icon = 21452;
   static constexpr auto Poprange0 = 3884000;
   static constexpr auto Territorytype0 = 204;
 
@@ -263,7 +265,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 0 );
+    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
     quest.setUI8BH( 1 );
     quest.setSeq( Seq2 );
   }
@@ -393,7 +395,7 @@ private:
   {
     quest.setSeq( Seq4 );
     quest.setUI8BH( 1 );
-    eventMgr().sendEventNotice( player, getId(), 2, 0 /*1, Item1*/ );//TODO:Item Icon Event Notice
+    eventMgr().sendNotice( player, getId(), 2, { Item1Icon } );
   }
 
   //////////////////////////////////////////////////////////////////////

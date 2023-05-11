@@ -54,6 +54,7 @@ private:
   static constexpr auto Eobject1 = 2000017;//Decaying Tree (South)
   static constexpr auto Eobject2 = 2000018;//Decaying Tree (East)
   static constexpr auto Item0 = 2000061;
+  static constexpr auto Item0Icon = 20661;
   static constexpr auto Seq0Actor0 = 0;
   static constexpr auto Seq1Eobject0 = 1;
   static constexpr auto Seq1Eobject0Useitemno = 99;
@@ -184,7 +185,7 @@ public:
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AH(), 3 );//TODO: Probably needs item icon
+    eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AH(), 3, Item0Icon } );
 
     if( quest.getUI8AH() >= 3 )
     {
