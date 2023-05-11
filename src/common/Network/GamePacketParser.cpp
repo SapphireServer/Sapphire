@@ -48,7 +48,8 @@ PacketParseResult Network::Packets::getSegmentHeader( const std::vector< uint8_t
 PacketParseResult Network::Packets::getPackets( const std::vector< uint8_t >& buffer,
                                                           const uint32_t offset,
                                                           const FFXIVARR_PACKET_HEADER& packetHeader,
-                                                          std::vector< FFXIVARR_PACKET_RAW >& packets )
+                                                          std::vector< FFXIVARR_PACKET_RAW >& packets,
+                                                          Network::Oodle* oodle)
 {
   // sanity check: check there's enough bytes in the buffer
   auto bytesExpected = packetHeader.size - sizeof( struct FFXIVARR_PACKET_HEADER );
@@ -60,14 +61,19 @@ PacketParseResult Network::Packets::getPackets( const std::vector< uint8_t >& bu
   // check compression, do decompress if Oodle/Zlib
   if( packetHeader.compressionType == Oodle )
   {
+    if( oodle == nullptr )
+    {
+      Logger::warn( "Oodle compression type was specified, but no Oodle decompressor was supplied for this connection." );
+      return Malformed;
+    }
+
     std::vector< uint8_t > inBuf;
     inBuf.assign( buffer.begin() + sizeof( struct FFXIVARR_PACKET_HEADER ), buffer.end() );
 
     std::vector< uint8_t > outBuf;
     outBuf.resize( packetHeader.oodleDecompressedSize );
 
-    auto _oodle = Network::Oodle();
-    bool oodleSuccess = _oodle.oodleDecode( inBuf, bytesExpected, outBuf, packetHeader.oodleDecompressedSize );
+    bool oodleSuccess = oodle->oodleDecode( inBuf, bytesExpected, outBuf, packetHeader.oodleDecompressedSize );
 
     if( !oodleSuccess )
     {

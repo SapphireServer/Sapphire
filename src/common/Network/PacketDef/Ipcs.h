@@ -337,10 +337,10 @@ namespace Sapphire::Network::Packets
    */
   enum ClientZoneIpcType : uint16_t
   {
-    PingHandler = 0x0273, // updated 6.31h
-    InitHandler = 0x03a8, // updated 6.31h
+    PingHandler = 0x032A, // updated 6.38
+    InitHandler = 0x0090, // updated 6.38
 
-    FinishLoadingHandler = 0x032d, // updated 6.31h
+    FinishLoadingHandler = 0x037B, // updated 6.38
 
     CFCommenceHandler = 0x0381, // updated 5.58h
 
@@ -348,7 +348,7 @@ namespace Sapphire::Network::Packets
     CFRegisterDuty = 0x01BD,     // updated 5.58h
     CFRegisterRoulette = 0x037A, // updated 5.58h
     PlayTimeHandler = 0x02B7,    // updated 5.58h
-    LogoutHandler = 0x0387,      // updated 6.31h
+    LogoutHandler = 0x02E5,      // updated 6.38
     CancelLogout = 0x01e3,       // updated 6.31h
     CFDutyInfoHandler = 0xF078,  // updated 4.2
 
@@ -356,7 +356,7 @@ namespace Sapphire::Network::Packets
     SocialResponseHandler = 0x023B, // updated 5.58h
     CreateCrossWorldLS = 0x035D,    // updated 5.58h
 
-    ChatHandler = 0x00f1, // Updated 6.31h
+    ChatHandler = 0x01F2, // Updated 6.38
     PartyChatHandler = 0x0065,
     PartySetLeaderHandler = 0x036C,  // updated 5.58h
     LeavePartyHandler = 0x019D,      // updated 5.58h
@@ -364,7 +364,7 @@ namespace Sapphire::Network::Packets
     DisbandPartyHandler = 0x0276,    // updated 5.58h
 
     SocialListHandler = 0x0200,              // updated 6.31
-    SetSearchInfoHandler = 0x0368,           // updated 6.31h
+    SetSearchInfoHandler = 0x0165,           // updated 6.38
     ReqSearchInfoHandler = 0x03b0,           // updated 6.31h
     ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
@@ -377,8 +377,9 @@ namespace Sapphire::Network::Packets
     MarketBoardRequestItemListingInfo = 0x00F4, // updated 5.58h
     MarketBoardRequestItemListings = 0x0122,    // updated 5.58h
     MarketBoardSearch = 0x0082,                 // updated 5.58h
+    MarketBoardPurchaseHandler = 0x0397,        // updated 6.38
 
-    ReqExamineFcInfo = 0x037B, // updated 5.58h
+    ReqExamineFcInfo = 0xF37B, // updated 5.58h (prepended F. Conflicts with FinishLoadingHandler 6.38)
 
     FcInfoReqHandler = 0x9999, // unknown
 
@@ -392,33 +393,31 @@ namespace Sapphire::Network::Packets
     ReqCountdownCancel = 0x023a,   // updated 6.31h
 
     ZoneLineHandler = 0x00ce,  // updated 6.31h
-    ClientTrigger = 0x0244,    // updated 6.31h
+    ClientTrigger = 0x01BE,    // updated 6.38
     DiscoveryHandler = 0x038B, // updated 5.58h
 
-    PlaceFieldMarkerPreset = 0x204, // updated 6.30h
-    PlaceFieldMarker = 0x38e,       // updated 6.30h
     SkillHandler = 0x0133,          // updated 6.31h
-    GMCommand1 = 0x0278,            // updated 6.31h
-    GMCommand2 = 0x03d8,            // updated 6.31h
+    GMCommand1 = 0x0273,            // updated 6.38
+    GMCommand2 = 0x0328,            // updated 6.38
     AoESkillHandler = 0x0152,       // updated 5.58h
 
-    UpdatePositionHandler = 0x01f7, // updated 6.31h
+    UpdatePositionHandler = 0x025F, // updated 6.38
 
-    InventoryModifyHandler = 0x01a2, // updated 6.31h
+    InventoryModifyHandler = 0x024D, // updated 6.38
 
     InventoryEquipRecommendedItems = 0x01C9, // updated 5.58h
 
     ReqPlaceHousingItem = 0x02D4, // updated 5.58h
     BuildPresetHandler = 0x0223,  // updated 5.58h
 
-    TalkEventHandler = 0x0205,         // updated 6.31h
+    TalkEventHandler = 0x02C4,         // updated 6.38
     EmoteEventHandler = 0x00B0,        // updated 5.58h
     WithinRangeEventHandler = 0x02B6,  // updated 5.58h
     OutOfRangeEventHandler = 0x00b4,   // updated 6.31h
-    EnterTeriEventHandler = 0x014e,    // updated 6.31h
+    EnterTeriEventHandler = 0x018F,    // updated 6.38
     ShopEventHandler = 0x0384,         // updated 5.58h
-    ReturnEventHandler = 0x0119,       // updated 6.31h
-    TradeReturnEventHandler = 0x0100,  // updated 6.31h
+    ReturnEventHandler = 0x0268,       // updated 6.38
+    TradeReturnEventHandler = 0x00FB,  // updated 6.38
     TradeReturnEventHandler2 = 0x023C, // updated 5.58h
     EventYield2Handler = 0x021D,       // updated 5.58h
     EventYield16Handler = 0x0207,      // updated 5.58h
@@ -436,7 +435,7 @@ namespace Sapphire::Network::Packets
 
     SetSharedEstateSettings = 0x00D2, // updated 5.58h
 
-    UpdatePositionInstance = 0x03bd, // Updated 6.31h
+    UpdatePositionInstance = 0x01A0, // Updated 6.38
 
     PerformNoteHandler = 0x0243, // updated 5.58h
 
@@ -452,7 +451,7 @@ namespace Sapphire::Network::Packets
   enum ServerChatIpcType : uint16_t
   {
     Tell = 0x0064,              // updated for sb
-    PublicContentTell = 0x00FB, // added 4.5, this is used when receiving a /tell in PublicContent instances such as Eureka or Bozja
+    PublicContentTell = 0xF0FB, // added 4.5, this is used when receiving a /tell in PublicContent instances such as Eureka or Bozja (prepended F conflicts with TradeReturnEventHandler 6.38)
     TellErrNotFound = 0x0066,
 
     FreeCompanyEvent = 0x012C, // added 5.0
