@@ -76,6 +76,7 @@ struct AOZArrangement;
 struct AOZBoss;
 struct AOZContent;
 struct AOZContentBriefingBNpc;
+struct AOZContentBriefingObject;
 struct AOZReport;
 struct AOZScore;
 struct AquariumFish;
@@ -211,6 +212,7 @@ struct CreditCast;
 struct CreditList;
 struct CreditListText;
 struct CustomTalk;
+struct CustomTalkDefineClient;
 struct CustomTalkNestHandlers;
 struct Cutscene;
 struct CutSceneIncompQuest;
@@ -278,6 +280,7 @@ struct EurekaSphereElementAdjust;
 struct EventAction;
 struct EventCustomIconType;
 struct EventIconPriority;
+struct EventIconPriorityPair;
 struct EventIconType;
 struct EventItem;
 struct EventItemCastTimeline;
@@ -312,6 +315,7 @@ struct FCRights;
 struct Festival;
 struct FieldMarker;
 struct FishingBaitParameter;
+struct FishingNoteInfo;
 struct FishingRecordType;
 struct FishingRecordTypeTransient;
 struct FishingSpot;
@@ -488,6 +492,7 @@ struct MacroIcon;
 struct MacroIconRedirectOld;
 struct MainCommand;
 struct MainCommandCategory;
+struct MandervilleWeaponEnhance;
 struct ManeuversArmor;
 struct Map;
 struct MapCondition;
@@ -507,6 +512,13 @@ struct MateriaTomestoneRate;
 struct McGuffin;
 struct McGuffinUIData;
 struct MiniGameRA;
+struct MiniGameTurnBreakAction;
+struct MiniGameTurnBreakConst;
+struct MiniGameTurnBreakEnemy;
+struct MiniGameTurnBreakPop;
+struct MiniGameTurnBreakPopOffset;
+struct MiniGameTurnBreakStage;
+struct MiniGameTurnBreakStatus;
 struct MinionRace;
 struct MinionRules;
 struct MinionSkillType;
@@ -525,6 +537,7 @@ struct MJIDisposalShopItem;
 struct MJIDisposalShopUICategory;
 struct MJIFarmPastureRank;
 struct MJIFunction;
+struct MJIGardenscaping;
 struct MJIGathering;
 struct MJIGatheringItem;
 struct MJIGatheringObject;
@@ -537,6 +550,7 @@ struct MJILandmark;
 struct MJILandmarkPlace;
 struct MJILivelyActor;
 struct MJIMinionPopAreas;
+struct MJIName;
 struct MJIProgress;
 struct MJIRank;
 struct MJIRecipe;
@@ -638,7 +652,9 @@ struct QuestDefineClient;
 struct QuestDerivedClass;
 struct QuestEffect;
 struct QuestEffectDefine;
+struct QuestEventAreaEntranceInfo;
 struct QuestLinkMarker;
+struct QuestLinkMarkerIcon;
 struct QuestLinkMarkerSet;
 struct QuestRedo;
 struct QuestRedoChapterUI;
@@ -734,6 +750,9 @@ struct Title;
 struct TofuEditParam;
 struct TofuObject;
 struct TofuObjectCategory;
+struct TofuPreset;
+struct TofuPresetCategory;
+struct TofuPresetObject;
 struct Tomestones;
 struct TomestonesItem;
 struct TopicSelect;
@@ -1350,17 +1369,17 @@ struct AOZContent
   uint8_t act1FightType;
   uint16_t act1;
   uint8_t arenaType1;
-  uint16_t act2FightType;
-  uint8_t act2;
-  uint16_t arenaType2;
+  uint8_t act2FightType;
+  uint16_t act2;
+  uint8_t arenaType2;
   uint8_t act3FightType;
   uint16_t act3;
   uint8_t arenaType3;
-  uint16_t contentEntry;
+  uint32_t contentEntry;
   uint8_t order;
   uint16_t gilReward;
-  uint32_t alliedSealsReward;
-  uint8_t tomestonesReward;
+  uint16_t alliedSealsReward;
+  uint16_t tomestonesReward;
 
   AOZContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -1394,6 +1413,13 @@ struct AOZContentBriefingBNpc
   bool flatOrDeathVuln;
 
   AOZContentBriefingBNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct AOZContentBriefingObject
+{
+  uint32_t icon;
+
+  AOZContentBriefingObject( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct AOZReport
@@ -2444,10 +2470,10 @@ struct CollectablesShopItem
   uint32_t item;
   uint8_t collectablesShopItemGroup;
   uint16_t levelMin;
-  uint32_t levelMax;
-  uint16_t stars;
+  uint16_t levelMax;
+  uint8_t stars;
   uint8_t key;
-  uint8_t collectablesShopRefine;
+  uint16_t collectablesShopRefine;
   uint16_t collectablesShopRewardScrip;
 
   CollectablesShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -2835,11 +2861,11 @@ struct ContentRoulette
   uint16_t rewardTomeA;
   uint16_t rewardTomeB;
   uint16_t rewardTomeC;
-  uint32_t sortKey;
+  uint8_t sortKey;
   uint8_t contentMemberType;
   bool requireAllDuties;
-  bool contentRouletteOpenRule;
-  uint8_t instanceContent;
+  uint8_t contentRouletteOpenRule;
+  uint16_t instanceContent;
 
   ContentRoulette( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3037,6 +3063,12 @@ struct CustomTalk
   uint32_t specialLinks;
 
   CustomTalk( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CustomTalkDefineClient
+{
+
+  CustomTalkDefineClient( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CustomTalkNestHandlers
@@ -3749,6 +3781,13 @@ struct EventIconPriority
   EventIconPriority( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct EventIconPriorityPair
+{
+  uint32_t icon1;
+
+  EventIconPriorityPair( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct EventIconType
 {
   uint32_t npcIconAvailable;
@@ -4081,6 +4120,19 @@ struct FishingBaitParameter
   FishingBaitParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct FishingNoteInfo
+{
+  uint8_t size;
+  uint8_t aquariumWater;
+  uint8_t weatherRestriction;
+  uint8_t timeRestriction;
+  uint8_t specialConditions;
+  uint8_t isCollectable;
+  int32_t item;
+
+  FishingNoteInfo( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct FishingRecordType
 {
   int32_t addon;
@@ -4126,10 +4178,13 @@ struct FishParameter
   std::string text;
   int32_t item;
   uint16_t gatheringItemLevel;
+  uint8_t oceanStars;
   bool isHidden;
-  uint16_t fishingRecordType;
-  bool fishingSpot;
-  uint32_t gatheringSubCategory;
+  uint8_t fishingRecordType;
+  uint16_t fishingSpot;
+  uint16_t gatheringSubCategory;
+  bool isInLog;
+  uint32_t achievementCredit;
 
   FishParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5235,7 +5290,7 @@ struct IKDRoute
 {
   uint32_t image;
   uint32_t territoryType;
-  uint32_t name;
+  std::string name;
 
   IKDRoute( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5877,6 +5932,12 @@ struct MainCommandCategory
   MainCommandCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MandervilleWeaponEnhance
+{
+
+  MandervilleWeaponEnhance( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct ManeuversArmor
 {
   std::vector< uint32_t > bNpcBase;
@@ -5974,7 +6035,7 @@ struct MapType
 struct Marker
 {
   int32_t icon;
-  uint8_t name;
+  std::string name;
 
   Marker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5982,8 +6043,8 @@ struct Marker
 struct Materia
 {
   std::vector< int32_t > item;
-  int32_t baseParam;
-  std::vector< int32_t > value;
+  uint8_t baseParam;
+  std::vector< int16_t > value;
 
   Materia( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6040,6 +6101,48 @@ struct MiniGameRA
   int32_t bGM;
 
   MiniGameRA( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakAction
+{
+
+  MiniGameTurnBreakAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakConst
+{
+
+  MiniGameTurnBreakConst( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakEnemy
+{
+
+  MiniGameTurnBreakEnemy( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakPop
+{
+
+  MiniGameTurnBreakPop( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakPopOffset
+{
+
+  MiniGameTurnBreakPopOffset( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakStage
+{
+
+  MiniGameTurnBreakStage( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MiniGameTurnBreakStatus
+{
+
+  MiniGameTurnBreakStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MinionRace
@@ -6185,6 +6288,14 @@ struct MJIFunction
   MJIFunction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MJIGardenscaping
+{
+  uint8_t level;
+  int32_t item;
+
+  MJIGardenscaping( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct MJIGathering
 {
   uint8_t gatheringObject;
@@ -6290,6 +6401,19 @@ struct MJIMinionPopAreas
 {
 
   MJIMinionPopAreas( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MJIName
+{
+  std::string singular;
+  int8_t adjective;
+  std::string plural;
+  int8_t possessivePronoun;
+  int8_t startsWithVowel;
+  int8_t pronoun;
+  int8_t article;
+
+  MJIName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MJIProgress
@@ -6816,9 +6940,9 @@ struct OmikujiGuidance
 struct OnlineStatus
 {
   bool list;
-  bool priority;
-  uint8_t name;
+  uint8_t priority;
   uint32_t icon;
+  std::string name;
 
   OnlineStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -7420,10 +7544,25 @@ struct QuestEffectDefine
   QuestEffectDefine( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct QuestEventAreaEntranceInfo
+{
+  uint32_t quest;
+  uint32_t location;
+
+  QuestEventAreaEntranceInfo( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct QuestLinkMarker
 {
 
   QuestLinkMarker( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct QuestLinkMarkerIcon
+{
+  uint32_t icon;
+
+  QuestLinkMarkerIcon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct QuestLinkMarkerSet
@@ -8088,8 +8227,9 @@ struct SpearfishingItem
   std::string description;
   int32_t item;
   uint16_t gatheringItemLevel;
-  uint16_t fishingRecordType;
+  uint8_t fishingRecordType;
   uint16_t territoryType;
+  bool isVisible;
 
   SpearfishingItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -8252,7 +8392,7 @@ struct SubmarineExploration
   int16_t y;
   int16_t z;
   uint8_t map;
-  bool passengers;
+  bool startingPoint;
   uint8_t stars;
   uint8_t rankReq;
   uint8_t ceruleumTankReq;
@@ -8412,6 +8552,24 @@ struct TofuObjectCategory
 {
 
   TofuObjectCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TofuPreset
+{
+
+  TofuPreset( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TofuPresetCategory
+{
+
+  TofuPresetCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct TofuPresetObject
+{
+
+  TofuPresetObject( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Tomestones
@@ -9074,6 +9232,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_AOZBossDat;
      xiv::exd::Exd m_AOZContentDat;
      xiv::exd::Exd m_AOZContentBriefingBNpcDat;
+     xiv::exd::Exd m_AOZContentBriefingObjectDat;
      xiv::exd::Exd m_AOZReportDat;
      xiv::exd::Exd m_AOZScoreDat;
      xiv::exd::Exd m_AquariumFishDat;
@@ -9209,6 +9368,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CreditListDat;
      xiv::exd::Exd m_CreditListTextDat;
      xiv::exd::Exd m_CustomTalkDat;
+     xiv::exd::Exd m_CustomTalkDefineClientDat;
      xiv::exd::Exd m_CustomTalkNestHandlersDat;
      xiv::exd::Exd m_CutsceneDat;
      xiv::exd::Exd m_CutSceneIncompQuestDat;
@@ -9276,6 +9436,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_EventActionDat;
      xiv::exd::Exd m_EventCustomIconTypeDat;
      xiv::exd::Exd m_EventIconPriorityDat;
+     xiv::exd::Exd m_EventIconPriorityPairDat;
      xiv::exd::Exd m_EventIconTypeDat;
      xiv::exd::Exd m_EventItemDat;
      xiv::exd::Exd m_EventItemCastTimelineDat;
@@ -9310,6 +9471,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_FestivalDat;
      xiv::exd::Exd m_FieldMarkerDat;
      xiv::exd::Exd m_FishingBaitParameterDat;
+     xiv::exd::Exd m_FishingNoteInfoDat;
      xiv::exd::Exd m_FishingRecordTypeDat;
      xiv::exd::Exd m_FishingRecordTypeTransientDat;
      xiv::exd::Exd m_FishingSpotDat;
@@ -9486,6 +9648,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MacroIconRedirectOldDat;
      xiv::exd::Exd m_MainCommandDat;
      xiv::exd::Exd m_MainCommandCategoryDat;
+     xiv::exd::Exd m_MandervilleWeaponEnhanceDat;
      xiv::exd::Exd m_ManeuversArmorDat;
      xiv::exd::Exd m_MapDat;
      xiv::exd::Exd m_MapConditionDat;
@@ -9505,6 +9668,13 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_McGuffinDat;
      xiv::exd::Exd m_McGuffinUIDataDat;
      xiv::exd::Exd m_MiniGameRADat;
+     xiv::exd::Exd m_MiniGameTurnBreakActionDat;
+     xiv::exd::Exd m_MiniGameTurnBreakConstDat;
+     xiv::exd::Exd m_MiniGameTurnBreakEnemyDat;
+     xiv::exd::Exd m_MiniGameTurnBreakPopDat;
+     xiv::exd::Exd m_MiniGameTurnBreakPopOffsetDat;
+     xiv::exd::Exd m_MiniGameTurnBreakStageDat;
+     xiv::exd::Exd m_MiniGameTurnBreakStatusDat;
      xiv::exd::Exd m_MinionRaceDat;
      xiv::exd::Exd m_MinionRulesDat;
      xiv::exd::Exd m_MinionSkillTypeDat;
@@ -9523,6 +9693,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MJIDisposalShopUICategoryDat;
      xiv::exd::Exd m_MJIFarmPastureRankDat;
      xiv::exd::Exd m_MJIFunctionDat;
+     xiv::exd::Exd m_MJIGardenscapingDat;
      xiv::exd::Exd m_MJIGatheringDat;
      xiv::exd::Exd m_MJIGatheringItemDat;
      xiv::exd::Exd m_MJIGatheringObjectDat;
@@ -9535,6 +9706,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MJILandmarkPlaceDat;
      xiv::exd::Exd m_MJILivelyActorDat;
      xiv::exd::Exd m_MJIMinionPopAreasDat;
+     xiv::exd::Exd m_MJINameDat;
      xiv::exd::Exd m_MJIProgressDat;
      xiv::exd::Exd m_MJIRankDat;
      xiv::exd::Exd m_MJIRecipeDat;
@@ -9636,7 +9808,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_QuestDerivedClassDat;
      xiv::exd::Exd m_QuestEffectDat;
      xiv::exd::Exd m_QuestEffectDefineDat;
+     xiv::exd::Exd m_QuestEventAreaEntranceInfoDat;
      xiv::exd::Exd m_QuestLinkMarkerDat;
+     xiv::exd::Exd m_QuestLinkMarkerIconDat;
      xiv::exd::Exd m_QuestLinkMarkerSetDat;
      xiv::exd::Exd m_QuestRedoDat;
      xiv::exd::Exd m_QuestRedoChapterUIDat;
@@ -9732,6 +9906,9 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_TofuEditParamDat;
      xiv::exd::Exd m_TofuObjectDat;
      xiv::exd::Exd m_TofuObjectCategoryDat;
+     xiv::exd::Exd m_TofuPresetDat;
+     xiv::exd::Exd m_TofuPresetCategoryDat;
+     xiv::exd::Exd m_TofuPresetObjectDat;
      xiv::exd::Exd m_TomestonesDat;
      xiv::exd::Exd m_TomestonesItemDat;
      xiv::exd::Exd m_TopicSelectDat;
@@ -9846,6 +10023,7 @@ struct ZoneSharedGroup
      using AOZBossPtr = std::shared_ptr< AOZBoss >;
      using AOZContentPtr = std::shared_ptr< AOZContent >;
      using AOZContentBriefingBNpcPtr = std::shared_ptr< AOZContentBriefingBNpc >;
+     using AOZContentBriefingObjectPtr = std::shared_ptr< AOZContentBriefingObject >;
      using AOZReportPtr = std::shared_ptr< AOZReport >;
      using AOZScorePtr = std::shared_ptr< AOZScore >;
      using AquariumFishPtr = std::shared_ptr< AquariumFish >;
@@ -9981,6 +10159,7 @@ struct ZoneSharedGroup
      using CreditListPtr = std::shared_ptr< CreditList >;
      using CreditListTextPtr = std::shared_ptr< CreditListText >;
      using CustomTalkPtr = std::shared_ptr< CustomTalk >;
+     using CustomTalkDefineClientPtr = std::shared_ptr< CustomTalkDefineClient >;
      using CustomTalkNestHandlersPtr = std::shared_ptr< CustomTalkNestHandlers >;
      using CutscenePtr = std::shared_ptr< Cutscene >;
      using CutSceneIncompQuestPtr = std::shared_ptr< CutSceneIncompQuest >;
@@ -10048,6 +10227,7 @@ struct ZoneSharedGroup
      using EventActionPtr = std::shared_ptr< EventAction >;
      using EventCustomIconTypePtr = std::shared_ptr< EventCustomIconType >;
      using EventIconPriorityPtr = std::shared_ptr< EventIconPriority >;
+     using EventIconPriorityPairPtr = std::shared_ptr< EventIconPriorityPair >;
      using EventIconTypePtr = std::shared_ptr< EventIconType >;
      using EventItemPtr = std::shared_ptr< EventItem >;
      using EventItemCastTimelinePtr = std::shared_ptr< EventItemCastTimeline >;
@@ -10082,6 +10262,7 @@ struct ZoneSharedGroup
      using FestivalPtr = std::shared_ptr< Festival >;
      using FieldMarkerPtr = std::shared_ptr< FieldMarker >;
      using FishingBaitParameterPtr = std::shared_ptr< FishingBaitParameter >;
+     using FishingNoteInfoPtr = std::shared_ptr< FishingNoteInfo >;
      using FishingRecordTypePtr = std::shared_ptr< FishingRecordType >;
      using FishingRecordTypeTransientPtr = std::shared_ptr< FishingRecordTypeTransient >;
      using FishingSpotPtr = std::shared_ptr< FishingSpot >;
@@ -10258,6 +10439,7 @@ struct ZoneSharedGroup
      using MacroIconRedirectOldPtr = std::shared_ptr< MacroIconRedirectOld >;
      using MainCommandPtr = std::shared_ptr< MainCommand >;
      using MainCommandCategoryPtr = std::shared_ptr< MainCommandCategory >;
+     using MandervilleWeaponEnhancePtr = std::shared_ptr< MandervilleWeaponEnhance >;
      using ManeuversArmorPtr = std::shared_ptr< ManeuversArmor >;
      using MapPtr = std::shared_ptr< Map >;
      using MapConditionPtr = std::shared_ptr< MapCondition >;
@@ -10277,6 +10459,13 @@ struct ZoneSharedGroup
      using McGuffinPtr = std::shared_ptr< McGuffin >;
      using McGuffinUIDataPtr = std::shared_ptr< McGuffinUIData >;
      using MiniGameRAPtr = std::shared_ptr< MiniGameRA >;
+     using MiniGameTurnBreakActionPtr = std::shared_ptr< MiniGameTurnBreakAction >;
+     using MiniGameTurnBreakConstPtr = std::shared_ptr< MiniGameTurnBreakConst >;
+     using MiniGameTurnBreakEnemyPtr = std::shared_ptr< MiniGameTurnBreakEnemy >;
+     using MiniGameTurnBreakPopPtr = std::shared_ptr< MiniGameTurnBreakPop >;
+     using MiniGameTurnBreakPopOffsetPtr = std::shared_ptr< MiniGameTurnBreakPopOffset >;
+     using MiniGameTurnBreakStagePtr = std::shared_ptr< MiniGameTurnBreakStage >;
+     using MiniGameTurnBreakStatusPtr = std::shared_ptr< MiniGameTurnBreakStatus >;
      using MinionRacePtr = std::shared_ptr< MinionRace >;
      using MinionRulesPtr = std::shared_ptr< MinionRules >;
      using MinionSkillTypePtr = std::shared_ptr< MinionSkillType >;
@@ -10295,6 +10484,7 @@ struct ZoneSharedGroup
      using MJIDisposalShopUICategoryPtr = std::shared_ptr< MJIDisposalShopUICategory >;
      using MJIFarmPastureRankPtr = std::shared_ptr< MJIFarmPastureRank >;
      using MJIFunctionPtr = std::shared_ptr< MJIFunction >;
+     using MJIGardenscapingPtr = std::shared_ptr< MJIGardenscaping >;
      using MJIGatheringPtr = std::shared_ptr< MJIGathering >;
      using MJIGatheringItemPtr = std::shared_ptr< MJIGatheringItem >;
      using MJIGatheringObjectPtr = std::shared_ptr< MJIGatheringObject >;
@@ -10307,6 +10497,7 @@ struct ZoneSharedGroup
      using MJILandmarkPlacePtr = std::shared_ptr< MJILandmarkPlace >;
      using MJILivelyActorPtr = std::shared_ptr< MJILivelyActor >;
      using MJIMinionPopAreasPtr = std::shared_ptr< MJIMinionPopAreas >;
+     using MJINamePtr = std::shared_ptr< MJIName >;
      using MJIProgressPtr = std::shared_ptr< MJIProgress >;
      using MJIRankPtr = std::shared_ptr< MJIRank >;
      using MJIRecipePtr = std::shared_ptr< MJIRecipe >;
@@ -10408,7 +10599,9 @@ struct ZoneSharedGroup
      using QuestDerivedClassPtr = std::shared_ptr< QuestDerivedClass >;
      using QuestEffectPtr = std::shared_ptr< QuestEffect >;
      using QuestEffectDefinePtr = std::shared_ptr< QuestEffectDefine >;
+     using QuestEventAreaEntranceInfoPtr = std::shared_ptr< QuestEventAreaEntranceInfo >;
      using QuestLinkMarkerPtr = std::shared_ptr< QuestLinkMarker >;
+     using QuestLinkMarkerIconPtr = std::shared_ptr< QuestLinkMarkerIcon >;
      using QuestLinkMarkerSetPtr = std::shared_ptr< QuestLinkMarkerSet >;
      using QuestRedoPtr = std::shared_ptr< QuestRedo >;
      using QuestRedoChapterUIPtr = std::shared_ptr< QuestRedoChapterUI >;
@@ -10504,6 +10697,9 @@ struct ZoneSharedGroup
      using TofuEditParamPtr = std::shared_ptr< TofuEditParam >;
      using TofuObjectPtr = std::shared_ptr< TofuObject >;
      using TofuObjectCategoryPtr = std::shared_ptr< TofuObjectCategory >;
+     using TofuPresetPtr = std::shared_ptr< TofuPreset >;
+     using TofuPresetCategoryPtr = std::shared_ptr< TofuPresetCategory >;
+     using TofuPresetObjectPtr = std::shared_ptr< TofuPresetObject >;
      using TomestonesPtr = std::shared_ptr< Tomestones >;
      using TomestonesItemPtr = std::shared_ptr< TomestonesItem >;
      using TopicSelectPtr = std::shared_ptr< TopicSelect >;
@@ -10618,6 +10814,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_AOZBossIdList;
      std::set< uint32_t > m_AOZContentIdList;
      std::set< uint32_t > m_AOZContentBriefingBNpcIdList;
+     std::set< uint32_t > m_AOZContentBriefingObjectIdList;
      std::set< uint32_t > m_AOZReportIdList;
      std::set< uint32_t > m_AOZScoreIdList;
      std::set< uint32_t > m_AquariumFishIdList;
@@ -10753,6 +10950,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CreditListIdList;
      std::set< uint32_t > m_CreditListTextIdList;
      std::set< uint32_t > m_CustomTalkIdList;
+     std::set< uint32_t > m_CustomTalkDefineClientIdList;
      std::set< uint32_t > m_CustomTalkNestHandlersIdList;
      std::set< uint32_t > m_CutsceneIdList;
      std::set< uint32_t > m_CutSceneIncompQuestIdList;
@@ -10820,6 +11018,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_EventActionIdList;
      std::set< uint32_t > m_EventCustomIconTypeIdList;
      std::set< uint32_t > m_EventIconPriorityIdList;
+     std::set< uint32_t > m_EventIconPriorityPairIdList;
      std::set< uint32_t > m_EventIconTypeIdList;
      std::set< uint32_t > m_EventItemIdList;
      std::set< uint32_t > m_EventItemCastTimelineIdList;
@@ -10854,6 +11053,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_FestivalIdList;
      std::set< uint32_t > m_FieldMarkerIdList;
      std::set< uint32_t > m_FishingBaitParameterIdList;
+     std::set< uint32_t > m_FishingNoteInfoIdList;
      std::set< uint32_t > m_FishingRecordTypeIdList;
      std::set< uint32_t > m_FishingRecordTypeTransientIdList;
      std::set< uint32_t > m_FishingSpotIdList;
@@ -11030,6 +11230,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MacroIconRedirectOldIdList;
      std::set< uint32_t > m_MainCommandIdList;
      std::set< uint32_t > m_MainCommandCategoryIdList;
+     std::set< uint32_t > m_MandervilleWeaponEnhanceIdList;
      std::set< uint32_t > m_ManeuversArmorIdList;
      std::set< uint32_t > m_MapIdList;
      std::set< uint32_t > m_MapConditionIdList;
@@ -11049,6 +11250,13 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_McGuffinIdList;
      std::set< uint32_t > m_McGuffinUIDataIdList;
      std::set< uint32_t > m_MiniGameRAIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakActionIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakConstIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakEnemyIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakPopIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakPopOffsetIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakStageIdList;
+     std::set< uint32_t > m_MiniGameTurnBreakStatusIdList;
      std::set< uint32_t > m_MinionRaceIdList;
      std::set< uint32_t > m_MinionRulesIdList;
      std::set< uint32_t > m_MinionSkillTypeIdList;
@@ -11067,6 +11275,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MJIDisposalShopUICategoryIdList;
      std::set< uint32_t > m_MJIFarmPastureRankIdList;
      std::set< uint32_t > m_MJIFunctionIdList;
+     std::set< uint32_t > m_MJIGardenscapingIdList;
      std::set< uint32_t > m_MJIGatheringIdList;
      std::set< uint32_t > m_MJIGatheringItemIdList;
      std::set< uint32_t > m_MJIGatheringObjectIdList;
@@ -11079,6 +11288,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MJILandmarkPlaceIdList;
      std::set< uint32_t > m_MJILivelyActorIdList;
      std::set< uint32_t > m_MJIMinionPopAreasIdList;
+     std::set< uint32_t > m_MJINameIdList;
      std::set< uint32_t > m_MJIProgressIdList;
      std::set< uint32_t > m_MJIRankIdList;
      std::set< uint32_t > m_MJIRecipeIdList;
@@ -11180,7 +11390,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_QuestDerivedClassIdList;
      std::set< uint32_t > m_QuestEffectIdList;
      std::set< uint32_t > m_QuestEffectDefineIdList;
+     std::set< uint32_t > m_QuestEventAreaEntranceInfoIdList;
      std::set< uint32_t > m_QuestLinkMarkerIdList;
+     std::set< uint32_t > m_QuestLinkMarkerIconIdList;
      std::set< uint32_t > m_QuestLinkMarkerSetIdList;
      std::set< uint32_t > m_QuestRedoIdList;
      std::set< uint32_t > m_QuestRedoChapterUIIdList;
@@ -11276,6 +11488,9 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_TofuEditParamIdList;
      std::set< uint32_t > m_TofuObjectIdList;
      std::set< uint32_t > m_TofuObjectCategoryIdList;
+     std::set< uint32_t > m_TofuPresetIdList;
+     std::set< uint32_t > m_TofuPresetCategoryIdList;
+     std::set< uint32_t > m_TofuPresetObjectIdList;
      std::set< uint32_t > m_TomestonesIdList;
      std::set< uint32_t > m_TomestonesItemIdList;
      std::set< uint32_t > m_TopicSelectIdList;
@@ -11659,6 +11874,12 @@ const std::set< uint32_t >& getAOZContentBriefingBNpcIdList()
    if( m_AOZContentBriefingBNpcIdList.size() == 0 )
       loadIdList( m_AOZContentBriefingBNpcDat, m_AOZContentBriefingBNpcIdList );
    return m_AOZContentBriefingBNpcIdList;
+}
+const std::set< uint32_t >& getAOZContentBriefingObjectIdList()
+{
+   if( m_AOZContentBriefingObjectIdList.size() == 0 )
+      loadIdList( m_AOZContentBriefingObjectDat, m_AOZContentBriefingObjectIdList );
+   return m_AOZContentBriefingObjectIdList;
 }
 const std::set< uint32_t >& getAOZReportIdList()
 {
@@ -12470,6 +12691,12 @@ const std::set< uint32_t >& getCustomTalkIdList()
       loadIdList( m_CustomTalkDat, m_CustomTalkIdList );
    return m_CustomTalkIdList;
 }
+const std::set< uint32_t >& getCustomTalkDefineClientIdList()
+{
+   if( m_CustomTalkDefineClientIdList.size() == 0 )
+      loadIdList( m_CustomTalkDefineClientDat, m_CustomTalkDefineClientIdList );
+   return m_CustomTalkDefineClientIdList;
+}
 const std::set< uint32_t >& getCustomTalkNestHandlersIdList()
 {
    if( m_CustomTalkNestHandlersIdList.size() == 0 )
@@ -12872,6 +13099,12 @@ const std::set< uint32_t >& getEventIconPriorityIdList()
       loadIdList( m_EventIconPriorityDat, m_EventIconPriorityIdList );
    return m_EventIconPriorityIdList;
 }
+const std::set< uint32_t >& getEventIconPriorityPairIdList()
+{
+   if( m_EventIconPriorityPairIdList.size() == 0 )
+      loadIdList( m_EventIconPriorityPairDat, m_EventIconPriorityPairIdList );
+   return m_EventIconPriorityPairIdList;
+}
 const std::set< uint32_t >& getEventIconTypeIdList()
 {
    if( m_EventIconTypeIdList.size() == 0 )
@@ -13075,6 +13308,12 @@ const std::set< uint32_t >& getFishingBaitParameterIdList()
    if( m_FishingBaitParameterIdList.size() == 0 )
       loadIdList( m_FishingBaitParameterDat, m_FishingBaitParameterIdList );
    return m_FishingBaitParameterIdList;
+}
+const std::set< uint32_t >& getFishingNoteInfoIdList()
+{
+   if( m_FishingNoteInfoIdList.size() == 0 )
+      loadIdList( m_FishingNoteInfoDat, m_FishingNoteInfoIdList );
+   return m_FishingNoteInfoIdList;
 }
 const std::set< uint32_t >& getFishingRecordTypeIdList()
 {
@@ -14132,6 +14371,12 @@ const std::set< uint32_t >& getMainCommandCategoryIdList()
       loadIdList( m_MainCommandCategoryDat, m_MainCommandCategoryIdList );
    return m_MainCommandCategoryIdList;
 }
+const std::set< uint32_t >& getMandervilleWeaponEnhanceIdList()
+{
+   if( m_MandervilleWeaponEnhanceIdList.size() == 0 )
+      loadIdList( m_MandervilleWeaponEnhanceDat, m_MandervilleWeaponEnhanceIdList );
+   return m_MandervilleWeaponEnhanceIdList;
+}
 const std::set< uint32_t >& getManeuversArmorIdList()
 {
    if( m_ManeuversArmorIdList.size() == 0 )
@@ -14246,6 +14491,48 @@ const std::set< uint32_t >& getMiniGameRAIdList()
       loadIdList( m_MiniGameRADat, m_MiniGameRAIdList );
    return m_MiniGameRAIdList;
 }
+const std::set< uint32_t >& getMiniGameTurnBreakActionIdList()
+{
+   if( m_MiniGameTurnBreakActionIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakActionDat, m_MiniGameTurnBreakActionIdList );
+   return m_MiniGameTurnBreakActionIdList;
+}
+const std::set< uint32_t >& getMiniGameTurnBreakConstIdList()
+{
+   if( m_MiniGameTurnBreakConstIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakConstDat, m_MiniGameTurnBreakConstIdList );
+   return m_MiniGameTurnBreakConstIdList;
+}
+const std::set< uint32_t >& getMiniGameTurnBreakEnemyIdList()
+{
+   if( m_MiniGameTurnBreakEnemyIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakEnemyDat, m_MiniGameTurnBreakEnemyIdList );
+   return m_MiniGameTurnBreakEnemyIdList;
+}
+const std::set< uint32_t >& getMiniGameTurnBreakPopIdList()
+{
+   if( m_MiniGameTurnBreakPopIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakPopDat, m_MiniGameTurnBreakPopIdList );
+   return m_MiniGameTurnBreakPopIdList;
+}
+const std::set< uint32_t >& getMiniGameTurnBreakPopOffsetIdList()
+{
+   if( m_MiniGameTurnBreakPopOffsetIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakPopOffsetDat, m_MiniGameTurnBreakPopOffsetIdList );
+   return m_MiniGameTurnBreakPopOffsetIdList;
+}
+const std::set< uint32_t >& getMiniGameTurnBreakStageIdList()
+{
+   if( m_MiniGameTurnBreakStageIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakStageDat, m_MiniGameTurnBreakStageIdList );
+   return m_MiniGameTurnBreakStageIdList;
+}
+const std::set< uint32_t >& getMiniGameTurnBreakStatusIdList()
+{
+   if( m_MiniGameTurnBreakStatusIdList.size() == 0 )
+      loadIdList( m_MiniGameTurnBreakStatusDat, m_MiniGameTurnBreakStatusIdList );
+   return m_MiniGameTurnBreakStatusIdList;
+}
 const std::set< uint32_t >& getMinionRaceIdList()
 {
    if( m_MinionRaceIdList.size() == 0 )
@@ -14354,6 +14641,12 @@ const std::set< uint32_t >& getMJIFunctionIdList()
       loadIdList( m_MJIFunctionDat, m_MJIFunctionIdList );
    return m_MJIFunctionIdList;
 }
+const std::set< uint32_t >& getMJIGardenscapingIdList()
+{
+   if( m_MJIGardenscapingIdList.size() == 0 )
+      loadIdList( m_MJIGardenscapingDat, m_MJIGardenscapingIdList );
+   return m_MJIGardenscapingIdList;
+}
 const std::set< uint32_t >& getMJIGatheringIdList()
 {
    if( m_MJIGatheringIdList.size() == 0 )
@@ -14425,6 +14718,12 @@ const std::set< uint32_t >& getMJIMinionPopAreasIdList()
    if( m_MJIMinionPopAreasIdList.size() == 0 )
       loadIdList( m_MJIMinionPopAreasDat, m_MJIMinionPopAreasIdList );
    return m_MJIMinionPopAreasIdList;
+}
+const std::set< uint32_t >& getMJINameIdList()
+{
+   if( m_MJINameIdList.size() == 0 )
+      loadIdList( m_MJINameDat, m_MJINameIdList );
+   return m_MJINameIdList;
 }
 const std::set< uint32_t >& getMJIProgressIdList()
 {
@@ -15032,11 +15331,23 @@ const std::set< uint32_t >& getQuestEffectDefineIdList()
       loadIdList( m_QuestEffectDefineDat, m_QuestEffectDefineIdList );
    return m_QuestEffectDefineIdList;
 }
+const std::set< uint32_t >& getQuestEventAreaEntranceInfoIdList()
+{
+   if( m_QuestEventAreaEntranceInfoIdList.size() == 0 )
+      loadIdList( m_QuestEventAreaEntranceInfoDat, m_QuestEventAreaEntranceInfoIdList );
+   return m_QuestEventAreaEntranceInfoIdList;
+}
 const std::set< uint32_t >& getQuestLinkMarkerIdList()
 {
    if( m_QuestLinkMarkerIdList.size() == 0 )
       loadIdList( m_QuestLinkMarkerDat, m_QuestLinkMarkerIdList );
    return m_QuestLinkMarkerIdList;
+}
+const std::set< uint32_t >& getQuestLinkMarkerIconIdList()
+{
+   if( m_QuestLinkMarkerIconIdList.size() == 0 )
+      loadIdList( m_QuestLinkMarkerIconDat, m_QuestLinkMarkerIconIdList );
+   return m_QuestLinkMarkerIconIdList;
 }
 const std::set< uint32_t >& getQuestLinkMarkerSetIdList()
 {
@@ -15607,6 +15918,24 @@ const std::set< uint32_t >& getTofuObjectCategoryIdList()
    if( m_TofuObjectCategoryIdList.size() == 0 )
       loadIdList( m_TofuObjectCategoryDat, m_TofuObjectCategoryIdList );
    return m_TofuObjectCategoryIdList;
+}
+const std::set< uint32_t >& getTofuPresetIdList()
+{
+   if( m_TofuPresetIdList.size() == 0 )
+      loadIdList( m_TofuPresetDat, m_TofuPresetIdList );
+   return m_TofuPresetIdList;
+}
+const std::set< uint32_t >& getTofuPresetCategoryIdList()
+{
+   if( m_TofuPresetCategoryIdList.size() == 0 )
+      loadIdList( m_TofuPresetCategoryDat, m_TofuPresetCategoryIdList );
+   return m_TofuPresetCategoryIdList;
+}
+const std::set< uint32_t >& getTofuPresetObjectIdList()
+{
+   if( m_TofuPresetObjectIdList.size() == 0 )
+      loadIdList( m_TofuPresetObjectDat, m_TofuPresetObjectIdList );
+   return m_TofuPresetObjectIdList;
 }
 const std::set< uint32_t >& getTomestonesIdList()
 {

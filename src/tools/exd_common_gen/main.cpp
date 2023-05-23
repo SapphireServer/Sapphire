@@ -132,7 +132,7 @@ int main( int argc, char** argv )
   result += generateEnum( "GuardianDeity", 0, "uint8_t" );
   result += generateEnum( "ItemUICategory", 0, "uint8_t" );
   result += generateEnum( "ItemSearchCategory", 0, "uint8_t" );
-  result += generateEnum( "OnlineStatus", 3, "uint8_t" );
+  result += generateEnum( "OnlineStatus", 6, "uint8_t" );
   result += generateEnum( "Race", 1, "uint8_t" );
   result += generateEnum( "Tribe", 0, "uint8_t" );
   result += generateEnum( "Town", 0, "uint8_t" );
