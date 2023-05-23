@@ -377,7 +377,7 @@ namespace Sapphire::Network::Packets
         MarketBoardRequestItemListingInfo = 0x00F4, // updated 5.58h
         MarketBoardRequestItemListings = 0x0122,    // updated 5.58h
         MarketBoardSearch = 0x0082,                 // updated 5.58h
-        MarketBoardPurchaseHandler = 0x323,        // updated 6.40
+        MarketBoardPurchaseHandler = 0x0256,        // updated 6.40
 
         ReqExamineFcInfo = 0xF37B, // updated 5.58h (prepended F. Conflicts with FinishLoadingHandler 6.38)
 
@@ -393,7 +393,7 @@ namespace Sapphire::Network::Packets
         ReqCountdownCancel = 0x023a,   // updated 6.31h
 
         ZoneLineHandler = 0x00ce,  // updated 6.31h
-        ClientTrigger = 0x1c1,    // updated 6.40
+        ClientTrigger = 0x01BC,    // updated 6.40
         DiscoveryHandler = 0x038B, // updated 5.58h
 
         SkillHandler = 0x0228,    // updated 6.40
@@ -401,22 +401,22 @@ namespace Sapphire::Network::Packets
         GMCommand2 = 0x0195,      // updated 6.40
         AoESkillHandler = 0x016f, // updated 6.40
 
-        UpdatePositionHandler = 0xae, // updated 6.40
+        UpdatePositionHandler = 0x0179, // updated 6.40
 
-        InventoryModifyHandler = 0x278, // updated 6.40
+        InventoryModifyHandler = 0x02DB, // updated 6.40
 
         InventoryEquipRecommendedItems = 0x01C9, // updated 5.58h
 
         ReqPlaceHousingItem = 0x02D4, // updated 5.58h
         BuildPresetHandler = 0x0223,  // updated 5.58h
 
-        TalkEventHandler = 0x295,         // updated 6.40
+        TalkEventHandler = 0x035D,         // updated 6.40
         EmoteEventHandler = 0x00B0,        // updated 5.58h
         WithinRangeEventHandler = 0x02B6,  // updated 5.58h
         OutOfRangeEventHandler = 0x00b4,   // updated 6.31h
         EnterTeriEventHandler = 0x208,    // updated 6.40
         ShopEventHandler = 0x0384,         // updated 5.58h
-        ReturnEventHandler = 0x21a,       // updated 6.40
+        ReturnEventHandler = 0x0131,       // updated 6.40
         TradeReturnEventHandler = 0x3c9,  // updated 6.40
         TradeReturnEventHandler2 = 0x023C, // updated 5.58h
         EventYield2Handler = 0x021D,       // updated 5.58h
@@ -435,7 +435,7 @@ namespace Sapphire::Network::Packets
 
         SetSharedEstateSettings = 0x00D2, // updated 5.58h
 
-        UpdatePositionInstance = 0x346, // updated 6.40
+        UpdatePositionInstance = 0x00E5, // updated 6.40
 
         PerformNoteHandler = 0x0243, // updated 5.58h
 
