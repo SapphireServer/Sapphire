@@ -396,10 +396,10 @@ namespace Sapphire::Network::Packets
         ClientTrigger = 0x1c1,    // updated 6.40
         DiscoveryHandler = 0x038B, // updated 5.58h
 
-        SkillHandler = 0x0133,    // updated 6.31h
+        SkillHandler = 0x0228,    // updated 6.31h
         GMCommand1 = 0x0139,      // updated 6.40
         GMCommand2 = 0x0195,      // updated 6.40
-        AoESkillHandler = 0x0152, // updated 5.58h
+        AoESkillHandler = 0x016f, // updated 5.58h
 
         UpdatePositionHandler = 0xae, // updated 6.40
 
