@@ -321,7 +321,6 @@ struct FittingShopCategory;
 struct FittingShopCategoryItem;
 struct FittingShopItemSet;
 struct Frontline03;
-struct Frontline04;
 struct FurnitureCatalogCategory;
 struct FurnitureCatalogItemList;
 struct GameRewardObtainType;
@@ -1351,17 +1350,17 @@ struct AOZContent
   uint8_t act1FightType;
   uint16_t act1;
   uint8_t arenaType1;
-  uint8_t act2FightType;
-  uint16_t act2;
-  uint8_t arenaType2;
+  uint16_t act2FightType;
+  uint8_t act2;
+  uint16_t arenaType2;
   uint8_t act3FightType;
   uint16_t act3;
   uint8_t arenaType3;
-  uint32_t contentEntry;
+  uint16_t contentEntry;
   uint8_t order;
   uint16_t gilReward;
-  uint16_t alliedSealsReward;
-  uint16_t tomestonesReward;
+  uint32_t alliedSealsReward;
+  uint8_t tomestonesReward;
 
   AOZContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -2445,10 +2444,10 @@ struct CollectablesShopItem
   uint32_t item;
   uint8_t collectablesShopItemGroup;
   uint16_t levelMin;
-  uint16_t levelMax;
-  uint8_t stars;
+  uint32_t levelMax;
+  uint16_t stars;
   uint8_t key;
-  uint16_t collectablesShopRefine;
+  uint8_t collectablesShopRefine;
   uint16_t collectablesShopRewardScrip;
 
   CollectablesShopItem( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
@@ -2836,11 +2835,11 @@ struct ContentRoulette
   uint16_t rewardTomeA;
   uint16_t rewardTomeB;
   uint16_t rewardTomeC;
-  uint8_t sortKey;
+  uint32_t sortKey;
   uint8_t contentMemberType;
   bool requireAllDuties;
-  uint8_t contentRouletteOpenRule;
-  uint16_t instanceContent;
+  bool contentRouletteOpenRule;
+  uint8_t instanceContent;
 
   ContentRoulette( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4128,12 +4127,9 @@ struct FishParameter
   int32_t item;
   uint16_t gatheringItemLevel;
   bool isHidden;
-  uint8_t fishingRecordType;
-  uint16_t fishingSpot;
-  uint16_t gatheringSubCategory;
-  bool isInLog;
-  bool timeRestricted;
-  bool weatherRestricted;
+  uint16_t fishingRecordType;
+  bool fishingSpot;
+  uint32_t gatheringSubCategory;
 
   FishParameter( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4170,15 +4166,6 @@ struct Frontline03
   std::vector< uint32_t > immortalFlamesIcon;
 
   Frontline03( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
-};
-
-struct Frontline04
-{
-  int32_t level1;
-  int32_t level2;
-  int32_t level3;
-
-  Frontline04( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FurnitureCatalogCategory
@@ -5248,7 +5235,7 @@ struct IKDRoute
 {
   uint32_t image;
   uint32_t territoryType;
-  std::string name;
+  uint32_t name;
 
   IKDRoute( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5987,7 +5974,7 @@ struct MapType
 struct Marker
 {
   int32_t icon;
-  std::string name;
+  uint8_t name;
 
   Marker( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5995,8 +5982,8 @@ struct Marker
 struct Materia
 {
   std::vector< int32_t > item;
-  uint8_t baseParam;
-  std::vector< int16_t > value;
+  int32_t baseParam;
+  std::vector< int32_t > value;
 
   Materia( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6532,7 +6519,7 @@ struct Mount
   int32_t equipFoot;
   int16_t order;
   uint16_t icon;
-  uint8_t uIPriority;
+  uint16_t uIPriority;
   uint8_t radiusRate;
   uint8_t baseMotionSpeed_Run;
   uint8_t baseMotionSpeed_Walk;
@@ -6829,8 +6816,8 @@ struct OmikujiGuidance
 struct OnlineStatus
 {
   bool list;
-  uint8_t priority;
-  std::string name;
+  bool priority;
+  uint8_t name;
   uint32_t icon;
 
   OnlineStatus( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
@@ -7332,7 +7319,7 @@ struct Quest
   std::vector< uint8_t > optionalItemCountReward;
   std::vector< bool > optionalItemIsHQReward;
   std::vector< uint8_t > optionalItemStainReward;
-  uint8_t emoteReward;
+  uint16_t emoteReward;
   uint16_t actionReward;
   std::vector< uint8_t > generalActionReward;
   uint16_t systemReward0;
@@ -8101,9 +8088,8 @@ struct SpearfishingItem
   std::string description;
   int32_t item;
   uint16_t gatheringItemLevel;
-  uint8_t fishingRecordType;
+  uint16_t fishingRecordType;
   uint16_t territoryType;
-  bool isVisible;
 
   SpearfishingItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -8186,7 +8172,7 @@ struct Status
 {
   std::string name;
   std::string description;
-  uint16_t icon;
+  uint32_t icon;
   uint8_t maxStacks;
   uint8_t classJobCategory;
   uint8_t statusCategory;
@@ -8770,7 +8756,7 @@ struct VVDVariantAction
 {
   uint32_t action;
 
-  VVDVariantAction( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+  VVDVariantAction( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Warp
@@ -9333,7 +9319,6 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_FittingShopCategoryItemDat;
      xiv::exd::Exd m_FittingShopItemSetDat;
      xiv::exd::Exd m_Frontline03Dat;
-     xiv::exd::Exd m_Frontline04Dat;
      xiv::exd::Exd m_FurnitureCatalogCategoryDat;
      xiv::exd::Exd m_FurnitureCatalogItemListDat;
      xiv::exd::Exd m_GameRewardObtainTypeDat;
@@ -10106,7 +10091,6 @@ struct ZoneSharedGroup
      using FittingShopCategoryItemPtr = std::shared_ptr< FittingShopCategoryItem >;
      using FittingShopItemSetPtr = std::shared_ptr< FittingShopItemSet >;
      using Frontline03Ptr = std::shared_ptr< Frontline03 >;
-     using Frontline04Ptr = std::shared_ptr< Frontline04 >;
      using FurnitureCatalogCategoryPtr = std::shared_ptr< FurnitureCatalogCategory >;
      using FurnitureCatalogItemListPtr = std::shared_ptr< FurnitureCatalogItemList >;
      using GameRewardObtainTypePtr = std::shared_ptr< GameRewardObtainType >;
@@ -10879,7 +10863,6 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_FittingShopCategoryItemIdList;
      std::set< uint32_t > m_FittingShopItemSetIdList;
      std::set< uint32_t > m_Frontline03IdList;
-     std::set< uint32_t > m_Frontline04IdList;
      std::set< uint32_t > m_FurnitureCatalogCategoryIdList;
      std::set< uint32_t > m_FurnitureCatalogItemListIdList;
      std::set< uint32_t > m_GameRewardObtainTypeIdList;
@@ -13146,12 +13129,6 @@ const std::set< uint32_t >& getFrontline03IdList()
    if( m_Frontline03IdList.size() == 0 )
       loadIdList( m_Frontline03Dat, m_Frontline03IdList );
    return m_Frontline03IdList;
-}
-const std::set< uint32_t >& getFrontline04IdList()
-{
-   if( m_Frontline04IdList.size() == 0 )
-      loadIdList( m_Frontline04Dat, m_Frontline04IdList );
-   return m_Frontline04IdList;
 }
 const std::set< uint32_t >& getFurnitureCatalogCategoryIdList()
 {
