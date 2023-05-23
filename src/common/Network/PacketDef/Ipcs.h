@@ -154,7 +154,7 @@ namespace Sapphire::Network::Packets
         PersistantEffect = 0xe7,       // updated 6.40
 
         PlaceFieldMarker = 0xd8,       // updated 6.40
-        PlaceFieldMarkerPreset = 0xFFFFF, // updated 6.40
+        PlaceFieldMarkerPreset = 0xFFFF, // updated 6.40
 
         GCAffiliation = 0x159, // updated 6.40
 
@@ -397,8 +397,8 @@ namespace Sapphire::Network::Packets
         DiscoveryHandler = 0x038B, // updated 5.58h
 
         SkillHandler = 0x0133,    // updated 6.31h
-        GMCommand1 = 0x195,      // updated 6.40
-        GMCommand2 = 0x16f,      // updated 6.40
+        GMCommand1 = 0x0139,      // updated 6.40
+        GMCommand2 = 0x0195,      // updated 6.40
         AoESkillHandler = 0x0152, // updated 5.58h
 
         UpdatePositionHandler = 0xae, // updated 6.40
