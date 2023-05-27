@@ -351,7 +351,7 @@ enum ClientZoneIpcType :
 
   SocialReqSendHandler = 0x00D7,  // updated 5.58h
   SocialResponseHandler = 0x023B, // updated 5.58h
-  CreateCrossWorldLS = 0x035D,    // updated 5.58h
+  CreateCrossWorldLS = 0x9999,    // updated 5.58h
 
   ChatHandler = 0xd3, // updated 6.40
   PartyChatHandler = 0x0065, PartySetLeaderHandler = 0x036C,  // updated 5.58h
@@ -359,13 +359,13 @@ enum ClientZoneIpcType :
   KickPartyMemberHandler = 0x0262, // updated 5.58h
   DisbandPartyHandler = 0x0276,    // updated 5.58h
 
-  SocialListHandler = 0x0200,              // updated 6.31
+  SocialListHandler = 0x206,              // updated 6.40
   SetSearchInfoHandler = 0x3b6,           // updated 6.40
   ReqSearchInfoHandler = 0x03b0,           // updated 6.31h
   ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
   ReqRemovePlayerFromBlacklist = 0x00B4, // updated 5.58h
-  BlackListHandler = 0x010c,             // updated 6.31h
+  BlackListHandler = 0x29c,             // updated 6.40
   PlayerSearchHandler = 0x037D,          // updated 5.58h
 
   LinkshellListHandler = 0x03B6, // updated 5.58h
@@ -388,7 +388,7 @@ enum ClientZoneIpcType :
   ReqCountdownInitiate = 0x03e1, // updated 6.31h
   ReqCountdownCancel = 0x023a,   // updated 6.31h
 
-  ZoneLineHandler = 0x00ce,  // updated 6.31h
+  ZoneLineHandler = 0x02b9,  // updated 6.40
   ClientTrigger = 0x01BC,    // updated 6.40
   DiscoveryHandler = 0x038B, // updated 5.58h
 
@@ -408,13 +408,13 @@ enum ClientZoneIpcType :
 
   TalkEventHandler = 0x035D,         // updated 6.40
   EmoteEventHandler = 0x00B0,        // updated 5.58h
-  WithinRangeEventHandler = 0x02B6,  // updated 5.58h
-  OutOfRangeEventHandler = 0x00b4,   // updated 6.31h
-  EnterTeriEventHandler = 0x208,    // updated 6.40
+  WithinRangeEventHandler = 0x0213,  // updated 6.40
+  OutOfRangeEventHandler = 0x03A6,   // updated 6.40
+  EnterTeriEventHandler = 0x0247,    // updated 6.40
   ShopEventHandler = 0x0384,         // updated 5.58h
   ReturnEventHandler = 0x0131,       // updated 6.40
-  TradeReturnEventHandler = 0x3c9,  // updated 6.40
-  TradeReturnEventHandler2 = 0x023C, // updated 5.58h
+  TradeReturnEventHandler = 0x021A,  // updated 6.40
+  TradeReturnEventHandler2 = 0x03C9, // updated 6.40
   EventYield2Handler = 0x021D,       // updated 5.58h
   EventYield16Handler = 0x0207,      // updated 5.58h
 
