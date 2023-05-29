@@ -44,6 +44,7 @@ namespace Sapphire::Network::Packets::Server
     Common::ChatType chatType;
     char name[32];
     char msg[1012];
+    uint8_t unknown[12]; //possibly padding?
   };
 
   struct FFXIVIpcPartyChat : FFXIVIpcBasePacket< PartyChat >
@@ -184,7 +185,7 @@ namespace Sapphire::Network::Packets::Server
     char searchComment[195];
     char padding;
   };
-  
+
   /**
   * Structural representation of the packet sent by the server
   * to display a server notice message
@@ -199,7 +200,7 @@ namespace Sapphire::Network::Packets::Server
     // 5 = on screen message + chat log
     char message[538];
   };
-  
+
   /**
   * Structural representation of the packet sent by the server
   * to display a server notice message
@@ -981,7 +982,7 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknown5E;
     uint16_t pvpFrontlineWeeklyCampaigns;
     uint16_t enhancedAnimaGlassProgress;
-    uint16_t unknown64[4];
+    uint16_t unknown64[8];
     uint16_t pvpRivalWingsTotalMatches;
     uint16_t pvpRivalWingsTotalVictories;
     uint16_t pvpRivalWingsWeeklyMatches;
@@ -1044,25 +1045,26 @@ namespace Sapphire::Network::Packets::Server
     uint8_t companionHealRank;
     uint8_t mountGuideMask[33];
     uint8_t ornamentMask[4];
-    uint8_t unknown281[13];
+    uint8_t unknown281[16];
     char name[32];
     uint8_t unknown293[16];
     uint8_t unknown2A3;
     uint8_t unlockBitmask[64];
     uint8_t aetheryte[26];
-    uint8_t favoriteAetheryteIds[4];
-    uint8_t freeAetheryteId;
+    uint16_t favoriteAetheryteIds[4];
+    uint16_t freeAetheryteId;
+    uint16_t psPlusFreeAetheryteId;
     uint8_t discovery[472];
     uint8_t howto[36];
+    uint8_t unknown554[4];
     uint8_t minions[60];
     uint8_t chocoboTaxiMask[12];
-    uint8_t watchedCutscenes[152];
+    uint8_t watchedCutscenes[154];
     uint8_t companionBardingMask[12];
+    uint8_t unknownMask64E[23];
     uint8_t companionEquippedHead;
     uint8_t companionEquippedBody;
     uint8_t companionEquippedLegs;
-    uint8_t unknown5D1[4];
-    uint8_t unknownMask5D5[11];
     uint8_t fishingGuideMask[161];
     uint8_t fishingSpotVisited[38];
     uint8_t unknown694[34];
@@ -1079,11 +1081,12 @@ namespace Sapphire::Network::Packets::Server
     uint8_t sightseeingMask[37];
     uint8_t huntingMarkMask[102];
     uint8_t tripleTriadCards[45];
-    uint8_t unknown7D7[14];
+    uint8_t unknown895;
+    uint8_t unknown7D7[15];
     uint8_t unknown7D8;
     uint8_t unknown7E6[49];
     uint8_t regionalFolkloreMask[6];
-    uint8_t orchestrionMask[75];
+    uint8_t orchestrionMask[87];
     uint8_t hallOfNoviceCompletion[3];
     uint8_t animaCompletion[11];
     uint8_t unknown85E[16];
@@ -1093,16 +1096,17 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unlockedRaids[28];
     uint8_t unlockedDungeons[18];
     uint8_t unlockedGuildhests[10];
-    uint8_t unlockedTrials[11];
+    uint8_t unlockedTrials[12];
     uint8_t unlockedPvp[5];
     uint8_t clearedRaids[28];
     uint8_t clearedDungeons[18];
     uint8_t clearedGuildhests[10];
-    uint8_t clearedTrials[11];
+    uint8_t clearedTrials[12];
     uint8_t clearedPvp[5];
-    uint8_t unknown948[4];
+    uint8_t unknown948[6];
     uint8_t unknown94C[2];
     uint8_t unknown94E[2];
+    uint8_t unknownA06[2];
   };
 
 
@@ -2129,7 +2133,7 @@ namespace Sapphire::Network::Packets::Server
 
     char otherName[32];
   };
-  
+
   struct FFXIVIpcRetainerInformation : FFXIVIpcBasePacket< RetainerInformation >
   {
     uint8_t unknown0[8];
