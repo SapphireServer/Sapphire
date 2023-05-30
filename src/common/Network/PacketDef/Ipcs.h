@@ -324,6 +324,7 @@ enum ServerZoneIpcType :
   SubmarineExplorationResult = 0x2c9, // updated 6.40
 
   EnvironmentControl = 0x108,         // updated 6.40
+  RSVData = 0x01DD,                   // updated 6.40
   IslandWorkshopSupplyDemand = 0x1b7, // updated 6.40
 
 };
