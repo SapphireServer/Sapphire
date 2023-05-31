@@ -2360,6 +2360,21 @@ namespace Sapphire::Network::Packets::Server
     FFXIVIpcMapUpdateN< 128 >
   {
   };
+
+struct FFXIVIpcEnvironmentControl : FFXIVIpcBasePacket< EnvironmentControl >
+{
+  uint32_t directorId;
+  uint32_t state;
+  uint16_t param3;
+  uint16_t param4;
+};
+
+struct FFXIVIpcRemoteServerValue : FFXIVIpcBasePacket< RSVData >
+{
+  uint32_t value_size;
+  char key_str[48];
+  char value_str[1024];
+};
 }
 
 #endif /*_CORE_NETWORK_PACKETS_SERVER_IPC_H*/
