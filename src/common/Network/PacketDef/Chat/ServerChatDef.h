@@ -20,6 +20,19 @@ struct FFXIVIpcTell : FFXIVIpcBasePacket< Tell >
   char msg[1029];
 };
 
+struct FFXIVIpcChannelChat : FFXIVIpcBasePacket< ChannelChat >
+{
+  uint64_t channelId;
+  uint64_t contentId;
+  uint32_t charaId;
+  uint8_t type;
+  uint8_t unknown1;
+  uint8_t unknown2;
+  char name[32];
+  char message[1024];
+  uint8_t padding;
+};
+
 /**
 * Structural representation of the packet sent by the server as response
 * to a failed tell because of unavailable target player

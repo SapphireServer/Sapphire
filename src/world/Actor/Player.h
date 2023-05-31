@@ -543,6 +543,11 @@ namespace Sapphire::Entity
     /*! returns the current online status */
     uint64_t getOnlineStatusMask() const;
 
+    void addOnlineStatus( Common::OnlineStatus status );
+    void addOnlineStatus( const std::vector< Common::OnlineStatus >& status );
+    void removeOnlineStatus( Common::OnlineStatus status );
+    void removeOnlineStatus( const std::vector< Common::OnlineStatus >& status );
+
     /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
 
@@ -769,6 +774,7 @@ namespace Sapphire::Entity
 
     /*! queue a packet for the player */
     void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
+    void queuePacket( std::vector< Network::Packets::FFXIVPacketBasePtr > packets );
 
     /*! queue a char connection packet for the player */
     void queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket );
@@ -1028,6 +1034,9 @@ namespace Sapphire::Entity
 
     void updateHuntingLog( uint16_t id );
 
+    uint64_t getPartyId() const;
+    void setPartyId( uint64_t partyId );
+
     World::SessionPtr getSession();
 
     uint64_t m_lastMoveTime;
@@ -1180,6 +1189,8 @@ namespace Sapphire::Entity
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+
+    uint64_t m_partyId;
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
     std::unordered_map< uint32_t, std::vector< ShopBuyBackEntry > > m_shopBuyBackMap;

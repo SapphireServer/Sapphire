@@ -24,10 +24,8 @@ namespace Sapphire::World
 
     bool createSession( uint32_t sessionId );
 
-    void removeSession( uint32_t sessionId );
-    void removeSession( const std::string& playerName );
-
     World::SessionPtr getSession( uint32_t id );
+    World::SessionPtr getSession( uint64_t contentId );
     World::SessionPtr getSession( const std::string& playerName );
 
     size_t getSessionCount() const;
@@ -66,11 +64,15 @@ namespace Sapphire::World
     Sapphire::Common::Config::WorldConfig m_config;
 
     std::map< uint32_t, SessionPtr > m_sessionMapById;
+    std::map< uint64_t, SessionPtr > m_sessionMapByContentId;
     std::map< std::string, SessionPtr > m_sessionMapByName;
     std::map< uint32_t, std::string > m_playerNameMapById;
     std::map< uint32_t, uint32_t > m_zones;
     std::map< std::string, Entity::BNpcTemplatePtr > m_bNpcTemplateMap;
 
+    void removeSession( uint32_t sessionId );
+    void removeSession( uint64_t contentId );
+    void removeSession( const std::string& playerName );
   };
 
 }
