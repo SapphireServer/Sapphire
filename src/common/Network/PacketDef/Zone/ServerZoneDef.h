@@ -46,19 +46,6 @@ namespace Sapphire::Network::Packets::Server
     char msg[1012];
   };
 
-  struct FFXIVIpcPartyChat : FFXIVIpcBasePacket< PartyChat >
-  {
-    uint64_t unknown;
-    uint64_t contentId;
-    uint32_t charaId;
-    uint8_t u1;
-    uint8_t u2;
-    uint8_t u3;
-    char name[32];
-    char message[1024];
-    uint8_t padding;
-  };
-
   struct FFXIVIpcChatBanned : FFXIVIpcBasePacket< ChatBanned >
   {
     uint8_t padding[4]; // I was not sure reinterpreting ZST is valid behavior in C++.
@@ -2178,7 +2165,7 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param7;
   };
 
-  struct FFXIVIpcSocialMessage : FFXIVIpcBasePacket< SocialMessage >
+  struct FFXIVIpcSocialInviteUpdate : FFXIVIpcBasePacket< SocialInviteUpdate >
   {
     uint64_t contentId;
     uint32_t expireTime;
@@ -2187,12 +2174,12 @@ namespace Sapphire::Network::Packets::Server
     uint8_t socialType;
     uint8_t padding;
     uint8_t type;
-    uint8_t unknown4;
+    uint8_t gender;
     char name[32];
     uint8_t padding2[6];
   };
 
-  struct FFXIVIpcSocialMessage2 : FFXIVIpcBasePacket< SocialMessage2 >
+  struct FFXIVIpcSocialInviteResult : FFXIVIpcBasePacket< SocialInviteResult >
   {
     uint64_t contentId;
     uint32_t unknown3;
@@ -2203,40 +2190,42 @@ namespace Sapphire::Network::Packets::Server
     char name[32];
   };
 
-  struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket< SocialRequestResponse >
+  struct FFXIVIpcSocialInviteResponse : FFXIVIpcBasePacket< SocialInviteResponse >
   {
     uint64_t contentId;
     uint32_t unknown3;
-    uint8_t u1AlwaysOne;
+    uint8_t socialType;
     uint8_t response;
-    uint8_t u2AlwaysOne;
+    uint8_t gender;
     char name[32];
     uint8_t padding;
   };
 
+  struct PartyMember
+  {
+    char name[32];
+    uint64_t contentId;
+    uint32_t charaId;
+    uint32_t u1; // 3.x ParentEntityId?
+    uint32_t u2; // 3.x PetEntityId?
+    uint32_t hp;
+    uint32_t maxHp;
+    uint16_t mp;
+    uint16_t maxMp;
+    uint16_t u3;
+    uint16_t zoneId;
+    uint8_t gposeSelectable; // 3.x Valid?
+    uint8_t classId;
+    uint8_t u5; // 3.x ObjType?
+    uint8_t level;
+    uint8_t isLevelSync;
+    uint8_t unknown[7];
+    Common::StatusEffect effect[30];
+  };
+
   struct FFXIVIpcPartyList : FFXIVIpcBasePacket< PartyList >
   {
-    struct
-    {
-      char name[32];
-      uint64_t contentId;
-      uint32_t charaId;
-      uint32_t u1;
-      uint32_t u2;
-      uint32_t hp;
-      uint32_t maxHp;
-      uint16_t mp;
-      uint16_t maxMp;
-      uint16_t u3;
-      uint16_t zoneId;
-      uint8_t gposeSelectable;
-      uint8_t classId;
-      uint8_t u5;
-      uint8_t level;
-      uint8_t isLevelSync;
-      uint8_t unknown[7];
-      Common::StatusEffect effect[30];
-    } member[8];
+    PartyMember member[8];
     uint64_t partyId;
     uint64_t channelId;
     uint8_t leaderIndex;
@@ -2245,16 +2234,16 @@ namespace Sapphire::Network::Packets::Server
     uint32_t padding2;
   };
 
-  struct FFXIVIpcPartyMessage : FFXIVIpcBasePacket< PartyMessage >
+  struct FFXIVIpcPartyUpdate : FFXIVIpcBasePacket< PartyUpdate >
   {
-    uint64_t leaderContentId;
-    uint64_t memberContentId;
-    uint8_t u1;
-    uint8_t u2;
-    uint16_t type;
-    uint8_t partySize; // ?
-    char leaderName[32];
-    char memberName[32];
+    uint64_t executeContentId;
+    uint64_t targetContentId;
+    uint8_t executeGender;
+    uint8_t targetGender;
+    uint16_t updateStatus;
+    uint8_t partySize;
+    char executeName[32];
+    char targetName[32];
     uint8_t padding[3];
   };
 

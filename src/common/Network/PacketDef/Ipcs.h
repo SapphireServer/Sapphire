@@ -73,15 +73,14 @@ namespace Sapphire::Network::Packets
     SocialRequestError = 0xF0AD,
 
     CFRegistered = 0x029F, // updated 5.58 hotfix
-    SocialRequestResponse = 0x0082, // updated 5.58 hotfix
-    SocialMessage = 0x03CB, // updated 5.58 hotfix
-    SocialMessage2 = 0x01D7, // updated 5.58 hotfix
+    SocialInviteResponse = 0x0082, // updated 5.58 hotfix
+    SocialInviteUpdate = 0x03CB, // updated 5.58 hotfix
+    SocialInviteResult = 0x01D7, // updated 5.58 hotfix
     CancelAllianceForming = 0xF0C6, // updated 4.2
 
     LogMessage = 0x0118, // updated 5.58 hotfix
 
     Chat = 0x00FE, // updated 5.58 hotfix
-    PartyChat = 0x0065,
 
     WorldVisitList = 0xF0FE, // added 4.5
 
@@ -149,7 +148,7 @@ namespace Sapphire::Network::Packets
     SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
     PartyList = 0x0349, // updated 5.58 hotfix
-    PartyMessage = 0x00A4, // updated 5.58 hotfix
+    PartyUpdate = 0x00A4, // updated 5.58 hotfix
     HateRank = 0x0150, // updated 5.58 hotfix
     HateList = 0x0243, // updated 5.58 hotfix
     ObjectSpawn = 0x0125, // updated 5.58 hotfix
@@ -333,16 +332,15 @@ namespace Sapphire::Network::Packets
     CancelLogout = 0x01AC, // updated 5.58 hotfix
     CFDutyInfoHandler = 0xF078, // updated 4.2
 
-    SocialReqSendHandler = 0x00D7, // updated 5.58 hotfix
-    SocialResponseHandler = 0x023B, // updated 5.58 hotfix
+    SocialInviteHandler = 0x00D7, // updated 5.58 hotfix
+    SocialReplyHandler = 0x023B, // updated 5.58 hotfix
     CreateCrossWorldLS = 0x035D, // updated 5.58 hotfix
 
     ChatHandler = 0x03B0, // updated 5.58 hotfix
-    PartyChatHandler = 0x0065,
-    PartySetLeaderHandler = 0x036C, // updated 5.58 hotfix
-    LeavePartyHandler = 0x019D, // updated 5.58 hotfix
-    KickPartyMemberHandler = 0x0262, // updated 5.58 hotfix
-    DisbandPartyHandler = 0x0276, // updated 5.58 hotfix
+    PartyChangeLeaderHandler = 0x036C, // updated 5.58 hotfix
+    PartyLeaveHandler = 0x019D, // updated 5.58 hotfix
+    PartyKickHandler = 0x0262, // updated 5.58 hotfix
+    PartyDisbandHandler = 0x0276, // updated 5.58 hotfix
 
     SocialListHandler = 0x01CA, // updated 5.58 hotfix
     SetSearchInfoHandler = 0x01D4, // updated 5.58 hotfix
@@ -433,6 +431,7 @@ namespace Sapphire::Network::Packets
   enum ServerChatIpcType : uint16_t
   {
     Tell = 0x0064, // updated for sb
+    ChannelChat = 0x0065,
     PublicContentTell = 0x00FB, // added 4.5, this is used when receiving a /tell in PublicContent instances such as Eureka or Bozja
     TellErrNotFound = 0x0066,
 
@@ -445,6 +444,7 @@ namespace Sapphire::Network::Packets
   enum ClientChatIpcType : uint16_t
   {
     TellReq = 0x0064,
+    ChannelChatReq = 0x0065,
     PublicContentTellReq = 0x0326, // updated 5.35 hotfix, this is used when sending a /tell in PublicContent instances such as Eureka or Bozja
   };
 
