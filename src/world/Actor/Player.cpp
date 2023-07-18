@@ -1657,14 +1657,17 @@ void Sapphire::Entity::Player::sendHateList()
 void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
 {
   hateListAdd( pBNpc );
-  queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
-  setStateFlag( Common::PlayerStateFlag::InCombat );
+  if( !hasStateFlag( Common::PlayerStateFlag::InCombat ) )
+  {
+    queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
+    setStateFlag( Common::PlayerStateFlag::InCombat );
+  }
 }
 
 void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
 {
   hateListRemove( pBNpc );
-  if( m_actorIdTohateSlotMap.empty() )
+  if( m_actorIdTohateSlotMap.empty() && hasStateFlag( Common::PlayerStateFlag::InCombat ) )
   {
     queuePacket( makeActorControl( getId(), ToggleAggro ) );
     unsetStateFlag( Common::PlayerStateFlag::InCombat );

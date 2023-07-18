@@ -329,7 +329,7 @@ void Sapphire::Entity::BNpc::hateListAddOrUpdate( Sapphire::Entity::CharaPtr pCh
   if( pChara->isPlayer() )
   {
     auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( getAsBNpc() );
+    pPlayer->onMobAggro( getAsBNpc() );
   }
   auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcHateListAdd( *this, *pChara );
