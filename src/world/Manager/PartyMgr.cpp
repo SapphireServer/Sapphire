@@ -161,7 +161,10 @@ void PartyMgr::onDisband( Entity::Player& disbandingPlayer )
 void PartyMgr::onMoveZone( Sapphire::Entity::Player &movingPlayer )
 {
   if( movingPlayer.getPartyId() == 0 )
+  {
+    movingPlayer.queuePacket( makeZonePacket< FFXIVIpcPartyList >( movingPlayer.getId() ) );
     return;
+  }
   auto party = getParty( movingPlayer.getPartyId() );
   assert( party );
   sendPartyUpdate( *party );
