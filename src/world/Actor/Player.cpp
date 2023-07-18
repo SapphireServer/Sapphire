@@ -560,14 +560,15 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto d = getCurrentTerritory()->getAsDirector();
+  auto d = getCurrentTerritory()->getAsInstanceContent();
   if( d && d->getContentFinderConditionId() > 0 )
   {
+    // shows correct name when leaving dungeon
     auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
     p->data().param[0] = d->getDirectorId();
     p->data().param[1] = 1534;
     p->data().param[2] = 1;
-    p->data().param[3] = d->getContentFinderConditionId();
+    p->data().param[3] = d->getContentId();
     queuePacket( p );
 
     prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
