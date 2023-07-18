@@ -42,81 +42,81 @@ enum ClientLobbyIpcType :
 enum ServerZoneIpcType :
   uint16_t
 {
-  Ping = 0x319, // updated 6.41
-  Init = 0x35d, // updated 6.41
+  Ping = 0x349, // updated 6.45
+  Init = 0x3bd, // updated 6.45
 
-  ActorFreeSpawn = 0x72, // updated 6.41
+  ActorFreeSpawn = 0x3a6, // updated 6.45
 
-  InitZone = 0x1d5,      // updated 6.41
-  PrepareZoning = 0x39c, // updated 6.41
+  InitZone = 0xd8,       // updated 6.45
+  PrepareZoning = 0x3a8, // updated 6.45
 
-  EffectResult = 0x10c,      // updated 6.41
-  EffectResultBasic = 0x39f, // updated 6.41
+  EffectResult = 0xd2,       // updated 6.45
+  EffectResultBasic = 0x34f, // updated 6.45
 
-  ActorControl = 0x19d,       // updated 6.41
-  ActorControlTarget = 0x2fe, // updated 6.41
-  ActorControlSelf = 0xa6,    // updated 6.41
-  ActorCast = 0x1c0,          // updated 6.41
-  ActorSetPos = 0x15f,        // updated 6.41
-  ActorMove = 0x2c4,          // updated 6.41
-  ActorGauge = 0x26d,         // updated 6.41
+  ActorControl = 0x88,       // updated 6.45
+  ActorControlTarget = 0xa1, // updated 6.45
+  ActorControlSelf = 0x2f7,  // updated 6.45
+  ActorCast = 0x330,         // updated 6.45
+  ActorSetPos = 0x196,       // updated 6.45
+  ActorMove = 0x1f1,         // updated 6.45
+  ActorGauge = 0x80,         // updated 6.45
 
   /*!
    * @brief Used when resting
    */
-  UpdateHpMpTp = 0x316,     // updated 6.41
-  UpdateClassInfo = 0xa0, // updated 6.41
+  UpdateHpMpTp = 0x2fa,     // updated 6.45
+  UpdateClassInfo = 0x3a5, // updated 6.45
 
   ///////////////////////////////////////////////////
 
   ChatBanned = 0xF06B,
-  Playtime = 0x3a3, // updated 6.41
-  Logout = 0x363,   // updated 6.41
-  CFNotify = 0x21a, // updated 6.41
+  Playtime = 0x2e5,         // updated 6.45
+  Logout = 0x132,           // updated 6.45
+  CFNotify = 0x126,         // updated 6.45
   CFMemberStatus = 0x0079,
-  CFDutyInfo = 0xba, // updated 6.41
+  CFDutyInfo = 0x105,       // updated 6.45
   CFPlayerInNeed = 0xF07F,
-  CFPreferredRole = 0xfb,  // updated 6.41
-  CFCancel = 0x2ad,        // updated 6.41
+  CFPreferredRole = 0x211,  // updated 6.45
+  CFCancel = 0xcc,          // updated 6.45
   SocialRequestError = 0xF0AD,
 
   CFRegistered = 0x029F,          // updated 5.58h
-  SocialRequestResponse = 0x11c,  // updated 6.41
+  SocialRequestResponse = 0x27f,  // updated 6.45
   SocialMessage = 0x03CB,         // updated 5.58h
   SocialMessage2 = 0x01D7,        // updated 5.58h
   CancelAllianceForming = 0xF0C6, // updated 4.2
 
-  LogMessage = 0x133, // updated 6.41
+  LogMessage = 0x16b, // updated 6.45
 
-  Chat = 0x283, // updated 6.41
+  Chat = 0x218, // updated 6.45
   PartyChat = 0x0065,
 
   WorldVisitList = 0xF0FE, // added 4.5
 
-  SocialList = 0x23e, // updated 6.41
+  SocialList = 0x208, // updated 6.45
 
-  ExamineSearchInfo = 0x3da,   // updated 6.41
-  UpdateSearchInfo = 0x92,     // updated 6.41
-  InitSearchInfo = 0xd8,       // updated 6.41
-  ExamineSearchComment = 0x7e, // updated 6.41
+  ExamineSearchInfo = 0x6b,    // updated 6.45
+  UpdateSearchInfo = 0x2ce,    // updated 6.45
+  InitSearchInfo = 0xf9,       // updated 6.45
+  ExamineSearchComment = 0xce, // updated 6.45
 
   ServerNoticeShort = 0x0333, // updated 5.58h
-  ServerNotice = 0x6f,        // updated 6.41
-  SystemLogMessage = 0x39d,   // updated 6.41
-  SetOnlineStatus = 0xd9,     // updated 6.41
+  ServerNotice = 0x194,       // updated 6.45
+  SystemLogMessage = 0x100,   // updated 6.45
+  SetOnlineStatus = 0x21d,    // updated 6.45
 
-  CountdownInitiate = 0x128, // updated 6.41
-  CountdownCancel = 0x377,   // updated 6.41
+  CountdownInitiate = 0x351, // updated 6.45
+  CountdownCancel = 0xc8,    // updated 6.45
 
-  PlayerAddedToBlacklist = 0x3b3,    // updated 6.41
-  PlayerRemovedFromBlacklist = 0xe4, // updated 6.41
-  BlackList = 0x3cc,                 // updated 6.41
+  PlayerAddedToBlacklist = 0x305,     // updated 6.45
+  PlayerRemovedFromBlacklist = 0x160, // updated 6.45
+  BlackList = 0x85,                   // updated 6.45
 
-  LinkshellList = 0x1b5,           // updated 6.41
-  CrossWorldLinkshellList = 0x113, // updated 6.41
-  FellowshipList = 0x2a9,          // updated 6.41
+  LinkshellList = 0x2f0,           // updated 6.45
+  CrossWorldLinkshellList = 0x11a, // updated 6.45
+  FellowshipList = 0x23a,          // updated 6.45
 
-  MailDeleteRequest = 0x2a2, // updated 6.41
+  MailDeleteRequest = 0x236, // updated 6.45
 
   // 12D - 137 - constant gap between 4.5x -> 5.0
   ReqMoogleMailList = 0xF138,      // updated 5.0
@@ -125,111 +125,111 @@ enum ServerZoneIpcType :
 
   MarketTaxRates = 0x01F8, // updated 5.35h
 
-  MarketBoardSearchResult = 0x19f,      // updated 6.41
-  MarketBoardItemListingCount = 0x67,   // updated 6.41
-  MarketBoardItemListingHistory = 0x69, // updated 6.41
-  MarketBoardItemListing = 0x221,       // updated 6.41
-  MarketBoardPurchase = 0x1b6,          // updated 6.41
-  ItemMarketBoardInfo = 0xfe,           // updated 6.41
+  MarketBoardSearchResult = 0x2fd,       // updated 6.45
+  MarketBoardItemListingCount = 0x26b,   // updated 6.45
+  MarketBoardItemListingHistory = 0x3cb, // updated 6.45
+  MarketBoardItemListing = 0xeb,         // updated 6.45
+  MarketBoardPurchase = 0x17b,           // updated 6.45
+  ItemMarketBoardInfo = 0x143,           // updated 6.45
 
-  CharaFreeCompanyTag = 0x013B,  // updated 4.5
-  FreeCompanyBoardMsg = 0x03DB,  // updated 5.58h
-  FreeCompanyInfo = 0xce,        // updated 6.41
-  FreeCompanyDialog = 0x33e,     // updated 6.41
-  ExamineFreeCompanyInfo = 0x95, // updated 6.41
+  CharaFreeCompanyTag = 0x013B,   // updated 4.5
+  FreeCompanyBoardMsg = 0x03DB,   // updated 5.58h
+  FreeCompanyInfo = 0x231,        // updated 6.45
+  FreeCompanyDialog = 0x23e,      // updated 6.45
+  ExamineFreeCompanyInfo = 0x202, // updated 6.45
 
   FreeCompanyUpdateShortMessage = 0xF157, // added 5.0
 
-  StatusEffectList = 0x171,      // updated 6.41
-  EurekaStatusEffectList = 0xff, // updated 6.41
-  BossStatusEffectList = 0xda,   // updated 6.41
-  StatusEffectList2 = 0x32f,     // updated 6.41
-  StatusEffectList3 = 0x9e,      // updated 6.41
-  Effect = 0x1bb,                // updated 6.41
-  AoeEffect8 = 0x2ba,            // updated 6.41
-  AoeEffect16 = 0x27f,           // updated 6.41
-  AoeEffect24 = 0x93,            // updated 6.41
-  AoeEffect32 = 0x2a6,           // updated 6.41
-  PersistantEffect = 0x9e,       // updated 6.41
+  StatusEffectList = 0x3ce,       // updated 6.45
+  EurekaStatusEffectList = 0x198, // updated 6.45
+  BossStatusEffectList = 0x2eb,   // updated 6.45
+  StatusEffectList2 = 0x2b7,      // updated 6.45
+  StatusEffectList3 = 0xee,       // updated 6.45
+  Effect = 0x1e1,                 // updated 6.45
+  AoeEffect8 = 0x181,             // updated 6.45
+  AoeEffect16 = 0x365,            // updated 6.45
+  AoeEffect24 = 0x2ec,            // updated 6.45
+  AoeEffect32 = 0x103,            // updated 6.45
+  PersistantEffect = 0xee,        // updated 6.45
 
-  PlaceFieldMarker = 0x139,      // updated 6.41
-  PlaceFieldMarkerPreset = 0xcc, // updated 6.41
+  PlaceFieldMarker = 0x172,      // updated 6.45
+  PlaceFieldMarkerPreset = 0xd3, // updated 6.45
 
-  GCAffiliation = 0x1e0, // updated 6.41
+  GCAffiliation = 0x1b9, // updated 6.45
 
-  PlayerSpawn = 0x1a7, // updated 6.41
-  NpcSpawn = 0xac,     // updated 6.41
-  NpcSpawn2 = 0x9b,    // updated 6.41
+  PlayerSpawn = 0x2d3, // updated 6.45
+  NpcSpawn = 0x179,    // updated 6.45
+  NpcSpawn2 = 0x3d6,   // updated 6.45
 
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-  PartyList = 0x219,          // updated 6.41
-  PartyMessage = 0x3cf,       // updated 6.41
-  HateRank = 0x2d2,           // updated 6.41
-  HateList = 0x17f,           // updated 6.41
-  ObjectSpawn = 0x295,        // updated 6.41
-  ObjectDespawn = 0x386,      // updated 6.41
+  PartyList = 0x36d,          // updated 6.45
+  PartyMessage = 0x13e,       // updated 6.45
+  HateRank = 0x8f,            // updated 6.45
+  HateList = 0xe3,            // updated 6.45
+  ObjectSpawn = 0x240,        // updated 6.45
+  ObjectDespawn = 0x2e1,      // updated 6.45
   SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
-  PlayerSetup = 0x3e6,        // updated 6.41
-  PlayerStats = 0x343,        // updated 6.41
-  ActorOwner = 0x3e6,         // updated 6.41
-  PlayerStateFlags = 0xa2,    // updated 6.41
-  PlayerClassInfo = 0x1c5,    // updated 6.41
-  PlayerUpdateLook = 0x351,   // updated 6.41
-  CharaVisualEffect = 0xf4,   // updated 6.41
+  PlayerSetup = 0x2c5,        // updated 6.45
+  PlayerStats = 0x30c,        // updated 6.45
+  ActorOwner = 0x2c5,         // updated 6.45
+  PlayerStateFlags = 0x127,   // updated 6.45
+  PlayerClassInfo = 0x1a2,    // updated 6.45
+  PlayerUpdateLook = 0x335,   // updated 6.45
+  CharaVisualEffect = 0x252,  // updated 6.45
 
-  ModelEquip = 0x36e,   // updated 6.41
-  Examine = 0x228,      // updated 6.41
-  CharaNameReq = 0x1ff, // updated 6.41
+  ModelEquip = 0x9c,    // updated 6.45
+  Examine = 0xed,       // updated 6.45
+  CharaNameReq = 0x1c5, // updated 6.45
 
   // nb: see #565 on github
   UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
-  RetainerSaleHistory = 0xcf,           // updated 6.41
-  RetainerInformation = 0x229,          // updated 6.41
+  RetainerSaleHistory = 0x111,          // updated 6.45
+  RetainerInformation = 0x2f8,          // updated 6.45
 
   SetLevelSync = 0x1186, // not updated for 4.4, not sure what it is anymore
 
-  ItemInfo = 0x388,                   // updated 6.41
-  ContainerInfo = 0x21f,              // updated 6.41
-  InventoryTransactionFinish = 0x1d1, // updated 6.41
-  InventoryTransaction = 0x252,       // updated 6.41
-  CurrencyCrystalInfo = 0x1a4,        // updated 6.41
+  ItemInfo = 0x333,                   // updated 6.45
+  ContainerInfo = 0x343,              // updated 6.45
+  InventoryTransactionFinish = 0x2ee, // updated 6.45
+  InventoryTransaction = 0x1d2,       // updated 6.45
+  CurrencyCrystalInfo = 0x26a,        // updated 6.45
 
-  InventoryActionAck = 0x34c,  // updated 6.41
-  UpdateInventorySlot = 0x79,  // updated 6.41
+  InventoryActionAck = 0xbd,   // updated 6.45
+  UpdateInventorySlot = 0x13f, // updated 6.45
 
-  HuntingLogEntry = 0x138, // updated 6.41
+  HuntingLogEntry = 0x15a, // updated 6.45
 
-  EventPlay = 0x36f,    // updated 6.41
-  EventPlay4 = 0x124,   // updated 6.41
-  EventPlay8 = 0x9a,    // updated 6.41
-  EventPlay16 = 0x2f2,  // updated 6.41
-  EventPlay32 = 0xe3,   // updated 6.41
-  EventPlay64 = 0x38f,  // updated 6.41
-  EventPlay128 = 0x197, // updated 6.41
-  EventPlay255 = 0x202, // updated 6.41
-  EventStart = 0x3a6,   // updated 6.41
-  EventFinish = 0x2fa,  // updated 6.41
+  EventPlay = 0x14a,    // updated 6.45
+  EventPlay4 = 0x1a5,   // updated 6.45
+  EventPlay8 = 0x3b7,   // updated 6.45
+  EventPlay16 = 0x3c4,  // updated 6.45
+  EventPlay32 = 0x108,  // updated 6.45
+  EventPlay64 = 0x3e4,  // updated 6.45
+  EventPlay128 = 0x320, // updated 6.45
+  EventPlay255 = 0x151, // updated 6.45
+  EventStart = 0x133,   // updated 6.45
+  EventFinish = 0x125,  // updated 6.45
 
-  EventContinue = 0x1f2, // updated 6.41
+  EventContinue = 0x11d, // updated 6.45
 
   EventLinkshell = 0x1169,
 
-  QuestActiveList = 0x257,   // updated 6.41
-  QuestUpdate = 0x306,       // updated 6.41
-  QuestCompleteList = 0x2aa, // updated 6.41
+  QuestActiveList = 0x10c,   // updated 6.45
+  QuestUpdate = 0x227,       // updated 6.45
+  QuestCompleteList = 0x239, // updated 6.45
 
-  QuestFinish = 0xa1,          // updated 6.41
-  MSQTrackerComplete = 0x2f8,  // updated 6.41
+  QuestFinish = 0x24f,         // updated 6.45
+  MSQTrackerComplete = 0x232,  // updated 6.45
   MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
   QuestMessage = 0x0220, // updated 5.58h
 
-  QuestTracker = 0x109, // updated 6.41
+  QuestTracker = 0x192, // updated 6.45
 
-  Mount = 0x244, // updated 6.41
+  Mount = 0x15e, // updated 6.45
 
-  DirectorVars = 0x192,       // updated 6.41
+  DirectorVars = 0x27e,       // updated 6.45
   SomeDirectorUnk1 = 0x0084,  // updated 5.18
   SomeDirectorUnk2 = 0xF0C1,  // updated 5.18
   SomeDirectorUnk4 = 0x03DD,  // updated 5.58h
@@ -241,67 +241,67 @@ enum ServerZoneIpcType :
 
   CFAvailableContents = 0xF1FD, // updated 4.2
 
-  WeatherChange = 0x2d9,   // updated 6.41
-  PlayerTitleList = 0x380, // updated 6.41
-  Discovery = 0x1d0,       // updated 6.41
+  WeatherChange = 0xf0,    // updated 6.45
+  PlayerTitleList = 0x144, // updated 6.45
+  Discovery = 0x1a4,       // updated 6.45
 
-  EorzeaTimeOffset = 0x108, // updated 6.41
+  EorzeaTimeOffset = 0x18f, // updated 6.45
 
-  EquipDisplayFlags = 0x259, // updated 6.41
+  EquipDisplayFlags = 0x69, // updated 6.45
 
   MiniCactpotInit = 0x0286, // added 5.31
   ShopMessage = 0x0287,     // updated 5.58h
-  LootMessage = 0x360,      // updated 6.41
-  ResultDialog = 0x7d,      // updated 6.41
-  DesynthResult = 0x325,    // updated 6.41
+  LootMessage = 0x14b,      // updated 6.45
+  ResultDialog = 0xc2,      // updated 6.45
+  DesynthResult = 0x1df,    // updated 6.45
 
   /// Housing //////////////////////////////////////
 
-  LandSetInitialize = 0x2ef,            // updated 6.41
-  LandUpdate = 0x1ed,                   // updated 6.41
-  LandAvailability = 0x284,             // updated 6.41
-  YardObjectSpawn = 0x167,              // updated 6.41
-  HousingIndoorInitialize = 0x174,      // updated 6.41
-  LandPriceUpdate = 0x16c,              // updated 6.41
-  LandInfoSign = 0x2f4,                 // updated 6.41
-  LandRename = 0x19b,                   // updated 6.41
-  HousingEstateGreeting = 0xa7,         // updated 6.41
-  HousingUpdateLandFlagsSlot = 0x333,   // updated 6.41
-  HousingLandFlags = 0x1c4,             // updated 6.41
-  HousingShowEstateGuestAccess = 0x296, // updated 6.41
+  LandSetInitialize = 0x3d2,            // updated 6.45
+  LandUpdate = 0x101,                   // updated 6.45
+  LandAvailability = 0x273,             // updated 6.45
+  YardObjectSpawn = 0x2ba,              // updated 6.45
+  HousingIndoorInitialize = 0x2fe,      // updated 6.45
+  LandPriceUpdate = 0x1b4,              // updated 6.45
+  LandInfoSign = 0x13d,                 // updated 6.45
+  LandRename = 0x27b,                   // updated 6.45
+  HousingEstateGreeting = 0x1c9,        // updated 6.45
+  HousingUpdateLandFlagsSlot = 0x34b,   // updated 6.45
+  HousingLandFlags = 0x12b,             // updated 6.45
+  HousingShowEstateGuestAccess = 0xfc,  // updated 6.45
 
-  HousingObjectInitialize = 0x251,   // updated 6.41
-  HousingInternalObjectSpawn = 0xf1, // updated 6.41
+  HousingObjectInitialize = 0x19c,    // updated 6.45
+  HousingInternalObjectSpawn = 0x1a0, // updated 6.45
 
-  HousingWardInfo = 0x110,  // updated 6.41
-  HousingObjectMove = 0x8b, // updated 6.41
-  HousingObjectDye = 0x154, // updated 6.41
+  HousingWardInfo = 0x284,  // updated 6.45
+  HousingObjectMove = 0xaa, // updated 6.45
+  HousingObjectDye = 0x33d, // updated 6.45
 
-  SharedEstateSettingsResponse = 0x254, // updated 6.41
+  SharedEstateSettingsResponse = 0x32c, // updated 6.45
 
-  LandUpdateHouseName = 0x14c, // updated 6.41
-  LandSetMap = 0x35e,          // updated 6.41
+  LandUpdateHouseName = 0x2d2, // updated 6.45
+  LandSetMap = 0x36f,          // updated 6.45
 
-  CeremonySetActorAppearance = 0xf7, // updated 6.41
+  CeremonySetActorAppearance = 0x2e7, // updated 6.45
 
   //////////////////////////////////////////////////
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
-  PerformNote = 0x162,    // updated 6.41
+  PerformNote = 0x2a8,    // updated 6.45
 
   DutyGauge = 0x02E5, // updated 5.58h
 
   // daily quest info -> without them sent,  login will take longer...
-  DailyQuests = 0x2d6,           // updated 6.41
-  DailyQuestRepeatFlags = 0x337, // updated 6.41
+  DailyQuests = 0x301,           // updated 6.45
+  DailyQuestRepeatFlags = 0x36a, // updated 6.45
 
-  MapUpdate = 0x2ee,   // updated 6.41
-  MapUpdate4 = 0x3ba,  // updated 6.41
-  MapUpdate8 = 0x272,  // updated 6.41
-  MapUpdate16 = 0x1ab, // updated 6.41
-  MapUpdate32 = 0x3bc, // updated 6.41
-  MapUpdate64 = 0x1ca, // updated 6.41
-  MapUpdate128 = 0xc7, // updated 6.41
+  MapUpdate = 0x2f5,    // updated 6.45
+  MapUpdate4 = 0x185,   // updated 6.45
+  MapUpdate8 = 0x32e,   // updated 6.45
+  MapUpdate16 = 0x329,  // updated 6.45
+  MapUpdate32 = 0x11c,  // updated 6.45
+  MapUpdate64 = 0x2be,  // updated 6.45
+  MapUpdate128 = 0x1f8, // updated 6.45
 
   /// Doman Mahjong //////////////////////////////////////
   MahjongOpenGui = 0x02A4,       // only available in mahjong instance
@@ -316,19 +316,19 @@ enum ServerZoneIpcType :
   MahjongEndGame = 0x02C6,      // finished oorasu(all-last) round; shows a result screen.
 
   /// Airship & Submarine //////////////////////////////////////
-  AirshipTimers = 0x3c5,            // updated 6.41
-  AirshipStatus = 0x172,            // updated 6.41
-  AirshipStatusList = 0x265,        // updated 6.41
-  AirshipExplorationResult = 0x21e, // updated 6.41
+  AirshipTimers = 0x75,             // updated 6.45
+  AirshipStatus = 0x7b,             // updated 6.45
+  AirshipStatusList = 0x391,        // updated 6.45
+  AirshipExplorationResult = 0x304, // updated 6.45
 
-  SubmarineTimers = 0x372,            // updated 6.41
-  SubmarineProgressionStatus = 0x1ea, // updated 6.41
-  SubmarineStatusList = 0x383,        // updated 6.41
-  SubmarineExplorationResult = 0x1d3, // updated 6.41
+  SubmarineTimers = 0xcd,             // updated 6.45
+  SubmarineProgressionStatus = 0x22d, // updated 6.45
+  SubmarineStatusList = 0x1bc,        // updated 6.45
+  SubmarineExplorationResult = 0x34a, // updated 6.45
 
-  EnvironmentControl = 0x2e0,         // updated 6.41
-  RSVData = 0x8e,                     // updated 6.41
-  IslandWorkshopSupplyDemand = 0x27c, // updated 6.41
+  EnvironmentControl = 0x29f,         // updated 6.45
+  RSVData = 0x3ca,                    // updated 6.45
+  IslandWorkshopSupplyDemand = 0x1f4, // updated 6.45
 };
 
 /**
@@ -337,10 +337,10 @@ enum ServerZoneIpcType :
 enum ClientZoneIpcType :
   uint16_t
 {
-  PingHandler = 0x8f,  // updated 6.41
-  InitHandler = 0x260, // updated 6.41
+  PingHandler = 0x3bc, // updated 6.45
+  InitHandler = 0x372, // updated 6.45
 
-  FinishLoadingHandler = 0x35d, // updated 6.41
+  FinishLoadingHandler = 0x3bd, // updated 6.45
 
   CFCommenceHandler = 0x0381, // updated 5.58h
 
@@ -348,7 +348,7 @@ enum ClientZoneIpcType :
   CFRegisterDuty = 0x01BD,     // updated 5.58h
   CFRegisterRoulette = 0x037A, // updated 5.58h
   PlayTimeHandler = 0x02B7,    // updated 5.58h
-  LogoutHandler = 0x11f,       // updated 6.41
+  LogoutHandler = 0x2b3,       // updated 6.45
   CancelLogout = 0x01e3,       // updated 6.31h
   CFDutyInfoHandler = 0xF078,  // updated 4.2
 
@@ -356,27 +356,27 @@ enum ClientZoneIpcType :
   SocialResponseHandler = 0x023B, // updated 5.58h
   CreateCrossWorldLS = 0x9999,    // updated 5.58h
 
-  ChatHandler = 0x3c1, // updated 6.41
+  ChatHandler = 0x31f, // updated 6.45
   PartyChatHandler = 0x0065, PartySetLeaderHandler = 0x036C,  // updated 5.58h
   LeavePartyHandler = 0x019D,      // updated 5.58h
   KickPartyMemberHandler = 0x0262, // updated 5.58h
   DisbandPartyHandler = 0x0276,    // updated 5.58h
 
   SocialListHandler = 0x206,               // updated 6.40
-  SetSearchInfoHandler = 0x84,             // updated 6.41
+  SetSearchInfoHandler = 0x129,            // updated 6.45
   ReqSearchInfoHandler = 0x03b0,           // updated 6.31h
   ReqExamineSearchCommentHandler = 0x00E7, // updated 5.0
 
   ReqRemovePlayerFromBlacklist = 0x00B4, // updated 5.58h
-  BlackListHandler = 0xad,               // updated 6.41
+  BlackListHandler = 0x204,              // updated 6.45
   PlayerSearchHandler = 0x037D,          // updated 5.58h
 
   LinkshellListHandler = 0x03B6, // updated 5.58h
 
-  MarketBoardRequestItemListingInfo = 0x00F4,  // updated 5.58h
-  MarketBoardRequestItemListings = 0x0122,     // updated 5.58h
-  MarketBoardSearch = 0x0082,                  // updated 5.58h
-  MarketBoardPurchaseHandler = 0x31e,          // updated 6.41
+  MarketBoardRequestItemListingInfo = 0x00F4, // updated 5.58h
+  MarketBoardRequestItemListings = 0x0122,    // updated 5.58h
+  MarketBoardSearch = 0x0082,                 // updated 5.58h
+  MarketBoardPurchaseHandler = 0x66,          // updated 6.45
 
   ReqExamineFcInfo = 0xF37B, // updated 5.58h (prepended F. Conflicts with FinishLoadingHandler 6.38)
 
@@ -391,33 +391,33 @@ enum ClientZoneIpcType :
   ReqCountdownInitiate = 0x03e1, // updated 6.31h
   ReqCountdownCancel = 0x023a,   // updated 6.31h
 
-  ZoneLineHandler = 0x12b,   // updated 6.41
-  ClientTrigger = 0x23f,     // updated 6.41
+  ZoneLineHandler = 0x251,   // updated 6.45
+  ClientTrigger = 0xdf,      // updated 6.45
   DiscoveryHandler = 0x038B, // updated 5.58h
 
-  SkillHandler = 0x94,     // updated 6.41
-  GMCommand1 = 0x205,      // updated 6.41
-  GMCommand2 = 0x193,      // updated 6.41
-  AoESkillHandler = 0x22e, // updated 6.41
+  SkillHandler = 0x1eb,   // updated 6.45
+  GMCommand1 = 0xf5,      // updated 6.45
+  GMCommand2 = 0x2ea,     // updated 6.45
+  AoESkillHandler = 0x78, // updated 6.45
 
-  UpdatePositionHandler = 0x2df, // updated 6.41
+  UpdatePositionHandler = 0xa5, // updated 6.45
 
-  InventoryModifyHandler = 0x322, // updated 6.41
+  InventoryModifyHandler = 0x140, // updated 6.45
 
   InventoryEquipRecommendedItems = 0x01C9, // updated 5.58h
 
   ReqPlaceHousingItem = 0x02D4, // updated 5.58h
   BuildPresetHandler = 0x0223,  // updated 5.58h
 
-  TalkEventHandler = 0x384,         // updated 6.41
+  TalkEventHandler = 0x1f6,         // updated 6.45
   EmoteEventHandler = 0x00B0,       // updated 5.58h
-  WithinRangeEventHandler = 0x1df,  // updated 6.41
-  OutOfRangeEventHandler = 0x13b,   // updated 6.41
-  EnterTeriEventHandler = 0x248,    // updated 6.41
+  WithinRangeEventHandler = 0x36e,  // updated 6.45
+  OutOfRangeEventHandler = 0x2dd,   // updated 6.45
+  EnterTeriEventHandler = 0x165,    // updated 6.45
   ShopEventHandler = 0x0384,        // updated 5.58h
-  ReturnEventHandler = 0x2fe,       // updated 6.41
-  TradeReturnEventHandler = 0x316,  // updated 6.41
-  TradeReturnEventHandler2 = 0x1bb, // updated 6.41
+  ReturnEventHandler = 0xa1,        // updated 6.45
+  TradeReturnEventHandler = 0x2fa,  // updated 6.45
+  TradeReturnEventHandler2 = 0x1e1, // updated 6.45
   EventYield2Handler = 0x021D,      // updated 5.58h
   EventYield16Handler = 0x0207,     // updated 5.58h
 
@@ -434,7 +434,7 @@ enum ClientZoneIpcType :
 
   SetSharedEstateSettings = 0x00D2, // updated 5.58h
 
-  UpdatePositionInstance = 0x212, // updated 6.41
+  UpdatePositionInstance = 0x95, // updated 6.45
 
   PerformNoteHandler = 0x0243, // updated 5.58h
 
