@@ -1195,6 +1195,16 @@ namespace Sapphire::Common
     RequireCorrectPositional = 2,
   };
 
+  enum class StatusRefreshPolicy : uint8_t
+  {
+    Stack = 0,
+    ReplaceOrApply = 1,
+    Extend = 2,
+    ExtendOrApply = 3,
+    Reject = 4,
+    Custom = 15, // script handled
+  };
+
   enum class AstCardType : uint8_t
   {
     None = 0,

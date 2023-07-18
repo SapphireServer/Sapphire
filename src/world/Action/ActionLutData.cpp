@@ -135,14 +135,15 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 31, { 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Maim, メイム
-  //has damage: potency 100, combo potency 300, directional potency 0
+  //has damage: potency 100, combo potency 320, directional potency 0
   //has bonus effect: GainJobResource, 169148416
   //bonus effect requirement: RequireCorrectCombo
-  { 37, { 100, 300, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1, 169148416 } },
+  { 37, { 100, 320, 0, 0, 0, 0, 0, 0, 0, 0, 8, 1, 169148416 } },
 
   //Berserk, バーサク
   //applies to self: Berserk, バーサク, duration 10000, param 0
-  { 38, { 0, 0, 0, 0, 86, 10000, 0, 0, 0, 0, 0, 0, 0 } },
+  //applies to target: Storm's Eye, シュトルムブレハ, duration 15000, param 0, Extend, Extend, 60000
+  { 38, { 0, 0, 0, 0, 86, 10000, 0, 90, 15000, 0, 0, 0, 0, 0, 0, ( 2 << 4 ) + 2, 60000 } },
 
   //Overpower, オーバーパワー
   //has damage: potency 130, combo potency 0, directional potency 0
@@ -158,10 +159,10 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 46, { 140, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Storm's Path, シュトルムヴィント
-  //has damage: potency 100, combo potency 380, directional potency 0
+  //has damage: potency 100, combo potency 420, directional potency 0
   //has bonus effect: 24, 336920826
   //bonus effect requirement: RequireCorrectCombo
-  { 42, { 100, 380, 0, 0, 0, 0, 0, 0, 0, 0, 24, 1, 336920826 } },
+  { 42, { 100, 420, 0, 0, 0, 0, 0, 0, 0, 0, 24, 1, 336920826 } },
 
   //Thrill of Battle, スリル・オブ・バトル
   //applies to targets: Thrill of Battle, スリル・オブ・バトル, duration 20000, param 0
@@ -179,11 +180,11 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 43, { 0, 0, 0, 0, 409, 8000, 0, 88, 8000, 0, 0, 0, 0 } },
 
   //Storm's Eye, シュトルムブレハ
-  //has damage: potency 100, combo potency 380, directional potency 0
-  //applies to self: Storm's Eye, シュトルムブレハ, duration 30000, param 0
+  //has damage: potency 100, combo potency 420, directional potency 0
+  //applies to self: Storm's Eye, シュトルムブレハ, duration 30000, param 0, ExtendOrApply, ExtendOrApply, 60000
   //has bonus effect: GainJobResource, 169148416
   //bonus effect requirement: RequireCorrectCombo
-  { 45, { 100, 380, 0, 0, 90, 30000, 0, 0, 0, 0, 8, 1, 169148416 } },
+  { 45, { 100, 420, 0, 0, 90, 30000, 0, 0, 0, 0, 8, 1, 169148416, ( 3 << 4 ) + 3, 60000, 0, 0 } },
 
   //Inner Beast, 原初の魂
   //has damage: potency 350, combo potency 0, directional potency 0
@@ -191,7 +192,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Mythril Tempest, ミスリルテンペスト
   //has damage: potency 100, combo potency 200, directional potency 0
-  { 16462, { 100, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+  //applies to self: Storm's Eye, シュトルムブレハ, duration 30000, param 0, Extend, Extend, 60000
+  { 16462, { 100, 200, 0, 0, 90, 30000, 0, 0, 0, 0, 0, 0, 0, ( 2 << 4 ) + 2, 60000, 0, 0 } },
 
   //Steel Cyclone, スチールサイクロン
   //has damage: potency 220, combo potency 0, directional potency 0
@@ -231,7 +233,8 @@ ActionLut::Lut ActionLut::m_actionLut =
 
   //Inner Release, 原初の解放
   //applies to self: Inner Release, 原初の解放, duration 10000, param 65436
-  { 7389, { 0, 0, 0, 0, 1177, 10000, 65436, 0, 0, 0, 0, 0, 0 } },
+  //applies to target: Storm's Eye, シュトルムブレハ, duration 15000, param 0, Extend, Extend, 60000
+  { 7389, { 0, 0, 0, 0, 1177, 10000, 65436, 90, 15000, 0, 0, 0, 0, 0, 0, ( 2 << 4 ) + 2, 60000 } },
 
   //Chaotic Cyclone, カオティックサイクロン
   //has damage: potency 400, combo potency 0, directional potency 0
@@ -239,8 +242,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 16463, { 400, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 100 } },
 
   //Nascent Flash, 原初の猛り
-  //applies to targets: Sleep, 睡眠, duration 30000, param 0
-  { 16464, { 0, 0, 0, 0, 0, 0, 0, 3, 30000, 0, 0, 0, 0 } },
+  //applies to targets: Nascent Flash, 原初の猛り, duration 6000, param 0
+  { 16464, { 0, 0, 0, 0, 0, 0, 0, 1857, 6000, 0, 0, 0, 0 } },
 
   //Inner Chaos, インナーカオス
   //has damage: potency 920, combo potency 0, directional potency 0

@@ -176,6 +176,8 @@ namespace Sapphire::World::Action
 
     bool hasValidLutEntry() const;
 
+    void applyStatusEffect( bool selfStatus, Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint16_t param, uint64_t resultDelayMs = 500, bool statusToSource = false );
+
     uint32_t m_id;
 
     uint16_t m_sequence;

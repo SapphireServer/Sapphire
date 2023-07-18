@@ -26,8 +26,8 @@ namespace Sapphire::World::Action
     void restoreMP( uint32_t amount, Common::ActionEffectResultFlag flag = Common::ActionEffectResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
-    void applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param, bool statusToSource = false );
-    void applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect, bool statusToSource = false );
+    void applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param, bool statusToSource = false, bool shouldReuse = true );
+    void applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect, bool statusToSource = false, bool shouldReuse = true );
     void statusNoEffect( uint16_t statusId );
     void mount( uint16_t mountId );
     void provoke();
@@ -61,6 +61,7 @@ namespace Sapphire::World::Action
     Common::ActionEffectResultFlag m_flag;
 
     StatusEffect::StatusEffectPtr m_pPreBuiltStatusEffect;
+    bool m_statusShouldReuse;
   };
 }
 
