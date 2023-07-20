@@ -24,9 +24,9 @@ Sapphire::World::Navi::NaviProvider::NaviProvider( const std::string& internalNa
   m_internalName( internalName )
 {
   // Set defaults
-  m_polyFindRange[ 0 ] = 10;
+  m_polyFindRange[ 0 ] = 20;
   m_polyFindRange[ 1 ] = 20;
-  m_polyFindRange[ 2 ] = 10;
+  m_polyFindRange[ 2 ] = 20;
 }
 
 bool Sapphire::World::Navi::NaviProvider::init()
@@ -355,7 +355,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
     //               iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
-    const float STEP_SIZE = 1.2f;
+    const float STEP_SIZE = 0.5f;
     const float SLOP = 0.15f;
 
     int32_t numSmoothPath = 0;
@@ -573,7 +573,8 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
-  params.maxSpeed = std::pow( 2, chara.getRadius() * 0.35f ) + 1.f;
+  //params.maxSpeed = std::pow( 2, chara.getRadius() * 0.35f ) + 1.f;
+  params.maxSpeed = ( std::pow( 2.f, 1.f * 0.35f ) + 1.f ) * 0.5f;
   params.radius = ( chara.getRadius() ) * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
@@ -589,9 +590,10 @@ void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& b
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
-  params.maxSpeed = std::pow( 2, bnpc.getRadius() * 0.35f ) + 1.f;
+  //params.maxSpeed = std::pow( 2, bnpc.getRadius() * 0.35f ) + 1.f;
+  params.maxSpeed = ( std::pow( 2.f, 1.f * 0.35f ) + 1.f ) * 0.5f;
   if( bnpc.getState() == Entity::BNpcState::Combat || bnpc.getState() == Entity::BNpcState::Retreat )
-    params.maxSpeed *= 2;
+    params.maxSpeed *= 2.5f;
   params.radius = ( bnpc.getRadius() ) * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;

@@ -1244,13 +1244,13 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
           auto chara = actor->getAsChara();
 
           // default autoattack range
-          float range = 3.f + chara->getRadius();
+          float range = 3.f + chara->getRadius() + getRadius() * 0.5f;
 
           // default autoattack range for ranged classes
           if( getClass() == ClassJob::Machinist ||
               getClass() == ClassJob::Bard ||
               getClass() == ClassJob::Archer )
-            range = 25;
+            range = 25.f + chara->getRadius() + getRadius() * 0.5f;
 
 
           if( Util::distance( getPos().x, getPos().y, getPos().z,
