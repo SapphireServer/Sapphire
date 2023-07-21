@@ -492,12 +492,12 @@ void Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
   auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  int8_t nextSlot = -1;
-  if( !pEffect->getCanApplyMultipleTimes() )
+  int8_t nextSlot = getStatusEffectSlotWithIdAndSource( pEffect->getId(), pEffect->getSrcActorId() );
+  if( nextSlot == -1 && !pEffect->getCanApplyMultipleTimes() )
   {
-    nextSlot = getStatusEffectSlotWithId( pEffect->getId() );
+    nextSlot = getStatusEffectSlotWithId( pEffect->getId());
   }
-  if( nextSlot == -1 || pEffect->getCanApplyMultipleTimes() )
+  if( nextSlot == -1)
   {
     nextSlot = getStatusEffectFreeSlot();
   }
@@ -526,11 +526,24 @@ void Chara::addStatusEffectByIdIfNotExist( StatusEffect::StatusEffectPtr pStatus
   addStatusEffect( pStatus );
 }
 
-int8_t Chara::getStatusEffectSlotWithId( uint8_t id )
+int8_t Chara::getStatusEffectSlotWithIdAndSource( uint8_t statusId, uint32_t sourceId )
 {
   for( const auto& effectIt : m_statusEffectMap )
   {
-    if( effectIt.second->getId() == id )
+    if( effectIt.second->getId() == statusId && effectIt.second->getSrcActorId() == sourceId )
+    {
+      return effectIt.first;
+    }
+  }
+
+  return -1;
+}
+
+int8_t Chara::getStatusEffectSlotWithId( uint8_t statusId )
+{
+  for( const auto& effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getId() == statusId )
     {
       return effectIt.first;
     }

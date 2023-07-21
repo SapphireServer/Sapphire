@@ -120,7 +120,9 @@ namespace Sapphire::Entity
 
     bool hasStatusEffect( uint32_t id );
 
-    int8_t getStatusEffectSlotWithId( uint8_t id );
+    int8_t getStatusEffectSlotWithIdAndSource( uint8_t statusId, uint32_t sourceId );
+
+    int8_t getStatusEffectSlotWithId( uint8_t statusId );
 
     int8_t getStatusEffectFreeSlot();
 
