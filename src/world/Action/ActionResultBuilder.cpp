@@ -89,10 +89,10 @@ void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t 
 }
 
 void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, bool shouldOverride )
+                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, bool canApplyMultipleTimes, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( target, 0 );
-  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, shouldOverride );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, canApplyMultipleTimes, shouldOverride );
   addResultToActor( target, nextResult );
 }
 

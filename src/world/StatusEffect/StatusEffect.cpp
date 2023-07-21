@@ -23,11 +23,12 @@ using namespace Sapphire::Network::Packets;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                                                     uint32_t duration,std::vector< World::Action::StatusModifier >& modifiers,
-                                                    uint32_t flag, uint32_t tickRate ) :
+                                                    uint32_t flag, uint32_t tickRate, bool canApplyMultipleTimes ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
   m_statusModifiers = std::move( modifiers );
   m_flag = flag;
+  m_canApplyMultipleTimes = canApplyMultipleTimes;
 }
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
@@ -40,7 +41,8 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   m_startTime( 0 ),
   m_tickRate( tickRate ),
   m_lastTick( 0 ),
-  m_flag( 0 )
+  m_flag( 0 ),
+  m_canApplyMultipleTimes( false )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto entry = exdData.getRow< Excel::Status >( id );
@@ -196,6 +198,11 @@ uint32_t Sapphire::StatusEffect::StatusEffect::getFlag() const
   return m_flag;
 }
 
+bool Sapphire::StatusEffect::StatusEffect::getCanApplyMultipleTimes() const
+{
+  return m_canApplyMultipleTimes;
+}
+
 std::vector< World::Action::StatusModifier > Sapphire::StatusEffect::StatusEffect::getStatusModifiers() const
 {
   return m_statusModifiers;
@@ -204,6 +211,11 @@ std::vector< World::Action::StatusModifier > Sapphire::StatusEffect::StatusEffec
 void Sapphire::StatusEffect::StatusEffect::setFlag( uint32_t flag )
 {
   m_flag = flag;
+}
+
+void Sapphire::StatusEffect::StatusEffect::setCanApplyMultipleTimes( bool canApplyMultipleTimes )
+{
+  m_canApplyMultipleTimes = canApplyMultipleTimes;
 }
 
 void Sapphire::StatusEffect::StatusEffect::setLastTick( uint64_t lastTick )

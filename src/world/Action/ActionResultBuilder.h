@@ -28,7 +28,7 @@ namespace Sapphire::World::Action
 
     void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false );
     void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                            std::vector< World::Action::StatusModifier > modifiers, uint32_t flag = 0, bool shouldOverride = false );
+                            std::vector< World::Action::StatusModifier > modifiers, uint32_t flag = 0, bool canApplyMultipleTimes = false, bool shouldOverride = false );
     void applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false );
     void applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
                                 uint32_t flag = 0, bool shouldOverride = false );

@@ -12,7 +12,7 @@ class StatusEffect
 {
 public:
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate );
+                uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate, bool canApplyMultipleTimes );
 
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, uint32_t tickRate );
@@ -50,6 +50,8 @@ public:
 
   uint32_t getFlag() const;
 
+  bool getCanApplyMultipleTimes() const;
+
   std::vector< World::Action::StatusModifier > getStatusModifiers() const;
 
   void setLastTick( uint64_t lastTick );
@@ -57,6 +59,8 @@ public:
   void setParam( uint16_t param );
 
   void setFlag( uint32_t flag );
+
+  void setCanApplyMultipleTimes( bool canApplyMultipleTimes );
 
   void registerTickEffect( Common::ParamModifier type, uint32_t param );
 
@@ -82,6 +86,7 @@ private:
   std::vector< World::Action::StatusModifier > m_statusModifiers;
   std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
   uint8_t m_slot;
+  bool m_canApplyMultipleTimes;
 
 };
 

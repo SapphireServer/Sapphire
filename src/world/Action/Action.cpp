@@ -630,7 +630,7 @@ void Action::Action::handleStatusEffects()
     {
       for( auto& status : m_lutEntry.statuses.target )
       {
-        getActionResultBuilder()->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, true );
+        getActionResultBuilder()->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, status.canApplyMultipleTimes, true );
       }
 
       if( actor->getStatusEffectMap().size() > 0 )

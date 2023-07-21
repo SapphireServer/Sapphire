@@ -83,14 +83,14 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
 }
 
 void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                      std::vector< StatusModifier > modifiers, uint32_t flag, bool shouldOverride )
+                                      std::vector< StatusModifier > modifiers, uint32_t flag, bool canApplyMultipleTimes, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
   m_result.Type = Common::ActionEffectType::CALC_RESULT_TYPE_SET_STATUS;
 
   m_bOverrideStatus = shouldOverride;
-  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, flag, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, flag, 3000, canApplyMultipleTimes );
   m_pStatus->setParam( param );
 }
 
@@ -115,7 +115,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::EffectOnSource );
 
   m_bOverrideStatus = shouldOverride;
-  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, flag, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, flag, 3000, false );
   m_pStatus->setParam( param );
 }
 
