@@ -492,7 +492,16 @@ void Chara::addStatusEffect( StatusEffect::StatusEffectPtr pEffect )
   auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
-  int8_t nextSlot = getStatusEffectFreeSlot();
+  int8_t nextSlot = -1;
+  if( !pEffect->getCanApplyMultipleTimes() )
+  {
+    nextSlot = getStatusEffectSlotWithId( pEffect->getId() );
+  }
+  if( nextSlot == -1 || pEffect->getCanApplyMultipleTimes() )
+  {
+    nextSlot = getStatusEffectFreeSlot();
+  }
+
   // if there is no slot left, do not add the effect
   if( nextSlot == -1 )
     return;
@@ -515,6 +524,19 @@ void Chara::addStatusEffectByIdIfNotExist( StatusEffect::StatusEffectPtr pStatus
     return;
 
   addStatusEffect( pStatus );
+}
+
+int8_t Chara::getStatusEffectSlotWithId( uint8_t id )
+{
+  for( const auto& effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getId() == id )
+    {
+      return effectIt.first;
+    }
+  }
+
+  return -1;
 }
 
 int8_t Chara::getStatusEffectFreeSlot()
