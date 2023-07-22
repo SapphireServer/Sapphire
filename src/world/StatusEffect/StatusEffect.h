@@ -86,7 +86,7 @@ private:
   std::vector< World::Action::StatusModifier > m_statusModifiers;
   std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
   uint8_t m_slot;
-  bool m_canApplyMultipleTimes;
+  bool m_canApplyMultipleTimes; // 0x1F in status.exh
 
 };
 
