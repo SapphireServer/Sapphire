@@ -355,13 +355,16 @@ bool Sapphire::Entity::Chara::checkAction()
 
 void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
-  updateStatusEffects();
-
-  if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
+  if( isAlive() )
   {
-    onTick();
+    updateStatusEffects();
 
-    m_lastTickTime = static_cast< time_t >( tickCount );
+    if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
+    {
+      onTick();
+
+      m_lastTickTime = static_cast< time_t >( tickCount );
+    }
   }
 
   m_lastUpdate = static_cast< time_t >( tickCount );
