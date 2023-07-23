@@ -534,8 +534,8 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     Common::CalcResultParam entry{};
     entry.Value = static_cast< int16_t >( param1 );
-    entry.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-    entry.Arg0 = static_cast< uint8_t >( Common::ActionHitSeverityType::NormalDamage );
+    entry.Type = Common::CalcResultType::TypeDamageHp;
+    entry.Arg0 = 1;
 
     effectPacket->addTargetEffect( entry, static_cast< uint64_t >( player.getId() ) );
     effectPacket->setResultId( pCurrentZone->getNextActionResultId() );

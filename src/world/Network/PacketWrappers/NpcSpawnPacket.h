@@ -77,6 +77,16 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.NpcId = bnpc.getBNpcBaseId();
       m_data.NameId = bnpc.getBNpcNameId();
 
+      if( bnpc.getInstanceObjectInfo() )
+      {
+        m_data.LinkCountLimit = bnpc.getInstanceObjectInfo()->LinkCountLimit;
+        m_data.LinkFamily = bnpc.getInstanceObjectInfo()->LinkFamily;
+        m_data.LinkGroup = bnpc.getInstanceObjectInfo()->LinkGroup;
+        m_data.LinkParent = bnpc.getInstanceObjectInfo()->LinkParent;
+        m_data.LinkRange = bnpc.getInstanceObjectInfo()->LinkRange;
+        m_data.LinkReply = bnpc.getInstanceObjectInfo()->LinkReply;
+      }
+
       assert( target.getId() != bnpc.getId() );
 
       m_data.Index = target.getSpawnIdForActorId( bnpc.getId() );

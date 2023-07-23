@@ -64,7 +64,8 @@ class SubSea016 : public Sapphire::ScriptAPI::QuestScript
       }
       case Actor1:
       {
-        Scene00002( quest, player );
+        if( quest.getSeq() == Seq1 )
+          Scene00002( quest, player );
         break;
       }
     }
@@ -131,6 +132,7 @@ class SubSea016 : public Sapphire::ScriptAPI::QuestScript
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     eventMgr().sendEventNotice( player, getId(), 0, 0 );
+    quest.setBitFlag8( 1, true );
     quest.setSeq( SeqFinish );
   }
 

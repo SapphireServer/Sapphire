@@ -51,9 +51,37 @@ namespace World::AI
 {
   TYPE_FORWARD( GambitTargetCondition );
   TYPE_FORWARD( TopHateTargetCondition );
-  TYPE_FORWARD( HPSelfPctLessThan );
+  TYPE_FORWARD( HPSelfPctLessThanTargetCondition );
 
   TYPE_FORWARD( GambitRule );
+  TYPE_FORWARD( GambitPack );
+  TYPE_FORWARD( GambitTimeLinePack );
+  TYPE_FORWARD( GambitRuleSetPack );
+}
+
+namespace World::AI::Fsm
+{
+
+  TYPE_FORWARD( Condition );
+  TYPE_FORWARD( State );
+  TYPE_FORWARD( Transition );
+  TYPE_FORWARD( StateMachine );
+
+  TYPE_FORWARD( StateIdle );
+  TYPE_FORWARD( StateRoam );
+  TYPE_FORWARD( StateCombat );
+  TYPE_FORWARD( StateRetreat );
+  TYPE_FORWARD( StateDead );
+
+  TYPE_FORWARD( RoamNextTimeReachedCondition );
+  TYPE_FORWARD( RoamTargetReachedCondition );
+  TYPE_FORWARD( HateListEmptyCondition );
+  TYPE_FORWARD( HateListHasEntriesCondition );
+  TYPE_FORWARD( SpawnPointDistanceGtMaxDistanceCondition );
+  TYPE_FORWARD( IsDeadCondition );
+
+
+
 }
 
 namespace Inventory

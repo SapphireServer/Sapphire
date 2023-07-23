@@ -91,6 +91,27 @@ namespace Sapphire::Data
       return ids;
     }
 
+    template< typename T >
+    std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > > getRows()
+    {
+      xiv::exd::Exd sheet;
+      auto needle = m_sheets.find( typeid( T ) );
+      if( needle == m_sheets.end() )
+      {
+        auto sheetName = getSheetName< T >();
+
+        // load sheet
+        auto& cat = m_exd_data->get_category( sheetName );
+        m_sheets[ typeid( T ) ] = sheet = static_cast< xiv::exd::Exd >( cat.get_data( xiv::exd::Language::en ) );
+      }
+      else
+      {
+        sheet = needle->second;
+      }
+
+      return sheet.get_sheet_rows< T >();
+    }
+
     std::shared_ptr< xiv::dat::GameData > getGameData()
     {
       return m_data;

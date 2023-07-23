@@ -475,8 +475,8 @@ void Chara::autoAttack( CharaPtr pTarget )
 
     Common::CalcResultParam effectEntry{};
     effectEntry.Value = static_cast< int16_t >( damage );
-    effectEntry.Type = ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-    effectEntry.Arg0 = static_cast< uint8_t >( ActionHitSeverityType::NormalDamage );
+    effectEntry.Type = CalcResultType::TypeDamageHp;
+    effectEntry.Arg0 = 1;
     effectEntry.Arg2 = 0x71;
     effectPacket->addTargetEffect( effectEntry );
 
@@ -825,7 +825,7 @@ void Chara::onTick()
   {
     takeDamage( thisTickDmg );
     Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP, thisTickDmg );
+                                             CalcResultType::TypeDamageHp, thisTickDmg );
 
     Network::Util::Packet::sendHudParam( *this );
   }
@@ -834,7 +834,7 @@ void Chara::onTick()
   {
     heal( thisTickHeal );
     Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), HPFloatingText, 0,
-                                             ActionEffectType::CALC_RESULT_TYPE_RECOVER_HP, thisTickHeal );
+                                             CalcResultType::TypeRecoverMp, thisTickHeal );
 
     Network::Util::Packet::sendHudParam( *this );
   }

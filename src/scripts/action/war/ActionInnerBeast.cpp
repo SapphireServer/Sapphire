@@ -31,8 +31,7 @@ public:
 
     auto dmg = action.calcDamage( Potency );
     action.getActionResultBuilder()->damage( pSource, pTarget, dmg.first, dmg.second );
-    action.getActionResultBuilder()->heal( pTarget, pSource, dmg.first, Common::ActionHitSeverityType::NormalHeal,
-                                           Common::ActionResultFlag::EffectOnSource );
+    action.getActionResultBuilder()->heal( pTarget, pSource, dmg.first, Common::CalcResultType::TypeRecoverHp, Common::ActionResultFlag::EffectOnSource );
 
     action.getActionResultBuilder()->applyStatusEffectSelf( InnerBeast, 15000, 0, { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
     

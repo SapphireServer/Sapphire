@@ -35,12 +35,10 @@ using namespace Sapphire::World::Manager;
 bool MapMgr::loadQuests()
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Excel::Quest >();
+  auto questList = exdData.getRows< Excel::Quest >();
 
-  for( auto id : idList )
+  for( auto& [ id, questExdData ] : questList )
   {
-    auto questExdData = exdData.getRow< Excel::Quest >( id );
-
     m_quests.emplace( id, std::move( questExdData ) );
   }
 

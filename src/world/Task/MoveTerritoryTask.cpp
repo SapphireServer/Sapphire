@@ -41,6 +41,10 @@ void MoveTerritoryTask::execute()
   if( !pPlayer )
     return;
 
+  pPlayer->setTargetId( 0 );
+  pPlayer->setStance( Common::Stance::Passive );
+  pPlayer->setAutoattack( false );
+
   auto inRangePlayerIds = pPlayer->getInRangePlayerIds( true );
 
   auto warpStart = makeActorControlSelf( pPlayer->getId(), WarpStart, m_warpInfo.m_warpType, 1, 0, m_warpInfo.m_targetTerritoryId, 1 );
