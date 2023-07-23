@@ -512,8 +512,8 @@ void Action::Action::buildEffects()
     if( !shouldHitThisTarget )
       continue;
 
-    bool shouldTriggerActionBonus = true;
-    if( m_lutEntry.damagePotency > 0 )
+    bool isValidVictim = false;
+    if( m_lutEntry.damagePotency > 0 && actor->getObjKind() != m_pSource->getObjKind() /* is NOT friendly target, this will do for now */ )
     {
       Common::AttackType attackType = static_cast< Common::AttackType >( m_actionData->attackType );
       actor->onActionHostile( m_pSource );
@@ -539,7 +539,6 @@ void Action::Action::buildEffects()
       if( actor->hasInvulnerableEffect() )
       {
         dmg.first = 0;
-        shouldTriggerActionBonus = false;
       }
 
       if( dmg.first > 0 )
@@ -563,7 +562,6 @@ void Action::Action::buildEffects()
       if( dodged )
       {
         dmg.first = 0;
-        shouldTriggerActionBonus = false;
       }
       else
       {
@@ -573,6 +571,7 @@ void Action::Action::buildEffects()
 
       if( dmg.first > 0 )
       {
+        isValidVictim = true;
         auto attackTypeEffect = m_actionData->attackType;
         if( attackTypeEffect == -1 )
         {
@@ -612,113 +611,114 @@ void Action::Action::buildEffects()
           m_effectBuilder->invulnerable( actor );
         }
       }
-
-      if( shouldTriggerActionBonus )
-      {
-        if( ( !isComboAction() || isCorrectCombo() ) )
-        {
-          if ( !m_actionData->preservesCombo ) // this matches retail packet, on all standalone actions even casts.
-          {
-            m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
-          }
-        }
-
-        if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::SelfHeal )
-        {
-          if( checkActionBonusRequirement() )
-          {
-            auto heal = calcHealing( m_lutEntry.getSelfHealPotency() );
-            heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
-            m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
-          }
-        }
-
-        if( validVictimCounter == 0 ) // effects only apply once if aoe, on first valid target (can be single target action as well)
-        {
-          if( isCorrectCombo() )
-            m_effectBuilder->comboSucceed( actor );
-
-          if( m_isAutoAttack && player )
-          {
-            if( player->getClass() == Common::ClassJob::Paladin )
-            {
-              player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
-            }
-          }
-
-          if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainMPPercentage )
-          {
-            if( checkActionBonusRequirement() )
-              m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.getMPGainPercentage() / 100, Common::ActionEffectResultFlag::EffectOnSource );
-          }
-
-          if( ( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource ) && player )
-          {
-            if( checkActionBonusRequirement() )
-            {
-              switch( m_lutEntry.getAffectedJob() )
-              {
-                case Common::ClassJob::Marauder:
-                case Common::ClassJob::Warrior:
-                {
-                  player->gaugeWarSetIb( std::min( 100, player->gaugeWarGetIb() + m_lutEntry.getJobResourceGain() ) );
-                  break;
-                }
-                case Common::ClassJob::Darkknight:
-                {
-                  player->gaugeDrkSetBlood( std::min( 100, player->gaugeDrkGetBlood() + m_lutEntry.getJobResourceGain() ) );
-                  break;
-                }
-                case Common::ClassJob::Gunbreaker:
-                {
-                  player->gaugeGnbSetAmmo( std::min( 2, player->gaugeGnbGetAmmo() + m_lutEntry.getJobResourceGain() ) );
-                  break;
-                }
-                case Common::ClassJob::Samurai:
-                {
-                  player->gaugeSamSetKenki( std::min( 100, player->gaugeSamGetKenki() + m_lutEntry.getJobResourceGain() ) );
-                  break;
-                }
-              }
-            }
-          }
-
-          if( ( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobTimer ) && player )
-          {
-            if( checkActionBonusRequirement() )
-            {
-              switch( m_lutEntry.getAffectedJob() )
-              {
-                case Common::ClassJob::Darkknight:
-                {
-                  player->gaugeDrkSetDarkSideTimer( std::min( 60000, player->gaugeDrkGetDarkSideTimer() + m_lutEntry.getJobTimerGain() ), true );
-                  break;
-                }
-                case Common::ClassJob::Dragoon:
-                {
-                  player->gaugeDrgSetDragonTimer( std::min( 30000, player->gaugeDrgGetDragonTimer() + m_lutEntry.getJobTimerGain() ), true );
-                  break;
-                }
-              }
-            }
-          }
-        }
-        if( validVictimCounter == 0 )
-          firstValidVictim = actor;
-        validVictimCounter++;
-      }
     }
 
     if( m_lutEntry.healPotency > 0 && actor->getObjKind() == m_pSource->getObjKind() /* is friendly target, this will do for now */)
     {
+      isValidVictim = true;
       auto heal = calcHealing( m_lutEntry.healPotency );
       heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *actor, heal.first );
       m_effectBuilder->heal( actor, actor, heal.first, heal.second, Common::ActionEffectResultFlag::None, getExecutionDelay() + victimCounter * 100 );
     }
 
+    if( isValidVictim )
+    {
+      if( ( !isComboAction() || isCorrectCombo() ) )
+      {
+        if ( !m_actionData->preservesCombo ) // this matches retail packet, on all standalone actions even casts.
+        {
+          m_effectBuilder->startCombo( actor, getId() ); // this is on all targets hit
+        }
+      }
+
+      if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::SelfHeal )
+      {
+        if( checkActionBonusRequirement() )
+        {
+          auto heal = calcHealing( m_lutEntry.getSelfHealPotency() );
+          heal.first = Math::CalcStats::applyHealingReceiveMultiplier( *m_pSource, heal.first );
+          m_effectBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionEffectResultFlag::EffectOnSource );
+        }
+      }
+
+      if( validVictimCounter == 0 ) // effects only apply once if aoe, on first valid target (can be single target action as well)
+      {
+        if( isCorrectCombo() )
+          m_effectBuilder->comboSucceed( actor );
+
+        if( m_isAutoAttack && player )
+        {
+          if( player->getClass() == Common::ClassJob::Paladin )
+          {
+            player->gaugePldSetOath( std::min( 100, player->gaugePldGetOath() + 5 ) );
+          }
+        }
+
+        if( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainMPPercentage )
+        {
+          if( checkActionBonusRequirement() )
+            m_effectBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.getMPGainPercentage() / 100, Common::ActionEffectResultFlag::EffectOnSource );
+        }
+
+        if( ( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobResource ) && player )
+        {
+          if( checkActionBonusRequirement() )
+          {
+            switch( m_lutEntry.getAffectedJob() )
+            {
+              case Common::ClassJob::Marauder:
+              case Common::ClassJob::Warrior:
+              {
+                player->gaugeWarSetIb( std::min( 100, player->gaugeWarGetIb() + m_lutEntry.getJobResourceGain() ) );
+                break;
+              }
+              case Common::ClassJob::Darkknight:
+              {
+                player->gaugeDrkSetBlood( std::min( 100, player->gaugeDrkGetBlood() + m_lutEntry.getJobResourceGain() ) );
+                break;
+              }
+              case Common::ClassJob::Gunbreaker:
+              {
+                player->gaugeGnbSetAmmo( std::min( 2, player->gaugeGnbGetAmmo() + m_lutEntry.getJobResourceGain() ) );
+                break;
+              }
+              case Common::ClassJob::Samurai:
+              {
+                player->gaugeSamSetKenki( std::min( 100, player->gaugeSamGetKenki() + m_lutEntry.getJobResourceGain() ) );
+                break;
+              }
+            }
+          }
+        }
+
+        if( ( m_lutEntry.bonusEffect & Common::ActionBonusEffect::GainJobTimer ) && player )
+        {
+          if( checkActionBonusRequirement() )
+          {
+            switch( m_lutEntry.getAffectedJob() )
+            {
+              case Common::ClassJob::Darkknight:
+              {
+                player->gaugeDrkSetDarkSideTimer( std::min( 60000, player->gaugeDrkGetDarkSideTimer() + m_lutEntry.getJobTimerGain() ), true );
+                break;
+              }
+              case Common::ClassJob::Dragoon:
+              {
+                player->gaugeDrgSetDragonTimer( std::min( 30000, player->gaugeDrgGetDragonTimer() + m_lutEntry.getJobTimerGain() ), true );
+                break;
+              }
+            }
+          }
+        }
+      }
+      if( validVictimCounter == 0 )
+        firstValidVictim = actor;
+      validVictimCounter++;
+    }
+
     if( m_lutEntry.targetStatus != 0 )
     {
-      if( shouldTriggerActionBonus || actor->getObjKind() == m_pSource->getObjKind() /* is friendly target, this will do for now */ )
+      if( isValidVictim || actor->getObjKind() == m_pSource->getObjKind() /* is friendly target, this will do for now */ )
       {
         if( !isComboAction() || isCorrectCombo() )
           applyStatusEffect( false, actor, m_pSource, m_lutEntry.targetStatus, m_lutEntry.targetStatusDuration, m_lutEntry.targetStatusParam, getExecutionDelay() + victimCounter * 100 );
@@ -1168,6 +1168,9 @@ void Action::Action::addDefaultActorFilters()
 
 bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
 {
+  if( m_castType == Common::CastType::SingleTarget ) // trust the target sent by client is valid
+    return true;
+
   auto kind = actor.getObjKind();
   auto chara = actor.getAsChara();
 
@@ -1175,19 +1178,16 @@ bool Action::Action::preFilterActor( Sapphire::Entity::Actor& actor ) const
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
   
-  if( m_lutEntry.damagePotency > 0 && chara->getId() == m_pSource->getId() ) // !m_canTargetSelf
-    return false;
-  
-  if( ( m_lutEntry.damagePotency > 0 || m_lutEntry.healPotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
-    return false;
+  if( chara->isAlive() && m_lutEntry.healPotency > 0 && m_pSource->getObjKind() == chara->getObjKind() )
+    return true;
 
-  if( m_lutEntry.damagePotency > 0 && m_pSource->getObjKind() == chara->getObjKind() ) // !m_canTargetFriendly not working for aoe
-    return false;
-
-  if( ( m_lutEntry.damagePotency == 0 && m_lutEntry.healPotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
-    return false;
+  if( chara->isAlive() && m_lutEntry.damagePotency > 0 && m_pSource->getObjKind() != chara->getObjKind() )
+    return true;
   
-  return true;
+  if( !chara->isAlive() && m_lutEntry.damagePotency == 0 && m_lutEntry.healPotency == 0 )
+    return true;
+  
+  return false;
 }
 
 std::vector< Sapphire::Entity::CharaPtr >& Action::Action::getHitCharas()

@@ -1837,8 +1837,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 7431, { 280, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Divine Benison, ディヴァインベニゾン
-  //applies to targets: Divine Benison, ディヴァインベニゾン, duration 15000, param 0
-  { 7432, { 0, 0, 0, 0, 0, 0, 0, 1218, 15000, 0, 0, 0, 0 } },
+  //applies to targets: Divine Benison, ディヴァインベニゾン, duration 15000, param 0 >> moved to script
+  { 7432, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Plenary Indulgence, インドゥルゲンティア
   //applies to targets: Confession, インドゥルゲンティア, duration 10000, param 0
@@ -1863,8 +1863,8 @@ ActionLut::Lut ActionLut::m_actionLut =
   { 16534, { 0, 0, 0, 300, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
 
   //Temperance, テンパランス
-  //applies to targets: Temperance, テンパランス：効果, duration 20000, param 0
-  { 16536, { 0, 0, 0, 0, 0, 0, 0, 1873, 20000, 0, 0, 0, 0 } },
+  //applies to targets: Temperance, テンパランス, duration 20000, param 0
+  { 16536, { 0, 0, 0, 0, 0, 0, 0, 1872, 20000, 0, 0, 0, 0 } },
 
   //Ruin, ルイン
   //has damage: potency 160, combo potency 0, directional potency 0
@@ -3560,4 +3560,7 @@ ActionLut::StatusEffectTable ActionLut::m_statusEffectTable =
 
   //Walking Dead, ウォーキングデッド: CannotDie
   { 811, { 19, 0, 0, 0, 0 } },
+
+  //Divine Benison, ディヴァインベニゾン (scripted)
+  { 1218, { 0, 0, 0, 0, 0 } },
 };
