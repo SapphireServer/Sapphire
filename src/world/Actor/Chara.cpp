@@ -355,16 +355,13 @@ bool Sapphire::Entity::Chara::checkAction()
 
 void Sapphire::Entity::Chara::update( uint64_t tickCount )
 {
-  if( isAlive() )
+  updateStatusEffects();
+
+  if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
   {
-    updateStatusEffects();
+    onTick();
 
-    if( std::difftime( static_cast< time_t >( tickCount ), m_lastTickTime ) > 3000 )
-    {
-      onTick();
-
-      m_lastTickTime = static_cast< time_t >( tickCount );
-    }
+    m_lastTickTime = static_cast< time_t >( tickCount );
   }
 
   m_lastUpdate = static_cast< time_t >( tickCount );
@@ -1059,7 +1056,7 @@ void Sapphire::Entity::Chara::onTick()
     }
   }
 
-  if( thisTickDmg != 0 )
+  if( thisTickDmg != 0 && isAlive() )
   {
     thisTickDmg = applyShieldProtection( thisTickDmg );
     if( thisTickDmg > 0 )
@@ -1068,7 +1065,7 @@ void Sapphire::Entity::Chara::onTick()
                                         static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
   }
 
-  if( thisTickHeal != 0 )
+  if( thisTickHeal != 0 && isAlive() )
   {
     heal( thisTickHeal );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,
