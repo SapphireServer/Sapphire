@@ -41,6 +41,7 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
     static constexpr auto Actor1 = 1000957; // R'sushmo ( Pos: -49.240898 43.991699 -146.380005  Teri: 128 )
     static constexpr auto Actor2 = 1000937; // Godebert ( Pos: -12.222500 44.998798 -251.850006  Teri: 128 )
     static constexpr auto Item0 = 2000455;
+    static constexpr auto Item0Icon = 25906;
 
   public:
     SubSea007() : Sapphire::ScriptAPI::QuestScript( 65653 ){}; 
@@ -117,7 +118,7 @@ class SubSea007 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 0 ); // TODO: Show item icon
+    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
     quest.setUI8BH( 1 );
     quest.setSeq( Seq2 );
   }

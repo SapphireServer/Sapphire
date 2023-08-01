@@ -128,9 +128,9 @@ namespace Sapphire::World::Action
      */
     void addDefaultActorFilters();
 
-    std::pair< uint32_t, Common::ActionHitSeverityType > calcDamage( uint32_t potency );
+    std::pair< uint32_t, Common::CalcResultType > calcDamage( uint32_t potency );
 
-    std::pair< uint32_t, Common::ActionHitSeverityType > calcHealing( uint32_t potency );
+    std::pair< uint32_t, Common::CalcResultType > calcHealing( uint32_t potency );
 
 
     std::vector< Entity::CharaPtr >& getHitCharas();

@@ -55,6 +55,7 @@ private:
   static constexpr auto EventActionSearchMiddle = 3;
   static constexpr auto Item0 = 2000616;
   static constexpr auto Item1 = 2000617;
+  static constexpr auto Item1Icon = 20005;
 
 public:
   GaiUsa803() : Sapphire::ScriptAPI::QuestScript( 66323 ){};
@@ -140,7 +141,7 @@ public:
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AH(), 5 );//TODO:Show Item Icon
+    eventMgr().sendNotice( player, getId(), 1, { quest.getUI8AH(), 5, Item1Icon } );
     if( quest.getUI8AH() >= 5 )
     {
       quest.setUI8BH( quest.getUI8DH() );

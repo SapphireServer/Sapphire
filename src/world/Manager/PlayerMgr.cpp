@@ -313,7 +313,7 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
 {
   auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
-  if( !mainWeap || !player.isAutoattackOn() || player.checkAction() || !player.getTargetId() || player.getStance() != Common::Active )
+  if( !mainWeap || player.checkAction() || !player.isAutoattackOn() || !player.getTargetId() || player.getStance() != Common::Active )
     return;
 
   for( const auto& actor : player.getInRangeActors() )

@@ -457,7 +457,7 @@ void Action::Action::execute()
   }
 }
 
-std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage( uint32_t potency )
+std::pair< uint32_t, Common::CalcResultType > Action::Action::calcDamage( uint32_t potency )
 {
   // todo: what do for npcs?
   auto wepDmg = 1.f;
@@ -481,7 +481,7 @@ std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcDamage(
   return Math::CalcStats::calcActionDamage( *m_pSource, potency, wepDmg );
 }
 
-std::pair< uint32_t, Common::ActionHitSeverityType > Action::Action::calcHealing( uint32_t potency )
+std::pair< uint32_t, Common::CalcResultType > Action::Action::calcHealing( uint32_t potency )
 {
   auto wepDmg = 1.f;
 
@@ -520,7 +520,7 @@ void Action::Action::buildActionResults()
 
   Network::Util::Packet::sendHudParam( *m_pSource );
 
-  if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
+  if( m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_actionResultBuilder->sendActionResults( {} );
@@ -539,56 +539,62 @@ void Action::Action::buildActionResults()
   bool shouldRestoreMP = true;
   bool shouldApplyComboSucceedEffect = true;
 
-  for( auto& actor : m_hitActors )
+  if( m_enableGenericHandler && hasLutEntry )
   {
-    if( m_lutEntry.potency > 0 )
+    for( auto& actor : m_hitActors )
     {
-      auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
-
-      if( dmg.first > 0 )
-        actor->onActionHostile( m_pSource );
-
-      if( isCorrectCombo() && shouldApplyComboSucceedEffect )
+      if( m_lutEntry.potency > 0 )
       {
-        m_actionResultBuilder->comboSucceed( m_pSource );
-        shouldApplyComboSucceedEffect = false;
-      }
+        auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
+        m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
-      if( !isComboAction() || isCorrectCombo() )
-      {
-        if( m_lutEntry.curePotency > 0 ) // actions with self heal
+        if( dmg.first > 0 )
+          actor->onActionHostile( m_pSource );
+
+        if( isCorrectCombo() && shouldApplyComboSucceedEffect )
         {
-          auto heal = calcHealing( m_lutEntry.curePotency );
-          m_actionResultBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionResultFlag::EffectOnSource );
+          m_actionResultBuilder->comboSucceed( m_pSource );
+          shouldApplyComboSucceedEffect = false;
         }
+
+        if( !isComboAction() || isCorrectCombo() )
+        {
+          if( m_lutEntry.curePotency > 0 )// actions with self heal
+          {
+            auto heal = calcHealing( m_lutEntry.curePotency );
+            m_actionResultBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionResultFlag::EffectOnSource );
+          }
+
+          if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+          {
+            m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
+            shouldRestoreMP = false;
+          }
+
+          if( !m_lutEntry.nextCombo.empty() )                       // if we have a combo action followup
+            m_actionResultBuilder->startCombo( m_pSource, getId() );// this is on all targets hit
+        }
+      }
+      else if( m_lutEntry.curePotency > 0 )
+      {
+        auto heal = calcHealing( m_lutEntry.curePotency );
+        m_actionResultBuilder->heal( actor, actor, heal.first, heal.second );
 
         if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
         {
           m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
           shouldRestoreMP = false;
         }
-
-        if( !m_lutEntry.nextCombo.empty() ) // if we have a combo action followup
-          m_actionResultBuilder->startCombo( m_pSource, getId() ); // this is on all targets hit
       }
-    }
-    else if( m_lutEntry.curePotency > 0 )
-    {
-      auto heal = calcHealing( m_lutEntry.curePotency );
-      m_actionResultBuilder->heal( actor, actor, heal.first, heal.second );
-
-      if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
+      else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
         m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
         shouldRestoreMP = false;
       }
     }
-    else if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
-    {
-      m_actionResultBuilder->restoreMP( actor, m_pSource, m_pSource->getMaxMp() * m_lutEntry.restoreMPPercentage / 100, Common::ActionResultFlag::EffectOnSource );
-      shouldRestoreMP = false;
-    }
+
+    if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
+      handleStatusEffects();
   }
 
   // If we hit an enemy
@@ -598,9 +604,6 @@ void Action::Action::buildActionResults()
   }
 
   handleJobAction();
-
-  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
-    handleStatusEffects();
 
   m_actionResultBuilder->sendActionResults( m_hitActors );
 

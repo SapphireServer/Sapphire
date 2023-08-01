@@ -102,3 +102,12 @@ void Sapphire::Cell::unload()
   removeActors();
 }
 
+uint32_t Sapphire::Cell::getLastActiveTime() const
+{
+  return m_lastActiveTime;
+}
+
+void Sapphire::Cell::setLastActiveTime( uint32_t lastActiveTime )
+{
+  m_lastActiveTime = lastActiveTime;
+}

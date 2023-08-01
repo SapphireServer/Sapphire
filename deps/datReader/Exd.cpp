@@ -7,50 +7,6 @@
 
 using xiv::utils::bparse::extract;
 
-
-namespace xiv::exd
-{
-  struct ExdHeader
-  {
-    char magic[0x4];
-    uint16_t unknown;
-    uint16_t unknown2;
-    uint32_t index_size;
-  };
-
-  struct ExdRecordIndex
-  {
-    uint32_t id;
-    uint32_t offset;
-  };
-}
-
-namespace xiv::utils::bparse {
-template<>
-  inline void reorder< xiv::exd::ExdHeader >( xiv::exd::ExdHeader& i_struct )
-  {
-    for( int32_t i = 0; i < 0x4; ++i )
-    {
-      xiv::utils::bparse::reorder( i_struct.magic[ i ] );
-    }
-    i_struct.unknown = xiv::utils::bparse::byteswap( i_struct.unknown );
-    xiv::utils::bparse::reorder( i_struct.unknown );
-    i_struct.unknown2 = xiv::utils::bparse::byteswap( i_struct.unknown2 );
-    xiv::utils::bparse::reorder( i_struct.unknown2 );
-    i_struct.index_size = xiv::utils::bparse::byteswap( i_struct.index_size );
-    xiv::utils::bparse::reorder( i_struct.index_size );
-  }
-
-  template<>
-  inline void reorder< xiv::exd::ExdRecordIndex >( xiv::exd::ExdRecordIndex& i_struct )
-  {
-    i_struct.id = xiv::utils::bparse::byteswap( i_struct.id );
-    xiv::utils::bparse::reorder( i_struct.id );
-    i_struct.offset = xiv::utils::bparse::byteswap( i_struct.offset );
-    xiv::utils::bparse::reorder( i_struct.offset );
-  }
-};
-
 namespace xiv::exd
 {
   Exd::Exd( std::shared_ptr< Exh > i_exh, const std::vector< std::shared_ptr< dat::File>>& i_files )
@@ -68,16 +24,16 @@ namespace xiv::exd
       std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
 
       // Extract the header and skip to the record indices
-      auto exd_header = extract< ExdHeader >( iss );
+      auto exd_header = extract< ExdHeaderMinimal >( iss );
       iss.seekg( 0x20 );
 
       // Preallocate and extract the record_indices
-      const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndex );
-      std::vector< ExdRecordIndex > record_indices;
+      const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndexData );
+      std::vector< ExdRecordIndexData > record_indices;
       record_indices.reserve( record_count );
       for( uint32_t i = 0; i < record_count; ++i )
       {
-        auto recordIndex = extract< ExdRecordIndex >( iss );
+        auto recordIndex = extract< ExdRecordIndexData >( iss );
         _idCache[ recordIndex.id ] = ExdCacheEntry{ file_ptr, recordIndex.offset };
       }
     }
@@ -290,16 +246,16 @@ namespace xiv::exd
       std::istringstream iss( std::string( dataCpy.begin(), dataCpy.end() ) );
 
       // Extract the header and skip to the record indices
-      auto exd_header = extract< ExdHeader >( iss );
+      auto exd_header = extract< ExdHeaderMinimal >( iss );
       iss.seekg( 0x20 );
 
       // Preallocate and extract the record_indices
-      const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndex );
-      std::vector< ExdRecordIndex > record_indices;
+      const uint32_t record_count = exd_header.index_size / sizeof( ExdRecordIndexData );
+      std::vector< ExdRecordIndexData > record_indices;
       record_indices.reserve( record_count );
       for( uint32_t i = 0; i < record_count; ++i )
       {
-        record_indices.emplace_back( extract< ExdRecordIndex >( iss ) );
+        record_indices.emplace_back( extract< ExdRecordIndexData >( iss ) );
       }
 
       for( auto& record_index : record_indices )

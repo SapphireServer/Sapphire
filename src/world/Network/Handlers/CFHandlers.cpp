@@ -74,12 +74,12 @@ void Sapphire::Network::GameConnection::find5Contents( const Packets::FFXIVARR_P
     if( territoryType != 0 )
       selectedContent.insert( territoryType );
 
-  auto contentListIds = exdData.getIdList< Excel::InstanceContent >();
-
   std::vector< uint32_t > idList;
-  for( auto id : contentListIds )
+
+  auto contentFinderList = exdData.getRows< Excel::InstanceContent >();
+  
+  for( const auto& [ id, instanceContent ] : contentFinderList )
   {
-    auto instanceContent = exdData.getRow< Excel::InstanceContent >( id );
     if( selectedContent.count( instanceContent->data().TerritoryType ) )
     {
       idList.push_back( id );

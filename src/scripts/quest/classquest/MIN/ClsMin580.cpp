@@ -64,6 +64,7 @@ private:
   static constexpr auto Eobject2 = 2005950;
   static constexpr auto EventActionGatherMiddle = 7;
   static constexpr auto Item0 = 2001728;
+  static constexpr auto Item0Icon = 21223;
   static constexpr auto LocActor1 = 1013860;
   static constexpr auto LocActor2 = 1013870;
   static constexpr auto LocActor3 = 1013871;
@@ -207,7 +208,7 @@ public:
 private:
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 3 );//TODO: Item Icon, probably
+    eventMgr().sendNotice( player, getId(), 1, { quest.getUI8AL(), 3, Item0Icon } );
 
     if( quest.getUI8AL() >= 3 )
     {

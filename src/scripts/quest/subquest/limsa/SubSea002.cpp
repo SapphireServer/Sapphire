@@ -8,7 +8,7 @@
 #include <Service.h>
 
 // Quest Script: SubSea002_00112
-// Quest Name: Suspiciously SoberF
+// Quest Name: Suspiciously Sober
 // Quest ID: 65648
 // Start NPC: 1003604 (Ahldskyf)
 // End NPC: 1003275 (Frydwyb)
