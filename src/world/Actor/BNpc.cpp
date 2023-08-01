@@ -83,6 +83,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
   m_pCurrentTerritory = std::move( pZone );
 
   m_spawnPos = m_pos;
+  m_isMoving = false;
 
   m_timeOfDeath = 0;
   m_targetId = Common::INVALID_GAME_OBJECT_ID64;
@@ -116,9 +117,7 @@ Sapphire::Entity::BNpc::BNpc( uint32_t id, BNpcTemplatePtr pTemplate, float posX
       m_radius *= modelSkeleton->radius;
   }
 
-  // todo: is this actually good?
-  //m_naviTargetReachedDistance = m_scale * 2.f;
-  m_naviTargetReachedDistance = 4.f;
+  m_naviTargetReachedDistance = m_radius;
 
   calculateStats();
   auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
@@ -194,7 +193,7 @@ void Sapphire::Entity::BNpc::setState( BNpcState state )
   m_state = state;
 }
 
-bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
+bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos, float radius )
 {
 
   auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
@@ -208,14 +207,15 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   }
 
   auto pos1 = pNaviProvider->getMovePos( *this );
-
-  if( Util::distance( pos1, pos ) < getRadius() + 3.f )
+  
+  if( Util::distance( pos1, pos ) < getNaviTargetReachedDistance() + radius )
   {
     // Reached destination
     face( pos );
     setPos( pos1 );
     sendPositionUpdate();
     pNaviProvider->updateAgentPosition( *this );
+    m_isMoving = false;
     return true;
   }
 
@@ -223,59 +223,38 @@ bool Sapphire::Entity::BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   face( pos );
   setPos( pos1 );
   sendPositionUpdate();
+  m_isMoving = true;
   return false;
 }
 
 bool Sapphire::Entity::BNpc::moveTo( const Entity::Chara& targetChara )
 {
-
-  auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
-
-  if( !pNaviProvider )
-  {
-    Logger::error( "No NaviProvider for zone#{0} - {1}",
-                   m_pCurrentTerritory->getGuId(),
-                   m_pCurrentTerritory->getInternalName() );
-    return false;
-  }
-
-  auto pos1 = pNaviProvider->getMovePos( *this );
-
-  if( Util::distance( pos1, targetChara.getPos() ) <= ( getRadius() + targetChara.getRadius() ) + 3.f )
-  {
-    // Reached destination
-    face( targetChara.getPos() );
-    setPos( pos1 );
-    sendPositionUpdate();
-    pNaviProvider->updateAgentPosition( *this );
-    return true;
-  }
-
-  m_pCurrentTerritory->updateActorPosition( *this );
-  face( targetChara.getPos() );
-  setPos( pos1 );
-  sendPositionUpdate();
-  return false;
+  return moveTo( targetChara.getPos(), targetChara.getRadius() );
 }
 
 void Sapphire::Entity::BNpc::stopMoving()
 {
   auto pNaviProvider = m_pCurrentTerritory->getNaviProvider();
-  if( !pNaviProvider )
+  if( !pNaviProvider || !m_isMoving )
     return;
   sendPositionUpdate();
   pNaviProvider->updateAgentPosition( *this );
+  m_isMoving = false;
 }
 
 void Sapphire::Entity::BNpc::sendPositionUpdate()
 {
   uint8_t unk1 = 0x3a;
   uint8_t animationType = 2;
+  uint16_t moveSpeed = MoveSpeed::Walk;
 
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
+  {
     animationType = 0;
+    moveSpeed = MoveSpeed::Run;
+  }
 
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, 0x5A );
+  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), unk1, animationType, 0, moveSpeed );
   sendToInRangeSet( movePacket );
 }
 
@@ -329,7 +308,7 @@ void Sapphire::Entity::BNpc::hateListAddOrUpdate( Sapphire::Entity::CharaPtr pCh
   if( pChara->isPlayer() )
   {
     auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( getAsBNpc() );
+    pPlayer->onMobAggro( getAsBNpc() );
   }
   auto& scriptMgr = Common::Service< Sapphire::Scripting::ScriptMgr >::ref();
   scriptMgr.onBNpcHateListAdd( *this, *pChara );
@@ -496,6 +475,7 @@ void Sapphire::Entity::BNpc::doDefaultBNpcUpdate( uint64_t tickCount )
 
         m_roamPos = pNaviProvider->findRandomPositionInCircle( m_spawnPos, 5 );
         m_state = BNpcState::Roaming;
+        pNaviProvider->updateAgentParameters( *this );
       }
 
       checkAggro();
@@ -527,9 +507,6 @@ void Sapphire::Entity::BNpc::doDefaultBNpcUpdate( uint64_t tickCount )
         return;
       }
 
-      if( pNaviProvider->syncPosToChara( *this ) )
-        sendPositionUpdate();
-
       auto distance = Util::distance( getPos().x, getPos().y, getPos().z,
         pHatedActor->getPos().x, pHatedActor->getPos().y, pHatedActor->getPos().z );
 
@@ -543,7 +520,7 @@ void Sapphire::Entity::BNpc::doDefaultBNpcUpdate( uint64_t tickCount )
         break;
       }
 
-      if( distance > ( getRadius() + pHatedActor->getRadius() ) )
+      if( distance > ( getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
       {
         if( hasFlag( Immobile ) )
           break;
@@ -556,6 +533,8 @@ void Sapphire::Entity::BNpc::doDefaultBNpcUpdate( uint64_t tickCount )
 
       if( distance < ( getRadius() + pHatedActor->getRadius() + 3.f ) )
       {
+        stopMoving();
+
         if( !hasFlag( TurningDisabled ) && face( pHatedActor->getPos() ) )
           sendPositionUpdate();
 

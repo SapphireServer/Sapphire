@@ -99,17 +99,17 @@ void EffectBuilder::comboSucceed( Entity::CharaPtr& target )
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint16_t param, uint64_t resultDelayMs, bool statusToSource )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint16_t param, uint64_t resultDelayMs, bool statusToSource, bool shouldReuse )
 {
   EffectResultPtr nextResult = make_EffectResult( target, source, Common::Util::getTimeMs() + resultDelayMs );
-  nextResult->applyStatusEffect( statusId, duration, param, statusToSource );
+  nextResult->applyStatusEffect( statusId, duration, param, statusToSource, shouldReuse );
   moveToResultList( target, nextResult );
 }
 
-void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs, bool statusToSource )
+void EffectBuilder::applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs, bool statusToSource, bool shouldReuse )
 {
   EffectResultPtr nextResult = make_EffectResult( target, source, Common::Util::getTimeMs() + resultDelayMs );
-  nextResult->applyStatusEffect( pStatusEffect, statusToSource );
+  nextResult->applyStatusEffect( pStatusEffect, statusToSource, shouldReuse );
   moveToResultList( target, nextResult );
 }
 

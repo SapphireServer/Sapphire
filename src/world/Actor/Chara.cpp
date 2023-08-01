@@ -1056,7 +1056,7 @@ void Sapphire::Entity::Chara::onTick()
     }
   }
 
-  if( thisTickDmg != 0 )
+  if( thisTickDmg != 0 && isAlive() )
   {
     thisTickDmg = applyShieldProtection( thisTickDmg );
     if( thisTickDmg > 0 )
@@ -1065,7 +1065,7 @@ void Sapphire::Entity::Chara::onTick()
                                         static_cast< uint8_t >( ActionEffectType::Damage ), thisTickDmg ), true );
   }
 
-  if( thisTickHeal != 0 )
+  if( thisTickHeal != 0 && isAlive() )
   {
     heal( thisTickHeal );
     sendToInRangeSet( makeActorControl( getId(), HPFloatingText, 0,

@@ -341,6 +341,12 @@ void Sapphire::StatusEffect::StatusEffect::refresh()
   applyStatus();
 }
 
+void Sapphire::StatusEffect::StatusEffect::refresh( uint32_t newDuration )
+{
+  m_duration = newDuration;
+  refresh();
+}
+
 void Sapphire::StatusEffect::StatusEffect::refresh( Sapphire::World::Action::StatusEffectEntry newEntry )
 {
   m_effectEntry = newEntry;

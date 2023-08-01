@@ -67,9 +67,18 @@ namespace Sapphire::Common
     French = 8
   };
 
-  enum TellFlags : uint8_t
+  enum ChatFromType : uint8_t
   {
     GmTellMsg = 0x4,
+  };
+
+  enum ChatChannelType : uint16_t
+  {
+    CWLinkshellChat = 0x0,
+    PartyChat = 0x1,
+    LinkshellChat = 0x2,
+    FreeCompanyChat = 0x3,
+    NoviceNetworkChat = 0x4
   };
 
   enum BNpcType : uint8_t
@@ -801,6 +810,22 @@ namespace Sapphire::Common
     InvincibilityIgnoreDamage,
   };
 
+  enum InviteReplyType : int32_t
+  {
+    DENY = 0x0,
+    ACCEPT = 0x1,
+    CANCEL = 0x2,
+  };
+
+  enum InviteUpdateType : uint8_t
+  {
+    NEW_INVITE = 0x01,
+    INVITE_CANCEL = 0x02,
+    JOINED_PARTY = 0x03,
+    ACCEPT_INVITE = 0x04,
+    REJECT_INVITE = 0x05,
+  };
+
   enum PlayerStateFlag : uint8_t
   {
     HideUILockChar = 0, // as the name suggests, hides the ui and logs the char...
@@ -1168,6 +1193,16 @@ namespace Sapphire::Common
     NoRequirement = 0,
     RequireCorrectCombo = 1,
     RequireCorrectPositional = 2,
+  };
+
+  enum class StatusRefreshPolicy : uint8_t
+  {
+    Stack = 0,
+    ReplaceOrApply = 1,
+    Extend = 2,
+    ExtendOrApply = 3,
+    Reject = 4,
+    Custom = 15, // script handled
   };
 
   enum class AstCardType : uint8_t

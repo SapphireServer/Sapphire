@@ -68,6 +68,7 @@ public:
   void markToRemove();
 
   void refresh();
+  void refresh( uint32_t newDuration );
   void refresh( Sapphire::World::Action::StatusEffectEntry newEntry );
 
 private:

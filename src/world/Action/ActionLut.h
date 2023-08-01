@@ -40,9 +40,14 @@ namespace Sapphire::World::Action
         uint8_t bonusDataByte4;
       };
     };
+    uint8_t selfStatusRefreshPolicy;
+    int32_t selfStatusRefreshValue;
+    uint8_t targetStatusRefreshPolicy;
+    int32_t targetStatusRefreshValue;
   public:
     ActionEntry() = default;
     ActionEntry( uint16_t dp, uint16_t dcp, uint16_t ddp, uint16_t hp, uint16_t ss, uint32_t ssd, uint16_t ssp, uint16_t ts, uint32_t tsd, uint16_t tsp, uint8_t be, uint8_t br, uint32_t bdu32 );
+    ActionEntry( uint16_t dp, uint16_t dcp, uint16_t ddp, uint16_t hp, uint16_t ss, uint32_t ssd, uint16_t ssp, uint16_t ts, uint32_t tsd, uint16_t tsp, uint8_t be, uint8_t br, uint32_t bdu32, int ssrp, int32_t ssrv, int tsrp, int32_t tsrv );
     uint32_t getRawBonusData() const;
     uint8_t getDamageFallOffPercentage() const; // as the result percentage for 2nd (or more) victims, not the percentage to subtract from 100%
     uint16_t getSelfHealPotency() const;
@@ -52,6 +57,10 @@ namespace Sapphire::World::Action
     uint16_t getJobTimerGain() const;
     uint16_t getCritRateBonus() const;
     uint16_t getDirectHitRateBonus() const;
+    Common::StatusRefreshPolicy getSelfStatusRefreshPolicy( bool sameSource );
+    Common::StatusRefreshPolicy getTargetStatusRefreshPolicy( bool sameSource );
+    int32_t getSelfStatusRefreshValue();
+    int32_t getTargetStatusRefreshValue();
   };
 
   struct StatusEffectEntry

@@ -20,7 +20,8 @@ EffectResult::EffectResult( Entity::CharaPtr target, Entity::CharaPtr source, ui
   m_param1( 0 ),
   m_param2( 0 ),
   m_flag( Common::ActionEffectResultFlag::None ),
-  m_pPreBuiltStatusEffect( nullptr )
+  m_pPreBuiltStatusEffect( nullptr ),
+  m_statusShouldReuse( true )
 {
 
 }
@@ -123,23 +124,23 @@ void EffectResult::comboSucceed()
   m_type = Common::ActionEffectType::ComboSucceed;
 }
 
-void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param, bool statusToSource )
+void EffectResult::applyStatusEffect( uint16_t statusId, uint32_t duration, uint16_t param, bool statusToSource, bool shouldReuse )
 {
   m_value = statusId;
   m_statusDuration = duration;
   m_param2 = param;
   m_flag = statusToSource ? Common::ActionEffectResultFlag::EffectOnSource : Common::ActionEffectResultFlag::None;
-
+  m_statusShouldReuse = shouldReuse;
   m_type = statusToSource ? Common::ActionEffectType::ApplyStatusEffectSource : Common::ActionEffectType::ApplyStatusEffectTarget;
 }
 
-void EffectResult::applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect, bool statusToSource )
+void EffectResult::applyStatusEffect( StatusEffect::StatusEffectPtr pStatusEffect, bool statusToSource, bool shouldReuse )
 {
   m_value = pStatusEffect->getId();
   m_param2 = pStatusEffect->getParam();
   m_pPreBuiltStatusEffect = std::move( pStatusEffect );
   m_flag = statusToSource ? Common::ActionEffectResultFlag::EffectOnSource : Common::ActionEffectResultFlag::None;
-
+  m_statusShouldReuse = shouldReuse;
   m_type = statusToSource ? Common::ActionEffectType::ApplyStatusEffectSource : Common::ActionEffectType::ApplyStatusEffectTarget;
 }
 
@@ -224,7 +225,7 @@ void EffectResult::execute()
       for( auto const& entry : applyTarget->getStatusEffectMap() )
       {
         auto statusEffect = entry.second;
-        if( statusEffect->getId() == m_value && statusEffect->getSrcActorId() == m_source->getId() )
+        if( statusEffect->getId() == m_value && m_statusShouldReuse )
         {
           if( m_pPreBuiltStatusEffect )
           {
@@ -232,7 +233,7 @@ void EffectResult::execute()
           }
           else
           {
-            statusEffect->refresh();
+            statusEffect->refresh( m_statusDuration );
           }
           applyTarget->sendStatusEffectUpdate();
           return;

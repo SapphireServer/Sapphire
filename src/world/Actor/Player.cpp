@@ -87,6 +87,7 @@ Sapphire::Entity::Player::Player() :
   m_onEnterEventDone( false ),
   m_falling( false ),
   m_pQueuedAction( nullptr ),
+  m_partyId( 0 ),
   m_cfNotifiedContent( 0 )
 {
   m_id = 0;
@@ -136,7 +137,8 @@ uint32_t Sapphire::Entity::Player::getMaxHp()
 
 uint32_t Sapphire::Entity::Player::getMaxMp()
 {
-  return m_baseStats.max_mp;
+  //return m_baseStats.max_mp;
+  return 10000;
 }
 
 uint16_t Sapphire::Entity::Player::getZoneId() const
@@ -247,6 +249,47 @@ void Sapphire::Entity::Player::setOnlineStatusMask( uint64_t status )
 uint64_t Sapphire::Entity::Player::getOnlineStatusMask() const
 {
   return m_onlineStatus;
+}
+
+void Sapphire::Entity::Player::addOnlineStatus( OnlineStatus status )
+{
+  uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
+  uint64_t newFlags = getOnlineStatusMask() | statusValue;
+
+  setOnlineStatusMask( newFlags );
+}
+
+void Sapphire::Entity::Player::addOnlineStatus( const std::vector< Common::OnlineStatus >& status )
+{
+  uint64_t newFlags = getOnlineStatusMask();
+  for( const auto& state : status )
+  {
+    uint64_t statusValue = 1ull << static_cast< uint8_t >( state );
+    newFlags |= statusValue;
+  }
+
+  setOnlineStatusMask( newFlags );
+}
+
+void Sapphire::Entity::Player::removeOnlineStatus( OnlineStatus status )
+{
+  uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
+  uint64_t newFlags = getOnlineStatusMask();
+  newFlags &= ~statusValue;
+
+  setOnlineStatusMask( newFlags );
+}
+
+void Sapphire::Entity::Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& status )
+{
+  uint64_t newFlags = getOnlineStatusMask();
+  for( const auto& state : status )
+  {
+    uint64_t statusValue = 1ull << static_cast< uint8_t >( state );
+    newFlags &= ~statusValue;
+  }
+
+  setOnlineStatusMask( newFlags );
 }
 
 void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation, uint8_t param4, uint8_t param7, uint8_t unknown )
@@ -1201,13 +1244,13 @@ void Sapphire::Entity::Player::update( uint64_t tickCount )
           auto chara = actor->getAsChara();
 
           // default autoattack range
-          float range = 3.f + chara->getRadius();
+          float range = 3.f + chara->getRadius() + getRadius() * 0.5f;
 
           // default autoattack range for ranged classes
           if( getClass() == ClassJob::Machinist ||
               getClass() == ClassJob::Bard ||
               getClass() == ClassJob::Archer )
-            range = 25;
+            range = 25.f + chara->getRadius() + getRadius() * 0.5f;
 
 
           if( Util::distance( getPos().x, getPos().y, getPos().z,
@@ -1434,6 +1477,14 @@ void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr
 
 }
 
+void Sapphire::Entity::Player::queuePacket( std::vector< Network::Packets::FFXIVPacketBasePtr > packets )
+{
+  for( auto& packet : packets )
+  {
+    queuePacket( packet );
+  }
+}
+
 void Sapphire::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
 {
   auto& serverMgr = Common::Service< World::ServerMgr >::ref();
@@ -1606,14 +1657,17 @@ void Sapphire::Entity::Player::sendHateList()
 void Sapphire::Entity::Player::onMobAggro( BNpcPtr pBNpc )
 {
   hateListAdd( pBNpc );
-  queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
-  setStateFlag( Common::PlayerStateFlag::InCombat );
+  if( !hasStateFlag( Common::PlayerStateFlag::InCombat ) )
+  {
+    queuePacket( makeActorControl( getId(), ToggleAggro, 1 ) );
+    setStateFlag( Common::PlayerStateFlag::InCombat );
+  }
 }
 
 void Sapphire::Entity::Player::onMobDeaggro( BNpcPtr pBNpc )
 {
   hateListRemove( pBNpc );
-  if( m_actorIdTohateSlotMap.empty() )
+  if( m_actorIdTohateSlotMap.empty() && hasStateFlag( Common::PlayerStateFlag::InCombat ) )
   {
     queuePacket( makeActorControl( getId(), ToggleAggro ) );
     unsetStateFlag( Common::PlayerStateFlag::InCombat );
@@ -2399,6 +2453,16 @@ bool Sapphire::Entity::Player::checkAction()
   }
 
   return true;
+}
+
+uint64_t Sapphire::Entity::Player::getPartyId() const
+{
+  return m_partyId;
+}
+
+void Sapphire::Entity::Player::setPartyId( uint64_t partyId )
+{
+  m_partyId = partyId;
 }
 
 std::vector< Sapphire::Entity::ShopBuyBackEntry >& Sapphire::Entity::Player::getBuyBackListForShop( uint32_t shopId )

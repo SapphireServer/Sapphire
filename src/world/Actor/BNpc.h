@@ -75,7 +75,7 @@ namespace Sapphire::Entity
     float getNaviTargetReachedDistance() const;
 
     // return true if it reached the position
-    bool moveTo( const Common::FFXIVARR_POSITION3& pos );
+    bool moveTo( const Common::FFXIVARR_POSITION3& pos, float radius = 0 );
 
     bool moveTo( const Entity::Chara& targetChara );
 
@@ -149,6 +149,7 @@ namespace Sapphire::Entity
 
     Common::FFXIVARR_POSITION3 m_spawnPos;
     Common::FFXIVARR_POSITION3 m_roamPos;
+    bool m_isMoving;
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;

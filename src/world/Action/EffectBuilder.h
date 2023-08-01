@@ -36,8 +36,8 @@ namespace Sapphire::World::Action
 
     void comboSucceed( Entity::CharaPtr& target );
 
-    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint16_t param, uint64_t resultDelayMs = 500, bool statusToSource = false );
-    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs = 500, bool statusToSource = false );
+    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, uint16_t statusId, uint32_t duration, uint16_t param, uint64_t resultDelayMs = 500, bool statusToSource = false, bool shouldReuse = true );
+    void applyStatusEffect( Entity::CharaPtr& target, Entity::CharaPtr& source, StatusEffect::StatusEffectPtr pStatusEffect, uint64_t resultDelayMs = 500, bool statusToSource = false, bool shouldReuse = true );
 
     void statusNoEffect( Entity::CharaPtr& target, uint16_t statusId );
 
