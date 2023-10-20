@@ -1,129 +1,63 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Sapphire - Login</title>
-	<link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
-	<link rel="stylesheet" href="assets/css/styles.css">
-	<link rel="stylesheet" href="assets/css/global.css">
-	<script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
-		<script>
-			function doLogin(){
-				var url = "sapphire-api/lobby/login";
-				var params = "{\"username\":\"" + document.getElementsByName('username')[0].value + "\",\"pass\":\"" + document.getElementsByName('password')[0].value + "\"}";
-				var xhr = new XMLHttpRequest();
-				xhr.open("POST", url, true);
-
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 4) {
-						try {
-							var response = readBody(xhr);
-							var parsed = JSON.parse(response);
-							window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost);
-						} catch(err) {
-							document.getElementById("Error").innerHTML = "Login failed.";
-						}
-					}
-				}
-				
-				xhr.send(params);
-			}
-			
-			function readBody(xhr) {
-				var data;
-				if (!xhr.responseType || xhr.responseType === "text") {
-					data = xhr.responseText;
-				} else if (xhr.responseType === "document") {
-					data = xhr.responseXML;
-				} else {
-					data = xhr.response;
-				}
-				return data;
-			}
-
-			function keypressing(e) {
-				if (!e) e = window.event;
-				var keyCode = e.keyCode || e.which;
-				if (keyCode == '13'){
-				  doLogin();
-				  return false;
-				}
-			}
-			
-			
-		</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sapphire - Login</title>
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/global.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
+  <script src="assets/js/login.js"></script>
 </head>
 
 <body scroll="no">
-	<div class="s-full-split s-left-half col-xs-7">
-		<div class="clearfix s-link-badge-wrapper">
-			<a href="https://discord.gg/KfrZCkx" class="s-link-badge s-link-badge-discord col-xs-5">
-				Join us on Discord!
-			</a>
-			<a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-right">
-				Our Github repository
-			</a>
-		</div>
-		<h2>Recent Activity</h2>
-		<ul id="commit-log" class="commit-history">
 
-		</ul>
-	</div>
-	<div class="s-full-split s-right-half col-xs-5">
-		<div class="s-logo">
-			<img src="assets/img/sapphire_logo_resize.png">
-		</div>
-		<div class="s-login-box col-xs-12">
-			<div class="s-login-box-form">
-				<h1 class="text-center s-login-call">Login to Account</h1>
-				<div class="input-control">
-					<label class="s-login-input-wrapper">
-						Username
-						<input type="text" name="username" autofocus>
-					</label>
-				</div>
-				<div class="input-control">
-					<label class="s-login-input-wrapper">
-						Password
-						<input type="password" name="password" onkeypress="return keypressing(event)">
-					</label>
-				</div>
-				<button class="btn btn-default s-login-btn pull-right" id="submitButton" onclick="doLogin()">Login</button>
-				<p id="Error" class="s-error-text"></p>
-			</div>
-			<a class="btn btn-default s-acc-btn" href="createUser.html">Create Account</a>
-		</div>
-		<div class="s-gears">
-			<img class="s-gears" src="assets/img/graffletopia-gears.png" alt="">
-		</div>
-	</div>
-	<div id="TopDiv"></div>
-	<div class="container"></div>
-	
-	<script src="assets/js/jquery.min.js"></script>
-	<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <div class="s-full-split s-left-half col-xs-7">
+    <div class="clearfix s-link-badge-wrapper">
+      <a href="https://discord.gg/KfrZCkx" class="s-link-badge s-link-badge-discord col-xs-5">
+        Join us on Discord!
+      </a>
+      <a href="https://github.com/SapphireMordred/Sapphire" class="s-link-badge s-link-badge-github col-xs-5 pull-right">
+        Our Github repository
+      </a>
+    </div>
+    <h2>Recent Activity</h2>
+    <ul id="commit-log" class="commit-history"></ul>
+  </div>
+  <div class="s-full-split s-right-half col-xs-5">
+    <div class="s-logo">
+      <img src="assets/img/sapphire_logo_resize.png">
+    </div>
+    <div class="s-login-box col-xs-12">
+      <div class="s-login-box-form">
+        <h1 class="text-center s-login-call">Login to Account</h1>
+        <div class="input-control">
+          <label class="s-login-input-wrapper">
+            Username
+            <input type="text" name="username" autofocus>
+          </label>
+        </div>
+        <div class="input-control">
+          <label class="s-login-input-wrapper">
+            Password
+            <input type="password" name="password">
+          </label>
+        </div>
+        <button class="btn btn-default s-login-btn pull-right" id="submitButton">Login</button>
+        <p id="Error" class="s-error-text"></p>
+      </div>
+      <a class="btn btn-default s-acc-btn" href="createUser.html">Create Account</a>
+    </div>
+    <div class="s-gears">
+      <img class="s-gears" src="assets/img/graffletopia-gears.png" alt="">
+    </div>
+  </div>
+  <div id="TopDiv"></div>
+  <div class="container"></div>
 
-	<script>
-		fetch( "https://api.github.com/repos/SapphireMordred/Sapphire/events" ).then( function( resp ) {
-			return resp.json();
-		}).then( function( data ) {
-			data = data.filter( function( e ) {
-				return e.type == "PushEvent";
-			});
-
-			let commitContainer = document.getElementById( 'commit-log' );
-			for ( var evnt of data ) {
-				for ( var commit of evnt.payload.commits ) {
-					let e = document.createElement( 'li' );
-					e.innerHTML = '<a href="https://github.com/SapphireMordred/Sapphire/commit/' + commit.sha + '">' + commit.message + '</a>';
-
-					commitContainer.appendChild( e );
-				}
-			}
-		});
-	</script>
+  <script src="assets/js/jquery.min.js"></script>
+  <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/js/github.js"></script>
 </body>
-
 </html>
