@@ -1023,6 +1023,7 @@ namespace Sapphire::Common
     ItemActionCompanion = 853,
     ItemActionVFX2 = 944,
     ItemActionMount = 1322,
+    ItemActionSong = 5845,
   };
 
   enum ActionEffectDisplayType : uint8_t
