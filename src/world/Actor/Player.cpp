@@ -1183,7 +1183,7 @@ void Player::setTitle( uint16_t titleId )
   uint8_t value;
   Util::valueToFlagByteIndexValue( titleId, value, index );
 
-  if( ( m_titleList[ index ] & value ) == 0 )   // Player doesn't have title - bail
+  if( ( m_titleList[ index ] & value ) == 0 && titleId != 0 )   // Player doesn't have title and is not "no title" - bail
     return;
 
   m_activeTitle = titleId;
