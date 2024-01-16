@@ -85,7 +85,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_result.Flag = static_cast< uint8_t >( ActionResultFlag::EffectOnSource );
 
   m_bOverrideStatus = shouldOverride;
-  m_pStatus = StatusEffect::make_StatusEffect( id, m_target, m_target, duration, 3000 );
+  m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, 3000 );
   m_pStatus->setParam( param );
 }
 
