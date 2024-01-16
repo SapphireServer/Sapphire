@@ -249,7 +249,7 @@ namespace xiv::exd
       for( int32_t i = 0; i < cacheEntry.second.subRows; i++ )
       {
         // Get the vector fields for the given record and preallocate it
-        ExdRow row = { cacheEntry.first, i };
+        ExdRow row = { cacheEntry.first, static_cast< uint8_t >( i ) };
         auto& fields = data[ row ];
         fields.reserve( memberCount );
 
