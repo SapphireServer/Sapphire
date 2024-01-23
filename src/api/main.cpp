@@ -244,12 +244,14 @@ void createAccount( shared_ptr< HttpServer::Response > response, shared_ptr< Htt
     std::string sId;
     if( g_sapphireAPI.createAccount( user, pass, sId ) )
     {
-      // todo: construct proper json object here
-      std::string json_string = "{\"sId\":\"" + sId +
-                                "\", \"lobbyHost\":\"" +
-                                m_config.global.network.lobbyHost +
-                                "\", \"frontierHost\":\"" +
-                                m_config.global.network.restHost + "\"}";
+      nlohmann::json response_json = {
+              {"sId", sId},
+              {"lobbyHost", m_config.global.network.lobbyHost},
+              {"frontierHost", m_config.global.network.restHost},
+              {"lobbyPort", m_config.global.network.lobbyPort}
+      };
+
+      std::string json_string = response_json.dump();
       *response << buildHttpResponse( 200, json_string, JSON );
     }
     else
@@ -277,12 +279,15 @@ void login( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer:
     // reloadConfig();
     if( g_sapphireAPI.login( user, pass, sId ) )
     {
-      // todo: build proper json object and stringify it
-      std::string json_string = "{\"sId\":\"" + sId +
-                                "\", \"lobbyHost\":\"" +
-                                m_config.global.network.lobbyHost +
-                                "\", \"frontierHost\":\"" +
-                                m_config.global.network.restHost + "\"}";
+      nlohmann::json response_json = {
+              {"sId", sId},
+              {"lobbyHost", m_config.global.network.lobbyHost},
+              {"frontierHost", m_config.global.network.restHost},
+              {"lobbyPort", m_config.global.network.lobbyPort}
+      };
+
+      std::string json_string = response_json.dump();
+
       *response << buildHttpResponse( 200, json_string, JSON );
     }
     else
@@ -294,7 +299,6 @@ void login( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer:
     *response << buildHttpResponse( 500 );
     Logger::error( e.what() );
   }
-
 }
 
 void deleteCharacter( shared_ptr< HttpServer::Response > response, shared_ptr< HttpServer::Request > request )
