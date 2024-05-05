@@ -11,7 +11,7 @@
 
 namespace Sapphire
 {
-  static class EncounterTimeline
+  class EncounterTimeline
   {
   public:
     // EncounterFight::OnTick() { switch EncounterTimepointConditionId }
