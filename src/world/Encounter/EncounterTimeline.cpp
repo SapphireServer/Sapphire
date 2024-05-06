@@ -6,21 +6,21 @@
 
 namespace Sapphire
 {
-  void EncounterTimeline::EncounterConditionHp::from_json( nlohmann::json& json, EncounterPhasePtr pPhase, EncounterConditionId conditionId )
+  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId )
   {
-    EncounterTimepointCondition::from_json( json, pPhase, conditionId );
+    TimepointCondition::from_json( json, pPhase, conditionId );
 
     auto params = json.at( "params" ).get< std::vector< uint32_t > >();
 
     this->actorId = params[ 0 ];
 
-    if( conditionId == EncounterConditionId::HpPctLessThan )
+    if( conditionId == ConditionId::HpPctLessThan )
       this->hp.val = params[ 1 ];
     else
       this->hp.min = params[ 1 ], this->hp.max = params[ 2 ];
   }
 
-  bool EncounterTimeline::EncounterConditionHp::canExecute( EncounterFightPtr pFight, uint64_t time )
+  bool EncounterTimeline::ConditionHp::canExecute( EncounterFightPtr pFight, uint64_t time )
   {
     auto pBNpc = pFight->getBNpc( actorId );
     if( !pBNpc )
@@ -30,9 +30,9 @@ namespace Sapphire
 
     switch( m_conditionId )
     {
-      case EncounterConditionId::HpPctLessThan:
+      case ConditionId::HpPctLessThan:
         return pBNpc->getHpPercent() < hp.val;
-      case EncounterConditionId::HpPctBetween:
+      case ConditionId::HpPctBetween:
       {
         auto hpPct = pBNpc->getHpPercent();
         return hpPct >= hp.min && hpPct <= hp.max;
@@ -41,9 +41,9 @@ namespace Sapphire
     return false;
   };
 
-  void EncounterTimeline::EncounterConditionDirectorVar::from_json( nlohmann::json& json, EncounterPhasePtr pPhase, EncounterConditionId conditionId )
+  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId )
   {
-    EncounterTimepointCondition::from_json( json, pPhase, conditionId );
+    TimepointCondition::from_json( json, pPhase, conditionId );
 
     auto params = json.at( "params" ).get< std::vector< uint32_t > >();
 
@@ -51,110 +51,142 @@ namespace Sapphire
     this->value = params[ 1 ];
   }
 
-  bool EncounterTimeline::EncounterConditionDirectorVar::canExecute( EncounterFightPtr pFight, uint64_t time )
+  bool EncounterTimeline::ConditionDirectorVar::canExecute( EncounterFightPtr pFight, uint64_t time )
   {
+    auto pInstance = pFight->getInstance();
+
+    // todo: use something other than InstanceContentPtr
+    if( !pInstance )
+      return false;
+
     switch( m_conditionId )
     {
-      case EncounterConditionId::DirectorVarEquals:
-        return false; // pFight->getDirectorVar( directorVar ) == value;
-      case EncounterConditionId::DirectorVarGreaterThan:
-        return false; // pFight->getDirectorVar( directorVar ) > value;
+      case ConditionId::DirectorVarEquals:
+        return pInstance->getDirectorVar( directorVar ) == value;
+      case ConditionId::DirectorVarGreaterThan:
+        return pInstance->getDirectorVar( directorVar ) > value;
     }
     return false;
+  }
+
+  void EncounterTimeline::Timepoint::execute( EncounterFightPtr pFight, uint64_t time )
+  {
+    switch( m_type )
+    {
+      case TimepointDataType::Idle:
+      {
+        auto pIdleData = std::dynamic_pointer_cast< TimepointDataIdle, TimepointData >( m_pData );
+        auto pBNpc = pFight->getBNpc( pIdleData->m_actorId );
+
+        if( pBNpc )
+        {
+          // todo: idle
+        }
+      }
+      break;
+      case TimepointDataType::CastAction:
+      {
+        auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( m_pData );
+
+        // todo: filter the correct target
+        // todo: tie to mechanic script?
+      }
+      break;
+      case TimepointDataType::MoveTo:
+      {
+        auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( m_pData );
+        auto pBNpc = pFight->getBNpc( pMoveToData->m_actorId );
+
+        // todo: path
+        if( pBNpc )
+        {
+          pBNpc->setPos( pMoveToData->m_x, pMoveToData->m_y, pMoveToData->m_z );
+          pBNpc->setRot( pMoveToData->m_rot );
+          pBNpc->sendPositionUpdate();
+        }
+      }
+      break;
+      case TimepointDataType::BattleTalk:
+      {
+        // auto pBattleTalkData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >();
+      }
+      break;
+      case TimepointDataType::SetDirectorSeq:
+      case TimepointDataType::SetDirectorVar:
+      case TimepointDataType::SetDirectorFlag:
+      {
+        auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( m_pData );
+        auto pInstance = pFight->getInstance();
+
+        // todo: this should never not be set?
+        // todo: probably should use ContentDirector 
+        if( pInstance )
+        {
+          switch( pDirectorData->m_directorOp )
+          {
+            case DirectorOpId::SetDirectorVar:
+              pInstance->setDirectorVar( pDirectorData->m_data.index, pDirectorData->m_data.value.val );
+              break;
+            case DirectorOpId::SetDirectorVarLR:
+              pInstance->setDirectorVar( pDirectorData->m_data.index, pDirectorData->m_data.value.left, pDirectorData->m_data.value.right );
+              break;
+            case DirectorOpId::SetDirectorFlag:
+              pInstance->setDirectorFlags( pDirectorData->m_data.flags );
+              break;
+            case DirectorOpId::SetDirectorSeq:
+              pInstance->setDirectorSequence( pDirectorData->m_data.seq );
+              break;
+            case DirectorOpId::ClearDirectorFlag:
+              break;
+            default:
+              // probably throw an error here
+              break;
+          }
+        }
+      }
+      break;
+    }
   }
 
   EncounterTimeline::EncounterTimelineInfo EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
   {
     static std::map< uint32_t, EncounterTimelineInfo > cache = {};
-    const static std::map< std::string, EncounterTimepointDataType > timepointTypeMap =
+    const static std::map< std::string, TimepointDataType > timepointTypeMap =
     {
-      { "idle",               EncounterTimepointDataType::Idle },
-      { "castAction",         EncounterTimepointDataType::CastAction },
-      { "moveTo",             EncounterTimepointDataType::MoveTo },
-      { "logMessage",         EncounterTimepointDataType::LogMessage },
-      { "setDirectorVar",     EncounterTimepointDataType::SetDirectorVar },
-      { "addStatusEffect",    EncounterTimepointDataType::AddStatusEffect },
-      { "removeStatusEffect", EncounterTimepointDataType::RemoveStatusEffect }
+      { "idle",               TimepointDataType::Idle },
+      { "castAction",         TimepointDataType::CastAction },
+      { "moveTo",             TimepointDataType::MoveTo },
+      { "logMessage",         TimepointDataType::LogMessage },
+      { "setDirectorVar",     TimepointDataType::SetDirectorVar },
+      { "setDirectorSeq",     TimepointDataType::SetDirectorSeq },
+      { "setDirectorFlags",   TimepointDataType::SetDirectorFlag },
+      { "addStatusEffect",    TimepointDataType::AddStatusEffect },
+      { "removeStatusEffect", TimepointDataType::RemoveStatusEffect }
     };
 
-    const static std::map< std::string, EncounterTimepointCallbackType > callbackTypeMap =
+    const static std::map< std::string, TimepointCallbackType > callbackTypeMap =
     {
-      { "onActionInit",       EncounterTimepointCallbackType::OnActionInit },
-      { "onActionStart",      EncounterTimepointCallbackType::OnActionStart },
-      { "onActionInterrupt",  EncounterTimepointCallbackType::OnActionInterrupt },
-      { "onActionExecute",    EncounterTimepointCallbackType::OnActionExecute },
+      { "onActionInit",       TimepointCallbackType::OnActionInit },
+      { "onActionStart",      TimepointCallbackType::OnActionStart },
+      { "onActionInterrupt",  TimepointCallbackType::OnActionInterrupt },
+      { "onActionExecute",    TimepointCallbackType::OnActionExecute },
     };
 
-    const static std::map< std::string, EncounterConditionId > conditionIdMap =
+    const static std::map< std::string, ConditionId > conditionIdMap =
     {
-      { "hpPctLessThan",          EncounterConditionId::HpPctLessThan },
-      { "hpPctBetween",           EncounterConditionId::HpPctBetween },
-      { "directorVarEquals",      EncounterConditionId::DirectorVarEquals },
-      { "directorVarGreaterThan", EncounterConditionId::DirectorVarGreaterThan },
+      { "hpPctLessThan",          ConditionId::HpPctLessThan },
+      { "hpPctBetween",           ConditionId::HpPctBetween },
+      { "directorVarEquals",      ConditionId::DirectorVarEquals },
+      { "directorVarGreaterThan", ConditionId::DirectorVarGreaterThan },
+      { "encounterTimeElapsed",   ConditionId::EncounterTimeElapsed },
+      { "phaseTimeElapsed",       ConditionId::PhaseTimeElapsed }
     };
 
     EncounterTimelineInfo info;
     if( cache.find( encounterId ) != cache.end() && !reload )
       return cache.at( encounterId );
     /*
-      array of states e.g.
-      [
-        pushStates:
-        [
-          {
-            condition: "HpPctBetween", params:[ 20, 25 ], state: "phase1", loop: true
-          },
-          {
-            condition: "RNGMinMax", params:[ 0, 10, 5 ], state: "phase1", loop: true
-          }
-        ],
-        states:
-        [
-          {
-            name: "idle",
-            type: "idle",
-            duration: 5000,
-            overrideFlags: ["INVULNERABLE"],
-            data: {}
-          }
-          {
-            name: "phase1",
-            type: "action",
-            data: {
-              actionId: 150,
-              onFinish: {
-                type: "addStatusEffect",
-                data: {
-                  selectFilter: "self",
-                  statusEffectId: 70,
-                  duration: 30000
-                }
-              }
-            }
-          }
-        ]
-      ]
-          /*
-  *
-    class HpPercentCondition : EncounterTimepointCondition
-    {
-      EncounterTimepointConditionId m_type;
-      std::vector< uint32_t > m_params
-      
-      HpPercentCondition( EncounterTimepointConditionId conditionId std::vector< uint32_t params ) : m_type( conditionId ), m_params( params ){}
-      bool isConditionMet( uint32_t bossHpPct )
-      {
-        switch( m_type )
-        {
-          case EncounterTimepointConditionId::HpLessThanPct:
-            return bossHpPct < m_params[0];
-          case EncounterTimepointConditionId::HpBetweenPct:
-            return bossHpPct >= m_params[0] && bossHpPct <= m_params[1];
-        }
-        return false;
-      }
-    }
-    class RngCondition : EncounterTimepointCondition
+    class RngCondition : TimepointCondition
     {
       EncounterTimepointConditionId m_type;
       std::vector< uint32_t > m_params
@@ -196,7 +228,7 @@ namespace Sapphire
 
     auto json = nlohmann::json::parse( f );
 
-    std::map< std::string, EncounterPhasePtr > phaseNameMap;
+    std::map< std::string, PhasePtr > phaseNameMap;
 
 
     for( const auto& phaseJ : json.at( "phases" ).items() )
@@ -206,7 +238,7 @@ namespace Sapphire
       const auto& phaseName = phaseV.at( "name" ).get< std::string >();
       const auto& timepoints = phaseV.at( "timepoints" );
 
-      EncounterPhasePtr pPhase = std::make_shared< EncounterPhase >();
+      PhasePtr pPhase = std::make_shared< Phase >();
 
       for( const auto& timepoint : timepoints.items() )
       {
@@ -228,8 +260,8 @@ namespace Sapphire
       auto loop = pcV.at( "loop" ).get< bool >();
       auto phaseRef = pcV.at( "phase" ).get< std::string >();
 
-      EncounterPhasePtr pPhase;
-      EncounterConditionId conditionId;
+      PhasePtr pPhase;
+      ConditionId conditionId;
 
       // make sure condition exists
       if( auto it = conditionIdMap.find( conditionName ); it != conditionIdMap.end() )
@@ -244,20 +276,20 @@ namespace Sapphire
         throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no state found by name: %s" ), phaseRef ) );
 
       // build the condition
-      EncounterTimepointConditionPtr pCondition;
+      TimepointConditionPtr pCondition;
       switch( conditionId )
       {
-        case EncounterConditionId::HpPctLessThan:
-        case EncounterConditionId::HpPctBetween:
+        case ConditionId::HpPctLessThan:
+        case ConditionId::HpPctBetween:
         {
-          auto pHpCondition = std::make_shared< EncounterConditionHp >();
+          auto pHpCondition = std::make_shared< ConditionHp >();
           pHpCondition->from_json( pcV, pPhase, conditionId );
         }
         break;
-        case EncounterConditionId::DirectorVarEquals:
-        case EncounterConditionId::DirectorVarGreaterThan:
+        case ConditionId::DirectorVarEquals:
+        case ConditionId::DirectorVarGreaterThan:
         {
-          auto pDirectorCondition = std::make_shared< EncounterConditionDirectorVar >();
+          auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
           pDirectorCondition->from_json( pcV, pPhase, conditionId );
         }
         break;

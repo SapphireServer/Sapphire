@@ -134,6 +134,11 @@ namespace Sapphire
       m_bnpcs.erase( layoutId );
     }
 
+    InstanceContentPtr getInstance()
+    {
+      return m_pInstance;
+    }
+
   protected:
     uint64_t m_startTime{ 0 };
     EncounterState::StateStackPtr m_stateStack;

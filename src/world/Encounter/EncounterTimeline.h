@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <queue>
 
 #include <nlohmann/json.hpp>
 
@@ -15,22 +16,33 @@ namespace Sapphire
   {
   public:
     // EncounterFight::OnTick() { switch EncounterTimepointConditionId }
-    enum class EncounterConditionId : uint32_t
+    enum class ConditionId : uint32_t
     {
       HpPctLessThan,
       HpPctBetween,
       DirectorVarEquals,
-      DirectorVarGreaterThan
+      DirectorVarGreaterThan,
+      PhaseTimeElapsed,
+      EncounterTimeElapsed
+    };
+
+    enum class DirectorOpId
+    {
+      SetDirectorVar,
+      SetDirectorVarLR,
+      SetDirectorSeq,
+      SetDirectorFlag,
+      ClearDirectorFlag
     };
 
     // TODO: what should this do?
-    enum class EncounterTimepointOverrideFlags
+    enum class TimepointOverrideFlags : uint32_t
     {
       None,
       Invulnerable
     };
 
-    enum class EncounterTimepointDataType : uint32_t
+    enum class TimepointDataType : uint32_t
     {
       Idle,
       CastAction,
@@ -38,11 +50,13 @@ namespace Sapphire
       LogMessage,
       BattleTalk,
       SetDirectorVar,
+      SetDirectorSeq,
+      SetDirectorFlag,
       AddStatusEffect,
       RemoveStatusEffect
     };
 
-    enum class EncounterTimepointCallbackType : uint32_t
+    enum class TimepointCallbackType : uint32_t
     {
       OnActionInit,
       OnActionStart,
@@ -50,7 +64,7 @@ namespace Sapphire
       OnActionExecute
     };
 
-    enum class TargetSelectFilterIds
+    enum class TargetSelectFilterIds : uint32_t
     {
       Self,
       Tank,
@@ -76,97 +90,175 @@ namespace Sapphire
     };
 
 
-    // Generated Structures
-
-    // Generated Callback Structure
-    struct EncounterTimepointCallbackData :
-      public std::enable_shared_from_this< EncounterTimepointCallbackData >
+    using TimepointCallbackFunc = std::function< void( EncounterFightPtr, uint64_t ) >;
+    // Timepoint Data Objects
+    struct TimepointCallbackData :
+      public std::enable_shared_from_this< TimepointCallbackData >
     {
-      EncounterTimepointCallbackType m_type;
+      TimepointCallbackType m_type;
+      std::vector < TimepointCallbackFunc > m_callbacks;
     };
-    using EncounterTimepointCallbackDataPtr = std::shared_ptr< EncounterTimepointCallbackData >;
-    using EncounterTimepointCallbacks = std::map< EncounterTimepointCallbackType, EncounterTimepointCallbackDataPtr >;
+    using TimebackCallbackDataPtr = std::shared_ptr< TimepointCallbackData >;
+    using TimepointCallbacks = std::map< TimepointCallbackType, TimebackCallbackDataPtr >;
 
 
-    // Generated State Objects
-    struct EncounterTimepointData :
-      public std::enable_shared_from_this< EncounterTimepointData >
+    struct TimepointData :
+      public std::enable_shared_from_this< TimepointData >
     {
-      EncounterTimepointDataType m_type;
+      TimepointData( TimepointDataType) {}
+      virtual ~TimepointData() = 0;
+      TimepointDataType m_type;
     };
-    using EncounterTimepointDataPtr = std::shared_ptr< EncounterTimepointData >;
+    using TimepointDataPtr = std::shared_ptr< TimepointData >;
 
+    struct TimepointDataIdle : public TimepointData
+    {
+      uint32_t m_actorId;
+      uint64_t m_durationMs;
+    };
 
-    // Generated State Data Objects
-    struct EncounterTimepointDataStatusEffect : EncounterTimepointData
+    struct TimepointDataStatusEffect : public TimepointData
     {
       uint32_t m_statusEffectId;
       TargetSelectFilter m_targetFilter;
       uint32_t m_durationMs;
     };
 
-    struct EncounterTimepointDataAction : EncounterTimepointData
+    struct TimepointDataAction : public TimepointData
     {
+      uint32_t m_actorId;
       uint32_t m_actionId;
-      EncounterTimepointCallbacks m_callbacks;
+      TimepointCallbacks m_callbacks;
     };
 
-    struct EncounterTimepointDataMoveTo : EncounterTimepointData
+    struct TimepointDataMoveTo : public TimepointData
     {
-      float x, y, z, rot;
+      uint32_t m_actorId;
+      MoveType m_moveType;
+      float m_x, m_y, m_z, m_rot;
     };
 
-    struct EncounterTimepoint :
-      public std::enable_shared_from_this< EncounterTimepoint >
+
+    struct TimepointDataLogMessage : public TimepointData
+    {
+      uint32_t m_logMessageType;
+      uint32_t m_logMessageId;
+      std::string m_message;
+    };
+
+    struct TimepointDataDirector : public TimepointData
+    {
+      DirectorOpId m_directorOp;
+      union
+      {
+        struct
+        {
+          uint8_t index;
+          union
+          {
+            uint8_t val;
+            struct
+            {
+              uint8_t left, right;
+            };
+          } value;
+        };
+        uint8_t seq;
+        uint8_t flags;
+      } m_data;
+    };
+
+    class Timepoint :
+      public std::enable_shared_from_this< Timepoint >
     {
     public:
-      EncounterTimepointDataType m_type;
-      uint32_t m_duration;
-      EncounterTimepointOverrideFlags m_overrideFlags;
-      EncounterTimepointDataPtr m_pData;
+      TimepointDataType m_type;
+      uint64_t m_duration{ 0 };
+      uint64_t m_executeTime{ 0 };
+      TimepointOverrideFlags m_overrideFlags;
+      TimepointDataPtr m_pData;
       std::string m_description;
 
-      // switch( m_type )
-      virtual void execute( EncounterFightPtr pFight, uint64_t time );
-    };
-    using EncounterTimepointPtr = std::shared_ptr< EncounterTimepoint >;
+      // todo: repeatable?
 
-    class EncounterPhase :
-      public std::enable_shared_from_this< EncounterPhase >
+      bool canExecute()
+      {
+        return m_executeTime == 0;
+      }
+
+      bool finished( uint64_t time )
+      {
+        return m_executeTime + m_duration <= time;
+      }
+
+      void execute( EncounterFightPtr pFight, uint64_t time );
+    };
+    using TimepointPtr = std::shared_ptr< Timepoint >;
+
+    class Phase :
+      public std::enable_shared_from_this< Phase >
     {
     public:
+
+      // todo: respect looping phases, allow callbacks to push timepoints
+
       std::string m_name;
-      std::map< std::string, EncounterTimepointPtr > m_timepoints;
+      std::queue< TimepointPtr > m_timepoints;
       uint64_t m_startTime{ 0 };
-      uint64_t m_currTime{ 0 };
+      uint64_t m_lastTimepoint{ 0 };
+
+      std::queue< TimepointPtr > m_executed;
+
+      // todo: i wrote this very sleep deprived, ensure it is actually sane
       void execute( EncounterFightPtr pFight, uint64_t time )
       {
-        uint64_t durationMs = time - m_currTime;
-        for( const auto& timepoint : m_timepoints )
-          timepoint.second->execute( pFight, time );
-
         if( m_startTime == 0 )
           m_startTime = time;
+        if( m_lastTimepoint == 0 )
+          m_lastTimepoint = time;
 
-        m_currTime = time;
+        // todo: this is stupid
+        while( m_timepoints.size() > 0 )
+        {
+          uint64_t phaseElapsed = time - m_startTime;
+          uint64_t timepointElapsed = time - m_lastTimepoint;
+
+          auto& pTimepoint = m_timepoints.front();
+          if( pTimepoint->canExecute() )
+          {
+            pTimepoint->execute( pFight, time );
+            m_lastTimepoint = time;
+            m_executed.push( pTimepoint );
+          }
+          else if( pTimepoint->finished( timepointElapsed ) )
+          {
+            // todo: this is stupid, temp workaround for allowing phases to loop
+            pTimepoint->m_executeTime = 0;
+            m_timepoints.pop();
+          }
+          else
+          {
+            break;
+          }
+        }
       }
     };
-    using EncounterPhasePtr = std::shared_ptr< EncounterPhase >;
+    using PhasePtr = std::shared_ptr< Phase >;
 
-    class EncounterTimepointCondition :
-      public std::enable_shared_from_this< EncounterTimepointCondition >
+    class TimepointCondition :
+      public std::enable_shared_from_this< TimepointCondition >
     {
     public:
-      EncounterConditionId m_conditionId{ 0 };
-      EncounterPhasePtr m_pPhase{ nullptr };
+      ConditionId m_conditionId{ 0 };
+      PhasePtr m_pPhase{ nullptr };
       bool m_loop{ false };
       uint64_t m_startTime{ 0 };
       uint32_t m_cooldown{ 0 };
 
-      EncounterTimepointCondition() {}
-      ~EncounterTimepointCondition() {}
+      TimepointCondition() {}
+      ~TimepointCondition() {}
 
-      virtual void from_json( nlohmann::json& json, EncounterPhasePtr pPhase, EncounterConditionId conditionId )
+      virtual void from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId )
       {
         this->m_conditionId = conditionId;
         this->m_loop = json.at( "loop" ).get< bool >();
@@ -186,9 +278,9 @@ namespace Sapphire
       };
 
     };
-    using EncounterTimepointConditionPtr = std::shared_ptr< EncounterTimepointCondition >;
+    using TimepointConditionPtr = std::shared_ptr< TimepointCondition >;
 
-    class EncounterConditionHp : EncounterTimepointCondition
+    class ConditionHp : TimepointCondition
     {
     public:
       uint32_t actorId;
@@ -201,21 +293,21 @@ namespace Sapphire
         };
       } hp;
 
-      void from_json( nlohmann::json& json, EncounterPhasePtr pPhase, EncounterConditionId conditionId );
+      void from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId );
       bool canExecute( EncounterFightPtr pFight, uint64_t time ) override;
     };
 
-    class EncounterConditionDirectorVar : EncounterTimepointCondition
+    class ConditionDirectorVar : TimepointCondition
     {
     public:
       uint32_t directorVar;
       uint32_t value;
 
-      void from_json( nlohmann::json& json, EncounterPhasePtr pPhase, EncounterConditionId conditionId );
+      void from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId );
       bool canExecute( EncounterFightPtr pFight, uint64_t time ) override;
     };
 
-    using EncounterTimelineInfo = std::stack< EncounterTimepointConditionPtr >;
+    using EncounterTimelineInfo = std::queue< TimepointConditionPtr >;
 
   public:
 
