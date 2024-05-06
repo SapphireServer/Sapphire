@@ -22,6 +22,10 @@ namespace Sapphire
       HpPctBetween,
       DirectorVarEquals,
       DirectorVarGreaterThan,
+      DirectorSeqEquals,
+      DirectorSeqGreaterThan,
+      DirectorFlagsEquals,
+      DirectorFlagsGreaterThan,
       PhaseTimeElapsed,
       EncounterTimeElapsed
     };
@@ -64,7 +68,7 @@ namespace Sapphire
       OnActionExecute
     };
 
-    enum class TargetSelectFilterIds : uint32_t
+    enum class TargetSelectFilterId : uint32_t
     {
       Self,
       Tank,
@@ -86,7 +90,7 @@ namespace Sapphire
 
     struct TargetSelectFilter
     {
-      TargetSelectFilterIds m_flags;
+      TargetSelectFilterId m_flags;
     };
 
 
@@ -105,9 +109,9 @@ namespace Sapphire
     struct TimepointData :
       public std::enable_shared_from_this< TimepointData >
     {
-      TimepointData( TimepointDataType) {}
-      virtual ~TimepointData() = 0;
-      TimepointDataType m_type;
+      TimepointData( TimepointDataType type ) : m_type( type ) {}
+      virtual ~TimepointData(){};
+      TimepointDataType m_type{ 0 };
     };
     using TimepointDataPtr = std::shared_ptr< TimepointData >;
 
@@ -115,13 +119,41 @@ namespace Sapphire
     {
       uint32_t m_actorId;
       uint64_t m_durationMs;
+
+      TimepointDataIdle( uint32_t actorId, uint64_t durationMs ) :
+        TimepointData( TimepointDataType::Idle ),
+        m_actorId( actorId ),
+        m_durationMs( durationMs )
+      {
+      } 
     };
 
-    struct TimepointDataStatusEffect : public TimepointData
+    struct TimepointDataAddStatusEffect : public TimepointData
     {
       uint32_t m_statusEffectId;
       TargetSelectFilter m_targetFilter;
       uint32_t m_durationMs;
+
+      TimepointDataAddStatusEffect( uint32_t statusId, TargetSelectFilter targFilter, uint32_t durationMs ) :
+        TimepointData( TimepointDataType::AddStatusEffect ),
+        m_statusEffectId( statusId ),
+        m_targetFilter( targFilter ),
+        m_durationMs( durationMs )
+      {
+      } 
+    };
+
+    struct TimepointDataRemoveStatusEffect : public TimepointData
+    {
+      uint32_t m_statusEffectId;
+      TargetSelectFilter m_targetFilter;
+
+      TimepointDataRemoveStatusEffect( uint32_t statusId, TargetSelectFilter targFilter ) :
+        TimepointData( TimepointDataType::RemoveStatusEffect ),
+        m_statusEffectId( statusId ),
+        m_targetFilter( targFilter )
+      {
+      }
     };
 
     struct TimepointDataAction : public TimepointData
@@ -129,6 +161,14 @@ namespace Sapphire
       uint32_t m_actorId;
       uint32_t m_actionId;
       TimepointCallbacks m_callbacks;
+
+      TimepointDataAction( uint32_t actorId, uint32_t actionId, TimepointCallbacks callbacks ) :
+        TimepointData( TimepointDataType::CastAction ),
+        m_actorId( actorId ),
+        m_actionId( actionId ),
+        m_callbacks( callbacks )
+      {
+      }
     };
 
     struct TimepointDataMoveTo : public TimepointData
@@ -136,14 +176,29 @@ namespace Sapphire
       uint32_t m_actorId;
       MoveType m_moveType;
       float m_x, m_y, m_z, m_rot;
+
+      TimepointDataMoveTo( uint32_t actorId, MoveType moveType, float x, float y, float z, float rot ) :
+        TimepointData( TimepointDataType::MoveTo ),
+        m_actorId( actorId ),
+        m_moveType( moveType ),
+        m_x( x ), m_y( y ), m_z( z ), m_rot( rot )
+      {
+      }
     };
 
 
     struct TimepointDataLogMessage : public TimepointData
     {
-      uint32_t m_logMessageType;
-      uint32_t m_logMessageId;
-      std::string m_message;
+      uint32_t m_messageId;
+      uint32_t m_params[ 6 ]{ 0 };
+
+      TimepointDataLogMessage( uint32_t messageId, std::vector< uint32_t > params ) :
+        TimepointData( TimepointDataType::LogMessage ),
+        m_messageId( messageId )
+      {
+        for( auto i = 0; i < params.size(); ++i )
+          m_params[i] = params[i];
+      }
     };
 
     struct TimepointDataDirector : public TimepointData
@@ -166,6 +221,7 @@ namespace Sapphire
         uint8_t seq;
         uint8_t flags;
       } m_data;
+
     };
 
     class Timepoint :
@@ -181,6 +237,11 @@ namespace Sapphire
 
       // todo: repeatable?
 
+      const TimepointDataPtr getData() const
+      {
+        return m_pData;
+      }
+
       bool canExecute()
       {
         return m_executeTime == 0;
@@ -191,9 +252,9 @@ namespace Sapphire
         return m_executeTime + m_duration <= time;
       }
 
+      void from_json( const nlohmann::json& json );
       void execute( EncounterFightPtr pFight, uint64_t time );
     };
-    using TimepointPtr = std::shared_ptr< Timepoint >;
 
     class Phase :
       public std::enable_shared_from_this< Phase >
@@ -203,11 +264,11 @@ namespace Sapphire
       // todo: respect looping phases, allow callbacks to push timepoints
 
       std::string m_name;
-      std::queue< TimepointPtr > m_timepoints;
+      std::queue< Timepoint > m_timepoints;
       uint64_t m_startTime{ 0 };
       uint64_t m_lastTimepoint{ 0 };
 
-      std::queue< TimepointPtr > m_executed;
+      std::queue< Timepoint > m_executed;
 
       // todo: i wrote this very sleep deprived, ensure it is actually sane
       void execute( EncounterFightPtr pFight, uint64_t time )
@@ -223,17 +284,17 @@ namespace Sapphire
           uint64_t phaseElapsed = time - m_startTime;
           uint64_t timepointElapsed = time - m_lastTimepoint;
 
-          auto& pTimepoint = m_timepoints.front();
-          if( pTimepoint->canExecute() )
+          auto& timepoint = m_timepoints.front();
+          if( timepoint.canExecute() )
           {
-            pTimepoint->execute( pFight, time );
+            timepoint.execute( pFight, time );
             m_lastTimepoint = time;
-            m_executed.push( pTimepoint );
+            m_executed.push( timepoint );
           }
-          else if( pTimepoint->finished( timepointElapsed ) )
+          else if( timepoint.finished( timepointElapsed ) )
           {
             // todo: this is stupid, temp workaround for allowing phases to loop
-            pTimepoint->m_executeTime = 0;
+            timepoint.m_executeTime = 0;
             m_timepoints.pop();
           }
           else
@@ -241,6 +302,11 @@ namespace Sapphire
             break;
           }
         }
+      }
+
+      bool completed()
+      {
+        return m_timepoints.size() == 0;
       }
     };
     using PhasePtr = std::shared_ptr< Phase >;
@@ -250,7 +316,7 @@ namespace Sapphire
     {
     public:
       ConditionId m_conditionId{ 0 };
-      PhasePtr m_pPhase{ nullptr };
+      Phase m_phase;
       bool m_loop{ false };
       uint64_t m_startTime{ 0 };
       uint32_t m_cooldown{ 0 };
@@ -258,19 +324,29 @@ namespace Sapphire
       TimepointCondition() {}
       ~TimepointCondition() {}
 
-      virtual void from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId )
+      virtual void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
       {
         this->m_conditionId = conditionId;
         this->m_loop = json.at( "loop" ).get< bool >();
         this->m_cooldown = json.at( "cooldown" ).get< uint32_t >();
-        this->m_pPhase = pPhase;
+        this->m_phase = phase;
       }
 
       void execute( EncounterFightPtr pFight, uint64_t time )
       {
         m_startTime = time;
-        m_pPhase->execute( pFight, time );
+        m_phase.execute( pFight, time );
       };
+
+      bool completed()
+      {
+        return m_phase.completed();
+      }
+
+      bool canLoop()
+      {
+        return m_phase.completed() && m_loop;
+      }
 
       virtual bool canExecute( EncounterFightPtr pFight, uint64_t time )
       {
@@ -293,17 +369,26 @@ namespace Sapphire
         };
       } hp;
 
-      void from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId );
+      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId );
       bool canExecute( EncounterFightPtr pFight, uint64_t time ) override;
     };
 
     class ConditionDirectorVar : TimepointCondition
     {
     public:
-      uint32_t directorVar;
-      uint32_t value;
 
-      void from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId );
+      union
+      {
+        struct
+        {
+          uint32_t var;
+          uint32_t value;
+        };
+        uint8_t seq;
+        uint8_t flag;
+      } param;
+      
+      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId );
       bool canExecute( EncounterFightPtr pFight, uint64_t time ) override;
     };
 

@@ -6,9 +6,9 @@
 
 namespace Sapphire
 {
-  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId )
+  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
   {
-    TimepointCondition::from_json( json, pPhase, conditionId );
+    TimepointCondition::from_json( json, phase, conditionId );
 
     auto params = json.at( "params" ).get< std::vector< uint32_t > >();
 
@@ -18,6 +18,38 @@ namespace Sapphire
       this->hp.val = params[ 1 ];
     else
       this->hp.min = params[ 1 ], this->hp.max = params[ 2 ];
+  }
+  
+  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
+  {
+    TimepointCondition::from_json( json, phase, conditionId );
+
+    auto params = json.at( "params" ).get< std::vector< uint32_t > >();
+
+    switch( conditionId )
+    {
+      case ConditionId::DirectorVarEquals:
+      case ConditionId::DirectorVarGreaterThan:
+      {
+        param.var = params[ 0 ];
+        param.value = params[ 1 ];
+      }
+      break;
+      case ConditionId::DirectorFlagsEquals:
+      case ConditionId::DirectorFlagsGreaterThan:
+      {
+        param.flag = params[ 0 ];
+      }
+      break;
+      case ConditionId::DirectorSeqEquals:
+      case ConditionId::DirectorSeqGreaterThan:
+      {
+        param.seq = params[ 0 ];
+      }
+      break;
+      default:
+        break;
+    }
   }
 
   bool EncounterTimeline::ConditionHp::canExecute( EncounterFightPtr pFight, uint64_t time )
@@ -41,16 +73,6 @@ namespace Sapphire
     return false;
   };
 
-  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, PhasePtr pPhase, ConditionId conditionId )
-  {
-    TimepointCondition::from_json( json, pPhase, conditionId );
-
-    auto params = json.at( "params" ).get< std::vector< uint32_t > >();
-
-    this->directorVar = params[ 0 ];
-    this->value = params[ 1 ];
-  }
-
   bool EncounterTimeline::ConditionDirectorVar::canExecute( EncounterFightPtr pFight, uint64_t time )
   {
     auto pInstance = pFight->getInstance();
@@ -62,9 +84,17 @@ namespace Sapphire
     switch( m_conditionId )
     {
       case ConditionId::DirectorVarEquals:
-        return pInstance->getDirectorVar( directorVar ) == value;
+        return pInstance->getDirectorVar( param.var ) == param.value;
       case ConditionId::DirectorVarGreaterThan:
-        return pInstance->getDirectorVar( directorVar ) > value;
+        return pInstance->getDirectorVar( param.var ) > param.value;
+      case ConditionId::DirectorFlagsEquals:
+        return pInstance->getFlags() == param.flag;
+      case ConditionId::DirectorFlagsGreaterThan:
+        return pInstance->getFlags() > param.flag;
+      case ConditionId::DirectorSeqEquals:
+        return pInstance->getSequence() == param.seq;
+      case ConditionId::DirectorSeqGreaterThan:
+        return pInstance->getSequence() > param.seq;
     }
     return false;
   }
@@ -75,7 +105,7 @@ namespace Sapphire
     {
       case TimepointDataType::Idle:
       {
-        auto pIdleData = std::dynamic_pointer_cast< TimepointDataIdle, TimepointData >( m_pData );
+        auto pIdleData = std::dynamic_pointer_cast< TimepointDataIdle, TimepointData >( getData() );
         auto pBNpc = pFight->getBNpc( pIdleData->m_actorId );
 
         if( pBNpc )
@@ -86,7 +116,7 @@ namespace Sapphire
       break;
       case TimepointDataType::CastAction:
       {
-        auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( m_pData );
+        auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( getData() );
 
         // todo: filter the correct target
         // todo: tie to mechanic script?
@@ -94,7 +124,7 @@ namespace Sapphire
       break;
       case TimepointDataType::MoveTo:
       {
-        auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( m_pData );
+        auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( getData() );
         auto pBNpc = pFight->getBNpc( pMoveToData->m_actorId );
 
         // todo: path
@@ -115,7 +145,7 @@ namespace Sapphire
       case TimepointDataType::SetDirectorVar:
       case TimepointDataType::SetDirectorFlag:
       {
-        auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( m_pData );
+        auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( getData() );
         auto pInstance = pFight->getInstance();
 
         // todo: this should never not be set?
@@ -148,10 +178,9 @@ namespace Sapphire
     }
   }
 
-  EncounterTimeline::EncounterTimelineInfo EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
+  void EncounterTimeline::Timepoint::from_json( const nlohmann::json& json )
   {
-    static std::map< uint32_t, EncounterTimelineInfo > cache = {};
-    const static std::map< std::string, TimepointDataType > timepointTypeMap =
+    const static std::unordered_map< std::string, TimepointDataType > timepointTypeMap =
     {
       { "idle",               TimepointDataType::Idle },
       { "castAction",         TimepointDataType::CastAction },
@@ -164,7 +193,25 @@ namespace Sapphire
       { "removeStatusEffect", TimepointDataType::RemoveStatusEffect }
     };
 
-    const static std::map< std::string, TimepointCallbackType > callbackTypeMap =
+    const static std::unordered_map< std::string, TimepointOverrideFlags > overrideFlagMap =
+    {
+      {}
+    };
+
+    const static std::unordered_map< std::string, TargetSelectFilterId > targetFilterMap =
+    {
+      { "self",       TargetSelectFilterId::Self },
+      { "tank",       TargetSelectFilterId::Tank },
+      { "healer",     TargetSelectFilterId::Healer },
+      { "dps",        TargetSelectFilterId::Dps },
+      { "dpsMelee",   TargetSelectFilterId::DpsMelee },
+      { "dpsRanged",  TargetSelectFilterId::DpsRanged },
+      { "furthest",   TargetSelectFilterId::Furthest },
+      { "aggro1",     TargetSelectFilterId::Aggro1 },
+      { "aggro2",     TargetSelectFilterId::Aggro2 }
+    };
+
+    const static std::unordered_map< std::string, TimepointCallbackType > callbackTypeMap =
     {
       { "onActionInit",       TimepointCallbackType::OnActionInit },
       { "onActionStart",      TimepointCallbackType::OnActionStart },
@@ -172,7 +219,42 @@ namespace Sapphire
       { "onActionExecute",    TimepointCallbackType::OnActionExecute },
     };
 
-    const static std::map< std::string, ConditionId > conditionIdMap =
+    TimepointDataType tpType{ 0 };
+
+    auto typeStr = json.at( "type" ).get< std::string >();
+    if( auto it = timepointTypeMap.find( typeStr ); it != timepointTypeMap.end() )
+      tpType = it->second;
+    else
+      throw std::runtime_error( fmt::format( "Timepoint::from_json unable to find timepoint by type: %s", typeStr ) );
+
+    m_duration = json.at( "duration" ).get< uint64_t >();
+    //m_overrideFlags = json.at( "overrideFlags" ).get< TimepointOverrideFlags >();
+    m_description = json.at( "description" ).get< std::string >();
+
+    switch( tpType )
+    {
+      case TimepointDataType::MoveTo:
+      {
+        auto dataJ = json.at( "data" );
+        auto posJ = dataJ.at( "pos" );
+        auto x = posJ.at( "x" ).get< float >();
+        auto y = posJ.at( "y" ).get< float >();
+        auto z = posJ.at( "z" ).get< float >();
+        auto rot = dataJ.at( "rot" ).get< float >();
+        auto pathReq = dataJ.at( "pathRequested" ).get< bool >() ? MoveType::WalkPath : MoveType::Teleport;
+        auto actorId = dataJ.at( "actorId" ).get< uint32_t >();
+
+        m_pData = std::make_shared< TimepointDataMoveTo >( actorId, pathReq, x, y, z, rot );
+      }
+      break;
+      default:
+        break;
+    }
+  }
+  EncounterTimeline::EncounterTimelineInfo EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
+  {
+    static std::map< uint32_t, EncounterTimelineInfo > cache = {};
+    const static std::unordered_map< std::string, ConditionId > conditionIdMap =
     {
       { "hpPctLessThan",          ConditionId::HpPctLessThan },
       { "hpPctBetween",           ConditionId::HpPctBetween },
@@ -228,7 +310,7 @@ namespace Sapphire
 
     auto json = nlohmann::json::parse( f );
 
-    std::map< std::string, PhasePtr > phaseNameMap;
+    std::map< std::string, Phase > phaseNameMap;
 
 
     for( const auto& phaseJ : json.at( "phases" ).items() )
@@ -236,21 +318,22 @@ namespace Sapphire
       auto phaseV = phaseJ.value();
       const auto id = phaseV.at( "id" ).get< uint32_t >();
       const auto& phaseName = phaseV.at( "name" ).get< std::string >();
-      const auto& timepoints = phaseV.at( "timepoints" );
+      const auto& timepointsJ = phaseV.at( "timepoints" );
 
-      PhasePtr pPhase = std::make_shared< Phase >();
-
-      for( const auto& timepoint : timepoints.items() )
+      Phase phase;
+      for( const auto& timepointJ : timepointsJ.items() )
       {
-       
+        auto timepointV = timepointJ.value();
+        Timepoint timepoint;
+        timepoint.from_json( timepointV );
 
-        
+        phase.m_timepoints.push( timepoint );
       }
 
       if( phaseNameMap.find( phaseName ) != phaseNameMap.end() )
         throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - duplicate phase by name: %s" ), phaseName ) );
 
-      phaseNameMap.emplace( std::make_pair( phaseName, pPhase ) );
+      phaseNameMap.emplace( std::make_pair( phaseName, phase ) );
     }
     for( const auto& pcJ : json.at( "phaseConditions" ).items() )
     {
@@ -260,9 +343,8 @@ namespace Sapphire
       auto loop = pcV.at( "loop" ).get< bool >();
       auto phaseRef = pcV.at( "phase" ).get< std::string >();
 
-      PhasePtr pPhase;
       ConditionId conditionId;
-
+      
       // make sure condition exists
       if( auto it = conditionIdMap.find( conditionName ); it != conditionIdMap.end() )
         conditionId = it->second;
@@ -270,33 +352,37 @@ namespace Sapphire
         throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no condition id found by name: %s" ), conditionName ) );
 
       // make sure phase we're referencing exists
-      if( auto it = phaseNameMap.find( phaseRef ); it != phaseNameMap.end() )
-        pPhase = it->second;
-      else
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no state found by name: %s" ), phaseRef ) );
-
-      // build the condition
-      TimepointConditionPtr pCondition;
-      switch( conditionId )
+      if( auto phaseIt = phaseNameMap.find( phaseRef ); phaseIt != phaseNameMap.end() )
       {
-        case ConditionId::HpPctLessThan:
-        case ConditionId::HpPctBetween:
+        Phase& phase = phaseIt->second;
+
+        // build the condition
+        TimepointConditionPtr pCondition;
+        switch( conditionId )
         {
-          auto pHpCondition = std::make_shared< ConditionHp >();
-          pHpCondition->from_json( pcV, pPhase, conditionId );
-        }
-        break;
-        case ConditionId::DirectorVarEquals:
-        case ConditionId::DirectorVarGreaterThan:
-        {
-          auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
-          pDirectorCondition->from_json( pcV, pPhase, conditionId );
-        }
-        break;
-        default:
+          case ConditionId::HpPctLessThan:
+          case ConditionId::HpPctBetween:
+          {
+            auto pHpCondition = std::make_shared< ConditionHp >();
+            pHpCondition->from_json( pcV, phase, conditionId );
+          }
           break;
+          case ConditionId::DirectorVarEquals:
+          case ConditionId::DirectorVarGreaterThan:
+          {
+            auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
+            pDirectorCondition->from_json( pcV, phase, conditionId );
+          }
+          break;
+          default:
+            break;
+        }
+        info.push( pCondition );
       }
-      info.push( pCondition );
+      else
+      {
+        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no state found by name: %s" ), phaseRef ) );
+      }
     }
     if( reload )
       cache[ encounterId ] = info;
