@@ -8,6 +8,8 @@
 #include <vector>
 #include <queue>
 
+#include <Common.h>
+#include <Forwards.h>
 #include <nlohmann/json.hpp>
 
 namespace Sapphire
@@ -15,6 +17,9 @@ namespace Sapphire
   class EncounterTimeline
   {
   public:
+    // forwards
+    class TimelineActor;
+
     // EncounterFight::OnTick() { switch EncounterTimepointConditionId }
     enum class ConditionId : uint32_t
     {
@@ -82,10 +87,32 @@ namespace Sapphire
       Aggro2
     };
 
-    enum class MoveType
+    enum class MoveType : uint32_t
     {
       WalkPath,
       Teleport
+    };
+
+    enum class TimelineActorType : uint32_t
+    {
+      LayerSetObject,
+      BattleNpc
+    };
+
+    enum class CombatStateType
+    {
+      Idle,
+      Combat,
+      Retreat,
+      Roaming,
+      JustDied,
+      Dead
+    };
+
+    enum class TimelinePackType : uint32_t
+    {
+      Solo,
+      EncounterFight
     };
 
     struct TargetSelectFilter
@@ -224,6 +251,7 @@ namespace Sapphire
 
     };
 
+    // todo: refactor all this to allow solo actor to use
     class Timepoint :
       public std::enable_shared_from_this< Timepoint >
     {
@@ -242,9 +270,9 @@ namespace Sapphire
         return m_pData;
       }
 
-      bool canExecute()
+      bool canExecute( uint64_t elapsed )
       {
-        return m_executeTime == 0;
+        return m_executeTime == 0 && m_duration <= elapsed;
       }
 
       bool finished( uint64_t time )
@@ -252,7 +280,7 @@ namespace Sapphire
         return m_executeTime + m_duration <= time;
       }
 
-      void from_json( const nlohmann::json& json );
+      void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors );
       void execute( EncounterFightPtr pFight, uint64_t time );
     };
 
@@ -264,9 +292,10 @@ namespace Sapphire
       // todo: respect looping phases, allow callbacks to push timepoints
 
       std::string m_name;
-      std::queue< Timepoint > m_timepoints;
+      std::vector< Timepoint > m_timepoints;
+      uint32_t m_lastTimepointIndex{ 0 };
       uint64_t m_startTime{ 0 };
-      uint64_t m_lastTimepoint{ 0 };
+      uint64_t m_lastTimepointTime{ 0 };
 
       std::queue< Timepoint > m_executed;
 
@@ -275,32 +304,32 @@ namespace Sapphire
       {
         if( m_startTime == 0 )
           m_startTime = time;
-        if( m_lastTimepoint == 0 )
-          m_lastTimepoint = time;
+        if( m_lastTimepointTime == 0 )
+          m_lastTimepointTime = time;
 
-        // todo: this is stupid
-        while( m_timepoints.size() > 0 )
+        for( auto i = m_lastTimepointIndex; i < m_timepoints.size();  )
         {
           uint64_t phaseElapsed = time - m_startTime;
-          uint64_t timepointElapsed = time - m_lastTimepoint;
+          uint64_t timepointElapsed = time - m_lastTimepointTime;
 
-          auto& timepoint = m_timepoints.front();
-          if( timepoint.canExecute() )
+          auto& timepoint = m_timepoints[ i ];
+          if( timepoint.canExecute( timepointElapsed ) )
           {
             timepoint.execute( pFight, time );
-            m_lastTimepoint = time;
+            m_lastTimepointTime = time;
             m_executed.push( timepoint );
           }
-          else if( timepoint.finished( timepointElapsed ) )
+
+          // fire off all timepoints 
+          if( timepoint.finished( timepointElapsed ) )
           {
             // todo: this is stupid, temp workaround for allowing phases to loop
             timepoint.m_executeTime = 0;
-            m_timepoints.pop();
+            m_lastTimepointIndex = i;
+            ++i;
+            continue;
           }
-          else
-          {
-            break;
-          }
+          break;
         }
       }
 
@@ -311,8 +340,8 @@ namespace Sapphire
     };
     using PhasePtr = std::shared_ptr< Phase >;
 
-    class TimepointCondition :
-      public std::enable_shared_from_this< TimepointCondition >
+    class PhaseCondition :
+      public std::enable_shared_from_this< PhaseCondition >
     {
     public:
       ConditionId m_conditionId{ 0 };
@@ -320,15 +349,16 @@ namespace Sapphire
       bool m_loop{ false };
       uint64_t m_startTime{ 0 };
       uint32_t m_cooldown{ 0 };
+      std::string m_description;
 
-      TimepointCondition() {}
-      ~TimepointCondition() {}
+      PhaseCondition() {}
+      ~PhaseCondition() {}
 
       virtual void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
       {
         this->m_conditionId = conditionId;
         this->m_loop = json.at( "loop" ).get< bool >();
-        this->m_cooldown = json.at( "cooldown" ).get< uint32_t >();
+        //this->m_cooldown = json.at( "cooldown" ).get< uint32_t >();
         this->m_phase = phase;
       }
 
@@ -338,25 +368,101 @@ namespace Sapphire
         m_phase.execute( pFight, time );
       };
 
+      void update( EncounterFightPtr pFight, uint64_t time )
+      {
+        m_phase.execute( pFight, time );
+      }
+
+      void reset()
+      {
+        m_startTime = 0;
+      }
+
+      bool inProgress()
+      {
+        return m_startTime != 0;
+      }
+
       bool completed()
       {
         return m_phase.completed();
       }
 
-      bool canLoop()
+      bool isLoopable()
       {
-        return m_phase.completed() && m_loop;
+        return m_loop;
       }
 
-      virtual bool canExecute( EncounterFightPtr pFight, uint64_t time )
+      bool loopReady( uint64_t time )
+      {
+        return m_phase.completed() && m_loop && ( m_startTime + m_cooldown <= time );
+      }
+
+      virtual bool isConditionMet( EncounterFightPtr pFight, uint64_t time )
       {
         return false;
       };
 
     };
-    using TimepointConditionPtr = std::shared_ptr< TimepointCondition >;
+    using PhaseConditionPtr = std::shared_ptr< PhaseCondition >;
 
-    class ConditionHp : TimepointCondition
+    class TimelineActor
+    {
+    public:
+      uint32_t m_layoutId;
+      uint32_t m_hp;
+      std::string m_name;
+
+      std::vector< PhaseConditionPtr > m_phaseConditions;
+      std::queue< PhaseConditionPtr > m_phaseHistory;
+
+      void update( EncounterFightPtr pFight, uint64_t time )
+      {
+        // todo: handle auto attacks and make it so they dont fire during boss intermission phases
+        // todo: handle interrupts
+        for( const auto& pCondition : m_phaseConditions )
+        {
+          if( pCondition->completed() )
+          {
+            if( pCondition->isLoopable() )
+            {
+              if( pCondition->loopReady( time ) )
+                pCondition->reset();
+            }
+          }
+          else if( pCondition->inProgress() )
+          {
+            pCondition->execute( pFight, time );
+          }
+          else if( pCondition->isConditionMet( pFight, time ) )
+          {
+            pCondition->execute( pFight, time );
+            m_phaseHistory.push( pCondition );
+          }
+        }
+      }
+    };
+
+    class TimelinePack
+    {
+      TimelinePackType m_type{TimelinePackType::Solo};
+      std::vector< TimelineActor > m_actors;
+      std::string m_name;
+
+    public:
+      TimelinePack() { }
+      TimelinePack( TimelinePackType type ) : m_type( type ) {}
+      void update( EncounterFightPtr pFight, uint64_t time )
+      {
+        for( auto& actor : m_actors )
+          actor.update( pFight, time );
+      }
+    };
+
+    //
+    // Conditions
+    //
+    class ConditionHp : PhaseCondition
     {
     public:
       uint32_t actorId;
@@ -365,18 +471,19 @@ namespace Sapphire
         uint8_t val;
         struct
         {
-          uint8_t min, max; 
+          uint8_t min, max;
         };
       } hp;
 
-      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId );
-      bool canExecute( EncounterFightPtr pFight, uint64_t time ) override;
+      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
+        const std::unordered_map< std::string, TimelineActor >& actors );
+
+      bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;
     };
 
-    class ConditionDirectorVar : TimepointCondition
+    class ConditionDirectorVar : PhaseCondition
     {
     public:
-
       union
       {
         struct
@@ -387,15 +494,23 @@ namespace Sapphire
         uint8_t seq;
         uint8_t flag;
       } param;
-      
+
       void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId );
-      bool canExecute( EncounterFightPtr pFight, uint64_t time ) override;
+      bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;
     };
 
-    using EncounterTimelineInfo = std::queue< TimepointConditionPtr >;
+    class ConditionCombatState : PhaseCondition
+    {
+    public:
+      uint32_t actorId;
+      CombatStateType type;
+
+      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
+      bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;
+    };
 
   public:
 
-    EncounterTimelineInfo buildEncounterTimeline( uint32_t encounterId, bool reload = false );
+    TimelinePack buildEncounterTimeline( uint32_t encounterId, bool reload = false );
   };
 }// namespace Sapphire

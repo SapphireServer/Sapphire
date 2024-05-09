@@ -6,53 +6,7 @@
 
 namespace Sapphire
 {
-  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
-  {
-    TimepointCondition::from_json( json, phase, conditionId );
-
-    auto params = json.at( "params" ).get< std::vector< uint32_t > >();
-
-    this->actorId = params[ 0 ];
-
-    if( conditionId == ConditionId::HpPctLessThan )
-      this->hp.val = params[ 1 ];
-    else
-      this->hp.min = params[ 1 ], this->hp.max = params[ 2 ];
-  }
-  
-  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
-  {
-    TimepointCondition::from_json( json, phase, conditionId );
-
-    auto params = json.at( "params" ).get< std::vector< uint32_t > >();
-
-    switch( conditionId )
-    {
-      case ConditionId::DirectorVarEquals:
-      case ConditionId::DirectorVarGreaterThan:
-      {
-        param.var = params[ 0 ];
-        param.value = params[ 1 ];
-      }
-      break;
-      case ConditionId::DirectorFlagsEquals:
-      case ConditionId::DirectorFlagsGreaterThan:
-      {
-        param.flag = params[ 0 ];
-      }
-      break;
-      case ConditionId::DirectorSeqEquals:
-      case ConditionId::DirectorSeqGreaterThan:
-      {
-        param.seq = params[ 0 ];
-      }
-      break;
-      default:
-        break;
-    }
-  }
-
-  bool EncounterTimeline::ConditionHp::canExecute( EncounterFightPtr pFight, uint64_t time )
+  bool EncounterTimeline::ConditionHp::isConditionMet( EncounterFightPtr pFight, uint64_t time )
   {
     auto pBNpc = pFight->getBNpc( actorId );
     if( !pBNpc )
@@ -73,7 +27,7 @@ namespace Sapphire
     return false;
   };
 
-  bool EncounterTimeline::ConditionDirectorVar::canExecute( EncounterFightPtr pFight, uint64_t time )
+  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( EncounterFightPtr pFight, uint64_t time )
   {
     auto pInstance = pFight->getInstance();
 
@@ -178,7 +132,86 @@ namespace Sapphire
     }
   }
 
-  void EncounterTimeline::Timepoint::from_json( const nlohmann::json& json )
+  //
+  // parsing stuff below
+  //
+
+  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
+    const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    PhaseCondition::from_json( json, phase, conditionId );
+
+    auto paramData = json.at( "paramData" );
+    auto actorRef = paramData.at( "sourceActor" );
+
+    // resolve the actor whose hp we are checking
+    if( auto it = actors.find( actorRef ); it != actors.end() )
+      this->actorId = it->second.m_layoutId;
+    else
+      throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionHp::from_json unable to find actor by name: %s" ), actorRef ) );
+
+    switch( conditionId )
+    {
+      case ConditionId::HpPctLessThan:
+        this->hp.val = paramData.at( "hp" ).get< uint32_t >();
+        break;
+      case ConditionId::HpPctBetween:
+        this->hp.val = paramData.at( "hpMin" ).get< uint32_t >(),
+        this->hp.val = paramData.at( "hpMax" ).get< uint32_t >();
+        break;
+      default:
+        break;
+    }
+  }
+
+  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
+  {
+    PhaseCondition::from_json( json, phase, conditionId );
+
+    auto params = json.at( "params" ).get< std::vector< uint32_t > >();
+
+    switch( conditionId )
+    {
+      case ConditionId::DirectorVarEquals:
+      case ConditionId::DirectorVarGreaterThan:
+      {
+        param.var = params[ 0 ];
+        param.value = params[ 1 ];
+      }
+      break;
+      case ConditionId::DirectorFlagsEquals:
+      case ConditionId::DirectorFlagsGreaterThan:
+      {
+        param.flag = params[ 0 ];
+      }
+      break;
+      case ConditionId::DirectorSeqEquals:
+      case ConditionId::DirectorSeqGreaterThan:
+      {
+        param.seq = params[ 0 ];
+      }
+      break;
+      default:
+        break;
+    }
+  }
+  void EncounterTimeline::ConditionCombatState::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
+    const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    PhaseCondition::from_json( json, phase, conditionId );
+
+    auto paramData = json.at( "paramData" );
+    auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
+
+    // resolve the actor whose name we are checking
+    if( auto it = actors.find( actorRef ); it != actors.end() )
+      this->actorId = it->second.m_layoutId;
+    else
+      throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionCombatState::from_json unable to find actor by name: %s" ), actorRef ) );
+
+    this->type = paramData.at( "combatState" ).get< CombatStateType >();
+  }
+  void EncounterTimeline::Timepoint::from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor>& actors )
   {
     const static std::unordered_map< std::string, TimepointDataType > timepointTypeMap =
     {
@@ -251,9 +284,9 @@ namespace Sapphire
         break;
     }
   }
-  EncounterTimeline::EncounterTimelineInfo EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
+  EncounterTimeline::TimelinePack EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
   {
-    static std::map< uint32_t, EncounterTimelineInfo > cache = {};
+    static std::map< uint32_t, TimelinePack > cache = {};
     const static std::unordered_map< std::string, ConditionId > conditionIdMap =
     {
       { "hpPctLessThan",          ConditionId::HpPctLessThan },
@@ -264,7 +297,7 @@ namespace Sapphire
       { "phaseTimeElapsed",       ConditionId::PhaseTimeElapsed }
     };
 
-    EncounterTimelineInfo info;
+    TimelinePack pack;
     if( cache.find( encounterId ) != cache.end() && !reload )
       return cache.at( encounterId );
     /*
@@ -284,21 +317,6 @@ namespace Sapphire
         return false;
       }
     }
-    // Main encounter script
-    EncounterFight::update()
-    {
-      auto pStateCondition = m_stateConditions.pop();
-      
-      switch( pStateCondition->getType() )
-      {
-        case EncounterTimepointConditionId::HpBetweenPct:
-          if (((HpPercentCondition*)pStateCondition)->isConditionMet( bossHpPct ) )
-            pStateCondition->execute( someDutyInstanceInfoHere );
-          else if( !pStateCondition->hasExecuted() || pStateCondition->canLoop() )
-            m_stateConditions.push( pStateCondition );
-      }
-    }
-
   */
 
     std::string encounter_name( fmt::format( std::string( "data/EncounterTimelines/EncounterTimeline%u.json" ), encounterId ) );
@@ -306,42 +324,75 @@ namespace Sapphire
     std::fstream f( encounter_name );
 
     if( !f.is_open() )
-      return {};
+      return pack;
 
     auto json = nlohmann::json::parse( f );
 
-    std::map< std::string, Phase > phaseNameMap;
+    std::unordered_map< std::string, TimelineActor > actorNameMap;
+    std::unordered_map< std::string, std::map< std::string, Phase > > actorNamePhaseMap;
 
-
-    for( const auto& phaseJ : json.at( "phases" ).items() )
+    // first run through cache actor info
+    for( const auto& actorJ : json.at( "actors" ).items() )
     {
-      auto phaseV = phaseJ.value();
-      const auto id = phaseV.at( "id" ).get< uint32_t >();
-      const auto& phaseName = phaseV.at( "name" ).get< std::string >();
-      const auto& timepointsJ = phaseV.at( "timepoints" );
+      TimelineActor actor;
+      auto actorV = actorJ.value();
+      actor.m_hp = actorV.at( "hp" ).get< uint32_t >();
+      actor.m_layoutId = actorV.at( "layoutId" ).get< uint32_t >();
+      actor.m_name = actorV.at( "name" ).get< std::string >();
 
-      Phase phase;
-      for( const auto& timepointJ : timepointsJ.items() )
-      {
-        auto timepointV = timepointJ.value();
-        Timepoint timepoint;
-        timepoint.from_json( timepointV );
-
-        phase.m_timepoints.push( timepoint );
-      }
-
-      if( phaseNameMap.find( phaseName ) != phaseNameMap.end() )
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - duplicate phase by name: %s" ), phaseName ) );
-
-      phaseNameMap.emplace( std::make_pair( phaseName, phase ) );
+      actorNameMap.emplace( std::make_pair( actor.m_name, actor ) );
     }
+
+    // build timeline info per actor
+    for( const auto& actorJ : json.at( "actors" ).items() )
+    {
+      // < actorName, < phasename, phase > >
+      std::map< std::string, Phase > phaseNameMap;
+
+      auto actorV = actorJ.value();
+      uint32_t layoutId = actorV.at( "layoutId" );
+      std::string actorName = actorV.at( "name" );
+
+      TimelineActor actor;
+      // todo: are phases linked by actor, or global in the json
+      for( const auto& phaseJ : json.at( "phases" ).items() )
+      {
+        auto phaseV = phaseJ.value();
+        const auto id = phaseV.at( "id" ).get< uint32_t >();
+        const auto& phaseName = phaseV.at( "name" ).get< std::string >();
+        const auto& timepointsJ = phaseV.at( "timepoints" );
+
+        Phase phase;
+        for( const auto& timepointJ : timepointsJ.items() )
+        {
+          auto timepointV = timepointJ.value();
+          Timepoint timepoint;
+          timepoint.from_json( timepointV, actorNameMap );
+
+          phase.m_timepoints.push_back( timepoint );
+        }
+
+        if( phaseNameMap.find( phaseName ) != phaseNameMap.end() )
+          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - duplicate phase by name: %s" ), phaseName ) );
+
+        phaseNameMap.emplace( std::make_pair( phaseName, phase ) );
+      }
+      actorNamePhaseMap[ actorName ] = phaseNameMap;
+      if( actorNameMap.find( actorName ) != actorNameMap.end() )
+        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - duplicate actor by name: %s" ), actorName ) );
+
+      actorNameMap.emplace( std::make_pair( actorName, actor ) );
+    }
+
+    // build the condition list
     for( const auto& pcJ : json.at( "phaseConditions" ).items() )
     {
       auto pcV = pcJ.value();
       auto conditionName = pcV.at( "condition" ).get< std::string>();
       auto description = pcV.at( "description" ).get< std::string >();
       auto loop = pcV.at( "loop" ).get< bool >();
-      auto phaseRef = pcV.at( "phase" ).get< std::string >();
+      auto phaseRef = pcV.at( "targetPhase" ).get< std::string >();
+      auto actorRef = pcV.at( "targetActor" ).get< std::string >();
 
       ConditionId conditionId;
       
@@ -351,33 +402,42 @@ namespace Sapphire
       else
         throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no condition id found by name: %s" ), conditionName ) );
 
-      // make sure phase we're referencing exists
-      if( auto phaseIt = phaseNameMap.find( phaseRef ); phaseIt != phaseNameMap.end() )
+      // make sure the actor we're referencing exists
+      if( auto actorIt = actorNameMap.find( actorRef ); actorIt != actorNameMap.end() )
       {
-        Phase& phase = phaseIt->second;
+        auto phaseNameMap = actorNamePhaseMap[ actorRef ];
 
-        // build the condition
-        TimepointConditionPtr pCondition;
-        switch( conditionId )
+        TimelineActor& actor = actorIt->second;
+
+        // make sure phase we're referencing exists
+        if( auto phaseIt = phaseNameMap.find( phaseRef ); phaseIt != phaseNameMap.end() )
         {
-          case ConditionId::HpPctLessThan:
-          case ConditionId::HpPctBetween:
+          Phase& phase = phaseIt->second;
+
+          // build the condition
+          PhaseConditionPtr pCondition;
+          pCondition->m_description = description;
+          switch( conditionId )
           {
-            auto pHpCondition = std::make_shared< ConditionHp >();
-            pHpCondition->from_json( pcV, phase, conditionId );
-          }
-          break;
-          case ConditionId::DirectorVarEquals:
-          case ConditionId::DirectorVarGreaterThan:
-          {
-            auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
-            pDirectorCondition->from_json( pcV, phase, conditionId );
-          }
-          break;
-          default:
+            case ConditionId::HpPctLessThan:
+            case ConditionId::HpPctBetween:
+            {
+              auto pHpCondition = std::make_shared< ConditionHp >();
+              pHpCondition->from_json( pcV, phase, conditionId, actorNameMap );
+            }
             break;
+            case ConditionId::DirectorVarEquals:
+            case ConditionId::DirectorVarGreaterThan:
+            {
+              auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
+              pDirectorCondition->from_json( pcV, phase, conditionId );
+            }
+            break;
+            default:
+              break;
+          }
+          actor.m_phaseConditions.push_back( pCondition );
         }
-        info.push( pCondition );
       }
       else
       {
@@ -385,9 +445,9 @@ namespace Sapphire
       }
     }
     if( reload )
-      cache[ encounterId ] = info;
+      cache[ encounterId ] = pack;
     else
-      cache.emplace( std::make_pair( encounterId, info ) );
-    return info;
+      cache.emplace( std::make_pair( encounterId, pack ) );
+    return pack;
   }
 }// namespace Sapphire
