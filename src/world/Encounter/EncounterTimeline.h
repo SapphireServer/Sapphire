@@ -32,7 +32,8 @@ namespace Sapphire
       DirectorFlagsEquals,
       DirectorFlagsGreaterThan,
       PhaseTimeElapsed,
-      EncounterTimeElapsed
+      EncounterTimeElapsed,
+      CombatState
     };
 
     enum class DirectorOpId
@@ -280,7 +281,7 @@ namespace Sapphire
         return m_executeTime + m_duration <= time;
       }
 
-      void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors );
+      void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
       void execute( EncounterFightPtr pFight, uint64_t time );
     };
 
@@ -409,8 +410,8 @@ namespace Sapphire
     class TimelineActor
     {
     public:
-      uint32_t m_layoutId;
-      uint32_t m_hp;
+      uint32_t m_layoutId{ 0 };
+      uint32_t m_hp{ 0 };
       std::string m_name;
 
       std::vector< PhaseConditionPtr > m_phaseConditions;
@@ -465,7 +466,7 @@ namespace Sapphire
     class ConditionHp : PhaseCondition
     {
     public:
-      uint32_t actorId;
+      uint32_t layoutId;
       union
       {
         uint8_t val;
@@ -502,8 +503,8 @@ namespace Sapphire
     class ConditionCombatState : PhaseCondition
     {
     public:
-      uint32_t actorId;
-      CombatStateType type;
+      uint32_t layoutId;
+      CombatStateType combatState;
 
       void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
       bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;

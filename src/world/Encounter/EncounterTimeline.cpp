@@ -1,14 +1,14 @@
 #include "EncounterFight.h"
 #include "EncounterTimeline.h"
 
-#include "../Actor/BNpc.h"
-#include "../Actor/Chara.h"
+#include <Actor/BNpc.h>
+#include <Actor/Chara.h>
 
 namespace Sapphire
 {
   bool EncounterTimeline::ConditionHp::isConditionMet( EncounterFightPtr pFight, uint64_t time )
   {
-    auto pBNpc = pFight->getBNpc( actorId );
+    auto pBNpc = pFight->getBNpc( layoutId );
     if( !pBNpc )
       return false;
 
@@ -49,6 +49,36 @@ namespace Sapphire
         return pInstance->getSequence() == param.seq;
       case ConditionId::DirectorSeqGreaterThan:
         return pInstance->getSequence() > param.seq;
+    }
+    return false;
+  }
+
+  bool EncounterTimeline::ConditionCombatState::isConditionMet( EncounterFightPtr pFight, uint64_t time)
+  {
+    auto pBattleNpc = pFight->getBNpc( this->layoutId );
+
+    switch( combatState )
+    {
+      case CombatStateType::Idle:
+        return pBattleNpc->getState() == Entity::BNpcState::Idle;
+        break;
+      case CombatStateType::Combat:
+        return pBattleNpc->getState() == Entity::BNpcState::Combat;
+        break;
+      case CombatStateType::Retreat:
+        return pBattleNpc->getState() == Entity::BNpcState::Retreat;
+        break;
+      case CombatStateType::Roaming:
+        return pBattleNpc->getState() == Entity::BNpcState::Roaming;
+        break;
+      case CombatStateType::JustDied:
+        return pBattleNpc->getState() == Entity::BNpcState::JustDied;
+        break;
+      case CombatStateType::Dead:
+        return pBattleNpc->getState() == Entity::BNpcState::Dead;
+        break;
+      default:
+        break;
     }
     return false;
   }
@@ -146,7 +176,7 @@ namespace Sapphire
 
     // resolve the actor whose hp we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
-      this->actorId = it->second.m_layoutId;
+      this->layoutId = it->second.m_layoutId;
     else
       throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionHp::from_json unable to find actor by name: %s" ), actorRef ) );
 
@@ -195,6 +225,7 @@ namespace Sapphire
         break;
     }
   }
+
   void EncounterTimeline::ConditionCombatState::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
     const std::unordered_map< std::string, TimelineActor >& actors )
   {
@@ -205,13 +236,14 @@ namespace Sapphire
 
     // resolve the actor whose name we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
-      this->actorId = it->second.m_layoutId;
+      this->layoutId = it->second.m_layoutId;
     else
       throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionCombatState::from_json unable to find actor by name: %s" ), actorRef ) );
 
-    this->type = paramData.at( "combatState" ).get< CombatStateType >();
+    this->combatState = paramData.at( "combatState" ).get< CombatStateType >();
   }
-  void EncounterTimeline::Timepoint::from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor>& actors )
+
+  void EncounterTimeline::Timepoint::from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor>& actors, uint32_t selfLayoutId )
   {
     const static std::unordered_map< std::string, TimepointDataType > timepointTypeMap =
     {
@@ -275,7 +307,7 @@ namespace Sapphire
         auto z = posJ.at( "z" ).get< float >();
         auto rot = dataJ.at( "rot" ).get< float >();
         auto pathReq = dataJ.at( "pathRequested" ).get< bool >() ? MoveType::WalkPath : MoveType::Teleport;
-        auto actorId = dataJ.at( "actorId" ).get< uint32_t >();
+        auto actorId = selfLayoutId;
 
         m_pData = std::make_shared< TimepointDataMoveTo >( actorId, pathReq, x, y, z, rot );
       }
@@ -284,6 +316,7 @@ namespace Sapphire
         break;
     }
   }
+
   EncounterTimeline::TimelinePack EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
   {
     static std::map< uint32_t, TimelinePack > cache = {};
@@ -350,10 +383,9 @@ namespace Sapphire
       std::map< std::string, Phase > phaseNameMap;
 
       auto actorV = actorJ.value();
-      uint32_t layoutId = actorV.at( "layoutId" );
       std::string actorName = actorV.at( "name" );
 
-      TimelineActor actor;
+      TimelineActor& actor = actorNameMap[actorName];
       // todo: are phases linked by actor, or global in the json
       for( const auto& phaseJ : json.at( "phases" ).items() )
       {
@@ -367,7 +399,7 @@ namespace Sapphire
         {
           auto timepointV = timepointJ.value();
           Timepoint timepoint;
-          timepoint.from_json( timepointV, actorNameMap );
+          timepoint.from_json( timepointV, actorNameMap, actor.m_layoutId );
 
           phase.m_timepoints.push_back( timepoint );
         }
@@ -431,6 +463,12 @@ namespace Sapphire
             {
               auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
               pDirectorCondition->from_json( pcV, phase, conditionId );
+            }
+            break;
+            case ConditionId::CombatState:
+            {
+              auto pCombatStateCondition = std::make_shared< ConditionCombatState >();
+              pCombatStateCondition->from_json( pcV, phase, conditionId, actorNameMap );
             }
             break;
             default:
