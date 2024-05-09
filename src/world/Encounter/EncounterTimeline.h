@@ -311,7 +311,7 @@ namespace Sapphire
         {
           uint64_t phaseElapsed = time - m_startTime;
           uint64_t timepointElapsed = time - m_lastTimepointTime;
-
+          
           auto& timepoint = m_timepoints[ i ];
           if( timepoint.canExecute( timepointElapsed ) )
           {
@@ -432,7 +432,7 @@ namespace Sapphire
           }
           else if( pCondition->inProgress() )
           {
-            pCondition->execute( pFight, time );
+            pCondition->update( pFight, time );
           }
           else if( pCondition->isConditionMet( pFight, time ) )
           {

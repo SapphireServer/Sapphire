@@ -142,7 +142,7 @@ namespace Sapphire
     PhaseCondition::from_json( json, phase, conditionId );
 
     auto paramData = json.at( "paramData" );
-    auto actorRef = paramData.at( "sourceActor" );
+    auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
 
     // resolve the actor whose hp we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
