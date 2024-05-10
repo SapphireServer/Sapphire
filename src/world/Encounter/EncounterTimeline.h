@@ -532,6 +532,17 @@ namespace Sapphire
       uint32_t m_hp{ 0 };
       std::string m_name;
 
+      TimelineActor() { }
+      TimelineActor( const TimelineActor& rhs ) :
+        m_layoutId( rhs.m_layoutId ),
+        m_hp( rhs.m_hp ),
+        m_name( rhs.m_name ),
+        m_phaseConditions( rhs.m_phaseConditions ),
+        m_conditionStates( rhs.m_conditionStates )
+      {
+
+      }
+
       void addPhaseCondition( PhaseConditionPtr pCondition )
       {
         m_phaseConditions.push_back( pCondition );
@@ -579,7 +590,25 @@ namespace Sapphire
       uint64_t m_startTime{ 0 };
     public:
       TimelinePack() { }
+      TimelinePack( const TimelinePack& rhs ) :
+        m_type( rhs.m_type ),
+        m_name( rhs.m_name ),
+        m_actors( rhs.m_actors ),
+        m_startTime( 0 )
+      {
+
+      }
       TimelinePack( TimelinePackType type ) : m_type( type ) {}
+
+      void setName( const std::string& name )
+      {
+        m_name = name;
+      }
+
+      void addTimelineActor(const TimelineActor& actor)
+      {
+        m_actors.push_back( actor );
+      }
 
       void setStartTime( uint64_t time )
       {
@@ -669,6 +698,6 @@ namespace Sapphire
 
   public:
 
-    TimelinePack buildEncounterTimeline( uint32_t encounterId, bool reload = false );
+    TimelinePack getEncounterPack( uint32_t encounterId, bool reload = false );
   };
 }// namespace Sapphire

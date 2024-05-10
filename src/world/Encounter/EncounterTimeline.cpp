@@ -591,7 +591,7 @@ namespace Sapphire
     }
   }
 
-  EncounterTimeline::TimelinePack EncounterTimeline::buildEncounterTimeline( uint32_t encounterId, bool reload )
+  EncounterTimeline::TimelinePack EncounterTimeline::getEncounterPack( uint32_t encounterId, bool reload )
   {
     static std::map< uint32_t, TimelinePack > cache = {};
     const static std::unordered_map< std::string, ConditionId > conditionIdMap =
@@ -757,6 +757,16 @@ namespace Sapphire
         throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no state found by name: %s" ), phaseRef ) );
       }
     }
+
+    for( const auto& actor : actorNameMap )
+      pack.addTimelineActor( actor.second );
+
+    std::string name( "Encounter" );
+    name += std::to_string( encounterId );
+
+    pack.setName( name );
+
+    // todo: reload will probably kill the server when CastAction.callbacks are added
     if( reload )
       cache[ encounterId ] = pack;
     else
