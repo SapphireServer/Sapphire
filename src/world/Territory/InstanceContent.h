@@ -169,6 +169,8 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObjByName( const std::string& name );
 
+    Entity::EventObjectPtr getEObjById( uint32_t eobjId );
+
     /*! binds a player to the instance */
     bool bindPlayer( uint32_t playerId );
 
@@ -194,6 +196,8 @@ namespace Sapphire
     bool isTerminationReady() const;
 
     size_t getInstancePlayerCount() const;
+
+    std::set< uint32_t > getSpawnedPlayerIds() const;
 
     void movePlayerToEntrance( Entity::Player& player );
   private:

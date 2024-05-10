@@ -825,6 +825,11 @@ void BNpc::setFlag( uint32_t flag )
   m_flags |= flag;
 }
 
+void BNpc::clearFlags()
+{
+  m_flags = 0;
+}
+
 void BNpc::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();

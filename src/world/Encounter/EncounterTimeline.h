@@ -25,15 +25,17 @@ namespace Sapphire
     {
       HpPctLessThan,
       HpPctBetween,
+
       DirectorVarEquals,
       DirectorVarGreaterThan,
       DirectorSeqEquals,
       DirectorSeqGreaterThan,
       DirectorFlagsEquals,
       DirectorFlagsGreaterThan,
-      PhaseTimeElapsed,
+
       EncounterTimeElapsed,
-      CombatState
+      CombatState,
+      BNpcHasFlags
     };
 
     enum class DirectorOpId
@@ -42,7 +44,7 @@ namespace Sapphire
       SetDirectorVarLR,
       SetDirectorSeq,
       SetDirectorFlag,
-      ClearDirectorFlag
+      ClearDirector
     };
 
     // TODO: what should this do?
@@ -64,7 +66,10 @@ namespace Sapphire
       SetDirectorSeq,
       SetDirectorFlag,
       AddStatusEffect,
-      RemoveStatusEffect
+      RemoveStatusEffect,
+      SetBNpcFlags,
+      SetEObjState,
+      SetBgm
     };
 
     enum class TimepointCallbackType : uint32_t
@@ -215,7 +220,6 @@ namespace Sapphire
       }
     };
 
-
     struct TimepointDataLogMessage : public TimepointData
     {
       uint32_t m_messageId;
@@ -232,7 +236,7 @@ namespace Sapphire
 
     struct TimepointDataDirector : public TimepointData
     {
-      DirectorOpId m_directorOp;
+      DirectorOpId m_directorOp{ 0 };
       union
       {
         struct
@@ -249,8 +253,64 @@ namespace Sapphire
         };
         uint8_t seq;
         uint8_t flags;
-      } m_data;
+      } m_data{ 0 };
 
+      TimepointDataDirector( TimepointDataType type ) :
+        TimepointData( type )
+      {
+        switch( type )
+        {
+          case TimepointDataType::SetDirectorVar:
+            m_directorOp = DirectorOpId::SetDirectorVar;
+            break;
+          case TimepointDataType::SetDirectorVarLR:
+            m_directorOp = DirectorOpId::SetDirectorVarLR;
+            break;
+          case TimepointDataType::SetDirectorFlag:
+            m_directorOp = DirectorOpId::SetDirectorFlag;
+            break;
+          case TimepointDataType::SetDirectorSeq:
+            m_directorOp = DirectorOpId::SetDirectorSeq;
+            break;
+        }
+      }
+    };
+
+    struct TimepointDataBNpcFlags : public TimepointData
+    {
+      uint32_t m_layoutId;
+      uint32_t m_flags;
+
+      TimepointDataBNpcFlags( uint32_t layoutId, uint32_t flags ) :
+        TimepointData( TimepointDataType::SetBNpcFlags ),
+        m_layoutId( layoutId ),
+        m_flags( flags )
+      {
+      }
+    };
+
+    struct TimepointDataEObjState : public TimepointData
+    {
+      uint32_t m_eobjId{ 0xE0000000 };
+      uint32_t m_state{ 0 };
+
+      TimepointDataEObjState( uint32_t eobjId, uint32_t state ) :
+        TimepointData( TimepointDataType::SetEObjState ),
+        m_eobjId( eobjId ),
+        m_state( state )
+      {
+      }
+    };
+
+    struct TimepointDataBGM : public TimepointData
+    {
+      uint32_t m_bgmId{ 0 };
+
+      TimepointDataBGM( uint32_t bgmId ):
+        TimepointData( TimepointDataType::SetBgm ),
+        m_bgmId( bgmId )
+      {
+      }
     };
 
     // todo: refactor all this to allow solo actor to use
@@ -370,7 +430,7 @@ namespace Sapphire
       PhaseCondition() {}
       ~PhaseCondition() {}
 
-      virtual void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
+      virtual void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId )
       {
         this->m_conditionId = conditionId;
         this->m_loop = json.at( "loop" ).get< bool >();
@@ -491,7 +551,7 @@ namespace Sapphire
         };
       } hp;
 
-      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
+      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId,
         const std::unordered_map< std::string, TimelineActor >& actors );
 
       bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
@@ -504,14 +564,23 @@ namespace Sapphire
       {
         struct
         {
-          uint32_t var;
+          uint32_t index;
           uint32_t value;
         };
         uint8_t seq;
-        uint8_t flag;
+        uint8_t flags;
       } param;
 
-      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId );
+      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId );
+      bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
+    };
+
+    class ConditionEncounterTimeElapsed : PhaseCondition
+    {
+    public:
+      uint64_t duration;
+
+      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId );
       bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
     };
 
@@ -521,7 +590,17 @@ namespace Sapphire
       uint32_t layoutId;
       CombatStateType combatState;
 
-      void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
+      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
+      bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
+    };
+
+    class ConditionBNpcFlags : PhaseCondition
+    {
+    public:
+      uint32_t layoutId;
+      uint32_t flags;
+
+      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
       bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
     };
 

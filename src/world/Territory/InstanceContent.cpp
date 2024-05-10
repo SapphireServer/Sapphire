@@ -598,6 +598,17 @@ Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjByName( const
   return it->second;
 }
 
+Sapphire::Entity::EventObjectPtr Sapphire::InstanceContent::getEObjById( uint32_t eobjId )
+{
+  Entity::EventObjectPtr pEObj = nullptr;
+
+  for( auto& eobj : m_eventIdToObjectMap )
+    if( eobj.second->getObjectId() == eobjId )
+      return pEObj;
+
+  return nullptr;
+}
+
 void Sapphire::InstanceContent::onTalk( Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId )
 {
   // todo: handle exit (and maybe shortcut?) behaviour here
@@ -781,4 +792,9 @@ void Sapphire::InstanceContent::setExpireValue( uint32_t value )
 size_t Sapphire::InstanceContent::getInstancePlayerCount() const
 {
   return m_boundPlayerIds.size();
+}
+
+std::set< uint32_t > Sapphire::InstanceContent::getSpawnedPlayerIds() const
+{
+  return m_spawnedPlayers;
 }

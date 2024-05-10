@@ -3,6 +3,7 @@
 
 #include <Actor/BNpc.h>
 #include <Actor/Chara.h>
+#include <Actor/EventObject.h>
 
 #include <Util/UtilMath.h>
 
@@ -38,13 +39,13 @@ namespace Sapphire
     switch( m_conditionId )
     {
       case ConditionId::DirectorVarEquals:
-        return pInstance->getDirectorVar( param.var ) == param.value;
+        return pInstance->getDirectorVar( param.index ) == param.value;
       case ConditionId::DirectorVarGreaterThan:
-        return pInstance->getDirectorVar( param.var ) > param.value;
+        return pInstance->getDirectorVar( param.index ) > param.value;
       case ConditionId::DirectorFlagsEquals:
-        return pInstance->getFlags() == param.flag;
+        return pInstance->getFlags() == param.flags;
       case ConditionId::DirectorFlagsGreaterThan:
-        return pInstance->getFlags() > param.flag;
+        return pInstance->getFlags() > param.flags;
       case ConditionId::DirectorSeqEquals:
         return pInstance->getSequence() == param.seq;
       case ConditionId::DirectorSeqGreaterThan:
@@ -53,7 +54,7 @@ namespace Sapphire
     return false;
   }
 
-  bool EncounterTimeline::ConditionCombatState::isConditionMet( InstanceContentPtr pInstance, uint64_t time)
+  bool EncounterTimeline::ConditionCombatState::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
   {
     auto pBattleNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
 
@@ -61,26 +62,38 @@ namespace Sapphire
     {
       case CombatStateType::Idle:
         return pBattleNpc->getState() == Entity::BNpcState::Idle;
-        break;
       case CombatStateType::Combat:
         return pBattleNpc->getState() == Entity::BNpcState::Combat;
-        break;
       case CombatStateType::Retreat:
         return pBattleNpc->getState() == Entity::BNpcState::Retreat;
-        break;
       case CombatStateType::Roaming:
         return pBattleNpc->getState() == Entity::BNpcState::Roaming;
-        break;
       case CombatStateType::JustDied:
         return pBattleNpc->getState() == Entity::BNpcState::JustDied;
-        break;
       case CombatStateType::Dead:
         return pBattleNpc->getState() == Entity::BNpcState::Dead;
-        break;
       default:
         break;
     }
     return false;
+  }
+
+  bool EncounterTimeline::ConditionEncounterTimeElapsed::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  {
+    if( pInstance == nullptr )
+    {
+      // die idk
+      return false;
+    }
+
+    // todo: check encounter time
+    return false;
+  }
+
+  bool EncounterTimeline::ConditionBNpcFlags::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  {
+    auto pBNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
+    return pBNpc && pBNpc->hasFlag( this->flags );
   }
 
   void EncounterTimeline::Timepoint::update( InstanceContentPtr pInstance, uint64_t time )
@@ -134,13 +147,20 @@ namespace Sapphire
         }
       }
       break;
+      case TimepointDataType::LogMessage:
+      {
+        // todo: LogMessage
+      }
+      break;
       case TimepointDataType::BattleTalk:
       {
+        // todo: BattleTalk
         // auto pBattleTalkData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >();
       }
       break;
       case TimepointDataType::SetDirectorSeq:
       case TimepointDataType::SetDirectorVar:
+      case TimepointDataType::SetDirectorVarLR:
       case TimepointDataType::SetDirectorFlag:
       {
         auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( getData() );
@@ -152,23 +172,68 @@ namespace Sapphire
           {
             case DirectorOpId::SetDirectorVar:
               pInstance->setDirectorVar( pDirectorData->m_data.index, pDirectorData->m_data.value.val );
-              break;
+            break;
             case DirectorOpId::SetDirectorVarLR:
               pInstance->setDirectorVar( pDirectorData->m_data.index, pDirectorData->m_data.value.left, pDirectorData->m_data.value.right );
-              break;
+            break;
             case DirectorOpId::SetDirectorFlag:
               pInstance->setDirectorFlags( pDirectorData->m_data.flags );
-              break;
+            break;
             case DirectorOpId::SetDirectorSeq:
               pInstance->setDirectorSequence( pDirectorData->m_data.seq );
-              break;
-            case DirectorOpId::ClearDirectorFlag:
-              break;
+            break;
+            case DirectorOpId::ClearDirector:
+            {
+              for( auto playerId : pInstance->getSpawnedPlayerIds() )
+              {
+                // todo: get all players, clear director vars/flags to default(?)
+              }
+            }
+            break;
             default:
               // probably throw an error here
               break;
           }
         }
+      }
+      break;
+      case TimepointDataType::AddStatusEffect:
+      {
+        // todo:
+      }
+      break;
+      case TimepointDataType::RemoveStatusEffect:
+      {
+
+      }
+      break;
+      case TimepointDataType::SetBNpcFlags:
+      {
+        auto pBNpcFlagData = std::dynamic_pointer_cast< TimepointDataBNpcFlags, TimepointData >( getData() );
+        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pBNpcFlagData->m_layoutId );
+
+        if( pBNpc )
+        {
+          pBNpc->clearFlags();
+          pBNpc->setFlag( pBNpcFlagData->m_flags );
+        }
+      }
+      break;
+      case TimepointDataType::SetEObjState:
+      {
+        auto pEObjData = std::dynamic_pointer_cast< TimepointDataEObjState, TimepointData >( getData() );
+        auto pEObj = pInstance->getEObjById( pEObjData->m_eobjId );
+
+        if( pEObj )
+        {
+          pEObj->setState( pEObjData->m_state );
+        }
+      }
+      break;
+      case TimepointDataType::SetBgm:
+      {
+        auto pBgmData = std::dynamic_pointer_cast< TimepointDataBGM, TimepointData >( getData() );
+        pInstance->setCurrentBGM( pBgmData->m_bgmId );
       }
       break;
     }
@@ -247,7 +312,7 @@ namespace Sapphire
   // parsing stuff below
   //
 
-  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
+  void EncounterTimeline::ConditionHp::from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId,
     const std::unordered_map< std::string, TimelineActor >& actors )
   {
     PhaseCondition::from_json( json, phase, conditionId );
@@ -267,39 +332,39 @@ namespace Sapphire
         this->hp.val = paramData.at( "hp" ).get< uint32_t >();
         break;
       case ConditionId::HpPctBetween:
-        this->hp.val = paramData.at( "hpMin" ).get< uint32_t >(),
-        this->hp.val = paramData.at( "hpMax" ).get< uint32_t >();
+        this->hp.min = paramData.at( "hpMin" ).get< uint32_t >(),
+        this->hp.max = paramData.at( "hpMax" ).get< uint32_t >();
         break;
       default:
         break;
     }
   }
 
-  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId )
+  void EncounterTimeline::ConditionDirectorVar::from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId )
   {
     PhaseCondition::from_json( json, phase, conditionId );
 
-    auto params = json.at( "params" ).get< std::vector< uint32_t > >();
+    auto paramData = json.at( "paramData" );
 
     switch( conditionId )
     {
       case ConditionId::DirectorVarEquals:
       case ConditionId::DirectorVarGreaterThan:
       {
-        param.var = params[ 0 ];
-        param.value = params[ 1 ];
+        param.index = paramData.at( "index" ).get< uint32_t >();
+        param.value = paramData.at( "value" ).get< uint32_t >();
       }
       break;
       case ConditionId::DirectorFlagsEquals:
       case ConditionId::DirectorFlagsGreaterThan:
       {
-        param.flag = params[ 0 ];
+        param.flags = paramData.at( "flags" ).get< uint32_t >();
       }
       break;
       case ConditionId::DirectorSeqEquals:
       case ConditionId::DirectorSeqGreaterThan:
       {
-        param.seq = params[ 0 ];
+        param.seq = paramData.at( "seq" ).get< uint32_t >();
       }
       break;
       default:
@@ -307,7 +372,7 @@ namespace Sapphire
     }
   }
 
-  void EncounterTimeline::ConditionCombatState::from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
+  void EncounterTimeline::ConditionCombatState::from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId,
     const std::unordered_map< std::string, TimelineActor >& actors )
   {
     PhaseCondition::from_json( json, phase, conditionId );
@@ -324,6 +389,23 @@ namespace Sapphire
     this->combatState = paramData.at( "combatState" ).get< CombatStateType >();
   }
 
+  void EncounterTimeline::ConditionEncounterTimeElapsed::from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId )
+  {
+    PhaseCondition::from_json( json, phase, conditionId );
+
+    auto paramData = json.at( "paramData" );
+    auto duration = paramData.at( "duration" ).get< uint64_t >();
+
+    this->duration = duration;
+  }
+
+  void EncounterTimeline::ConditionBNpcFlags::from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId,
+                                                           const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    PhaseCondition::from_json( json, phase, conditionId );
+    // todo: BNpcHasFlags
+  }
+
   void EncounterTimeline::Timepoint::from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor>& actors, uint32_t selfLayoutId )
   {
     const static std::unordered_map< std::string, TimepointDataType > timepointTypeMap =
@@ -337,7 +419,9 @@ namespace Sapphire
       { "setDirectorSeq",     TimepointDataType::SetDirectorSeq },
       { "setDirectorFlags",   TimepointDataType::SetDirectorFlag },
       { "addStatusEffect",    TimepointDataType::AddStatusEffect },
-      { "removeStatusEffect", TimepointDataType::RemoveStatusEffect }
+      { "removeStatusEffect", TimepointDataType::RemoveStatusEffect },
+      { "setBNpcFlags",       TimepointDataType::SetBNpcFlags },
+      { "setEObjState",       TimepointDataType::SetEObjState }
     };
 
     const static std::unordered_map< std::string, TimepointOverrideFlags > overrideFlagMap =
@@ -380,6 +464,20 @@ namespace Sapphire
 
     switch( tpType )
     {
+      case TimepointDataType::Idle:
+      {
+        auto duration = json.at( "duration" ).get< uint32_t >();
+        m_pData = std::make_shared< TimepointDataIdle >( selfLayoutId, duration );
+      }
+      break;
+      case TimepointDataType::CastAction:
+      {
+        // todo: CastAction
+        // todo: parse and build callback funcs
+        auto dataJ = json.at( "data" );
+
+      }
+      break;
       case TimepointDataType::MoveTo:
       {
         auto dataJ = json.at( "data" );
@@ -393,6 +491,106 @@ namespace Sapphire
         m_pData = std::make_shared< TimepointDataMoveTo >( selfLayoutId, pathReq, x, y, z, rot );
       }
       break;
+      case TimepointDataType::LogMessage:
+      {
+        auto dataJ = json.at( "data" );
+        auto messageId = dataJ.at( "messageId" ).get< uint32_t >();
+        auto params = dataJ.at( "params" ).get< std::vector< uint32_t > >();
+
+        m_pData = std::make_shared< TimepointDataLogMessage >( messageId, params );
+      }
+      break;
+      case TimepointDataType::BattleTalk:
+      {
+        auto dataJ = json.at( "data" );
+
+        // todo: BattleTalk
+      }
+      break;
+
+      //
+      // Directors
+      //
+      case TimepointDataType::SetDirectorVar:
+      {
+        auto dataJ = json.at( "data" );
+        auto index = dataJ.at( "index" ).get< uint32_t >();
+        auto val = dataJ.at( "value" ).get< uint32_t >();
+
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
+        pDirectorData->m_directorOp = DirectorOpId::SetDirectorVar;
+        pDirectorData->m_data.index = index;
+        pDirectorData->m_data.value.val = val;
+
+        m_pData = pDirectorData;
+      }
+      break;
+      case TimepointDataType::SetDirectorVarLR:
+      {
+        auto dataJ = json.at( "data" );
+        auto index = dataJ.at( "index" ).get< uint32_t >();
+        auto left = dataJ.at( "left" ).get< uint32_t >();
+        auto right = dataJ.at( "right" ).get< uint32_t >();
+
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
+        pDirectorData->m_directorOp = DirectorOpId::SetDirectorVarLR;
+        pDirectorData->m_data.index = index;
+        pDirectorData->m_data.value.left = left;
+        pDirectorData->m_data.value.right = right;
+
+        m_pData = pDirectorData;
+      }
+      break;
+      case TimepointDataType::SetDirectorSeq:
+      {
+        auto dataJ = json.at( "data" );
+        auto seq = dataJ.at( "seq" ).get< uint32_t >();
+
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
+        pDirectorData->m_directorOp = DirectorOpId::SetDirectorSeq;
+        pDirectorData->m_data.seq = seq;
+
+        m_pData = pDirectorData;
+      }
+      break;
+      case TimepointDataType::SetDirectorFlag:
+      {
+        auto dataJ = json.at( "data" );
+        auto flags = dataJ.at( "flags" ).get< uint32_t >();
+
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
+        pDirectorData->m_directorOp = DirectorOpId::SetDirectorFlag;
+        pDirectorData->m_data.flags = flags;
+
+        m_pData = pDirectorData;
+      }
+      break;
+
+      //
+      // Status Effects
+      //
+      case TimepointDataType::AddStatusEffect:
+      case TimepointDataType::RemoveStatusEffect:
+      {
+        // todo: add/remove status effects
+      }
+      break;
+
+
+      case TimepointDataType::SetBNpcFlags:
+      {
+        auto dataJ = json.at( "data" );
+
+        // todo: SetBNpcFlags
+      }
+      break;
+
+      case TimepointDataType::SetEObjState:
+      {
+        auto dataJ = json.at( "data" );
+
+        // todo: SetEObjState
+      }
       default:
         break;
     }
@@ -403,12 +601,22 @@ namespace Sapphire
     static std::map< uint32_t, TimelinePack > cache = {};
     const static std::unordered_map< std::string, ConditionId > conditionIdMap =
     {
-      { "hpPctLessThan",          ConditionId::HpPctLessThan },
-      { "hpPctBetween",           ConditionId::HpPctBetween },
-      { "directorVarEquals",      ConditionId::DirectorVarEquals },
-      { "directorVarGreaterThan", ConditionId::DirectorVarGreaterThan },
-      { "encounterTimeElapsed",   ConditionId::EncounterTimeElapsed },
-      { "phaseTimeElapsed",       ConditionId::PhaseTimeElapsed }
+      { "hpPctLessThan",            ConditionId::HpPctLessThan },
+      { "hpPctBetween",             ConditionId::HpPctBetween },
+
+      { "directorVarEquals",        ConditionId::DirectorVarEquals },
+      { "directorVarGreaterThan",   ConditionId::DirectorVarGreaterThan },
+
+      { "directorSeqEquals",        ConditionId::DirectorSeqEquals },
+      { "directorSeqGreaterThan",   ConditionId::DirectorSeqGreaterThan },
+
+      { "directorFlagsEquals",      ConditionId::DirectorFlagsEquals },
+      { "directorFlagsGreaterThan", ConditionId::DirectorFlagsGreaterThan },
+
+      { "encounterTimeElapsed",     ConditionId::EncounterTimeElapsed },
+
+      { "combatState",              ConditionId::CombatState },
+      { "bnpcHasFlags",             ConditionId::BNpcHasFlags }
     };
 
     TimelinePack pack;
@@ -523,9 +731,19 @@ namespace Sapphire
             break;
             case ConditionId::DirectorVarEquals:
             case ConditionId::DirectorVarGreaterThan:
+            case ConditionId::DirectorFlagsEquals:
+            case ConditionId::DirectorFlagsGreaterThan:
+            case ConditionId::DirectorSeqEquals:
+            case ConditionId::DirectorSeqGreaterThan:
             {
               auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
               pDirectorCondition->from_json( pcV, phase, conditionId );
+            }
+            break;
+            case ConditionId::EncounterTimeElapsed:
+            {
+              auto pEncounterCondition = std::make_shared< ConditionEncounterTimeElapsed >();
+              pEncounterCondition->from_json( pcV, phase, conditionId );
             }
             break;
             case ConditionId::CombatState:
