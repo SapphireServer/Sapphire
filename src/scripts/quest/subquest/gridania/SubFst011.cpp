@@ -67,8 +67,11 @@ public:
       case Enemy0:
       {
         auto currentKC = quest.getUI8AL();
-        quest.setUI8AL( currentKC + 1 );
-        eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 6 );
+        if( currentKC < 6 )
+        {
+          quest.setUI8AL( currentKC + 1 );
+          eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 6 );
+        }
 
         if( currentKC + 1 >= 6 )
           quest.setSeq( SeqFinish );
