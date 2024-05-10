@@ -9,7 +9,7 @@
 
 namespace Sapphire
 {
-  bool EncounterTimeline::ConditionHp::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  bool EncounterTimeline::ConditionHp::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
   {
     auto pBNpc = pInstance->getActiveBNpcByLayoutId( layoutId );
     if( !pBNpc )
@@ -30,7 +30,7 @@ namespace Sapphire
     return false;
   };
 
-  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
   {
     // todo: use something other than InstanceContentPtr
     if( !pInstance )
@@ -54,7 +54,7 @@ namespace Sapphire
     return false;
   }
 
-  bool EncounterTimeline::ConditionCombatState::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  bool EncounterTimeline::ConditionCombatState::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
   {
     auto pBattleNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
 
@@ -78,27 +78,22 @@ namespace Sapphire
     return false;
   }
 
-  bool EncounterTimeline::ConditionEncounterTimeElapsed::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  bool EncounterTimeline::ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
   {
-    if( pInstance == nullptr )
-    {
-      // die idk
-      return false;
-    }
-
+    auto elapsed = time - pack.getStartTime();
     // todo: check encounter time
-    return false;
+    return elapsed >= this->duration;
   }
 
-  bool EncounterTimeline::ConditionBNpcFlags::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
+  bool EncounterTimeline::ConditionBNpcFlags::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
   {
     auto pBNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
     return pBNpc && pBNpc->hasFlag( this->flags );
   }
 
-  void EncounterTimeline::Timepoint::update( InstanceContentPtr pInstance, uint64_t time )
+  void EncounterTimeline::Timepoint::update( TimepointState& state, InstanceContentPtr pInstance, uint64_t time ) const
   {
-    m_lastTick = time;
+    state.m_lastTick = time;
     switch( m_type )
     {
       case TimepointDataType::Idle:
@@ -141,7 +136,7 @@ namespace Sapphire
           else
           {
             // if we are at the pos, stop waiting
-            m_finished = true;
+            state.m_finished = true;
           }
           pBNpc->setRot( pMoveToData->m_rot );
         }
@@ -237,7 +232,7 @@ namespace Sapphire
       }
       break;
     }
-    m_finished = m_finished || m_executeTime + m_duration <= time;
+    state.m_finished = state.m_finished || state.m_startTime + m_duration <= time;
   }
 
   /*
@@ -302,10 +297,10 @@ namespace Sapphire
   }
   */
 
-  void EncounterTimeline::Timepoint::execute( InstanceContentPtr pInstance, uint64_t time )
+  void EncounterTimeline::Timepoint::execute( TimepointState& state, InstanceContentPtr pInstance, uint64_t time ) const
   {
-    m_executeTime = time;
-    update( pInstance, time );
+    state.m_startTime = time;
+    update( state, pInstance, time );
   }
 
   //
@@ -719,7 +714,6 @@ namespace Sapphire
 
           // build the condition
           PhaseConditionPtr pCondition;
-          pCondition->m_description = description;
           switch( conditionId )
           {
             case ConditionId::HpPctLessThan:
@@ -755,7 +749,7 @@ namespace Sapphire
             default:
               break;
           }
-          actor.m_phaseConditions.push_back( pCondition );
+          actor.addPhaseCondition( pCondition );
         }
       }
       else
