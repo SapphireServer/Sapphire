@@ -260,9 +260,11 @@ namespace Sapphire
       TimepointDataType m_type;
       uint64_t m_duration{ 0 };
       uint64_t m_executeTime{ 0 };
+      uint64_t m_lastTick{ 0 };
       TimepointOverrideFlags m_overrideFlags;
       TimepointDataPtr m_pData;
       std::string m_description;
+      bool m_finished{ false };
 
       // todo: repeatable?
 
@@ -273,15 +275,24 @@ namespace Sapphire
 
       bool canExecute( uint64_t elapsed )
       {
-        return m_executeTime == 0 && m_duration <= elapsed;
+        return m_executeTime == 0; // & &m_duration <= elapsed;
       }
 
       bool finished( uint64_t time )
       {
-        return m_executeTime + m_duration <= time;
+        return m_executeTime + m_duration <= time || m_finished;
+      }
+
+      void reset()
+      {
+        m_executeTime = 0;
+        m_lastTick = 0;
+        m_finished = false;
       }
 
       void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
+      // todo: separate execute/update into onStart and onTick?
+      void update( EncounterFightPtr pFight, uint64_t time );
       void execute( EncounterFightPtr pFight, uint64_t time );
     };
 
@@ -320,13 +331,16 @@ namespace Sapphire
             m_lastTimepointTime = time;
             m_executed.push( timepoint );
           }
+          else if( !timepoint.finished( timepointElapsed ) )
+          {
+            timepoint.update( pFight, time );
+          }
 
-          // fire off all timepoints 
           if( timepoint.finished( timepointElapsed ) )
           {
-            // todo: this is stupid, temp workaround for allowing phases to loop
-            timepoint.m_executeTime = 0;
+            timepoint.reset();
             m_lastTimepointIndex = i;
+            // make sure this timepoint isnt run again unless phase loops
             ++i;
             continue;
           }

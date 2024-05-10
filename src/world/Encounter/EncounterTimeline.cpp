@@ -4,6 +4,8 @@
 #include <Actor/BNpc.h>
 #include <Actor/Chara.h>
 
+#include <Util/UtilMath.h>
+
 namespace Sapphire
 {
   bool EncounterTimeline::ConditionHp::isConditionMet( EncounterFightPtr pFight, uint64_t time )
@@ -83,8 +85,9 @@ namespace Sapphire
     return false;
   }
 
-  void EncounterTimeline::Timepoint::execute( EncounterFightPtr pFight, uint64_t time )
+  void EncounterTimeline::Timepoint::update( EncounterFightPtr pFight, uint64_t time )
   {
+    m_lastTick = time;
     switch( m_type )
     {
       case TimepointDataType::Idle:
@@ -111,12 +114,25 @@ namespace Sapphire
         auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( getData() );
         auto pBNpc = pFight->getBNpc( pMoveToData->m_actorId );
 
-        // todo: path
         if( pBNpc )
         {
-          pBNpc->setPos( pMoveToData->m_x, pMoveToData->m_y, pMoveToData->m_z );
+          auto currPos = pBNpc->getPos();
+          Common::FFXIVARR_POSITION3 targetPos = { pMoveToData->m_x, pMoveToData->m_y, pMoveToData->m_z };
+
+          auto distance = Common::Util::distance( currPos, targetPos );
+          if( distance > 0.5f )
+          {
+            if( pMoveToData->m_moveType == MoveType::WalkPath )
+              pBNpc->moveTo( targetPos );
+            else
+              pBNpc->setPos( pMoveToData->m_x, pMoveToData->m_y, pMoveToData->m_z );
+          }
+          else
+          {
+            // if we are at the pos, stop waiting
+            m_finished = true;
+          }
           pBNpc->setRot( pMoveToData->m_rot );
-          pBNpc->sendPositionUpdate();
         }
       }
       break;
@@ -133,7 +149,7 @@ namespace Sapphire
         auto pInstance = pFight->getInstance();
 
         // todo: this should never not be set?
-        // todo: probably should use ContentDirector 
+        // todo: probably should use ContentDirector
         if( pInstance )
         {
           switch( pDirectorData->m_directorOp )
@@ -160,6 +176,75 @@ namespace Sapphire
       }
       break;
     }
+    m_finished = m_finished || m_executeTime + m_duration <= time;
+  }
+
+  /*
+  class RngCondition : TimepointCondition
+  {
+    EncounterTimepointConditionId m_type;
+    std::vector< uint32_t > m_params
+    
+    RngCondition( EncounterTimepointConditionId conditionId std::vector< uint32_t params ) : m_type( conditionId ), m_params( params ){}
+    bool isConditionMet( uint32_t shit )
+    {
+      switch( m_type )
+      {
+        case EncounterTimepointConditionId::RngMinMax:
+          return RNGMgr::generate( params[0], params[1] ) == params[2];
+      }
+      return false;
+    }
+  }
+  enum class ActionCallbackType : uint32_t
+  {
+    OnActionInit,
+    OnActionStart,
+    OnActionInterrupt,
+    OnActionExecute
+  };
+
+  using CallbackFunc = std::function< void < CharaPtr, Action > >;
+
+  std::unordered_map< ActionCallbackType, CallbackFunc > m_actionCallbacks;
+  void Chara::registerActionCallback( ActionCallbackType type, CallbackFunc callback )
+  {
+    m_actionCallbacks[ type ].push_back( callback );
+  }
+
+  // call this when changing EncounterPack
+  void Chara::clearActionCallbacks()
+  {
+    for( auto& callback : m_actionCallbacks )
+      callback.second.clear()
+  }
+
+  void Chara::onActionInterrupt()
+  {
+    auto action = getCurrentAction();
+    for( auto& callback : m_actionCallbacks[ ActionCallbackType::OnActionInterrupt ] )
+      callback( this, action );
+  }
+
+  void EncounterTimeline::Timepoint::execute( EncounterFightPtr pFight, uint64_t time )
+  {
+    switch( m_type )
+    {
+      case TimepointDataType::CastAction:
+      {
+        auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( getData() );
+
+        // todo: filter the correct target
+        // todo: tie to mechanic script?
+      }
+    }
+  }
+  */
+
+  void EncounterTimeline::Timepoint::execute( EncounterFightPtr pFight, uint64_t time )
+  {
+    m_executeTime = time;
+    update( pFight, time );
   }
 
   //
@@ -333,24 +418,6 @@ namespace Sapphire
     TimelinePack pack;
     if( cache.find( encounterId ) != cache.end() && !reload )
       return cache.at( encounterId );
-    /*
-    class RngCondition : TimepointCondition
-    {
-      EncounterTimepointConditionId m_type;
-      std::vector< uint32_t > m_params
-      
-      RngCondition( EncounterTimepointConditionId conditionId std::vector< uint32_t params ) : m_type( conditionId ), m_params( params ){}
-      bool isConditionMet( uint32_t shit )
-      {
-        switch( m_type )
-        {
-          case EncounterTimepointConditionId::RngMinMax:
-            return RNGMgr::generate( params[0], params[1] ) == params[2];
-        }
-        return false;
-      }
-    }
-  */
 
     std::string encounter_name( fmt::format( std::string( "data/EncounterTimelines/EncounterTimeline%u.json" ), encounterId ) );
 
@@ -385,7 +452,7 @@ namespace Sapphire
       auto actorV = actorJ.value();
       std::string actorName = actorV.at( "name" );
 
-      TimelineActor& actor = actorNameMap[actorName];
+      TimelineActor& actor = actorNameMap[ actorName ];
       // todo: are phases linked by actor, or global in the json
       for( const auto& phaseJ : json.at( "phases" ).items() )
       {
@@ -420,14 +487,14 @@ namespace Sapphire
     for( const auto& pcJ : json.at( "phaseConditions" ).items() )
     {
       auto pcV = pcJ.value();
-      auto conditionName = pcV.at( "condition" ).get< std::string>();
+      auto conditionName = pcV.at( "condition" ).get< std::string >();
       auto description = pcV.at( "description" ).get< std::string >();
       auto loop = pcV.at( "loop" ).get< bool >();
       auto phaseRef = pcV.at( "targetPhase" ).get< std::string >();
       auto actorRef = pcV.at( "targetActor" ).get< std::string >();
 
       ConditionId conditionId;
-      
+
       // make sure condition exists
       if( auto it = conditionIdMap.find( conditionName ); it != conditionIdMap.end() )
         conditionId = it->second;
