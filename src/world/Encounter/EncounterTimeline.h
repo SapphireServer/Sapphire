@@ -399,8 +399,13 @@ namespace Sapphire
           state.m_startTime = time;
         if( state.m_phaseInfo.m_startTime == 0 )
           state.m_phaseInfo.m_startTime = time;
+
         if( state.m_phaseInfo.m_lastTimepointTime == 0 )
+        {
           state.m_phaseInfo.m_lastTimepointTime = time;
+          state.m_phaseInfo.m_timepointStates.clear();
+          state.m_phaseInfo.m_timepointStates.resize( m_timepoints.size() );
+        }
 
         for( auto i = state.m_phaseInfo.m_lastTimepointIndex; i < m_timepoints.size();  )
         {
@@ -443,8 +448,7 @@ namespace Sapphire
         state.m_phaseInfo.m_lastTimepointTime = 0;
 
         state.m_phaseInfo.m_timepointStates.clear();
-        for( auto i = 0; i < m_timepoints.size(); ++i )
-          state.m_phaseInfo.m_timepointStates.push_back( {} );
+        state.m_phaseInfo.m_timepointStates.resize( m_timepoints.size() );
       }
 
       bool completed( ConditionState& state ) const
@@ -605,7 +609,7 @@ namespace Sapphire
         m_name = name;
       }
 
-      void addTimelineActor(const TimelineActor& actor)
+      void addTimelineActor( const TimelineActor& actor )
       {
         m_actors.push_back( actor );
       }
