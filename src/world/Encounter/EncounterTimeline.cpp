@@ -8,9 +8,9 @@
 
 namespace Sapphire
 {
-  bool EncounterTimeline::ConditionHp::isConditionMet( EncounterFightPtr pFight, uint64_t time )
+  bool EncounterTimeline::ConditionHp::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
   {
-    auto pBNpc = pFight->getBNpc( layoutId );
+    auto pBNpc = pInstance->getActiveBNpcByLayoutId( layoutId );
     if( !pBNpc )
       return false;
 
@@ -29,10 +29,8 @@ namespace Sapphire
     return false;
   };
 
-  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( EncounterFightPtr pFight, uint64_t time )
+  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( InstanceContentPtr pInstance, uint64_t time )
   {
-    auto pInstance = pFight->getInstance();
-
     // todo: use something other than InstanceContentPtr
     if( !pInstance )
       return false;
@@ -55,9 +53,9 @@ namespace Sapphire
     return false;
   }
 
-  bool EncounterTimeline::ConditionCombatState::isConditionMet( EncounterFightPtr pFight, uint64_t time)
+  bool EncounterTimeline::ConditionCombatState::isConditionMet( InstanceContentPtr pInstance, uint64_t time)
   {
-    auto pBattleNpc = pFight->getBNpc( this->layoutId );
+    auto pBattleNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
 
     switch( combatState )
     {
@@ -85,7 +83,7 @@ namespace Sapphire
     return false;
   }
 
-  void EncounterTimeline::Timepoint::update( EncounterFightPtr pFight, uint64_t time )
+  void EncounterTimeline::Timepoint::update( InstanceContentPtr pInstance, uint64_t time )
   {
     m_lastTick = time;
     switch( m_type )
@@ -93,7 +91,7 @@ namespace Sapphire
       case TimepointDataType::Idle:
       {
         auto pIdleData = std::dynamic_pointer_cast< TimepointDataIdle, TimepointData >( getData() );
-        auto pBNpc = pFight->getBNpc( pIdleData->m_actorId );
+        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pIdleData->m_layoutId );
 
         if( pBNpc )
         {
@@ -112,7 +110,7 @@ namespace Sapphire
       case TimepointDataType::MoveTo:
       {
         auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( getData() );
-        auto pBNpc = pFight->getBNpc( pMoveToData->m_actorId );
+        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pMoveToData->m_layoutId );
 
         if( pBNpc )
         {
@@ -146,8 +144,6 @@ namespace Sapphire
       case TimepointDataType::SetDirectorFlag:
       {
         auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( getData() );
-        auto pInstance = pFight->getInstance();
-
         // todo: this should never not be set?
         // todo: probably should use ContentDirector
         if( pInstance )
@@ -226,7 +222,7 @@ namespace Sapphire
       callback( this, action );
   }
 
-  void EncounterTimeline::Timepoint::execute( EncounterFightPtr pFight, uint64_t time )
+  void EncounterTimeline::Timepoint::execute( InstanceContentPtr pInstance, uint64_t time )
   {
     switch( m_type )
     {
@@ -241,10 +237,10 @@ namespace Sapphire
   }
   */
 
-  void EncounterTimeline::Timepoint::execute( EncounterFightPtr pFight, uint64_t time )
+  void EncounterTimeline::Timepoint::execute( InstanceContentPtr pInstance, uint64_t time )
   {
     m_executeTime = time;
-    update( pFight, time );
+    update( pInstance, time );
   }
 
   //
@@ -336,6 +332,7 @@ namespace Sapphire
       { "castAction",         TimepointDataType::CastAction },
       { "moveTo",             TimepointDataType::MoveTo },
       { "logMessage",         TimepointDataType::LogMessage },
+      { "battleTalk",         TimepointDataType::BattleTalk  },
       { "setDirectorVar",     TimepointDataType::SetDirectorVar },
       { "setDirectorSeq",     TimepointDataType::SetDirectorSeq },
       { "setDirectorFlags",   TimepointDataType::SetDirectorFlag },
@@ -392,9 +389,8 @@ namespace Sapphire
         auto z = posJ.at( "z" ).get< float >();
         auto rot = dataJ.at( "rot" ).get< float >();
         auto pathReq = dataJ.at( "pathRequested" ).get< bool >() ? MoveType::WalkPath : MoveType::Teleport;
-        auto actorId = selfLayoutId;
-
-        m_pData = std::make_shared< TimepointDataMoveTo >( actorId, pathReq, x, y, z, rot );
+        
+        m_pData = std::make_shared< TimepointDataMoveTo >( selfLayoutId, pathReq, x, y, z, rot );
       }
       break;
       default:
@@ -504,7 +500,7 @@ namespace Sapphire
       // make sure the actor we're referencing exists
       if( auto actorIt = actorNameMap.find( actorRef ); actorIt != actorNameMap.end() )
       {
-        auto phaseNameMap = actorNamePhaseMap[ actorRef ];
+        auto& phaseNameMap = actorNamePhaseMap[ actorRef ];
 
         TimelineActor& actor = actorIt->second;
 

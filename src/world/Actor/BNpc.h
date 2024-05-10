@@ -31,13 +31,16 @@ namespace Sapphire::Entity
 
   enum BNpcFlag
   {
-    None = 0,
-    Immobile = 1,
-    TurningDisabled = 2,
-    Invincible = 4,
-    InvincibleRefill = 8,
-    NoDeaggro = 16,
-    Untargetable = 32,
+    None               = 0x00,
+    Immobile           = 0x01,
+    TurningDisabled    = 0x02,
+    Invincible         = 0x04,
+    InvincibleRefill   = 0x08,
+    NoDeaggro          = 0x10,
+    Untargetable       = 0x20,
+    AutoAttackDisabled = 0x40,
+
+    Intermission       = 0x77 // for transition phases to ensure boss only moves/acts when scripted
   };
 
   const std::array< uint32_t, 50 > BnpcBaseHp =

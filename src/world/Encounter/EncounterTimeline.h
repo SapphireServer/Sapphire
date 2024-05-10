@@ -60,6 +60,7 @@ namespace Sapphire
       LogMessage,
       BattleTalk,
       SetDirectorVar,
+      SetDirectorVarLR,
       SetDirectorSeq,
       SetDirectorFlag,
       AddStatusEffect,
@@ -122,7 +123,7 @@ namespace Sapphire
     };
 
 
-    using TimepointCallbackFunc = std::function< void( EncounterFightPtr, uint64_t ) >;
+    using TimepointCallbackFunc = std::function< void( InstanceContentPtr, uint64_t ) >;
     // Timepoint Data Objects
     struct TimepointCallbackData :
       public std::enable_shared_from_this< TimepointCallbackData >
@@ -145,12 +146,12 @@ namespace Sapphire
 
     struct TimepointDataIdle : public TimepointData
     {
-      uint32_t m_actorId;
+      uint32_t m_layoutId;
       uint64_t m_durationMs;
 
-      TimepointDataIdle( uint32_t actorId, uint64_t durationMs ) :
+      TimepointDataIdle( uint32_t layoutId, uint64_t durationMs ) :
         TimepointData( TimepointDataType::Idle ),
-        m_actorId( actorId ),
+        m_layoutId( layoutId ),
         m_durationMs( durationMs )
       {
       } 
@@ -186,13 +187,13 @@ namespace Sapphire
 
     struct TimepointDataAction : public TimepointData
     {
-      uint32_t m_actorId;
+      uint32_t m_layoutId;
       uint32_t m_actionId;
       TimepointCallbacks m_callbacks;
 
-      TimepointDataAction( uint32_t actorId, uint32_t actionId, TimepointCallbacks callbacks ) :
+      TimepointDataAction( uint32_t layoutId, uint32_t actionId, TimepointCallbacks callbacks ) :
         TimepointData( TimepointDataType::CastAction ),
-        m_actorId( actorId ),
+        m_layoutId( layoutId ),
         m_actionId( actionId ),
         m_callbacks( callbacks )
       {
@@ -201,13 +202,13 @@ namespace Sapphire
 
     struct TimepointDataMoveTo : public TimepointData
     {
-      uint32_t m_actorId;
+      uint32_t m_layoutId;
       MoveType m_moveType;
       float m_x, m_y, m_z, m_rot;
 
-      TimepointDataMoveTo( uint32_t actorId, MoveType moveType, float x, float y, float z, float rot ) :
+      TimepointDataMoveTo( uint32_t layoutId, MoveType moveType, float x, float y, float z, float rot ) :
         TimepointData( TimepointDataType::MoveTo ),
-        m_actorId( actorId ),
+        m_layoutId( layoutId ),
         m_moveType( moveType ),
         m_x( x ), m_y( y ), m_z( z ), m_rot( rot )
       {
@@ -292,8 +293,8 @@ namespace Sapphire
 
       void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
       // todo: separate execute/update into onStart and onTick?
-      void update( EncounterFightPtr pFight, uint64_t time );
-      void execute( EncounterFightPtr pFight, uint64_t time );
+      void update( InstanceContentPtr pInstance, uint64_t time );
+      void execute( InstanceContentPtr pInstance, uint64_t time );
     };
 
     class Phase :
@@ -312,7 +313,7 @@ namespace Sapphire
       std::queue< Timepoint > m_executed;
 
       // todo: i wrote this very sleep deprived, ensure it is actually sane
-      void execute( EncounterFightPtr pFight, uint64_t time )
+      void execute( InstanceContentPtr pInstance, uint64_t time )
       {
         if( m_startTime == 0 )
           m_startTime = time;
@@ -327,13 +328,13 @@ namespace Sapphire
           auto& timepoint = m_timepoints[ i ];
           if( timepoint.canExecute( timepointElapsed ) )
           {
-            timepoint.execute( pFight, time );
+            timepoint.execute( pInstance, time );
             m_lastTimepointTime = time;
             m_executed.push( timepoint );
           }
           else if( !timepoint.finished( timepointElapsed ) )
           {
-            timepoint.update( pFight, time );
+            timepoint.update( pInstance, time );
           }
 
           if( timepoint.finished( timepointElapsed ) )
@@ -377,15 +378,15 @@ namespace Sapphire
         this->m_phase = phase;
       }
 
-      void execute( EncounterFightPtr pFight, uint64_t time )
+      void execute( InstanceContentPtr pInstance, uint64_t time )
       {
         m_startTime = time;
-        m_phase.execute( pFight, time );
+        m_phase.execute( pInstance, time );
       };
 
-      void update( EncounterFightPtr pFight, uint64_t time )
+      void update( InstanceContentPtr pInstance, uint64_t time )
       {
-        m_phase.execute( pFight, time );
+        m_phase.execute( pInstance, time );
       }
 
       void reset()
@@ -413,7 +414,7 @@ namespace Sapphire
         return m_phase.completed() && m_loop && ( m_startTime + m_cooldown <= time );
       }
 
-      virtual bool isConditionMet( EncounterFightPtr pFight, uint64_t time )
+      virtual bool isConditionMet( InstanceContentPtr pInstance, uint64_t time )
       {
         return false;
       };
@@ -431,7 +432,7 @@ namespace Sapphire
       std::vector< PhaseConditionPtr > m_phaseConditions;
       std::queue< PhaseConditionPtr > m_phaseHistory;
 
-      void update( EncounterFightPtr pFight, uint64_t time )
+      void update( InstanceContentPtr pInstance, uint64_t time )
       {
         // todo: handle auto attacks and make it so they dont fire during boss intermission phases
         // todo: handle interrupts
@@ -447,11 +448,11 @@ namespace Sapphire
           }
           else if( pCondition->inProgress() )
           {
-            pCondition->update( pFight, time );
+            pCondition->update( pInstance, time );
           }
-          else if( pCondition->isConditionMet( pFight, time ) )
+          else if( pCondition->isConditionMet( pInstance, time ) )
           {
-            pCondition->execute( pFight, time );
+            pCondition->execute( pInstance, time );
             m_phaseHistory.push( pCondition );
           }
         }
@@ -467,10 +468,10 @@ namespace Sapphire
     public:
       TimelinePack() { }
       TimelinePack( TimelinePackType type ) : m_type( type ) {}
-      void update( EncounterFightPtr pFight, uint64_t time )
+      void update( InstanceContentPtr pInstance, uint64_t time )
       {
         for( auto& actor : m_actors )
-          actor.update( pFight, time );
+          actor.update( pInstance, time );
       }
     };
 
@@ -493,7 +494,7 @@ namespace Sapphire
       void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId,
         const std::unordered_map< std::string, TimelineActor >& actors );
 
-      bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;
+      bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
     };
 
     class ConditionDirectorVar : PhaseCondition
@@ -511,7 +512,7 @@ namespace Sapphire
       } param;
 
       void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId );
-      bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;
+      bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
     };
 
     class ConditionCombatState : PhaseCondition
@@ -521,7 +522,7 @@ namespace Sapphire
       CombatStateType combatState;
 
       void from_json( nlohmann::json& json, Phase phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
-      bool isConditionMet( EncounterFightPtr pFight, uint64_t time ) override;
+      bool isConditionMet( InstanceContentPtr pInstance, uint64_t time ) override;
     };
 
   public:
