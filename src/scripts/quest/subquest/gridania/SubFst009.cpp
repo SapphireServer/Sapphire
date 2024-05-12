@@ -96,8 +96,6 @@ class SubFst009 : public Sapphire::ScriptAPI::QuestScript
   {
     if (result.getResult(0) == 1)
       Scene00100(quest, player);
-    else
-      Scene00099(quest, player);
   }
 
   //////////////////////////////////////////////////////////////////////
