@@ -607,8 +607,9 @@ void Sapphire::Network::GameConnection::commandHandler( const Packets::FFXIVARR_
     }
     case PacketCommand::TELEPO_INQUIRY: // Teleport
     {
-
-      player.teleportQuery( static_cast< uint16_t >( data.Arg0 ) );
+      // data.Arg0 = aetheryte id
+      // data.Arg1 = confirm or cancel if using aetheryte ticket
+      player.teleportQuery( static_cast< uint16_t >( data.Arg0 ), data.Arg1 == 1 );
       break;
     }
     case PacketCommand::DYE_ITEM: // Dye item
