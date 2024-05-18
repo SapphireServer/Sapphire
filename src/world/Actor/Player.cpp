@@ -1380,9 +1380,9 @@ void Player::teleportQuery( uint16_t aetheryteId, bool useAetheryteTicket )
 
   // calculate cost - does not apply for favorite points or homepoints
   // if using aetheryte ticket, cost is 0
-  auto cost = useAetheryteTicket ? 0 : static_cast<uint16_t>(
+  auto cost = useAetheryteTicket ? 0 : static_cast< uint16_t > (
     ( std::sqrt( std::pow( fromAetheryte->data().CostPosX - targetAetheryte->data().CostPosX, 2 ) +
-               std::pow( fromAetheryte->data().CostPosY - targetAetheryte->data().CostPosY, 2 )) / 2 ) + 100 );
+                 std::pow( fromAetheryte->data().CostPosY - targetAetheryte->data().CostPosY, 2 ) ) / 2 ) + 100 );
 
   // cap at 999 gil
   cost = std::min< uint16_t >( 999, cost );
