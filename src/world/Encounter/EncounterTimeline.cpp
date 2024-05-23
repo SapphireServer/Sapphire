@@ -1,9 +1,17 @@
 #include "EncounterFight.h"
 #include "EncounterTimeline.h"
 
+#include <Action/Action.h>
+
 #include <Actor/BNpc.h>
 #include <Actor/Chara.h>
 #include <Actor/EventObject.h>
+#include <Actor/Player.h>
+
+
+#include <Manager/ActionMgr.h>
+#include <Manager/PlayerMgr.h>
+#include <Service.h>
 
 #include <Util/UtilMath.h>
 
@@ -91,9 +99,14 @@ namespace Sapphire
     return pBNpc && pBNpc->hasFlag( this->flags );
   }
 
-  void EncounterTimeline::Timepoint::update( TimepointState& state, InstanceContentPtr pInstance, uint64_t time ) const
+  void EncounterTimeline::Timepoint::update( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const
   {
     state.m_lastTick = time;
+
+    // todo: separate execute and update?
+    if( state.m_finished )
+      return;
+
     switch( m_type )
     {
       case TimepointDataType::Idle:
@@ -104,15 +117,25 @@ namespace Sapphire
         if( pBNpc )
         {
           // todo: idle
+          
         }
       }
       break;
       case TimepointDataType::CastAction:
       {
         auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( getData() );
-
+        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pActionData->m_layoutId );
         // todo: filter the correct target
         // todo: tie to mechanic script?
+        // todo: mechanic should probably just be an Action::onTick, with instance/director passed to it
+        if( pBNpc)
+        {
+          auto actionMgr = Common::Service< Sapphire::World::Manager::ActionMgr >::ref();
+
+          // todo: this is probably wrong
+          if( pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() != pActionData->m_actionId )
+            actionMgr.handleTargetedAction( *pBNpc.get(), pActionData->m_actionId, pBNpc->getTargetId(), 0 );
+        }
       }
       break;
       case TimepointDataType::MoveTo:
@@ -144,49 +167,105 @@ namespace Sapphire
       break;
       case TimepointDataType::LogMessage:
       {
-        // todo: LogMessage
+        auto pLogMessage = std::dynamic_pointer_cast< TimepointDataLogMessage, TimepointData >( getData() );
+        auto params = pLogMessage->m_params;
+
+        // todo: probably should use ContentDirector
+        if( pInstance )
+        {
+          auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+          for( uint32_t id : pInstance->getSpawnedPlayerIds() )
+          {
+            auto pPlayer = playerMgr.getPlayer( id );
+            if( pPlayer )
+              playerMgr.sendLogMessage( *pPlayer.get(), pLogMessage->m_messageId,
+                                        params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ], params[ 4 ] );
+          }
+        }
       }
       break;
       case TimepointDataType::BattleTalk:
       {
         // todo: BattleTalk
-        // auto pBattleTalkData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >();
+        auto pBtData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >( getData() );
+        auto params = pBtData->m_params;
+
+        if( pInstance )
+        {
+          auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+          for( uint32_t id : pInstance->getSpawnedPlayerIds() )
+          {
+            auto pPlayer = playerMgr.getPlayer( id );
+            if( pPlayer )
+              playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, pBtData->m_handlerId,
+                                        pBtData->m_kind, pBtData->m_nameId, pBtData->m_talkerId,
+                                        params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
+                                        params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
+          }
+        }
       }
       break;
-      case TimepointDataType::SetDirectorSeq:
-      case TimepointDataType::SetDirectorVar:
-      case TimepointDataType::SetDirectorVarLR:
-      case TimepointDataType::SetDirectorFlag:
+      case TimepointDataType::DirectorSeq:
+      case TimepointDataType::DirectorVar:
+      case TimepointDataType::DirectorVarLR:
+      case TimepointDataType::DirectorFlags:
       {
         auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( getData() );
+
+        uint32_t val = 0;
+        uint32_t param = 0;
+
         // todo: this should never not be set?
         // todo: probably should use ContentDirector
         if( pInstance )
         {
+          switch( m_type )
+          {
+            case TimepointDataType::DirectorVar:
+              val = pInstance->getDirectorVar( pDirectorData->m_data.index );
+              param = pDirectorData->m_data.value.val;
+              break;
+            case TimepointDataType::DirectorFlags:
+              val = pInstance->getFlags();
+              param = pDirectorData->m_data.flags;
+              break;
+            case TimepointDataType::DirectorSeq:
+              val = pInstance->getSequence();
+              param = pDirectorData->m_data.seq;
+              break;
+            default:
+              break;
+          }
+
           switch( pDirectorData->m_directorOp )
           {
-            case DirectorOpId::SetDirectorVar:
-              pInstance->setDirectorVar( pDirectorData->m_data.index, pDirectorData->m_data.value.val );
-            break;
-            case DirectorOpId::SetDirectorVarLR:
-              pInstance->setDirectorVar( pDirectorData->m_data.index, pDirectorData->m_data.value.left, pDirectorData->m_data.value.right );
-            break;
-            case DirectorOpId::SetDirectorFlag:
-              pInstance->setDirectorFlags( pDirectorData->m_data.flags );
-            break;
-            case DirectorOpId::SetDirectorSeq:
-              pInstance->setDirectorSequence( pDirectorData->m_data.seq );
-            break;
-            case DirectorOpId::ClearDirector:
-            {
-              for( auto playerId : pInstance->getSpawnedPlayerIds() )
-              {
-                // todo: get all players, clear director vars/flags to default(?)
-              }
-            }
-            break;
+            case DirectorOpId::Set: val = param;  break;
+            case DirectorOpId::Add: val += param; break;
+            case DirectorOpId::Sub: val -= param; break;
+            case DirectorOpId::Mul: val *= param; break;
+            case DirectorOpId::Div: val /= param; break;
+            case DirectorOpId::Mod: val %= param; break;
+            case DirectorOpId::Sll: val = val << param; break;
+            case DirectorOpId::Srl: val = val >> param; break;
+            case DirectorOpId::Or:  val |= param; break;
+            case DirectorOpId::Xor: val ^= param; break;
+            case DirectorOpId::Nor: val = ~( val | param ); break;
+            case DirectorOpId::And: val &= param; break;
+            default: break;
+          }
+
+          switch( m_type )
+          {
+            case TimepointDataType::DirectorVar:
+              pInstance->setVar( pDirectorData->m_data.index, val );
+              break;
+            case TimepointDataType::DirectorFlags:
+              pInstance->setFlags( val );
+              break;
+            case TimepointDataType::DirectorSeq:
+              pInstance->setSequence( val );
+              break;
             default:
-              // probably throw an error here
               break;
           }
         }
@@ -202,6 +281,20 @@ namespace Sapphire
 
       }
       break;
+      case TimepointDataType::SpawnBNpc:
+      {
+        auto pSpawnData = std::dynamic_pointer_cast< TimepointDataSpawnBNpc, TimepointData >( getData() );
+        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pSpawnData->m_layoutId );
+
+        if( pBNpc )
+        {
+          pBNpc->clearFlags();
+          pBNpc->setFlag( pSpawnData->m_flags );
+          // todo: pBNpc->hateListAdd();
+          pInstance->pushActor( pBNpc );
+        }
+      }
+      break;
       case TimepointDataType::SetBNpcFlags:
       {
         auto pBNpcFlagData = std::dynamic_pointer_cast< TimepointDataBNpcFlags, TimepointData >( getData() );
@@ -211,6 +304,7 @@ namespace Sapphire
         {
           pBNpc->clearFlags();
           pBNpc->setFlag( pBNpcFlagData->m_flags );
+          // todo: resend some bnpc packet/actrl?
         }
       }
       break;
@@ -219,9 +313,11 @@ namespace Sapphire
         auto pEObjData = std::dynamic_pointer_cast< TimepointDataEObjState, TimepointData >( getData() );
         auto pEObj = pInstance->getEObjById( pEObjData->m_eobjId );
 
+        // todo: SetEObjAnimationFlag?
         if( pEObj )
         {
           pEObj->setState( pEObjData->m_state );
+          // todo: resend the eobj spawn packet?
         }
       }
       break;
@@ -231,7 +327,19 @@ namespace Sapphire
         pInstance->setCurrentBGM( pBgmData->m_bgmId );
       }
       break;
+      case TimepointDataType::SetCondition:
+      {
+        auto pConditionData = std::dynamic_pointer_cast< TimepointDataCondition, TimepointData >( getData() );
+
+        // todo: dont reset so things can resume? idk
+        self.resetConditionState( pConditionData->m_index );
+        self.setConditionStateEnabled( pConditionData->m_index, pConditionData->m_enabled );
+      }
     }
+
+    if( m_type != TimepointDataType::MoveTo && m_type != TimepointDataType::CastAction )
+      state.m_finished = true;
+
     state.m_finished = state.m_finished || state.m_startTime + m_duration <= time;
   }
 
@@ -297,10 +405,10 @@ namespace Sapphire
   }
   */
 
-  void EncounterTimeline::Timepoint::execute( TimepointState& state, InstanceContentPtr pInstance, uint64_t time ) const
+  void EncounterTimeline::Timepoint::execute( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const
   {
     state.m_startTime = time;
-    update( state, pInstance, time );
+    update( state, self, pInstance, time );
   }
 
   //
@@ -346,8 +454,8 @@ namespace Sapphire
       case ConditionId::DirectorVarEquals:
       case ConditionId::DirectorVarGreaterThan:
       {
-        param.index = paramData.at( "index" ).get< uint32_t >();
-        param.value = paramData.at( "value" ).get< uint32_t >();
+        param.index = paramData.at( "idx" ).get< uint32_t >();
+        param.value = paramData.at( "val" ).get< uint32_t >();
       }
       break;
       case ConditionId::DirectorFlagsEquals:
@@ -398,6 +506,15 @@ namespace Sapphire
                                                            const std::unordered_map< std::string, TimelineActor >& actors )
   {
     PhaseCondition::from_json( json, phase, conditionId );
+    auto actorRef = json.at( "actor" ).get< std::string >();
+
+    // resolve the actor whose name we are checking
+    if( auto it = actors.find( actorRef ); it != actors.end() )
+      this->layoutId = it->second.m_layoutId;
+    else
+      throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionBNpcFlags::from_json unable to find actor by name: %s" ), actorRef ) );
+
+    this->flags = json.at( "flags" ).get< uint32_t >();
     // todo: BNpcHasFlags
   }
 
@@ -410,13 +527,15 @@ namespace Sapphire
       { "moveTo",             TimepointDataType::MoveTo },
       { "logMessage",         TimepointDataType::LogMessage },
       { "battleTalk",         TimepointDataType::BattleTalk  },
-      { "setDirectorVar",     TimepointDataType::SetDirectorVar },
-      { "setDirectorSeq",     TimepointDataType::SetDirectorSeq },
-      { "setDirectorFlags",   TimepointDataType::SetDirectorFlag },
+      { "directorVar",        TimepointDataType::DirectorVar },
+      { "directorSeq",        TimepointDataType::DirectorSeq },
+      { "directorFlags",      TimepointDataType::DirectorFlags },
       { "addStatusEffect",    TimepointDataType::AddStatusEffect },
       { "removeStatusEffect", TimepointDataType::RemoveStatusEffect },
-      { "setBNpcFlags",       TimepointDataType::SetBNpcFlags },
-      { "setEObjState",       TimepointDataType::SetEObjState }
+      { "spawnBNpc",          TimepointDataType::SpawnBNpc },
+      { "bNpcFlags",          TimepointDataType::SetBNpcFlags },
+      { "setEObjState",       TimepointDataType::SetEObjState },
+      { "setCondition",       TimepointDataType::SetCondition }
     };
 
     const static std::unordered_map< std::string, TimepointOverrideFlags > overrideFlagMap =
@@ -445,6 +564,22 @@ namespace Sapphire
       { "onActionExecute",    TimepointCallbackType::OnActionExecute },
     };
 
+    const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
+    {
+      { "set", DirectorOpId::Set },
+      { "add", DirectorOpId::Add },
+      { "sub", DirectorOpId::Sub },
+      { "mul", DirectorOpId::Mul },
+      { "div", DirectorOpId::Div },
+      { "mod", DirectorOpId::Mod },
+      { "sll", DirectorOpId::Sll },
+      { "srl", DirectorOpId::Srl },
+      { "or",  DirectorOpId::Or },
+      { "xor", DirectorOpId::Xor },
+      { "nor", DirectorOpId::Nor },
+      { "and", DirectorOpId::And }
+    };
+
     TimepointDataType tpType{ 0 };
 
     auto typeStr = json.at( "type" ).get< std::string >();
@@ -470,20 +605,26 @@ namespace Sapphire
         // todo: CastAction
         // todo: parse and build callback funcs
         auto dataJ = json.at( "data" );
+        auto actorRef = json.at( "sourceActor" ).get< std::string >();
+        auto actionId = json.at( "actionId" ).get< uint32_t >();
 
+        uint32_t layoutId = 0xE0000000;
+        if( auto it = actors.find( actorRef ); it != actors.end() )
+          layoutId = it->second.m_layoutId;
+        else
+          throw std::runtime_error( fmt::format( "EncounterTimeline::Timepoint::from_json: CastAction invalid actor ref: %s", actorRef ) );
+
+        m_pData = std::make_shared< TimepointDataAction >( layoutId, actionId );
       }
       break;
       case TimepointDataType::MoveTo:
       {
         auto dataJ = json.at( "data" );
-        auto posJ = dataJ.at( "pos" );
-        auto x = posJ.at( "x" ).get< float >();
-        auto y = posJ.at( "y" ).get< float >();
-        auto z = posJ.at( "z" ).get< float >();
+        auto pos = dataJ.at( "pos" ).get< std::vector< float > >();
         auto rot = dataJ.at( "rot" ).get< float >();
         auto pathReq = dataJ.at( "pathRequested" ).get< bool >() ? MoveType::WalkPath : MoveType::Teleport;
         
-        m_pData = std::make_shared< TimepointDataMoveTo >( selfLayoutId, pathReq, x, y, z, rot );
+        m_pData = std::make_shared< TimepointDataMoveTo >( selfLayoutId, pathReq, pos[ 0 ], pos[ 1 ], pos[ 2 ], rot );
       }
       break;
       case TimepointDataType::LogMessage:
@@ -498,37 +639,48 @@ namespace Sapphire
       case TimepointDataType::BattleTalk:
       {
         auto dataJ = json.at( "data" );
+        auto params = dataJ.at( "params" ).get< std::vector< uint32_t > >();
 
-        // todo: BattleTalk
+        auto pBattleTalkData = std::make_shared< TimepointDataBattleTalk >( params );
+
+        pBattleTalkData->m_battleTalkId = dataJ.at( "battleTalkId" ).get< uint32_t >();
+        pBattleTalkData->m_handlerId = dataJ.at( "handlerId" ).get< uint32_t >();
+        pBattleTalkData->m_kind = dataJ.at( "kind" ).get< uint32_t >();
+        pBattleTalkData->m_nameId = dataJ.at( "nameId" ).get< uint32_t >();
+        pBattleTalkData->m_talkerId = dataJ.at( "talkerId" ).get< uint32_t >();
+
+        m_pData = pBattleTalkData;
       }
       break;
 
       //
       // Directors
       //
-      case TimepointDataType::SetDirectorVar:
+      case TimepointDataType::DirectorVar:
       {
         auto dataJ = json.at( "data" );
-        auto index = dataJ.at( "index" ).get< uint32_t >();
-        auto val = dataJ.at( "value" ).get< uint32_t >();
+        auto index = dataJ.at( "idx" ).get< uint32_t >();
+        auto val = dataJ.at( "val" ).get< uint32_t >();
+        auto opStr = dataJ.at( "opc" ).get< std::string >();
+        DirectorOpId op = directorOpMap.find( opStr )->second;
 
-        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
-        pDirectorData->m_directorOp = DirectorOpId::SetDirectorVar;
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.index = index;
         pDirectorData->m_data.value.val = val;
 
         m_pData = pDirectorData;
       }
       break;
-      case TimepointDataType::SetDirectorVarLR:
+      case TimepointDataType::DirectorVarLR:
       {
         auto dataJ = json.at( "data" );
-        auto index = dataJ.at( "index" ).get< uint32_t >();
+        auto index = dataJ.at( "idx" ).get< uint32_t >();
         auto left = dataJ.at( "left" ).get< uint32_t >();
         auto right = dataJ.at( "right" ).get< uint32_t >();
+        auto opStr = dataJ.at( "opc" ).get< std::string >();
+        DirectorOpId op = directorOpMap.find( opStr )->second;
 
-        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
-        pDirectorData->m_directorOp = DirectorOpId::SetDirectorVarLR;
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.index = index;
         pDirectorData->m_data.value.left = left;
         pDirectorData->m_data.value.right = right;
@@ -536,25 +688,27 @@ namespace Sapphire
         m_pData = pDirectorData;
       }
       break;
-      case TimepointDataType::SetDirectorSeq:
+      case TimepointDataType::DirectorSeq:
       {
         auto dataJ = json.at( "data" );
-        auto seq = dataJ.at( "seq" ).get< uint32_t >();
+        auto seq = dataJ.at( "val" ).get< uint32_t >();
+        auto opStr = dataJ.at( "opc" ).get< std::string >();
+        DirectorOpId op = directorOpMap.find( opStr )->second;
 
-        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
-        pDirectorData->m_directorOp = DirectorOpId::SetDirectorSeq;
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.seq = seq;
 
         m_pData = pDirectorData;
       }
       break;
-      case TimepointDataType::SetDirectorFlag:
+      case TimepointDataType::DirectorFlags:
       {
         auto dataJ = json.at( "data" );
-        auto flags = dataJ.at( "flags" ).get< uint32_t >();
+        auto flags = dataJ.at( "val" ).get< uint32_t >();
+        auto opStr = dataJ.at( "opc" ).get< std::string >();
+        DirectorOpId op = directorOpMap.find( opStr )->second;
 
-        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType );
-        pDirectorData->m_directorOp = DirectorOpId::SetDirectorFlag;
+        auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.flags = flags;
 
         m_pData = pDirectorData;
@@ -572,10 +726,39 @@ namespace Sapphire
       break;
 
 
+      case TimepointDataType::SpawnBNpc:
+      {
+        auto dataJ = json.at( "data" );
+        auto hateSrcJ = dataJ.at( "hateSrc" );
+        auto actorRef = dataJ.at( "spawnActor" );
+        auto flags = dataJ.at( "flags" ).get< uint32_t >();
+
+        // todo: hateSrc
+
+        uint32_t layoutId = 0xE0000000;
+        if( auto it = actors.find( actorRef ); it != actors.end() )
+          layoutId = it->second.m_layoutId;
+        else
+          throw std::runtime_error( fmt::format( "EncounterTimeline::Timepoint::from_json: SpawnBNpc invalid actor ref: %s", actorRef ) );
+
+        m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags );
+      }
+      break;
       case TimepointDataType::SetBNpcFlags:
       {
         auto dataJ = json.at( "data" );
+        auto actorRef = dataJ.at( "spawnActor" );
+        auto flags = dataJ.at( "flags" ).get< uint32_t >();
 
+        // todo: hateSrc
+
+        uint32_t layoutId = 0xE0000000;
+        if( auto it = actors.find( actorRef ); it != actors.end() )
+          layoutId = it->second.m_layoutId;
+        else
+          throw std::runtime_error( fmt::format( "EncounterTimeline::Timepoint::from_json: SetBNpcFlags invalid actor ref: %s", actorRef ) );
+
+        m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags );
         // todo: SetBNpcFlags
       }
       break;
@@ -586,6 +769,18 @@ namespace Sapphire
 
         // todo: SetEObjState
       }
+      break;
+
+      case TimepointDataType::SetCondition:
+      {
+        auto dataJ = json.at( "data" );
+        auto index = dataJ.at( "conditionId" ).get< uint32_t >();
+        auto enabled = dataJ.at( "enabled" ).get< bool >();
+
+        m_pData = std::make_shared< TimepointDataCondition >( index, enabled );
+      }
+      break;
+
       default:
         break;
     }
@@ -683,7 +878,7 @@ namespace Sapphire
     }
 
     // build the condition list
-    for( const auto& pcJ : json.at( "phaseConditions" ).items() )
+    for( const auto& pcJ : json.at( "conditions" ).items() )
     {
       auto pcV = pcJ.value();
       auto conditionName = pcV.at( "condition" ).get< std::string >();

@@ -21,6 +21,11 @@ namespace Sapphire
     class TimelineActor;
     class TimelinePack;
 
+    //
+    // State tracking objects (per actor)
+    //
+    // todo: move ConditionState/TimepointState to Chara::GambitState?
+
     struct TimepointState
     {
       uint64_t m_startTime{ 0 };
@@ -33,6 +38,7 @@ namespace Sapphire
       uint64_t m_startTime{ 0 };
       bool m_loop{ false };
       bool m_completed{ false };
+      bool m_enabled{ false };
 
       struct
       {
@@ -44,6 +50,9 @@ namespace Sapphire
       } m_phaseInfo;
     };
 
+    //
+    // Enums
+    // 
     // EncounterFight::OnTick() { switch EncounterTimepointConditionId }
     enum class ConditionId : uint32_t
     {
@@ -64,11 +73,18 @@ namespace Sapphire
 
     enum class DirectorOpId
     {
-      SetDirectorVar,
-      SetDirectorVarLR,
-      SetDirectorSeq,
-      SetDirectorFlag,
-      ClearDirector
+      Set, // idx = val
+      Add, // idx += val
+      Sub, // idx -= val
+      Mul, // idx *= val
+      Div, // idx /= val
+      Mod, // idx %= val
+      Sll, // idx << val
+      Srl, // idx >> val
+      Or,  // idx |= val
+      Xor, // idx ^= val
+      Nor, // idx ~= val
+      And  // idx &= val
     };
 
     // TODO: what should this do?
@@ -87,17 +103,20 @@ namespace Sapphire
       LogMessage,
       BattleTalk,
 
-      SetDirectorVar,
-      SetDirectorVarLR,
-      SetDirectorSeq,
-      SetDirectorFlag,
+      DirectorVar,
+      DirectorVarLR,
+      DirectorSeq,
+      DirectorFlags,
 
       AddStatusEffect,
       RemoveStatusEffect,
 
+      SpawnBNpc,
       SetBNpcFlags,
       SetEObjState,
-      SetBgm
+      SetBgm,
+
+      SetCondition
     };
 
     enum class TimepointCallbackType : uint32_t
@@ -155,7 +174,9 @@ namespace Sapphire
       TargetSelectFilterId m_flags;
     };
 
-
+    //
+    // Timepoint.m_pData objects
+    //
     using TimepointCallbackFunc = std::function< void( InstanceContentPtr, uint64_t ) >;
     // Timepoint Data Objects
     struct TimepointCallbackData :
@@ -179,7 +200,7 @@ namespace Sapphire
 
     struct TimepointDataIdle : public TimepointData
     {
-      uint32_t m_layoutId;
+      uint32_t m_layoutId{ 0xE0000000 };
       uint64_t m_durationMs;
 
       TimepointDataIdle( uint32_t layoutId, uint64_t durationMs ) :
@@ -220,22 +241,22 @@ namespace Sapphire
 
     struct TimepointDataAction : public TimepointData
     {
-      uint32_t m_layoutId;
+      uint32_t m_layoutId{ 0xE0000000 };
       uint32_t m_actionId;
-      TimepointCallbacks m_callbacks;
+      //TimepointCallbacks m_callbacks;
 
-      TimepointDataAction( uint32_t layoutId, uint32_t actionId, TimepointCallbacks callbacks ) :
+      TimepointDataAction( uint32_t layoutId, uint32_t actionId ) :
         TimepointData( TimepointDataType::CastAction ),
         m_layoutId( layoutId ),
-        m_actionId( actionId ),
-        m_callbacks( callbacks )
+        m_actionId( actionId )
+        //m_callbacks( callbacks )
       {
       }
     };
 
     struct TimepointDataMoveTo : public TimepointData
     {
-      uint32_t m_layoutId;
+      uint32_t m_layoutId{ 0xE0000000 };
       MoveType m_moveType;
       float m_x, m_y, m_z, m_rot;
 
@@ -251,13 +272,31 @@ namespace Sapphire
     struct TimepointDataLogMessage : public TimepointData
     {
       uint32_t m_messageId;
-      uint32_t m_params[ 6 ]{ 0 };
+      uint32_t m_params[ 5 ]{ 0 };
 
-      TimepointDataLogMessage( uint32_t messageId, std::vector< uint32_t > params ) :
+      TimepointDataLogMessage( uint32_t messageId, const std::vector< uint32_t >& params ) :
         TimepointData( TimepointDataType::LogMessage ),
         m_messageId( messageId )
       {
-        for( auto i = 0; i < params.size(); ++i )
+        for( auto i = 0; i < params.size() && i < 5; ++i )
+          m_params[i] = params[i];
+      }
+    };
+
+    struct TimepointDataBattleTalk : public TimepointData
+    {
+      uint32_t m_battleTalkId;
+      uint32_t m_handlerId;
+      uint32_t m_kind;
+      uint32_t m_nameId;
+      uint32_t m_talkerId;
+
+      uint32_t m_params[ 8 ]{ 0 };
+
+      TimepointDataBattleTalk( const std::vector< uint32_t >& params ) :
+        TimepointData( TimepointDataType::BattleTalk )
+      {
+        for( auto i = 0; i < params.size() && i < 8; ++i )
           m_params[i] = params[i];
       }
     };
@@ -283,31 +322,32 @@ namespace Sapphire
         uint8_t flags;
       } m_data{ 0 };
 
-      TimepointDataDirector( TimepointDataType type ) :
-        TimepointData( type )
+      TimepointDataDirector( TimepointDataType type, DirectorOpId op ) :
+        TimepointData( type ),
+        m_directorOp( op )
       {
-        switch( type )
-        {
-          case TimepointDataType::SetDirectorVar:
-            m_directorOp = DirectorOpId::SetDirectorVar;
-            break;
-          case TimepointDataType::SetDirectorVarLR:
-            m_directorOp = DirectorOpId::SetDirectorVarLR;
-            break;
-          case TimepointDataType::SetDirectorFlag:
-            m_directorOp = DirectorOpId::SetDirectorFlag;
-            break;
-          case TimepointDataType::SetDirectorSeq:
-            m_directorOp = DirectorOpId::SetDirectorSeq;
-            break;
-        }
+
+      }
+    };
+
+    struct TimepointDataSpawnBNpc : public TimepointData
+    {
+      uint32_t m_layoutId{ 0xE0000000 };
+      uint32_t m_flags{ 0 };
+      // todo: hate type, source
+
+      TimepointDataSpawnBNpc( uint32_t layoutId, uint32_t flags ) :
+        TimepointData( TimepointDataType::SpawnBNpc ),
+        m_layoutId( layoutId ),
+        m_flags( flags)
+      {
       }
     };
 
     struct TimepointDataBNpcFlags : public TimepointData
     {
-      uint32_t m_layoutId;
-      uint32_t m_flags;
+      uint32_t m_layoutId{ 0xE0000000 };
+      uint32_t m_flags{ 0 };
 
       TimepointDataBNpcFlags( uint32_t layoutId, uint32_t flags ) :
         TimepointData( TimepointDataType::SetBNpcFlags ),
@@ -341,13 +381,27 @@ namespace Sapphire
       }
     };
 
+    struct TimepointDataCondition : public TimepointData
+    {
+      // todo: rng?
+      uint32_t m_index;
+      bool m_enabled;
+
+      TimepointDataCondition( uint32_t index, bool enabled ) :
+        TimepointData( TimepointDataType::SetCondition ),
+        m_index( index ),
+        m_enabled( enabled )
+      {
+      }
+    };
+
     // todo: refactor all this to allow solo actor to use
     class Timepoint :
       public std::enable_shared_from_this< Timepoint >
     {
     public:
       TimepointDataType m_type;
-      uint64_t m_duration{ 0 };
+      uint64_t m_duration{ 0 }; // milliseconds
       TimepointOverrideFlags m_overrideFlags;
       TimepointDataPtr m_pData;
       std::string m_description;
@@ -359,14 +413,19 @@ namespace Sapphire
         return m_pData;
       }
 
-      bool canExecute( TimepointState& state, uint64_t elapsed ) const
+      bool canExecute( const TimepointState& state, uint64_t elapsed ) const
       {
         return state.m_startTime == 0; // & &m_duration <= elapsed;
       }
 
-      bool finished( TimepointState& state, uint64_t time ) const
+      bool durationElapsed( uint64_t elapsed ) const
       {
-        return state.m_startTime + m_duration <= time || state.m_finished;
+        return m_duration < elapsed;
+      }
+
+      bool finished( const TimepointState& state, uint64_t elapsed ) const
+      {
+        return durationElapsed( elapsed ) || state.m_finished;
       }
 
       void reset( TimepointState& state ) const
@@ -378,8 +437,8 @@ namespace Sapphire
 
       void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
       // todo: separate execute/update into onStart and onTick?
-      void update( TimepointState& state, InstanceContentPtr pInstance, uint64_t time ) const;
-      void execute( TimepointState& state, InstanceContentPtr pInstance, uint64_t time ) const;
+      void update( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const;
+      void execute( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const;
     };
 
     class Phase :
@@ -387,13 +446,13 @@ namespace Sapphire
     {
     public:
 
-      // todo: respect looping phases, allow callbacks to push timepoints
+      // todo: allow callbacks to push timepoints
 
       std::string m_name;
       std::vector< Timepoint > m_timepoints;
 
       // todo: i wrote this very sleep deprived, ensure it is actually sane
-      void execute( ConditionState& state, InstanceContentPtr pInstance, uint64_t time ) const
+      void execute( ConditionState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const
       {
         if( state.m_startTime == 0 )
           state.m_startTime = time;
@@ -414,17 +473,18 @@ namespace Sapphire
 
           auto& tpState = state.m_phaseInfo.m_timepointStates[ i ];
           auto& timepoint = m_timepoints[ i ];
+
           if( timepoint.canExecute( tpState, timepointElapsed ) )
           {
-            timepoint.execute( tpState, pInstance, time );
+            timepoint.execute( tpState, self, pInstance, time );
             state.m_phaseInfo.m_lastTimepointTime = time;
           }
           else if( !timepoint.finished( tpState, timepointElapsed ) )
           {
-            timepoint.update( tpState, pInstance, time );
+            timepoint.update( tpState, self, pInstance, time );
           }
 
-          if( timepoint.finished( tpState, timepointElapsed ) )
+          if( timepoint.durationElapsed( timepointElapsed ) && timepoint.finished( tpState, timepointElapsed ) )
           {
             timepoint.reset( tpState );
             // make sure this timepoint isnt run again unless phase loops
@@ -451,7 +511,7 @@ namespace Sapphire
         state.m_phaseInfo.m_timepointStates.resize( m_timepoints.size() );
       }
 
-      bool completed( ConditionState& state ) const
+      bool completed( const ConditionState& state ) const
       {
         return state.m_phaseInfo.m_lastTimepointIndex > m_timepoints.size();
       }
@@ -467,6 +527,8 @@ namespace Sapphire
       std::string m_description;
       uint32_t m_cooldown{ 0 };
       bool m_loop{ false };
+      bool m_enabled{ true };
+
     public:
       PhaseCondition() {}
       ~PhaseCondition() {}
@@ -478,31 +540,49 @@ namespace Sapphire
         //this->m_cooldown = json.at( "cooldown" ).get< uint32_t >();
         this->m_phase = phase;
         this->m_description = json.at( "description" ).get< std::string >();
+        this->m_enabled = json.at( "enabled" ).get< bool >();
       }
 
-      void execute( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+      void execute( ConditionState& state, TimelineActor& self, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
       {
         state.m_startTime = time;
-        m_phase.execute( state, pInstance, time );
+        m_phase.execute( state, self, pInstance, time );
       };
 
-      void update( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+      void update( ConditionState& state, TimelineActor& self, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
       {
-        m_phase.execute( state, pInstance, time );
+        m_phase.execute( state, self, pInstance, time );
+      }
+
+      void setEnabled( ConditionState& state, bool enabled )
+      {
+        state.m_enabled = enabled;
       }
 
       void reset( ConditionState& state ) const
       {
         state.m_startTime = 0;
+        state.m_enabled = isDefaultEnabled();
         m_phase.reset( state );
       }
 
-      bool inProgress( ConditionState& state ) const
+      bool inProgress( const ConditionState& state ) const
       {
         return state.m_startTime != 0;
       }
 
-      bool completed( ConditionState& state ) const
+      // todo: better naming
+      bool isStateEnabled( const ConditionState& state ) const
+      {
+        return state.m_enabled;
+      }
+
+      bool isDefaultEnabled() const
+      {
+        return m_enabled;
+      }
+
+      bool completed( const ConditionState& state ) const
       {
         return m_phase.completed( state );
       }
@@ -551,6 +631,7 @@ namespace Sapphire
       {
         m_phaseConditions.push_back( pCondition );
         m_conditionStates.push_back( {} );
+        m_conditionStates[ m_conditionStates.size() - 1 ].m_enabled = pCondition->isDefaultEnabled();
       }
 
       // todo: make this sane and pass info down
@@ -563,6 +644,10 @@ namespace Sapphire
           const auto& pCondition = m_phaseConditions[ i ];
           auto& state = m_conditionStates[ i ];
 
+          // ignore if not enabled, unless overriden to enable
+          if( !pCondition->isDefaultEnabled() && !pCondition->isStateEnabled( state ) )
+            continue;
+
           if( pCondition->completed( state ) )
           {
             if( pCondition->isLoopable() )
@@ -573,14 +658,35 @@ namespace Sapphire
           }
           else if( pCondition->inProgress( state ) )
           {
-            pCondition->update( state, pInstance, pack, time );
+            pCondition->update( state, *this, pInstance, pack, time );
           }
           else if( pCondition->isConditionMet( state, pInstance, pack, time ) )
           {
-            pCondition->execute( state, pInstance, pack, time );
+            pCondition->execute( state, *this, pInstance, pack, time );
             m_phaseHistory.push( pCondition );
+
+            if( pack.getStartTime() == 0 )
+              pack.setStartTime( state.m_startTime );
           }
         }
+      }
+
+      void resetConditionState( uint32_t conditionIdx )
+      {
+        assert( conditionIdx < m_phaseConditions.size() );
+
+        const auto& pCondition = m_phaseConditions[ conditionIdx ];
+        auto& state = m_conditionStates[ conditionIdx ];
+
+        pCondition->reset( state );
+      }
+
+      void setConditionStateEnabled( uint32_t conditionIdx, bool enabled )
+      {
+        assert( conditionIdx < m_conditionStates.size() );
+
+        auto& state = m_conditionStates[ conditionIdx ];
+        state.m_enabled = enabled;
       }
     };
 

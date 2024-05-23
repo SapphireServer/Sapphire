@@ -68,4 +68,9 @@ namespace Sapphire::Network::Util::Packet
 
   void sendActorControlTarget( const std::set< uint64_t >& characterIds, uint32_t srcId, uint16_t category, uint32_t param1 = 0,
                                uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
+
+  void sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId,
+                       uint32_t kind, uint32_t nameId, uint32_t talkerId,
+                       uint32_t param1 = 0, uint32_t param2= 0, uint32_t param3 = 0, uint32_t param4 = 0,
+                       uint32_t param5 = 0, uint32_t param6= 0, uint32_t param7 = 0, uint32_t param8 = 0 );
 }
