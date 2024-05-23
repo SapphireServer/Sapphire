@@ -730,7 +730,7 @@ namespace Sapphire
       {
         auto dataJ = json.at( "data" );
         auto hateSrcJ = dataJ.at( "hateSrc" );
-        auto actorRef = dataJ.at( "spawnActor" );
+        auto actorRef = dataJ.at( "spawnActor" ).get< std::string >();
         auto flags = dataJ.at( "flags" ).get< uint32_t >();
 
         // todo: hateSrc
@@ -739,7 +739,7 @@ namespace Sapphire
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( "EncounterTimeline::Timepoint::from_json: SpawnBNpc invalid actor ref: %s", actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::Timepoint::from_json: SpawnBNpc invalid actor ref: %s" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags );
       }
@@ -747,7 +747,7 @@ namespace Sapphire
       case TimepointDataType::SetBNpcFlags:
       {
         auto dataJ = json.at( "data" );
-        auto actorRef = dataJ.at( "spawnActor" );
+        auto actorRef = dataJ.at( "spawnActor" ).get< std::string >();
         auto flags = dataJ.at( "flags" ).get< uint32_t >();
 
         // todo: hateSrc
@@ -756,7 +756,7 @@ namespace Sapphire
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( "EncounterTimeline::Timepoint::from_json: SetBNpcFlags invalid actor ref: %s", actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::Timepoint::from_json: SetBNpcFlags invalid actor ref: %s" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags );
         // todo: SetBNpcFlags
