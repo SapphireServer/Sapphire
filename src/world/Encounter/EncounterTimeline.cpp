@@ -8,18 +8,20 @@
 #include <Actor/EventObject.h>
 #include <Actor/Player.h>
 
+#include <Event/Director.h>
 
 #include <Manager/ActionMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
+#include <Territory/QuestBattle.h>
 #include <Util/UtilMath.h>
 
 namespace Sapphire
 {
-  bool EncounterTimeline::ConditionHp::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+  bool EncounterTimeline::ConditionHp::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
   {
-    auto pBNpc = pInstance->getActiveBNpcByLayoutId( layoutId );
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( layoutId );
     if( !pBNpc )
       return false;
 
@@ -38,33 +40,34 @@ namespace Sapphire
     return false;
   };
 
-  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+  bool EncounterTimeline::ConditionDirectorVar::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
   {
-    // todo: use something other than InstanceContentPtr
-    if( !pInstance )
-      return false;
+
+    Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
+    if( pDirector == nullptr )
+      pDirector = pTeri->getAsQuestBattle();
 
     switch( m_conditionId )
     {
       case ConditionId::DirectorVarEquals:
-        return pInstance->getDirectorVar( param.index ) == param.value;
+        return pDirector->getDirectorVar( param.index ) == param.value;
       case ConditionId::DirectorVarGreaterThan:
-        return pInstance->getDirectorVar( param.index ) > param.value;
+        return pDirector->getDirectorVar( param.index ) > param.value;
       case ConditionId::DirectorFlagsEquals:
-        return pInstance->getFlags() == param.flags;
+        return pDirector->getFlags() == param.flags;
       case ConditionId::DirectorFlagsGreaterThan:
-        return pInstance->getFlags() > param.flags;
+        return pDirector->getFlags() > param.flags;
       case ConditionId::DirectorSeqEquals:
-        return pInstance->getSequence() == param.seq;
+        return pDirector->getSequence() == param.seq;
       case ConditionId::DirectorSeqGreaterThan:
-        return pInstance->getSequence() > param.seq;
+        return pDirector->getSequence() > param.seq;
     }
     return false;
   }
 
-  bool EncounterTimeline::ConditionCombatState::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+  bool EncounterTimeline::ConditionCombatState::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
   {
-    auto pBattleNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
+    auto pBattleNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
 
     switch( combatState )
     {
@@ -86,20 +89,20 @@ namespace Sapphire
     return false;
   }
 
-  bool EncounterTimeline::ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+  bool EncounterTimeline::ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
   {
     auto elapsed = time - pack.getStartTime();
     // todo: check encounter time
     return elapsed >= this->duration;
   }
 
-  bool EncounterTimeline::ConditionBNpcFlags::isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+  bool EncounterTimeline::ConditionBNpcFlags::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
   {
-    auto pBNpc = pInstance->getActiveBNpcByLayoutId( this->layoutId );
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
     return pBNpc && pBNpc->hasFlag( this->flags );
   }
 
-  void EncounterTimeline::Timepoint::update( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const
+  void EncounterTimeline::Timepoint::update( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const
   {
     state.m_lastTick = time;
 
@@ -112,7 +115,7 @@ namespace Sapphire
       case TimepointDataType::Idle:
       {
         auto pIdleData = std::dynamic_pointer_cast< TimepointDataIdle, TimepointData >( getData() );
-        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pIdleData->m_layoutId );
+        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pIdleData->m_layoutId );
 
         if( pBNpc )
         {
@@ -124,7 +127,7 @@ namespace Sapphire
       case TimepointDataType::CastAction:
       {
         auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( getData() );
-        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pActionData->m_layoutId );
+        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pActionData->m_layoutId );
         // todo: filter the correct target
         // todo: tie to mechanic script?
         // todo: mechanic should probably just be an Action::onTick, with instance/director passed to it
@@ -141,7 +144,7 @@ namespace Sapphire
       case TimepointDataType::MoveTo:
       {
         auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( getData() );
-        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pMoveToData->m_layoutId );
+        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pMoveToData->m_layoutId );
 
         if( pBNpc )
         {
@@ -171,12 +174,12 @@ namespace Sapphire
         auto params = pLogMessage->m_params;
 
         // todo: probably should use ContentDirector
-        if( pInstance )
+        
         {
           auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-          for( uint32_t id : pInstance->getSpawnedPlayerIds() )
+          for( auto player : pTeri->getPlayers() )
           {
-            auto pPlayer = playerMgr.getPlayer( id );
+            auto pPlayer = player.second;
             if( pPlayer )
               playerMgr.sendLogMessage( *pPlayer.get(), pLogMessage->m_messageId,
                                         params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ], params[ 4 ] );
@@ -190,18 +193,16 @@ namespace Sapphire
         auto pBtData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >( getData() );
         auto params = pBtData->m_params;
 
-        if( pInstance )
+
+        auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+        for( auto player : pTeri->getPlayers() )
         {
-          auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-          for( uint32_t id : pInstance->getSpawnedPlayerIds() )
-          {
-            auto pPlayer = playerMgr.getPlayer( id );
-            if( pPlayer )
-              playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, pBtData->m_handlerId,
-                                        pBtData->m_kind, pBtData->m_nameId, pBtData->m_talkerId,
-                                        params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
-                                        params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
-          }
+          auto pPlayer = player.second;
+          if( pPlayer )
+            playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, pBtData->m_handlerId,
+                                      pBtData->m_kind, pBtData->m_nameId, pBtData->m_talkerId,
+                                      params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
+                                      params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
         }
       }
       break;
@@ -215,22 +216,28 @@ namespace Sapphire
         uint32_t val = 0;
         uint32_t param = 0;
 
+        // todo: expand for fates
+        Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
+        if( pDirector == nullptr )
+          pDirector = pTeri->getAsQuestBattle();
+
         // todo: this should never not be set?
         // todo: probably should use ContentDirector
-        if( pInstance )
+        // todo: this needs to resend packets too
+        if( pDirector )
         {
           switch( m_type )
           {
             case TimepointDataType::DirectorVar:
-              val = pInstance->getDirectorVar( pDirectorData->m_data.index );
+              val = pDirector->getDirectorVar( pDirectorData->m_data.index );
               param = pDirectorData->m_data.value.val;
               break;
             case TimepointDataType::DirectorFlags:
-              val = pInstance->getFlags();
+              val = pDirector->getFlags();
               param = pDirectorData->m_data.flags;
               break;
             case TimepointDataType::DirectorSeq:
-              val = pInstance->getSequence();
+              val = pDirector->getSequence();
               param = pDirectorData->m_data.seq;
               break;
             default:
@@ -254,16 +261,17 @@ namespace Sapphire
             default: break;
           }
 
+          // todo: resend packets
           switch( m_type )
           {
             case TimepointDataType::DirectorVar:
-              pInstance->setVar( pDirectorData->m_data.index, val );
+              pDirector->setDirectorVar( pDirectorData->m_data.index, val );
               break;
             case TimepointDataType::DirectorFlags:
-              pInstance->setFlags( val );
+              pDirector->setDirectorFlags( val );
               break;
             case TimepointDataType::DirectorSeq:
-              pInstance->setSequence( val );
+              pDirector->setDirectorSequence( val );
               break;
             default:
               break;
@@ -284,21 +292,20 @@ namespace Sapphire
       case TimepointDataType::SpawnBNpc:
       {
         auto pSpawnData = std::dynamic_pointer_cast< TimepointDataSpawnBNpc, TimepointData >( getData() );
-        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pSpawnData->m_layoutId );
+        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pSpawnData->m_layoutId );
 
         if( pBNpc )
         {
           pBNpc->clearFlags();
           pBNpc->setFlag( pSpawnData->m_flags );
-          // todo: pBNpc->hateListAdd();
-          pInstance->pushActor( pBNpc );
+          pBNpc->init();
         }
       }
       break;
       case TimepointDataType::SetBNpcFlags:
       {
         auto pBNpcFlagData = std::dynamic_pointer_cast< TimepointDataBNpcFlags, TimepointData >( getData() );
-        auto pBNpc = pInstance->getActiveBNpcByLayoutId( pBNpcFlagData->m_layoutId );
+        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pBNpcFlagData->m_layoutId );
 
         if( pBNpc )
         {
@@ -311,20 +318,35 @@ namespace Sapphire
       case TimepointDataType::SetEObjState:
       {
         auto pEObjData = std::dynamic_pointer_cast< TimepointDataEObjState, TimepointData >( getData() );
-        auto pEObj = pInstance->getEObjById( pEObjData->m_eobjId );
 
+        auto pInstance = pTeri->getAsInstanceContent();
+        auto pQBattle = pTeri->getAsQuestBattle();
+        
+        // todo: event objects on quest battles
         // todo: SetEObjAnimationFlag?
-        if( pEObj )
+
+        if( pInstance )
         {
-          pEObj->setState( pEObjData->m_state );
-          // todo: resend the eobj spawn packet?
+          auto pEObj = pInstance->getEObjById( pEObjData->m_eobjId );
+          if( pEObj )
+          {
+            pEObj->setState( pEObjData->m_state );
+            // todo: resend the eobj spawn packet?
+          }
         }
       }
       break;
       case TimepointDataType::SetBgm:
       {
         auto pBgmData = std::dynamic_pointer_cast< TimepointDataBGM, TimepointData >( getData() );
-        pInstance->setCurrentBGM( pBgmData->m_bgmId );
+        auto pInstance = pTeri->getAsInstanceContent();
+        auto pQBattle = pTeri->getAsQuestBattle();
+
+        // todo: quest battles refactor to inherit InstanceContent
+        if( pInstance )
+        {
+          pInstance->setCurrentBGM( pBgmData->m_bgmId );
+        }
       }
       break;
       case TimepointDataType::SetCondition:
@@ -390,7 +412,7 @@ namespace Sapphire
       callback( this, action );
   }
 
-  void EncounterTimeline::Timepoint::execute( InstanceContentPtr pInstance, uint64_t time )
+  void EncounterTimeline::Timepoint::execute( TerritoryPtr pTeri, uint64_t time )
   {
     switch( m_type )
     {
@@ -405,10 +427,10 @@ namespace Sapphire
   }
   */
 
-  void EncounterTimeline::Timepoint::execute( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const
+  void EncounterTimeline::Timepoint::execute( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const
   {
     state.m_startTime = time;
-    update( state, self, pInstance, time );
+    update( state, self, pTeri, time );
   }
 
   //
@@ -543,17 +565,17 @@ namespace Sapphire
       {}
     };
 
-    const static std::unordered_map< std::string, TargetSelectFilterId > targetFilterMap =
+    const static std::unordered_map< std::string, TargetSelectFilterFlags > targetFilterMap =
     {
-      { "self",       TargetSelectFilterId::Self },
-      { "tank",       TargetSelectFilterId::Tank },
-      { "healer",     TargetSelectFilterId::Healer },
-      { "dps",        TargetSelectFilterId::Dps },
-      { "dpsMelee",   TargetSelectFilterId::DpsMelee },
-      { "dpsRanged",  TargetSelectFilterId::DpsRanged },
-      { "furthest",   TargetSelectFilterId::Furthest },
-      { "aggro1",     TargetSelectFilterId::Aggro1 },
-      { "aggro2",     TargetSelectFilterId::Aggro2 }
+      { "self",       TargetSelectFilterFlags::Self },
+      { "tank",       TargetSelectFilterFlags::Tank },
+      { "healer",     TargetSelectFilterFlags::Healer },
+      { "dps",        TargetSelectFilterFlags::Dps },
+      { "melee",      TargetSelectFilterFlags::Melee },
+      { "ranged",     TargetSelectFilterFlags::Ranged },
+      { "furthest",   TargetSelectFilterFlags::Furthest },
+      { "aggro1",     TargetSelectFilterFlags::Aggro1 },
+      { "aggro2",     TargetSelectFilterFlags::Aggro2 }
     };
 
     const static std::unordered_map< std::string, TimepointCallbackType > callbackTypeMap =
@@ -596,8 +618,7 @@ namespace Sapphire
     {
       case TimepointDataType::Idle:
       {
-        auto duration = json.at( "duration" ).get< uint32_t >();
-        m_pData = std::make_shared< TimepointDataIdle >( selfLayoutId, duration );
+        m_pData = std::make_shared< TimepointDataIdle >( selfLayoutId, m_duration );
       }
       break;
       case TimepointDataType::CastAction:
@@ -777,7 +798,7 @@ namespace Sapphire
         auto index = dataJ.at( "conditionId" ).get< uint32_t >();
         auto enabled = dataJ.at( "enabled" ).get< bool >();
 
-        m_pData = std::make_shared< TimepointDataCondition >( index, enabled );
+        m_pData = std::make_shared< TimepointDataCondition >( index - 1, enabled );
       }
       break;
 
@@ -786,9 +807,9 @@ namespace Sapphire
     }
   }
 
-  EncounterTimeline::TimelinePack EncounterTimeline::getEncounterPack( uint32_t encounterId, bool reload )
+  EncounterTimeline::TimelinePack EncounterTimeline::getEncounterPack( const std::string& name, bool reload )
   {
-    static std::map< uint32_t, TimelinePack > cache = {};
+    static std::map< std::string, TimelinePack > cache = {};
     const static std::unordered_map< std::string, ConditionId > conditionIdMap =
     {
       { "hpPctLessThan",            ConditionId::HpPctLessThan },
@@ -810,10 +831,10 @@ namespace Sapphire
     };
 
     TimelinePack pack;
-    if( cache.find( encounterId ) != cache.end() && !reload )
-      return cache.at( encounterId );
+    if( cache.find( name ) != cache.end() && !reload )
+      return cache.at( name );
 
-    std::string encounter_name( fmt::format( std::string( "data/EncounterTimelines/EncounterTimeline%u.json" ), encounterId ) );
+    std::string encounter_name( fmt::format( std::string( "data/EncounterTimelines/%s.json" ), name ) );
 
     std::fstream f( encounter_name );
 
@@ -829,7 +850,7 @@ namespace Sapphire
     for( const auto& actorJ : json.at( "actors" ).items() )
     {
       TimelineActor actor;
-      auto actorV = actorJ.value();
+      auto& actorV = actorJ.value();
       actor.m_hp = actorV.at( "hp" ).get< uint32_t >();
       actor.m_layoutId = actorV.at( "layoutId" ).get< uint32_t >();
       actor.m_name = actorV.at( "name" ).get< std::string >();
@@ -850,7 +871,7 @@ namespace Sapphire
       // todo: are phases linked by actor, or global in the json
       for( const auto& phaseJ : json.at( "phases" ).items() )
       {
-        auto phaseV = phaseJ.value();
+        auto& phaseV = phaseJ.value();
         const auto id = phaseV.at( "id" ).get< uint32_t >();
         const auto& phaseName = phaseV.at( "name" ).get< std::string >();
         const auto& timepointsJ = phaseV.at( "timepoints" );
@@ -880,7 +901,7 @@ namespace Sapphire
     // build the condition list
     for( const auto& pcJ : json.at( "conditions" ).items() )
     {
-      auto pcV = pcJ.value();
+      auto& pcV = pcJ.value();
       auto conditionName = pcV.at( "condition" ).get< std::string >();
       auto description = pcV.at( "description" ).get< std::string >();
       auto loop = pcV.at( "loop" ).get< bool >();
@@ -956,16 +977,57 @@ namespace Sapphire
     for( const auto& actor : actorNameMap )
       pack.addTimelineActor( actor.second );
 
-    std::string name( "Encounter" );
-    name += std::to_string( encounterId );
-
     pack.setName( name );
 
     // todo: reload will probably kill the server when CastAction.callbacks are added
     if( reload )
-      cache[ encounterId ] = pack;
+      cache[ name ] = pack;
     else
-      cache.emplace( std::make_pair( encounterId, pack ) );
+      cache.emplace( std::make_pair( name, pack ) );
     return pack;
   }
+
+  Entity::BNpcPtr EncounterTimeline::TimelineActor::spawnSubActor( TerritoryPtr pTeri, const std::string& name )
+  {
+    // todo: retail straight up respawns sub actors, even bnpc parts (qarn adjudicator body parts respawn each time with new ids)
+    auto flags = Entity::BNpcFlag::Invincible | Entity::BNpcFlag::Untargetable |
+                 Entity::BNpcFlag::Immobile | Entity::BNpcFlag::AutoAttackDisabled |
+                 Entity::BNpcFlag::TurningDisabled;
+
+    auto pActor = getSubActor( name );
+    if( pActor == nullptr )
+    {
+      auto pParent = pTeri->getActiveBNpcByLayoutId( m_layoutId );
+      pActor = pTeri->createBNpcFromLayoutId( m_layoutId, 1000, pParent->getBNpcType() );
+      m_subActors[ name ] = pActor;
+    }
+    pActor->setInvincibilityType( Common::InvincibilityIgnoreDamage );
+    pActor->setFlag( flags );
+    pActor->init();
+
+    pTeri->pushActor( pActor );
+    return pActor;
+  }
+
+  Entity::BNpcPtr EncounterTimeline::TimelineActor::getSubActor( const std::string& name )
+  {
+    if( auto it = m_subActors.find( name ); it != m_subActors.end() )
+      return it->second;
+    return nullptr;
+  }
+
+  void EncounterTimeline::TimelineActor::resetSubActors( TerritoryPtr pTeri )
+  {
+    for( auto& subActor : m_subActors )
+    {
+      if( subActor.second )
+      {
+        auto pBNpc = subActor.second;
+        pTeri->removeActor( pBNpc );
+        // todo: despawn?
+        subActor.second = nullptr;
+      }
+    }
+  }
+
 }// namespace Sapphire

@@ -186,6 +186,10 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
+    Entity::PlayerPtr getPlayer( uint32_t playerId );
+
+    std::unordered_map< uint32_t, Entity::PlayerPtr > getPlayers();
+
     InstanceContentPtr getAsInstanceContent();
 
     QuestBattlePtr getAsQuestBattle();

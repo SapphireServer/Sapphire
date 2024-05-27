@@ -765,6 +765,18 @@ Entity::EventObjectPtr Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
+{
+  if( auto it = m_playerMap.find( playerId ); it != m_playerMap.end() )
+    return it->second;
+  return nullptr;
+}
+
+std::unordered_map< uint32_t, Entity::PlayerPtr > Territory::getPlayers()
+{
+  return m_playerMap;
+}
+
 InstanceContentPtr Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );

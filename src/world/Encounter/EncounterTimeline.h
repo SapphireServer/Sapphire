@@ -127,18 +127,25 @@ namespace Sapphire
       OnActionExecute
     };
 
-    enum class TargetSelectFilterId : uint32_t
+    enum class TargetSelectFilterFlags : uint32_t
     {
-      Self,
-      Tank,
-      Healer,
-      Dps,
-      DpsMelee,
-      DpsRanged,
-      Furthest,
+      Self           = 0x00000000,
 
-      Aggro1,
-      Aggro2
+      Player         = 0x00000001,
+
+      EnemyBattalion = 0x00000002,
+      OwnBattalion   = 0x00000004,
+
+      Tank           = 0x00000010,
+      Healer         = 0x00000020,
+      Dps            = 0x00000040,
+      Melee          = 0x00000080,
+      Ranged         = 0x00000100,
+      Closest        = 0x00000200,
+      Furthest       = 0x00000400,
+
+      Aggro1         = 0x10000000,
+      Aggro2         = 0x20000000,
     };
 
     enum class MoveType : uint32_t
@@ -171,13 +178,13 @@ namespace Sapphire
 
     struct TargetSelectFilter
     {
-      TargetSelectFilterId m_flags;
+      TargetSelectFilterFlags m_flags;
     };
 
     //
     // Timepoint.m_pData objects
     //
-    using TimepointCallbackFunc = std::function< void( InstanceContentPtr, uint64_t ) >;
+    using TimepointCallbackFunc = std::function< void( TerritoryPtr, uint64_t ) >;
     // Timepoint Data Objects
     struct TimepointCallbackData :
       public std::enable_shared_from_this< TimepointCallbackData >
@@ -437,8 +444,8 @@ namespace Sapphire
 
       void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
       // todo: separate execute/update into onStart and onTick?
-      void update( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const;
-      void execute( TimepointState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const;
+      void update( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const;
+      void execute( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const;
     };
 
     class Phase :
@@ -452,7 +459,7 @@ namespace Sapphire
       std::vector< Timepoint > m_timepoints;
 
       // todo: i wrote this very sleep deprived, ensure it is actually sane
-      void execute( ConditionState& state, TimelineActor& self, InstanceContentPtr pInstance, uint64_t time ) const
+      void execute( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const
       {
         if( state.m_startTime == 0 )
           state.m_startTime = time;
@@ -476,12 +483,12 @@ namespace Sapphire
 
           if( timepoint.canExecute( tpState, timepointElapsed ) )
           {
-            timepoint.execute( tpState, self, pInstance, time );
+            timepoint.execute( tpState, self, pTeri, time );
             state.m_phaseInfo.m_lastTimepointTime = time;
           }
           else if( !timepoint.finished( tpState, timepointElapsed ) )
           {
-            timepoint.update( tpState, self, pInstance, time );
+            timepoint.update( tpState, self, pTeri, time );
           }
 
           if( timepoint.durationElapsed( timepointElapsed ) && timepoint.finished( tpState, timepointElapsed ) )
@@ -543,15 +550,15 @@ namespace Sapphire
         this->m_enabled = json.at( "enabled" ).get< bool >();
       }
 
-      void execute( ConditionState& state, TimelineActor& self, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+      void execute( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
       {
         state.m_startTime = time;
-        m_phase.execute( state, self, pInstance, time );
+        m_phase.execute( state, self, pTeri, time );
       };
 
-      void update( ConditionState& state, TimelineActor& self, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+      void update( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
       {
-        m_phase.execute( state, self, pInstance, time );
+        m_phase.execute( state, self, pTeri, time );
       }
 
       void setEnabled( ConditionState& state, bool enabled )
@@ -597,7 +604,7 @@ namespace Sapphire
         return m_phase.completed( state ) && m_loop && ( state.m_startTime + m_cooldown <= time );
       }
 
-      virtual bool isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const
+      virtual bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
       {
         return false;
       };
@@ -611,6 +618,8 @@ namespace Sapphire
       std::vector< PhaseConditionPtr > m_phaseConditions;
       std::queue< PhaseConditionPtr > m_phaseHistory;
       std::vector< ConditionState > m_conditionStates;
+      // PARENTNAME_SUBACTOR_1, ..., PARENTNAME_SUBACTOR_69
+      std::map< std::string, Entity::BNpcPtr > m_subActors;
     public:
       uint32_t m_layoutId{ 0 };
       uint32_t m_hp{ 0 };
@@ -634,10 +643,9 @@ namespace Sapphire
         m_conditionStates[ m_conditionStates.size() - 1 ].m_enabled = pCondition->isDefaultEnabled();
       }
 
-      // todo: make this sane and pass info down
-      void update( InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time )
+      // todo: make this sane
+      void update( TerritoryPtr pTeri, TimelinePack& pack, uint64_t time )
       {
-        // todo: handle auto attacks and make it so they dont fire during boss intermission phases
         // todo: handle interrupts
         for( auto i = 0; i < m_phaseConditions.size(); ++i )
         {
@@ -645,7 +653,7 @@ namespace Sapphire
           auto& state = m_conditionStates[ i ];
 
           // ignore if not enabled, unless overriden to enable
-          if( !pCondition->isDefaultEnabled() && !pCondition->isStateEnabled( state ) )
+          if( !pCondition->isStateEnabled( state ) )
             continue;
 
           if( pCondition->completed( state ) )
@@ -658,11 +666,11 @@ namespace Sapphire
           }
           else if( pCondition->inProgress( state ) )
           {
-            pCondition->update( state, *this, pInstance, pack, time );
+            pCondition->update( state, *this, pTeri, pack, time );
           }
-          else if( pCondition->isConditionMet( state, pInstance, pack, time ) )
+          else if( pCondition->isConditionMet( state, pTeri, pack, time ) )
           {
-            pCondition->execute( state, *this, pInstance, pack, time );
+            pCondition->execute( state, *this, pTeri, pack, time );
             m_phaseHistory.push( pCondition );
 
             if( pack.getStartTime() == 0 )
@@ -688,12 +696,27 @@ namespace Sapphire
         auto& state = m_conditionStates[ conditionIdx ];
         state.m_enabled = enabled;
       }
+
+      void resetAllConditionStates()
+      {
+        for( auto i = 0; i < m_phaseConditions.size(); ++i )
+        {
+          const auto& pCondition = m_phaseConditions[ i ];
+          auto& state = m_conditionStates[ i ];
+
+          pCondition->reset( state );
+        }
+      }
+
+      Entity::BNpcPtr spawnSubActor( TerritoryPtr pTeri, const std::string& name );
+      Entity::BNpcPtr getSubActor( const std::string& name );
+      void resetSubActors( TerritoryPtr pTeri );
     };
 
     // todo: actually handle solo stuff properly (or tie to zone director/content director at least)
     class TimelinePack
     {
-      TimelinePackType m_type{TimelinePackType::Solo};
+      TimelinePackType m_type{TimelinePackType::EncounterFight};
       std::vector< TimelineActor > m_actors;
       std::string m_name;
 
@@ -717,7 +740,7 @@ namespace Sapphire
 
       void addTimelineActor( const TimelineActor& actor )
       {
-        m_actors.push_back( actor );
+        m_actors.emplace_back( actor );
       }
 
       void setStartTime( uint64_t time )
@@ -730,10 +753,10 @@ namespace Sapphire
         return m_startTime;
       }
 
-      void update( InstanceContentPtr pInstance, uint64_t time )
+      void update( TerritoryPtr pTeri, uint64_t time )
       {
         for( auto& actor : m_actors )
-          actor.update( pInstance, *this, time );
+          actor.update( pTeri, *this, time );
       }
     };
 
@@ -756,7 +779,7 @@ namespace Sapphire
       void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId,
         const std::unordered_map< std::string, TimelineActor >& actors );
 
-      bool isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const override;
+      bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
     class ConditionDirectorVar : PhaseCondition
@@ -774,7 +797,7 @@ namespace Sapphire
       } param;
 
       void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId );
-      bool isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const override;
+      bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
     class ConditionEncounterTimeElapsed : PhaseCondition
@@ -783,7 +806,7 @@ namespace Sapphire
       uint64_t duration;
 
       void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId );
-      bool isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const override;
+      bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
     class ConditionCombatState : PhaseCondition
@@ -793,7 +816,7 @@ namespace Sapphire
       CombatStateType combatState;
 
       void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
-      bool isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const override;
+      bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
     class ConditionBNpcFlags : PhaseCondition
@@ -803,11 +826,11 @@ namespace Sapphire
       uint32_t flags;
 
       void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
-      bool isConditionMet( ConditionState& state, InstanceContentPtr pInstance, TimelinePack& pack, uint64_t time ) const override;
+      bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
   public:
 
-    TimelinePack getEncounterPack( uint32_t encounterId, bool reload = false );
+    TimelinePack getEncounterPack( const std::string& name, bool reload = false );
   };
 }// namespace Sapphire
