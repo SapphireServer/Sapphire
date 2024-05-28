@@ -53,8 +53,8 @@ namespace Sapphire
     //
     // Enums
     // 
-    // EncounterFight::OnTick() { switch EncounterTimepointConditionId }
-    enum class ConditionId : uint32_t
+    // EncounterFight::OnTick() { switch EncounterTimepointcondition }
+    enum class ConditionType : uint32_t
     {
       HpPctLessThan,
       HpPctBetween,
@@ -391,12 +391,12 @@ namespace Sapphire
     struct TimepointDataCondition : public TimepointData
     {
       // todo: rng?
-      uint32_t m_index;
+      uint32_t m_conditionId;
       bool m_enabled;
 
-      TimepointDataCondition( uint32_t index, bool enabled ) :
+      TimepointDataCondition( uint32_t conditionId, bool enabled ) :
         TimepointData( TimepointDataType::SetCondition ),
-        m_index( index ),
+        m_conditionId( conditionId ),
         m_enabled( enabled )
       {
       }
@@ -493,7 +493,7 @@ namespace Sapphire
 
           if( timepoint.durationElapsed( timepointElapsed ) && timepoint.finished( tpState, timepointElapsed ) )
           {
-            timepoint.reset( tpState );
+            // timepoint.reset( tpState );
             // make sure this timepoint isnt run again unless phase loops
             ++i;
             state.m_phaseInfo.m_lastTimepointIndex = i;
@@ -513,9 +513,6 @@ namespace Sapphire
         state.m_phaseInfo.m_startTime = 0;
         state.m_phaseInfo.m_lastTimepointIndex = 0;
         state.m_phaseInfo.m_lastTimepointTime = 0;
-
-        state.m_phaseInfo.m_timepointStates.clear();
-        state.m_phaseInfo.m_timepointStates.resize( m_timepoints.size() );
       }
 
       bool completed( const ConditionState& state ) const
@@ -529,25 +526,27 @@ namespace Sapphire
       public std::enable_shared_from_this< PhaseCondition >
     {
     protected:
-      ConditionId m_conditionId{ 0 };
+      ConditionType m_conditionType{ 0 };
       Phase m_phase;
       std::string m_description;
       uint32_t m_cooldown{ 0 };
       bool m_loop{ false };
       bool m_enabled{ true };
+      uint32_t m_id{ 0 };
 
     public:
       PhaseCondition() {}
       ~PhaseCondition() {}
 
-      virtual void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId )
+      virtual void from_json( nlohmann::json& json, Phase& phase, ConditionType condition )
       {
-        this->m_conditionId = conditionId;
+        this->m_conditionType = condition;
         this->m_loop = json.at( "loop" ).get< bool >();
         //this->m_cooldown = json.at( "cooldown" ).get< uint32_t >();
         this->m_phase = phase;
         this->m_description = json.at( "description" ).get< std::string >();
         this->m_enabled = json.at( "enabled" ).get< bool >();
+        this->m_id = json.at( "id" ).get< uint32_t >();
       }
 
       void execute( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
@@ -609,15 +608,18 @@ namespace Sapphire
         return false;
       };
 
+      uint32_t getId() const
+      {
+        return m_id;
+      }
     };
     using PhaseConditionPtr = std::shared_ptr< PhaseCondition >;
 
     class TimelineActor
     {
     protected:
-      std::vector< PhaseConditionPtr > m_phaseConditions;
-      std::queue< PhaseConditionPtr > m_phaseHistory;
-      std::vector< ConditionState > m_conditionStates;
+      std::unordered_map< uint32_t, PhaseConditionPtr > m_phaseConditions;
+      std::unordered_map< uint32_t, ConditionState > m_conditionStates;
       // PARENTNAME_SUBACTOR_1, ..., PARENTNAME_SUBACTOR_69
       std::map< std::string, Entity::BNpcPtr > m_subActors;
     public:
@@ -638,19 +640,19 @@ namespace Sapphire
 
       void addPhaseCondition( PhaseConditionPtr pCondition )
       {
-        m_phaseConditions.push_back( pCondition );
-        m_conditionStates.push_back( {} );
-        m_conditionStates[ m_conditionStates.size() - 1 ].m_enabled = pCondition->isDefaultEnabled();
+        m_phaseConditions.emplace( std::make_pair( pCondition->getId(), pCondition ) );
+        m_conditionStates[ pCondition->getId() ] = {};
+        m_conditionStates[ pCondition->getId() ].m_enabled = pCondition->isDefaultEnabled();
       }
 
       // todo: make this sane
       void update( TerritoryPtr pTeri, TimelinePack& pack, uint64_t time )
       {
         // todo: handle interrupts
-        for( auto i = 0; i < m_phaseConditions.size(); ++i )
+        for( const auto& condition : m_phaseConditions)
         {
-          const auto& pCondition = m_phaseConditions[ i ];
-          auto& state = m_conditionStates[ i ];
+          const auto& pCondition = condition.second;
+          auto& state = m_conditionStates[ pCondition->getId() ];
 
           // ignore if not enabled, unless overriden to enable
           if( !pCondition->isStateEnabled( state ) )
@@ -671,7 +673,6 @@ namespace Sapphire
           else if( pCondition->isConditionMet( state, pTeri, pack, time ) )
           {
             pCondition->execute( state, *this, pTeri, pack, time );
-            m_phaseHistory.push( pCondition );
 
             if( pack.getStartTime() == 0 )
               pack.setStartTime( state.m_startTime );
@@ -679,30 +680,30 @@ namespace Sapphire
         }
       }
 
-      void resetConditionState( uint32_t conditionIdx )
+      void resetConditionState( uint32_t conditionId )
       {
-        assert( conditionIdx < m_phaseConditions.size() );
-
-        const auto& pCondition = m_phaseConditions[ conditionIdx ];
-        auto& state = m_conditionStates[ conditionIdx ];
-
-        pCondition->reset( state );
+        if( auto it = m_phaseConditions.find( conditionId ); it != m_phaseConditions.end() )
+        {
+          auto& state = m_conditionStates.at( it->first );
+          it->second->reset( state );
+        }
       }
 
-      void setConditionStateEnabled( uint32_t conditionIdx, bool enabled )
+      void setConditionStateEnabled( uint32_t conditionId, bool enabled )
       {
-        assert( conditionIdx < m_conditionStates.size() );
-
-        auto& state = m_conditionStates[ conditionIdx ];
-        state.m_enabled = enabled;
+        if( auto it = m_conditionStates.find( conditionId ); it != m_conditionStates.end() )
+        {
+          auto& state = m_conditionStates.at( it->first );
+          state.m_enabled = enabled;
+        }
       }
 
       void resetAllConditionStates()
       {
-        for( auto i = 0; i < m_phaseConditions.size(); ++i )
+        for( const auto& condition : m_phaseConditions )
         {
-          const auto& pCondition = m_phaseConditions[ i ];
-          auto& state = m_conditionStates[ i ];
+          const auto& pCondition = condition.second;
+          auto& state = m_conditionStates.at( condition.first );
 
           pCondition->reset( state );
         }
@@ -776,7 +777,7 @@ namespace Sapphire
         };
       } hp;
 
-      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId,
+      void from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
         const std::unordered_map< std::string, TimelineActor >& actors );
 
       bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
@@ -796,7 +797,7 @@ namespace Sapphire
         uint8_t flags;
       } param;
 
-      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId );
+      void from_json( nlohmann::json& json, Phase& phase, ConditionType condition );
       bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
@@ -805,7 +806,7 @@ namespace Sapphire
     public:
       uint64_t duration;
 
-      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId );
+      void from_json( nlohmann::json& json, Phase& phase, ConditionType condition );
       bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
@@ -815,7 +816,7 @@ namespace Sapphire
       uint32_t layoutId;
       CombatStateType combatState;
 
-      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
+      void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors );
       bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
@@ -825,7 +826,7 @@ namespace Sapphire
       uint32_t layoutId;
       uint32_t flags;
 
-      void from_json( nlohmann::json& json, Phase& phase, ConditionId conditionId, const std::unordered_map< std::string, TimelineActor >& actors );
+      void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors );
       bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
     };
 
