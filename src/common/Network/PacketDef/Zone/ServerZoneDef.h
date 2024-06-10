@@ -1020,7 +1020,11 @@ namespace Sapphire::Network::Packets::Server
     uint8_t sightseeingHeavenswardUnlock;
     uint8_t unknown9E[26];
     uint32_t exp[Common::CLASSJOB_SLOTS];
-    uint32_t unknown138[7];
+    uint32_t pvpTotalExp;
+    uint32_t unknownPvp124;
+    uint32_t pvpExp;
+    uint32_t pvpFrontlineOverallRanks[3];
+    uint32_t unknown138;
     uint16_t levels[Common::CLASSJOB_SLOTS];
     /*
     uint16_t unknown178[8];

@@ -211,7 +211,7 @@ enum ServerZoneIpcType :
   EventStart = 0x0146, // updated 6.58 hotfix 2
   EventFinish = 0x0339, // updated 6.58 hotfix 2
 
-  EventReturn = 0x11d, // updated 6.45
+  EventReturn = 0xd9, // updated 6.48
 
   EventLinkshell = 0x1169,
 
@@ -391,7 +391,7 @@ enum ClientZoneIpcType :
   ReqCountdownInitiate = 0x03E3, // updated 6.58 hotfix 2
   ReqCountdownCancel = 0x023a,   // updated 6.31h
 
-  ZoneLineHandler = 0x34e,   // updated 6.48
+  ZoneLineHandler = 0x326,   // updated 6.58 hotfix 2
   ClientTrigger = 0x035C, // updated 6.58 hotfix 2
   DiscoveryHandler = 0x038B, // updated 5.58h
 
