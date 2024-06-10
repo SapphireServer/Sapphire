@@ -320,7 +320,7 @@ void Sapphire::Network::GameConnection::eventYieldHandler( const Packets::FFXIVA
 
   scriptMgr.onEventYield( player, eventId, scene, param );
 
-  auto response = makeZonePacket< FFXIVIpcEventContinue >( player.getId() );
+  auto response = makeZonePacket< FFXIVIpcEventReturn >( player.getId() );
   response->data().eventId = eventId;
   response->data().scene = scene;
   player.queuePacket( response );

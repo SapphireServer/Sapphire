@@ -686,32 +686,41 @@ namespace Sapphire::Network::Packets::Server
     uint16_t activeMinion;
     uint8_t u23;
     uint8_t u24;
-    uint8_t spawnIndex;
+    uint8_t spawnIndex; // need to recheck the position of this field in the range of u23-u25
+
+    //uint16_t u25c;
+    uint8_t u25cl; // spilted to prevent extra padding byte
+    uint8_t u25ch;
+
     uint8_t state;
     uint8_t persistentEmote;
     uint8_t modelType;
     uint8_t subtype;
     uint8_t voice;
-    uint16_t u25c;
     uint8_t enemyType;
+    uint8_t u28;
     uint8_t level;
     uint8_t classJob;
     uint8_t u26d;
-    uint16_t u27a;
+
+    //uint16_t u27a;
+    uint8_t u27al; // spilted to prevent extra padding byte
+    uint8_t u27ah;
+
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
     uint8_t elementData[6];
-    uint8_t unknown5_5;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
+    uint8_t unknown6_58[10];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
-    uint32_t unk30[2];
+    uint8_t padding[6];
   };
 
   /**
@@ -784,6 +793,7 @@ namespace Sapphire::Network::Packets::Server
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
+    uint8_t unknown6_58[10];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
@@ -953,10 +963,9 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcPlayerSetup : FFXIVIpcBasePacket< PlayerSetup >
   {
-    // plain C types for a bit until the packet is actually fixed.
-    // makes conversion between different editors easier.
     uint64_t contentId;
     uint64_t crest;
+    uint64_t unknown10;
     uint32_t charId;
     uint32_t restedExp;
     uint32_t companionCurrentExp;
@@ -978,10 +987,6 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknownPvp52[4];
     uint16_t pvpSeriesExp;
     uint16_t playerCommendations;
-    uint16_t unknown5C;
-    uint16_t unknown5E;
-    uint16_t pvpFrontlineWeeklyCampaigns;
-    uint16_t enhancedAnimaGlassProgress;
     uint16_t unknown64[8];
     uint16_t pvpRivalWingsTotalMatches;
     uint16_t pvpRivalWingsTotalVictories;
@@ -1002,36 +1007,22 @@ namespace Sapphire::Network::Packets::Server
     uint8_t namedayDay;
     uint8_t cityState;
     uint8_t homepoint;
-    uint8_t unknown83;
-    uint8_t petHotBar;
+    uint8_t unknown8D[3];
     uint8_t companionRank;
     uint8_t companionStars;
     uint8_t companionSp;
-    uint8_t companionUnk86;
+    uint8_t companionUnk93;
     uint8_t companionColor;
     uint8_t companionFavFeed;
     uint8_t favAetheryteCount;
-    uint8_t unknown8C[4];
-    uint8_t hasRelicBook;
-    uint8_t relicBookId;
+    uint8_t unknown97[5];
     uint8_t sightseeing21To80Unlock;
     uint8_t sightseeingHeavenswardUnlock;
-    uint8_t unknown94[2];
-    uint8_t craftingMasterMask;
-    uint8_t unknown97[9];
-    uint8_t unknownA0[3];
-    uint8_t pvpSeriesLevel;
-    uint8_t pvpMalmstonesClaimed;
-    uint8_t lastSeasonMalmstonesEarned;
-    uint8_t lastSeasonMalmstonesClaimed;
-    uint8_t unknownA7[7];
-    uint32_t exp[30];
-    uint32_t pvpTotalExp;
-    uint32_t unknownPvp124;
-    uint32_t pvpExp;
-    uint32_t pvpFrontlineOverallRanks[3];
-    uint32_t unknown138;
-    uint16_t levels[30];
+    uint8_t unknown9E[26];
+    uint32_t exp[Common::CLASSJOB_SLOTS];
+    uint32_t unknown138[7];
+    uint16_t levels[Common::CLASSJOB_SLOTS];
+    /*
     uint16_t unknown178[8];
     uint16_t fishingRecordsFishId[33];
     uint16_t fishingRecordsFishLength[33];
@@ -1039,13 +1030,15 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknown21C[6];
     uint16_t pvpFrontlineWeeklyRanks[3];
     uint16_t unknownMask22C[8];
+    */
+    uint8_t unknown194[218];
     uint8_t companionName[21];
     uint8_t companionDefRank;
     uint8_t companionAttRank;
     uint8_t companionHealRank;
     uint8_t mountGuideMask[33];
     uint8_t ornamentMask[4];
-    uint8_t unknown281[16];
+    uint8_t unknown281[23];
     char name[32];
     uint8_t unknown293[16];
     uint8_t unknown2A3;
@@ -1185,7 +1178,6 @@ namespace Sapphire::Network::Packets::Server
     uint8_t isSpecialist;
     uint16_t syncedLevel;   // Locks actions, equipment, prob more. Player's current level (synced).
     uint16_t classLevel;  // Locks roles, prob more. Player's actual unsynced level.
-    uint32_t roleActions[10];
   };
 
   /**
@@ -2270,7 +2262,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t padding[3];
   };
 
-  struct FFXIVIpcEventContinue : FFXIVIpcBasePacket< EventContinue >
+  struct FFXIVIpcEventReturn : FFXIVIpcBasePacket< EventReturn >
   {
     uint32_t eventId;
     uint16_t scene;

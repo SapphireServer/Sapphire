@@ -118,7 +118,15 @@ enum class BaseParam: uint8_t
 //BeastReputationRank.exd
 enum class BeastReputationRank: uint8_t
 {
-    None = 0, Neutral = 1, Recognized = 2, Friendly = 3, Trusted = 4, Respected = 5, Honored = 6, Sworn = 7, Allied = 8,
+    None = 0,
+    Neutral = 1,
+    Recognized = 2,
+    Friendly = 3,
+    Trusted = 4,
+    Respected = 5,
+    Honored = 6,
+    Sworn = 7,
+    Allied = 8,
 };
 
 ///////////////////////////////////////////////////////////
@@ -190,6 +198,8 @@ enum class ClassJob: uint8_t
     Dancer = 38,
     Reaper = 39,
     Sage = 40,
+    //Viper = 41,
+    //Pictomancer = 42,
 };
 
 ///////////////////////////////////////////////////////////
@@ -227,13 +237,22 @@ enum class ContentType: uint8_t
     UltimateRaids = 28,
     //5 = 29,
     VAndCDungeonFinder = 30,
+    OceanFishing = 31,
+    TripleTriad = 32,
+    TheHunt = 33,
+    Fishing = 34,
+    GATE = 35,
+    //6 = 36,
 };
 
 ///////////////////////////////////////////////////////////
 //EmoteCategory.exd
 enum class EmoteCategory: uint8_t
 {
-    None = 0, General = 1, Special = 2, Expressions = 3,
+    None = 0,
+    General = 1,
+    Special = 2,
+    Expressions = 3,
     //1 = 4,
 };
 
@@ -241,14 +260,21 @@ enum class EmoteCategory: uint8_t
 //ExVersion.exd
 enum class ExVersion: uint8_t
 {
-    ARealmReborn = 0, Heavensward = 1, Stormblood = 2, Shadowbringers = 3, Endwalker = 4,
+    ARealmReborn = 0,
+    Heavensward = 1,
+    Stormblood = 2,
+    Shadowbringers = 3,
+    Endwalker = 4,
 };
 
 ///////////////////////////////////////////////////////////
 //GrandCompany.exd
 enum class GrandCompany: uint8_t
 {
-    None = 0, Maelstrom = 1, OrderoftheTwinAdder = 2, ImmortalFlames = 3,
+    None = 0,
+    Maelstrom = 1,
+    OrderoftheTwinAdder = 2,
+    ImmortalFlames = 3,
 };
 
 ///////////////////////////////////////////////////////////
@@ -384,6 +410,8 @@ enum class ItemUICategory: uint8_t
     DancersArm = 107,
     ReapersArm = 108,
     SagesArm = 109,
+    //VipersArm = 110,
+    //PictomancersArm = 111,
 };
 
 ///////////////////////////////////////////////////////////
@@ -469,7 +497,7 @@ enum class ItemSearchCategory: uint8_t
     DarkKnightsArms = 76,
     MachinistsArms = 77,
     AstrologiansArms = 78,
-    AirshipAndSubmersibleComponents = 79,
+    AirshipSubmersibleComponents = 79,
     OrchestrionComponents = 80,
     GardeningItems = 81,
     Paintings = 82,
@@ -481,16 +509,16 @@ enum class ItemSearchCategory: uint8_t
     ReapersArms = 88,
     SagesArms = 89,
     RegistrableMiscellany = 90,
-    /*1 = 91,
-    2 = 92,
-    3 = 93,
-    4 = 94,
-    5 = 95,
-    6 = 96,
-    7 = 97,
-    8 = 98,
-    9 = 99,
-    10 = 100,*/
+    //1 = 91,
+    //2 = 92,
+    //3 = 93,
+    //4 = 94,
+    //5 = 95,
+    //6 = 96,
+    //7 = 97,
+    //8 = 98,
+    //9 = 99,
+    //10 = 100,
 };
 
 ///////////////////////////////////////////////////////////
@@ -551,7 +579,15 @@ enum class OnlineStatus: uint8_t
 //Race.exd
 enum class Race: uint8_t
 {
-    None = 0, Hyur = 1, Elezen = 2, Lalafell = 3, Miqote = 4, Roegadyn = 5, AuRa = 6, Hrothgar = 7, Viera = 8,
+    None = 0,
+    Hyur = 1,
+    Elezen = 2,
+    Lalafell = 3,
+    Miqote = 4,
+    Roegadyn = 5,
+    AuRa = 6,
+    Hrothgar = 7,
+    Viera = 8,
 };
 
 ///////////////////////////////////////////////////////////
@@ -581,11 +617,18 @@ enum class Tribe: uint8_t
 //Town.exd
 enum class Town: uint8_t
 {
-    Nowheresville = 0, LimsaLominsa = 1, Gridania = 2, Uldah = 3, Ishgard = 4, //= 5,
+    Nowheresville = 0,
+    LimsaLominsa = 1,
+    Gridania = 2,
+    Uldah = 3,
+    Ishgard = 4,
+    // = 5,
     //1 = 6,
-    Kugane = 7, //2 = 8,
+    Kugane = 7,
+    //2 = 8,
     //3 = 9,
-    Crystarium = 10, //4 = 11,
+    Crystarium = 10,
+    //4 = 11,
     OldSharlayan = 12,
     //5 = 13,
 };
@@ -773,6 +816,8 @@ enum class Weather: uint8_t
     DimensionalDisruption6 = 176,
     Pandaemonium3 = 177,
     Pandaemonium4 = 178,
+    LyricalCatharsis = 179,
+    Vacuity3 = 180,
 };
 
 ///////////////////////////////////////////////////////////
@@ -792,7 +837,7 @@ enum class HousingAppeal: uint8_t
     Sanctum = 10,
     Venue = 11,
     Florist = 12,
-    //= 13,
+    // = 13,
     Library = 14,
     PhotoStudio = 15,
     HauntedHouse = 16,

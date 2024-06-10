@@ -25,8 +25,8 @@ namespace Sapphire::Common
   const uint16_t MAX_PLAYER_LEVEL = 90;
   const uint8_t CURRENT_EXPANSION_ID = 4;
 
-  const uint8_t CLASSJOB_TOTAL = 40;
-  const uint8_t CLASSJOB_SLOTS = 30;
+  const uint8_t CLASSJOB_TOTAL = 42;
+  const uint8_t CLASSJOB_SLOTS = 32;
 
   const uint8_t TOWN_COUNT = 7;
 
