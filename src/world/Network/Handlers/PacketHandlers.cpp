@@ -47,6 +47,8 @@
 #include "Manager/HousingMgr.h"
 #include "Manager/RNGMgr.h"
 #include "Manager/ItemMgr.h"
+#include "Manager/PartyMgr.h"
+#include "Manager/ChatChannelMgr.h"
 
 #include "Action/Action.h"
 #include "Inventory/Item.h"
@@ -91,18 +93,12 @@ void Sapphire::Network::GameConnection::setSearchInfoHandler( const Packets::FFX
     // mark player as new adventurer
     player.setNewAdventurer( true );
 
-  auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
-  statusPacket->data().onlineStatusFlags = status;
-  queueOutPacket( statusPacket );
-
   auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
   searchInfoPacket->data().onlineStatusFlags = status;
   searchInfoPacket->data().selectRegion = player.getSearchSelectRegion();
   strcpy( searchInfoPacket->data().searchMessage, player.getSearchMessage() );
   queueOutPacket( searchInfoPacket );
 
-  player.sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                             static_cast< uint8_t >( player.getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Network::GameConnection::reqSearchInfoHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,
@@ -444,31 +440,58 @@ void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVA
     int32_t entrysizes = sizeof( listPacket->data().entries );
     memset( listPacket->data().entries, 0, sizeof( listPacket->data().entries ) );
 
-    listPacket->data().entries[ 0 ].bytes[ 2 ] = player.getCurrentTerritory()->getTerritoryTypeId();
-    listPacket->data().entries[ 0 ].bytes[ 3 ] = 0x80;
-    listPacket->data().entries[ 0 ].bytes[ 4 ] = 0x02;
-    listPacket->data().entries[ 0 ].bytes[ 6 ] = 0x3B;
-    listPacket->data().entries[ 0 ].bytes[ 11 ] = 0x10;
-    listPacket->data().entries[ 0 ].classJob = static_cast< uint8_t >( player.getClass() );
-    listPacket->data().entries[ 0 ].contentId = player.getContentId();
-    listPacket->data().entries[ 0 ].level = player.getLevel();
-    listPacket->data().entries[ 0 ].zoneId = player.getCurrentTerritory()->getTerritoryTypeId();
-    listPacket->data().entries[ 0 ].zoneId1 = 0x0100;
-    // TODO: no idea what this does
-    //listPacket.data().entries[0].one = 1;
+    auto fillEntryAt = [ &listPacket ]( int i, Entity::PlayerPtr nextPlayer, bool isLeader )
+    {
+      listPacket->data().entries[ i ].bytes[ 2 ] = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
+      listPacket->data().entries[ i ].bytes[ 3 ] = 0x80;
+      listPacket->data().entries[ i ].bytes[ 4 ] = 0x02;
+      listPacket->data().entries[ i ].bytes[ 6 ] = 0x3B;
+      listPacket->data().entries[ i ].bytes[ 8 ] = isLeader;
+      listPacket->data().entries[ i ].bytes[ 11 ] = 0x10;
+      listPacket->data().entries[ i ].classJob = static_cast< uint8_t >( nextPlayer->getClass() );
+      listPacket->data().entries[ i ].contentId = nextPlayer->getContentId();
+      listPacket->data().entries[ i ].level = nextPlayer->getLevel();
+      listPacket->data().entries[ i ].zoneId = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
+      listPacket->data().entries[ i ].zoneId1 = 0x0100;
+      // TODO: no idea what this does
+      //listPacket.data().entries[0].one = 1;
 
-    memcpy( listPacket->data().entries[ 0 ].name, player.getName().c_str(), strlen( player.getName().c_str() ) );
+      memcpy( listPacket->data().entries[ i ].name, nextPlayer->getName().c_str(), strlen( nextPlayer->getName().c_str() ) );
 
-    // GC icon
-    listPacket->data().entries[ 0 ].bytes1[ 0 ] = 2;
-    // client language J = 0, E = 1, D = 2, F = 3
-    listPacket->data().entries[ 0 ].bytes1[ 1 ] = 1;
-    // user language settings flag J = 1, E = 2, D = 4, F = 8
-    listPacket->data().entries[ 0 ].bytes1[ 2 ] = 1 + 2; 
-    listPacket->data().entries[ 0 ].onlineStatusMask = player.getOnlineStatusMask();
+      // GC icon
+      listPacket->data().entries[ i ].bytes1[ 0 ] = 2;
+      // client language J = 0, E = 1, D = 2, F = 3
+      listPacket->data().entries[ i ].bytes1[ 1 ] = 1;
+      // user language settings flag J = 1, E = 2, D = 4, F = 8
+      listPacket->data().entries[ i ].bytes1[ 2 ] = 1 + 2 + 4 + 8; 
+      listPacket->data().entries[ i ].onlineStatusMask = nextPlayer->getOnlineStatusMask();
+    };
+    auto nextPlayer = player.getAsPlayer();
+    fillEntryAt( 0, nextPlayer, false );
+    if( player.getPartyId() != 0 )
+    {
+      // fill party members
+      auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+      auto& server = Common::Service< World::ServerMgr >::ref();
+      auto pParty = partyMgr.getParty( player.getPartyId() );
+      assert( pParty );
+
+      int i = 1;
+      for( auto id : pParty->MemberId )
+      {
+        nextPlayer = server.getSession( id )->getPlayer();
+        if( nextPlayer->getId() == player.getId() )
+        {
+          // data already in entry 0, only change the leader flag
+          listPacket->data().entries[ 0 ].bytes[ 8 ] = pParty->LeaderId == id;
+          continue;
+        }
+        fillEntryAt( i, nextPlayer, pParty->LeaderId == id );
+        i++;
+      }
+    }
 
     queueOutPacket( listPacket );
-
   }
   else if( type == 2 )
   { // friend list
@@ -604,10 +627,22 @@ void Sapphire::Network::GameConnection::tellHandler( const Packets::FFXIVARR_PAC
 
   if( player.isActingAsGm() )
   {
-    tellPacket->data().flags |= TellFlags::GmTellMsg;
+    tellPacket->data().flags |= ChatFromType::GmTellMsg;
   }
 
   pTargetPlayer->queueChatPacket( tellPacket );
+}
+
+void Sapphire::Network::GameConnection::channelChatHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  const auto packet = ChatChannelPacket< Client::FFXIVIpcChannelChatHandler >( inPacket );
+  auto& data = packet.data();
+
+  auto& chatChannelMgr = Common::Service< ChatChannelMgr >::ref();
+
+  std::string message = std::string( data.message );
+
+  chatChannelMgr.sendMessageToChannel( data.channelId, player, message );
 }
 
 void Sapphire::Network::GameConnection::performNoteHandler( const Packets::FFXIVARR_PACKET_RAW& inPacket,

@@ -179,6 +179,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( tellHandler );
 
+    DECLARE_HANDLER( channelChatHandler );
+
     DECLARE_HANDLER( reqPlaceHousingItem );
 
     DECLARE_HANDLER( reqMoveHousingItem );
@@ -200,6 +202,14 @@ namespace Sapphire::Network
     DECLARE_HANDLER( eventYieldHandler );
 
     DECLARE_HANDLER( inventoryEquipRecommendedItemsHandler );
+
+    DECLARE_HANDLER( socialInviteHandler );
+    DECLARE_HANDLER( socialReplyHandler );
+
+    DECLARE_HANDLER( partyLeaveHandler );
+    DECLARE_HANDLER( partyDisbandHandler );
+    DECLARE_HANDLER( partyKickHandler );
+    DECLARE_HANDLER( partyChangeLeaderHandler );
   };
 
 }

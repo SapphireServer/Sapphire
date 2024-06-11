@@ -8,6 +8,9 @@
 #include "Network/GameConnection.h"
 #include "Actor/Player.h"
 
+#include "Service.h"
+#include "Manager/PartyMgr.h"
+
 #include "Session.h"
 
 namespace fs = std::filesystem;
@@ -73,6 +76,12 @@ void Sapphire::World::Session::close()
   if( m_pPlayer )
   {
     m_pPlayer->clearBuyBackMap();
+    if( m_pPlayer->getPartyId() != 0 )
+    {
+      // offline player is removed from party for now;
+      auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+      partyMgr.onLeave( *m_pPlayer );
+    }
     // do one last update to db
     m_pPlayer->updateSql();
     // reset the zone, so the zone handler knows to remove the actor

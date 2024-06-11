@@ -143,7 +143,15 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::InventoryEquipRecommendedItems, "InventoryEquipRecommendedItemsHandler", &GameConnection::inventoryEquipRecommendedItemsHandler );
 
   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
+  setChatHandler( ClientChatIpcType::ChannelChatReq, "ChannelChatReq", &GameConnection::channelChatHandler );
 
+  setZoneHandler( ClientZoneIpcType::SocialInviteHandler, "SocialInviteHandler", &GameConnection::socialInviteHandler );
+  setZoneHandler( ClientZoneIpcType::SocialReplyHandler, "SocialReplyHandler", &GameConnection::socialReplyHandler );
+  
+  setZoneHandler( ClientZoneIpcType::PartyLeaveHandler, "PartyLeaveHandler", &GameConnection::partyLeaveHandler );
+  setZoneHandler( ClientZoneIpcType::PartyDisbandHandler, "PartyDisbandHandler", &GameConnection::partyDisbandHandler );
+  setZoneHandler( ClientZoneIpcType::PartyKickHandler, "PartyKickHandler", &GameConnection::partyKickHandler );
+  setZoneHandler( ClientZoneIpcType::PartyChangeLeaderHandler, "PartyChangeLeaderHandler", &GameConnection::partyChangeLeaderHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

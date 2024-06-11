@@ -256,19 +256,12 @@ void Sapphire::Network::GameConnection::gm1Handler( const Packets::FFXIVARR_PACK
     {
       targetPlayer->setOnlineStatusMask( param1 );
 
-      auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( player.getId() );
-      statusPacket->data().onlineStatusFlags = param1;
-      queueOutPacket( statusPacket );
-
       auto searchInfoPacket = makeZonePacket< FFXIVIpcSetSearchInfo >( player.getId() );
       searchInfoPacket->data().onlineStatusFlags = param1;
       searchInfoPacket->data().selectRegion = targetPlayer->getSearchSelectRegion();
       strcpy( searchInfoPacket->data().searchMessage, targetPlayer->getSearchMessage() );
       targetPlayer->queuePacket( searchInfoPacket );
 
-      targetPlayer->sendToInRangeSet( makeActorControl( player.getId(), SetStatusIcon,
-                                                        static_cast< uint8_t >( player.getOnlineStatus() ) ),
-                                      true );
       player.sendNotice( "Icon for {0} was set to {1}", targetPlayer->getName(), param1 );
       break;
     }
