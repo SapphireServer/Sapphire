@@ -88,7 +88,7 @@ enum ServerZoneIpcType :
 
   LogMessage = 0x316, // updated 6.48
 
-  Chat = 0xF2d7, // updated 6.48
+  Chat = 0x0325, // updated 6.58 hotfix 2
   PartyChat = 0x0065,
 
   WorldVisitList = 0xF0FE, // added 4.5
