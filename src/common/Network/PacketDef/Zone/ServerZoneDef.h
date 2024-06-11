@@ -680,34 +680,28 @@ namespace Sapphire::Network::Packets::Server
     uint16_t fateID;
     uint16_t mPCurr;
     uint16_t mPMax;
-    uint16_t unk; // == 0
+    uint16_t unk;
     uint16_t modelChara;
     uint16_t rotation;
     uint16_t currentMount;
     uint16_t activeMinion;
     uint8_t u23;
     uint8_t u24;
-    uint8_t spawnIndex; // need to recheck the position of this field in the range of u23-u25
-
-    //uint16_t u25c;
-    uint8_t u25cl; // spilted to prevent extra padding byte
-    uint8_t u25ch;
-
+    uint8_t u25;
+    uint8_t u26; 
+    uint8_t spawnIndex;
     uint8_t state;
     uint8_t persistentEmote;
     uint8_t modelType;
     uint8_t subtype;
     uint8_t voice;
     uint8_t enemyType;
-    uint8_t u28;
+    uint8_t u27;
     uint8_t level;
     uint8_t classJob;
-    uint8_t u26d;
-
-    //uint16_t u27a;
-    uint8_t u27al; // spilted to prevent extra padding byte
-    uint8_t u27ah;
-
+    uint8_t u28;
+    uint8_t u29;
+    uint8_t u30;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
@@ -772,25 +766,27 @@ namespace Sapphire::Network::Packets::Server
     uint16_t activeMinion;
     uint8_t u23;
     uint8_t u24;
+    uint8_t u6_58a;
+    uint8_t u6_58b;
     uint8_t spawnIndex;
     uint8_t state;
     uint8_t persistantEmote;
     uint8_t modelType;
     uint8_t subtype;
     uint8_t voice;
-    uint16_t u25c;
+    uint8_t u25c;
     uint8_t enemyType;
     uint8_t level;
     uint8_t classJob;
-    uint8_t u26d;
-    uint16_t u27a;
+    uint8_t u26;
+    uint8_t u27;
+    uint8_t u28;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
     uint8_t elemental[6];
-    uint8_t unknown5_5;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
@@ -803,7 +799,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t bNPCPartSlot;
     uint8_t unk32;
     uint16_t unk33;
-    uint32_t unk34[2];
+    uint16_t unk34;
   };
 
   /**
