@@ -295,13 +295,13 @@ enum ServerZoneIpcType :
   DailyQuests = 0x2EF,           // updated 6.58 hotfix 2
   DailyQuestRepeatFlags = 0x134, // updated 6.58 hotfix 2
 
-  MapUpdate = 0xa3,    // updated 6.48
-  MapUpdate4 = 0x345,  // updated 6.48
-  MapUpdate8 = 0x10c,  // updated 6.48
-  MapUpdate16 = 0x360, // updated 6.48
-  MapUpdate32 = 0x1b1, // updated 6.48
-  MapUpdate64 = 0x325, // updated 6.48
-  MapUpdate128 = 0x9c, // updated 6.48
+  MapUpdate = 0xF0A3,    // updated 6.48
+  MapUpdate4 = 0xF345,  // updated 6.48
+  MapUpdate8 = 0xF10c,  // updated 6.48
+  MapUpdate16 = 0xF360, // updated 6.48
+  MapUpdate32 = 0xF1b1, // updated 6.48
+  MapUpdate64 = 0xF325, // updated 6.48
+  MapUpdate128 = 0xF09c, // updated 6.48
 
   /// Doman Mahjong //////////////////////////////////////
   MahjongOpenGui = 0x02A4,       // only available in mahjong instance
@@ -414,7 +414,7 @@ enum ClientZoneIpcType :
   WithinRangeEventHandler = 0x1b9,  // updated 6.48
   OutOfRangeEventHandler = 0x263,   // updated 6.48
   EnterTeriEventHandler = 0x105,    // updated 6.58 hotfix 2
-  ShopEventHandler = 0x0384,        // updated 5.58h
+  ShopEventHandler = 0xF384,        // updated 5.58h
   ReturnEventHandler = 0x07D,        // updated 6.58 hotfix 2
   TradeReturnEventHandler = 0x37D,  // updated 6.58 hotfix 2
   TradeReturnEventHandler2 = 0x354, // updated 6.48
