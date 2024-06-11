@@ -62,7 +62,8 @@ Sapphire::Territory::Territory() :
   m_weatherOverride( Weather::None ),
   m_lastMobUpdate( 0 ),
   m_nextEObjId( 0x400D0000 ),
-  m_nextActorId( 0x500D0000 )
+  m_nextActorId( 0x500D0000 ),
+  m_effectCounter( 1 )
 {
 }
 
@@ -72,7 +73,8 @@ Sapphire::Territory::Territory( uint16_t territoryTypeId, uint32_t guId,
   m_nextEObjId( 0x400D0000 ),
   m_nextActorId( 0x500D0000 ),
   m_lastUpdate( 0 ),
-  m_lastActivityTime( Util::getTimeMs() )
+  m_lastActivityTime( Util::getTimeMs() ),
+  m_effectCounter( 1 )
 {
   auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
   m_guId = guId;
