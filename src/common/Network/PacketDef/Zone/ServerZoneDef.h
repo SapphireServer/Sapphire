@@ -554,11 +554,11 @@ namespace Sapphire::Network::Packets::Server
      */
     uint32_t sequence;
 
-    float animationLockTime; // maybe? doesn't seem to do anything
+    float animationLockTime;
     uint32_t someTargetId; // always 0x0E000000?
 
     /*!
-     * @brief The cast sequence from the originating player. Should only be sent to the source, 0 for every other player.
+     * @brief The cast sequence from the originating player.
      *
      * This needs to match the sequence sent from the player in the action start packet otherwise you'll cancel the
      * initial animation and start a new one once the packet arrives.
@@ -575,7 +575,7 @@ namespace Sapphire::Network::Packets::Server
 
     uint16_t padding_22[3];
 
-    uint8_t effects[65];
+    uint8_t effects[64];
 
     uint16_t padding_6A[3];
 
