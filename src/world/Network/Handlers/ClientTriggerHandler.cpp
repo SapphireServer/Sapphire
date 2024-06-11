@@ -527,7 +527,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::CameraMode:
     {
-      if( param11 == 1 )
+      if( ( param11 & 0xFF ) == 1 )
       {
         player.setOnlineStatusMask( player.getOnlineStatusMask() | 0x0000000000040000 );
       }

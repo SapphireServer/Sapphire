@@ -479,6 +479,7 @@ namespace Sapphire::Network::Packets::Server
       uint32_t sourceActorId;
     } statusEntries[4];
 
+    uint32_t padding;
   };
 
   /**
