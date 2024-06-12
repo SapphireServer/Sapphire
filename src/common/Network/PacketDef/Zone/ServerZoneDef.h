@@ -944,10 +944,12 @@ namespace Sapphire::Network::Packets::Server
   /**
   * Structural representation of the packet sent by the server to initialize
   * the client UI upon initial connection.
+  *
+  * verified = at correct offset, if the next field is not verified it may have an incorrect size
   */
   struct FFXIVIpcPlayerSetup : FFXIVIpcBasePacket< PlayerSetup >
   {
-    uint64_t contentId;
+    uint64_t contentId; // verified
     uint64_t crest;
     uint64_t unknown10;
     uint32_t charId;
@@ -970,74 +972,74 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknown50;
     uint16_t unknownPvp52[4];
     uint16_t pvpSeriesExp;
-    uint16_t playerCommendations;
+    uint16_t playerCommendations; // verified
     uint16_t unknown64[8];
     uint16_t pvpRivalWingsTotalMatches;
     uint16_t pvpRivalWingsTotalVictories;
     uint16_t pvpRivalWingsWeeklyMatches;
     uint16_t pvpRivalWingsWeeklyVictories;
-    uint8_t maxLevel;
-    uint8_t expansion;
+    uint8_t maxLevel; // verified
+    uint8_t expansion; // verified
     uint8_t unknown76;
     uint8_t unknown77;
     uint8_t unknown78;
-    uint8_t race;
-    uint8_t tribe;
-    uint8_t gender;
-    uint8_t currentJob;
-    uint8_t currentClass;
-    uint8_t deity;
-    uint8_t namedayMonth;
-    uint8_t namedayDay;
-    uint8_t cityState;
-    uint8_t homepoint;
+    uint8_t race; // verified
+    uint8_t tribe; // verified
+    uint8_t gender; // verified
+    uint8_t currentJob; // verified
+    uint8_t currentClass; // verified
+    uint8_t deity; // verified
+    uint8_t namedayMonth; // verified
+    uint8_t namedayDay; // verified
+    uint8_t cityState; // verified
+    uint8_t homepoint; // verified
     uint8_t unknown8D[3];
-    uint8_t companionRank;
-    uint8_t companionStars;
-    uint8_t companionSp;
+    uint8_t companionRank; // verified
+    uint8_t companionStars; // verified
+    uint8_t companionSp; // verified
     uint8_t companionUnk93;
-    uint8_t companionColor;
+    uint8_t companionColor; // verified
     uint8_t companionFavFeed;
-    uint8_t favAetheryteCount;
+    uint8_t favAetheryteCount; // verified
     uint8_t unknown97[5];
     uint8_t sightseeing21To80Unlock;
     uint8_t sightseeingHeavenswardUnlock;
     uint8_t unknown9E[26];
-    uint32_t exp[32];
+    uint32_t exp[32]; // verified
     uint32_t pvpTotalExp;
     uint32_t unknownPvp124;
     uint32_t pvpExp;
     uint32_t pvpFrontlineOverallRanks[3];
     uint32_t unknown138;
-    uint16_t levels[32];
+    uint16_t levels[32]; // verified
     uint8_t unknown194[218];
-    char companionName[21];
-    uint8_t companionDefRank;
-    uint8_t companionAttRank;
-    uint8_t companionHealRank;
+    char companionName[21]; // verified
+    uint8_t companionDefRank; // verified
+    uint8_t companionAttRank; // verified
+    uint8_t companionHealRank; // verified
     uint8_t mountGuideMask[33];
     uint8_t ornamentMask[4];
     uint8_t unknown281[23];
-    char name[32];
+    char name[32]; // verified
     uint8_t unknown293[16];
     uint8_t unknown2A3[16];
     uint8_t unlockBitmask[64];
     uint8_t aetheryte[26];
-    uint16_t favoriteAetheryteIds[4];
+    uint16_t favoriteAetheryteIds[4]; // verified
     uint16_t freeAetheryteId;
     uint16_t psPlusFreeAetheryteId;
-    uint8_t discovery[480];
-    uint8_t howto[36];
+    uint8_t discovery[480]; // verified
+    uint8_t howto[36]; // verified
     uint8_t unknown554[4];
     uint8_t minions[60];
     uint8_t chocoboTaxiMask[12];
     uint8_t watchedCutscenes[159];
     uint8_t companionBardingMask[12];
-    uint8_t companionEquippedHead;
-    uint8_t companionEquippedBody;
-    uint8_t companionEquippedLegs;
+    uint8_t companionEquippedHead; // verified
+    uint8_t companionEquippedBody; // verified
+    uint8_t companionEquippedLegs; // verified
     uint8_t unknownMask[287];
-    uint8_t pose[7];
+    uint8_t pose[7]; // verified
     uint8_t unknown6DF[3];
     uint8_t challengeLogComplete[13];
     uint8_t secretRecipeBookMask[12];
@@ -1052,18 +1054,18 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown7E6[49];
     uint8_t regionalFolkloreMask[6];
     uint8_t orchestrionMask[87];
-    uint8_t hallOfNoviceCompletion[3];
+    uint8_t hallOfNoviceCompletion[3]; // verified
     uint8_t animaCompletion[11];
     uint8_t unknown85E[41];
-    uint8_t unlockedRaids[28];
-    uint8_t unlockedDungeons[18];
-    uint8_t unlockedGuildhests[10];
-    uint8_t unlockedTrials[12];
+    uint8_t unlockedRaids[28]; // verified
+    uint8_t unlockedDungeons[18]; // verified
+    uint8_t unlockedGuildhests[10]; // verified
+    uint8_t unlockedTrials[12]; // verified
     uint8_t unlockedPvp[5];
-    uint8_t clearedRaids[28];
-    uint8_t clearedDungeons[18];
-    uint8_t clearedGuildhests[10];
-    uint8_t clearedTrials[12];
+    uint8_t clearedRaids[28]; // verified
+    uint8_t clearedDungeons[18]; // verified
+    uint8_t clearedGuildhests[10]; // verified
+    uint8_t clearedTrials[12]; // verified
     uint8_t clearedPvp[5];
     uint8_t unknown948[15];
   };
