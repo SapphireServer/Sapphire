@@ -346,7 +346,7 @@ enum ClientZoneIpcType :
   CFCancelHandler = 0x02B2,    // updated 5.58h
   CFRegisterDuty = 0x0312,     // updated 6.58 hotfix 2
   CFRegisterRoulette = 0x037A, // updated 5.58h
-  PlayTimeHandler = 0x02B7,    // updated 5.58h
+  PlayTimeHandler = 0x0378,    // updated 6.58 hotfix 2
   LogoutHandler = 0x384,       // updated 6.58 hotfix 2
   CancelLogout = 0x01e3,       // updated 6.31h
   CFDutyInfoHandler = 0xF078,  // updated 4.2
@@ -392,26 +392,26 @@ enum ClientZoneIpcType :
 
   ZoneLineHandler = 0x326,   // updated 6.58 hotfix 2
   ClientTrigger = 0x035C, // updated 6.58 hotfix 2
-  DiscoveryHandler = 0x038B, // updated 5.58h
+  DiscoveryHandler = 0x0129, // updated 6.58 hotfix 2
 
   SkillHandler = 0x07C,   // updated 6.58 hotfix 2
   GMCommand1 = 0x152,      // updated 6.58 hotfix 2
-  GMCommand2 = 0x299,     // updated 6.48
+  GMCommand2 = 0x306,     // updated 6.58 hotfix 2
   AoESkillHandler = 0x0FC, // updated 6.58 hotfix 2
 
   UpdatePositionHandler = 0x0256, // updated 6.58 hotfix 2
 
   InventoryModifyHandler = 0x023E, // updated 6.58 hotfix 2
 
-  InventoryEquipRecommendedItems = 0x01C9, // updated 5.58h
+  InventoryEquipRecommendedItems = 0x355, // updated 6.58 hotfix 2
 
   ReqPlaceHousingItem = 0x02D4, // updated 5.58h
   BuildPresetHandler = 0x0223,  // updated 5.58h
 
   TalkEventHandler = 0x23A,         // updated 6.58 hotfix 2
-  EmoteEventHandler = 0x00B0,       // updated 5.58h
+  EmoteEventHandler = 0x1B5,       // updated 6.58 hotfix 2
   WithinRangeEventHandler = 0x38E,  // updated 6.58 hotfix 2
-  OutOfRangeEventHandler = 0x1B5,   // updated 6.58 hotfix 2
+  OutOfRangeEventHandler = 0x200,   // updated 6.58 hotfix 2
   EnterTeriEventHandler = 0x105,    // updated 6.58 hotfix 2
   ShopEventHandler = 0xF384,        // updated 5.58h
   ReturnEventHandler = 0x07D,        // updated 6.58 hotfix 2
@@ -437,7 +437,7 @@ enum ClientZoneIpcType :
 
   PerformNoteHandler = 0x0243, // updated 5.58h
 
-  WorldInteractionHandler = 0x0274, // updated 5.58h
+  WorldInteractionHandler = 0x0295, // updated 6.58 hotfix 2
   Dive = 0x018C,                    // updated 6.30h
 };
 
