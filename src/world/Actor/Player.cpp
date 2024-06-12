@@ -571,6 +571,11 @@ bool Sapphire::Entity::Player::exitInstance()
     p->data().param[3] = d->getContentId();
     queuePacket( p );
 
+    auto p2 = makeZonePacket< FFXIVIpcCFUnk >( getId() );
+    p2->data().cfConditionId = d->getContentFinderConditionId();
+    p2->data().five = 5;
+    queuePacket( p2 );
+
     prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
   }
 

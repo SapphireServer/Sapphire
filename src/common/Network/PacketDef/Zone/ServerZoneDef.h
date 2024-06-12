@@ -2123,6 +2123,15 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown2;
   };
 
+  // used to clear CF state, otherwise the UI stays locked and cannot queue again.
+  struct FFXIVIpcCFUnk : FFXIVIpcBasePacket< CFUnk >
+  {
+    uint16_t cfConditionId;
+    uint16_t unknown1;
+    uint32_t five;
+    uint32_t unknown2[2];
+  };
+
   struct FFXIVIpcShopMessage : FFXIVIpcBasePacket< ShopMessage >
   {
     uint32_t shopId;

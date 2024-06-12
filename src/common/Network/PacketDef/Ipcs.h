@@ -78,6 +78,7 @@ enum ServerZoneIpcType :
   CFPlayerInNeed = 0xF07F,
   CFPreferredRole = 0x282,  // updated 6.58 hotfix 2
   CFCancel = 0x384,        // updated 6.58 hotfix 2
+  CFUnk = 0x196, // updated 6.58 hotfix 2
   SocialRequestError = 0xF0AD,
 
   CFRegistered = 0x029F,          // updated 5.58h
