@@ -341,10 +341,10 @@ enum ClientZoneIpcType :
 
   FinishLoadingHandler = 0x12A, // updated 6.58 hotfix 2
 
-  CFCommenceHandler = 0x0381, // updated 5.58h
+  CFCommenceHandler = 0x0242, // updated 6.58 hotfix 2
 
   CFCancelHandler = 0x02B2,    // updated 5.58h
-  CFRegisterDuty = 0x01BD,     // updated 5.58h
+  CFRegisterDuty = 0x0312,     // updated 6.58 hotfix 2
   CFRegisterRoulette = 0x037A, // updated 5.58h
   PlayTimeHandler = 0x02B7,    // updated 5.58h
   LogoutHandler = 0x384,       // updated 6.58 hotfix 2

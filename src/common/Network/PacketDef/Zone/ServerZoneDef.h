@@ -1607,15 +1607,12 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcCFNotify : FFXIVIpcBasePacket< CFNotify >
   {
-    uint32_t state1; // 3 = cancelled, 4 = duty ready
-    uint32_t state2; // if state1 == 3, state2 is cancelled reason
+    uint32_t state1;
+    uint32_t unknown[5];
 
-    uint32_t param1; // usually classJobId
-    uint32_t param2; // usually flag
-    uint32_t param3; // usually languages, sometimes join in progress timestamp
-
-    uint16_t param4; // usually roulette id
+    uint32_t unknown_one;
     uint16_t contents[5];
+    uint16_t padding;
   };
 
   /**
