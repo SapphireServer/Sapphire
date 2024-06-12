@@ -8704,7 +8704,7 @@ Sapphire::Data::Quest::Quest( uint32_t row_id, Sapphire::Data::ExdDataGenerated*
   classJobLevel1 = exdData->getField< uint16_t >( row, 7 );
   previousQuestJoin = exdData->getField< uint8_t >( row, 8 );
   previousQuest.push_back( exdData->getField< uint32_t >( row, 9 ) );
-  previousQuest.push_back( exdData->getField< uint32_t >( row, 10 ) );
+  previousQuest0Sequence = exdData->getField< uint8_t >( row, 10 );
   previousQuest.push_back( exdData->getField< uint32_t >( row, 11 ) );
   previousQuest.push_back( exdData->getField< uint32_t >( row, 12 ) );
   questLockJoin = exdData->getField< uint8_t >( row, 13 );

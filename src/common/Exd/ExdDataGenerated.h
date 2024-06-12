@@ -7513,6 +7513,7 @@ struct Quest
   uint16_t classJobLevel1;
   uint8_t previousQuestJoin;
   std::vector< uint32_t > previousQuest;
+  uint8_t previousQuest0Sequence;
   uint8_t questLockJoin;
   std::vector< uint32_t > questLock;
   uint16_t header;

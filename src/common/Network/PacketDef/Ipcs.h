@@ -74,7 +74,7 @@ enum ServerZoneIpcType :
   Logout = 0x0378, // updated 6.58 hotfix 2
   CFNotify = 0x0279, // updated 6.58 hotfix 2
   CFMemberStatus = 0x0079,
-  CFDutyInfo = 0x1be, // updated 6.48
+  CFDutyInfo = 0x2E8, // updated 6.58 hotfix 2?
   CFPlayerInNeed = 0xF07F,
   CFPreferredRole = 0x282,  // updated 6.58 hotfix 2
   CFCancel = 0x384,        // updated 6.58 hotfix 2
@@ -87,7 +87,7 @@ enum ServerZoneIpcType :
   SocialInviteResult = 0x01D7, // updated 5.58h
   CancelAllianceForming = 0xF0C6, // updated 4.2
 
-  LogMessage = 0x316, // updated 6.48
+  LogMessage = 0x19C, // updated 6.58 hotfix 2?
 
   Chat = 0x0325, // updated 6.58 hotfix 2
 
@@ -98,9 +98,9 @@ enum ServerZoneIpcType :
   ExamineSearchInfo = 0x014A, // updated 6.58 hotfix 2
   UpdateSearchInfo = 0x00CF, // updated 6.58 hotfix 2
   InitSearchInfo = 0x329,       // updated 6.58 hotfix 2
-  ExamineSearchComment = 0x199, // updated 6.48
+  ExamineSearchComment = 0x244, // updated 6.58 hotfix 2?
 
-  ServerNoticeShort = 0x0333, // updated 5.58h
+  ServerNoticeShort = 0xF333, // updated 5.58h
   ServerNotice = 0x33B,       // updated 6.58 hotfix 2
   SetOnlineStatus = 0x285,    // updated 6.58 hotfix 2
 
@@ -108,14 +108,14 @@ enum ServerZoneIpcType :
   CountdownCancel = 0x2B7,    // updated 6.58 hotfix 2
 
   PlayerAddedToBlacklist = 0xe2,     // updated 6.48
-  PlayerRemovedFromBlacklist = 0xd0, // updated 6.48
+  PlayerRemovedFromBlacklist = 0x201, // updated 6.58 hotfix 2?
   BlackList = 0x38A,                   // updated 6.58 hotfix 2
 
   LinkshellList = 0x2B2,           // updated 6.58 hotfix 2
-  CrossWorldLinkshellList = 0x3cc, // updated 6.48
-  FellowshipList = 0x1c5,          // updated 6.48
+  CrossWorldLinkshellList = 0x2EA, // updated 6.58 hotfix 2?
+  FellowshipList = 0x0BD,          // updated 6.58 hotfix 2?
 
-  MailDeleteRequest = 0xF1b6, // updated 6.48
+  MailDeleteRequest = 0x168, // updated 6.58 hotfix 2?
 
   // 12D - 137 - constant gap between 4.5x -> 5.0
   ReqMoogleMailList = 0xF138,      // updated 5.0
@@ -162,8 +162,8 @@ enum ServerZoneIpcType :
 
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-  PartyList = 0x16f,          // updated 6.48
-  PartyUpdate = 0x336,       // updated 6.48
+  PartyList = 0x164,         // updated 6.58 hotfix 2?
+  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2?
   HateRank = 0x2A7,            // updated 6.58 hotfix 2
   HateList = 0x26B,            // updated 6.58 hotfix 2
   ObjectSpawn = 0x03B8, // updated 6.58 hotfix 2
@@ -179,7 +179,7 @@ enum ServerZoneIpcType :
 
   ModelEquip = 0x27D,    // updated 6.58 hotfix 2
   Examine = 0x02C0, // updated 6.58 hotfix 2
-  CharaNameReq = 0x267, // updated 6.48
+  CharaNameReq = 0x33C, // updated 6.58 hotfix 2?
 
   // nb: see #565 on github
   UpdateRetainerItemSalePrice = 0xF19F, // updated 5.0
@@ -210,15 +210,15 @@ enum ServerZoneIpcType :
   EventStart = 0x0146, // updated 6.58 hotfix 2
   EventFinish = 0x0339, // updated 6.58 hotfix 2
 
-  EventReturn = 0xd9, // updated 6.48
+  EventReturn = 0x1F3, // updated 6.58 hotfix 2?
 
   EventLinkshell = 0x1169,
 
   QuestActiveList = 0x247,   // updated 6.58 hotfix 2
-  QuestUpdate = 0x2f0,       // updated 6.48
+  QuestUpdate = 0x1A4,       // updated 6.58 hotfix 2
   QuestCompleteList = 0x352, // updated 6.58 hotfix 2
 
-  QuestFinish = 0xf4,          // updated 6.48
+  QuestFinish = 0x2BB,         // updated 6.58 hotfix 2
   MSQTrackerComplete = 0x1A9,  // updated 6.58 hotfix 2
   MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
@@ -241,52 +241,52 @@ enum ServerZoneIpcType :
   CFAvailableContents = 0xF1FD, // updated 4.2
 
   WeatherChange = 0x021D, // updated 6.58 hotfix 2
-  PlayerTitleList = 0x17c, // updated 6.48
-  Discovery = 0x14f,       // updated 6.48
+  PlayerTitleList = 0x1FF, // updated 6.58 hotfix 2?
+  Discovery = 0x11E,       // updated 6.58 hotfix 2?
 
-  EorzeaTimeOffset = 0x1a2, // updated 6.48
+  EorzeaTimeOffset = 0x398, // updated 6.58 hotfix 2?
 
   EquipDisplayFlags = 0x33A, // updated 6.58 hotfix 2
 
   MiniCactpotInit = 0x0286, // added 5.31
   ShopMessage = 0x016F,     // updated 6.58 hotfix 2
-  LootMessage = 0x219,      // updated 6.48
+  LootMessage = 0x265,      // updated 6.58 hotfix 2
   ResultDialog = 0x0362, // updated 6.58 hotfix 2
   DesynthResult = 0x007F, // updated 6.58 hotfix 2
 
   /// Housing //////////////////////////////////////
 
   LandSetInitialize = 0x1C9,            // updated 6.58 hotfix 2
-  LandUpdate = 0x26c,                   // updated 6.48
-  LandAvailability = 0x258,             // updated 6.48
-  YardObjectSpawn = 0x2c0,              // updated 6.48
-  HousingIndoorInitialize = 0x24f,      // updated 6.48
-  LandPriceUpdate = 0x94,               // updated 6.48
-  LandInfoSign = 0x330,                 // updated 6.48
-  LandRename = 0x255,                   // updated 6.48
-  HousingEstateGreeting = 0x253,        // updated 6.48
-  HousingUpdateLandFlagsSlot = 0x3a1,   // updated 6.48
+  LandUpdate = 0x1AB,                   // updated 6.58 hotfix 2?
+  LandAvailability = 0xF258,            // updated 6.48
+  YardObjectSpawn = 0x0D1,              // updated 6.58 hotfix 2?
+  HousingIndoorInitialize = 0x084,      // updated 6.58 hotfix 2?
+  LandPriceUpdate = 0x0F1,              // updated 6.58 hotfix 2?
+  LandInfoSign = 0x15F,                 // updated 6.58 hotfix 2?
+  LandRename = 0x09B,                   // updated 6.58 hotfix 2?
+  HousingEstateGreeting = 0x298,        // updated 6.58 hotfix 2?
+  HousingUpdateLandFlagsSlot = 0x151,   // updated 6.58 hotfix 2?
   HousingLandFlags = 0x330,             // updated 6.58 hotfix 2
-  HousingShowEstateGuestAccess = 0x2f2, // updated 6.48
+  HousingShowEstateGuestAccess = 0x0E6, // updated 6.58 hotfix 2?
 
   HousingObjectInitialize = 0x1AA,    // updated 6.58 hotfix 2
-  HousingInternalObjectSpawn = 0x31c, // updated 6.48
+  HousingInternalObjectSpawn = 0x2D7, // updated 6.58 hotfix 2?
 
   HousingWardInfo = 0x327,  // updated 6.58 hotfix 2?
   HousingObjectMove = 0x21b, // updated 6.48
-  HousingObjectDye = 0x2a6,  // updated 6.48
+  HousingObjectDye = 0x333,  // updated 6.58 hotfix 2?
 
-  SharedEstateSettingsResponse = 0x2d1, // updated 6.48
+  SharedEstateSettingsResponse = 0x25B, // updated 6.58 hotfix 2?
 
-  LandUpdateHouseName = 0x98, // updated 6.48
-  LandSetMap = 0x366,         // updated 6.48
+  LandUpdateHouseName = 0x0B5, // updated 6.58 hotfix 2?
+  LandSetMap = 0x0A6,         // updated 6.58 hotfix 2?
 
-  CeremonySetActorAppearance = 0x3be, // updated 6.48
+  CeremonySetActorAppearance = 0x140, // updated 6.58 hotfix 2?
 
   //////////////////////////////////////////////////
 
   DuelChallenge = 0x0277, // 4.2; this is responsible for opening the ui
-  PerformNote = 0x12a,    // updated 6.48
+  PerformNote = 0x266,    // updated 6.58 hotfix 2?
 
   DutyGauge = 0x02E5, // updated 5.58h
 
@@ -295,11 +295,11 @@ enum ServerZoneIpcType :
   DailyQuestRepeatFlags = 0x134, // updated 6.58 hotfix 2
 
   MapUpdate = 0xF0A3,    // updated 6.48
-  MapUpdate4 = 0xF345,  // updated 6.48
-  MapUpdate8 = 0xF10c,  // updated 6.48
-  MapUpdate16 = 0xF360, // updated 6.48
-  MapUpdate32 = 0xF1b1, // updated 6.48
-  MapUpdate64 = 0xF325, // updated 6.48
+  MapUpdate4 = 0x345,  // updated 6.58 hotfix 2
+  MapUpdate8 = 0x114,  // updated 6.58 hotfix 2
+  MapUpdate16 = 0x2CE, // updated 6.58 hotfix 2
+  MapUpdate32 = 0x205, // updated 6.58 hotfix 2
+  MapUpdate64 = 0x1FC, // updated 6.58 hotfix 2
   MapUpdate128 = 0xF09c, // updated 6.48
 
   /// Doman Mahjong //////////////////////////////////////
@@ -326,7 +326,7 @@ enum ServerZoneIpcType :
   SubmarineExplorationResult = 0x02AA, // updated 6.58 hotfix 2
 
   EnvironmentControl = 0x02FC, // updated 6.58 hotfix 2
-  RSVData = 0x212,                   // updated 6.48
+  RSVData = 0x065,             // updated 6.58 hotfix 2?
   IslandWorkshopSupplyDemand = 0x013C, // updated 6.58 hotfix 2
 };
 
@@ -388,7 +388,7 @@ enum ClientZoneIpcType :
   ReqJoinNoviceNetwork = 0x0129, // updated 4.2
 
   ReqCountdownInitiate = 0x03E3, // updated 6.58 hotfix 2
-  ReqCountdownCancel = 0x023a,   // updated 6.31h
+  ReqCountdownCancel = 0xF23a,   // updated 6.31h
 
   ZoneLineHandler = 0x326,   // updated 6.58 hotfix 2
   ClientTrigger = 0x035C, // updated 6.58 hotfix 2
@@ -410,13 +410,13 @@ enum ClientZoneIpcType :
 
   TalkEventHandler = 0x23A,         // updated 6.58 hotfix 2
   EmoteEventHandler = 0x00B0,       // updated 5.58h
-  WithinRangeEventHandler = 0x1b9,  // updated 6.48
-  OutOfRangeEventHandler = 0x263,   // updated 6.48
+  WithinRangeEventHandler = 0x38E,  // updated 6.58 hotfix 2
+  OutOfRangeEventHandler = 0x1B5,   // updated 6.58 hotfix 2
   EnterTeriEventHandler = 0x105,    // updated 6.58 hotfix 2
   ShopEventHandler = 0xF384,        // updated 5.58h
   ReturnEventHandler = 0x07D,        // updated 6.58 hotfix 2
-  TradeReturnEventHandler = 0x37D,  // updated 6.58 hotfix 2
-  TradeReturnEventHandler2 = 0x354, // updated 6.48
+  TradeReturnEventHandler = 0x166,  // updated 6.58 hotfix 2
+  TradeReturnEventHandler2 = 0x37D, // updated 6.58 hotfix 2
   EventYield2Handler = 0x021D,      // updated 5.58h
   EventYield16Handler = 0x0207,     // updated 5.58h
 

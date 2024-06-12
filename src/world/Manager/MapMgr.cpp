@@ -67,7 +67,7 @@ void Sapphire::World::Manager::MapMgr::updateAll( Entity::Player& player )
             {
               auto quest = m_quests[ npcData ];
 
-              if( quest && quest->issuerLocation == eventNpc.first )
+              if( quest->issuerLocation == eventNpc.first )
               {
                 insertQuest( player, npcData, mapData );
               }
@@ -176,7 +176,7 @@ void Sapphire::World::Manager::MapMgr::updateAll( Entity::Player& player )
           {
             auto quest = m_quests[ eObjData ];
 
-            if( quest && quest->issuerLocation == eventObj.first )
+            if( quest->issuerLocation == eventObj.first )
             {
               insertQuest( player, eObjData, mapData );
             }
@@ -219,7 +219,7 @@ void Sapphire::World::Manager::MapMgr::updateQuests( Entity::Player& player )
         {
           auto quest = m_quests[ npcData ];
 
-          if( quest && quest->issuerLocation == eventNpc.first )
+          if( quest->issuerLocation == eventNpc.first )
           {
             insertQuest( player, npcData, mapData );
           }
@@ -249,7 +249,7 @@ void Sapphire::World::Manager::MapMgr::updateQuests( Entity::Player& player )
           {
             auto quest = m_quests[ eObjData ];
 
-            if( quest && quest->issuerLocation == eventObj.first )
+            if( quest->issuerLocation == eventObj.first )
             {
               insertQuest( player, eObjData, mapData );
             }
@@ -269,7 +269,7 @@ void Sapphire::World::Manager::MapMgr::insertQuest( Entity::Player& player, uint
 
   auto quest = m_quests[ questId ];
 
-  if( quest && isQuestVisible( player, questId, quest ) )
+  if( isQuestVisible( player, questId, quest ) )
   {
     auto script = scriptMgr.getNativeScriptHandler().getScript< Sapphire::ScriptAPI::EventScript >( questId );
 
@@ -423,7 +423,15 @@ bool Sapphire::World::Manager::MapMgr::isQuestVisible( Entity::Player& player, u
 
       if( !player.isQuestCompleted( questPtr->previousQuest[ i ] ) )
       {
-        return false;
+        if( i == 0 && questPtr->previousQuest0Sequence != 0 )
+        {
+          if( player.getQuestSeq( questPtr->previousQuest[ i ] ) < questPtr->previousQuest0Sequence )
+            return false;
+        }
+        else
+        {
+          return false;
+        }
       }
     }
   }
