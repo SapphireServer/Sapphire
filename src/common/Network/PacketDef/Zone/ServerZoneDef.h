@@ -94,6 +94,7 @@ namespace Sapphire::Network::Packets::Server
   struct PlayerEntry
   {
     uint64_t contentId;
+    uint64_t unknown;
     uint8_t bytes[12];
     uint16_t zoneId;
     uint16_t zoneId1;
@@ -103,10 +104,10 @@ namespace Sapphire::Network::Packets::Server
     uint8_t padding;
     uint8_t level;
     uint8_t padding1;
-    uint16_t padding2;
-    uint8_t one;
+    uint8_t unknown2[8];
     char name[0x20];
-    char fcTag[9];
+    char fcTag[6];
+    uint8_t padding2[6];
   };
 
   struct FFXIVIpcSocialList : FFXIVIpcBasePacket< SocialList >
@@ -2160,6 +2161,7 @@ namespace Sapphire::Network::Packets::Server
   struct FFXIVIpcSocialInviteUpdate : FFXIVIpcBasePacket< SocialInviteUpdate >
   {
     uint64_t contentId;
+    uint64_t unknown;
     uint32_t expireTime;
     uint8_t p1;
     uint8_t p2;
@@ -2196,6 +2198,7 @@ namespace Sapphire::Network::Packets::Server
   struct PartyMember
   {
     char name[32];
+    uint64_t unknown2;
     uint64_t contentId;
     uint32_t charaId;
     uint32_t u1; // 3.x ParentEntityId?

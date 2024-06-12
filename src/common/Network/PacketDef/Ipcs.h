@@ -82,9 +82,9 @@ enum ServerZoneIpcType :
   SocialRequestError = 0xF0AD,
 
   CFRegistered = 0x029F,          // updated 5.58h
-  SocialInviteResponse = 0x373,  // updated 6.48
-  SocialInviteUpdate = 0x03CB, // updated 5.58h
-  SocialInviteResult = 0x01D7, // updated 5.58h
+  SocialInviteResponse = 0x322,  // updated 6.58 hotfix 2
+  SocialInviteUpdate = 0x01C1, // updated 6.58 hotfix 2
+  SocialInviteResult = 0x031B, // updated 6.58 hotfix 2
   CancelAllianceForming = 0xF0C6, // updated 4.2
 
   LogMessage = 0x19C, // updated 6.58 hotfix 2?
@@ -162,8 +162,8 @@ enum ServerZoneIpcType :
 
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
-  PartyList = 0x164,         // updated 6.58 hotfix 2?
-  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2?
+  PartyList = 0x164,         // updated 6.58 hotfix 2
+  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2
   HateRank = 0x2A7,            // updated 6.58 hotfix 2
   HateList = 0x26B,            // updated 6.58 hotfix 2
   ObjectSpawn = 0x03B8, // updated 6.58 hotfix 2
@@ -222,7 +222,7 @@ enum ServerZoneIpcType :
   MSQTrackerComplete = 0x1A9,  // updated 6.58 hotfix 2
   MSQTrackerProgress = 0xF1CD, // updated 4.5 ? this actually looks like the two opcodes have been combined, see #474
 
-  QuestMessage = 0x0220, // updated 5.58h
+  QuestMessage = 0x06B, // updated 6.58 hotfix 2
 
   QuestTracker = 0x27C, // updated 6.58 hotfix 2
 
@@ -351,15 +351,15 @@ enum ClientZoneIpcType :
   CancelLogout = 0x01e3,       // updated 6.31h
   CFDutyInfoHandler = 0xF078,  // updated 4.2
 
-  SocialInviteHandler = 0x00D7, // updated 5.58h
-  SocialReplyHandler = 0x023B, // updated 5.58h
+  SocialInviteHandler = 0x00F5, // updated 6.58 hotfix 2
+  SocialReplyHandler = 0x0160, // updated 6.58 hotfix 2
   CreateCrossWorldLS = 0x9999,    // updated 5.58h
 
   ChatHandler = 0x246, // updated 6.58 hotfix 2
-  PartyChangeLeaderHandler = 0x036C, // updated 5.58h
-  PartyLeaveHandler = 0x019D, // updated 5.58h
-  PartyKickHandler = 0x0262, // updated 5.58h
-  PartyDisbandHandler = 0x0276, // updated 5.58h
+  PartyChangeLeaderHandler = 0x0E4, // updated 6.58 hotfix 2
+  PartyLeaveHandler = 0x0373, // updated 6.58 hotfix 2
+  PartyKickHandler = 0x013F, // updated 6.58 hotfix 2
+  PartyDisbandHandler = 0x03BF, // updated 6.58 hotfix 2
 
   SocialListHandler = 0x10B,               // updated 6.58 hotfix 2
   SetSearchInfoHandler = 0x01A0, // updated 6.58 hotfix 2
@@ -417,7 +417,7 @@ enum ClientZoneIpcType :
   ReturnEventHandler = 0x07D,        // updated 6.58 hotfix 2
   TradeReturnEventHandler = 0x166,  // updated 6.58 hotfix 2
   TradeReturnEventHandler2 = 0x37D, // updated 6.58 hotfix 2
-  EventYield2Handler = 0x021D,      // updated 5.58h
+  EventYield2Handler = 0x0273,      // updated 6.58 hotfix 2
   EventYield16Handler = 0x0207,     // updated 5.58h
 
   LinkshellEventHandler = 0x9999,  // unknown

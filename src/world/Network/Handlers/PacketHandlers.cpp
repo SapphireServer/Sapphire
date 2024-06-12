@@ -442,10 +442,10 @@ void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVA
 
     auto fillEntryAt = [ &listPacket ]( int i, Entity::PlayerPtr nextPlayer, bool isLeader )
     {
-      listPacket->data().entries[ i ].bytes[ 2 ] = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
-      listPacket->data().entries[ i ].bytes[ 3 ] = 0x80;
-      listPacket->data().entries[ i ].bytes[ 4 ] = 0x02;
-      listPacket->data().entries[ i ].bytes[ 6 ] = 0x3B;
+      //listPacket->data().entries[ i ].bytes[ 2 ] = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
+      //listPacket->data().entries[ i ].bytes[ 3 ] = 0x80;
+      //listPacket->data().entries[ i ].bytes[ 4 ] = 0x02;
+      //listPacket->data().entries[ i ].bytes[ 6 ] = 0x3B;
       listPacket->data().entries[ i ].bytes[ 8 ] = isLeader;
       listPacket->data().entries[ i ].bytes[ 11 ] = 0x10;
       listPacket->data().entries[ i ].classJob = static_cast< uint8_t >( nextPlayer->getClass() );
@@ -453,8 +453,6 @@ void Sapphire::Network::GameConnection::socialListHandler( const Packets::FFXIVA
       listPacket->data().entries[ i ].level = nextPlayer->getLevel();
       listPacket->data().entries[ i ].zoneId = nextPlayer->getCurrentTerritory()->getTerritoryTypeId();
       listPacket->data().entries[ i ].zoneId1 = 0x0100;
-      // TODO: no idea what this does
-      //listPacket.data().entries[0].one = 1;
 
       memcpy( listPacket->data().entries[ i ].name, nextPlayer->getName().c_str(), strlen( nextPlayer->getName().c_str() ) );
 
