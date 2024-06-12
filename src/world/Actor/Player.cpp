@@ -564,7 +564,7 @@ bool Sapphire::Entity::Player::exitInstance()
   if( d && d->getContentFinderConditionId() > 0 )
   {
     // shows correct name when leaving dungeon
-    auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+    auto p = makeZonePacket< FFXIVDirectorMsg4 >( getId() );
     p->data().param[0] = d->getDirectorId();
     p->data().param[1] = 1534;
     p->data().param[2] = 1;

@@ -2118,6 +2118,7 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFXIVIpcCFCancel : FFXIVIpcBasePacket< CFCancel >
   {
+    uint64_t unknown1;
     uint32_t cancelReason;
     uint32_t unknown2;
   };
@@ -2237,7 +2238,7 @@ namespace Sapphire::Network::Packets::Server
     uint64_t unknown2;
   };
 
-  struct FFXIVDirectorUnk4 : FFXIVIpcBasePacket< SomeDirectorUnk4 >
+  struct FFXIVDirectorMsg4 : FFXIVIpcBasePacket< DirectorMsg4 >
   {
     uint32_t param[4];
     uint64_t unknown;

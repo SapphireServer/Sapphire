@@ -77,7 +77,7 @@ enum ServerZoneIpcType :
   CFDutyInfo = 0x1be, // updated 6.48
   CFPlayerInNeed = 0xF07F,
   CFPreferredRole = 0x282,  // updated 6.58 hotfix 2
-  CFCancel = 0x1bb,        // updated 6.48
+  CFCancel = 0x384,        // updated 6.58 hotfix 2
   SocialRequestError = 0xF0AD,
 
   CFRegistered = 0x029F,          // updated 5.58h
@@ -101,7 +101,6 @@ enum ServerZoneIpcType :
 
   ServerNoticeShort = 0x0333, // updated 5.58h
   ServerNotice = 0x33B,       // updated 6.58 hotfix 2
-  SystemLogMessage = 0x03A9, // updated 6.58 hotfix 2
   SetOnlineStatus = 0x285,    // updated 6.58 hotfix 2
 
   CountdownInitiate = 0x376, // updated 6.58 hotfix 2
@@ -115,7 +114,7 @@ enum ServerZoneIpcType :
   CrossWorldLinkshellList = 0x3cc, // updated 6.48
   FellowshipList = 0x1c5,          // updated 6.48
 
-  MailDeleteRequest = 0x1b6, // updated 6.48
+  MailDeleteRequest = 0xF1b6, // updated 6.48
 
   // 12D - 137 - constant gap between 4.5x -> 5.0
   ReqMoogleMailList = 0xF138,      // updated 5.0
@@ -228,15 +227,15 @@ enum ServerZoneIpcType :
 
   Mount = 0x09F, // updated 6.58 hotfix 2
 
-  DirectorVars = 0x3A6,       // updated 6.58 hotfix 2
-  SomeDirectorUnk1 = 0x0084,  // updated 5.18
-  SomeDirectorUnk2 = 0xF0C1,  // updated 5.18
-  SomeDirectorUnk4 = 0x03DD,  // updated 5.58h
-  SomeDirectorUnk8 = 0x028A,  // updated 5.18
-  SomeDirectorUnk16 = 0x028C, // updated 5.18
-  DirectorPopUp = 0x03DF,     // updated 5.58h
-  DirectorPopUp4 = 0x019B,    // updated 5.58h
-  DirectorPopUp8 = 0x0271,    // updated 5.58h
+  DirectorVars = 0xF3A6,   // updated 6.58 hotfix 2
+  DirectorMsg1 = 0xF084,  // updated 5.18
+  DirectorMsg2 = 0xF0C1,  // updated 5.18
+  DirectorMsg4 = 0x03A9,  // updated 6.58 hotfix 2
+  DirectorMsg8 = 0xF28A,  // updated 5.18
+  DirectorMsg16 = 0xF28C, // updated 5.18
+  DirectorPopUp = 0xF3DF,     // updated 5.58h
+  DirectorPopUp4 = 0xF19B,    // updated 5.58h
+  DirectorPopUp8 = 0xF271,    // updated 5.58h
 
   CFAvailableContents = 0xF1FD, // updated 4.2
 
