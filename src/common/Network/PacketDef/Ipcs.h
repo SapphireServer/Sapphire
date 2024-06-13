@@ -163,7 +163,7 @@ enum ServerZoneIpcType :
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
   PartyList = 0x164,         // updated 6.58 hotfix 2
-  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2?
+  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2
   HateRank = 0x2A7,            // updated 6.58 hotfix 2
   HateList = 0x26B,            // updated 6.58 hotfix 2
   ObjectSpawn = 0x03B8, // updated 6.58 hotfix 2
@@ -258,11 +258,11 @@ enum ServerZoneIpcType :
 
   LandSetInitialize = 0x1C9,            // updated 6.58 hotfix 2
   LandUpdate = 0x1AB,                   // updated 6.58 hotfix 2?
-  LandAvailability = 0xF258,            // updated 6.48
+  LandAvailability = 0x236,            // updated 6.58 hotfix 2
   YardObjectSpawn = 0x0D1,              // updated 6.58 hotfix 2?
   HousingIndoorInitialize = 0x084,      // updated 6.58 hotfix 2?
-  LandPriceUpdate = 0x0F1,              // updated 6.58 hotfix 2?
-  LandInfoSign = 0x15F,                 // updated 6.58 hotfix 2?
+  LandPriceUpdate = 0x0F1,              // updated 6.58 hotfix 2
+  LandInfoSign = 0x15F,                 // updated 6.58 hotfix 2
   LandRename = 0x09B,                   // updated 6.58 hotfix 2?
   HousingEstateGreeting = 0x298,        // updated 6.58 hotfix 2?
   HousingUpdateLandFlagsSlot = 0x151,   // updated 6.58 hotfix 2?
@@ -279,7 +279,7 @@ enum ServerZoneIpcType :
   SharedEstateSettingsResponse = 0x25B, // updated 6.58 hotfix 2?
 
   LandUpdateHouseName = 0x0B5, // updated 6.58 hotfix 2?
-  LandSetMap = 0x0A6,         // updated 6.58 hotfix 2?
+  LandSetMap = 0x32B,         // updated 6.58 hotfix 2
 
   CeremonySetActorAppearance = 0x140, // updated 6.58 hotfix 2?
 
@@ -405,16 +405,16 @@ enum ClientZoneIpcType :
 
   InventoryEquipRecommendedItems = 0x355, // updated 6.58 hotfix 2
 
-  ReqPlaceHousingItem = 0x02D4, // updated 5.58h
-  BuildPresetHandler = 0x0223,  // updated 5.58h
+  ReqPlaceHousingItem = 0x032D, // updated 6.58 hotfix 2
+  BuildPresetHandler = 0x0D9,  // updated 6.58 hotfix 2
 
   TalkEventHandler = 0x23A,         // updated 6.58 hotfix 2
-  EmoteEventHandler = 0x1B5,       // updated 6.58 hotfix 2
+  EmoteEventHandler = 0x1B5,        // updated 6.58 hotfix 2
   WithinRangeEventHandler = 0x38E,  // updated 6.58 hotfix 2
   OutOfRangeEventHandler = 0x200,   // updated 6.58 hotfix 2
   EnterTeriEventHandler = 0x105,    // updated 6.58 hotfix 2
-  ShopEventHandler = 0xF384,        // updated 5.58h
-  ReturnEventHandler = 0x07D,        // updated 6.58 hotfix 2
+  ShopEventHandler = 0x0148,        // updated 6.58 hotfix 2
+  ReturnEventHandler = 0x07D,       // updated 6.58 hotfix 2
   TradeReturnEventHandler = 0x166,  // updated 6.58 hotfix 2
   TradeReturnEventHandler2 = 0x37D, // updated 6.58 hotfix 2
   EventYield2Handler = 0x0273,      // updated 6.58 hotfix 2
@@ -425,11 +425,11 @@ enum ClientZoneIpcType :
 
   ReqEquipDisplayFlagsChange = 0x0150, // updated 6.58 hotfix 2
 
-  LandRenameHandler = 0x028E,           // updated 5.58h
-  HousingUpdateHouseGreeting = 0x0343,  // updated 5.58h
-  HousingUpdateObjectPosition = 0x9999, // unknown
-  HousingEditExterior = 0x027B,         // updated 5.58h
-  HousingEditInterior = 0x02E3,         // updated 5.58h
+  LandRenameHandler = 0x03B7,           // updated 6.58 hotfix 2
+  HousingUpdateHouseGreeting = 0x03A7,  // updated 6.58 hotfix 2
+  HousingUpdateObjectPosition = 0x0157, // updated 6.58 hotfix 2
+  HousingEditExterior = 0x028C,         // updated 6.58 hotfix 2
+  HousingEditInterior = 0x0336,         // updated 6.58 hotfix 2
 
   SetSharedEstateSettings = 0x00D2, // updated 5.58h
 
