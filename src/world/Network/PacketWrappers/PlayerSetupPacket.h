@@ -45,7 +45,6 @@ namespace Sapphire::Network::Packets::Server
       //m_data.gcRank = GCRank::None;
 
       m_data.homepoint = player.getHomepoint();
-      m_data.pose[0] = player.getPose();
 
       memset( &m_data.name[ 0 ], 0, sizeof( m_data.name ) );
       strcpy( &m_data.name[ 0 ], player.getName().c_str() );
@@ -69,29 +68,27 @@ namespace Sapphire::Network::Packets::Server
 
       memcpy( m_data.howto, player.getHowToArray(), sizeof( m_data.howto ) );
 
-      // possibly max level or current level
       m_data.maxLevel = Common::MAX_PLAYER_LEVEL;
       m_data.expansion = Common::CURRENT_EXPANSION_ID;
 
-      // df stuff
-      // todo: actually do this properly
-      //      m_data.unknown70[4] = 1; // enable df
+      // unlock mounts
+      memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
 
-      // enable all raids/guildhests/dungeons
+      // uncomment to unlock everything or choose options below
+      //memset( &m_data.unknown293[ 0 ], 0xFF, reinterpret_cast< uint64_t >( &m_data.unknown85E[ 40 ] ) - reinterpret_cast< uint64_t >( &m_data.unknown293[ 0 ] ) + 1 );
+
+      m_data.pose[0] = player.getPose();
+      memset( &m_data.pose[ 1 ], 0, sizeof( m_data.pose ) - 1 );
+      
+      // custom unlock options
       memset( m_data.unlockedDungeons, 0xFF, sizeof( m_data.unlockedDungeons ) );
       memset( m_data.unlockedGuildhests, 0xFF, sizeof( m_data.unlockedGuildhests ) );
       memset( m_data.unlockedPvp, 0xFF, sizeof( m_data.unlockedPvp ) );
       memset( m_data.unlockedRaids, 0xFF, sizeof( m_data.unlockedRaids ) );
       memset( m_data.unlockedTrials, 0xFF, sizeof( m_data.unlockedTrials ) );
-
-      // uncomment to enable custom unlocks
-
-      // everything
-      //memset( &m_data.unknownOword[ 0 ], 0xFF, reinterpret_cast< uint64_t >( &m_data.unknown5_55c ) - reinterpret_cast< uint64_t >( &m_data.unknownOword[ 0 ] ) );
-      // or select options below
       //memset( m_data.unlockBitmask, 0xFF, sizeof( m_data.unlockBitmask ) );
-      //memset( m_data.mountGuideMask, 0xFF, sizeof( m_data.mountGuideMask ) );
       //memset( m_data.minions, 0xFF, sizeof( m_data.minions ) );
+      //memset( m_data.discovery, 0xFF, sizeof( m_data.discovery ) );
     };
   };
 

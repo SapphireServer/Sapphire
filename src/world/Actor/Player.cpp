@@ -690,9 +690,9 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   }
 
   if( info->discoveryArrayByte )
-    offset = 5 + 2 * info->discoveryIndex;
+    offset = 2 * info->discoveryIndex;
   else
-    offset = 325 + 4 * info->discoveryIndex;
+    offset = 320 + 4 * info->discoveryIndex;
 
   int32_t index = offset + sub_id / 8;
   uint8_t bitIndex = sub_id % 8;

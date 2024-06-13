@@ -163,7 +163,7 @@ enum ServerZoneIpcType :
   SomeCustomiseChangePacketProbably = 0x00CD, // added 5.18
 
   PartyList = 0x164,         // updated 6.58 hotfix 2
-  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2
+  PartyUpdate = 0x2D8,       // updated 6.58 hotfix 2?
   HateRank = 0x2A7,            // updated 6.58 hotfix 2
   HateList = 0x26B,            // updated 6.58 hotfix 2
   ObjectSpawn = 0x03B8, // updated 6.58 hotfix 2
@@ -242,7 +242,7 @@ enum ServerZoneIpcType :
 
   WeatherChange = 0x021D, // updated 6.58 hotfix 2
   PlayerTitleList = 0x1FF, // updated 6.58 hotfix 2?
-  Discovery = 0x11E,       // updated 6.58 hotfix 2?
+  Discovery = 0x11E,       // updated 6.58 hotfix 2
 
   EorzeaTimeOffset = 0x398, // updated 6.58 hotfix 2?
 
@@ -294,13 +294,13 @@ enum ServerZoneIpcType :
   DailyQuests = 0x2EF,           // updated 6.58 hotfix 2
   DailyQuestRepeatFlags = 0x134, // updated 6.58 hotfix 2
 
-  MapUpdate = 0xF0A3,    // updated 6.48
+  MapUpdate = 0x0FF,    // updated 6.58 hotfix 2
   MapUpdate4 = 0x345,  // updated 6.58 hotfix 2
   MapUpdate8 = 0x114,  // updated 6.58 hotfix 2
   MapUpdate16 = 0x2CE, // updated 6.58 hotfix 2
   MapUpdate32 = 0x205, // updated 6.58 hotfix 2
   MapUpdate64 = 0x1FC, // updated 6.58 hotfix 2
-  MapUpdate128 = 0xF09c, // updated 6.48
+  MapUpdate128 = 0x158, // updated 6.58 hotfix 2
 
   /// Doman Mahjong //////////////////////////////////////
   MahjongOpenGui = 0x02A4,       // only available in mahjong instance
