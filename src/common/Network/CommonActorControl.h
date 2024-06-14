@@ -381,7 +381,7 @@ namespace Sapphire::Network::ActorControl
     SetTitleReq = 0x12E,
     TitleList = 0x12F,
 
-    UpdatedSeenHowTos = 0x133,
+    UpdatedSeenHowTos = 0x132,
     CutscenePlayed = 0x134, // param1 = cutscene id
     AllotAttribute = 0x135,
 

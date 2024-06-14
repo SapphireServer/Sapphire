@@ -112,8 +112,8 @@ enum ServerZoneIpcType :
   BlackList = 0x38A,                   // updated 6.58 hotfix 2
 
   LinkshellList = 0x2B2,           // updated 6.58 hotfix 2
-  CrossWorldLinkshellList = 0x2EA, // updated 6.58 hotfix 2?
-  FellowshipList = 0x0BD,          // updated 6.58 hotfix 2?
+  CrossWorldLinkshellList = 0x3D5, // updated 6.58 hotfix 2
+  FellowshipList = 0x373,          // updated 6.58 hotfix 2
 
   MailDeleteRequest = 0x168, // updated 6.58 hotfix 2?
 
@@ -171,7 +171,7 @@ enum ServerZoneIpcType :
   SilentSetClassJob = 0xF18E, // updated 5.0 - seems to be the case, not sure if it's actually used for anything
   PlayerSetup = 0x035F, // updated 6.58 hotfix 2
   PlayerStats = 0x034F, // updated 6.58 hotfix 2
-  ActorOwner = 0x2c3,         // updated 6.58 hotfix 2?
+  ActorOwner = 0x2c3,         // updated 6.58 hotfix 2
   PlayerStateFlags = 0x1B6,   // updated 6.58 hotfix 2
   PlayerClassInfo = 0x238,    // updated 6.58 hotfix 2
   PlayerUpdateLook = 0xa8,    // updated 6.48
