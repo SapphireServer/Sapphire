@@ -210,7 +210,7 @@ enum ServerZoneIpcType :
   EventStart = 0x0146, // updated 6.58 hotfix 2
   EventFinish = 0x0339, // updated 6.58 hotfix 2
 
-  EventReturn = 0x1F3, // updated 6.58 hotfix 2?
+  EventReturn = 0x1F3, // updated 6.58 hotfix 2
 
   EventLinkshell = 0x1169,
 
