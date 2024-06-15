@@ -19,6 +19,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
 #include "Network/GameConnection.h"
@@ -51,6 +52,8 @@
 #include "WorldServer.h"
 
 #include "Session.h"
+
+#include "Util/UtilMath.h"
 
 
 using namespace Sapphire::Network;
@@ -541,6 +544,37 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     effectPacket->setResultId( pCurrentZone->getNextActionResultId() );
 
     server().queueForPlayer( player.getCharacterId(), effectPacket );
+  }
+  else if( subCommand == "actorMove" )
+  {
+    uint8_t animationType{ 0 };
+    uint8_t animationState{ 0 };
+    uint8_t speed{ 20 };
+    float x{ 0 }, y{ 0 }, z{ 0 };
+
+    sscanf( params.c_str(), "%u %u %u %d %d %d", &animationType, &animationState, &speed, &x, &y, &z );
+    auto targetId = static_cast< uint32_t >( player.getTargetId() );
+    auto actorMovePacket = makeZonePacket< FFXIVIpcActorMove >( targetId, player.getId() );
+
+    Entity::GameObjectPtr pTarget = nullptr;
+    auto inRange = player.getInRangeActors();
+    for( auto pChara : inRange )
+      if( pChara->getId() == targetId )
+        pTarget = pChara;
+
+    if( pTarget )
+    {
+      actorMovePacket->data().dir = Common::Util::floatToUInt8Rot( pTarget->getRot() );
+      actorMovePacket->data().dirBeforeSlip = Common::Util::floatToUInt8Rot( pTarget->getRot() );
+      actorMovePacket->data().flag = animationType;
+      actorMovePacket->data().flag2 = animationState;
+      actorMovePacket->data().speed = speed;
+      actorMovePacket->data().pos[ 0 ] = Common::Util::floatToUInt16( x );
+      actorMovePacket->data().pos[ 1 ] = Common::Util::floatToUInt16( y );
+      actorMovePacket->data().pos[ 2 ] = Common::Util::floatToUInt16( z );
+
+      server().queueForPlayer( player.getCharacterId(), actorMovePacket );
+    }
   }
   else if( subCommand == "achvGeneral" )
   {
