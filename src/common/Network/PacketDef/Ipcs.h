@@ -392,6 +392,7 @@ enum ClientZoneIpcType :
 
   ZoneLineHandler = 0x326,   // updated 6.58 hotfix 2
   ClientTrigger = 0x035C, // updated 6.58 hotfix 2
+  ClientTriggerEnvironment = 0x0295, // updated 6.58 hotfix 2
   DiscoveryHandler = 0x0129, // updated 6.58 hotfix 2
 
   SkillHandler = 0x07C,   // updated 6.58 hotfix 2
@@ -436,8 +437,6 @@ enum ClientZoneIpcType :
   UpdatePositionInstance = 0x0227, // updated 6.58 hotfix 2
 
   PerformNoteHandler = 0x0243, // updated 5.58h
-
-  WorldInteractionHandler = 0x0295, // updated 6.58 hotfix 2
   Dive = 0x018C,                    // updated 6.30h
 };
 

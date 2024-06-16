@@ -2020,10 +2020,10 @@ void Sapphire::Entity::Player::finishZoning()
   }
 }
 
-void Sapphire::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent )
+void Sapphire::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent, uint32_t rotation )
 {
   sendToInRangeSet( makeActorControlTarget( getId(), ActorControlType::Emote,
-                                         emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
+                                         emoteId, 0, isSilent ? 1 : 0, rotation, targetId ) );
 }
 
 void Sapphire::Entity::Player::emoteInterrupt()

@@ -70,7 +70,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::ReqExamineFcInfo, "ReqExamineFcInfo", &GameConnection::reqExamineFcInfo );
   setZoneHandler( ClientZoneIpcType::ZoneLineHandler, "ZoneLineHandler", &GameConnection::zoneLineHandler );
   setZoneHandler( ClientZoneIpcType::ClientTrigger, "ClientTrigger", &GameConnection::clientTriggerHandler );
-
+  setZoneHandler( ClientZoneIpcType::ClientTriggerEnvironment, "ClientTriggerEnvironment", &GameConnection::clientTriggerHandler );
   setZoneHandler( ClientZoneIpcType::DiscoveryHandler, "DiscoveryHandler", &GameConnection::discoveryHandler );
 
   setZoneHandler( ClientZoneIpcType::SkillHandler, "ActionHandler", &GameConnection::actionHandler );
@@ -137,7 +137,6 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListings, "MarketBoardRequestItemListings",
                   &GameConnection::marketBoardRequestItemListings );
 
-  setZoneHandler( ClientZoneIpcType::WorldInteractionHandler, "WorldInteractionHandler", &GameConnection::worldInteractionhandler );
   setZoneHandler( ClientZoneIpcType::Dive, "Dive", &GameConnection::diveHandler );
 
   setZoneHandler( ClientZoneIpcType::InventoryEquipRecommendedItems, "InventoryEquipRecommendedItemsHandler", &GameConnection::inventoryEquipRecommendedItemsHandler );
