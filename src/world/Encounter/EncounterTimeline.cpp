@@ -69,6 +69,7 @@ namespace Sapphire
   {
     auto pBattleNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
 
+    // todo: these should really use callbacks when the state transitions or we could miss this tick
     switch( combatState )
     {
       case CombatStateType::Idle:
@@ -114,14 +115,7 @@ namespace Sapphire
     {
       case TimepointDataType::Idle:
       {
-        auto pIdleData = std::dynamic_pointer_cast< TimepointDataIdle, TimepointData >( getData() );
-        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pIdleData->m_layoutId );
-
-        if( pBNpc )
-        {
-          // todo: idle
-          
-        }
+        // just wait up the duration of this timepoint  
       }
       break;
       case TimepointDataType::CastAction:
@@ -162,7 +156,7 @@ namespace Sapphire
           else
           {
             // if we are at the pos, stop waiting
-            state.m_finished = true;
+            //state.m_finished = true;
           }
           pBNpc->setRot( pMoveToData->m_rot );
         }
@@ -557,25 +551,13 @@ namespace Sapphire
       { "spawnBNpc",          TimepointDataType::SpawnBNpc },
       { "bNpcFlags",          TimepointDataType::SetBNpcFlags },
       { "setEObjState",       TimepointDataType::SetEObjState },
-      { "setCondition",       TimepointDataType::SetCondition }
+      { "setCondition",       TimepointDataType::SetCondition },
+      { "snapshot",           TimepointDataType::Snapshot }
     };
 
     const static std::unordered_map< std::string, TimepointOverrideFlags > overrideFlagMap =
     {
       {}
-    };
-
-    const static std::unordered_map< std::string, TargetSelectFilterFlags > targetFilterMap =
-    {
-      { "self",       TargetSelectFilterFlags::Self },
-      { "tank",       TargetSelectFilterFlags::Tank },
-      { "healer",     TargetSelectFilterFlags::Healer },
-      { "dps",        TargetSelectFilterFlags::Dps },
-      { "melee",      TargetSelectFilterFlags::Melee },
-      { "ranged",     TargetSelectFilterFlags::Ranged },
-      { "furthest",   TargetSelectFilterFlags::Furthest },
-      { "aggro1",     TargetSelectFilterFlags::Aggro1 },
-      { "aggro2",     TargetSelectFilterFlags::Aggro2 }
     };
 
     const static std::unordered_map< std::string, TimepointCallbackType > callbackTypeMap =
@@ -600,6 +582,12 @@ namespace Sapphire
       { "xor", DirectorOpId::Xor },
       { "nor", DirectorOpId::Nor },
       { "and", DirectorOpId::And }
+    };
+
+    const static std::unordered_map< std::string, Common::BNpcType > bnpcTypeMap =
+    {
+      { "bnpc", Common::BNpcType::Enemy },
+      { "ally", Common::BNpcType::Friendly } // todo: rename this
     };
 
     TimepointDataType tpType{ 0 };
@@ -727,7 +715,7 @@ namespace Sapphire
         auto& dataJ = json.at( "data" );
         auto flags = dataJ.at( "val" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.find( opStr )->second;
+        DirectorOpId op = directorOpMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.flags = flags;
@@ -753,6 +741,9 @@ namespace Sapphire
         auto hateSrcJ = dataJ.at( "hateSrc" );
         auto actorRef = dataJ.at( "spawnActor" ).get< std::string >();
         auto flags = dataJ.at( "flags" ).get< uint32_t >();
+        // todo: batallion
+        // auto battalion = dataJ.at( "batallion" ).get< uint32_t >();
+        auto bnpcType = bnpcTypeMap.at( dataJ.at( "type" ).get< std::string >() );
 
         // todo: hateSrc
 
@@ -762,7 +753,7 @@ namespace Sapphire
         else
           throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::Timepoint::from_json: SpawnBNpc invalid actor ref: %s" ), actorRef ) );
 
-        m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags );
+        m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags, bnpcType );
       }
       break;
       case TimepointDataType::SetBNpcFlags:

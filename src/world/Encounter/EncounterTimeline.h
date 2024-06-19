@@ -1,12 +1,12 @@
 #include <fstream>
 #include <memory>
-#include <map>
+
 #include <optional>
 #include <stack>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
-#include <queue>
 
 #include <Common.h>
 #include <Forwards.h>
@@ -116,7 +116,9 @@ namespace Sapphire
       SetEObjState,
       SetBgm,
 
-      SetCondition
+      SetCondition,
+
+      Snapshot
     };
 
     enum class TimepointCallbackType : uint32_t
@@ -193,7 +195,7 @@ namespace Sapphire
       std::vector < TimepointCallbackFunc > m_callbacks;
     };
     using TimebackCallbackDataPtr = std::shared_ptr< TimepointCallbackData >;
-    using TimepointCallbacks = std::map< TimepointCallbackType, TimebackCallbackDataPtr >;
+    using TimepointCallbacks = std::unordered_map< TimepointCallbackType, TimebackCallbackDataPtr >;
 
 
     struct TimepointData :
@@ -341,12 +343,15 @@ namespace Sapphire
     {
       uint32_t m_layoutId{ 0xE0000000 };
       uint32_t m_flags{ 0 };
+      uint32_t m_type{ 0 };
+
       // todo: hate type, source
 
-      TimepointDataSpawnBNpc( uint32_t layoutId, uint32_t flags ) :
+      TimepointDataSpawnBNpc( uint32_t layoutId, uint32_t flags, uint32_t type ) :
         TimepointData( TimepointDataType::SpawnBNpc ),
         m_layoutId( layoutId ),
-        m_flags( flags)
+        m_flags( flags ),
+        m_type( type )
       {
       }
     };
@@ -615,13 +620,21 @@ namespace Sapphire
     };
     using PhaseConditionPtr = std::shared_ptr< PhaseCondition >;
 
+    // todo: bnpc parts 
+    class TimelineBNpcPart
+    {
+      uint32_t m_hp{ 0 };
+      std::string m_name;
+    };
+
     class TimelineActor
     {
     protected:
       std::unordered_map< uint32_t, PhaseConditionPtr > m_phaseConditions;
       std::unordered_map< uint32_t, ConditionState > m_conditionStates;
+
       // PARENTNAME_SUBACTOR_1, ..., PARENTNAME_SUBACTOR_69
-      std::map< std::string, Entity::BNpcPtr > m_subActors;
+      std::unordered_map< std::string, Entity::BNpcPtr > m_subActors;
     public:
       uint32_t m_layoutId{ 0 };
       uint32_t m_hp{ 0 };

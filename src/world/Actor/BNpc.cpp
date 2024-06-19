@@ -442,6 +442,11 @@ void BNpc::sendPositionUpdate()
   server().queueForPlayers( getInRangePlayerIds(), movePacket );
 }
 
+const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const
+{
+  return m_hateList;
+}
+
 void BNpc::hateListClear()
 {
   for( auto& listEntry : m_hateList )
@@ -823,6 +828,11 @@ bool BNpc::hasFlag( uint32_t flag ) const
 void BNpc::setFlag( uint32_t flag )
 {
   m_flags |= flag;
+}
+
+void BNpc::removeFlag( uint32_t flag )
+{
+  m_flags &= ~flag;
 }
 
 void BNpc::clearFlags()
