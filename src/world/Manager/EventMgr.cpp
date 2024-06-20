@@ -552,6 +552,9 @@ void EventMgr::eventFinish( Sapphire::Entity::Player& player, uint32_t eventId, 
 
   if( player.hasCondition( Common::PlayerCondition::WatchingCutscene ) )
     player.removeCondition( Common::PlayerCondition::WatchingCutscene );
+  
+  if( player.hasCondition( Common::PlayerCondition::Casting ))
+    player.removeCondition( Common::PlayerCondition::Casting );
 
   player.removeEvent( pEvent->getId() );
 

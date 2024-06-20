@@ -31,6 +31,8 @@ namespace Sapphire::World::Action
 
     void handleMountItem();
 
+    void handleSongItem();
+
   private:
     std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > m_itemAction;
 

@@ -340,7 +340,7 @@ namespace Sapphire::Entity
     uint64_t getFullOnlineStatusMask() const;
 
     /*! query teleport of a specified type */
-    void teleportQuery( uint16_t aetheryteId );
+    void teleportQuery( uint16_t aetheryteId, bool useAetheryteTicket );
 
     Common::PlayerTeleportQuery getTeleportQuery() const;
 

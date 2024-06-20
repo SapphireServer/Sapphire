@@ -67,6 +67,13 @@ void ItemAction::execute()
 
       break;
     }
+
+    case Common::ItemActionType::ItemActionSong:
+    {
+      handleSongItem();
+
+      break;
+    }
   }
 }
 
@@ -101,5 +108,13 @@ void ItemAction::handleMountItem()
   auto player = getSourceChara()->getAsPlayer();
 
   player->unlockMount( m_itemAction->data().Calcu0Arg[ 0 ] );
+  player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), static_cast< uint8_t >( m_itemSourceSlot ) );
+}
+
+void ItemAction::handleSongItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+
+  player->learnSong( m_itemAction->data().Calcu0Arg[ 0 ], m_id );
   player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), static_cast< uint8_t >( m_itemSourceSlot ) );
 }

@@ -22,6 +22,7 @@ public:
     auto teleportQuery = pPlayer->getTeleportQuery();
 
     if( pPlayer->getCurrency( Common::CurrencyType::Gil ) < teleportQuery.cost ||
+        teleportQuery.useAetheryteTicket && !pPlayer->removeItem( 7569 ) ||
         teleportQuery.targetAetheryte == 0 )
     {
       action.interrupt();
