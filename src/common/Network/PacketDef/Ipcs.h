@@ -228,10 +228,10 @@ enum ServerZoneIpcType :
 
   Mount = 0x09F, // updated 6.58 hotfix 2
 
-  DirectorVars = 0xF3A6,   // updated 6.58 hotfix 2
+  DirectorVars = 0x3A6,   // updated 6.58 hotfix 2
   DirectorMsg1 = 0xF084,  // updated 5.18
   DirectorMsg2 = 0xF0C1,  // updated 5.18
-  DirectorMsg4 = 0x03A9,  // updated 6.58 hotfix 2
+  DirectorMsg4 = 0x3A9,  // updated 6.58 hotfix 2
   DirectorMsg8 = 0xF28A,  // updated 5.18
   DirectorMsg16 = 0xF28C, // updated 5.18
   DirectorPopUp = 0xF3DF,     // updated 5.58h
