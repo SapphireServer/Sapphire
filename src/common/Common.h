@@ -1790,6 +1790,7 @@ namespace Sapphire::Common
   {
     uint16_t targetAetheryte;
     uint16_t cost;
+    bool useAetheryteTicket{ false };
   };
 
   enum EventSceneError : uint8_t
