@@ -512,6 +512,7 @@ namespace Sapphire::Entity
     uint32_t getTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
+    void forceZoneing( uint32_t zoneId, Sapphire::Common::FFXIVARR_POSITION3 pos, float rot, bool showZoneName );
 
     /*! return player to preset homepoint */
     void returnToHomepoint();

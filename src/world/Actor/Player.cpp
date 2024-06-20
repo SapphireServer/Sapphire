@@ -467,6 +467,16 @@ void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
   //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
+void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId, FFXIVARR_POSITION3 pos, float rot, bool showZoneName )
+{
+  if( zoneId == 0 )
+  {
+    zoneId = getCurrentTerritory()->getTerritoryTypeId();
+  }
+  m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, pos, Util::getTimeMs(), rot );
+  prepareZoning( showZoneName ? zoneId : 0, true, 1, 0 );
+}
+
 void Sapphire::Entity::Player::returnToHomepoint()
 {
   setZoningType( Common::ZoneingType::Return );
@@ -514,10 +524,14 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
-    m_prevPos = m_pos;
-    m_prevRot = m_rot;
-    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
+    // never returning to a BeforeTrialDung zone.
+    if( currentZone->getTerritoryTypeInfo()->territoryIntendedUse != Sapphire::World::Manager::TerritoryMgr::TerritoryIntendedUse::BeforeTrialDung )
+    {
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+      m_prevTerritoryId = getTerritoryId();
+    }
   }
 
   return teriMgr.movePlayer( instance, getAsPlayer() );
@@ -535,10 +549,14 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIV
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
-    m_prevPos = m_pos;
-    m_prevRot = m_rot;
-    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
+    // never returning to a BeforeTrialDung zone.
+    if( currentZone->getTerritoryTypeInfo()->territoryIntendedUse != Sapphire::World::Manager::TerritoryMgr::TerritoryIntendedUse::BeforeTrialDung )
+    {
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+      m_prevTerritoryId = getTerritoryId();
+    }
   }
 
   m_pos = pos;
