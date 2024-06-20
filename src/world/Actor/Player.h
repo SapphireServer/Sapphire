@@ -791,7 +791,7 @@ namespace Sapphire::Entity
     /*! return true if the player is marked for zoning */
     bool isMarkedForZoning() const;
 
-    void emote( uint32_t emoteId, uint64_t targetId, bool isSilent, uint32_t rotation = 0 );
+    void emote( uint32_t emoteId, uint64_t targetId, bool isSilent, uint16_t rotation = 0 );
 
     void emoteInterrupt();
 

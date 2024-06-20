@@ -210,11 +210,11 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
       if( commandId == ClientTriggerType::EmoteWithWarp )
       {
         player.setPos( packet.data().position );
-        player.setRot( Util::floatFromUInt16Rot( p4 ) );
+        player.setRot( Util::floatFromUInt16Rot( static_cast< uint16_t >( p4 ) ) );
         if( player.hasInRangeActor() )
         {
           auto setpos = makeZonePacket< FFXIVIpcActorSetPos >( player.getId() );
-          setpos->data().r16 = p4;
+          setpos->data().r16 = static_cast< uint16_t >( p4 );
           setpos->data().waitForLoad = 18;
           setpos->data().x = packet.data().position.x;
           setpos->data().y = packet.data().position.y;
@@ -223,7 +223,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
         }
       }
 
-      player.emote( emoteId, targetId, isSilent, commandId == ClientTriggerType::EmoteWithWarp ? p4 : 0 );
+      player.emote( emoteId, targetId, isSilent, commandId == ClientTriggerType::EmoteWithWarp ? static_cast< uint16_t >( p4 ) : 0 );
 
       bool isPersistent = emoteData->emoteMode != 0;
 

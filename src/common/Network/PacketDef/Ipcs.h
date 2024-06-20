@@ -73,7 +73,7 @@ enum ServerZoneIpcType :
   Playtime = 0x03DE, // updated 6.58 hotfix 2
   Logout = 0x0378, // updated 6.58 hotfix 2
   CFNotify = 0x0279, // updated 6.58 hotfix 2
-  CFMemberStatus = 0x0079,
+  CFMemberStatus = 0x21F, // updated 6.58 hotfix 2?
   CFDutyInfo = 0x2E8, // updated 6.58 hotfix 2?
   CFPlayerInNeed = 0xF07F,
   CFPreferredRole = 0x282,  // updated 6.58 hotfix 2
