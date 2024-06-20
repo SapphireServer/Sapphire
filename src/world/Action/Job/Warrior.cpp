@@ -33,6 +33,11 @@ void Warrior::handleWrath( Entity::Player& player, Action& action )
   auto parry = 2;
   auto asChara = player.getAsChara();
 
+  auto pActionBuilder = action.getActionResultBuilder();
+    
+  if( !pActionBuilder )
+    return;
+
   if( player.hasStatusEffect( Wrath ) )
   {
     player.replaceSingleStatusEffectById( Wrath );
@@ -59,7 +64,7 @@ void Warrior::handleWrath( Entity::Player& player, Action& action )
   }
 
   if( !player.hasStatusEffect( Infuriated ) )
-  {
-    action.getActionResultBuilder()->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } }, 0, false );
+  {    
+    pActionBuilder->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } }, 0, false );
   }
 }

@@ -611,6 +611,11 @@ void Action::Action::buildActionResults()
 
 void Action::Action::handleStatusEffects()
 {
+  auto pActionBuilder = getActionResultBuilder();
+
+  if( !pActionBuilder )
+    return;
+
   if( isComboAction() && !isCorrectCombo() )
     return;
 
@@ -619,7 +624,7 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      getActionResultBuilder()->applyStatusEffectSelf( status.id, status.duration, 0, status.modifiers, status.flag, true );
+      pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, status.modifiers, status.flag, true );
     }
   }
 
@@ -630,7 +635,7 @@ void Action::Action::handleStatusEffects()
     {
       for( auto& status : m_lutEntry.statuses.target )
       {
-        getActionResultBuilder()->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, true );
+        pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, true );
       }
 
       if( actor->getStatusEffectMap().size() > 0 )

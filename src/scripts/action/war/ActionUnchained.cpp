@@ -18,14 +18,15 @@ public:
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pPlayer = action.getSourceChara()->getAsPlayer();
+    auto pActionBuilder = action.getActionResultBuilder();
 
-    if( !pPlayer )
+    if( !pPlayer || !pActionBuilder )
       return;
 
     if( auto status = pPlayer->getStatusEffectById( Defiance ); status )
       status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
-    action.getActionResultBuilder()->applyStatusEffectSelf( Unchained, 20000, 0 );
+    pActionBuilder->applyStatusEffectSelf( Unchained, 20000, 0 );
   }
 };
 
