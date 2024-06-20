@@ -234,7 +234,7 @@ enum ServerZoneIpcType :
   DirectorMsg4 = 0x3A9,  // updated 6.58 hotfix 2
   DirectorMsg8 = 0xF28A,  // updated 5.18
   DirectorMsg16 = 0xF28C, // updated 5.18
-  DirectorPopUp = 0xF3DF,     // updated 5.58h
+  DirectorPopUp2 = 0x300,     // updated 6.58 hotfix 2
   DirectorPopUp4 = 0xF19B,    // updated 5.58h
   DirectorPopUp8 = 0xF271,    // updated 5.58h
 
