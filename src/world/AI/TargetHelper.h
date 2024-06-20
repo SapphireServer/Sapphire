@@ -35,6 +35,8 @@ namespace Sapphire::World::AI
       TopAggro,
       SecondAggro,
 
+      PartyMember,
+
       AllianceA,
       AllianceB,
       AllianceC
@@ -54,7 +56,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+    virtual bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
     {
       return false;
     };
@@ -78,7 +80,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class OutsideRadiusFilter : public TargetSelectFilter
@@ -92,7 +94,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class PlayerFilter : public TargetSelectFilter
@@ -103,7 +105,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class AllyFilter : public TargetSelectFilter
@@ -114,7 +116,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class OwnBattalionFilter : public TargetSelectFilter
@@ -125,7 +127,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class TankFilter : public TargetSelectFilter
@@ -136,7 +138,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class HealerFilter : public TargetSelectFilter
@@ -147,7 +149,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class DpsFilter : public TargetSelectFilter
@@ -158,7 +160,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class HasStatusEffectFilter : public TargetSelectFilter
@@ -172,7 +174,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class TopAggroFilter : public TargetSelectFilter
@@ -183,7 +185,7 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   class SecondAggroFilter : public TargetSelectFilter
@@ -194,7 +196,18 @@ namespace Sapphire::World::AI
     {
     }
 
-    bool isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const;
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
+  };
+
+  class PartyMemberFilter : public TargetSelectFilter
+  {
+  public:
+    PartyMemberFilter( bool negate ) :
+      TargetSelectFilter( Type::PartyMember, negate )
+    {
+    }
+
+    bool isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const override;
   };
 
   //
@@ -203,6 +216,7 @@ namespace Sapphire::World::AI
   class Snapshot :
     public std::enable_shared_from_this< Snapshot >
   {
+  public:
     struct CharaEntry
     {
       uint32_t m_entityId;
@@ -210,17 +224,20 @@ namespace Sapphire::World::AI
       float m_rot;
       // todo: status effects?
     };
+    using Results = std::vector< CharaEntry >;
+    using TargetIds = std::vector< uint32_t >;
   private:
     std::vector< TargetSelectFilterPtr > m_filters;
-    std::vector< CharaEntry > m_targets;
+    std::vector< CharaEntry > m_results;
+    std::vector< uint32_t > m_targetIds;
 
-public:
-    Snapshot( const std::vector< TargetSelectFilterPtr > filters ) :
+  public:
+    Snapshot( const std::vector< TargetSelectFilterPtr >& filters ) :
       m_filters( filters )
     {
     }
     void createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
-                         int count, bool fillWithRandom, const std::set< uint32_t >& exclude = {} );
+                         int count, bool fillWithRandom, const std::vector< uint32_t >& exclude = {} );
 
     // returns actors sorted by distance
     const std::vector< CharaEntry >& getResults() const;

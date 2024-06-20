@@ -4,6 +4,8 @@
 
 #include <Actor/BNpc.h>
 #include <Actor/Chara.h>
+#include <Actor/Player.h>
+#include <Manager/PartyMgr.h>
 #include <Manager/RNGMgr.h>
 #include <Util/UtilMath.h>
 #include <Service.h>
@@ -11,27 +13,28 @@
 namespace Sapphire::World::AI
 {
 
-  bool InsideRadiusFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool InsideRadiusFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = Common::Util::distance( pSrc->getPos(), pTarget->getPos() ) <= m_distance;
     return m_negate ? !ret : ret;
   }
 
-  bool OutsideRadiusFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool OutsideRadiusFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = Common::Util::distance( pSrc->getPos(), pTarget->getPos() ) >= m_distance;
     return m_negate ? !ret : ret;
   }
 
-  bool PlayerFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool PlayerFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = pTarget->isPlayer();
     return m_negate ? !ret : ret;
   }
 
-  bool AllyFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool AllyFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = false;
+    // todo: pets, companions, enpc
     if( pSrc->isPlayer() )
     {
       auto pBNpcTarget = pTarget->getAsBNpc();
@@ -52,24 +55,24 @@ namespace Sapphire::World::AI
     return m_negate ? !ret : ret;
   }
 
-  bool OwnBattalionFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool OwnBattalionFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     return false;
   }
 
-  bool TankFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool TankFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = pTarget->getRole() == Common::Role::Tank;
     return m_negate ? !ret : ret;
   }
 
-  bool HealerFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool HealerFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = pTarget->getRole() == Common::Role::Healer;
     return m_negate ? !ret : ret;
   }
 
-  bool DpsFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool DpsFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     bool ret = true;
     switch( pTarget->getRole() )
@@ -86,13 +89,13 @@ namespace Sapphire::World::AI
     return m_negate ? !ret : ret;
   }
 
-  bool HasStatusEffectFilter::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool HasStatusEffectFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     auto ret = pTarget->hasStatusEffect( m_statusId );
     return m_negate ? !ret : ret;
   }
 
-  bool TopAggroFilter ::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool TopAggroFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     auto pBNpc = pSrc->getAsBNpc();
     bool ret = false;
@@ -103,7 +106,7 @@ namespace Sapphire::World::AI
     return m_negate ? !ret : ret;
   }
 
-  bool SecondAggroFilter ::isConditionMet( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
+  bool SecondAggroFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
     auto pBNpc = pSrc->getAsBNpc();
     bool ret = false;
@@ -126,10 +129,40 @@ namespace Sapphire::World::AI
     return m_negate ? !ret : ret;
   }
 
-  void Snapshot::createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
-                                 int count, bool fillWithRandom, const std::set< uint32_t >& exclude )
+  bool PartyMemberFilter::isApplicable( Entity::CharaPtr& pSrc, Entity::CharaPtr& pTarget ) const
   {
-    m_targets.clear();
+    bool ret = false;
+    // todo: pets, companions, enpc
+    if( auto pPlayer = pSrc->getAsPlayer() )
+    {
+      if( auto pTargetPlayer = pTarget->getAsPlayer() )
+      {
+        ret = pPlayer->getPartyId() == pTargetPlayer->getPartyId();
+      }
+      else if( auto pBNpc = pTarget->getAsBNpc() )
+      {
+        ret = pBNpc->getBNpcType() == 0;
+      }
+    }
+    else if( auto pBNpc = pSrc->getAsBNpc() )
+    {
+      if( auto pTargetPlayer = pTarget->getAsPlayer() )
+      {
+        ret = pPlayer->getPartyId() == pTargetPlayer->getPartyId();
+      }
+      else if( auto pTargetBNpc = pTarget->getAsBNpc() )
+      {
+        ret = pBNpc->getBNpcType() == pTargetBNpc->getEnemyType();
+      }
+    }
+    return m_negate ? !ret : ret;
+  }
+
+  void Snapshot::createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
+                                 int count, bool fillWithRandom, const std::vector< uint32_t >& exclude )
+  {
+    m_results.clear();
+    m_targetIds.clear();
 
     auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
     for( const auto& pActor : inRange )
@@ -138,12 +171,17 @@ namespace Sapphire::World::AI
       if( pChara == nullptr )
         continue;
 
-      if( exclude.find( pChara->getId() ) != exclude.end() ) continue;
+      // exclude this character from the result set
+      auto excludeIt = std::find_if( exclude.begin(), exclude.end(),
+        [ pChara ]( uint32_t id ) { return pChara->getId() == id; }
+      );
+      if( excludeIt != exclude.end() )
+        continue;
 
       bool matches = true;
       for( const auto& filter : m_filters )
       {
-        if( !filter->isConditionMet( pSrc, pChara ) )
+        if( !filter->isApplicable( pSrc, pChara ) )
         {
           matches = false;
           break;
@@ -157,12 +195,13 @@ namespace Sapphire::World::AI
         entry.m_pos = pChara->getPos();
         entry.m_rot = pChara->getRot();
 
-        m_targets.push_back( entry );
-        if( m_targets.size() == count ) break;
+        m_results.push_back( entry );
+        if( m_results.size() == count ) break;
       }
     }
 
-    if( fillWithRandom && m_targets.size() < count )
+    // fallback to fill with random entries if we dont have enough valid results
+    if( fillWithRandom && m_results.size() < count )
     {
       std::vector< Entity::CharaPtr > remaining;
       for( const auto& pActor : inRange )
@@ -171,48 +210,54 @@ namespace Sapphire::World::AI
         if( pChara == nullptr )
           continue;
 
-        if( exclude.find( pChara->getId() ) == exclude.end() && std::find_if( m_targets.begin(), m_targets.end(),
-            [ &pChara ]( CharaEntry entry ) { return entry.m_entityId == pChara->getId(); } ) == m_targets.end() )
+        auto excludeIt = std::find_if( exclude.begin(), exclude.end(),
+          [ pChara ]( uint32_t id ) { return pChara->getId() == id; }
+        );
+
+        if( excludeIt == exclude.end() && std::find_if( m_results.begin(), m_results.end(),
+            [ &pChara ]( CharaEntry entry ) { return entry.m_entityId == pChara->getId(); } ) == m_results.end() )
         {
           remaining.push_back( pChara );
         }
       }
-      while( m_targets.size() < count && !remaining.empty() )
+      while( m_results.size() < count && !remaining.empty() )
       {
         // idk
-        std::shuffle( remaining.begin(), remaining.end(), *RNGMgr.getRNGEngine().get() );
+        std::shuffle( remaining.begin(), remaining.end(), *RNGMgr.getRNGEngine() );
 
         auto pChara = remaining.back();
         CharaEntry entry;
         entry.m_entityId = pChara->getId();
         entry.m_pos = pChara->getPos();
         entry.m_rot = pChara->getRot();
-        m_targets.emplace_back( entry );
+        m_results.emplace_back( entry );
         remaining.pop_back();
       }
     }
 
     // sort by distance at the end always
     auto srcPos = pSrc->getPos();
-    std::sort( m_targets.begin(), m_targets.end(),
+    std::sort( m_results.begin(), m_results.end(),
       [ srcPos ]( CharaEntry l, CharaEntry r )
       {
         return Common::Util::distance( srcPos, l.m_pos ) < Common::Util::distance( srcPos, r.m_pos );
       }
     );
+
+    // we might want the target ids separately
+    m_targetIds.resize( m_results.size() );
+    for( auto i = 0; i < m_results.size(); ++i )
+      m_targetIds[ i ] = m_results[ i ].m_entityId;
   }
 
   const std::vector< Snapshot::CharaEntry >& Snapshot::getResults() const
   {
-    return m_targets;
+    return m_results;
   }
 
   const std::vector< uint32_t > Snapshot::getTargetIds() const
   {
-    std::vector< uint32_t > ret( m_targets.size() );
-    for( auto i = 0; i < m_targets.size(); ++i )
-      ret[ i ] = m_targets[ i ].m_entityId;
-    return ret;
+    return m_targetIds;
   }
 
 };// namespace Sapphire::World::AI
