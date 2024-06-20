@@ -99,6 +99,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void EventScript::onSay( uint32_t eventId, Entity::Player& player, uint64_t actorId )
+  {
+  }
+
   void EventScript::onBNpcKill( uint32_t nameId, Entity::Player& player )
   {
   }

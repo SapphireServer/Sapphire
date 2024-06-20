@@ -192,6 +192,17 @@ bool Sapphire::Scripting::ScriptMgr::onTalk( Entity::Player& player, uint64_t ac
   }
 }
 
+bool Sapphire::Scripting::ScriptMgr::onSay( Entity::Player& player, uint64_t actorId, uint32_t eventId )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::EventScript >( eventId );
+  if( script )
+  {
+    script->onSay( eventId, player, actorId );
+    return true;
+  }
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onEnterTerritory( Entity::Player& player, uint32_t eventId,
                                                        uint16_t param1, uint16_t param2 )
 {

@@ -80,6 +80,32 @@ void Sapphire::Network::GameConnection::eventHandlerTalk( const Packets::FFXIVAR
 
 }
 
+void Sapphire::Network::GameConnection::eventHandlerSay( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();
+  auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
+
+  const auto packet = ZoneChannelPacket< Client::FFXIVIpcEventHandlerSay >( inPacket );
+
+  const auto actorId = packet.data().actorId;
+  const auto eventId = packet.data().eventId;
+
+  std::string eventName = "onSay";
+  std::string objName = eventMgr.getEventName( eventId );
+
+  player.sendDebug( "Chara: {0} -> {1} \neventId: {2} ({3:08X})", actorId,
+    eventMgr.mapEventActorToRealActor( static_cast< uint32_t >( actorId ) ), eventId, eventId );
+
+  player.sendDebug( "Calling: {0}.{1}", objName, eventName );
+
+  player.eventStart( actorId, eventId, Event::EventHandler::Say, 0, 0 );
+
+  scriptMgr.onSay( player, actorId, eventId );
+
+  player.checkEvent( eventId );
+}
+
 void Sapphire::Network::GameConnection::eventHandlerEmote( const Packets::FFXIVARR_PACKET_RAW& inPacket,
                                                            Entity::Player& player )
 {

@@ -150,6 +150,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onTalk( uint32_t eventId, Sapphire::Entity::Player& player, uint64_t actorId );
 
+    virtual void onSay( uint32_t eventId, Sapphire::Entity::Player& player, uint64_t actorId );
+
     virtual void onBNpcKill( uint32_t nameId, Sapphire::Entity::Player& player );
 
     virtual void onEmote( uint64_t actorId, uint32_t eventId, uint32_t emoteId, Sapphire::Entity::Player& player );

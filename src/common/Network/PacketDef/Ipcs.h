@@ -410,6 +410,7 @@ enum ClientZoneIpcType :
   BuildPresetHandler = 0x0D9,  // updated 6.58 hotfix 2
 
   TalkEventHandler = 0x23A,         // updated 6.58 hotfix 2
+  SayEventHandler = 0x25D,         // updated 6.58 hotfix 2
   EmoteEventHandler = 0x1B5,        // updated 6.58 hotfix 2
   WithinRangeEventHandler = 0x38E,  // updated 6.58 hotfix 2
   OutOfRangeEventHandler = 0x200,   // updated 6.58 hotfix 2

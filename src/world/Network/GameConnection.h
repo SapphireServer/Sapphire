@@ -133,6 +133,8 @@ namespace Sapphire::Network
 
     DECLARE_HANDLER( eventHandlerTalk );
 
+    DECLARE_HANDLER( eventHandlerSay );
+
     DECLARE_HANDLER( eventHandlerEmote );
 
     DECLARE_HANDLER( eventHandlerWithinRange );
