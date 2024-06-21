@@ -772,7 +772,7 @@ Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
   return nullptr;
 }
 
-std::unordered_map< uint32_t, Entity::PlayerPtr > Territory::getPlayers()
+const std::unordered_map< uint32_t, Entity::PlayerPtr >& Territory::getPlayers()
 {
   return m_playerMap;
 }

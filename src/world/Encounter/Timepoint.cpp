@@ -63,12 +63,12 @@ namespace Sapphire::Encounter
       { "directorSeq",   TimepointDataType::DirectorSeq },
       { "directorFlags", TimepointDataType::DirectorFlags },
 
-      { "spawnBNpc",    TimepointDataType::SpawnBNpc },
-      { "bNpcFlags",    TimepointDataType::SetBNpcFlags },
-      { "setEObjState", TimepointDataType::SetEObjState },
+      { "spawnBNpc",     TimepointDataType::SpawnBNpc },
+      { "bNpcFlags",     TimepointDataType::SetBNpcFlags },
+      { "setEObjState",  TimepointDataType::SetEObjState },
 
-      { "setCondition", TimepointDataType::SetCondition },
-      { "snapshot",     TimepointDataType::Snapshot }
+      { "setCondition",  TimepointDataType::SetCondition },
+      { "snapshot",      TimepointDataType::Snapshot }
     };
 
     const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
@@ -181,7 +181,7 @@ namespace Sapphire::Encounter
         auto index = dataJ.at( "idx" ).get< uint32_t >();
         auto val = dataJ.at( "val" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.find( opStr )->second;
+        DirectorOpId op = directorOpMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.index = index;
@@ -197,7 +197,7 @@ namespace Sapphire::Encounter
         auto left = dataJ.at( "left" ).get< uint32_t >();
         auto right = dataJ.at( "right" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.find( opStr )->second;
+        DirectorOpId op = directorOpMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.index = index;
@@ -212,7 +212,7 @@ namespace Sapphire::Encounter
         auto& dataJ = json.at( "data" );
         auto seq = dataJ.at( "val" ).get< uint32_t >();
         auto opStr = dataJ.at( "opc" ).get< std::string >();
-        DirectorOpId op = directorOpMap.find( opStr )->second;
+        DirectorOpId op = directorOpMap.at( opStr );
 
         auto pDirectorData = std::make_shared< TimepointDataDirector >( tpType, op );
         pDirectorData->m_data.seq = seq;
@@ -261,7 +261,7 @@ namespace Sapphire::Encounter
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::Timepoint::from_json: SpawnBNpc invalid actor ref: %s" ), actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: %s" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags, bnpcType );
       }
@@ -278,7 +278,7 @@ namespace Sapphire::Encounter
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::Timepoint::from_json: SetBNpcFlags invalid actor ref: %s" ), actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SetBNpcFlags invalid actor ref: %s" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags );
         // todo: SetBNpcFlags
@@ -308,10 +308,10 @@ namespace Sapphire::Encounter
         auto& dataJ = json.at( "data" );
         auto selectorName = dataJ.at( "selectorName" ).get< std::string >();
         auto actorRef = dataJ.at( "sourceActor" ).get< std::string >();
-        // auto excludeSelector = dataJ.at( "excludeSelector" ).get< std::string >();
-        // todo:
+        auto excludeSelector = std::string(); // dataJ.at( "excludeSelector" ).get< std::string >();
+        // todo: use exclude selector when added to ui
 
-        m_pData = std::make_shared< TimepointDataSnapshot >( selectorName, actorRef, "" );
+        m_pData = std::make_shared< TimepointDataSnapshot >( selectorName, actorRef, excludeSelector );
       }
       break;
       default:
@@ -381,8 +381,6 @@ namespace Sapphire::Encounter
 
         if( pBNpc )
         {
-          auto currPos = pBNpc->getPos();
-
           pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z );
           pBNpc->setRot( pSetPosData->m_rot );
         }
@@ -426,9 +424,9 @@ namespace Sapphire::Encounter
 
         {
           auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-          for( auto player : pTeri->getPlayers() )
+          for( auto& player : pTeri->getPlayers() )
           {
-            auto pPlayer = player.second;
+            auto& pPlayer = player.second;
             if( pPlayer )
               playerMgr.sendLogMessage( *pPlayer.get(), pLogMessage->m_messageId,
                                         params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ], params[ 4 ] );
@@ -444,9 +442,9 @@ namespace Sapphire::Encounter
 
 
         auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
-        for( auto player : pTeri->getPlayers() )
+        for( auto& player : pTeri->getPlayers() )
         {
-          auto pPlayer = player.second;
+          auto& pPlayer = player.second;
           if( pPlayer )
             playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, pBtData->m_handlerId,
                                       pBtData->m_kind, pBtData->m_nameId, pBtData->m_talkerId,
