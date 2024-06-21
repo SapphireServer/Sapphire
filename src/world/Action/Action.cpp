@@ -592,15 +592,13 @@ void Action::Action::buildActionResults()
   }
 
   // If we hit an enemy
-  if( m_hitActors.size() > 0 && getHitChara()->getObjKind() != m_pSource->getObjKind() )
+  if( !m_hitActors.empty() && getHitChara()->getObjKind() != m_pSource->getObjKind() )
   {
     m_pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
   }
 
   handleJobAction();
-
-  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
-    handleStatusEffects();
+  handleStatusEffects();
 
   m_actionResultBuilder->sendActionResults( m_hitActors );
 
@@ -620,7 +618,7 @@ void Action::Action::handleStatusEffects()
     return;
 
   // handle caster statuses
-  if( m_lutEntry.statuses.caster.size() > 0 )
+  if( !m_lutEntry.statuses.caster.empty() )
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
@@ -629,7 +627,7 @@ void Action::Action::handleStatusEffects()
   }
 
   // handle hit actor statuses
-  if( m_lutEntry.statuses.target.size() > 0 && m_hitActors.size() > 0 )
+  if( !m_lutEntry.statuses.target.empty() && !m_hitActors.empty() )
   {
     for( auto& actor : m_hitActors )
     {
@@ -638,7 +636,7 @@ void Action::Action::handleStatusEffects()
         pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
 
-      if( actor->getStatusEffectMap().size() > 0 )
+      if( !actor->getStatusEffectMap().empty() )
         actor->onActionHostile( m_pSource );
     }
   }
