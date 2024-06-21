@@ -114,6 +114,8 @@ namespace Sapphire::Entity
 
     void removeSingleStatusEffectById( uint32_t id );
 
+    void removeStatusEffectById( std::vector< uint32_t > ids );
+
     void removeStatusEffectByFlag( Common::StatusEffectFlag flag );
 
     void updateStatusEffects();

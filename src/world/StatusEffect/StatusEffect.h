@@ -12,7 +12,7 @@ class StatusEffect
 {
 public:
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                uint32_t duration, std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate );
+                uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, uint32_t tickRate );
 
   StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
                 uint32_t duration, uint32_t tickRate );
@@ -21,7 +21,7 @@ public:
 
   void onTick();
 
-  std::unordered_map< Common::ParamModifier, int32_t >& getModifiers();
+  const std::unordered_map< Common::ParamModifier, int32_t >& getModifiers() const;
 
   void setModifier( Common::ParamModifier paramModifier, int32_t value );
 
@@ -50,7 +50,7 @@ public:
 
   uint32_t getFlag() const;
 
-  std::vector< World::Action::StatusModifier > getStatusModifiers() const;
+  const std::vector< World::Action::StatusModifier >& getStatusModifiers() const;
 
   void setLastTick( uint64_t lastTick );
 

@@ -22,11 +22,11 @@ using namespace Sapphire::Network::Packets;
 //using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
 Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPtr sourceActor, Entity::CharaPtr targetActor,
-                                                    uint32_t duration,std::vector< World::Action::StatusModifier >& modifiers,
+                                                    uint32_t duration, const std::vector< World::Action::StatusModifier >& modifiers,
                                                     uint32_t flag, uint32_t tickRate ) :
   StatusEffect( id, sourceActor, targetActor, duration, tickRate )
 {
-  m_statusModifiers = std::move( modifiers );
+  m_statusModifiers = modifiers;
   m_flag = flag;
 }
 
@@ -109,7 +109,7 @@ uint16_t Sapphire::StatusEffect::StatusEffect::getParam() const
   return m_param;
 }
 
-std::unordered_map< Common::ParamModifier, int32_t >& Sapphire::StatusEffect::StatusEffect::getModifiers()
+const std::unordered_map< Common::ParamModifier, int32_t >& Sapphire::StatusEffect::StatusEffect::getModifiers() const
 {
   return m_modifiers;
 }
@@ -196,7 +196,7 @@ uint32_t Sapphire::StatusEffect::StatusEffect::getFlag() const
   return m_flag;
 }
 
-std::vector< World::Action::StatusModifier > Sapphire::StatusEffect::StatusEffect::getStatusModifiers() const
+const std::vector< World::Action::StatusModifier >& Sapphire::StatusEffect::StatusEffect::getStatusModifiers() const
 {
   return m_statusModifiers;
 }

@@ -430,7 +430,7 @@ namespace Excel
     uint8_t HideCastBar : 1;
     uint8_t IsTargetLine : 1;
 
-    int8_t unknown : 8;
+    int8_t unknown;
   };
 
   /* 75653 */
