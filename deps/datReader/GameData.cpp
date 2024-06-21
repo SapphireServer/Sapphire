@@ -273,8 +273,8 @@ namespace xiv::dat
     std::string filenamePart = pathLower.substr( lastSlashPos + 1 );
 
     // Get the crc32 values from zlib, to compensate the final XOR 0xFFFFFFFF that isnot done in the exe we just reXOR
-    dirHash = crc32( 0, reinterpret_cast<const uint8_t*>( dirPart.data() ), dirPart.size() ) ^ 0xFFFFFFFF;
-    filenameHash = crc32( 0, reinterpret_cast<const uint8_t*>( filenamePart.data() ), filenamePart.size() ) ^ 0xFFFFFFFF;
+    dirHash = crc32( 0, reinterpret_cast<const uint8_t*>( dirPart.data() ), (uInt)dirPart.size() ) ^ 0xFFFFFFFF;
+    filenameHash = crc32( 0, reinterpret_cast<const uint8_t*>( filenamePart.data() ), (uInt)filenamePart.size() ) ^ 0xFFFFFFFF;
   }
 
   void GameData::createCategory( uint32_t catNum )

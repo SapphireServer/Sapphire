@@ -122,7 +122,7 @@ int main( int argc, char* argv[] )
     }
     catch( const std::exception& ex )
     {
-
+      (void)ex; // suppress unused variable warning
     }
   }
 

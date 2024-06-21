@@ -114,7 +114,7 @@ int SapphireApi::createCharacter( const uint32_t accountId, const std::string& n
   const char* ptr = infoJson.c_str() + 50;
 
   std::string lookPart( ptr );
-  int32_t pos = lookPart.find_first_of( "]" );
+  int32_t pos = (int32_t)lookPart.find_first_of( "]" );
   if( pos != std::string::npos )
   {
     lookPart = lookPart.substr( 0, pos + 1 );

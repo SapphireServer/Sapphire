@@ -474,7 +474,7 @@ bool Sapphire::Territory::update( uint64_t tickCount )
   auto dt = std::difftime( tickCount, m_lastUpdate ) / 1000.f;
 
   if( m_pNaviProvider )
-    m_pNaviProvider->updateCrowd( dt );
+    m_pNaviProvider->updateCrowd( (float)dt );
 
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );

@@ -475,7 +475,7 @@ Sapphire::TerritoryPtr Sapphire::World::Manager::TerritoryMgr::findOrCreateHousi
   if( !parentZone )
     return nullptr;
 
-  auto land = parentZone->getLand( landIdent.landId );
+  auto land = parentZone->getLand( (uint8_t)landIdent.landId );
   if( !land )
     return nullptr;
 

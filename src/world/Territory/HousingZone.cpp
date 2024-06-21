@@ -140,12 +140,12 @@ bool Sapphire::HousingZone::init()
       land->setHouse( house );
     }
 
-    land->init( entry.m_type, entry.m_size, entry.m_status, entry.m_currentPrice, entry.m_ownerId, entry.m_houseId );
+    land->init( entry.m_type, entry.m_size, entry.m_status, (uint32_t)entry.m_currentPrice, entry.m_ownerId, entry.m_houseId );
 
-    m_landPtrMap[ entry.m_landId ] = land;
+    m_landPtrMap[ (unsigned char)entry.m_landId ] = land;
 
     if( entry.m_houseId > 0 )
-      registerEstateEntranceEObj( entry.m_landId );
+      registerEstateEntranceEObj( (uint8_t)entry.m_landId );
 
     updateYardObjects( land->getLandIdent() );
   }
@@ -169,7 +169,7 @@ void Sapphire::HousingZone::onPlayerZoneIn( Entity::Player& player )
   {
     auto housingObjectInit = makeZonePacket< FFXIVIpcHousingObjectInitialize >( player.getId() );
     memset( &housingObjectInit->data().landIdent, 0xFF, sizeof( Common::LandIdent ) );
-    housingObjectInit->data().u1 = 0xFF;
+    housingObjectInit->data().u1 |= 0xFF;
     housingObjectInit->data().packetNum = yardPacketNum;
     housingObjectInit->data().packetTotal = yardPacketTotal;
 
@@ -232,7 +232,7 @@ void Sapphire::HousingZone::sendLandSet( Entity::Player& player )
       for( auto i = 0; i != parts.size(); i++ )
       {
         landData.housePart[ i ] = parts[ i ].first;
-        landData.houseColour[ i ] = parts[ i ].second;
+        landData.houseColour[ i ] = (uint8_t)parts[ i ].second;
       }
     }
   }
@@ -269,7 +269,7 @@ void Sapphire::HousingZone::sendLandUpdate( uint8_t landId )
       for( auto i = 0; i != parts.size(); i++ )
       {
         landData.housePart[ i ] = parts[ i ].first;
-        landData.houseColour[ i ] = parts[ i ].second;
+        landData.houseColour[ i ] = (uint8_t)parts[ i ].second;
       }
     }
 
@@ -409,11 +409,11 @@ void Sapphire::HousingZone::updateYardObjectPos( Entity::Player& sourcePlayer, u
 
     auto packet = makeZonePacket< Server::FFXIVIpcHousingObjectMove >( player.second->getId() );
 
-    packet->data().itemRotation = item.getRot();
+    packet->data().itemRotation = (uint16_t)item.getRot();
     packet->data().pos = item.getPos();
 
-    packet->data().landId = landId;
-    packet->data().objectArray = slot;
+    packet->data().landId = (uint8_t)landId;
+    packet->data().objectArray = (uint8_t)slot;
 
     player.second->queuePacket( packet );
   }

@@ -1032,13 +1032,13 @@ Sapphire::ItemPtr Sapphire::Entity::Player::dropInventoryItem( Sapphire::Common:
 {
   auto& container = m_storageMap[ type ];
 
-  auto item = container->getItem( slotId );
+  auto item = container->getItem( (uint8_t)slotId );
   if( !item )
     return nullptr;
 
   // unlink item
-  container->removeItem( slotId, false );
-  updateContainer( type, slotId, nullptr );
+  container->removeItem((uint8_t)slotId, false );
+  updateContainer( type, (uint8_t)slotId, nullptr );
 
   if( !silent )
   {
@@ -1079,7 +1079,7 @@ bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Inventory::Invento
 
     for( uint16_t idx = 0; idx < container->getMaxSize(); idx++ )
     {
-      auto item = container->getItem( idx );
+      auto item = container->getItem((uint8_t)idx );
       if( !item )
       {
         containerPair = std::make_pair( bagId, idx );
@@ -1094,7 +1094,7 @@ bool Sapphire::Entity::Player::getFreeInventoryContainerSlot( Inventory::Invento
 void Sapphire::Entity::Player::insertInventoryItem( Sapphire::Common::InventoryType type, uint16_t slot,
                                                     const Sapphire::ItemPtr item )
 {
-  updateContainer( type, slot, item );
+  updateContainer( type, (uint8_t)slot, item );
 
   auto slotUpdate = std::make_shared< UpdateInventorySlotPacket >( getId(), slot, type, *item );
   queuePacket( slotUpdate );

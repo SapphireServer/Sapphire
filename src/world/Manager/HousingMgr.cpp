@@ -89,7 +89,7 @@ bool Sapphire::World::Manager::HousingMgr::init()
   {
     auto count = landSet.second.size();
 
-    houseCount += count;
+    houseCount += (uint32_t)count;
 
     if( landSet.second.size() != 60 )
     {
@@ -810,7 +810,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( ident.landId );
+  auto land = hZone->getLand( (uint8_t)ident.landId );
   if( !land )
     return;
 
@@ -1295,6 +1295,7 @@ bool Sapphire::World::Manager::HousingMgr::moveInternalItem( Entity::Player& pla
   }
   catch( const std::out_of_range& ex )
   {
+    (void)ex; // suppress unused var warning
     return false;
   }
 
@@ -1702,7 +1703,7 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
   updateHouseModels( land->getHouse() );
   if( !isInterior )
   {
-    terri->sendLandUpdate( landIdent.landId );
+    terri->sendLandUpdate( (uint8_t)landIdent.landId );
   }
 }
 
@@ -1758,11 +1759,11 @@ void Sapphire::World::Manager::HousingMgr::removeHouse( Entity::Player& player, 
 
   land->setStatus( HouseStatus::Sold );
   land->updateLandDb();
-  terri->sendLandUpdate( plot );
+  terri->sendLandUpdate( (uint8_t)plot );
 
   player.setLandFlags( LandFlagsSlot::Private, 0, land->getLandIdent() );
 
-  terri->removeEstateEntranceEObj( plot );
+  terri->removeEstateEntranceEObj((uint8_t)plot );
 
   // missing reply for ClientTrigger RequestEstateHallRemoval
 }

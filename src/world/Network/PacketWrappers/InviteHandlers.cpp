@@ -115,7 +115,7 @@ void Sapphire::Network::GameConnection::socialReplyHandler( const FFXIVARR_PACKE
       strcpy( inviteUpPacket->data().name, player.getName().c_str() );
       pPlayer->queuePacket( inviteUpPacket );
 
-      inviteReplyData.contentId == pPlayer->getContentId();
+      inviteReplyData.contentId = pPlayer->getContentId();
       inviteReplyData.socialType = data.socialType;
       inviteReplyData.gender = pPlayer->getGender();
       strcpy( inviteReplyData.name, pPlayer->getName().c_str() );

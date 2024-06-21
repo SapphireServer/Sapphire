@@ -573,7 +573,7 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
-  params.maxSpeed = std::pow( 2, chara.getRadius() * 0.35f ) + 1.f;
+  params.maxSpeed = (float)std::pow( 2, chara.getRadius() * 0.35f ) + 1.f;
   params.radius = ( chara.getRadius() ) * 0.75f;
   params.collisionQueryRange = params.radius * 12.0f;
   params.pathOptimizationRange = params.radius * 20.0f;
@@ -589,7 +589,7 @@ void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& b
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;
   params.maxAcceleration = 25.f;
-  params.maxSpeed = std::pow( 2, bnpc.getRadius() * 0.35f ) + 1.f;
+  params.maxSpeed = (float)std::pow( 2, bnpc.getRadius() * 0.35f ) + 1.f;
   if( bnpc.getState() == Entity::BNpcState::Combat || bnpc.getState() == Entity::BNpcState::Retreat )
     params.maxSpeed *= 2;
   params.radius = ( bnpc.getRadius() ) * 0.75f;

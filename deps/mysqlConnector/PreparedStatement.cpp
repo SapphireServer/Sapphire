@@ -77,7 +77,7 @@ struct LongDataSender
 
       while( sent < str->length() )
       {
-         chunkSize = ( sent + MAX_SEND_LONGDATA_CHUNK > str->length()
+         chunkSize = (uint32_t)( sent + MAX_SEND_LONGDATA_CHUNK > str->length()
                      ? str->length() - sent
                      : MAX_SEND_LONGDATA_CHUNK );
 

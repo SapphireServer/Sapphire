@@ -131,7 +131,7 @@ void Sapphire::Db::DbWorkerPool< T >::escapeString( std::string& str )
     return;
 
   char* buf = new char[str.size() * 2 + 1];
-  escapeString( buf, str.c_str(), str.size() );
+  escapeString( buf, str.c_str(), (unsigned long)str.size() );
   str = buf;
   delete[] buf;
 }

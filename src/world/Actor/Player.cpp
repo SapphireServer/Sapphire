@@ -1572,9 +1572,9 @@ bool Sapphire::Entity::Player::hateListHasEntry( BNpcPtr pBNpc )
 void Sapphire::Entity::Player::sendHateList()
 {
   auto hateListPacket = makeZonePacket< FFXIVIpcHateList >( getId() );
-  hateListPacket->data().numEntries = m_actorIdTohateSlotMap.size();
+  hateListPacket->data().numEntries = (uint32_t)m_actorIdTohateSlotMap.size();
   auto hateRankPacket = makeZonePacket< FFXIVIpcHateRank >( getId() );
-  hateRankPacket->data().numEntries = m_actorIdTohateSlotMap.size();
+  hateRankPacket->data().numEntries = (uint32_t)m_actorIdTohateSlotMap.size();
   auto it = m_actorIdTohateSlotMap.begin();
   for( int32_t i = 0; it != m_actorIdTohateSlotMap.end(); ++it, i++ )
   {
@@ -1759,7 +1759,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = damage.first;
+    entry.value = (int16_t)damage.first;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.param0 = static_cast< uint8_t >( damage.second );
     entry.param2 = 0x72;
@@ -1774,7 +1774,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
     effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
 
     Common::EffectEntry entry{};
-    entry.value = damage.first;
+    entry.value = (int16_t)damage.first;
     entry.effectType = Common::ActionEffectType::Damage;
     entry.param0 = static_cast< uint8_t >( damage.second );
     entry.param2 = 0x73;
@@ -1785,7 +1785,7 @@ void Sapphire::Entity::Player::autoAttack( CharaPtr pTarget )
 
   }
 
-  pTarget->takeDamage( damage.first );
+  pTarget->takeDamage( (uint32_t)damage.first );
 
 }
 

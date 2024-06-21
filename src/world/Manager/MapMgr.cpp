@@ -620,7 +620,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   if( mapData.size() <= 2 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     
@@ -629,7 +629,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   else if( mapData.size() <= 4 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate4 >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     
@@ -638,7 +638,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   else if( mapData.size() <= 8 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate8 >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     
@@ -647,7 +647,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   else if( mapData.size() <= 16 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate16 >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     
@@ -656,7 +656,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   else if( mapData.size() <= 32 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate32 >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     
@@ -665,7 +665,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   else if( mapData.size() <= 64 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate64 >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     
@@ -674,7 +674,7 @@ void Sapphire::World::Manager::MapMgr::sendPackets( Entity::Player& player, Even
   else if( mapData.size() <= 128 )
   {
     auto mapUpdatePacket = makeZonePacket< FFXIVIpcMapUpdate128 >( player.getId() );
-    mapUpdatePacket->data().entryCount = mapData.size();
+    mapUpdatePacket->data().entryCount = (uint8_t)mapData.size();
 
     fillPacket( mapData, mapUpdatePacket->data().iconIds, mapUpdatePacket->data().levelIds, mapUpdatePacket->data().eventIds );
     

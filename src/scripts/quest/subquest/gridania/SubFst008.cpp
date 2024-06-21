@@ -125,7 +125,7 @@ private:
                         {
                           if( player.giveQuestRewards( getId(), result.param3 ) )
                           {
-                            player.setQuestUI8BH( getId(), result.param3 );
+                            player.setQuestUI8BH( getId(), (uint8_t)result.param3 );
                             player.finishQuest( getId() );
                           }
                         }

@@ -101,7 +101,7 @@ namespace xiv::utils::crc32
   void generate_hashes_1( std::string& i_format, const uint32_t i_first_index, std::vector< uint32_t >& o_hashes )
   {
     char* str = const_cast<char*>(i_format.data());
-    const uint32_t str_size = i_format.size();
+    const uint32_t str_size = (uint32_t)i_format.size();
 
     o_hashes.resize( 10000 );
 
@@ -130,7 +130,7 @@ namespace xiv::utils::crc32
                           std::vector< uint32_t >& o_hashes )
   {
     char* str = const_cast<char*>(i_format.data());
-    const uint32_t str_size = i_format.size();
+    const uint32_t str_size = (uint32_t)i_format.size();
 
     o_hashes.resize( 100000000 );
 
