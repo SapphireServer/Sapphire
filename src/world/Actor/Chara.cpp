@@ -559,6 +559,24 @@ void Chara::removeSingleStatusEffectById( uint32_t id )
   }
 }
 
+void Chara::removeStatusEffectById( std::vector< uint32_t > ids )
+{
+  for( auto effectIt = m_statusEffectMap.begin(); effectIt != m_statusEffectMap.end(); )
+  {
+    auto foundStatus = std::find( ids.begin(), ids.end(), effectIt->second->getId() );
+
+    if( foundStatus != ids.end() )
+    {
+      effectIt = removeStatusEffect( effectIt->first );
+      ids.erase( foundStatus );
+    }
+    else
+    {
+      ++effectIt;
+    }
+  }
+}
+
 void Chara::removeStatusEffectByFlag( Common::StatusEffectFlag flag )
 {
   for( auto effectIt = m_statusEffectMap.begin(); effectIt != m_statusEffectMap.end(); )

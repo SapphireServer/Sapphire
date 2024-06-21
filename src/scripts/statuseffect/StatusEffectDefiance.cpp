@@ -15,12 +15,7 @@ public:
 
   void onExpire( Entity::Chara& actor ) override
   {
-    actor.removeSingleStatusEffectById( Unchained );
-    actor.removeSingleStatusEffectById( Wrath );
-    actor.removeSingleStatusEffectById( WrathII );
-    actor.removeSingleStatusEffectById( WrathIII );
-    actor.removeSingleStatusEffectById( WrathIV );
-    actor.removeSingleStatusEffectById( Infuriated );
+    actor.removeStatusEffectById( { Unchained, Wrath, WrathII, WrathIII, WrathIV, Infuriated } );
   }
 };
 
