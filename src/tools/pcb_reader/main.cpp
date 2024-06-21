@@ -212,6 +212,7 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
+    printf("An exception has occurred: %s", e.what());
     printf( "Unable to initialise EXD!\n Usage: pcb_reader <teri> \"path/to/FINAL FANTASY XIV - A REALM REBORN/game/sqpack\" [--no-obj, --dump-all, --navmesh, --jobs #]\n" );
     return -1;
   }
@@ -390,7 +391,7 @@ int main( int argc, char* argv[] )
             mesh.indices[ indices++ ] = index.index[ 2 ];
             // std::cout << std::to_string( index.unknown[0] )<< " " << std::to_string( index.unknown[1] )<< " " << std::to_string( index.unknown[2]) << std::endl;
           }
-          max_index += entry.data.vertices.size() + entry.data.vertices_i16.size();
+          max_index += (uint32_t)(entry.data.vertices.size() + entry.data.vertices_i16.size());
           model.meshes[ meshCount++ ] = mesh;
         }
         exportedGroup.models[model.name] = model;
@@ -521,7 +522,7 @@ int main( int argc, char* argv[] )
 
       printf( "Built export struct for %s in %lu seconds \n",
         zoneName.c_str(),
-        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
+        (unsigned long)std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
       if( zoneCount++ % nJobs == 0 )
       {
         exportMgr.restart();
@@ -540,7 +541,7 @@ int main( int argc, char* argv[] )
   std::cout << "\n\n\n";
 
   printf( "Finished all tasks in %lu seconds\n",
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
+            (unsigned long)std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
 
   delete eData;
   delete gameData;

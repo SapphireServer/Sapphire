@@ -121,7 +121,7 @@ struct PCB_FILE
         /*   printf( "\tnum_v16: %i, num_indices: %i, num_vertices: %i\n\n",
                    block_entry.header.num_v16, block_entry.header.num_indices, block_entry.header.num_vertices );*/
         int doffset = sizeof( block_entry.header ) + offset;
-        uint16_t block_size = sizeof( block_entry.header ) +
+        uint16_t block_size = (uint16_t)sizeof( block_entry.header ) +
                               block_entry.header.num_vertices * 3 * 4 +
                               block_entry.header.num_v16 * 6 +
                               block_entry.header.num_indices * 6;

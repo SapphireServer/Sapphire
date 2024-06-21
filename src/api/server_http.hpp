@@ -242,7 +242,7 @@ namespace SimpleWeb {
             std::shared_ptr<Request> request(new Request(*socket));
 
             //Set timeout on the following asio::async-read or write function
-            auto timer=this->get_timeout_timer(socket, config.timeout_request);
+            auto timer=this->get_timeout_timer(socket, (long)config.timeout_request);
                         
             asio::async_read_until(*socket, request->streambuf, "\r\n\r\n",
                     [this, socket, request, timer](const std::error_code& ec, size_t bytes_transferred) {
@@ -272,7 +272,7 @@ namespace SimpleWeb {
                         }
                         if(content_length>num_additional_bytes) {
                             //Set timeout on the following asio::async-read or write function
-                            auto timer=this->get_timeout_timer(socket, config.timeout_content);
+                            auto timer=this->get_timeout_timer(socket, (long)config.timeout_content);
                             asio::async_read(*socket, request->streambuf,
                                     asio::transfer_exactly(static_cast< size_t >(content_length-num_additional_bytes)),
                                     [this, socket, request, timer]
@@ -368,7 +368,7 @@ namespace SimpleWeb {
                 std::function<void(std::shared_ptr<typename ServerBase<socket_type>::Response>,
                                    std::shared_ptr<typename ServerBase<socket_type>::Request>)>& resource_function) {
             //Set timeout on the following asio::async-read or write function
-            auto timer=this->get_timeout_timer(socket, config.timeout_content);
+            auto timer=this->get_timeout_timer(socket, (long)config.timeout_content);
 
             auto response=std::shared_ptr<Response>(new Response(socket), [this, request, timer](Response *response_ptr) {
                 auto response=std::shared_ptr<Response>(response_ptr);

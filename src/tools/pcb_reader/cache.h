@@ -119,6 +119,7 @@ private:
     }
     catch( std::exception& e )
     {
+      (void)e; // suppress unused warning
       std::vector< char > empty;
       return empty;
     }
