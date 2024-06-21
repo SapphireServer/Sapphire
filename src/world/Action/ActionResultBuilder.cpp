@@ -94,7 +94,7 @@ void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t 
 }
 
 void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
-                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, bool shouldOverride )
+                                             const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( target );
   nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, shouldOverride );
@@ -108,7 +108,7 @@ void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t dur
   addResultToActor( m_sourceChara, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
+void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                                  uint32_t flag, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara );

@@ -624,7 +624,7 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, status.modifiers, status.flag, true );
+      pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
     }
   }
 
@@ -635,7 +635,7 @@ void Action::Action::handleStatusEffects()
     {
       for( auto& status : m_lutEntry.statuses.target )
       {
-        pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, true );
+        pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
 
       if( actor->getStatusEffectMap().size() > 0 )

@@ -22,9 +22,9 @@ namespace Sapphire::World::Action
     void comboSucceed();
     void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride );
     void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                            std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, bool shouldOverride );
+                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool shouldOverride );
     void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, bool shouldOverride );
-    void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
+    void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                 uint32_t flag, bool shouldOverride );
     void mount( uint16_t mountId );
 
