@@ -92,7 +92,7 @@ std::unique_ptr< RandGenerator< float > > CalcStats::rnd = nullptr;
    Big thanks to the Theoryjerks group!
 
    NOTE:
-   Formulas here shouldn't be considered final. It's possible that the formula it was based on is correct but 
+   Formulas here shouldn't be considered final. It's possible that the formula it was based on is correct but
    wasn't implemented correctly here, or approximated things due to limited knowledge of how things work in retail.
    It's also possible that we're using formulas that were correct for previous patches, but not the current version.
 
@@ -142,11 +142,14 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
   uint16_t hpMod = paramGrowthInfo->data().ParamBase;
   uint16_t jobModHp = classInfo->data().Hp;
   float approxBaseHp = 0.0f; // Read above
+  float hpModPercent = player.getModifier( Common::ParamModifier::HPPercent );
 
   approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
   auto result = static_cast< uint32_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
                                          floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+
+  result *= hpModPercent;
 
   return result;
 }
@@ -601,6 +604,7 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage
   auto wd = weaponDamage( chara, wepDmg );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
+  auto damageDealtMod = chara.getModifier( Common::ParamModifier::DamageDealtPercent );
 
   auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
   Sapphire::Common::CalcResultType hitType = Sapphire::Common::CalcResultType::TypeDamageHp;
@@ -615,11 +619,14 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage
 
   // todo: buffs
 
+  factor *= damageDealtMod;
+
   constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {}  = {}";
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
     PlayerMgr::sendDebug( *player, format, pot, ptc, wd, wepDmg, ap, det, factor );
+    PlayerMgr::sendDebug( *player, "DamageDealtPercent: {}", damageDealtMod );
   }
   else
   {

@@ -32,6 +32,8 @@
 #include <Service.h>
 #include "WorldServer.h"
 
+#include "Job/Warrior.h"
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network;
@@ -100,6 +102,7 @@ bool Action::Action::init()
   m_cooldownGroup = m_actionData->data().RecastGroup;
   m_range = m_actionData->data().SelectRange;
   m_effectRange = m_actionData->data().EffectRange;
+  m_effectWidth = m_actionData->data().EffectWidth;
   m_category = static_cast< Common::ActionCategory >( m_actionData->data().Category );
   m_castType = static_cast< Common::CastType >( m_actionData->data().EffectType );
   m_aspect = static_cast< Common::ActionAspect >( m_actionData->data().AttackType );
@@ -131,7 +134,7 @@ bool Action::Action::init()
   m_primaryCostType = static_cast< Common::ActionPrimaryCostType >( m_actionData->data().CostType );
   m_primaryCost = m_actionData->data().CostValue;
 
-  /*if( !m_actionData->targetArea )
+  if( !m_actionData->data().SelectGround )
   {
     // override pos to target position
     // todo: this is kinda dirty
@@ -143,7 +146,7 @@ bool Action::Action::init()
         break;
       }
     }
-  }*/
+  }
 
   // todo: add missing rows for secondaryCostType/secondaryCostType and rename the current rows to primaryCostX
 
@@ -503,17 +506,21 @@ void Action::Action::buildActionResults()
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto hasLutEntry = hasValidLutEntry();
+  auto hasScript = scriptMgr.onExecute( *this );
 
-  if( !scriptMgr.onExecute( *this ) && !hasLutEntry )
+  if( !hasScript && !hasLutEntry )
   {
     if( auto player = m_pSource->getAsPlayer() )
       Manager::PlayerMgr::sendUrgent( *player, "missing lut entry for action#{}", getId() );
     return;
   }
 
+  if( !hasScript )
+    m_enableGenericHandler = true;
+
   Network::Util::Packet::sendHudParam( *m_pSource );
 
-  if( !hasLutEntry || m_hitActors.empty() )
+  if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
     m_actionResultBuilder->sendActionResults( {} );
@@ -583,11 +590,70 @@ void Action::Action::buildActionResults()
       shouldRestoreMP = false;
     }
   }
+
+  // If we hit an enemy
+  if( m_hitActors.size() > 0 && getHitChara()->getObjKind() != m_pSource->getObjKind() )
+  {
+    m_pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
+  }
+
+  handleJobAction();
+
+  if( m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0 )
+    handleStatusEffects();
+
   m_actionResultBuilder->sendActionResults( m_hitActors );
 
   // TODO: disabled, reset kills our queued actions
   // at this point we're done with it and no longer need it
   // m_effectBuilder.reset();
+}
+
+void Action::Action::handleStatusEffects()
+{
+  auto pActionBuilder = getActionResultBuilder();
+
+  if( !pActionBuilder )
+    return;
+
+  if( isComboAction() && !isCorrectCombo() )
+    return;
+
+  // handle caster statuses
+  if( m_lutEntry.statuses.caster.size() > 0 )
+  {
+    for( auto& status : m_lutEntry.statuses.caster )
+    {
+      pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, status.modifiers, status.flag, true );
+    }
+  }
+
+  // handle hit actor statuses
+  if( m_lutEntry.statuses.target.size() > 0 && m_hitActors.size() > 0 )
+  {
+    for( auto& actor : m_hitActors )
+    {
+      for( auto& status : m_lutEntry.statuses.target )
+      {
+        pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, status.modifiers, status.flag, true );
+      }
+
+      if( actor->getStatusEffectMap().size() > 0 )
+        actor->onActionHostile( m_pSource );
+    }
+  }
+}
+
+void Action::Action::handleJobAction()
+{
+  switch( m_pSource->getClass() )
+  {
+    case ClassJob::Warrior:
+    {
+      Warrior::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
+    }
+  }
 }
 
 bool Action::Action::preCheck()
@@ -712,6 +778,17 @@ bool Action::Action::primaryCostCheck( bool subtractCosts )
       return true;
     }
 
+    case Common::ActionPrimaryCostType::StatusEffect:
+    {
+      if( !m_pSource->hasStatusEffect( m_primaryCost ) )
+        return false;
+
+      if( subtractCosts )
+        m_pSource->removeSingleStatusEffectById( m_primaryCost );
+
+      return true;
+    }
+
     // free casts, likely just pure ogcds
     case Common::ActionPrimaryCostType::None:
     {
@@ -780,7 +857,6 @@ void Action::Action::addDefaultActorFilters()
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
-    case Common::CastType::Type3:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
       addActorFilter( filter );
@@ -849,7 +925,8 @@ Entity::CharaPtr Action::Action::getHitChara()
 bool Action::Action::hasValidLutEntry() const
 {
   return m_lutEntry.potency != 0 || m_lutEntry.comboPotency != 0 || m_lutEntry.flankPotency != 0 || m_lutEntry.frontPotency != 0 ||
-    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0;
+    m_lutEntry.rearPotency != 0 || m_lutEntry.curePotency != 0 || m_lutEntry.restoreMPPercentage != 0 ||
+    m_lutEntry.statuses.caster.size() > 0 || m_lutEntry.statuses.target.size() > 0;
 }
 
 Action::ActionResultBuilderPtr Action::Action::getActionResultBuilder()
@@ -875,4 +952,9 @@ void Action::Action::setAggroMultiplier( float aggroMultiplier )
 uint64_t Action::Action::getCastTimeRest() const
 {
   return m_castTimeRestMs;
+}
+
+void Action::Action::enableGenericHandler()
+{
+  m_enableGenericHandler = true;
 }

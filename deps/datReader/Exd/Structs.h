@@ -391,14 +391,14 @@ namespace Excel
     uint8_t EffectWidth;
     uint8_t CostType;
     uint8_t Cond;
-    uint8_t RecastGroup;
     uint8_t Element;
     uint8_t ProcStatus;
-    uint8_t UseClassJob;
+    uint8_t ClassJobCategory;
+    uint8_t RecastGroup;
     uint8_t Init;
     uint8_t Omen;
-    uint8_t Unknown;
-    int8_t Learn;
+    uint8_t Learn;
+    int8_t UseClassJob;
     int8_t SelectRange;
     int8_t SelectCorpse;
     int8_t AttackType;
@@ -430,7 +430,7 @@ namespace Excel
     uint8_t HideCastBar : 1;
     uint8_t IsTargetLine : 1;
 
-    int8_t padding0;
+    int8_t unknown : 8;
   };
 
   /* 75653 */
@@ -2054,7 +2054,8 @@ namespace Excel
     uint8_t NotControl : 1;
     uint8_t NotAction : 1;
     uint8_t NotMove : 1;
-    uint8_t padding0 : 6;
+    uint8_t padding0 : 5;
+    uint8_t CanOff : 1;
     uint8_t SemiTransparent : 1;
     uint8_t FcAction : 1;
     int8_t padding1[2];

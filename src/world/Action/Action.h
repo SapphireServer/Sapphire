@@ -55,6 +55,8 @@ namespace Sapphire::World::Action
 
     uint64_t getCastTimeRest() const;
 
+    void enableGenericHandler();
+    
     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > getActionData() const;
 
     /*!
@@ -110,6 +112,10 @@ namespace Sapphire::World::Action
     ActionResultBuilderPtr getActionResultBuilder();
 
     void buildActionResults();
+
+    void handleStatusEffects();
+
+    void handleJobAction();
 
     /*!
      * @brief Adds an actor filter to this action.
@@ -190,6 +196,7 @@ namespace Sapphire::World::Action
     uint8_t m_cooldownGroup{};
     int8_t m_range{};
     uint8_t m_effectRange{};
+    uint8_t m_effectWidth{};
     uint8_t m_xAxisModifier{};
     Common::ActionAspect m_aspect;
     Common::CastType m_castType;
@@ -206,6 +213,7 @@ namespace Sapphire::World::Action
     bool m_canTargetFriendly{};
     bool m_canTargetHostile{};
     bool m_canTargetDead{};
+    bool m_enableGenericHandler{};
 
     Common::ActionInterruptType m_interruptType;
 

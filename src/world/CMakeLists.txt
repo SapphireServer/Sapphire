@@ -7,6 +7,7 @@ file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         *.cpp
         Actor/*.cpp
         Action/*.cpp
+        Action/Job/*.cpp
         AI/*.cpp
         AI/Fsm/*.cpp
         ContentFinder/*.cpp

@@ -40,6 +40,8 @@ struct StatusModifier
 struct StatusEntry
 {
   uint16_t id;
+  int32_t duration;
+  uint32_t flag;
   std::vector< StatusModifier > modifiers;
 };
 
@@ -76,6 +78,8 @@ void to_json( nlohmann::ordered_json& j, const StatusEntry& statusEntry )
 {
   j = nlohmann::ordered_json{
     { "id", statusEntry.id },
+    { "duration", statusEntry.duration },
+    { "flag", statusEntry.flag },
     { "modifiers", statusEntry.modifiers }
   };
 }

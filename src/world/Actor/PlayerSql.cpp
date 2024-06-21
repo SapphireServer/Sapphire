@@ -258,7 +258,7 @@ bool Player::loadAchievements()
 bool Player::loadClassData()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  // ClassIdx, Exp, Lvl
+  // ClassIdx, Exp, Lvl, BorrowAction
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
@@ -268,9 +268,11 @@ bool Player::loadClassData()
     auto index = res->getUInt16( 1 );
     auto exp = res->getUInt( 2 );
     auto lvl = res->getUInt8( 3 );
+    auto borrowAction = res->getBlobVector( "BorrowAction" );
 
     m_classArray[ index ] = lvl;
     m_expArray[ index ] = exp;
+    memcpy( m_borrowActions[ index ].data(), borrowAction.data(), borrowAction.size() );
   }
 
   return true;
@@ -487,13 +489,19 @@ void Player::updateDbClass() const
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast<uint8_t>( getClass() ) )->data().WorkIndex;
+  auto& borrowAction = m_borrowActions[ classJobIndex ];
 
-  //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
+  //Exp = ?, Lvl = ?, BorrowAction = ? WHERE CharacterId = ? AND ClassIdx = ?
   auto stmtS = db.getPreparedStatement( Db::CHARA_CLASS_UP );
   stmtS->setInt( 1, getExp() );
   stmtS->setInt( 2, getLevel() );
-  stmtS->setUInt64( 3, m_characterId );
-  stmtS->setInt( 4, classJobIndex );
+
+  std::vector< uint8_t > borrowActionVec( borrowAction.size() * 4 );
+  memcpy( borrowActionVec.data(), borrowAction.data(), borrowAction.size() * 4 );
+  stmtS->setBinary( 3, borrowActionVec );
+
+  stmtS->setUInt64( 4, m_characterId );
+  stmtS->setInt( 5, classJobIndex );
   db.execute( stmtS );
 }
 
@@ -581,10 +589,14 @@ void Player::insertDbClass( const uint8_t classJobIndex, uint8_t level ) const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmtClass = db.getPreparedStatement( Db::CHARA_CLASS_INS );
+  auto& borrowAction = m_borrowActions[ classJobIndex ];
+
   stmtClass->setUInt64( 1, m_characterId );
   stmtClass->setInt( 2, classJobIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, level );
+  std::vector< uint8_t > borrowActionVec( borrowAction.size() );
+  stmtClass->setBinary( 5, borrowActionVec );
   db.directExecute( stmtClass );
 }
 

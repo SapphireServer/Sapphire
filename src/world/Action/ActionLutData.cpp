@@ -85,6 +85,14 @@ std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifi
   { "Control", Common::ParamModifier::Control },
   { "Gathering", Common::ParamModifier::Gathering },
   { "Perception", Common::ParamModifier::Perception },
+  { "TickHeal", Common::ParamModifier::TickHeal },
+  { "TickDamage", Common::ParamModifier::TickDamage },
+  { "StrengthPercent", Common::ParamModifier::StrengthPercent },
+  { "DexterityPercent", Common::ParamModifier::DexterityPercent },
+  { "VitalityPercent", Common::ParamModifier::VitalityPercent },
+  { "IntelligencePercent", Common::ParamModifier::IntelligencePercent },
+  { "MindPercent", Common::ParamModifier::MindPercent },
+  { "PietyPercent", Common::ParamModifier::PietyPercent },
   { "HPPercent", Common::ParamModifier::HPPercent },
   { "MPPercent", Common::ParamModifier::MPPercent },
   { "TPPercent", Common::ParamModifier::TPPercent },
@@ -100,7 +108,15 @@ std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifi
   { "CriticalHitPowerPercent", Common::ParamModifier::CriticalHitPowerPercent },
   { "CriticalHitResiliencePercent", Common::ParamModifier::CriticalHitResiliencePercent },
   { "CriticalHitPercent", Common::ParamModifier::CriticalHitPercent },
-  { "EnmityPercent", Common::ParamModifier::EnmityPercent }
+  { "EnmityPercent", Common::ParamModifier::EnmityPercent },
+  { "DamageDealtPercent", Common::ParamModifier::DamageDealtPercent },
+  { "DamageTakenPercent", Common::ParamModifier::DamageTakenPercent },
+  { "HealingMagicRecoveryPercent", Common::ParamModifier::HealingMagicRecoveryPercent },
+  { "SlashingResistancePercent", Common::ParamModifier::SlashingResistancePercent },
+  { "PiercingResistancePercent", Common::ParamModifier::PiercingResistancePercent },
+  { "BluntResistancePercent", Common::ParamModifier::BluntResistancePercent },
+  { "ProjectileResistancePercent", Common::ParamModifier::ProjectileResistancePercent },
+  { "ParryPercent", Common::ParamModifier::ParryPercent }
 };
 
 bool ActionLutData::cacheActions()

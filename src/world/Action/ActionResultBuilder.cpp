@@ -1,4 +1,4 @@
-#include "ActionResultBuilder.h"
+  #include "ActionResultBuilder.h"
 #include "ActionResult.h"
 
 #include <Actor/Player.h>
@@ -93,10 +93,26 @@ void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t 
   addResultToActor( target, nextResult );
 }
 
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
+                                             std::vector< World::Action::StatusModifier > modifiers, uint32_t flag, bool shouldOverride )
+{
+  ActionResultPtr nextResult = make_ActionResult( target );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, shouldOverride );
+  addResultToActor( target, nextResult );
+}
+
 void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara );
   nextResult->applyStatusEffectSelf( statusId, duration, param, shouldOverride );
+  addResultToActor( m_sourceChara, nextResult );
+}
+
+void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, std::vector< World::Action::StatusModifier > modifiers,
+                                                 uint32_t flag, bool shouldOverride )
+{
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara );
+  nextResult->applyStatusEffectSelf( statusId, duration, param, modifiers, flag, shouldOverride );
   addResultToActor( m_sourceChara, nextResult );
 }
 

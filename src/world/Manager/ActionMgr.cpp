@@ -71,13 +71,6 @@ void ActionMgr::handleTargetedAction( Entity::Chara& src, uint32_t actionId, uin
 
   auto actionData = action->getActionData();
 
-  // cancel any aoe actions casted with this packet
-  if( actionData->data().EffectRange )
-  {
-    action->interrupt();
-    return;
-  }
-
   bootstrapAction( src, action, actionData );
 }
 
