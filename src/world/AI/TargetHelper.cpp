@@ -255,7 +255,7 @@ namespace Sapphire::World::AI
     return m_results;
   }
 
-  const std::vector< uint32_t > Snapshot::getTargetIds() const
+  const std::vector< uint32_t >& Snapshot::getTargetIds() const
   {
     return m_targetIds;
   }

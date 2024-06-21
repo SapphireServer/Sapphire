@@ -14,7 +14,7 @@
 
 namespace Sapphire::Encounter
 {
-  bool ConditionHp::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+  bool ConditionHp::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( layoutId );
     if( !pBNpc )
@@ -35,7 +35,7 @@ namespace Sapphire::Encounter
     return false;
   };
 
-  bool ConditionDirectorVar::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+  bool ConditionDirectorVar::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
 
     Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
@@ -60,7 +60,7 @@ namespace Sapphire::Encounter
     return false;
   }
 
-  bool ConditionCombatState::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+  bool ConditionCombatState::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     auto pBattleNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
 
@@ -85,14 +85,14 @@ namespace Sapphire::Encounter
     return false;
   }
 
-  bool ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+  bool ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     auto elapsed = time - pack.getStartTime();
     // todo: check encounter time
     return elapsed >= this->duration;
   }
 
-  bool ConditionBNpcFlags::isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+  bool ConditionBNpcFlags::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
     return pBNpc && pBNpc->hasFlag( this->flags );
@@ -204,7 +204,7 @@ namespace Sapphire::Encounter
 
   // todo: i wrote this very sleep deprived, ensure it is actually sane
 
-  void Phase::execute( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const
+  void Phase::execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     if( state.m_startTime == 0 )
     {
@@ -232,12 +232,12 @@ namespace Sapphire::Encounter
 
       if( timepoint.canExecute( tpState, timepointElapsed ) )
       {
-        timepoint.execute( tpState, self, pTeri, time );
+        timepoint.execute( tpState, self, pack, pTeri, time );
         state.m_phaseInfo.m_lastTimepointTime = time;
       }
       else if( !timepoint.finished( tpState, timepointElapsed ) )
       {
-        timepoint.update( tpState, self, pTeri, time );
+        timepoint.update( tpState, self, pack, pTeri, time );
       }
 
       if( timepoint.durationElapsed( timepointElapsed ) && timepoint.finished( tpState, timepointElapsed ) )

@@ -298,16 +298,18 @@ namespace Sapphire::Encounter
 
   const World::AI::Snapshot::Results& TimelinePack::getSnapshotResults( const std::string& selectorName )
   {
+    static World::AI::Snapshot::Results empty;
     if( auto it = m_selectors.find( selectorName ); it != m_selectors.end() )
       return it->second.getResults();
-    return {};
+    return empty;
   }
 
   const World::AI::Snapshot::TargetIds& TimelinePack::getSnapshotTargetIds( const std::string& selectorName )
   {
+    static World::AI::Snapshot::TargetIds empty;
     if( auto it = m_selectors.find( selectorName ); it != m_selectors.end() )
       return it->second.getTargetIds();
-    return {};
+    return empty;
   }
 
   void TimelinePack::addTimelineActor( const TimelineActor& actor )

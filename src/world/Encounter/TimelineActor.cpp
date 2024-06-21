@@ -37,11 +37,11 @@ namespace Sapphire::Encounter
       }
       else if( pCondition->inProgress( state ) )
       {
-        pCondition->update( state, *this, pTeri, pack, time );
+        pCondition->update( state, *this, pack, pTeri, time );
       }
-      else if( pCondition->isConditionMet( state, pTeri, pack, time ) )
+      else if( pCondition->isConditionMet( state, pack, pTeri, time ) )
       {
-        pCondition->execute( state, *this, pTeri, pack, time );
+        pCondition->execute( state, *this, pack, pTeri, time );
 
         if( pack.getStartTime() == 0 )
           pack.setStartTime( state.m_startTime );

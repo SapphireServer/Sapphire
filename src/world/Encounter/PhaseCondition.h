@@ -2,11 +2,12 @@
 
 #include <cstdint>
 
-#include "Timepoint.h"
 #include "TimelineActorState.h"
+#include "Timepoint.h"
 
 namespace Sapphire::Encounter
 {
+  // todo: just use the actual combat state return type
   enum class CombatStateType
   {
     Idle,
@@ -34,24 +35,20 @@ namespace Sapphire::Encounter
     BNpcHasFlags
   };
 
-  class Phase :
-      public std::enable_shared_from_this< Phase >
-    {
-    public:
+  class Phase : public std::enable_shared_from_this< Phase >
+  {
+  public:
+    // todo: getters/setters
+    std::string m_name;
+    std::vector< Timepoint > m_timepoints;
 
-      // todo: allow callbacks to push timepoints
+    void execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
 
-      std::string m_name;
-      std::vector< Timepoint > m_timepoints;
+    void reset( ConditionState& state ) const;
 
-      // todo: i wrote this very sleep deprived, ensure it is actually sane
-      void execute( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const;
-
-      void reset( ConditionState& state ) const;
-
-      bool completed( const ConditionState& state ) const;
-    };
-    using PhasePtr = std::shared_ptr< Phase >;
+    bool completed( const ConditionState& state ) const;
+  };
+  using PhasePtr = std::shared_ptr< Phase >;
 
   class PhaseCondition : public std::enable_shared_from_this< PhaseCondition >
   {
@@ -79,15 +76,15 @@ namespace Sapphire::Encounter
       this->m_id = json.at( "id" ).get< uint32_t >();
     }
 
-    void execute( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+    void execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
     {
       state.m_startTime = time;
-      m_phase.execute( state, self, pTeri, time );
+      m_phase.execute( state, self, pack, pTeri, time );
     };
 
-    void update( ConditionState& state, TimelineActor& self, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+    void update( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
     {
-      m_phase.execute( state, self, pTeri, time );
+      m_phase.execute( state, self, pack, pTeri, time );
     }
 
     void setEnabled( ConditionState& state, bool enabled )
@@ -133,7 +130,7 @@ namespace Sapphire::Encounter
       return m_phase.completed( state ) && m_loop && ( state.m_startTime + m_cooldown <= time );
     }
 
-    virtual bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const
+    virtual bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
     {
       return false;
     };
@@ -145,7 +142,7 @@ namespace Sapphire::Encounter
   };
   using PhaseConditionPtr = std::shared_ptr< PhaseCondition >;
 
-      //
+  //
   // Conditions
   //
   class ConditionHp : PhaseCondition
@@ -157,14 +154,14 @@ namespace Sapphire::Encounter
       uint8_t val;
       struct
       {
-          uint8_t min, max;
+        uint8_t min, max;
       };
     } hp;
 
     void from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
                     const std::unordered_map< std::string, TimelineActor >& actors );
 
-    bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
   class ConditionDirectorVar : PhaseCondition
@@ -174,15 +171,15 @@ namespace Sapphire::Encounter
     {
       struct
       {
-          uint32_t index;
-          uint32_t value;
+        uint32_t index;
+        uint32_t value;
       };
       uint8_t seq;
       uint8_t flags;
     } param;
 
     void from_json( nlohmann::json& json, Phase& phase, ConditionType condition );
-    bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
   class ConditionEncounterTimeElapsed : PhaseCondition
@@ -191,7 +188,7 @@ namespace Sapphire::Encounter
     uint64_t duration;
 
     void from_json( nlohmann::json& json, Phase& phase, ConditionType condition );
-    bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
   class ConditionCombatState : PhaseCondition
@@ -201,7 +198,7 @@ namespace Sapphire::Encounter
     CombatStateType combatState;
 
     void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors );
-    bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
   class ConditionBNpcFlags : PhaseCondition
@@ -211,7 +208,7 @@ namespace Sapphire::Encounter
     uint32_t flags;
 
     void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors );
-    bool isConditionMet( ConditionState& state, TerritoryPtr pTeri, TimelinePack& pack, uint64_t time ) const override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
 }// namespace Sapphire::Encounter

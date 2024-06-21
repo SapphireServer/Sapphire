@@ -1,5 +1,6 @@
 #include "Timepoint.h"
 #include "TimelineActor.h"
+#include "EncounterTimeline.h"
 
 #include <Action/Action.h>
 
@@ -51,21 +52,23 @@ namespace Sapphire::Encounter
   {
     const static std::unordered_map< std::string, TimepointDataType > timepointTypeMap =
     {
-      { "idle", TimepointDataType::Idle },
-      { "castAction", TimepointDataType::CastAction },
-      { "moveTo", TimepointDataType::MoveTo },
-      { "logMessage", TimepointDataType::LogMessage },
-      { "battleTalk", TimepointDataType::BattleTalk },
-      { "directorVar", TimepointDataType::DirectorVar },
-      { "directorSeq", TimepointDataType::DirectorSeq },
+      { "idle",          TimepointDataType::Idle },
+      { "castAction",    TimepointDataType::CastAction },
+      { "setPos",        TimepointDataType::SetPos },
+
+      { "logMessage",    TimepointDataType::LogMessage },
+      { "battleTalk",    TimepointDataType::BattleTalk },
+
+      { "directorVar",   TimepointDataType::DirectorVar },
+      { "directorSeq",   TimepointDataType::DirectorSeq },
       { "directorFlags", TimepointDataType::DirectorFlags },
-      { "addStatusEffect", TimepointDataType::AddStatusEffect },
-      { "removeStatusEffect", TimepointDataType::RemoveStatusEffect },
-      { "spawnBNpc", TimepointDataType::SpawnBNpc },
-      { "bNpcFlags", TimepointDataType::SetBNpcFlags },
+
+      { "spawnBNpc",    TimepointDataType::SpawnBNpc },
+      { "bNpcFlags",    TimepointDataType::SetBNpcFlags },
       { "setEObjState", TimepointDataType::SetEObjState },
+
       { "setCondition", TimepointDataType::SetCondition },
-      { "snapshot", TimepointDataType::Snapshot }
+      { "snapshot",     TimepointDataType::Snapshot }
     };
 
     const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
@@ -78,7 +81,7 @@ namespace Sapphire::Encounter
       { "mod", DirectorOpId::Mod },
       { "sll", DirectorOpId::Sll },
       { "srl", DirectorOpId::Srl },
-      { "or", DirectorOpId::Or },
+      { "or",  DirectorOpId::Or },
       { "xor", DirectorOpId::Xor },
       { "nor", DirectorOpId::Nor },
       { "and", DirectorOpId::And }
@@ -92,9 +95,9 @@ namespace Sapphire::Encounter
 
     const static std::unordered_map< std::string, ActionTargetType > actionTypeMap =
     {
-      { "none", ActionTargetType::None },
-      { "self", ActionTargetType::Self },
-      { "target", ActionTargetType::Target },
+      { "none",     ActionTargetType::None },
+      { "self",     ActionTargetType::Self },
+      { "target",   ActionTargetType::Target },
       { "selector", ActionTargetType::Selector }
     };
 
@@ -132,15 +135,15 @@ namespace Sapphire::Encounter
                                                            selectorRef, selectorIndex );
       }
       break;
-      case TimepointDataType::MoveTo:
+      case TimepointDataType::SetPos:
       {
         auto& dataJ = json.at( "data" );
         auto pos = dataJ.at( "pos" ).get< std::vector< float > >();
         auto rot = dataJ.at( "rot" ).get< float >();
-        auto pathReq = dataJ.at( "pathRequested" ).get< bool >() ? MoveType::WalkPath : MoveType::Teleport;
+        auto actorRef = dataJ.at( "actorName" ).get< std::string >();
 
-        // todo: moveTo
-
+        m_pData = std::make_shared< TimepointDataSetPos >( actorRef, MoveType::SetPos,
+                                                           pos[ 0 ], pos[ 1 ], pos[ 2 ], rot );
       }
       break;
       case TimepointDataType::LogMessage:
@@ -305,23 +308,24 @@ namespace Sapphire::Encounter
         auto& dataJ = json.at( "data" );
         auto selectorName = dataJ.at( "selectorName" ).get< std::string >();
         auto actorRef = dataJ.at( "sourceActor" ).get< std::string >();
+        // auto excludeSelector = dataJ.at( "excludeSelector" ).get< std::string >();
         // todo:
 
-        m_pData = std::make_shared< TimepointDataSnapshot >( selectorName, actorRef );
+        m_pData = std::make_shared< TimepointDataSnapshot >( selectorName, actorRef, "" );
       }
-
+      break;
       default:
         break;
     }
   }
 
-  void Timepoint::execute( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const
+  void Timepoint::execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     state.m_startTime = time;
-    update( state, self, pTeri, time );
+    update( state, self, pack, pTeri, time );
   }
 
-  void Timepoint::update( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const
+  void Timepoint::update( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     state.m_lastTick = time;
 
@@ -338,7 +342,7 @@ namespace Sapphire::Encounter
       break;
       case TimepointDataType::CastAction:
       {
-        auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( getData() );
+        auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( m_pData );
         auto pBNpc = self.getBNpcByRef( pActionData->m_sourceRef, pTeri );
         // todo: filter the correct target
         // todo: tie to mechanic script?
@@ -349,17 +353,20 @@ namespace Sapphire::Encounter
           switch( pActionData->m_targetType )
           {
             case ActionTargetType::Target:
-              targetId = pBNpc->getTargetId();
+              targetId = static_cast< uint32_t >( pBNpc->getTargetId() );
               break;
             case ActionTargetType::Selector:
             {
               // todo: selector
+              const auto& results = pack.getSnapshotTargetIds( pActionData->m_selectorRef );
+              if( pActionData->m_selectorIndex < results.size() )
+                targetId = results[ pActionData->m_selectorIndex ];
             }
             break;
             default:
               break;
           }
-          auto actionMgr = Common::Service< Sapphire::World::Manager::ActionMgr >::ref();
+          auto& actionMgr = Common::Service< Sapphire::World::Manager::ActionMgr >::ref();
 
           // todo: this is probably wrong
           if( pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() != pActionData->m_actionId )
@@ -367,9 +374,24 @@ namespace Sapphire::Encounter
         }
       }
       break;
+      case TimepointDataType::SetPos:
+      {
+        auto pSetPosData = std::dynamic_pointer_cast< TimepointDataSetPos, TimepointData >( m_pData );
+        auto pBNpc = self.getBNpcByRef( pSetPosData->m_actorRef, pTeri );
+
+        if( pBNpc )
+        {
+          auto currPos = pBNpc->getPos();
+
+          pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z );
+          pBNpc->setRot( pSetPosData->m_rot );
+        }
+      }
+      break;
+      /*
       case TimepointDataType::MoveTo:
       {
-        auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( getData() );
+        auto pMoveToData = std::dynamic_pointer_cast< TimepointDataMoveTo, TimepointData >( m_pData );
         auto pBNpc = self.getBNpcByRef( pMoveToData->m_actorRef, pTeri );
 
         if( pBNpc )
@@ -394,9 +416,10 @@ namespace Sapphire::Encounter
         }
       }
       break;
+      */
       case TimepointDataType::LogMessage:
       {
-        auto pLogMessage = std::dynamic_pointer_cast< TimepointDataLogMessage, TimepointData >( getData() );
+        auto pLogMessage = std::dynamic_pointer_cast< TimepointDataLogMessage, TimepointData >( m_pData );
         auto params = pLogMessage->m_params;
 
         // todo: probably should use ContentDirector
@@ -416,7 +439,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::BattleTalk:
       {
         // todo: BattleTalk
-        auto pBtData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >( getData() );
+        auto pBtData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >( m_pData );
         auto params = pBtData->m_params;
 
 
@@ -437,7 +460,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::DirectorVarLR:
       case TimepointDataType::DirectorFlags:
       {
-        auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( getData() );
+        auto pDirectorData = std::dynamic_pointer_cast< TimepointDataDirector, TimepointData >( m_pData );
 
         uint32_t val = 0;
         uint32_t param = 0;
@@ -541,7 +564,7 @@ namespace Sapphire::Encounter
       break;
       case TimepointDataType::SpawnBNpc:
       {
-        auto pSpawnData = std::dynamic_pointer_cast< TimepointDataSpawnBNpc, TimepointData >( getData() );
+        auto pSpawnData = std::dynamic_pointer_cast< TimepointDataSpawnBNpc, TimepointData >( m_pData );
         auto pBNpc = pTeri->getActiveBNpcByLayoutId( pSpawnData->m_layoutId );
 
         if( pBNpc )
@@ -554,7 +577,7 @@ namespace Sapphire::Encounter
       break;
       case TimepointDataType::SetBNpcFlags:
       {
-        auto pBNpcFlagData = std::dynamic_pointer_cast< TimepointDataBNpcFlags, TimepointData >( getData() );
+        auto pBNpcFlagData = std::dynamic_pointer_cast< TimepointDataBNpcFlags, TimepointData >( m_pData );
         auto pBNpc = pTeri->getActiveBNpcByLayoutId( pBNpcFlagData->m_layoutId );
 
         if( pBNpc )
@@ -567,7 +590,7 @@ namespace Sapphire::Encounter
       break;
       case TimepointDataType::SetEObjState:
       {
-        auto pEObjData = std::dynamic_pointer_cast< TimepointDataEObjState, TimepointData >( getData() );
+        auto pEObjData = std::dynamic_pointer_cast< TimepointDataEObjState, TimepointData >( m_pData );
 
         auto pInstance = pTeri->getAsInstanceContent();
         auto pQBattle = pTeri->getAsQuestBattle();
@@ -588,7 +611,7 @@ namespace Sapphire::Encounter
       break;
       case TimepointDataType::SetBgm:
       {
-        auto pBgmData = std::dynamic_pointer_cast< TimepointDataBGM, TimepointData >( getData() );
+        auto pBgmData = std::dynamic_pointer_cast< TimepointDataBGM, TimepointData >( m_pData );
         auto pInstance = pTeri->getAsInstanceContent();
         auto pQBattle = pTeri->getAsQuestBattle();
 
@@ -601,15 +624,30 @@ namespace Sapphire::Encounter
       break;
       case TimepointDataType::SetCondition:
       {
-        auto pConditionData = std::dynamic_pointer_cast< TimepointDataCondition, TimepointData >( getData() );
+        auto pConditionData = std::dynamic_pointer_cast< TimepointDataCondition, TimepointData >( m_pData );
 
         // todo: dont reset so things can resume? idk
         self.resetConditionState( pConditionData->m_conditionId );
         self.setConditionStateEnabled( pConditionData->m_conditionId, pConditionData->m_enabled );
       }
+      break;
+      case TimepointDataType::Snapshot:
+      {
+        auto pSnapshotData = std::dynamic_pointer_cast< TimepointDataSnapshot, TimepointData >( m_pData );
+        auto pBNpc = self.getBNpcByRef( pSnapshotData->m_actorRef, pTeri );
+
+        if( pBNpc )
+        {
+          const auto& exclude = pack.getSnapshotTargetIds( pSnapshotData->m_excludeSelector );
+          pack.createSnapshot( pSnapshotData->m_selector, pBNpc, exclude );
+        }
+      }
+      break;
+      default:
+        break;
     }
 
-    if( m_type != TimepointDataType::MoveTo && m_type != TimepointDataType::CastAction )
+    if( m_type != TimepointDataType::SetPos && m_type != TimepointDataType::CastAction )
       state.m_finished = true;
 
     state.m_finished = state.m_finished || state.m_startTime + m_duration <= time;

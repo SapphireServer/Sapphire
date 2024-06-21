@@ -241,7 +241,7 @@ namespace Sapphire::World::AI
 
     // returns actors sorted by distance
     const std::vector< CharaEntry >& getResults() const;
-    const std::vector< uint32_t > getTargetIds() const;
+    const std::vector< uint32_t >& getTargetIds() const;
   };
   using SnapshotPtr = std::shared_ptr< Snapshot >;
 }// namespace Sapphire::World::AI

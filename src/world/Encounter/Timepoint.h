@@ -17,7 +17,7 @@ namespace Sapphire::Encounter
   {
     Idle,
     CastAction,
-    MoveTo,
+    SetPos,
 
     LogMessage,
     BattleTalk,
@@ -51,7 +51,8 @@ namespace Sapphire::Encounter
   enum class MoveType : uint32_t
   {
     WalkPath,
-    Teleport
+    Teleport,
+    SetPos
   };
 
   enum class DirectorOpId
@@ -111,15 +112,15 @@ namespace Sapphire::Encounter
     }
   };
 
-  struct TimepointDataMoveTo : public TimepointData {
+  struct TimepointDataSetPos : public TimepointData {
     // todo: use internal id
     std::string m_actorRef;
     MoveType m_moveType;
     float m_x, m_y, m_z, m_rot;
 
-    TimepointDataMoveTo( const std::string& actorRef, MoveType moveType,
+    TimepointDataSetPos( const std::string& actorRef, MoveType moveType,
                         float x, float y, float z, float rot ) :
-      TimepointData( TimepointDataType::MoveTo ),
+      TimepointData( TimepointDataType::SetPos ),
       m_actorRef( actorRef ),
       m_moveType( moveType ),
       m_x( x ), m_y( y ), m_z( z ), m_rot( rot )
@@ -255,13 +256,15 @@ namespace Sapphire::Encounter
   struct TimepointDataSnapshot : public TimepointData
   {
     // todo: rng?
-    std::string m_name;
+    std::string m_selector;
     std::string m_actorRef;
+    std::string m_excludeSelector;
 
-    TimepointDataSnapshot( const std::string& name, const std::string& actorRef ) :
+    TimepointDataSnapshot( const std::string& selector, const std::string& actorRef, const std::string& excludeSelector ) :
       TimepointData( TimepointDataType::Snapshot ),
-      m_name( name ),
-      m_actorRef( actorRef )
+      m_selector( selector ),
+      m_actorRef( actorRef ),
+      m_excludeSelector( excludeSelector )
     {
     }
   };
@@ -289,7 +292,7 @@ namespace Sapphire::Encounter
 
     void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
     // todo: separate execute/update into onStart and onTick?
-    void update( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const;
-    void execute( TimepointState& state, TimelineActor& self, TerritoryPtr pTeri, uint64_t time ) const;
+    void update( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
+    void execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
   };
 }// namespace Sapphire::Encounter
