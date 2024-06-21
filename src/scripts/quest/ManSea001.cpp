@@ -74,21 +74,25 @@ private:
 
   void Scene00005( Entity::Player& player )
   {
-    player.playSceneChain( getId(), 5, HIDE_HOTBAR, bindScene( &ManSea001::Scene00006 ) );
+    player.playScene( getId(), 5, HIDE_HOTBAR,
+      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+      {
+        if( result.param2 == 1 )
+        {
+         Scene00006( player );
+        }
+      } );
   }
 
   void Scene00006( Entity::Player& player )
   {
     player.playScene( getId(), 6, INVIS_OTHER_PC,
-                      [ & ]( Entity::Player& player, const Event::SceneResult& result )
-                      {
-                        if( result.param2 == 1 )
-                        {
-                          player.updateQuest( getId(), SEQ_FINISH );
-                          player.prepareZoning( player.getZoneId(), true, 1, 0 );
-                          player.changePosition( 9, 40, 14, 2 );
-                        }
-                      } );
+      [ & ]( Entity::Player& player, const Event::SceneResult& result )
+      {
+        player.updateQuest( getId(), SEQ_FINISH );
+        player.prepareZoning( player.getZoneId(), true, 1, 0 );
+        player.changePosition( 9, 40, 14, 2 );
+      } );
   }
 
   void Scene00007( Entity::Player& player )

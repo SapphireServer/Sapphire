@@ -381,26 +381,28 @@ namespace Sapphire::Network::ActorControl
     SetTitleReq = 0x12E,
     TitleList = 0x12F,
 
-    UpdatedSeenHowTos = 0x133,
-    CutscenePlayed = 0x134, // param1 = cutscene id
+    UpdatedSeenHowTos = 0x132,
+    CutscenePlayed = 0x134, // p1 = cutscene id
     AllotAttribute = 0x135,
 
-    ClearFieldMarkers = 0x13A,
-    CameraMode = 0x13B, // param11, 1 = enable, 0 = disable
+    //ClearFieldMarkers = 0x13A,
+    CameraMode = 0x13A, // p1 (only read lowest byte), 1 = enable, 0 = disable
     CharaNameReq = 0x13D, // requests character name by content id
     HuntingLogDetails = 0x194,
 
     Timers = 0x1AB,
 
-    DyeItem = 0x1B0, // updated 5.21
+    DyeItem = 0x1B1, // updated 6.58 hotfix 2
 
     RequestChocoboInventory = 0x1C4,
 
     EmoteReq = 0x1F4,
+    EmoteWithWarp = 0x1F5,
     EmoteCancel = 0x1F6,
     PersistentEmoteCancel = 0x1F7,
+    EmoteCancelWithWarp = 0x1F8,
     /*!
-     * param2 = pose ID
+     *     p2 = pose ID
      *      0 = idle pose 0 (just standing)
      *      1 = idle pose 1
      *    2-4 = idle poses 2-4
@@ -430,9 +432,9 @@ namespace Sapphire::Network::ActorControl
     AchievementCritReq = 0x3E8,
     AchievementList = 0x3E9,
 
-    SetEstateLightingLevel = 0x40B, // param1 = light level 0 - 5 maps to UI val 5-0
+    SetEstateLightingLevel = 0x40B, // p1 = light level 0 - 5 maps to UI val 5-0
     RequestHousingBuildPreset = 0x44C,
-    RequestEstateExteriorRemodel = 0x044D, // param11 = land id
+    RequestEstateExteriorRemodel = 0x044D, // p1 = land id
     RequestEstateInteriorRemodel = 0x44E,
     RequestEstateHallRemoval = 0x44F,
     RequestBuildPreset = 0x450, // no idea what this is, it gets sent with BuildPresetHandler and has the plot id in param1

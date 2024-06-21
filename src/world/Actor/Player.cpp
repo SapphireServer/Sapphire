@@ -85,6 +85,7 @@ Sapphire::Entity::Player::Player() :
   m_onEnterEventDone( false ),
   m_falling( false ),
   m_pQueuedAction( nullptr ),
+  m_partyId( 0 ),
   m_cfNotifiedContent( 0 )
 {
   m_id = 0;
@@ -134,7 +135,8 @@ uint32_t Sapphire::Entity::Player::getMaxHp()
 
 uint32_t Sapphire::Entity::Player::getMaxMp()
 {
-  return m_baseStats.max_mp;
+  //return m_baseStats.max_mp;
+  return 10000;
 }
 
 uint16_t Sapphire::Entity::Player::getZoneId() const
@@ -236,11 +238,56 @@ Sapphire::Common::OnlineStatus Sapphire::Entity::Player::getOnlineStatus() const
 void Sapphire::Entity::Player::setOnlineStatusMask( uint64_t status )
 {
   m_onlineStatus = status;
+  sendToInRangeSet( makeActorControl( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ), true );
+  auto statusPacket = makeZonePacket< FFXIVIpcSetOnlineStatus >( getId() );
+  statusPacket->data().onlineStatusFlags = status;
+  queuePacket( statusPacket );
 }
 
 uint64_t Sapphire::Entity::Player::getOnlineStatusMask() const
 {
   return m_onlineStatus;
+}
+
+void Sapphire::Entity::Player::addOnlineStatus( OnlineStatus status )
+{
+  uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
+  uint64_t newFlags = getOnlineStatusMask() | statusValue;
+
+  setOnlineStatusMask( newFlags );
+}
+
+void Sapphire::Entity::Player::addOnlineStatus( const std::vector< Common::OnlineStatus >& status )
+{
+  uint64_t newFlags = getOnlineStatusMask();
+  for( const auto& state : status )
+  {
+    uint64_t statusValue = 1ull << static_cast< uint8_t >( state );
+    newFlags |= statusValue;
+  }
+
+  setOnlineStatusMask( newFlags );
+}
+
+void Sapphire::Entity::Player::removeOnlineStatus( OnlineStatus status )
+{
+  uint64_t statusValue = 1ull << static_cast< uint8_t >( status );
+  uint64_t newFlags = getOnlineStatusMask();
+  newFlags &= ~statusValue;
+
+  setOnlineStatusMask( newFlags );
+}
+
+void Sapphire::Entity::Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& status )
+{
+  uint64_t newFlags = getOnlineStatusMask();
+  for( const auto& state : status )
+  {
+    uint64_t statusValue = 1ull << static_cast< uint8_t >( state );
+    newFlags &= ~statusValue;
+  }
+
+  setOnlineStatusMask( newFlags );
 }
 
 void Sapphire::Entity::Player::prepareZoning( uint16_t targetZone, bool fadeOut, uint8_t fadeOutTime, uint16_t animation, uint8_t param4, uint8_t param7, uint8_t unknown )
@@ -420,6 +467,16 @@ void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId )
   //performZoning( zoneId, Common::ZoneingType::None, getPos() );
 }
 
+void Sapphire::Entity::Player::forceZoneing( uint32_t zoneId, FFXIVARR_POSITION3 pos, float rot, bool showZoneName )
+{
+  if( zoneId == 0 )
+  {
+    zoneId = getCurrentTerritory()->getTerritoryTypeId();
+  }
+  m_queuedZoneing = std::make_shared< QueuedZoning >( zoneId, pos, Util::getTimeMs(), rot );
+  prepareZoning( showZoneName ? zoneId : 0, true, 1, 0 );
+}
+
 void Sapphire::Entity::Player::returnToHomepoint()
 {
   setZoningType( Common::ZoneingType::Return );
@@ -467,10 +524,14 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance )
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
-    m_prevPos = m_pos;
-    m_prevRot = m_rot;
-    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
+    // never returning to a BeforeTrialDung zone.
+    if( currentZone->getTerritoryTypeInfo()->territoryIntendedUse != Sapphire::World::Manager::TerritoryMgr::TerritoryIntendedUse::BeforeTrialDung )
+    {
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+      m_prevTerritoryId = getTerritoryId();
+    }
   }
 
   return teriMgr.movePlayer( instance, getAsPlayer() );
@@ -488,10 +549,14 @@ bool Sapphire::Entity::Player::setInstance( TerritoryPtr instance, Common::FFXIV
   // zoning within the same zone won't cause the prev data to be overwritten
   if( instance->getTerritoryTypeId() != m_territoryTypeId )
   {
-    m_prevPos = m_pos;
-    m_prevRot = m_rot;
-    m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
-    m_prevTerritoryId = getTerritoryId();
+    // never returning to a BeforeTrialDung zone.
+    if( currentZone->getTerritoryTypeInfo()->territoryIntendedUse != Sapphire::World::Manager::TerritoryMgr::TerritoryIntendedUse::BeforeTrialDung )
+    {
+      m_prevPos = m_pos;
+      m_prevRot = m_rot;
+      m_prevTerritoryTypeId = currentZone->getTerritoryTypeId();
+      m_prevTerritoryId = getTerritoryId();
+    }
   }
 
   m_pos = pos;
@@ -513,15 +578,21 @@ bool Sapphire::Entity::Player::exitInstance()
 {
   auto& teriMgr = Common::Service< TerritoryMgr >::ref();
 
-  auto d = getCurrentTerritory()->getAsDirector();
+  auto d = getCurrentTerritory()->getAsInstanceContent();
   if( d && d->getContentFinderConditionId() > 0 )
   {
-    auto p = makeZonePacket< FFXIVDirectorUnk4 >( getId() );
+    // shows correct name when leaving dungeon
+    auto p = makeZonePacket< FFXIVDirectorMsg4 >( getId() );
     p->data().param[0] = d->getDirectorId();
     p->data().param[1] = 1534;
     p->data().param[2] = 1;
-    p->data().param[3] = d->getContentFinderConditionId();
+    p->data().param[3] = d->getContentId();
     queuePacket( p );
+
+    auto p2 = makeZonePacket< FFXIVIpcCFUnk >( getId() );
+    p2->data().cfConditionId = d->getContentFinderConditionId();
+    p2->data().five = 5;
+    queuePacket( p2 );
 
     prepareZoning( 0, 1, 1, 0, 0, 1, 9 );
   }
@@ -637,9 +708,9 @@ void Sapphire::Entity::Player::discover( int16_t map_id, int16_t sub_id )
   }
 
   if( info->discoveryArrayByte )
-    offset = 5 + 2 * info->discoveryIndex;
+    offset = 2 * info->discoveryIndex;
   else
-    offset = 325 + 4 * info->discoveryIndex;
+    offset = 320 + 4 * info->discoveryIndex;
 
   int32_t index = offset + sub_id / 8;
   uint8_t bitIndex = sub_id % 8;
@@ -1080,7 +1151,6 @@ bool Sapphire::Entity::Player::hasStateFlag( Common::PlayerStateFlag flag ) cons
 
 void Sapphire::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
 {
-  auto prevOnlineStatus = getOnlineStatus();
   int32_t iFlag = static_cast< uint32_t >( flag );
 
   uint16_t index;
@@ -1089,13 +1159,6 @@ void Sapphire::Entity::Player::setStateFlag( Common::PlayerStateFlag flag )
 
   m_stateFlags[ index ] |= value;
   sendStateFlags();
-
-  auto newOnlineStatus = getOnlineStatus();
-
-  if( prevOnlineStatus != newOnlineStatus )
-    sendToInRangeSet( makeActorControl( getId(), SetStatusIcon,
-                                        static_cast< uint8_t >( getOnlineStatus() ) ), true );
-
 }
 
 void Sapphire::Entity::Player::setStateFlags( std::vector< Common::PlayerStateFlag > flags )
@@ -1116,8 +1179,6 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
   if( !hasStateFlag( flag ) )
     return;
 
-  auto prevOnlineStatus = getOnlineStatus();
-
   int32_t iFlag = static_cast< uint32_t >( flag );
 
   uint16_t index;
@@ -1126,11 +1187,6 @@ void Sapphire::Entity::Player::unsetStateFlag( Common::PlayerStateFlag flag )
 
   m_stateFlags[ index ] ^= value;
   sendStateFlags();
-
-  auto newOnlineStatus = getOnlineStatus();
-
-  if( prevOnlineStatus != newOnlineStatus )
-    sendToInRangeSet( makeActorControl( getId(), SetStatusIcon, static_cast< uint8_t >( getOnlineStatus() ) ), true );
 }
 
 void Sapphire::Entity::Player::update( uint64_t tickCount )
@@ -1354,6 +1410,14 @@ void Sapphire::Entity::Player::queuePacket( Network::Packets::FFXIVPacketBasePtr
   if( pZoneCon )
     pZoneCon->queueOutPacket( pPacket );
 
+}
+
+void Sapphire::Entity::Player::queuePacket( std::vector< Network::Packets::FFXIVPacketBasePtr > packets )
+{
+  for( auto& packet : packets )
+  {
+    queuePacket( packet );
+  }
 }
 
 void Sapphire::Entity::Player::queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket )
@@ -1974,10 +2038,10 @@ void Sapphire::Entity::Player::finishZoning()
   }
 }
 
-void Sapphire::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent )
+void Sapphire::Entity::Player::emote( uint32_t emoteId, uint64_t targetId, bool isSilent, uint16_t rotation )
 {
   sendToInRangeSet( makeActorControlTarget( getId(), ActorControlType::Emote,
-                                         emoteId, 0, isSilent ? 1 : 0, 0, targetId ) );
+                                         emoteId, 0, isSilent ? 1 : 0, rotation, targetId ) );
 }
 
 void Sapphire::Entity::Player::emoteInterrupt()
@@ -2332,6 +2396,16 @@ bool Sapphire::Entity::Player::checkAction()
   }
 
   return true;
+}
+
+uint64_t Sapphire::Entity::Player::getPartyId() const
+{
+  return m_partyId;
+}
+
+void Sapphire::Entity::Player::setPartyId( uint64_t partyId )
+{
+  m_partyId = partyId;
 }
 
 std::vector< Sapphire::Entity::ShopBuyBackEntry >& Sapphire::Entity::Player::getBuyBackListForShop( uint32_t shopId )

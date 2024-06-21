@@ -6,6 +6,7 @@
 
 #include <unordered_map>
 #include <Service.h>
+#include "Manager/PartyMgr.h"
 
 #include "Actor/Player.h"
 
@@ -758,6 +759,9 @@ bool Sapphire::World::Manager::TerritoryMgr::movePlayer( TerritoryPtr pZone, Sap
   }
 
   pPlayer->sendZonePackets();
+
+  auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+  partyMgr.onMoveZone( *pPlayer );
 
   return true;
 }

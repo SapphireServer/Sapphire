@@ -9,7 +9,7 @@
 [![Windows Build Status](https://ci.appveyor.com/api/projects/status/lil7lxa3ty165emm?svg=true)](https://ci.appveyor.com/project/SapphireMordred/Sapphire)
 
 
-Sapphire is a FINAL FANTASY XIV Server Emulator. This version targets FFXIV v5.58.
+Sapphire is a FINAL FANTASY XIV Server Emulator. This version targets FFXIV v6.58 hotfix 2.
 
 It is a **research project** to learn how retail servers work and currently not production code; at this time it is **insecure** (use throwaway passwords for accounts) and you should expect a lot of things unimplemented or broken (of course contributions are always welcome).
 

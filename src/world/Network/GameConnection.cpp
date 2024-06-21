@@ -70,7 +70,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::ReqExamineFcInfo, "ReqExamineFcInfo", &GameConnection::reqExamineFcInfo );
   setZoneHandler( ClientZoneIpcType::ZoneLineHandler, "ZoneLineHandler", &GameConnection::zoneLineHandler );
   setZoneHandler( ClientZoneIpcType::ClientTrigger, "ClientTrigger", &GameConnection::clientTriggerHandler );
-
+  setZoneHandler( ClientZoneIpcType::ClientTriggerEnvironment, "ClientTriggerEnvironment", &GameConnection::clientTriggerHandler );
   setZoneHandler( ClientZoneIpcType::DiscoveryHandler, "DiscoveryHandler", &GameConnection::discoveryHandler );
 
   setZoneHandler( ClientZoneIpcType::SkillHandler, "ActionHandler", &GameConnection::actionHandler );
@@ -96,6 +96,7 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::HousingEditInterior, "HousingEditInterior", &GameConnection::housingEditInterior );
 
   setZoneHandler( ClientZoneIpcType::TalkEventHandler, "EventHandlerTalk", &GameConnection::eventHandlerTalk );
+  setZoneHandler( ClientZoneIpcType::SayEventHandler, "EventHandlerSay", &GameConnection::eventHandlerSay );
   setZoneHandler( ClientZoneIpcType::EmoteEventHandler, "EventHandlerEmote", &GameConnection::eventHandlerEmote );
   setZoneHandler( ClientZoneIpcType::WithinRangeEventHandler, "EventHandlerWithinRange",
                   &GameConnection::eventHandlerWithinRange );
@@ -137,13 +138,20 @@ Sapphire::Network::GameConnection::GameConnection( Sapphire::Network::HivePtr pH
   setZoneHandler( ClientZoneIpcType::MarketBoardRequestItemListings, "MarketBoardRequestItemListings",
                   &GameConnection::marketBoardRequestItemListings );
 
-  setZoneHandler( ClientZoneIpcType::WorldInteractionHandler, "WorldInteractionHandler", &GameConnection::worldInteractionhandler );
   setZoneHandler( ClientZoneIpcType::Dive, "Dive", &GameConnection::diveHandler );
 
   setZoneHandler( ClientZoneIpcType::InventoryEquipRecommendedItems, "InventoryEquipRecommendedItemsHandler", &GameConnection::inventoryEquipRecommendedItemsHandler );
 
   setChatHandler( ClientChatIpcType::TellReq, "TellReq", &GameConnection::tellHandler );
+  setChatHandler( ClientChatIpcType::ChannelChatReq, "ChannelChatReq", &GameConnection::channelChatHandler );
 
+  setZoneHandler( ClientZoneIpcType::SocialInviteHandler, "SocialInviteHandler", &GameConnection::socialInviteHandler );
+  setZoneHandler( ClientZoneIpcType::SocialReplyHandler, "SocialReplyHandler", &GameConnection::socialReplyHandler );
+  
+  setZoneHandler( ClientZoneIpcType::PartyLeaveHandler, "PartyLeaveHandler", &GameConnection::partyLeaveHandler );
+  setZoneHandler( ClientZoneIpcType::PartyDisbandHandler, "PartyDisbandHandler", &GameConnection::partyDisbandHandler );
+  setZoneHandler( ClientZoneIpcType::PartyKickHandler, "PartyKickHandler", &GameConnection::partyKickHandler );
+  setZoneHandler( ClientZoneIpcType::PartyChangeLeaderHandler, "PartyChangeLeaderHandler", &GameConnection::partyChangeLeaderHandler );
 }
 
 Sapphire::Network::GameConnection::~GameConnection() = default;

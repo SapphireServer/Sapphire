@@ -47,19 +47,6 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown[12]; //possibly padding?
   };
 
-  struct FFXIVIpcPartyChat : FFXIVIpcBasePacket< PartyChat >
-  {
-    uint64_t unknown;
-    uint64_t contentId;
-    uint32_t charaId;
-    uint8_t u1;
-    uint8_t u2;
-    uint8_t u3;
-    char name[32];
-    char message[1024];
-    uint8_t padding;
-  };
-
   struct FFXIVIpcChatBanned : FFXIVIpcBasePacket< ChatBanned >
   {
     uint8_t padding[4]; // I was not sure reinterpreting ZST is valid behavior in C++.
@@ -107,6 +94,7 @@ namespace Sapphire::Network::Packets::Server
   struct PlayerEntry
   {
     uint64_t contentId;
+    uint64_t unknown;
     uint8_t bytes[12];
     uint16_t zoneId;
     uint16_t zoneId1;
@@ -116,10 +104,10 @@ namespace Sapphire::Network::Packets::Server
     uint8_t padding;
     uint8_t level;
     uint8_t padding1;
-    uint16_t padding2;
-    uint8_t one;
+    uint8_t unknown2[8];
     char name[0x20];
-    char fcTag[9];
+    char fcTag[6];
+    uint8_t padding2[6];
   };
 
   struct FFXIVIpcSocialList : FFXIVIpcBasePacket< SocialList >
@@ -456,8 +444,8 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcEffectResult : FFXIVIpcBasePacket< EffectResult >
   {
-    uint32_t globalSequence;
     uint32_t unknown1;
+    uint32_t globalSequence;
     uint32_t actor_id;
     uint32_t current_hp;
     uint32_t max_hp;
@@ -479,6 +467,7 @@ namespace Sapphire::Network::Packets::Server
       uint32_t sourceActorId;
     } statusEntries[4];
 
+    uint32_t padding;
   };
 
   /**
@@ -553,11 +542,11 @@ namespace Sapphire::Network::Packets::Server
      */
     uint32_t sequence;
 
-    float animationLockTime; // maybe? doesn't seem to do anything
+    float animationLockTime;
     uint32_t someTargetId; // always 0x0E000000?
 
     /*!
-     * @brief The cast sequence from the originating player. Should only be sent to the source, 0 for every other player.
+     * @brief The cast sequence from the originating player.
      *
      * This needs to match the sequence sent from the player in the action start packet otherwise you'll cancel the
      * initial animation and start a new one once the packet arrives.
@@ -574,7 +563,7 @@ namespace Sapphire::Network::Packets::Server
 
     uint16_t padding_22[3];
 
-    uint8_t effects[65];
+    uint8_t effects[64];
 
     uint16_t padding_6A[3];
 
@@ -679,39 +668,42 @@ namespace Sapphire::Network::Packets::Server
     uint16_t fateID;
     uint16_t mPCurr;
     uint16_t mPMax;
-    uint16_t unk; // == 0
+    uint16_t unk;
     uint16_t modelChara;
     uint16_t rotation;
     uint16_t currentMount;
     uint16_t activeMinion;
     uint8_t u23;
     uint8_t u24;
+    uint8_t u25;
+    uint8_t u26; 
     uint8_t spawnIndex;
     uint8_t state;
     uint8_t persistentEmote;
     uint8_t modelType;
     uint8_t subtype;
     uint8_t voice;
-    uint16_t u25c;
     uint8_t enemyType;
+    uint8_t u27;
     uint8_t level;
     uint8_t classJob;
-    uint8_t u26d;
-    uint16_t u27a;
+    uint8_t u28;
+    uint8_t u29;
+    uint8_t u30;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
     uint8_t elementData[6];
-    uint8_t unknown5_5;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
+    uint8_t unknown6_58[10];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
-    uint32_t unk30[2];
+    uint8_t padding[6];
   };
 
   /**
@@ -762,28 +754,31 @@ namespace Sapphire::Network::Packets::Server
     uint16_t activeMinion;
     uint8_t u23;
     uint8_t u24;
+    uint8_t u6_58a;
+    uint8_t u6_58b;
     uint8_t spawnIndex;
     uint8_t state;
     uint8_t persistantEmote;
     uint8_t modelType;
     uint8_t subtype;
     uint8_t voice;
-    uint16_t u25c;
+    uint8_t u25c;
     uint8_t enemyType;
     uint8_t level;
     uint8_t classJob;
-    uint8_t u26d;
-    uint16_t u27a;
+    uint8_t u26;
+    uint8_t u27;
+    uint8_t u28;
     uint8_t mountHead;
     uint8_t mountBody;
     uint8_t mountFeet;
     uint8_t mountColor;
     uint8_t scale;
     uint8_t elemental[6];
-    uint8_t unknown5_5;
     Common::StatusEffect effect[30];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t models[10];
+    uint8_t unknown6_58[10];
     char name[32];
     uint8_t look[26];
     char fcTag[6];
@@ -792,7 +787,7 @@ namespace Sapphire::Network::Packets::Server
     uint8_t bNPCPartSlot;
     uint8_t unk32;
     uint16_t unk33;
-    uint32_t unk34[2];
+    uint16_t unk34;
   };
 
   /**
@@ -950,13 +945,14 @@ namespace Sapphire::Network::Packets::Server
   /**
   * Structural representation of the packet sent by the server to initialize
   * the client UI upon initial connection.
+  *
+  * verified = at correct offset, if the next field is not verified it may have an incorrect size
   */
   struct FFXIVIpcPlayerSetup : FFXIVIpcBasePacket< PlayerSetup >
   {
-    // plain C types for a bit until the packet is actually fixed.
-    // makes conversion between different editors easier.
-    uint64_t contentId;
+    uint64_t contentId; // verified
     uint64_t crest;
+    uint64_t unknown10;
     uint32_t charId;
     uint32_t restedExp;
     uint32_t companionCurrentExp;
@@ -977,105 +973,77 @@ namespace Sapphire::Network::Packets::Server
     uint16_t unknown50;
     uint16_t unknownPvp52[4];
     uint16_t pvpSeriesExp;
-    uint16_t playerCommendations;
-    uint16_t unknown5C;
-    uint16_t unknown5E;
-    uint16_t pvpFrontlineWeeklyCampaigns;
-    uint16_t enhancedAnimaGlassProgress;
+    uint16_t playerCommendations; // verified
     uint16_t unknown64[8];
     uint16_t pvpRivalWingsTotalMatches;
     uint16_t pvpRivalWingsTotalVictories;
     uint16_t pvpRivalWingsWeeklyMatches;
     uint16_t pvpRivalWingsWeeklyVictories;
-    uint8_t maxLevel;
-    uint8_t expansion;
+    uint8_t maxLevel; // verified
+    uint8_t expansion; // verified
     uint8_t unknown76;
     uint8_t unknown77;
     uint8_t unknown78;
-    uint8_t race;
-    uint8_t tribe;
-    uint8_t gender;
-    uint8_t currentJob;
-    uint8_t currentClass;
-    uint8_t deity;
-    uint8_t namedayMonth;
-    uint8_t namedayDay;
-    uint8_t cityState;
-    uint8_t homepoint;
-    uint8_t unknown83;
-    uint8_t petHotBar;
-    uint8_t companionRank;
-    uint8_t companionStars;
-    uint8_t companionSp;
-    uint8_t companionUnk86;
-    uint8_t companionColor;
+    uint8_t race; // verified
+    uint8_t tribe; // verified
+    uint8_t gender; // verified
+    uint8_t currentJob; // verified
+    uint8_t currentClass; // verified
+    uint8_t deity; // verified
+    uint8_t namedayMonth; // verified
+    uint8_t namedayDay; // verified
+    uint8_t cityState; // verified
+    uint8_t homepoint; // verified
+    uint8_t unknown8D[3];
+    uint8_t companionRank; // verified
+    uint8_t companionStars; // verified
+    uint8_t companionSp; // verified
+    uint8_t companionUnk93;
+    uint8_t companionColor; // verified
     uint8_t companionFavFeed;
-    uint8_t favAetheryteCount;
-    uint8_t unknown8C[4];
-    uint8_t hasRelicBook;
-    uint8_t relicBookId;
+    uint8_t favAetheryteCount; // verified
+    uint8_t unknown97[5];
     uint8_t sightseeing21To80Unlock;
     uint8_t sightseeingHeavenswardUnlock;
-    uint8_t unknown94[2];
-    uint8_t craftingMasterMask;
-    uint8_t unknown97[9];
-    uint8_t unknownA0[3];
-    uint8_t pvpSeriesLevel;
-    uint8_t pvpMalmstonesClaimed;
-    uint8_t lastSeasonMalmstonesEarned;
-    uint8_t lastSeasonMalmstonesClaimed;
-    uint8_t unknownA7[7];
-    uint32_t exp[30];
+    uint8_t unknown9E[26];
+    uint32_t exp[32]; // verified
     uint32_t pvpTotalExp;
     uint32_t unknownPvp124;
     uint32_t pvpExp;
     uint32_t pvpFrontlineOverallRanks[3];
     uint32_t unknown138;
-    uint16_t levels[30];
-    uint16_t unknown178[8];
-    uint16_t fishingRecordsFishId[33];
-    uint16_t fishingRecordsFishLength[33];
-    uint16_t beastExp[17];
-    uint16_t unknown21C[6];
-    uint16_t pvpFrontlineWeeklyRanks[3];
-    uint16_t unknownMask22C[8];
-    uint8_t companionName[21];
-    uint8_t companionDefRank;
-    uint8_t companionAttRank;
-    uint8_t companionHealRank;
+    uint16_t levels[32]; // verified
+    uint8_t unknown194[218];
+    char companionName[21]; // verified
+    uint8_t companionDefRank; // verified
+    uint8_t companionAttRank; // verified
+    uint8_t companionHealRank; // verified
     uint8_t mountGuideMask[33];
     uint8_t ornamentMask[4];
-    uint8_t unknown281[16];
-    char name[32];
+    uint8_t unknown281[23];
+    char name[32]; // verified
     uint8_t unknown293[16];
-    uint8_t unknown2A3;
+    uint8_t unknown2A3[16];
     uint8_t unlockBitmask[64];
     uint8_t aetheryte[26];
-    uint16_t favoriteAetheryteIds[4];
+    uint16_t favoriteAetheryteIds[4]; // verified
     uint16_t freeAetheryteId;
     uint16_t psPlusFreeAetheryteId;
-    uint8_t discovery[472];
-    uint8_t howto[36];
+    uint8_t discovery[480]; // verified
+    uint8_t howto[36]; // verified
     uint8_t unknown554[4];
     uint8_t minions[60];
     uint8_t chocoboTaxiMask[12];
-    uint8_t watchedCutscenes[154];
+    uint8_t watchedCutscenes[159];
     uint8_t companionBardingMask[12];
-    uint8_t unknownMask64E[23];
-    uint8_t companionEquippedHead;
-    uint8_t companionEquippedBody;
-    uint8_t companionEquippedLegs;
-    uint8_t fishingGuideMask[161];
-    uint8_t fishingSpotVisited[38];
-    uint8_t unknown694[34];
-    uint8_t unknown6B6[7];
-    uint8_t unknownPvp6BD[3];
-    uint8_t beastRank[17];
-    uint8_t unknownPvp6CE[12];
-    uint8_t pose[7];
+    uint8_t companionEquippedHead; // verified
+    uint8_t companionEquippedBody; // verified
+    uint8_t companionEquippedLegs; // verified
+    uint8_t unknownMask[287];
+    uint8_t pose[7]; // verified
     uint8_t unknown6DF[3];
     uint8_t challengeLogComplete[13];
-    uint8_t secretRecipeBookMask[10];
+    uint8_t secretRecipeBookMask[12];
     uint8_t unknownMask6F7[29];
     uint8_t relicCompletion[12];
     uint8_t sightseeingMask[37];
@@ -1087,26 +1055,20 @@ namespace Sapphire::Network::Packets::Server
     uint8_t unknown7E6[49];
     uint8_t regionalFolkloreMask[6];
     uint8_t orchestrionMask[87];
-    uint8_t hallOfNoviceCompletion[3];
+    uint8_t hallOfNoviceCompletion[3]; // verified
     uint8_t animaCompletion[11];
-    uint8_t unknown85E[16];
-    uint8_t unknown86E[4];
-    uint8_t unknown872[18];
-    uint8_t unknown880;
-    uint8_t unlockedRaids[28];
-    uint8_t unlockedDungeons[18];
-    uint8_t unlockedGuildhests[10];
-    uint8_t unlockedTrials[12];
+    uint8_t unknown85E[41];
+    uint8_t unlockedRaids[28]; // verified
+    uint8_t unlockedDungeons[18]; // verified
+    uint8_t unlockedGuildhests[10]; // verified
+    uint8_t unlockedTrials[12]; // verified
     uint8_t unlockedPvp[5];
-    uint8_t clearedRaids[28];
-    uint8_t clearedDungeons[18];
-    uint8_t clearedGuildhests[10];
-    uint8_t clearedTrials[12];
+    uint8_t clearedRaids[28]; // verified
+    uint8_t clearedDungeons[18]; // verified
+    uint8_t clearedGuildhests[10]; // verified
+    uint8_t clearedTrials[12]; // verified
     uint8_t clearedPvp[5];
-    uint8_t unknown948[6];
-    uint8_t unknown94C[2];
-    uint8_t unknown94E[2];
-    uint8_t unknownA06[2];
+    uint8_t unknown948[15];
   };
 
 
@@ -1185,7 +1147,6 @@ namespace Sapphire::Network::Packets::Server
     uint8_t isSpecialist;
     uint16_t syncedLevel;   // Locks actions, equipment, prob more. Player's current level (synced).
     uint16_t classLevel;  // Locks roles, prob more. Player's actual unsynced level.
-    uint32_t roleActions[10];
   };
 
   /**
@@ -1647,15 +1608,12 @@ namespace Sapphire::Network::Packets::Server
   */
   struct FFXIVIpcCFNotify : FFXIVIpcBasePacket< CFNotify >
   {
-    uint32_t state1; // 3 = cancelled, 4 = duty ready
-    uint32_t state2; // if state1 == 3, state2 is cancelled reason
+    uint32_t state1;
+    uint32_t unknown[5];
 
-    uint32_t param1; // usually classJobId
-    uint32_t param2; // usually flag
-    uint32_t param3; // usually languages, sometimes join in progress timestamp
-
-    uint16_t param4; // usually roulette id
+    uint32_t unknown_one;
     uint16_t contents[5];
+    uint16_t padding;
   };
 
   /**
@@ -1831,22 +1789,18 @@ namespace Sapphire::Network::Packets::Server
     uint16_t u28;
   };
 
-  struct FFXIVIpcDirectorPopUp : FFXIVIpcBasePacket< DirectorPopUp >
+  struct FFXIVIpcDirectorPopUp2 : FFXIVIpcBasePacket< DirectorPopUp2 >
   {
     uint32_t directorId;
     uint16_t pad1[2];
     uint64_t sourceActorId;
-    /*!
-     * 2 = green text in log
-     */
-    uint8_t flags;
-    uint8_t pad2[3];
-    uint32_t bNPCName;
     uint32_t textId;
     uint32_t popupTimeMs;
-    uint32_t param[6];
+    uint32_t bNPCName;
+    uint8_t flags; // 2 = green text in log
+    uint8_t pad2[3];
+    uint32_t param[2];
   };
-
 
   struct FFXIVIpcActorGauge : FFXIVIpcBasePacket< ActorGauge >
   {
@@ -2161,8 +2115,18 @@ namespace Sapphire::Network::Packets::Server
 
   struct FFXIVIpcCFCancel : FFXIVIpcBasePacket< CFCancel >
   {
+    uint64_t unknown1;
     uint32_t cancelReason;
     uint32_t unknown2;
+  };
+
+  // used to clear CF state, otherwise the UI stays locked and cannot queue again.
+  struct FFXIVIpcCFUnk : FFXIVIpcBasePacket< CFUnk >
+  {
+    uint16_t cfConditionId;
+    uint16_t unknown1;
+    uint32_t five;
+    uint32_t unknown2[2];
   };
 
   struct FFXIVIpcShopMessage : FFXIVIpcBasePacket< ShopMessage >
@@ -2190,21 +2154,22 @@ namespace Sapphire::Network::Packets::Server
     uint32_t param7;
   };
 
-  struct FFXIVIpcSocialMessage : FFXIVIpcBasePacket< SocialMessage >
+  struct FFXIVIpcSocialInviteUpdate : FFXIVIpcBasePacket< SocialInviteUpdate >
   {
     uint64_t contentId;
+    uint64_t unknown;
     uint32_t expireTime;
     uint8_t p1;
     uint8_t p2;
     uint8_t socialType;
     uint8_t padding;
     uint8_t type;
-    uint8_t unknown4;
+    uint8_t gender;
     char name[32];
     uint8_t padding2[6];
   };
 
-  struct FFXIVIpcSocialMessage2 : FFXIVIpcBasePacket< SocialMessage2 >
+  struct FFXIVIpcSocialInviteResult : FFXIVIpcBasePacket< SocialInviteResult >
   {
     uint64_t contentId;
     uint32_t unknown3;
@@ -2215,40 +2180,43 @@ namespace Sapphire::Network::Packets::Server
     char name[32];
   };
 
-  struct FFXIVIpcSocialRequestResponse : FFXIVIpcBasePacket< SocialRequestResponse >
+  struct FFXIVIpcSocialInviteResponse : FFXIVIpcBasePacket< SocialInviteResponse >
   {
     uint64_t contentId;
     uint32_t unknown3;
-    uint8_t u1AlwaysOne;
+    uint8_t socialType;
     uint8_t response;
-    uint8_t u2AlwaysOne;
+    uint8_t gender;
     char name[32];
     uint8_t padding;
   };
 
+  struct PartyMember
+  {
+    char name[32];
+    uint64_t unknown2;
+    uint64_t contentId;
+    uint32_t charaId;
+    uint32_t u1; // 3.x ParentEntityId?
+    uint32_t u2; // 3.x PetEntityId?
+    uint32_t hp;
+    uint32_t maxHp;
+    uint16_t mp;
+    uint16_t maxMp;
+    uint16_t u3;
+    uint16_t zoneId;
+    uint8_t gposeSelectable; // 3.x Valid?
+    uint8_t classId;
+    uint8_t u5; // 3.x ObjType?
+    uint8_t level;
+    uint8_t isLevelSync;
+    uint8_t unknown[7];
+    Common::StatusEffect effect[30];
+  };
+
   struct FFXIVIpcPartyList : FFXIVIpcBasePacket< PartyList >
   {
-    struct
-    {
-      char name[32];
-      uint64_t contentId;
-      uint32_t charaId;
-      uint32_t u1;
-      uint32_t u2;
-      uint32_t hp;
-      uint32_t maxHp;
-      uint16_t mp;
-      uint16_t maxMp;
-      uint16_t u3;
-      uint16_t zoneId;
-      uint8_t gposeSelectable;
-      uint8_t classId;
-      uint8_t u5;
-      uint8_t level;
-      uint8_t isLevelSync;
-      uint8_t unknown[7];
-      Common::StatusEffect effect[30];
-    } member[8];
+    PartyMember member[8];
     uint64_t partyId;
     uint64_t channelId;
     uint8_t leaderIndex;
@@ -2257,20 +2225,20 @@ namespace Sapphire::Network::Packets::Server
     uint32_t padding2;
   };
 
-  struct FFXIVIpcPartyMessage : FFXIVIpcBasePacket< PartyMessage >
+  struct FFXIVIpcPartyUpdate : FFXIVIpcBasePacket< PartyUpdate >
   {
-    uint64_t leaderContentId;
-    uint64_t memberContentId;
-    uint8_t u1;
-    uint8_t u2;
-    uint16_t type;
-    uint8_t partySize; // ?
-    char leaderName[32];
-    char memberName[32];
+    uint64_t executeContentId;
+    uint64_t targetContentId;
+    uint8_t executeGender;
+    uint8_t targetGender;
+    uint16_t updateStatus;
+    uint8_t partySize;
+    char executeName[32];
+    char targetName[32];
     uint8_t padding[3];
   };
 
-  struct FFXIVIpcEventContinue : FFXIVIpcBasePacket< EventContinue >
+  struct FFXIVIpcEventReturn : FFXIVIpcBasePacket< EventReturn >
   {
     uint32_t eventId;
     uint16_t scene;
@@ -2278,7 +2246,7 @@ namespace Sapphire::Network::Packets::Server
     uint64_t unknown2;
   };
 
-  struct FFXIVDirectorUnk4 : FFXIVIpcBasePacket< SomeDirectorUnk4 >
+  struct FFXIVDirectorMsg4 : FFXIVIpcBasePacket< DirectorMsg4 >
   {
     uint32_t param[4];
     uint64_t unknown;

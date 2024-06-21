@@ -134,6 +134,7 @@ struct Carry;
 struct Channeling;
 struct CharaCardBase;
 struct CharaCardDecoration;
+struct CharaCardDesignCategory;
 struct CharaCardDesignPreset;
 struct CharaCardDesignType;
 struct CharaCardHeader;
@@ -187,9 +188,11 @@ struct ContentEventItem;
 struct ContentExAction;
 struct ContentFinderCondition;
 struct ContentFinderConditionTransient;
+struct ContentFinderParamTable;
 struct ContentGauge;
 struct ContentGaugeColor;
 struct ContentMemberType;
+struct ContentNpc;
 struct ContentNpcTalk;
 struct ContentRandomSelect;
 struct ContentRoulette;
@@ -211,6 +214,13 @@ struct CreditBackImage;
 struct CreditCast;
 struct CreditList;
 struct CreditListText;
+struct CSBonusContent;
+struct CSBonusContentIdentifier;
+struct CSBonusContentType;
+struct CSBonusMission;
+struct CSBonusMissionType;
+struct CSBonusSeason;
+struct CSBonusTextData;
 struct CustomTalk;
 struct CustomTalkDefineClient;
 struct CustomTalkNestHandlers;
@@ -271,6 +281,7 @@ struct EquipRaceCategory;
 struct EquipSlotCategory;
 struct EurekaAetherItem;
 struct EurekaAethernet;
+struct EurekaDungeonPortal;
 struct EurekaGrowData;
 struct EurekaLogosMixerProbability;
 struct EurekaMagiaAction;
@@ -313,6 +324,8 @@ struct FCRank;
 struct FCReputation;
 struct FCRights;
 struct Festival;
+struct FGSAddon;
+struct FGSStageUI;
 struct FieldMarker;
 struct FishingBaitParameter;
 struct FishingNoteInfo;
@@ -374,6 +387,7 @@ struct GFateClimbing2;
 struct GFateClimbing2Content;
 struct GFateClimbing2TotemType;
 struct GFateRideShooting;
+struct GFateType;
 struct GilShop;
 struct GilShopItem;
 struct GimmickAccessor;
@@ -473,6 +487,7 @@ struct JobHudManualPriority;
 struct JournalCategory;
 struct JournalGenre;
 struct JournalSection;
+struct KineDriverOffGroup;
 struct Knockback;
 struct LegacyQuest;
 struct Leve;
@@ -522,6 +537,7 @@ struct MiniGameTurnBreakStatus;
 struct MinionRace;
 struct MinionRules;
 struct MinionSkillType;
+struct MirageStoreSetItem;
 struct MJIAnimals;
 struct MJIBuilding;
 struct MJIBuildingPlace;
@@ -551,6 +567,7 @@ struct MJILandmarkPlace;
 struct MJILivelyActor;
 struct MJIMinionPopAreas;
 struct MJIName;
+struct MJINekomimiRequest;
 struct MJIProgress;
 struct MJIRank;
 struct MJIRecipe;
@@ -594,6 +611,7 @@ struct MYCWarResultNotebook;
 struct NotebookDivision;
 struct NotebookDivisionCategory;
 struct NotoriousMonster;
+struct NotoriousMonsterTerritory;
 struct NpcEquip;
 struct NpcYell;
 struct Omen;
@@ -783,6 +801,7 @@ struct UDS_Event;
 struct UDS_Property;
 struct UIColor;
 struct UIConst;
+struct UILevelLookup;
 struct VaseFlower;
 struct VFX;
 struct VVDData;
@@ -2060,7 +2079,7 @@ struct BuddySkill
 
 struct Cabinet
 {
-  int32_t item;
+  uint32_t item;
   uint16_t order;
   uint8_t category;
 
@@ -2070,6 +2089,7 @@ struct Cabinet
 struct CabinetCategory
 {
   uint8_t menuOrder;
+  uint8_t hideOrder;
   int32_t icon;
   int32_t category;
 
@@ -2120,6 +2140,12 @@ struct CharaCardDecoration
   std::string name;
 
   CharaCardDecoration( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CharaCardDesignCategory
+{
+
+  CharaCardDesignCategory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CharaCardDesignPreset
@@ -2801,6 +2827,12 @@ struct ContentFinderConditionTransient
   ContentFinderConditionTransient( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct ContentFinderParamTable
+{
+
+  ContentFinderParamTable( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct ContentGauge
 {
   std::string name;
@@ -2827,6 +2859,12 @@ struct ContentMemberType
   uint8_t rangedPerParty;
 
   ContentMemberType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct ContentNpc
+{
+
+  ContentNpc( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct ContentNpcTalk
@@ -2907,9 +2945,9 @@ struct ContentsNote
 
 struct ContentsTutorial
 {
+  std::vector< int32_t > page;
   std::string name;
   std::string description;
-  std::vector< int32_t > page;
 
   ContentsTutorial( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -3049,6 +3087,48 @@ struct CreditListText
   std::string name;
 
   CreditListText( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusContent
+{
+
+  CSBonusContent( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusContentIdentifier
+{
+
+  CSBonusContentIdentifier( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusContentType
+{
+
+  CSBonusContentType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusMission
+{
+
+  CSBonusMission( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusMissionType
+{
+
+  CSBonusMissionType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusSeason
+{
+
+  CSBonusSeason( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct CSBonusTextData
+{
+
+  CSBonusTextData( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct CustomTalk
@@ -3708,6 +3788,13 @@ struct EurekaAethernet
   EurekaAethernet( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct EurekaDungeonPortal
+{
+  uint32_t levelId;
+
+  EurekaDungeonPortal( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct EurekaGrowData
 {
   uint16_t baseResistance;
@@ -3783,7 +3870,7 @@ struct EventIconPriority
 
 struct EventIconPriorityPair
 {
-  uint32_t icon1;
+  uint32_t icon;
 
   EventIconPriorityPair( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -4102,6 +4189,18 @@ struct Festival
   std::string name;
 
   Festival( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct FGSAddon
+{
+
+  FGSAddon( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct FGSStageUI
+{
+
+  FGSStageUI( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct FieldMarker
@@ -4698,6 +4797,12 @@ struct GFateRideShooting
   GFateRideShooting( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct GFateType
+{
+
+  GFateType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct GilShop
 {
   std::string name;
@@ -4733,7 +4838,7 @@ struct GimmickAccessor
 struct GimmickJump
 {
   uint16_t fallDamage;
-  int8_t height;
+  uint16_t height;
   uint32_t loopMotion;
   uint32_t endMotion;
   bool startClient;
@@ -4978,7 +5083,6 @@ struct HousingFurniture
   uint32_t customTalk;
   uint32_t item;
   bool destroyOnRemoval;
-  bool tooltip;
 
   HousingFurniture( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -5466,6 +5570,7 @@ struct Item
   bool alwaysCollectable;
   uint16_t aetherialReduce;
   uint8_t levelEquip;
+  uint8_t requiredPvpRank;
   uint8_t equipRestriction;
   uint8_t classJobCategory;
   uint8_t grandCompany;
@@ -5728,6 +5833,12 @@ struct JournalSection
   std::string name;
 
   JournalSection( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct KineDriverOffGroup
+{
+
+  KineDriverOffGroup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct Knockback
@@ -6167,10 +6278,18 @@ struct MinionSkillType
   MinionSkillType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct MirageStoreSetItem
+{
+
+  MirageStoreSetItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct MJIAnimals
 {
   uint32_t bNpcBase;
   uint8_t size;
+  uint8_t rarity;
+  uint8_t sort;
   std::vector< uint32_t > reward;
   int32_t icon;
 
@@ -6264,7 +6383,11 @@ struct MJICropSeed
 
 struct MJIDisposalShopItem
 {
+  uint8_t item;
+  uint8_t currency;
+  uint16_t count;
   uint8_t category;
+  uint8_t sort;
 
   MJIDisposalShopItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6307,9 +6430,11 @@ struct MJIGatheringItem
 {
   uint32_t item;
   uint8_t sort;
+  uint8_t tool;
   int16_t x;
   int16_t y;
   uint16_t radius;
+  uint8_t map;
 
   MJIGatheringItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6325,6 +6450,7 @@ struct MJIGatheringObject
 
 struct MJIGatheringTool
 {
+  uint8_t item;
 
   MJIGatheringTool( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6351,6 +6477,7 @@ struct MJIItemPouch
   uint32_t item;
   int32_t category;
   uint8_t crop;
+  uint8_t sort;
 
   MJIItemPouch( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6358,6 +6485,7 @@ struct MJIItemPouch
 struct MJIKeyItem
 {
   int32_t item;
+  uint8_t sort;
 
   MJIKeyItem( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -6369,6 +6497,8 @@ struct MJILandmark
   uint16_t sGB2;
   uint16_t sGB3;
   uint16_t sGB4;
+  uint16_t sGB5;
+  uint16_t sGB6;
   std::vector< uint16_t > material;
   std::vector< uint8_t > amount;
   uint32_t name;
@@ -6414,6 +6544,12 @@ struct MJIName
   int8_t article;
 
   MJIName( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct MJINekomimiRequest
+{
+
+  MJINekomimiRequest( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct MJIProgress
@@ -6870,6 +7006,13 @@ struct NotoriousMonster
   uint32_t bNpcName;
 
   NotoriousMonster( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
+struct NotoriousMonsterTerritory
+{
+  std::vector< uint16_t > notoriousMonsters;
+
+  NotoriousMonsterTerritory( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
 struct NpcEquip
@@ -7554,6 +7697,9 @@ struct QuestEventAreaEntranceInfo
 
 struct QuestLinkMarker
 {
+  uint32_t sourceMap;
+  uint32_t level;
+  uint32_t targetMap;
 
   QuestLinkMarker( uint32_t row_id, uint32_t subRow, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -8490,6 +8636,7 @@ struct TerritoryType
   bool isPvpZone;
   uint8_t exVersion;
   uint8_t mountSpeed;
+  uint16_t notoriousMonsterTerritory;
 
   TerritoryType( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
@@ -8866,6 +9013,12 @@ struct UIConst
   UIConst( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
 };
 
+struct UILevelLookup
+{
+
+  UILevelLookup( uint32_t row_id, Sapphire::Data::ExdDataGenerated* exdData );
+};
+
 struct VaseFlower
 {
   uint32_t item;
@@ -8941,7 +9094,7 @@ struct WarpCondition
   uint8_t completeParam;
   uint32_t requiredQuest1;
   uint32_t requiredQuest2;
-  uint32_t dRequiredQuest3;
+  uint32_t requiredQuest3;
   uint32_t requiredQuest4;
   uint16_t questReward;
   uint16_t classLevel;
@@ -9290,6 +9443,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ChannelingDat;
      xiv::exd::Exd m_CharaCardBaseDat;
      xiv::exd::Exd m_CharaCardDecorationDat;
+     xiv::exd::Exd m_CharaCardDesignCategoryDat;
      xiv::exd::Exd m_CharaCardDesignPresetDat;
      xiv::exd::Exd m_CharaCardDesignTypeDat;
      xiv::exd::Exd m_CharaCardHeaderDat;
@@ -9343,9 +9497,11 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_ContentExActionDat;
      xiv::exd::Exd m_ContentFinderConditionDat;
      xiv::exd::Exd m_ContentFinderConditionTransientDat;
+     xiv::exd::Exd m_ContentFinderParamTableDat;
      xiv::exd::Exd m_ContentGaugeDat;
      xiv::exd::Exd m_ContentGaugeColorDat;
      xiv::exd::Exd m_ContentMemberTypeDat;
+     xiv::exd::Exd m_ContentNpcDat;
      xiv::exd::Exd m_ContentNpcTalkDat;
      xiv::exd::Exd m_ContentRandomSelectDat;
      xiv::exd::Exd m_ContentRouletteDat;
@@ -9367,6 +9523,13 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_CreditCastDat;
      xiv::exd::Exd m_CreditListDat;
      xiv::exd::Exd m_CreditListTextDat;
+     xiv::exd::Exd m_CSBonusContentDat;
+     xiv::exd::Exd m_CSBonusContentIdentifierDat;
+     xiv::exd::Exd m_CSBonusContentTypeDat;
+     xiv::exd::Exd m_CSBonusMissionDat;
+     xiv::exd::Exd m_CSBonusMissionTypeDat;
+     xiv::exd::Exd m_CSBonusSeasonDat;
+     xiv::exd::Exd m_CSBonusTextDataDat;
      xiv::exd::Exd m_CustomTalkDat;
      xiv::exd::Exd m_CustomTalkDefineClientDat;
      xiv::exd::Exd m_CustomTalkNestHandlersDat;
@@ -9427,6 +9590,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_EquipSlotCategoryDat;
      xiv::exd::Exd m_EurekaAetherItemDat;
      xiv::exd::Exd m_EurekaAethernetDat;
+     xiv::exd::Exd m_EurekaDungeonPortalDat;
      xiv::exd::Exd m_EurekaGrowDataDat;
      xiv::exd::Exd m_EurekaLogosMixerProbabilityDat;
      xiv::exd::Exd m_EurekaMagiaActionDat;
@@ -9469,6 +9633,8 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_FCReputationDat;
      xiv::exd::Exd m_FCRightsDat;
      xiv::exd::Exd m_FestivalDat;
+     xiv::exd::Exd m_FGSAddonDat;
+     xiv::exd::Exd m_FGSStageUIDat;
      xiv::exd::Exd m_FieldMarkerDat;
      xiv::exd::Exd m_FishingBaitParameterDat;
      xiv::exd::Exd m_FishingNoteInfoDat;
@@ -9530,6 +9696,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_GFateClimbing2ContentDat;
      xiv::exd::Exd m_GFateClimbing2TotemTypeDat;
      xiv::exd::Exd m_GFateRideShootingDat;
+     xiv::exd::Exd m_GFateTypeDat;
      xiv::exd::Exd m_GilShopDat;
      xiv::exd::Exd m_GilShopItemDat;
      xiv::exd::Exd m_GimmickAccessorDat;
@@ -9629,6 +9796,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_JournalCategoryDat;
      xiv::exd::Exd m_JournalGenreDat;
      xiv::exd::Exd m_JournalSectionDat;
+     xiv::exd::Exd m_KineDriverOffGroupDat;
      xiv::exd::Exd m_KnockbackDat;
      xiv::exd::Exd m_LegacyQuestDat;
      xiv::exd::Exd m_LeveDat;
@@ -9678,6 +9846,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MinionRaceDat;
      xiv::exd::Exd m_MinionRulesDat;
      xiv::exd::Exd m_MinionSkillTypeDat;
+     xiv::exd::Exd m_MirageStoreSetItemDat;
      xiv::exd::Exd m_MJIAnimalsDat;
      xiv::exd::Exd m_MJIBuildingDat;
      xiv::exd::Exd m_MJIBuildingPlaceDat;
@@ -9707,6 +9876,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_MJILivelyActorDat;
      xiv::exd::Exd m_MJIMinionPopAreasDat;
      xiv::exd::Exd m_MJINameDat;
+     xiv::exd::Exd m_MJINekomimiRequestDat;
      xiv::exd::Exd m_MJIProgressDat;
      xiv::exd::Exd m_MJIRankDat;
      xiv::exd::Exd m_MJIRecipeDat;
@@ -9750,6 +9920,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_NotebookDivisionDat;
      xiv::exd::Exd m_NotebookDivisionCategoryDat;
      xiv::exd::Exd m_NotoriousMonsterDat;
+     xiv::exd::Exd m_NotoriousMonsterTerritoryDat;
      xiv::exd::Exd m_NpcEquipDat;
      xiv::exd::Exd m_NpcYellDat;
      xiv::exd::Exd m_OmenDat;
@@ -9939,6 +10110,7 @@ struct ZoneSharedGroup
      xiv::exd::Exd m_UDS_PropertyDat;
      xiv::exd::Exd m_UIColorDat;
      xiv::exd::Exd m_UIConstDat;
+     xiv::exd::Exd m_UILevelLookupDat;
      xiv::exd::Exd m_VaseFlowerDat;
      xiv::exd::Exd m_VFXDat;
      xiv::exd::Exd m_VVDDataDat;
@@ -10081,6 +10253,7 @@ struct ZoneSharedGroup
      using ChannelingPtr = std::shared_ptr< Channeling >;
      using CharaCardBasePtr = std::shared_ptr< CharaCardBase >;
      using CharaCardDecorationPtr = std::shared_ptr< CharaCardDecoration >;
+     using CharaCardDesignCategoryPtr = std::shared_ptr< CharaCardDesignCategory >;
      using CharaCardDesignPresetPtr = std::shared_ptr< CharaCardDesignPreset >;
      using CharaCardDesignTypePtr = std::shared_ptr< CharaCardDesignType >;
      using CharaCardHeaderPtr = std::shared_ptr< CharaCardHeader >;
@@ -10134,9 +10307,11 @@ struct ZoneSharedGroup
      using ContentExActionPtr = std::shared_ptr< ContentExAction >;
      using ContentFinderConditionPtr = std::shared_ptr< ContentFinderCondition >;
      using ContentFinderConditionTransientPtr = std::shared_ptr< ContentFinderConditionTransient >;
+     using ContentFinderParamTablePtr = std::shared_ptr< ContentFinderParamTable >;
      using ContentGaugePtr = std::shared_ptr< ContentGauge >;
      using ContentGaugeColorPtr = std::shared_ptr< ContentGaugeColor >;
      using ContentMemberTypePtr = std::shared_ptr< ContentMemberType >;
+     using ContentNpcPtr = std::shared_ptr< ContentNpc >;
      using ContentNpcTalkPtr = std::shared_ptr< ContentNpcTalk >;
      using ContentRandomSelectPtr = std::shared_ptr< ContentRandomSelect >;
      using ContentRoulettePtr = std::shared_ptr< ContentRoulette >;
@@ -10158,6 +10333,13 @@ struct ZoneSharedGroup
      using CreditCastPtr = std::shared_ptr< CreditCast >;
      using CreditListPtr = std::shared_ptr< CreditList >;
      using CreditListTextPtr = std::shared_ptr< CreditListText >;
+     using CSBonusContentPtr = std::shared_ptr< CSBonusContent >;
+     using CSBonusContentIdentifierPtr = std::shared_ptr< CSBonusContentIdentifier >;
+     using CSBonusContentTypePtr = std::shared_ptr< CSBonusContentType >;
+     using CSBonusMissionPtr = std::shared_ptr< CSBonusMission >;
+     using CSBonusMissionTypePtr = std::shared_ptr< CSBonusMissionType >;
+     using CSBonusSeasonPtr = std::shared_ptr< CSBonusSeason >;
+     using CSBonusTextDataPtr = std::shared_ptr< CSBonusTextData >;
      using CustomTalkPtr = std::shared_ptr< CustomTalk >;
      using CustomTalkDefineClientPtr = std::shared_ptr< CustomTalkDefineClient >;
      using CustomTalkNestHandlersPtr = std::shared_ptr< CustomTalkNestHandlers >;
@@ -10218,6 +10400,7 @@ struct ZoneSharedGroup
      using EquipSlotCategoryPtr = std::shared_ptr< EquipSlotCategory >;
      using EurekaAetherItemPtr = std::shared_ptr< EurekaAetherItem >;
      using EurekaAethernetPtr = std::shared_ptr< EurekaAethernet >;
+     using EurekaDungeonPortalPtr = std::shared_ptr< EurekaDungeonPortal >;
      using EurekaGrowDataPtr = std::shared_ptr< EurekaGrowData >;
      using EurekaLogosMixerProbabilityPtr = std::shared_ptr< EurekaLogosMixerProbability >;
      using EurekaMagiaActionPtr = std::shared_ptr< EurekaMagiaAction >;
@@ -10260,6 +10443,8 @@ struct ZoneSharedGroup
      using FCReputationPtr = std::shared_ptr< FCReputation >;
      using FCRightsPtr = std::shared_ptr< FCRights >;
      using FestivalPtr = std::shared_ptr< Festival >;
+     using FGSAddonPtr = std::shared_ptr< FGSAddon >;
+     using FGSStageUIPtr = std::shared_ptr< FGSStageUI >;
      using FieldMarkerPtr = std::shared_ptr< FieldMarker >;
      using FishingBaitParameterPtr = std::shared_ptr< FishingBaitParameter >;
      using FishingNoteInfoPtr = std::shared_ptr< FishingNoteInfo >;
@@ -10321,6 +10506,7 @@ struct ZoneSharedGroup
      using GFateClimbing2ContentPtr = std::shared_ptr< GFateClimbing2Content >;
      using GFateClimbing2TotemTypePtr = std::shared_ptr< GFateClimbing2TotemType >;
      using GFateRideShootingPtr = std::shared_ptr< GFateRideShooting >;
+     using GFateTypePtr = std::shared_ptr< GFateType >;
      using GilShopPtr = std::shared_ptr< GilShop >;
      using GilShopItemPtr = std::shared_ptr< GilShopItem >;
      using GimmickAccessorPtr = std::shared_ptr< GimmickAccessor >;
@@ -10420,6 +10606,7 @@ struct ZoneSharedGroup
      using JournalCategoryPtr = std::shared_ptr< JournalCategory >;
      using JournalGenrePtr = std::shared_ptr< JournalGenre >;
      using JournalSectionPtr = std::shared_ptr< JournalSection >;
+     using KineDriverOffGroupPtr = std::shared_ptr< KineDriverOffGroup >;
      using KnockbackPtr = std::shared_ptr< Knockback >;
      using LegacyQuestPtr = std::shared_ptr< LegacyQuest >;
      using LevePtr = std::shared_ptr< Leve >;
@@ -10469,6 +10656,7 @@ struct ZoneSharedGroup
      using MinionRacePtr = std::shared_ptr< MinionRace >;
      using MinionRulesPtr = std::shared_ptr< MinionRules >;
      using MinionSkillTypePtr = std::shared_ptr< MinionSkillType >;
+     using MirageStoreSetItemPtr = std::shared_ptr< MirageStoreSetItem >;
      using MJIAnimalsPtr = std::shared_ptr< MJIAnimals >;
      using MJIBuildingPtr = std::shared_ptr< MJIBuilding >;
      using MJIBuildingPlacePtr = std::shared_ptr< MJIBuildingPlace >;
@@ -10498,6 +10686,7 @@ struct ZoneSharedGroup
      using MJILivelyActorPtr = std::shared_ptr< MJILivelyActor >;
      using MJIMinionPopAreasPtr = std::shared_ptr< MJIMinionPopAreas >;
      using MJINamePtr = std::shared_ptr< MJIName >;
+     using MJINekomimiRequestPtr = std::shared_ptr< MJINekomimiRequest >;
      using MJIProgressPtr = std::shared_ptr< MJIProgress >;
      using MJIRankPtr = std::shared_ptr< MJIRank >;
      using MJIRecipePtr = std::shared_ptr< MJIRecipe >;
@@ -10541,6 +10730,7 @@ struct ZoneSharedGroup
      using NotebookDivisionPtr = std::shared_ptr< NotebookDivision >;
      using NotebookDivisionCategoryPtr = std::shared_ptr< NotebookDivisionCategory >;
      using NotoriousMonsterPtr = std::shared_ptr< NotoriousMonster >;
+     using NotoriousMonsterTerritoryPtr = std::shared_ptr< NotoriousMonsterTerritory >;
      using NpcEquipPtr = std::shared_ptr< NpcEquip >;
      using NpcYellPtr = std::shared_ptr< NpcYell >;
      using OmenPtr = std::shared_ptr< Omen >;
@@ -10730,6 +10920,7 @@ struct ZoneSharedGroup
      using UDS_PropertyPtr = std::shared_ptr< UDS_Property >;
      using UIColorPtr = std::shared_ptr< UIColor >;
      using UIConstPtr = std::shared_ptr< UIConst >;
+     using UILevelLookupPtr = std::shared_ptr< UILevelLookup >;
      using VaseFlowerPtr = std::shared_ptr< VaseFlower >;
      using VFXPtr = std::shared_ptr< VFX >;
      using VVDDataPtr = std::shared_ptr< VVDData >;
@@ -10872,6 +11063,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ChannelingIdList;
      std::set< uint32_t > m_CharaCardBaseIdList;
      std::set< uint32_t > m_CharaCardDecorationIdList;
+     std::set< uint32_t > m_CharaCardDesignCategoryIdList;
      std::set< uint32_t > m_CharaCardDesignPresetIdList;
      std::set< uint32_t > m_CharaCardDesignTypeIdList;
      std::set< uint32_t > m_CharaCardHeaderIdList;
@@ -10925,9 +11117,11 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_ContentExActionIdList;
      std::set< uint32_t > m_ContentFinderConditionIdList;
      std::set< uint32_t > m_ContentFinderConditionTransientIdList;
+     std::set< uint32_t > m_ContentFinderParamTableIdList;
      std::set< uint32_t > m_ContentGaugeIdList;
      std::set< uint32_t > m_ContentGaugeColorIdList;
      std::set< uint32_t > m_ContentMemberTypeIdList;
+     std::set< uint32_t > m_ContentNpcIdList;
      std::set< uint32_t > m_ContentNpcTalkIdList;
      std::set< uint32_t > m_ContentRandomSelectIdList;
      std::set< uint32_t > m_ContentRouletteIdList;
@@ -10949,6 +11143,13 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_CreditCastIdList;
      std::set< uint32_t > m_CreditListIdList;
      std::set< uint32_t > m_CreditListTextIdList;
+     std::set< uint32_t > m_CSBonusContentIdList;
+     std::set< uint32_t > m_CSBonusContentIdentifierIdList;
+     std::set< uint32_t > m_CSBonusContentTypeIdList;
+     std::set< uint32_t > m_CSBonusMissionIdList;
+     std::set< uint32_t > m_CSBonusMissionTypeIdList;
+     std::set< uint32_t > m_CSBonusSeasonIdList;
+     std::set< uint32_t > m_CSBonusTextDataIdList;
      std::set< uint32_t > m_CustomTalkIdList;
      std::set< uint32_t > m_CustomTalkDefineClientIdList;
      std::set< uint32_t > m_CustomTalkNestHandlersIdList;
@@ -11009,6 +11210,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_EquipSlotCategoryIdList;
      std::set< uint32_t > m_EurekaAetherItemIdList;
      std::set< uint32_t > m_EurekaAethernetIdList;
+     std::set< uint32_t > m_EurekaDungeonPortalIdList;
      std::set< uint32_t > m_EurekaGrowDataIdList;
      std::set< uint32_t > m_EurekaLogosMixerProbabilityIdList;
      std::set< uint32_t > m_EurekaMagiaActionIdList;
@@ -11051,6 +11253,8 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_FCReputationIdList;
      std::set< uint32_t > m_FCRightsIdList;
      std::set< uint32_t > m_FestivalIdList;
+     std::set< uint32_t > m_FGSAddonIdList;
+     std::set< uint32_t > m_FGSStageUIIdList;
      std::set< uint32_t > m_FieldMarkerIdList;
      std::set< uint32_t > m_FishingBaitParameterIdList;
      std::set< uint32_t > m_FishingNoteInfoIdList;
@@ -11112,6 +11316,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_GFateClimbing2ContentIdList;
      std::set< uint32_t > m_GFateClimbing2TotemTypeIdList;
      std::set< uint32_t > m_GFateRideShootingIdList;
+     std::set< uint32_t > m_GFateTypeIdList;
      std::set< uint32_t > m_GilShopIdList;
      std::set< uint32_t > m_GilShopItemIdList;
      std::set< uint32_t > m_GimmickAccessorIdList;
@@ -11211,6 +11416,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_JournalCategoryIdList;
      std::set< uint32_t > m_JournalGenreIdList;
      std::set< uint32_t > m_JournalSectionIdList;
+     std::set< uint32_t > m_KineDriverOffGroupIdList;
      std::set< uint32_t > m_KnockbackIdList;
      std::set< uint32_t > m_LegacyQuestIdList;
      std::set< uint32_t > m_LeveIdList;
@@ -11260,6 +11466,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MinionRaceIdList;
      std::set< uint32_t > m_MinionRulesIdList;
      std::set< uint32_t > m_MinionSkillTypeIdList;
+     std::set< uint32_t > m_MirageStoreSetItemIdList;
      std::set< uint32_t > m_MJIAnimalsIdList;
      std::set< uint32_t > m_MJIBuildingIdList;
      std::set< uint32_t > m_MJIBuildingPlaceIdList;
@@ -11289,6 +11496,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_MJILivelyActorIdList;
      std::set< uint32_t > m_MJIMinionPopAreasIdList;
      std::set< uint32_t > m_MJINameIdList;
+     std::set< uint32_t > m_MJINekomimiRequestIdList;
      std::set< uint32_t > m_MJIProgressIdList;
      std::set< uint32_t > m_MJIRankIdList;
      std::set< uint32_t > m_MJIRecipeIdList;
@@ -11332,6 +11540,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_NotebookDivisionIdList;
      std::set< uint32_t > m_NotebookDivisionCategoryIdList;
      std::set< uint32_t > m_NotoriousMonsterIdList;
+     std::set< uint32_t > m_NotoriousMonsterTerritoryIdList;
      std::set< uint32_t > m_NpcEquipIdList;
      std::set< uint32_t > m_NpcYellIdList;
      std::set< uint32_t > m_OmenIdList;
@@ -11521,6 +11730,7 @@ struct ZoneSharedGroup
      std::set< uint32_t > m_UDS_PropertyIdList;
      std::set< uint32_t > m_UIColorIdList;
      std::set< uint32_t > m_UIConstIdList;
+     std::set< uint32_t > m_UILevelLookupIdList;
      std::set< uint32_t > m_VaseFlowerIdList;
      std::set< uint32_t > m_VFXIdList;
      std::set< uint32_t > m_VVDDataIdList;
@@ -12223,6 +12433,12 @@ const std::set< uint32_t >& getCharaCardDecorationIdList()
       loadIdList( m_CharaCardDecorationDat, m_CharaCardDecorationIdList );
    return m_CharaCardDecorationIdList;
 }
+const std::set< uint32_t >& getCharaCardDesignCategoryIdList()
+{
+   if( m_CharaCardDesignCategoryIdList.size() == 0 )
+      loadIdList( m_CharaCardDesignCategoryDat, m_CharaCardDesignCategoryIdList );
+   return m_CharaCardDesignCategoryIdList;
+}
 const std::set< uint32_t >& getCharaCardDesignPresetIdList()
 {
    if( m_CharaCardDesignPresetIdList.size() == 0 )
@@ -12541,6 +12757,12 @@ const std::set< uint32_t >& getContentFinderConditionTransientIdList()
       loadIdList( m_ContentFinderConditionTransientDat, m_ContentFinderConditionTransientIdList );
    return m_ContentFinderConditionTransientIdList;
 }
+const std::set< uint32_t >& getContentFinderParamTableIdList()
+{
+   if( m_ContentFinderParamTableIdList.size() == 0 )
+      loadIdList( m_ContentFinderParamTableDat, m_ContentFinderParamTableIdList );
+   return m_ContentFinderParamTableIdList;
+}
 const std::set< uint32_t >& getContentGaugeIdList()
 {
    if( m_ContentGaugeIdList.size() == 0 )
@@ -12558,6 +12780,12 @@ const std::set< uint32_t >& getContentMemberTypeIdList()
    if( m_ContentMemberTypeIdList.size() == 0 )
       loadIdList( m_ContentMemberTypeDat, m_ContentMemberTypeIdList );
    return m_ContentMemberTypeIdList;
+}
+const std::set< uint32_t >& getContentNpcIdList()
+{
+   if( m_ContentNpcIdList.size() == 0 )
+      loadIdList( m_ContentNpcDat, m_ContentNpcIdList );
+   return m_ContentNpcIdList;
 }
 const std::set< uint32_t >& getContentNpcTalkIdList()
 {
@@ -12684,6 +12912,48 @@ const std::set< uint32_t >& getCreditListTextIdList()
    if( m_CreditListTextIdList.size() == 0 )
       loadIdList( m_CreditListTextDat, m_CreditListTextIdList );
    return m_CreditListTextIdList;
+}
+const std::set< uint32_t >& getCSBonusContentIdList()
+{
+   if( m_CSBonusContentIdList.size() == 0 )
+      loadIdList( m_CSBonusContentDat, m_CSBonusContentIdList );
+   return m_CSBonusContentIdList;
+}
+const std::set< uint32_t >& getCSBonusContentIdentifierIdList()
+{
+   if( m_CSBonusContentIdentifierIdList.size() == 0 )
+      loadIdList( m_CSBonusContentIdentifierDat, m_CSBonusContentIdentifierIdList );
+   return m_CSBonusContentIdentifierIdList;
+}
+const std::set< uint32_t >& getCSBonusContentTypeIdList()
+{
+   if( m_CSBonusContentTypeIdList.size() == 0 )
+      loadIdList( m_CSBonusContentTypeDat, m_CSBonusContentTypeIdList );
+   return m_CSBonusContentTypeIdList;
+}
+const std::set< uint32_t >& getCSBonusMissionIdList()
+{
+   if( m_CSBonusMissionIdList.size() == 0 )
+      loadIdList( m_CSBonusMissionDat, m_CSBonusMissionIdList );
+   return m_CSBonusMissionIdList;
+}
+const std::set< uint32_t >& getCSBonusMissionTypeIdList()
+{
+   if( m_CSBonusMissionTypeIdList.size() == 0 )
+      loadIdList( m_CSBonusMissionTypeDat, m_CSBonusMissionTypeIdList );
+   return m_CSBonusMissionTypeIdList;
+}
+const std::set< uint32_t >& getCSBonusSeasonIdList()
+{
+   if( m_CSBonusSeasonIdList.size() == 0 )
+      loadIdList( m_CSBonusSeasonDat, m_CSBonusSeasonIdList );
+   return m_CSBonusSeasonIdList;
+}
+const std::set< uint32_t >& getCSBonusTextDataIdList()
+{
+   if( m_CSBonusTextDataIdList.size() == 0 )
+      loadIdList( m_CSBonusTextDataDat, m_CSBonusTextDataIdList );
+   return m_CSBonusTextDataIdList;
 }
 const std::set< uint32_t >& getCustomTalkIdList()
 {
@@ -13045,6 +13315,12 @@ const std::set< uint32_t >& getEurekaAethernetIdList()
       loadIdList( m_EurekaAethernetDat, m_EurekaAethernetIdList );
    return m_EurekaAethernetIdList;
 }
+const std::set< uint32_t >& getEurekaDungeonPortalIdList()
+{
+   if( m_EurekaDungeonPortalIdList.size() == 0 )
+      loadIdList( m_EurekaDungeonPortalDat, m_EurekaDungeonPortalIdList );
+   return m_EurekaDungeonPortalIdList;
+}
 const std::set< uint32_t >& getEurekaGrowDataIdList()
 {
    if( m_EurekaGrowDataIdList.size() == 0 )
@@ -13296,6 +13572,18 @@ const std::set< uint32_t >& getFestivalIdList()
    if( m_FestivalIdList.size() == 0 )
       loadIdList( m_FestivalDat, m_FestivalIdList );
    return m_FestivalIdList;
+}
+const std::set< uint32_t >& getFGSAddonIdList()
+{
+   if( m_FGSAddonIdList.size() == 0 )
+      loadIdList( m_FGSAddonDat, m_FGSAddonIdList );
+   return m_FGSAddonIdList;
+}
+const std::set< uint32_t >& getFGSStageUIIdList()
+{
+   if( m_FGSStageUIIdList.size() == 0 )
+      loadIdList( m_FGSStageUIDat, m_FGSStageUIIdList );
+   return m_FGSStageUIIdList;
 }
 const std::set< uint32_t >& getFieldMarkerIdList()
 {
@@ -13662,6 +13950,12 @@ const std::set< uint32_t >& getGFateRideShootingIdList()
    if( m_GFateRideShootingIdList.size() == 0 )
       loadIdList( m_GFateRideShootingDat, m_GFateRideShootingIdList );
    return m_GFateRideShootingIdList;
+}
+const std::set< uint32_t >& getGFateTypeIdList()
+{
+   if( m_GFateTypeIdList.size() == 0 )
+      loadIdList( m_GFateTypeDat, m_GFateTypeIdList );
+   return m_GFateTypeIdList;
 }
 const std::set< uint32_t >& getGilShopIdList()
 {
@@ -14257,6 +14551,12 @@ const std::set< uint32_t >& getJournalSectionIdList()
       loadIdList( m_JournalSectionDat, m_JournalSectionIdList );
    return m_JournalSectionIdList;
 }
+const std::set< uint32_t >& getKineDriverOffGroupIdList()
+{
+   if( m_KineDriverOffGroupIdList.size() == 0 )
+      loadIdList( m_KineDriverOffGroupDat, m_KineDriverOffGroupIdList );
+   return m_KineDriverOffGroupIdList;
+}
 const std::set< uint32_t >& getKnockbackIdList()
 {
    if( m_KnockbackIdList.size() == 0 )
@@ -14551,6 +14851,12 @@ const std::set< uint32_t >& getMinionSkillTypeIdList()
       loadIdList( m_MinionSkillTypeDat, m_MinionSkillTypeIdList );
    return m_MinionSkillTypeIdList;
 }
+const std::set< uint32_t >& getMirageStoreSetItemIdList()
+{
+   if( m_MirageStoreSetItemIdList.size() == 0 )
+      loadIdList( m_MirageStoreSetItemDat, m_MirageStoreSetItemIdList );
+   return m_MirageStoreSetItemIdList;
+}
 const std::set< uint32_t >& getMJIAnimalsIdList()
 {
    if( m_MJIAnimalsIdList.size() == 0 )
@@ -14724,6 +15030,12 @@ const std::set< uint32_t >& getMJINameIdList()
    if( m_MJINameIdList.size() == 0 )
       loadIdList( m_MJINameDat, m_MJINameIdList );
    return m_MJINameIdList;
+}
+const std::set< uint32_t >& getMJINekomimiRequestIdList()
+{
+   if( m_MJINekomimiRequestIdList.size() == 0 )
+      loadIdList( m_MJINekomimiRequestDat, m_MJINekomimiRequestIdList );
+   return m_MJINekomimiRequestIdList;
 }
 const std::set< uint32_t >& getMJIProgressIdList()
 {
@@ -14982,6 +15294,12 @@ const std::set< uint32_t >& getNotoriousMonsterIdList()
    if( m_NotoriousMonsterIdList.size() == 0 )
       loadIdList( m_NotoriousMonsterDat, m_NotoriousMonsterIdList );
    return m_NotoriousMonsterIdList;
+}
+const std::set< uint32_t >& getNotoriousMonsterTerritoryIdList()
+{
+   if( m_NotoriousMonsterTerritoryIdList.size() == 0 )
+      loadIdList( m_NotoriousMonsterTerritoryDat, m_NotoriousMonsterTerritoryIdList );
+   return m_NotoriousMonsterTerritoryIdList;
 }
 const std::set< uint32_t >& getNpcEquipIdList()
 {
@@ -16116,6 +16434,12 @@ const std::set< uint32_t >& getUIConstIdList()
    if( m_UIConstIdList.size() == 0 )
       loadIdList( m_UIConstDat, m_UIConstIdList );
    return m_UIConstIdList;
+}
+const std::set< uint32_t >& getUILevelLookupIdList()
+{
+   if( m_UILevelLookupIdList.size() == 0 )
+      loadIdList( m_UILevelLookupDat, m_UILevelLookupIdList );
+   return m_UILevelLookupIdList;
 }
 const std::set< uint32_t >& getVaseFlowerIdList()
 {

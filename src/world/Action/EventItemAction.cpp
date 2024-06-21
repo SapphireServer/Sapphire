@@ -67,4 +67,6 @@ void EventItemAction::execute()
 void EventItemAction::start()
 {
   m_startTime = Common::Util::getTimeMs();
+  if( !hasCastTime() )
+    execute();
 }

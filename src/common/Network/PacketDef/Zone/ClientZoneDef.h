@@ -37,12 +37,11 @@ struct FFXIVIpcClientTrigger :
 {
   /* 0000 */ uint16_t commandId;
   /* 0002 */ uint8_t unk_2[2];
-  /* 0004 */ uint32_t param11;
-  /* 0008 */ uint32_t param12;
-  /* 000C */ uint32_t param2;
-  /* 0010 */ uint32_t param4; // todo: really?
-  /* 0014 */ uint32_t param5;
-  /* 0018 */ uint64_t param3;
+  /* 0004 */ uint32_t param1;
+  /* 0008 */ uint32_t param2;
+  /* 000C */ uint32_t param3;
+  /* 0010 */ uint32_t param4;
+  /* 0014 */ Common::FFXIVARR_POSITION3 position;
 };
 
 struct FFXIVIpcUpdatePosition :
@@ -161,6 +160,13 @@ struct FFXIVIpcEventHandlerTalk :
   /* 0008 */ uint32_t eventId;
 };
 
+struct FFXIVIpcEventHandlerSay :
+  FFXIVIpcBasePacket< SayEventHandler >
+{
+  /* 0000 */ uint64_t actorId;
+  /* 0008 */ uint32_t eventId;
+};
+
 struct FFXIVIpcPingHandler :
   FFXIVIpcBasePacket< PingHandler >
 {
@@ -207,10 +213,10 @@ struct FFXIVIpcChatHandler :
   /* 001A */ char message[1012];
 };
 
-struct FFXIVIpcPartyChatHandler :
-  FFXIVIpcBasePacket< ChatHandler >
+struct FFXIVIpcChannelChatHandler :
+  FFXIVIpcBasePacket< ChannelChatReq >
 {
-  uint64_t unknown;
+  uint64_t channelId;
   char message[1024];
 };
 
@@ -351,19 +357,8 @@ struct FFXIVIpcFreeCompanyUpdateShortMessageHandler :
   uint16_t unknown2;
 };
 
-struct FFXIVIpcWorldInteractionHandler :
-  FFXIVIpcBasePacket< WorldInteractionHandler >
-{
-  uint32_t action;
-  uint32_t param1;
-  uint32_t param2;
-  uint32_t param3;
-  uint32_t param4;
-  Common::FFXIVARR_POSITION3 position;
-};
-
-struct FFXIVIpcSocialReqSendHandler :
-  FFXIVIpcBasePacket< SocialReqSendHandler >
+struct FFXIVIpcSocialInviteHandler :
+  FFXIVIpcBasePacket< SocialInviteHandler >
 {
   uint64_t unknown;
   uint8_t p1;
@@ -373,8 +368,8 @@ struct FFXIVIpcSocialReqSendHandler :
   uint8_t padding[5];
 };
 
-struct FFXIVIpcSocialResponseHandler :
-  FFXIVIpcBasePacket< SocialResponseHandler >
+struct FFXIVIpcSocialReplyHandler :
+  FFXIVIpcBasePacket< SocialReplyHandler >
 {
   uint64_t contentId;
   uint8_t p1;
@@ -384,8 +379,8 @@ struct FFXIVIpcSocialResponseHandler :
   uint32_t unknown;
 };
 
-struct FFXIVIpcPartySetLeaderHandler :
-  FFXIVIpcBasePacket< PartySetLeaderHandler >
+struct FFXIVIpcPartyChangeLeaderHandler :
+  FFXIVIpcBasePacket< PartyChangeLeaderHandler >
 {
   uint64_t contentId;
   uint8_t p1;
@@ -394,14 +389,14 @@ struct FFXIVIpcPartySetLeaderHandler :
   uint8_t padding[6];
 };
 
-struct FFXIVIpcLeavePartyHandler :
-  FFXIVIpcBasePacket< LeavePartyHandler >
+struct FFXIVIpcPartyLeaveHandler :
+  FFXIVIpcBasePacket< PartyLeaveHandler >
 {
   uint64_t empty;
 };
 
-struct FFXIVIpcKickPartyMemberHander :
-  FFXIVIpcBasePacket< KickPartyMemberHandler >
+struct FFXIVIpcPartyKickHandler :
+  FFXIVIpcBasePacket< PartyKickHandler >
 {
   uint64_t contentId;
   uint8_t p1;
@@ -410,8 +405,8 @@ struct FFXIVIpcKickPartyMemberHander :
   uint8_t padding[6];
 };
 
-struct FFXIVIpcDisbandPartyHandler :
-  FFXIVIpcBasePacket< DisbandPartyHandler >
+struct FFXIVIpcPartyDisbandHandler :
+  FFXIVIpcBasePacket< PartyDisbandHandler >
 {
   uint64_t empty;
 };

@@ -46,7 +46,7 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
   Packets::FFXIVARR_PACKET_RAW copy = inPacket;
   std::vector< uint16_t > selectedContent;
 
-  for( uint32_t offset = 0x1E; offset <= 0x26; offset += 0x2 )
+  for( uint32_t offset = 0x2A; offset <= 0x32; offset += 0x2 )
   {
     auto id = *reinterpret_cast< uint16_t* >( &copy.data[ offset ] );
     if( id == 0 )
@@ -64,9 +64,9 @@ void Sapphire::Network::GameConnection::cfRegisterDuty( const Packets::FFXIVARR_
   player.sendDebug( "Duty register request for contentFinderConditionId#{0}", contentFinderConditionId );
   player.m_cfNotifiedContent = contentFinderConditionId;
   auto notify = makeZonePacket< FFXIVIpcCFNotify >( player.getId() );
-  notify->data().state1 = 8195;
-  notify->data().param3 = 1;
-  notify->data().param4 = contentFinderConditionId;
+  notify->data().state1 = 3;
+  notify->data().unknown_one = 1;
+  notify->data().contents[ 0 ] = contentFinderConditionId;
   player.queuePacket( notify );
 }
 

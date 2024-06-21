@@ -132,15 +132,16 @@ Sapphire::ItemPtr Sapphire::World::Manager::ItemMgr::loadItem( uint64_t uId )
   try
   {
     auto itemInfo = exdData.get< Sapphire::Data::Item >( itemRes->getUInt( 1 ) );
-    bool isHq = itemRes->getUInt( 3 ) == 1;
+    bool isHq = itemRes->getUInt( 5 ) & Common::ItemFlag::FlagHq;
 
     ItemPtr pItem = make_Item( uId,
                                itemRes->getUInt( 1 ),
                                isHq );
 
     pItem->setStackSize( itemRes->getUInt( 2 ) );
-    pItem->setStain( itemRes->getUInt16( 13 ) );
+    pItem->setReservedFlag( itemRes->getUInt( 3 ) );
     pItem->setDurability( itemRes->getInt16( 6 ) );
+    pItem->setStain( itemRes->getUInt16( 13 ) );
 
     return pItem;
   }

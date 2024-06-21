@@ -25,8 +25,8 @@ namespace Sapphire::Common
   const uint16_t MAX_PLAYER_LEVEL = 90;
   const uint8_t CURRENT_EXPANSION_ID = 4;
 
-  const uint8_t CLASSJOB_TOTAL = 40;
-  const uint8_t CLASSJOB_SLOTS = 30;
+  const uint8_t CLASSJOB_TOTAL = 42;
+  const uint8_t CLASSJOB_SLOTS = 32;
 
   const uint8_t TOWN_COUNT = 7;
 
@@ -68,9 +68,18 @@ namespace Sapphire::Common
     French = 8
   };
 
-  enum TellFlags : uint8_t
+  enum ChatFromType : uint8_t
   {
     GmTellMsg = 0x4,
+  };
+
+  enum ChatChannelType : uint16_t
+  {
+    CWLinkshellChat = 0x0,
+    PartyChat = 0x1,
+    LinkshellChat = 0x2,
+    FreeCompanyChat = 0x3,
+    NoviceNetworkChat = 0x4
   };
 
   enum BNpcType : uint8_t
@@ -694,10 +703,10 @@ namespace Sapphire::Common
     MpGain = 11,
     TpLoss = 12,
     TpGain = 13,
-    GpGain = 14,
-    ApplyStatusEffectTarget = 15,
-    ApplyStatusEffectSource = 16, // effect entry on target but buff applies to source, like storm's eye
-    StatusNoEffect = 20, // shifted one up from 5.18
+    //GpGain = 14,
+    ApplyStatusEffectTarget = 14, // shifted up again 6.x, need to recheck everything I guess
+    ApplyStatusEffectSource = 15,
+    StatusNoEffect = 20,
     /*!
      * @brief Tells the client that it should show combo indicators on actions.
      *
@@ -705,10 +714,10 @@ namespace Sapphire::Common
      * @param value The actionid that starts/continues the combo. eg, 3617 will start a spinning slash and/or syphon strike combo
      */
     Provoke = 24,
-    StartActionCombo = 27, // shifted one up from 5.18
-    ComboSucceed = 28, // shifted one up from 5.18, on retail this is not seen anymore, still working though.
+    StartActionCombo = 27, 
+    ComboSucceed = 28,
     Knockback = 33,
-    Mount = 40, // shifted one down from 5.18
+    Mount = 40,
     VFX = 59, // links to VFX sheet
   };
 
@@ -802,6 +811,22 @@ namespace Sapphire::Common
     InvincibilityRefill,
     InvincibilityStayAlive,
     InvincibilityIgnoreDamage,
+  };
+
+  enum InviteReplyType : int32_t
+  {
+    DENY = 0x0,
+    ACCEPT = 0x1,
+    CANCEL = 0x2,
+  };
+
+  enum InviteUpdateType : uint8_t
+  {
+    NEW_INVITE = 0x01,
+    INVITE_CANCEL = 0x02,
+    JOINED_PARTY = 0x03,
+    ACCEPT_INVITE = 0x04,
+    REJECT_INVITE = 0x05,
   };
 
   enum PlayerStateFlag : uint8_t
@@ -1339,6 +1364,12 @@ namespace Sapphire::Common
     LootRolled = 7, // p1: actorId, p2: itemId, p3: amount
     GetGil = 9, // p1: gil
     EmptyCoffer = 11, // seems like no param
+  };
+
+  enum ItemFlag
+  {
+    FlagNone = 0,
+    FlagHq = 1,
   };
 }
 

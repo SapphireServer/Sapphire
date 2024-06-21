@@ -340,7 +340,7 @@ namespace Sapphire::Entity
     void equipSoulCrystal( ItemPtr pItem, bool updateClass );
 
     /*! unequip a soul crystal, returning to the base class*/
-    void unequipSoulCrystal( ItemPtr pItem );
+    void unequipSoulCrystal();
 
     /*! get player ilvl */
     uint16_t getItemLevel() const;
@@ -512,6 +512,7 @@ namespace Sapphire::Entity
     uint32_t getTerritoryTypeId() const;
 
     void forceZoneing( uint32_t zoneId );
+    void forceZoneing( uint32_t zoneId, Sapphire::Common::FFXIVARR_POSITION3 pos, float rot, bool showZoneName );
 
     /*! return player to preset homepoint */
     void returnToHomepoint();
@@ -542,6 +543,11 @@ namespace Sapphire::Entity
 
     /*! returns the current online status */
     uint64_t getOnlineStatusMask() const;
+
+    void addOnlineStatus( Common::OnlineStatus status );
+    void addOnlineStatus( const std::vector< Common::OnlineStatus >& status );
+    void removeOnlineStatus( Common::OnlineStatus status );
+    void removeOnlineStatus( const std::vector< Common::OnlineStatus >& status );
 
     /*! perform a teleport of a specified type ( teleport,return,aethernet ) */
     void teleport( uint16_t aetheryteId, uint8_t type = 1 );
@@ -769,6 +775,7 @@ namespace Sapphire::Entity
 
     /*! queue a packet for the player */
     void queuePacket( Network::Packets::FFXIVPacketBasePtr pPacket );
+    void queuePacket( std::vector< Network::Packets::FFXIVPacketBasePtr > packets );
 
     /*! queue a char connection packet for the player */
     void queueChatPacket( Network::Packets::FFXIVPacketBasePtr pPacket );
@@ -785,7 +792,7 @@ namespace Sapphire::Entity
     /*! return true if the player is marked for zoning */
     bool isMarkedForZoning() const;
 
-    void emote( uint32_t emoteId, uint64_t targetId, bool isSilent );
+    void emote( uint32_t emoteId, uint64_t targetId, bool isSilent, uint16_t rotation = 0 );
 
     void emoteInterrupt();
 
@@ -1028,6 +1035,9 @@ namespace Sapphire::Entity
 
     void updateHuntingLog( uint16_t id );
 
+    uint64_t getPartyId() const;
+    void setPartyId( uint64_t partyId );
+
     World::SessionPtr getSession();
 
     uint64_t m_lastMoveTime;
@@ -1097,21 +1107,21 @@ namespace Sapphire::Entity
 
     uint16_t m_activeTitle;
     uint8_t m_titleList[48];
-    uint8_t m_howTo[35];
-    uint8_t m_minions[56];
-    uint8_t m_mountGuide[29];
+    uint8_t m_howTo[36];
+    uint8_t m_minions[60];
+    uint8_t m_mountGuide[33];
     uint8_t m_homePoint;
     uint8_t m_startTown;
     uint16_t m_townWarpFstFlags;
     uint8_t m_questCompleteFlags[487];
-    uint8_t m_discovery[464];
+    uint8_t m_discovery[480];
     uint32_t m_playTime;
 
     uint16_t m_classArray[ Common::CLASSJOB_SLOTS ];
     uint32_t m_expArray[ Common::CLASSJOB_SLOTS ];
-    uint8_t m_aetheryte[21];
+    uint8_t m_aetheryte[26];
     uint8_t m_unlocks[64];
-    uint8_t m_orchestrion[64];
+    uint8_t m_orchestrion[87];
 
     uint8_t m_openingSequence;
 
@@ -1180,6 +1190,8 @@ namespace Sapphire::Entity
 
     Common::Util::SpawnIndexAllocator< uint8_t > m_objSpawnIndexAllocator;
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
+
+    uint64_t m_partyId;
 
     std::array< Common::HuntingLogEntry, 12 > m_huntingLogEntries;
     std::unordered_map< uint32_t, std::vector< ShopBuyBackEntry > > m_shopBuyBackMap;
