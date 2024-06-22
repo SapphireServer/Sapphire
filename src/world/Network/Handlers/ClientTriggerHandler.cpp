@@ -154,7 +154,7 @@ void Sapphire::Network::GameConnection::clientTriggerHandler( const Packets::FFX
     }
     case ClientTriggerType::Examine:
     {
-      uint32_t targetId = p1u64;
+      uint32_t targetId = p1;
       examineHandler( player, targetId );
       break;
     }

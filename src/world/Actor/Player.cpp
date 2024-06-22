@@ -1936,7 +1936,7 @@ void Sapphire::Entity::Player::sendZonePackets()
   auto initZonePacket = makeZonePacket< FFXIVIpcInitZone >( getId() );
   initZonePacket->data().zoneId = getCurrentTerritory()->getTerritoryTypeId();
   initZonePacket->data().weatherId = static_cast< uint8_t >( getCurrentTerritory()->getCurrentWeather() );
-  initZonePacket->data().bitmask = 0x1;
+  initZonePacket->data().bitmask1 = 0x10;
   initZonePacket->data().festivalId = getCurrentTerritory()->getCurrentFestival().first;
   initZonePacket->data().additionalFestivalId = getCurrentTerritory()->getCurrentFestival().second;
   initZonePacket->data().pos.x = getPos().x;
@@ -1945,7 +1945,6 @@ void Sapphire::Entity::Player::sendZonePackets()
   if( auto d = getCurrentTerritory()->getAsDirector() )
   {
     initZonePacket->data().contentfinderConditionId = d->getContentFinderConditionId();
-    initZonePacket->data().bitmask = 0xFF;
     initZonePacket->data().bitmask1 = 0x2A;
   }
   queuePacket( initZonePacket );
