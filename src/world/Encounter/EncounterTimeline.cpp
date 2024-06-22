@@ -94,7 +94,7 @@ namespace Sapphire::Encounter
 
   TimelinePack EncounterTimeline::getEncounterPack( const std::string& name, bool reload )
   {
-    static std::map< std::string, TimelinePack > cache = {};
+    static std::unordered_map< std::string, TimelinePack > cache = {};
     const static std::unordered_map< std::string, ConditionType > conditionMap =
     {
       { "hpPctLessThan",            ConditionType::HpPctLessThan },
@@ -119,7 +119,7 @@ namespace Sapphire::Encounter
     if( cache.find( name ) != cache.end() && !reload )
       return cache.at( name );
 
-    std::string encounter_name( fmt::format( std::string( "data/EncounterTimelines/%s.json" ), name ) );
+    std::string encounter_name( fmt::format( std::string( "data/EncounterTimelines/{}.json" ), name ) );
 
     std::fstream f( encounter_name );
 
@@ -164,14 +164,17 @@ namespace Sapphire::Encounter
 
       TimelineActor& actor = actorNameMap[ actorName ];
       // todo: are phases linked by actor, or global in the json
-      for( const auto& phaseJ : json.at( "phases" ).items() )
+      for( const auto& phaseJ : actorV.at( "phases" ).items() )
       {
         auto& phaseV = phaseJ.value();
         const auto id = phaseV.at( "id" ).get< uint32_t >();
         const auto& phaseName = phaseV.at( "name" ).get< std::string >();
         const auto& timepointsJ = phaseV.at( "timepoints" );
+        const auto& description = phaseV.at( "description" ).get< std::string >();
 
         Phase phase;
+        phase.m_name = phaseName;
+        phase.m_description = description;
         for( const auto& timepointJ : timepointsJ.items() )
         {
           auto timepointV = timepointJ.value();
@@ -182,15 +185,11 @@ namespace Sapphire::Encounter
         }
 
         if( phaseNameMap.find( phaseName ) != phaseNameMap.end() )
-          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - duplicate phase by name: %s" ), phaseName ) );
+          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - duplicate phase by name: {}" ), phaseName ) );
 
         phaseNameMap.emplace( std::make_pair( phaseName, phase ) );
       }
       actorNamePhaseMap[ actorName ] = phaseNameMap;
-      if( actorNameMap.find( actorName ) != actorNameMap.end() )
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - duplicate actor by name: %s" ), actorName ) );
-
-      actorNameMap.emplace( std::make_pair( actorName, actor ) );
     }
 
     // build the condition list
@@ -207,7 +206,7 @@ namespace Sapphire::Encounter
       if( auto it = conditionMap.find( conditionName ); it != conditionMap.end() )
         condition = it->second;
       else
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no condition id found by name: %s" ), conditionName ) );
+        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - no condition id found by name: {}" ), conditionName ) );
 
       // make sure the actor we're referencing exists
       if( auto actorIt = actorNameMap.find( actorRef ); actorIt != actorNameMap.end() )
@@ -222,14 +221,14 @@ namespace Sapphire::Encounter
           Phase& phase = phaseIt->second;
 
           // build the condition
-          PhaseConditionPtr pCondition;
+          PhaseConditionPtr pCondition = nullptr;
           switch( condition )
           {
             case ConditionType::HpPctLessThan:
             case ConditionType::HpPctBetween:
             {
-              auto pHpCondition = std::make_shared< ConditionHp >();
-              pHpCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition = std::make_shared< ConditionHp >();
+              pCondition->from_json( pcV, phase, condition, actorNameMap );
             }
             break;
             case ConditionType::DirectorVarEquals:
@@ -239,20 +238,20 @@ namespace Sapphire::Encounter
             case ConditionType::DirectorSeqEquals:
             case ConditionType::DirectorSeqGreaterThan:
             {
-              auto pDirectorCondition = std::make_shared< ConditionDirectorVar >();
-              pDirectorCondition->from_json( pcV, phase, condition );
+              pCondition = std::make_shared< ConditionDirectorVar >();
+              pCondition->from_json( pcV, phase, condition, actorNameMap );
             }
             break;
             case ConditionType::EncounterTimeElapsed:
             {
-              auto pEncounterCondition = std::make_shared< ConditionEncounterTimeElapsed >();
-              pEncounterCondition->from_json( pcV, phase, condition );
+              pCondition = std::make_shared< ConditionEncounterTimeElapsed >();
+              pCondition->from_json( pcV, phase, condition, actorNameMap );
             }
             break;
             case ConditionType::CombatState:
             {
-              auto pCombatStateCondition = std::make_shared< ConditionCombatState >();
-              pCombatStateCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition = std::make_shared< ConditionCombatState >();
+              pCondition->from_json( pcV, phase, condition, actorNameMap );
             }
             break;
             default:
@@ -263,7 +262,7 @@ namespace Sapphire::Encounter
       }
       else
       {
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::buildEncounterTimeline - no state found by name: %s" ), phaseRef ) );
+        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - no state found by name: {}" ), phaseRef ) );
       }
     }
 
@@ -327,6 +326,14 @@ namespace Sapphire::Encounter
       }
     }
     return nullptr;
+  }
+
+  void TimelinePack::reset( TerritoryPtr pTeri )
+  {
+    for( auto& actor : m_actors )
+    {
+      actor.resetAllSubActors( pTeri );
+    }
   }
 
   void TimelinePack::setStartTime( uint64_t time )

@@ -107,7 +107,7 @@ namespace Sapphire::Encounter
     if( auto it = timepointTypeMap.find( typeStr ); it != timepointTypeMap.end() )
       tpType = it->second;
     else
-      throw std::runtime_error( fmt::format( "Timepoint::from_json unable to find timepoint by type: %s", typeStr ) );
+      throw std::runtime_error( fmt::format( "Timepoint::from_json unable to find timepoint by type: {}", typeStr ) );
 
     m_duration = json.at( "duration" ).get< uint64_t >();
     //m_overrideFlags = json.at( "overrideFlags" ).get< TimepointOverrideFlags >();
@@ -163,10 +163,10 @@ namespace Sapphire::Encounter
         auto pBattleTalkData = std::make_shared< TimepointDataBattleTalk >( params );
 
         pBattleTalkData->m_battleTalkId = dataJ.at( "battleTalkId" ).get< uint32_t >();
-        pBattleTalkData->m_handlerId = dataJ.at( "handlerId" ).get< uint32_t >();
+        pBattleTalkData->m_handlerRef = dataJ.at( "handlerActorName" ).get< std::string >();
         pBattleTalkData->m_kind = dataJ.at( "kind" ).get< uint32_t >();
         pBattleTalkData->m_nameId = dataJ.at( "nameId" ).get< uint32_t >();
-        pBattleTalkData->m_talkerId = dataJ.at( "talkerId" ).get< uint32_t >();
+        pBattleTalkData->m_talkerRef = dataJ.at( "talkerActorName" ).get< std::string >();
 
         m_pData = pBattleTalkData;
       }
@@ -248,12 +248,12 @@ namespace Sapphire::Encounter
       case TimepointDataType::SpawnBNpc:
       {
         auto& dataJ = json.at( "data" );
-        auto hateSrcJ = dataJ.at( "hateSrc" );
+        // auto hateSrcJ = dataJ.at( "hateSrc" );
         auto actorRef = dataJ.at( "spawnActor" ).get< std::string >();
         auto flags = dataJ.at( "flags" ).get< uint32_t >();
         // todo: batallion
         // auto battalion = dataJ.at( "batallion" ).get< uint32_t >();
-        auto bnpcType = bnpcTypeMap.at( dataJ.at( "type" ).get< std::string >() );
+        auto bnpcType = Common::BNpcType::Enemy;//bnpcTypeMap.at( dataJ.at( "type" ).get< std::string >() );
 
         // todo: hateSrc
 
@@ -261,7 +261,7 @@ namespace Sapphire::Encounter
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: %s" ), actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: {}" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags, bnpcType );
       }
@@ -269,16 +269,16 @@ namespace Sapphire::Encounter
       case TimepointDataType::SetBNpcFlags:
       {
         auto& dataJ = json.at( "data" );
-        auto actorRef = dataJ.at( "spawnActor" ).get< std::string >();
+        auto actorRef = dataJ.at( "targetActor" ).get< std::string >();
         auto flags = dataJ.at( "flags" ).get< uint32_t >();
 
         // todo: hateSrc
 
-        uint32_t layoutId = 0xE0000000;
-        if( auto it = actors.find( actorRef ); it != actors.end() )
-          layoutId = it->second.m_layoutId;
-        else
-          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SetBNpcFlags invalid actor ref: %s" ), actorRef ) );
+        uint32_t layoutId = selfLayoutId;
+        //if( auto it = actors.find( actorRef ); it != actors.end() )
+        //  layoutId = it->second.m_layoutId;
+        //else
+        //  throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SetBNpcFlags invalid actor ref: {}" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags );
         // todo: SetBNpcFlags
@@ -308,7 +308,7 @@ namespace Sapphire::Encounter
         auto& dataJ = json.at( "data" );
         auto selectorName = dataJ.at( "selectorName" ).get< std::string >();
         auto actorRef = dataJ.at( "sourceActor" ).get< std::string >();
-        auto excludeSelector = std::string(); // dataJ.at( "excludeSelector" ).get< std::string >();
+        auto excludeSelector = std::string(); // dataJ.at( "excludeSelectorName" ).get< std::string >();
         // todo: use exclude selector when added to ui
 
         m_pData = std::make_shared< TimepointDataSnapshot >( selectorName, actorRef, excludeSelector );
@@ -440,14 +440,19 @@ namespace Sapphire::Encounter
         auto pBtData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >( m_pData );
         auto params = pBtData->m_params;
 
+        auto pHandler = pack.getBNpcByActorRef( pBtData->m_handlerRef , pTeri );
+        auto pTalker = pack.getBNpcByActorRef( pBtData->m_talkerRef, pTeri );
+
+        auto handlerId = pHandler ? pHandler->getId() : 0xE0000000;
+        auto talkerId = pTalker ? pTalker->getId() : 0xE0000000;
 
         auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
         for( auto& player : pTeri->getPlayers() )
         {
           auto& pPlayer = player.second;
           if( pPlayer )
-            playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, pBtData->m_handlerId,
-                                      pBtData->m_kind, pBtData->m_nameId, pBtData->m_talkerId,
+            playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, handlerId,
+                                      pBtData->m_kind, pBtData->m_nameId, talkerId,
                                       params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
                                       params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
         }

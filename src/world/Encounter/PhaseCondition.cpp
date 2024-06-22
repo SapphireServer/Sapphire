@@ -99,9 +99,9 @@ namespace Sapphire::Encounter
   }
 
   void ConditionHp::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
-                                                  const std::unordered_map< std::string, TimelineActor >& actors )
+                               const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    PhaseCondition::from_json( json, phase, condition );
+    PhaseCondition::from_json( json, phase, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -126,9 +126,10 @@ namespace Sapphire::Encounter
     }
   }
 
-  void ConditionDirectorVar::from_json( nlohmann::json& json, Phase& phase, ConditionType condition )
+  void ConditionDirectorVar::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
+                                        const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    PhaseCondition::from_json( json, phase, condition );
+    PhaseCondition::from_json( json, phase, condition, actors );
 
     auto& paramData = json.at( "paramData" );
 
@@ -159,9 +160,9 @@ namespace Sapphire::Encounter
   }
 
   void ConditionCombatState::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
-                                                           const std::unordered_map< std::string, TimelineActor >& actors )
+                                        const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    PhaseCondition::from_json( json, phase, condition );
+    PhaseCondition::from_json( json, phase, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
@@ -175,9 +176,10 @@ namespace Sapphire::Encounter
     this->combatState = paramData.at( "combatState" ).get< CombatStateType >();
   }
 
-  void ConditionEncounterTimeElapsed::from_json( nlohmann::json& json, Phase& phase, ConditionType condition )
+  void ConditionEncounterTimeElapsed::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
+                                                 const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    PhaseCondition::from_json( json, phase, condition );
+    PhaseCondition::from_json( json, phase, condition, actors );
 
     auto& paramData = json.at( "paramData" );
     auto duration = paramData.at( "duration" ).get< uint64_t >();
@@ -186,9 +188,9 @@ namespace Sapphire::Encounter
   }
 
   void ConditionBNpcFlags::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
-                                                         const std::unordered_map< std::string, TimelineActor >& actors )
+                                      const std::unordered_map< std::string, TimelineActor >& actors )
   {
-    PhaseCondition::from_json( json, phase, condition );
+    PhaseCondition::from_json( json, phase, condition, actors );
     auto& paramData = json.at( "paramData" );
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
 

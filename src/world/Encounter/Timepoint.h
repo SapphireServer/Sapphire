@@ -143,10 +143,10 @@ namespace Sapphire::Encounter
 
   struct TimepointDataBattleTalk : public TimepointData {
     uint32_t m_battleTalkId;
-    uint32_t m_handlerId;
+    std::string m_handlerRef;
     uint32_t m_kind;
     uint32_t m_nameId;
-    uint32_t m_talkerId;
+    std::string m_talkerRef;
 
     uint32_t m_params[ 8 ]{ 0 };
 

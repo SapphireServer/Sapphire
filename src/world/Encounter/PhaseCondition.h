@@ -41,6 +41,7 @@ namespace Sapphire::Encounter
     // todo: getters/setters
     std::string m_name;
     std::vector< Timepoint > m_timepoints;
+    std::string m_description;
 
     void execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
 
@@ -65,7 +66,7 @@ namespace Sapphire::Encounter
     PhaseCondition() {}
     ~PhaseCondition() {}
 
-    virtual void from_json( nlohmann::json& json, Phase& phase, ConditionType condition )
+    virtual void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors )
     {
       this->m_conditionType = condition;
       this->m_loop = json.at( "loop" ).get< bool >();
@@ -145,7 +146,7 @@ namespace Sapphire::Encounter
   //
   // Conditions
   //
-  class ConditionHp : PhaseCondition
+  class ConditionHp : public PhaseCondition
   {
   public:
     uint32_t layoutId;
@@ -158,13 +159,12 @@ namespace Sapphire::Encounter
       };
     } hp;
 
-    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
-                    const std::unordered_map< std::string, TimelineActor >& actors );
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
 
     bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
-  class ConditionDirectorVar : PhaseCondition
+  class ConditionDirectorVar : public PhaseCondition
   {
   public:
     union
@@ -178,36 +178,36 @@ namespace Sapphire::Encounter
       uint8_t flags;
     } param;
 
-    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition );
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
-  class ConditionEncounterTimeElapsed : PhaseCondition
+  class ConditionEncounterTimeElapsed : public PhaseCondition
   {
   public:
     uint64_t duration;
 
-    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition );
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
-  class ConditionCombatState : PhaseCondition
+  class ConditionCombatState : public PhaseCondition
   {
   public:
     uint32_t layoutId;
     CombatStateType combatState;
 
-    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors );
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 
-  class ConditionBNpcFlags : PhaseCondition
+  class ConditionBNpcFlags : public PhaseCondition
   {
   public:
     uint32_t layoutId;
     uint32_t flags;
 
-    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors );
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
   };
 

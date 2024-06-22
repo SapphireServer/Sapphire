@@ -17,6 +17,8 @@
 #include <Common.h>
 #include <Forwards.h>
 
+#include "TimelineActor.h"
+
 #include "Selector.h"
 #include "Forwards.h"
 
@@ -66,6 +68,8 @@ namespace Sapphire::Encounter
 
     Entity::BNpcPtr getBNpcByActorRef( const std::string& name, TerritoryPtr pTeri, const std::string& subActorName = {} );
 
+    void reset( TerritoryPtr pTeri );
+
     void setStartTime( uint64_t time );
 
     uint64_t getStartTime() const;
@@ -77,6 +81,6 @@ namespace Sapphire::Encounter
   {
   public:
 
-    TimelinePack getEncounterPack( const std::string& name, bool reload = false );
+    static TimelinePack getEncounterPack( const std::string& name, bool reload = false );
   };
 }// namespace Sapphire

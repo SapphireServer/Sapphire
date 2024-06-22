@@ -3,6 +3,7 @@
 #include "EncounterTimeline.h"
 
 #include <Actor/BNpc.h>
+#include <Action/Action.h>
 
 namespace Sapphire::Encounter
 {
@@ -117,6 +118,11 @@ namespace Sapphire::Encounter
           if( auto pPlayer = pActor->getAsPlayer() )
             subActor.second->despawn( pPlayer );
         }
+        // todo: need to reset the ai on interrupt
+        auto pAction = subActor.second->getCurrentAction();
+        if( pAction )
+          pAction->interrupt();
+
         pTeri->removeActor( subActor.second );
         subActor.second = nullptr;
       }
