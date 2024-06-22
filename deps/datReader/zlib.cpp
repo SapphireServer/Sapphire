@@ -14,7 +14,7 @@ namespace xiv::utils::zlib
     out.resize( out_size );
 
     auto ret = compress2( reinterpret_cast<uint8_t*>(out.data()), &out_size,
-                          reinterpret_cast<const uint8_t*>(in.data()), (uLong)in.size(), Z_BEST_COMPRESSION );
+                          reinterpret_cast<const uint8_t*>(in.data()), static_cast<uLong>(in.size()), Z_BEST_COMPRESSION );
 
     if( ret != Z_OK )
     {

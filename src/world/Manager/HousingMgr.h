@@ -26,32 +26,32 @@ namespace Sapphire::World::Manager
     struct LandCacheEntry
     {
       // land table
-      uint64_t m_landSetId;
-      uint16_t m_landId;
+      uint64_t m_landSetId{};
+      uint16_t m_landId{};
 
-      Common::LandType m_type;
-      Common::HouseSize m_size;
-      Common::HouseStatus m_status;
+      Common::LandType m_type{};
+      Common::HouseSize m_size{};
+      Common::HouseStatus m_status{};
 
-      uint64_t m_currentPrice;
+      uint64_t m_currentPrice{};
 
-      uint64_t m_updateTime;
-      uint64_t m_ownerId;
-      uint64_t m_houseId;
+      uint64_t m_updateTime{};
+      uint64_t m_ownerId{};
+      uint64_t m_houseId{};
 
       // house table
 
-      std::string m_estateWelcome;
-      std::string m_estateComment;
-      std::string m_estateName;
+      std::string m_estateWelcome{};
+      std::string m_estateComment{};
+      std::string m_estateName{};
 
-      bool m_hasAetheryte;
+      bool m_hasAetheryte{};
 
-      uint64_t m_buildTime;
-      uint64_t m_endorsements;
+      uint64_t m_buildTime{};
+      uint64_t m_endorsements{};
 
-      uint16_t m_maxPlacedExternalItems;
-      uint16_t m_maxPlacedInternalItems;
+      uint16_t m_maxPlacedExternalItems{};
+      uint16_t m_maxPlacedInternalItems{};
     };
 
     /*!

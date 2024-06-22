@@ -18,7 +18,7 @@ struct LongDataSender
 {
    unsigned	position;
    MYSQL_STMT* m_pStmt;
-   LongDataSender()
+   LongDataSender() : position( 0 ), m_pStmt(nullptr)
    {}
 
 
@@ -77,9 +77,9 @@ struct LongDataSender
 
       while( sent < str->length() )
       {
-         chunkSize = (uint32_t)( sent + MAX_SEND_LONGDATA_CHUNK > str->length()
+         chunkSize = static_cast<uint32_t>(( sent + MAX_SEND_LONGDATA_CHUNK > str->length()
                      ? str->length() - sent
-                     : MAX_SEND_LONGDATA_CHUNK );
+                     : MAX_SEND_LONGDATA_CHUNK ));
 
          if( mysql_stmt_send_long_data( m_pStmt, position, str->c_str() + sent, chunkSize ) )
          {
@@ -307,7 +307,7 @@ public:
 }
 
 Mysql::PreparedStatement::PreparedStatement( MYSQL_STMT* pStmt, std::shared_ptr< Mysql::Connection > pConn )
-        : Statement( pConn )
+        : Statement( pConn ), m_paramCount( 0 ), resultSetConcurrency ( 0 ), resultSetType( 0 ), warningsCount( 0 )
 {
    m_pStmt = pStmt;
    m_pConnection = pConn;
