@@ -150,7 +150,8 @@ namespace Sapphire::Encounter
 
     uint32_t m_params[ 8 ]{ 0 };
 
-    TimepointDataBattleTalk( const std::vector< uint32_t >& params ) : TimepointData( TimepointDataType::BattleTalk )
+    TimepointDataBattleTalk( const std::vector< uint32_t >& params ) :
+      TimepointData( TimepointDataType::BattleTalk )
     {
       for( auto i = 0; i < params.size() && i < 8; ++i )
         m_params[ i ] = params[ i ];

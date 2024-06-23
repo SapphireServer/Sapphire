@@ -36,16 +36,20 @@ namespace Sapphire::Encounter
             pCondition->reset( state );
         }
       }
-      else if( pCondition->inProgress( state ) )
-      {
-        pCondition->update( state, *this, pack, pTeri, time );
-      }
+      // update or execute
       else if( pCondition->isConditionMet( state, pack, pTeri, time ) )
       {
-        pCondition->execute( state, *this, pack, pTeri, time );
+        if( pCondition->inProgress( state ) )
+        {
+          pCondition->update( state, *this, pack, pTeri, time );
+        }
+        else
+        {
+          pCondition->execute( state, *this, pack, pTeri, time );
 
-        if( pack.getStartTime() == 0 )
-          pack.setStartTime( state.m_startTime );
+          if( pack.getStartTime() == 0 )
+            pack.setStartTime( state.m_startTime );
+        }
       }
     }
   }

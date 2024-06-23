@@ -66,6 +66,7 @@ namespace Sapphire::Encounter
       { "spawnBNpc",     TimepointDataType::SpawnBNpc },
       { "bNpcFlags",     TimepointDataType::SetBNpcFlags },
       { "setEObjState",  TimepointDataType::SetEObjState },
+      { "setBGM",        TimepointDataType::SetBgm },
 
       { "setCondition",  TimepointDataType::SetCondition },
       { "snapshot",      TimepointDataType::Snapshot }
@@ -112,6 +113,7 @@ namespace Sapphire::Encounter
     m_duration = json.at( "duration" ).get< uint64_t >();
     //m_overrideFlags = json.at( "overrideFlags" ).get< TimepointOverrideFlags >();
     m_description = json.at( "description" ).get< std::string >();
+    m_type = tpType;
 
     switch( tpType )
     {
@@ -292,7 +294,14 @@ namespace Sapphire::Encounter
         // todo: SetEObjState
       }
       break;
+      case TimepointDataType::SetBgm:
+      {
+        auto& dataJ = json.at( "data" );
+        auto bgmId = dataJ.at( "bgmId" ).get< uint32_t >();
 
+        m_pData = std::make_shared< TimepointDataBGM >( bgmId );
+      }
+      break;
       case TimepointDataType::SetCondition:
       {
         auto& dataJ = json.at( "data" );
@@ -322,6 +331,17 @@ namespace Sapphire::Encounter
   void Timepoint::execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     state.m_startTime = time;
+
+    const auto& players = pTeri->getPlayers();
+    // send debug msg
+    if( !m_description.empty() )
+    {
+      auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+
+      for( const auto& player : players )
+        playerMgr.sendDebug( *player.second, m_description );
+    }
+
     update( state, self, pack, pTeri, time );
   }
 
@@ -357,7 +377,6 @@ namespace Sapphire::Encounter
               break;
             case ActionTargetType::Selector:
             {
-              // todo: selector
               const auto& results = pack.getSnapshotTargetIds( pActionData->m_selectorRef );
               if( pActionData->m_selectorIndex < results.size() )
                 targetId = results[ pActionData->m_selectorIndex ];
@@ -369,8 +388,11 @@ namespace Sapphire::Encounter
           auto& actionMgr = Common::Service< Sapphire::World::Manager::ActionMgr >::ref();
 
           // todo: this is probably wrong
-          if( pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() != pActionData->m_actionId )
-            actionMgr.handleTargetedAction( *pBNpc.get(), pActionData->m_actionId, targetId, 0 );
+          if( !pBNpc->getCurrentAction() )
+          {
+            actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, 0 );
+            state.m_finished = true;
+          }
         }
       }
       break;
@@ -381,8 +403,9 @@ namespace Sapphire::Encounter
 
         if( pBNpc )
         {
-          pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z );
           pBNpc->setRot( pSetPosData->m_rot );
+          pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
+          state.m_finished = true;
         }
       }
       break;
@@ -446,6 +469,7 @@ namespace Sapphire::Encounter
         auto handlerId = pHandler ? pHandler->getId() : 0xE0000000;
         auto talkerId = pTalker ? pTalker->getId() : 0xE0000000;
 
+        // todo: use Actrl EventBattleDialog = 0x39C maybe?,
         auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
         for( auto& player : pTeri->getPlayers() )
         {
@@ -650,7 +674,7 @@ namespace Sapphire::Encounter
         break;
     }
 
-    if( m_type != TimepointDataType::SetPos && m_type != TimepointDataType::CastAction )
+    if( m_type != TimepointDataType::CastAction )
       state.m_finished = true;
 
     state.m_finished = state.m_finished || state.m_startTime + m_duration <= time;

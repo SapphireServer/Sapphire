@@ -929,15 +929,16 @@ void BNpc::init()
 
   m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
+  /*
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
-/*
+
   auto gambitPack = AI::make_GambitRuleSetPack();
   gambitPack->addRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   gambitPack->addRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 10000 );
   m_pGambitPack = gambitPack;
-*/
+
 
   auto gambitPack = AI::make_GambitTimeLinePack( -1 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 2 );
@@ -948,7 +949,7 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 81, 0 ), 12 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
-
+  */
   using namespace AI::Fsm;
   m_fsm = make_StateMachine();
   auto stateIdle = make_StateIdle();
@@ -980,7 +981,8 @@ void BNpc::init()
 void BNpc::processGambits( uint64_t tickCount )
 {
   m_tp = 1000;
-  m_pGambitPack->update( *this, tickCount );
+  if( m_pGambitPack )
+    m_pGambitPack->update( *this, tickCount );
 }
 
 uint32_t BNpc::getLastRoamTargetReachedTime() const

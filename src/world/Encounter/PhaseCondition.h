@@ -79,7 +79,6 @@ namespace Sapphire::Encounter
 
     void execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
     {
-      state.m_startTime = time;
       m_phase.execute( state, self, pack, pTeri, time );
     };
 
@@ -96,7 +95,6 @@ namespace Sapphire::Encounter
     void reset( ConditionState& state ) const
     {
       state.m_startTime = 0;
-      state.m_enabled = isDefaultEnabled();
       m_phase.reset( state );
     }
 

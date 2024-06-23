@@ -22,6 +22,7 @@
 #include <Territory/QuestBattle.h>
 #include <Territory/InstanceContent.h>
 #include <Util/UtilMath.h>
+#include <Util/Util.h>
 
 namespace Sapphire::Encounter
 {
@@ -348,7 +349,8 @@ namespace Sapphire::Encounter
 
   void TimelinePack::update( TerritoryPtr pTeri, uint64_t time )
   {
+    auto now = Common::Util::getTimeMs(); 
     for( auto& actor : m_actors )
-      actor.update( pTeri, *this, time );
+      actor.update( pTeri, *this, now );
   }
 }// namespace Sapphire::Encounter

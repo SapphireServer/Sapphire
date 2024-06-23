@@ -854,6 +854,8 @@ void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
+    case( Common::CastType ) 5:
+    case Common::CastType::RectangularAOE:
     case Common::CastType::SingleTarget:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );

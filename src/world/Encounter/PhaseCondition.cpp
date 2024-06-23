@@ -29,7 +29,7 @@ namespace Sapphire::Encounter
       case ConditionType::HpPctBetween:
       {
         auto hpPct = pBNpc->getHpPercent();
-        return hpPct >= hp.min && hpPct <= hp.max;
+        return hpPct > hp.min && hpPct < hp.max;
       }
     }
     return false;
@@ -62,23 +62,26 @@ namespace Sapphire::Encounter
 
   bool ConditionCombatState::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
-    auto pBattleNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
+
+    if( !pBNpc )
+      return false;
 
     // todo: these should really use callbacks when the state transitions or we could miss this tick
     switch( combatState )
     {
       case CombatStateType::Idle:
-        return pBattleNpc->getState() == Entity::BNpcState::Idle;
+        return pBNpc->getState() == Entity::BNpcState::Idle;
       case CombatStateType::Combat:
-        return pBattleNpc->getState() == Entity::BNpcState::Combat;
+        return pBNpc->getState() == Entity::BNpcState::Combat;
       case CombatStateType::Retreat:
-        return pBattleNpc->getState() == Entity::BNpcState::Retreat;
+        return pBNpc->getState() == Entity::BNpcState::Retreat;
       case CombatStateType::Roaming:
-        return pBattleNpc->getState() == Entity::BNpcState::Roaming;
+        return pBNpc->getState() == Entity::BNpcState::Roaming;
       case CombatStateType::JustDied:
-        return pBattleNpc->getState() == Entity::BNpcState::JustDied;
+        return pBNpc->getState() == Entity::BNpcState::JustDied;
       case CombatStateType::Dead:
-        return pBattleNpc->getState() == Entity::BNpcState::Dead;
+        return pBNpc->getState() == Entity::BNpcState::Dead;
       default:
         break;
     }
@@ -219,9 +222,9 @@ namespace Sapphire::Encounter
 
     if( state.m_phaseInfo.m_lastTimepointTime == 0 )
     {
-      state.m_phaseInfo.m_lastTimepointTime = time;
       state.m_phaseInfo.m_timepointStates.clear();
       state.m_phaseInfo.m_timepointStates.resize( m_timepoints.size() );
+      state.m_phaseInfo.m_lastTimepointTime = time;
     }
 
     for( auto i = state.m_phaseInfo.m_lastTimepointIndex; i < m_timepoints.size(); )
@@ -244,16 +247,13 @@ namespace Sapphire::Encounter
 
       if( timepoint.durationElapsed( timepointElapsed ) && timepoint.finished( tpState, timepointElapsed ) )
       {
-        // timepoint.reset( tpState );
+        timepoint.reset( tpState );
         // make sure this timepoint isnt run again unless phase loops
         ++i;
         state.m_phaseInfo.m_lastTimepointIndex = i;
 
         if( i == m_timepoints.size() )
-        {
           state.m_phaseInfo.m_lastTimepointIndex++;
-        }
-        continue;
       }
       break;
     }
