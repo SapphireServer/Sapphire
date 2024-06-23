@@ -230,15 +230,19 @@ namespace Sapphire::Encounter
     for( auto i = state.m_phaseInfo.m_lastTimepointIndex; i < m_timepoints.size(); )
     {
       uint64_t phaseElapsed = time - state.m_phaseInfo.m_startTime;
-      uint64_t timepointElapsed = time - state.m_phaseInfo.m_lastTimepointTime;
 
       auto& tpState = state.m_phaseInfo.m_timepointStates[ i ];
       auto& timepoint = m_timepoints[ i ];
 
+      uint64_t timepointElapsed = time - tpState.m_startTime;
+
+      if( tpState.m_startTime == 0 )
+        timepointElapsed = 0;
+
       if( timepoint.canExecute( tpState, timepointElapsed ) )
       {
-        timepoint.execute( tpState, self, pack, pTeri, time );
-        state.m_phaseInfo.m_lastTimepointTime = time;
+        if( timepoint.execute( tpState, self, pack, pTeri, time ) )
+          state.m_phaseInfo.m_lastTimepointTime = time;
       }
       else if( !timepoint.finished( tpState, timepointElapsed ) )
       {

@@ -1,0 +1,104 @@
+{
+  "872": {
+    "name": "Auto Attack",
+    "potency": 100,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  },
+  "453": {
+    "name": "Incinerate",
+    "potency": 100,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  },
+  "454": {
+    "name": "Vulcan Burst",
+    "potency": 100,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  },
+  "458": {
+    "name": "Hellfire",
+    "potency": 400,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [
+        {
+          "id": 394,
+          "duration": 8000,
+          "modifiers": [
+            {
+              "modifier": "DamageTakenPercent",
+              "value": -100
+            }
+          ]
+        }
+      ],
+      "target": []
+    }
+  },
+  "733": {
+    "name": "Eruption",
+    "potency": 200,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  },
+  "734": {
+    "name": "Radiant Plume",
+    "potency": 200,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  }
+
+}

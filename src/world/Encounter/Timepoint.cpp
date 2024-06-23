@@ -328,10 +328,8 @@ namespace Sapphire::Encounter
     }
   }
 
-  void Timepoint::execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool Timepoint::execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
-    state.m_startTime = time;
-
     const auto& players = pTeri->getPlayers();
     // send debug msg
     if( !m_description.empty() )
@@ -342,16 +340,22 @@ namespace Sapphire::Encounter
         playerMgr.sendDebug( *player.second, m_description );
     }
 
-    update( state, self, pack, pTeri, time );
+    if( update( state, self, pack, pTeri, time ) )
+    {
+      state.m_startTime = time;
+      state.m_finished = true;
+      return true;
+    }
+    return false;
   }
 
-  void Timepoint::update( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool Timepoint::update( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
     state.m_lastTick = time;
 
     // todo: separate execute and update?
     if( state.m_finished )
-      return;
+      return true;
 
     switch( m_type )
     {
@@ -391,7 +395,10 @@ namespace Sapphire::Encounter
           if( !pBNpc->getCurrentAction() )
           {
             actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, 0 );
-            state.m_finished = true;
+          }
+          else
+          {
+            return false;
           }
         }
       }
@@ -405,7 +412,6 @@ namespace Sapphire::Encounter
         {
           pBNpc->setRot( pSetPosData->m_rot );
           pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
-          state.m_finished = true;
         }
       }
       break;
@@ -594,11 +600,18 @@ namespace Sapphire::Encounter
         auto pSpawnData = std::dynamic_pointer_cast< TimepointDataSpawnBNpc, TimepointData >( m_pData );
         auto pBNpc = pTeri->getActiveBNpcByLayoutId( pSpawnData->m_layoutId );
 
+        // todo: probably have this info in the timepoint data
+        if( !pBNpc )
+          pBNpc = pTeri->createBNpcFromLayoutId( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
+
         if( pBNpc )
         {
           pBNpc->clearFlags();
           pBNpc->setFlag( pSpawnData->m_flags );
           pBNpc->init();
+
+          for( const auto& player : pTeri->getPlayers() )
+            pBNpc->spawn( player.second );
         }
       }
       break;
@@ -673,10 +686,6 @@ namespace Sapphire::Encounter
       default:
         break;
     }
-
-    if( m_type != TimepointDataType::CastAction )
-      state.m_finished = true;
-
-    state.m_finished = state.m_finished || state.m_startTime + m_duration <= time;
+    return true;
   }
 }

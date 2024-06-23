@@ -971,3 +971,13 @@ const Common::TerritoryIdent& Territory::getTerritoryIdent() const
 {
   return m_ident;
 }
+
+void Territory::setEncounterTimeline( const std::string& name )
+{
+  m_timelinePack = Encounter::EncounterTimeline::getEncounterPack( name, true );
+}
+
+Encounter::TimelinePack& Territory::getEncounterTimeline()
+{
+  return m_timelinePack;
+}

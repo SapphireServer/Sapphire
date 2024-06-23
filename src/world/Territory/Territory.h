@@ -7,6 +7,7 @@
 #include "Cell.h"
 #include "CellHandler.h"
 
+#include <Encounter/EncounterTimeline.h>
 #include "ForwardsZone.h"
 
 #include <set>
@@ -75,6 +76,8 @@ namespace Sapphire
     Common::TerritoryIdent m_ident;
 
     float m_inRangeDistance;
+
+    Encounter::TimelinePack m_timelinePack;
 
   public:
     Territory();
@@ -199,6 +202,9 @@ namespace Sapphire
     uint32_t getNextActionResultId();
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
+
+    void setEncounterTimeline( const std::string& name );
+    Encounter::TimelinePack& getEncounterTimeline();
   };
 
 }

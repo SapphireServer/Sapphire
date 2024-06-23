@@ -334,6 +334,7 @@ namespace Sapphire::Encounter
     for( auto& actor : m_actors )
     {
       actor.resetAllSubActors( pTeri );
+      actor.resetAllConditionStates();
     }
   }
 
@@ -352,5 +353,10 @@ namespace Sapphire::Encounter
     auto now = Common::Util::getTimeMs(); 
     for( auto& actor : m_actors )
       actor.update( pTeri, *this, now );
+  }
+
+  bool TimelinePack::valid()
+  {
+    return !m_actors.empty();
   }
 }// namespace Sapphire::Encounter

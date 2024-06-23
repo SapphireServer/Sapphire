@@ -1,5 +1,7 @@
 #include <Encounter/EncounterFight.h>
 
+#include <Encounter/EncounterTimeline.h>
+
 namespace Sapphire
 {
   class IfritEncounterFight : public EncounterFight
@@ -12,7 +14,7 @@ namespace Sapphire
   public:
     IfritEncounterFight( InstanceContentPtr pInstance ) : EncounterFight( pInstance )
     {
-
+      pInstance->setEncounterTimeline( "IfritNormal" );
     };
 
     void init() override
@@ -43,6 +45,7 @@ namespace Sapphire
       {
         removeBNpc( NPC_IFRIT );
         m_pInstance->removeActor( boss );
+        m_pInstance->getEncounterTimeline().reset( getInstance() );
       }
 
       init();
@@ -122,11 +125,14 @@ namespace Sapphire
         start();
       }
 
-      if( m_status == EncounterFightStatus::ACTIVE && ifrit && !ifrit->hateListGetHighest()->isAlive() )
+      if( m_status == EncounterFightStatus::ACTIVE && ifrit && (!ifrit->hateListGetHighest() || !ifrit->hateListGetHighest()->isAlive() ) )
       {
         m_status = EncounterFightStatus::FAIL;
       }
 
+      m_pInstance->getEncounterTimeline().update( getInstance(), deltaTime );
+
+      //*
       if( m_stateStack; !m_stateStack->empty() )
       {
         if( m_stateStack->top()->shouldFinish() )
@@ -138,6 +144,7 @@ namespace Sapphire
         if( !m_stateStack->empty() )
           m_stateStack->top()->update( deltaTime );
       }
+      //*/
     }
   };
 }

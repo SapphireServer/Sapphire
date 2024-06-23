@@ -5,6 +5,8 @@
 #include <Actor/BNpc.h>
 #include <Action/Action.h>
 
+#include <Territory/Territory.h>
+
 namespace Sapphire::Encounter
 {
   void TimelineActor::addPhaseCondition( PhaseConditionPtr pCondition )
@@ -79,7 +81,7 @@ namespace Sapphire::Encounter
       const auto& pCondition = condition.second;
       auto& state = m_conditionStates.at( condition.first );
 
-      pCondition->reset( state );
+      pCondition->reset( state, true );
     }
   }
 
@@ -152,6 +154,9 @@ namespace Sapphire::Encounter
       pActor->init();
 
       pTeri->pushActor( pActor );
+
+      for( const auto& player : pTeri->getPlayers() )
+        pActor->spawn( player.second );
     }
 
     return pActor;
@@ -170,7 +175,7 @@ namespace Sapphire::Encounter
     {
       if( subActor.second )
       {
-        auto pBNpc = subActor.second;
+        auto& pBNpc = subActor.second;
         pTeri->removeActor( pBNpc );
         // todo: despawn?
         subActor.second = nullptr;

@@ -92,9 +92,13 @@ namespace Sapphire::Encounter
       state.m_enabled = enabled;
     }
 
-    void reset( ConditionState& state ) const
+    void reset( ConditionState& state, bool toDefaults = false ) const
     {
       state.m_startTime = 0;
+
+      if( toDefaults )
+        state.m_enabled = isDefaultEnabled();
+
       m_phase.reset( state );
     }
 

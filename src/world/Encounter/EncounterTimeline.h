@@ -13,7 +13,6 @@
 #include <nlohmann/json.hpp>
 
 #include <AI/TargetHelper.h>
-#include <Territory/Territory.h>
 #include <Common.h>
 #include <Forwards.h>
 
@@ -38,7 +37,7 @@ namespace Sapphire::Encounter
     std::string m_name;
 
     std::unordered_map< std::string, Selector > m_selectors;
-
+    
     uint64_t m_startTime{ 0 };
 
   public:
@@ -75,6 +74,8 @@ namespace Sapphire::Encounter
     uint64_t getStartTime() const;
 
     void update( TerritoryPtr pTeri, uint64_t time );
+
+    bool valid();
   };
 
   class EncounterTimeline
