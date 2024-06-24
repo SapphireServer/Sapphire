@@ -260,4 +260,10 @@ namespace Sapphire::World::AI
     return m_targetIds;
   }
 
+  void Snapshot::clearResults()
+  {
+    m_results.clear();
+    m_targetIds.clear();
+  }
+
 };// namespace Sapphire::World::AI

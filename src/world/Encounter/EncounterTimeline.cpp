@@ -24,6 +24,8 @@
 #include <Util/UtilMath.h>
 #include <Util/Util.h>
 
+#include <filesystem>
+
 namespace Sapphire::Encounter
 {
 
@@ -134,8 +136,8 @@ namespace Sapphire::Encounter
 
     for( const auto& selectorJ : json.at( "selectors" ).items() )
     {
-      auto selectorV = selectorJ.value();
-      auto name = selectorV.at( "name" );
+      auto& selectorV = selectorJ.value();
+      auto name = selectorV.at( "name" ).get< std::string >();
       Selector selector;
       selector.from_json( selectorV );
 
@@ -151,6 +153,12 @@ namespace Sapphire::Encounter
       actor.m_layoutId = actorV.at( "layoutId" ).get< uint32_t >();
       actor.m_name = actorV.at( "name" ).get< std::string >();
 
+      auto& subActorsJ = actorV.at( "subactors" );
+
+      if( !subActorsJ.is_null() )
+        for( const auto& subActorV : subActorsJ.items() )
+          actor.addPlaceholderSubactor( subActorV.value().get< std::string >() );
+       
       actorNameMap.emplace( std::make_pair( actor.m_name, actor ) );
     }
 
@@ -317,14 +325,13 @@ namespace Sapphire::Encounter
     m_actors.emplace_back( actor );
   }
 
-  Entity::BNpcPtr TimelinePack::getBNpcByActorRef( const std::string& name, TerritoryPtr pTeri, const std::string& subActorName )
+  Entity::BNpcPtr TimelinePack::getBNpcByRef( const std::string& name, TerritoryPtr pTeri )
   {
     for( const auto& actor : m_actors )
     {
-      if( actor.m_name == name )
-      {
-        return actor.getBNpcByRef( name, pTeri );
-      }
+      auto pBNpc = actor.getBNpcByRef( name, pTeri );
+      if( pBNpc )
+        return pBNpc;
     }
     return nullptr;
   }
@@ -353,6 +360,12 @@ namespace Sapphire::Encounter
     auto now = Common::Util::getTimeMs(); 
     for( auto& actor : m_actors )
       actor.update( pTeri, *this, now );
+  }
+
+  void TimelinePack::spawnSubActors( TerritoryPtr pTeri )
+  {
+    for( auto& actor : m_actors )
+      actor.spawnAllSubActors( pTeri );
   }
 
   bool TimelinePack::valid()

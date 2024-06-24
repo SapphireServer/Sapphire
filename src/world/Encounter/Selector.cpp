@@ -134,4 +134,9 @@ namespace Sapphire::Encounter
   {
     return m_snapshot.getTargetIds();
   }
+
+  void Selector::clearResults()
+  {
+    m_snapshot.clearResults();
+  }
 }// namespace Sapphire::Encounter

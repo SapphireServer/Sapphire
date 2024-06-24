@@ -45,8 +45,8 @@ namespace Sapphire
       {
         removeBNpc( NPC_IFRIT );
         m_pInstance->removeActor( boss );
-        m_pInstance->getEncounterTimeline().reset( getInstance() );
       }
+      m_pInstance->getEncounterTimeline().reset( getInstance() );
 
       init();
     }

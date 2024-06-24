@@ -399,7 +399,7 @@ void Chara::takeDamage( uint32_t damage )
         resetHp();
         break;
       case InvincibilityStayAlive:
-        setHp( 0 );
+        setHp( 1 );
         break;
       case InvincibilityIgnoreDamage:
         break;

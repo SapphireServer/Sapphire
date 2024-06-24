@@ -46,8 +46,11 @@ namespace Sapphire::Encounter
       m_type( rhs.m_type ),
       m_name( rhs.m_name ),
       m_actors( rhs.m_actors ),
+      m_selectors( rhs.m_selectors ),
       m_startTime( 0 )
     {
+      for( auto& selector : m_selectors )
+        selector.second.clearResults();
     }
 
     TimelinePack( TimelinePackType type ) : m_type( type ) {}
@@ -65,7 +68,8 @@ namespace Sapphire::Encounter
 
     void addTimelineActor( const TimelineActor& actor );
 
-    Entity::BNpcPtr getBNpcByActorRef( const std::string& name, TerritoryPtr pTeri, const std::string& subActorName = {} );
+    // get bnpc by internal timeline name
+    Entity::BNpcPtr getBNpcByRef( const std::string& name, TerritoryPtr pTeri );
 
     void reset( TerritoryPtr pTeri );
 
@@ -74,6 +78,9 @@ namespace Sapphire::Encounter
     uint64_t getStartTime() const;
 
     void update( TerritoryPtr pTeri, uint64_t time );
+
+    // todo: probably just make this a Timepoint in an InitPhase
+    void spawnSubActors( TerritoryPtr pTeri );
 
     bool valid();
   };

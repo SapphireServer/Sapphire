@@ -36,7 +36,7 @@ namespace Sapphire::Entity
     Immobile           = 0x01,
     TurningDisabled    = 0x02,
     Invincible         = 0x04,
-    InvincibleRefill   = 0x08,
+    StayAlive          = 0x08,
     NoDeaggro          = 0x10,
     Untargetable       = 0x20,
     AutoAttackDisabled = 0x40,

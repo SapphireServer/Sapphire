@@ -236,12 +236,14 @@ namespace Sapphire::World::AI
       m_filters( filters )
     {
     }
+
     void createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
                          int count, bool fillWithRandom, const std::vector< uint32_t >& exclude = {} );
 
     // returns actors sorted by distance
     const std::vector< CharaEntry >& getResults() const;
     const std::vector< uint32_t >& getTargetIds() const;
+    void clearResults();
   };
   using SnapshotPtr = std::shared_ptr< Snapshot >;
 }// namespace Sapphire::World::AI

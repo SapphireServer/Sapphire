@@ -107,7 +107,7 @@
               "data": {
                 "battleTalkId": 2939,
                 "handlerActorName": "Ifrit",
-                "kind": 0,
+                "kind": 1,
                 "nameId": 2961,
                 "params": [
                   0
@@ -211,7 +211,7 @@
             },
             {
               "data": {
-                "actionId": 733,
+                "actionId": 455,
                 "selectorIndex": 0,
                 "selectorName": "Eruption",
                 "snapshot": false,
@@ -234,7 +234,7 @@
               "data": {
                 "battleTalkId": 2939,
                 "handlerActorName": "Ifrit",
-                "kind": 0,
+                "kind": 1,
                 "nameId": 2961,
                 "params": [
                   0
@@ -256,7 +256,7 @@
               },
               "description": "",
               "duration": 1500,
-              "type": "spawnBNpc"
+              "type": "bNpcSpawn"
             },
             {
               "data": {
@@ -291,6 +291,16 @@
           "id": 7,
           "name": "Hellfire",
           "timepoints": [
+            {
+              "data": {
+                "conditionId": 7,
+                "conditionStr": "If Ifrit Nail 1 state is Dead, push Ifrit->Hellfire",
+                "enabled": false
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setCondition"
+            },
             {
               "data": {
                 "conditionId": 6,
@@ -354,7 +364,7 @@
             },
             {
               "data": {
-                "flags": 1,
+                "flags": 16,
                 "targetActor": ""
               },
               "description": "",
@@ -367,7 +377,7 @@
                 "conditionStr": "If Ifrit state is Combat, loop Ifrit->Final Phase",
                 "enabled": true
               },
-              "description": "",
+              "description": "Enable final phase",
               "duration": 0,
               "type": "setCondition"
             }
@@ -388,7 +398,7 @@
                 "sourceActor": "Ifrit",
                 "targetType": "target"
               },
-              "description": "Radiant plume begin",
+              "description": "Incinerate Final Phase",
               "duration": 8000,
               "type": "castAction"
             },
@@ -412,7 +422,7 @@
                 "targetType": "selector"
               },
               "description": "Subactor 1 Eruption",
-              "duration": 5000,
+              "duration": 8000,
               "type": "castAction"
             },
             {
@@ -524,16 +534,16 @@
                 "targetType": "self"
               },
               "description": "",
-              "duration": 0,
+              "duration": 5000,
               "type": "castAction"
             },
             {
               "data": {
                 "actorName": "Ifrit <subactor 1>",
                 "pos": [
-                  -10,
                   0,
-                  10
+                  0,
+                  -20
                 ],
                 "rot": 0
               },
@@ -545,9 +555,9 @@
               "data": {
                 "actorName": "Ifrit <subactor 2>",
                 "pos": [
-                  -10,
                   0,
-                  -10
+                  0,
+                  20
                 ],
                 "rot": 0
               },
@@ -559,9 +569,9 @@
               "data": {
                 "actorName": "Ifrit <subactor 3>",
                 "pos": [
-                  10,
+                  -20,
                   0,
-                  10
+                  0
                 ],
                 "rot": 0
               },
@@ -573,9 +583,65 @@
               "data": {
                 "actorName": "Ifrit <subactor 4>",
                 "pos": [
-                  10,
+                  -20,
                   0,
-                  -10
+                  20
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit <subactor 5>",
+                "pos": [
+                  -15,
+                  0,
+                  15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit <subactor 6>",
+                "pos": [
+                  -15,
+                  0,
+                  -15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit <subactor 7>",
+                "pos": [
+                  15,
+                  0,
+                  -15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit <subactor 8>",
+                "pos": [
+                  15,
+                  0,
+                  15
                 ],
                 "rot": 0
               },

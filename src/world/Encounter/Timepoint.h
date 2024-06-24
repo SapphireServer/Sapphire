@@ -30,8 +30,8 @@ namespace Sapphire::Encounter
     AddStatusEffect,
     RemoveStatusEffect,
 
-    SpawnBNpc,
-    SetBNpcFlags,
+    BNpcSpawn,
+    BNpcFlags,
     SetEObjState,
     SetBgm,
 
@@ -195,7 +195,7 @@ namespace Sapphire::Encounter
     // todo: hate type, source
 
     TimepointDataSpawnBNpc( uint32_t layoutId, uint32_t flags, uint32_t type ) :
-      TimepointData( TimepointDataType::SpawnBNpc ),
+      TimepointData( TimepointDataType::BNpcSpawn ),
       m_layoutId( layoutId ),
       m_flags( flags ),
       m_type( type )
@@ -209,7 +209,7 @@ namespace Sapphire::Encounter
     uint32_t m_flags{ 0 };
 
     TimepointDataBNpcFlags( uint32_t layoutId, uint32_t flags ) :
-      TimepointData( TimepointDataType::SetBNpcFlags ),
+      TimepointData( TimepointDataType::BNpcFlags ),
       m_layoutId( layoutId ),
       m_flags( flags )
     {

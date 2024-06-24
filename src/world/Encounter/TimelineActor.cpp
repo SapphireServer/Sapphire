@@ -5,6 +5,9 @@
 #include <Actor/BNpc.h>
 #include <Action/Action.h>
 
+#include <Manager/PlayerMgr.h>
+#include <Service.h>
+
 #include <Territory/Territory.h>
 
 namespace Sapphire::Encounter
@@ -140,7 +143,7 @@ namespace Sapphire::Encounter
     // todo: retail straight up respawns sub actors, even bnpc parts (qarn adjudicator body parts respawn each time with new ids)
     auto flags = Entity::BNpcFlag::Invincible | Entity::BNpcFlag::Untargetable |
                  Entity::BNpcFlag::Immobile | Entity::BNpcFlag::AutoAttackDisabled |
-                 Entity::BNpcFlag::TurningDisabled;
+                 Entity::BNpcFlag::TurningDisabled | Entity::BNpcFlag::NoDeaggro;
 
     auto pActor = getSubActor( name );
     if( pActor == nullptr )
@@ -155,8 +158,12 @@ namespace Sapphire::Encounter
 
       pTeri->pushActor( pActor );
 
+      auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
       for( const auto& player : pTeri->getPlayers() )
+      {
         pActor->spawn( player.second );
+        playerMgr.sendDebug( *player.second, fmt::format( "Spawned subactor {}", name ) );
+      }
     }
 
     return pActor;
