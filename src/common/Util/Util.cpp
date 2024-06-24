@@ -124,7 +124,7 @@ uint64_t Util::getTimeMs()
 uint32_t Util::getTimeSeconds()
 {
   auto currClock = std::chrono::system_clock::now();
-  return std::chrono::time_point_cast< std::chrono::seconds >( currClock ).time_since_epoch().count();
+  return static_cast<uint32_t>(std::chrono::time_point_cast< std::chrono::seconds >( currClock ).time_since_epoch().count());
 }
 
 uint64_t Util::getEorzeanTimeStamp()

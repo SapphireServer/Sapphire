@@ -53,7 +53,7 @@ public:
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %lu ms\n",
       zone.name.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+      static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ));
   }
 
   static void exportGroup( const std::string& zoneName, const ExportedGroup& group )
@@ -91,7 +91,7 @@ public:
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Navmesh] Finished exporting %s in %lu ms\n",
       fileName.c_str(),
-      std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+      static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ));
   }
 };
 #endif // !OBJ_EXPORTER_H

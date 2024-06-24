@@ -34,7 +34,7 @@ public:
     if( num == 0 )
       num = std::thread::hardware_concurrency() - 1;
 
-    for( auto i = 0; i < num; ++i )
+    for( unsigned int i = 0; i < num; ++i )
     {
       m_workers.push_back( std::async( std::launch::async, [this]{ run(); } ) );
     }

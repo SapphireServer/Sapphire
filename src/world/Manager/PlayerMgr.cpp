@@ -27,7 +27,7 @@ void Sapphire::World::Manager::PlayerMgr::movePlayerToLandDestination( Sapphire:
     if( terriMgr.isHousingTerritory( terriPos->getTargetZoneId() ) )
     {
       auto& housingMgr = Common::Service< HousingMgr >::ref();
-      auto landSetId = housingMgr.toLandSetId( terriPos->getTargetZoneId(), param );
+      auto landSetId = housingMgr.toLandSetId( terriPos->getTargetZoneId(), static_cast<uint8_t>(param) );
 
       auto housingZone = housingMgr.getHousingZoneByLandSetId( landSetId );
 

@@ -156,7 +156,7 @@ void loadAllInstanceContentEntries()
     if( name.empty() )
       continue;
     
-    auto i = 0;
+    size_t i = 0;
     while( ( i = name.find( ' ' ) ) != std::string::npos )
       name = name.replace( name.begin() + i, name.begin() + i + 1, { '_' } );
     

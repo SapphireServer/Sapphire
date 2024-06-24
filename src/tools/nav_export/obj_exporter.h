@@ -53,7 +53,7 @@ public:
 
     printf( "[Obj] Finished exporting %s in %lu ms\n",
             fileName.substr( fileName.find( "pcb_export" ) - 1 ).c_str(),
-            std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+            static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ));
     return fileName;
   }
 
@@ -91,7 +91,7 @@ public:
     auto end = std::chrono::high_resolution_clock::now();
     printf( "[Obj] Finished exporting %s in %lu ms\n",
             fileName.substr( fileName.find( "pcb_export" ) - 1 ).c_str(),
-            std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() );
+            static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::milliseconds >( end - start ).count() ));
     
     return fileName;
   }
@@ -128,7 +128,7 @@ private:
             std::to_string( mesh.indices[ i + 1 ] + indicesOffset + 1 ) << ' ' +
             std::to_string( mesh.indices[ i + 2 ] + indicesOffset + 1 ) << '\n';
         }
-        indicesOffset += mesh.verts.size() / 3;
+        indicesOffset += static_cast<int>(mesh.verts.size()) / 3;
       }
     }
     //of.flush();

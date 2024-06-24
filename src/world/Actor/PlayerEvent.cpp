@@ -338,7 +338,7 @@ void Sapphire::Entity::Player::playScene16( uint32_t eventId, uint32_t scene, ui
   eventPlay16->data().scene = scene;
   eventPlay16->data().flags = flags;
   eventPlay16->data().param3 = param3;
-  eventPlay16->data().paramSize = paramList.size();
+  eventPlay16->data().paramSize = static_cast<uint8_t>(paramList.size());
   int i = 0;
   for( auto p : paramList )
   {

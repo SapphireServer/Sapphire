@@ -10,14 +10,14 @@ std::shared_ptr< Mysql::Connection > Mysql::Statement::getConnection()
 }
 
 Mysql::Statement::Statement( std::shared_ptr< Mysql::Connection > conn ) :
-   m_pConnection( conn )
+   m_pConnection( conn ), m_lastUpdateCount( 0 ), m_warningsCount( 0 )
 {
 
 }
 
 void Mysql::Statement::doQuery( const std::string &q )
 {
-   mysql_real_query( m_pConnection->getRawCon(), q.c_str(), q.length() );
+   mysql_real_query( m_pConnection->getRawCon(), q.c_str(), static_cast<unsigned long>(q.length()) );
 
    if( errNo() )
       throw std::runtime_error( m_pConnection->getError() );

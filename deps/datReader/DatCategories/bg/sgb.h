@@ -258,7 +258,7 @@ struct SGB_FILE
       if( stateCount > 0 )
       {
         stateCount = stateCount;
-        for( int i = 0; i < stateCount; ++i )
+        for( uint32_t i = 0; i < stateCount; ++i )
         {
           auto state = SGB_STATE_ENTRY( buf + baseOffset + header.statesOffset + 8 + i * sizeof( SGB_STATE_HEADER ) );
           stateEntries.push_back( state );

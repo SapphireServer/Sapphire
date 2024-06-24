@@ -67,12 +67,12 @@ const Sapphire::ItemMap& Sapphire::ItemContainer::getItemMap() const
 
 int8_t Sapphire::ItemContainer::getFreeSlot()
 {
-  for( uint16_t slotId = 0; slotId < m_size; slotId++ )
+  for( uint8_t slotId = 0; slotId < m_size; slotId++ )
   {
     ItemMap::iterator it = m_itemMap.find( slotId );
     if( it == m_itemMap.end() ||
         it->second == nullptr )
-      return slotId;
+      return static_cast<int8_t>(slotId);
   }
   return -1;
 }

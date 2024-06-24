@@ -205,7 +205,7 @@ float CalcStats::directHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float dhRate = chara.getStatValue( Common::BaseParam::DirectHitRate );
+  float dhRate = static_cast<float>(chara.getStatValue( Common::BaseParam::DirectHitRate ));
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
@@ -218,7 +218,7 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float chRate = chara.getStatValue( Common::BaseParam::CriticalHit );
+  float chRate = (float)chara.getStatValue( Common::BaseParam::CriticalHit );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );

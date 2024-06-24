@@ -446,7 +446,7 @@ void Sapphire::World::Manager::DebugCommandMgr::set( char* data, Entity::Player&
   {
     uint8_t values[15];
     std::memset( values, 0, sizeof( values ) );
-    sscanf( params.c_str(), "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+    sscanf( params.c_str(), "%hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu %hhu",
             &values[ 0 ], &values[ 1 ], &values[ 2 ], &values[ 3 ], &values[ 4 ],
             &values[ 5 ], &values[ 6 ], &values[ 7 ], &values[ 8 ], &values[ 9 ],
             &values[ 10 ], &values[ 11 ], &values[ 12 ], &values[ 13 ], &values[ 14 ] );
@@ -686,7 +686,7 @@ void Sapphire::World::Manager::DebugCommandMgr::get( char* data, Entity::Player&
   }
   else if( ( subCommand == "poprange" ) )
   {
-    uint32_t id, param;
+    uint32_t id;
     sscanf( params.c_str(), "%u", &id );
 
     auto& instanceObjectCache = Common::Service< InstanceObjectCache >::ref();

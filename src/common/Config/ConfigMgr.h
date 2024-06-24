@@ -24,6 +24,8 @@ namespace Sapphire::Common
       template< class T >
       T getValue( const std::string& section, const std::string& name, T defaultValue = T() )
       {
+        #pragma warning( push )
+        #pragma warning( disable : 4244 )
         if constexpr ( std::is_same_v< T, uint32_t > )
           return m_pInih->GetInteger( section, name, defaultValue );
         else if constexpr ( std::is_same_v< T, int32_t > )
@@ -48,6 +50,7 @@ namespace Sapphire::Common
           return m_pInih->GetBoolean( section, name, defaultValue );
         else
           static_assert( always_false< T >::value, "non-exhaustive getter!" );
+        #pragma warning( pop )
       }
 
       template< class T >

@@ -313,7 +313,7 @@ std::string generateConstructorsDecl( const std::string& exd )
       {
 
         uint32_t amount = indexCountMap[ count ];
-        for( int i = 0; i < amount; i++ )
+        for( uint32_t i = 0; i < amount; i++ )
         {
 
           result += indent + indexToNameMap[ count ] + ".push_back( exdData->getField< " + indexToTypeMap[ count ] +

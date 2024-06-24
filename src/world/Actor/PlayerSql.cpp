@@ -527,7 +527,7 @@ void Sapphire::Entity::Player::updateDbMonsterNote()
   auto stmt = db.getPreparedStatement( Db::CHARA_MONSTERNOTE_UP );
   //std::array< std::vector< uint8_t >, 12 > vectors;
   std::vector< uint8_t > vector( 41 );
-  for( std::size_t i = 0; i < m_huntingLogEntries.size(); ++i )
+  for( uint8_t i = 0; i < m_huntingLogEntries.size(); ++i )
   {
     vector[ 0 ] = m_huntingLogEntries[ i ].rank;
 

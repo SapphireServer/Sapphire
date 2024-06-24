@@ -238,7 +238,7 @@ namespace xiv::exd
     std::map< ExdRow, std::vector< Field >, exdRowSort > data;
 
     // Iterates over all the cached ids
-    const uint32_t memberCount = _exh->get_members().size();
+    const uint32_t memberCount = static_cast<uint32_t>(_exh->get_members().size());
     for( auto& cacheEntry : _idCache )
     {
       std::vector< char > dataCpy = cacheEntry.second.file->get_data_sections().front();
@@ -249,7 +249,7 @@ namespace xiv::exd
       for( int32_t i = 0; i < cacheEntry.second.subRows; i++ )
       {
         // Get the vector fields for the given record and preallocate it
-        ExdRow row = { cacheEntry.first, i };
+        ExdRow row = { cacheEntry.first, static_cast<uint8_t>(i) };
         auto& fields = data[ row ];
         fields.reserve( memberCount );
 

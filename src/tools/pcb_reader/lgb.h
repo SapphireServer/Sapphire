@@ -379,7 +379,7 @@ struct LGB_FILE
     for( auto i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
-      const auto group = LGB_GROUP( buf, this, groupOffset );
+      const auto group = LGB_GROUP( buf, this, static_cast<uint32_t>(groupOffset) );
       groups.push_back( group );
     }
   };

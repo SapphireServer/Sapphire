@@ -328,7 +328,7 @@ void Sapphire::Network::GameConnection::processOutQueue()
     }
 
     pRP.addPacket( pPacket );
-    totalSize += pPacket->getSize();
+    totalSize += static_cast<int32_t>(pPacket->getSize());
 
     // todo: figure out a good max set size and make it configurable
     if( totalSize > 10000 )

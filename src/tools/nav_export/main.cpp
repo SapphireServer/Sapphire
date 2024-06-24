@@ -332,6 +332,7 @@ int main( int argc, char* argv[] )
   }
   catch( std::exception& e )
   {
+    printf("An exception has occurred: %s", e.what());
     printf( "Unable to initialise EXD!\n" );
     return -1;
   }
@@ -492,7 +493,7 @@ int main( int argc, char* argv[] )
 
       printf( "Built export struct for %s in %lu seconds \n",
         zoneName.c_str(),
-        std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
+        static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() ));
     }
     catch( std::exception& e )
     {
@@ -506,7 +507,7 @@ int main( int argc, char* argv[] )
   std::cout << "\n\n\n";
 
   printf( "Finished all tasks in %lu seconds\n",
-            std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
+            static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() ));
 
   delete eData;
   delete gameData;

@@ -289,7 +289,7 @@ int Lobby::RestConnector::createCharacter( char* sId, std::string name, std::str
 {
   std::string json_string =
     "{\"sId\": \"" + std::string( sId, 56 ) + "\",\"secret\": \"" + serverSecret + "\",\"name\": \"" + name +
-    "\",\"infoJson\": \"" + Common::Util::base64Encode( ( uint8_t* ) infoJson.c_str(), infoJson.length() ) + "\"}";
+    "\",\"infoJson\": \"" + Common::Util::base64Encode( ( uint8_t* ) infoJson.c_str(), static_cast<uint32_t>(infoJson.length()) ) + "\"}";
 
   HttpResponse r = requestApi( "createCharacter", json_string );
 

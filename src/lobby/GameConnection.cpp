@@ -470,7 +470,7 @@ void Lobby::GameConnection::handlePackets( const Network::Packets::FFXIVARR_PACK
       BlowFish blowfish;
       blowfish.initialize( m_encKey, 0x10 );
       blowfish.Decode( ( uint8_t* ) ( &inPacket.data[ 0 ] ), ( uint8_t* ) ( &inPacket.data[ 0 ] ),
-                       ( inPacket.data.size() ) - 0x10 );
+                       ( static_cast<uint32_t>(inPacket.data.size() ) - 0x10 ));
     }
 
     switch( inPacket.segHdr.type )

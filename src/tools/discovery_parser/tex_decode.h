@@ -63,7 +63,7 @@ struct Image
       data[ y ].resize( entries );
       offset += 8;
 
-      for( auto x = 0; x < entries; ++x )
+      for( uint32_t x = 0; x < entries; ++x )
         data[ y ][ x ] = *reinterpret_cast< uint32_t* >( buf + offset + ( x * 4 ) );
       offset += entries * 4;
     }
@@ -254,9 +254,9 @@ Image DecodeTexDXT1( const TEX_FILE& tex, uint32_t offset, uint32_t targetHeight
 
   Image img( targetHeight, targetWidth );
 
-  for( int y = 0; y < compressedHeight; y++ )
+  for( uint32_t y = 0; y < compressedHeight; y++ )
   {
-    for( int x = 0; x < compressedWidth; x++ )
+    for( uint32_t x = 0; x < compressedWidth; x++ )
     {
       const int t0 = *reinterpret_cast< const uint16_t* >( data + pos + 0 ) & 0xffff;
       const int t1 = *reinterpret_cast< const uint16_t* >( data + pos + 2 ) & 0xffff;

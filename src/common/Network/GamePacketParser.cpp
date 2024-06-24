@@ -73,7 +73,7 @@ PacketParseResult Network::Packets::getPackets( const std::vector< uint8_t >& bu
     std::vector< uint8_t > outBuf;
     outBuf.resize( packetHeader.oodleDecompressedSize );
 
-    bool oodleSuccess = oodle->oodleDecode( inBuf, bytesExpected, outBuf, packetHeader.oodleDecompressedSize );
+    bool oodleSuccess = oodle->oodleDecode( inBuf, static_cast<uint32_t>(bytesExpected), outBuf, packetHeader.oodleDecompressedSize );
 
     if( !oodleSuccess )
     {

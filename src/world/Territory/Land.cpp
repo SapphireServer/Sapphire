@@ -242,18 +242,16 @@ Sapphire::Land::InvMaxItemsPair Sapphire::Land::getInventoryItemMax() const
 {
   switch( m_size )
   {
+    default:
     case HouseSize::Cottage:
-    {
       return std::make_pair( 20, 200 );
-    }
+      break;
     case HouseSize::House:
-    {
       return std::make_pair( 30, 300 );
-    }
+      break;
     case HouseSize::Mansion:
-    {
       return std::make_pair( 40, 400 );
-    }
+      break;
   }
   assert( false );
 }
