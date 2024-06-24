@@ -72,7 +72,7 @@ int8_t Sapphire::ItemContainer::getFreeSlot()
     ItemMap::iterator it = m_itemMap.find( slotId );
     if( it == m_itemMap.end() ||
         it->second == nullptr )
-      return (int8_t)slotId;
+      return static_cast<int8_t>(slotId);
   }
   return -1;
 }

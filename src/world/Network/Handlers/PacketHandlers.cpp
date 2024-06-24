@@ -664,7 +664,7 @@ void Sapphire::Network::GameConnection::landRenameHandler( const Packets::FFXIVA
   if( !pZone )
     return;
 
-  auto pLand = pZone->getLand((uint8_t)packet.data().ident.landId );
+  auto pLand = pZone->getLand(static_cast<uint8_t>(packet.data().ident.landId) );
   if( !pLand )
     return;
 
@@ -712,11 +712,11 @@ void Sapphire::Network::GameConnection::reqPlaceHousingItem( const Packets::FFXI
 
   if( data.shouldPlaceItem == 1 )
   {
-    housingMgr.reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, (uint8_t)data.sourceInvSlotId,
+    housingMgr.reqPlaceHousingItem( player, data.landId, data.sourceInvContainerId, static_cast<uint8_t>(data.sourceInvSlotId),
                                      data.position, data.rotation );
   }
   else
-    housingMgr.reqPlaceItemInStore( player, data.landId, data.sourceInvContainerId, (uint8_t)data.sourceInvSlotId );
+    housingMgr.reqPlaceItemInStore( player, data.landId, data.sourceInvContainerId, static_cast<uint8_t>(data.sourceInvSlotId) );
 
 }
 
@@ -728,7 +728,7 @@ void Sapphire::Network::GameConnection::reqMoveHousingItem( const Packets::FFXIV
   const auto packet = ZoneChannelPacket< Client::FFXIVIpcHousingUpdateObjectPosition >( inPacket );
   const auto& data = packet.data();
 
-  housingMgr.reqMoveHousingItem( player, data.ident, (uint8_t)data.slot, data.pos, data.rotation );
+  housingMgr.reqMoveHousingItem( player, data.ident, static_cast<uint8_t>(data.slot), data.pos, data.rotation );
 }
 
 void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -748,7 +748,7 @@ void Sapphire::Network::GameConnection::housingEditExterior( const Packets::FFXI
     slotList.push_back( container != 0x270F ? static_cast< uint8_t >( packet.data().slot[i] ) : 0xFF );
   }
 
-  housingMgr.editAppearance( false, player, terri->getLand( (uint8_t)packet.data().landId )->getLandIdent(), containerList, slotList, packet.data().removeFlag );
+  housingMgr.editAppearance( false, player, terri->getLand( static_cast<uint8_t>(packet.data().landId) )->getLandIdent(), containerList, slotList, packet.data().removeFlag );
 }
 
 void Sapphire::Network::GameConnection::housingEditInterior( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
@@ -847,18 +847,18 @@ void Sapphire::Network::GameConnection::inventoryEquipRecommendedItemsHandler( c
     if ( fromContainer == Common::GearSet0 )
       continue;
 
-    const auto fromItem = fromSlot == -1 ? nullptr : player.getItemAt( fromContainer, (uint8_t)fromSlot );
+    const auto fromItem = fromSlot == -1 ? nullptr : player.getItemAt( fromContainer, static_cast<uint8_t>(fromSlot) );
     const auto equippedItem = player.getItemAt( Common::GearSet0, slot );
 
     if ( fromItem && equippedItem )
     {
-      player.swapItem( fromContainer, (uint8_t)fromSlot, Common::GearSet0, slot, slot == 0 || slot == 13 );
+      player.swapItem( fromContainer, static_cast<uint8_t>(fromSlot), Common::GearSet0, slot, slot == 0 || slot == 13 );
       player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, *equippedItem, 0 ) );
       player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
     }
     else if ( fromItem && !equippedItem )
     {
-      player.moveItem( fromContainer, (uint8_t)fromSlot, Common::GearSet0, slot, slot == 0 || slot == 13 );
+      player.moveItem( fromContainer, static_cast<uint8_t>(fromSlot), Common::GearSet0, slot, slot == 0 || slot == 13 );
       player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), fromSlot, fromContainer, 0 ) );
       player.queuePacket( std::make_shared< UpdateInventorySlotPacket >( player.getId(), slot, Common::GearSet0, *fromItem, 0 ) );
     }

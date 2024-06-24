@@ -65,14 +65,14 @@ void Network::Packets::PacketContainer::fillSendBuffer( std::vector< uint8_t >& 
     std::vector< uint8_t > outBuf;
     outBuf.resize( m_ipcHdr.size );
 
-    auto compLen = oodle->oodleEncode(inBuf, (uint32_t)inBuf.size(), outBuf);
+    auto compLen = oodle->oodleEncode(inBuf, static_cast<uint32_t>(inBuf.size()), outBuf);
 
     // Check if we compressed at all
     if (compLen != m_ipcHdr.size) {
       tempBuffer.resize(compLen);
       memcpy(&inBuf[0], &outBuf[0], compLen);
       m_ipcHdr.oodleDecompressedSize = m_ipcHdr.size;
-      m_ipcHdr.size = (uint32_t)compLen;
+      m_ipcHdr.size = static_cast<uint32_t>(compLen);
       m_ipcHdr.compressionType = static_cast< uint8_t >(Packets::CompressionType::Oodle);
     }
   }

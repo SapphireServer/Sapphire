@@ -70,12 +70,12 @@ enum class LgbEntryType :
 
 struct InstanceObject
 {
-  LgbEntryType type{};
-  uint32_t unknown{};
-  uint32_t nameOffset{};
-  vec3 translation{};
-  vec3 rotation{};
-  vec3 scale{};
+  LgbEntryType type;
+  uint32_t unknown;
+  uint32_t nameOffset;
+  vec3 translation;
+  vec3 rotation;
+  vec3 scale;
 };
 
 class LgbEntry
@@ -221,10 +221,10 @@ public:
 struct MapRangeData :
   public InstanceObject
 {
-  uint32_t type{};
-  uint16_t unknown2{};
-  uint16_t unknown3{};
-  uint8_t unknown4[0x10]{};
+  uint32_t type;
+  uint16_t unknown2;
+  uint16_t unknown3;
+  uint8_t unknown4[0x10];
 };
 
 struct LGB_MAP_RANGE_ENTRY :
@@ -380,7 +380,7 @@ struct LGB_FILE
     for( auto i = 0; i < header.groupCount; ++i )
     {
       const auto groupOffset = baseOffset + *reinterpret_cast< int32_t* >( buf + ( baseOffset + i * 4 ) );
-      const auto group = LGB_GROUP( buf, this, (uint32_t)groupOffset );
+      const auto group = LGB_GROUP( buf, this, static_cast<uint32_t>(groupOffset) );
       groups.push_back( group );
     }
   };

@@ -89,7 +89,7 @@ bool Sapphire::World::Manager::HousingMgr::init()
   {
     auto count = landSet.second.size();
 
-    houseCount += (uint32_t)count;
+    houseCount += static_cast<uint32_t>(count);
 
     if( landSet.second.size() != 60 )
     {
@@ -810,7 +810,7 @@ void Sapphire::World::Manager::HousingMgr::requestEstateEditGuestAccess( Entity:
   if( !hZone )
     return;
 
-  auto land = hZone->getLand( (uint8_t)ident.landId );
+  auto land = hZone->getLand(static_cast<uint8_t>(ident.landId) );
   if( !land )
     return;
 
@@ -1703,7 +1703,7 @@ void Sapphire::World::Manager::HousingMgr::editAppearance( bool isInterior, Sapp
   updateHouseModels( land->getHouse() );
   if( !isInterior )
   {
-    terri->sendLandUpdate( (uint8_t)landIdent.landId );
+    terri->sendLandUpdate(static_cast<uint8_t>(landIdent.landId) );
   }
 }
 
@@ -1759,11 +1759,11 @@ void Sapphire::World::Manager::HousingMgr::removeHouse( Entity::Player& player, 
 
   land->setStatus( HouseStatus::Sold );
   land->updateLandDb();
-  terri->sendLandUpdate( (uint8_t)plot );
+  terri->sendLandUpdate(static_cast<uint8_t>(plot) );
 
   player.setLandFlags( LandFlagsSlot::Private, 0, land->getLandIdent() );
 
-  terri->removeEstateEntranceEObj((uint8_t)plot );
+  terri->removeEstateEntranceEObj(static_cast<uint8_t>(plot) );
 
   // missing reply for ClientTrigger RequestEstateHallRemoval
 }

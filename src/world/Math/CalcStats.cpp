@@ -205,7 +205,7 @@ float CalcStats::directHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
-  float dhRate = (float)chara.getStatValue( Common::BaseParam::DirectHitRate );
+  float dhRate = static_cast<float>(chara.getStatValue( Common::BaseParam::DirectHitRate ));
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );

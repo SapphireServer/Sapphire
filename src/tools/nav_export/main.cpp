@@ -493,7 +493,7 @@ int main( int argc, char* argv[] )
 
       printf( "Built export struct for %s in %lu seconds \n",
         zoneName.c_str(),
-        (unsigned long)std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() );
+        static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - entryStartTime ).count() ));
     }
     catch( std::exception& e )
     {
@@ -507,7 +507,7 @@ int main( int argc, char* argv[] )
   std::cout << "\n\n\n";
 
   printf( "Finished all tasks in %lu seconds\n",
-            (unsigned long)std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() );
+            static_cast<unsigned long>(std::chrono::duration_cast< std::chrono::seconds >( std::chrono::high_resolution_clock::now() - startTime ).count() ));
 
   delete eData;
   delete gameData;

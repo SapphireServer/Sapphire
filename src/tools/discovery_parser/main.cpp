@@ -77,11 +77,11 @@ struct DiscoveryMap : std::enable_shared_from_this< DiscoveryMap >
   {
     auto ogX = x, ogY = y;
     int col = ( mapIndex % ( int ) ( ( float ) img.width / ( float ) tileWidth ) );
-    int row = (int)( mapIndex / ( ( float ) img.width / ( float ) tileWidth ) );
+    int row = static_cast<int>(( mapIndex / ( ( float ) img.width / ( float ) tileWidth ) ));
     x = ( x / 2048.f ) * ( float ) tileWidth;
     y = ( y / 2048.f ) * ( float ) tileWidth;
-    int tileX = (int)(( col * ( float ) tileWidth ) + x);
-    int tileY = (int)(( row * ( float ) tileWidth ) + y);
+    int tileX = static_cast<int>((col * (float)tileWidth) + x);
+    int tileY = static_cast<int>(( row * ( float ) tileWidth ) + y);
 
     if( tileX < 0 || tileY < 0 || tileY > img.data.size() - 1 || tileX > img.data[ 0 ].size() - 1 )
     {

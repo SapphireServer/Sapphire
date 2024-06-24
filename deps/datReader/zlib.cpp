@@ -10,7 +10,7 @@ namespace xiv::utils::zlib
   void compress( const std::vector< char >& in, std::vector< char >& out )
   {
     // Fetching upper bound for out size
-    auto out_size = compressBound( (uLong)in.size() );
+    auto out_size = compressBound( static_cast<uLong>(in.size()) );
     out.resize( out_size );
 
     auto ret = compress2( reinterpret_cast<uint8_t*>(out.data()), &out_size,

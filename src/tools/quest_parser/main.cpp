@@ -329,7 +329,7 @@ int main( int argc, char** argv )
 
   Logger::info( "Export in progress" );
 
-  uint32_t updateInterval = (uint32_t)rows.size() / 20;
+  uint32_t updateInterval = static_cast<uint32_t>(rows.size()) / 20;
   uint32_t i = 0;
   for( const auto& row : rows )
   {
@@ -386,7 +386,7 @@ int main( int argc, char** argv )
     {
 
       std::string entry( &section[ offset ] );
-      offset += (uint32_t)entry.size() + 1;
+      offset += static_cast<uint32_t>(entry.size()) + 1;
 
       if( entry.size() > 3
           && entry.find_first_not_of( "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-" ) ==

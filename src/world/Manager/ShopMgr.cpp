@@ -52,7 +52,7 @@ bool Sapphire::World::Manager::ShopMgr::purchaseGilShopItem( Entity::Player& pla
 
 bool Sapphire::World::Manager::ShopMgr::shopSellItem( Sapphire::Entity::Player& player, uint32_t shopId, uint16_t containerId, uint16_t slotId )
 {
-  auto item = player.getItemAt( containerId, (uint8_t)slotId );
+  auto item = player.getItemAt( containerId, static_cast<uint8_t>(slotId) );
   if( item )
   {
     auto& exdData = Common::Service< Data::ExdDataGenerated >::ref();

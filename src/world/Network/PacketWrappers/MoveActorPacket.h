@@ -32,7 +32,7 @@ namespace Sapphire::Network::Packets::Server
       m_data.headRotation = headRotation;
       m_data.animationType = animationType;
       m_data.animationState = state;
-      m_data.animationSpeed = (uint8_t)animationSpeed;
+      m_data.animationSpeed = static_cast<uint8_t>(animationSpeed);
       m_data.unknownRotation = unknownRotation;
       m_data.posX = Common::Util::floatToUInt16( actor.getPos().x );
       m_data.posY = Common::Util::floatToUInt16( actor.getPos().y );
