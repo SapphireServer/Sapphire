@@ -115,7 +115,10 @@ namespace Sapphire::Encounter
       { "encounterTimeElapsed",     ConditionType::EncounterTimeElapsed },
 
       { "combatState",              ConditionType::CombatState },
-      { "bnpcHasFlags",             ConditionType::BNpcHasFlags }
+      { "bnpcHasFlags",             ConditionType::BNpcHasFlags },
+
+      { "getAction",                ConditionType::GetAction },
+      { "phaseActive",              ConditionType::PhaseActive }
     };
 
     TimelinePack pack;
@@ -263,6 +266,18 @@ namespace Sapphire::Encounter
               pCondition->from_json( pcV, phase, condition, actorNameMap );
             }
             break;
+            case ConditionType::GetAction:
+            {
+              pCondition = std::make_shared< ConditionGetAction >();
+              pCondition->from_json( pcV, phase, condition, actorNameMap );
+            }
+            break;
+            case ConditionType::PhaseActive:
+            {
+              pCondition = std::make_shared< ConditionPhaseActive >();
+              pCondition->from_json( pcV, phase, condition, actorNameMap );
+            }
+            break;
             default:
               break;
           }
@@ -366,6 +381,32 @@ namespace Sapphire::Encounter
   {
     for( auto& actor : m_actors )
       actor.spawnAllSubActors( pTeri );
+  }
+
+  bool TimelinePack::isPhaseActive( const std::string& actorName, const std::string& phaseName )
+  {
+    for( const auto& actor : m_actors )
+      if( actor.getName() == actorName )
+        return actor.isPhaseActive( phaseName );
+    return false;
+  }
+
+  void TimelinePack::resetConditionState( uint32_t id, bool toDefault )
+  {
+    for( auto& actor : m_actors )
+    {
+      if( actor.resetConditionState( id, toDefault ) )
+        return;
+    }
+  }
+
+  void TimelinePack::setConditionStateEnabled( uint32_t id, bool enabled )
+  {
+    for( auto& actor : m_actors )
+    {
+      if( actor.setConditionStateEnabled( id, enabled ) )
+        return;
+    }
   }
 
   bool TimelinePack::valid()

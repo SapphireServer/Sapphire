@@ -134,29 +134,6 @@
             },
             {
               "data": {
-                "selectorName": "Eruption",
-                "sourceActor": "Ifrit"
-              },
-              "description": "",
-              "duration": 0,
-              "type": "snapshot"
-            },
-            {
-              "data": {
-                "actionId": 733,
-                "selectorIndex": 0,
-                "selectorName": "Eruption",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 1>",
-                "targetType": "selector"
-              },
-              "description": "Eruption",
-              "duration": 8000,
-              "type": "castAction"
-            },
-            {
-              "data": {
                 "actionId": 454,
                 "selectorIndex": 0,
                 "selectorName": "<unset>",
@@ -217,11 +194,21 @@
                 "snapshot": false,
                 "snapshotTime": 0,
                 "sourceActor": "Ifrit",
-                "targetType": "selector"
+                "targetType": "self"
               },
               "description": "Eruption",
-              "duration": 8000,
+              "duration": 0,
               "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 11,
+                "conditionStr": "If Ifrit casts Action#455, loop Ifrit Control->Eruption",
+                "enabled": true
+              },
+              "description": "",
+              "duration": 8000,
+              "type": "setCondition"
             }
           ]
         },
@@ -291,6 +278,14 @@
           "id": 7,
           "name": "Hellfire",
           "timepoints": [
+            {
+              "data": {
+                "despawnActor": "Ifrit Nail 1"
+              },
+              "description": "Despawn nail if up",
+              "duration": 0,
+              "type": "bNpcDespawn"
+            },
             {
               "data": {
                 "conditionId": 7,
@@ -390,6 +385,20 @@
           "timepoints": [
             {
               "data": {
+                "actionId": 455,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Eruption telegraph",
+              "duration": 8000,
+              "type": "castAction"
+            },
+            {
+              "data": {
                 "actionId": 453,
                 "selectorIndex": 0,
                 "selectorName": "<unset>",
@@ -404,306 +413,27 @@
             },
             {
               "data": {
-                "selectorName": "Eruption",
-                "sourceActor": "Ifrit"
-              },
-              "description": "Eruption snapshot",
-              "duration": 0,
-              "type": "snapshot"
-            },
-            {
-              "data": {
-                "actionId": 733,
-                "selectorIndex": 0,
-                "selectorName": "Eruption",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 1>",
-                "targetType": "selector"
-              },
-              "description": "Subactor 1 Eruption",
-              "duration": 8000,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 1>",
-                "pos": [
-                  -5,
-                  0,
-                  5
-                ],
-                "rot": 0
-              },
-              "description": "Move plumes",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 2>",
-                "pos": [
-                  -5,
-                  0,
-                  -5
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 3>",
-                "pos": [
-                  5,
-                  0,
-                  5
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 4>",
-                "pos": [
-                  5,
-                  0,
-                  -5
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 8000,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actionId": 734,
+                "actionId": 456,
                 "selectorIndex": 0,
                 "selectorName": "<unset>",
                 "snapshot": false,
                 "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 1>",
+                "sourceActor": "Ifrit",
                 "targetType": "self"
               },
-              "description": "Cast plumes",
+              "description": "Plumes telegraph",
               "duration": 0,
               "type": "castAction"
             },
             {
               "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 2>",
-                "targetType": "self"
+                "conditionId": 12,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes Loop",
+                "enabled": true
               },
               "description": "",
-              "duration": 0,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 3>",
-                "targetType": "self"
-              },
-              "description": "",
-              "duration": 0,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 4>",
-                "targetType": "self"
-              },
-              "description": "",
-              "duration": 5000,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 1>",
-                "pos": [
-                  0,
-                  0,
-                  -20
-                ],
-                "rot": 0
-              },
-              "description": "Move plumes out",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 2>",
-                "pos": [
-                  0,
-                  0,
-                  20
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 3>",
-                "pos": [
-                  -20,
-                  0,
-                  0
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 4>",
-                "pos": [
-                  -20,
-                  0,
-                  20
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 5>",
-                "pos": [
-                  -15,
-                  0,
-                  15
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 6>",
-                "pos": [
-                  -15,
-                  0,
-                  -15
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 7>",
-                "pos": [
-                  15,
-                  0,
-                  -15
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actorName": "Ifrit <subactor 8>",
-                "pos": [
-                  15,
-                  0,
-                  15
-                ],
-                "rot": 0
-              },
-              "description": "",
-              "duration": 0,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 1>",
-                "targetType": "self"
-              },
-              "description": "Cast plumes out",
-              "duration": 0,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 2>",
-                "targetType": "self"
-              },
-              "description": "",
-              "duration": 0,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 3>",
-                "targetType": "self"
-              },
-              "description": "",
-              "duration": 0,
-              "type": "castAction"
-            },
-            {
-              "data": {
-                "actionId": 734,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
-                "snapshot": false,
-                "snapshotTime": 0,
-                "sourceActor": "Ifrit <subactor 4>",
-                "targetType": "self"
-              },
-              "description": "",
-              "duration": 5000,
-              "type": "castAction"
+              "duration": 16000,
+              "type": "setCondition"
             }
           ]
         },
@@ -730,16 +460,7 @@
           ]
         }
       ],
-      "subactors": [
-        "Ifrit <subactor 1>",
-        "Ifrit <subactor 2>",
-        "Ifrit <subactor 3>",
-        "Ifrit <subactor 4>",
-        "Ifrit <subactor 5>",
-        "Ifrit <subactor 6>",
-        "Ifrit <subactor 7>",
-        "Ifrit <subactor 8>"
-      ],
+      "subactors": [],
       "type": "bnpc"
     },
     {
@@ -747,8 +468,404 @@
       "id": 2,
       "layoutId": 4126284,
       "name": "Ifrit Control",
-      "phases": [],
-      "subactors": [],
+      "phases": [
+        {
+          "description": "",
+          "id": 1,
+          "name": "Eruption",
+          "timepoints": [
+            {
+              "data": {
+                "selectorName": "Eruption",
+                "sourceActor": "Ifrit Control <subactor 1>"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "snapshot"
+            },
+            {
+              "data": {
+                "actionId": 733,
+                "selectorIndex": 0,
+                "selectorName": "Eruption",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 1>",
+                "targetType": "selector"
+              },
+              "description": "Subactor 1 Eruption",
+              "duration": 8000,
+              "type": "castAction"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 2,
+          "name": "Plumes Loop",
+          "timepoints": [
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 1>",
+                "pos": [
+                  -10,
+                  0,
+                  10
+                ],
+                "rot": 0
+              },
+              "description": "Move plumes",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 2>",
+                "pos": [
+                  -10,
+                  0,
+                  -10
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 3>",
+                "pos": [
+                  10,
+                  0,
+                  10
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 4>",
+                "pos": [
+                  10,
+                  0,
+                  -10
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 1>",
+                "targetType": "self"
+              },
+              "description": "Cast plumes",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 2>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 3>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 4>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 4000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 1>",
+                "pos": [
+                  0,
+                  0,
+                  -20
+                ],
+                "rot": 0
+              },
+              "description": "Move plumes out",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 2>",
+                "pos": [
+                  0,
+                  0,
+                  20
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 3>",
+                "pos": [
+                  -20,
+                  0,
+                  0
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 4>",
+                "pos": [
+                  -20,
+                  0,
+                  20
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 5>",
+                "pos": [
+                  -15,
+                  0,
+                  15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 6>",
+                "pos": [
+                  -15,
+                  0,
+                  -15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 7>",
+                "pos": [
+                  15,
+                  0,
+                  -15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actorName": "Ifrit Control <subactor 8>",
+                "pos": [
+                  15,
+                  0,
+                  15
+                ],
+                "rot": 0
+              },
+              "description": "",
+              "duration": 200,
+              "type": "setPos"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 1>",
+                "targetType": "self"
+              },
+              "description": "Cast plumes out",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 2>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 3>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 4>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 5>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 6>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 7>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "actionId": 734,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit Control <subactor 8>",
+                "targetType": "self"
+              },
+              "description": "",
+              "duration": 0,
+              "type": "castAction"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 3,
+          "name": "Setup",
+          "timepoints": [
+            {
+              "data": {},
+              "description": "",
+              "duration": 5000,
+              "type": "idle"
+            }
+          ]
+        }
+      ],
+      "subactors": [
+        "Ifrit Control <subactor 1>",
+        "Ifrit Control <subactor 2>",
+        "Ifrit Control <subactor 3>",
+        "Ifrit Control <subactor 4>",
+        "Ifrit Control <subactor 5>",
+        "Ifrit Control <subactor 6>",
+        "Ifrit Control <subactor 7>",
+        "Ifrit Control <subactor 8>"
+      ],
       "type": "bnpc"
     },
     {
@@ -902,6 +1019,45 @@
       },
       "targetActor": "Ifrit",
       "targetPhase": "Final Phase"
+    },
+    {
+      "condition": "getAction",
+      "description": "",
+      "enabled": true,
+      "id": 11,
+      "loop": true,
+      "paramData": {
+        "actionId": 455,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetPhase": "Eruption"
+    },
+    {
+      "condition": "phaseActive",
+      "description": "",
+      "enabled": false,
+      "id": 12,
+      "loop": false,
+      "paramData": {
+        "phaseName": "Final Phase",
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetPhase": "Plumes Loop"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 13,
+      "loop": false,
+      "paramData": {
+        "combatState": 1,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetPhase": "Setup"
     }
   ],
   "name": "Brand new timeline",

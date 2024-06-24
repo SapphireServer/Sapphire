@@ -4,6 +4,8 @@
 #include "TimelineActor.h"
 #include "TimelineActorState.h"
 
+#include <Action/Action.h>
+
 #include <Actor/Chara.h>
 #include <Actor/BNpc.h>
 #include <Actor/Player.h>
@@ -101,6 +103,17 @@ namespace Sapphire::Encounter
     return pBNpc && pBNpc->hasFlag( this->flags );
   }
 
+  bool ConditionGetAction::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  {
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
+    return pBNpc && pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() == this->actionId;
+  }
+
+  bool ConditionPhaseActive::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  {
+    return pack.isPhaseActive( this->actorName, this->phaseName );
+  }
+
   void ConditionHp::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
                                const std::unordered_map< std::string, TimelineActor >& actors )
   {
@@ -113,7 +126,7 @@ namespace Sapphire::Encounter
     if( auto it = actors.find( actorRef ); it != actors.end() )
       this->layoutId = it->second.m_layoutId;
     else
-      throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionHp::from_json unable to find actor by name: %s" ), actorRef ) );
+      throw std::runtime_error( fmt::format( std::string( "ConditionHp::from_json unable to find actor by name: %s" ), actorRef ) );
 
     switch( condition )
     {
@@ -174,7 +187,7 @@ namespace Sapphire::Encounter
     if( auto it = actors.find( actorRef ); it != actors.end() )
       this->layoutId = it->second.m_layoutId;
     else
-      throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionCombatState::from_json unable to find actor by name: %s" ), actorRef ) );
+      throw std::runtime_error( fmt::format( std::string( "ConditionCombatState::from_json unable to find actor by name: %s" ), actorRef ) );
 
     this->combatState = paramData.at( "combatState" ).get< CombatStateType >();
   }
@@ -201,10 +214,41 @@ namespace Sapphire::Encounter
     if( auto it = actors.find( actorRef ); it != actors.end() )
       this->layoutId = it->second.m_layoutId;
     else
-      throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::ConditionBNpcFlags::from_json unable to find actor by name: %s" ), actorRef ) );
+      throw std::runtime_error( fmt::format( std::string( "ConditionBNpcFlags::from_json unable to find actor by name: %s" ), actorRef ) );
 
     this->flags = json.at( "flags" ).get< uint32_t >();
     // todo: BNpcHasFlags
+  }
+
+  void ConditionGetAction::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
+                                      const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    PhaseCondition::from_json( json, phase, condition, actors );
+
+    auto& paramData = json.at( "paramData" );
+    auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
+    auto actionId = paramData.at( "actionId" ).get< uint32_t >();
+
+    // resolve the actor whose name we are checking
+    if( auto it = actors.find( actorRef ); it != actors.end() )
+      this->layoutId = it->second.m_layoutId;
+    else
+      throw std::runtime_error( fmt::format( std::string( "ConditionGetAction::from_json unable to find actor by name: %s" ), actorRef ) );
+
+    this->actionId = actionId;
+  }
+
+  void ConditionPhaseActive::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
+                                        const std::unordered_map< std::string, TimelineActor >& actors )
+  {
+    PhaseCondition::from_json( json, phase, condition, actors );
+
+    auto& paramData = json.at( "paramData" );
+    auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
+    auto phaseName = paramData.at( "phaseName" ).get< std::string >();
+
+    this->actorName = actorRef;
+    this->phaseName = phaseName;
   }
 
   // todo: i wrote this very sleep deprived, ensure it is actually sane
@@ -274,4 +318,4 @@ namespace Sapphire::Encounter
   {
     return state.m_phaseInfo.m_lastTimepointIndex > m_timepoints.size();
   }
-  }// namespace Sapphire::Encounter
+}// namespace Sapphire::Encounter

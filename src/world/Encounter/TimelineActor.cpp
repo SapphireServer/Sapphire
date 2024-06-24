@@ -12,6 +12,28 @@
 
 namespace Sapphire::Encounter
 {
+  const std::string& TimelineActor::getName() const
+  {
+    return m_name;
+  }
+
+  uint32_t TimelineActor::getLayoutId() const
+  {
+    return m_layoutId;
+  }
+
+  bool TimelineActor::isPhaseActive( const std::string& name ) const
+  {
+    for( const auto& condition : m_phaseConditions )
+    {
+      const auto& pCondition = condition.second;
+      const auto& state = m_conditionStates.at( condition.first );
+      if( pCondition->inProgress( state ) && pCondition->getPhaseName() == name )
+        return true;
+    }
+    return false;
+  }
+
   void TimelineActor::addPhaseCondition( PhaseConditionPtr pCondition )
   {
     m_phaseConditions.emplace( std::make_pair( pCondition->getId(), pCondition ) );
@@ -59,22 +81,26 @@ namespace Sapphire::Encounter
     }
   }
 
-  void TimelineActor::resetConditionState( uint32_t conditionId )
+  bool TimelineActor::resetConditionState( uint32_t conditionId, bool toDefault )
   {
     if( auto it = m_phaseConditions.find( conditionId ); it != m_phaseConditions.end() )
     {
       auto& state = m_conditionStates.at( it->first );
-      it->second->reset( state );
+      it->second->reset( state, toDefault );
+      return true;
     }
+    return false;
   }
 
-  void TimelineActor::setConditionStateEnabled( uint32_t conditionId, bool enabled )
+  bool TimelineActor::setConditionStateEnabled( uint32_t conditionId, bool enabled )
   {
     if( auto it = m_conditionStates.find( conditionId ); it != m_conditionStates.end() )
     {
       auto& state = m_conditionStates.at( it->first );
       state.m_enabled = enabled;
+      return true;
     }
+    return false;
   }
 
   void TimelineActor::resetAllConditionStates()
@@ -149,7 +175,9 @@ namespace Sapphire::Encounter
     if( pActor == nullptr )
     {
       auto pParent = pTeri->getActiveBNpcByLayoutId( m_layoutId );
-      pActor = pTeri->createBNpcFromLayoutId( m_layoutId, 1000, pParent->getBNpcType() );
+      Common::BNpcType type = pParent ? pParent->getBNpcType() : Common::BNpcType::Enemy;
+      
+      pActor = pTeri->createBNpcFromLayoutId( m_layoutId, 1000, type );
       m_subActors[ name ] = pActor;
 
       pActor->setInvincibilityType( Common::InvincibilityIgnoreDamage );

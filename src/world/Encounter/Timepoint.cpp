@@ -63,6 +63,7 @@ namespace Sapphire::Encounter
       { "directorSeq",   TimepointDataType::DirectorSeq },
       { "directorFlags", TimepointDataType::DirectorFlags },
 
+      { "bNpcDespawn",   TimepointDataType::BNpcDespawn },
       { "bNpcSpawn",     TimepointDataType::BNpcSpawn },
       { "bNpcFlags",     TimepointDataType::BNpcFlags },
       { "setEObjState",  TimepointDataType::SetEObjState },
@@ -246,7 +247,20 @@ namespace Sapphire::Encounter
       }
       break;
 
+      case TimepointDataType::BNpcDespawn:
+      {
+        auto& dataJ = json.at( "data" );
+        auto actorRef = dataJ.at( "despawnActor" ).get< std::string >();
 
+        uint32_t layoutId = 0xE0000000;
+        if( auto it = actors.find( actorRef ); it != actors.end() )
+          layoutId = it->second.m_layoutId;
+        else
+          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: {}" ), actorRef ) );
+
+        m_pData = std::make_shared< TimepointDataBNpcDespawn >( layoutId );
+      }
+      break;
       case TimepointDataType::BNpcSpawn:
       {
         auto& dataJ = json.at( "data" );
@@ -265,7 +279,7 @@ namespace Sapphire::Encounter
         else
           throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: {}" ), actorRef ) );
 
-        m_pData = std::make_shared< TimepointDataSpawnBNpc >( layoutId, flags, bnpcType );
+        m_pData = std::make_shared< TimepointDataBNpcSpawn >( layoutId, flags, bnpcType );
       }
       break;
       case TimepointDataType::BNpcFlags:
@@ -409,6 +423,7 @@ namespace Sapphire::Encounter
           {
             pAction->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
             pAction->interrupt();
+            return false;
           }
           else
           {
@@ -610,9 +625,23 @@ namespace Sapphire::Encounter
       {
       }
       break;
+      case TimepointDataType::BNpcDespawn:
+      {
+        auto pDespawnData = std::dynamic_pointer_cast< TimepointDataBNpcDespawn, TimepointData >( m_pData );
+        auto pBNpc = pTeri->getActiveBNpcByLayoutId( pDespawnData->m_layoutId );
+
+        if( pBNpc )
+        {
+          for( const auto& player : pTeri->getPlayers() )
+            pBNpc->despawn( player.second );
+
+          pTeri->removeActor( pBNpc );
+        }
+      }
+      break;
       case TimepointDataType::BNpcSpawn:
       {
-        auto pSpawnData = std::dynamic_pointer_cast< TimepointDataSpawnBNpc, TimepointData >( m_pData );
+        auto pSpawnData = std::dynamic_pointer_cast< TimepointDataBNpcSpawn, TimepointData >( m_pData );
         auto pBNpc = pTeri->getActiveBNpcByLayoutId( pSpawnData->m_layoutId );
 
         // todo: probably have this info in the timepoint data
@@ -682,8 +711,8 @@ namespace Sapphire::Encounter
         auto pConditionData = std::dynamic_pointer_cast< TimepointDataCondition, TimepointData >( m_pData );
 
         // todo: dont reset so things can resume? idk
-        self.resetConditionState( pConditionData->m_conditionId );
-        self.setConditionStateEnabled( pConditionData->m_conditionId, pConditionData->m_enabled );
+        pack.resetConditionState( pConditionData->m_conditionId );
+        pack.setConditionStateEnabled( pConditionData->m_conditionId, pConditionData->m_enabled );
       }
       break;
       case TimepointDataType::Snapshot:

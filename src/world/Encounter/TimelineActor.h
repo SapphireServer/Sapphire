@@ -40,17 +40,23 @@ namespace Sapphire::Encounter
 
       m_conditionStates = rhs.m_conditionStates;
       for( const auto& state : rhs.m_phaseConditions )
-        state.second->reset( m_conditionStates[ state.first ] );
+        state.second->reset( m_conditionStates[ state.first ], true );
     }
+
+    const std::string& getName() const;
+
+    uint32_t getLayoutId() const;
+
+    bool isPhaseActive( const std::string& name ) const;
 
     void addPhaseCondition( PhaseConditionPtr pCondition );
 
     // todo: make this sane
     void update( TerritoryPtr pTeri, TimelinePack& pack, uint64_t time );
 
-    void resetConditionState( uint32_t conditionId );
+    bool resetConditionState( uint32_t conditionId, bool toDefault = false );
 
-    void setConditionStateEnabled( uint32_t conditionId, bool enabled );
+    bool setConditionStateEnabled( uint32_t conditionId, bool enabled );
 
     void resetAllConditionStates();
 

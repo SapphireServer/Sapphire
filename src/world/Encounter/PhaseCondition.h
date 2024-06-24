@@ -32,7 +32,10 @@ namespace Sapphire::Encounter
 
     EncounterTimeElapsed,
     CombatState,
-    BNpcHasFlags
+    BNpcHasFlags,
+
+    GetAction,
+    PhaseActive
   };
 
   class Phase : public std::enable_shared_from_this< Phase >
@@ -75,6 +78,11 @@ namespace Sapphire::Encounter
       this->m_description = json.at( "description" ).get< std::string >();
       this->m_enabled = json.at( "enabled" ).get< bool >();
       this->m_id = json.at( "id" ).get< uint32_t >();
+    }
+
+    const std::string& getPhaseName()
+    {
+      return m_phase.m_name;
     }
 
     void execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
@@ -211,6 +219,26 @@ namespace Sapphire::Encounter
 
     void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
     bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
+  };
+
+  class ConditionGetAction : public PhaseCondition
+  {
+  public:
+    uint32_t layoutId;
+    uint32_t actionId;
+
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;
+  };
+
+  class ConditionPhaseActive : public PhaseCondition
+  {
+  public:
+    std::string actorName;
+    std::string phaseName;
+
+    void from_json( nlohmann::json& json, Phase& phase, ConditionType condition, const std::unordered_map< std::string, TimelineActor >& actors ) override;
+    bool isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const override;    
   };
 
 }// namespace Sapphire::Encounter
