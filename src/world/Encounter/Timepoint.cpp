@@ -423,6 +423,7 @@ namespace Sapphire::Encounter
           {
             pAction->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
             pAction->interrupt();
+            pBNpc->setCurrentAction( nullptr );
             return false;
           }
           else
@@ -441,7 +442,6 @@ namespace Sapphire::Encounter
         {
           pBNpc->setRot( pSetPosData->m_rot );
           pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
-          pBNpc->sendPositionUpdate();
         }
       }
       break;

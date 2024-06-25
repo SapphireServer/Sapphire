@@ -895,6 +895,8 @@ bool Territory::loadBNpcs()
   stmt->setUInt( 1, getTerritoryTypeId() );
   auto res = db.query( stmt );
 
+  // todo: load any exd links, cache them, build more info and setup bnpcs properly
+
   while( res->next() )
   {
     auto bnpc = std::make_shared< Common::BNPCInstanceObject >();

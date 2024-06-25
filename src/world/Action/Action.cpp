@@ -181,6 +181,16 @@ const Common::FFXIVARR_POSITION3& Action::Action::getPos() const
   return m_pos;
 }
 
+void Action::Action::setRot( float rot )
+{
+  m_rot = rot;
+}
+
+float Action::Action::getRot() const
+{
+  return m_rot;
+}
+
 void Action::Action::setTargetId( uint64_t targetId )
 {
   m_targetId = targetId;
@@ -327,10 +337,10 @@ void Action::Action::start()
     data.CastTime = static_cast< float >( m_castTimeMs ) / 1000.f;
     data.Target = static_cast< uint32_t >( m_targetId );
 
-    data.TargetPos[ 0 ] = Common::Util::floatToUInt16( m_pSource->getPos().x );
-    data.TargetPos[ 1 ] = Common::Util::floatToUInt16( m_pSource->getPos().y );
-    data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pSource->getPos().z );
-    data.Dir = m_pSource->getRot();
+    data.TargetPos[ 0 ] = Common::Util::floatToUInt16( m_pos.x );
+    data.TargetPos[ 1 ] = Common::Util::floatToUInt16( m_pos.y );
+    data.TargetPos[ 2 ] = Common::Util::floatToUInt16( m_pos.z );
+    data.Dir = m_rot;
 
     server().queueForPlayers( m_pSource->getInRangePlayerIds( m_pSource->isPlayer() ), castPacket );
 

@@ -1885,6 +1885,7 @@ namespace Sapphire::Common
 
   using PlayerStateFlagList = std::vector< PlayerCondition >;
 
+  // todo: load BNpcBase and other exd data into this struct
   struct BNPCInstanceObject
   {
     uint16_t territoryType;

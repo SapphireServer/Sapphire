@@ -14,6 +14,8 @@
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
 #include "Network/PacketWrappers/HudParamPacket.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
+
 #include "Network/Util/PacketUtil.h"
 
 #include "Action/Action.h"
@@ -25,6 +27,7 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/PlayerMgr.h"
+#include "Navi/NaviProvider.h"
 #include "Common.h"
 
 using namespace Sapphire;
@@ -197,6 +200,24 @@ uint64_t Chara::getTargetId() const
 bool Chara::isAlive() const
 {
   return ( m_hp > 0 );
+}
+
+void Chara::setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+{
+  GameObject::setPos( pos, broadcastUpdate );
+  m_dirtyFlag |= DirtyFlag::Position;
+}
+
+void Chara::setPos( float x, float y, float z, bool broadcastUpdate )
+{
+  GameObject::setPos( x, y, z, broadcastUpdate );
+  m_dirtyFlag |= DirtyFlag::Position;
+}
+
+void Sapphire::Entity::Chara::setRot( float rot )
+{
+  GameObject::setRot( rot );
+  m_dirtyFlag |= DirtyFlag::Position;
 }
 
 /*! \return max hp for the actor */
@@ -856,4 +877,39 @@ void Chara::onTick()
 
     Network::Util::Packet::sendHudParam( *this );
   }
+}
+
+void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ignoreNav )
+{
+  auto kbPos = Common::Util::getKnockbackPosition( origin, m_pos, distance );
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( !ignoreNav )
+  {
+    // todo: use agent
+    auto pNav = pTeri->getNaviProvider();
+    auto path = pNav->findFollowPath( m_pos, kbPos );
+
+    FFXIVARR_POSITION3 navPos{origin};
+    float prevDistance{1000.f};
+    for( const auto& point : path )
+    {
+      auto navDist = Common::Util::distance( kbPos, point );  
+      if( navDist < prevDistance )
+      {
+        navPos = point;
+        prevDistance = navDist;
+      }
+    }
+    setPos( navPos );
+    pNav->updateAgentPosition( *this );
+  }
+  else
+  {
+    setPos( kbPos );
+  }
+  pTeri->updateActorPosition( *this );
+
+  server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }

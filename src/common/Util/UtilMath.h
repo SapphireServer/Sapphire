@@ -31,6 +31,8 @@ namespace Sapphire::Common::Util
 
   FFXIVARR_POSITION3 getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rotation, float right, float up, float forward );
 
+  FFXIVARR_POSITION3 getKnockbackPosition( const FFXIVARR_POSITION3& origin, const FFXIVARR_POSITION3& pos, float distance );
+
   template < typename T >
   T clamp( T val, T minimum, T maximum )
   {

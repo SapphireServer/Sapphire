@@ -61,7 +61,6 @@ namespace Sapphire
           auto pIfrit = pEncounter->getBNpc( NPC_IFRIT );
 
           pIfrit->setRot( pIfrit->getRot() + .2f );
-          pIfrit->sendPositionUpdate();
 
           // todo: use gambits+timelines for this
           if( timeElapsedMs > 10000 )
@@ -100,7 +99,6 @@ namespace Sapphire
         auto pIfrit = pEncounter->getBNpc( NPC_IFRIT );
 
         pIfrit->setRot( pIfrit->getRot() - .2f );
-        pIfrit->sendPositionUpdate();
 
         // todo: use gambits+timelines for this
         if( timeElapsedMs > 5000 )

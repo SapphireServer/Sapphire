@@ -32,7 +32,6 @@ namespace Sapphire::Entity
 
   enum BNpcFlag
   {
-    None               = 0x00,
     Immobile           = 0x01,
     TurningDisabled    = 0x02,
     Invincible         = 0x04,

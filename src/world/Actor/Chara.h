@@ -13,6 +13,14 @@
 
 namespace Sapphire::Entity
 {
+  // todo: probably macro/template operators for enums
+  enum DirtyFlag : uint32_t
+  {
+    Position   = 0x01,
+    HpMpTp     = 0x02,
+    Status     = 0x04,
+    Appearance = 0x08
+  };
 
   /*!
   \class Chara
@@ -95,6 +103,8 @@ namespace Sapphire::Entity
 
     /*! Detour Crowd actor scale */
     float m_radius;
+
+    uint32_t m_dirtyFlag{};
 
   public:
     Chara( Common::ObjKind type );
@@ -195,6 +205,12 @@ namespace Sapphire::Entity
 
     bool isAlive() const;
 
+    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true ) override;
+
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+
+    virtual void setRot( float rot ) override;
+
     virtual uint32_t getMaxHp() const;
 
     virtual uint32_t getMaxMp() const;
@@ -265,6 +281,8 @@ namespace Sapphire::Entity
     float getRadius() const;
 
     Common::BaseParam getPrimaryStat() const;
+
+    void knockback( const Common::FFXIVARR_POSITION3& origin, float distance, bool ignoreNav = false );
 
   };
 

@@ -377,7 +377,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    sendPositionUpdate();
     pNaviProvider->updateAgentPosition( *this );
     return true;
   }
@@ -389,7 +388,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   else
     face( pos );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -415,7 +413,6 @@ bool BNpc::moveTo( const Chara& targetChara )
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
-    sendPositionUpdate();
     pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
     return true;
@@ -427,7 +424,6 @@ bool BNpc::moveTo( const Chara& targetChara )
   else
     face( targetChara.getPos() );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -659,6 +655,10 @@ void BNpc::onTick()
 void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
+
+  if( m_dirtyFlag & DirtyFlag::Position )
+    sendPositionUpdate();
+
   m_fsm->update( *this, tickCount );
 }
 

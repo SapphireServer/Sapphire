@@ -560,7 +560,7 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     Entity::GameObjectPtr pTarget = nullptr;
     auto inRange = player.getInRangeActors();
-    for( auto pChara : inRange )
+    for( auto& pChara : inRange )
     {
       if( pChara->getId() == targetId )
       {
@@ -581,6 +581,17 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
       actorMovePacket->data().pos[ 2 ] = Common::Util::floatToUInt16( z );
 
       server().queueForPlayer( player.getCharacterId(), actorMovePacket );
+    }
+  }
+  else if( subCommand == "knockback" )
+  {
+    float distance{ 0.f };
+    sscanf( params.c_str(), "%f", &distance );
+
+    for( auto& pActor : player.getInRangeActors() )
+    {
+      if( auto pBNpc = pActor->getAsBNpc(); pBNpc && Common::Util::distance( pBNpc->getPos(), player.getPos() ) <= distance )
+        pBNpc->knockback( player.getPos(), distance );
     }
   }
   else if( subCommand == "achvGeneral" )
