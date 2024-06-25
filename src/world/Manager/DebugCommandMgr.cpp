@@ -19,6 +19,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/CommonActorControl.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
@@ -83,6 +84,7 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
   registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
+  registerCommand( "cbt", &DebugCommandMgr::cbt, "Create, bind and teleport to an instance", 1 );
 }
 
 // clear all loaded commands
@@ -854,6 +856,7 @@ void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_pt
 
 void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -1113,6 +1116,14 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
 
     if( auto instance = pCurrentZone->getAsInstanceContent() )
       instance->setCurrentBGM( bgmId );
+  }
+  else if( subCommand == "dir_update" ) {
+    uint32_t dirType;
+    uint32_t param;
+    sscanf( params.c_str(), "%x %d", &dirType, &param );
+    if( auto instance = pCurrentZone->getAsInstanceContent() )
+      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::DirectorUpdate, instance->getDirectorId(),
+                                                 dirType, param ) );
   }
   else
   {
@@ -1439,6 +1450,58 @@ void DebugCommandMgr::contentFinder( char *data, Sapphire::Entity::Player &playe
     content->setState( QueuedContentState::MatchingComplete );
   }
 
+}
+
+void DebugCommandMgr::cbt( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+
+  uint32_t contentFinderConditionId;
+  sscanf( params.c_str(), "%d", &contentFinderConditionId );
+
+  auto instance = terriMgr.createInstanceContent( contentFinderConditionId );
+  if( instance )
+    PlayerMgr::sendDebug( player, "Created instance with id#{0} -> {1}", instance->getGuId(), instance->getName() );
+  else
+    return PlayerMgr::sendDebug( player, "Failed to create instance with id#{0}", contentFinderConditionId );
+
+
+  auto terri = terriMgr.getTerritoryByGuId( instance->getGuId() );
+  if( terri )
+  {
+    auto pInstanceContent = terri->getAsInstanceContent();
+    if( !pInstanceContent )
+    {
+      PlayerMgr::sendDebug( player, "Instance id#{} is not an InstanceContent territory.", pInstanceContent->getGuId() );
+      return;
+    }
+
+    pInstanceContent->bindPlayer( player.getId() );
+    PlayerMgr::sendDebug( player,
+      "Now bound to instance with id: " + std::to_string( pInstanceContent->getGuId() ) +
+      " -> " + pInstanceContent->getName() );
+
+    warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_INSTANCE_CONTENT, instance->getGuId(), { 0.f, 0.f, 0.f }, 0.f );
+  }
 }
 
 void DebugCommandMgr::easyWarp( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )

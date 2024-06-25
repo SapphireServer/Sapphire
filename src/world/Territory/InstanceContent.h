@@ -37,6 +37,7 @@ namespace Sapphire
       0x4000000E - INSTANCE_CONTENT_ORDER_SYSTEM_Unknown - no args - some timer set */
     enum DirectorEventId : uint32_t
     {
+      // 2.3
       DEBUG_TimeSync = 0xC0000001,
       DutyCommence = 0x40000001,
       DutyComplete = 0x40000002,
@@ -44,7 +45,7 @@ namespace Sapphire
       SetDutyTime = 0x40000004,
       LoadingScreen = 0x40000005,
       Forward = 0x40000006,
-      BattleGroundMusic = 0x40000007,
+      //BattleGroundMusic = 0x40000007,
       InvalidateTodoList = 0x40000008,
       VoteState = 0x40000009,
       VoteStart = 0x4000000A,
@@ -53,6 +54,14 @@ namespace Sapphire
       FirstTimeNotify = 0x4000000D,
       TreasureVoteRefresh = 0x4000000E,
       SetSharedGroupId = 0x4000000F,
+      // 3.3x onwards
+      Sync = 0x80000000,
+      BGM = 0x80000001,
+      SyncDutyTimer = 0x80000003,
+      // some vote stuff here
+      StartEventCutscene = 0x80000008,
+      EndEventCutscene = 0x80000009,
+      StartQTE = 0x8000000A
     };
 
     enum EventHandlerOrderId : uint32_t
