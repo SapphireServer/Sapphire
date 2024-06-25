@@ -2270,8 +2270,8 @@ namespace Sapphire::Network::Packets::Server
       uint16_t guardianDeity;
       uint32_t u5;
       uint32_t models[10];
+      uint8_t unknown[10];
       uint8_t look[26];
-      uint16_t padding3;
     } actors[2];
   };
 
