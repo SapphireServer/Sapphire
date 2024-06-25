@@ -19,6 +19,7 @@
 #include "Network/PacketWrappers/ServerNoticePacket.h"
 #include "Network/PacketWrappers/ActorControlPacket.h"
 #include "Network/PacketWrappers/ActorControlSelfPacket.h"
+#include "Network/CommonActorControl.h"
 #include "Network/PacketWrappers/MoveActorPacket.h"
 #include "Network/PacketWrappers/PlayerSetupPacket.h"
 #include "Network/PacketWrappers/PlayerSpawnPacket.h"
@@ -844,6 +845,7 @@ void DebugCommandMgr::script( char* data, Entity::Player& player, std::shared_pt
 
 void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
+  auto& server = Common::Service< World::WorldServer >::ref();
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -1103,6 +1105,14 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
 
     if( auto instance = pCurrentZone->getAsInstanceContent() )
       instance->setCurrentBGM( bgmId );
+  }
+  else if( subCommand == "dir_update" ) {
+    uint32_t dirType;
+    uint32_t param;
+    sscanf( params.c_str(), "%x %d", &dirType, &param );
+    if( auto instance = pCurrentZone->getAsInstanceContent() )
+      server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), Network::ActorControl::DirectorUpdate, instance->getDirectorId(),
+                                                 dirType, param ) );
   }
   else
   {

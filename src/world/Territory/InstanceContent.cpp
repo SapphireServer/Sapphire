@@ -661,7 +661,7 @@ void Sapphire::InstanceContent::setCurrentBGM( uint16_t bgmIndex )
     auto player = playerIt.second;
     server.queueForPlayer( player->getCharacterId(),
       makeActorControlSelf( player->getId(), DirectorUpdate, getDirectorId(),
-                            DirectorEventId::BattleGroundMusic, bgmIndex ) );
+                                                 DirectorEventId::BGM, bgmIndex ) );
   }
 }
 
@@ -669,7 +669,7 @@ void Sapphire::InstanceContent::setPlayerBGM( Sapphire::Entity::Player& player, 
 {
   auto& server = Common::Service< World::WorldServer >::ref();
   server.queueForPlayer( player.getCharacterId(), makeActorControlSelf( player.getId(), DirectorUpdate, getDirectorId(),
-                                                                           DirectorEventId::BattleGroundMusic, bgmId ) );
+                                                                        DirectorEventId::BGM, bgmId ) );
 }
 
 uint16_t Sapphire::InstanceContent::getCurrentBGM() const
