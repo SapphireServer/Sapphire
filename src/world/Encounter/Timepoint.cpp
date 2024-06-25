@@ -414,9 +414,9 @@ namespace Sapphire::Encounter
           auto pAction = pBNpc->getCurrentAction();
 
           // todo: this is probably wrong
-          if( !pAction )
+          if( !pAction || pAction->isInterrupted() )
           {
-            actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, 0 );
+            actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, pTeri->getNextActionResultId() );
           }
           // todo: this really shouldnt exist, but need to figure out why actions interrupt
           else if( pAction->getId() == pActionData->m_actionId )

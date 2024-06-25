@@ -1861,6 +1861,7 @@ namespace Sapphire::Common
     THREAT
   };
 
+  // todo: fill this out (Action.exd EffectType)
   enum CastType : uint8_t
   {
     SingleTarget = 1,

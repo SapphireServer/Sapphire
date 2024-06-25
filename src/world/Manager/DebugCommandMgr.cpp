@@ -559,8 +559,13 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
     Entity::GameObjectPtr pTarget = nullptr;
     auto inRange = player.getInRangeActors();
     for( auto pChara : inRange )
+    {
       if( pChara->getId() == targetId )
+      {
         pTarget = pChara;
+        break;
+      }
+    }
 
     if( pTarget )
     {
@@ -730,6 +735,11 @@ void DebugCommandMgr::nudge( char* data, Entity::Player& player, std::shared_ptr
     pos.y -= offset;
     PlayerMgr::sendServerNotice( player, "nudge: Placing down {0} yalms", offset );
 
+  }
+  else if( direction[ 0 ] == 'r' )
+  {
+    pos = Common::Util::getOffsettedPosition( pos, player.getRot(), offset, 0, 0 );
+    PlayerMgr::sendServerNotice( player, "nudge: Placing right {0} yalms", offset );
   }
   else
   {

@@ -29,7 +29,7 @@ namespace Sapphire::Common::Util
 
   uint8_t floatToUInt8Rot( float val );
 
-  FFXIVARR_POSITION3 getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rotation, float left, float up, float forward );
+  FFXIVARR_POSITION3 getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rotation, float right, float up, float forward );
 
   template < typename T >
   T clamp( T val, T minimum, T maximum )

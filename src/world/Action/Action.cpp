@@ -854,6 +854,7 @@ void Action::Action::addDefaultActorFilters()
 {
   switch( m_castType )
   {
+    // todo: figure these out and remove 5/RectangularAOE to own handler
     case( Common::CastType ) 5:
     case Common::CastType::RectangularAOE:
     case Common::CastType::SingleTarget:
