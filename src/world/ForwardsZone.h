@@ -29,6 +29,8 @@ TYPE_FORWARD( ItemContainer );
 TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
 TYPE_FORWARD( FreeCompany );
+TYPE_FORWARD( EncounterFight );
+TYPE_FORWARD( EncounterState );
 
 namespace World
 {

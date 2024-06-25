@@ -80,6 +80,39 @@ uint8_t Util::floatToUInt8Rot( float val )
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
 }
 
+FFXIVARR_POSITION3 Util::getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rot, float right, float up, float forward )
+{
+  FFXIVARR_POSITION3 ret{ pos };
+
+  // height
+  ret.y += up;
+
+  // forward
+  float angle = rot + ( PI / 2 );
+  ret.x -= forward * cos( angle );
+  ret.z += forward * sin( angle );
+
+  // side
+  ret.x -= right * cos( rot );
+  ret.z += right * sin( rot );
+
+  return ret;
+}
+
+FFXIVARR_POSITION3 Util::getKnockbackPosition( const FFXIVARR_POSITION3& origin, const FFXIVARR_POSITION3& pos, float distance )
+{
+  FFXIVARR_POSITION3 ret{ pos };
+
+  float from = Common::Util::calcAngFrom( origin.x, origin.z, pos.x, pos.z );
+  float angle = PI - from + ( PI / 2 );
+
+  angle = angle + ( PI / 2 );
+  ret.x -= distance * cos( angle );
+  ret.z += distance * sin( angle );
+
+  return ret;
+}
+
 FFXIVARR_POSITION3 Util::transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix )
 {
   FFXIVARR_POSITION3 dst{};

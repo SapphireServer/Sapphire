@@ -377,7 +377,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    sendPositionUpdate();
     pNaviProvider->updateAgentPosition( *this );
     return true;
   }
@@ -389,7 +388,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   else
     face( pos );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -415,7 +413,6 @@ bool BNpc::moveTo( const Chara& targetChara )
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
-    sendPositionUpdate();
     pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
     return true;
@@ -427,7 +424,6 @@ bool BNpc::moveTo( const Chara& targetChara )
   else
     face( targetChara.getPos() );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -440,6 +436,11 @@ void BNpc::sendPositionUpdate()
 
   auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
   server().queueForPlayers( getInRangePlayerIds(), movePacket );
+}
+
+const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const
+{
+  return m_hateList;
 }
 
 void BNpc::hateListClear()
@@ -654,6 +655,10 @@ void BNpc::onTick()
 void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
+
+  if( m_dirtyFlag & DirtyFlag::Position )
+    sendPositionUpdate();
+
   m_fsm->update( *this, tickCount );
 }
 
@@ -825,6 +830,16 @@ void BNpc::setFlag( uint32_t flag )
   m_flags |= flag;
 }
 
+void BNpc::removeFlag( uint32_t flag )
+{
+  m_flags &= ~flag;
+}
+
+void BNpc::clearFlags()
+{
+  m_flags = 0;
+}
+
 void BNpc::autoAttack( CharaPtr pTarget )
 {
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
@@ -914,15 +929,16 @@ void BNpc::init()
 
   m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
+  /*
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
-/*
+
   auto gambitPack = AI::make_GambitRuleSetPack();
   gambitPack->addRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   gambitPack->addRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 10000 );
   m_pGambitPack = gambitPack;
-*/
+
 
   auto gambitPack = AI::make_GambitTimeLinePack( -1 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 2 );
@@ -933,7 +949,7 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 81, 0 ), 12 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
-
+  */
   using namespace AI::Fsm;
   m_fsm = make_StateMachine();
   auto stateIdle = make_StateIdle();
@@ -965,7 +981,8 @@ void BNpc::init()
 void BNpc::processGambits( uint64_t tickCount )
 {
   m_tp = 1000;
-  m_pGambitPack->update( *this, tickCount );
+  if( m_pGambitPack )
+    m_pGambitPack->update( *this, tickCount );
 }
 
 uint32_t BNpc::getLastRoamTargetReachedTime() const

@@ -1861,6 +1861,7 @@ namespace Sapphire::Common
     THREAT
   };
 
+  // todo: fill this out (Action.exd EffectType)
   enum CastType : uint8_t
   {
     SingleTarget = 1,
@@ -1884,6 +1885,7 @@ namespace Sapphire::Common
 
   using PlayerStateFlagList = std::vector< PlayerCondition >;
 
+  // todo: load BNpcBase and other exd data into this struct
   struct BNPCInstanceObject
   {
     uint16_t territoryType;
