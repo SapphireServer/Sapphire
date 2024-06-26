@@ -249,6 +249,10 @@ namespace Sapphire::Entity
 
     virtual void update( uint64_t tickCount );
 
+    Common::FFXIVARR_POSITION3 getForwardVector() const;
+
+    bool isFacingTarget( const Chara& other, float threshold = 0.95f );
+
     World::Action::ActionPtr getCurrentAction() const;
 
     void setCurrentAction( World::Action::ActionPtr pAction );
