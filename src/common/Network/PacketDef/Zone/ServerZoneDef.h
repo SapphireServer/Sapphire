@@ -931,14 +931,14 @@ namespace Sapphire::Network::Packets::Server
     uint32_t unknown8;
     uint16_t festivalId;
     uint16_t additionalFestivalId;
-    uint32_t unknown9;
+    uint32_t unknown9[2];
     uint32_t unknown10;
     uint32_t unknown11;
     uint32_t unknown12[4];
     uint32_t unknown13[3];
     Common::FFXIVARR_POSITION3 pos;
     uint32_t unknown14[3];
-    uint32_t unknown15;
+    uint32_t unknown15[2];
   };
 
 
@@ -2270,8 +2270,8 @@ namespace Sapphire::Network::Packets::Server
       uint16_t guardianDeity;
       uint32_t u5;
       uint32_t models[10];
+      uint8_t unknown[10];
       uint8_t look[26];
-      uint16_t padding3;
     } actors[2];
   };
 
