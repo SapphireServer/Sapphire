@@ -813,6 +813,26 @@ float Chara::getModifier( Common::ParamModifier paramModifier ) const
   return result;
 }
 
+// Compute forward direction based on rotation angle (assuming rotation around Z axis)
+FFXIVARR_POSITION3 Chara::getForwardVector() const {
+  return Common::Util::normalize( FFXIVARR_POSITION3{ std::sin( getRot() ), 0, std::cos( getRot() ) } );
+}
+
+// Function to check if actor is facing target
+bool Chara::isFacingTarget( const Chara& other, float threshold )
+{
+  auto toActor = Common::Util::normalize( Common::Util::projectY( other.getPos() - getPos() ) );
+
+  auto forward = getForwardVector();
+  
+  float dot = Common::Util::dot( forward, toActor );
+  
+  // The threshold is used to determine how closely the actors need to be facing each other
+  // 1.0 means they need to be perfectly facing each other
+  // Lower values allow for some deviation
+  return dot >= threshold;
+}
+
 void Chara::onTick()
 {
   uint32_t thisTickDmg = 0;

@@ -65,6 +65,8 @@ namespace Sapphire::World::Manager
 
     void hotReload( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command );
 
+    void facing( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command );
+
   };
 
 }

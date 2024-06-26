@@ -80,6 +80,7 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
   registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
+  registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
 }
 
 // clear all loaded commands
@@ -1480,5 +1481,44 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
   else
   {
     PlayerMgr::sendDebug( player, "Unknown sub command." );
+  }
+}
+
+void DebugCommandMgr::facing( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  float threshold = 0.95f;
+  sscanf( params.c_str(), "%f", &threshold );
+
+  if( player.getTargetId() != 0 )
+  {
+    auto target = player.lookupTargetById( player.getTargetId() );
+
+    if( !target )
+      return;
+
+    if( auto bnpc = target->getAsBNpc() )
+    {
+      PlayerMgr::sendDebug( player, "Player facing target {0}: {1}", bnpc->getLayoutId(), player.isFacingTarget( *bnpc->getAsChara(), threshold ) );
+    }
   }
 }
