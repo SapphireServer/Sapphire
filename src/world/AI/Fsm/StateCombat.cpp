@@ -50,8 +50,9 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   pNaviProvider->syncPosToChara( bnpc );
 
-  if( distance < ( bnpc.getNaviTargetReachedDistance() + bnpc.getRadius() + pHatedActor->getRadius() ) )
+  if( distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
   {
+    // todo: dont turn if facing
     if( !bnpc.hasFlag( Entity::TurningDisabled ) )
       bnpc.face( pHatedActor->getPos() );
 

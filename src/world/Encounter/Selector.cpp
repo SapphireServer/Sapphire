@@ -34,7 +34,7 @@ namespace Sapphire::Encounter
     auto filtersJ = json.at( "filters" ).items();
     for( const auto& filterJ : filtersJ )
     {
-      auto filterV = filterJ.value();
+      auto& filterV = filterJ.value();
       auto name = filterV.at( "type" ).get< std::string >();
       auto typeId = filterMap.find( name )->second;
       auto negate = filterV.at( "negate" ).get< bool >();
@@ -115,14 +115,13 @@ namespace Sapphire::Encounter
         default:
           break;
       }
-      filters.push_back( pFilter );
+      m_filters.push_back( pFilter );
     }
-    m_snapshot = World::AI::Snapshot( filters );
   }
 
   void Selector::createSnapshot( Entity::CharaPtr pSrc, const std::vector< uint32_t >& exclude )
   {
-    m_snapshot.createSnapshot( pSrc, pSrc->getInRangeActors(), m_count, m_fillWithRandom, exclude );
+    m_snapshot.createSnapshot( pSrc, pSrc->getInRangeActors(), m_count, m_fillWithRandom, m_filters, exclude );
   }
 
   const World::AI::Snapshot::Results& Selector::getResults()

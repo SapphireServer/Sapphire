@@ -227,18 +227,16 @@ namespace Sapphire::World::AI
     using Results = std::vector< CharaEntry >;
     using TargetIds = std::vector< uint32_t >;
   private:
-    std::vector< TargetSelectFilterPtr > m_filters;
     std::vector< CharaEntry > m_results;
     std::vector< uint32_t > m_targetIds;
 
   public:
-    Snapshot( const std::vector< TargetSelectFilterPtr >& filters ) :
-      m_filters( filters )
-    {
-    }
+    Snapshot() {}
 
     void createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
-                         int count, bool fillWithRandom, const std::vector< uint32_t >& exclude = {} );
+                         uint32_t count, bool fillWithRandom,
+                         const std::vector< TargetSelectFilterPtr >& filters,
+                         const std::vector< uint32_t >& exclude = {} );
 
     // returns actors sorted by distance
     const std::vector< CharaEntry >& getResults() const;

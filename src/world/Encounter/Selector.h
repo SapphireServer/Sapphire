@@ -13,10 +13,11 @@ namespace Sapphire::Encounter
     std::string m_name;
     bool m_fillWithRandom{ true };
     uint32_t m_count{ 0 };
+    std::vector< World::AI::TargetSelectFilterPtr > m_filters;
     World::AI::Snapshot m_snapshot;
 
   public:
-    Selector() : m_snapshot( {} ){};
+    Selector(){}
     void createSnapshot( Entity::CharaPtr pSrc, const std::vector< uint32_t >& exclude = {} );
     const World::AI::Snapshot::Results& getResults();
     const World::AI::Snapshot::TargetIds& getTargetIds();

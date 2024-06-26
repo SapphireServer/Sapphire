@@ -39,8 +39,12 @@ float Util::distance2D( float x, float y, float x1, float y1 )
 
 float Util::calcAngTo( float x, float y, float x1, float y1 )
 {
-  float dx = x - x1;
-  float dy = y - y1;
+  float dx = x1 - x;
+  float dy = y1 - y;
+
+  if( dx == 0.0f && dy == 0.0f )
+    return 0.0f;
+
   if( dy != 0.0f )
   {
     return atan2( dy, dx );
@@ -55,6 +59,10 @@ float Util::calcAngFrom( float x, float y, float x1, float y1 )
 {
   float dx = x - x1;
   float dy = y - y1;
+
+  if( dx == 0.0f && dy == 0.0f )
+    return 0.0f;
+
   if( dy != 0.0f )
   {
     return atan2( dy, dx );

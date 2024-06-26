@@ -174,7 +174,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   }
 
   // todo: is this actually good?
-  m_naviTargetReachedDistance = m_radius * 2;
+  m_naviTargetReachedDistance = m_radius;
 
   calculateStats();
 
@@ -274,7 +274,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   auto modelChara = exdData.getRow< Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().ModelType );
+    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
       m_radius *= modelSkeleton->data().Radius;
   }

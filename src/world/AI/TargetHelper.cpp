@@ -159,7 +159,9 @@ namespace Sapphire::World::AI
   }
 
   void Snapshot::createSnapshot( Entity::CharaPtr pSrc, const std::set< Entity::GameObjectPtr >& inRange,
-                                 int count, bool fillWithRandom, const std::vector< uint32_t >& exclude )
+                                 uint32_t count, bool fillWithRandom,
+                                 const std::vector< TargetSelectFilterPtr >& filters,
+                                 const std::vector< uint32_t >& exclude )
   {
     m_results.clear();
     m_targetIds.clear();
@@ -179,7 +181,7 @@ namespace Sapphire::World::AI
         continue;
 
       bool matches = true;
-      for( const auto& filter : m_filters )
+      for( const auto& filter : filters )
       {
         if( !filter->isApplicable( pSrc, pChara ) )
         {
@@ -190,7 +192,7 @@ namespace Sapphire::World::AI
 
       if( matches )
       {
-        CharaEntry entry;
+        CharaEntry entry{};
         entry.m_entityId = pChara->getId();
         entry.m_pos = pChara->getPos();
         entry.m_rot = pChara->getRot();
@@ -226,7 +228,7 @@ namespace Sapphire::World::AI
         std::shuffle( remaining.begin(), remaining.end(), *RNGMgr.getRNGEngine() );
 
         auto pChara = remaining.back();
-        CharaEntry entry;
+        CharaEntry entry{};
         entry.m_entityId = pChara->getId();
         entry.m_pos = pChara->getPos();
         entry.m_rot = pChara->getRot();
@@ -236,7 +238,7 @@ namespace Sapphire::World::AI
     }
 
     // sort by distance at the end always
-    auto srcPos = pSrc->getPos();
+    const auto& srcPos = pSrc->getPos();
     std::sort( m_results.begin(), m_results.end(),
       [ srcPos ]( CharaEntry l, CharaEntry r )
       {
