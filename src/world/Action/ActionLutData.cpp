@@ -3,6 +3,7 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <Logging/Logger.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -138,6 +139,10 @@ bool ActionLutData::cacheActions()
       {
         auto id = std::stoi( i.key() );
         auto action = i.value().get< ActionEntry >();
+
+        if( ActionLut::m_actionLut.count( id ) > 0 )
+          throw std::runtime_error( fmt::format( "Action with ID {} cannot be defined more than once (defined again in {})", i.key(), p.path().string() ) );
+
         ActionLut::m_actionLut.try_emplace( id, action );
       }
 
