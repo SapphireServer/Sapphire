@@ -4,6 +4,7 @@
 #include <list>
 #include <map>
 #include <iostream>
+#include <cstdint>
 
 namespace Mysql
 {

@@ -1,6 +1,8 @@
 #ifndef __OODLE2NET_H__
 #define __OODLE2NET_H__
 
+#include <stdint.h>
+
 extern "C" intptr_t __stdcall OodleNetwork1_Shared_Size( int32_t htbits );
 
 extern "C" intptr_t __stdcall OodleNetwork1UDP_State_Size();

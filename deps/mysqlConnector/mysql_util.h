@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <iostream>
 #include <sstream>
+#include <cstdint>
 
 typedef struct st_mysql_field  MYSQL_FIELD;
 #ifndef UL64
