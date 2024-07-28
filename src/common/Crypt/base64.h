@@ -1,4 +1,5 @@
 #include <string>
+#include <cstdint>
 
 namespace Sapphire::Common::Util
 {

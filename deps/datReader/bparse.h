@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <vector>
+#include <cstdint>
 
 namespace xiv::utils::bparse
 {
