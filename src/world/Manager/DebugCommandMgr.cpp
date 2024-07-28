@@ -11,6 +11,7 @@
 #include <Database/DatabaseDef.h>
 #include <cmath>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Network/Util/PacketUtil.h>
 #include <Service.h>
 
 #include "DebugCommand/DebugCommand.h"
@@ -159,6 +160,7 @@ void DebugCommandMgr::help( char* data, Entity::Player& player, std::shared_ptr<
 void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< PlayerMgr >::ref();
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -233,7 +235,8 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    server.queueForPlayer( player.getCharacterId(), std::make_shared< PlayerSetupPacket >( player ) );
+    player.setIsLogin( true );
+    playerMgr.onMoveZone( player );
   }
   else if( subCommand == "classjob" )
   {
@@ -385,6 +388,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& playerMgr = Common::Service< PlayerMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   std::string subCommand;
@@ -524,6 +528,13 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     sscanf( params.c_str(), "%d", &id );
     player.setRewardFlag( static_cast< Common::UnlockEntry >( id ) );
+  }
+  else if( subCommand == "unlockall" )
+  {
+    player.fillRewardFlags();
+
+    player.setIsLogin( true );
+    playerMgr.onMoveZone( player );
   }
   else if( subCommand == "effect" )
   {
