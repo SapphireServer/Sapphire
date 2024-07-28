@@ -253,7 +253,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Kill:
     {
-      targetActor->getAsChara()->takeDamage( 9999999 );
+      targetActor->getAsChara()->takeDamage( 0xFFFFFFFF );
       PlayerMgr::sendServerNotice( player, "Killed {0}", targetActor->getId());
       break;
     }

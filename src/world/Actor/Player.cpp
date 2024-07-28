@@ -563,6 +563,11 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
   Network::Util::Packet::sendActorControlSelf( *this, getId(), SetRewardFlag, unlock, 1 );
 }
 
+void Player::fillRewardFlags()
+{
+  memset( m_unlocks.data(), 0xFF, m_unlocks.size() );
+}
+
 void Player::setBorrowAction( uint8_t slot, uint32_t action )
 {
   if( slot > Common::ARRSIZE_BORROWACTION )
@@ -1815,6 +1820,9 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
         takeDamage( damage );
       }
       Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetFallDamage, damage );
+      // todo: this used to work without refreshing the entire UI state
+      // does 3.x use some sort of fall integrity?
+      Network::Util::Packet::sendHudParam( *this );
     }
   }
 }
