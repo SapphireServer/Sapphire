@@ -441,6 +441,9 @@ namespace Sapphire::Entity
     /*! learn an action / update the unlock bitmask. */
     void setRewardFlag( Common::UnlockEntry unlockId );
 
+    /*! helper/debug function to fill unlock bitmask */
+    void fillRewardFlags();
+
     void setBorrowAction( uint8_t slot, uint32_t action );
 
     BorrowAction& getBorrowAction();
