@@ -9,14 +9,8 @@
 
 Sapphire::Common::Util::CrashHandler crashHandler;
 
-// fucking filesystem
-#if _MSC_VER >= 1925
 #include <filesystem>
 namespace filesys = std::filesystem;
-#else
-#include <experimental/filesystem>
-namespace filesys = std::experimental::filesystem;
-#endif
 
 #include <fstream>
 #include <streambuf>
