@@ -18,7 +18,24 @@ if( UNIX )
     "preferred path to MySQL (mysql_config)"
   )
 
-  find_program(MYSQL_CONFIG mysql_config
+  # use mariadb_config on Gentoo
+  find_program(LSB_RELEASE_EXEC lsb_release)
+  execute_process(COMMAND ${LSB_RELEASE_EXEC} -is
+    OUTPUT_VARIABLE LSB_RELEASE_ID_SHORT
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+
+  if( ${LSB_RELEASE_ID_SHORT} STREQUAL "Gentoo" )
+    set(MY_TMP "mariadb_config")
+  else()
+    set(MY_TMP "mysql_config")
+  endif()
+
+  set(MYSQL_CONFIG_EXECUTABLE_NAME ${MY_TMP} CACHE STRING
+    "mysql_config executable name"
+  )
+
+  find_program(MYSQL_CONFIG ${MYSQL_CONFIG_EXECUTABLE_NAME}
     ${MYSQL_CONFIG_PREFER_PATH}
     /usr/local/mysql/bin/
     /usr/local/bin/
