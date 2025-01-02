@@ -46,6 +46,8 @@ namespace Sapphire::World::Manager
 
     void onLevelChanged( Sapphire::Entity::Player& player, uint8_t level );
 
+    void onSongLearned( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId );
+
   //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

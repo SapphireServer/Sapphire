@@ -579,5 +579,11 @@ void PlayerMgr::onLevelChanged( Entity::Player& player, uint8_t level )
   Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
 }
 
+void PlayerMgr::onSongLearned( Entity::Player& player, uint8_t songId, uint32_t itemId )
+{
+  player.learnSong( songId, itemId );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId );
+}
+
 
 

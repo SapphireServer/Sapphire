@@ -115,6 +115,6 @@ void ItemAction::handleSongItem()
 {
   auto player = getSourceChara()->getAsPlayer();
 
-  player->learnSong( m_itemAction->data().Calcu0Arg[ 0 ], m_id );
+  playerMgr().onSongLearned( *player, m_itemAction->data().Calcu0Arg[ 0 ], m_id );
   player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), static_cast< uint8_t >( m_itemSourceSlot ) );
 }

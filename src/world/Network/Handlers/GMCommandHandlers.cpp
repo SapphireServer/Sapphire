@@ -328,7 +328,9 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         if( param2 == 0 )
         {
           for( uint8_t i = 0; i < 255; i++ )
-            targetPlayer->learnSong( i, 0 );
+          {
+            playerMgr().onSongLearned( *targetPlayer, i, 0 );
+          }
 
           PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName() );
         }
