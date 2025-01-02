@@ -923,7 +923,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
   }
   else if( subCommand == "return" || subCommand == "ret" )
   {
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
   }
   else if( subCommand == "stringendomode" || subCommand == "sm" )
   {
@@ -1165,7 +1165,7 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
   }
   else if( subCommand == "return" || subCommand == "ret" )
   {
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
   }
   else if( subCommand == "set" )
   {

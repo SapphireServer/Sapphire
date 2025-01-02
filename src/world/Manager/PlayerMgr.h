@@ -40,6 +40,8 @@ namespace Sapphire::World::Manager
 
     void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint8_t id );
 
+    void onExitInstance( Sapphire::Entity::Player& player );
+
   //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

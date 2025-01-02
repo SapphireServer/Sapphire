@@ -294,9 +294,6 @@ namespace Sapphire::Entity
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
 
-    /*! returns the player to their position before zoning into an instance */
-    bool exitInstance();
-
     /*! gets the players territoryTypeId */
     uint32_t getPrevTerritoryTypeId() const;
 

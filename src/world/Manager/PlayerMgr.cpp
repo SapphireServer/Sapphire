@@ -9,6 +9,7 @@
 #include <Manager/TerritoryMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/QuestMgr.h>
+#include <Manager/WarpMgr.h>
 
 #include <Script/ScriptMgr.h>
 #include <Common.h>
@@ -525,6 +526,18 @@ void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
 
   if( logChanged )
     Network::Util::Packet::sendHuntingLog( player );
+}
+
+void PlayerMgr::onExitInstance( Entity::Player& player )
+{
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+
+  player.resetHp();
+  player.resetMp();
+
+  warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_CONTENT_END_RETURN,
+                                player.getPrevTerritoryId(), player.getPrevPos(), player.getPrevRot() );
+
 }
 
 

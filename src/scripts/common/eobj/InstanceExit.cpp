@@ -26,7 +26,7 @@ public:
     eventMgr().playScene( player, eventId, 1, 0, [this, eobj]( Entity::Player& player, const Event::SceneResult& result )
     {
       if( result.getResult( 0 ) != 1 )
-        player.exitInstance();
+        playerMgr().onExitInstance( player );
     } );
   }
 };

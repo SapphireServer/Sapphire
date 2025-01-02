@@ -397,18 +397,6 @@ bool Player::isAutoattackOn() const
   return m_bAutoattack;
 }
 
-bool Player::exitInstance()
-{
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-
-  resetHp();
-  resetMp();
-
-  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, getPrevTerritoryId(), getPrevPos(), getPrevRot() );
-
-  return true;
-}
-
 uint32_t Player::getPlayTime() const
 {
   return m_playTime;
