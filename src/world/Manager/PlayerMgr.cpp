@@ -6,10 +6,12 @@
 #include <Util/Util.h>
 #include <Territory/Land.h>
 
+#include <Manager/AchievementMgr.h>
 #include <Manager/TerritoryMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/QuestMgr.h>
 #include <Manager/WarpMgr.h>
+#include <Manager/MapMgr.h>
 
 #include <Script/ScriptMgr.h>
 #include <Common.h>
@@ -368,9 +370,11 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 
     if( level + 1 >= Common::MAX_PLAYER_LEVEL )
       exp = 0;
+    else
+      onLevelChanged( player, level + 1 );
 
     player.setCurrentExp( exp );
-    player.levelUp();
+
   }
   else
     player.setCurrentExp( currentExp + exp );
@@ -538,6 +542,41 @@ void PlayerMgr::onExitInstance( Entity::Player& player )
   warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_CONTENT_END_RETURN,
                                 player.getPrevTerritoryId(), player.getPrevPos(), player.getPrevRot() );
 
+}
+
+void PlayerMgr::onClassJobChanged( Entity::Player& player, Common::ClassJob classJob )
+{
+  player.setClassJob( classJob );
+  if( player.getHp() > player.getMaxHp() )
+    player.setHp( player.getMaxHp() );
+
+  if( player.getMp() > player.getMaxMp() )
+    player.setMp( player.getMaxMp() );
+
+  player.setTp( 0 );
+
+  Network::Util::Packet::sendChangeClass( player );
+  Network::Util::Packet::sendStatusUpdate( player );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), ClassJobChange, 4 );
+  Network::Util::Packet::sendHudParam( player );
+  Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
+}
+
+void PlayerMgr::onLevelChanged( Entity::Player& player, uint8_t level )
+{
+  player.setLevel( level );
+  player.calculateStats();
+
+  player.setHp( player.getMaxHp() );
+  player.setMp( player.getMaxMp() );
+  Network::Util::Packet::sendBaseParams( player );
+  Network::Util::Packet::sendHudParam( player );
+  Network::Util::Packet::sendStatusUpdate( player );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ), player.getLevel(), player.getLevel() - 1 );
+
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+  Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
 }
 
 

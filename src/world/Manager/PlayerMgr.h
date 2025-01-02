@@ -42,6 +42,10 @@ namespace Sapphire::World::Manager
 
     void onExitInstance( Sapphire::Entity::Player& player );
 
+    void onClassJobChanged( Sapphire::Entity::Player& player, Common::ClassJob classJob );
+
+    void onLevelChanged( Sapphire::Entity::Player& player, uint8_t level );
+
   //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

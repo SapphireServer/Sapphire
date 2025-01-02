@@ -553,14 +553,6 @@ bool Player::hasMount( uint32_t mountId ) const
   return m_mountGuide[ index ] & value;
 }
 
-void Player::levelUp()
-{
-  m_hp = getMaxHp();
-  m_mp = getMaxMp();
-
-  setLevel( getLevel() + 1 );
-}
-
 uint8_t Player::getLevel() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
@@ -620,20 +612,6 @@ void Player::setInCombat( bool mode )
 void Player::setClassJob( Common::ClassJob classJob )
 {
   m_class = classJob;
-
-  if( getHp() > getMaxHp() )
-    m_hp = getMaxHp();
-
-  if( getMp() > getMaxMp() )
-    m_mp = getMaxMp();
-
-  m_tp = 0;
-
-  Network::Util::Packet::sendChangeClass( *this );
-  Network::Util::Packet::sendStatusUpdate( *this );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), ClassJobChange, 4 );
-  Network::Util::Packet::sendHudParam( *this );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevel( uint8_t level )
@@ -641,16 +619,6 @@ void Player::setLevel( uint8_t level )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_classArray[ classJobIndex ] = level;
-
-  calculateStats();
-  Network::Util::Packet::sendBaseParams( *this );
-  Network::Util::Packet::sendHudParam( *this );
-  Network::Util::Packet::sendStatusUpdate( *this );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
-
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )

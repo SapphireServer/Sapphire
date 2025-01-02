@@ -220,9 +220,6 @@ namespace Sapphire::Entity
     /*! sets the exp of the currently active class / job */
     void setCurrentExp( uint32_t amount );
 
-    /*! gain a level on the currently active class / job */
-    void levelUp();
-
     /*! set level on the currently active class / job to given level */
     void setLevel( uint8_t level );
 
