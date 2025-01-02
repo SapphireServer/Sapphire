@@ -553,44 +553,6 @@ bool Player::hasMount( uint32_t mountId ) const
   return m_mountGuide[ index ] & value;
 }
 
-void Player::gainExp( uint32_t amount )
-{
-  uint32_t currentExp = getCurrentExp();
-  uint16_t level = getLevel();
-  auto currentClass = static_cast< uint8_t >( getClass() );
-
-  if( level >= Common::MAX_PLAYER_LEVEL )
-  {
-    setCurrentExp( 0 );
-    if( currentExp != 0 )
-      Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, 0 );
-
-    return;
-  }
-
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
-  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
-
-  if( ( currentExp + amount ) >= neededExpToLevel )
-  {
-    // levelup
-    amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + amount - neededExpToLevel );
-
-    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
-      amount = 0;
-
-    setCurrentExp( amount );
-    levelUp();
-  }
-  else
-    setCurrentExp( currentExp + amount );
-
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), GainExpMsg, currentClass, amount );
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, getCurrentExp() );
-}
-
 void Player::levelUp()
 {
   m_hp = getMaxHp();
