@@ -3,7 +3,7 @@
 #include <Service.h>
 
 #include <Exd/ExdData.h>
-
+#include <Util/Util.h>
 #include <Territory/Land.h>
 
 #include <Manager/TerritoryMgr.h>
@@ -206,7 +206,7 @@ void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
   scriptMgr.onBNpcKill( player, bnpc );
 
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
-    player.updateHuntingLog( bnpc.getBNpcNameId() );
+    onUpdateHuntingLog( player, bnpc.getBNpcNameId() );
 }
 
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
@@ -341,6 +341,99 @@ void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) co
 
 }
 
+void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
+{
+  uint32_t currentExp = player.getCurrentExp();
+  uint16_t level = player.getLevel();
+  auto currentClass = static_cast< uint8_t >( player.getClass() );
+
+  if( level >= Common::MAX_PLAYER_LEVEL )
+  {
+    player.setCurrentExp( 0 );
+    if( currentExp != 0 )
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, 0 );
+
+    return;
+  }
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
+  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
+
+  if( ( currentExp + exp ) >= neededExpToLevel )
+  {
+    // levelup
+    exp = ( currentExp + exp - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + exp - neededExpToLevel );
+
+    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
+      exp = 0;
+
+    player.setCurrentExp( exp );
+    player.levelUp();
+  }
+  else
+    player.setCurrentExp( currentExp + exp );
+
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), GainExpMsg, currentClass, exp );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, player.getCurrentExp() );
+}
+
+void PlayerMgr::onDiscoverArea( Entity::Player& player, int16_t mapId, int16_t subId )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  int32_t offset;
+
+  auto info = exdData.getRow< Excel::Map >( mapId );
+  if( !info )
+  {
+    sendDebug( player, "discover(): Could not obtain map data for map_id == {0}", mapId );
+    return;
+  }
+
+  const auto& mapData = info->data();
+
+  if( mapData.IsUint16Discovery )
+    offset = 2 * mapData.DiscoveryIndex;
+  else
+    offset = 320 + 4 * mapData.DiscoveryIndex;
+
+  uint16_t index;
+  uint8_t value;
+  Common::Util::valueToFlagByteIndexValue( subId, value, index );
+
+  auto& discovery = player.getDiscoveryBitmask();
+
+  discovery[ offset + index ] |= value;
+
+  uint16_t level = player.getLevel();
+
+  uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
+  onGainExp( player, exp );
+
+  // gain 10x additional EXP if entire map is completed
+  uint32_t mask = mapData.DiscoveryFlag;
+  uint32_t discoveredAreas;
+  if( info->data().IsUint16Discovery )
+  {
+    discoveredAreas = ( discovery[ offset + 1 ] << 8 ) | discovery[ offset ];
+  }
+  else
+  {
+    discoveredAreas = ( discovery[ offset + 3 ] << 24 ) |
+                      ( discovery[ offset + 2 ] << 16 ) |
+                      ( discovery[ offset + 1 ] << 8  ) |
+                        discovery[ offset ];
+  }
+
+  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
+
+  if( allDiscovered )
+  {
+    onGainExp( player, exp * 10 );
+  }
+}
+
 
 ////////// Helper ///////////
 
@@ -364,3 +457,75 @@ void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint
 {
   Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }
+
+void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
+{
+  std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
+  const auto maxRank = 4;
+  auto& pExdData = Common::Service< Data::ExdData >::ref();
+
+  // make sure we get the matching base-class if a job is being used
+  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  if( !classJobInfo )
+    return;
+
+  auto currentClassId = classJobInfo->data().MainClass;
+
+  auto& logEntry = player.getHuntingLogEntry( currentClassId - 1 );
+
+  bool logChanged = false;
+
+
+  bool allSectionsComplete = true;
+  for( int i = 1; i <= 10; ++i )
+  {
+    bool sectionComplete = true;
+    bool sectionChanged = false;
+    auto monsterNoteId = static_cast< uint32_t >( classJobInfo->data().MainClass * 10000 + logEntry.rank * 10 + i );
+    auto note = pExdData.getRow< Excel::MonsterNote >( monsterNoteId );
+
+    // for classes that don't have entries, if the first fails the rest will fail
+    if( !note )
+      break;
+
+    for( auto x = 0; x < 4; ++x )
+    {
+      auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
+      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
+      {
+        logEntry.entries[ i - 1 ][ x ]++;
+        Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
+        logChanged = true;
+        sectionChanged = true;
+      }
+      if( logEntry.entries[ i - 1 ][ x ] != note->data().NeededKills[ x ] )
+        sectionComplete = false;
+    }
+    if( logChanged && sectionComplete && sectionChanged )
+    {
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 );
+      onGainExp( player, note->data().RewardExp );
+    }
+    if( !sectionComplete )
+    {
+      allSectionsComplete = false;
+    }
+  }
+  if( logChanged && allSectionsComplete )
+  {
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogRankFinish, 4 );
+    onGainExp( player, rankRewards[ logEntry.rank ] );
+    if( logEntry.rank < 4 )
+    {
+      logEntry.rank++;
+      memset( logEntry.entries, 0, 40 );
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
+    }
+  }
+
+  if( logChanged )
+    Network::Util::Packet::sendHuntingLog( player );
+}
+
+
+

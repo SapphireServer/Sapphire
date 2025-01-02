@@ -225,7 +225,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                targetPlayer->getTerritoryTypeId(),
                                static_cast< uint8_t >( targetPlayer->getClass() ),
                                targetPlayer->getLevel(),
-                               targetPlayer->getExp(),
+                                   targetPlayer->getCurrentExp(),
                                targetPlayer->getSearchMessage(),
                                targetPlayer->getPlayTime() );
       break;
@@ -307,7 +307,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Exp:
     {
-      targetPlayer->gainExp( param1 );
+      playerMgr().onGainExp( *targetPlayer, param1 );
       PlayerMgr::sendServerNotice( player, "{0} Exp was added to {1}", param1, targetPlayer->getName());
       break;
     }

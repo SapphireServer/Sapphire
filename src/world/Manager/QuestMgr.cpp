@@ -9,6 +9,8 @@
 
 #include "Network/GameConnection.h"
 
+#include <Manager/PlayerMgr.h>
+
 #include "QuestMgr.h"
 #include "AchievementMgr.h"
 
@@ -60,6 +62,7 @@ void QuestMgr::onRemoveQuest( Entity::Player &player, uint8_t questIndex )
 
 bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice )
 {
+  auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto questInfo = exdData.getRow< Excel::Quest >( static_cast< uint32_t >( Event::EventHandler::EventHandlerType::Quest ) << 16 | questId );
 
@@ -71,7 +74,9 @@ bool QuestMgr::giveQuestRewards( Entity::Player& player, uint16_t questId, uint3
 
   // TODO: check if there is room in inventory, else return false;
   if( exp > 0 )
-    player.gainExp( exp );
+  {
+    playerMgr.onGainExp( player, exp );
+  }
 
   for( uint32_t i = 0; i < 6; i++ )
   {

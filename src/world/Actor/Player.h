@@ -34,7 +34,7 @@ namespace Sapphire::Entity
     using AetheryteList = std::array< uint8_t, Common::ARRSIZE_AETHERYTES >;
     using UnlockList = std::array< uint8_t, Common::ARRSIZE_UNLOCKS >;
     using OrchestrionList = std::array< uint8_t, Common::ARRSIZE_ORCHESTRION >;
-    using Condition = std::array< uint8_t, 12 >;
+    using Condition = std::array< uint8_t, Common::ARRSIZE_CONDITION >;
 
     using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
     using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
@@ -215,10 +215,10 @@ namespace Sapphire::Entity
     bool isClassJobUnlocked( Common::ClassJob classJob ) const;
 
     /*! returns the exp of the currently active class / job */
-    uint32_t getExp() const;
+    uint32_t getCurrentExp() const;
 
     /*! sets the exp of the currently active class / job */
-    void setExp( uint32_t amount );
+    void setCurrentExp( uint32_t amount );
 
     /*! adds exp to the currently active class / job */
     void gainExp( uint32_t amount );
@@ -422,9 +422,6 @@ namespace Sapphire::Entity
 
     /*! get homepoint */
     uint8_t getHomepoint() const;
-
-    /*! discover subarea subid fo map map_id, also send udpate packet */
-    void discover( int16_t mapId, int16_t subId );
 
     /*! return a reference to the discovery bitmask array */
     Discovery& getDiscoveryBitmask();
@@ -780,8 +777,6 @@ namespace Sapphire::Entity
     using BlacklistIDVec = std::array< uint64_t, 200 >;
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
-
-    void updateHuntingLog( uint16_t id );
 
     uint64_t getPartyId() const;
     void setPartyId( uint64_t partyId );

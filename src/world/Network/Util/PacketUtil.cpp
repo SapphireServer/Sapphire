@@ -84,7 +84,7 @@ void Util::Packet::sendStatusUpdate( Entity::Player& player )
   playerStatusUpdate->data().Lv = player.getLevel();
   playerStatusUpdate->data().Lv1 = player.getLevel();
   playerStatusUpdate->data().LvSync = 0; //player.getLevelSync();
-  playerStatusUpdate->data().Exp = player.getExp();
+  playerStatusUpdate->data().Exp = player.getCurrentExp();
 
   server().queueForPlayer( player.getCharacterId(), playerStatusUpdate );
 }

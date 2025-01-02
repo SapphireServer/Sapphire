@@ -34,6 +34,12 @@ namespace Sapphire::World::Manager
 
     void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
 
+    void onGainExp( Sapphire::Entity::Player& player, uint32_t exp );
+
+    void onDiscoverArea( Sapphire::Entity::Player& player, int16_t mapId, int16_t subId );
+
+    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint8_t id );
+
   //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

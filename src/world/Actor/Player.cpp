@@ -474,60 +474,6 @@ Player::Discovery& Player::getDiscoveryBitmask()
   return m_discovery;
 }
 
-void Player::discover( int16_t mapId, int16_t subId )
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  int32_t offset;
-
-  auto info = exdData.getRow< Excel::Map >( mapId );
-  if( !info )
-  {
-    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", mapId );
-    return;
-  }
-
-  const auto& mapData = info->data();
-
-  if( mapData.IsUint16Discovery )
-    offset = 2 * mapData.DiscoveryIndex;
-  else
-    offset = 320 + 4 * mapData.DiscoveryIndex;
-
-  uint16_t index;
-  uint8_t value;
-  Util::valueToFlagByteIndexValue( subId, value, index );
-
-  m_discovery[ offset + index ] |= value;
-
-  uint16_t level = getLevel();
-
-  uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
-  gainExp( exp );
-
-  // gain 10x additional EXP if entire map is completed
-  uint32_t mask = mapData.DiscoveryFlag;
-  uint32_t discoveredAreas;
-  if( info->data().IsUint16Discovery )
-  {
-    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) | m_discovery[ offset ];
-  }
-  else
-  {
-    discoveredAreas = ( m_discovery[ offset + 3 ] << 24 ) |
-                      ( m_discovery[ offset + 2 ] << 16 ) |
-                      ( m_discovery[ offset + 1 ] << 8  ) |
-                        m_discovery[ offset ];
-  }
-
-  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
-
-  if( allDiscovered )
-  {
-    gainExp( exp * 10 );
-  }
-}
-
 bool Player::isNewAdventurer() const
 {
   return m_bNewAdventurer;
@@ -621,13 +567,13 @@ bool Player::hasMount( uint32_t mountId ) const
 
 void Player::gainExp( uint32_t amount )
 {
-  uint32_t currentExp = getExp();
+  uint32_t currentExp = getCurrentExp();
   uint16_t level = getLevel();
   auto currentClass = static_cast< uint8_t >( getClass() );
 
   if( level >= Common::MAX_PLAYER_LEVEL )
   {
-    setExp( 0 );
+    setCurrentExp( 0 );
     if( currentExp != 0 )
       Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, 0 );
 
@@ -647,14 +593,14 @@ void Player::gainExp( uint32_t amount )
     if( level + 1 >= Common::MAX_PLAYER_LEVEL )
       amount = 0;
 
-    setExp( amount );
+    setCurrentExp( amount );
     levelUp();
   }
   else
-    setExp( currentExp + amount );
+    setCurrentExp( currentExp + amount );
 
   Network::Util::Packet::sendActorControlSelf( *this, getId(), GainExpMsg, currentClass, amount );
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, getExp() );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, getCurrentExp() );
 }
 
 void Player::levelUp()
@@ -696,14 +642,14 @@ bool Player::isClassJobUnlocked( Common::ClassJob classJob ) const
   return getLevelForClass( classJob ) != 0;
 }
 
-uint32_t Player::getExp() const
+uint32_t Player::getCurrentExp() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   return m_expArray[ classJobIndex ];
 }
 
-void Player::setExp( uint32_t amount )
+void Player::setCurrentExp( uint32_t amount )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
@@ -1589,75 +1535,6 @@ Sapphire::Common::HuntingLogEntry& Player::getHuntingLogEntry( uint8_t index )
 {
   assert( index < m_huntingLogEntries.size() );
   return m_huntingLogEntries[ index ];
-}
-
-void Player::updateHuntingLog( uint16_t id )
-{
-  std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
-  const auto maxRank = 4;
-  auto& pExdData = Common::Service< Data::ExdData >::ref();
-
-  // make sure we get the matching base-class if a job is being used
-  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) );
-  if( !classJobInfo )
-    return;
-
-  auto currentClassId = classJobInfo->data().MainClass;
-
-  auto& logEntry = m_huntingLogEntries[ currentClassId - 1 ];
-
-  bool logChanged = false;
-
-
-  bool allSectionsComplete = true;
-  for( int i = 1; i <= 10; ++i )
-  {
-    bool sectionComplete = true;
-    bool sectionChanged = false;
-    auto monsterNoteId = static_cast< uint32_t >( classJobInfo->data().MainClass * 10000 + logEntry.rank * 10 + i );
-    auto note = pExdData.getRow< Excel::MonsterNote >( monsterNoteId );
-
-    // for classes that don't have entries, if the first fails the rest will fail
-    if( !note )
-      break;
-
-    for( auto x = 0; x < 4; ++x )
-    {
-      auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
-      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
-      {
-        logEntry.entries[ i - 1 ][ x ]++;
-        Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
-        logChanged = true;
-        sectionChanged = true;
-      }
-      if( logEntry.entries[ i - 1 ][ x ] != note->data().NeededKills[ x ] )
-        sectionComplete = false;
-    }
-    if( logChanged && sectionComplete && sectionChanged )
-    {
-      Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 );
-      gainExp( note->data().RewardExp );
-    }
-    if( !sectionComplete )
-    {
-      allSectionsComplete = false;
-    }
-  }
-  if( logChanged && allSectionsComplete )
-  {
-    Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogRankFinish, 4 );
-    gainExp( rankRewards[ logEntry.rank ] );
-    if( logEntry.rank < 4 )
-    {
-      logEntry.rank++;
-      memset( logEntry.entries, 0, 40 );
-      Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
-    }
-  }
-
-  if( logChanged )
-    Network::Util::Packet::sendHuntingLog( *this );
 }
 
 void Player::setActiveLand( uint8_t land, uint8_t ward )

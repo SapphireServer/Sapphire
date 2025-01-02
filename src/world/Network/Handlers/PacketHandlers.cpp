@@ -318,7 +318,7 @@ void Sapphire::Network::GameConnection::newDiscoveryHandler( const Packets::FFXI
   discoveryPacket->data().mapId = tInfo->data().Map;
   discoveryPacket->data().mapPartId = pRefInfo->data.discoveryIndex;
   server().queueForPlayer( player.getCharacterId(), discoveryPacket );
-  player.discover( tInfo->data().Map, pRefInfo->data.discoveryIndex );
+  playerMgr().onDiscoverArea( player, tInfo->data().Map, pRefInfo->data.discoveryIndex );
 
 }
 
