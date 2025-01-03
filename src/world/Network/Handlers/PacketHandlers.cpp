@@ -243,6 +243,7 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
   if( !player.hasInRangeActor() )
     return;
 
+  // todo: probably move this into a builder and send the packet on Player::update if( m_dirtyFlags & DirtyFlag::Position )
   //auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unknownRotation );
   auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, data.flag, data.flag2, animationSpeed, unknownRotation );
   server().queueForPlayers( player.getInRangePlayerIds(), movePacket );

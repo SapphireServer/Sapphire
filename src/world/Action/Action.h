@@ -30,6 +30,9 @@ namespace Sapphire::World::Action
     void setPos( const Common::FFXIVARR_POSITION3& pos );
     const Common::FFXIVARR_POSITION3& getPos() const;
 
+    void setRot( float rot );
+    float getRot() const;
+
     void setTargetId( uint64_t targetId );
     uint64_t getTargetId() const;
     Entity::CharaPtr getSourceChara() const;
@@ -220,6 +223,7 @@ namespace Sapphire::World::Action
     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos{};
+    float m_rot{};
 
     ActionResultBuilderPtr m_actionResultBuilder;
 

@@ -2,6 +2,7 @@
 
 namespace Sapphire::Common
 {
+  // todo: get rid of this struct and use an actual vector 3 class
   struct FFXIVARR_POSITION3
   {
     float x;
@@ -18,6 +19,7 @@ namespace Sapphire::Common
     float z;
     float reserve;
     inline bool operator == ( const Vector3& target ) const;
+    inline bool operator == ( const FFXIVARR_POSITION3& target ) const;
     Vector3 operator - ( const Vector3& target ) const;
   };
 

@@ -375,7 +375,7 @@ namespace Sapphire::ScriptAPI
   };
 
   /*!
-  * @brief The base class for any scripts that implement behaviour related to instance content zones
+  * @brief The base class for any scripts that implement behaviour related to quest battles
   */
   class QuestBattleScript : public ScriptObject
   {
@@ -405,7 +405,6 @@ namespace Sapphire::ScriptAPI
       return Common::Service< World::Manager::PlayerMgr >::ref();
     }
   };
-
 }
 
 #endif

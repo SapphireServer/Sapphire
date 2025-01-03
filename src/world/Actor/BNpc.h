@@ -18,6 +18,7 @@ namespace Sapphire::Entity
     uint32_t m_hateAmount;
     CharaPtr m_pChara;
   };
+  using HateListEntryPtr = std::shared_ptr< HateListEntry >;
 
   enum class BNpcState
   {
@@ -31,13 +32,16 @@ namespace Sapphire::Entity
 
   enum BNpcFlag
   {
-    None = 0,
-    Immobile = 1,
-    TurningDisabled = 2,
-    Invincible = 4,
-    InvincibleRefill = 8,
-    NoDeaggro = 16,
-    Untargetable = 32,
+    Immobile           = 0x01,
+    TurningDisabled    = 0x02,
+    Invincible         = 0x04,
+    StayAlive          = 0x08,
+    NoDeaggro          = 0x10,
+    Untargetable       = 0x20,
+    AutoAttackDisabled = 0x40,
+    Invisible          = 0x80,
+
+    Intermission       = 0x77 // for transition phases to ensure boss only moves/acts when scripted
   };
 
   const std::array< uint32_t, 50 > BnpcBaseHp =
@@ -103,6 +107,7 @@ namespace Sapphire::Entity
     BNpcState getState() const;
     void setState( BNpcState state );
 
+    const std::set< std::shared_ptr< HateListEntry > >& getHateList() const;
     void hateListClear();
     uint32_t hateListGetValue( const Sapphire::Entity::CharaPtr& pChara );
     uint32_t hateListGetHighestValue();
@@ -112,7 +117,7 @@ namespace Sapphire::Entity
     void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );
-
+    
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );
 
@@ -140,6 +145,8 @@ namespace Sapphire::Entity
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
+    void removeFlag( uint32_t flag );
+    void clearFlags();
 
     void calculateStats() override;
 

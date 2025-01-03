@@ -48,19 +48,20 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     bnpc.moveTo( *pHatedActor );
   }
 
-  if( pNaviProvider->syncPosToChara( bnpc ) )
-    bnpc.sendPositionUpdate();
+  pNaviProvider->syncPosToChara( bnpc );
 
   if( distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
   {
-    if( !bnpc.hasFlag( Entity::TurningDisabled ) && bnpc.face( pHatedActor->getPos() ) )
-      bnpc.sendPositionUpdate();
+    // todo: dont turn if facing
+    if( !bnpc.hasFlag( Entity::TurningDisabled ) )
+      bnpc.face( pHatedActor->getPos() );
 
     if( !bnpc.checkAction() )
       bnpc.processGambits( tickCount );
 
     // in combat range. ATTACK!
-    bnpc.autoAttack( pHatedActor );
+    if( !bnpc.hasFlag( Entity::BNpcFlag::AutoAttackDisabled ) )
+      bnpc.autoAttack( pHatedActor );
   }
 
 }

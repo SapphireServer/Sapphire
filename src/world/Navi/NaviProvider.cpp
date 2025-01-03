@@ -355,6 +355,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
     //               iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
+    // todo: adjust these for the actor radius
     const float STEP_SIZE = 0.5f;
     const float SLOP = 0.15f;
 

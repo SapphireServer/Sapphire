@@ -765,6 +765,18 @@ Entity::EventObjectPtr Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
+{
+  if( auto it = m_playerMap.find( playerId ); it != m_playerMap.end() )
+    return it->second;
+  return nullptr;
+}
+
+const std::unordered_map< uint32_t, Entity::PlayerPtr >& Territory::getPlayers()
+{
+  return m_playerMap;
+}
+
 InstanceContentPtr Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );
@@ -883,6 +895,8 @@ bool Territory::loadBNpcs()
   stmt->setUInt( 1, getTerritoryTypeId() );
   auto res = db.query( stmt );
 
+  // todo: load any exd links, cache them, build more info and setup bnpcs properly
+
   while( res->next() )
   {
     auto bnpc = std::make_shared< Common::BNPCInstanceObject >();
@@ -958,4 +972,14 @@ void Territory::onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint
 const Common::TerritoryIdent& Territory::getTerritoryIdent() const
 {
   return m_ident;
+}
+
+void Territory::setEncounterTimeline( const std::string& name )
+{
+  m_timelinePack = Encounter::EncounterTimeline::getEncounterPack( name, true );
+}
+
+Encounter::TimelinePack& Territory::getEncounterTimeline()
+{
+  return m_timelinePack;
 }
