@@ -302,18 +302,18 @@ namespace Excel
     uint16_t LimitBreakAction[3];
     uint16_t PvpLimitBreakAction[3];
     uint8_t Kind;
-    uint8_t UIPriority;
     uint8_t Unknown6;
+    uint8_t JobIndex;
     uint8_t MainClass;
     uint8_t Role;
     uint8_t Town;
-    int8_t MonsterNote;
+    int8_t UIPriority;
     int8_t StartingLevel;
     uint8_t PartyBuff;
     int8_t WorkIndex;
     int8_t BattleClassIndex;
     int8_t CraftingClassIndex;
-    int8_t Unknown7;
+    int8_t MonsterNote;
   };
 
   /* 63507 */

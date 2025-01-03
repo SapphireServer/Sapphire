@@ -1597,9 +1597,11 @@ void Player::updateHuntingLog( uint16_t id )
   if( !classJobInfo )
     return;
 
-  auto currentClassId = classJobInfo->data().MainClass;
+  auto currentClassId = classJobInfo->data().MonsterNote;
+  if( currentClassId == -1 || currentClassId == 127 )
+    return;
 
-  auto& logEntry = m_huntingLogEntries[ currentClassId - 1 ];
+  auto& logEntry = m_huntingLogEntries[ currentClassId ];
 
   bool logChanged = false;
 
