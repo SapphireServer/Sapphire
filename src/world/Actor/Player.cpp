@@ -397,18 +397,6 @@ bool Player::isAutoattackOn() const
   return m_bAutoattack;
 }
 
-bool Player::exitInstance()
-{
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-
-  resetHp();
-  resetMp();
-
-  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, getPrevTerritoryId(), getPrevPos(), getPrevRot() );
-
-  return true;
-}
-
 uint32_t Player::getPlayTime() const
 {
   return m_playTime;
@@ -474,60 +462,6 @@ Player::Discovery& Player::getDiscoveryBitmask()
   return m_discovery;
 }
 
-void Player::discover( int16_t mapId, int16_t subId )
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  int32_t offset;
-
-  auto info = exdData.getRow< Excel::Map >( mapId );
-  if( !info )
-  {
-    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", mapId );
-    return;
-  }
-
-  const auto& mapData = info->data();
-
-  if( mapData.IsUint16Discovery )
-    offset = 2 * mapData.DiscoveryIndex;
-  else
-    offset = 320 + 4 * mapData.DiscoveryIndex;
-
-  uint16_t index;
-  uint8_t value;
-  Util::valueToFlagByteIndexValue( subId, value, index );
-
-  m_discovery[ offset + index ] |= value;
-
-  uint16_t level = getLevel();
-
-  uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
-  gainExp( exp );
-
-  // gain 10x additional EXP if entire map is completed
-  uint32_t mask = mapData.DiscoveryFlag;
-  uint32_t discoveredAreas;
-  if( info->data().IsUint16Discovery )
-  {
-    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) | m_discovery[ offset ];
-  }
-  else
-  {
-    discoveredAreas = ( m_discovery[ offset + 3 ] << 24 ) |
-                      ( m_discovery[ offset + 2 ] << 16 ) |
-                      ( m_discovery[ offset + 1 ] << 8  ) |
-                        m_discovery[ offset ];
-  }
-
-  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
-
-  if( allDiscovered )
-  {
-    gainExp( exp * 10 );
-  }
-}
-
 bool Player::isNewAdventurer() const
 {
   return m_bNewAdventurer;
@@ -563,6 +497,11 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
   Network::Util::Packet::sendActorControlSelf( *this, getId(), SetRewardFlag, unlock, 1 );
 }
 
+void Player::fillRewardFlags()
+{
+  memset( m_unlocks.data(), 0xFF, m_unlocks.size() );
+}
+
 void Player::setBorrowAction( uint8_t slot, uint32_t action )
 {
   if( slot > Common::ARRSIZE_BORROWACTION )
@@ -586,8 +525,6 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
   Util::valueToFlagByteIndexValue( songId, value, index );
 
   m_orchestrion[ index ] |= value;
-
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), ToggleOrchestrionUnlock, songId, 1, itemId );
 }
 
 bool Player::hasReward( Common::UnlockEntry unlockId ) const
@@ -612,52 +549,6 @@ bool Player::hasMount( uint32_t mountId ) const
   Util::valueToFlagByteIndexValue( mount->data().MountOrder, value, index );
 
   return m_mountGuide[ index ] & value;
-}
-
-void Player::gainExp( uint32_t amount )
-{
-  uint32_t currentExp = getExp();
-  uint16_t level = getLevel();
-  auto currentClass = static_cast< uint8_t >( getClass() );
-
-  if( level >= Common::MAX_PLAYER_LEVEL )
-  {
-    setExp( 0 );
-    if( currentExp != 0 )
-      Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, 0 );
-
-    return;
-  }
-
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
-  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
-
-  if( ( currentExp + amount ) >= neededExpToLevel )
-  {
-    // levelup
-    amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + amount - neededExpToLevel );
-
-    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
-      amount = 0;
-
-    setExp( amount );
-    levelUp();
-  }
-  else
-    setExp( currentExp + amount );
-
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), GainExpMsg, currentClass, amount );
-  Network::Util::Packet::sendActorControlSelf( *this, getId(), UpdateUiExp, currentClass, getExp() );
-}
-
-void Player::levelUp()
-{
-  m_hp = getMaxHp();
-  m_mp = getMaxMp();
-
-  setLevel( getLevel() + 1 );
 }
 
 uint8_t Player::getLevel() const
@@ -691,14 +582,14 @@ bool Player::isClassJobUnlocked( Common::ClassJob classJob ) const
   return getLevelForClass( classJob ) != 0;
 }
 
-uint32_t Player::getExp() const
+uint32_t Player::getCurrentExp() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   return m_expArray[ classJobIndex ];
 }
 
-void Player::setExp( uint32_t amount )
+void Player::setCurrentExp( uint32_t amount )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
@@ -719,20 +610,6 @@ void Player::setInCombat( bool mode )
 void Player::setClassJob( Common::ClassJob classJob )
 {
   m_class = classJob;
-
-  if( getHp() > getMaxHp() )
-    m_hp = getMaxHp();
-
-  if( getMp() > getMaxMp() )
-    m_mp = getMaxMp();
-
-  m_tp = 0;
-
-  Network::Util::Packet::sendChangeClass( *this );
-  Network::Util::Packet::sendStatusUpdate( *this );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), ClassJobChange, 4 );
-  Network::Util::Packet::sendHudParam( *this );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevel( uint8_t level )
@@ -740,16 +617,6 @@ void Player::setLevel( uint8_t level )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_classArray[ classJobIndex ] = level;
-
-  calculateStats();
-  Network::Util::Packet::sendBaseParams( *this );
-  Network::Util::Packet::sendHudParam( *this );
-  Network::Util::Packet::sendStatusUpdate( *this );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
-
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
@@ -1586,77 +1453,6 @@ Sapphire::Common::HuntingLogEntry& Player::getHuntingLogEntry( uint8_t index )
   return m_huntingLogEntries[ index ];
 }
 
-void Player::updateHuntingLog( uint16_t id )
-{
-  std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
-  const auto maxRank = 4;
-  auto& pExdData = Common::Service< Data::ExdData >::ref();
-
-  // make sure we get the matching base-class if a job is being used
-  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) );
-  if( !classJobInfo )
-    return;
-
-  auto currentClassId = classJobInfo->data().MonsterNote;
-  if( currentClassId == -1 || currentClassId == 127 )
-    return;
-
-  auto& logEntry = m_huntingLogEntries[ currentClassId ];
-
-  bool logChanged = false;
-
-
-  bool allSectionsComplete = true;
-  for( int i = 1; i <= 10; ++i )
-  {
-    bool sectionComplete = true;
-    bool sectionChanged = false;
-    auto monsterNoteId = static_cast< uint32_t >( classJobInfo->data().MainClass * 10000 + logEntry.rank * 10 + i );
-    auto note = pExdData.getRow< Excel::MonsterNote >( monsterNoteId );
-
-    // for classes that don't have entries, if the first fails the rest will fail
-    if( !note )
-      break;
-
-    for( auto x = 0; x < 4; ++x )
-    {
-      auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
-      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
-      {
-        logEntry.entries[ i - 1 ][ x ]++;
-        Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
-        logChanged = true;
-        sectionChanged = true;
-      }
-      if( logEntry.entries[ i - 1 ][ x ] != note->data().NeededKills[ x ] )
-        sectionComplete = false;
-    }
-    if( logChanged && sectionComplete && sectionChanged )
-    {
-      Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 );
-      gainExp( note->data().RewardExp );
-    }
-    if( !sectionComplete )
-    {
-      allSectionsComplete = false;
-    }
-  }
-  if( logChanged && allSectionsComplete )
-  {
-    Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogRankFinish, 4 );
-    gainExp( rankRewards[ logEntry.rank ] );
-    if( logEntry.rank < 4 )
-    {
-      logEntry.rank++;
-      memset( logEntry.entries, 0, 40 );
-      Network::Util::Packet::sendActorControlSelf( *this, getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
-    }
-  }
-
-  if( logChanged )
-    Network::Util::Packet::sendHuntingLog( *this );
-}
-
 void Player::setActiveLand( uint8_t land, uint8_t ward )
 {
   m_activeLand.plot = land;
@@ -1817,6 +1613,9 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
         takeDamage( damage );
       }
       Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetFallDamage, damage );
+      // todo: this used to work without refreshing the entire UI state
+      // does 3.x use some sort of fall integrity?
+      Network::Util::Packet::sendHudParam( *this );
     }
   }
 }

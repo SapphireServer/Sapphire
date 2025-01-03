@@ -184,3 +184,23 @@ float Util::trunc( float value, uint8_t digitsToRemain )
 
   return std::floor( value * factor ) / factor;
 }
+
+float Util::length( const FFXIVARR_POSITION3& vec ) {
+  return std::sqrt( vec.x * vec.x + vec.y * vec.y + vec.z * vec.z );
+}
+
+FFXIVARR_POSITION3 Util::normalize( const FFXIVARR_POSITION3& vec ) {
+  float len = length( vec );
+  if( len == 0 ) return FFXIVARR_POSITION3();
+  return FFXIVARR_POSITION3{ vec.x / len, vec.y / len, vec.z / len };
+}
+
+float Util::dot( const FFXIVARR_POSITION3& vec1, const FFXIVARR_POSITION3& vec2 )
+{
+  return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+}
+
+FFXIVARR_POSITION3 Util::projectY( const FFXIVARR_POSITION3& vec )
+{
+  return FFXIVARR_POSITION3{ vec.x, 0, vec.z };
+}

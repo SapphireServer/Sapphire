@@ -34,7 +34,7 @@ namespace Sapphire::Entity
     using AetheryteList = std::array< uint8_t, Common::ARRSIZE_AETHERYTES >;
     using UnlockList = std::array< uint8_t, Common::ARRSIZE_UNLOCKS >;
     using OrchestrionList = std::array< uint8_t, Common::ARRSIZE_ORCHESTRION >;
-    using Condition = std::array< uint8_t, 12 >;
+    using Condition = std::array< uint8_t, Common::ARRSIZE_CONDITION >;
 
     using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
     using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
@@ -215,16 +215,10 @@ namespace Sapphire::Entity
     bool isClassJobUnlocked( Common::ClassJob classJob ) const;
 
     /*! returns the exp of the currently active class / job */
-    uint32_t getExp() const;
+    uint32_t getCurrentExp() const;
 
     /*! sets the exp of the currently active class / job */
-    void setExp( uint32_t amount );
-
-    /*! adds exp to the currently active class / job */
-    void gainExp( uint32_t amount );
-
-    /*! gain a level on the currently active class / job */
-    void levelUp();
+    void setCurrentExp( uint32_t amount );
 
     /*! set level on the currently active class / job to given level */
     void setLevel( uint8_t level );
@@ -293,9 +287,6 @@ namespace Sapphire::Entity
 
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
-
-    /*! returns the player to their position before zoning into an instance */
-    bool exitInstance();
 
     /*! gets the players territoryTypeId */
     uint32_t getPrevTerritoryTypeId() const;
@@ -423,9 +414,6 @@ namespace Sapphire::Entity
     /*! get homepoint */
     uint8_t getHomepoint() const;
 
-    /*! discover subarea subid fo map map_id, also send udpate packet */
-    void discover( int16_t mapId, int16_t subId );
-
     /*! return a reference to the discovery bitmask array */
     Discovery& getDiscoveryBitmask();
 
@@ -440,6 +428,9 @@ namespace Sapphire::Entity
 
     /*! learn an action / update the unlock bitmask. */
     void setRewardFlag( Common::UnlockEntry unlockId );
+
+    /*! helper/debug function to fill unlock bitmask */
+    void fillRewardFlags();
 
     void setBorrowAction( uint8_t slot, uint32_t action );
 
@@ -777,8 +768,6 @@ namespace Sapphire::Entity
     using BlacklistIDVec = std::array< uint64_t, 200 >;
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
-
-    void updateHuntingLog( uint16_t id );
 
     uint64_t getPartyId() const;
     void setPartyId( uint64_t partyId );

@@ -104,7 +104,7 @@ void Sapphire::InstanceContent::onPlayerZoneIn( Entity::Player& player )
   if( isTerminationReady() ) // wtf
   {
     Logger::warn( "Entity#{0} Appear for a terminated instance!", player.getId() );
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
     return;
   }
 
@@ -281,7 +281,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
             return;
 
           auto player = it->second;
-          player->exitInstance();
+          playerMgr().onExitInstance( *player );
           return;
         }
       }
@@ -316,7 +316,7 @@ void Sapphire::InstanceContent::onEventHandlerOrder( Entity::Player& player, uin
         {
           case 0: // Leave content
           {
-            player.exitInstance();
+            playerMgr().onExitInstance( player );
             break;
           }
           case 1: // Force leave ( afk timer )
@@ -578,7 +578,7 @@ void Sapphire::InstanceContent::onBeforePlayerZoneIn( Sapphire::Entity::Player& 
 {
   // remove any players from the instance who aren't bound on zone in
   if( !isPlayerBound( player.getId() ) )
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
 
   // if a player has already spawned once inside this instance, don't move them if they happen to zone in again
   if( !hasPlayerPreviouslySpawned( player ) )
@@ -713,7 +713,7 @@ void Sapphire::InstanceContent::unbindPlayer( uint32_t playerId )
 
   auto it = m_playerMap.find( playerId );
   if( it != m_playerMap.end() )
-    it->second->exitInstance();
+    playerMgr().onExitInstance( *it->second );
 }
 
 void Sapphire::InstanceContent::clearDirector( Entity::Player& player )

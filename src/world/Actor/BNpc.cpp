@@ -712,7 +712,7 @@ void BNpc::onDeath()
     if( pPlayer )
     {
       playerMgr.onMobKill( *pPlayer, *this );
-      pPlayer->gainExp( paramGrowthInfo->data().BaseExp );
+      playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }
   }
 

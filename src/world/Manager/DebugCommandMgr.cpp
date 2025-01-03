@@ -11,6 +11,7 @@
 #include <Database/DatabaseDef.h>
 #include <cmath>
 #include <Network/PacketWrappers/EffectPacket.h>
+#include <Network/Util/PacketUtil.h>
 #include <Service.h>
 
 #include "DebugCommand/DebugCommand.h"
@@ -84,6 +85,7 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
   registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
+  registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
   registerCommand( "cbt", &DebugCommandMgr::cbt, "Create, bind and teleport to an instance", 1 );
 }
 
@@ -163,6 +165,7 @@ void DebugCommandMgr::help( char* data, Entity::Player& player, std::shared_ptr<
 void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& server = Sapphire::Common::Service< Sapphire::World::WorldServer >::ref();
+  auto& playerMgr = Common::Service< PlayerMgr >::ref();
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
@@ -237,7 +240,8 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
   else if( subCommand == "discovery_reset" )
   {
     player.resetDiscovery();
-    server.queueForPlayer( player.getCharacterId(), std::make_shared< PlayerSetupPacket >( player ) );
+    player.setIsLogin( true );
+    playerMgr.onMoveZone( player );
   }
   else if( subCommand == "classjob" )
   {
@@ -248,10 +252,9 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     if( player.getLevelForClass( static_cast< Common::ClassJob > ( id ) ) == 0 )
     {
       player.setLevelForClass( 1, static_cast< Common::ClassJob > ( id ) );
-      player.setClassJob( static_cast< Common::ClassJob > ( id ) );
     }
-    else
-      player.setClassJob( static_cast< Common::ClassJob > ( id ) );
+
+    playerMgr.onClassJobChanged( player, static_cast< Common::ClassJob > ( id ) );
   }
   else if( subCommand == "cfpenalty" )
   {
@@ -389,6 +392,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
 void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< DebugCommand > command )
 {
   auto& terriMgr = Common::Service< TerritoryMgr >::ref();
+  auto& playerMgr = Common::Service< PlayerMgr >::ref();
   auto pCurrentZone = terriMgr.getTerritoryByGuId( player.getTerritoryId() );
 
   std::string subCommand;
@@ -528,6 +532,13 @@ void DebugCommandMgr::add( char* data, Entity::Player& player, std::shared_ptr< 
 
     sscanf( params.c_str(), "%d", &id );
     player.setRewardFlag( static_cast< Common::UnlockEntry >( id ) );
+  }
+  else if( subCommand == "unlockall" )
+  {
+    player.fillRewardFlags();
+
+    player.setIsLogin( true );
+    playerMgr.onMoveZone( player );
   }
   else if( subCommand == "effect" )
   {
@@ -969,7 +980,7 @@ void DebugCommandMgr::instance( char* data, Entity::Player& player, std::shared_
   }
   else if( subCommand == "return" || subCommand == "ret" )
   {
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
   }
   else if( subCommand == "stringendomode" || subCommand == "sm" )
   {
@@ -1219,7 +1230,7 @@ void DebugCommandMgr::questBattle( char* data, Entity::Player& player, std::shar
   }
   else if( subCommand == "return" || subCommand == "ret" )
   {
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
   }
   else if( subCommand == "set" )
   {
@@ -1598,5 +1609,44 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
   else
   {
     PlayerMgr::sendDebug( player, "Unknown sub command." );
+  }
+}
+
+void DebugCommandMgr::facing( char* data, Sapphire::Entity::Player& player, std::shared_ptr< DebugCommand > command )
+{
+  std::string subCommand;
+  std::string params = "";
+
+  // check if the command has parameters
+  std::string tmpCommand = std::string( data + command->getName().length() + 1 );
+
+  std::size_t pos = tmpCommand.find_first_of( ' ' );
+
+  if( pos != std::string::npos )
+    // command has parameters, grab the first part
+    subCommand = tmpCommand.substr( 0, pos );
+  else
+    // no subcommand given
+    subCommand = tmpCommand;
+
+  if( command->getName().length() + 1 + pos + 1 < strlen( data ) )
+    params = std::string( data + command->getName().length() + 1 + pos + 1 );
+
+  Logger::debug( "[{0}] subCommand: {1} params: {2}", player.getId(), subCommand, params );
+
+  float threshold = 0.95f;
+  sscanf( params.c_str(), "%f", &threshold );
+
+  if( player.getTargetId() != 0 )
+  {
+    auto target = player.lookupTargetById( player.getTargetId() );
+
+    if( !target )
+      return;
+
+    if( auto bnpc = target->getAsBNpc() )
+    {
+      PlayerMgr::sendDebug( player, "Player facing target {0}: {1}", bnpc->getLayoutId(), player.isFacingTarget( *bnpc->getAsChara(), threshold ) );
+    }
   }
 }

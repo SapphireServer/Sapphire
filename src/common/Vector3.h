@@ -9,6 +9,7 @@ namespace Sapphire::Common
     float y;
     float z;
     inline bool operator == ( const FFXIVARR_POSITION3& target ) const;
+    FFXIVARR_POSITION3 operator - ( const FFXIVARR_POSITION3& target ) const;
   };
 
   struct Vector3
@@ -16,8 +17,10 @@ namespace Sapphire::Common
     float x;
     float y;
     float z;
+    float reserve;
     inline bool operator == ( const Vector3& target ) const;
     inline bool operator == ( const FFXIVARR_POSITION3& target ) const;
+    Vector3 operator - ( const Vector3& target ) const;
   };
 
   struct Matrix33

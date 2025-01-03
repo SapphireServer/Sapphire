@@ -34,6 +34,20 @@ namespace Sapphire::World::Manager
 
     void onUpdate( Sapphire::Entity::Player& player, uint64_t tickCount );
 
+    void onGainExp( Sapphire::Entity::Player& player, uint32_t exp );
+
+    void onDiscoverArea( Sapphire::Entity::Player& player, int16_t mapId, int16_t subId );
+
+    void onUpdateHuntingLog( Sapphire::Entity::Player& player, uint8_t id );
+
+    void onExitInstance( Sapphire::Entity::Player& player );
+
+    void onClassJobChanged( Sapphire::Entity::Player& player, Common::ClassJob classJob );
+
+    void onLevelChanged( Sapphire::Entity::Player& player, uint8_t level );
+
+    void onSongLearned( Sapphire::Entity::Player& player, uint8_t songId, uint32_t itemId );
+
   //////////// Helpers
 
     static void sendServerNotice( Sapphire::Entity::Player& player, const std::string& message );

@@ -57,13 +57,20 @@ Sapphire::StatusEffect::StatusEffect::StatusEffect( uint32_t id, Entity::CharaPt
   Util::eraseAll( m_name, ')' );
 
   m_flag |= entry->data().Category;
-  m_flag |= static_cast< uint32_t >( entry->data().Forever ) << static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
-  m_flag |= static_cast< uint32_t >( entry->data().CanOff ) << static_cast< uint32_t >( Common::StatusEffectFlag::CanStatusOff );
-  m_flag |= static_cast< uint32_t >( entry->data().NotAction ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockActions );
-  m_flag |= static_cast< uint32_t >( entry->data().NotControl ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockControl );
-  m_flag |= static_cast< uint32_t >( entry->data().NotMove ) << static_cast< uint32_t >( Common::StatusEffectFlag::LockMovement );
-  m_flag |= static_cast< uint32_t >( entry->data().NotLookAt ) << static_cast< uint32_t >( Common::StatusEffectFlag::IsGaze );
-  m_flag |= static_cast< uint32_t >( entry->data().FcAction ) << static_cast< uint32_t >( Common::StatusEffectFlag::FcBuff );
+  if( entry->data().Forever )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+  if( entry->data().CanOff )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::CanStatusOff );
+  if( entry->data().NotAction )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::LockActions );
+  if( entry->data().NotControl )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::LockControl );
+  if( entry->data().NotMove )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::LockMovement );
+  if( entry->data().NotLookAt )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::IsGaze );
+  if( entry->data().FcAction )
+    m_flag |= static_cast< uint32_t >( Common::StatusEffectFlag::FcBuff );
 }
 
 
