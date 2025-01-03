@@ -11,14 +11,8 @@
 using namespace Sapphire;
 using namespace Sapphire::Common;
 
-// fucking filesystem
-#if _MSC_VER >= 1925
 #include <filesystem>
 namespace fs = std::filesystem;
-#else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
 
 
 DbManager::DbManager( const std::string& host, const std::string& database, const std::string& user, const std::string& pw, uint16_t port ) :

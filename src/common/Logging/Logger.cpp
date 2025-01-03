@@ -8,13 +8,8 @@
 #include <spdlog/sinks/daily_file_sink.h>
 
 // #include <iostream>
-#if _MSC_VER >= 1925
 #include <filesystem>
 namespace fs = std::filesystem;
-#else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
 
 
 void Sapphire::Logger::init( const std::string& logPath )

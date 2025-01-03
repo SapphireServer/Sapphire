@@ -48,6 +48,14 @@ namespace Sapphire::Common::Util
   FFXIVARR_POSITION3 transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix );
 
   float eulerToDirection( const FFXIVARR_POSITION3& euler );
+
+  float length( const FFXIVARR_POSITION3& vec );
+
+  FFXIVARR_POSITION3 normalize( const FFXIVARR_POSITION3& vec );
+  
+  float dot( const FFXIVARR_POSITION3& vec1, const FFXIVARR_POSITION3& vec2 );
+
+  FFXIVARR_POSITION3 projectY( const FFXIVARR_POSITION3& vec );
 }
 
 #endif

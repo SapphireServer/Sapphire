@@ -493,7 +493,7 @@ void Player::updateDbClass() const
 
   //Exp = ?, Lvl = ?, BorrowAction = ? WHERE CharacterId = ? AND ClassIdx = ?
   auto stmtS = db.getPreparedStatement( Db::CHARA_CLASS_UP );
-  stmtS->setInt( 1, getExp() );
+  stmtS->setInt( 1, getCurrentExp() );
   stmtS->setInt( 2, getLevel() );
 
   std::vector< uint8_t > borrowActionVec( borrowAction.size() * 4 );

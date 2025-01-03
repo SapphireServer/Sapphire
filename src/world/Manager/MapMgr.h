@@ -11,6 +11,8 @@
 namespace Sapphire::World::Manager
 {
   using QuestMap = std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< Excel::Quest > > >;
+  using EObjDataCache = std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< Excel::EObj > > >;
+  using ENpcDataCache = std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< Excel::ENpcBase > > >;
 
   class MapMgr
   {
@@ -64,8 +66,11 @@ namespace Sapphire::World::Manager
     };
 
     using EventSet = std::multiset< EventData, less >;
+    
 
-    QuestMap m_quests;
+    QuestMap m_questCacheMap;
+    ENpcDataCache m_eNpcCacheMap;
+    EObjDataCache m_eObjCacheMap;
 
     void insertQuest( Entity::Player& player, uint32_t questId, uint32_t layoutId, EventSet& mapData );
 

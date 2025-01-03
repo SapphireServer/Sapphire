@@ -171,6 +171,7 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
         break;
     }
 
+    m_actorResultsMap.clear();
     return actionResult;
   }
   else  // use Effect for single target

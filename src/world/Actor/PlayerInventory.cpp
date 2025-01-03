@@ -118,7 +118,7 @@ void Player::equipWeapon( const Item& item )
 
   if( ( isClassJobUnlocked( newClassJob ) ) && ( currentParentClass != newClassJob ) )
   {
-    setClassJob( newClassJob );
+    playerMgr().onClassJobChanged( *this, newClassJob );
   }
 }
 
@@ -131,7 +131,7 @@ void Player::equipSoulCrystal( const Item& item )
   auto newClassJob = static_cast< ClassJob >( itemClassJob );
 
   if( isClassJobUnlocked( newClassJob ) )
-    setClassJob( newClassJob );
+    playerMgr().onClassJobChanged( *this, newClassJob );
 }
 
 void Player::updateModels( GearSetSlot equipSlotId, const Sapphire::Item& item )
@@ -263,7 +263,7 @@ void Player::unequipSoulCrystal()
 
   auto currentClassJob = exdData.getRow< Excel::ClassJob >( static_cast< uint32_t >( getClass() ) );
   auto parentClass = static_cast< ClassJob >( currentClassJob->data().MainClass );
-  setClassJob( parentClass );
+  playerMgr().onClassJobChanged( *this, parentClass );
 }
 
 uint32_t Player::currencyTypeToItem( Common::CurrencyType type ) const
