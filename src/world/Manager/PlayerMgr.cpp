@@ -481,12 +481,13 @@ void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
   if( !classJobInfo )
     return;
 
-  auto currentClassId = classJobInfo->data().MainClass;
+  auto currentClassId = classJobInfo->data().MonsterNote;
+  if( currentClassId == -1 || currentClassId == 127 )
+    return;
 
-  auto& logEntry = player.getHuntingLogEntry( currentClassId - 1 );
+  auto& logEntry = player.getHuntingLogEntry( currentClassId );
 
   bool logChanged = false;
-
 
   bool allSectionsComplete = true;
   for( int i = 1; i <= 10; ++i )
