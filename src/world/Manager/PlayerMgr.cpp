@@ -461,7 +461,6 @@ void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint
   Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }
 
-<<<<<<< HEAD
 void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId,
                                 uint32_t kind, uint32_t nameId, uint32_t talkerId,
                                 uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4,
@@ -470,7 +469,7 @@ void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battl
   Network::Util::Packet::sendBattleTalk( player, battleTalkId, handlerId, kind, nameId, talkerId,
                                          param1, param2, param3, param4, param5, param6, param7, param8 );
 }
-=======
+
 void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
 {
   std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
@@ -595,4 +594,3 @@ void PlayerMgr::onSongLearned( Entity::Player& player, uint8_t songId, uint32_t 
 
 
 
->>>>>>> 952391ae4f19e29cadc39df2eee97ed15e6067d3

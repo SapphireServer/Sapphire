@@ -7,17 +7,6 @@ inline bool FFXIVARR_POSITION3::operator == ( const FFXIVARR_POSITION3& target )
   return x == target.x && y == target.y && z == target.z;
 }
 
-<<<<<<< HEAD
-inline bool Vector3::operator == ( const Vector3& target ) const
-{
-  return x == target.x && y == target.y && z == target.z;
-}
-
-inline bool Vector3::operator == ( const FFXIVARR_POSITION3& target ) const
-{
-  return x == target.x && y == target.y && z == target.z;
-}
-=======
 FFXIVARR_POSITION3 FFXIVARR_POSITION3::operator - ( const FFXIVARR_POSITION3& target ) const
 {
   return FFXIVARR_POSITION3{ x - target.x, y - target.y, z - target.z };
@@ -32,4 +21,3 @@ Vector3 Vector3::operator - ( const Vector3& target ) const
 {
   return Vector3{ x - target.x, y - target.y, z - target.z };
 }
->>>>>>> 952391ae4f19e29cadc39df2eee97ed15e6067d3

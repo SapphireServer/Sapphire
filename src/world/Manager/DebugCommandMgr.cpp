@@ -85,11 +85,8 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "cf", &DebugCommandMgr::contentFinder, "Content-Finder", 1 );
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
   registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
-<<<<<<< HEAD
-  registerCommand( "cbt", &DebugCommandMgr::cbt, "Create, bind and teleport to an instance", 1 );
-=======
   registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
->>>>>>> 952391ae4f19e29cadc39df2eee97ed15e6067d3
+  registerCommand( "cbt", &DebugCommandMgr::cbt, "Create, bind and teleport to an instance", 1 );
 }
 
 // clear all loaded commands
