@@ -346,6 +346,8 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
 {
   uint32_t currentExp = player.getCurrentExp();
   uint16_t level = player.getLevel();
+  uint32_t expGained = exp;
+
   auto currentClass = static_cast< uint8_t >( player.getClass() );
 
   if( level >= Common::MAX_PLAYER_LEVEL )
@@ -377,7 +379,7 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
   else
     player.setCurrentExp( currentExp + exp );
 
-  Network::Util::Packet::sendActorControlSelf( player, player.getId(), GainExpMsg, currentClass, exp );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), GainExpMsg, currentClass, expGained );
   Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, player.getCurrentExp() );
 }
 

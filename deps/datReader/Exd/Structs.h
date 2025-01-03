@@ -391,10 +391,10 @@ namespace Excel
     uint8_t EffectWidth;
     uint8_t CostType;
     uint8_t Cond;
-    uint8_t Element;
-    uint8_t ProcStatus;
-    uint8_t ClassJobCategory;
     uint8_t RecastGroup;
+    uint8_t ProcStatus;
+    uint8_t Unknown1; // todo: possibly cost type? tp etc?
+    uint8_t ClassJobCategory; // recastgroup
     uint8_t Init;
     uint8_t Omen;
     uint8_t Learn;
