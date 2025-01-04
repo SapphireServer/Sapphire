@@ -115,7 +115,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_enemyType = bNpcBaseData->data().Battalion;
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 || m_enemyType == 0 )
-    setFlag( Immobile );
+    setFlag( NoRoam | Immobile );
 
   m_class = ClassJob::Gladiator;
 
@@ -215,7 +215,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_territoryId = zone.getGuId();
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
-    setFlag( Immobile );
+    setFlag( Immobile | NoRoam );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -434,8 +434,12 @@ void BNpc::sendPositionUpdate()
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
 
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
-  server().queueForPlayers( getInRangePlayerIds(), movePacket );
+  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z )
+  {
+    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
+    server().queueForPlayers( getInRangePlayerIds(), movePacket );
+  }
+  m_lastPos = m_pos;
 }
 
 const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const
@@ -656,8 +660,9 @@ void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
 
-  if( m_dirtyFlag & DirtyFlag::Position )
-    sendPositionUpdate();
+  // removed check for now, replaced by position check to last position
+  //if( m_dirtyFlag & DirtyFlag::Position )
+  sendPositionUpdate();
 
   m_fsm->update( *this, tickCount );
 }
@@ -950,12 +955,17 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
   */
+  initFsm();
+}
+
+void BNpc::initFsm()
+{
   using namespace AI::Fsm;
   m_fsm = make_StateMachine();
   auto stateIdle = make_StateIdle();
   auto stateCombat = make_StateCombat();
   auto stateDead = make_StateDead();
-  if( !hasFlag( Immobile ) )
+  if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
   {
     auto stateRoam = make_StateRoam();
     stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );

@@ -421,10 +421,10 @@ namespace Sapphire::Encounter
           // todo: this really shouldnt exist, but need to figure out why actions interrupt
           else if( pAction->getId() == pActionData->m_actionId )
           {
-            pAction->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
-            pAction->interrupt();
-            pBNpc->setCurrentAction( nullptr );
-            return false;
+       //     pAction->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
+       //     pAction->interrupt();
+       //     pBNpc->setCurrentAction( nullptr );
+       //     return false;
           }
           else
           {

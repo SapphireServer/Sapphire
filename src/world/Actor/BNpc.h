@@ -32,14 +32,15 @@ namespace Sapphire::Entity
 
   enum BNpcFlag
   {
-    Immobile           = 0x01,
-    TurningDisabled    = 0x02,
-    Invincible         = 0x04,
-    StayAlive          = 0x08,
-    NoDeaggro          = 0x10,
-    Untargetable       = 0x20,
-    AutoAttackDisabled = 0x40,
-    Invisible          = 0x80,
+    Immobile           = 0x001,
+    TurningDisabled    = 0x002,
+    Invincible         = 0x004,
+    StayAlive          = 0x008,
+    NoDeaggro          = 0x010,
+    Untargetable       = 0x020,
+    AutoAttackDisabled = 0x040,
+    Invisible          = 0x080,
+    NoRoam             = 0x100,
 
     Intermission       = 0x77 // for transition phases to ensure boss only moves/acts when scripted
   };
@@ -170,6 +171,7 @@ namespace Sapphire::Entity
 
     const Common::FFXIVARR_POSITION3& getRoamTargetPos() const;
     const Common::FFXIVARR_POSITION3& getSpawnPos() const;
+    void initFsm();
 
   private:
     uint32_t m_bNpcBaseId;
@@ -203,6 +205,7 @@ namespace Sapphire::Entity
 
     Common::FFXIVARR_POSITION3 m_spawnPos;
     Common::FFXIVARR_POSITION3 m_roamPos;
+    Common::FFXIVARR_POSITION3 m_lastPos;
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;
@@ -216,6 +219,7 @@ namespace Sapphire::Entity
     World::AI::GambitPackPtr m_pGambitPack;
 
     std::shared_ptr< World::AI::Fsm::StateMachine > m_fsm;
+
 
   };
 

@@ -16,6 +16,8 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
 
+  bool hasQueuedAction = bnpc.checkAction();
+
   auto pHatedActor = bnpc.hateListGetHighest();
   if( !pHatedActor )
     return;
@@ -56,7 +58,7 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     if( !bnpc.hasFlag( Entity::TurningDisabled ) )
       bnpc.face( pHatedActor->getPos() );
 
-    if( !bnpc.checkAction() )
+    if( !hasQueuedAction )
       bnpc.processGambits( tickCount );
 
     // in combat range. ATTACK!

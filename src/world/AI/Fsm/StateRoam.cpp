@@ -15,6 +15,12 @@ void AI::Fsm::StateRoam::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
 
+  if( bnpc.hasFlag( Entity::NoRoam ) )
+  {
+    bnpc.setRoamTargetReached( true );
+    return;
+  }
+
   if( pNaviProvider )
     pNaviProvider->setMoveTarget( bnpc, bnpc.getRoamTargetPos() );
 
