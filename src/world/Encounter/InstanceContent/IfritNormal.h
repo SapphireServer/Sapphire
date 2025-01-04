@@ -38,7 +38,7 @@ namespace Sapphire
 
       m_status = EncounterFightStatus::ACTIVE;
     }
-    
+
     void reset() override
     {
       if( auto boss = m_pInstance->getActiveBNpcByLayoutId( NPC_IFRIT ); boss )
@@ -54,38 +54,34 @@ namespace Sapphire
     EncounterStatePtr makeIfritPhaseOneState()
     {
       auto ifritInitState = std::make_shared< EncounterState >( shared_from_this() );
-      ifritInitState->setOnUpdateCallback( [ & ]( EncounterFightPtr pEncounter, EncounterState state )
+      ifritInitState->setOnUpdateCallback( [ & ]( EncounterFightPtr pEncounter, EncounterState state ) {
+        auto timeElapsedMs = state.getElapsedTime();
+
+        auto pIfrit = pEncounter->getBNpc( NPC_IFRIT );
+
+        pIfrit->setRot( pIfrit->getRot() + .2f );
+
+        // todo: use gambits+timelines for this
+        if( timeElapsedMs > 10000 )
         {
-          auto timeElapsedMs = state.getElapsedTime();
-
-          auto pIfrit = pEncounter->getBNpc( NPC_IFRIT );
-
-          pIfrit->setRot( pIfrit->getRot() + .2f );
-
-          // todo: use gambits+timelines for this
-          if( timeElapsedMs > 10000 )
-          {
-            state.setFinishFlag();
-            return;
-          }
-
-          // todo: use gambits+timelines for this
-          if( timeElapsedMs > 5000 )
-          {
-            auto ifritTwoState = makeIfritPhaseTwoState();
-            pEncounter->addState( ifritTwoState );
-          }
+          state.setFinishFlag();
+          return;
         }
-      );
 
-      ifritInitState->setOnFinishCallback( [ & ]( EncounterFightPtr pEncounter, EncounterState state )
+        // todo: use gambits+timelines for this
+        if( timeElapsedMs > 5000 )
         {
-          Logger::info( "stage 1 finish - enrage" );
-
-          auto pIfrit = pEncounter->getBNpc( NPC_IFRIT );
-          pIfrit->hateListGetHighest()->die();
+          auto ifritTwoState = makeIfritPhaseTwoState();
+          pEncounter->addState( ifritTwoState );
         }
-      );
+      } );
+
+      ifritInitState->setOnFinishCallback( [ & ]( EncounterFightPtr pEncounter, EncounterState state ) {
+        Logger::info( "stage 1 finish - enrage" );
+
+        auto pIfrit = pEncounter->getBNpc( NPC_IFRIT );
+        pIfrit->hateListGetHighest()->die();
+      } );
 
       return ifritInitState;
     }
@@ -123,7 +119,7 @@ namespace Sapphire
         start();
       }
 
-      if( m_status == EncounterFightStatus::ACTIVE && ifrit && (!ifrit->hateListGetHighest() || !ifrit->hateListGetHighest()->isAlive() ) )
+      if( m_status == EncounterFightStatus::ACTIVE && ifrit && ( !ifrit->hateListGetHighest() || !ifrit->hateListGetHighest()->isAlive() ) )
       {
         m_status = EncounterFightStatus::FAIL;
       }
@@ -145,4 +141,4 @@ namespace Sapphire
       //*/
     }
   };
-}
+}// namespace Sapphire
