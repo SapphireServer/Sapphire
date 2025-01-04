@@ -22,12 +22,9 @@ namespace Sapphire::World::Manager
 
     bool cacheActionLut();
 
-    void handleItemManipulationAction( Entity::Player& player, uint32_t actionId, Excel::ExcelStructPtr< Excel::Action > actionData, uint16_t sequence );
-
-    void handleTargetedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, uint64_t targetId, uint16_t requestId );
-    void handlePlacedPlayerAction( Entity::Player& player, uint32_t actionId,
-                                   std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData, Common::FFXIVARR_POSITION3 pos, uint16_t sequence );
+    void handleItemManipulationAction( Entity::Player& player, uint32_t actionId, uint16_t requestId );
+    void handleTargetedAction( Entity::Chara& chara, uint32_t actionId, uint64_t targetId, uint16_t requestId );
+    void handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::FFXIVARR_POSITION3 pos, uint16_t requestId );
 
     void handleItemAction( Entity::Player& player, uint32_t itemId, std::shared_ptr< Excel::ExcelStruct< Excel::ItemAction > > itemActionData,
                            uint16_t itemSourceSlot, uint16_t itemSourceContainer );
@@ -40,7 +37,7 @@ namespace Sapphire::World::Manager
 
     bool actionHasCastTime( uint32_t actionId );
   private:
-    void bootstrapAction( Entity::Player& player, Action::ActionPtr currentAction, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
+    void bootstrapAction( Entity::Chara& src, Action::ActionPtr currentAction, std::shared_ptr< Excel::ExcelStruct< Excel::Action > > actionData );
 
     // item action handlers
     void handleItemActionVFX( Entity::Player& player, uint32_t itemId, uint16_t vfxId );

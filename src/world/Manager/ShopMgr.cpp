@@ -12,13 +12,12 @@ using namespace Sapphire::World::Manager;
 void ShopMgr::cacheShop( uint32_t shopId )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto itemShopList = exdData.getIdList< Excel::Shop >();
+  auto itemShopList = exdData.getRows< Excel::Shop >();
   uint8_t count = 0;
-  for( auto itemShop : itemShopList )
+  for( const auto& [ itemShop, shop ] : itemShopList )
   {
     if( shopId == itemShop )
     {
-      auto shop = exdData.getRow< Excel::Shop >( itemShop );
       for( auto shopItemId : shop->data().Item )
       {
         auto shopItem = exdData.getRow< Excel::ShopItem >( shopItemId );

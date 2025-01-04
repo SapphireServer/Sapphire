@@ -3,6 +3,7 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
+#include <Logging/Logger.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -85,6 +86,14 @@ std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifi
   { "Control", Common::ParamModifier::Control },
   { "Gathering", Common::ParamModifier::Gathering },
   { "Perception", Common::ParamModifier::Perception },
+  { "TickHeal", Common::ParamModifier::TickHeal },
+  { "TickDamage", Common::ParamModifier::TickDamage },
+  { "StrengthPercent", Common::ParamModifier::StrengthPercent },
+  { "DexterityPercent", Common::ParamModifier::DexterityPercent },
+  { "VitalityPercent", Common::ParamModifier::VitalityPercent },
+  { "IntelligencePercent", Common::ParamModifier::IntelligencePercent },
+  { "MindPercent", Common::ParamModifier::MindPercent },
+  { "PietyPercent", Common::ParamModifier::PietyPercent },
   { "HPPercent", Common::ParamModifier::HPPercent },
   { "MPPercent", Common::ParamModifier::MPPercent },
   { "TPPercent", Common::ParamModifier::TPPercent },
@@ -100,7 +109,15 @@ std::unordered_map< std::string, Common::ParamModifier > ActionLutData::m_modifi
   { "CriticalHitPowerPercent", Common::ParamModifier::CriticalHitPowerPercent },
   { "CriticalHitResiliencePercent", Common::ParamModifier::CriticalHitResiliencePercent },
   { "CriticalHitPercent", Common::ParamModifier::CriticalHitPercent },
-  { "EnmityPercent", Common::ParamModifier::EnmityPercent }
+  { "EnmityPercent", Common::ParamModifier::EnmityPercent },
+  { "DamageDealtPercent", Common::ParamModifier::DamageDealtPercent },
+  { "DamageTakenPercent", Common::ParamModifier::DamageTakenPercent },
+  { "HealingMagicRecoveryPercent", Common::ParamModifier::HealingMagicRecoveryPercent },
+  { "SlashingResistancePercent", Common::ParamModifier::SlashingResistancePercent },
+  { "PiercingResistancePercent", Common::ParamModifier::PiercingResistancePercent },
+  { "BluntResistancePercent", Common::ParamModifier::BluntResistancePercent },
+  { "ProjectileResistancePercent", Common::ParamModifier::ProjectileResistancePercent },
+  { "ParryPercent", Common::ParamModifier::ParryPercent }
 };
 
 bool ActionLutData::cacheActions()
@@ -122,6 +139,10 @@ bool ActionLutData::cacheActions()
       {
         auto id = std::stoi( i.key() );
         auto action = i.value().get< ActionEntry >();
+
+        if( ActionLut::m_actionLut.count( id ) > 0 )
+          throw std::runtime_error( fmt::format( "Action with ID {} cannot be defined more than once (defined again in {})", i.key(), p.path().string() ) );
+
         ActionLut::m_actionLut.try_emplace( id, action );
       }
 

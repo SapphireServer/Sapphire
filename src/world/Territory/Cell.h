@@ -20,6 +20,7 @@ private:
   bool m_bActive;
 
   uint16_t m_playerCount;
+  uint32_t m_lastActiveTime;
 
 public:
   Cell();
@@ -82,6 +83,9 @@ public:
   {
     return m_posY;
   }
+
+  uint32_t getLastActiveTime() const;
+  void setLastActiveTime( uint32_t lastActiveTime );
 };
 
 }

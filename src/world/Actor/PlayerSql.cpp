@@ -16,12 +16,14 @@
 
 #include "WorldServer.h"
 
+using namespace Sapphire;
+using namespace Sapphire::Entity;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
+bool Player::loadFromDb( uint64_t characterId )
 {
   m_characterId = characterId;
 
@@ -181,7 +183,7 @@ bool Sapphire::Entity::Player::loadFromDb( uint64_t characterId )
   return true;
 }
 
-bool Sapphire::Entity::Player::loadActiveQuests()
+bool Player::loadActiveQuests()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_QUEST );
@@ -194,7 +196,6 @@ bool Sapphire::Entity::Player::loadActiveQuests()
 
   while( res->next() )
   {
-
     auto slotId = res->getUInt8( 2 );
 
     auto quest = World::Quest( res->getUInt16( 3 ), res->getUInt8( 4 ), res->getUInt8( 5 ) );
@@ -205,14 +206,13 @@ bool Sapphire::Entity::Player::loadActiveQuests()
     quest.setUI8E( res->getUInt8( 10 ) );
     quest.setUI8F( res->getUInt8( 11 ) );
     m_quests[ slotId ] = quest;
-
   }
 
   return true;
 
 }
 
-bool Sapphire::Entity::Player::loadAchievements()
+bool Player::loadAchievements()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_ACHIEV_SEL );
@@ -255,10 +255,10 @@ bool Sapphire::Entity::Player::loadAchievements()
   return true;
 }
 
-bool Sapphire::Entity::Player::loadClassData()
+bool Player::loadClassData()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
-  // ClassIdx, Exp, Lvl
+  // ClassIdx, Exp, Lvl, BorrowAction
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_CLASS_SEL );
   stmt->setUInt64( 1, m_characterId );
   auto res = db.query( stmt );
@@ -268,15 +268,17 @@ bool Sapphire::Entity::Player::loadClassData()
     auto index = res->getUInt16( 1 );
     auto exp = res->getUInt( 2 );
     auto lvl = res->getUInt8( 3 );
+    auto borrowAction = res->getBlobVector( "BorrowAction" );
 
     m_classArray[ index ] = lvl;
     m_expArray[ index ] = exp;
+    memcpy( m_borrowActions[ index ].data(), borrowAction.data(), borrowAction.size() );
   }
 
   return true;
 }
 
-bool Sapphire::Entity::Player::loadSearchInfo()
+bool Player::loadSearchInfo()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_SEL_SEARCHINFO );
@@ -301,7 +303,7 @@ bool Sapphire::Entity::Player::loadSearchInfo()
 }
 
 
-bool Sapphire::Entity::Player::loadHuntingLog()
+bool Player::loadHuntingLog()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_MONSTERNOTE_SEL );
@@ -324,7 +326,7 @@ bool Sapphire::Entity::Player::loadHuntingLog()
   return true;
 }
 
-void Sapphire::Entity::Player::updateSql()
+void Player::updateSql()
 {
   ////// Update player data
   updateDbChara();
@@ -354,7 +356,7 @@ void Sapphire::Entity::Player::updateSql()
   syncLastDBWrite();
 }
 
-void Sapphire::Entity::Player::updateDbChara() const
+void Player::updateDbChara() const
 {
   auto& db = Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   /*"Hp 1, Mp 2, Tp 3, Gp 4, Mode 5, Mount 6, InvincibleGM 7, Voice 8, "
@@ -482,22 +484,28 @@ void Sapphire::Entity::Player::updateDbChara() const
   db.execute( stmt );
 }
 
-void Sapphire::Entity::Player::updateDbClass() const
+void Player::updateDbClass() const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast<uint8_t>( getClass() ) )->data().WorkIndex;
+  auto& borrowAction = m_borrowActions[ classJobIndex ];
 
-  //Exp = ?, Lvl = ? WHERE CharacterId = ? AND ClassIdx = ?
+  //Exp = ?, Lvl = ?, BorrowAction = ? WHERE CharacterId = ? AND ClassIdx = ?
   auto stmtS = db.getPreparedStatement( Db::CHARA_CLASS_UP );
-  stmtS->setInt( 1, getExp() );
+  stmtS->setInt( 1, getCurrentExp() );
   stmtS->setInt( 2, getLevel() );
-  stmtS->setUInt64( 3, m_characterId );
-  stmtS->setInt( 4, classJobIndex );
+
+  std::vector< uint8_t > borrowActionVec( borrowAction.size() * 4 );
+  memcpy( borrowActionVec.data(), borrowAction.data(), borrowAction.size() * 4 );
+  stmtS->setBinary( 3, borrowActionVec );
+
+  stmtS->setUInt64( 4, m_characterId );
+  stmtS->setInt( 5, classJobIndex );
   db.execute( stmtS );
 }
 
-void Sapphire::Entity::Player::updateDbMonsterNote()
+void Player::updateDbMonsterNote()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   // Category_0-11
@@ -515,7 +523,7 @@ void Sapphire::Entity::Player::updateDbMonsterNote()
   db.execute( stmt );
 }
 
-void Sapphire::Entity::Player::updateDbFriendList()
+void Player::updateDbFriendList()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -533,7 +541,7 @@ void Sapphire::Entity::Player::updateDbFriendList()
 }
 
 
-void Sapphire::Entity::Player::updateDbBlacklist()
+void Player::updateDbBlacklist()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -547,7 +555,7 @@ void Sapphire::Entity::Player::updateDbBlacklist()
   db.execute( stmt );
 }
 
-void Sapphire::Entity::Player::updateDbAchievement()
+void Player::updateDbAchievement()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
 
@@ -577,18 +585,22 @@ void Sapphire::Entity::Player::updateDbAchievement()
 }
 
 
-void Sapphire::Entity::Player::insertDbClass( const uint8_t classJobIndex, uint8_t level ) const
+void Player::insertDbClass( const uint8_t classJobIndex, uint8_t level ) const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmtClass = db.getPreparedStatement( Db::CHARA_CLASS_INS );
+  auto& borrowAction = m_borrowActions[ classJobIndex ];
+
   stmtClass->setUInt64( 1, m_characterId );
   stmtClass->setInt( 2, classJobIndex );
   stmtClass->setInt( 3, 0 );
   stmtClass->setInt( 4, level );
+  std::vector< uint8_t > borrowActionVec( borrowAction.size() );
+  stmtClass->setBinary( 5, borrowActionVec );
   db.directExecute( stmtClass );
 }
 
-void Sapphire::Entity::Player::updateDbSearchInfo() const
+void Player::updateDbSearchInfo() const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmtS = db.getPreparedStatement( Db::CHARA_SEARCHINFO_UP_SELECTCLASS );
@@ -607,7 +619,7 @@ void Sapphire::Entity::Player::updateDbSearchInfo() const
   db.execute( stmtS2 );
 }
 
-void Sapphire::Entity::Player::updateDbAllQuests() const
+void Player::updateDbAllQuests() const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   for( int32_t i = 0; i < 30; i++ )
@@ -633,7 +645,7 @@ void Sapphire::Entity::Player::updateDbAllQuests() const
   }
 }
 
-void Sapphire::Entity::Player::deleteDbQuest( uint16_t questId ) const
+void Player::deleteDbQuest( uint16_t questId ) const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::CHARA_QUEST_DEL );
@@ -642,7 +654,7 @@ void Sapphire::Entity::Player::deleteDbQuest( uint16_t questId ) const
   db.execute( stmt );
 }
 
-void Sapphire::Entity::Player::insertDbQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
+void Player::insertDbQuest( uint16_t questId, uint8_t index, uint8_t seq ) const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::CHARA_QUEST_INS );
@@ -661,7 +673,7 @@ void Sapphire::Entity::Player::insertDbQuest( uint16_t questId, uint8_t index, u
   db.execute( stmt );
 }
 
-void Sapphire::Entity::Player::insertDbQuest( const World::Quest& quest, uint8_t index ) const
+void Player::insertDbQuest( const World::Quest& quest, uint8_t index ) const
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::CHARA_QUEST_INS );
@@ -680,7 +692,7 @@ void Sapphire::Entity::Player::insertDbQuest( const World::Quest& quest, uint8_t
   db.execute( stmt );
 }
 
-Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint32_t quantity )
+ItemPtr Player::createItem( uint32_t catalogId, uint32_t quantity )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
@@ -707,7 +719,7 @@ Sapphire::ItemPtr Sapphire::Entity::Player::createItem( uint32_t catalogId, uint
   return pItem;
 }
 
-bool Sapphire::Entity::Player::loadInventory()
+bool Player::loadInventory()
 {
   auto& itemMgr = Common::Service< World::Manager::ItemMgr >::ref();
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
@@ -806,7 +818,7 @@ bool Sapphire::Entity::Player::loadInventory()
   return true;
 }
 
-bool Sapphire::Entity::Player::loadFriendList()
+bool Player::loadFriendList()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_FRIENDLIST_SEL );
@@ -831,7 +843,7 @@ bool Sapphire::Entity::Player::loadFriendList()
   return true;
 }
 
-bool Sapphire::Entity::Player::loadBlacklist()
+bool Player::loadBlacklist()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::CHARA_BLACKLIST_SEL );
@@ -853,7 +865,7 @@ bool Sapphire::Entity::Player::loadBlacklist()
 }
 
 
-bool Sapphire::Entity::Player::syncLastDBWrite()
+bool Player::syncLastDBWrite()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto res = db.query( "SELECT UNIX_TIMESTAMP(UPDATE_DATE) FROM charainfo WHERE characterid = " + std::to_string( m_characterId ) );

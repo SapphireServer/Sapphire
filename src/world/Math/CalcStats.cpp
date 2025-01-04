@@ -85,16 +85,14 @@ const int levelTable[61][6] =
   { 218, 354, 858, 2600, 282, 215 },
 };
 
-std::random_device CalcStats::dev;
-std::mt19937 CalcStats::rng( dev() );
-std::uniform_int_distribution< std::mt19937::result_type > CalcStats::range100( 0, 99 );
+std::unique_ptr< RandGenerator< float > > CalcStats::rnd = nullptr;
 
 /*
    Class used for battle-related formulas and calculations.
    Big thanks to the Theoryjerks group!
 
    NOTE:
-   Formulas here shouldn't be considered final. It's possible that the formula it was based on is correct but 
+   Formulas here shouldn't be considered final. It's possible that the formula it was based on is correct but
    wasn't implemented correctly here, or approximated things due to limited knowledge of how things work in retail.
    It's also possible that we're using formulas that were correct for previous patches, but not the current version.
 
@@ -144,11 +142,14 @@ uint32_t CalcStats::calculateMaxHp( Player& player )
   uint16_t hpMod = paramGrowthInfo->data().ParamBase;
   uint16_t jobModHp = classInfo->data().Hp;
   float approxBaseHp = 0.0f; // Read above
+  float hpModPercent = player.getModifier( Common::ParamModifier::HPPercent );
 
   approxBaseHp = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::HP ] );
 
   auto result = static_cast< uint32_t >( floor( jobModHp * ( approxBaseHp / 100.0f ) ) +
                                          floor( hpMod / 100.0f * ( vitStat - baseStat ) ) );
+
+  result *= hpModPercent;
 
   return result;
 }
@@ -285,19 +286,6 @@ float CalcStats::blockProbability( const Chara& chara )
   auto levelVal =  static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
 
   return std::floor( ( 30 * blockRate ) / levelVal + 10 );
-}
-
-float CalcStats::directHitProbability( const Chara& chara )
-{
-  const auto& baseStats = chara.getStats();
-  auto level = chara.getLevel();
-
-  auto dhRate = chara.getStatValueFloat( Common::BaseParam::Accuracy );
-
-  auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
-  auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
-
-  return std::floor( 550.f * ( dhRate - subVal ) / divVal ) / 10.f;
 }
 
 float CalcStats::criticalHitProbability( const Chara& chara )
@@ -564,7 +552,7 @@ float CalcStats::healingMagicPotency( const Sapphire::Entity::Chara& chara )
   return std::floor( 100.f * ( chara.getStatValue( Common::BaseParam::HealingMagicPotency ) - 292.f ) / 264.f + 100.f ) / 100.f;
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
+std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcAutoAttackDamage( const Sapphire::Entity::Chara& chara )
 {
   // D = ⌊ f(ptc) × f(aa) × f(ap) × f(det) × f(tnc) × traits ⌋ × f(ss) ⌋ ×
   // f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ × buff_1 ⌋ × buff... ⌋
@@ -577,27 +565,19 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
 
   // todo: everything after tenacity
   auto factor = Common::Util::trunc( pot * aa * ap * det, 0 );
-  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+  Sapphire::Common::CalcResultType hitType = Sapphire::Common::CalcResultType::TypeDamageHp;
 
   // todo: traits
 
   factor = std::floor( factor * speed( chara ) );
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
-    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+    hitType = Sapphire::Common::CalcResultType::TypeCriticalDamageHp;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
-  {
-    factor *= 1.25f;
-    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
-                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
-                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
-  }
-
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   // todo: buffs
 
@@ -615,7 +595,7 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcAutoA
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionDamage( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // D = ⌊ f(pot) × f(wd) × f(ap) × f(det) × f(tnc) × traits ⌋
   // × f(chr) ⌋ × f(dhr) ⌋ × rand[ 0.95, 1.05 ] ⌋ buff_1 ⌋ × buff_1 ⌋ × buff... ⌋
@@ -624,33 +604,29 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   auto wd = weaponDamage( chara, wepDmg );
   auto ap = getPrimaryAttackPower( chara );
   auto det = determination( chara );
+  auto damageDealtMod = chara.getModifier( Common::ParamModifier::DamageDealtPercent );
 
   auto factor = Common::Util::trunc( pot * wd * ap * det, 0 );
-  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalDamage;
+  Sapphire::Common::CalcResultType hitType = Sapphire::Common::CalcResultType::TypeDamageHp;
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
-    hitType = Sapphire::Common::ActionHitSeverityType::CritDamage;
+    hitType = Sapphire::Common::CalcResultType::TypeCriticalDamageHp;
   }
 
-  if( directHitProbability( chara ) > range100( rng ) )
-  {
-    factor *= 1.25f;
-    hitType = hitType == Sapphire::Common::ActionHitSeverityType::CritDamage ?
-                         Sapphire::Common::ActionHitSeverityType::CritDirectHitDamage :
-                         Sapphire::Common::ActionHitSeverityType::DirectHitDamage;
-  }
-
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   // todo: buffs
+
+  factor *= damageDealtMod;
 
   constexpr auto format = "dmg: pot: {} ({}) wd: {} ({}) ap: {} det: {}  = {}";
 
   if( auto player = const_cast< Entity::Chara& >( chara ).getAsPlayer() )
   {
     PlayerMgr::sendDebug( *player, format, pot, ptc, wd, wepDmg, ap, det, factor );
+    PlayerMgr::sendDebug( *player, "DamageDealtPercent: {}", damageDealtMod );
   }
   else
   {
@@ -660,19 +636,23 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
   return std::pair( factor, hitType );
 }
 
-std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
+std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg )
 {
   // lol just for testing
-  auto factor = std::floor( ptc * ( wepDmg / 10.0f ) + ptc );
-  Sapphire::Common::ActionHitSeverityType hitType = Sapphire::Common::ActionHitSeverityType::NormalHeal;
+  float det = chara.getStatValue( Common::BaseParam::Determination );
+  float mnd = chara.getStatValue( Common::BaseParam::Mind );
 
-  if( criticalHitProbability( chara ) > range100( rng ) )
+  auto factor = std::floor( ( wepDmg * ( mnd / 200 ) + ( det / 10 ) ) * ( ptc / 100 ) * 1.3f );
+
+  Sapphire::Common::CalcResultType hitType = Sapphire::Common::CalcResultType::TypeRecoverHp;
+
+  if( criticalHitProbability( chara ) > getRandomNumber0To100() )
   {
     factor *= criticalHitBonus( chara );
-    hitType = Sapphire::Common::ActionHitSeverityType::CritHeal;
+    hitType = Sapphire::Common::CalcResultType::TypeCriticalRecoverHp;
   }
 
-  factor *= 1.0f + ( ( range100( rng ) - 50.0f ) / 1000.0f );
+  factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   return std::pair( factor, hitType );
 }
@@ -680,4 +660,13 @@ std::pair< float, Sapphire::Common::ActionHitSeverityType > CalcStats::calcActio
 uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 {
   return chara.getStatValue( chara.getPrimaryStat() );
+}
+
+float CalcStats::getRandomNumber0To100()
+{
+  if( !rnd )
+  {
+    rnd = std::make_unique< RandGenerator< float > >( Common::Service< RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
+  }
+  return rnd->next();
 }

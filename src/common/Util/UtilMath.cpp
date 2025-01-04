@@ -39,8 +39,12 @@ float Util::distance2D( float x, float y, float x1, float y1 )
 
 float Util::calcAngTo( float x, float y, float x1, float y1 )
 {
-  float dx = x - x1;
-  float dy = y - y1;
+  float dx = x1 - x;
+  float dy = y1 - y;
+
+  if( dx == 0.0f && dy == 0.0f )
+    return 0.0f;
+
   if( dy != 0.0f )
   {
     return atan2( dy, dx );
@@ -55,6 +59,10 @@ float Util::calcAngFrom( float x, float y, float x1, float y1 )
 {
   float dx = x - x1;
   float dy = y - y1;
+
+  if( dx == 0.0f && dy == 0.0f )
+    return 0.0f;
+
   if( dy != 0.0f )
   {
     return atan2( dy, dx );
@@ -78,6 +86,39 @@ uint16_t Util::floatToUInt16Rot( float val )
 uint8_t Util::floatToUInt8Rot( float val )
 {
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
+}
+
+FFXIVARR_POSITION3 Util::getOffsettedPosition( const FFXIVARR_POSITION3& pos, float rot, float right, float up, float forward )
+{
+  FFXIVARR_POSITION3 ret{ pos };
+
+  // height
+  ret.y += up;
+
+  // forward
+  float angle = rot + ( PI / 2 );
+  ret.x -= forward * cos( angle );
+  ret.z += forward * sin( angle );
+
+  // side
+  ret.x -= right * cos( rot );
+  ret.z += right * sin( rot );
+
+  return ret;
+}
+
+FFXIVARR_POSITION3 Util::getKnockbackPosition( const FFXIVARR_POSITION3& origin, const FFXIVARR_POSITION3& pos, float distance )
+{
+  FFXIVARR_POSITION3 ret{ pos };
+
+  float from = Common::Util::calcAngFrom( origin.x, origin.z, pos.x, pos.z );
+  float angle = PI - from + ( PI / 2 );
+
+  angle = angle + ( PI / 2 );
+  ret.x -= distance * cos( angle );
+  ret.z += distance * sin( angle );
+
+  return ret;
 }
 
 FFXIVARR_POSITION3 Util::transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix )
@@ -142,4 +183,24 @@ float Util::trunc( float value, uint8_t digitsToRemain )
   auto factor = static_cast< float >( std::pow( 10.f, digitsToRemain ) );
 
   return std::floor( value * factor ) / factor;
+}
+
+float Util::length( const FFXIVARR_POSITION3& vec ) {
+  return std::sqrt( vec.x * vec.x + vec.y * vec.y + vec.z * vec.z );
+}
+
+FFXIVARR_POSITION3 Util::normalize( const FFXIVARR_POSITION3& vec ) {
+  float len = length( vec );
+  if( len == 0 ) return FFXIVARR_POSITION3();
+  return FFXIVARR_POSITION3{ vec.x / len, vec.y / len, vec.z / len };
+}
+
+float Util::dot( const FFXIVARR_POSITION3& vec1, const FFXIVARR_POSITION3& vec2 )
+{
+  return vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+}
+
+FFXIVARR_POSITION3 Util::projectY( const FFXIVARR_POSITION3& vec )
+{
+  return FFXIVARR_POSITION3{ vec.x, 0, vec.z };
 }

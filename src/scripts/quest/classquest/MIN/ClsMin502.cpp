@@ -45,6 +45,7 @@ private:
   static constexpr auto Actor4 = 1013231;//Hatchling
   static constexpr auto BindActor1 = 5896086;
   static constexpr auto Item0 = 2001726;
+  static constexpr auto Item0Icon = 26177;
   static constexpr auto LocBgm1 = 313;
 
 public:
@@ -137,7 +138,7 @@ private:
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setUI8BH( 1 );
-    eventMgr().sendEventNotice( player, getId(), 0, 0 );//TODO: Item Icon, probably
+    eventMgr().sendNotice( player, getId(), 0, { Item0Icon } );
     quest.setSeq( Seq2 );
   }
 

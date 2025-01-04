@@ -7,6 +7,7 @@
 #include "Cell.h"
 #include "CellHandler.h"
 
+#include <Encounter/EncounterTimeline.h>
 #include "ForwardsZone.h"
 
 #include <set>
@@ -72,11 +73,11 @@ namespace Sapphire
     uint32_t m_effectCounter{};
     std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
 
-    std::vector< World::Action::EffectResultPtr > m_effectResults;
-
     Common::TerritoryIdent m_ident;
 
     float m_inRangeDistance;
+
+    Encounter::TimelinePack m_timelinePack;
 
   public:
     Territory();
@@ -188,19 +189,22 @@ namespace Sapphire
 
     Entity::EventObjectPtr getEObj( uint32_t objId );
 
+    Entity::PlayerPtr getPlayer( uint32_t playerId );
+
+    const std::unordered_map< uint32_t, Entity::PlayerPtr >& getPlayers();
+
     InstanceContentPtr getAsInstanceContent();
 
     QuestBattlePtr getAsQuestBattle();
 
     void updateSpawnPoints();
 
-    uint32_t getNextEffectResultId();
+    uint32_t getNextActionResultId();
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
 
-    void addEffectResult( World::Action::EffectResultPtr result );
-
-    void processEffectResults( uint64_t tickCount );
+    void setEncounterTimeline( const std::string& name );
+    Encounter::TimelinePack& getEncounterTimeline();
   };
 
 }

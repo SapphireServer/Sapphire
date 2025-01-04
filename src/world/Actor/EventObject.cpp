@@ -3,12 +3,10 @@
 #include "Territory/InstanceContent.h"
 #include "Actor/Player.h"
 
-#include "Network/PacketWrappers/ActorControlPacket.h"
-#include "Network/PacketWrappers/ActorControlTargetPacket.h"
-
 #include <Logging/Logger.h>
 #include <Network/PacketDef/Zone/ServerZoneDef.h>
 #include <Network/CommonActorControl.h>
+#include <Network/Util/PacketUtil.h>
 #include <Util/UtilMath.h>
 
 #include <Service.h>
@@ -16,20 +14,19 @@
 #include <utility>
 #include "WorldServer.h"
 #include "Session.h"
-#include "Network/GameConnection.h"
 #include "Manager/MgrUtil.h"
 
-
+using namespace Sapphire;
 using namespace Sapphire::Common;
+using namespace Sapphire::Entity;
 using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::Network::ActorControl;
 
-Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId,
-                                            uint8_t initialState, Common::FFXIVARR_POSITION3 pos,
-                                            float rotation, const std::string& givenName, uint8_t permissionInv ) :
-  Sapphire::Entity::GameObject( ObjKind::EventObj ),
+EventObject::EventObject( uint32_t actorId, uint32_t objectId, uint32_t gimmickId, uint32_t instanceId, uint8_t initialState,
+                          FFXIVARR_POSITION3 pos, float rotation, const std::string& givenName, uint8_t permissionInv ) :
+  GameObject( ObjKind::EventObj ),
   m_gimmickId( gimmickId ),
   m_instanceId( instanceId ),
   m_state( initialState ),
@@ -37,7 +34,7 @@ Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId,
   m_name( givenName ),
   m_housingLink( 0 ),
   m_permissionInvisibility( permissionInv ),
-  m_ownerId( Common::INVALID_GAME_OBJECT_ID )
+  m_ownerId( INVALID_GAME_OBJECT_ID )
 {
   m_id = actorId;
   m_pos.x = pos.x;
@@ -46,78 +43,77 @@ Sapphire::Entity::EventObject::EventObject( uint32_t actorId, uint32_t objectId,
   m_rot = rotation;
 }
 
-uint32_t Sapphire::Entity::EventObject::getGimmickId() const
+uint32_t EventObject::getGimmickId() const
 {
   return m_gimmickId;
 }
 
-uint32_t Sapphire::Entity::EventObject::getObjectId() const
+uint32_t EventObject::getObjectId() const
 {
   return m_objectId;
 }
 
-float Sapphire::Entity::EventObject::getScale() const
+float EventObject::getScale() const
 {
   return m_scale;
 }
 
-void Sapphire::Entity::EventObject::setScale( float scale )
+void EventObject::setScale( float scale )
 {
   m_scale = scale;
 }
 
-Sapphire::Entity::EventObject::OnTalkEventHandler Sapphire::Entity::EventObject::getOnTalkHandler() const
+EventObject::OnTalkEventHandler EventObject::getOnTalkHandler() const
 {
   return m_onTalkEventHandler;
 }
 
-void Sapphire::Entity::EventObject::setOnTalkHandler( Sapphire::Entity::EventObject::OnTalkEventHandler handler )
+void EventObject::setOnTalkHandler( EventObject::OnTalkEventHandler handler )
 {
   m_onTalkEventHandler = std::move( handler );
 }
 
-void Sapphire::Entity::EventObject::setGimmickId( uint32_t gimmickId )
+void EventObject::setGimmickId( uint32_t gimmickId )
 {
   m_gimmickId = gimmickId;
 }
 
-uint8_t Sapphire::Entity::EventObject::getState() const
+uint8_t EventObject::getState() const
 {
   return m_state;
 }
 
-void Sapphire::Entity::EventObject::setState( uint8_t state )
+void EventObject::setState( uint8_t state )
 {
   m_state = state;
 }
 
-void Sapphire::Entity::EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
+void EventObject::setAnimationFlag( uint32_t flag, uint32_t animationFlag )
 {
-  for( const auto& player : m_inRangePlayers )
-    server().queueForPlayer( player->getCharacterId(), makeActorControl( getId(), EObjAnimation, flag, animationFlag ) );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), EObjAnimation, flag, animationFlag );
 }
 
-void Sapphire::Entity::EventObject::setHousingLink( uint32_t housingLink )
+void EventObject::setHousingLink( uint32_t housingLink )
 {
   m_housingLink = housingLink;
 }
 
-uint32_t Sapphire::Entity::EventObject::getHousingLink() const
+uint32_t EventObject::getHousingLink() const
 {
   return m_housingLink;
 }
 
-void Sapphire::Entity::EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
+void EventObject::setParentInstance( Sapphire::TerritoryPtr instance )
 {
   m_parentInstance = std::move( instance );
 }
 
-Sapphire::TerritoryPtr Sapphire::Entity::EventObject::getParentInstance() const
+TerritoryPtr EventObject::getParentInstance() const
 {
   return m_parentInstance;
 }
 
-void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
+void EventObject::spawn( PlayerPtr pTarget )
 {
   auto spawnIndex = pTarget->getNextObjSpawnIndexForActorId( getId() );
   if( !pTarget->isObjSpawnIndexValid( spawnIndex ) )
@@ -149,34 +145,31 @@ void Sapphire::Entity::EventObject::spawn( Sapphire::Entity::PlayerPtr pTarget )
 }
 
 
-void Sapphire::Entity::EventObject::despawn( Sapphire::Entity::PlayerPtr pTarget )
+void EventObject::despawn( PlayerPtr pTarget )
 {
   Logger::debug( "despawn eobj#{0}", getId() );
 
   pTarget->freeObjSpawnIndexForActorId( getId() );
 }
 
-const std::string& Sapphire::Entity::EventObject::getName() const
+const std::string& EventObject::getName() const
 {
   return m_name;
 }
 
-uint32_t Sapphire::Entity::EventObject::getInstanceId() const
+uint32_t EventObject::getInstanceId() const
 {
   return m_instanceId;
 }
 
-uint8_t Sapphire::Entity::EventObject::getPermissionInvisibility() const
+uint8_t EventObject::getPermissionInvisibility() const
 {
   return m_permissionInvisibility;
 }
 
-void Sapphire::Entity::EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
+void EventObject::setPermissionInvisibility( uint8_t permissionInvisibility )
 {
-  m_permissionInvisibility = permissionInvisibility;
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto inRangePlayerIds = getInRangePlayerIds();
-  server.queueForPlayers( inRangePlayerIds, makeActorControl( getId(), DirectorEObjMod, permissionInvisibility ) );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), DirectorEObjMod, permissionInvisibility );
 }
 
 uint32_t Sapphire::Entity::EventObject::getOwnerId() const

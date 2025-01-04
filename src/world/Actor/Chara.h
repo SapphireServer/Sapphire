@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Common.h>
+#include "Action/ActionLut.h"
 
 #include "Forwards.h"
 #include "GameObject.h"
@@ -8,9 +9,18 @@
 #include <map>
 #include <queue>
 #include <array>
+#include <numeric>
 
 namespace Sapphire::Entity
 {
+  // todo: probably macro/template operators for enums
+  enum DirtyFlag : uint32_t
+  {
+    Position   = 0x01,
+    HpMpTp     = 0x02,
+    Status     = 0x04,
+    Appearance = 0x08
+  };
 
   /*!
   \class Chara
@@ -94,6 +104,8 @@ namespace Sapphire::Entity
     /*! Detour Crowd actor scale */
     float m_radius;
 
+    uint32_t m_dirtyFlag{};
+
   public:
     Chara( Common::ObjKind type );
 
@@ -106,9 +118,15 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId );
+    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId, bool sendOrder = true );
+
+    void replaceSingleStatusEffectById( uint32_t id );
 
     void removeSingleStatusEffectById( uint32_t id );
+
+    void removeStatusEffectById( std::vector< uint32_t > ids );
+
+    void removeStatusEffectByFlag( Common::StatusEffectFlag flag );
 
     void updateStatusEffects();
 
@@ -124,6 +142,8 @@ namespace Sapphire::Entity
 
     std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr > getStatusEffectMap() const;
 
+    Sapphire::StatusEffect::StatusEffectPtr getStatusEffectById( uint32_t id ) const;
+
     void sendStatusEffectUpdate();
 
     /*! return a const pointer to the look array */
@@ -132,10 +152,10 @@ namespace Sapphire::Entity
     const uint32_t* getModelArray() const;
 
     // add a status effect by id
-    void addStatusEffectById( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectById( StatusEffect::StatusEffectPtr pStatus );
 
     // add a status effect by id if it doesn't exist
-    void addStatusEffectByIdIfNotExist( uint32_t id, int32_t duration, Entity::Chara& source, uint16_t param = 0 );
+    void addStatusEffectByIdIfNotExist( StatusEffect::StatusEffectPtr pStatus );
 
     // remove a status effect by id
     void removeSingleStatusEffectFromId( uint32_t id );
@@ -158,6 +178,8 @@ namespace Sapphire::Entity
     uint32_t getBonusStat( Common::BaseParam baseParam ) const;
 
     void setStatValue( Common::BaseParam baseParam, uint32_t value );
+
+    float getModifier( Common::ParamModifier paramModifier ) const;
 
     uint32_t getHp() const;
 
@@ -183,6 +205,12 @@ namespace Sapphire::Entity
 
     bool isAlive() const;
 
+    virtual void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true ) override;
+
+    virtual void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+
+    virtual void setRot( float rot ) override;
+
     virtual uint32_t getMaxHp() const;
 
     virtual uint32_t getMaxMp() const;
@@ -202,6 +230,10 @@ namespace Sapphire::Entity
     void setInvincibilityType( Common::InvincibilityType type );
 
     void die();
+
+    uint64_t getLastAttack() const;
+
+    void setLastAttack( uint64_t tickCount );
 
     Common::ActorStatus getStatus() const;
 
@@ -223,8 +255,6 @@ namespace Sapphire::Entity
 
     virtual uint8_t getLevel() const;
 
-    virtual void sendHudParam();
-
     virtual void takeDamage( uint32_t damage );
 
     virtual void heal( uint32_t amount );
@@ -234,6 +264,10 @@ namespace Sapphire::Entity
     virtual bool checkAction();
 
     virtual void update( uint64_t tickCount );
+
+    Common::FFXIVARR_POSITION3 getForwardVector() const;
+
+    bool isFacingTarget( const Chara& other, float threshold = 0.95f );
 
     World::Action::ActionPtr getCurrentAction() const;
 
@@ -251,6 +285,8 @@ namespace Sapphire::Entity
     float getRadius() const;
 
     Common::BaseParam getPrimaryStat() const;
+
+    void knockback( const Common::FFXIVARR_POSITION3& origin, float distance, bool ignoreNav = false );
 
   };
 

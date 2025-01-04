@@ -158,7 +158,7 @@ void Sapphire::QuestBattle::onUpdate( uint64_t tickCount )
 
       if( ( static_cast< int64_t >( tickCount ) - static_cast< int64_t >( m_instanceFailTime ) ) > 6000 )
       {
-        m_pPlayer->exitInstance();
+        playerMgr().onExitInstance( *m_pPlayer );
         m_pPlayer.reset();
       }
       break;
@@ -322,7 +322,7 @@ void Sapphire::QuestBattle::success()
                           auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
                           scriptMgr.onDutyComplete( *this, *m_pPlayer );
 
-                          player.exitInstance();
+                          playerMgr().onExitInstance( player );
                         } );
 
     } );

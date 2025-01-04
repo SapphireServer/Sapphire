@@ -144,6 +144,11 @@ std::string readFileToString( const std::string& filename )
   // Close the file
   file.close();
 
+  // Remove all newlines from the file contents
+  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\n' ), fileContents.end() );
+  fileContents.erase( std::remove( fileContents.begin(), fileContents.end(), '\r' ), fileContents.end() );
+
+
   // Return the file contents as a string
   return fileContents;
 }
@@ -386,20 +391,21 @@ void WorldServer::mainLoop()
   {
     auto tickCount = Common::Util::getTimeMs();
 
+    auto currTime = Common::Util::getTimeSeconds();
+    taskMgr.update( tickCount );
+    updateSessions( currTime );
+
     if( tickCount - m_lastServerTick < 300 )
     {
-      std::this_thread::sleep_for( std::chrono::milliseconds( 50 ) );
+      std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
       continue;
     }
     m_lastServerTick = tickCount;
 
-    auto currTime = Common::Util::getTimeSeconds();
-
-    taskMgr.update( tickCount );
     terriMgr.updateTerritoryInstances( tickCount );
     scriptMgr.update();
     contentFinder.update();
-    updateSessions( currTime );
+
 
     DbKeepAlive( currTime );
   }

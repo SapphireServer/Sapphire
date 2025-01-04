@@ -4,7 +4,7 @@
 #include "ActionLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
-#include "EffectBuilder.h"
+#include "ActionResultBuilder.h"
 #include "Exd/Structs.h"
 
 namespace Sapphire::World::Action
@@ -23,10 +23,15 @@ namespace Sapphire::World::Action
 
     uint32_t getId() const;
 
+    uint32_t getResultId() const;
+
     bool init();
 
     void setPos( const Common::FFXIVARR_POSITION3& pos );
     const Common::FFXIVARR_POSITION3& getPos() const;
+
+    void setRot( float rot );
+    float getRot() const;
 
     void setTargetId( uint64_t targetId );
     uint64_t getTargetId() const;
@@ -52,6 +57,10 @@ namespace Sapphire::World::Action
     void setAggroMultiplier( float aggroMultiplier );
 
     uint64_t getCastTimeRest() const;
+
+    void enableGenericHandler();
+    
+    std::shared_ptr< Excel::ExcelStruct< Excel::Action > > getActionData() const;
 
     /*!
      * @brief Checks if a chara has enough resources available to cast the action (tp/mp/etc)
@@ -103,9 +112,13 @@ namespace Sapphire::World::Action
      */
     bool snapshotAffectedActors( std::vector< Entity::CharaPtr >& actors );
 
-    EffectBuilderPtr getEffectbuilder();
+    ActionResultBuilderPtr getActionResultBuilder();
 
-    void buildEffects();
+    void buildActionResults();
+
+    void handleStatusEffects();
+
+    void handleJobAction();
 
     /*!
      * @brief Adds an actor filter to this action.
@@ -118,9 +131,9 @@ namespace Sapphire::World::Action
      */
     void addDefaultActorFilters();
 
-    std::pair< uint32_t, Common::ActionHitSeverityType > calcDamage( uint32_t potency );
+    std::pair< uint32_t, Common::CalcResultType > calcDamage( uint32_t potency );
 
-    std::pair< uint32_t, Common::ActionHitSeverityType > calcHealing( uint32_t potency );
+    std::pair< uint32_t, Common::CalcResultType > calcHealing( uint32_t potency );
 
 
     std::vector< Entity::CharaPtr >& getHitCharas();
@@ -172,6 +185,7 @@ namespace Sapphire::World::Action
     uint8_t m_actionKind{};
 
     uint16_t m_requestId{};
+    uint32_t m_resultId{};
 
     Common::ActionPrimaryCostType m_primaryCostType;
     uint16_t m_primaryCost{};
@@ -185,6 +199,7 @@ namespace Sapphire::World::Action
     uint8_t m_cooldownGroup{};
     int8_t m_range{};
     uint8_t m_effectRange{};
+    uint8_t m_effectWidth{};
     uint8_t m_xAxisModifier{};
     Common::ActionAspect m_aspect;
     Common::CastType m_castType;
@@ -201,14 +216,16 @@ namespace Sapphire::World::Action
     bool m_canTargetFriendly{};
     bool m_canTargetHostile{};
     bool m_canTargetDead{};
+    bool m_enableGenericHandler{};
 
     Common::ActionInterruptType m_interruptType;
 
     std::shared_ptr< Excel::ExcelStruct< Excel::Action > > m_actionData;
 
     Common::FFXIVARR_POSITION3 m_pos{};
+    float m_rot{};
 
-    EffectBuilderPtr m_effectBuilder;
+    ActionResultBuilderPtr m_actionResultBuilder;
 
     std::vector< World::Util::ActorFilterPtr > m_actorFilters;
     std::vector< Entity::CharaPtr > m_hitActors;

@@ -160,7 +160,7 @@ void Sapphire::World::Session::startReplay( const std::string& path )
     Logger::info( "Registering {0} for {1}, oldTime {2}", std::get< 1 >( set ), setTime - startTime, setTime );
   }
 
-  PlayerMgr::sendDebug( *getPlayer(), "Registered {0} sets for replay" ), m_replayCache.size();
+  PlayerMgr::sendDebug( *getPlayer(), "Registered {0} sets for replay" , m_replayCache.size() );
   m_isReplaying = true;
 }
 
@@ -204,26 +204,34 @@ void Sapphire::World::Session::sendReplayInfo()
   PlayerMgr::sendDebug( *getPlayer(), message );
 }
 
+void Sapphire::World::Session::processOutQueue()
+{
+  if( !m_pZoneConnection )
+    return;
+
+  m_pZoneConnection->processOutQueue();
+}
+
 void Sapphire::World::Session::update()
 {
   if( m_isReplaying )
     processReplay();
 
-  if( m_pZoneConnection )
+  if( !m_pZoneConnection )
+    return;
+
+  m_pZoneConnection->processInQueue();
+
+  // SESSION LOGIC
+  m_pPlayer->update( Common::Util::getTimeMs() );
+
+  if( Common::Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
   {
-    m_pZoneConnection->processInQueue();
-
-    // SESSION LOGIC
-    m_pPlayer->update( Common::Util::getTimeMs() );
-
-    if( Common::Util::getTimeSeconds() - static_cast< uint32_t >( getLastSqlTime() ) > 10 )
-    {
-      updateLastSqlTime();
-      m_pPlayer->updateSql();
-    }
-
-    m_pZoneConnection->processOutQueue();
+    updateLastSqlTime();
+    m_pPlayer->updateSql();
   }
+
+  m_pZoneConnection->processOutQueue();
 
   if( m_pChatConnection )
   {

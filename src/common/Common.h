@@ -37,6 +37,8 @@ namespace Sapphire::Common
   const uint16_t ARRSIZE_UNLOCKS = 64u;
   const uint16_t ARRSIZE_ORCHESTRION = 40u;
   const uint16_t ARRSIZE_MONSTERNOTE = 12u;
+  const uint16_t ARRSIZE_BORROWACTION = 10u;
+  const uint16_t ARRSIZE_CONDITION = 12u;
 
   const uint8_t TOWN_COUNT = 6;
 
@@ -887,22 +889,55 @@ namespace Sapphire::Common
     Perception = 73,
 
     // Unique modifiers
-    HPPercent = 1000,
-    MPPercent = 1001,
-    TPPercent = 1002,
-    GPPercent = 1003,
-    CPPercent = 1004,
-    PhysicalDamagePercent = 1005,
-    MagicDamagePercent = 1006,
-    AttackPowerPercent = 1007,
-    DefensePercent = 1008,
-    AccuracyPercent = 1009,
-    EvasionPercent = 1010,
-    MagicDefensePercent = 1011,
-    CriticalHitPowerPercent = 1012,
-    CriticalHitResiliencePercent = 1013,
-    CriticalHitPercent = 1014,
-    EnmityPercent = 1015
+    TickHeal = 1000,
+    TickDamage = 1001,
+    StrengthPercent = 1002,
+    DexterityPercent = 1003,
+    VitalityPercent = 1004,
+    IntelligencePercent = 1005,
+    MindPercent = 1006,
+    PietyPercent = 1007,
+    HPPercent = 1008,
+    MPPercent = 1009,
+    TPPercent = 1010,
+    GPPercent = 1011,
+    CPPercent = 1012,
+    PhysicalDamagePercent = 1013,
+    MagicDamagePercent = 1014,
+    AttackPowerPercent = 1015,
+    DefensePercent = 1016,
+    AccuracyPercent = 1017,
+    EvasionPercent = 1018,
+    MagicDefensePercent = 1019,
+    CriticalHitPowerPercent = 1020,
+    CriticalHitResiliencePercent = 1021,
+    CriticalHitPercent = 1022,
+    EnmityPercent = 1023,
+    DamageDealtPercent = 1024,
+    DamageTakenPercent = 1025,
+    HealingMagicRecoveryPercent = 1026,
+    SlashingResistancePercent = 1027,
+    PiercingResistancePercent = 1028,
+    BluntResistancePercent = 1029,
+    ProjectileResistancePercent = 1030,
+    ParryPercent = 1031
+  };
+
+  enum class StatusEffectFlag : uint32_t
+  {
+    BuffCategory = 1,
+    DebuffCategory = 2,
+    Permanent = 4,
+    IsGaze = 8,
+    Transfiguration = 16,
+    CanDispel = 32,
+    LockActions = 64,
+    LockControl = 128,
+    LockMovement = 256,
+    Invisibilty = 512,
+    CanStatusOff = 1024,
+    FcBuff = 2048,
+    RemoveOnSuccessfulHit = 4096
   };
 
   enum struct ActionAspect : uint8_t
@@ -923,6 +958,7 @@ namespace Sapphire::Common
     MagicPoints = 3,
     TacticsPoints = 5,
     TacticsPoints1 = 6,
+    StatusEffect = 10,
     Sprint = 18,
 //    WARGauge = 22,
 //    DRKGauge = 25,
@@ -948,77 +984,67 @@ namespace Sapphire::Common
     LimitBreak = 8,
   };
 
-  enum ActionEffectType : uint8_t
+  enum CalcResultType : uint8_t
   {
-    CALC_RESULT_TYPE_NONE = 0x0,
-    CALC_RESULT_TYPE_MISS = 0x1,
-    CALC_RESULT_TYPE_RESIST = 0x2,
-    CALC_RESULT_TYPE_DAMAGE_HP = 0x3,
-    CALC_RESULT_TYPE_RECOVER_HP = 0x4,
-    CALC_RESULT_TYPE_CRITICAL_DAMAGE_HP = 0x5,
-    CALC_RESULT_TYPE_CRITICAL_RECOVER_HP = 0x6,
-    CALC_RESULT_TYPE_GUARD = 0x7,
-    CALC_RESULT_TYPE_PARRY = 0x8,
-    CALC_RESULT_TYPE_INVALID = 0x9,
-    CALC_RESULT_TYPE_UNEFFECTIVE = 0xA,
-    CALC_RESULT_TYPE_NEGLECT = 0xB,
-    CALC_RESULT_TYPE_DAMAGE_MP = 0xC,
-    CALC_RESULT_TYPE_RECOVER_MP = 0xD,
-    CALC_RESULT_TYPE_DAMAGE_TP = 0xE,
-    CALC_RESULT_TYPE_RECOVER_TP = 0xF,
-    CALC_RESULT_TYPE_RECOVER_GP = 0x10,
-    CALC_RESULT_TYPE_SET_STATUS = 0x11,
-    CALC_RESULT_TYPE_SET_STATUS_ME = 0x12,
-    CALC_RESULT_TYPE_RESET_STATUS = 0x13,
-    CALC_RESULT_TYPE_RESET_STATUS_ME = 0x14,
-    CALC_RESULT_TYPE_RESET_BAD_STATUS = 0x15,
-    CALC_RESULT_TYPE_UNEFFECTIVE_STATUS = 0x16,
-    CALC_RESULT_TYPE_HALF_GOOD_STATUS = 0x17,
-    CALC_RESULT_TYPE_HATE_DIRECT = 0x18,
-    CALC_RESULT_TYPE_HATE_INDIRECTION = 0x19,
-    CALC_RESULT_TYPE_HATE_TOP = 0x1A,
-    CALC_RESULT_TYPE_HATE_ADD = 0x1B,
-    CALC_RESULT_TYPE_HATE_MULT = 0x1C,
-    CALC_RESULT_TYPE_COMBO = 0x1D,
-    CALC_RESULT_TYPE_COMBO_HIT = 0x1E,
-    CALC_RESULT_TYPE_COUNTER = 0x1F,
-    CALC_RESULT_TYPE_DESTRUCT = 0x20,
-    CALC_RESULT_TYPE_PARALYSIS = 0x21,
-    CALC_RESULT_TYPE_KNOCK_BACK = 0x22,
-    CALC_RESULT_TYPE_DRAW_UP_CHAIRS = 0x23,
-    CALC_RESULT_TYPE_SUCKED = 0x24,
-    CALC_RESULT_TYPE_CT_DRAW_UP_CHAIRS = 0x25,
-    CALC_RESULT_TYPE_LIVE_CALLBACK = 0x26,
-    CALC_RESULT_TYPE_MOUNT = 0x27,
-    CALC_RESULT_ARCHER_DOT = 0x28,
-    CALC_RESULT_MASTER_DOT = 0x29,
-    CALC_RESULT_BLESSINGS_OF_GODDESS = 0x2A,
-    CALC_RESULT_BAD_BREATH = 0x2B,
-    CALC_RESULT_REVIVAL = 0x2C,
-    CALC_RESULT_PET = 0x2D,
-    CALC_RESULT_TYPE_BLOW = 0x2E,
-    CALC_RESULT_TYPE_STATUS_RESIST = 0x2F,
-    CALC_RESULT_TYPE_CLEAR_PHYSICAL = 0x30,
-    CALC_RESULT_BNPC_STATE = 0x31,
-    CALC_RESULT_TYPE_VFX = 0x32,
-    CALC_RESULT_TYPE_HARD_CODE = 0x33,
-    CALC_RESULT_CALC_ID = 0x34,
-    CALC_RESULT_TYPE_CLEAR_PVP_POINT = 0x35,
-    CALC_RESULT_TYPE_CHECK_BARRIER = 0x36,
-    CALC_RESULT_TYPE_REFLEC = 0x37,
+    TypeNone = 0x0,
+    TypeMiss = 0x1,
+    TypeResist = 0x2,
+    TypeDamageHp = 0x3,
+    TypeRecoverHp = 0x4,
+    TypeCriticalDamageHp = 0x5,
+    TypeCriticalRecoverHp = 0x6,
+    TypeGuard = 0x7,
+    TypeParry = 0x8,
+    TypeInvalid = 0x9,
+    TypeUneffective = 0xA,
+    TypeNeglect = 0xB,
+    TypeDamageMp = 0xC,
+    TypeRecoverMp = 0xD,
+    TypeDamageTp = 0xE,
+    TypeRecoverTp = 0xF,
+    TypeRecoverGp = 0x10,
+    TypeSetStatus = 0x11,
+    TypeSetStatusMe = 0x12,
+    TypeResetStatus = 0x13,
+    TypeResetStatusMe = 0x14,
+    TypeResetBadStatus = 0x15,
+    TypeUneffectiveStatus = 0x16,
+    TypeHalfGoodStatus = 0x17,
+    TypeHateDirect = 0x18,
+    TypeHateIndirection = 0x19,
+    TypeHateTop = 0x1A,
+    TypeHateAdd = 0x1B,
+    TypeHateMult = 0x1C,
+    TypeCombo = 0x1D,
+    TypeComboHit = 0x1E,
+    TypeCounter = 0x1F,
+    TypeDestruct = 0x20,
+    TypeParalysis = 0x21,
+    TypeKnockBack = 0x22,
+    TypeDrawUpChairs = 0x23,
+    TypeSucked = 0x24,
+    TypeCtDrawUpChairs = 0x25,
+    TypeLiveCallback = 0x26,
+    TypeMount = 0x27,
+    TypeArcherDot = 0x28,
+    TypeMasterDot = 0x29,
+    TypeBlessingOfGoddess = 0x2A,
+    TypeBadBreath = 0x2B,
+    TypeRevival = 0x2C,
+    TypePet = 0x2D,
+    TypeBlow = 0x2E,
+    TypeStatusResist = 0x2F,
+    TypeClearPhysical = 0x30,
+    TypeBNpcState = 0x31,
+    TypeVfx = 0x32,
+    TypeHardCode = 0x33,
+    TypeCalcId = 0x34,
+    TypeClearPvpPoint = 0x35,
+    TypeCheckBarrier = 0x36,
+    TypeReflect = 0x37,
   };
 
-  enum class ActionHitSeverityType : uint8_t
-  {
-    NormalDamage = 0,
-    CritHeal = 0,
-    CritDamage = 1,
-    NormalHeal = 1,
-    DirectHitDamage = 2,
-    CritDirectHitDamage = 3
-  };
-
-  enum class ActionEffectResultFlag : uint8_t
+  enum class ActionResultFlag : uint8_t
   {
     None = 0,
     Absorbed = 0x04,
@@ -1033,6 +1059,7 @@ namespace Sapphire::Common
     ItemActionCompanion = 853,
     ItemActionVFX2 = 944,
     ItemActionMount = 1322,
+    ItemActionSong = 5845,
   };
 
   enum ActionEffectDisplayType : uint8_t
@@ -1383,9 +1410,10 @@ namespace Sapphire::Common
   {
     None1 = 0,
     HideUILockChar = 1, // as the name suggests, hides the ui and logs the char...
-    InCombat = 2, // in Combat, locks gearchange/return/teleport
-    Casting = 3,
-    InNpcEvent = 6, // when talking to an npc, locks ui giving "occupied" message
+    InCombat = 18, // in Combat, locks gearchange/return/teleport
+    Casting = 19,
+    EventAction = 22,
+    InNpcEvent = 24, // when talking to an npc, locks ui giving "occupied" message
 
  //   InNpcEvent1 = 10, // Sent together with InNpcEvent, when waiting for input? just a guess...
 
@@ -1798,6 +1826,7 @@ namespace Sapphire::Common
   {
     uint16_t targetAetheryte;
     uint16_t cost;
+    bool useAetheryteTicket{ false };
   };
 
   enum EventSceneError : uint8_t
@@ -1833,12 +1862,13 @@ namespace Sapphire::Common
     THREAT
   };
 
+  // todo: fill this out (Action.exd EffectType)
   enum CastType : uint8_t
   {
     SingleTarget = 1,
     CircularAOE = 2,
-    Type3 = 3, // another single target? no idea how to call it
-    RectangularAOE = 4,
+    RectangularAOE = 3,
+    ConeAOE = 4,
     CircularAoEPlaced = 7
   };
 
@@ -1856,6 +1886,7 @@ namespace Sapphire::Common
 
   using PlayerStateFlagList = std::vector< PlayerCondition >;
 
+  // todo: load BNpcBase and other exd data into this struct
   struct BNPCInstanceObject
   {
     uint16_t territoryType;

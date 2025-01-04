@@ -225,7 +225,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
                                targetPlayer->getTerritoryTypeId(),
                                static_cast< uint8_t >( targetPlayer->getClass() ),
                                targetPlayer->getLevel(),
-                               targetPlayer->getExp(),
+                                   targetPlayer->getCurrentExp(),
                                targetPlayer->getSearchMessage(),
                                targetPlayer->getPlayTime() );
       break;
@@ -253,7 +253,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Kill:
     {
-      targetActor->getAsChara()->takeDamage( 9999999 );
+      targetActor->getAsChara()->takeDamage( 0xFFFFFFFF );
       PlayerMgr::sendServerNotice( player, "Killed {0}", targetActor->getId());
       break;
     }
@@ -307,7 +307,7 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
     }
     case GmCommand::Exp:
     {
-      targetPlayer->gainExp( param1 );
+      playerMgr().onGainExp( *targetPlayer, param1 );
       PlayerMgr::sendServerNotice( player, "{0} Exp was added to {1}", param1, targetPlayer->getName());
       break;
     }
@@ -328,7 +328,9 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
         if( param2 == 0 )
         {
           for( uint8_t i = 0; i < 255; i++ )
-            targetPlayer->learnSong( i, 0 );
+          {
+            playerMgr().onSongLearned( *targetPlayer, i, 0 );
+          }
 
           PlayerMgr::sendServerNotice( player, "All Songs for {0} were turned on.", targetPlayer->getName() );
         }
@@ -506,19 +508,14 @@ void Sapphire::Network::GameConnection::gmCommandHandler( const Packets::FFXIVAR
 
         bool doTeleport = false;
         uint16_t teleport;
-        auto idList = exdData.getIdList< Excel::Aetheryte >();
+        auto aetheryteList = exdData.getRows< Excel::Aetheryte >();
 
-        for( auto i : idList )
+        for( const auto& [ id, data ] : aetheryteList )
         {
-          auto data = exdData.getRow< Excel::Aetheryte >( i );
-
-          if( !data )
-            continue;
-
           if( data->data().TerritoryType == param1 && data->data().Telepo )
           {
             doTeleport = true;
-            teleport = static_cast< uint16_t >( i );
+            teleport = static_cast< uint16_t >( id );
             break;
           }
 

@@ -29,7 +29,7 @@
 #include "Actor/Player.h"
 #include "Actor/EventObject.h"
 
-#include "Action/EffectResult.h"
+#include "Action/ActionResult.h"
 
 #include "Network/GameConnection.h"
 
@@ -466,8 +466,6 @@ bool Territory::update( uint64_t tickCount )
   updateSessions( tickCount, changedWeather );
   onUpdate( tickCount );
 
-  processEffectResults( tickCount );
-
   if( !m_playerMap.empty() )
     m_lastActivityTime = tickCount;
 
@@ -530,6 +528,7 @@ bool Territory::isCellActive( uint32_t x, uint32_t y )
   uint32_t posY;
 
   CellPtr pCell;
+  uint32_t time = Common::Util::getTimeSeconds();
 
   for( posX = startX; posX <= endX; posX++ )
   {
@@ -537,7 +536,7 @@ bool Territory::isCellActive( uint32_t x, uint32_t y )
     {
       pCell = getCellPtr( posX, posY );
 
-      if( pCell && ( pCell->hasPlayers() || pCell->isForcedActive() ) )
+      if( pCell && ( pCell->hasPlayers() || pCell->isForcedActive() || ( time - pCell->getLastActiveTime() ) < 20 ) )
         return true;
     }
   }
@@ -568,13 +567,13 @@ void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
         {
           pCell = create( posX, posY );
           pCell->init( posX, posY );
-
           pCell->setActivity( true );
-
+          pCell->setLastActiveTime( Common::Util::getTimeSeconds() );
         }
       }
       else
       {
+        pCell->setLastActiveTime( Common::Util::getTimeSeconds() );
         //Cell is now active
         if( isCellActive( posX, posY ) && !pCell->isActive() )
         {
@@ -583,6 +582,7 @@ void Territory::updateCellActivity( uint32_t x, uint32_t y, int32_t radius )
         else if( !isCellActive( posX, posY ) && pCell->isActive() )
           pCell->setActivity( false );
       }
+
     }
   }
 }
@@ -765,6 +765,18 @@ Entity::EventObjectPtr Territory::getEObj( uint32_t objId )
   return obj->second;
 }
 
+Entity::PlayerPtr Territory::getPlayer( uint32_t playerId )
+{
+  if( auto it = m_playerMap.find( playerId ); it != m_playerMap.end() )
+    return it->second;
+  return nullptr;
+}
+
+const std::unordered_map< uint32_t, Entity::PlayerPtr >& Territory::getPlayers()
+{
+  return m_playerMap;
+}
+
 InstanceContentPtr Territory::getAsInstanceContent()
 {
   return std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() );
@@ -824,7 +836,7 @@ void Territory::updateSpawnPoints()
   }
 }
 
-uint32_t Territory::getNextEffectResultId()
+uint32_t Territory::getNextActionResultId()
 {
   return m_effectCounter++;
 }
@@ -836,6 +848,7 @@ Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t h
     return nullptr;
 
   auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, *this, hp, bnpcType );
+  pBNpc->init();
   pBNpc->setTriggerOwnerId( triggerOwnerId );
   pushActor( pBNpc );
   return pBNpc;
@@ -875,36 +888,14 @@ std::shared_ptr< World::Navi::NaviProvider > Territory::getNaviProvider()
   return m_pNaviProvider;
 }
 
-void Territory::addEffectResult( World::Action::EffectResultPtr result )
-{
-  m_effectResults.emplace_back( std::move( result ) );
-}
-
-void Territory::processEffectResults( uint64_t tickCount )
-{
-  // todo: move this to generic territory/instance delay wrapper cause it might be useful scheduling other things
-  for( auto it = m_effectResults.begin(); it != m_effectResults.end(); )
-  {
-    auto effect = *it;
-
-    if( tickCount < effect->getDelay() )
-    {
-      ++it;
-      continue;
-    }
-
-    effect->execute();
-
-    it = m_effectResults.erase( it );
-  }
-}
-
 bool Territory::loadBNpcs()
 {
   auto& db = Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::ref();
   auto stmt = db.getPreparedStatement( Db::ZoneDbStatements::ZONE_SEL_BNPCS_BY_TERI );
   stmt->setUInt( 1, getTerritoryTypeId() );
   auto res = db.query( stmt );
+
+  // todo: load any exd links, cache them, build more info and setup bnpcs properly
 
   while( res->next() )
   {
@@ -981,4 +972,14 @@ void Territory::onEventHandlerOrder( Entity::Player& player, uint32_t arg0, uint
 const Common::TerritoryIdent& Territory::getTerritoryIdent() const
 {
   return m_ident;
+}
+
+void Territory::setEncounterTimeline( const std::string& name )
+{
+  m_timelinePack = Encounter::EncounterTimeline::getEncounterPack( name, true );
+}
+
+Encounter::TimelinePack& Territory::getEncounterTimeline()
+{
+  return m_timelinePack;
 }

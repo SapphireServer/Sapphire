@@ -67,6 +67,13 @@ void ItemAction::execute()
 
       break;
     }
+
+    case Common::ItemActionType::ItemActionSong:
+    {
+      handleSongItem();
+
+      break;
+    }
   }
 }
 
@@ -78,12 +85,11 @@ void ItemAction::interrupt()
 void ItemAction::handleVFXItem()
 {
   Common::CalcResultParam effect{};
-  effect.Type = Common::ActionEffectType::CALC_RESULT_TYPE_CHECK_BARRIER;
+  effect.Type = Common::CalcResultType::TypeCheckBarrier;
   effect.Value = m_itemAction->data().Calcu0Arg[ 0 ];
 
-  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getId() );
-  effectPacket->setTargetActor( getSourceChara()->getId() );
-  effectPacket->setAnimationId( Common::ItemActionType::ItemActionVFX );
+  auto effectPacket = std::make_shared< EffectPacket >( getSourceChara()->getId(), getSourceChara()->getId(), getId() );
+  effectPacket->setActionId( Common::ItemActionType::ItemActionVFX );
   effectPacket->setDisplayType( Common::ActionEffectDisplayType::ShowItemName );
   effectPacket->addTargetEffect( effect, static_cast< uint64_t >( getSourceChara()->getId() ) );
   server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), effectPacket );
@@ -102,5 +108,13 @@ void ItemAction::handleMountItem()
   auto player = getSourceChara()->getAsPlayer();
 
   player->unlockMount( m_itemAction->data().Calcu0Arg[ 0 ] );
+  player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), static_cast< uint8_t >( m_itemSourceSlot ) );
+}
+
+void ItemAction::handleSongItem()
+{
+  auto player = getSourceChara()->getAsPlayer();
+
+  playerMgr().onSongLearned( *player, m_itemAction->data().Calcu0Arg[ 0 ], m_id );
   player->dropInventoryItem( static_cast< Common::InventoryType >( m_itemSourceContainer ), static_cast< uint8_t >( m_itemSourceSlot ) );
 }

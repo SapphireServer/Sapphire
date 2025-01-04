@@ -3,6 +3,7 @@
 #include <Common.h>
 
 #include "Forwards.h"
+#include "ForwardsZone.h"
 #include "Chara.h"
 #include "Npc.h"
 #include <set>
@@ -17,6 +18,7 @@ namespace Sapphire::Entity
     uint32_t m_hateAmount;
     CharaPtr m_pChara;
   };
+  using HateListEntryPtr = std::shared_ptr< HateListEntry >;
 
   enum class BNpcState
   {
@@ -30,13 +32,16 @@ namespace Sapphire::Entity
 
   enum BNpcFlag
   {
-    None = 0,
-    Immobile = 1,
-    TurningDisabled = 2,
-    Invincible = 4,
-    InvincibleRefill = 8,
-    NoDeaggro = 16,
-    Untargetable = 32,
+    Immobile           = 0x01,
+    TurningDisabled    = 0x02,
+    Invincible         = 0x04,
+    StayAlive          = 0x08,
+    NoDeaggro          = 0x10,
+    Untargetable       = 0x20,
+    AutoAttackDisabled = 0x40,
+    Invisible          = 0x80,
+
+    Intermission       = 0x77 // for transition phases to ensure boss only moves/acts when scripted
   };
 
   const std::array< uint32_t, 50 > BnpcBaseHp =
@@ -102,6 +107,7 @@ namespace Sapphire::Entity
     BNpcState getState() const;
     void setState( BNpcState state );
 
+    const std::set< std::shared_ptr< HateListEntry > >& getHateList() const;
     void hateListClear();
     uint32_t hateListGetValue( const Sapphire::Entity::CharaPtr& pChara );
     uint32_t hateListGetHighestValue();
@@ -111,7 +117,7 @@ namespace Sapphire::Entity
     void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );
-
+    
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );
 
@@ -139,6 +145,8 @@ namespace Sapphire::Entity
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
+    void removeFlag( uint32_t flag );
+    void clearFlags();
 
     void calculateStats() override;
 
@@ -147,6 +155,21 @@ namespace Sapphire::Entity
     Common::BNpcType getBNpcType() const;
 
     uint32_t getLayoutId() const;
+
+    void processGambits( uint64_t tickCount );
+
+    uint32_t getLastRoamTargetReachedTime() const;
+    void setLastRoamTargetReachedTime( uint32_t time );
+
+    std::shared_ptr< Common::BNPCInstanceObject > getInstanceObjectInfo() const;
+
+    void setRoamTargetReached( bool reached );
+    bool isRoamTargetReached() const;
+
+    void setRoamTargetPos( const Common::FFXIVARR_POSITION3& targetPos );
+
+    const Common::FFXIVARR_POSITION3& getRoamTargetPos() const;
+    const Common::FFXIVARR_POSITION3& getSpawnPos() const;
 
   private:
     uint32_t m_bNpcBaseId;
@@ -175,7 +198,8 @@ namespace Sapphire::Entity
     std::shared_ptr< Common::BNPCInstanceObject > m_pInfo;
 
     uint32_t m_timeOfDeath;
-    uint32_t m_lastRoamTargetReached;
+    uint32_t m_lastRoamTargetReachedTime;
+    bool m_roamTargetReached{ false };
 
     Common::FFXIVARR_POSITION3 m_spawnPos;
     Common::FFXIVARR_POSITION3 m_roamPos;
@@ -189,6 +213,9 @@ namespace Sapphire::Entity
     Common::FFXIVARR_POSITION3 m_naviTarget;
 
     CharaPtr m_pOwner;
+    World::AI::GambitPackPtr m_pGambitPack;
+
+    std::shared_ptr< World::AI::Fsm::StateMachine > m_fsm;
 
   };
 

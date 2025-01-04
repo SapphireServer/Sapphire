@@ -34,10 +34,11 @@ namespace Sapphire::Entity
     using AetheryteList = std::array< uint8_t, Common::ARRSIZE_AETHERYTES >;
     using UnlockList = std::array< uint8_t, Common::ARRSIZE_UNLOCKS >;
     using OrchestrionList = std::array< uint8_t, Common::ARRSIZE_ORCHESTRION >;
-    using Condition = std::array< uint8_t, 12 >;
+    using Condition = std::array< uint8_t, Common::ARRSIZE_CONDITION >;
 
     using ClassList = std::array< uint16_t, Common::ARRSIZE_CLASSJOB >;
     using ExpList = std::array< uint32_t, Common::ARRSIZE_CLASSJOB >;
+    using BorrowAction = std::array< uint32_t, Common::ARRSIZE_BORROWACTION >;
 
     struct AchievementData {
       std::array< uint8_t, 2048 / 8 > unlockList;
@@ -82,12 +83,6 @@ namespace Sapphire::Entity
 
     /*! Event called on every session iteration */
     void update( uint64_t tickCount ) override;
-
-    /*! get last attack tick for player */
-    uint64_t getLastAttack() const;
-
-    /*! set last attack tick for player */
-    void setLastAttack( uint64_t tickCount );
 
     // Quest
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,16 +215,10 @@ namespace Sapphire::Entity
     bool isClassJobUnlocked( Common::ClassJob classJob ) const;
 
     /*! returns the exp of the currently active class / job */
-    uint32_t getExp() const;
+    uint32_t getCurrentExp() const;
 
     /*! sets the exp of the currently active class / job */
-    void setExp( uint32_t amount );
-
-    /*! adds exp to the currently active class / job */
-    void gainExp( uint32_t amount );
-
-    /*! gain a level on the currently active class / job */
-    void levelUp();
+    void setCurrentExp( uint32_t amount );
 
     /*! set level on the currently active class / job to given level */
     void setLevel( uint8_t level );
@@ -299,9 +288,6 @@ namespace Sapphire::Entity
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
 
-    /*! returns the player to their position before zoning into an instance */
-    bool exitInstance();
-
     /*! gets the players territoryTypeId */
     uint32_t getPrevTerritoryTypeId() const;
 
@@ -345,7 +331,7 @@ namespace Sapphire::Entity
     uint64_t getFullOnlineStatusMask() const;
 
     /*! query teleport of a specified type */
-    void teleportQuery( uint16_t aetheryteId );
+    void teleportQuery( uint16_t aetheryteId, bool useAetheryteTicket );
 
     Common::PlayerTeleportQuery getTeleportQuery() const;
 
@@ -428,9 +414,6 @@ namespace Sapphire::Entity
     /*! get homepoint */
     uint8_t getHomepoint() const;
 
-    /*! discover subarea subid fo map map_id, also send udpate packet */
-    void discover( int16_t mapId, int16_t subId );
-
     /*! return a reference to the discovery bitmask array */
     Discovery& getDiscoveryBitmask();
 
@@ -445,6 +428,13 @@ namespace Sapphire::Entity
 
     /*! learn an action / update the unlock bitmask. */
     void setRewardFlag( Common::UnlockEntry unlockId );
+
+    /*! helper/debug function to fill unlock bitmask */
+    void fillRewardFlags();
+
+    void setBorrowAction( uint8_t slot, uint32_t action );
+
+    BorrowAction& getBorrowAction();
 
     /*! learn a song / update the unlock bitmask. */
     void learnSong( uint8_t songId, uint32_t itemId );
@@ -489,8 +479,8 @@ namespace Sapphire::Entity
     void setRecastGroup( uint8_t index, float time );
 
     float getRecastGroup( uint8_t index ) const;
-    const std::array< float, 80 >& Player::getRecastGroups() const;
-    const std::array< float, 80 >& Player::getRecastGroupsMax() const;
+    const std::array< float, 80 >& getRecastGroups() const;
+    const std::array< float, 80 >& getRecastGroupsMax() const;
 
     void resetRecastGroups();
 
@@ -779,8 +769,6 @@ namespace Sapphire::Entity
 
     Common::HuntingLogEntry& getHuntingLogEntry( uint8_t index );
 
-    void updateHuntingLog( uint16_t id );
-
     uint64_t getPartyId() const;
     void setPartyId( uint64_t partyId );
 
@@ -965,6 +953,8 @@ namespace Sapphire::Entity
     Common::Util::SpawnIndexAllocator< uint8_t > m_actorSpawnIndexAllocator;
 
     std::array< Common::HuntingLogEntry, Common::ARRSIZE_MONSTERNOTE > m_huntingLogEntries{};
+
+    std::array< BorrowAction, Common::ARRSIZE_CLASSJOB > m_borrowActions{};
 
     FriendListIDVec m_friendList{};
     FriendListDataVec m_friendInviteList{};

@@ -302,18 +302,18 @@ namespace Excel
     uint16_t LimitBreakAction[3];
     uint16_t PvpLimitBreakAction[3];
     uint8_t Kind;
-    uint8_t UIPriority;
     uint8_t Unknown6;
+    uint8_t JobIndex;
     uint8_t MainClass;
     uint8_t Role;
     uint8_t Town;
-    int8_t MonsterNote;
+    int8_t UIPriority;
     int8_t StartingLevel;
     uint8_t PartyBuff;
     int8_t WorkIndex;
     int8_t BattleClassIndex;
     int8_t CraftingClassIndex;
-    int8_t Unknown7;
+    int8_t MonsterNote;
   };
 
   /* 63507 */
@@ -392,12 +392,13 @@ namespace Excel
     uint8_t CostType;
     uint8_t Cond;
     uint8_t RecastGroup;
-    uint8_t Element;
     uint8_t ProcStatus;
-    uint8_t UseClassJob;
+    uint8_t Unknown1; // todo: possibly cost type? tp etc?
+    uint8_t ClassJobCategory; // recastgroup
     uint8_t Init;
     uint8_t Omen;
-    int8_t Learn;
+    uint8_t Learn;
+    int8_t UseClassJob;
     int8_t SelectRange;
     int8_t SelectCorpse;
     int8_t AttackType;
@@ -429,7 +430,7 @@ namespace Excel
     uint8_t HideCastBar : 1;
     uint8_t IsTargetLine : 1;
 
-    int8_t padding0;
+    int8_t unknown;
   };
 
   /* 75653 */
@@ -2053,7 +2054,8 @@ namespace Excel
     uint8_t NotControl : 1;
     uint8_t NotAction : 1;
     uint8_t NotMove : 1;
-    uint8_t padding0 : 6;
+    uint8_t padding0 : 5;
+    uint8_t CanOff : 1;
     uint8_t SemiTransparent : 1;
     uint8_t FcAction : 1;
     int8_t padding1[2];

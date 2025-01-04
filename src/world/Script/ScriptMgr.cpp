@@ -644,9 +644,6 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Sapp
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
-    if( pChara->isPlayer() )
-      PlayerMgr::sendDebug( *pChara->getAsPlayer(), "Calling status tick for statusid#{0}", effect.getId() );
-
     script->onTick( *pChara );
     return true;
   }

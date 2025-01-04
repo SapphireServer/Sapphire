@@ -62,10 +62,18 @@ public:
       // eventParam4 (or params[1] if using EventPlay8, which is actually used on retail) anything bigger than 1 will show select instance menu item
       eventMgr().playScene( player, eventId, 0, 1, { 1, 2 }, [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-        if( result.numOfResults == 1 ) // set homepoint
+        if( result.numOfResults == 1 )
         {
-          player.setHomepoint( result.eventId & 0xFFFF );
-          eventMgr().sendEventNotice( player, result.eventId, 2, 0xEA, 0, 0 );
+          auto cmd = result.getResult( 0 );
+          if( cmd == 1 ) // set homepoint
+          {
+            player.setHomepoint( result.eventId & 0xFFFF );
+            eventMgr().sendEventNotice( player, result.eventId, 2, 0xEA, 0, 0 );
+          }
+          else if( cmd == 5 )
+          {
+            //TODO: Housing teleport selection
+          }
         }
         else if( result.numOfResults == 2 ) // aethernet access
         {

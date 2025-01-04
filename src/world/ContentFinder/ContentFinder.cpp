@@ -18,13 +18,15 @@
 
 #include <WorldServer.h>
 
+using namespace Sapphire;
+using namespace Sapphire::World;
 using namespace Sapphire::Common;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 using namespace Sapphire::World::Manager;
 
-void Sapphire::World::ContentFinder::update()
+void World::ContentFinder::update()
 {
   auto& exdData = Service< Data::ExdData >::ref();
   auto& server = Service< WorldServer >::ref();
@@ -114,27 +116,26 @@ void Sapphire::World::ContentFinder::update()
 
 }
 
-void Sapphire::World::ContentFinder::registerContentsRequest( Sapphire::Entity::Player &player, const std::vector< uint32_t >& contentIds )
+void World::ContentFinder::registerContentsRequest( Entity::Player &player, const std::vector< uint32_t >& contentIds )
 {
   queueForContent( player, contentIds );
   completeRegistration( player );
 }
 
-void Sapphire::World::ContentFinder::registerContentRequest( Sapphire::Entity::Player &player, uint32_t contentId, uint8_t flags )
+void World::ContentFinder::registerContentRequest( Entity::Player &player, uint32_t contentId, uint8_t flags )
 {
   queueForContent( player, { contentId } );
   completeRegistration( player, flags );
 }
 
-void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Entity::Player &player, uint32_t randomContentTypeId )
+void World::ContentFinder::registerRandomContentRequest( Entity::Player &player, uint32_t randomContentTypeId )
 {
   auto& exdData = Service< Data::ExdData >::ref();
-  auto contentListIds = exdData.getIdList< Excel::ContentFinderCondition >();
+  auto contentFinderList = exdData.getRows< Excel::ContentFinderCondition >();
   std::vector< uint32_t > idList;
 
-  for( auto id : contentListIds )
+  for( const auto& [ id, instanceContent ] : contentFinderList )
   {
-    auto instanceContent = exdData.getRow< Excel::ContentFinderCondition >( id );
     if( instanceContent->data().RandomContentType == randomContentTypeId )
     {
       if( instanceContent->data().LevelMin <= player.getLevel() )
@@ -146,9 +147,8 @@ void Sapphire::World::ContentFinder::registerRandomContentRequest( Sapphire::Ent
   completeRegistration( player );
 }
 
-void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entity::Player &player, uint8_t flags )
+void World::ContentFinder::completeRegistration( const Entity::Player &player, uint8_t flags )
 {
-
   auto& server = Service< WorldServer >::ref();
   auto queuedContent = m_queuedContent[ m_queuedPlayer[ player.getId() ]->getActiveRegisterId() ];
 
@@ -182,7 +182,7 @@ void Sapphire::World::ContentFinder::completeRegistration( const Sapphire::Entit
   }
 }
 
-void Sapphire::World::ContentFinder::queueForContent( Sapphire::Entity::Player &player, const std::vector< uint32_t >& contentIds )
+void World::ContentFinder::queueForContent( Entity::Player &player, const std::vector< uint32_t >& contentIds )
 {
   for( auto contentId : contentIds )
   {
@@ -215,7 +215,7 @@ void Sapphire::World::ContentFinder::queueForContent( Sapphire::Entity::Player &
   }
 }
 
-void Sapphire::World::QueuedContent::queuePlayer( const std::shared_ptr< QueuedPlayer >& pQPlayer )
+void World::QueuedContent::queuePlayer( const std::shared_ptr< QueuedPlayer >& pQPlayer )
 {
   m_players.push_back( pQPlayer );
   m_partyMemberCount++;
@@ -241,7 +241,7 @@ void Sapphire::World::QueuedContent::queuePlayer( const std::shared_ptr< QueuedP
   }
 }
 
-bool Sapphire::World::QueuedContent::withdrawPlayer( const std::shared_ptr< QueuedPlayer >& pQPlayer )
+bool World::QueuedContent::withdrawPlayer( const std::shared_ptr< QueuedPlayer >& pQPlayer )
 {
   auto preSize = m_players.size();
   auto it = m_players.begin();
@@ -282,12 +282,12 @@ bool Sapphire::World::QueuedContent::withdrawPlayer( const std::shared_ptr< Queu
   return true;
 }
 
-uint32_t Sapphire::World::ContentFinder::getNextRegisterId()
+uint32_t World::ContentFinder::getNextRegisterId()
 {
   return ++m_nextRegisterId;
 }
 
-Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFinder::getMatchingContentList( Sapphire::Entity::Player &player, uint32_t contentFinderId )
+World::ContentFinder::QueuedContentPtrList World::ContentFinder::getMatchingContentList( Entity::Player &player, uint32_t contentFinderId )
 {
   QueuedContentPtrList outVec;
   for( auto& it : m_queuedContent )
@@ -361,7 +361,7 @@ Sapphire::World::ContentFinder::QueuedContentPtrList Sapphire::World::ContentFin
   return outVec;
 }
 
-void Sapphire::World::ContentFinder::accept( Entity::Player& player )
+void World::ContentFinder::accept( Entity::Player& player )
 {
   auto& server = Service< WorldServer >::ref();
   auto& exdData = Service< Data::ExdData >::ref();
@@ -408,7 +408,7 @@ void Sapphire::World::ContentFinder::accept( Entity::Player& player )
     queuedContent->setState( Accepted );
 }
 
-void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
+void World::ContentFinder::withdraw( Entity::Player& player )
 {
   auto& server = Service< WorldServer >::ref();
   auto& exdData = Service< Data::ExdData >::ref();
@@ -471,7 +471,7 @@ void Sapphire::World::ContentFinder::withdraw( Entity::Player& player )
 
 }
 
-std::shared_ptr< Sapphire::World::QueuedContent > Sapphire::World::ContentFinder::findContentByRegisterId( uint32_t registerId )
+std::shared_ptr< World::QueuedContent > World::ContentFinder::findContentByRegisterId( uint32_t registerId )
 {
   auto it = m_queuedContent.find( registerId );
   if( it != m_queuedContent.end() )
@@ -479,7 +479,7 @@ std::shared_ptr< Sapphire::World::QueuedContent > Sapphire::World::ContentFinder
   return nullptr;
 }
 
-bool Sapphire::World::ContentFinder::removeContentByRegisterId( uint32_t registerId )
+bool World::ContentFinder::removeContentByRegisterId( uint32_t registerId )
 {
   auto it = m_queuedContent.find( registerId );
   if( it == m_queuedContent.end() )
@@ -490,21 +490,21 @@ bool Sapphire::World::ContentFinder::removeContentByRegisterId( uint32_t registe
 
 //////////////////////////////////////////////////////////////////////
 
-uint32_t Sapphire::World::QueuedContent::getInstanceId() const
+uint32_t World::QueuedContent::getInstanceId() const
 {
   return m_contentFinderId;
 }
 
-uint32_t Sapphire::World::QueuedContent::getRegisterId() const
+uint32_t World::QueuedContent::getRegisterId() const
 {
   return m_registerId;
 }
 
-Sapphire::World::QueuedContent::QueuedContent( uint32_t registerId, uint32_t contentId ) :
-        m_registerId( registerId ),
-        m_contentFinderId( contentId ),
-        m_state( QueuedContentState::MatchingInProgress ),
-        m_contentPopTime( 0 )
+World::QueuedContent::QueuedContent( uint32_t registerId, uint32_t contentId ) :
+  m_registerId( registerId ),
+  m_contentFinderId( contentId ),
+  m_state( QueuedContentState::MatchingInProgress ),
+  m_contentPopTime( 0 )
 {
  // auto& exdData = Common::Service< Data::ExdData >::ref();
  // auto content = exdData.getRow< Excel::InstanceContent >( contentId );
@@ -512,7 +512,7 @@ Sapphire::World::QueuedContent::QueuedContent( uint32_t registerId, uint32_t con
 
 }
 
-uint8_t Sapphire::World::QueuedContent::getRoleCount( Sapphire::Common::Role role ) const
+uint8_t World::QueuedContent::getRoleCount( Common::Role role ) const
 {
   switch( role )
   {
@@ -533,12 +533,12 @@ uint8_t Sapphire::World::QueuedContent::getRoleCount( Sapphire::Common::Role rol
   return 0;
 }
 
-Sapphire::World::QueuedContentState Sapphire::World::QueuedContent::getState() const
+World::QueuedContentState World::QueuedContent::getState() const
 {
   return m_state;
 }
 
-void Sapphire::World::QueuedContent::setState( Sapphire::World::QueuedContentState state )
+void World::QueuedContent::setState( World::QueuedContentState state )
 {
   m_state = state;
 }
@@ -546,7 +546,7 @@ void Sapphire::World::QueuedContent::setState( Sapphire::World::QueuedContentSta
 //////////////////////////////////////////////////////////////////////
 
 
-Sapphire::World::QueuedPlayer::QueuedPlayer( const Entity::Player &player, uint8_t registerId  )
+World::QueuedPlayer::QueuedPlayer( const Entity::Player &player, uint8_t registerId  )
 {
   m_characterId = player.getCharacterId();
   m_classJob = static_cast< uint32_t >( player.getClass() );
@@ -556,27 +556,27 @@ Sapphire::World::QueuedPlayer::QueuedPlayer( const Entity::Player &player, uint8
   m_entityId = player.getId();
 }
 
-Sapphire::Common::Role Sapphire::World::QueuedPlayer::getRole() const
+Common::Role World::QueuedPlayer::getRole() const
 {
   return m_role;
 }
 
-void Sapphire::World::QueuedPlayer::setActiveRegisterId( uint8_t registerId )
+void World::QueuedPlayer::setActiveRegisterId( uint8_t registerId )
 {
   m_activeRegisterId = registerId;
 }
 
-uint8_t Sapphire::World::QueuedPlayer::getActiveRegisterId() const
+uint8_t World::QueuedPlayer::getActiveRegisterId() const
 {
   return m_activeRegisterId;
 }
 
-uint64_t Sapphire::World::QueuedPlayer::getCharacterId() const
+uint64_t World::QueuedPlayer::getCharacterId() const
 {
   return m_characterId;
 }
 
-uint32_t Sapphire::World::QueuedPlayer::getEntityId() const
+uint32_t World::QueuedPlayer::getEntityId() const
 {
   return m_entityId;
 }

@@ -35,13 +35,24 @@ using namespace Sapphire::World::Manager;
 bool MapMgr::loadQuests()
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
-  auto idList = exdData.getIdList< Excel::Quest >();
 
-  for( auto id : idList )
+  auto questList = exdData.getRows< Excel::Quest >();
+  auto eNpcList = exdData.getRows< Excel::ENpcBase >();
+  auto eObjList = exdData.getRows< Excel::EObj >();
+
+  for( auto& [ id, questExdData ] : questList )
   {
-    auto questExdData = exdData.getRow< Excel::Quest >( id );
+    m_questCacheMap.emplace( id, std::move( questExdData ) );
+  }
 
-    m_quests.emplace( id, std::move( questExdData ) );
+  for( auto& [ id, eNpcExdData ] : eNpcList )
+  {
+    m_eNpcCacheMap.emplace( id, std::move( eNpcExdData ) );
+  }
+
+  for( auto& [ id, eObjExdData ] : eObjList )
+  {
+    m_eObjCacheMap.emplace( id, std::move( eObjExdData ) );
   }
 
   return true;
@@ -60,12 +71,12 @@ void MapMgr::updateAll( Entity::Player& player )
   
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpc = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId );
-    if( !eNpc )
+    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->data.enpcId );
+    if( eNpcIt == std::end( m_eNpcCacheMap ) )
       continue;
 
-    auto eNpcData = eNpc->data().EventHandler;
-    for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
+    auto eNpcData = eNpcIt->second->data().EventHandler;
+    for( auto npcEvent = 0; npcEvent < 32; ++npcEvent )
     {
       auto npcData = eNpcData[ npcEvent ].EventHandler;
 
@@ -82,7 +93,7 @@ void MapMgr::updateAll( Entity::Player& player )
       {
         case EventHandler::EventHandlerType::Quest:
         {
-          auto& quest = m_quests[ npcData ]->data();
+          auto& quest = m_questCacheMap[ npcData ]->data();
 
           if( quest.Client == eventNpc.second->data.enpcId )
           {
@@ -104,7 +115,7 @@ void MapMgr::updateAll( Entity::Player& player )
             {
               if( guildLeve.NeedGrandCompanyRank > 0 && player.getGc() != 0 )
               {
-                for( int8_t i = 0; i < 3; i++ )
+                for( int8_t i = 0; i < 3; ++i )
                 {
                   if( player.getGcRankArray()[ i ] >= guildLeve.NeedGrandCompanyRank )
                   {
@@ -164,11 +175,11 @@ void MapMgr::updateAll( Entity::Player& player )
 
   for( const auto& eventObj : *eventObjs )
   {
-    auto eObj = exdData.getRow< Excel::EObj >( eventObj.second->data.BaseId );
-    if( !eObj )
-      return;
+    auto eObjIt = m_eObjCacheMap.find( eventObj.second->data.BaseId );
+    if( eObjIt == std::end( m_eObjCacheMap ) )
+      continue;
 
-    auto eObjData = eObj->data();
+    auto eObjData = eObjIt->second->data();
     EventData eventData;
     eventData.handlerId = eObjData.EventHandler;
     eventData.layoutId = eventObj.first;
@@ -177,7 +188,7 @@ void MapMgr::updateAll( Entity::Player& player )
 
     if( eventHandlerType == EventHandler::EventHandlerType::Quest )
     {
-      auto& quest = m_quests[ eObjData.EventHandler ]->data();
+      auto& quest = m_questCacheMap[ eObjData.EventHandler ]->data();
 
       if( quest.Client == eventObj.second->data.BaseId )
       {
@@ -202,13 +213,13 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventNpc : *eventNpcs )
   {
-    auto eNpc = exdData.getRow< Excel::ENpcBase >( eventNpc.second->data.enpcId );
-    if( !eNpc )
+    auto eNpcIt = m_eNpcCacheMap.find( eventNpc.second->data.enpcId );
+    if( eNpcIt == std::end( m_eNpcCacheMap ) )
       continue;
 
-    auto eNpcData = eNpc->data().EventHandler;
+    auto eNpcData = eNpcIt->second->data().EventHandler;
 
-    for( int npcEvent = 0; npcEvent < 32; npcEvent++ )
+    for( auto npcEvent = 0; npcEvent < 32; ++npcEvent )
     {
       auto npcData = eNpcData[ npcEvent ].EventHandler;
 
@@ -223,7 +234,7 @@ void MapMgr::updateQuests( Entity::Player& player )
 
       if( eventHandlerType == EventHandler::EventHandlerType::Quest )
       {
-        auto& quest = m_quests[ npcData ]->data();
+        auto& quest = m_questCacheMap[ npcData ]->data();
 
         if( quest.Client == eventNpc.second->data.enpcId )
         {
@@ -239,11 +250,11 @@ void MapMgr::updateQuests( Entity::Player& player )
 
   for( const auto& eventObj : *eventObjs )
   {
-    auto eObj = exdData.getRow< Excel::EObj >( eventObj.second->data.BaseId );
-    if( !eObj )
-      return;
+    auto eObjIt = m_eObjCacheMap.find( eventObj.second->data.BaseId );
+    if( eObjIt == std::end( m_eObjCacheMap ) )
+      continue;
 
-    auto eObjData = eObj->data();
+    auto eObjData = eObjIt->second->data();
     EventData eventData;
     eventData.handlerId = eObjData.EventHandler;
     eventData.layoutId = eventObj.first;
@@ -252,7 +263,7 @@ void MapMgr::updateQuests( Entity::Player& player )
 
     if( eventHandlerType == EventHandler::EventHandlerType::Quest )
     {
-      auto& quest = m_quests[ eObjData.EventHandler ]->data();
+      auto& quest = m_questCacheMap[ eObjData.EventHandler ]->data();
 
       if( quest.Client == eventObj.second->data.BaseId )
       {
@@ -269,7 +280,7 @@ void MapMgr::insertQuest( Entity::Player& player, uint32_t questId, uint32_t lay
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  auto& quest = m_quests[ questId ]->data();
+  auto& quest = m_questCacheMap[ questId ]->data();
 
   if( isQuestVisible( player, questId, quest ) )
   {
@@ -309,7 +320,7 @@ bool MapMgr::isQuestAvailable( Entity::Player& player, uint32_t questId, Excel::
 
   if( quest.InstanceContentOperator == 1 )
   {
-    for( int32_t i = 0; i < 3; i++ )
+    for( int32_t i = 0; i < 3; ++i )
     {
       if( quest.InstanceContent[ i ] == 0 )
         continue;
@@ -321,7 +332,7 @@ bool MapMgr::isQuestAvailable( Entity::Player& player, uint32_t questId, Excel::
   }
   else if( quest.InstanceContentOperator == 2 )
   {
-    for( int32_t i = 0; i < 3; i++ )
+    for( int32_t i = 0; i < 3; ++i )
     {
       if( quest.InstanceContent[ i ] == 0 )
         continue;
@@ -398,7 +409,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
 
   if( quest.PrevQuestOperator == 1 )
   {
-    for( int32_t i = 0; i < 3; i++ )
+    for( auto i = 0; i < 3; ++i )
     {
       if( quest.PrevQuest[ i ] == 0 )
         continue;
@@ -421,7 +432,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   }
   else if( quest.PrevQuestOperator == 2 )
   {
-    for( int32_t i = 0; i < 3; i++ )
+    for( auto i = 0; i < 3; ++i )
     {
       if( quest.PrevQuest[ i ] == 0 )
         continue;
@@ -436,7 +447,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
 
   if( quest.ExcludeQuestOperator == 1 )
   {
-    for( int32_t i = 0; i < 2; i++ )
+    for( auto i = 0; i < 2; ++i )
     {
       if( quest.ExcludeQuest[ i ] == 0 )
         continue;
@@ -450,7 +461,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   }
   else if( quest.ExcludeQuestOperator == 2 )
   {
-    for( int32_t i = 0; i < 2; i++ )
+    for( auto i = 0; i < 2; ++i )
     {
       if( quest.ExcludeQuest[ i ] == 0 )
         continue;
@@ -477,7 +488,7 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   {
     auto classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob )->data().ClassJob;
 
-    for( int32_t i = 1; i <= Common::CLASSJOB_TOTAL; i++ )
+    for( auto i = 1; i <= Common::CLASSJOB_TOTAL; ++i )
     {
       if( i == Common::CLASSJOB_TOTAL )
         return false;
@@ -496,13 +507,14 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   }
 
   // TODO: I think this changed in 3.x to be for all relics, more research is needed.
-  for( int32_t i = 0; i < Common::CLASSJOB_TOTAL; i++ )
+  // todo: fix this inner j loop
+  for( auto i = 0; i < Common::CLASSJOB_TOTAL; ++i )
   {
     auto classJob = exdData.getRow< Excel::ClassJob >( i );
 
     if( classJob->data().ARRRelicQuestId == questId )
     {
-      for( int32_t j = 0; i < Common::CLASSJOB_TOTAL; i++ )
+      for( auto j = 0; i < Common::CLASSJOB_TOTAL; ++i )
       {
         classJob = exdData.getRow< Excel::ClassJob >( i );
 

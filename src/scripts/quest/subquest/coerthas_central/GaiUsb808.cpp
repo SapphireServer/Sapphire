@@ -55,6 +55,7 @@ private:
   static constexpr auto Item0 = 2000720;
   static constexpr auto Item1 = 2000721;
   static constexpr auto Item2 = 2000722;
+  static constexpr auto Item0Icon = 26002;
 
 public:
   GaiUsb808() : Sapphire::ScriptAPI::QuestScript( 66453 ){};
@@ -162,7 +163,7 @@ private:
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 1, 0 );//TODO:Show Item Icon (Needs func update)
+    eventMgr().sendNotice( player, getId(), 1, { Item0Icon } );
     quest.setUI8BH( 1 );
     quest.setSeq( Seq3 );
   }

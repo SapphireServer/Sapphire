@@ -3,14 +3,15 @@
 #include <Service.h>
 
 #include <Exd/ExdData.h>
-
+#include <Util/Util.h>
 #include <Territory/Land.h>
 
-#include <Manager/TerritoryMgr.h>
 #include <Manager/AchievementMgr.h>
-#include <Manager/PartyMgr.h>
+#include <Manager/TerritoryMgr.h>
 #include <Manager/HousingMgr.h>
 #include <Manager/QuestMgr.h>
+#include <Manager/WarpMgr.h>
+#include <Manager/MapMgr.h>
 
 #include <Script/ScriptMgr.h>
 #include <Common.h>
@@ -18,18 +19,8 @@
 #include <Database/ZoneDbConnection.h>
 #include <Database/DbWorkerPool.h>
 
-#include <Network/GameConnection.h>
 #include <Network/CommonActorControl.h>
-#include <Network/PacketDef/Zone/ServerZoneDef.h>
-#include <Network/PacketWrappers/ActorControlPacket.h>
-#include <Network/PacketWrappers/ActorControlSelfPacket.h>
-#include <Network/PacketWrappers/ActorControlTargetPacket.h>
-#include <Network/PacketWrappers/InitZonePacket.h>
-#include <Network/PacketWrappers/PlayerSetupPacket.h>
-#include <Network/PacketWrappers/ServerNoticePacket.h>
-#include <Network/PacketWrappers/ChatPacket.h>
-#include <Network/PacketWrappers/HudParamPacket.h>
-#include <Network/Util/PlayerUtil.h>
+#include <Network/Util/PacketUtil.h>
 
 #include <Actor/Player.h>
 #include <Actor/BNpc.h>
@@ -93,7 +84,6 @@ std::vector< Sapphire::Entity::PlayerPtr > PlayerMgr::searchPlayersByName( const
   return results;
 }
 
-
 std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLoad )
 {
   if( !forceDbLoad )
@@ -108,13 +98,12 @@ std::string PlayerMgr::getPlayerNameFromDb( uint64_t characterId, bool forceDbLo
   auto res = db.query( "SELECT name FROM charainfo WHERE characterid = " + std::to_string( characterId ) );
 
   if( !res->next() )
-    return "Unknown";
+    return "Obtaining Signature";
 
   std::string playerName = res->getString( 1 );
 
   return playerName;
 }
-
 
 Sapphire::Entity::PlayerPtr PlayerMgr::addPlayer( uint64_t characterId )
 {
@@ -218,9 +207,7 @@ void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
   scriptMgr.onBNpcKill( player, bnpc );
 
   if( player.hasReward( Common::UnlockEntry::HuntingLog ) )
-  {
-    player.updateHuntingLog( bnpc.getBNpcNameId() );
-  }
+    onUpdateHuntingLog( player, bnpc.getBNpcNameId() );
 }
 
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
@@ -262,48 +249,48 @@ void PlayerMgr::onMoveZone( Sapphire::Entity::Player& player )
   }
   auto& teri = *pZone;
 
-  Network::Util::Player::sendLogin( player );
+  Network::Util::Packet::sendLogin( player );
 
   player.sendInventory();
 
   if( player.isLogin() )
   {
-    Network::Util::Player::sendActorControlSelf( player, SetConfigFlags, player.getConfigFlags(), 1 );
-    Network::Util::Player::sendActorControlSelf( player, SetMaxGearSets, player.getMaxGearSets() );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetConfigFlags, player.getConfigFlags(), 1 );
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), SetMaxGearSets, player.getMaxGearSets() );
   }
 
   // set flags, will be reset automatically by zoning ( only on client side though )
   //setStateFlag( PlayerStateFlag::BetweenAreas );
   //setStateFlag( PlayerStateFlag::BetweenAreas1 );
 
-  Network::Util::Player::sendHuntingLog( player );
+  Network::Util::Packet::sendHuntingLog( player );
 
   if( player.isLogin() )
-    Network::Util::Player::sendPlayerSetup( player );
+    Network::Util::Packet::sendPlayerSetup( player );
 
-  Network::Util::Player::sendRecastGroups( player );
-  Network::Util::Player::sendBaseParams( player );
-  Network::Util::Player::sendActorControl( player, SetItemLevel, player.getItemLevel() );
+  Network::Util::Packet::sendRecastGroups( player );
+  Network::Util::Packet::sendBaseParams( player );
+  Network::Util::Packet::sendActorControl( player, player.getId(), SetItemLevel, player.getItemLevel() );
   if( player.isLogin() )
   {
-    Network::Util::Player::sendChangeClass( player );
-    Network::Util::Player::sendActorControl( player, 0x112, 0x24 ); // unknown
-    Network::Util::Player::sendContentAttainFlags( player );
+    Network::Util::Packet::sendChangeClass( player );
+    Network::Util::Packet::sendActorControl( player, player.getId(), 0x112, 0x24 ); // unknown
+    Network::Util::Packet::sendContentAttainFlags( player );
     player.clearSoldItems();
   }
 
   housingMgr.sendLandFlags( player );
 
-  Network::Util::Player::sendInitZone( player );
+  Network::Util::Packet::sendInitZone( player );
 
   if( player.isLogin() )
   {
-    Network::Util::Player::sendDailyQuests( player );
-    Network::Util::Player::sendQuestRepeatFlags( player );
+    Network::Util::Packet::sendDailyQuests( player );
+    Network::Util::Packet::sendQuestRepeatFlags( player );
 
     auto &questMgr = Common::Service< World::Manager::QuestMgr >::ref();
     questMgr.sendQuestsInfo( player );
-    Network::Util::Player::sendGrandCompany( player );
+    Network::Util::Packet::sendGrandCompany( player );
   }
 
   teri.onPlayerZoneIn( player );
@@ -321,34 +308,134 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
   if( !player.isAlive() )
     return;
 
-  auto mainWeap = player.getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
-  if( mainWeap && !player.checkAction() && ( player.getTargetId() && player.getStance() == Common::Stance::Active && player.isAutoattackOn() ) )
+  checkAutoAttack( player, tickCount );
+}
+
+void PlayerMgr::checkAutoAttack( Entity::Player& player, uint64_t tickCount ) const
+{
+  auto mainWeap = player.getItemAt( Common::GearSet0, Common::MainHand );
+  if( !mainWeap || player.checkAction() || !player.isAutoattackOn() || !player.getTargetId() || player.getStance() != Common::Active )
+    return;
+
+  for( const auto& actor : player.getInRangeActors() )
   {
-    // @TODO i dislike this, iterating over all in range actors when you already know the id of the actor you need...
-    for( const auto& actor : player.getInRangeActors() )
+    if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
+      continue;
+    auto chara = actor->getAsChara();
+
+    // default autoattack range
+    float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    // default autoattack range for ranged classes
+    auto classJob = player.getClass();
+
+    if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
+      range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
+
+    if( ( Common::Util::distance( player.getPos(), actor->getPos() ) <= range ) &&
+        ( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() ) )
     {
-      if( actor->getId() != player.getTargetId() || !actor->getAsChara()->isAlive() )
-        continue;
-      auto chara = actor->getAsChara();
-
-      // default autoattack range
-      float range = 3.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      // default autoattack range for ranged classes
-      auto classJob = player.getClass();
-
-      if( classJob == Common::ClassJob::Machinist || classJob == Common::ClassJob::Bard || classJob == Common::ClassJob::Archer )
-        range = 25.f + chara->getRadius() + player.getRadius() * 0.5f;
-
-      if( Common::Util::distance( player.getPos(), actor->getPos() ) <= range )
-      {
-        if( ( tickCount - player.getLastAttack() ) > mainWeap->getDelay() )
-        {
-          player.setLastAttack( tickCount );
-          player.autoAttack( actor->getAsChara() );
-        }
-      }
+      player.setLastAttack( tickCount );
+      player.autoAttack( actor->getAsChara() );
     }
+  }
+
+}
+
+void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
+{
+  uint32_t currentExp = player.getCurrentExp();
+  uint16_t level = player.getLevel();
+  uint32_t expGained = exp;
+
+  auto currentClass = static_cast< uint8_t >( player.getClass() );
+
+  if( level >= Common::MAX_PLAYER_LEVEL )
+  {
+    player.setCurrentExp( 0 );
+    if( currentExp != 0 )
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, 0 );
+
+    return;
+  }
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
+  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
+
+  if( ( currentExp + exp ) >= neededExpToLevel )
+  {
+    // levelup
+    exp = ( currentExp + exp - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + exp - neededExpToLevel );
+
+    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
+      exp = 0;
+    else
+      onLevelChanged( player, level + 1 );
+
+    player.setCurrentExp( exp );
+
+  }
+  else
+    player.setCurrentExp( currentExp + exp );
+
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), GainExpMsg, currentClass, expGained );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, player.getCurrentExp() );
+}
+
+void PlayerMgr::onDiscoverArea( Entity::Player& player, int16_t mapId, int16_t subId )
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  int32_t offset;
+
+  auto info = exdData.getRow< Excel::Map >( mapId );
+  if( !info )
+  {
+    sendDebug( player, "discover(): Could not obtain map data for map_id == {0}", mapId );
+    return;
+  }
+
+  const auto& mapData = info->data();
+
+  if( mapData.IsUint16Discovery )
+    offset = 2 * mapData.DiscoveryIndex;
+  else
+    offset = 320 + 4 * mapData.DiscoveryIndex;
+
+  uint16_t index;
+  uint8_t value;
+  Common::Util::valueToFlagByteIndexValue( subId, value, index );
+
+  auto& discovery = player.getDiscoveryBitmask();
+
+  discovery[ offset + index ] |= value;
+
+  uint16_t level = player.getLevel();
+
+  uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
+  onGainExp( player, exp );
+
+  // gain 10x additional EXP if entire map is completed
+  uint32_t mask = mapData.DiscoveryFlag;
+  uint32_t discoveredAreas;
+  if( info->data().IsUint16Discovery )
+  {
+    discoveredAreas = ( discovery[ offset + 1 ] << 8 ) | discovery[ offset ];
+  }
+  else
+  {
+    discoveredAreas = ( discovery[ offset + 3 ] << 24 ) |
+                      ( discovery[ offset + 2 ] << 16 ) |
+                      ( discovery[ offset + 1 ] << 8  ) |
+                        discovery[ offset ];
+  }
+
+  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
+
+  if( allDiscovered )
+  {
+    onGainExp( player, exp * 10 );
   }
 }
 
@@ -357,22 +444,156 @@ void PlayerMgr::onUpdate( Entity::Player& player, uint64_t tickCount )
 
 void PlayerMgr::sendServerNotice( Entity::Player& player, const std::string& message ) //Purple Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ServerNoticePacket >( player.getId(), message ) );
+  Network::Util::Packet::sendServerNotice( player, message );
 }
 
 void PlayerMgr::sendUrgent( Entity::Player& player, const std::string& message ) //Red Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::ServerUrgent, message ) );
+  Network::Util::Packet::sendChat( player, Common::ChatType::ServerUrgent, message );
 }
 
 void PlayerMgr::sendDebug( Entity::Player& player, const std::string& message ) //Grey Text
 {
-  server().queueForPlayer( player.getCharacterId(), std::make_shared< ChatPacket >( player, Common::ChatType::SystemMessage, message ) );
+  Network::Util::Packet::sendChat( player, Common::ChatType::SystemMessage, message );
 }
 
 void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint32_t param2, uint32_t param3,
                                 uint32_t param4, uint32_t param5, uint32_t param6 )
 {
-  server().queueForPlayer( player.getCharacterId(), makeActorControlTarget( player.getId(), ActorControlType::LogMsg, messageId,
-                                                                            param2, param3, param4, param5, param6 ) );
+  Network::Util::Packet::sendActorControlTarget( player, player.getId(), LogMsg, messageId, param2, param3, param4, param5, param6 );
 }
+
+void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId,
+                                uint32_t kind, uint32_t nameId, uint32_t talkerId,
+                                uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4,
+                                uint32_t param5, uint32_t param6, uint32_t param7, uint32_t param8 )
+{
+  Network::Util::Packet::sendBattleTalk( player, battleTalkId, handlerId, kind, nameId, talkerId,
+                                         param1, param2, param3, param4, param5, param6, param7, param8 );
+}
+
+void PlayerMgr::onUpdateHuntingLog( Entity::Player& player, uint8_t id )
+{
+  std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
+  const auto maxRank = 4;
+  auto& pExdData = Common::Service< Data::ExdData >::ref();
+
+  // make sure we get the matching base-class if a job is being used
+  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) );
+  if( !classJobInfo )
+    return;
+
+  auto currentClassId = classJobInfo->data().MonsterNote;
+  if( currentClassId == -1 || currentClassId == 127 )
+    return;
+
+  auto& logEntry = player.getHuntingLogEntry( currentClassId );
+
+  bool logChanged = false;
+
+  bool allSectionsComplete = true;
+  for( int i = 1; i <= 10; ++i )
+  {
+    bool sectionComplete = true;
+    bool sectionChanged = false;
+    auto monsterNoteId = static_cast< uint32_t >( classJobInfo->data().MainClass * 10000 + logEntry.rank * 10 + i );
+    auto note = pExdData.getRow< Excel::MonsterNote >( monsterNoteId );
+
+    // for classes that don't have entries, if the first fails the rest will fail
+    if( !note )
+      break;
+
+    for( auto x = 0; x < 4; ++x )
+    {
+      auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
+      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
+      {
+        logEntry.entries[ i - 1 ][ x ]++;
+        Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
+        logChanged = true;
+        sectionChanged = true;
+      }
+      if( logEntry.entries[ i - 1 ][ x ] != note->data().NeededKills[ x ] )
+        sectionComplete = false;
+    }
+    if( logChanged && sectionComplete && sectionChanged )
+    {
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogSectionFinish, monsterNoteId, i, 0 );
+      onGainExp( player, note->data().RewardExp );
+    }
+    if( !sectionComplete )
+    {
+      allSectionsComplete = false;
+    }
+  }
+  if( logChanged && allSectionsComplete )
+  {
+    Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogRankFinish, 4 );
+    onGainExp( player, rankRewards[ logEntry.rank ] );
+    if( logEntry.rank < 4 )
+    {
+      logEntry.rank++;
+      memset( logEntry.entries, 0, 40 );
+      Network::Util::Packet::sendActorControlSelf( player, player.getId(), HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
+    }
+  }
+
+  if( logChanged )
+    Network::Util::Packet::sendHuntingLog( player );
+}
+
+void PlayerMgr::onExitInstance( Entity::Player& player )
+{
+  auto& warpMgr = Common::Service< WarpMgr >::ref();
+
+  player.resetHp();
+  player.resetMp();
+
+  warpMgr.requestMoveTerritory( player, Common::WarpType::WARP_TYPE_CONTENT_END_RETURN,
+                                player.getPrevTerritoryId(), player.getPrevPos(), player.getPrevRot() );
+
+}
+
+void PlayerMgr::onClassJobChanged( Entity::Player& player, Common::ClassJob classJob )
+{
+  player.setClassJob( classJob );
+  if( player.getHp() > player.getMaxHp() )
+    player.setHp( player.getMaxHp() );
+
+  if( player.getMp() > player.getMaxMp() )
+    player.setMp( player.getMaxMp() );
+
+  player.setTp( 0 );
+
+  Network::Util::Packet::sendChangeClass( player );
+  Network::Util::Packet::sendStatusUpdate( player );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), ClassJobChange, 4 );
+  Network::Util::Packet::sendHudParam( player );
+  Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
+}
+
+void PlayerMgr::onLevelChanged( Entity::Player& player, uint8_t level )
+{
+  player.setLevel( level );
+  player.calculateStats();
+
+  player.setHp( player.getMaxHp() );
+  player.setMp( player.getMaxMp() );
+  Network::Util::Packet::sendBaseParams( player );
+  Network::Util::Packet::sendHudParam( player );
+  Network::Util::Packet::sendStatusUpdate( player );
+  Network::Util::Packet::sendActorControl( player.getInRangePlayerIds( true ), player.getId(), LevelUpEffect, static_cast< uint8_t >( player.getClass() ), player.getLevel(), player.getLevel() - 1 );
+
+  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
+  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( player, static_cast< uint32_t >( player.getClass() ) );
+  Common::Service< World::Manager::MapMgr >::ref().updateQuests( player );
+}
+
+void PlayerMgr::onSongLearned( Entity::Player& player, uint8_t songId, uint32_t itemId )
+{
+  player.learnSong( songId, itemId );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ToggleOrchestrionUnlock, songId, 1, itemId );
+}
+
+
+

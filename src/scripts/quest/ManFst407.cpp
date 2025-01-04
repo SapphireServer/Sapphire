@@ -823,7 +823,7 @@ private:
     quest.setSeq( Seq6 );
     eventMgr().sendEventNotice( player, getId(), 4, 0 );
     playerMgr().sendUrgent( player, "QuestBattle Unimplemented, skipping..." );
-    player.exitInstance();
+    playerMgr().onExitInstance( player );
     travelToPoprange( player, Poprange3, false );
   }
 

@@ -13,15 +13,15 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   class EffectPacket : public ZoneChannelPacket< FFXIVIpcActionResult >
   {
   public:
-    EffectPacket( uint64_t sourceId, uint32_t actionId ) :
-      ZoneChannelPacket< FFXIVIpcActionResult >( static_cast< uint32_t >( sourceId ) )
+    EffectPacket( uint64_t sourceId, uint32_t mainTarget, uint32_t actionId ) :
+      ZoneChannelPacket< FFXIVIpcActionResult >( static_cast< uint32_t >( sourceId ), mainTarget )
     {
       m_data.Flag = 0;
       m_data.ActionKey = actionId;
       m_data.Action = static_cast< uint16_t >( actionId );
       m_data.ActionKind = 1;
 
-      m_data.MainTarget = Common::INVALID_GAME_OBJECT_ID;
+      m_data.MainTarget = static_cast< uint64_t >( mainTarget );
       m_data.BallistaEntityId = Common::INVALID_GAME_OBJECT_ID;
 
       m_data.LockTime = 0.6f;
@@ -58,9 +58,9 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       std::memcpy( &m_data.CalcResult[ m_data.TargetCount - 1 ].CalcResultCt[ m_sourceEffectCount++ ], &effect, sizeof( Common::CalcResultParam ) );
     }
 
-    void setAnimationId( uint16_t animationId )
+    void setActionId( uint16_t actionId )
     {
-      m_data.Action = animationId;
+      m_data.Action = actionId;
     }
 
     void setDisplayType( Common::ActionEffectDisplayType displayType )
@@ -78,13 +78,6 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
       m_data.DirTarget = rotation;
     }
 
-    void setTargetActor( const uint32_t targetId )
-    {
-      m_data.MainTarget = static_cast< uint64_t >( targetId );
-
-      FFXIVPacketBase::setTargetActor( targetId );
-    }
-
     void setRequestId( uint16_t requestId )
     {
       m_data.RequestId = static_cast< uint32_t >( requestId );
@@ -98,5 +91,11 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t m_targetEffectCount{ 0 };
     uint8_t m_sourceEffectCount{ 0 };
   };
+
+  template< typename... Args >
+  std::shared_ptr< EffectPacket > makeEffectPacket( Args... args )
+  {
+    return std::make_shared< EffectPacket >( args... );
+  }
 
 }

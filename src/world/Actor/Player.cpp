@@ -35,7 +35,7 @@
 #include "Network/PacketWrappers/EffectPacket1.h"
 #include "Network/PacketWrappers/InitZonePacket.h"
 
-#include "Network/Util/PlayerUtil.h"
+#include "Network/Util/PacketUtil.h"
 
 #include "Action/Action.h"
 
@@ -264,7 +264,7 @@ void Player::addOnlineStatus( OnlineStatus status )
 
   setOnlineStatusMask( newFlags );
 
-  Network::Util::Player::sendOnlineStatus( *this );
+  Network::Util::Packet::sendOnlineStatus( *this );
 }
 
 void Player::addOnlineStatus( const std::vector< Common::OnlineStatus >& status )
@@ -278,7 +278,7 @@ void Player::addOnlineStatus( const std::vector< Common::OnlineStatus >& status 
 
   setOnlineStatusMask( newFlags );
 
-  Network::Util::Player::sendOnlineStatus( *this );
+  Network::Util::Packet::sendOnlineStatus( *this );
 }
 
 void Player::removeOnlineStatus( OnlineStatus status )
@@ -292,7 +292,7 @@ void Player::removeOnlineStatus( OnlineStatus status )
   setOnlineStatusMask( newFlags );
   setOnlineStatusCustomMask( newFlagsCustom );
 
-  Network::Util::Player::sendOnlineStatus( *this );
+  Network::Util::Packet::sendOnlineStatus( *this );
 }
 
 void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& status )
@@ -309,7 +309,7 @@ void Player::removeOnlineStatus( const std::vector< Common::OnlineStatus >& stat
   setOnlineStatusMask( newFlags );
   setOnlineStatusCustomMask( newFlagsCustom );
 
-  Network::Util::Player::sendOnlineStatus( *this );
+  Network::Util::Packet::sendOnlineStatus( *this );
 }
 
 void Player::calculateStats()
@@ -397,18 +397,6 @@ bool Player::isAutoattackOn() const
   return m_bAutoattack;
 }
 
-bool Player::exitInstance()
-{
-  auto& warpMgr = Common::Service< WarpMgr >::ref();
-
-  resetHp();
-  resetMp();
-
-  warpMgr.requestMoveTerritory( *this, WarpType::WARP_TYPE_CONTENT_END_RETURN, getPrevTerritoryId(), getPrevPos(), getPrevRot() );
-
-  return true;
-}
-
 uint32_t Player::getPlayTime() const
 {
   return m_playTime;
@@ -457,7 +445,7 @@ void Player::registerAetheryte( uint8_t aetheryteId )
   Util::valueToFlagByteIndexValue( aetheryteId, value, index );
 
   m_aetheryte[ index ] |= value;
-  Network::Util::Player::sendActorControlSelf( *this, LearnTeleport, aetheryteId, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), LearnTeleport, aetheryteId, 1 );
 }
 
 bool Player::isAetheryteRegistered( uint8_t aetheryteId ) const
@@ -472,60 +460,6 @@ bool Player::isAetheryteRegistered( uint8_t aetheryteId ) const
 Player::Discovery& Player::getDiscoveryBitmask()
 {
   return m_discovery;
-}
-
-void Player::discover( int16_t mapId, int16_t subId )
-{
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  int32_t offset;
-
-  auto info = exdData.getRow< Excel::Map >( mapId );
-  if( !info )
-  {
-    PlayerMgr::sendDebug( *this, "discover(): Could not obtain map data for map_id == {0}", mapId );
-    return;
-  }
-
-  const auto& mapData = info->data();
-
-  if( mapData.IsUint16Discovery )
-    offset = 2 * mapData.DiscoveryIndex;
-  else
-    offset = 320 + 4 * mapData.DiscoveryIndex;
-
-  uint16_t index;
-  uint8_t value;
-  Util::valueToFlagByteIndexValue( subId, value, index );
-
-  m_discovery[ offset + index ] |= value;
-
-  uint16_t level = getLevel();
-
-  uint32_t exp = ( exdData.getRow< Excel::ParamGrow >( level )->data().NextExp * 5 / 100 );
-  gainExp( exp );
-
-  // gain 10x additional EXP if entire map is completed
-  uint32_t mask = mapData.DiscoveryFlag;
-  uint32_t discoveredAreas;
-  if( info->data().IsUint16Discovery )
-  {
-    discoveredAreas = ( m_discovery[ offset + 1 ] << 8 ) | m_discovery[ offset ];
-  }
-  else
-  {
-    discoveredAreas = ( m_discovery[ offset + 3 ] << 24 ) |
-                      ( m_discovery[ offset + 2 ] << 16 ) |
-                      ( m_discovery[ offset + 1 ] << 8  ) |
-                        m_discovery[ offset ];
-  }
-
-  bool allDiscovered = ( ( discoveredAreas & mask ) == mask );
-
-  if( allDiscovered )
-  {
-    gainExp( exp * 10 );
-  }
 }
 
 bool Player::isNewAdventurer() const
@@ -560,7 +494,28 @@ void Player::setRewardFlag( Common::UnlockEntry unlockId )
 
   m_unlocks[ index ] |= value;
 
-  Network::Util::Player::sendActorControlSelf( *this, SetRewardFlag, unlock, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetRewardFlag, unlock, 1 );
+}
+
+void Player::fillRewardFlags()
+{
+  memset( m_unlocks.data(), 0xFF, m_unlocks.size() );
+}
+
+void Player::setBorrowAction( uint8_t slot, uint32_t action )
+{
+  if( slot > Common::ARRSIZE_BORROWACTION )
+    return;
+
+  auto& borrowAction = getBorrowAction();
+  borrowAction[ slot ] = action;
+}
+
+Player::BorrowAction& Player::getBorrowAction()
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast<uint8_t>( getClass() ) )->data().WorkIndex;
+  return m_borrowActions[ classJobIndex ];
 }
 
 void Player::learnSong( uint8_t songId, uint32_t itemId )
@@ -570,8 +525,6 @@ void Player::learnSong( uint8_t songId, uint32_t itemId )
   Util::valueToFlagByteIndexValue( songId, value, index );
 
   m_orchestrion[ index ] |= value;
-
-  Network::Util::Player::sendActorControlSelf( *this, ToggleOrchestrionUnlock, songId, 1, itemId );
 }
 
 bool Player::hasReward( Common::UnlockEntry unlockId ) const
@@ -596,57 +549,6 @@ bool Player::hasMount( uint32_t mountId ) const
   Util::valueToFlagByteIndexValue( mount->data().MountOrder, value, index );
 
   return m_mountGuide[ index ] & value;
-}
-
-void Player::gainExp( uint32_t amount )
-{
-  uint32_t currentExp = getExp();
-  uint16_t level = getLevel();
-  auto currentClass = static_cast< uint8_t >( getClass() );
-
-  if( level >= Common::MAX_PLAYER_LEVEL )
-  {
-    setExp( 0 );
-    if( currentExp != 0 )
-      Network::Util::Player::sendActorControlSelf( *this, UpdateUiExp, currentClass, 0 );
-
-    return;
-  }
-
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
-  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
-
-  if( ( currentExp + amount ) >= neededExpToLevel )
-  {
-    // levelup
-    amount = ( currentExp + amount - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + amount - neededExpToLevel );
-
-    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
-      amount = 0;
-
-    setExp( amount );
-    levelUp();
-  }
-  else
-    setExp( currentExp + amount );
-
-  Network::Util::Player::sendActorControlSelf( *this, GainExpMsg, currentClass, amount );
-  Network::Util::Player::sendActorControlSelf( *this, UpdateUiExp, currentClass, getExp() );
-}
-
-void Player::levelUp()
-{
-  m_hp = getMaxHp();
-  m_mp = getMaxMp();
-
-  setLevel( getLevel() + 1 );
-  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, LevelUpEffect, static_cast< uint8_t >( getClass() ), getLevel(), getLevel() - 1 );
-
-  auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
-  achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( getClass() ) );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 uint8_t Player::getLevel() const
@@ -680,14 +582,14 @@ bool Player::isClassJobUnlocked( Common::ClassJob classJob ) const
   return getLevelForClass( classJob ) != 0;
 }
 
-uint32_t Player::getExp() const
+uint32_t Player::getCurrentExp() const
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   return m_expArray[ classJobIndex ];
 }
 
-void Player::setExp( uint32_t amount )
+void Player::setCurrentExp( uint32_t amount )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
@@ -708,19 +610,6 @@ void Player::setInCombat( bool mode )
 void Player::setClassJob( Common::ClassJob classJob )
 {
   m_class = classJob;
-
-  if( getHp() > getMaxHp() )
-    m_hp = getMaxHp();
-
-  if( getMp() > getMaxMp() )
-    m_mp = getMaxMp();
-
-  m_tp = 0;
-
-  Network::Util::Player::sendStatusUpdate( *this );
-  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, ClassJobChange, 4 );
-  Network::Util::Player::sendHudParam( *this );
-  Service< World::Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 void Player::setLevel( uint8_t level )
@@ -728,11 +617,6 @@ void Player::setLevel( uint8_t level )
   auto& exdData = Common::Service< Data::ExdData >::ref();
   uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) )->data().WorkIndex;
   m_classArray[ classJobIndex ] = level;
-
-  calculateStats();
-  Network::Util::Player::sendBaseParams( *this );
-  Network::Util::Player::sendHudParam( *this );
-  Network::Util::Player::sendStatusUpdate( *this );
 }
 
 void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
@@ -745,7 +629,7 @@ void Player::setLevelForClass( uint8_t level, Common::ClassJob classjob )
 
   m_classArray[ classJobIndex ] = level;
 
-  Network::Util::Player::sendActorControlSelf( *this, ClassJobUpdate, static_cast< uint8_t >( classjob ), getLevelForClass( classjob ) );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), ClassJobUpdate, static_cast< uint8_t >( classjob ), getLevelForClass( classjob ) );
 
   auto& achvMgr = Common::Service< World::Manager::AchievementMgr >::ref();
   achvMgr.progressAchievementByType< Common::Achievement::Type::Classjob >( *this, static_cast< uint32_t >( classjob ) );
@@ -818,7 +702,7 @@ void Player::despawn( Entity::PlayerPtr pTarget )
   Logger::debug( "Despawning {0} for {1}", getName(), pTarget->getName() );
 
   pPlayer->freePlayerSpawnId( getId() );
-  Network::Util::Player::sendActorControlSelf( *this, WarpStart, 4, getId(), 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), WarpStart, 4, getId(), 1 );
 }
 
 GameObjectPtr Player::lookupTargetById( uint64_t targetId )
@@ -848,13 +732,13 @@ void Player::setGrandCompany( uint8_t gc )
   m_gc = gc;
   if( m_gcRank[ gc ] == 0 )
     m_gcRank[ gc ] = 1;
-  Network::Util::Player::sendGrandCompany( *this );
+  Network::Util::Packet::sendGrandCompany( *this );
 }
 
 void Player::setGrandCompanyRankAt( uint8_t index, uint8_t rank )
 {
   m_gcRank[ index ] = rank;
-  Network::Util::Player::sendGrandCompany( *this );
+  Network::Util::Packet::sendGrandCompany( *this );
 }
 
 const Player::Condition& Player::getConditions() const
@@ -882,7 +766,7 @@ void Player::setCondition( Common::PlayerCondition flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_condition[ index ] |= value;
-  Network::Util::Player::sendCondition( *this );
+  Network::Util::Packet::sendCondition( *this );
 }
 
 void Player::setConditions( const std::vector< Common::PlayerCondition >& flags )
@@ -897,7 +781,7 @@ void Player::setConditions( const std::vector< Common::PlayerCondition >& flags 
 
     m_condition[ index ] |= value;
   }
-  Network::Util::Player::sendCondition( *this );
+  Network::Util::Packet::sendCondition( *this );
 }
 
 void Player::removeCondition( Common::PlayerCondition flag )
@@ -912,7 +796,7 @@ void Player::removeCondition( Common::PlayerCondition flag )
   Util::valueToFlagByteIndexValue( iFlag, value, index );
 
   m_condition[ index ] ^= value;
-  Network::Util::Player::sendCondition( *this );
+  Network::Util::Packet::sendCondition( *this );
 }
 
 void Player::update( uint64_t tickCount )
@@ -923,16 +807,6 @@ void Player::update( uint64_t tickCount )
   Chara::update( tickCount );
 }
 
-uint64_t Player::getLastAttack() const
-{
-  return m_lastAttack;
-}
-
-void Player::setLastAttack( uint64_t tickCount )
-{
-  m_lastAttack = tickCount;
-}
-
 void Player::freePlayerSpawnId( uint32_t actorId )
 {
   auto spawnId = m_actorSpawnIndexAllocator.freeUsedSpawnIndex( actorId );
@@ -941,7 +815,7 @@ void Player::freePlayerSpawnId( uint32_t actorId )
   if( spawnId == m_actorSpawnIndexAllocator.getAllocFailId() )
     return;
 
-  Network::Util::Player::sendDeletePlayer( *this, actorId, spawnId );
+  Network::Util::Packet::sendDeletePlayer( *this, actorId, spawnId );
 }
 
 Player::AetheryteList& Player::getAetheryteArray()
@@ -953,7 +827,7 @@ Player::AetheryteList& Player::getAetheryteArray()
 void Player::setHomepoint( uint8_t aetheryteId )
 {
   m_homePoint = aetheryteId;
-  Network::Util::Player::sendActorControlSelf( *this, SetHomepoint, aetheryteId );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetHomepoint, aetheryteId );
 }
 
 /*! get homepoint */
@@ -1002,7 +876,7 @@ void Player::unlockMount( uint32_t mountId )
 
   m_mountGuide[ mount->data().MountOrder / 8 ] |= ( 1 << ( mount->data().MountOrder % 8 ) );
 
-  Network::Util::Player::sendActorControlSelf( *this, SetMountBitmask, mount->data().MountOrder, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetMountBitmask, mount->data().MountOrder, 1 );
 }
 
 void Player::unlockCompanion( uint32_t companionId )
@@ -1019,7 +893,7 @@ void Player::unlockCompanion( uint32_t companionId )
 
   m_minionGuide[ index ] |= value;
 
-  Network::Util::Player::sendActorControlSelf( *this, LearnCompanion, companionId, 1 );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), LearnCompanion, companionId, 1 );
 }
 
 Player::MinionList& Player::getMinionGuideBitmask()
@@ -1109,7 +983,7 @@ void Player::hateListAdd( const BNpc& bnpc )
     uint8_t hateId = m_freeHateSlotQueue.front();
     m_freeHateSlotQueue.pop();
     m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
-    Network::Util::Player::sendHateList( *this );
+    Network::Util::Packet::sendHateList( *this );
   }
 }
 
@@ -1124,7 +998,7 @@ void Player::hateListRemove( const BNpc& bnpc )
       uint8_t hateSlot = it->second;
       m_freeHateSlotQueue.push( hateSlot );
       m_actorIdTohateSlotMap.erase( it );
-      Network::Util::Player::sendHateList( *this );
+      Network::Util::Packet::sendHateList( *this );
       return;
     }
   }
@@ -1144,14 +1018,18 @@ const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
-  Network::Util::Player::sendActorControl( *this, SetBattle, 1 );
+  setCondition( PlayerCondition::InCombat );
+  Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 1 );
 }
 
 void Player::onMobDeaggro( const BNpc& bnpc )
 {
   hateListRemove( bnpc );
   if( m_actorIdTohateSlotMap.empty() )
-    Network::Util::Player::sendActorControl( *this, SetBattle, 0 );
+  {
+    removeCondition( PlayerCondition::InCombat );
+    Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 0 );
+  }
 }
 
 bool Player::isLogin() const
@@ -1189,11 +1067,11 @@ void Player::setTitle( uint16_t titleId )
   uint8_t value;
   Util::valueToFlagByteIndexValue( titleId, value, index );
 
-  if( ( m_titleList[ index ] & value ) == 0 )   // Player doesn't have title - bail
+  if( ( m_titleList[ index ] & value ) == 0 && titleId != 0 )   // Player doesn't have title and is not "no title" - bail
     return;
 
   m_activeTitle = titleId;
-  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, SetTitle, titleId );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetTitle, titleId );
 }
 
 const Player::AchievementData& Player::getAchievementData() const
@@ -1209,7 +1087,7 @@ void Player::setAchievementData( const Player::AchievementData& achievementData 
 void Player::setMaxGearSets( uint8_t amount )
 {
   m_equippedMannequin = amount;
-  Network::Util::Player::sendActorControlSelf( *this, SetMaxGearSets, m_equippedMannequin );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), SetMaxGearSets, m_equippedMannequin );
 }
 
 void Player::addGearSet()
@@ -1234,7 +1112,7 @@ uint8_t Player::getMaxGearSets() const
 void Player::setConfigFlags( uint16_t state )
 {
   m_configFlags = static_cast< uint8_t >( state );
-  Network::Util::Player::sendConfigFlags( *this );
+  Network::Util::Packet::sendConfigFlags( *this );
 }
 
 uint8_t Player::getConfigFlags() const
@@ -1245,7 +1123,7 @@ uint8_t Player::getConfigFlags() const
 void Player::setMount( uint32_t mountId )
 {
   m_mount = mountId;
-  Network::Util::Player::sendMount( *this );
+  Network::Util::Packet::sendMount( *this );
 }
 
 void Player::setCompanion( uint8_t id )
@@ -1258,7 +1136,7 @@ void Player::setCompanion( uint8_t id )
 
   m_companionId = id;
 
-  Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, ToggleCompanion, id );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), ToggleCompanion, id );
 }
 
 uint8_t Player::getCurrentCompanion() const
@@ -1295,33 +1173,8 @@ void Player::autoAttack( CharaPtr pTarget )
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
-  //actionMgr.handleTargetedPlayerAction( *this, 7, exdData.getRow< Excel::Action >( 7 ), pTarget->getId(), 0 );
+  actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );
 
-  auto damage = Math::CalcStats::calcAutoAttackDamage( *this );
-
-  auto effectPacket = std::make_shared< EffectPacket1 >( getId(), pTarget->getId(), 7 );
-
-  Common::CalcResultParam entry{};
-
-  entry.Value = static_cast< int16_t >( damage.first );
-  entry.Type = Common::ActionEffectType::CALC_RESULT_TYPE_DAMAGE_HP;
-  entry.Arg0 = 2;
-  entry.Arg1 = 7;
-
-  if( getClass() == ClassJob::Machinist || getClass() == ClassJob::Bard || getClass() == ClassJob::Archer )
-    effectPacket->setActionId( 8 );
-
-  auto resultId = pZone->getNextEffectResultId();
-  effectPacket->setResultId( resultId );
-  effectPacket->setRotation( Util::floatToUInt16Rot( getRot() ) );
-  effectPacket->addTargetEffect( entry );
-
-  server().queueForPlayers( getInRangePlayerIds( true ), effectPacket );
-
-  pTarget->takeDamage( static_cast< uint32_t >( damage.first ) );
-
-  auto& taskMgr = Common::Service< TaskMgr >::ref();
-  taskMgr.queueTask( Sapphire::World::makeActionIntegrityTask( resultId, pTarget, 500 ) );
 }
 
 
@@ -1398,7 +1251,7 @@ bool Player::isDirectorInitialized() const
   return m_directorInitialized;
 }
 
-void Player::teleportQuery( uint16_t aetheryteId )
+void Player::teleportQuery( uint16_t aetheryteId, bool useAetheryteTicket )
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();
   // TODO: only register this action if enough gil is in possession
@@ -1409,8 +1262,9 @@ void Player::teleportQuery( uint16_t aetheryteId )
 
   auto fromAetheryte = exdData.getRow< Excel::Aetheryte >( exdData.getRow< Excel::TerritoryType >( getTerritoryTypeId() )->data().Aetheryte );
 
-  // calculate cost - does not apply for favorite points or homepoints neither checks for aether tickets
-  auto cost = static_cast< uint16_t > (
+  // calculate cost - does not apply for favorite points or homepoints
+  // if using aetheryte ticket, cost is 0
+  auto cost = useAetheryteTicket ? 0 : static_cast< uint16_t > (
     ( std::sqrt( std::pow( fromAetheryte->data().CostPosX - targetAetheryte->data().CostPosX, 2 ) +
                  std::pow( fromAetheryte->data().CostPosY - targetAetheryte->data().CostPosY, 2 ) ) / 2 ) + 100 );
 
@@ -1418,12 +1272,13 @@ void Player::teleportQuery( uint16_t aetheryteId )
   cost = std::min< uint16_t >( 999, cost );
 
   bool insufficientGil = getCurrency( Common::CurrencyType::Gil ) < cost;
-  Network::Util::Player::sendActorControlSelf( *this, OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), OnExecuteTelepo, insufficientGil ? 2 : 0, aetheryteId );
 
   if( !insufficientGil )
   {
     m_teleportQuery.targetAetheryte = aetheryteId;
     m_teleportQuery.cost = cost;
+    m_teleportQuery.useAetheryteTicket = useAetheryteTicket;
   }
   else
   {
@@ -1493,7 +1348,7 @@ void Player::dyeItemFromDyeingInfo()
   insertInventoryItem( static_cast< Sapphire::Common::InventoryType >( itemToDyeContainer ), static_cast< uint16_t >( itemToDyeSlot ), itemToDye );
   writeItem( itemToDye );
 
-  Network::Util::Player::sendActorControlSelf( *this, DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
+  Network::Util::Packet::sendActorControlSelf( *this, getId(), DyeMsg, itemToDye->getId(), shouldDye, invalidateGearSet );
 }
 
 void Player::setGlamouringInfo( uint32_t itemToGlamourContainer, uint32_t itemToGlamourSlot, uint32_t glamourBagContainer, uint32_t glamourBagSlot, bool shouldGlamour )
@@ -1515,7 +1370,7 @@ void Player::glamourItemFromGlamouringInfo()
   uint32_t glamourBagSlot = m_glamouringInfo.glamourBagSlot;
   bool shouldGlamour = m_glamouringInfo.shouldGlamour;
 
-  Network::Util::Player::sendCondition( *this );
+  Network::Util::Packet::sendCondition( *this );
 
   auto itemToGlamour = getItemAt( itemToGlamourContainer, itemToGlamourSlot );
   auto glamourToUse = getItemAt( glamourBagContainer, glamourBagSlot );
@@ -1547,9 +1402,9 @@ void Player::glamourItemFromGlamouringInfo()
   writeItem( itemToGlamour );
 
   if( shouldGlamour )
-    Network::Util::Player::sendActorControlSelf( *this, GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
+    Network::Util::Packet::sendActorControlSelf( *this, getId(), GlamourCastMsg, itemToGlamour->getId(), glamourToUse->getId(), invalidateGearSet );
   else
-    Network::Util::Player::sendActorControlSelf( *this, GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
+    Network::Util::Packet::sendActorControlSelf( *this, getId(), GlamourRemoveMsg, itemToGlamour->getId(), invalidateGearSet );
 }
 
 void Player::resetObjSpawnIndex()
@@ -1565,7 +1420,7 @@ void Player::freeObjSpawnIndexForActorId( uint32_t actorId )
   if( spawnId == m_objSpawnIndexAllocator.getAllocFailId() )
     return;
 
-  Network::Util::Player::sendDeleteObject( *this, spawnId );
+  Network::Util::Packet::sendDeleteObject( *this, spawnId );
 }
 
 bool Player::isObjSpawnIndexValid( uint8_t index )
@@ -1596,75 +1451,6 @@ Sapphire::Common::HuntingLogEntry& Player::getHuntingLogEntry( uint8_t index )
 {
   assert( index < m_huntingLogEntries.size() );
   return m_huntingLogEntries[ index ];
-}
-
-void Player::updateHuntingLog( uint16_t id )
-{
-  std::vector< uint32_t > rankRewards{ 2500, 10000, 20000, 30000, 40000 };
-  const auto maxRank = 4;
-  auto& pExdData = Common::Service< Data::ExdData >::ref();
-
-  // make sure we get the matching base-class if a job is being used
-  auto classJobInfo = pExdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( getClass() ) );
-  if( !classJobInfo )
-    return;
-
-  auto currentClassId = classJobInfo->data().MainClass;
-
-  auto& logEntry = m_huntingLogEntries[ currentClassId - 1 ];
-
-  bool logChanged = false;
-
-
-  bool allSectionsComplete = true;
-  for( int i = 1; i <= 10; ++i )
-  {
-    bool sectionComplete = true;
-    bool sectionChanged = false;
-    auto monsterNoteId = static_cast< uint32_t >( classJobInfo->data().MainClass * 10000 + logEntry.rank * 10 + i );
-    auto note = pExdData.getRow< Excel::MonsterNote >( monsterNoteId );
-
-    // for classes that don't have entries, if the first fails the rest will fail
-    if( !note )
-      break;
-
-    for( auto x = 0; x < 4; ++x )
-    {
-      auto note1 = pExdData.getRow< Excel::MonsterNoteTarget >( note->data().Target[ x ] );
-      if( note1->data().Monster == id && logEntry.entries[ i - 1 ][ x ] < note->data().NeededKills[ x ] )
-      {
-        logEntry.entries[ i - 1 ][ x ]++;
-        Network::Util::Player::sendActorControlSelf( *this, HuntingLogEntryUpdate, monsterNoteId, x, logEntry.entries[ i - 1 ][ x ] );
-        logChanged = true;
-        sectionChanged = true;
-      }
-      if( logEntry.entries[ i - 1 ][ x ] != note->data().NeededKills[ x ] )
-        sectionComplete = false;
-    }
-    if( logChanged && sectionComplete && sectionChanged )
-    {
-      Network::Util::Player::sendActorControlSelf( *this, HuntingLogSectionFinish, monsterNoteId, i, 0 );
-      gainExp( note->data().RewardExp );
-    }
-    if( !sectionComplete )
-    {
-      allSectionsComplete = false;
-    }
-  }
-  if( logChanged && allSectionsComplete )
-  {
-    Network::Util::Player::sendActorControlSelf( *this, HuntingLogRankFinish, 4 );
-    gainExp( rankRewards[ logEntry.rank ] );
-    if( logEntry.rank < 4 )
-    {
-      logEntry.rank++;
-      memset( logEntry.entries, 0, 40 );
-      Network::Util::Player::sendActorControlSelf( *this, HuntingLogRankUnlock, currentClassId, logEntry.rank + 1, 0 );
-    }
-  }
-
-  if( logChanged )
-    Network::Util::Player::sendHuntingLog( *this );
 }
 
 void Player::setActiveLand( uint8_t land, uint8_t ward )
@@ -1727,7 +1513,7 @@ void Player::resetRecastGroups()
     m_recast[ i ] = 0.0f;
     m_recastMax[ i ] = 0.0f;
   }
-  Network::Util::Player::sendRecastGroups( *this );
+  Network::Util::Packet::sendRecastGroups( *this );
 }
 
 bool Player::checkAction()
@@ -1826,7 +1612,10 @@ void Player::setFalling( bool state, const Common::FFXIVARR_POSITION3& pos, bool
         // no mercy on hated players
         takeDamage( damage );
       }
-      Network::Util::Player::sendActorControl( getInRangePlayerIds( true ), *this, SetFallDamage, damage );
+      Network::Util::Packet::sendActorControl( getInRangePlayerIds( true ), getId(), SetFallDamage, damage );
+      // todo: this used to work without refreshing the entire UI state
+      // does 3.x use some sort of fall integrity?
+      Network::Util::Packet::sendHudParam( *this );
     }
   }
 }

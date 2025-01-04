@@ -89,11 +89,11 @@ int main( int argc, char* argv[] )
   // CFC list
   {
 
-    auto idList = g_exdDataGen.getIdList< Excel::ContentFinderCondition >();
+    auto cfcList = g_exdDataGen.getRows< Excel::ContentFinderCondition >();
 
     std::stringstream cfcOutputStream;
 
-    auto total = idList.size();
+    auto total = cfcList.size();
     int cursor = 0;
 
     std::map< uint8_t, std::string > instanceContentTypeMap;
@@ -118,7 +118,7 @@ int main( int argc, char* argv[] )
     cfcOutputStream << "| ID | Instance | Territory | Name | Type |" << std::endl
                     << "| --- | --- | --- | --- | --- |" << std::endl;
 
-    for( auto id : idList )
+    for( const auto& [ id, cfc ] : cfcList )
     {
       auto done = ( cursor++ / static_cast< float >( total ) ) * 100.f;
       if( cursor % 50 == 0 && cursor > 0 )
@@ -126,8 +126,6 @@ int main( int argc, char* argv[] )
 
       if( id == 0 )
         continue;
-
-      auto cfc = g_exdDataGen.getRow< Excel::ContentFinderCondition >( id );
 
       if( cfc )
       {
@@ -234,23 +232,21 @@ int main( int argc, char* argv[] )
     teriTypeIntendedUseMap[ TheFeastArea ] = "TheFeastArea";
     teriTypeIntendedUseMap[ PrivateEventArea ] = "PrivateEventArea";
 
-    auto idList = g_exdDataGen.getIdList< Excel::TerritoryType >();
+    auto teriList = g_exdDataGen.getRows< Excel::TerritoryType >();
 
     std::stringstream teritypeOutputStream;
 
     teritypeOutputStream << "| ID | Place Name | Name | Intended Use |" << std::endl
                          << "| --- | --- | --- | --- |" << std::endl;
 
-    auto total = idList.size();
+    auto total = teriList.size();
     int cursor = 0;
 
-    for( auto id : idList )
+    for( const auto& [ id, teriType ] : teriList )
     {
       auto done = ( cursor++ / static_cast< float >( total ) ) * 100.f;
       if( cursor % 50 == 0 && cursor > 0 )
         Logger::info( "Processing {} teritypes of {} ({:.2f}%)", cursor, total, done );
-
-      auto teriType = g_exdDataGen.getRow< Excel::TerritoryType >( id );
 
       if( teriType )
       {
@@ -291,23 +287,21 @@ int main( int argc, char* argv[] )
 
   // class/job list
   {
-    auto idList = g_exdDataGen.getIdList< Excel::ClassJob >();
+    auto classJobList = g_exdDataGen.getRows< Excel::ClassJob >();
 
     std::stringstream classjobOutputStream;
 
     classjobOutputStream << "| ID | Name | Short | Main Class |" << std::endl
                          << "| --- | --- | --- | --- |" << std::endl;
 
-    auto total = idList.size();
+    auto total = classJobList.size();
     int cursor = 0;
 
-    for( auto id : idList )
+    for( const auto& [ id, classJob ] : classJobList )
     {
       auto done = ( cursor++ / static_cast< float >( total ) ) * 100.f;
       if( cursor % 50 == 0 && cursor > 0 )
         Logger::info( "Processing {} classjobs of {} ({:.2f}%)", cursor, total, done );
-
-      auto classJob = g_exdDataGen.getRow< Excel::ClassJob >( id );
 
       if( classJob )
       {
@@ -338,7 +332,7 @@ int main( int argc, char* argv[] )
 
   // achievement list
   {
-    auto idList = g_exdDataGen.getIdList< Excel::Achievement >();
+    auto achvList = g_exdDataGen.getRows< Excel::Achievement >();
 
     enum class Type : uint8_t
     {
@@ -394,16 +388,14 @@ int main( int argc, char* argv[] )
     achvOutputStream << "| ID | Name | Type (Subtype) | Description |" << std::endl
                          << "| --- | --- | --- | --- |" << std::endl;
 
-    auto total = idList.size();
+    auto total = achvList.size();
     int cursor = 0;
 
-    for( auto id : idList )
+    for( const auto& [ id, pAchv ] : achvList )
     {
       auto done = ( cursor++ / static_cast< float >( total ) ) * 100.f;
       if( cursor % 50 == 0 && cursor > 0 )
         Logger::info( "Processing {} achievements of {} ({:.2f}%)", cursor, total, done );
-
-      auto pAchv = g_exdDataGen.getRow< Excel::Achievement >( id );
 
       if( pAchv )
       {

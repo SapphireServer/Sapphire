@@ -30,6 +30,7 @@ TYPE_FORWARD( Land );
 TYPE_FORWARD( Linkshell );
 TYPE_FORWARD( FreeCompany );
 TYPE_FORWARD( EncounterFight );
+TYPE_FORWARD( EncounterState );
 
 namespace World
 {
@@ -46,6 +47,43 @@ TYPE_FORWARD( NaviProvider );
 namespace World::Territory::Housing
 {
 TYPE_FORWARD( HousingInteriorTerritory );
+}
+
+namespace World::AI
+{
+  TYPE_FORWARD( GambitTargetCondition );
+  TYPE_FORWARD( TopHateTargetCondition );
+  TYPE_FORWARD( HPSelfPctLessThanTargetCondition );
+
+  TYPE_FORWARD( GambitRule );
+  TYPE_FORWARD( GambitPack );
+  TYPE_FORWARD( GambitTimeLinePack );
+  TYPE_FORWARD( GambitRuleSetPack );
+}
+
+namespace World::AI::Fsm
+{
+
+  TYPE_FORWARD( Condition );
+  TYPE_FORWARD( State );
+  TYPE_FORWARD( Transition );
+  TYPE_FORWARD( StateMachine );
+
+  TYPE_FORWARD( StateIdle );
+  TYPE_FORWARD( StateRoam );
+  TYPE_FORWARD( StateCombat );
+  TYPE_FORWARD( StateRetreat );
+  TYPE_FORWARD( StateDead );
+
+  TYPE_FORWARD( RoamNextTimeReachedCondition );
+  TYPE_FORWARD( RoamTargetReachedCondition );
+  TYPE_FORWARD( HateListEmptyCondition );
+  TYPE_FORWARD( HateListHasEntriesCondition );
+  TYPE_FORWARD( SpawnPointDistanceGtMaxDistanceCondition );
+  TYPE_FORWARD( IsDeadCondition );
+
+
+
 }
 
 namespace Inventory
@@ -89,8 +127,8 @@ TYPE_FORWARD( ItemAction );
 TYPE_FORWARD( EventItemAction );
 TYPE_FORWARD( MountAction );
 TYPE_FORWARD( ItemManipulationAction );
-TYPE_FORWARD( EffectBuilder );
-TYPE_FORWARD( EffectResult );
+TYPE_FORWARD( ActionResultBuilder );
+TYPE_FORWARD( ActionResult );
 
 using ActionCallback = std::function< void( Entity::Player&, uint32_t, uint64_t ) >;
 }

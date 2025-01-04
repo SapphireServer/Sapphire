@@ -17,6 +17,8 @@ namespace Sapphire::World::Action
   struct StatusEntry
   {
     uint16_t id;
+    uint32_t duration;
+    uint32_t flag;
     std::vector< StatusModifier > modifiers;
   };
 

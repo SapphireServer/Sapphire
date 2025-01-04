@@ -56,6 +56,7 @@ private:
   static constexpr auto Actor7 = 1013961;//Goblin Trader (Seq5)
   static constexpr auto BindActor1 = 5896328;
   static constexpr auto Item0 = 2001729;
+  static constexpr auto Item0Icon = 25919;
   static constexpr auto LocActor1 = 1013954;
   static constexpr auto LocActor2 = 1013955;
   static constexpr auto LocBgm1 = 313;
@@ -390,7 +391,7 @@ private:
 
   void Scene00019Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 5, 0 );//TODO: Item Icon?
+    eventMgr().sendNotice( player, getId(), 5, { Item0Icon } );
     quest.setSeq( SeqFinish );
     quest.setUI8BH( 0 );
   }

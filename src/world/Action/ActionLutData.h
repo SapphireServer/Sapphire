@@ -32,6 +32,9 @@ namespace Sapphire::World::Action
   inline void from_json( const nlohmann::json& j, StatusEntry& statusEntry )
   {
     j.at( "id" ).get_to( statusEntry.id );
+    j.at( "duration" ).get_to( statusEntry.duration );
+    if( j.contains( "flag" ) )
+      j.at( "flag" ).get_to( statusEntry.flag );
     if( j.contains( "modifiers" ) )
       j.at( "modifiers" ).get_to( statusEntry.modifiers );
   }

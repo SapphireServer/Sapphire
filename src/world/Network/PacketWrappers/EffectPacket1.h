@@ -83,5 +83,10 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t m_sourceEffectCount{ 0 };
   };
 
+  template< typename... Args >
+  std::shared_ptr< EffectPacket1 > makeEffectPacket1( Args... args )
+  {
+    return std::make_shared< EffectPacket1 >( args... );
+  }
 }
 
