@@ -302,6 +302,7 @@ namespace Sapphire::Encounter
 
         if( i == m_timepoints.size() )
           state.m_phaseInfo.m_lastTimepointIndex++;
+        continue;
       }
       break;
     }
