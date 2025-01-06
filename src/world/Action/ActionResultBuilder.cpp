@@ -152,7 +152,11 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
 
   if( targetCount > 1 || actionData->data().EffectType != Common::CastType::SingleTarget ) // use AoeEffect packets
   {
-    auto actionResult = makeEffectPacket( m_sourceChara->getId(), 0, m_actionId );
+    // todo: maintarget logic is lackluster. There needs to be some criteria for when a main target is required.
+    uint32_t mainTarget = Common::INVALID_GAME_OBJECT_ID;
+    if( !targetList.empty() )
+      mainTarget = targetList[ 0 ]->getId();
+    auto actionResult = makeEffectPacket( m_sourceChara->getId(), mainTarget, m_actionId );
     actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
