@@ -417,6 +417,7 @@ namespace Sapphire::Encounter
           if( !pAction || pAction->isInterrupted() )
           {
             actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, pTeri->getNextActionResultId() );
+            //actionMgr.handlePlacedAction( *pBNpc, pActionData->m_actionId, pBNpc->getPos(), pTeri->getNextActionResultId() );
           }
           // todo: this really shouldnt exist, but need to figure out why actions interrupt
           else if( pAction->getId() == pActionData->m_actionId )

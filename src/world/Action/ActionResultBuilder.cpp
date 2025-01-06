@@ -143,12 +143,21 @@ std::shared_ptr< FFXIVPacketBase > ActionResultBuilder::createActionResultPacket
   auto& teriMgr = Common::Service< Sapphire::World::Manager::TerritoryMgr >::ref();
   auto zone = teriMgr.getTerritoryByGuId( m_sourceChara->getTerritoryId() );
 
-  if( targetCount > 1 ) // use AoeEffect packets
+  // need to get actionData
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto actionData = exdData.getRow< Excel::Action >( m_actionId );
+  if( !actionData )
+    throw std::runtime_error( "No actiondata found!" );
+
+  if( targetCount > 1 || actionData->data().EffectType != Common::CastType::SingleTarget ) // use AoeEffect packets
   {
-    auto actionResult = makeEffectPacket( m_sourceChara->getId(), targetList[ 0 ]->getId(), m_actionId );
+    auto actionResult = makeEffectPacket( m_sourceChara->getId(), 0, m_actionId );
     actionResult->setRotation( Common::Util::floatToUInt16Rot( m_sourceChara->getRot() ) );
     actionResult->setRequestId( m_requestId );
     actionResult->setResultId( m_resultId );
+    actionResult->setTargetPosition( m_sourceChara->getPos() );
+
 
     uint8_t targetIndex = 0;
     for( auto& [ actor, actorResultList ] : m_actorResultsMap )
