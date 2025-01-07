@@ -464,11 +464,11 @@ void PlayerMgr::sendLogMessage( Entity::Player& player, uint32_t messageId, uint
 }
 
 void PlayerMgr::sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId,
-                                uint32_t kind, uint32_t nameId, uint32_t talkerId,
+                                uint32_t kind, uint32_t nameId, uint32_t talkerId, uint32_t time,
                                 uint32_t param1, uint32_t param2, uint32_t param3, uint32_t param4,
                                 uint32_t param5, uint32_t param6, uint32_t param7, uint32_t param8 )
 {
-  Network::Util::Packet::sendBattleTalk( player, battleTalkId, handlerId, kind, nameId, talkerId,
+  Network::Util::Packet::sendBattleTalk( player, battleTalkId, handlerId, kind, nameId, talkerId, time,
                                          param1, param2, param3, param4, param5, param6, param7, param8 );
 }
 

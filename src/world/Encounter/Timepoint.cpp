@@ -508,12 +508,23 @@ namespace Sapphire::Encounter
 
         // todo: use Actrl EventBattleDialog = 0x39C maybe?,
         auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
+
+        // todo: this does not always need to be a director, and can also be an eventhandler
+        //       needs further investigation
+        Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
+        if( pDirector == nullptr )
+          pDirector = pTeri->getAsQuestBattle();
+
+        if( pDirector )
+          handlerId = pDirector->getDirectorId();
+
         for( auto& player : pTeri->getPlayers() )
         {
+
           auto& pPlayer = player.second;
           if( pPlayer )
             playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, handlerId,
-                                      pBtData->m_kind, pBtData->m_nameId, talkerId,
+                                      pBtData->m_kind, pBtData->m_nameId, talkerId, m_duration,
                                       params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
                                       params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
         }

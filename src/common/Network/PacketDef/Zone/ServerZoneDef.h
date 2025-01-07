@@ -1273,6 +1273,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
   struct FFXIVIpcBattleTalkN
   {
     uint32_t handlerId;
+    uint32_t padding;
     uint64_t talkerId;
     uint8_t kind;
     uint8_t __padding1;

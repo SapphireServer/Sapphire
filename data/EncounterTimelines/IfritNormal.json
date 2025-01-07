@@ -105,10 +105,10 @@
             },
             {
               "data": {
-                "battleTalkId": 2939,
+                "battleTalkId": 2601,
                 "handlerActorName": "Ifrit",
-                "kind": 1,
-                "nameId": 2961,
+                "kind": 2,
+                "nameId": 1185,
                 "params": [
                   0
                 ],
@@ -219,10 +219,10 @@
           "timepoints": [
             {
               "data": {
-                "battleTalkId": 2939,
+                "battleTalkId": 2602,
                 "handlerActorName": "Ifrit",
-                "kind": 1,
-                "nameId": 2961,
+                "kind": 2,
+                "nameId": 1185,
                 "params": [
                   0
                 ],
