@@ -458,6 +458,33 @@
               "type": "idle"
             }
           ]
+        },
+        {
+          "description": "",
+          "id": 9,
+          "name": "Nail death",
+          "timepoints": [
+            {
+              "data": {
+                "conditionId": 5,
+                "conditionStr": "If Ifrit has 0% < HP < 50%, push Ifrit->Nail Spawn",
+                "enabled": false
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "conditionId": 8,
+                "conditionStr": "If Ifrit state is Combat, push Ifrit->Hellfire",
+                "enabled": true
+              },
+              "description": "",
+              "duration": 0,
+              "type": "setCondition"
+            }
+          ]
         }
       ],
       "subactors": [],
@@ -725,7 +752,7 @@
                 "rot": 0
               },
               "description": "",
-              "duration": 200,
+              "duration": 0,
               "type": "setPos"
             },
             {
@@ -992,7 +1019,7 @@
         "sourceActor": "Ifrit Nail 1"
       },
       "targetActor": "Ifrit",
-      "targetPhase": "Hellfire"
+      "targetPhase": "Nail death"
     },
     {
       "condition": "combatState",
