@@ -42,8 +42,9 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   }
 
-  if( !bnpc.hasFlag( Entity::Immobile ) && distance > ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
+  if( !hasQueuedAction && !bnpc.hasFlag( Entity::Immobile ) && distance > ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
   {
+
     if( pNaviProvider )
       pNaviProvider->setMoveTarget( bnpc, pHatedActor->getPos() );
 
