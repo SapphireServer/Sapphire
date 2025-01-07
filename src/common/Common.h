@@ -1171,7 +1171,6 @@ namespace Sapphire::Common
 
         // Legacy subtypes - skipping
 
-        #pragma region Synth 1 -50 Recipes
         SynthWoodworkingLv01to10Recipes = 23,
         SynthWoodworkingLv11to20Recipes = 24,
         SynthWoodworkingLv21to30Recipes = 25,
@@ -1212,7 +1211,6 @@ namespace Sapphire::Common
         SynthCookingLv21to30Recipes = 60,
         SynthCookingLv31to40Recipes = 61,
         SynthCookingLv41to50Recipes = 62,
-        #pragma endregion
 
         // TODO: Map gathering subtypes 63 to 128
 
