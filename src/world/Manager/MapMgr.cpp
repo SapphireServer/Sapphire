@@ -381,11 +381,12 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
 
   if( quest.ClassJobUnlock && quest.ClassJob != 1 )
   {
+    uint8_t classJobIndex = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( player.getClass() ) )->data().WorkIndex;
     if( quest.ClassJobUnlockFlag == 3 )
-      if( static_cast< uint8_t >( player.getClass() ) != quest.ClassJobUnlock )
+      if( classJobIndex != quest.ClassJobUnlock )
         return false;
     else if( quest.ClassJobUnlockFlag == 4 )
-      if ( static_cast< uint8_t >( player.getClass() ) == quest.ClassJobUnlock )
+      if( static_cast< uint8_t >( player.getClass() ) == quest.ClassJobUnlock )
         return false;
     else
       return false;
@@ -432,31 +433,31 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
   }
   else if( quest.PrevQuestOperator == 2 )
   {
-    for( auto i = 0; i < 3; ++i )
+    for( auto i = 0; i <= 3; ++i )
     {
+      if( i == 3 )
+        return false;
+
       if( quest.PrevQuest[ i ] == 0 )
         continue;
 
       if( player.isQuestCompleted( quest.PrevQuest[ i ] ) )
         break;
-
-      if( i == 2 )
-        return false;
     }
   }
 
   if( quest.ExcludeQuestOperator == 1 )
   {
-    for( auto i = 0; i < 2; ++i )
+    for( auto i = 0; i <= 2; ++i )
     {
+      if( i == 2 )
+        return false;
+
       if( quest.ExcludeQuest[ i ] == 0 )
         continue;
 
       if( !player.isQuestCompleted( quest.ExcludeQuest[ i ] ) && !player.hasQuest( quest.ExcludeQuest[ i ] ) )
         break;
-
-      if( i == 1 )
-        return false;
     }
   }
   else if( quest.ExcludeQuestOperator == 2 )
@@ -514,15 +515,8 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
 
     if( classJob->data().ARRRelicQuestId == questId )
     {
-      for( auto j = 0; i < Common::CLASSJOB_TOTAL; ++i )
-      {
-        classJob = exdData.getRow< Excel::ClassJob >( i );
-
-        if( player.hasQuest( classJob->data().ARRRelicQuestId ) )
-          return false;
-      }
-
-      break;
+      if( player.hasQuest( classJob->data().ARRRelicQuestId ) )
+        return false;
     }
   }
 
