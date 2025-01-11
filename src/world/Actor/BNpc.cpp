@@ -88,6 +88,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_pos.x = pInfo->x;
   m_pos.y = pInfo->y;
   m_pos.z = pInfo->z;
+  m_lastPos = m_pos;
   m_rot = pInfo->rotation;
   m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
@@ -203,6 +204,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_pos.x = pInfo->x;
   m_pos.y = pInfo->y;
   m_pos.z = pInfo->z;
+  m_lastPos = m_pos;
   m_rot = pInfo->rotation;
   m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
@@ -832,7 +834,30 @@ bool BNpc::hasFlag( uint32_t flag ) const
 
 void BNpc::setFlag( uint32_t flag )
 {
+  uint32_t oldFlags = m_flags;
   m_flags |= flag;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && ( oldFlags & Entity::Immobile ) != Entity::Immobile  &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( *this );
+    setAgentId( 0 );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+             ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( *this );
+    auto agentId = pNaviProvider->addAgent( *this );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
 }
 
 void BNpc::removeFlag( uint32_t flag )

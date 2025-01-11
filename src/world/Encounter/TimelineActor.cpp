@@ -177,7 +177,7 @@ namespace Sapphire::Encounter
       auto pParent = pTeri->getActiveBNpcByLayoutId( m_layoutId );
       Common::BNpcType type = pParent ? pParent->getBNpcType() : Common::BNpcType::Enemy;
       
-      pActor = pTeri->createBNpcFromLayoutId( m_layoutId, 1000, type );
+      pActor = pTeri->createBNpcFromLayoutIdNoPush( m_layoutId, 1000, type );
       m_subActors[ name ] = pActor;
 
       pActor->setInvincibilityType( Common::InvincibilityIgnoreDamage );
@@ -189,7 +189,7 @@ namespace Sapphire::Encounter
       auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
       for( const auto& player : pTeri->getPlayers() )
       {
-        pActor->spawn( player.second );
+      //  pActor->spawn( player.second );
         playerMgr.sendDebug( *player.second, fmt::format( "Spawned subactor {}", name ) );
       }
     }

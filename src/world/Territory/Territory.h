@@ -180,6 +180,7 @@ namespace Sapphire
     void addEObj( Entity::EventObjectPtr object );
 
     Entity::BNpcPtr createBNpcFromLayoutId( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
+    Entity::BNpcPtr createBNpcFromLayoutIdNoPush( uint32_t levelId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId = 0 );
 
     Entity::BNpcPtr getActiveBNpcByEntityId( uint32_t entityId );
 

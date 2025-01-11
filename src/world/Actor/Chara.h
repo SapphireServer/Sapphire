@@ -99,7 +99,7 @@ namespace Sapphire::Entity
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
     /*! Detour Crowd AgentId */
-    uint32_t m_agentId;
+    uint32_t m_agentId{0};
 
     /*! Detour Crowd actor scale */
     float m_radius;

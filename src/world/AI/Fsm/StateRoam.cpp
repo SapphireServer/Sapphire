@@ -15,7 +15,7 @@ void AI::Fsm::StateRoam::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
 
-  if( bnpc.hasFlag( Entity::NoRoam ) )
+  if( bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) || !bnpc.pathingActive() )
   {
     bnpc.setRoamTargetReached( true );
     return;
@@ -38,7 +38,7 @@ void AI::Fsm::StateRoam::onEnter( Entity::BNpc& bnpc )
   auto pZone = teriMgr.getTerritoryByGuId( bnpc.getTerritoryId() );
   auto pNaviProvider = pZone->getNaviProvider();
 
-  if( !pNaviProvider )
+  if( !pNaviProvider || bnpc.hasFlag( Entity::NoRoam ) || bnpc.hasFlag( Entity::Immobile ) )
   {
     bnpc.setRoamTargetReached( true );
     return;

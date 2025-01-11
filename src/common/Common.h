@@ -1867,6 +1867,7 @@ namespace Sapphire::Common
     CircularAOE = 2,
     RectangularAOE = 3,
     ConeAOE = 4,
+    CircularAOESelf = 5,
     CircularAoEPlaced = 7
   };
 

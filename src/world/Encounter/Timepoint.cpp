@@ -658,7 +658,7 @@ namespace Sapphire::Encounter
 
         // todo: probably have this info in the timepoint data
         if( !pBNpc )
-          pBNpc = pTeri->createBNpcFromLayoutId( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
+          pBNpc = pTeri->createBNpcFromLayoutIdNoPush( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
 
         if( pBNpc )
         {
@@ -666,8 +666,7 @@ namespace Sapphire::Encounter
           pBNpc->setFlag( pSpawnData->m_flags );
           pBNpc->init();
 
-          for( const auto& player : pTeri->getPlayers() )
-            pBNpc->spawn( player.second );
+          pTeri->pushActor( pBNpc );
         }
       }
       break;

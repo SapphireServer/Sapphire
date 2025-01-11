@@ -259,9 +259,11 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
   {
     auto pBNpc = pActor->getAsBNpc();
 
-    if( m_pNaviProvider )
+    if( m_pNaviProvider && pBNpc->pathingActive() )
+    {
       agentId = m_pNaviProvider->addAgent( *pBNpc );
-    pBNpc->setAgentId( agentId );
+      pBNpc->setAgentId( agentId );
+    }
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;
     updateCellActivity( cx, cy, 1 );
@@ -851,6 +853,18 @@ Entity::BNpcPtr Territory::createBNpcFromLayoutId( uint32_t layoutId, uint32_t h
   pBNpc->init();
   pBNpc->setTriggerOwnerId( triggerOwnerId );
   pushActor( pBNpc );
+  return pBNpc;
+}
+
+Entity::BNpcPtr Territory::createBNpcFromLayoutIdNoPush( uint32_t layoutId, uint32_t hp, Common::BNpcType bnpcType, uint32_t triggerOwnerId )
+{
+  auto infoPtr = m_bNpcBaseMap.find( layoutId );
+  if( infoPtr == m_bNpcBaseMap.end() )
+    return nullptr;
+
+  auto pBNpc = std::make_shared< Entity::BNpc >( getNextActorId(), infoPtr->second, *this, hp, bnpcType );
+  pBNpc->init();
+  pBNpc->setTriggerOwnerId( triggerOwnerId );
   return pBNpc;
 }
 

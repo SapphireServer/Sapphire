@@ -22,7 +22,8 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   if( !pHatedActor )
     return;
 
-  pNaviProvider->updateAgentParameters( bnpc );
+  if( pNaviProvider && bnpc.pathingActive() )
+    pNaviProvider->updateAgentParameters( bnpc );
 
   auto distanceOrig = Common::Util::distance( bnpc.getPos(), bnpc.getSpawnPos() );
 
@@ -42,7 +43,9 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   }
 
-  if( !hasQueuedAction && !bnpc.hasFlag( Entity::Immobile ) && distance > ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
+  if( bnpc.pathingActive() && !hasQueuedAction &&
+      !bnpc.hasFlag( Entity::Immobile ) &&
+      distance > ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
   {
 
     if( pNaviProvider )
@@ -53,14 +56,13 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   pNaviProvider->syncPosToChara( bnpc );
 
-  if( !hasQueuedAction && distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
+  if( !hasQueuedAction && (distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) || !bnpc.pathingActive() ) )
   {
     // todo: dont turn if facing
     if( !bnpc.hasFlag( Entity::TurningDisabled ) )
       bnpc.face( pHatedActor->getPos() );
 
-    if( !hasQueuedAction )
-      bnpc.processGambits( tickCount );
+    bnpc.processGambits( tickCount );
 
     // in combat range. ATTACK!
     if( !bnpc.hasFlag( Entity::BNpcFlag::AutoAttackDisabled ) )
