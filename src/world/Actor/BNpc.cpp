@@ -831,29 +831,62 @@ bool BNpc::hasFlag( uint32_t flag ) const
 {
   return m_flags & flag;
 }
+void BNpc::resetFlags( uint32_t flags )
+{
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
+  m_flags |= flags;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( *this );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+           ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( *this );
+    auto agentId = pNaviProvider->addAgent( *this );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
+}
 
 void BNpc::setFlag( uint32_t flag )
 {
   uint32_t oldFlags = m_flags;
+  m_flags = 0;
   m_flags |= flag;
 
   auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
   auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
 
 
-  if( pZone && ( oldFlags & Entity::Immobile ) != Entity::Immobile  &&
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
       ( m_flags & Entity::Immobile ) == Entity::Immobile )
   {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
     auto pNaviProvider = pZone->getNaviProvider();
     pNaviProvider->removeAgent( *this );
-    setAgentId( 0 );
     setPathingActive( false );
   }
   else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
              ( m_flags & Entity::Immobile ) != Entity::Immobile )
   {
+    Logger::debug( "{} Pathing activated", m_id );
     auto pNaviProvider = pZone->getNaviProvider();
-    pNaviProvider->removeAgent( *this );
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( *this );
     auto agentId = pNaviProvider->addAgent( *this );
     setAgentId( agentId );
     setPathingActive( true );

@@ -586,6 +586,8 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
 
 void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& bnpc )
 {
+  if( bnpc.getAgentId() == -1 )
+    return;
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;

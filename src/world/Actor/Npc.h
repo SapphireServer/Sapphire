@@ -27,7 +27,7 @@ namespace Sapphire::Entity
     void setPathingActive( bool pathing );
 
   private:
-    bool m_bPathingActive{true};
+    bool m_bPathingActive{false};
 
 
   };

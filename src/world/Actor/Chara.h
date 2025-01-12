@@ -99,7 +99,7 @@ namespace Sapphire::Entity
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
 
     /*! Detour Crowd AgentId */
-    uint32_t m_agentId{0};
+    int32_t m_agentId{-1};
 
     /*! Detour Crowd actor scale */
     float m_radius;
@@ -279,8 +279,8 @@ namespace Sapphire::Entity
     uint32_t getDirectorId() const;
     void setDirectorId( uint32_t directorId );
 
-    uint32_t getAgentId() const;
-    void setAgentId( uint32_t agentId );
+    int32_t getAgentId() const;
+    void setAgentId( int32_t agentId );
 
     float getRadius() const;
 

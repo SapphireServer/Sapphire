@@ -146,6 +146,9 @@ namespace Sapphire::Entity
 
     bool hasFlag( uint32_t flag ) const;
     void setFlag( uint32_t flags );
+
+    // resets all flags to the given flags
+    void resetFlags( uint32_t flags );
     void removeFlag( uint32_t flag );
     void clearFlags();
 

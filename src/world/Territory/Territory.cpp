@@ -259,10 +259,11 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
   {
     auto pBNpc = pActor->getAsBNpc();
 
-    if( m_pNaviProvider && pBNpc->pathingActive() )
+    if( m_pNaviProvider && !pBNpc->hasFlag( Entity::Immobile ) )
     {
       agentId = m_pNaviProvider->addAgent( *pBNpc );
       pBNpc->setAgentId( agentId );
+      pBNpc->setPathingActive( true );
     }
 
     m_bNpcMap[ pBNpc->getId() ] = pBNpc;

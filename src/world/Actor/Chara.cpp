@@ -756,12 +756,12 @@ void Chara::setDirectorId( uint32_t directorId )
   m_directorId = directorId;
 }
 
-uint32_t Chara::getAgentId() const
+int32_t Chara::getAgentId() const
 {
   return m_agentId;
 }
 
-void Chara::setAgentId( uint32_t agentId )
+void Chara::setAgentId( int32_t agentId )
 {
   m_agentId = agentId;
 }

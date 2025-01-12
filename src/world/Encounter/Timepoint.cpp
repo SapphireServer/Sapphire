@@ -662,8 +662,7 @@ namespace Sapphire::Encounter
 
         if( pBNpc )
         {
-          pBNpc->clearFlags();
-          pBNpc->setFlag( pSpawnData->m_flags );
+          pBNpc->resetFlags( pSpawnData->m_flags );
           pBNpc->init();
 
           pTeri->pushActor( pBNpc );
@@ -677,8 +676,7 @@ namespace Sapphire::Encounter
 
         if( pBNpc )
         {
-          pBNpc->clearFlags();
-          pBNpc->setFlag( pBNpcFlagData->m_flags );
+          pBNpc->resetFlags( pBNpcFlagData->m_flags );
           // todo: resend some bnpc packet/actrl?
         }
       }
