@@ -18,6 +18,7 @@ namespace Sapphire::Encounter
     Idle,
     CastAction,
     SetPos,
+    ActionTimeLine,
 
     LogMessage,
     BattleTalk,
@@ -109,6 +110,18 @@ namespace Sapphire::Encounter
       m_targetType( type ),
       m_selectorRef( selectorRef ),
       m_selectorIndex( selectorIndex )
+    {
+    }
+  };
+
+  struct TimepointDataActionTimeLine : public TimepointData {
+    std::string m_actorRef;
+    uint32_t m_actionId;
+
+    TimepointDataActionTimeLine( const std::string& actorRef, uint32_t action ) :
+      TimepointData( TimepointDataType::ActionTimeLine ),
+      m_actorRef( actorRef ),
+      m_actionId( action )
     {
     }
   };

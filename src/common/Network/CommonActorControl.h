@@ -210,6 +210,7 @@ namespace Sapphire::Network::ActorControl
      */ 
     AetherReductionDlg = 0x17D,
 
+    PlayActionTimeline = 0x197,
     /*!
      * param1 = state
      * param2 = actorid

@@ -19,6 +19,9 @@
 #include <Territory/InstanceContent.h>
 #include <Util/UtilMath.h>
 
+#include <Network/CommonActorControl.h>
+#include <Network/Util/PacketUtil.h>
+
 namespace Sapphire::Encounter
 {
   const TimepointDataPtr Timepoint::getData() const
@@ -52,25 +55,26 @@ namespace Sapphire::Encounter
   {
     const static std::unordered_map< std::string, TimepointDataType > timepointTypeMap =
     {
-      { "idle",          TimepointDataType::Idle },
-      { "castAction",    TimepointDataType::CastAction },
-      { "setPos",        TimepointDataType::SetPos },
+      { "idle",                TimepointDataType::Idle },
+      { "castAction",          TimepointDataType::CastAction },
+      { "setPos",              TimepointDataType::SetPos },
+      { "playActionTimeLine",  TimepointDataType::ActionTimeLine },
 
-      { "logMessage",    TimepointDataType::LogMessage },
-      { "battleTalk",    TimepointDataType::BattleTalk },
+      { "logMessage",          TimepointDataType::LogMessage },
+      { "battleTalk",          TimepointDataType::BattleTalk },
 
-      { "directorVar",   TimepointDataType::DirectorVar },
-      { "directorSeq",   TimepointDataType::DirectorSeq },
-      { "directorFlags", TimepointDataType::DirectorFlags },
+      { "directorVar",         TimepointDataType::DirectorVar },
+      { "directorSeq",         TimepointDataType::DirectorSeq },
+      { "directorFlags",       TimepointDataType::DirectorFlags },
 
-      { "bNpcDespawn",   TimepointDataType::BNpcDespawn },
-      { "bNpcSpawn",     TimepointDataType::BNpcSpawn },
-      { "bNpcFlags",     TimepointDataType::BNpcFlags },
-      { "setEObjState",  TimepointDataType::SetEObjState },
-      { "setBGM",        TimepointDataType::SetBgm },
+      { "bNpcDespawn",         TimepointDataType::BNpcDespawn },
+      { "bNpcSpawn",           TimepointDataType::BNpcSpawn },
+      { "bNpcFlags",           TimepointDataType::BNpcFlags },
+      { "setEObjState",        TimepointDataType::SetEObjState },
+      { "setBGM",              TimepointDataType::SetBgm },
 
-      { "setCondition",  TimepointDataType::SetCondition },
-      { "snapshot",      TimepointDataType::Snapshot }
+      { "setCondition",        TimepointDataType::SetCondition },
+      { "snapshot",            TimepointDataType::Snapshot }
     };
 
     const static std::unordered_map< std::string, DirectorOpId > directorOpMap =
@@ -147,6 +151,15 @@ namespace Sapphire::Encounter
 
         m_pData = std::make_shared< TimepointDataSetPos >( actorRef, MoveType::SetPos,
                                                            pos[ 0 ], pos[ 1 ], pos[ 2 ], rot );
+      }
+      break;
+      case TimepointDataType::ActionTimeLine:
+      {
+        auto& dataJ = json.at( "data" );
+        auto action = dataJ.at( "action" ).get< uint32_t >();
+        auto actorRef = dataJ.at( "actorName" ).get< std::string >();
+
+        m_pData = std::make_shared< TimepointDataActionTimeLine >( actorRef, action );
       }
       break;
       case TimepointDataType::LogMessage:
@@ -446,6 +459,21 @@ namespace Sapphire::Encounter
         }
       }
       break;
+
+      case TimepointDataType::ActionTimeLine:
+      {
+        auto pActionTimelineData = std::dynamic_pointer_cast< TimepointDataActionTimeLine, TimepointData >( m_pData );
+        auto pBNpc = pack.getBNpcByRef( pActionTimelineData->m_actorRef, pTeri );
+        auto action = pActionTimelineData->m_actionId;
+
+        if( pBNpc )
+        {
+          Network::Util::Packet::sendActorControl( pBNpc->getInRangePlayerIds(), pBNpc->getId(),
+                                                   Network::ActorControl::PlayActionTimeline, action );
+        }
+      }
+      break;
+
       /*
       case TimepointDataType::MoveTo:
       {
