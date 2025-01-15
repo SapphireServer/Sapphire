@@ -11,16 +11,21 @@
 
 #include <Event/Director.h>
 
+#include <Manager/TerritoryMgr.h>
 #include <Manager/ActionMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Service.h>
 
+
+#include <Territory/Territory.h>
 #include <Territory/QuestBattle.h>
 #include <Territory/InstanceContent.h>
 #include <Util/UtilMath.h>
 
 #include <Network/CommonActorControl.h>
 #include <Network/Util/PacketUtil.h>
+
+#include <Navi/NaviProvider.h>
 
 namespace Sapphire::Encounter
 {
@@ -58,7 +63,7 @@ namespace Sapphire::Encounter
       { "idle",                TimepointDataType::Idle },
       { "castAction",          TimepointDataType::CastAction },
       { "setPos",              TimepointDataType::SetPos },
-      { "playActionTimeLine",  TimepointDataType::ActionTimeLine },
+      { "actionTimeline",      TimepointDataType::ActionTimeLine },
 
       { "logMessage",          TimepointDataType::LogMessage },
       { "battleTalk",          TimepointDataType::BattleTalk },
@@ -156,7 +161,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::ActionTimeLine:
       {
         auto& dataJ = json.at( "data" );
-        auto action = dataJ.at( "action" ).get< uint32_t >();
+        auto action = dataJ.at( "actionTimelineId" ).get< uint32_t >();
         auto actorRef = dataJ.at( "actorName" ).get< std::string >();
 
         m_pData = std::make_shared< TimepointDataActionTimeLine >( actorRef, action );
@@ -179,10 +184,11 @@ namespace Sapphire::Encounter
         auto pBattleTalkData = std::make_shared< TimepointDataBattleTalk >( params );
 
         pBattleTalkData->m_battleTalkId = dataJ.at( "battleTalkId" ).get< uint32_t >();
-        pBattleTalkData->m_handlerRef = dataJ.at( "handlerActorName" ).get< std::string >();
+
         pBattleTalkData->m_kind = dataJ.at( "kind" ).get< uint32_t >();
         pBattleTalkData->m_nameId = dataJ.at( "nameId" ).get< uint32_t >();
         pBattleTalkData->m_talkerRef = dataJ.at( "talkerActorName" ).get< std::string >();
+        pBattleTalkData->m_handlerRef = pBattleTalkData->m_talkerRef;
 
         m_pData = pBattleTalkData;
       }
@@ -456,6 +462,16 @@ namespace Sapphire::Encounter
         {
           pBNpc->setRot( pSetPosData->m_rot );
           pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
+          auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+          auto pZone = teriMgr.getTerritoryByGuId( pBNpc->getTerritoryId() );
+
+          auto pNaviProvider = pZone->getNaviProvider();
+
+          if( pNaviProvider )
+          {
+            pNaviProvider->updateAgentPosition( *pBNpc );
+          }
+          pBNpc->sendPositionUpdate();
         }
       }
       break;

@@ -134,6 +134,9 @@ namespace Sapphire::Entity
     uint32_t getTimeOfDeath() const;
     void setTimeOfDeath( uint32_t timeOfDeath );
 
+    void setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate = true ) override;
+    void setPos( float x, float y, float z, bool broadcastUpdate = true ) override;
+
     void restHp();
 
     void checkAggro();
