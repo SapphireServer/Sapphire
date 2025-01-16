@@ -29,21 +29,6 @@ namespace Sapphire::Encounter
     return m_pData;
   }
 
-  bool Timepoint::canExecute( const TimepointState& state, uint64_t elapsed ) const
-  {
-    return state.m_startTime == 0;
-  }
-
-  bool Timepoint::durationElapsed( uint64_t elapsed ) const
-  {
-    return m_duration <= elapsed;
-  }
-
-  bool Timepoint::finished( const TimepointState& state, uint64_t elapsed ) const
-  {
-    return durationElapsed( elapsed ) || state.m_finished;
-  }
-
   void Timepoint::reset( TimepointState& state ) const
   {
     state.m_startTime = 0;
@@ -58,7 +43,7 @@ namespace Sapphire::Encounter
       { "idle",                TimepointDataType::Idle },
       { "castAction",          TimepointDataType::CastAction },
       { "setPos",              TimepointDataType::SetPos },
-      { "playActionTimeLine",  TimepointDataType::ActionTimeLine },
+      { "actionTimeline",      TimepointDataType::ActionTimeline },
 
       { "logMessage",          TimepointDataType::LogMessage },
       { "battleTalk",          TimepointDataType::BattleTalk },
@@ -107,6 +92,20 @@ namespace Sapphire::Encounter
       { "selector", ActionTargetType::Selector }
     };
 
+    const static std::unordered_map< std::string, SetPosType > setPosTypeMap =
+    {
+      { "absolute", SetPosType::Absolute },
+      { "relative", SetPosType::Relative }
+    };
+
+    const static std::unordered_map< std::string, SetPosTargetType > setPosTargetTypeMap =
+    {
+      { "none",     SetPosTargetType::None },
+      { "self",     SetPosTargetType::Self },
+      { "target",   SetPosTargetType::Target },
+      { "selector", SetPosTargetType::Selector }
+    };
+
     TimepointDataType tpType{ 0 };
 
     auto typeStr = json.at( "type" ).get< std::string >();
@@ -114,19 +113,14 @@ namespace Sapphire::Encounter
       tpType = it->second;
     else
       throw std::runtime_error( fmt::format( "Timepoint::from_json unable to find timepoint by type: {}", typeStr ) );
-
-    m_duration = json.at( "duration" ).get< uint64_t >();
+    
+    m_offset = json.at( "startTime" ).get< uint64_t >();
     //m_overrideFlags = json.at( "overrideFlags" ).get< TimepointOverrideFlags >();
     m_description = json.at( "description" ).get< std::string >();
     m_type = tpType;
 
     switch( tpType )
     {
-      case TimepointDataType::Idle:
-      {
-        m_pData = std::make_shared< TimepointDataIdle >( m_duration );
-      }
-      break;
       case TimepointDataType::CastAction:
       {
         // todo: CastAction
@@ -134,7 +128,7 @@ namespace Sapphire::Encounter
         auto& dataJ = json.at( "data" );
         auto sourceRef = dataJ.at( "sourceActor" ).get< std::string >();
         auto actionId = dataJ.at( "actionId" ).get< uint32_t >();
-        auto targetType = actionTypeMap.find( dataJ.at( "targetType" ).get< std::string >() )->second;
+        auto targetType = actionTypeMap.at( dataJ.at( "targetType" ).get< std::string >() );
         auto selectorRef = dataJ.at( "selectorName" ).get< std::string >();
         auto selectorIndex = dataJ.at( "selectorIndex" ).get< uint32_t >();
 
@@ -148,15 +142,20 @@ namespace Sapphire::Encounter
         auto pos = dataJ.at( "pos" ).get< std::vector< float > >();
         auto rot = dataJ.at( "rot" ).get< float >();
         auto actorRef = dataJ.at( "actorName" ).get< std::string >();
+        auto selectorName = dataJ.at( "selectorName" ).get< std::string >();
+        auto selectorIndex = dataJ.at( "selectorIndex" ).get< uint32_t >();
+        auto targetType = setPosTargetTypeMap.at( dataJ.at( "targetType" ).get< std::string >() );
+        auto posType = setPosTypeMap.at( dataJ.at( "positionType" ).get< std::string >() );
 
-        m_pData = std::make_shared< TimepointDataSetPos >( actorRef, MoveType::SetPos,
+        m_pData = std::make_shared< TimepointDataSetPos >( actorRef, posType, targetType, MoveType::SetPos,
+                                                           selectorName, selectorIndex,
                                                            pos[ 0 ], pos[ 1 ], pos[ 2 ], rot );
       }
       break;
-      case TimepointDataType::ActionTimeLine:
+      case TimepointDataType::ActionTimeline:
       {
         auto& dataJ = json.at( "data" );
-        auto action = dataJ.at( "action" ).get< uint32_t >();
+        auto action = dataJ.at( "actionTimelineId" ).get< uint32_t >();
         auto actorRef = dataJ.at( "actorName" ).get< std::string >();
 
         m_pData = std::make_shared< TimepointDataActionTimeLine >( actorRef, action );
@@ -179,10 +178,10 @@ namespace Sapphire::Encounter
         auto pBattleTalkData = std::make_shared< TimepointDataBattleTalk >( params );
 
         pBattleTalkData->m_battleTalkId = dataJ.at( "battleTalkId" ).get< uint32_t >();
-        pBattleTalkData->m_handlerRef = dataJ.at( "handlerActorName" ).get< std::string >();
         pBattleTalkData->m_kind = dataJ.at( "kind" ).get< uint32_t >();
         pBattleTalkData->m_nameId = dataJ.at( "nameId" ).get< uint32_t >();
         pBattleTalkData->m_talkerRef = dataJ.at( "talkerActorName" ).get< std::string >();
+        pBattleTalkData->m_length = dataJ.at( "length" ).get< uint32_t >();
 
         m_pData = pBattleTalkData;
       }
@@ -269,7 +268,7 @@ namespace Sapphire::Encounter
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: {}" ), actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: BNpcDespawn invalid actor ref: {}" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataBNpcDespawn >( layoutId );
       }
@@ -290,7 +289,7 @@ namespace Sapphire::Encounter
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
-          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SpawnBNpc invalid actor ref: {}" ), actorRef ) );
+          throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: BNpcSpawn invalid actor ref: {}" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataBNpcSpawn >( layoutId, flags, bnpcType );
       }
@@ -307,7 +306,7 @@ namespace Sapphire::Encounter
         //if( auto it = actors.find( actorRef ); it != actors.end() )
         //  layoutId = it->second.m_layoutId;
         //else
-        //  throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: SetBNpcFlags invalid actor ref: {}" ), actorRef ) );
+        //  throw std::runtime_error( fmt::format( std::string( "Timepoint::from_json: BNpcFlags invalid actor ref: {}" ), actorRef ) );
 
         m_pData = std::make_shared< TimepointDataBNpcFlags >( layoutId, flags );
         // todo: SetBNpcFlags
@@ -355,13 +354,10 @@ namespace Sapphire::Encounter
     }
   }
 
-  bool Timepoint::execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool Timepoint::execute( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
-    if( update( state, self, pack, pTeri, time ) )
+    if( update( self, pack, pTeri, time ) )
     {
-      state.m_startTime = time;
-      state.m_finished = true;
-
       const auto& players = pTeri->getPlayers();
       // send debug msg
       if( !m_description.empty() )
@@ -377,14 +373,9 @@ namespace Sapphire::Encounter
     return false;
   }
 
-  bool Timepoint::update( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool Timepoint::update( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
   {
-    state.m_lastTick = time;
-
     // todo: separate execute and update?
-    if( state.m_finished )
-      return true;
-
     switch( m_type )
     {
       case TimepointDataType::Idle:
@@ -454,13 +445,62 @@ namespace Sapphire::Encounter
 
         if( pBNpc )
         {
-          pBNpc->setRot( pSetPosData->m_rot );
-          pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
+          auto pos = pBNpc->getPos();
+          float rot = 0.f;
+          switch( pSetPosData->m_targetType )
+          {
+            case SetPosTargetType::Target:
+            {
+              auto inRange = pBNpc->getInRangeActors();
+              for( const auto& pActor : inRange )
+              {
+                if( pActor->getId() == pBNpc->getTargetId() )
+                {
+                  pos = pActor->getPos();
+                  rot = pActor->getRot();
+                  break;
+                }
+              }
+            }
+            break;
+            case SetPosTargetType::Selector:
+            {
+              const auto& results = pack.getSnapshotResults( pSetPosData->m_selectorName );
+              if( pSetPosData->m_selectorIndex < results.size() )
+              {
+                pos = results[ pSetPosData->m_selectorIndex ].m_pos;
+                rot = results[ pSetPosData->m_selectorIndex ].m_rot;
+              }
+            }
+            break;
+            default:
+              break;
+          }
+
+          switch( pSetPosData->m_posType )
+          {
+            case SetPosType::Absolute:
+            {
+              pBNpc->setRot( pSetPosData->m_rot );
+              pBNpc->setPos( pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z, true );
+            }
+            break;
+            case SetPosType::Relative:
+            {
+              auto offsetPos = Common::Util::getOffsettedPosition( pos, rot, pSetPosData->m_x, pSetPosData->m_y, pSetPosData->m_z );
+              pBNpc->setRot( rot );
+              pBNpc->setPos( offsetPos );
+            }
+            break;
+            default:
+              break;
+          }
+
         }
       }
       break;
 
-      case TimepointDataType::ActionTimeLine:
+      case TimepointDataType::ActionTimeline:
       {
         auto pActionTimelineData = std::dynamic_pointer_cast< TimepointDataActionTimeLine, TimepointData >( m_pData );
         auto pBNpc = pack.getBNpcByRef( pActionTimelineData->m_actorRef, pTeri );
@@ -552,7 +592,7 @@ namespace Sapphire::Encounter
           auto& pPlayer = player.second;
           if( pPlayer )
             playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, handlerId,
-                                      pBtData->m_kind, pBtData->m_nameId, talkerId, m_duration,
+                                      pBtData->m_kind, pBtData->m_nameId, talkerId, pBtData->m_length,
                                       params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
                                       params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
         }

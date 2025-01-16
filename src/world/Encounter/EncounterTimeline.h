@@ -82,7 +82,7 @@ namespace Sapphire::Encounter
     // todo: probably just make this a Timepoint in an InitPhase
     void spawnSubActors( TerritoryPtr pTeri );
 
-    bool isPhaseActive( const std::string& actorRef, const std::string& phaseName );
+    bool isScheduleActive( const std::string& actorRef, const std::string& scheduleName );
 
     void resetConditionState( uint32_t id, bool toDefault = false );
 

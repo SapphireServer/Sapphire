@@ -18,7 +18,7 @@ namespace Sapphire::Encounter
     Idle,
     CastAction,
     SetPos,
-    ActionTimeLine,
+    ActionTimeline,
 
     LogMessage,
     BattleTalk,
@@ -55,6 +55,20 @@ namespace Sapphire::Encounter
     WalkPath,
     Teleport,
     SetPos
+  };
+
+  enum class SetPosType : uint32_t
+  {
+    Absolute,
+    Relative
+  };
+
+  enum class SetPosTargetType : uint32_t
+  {
+    None,
+    Self,
+    Target,
+    Selector
   };
 
   enum class DirectorOpId
@@ -119,7 +133,7 @@ namespace Sapphire::Encounter
     uint32_t m_actionId;
 
     TimepointDataActionTimeLine( const std::string& actorRef, uint32_t action ) :
-      TimepointData( TimepointDataType::ActionTimeLine ),
+      TimepointData( TimepointDataType::ActionTimeline ),
       m_actorRef( actorRef ),
       m_actionId( action )
     {
@@ -130,13 +144,21 @@ namespace Sapphire::Encounter
     // todo: use internal id
     std::string m_actorRef;
     MoveType m_moveType;
+    SetPosType m_posType;
+    SetPosTargetType m_targetType;
+    std::string m_selectorName;
+    uint32_t m_selectorIndex;
     float m_x, m_y, m_z, m_rot;
 
-    TimepointDataSetPos( const std::string& actorRef, MoveType moveType,
+    TimepointDataSetPos( const std::string& actorRef,
+                        SetPosType type, SetPosTargetType targetType, MoveType moveType,
+                        const std::string& selectorName, uint32_t selectorIndex,
                         float x, float y, float z, float rot ) :
       TimepointData( TimepointDataType::SetPos ),
       m_actorRef( actorRef ),
+      m_posType( type ),
       m_moveType( moveType ),
+      m_selectorName( selectorName), m_selectorIndex( selectorIndex ),
       m_x( x ), m_y( y ), m_z( z ), m_rot( rot )
     {
     }
@@ -161,6 +183,7 @@ namespace Sapphire::Encounter
     uint32_t m_kind;
     uint32_t m_nameId;
     std::string m_talkerRef;
+    uint32_t m_length{ 0 };
 
     uint32_t m_params[ 8 ]{ 0 };
 
@@ -300,25 +323,18 @@ namespace Sapphire::Encounter
   {
   public:
     TimepointDataType m_type;
-    uint64_t m_duration{ 0 };// milliseconds
+    uint64_t m_offset{ 0 };
     TimepointDataPtr m_pData;
     std::string m_description;
 
     // todo: repeatable?
 
     const TimepointDataPtr getData() const;
-
-    bool canExecute( const TimepointState& state, uint64_t elapsed ) const;
-
-    bool durationElapsed( uint64_t elapsed ) const;
-
-    bool finished( const TimepointState& state, uint64_t elapsed ) const;
-
     void reset( TimepointState& state ) const;
 
     void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
     // todo: separate execute/update into onStart and onTick?
-    bool update( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
-    bool execute( TimepointState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
+    bool update( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
+    bool execute( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
   };
 }// namespace Sapphire::Encounter
