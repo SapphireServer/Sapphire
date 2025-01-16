@@ -352,6 +352,8 @@ namespace Sapphire::ScriptAPI
 
     virtual void onInit( Sapphire::InstanceContent& instance );
 
+    virtual void onReset( Sapphire::InstanceContent& instance );
+
     virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, uint32_t eventId );
 
     virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId );

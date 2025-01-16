@@ -1092,3 +1092,13 @@ const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
 }
+
+void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
+{
+  Chara::setPos( x, y, z, broadcastUpdate );
+}
+
+void BNpc::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+{
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
+}

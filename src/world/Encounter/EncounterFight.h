@@ -98,10 +98,33 @@ namespace Sapphire
 
     virtual ~EncounterFight() = default;
 
-    virtual void init() = 0;
-    virtual void start() = 0;
-    virtual void update( uint64_t currTime ) = 0;
-    virtual void reset() = 0;
+    void init()
+    {
+      m_status = EncounterFightStatus::IDLE;
+      m_startTime = 0;
+    };
+
+    virtual void start() { m_status = EncounterFightStatus::ACTIVE; };
+    virtual void update( uint64_t currTime )
+    {
+      m_pInstance->getEncounterTimeline().update( getInstance(), currTime );
+    }
+
+    void reset()
+    {
+      for( auto& pBNpc : m_bnpcs )
+      {
+        removeBNpc( pBNpc.first );
+        m_pInstance->removeActor( pBNpc.second );
+      }
+      m_pInstance->getEncounterTimeline().reset( getInstance() );
+      init();
+    }
+
+    void setStartTime( uint64_t startTime )
+    {
+      m_startTime = startTime;
+    }
 
     void addState( EncounterState::EncounterStatePtr pState, bool initState = true )
     {
@@ -110,9 +133,14 @@ namespace Sapphire
         pState->init();
     }
 
-    EncounterFightStatus getEncounterFightStatus() const
+    EncounterFightStatus getStatus() const
     {
       return m_status;
+    }
+
+    void setStatus( EncounterFightStatus status )
+    {
+      m_status = status;
     }
 
     void addBNpc( Entity::BNpcPtr pBNpc )

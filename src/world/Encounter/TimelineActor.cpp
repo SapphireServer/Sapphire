@@ -147,12 +147,6 @@ namespace Sapphire::Encounter
     {
       if( subActor.second )
       {
-        auto inRange = subActor.second->getInRangeActors();
-        for( const auto& pActor : inRange )
-        {
-          if( auto pPlayer = pActor->getAsPlayer() )
-            subActor.second->despawn( pPlayer );
-        }
         // todo: need to reset the ai on interrupt
         auto pAction = subActor.second->getCurrentAction();
         if( pAction )
@@ -189,7 +183,6 @@ namespace Sapphire::Encounter
       auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
       for( const auto& player : pTeri->getPlayers() )
       {
-      //  pActor->spawn( player.second );
         playerMgr.sendDebug( *player.second, fmt::format( "Spawned subactor {}", name ) );
       }
     }
@@ -212,7 +205,6 @@ namespace Sapphire::Encounter
       {
         auto& pBNpc = subActor.second;
         pTeri->removeActor( pBNpc );
-        // todo: despawn?
         subActor.second = nullptr;
       }
     }

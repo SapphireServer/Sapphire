@@ -693,6 +693,21 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceInit( InstanceContent& instance )
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onInstanceReset( InstanceContent& instance )
+{
+  auto instId = instance.getDirectorId();
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onReset( instance );
+
+    return true;
+  }
+
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance, uint64_t tickCount )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );

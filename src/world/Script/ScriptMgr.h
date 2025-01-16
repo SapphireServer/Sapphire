@@ -100,6 +100,8 @@ namespace Sapphire::Scripting
 
     bool onInstanceInit( InstanceContent& instance );
 
+    bool onInstanceReset( InstanceContent& instance );
+
     bool onInstanceUpdate( InstanceContent& instance, uint64_t tickCount );
 
     bool
