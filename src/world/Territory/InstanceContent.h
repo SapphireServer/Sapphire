@@ -209,6 +209,9 @@ namespace Sapphire
     std::set< uint32_t > getSpawnedPlayerIds() const;
 
     void movePlayerToEntrance( Entity::Player& player );
+
+    void setEncounter( EncounterFightPtr pEncounter );
+    EncounterFightPtr getEncounter();
   private:
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > m_instanceConfiguration;
     std::shared_ptr< Excel::ExcelStruct< Excel::ContentFinderCondition > > m_contentFinderCondition;

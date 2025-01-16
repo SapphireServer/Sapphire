@@ -235,6 +235,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onReset( InstanceContent& instance )
+  {
+  }
+
   void InstanceContentScript::onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, Sapphire::Entity::EventObject& eobj, 
                                       uint32_t eventId )
   {

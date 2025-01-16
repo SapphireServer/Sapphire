@@ -28,7 +28,7 @@
 #include "InstanceContent.h"
 #include "InstanceObjectCache.h"
 
-#include <Encounter/InstanceContent/IfritNormal.h>
+#include <Encounter/EncounterFight.h>
 #include <Task/MoveTerritoryTask.h>
 
 
@@ -71,11 +71,6 @@ bool Sapphire::InstanceContent::init()
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceInit( *this );
-
-  // todo: every fight is now ifrit
-  m_pEncounter = std::make_shared< IfritEncounterFight >( std::dynamic_pointer_cast< InstanceContent, Territory >( shared_from_this() ) );
-
-  m_pEncounter->init();
 
   return true;
 }
@@ -129,6 +124,7 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
 
 void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 {
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   switch( m_state )
   {
     case Created:
@@ -186,6 +182,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       else if( tickCount < m_instanceResetTime )
         return;
 
+
+
       if( m_instanceResetFinishTime == 0 )
       {
         m_instanceResetFinishTime = tickCount + 5000;
@@ -215,6 +213,8 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
         if( m_pEntranceEObj )
           m_pEntranceEObj->setPermissionInvisibility( 0 );
+
+        scriptMgr.onInstanceReset( *this );
 
         return;
       }
@@ -255,7 +255,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
       updateBNpcs( tickCount );
 
-      if( m_pEncounter->getEncounterFightStatus() == EncounterFightStatus::FAIL )
+      if( m_pEncounter->getStatus() == EncounterFightStatus::FAIL )
         m_state = DutyReset;
       break;
     }
@@ -291,7 +291,6 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
     }
   }
 
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   scriptMgr.onInstanceUpdate( *this, tickCount );
 
   m_pEncounter->update( tickCount );
@@ -797,4 +796,14 @@ size_t Sapphire::InstanceContent::getInstancePlayerCount() const
 std::set< uint32_t > Sapphire::InstanceContent::getSpawnedPlayerIds() const
 {
   return m_spawnedPlayers;
+}
+
+void Sapphire::InstanceContent::setEncounter( Sapphire::EncounterFightPtr pEncounter )
+{
+  m_pEncounter = pEncounter;
+}
+
+Sapphire::EncounterFightPtr Sapphire::InstanceContent::getEncounter()
+{
+  return m_pEncounter;
 }
