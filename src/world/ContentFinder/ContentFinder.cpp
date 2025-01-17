@@ -54,14 +54,10 @@ void World::ContentFinder::update()
         {
           uint32_t inProgress = 0; // 0x01 - in progress
           uint32_t dutyProgress = 0;
-          uint32_t flags = 0; // 0x20 freerole, 0x40 ownrequest, 0x100 random
-
-          // Undersized
-          if( content->m_flags & 0x01 )
-            flags |= 0x20;
+          // uint32_t flags = 0; // 0x20 freerole, 0x40 ownrequest, 0x100 random
 
           auto finishContentMatchPacket = makeFinishContentMatchToClient( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
-                                                                          queuedPlayer->m_classJob, content->m_players.size(), dutyProgress, flags );
+                                                                          queuedPlayer->m_classJob, content->m_players.size(), dutyProgress, content->m_flags );
           server.queueForPlayer( queuedPlayer->getCharacterId(), finishContentMatchPacket );
         }
 
@@ -161,14 +157,14 @@ void World::ContentFinder::completeRegistration( const Entity::Player &player, u
   if( flags & 0x01 )
   {
     auto updatePacket = makeUpdateFindContent( player.getId(), content->data().TerritoryType,
-                                               CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ), 0x20 );
+                                               CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ), FindContentFlag::Undersized );
     server.queueForPlayer( player.getCharacterId(), updatePacket );
 
     auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 2, queuedContent->m_attackerCount + queuedContent->m_rangeCount,
                                                      queuedContent->m_healerCount, queuedContent->m_tankCount, 0 );
     server.queueForPlayer( player.getCharacterId(), statusPacket );
 
-    queuedContent->m_flags = flags;
+    queuedContent->m_flags |= FindContentFlag::Undersized;
     queuedContent->setState( MatchingComplete );
   }
   else
