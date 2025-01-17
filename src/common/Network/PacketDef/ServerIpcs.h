@@ -375,7 +375,7 @@ namespace Sapphire::Network::Packets
     GroundMarker = 0x335,
     Frontline01Result = 0x336,
     Frontline01BaseInfo = 0x337,
-    FinishContentMatchToClient = 0x338,
+    FinishContentMatchToClient = 0x339,
     UnMountLink = 0x33E,
 
   };
