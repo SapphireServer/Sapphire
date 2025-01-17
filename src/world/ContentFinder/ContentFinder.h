@@ -6,6 +6,13 @@
 namespace Sapphire::World
 {
 
+  enum FindContentFlag : uint32_t
+  {
+    Undersized = 0x20,
+    OwnRequest = 0x40,
+    Random = 0x100
+  };
+
   enum UpdateFindContentKind : uint8_t
   {
     CompleteRegistration = 0, // value1 is used to call setResultFindSuccess if bit1 or bit2 is set, value2 is passed to setFindInfo

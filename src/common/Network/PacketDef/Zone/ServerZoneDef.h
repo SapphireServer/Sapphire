@@ -1614,6 +1614,20 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
     uint8_t unknown3;
   };
 
+  struct FFXIVIpcFinishContentMatchToClient : FFXIVIpcBasePacket< FinishContentMatchToClient >
+  {
+    uint8_t classJob;
+    uint8_t progress;
+    uint8_t playerNum;
+    uint8_t unknown1;
+    uint16_t territoryType;
+    uint8_t __padding2;
+    uint8_t __padding3;
+    uint32_t flags;
+    uint32_t finishContentMatchFlags;
+    uint64_t startTime;
+  };
+
   /**
   * Structural representation of the packet sent by the server
   * to update contents available in duty finder or raid finder

@@ -121,7 +121,7 @@ void Sapphire::Network::GameConnection::acceptContent( const Packets::FFXIVARR_P
                         packet.data().accept, packet.data().territoryId, packet.data().territoryType );
   auto& contentFinder = Common::Service< World::ContentFinder >::ref();
 
-  if( packet.data().accept )
+  if( packet.data().accept == 0 )
     contentFinder.accept( player ); 
   else
     contentFinder.withdraw( player );
