@@ -163,6 +163,8 @@ void Player::updateQuestsCompleted( uint32_t questId )
   uint8_t value = 0x80 >> bitIndex;
 
   m_questCompleteFlags[ index ] |= value;
+
+  Common::Service< Manager::MapMgr >::ref().updateQuests( *this );
 }
 
 bool Player::isQuestCompleted( uint32_t questId )
