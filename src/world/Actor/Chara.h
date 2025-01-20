@@ -89,6 +89,7 @@ namespace Sapphire::Entity
     std::queue< uint8_t > m_statusEffectFreeSlotQueue;
     std::vector< std::pair< uint8_t, uint32_t > > m_statusEffectList;
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
+    std::set< uint8_t > m_statusEffectSlots;
 
     /*! Detour Crowd AgentId */
     uint32_t m_agentId;
@@ -108,7 +109,9 @@ namespace Sapphire::Entity
     /// Status effect functions
     void addStatusEffect( StatusEffect::StatusEffectPtr pEffect );
 
-    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId, bool sendOrder = true );
+    std::map< uint8_t, StatusEffect::StatusEffectPtr >::iterator removeStatusEffect( uint8_t effectSlotId, bool updateStatus = true );
+
+    void replaceSingleStatusEffect( uint32_t slotId, StatusEffect::StatusEffectPtr pStatus );
 
     void replaceSingleStatusEffectById( uint32_t id );
 
