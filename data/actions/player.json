@@ -504,6 +504,8 @@
         {
           "id": 85,
           "duration": 24000,
+          "maxDuration": 60000,
+          "statusRefreshPolicy": 48,
           "modifiers": [
             {
               "modifier": "DamageDealtPercent",
