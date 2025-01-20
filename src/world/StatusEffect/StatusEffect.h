@@ -67,6 +67,8 @@ public:
   uint8_t getSlot() const;
   void setSlot( uint8_t slot );
 
+  void refresh( uint32_t newDuration );
+
 private:
   uint32_t m_id;
   Entity::CharaPtr m_sourceActor;
@@ -83,6 +85,7 @@ private:
   std::unordered_map< Common::ParamModifier, int32_t > m_modifiers;
   uint8_t m_slot;
 
+  void refresh();
 };
 
 }
