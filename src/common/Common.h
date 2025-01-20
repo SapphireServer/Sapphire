@@ -940,6 +940,16 @@ namespace Sapphire::Common
     RemoveOnSuccessfulHit = 4096
   };
 
+  enum class StatusRefreshPolicy : uint8_t
+  {
+    Stack = 0,
+    ReplaceOrApply = 1,
+    Extend = 2,
+    ExtendOrApply = 3,
+    Reject = 4,
+    Custom = 255
+  };
+
   enum struct ActionAspect : uint8_t
   {
     None = 0,   // Doesn't imply unaspected

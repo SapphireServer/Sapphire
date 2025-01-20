@@ -33,6 +33,10 @@ namespace Sapphire::World::Action
   {
     j.at( "id" ).get_to( statusEntry.id );
     j.at( "duration" ).get_to( statusEntry.duration );
+    if( j.contains( "maxDuration" ) )
+      j.at( "maxDuration" ).get_to( statusEntry.maxDuration );
+    if( j.contains( "statusRefreshPolicy" ) )
+      j.at( "statusRefreshPolicy" ).get_to( statusEntry.statusRefreshPolicy );
     if( j.contains( "flag" ) )
       j.at( "flag" ).get_to( statusEntry.flag );
     if( j.contains( "modifiers" ) )

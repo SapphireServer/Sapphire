@@ -41,6 +41,8 @@ struct StatusEntry
 {
   uint16_t id;
   uint32_t duration;
+  uint32_t maxDuration;
+  uint8_t statusRefreshPolicy;
   uint32_t flag;
   std::vector< StatusModifier > modifiers;
 };
@@ -79,6 +81,8 @@ void to_json( nlohmann::ordered_json& j, const StatusEntry& statusEntry )
   j = nlohmann::ordered_json{
     { "id", statusEntry.id },
     { "duration", statusEntry.duration },
+    { "maxDuration", statusEntry.maxDuration },
+    { "statusRefreshPolicy", statusEntry.statusRefreshPolicy },
     { "flag", statusEntry.flag },
     { "modifiers", statusEntry.modifiers }
   };
@@ -98,7 +102,7 @@ void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
     { "nextCombo", action.nextCombo },
     { "statuses", {
         { "caster", action.statuses.caster },
-        { "target", action.statuses.target },
+        { "target", action.statuses.target }
       }
     }
   };

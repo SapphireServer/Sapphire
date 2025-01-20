@@ -113,6 +113,8 @@ namespace Sapphire::World::Action
 
     void buildActionResults();
 
+    void applyStatusEffect( bool isSelf, Entity::CharaPtr& target, Entity::CharaPtr& source, World::Action::StatusEntry& status, bool statusToSource = false );
+
     void handleStatusEffects();
 
     void handleJobAction();
