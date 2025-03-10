@@ -649,7 +649,10 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
     }
     case Common::StatusRefreshPolicy::ReplaceOrApply:
     {
-      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+      else
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       break;
     }
     case Common::StatusRefreshPolicy::Extend:

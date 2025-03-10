@@ -937,7 +937,8 @@ namespace Sapphire::Common
     Invisibilty = 512,
     CanStatusOff = 1024,
     FcBuff = 2048,
-    RemoveOnSuccessfulHit = 4096
+    RemoveOnSuccessfulHit = 4096,
+    ReplaceSameCaster = 8192
   };
 
   enum class StatusRefreshPolicy : uint8_t

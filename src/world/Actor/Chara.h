@@ -86,7 +86,6 @@ namespace Sapphire::Entity
 
     /*! Status effects */
     const uint8_t MAX_STATUS_EFFECTS = 30;
-    std::queue< uint8_t > m_statusEffectFreeSlotQueue;
     std::vector< std::pair< uint8_t, uint32_t > > m_statusEffectList;
     std::map< uint8_t, StatusEffect::StatusEffectPtr > m_statusEffectMap;
     std::set< uint8_t > m_statusEffectSlots;

@@ -184,7 +184,7 @@ void ActionResult::execute()
       for( auto const& entry : m_target->getStatusEffectMap() )
       {
         auto statusEffect = entry.second;
-        if( statusEffect->getId() == m_result.Value && m_bShouldOverride )
+        if( statusEffect->getId() == m_result.Value && m_bShouldOverride && statusEffect->getSrcActorId() == m_pStatus->getSrcActorId() )
         {
           statusEffect->refresh( m_pStatus->getDuration() );
           m_pStatus->setSlot( statusEffect->getSlot() );

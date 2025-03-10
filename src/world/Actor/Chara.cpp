@@ -49,12 +49,6 @@ Chara::Chara( ObjKind type ) :
   m_lastAttack = Common::Util::getTimeMs();
 
   m_bonusStats.fill( 0 );
-
-  // initialize the free slot queue
-  for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
-  {
-    m_statusEffectFreeSlotQueue.push( i );
-  }
 }
 
 Chara::~Chara() = default;
@@ -521,12 +515,6 @@ int8_t Chara::getStatusEffectFreeSlot()
 {
   int8_t freeEffectSlot = -1;
 
-  // if( m_statusEffectFreeSlotQueue.empty() )
-  //   return freeEffectSlot;
-
-  // freeEffectSlot = static_cast< int8_t >( m_statusEffectFreeSlotQueue.front() );
-  // m_statusEffectFreeSlotQueue.pop();
-
   if( m_statusEffectSlots.size() >= MAX_STATUS_EFFECTS )
     return freeEffectSlot;
 
@@ -544,15 +532,11 @@ int8_t Chara::getStatusEffectFreeSlot()
 
 void Chara::statusEffectFreeSlot( uint8_t slotId )
 {
-  // m_statusEffectFreeSlotQueue.push( slotId );
   m_statusEffectSlots.erase( slotId );
-  // std::set< uint8_t > shiftedSlots;
 }
 
 void Chara::replaceSingleStatusEffect( uint32_t slotId, StatusEffect::StatusEffectPtr pStatus )
 {
-  // removeStatusEffect( slotId, false );
-  // addStatusEffect( pStatus );
   pStatus->setSlot( slotId );
   m_statusEffectMap[ slotId ] = pStatus;
   pStatus->applyStatus();
@@ -630,13 +614,11 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
 
   auto it = m_statusEffectMap.erase( pEffectIt );
 
-  // for( const auto& effectIt : m_statusEffectMap )
   for( auto effectIt = it; effectIt != m_statusEffectMap.end(); )
   {
-    // if( effectIt.first > effectSlotId )
-    // {
     // if the status is *after* the one being removed, shift the slots down by one
     auto shifted_slot = effectIt->first - 1;
+
     auto node_slot = m_statusEffectSlots.extract( effectIt->first );
     node_slot.value() = shifted_slot;
     m_statusEffectSlots.insert( std::move( node_slot ) );
@@ -649,7 +631,6 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
 
     Logger::warn( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
     ++effectIt;
-    // }
   }
 
   Logger::warn( "Slot id being freed: {}", effectSlotId );

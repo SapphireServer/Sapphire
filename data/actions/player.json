@@ -2041,7 +2041,20 @@
     "nextCombo": [],
     "statuses": {
       "caster": [],
-      "target": []
+      "target": [
+        {
+          "id": 150,
+          "duration": 30000,
+          "statusRefreshPolicy": 17,
+          "flag": 8192,
+          "modifiers": [
+            {
+              "modifier": "TickHeal",
+              "value": 50
+            }
+          ]
+        }
+      ]
     }
   },
   "134": {
@@ -2101,7 +2114,20 @@
     "nextCombo": [],
     "statuses": {
       "caster": [],
-      "target": []
+      "target": [
+        {
+          "id": 158,
+          "duration": 21000,
+          "statusRefreshPolicy": 17,
+          "flag": 8192,
+          "modifiers": [
+            {
+              "modifier": "TickHeal",
+              "value": 150
+            }
+          ]
+        }
+      ]
     }
   },
   "138": {

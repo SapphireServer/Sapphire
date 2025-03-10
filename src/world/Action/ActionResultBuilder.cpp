@@ -1,4 +1,4 @@
-  #include "ActionResultBuilder.h"
+#include "ActionResultBuilder.h"
 #include "ActionResult.h"
 
 #include <Actor/Player.h>
