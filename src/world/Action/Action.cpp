@@ -350,7 +350,7 @@ void Action::Action::start()
   onStart();
 
   // instantly finish cast if there's no cast time
-  if( !hasCastTime() )
+  if( !hasCastTime() && !isInterrupted() )
     execute();
 }
 
@@ -379,6 +379,8 @@ void Action::Action::onStart()
 void Action::Action::interrupt()
 {
   assert( m_pSource );
+  if( m_interruptType == ActionInterruptType::None )
+    m_interruptType = ActionInterruptType::RegularInterrupt;
   // things that aren't players don't care about cooldowns and state flags
   if( m_pSource->isPlayer() )
   {
@@ -522,6 +524,7 @@ void Action::Action::buildActionResults()
 
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
+    scriptMgr.onAfterBuildEffect( *this );
     // send any effect packet added by script or an empty one just to play animation for other players
     m_actionResultBuilder->sendActionResults( {} );
     return;
@@ -592,13 +595,15 @@ void Action::Action::buildActionResults()
   }
 
   // If we hit an enemy
-  if( !m_hitActors.empty() && getHitChara()->getObjKind() != m_pSource->getObjKind() )
+  if( !m_hitActors.empty() && getHitChara()->isHostile( *m_pSource ) )
   {
     m_pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
   }
 
   handleJobAction();
   handleStatusEffects();
+
+  scriptMgr.onAfterBuildEffect( *this );
 
   m_actionResultBuilder->sendActionResults( m_hitActors );
 
@@ -667,7 +672,6 @@ bool Action::Action::preCheck()
 
 bool Action::Action::playerPreCheck( Entity::Player& player )
 {
-  // lol
   if( !player.isAlive() )
     return false;
 
@@ -675,28 +679,28 @@ bool Action::Action::playerPreCheck( Entity::Player& player )
   //if( m_actionData->data().UseClassJob == -1 /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
   //  return false;
 
-  if( player.getLevel() < m_actionData->data().UseClassJob )
-    return false;
+  //if( player.getLevel() < m_actionData->data().UseClassJob )
+  //  return false;
 
-  auto currentClass = player.getClass();
-  auto actionClass = static_cast< Common::ClassJob >( m_actionData->data().UseClassJob );
+  //auto currentClass = player.getClass();
+  //auto actionClass = static_cast< Common::ClassJob >( m_actionData->data().UseClassJob );
 
-  if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
-  {
+  //if( actionClass != Common::ClassJob::Adventurer && currentClass != actionClass /* dunno what this is in old data && !m_actionData->data().isRoleAction*/ )
+  //{
     // check if not a base class action
-    auto& exdData = Common::Service< Data::ExdData >::ref();
+    //auto& exdData = Common::Service< Data::ExdData >::ref();
 
-    auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( currentClass ) );
-    if( !classJob )
-      return false;
+    //auto classJob = exdData.getRow< Excel::ClassJob >( static_cast< uint8_t >( currentClass ) );
+    //if( !classJob )
+    //  return false;
 
-    if( classJob->data().MainClass != m_actionData->data().UseClassJob )
-      return false;
-  }
+    //if( classJob->data().MainClass != m_actionData->data().UseClassJob )
+    //  return false;
+  //}
 
-  if( !m_actionData->data().SelectMyself && getTargetId() == m_pSource->getId() )
-    return false;
-
+  //if( !m_actionData->data().SelectMyself && getTargetId() == m_pSource->getId() )
+  //  return false;
+  
   // todo: does this need to check for party/alliance stuff or it's just same type?
   // todo: m_pTarget doesn't exist at this stage because we only fill it when we snapshot targets
 //  if( !m_actionData->canTargetFriendly && m_pSource->getObjKind() == m_pTarget->getObjKind() )
@@ -885,6 +889,9 @@ void Action::Action::addDefaultActorFilters()
 
 bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
 {
+  if( m_castType == Common::CastType::SingleTarget ) // client filters any single target action by itself
+    return true;
+
   auto kind = actor.getObjKind();
   auto chara = actor.getAsChara();
 
@@ -892,20 +899,15 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
 
-  // todo: evaluate other actions that can hit condition (eg. sprint)
-  /* if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
-    return false;*/
+  // for any non-targeted aoe action m_canTargetSelf is always true and no other info is available 
   
-  if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
-    return false;
+  if( chara->isAlive() && ( m_lutEntry.curePotency > 0 || m_canTargetFriendly ) && m_pSource->isFriendly( *chara ) )
+    return true;
 
-  if( m_lutEntry.potency > 0 && m_pSource->getObjKind() == chara->getObjKind() ) // !m_canTargetFriendly not working for aoe
-    return false;
+  if( chara->isAlive() && ( m_lutEntry.potency > 0 || m_canTargetHostile ) > 0 && m_pSource->isHostile( *chara ) )
+    return true;
 
-  if( ( m_lutEntry.potency == 0 && m_lutEntry.curePotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
-    return false;
-
-  return true;
+  return false;
 }
 
 std::vector< Entity::CharaPtr >& Action::Action::getHitCharas()

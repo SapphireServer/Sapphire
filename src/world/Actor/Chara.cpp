@@ -833,8 +833,21 @@ bool Chara::isFacingTarget( const Chara& other, float threshold )
   return dot >= threshold;
 }
 
+bool Sapphire::Entity::Chara::isHostile( const Chara& chara )
+{
+  return m_objKind != chara.getObjKind();
+}
+
+bool Sapphire::Entity::Chara::isFriendly( const Chara& chara )
+{
+  return m_objKind == chara.getObjKind();
+}
+
 void Chara::onTick()
 {
+  if ( !isAlive() )
+    return;
+
   uint32_t thisTickDmg = 0;
   uint32_t thisTickHeal = 0;
 

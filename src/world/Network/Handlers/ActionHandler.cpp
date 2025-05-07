@@ -90,9 +90,6 @@ void Sapphire::Network::GameConnection::actionRequest( const Packets::FFXIVARR_P
       break;
     }
   }
-
-
-
 }
 
 void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets::FFXIVARR_PACKET_RAW& inPacket, Entity::Player& player )
