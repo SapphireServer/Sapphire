@@ -12,7 +12,7 @@
 
 using namespace Sapphire;
 
-class ManFst002 : public Sapphire::ScriptAPI::QuestScript
+class ManFst002_1 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
 
@@ -218,4 +218,4 @@ public:
   }
 };
 
-EXPOSE_SCRIPT( ManFst002 );
+EXPOSE_SCRIPT( ManFst002_1 );

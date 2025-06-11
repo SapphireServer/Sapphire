@@ -235,6 +235,8 @@ namespace Sapphire::Entity
     /*! returns a pointer to the exp array */
     ExpList& getExpArray();
 
+    uint8_t getElementalLevelMod();
+
     // Base Look / Stats / Params
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     /*! return the birth day */
