@@ -49,12 +49,6 @@ Chara::Chara( ObjKind type ) :
   m_lastAttack = Common::Util::getTimeMs();
 
   m_bonusStats.fill( 0 );
-
-  // initialize the free slot queue
-  for( uint8_t i = 0; i < MAX_STATUS_EFFECTS; i++ )
-  {
-    m_statusEffectFreeSlotQueue.push( i );
-  }
 }
 
 Chara::~Chara() = default;
@@ -521,18 +515,31 @@ int8_t Chara::getStatusEffectFreeSlot()
 {
   int8_t freeEffectSlot = -1;
 
-  if( m_statusEffectFreeSlotQueue.empty() )
+  if( m_statusEffectSlots.size() >= MAX_STATUS_EFFECTS )
     return freeEffectSlot;
 
-  freeEffectSlot = static_cast< int8_t >( m_statusEffectFreeSlotQueue.front() );
-  m_statusEffectFreeSlotQueue.pop();
+  if( m_statusEffectSlots.empty() )
+    freeEffectSlot = 0;
+  else
+    freeEffectSlot = static_cast< int8_t >( *m_statusEffectSlots.rbegin() + 1 );
+  
+  m_statusEffectSlots.insert( freeEffectSlot );
+
+  Logger::warn( "Slot id being added: {}", freeEffectSlot );
 
   return freeEffectSlot;
 }
 
 void Chara::statusEffectFreeSlot( uint8_t slotId )
 {
-  m_statusEffectFreeSlotQueue.push( slotId );
+  m_statusEffectSlots.erase( slotId );
+}
+
+void Chara::replaceSingleStatusEffect( uint32_t slotId, StatusEffect::StatusEffectPtr pStatus )
+{
+  pStatus->setSlot( slotId );
+  m_statusEffectMap[ slotId ] = pStatus;
+  pStatus->applyStatus();
 }
 
 void Chara::replaceSingleStatusEffectById( uint32_t id )
@@ -588,7 +595,7 @@ void Chara::removeStatusEffectByFlag( Common::StatusEffectFlag flag )
   }
 }
 
-std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::removeStatusEffect( uint8_t effectSlotId, bool sendOrder )
+std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::removeStatusEffect( uint8_t effectSlotId, bool updateStatus )
 {
   auto pEffectIt = m_statusEffectMap.find( effectSlotId );
   if( pEffectIt == m_statusEffectMap.end() )
@@ -599,11 +606,35 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  if( sendOrder )
+  if( updateStatus )
+  {
     Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), StatusEffectLose, pEffect->getId() );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 
   auto it = m_statusEffectMap.erase( pEffectIt );
-  Network::Util::Packet::sendHudParam( *this );
+
+  for( auto effectIt = it; effectIt != m_statusEffectMap.end(); )
+  {
+    // if the status is *after* the one being removed, shift the slots down by one
+    auto shifted_slot = effectIt->first - 1;
+
+    auto node_slot = m_statusEffectSlots.extract( effectIt->first );
+    node_slot.value() = shifted_slot;
+    m_statusEffectSlots.insert( std::move( node_slot ) );
+
+    auto node_status = m_statusEffectMap.extract( effectIt->first );
+    node_status.key() = shifted_slot;
+    m_statusEffectMap.insert( std::move( node_status ) );
+
+    effectIt->second->setSlot( effectIt->second->getSlot() - 1 );
+
+    Logger::warn( "Shifted slot {} to slot: {}", effectSlotId, shifted_slot );
+    ++effectIt;
+  }
+
+  Logger::warn( "Slot id being freed: {}", effectSlotId );
+
   return it;
 }
 

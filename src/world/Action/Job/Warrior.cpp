@@ -3,6 +3,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <Actor/Player.h>
+#include <StatusEffect/StatusEffect.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -29,6 +30,7 @@ void Warrior::onAction( Entity::Player& player, Action& action )
 
 void Warrior::handleWrath( Entity::Player& player, Action& action )
 {
+  Sapphire::StatusEffect::StatusEffectPtr oldStatus = nullptr;
   auto effectToApply = Wrath;
   auto parry = 2;
   auto asChara = player.getAsChara();
@@ -38,33 +40,45 @@ void Warrior::handleWrath( Entity::Player& player, Action& action )
   if( !pActionBuilder )
     return;
 
-  if( player.hasStatusEffect( Wrath ) )
+  auto statusMap = player.getStatusEffectMap();
+
+  for( const auto& effectIt : statusMap )
   {
-    player.replaceSingleStatusEffectById( Wrath );
-    effectToApply = WrathII;
-    parry += 2;
-  }
-  else if( player.hasStatusEffect( WrathII ) )
-  {
-    player.replaceSingleStatusEffectById( WrathII );
-    effectToApply = WrathIII;
-    parry += 2;
-  }
-  else if( player.hasStatusEffect( WrathIII ) )
-  {
-    player.replaceSingleStatusEffectById( WrathIII );
-    effectToApply = WrathIV;
-    parry += 2;
-  }
-  else if( player.hasStatusEffect( WrathIV ) )
-  {
-    player.replaceSingleStatusEffectById( WrathIV );
-    effectToApply = Infuriated;
-    parry += 2;
+    if( effectIt.second->getId() == Wrath )
+    {
+      oldStatus = effectIt.second;
+      effectToApply = WrathII;
+      parry += 2;
+      break;
+    }
+    else if( effectIt.second->getId() == WrathII )
+    {
+      oldStatus = effectIt.second;
+      effectToApply = WrathIII;
+      parry += 2;      
+      break;
+    }
+    else if( effectIt.second->getId() == WrathIII )
+    {
+      oldStatus = effectIt.second;
+      effectToApply = WrathIV;
+      parry += 2;      
+      break;
+    }
+    else if( effectIt.second->getId() == WrathIV )
+    {
+      oldStatus = effectIt.second;
+      effectToApply = Infuriated;
+      parry += 2;     
+      break;
+    }
   }
 
   if( !player.hasStatusEffect( Infuriated ) )
-  {    
-    pActionBuilder->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } }, 0, false );
+  {
+    if( oldStatus )
+      pActionBuilder->replaceStatusEffectSelf( oldStatus, effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
+    else
+      pActionBuilder->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
   }
 }

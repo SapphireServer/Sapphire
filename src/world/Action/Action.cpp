@@ -32,6 +32,8 @@
 #include <Service.h>
 #include "WorldServer.h"
 
+#include "StatusEffect/StatusEffect.h"
+
 #include "Job/Warrior.h"
 
 using namespace Sapphire;
@@ -607,6 +609,89 @@ void Action::Action::buildActionResults()
   // m_effectBuilder.reset();
 }
 
+void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, Entity::CharaPtr& source, World::Action::StatusEntry& status, bool statusToSource )
+{
+  auto pActionBuilder = getActionResultBuilder();
+
+  if( !pActionBuilder )
+    return;
+
+  auto hasSameStatus = false;
+  auto hasSameStatusFromSameCaster = false;
+  Sapphire::StatusEffect::StatusEffectPtr referenceStatus = nullptr;
+
+  for( auto const& entry : statusToSource ? source->getStatusEffectMap() : target->getStatusEffectMap() )
+  {
+    auto statusEffect = entry.second;
+    if( statusEffect->getId() == status.id )
+    {
+      hasSameStatus = true;
+      
+      if( !referenceStatus )
+        referenceStatus = statusEffect;
+      
+      if( statusEffect->getSrcActorId() == source->getId() )
+      {
+        hasSameStatusFromSameCaster = true;
+        referenceStatus = statusEffect;
+        break;;
+      }
+    }
+  }
+
+  auto policy = getStatusRefreshPolicy( status.statusRefreshPolicy, isSelf );
+  switch( policy )
+  {
+    case Common::StatusRefreshPolicy::Stack:
+    {
+      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
+      break;
+    }
+    case Common::StatusRefreshPolicy::ReplaceOrApply:
+    {
+      if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+      else
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      break;
+    }
+    case Common::StatusRefreshPolicy::Extend:
+    case Common::StatusRefreshPolicy::ExtendOrApply:
+    {
+      int64_t remainingDuration = 0;
+      if( hasSameStatus )
+      {
+        remainingDuration = static_cast< int64_t >( referenceStatus->getDuration() ) - ( Common::Util::getTimeMs() - referenceStatus->getStartTimeMs() );
+        if( remainingDuration < 0 )
+          remainingDuration = 0;
+      }
+
+      if( hasSameStatus || policy == Common::StatusRefreshPolicy::ExtendOrApply )
+      {
+        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      }
+      break;
+    }
+    case Common::StatusRefreshPolicy::Reject:
+    {
+      if( !hasSameStatus )
+      {
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      }
+      else
+      {
+        // add function to ActionBuilder for No Effect effect
+      }
+      break;
+    }
+    case Common::StatusRefreshPolicy::Custom:
+    {
+      // script should handle it
+      break;
+    }
+  }
+}
+
 void Action::Action::handleStatusEffects()
 {
   auto pActionBuilder = getActionResultBuilder();
@@ -622,7 +707,12 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
+      /*if( m_hitActors[ 0 ] ) // might need a firstValidVictim?
+        applyStatusEffect( true, m_hitActors[ 0 ], m_pSource, status, true );
+        // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true ); // statusToSource true
+      else if( m_lutEntry.potency == 0 )*/
+      applyStatusEffect( true, m_pSource, m_pSource, status, true );
+        // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
     }
   }
 
@@ -633,7 +723,8 @@ void Action::Action::handleStatusEffects()
     {
       for( auto& status : m_lutEntry.statuses.target )
       {
-        pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
+        applyStatusEffect( false, actor, m_pSource, status );
+        // pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
 
       if( !actor->getStatusEffectMap().empty() )
