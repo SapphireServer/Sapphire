@@ -424,13 +424,9 @@ uint8_t Player::getRace() const
 
 uint8_t Player::getElementalLevelMod()
 {
-  auto level = getLevel();
+  auto level = getLevel() - 1;
 
-  if (level == 1)
-  {
-    return 0;
-  }
-  else if( level < 49 )
+  if( level < 49 )
   {
     return round( 0.083 * pow( level, 2 ) + 1.2 * level );
   }
@@ -438,6 +434,8 @@ uint8_t Player::getElementalLevelMod()
   {
     return round( 220 + 1.4 * ( level - 50 ) );
   }
+
+  return 0;
 }
 
 uint8_t Player::getGender() const

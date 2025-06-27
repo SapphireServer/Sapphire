@@ -8,7 +8,7 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: ManFst003_00123
+// Quest Script: ManFst002_2_00123
 // Quest Name: Close to Home
 // Quest ID: 65659
 // Start NPC: 1001140
@@ -60,10 +60,10 @@ private:
   static constexpr auto UnlockDesion = 14;
 
 public:
-  ManFst003() : Sapphire::ScriptAPI::QuestScript( 65659 )
+  ManFst002_2() : Sapphire::ScriptAPI::QuestScript( 65659 )
   {};
 
-  ~ManFst003() = default;
+  ~ManFst002_2() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -135,7 +135,7 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManFst002_2::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -150,7 +150,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst003::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst002_2::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -163,7 +163,7 @@ private:
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManFst002_2::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -176,7 +176,7 @@ private:
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &ManFst002_2::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -195,7 +195,7 @@ private:
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &ManFst003::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &ManFst002_2::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -207,7 +207,7 @@ private:
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst003::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst002_2::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -222,7 +222,7 @@ private:
 
   void Scene00050( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst003::Scene00050Return ) );
+    eventMgr().playQuestScene( player, getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002_2::Scene00050Return ) );
   }
 
   void Scene00050Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -236,7 +236,7 @@ private:
 
   void Scene00051( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 51, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00051Return ) );
+    eventMgr().playQuestScene( player, getId(), 51, HIDE_HOTBAR, bindSceneReturn( &ManFst002_2::Scene00051Return ) );
   }
 
   void Scene00051Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -248,7 +248,7 @@ private:
 
   void Scene00099( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 99, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00099Return ) );
+    eventMgr().playQuestScene( player, getId(), 99, HIDE_HOTBAR, bindSceneReturn( &ManFst002_2::Scene00099Return ) );
   }
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -260,7 +260,7 @@ private:
 
   void Scene00100( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 100, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst003::Scene00100Return ) );
+    eventMgr().playQuestScene( player, getId(), 100, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst002_2::Scene00100Return ) );
   }
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )

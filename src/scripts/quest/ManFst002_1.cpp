@@ -4,7 +4,7 @@
 #include "Manager/EventMgr.h"
 #include <Service.h>
 
-// Quest Script: ManFst002_00124
+// Quest Script: ManFst002_1_00124
 // Quest Name: Close to Home
 // Quest ID: 65660
 // Start NPC: 1001140
@@ -85,7 +85,7 @@ private:
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, bindSceneReturn( &ManFst002::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_0_ACTOR0, HIDE_HOTBAR, bindSceneReturn( &ManFst002_1::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -96,7 +96,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR1, 0x0EFB, bindSceneReturn( &ManFst002::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR1, 0x0EFB, bindSceneReturn( &ManFst002_1::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -107,7 +107,7 @@ private:
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR2, NONE, bindSceneReturn( &ManFst002::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR2, NONE, bindSceneReturn( &ManFst002_1::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -118,7 +118,7 @@ private:
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR3, NONE, bindSceneReturn( &ManFst002::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR3, NONE, bindSceneReturn( &ManFst002_1::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -136,7 +136,7 @@ private:
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_2_ACTOR4, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002_1::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -149,7 +149,7 @@ private:
 
   void Scene00050( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002::Scene00050Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_0_ACTOR0_LQ, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002_1::Scene00050Return ) );
   }
 
   void Scene00050Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -164,17 +164,17 @@ private:
 
   void Scene00051( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestSceneChain( player, getId(), SEQ_1_ACTOR1_WAIT, NONE, bindQuestScene( &ManFst002::Scene00001 ) );
+    eventMgr().playQuestSceneChain( player, getId(), SEQ_1_ACTOR1_WAIT, NONE, bindQuestScene( &ManFst002_1::Scene00001 ) );
   }
 
   void Scene00099( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestSceneChain( player, getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, bindQuestScene( &ManFst002::Scene00005 ) );
+    eventMgr().playQuestSceneChain( player, getId(), SEQ_1_ACTOR3_NPCTRADENO, NONE, bindQuestScene( &ManFst002_1::Scene00005 ) );
   }
 
   void Scene00100( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, bindSceneReturn( &ManFst002::Scene00100Return ) );
+    eventMgr().playQuestScene( player, getId(), SEQ_1_ACTOR3_NPCTRADEOK, 0x0EFB, bindSceneReturn( &ManFst002_1::Scene00100Return ) );
   }
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -185,7 +185,7 @@ private:
   }
 
 public:
-  ManFst002() : Sapphire::ScriptAPI::QuestScript( 65621 )
+  ManFst002_1() : Sapphire::ScriptAPI::QuestScript( 65621 )
   {
   }
 
