@@ -60,13 +60,9 @@ public:
     if( actorId == Actor0 )
     {
       if( quest.getSeq() == Seq0 )
-      {
         Scene00000( quest, player );
-      }
-      else
-      {
+      if( quest.getSeq() == SeqFinish )
         Scene00009( quest, player );
-      }
     }
 
     if( actorId == Eobject0 )
@@ -76,7 +72,8 @@ public:
       eventMgr().eventActionStart(
               player, getId(), EventActionProcessShor,
               [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
-                quest.setSeq( SeqFinish );
+                //quest.setSeq( SeqFinish );
+                Scene00008( quest, player );
               },
               nullptr, getId() );
     }
@@ -213,6 +210,9 @@ private:
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    quest.setUI8BH( 1 );
+    eventMgr().sendEventNotice( player, getId(), 2, 0 );
+    quest.setSeq( SeqFinish );
   }
 
   //////////////////////////////////////////////////////////////////////

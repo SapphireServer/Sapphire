@@ -163,7 +163,7 @@ public:
           eventMgr().eventActionStart(
                   player, getId(), 0x1A,
                   [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
-                    Scene00013( quest, player );
+                    Scene00016( quest, player );
                   },
                   nullptr, 0 );
         }

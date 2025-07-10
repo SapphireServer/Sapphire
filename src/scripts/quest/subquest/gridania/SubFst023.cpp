@@ -3,31 +3,24 @@
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
 #include "Manager/EventMgr.h"
-#include <Actor/Player.h>
 #include <Actor/BNpc.h>
+#include <Actor/Player.h>
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: SubFst007_00031
-// Quest Name: Essential Oil
-// Quest ID: 65567
-// Start NPC: 1000705
-// End NPC: 1000705
+// Quest Script: SubFst023
+// Quest Name: Drink Your Beans, Dear
+// Quest ID: 65634
+// Start NPC: 1000656
+// End NPC: 1000612
 
 using namespace Sapphire;
 
-class SubFst007 : public Sapphire::ScriptAPI::QuestScript
+class SubFst023 : public Sapphire::ScriptAPI::QuestScript
 {
-private:
-  // Basic quest information
-  // Quest vars / flags used
-  // UI8AL
-  // UI8BH
 
-  /// Countable Num: 6 Seq: 1 Event: 9 Listener: 49
-  /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1000705
-  // Steps in this quest ( 0 is before accepting,
-  // 1 is first, 255 means ready for turning it in
+private:
+
   enum Sequence : uint8_t
   {
     Seq0 = 0,
@@ -36,17 +29,17 @@ private:
   };
 
   // Entities found in the script data of the quest
-  static constexpr auto Actor0 = 1000705;
-  static constexpr auto Enemy0 = 49;
-  static constexpr auto Item0 = 2000098;
-  static constexpr auto Seq0Actor0 = 0;
-  static constexpr auto Seq2Actor0 = 1;
-  static constexpr auto Seq2Actor0Npctradeno = 99;
-  static constexpr auto Seq2Actor0Npctradeok = 100;
+  static constexpr auto Actor0 = 1000656;// Dametta ( Pos: 400.656006 -5.886250 -104.875000  Teri: 154 )
+  static constexpr auto Enemy0 = 32;     // Microchu
+  static constexpr auto Item0 = 2000077;
+  static constexpr auto Seq0Actor0 = 0;            //
+  static constexpr auto Seq2Actor0 = 1;            //
+  static constexpr auto Seq2Actor0Npctradeno = 99; // Hecatoncheir Piledriver
+  static constexpr auto Seq2Actor0Npctradeok = 100;// Hecatoncheir Blastmaster ( Pos: -135.210007 5.708900 -117.417999  Teri: 141 )
 
 public:
-  SubFst007() : Sapphire::ScriptAPI::QuestScript( 65567 ){};
-  ~SubFst007() = default;
+  SubFst023() : Sapphire::ScriptAPI::QuestScript( 65634 ) {};
+  ~SubFst023() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -56,30 +49,28 @@ public:
     {
       case Actor0:
       {
-        if( !player.hasQuest( getId() ) )
+        if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
-        else if( quest.getSeq() == SeqFinish )
+        if( quest.getSeq() == SeqFinish )
           Scene00001( quest, player );
         break;
       }
     }
   }
 
-  void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
+  void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
     if( bnpc.getBNpcNameId() != Enemy0 )
       return;
-
-    auto currentKC = quest.getUI8AL();
-
-    if ( currentKC <= 6 )
+    else
     {
-      eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 6 );
-      quest.setUI8AL( currentKC + 1 );
-      quest.setUI8BH( currentKC + 1 );
-      if( quest.getUI8AL() >= 6 )
+      auto currentKC = quest.getUI8AL();
+      if( currentKC <= 4 )
       {
-        quest.setSeq( SeqFinish );
+        eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 4 );
+        quest.setUI8AL( currentKC + 1 );
+        quest.setUI8BH( currentKC + 1 );
+        checkQuestCompletion( quest, player );
       }
     }
   }
@@ -89,9 +80,18 @@ private:
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
 
+  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
+  {
+    if( quest.getUI8AL() >= 4 )
+    {
+      quest.setUI8AL( 0 );
+      quest.setSeq( SeqFinish );
+    }
+  }
+
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &SubFst007::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubFst023::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -106,7 +106,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &SubFst007::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubFst023::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -121,24 +121,22 @@ private:
 
   void Scene00099( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 99, HIDE_HOTBAR, bindSceneReturn( &SubFst007::Scene00099Return ) );
+    eventMgr().playQuestScene( player, getId(), 99, NONE, bindSceneReturn( &SubFst023::Scene00099Return ) );
   }
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    //Empty
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00100( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 100, HIDE_HOTBAR, bindSceneReturn( &SubFst007::Scene00100Return ) );
+    eventMgr().playQuestScene( player, getId(), 100, NONE, bindSceneReturn( &SubFst023::Scene00100Return ) );
   }
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
@@ -146,4 +144,4 @@ private:
   }
 };
 
-EXPOSE_SCRIPT( SubFst007 );
+EXPOSE_SCRIPT( SubFst023 );
