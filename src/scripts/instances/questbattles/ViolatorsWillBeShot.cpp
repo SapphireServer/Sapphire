@@ -1,5 +1,8 @@
 #include <ScriptObject.h>
 #include <Territory/QuestBattle.h>
+#include <Actor/Player.h>
+#include <Actor/GameObject.h>
+#include <Actor/BNpc.h>
 
 using namespace Sapphire;
 
@@ -31,6 +34,8 @@ private:
   static constexpr auto INIT_POP_ADD_GLA01 = 4246863;
   static constexpr auto INIT_POP_ADD_GLA02 = 4246864;
   static constexpr auto POP_RANGE_MIRAUDONT_MOVE = 4358145;
+
+  bool maraSpawn = false;
 
 public:
   ViolatorsWillBeShot() : Sapphire::ScriptAPI::QuestBattleScript( 6 )
@@ -133,15 +138,124 @@ public:
 
   }
 
+  void onPlayerSetup( Sapphire::QuestBattle& instance, Entity::Player& player ) override
+  {
+    player.setRot( -3.13f );
+    player.setPos( { 288.63f, -11.75f, 51.73f } );
+  }
+
+  enum vars
+  {
+    SUCCESS_CALLED,
+  };
+
   void onUpdate( QuestBattle& instance, uint64_t tickCount ) override
   {
+    auto pPlayer = instance.getPlayerPtr();
+    auto boss = instance.getActiveBNpcByLayoutId( INIT_POP_01 );
 
+    auto successCalled = instance.getDirectorVar( SUCCESS_CALLED );
+
+    uint32_t bossHpPercent = 0;
+    if( boss )
+      bossHpPercent = boss->getHpPercent();
+
+    if( pPlayer && !pPlayer->isAlive() )
+    {
+      instance.fail();
+      return;
+    }
+
+    if( bossHpPercent == 0 && successCalled == 0 )
+    {
+      instance.setDirectorVar( SUCCESS_CALLED, 1 );
+      instance.success();
+      return;
+    }
+
+    /* if( !maraSpawn )
+    {
+      auto range = pPlayer->getInRangeActors();
+
+      if( !range.empty() )
+      {
+        for( auto actor : range )
+        {
+          if (actor->getAsEventObj() == instance.getEObj(2004128))
+          {
+            auto mira = instance.createBNpcFromLayoutId( INIT_P_POP_MIRAUDONT, 1440, Common::BNpcType::Enemy );
+            maraSpawn = true;
+          }
+        }
+      }
+    }*/
+    
+
+    
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
                          uint16_t param2 ) override
   {
+    player.setOnEnterEventDone( true );
+  }
 
+  void onDutyCommence( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto boss = instance.createBNpcFromLayoutId( INIT_POP_01, 1440, Common::BNpcType::Enemy );
+    auto a2 = instance.createBNpcFromLayoutId( INIT_POP_02, 1440, Common::BNpcType::Enemy );
+    auto a3 = instance.createBNpcFromLayoutId( INIT_POP_03, 1440, Common::BNpcType::Enemy );
+    auto a4 = instance.createBNpcFromLayoutId( INIT_POP_04, 1440, Common::BNpcType::Enemy );
+    auto a5 = instance.createBNpcFromLayoutId( INIT_POP_05, 1440, Common::BNpcType::Enemy );
+    auto a6 = instance.createBNpcFromLayoutId( INIT_POP_06, 1440, Common::BNpcType::Enemy );
+    auto a7 = instance.createBNpcFromLayoutId( INIT_POP_07, 1440, Common::BNpcType::Enemy );
+    auto a8 = instance.createBNpcFromLayoutId( INIT_POP_08, 1440, Common::BNpcType::Enemy );
+    auto a9 = instance.createBNpcFromLayoutId( INIT_POP_09, 1440, Common::BNpcType::Enemy );
+    auto a10 = instance.createBNpcFromLayoutId( INIT_POP_10, 1440, Common::BNpcType::Enemy );
+    auto a11 = instance.createBNpcFromLayoutId( INIT_POP_11, 1440, Common::BNpcType::Enemy );
+    auto a12 = instance.createBNpcFromLayoutId( INIT_POP_12, 1440, Common::BNpcType::Enemy );
+
+    auto a13 = instance.createBNpcFromLayoutId( INIT_POP_CAMP_EXC01, 1440, Common::BNpcType::Enemy );
+    auto a14 = instance.createBNpcFromLayoutId( INIT_POP_CAMP_EXC02, 1440, Common::BNpcType::Enemy );
+    auto a15 = instance.createBNpcFromLayoutId( INIT_POP_CAMP_EXC03, 1440, Common::BNpcType::Enemy );
+    auto a16 = instance.createBNpcFromLayoutId( INIT_POP_CAMP_EXC04, 1440, Common::BNpcType::Enemy );
+    auto a17 = instance.createBNpcFromLayoutId( INIT_POP_CAMP_LNC01, 1440, Common::BNpcType::Enemy );
+    auto a18 = instance.createBNpcFromLayoutId( INIT_POP_CAMP_LNC02, 1440, Common::BNpcType::Enemy );
+
+    boss->setFlag( Entity::NoDeaggro );
+    a2->setFlag( Entity::NoDeaggro );
+    a3->setFlag( Entity::NoDeaggro );
+    a4->setFlag( Entity::NoDeaggro );
+    a5->setFlag( Entity::NoDeaggro );
+    a6->setFlag( Entity::NoDeaggro );
+    a7->setFlag( Entity::NoDeaggro );
+    a8->setFlag( Entity::NoDeaggro );
+    a9->setFlag( Entity::NoDeaggro );
+    a10->setFlag( Entity::NoDeaggro );
+    a11->setFlag( Entity::NoDeaggro );
+    a12->setFlag( Entity::NoDeaggro );
+
+    a13->setFlag( Entity::NoDeaggro );
+    a14->setFlag( Entity::NoDeaggro );
+    a15->setFlag( Entity::NoDeaggro );
+    a16->setFlag( Entity::NoDeaggro );
+    a17->setFlag( Entity::NoDeaggro );
+    a18->setFlag( Entity::NoDeaggro );
+
+
+    /////////////////
+    //auto t2 = instance.createBNpcFromLayoutId( INIT_POP_ADD_GLA01, 1440, Common::BNpcType::Enemy );
+    //auto t3 = instance.createBNpcFromLayoutId( INIT_POP_ADD_GLA02, 1440, Common::BNpcType::Enemy );
+    auto t4 = instance.createBNpcFromLayoutId( ER_RECT_01, 1440, Common::BNpcType::Enemy );
+  }
+
+  void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override
+  {
+    auto idx = player.getQuestIndex( instance.getQuestId() );
+    if( idx == -1 )
+      return;
+    auto& quest = player.getQuestByIndex( idx );
+    quest.setSeq( 5 );
   }
 
 };
