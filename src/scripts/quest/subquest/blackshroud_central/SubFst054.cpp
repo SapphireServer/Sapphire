@@ -8,6 +8,9 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
+#include "Manager/TerritoryMgr.h"
+#include "Territory/Territory.h"
+
 // Quest Script: SubFst054_00160
 // Quest Name: Slimy Hollows
 // Quest ID: 65696
@@ -78,6 +81,40 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
     {
       case Actor0:
       {
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+        else if( quest.getSeq() == SeqFinish )
+          Scene00004( quest, player );
+        break;
+      }
+      case Eobject0:
+      {
+        eventMgr().eventActionStart(
+                player, getId(), 0x02,
+                [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+                  Scene00001( quest, player );
+                },
+                nullptr, 0 );
+        break;
+      }
+      case Eobject1:
+      {
+        eventMgr().eventActionStart(
+                player, getId(), 0x02,
+                [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+                  Scene00002( quest, player );
+                },
+                nullptr, 0 );
+        break;
+      }
+      case Eobject2:
+      {
+        eventMgr().eventActionStart(
+                player, getId(), 0x02,
+                [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+                  Scene00003( quest, player );
+                },
+                nullptr, 0 );
         break;
       }
     }
@@ -85,18 +122,69 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
 
   void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
+    switch( actorId )
+    {
+      case Eobject0:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00100( quest, player );
+        break;
+      }
+      case Eobject1:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00098( quest, player );
+        break;
+      }
+      case Eobject2:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00096( quest, player );
+        break;
+      }
+    }
   }
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    switch( bnpc.getBNpcNameId() )
+    switch( bnpc.getLayoutId() )
     {
-      case Enemy0: { break; }
-      case Enemy1: { break; }
-      case Enemy2: { break; }
-      case Enemy3: { break; }
-      case Enemy4: { break; }
-      case Enemy5: { break; }
+      case Enemy0:
+      {
+        quest.setUI8AL( 1 );
+        checkCompletition( quest, player, 1 );
+        break;
+      }
+      case Enemy1:
+      {
+        quest.setUI8BH( 1 );
+        checkCompletition( quest, player, 1 );
+        break;
+      }
+      case Enemy2:
+      {
+        quest.setUI8BL( 1 );
+        checkCompletition( quest, player, 2 );
+        break;
+      }
+      case Enemy3:
+      {
+        quest.setUI8CH( 1 );
+        checkCompletition( quest, player, 2 );
+        break;
+      }
+      case Enemy4:
+      {
+        quest.setUI8CL( 1 );
+        checkCompletition( quest, player, 3 );
+        break;
+      }
+      case Enemy5:
+      {
+        quest.setUI8DH( 1 );
+        checkCompletition( quest, player, 3 );
+        break;
+      }
     }
   }
 
@@ -105,6 +193,52 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
 
+  void checkCompletition( World::Quest& quest, Entity::Player& player, uint16_t groupKill )
+  {
+    auto UI8AH = quest.getUI8AH(); // seq obj counter
+
+    auto UI8AL = quest.getUI8AL();
+    auto UI8BH = quest.getUI8BH();
+    auto UI8BL = quest.getUI8BL();
+    auto UI8CH = quest.getUI8CH();
+    auto UI8CL = quest.getUI8CL();
+    auto UI8DH = quest.getUI8DH();
+
+    switch ( groupKill )
+    {
+      case( 1 ):
+      {
+        if( UI8AL  >= 1 && UI8BH >= 1 )
+        {
+          quest.setUI8AH( UI8AH + 1 );
+          eventMgr().sendEventNotice( player, getId(), 0, 2, UI8AH + 1, 3 );
+        }
+        break;
+      }
+      case( 2 ):
+      {
+        if( UI8BL == 1 && UI8CH == 1 )
+        {
+          quest.setUI8AH( UI8AH + 1 );
+          eventMgr().sendEventNotice( player, getId(), 0, 2, UI8AH + 1, 3 );
+        }
+        break;
+      }
+      case( 3 ):
+      {
+        if( UI8CL == 1 && UI8DH == 1 )
+        {
+          quest.setUI8AH( UI8AH + 1 );
+          eventMgr().sendEventNotice( player, getId(), 0, 2, UI8AH + 1, 3 );
+        }
+        break;
+      }
+    }
+
+    if( quest.getUI8AH() == 3 )
+      quest.setSeq( SeqFinish );
+  }
+
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
     eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubFst054::Scene00000Return ) );
@@ -112,12 +246,11 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 ) // accept quest
+    if( result.getResult( 0 ) == 1 )// accept quest
     {
- 
+      quest.setSeq( Seq1 );
+      quest.setUI8DL( 3 );
     }
-
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -168,7 +301,6 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
@@ -197,7 +329,17 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00096Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    quest.setBitFlag8( 3, true );
+    quest.setUI8DL( quest.getUI8DL() - 1 );
 
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+    auto enemy0 = instance->createBNpcFromLayoutId( Enemy4, 150 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy1 = instance->createBNpcFromLayoutId( Enemy5, 150 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+
+    enemy0->setFlag( Entity::NoDeaggro );
+    enemy0->hateListAdd( player.getAsChara(), 10000 );
+    enemy1->setFlag( Entity::NoDeaggro );
+    enemy1->hateListAdd( player.getAsChara(), 10000 );
 
   }
 
@@ -223,7 +365,17 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00098Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    quest.setBitFlag8( 2, true );
+    quest.setUI8DL( quest.getUI8DL() - 1 );
 
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+    auto enemy0 = instance->createBNpcFromLayoutId( Enemy2, 150 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy1 = instance->createBNpcFromLayoutId( Enemy3, 150 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+
+    enemy0->setFlag( Entity::NoDeaggro );
+    enemy0->hateListAdd( player.getAsChara(), 10000 );
+    enemy1->setFlag( Entity::NoDeaggro );
+    enemy1->hateListAdd( player.getAsChara(), 10000 );
 
   }
 
@@ -249,8 +401,17 @@ class SubFst054 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    quest.setBitFlag8( 1, true );
+    quest.setUI8DL( quest.getUI8DL() - 1 );
 
+    auto instance = teriMgr().getTerritoryByGuId( player.getTerritoryId() );
+    auto enemy0 = instance->createBNpcFromLayoutId( Enemy0, 150 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
+    auto enemy1 = instance->createBNpcFromLayoutId( Enemy1, 150 /*TODO: Find the right value*/, Common::BNpcType::Enemy, player.getId() );
 
+    enemy0->setFlag( Entity::NoDeaggro );
+    enemy0->hateListAdd( player.getAsChara(), 10000 );
+    enemy1->setFlag( Entity::NoDeaggro );
+    enemy1->hateListAdd( player.getAsChara(), 10000 );
   }
 
 };
