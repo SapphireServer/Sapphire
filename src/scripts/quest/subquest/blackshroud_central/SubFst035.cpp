@@ -209,6 +209,7 @@ private:
     {
       quest.setUI8AL( 0 );
       quest.setSeq( Seq3 );
+      quest.setBitFlag8( 1, false );
     }
   }
   //////////////////////////////////////////////////////////////////////
@@ -521,7 +522,7 @@ private:
 
   void Scene00024Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice(player, getId(), 2, 0);
+    eventMgr().sendEventNotice(player, getId(), 3, 0);
     quest.setSeq( SeqFinish );
   }
 
@@ -538,6 +539,7 @@ private:
     if( result.getResult( 0 ) == 1 )
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
+      player.setRewardFlag( Common::UnlockEntry::InnRoom );
     }
   }
 };
