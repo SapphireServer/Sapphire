@@ -75,7 +75,7 @@ public:
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    if( bnpc.getBNpcBaseId() != Enemy0 )
+    if( bnpc.getBNpcNameId() != Enemy0 )
       return;
     else
     {
