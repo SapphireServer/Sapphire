@@ -449,7 +449,7 @@ void BNpc::hateListClear()
     if( isInRangeSet( listEntry->m_pChara ) )
     {
       if( listEntry->m_pChara->isPlayer() )
-        BNpc::notifyPlayerDeaggro( listEntry->m_pChara );
+        notifyPlayerDeaggro( listEntry->m_pChara );
     }
   }
   m_hateList.clear();
