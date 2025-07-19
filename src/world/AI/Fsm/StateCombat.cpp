@@ -48,6 +48,11 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     bnpc.moveTo( *pHatedActor );
   }
 
+  if (bnpc.hasFlag(Entity::Immobile) && distance > 30.0f )
+  {
+    bnpc.deaggro( pHatedActor );
+  }
+
   if( pNaviProvider->syncPosToChara( bnpc ) )
     bnpc.sendPositionUpdate();
 

@@ -447,7 +447,10 @@ void BNpc::hateListClear()
   for( auto& listEntry : m_hateList )
   {
     if( isInRangeSet( listEntry->m_pChara ) )
-      deaggro( listEntry->m_pChara );
+    {
+      if( listEntry->m_pChara->isPlayer() )
+        notifyPlayerDeaggro( listEntry->m_pChara )
+    }
   }
   m_hateList.clear();
 }
@@ -623,22 +626,25 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 
 void BNpc::deaggro( const CharaPtr& pChara )
 {
-  if( !hateListHasActor( pChara ) )
+  if( hateListHasActor( pChara ) )
     hateListRemove( pChara );
 
   if( pChara->isPlayer() )
-  {
-    PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
-    tmpPlayer->onMobDeaggro( *this );
+    notifyPlayerDeaggro(pChara)
+}
 
-    if( getTriggerOwnerId() == pChara->getId() )
-    {
-      auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-      auto bnpc = *getAsBNpc();
-      scriptMgr.onTriggerOwnerDeaggro( *tmpPlayer, bnpc );
-    }
+void BNpc::notifyPlayerDeaggro(const CharaPtr& pChara)
+{
+  PlayerPtr tmpPlayer = pChara->getAsPlayer();
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+  tmpPlayer->onMobDeaggro( *this );
+
+  if( getTriggerOwnerId() == pChara->getId() )
+  {
+    auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+    auto bnpc = *getAsBNpc();
+    scriptMgr.onTriggerOwnerDeaggro( *tmpPlayer, bnpc );
   }
 }
 
