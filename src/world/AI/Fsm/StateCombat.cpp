@@ -35,6 +35,11 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   auto distance = Common::Util::distance( bnpc.getPos(), pHatedActor->getPos() );
 
+  if( bnpc.hasFlag( Entity::Immobile ) && distance > 30.0f )
+  {
+    bnpc.deaggro( pHatedActor );
+  }
+
   if( !bnpc.hasFlag( Entity::NoDeaggro ) )
   {
 
@@ -46,11 +51,6 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
       pNaviProvider->setMoveTarget( bnpc, pHatedActor->getPos() );
 
     bnpc.moveTo( *pHatedActor );
-  }
-
-  if (bnpc.hasFlag(Entity::Immobile) && distance > 30.0f )
-  {
-    bnpc.deaggro( pHatedActor );
   }
 
   if( pNaviProvider->syncPosToChara( bnpc ) )
