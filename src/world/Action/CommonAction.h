@@ -14,7 +14,8 @@ namespace Sapphire::World::Action
     StormsEye = 45,
     ButchersBlock = 47,
     HeavyShot = 97,
-    StraightShot = 98
+    StraightShot = 98,
+    Bloodletter = 110
   };
 
   enum ActionStatus
@@ -27,6 +28,7 @@ namespace Sapphire::World::Action
     WrathIV = 96,
     Infuriated = 97,
     StraightShotReady = 122,
+    VenomousBite = 124,
     StraightShotBuff = 130,
     InnerBeast = 411,
     Deliverance = 729
