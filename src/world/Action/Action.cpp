@@ -526,7 +526,7 @@ void Action::Action::buildActionResults()
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_actionResultBuilder->sendActionResults( {} );
+    m_actionResultBuilder->sendActionResults( m_hitActors );
     return;
   }
 

@@ -4,7 +4,6 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
-#include "Network/Util/PacketUtil.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -28,8 +27,6 @@ public:
     if( !pPlayer || !pActionBuilder )
       return;
 
-    Network::Util::Packet::sendHudParam( *pSource );
-
     if( auto status = pPlayer->getStatusEffectById( StraightShotReady ); status )
       status->setModifier( Common::ParamModifier::CriticalHit, 100 );
     
@@ -47,8 +44,6 @@ public:
 
     pSource->removeSingleStatusEffectById( StraightShotReady );
     pActionBuilder->applyStatusEffectSelf( StraightShotBuff, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHit, 10 } }, 1024, true );
-
-    pActionBuilder->sendActionResults( { pTarget } );
   }
 };
 
