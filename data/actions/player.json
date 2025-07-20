@@ -1560,7 +1560,19 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 125,
+          "duration": 20000,
+          "flag": 1025,
+          "modifiers": [
+            {
+              "modifier": "DamageDealtPercent",
+              "value": 120
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
