@@ -28,7 +28,7 @@ public:
       return;
 
     if( auto status = pPlayer->getStatusEffectById( StraightShotReady ); status )
-      status->setModifier( Common::ParamModifier::CriticalHit, 100 );
+      status->setModifier( Common::ParamModifier::CriticalHitPercent, 10000 );
     
 
     auto dmg = action.calcDamage( Potency );
@@ -43,7 +43,7 @@ public:
     }
 
     pSource->removeSingleStatusEffectById( StraightShotReady );
-    pActionBuilder->applyStatusEffectSelf( StraightShotBuff, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHit, 10 } }, 1024, true );
+    pActionBuilder->applyStatusEffectSelf( StraightShotBuff, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 110 } }, 1024, true );
   }
 };
 

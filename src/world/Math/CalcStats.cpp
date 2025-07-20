@@ -293,12 +293,18 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
+  // ⌊ 200 × ( CHR - subVal )/ divVal + 50 ⌋ / 10
+  // CHR is the critical hit stat. Additional modifiers from (de)buffs get applied at the end
   auto chRate = chara.getStatValueFloat( Common::BaseParam::CriticalHit );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  chRate = std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
 
-  return std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
+  // TODO: Flat modifier either after or before multiplier
+  chRate *= chara.getModifier( Common::ParamModifier::CriticalHitPercent );
+
+  return chRate;
 }
 
 
