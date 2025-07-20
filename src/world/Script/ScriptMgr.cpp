@@ -644,7 +644,7 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Sapp
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
-    script->onTick( *pChara );
+    script->onTick( *pChara, effect );
     return true;
   }
 

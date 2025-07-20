@@ -71,7 +71,7 @@ namespace Sapphire::ScriptAPI
     *
     * @param actor the actor the status effect is ticking on
     */
-    virtual void onTick( Sapphire::Entity::Chara& actor );
+    virtual void onTick( Sapphire::Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect );
 
     /*!
     * @brief Called when the status effect is applied to an actor
