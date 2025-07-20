@@ -34,6 +34,7 @@
 
 #include "StatusEffect/StatusEffect.h"
 
+#include "class/Archer.h"
 #include "Job/Warrior.h"
 #include "Job/Bard.h"
 
@@ -738,6 +739,11 @@ void Action::Action::handleJobAction()
 {
   switch( m_pSource->getClass() )
   {
+    case ClassJob::Archer:
+    {
+      Archer::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
+    }
     case ClassJob::Warrior:
     {
       Warrior::onAction( *m_pSource->getAsPlayer(), *this );
@@ -745,6 +751,7 @@ void Action::Action::handleJobAction()
     }
     case ClassJob::Bard:
     {
+      Archer::onAction( *m_pSource->getAsPlayer(), *this );
       Bard::onAction( *m_pSource->getAsPlayer(), *this );
       break;
     }
