@@ -35,6 +35,7 @@
 #include "StatusEffect/StatusEffect.h"
 
 #include "Job/Warrior.h"
+#include "Job/Bard.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -740,6 +741,11 @@ void Action::Action::handleJobAction()
     case ClassJob::Warrior:
     {
       Warrior::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
+    }
+    case ClassJob::Bard:
+    {
+      Bard::onAction( *m_pSource->getAsPlayer(), *this );
       break;
     }
   }
