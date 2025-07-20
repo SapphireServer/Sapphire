@@ -1568,7 +1568,7 @@
           "modifiers": [
             {
               "modifier": "DamageDealtPercent",
-              "value": 120
+              "value": 20
             }
           ]
         }

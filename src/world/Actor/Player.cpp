@@ -1168,12 +1168,17 @@ void Player::autoAttack( CharaPtr pTarget )
 
   auto mainWeap = getItemAt( Common::GearSet0, Common::GearSetSlot::MainHand );
 
+  auto weaponType = mainWeap->getCategory();
+  uint32_t attackId = 7;
+  if( weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm)
+    attackId = 8;
+
   pTarget->onActionHostile( getAsChara() );
 
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
-  actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );
+  actionMgr.handleTargetedAction( *this, attackId, pTarget->getId(), 0 );
 
 }
 
