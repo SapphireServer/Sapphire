@@ -16,11 +16,13 @@ namespace Sapphire::World::Action
     HeavyShot = 97,
     StraightShot = 98,
     VenomousBite = 100,
+    Shadowbind = 108,
     Bloodletter = 110
   };
 
   enum ActionStatus
   {
+    Bind = 13,
     Defiance = 91,
     Unchained = 92,
     Wrath = 93,

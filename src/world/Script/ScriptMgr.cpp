@@ -666,6 +666,18 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, u
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onPlayerDamaged( Entity::Chara& chara, Sapphire::StatusEffect::StatusEffect& effect )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
+  if( script )
+  {
+    script->onPlayerDamaged( chara );
+    return true;
+  }
+
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onZoneInit( const Territory& zone )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ZoneScript >( zone.getTerritoryTypeId() );
