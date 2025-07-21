@@ -613,12 +613,6 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
   auto pEffect = pEffectIt->second;
   pEffect->removeStatus();
 
-  if( updateStatus )
-  {
-    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), StatusEffectLose, pEffect->getId() );
-    Network::Util::Packet::sendHudParam( *this );
-  }
-
   auto it = m_statusEffectMap.erase( pEffectIt );
 
   for( auto effectIt = it; effectIt != m_statusEffectMap.end(); )
@@ -641,6 +635,12 @@ std::map< uint8_t, Sapphire::StatusEffect::StatusEffectPtr >::iterator Chara::re
   }
 
   Logger::warn( "Slot id being freed: {}", effectSlotId );
+
+  if( updateStatus )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds( isPlayer() ), getId(), StatusEffectLose, pEffect->getId() );
+    Network::Util::Packet::sendHudParam( *this );
+  }
 
   return it;
 }
