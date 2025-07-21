@@ -1562,14 +1562,7 @@
     "nextCombo": [],
     "statuses": {
       "caster": [],
-      "target": [
-        {
-          "id": 124,
-          "duration": 18000,
-          "flag": 8226,
-          "modifiers": []
-        }
-      ]
+      "target": []
     }
   },
   "101": {

@@ -8,14 +8,15 @@
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
-class ActionStraightShot : public Sapphire::ScriptAPI::ActionScript
+class ActionVenomousBite : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionStraightShot() : Sapphire::ScriptAPI::ActionScript( StraightShot )
+  ActionVenomousBite() : Sapphire::ScriptAPI::ActionScript( VenomousBite )
   {
   }
 
-  static constexpr auto Potency = 140;
+  static constexpr auto Potency = 100;
+  static constexpr auto Flags = 8226;
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
@@ -24,12 +25,8 @@ public:
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
-    if( !pPlayer || !pActionBuilder )
+    if( !pActionBuilder )
       return;
-
-    if( auto status = pPlayer->getStatusEffectById( StraightShotReady ); status )
-      status->setModifier( Common::ParamModifier::CriticalHit, 10000 );
-    
 
     auto dmg = action.calcDamage( Potency );
     pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
@@ -42,9 +39,12 @@ public:
       pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
     }
 
-    pSource->removeSingleStatusEffectById( StraightShotReady );
-    pActionBuilder->applyStatusEffectSelf( StraightShotBuff, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, 1025, true );
+    if( pPlayer && pPlayer->getLevel() >= 24 )
+      pActionBuilder->applyStatusEffect( pTarget, VenomousBiteStatus, 18000, 0, {}, Flags, false, true );
+    else
+      pActionBuilder->applyStatusEffect( pTarget, VenomousBiteStatus, 9000, 0, {}, Flags, false, true );
+    
   }
 };
 
-EXPOSE_SCRIPT( ActionStraightShot );
+EXPOSE_SCRIPT( ActionVenomousBite );

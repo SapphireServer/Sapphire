@@ -15,6 +15,7 @@ namespace Sapphire::World::Action
     ButchersBlock = 47,
     HeavyShot = 97,
     StraightShot = 98,
+    VenomousBite = 100,
     Bloodletter = 110
   };
 
