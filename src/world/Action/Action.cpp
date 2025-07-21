@@ -752,6 +752,17 @@ void Action::Action::handleJobAction()
   }
 }
 
+void Action::Action::modifyCooldown( float cdTime )
+{
+  auto pPlayer = m_pSource->getAsPlayer();
+  if ( pPlayer )
+  {
+    pPlayer->setRecastGroup( m_cooldownGroup, cdTime );
+    auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::ActionStart, 1, getId(), cdTime / 10 );
+    server().queueForPlayer( pPlayer->getCharacterId(), actionStartPkt );
+  }
+}
+
 bool Action::Action::preCheck()
 {
   if( auto player = m_pSource->getAsPlayer() )

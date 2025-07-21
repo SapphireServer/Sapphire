@@ -28,7 +28,7 @@ namespace Sapphire::World::Action
     WrathIV = 96,
     Infuriated = 97,
     StraightShotReady = 122,
-    VenomousBite = 124,
+    VenomousBiteStatus = 124,
     StraightShotBuff = 130,
     InnerBeast = 411,
     Deliverance = 729

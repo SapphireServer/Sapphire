@@ -1,13 +1,17 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
+#include "StatusEffect/StatusEffect.h"
+#include <action/Action.h>
+
 #include <Actor/Player.h>
 #include <Action/CommonAction.h>
-#include "StatusEffect/StatusEffect.h"
 #include <Actor/Chara.h>
+
 #include <Network/Util/PacketUtil.h>
 #include <Network/CommonActorControl.h>
+
 #include <Math/CalcStats.h>
-#include <Service.h>
+#include <stdlib.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -15,7 +19,7 @@ using namespace Sapphire::World::Action;
 class StatusEffectVenomousBite : public Sapphire::ScriptAPI::StatusEffectScript
 {
 public:
-  StatusEffectVenomousBite() : Sapphire::ScriptAPI::StatusEffectScript( VenomousBite )
+  StatusEffectVenomousBite() : Sapphire::ScriptAPI::StatusEffectScript( VenomousBiteStatus )
   {
   }
 
@@ -34,17 +38,15 @@ public:
 
     actor.takeDamage( damageVal );
 
-    if( pPlayer && damageType == Common::CalcResultType::TypeCriticalDamageHp )
+    if( pPlayer && damageType == Common::CalcResultType::TypeCriticalDamageHp && ( float ) rand() / ( float ) RAND_MAX <= 0.5 )
     {
-
+      World::Action::Action action( pSource, Bloodletter, 0 );
+      action.modifyCooldown( 0 ); // TODO: Does not seem to have the nice reset effect like in retail where the CD circle does a quick spin
     }
-    auto& exdData = Common::Service< Data::ExdData >::ref();
-    auto actionData = exdData.getRow< Excel::Action >( Bloodletter );
-    pPlayer->setRecastGroup( actionData->data().RecastGroup, 0 );// TODO: Does not seem to have the nice reset effect like in retail where the CD circle does a quick spin
 
     Network::Util::Packet::sendActorControl( actor.getInRangePlayerIds( actor.isPlayer() ), actor.getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
                                              Common::CalcResultType::TypeDamageHp, damageVal );
-    //Network::Util::Packet::sendRecastGroups( *( pSource->getAsPlayer() ) );
+    
 
     if( damageVal > 0 )
     {
