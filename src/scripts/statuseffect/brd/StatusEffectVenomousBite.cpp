@@ -44,14 +44,15 @@ public:
       action.modifyCooldown( 0 ); // TODO: Does not seem to have the nice reset effect like in retail where the CD circle does a quick spin
     }
 
-    Network::Util::Packet::sendActorControl( actor.getInRangePlayerIds( actor.isPlayer() ), actor.getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
-                                             Common::CalcResultType::TypeDamageHp, damageVal );
-    
-
     if( damageVal > 0 )
     {
       actor.onActionHostile( pSource );
     }
+
+    Network::Util::Packet::sendActorControl( actor.getInRangePlayerIds( actor.isPlayer() ), actor.getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
+      Common::CalcResultType::TypeDamageHp, damageVal );
+    Network::Util::Packet::sendHudParam( actor );
+
   }
 };
 
