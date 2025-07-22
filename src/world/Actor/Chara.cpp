@@ -26,7 +26,6 @@
 #include "Manager/MgrUtil.h"
 #include "Manager/PlayerMgr.h"
 #include "Common.h"
-#include "Script/ScriptMgr.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -403,11 +402,6 @@ void Chara::takeDamage( uint32_t damage )
   else
     m_hp -= damage;
 
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  for( auto status : m_statusEffectMap )
-  {
-    scriptMgr.onPlayerDamaged( *this , *status.second );
-  }
 }
 
 /*!

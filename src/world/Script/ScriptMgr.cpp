@@ -666,12 +666,12 @@ bool Sapphire::Scripting::ScriptMgr::onStatusTimeOut( Entity::CharaPtr pChara, u
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onPlayerDamaged( Entity::Chara& chara, Sapphire::StatusEffect::StatusEffect& effect )
+bool Sapphire::Scripting::ScriptMgr::onPlayerHit( Sapphire::StatusEffect::StatusEffect& effect, Entity::CharaPtr& attackSource, Entity::CharaPtr& attackTarget, uint32_t& amount, uint32_t actionId )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
-    script->onPlayerDamaged( chara );
+    script->onPlayerHit( effect, attackSource, attackTarget, amount, actionId );
     return true;
   }
 

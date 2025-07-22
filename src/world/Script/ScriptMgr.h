@@ -90,7 +90,7 @@ namespace Sapphire::Scripting
 
     bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 
-    bool onPlayerDamaged( Entity::Chara& chara, Sapphire::StatusEffect::StatusEffect& effect );
+    bool onPlayerHit( Sapphire::StatusEffect::StatusEffect& effect, Entity::CharaPtr& attackSource, Entity::CharaPtr& attackTarget, uint32_t& amount, uint32_t actionId );
 
     bool onZoneInit( const Territory& zone );
 

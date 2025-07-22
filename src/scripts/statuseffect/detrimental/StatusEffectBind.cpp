@@ -16,9 +16,9 @@ public:
   {
   }
 
-  void onPlayerDamaged( Entity::Chara& actor ) override
+  void onPlayerHit( Sapphire::StatusEffect::StatusEffect& effect, Entity::CharaPtr& attackSource, Entity::CharaPtr& attackTarget, uint32_t& amount, uint32_t actionId ) override
   {
-    actor.removeSingleStatusEffectById( Bind );
+    attackTarget->removeSingleStatusEffectById( Bind );
   }
 };
 
