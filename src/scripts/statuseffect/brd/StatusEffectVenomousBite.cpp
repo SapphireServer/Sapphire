@@ -41,8 +41,10 @@ public:
     if( pPlayer && damageType == Common::CalcResultType::TypeCriticalDamageHp && pPlayer->getLevel() >= 48 && ( float ) rand() / ( float ) RAND_MAX <= 0.5 )
     {
       World::Action::Action action( pSource, Bloodletter, 0 );
-      action.modifyCooldown( 0 ); // TODO: Does not seem to have the nice reset effect like in retail where the CD circle does a quick spin
+      action.setCooldown( 0.0f, 500.0f );
     }
+
+    
 
     if( damageVal > 0 )
     {

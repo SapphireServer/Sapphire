@@ -123,7 +123,7 @@ namespace Sapphire::World::Action
      * @brief Changes the current cooldown value and updates it on the players client
      * @param cdTime New cooldown value in ms
      */
-    void modifyCooldown( float cdTime );
+    void setCooldown( float passedTime, float maxTime, int cooldownGroup = 1 );
 
     /*!
      * @brief Adds an actor filter to this action.
