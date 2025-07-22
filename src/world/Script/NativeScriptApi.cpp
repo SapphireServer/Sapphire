@@ -38,7 +38,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void StatusEffectScript::onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect )
+  void StatusEffectScript::onTick( Sapphire::StatusEffect::StatusEffect& effect )
   {
   }
 

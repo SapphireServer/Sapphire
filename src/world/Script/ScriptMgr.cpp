@@ -639,12 +639,12 @@ bool Sapphire::Scripting::ScriptMgr::onStatusReceive( Entity::CharaPtr pActor, u
   return false;
 }
 
-bool Sapphire::Scripting::ScriptMgr::onStatusTick( Entity::CharaPtr pChara, Sapphire::StatusEffect::StatusEffect& effect )
+bool Sapphire::Scripting::ScriptMgr::onStatusTick( Sapphire::StatusEffect::StatusEffect& effect )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::StatusEffectScript >( effect.getId() );
   if( script )
   {
-    script->onTick( *pChara, effect );
+    script->onTick( effect );
     return true;
   }
 

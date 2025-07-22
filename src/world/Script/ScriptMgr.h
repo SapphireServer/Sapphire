@@ -86,7 +86,7 @@ namespace Sapphire::Scripting
 
     bool onStatusReceive( Entity::CharaPtr pActor, uint32_t effectId );
 
-    bool onStatusTick( Entity::CharaPtr pActor, Sapphire::StatusEffect::StatusEffect& effect );
+    bool onStatusTick( Sapphire::StatusEffect::StatusEffect& effect );
 
     bool onStatusTimeOut( Entity::CharaPtr pActor, uint32_t effectId );
 
