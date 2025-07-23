@@ -120,12 +120,6 @@ namespace Sapphire::World::Action
     void handleJobAction();
 
     /*!
-     * @brief Changes the current cooldown value and updates it on the players client
-     * @param cdTime New cooldown value in ms
-     */
-    void setCooldown( float passedTime, float maxTime, int cooldownGroup = 1 );
-
-    /*!
      * @brief Adds an actor filter to this action.
      * @param filter The ptr to the ActorFilter to add
      */

@@ -1,11 +1,11 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include "StatusEffect/StatusEffect.h"
-#include <action/Action.h>
-
 #include <Actor/Player.h>
 #include <Action/CommonAction.h>
 #include <Actor/Chara.h>
+
+#include "Manager/PlayerMgr.h"
 
 #include <Network/Util/PacketUtil.h>
 #include <Network/CommonActorControl.h>
@@ -40,11 +40,8 @@ public:
 
     if( pPlayer && damageType == Common::CalcResultType::TypeCriticalDamageHp && pPlayer->getLevel() >= 48 && ( float ) rand() / ( float ) RAND_MAX <= 0.5 )
     {
-      World::Action::Action action( pSource, Bloodletter, 0 );
-      action.setCooldown( 0.0f, 500.0f );
+      playerMgr().onSkillProc( *pPlayer, 1 );
     }
-
-    
 
     if( damageVal > 0 )
     {
@@ -54,7 +51,6 @@ public:
     Network::Util::Packet::sendActorControl( actor.getInRangePlayerIds( actor.isPlayer() ), actor.getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
       Common::CalcResultType::TypeDamageHp, damageVal );
     Network::Util::Packet::sendHudParam( actor );
-
   }
 };
 

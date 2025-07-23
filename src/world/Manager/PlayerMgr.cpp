@@ -212,6 +212,12 @@ void PlayerMgr::onMobKill( Entity::Player& player, Entity::BNpc& bnpc )
     onUpdateHuntingLog( player, bnpc.getBNpcNameId() );
 }
 
+void PlayerMgr::onSkillProc( Entity::Player& player, uint8_t index )
+{
+  player.setRecastGroup( index, 0.5f );
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), ActorControlType::SetRecastTimer, index, 0.0f, 50.0f );
+}
+
 void PlayerMgr::sendLoginMessage( Entity::Player& player )
 {
   auto motd = server().getConfig().motd;

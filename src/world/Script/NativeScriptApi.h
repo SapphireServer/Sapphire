@@ -123,6 +123,11 @@ namespace Sapphire::ScriptAPI
     * @param actor The actor that died
     */
     virtual void onPlayerDeath( Sapphire::Entity::Chara& actor );
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
 

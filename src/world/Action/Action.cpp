@@ -752,18 +752,6 @@ void Action::Action::handleJobAction()
   }
 }
 
-// TODO: use m_cooldownGroup once it works instead of passing it as an argument 
-void Action::Action::setCooldown( float passedTime, float maxTime, int cooldownGroup )
-{
-  auto pPlayer = m_pSource->getAsPlayer();
-  if ( pPlayer )
-  {
-    pPlayer->setRecastGroup( cooldownGroup, maxTime - passedTime );
-    auto actionStartPkt = makeActorControlSelf( m_pSource->getId(), ActorControlType::SetRecastTimer, cooldownGroup, passedTime / 10, maxTime / 10 );
-    server().queueForPlayer( pPlayer->getCharacterId(), actionStartPkt );
-  }
-}
-
 bool Action::Action::preCheck()
 {
   if( auto player = m_pSource->getAsPlayer() )
