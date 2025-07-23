@@ -301,8 +301,8 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
   chRate = std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
 
-  chRate += chara.getModifier( Common::ParamModifier::CriticalHit );
   chRate *= chara.getModifier( Common::ParamModifier::CriticalHitPercent );
+  chRate += chara.getModifier( Common::ParamModifier::CriticalHit );
 
   return chRate;
 }

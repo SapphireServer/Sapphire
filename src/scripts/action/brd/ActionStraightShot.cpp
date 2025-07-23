@@ -28,7 +28,7 @@ public:
       return;
 
     if( auto status = pPlayer->getStatusEffectById( StraightShotReady ); status )
-      status->setModifier( Common::ParamModifier::CriticalHit, 10000 );
+      status->setModifier( Common::ParamModifier::CriticalHit, 100 );
     
 
     auto dmg = action.calcDamage( Potency );
