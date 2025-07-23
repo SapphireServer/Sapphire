@@ -16,7 +16,7 @@ public:
   {
   }
 
-  void onPlayerHit( Sapphire::StatusEffect::StatusEffect& effect, Entity::CharaPtr& attackSource, Entity::CharaPtr& attackTarget, uint32_t& amount, uint32_t actionId ) override
+  void onPlayerHit( Entity::CharaPtr& attackTarget, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
     attackTarget->removeSingleStatusEffectById( Bind );
   }

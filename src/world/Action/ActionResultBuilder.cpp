@@ -70,7 +70,7 @@ void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaP
   auto statusEffects( damagingTarget->getStatusEffectMap() );
   for( auto status : statusEffects )
   {
-    scriptMgr.onPlayerHit( *status.second, effectTarget, damagingTarget, amount, m_actionId );
+    scriptMgr.onPlayerHit( damagingTarget, *status.second );
   }
 
   ActionResultPtr nextResult = make_ActionResult( damagingTarget );
