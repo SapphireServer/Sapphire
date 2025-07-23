@@ -19,7 +19,6 @@
 
 #include <Manager/TaskMgr.h>
 #include <Task/ActionIntegrityTask.h>
-#include "Script/ScriptMgr.h"
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -66,13 +65,6 @@ void ActionResultBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr&
 
 void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
-  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  auto statusEffects( damagingTarget->getStatusEffectMap() );
-  for( auto status : statusEffects )
-  {
-    scriptMgr.onPlayerHit( damagingTarget, *status.second );
-  }
-
   ActionResultPtr nextResult = make_ActionResult( damagingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionData = exdData.getRow< Excel::Action >( m_actionId );

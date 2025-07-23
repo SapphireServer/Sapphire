@@ -11,6 +11,8 @@
 
 #include "Network/Util/PacketUtil.h"
 
+#include "Script/ScriptMgr.h"
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::World::Action;
@@ -161,6 +163,13 @@ void ActionResult::execute()
     case CalcResultType::TypeDamageHp:
     case CalcResultType::TypeCriticalDamageHp:
     {
+      auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+      auto statusEffects( m_target->getStatusEffectMap() );
+      for( auto status : statusEffects )
+      {
+        scriptMgr.onPlayerHit( m_target, *status.second );
+      }
+
       m_target->takeDamage( m_result.Value );
       break;
     }
