@@ -93,7 +93,7 @@ void Sapphire::StatusEffect::StatusEffect::onTick()
   m_lastTick = Util::getTimeMs();
 
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
-  scriptMgr.onStatusTick( *this );
+  scriptMgr.onStatusTick( m_targetActor, *this );
 }
 
 uint32_t Sapphire::StatusEffect::StatusEffect::getSrcActorId() const
