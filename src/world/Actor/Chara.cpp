@@ -401,7 +401,6 @@ void Chara::takeDamage( uint32_t damage )
   }
   else
     m_hp -= damage;
-
 }
 
 /*!
@@ -836,7 +835,7 @@ float Chara::getModifier( Common::ParamModifier paramModifier ) const
         continue;
 
       if( paramModifier >= Common::ParamModifier::StrengthPercent )
-        result *= 1 + ( val / 100.0f );
+        result *= 1.0f + ( val / 100.0f );
       else
         result += val;
     }
