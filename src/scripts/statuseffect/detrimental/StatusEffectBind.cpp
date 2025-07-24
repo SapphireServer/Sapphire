@@ -1,7 +1,6 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include "StatusEffect/StatusEffect.h"
-#include <action/Action.h>
 #include <Action/CommonAction.h>
 
 #include <Actor/Chara.h>
