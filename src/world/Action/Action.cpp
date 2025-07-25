@@ -17,6 +17,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/PartyMgr.h"
 
 #include "Session.h"
 #include "Network/GameConnection.h"
@@ -952,22 +953,24 @@ void Action::Action::addDefaultActorFilters()
       break;
     }
 
-    case Common::CastType::CircularAOE:
+    case Common::CastType::Circle:
     {
       auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
       addActorFilter( filter );
       break;
     }
 
-//    case Common::CastType::RectangularAOE:
-//    {
-//      break;
-//    }
+   case Common::CastType::Box:
+   {
+      auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
+      addActorFilter( filter );
+     break;
+   }
 
     default:
     {
       Logger::error( "[{}] Action#{} has CastType#{} but that cast type is unhandled. Cancelling cast.",
-                     m_pSource->getId(), getId(), m_castType );
+                     m_pSource->getId(), getId(), static_cast< uint8_t >( m_castType ) );
 
       interrupt();
     }
