@@ -62,7 +62,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void StatusEffectScript::onPlayerHit( Entity::CharaPtr& attackTarget, Sapphire::StatusEffect::StatusEffect& effect )
+  void StatusEffectScript::onPlayerHit( Entity::Chara& hitActor, Sapphire::StatusEffect::StatusEffect& effect )
   {
   }
 

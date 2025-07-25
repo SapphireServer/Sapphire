@@ -115,7 +115,7 @@ namespace Sapphire::ScriptAPI
     *
     * @param actor The actor that was damaged
     */
-    virtual void onPlayerHit( Entity::CharaPtr& attackTarget, Sapphire::StatusEffect::StatusEffect& effect );
+    virtual void onPlayerHit( Entity::Chara& hitActor, Sapphire::StatusEffect::StatusEffect& effect );
 
     /*!
     * @brief Called when the status effect owner dies
