@@ -53,7 +53,7 @@ namespace Sapphire::World::Util
     Sapphire::Entity::Player& m_player;
 
   public:
-    explicit ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle, Sapphire::Entity::Player& player );
+    explicit ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle );
     bool conditionApplies( const Entity::GameObject& actor ) override;
   };
 }

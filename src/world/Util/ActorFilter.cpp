@@ -33,7 +33,7 @@ bool Sapphire::World::Util::ActorFilterSingleTarget::conditionApplies( const Sap
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Sapphire::World::Util::ActorFilterInCone::ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle, Sapphire::Entity::Player& player ) : m_startPos( startPos ), m_skillTargetPos( skillTargetPos ), m_startAngle( startAngle ), m_endAngle( endAngle ), m_player( player )
+Sapphire::World::Util::ActorFilterInCone::ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle ) : m_startPos( startPos ), m_skillTargetPos( skillTargetPos ), m_startAngle( startAngle ), m_endAngle( endAngle )
 {
 }
 
@@ -44,11 +44,11 @@ bool Sapphire::World::Util::ActorFilterInCone::conditionApplies( const Entity::G
   float angleToCurrentTarget = Sapphire::Common::Util::radianToDegrees( Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, targetPos.x, targetPos.z ) );
   float angleToSkillTarget = Sapphire::Common::Util::radianToDegrees( Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, m_skillTargetPos.x, m_skillTargetPos.z ) );
   angleToCurrentTarget = angleToCurrentTarget - angleToSkillTarget;// Checking angle in world rotation
-  Manager::PlayerMgr::sendDebug( m_player, "angleToTargetFinal: {}", angleToCurrentTarget );
 
   float leftAngle = m_startAngle - angleToCurrentTarget;
   float rightAngle = m_endAngle - angleToCurrentTarget;
 
+  // Those loops usually execute between 0 and 1 time. Somebody needs to use funky start/end angles for more iterations (which leads to 2 iterations)
   while( leftAngle < -180 )
     leftAngle += 360;
   while( leftAngle > 180 )
