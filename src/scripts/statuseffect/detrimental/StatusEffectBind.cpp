@@ -1,7 +1,6 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include "StatusEffect/StatusEffect.h"
-#include <action/Action.h>
 #include <Action/CommonAction.h>
 
 #include <Actor/Chara.h>
@@ -16,9 +15,9 @@ public:
   {
   }
 
-  void onPlayerHit( Entity::CharaPtr& attackTarget, Sapphire::StatusEffect::StatusEffect& effect ) override
+  void onPlayerHit( Entity::Chara& hitActor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
-    attackTarget->removeSingleStatusEffectById( Bind );
+    hitActor.removeSingleStatusEffectById( Bind );
   }
 };
 
