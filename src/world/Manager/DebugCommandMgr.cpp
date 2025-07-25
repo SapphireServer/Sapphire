@@ -361,6 +361,13 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     player.resetRecastGroups();
     PlayerMgr::sendDebug( player, "All recast groups cleared." );
   }
+  else if( subCommand == "recover" )
+  {
+    player.resetHp();
+    player.resetMp();
+    player.setTp( 1000 );
+    Network::Util::Packet::sendHudParam( player );
+  }
   else if( subCommand == "freecompany" )
   {
     auto fcPacket = makeZonePacket< FFXIVIpcFreeCompany >( player.getId() );

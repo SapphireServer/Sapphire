@@ -921,14 +921,19 @@ bool Action::Action::snapshotAffectedActors( std::vector< Entity::CharaPtr >& ac
     if( !preFilterActor( *actor ) )
       continue;
 
+
+    bool snapshotActor = true;
     for( const auto& filter : m_actorFilters )
     {
-      if( filter->conditionApplies( *actor ) )
+      if( !filter->conditionApplies( *actor ) )
       {
-        actors.push_back( actor->getAsChara() );
+        snapshotActor = false;
         break;
       }
     }
+
+    if( snapshotActor )
+      actors.push_back( actor->getAsChara() );
   }
 
   if( auto player = m_pSource->getAsPlayer() )
@@ -950,6 +955,9 @@ void Action::Action::addActorFilter( World::Util::ActorFilterPtr filter )
 
 void Action::Action::addDefaultActorFilters()
 {
+  if( auto player = m_pSource->getAsPlayer() )
+    Manager::PlayerMgr::sendDebug( *player, "CastType: {}", m_castType );
+
   switch( m_castType )
   {
     case Common::CastType::SingleTarget:
@@ -965,11 +973,14 @@ void Action::Action::addDefaultActorFilters()
       addActorFilter( filter );
       break;
     }
-
-//    case Common::CastType::RectangularAOE:
-//    {
-//      break;
-//    }
+    case Common::CastType::ConeAOE:
+    {
+      auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), 12 );
+      addActorFilter( rangeFilter );
+      auto coneFilter = std::make_shared< World::Util::ActorFilterInCone >( m_pSource->getPos(), m_pos, -45, 45, *m_pSource->getAsPlayer() );
+      addActorFilter( coneFilter );
+      break;
+    }
 
     default:
     {
