@@ -4,8 +4,6 @@
 #include "Util/UtilMath.h"
 #include <math.h>
 
-#include "Manager/PlayerMgr.h"
-
 
 Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_POSITION3 startPos,
                                                                float range ) :
@@ -33,7 +31,8 @@ bool Sapphire::World::Util::ActorFilterSingleTarget::conditionApplies( const Sap
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Sapphire::World::Util::ActorFilterInCone::ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle ) : m_startPos( startPos ), m_skillTargetPos( skillTargetPos ), m_startAngle( startAngle ), m_endAngle( endAngle )
+Sapphire::World::Util::ActorFilterInCone::ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, float startAngle, float endAngle ) :
+  m_startPos( startPos ), m_skillTargetPos( skillTargetPos ), m_startAngle( startAngle ), m_endAngle( endAngle )
 {
 }
 
@@ -43,25 +42,18 @@ bool Sapphire::World::Util::ActorFilterInCone::conditionApplies( const Entity::G
   
   float angleToCurrentTarget = Sapphire::Common::Util::radianToDegrees( Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, targetPos.x, targetPos.z ) );
   float angleToSkillTarget = Sapphire::Common::Util::radianToDegrees( Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, m_skillTargetPos.x, m_skillTargetPos.z ) );
-  angleToCurrentTarget = angleToCurrentTarget - angleToSkillTarget;// Checking angle in world rotation
+  angleToCurrentTarget = angleToCurrentTarget - angleToSkillTarget; // Checking angle in world rotation
 
-  float leftAngle = m_startAngle - angleToCurrentTarget;
-  float rightAngle = m_endAngle - angleToCurrentTarget;
+  if( angleToCurrentTarget < 0.0f )
+    angleToCurrentTarget += 360.0f;
 
-  // Those loops usually execute between 0 and 1 time. Somebody needs to use funky start/end angles for more iterations (which leads to 2 iterations)
-  while( leftAngle < -180 )
-    leftAngle += 360;
-  while( leftAngle > 180 )
-    leftAngle -= 360;
+  if( m_startAngle > m_endAngle ) // start -> end wraps around
+  {
+    return angleToCurrentTarget >= m_startAngle || angleToCurrentTarget <= m_endAngle;
+  }
 
-  while( rightAngle < -180 )
-    rightAngle += 360;
-  while( rightAngle > 180 )
-    rightAngle -= 360;
-
-  if( leftAngle * rightAngle >= 0 )
-    return false;
-  return abs( leftAngle - rightAngle ) < 180;
+  // Simple case where values don't warp around
+  return angleToCurrentTarget >= m_startAngle && angleToCurrentTarget <= m_endAngle;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////

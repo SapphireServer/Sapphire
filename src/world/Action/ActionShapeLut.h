@@ -8,8 +8,8 @@
 namespace Sapphire::World::Action
 {
   struct ConeEntry {
-    int16_t startAngle;
-    int16_t endAngle;
+    float startAngle;
+    float endAngle;
   };
 
   class ActionShapeLut

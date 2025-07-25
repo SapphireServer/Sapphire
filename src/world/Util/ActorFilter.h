@@ -48,11 +48,11 @@ namespace Sapphire::World::Util
   {
     Common::FFXIVARR_POSITION3 m_startPos;
     Common::FFXIVARR_POSITION3 m_skillTargetPos;
-    int8_t m_startAngle;
-    int8_t m_endAngle;
+    float m_startAngle;
+    float m_endAngle;
 
   public:
-    explicit ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle );
+    explicit ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, float startAngle, float endAngle );
     bool conditionApplies( const Entity::GameObject& actor ) override;
   };
 }

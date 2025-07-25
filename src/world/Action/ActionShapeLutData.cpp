@@ -28,6 +28,11 @@ bool ActionShapeLutData::cacheShapes()
     if( ActionShapeLut::m_coneLut.count( id ) > 0 )
       throw std::runtime_error( fmt::format( "Cone for action with ID {} cannot be defined more than once", i.key() ) );
 
+    if( cone.startAngle < 0 )
+      cone.startAngle += 360;
+    if( cone.endAngle < 0 )
+      cone.endAngle += 360;
+
     ActionShapeLut::m_coneLut.try_emplace( id, cone );
   }
 
