@@ -972,9 +972,15 @@ void Action::Action::addDefaultActorFilters()
     }
     case Common::CastType::ConeAOE:
     {
+      ConeEntry shapeEntry = { 0, 0 };
+      if( ActionShapeLut::validConeEntryExists( static_cast< uint16_t >( getId() ) ) )
+      {
+        shapeEntry = ActionShapeLut::getConeEntry( static_cast< uint16_t >( getId() ) );
+      }
+
       auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), 12 );
       addActorFilter( rangeFilter );
-      auto coneFilter = std::make_shared< World::Util::ActorFilterInCone >( m_pSource->getPos(), m_pos, -45, 45 );
+      auto coneFilter = std::make_shared< World::Util::ActorFilterInCone >( m_pSource->getPos(), m_pos, shapeEntry.startAngle, shapeEntry.endAngle );
       addActorFilter( coneFilter );
       break;
     }

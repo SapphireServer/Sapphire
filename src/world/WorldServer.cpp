@@ -263,6 +263,11 @@ void WorldServer::run( int32_t argc, char* argv[] )
     Logger::fatal( "Unable to cache actions!" );
     return;
   }
+  if (!pActionMgr->cacheActionShapeLut())
+  {
+    Logger::fatal( "Unable to cache action shapes!" );
+    return;
+  }
   Common::Service< Manager::ActionMgr >::set( pActionMgr );
 
   auto pMapMgr = std::make_shared< Manager::MapMgr >();

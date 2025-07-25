@@ -50,7 +50,6 @@ namespace Sapphire::World::Util
     Common::FFXIVARR_POSITION3 m_skillTargetPos;
     int8_t m_startAngle;
     int8_t m_endAngle;
-    Sapphire::Entity::Player& m_player;
 
   public:
     explicit ActorFilterInCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, int8_t startAngle, int8_t endAngle );
