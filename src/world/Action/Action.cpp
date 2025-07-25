@@ -978,7 +978,7 @@ void Action::Action::addDefaultActorFilters()
         shapeEntry = ActionShapeLut::getConeEntry( static_cast< uint16_t >( getId() ) );
       }
 
-      auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), 12 );
+      auto rangeFilter = std::make_shared< World::Util::ActorFilterInRange >( m_pSource->getPos(), m_range );
       addActorFilter( rangeFilter );
       auto coneFilter = std::make_shared< World::Util::ActorFilterInCone >( m_pSource->getPos(), m_pos, shapeEntry.startAngle, shapeEntry.endAngle );
       addActorFilter( coneFilter );
