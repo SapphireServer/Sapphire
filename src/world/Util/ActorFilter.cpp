@@ -4,9 +4,9 @@
 #include "Util/UtilMath.h"
 
 
-Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_POSITION3 startPos,
+Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_POSITION3 aoePos,
                                                                float radius ) :
-  m_aoePos( startPos ),
+  m_aoePos( aoePos ),
   m_radius( radius )
 {
 }
