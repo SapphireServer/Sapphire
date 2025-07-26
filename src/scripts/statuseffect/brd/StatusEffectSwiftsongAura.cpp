@@ -70,7 +70,7 @@ public:
           }
           else
           {
-            auto effect = StatusEffect::make_StatusEffect( SwiftsongBuff, actor.getAsChara(), targetChara, 5000, 3000 );
+            auto effect = Sapphire::StatusEffect::make_StatusEffect( SwiftsongBuff, actor.getAsChara(), targetChara, 5000, 3000 );
             effect->setFlag( 5 );
             effect->setParam( 20 );
             targetChara->addStatusEffect( effect );
