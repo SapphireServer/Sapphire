@@ -17,6 +17,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/PartyMgr.h"
 
 #include "Session.h"
 #include "Network/GameConnection.h"
@@ -959,22 +960,24 @@ void Action::Action::addDefaultActorFilters()
       break;
     }
 
-    case Common::CastType::CircularAOE:
+    case Common::CastType::Circle:
     {
       auto filter = std::make_shared< World::Util::ActorFilterInRange >( m_pos, m_effectRange );
       addActorFilter( filter );
       break;
     }
 
-//    case Common::CastType::RectangularAOE:
-//    {
-//      break;
-//    }
+   case Common::CastType::Box:
+   {
+      auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
+      addActorFilter( filter );
+     break;
+   }
 
     default:
     {
       Logger::error( "[{}] Action#{} has CastType#{} but that cast type is unhandled. Cancelling cast.",
-                     m_pSource->getId(), getId(), m_castType );
+                     m_pSource->getId(), getId(), static_cast< uint8_t >( m_castType ) );
 
       interrupt();
     }
@@ -990,9 +993,52 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
 
-  // todo: evaluate other actions that can hit condition (eg. sprint)
-  /* if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
-    return false;*/
+  bool actorApplicable = false;
+  switch( static_cast< Common::TargetFilter >( m_lutEntry.targetFilter ) )
+  {
+    case Common::TargetFilter::All:
+    {
+      actorApplicable = true;
+      break;
+    }
+    case Common::TargetFilter::Players:
+    {
+      actorApplicable = kind == ObjKind::Player;
+      break;
+    }
+    case Common::TargetFilter::Allies:
+    {
+      // Todo: Make this work for allies properly
+      actorApplicable = kind != ObjKind::BattleNpc;
+      break;
+    }
+    case Common::TargetFilter::Party:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer && pPlayer->getPartyId() != 0 )
+      {
+        auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+        // Get party members
+        auto pParty = partyMgr.getParty( pPlayer->getPartyId() );
+        assert( pParty );
+
+        for( const auto& id : pParty->MemberId )
+        {
+          if( id == actor.getId() )
+          {
+            actorApplicable = true;
+            break;
+          }
+        }
+      }
+      break;
+    }
+    case Common::TargetFilter::Enemies:
+    {
+      actorApplicable = kind == ObjKind::BattleNpc;
+      break;
+    }
+  }
   
   if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
     return false;
@@ -1003,7 +1049,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( ( m_lutEntry.potency == 0 && m_lutEntry.curePotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
     return false;
 
-  return true;
+  return actorApplicable;
 }
 
 std::vector< Entity::CharaPtr >& Action::Action::getHitCharas()

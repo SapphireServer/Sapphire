@@ -1872,13 +1872,26 @@ namespace Sapphire::Common
     THREAT
   };
 
-  enum CastType : uint8_t
+  enum class TargetFilter : uint8_t
   {
-    SingleTarget = 1,
-    CircularAOE = 2,
-    RectangularAOE = 3,
-    ConeAOE = 4,
-    CircularAoEPlaced = 7
+    All,
+    Players,
+    Allies,
+    Party,
+    Enemies
+  };
+
+  enum class CastType : uint8_t
+  {
+    None,
+    SingleTarget,
+    Circle,
+    Cone,
+    Box,
+    Unknown,
+    Unknown2,
+    PersistentArea, // for when you set aoe like asylum
+    Unknown3
   };
 
   enum class Role : uint8_t
