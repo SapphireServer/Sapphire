@@ -16,6 +16,7 @@ namespace Sapphire::World::Action
     HeavyShot = 97,
     StraightShot = 98,
     VenomousBite = 100,
+    Swiftsong = 105,
     Shadowbind = 108,
     Bloodletter = 110
   };
@@ -33,6 +34,8 @@ namespace Sapphire::World::Action
     StraightShotReady = 122,
     VenomousBiteStatus = 124,
     StraightShotBuff = 130,
+    SwiftsongAura = 133,
+    SwiftsongBuff = 134,
     InnerBeast = 411,
     Deliverance = 729
   };
