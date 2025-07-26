@@ -35,6 +35,7 @@
 #include "StatusEffect/StatusEffect.h"
 
 #include "Job/Warrior.h"
+#include "Job/Bard.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -525,7 +526,7 @@ void Action::Action::buildActionResults()
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_actionResultBuilder->sendActionResults( {} );
+    m_actionResultBuilder->sendActionResults( m_hitActors );
     return;
   }
 
@@ -740,6 +741,12 @@ void Action::Action::handleJobAction()
     case ClassJob::Warrior:
     {
       Warrior::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
+    }
+    case ClassJob::Archer:
+    case ClassJob::Bard:
+    {
+      Bard::onAction( *m_pSource->getAsPlayer(), *this );
       break;
     }
   }
