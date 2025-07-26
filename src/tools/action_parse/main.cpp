@@ -65,6 +65,7 @@ struct ActionEntry
   uint32_t curePotency;
   uint32_t restorePercentage;
   std::vector< uint32_t > nextCombo{};
+  Common::TargetFilter targetFilter = Common::TargetFilter::All;
   StatusEffect statuses;
 };
 
@@ -100,6 +101,7 @@ void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
     { "curePotency", action.curePotency },
     { "restorePercentage", action.restorePercentage },
     { "nextCombo", action.nextCombo },
+    { "targetFilter", action.targetFilter },
     { "statuses", {
         { "caster", action.statuses.caster },
         { "target", action.statuses.target }
