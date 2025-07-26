@@ -6,12 +6,11 @@
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
 
-#include "Util/UtilMath.h"
-
-#include <Network/CommonActorControl.h>
 #include <Network/Util/PacketUtil.h>
 
 #include "Manager/PartyMgr.h"
+
+#include "Util/UtilMath.h"
 #include <algorithm>
 
 
@@ -43,8 +42,6 @@ public:
       return;
     }
 
-    
-
     if( pPlayer->getPartyId() == 0 )
       return;
 
@@ -53,10 +50,10 @@ public:
     auto membersIds = pParty->MemberId;
     for( auto& target : actor.getInRangeActors(false) )
     {
-      if( std::find(membersIds.begin(), membersIds.end(), target->getId()) != membersIds.end() )
+      if( std::find( membersIds.begin(), membersIds.end(), target->getId() ) != membersIds.end() )
       {
         if ( ( target->isPlayer() && target->getAsPlayer()->isInCombat() ) ||
-          ( target->isBattleNpc() && target->getAsBNpc()->getState() == Sapphire::Entity::BNpcState::Combat) )
+          ( target->isBattleNpc() && target->getAsBNpc()->getState() == Sapphire::Entity::BNpcState::Combat ) )
         {
           continue;
         }

@@ -1,6 +1,6 @@
 #include <Action/Action.h>
 #include <Action/CommonAction.h>
-#include <Actor/Player.h>
+#include <Actor/Chara.h>
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <StatusEffect/StatusEffect.h>
