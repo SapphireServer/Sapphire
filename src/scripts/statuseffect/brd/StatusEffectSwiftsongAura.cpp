@@ -55,7 +55,7 @@ public:
     {
       if( std::find(membersIds.begin(), membersIds.end(), target->getId()) != membersIds.end() )
       {
-        if ( (target->isPlayer() && target->getAsPlayer()->isInCombat() ) ||
+        if ( ( target->isPlayer() && target->getAsPlayer()->isInCombat() ) ||
           ( target->isBattleNpc() && target->getAsBNpc()->getState() == Sapphire::Entity::BNpcState::Combat) )
         {
           continue;
@@ -63,27 +63,28 @@ public:
 
 
         auto distance = Sapphire::Common::Util::distance( actor.getPos(), target->getPos() );
-        if( distance <= 30.0f )
+        if( distance <= 20.0f )
         {
           auto targetChara = target->getAsChara();
           if (targetChara->hasStatusEffect(SwiftsongBuff))
           {
             auto effect = targetChara->getStatusEffectById( SwiftsongBuff );
-            effect->refresh( 5 );
+            effect->refresh( 5000 );
           }
           else
           {
-            auto effect = StatusEffect::make_StatusEffect( SwiftsongBuff, actor.getAsChara(), targetChara, 5, 3000 );
+            auto effect = StatusEffect::make_StatusEffect( SwiftsongBuff, actor.getAsChara(), targetChara, 5000, 3000 );
             effect->setFlag( 5 );
-            effect->setParam( 30 );
+            effect->setParam( 20 );
             targetChara->addStatusEffect( effect );
+            Network::Util::Packet::sendHudParam( *targetChara );
           }
         }
       }
     }
 
 
-    //Network::Util::Packet::sendHudParam( actor );
+    
   }
 };
 

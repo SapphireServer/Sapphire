@@ -33,16 +33,12 @@ public:
       return;
     }
 
-    auto pPlayer = actor.getAsPlayer();
-    if( !pPlayer )
-      return;
-
-    if (auto pPlayer = actor.getAsPlayer() && pPlayer->isInCombat())
+    if( actor.isPlayer() && actor.getAsPlayer()->isInCombat() )
     {
       actor.removeSingleStatusEffectById( SwiftsongBuff );
       return;
     }
-    if( auto pBNpc = actor.getAsBNpc() && pBNpc->getState() == BNpcState::Combat )
+    if( actor.isBattleNpc() && actor.getAsBNpc()->getState() == Sapphire::Entity::BNpcState::Combat )
     {
       actor.removeSingleStatusEffectById( SwiftsongBuff );
       return;
