@@ -2,6 +2,7 @@
 #include "PlayerMgr.h"
 
 #include "Action/ActionLutData.h"
+#include "Action/ActionShapeLutData.h"
 #include "Action/Action.h"
 #include "Action/ItemAction.h"
 #include "Action/EventItemAction.h"
@@ -21,6 +22,11 @@ using namespace Sapphire::World::Manager;
 bool ActionMgr::cacheActionLut()
 {
   return Action::ActionLutData::cacheActions();
+}
+
+bool ActionMgr::cacheActionShapeLut()
+{
+  return Action::ActionShapeLutData::cacheShapes();
 }
 
 void ActionMgr::handlePlacedAction( Entity::Chara& chara, uint32_t actionId, Common::FFXIVARR_POSITION3 pos, uint16_t requestId )

@@ -30,6 +30,7 @@
 #include "Actor/BNpc.h"
 
 #include "Action/ActionLutData.h"
+#include "Action/ActionShapeLutData.h"
 
 #include "Territory/Territory.h"
 #include "Territory/HousingZone.h"
@@ -360,6 +361,13 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
   {
     player.resetRecastGroups();
     PlayerMgr::sendDebug( player, "All recast groups cleared." );
+  }
+  else if( subCommand == "recover" )
+  {
+    player.resetHp();
+    player.resetMp();
+    player.setTp( 1000 );
+    Network::Util::Packet::sendHudParam( player );
   }
   else if( subCommand == "freecompany" )
   {
@@ -1486,6 +1494,14 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
     else
     {
       PlayerMgr::sendDebug( player, "There was an error reloading actions." );
+    }
+    if ( Action::ActionShapeLutData::reloadShapes() )
+    {
+      PlayerMgr::sendDebug( player, "Successfully reloaded action shapes." );
+    }
+    else
+    {
+      PlayerMgr::sendDebug( player, "There was an error reloading action shapes." );
     }
   }
   else
