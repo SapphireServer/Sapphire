@@ -17,7 +17,8 @@ namespace Sapphire::World::Action
     StraightShot = 98,
     VenomousBite = 100,
     Shadowbind = 108,
-    Bloodletter = 110
+    Bloodletter = 110,
+    Windbite = 113
   };
 
   enum ActionStatus
@@ -32,6 +33,7 @@ namespace Sapphire::World::Action
     Infuriated = 97,
     StraightShotReady = 122,
     VenomousBiteStatus = 124,
+    WindbiteStatus = 129,
     StraightShotBuff = 130,
     InnerBeast = 411,
     Deliverance = 729
