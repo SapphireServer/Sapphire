@@ -48,7 +48,7 @@ bool Sapphire::World::Util::ActorFilterBox::conditionApplies( const Sapphire::En
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Sapphire::World::Util::ActorFilterCone::ActorFilterCone( Common::FFXIVARR_POSITION3 startPos, Common::FFXIVARR_POSITION3 skillTargetPos, float startAngle, float endAngle ) :
-  m_startPos( startPos ), m_skillTargetPos( skillTargetPos ), m_startAngle( startAngle ), m_endAngle( endAngle )
+                                                         m_startPos( startPos ), m_skillTargetPos( skillTargetPos ), m_startAngle( startAngle ), m_endAngle( endAngle )
 {
 }
 
@@ -56,12 +56,12 @@ bool Sapphire::World::Util::ActorFilterCone::conditionApplies( const Entity::Gam
 {
   Common::FFXIVARR_POSITION3 targetPos = actor.getPos();
   
-  float angleToCurrentTarget = Sapphire::Common::Util::radianToDegrees( Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, targetPos.x, targetPos.z ) );
-  float angleToSkillTarget = Sapphire::Common::Util::radianToDegrees( Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, m_skillTargetPos.x, m_skillTargetPos.z ) );
+  float angleToCurrentTarget = Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, targetPos.x, targetPos.z );
+  float angleToSkillTarget = Sapphire::Common::Util::calcAngTo( m_startPos.x, m_startPos.z, m_skillTargetPos.x, m_skillTargetPos.z );
   angleToCurrentTarget = angleToCurrentTarget - angleToSkillTarget; // Checking angle in world rotation
 
-  if( angleToCurrentTarget < 0.0f )
-    angleToCurrentTarget += 360.0f;
+  if( angleToCurrentTarget < -PI )
+    angleToCurrentTarget += 2 * PI;
 
   if( m_startAngle > m_endAngle ) // start -> end wraps around
   {

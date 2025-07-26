@@ -80,9 +80,14 @@ uint8_t Util::floatToUInt8Rot( float val )
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
 }
 
-float Util::radianToDegrees( float val )
+float Util::radiansToDegrees( float val )
 {
   return  val * ( 180 / PI );
+}
+
+float Util::degreesToRadians(float val)
+{
+  return val * ( PI / 180 );
 }
 
 FFXIVARR_POSITION3 Util::transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix )

@@ -1,5 +1,6 @@
 #include "ActionShapeLut.h"
 #include "ActionShapeLutData.h"
+#include "Util/UtilMath.h"
 #include <Logging/Logger.h>
 #include <filesystem>
 #include <fstream>
@@ -28,10 +29,17 @@ bool ActionShapeLutData::cacheShapes()
     if( ActionShapeLut::m_coneLut.count( id ) > 0 )
       throw std::runtime_error( fmt::format( "Cone for action with ID {} cannot be defined more than once", i.key() ) );
 
-    if( cone.startAngle < 0 )
+    if( cone.startAngle < -180 )
       cone.startAngle += 360;
-    if( cone.endAngle < 0 )
+    if( cone.startAngle >= 180 )
+      cone.startAngle -= 360;
+    if( cone.endAngle < -180 )
       cone.endAngle += 360;
+    if( cone.endAngle >= 180 )
+      cone.endAngle -= 360;
+
+    cone.startAngle = Sapphire::Common::Util::degreesToRadians( cone.startAngle );
+    cone.endAngle = Sapphire::Common::Util::degreesToRadians( cone.endAngle );
 
     ActionShapeLut::m_coneLut.try_emplace( id, cone );
   }
