@@ -365,27 +365,31 @@ void PlayerMgr::onGainExp( Entity::Player& player, uint32_t exp )
     return;
   }
   auto& exdData = Common::Service< Data::ExdData >::ref();
-
   uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
-  uint32_t neededExpToLevelPlus1 = exdData.getRow< Excel::ParamGrow >( level + 1 )->data().NextExp;
+  uint32_t gainedExp = exp;
+  exp += currentExp;
 
-  if( ( currentExp + exp ) >= neededExpToLevel )
+  while( exp >= neededExpToLevel ) // levelup
   {
-    // levelup
-    exp = ( currentExp + exp - neededExpToLevel ) > neededExpToLevelPlus1 ? neededExpToLevelPlus1 - 1 : ( currentExp + exp - neededExpToLevel );
+    exp -= neededExpToLevel;
+    level += 1;
 
-    if( level + 1 >= Common::MAX_PLAYER_LEVEL )
+    if (level > Common::MAX_PLAYER_LEVEL)
+    {
       exp = 0;
+      break;
+    }
     else
-      onLevelChanged( player, level + 1 );
+    {
+      onLevelChanged( player, level );
+    }
 
-    player.setCurrentExp( exp );
-
+    uint32_t neededExpToLevel = exdData.getRow< Excel::ParamGrow >( level )->data().NextExp;
   }
-  else
-    player.setCurrentExp( currentExp + exp );
 
-  Network::Util::Packet::sendActorControlSelf( player, player.getId(), GainExpMsg, currentClass, exp );
+  player.setCurrentExp( exp );
+
+  Network::Util::Packet::sendActorControlSelf( player, player.getId(), GainExpMsg, currentClass, gainedExp );
   Network::Util::Packet::sendActorControlSelf( player, player.getId(), UpdateUiExp, currentClass, player.getCurrentExp() );
 }
 
