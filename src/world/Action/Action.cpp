@@ -987,7 +987,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
     return false;
 
   bool actorApplicable = false;
-  switch( static_cast< Common::TargetFilter >( m_lutEntry.targetFilter ) )
+  switch( m_lutEntry.targetFilter )
   {
     case Common::TargetFilter::All:
     {
