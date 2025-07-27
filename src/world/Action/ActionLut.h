@@ -39,7 +39,7 @@ namespace Sapphire::World::Action
     uint16_t curePotency;
     uint16_t restoreMPPercentage;
     std::vector< uint32_t > nextCombo;
-    uint8_t targetFilter;
+    Common::TargetFilter targetFilter;
     StatusEffect statuses;
   };
 
