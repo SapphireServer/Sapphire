@@ -43,7 +43,7 @@ public:
     }
 
     pSource->removeSingleStatusEffectById( StraightShotReady );
-    pActionBuilder->applyStatusEffectSelf( StraightShotBuff, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, 1025, true );
+    pActionBuilder->applyStatusEffectSelf( StraightShotStatus, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, 1025, true );
   }
 };
 

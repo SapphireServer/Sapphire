@@ -63,14 +63,14 @@ public:
         if( distance <= 20.0f )
         {
           auto targetChara = target->getAsChara();
-          if (targetChara->hasStatusEffect(SwiftsongBuff))
+          if( targetChara->hasStatusEffect( SwiftsongStatus ) )
           {
-            auto effect = targetChara->getStatusEffectById( SwiftsongBuff );
+            auto effect = targetChara->getStatusEffectById( SwiftsongStatus );
             effect->refresh( 5000 );
           }
           else
           {
-            auto effect = Sapphire::StatusEffect::make_StatusEffect( SwiftsongBuff, actor.getAsChara(), targetChara, 5000, 3000 );
+            auto effect = Sapphire::StatusEffect::make_StatusEffect( SwiftsongStatus, actor.getAsChara(), targetChara, 5000, 3000 );
             effect->setFlag( 5 );
             effect->setParam( 20 );
             targetChara->addStatusEffect( effect );
