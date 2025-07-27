@@ -10,3 +10,12 @@
 [submodule "deps/ffxiv-actions"]
 	path = deps/ffxiv-actions
 	url = https://github.com/SapphireServer/ffxiv-actions.git
+[submodule "deps/reactphysics3d"]
+	path = deps/reactphysics3d
+	url = https://github.com/DanielChappuis/reactphysics3d
+[submodule "deps/coal"]
+	path = deps/coal
+	url = https://github.com/coal-library/coal
+[submodule "deps/fcl"]
+	path = deps/fcl
+	url = https://github.com/flexible-collision-library/fcl
