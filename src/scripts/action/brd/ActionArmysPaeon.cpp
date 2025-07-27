@@ -29,7 +29,7 @@ public:
     if( pSource->hasStatusEffect( ArmysPaeonAura ) )
       pSource->removeSingleStatusEffectById( ArmysPaeonAura );
     else
-      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, {}, 5, false );
+      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, 5, false );
   }
 };
 

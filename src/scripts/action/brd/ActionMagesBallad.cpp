@@ -29,7 +29,7 @@ public:
     if( pSource->hasStatusEffect( MagesBalladAura ) )
       pSource->removeSingleStatusEffectById( MagesBalladAura );
     else
-      pActionBuilder->applyStatusEffectSelf( MagesBalladAura, 0, 0, {}, 5, false );
+      pActionBuilder->applyStatusEffectSelf( MagesBalladAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, 5, false );
   }
 };
 
