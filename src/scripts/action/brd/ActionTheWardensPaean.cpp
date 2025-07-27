@@ -1,9 +1,11 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
-#include <Actor/Player.h>
+#include <Actor/Chara.h>
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+
+#include <Network/Util/PacketUtil.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -24,23 +26,15 @@ public:
     if( !pActionBuilder )
       return;
 
-    int slotToRemove = -1;
-
-    /*for( auto entry : pTarget->getStatusEffectMap() )
+    if( !pTarget )
     {
-      if( entry.second->getFlag() & static_cast< uint32_t >( Common::StatusEffectFlag::CanDispel ) )
-      {
-        slotToRemove = entry.first;
-        break;
-      }
+      pTarget = pSource;
     }
 
-    if (slotToRemove > -1)
-    {
-      pTarget->removeStatusEffect( slotToRemove );
-    }*/
-
+    pTarget->removeSingleStatusEffectByFlag( Common::StatusEffectFlag::CanDispel );
     pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, 30000, 0, {}, 1025, false, true );
+
+    Network::Util::Packet::sendHudParam( *pTarget );
   }
 };
 

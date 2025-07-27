@@ -584,6 +584,18 @@ void Chara::removeStatusEffectById( std::vector< uint32_t > ids )
   }
 }
 
+void Chara::removeSingleStatusEffectByFlag( Common::StatusEffectFlag flag )
+{
+  for( const auto& effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getFlag() & static_cast<uint32_t>( flag ) )
+    {
+      removeStatusEffect( effectIt.first );
+      return;
+    }
+  }
+}
+
 void Chara::removeStatusEffectByFlag( Common::StatusEffectFlag flag )
 {
   for( auto effectIt = m_statusEffectMap.begin(); effectIt != m_statusEffectMap.end(); )
