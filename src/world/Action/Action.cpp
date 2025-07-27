@@ -967,12 +967,12 @@ void Action::Action::addDefaultActorFilters()
       break;
     }
 
-   case Common::CastType::Box:
-   {
+    case Common::CastType::Box:
+    {
       auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
       addActorFilter( filter );
-     break;
-   }
+      break;
+    }
 
     default:
     {
