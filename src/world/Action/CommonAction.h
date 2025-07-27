@@ -34,7 +34,12 @@ namespace Sapphire::World::Action
     FoeRequiem = 115,
     ArmysPaeon = 116,
     RainOfDeath = 117,
-    BattleVoice = 118
+    BattleVoice = 118,
+    EmpyrealArrow = 3558,
+    TheWanderersMinuet = 3559,
+    IronJaws = 3560,
+    TheWardensPaean = 3561,
+    Sidewinder = 3562
   };
 
   enum ActionStatus
@@ -67,6 +72,8 @@ namespace Sapphire::World::Action
     RainOfDeathStatus = 247,
     FlamingArrowStatus = 249,
     InnerBeast = 411,
-    Deliverance = 729
+    Deliverance = 729,
+    TheWanderersMinuetStatus = 865,
+    TheWardensPaeanStatus = 866
   };
 }

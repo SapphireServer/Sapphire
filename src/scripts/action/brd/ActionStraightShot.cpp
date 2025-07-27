@@ -24,10 +24,10 @@ public:
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
-    if( !pPlayer || !pActionBuilder )
+    if( !pActionBuilder )
       return;
 
-    if( auto status = pPlayer->getStatusEffectById( StraightShotReady ); status )
+    if( auto status = pSource->getStatusEffectById( StraightShotReady ); status )
       status->setModifier( Common::ParamModifier::CriticalHit, 100 );
     
 
