@@ -24,6 +24,9 @@ public:
     if( !pActionBuilder )
       return;
 
+    if( pSource->getMp() == 0 )
+      return;
+
     if( pSource->hasStatusEffect( MagesBalladAura ) )
       pSource->removeSingleStatusEffectById( MagesBalladAura );
     else

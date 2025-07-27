@@ -28,18 +28,21 @@ public:
   static constexpr auto PotencySelf = 20;
   static constexpr auto PotencyParty = 30;
 
+  void onApply( Entity::Chara& actor )
+  {
+    actor.removeSingleStatusEffectById( MagesBalladStatus );
+  }
+
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
-    auto potencySelf = PotencySelf;
     auto potencyParty = PotencyParty;
 
     if( actor.hasStatusEffect( BattleVoiceStatus ) )
     {
-      potencySelf *= 2;
       potencyParty *= 2;
     }
 
-    uint32_t mp = actor.getMp() + Math::CalcStats::calcMpRefresh( potencySelf, actor.getLevel() );
+    uint32_t mp = actor.getMp() + Math::CalcStats::calcMpRefresh( PotencySelf, actor.getLevel() );
     uint32_t mpDrained = Math::CalcStats::calcMpRefresh( DrainPotency, actor.getLevel() );
     if( mp <= mpDrained )
     {

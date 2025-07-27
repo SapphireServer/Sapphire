@@ -64,6 +64,7 @@ namespace Sapphire::World::Action
     FoeRequiemAura = 139,
     FoeRequiemStatus = 140,
     BattleVoiceStatus = 141,
+    RainOfDeathStatus = 247,
     FlamingArrowStatus = 249,
     InnerBeast = 411,
     Deliverance = 729
