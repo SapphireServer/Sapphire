@@ -238,7 +238,7 @@ void Chara::setGp( uint32_t gp )
 /*! \param tp amount to set*/
 void Chara::setTp( uint32_t tp )
 {
-  m_tp = static_cast< uint16_t >( tp );
+  m_tp = tp < 1000 ? static_cast< uint16_t >( tp ) : 1000;
 }
 
 /*! \param type invincibility type to set */

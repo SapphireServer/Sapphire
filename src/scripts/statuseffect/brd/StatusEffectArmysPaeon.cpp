@@ -11,23 +11,22 @@
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
-class StatusEffectMagesBallad : public Sapphire::ScriptAPI::StatusEffectScript
+class StatusEffectArmysPaeon : public Sapphire::ScriptAPI::StatusEffectScript
 {
 public:
-  StatusEffectMagesBallad() : Sapphire::ScriptAPI::StatusEffectScript( MagesBalladStatus )
+  StatusEffectArmysPaeon() : Sapphire::ScriptAPI::StatusEffectScript( ArmysPaeonStatus )
   {
   }
 
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
     auto statusMap = effect.getModifiers();
-    auto potency = statusMap[ Common::ParamModifier::Refresh ];
+    auto potency = statusMap[ Common::ParamModifier::TpRefresh ];
 
     auto pSource = effect.getSrcActor();
-    auto mpGained = Math::CalcStats::calcMpRefresh( potency, pSource->getLevel() );
 
-    actor.setMp( actor.getMp() + mpGained );
+    actor.setTp( actor.getTp() + potency );
   }
 };
 
-EXPOSE_SCRIPT( StatusEffectMagesBallad );
+EXPOSE_SCRIPT( StatusEffectArmysPaeon );

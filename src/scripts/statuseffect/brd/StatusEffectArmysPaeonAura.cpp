@@ -17,44 +17,44 @@
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
-class StatusEffectMagesBalladAura : public Sapphire::ScriptAPI::StatusEffectScript
+class StatusEffectArmysPaeonAura : public Sapphire::ScriptAPI::StatusEffectScript
 {
 public:
-  StatusEffectMagesBalladAura() : Sapphire::ScriptAPI::StatusEffectScript( MagesBalladAura )
+  StatusEffectArmysPaeonAura() : Sapphire::ScriptAPI::StatusEffectScript( ArmysPaeonAura )
   {
   }
 
   static constexpr auto DrainPotency = 60;
-  static constexpr auto PotencySelf = 20;
-  static constexpr auto PotencyParty = 30;
+  static constexpr auto Potency = 30;
 
   void onApply( Entity::Chara& actor )
   {
-    actor.removeSingleStatusEffectById( MagesBalladStatus );
-    actor.removeSingleStatusEffectById( ArmysPaeonAura );
+    actor.removeSingleStatusEffectById( ArmysPaeonStatus );
+    actor.removeSingleStatusEffectById( MagesBalladAura );
     actor.removeSingleStatusEffectById( FoeRequiemAura );
   }
 
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
-    auto potencyParty = PotencyParty;
-
-    if( actor.hasStatusEffect( BattleVoiceStatus ) )
-    {
-      potencyParty *= 2;
-    }
-
-    uint32_t mp = actor.getMp() + Math::CalcStats::calcMpRefresh( PotencySelf, actor.getLevel() );
+    uint32_t mp = actor.getMp();
     uint32_t mpDrained = Math::CalcStats::calcMpRefresh( DrainPotency, actor.getLevel() );
     if( mp <= mpDrained )
     {
       actor.setMp( 0 );
-      actor.removeSingleStatusEffectById( MagesBalladAura );
-      // We refresh the buff on other players one last time
+      actor.removeSingleStatusEffectById( ArmysPaeonAura );
+      // We refresh the buff on other players one last time. The caster also gets one last tick
     }
     else
     {
       actor.setMp( mp - mpDrained );
+    }
+
+    actor.setTp( actor.getTp() + Potency );
+    auto partyPotency = Potency;
+
+    if( actor.hasStatusEffect( BattleVoiceStatus ) )
+    {
+      partyPotency *= 2;
     }
 
     auto pPlayer = actor.getAsPlayer();
@@ -75,21 +75,21 @@ public:
         if( distance <= 20.0f )
         {
           auto targetChara = target->getAsChara();
-          if( targetChara->hasStatusEffect( MagesBalladAura ) )
+          if( targetChara->hasStatusEffect( ArmysPaeonAura ) )
           {
             continue;
           }
-          else if( targetChara->hasStatusEffect( MagesBalladStatus ) )
+          else if( targetChara->hasStatusEffect( ArmysPaeonStatus ) )
           {
-            auto effect = targetChara->getStatusEffectById( MagesBalladStatus );
-            effect->setModifier( Common::ParamModifier::Refresh, potencyParty );
+            auto effect = targetChara->getStatusEffectById( ArmysPaeonStatus );
+            effect->setModifier( Common::ParamModifier::TpRefresh, partyPotency );
             effect->refresh( 5000 );
           }
           else
           {
-            auto effect = Sapphire::StatusEffect::make_StatusEffect( MagesBalladStatus, actor.getAsChara(), targetChara, 5000, 3000 );
+            auto effect = Sapphire::StatusEffect::make_StatusEffect( ArmysPaeonStatus, actor.getAsChara(), targetChara, 5000, 3000 );
             effect->setFlag( 5 );
-            effect->setModifier( Common::ParamModifier::Refresh, potencyParty );
+            effect->setModifier( Common::ParamModifier::TpRefresh, partyPotency );
             targetChara->addStatusEffect( effect );
             Network::Util::Packet::sendHudParam( *targetChara );
           }
@@ -101,4 +101,4 @@ public:
   }
 };
 
-EXPOSE_SCRIPT( StatusEffectMagesBalladAura );
+EXPOSE_SCRIPT( StatusEffectArmysPaeonAura );

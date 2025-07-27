@@ -8,10 +8,10 @@
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
-class ActionMagesBallad : public Sapphire::ScriptAPI::ActionScript
+class ActionArmysPaeon : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionMagesBallad() : Sapphire::ScriptAPI::ActionScript( MagesBallad )
+  ActionArmysPaeon() : Sapphire::ScriptAPI::ActionScript( ArmysPaeon )
   {
   }
 
@@ -26,11 +26,11 @@ public:
     if( pSource->getMp() == 0 )
       return;
 
-    if( pSource->hasStatusEffect( MagesBalladAura ) )
-      pSource->removeSingleStatusEffectById( MagesBalladAura );
+    if( pSource->hasStatusEffect( ArmysPaeonAura ) )
+      pSource->removeSingleStatusEffectById( ArmysPaeonAura );
     else
-      pActionBuilder->applyStatusEffectSelf( MagesBalladAura, 0, 0, {}, 5, false );
+      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, {}, 5, false );
   }
 };
 
-EXPOSE_SCRIPT( ActionMagesBallad );
+EXPOSE_SCRIPT( ActionArmysPaeon );
