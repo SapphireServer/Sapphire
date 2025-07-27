@@ -142,6 +142,8 @@ namespace Sapphire::Math
 
     static std::pair< float, Common::CalcResultType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
+    static uint32_t calcMpRefresh( uint32_t potency, uint8_t level );
+
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
   private:
 
