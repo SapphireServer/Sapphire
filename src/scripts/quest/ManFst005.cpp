@@ -57,34 +57,41 @@ public:
   // Event Handlers
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    if( actorId == Actor0 )
+    switch (actorId)
     {
-      if( quest.getSeq() == Seq0 )
-        Scene00000( quest, player );
-      if( quest.getSeq() == SeqFinish )
-        Scene00009( quest, player );
-    }
-
-    if( actorId == Eobject0 )
-      Scene00002( quest, player );
-    if( actorId == Eobject1 )
-    {
-      eventMgr().eventActionStart(
-              player, getId(), EventActionProcessShor,
-              [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
-                //quest.setSeq( SeqFinish );
-                Scene00008( quest, player );
-              },
-              nullptr, getId() );
+      case( Actor0 ):
+      {
+        if( quest.getSeq() == Seq0 )
+          Scene00000( quest, player );
+        else if( quest.getSeq() == SeqFinish )
+          Scene00009( quest, player );
+        break;
+      }
+      case( Eobject0 ):
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00002( quest, player );
+        break;
+      }
+      case( Eobject1 ):
+      {
+        if( quest.getSeq() == Seq3 )
+          eventMgr().eventActionStart(
+                  player, getId(), EventActionProcessShor,
+                  [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional ) {
+                    //quest.setSeq( SeqFinish );
+                    Scene00008( quest, player );
+                  },
+                  nullptr, getId() );
+        break;
+      }
     }
   }
 
   void onEnterTerritory( World::Quest& quest, Entity::Player& player, uint16_t param1, uint16_t param2 ) override
   {
     if( quest.getSeq() == Seq2 )
-    {
       Scene00005( quest, player );
-    }
   }
 
 
@@ -101,9 +108,7 @@ private:
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )// accept quest
-    {
       Scene00001( quest, player );
-    }
   }
 
   //////////////////////////////////////////////////////////////////////

@@ -60,34 +60,24 @@ public:
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    if( bnpc.getBNpcNameId() != Enemy0 )
-      return;
-    else
+    if( quest.getSeq() == Seq1 )
     {
-      auto currentKC = quest.getUI8AL();
-      if( currentKC <= 4 )
-      {
-        eventMgr().sendEventNotice( player, getId(), 0, 2, currentKC + 1, 4 );
-        quest.setUI8AL( currentKC + 1 );
-        quest.setUI8BH( currentKC + 1 );
-        checkQuestCompletion( quest, player );
-      }
-    }
+      if( bnpc.getBNpcNameId() != Enemy0 )
+        return;
+
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 4 );
+
+      if( quest.getUI8AL() >= 4 )
+        quest.setSeq( SeqFinish );
+    }    
   }
 
 private:
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
-
-  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
-  {
-    if( quest.getUI8AL() >= 4 )
-    {
-      quest.setUI8AL( 0 );
-      quest.setSeq( SeqFinish );
-    }
-  }
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {

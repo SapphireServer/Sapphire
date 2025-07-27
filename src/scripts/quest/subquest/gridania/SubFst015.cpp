@@ -134,18 +134,11 @@ private:
 
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    auto currentCC = quest.getUI8AL();
+    quest.setUI8AL( quest.getUI8AL() + 1 );
+    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 6 );
 
-    eventMgr().sendEventNotice( player, getId(), 0, 2, currentCC + 1, 6 );
-
-    if( currentCC + 1 >= 6 )
-    {
+    if( quest.getUI8AL() >= 6 )
       quest.setSeq( SeqFinish );
-    }
-    else
-    {
-      quest.setUI8AL( currentCC + 1 );
-    }
   }
 
   //////////////////////////////////////////////////////////////////////

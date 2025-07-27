@@ -35,8 +35,6 @@ private:
   static constexpr auto INIT_POP_ADD_GLA02 = 4246864;
   static constexpr auto POP_RANGE_MIRAUDONT_MOVE = 4358145;
 
-  bool maraSpawn = false;
-
 public:
   ViolatorsWillBeShot() : Sapphire::ScriptAPI::QuestBattleScript( 6 )
   { }
@@ -173,25 +171,6 @@ public:
       return;
     }
 
-    /* if( !maraSpawn )
-    {
-      auto range = pPlayer->getInRangeActors();
-
-      if( !range.empty() )
-      {
-        for( auto actor : range )
-        {
-          if (actor->getAsEventObj() == instance.getEObj(2004128))
-          {
-            auto mira = instance.createBNpcFromLayoutId( INIT_P_POP_MIRAUDONT, 1440, Common::BNpcType::Enemy );
-            maraSpawn = true;
-          }
-        }
-      }
-    }*/
-    
-
-    
   }
 
   void onEnterTerritory( QuestBattle& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,
@@ -242,11 +221,8 @@ public:
     a17->setFlag( Entity::NoDeaggro );
     a18->setFlag( Entity::NoDeaggro );
 
-
-    /////////////////
-    //auto t2 = instance.createBNpcFromLayoutId( INIT_POP_ADD_GLA01, 1440, Common::BNpcType::Enemy );
-    //auto t3 = instance.createBNpcFromLayoutId( INIT_POP_ADD_GLA02, 1440, Common::BNpcType::Enemy );
-    auto t4 = instance.createBNpcFromLayoutId( ER_RECT_01, 1440, Common::BNpcType::Enemy );
+    auto t2 = instance.createBNpcFromLayoutId( INIT_POP_ADD_GLA01, 1440, Common::BNpcType::Enemy );
+    auto t3 = instance.createBNpcFromLayoutId( INIT_POP_ADD_GLA02, 1440, Common::BNpcType::Enemy );
   }
 
   void onDutyComplete( QuestBattle& instance, Entity::Player& player ) override

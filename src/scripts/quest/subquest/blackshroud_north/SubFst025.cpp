@@ -68,22 +68,17 @@ public:
 
   void onBNpcKill( World::Quest& quest, Sapphire::Entity::BNpc& bnpc, Sapphire::Entity::Player& player ) override
   {
-    if( bnpc.getBNpcNameId() != Enemy0 )
-      return;
-
-    auto credit = quest.getUI8AL();
-
-    if( credit + 1 >= 6 )
+    if( quest.getSeq() == Seq1 )
     {
-      eventMgr().sendEventNotice( player, getId(), 0, 2, credit + 1, 6 );
-      quest.setUI8BH( credit + 1 );
-      quest.setSeq( SeqFinish );
-    }
-    else
-    {
-      quest.setUI8AL( credit + 1 );
-      quest.setUI8BH( credit + 1 );
-      eventMgr().sendEventNotice( player, getId(), 0, 2, credit + 1, 6 );
+      if( bnpc.getBNpcNameId() != Enemy0 )
+        return;
+
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 6 );
+
+      if( quest.getUI8AL() >= 6 )
+        quest.setSeq( SeqFinish );
     }
   }
 
