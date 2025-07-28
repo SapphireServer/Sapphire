@@ -261,6 +261,16 @@
             },
             {
               "data": {
+                "conditionId": 2,
+                "conditionStr": "If Ifrit has 50% < HP < 70%, loop Ifrit->Phase 2 Main",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            },
+            {
+              "data": {
                 "flags": 375,
                 "targetActor": ""
               },
@@ -418,18 +428,42 @@
                 "sourceActor": "Ifrit",
                 "targetType": "self"
               },
-              "description": "",
+              "description": "Ifrit Plumes In",
               "startTime": 16000,
               "type": "castAction"
             },
             {
               "data": {
                 "conditionId": 8,
-                "conditionStr": "If Ifrit->Final Phase is active, loop Ifrit Control->Plumes",
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes In",
                 "enabled": true
               },
               "description": "",
               "startTime": 16000,
+              "type": "setCondition"
+            },
+            {
+              "data": {
+                "actionId": 456,
+                "selectorIndex": 0,
+                "selectorName": "<unset>",
+                "snapshot": false,
+                "snapshotTime": 0,
+                "sourceActor": "Ifrit",
+                "targetType": "self"
+              },
+              "description": "Ifrit Plumes Out",
+              "startTime": 23000,
+              "type": "castAction"
+            },
+            {
+              "data": {
+                "conditionId": 13,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes Out",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 23000,
               "type": "setCondition"
             }
           ]
@@ -503,15 +537,15 @@
         {
           "description": "",
           "id": 2,
-          "name": "Plumes",
+          "name": "Plumes In",
           "timepoints": [
             {
               "data": {
                 "actorName": "Ifrit Control <subactor 1>",
                 "pos": [
-                  -10,
+                  -5,
                   0,
-                  10
+                  5
                 ],
                 "positionType": "absolute",
                 "rot": 0,
@@ -528,9 +562,9 @@
               "data": {
                 "actorName": "Ifrit Control <subactor 2>",
                 "pos": [
-                  -10,
+                  -5,
                   0,
-                  -10
+                  -5
                 ],
                 "positionType": "absolute",
                 "rot": 0,
@@ -547,9 +581,9 @@
               "data": {
                 "actorName": "Ifrit Control <subactor 3>",
                 "pos": [
-                  -10,
+                  5,
                   0,
-                  -10
+                  5
                 ],
                 "positionType": "absolute",
                 "rot": 0,
@@ -566,9 +600,9 @@
               "data": {
                 "actorName": "Ifrit Control <subactor 4>",
                 "pos": [
-                  10,
+                  5,
                   0,
-                  -10
+                  -5
                 ],
                 "positionType": "absolute",
                 "rot": 0,
@@ -639,6 +673,23 @@
             },
             {
               "data": {
+                "conditionId": 8,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes In",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 3,
+          "name": "Plumes Out",
+          "timepoints": [
+            {
+              "data": {
                 "actorName": "Ifrit Control <subactor 1>",
                 "pos": [
                   0,
@@ -653,7 +704,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -672,7 +723,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -691,16 +742,16 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
               "data": {
                 "actorName": "Ifrit Control <subactor 4>",
                 "pos": [
-                  -20,
+                  20,
                   0,
-                  20
+                  0
                 ],
                 "positionType": "absolute",
                 "rot": 0,
@@ -710,7 +761,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -729,7 +780,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -748,7 +799,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -767,7 +818,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -786,7 +837,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "setPos"
             },
             {
@@ -800,7 +851,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -814,7 +865,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -828,7 +879,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -842,7 +893,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -856,7 +907,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -870,7 +921,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -884,7 +935,7 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
@@ -898,14 +949,18 @@
                 "targetType": "self"
               },
               "description": "",
-              "startTime": 4000,
+              "startTime": 0,
               "type": "castAction"
             },
             {
-              "data": {},
-              "description": "Plumes delay filler",
-              "startTime": 12000,
-              "type": "idle"
+              "data": {
+                "conditionId": 13,
+                "conditionStr": "If Ifrit->Final Phase is active, push Ifrit Control->Plumes Out",
+                "enabled": false
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "setCondition"
             }
           ]
         }
@@ -925,7 +980,7 @@
     {
       "hp": 445,
       "id": 3,
-      "layoutId": 4126285,
+      "layoutId": 4126281,
       "name": "Ifrit Nail 1",
       "schedules": [],
       "subactors": [],
@@ -1046,13 +1101,26 @@
       "description": "",
       "enabled": false,
       "id": 8,
-      "loop": true,
+      "loop": false,
       "paramData": {
         "scheduleName": "Final Phase",
         "sourceActor": "Ifrit"
       },
       "targetActor": "Ifrit Control",
-      "targetSchedule": "Plumes"
+      "targetSchedule": "Plumes In"
+    },
+    {
+      "condition": "scheduleActive",
+      "description": "",
+      "enabled": false,
+      "id": 13,
+      "loop": false,
+      "paramData": {
+        "scheduleName": "Final Phase",
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit Control",
+      "targetSchedule": "Plumes Out"
     },
     {
       "condition": "getAction",
