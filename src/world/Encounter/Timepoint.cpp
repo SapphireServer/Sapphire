@@ -726,7 +726,7 @@ namespace Sapphire::Encounter
 
         // todo: probably have this info in the timepoint data
         if( !pBNpc )
-          pBNpc = pTeri->createBNpcFromLayoutIdNoPush( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
+          pBNpc = pTeri->createBNpcFromLayoutId( pSpawnData->m_layoutId, 100, Common::BNpcType::Enemy );
 
         if( pBNpc )
         {

@@ -44,6 +44,21 @@
       "target": []
     }
   },
+  "456": {
+    "name": "Radiant Plume",
+    "potency": 1,
+    "comboPotency": 0,
+    "flankPotency": 0,
+    "frontPotency": 0,
+    "rearPotency": 0,
+    "curePotency": 0,
+    "restorePercentage": 0,
+    "nextCombo": [],
+    "statuses": {
+      "caster": [],
+      "target": []
+    }
+  },
   "458": {
     "name": "Hellfire",
     "potency": 400,
