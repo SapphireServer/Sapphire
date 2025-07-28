@@ -19,13 +19,13 @@ struct ConditionState
   bool m_completed{ false };
   bool m_enabled{ false };
 
-  struct
+  struct ScheduleInfo
   {
     uint64_t m_startTime{ 0 };
     uint64_t m_lastTimepointTime{ 0 };
     uint32_t m_lastTimepointIndex{ 0 };
 
     std::vector< TimepointState > m_timepointStates;
-  } m_phaseInfo;
+  } m_scheduleInfo;
 };
 }; // namespace Sapphire::Encounter

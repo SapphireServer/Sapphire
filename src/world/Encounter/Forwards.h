@@ -6,13 +6,13 @@ namespace Sapphire
 {
   class Selector;
   class TimelineActor;
-  class Phase;
-  class PhaseCondition;
+  class Schedule;
+  class ScheduleCondition;
   class Timepoint;
 
   class Encounter;
   class TimelinePack;
 
-  using PhaseConditionPtr = std::shared_ptr< PhaseCondition >;
+  using ScheduleConditionPtr = std::shared_ptr< ScheduleCondition >;
   using EncounterPtr = std::shared_ptr< Encounter >;
 }

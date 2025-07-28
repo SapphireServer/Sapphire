@@ -22,21 +22,21 @@ namespace Sapphire
     return m_layoutId;
   }
 
-  bool TimelineActor::isPhaseActive( const std::string& name ) const
+  bool TimelineActor::isScheduleActive( const std::string& name ) const
   {
-    for( const auto& condition : m_phaseConditions )
+    for( const auto& condition : m_scheduleConditions )
     {
       const auto& pCondition = condition.second;
       const auto& state = m_conditionStates.at( condition.first );
-      if( pCondition->inProgress( state ) && pCondition->getPhaseName() == name )
+      if( pCondition->inProgress( state ) && pCondition->getScheduleName() == name )
         return true;
     }
     return false;
   }
 
-  void TimelineActor::addPhaseCondition( PhaseConditionPtr pCondition )
+  void TimelineActor::addPhaseCondition( ScheduleConditionPtr pCondition )
   {
-    m_phaseConditions.emplace( std::make_pair( pCondition->getId(), pCondition ) );
+    m_scheduleConditions.emplace( std::make_pair( pCondition->getId(), pCondition ) );
     m_conditionStates[ pCondition->getId() ] = {};
     m_conditionStates[ pCondition->getId() ].m_enabled = pCondition->isDefaultEnabled();
   }
@@ -46,7 +46,7 @@ namespace Sapphire
   void TimelineActor::update(  EncounterPtr pEncounter, TimelinePack& pack, uint64_t time )
   {
     // todo: handle interrupts
-    for( const auto& condition : m_phaseConditions )
+    for( const auto& condition : m_scheduleConditions )
     {
       const auto& pCondition = condition.second;
       auto& state = m_conditionStates[ pCondition->getId() ];
@@ -83,7 +83,7 @@ namespace Sapphire
 
   bool TimelineActor::resetConditionState( uint32_t conditionId, bool toDefault )
   {
-    if( auto it = m_phaseConditions.find( conditionId ); it != m_phaseConditions.end() )
+    if( auto it = m_scheduleConditions.find( conditionId ); it != m_scheduleConditions.end() )
     {
       auto& state = m_conditionStates.at( it->first );
       it->second->reset( state, toDefault );
@@ -105,7 +105,7 @@ namespace Sapphire
 
   void TimelineActor::resetAllConditionStates()
   {
-    for( const auto& condition : m_phaseConditions )
+    for( const auto& condition : m_scheduleConditions )
     {
       const auto& pCondition = condition.second;
       auto& state = m_conditionStates.at( condition.first );

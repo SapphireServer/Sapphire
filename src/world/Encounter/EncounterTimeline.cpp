@@ -4,7 +4,7 @@
 #include "Timepoint.h"
 #include "TimelineActorState.h"
 #include "TimelineActor.h"
-#include "PhaseCondition.h"
+#include "ScheduleCondition.h"
 #include "Selector.h"
 
 #include <Action/Action.h>
@@ -119,7 +119,7 @@ namespace Sapphire
       { "bnpcHasFlags",             ConditionType::BNpcHasFlags },
 
       { "getAction",                ConditionType::GetAction },
-      { "phaseActive",              ConditionType::PhaseActive }
+      { "scheduleActive",           ConditionType::ScheduleActive }
     };
 
     TimelinePack pack;
@@ -136,7 +136,7 @@ namespace Sapphire
     auto json = nlohmann::json::parse( f );
 
     std::unordered_map< std::string, TimelineActor > actorNameMap;
-    std::unordered_map< std::string, std::map< std::string, Phase > > actorNamePhaseMap;
+    std::unordered_map< std::string, std::map< std::string, Schedule > > actorNameSchedMap;
 
     for( const auto& selectorJ : json.at( "selectors" ).items() )
     {
@@ -169,49 +169,51 @@ namespace Sapphire
     // build timeline info per actor
     for( const auto& actorJ : json.at( "actors" ).items() )
     {
-      // < actorName, < phasename, phase > >
-      std::map< std::string, Phase > phaseNameMap;
+      // < actorName, < schedulename, schedule > >
+      std::map< std::string, Schedule > scheduleNameMap;
 
-      auto actorV = actorJ.value();
+      auto& actorV = actorJ.value();
       std::string actorName = actorV.at( "name" );
 
       TimelineActor& actor = actorNameMap[ actorName ];
-      // todo: are phases linked by actor, or global in the json
-      for( const auto& phaseJ : actorV.at( "phases" ).items() )
+      // todo: are schedules linked by actor, or global in the json
+      for( const auto& scheduleJ : actorV.at( "schedules" ).items() )
       {
-        auto& phaseV = phaseJ.value();
-        const auto id = phaseV.at( "id" ).get< uint32_t >();
-        const auto& phaseName = phaseV.at( "name" ).get< std::string >();
-        const auto& timepointsJ = phaseV.at( "timepoints" );
-        const auto& description = phaseV.at( "description" ).get< std::string >();
+        auto& scheduleV = scheduleJ.value();
+        const auto id = scheduleV.at( "id" ).get< uint32_t >();
+        const auto& scheduleName = scheduleV.at( "name" ).get< std::string >();
+        const auto& timepointsJ = scheduleV.at( "timepoints" );
+        const auto& description = scheduleV.at( "description" ).get< std::string >();
 
-        Phase phase;
-        phase.m_name = phaseName;
-        phase.m_description = description;
+        Schedule schedule;
+        schedule.m_name = scheduleName;
+        schedule.m_description = description;
+
+        uint64_t timepointOffset = 0;
         for( const auto& timepointJ : timepointsJ.items() )
         {
-          auto timepointV = timepointJ.value();
+          auto& timepointV = timepointJ.value();
           Timepoint timepoint;
           timepoint.from_json( timepointV, actorNameMap, actor.m_layoutId );
 
-          phase.m_timepoints.push_back( timepoint );
+          schedule.m_timepoints.push_back( timepoint );
         }
 
-        if( phaseNameMap.find( phaseName ) != phaseNameMap.end() )
-          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - duplicate phase by name: {}" ), phaseName ) );
+        if( scheduleNameMap.find( scheduleName ) != scheduleNameMap.end() )
+          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - duplicate schedule by name: {}" ), scheduleName ) );
 
-        phaseNameMap.emplace( std::make_pair( phaseName, phase ) );
+        scheduleNameMap.emplace( std::make_pair( scheduleName, schedule ) );
       }
-      actorNamePhaseMap[ actorName ] = phaseNameMap;
+      actorNameSchedMap[ actorName ] = scheduleNameMap;
     }
 
     // build the condition list
     for( const auto& pcJ : json.at( "conditions" ).items() )
     {
-      auto& pcV = pcJ.value();
-      auto conditionName = pcV.at( "condition" ).get< std::string >();
-      auto phaseRef = pcV.at( "targetPhase" ).get< std::string >();
-      auto actorRef = pcV.at( "targetActor" ).get< std::string >();
+      auto& scV = pcJ.value();
+      auto conditionName = scV.at( "condition" ).get< std::string >();
+      auto scheduleRef = scV.at( "targetSchedule" ).get< std::string >();
+      auto actorRef = scV.at( "targetActor" ).get< std::string >();
       
       ConditionType condition;
 
@@ -224,24 +226,24 @@ namespace Sapphire
       // make sure the actor we're referencing exists
       if( auto actorIt = actorNameMap.find( actorRef ); actorIt != actorNameMap.end() )
       {
-        auto& phaseNameMap = actorNamePhaseMap[ actorRef ];
+        auto& scheduleNameMap = actorNameSchedMap[ actorRef ];
 
         TimelineActor& actor = actorIt->second;
 
-        // make sure phase we're referencing exists
-        if( auto phaseIt = phaseNameMap.find( phaseRef ); phaseIt != phaseNameMap.end() )
+        // make sure schedule we're referencing exists
+        if( auto scheduleIt = scheduleNameMap.find( scheduleRef ); scheduleIt != scheduleNameMap.end() )
         {
-          Phase& phase = phaseIt->second;
+          Schedule& schedule = scheduleIt->second;
 
           // build the condition
-          PhaseConditionPtr pCondition = nullptr;
+          ScheduleConditionPtr pCondition = nullptr;
           switch( condition )
           {
             case ConditionType::HpPctLessThan:
             case ConditionType::HpPctBetween:
             {
               pCondition = std::make_shared< ConditionHp >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( scV, schedule, condition, actorNameMap );
             }
             break;
             case ConditionType::DirectorVarEquals:
@@ -252,31 +254,31 @@ namespace Sapphire
             case ConditionType::DirectorSeqGreaterThan:
             {
               pCondition = std::make_shared< ConditionDirectorVar >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( scV, schedule, condition, actorNameMap );
             }
             break;
             case ConditionType::EncounterTimeElapsed:
             {
               pCondition = std::make_shared< ConditionEncounterTimeElapsed >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( scV, schedule, condition, actorNameMap );
             }
             break;
             case ConditionType::CombatState:
             {
               pCondition = std::make_shared< ConditionCombatState >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( scV, schedule, condition, actorNameMap );
             }
             break;
             case ConditionType::GetAction:
             {
               pCondition = std::make_shared< ConditionGetAction >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( scV, schedule, condition, actorNameMap );
             }
             break;
-            case ConditionType::PhaseActive:
+            case ConditionType::ScheduleActive:
             {
-              pCondition = std::make_shared< ConditionPhaseActive >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition = std::make_shared< ConditionScheduleActive >();
+              pCondition->from_json( scV, schedule, condition, actorNameMap );
             }
             break;
             default:
@@ -287,7 +289,7 @@ namespace Sapphire
       }
       else
       {
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - no state found by name: {}" ), phaseRef ) );
+        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - no state found by name: {}" ), scheduleRef ) );
       }
     }
 
@@ -326,7 +328,7 @@ namespace Sapphire
       { "bnpcHasFlags",             ConditionType::BNpcHasFlags },
 
       { "getAction",                ConditionType::GetAction },
-      { "phaseActive",              ConditionType::PhaseActive }
+      { "scheduleActive",           ConditionType::ScheduleActive }
     };
 
     auto pack = std::make_shared< TimelinePack >();
@@ -340,7 +342,7 @@ namespace Sapphire
     auto json = nlohmann::json::parse( f );
 
     std::unordered_map< std::string, TimelineActor > actorNameMap;
-    std::unordered_map< std::string, std::map< std::string, Phase > > actorNamePhaseMap;
+    std::unordered_map< std::string, std::map< std::string, Schedule > > actorNameScheduleMap;
 
     for( const auto& selectorJ : json.at( "selectors" ).items() )
     {
@@ -374,23 +376,23 @@ namespace Sapphire
     for( const auto& actorJ : json.at( "actors" ).items() )
     {
       // < actorName, < phasename, phase > >
-      std::map< std::string, Phase > phaseNameMap;
+      std::map< std::string, Schedule > scheduleNameMap;
 
       auto actorV = actorJ.value();
       std::string actorName = actorV.at( "name" );
 
       TimelineActor& actor = actorNameMap[ actorName ];
       // todo: are phases linked by actor, or global in the json
-      for( const auto& phaseJ : actorV.at( "phases" ).items() )
+      for( const auto& scheduleJ : actorV.at( "schedules" ).items() )
       {
-        auto& phaseV = phaseJ.value();
-        const auto id = phaseV.at( "id" ).get< uint32_t >();
-        const auto& phaseName = phaseV.at( "name" ).get< std::string >();
-        const auto& timepointsJ = phaseV.at( "timepoints" );
-        const auto& description = phaseV.at( "description" ).get< std::string >();
+        auto& scheduleV = scheduleJ.value();
+        const auto id = scheduleV.at( "id" ).get< uint32_t >();
+        const auto& scheduleName = scheduleV.at( "name" ).get< std::string >();
+        const auto& timepointsJ = scheduleV.at( "timepoints" );
+        const auto& description = scheduleV.at( "description" ).get< std::string >();
 
-        Phase phase;
-        phase.m_name = phaseName;
+        Schedule phase;
+        phase.m_name = scheduleName;
         phase.m_description = description;
         for( const auto& timepointJ : timepointsJ.items() )
         {
@@ -401,12 +403,12 @@ namespace Sapphire
           phase.m_timepoints.push_back( timepoint );
         }
 
-        if( phaseNameMap.find( phaseName ) != phaseNameMap.end() )
-          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - duplicate phase by name: {}" ), phaseName ) );
+        if( scheduleNameMap.find( scheduleName ) != scheduleNameMap.end() )
+          throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - duplicate phase by name: {}" ), scheduleName ) );
 
-        phaseNameMap.emplace( std::make_pair( phaseName, phase ) );
+        scheduleNameMap.emplace( std::make_pair( scheduleName, phase ) );
       }
-      actorNamePhaseMap[ actorName ] = phaseNameMap;
+      actorNameScheduleMap[ actorName ] = scheduleNameMap;
     }
 
     // build the condition list
@@ -414,7 +416,7 @@ namespace Sapphire
     {
       auto& pcV = pcJ.value();
       auto conditionName = pcV.at( "condition" ).get< std::string >();
-      auto phaseRef = pcV.at( "targetPhase" ).get< std::string >();
+      auto scheduleRef = pcV.at( "targetSchedule" ).get< std::string >();
       auto actorRef = pcV.at( "targetActor" ).get< std::string >();
 
       ConditionType condition;
@@ -428,24 +430,24 @@ namespace Sapphire
       // make sure the actor we're referencing exists
       if( auto actorIt = actorNameMap.find( actorRef ); actorIt != actorNameMap.end() )
       {
-        auto& phaseNameMap = actorNamePhaseMap[ actorRef ];
+        auto& scheduleNameMap = actorNameScheduleMap[ actorRef ];
 
         TimelineActor& actor = actorIt->second;
 
         // make sure phase we're referencing exists
-        if( auto phaseIt = phaseNameMap.find( phaseRef ); phaseIt != phaseNameMap.end() )
+        if( auto scheduleIt = scheduleNameMap.find( scheduleRef ); scheduleIt != scheduleNameMap.end() )
         {
-          Phase& phase = phaseIt->second;
+          Schedule& schedule = scheduleIt->second;
 
           // build the condition
-          PhaseConditionPtr pCondition = nullptr;
+          ScheduleConditionPtr pCondition = nullptr;
           switch( condition )
           {
             case ConditionType::HpPctLessThan:
             case ConditionType::HpPctBetween:
             {
               pCondition = std::make_shared< ConditionHp >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( pcV, schedule, condition, actorNameMap );
             }
               break;
             case ConditionType::DirectorVarEquals:
@@ -456,31 +458,32 @@ namespace Sapphire
             case ConditionType::DirectorSeqGreaterThan:
             {
               pCondition = std::make_shared< ConditionDirectorVar >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( pcV, schedule, condition, actorNameMap );
+
             }
               break;
             case ConditionType::EncounterTimeElapsed:
             {
               pCondition = std::make_shared< ConditionEncounterTimeElapsed >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( pcV, schedule, condition, actorNameMap );
             }
               break;
             case ConditionType::CombatState:
             {
               pCondition = std::make_shared< ConditionCombatState >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( pcV, schedule, condition, actorNameMap );
             }
               break;
             case ConditionType::GetAction:
             {
               pCondition = std::make_shared< ConditionGetAction >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition->from_json( pcV, schedule, condition, actorNameMap );
             }
               break;
-            case ConditionType::PhaseActive:
+            case ConditionType::ScheduleActive:
             {
-              pCondition = std::make_shared< ConditionPhaseActive >();
-              pCondition->from_json( pcV, phase, condition, actorNameMap );
+              pCondition = std::make_shared< ConditionScheduleActive >();
+              pCondition->from_json( pcV, schedule, condition, actorNameMap );
             }
               break;
             default:
@@ -491,7 +494,7 @@ namespace Sapphire
       }
       else
       {
-        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - no state found by name: {}" ), phaseRef ) );
+        throw std::runtime_error( fmt::format( std::string( "EncounterTimeline::getEncounterPack - no state found by name: {}" ), scheduleRef ) );
       }
     }
 
@@ -576,11 +579,11 @@ namespace Sapphire
       actor.update( m_pEncounter, *this, now );
   }
 
-  bool TimelinePack::isPhaseActive( const std::string& actorName, const std::string& phaseName )
+  bool TimelinePack::isScheduleActive( const std::string& actorName, const std::string& scheduleName )
   {
     for( const auto& actor : m_timelineActors )
       if( actor.getName() == actorName )
-        return actor.isPhaseActive( phaseName );
+        return actor.isScheduleActive( scheduleName );
     return false;
   }
 

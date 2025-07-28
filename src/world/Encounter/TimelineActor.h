@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "PhaseCondition.h"
+#include "ScheduleCondition.h"
 #include "TimelineActorState.h"
 
 namespace Sapphire
@@ -16,7 +16,7 @@ namespace Sapphire
   class TimelineActor
   {
   protected:
-    std::unordered_map< uint32_t, PhaseConditionPtr > m_phaseConditions;
+    std::unordered_map< uint32_t, ScheduleConditionPtr > m_scheduleConditions;
     std::unordered_map< uint32_t, ConditionState > m_conditionStates;
 
     // PARENTNAME_SUBACTOR_1, ..., PARENTNAME_SUBACTOR_69
@@ -32,14 +32,14 @@ namespace Sapphire
       m_layoutId( rhs.m_layoutId ),
       m_hp( rhs.m_hp ),
       m_name( rhs.m_name ),
-      m_phaseConditions( rhs.m_phaseConditions )
+      m_scheduleConditions( rhs.m_scheduleConditions )
     {
       // yeah
       for( const auto& subActor : rhs.m_subActors )
         m_subActors.emplace( std::make_pair( subActor.first, nullptr ) );
 
       m_conditionStates = rhs.m_conditionStates;
-      for( const auto& state : rhs.m_phaseConditions )
+      for( const auto& state : rhs.m_scheduleConditions )
         state.second->reset( m_conditionStates[ state.first ], true );
     }
 
@@ -47,9 +47,9 @@ namespace Sapphire
 
     uint32_t getLayoutId() const;
 
-    bool isPhaseActive( const std::string& name ) const;
+    bool isScheduleActive( const std::string& name ) const;
 
-    void addPhaseCondition( PhaseConditionPtr pCondition );
+    void addPhaseCondition( ScheduleConditionPtr pCondition );
 
     // todo: make this sane
     void update( EncounterPtr pEncounter, TimelinePack& pack, uint64_t time );

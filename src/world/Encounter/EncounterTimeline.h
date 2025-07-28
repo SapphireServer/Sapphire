@@ -80,7 +80,7 @@ namespace Sapphire
 
     void update( uint64_t time );
 
-    bool isPhaseActive( const std::string& actorRef, const std::string& phaseName );
+    bool isScheduleActive( const std::string& actorRef, const std::string& scheduleName );
 
     void resetConditionState( uint32_t id, bool toDefault = false );
 
