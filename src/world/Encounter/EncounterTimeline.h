@@ -21,7 +21,7 @@
 #include "Selector.h"
 #include "Forwards.h"
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   enum class TimelinePackType : uint32_t
   {
@@ -33,19 +33,20 @@ namespace Sapphire::Encounter
   class TimelinePack
   {
     TimelinePackType m_type{ TimelinePackType::EncounterFight };
-    std::vector< TimelineActor > m_actors;
+    std::vector< TimelineActor > m_timelineActors;
     std::string m_name;
 
     std::unordered_map< std::string, Selector > m_selectors;
     
     uint64_t m_startTime{ 0 };
+    std::shared_ptr< Encounter > m_pEncounter;
 
   public:
     TimelinePack() {}
     TimelinePack( const TimelinePack& rhs ) :
       m_type( rhs.m_type ),
       m_name( rhs.m_name ),
-      m_actors( rhs.m_actors ),
+      m_timelineActors( rhs.m_timelineActors ),
       m_selectors( rhs.m_selectors ),
       m_startTime( 0 )
     {
@@ -69,18 +70,15 @@ namespace Sapphire::Encounter
     void addTimelineActor( const TimelineActor& actor );
 
     // get bnpc by internal timeline name
-    Entity::BNpcPtr getBNpcByRef( const std::string& name, TerritoryPtr pTeri );
+    Entity::BNpcPtr getBNpcByRef( const std::string& name, EncounterPtr pEncounter );
 
-    void reset( TerritoryPtr pTeri );
+    void reset( EncounterPtr pEncounter );
 
     void setStartTime( uint64_t time );
 
     uint64_t getStartTime() const;
 
-    void update( TerritoryPtr pTeri, uint64_t time );
-
-    // todo: probably just make this a Timepoint in an InitPhase
-    void spawnSubActors( TerritoryPtr pTeri );
+    void update( uint64_t time );
 
     bool isScheduleActive( const std::string& actorRef, const std::string& scheduleName );
 
@@ -89,12 +87,15 @@ namespace Sapphire::Encounter
     void setConditionStateEnabled( uint32_t id, bool enabled );
 
     bool valid();
+
+    void setEncounter( std::shared_ptr< Encounter > pEncounter );
   };
 
   class EncounterTimeline
   {
   public:
 
+    static std::shared_ptr< TimelinePack > createTimelinePack( const std::string& name );
     static TimelinePack getEncounterPack( const std::string& name, bool reload = false );
   };
 }// namespace Sapphire

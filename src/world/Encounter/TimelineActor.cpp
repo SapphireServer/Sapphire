@@ -10,7 +10,7 @@
 
 #include <Territory/Territory.h>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   const std::string& TimelineActor::getName() const
   {
@@ -43,7 +43,7 @@ namespace Sapphire::Encounter
 
   // todo: make this sane
 
-  void TimelineActor::update( TerritoryPtr pTeri, TimelinePack& pack, uint64_t time )
+  void TimelineActor::update(  EncounterPtr pEncounter, TimelinePack& pack, uint64_t time )
   {
     // todo: handle interrupts
     for( const auto& condition : m_scheduleConditions )
@@ -64,15 +64,15 @@ namespace Sapphire::Encounter
         }
       }
       // update or execute
-      else if( pCondition->isConditionMet( state, pack, pTeri, time ) )
+      else if( pCondition->isConditionMet( state, pack, pEncounter, time ) )
       {
         if( pCondition->inProgress( state ) )
         {
-          pCondition->update( state, *this, pack, pTeri, time );
+          pCondition->update( state, *this, pack, pEncounter, time );
         }
         else
         {
-          pCondition->execute( state, *this, pack, pTeri, time );
+          pCondition->execute( state, *this, pack, pEncounter, time );
 
           if( pack.getStartTime() == 0 )
             pack.setStartTime( state.m_startTime );

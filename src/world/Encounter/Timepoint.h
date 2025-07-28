@@ -11,7 +11,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   enum class TimepointDataType : uint32_t
   {
@@ -334,7 +334,7 @@ namespace Sapphire::Encounter
 
     void from_json( const nlohmann::json& json, const std::unordered_map< std::string, TimelineActor >& actors, uint32_t selfLayoutId );
     // todo: separate execute/update into onStart and onTick?
-    bool update( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
-    bool execute( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const;
+    bool update( TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const;
+    bool execute( TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const;
   };
 }// namespace Sapphire::Encounter

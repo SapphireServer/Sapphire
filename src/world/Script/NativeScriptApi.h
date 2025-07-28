@@ -10,6 +10,7 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Exd/ExdData.h"
+#include "Territory/InstanceContent.h"
 #include "Territory/InstanceObjectCache.h"
 #include "Service.h"
 
@@ -359,6 +360,10 @@ namespace Sapphire::ScriptAPI
     virtual void onTalk( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId, uint64_t actorId );
 
     virtual void onUpdate( Sapphire::InstanceContent& instance, uint64_t tickCount );
+
+    virtual void onStateChange( Sapphire::InstanceContent& instance,
+                                Sapphire::InstanceContentState oldState,
+                                Sapphire::InstanceContentState newState );
 
     virtual void onEnterTerritory( Sapphire::InstanceContent& instance, Sapphire::Entity::Player& player, uint32_t eventId,
                                    uint16_t param1, uint16_t param2 );

@@ -1,6 +1,7 @@
 #include "Timepoint.h"
 #include "TimelineActor.h"
 #include "EncounterTimeline.h"
+#include "Encounter.h"
 
 #include <Action/Action.h>
 
@@ -22,7 +23,7 @@
 #include <Network/CommonActorControl.h>
 #include <Network/Util/PacketUtil.h>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   const TimepointDataPtr Timepoint::getData() const
   {
@@ -264,7 +265,7 @@ namespace Sapphire::Encounter
         auto& dataJ = json.at( "data" );
         auto actorRef = dataJ.at( "despawnActor" ).get< std::string >();
 
-        uint32_t layoutId = 0xE0000000;
+        uint32_t layoutId = Common::INVALID_GAME_OBJECT_ID;
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
@@ -285,7 +286,7 @@ namespace Sapphire::Encounter
 
         // todo: hateSrc
 
-        uint32_t layoutId = 0xE0000000;
+        uint32_t layoutId = Common::INVALID_GAME_OBJECT_ID;
         if( auto it = actors.find( actorRef ); it != actors.end() )
           layoutId = it->second.m_layoutId;
         else
@@ -354,10 +355,11 @@ namespace Sapphire::Encounter
     }
   }
 
-  bool Timepoint::execute( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool Timepoint::execute( TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    if( update( self, pack, pTeri, time ) )
+    if( update( self, pack, pEncounter, time ) )
     {
+      auto pTeri = pEncounter->getTeriPtr();
       const auto& players = pTeri->getPlayers();
       // send debug msg
       if( !m_description.empty() )
@@ -373,8 +375,9 @@ namespace Sapphire::Encounter
     return false;
   }
 
-  bool Timepoint::update( TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool Timepoint::update( TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
+    auto pTeri = pEncounter->getTeriPtr();
     // todo: separate execute and update?
     switch( m_type )
     {
@@ -386,7 +389,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::CastAction:
       {
         auto pActionData = std::dynamic_pointer_cast< TimepointDataAction, TimepointData >( m_pData );
-        auto pBNpc = pack.getBNpcByRef( pActionData->m_sourceRef, pTeri );
+        auto pBNpc = pack.getBNpcByRef( pActionData->m_sourceRef, pEncounter );
         // todo: filter the correct target
         // todo: tie to mechanic script?
         // todo: mechanic should probably just be an Action::onTick, with instance/director passed to it
@@ -396,7 +399,7 @@ namespace Sapphire::Encounter
           switch( pActionData->m_targetType )
           {
             case ActionTargetType::None:
-              targetId = 0xE0000000;
+              targetId = Common::INVALID_GAME_OBJECT_ID;
               break;
             case ActionTargetType::Target:
               targetId = static_cast< uint32_t >( pBNpc->getTargetId() );
@@ -423,14 +426,6 @@ namespace Sapphire::Encounter
             actionMgr.handleTargetedAction( *pBNpc, pActionData->m_actionId, targetId, pTeri->getNextActionResultId() );
             //actionMgr.handlePlacedAction( *pBNpc, pActionData->m_actionId, pBNpc->getPos(), pTeri->getNextActionResultId() );
           }
-          // todo: this really shouldnt exist, but need to figure out why actions interrupt
-          else if( pAction->getId() == pActionData->m_actionId )
-          {
-       //     pAction->setInterrupted( Common::ActionInterruptType::RegularInterrupt );
-       //     pAction->interrupt();
-       //     pBNpc->setCurrentAction( nullptr );
-       //     return false;
-          }
           else
           {
             return false;
@@ -441,7 +436,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::SetPos:
       {
         auto pSetPosData = std::dynamic_pointer_cast< TimepointDataSetPos, TimepointData >( m_pData );
-        auto pBNpc = pack.getBNpcByRef( pSetPosData->m_actorRef, pTeri );
+        auto pBNpc = pack.getBNpcByRef( pSetPosData->m_actorRef, pEncounter );
 
         if( pBNpc )
         {
@@ -503,7 +498,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::ActionTimeline:
       {
         auto pActionTimelineData = std::dynamic_pointer_cast< TimepointDataActionTimeLine, TimepointData >( m_pData );
-        auto pBNpc = pack.getBNpcByRef( pActionTimelineData->m_actorRef, pTeri );
+        auto pBNpc = pack.getBNpcByRef( pActionTimelineData->m_actorRef, pEncounter );
         auto action = pActionTimelineData->m_actionId;
 
         if( pBNpc )
@@ -568,11 +563,11 @@ namespace Sapphire::Encounter
         auto pBtData = std::dynamic_pointer_cast< TimepointDataBattleTalk, TimepointData >( m_pData );
         auto params = pBtData->m_params;
 
-        auto pHandler = pack.getBNpcByRef( pBtData->m_handlerRef , pTeri );
-        auto pTalker = pack.getBNpcByRef( pBtData->m_talkerRef, pTeri );
+        auto pHandler = pack.getBNpcByRef( pBtData->m_handlerRef, pEncounter );
+        auto pTalker = pack.getBNpcByRef( pBtData->m_talkerRef, pEncounter );
 
-        auto handlerId = pHandler ? pHandler->getId() : 0xE0000000;
-        auto talkerId = pTalker ? pTalker->getId() : 0xE0000000;
+        auto handlerId = pHandler ? pHandler->getId() : Common::INVALID_GAME_OBJECT_ID;
+        auto talkerId = pTalker ? pTalker->getId() : Common::INVALID_GAME_OBJECT_ID;
 
         // todo: use Actrl EventBattleDialog = 0x39C maybe?,
         auto& playerMgr = Common::Service< Sapphire::World::Manager::PlayerMgr >::ref();
@@ -592,7 +587,7 @@ namespace Sapphire::Encounter
           auto& pPlayer = player.second;
           if( pPlayer )
             playerMgr.sendBattleTalk( *pPlayer.get(), pBtData->m_battleTalkId, handlerId,
-                                      pBtData->m_kind, pBtData->m_nameId, talkerId, pBtData->m_length,
+                                      pBtData->m_kind, pBtData->m_nameId, talkerId, static_cast< uint32_t >( pBtData->m_length ),
                                       params[ 0 ], params[ 1 ], params[ 2 ], params[ 3 ],
                                       params[ 4 ], params[ 5 ], params[ 6 ], params[ 7 ] );
         }
@@ -712,9 +707,6 @@ namespace Sapphire::Encounter
 
         if( pBNpc )
         {
-          for( const auto& player : pTeri->getPlayers() )
-            pBNpc->despawn( player.second );
-
           pTeri->removeActor( pBNpc );
         }
       }
@@ -734,6 +726,7 @@ namespace Sapphire::Encounter
           pBNpc->init();
 
           pTeri->pushActor( pBNpc );
+
         }
       }
       break;
@@ -795,7 +788,7 @@ namespace Sapphire::Encounter
       case TimepointDataType::Snapshot:
       {
         auto pSnapshotData = std::dynamic_pointer_cast< TimepointDataSnapshot, TimepointData >( m_pData );
-        auto pBNpc = pack.getBNpcByRef( pSnapshotData->m_actorRef, pTeri );
+        auto pBNpc = pack.getBNpcByRef( pSnapshotData->m_actorRef, pEncounter );
 
         if( pBNpc )
         {

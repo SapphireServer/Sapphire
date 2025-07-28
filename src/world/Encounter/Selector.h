@@ -5,7 +5,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   class Selector
   {

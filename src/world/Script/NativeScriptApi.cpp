@@ -253,6 +253,12 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void InstanceContentScript::onStateChange( InstanceContent& instance,
+                                             InstanceContentState oldState,
+                                             InstanceContentState newState )
+  {
+  }
+
   void InstanceContentScript::onEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId,
                                                 uint16_t param1, uint16_t param2 )
   {

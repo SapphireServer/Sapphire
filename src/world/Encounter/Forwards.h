@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   class Selector;
   class TimelineActor;
@@ -10,7 +10,9 @@ namespace Sapphire::Encounter
   class ScheduleCondition;
   class Timepoint;
 
+  class Encounter;
   class TimelinePack;
 
   using ScheduleConditionPtr = std::shared_ptr< ScheduleCondition >;
+  using EncounterPtr = std::shared_ptr< Encounter >;
 }
