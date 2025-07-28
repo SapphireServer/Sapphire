@@ -28,7 +28,7 @@
 #include "InstanceContent.h"
 #include "InstanceObjectCache.h"
 
-#include <Encounter/EncounterFight.h>
+#include <Encounter/Encounter.h>
 #include <Task/MoveTerritoryTask.h>
 
 
@@ -50,7 +50,7 @@ Sapphire::InstanceContent::InstanceContent( std::shared_ptr< Excel::ExcelStruct<
   m_instanceConfiguration( pInstanceConfiguration ),
   m_contentFinderCondition( pContentFinderCondition ),
   m_instanceContentId( instanceContentId ),
-  m_state( Created ),
+  m_state( InstanceContentState::Created ),
   m_pEntranceEObj( nullptr ),
   m_instanceCommenceTime( 0 ),
   m_voteState( false ),
@@ -122,12 +122,12 @@ void Sapphire::InstanceContent::onLeaveTerritory( Entity::Player& player )
   scriptMgr.onInstanceLeaveTerritory( *this, player );
 }
 
-void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
+void Sapphire::InstanceContent::updateState( uint64_t tickCount )
 {
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   switch( m_state )
   {
-    case Created:
+    case InstanceContentState::Created:
     {
       if( !getInstancePlayerCount() )
         return;
@@ -146,7 +146,7 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
         auto pPlayer = it->second;
         if( !pPlayer->isLoadingComplete() ||
             !pPlayer->isDirectorInitialized() ||
-                pPlayer->hasCondition( PlayerCondition::WatchingCutscene ) )
+            pPlayer->hasCondition( PlayerCondition::WatchingCutscene ) )
           return;
       }
 
@@ -163,20 +163,20 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
       if( m_pEntranceEObj )
         m_pEntranceEObj->setPermissionInvisibility( 1 );
-      m_state = DutyInProgress;
+      m_state = InstanceContentState::DutyInProgress;
 
       break;
     }
 
 
-    case DutyReset:
+    case InstanceContentState::DutyReset:
     {
       // todo: revive players if trial/enclosed raid arena, add reset timer
       if( m_instanceResetTime == 0 )
       {
         sendDutyReset();
         m_instanceResetTime = tickCount + 3000;
-        
+
         return;
       }
       else if( tickCount < m_instanceResetTime )
@@ -233,15 +233,15 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
       m_pEntranceEObj->setPermissionInvisibility( 1 );
       sendForward();
-      
-      m_state = DutyInProgress;
+
+      m_state = InstanceContentState::DutyInProgress;
 
       m_instanceResetTime = 0;
       m_instanceResetFinishTime = 0;
       break;
     }
 
-    case DutyInProgress:
+    case InstanceContentState::DutyInProgress:
     {
       // remove 15min timelock to kick & abandon
       if( ( m_instanceCommenceTime + 900000 < tickCount ) && !getVoteState() )
@@ -255,16 +255,32 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
 
       updateBNpcs( tickCount );
 
-      if( m_pEncounter->getStatus() == EncounterFightStatus::FAIL )
-        m_state = DutyReset;
+      if( m_pEncounter->getStatus() == EncounterStatus::FAIL )
+        m_state = InstanceContentState::DutyReset;
+
+      if( m_pEncounter->getStatus() == EncounterStatus::SUCCESS )
+        m_state = InstanceContentState::DutyFinished;
+
       break;
     }
 
 
-    case DutyFinished:
+    case InstanceContentState::DutyFinished:
     {
       if( !getInstancePlayerCount() )
         m_instanceTerminate = true;
+
+      if( m_instanceResetTime == 0 )
+      {
+        sendDutyComplete();
+        m_instanceResetTime = tickCount + 3000;
+        if( m_pEncounter )
+        {
+          m_pEncounter->removeBNpcs();
+        }
+
+        return;
+      }
 
       break;
     }
@@ -290,10 +306,25 @@ void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
       return;
     }
   }
+}
+
+
+void Sapphire::InstanceContent::onUpdate( uint64_t tickCount )
+{
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+
+  auto oldState = m_state;
+  updateState( tickCount );
+
+  if( oldState != m_state )
+  {
+    scriptMgr.onInstanceStateChange( *this, oldState, m_state );
+  }
 
   scriptMgr.onInstanceUpdate( *this, tickCount );
 
-  m_pEncounter->update( tickCount );
+  if( m_pEncounter )
+    m_pEncounter->update( tickCount );
 
   m_lastUpdate = tickCount;
 }
@@ -540,7 +571,7 @@ bool Sapphire::InstanceContent::hasPlayerPreviouslySpawned( Entity::Player& play
   return it != m_spawnedPlayers.end();
 }
 
-Sapphire::InstanceContent::InstanceContentState Sapphire::InstanceContent::getState() const
+Sapphire::InstanceContentState Sapphire::InstanceContent::getState() const
 {
   return m_state;
 }
@@ -798,12 +829,13 @@ std::set< uint32_t > Sapphire::InstanceContent::getSpawnedPlayerIds() const
   return m_spawnedPlayers;
 }
 
-void Sapphire::InstanceContent::setEncounter( Sapphire::EncounterFightPtr pEncounter )
+void Sapphire::InstanceContent::setEncounter( Sapphire::EncounterPtr pEncounter )
 {
   m_pEncounter = pEncounter;
 }
 
-Sapphire::EncounterFightPtr Sapphire::InstanceContent::getEncounter()
+Sapphire::EncounterPtr Sapphire::InstanceContent::getEncounter()
 {
   return m_pEncounter;
 }
+

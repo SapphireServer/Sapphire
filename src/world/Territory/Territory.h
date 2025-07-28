@@ -77,7 +77,7 @@ namespace Sapphire
 
     float m_inRangeDistance;
 
-    Encounter::TimelinePack m_timelinePack;
+    TimelinePack m_timelinePack;
 
   public:
     Territory();
@@ -203,9 +203,6 @@ namespace Sapphire
     uint32_t getNextActionResultId();
 
     std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
-
-    void setEncounterTimeline( const std::string& name );
-    Encounter::TimelinePack& getEncounterTimeline();
   };
 
 }

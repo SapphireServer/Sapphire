@@ -5,7 +5,7 @@
 #include "PhaseCondition.h"
 #include "TimelineActorState.h"
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
   enum class TimelineActorType : uint32_t
   {
@@ -52,7 +52,7 @@ namespace Sapphire::Encounter
     void addPhaseCondition( PhaseConditionPtr pCondition );
 
     // todo: make this sane
-    void update( TerritoryPtr pTeri, TimelinePack& pack, uint64_t time );
+    void update( EncounterPtr pEncounter, TimelinePack& pack, uint64_t time );
 
     bool resetConditionState( uint32_t conditionId, bool toDefault = false );
 

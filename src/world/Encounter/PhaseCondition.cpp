@@ -1,5 +1,6 @@
 #include "PhaseCondition.h"
 
+#include "Encounter.h"
 #include "EncounterTimeline.h"
 #include "TimelineActor.h"
 #include "TimelineActorState.h"
@@ -14,11 +15,12 @@
 #include <Territory/InstanceContent.h>
 #include <Territory/QuestBattle.h>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
-  bool ConditionHp::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionHp::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    auto pBNpc = pTeri->getActiveBNpcByLayoutId( layoutId );
+    auto pTeri = pEncounter->getTeriPtr();
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
     if( !pBNpc )
       return false;
 
@@ -27,19 +29,19 @@ namespace Sapphire::Encounter
     switch( m_conditionType )
     {
       case ConditionType::HpPctLessThan:
-        return pBNpc->getHpPercent() < hp.val;
+        return pBNpc->getHpPercent() < m_hp.val;
       case ConditionType::HpPctBetween:
       {
         auto hpPct = pBNpc->getHpPercent();
-        return hpPct > hp.min && hpPct < hp.max;
+        return hpPct > m_hp.min && hpPct < m_hp.max;
       }
     }
     return false;
   };
 
-  bool ConditionDirectorVar::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionDirectorVar::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-
+    auto pTeri = pEncounter->getTeriPtr();
     Event::DirectorPtr pDirector = pTeri->getAsInstanceContent();
     if( pDirector == nullptr )
       pDirector = pTeri->getAsQuestBattle();
@@ -47,30 +49,31 @@ namespace Sapphire::Encounter
     switch( m_conditionType )
     {
       case ConditionType::DirectorVarEquals:
-        return pDirector->getDirectorVar( param.index ) == param.value;
+        return pDirector->getDirectorVar( m_param.index ) == m_param.value;
       case ConditionType::DirectorVarGreaterThan:
-        return pDirector->getDirectorVar( param.index ) > param.value;
+        return pDirector->getDirectorVar( m_param.index ) > m_param.value;
       case ConditionType::DirectorFlagsEquals:
-        return pDirector->getFlags() == param.flags;
+        return pDirector->getFlags() == m_param.flags;
       case ConditionType::DirectorFlagsGreaterThan:
-        return pDirector->getFlags() > param.flags;
+        return pDirector->getFlags() > m_param.flags;
       case ConditionType::DirectorSeqEquals:
-        return pDirector->getSequence() == param.seq;
+        return pDirector->getSequence() == m_param.seq;
       case ConditionType::DirectorSeqGreaterThan:
-        return pDirector->getSequence() > param.seq;
+        return pDirector->getSequence() > m_param.seq;
     }
     return false;
   }
 
-  bool ConditionCombatState::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionCombatState::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
+    auto pTeri = pEncounter->getTeriPtr();
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
 
     if( !pBNpc )
       return false;
 
     // todo: these should really use callbacks when the state transitions or we could miss this tick
-    switch( combatState )
+    switch( m_combatState )
     {
       case CombatStateType::Idle:
         return pBNpc->getState() == Entity::BNpcState::Idle;
@@ -90,28 +93,30 @@ namespace Sapphire::Encounter
     return false;
   }
 
-  bool ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionEncounterTimeElapsed::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     auto elapsed = time - pack.getStartTime();
     // todo: check encounter time
-    return elapsed >= this->duration;
+    return elapsed >= m_duration;
   }
 
-  bool ConditionBNpcFlags::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionBNpcFlags::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
-    return pBNpc && pBNpc->hasFlag( this->flags );
+    auto pTeri = pEncounter->getTeriPtr();
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
+    return pBNpc && pBNpc->hasFlag( m_flags );
   }
 
-  bool ConditionGetAction::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionGetAction::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    auto pBNpc = pTeri->getActiveBNpcByLayoutId( this->layoutId );
-    return pBNpc && pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() == this->actionId;
+    auto pTeri = pEncounter->getTeriPtr();
+    auto pBNpc = pTeri->getActiveBNpcByLayoutId( m_layoutId );
+    return pBNpc && pBNpc->getCurrentAction() && pBNpc->getCurrentAction()->getId() == m_actionId;
   }
 
-  bool ConditionPhaseActive::isConditionMet( ConditionState& state, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  bool ConditionPhaseActive::isConditionMet( ConditionState& state, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
-    return pack.isPhaseActive( this->actorName, this->phaseName );
+    return pack.isPhaseActive( m_actorName, m_phaseName );
   }
 
   void ConditionHp::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
@@ -124,18 +129,18 @@ namespace Sapphire::Encounter
 
     // resolve the actor whose hp we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
-      this->layoutId = it->second.m_layoutId;
+      m_layoutId = it->second.m_layoutId;
     else
       throw std::runtime_error( fmt::format( std::string( "ConditionHp::from_json unable to find actor by name: %s" ), actorRef ) );
 
     switch( condition )
     {
       case ConditionType::HpPctLessThan:
-        this->hp.val = paramData.at( "hp" ).get< uint32_t >();
+        m_hp.val = paramData.at( "hp" ).get< uint32_t >();
         break;
       case ConditionType::HpPctBetween:
-        this->hp.min = paramData.at( "hpMin" ).get< uint32_t >(),
-        this->hp.max = paramData.at( "hpMax" ).get< uint32_t >();
+        m_hp.min = paramData.at( "hpMin" ).get< uint32_t >(),
+        m_hp.max = paramData.at( "hpMax" ).get< uint32_t >();
         break;
       default:
         break;
@@ -154,20 +159,20 @@ namespace Sapphire::Encounter
       case ConditionType::DirectorVarEquals:
       case ConditionType::DirectorVarGreaterThan:
       {
-        param.index = paramData.at( "idx" ).get< uint32_t >();
-        param.value = paramData.at( "val" ).get< uint32_t >();
+        m_param.index = paramData.at( "idx" ).get< uint32_t >();
+        m_param.value = paramData.at( "val" ).get< uint32_t >();
       }
       break;
       case ConditionType::DirectorFlagsEquals:
       case ConditionType::DirectorFlagsGreaterThan:
       {
-        param.flags = paramData.at( "flags" ).get< uint32_t >();
+        m_param.flags = paramData.at( "flags" ).get< uint32_t >();
       }
       break;
       case ConditionType::DirectorSeqEquals:
       case ConditionType::DirectorSeqGreaterThan:
       {
-        param.seq = paramData.at( "seq" ).get< uint32_t >();
+        m_param.seq = paramData.at( "seq" ).get< uint32_t >();
       }
       break;
       default:
@@ -185,11 +190,11 @@ namespace Sapphire::Encounter
 
     // resolve the actor whose name we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
-      this->layoutId = it->second.m_layoutId;
+      m_layoutId = it->second.m_layoutId;
     else
       throw std::runtime_error( fmt::format( std::string( "ConditionCombatState::from_json unable to find actor by name: %s" ), actorRef ) );
 
-    this->combatState = paramData.at( "combatState" ).get< CombatStateType >();
+    m_combatState = paramData.at( "combatState" ).get< CombatStateType >();
   }
 
   void ConditionEncounterTimeElapsed::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
@@ -200,7 +205,7 @@ namespace Sapphire::Encounter
     auto& paramData = json.at( "paramData" );
     auto duration = paramData.at( "duration" ).get< uint64_t >();
 
-    this->duration = duration;
+    m_duration = duration;
   }
 
   void ConditionBNpcFlags::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
@@ -212,11 +217,11 @@ namespace Sapphire::Encounter
 
     // resolve the actor whose name we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
-      this->layoutId = it->second.m_layoutId;
+      m_layoutId = it->second.m_layoutId;
     else
       throw std::runtime_error( fmt::format( std::string( "ConditionBNpcFlags::from_json unable to find actor by name: %s" ), actorRef ) );
 
-    this->flags = json.at( "flags" ).get< uint32_t >();
+    m_flags = json.at( "flags" ).get< uint32_t >();
     // todo: BNpcHasFlags
   }
 
@@ -231,11 +236,11 @@ namespace Sapphire::Encounter
 
     // resolve the actor whose name we are checking
     if( auto it = actors.find( actorRef ); it != actors.end() )
-      this->layoutId = it->second.m_layoutId;
+      m_layoutId = it->second.m_layoutId;
     else
       throw std::runtime_error( fmt::format( std::string( "ConditionGetAction::from_json unable to find actor by name: %s" ), actorRef ) );
 
-    this->actionId = actionId;
+    m_actionId = actionId;
   }
 
   void ConditionPhaseActive::from_json( nlohmann::json& json, Phase& phase, ConditionType condition,
@@ -247,18 +252,18 @@ namespace Sapphire::Encounter
     auto actorRef = paramData.at( "sourceActor" ).get< std::string >();
     auto phaseName = paramData.at( "phaseName" ).get< std::string >();
 
-    this->actorName = actorRef;
-    this->phaseName = phaseName;
+    m_actorName = actorRef;
+    m_phaseName = phaseName;
   }
 
   // todo: i wrote this very sleep deprived, ensure it is actually sane
 
-  void Phase::execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, TerritoryPtr pTeri, uint64_t time ) const
+  void Phase::execute( ConditionState& state, TimelineActor& self, TimelinePack& pack, EncounterPtr pEncounter, uint64_t time ) const
   {
     if( state.m_startTime == 0 )
     {
       state.m_startTime = time;
-      self.spawnAllSubActors( pTeri );
+      self.spawnAllSubActors( pEncounter->getTeriPtr() );
     }
 
     if( state.m_phaseInfo.m_startTime == 0 )
@@ -285,12 +290,12 @@ namespace Sapphire::Encounter
 
       if( timepoint.canExecute( tpState, timepointElapsed ) )
       {
-        if( timepoint.execute( tpState, self, pack, pTeri, time ) )
+        if( timepoint.execute( tpState, self, pack, pEncounter, time ) )
           state.m_phaseInfo.m_lastTimepointTime = time;
       }
       else if( !timepoint.finished( tpState, timepointElapsed ) )
       {
-        timepoint.update( tpState, self, pack, pTeri, time );
+        timepoint.update( tpState, self, pack, pEncounter, time );
       }
 
       if( timepoint.durationElapsed( timepointElapsed ) && timepoint.finished( tpState, timepointElapsed ) )
