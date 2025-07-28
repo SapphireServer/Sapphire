@@ -16,7 +16,9 @@ public:
   }
 
   static constexpr auto Potency = 60;
-  static constexpr auto Flags = 8226;
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::DebuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::CanDispel ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster );
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
