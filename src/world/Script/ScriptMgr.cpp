@@ -722,6 +722,26 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( InstanceContent& instance
   return false;
 }
 
+
+bool Sapphire::Scripting::ScriptMgr::onInstanceStateChange( Sapphire::InstanceContent& instance,
+                                                            Sapphire::InstanceContentState oldState,
+                                                            Sapphire::InstanceContentState newState )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::InstanceContentScript >( instance.getDirectorId() );
+
+  if( script )
+  {
+    script->onStateChange( instance, oldState, newState );
+
+    return true;
+  }
+
+  return false;
+}
+
+
+
+
 bool Sapphire::Scripting::ScriptMgr::onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player,
                                                                uint32_t eventId, uint16_t param1, uint16_t param2 )
 {
@@ -783,7 +803,6 @@ bool Sapphire::Scripting::ScriptMgr::onInstanceUpdate( QuestBattle& instance, ui
 
   return false;
 }
-
 
 bool Sapphire::Scripting::ScriptMgr::onDutyCommence( QuestBattle& instance, Entity::Player& player )
 {
@@ -876,3 +895,4 @@ bool Sapphire::Scripting::ScriptMgr::onSay( Sapphire::Entity::Player& player, ui
   }
   return false;
 }
+

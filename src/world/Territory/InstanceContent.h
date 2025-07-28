@@ -9,17 +9,19 @@
 
 namespace Sapphire
 {
+  enum InstanceContentState
+  {
+    Created,
+    DutyReset,
+    DutyInProgress,
+    DutyFinished,
+    Terminate
+  };
+
   class InstanceContent : public Event::Director, public Territory
   {
   public:
-    enum InstanceContentState
-    {
-      Created,
-      DutyReset,
-      DutyInProgress,
-      DutyFinished,
-      Terminate
-    };
+
 
     /*0x40000001 - INSTANCE_CONTENT_ORDER_SYSTEM_START
       0x40000002 - INSTANCE_CONTENT_ORDER_SYSTEM_CLEAR_NORMAL
@@ -125,6 +127,8 @@ namespace Sapphire
 
     void sendSharedGroup( uint32_t sharedGroupId, uint32_t timeIndex );
 
+    void updateState( uint64_t tickCount );
+
     void sendInvalidateTodoList();
 
     void sendDutyComplete();
@@ -210,8 +214,8 @@ namespace Sapphire
 
     void movePlayerToEntrance( Entity::Player& player );
 
-    void setEncounter( EncounterFightPtr pEncounter );
-    EncounterFightPtr getEncounter();
+    void setEncounter( EncounterPtr pEncounter );
+    EncounterPtr getEncounter();
   private:
     std::shared_ptr< Excel::ExcelStruct< Excel::InstanceContent > > m_instanceConfiguration;
     std::shared_ptr< Excel::ExcelStruct< Excel::ContentFinderCondition > > m_contentFinderCondition;
@@ -238,7 +242,7 @@ namespace Sapphire
     // the players which are bound to the instance, regardless of inside or offline
     std::set< uint32_t > m_boundPlayerIds;
 
-    EncounterFightPtr m_pEncounter;
+    EncounterPtr m_pEncounter;
   };
 
 }

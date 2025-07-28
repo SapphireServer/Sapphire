@@ -7,7 +7,7 @@
 
 namespace Sapphire
 {
-  using EncounterCallback = std::function< void( EncounterFightPtr, EncounterState ) >;
+  using EncounterCallback = std::function< void( EncounterPtr, EncounterState ) >;
 
   class EncounterState
   {
@@ -19,7 +19,7 @@ namespace Sapphire
   protected:
     bool m_bShouldFinish{ false };
     StateStackPtr m_stateStack;
-    std::shared_ptr< EncounterFight > m_pEncounter;
+    std::shared_ptr< Encounter > m_pEncounter;
     uint64_t m_startTime{ 0 };
     uint64_t m_currTime{ 0 };
 
@@ -28,7 +28,7 @@ namespace Sapphire
     EncounterCallback m_onFinishCb;
 
   public:
-    EncounterState( std::shared_ptr< EncounterFight > pEncounter ) :
+    EncounterState( std::shared_ptr< Encounter > pEncounter ) :
       m_pEncounter( pEncounter )
     {
     };
@@ -80,45 +80,55 @@ namespace Sapphire
     }
   };
 
-  enum class EncounterFightStatus
+  enum class EncounterStatus
   {
+    UNINITIALIZED,
     IDLE,
     ACTIVE,
     FAIL,
     SUCCESS
   };
 
-  class EncounterFight : public std::enable_shared_from_this< EncounterFight >
+  class Encounter : public std::enable_shared_from_this< Encounter >
   {
   public:
-    EncounterFight( InstanceContentPtr pInstance ) :
-      m_pInstance( pInstance )
+    Encounter( TerritoryPtr pInstance, const std::string& timelineName ) :
+            m_pTeri( pInstance ),
+            m_timelineName( timelineName ),
+            m_status( EncounterStatus::UNINITIALIZED )
     {
     };
 
-    virtual ~EncounterFight() = default;
+    virtual ~Encounter() = default;
 
     void init()
     {
-      m_status = EncounterFightStatus::IDLE;
+      m_pTimeline = EncounterTimeline::createTimelinePack( m_timelineName );
+      m_pTimeline->setEncounter( shared_from_this() );
+      m_status = EncounterStatus::IDLE;
       m_startTime = 0;
     };
 
-    virtual void start() { m_status = EncounterFightStatus::ACTIVE; };
+    virtual void start() { m_status = EncounterStatus::ACTIVE; };
     virtual void update( uint64_t currTime )
     {
-      m_pInstance->getEncounterTimeline().update( getInstance(), currTime );
+      m_pTimeline->update( currTime );
     }
 
     void reset()
     {
-      for( auto& pBNpc : m_bnpcs )
-      {
-        removeBNpc( pBNpc.first );
-        m_pInstance->removeActor( pBNpc.second );
-      }
-      m_pInstance->getEncounterTimeline().reset( getInstance() );
+      removeBNpcs();
+      m_pTimeline->reset( shared_from_this() );
       init();
+    }
+
+    void removeBNpcs()
+    {
+      for (auto it = m_bnpcs.begin(); it != m_bnpcs.end(); )
+      {
+        m_pTeri->removeActor( it->second);
+        it = m_bnpcs.erase(it);
+      }
     }
 
     void setStartTime( uint64_t startTime )
@@ -133,12 +143,12 @@ namespace Sapphire
         pState->init();
     }
 
-    EncounterFightStatus getStatus() const
+    EncounterStatus getStatus() const
     {
       return m_status;
     }
 
-    void setStatus( EncounterFightStatus status )
+    void setStatus( EncounterStatus status )
     {
       m_status = status;
     }
@@ -162,17 +172,19 @@ namespace Sapphire
       m_bnpcs.erase( layoutId );
     }
 
-    InstanceContentPtr getInstance()
+    TerritoryPtr getTeriPtr()
     {
-      return m_pInstance;
+      return m_pTeri;
     }
 
   protected:
     uint64_t m_startTime{ 0 };
+    std::string m_timelineName;
     EncounterState::StateStackPtr m_stateStack;
     std::set< Entity::PlayerPtr > m_playerList;
     std::unordered_map< uint32_t, Entity::BNpcPtr > m_bnpcs;
-    InstanceContentPtr m_pInstance;
-    EncounterFightStatus m_status{ EncounterFightStatus::IDLE };
+    TerritoryPtr m_pTeri;
+    EncounterStatus m_status{ EncounterStatus::IDLE };
+    std::shared_ptr< TimelinePack > m_pTimeline;
   };
 }

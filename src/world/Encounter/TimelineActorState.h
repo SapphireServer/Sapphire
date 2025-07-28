@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace Sapphire::Encounter
+namespace Sapphire
 {
 struct TimepointState
 {
