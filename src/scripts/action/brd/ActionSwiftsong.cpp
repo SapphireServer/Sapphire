@@ -15,6 +15,9 @@ public:
   {
   }
 
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();
@@ -27,7 +30,7 @@ public:
     if( pSource->hasStatusEffect( SwiftsongAura ) )
       pSource->removeSingleStatusEffectById( SwiftsongAura );
     else
-      pActionBuilder->applyStatusEffectSelf( SwiftsongAura, 0, 20, {}, 5, false );
+      pActionBuilder->applyStatusEffectSelf( SwiftsongAura, 0, 20, {}, Flags, false );
   }
 };
 

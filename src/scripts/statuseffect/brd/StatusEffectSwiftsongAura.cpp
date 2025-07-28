@@ -24,6 +24,9 @@ public:
   {
   }
 
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
     if (!actor.isAlive())
@@ -71,7 +74,7 @@ public:
           else
           {
             auto effect = Sapphire::StatusEffect::make_StatusEffect( SwiftsongStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( 5 );
+            effect->setFlag( Flags );
             effect->setParam( 20 );
             targetChara->addStatusEffect( effect );
             Network::Util::Packet::sendHudParam( *targetChara );
