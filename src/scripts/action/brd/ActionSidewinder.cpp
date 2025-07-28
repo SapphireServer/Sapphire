@@ -36,7 +36,7 @@ public:
       if( entry.second->getSrcActorId() == sourceId && ( entry.second->getId() == VenomousBiteStatus || entry.second->getId() == WindbiteStatus ) )
       {
         // We assume the player can't apply the same dot twice
-        if (potency == Potency)
+        if( potency == Potency )
         {
           // First dot found
           potency = PotencyOneDot;

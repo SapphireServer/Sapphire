@@ -26,6 +26,8 @@ public:
 
   static constexpr auto DrainPotency = 60;
   static constexpr auto Potency = 30;
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
 
   void onApply( Entity::Chara& actor )
   {
@@ -88,7 +90,7 @@ public:
           else
           {
             auto effect = Sapphire::StatusEffect::make_StatusEffect( ArmysPaeonStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( 5 );
+            effect->setFlag( Flags );
             effect->setModifier( Common::ParamModifier::TpRefresh, partyPotency );
             targetChara->addStatusEffect( effect );
             Network::Util::Packet::sendHudParam( *targetChara );

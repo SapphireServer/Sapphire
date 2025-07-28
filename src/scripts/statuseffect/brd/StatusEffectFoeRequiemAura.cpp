@@ -26,6 +26,8 @@ public:
 
   static constexpr auto DrainPotency = 60;
   static constexpr int32_t ModifierValue = -10;
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::DebuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
 
   void onApply( Entity::Chara& actor )
   {
@@ -71,7 +73,7 @@ public:
           else
           {
             auto effect = Sapphire::StatusEffect::make_StatusEffect( FoeRequiemStatus, actor.getAsChara(), targetChara, 5000, 3000 );
-            effect->setFlag( 6 );
+            effect->setFlag( Flags );
             effect->setModifier( Common::ParamModifier::MagicDefensePercent, modifierVal );
             targetChara->addStatusEffect( effect );
             Network::Util::Packet::sendHudParam( *targetChara );

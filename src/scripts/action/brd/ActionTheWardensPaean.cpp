@@ -17,6 +17,9 @@ public:
   {
   }
 
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::CanStatusOff );
+
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();
@@ -32,7 +35,7 @@ public:
     }
 
     pTarget->removeSingleStatusEffectByFlag( Common::StatusEffectFlag::CanDispel );
-    pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, 30000, 0, {}, 1025, false, true );
+    pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, 30000, 0, {}, Flags, false, true );
 
     Network::Util::Packet::sendHudParam( *pTarget );
   }

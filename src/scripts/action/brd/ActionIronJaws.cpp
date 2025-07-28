@@ -16,7 +16,9 @@ public:
   }
 
   static constexpr auto Potency = 100;
-  static constexpr auto Flags = 8226;
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::DebuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::CanDispel ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster );
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
@@ -34,6 +36,8 @@ public:
     {
       applyVenomousBite = applyVenomousBite || ( entry.second->getSrcActorId() == sourceId && entry.second->getId() == VenomousBiteStatus );
       applyWindbite = applyWindbite || ( entry.second->getSrcActorId() == sourceId && entry.second->getId() == WindbiteStatus );
+      if( applyVenomousBite && applyWindbite )
+        break;
     }
 
     auto dmg = action.calcDamage( Potency );

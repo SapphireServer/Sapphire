@@ -20,8 +20,8 @@ public:
 
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
-    auto statusMap = effect.getModifiers();
-    auto potency = statusMap[ Common::ParamModifier::Refresh ];
+    const auto& statusMap = effect.getModifiers();
+    auto potency = statusMap.at( Common::ParamModifier::Refresh );
 
     auto pSource = effect.getSrcActor();
     auto mpGained = Math::CalcStats::calcMpRefresh( potency, pSource->getLevel() );

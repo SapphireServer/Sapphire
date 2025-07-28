@@ -15,6 +15,9 @@ public:
   {
   }
 
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();
@@ -26,7 +29,7 @@ public:
     if( pSource->hasStatusEffect( TheWanderersMinuetStatus ) )
       pSource->removeSingleStatusEffectById( TheWanderersMinuetStatus );
     else
-      pActionBuilder->applyStatusEffectSelf( TheWanderersMinuetStatus, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, 30 } }, 5, false );
+      pActionBuilder->applyStatusEffectSelf( TheWanderersMinuetStatus, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, 30 } }, Flags, false );
   }
 };
 

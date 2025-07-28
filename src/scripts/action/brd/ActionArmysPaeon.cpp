@@ -15,6 +15,9 @@ public:
   {
   }
 
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::Permanent );
+
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();
@@ -29,7 +32,7 @@ public:
     if( pSource->hasStatusEffect( ArmysPaeonAura ) )
       pSource->removeSingleStatusEffectById( ArmysPaeonAura );
     else
-      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, 5, false );
+      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, Flags, false );
   }
 };
 
