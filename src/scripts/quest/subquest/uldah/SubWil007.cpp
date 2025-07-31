@@ -131,17 +131,14 @@ private:
 
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
   {
-    auto currentQC = quest.getUI8AL() + 1;
-
-    if( currentQC >= 5 )
+    if( quest.getSeq() == Seq2 )
     {
-      quest.setSeq( SeqFinish );
-      eventMgr().sendEventNotice( player, getId(), 1, 2, currentQC, 5 );
-    }
-    else
-    {
+      auto currentQC = quest.getUI8AL() + 1;
       quest.setUI8AL( currentQC );
       eventMgr().sendEventNotice( player, getId(), 1, 2, currentQC, 5 );
+
+      if( currentQC >= 5 )
+        quest.setSeq( SeqFinish );
     }
   }
   //////////////////////////////////////////////////////////////////////

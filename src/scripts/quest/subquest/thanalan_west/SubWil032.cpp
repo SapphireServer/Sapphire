@@ -3,29 +3,30 @@
 // In order for this script to be loaded, move it to the correct folder in <root>/scripts/
 
 #include <Actor/Player.h>
-#include <Actor/BNpc.h>
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
+#include <Actor/BNpc.h>
 
-// Quest Script: SubFst034_00128
-// Quest Name: Eggs over Queasy
-// Quest ID: 65664
-// Start NPC: 1000421
-// End NPC: 1000449
+// Quest Script: SubWil032_00224
+// Quest Name: I Believe You Can Fly
+// Quest ID: 65760
+// Start NPC: 1001992 (Oswell)
+// End NPC: 1002014 (Kikipu)
 
 using namespace Sapphire;
 
-class SubFst034 : public Sapphire::ScriptAPI::QuestScript
+class SubWil032 : public Sapphire::ScriptAPI::QuestScript
 {
   private:
     // Basic quest information 
     // Quest vars / flags used
     // UI8AL
     // UI8BH
+    // UI8BL
 
-    /// Countable Num: 8 Seq: 1 Event: 9 Listener: 43
-    /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1000449
+    /// Countable Num: 5 Seq: 1 Event: 9 Listener: 431
+    /// Countable Num: 1 Seq: 255 Event: 1 Listener: 1002014
     // Steps in this quest ( 0 is before accepting, 
     // 1 is first, 255 means ready for turning it in
     enum Sequence : uint8_t
@@ -36,18 +37,15 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
     };
 
     // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1000421;
-    static constexpr auto Actor1 = 1000449;
-    static constexpr auto Enemy0 = 43;
-    static constexpr auto Item0 = 2000062;
-    static constexpr auto Seq0Actor0 = 0;
-    static constexpr auto Seq2Actor1 = 1;
-    static constexpr auto Seq2Actor1Npctradeno = 99;
-    static constexpr auto Seq2Actor1Npctradeok = 100;
+    static constexpr auto Actor0 = 1001992; // Oswell ( Pos: 223.162994 52.017899 141.253006  Teri: 140 )
+    static constexpr auto Actor1 = 1002014; // Kikipu ( Pos: -253.427002 33.219002 404.062988  Teri: 140 )
+    static constexpr auto Enemy0 = 282; // Attack Hound
+    static constexpr auto Item0 = 2000354;
+    static constexpr auto Item1 = 2000355;
 
   public:
-    SubFst034() : Sapphire::ScriptAPI::QuestScript( 65664 ){}; 
-    ~SubFst034() = default; 
+    SubWil032() : Sapphire::ScriptAPI::QuestScript( 65760 ){}; 
+    ~SubWil032() = default; 
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -59,32 +57,38 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
       {
         if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
-
         break;
       }
       case Actor1:
       {
         if( quest.getSeq() == SeqFinish )
           Scene00001( quest, player );
-
         break;
       }
     }
   }
 
+  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
+  {
+  }
+
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    if( quest.getSeq() == Seq1 )
+    switch( bnpc.getBNpcNameId() )
     {
-      if( bnpc.getBNpcNameId() != Enemy0 )
-        return;
+      case Enemy0:
+      {
+        if( quest.getSeq() == Seq1 )
+        {
+          quest.setUI8AL( quest.getUI8AL() + 1 );
+          quest.setUI8BL( quest.getUI8BL() + 1 );
+          eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
 
-      quest.setUI8AL( quest.getUI8AL() + 1 );
-      quest.setUI8BH( quest.getUI8BH() + 1 );
-      eventMgr().sendEventNotice( player, getId(), 0, 3, quest.getUI8AL(), 8 );
-
-      if( quest.getUI8AL() >= 8 )
-        quest.setSeq( SeqFinish );
+          if( quest.getUI8AL() >= 5 )
+            quest.setSeq( SeqFinish );
+        }
+        break;
+      }
     }
   }
 
@@ -95,7 +99,7 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubFst034::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubWil032::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -103,6 +107,7 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
       quest.setSeq( Seq1 );
+      quest.setUI8BH( 1 );
     }
   }
 
@@ -110,26 +115,28 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubFst034::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubWil032::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 )
+    if( result.getResult( 0 ) == 1 && result.getResult( 2 ) == 1 && result.getResult( 5 ) == 5 )
       Scene00100( quest, player );
     else
       Scene00099( quest, player );
+
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00099( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 99, NONE, bindSceneReturn( &SubFst034::Scene00099Return ) );
+    eventMgr().playQuestScene( player, getId(), 99, NONE, bindSceneReturn( &SubWil032::Scene00099Return ) );
   }
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+
 
   }
 
@@ -137,17 +144,17 @@ class SubFst034 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00100( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 100, NONE, bindSceneReturn( &SubFst034::Scene00100Return ) );
+    eventMgr().playQuestScene( player, getId(), 100, NONE, bindSceneReturn( &SubWil032::Scene00100Return ) );
   }
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 )
     {
-      player.finishQuest( getId(), result.getResult( 1 ) );
+        player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }
 
 };
 
-EXPOSE_SCRIPT( SubFst034 );
+EXPOSE_SCRIPT( SubWil032 );
