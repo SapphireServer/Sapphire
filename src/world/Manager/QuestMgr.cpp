@@ -141,3 +141,10 @@ void QuestMgr::sendQuestsInfo( Entity::Player &player )
   sendQuestTracker( player );
 }
 
+uint16_t QuestMgr::getItemIcon(uint32_t itemId)
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto eventItem = exdData.getRow< Excel::EventItem >( itemId );
+
+  return eventItem->_data.Icon;
+}

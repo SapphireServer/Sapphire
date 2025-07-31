@@ -211,7 +211,12 @@ Player::QuestComplete& Player::getQuestCompleteFlags()
   return m_questCompleteFlags;
 }
 
+uint16_t Player::getQuestItemIcon( uint32_t itemId )
+{
+  auto& questMgr = Common::Service< Manager::QuestMgr >::ref();
 
+  return questMgr.getItemIcon( itemId );
+}
 
 
 

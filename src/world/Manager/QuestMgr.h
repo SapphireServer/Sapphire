@@ -26,6 +26,7 @@ namespace Sapphire::World::Manager
 
     bool giveQuestRewards( Entity::Player& player, uint16_t questId, uint32_t optionalChoice );
 
+    uint16_t getItemIcon( uint32_t itemId );
   };
 
 }
