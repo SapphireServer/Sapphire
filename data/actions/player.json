@@ -1756,7 +1756,19 @@
     "nextCombo": [],
     "targetFilter": 0,
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 127,
+          "duration": 15000,
+          "flag": 1025,
+          "modifiers": [
+            {
+              "modifier": "EnmityReduction",
+              "value": 50
+            }
+          ]
+        }
+      ],
       "target": []
     }
   },
@@ -1837,7 +1849,14 @@
     "targetFilter": 0,
     "statuses": {
       "caster": [],
-      "target": []
+      "target": [
+        {
+          "id": 7,
+          "duration": 1000,
+          "flag": 34,
+          "modifiers": []
+        }
+      ]
     }
   },
   "110": {
