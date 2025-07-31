@@ -4,6 +4,7 @@
 
 #include <Actor/Player.h>
 #include "Manager/EventMgr.h"
+#include "Manager/QuestMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
 
@@ -97,25 +98,28 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
+  private:
+  //////////////////////////////////////////////////////////////////////
+  // Available Scenes in this quest, not necessarly all are used
+  //////////////////////////////////////////////////////////////////////
+
+  void onCompletitionCheck(World::Quest& quest, Entity::Player& player)
   {
-    if( quest.getSeq() != Seq1 ) return;
+    if( quest.getSeq() != Seq1 )
+      return;
 
     quest.setUI8AH( quest.getUI8AH() + 1 );
     quest.setUI8CH( quest.getUI8CH() + 1 );
-    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AH(), 3 );
+
+    eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AH(), 3, player.getQuestItemIcon( Item0 ) } );
+    //eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AH(), 3 );
+
     if( quest.getUI8AH() >= 3 )
     {
       quest.setSeq( SeqFinish );
       quest.setUI8BH( 3 );
     }
   }
-
-
-  private:
-  //////////////////////////////////////////////////////////////////////
-  // Available Scenes in this quest, not necessarly all are used
-  //////////////////////////////////////////////////////////////////////
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
@@ -140,7 +144,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -152,7 +155,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -166,7 +168,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -179,8 +180,7 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setBitFlag8( 3, true );
-    //quest.setUI8BL( 1 );
-    onEventItem( quest, player, 0 );
+    onCompletitionCheck( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -192,7 +192,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -206,8 +205,7 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setBitFlag8( 2, true );
-    //quest.setUI8BH( 1 );
-    onEventItem( quest, player, 0 );
+    onCompletitionCheck( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -219,7 +217,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -233,8 +230,7 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setBitFlag8( 1, true );
-    //quest.setUI8AL( 1 );
-    onEventItem( quest, player, 0 );
+    onCompletitionCheck( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -246,7 +242,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -272,12 +267,10 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
         player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -289,7 +282,6 @@ class SubWil030 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00012Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 

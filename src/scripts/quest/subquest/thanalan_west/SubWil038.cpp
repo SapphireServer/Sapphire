@@ -253,7 +253,6 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -281,7 +280,6 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -324,7 +322,6 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -366,7 +363,6 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
   void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -407,7 +403,6 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 

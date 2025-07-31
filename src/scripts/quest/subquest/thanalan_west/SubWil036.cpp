@@ -137,10 +137,6 @@ class SubWil036 : public Sapphire::ScriptAPI::QuestScript
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
     switch( bnpc.getLayoutId() )
@@ -204,7 +200,6 @@ class SubWil036 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -316,7 +311,6 @@ class SubWil036 : public Sapphire::ScriptAPI::QuestScript
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -370,9 +364,7 @@ class SubWil036 : public Sapphire::ScriptAPI::QuestScript
   void Scene00013Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
-
 };
 
 EXPOSE_SCRIPT( SubWil036 );

@@ -61,23 +61,20 @@ class SubWil031 : public Sapphire::ScriptAPI::QuestScript
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    if( ( bnpc.getBNpcNameId() != Enemy0 && !quest.getSeq() == Seq1 ) )
+    if( bnpc.getBNpcNameId() != Enemy0 )
       return;
-    else
-    {
-        quest.setUI8AL( quest.getUI8AL() + 1 );
-        quest.setUI8BH( quest.getUI8BH() + 1 );
-        eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 4 );
 
-        if( quest.getUI8AL() >= 4 )
-          quest.setSeq( SeqFinish );
-    }
+    if( quest.getSeq() == Seq1 )
+    {
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 4 );
+
+      if( quest.getUI8AL() >= 4 )
+        quest.setSeq( SeqFinish );
+    }    
   }
 
   private:
@@ -108,7 +105,6 @@ class SubWil031 : public Sapphire::ScriptAPI::QuestScript
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -122,7 +118,6 @@ class SubWil031 : public Sapphire::ScriptAPI::QuestScript
   {
     if( result.getResult( 0 ) == 1 )
       Scene00003( quest, player );
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -134,12 +129,10 @@ class SubWil031 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
     if( result.getResult( 0 ) == 1 )
     {
         player.finishQuest( getId(), result.getResult( 1 ) );
     }
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -151,7 +144,6 @@ class SubWil031 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 

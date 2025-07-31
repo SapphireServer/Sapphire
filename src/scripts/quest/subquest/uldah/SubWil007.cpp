@@ -99,29 +99,44 @@ public:
     if( emoteId != 41 )
       return;
 
-    if( actorId == Actor0 && quest.getSeq() == Seq1 )
+    switch (actorId)
     {
-      Scene00003( quest, player );
-    }
-    else if( actorId == Actor1 && quest.getSeq() == Seq2 )
-    {
-      Scene00006( quest, player );
-    }
-    else if( actorId == Actor2 && quest.getSeq() == Seq2 )
-    {
-      Scene00009( quest, player );
-    }
-    else if( actorId == Actor3 && quest.getSeq() == Seq2 )
-    {
-      Scene00012( quest, player );
-    }
-    else if( actorId == Actor4 && quest.getSeq() == Seq2 )
-    {
-      Scene00015( quest, player );
-    }
-    else if( actorId == Actor5 && quest.getSeq() == Seq2 )
-    {
-      Scene00018( quest, player );
+      case Actor0:
+      {
+        if( quest.getSeq() == Seq1 )
+          Scene00003( quest, player );
+        break;
+      }
+      case Actor1:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00006( quest, player );
+        break;
+      }
+      case Actor2:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00009( quest, player );
+        break;
+      }
+      case Actor3:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00012( quest, player );
+        break;
+      }
+      case Actor4:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00015( quest, player );
+        break;
+      }
+      case Actor5:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00018( quest, player );
+        break;
+      }
     }
   }
 
@@ -133,11 +148,10 @@ private:
   {
     if( quest.getSeq() == Seq2 )
     {
-      auto currentQC = quest.getUI8AL() + 1;
-      quest.setUI8AL( currentQC );
-      eventMgr().sendEventNotice( player, getId(), 1, 2, currentQC, 5 );
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      eventMgr().sendEventNotice( player, getId(), 1, 2, quest.getUI8AL(), 5 );
 
-      if( currentQC >= 5 )
+      if( quest.getUI8AL() >= 5 )
         quest.setSeq( SeqFinish );
     }
   }

@@ -61,26 +61,20 @@ class SubWil037 : public Sapphire::ScriptAPI::QuestScript
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    switch( bnpc.getBNpcNameId() )
+    if( !bnpc.getBNpcNameId() )
+      return;
+
+    if( quest.getSeq() == Seq1 )
     {
-      case Enemy0:
-      {
-        quest.setUI8AL( quest.getUI8AL() + 1 );
-        quest.setUI8BH( quest.getUI8BH() + 1 );
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+      quest.setUI8BH( quest.getUI8BH() + 1 );
 
-        eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8BH(), 2 );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8BH(), 2 );
 
-        if( quest.getUI8AL() >= 2 )
-          quest.setSeq( SeqFinish );
-
-        break;
-      }
+      if( quest.getUI8AL() >= 2 )
+        quest.setSeq( SeqFinish );
     }
   }
 
@@ -140,9 +134,7 @@ class SubWil037 : public Sapphire::ScriptAPI::QuestScript
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
-
 };
 
 EXPOSE_SCRIPT( SubWil037 );

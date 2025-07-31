@@ -79,45 +79,46 @@ class ClsPgl020 : public Sapphire::ScriptAPI::QuestScript
   {
     if( bnpc.getBNpcNameId() != Enemy0 && bnpc.getBNpcNameId() != Enemy1 && bnpc.getBNpcNameId() != Enemy2 )
       return;
-    else
+
+    switch( bnpc.getBNpcNameId() )
     {
-      if( bnpc.getBNpcNameId() == Enemy0 && quest.getUI8AL() < 3 )
+      case Enemy0:
       {
-        quest.setUI8AL( quest.getUI8AL() + 1 );
-        eventMgr().sendEventNotice( player, getId(), 1, 0, quest.getUI8AL(), 3 );
-        checkQuestCompletion( quest, player );
+        if( quest.getUI8AL() < 3 )
+        {
+          quest.setUI8AL( quest.getUI8AL() + 1 );
+          eventMgr().sendEventNotice( player, getId(), 1, 0, quest.getUI8AL(), 3 );
+        }
+        break;
       }
-      else if( bnpc.getBNpcNameId() == Enemy1 && quest.getUI8BH() < 3 )
+      case Enemy1:
       {
-        quest.setUI8BH( quest.getUI8BH() + 1 );
-        eventMgr().sendEventNotice( player, getId(), 2, 0, quest.getUI8BH(), 3 );
-        checkQuestCompletion( quest, player );
+        if( quest.getUI8BH() < 3 )
+        {
+          quest.setUI8BH( quest.getUI8BH() + 1 );
+          eventMgr().sendEventNotice( player, getId(), 2, 0, quest.getUI8BH(), 3 );
+        }
+        break;
       }
-      else if( bnpc.getBNpcNameId() == Enemy2 && quest.getUI8BL() < 3 )
+      case Enemy2:
       {
-        quest.setUI8BL( quest.getUI8BL() + 1 );
-        eventMgr().sendEventNotice( player, getId(), 3, 0, quest.getUI8BL(), 3 );
-        checkQuestCompletion( quest, player );
+        if( quest.getUI8BL() < 3 )
+        {
+          quest.setUI8BL( quest.getUI8BL() + 1 );
+          eventMgr().sendEventNotice( player, getId(), 3, 0, quest.getUI8BL(), 3 );
+        }
+        break;
       }
     }
+
+    if( quest.getUI8AL() == 3 && quest.getUI8BH() == 3 && quest.getUI8BL() == 3 )
+      quest.setSeq( SeqFinish );
   }
 
   private:
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
-
-  void checkQuestCompletion( World::Quest& quest, Entity::Player& player )
-  {
-    auto QUEST_VAR_UI8AL = quest.getUI8AL();
-    auto QUEST_VAR_UI8BH = quest.getUI8BH();
-    auto QUEST_VAR_UI8BL = quest.getUI8BL();
-
-    if( QUEST_VAR_UI8AL == 3 && QUEST_VAR_UI8BH == 3 && QUEST_VAR_UI8BL == 3 )
-    {
-      quest.setSeq( SeqFinish );
-    }
-  }
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
@@ -153,7 +154,7 @@ class ClsPgl020 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if (result.getResult(0) == 1)
+    if( result.getResult( 0 ) == 1 )
     {
       eventMgr().sendEventNotice( player, getId(), 0, 0, 0, 0 );
       quest.setSeq( Seq2 );

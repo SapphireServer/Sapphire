@@ -81,14 +81,13 @@ class SubWil039 : public Sapphire::ScriptAPI::QuestScript
 
   void onBNpcKill( World::Quest& quest, Entity::BNpc& bnpc, Entity::Player& player ) override
   {
-    switch( bnpc.getLayoutId() )
+    if( !bnpc.getLayoutId() )
+      return;
+
+    if( quest.getSeq() == Seq2 )
     {
-      case Enemy0:
-      {
-        eventMgr().sendEventNotice( player, getId(), 0, 0 );
-        quest.setSeq( SeqFinish );
-        break;
-      }
+      eventMgr().sendEventNotice( player, getId(), 0, 0 );
+      quest.setSeq( SeqFinish );
     }
   }
 
@@ -120,7 +119,6 @@ class SubWil039 : public Sapphire::ScriptAPI::QuestScript
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -147,7 +145,6 @@ class SubWil039 : public Sapphire::ScriptAPI::QuestScript
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
 
-
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -164,7 +161,6 @@ class SubWil039 : public Sapphire::ScriptAPI::QuestScript
         player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }
-
 };
 
 EXPOSE_SCRIPT( SubWil039 );

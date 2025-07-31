@@ -122,12 +122,6 @@ class SubWil034 : public Sapphire::ScriptAPI::QuestScript
       } 
   }
 
-
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
-
   private:
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
@@ -252,7 +246,6 @@ class SubWil034 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00095Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
