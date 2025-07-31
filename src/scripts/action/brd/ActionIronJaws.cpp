@@ -8,10 +8,10 @@
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
 
-class ActionVenomousBite : public Sapphire::ScriptAPI::ActionScript
+class ActionIronJaws : public Sapphire::ScriptAPI::ActionScript
 {
 public:
-  ActionVenomousBite() : Sapphire::ScriptAPI::ActionScript( VenomousBite )
+  ActionIronJaws() : Sapphire::ScriptAPI::ActionScript( IronJaws )
   {
   }
 
@@ -22,13 +22,23 @@ public:
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
-    auto pPlayer = action.getSourceChara()->getAsPlayer();
     auto pSource = action.getSourceChara();
+    auto sourceId = pSource->getId();
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
     if( !pActionBuilder )
       return;
+
+    bool applyVenomousBite = false;
+    bool applyWindbite = false;
+    for( auto entry : pTarget->getStatusEffectMap() )
+    {
+      applyVenomousBite = applyVenomousBite || ( entry.second->getSrcActorId() == sourceId && entry.second->getId() == VenomousBiteStatus );
+      applyWindbite = applyWindbite || ( entry.second->getSrcActorId() == sourceId && entry.second->getId() == WindbiteStatus );
+      if( applyVenomousBite && applyWindbite )
+        break;
+    }
 
     auto dmg = action.calcDamage( Potency );
     pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
@@ -41,12 +51,15 @@ public:
       pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
     }
 
-    if( pPlayer && pPlayer->getLevel() >= 24 )
+    if( applyVenomousBite )
+    {
       pActionBuilder->applyStatusEffect( pTarget, VenomousBiteStatus, 18000, 0, {}, Flags, false, true );
-    else
-      pActionBuilder->applyStatusEffect( pTarget, VenomousBiteStatus, 9000, 0, {}, Flags, false, true );
-    
+    }
+    if( applyWindbite )
+    {
+      pActionBuilder->applyStatusEffect( pTarget, WindbiteStatus, 18000, 0, {}, Flags, false, true );
+    }
   }
 };
 
-EXPOSE_SCRIPT( ActionVenomousBite );
+EXPOSE_SCRIPT( ActionIronJaws );

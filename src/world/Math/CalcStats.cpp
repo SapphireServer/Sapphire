@@ -663,6 +663,23 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionHealin
   return std::pair( factor, hitType );
 }
 
+uint32_t CalcStats::calcMpRefresh(uint32_t potency, uint8_t level)
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( level );
+
+  if (!paramGrowthInfo)
+  {
+    Logger::error( "Failed to read paramgrow exd when calculating MP refresh!" );
+    // Just assume max level (60) if we fail to read the file
+    return std::floor( potency * 0.884f );
+  }
+
+  uint32_t mpMod = paramGrowthInfo->data().Mp;
+  return std::floor( potency * mpMod / 1000 );
+}
+
 uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )
 {
   return chara.getStatValue( chara.getPrimaryStat() );

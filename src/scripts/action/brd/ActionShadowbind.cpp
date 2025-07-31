@@ -15,18 +15,22 @@ public:
   {
   }
 
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::DebuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::CanDispel ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::LockMovement );
+
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
-    if( !pActionBuilder )
+    if( !pActionBuilder || !pTarget )
       return;
 
     pTarget->onActionHostile( pSource );
 
-    pActionBuilder->applyStatusEffect( pTarget, Bind, 10000, 0, { }, 290, false, false );
+    pActionBuilder->applyStatusEffect( pTarget, Bind, 10000, 0, { }, Flags, false, false );
   }
 };
 

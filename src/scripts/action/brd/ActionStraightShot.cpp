@@ -16,6 +16,8 @@ public:
   }
 
   static constexpr auto Potency = 140;
+  static constexpr uint32_t Flags = static_cast< uint32_t >( Common::StatusEffectFlag::BuffCategory ) |
+                                    static_cast< uint32_t >( Common::StatusEffectFlag::CanStatusOff );
 
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
@@ -24,10 +26,10 @@ public:
     auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
-    if( !pPlayer || !pActionBuilder )
+    if( !pActionBuilder )
       return;
 
-    if( auto status = pPlayer->getStatusEffectById( StraightShotReady ); status )
+    if( auto status = pSource->getStatusEffectById( StraightShotReady ); status )
       status->setModifier( Common::ParamModifier::CriticalHit, 100 );
     
 
@@ -43,7 +45,7 @@ public:
     }
 
     pSource->removeSingleStatusEffectById( StraightShotReady );
-    pActionBuilder->applyStatusEffectSelf( StraightShotBuff, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, 1025, true );
+    pActionBuilder->applyStatusEffectSelf( StraightShotStatus, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, Flags, true );
   }
 };
 
