@@ -238,7 +238,7 @@ void Chara::setGp( uint32_t gp )
 /*! \param tp amount to set*/
 void Chara::setTp( uint32_t tp )
 {
-  m_tp = static_cast< uint16_t >( tp );
+  m_tp = tp < 1000 ? static_cast< uint16_t >( tp ) : 1000;
 }
 
 /*! \param type invincibility type to set */
@@ -580,6 +580,18 @@ void Chara::removeStatusEffectById( std::vector< uint32_t > ids )
     else
     {
       ++effectIt;
+    }
+  }
+}
+
+void Chara::removeSingleStatusEffectByFlag( Common::StatusEffectFlag flag )
+{
+  for( const auto& effectIt : m_statusEffectMap )
+  {
+    if( effectIt.second->getFlag() & static_cast<uint32_t>( flag ) )
+    {
+      removeStatusEffect( effectIt.first );
+      return;
     }
   }
 }

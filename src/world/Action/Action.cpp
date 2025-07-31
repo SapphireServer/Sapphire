@@ -973,8 +973,8 @@ void Action::Action::addDefaultActorFilters()
     }
     case Common::CastType::Box:
     {
-        auto filter = std::make_shared< World::Util::ActorFilterBox >(m_pos, m_effectWidth, m_effectRange);
-        addActorFilter(filter);
+        auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
+        addActorFilter( filter );
         break;
     }
     case Common::CastType::Cone:
@@ -1012,7 +1012,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
     return false;
 
   bool actorApplicable = false;
-  switch( static_cast< Common::TargetFilter >( m_lutEntry.targetFilter ) )
+  switch( m_lutEntry.targetFilter )
   {
     case Common::TargetFilter::All:
     {

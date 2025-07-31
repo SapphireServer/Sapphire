@@ -1965,7 +1965,19 @@
     "targetFilter": 0,
     "statuses": {
       "caster": [],
-      "target": []
+      "target": [
+        {
+          "id": 247,
+          "duration": 20000,
+          "flag": 2,
+          "modifiers": [
+            {
+              "modifier": "EvasionPercent",
+              "value": -10
+            }
+          ]
+        }
+      ]
     }
   },
   "118": {
@@ -1980,7 +1992,14 @@
     "nextCombo": [],
     "targetFilter": 0,
     "statuses": {
-      "caster": [],
+      "caster": [
+        {
+          "id": 141,
+          "duration": 30000,
+          "flag": 1025,
+          "modifiers": []
+        }
+      ],
       "target": []
     }
   },
