@@ -8,15 +8,15 @@
 #include <ScriptObject.h>
 #include <Service.h>
 
-// Quest Script: ManFst003_00123
+// Quest Script: ManFst002_3_00124
 // Quest Name: Close to Home
-// Quest ID: 65659
+// Quest ID: 65660
 // Start NPC: 1001140
 // End NPC: 1000100
 
 using namespace Sapphire;
 
-class ManFst003 : public Sapphire::ScriptAPI::QuestScript
+class ManFst002_3 : public Sapphire::ScriptAPI::QuestScript
 {
 private:
   // Basic quest information
@@ -39,11 +39,11 @@ private:
   // Entities found in the script data of the quest
   static constexpr auto Actor0 = 1001140;
   static constexpr auto Actor1 = 2;
-  static constexpr auto Actor2 = 1000197;
+  static constexpr auto Actor2 = 1000323;
   static constexpr auto Actor20 = 1000159;
   static constexpr auto Actor3 = 1000768;
   static constexpr auto Actor4 = 1000100;
-  static constexpr auto Item0 = 2000119;
+  static constexpr auto Item0 = 2000120;
   static constexpr auto Poprange0 = 2280858;
   static constexpr auto RewardDesion = 1;
   static constexpr auto Seq0Actor0 = 0;
@@ -60,21 +60,24 @@ private:
   static constexpr auto UnlockDesion = 14;
 
 public:
-  ManFst003() : Sapphire::ScriptAPI::QuestScript( 65659 )
+  ManFst002_3() : Sapphire::ScriptAPI::QuestScript( 65660 )
   {};
 
-  ~ManFst003() = default;
+  ~ManFst002_3() = default;
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
   void onTalk( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    if( actorId == Actor0 )
+    if( actorId == ManFst002_3::Actor0 )
     {
       Scene00000( quest, player );
     }
-    else if( actorId == Actor1 )
+    else if( actorId == ManFst002_3::Actor1 )
     {
+      // starting the Aetheryte eventaction
+      // player.eventStart( actorId, 0x050002, 7, 0, 0);
+      // starting the eventaction 0x13 ( attuning )
       eventMgr().eventActionStart( player, 0x050002, 0x13,
                                    [ & ]( Entity::Player& player, uint32_t eventId, uint64_t additional )
                                    {
@@ -85,29 +88,23 @@ public:
                                    },
                                    nullptr, quest.getId() );
     }
-    else if( actorId == Actor2 )
+    else if( actorId == ManFst002_3::Actor2 )
     {
       Scene00002( quest, player );
     }
-    else if( actorId == Actor3 )
+    else if( actorId == ManFst002_3::Actor3 )
     {
       Scene00003( quest, player );
     }
-    else if( actorId == Actor4 )
+    else if( actorId == ManFst002_3::Actor4 )
     {
       Scene00005( quest, player );
     }
   }
 
-
 private:
-  //////////////////////////////////////////////////////////////////////
-  // Available Scenes in this quest, not necessarly all are used
-  //////////////////////////////////////////////////////////////////////
-
   void checkQuestCompletion( World::Quest& quest, Entity::Player& player, uint32_t varIdx )
   {
-
     if( varIdx == 3 )
     {
       eventMgr().sendEventNotice( player, getId(), 1, 0, 0, 0 );
@@ -132,15 +129,17 @@ private:
   }
 
   //////////////////////////////////////////////////////////////////////
+  // Available Scenes in this quest, not necessarly all are used
+  //////////////////////////////////////////////////////////////////////
 
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &ManFst002_3::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 )
+    if( result.getResult( 0 ) == 1 ) // accept quest
     {
       Scene00050( quest, player );
     }
@@ -150,7 +149,7 @@ private:
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst003::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst002_3::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -163,7 +162,7 @@ private:
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &ManFst002_3::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -176,7 +175,7 @@ private:
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &ManFst002_3::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -195,7 +194,7 @@ private:
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &ManFst003::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &ManFst002_3::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -207,12 +206,12 @@ private:
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst003::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002_3::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    if( result.getResult( 0 ) == 1 )
+    if( result.getResult( 0 ) == 1 ) // finish quest
     {
       player.finishQuest( getId(), result.getResult( 1 ) );
     }
@@ -222,21 +221,23 @@ private:
 
   void Scene00050( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst003::Scene00050Return ) );
+    eventMgr().playQuestScene( player, getId(), 50, FADE_OUT | CONDITION_CUTSCENE | HIDE_UI, bindSceneReturn( &ManFst002_3::Scene00050Return ) );
   }
 
   void Scene00050Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
+    // accepting quest "close to home"
     quest.setSeq( Seq1 );
-    quest.setUI8CH( 1 );
-    warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, 132 );
+    quest.setUI8CH( 1 ); // receive key item
+    // event is done, need to teleport to real zone.
+    warpMgr().requestMoveTerritoryType( player, Common::WarpType::WARP_TYPE_NORMAL, Territorytype0 );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00051( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 51, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00051Return ) );
+    eventMgr().playQuestScene( player, getId(), 51, HIDE_HOTBAR, bindSceneReturn( &ManFst002_3::Scene00051Return ) );
   }
 
   void Scene00051Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -248,7 +249,7 @@ private:
 
   void Scene00099( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 99, HIDE_HOTBAR, bindSceneReturn( &ManFst003::Scene00099Return ) );
+    eventMgr().playQuestScene( player, getId(), 99, HIDE_HOTBAR, bindSceneReturn( &ManFst002_3::Scene00099Return ) );
   }
 
   void Scene00099Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
@@ -260,16 +261,16 @@ private:
 
   void Scene00100( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 100, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst003::Scene00100Return ) );
+    eventMgr().playQuestScene( player, getId(), 100, SET_EOBJ_BASE | HIDE_HOTBAR | INVIS_EOBJ, bindSceneReturn( &ManFst002_3::Scene00100Return ) );
   }
 
   void Scene00100Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setUI8CH( 0 );
+    quest.setUI8CH( 0 ); // remove key item, since we have just traded it
     quest.setUI8BL( 1 );
     checkQuestCompletion( quest, player, 2 );
   }
 
 };
 
-EXPOSE_SCRIPT( ManFst003 );
+EXPOSE_SCRIPT( ManFst002_3 );
