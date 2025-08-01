@@ -263,7 +263,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
     Logger::fatal( "Unable to cache actions!" );
     return;
   }
-  if (!pActionMgr->cacheActionShapeLut())
+  if ( !pActionMgr->cacheActionShapeLut() )
   {
     Logger::fatal( "Unable to cache action shapes!" );
     return;

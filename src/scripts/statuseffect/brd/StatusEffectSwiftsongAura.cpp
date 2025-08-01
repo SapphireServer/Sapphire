@@ -39,7 +39,7 @@ public:
     if( !pPlayer )
       return;
 
-    if (pPlayer->isInCombat())
+    if ( pPlayer->isInCombat() )
     {
       pPlayer->removeSingleStatusEffectById( SwiftsongAura );
       return;
@@ -51,7 +51,7 @@ public:
     auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
     auto pParty = partyMgr.getParty( pPlayer->getPartyId() );
     auto membersIds = pParty->MemberId;
-    for( auto& target : actor.getInRangeActors(false) )
+    for( auto& target : actor.getInRangeActors( false ) )
     {
       if( std::find( membersIds.begin(), membersIds.end(), target->getId() ) != membersIds.end() )
       {
