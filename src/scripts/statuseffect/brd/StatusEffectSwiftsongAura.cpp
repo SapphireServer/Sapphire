@@ -29,7 +29,7 @@ public:
 
   void onTick( Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect ) override
   {
-    if ( !actor.isAlive() )
+    if( !actor.isAlive() )
     {
       actor.removeSingleStatusEffectById( SwiftsongAura );
       return;
@@ -39,7 +39,7 @@ public:
     if( !pPlayer )
       return;
 
-    if ( pPlayer->isInCombat() )
+    if( pPlayer->isInCombat() )
     {
       pPlayer->removeSingleStatusEffectById( SwiftsongAura );
       return;

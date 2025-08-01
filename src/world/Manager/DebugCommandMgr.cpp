@@ -1495,7 +1495,7 @@ void DebugCommandMgr::hotReload( char* data, Sapphire::Entity::Player& player, s
     {
       PlayerMgr::sendDebug( player, "There was an error reloading actions." );
     }
-    if ( Action::ActionShapeLutData::reloadShapes() )
+    if( Action::ActionShapeLutData::reloadShapes() )
     {
       PlayerMgr::sendDebug( player, "Successfully reloaded action shapes." );
     }
