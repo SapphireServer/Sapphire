@@ -603,7 +603,6 @@ bool Player::isInCombat() const
 
 void Player::setInCombat( bool mode )
 {
-  //m_lastAttack = GetTickCount();
   m_bInCombat = mode;
 }
 
@@ -1019,6 +1018,7 @@ void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
   setCondition( PlayerCondition::InCombat );
+  m_bInCombat = true;
   Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 1 );
 }
 
@@ -1028,6 +1028,7 @@ void Player::onMobDeaggro( const BNpc& bnpc )
   if( m_actorIdTohateSlotMap.empty() )
   {
     removeCondition( PlayerCondition::InCombat );
+    m_bInCombat = false;
     Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 0 );
   }
 }

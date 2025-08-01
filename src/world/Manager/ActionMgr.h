@@ -21,6 +21,7 @@ namespace Sapphire::World::Manager
     ~ActionMgr() = default;
 
     bool cacheActionLut();
+    bool cacheActionShapeLut();
 
     void handleItemManipulationAction( Entity::Player& player, uint32_t actionId, uint16_t requestId );
     void handleTargetedAction( Entity::Chara& chara, uint32_t actionId, uint64_t targetId, uint16_t requestId );

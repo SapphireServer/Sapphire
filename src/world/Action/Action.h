@@ -2,6 +2,7 @@
 
 #include <Common.h>
 #include "ActionLut.h"
+#include "ActionShapeLut.h"
 #include "Util/ActorFilter.h"
 #include "ForwardsZone.h"
 #include "ActionResultBuilder.h"
