@@ -70,66 +70,53 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
   void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos ) override
   {
     uint8_t hitTargets = 0;
-    if( quest.getUI8AL() == 0 )
+    if( !quest.getBitFlag8( 1 ) && eventMgr().checkHitEobject( player, pos, Eobject0 ) )
     {
-      if( eventMgr().checkHitEobject( player, pos, Eobject0 ) )
-      {
-        Scene00003( quest, player );
-        hitTargets++;
-      }
-    }
-    else
-    {
-      hitTargets++;
+      Scene00003( quest, player );
     }
 
-    if( quest.getUI8BH() == 0 )
+    if( !quest.getBitFlag8( 2 ) && eventMgr().checkHitEobject( player, pos, Eobject1 ) )
     {
-      if( eventMgr().checkHitEobject( player, pos, Eobject1 ) )
-      {
-        Scene00005( quest, player );
-        hitTargets++;
-      }
-    }
-    else
-    {
-      hitTargets++;
+      Scene00005( quest, player );
     }
 
-    if( quest.getUI8BL() == 0 )
+    if( !quest.getBitFlag8( 3 ) && eventMgr().checkHitEobject( player, pos, Eobject2 ) )
     {
-      if( eventMgr().checkHitEobject( player, pos, Eobject2 ) )
-      {
-        Scene00007( quest, player );
-        hitTargets++;
-      }
-    }
-    else
-    {
-      hitTargets++;
-    }
-
-    if( quest.getUI8AH() != hitTargets )
-    {
-      quest.setUI8CH( 3 - hitTargets );
-      quest.setUI8AH( hitTargets );
-      eventMgr().sendEventNotice( player, getId(), 0, 2, hitTargets, 3 );
-
-      if( hitTargets == 3 )
-      {
-        quest.setUI8AL( 0 );
-        quest.setUI8BH( 0 );
-        quest.setUI8BL( 0 );
-        quest.setBitFlag8( 1, false );
-        quest.setBitFlag8( 2, false );
-        quest.setBitFlag8( 3, false );
-        quest.setSeq( SeqFinish );
-      }
+      Scene00007( quest, player );
     }
   }
 
 
   private:
+
+  void checkProgress( World::Quest& quest, Entity::Player& player )
+  {
+    uint8_t hitTargets = 0;
+    if( quest.getBitFlag8( 1 ) )
+      hitTargets++;
+    if( quest.getBitFlag8( 2 ) )
+      hitTargets++;
+    if( quest.getBitFlag8( 3 ) )
+      hitTargets++;
+
+    eventMgr().sendEventNotice( player, getId(), 0, 2, hitTargets, 3 );
+    quest.setUI8CH( 3 - hitTargets );
+    quest.setUI8AH( hitTargets );
+
+    if( hitTargets == 3 )
+    {
+      quest.setUI8AH( 0 );
+      quest.setUI8AL( 0 );
+      quest.setUI8BH( 0 );
+      quest.setUI8BL( 0 );
+      quest.setUI8CH( 0 );
+      quest.setBitFlag8( 1, false );
+      quest.setBitFlag8( 2, false );
+      quest.setBitFlag8( 3, false );
+      quest.setSeq( SeqFinish );
+    }
+  }
+
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
@@ -158,6 +145,13 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
   {
     quest.setSeq( Seq1 );
     quest.setUI8CH( 3 );
+
+    quest.setUI8AL( 0 );
+    quest.setUI8BH( 0 );
+    quest.setUI8BL( 0 );
+    quest.setBitFlag8( 1, false );
+    quest.setBitFlag8( 2, false );
+    quest.setBitFlag8( 3, false );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -184,6 +178,7 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
   {
     quest.setUI8AL( 1 );
     quest.setBitFlag8( 1, true );
+    checkProgress( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -209,6 +204,7 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
   {
     quest.setUI8BH( 1 );
     quest.setBitFlag8( 2, true );
+    checkProgress( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -235,6 +231,7 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
   {
     quest.setUI8BL( 1 );
     quest.setBitFlag8( 3, true );
+    checkProgress( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
