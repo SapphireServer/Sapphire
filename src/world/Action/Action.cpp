@@ -319,7 +319,7 @@ void Action::Action::start()
   m_startTime = Common::Util::getTimeMs();
 
   auto player = m_pSource->getAsPlayer();
-
+  
   if( hasCastTime() )
   {
     auto castPacket = makeZonePacket< Server::FFXIVIpcActorCast >( m_pSource->getId() );

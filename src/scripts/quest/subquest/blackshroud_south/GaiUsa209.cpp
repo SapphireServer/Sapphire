@@ -4,8 +4,10 @@
 
 #include <Actor/Player.h>
 #include "Manager/EventMgr.h"
+#include "Manager/PlayerMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
+#include "Util/UtilMath.h"
 
 // Quest Script: GaiUsa209_00732
 // Quest Name: Stash Saboteur
@@ -59,13 +61,76 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
       {
         if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
+        if( quest.getSeq() == SeqFinish )
+          Scene00008( quest, player );
         break;
       }
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
+  void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos ) override
   {
+    Common::FFXIVARR_POSITION3 Eobj0Pos = { -287.321014f, 24.902500f, -194.147995f };
+    Common::FFXIVARR_POSITION3 Eobj1Pos = { -294.333008f, 24.268900f, -207.630997f };
+    Common::FFXIVARR_POSITION3 Eobj2Pos = { -294.175995f, 25.021999f, -194.072006f };
+
+    uint8_t hitTargets = 0;
+    if( quest.getUI8AL() == 0 )
+    {
+      if( Sapphire::Common::Util::distance( pos, Eobj0Pos ) <= 1 )
+      {
+        Scene00003( quest, player );
+        hitTargets++;
+      }
+    }
+    else
+    {
+      hitTargets++;
+    }
+
+    if( quest.getUI8BH() == 0 )
+    {
+      if( Sapphire::Common::Util::distance( pos, Eobj1Pos ) <= 1 )
+      {
+        Scene00005( quest, player );
+        hitTargets++;
+      }
+    }
+    else
+    {
+      hitTargets++;
+    }
+
+    if( quest.getUI8BL() == 0 )
+    {
+      if( Sapphire::Common::Util::distance( pos, Eobj2Pos ) <= 1 )
+      {
+        Scene00007( quest, player );
+        hitTargets++;
+      }
+    }
+    else
+    {
+      hitTargets++;
+    }
+
+    if( quest.getUI8AH() != hitTargets )
+    {
+      quest.setUI8CH( 3 - hitTargets );
+      quest.setUI8AH( hitTargets );
+      eventMgr().sendEventNotice( player, getId(), 0, 2, hitTargets, 3 );
+
+      if( hitTargets == 3 )
+      {
+        quest.setUI8AL( 0 );
+        quest.setUI8BH( 0 );
+        quest.setUI8BL( 0 );
+        quest.setBitFlag8( 1, false );
+        quest.setBitFlag8( 2, false );
+        quest.setBitFlag8( 3, false );
+        quest.setSeq( SeqFinish );
+      }
+    }
   }
 
 
@@ -97,8 +162,7 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( Seq1 );
-    quest.setUI8CH( 1 );
-    eventMgr().sendEventNotice( player, getId(), 1, 0 );
+    quest.setUI8CH( 3 );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -118,39 +182,38 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, NONE, bindSceneReturn( &GaiUsa209::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &GaiUsa209::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    quest.setUI8AL( 1 );
+    quest.setBitFlag8( 1, true );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &GaiUsa209::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &GaiUsa209::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, NONE, bindSceneReturn( &GaiUsa209::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &GaiUsa209::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    quest.setUI8BH( 1 );
+    quest.setBitFlag8( 2, true );
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -175,8 +238,8 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    quest.setUI8BL( 1 );
+    quest.setBitFlag8( 3, true );
   }
 
   //////////////////////////////////////////////////////////////////////

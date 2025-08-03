@@ -102,6 +102,21 @@ void ActionMgr::handleEventItemAction( Sapphire::Entity::Player& player, uint32_
   action->start();
 }
 
+void ActionMgr::handlePlacedEventItemAction( Sapphire::Entity::Player& player, uint32_t itemId,
+                                             Excel::ExcelStructPtr< Excel::EventItem > itemActionData,
+                                             uint32_t sequence, Common::FFXIVARR_POSITION3 targetPos )
+{
+  auto action = Action::make_EventItemAction( player.getAsChara(), itemId, itemActionData, sequence, targetPos, Common::CastType::Circle );
+  action->init();
+
+  if( itemActionData->data().CastTime )
+  {
+    player.setCurrentAction( action );
+  }
+
+  action->start();
+}
+
 void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
                                    Excel::ExcelStructPtr< Excel::Action > actionData, uint64_t targetId,
                                    uint16_t sequence )
