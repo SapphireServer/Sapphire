@@ -87,6 +87,7 @@ void EventItemAction::execute()
 
     case Common::CastType::Circle:
     {
+      eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler, Event::EventHandler::ActionResult, 0, 0 );
       scriptMgr.onEventGroundItem( *pPlayer, m_eventItem, m_eventItemAction->data().EventHandler, m_pos );
       eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
       break;

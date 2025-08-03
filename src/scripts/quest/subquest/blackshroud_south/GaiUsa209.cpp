@@ -41,9 +41,9 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
     // Entities found in the script data of the quest
     static constexpr auto Actor0 = 1000598; // Auphiliot ( Pos: -170.809998 9.964130 -84.129402  Teri: 153 )
-    static constexpr Common::QuestEobject Eobject0 = { 2001942, 153, { -287.321014, 24.902500, -194.147995 }, 1 }; // Storage Case
-    static constexpr Common::QuestEobject Eobject1 = { 2001943, 153, { -294.333008, 24.268900, -207.630997 }, 1 }; // Storage Case
-    static constexpr Common::QuestEobject Eobject2 = { 2001944, 153, { -294.175995, 25.021999, -194.072006 }, 1 }; // Storage Case
+    static constexpr Common::QuestEobject Eobject0 = { 2001942, 153, { -287.321014, 24.902500, -194.147995 }, 1.000000 }; // Storage Case
+    static constexpr Common::QuestEobject Eobject1 = { 2001943, 153, { -294.333008, 24.268900, -207.630997 }, 1.000000 }; // Storage Case
+    static constexpr Common::QuestEobject Eobject2 = { 2001944, 153, { -294.175995, 25.021999, -194.072006 }, 1.000000 }; // Storage Case
     static constexpr auto Item0 = 2000586;
 
   public:
@@ -85,7 +85,6 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
       Scene00007( quest, player );
     }
   }
-
 
   private:
 

@@ -154,6 +154,40 @@ const std::string& getItemNameFromExd( uint32_t id )
   return invalid;
 }
 
+const std::string& getEobjectStructFromLevelExd( uint32_t id )
+{
+  static std::unordered_map< uint32_t, std::string > levelPositions;
+  static std::string onlyId = std::to_string( id );
+
+  if( levelPositions.empty() )
+  {
+    auto levelIdList = g_exdDataGen.getIdList< Excel::Level >();
+    for( auto id : levelIdList )
+    {
+      auto levelRow = g_exdDataGen.getRow< Excel::Level >( id );
+      if( levelRow )
+      {
+        auto assetType = levelRow->data().eAssetType;
+        // enpc, bnpc, eobj
+        if( assetType != 8 && assetType != 9 && assetType != 45 )
+          continue;
+        std::string pos( "{ " );
+        pos +=
+                std::to_string( levelRow->data().BaseId ) + ", " +
+                std::to_string( levelRow->data().TerritoryType ) + ", { " +
+                std::to_string( levelRow->data().TransX ) + ", " +
+                std::to_string( levelRow->data().TransY ) + ", " +
+                std::to_string( levelRow->data().TransZ ) + " }, " +
+                std::to_string( levelRow->data().RangeOnMap ) + " }";
+        levelPositions.emplace( levelRow->data().BaseId, pos );
+      }
+    }
+  }
+  if( auto pos = levelPositions.find( id ); pos != levelPositions.end() )
+    return pos->second;
+  return onlyId;
+}
+
 const std::string& getActorPosFromLevelExd( uint32_t id )
 {
   static std::unordered_map< uint32_t, std::string > levelPositions;
@@ -465,7 +499,7 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
       std::transform( nameStripped.begin(), nameStripped.end(), nameStripped.begin(), ::tolower);
       // comment actor names and positions if possible
       if( nameStripped.find( "acto" ) != std::string::npos || nameStripped.find( "enemy" ) != std::string::npos
-        || nameStripped.find( "eobj" ) != std::string::npos || nameStripped.find( "npc" ) != std::string::npos )
+        || nameStripped.find( "npc" ) != std::string::npos )
       { 
         script_entities.push_back( name + " = " + std::to_string( pQuestData->data().Define[ ca ].Value ) + "; // " +
           getActorNameFromExd( pQuestData->data().Define[ca].Value ) + getActorPosFromLevelExd( pQuestData->data().Define[ca].Value ) );
@@ -474,6 +508,12 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
       else if( nameStripped.find( "ritem" ) != std::string::npos )
       { 
         script_entities.push_back( name + " = " + std::to_string( pQuestData->data().Define[ ca ].Value ) + "; // " + getItemNameFromExd( pQuestData->data().Define[ca].Value ) );
+      }
+      // Create QuestEobject struct for eobjects
+      else if( nameStripped.find( "eobj" ) != std::string::npos )
+      {
+        script_entities.push_back( name + " = " + getEobjectStructFromLevelExd( pQuestData->data().Define[ ca ].Value ) + "; // " +
+                                   getActorNameFromExd( pQuestData->data().Define[ ca ].Value ) );
       }
       else
         script_entities.push_back(
@@ -486,8 +526,14 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
   for( auto& entity : script_entities )
   {
     auto name = titleCaseNoUnderscores( entity );
-    sentities += "    static constexpr auto " + name + "\n";
-
+    if( name.rfind( "Eobject", 0 ) == 0 && name.find( '{' ) != std::string::npos )
+    {
+      sentities += "    static constexpr Common::QuestEobject " + name + "\n";
+    }
+    else
+    {
+      sentities += "    static constexpr auto " + name + "\n";
+    }
   }
 
   std::string additional = "// Quest Script: " + pQuestData->getString( pQuestData->data().Script ) + "\n";
@@ -537,7 +583,10 @@ createScript( std::shared_ptr< Excel::ExcelStruct< Excel::Quest > >& pQuestData,
   {
     scriptEntry +=  "  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override\n"
             "  {\n"
-            "  }\n\n" ;
+            "  }\n\n"
+            "  void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos ) override\n"
+            "  {\n"
+            "  }\n\n";
   }
 
   if( !enemy_ids.empty() )
