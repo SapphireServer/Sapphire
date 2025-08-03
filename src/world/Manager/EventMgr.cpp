@@ -1,5 +1,6 @@
 #include <Common.h>
 #include <Util/Util.h>
+#include <Util/UtilMath.h>
 #include <Service.h>
 
 #include "EventMgr.h"
@@ -620,6 +621,11 @@ void EventMgr::eventItemActionStart( Entity::Player& player, uint32_t eventId, u
   player.setCurrentAction( pEventItemAction );
 
   pEventItemAction->onStart();
+}
+
+bool EventMgr::checkHitEobject( Entity::Player& player, Common::FFXIVARR_POSITION3 targetPos, Common::QuestEobject Eobject )
+{
+  return player.getTerritoryTypeId() == Eobject.teri && Sapphire::Common::Util::distance( targetPos, Eobject.pos ) < 2.0f + Eobject.radius;
 }
 
 

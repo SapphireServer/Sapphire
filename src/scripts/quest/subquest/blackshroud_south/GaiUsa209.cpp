@@ -7,7 +7,6 @@
 #include "Manager/PlayerMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
-#include "Util/UtilMath.h"
 
 // Quest Script: GaiUsa209_00732
 // Quest Name: Stash Saboteur
@@ -42,9 +41,9 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
     // Entities found in the script data of the quest
     static constexpr auto Actor0 = 1000598; // Auphiliot ( Pos: -170.809998 9.964130 -84.129402  Teri: 153 )
-    static constexpr auto Eobject0 = 2001942; // Storage Case ( Pos: -287.321014 24.902500 -194.147995  Teri: 153 )
-    static constexpr auto Eobject1 = 2001943; // Storage Case ( Pos: -294.333008 24.268900 -207.630997  Teri: 153 )
-    static constexpr auto Eobject2 = 2001944; // Storage Case ( Pos: -294.175995 25.021999 -194.072006  Teri: 153 )
+    static constexpr Common::QuestEobject Eobject0 = { 2001942, 153, { -287.321014, 24.902500, -194.147995 }, 1 }; // Storage Case
+    static constexpr Common::QuestEobject Eobject1 = { 2001943, 153, { -294.333008, 24.268900, -207.630997 }, 1 }; // Storage Case
+    static constexpr Common::QuestEobject Eobject2 = { 2001944, 153, { -294.175995, 25.021999, -194.072006 }, 1 }; // Storage Case
     static constexpr auto Item0 = 2000586;
 
   public:
@@ -70,14 +69,10 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
   void onEventGroundItem( World::Quest& quest, Entity::Player& player, Common::FFXIVARR_POSITION3 pos ) override
   {
-    Common::FFXIVARR_POSITION3 Eobj0Pos = { -287.321014f, 24.902500f, -194.147995f };
-    Common::FFXIVARR_POSITION3 Eobj1Pos = { -294.333008f, 24.268900f, -207.630997f };
-    Common::FFXIVARR_POSITION3 Eobj2Pos = { -294.175995f, 25.021999f, -194.072006f };
-
     uint8_t hitTargets = 0;
     if( quest.getUI8AL() == 0 )
     {
-      if( Sapphire::Common::Util::distance( pos, Eobj0Pos ) <= 1 )
+      if( eventMgr().checkHitEobject( player, pos, Eobject0 ) )
       {
         Scene00003( quest, player );
         hitTargets++;
@@ -90,7 +85,7 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
     if( quest.getUI8BH() == 0 )
     {
-      if( Sapphire::Common::Util::distance( pos, Eobj1Pos ) <= 1 )
+      if( eventMgr().checkHitEobject( player, pos, Eobject1 ) )
       {
         Scene00005( quest, player );
         hitTargets++;
@@ -103,7 +98,7 @@ class GaiUsa209 : public Sapphire::ScriptAPI::QuestScript
 
     if( quest.getUI8BL() == 0 )
     {
-      if( Sapphire::Common::Util::distance( pos, Eobj2Pos ) <= 1 )
+      if( eventMgr().checkHitEobject( player, pos, Eobject2 ) )
       {
         Scene00007( quest, player );
         hitTargets++;
