@@ -1,5 +1,5 @@
 cmake_policy( SET CMP0014 NEW )
-cmake_minimum_required( VERSION 3.0.2 )
+cmake_minimum_required( VERSION 3.10 )
 project( Sapphire )
 
 set( EXECUTABLE_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH}/tools )
@@ -29,4 +29,5 @@ add_subdirectory( "nav_export" )
 add_subdirectory( "event_object_parser" )
 add_subdirectory( "action_parse" )
 add_subdirectory( "wiki_parse" )
+add_subdirectory( "Toolkit" )
 #add_subdirectory( "questbattle_bruteforce" )

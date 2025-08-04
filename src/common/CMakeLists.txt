@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0.2 )
+cmake_minimum_required( VERSION 3.10 )
 project( Sapphire )
 
 file(GLOB UTILS_SOURCE_FILES
@@ -14,7 +14,7 @@ file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/Util/*.cpp")
 
 
-add_library( common ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
+add_library( common STATIC ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
 
 target_link_libraries( common
                          PUBLIC

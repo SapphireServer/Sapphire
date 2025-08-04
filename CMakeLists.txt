@@ -1,5 +1,5 @@
 cmake_policy( SET CMP0014 NEW )
-cmake_minimum_required( VERSION 3.0.2 )
+cmake_minimum_required( VERSION 3.10 )
 project( Sapphire )
 
 set( CMAKE_MODULE_PATH
@@ -23,6 +23,14 @@ file( COPY ${CMAKE_SOURCE_DIR}/data DESTINATION ${CMAKE_BINARY_DIR}/bin )
 include( "cmake/paths.cmake" )
 include( "cmake/compiler.cmake" )
 
+include_directories(
+        "deps/glew-1.9.0/include"
+        "deps/glfw-3.2.1/include"
+        "deps/glm"
+        "deps/freetype/include"
+        "deps/"
+)
+
 ##############################
 #             Git            #
 ##############################
@@ -31,6 +39,16 @@ get_git_head_revision( GIT_REFSPEC GIT_SHA1 )
 git_describe( VERSION --all --dirty=-d )
 configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
+
+link_directories(
+        "${CMAKE_SOURCE_DIR}/deps/glew-1.9.0/lib/Release/x64"
+        "${CMAKE_SOURCE_DIR}/deps/glfw-3.2.1/lib-vc2015"
+        "${CMAKE_BUILD_PATH}"
+        "${CMAKE_BUILD_PATH}/../")
+
+
+set( FREETYPE_LIBRARY "${CMAKE_SOURCE_DIR}/lib/freetype.lib" )
+set( FREETYPE_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/freetype/include" )
 
 ##############################
 #           Mysql            #
@@ -46,6 +64,8 @@ add_subdirectory( "deps/datReader" )
 add_subdirectory( "deps/datReaderPs3" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "deps/recastnavigation" )
+add_subdirectory( "deps/glm" )
+add_subdirectory( "deps/freetype" )
 
 ##############################
 #  Main Sapphire Components  #
