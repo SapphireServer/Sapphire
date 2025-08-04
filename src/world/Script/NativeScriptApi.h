@@ -42,6 +42,8 @@ namespace Sapphire::ScriptAPI
     */
     ScriptObject( uint32_t id, std::size_t type );
 
+    virtual ~ScriptObject() = default;
+
     /*!
     * @brief Gets the ID set for this script
     *
