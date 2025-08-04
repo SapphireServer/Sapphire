@@ -71,7 +71,6 @@ Player::Player() :
   m_townWarpFstFlags( 0 ),
   m_playTime( 0 ),
   m_lastActionTick( 0 ),
-  m_bInCombat( false ),
   m_bLoadingComplete( false ),
   m_bAutoattack( false ),
   m_markedForRemoval( false ),
@@ -598,12 +597,7 @@ void Player::setCurrentExp( uint32_t amount )
 
 bool Player::isInCombat() const
 {
-  return m_bInCombat;
-}
-
-void Player::setInCombat( bool mode )
-{
-  m_bInCombat = mode;
+  return hasCondition( PlayerCondition::InCombat );
 }
 
 void Player::setClassJob( Common::ClassJob classJob )
@@ -1018,7 +1012,6 @@ void Player::onMobAggro( const BNpc& bnpc )
 {
   hateListAdd( bnpc );
   setCondition( PlayerCondition::InCombat );
-  m_bInCombat = true;
   Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 1 );
 }
 
@@ -1028,7 +1021,6 @@ void Player::onMobDeaggro( const BNpc& bnpc )
   if( m_actorIdTohateSlotMap.empty() )
   {
     removeCondition( PlayerCondition::InCombat );
-    m_bInCombat = false;
     Network::Util::Packet::sendActorControl( *this, getId(), SetBattle, 0 );
   }
 }
