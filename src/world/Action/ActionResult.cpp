@@ -9,6 +9,10 @@
 #include "Actor/Player.h"
 #include "StatusEffect/StatusEffect.h"
 
+#include "Network/Util/PacketUtil.h"
+
+#include "Script/ScriptMgr.h"
+
 using namespace Sapphire;
 using namespace Sapphire::Common;
 using namespace Sapphire::World::Action;
@@ -72,19 +76,21 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
   m_result.Arg2 = param;
   m_result.Type = CalcResultType::TypeSetStatus;
 
-  m_bOverrideStatus = shouldOverride;
+  m_bShouldOverride = shouldOverride;
   m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, 3000 );
   m_pStatus->setParam( param );
 }
 
 void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                      const std::vector< StatusModifier >& modifiers, uint32_t flag, bool shouldOverride )
+                                      const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
-  m_result.Type = CalcResultType::TypeSetStatus;
+  m_result.Type = statusToSource ? CalcResultType::TypeSetStatusMe : CalcResultType::TypeSetStatus;
+  if( statusToSource )
+    m_result.Flag = static_cast< uint8_t >( ActionResultFlag::EffectOnSource );
 
-  m_bOverrideStatus = shouldOverride;
+  m_bShouldOverride = shouldOverride;
   m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, source.getAsChara(), m_target, duration, modifiers, flag, 3000 );
   m_pStatus->setParam( param );
 }
@@ -96,7 +102,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_result.Type = CalcResultType::TypeSetStatusMe;
   m_result.Flag = static_cast< uint8_t >( ActionResultFlag::EffectOnSource );
 
-  m_bOverrideStatus = shouldOverride;
+  m_bShouldOverride = shouldOverride;
   m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, 3000 );
   m_pStatus->setParam( param );
 }
@@ -109,9 +115,25 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_result.Type = CalcResultType::TypeSetStatusMe;
   m_result.Flag = static_cast< uint8_t >( Common::ActionResultFlag::EffectOnSource );
 
-  m_bOverrideStatus = shouldOverride;
+  m_bShouldOverride = shouldOverride;
   m_pStatus = Sapphire::StatusEffect::make_StatusEffect( id, m_target, m_target, duration, modifiers, flag, 3000 );
   m_pStatus->setParam( param );
+}
+
+void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
+                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource )
+{
+  applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, false );
+  m_pOldStatus = std::move( pOldStatus );
+  m_pStatus->setSlot( m_pOldStatus->getSlot() );
+}
+
+void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
+                                            const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag )
+{
+  applyStatusEffectSelf( id, duration, param, modifiers, flag, false );
+  m_pOldStatus = std::move( pOldStatus );
+  m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
 
 void ActionResult::mount( uint16_t mountId )
@@ -141,6 +163,13 @@ void ActionResult::execute()
     case CalcResultType::TypeDamageHp:
     case CalcResultType::TypeCriticalDamageHp:
     {
+      auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+      auto statusEffects( m_target->getStatusEffectMap() );
+      for( auto status : statusEffects )
+      {
+        scriptMgr.onPlayerHit( m_target, *status.second );
+      }
+
       m_target->takeDamage( m_result.Value );
       break;
     }
@@ -161,7 +190,22 @@ void ActionResult::execute()
     case CalcResultType::TypeSetStatus:
     case CalcResultType::TypeSetStatusMe:
     {
-      if( !m_bOverrideStatus )
+      for( auto const& entry : m_target->getStatusEffectMap() )
+      {
+        auto statusEffect = entry.second;
+        if( statusEffect->getId() == m_result.Value && m_bShouldOverride && statusEffect->getSrcActorId() == m_pStatus->getSrcActorId() )
+        {
+          statusEffect->refresh( m_pStatus->getDuration() );
+          m_pStatus->setSlot( statusEffect->getSlot() );
+          
+          Network::Util::Packet::sendHudParam( *m_target );
+          return;
+        }
+      }
+
+      if( m_pOldStatus )
+        m_target->replaceSingleStatusEffect( m_pOldStatus->getSlot(), m_pStatus );
+      else if( !m_bShouldOverride )
         m_target->addStatusEffectByIdIfNotExist( m_pStatus );
       else
         m_target->addStatusEffectById( m_pStatus );

@@ -103,6 +103,8 @@ namespace Sapphire::Entity
 
     int16_t getQuestTracking( uint8_t index ) const;
 
+    uint16_t getQuestItemIcon( uint32_t itemId );
+
     /*! finish a given quest */
     void finishQuest( uint16_t questId, uint32_t optionalChoice = 0 );
 

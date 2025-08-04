@@ -70,9 +70,10 @@ namespace Sapphire::ScriptAPI
     /*!
     * @brief Called on each tick that a status effect is active on an actor
     *
-    * @param actor the actor the status effect is ticking on
+    * @param actor the actor on which the status effect was applied to
+    * @param effect the status effect that does a tick event
     */
-    virtual void onTick( Sapphire::Entity::Chara& actor );
+    virtual void onTick( Sapphire::Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect );
 
     /*!
     * @brief Called when the status effect is applied to an actor
@@ -115,7 +116,7 @@ namespace Sapphire::ScriptAPI
     *
     * @param actor The actor that was damaged
     */
-    virtual void onPlayerDamaged( Sapphire::Entity::Chara& actor );
+    virtual void onPlayerHit( Entity::Chara& hitActor, Sapphire::StatusEffect::StatusEffect& effect );
 
     /*!
     * @brief Called when the status effect owner dies
@@ -123,6 +124,11 @@ namespace Sapphire::ScriptAPI
     * @param actor The actor that died
     */
     virtual void onPlayerDeath( Sapphire::Entity::Chara& actor );
+
+    World::Manager::PlayerMgr& playerMgr()
+    {
+      return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
   };
 
 
