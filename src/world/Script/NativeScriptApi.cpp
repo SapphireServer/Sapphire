@@ -38,7 +38,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void StatusEffectScript::onTick( Entity::Chara& actor )
+  void StatusEffectScript::onTick( Sapphire::Entity::Chara& actor, Sapphire::StatusEffect::StatusEffect& effect )
   {
   }
 
@@ -62,7 +62,7 @@ namespace Sapphire::ScriptAPI
   {
   }
 
-  void StatusEffectScript::onPlayerDamaged( Entity::Chara& actor )
+  void StatusEffectScript::onPlayerHit( Entity::Chara& hitActor, Sapphire::StatusEffect::StatusEffect& effect )
   {
   }
 

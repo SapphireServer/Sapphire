@@ -23,10 +23,10 @@ namespace Sapphire::World::Util
  
   class ActorFilterInRange : public ActorFilter
   {
-    Common::FFXIVARR_POSITION3 m_startPos;
-    float m_range;
+    Common::FFXIVARR_POSITION3 m_aoePos;
+    float m_radius;
   public:
-    ActorFilterInRange( Common::FFXIVARR_POSITION3 startPos, float range );
+    ActorFilterInRange( Common::FFXIVARR_POSITION3 aoePos, float range );
     bool conditionApplies( const Entity::GameObject& actor ) override;
   };
 
@@ -37,6 +37,18 @@ namespace Sapphire::World::Util
     uint32_t m_actorId;
   public:
     explicit ActorFilterSingleTarget( uint32_t actorId );
+    bool conditionApplies( const Entity::GameObject& actor ) override;
+  };
+  
+  /////////////////////////////////////////////////////////////////////////////
+
+  class ActorFilterBox : public ActorFilter
+  {
+    Common::FFXIVARR_POSITION3 m_aoePos;
+    uint16_t m_width;
+    uint16_t m_height;
+  public:
+    explicit ActorFilterBox( Common::FFXIVARR_POSITION3 aoePos, uint16_t width, uint16_t height );
     bool conditionApplies( const Entity::GameObject& actor ) override;
   };
 }

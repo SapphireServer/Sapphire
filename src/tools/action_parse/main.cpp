@@ -41,6 +41,8 @@ struct StatusEntry
 {
   uint16_t id;
   uint32_t duration;
+  uint32_t maxDuration;
+  uint8_t statusRefreshPolicy;
   uint32_t flag;
   std::vector< StatusModifier > modifiers;
 };
@@ -63,6 +65,7 @@ struct ActionEntry
   uint32_t curePotency;
   uint32_t restorePercentage;
   std::vector< uint32_t > nextCombo{};
+  Common::TargetFilter targetFilter = Common::TargetFilter::All;
   StatusEffect statuses;
 };
 
@@ -79,6 +82,8 @@ void to_json( nlohmann::ordered_json& j, const StatusEntry& statusEntry )
   j = nlohmann::ordered_json{
     { "id", statusEntry.id },
     { "duration", statusEntry.duration },
+    { "maxDuration", statusEntry.maxDuration },
+    { "statusRefreshPolicy", statusEntry.statusRefreshPolicy },
     { "flag", statusEntry.flag },
     { "modifiers", statusEntry.modifiers }
   };
@@ -96,9 +101,10 @@ void to_json( nlohmann::ordered_json& j, const ActionEntry& action )
     { "curePotency", action.curePotency },
     { "restorePercentage", action.restorePercentage },
     { "nextCombo", action.nextCombo },
+    { "targetFilter", action.targetFilter },
     { "statuses", {
         { "caster", action.statuses.caster },
-        { "target", action.statuses.target },
+        { "target", action.statuses.target }
       }
     }
   };

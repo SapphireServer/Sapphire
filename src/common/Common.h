@@ -868,25 +868,26 @@ namespace Sapphire::Common
     EXPBonus = 52,
     Regen = 53,
     Refresh = 54,
-    MainAttribute = 55,
-    SecondaryAttribute = 56,
-    SlowResistance = 57,
-    PetrificationResistance = 58,
-    ParalysisResistance = 59,
-    SilenceResistance = 60,
-    BlindResistance = 61,
-    PoisonResistance = 62,
-    StunResistance = 63,
-    SleepResistance = 64,
-    BindResistance = 65,
-    HeavyResistance = 66,
-    DoomResistance = 67,
-    ReducedDurabilityLoss = 68,
-    IncreasedSpiritbondGain = 69,
-    Craftsmanship = 70,
-    Control = 71,
-    Gathering = 72,
-    Perception = 73,
+    TpRefresh = 55,
+    MainAttribute = 56,
+    SecondaryAttribute = 57,
+    SlowResistance = 58,
+    PetrificationResistance = 59,
+    ParalysisResistance = 60,
+    SilenceResistance = 61,
+    BlindResistance = 62,
+    PoisonResistance = 63,
+    StunResistance = 64,
+    SleepResistance = 65,
+    BindResistance = 66,
+    HeavyResistance = 67,
+    DoomResistance = 68,
+    ReducedDurabilityLoss = 69,
+    IncreasedSpiritbondGain = 70,
+    Craftsmanship = 71,
+    Control = 72,
+    Gathering = 73,
+    Perception = 74,
 
     // Unique modifiers
     TickHeal = 1000,
@@ -937,7 +938,18 @@ namespace Sapphire::Common
     Invisibilty = 512,
     CanStatusOff = 1024,
     FcBuff = 2048,
-    RemoveOnSuccessfulHit = 4096
+    RemoveOnSuccessfulHit = 4096,
+    ReplaceSameCaster = 8192
+  };
+
+  enum class StatusRefreshPolicy : uint8_t
+  {
+    Stack = 0,
+    ReplaceOrApply = 1,
+    Extend = 2,
+    ExtendOrApply = 3,
+    Reject = 4,
+    Custom = 255
   };
 
   enum struct ActionAspect : uint8_t
@@ -1171,7 +1183,7 @@ namespace Sapphire::Common
 
         // Legacy subtypes - skipping
 
-        #pragma region Synth 1 -50 Recipes
+        // Synth 1 -50 Recipes
         SynthWoodworkingLv01to10Recipes = 23,
         SynthWoodworkingLv11to20Recipes = 24,
         SynthWoodworkingLv21to30Recipes = 25,
@@ -1212,7 +1224,6 @@ namespace Sapphire::Common
         SynthCookingLv21to30Recipes = 60,
         SynthCookingLv31to40Recipes = 61,
         SynthCookingLv41to50Recipes = 62,
-        #pragma endregion
 
         // TODO: Map gathering subtypes 63 to 128
 
@@ -1862,13 +1873,26 @@ namespace Sapphire::Common
     THREAT
   };
 
-  enum CastType : uint8_t
+  enum class TargetFilter : uint8_t
   {
-    SingleTarget = 1,
-    CircularAOE = 2,
-    RectangularAOE = 3,
-    ConeAOE = 4,
-    CircularAoEPlaced = 7
+    All,
+    Players,
+    Allies,
+    Party,
+    Enemies
+  };
+
+  enum class CastType : uint8_t
+  {
+    None,
+    SingleTarget,
+    Circle,
+    Cone,
+    Box,
+    Unknown,
+    Unknown2,
+    PersistentArea, // for when you set aoe like asylum
+    Unknown3
   };
 
   enum class Role : uint8_t

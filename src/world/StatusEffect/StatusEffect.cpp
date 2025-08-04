@@ -147,14 +147,17 @@ void Sapphire::StatusEffect::StatusEffect::applyStatus()
   m_startTime = Util::getTimeMs();
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
 
-  for( const auto& mod : m_statusModifiers )
-  {
-    if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
-      setModifier( mod.modifier, mod.value );
-    else if( mod.modifier == Common::ParamModifier::TickDamage )
-      registerTickEffect( mod.modifier, mod.value );
-    else if( mod.modifier == Common::ParamModifier::TickHeal )
-      registerTickEffect( mod.modifier, mod.value );
+  if( m_modifiers.empty() )
+  {  
+    for( const auto& mod : m_statusModifiers )
+    {
+      if( mod.modifier != Common::ParamModifier::TickDamage && mod.modifier != Common::ParamModifier::TickHeal )
+        setModifier( mod.modifier, mod.value );
+      else if( mod.modifier == Common::ParamModifier::TickDamage )
+        registerTickEffect( mod.modifier, mod.value );
+      else if( mod.modifier == Common::ParamModifier::TickHeal )
+        registerTickEffect( mod.modifier, mod.value );
+    }
   }
 
   m_targetActor->calculateStats();
@@ -236,4 +239,15 @@ uint8_t Sapphire::StatusEffect::StatusEffect::getSlot() const
 void Sapphire::StatusEffect::StatusEffect::setSlot( uint8_t slot )
 {
   m_slot = slot;
+}
+
+void Sapphire::StatusEffect::StatusEffect::refresh()
+{
+  applyStatus();
+}
+
+void Sapphire::StatusEffect::StatusEffect::refresh( uint32_t newDuration )
+{
+  m_duration = newDuration;
+  refresh();
 }

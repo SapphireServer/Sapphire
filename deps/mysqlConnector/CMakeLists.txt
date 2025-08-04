@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.2.0)
-project(Sapphire)
-
-
 file( GLOB UTILS_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*" )
 file( GLOB UTILS_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*" )
 

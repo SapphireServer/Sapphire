@@ -35,9 +35,13 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
 
   auto distance = Common::Util::distance( bnpc.getPos(), pHatedActor->getPos() );
 
+  // All possibilities to automatically lose aggro go here
   if( !bnpc.hasFlag( Entity::NoDeaggro ) )
   {
-
+    if( bnpc.hasFlag( Entity::Immobile ) && distance > 40.0f )
+    {
+      bnpc.deaggro( pHatedActor );
+    }
   }
 
   if( !bnpc.hasFlag( Entity::Immobile ) && distance > ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )

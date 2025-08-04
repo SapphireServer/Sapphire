@@ -25,6 +25,8 @@ namespace Sapphire::World::Manager
 
     void onMobKill( Sapphire::Entity::Player& player, Sapphire::Entity::BNpc& bnpc );
 
+    void onSkillProc( Entity::Player& player, uint8_t index );
+
     void sendLoginMessage( Sapphire::Entity::Player& player );
 
     void onLogin( Sapphire::Entity::Player& player );
