@@ -198,9 +198,10 @@ void ZoneEditor::showBnpcWindow()
     {
       const auto& bnpc = m_filteredBnpcs[ i ];
 
+
       // Create display text
-      std::string displayText = fmt::format( "{} - {} (ID: {})",
-                                             bnpc->instanceId, bnpc->bnpcName, bnpc->BaseId );
+      std::string displayText = fmt::format( "{} - {} (BaseID: {})",
+                                             bnpc->instanceId, bnpc->nameString, bnpc->BaseId );
 
       bool isSelected = ( m_selectedBnpcIndex == i );
       if( ImGui::Selectable( displayText.c_str(), isSelected ) )
@@ -358,7 +359,7 @@ void ZoneEditor::loadBnpcs()
 
   while( res->next() )
   {
-    auto bnpc = std::make_shared< Sapphire::Common::BNPCInstanceObject >();
+    auto bnpc = std::make_shared< CachedBnpc >();
 
     bnpc->territoryType = res->getInt( 1 );
     bnpc->bnpcName = res->getString( 3 );
@@ -407,6 +408,17 @@ void ZoneEditor::loadBnpcs()
     bnpc->Nonpop = res->getInt( 46 );
 
     int groupId = res->getInt( 47 );
+
+    bnpc->nameString = bnpc->bnpcName;
+    auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
+
+    std::string bnpcName = bnpc->bnpcName;
+    auto bnpcNameEntry = exdD.getRow< Excel::BNpcName >( bnpc->NameId );
+    if( bnpcNameEntry )
+    {
+      bnpc->nameString = bnpcNameEntry->getString( bnpcNameEntry->data().Text.SGL );
+    }
+
     m_bnpcs.push_back( bnpc );
   }
 }
