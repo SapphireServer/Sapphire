@@ -972,35 +972,48 @@ void Player::updateHowtosSeen( uint32_t howToId )
 void Player::initHateSlotQueue()
 {
   m_freeHateSlotQueue = std::queue< uint8_t >();
-  for( int32_t i = 1; i < 26; ++i )
+  for( int32_t i = 0; i < 26; ++i )
     m_freeHateSlotQueue.push( i );
 }
 
 void Player::hateListAdd( const BNpc& bnpc )
 {
+  // todo: fix letter assignment. It doesn't seem to perfectly replicate retail yet.
   if( !m_freeHateSlotQueue.empty() )
   {
     uint8_t hateId = m_freeHateSlotQueue.front();
     m_freeHateSlotQueue.pop();
     m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
     Network::Util::Packet::sendHateList( *this );
+    Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
+  }
+  else
+  {
+    uint8_t hateId = m_actorIdTohateSlotMap.size();
+    m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
+    Network::Util::Packet::sendHateList( *this );
+    Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
   }
 }
 
 void Player::hateListRemove( const BNpc& bnpc )
 {
+  auto bnpcId = bnpc.getId();
+  auto result = m_actorIdTohateSlotMap.find( bnpcId );
+  if( result == m_actorIdTohateSlotMap.end() )
+    return;
 
-  auto it = m_actorIdTohateSlotMap.begin();
-  for( ; it != m_actorIdTohateSlotMap.end(); ++it )
+  uint8_t hateSlot = m_actorIdTohateSlotMap[ bnpcId ];
+  if( hateSlot < 26 )
   {
-    if( it->first == bnpc.getId() )
-    {
-      uint8_t hateSlot = it->second;
-      m_freeHateSlotQueue.push( hateSlot );
-      m_actorIdTohateSlotMap.erase( it );
-      Network::Util::Packet::sendHateList( *this );
-      return;
-    }
+    m_freeHateSlotQueue.push( hateSlot );
+    m_actorIdTohateSlotMap.erase( bnpcId );
+    Network::Util::Packet::sendHateList( *this );
+  }
+  else
+  {
+    m_actorIdTohateSlotMap.erase( bnpcId );
+    Network::Util::Packet::sendHateList( *this );
   }
 }
 

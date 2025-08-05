@@ -680,10 +680,10 @@ void BNpc::restHp()
 
 void BNpc::onActionHostile( CharaPtr pSource )
 {
-  if( !hateListGetHighest() )
-    aggro( pSource );
-
   hateListUpdate( pSource, 1 );
+
+  if( getCanSwapTarget() ) // todo: only call on global server tick
+    updateAggroTarget();
 
   if( !m_pOwner )
     setOwner( pSource );
@@ -806,8 +806,8 @@ void BNpc::setOwner( const CharaPtr& m_pChara )
   setOwnerPacket->data().Id = targetId;
   server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
 
-  if( m_pChara && m_pChara->isPlayer() )
-    Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
+  //if( m_pChara && m_pChara->isPlayer() )
+  //  Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
 
 }
 
@@ -891,6 +891,16 @@ void BNpc::calculateStats()
   setStatValue( BaseParam::AttackMagicPotency, inte );
   setStatValue( BaseParam::HealingMagicPotency, mnd );
 
+}
+
+void BNpc::updateAggroTarget()
+{
+  auto highestAggro = hateListGetHighest();
+  if( highestAggro && getTargetId() != highestAggro->getId() )
+  {
+    aggro( highestAggro );
+  }
+    
 }
 
 uint32_t BNpc::getRank() const
@@ -1012,4 +1022,19 @@ const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
 const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
+}
+
+bool BNpc::getCanSwapTarget()
+{
+  return m_canSwapTarget;
+}
+
+void BNpc::setCanSwapTarget( bool value )
+{
+  m_canSwapTarget = value;
+
+  if( m_canSwapTarget ) // todo: only call on global server tick
+  {
+    updateAggroTarget();
+  }
 }

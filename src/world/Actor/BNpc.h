@@ -162,8 +162,13 @@ namespace Sapphire::Entity
 
     void setRoamTargetPos( const Common::FFXIVARR_POSITION3& targetPos );
 
+    void updateAggroTarget();
+
     const Common::FFXIVARR_POSITION3& getRoamTargetPos() const;
     const Common::FFXIVARR_POSITION3& getSpawnPos() const;
+
+    bool getCanSwapTarget();
+    void setCanSwapTarget( bool value );
 
   private:
     uint32_t m_bNpcBaseId;
@@ -200,6 +205,7 @@ namespace Sapphire::Entity
 
     BNpcState m_state;
     std::set< std::shared_ptr< HateListEntry > > m_hateList;
+    bool m_canSwapTarget{ true };
 
     uint64_t m_naviLastUpdate;
     std::vector< Common::FFXIVARR_POSITION3 > m_naviLastPath;
