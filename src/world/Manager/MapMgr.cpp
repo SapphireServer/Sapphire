@@ -105,7 +105,7 @@ void MapMgr::updateAll( Entity::Player& player )
         {
           if( player.hasReward( static_cast< Common::UnlockEntry >( 5 ) ) )
           {
-            auto& guildLeve = exdData.getRow< Excel::GuildleveAssignment >( npcData )->data();
+            auto guildLeve = exdData.getRow< Excel::GuildleveAssignment >( npcData )->data();
 
             eventData.iconId = exdData.getRow< Excel::EventIconType >( 5 )->data().MapAvailable + 1;
 
@@ -358,14 +358,14 @@ bool MapMgr::isQuestAvailable( Entity::Player& player, uint32_t questId, Excel::
     }
   }  
 
-  auto classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob )->data().ClassJob;
-  if( !classJobCategory[ static_cast< uint8_t >( player.getClass() ) ] )
+  auto classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob );
+  if( !classJobCategory->data().ClassJob[ static_cast< uint8_t >( player.getClass() ) ] )
     return false;
 
   if( quest.ClassJob2 > 1 )
   {
-    classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob2 )->data().ClassJob;
-    if( !classJobCategory[ static_cast< uint8_t >( player.getClass() ) ] )
+    classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob2 );
+    if( !classJobCategory->data().ClassJob[ static_cast< uint8_t >( player.getClass() ) ] )
       return false;
   }
 
@@ -487,14 +487,14 @@ bool MapMgr::isQuestVisible( Entity::Player& player, uint32_t questId, Excel::Qu
 
   if( ( quest.Type & 1 ) == 0 )
   {
-    auto classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob )->data().ClassJob;
+    auto classJobCategory = exdData.getRow< Excel::ClassJobCategory >( quest.ClassJob );
 
     for( auto i = 1; i <= Common::CLASSJOB_TOTAL; ++i )
     {
       if( i == Common::CLASSJOB_TOTAL )
         return false;
 
-      if( classJobCategory[ i ] )
+      if( classJobCategory->data().ClassJob[ i ] )
       {
         if( player.getLevelForClass( static_cast< Common::ClassJob >( i ) ) >=  quest.ClassLevel )
           break;

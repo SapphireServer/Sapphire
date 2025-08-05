@@ -249,7 +249,11 @@ namespace Sapphire::Entity
 
     virtual void onDamageTaken( Chara& pSource ) {};
 
+    virtual bool isHostile( const Chara& chara );
+
     virtual void onActionHostile( CharaPtr pSource ) {};
+
+    virtual bool isFriendly( const Chara& chara );
 
     virtual void onActionFriendly( Chara& pSource ) {};
 

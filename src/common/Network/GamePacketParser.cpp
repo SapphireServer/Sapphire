@@ -97,6 +97,10 @@ PacketParseResult Network::Packets::getPacket( const std::vector< uint8_t >& buf
   const auto dataOffset = offset + sizeof( struct FFXIVARR_PACKET_SEGMENT_HEADER );
   const auto dataSize = packet.segHdr.size;
 
+  // Check if the packet is complete
+  if( dataOffset + dataSize > buffer.size() )
+    return Incomplete;
+
   // Allocate data buffer and copy
   packet.data.resize( dataSize );
   memcpy( packet.data.data(), buffer.data() + dataOffset, dataSize );
