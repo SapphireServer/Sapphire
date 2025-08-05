@@ -40,6 +40,15 @@ namespace Sapphire::Network::ActorControl
     CastInterrupt = 0x0F,
 
     /*!
+     * @brief Changes the CD of current recast group to (param3 - param2). The cooldown will look as if param3 was the recast time and param2 was the time that already passed since using the action
+     *
+     * param1 recast group
+     * param2 progressed recast time
+     * param3 max recast time
+     */
+    SetRecastTimer = 0x10,
+
+    /*!
      * @brief Sent when a player uses an action
      *
      * param1 Seems to be always 1 from what I've seen, needs more research

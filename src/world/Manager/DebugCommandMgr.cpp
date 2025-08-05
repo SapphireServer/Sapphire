@@ -86,6 +86,7 @@ DebugCommandMgr::DebugCommandMgr()
   registerCommand( "ew", &DebugCommandMgr::easyWarp, "Easy warping", 1 );
   registerCommand( "reload", &DebugCommandMgr::hotReload, "Reloads a resource", 1 );
   registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
+  registerCommand( "facing", &DebugCommandMgr::facing, "Checks if you are facing an actor", 1 );
   registerCommand( "cbt", &DebugCommandMgr::cbt, "Create, bind and teleport to an instance", 1 );
 }
 

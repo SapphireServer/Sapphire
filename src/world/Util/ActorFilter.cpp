@@ -4,16 +4,16 @@
 #include "Util/UtilMath.h"
 
 
-Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_POSITION3 startPos,
-                                                               float range ) :
-  m_startPos( startPos ),
-  m_range( range )
+Sapphire::World::Util::ActorFilterInRange::ActorFilterInRange( Common::FFXIVARR_POSITION3 aoePos,
+                                                               float radius ) :
+  m_aoePos( aoePos ),
+  m_radius( radius )
 {
 }
 
 bool Sapphire::World::Util::ActorFilterInRange::conditionApplies( const Entity::GameObject& actor )
 {
-  return Sapphire::Common::Util::distance( m_startPos, actor.getPos() ) <= m_range;
+  return Sapphire::Common::Util::distance( m_aoePos, actor.getPos() ) <= m_radius;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -29,3 +29,18 @@ bool Sapphire::World::Util::ActorFilterSingleTarget::conditionApplies( const Sap
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Sapphire::World::Util::ActorFilterBox::ActorFilterBox( Common::FFXIVARR_POSITION3 aoePos, uint16_t width, uint16_t height ) :
+  m_aoePos( aoePos ),
+  m_width( width ),
+  m_height( height )
+{
+}
+
+bool Sapphire::World::Util::ActorFilterBox::conditionApplies( const Sapphire::Entity::GameObject& actor )
+{
+  return actor.getPos().x < m_aoePos.x + m_width &&
+      actor.getPos().x > m_aoePos.x &&
+      actor.getPos().y < m_aoePos.y + m_height &&
+      actor.getPos().y > m_aoePos.y;
+}

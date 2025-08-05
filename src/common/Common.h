@@ -868,25 +868,26 @@ namespace Sapphire::Common
     EXPBonus = 52,
     Regen = 53,
     Refresh = 54,
-    MainAttribute = 55,
-    SecondaryAttribute = 56,
-    SlowResistance = 57,
-    PetrificationResistance = 58,
-    ParalysisResistance = 59,
-    SilenceResistance = 60,
-    BlindResistance = 61,
-    PoisonResistance = 62,
-    StunResistance = 63,
-    SleepResistance = 64,
-    BindResistance = 65,
-    HeavyResistance = 66,
-    DoomResistance = 67,
-    ReducedDurabilityLoss = 68,
-    IncreasedSpiritbondGain = 69,
-    Craftsmanship = 70,
-    Control = 71,
-    Gathering = 72,
-    Perception = 73,
+    TpRefresh = 55,
+    MainAttribute = 56,
+    SecondaryAttribute = 57,
+    SlowResistance = 58,
+    PetrificationResistance = 59,
+    ParalysisResistance = 60,
+    SilenceResistance = 61,
+    BlindResistance = 62,
+    PoisonResistance = 63,
+    StunResistance = 64,
+    SleepResistance = 65,
+    BindResistance = 66,
+    HeavyResistance = 67,
+    DoomResistance = 68,
+    ReducedDurabilityLoss = 69,
+    IncreasedSpiritbondGain = 70,
+    Craftsmanship = 71,
+    Control = 72,
+    Gathering = 73,
+    Perception = 74,
 
     // Unique modifiers
     TickHeal = 1000,
@@ -937,7 +938,18 @@ namespace Sapphire::Common
     Invisibilty = 512,
     CanStatusOff = 1024,
     FcBuff = 2048,
-    RemoveOnSuccessfulHit = 4096
+    RemoveOnSuccessfulHit = 4096,
+    ReplaceSameCaster = 8192
+  };
+
+  enum class StatusRefreshPolicy : uint8_t
+  {
+    Stack = 0,
+    ReplaceOrApply = 1,
+    Extend = 2,
+    ExtendOrApply = 3,
+    Reject = 4,
+    Custom = 255
   };
 
   enum struct ActionAspect : uint8_t
@@ -1171,6 +1183,7 @@ namespace Sapphire::Common
 
         // Legacy subtypes - skipping
 
+        // Synth 1 -50 Recipes
         SynthWoodworkingLv01to10Recipes = 23,
         SynthWoodworkingLv11to20Recipes = 24,
         SynthWoodworkingLv21to30Recipes = 25,
@@ -1869,6 +1882,14 @@ namespace Sapphire::Common
     ConeAOE = 4,
     CircularAOESelf = 5,
     CircularAoEPlaced = 7
+  };
+  enum class TargetFilter : uint8_t
+  {
+    All,
+    Players,
+    Allies,
+    Party,
+    Enemies
   };
 
   enum class Role : uint8_t

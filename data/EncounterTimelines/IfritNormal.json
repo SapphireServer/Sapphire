@@ -66,6 +66,12 @@
               "description": "Incinerate",
               "startTime": 24000,
               "type": "castAction"
+            },
+            {
+              "data": {},
+              "description": "",
+              "startTime": 28000,
+              "type": "idle"
             }
           ]
         },
@@ -150,7 +156,7 @@
                 "enabled": true
               },
               "description": "",
-              "startTime": 10100,
+              "startTime": 10000,
               "type": "setCondition"
             },
             {
@@ -166,6 +172,12 @@
               "description": "Vulcan Burst",
               "startTime": 12000,
               "type": "castAction"
+            },
+            {
+              "data": {},
+              "description": "",
+              "startTime": 16000,
+              "type": "idle"
             }
           ]
         },
@@ -344,8 +356,35 @@
                 "conditionStr": "If Ifrit state is Combat, loop Ifrit->Final Phase",
                 "enabled": true
               },
-              "description": "",
+              "description": "enable final phase",
               "startTime": 12000,
+              "type": "setCondition"
+            }
+          ]
+        },
+        {
+          "description": "",
+          "id": 9,
+          "name": "Hellfire Success Director",
+          "timepoints": [
+            {
+              "data": {
+                "idx": 0,
+                "opc": "set",
+                "val": 1
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "directorVar"
+            },
+            {
+              "data": {
+                "conditionId": 4,
+                "conditionStr": "If Ifrit state is Combat, push Ifrit->Hellfire Success",
+                "enabled": true
+              },
+              "description": "",
+              "startTime": 0,
               "type": "setCondition"
             }
           ]
@@ -359,7 +398,7 @@
               "data": {
                 "idx": 0,
                 "opc": "set",
-                "val": 1
+                "val": 2
               },
               "description": "",
               "startTime": 0,
@@ -481,6 +520,14 @@
               "description": "",
               "startTime": 0,
               "type": "bNpcFlags"
+            },
+            {
+              "data": {
+                "despawnActor": "Ifrit Nail 1"
+              },
+              "description": "",
+              "startTime": 0,
+              "type": "bNpcDespawn"
             }
           ]
         }
@@ -501,32 +548,13 @@
           "timepoints": [
             {
               "data": {
-                "actorName": "Ifrit Control <subactor 1>",
-                "pos": [
-                  0,
-                  0,
-                  0
-                ],
-                "positionType": "absolute",
-                "rot": 0,
+                "actionId": 733,
                 "selectorIndex": 0,
                 "selectorName": "Eruption",
-                "targetActor": "<unknown>",
-                "targetType": "selector"
-              },
-              "description": "",
-              "startTime": 100,
-              "type": "setPos"
-            },
-            {
-              "data": {
-                "actionId": 753,
-                "selectorIndex": 0,
-                "selectorName": "<unset>",
                 "snapshot": false,
                 "snapshotTime": 0,
                 "sourceActor": "Ifrit Control <subactor 1>",
-                "targetType": "self"
+                "targetType": "selector"
               },
               "description": "",
               "startTime": 100,
@@ -1081,7 +1109,7 @@
         "sourceActor": "Ifrit Nail 1"
       },
       "targetActor": "Ifrit",
-      "targetSchedule": "Hellfire Success"
+      "targetSchedule": "Hellfire Success Director"
     },
     {
       "condition": "combatState",
@@ -1160,6 +1188,19 @@
       },
       "targetActor": "Ifrit",
       "targetSchedule": "Reset"
+    },
+    {
+      "condition": "combatState",
+      "description": "",
+      "enabled": true,
+      "id": 14,
+      "loop": false,
+      "paramData": {
+        "combatState": 4,
+        "sourceActor": "Ifrit"
+      },
+      "targetActor": "Ifrit",
+      "targetSchedule": "Reset"
     }
   ],
   "name": "Brand new timeline",
@@ -1174,6 +1215,11 @@
           "negate": true,
           "param": null,
           "type": "topAggro"
+        },
+        {
+          "negate": false,
+          "param": null,
+          "type": "player"
         }
       ],
       "id": 1,

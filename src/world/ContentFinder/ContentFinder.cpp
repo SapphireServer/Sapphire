@@ -8,6 +8,7 @@
 #include "Network/PacketWrappers/UpdateFindContentPacket.h"
 #include "Network/PacketWrappers/UpdateContentPacket.h"
 #include "Network/PacketWrappers/NotifyFindContentPacket.h"
+#include "Network/PacketWrappers/FinishContentMatchToClientPacket.h"
 
 #include "Territory/Territory.h"
 #include "Territory/InstanceContent.h"
@@ -53,15 +54,11 @@ void World::ContentFinder::update()
         {
           uint32_t inProgress = 0; // 0x01 - in progress
           uint32_t dutyProgress = 0;
-          uint32_t flags = 0; // 0x20 freerole, 0x40 ownrequest, 0x100 random
+          // uint32_t flags = 0; // 0x20 freerole, 0x40 ownrequest, 0x100 random
 
-          // Undersized
-          if( content->m_flags & 0x01 )
-            flags |= 0x20;
-
-          auto updatePacket = makeUpdateFindContent( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
-                                                     SetResultMatched, inProgress, queuedPlayer->m_classJob, dutyProgress, flags );
-          server.queueForPlayer( queuedPlayer->getCharacterId(), updatePacket );
+          auto finishContentMatchPacket = makeFinishContentMatchToClient( queuedPlayer->getEntityId(), contentInfo->data().TerritoryType,
+                                                                          queuedPlayer->m_classJob, content->m_players.size(), dutyProgress, content->m_flags );
+          server.queueForPlayer( queuedPlayer->getCharacterId(), finishContentMatchPacket );
         }
 
         content->setState( WaitingForAccept );
@@ -81,8 +78,8 @@ void World::ContentFinder::update()
 
           for( auto& queuedPlayer : content->m_players )
           {
-            auto updatePacket = makeUpdateFindContent( queuedPlayer->getEntityId(), 0x06,
-                                                       SetResultReadyToEnter, 0, queuedPlayer->m_classJob, 0 );
+            auto updatePacket = makeUpdateFindContent( queuedPlayer->getEntityId(), instance->getTerritoryTypeId(),
+                                                       SetResultReadyToEnter, 1 );
             server.queueForPlayer( queuedPlayer->getCharacterId(), updatePacket );
 
             pInstanceContent->bindPlayer( queuedPlayer->getEntityId() );
@@ -160,10 +157,14 @@ void World::ContentFinder::completeRegistration( const Entity::Player &player, u
   if( flags & 0x01 )
   {
     auto updatePacket = makeUpdateFindContent( player.getId(), content->data().TerritoryType,
-                                               CompleteRegistration, 0x20, static_cast< uint32_t >( player.getClass() ) );
+                                               CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ), FindContentFlag::Undersized );
     server.queueForPlayer( player.getCharacterId(), updatePacket );
 
-    queuedContent->m_flags = flags;
+    auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 2, queuedContent->m_attackerCount + queuedContent->m_rangeCount,
+                                                     queuedContent->m_healerCount, queuedContent->m_tankCount, 0 );
+    server.queueForPlayer( player.getCharacterId(), statusPacket );
+
+    queuedContent->m_flags |= FindContentFlag::Undersized;
     queuedContent->setState( MatchingComplete );
   }
   else
@@ -172,8 +173,8 @@ void World::ContentFinder::completeRegistration( const Entity::Player &player, u
                                                CompleteRegistration, 1, static_cast< uint32_t >( player.getClass() ) );
     server.queueForPlayer( player.getCharacterId(), updatePacket );
 
-    auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 3, queuedContent->m_attackerCount + queuedContent->m_rangeCount,
-                                                     queuedContent->m_healerCount, queuedContent->m_tankCount, 0xff );
+    auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 1, queuedContent->m_attackerCount + queuedContent->m_rangeCount,
+                                                     queuedContent->m_healerCount, queuedContent->m_tankCount, 0xFF );
 
     for( auto& queuedPlayer : queuedContent->m_players )
     {
@@ -394,7 +395,7 @@ void World::ContentFinder::accept( Entity::Player& player )
                 queuedContent->getInstanceId(), queuedContent->getRegisterId(), player.getId() );
 
   auto statusPacket = makeNotifyFindContentStatus( player.getId(), content->data().TerritoryType, 4, queuedContent->m_dpsAccepted,
-                                                   queuedContent->m_healerAccepted, queuedContent->m_tankAccepted, 0x01 );
+                                                   queuedContent->m_healerAccepted, queuedContent->m_tankAccepted, 1 );
 
   for( auto& pPlayer : queuedContent->m_players )
   {

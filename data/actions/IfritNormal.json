@@ -1,19 +1,4 @@
 {
-  "872": {
-    "name": "Auto Attack",
-    "potency": 100,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
   "453": {
     "name": "Incinerate",
     "potency": 100,
@@ -24,6 +9,7 @@
     "curePotency": 0,
     "restorePercentage": 0,
     "nextCombo": [],
+    "targetFilter": 0,
     "statuses": {
       "caster": [],
       "target": []
@@ -39,6 +25,7 @@
     "curePotency": 0,
     "restorePercentage": 0,
     "nextCombo": [],
+    "targetFilter": 0,
     "statuses": {
       "caster": [],
       "target": []
@@ -53,6 +40,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
+    "targetFilter": 0,
     "nextCombo": [],
     "statuses": {
       "caster": [],
@@ -68,6 +56,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
+    "targetFilter": 0,
     "nextCombo": [],
     "statuses": {
       "caster": [
@@ -94,6 +83,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
+    "targetFilter": 0,
     "nextCombo": [],
     "statuses": {
       "caster": [],
@@ -109,6 +99,7 @@
     "rearPotency": 0,
     "curePotency": 0,
     "restorePercentage": 0,
+    "targetFilter": 0,
     "nextCombo": [],
     "statuses": {
       "caster": [],

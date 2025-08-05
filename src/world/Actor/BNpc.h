@@ -121,6 +121,7 @@ namespace Sapphire::Entity
     
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );
+    void notifyPlayerDeaggro( const CharaPtr& pChara );
 
     void update( uint64_t tickCount ) override;
     void onTick() override;

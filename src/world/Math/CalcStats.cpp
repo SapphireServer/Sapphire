@@ -293,12 +293,18 @@ float CalcStats::criticalHitProbability( const Chara& chara )
   const auto& baseStats = chara.getStats();
   auto level = chara.getLevel();
 
+  // ⌊ 200 × ( CHR - subVal )/ divVal + 50 ⌋ / 10
+  // CHR is the critical hit stat. Additional modifiers from (de)buffs get applied at the end
   auto chRate = chara.getStatValueFloat( Common::BaseParam::CriticalHit );
 
   auto divVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::DIV ] );
   auto subVal = static_cast< float >( levelTable[ level ][ Common::LevelTableEntry::SUB ] );
+  chRate = std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
 
-  return std::floor( 200.f * ( chRate - subVal ) / divVal + 50.f ) / 10.f;
+  chRate *= chara.getModifier( Common::ParamModifier::CriticalHitPercent );
+  chRate += chara.getModifier( Common::ParamModifier::CriticalHit );
+
+  return chRate;
 }
 
 
@@ -655,6 +661,23 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionHealin
   factor *= 1.0f + ( ( getRandomNumber0To100() - 50.0f ) / 1000.0f );
 
   return std::pair( factor, hitType );
+}
+
+uint32_t CalcStats::calcMpRefresh(uint32_t potency, uint8_t level)
+{
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+
+  auto paramGrowthInfo = exdData.getRow< Excel::ParamGrow >( level );
+
+  if (!paramGrowthInfo)
+  {
+    Logger::error( "Failed to read paramgrow exd when calculating MP refresh!" );
+    // Just assume max level (60) if we fail to read the file
+    return std::floor( potency * 0.884f );
+  }
+
+  uint32_t mpMod = paramGrowthInfo->data().Mp;
+  return std::floor( potency * mpMod / 1000 );
 }
 
 uint32_t CalcStats::primaryStatValue( const Sapphire::Entity::Chara& chara )

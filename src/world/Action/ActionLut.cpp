@@ -27,3 +27,9 @@ const ActionEntry& ActionLut::getEntry( uint16_t actionId )
 
   return it->second;
 }
+
+Sapphire::Common::StatusRefreshPolicy Sapphire::World::Action::getStatusRefreshPolicy( uint8_t statusRefreshPolicy, bool sameSource )
+{
+  uint8_t policy = sameSource ? statusRefreshPolicy >> 4 : statusRefreshPolicy & 0x0F;
+  return static_cast< Sapphire::Common::StatusRefreshPolicy >( policy );
+}

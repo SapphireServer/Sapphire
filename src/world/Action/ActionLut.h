@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <unordered_map>
-#include <string>
 #include <vector>
 #include "Common.h"
 
@@ -18,6 +17,8 @@ namespace Sapphire::World::Action
   {
     uint16_t id;
     uint32_t duration;
+    uint32_t maxDuration;
+    uint8_t statusRefreshPolicy;
     uint32_t flag;
     std::vector< StatusModifier > modifiers;
   };
@@ -38,6 +39,7 @@ namespace Sapphire::World::Action
     uint16_t curePotency;
     uint16_t restoreMPPercentage;
     std::vector< uint32_t > nextCombo;
+    Common::TargetFilter targetFilter;
     StatusEffect statuses;
   };
 
@@ -51,4 +53,6 @@ namespace Sapphire::World::Action
 
     static Lut m_actionLut;
   };
+
+  Sapphire::Common::StatusRefreshPolicy getStatusRefreshPolicy( uint8_t statusRefreshPolicy, bool sameSource );
 }

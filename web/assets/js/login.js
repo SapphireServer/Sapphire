@@ -23,7 +23,7 @@ function doLogin() {
       try {
         var response = readBody(xhr);
         var parsed = JSON.parse(response);
-        window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost);
+        window.external.Boot(parsed.sId, parsed.lobbyHost, parsed.frontierHost, parsed.lobbyPort);
       } catch(err) {
         document.getElementById("Error").innerHTML = "Login failed.";
       }

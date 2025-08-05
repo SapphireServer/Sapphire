@@ -17,6 +17,7 @@
 #include "Manager/PlayerMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/TerritoryMgr.h"
+#include "Manager/PartyMgr.h"
 
 #include "Session.h"
 #include "Network/GameConnection.h"
@@ -32,7 +33,10 @@
 #include <Service.h>
 #include "WorldServer.h"
 
+#include "StatusEffect/StatusEffect.h"
+
 #include "Job/Warrior.h"
+#include "Job/Bard.h"
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -533,7 +537,7 @@ void Action::Action::buildActionResults()
   if( !m_enableGenericHandler || !hasLutEntry || m_hitActors.empty() )
   {
     // send any effect packet added by script or an empty one just to play animation for other players
-    m_actionResultBuilder->sendActionResults( {} );
+    m_actionResultBuilder->sendActionResults( m_hitActors );
     return;
   }
 
@@ -617,6 +621,89 @@ void Action::Action::buildActionResults()
   // m_effectBuilder.reset();
 }
 
+void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, Entity::CharaPtr& source, World::Action::StatusEntry& status, bool statusToSource )
+{
+  auto pActionBuilder = getActionResultBuilder();
+
+  if( !pActionBuilder )
+    return;
+
+  auto hasSameStatus = false;
+  auto hasSameStatusFromSameCaster = false;
+  Sapphire::StatusEffect::StatusEffectPtr referenceStatus = nullptr;
+
+  for( auto const& entry : statusToSource ? source->getStatusEffectMap() : target->getStatusEffectMap() )
+  {
+    auto statusEffect = entry.second;
+    if( statusEffect->getId() == status.id )
+    {
+      hasSameStatus = true;
+      
+      if( !referenceStatus )
+        referenceStatus = statusEffect;
+      
+      if( statusEffect->getSrcActorId() == source->getId() )
+      {
+        hasSameStatusFromSameCaster = true;
+        referenceStatus = statusEffect;
+        break;;
+      }
+    }
+  }
+
+  auto policy = getStatusRefreshPolicy( status.statusRefreshPolicy, isSelf );
+  switch( policy )
+  {
+    case Common::StatusRefreshPolicy::Stack:
+    {
+      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
+      break;
+    }
+    case Common::StatusRefreshPolicy::ReplaceOrApply:
+    {
+      if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+      else
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      break;
+    }
+    case Common::StatusRefreshPolicy::Extend:
+    case Common::StatusRefreshPolicy::ExtendOrApply:
+    {
+      int64_t remainingDuration = 0;
+      if( hasSameStatus )
+      {
+        remainingDuration = static_cast< int64_t >( referenceStatus->getDuration() ) - ( Common::Util::getTimeMs() - referenceStatus->getStartTimeMs() );
+        if( remainingDuration < 0 )
+          remainingDuration = 0;
+      }
+
+      if( hasSameStatus || policy == Common::StatusRefreshPolicy::ExtendOrApply )
+      {
+        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      }
+      break;
+    }
+    case Common::StatusRefreshPolicy::Reject:
+    {
+      if( !hasSameStatus )
+      {
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+      }
+      else
+      {
+        // add function to ActionBuilder for No Effect effect
+      }
+      break;
+    }
+    case Common::StatusRefreshPolicy::Custom:
+    {
+      // script should handle it
+      break;
+    }
+  }
+}
+
 void Action::Action::handleStatusEffects()
 {
   auto pActionBuilder = getActionResultBuilder();
@@ -632,7 +719,12 @@ void Action::Action::handleStatusEffects()
   {
     for( auto& status : m_lutEntry.statuses.caster )
     {
-      pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
+      /*if( m_hitActors[ 0 ] ) // might need a firstValidVictim?
+        applyStatusEffect( true, m_hitActors[ 0 ], m_pSource, status, true );
+        // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true ); // statusToSource true
+      else if( m_lutEntry.potency == 0 )*/
+      applyStatusEffect( true, m_pSource, m_pSource, status, true );
+        // pActionBuilder->applyStatusEffectSelf( status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
     }
   }
 
@@ -643,7 +735,8 @@ void Action::Action::handleStatusEffects()
     {
       for( auto& status : m_lutEntry.statuses.target )
       {
-        pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
+        applyStatusEffect( false, actor, m_pSource, status );
+        // pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
 
       if( !actor->getStatusEffectMap().empty() )
@@ -659,6 +752,12 @@ void Action::Action::handleJobAction()
     case ClassJob::Warrior:
     {
       Warrior::onAction( *m_pSource->getAsPlayer(), *this );
+      break;
+    }
+    case ClassJob::Archer:
+    case ClassJob::Bard:
+    {
+      Bard::onAction( *m_pSource->getAsPlayer(), *this );
       break;
     }
   }
@@ -866,7 +965,6 @@ void Action::Action::addDefaultActorFilters()
   {
     // todo: figure these out and remove 5/RectangularAOE to own handler
     case( Common::CastType ) 5:
-    case Common::CastType::RectangularAOE:
     case Common::CastType::SingleTarget:
     {
       auto filter = std::make_shared< World::Util::ActorFilterSingleTarget >( static_cast< uint32_t >( m_targetId ) );
@@ -881,15 +979,17 @@ void Action::Action::addDefaultActorFilters()
       break;
     }
 
-//    case Common::CastType::RectangularAOE:
-//    {
-//      break;
-//    }
+    case Common::CastType::RectangularAOE:
+    {
+      auto filter = std::make_shared< World::Util::ActorFilterBox >( m_pos, m_effectWidth, m_effectRange );
+      addActorFilter( filter );
+      break;
+    }
 
     default:
     {
       Logger::error( "[{}] Action#{} has CastType#{} but that cast type is unhandled. Cancelling cast.",
-                     m_pSource->getId(), getId(), m_castType );
+                     m_pSource->getId(), getId(), static_cast< uint8_t >( m_castType ) );
 
       interrupt();
     }
@@ -905,9 +1005,52 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( kind != ObjKind::BattleNpc && kind != ObjKind::Player )
     return false;
 
-  // todo: evaluate other actions that can hit condition (eg. sprint)
-  /* if( !m_canTargetSelf && chara->getId() == m_pSource->getId() )
-    return false;*/
+  bool actorApplicable = false;
+  switch( m_lutEntry.targetFilter )
+  {
+    case Common::TargetFilter::All:
+    {
+      actorApplicable = true;
+      break;
+    }
+    case Common::TargetFilter::Players:
+    {
+      actorApplicable = kind == ObjKind::Player;
+      break;
+    }
+    case Common::TargetFilter::Allies:
+    {
+      // Todo: Make this work for allies properly
+      actorApplicable = kind != ObjKind::BattleNpc;
+      break;
+    }
+    case Common::TargetFilter::Party:
+    {
+      auto pPlayer = m_pSource->getAsPlayer();
+      if( pPlayer && pPlayer->getPartyId() != 0 )
+      {
+        auto& partyMgr = Common::Service< World::Manager::PartyMgr >::ref();
+        // Get party members
+        auto pParty = partyMgr.getParty( pPlayer->getPartyId() );
+        assert( pParty );
+
+        for( const auto& id : pParty->MemberId )
+        {
+          if( id == actor.getId() )
+          {
+            actorApplicable = true;
+            break;
+          }
+        }
+      }
+      break;
+    }
+    case Common::TargetFilter::Enemies:
+    {
+      actorApplicable = kind == ObjKind::BattleNpc;
+      break;
+    }
+  }
   
   if( ( m_lutEntry.potency > 0 || m_lutEntry.curePotency > 0 ) && !chara->isAlive() ) // !m_canTargetDead not working for aoe
     return false;
@@ -918,7 +1061,7 @@ bool Action::Action::preFilterActor( Entity::GameObject& actor ) const
   if( ( m_lutEntry.potency == 0 && m_lutEntry.curePotency > 0 ) && m_pSource->getObjKind() != chara->getObjKind() ) // !m_canTargetHostile not working for aoe
     return false;
 
-  return true;
+  return actorApplicable;
 }
 
 std::vector< Entity::CharaPtr >& Action::Action::getHitCharas()
