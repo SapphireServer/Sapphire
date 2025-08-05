@@ -284,9 +284,6 @@ namespace Sapphire::Entity
     /*! returns true if the player is currently in combat */
     bool isInCombat() const;
 
-    /*! sets players combat state */
-    void setInCombat( bool mode );
-
     /*! return current online status depending on current state / activity */
     Common::OnlineStatus getOnlineStatus() const;
 
@@ -896,7 +893,6 @@ namespace Sapphire::Entity
 
     uint8_t m_configFlags{};
 
-    bool m_bInCombat;
     bool m_bLoadingComplete;
     bool m_bAutoattack;
 
