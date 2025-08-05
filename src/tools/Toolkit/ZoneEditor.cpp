@@ -661,7 +661,7 @@ void ZoneEditor::showMapWindow()
   if( !m_showMapWindow || m_mapTextureId == 0 )
     return;
 
-  ImGui::Begin( "Map Viewer", &m_showMapWindow, ImGuiWindowFlags_HorizontalScrollbar | ImGuiWindowFlags_MenuBar );
+  ImGui::Begin( "Map Viewer", &m_showMapWindow, ImGuiWindowFlags_MenuBar );
 
   // Menu bar with map info and controls
   if( ImGui::BeginMenuBar() )
@@ -691,18 +691,7 @@ void ZoneEditor::showMapWindow()
   // Get available content region
   ImVec2 contentRegion = ImGui::GetContentRegionAvail();
 
-  // Handle zoom controls
-  if( ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered() )
-  {
-    float wheel = ImGui::GetIO().MouseWheel;
-    if( wheel != 0.0f )
-    {
-      m_zoomLevel += wheel * 0.1f;
-      m_zoomLevel = std::max( 0.1f, std::min( m_zoomLevel, 10.0f ) );
-    }
-  }
-
-  // Calculate image size
+  // Calculate image size first
   ImVec2 imageSize;
   if( m_zoomLevel <= 0.0f )
   {
@@ -718,37 +707,96 @@ void ZoneEditor::showMapWindow()
     imageSize = ImVec2( m_mapWidth * m_zoomLevel, m_mapHeight * m_zoomLevel );
   }
 
-  // Center the image if it's smaller than the content region
-  ImVec2 cursorPos = ImGui::GetCursorPos();
-  if( imageSize.x < contentRegion.x )
-  {
-    cursorPos.x += ( contentRegion.x - imageSize.x ) * 0.5f;
-  }
-  if( imageSize.y < contentRegion.y )
-  {
-    cursorPos.y += ( contentRegion.y - imageSize.y ) * 0.5f;
-  }
-  ImGui::SetCursorPos( cursorPos );
+  // Determine if we need scrollbars
+  bool needsScrollbars = ( imageSize.x > contentRegion.x || imageSize.y > contentRegion.y );
 
-  // Store image position for BNPC icon drawing
-  ImVec2 imagePos = ImGui::GetCursorScreenPos();
-
-  // Display the map image
-  ImGui::Image( reinterpret_cast< void * >( static_cast< intptr_t >( m_mapTextureId ) ), imageSize );
-
-  // Draw BNPC icons if enabled
-  if( m_showBnpcIcons && !m_bnpcs.empty() )
+  // Use a child region - only add scrollbars if actually needed
+  ImGuiWindowFlags childFlags = ImGuiWindowFlags_NoScrollWithMouse;
+  if( needsScrollbars )
   {
-    drawBnpcIcons();
+    childFlags |= ImGuiWindowFlags_HorizontalScrollbar;
   }
 
-  // Handle panning (drag to move when zoomed in)
-  if( ImGui::IsItemHovered() && ImGui::IsMouseDragging( ImGuiMouseButton_Left ) )
+  if( ImGui::BeginChild( "MapScrollRegion", contentRegion, false, childFlags ) )
   {
-    ImVec2 delta = ImGui::GetIO().MouseDelta;
-    ImGui::SetScrollX( ImGui::GetScrollX() - delta.x );
-    ImGui::SetScrollY( ImGui::GetScrollY() - delta.y );
+    // Store the current scroll position for zoom centering
+    float oldScrollX = ImGui::GetScrollX();
+    float oldScrollY = ImGui::GetScrollY();
+    ImVec2 mousePos = ImGui::GetMousePos();
+    ImVec2 childPos = ImGui::GetWindowPos();
+
+    // Handle zoom controls - only when mouse is over the child window
+    if( ImGui::IsWindowHovered() )
+    {
+      float wheel = ImGui::GetIO().MouseWheel;
+      if( wheel != 0.0f )
+      {
+        float oldZoom = m_zoomLevel;
+        m_zoomLevel += wheel * 0.1f;
+        m_zoomLevel = std::max( 0.1f, std::min( m_zoomLevel, 10.0f ) );
+
+        // If zoom actually changed, recalculate image size and adjust scroll to zoom toward mouse
+        if( oldZoom != m_zoomLevel && m_zoomLevel > 0.0f )
+        {
+          // Recalculate image size with new zoom
+          ImVec2 newImageSize = ImVec2( m_mapWidth * m_zoomLevel, m_mapHeight * m_zoomLevel );
+
+          // Calculate mouse position relative to the old image
+          ImVec2 mouseRelativeToChild = ImVec2( mousePos.x - childPos.x, mousePos.y - childPos.y );
+          ImVec2 mouseRelativeToImage = ImVec2(
+            ( mouseRelativeToChild.x + oldScrollX ) / imageSize.x,
+            ( mouseRelativeToChild.y + oldScrollY ) / imageSize.y
+          );
+
+          // Update image size for next frame
+          imageSize = newImageSize;
+
+          // Calculate new scroll position to keep mouse point consistent
+          float newScrollX = ( mouseRelativeToImage.x * newImageSize.x ) - mouseRelativeToChild.x;
+          float newScrollY = ( mouseRelativeToImage.y * newImageSize.y ) - mouseRelativeToChild.y;
+
+          // Apply scroll on next frame
+          ImGui::SetScrollX( std::max( 0.0f, newScrollX ) );
+          ImGui::SetScrollY( std::max( 0.0f, newScrollY ) );
+        }
+      }
+    }
+
+    // Center the image if it's smaller than the content region
+    ImVec2 availableSize = ImGui::GetContentRegionAvail();
+    ImVec2 cursorPos = ImGui::GetCursorPos();
+
+    if( imageSize.x < availableSize.x )
+    {
+      cursorPos.x += ( availableSize.x - imageSize.x ) * 0.5f;
+    }
+    if( imageSize.y < availableSize.y )
+    {
+      cursorPos.y += ( availableSize.y - imageSize.y ) * 0.5f;
+    }
+    ImGui::SetCursorPos( cursorPos );
+
+    // Store image position for BNPC icon drawing
+    ImVec2 imagePos = ImGui::GetCursorScreenPos();
+
+    // Display the map image
+    ImGui::Image( reinterpret_cast< void * >( static_cast< intptr_t >( m_mapTextureId ) ), imageSize );
+
+    // Draw BNPC icons if enabled
+    if( m_showBnpcIcons && !m_bnpcs.empty() )
+    {
+      drawBnpcIcons();
+    }
+
+    // Handle panning (drag to move when zoomed in)
+    if( ImGui::IsItemHovered() && ImGui::IsMouseDragging( ImGuiMouseButton_Left ) )
+    {
+      ImVec2 delta = ImGui::GetIO().MouseDelta;
+      ImGui::SetScrollX( ImGui::GetScrollX() - delta.x );
+      ImGui::SetScrollY( ImGui::GetScrollY() - delta.y );
+    }
   }
+  ImGui::EndChild();
 
   // Show zoom level and controls in bottom-left corner
   ImVec2 windowPos = ImGui::GetWindowPos();
@@ -961,6 +1009,7 @@ void ZoneEditor::drawBnpcIcons()
       if( ImGui::IsItemHovered() )
       {
         ImGui::BeginTooltip();
+        ImGui::Text( "%s", bnpc->nameString.c_str() );
         ImGui::Text( "BNPC: %s", bnpc->bnpcName.c_str() );
         ImGui::Text( "ID: %u", bnpc->instanceId );
         ImGui::Text( "Level: %u", bnpc->Level );
