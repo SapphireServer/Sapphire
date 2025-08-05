@@ -36,12 +36,12 @@ public:
     if( !pActionBuilder )
       return;
 
-    for( auto& actor : pSource->getInRangeActors() )
+    for( auto& pActor : pSource->getInRangeActors() )
     {
-      if( !actor->isPlayer() )
+      if( !pActor->isPlayer() )
         continue;
 
-      auto pTarget = actor->getAsChara();
+      auto pTarget = pActor->getAsChara();
 
       // hellfire fail dmg is higher
       auto dmg = 1200;
@@ -49,7 +49,7 @@ public:
       if( pInstance->getDirectorVar( 0 ) == 1 )
         dmg = 200;
 
-      pActionBuilder->damage( pSource, pTarget->getAsChara(), dmg );
+      pActionBuilder->damage( pSource, pTarget, dmg );
     }
   }
 };

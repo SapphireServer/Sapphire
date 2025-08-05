@@ -30,18 +30,18 @@ public:
     if( !pActionBuilder )
       return;
 
-    for( auto& actor : pSource->getInRangeActors() )
+    for( auto& pActor : pSource->getInRangeActors() )
     {
-      
-      auto pTarget = actor->getAsPlayer();
-      if( !pTarget )
+      if( !pActor->isPlayer() )
         continue;
-      auto distance = Common::Util::distance( pSource->getPos(), actor->getPos() );
+
+      auto pTarget = pActor->getAsChara();
+      auto distance = Common::Util::distance( pSource->getPos(), pActor->getPos() );
       if( distance > 20.f )
         continue;
 
       auto dmg = action.calcDamage( Potency );
-      pActionBuilder->damage( pSource, pTarget->getAsChara(), dmg.first, dmg.second );
+      pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
 
     if( dmg.first > 0 )
       pTarget->knockback( pSource->getPos(), 20.f );
