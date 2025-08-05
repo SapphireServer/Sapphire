@@ -427,6 +427,8 @@ void ZoneEditor::onSelectionChanged()
     loadBnpcs();
     // Reset BNPC window state when zone changes
     m_selectedBnpcIndex = -1;
+    m_filteredBnpcs.clear();
+    m_lastBnpcSearchTerm = "N/A";
     memset( m_bnpcSearchBuffer, 0, sizeof( m_bnpcSearchBuffer ) );
     updateBnpcSearchFilter();
     m_lastBnpcSearchTerm = "";
