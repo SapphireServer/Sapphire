@@ -88,6 +88,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_pos.x = pInfo->x;
   m_pos.y = pInfo->y;
   m_pos.z = pInfo->z;
+  m_lastPos = m_pos;
   m_rot = pInfo->rotation;
   m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
@@ -115,7 +116,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_enemyType = bNpcBaseData->data().Battalion;
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 || m_enemyType == 0 )
-    setFlag( Immobile );
+    setFlag( NoRoam | Immobile );
 
   m_class = ClassJob::Gladiator;
 
@@ -174,7 +175,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   }
 
   // todo: is this actually good?
-  m_naviTargetReachedDistance = m_radius * 2;
+  m_naviTargetReachedDistance = m_radius;
 
   calculateStats();
 
@@ -203,6 +204,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_pos.x = pInfo->x;
   m_pos.y = pInfo->y;
   m_pos.z = pInfo->z;
+  m_lastPos = m_pos;
   m_rot = pInfo->rotation;
   m_level = pInfo->Level <= 0 ? 1 : pInfo->Level;
   m_invincibilityType = InvincibilityNone;
@@ -215,7 +217,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_territoryId = zone.getGuId();
 
   if( pInfo->WanderingRange == 0 || pInfo->BoundInstanceID != 0 )
-    setFlag( Immobile );
+    setFlag( Immobile | NoRoam );
 
   auto& exdData = Common::Service< Data::ExdData >::ref();
 
@@ -274,7 +276,7 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   auto modelChara = exdData.getRow< Excel::ModelChara >( bNpcBaseData->data().Model );
   if( modelChara )
   {
-    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().ModelType );
+    auto modelSkeleton = exdData.getRow< Excel::ModelSkeleton >( modelChara->data().SkeletonId );
     if( modelSkeleton )
       m_radius *= modelSkeleton->data().Radius;
   }
@@ -377,7 +379,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    sendPositionUpdate();
     pNaviProvider->updateAgentPosition( *this );
     return true;
   }
@@ -389,7 +390,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   else
     face( pos );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -415,7 +415,6 @@ bool BNpc::moveTo( const Chara& targetChara )
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
-    sendPositionUpdate();
     pNaviProvider->resetMoveTarget( *this );
     pNaviProvider->updateAgentPosition( *this );
     return true;
@@ -427,7 +426,6 @@ bool BNpc::moveTo( const Chara& targetChara )
   else
     face( targetChara.getPos() );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -438,8 +436,17 @@ void BNpc::sendPositionUpdate()
   if( m_state == BNpcState::Combat || m_state == BNpcState::Retreat )
     animationType = 0;
 
-  auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
-  server().queueForPlayers( getInRangePlayerIds(), movePacket );
+  if( m_lastPos.x != m_pos.x || m_lastPos.y != m_pos.y || m_lastPos.z != m_lastPos.z )
+  {
+    auto movePacket = std::make_shared< MoveActorPacket >( *getAsChara(), 0x3A, animationType, 0, 0x5A / 4 );
+    server().queueForPlayers( getInRangePlayerIds(), movePacket );
+  }
+  m_lastPos = m_pos;
+}
+
+const std::set< std::shared_ptr< HateListEntry > >& BNpc::getHateList() const
+{
+  return m_hateList;
 }
 
 void BNpc::hateListClear()
@@ -660,6 +667,11 @@ void BNpc::onTick()
 void BNpc::update( uint64_t tickCount )
 {
   Chara::update( tickCount );
+
+  // removed check for now, replaced by position check to last position
+  //if( m_dirtyFlag & DirtyFlag::Position )
+  sendPositionUpdate();
+
   m_fsm->update( *this, tickCount );
 }
 
@@ -825,10 +837,76 @@ bool BNpc::hasFlag( uint32_t flag ) const
 {
   return m_flags & flag;
 }
+void BNpc::resetFlags( uint32_t flags )
+{
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
+  m_flags |= flags;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( *this );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+           ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( *this );
+    auto agentId = pNaviProvider->addAgent( *this );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
+}
 
 void BNpc::setFlag( uint32_t flag )
 {
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
   m_flags |= flag;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( *this );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+             ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( *this );
+    auto agentId = pNaviProvider->addAgent( *this );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
+}
+
+void BNpc::removeFlag( uint32_t flag )
+{
+  m_flags &= ~flag;
+}
+
+void BNpc::clearFlags()
+{
+  m_flags = 0;
 }
 
 void BNpc::autoAttack( CharaPtr pTarget )
@@ -920,15 +998,16 @@ void BNpc::init()
 
   m_lastRoamTargetReachedTime = Common::Util::getTimeSeconds();
 
+  /*
   //setup a test gambit
   auto testGambitRule = AI::make_GambitRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   auto testGambitRule1 = AI::make_GambitRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 5000 );
-/*
+
   auto gambitPack = AI::make_GambitRuleSetPack();
   gambitPack->addRule( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 5000 );
   gambitPack->addRule( AI::make_HPSelfPctLessThanTargetCondition( 50 ), Action::make_Action( getAsChara(), 120, 0 ), 10000 );
   m_pGambitPack = gambitPack;
-*/
+
 
   auto gambitPack = AI::make_GambitTimeLinePack( -1 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 88, 0 ), 2 );
@@ -939,13 +1018,18 @@ void BNpc::init()
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 81, 0 ), 12 );
   gambitPack->addTimeLine( AI::make_TopHateTargetCondition(), Action::make_Action( getAsChara(), 82, 0 ), 14 );
   m_pGambitPack = gambitPack;
+  */
+  initFsm();
+}
 
+void BNpc::initFsm()
+{
   using namespace AI::Fsm;
   m_fsm = make_StateMachine();
   auto stateIdle = make_StateIdle();
   auto stateCombat = make_StateCombat();
   auto stateDead = make_StateDead();
-  if( !hasFlag( Immobile ) )
+  if( !hasFlag( Immobile ) && !hasFlag( NoRoam ) )
   {
     auto stateRoam = make_StateRoam();
     stateIdle->addTransition( stateRoam, make_RoamNextTimeReachedCondition() );
@@ -971,7 +1055,8 @@ void BNpc::init()
 void BNpc::processGambits( uint64_t tickCount )
 {
   m_tp = 1000;
-  m_pGambitPack->update( *this, tickCount );
+  if( m_pGambitPack )
+    m_pGambitPack->update( *this, tickCount );
 }
 
 uint32_t BNpc::getLastRoamTargetReachedTime() const
@@ -1012,4 +1097,14 @@ const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
 const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
+}
+
+void BNpc::setPos( float x, float y, float z, bool broadcastUpdate )
+{
+  Chara::setPos( x, y, z, broadcastUpdate );
+}
+
+void BNpc::setPos( const FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+{
+  setPos( pos.x, pos.y, pos.z, broadcastUpdate );
 }

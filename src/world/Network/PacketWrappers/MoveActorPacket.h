@@ -10,8 +10,7 @@ namespace Sapphire::Network::Packets::WorldPackets::Server
 {
 
   /**
-  * @brief The Client UI Initialization packet. This must be sent to the client
-  * once upon connection to configure the UI.
+  * @brief The MoveActor packet for updating an actor's position.
   */
   class MoveActorPacket : public ZoneChannelPacket< FFXIVIpcActorMove >
   {

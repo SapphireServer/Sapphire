@@ -355,6 +355,7 @@ std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
     //               iterPos[ 0 ], iterPos[ 1 ], iterPos[ 2 ],
     //               targetPos[ 0 ], targetPos[ 1 ], targetPos[ 2 ] );
 
+    // todo: adjust these for the actor radius
     const float STEP_SIZE = 0.5f;
     const float SLOP = 0.15f;
 
@@ -585,6 +586,8 @@ int32_t Sapphire::World::Navi::NaviProvider::addAgent( Entity::Chara& chara )
 
 void Sapphire::World::Navi::NaviProvider::updateAgentParameters( Entity::BNpc& bnpc )
 {
+  if( bnpc.getAgentId() == -1 )
+    return;
   dtCrowdAgentParams params{};
   std::memset( &params, 0, sizeof( params ) );
   params.height = 3.f;

@@ -77,6 +77,11 @@ namespace Sapphire::World::Manager
     static void sendLogMessage( Sapphire::Entity::Player& player, uint32_t messageId, uint32_t param2 = 0, uint32_t param3 = 0,
                                 uint32_t param4 = 0, uint32_t param5 = 0, uint32_t param6 = 0 );
 
+    static void sendBattleTalk( Sapphire::Entity::Player& player, uint32_t battleTalkId, uint32_t handlerId, uint32_t kind,
+                                uint32_t nameId, uint32_t talkerId, uint32_t time,
+                                uint32_t param1 = 0, uint32_t param2 = 0, uint32_t param3 = 0, uint32_t param4 = 0,
+                                uint32_t param5 = 0, uint32_t param6 = 0, uint32_t param7 = 0, uint32_t param8 = 0 );
+
   private:
     std::map< uint32_t, Entity::PlayerPtr > m_playerMapById;
     std::map< uint64_t, Entity::PlayerPtr > m_playerMapByCharacterId;

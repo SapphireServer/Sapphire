@@ -10,6 +10,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <Logging/Logger.h>
+
 namespace Sapphire::World::Manager
 {
   /*!
@@ -93,6 +95,11 @@ namespace Sapphire::World::Manager
     RandGenerator< T > getRandGenerator()
     {
       return RandGenerator< T >( m_engine );
+    }
+
+    std::shared_ptr< std::mt19937 > getRNGEngine()
+    {
+      return m_engine;
     }
 
   private:
