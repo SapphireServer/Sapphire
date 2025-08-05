@@ -4,8 +4,6 @@
 #include "StateMachine.h"
 #include "State.h"
 
-#pragma once
-
 using namespace Sapphire;
 using namespace Sapphire::World;
 
