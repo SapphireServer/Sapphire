@@ -47,48 +47,48 @@ void ActionResultBuilder::addResultToActor( Entity::CharaPtr& chara, ActionResul
   it->second.push_back( std::move( result ) );
 }
 
-void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
+void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, int32_t aggro, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( healingTarget );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, healingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionData = exdData.getRow< Excel::Action >( m_actionId );
-  nextResult->heal( amount, hitType, std::abs( actionData->data().AttackType ), flag );
+  nextResult->heal( amount, aggro, hitType, std::abs( actionData->data().AttackType ), flag );
   addResultToActor( effectTarget, nextResult );
 }
 
 void ActionResultBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr& restoringTarget, uint32_t amount, Common::ActionResultFlag flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( restoringTarget ); // restore mp source actor
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, restoringTarget );// restore mp source actor
   nextResult->restoreMP( amount, flag );
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
+void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, int32_t aggro, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( damagingTarget );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, damagingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionData = exdData.getRow< Excel::Action >( m_actionId );
-  nextResult->damage( amount, hitType, std::abs( actionData->data().AttackType ), flag );
+  nextResult->damage( amount, aggro, hitType, std::abs( actionData->data().AttackType ), flag );
   addResultToActor( damagingTarget, nextResult );
 }
 
 void ActionResultBuilder::startCombo( Entity::CharaPtr& target, uint16_t actionId )
 {
-  ActionResultPtr nextResult = make_ActionResult( target );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
   nextResult->startCombo( actionId );
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::comboSucceed( Entity::CharaPtr& target )
 {
-  ActionResultPtr nextResult = make_ActionResult( target );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
   nextResult->comboSucceed();
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
-  ActionResultPtr nextResult = make_ActionResult( target );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
   nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, shouldOverride );
   addResultToActor( target, nextResult );
 }
@@ -96,14 +96,14 @@ void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t 
 void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
                                              const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool shouldOverride )
 {
-  ActionResultPtr nextResult = make_ActionResult( target );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
   nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, shouldOverride );
   addResultToActor( target, nextResult );
 }
 
 void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
-  ActionResultPtr nextResult = make_ActionResult( m_sourceChara );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
   nextResult->applyStatusEffectSelf( statusId, duration, param, shouldOverride );
   addResultToActor( m_sourceChara, nextResult );
 }
@@ -111,7 +111,7 @@ void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t dur
 void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                                  uint32_t flag, bool shouldOverride )
 {
-  ActionResultPtr nextResult = make_ActionResult( m_sourceChara );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
   nextResult->applyStatusEffectSelf( statusId, duration, param, modifiers, flag, shouldOverride );
   addResultToActor( m_sourceChara, nextResult );
 }
@@ -119,7 +119,7 @@ void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t dur
 void ActionResultBuilder::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
                                                const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource )
 {
-  ActionResultPtr nextResult = make_ActionResult( target );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
   nextResult->replaceStatusEffect( pOldStatus, statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource );
   addResultToActor( target, nextResult );
 }
@@ -127,14 +127,14 @@ void ActionResultBuilder::replaceStatusEffect( Sapphire::StatusEffect::StatusEff
 void ActionResultBuilder::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint16_t statusId, uint32_t duration, uint8_t param,
                                                    const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag )
 {
-  ActionResultPtr nextResult = make_ActionResult( m_sourceChara );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
   nextResult->replaceStatusEffectSelf( pOldStatus, statusId, duration, param, modifiers, flag );
   addResultToActor( m_sourceChara, nextResult );
 }
 
 void ActionResultBuilder::mount( Entity::CharaPtr& target, uint16_t mountId )
 {
-  ActionResultPtr nextResult = make_ActionResult( target );
+  ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
   nextResult->mount( mountId );
   addResultToActor( target, nextResult );
 }

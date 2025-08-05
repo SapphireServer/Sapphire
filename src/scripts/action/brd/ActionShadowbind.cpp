@@ -28,8 +28,6 @@ public:
     if( !pActionBuilder || !pTarget )
       return;
 
-    pTarget->onActionHostile( pSource );
-
     pActionBuilder->applyStatusEffect( pTarget, Bind, 10000, 0, { }, Flags, false, false );
   }
 };

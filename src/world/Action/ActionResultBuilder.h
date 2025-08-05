@@ -11,14 +11,14 @@ namespace Sapphire::World::Action
   public:
     ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, uint32_t resultId, uint16_t requestId );
 
-    void heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount,
+    void heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, int32_t aggro,
                Common::CalcResultType hitType = Common::CalcResultType::TypeRecoverMp,
                Common::ActionResultFlag flag = Common::ActionResultFlag::None );
 
     void restoreMP( Entity::CharaPtr& effectTarget, Entity::CharaPtr& restoringTarget, uint32_t amount,
                     Common::ActionResultFlag flag = Common::ActionResultFlag::None );
 
-    void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount,
+    void damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, int32_t aggro,
                  Common::CalcResultType hitType = Common::CalcResultType::TypeDamageHp,
                  Common::ActionResultFlag flag = Common::ActionResultFlag::None );
 

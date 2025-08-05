@@ -112,6 +112,7 @@ namespace Sapphire::Entity
     void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );
+    //std::vector< Chara& > getHateList() override;
 
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );

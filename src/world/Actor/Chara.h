@@ -270,6 +270,8 @@ namespace Sapphire::Entity
     uint32_t getAgentId() const;
     void setAgentId( uint32_t agentId );
 
+    //virtual std::vector< Chara& > getHateList();
+
     float getRadius() const;
 
     Common::BaseParam getPrimaryStat() const;

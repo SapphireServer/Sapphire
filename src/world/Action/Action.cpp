@@ -548,10 +548,7 @@ void Action::Action::buildActionResults()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
-
-      if( dmg.first > 0 )
-        actor->onActionHostile( m_pSource );
+      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, 1, dmg.second );
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
@@ -564,7 +561,7 @@ void Action::Action::buildActionResults()
         if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
           auto heal = calcHealing( m_lutEntry.curePotency );
-          m_actionResultBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionResultFlag::EffectOnSource );
+          m_actionResultBuilder->heal( actor, m_pSource, heal.first, 1, heal.second, Common::ActionResultFlag::EffectOnSource );
         }
 
         if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
@@ -580,7 +577,7 @@ void Action::Action::buildActionResults()
     else if( m_lutEntry.curePotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.curePotency );
-      m_actionResultBuilder->heal( actor, actor, heal.first, heal.second );
+      m_actionResultBuilder->heal( actor, actor, heal.first, 1, heal.second );
 
       if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {

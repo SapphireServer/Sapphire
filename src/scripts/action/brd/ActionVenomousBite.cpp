@@ -31,10 +31,7 @@ public:
       return;
 
     auto dmg = action.calcDamage( Potency );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
-
-    if( dmg.first > 0 )
-      pTarget->onActionHostile( pSource );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, 1, dmg.second );
 
     if( pTarget->getObjKind() != pSource->getObjKind() )
     {

@@ -597,6 +597,12 @@ bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
                       [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
 }
 
+/*std::vector< Chara& > BNpc::getHateList() override
+{
+  std::vector hateList = {};
+  return hateList;
+}*/
+
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
   auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
@@ -843,7 +849,6 @@ void BNpc::autoAttack( CharaPtr pTarget )
   // todo: this needs to use the auto attack delay for the equipped weapon
   if( ( tick - m_lastAttack ) > 2500 )
   {
-    pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
     actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );

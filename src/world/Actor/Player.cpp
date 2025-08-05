@@ -1023,6 +1023,12 @@ bool Player::hateListHasEntry( const BNpc& bnpc )
                      [ bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
 }
 
+/*std::vector< Chara& > Player::getHateList() override
+{
+  std::vector hateList = {};
+  return hateList;
+}*/
+
 const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 {
   return m_actorIdTohateSlotMap;
@@ -1185,8 +1191,6 @@ void Player::autoAttack( CharaPtr pTarget )
   uint32_t attackId = 7;
   if( weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm)
     attackId = 8;
-
-  pTarget->onActionHostile( getAsChara() );
 
   auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );

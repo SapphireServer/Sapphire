@@ -788,6 +788,12 @@ void Chara::setAgentId( uint32_t agentId )
   m_agentId = agentId;
 }
 
+/*std::vector< Chara& > Chara::getHateList()
+{
+  std::vector hateList = {};
+  return hateList;
+}*/
+
 float Chara::getRadius() const
 {
   return m_radius;

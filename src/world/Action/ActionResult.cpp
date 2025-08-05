@@ -18,8 +18,8 @@ using namespace Sapphire::Common;
 using namespace Sapphire::World::Action;
 
 
-ActionResult::ActionResult( Entity::CharaPtr target ) :
-  m_target( std::move( target ) )
+ActionResult::ActionResult( Entity::CharaPtr source, Entity::CharaPtr target ) :
+  m_target( std::move( target ) ), m_source( std::move( source ) )
 {
   m_result.Arg0 = 0;
   m_result.Arg1 = 0;
@@ -34,20 +34,22 @@ Entity::CharaPtr ActionResult::getTarget() const
   return m_target;
 }
 
-void ActionResult::damage( uint32_t amount, CalcResultType hitType, uint8_t hitEffect, ActionResultFlag flag )
+void ActionResult::damage( uint32_t amount, int32_t aggro, CalcResultType hitType, uint8_t hitEffect, ActionResultFlag flag )
 {
   m_result.Arg0 = hitEffect;
   m_result.Value = static_cast< int16_t >( amount );
   m_result.Flag = static_cast< uint8_t >( flag );
   m_result.Type = hitType;
+  m_aggro = aggro;
 }
 
-void ActionResult::heal( uint32_t amount, CalcResultType hitType, uint8_t hitEffect, ActionResultFlag flag )
+void ActionResult::heal( uint32_t amount, int32_t aggro, CalcResultType hitType, uint8_t hitEffect, ActionResultFlag flag )
 {
   m_result.Arg0 = hitEffect;
   m_result.Value = static_cast< int16_t >( amount );
   m_result.Flag = static_cast< uint8_t >( flag );
   m_result.Type = hitType;
+  m_aggro = aggro;
 }
 
 void ActionResult::restoreMP( uint32_t amount, ActionResultFlag flag )
@@ -171,6 +173,7 @@ void ActionResult::execute()
       }
 
       m_target->takeDamage( m_result.Value );
+      m_target->onActionHostile( m_source );
       break;
     }
 

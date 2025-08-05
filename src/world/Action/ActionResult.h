@@ -13,10 +13,10 @@ namespace Sapphire::World::Action
   class ActionResult
   {
   public:
-    explicit ActionResult( Entity::CharaPtr target );
+    explicit ActionResult( Entity::CharaPtr source, Entity::CharaPtr target );
 
-    void damage( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
-    void heal( uint32_t amount, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
+    void damage( uint32_t amount, int32_t aggro, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
+    void heal( uint32_t amount, int32_t aggro, Common::CalcResultType hitType, uint8_t hitEffect, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void restoreMP( uint32_t amount, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
@@ -40,11 +40,13 @@ namespace Sapphire::World::Action
     void execute();
 
   private:
+    Entity::CharaPtr m_source;
     Entity::CharaPtr m_target;
 
     Common::CalcResultParam m_result;
-
+    int32_t m_aggro;
     bool m_bShouldOverride { false };
+
     Sapphire::StatusEffect::StatusEffectPtr m_pStatus;
     Sapphire::StatusEffect::StatusEffectPtr m_pOldStatus;
 

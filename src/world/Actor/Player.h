@@ -600,6 +600,8 @@ namespace Sapphire::Entity
 
     bool hateListHasEntry( const BNpc& bnpc );
 
+    //std::vector< Chara& > getHateList() override;
+
     const std::map< uint32_t, uint8_t >& getActorIdToHateSlotMap();
 
     Entity::GameObjectPtr lookupTargetById( uint64_t targetId );
