@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.0)
-project(Script)
-
 file(GLOB SCRIPT_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 
 message("exec: ${EXECUTABLE_OUTPUT_PATH}")

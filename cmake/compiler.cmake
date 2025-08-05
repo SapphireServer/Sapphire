@@ -1,37 +1,53 @@
-
-if( UNIX )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fPIC" )
-  set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
-else()
-  add_definitions( -D_WIN32_WINNT=0x601 )
-  add_definitions( -D_CRT_SECURE_NO_WARNINGS )
-  add_definitions( -DNOMINMAX )
-      
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHc" )
-  message( STATUS "Enabling Build with Multiple Processes.." )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP" )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4834" )
-  set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17" )
-
-  set( CMAKE_CXX_STANDARD 17 )
-  set( CMAKE_CXX_STANDARD_REQUIRED ON )
-  set( CMAKE_CXX_EXTENSIONS ON )
-
-  if( CMAKE_BUILD_TYPE STREQUAL "Debug" )
-    # disabling SAFESEH
-    message( STATUS "Disabling Safe Exception Handlers.." )
-    set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO" )
-
-    # edit and continue
-    message( STATUS "Enabling Edit and Continue.." )
-    add_definitions( /Zi )
-
-    # incremental linking
-    message( STATUS "Enabling Incremental Linking.." )
-    set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /INCREMENTAL" )
+option( ENABLE_SANITIZERS "Enable sanitizers" OFF )
+if( ENABLE_SANITIZERS )
+  if( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+    message( STATUS "Enabling Clang sanitizers..." )
+    add_compile_options( -fsanitize=address,undefined -fno-omit-frame-pointer )
+    add_link_options( -fsanitize=address,undefined )
+  elseif( MSVC )
+    # Reference: https://learn.microsoft.com/en-us/cpp/build/reference/fsanitize
+    message( WARNING "Enabling MSVC sanitizers (-T ClangCL has better support)..." )
+    add_compile_options( /fsanitize=address )
+    add_link_options( /INCREMENTAL:NO )
+  else()
+    message ( FATAL_ERROR "Unsupported compiler for sanitizers: ${CMAKE_CXX_COMPILER_ID}" )
   endif()
 endif()
 
-# force standalone asio
-add_definitions( -DASIO_STANDALONE )
+# C++ standard
+set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD_REQUIRED ON )
+set( CMAKE_CXX_EXTENSIONS ON )
+
+if( UNIX )
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+elseif( WIN32 )
+  # Do not collide with std::min/max
+  add_compile_definitions( NOMINMAX )
+
+  # Required for boost asio
+  add_compile_definitions( _WIN32_WINNT=0x601 )
+
+  if( MSVC )
+    # Disable CRT security warnings (easier to linux compatibility)
+    add_compile_definitions( _CRT_SECURE_NO_WARNINGS )
+
+    # Disable extension iterator warnings for outdated fmt
+    add_compile_definitions( _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING )
+
+    # Disable warning about nodiscard for boost asio
+    add_compile_options( /wd4834 )
+
+    # Increase number of sections in .obj file
+    add_compile_options( /bigobj )
+  endif()
+
+  # Visual Studio generator specific flags
+  if (CMAKE_GENERATOR MATCHES "Visual Studio")
+    message( STATUS "Enabling Build with Multiple Processes.." )
+    add_compile_options( /MP )
+  endif()
+endif()
+
+# Force standalone asio
+add_compile_definitions( ASIO_STANDALONE )

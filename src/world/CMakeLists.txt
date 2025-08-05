@@ -1,7 +1,3 @@
-cmake_minimum_required( VERSION 3.0.2 )
-cmake_policy( SET CMP0015 NEW )
-
-project( world )
 
 file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
         *.cpp
