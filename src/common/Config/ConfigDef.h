@@ -6,7 +6,7 @@ namespace Sapphire::Common::Config
 {
   struct GlobalConfig
   {
-    Sapphire::Db::ConnectionInfo database;
+   Sapphire::Db::ConnectionInfo database ;
 
     struct General
     {

@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+
+#include "Common.h"
 #include "Exd/ExdData.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
@@ -45,6 +47,18 @@ private:
   uint32_t m_currentMapId = 0;
   float m_zoomLevel = 1.0f;
 
+  bool m_showBnpcWindow = true;
+  char m_bnpcSearchBuffer[256] = "";
+  std::string m_lastBnpcSearchTerm = "N/A";
+  std::vector<Sapphire::Common::BNPCInstanceObject*> m_filteredBnpcs;
+  int m_selectedBnpcIndex = -1;
+
+  // Add these methods
+  void showBnpcWindow();
+  void updateBnpcSearchFilter();
+
+
+  std::vector< std::shared_ptr< Sapphire::Common::BNPCInstanceObject > > m_bnpcs;
 
 public:
   ZoneEditor();
@@ -89,10 +103,24 @@ public:
     return ret;
   }
 
+  bool m_showBnpcIcons = true;
+  float m_bnpcIconSize = 8.0f;
+  ImU32 m_bnpcIconColor = IM_COL32(255, 255, 0, 255); // Yellow
+  ImU32 m_selectedBnpcIconColor = IM_COL32(255, 0, 0, 255); // Red for selected
+  float m_mapScale = 100.0f; // You'll need to get this from the map data
+  ImVec2 m_mapOffset = ImVec2(1024.0f, 1024.0f); // Default offset
+
+  // Helper methods
+  void drawBnpcIcons();
+  ImVec2 worldToScreenPos(float worldX, float worldZ, const ImVec2& imagePos, const ImVec2& imageSize);
+
+
 private:
   void initializeCache();
 
   void updateSearchFilter();
+
+  void loadBnpcs();
 
   void onSelectionChanged();
 

@@ -15,6 +15,11 @@
 #include <Exd.h>
 #include <Exh.h>
 
+#include <Database/DbLoader.h>
+#include <Database/ZoneDbConnection.h>
+#include <Database/DbWorkerPool.h>
+#include <Database/PreparedStatement.h>
+
 #include <ZoneEditor.h>
 
 namespace Client
@@ -31,15 +36,27 @@ namespace Client
     void showZoneEditor();
 
     void render( double deltaTime ) override;
+
+    bool initGameData();
+    bool initMySQLConnection();
+
     void load() override;
     void unload() override;
     void handleInput( double deltaTime ) override;
     void reEnter() override;
-
+    void renderMainMenu();
   private:
     void onZoneSelectionChanged(uint32_t zoneId, const std::shared_ptr<Excel::ExcelStruct<Excel::TerritoryType>>& zoneInfo);
     void onZoneSelectionCleared();
     bool m_datLoaded{false};
+    void loadConfig();
+    void saveConfig();
+    void showSettingsDialog();
+
+    // Add these members
+    bool m_showSettingsDialog = false;
+    char m_datLocationBuffer[512]; // Buffer for ImGui input
+    static constexpr const char* CONFIG_FILE = "editor_config.txt";
 
     enum EditorMode
     {
@@ -51,6 +68,20 @@ namespace Client
     ImGuiID setupDockspace( bool& p_open, ImGuiIO& io ) const;
 
     ZoneEditor m_zoneEditor;
+
+    std::string m_mysqlHost{"localhost"};
+    std::string m_mysqlUser{"root"};
+    std::string m_mysqlPassword{""};
+    std::string m_mysqlDatabase{"sapphire"};
+    int m_mysqlPort{3306};
+
+    char m_mysqlHostBuffer[256];
+    char m_mysqlUserBuffer[256];
+    char m_mysqlPasswordBuffer[256];
+    char m_mysqlDatabaseBuffer[256];
+    int m_mysqlPortBuffer;
+    bool m_mysqlConnected = false;
+
 
 
   };

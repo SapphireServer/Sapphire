@@ -285,7 +285,7 @@ void Sapphire::Db::ZoneDbConnection::doPrepareStatements()
                     "bnpc.SenseRangeRate, bnpc.Level, bnpc.ActiveType, bnpc.PopInterval, bnpc.PopRate, bnpc.PopEvent, bnpc.LinkGroup, bnpc.LinkFamily, bnpc.LinkRange,"
                     "bnpc.LinkCountLimit, bnpc.NonpopInitZone, bnpc.InvalidRepop, bnpc.LinkParent, bnpc.LinkOverride, bnpc.LinkReply, bnpc.HorizontalPopRange, "
                     "bnpc.VerticalPopRange, bnpc.BNpcBaseData, bnpc.RepopId, bnpc.BNPCRankId, bnpc.TerritoryRange, bnpc.BoundInstanceID, bnpc.FateLayoutLabelId,"
-                    "bnpc.NormalAI, bnpc.ServerPathId, bnpc.EquipmentID, bnpc.CustomizeID, bnpc.rotation, bnpc.Nonpop "
+                    "bnpc.NormalAI, bnpc.ServerPathId, bnpc.EquipmentID, bnpc.CustomizeID, bnpc.rotation, bnpc.Nonpop, bnpc.groupid "
                     "FROM battlenpc as bnpc LEFT JOIN battlenpcgroupmapping AS bnpcgroup "
                     "ON bnpc.groupid = bnpcgroup.layergroupid where bnpcgroup.territorytypeid = ?;",
                     CONNECTION_BOTH );

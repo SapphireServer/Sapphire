@@ -4,7 +4,14 @@ using namespace Sapphire;
 
 bool Data::ExdData::init( const std::string& path )
 {
-  m_data = std::make_shared< xiv::dat::GameData >( path );
+  try
+  {
+    m_data = std::make_shared< xiv::dat::GameData >( path );
+  }
+  catch( const std::exception& e )
+  {
+    return false;
+  }
 
   if( !m_data )
   {
