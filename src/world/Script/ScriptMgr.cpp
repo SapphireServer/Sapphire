@@ -598,6 +598,18 @@ bool Sapphire::Scripting::ScriptMgr::onExecute( World::Action::Action& action )
   return false;
 }
 
+bool Sapphire::Scripting::ScriptMgr::onAfterBuildEffect( World::Action::Action& action )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+
+  if( script )
+  {
+    script->onAfterBuildEffect( action );
+    return true;
+  }
+  return false;
+}
+
 bool Sapphire::Scripting::ScriptMgr::onInterrupt( World::Action::Action& action )
 {
   auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
@@ -607,6 +619,19 @@ bool Sapphire::Scripting::ScriptMgr::onInterrupt( World::Action::Action& action 
     script->onInterrupt( action );
     return true;
   }
+  return false;
+}
+
+bool Sapphire::Scripting::ScriptMgr::onBeforeBootstrap( World::Action::Action& action )
+{
+  auto script = m_nativeScriptMgr->getScript< Sapphire::ScriptAPI::ActionScript >( action.getId() );
+
+  if( script )
+  {
+    script->onBeforeBootstrap( action );
+    return true;
+  }
+
   return false;
 }
 
