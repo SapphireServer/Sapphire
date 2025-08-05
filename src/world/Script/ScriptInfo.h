@@ -28,6 +28,7 @@ namespace Sapphire::Scripting
   {
   public:
     ScriptInfo() = default;
+    virtual ~ScriptInfo() = default;
 
     /*!
      * @brief The file name of the loaded library.

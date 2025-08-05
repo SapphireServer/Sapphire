@@ -136,15 +136,18 @@ void ActionMgr::handleMountAction( Entity::Player& player, uint16_t mountId,
 void ActionMgr::bootstrapAction( Entity::Chara& src, Action::ActionPtr currentAction,
                                  Excel::ExcelStructPtr< Excel::Action > actionData )
 {
-  /*
-  //TODO: need to be fixed
+  auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
+  scriptMgr.onBeforeBootstrap( *currentAction );
+  if( currentAction->isInterrupted() )
+    return;
+
+  // re-enable this call but disable most of the old unfixed checks as scripts can override it with special checks.
   if( !currentAction->preCheck() )
   {
-    // forcefully interrupt the action and reset the cooldown
     currentAction->interrupt();
     return;
   }
-  */
+  
 
   if( src.getCurrentAction() )
   {

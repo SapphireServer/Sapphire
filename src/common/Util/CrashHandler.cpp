@@ -198,7 +198,7 @@ void Util::CrashHandler::printStackTrace( unsigned int max_frames )
     DWORD64 offset = 0;
     char symbolBuffer[sizeof( IMAGEHLP_SYMBOL ) + 255];
     PIMAGEHLP_SYMBOL symbol = ( PIMAGEHLP_SYMBOL ) symbolBuffer;
-    symbol->SizeOfStruct = ( sizeof IMAGEHLP_SYMBOL ) + 255;
+    symbol->SizeOfStruct = sizeof( IMAGEHLP_SYMBOL ) + 255;
     symbol->MaxNameLength = 254;
 
     if( SymGetSymFromAddr( process, frame.AddrPC.Offset, &offset, symbol ) )

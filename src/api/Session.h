@@ -13,7 +13,7 @@ namespace Sapphire::Api
   private:
     uint32_t m_ip;
     uint32_t m_accountId;
-    char m_sessionId[ 64 ];
+    std::string m_sessionId;
 
   public:
     std::string newCharName;

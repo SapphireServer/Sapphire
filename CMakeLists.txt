@@ -1,5 +1,18 @@
-cmake_policy( SET CMP0014 NEW )
-cmake_minimum_required( VERSION 3.0.2 )
+# Required for: https://cmake.org/cmake/help/latest/prop_tgt/MSVC_RUNTIME_LIBRARY.html
+cmake_policy( SET CMP0091 NEW )
+
+# CMake 3.22 ships with Ubuntu 22.04 LTS
+# See: https://alexreinking.com/blog/how-to-use-cmake-without-the-agonizing-pain-part-1.html
+cmake_minimum_required( VERSION 3.22 )
+
+# Prevent common user error
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+  message(FATAL_ERROR "In-tree builds are not supported. Run CMake from a separate directory: cmake -B build")
+endif()
+
+# Enable folder support
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 project( Sapphire )
 
 set( CMAKE_MODULE_PATH

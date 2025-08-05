@@ -1,7 +1,3 @@
-cmake_minimum_required(VERSION 3.0)
-cmake_policy(SET CMP0015 NEW)
-project(Tool_discovery_parser)
-
 #set( CMAKE_RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_BINARY_DIR}/bin/tools")
 
 file(GLOB SERVER_PUBLIC_INCLUDE_FILES 
