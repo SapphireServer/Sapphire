@@ -6,26 +6,28 @@
 #include "Manager/EventMgr.h"
 #include <ScriptObject.h>
 #include <Service.h>
-#include <string> 
-// Quest Script: SubSea014_00662
-// Quest Name: Soothing the Savage Siren
-// Quest ID: 66198
-// Start NPC: 1000919 (O'kalkaya)
-// End NPC: 1000919 (O'kalkaya)
+
+// Quest Script: SubSea068_00480
+// Quest Name: Much Ado about Dodos
+// Quest ID: 66016
+// Start NPC: 1002657 (Moegramm)
+// End NPC: 1002657 (Moegramm)
 
 using namespace Sapphire;
 
-class SubSea014 : public Sapphire::ScriptAPI::QuestScript
+class SubSea068 : public Sapphire::ScriptAPI::QuestScript
 {
   private:
     // Basic quest information 
     // Quest vars / flags used
+    // BitFlag8
     // UI8AL
+    // UI8BH
+    // UI8BL
 
-    /// Countable Num: 0 Seq: 1 Event: 1 Listener: 1000918
-    /// Countable Num: 0 Seq: 2 Event: 2 Listener: 1000918
-    /// Countable Num: 0 Seq: 3 Event: 1 Listener: 1000918
-    /// Countable Num: 0 Seq: 255 Event: 2 Listener: 1000918
+    /// Countable Num: 1 Seq: 1 Event: 1 Listener: 1002660
+    /// Countable Num: 3 Seq: 2 Event: 1 Listener: 1002661
+    /// Countable Num: 1 Seq: 255 Event: 8 Listener: 1002661
     // Steps in this quest ( 0 is before accepting, 
     // 1 is first, 255 means ready for turning it in
     enum Sequence : uint8_t
@@ -33,21 +35,22 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
       Seq0 = 0,
       Seq1 = 1,
       Seq2 = 2,
-      Seq3 = 3,
       SeqFinish = 255,
     };
 
     // Entities found in the script data of the quest
-    static constexpr auto Actor0 = 1000919; // O'kalkaya ( Pos: 46.677399 44.659901 137.102005  Teri: 128 )
-    static constexpr auto Actor1 = 1000918; // Rhoswen ( Pos: 84.114304 44.428001 132.360001  Teri: 128 )
-    static constexpr auto FirstQuest = 65643;
-    static constexpr auto EmoteKneel = 19;
-    static constexpr auto EmoteDisappointed = 49;
-    static constexpr auto EmoteRally = 34;
+    static constexpr auto Actor0 = 1002657; // Moegramm ( Pos: 540.541992 89.000000 -73.998802  Teri: 135 )
+    static constexpr auto Actor1 = 1002660; // X'payan ( Pos: 541.771973 83.663101 -5.447510  Teri: 135 )
+    static constexpr auto Actor2 = 1002661; // Bolting Dodo
+    static constexpr auto Actor3 = 1002687; // Bolting Dodo
+    static constexpr auto Actor4 = 1002688; // Bolting Dodo
+    static constexpr auto Item0 = 2000435;
+    static constexpr auto Item1 = 2000436;
+    static constexpr auto VfxReaction = 177;
 
   public:
-    SubSea014() : Sapphire::ScriptAPI::QuestScript( 66198 ){}; 
-    ~SubSea014() = default; 
+    SubSea068() : Sapphire::ScriptAPI::QuestScript( 66016 ){}; 
+    ~SubSea068() = default; 
 
   //////////////////////////////////////////////////////////////////////
   // Event Handlers
@@ -60,36 +63,58 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
         if( quest.getSeq() == Seq0 )
           Scene00000( quest, player );
         else if( quest.getSeq() == SeqFinish )
-          Scene00011( quest, player );
+          Scene00008( quest, player );
         break;
       }
       case Actor1:
       {
         if( quest.getSeq() == Seq1 )
+          Scene00001( quest, player );
+        break;
+      }
+      case Actor2:
+      {
+        if( quest.getSeq() == Seq2 )
           Scene00002( quest, player );
-        else if( quest.getSeq() == Seq2 )
-          Scene00007( quest, player );
-        else if( quest.getSeq() == Seq3 )
-          Scene00010( quest, player );
+        break;
+      }
+      case Actor3:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00004( quest, player );
+        break;
+      }
+      case Actor4:
+      {
+        if( quest.getSeq() == Seq2 )
+          Scene00006( quest, player );
         break;
       }
     }
   }
 
-  void onEmote( World::Quest& quest, uint64_t actorId, uint32_t emoteId, Entity::Player& player ) override
+  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
   {
-    std::string s = std::to_string( emoteId );
-    Sapphire::World::Manager::PlayerMgr::sendDebug( player, s );
-    if( emoteId == EmoteKneel && quest.getSeq() == Seq1 )
+    if( quest.getSeq() != Seq2 )
+      return;
+
+    switch( actorId )
     {
-      Scene00003( quest, player );
-    }
-    else if (emoteId == EmoteDisappointed && quest.getSeq() == Seq2) {
-      Scene00006( quest, player );
-    }
-    else if( emoteId == EmoteRally && quest.getSeq() == Seq3 )
-    {
-      Scene00009( quest, player );
+      case Actor2:
+      {
+        Scene00003( quest, player );
+        break;
+      }
+      case Actor3:
+      {
+        Scene00005( quest, player );
+        break;
+      }
+      case Actor4:
+      {
+        Scene00007( quest, player );
+        break;
+      }
     }
   }
 
@@ -99,16 +124,31 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
   // Available Scenes in this quest, not necessarly all are used
   //////////////////////////////////////////////////////////////////////
 
+  void checkCompletition( World::Quest& quest, Entity::Player& player )
+  {
+    if( quest.getSeq() != Seq2 )
+      return;
+
+    quest.setUI8AL( quest.getUI8AL() + 1 );
+    quest.setUI8BL( quest.getUI8BL() + 1 );
+    quest.setUI8BH( quest.getUI8BH() - 1 );
+
+    eventMgr().sendNotice( player, getId(), 1, { quest.getUI8AL(), 3, player.getQuestItemIcon( Item1 ) } );
+
+    if( quest.getUI8AL() >= 3 )
+      quest.setSeq( SeqFinish );
+  }
+
   void Scene00000( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 0, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00000Return ) );
+    eventMgr().playQuestScene( player, getId(), 0, NONE, bindSceneReturn( &SubSea068::Scene00000Return ) );
   }
 
   void Scene00000Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     if( result.getResult( 0 ) == 1 ) // accept quest
     {
-      Scene00001( quest, player );
+       quest.setSeq( Seq1 );
     }
   }
 
@@ -116,24 +156,25 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00001( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 1, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00001Return ) );
+    eventMgr().playQuestScene( player, getId(), 1, NONE, bindSceneReturn( &SubSea068::Scene00001Return ) );
   }
 
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    quest.setSeq( Seq1 );
+    eventMgr().sendNotice( player, getId(), 0, { player.getQuestItemIcon( Item0 ) } );
+    quest.setUI8BH( 3 );
+    quest.setSeq( Seq2 );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00002( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 2, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00002Return ) );
+    eventMgr().playQuestScene( player, getId(), 2, NONE, bindSceneReturn( &SubSea068::Scene00002Return ) );
   }
 
   void Scene00002Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -141,25 +182,24 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00003( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 3, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00003Return ) );
+    eventMgr().playQuestScene( player, getId(), 3, NONE, bindSceneReturn( &SubSea068::Scene00003Return ) );
   }
 
   void Scene00003Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 0, 0 );
-    quest.setSeq( Seq2 );    
+    quest.setBitFlag8( 1, true );
+    checkCompletition( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00004( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 4, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00004Return ) );
+    eventMgr().playQuestScene( player, getId(), 4, NONE, bindSceneReturn( &SubSea068::Scene00004Return ) );
   }
 
   void Scene00004Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
 
   }
 
@@ -167,94 +207,68 @@ class SubSea014 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00005( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 5, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00005Return ) );
+    eventMgr().playQuestScene( player, getId(), 5, NONE, bindSceneReturn( &SubSea068::Scene00005Return ) );
   }
 
   void Scene00005Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    quest.setBitFlag8( 2, true );
+    checkCompletition( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00006( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 6, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00006Return ) );
+    eventMgr().playQuestScene( player, getId(), 6, NONE, bindSceneReturn( &SubSea068::Scene00006Return ) );
   }
 
   void Scene00006Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 1, 0 );
-    quest.setSeq( Seq3 );    
+
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00007( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 7, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00007Return ) );
+    eventMgr().playQuestScene( player, getId(), 7, NONE, bindSceneReturn( &SubSea068::Scene00007Return ) );
   }
 
   void Scene00007Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
-
+    quest.setBitFlag8( 3, true );
+    checkCompletition( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00008( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 8, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00008Return ) );
+    eventMgr().playQuestScene( player, getId(), 8, NONE, bindSceneReturn( &SubSea068::Scene00008Return ) );
   }
 
   void Scene00008Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-
+    if( result.getResult( 0 ) == 1 )
+      Scene00009( quest, player );
   }
 
   //////////////////////////////////////////////////////////////////////
 
   void Scene00009( World::Quest& quest, Entity::Player& player )
   {
-    eventMgr().playQuestScene( player, getId(), 9, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00009Return ) );
+    eventMgr().playQuestScene( player, getId(), 9, NONE, bindSceneReturn( &SubSea068::Scene00009Return ) );
   }
 
   void Scene00009Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 2, 0 );
-    quest.setSeq( SeqFinish );
-  }
-
-  //////////////////////////////////////////////////////////////////////
-
-  void Scene00010( World::Quest& quest, Entity::Player& player )
-  {
-    eventMgr().playQuestScene( player, getId(), 10, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00010Return ) );
-  }
-
-  void Scene00010Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
-  {
-
-
-  }
-
-  //////////////////////////////////////////////////////////////////////
-
-  void Scene00011( World::Quest& quest, Entity::Player& player )
-  {
-    eventMgr().playQuestScene( player, getId(), 11, HIDE_HOTBAR, bindSceneReturn( &SubSea014::Scene00011Return ) );
-  }
-
-  void Scene00011Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
-  {
     if( result.getResult( 0 ) == 1 )
     {
-      player.finishQuest( getId() );
+        player.finishQuest( getId(), result.getResult( 1 ) );
     }
   }
 
 };
 
-EXPOSE_SCRIPT( SubSea014 );
+EXPOSE_SCRIPT( SubSea068 );

@@ -162,7 +162,7 @@ private:
   void Scene00001Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
     quest.setSeq( Seq2 );
-    eventMgr().sendEventNotice( player, getId(), 0, 2, 0, 0 );
+    eventMgr().sendNotice( player, getId(), 0, { player.getQuestItemIcon( Item0 ) } );
     quest.setUI8BH( 3 );
   }
 

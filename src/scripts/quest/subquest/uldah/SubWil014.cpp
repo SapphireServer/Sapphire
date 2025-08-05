@@ -66,7 +66,7 @@ public:
     if( quest.getSeq() != Seq1 ) return;
 
     quest.setUI8AL( quest.getUI8AL() + 1 );
-    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
+    eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 5, player.getQuestItemIcon( Item0 ) } );
     if( quest.getUI8AL() >= 5 )
     {
       quest.setSeq( SeqFinish );

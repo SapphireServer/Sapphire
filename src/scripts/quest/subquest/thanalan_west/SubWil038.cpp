@@ -148,10 +148,6 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
   void onWithinRange( World::Quest& quest, Entity::Player& player, uint32_t eventId, uint32_t param1, float x, float y, float z )
   {
     switch( param1 )
@@ -220,7 +216,7 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
     quest.setUI8AH( quest.getUI8AH() + 1 );
     quest.setUI8CL( quest.getUI8CL() + 1 );
 
-    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AH(), 4 );
+    eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AH(), 4, player.getQuestItemIcon( Item0 ) } );
 
     if( quest.getUI8AH() >= 4 )
     {
@@ -454,7 +450,7 @@ class SubWil038 : public Sapphire::ScriptAPI::QuestScript
 
   void Scene00017Return( World::Quest& quest, Entity::Player& player, const Event::SceneResult& result )
   {
-    eventMgr().sendEventNotice( player, getId(), 2, 0 );
+    eventMgr().sendNotice( player, getId(), 2, { player.getQuestItemIcon( Item1 ) } );
     quest.setSeq( SeqFinish );
     quest.setUI8BH( 1 );
   }

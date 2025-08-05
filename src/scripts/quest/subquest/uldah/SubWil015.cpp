@@ -51,25 +51,9 @@ public:
     if( actorId == Actor0 )
     {
       if( quest.getSeq() == Seq0 )
-      {
         Scene00000( quest, player );
-      }
-      else
-      {
+      else if( quest.getSeq() == SeqFinish)
         Scene00002( quest, player );
-      }
-    }
-  }
-
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-    if( quest.getSeq() != Seq1 ) return;
-
-    quest.setUI8AL( quest.getUI8AL() + 1 );
-    eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
-    if( quest.getUI8AL() >= 5 )
-    {
-      quest.setSeq( SeqFinish );
     }
   }
 
@@ -77,13 +61,16 @@ public:
   {
     if( bnpc.getBNpcNameId() != Enemy0 )
       return;
-    else
+
+    if( quest.getSeq() == Seq1 )
     {
-      if( quest.getUI8BH() <= 5 )
-      {
-        quest.setUI8BH( quest.getUI8BH() + 1 );//adds to key items
-        onEventItem( quest, player, 0 );
-      }
+      quest.setUI8BH( quest.getUI8BH() + 1 );//adds to key items
+      quest.setUI8AL( quest.getUI8AL() + 1 );
+
+      eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 5, player.getQuestItemIcon( Item0 ) } );
+
+      if( quest.getUI8AL() >= 5 )
+        quest.setSeq( SeqFinish );
     }
   }
 

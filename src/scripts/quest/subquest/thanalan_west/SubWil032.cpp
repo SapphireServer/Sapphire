@@ -81,7 +81,7 @@ class SubWil032 : public Sapphire::ScriptAPI::QuestScript
     {
       quest.setUI8AL( quest.getUI8AL() + 1 );
       quest.setUI8BL( quest.getUI8BL() + 1 );
-      eventMgr().sendEventNotice( player, getId(), 0, 2, quest.getUI8AL(), 5 );
+      eventMgr().sendNotice( player, getId(), 0, { quest.getUI8AL(), 5, player.getQuestItemIcon( Item1 ) } );
 
       if( quest.getUI8AL() >= 5 )
         quest.setSeq( SeqFinish );
