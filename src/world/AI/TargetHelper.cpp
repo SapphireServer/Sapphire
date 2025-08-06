@@ -181,9 +181,9 @@ namespace Sapphire::World::AI
         continue;
 
       bool matches = true;
-      for( const auto& filter : filters )
+      for( const auto& pFilter : filters )
       {
-        if( !filter->isApplicable( pSrc, pChara ) )
+        if( !pFilter->isApplicable( pSrc, pChara ) )
         {
           matches = false;
           break;
@@ -212,11 +212,20 @@ namespace Sapphire::World::AI
         if( pChara == nullptr )
           continue;
 
+        bool matches = true;
+        for( const auto& pFilter : filters )
+        {
+          if( pFilter->isEnforcedOnRandomFill() && !pFilter->isApplicable( pSrc, pChara ) )
+          {
+            matches = false;
+            break;
+          }
+        }
         auto excludeIt = std::find_if( exclude.begin(), exclude.end(),
           [ pChara ]( uint32_t id ) { return pChara->getId() == id; }
         );
 
-        if( excludeIt == exclude.end() && std::find_if( m_results.begin(), m_results.end(),
+        if( matches && excludeIt == exclude.end() && std::find_if( m_results.begin(), m_results.end(),
             [ &pChara ]( CharaEntry entry ) { return entry.m_entityId == pChara->getId(); } ) == m_results.end() )
         {
           remaining.push_back( pChara );

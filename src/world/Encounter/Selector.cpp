@@ -38,6 +38,7 @@ namespace Sapphire
       auto name = filterV.at( "type" ).get< std::string >();
       auto typeId = filterMap.find( name )->second;
       auto negate = filterV.at( "negate" ).get< bool >();
+      auto enforceOnRandom = filterV.at( "enforceOnRandom" ).get< bool >();
 
       World::AI::TargetSelectFilterPtr pFilter = nullptr;
 
@@ -46,75 +47,77 @@ namespace Sapphire
         case World::AI::TargetSelectFilter::Type::InsideRadius:
         {
           auto radius = filterV.at( "param" ).get< uint32_t >();
-          pFilter = std::make_shared< World::AI::InsideRadiusFilter >( static_cast< float >( radius ), negate );
+          pFilter = std::make_shared< World::AI::InsideRadiusFilter >( static_cast< float >( radius ) );
         }
         break;
         case World::AI::TargetSelectFilter::Type::OutsideRadius:
         {
           auto radius = filterV.at( "param" ).get< uint32_t >();
-          pFilter = std::make_shared< World::AI::OutsideRadiusFilter >( static_cast< float >( radius ), negate );
+          pFilter = std::make_shared< World::AI::OutsideRadiusFilter >( static_cast< float >( radius ) );
         }
         break;
 
         case World::AI::TargetSelectFilter::Type::Player:
         {
-          pFilter = std::make_shared< World::AI::PlayerFilter >( negate );
+          pFilter = std::make_shared< World::AI::PlayerFilter >();
         }
         break;
         case World::AI::TargetSelectFilter::Type::Ally:
         {
-          pFilter = std::make_shared< World::AI::AllyFilter >( negate );
+          pFilter = std::make_shared< World::AI::AllyFilter >();
         }
         break;
         case World::AI::TargetSelectFilter::Type::OwnBattalion:
         {
-          pFilter = std::make_shared< World::AI::OwnBattalionFilter >( negate );
+          pFilter = std::make_shared< World::AI::OwnBattalionFilter >();
         }
         break;
 
         case World::AI::TargetSelectFilter::Type::Tank:
         {
-          pFilter = std::make_shared< World::AI::TankFilter >( negate );
+          pFilter = std::make_shared< World::AI::TankFilter >();
         }
         break;
         case World::AI::TargetSelectFilter::Type::Healer:
         {
-          pFilter = std::make_shared< World::AI::HealerFilter >( negate );
+          pFilter = std::make_shared< World::AI::HealerFilter >();
         }
         break;
         case World::AI::TargetSelectFilter::Type::Dps:
         {
-          pFilter = std::make_shared< World::AI::DpsFilter >( negate );
+          pFilter = std::make_shared< World::AI::DpsFilter >();
         }
         break;
 
         case World::AI::TargetSelectFilter::Type::HasStatusEffect:
         {
           auto statusId = filterV.at( "param" ).get< uint32_t >();
-          pFilter = std::make_shared< World::AI::HasStatusEffectFilter >( statusId, negate );
+          pFilter = std::make_shared< World::AI::HasStatusEffectFilter >( statusId );
         }
         break;
 
         case World::AI::TargetSelectFilter::Type::TopAggro:
         {
-          pFilter = std::make_shared< World::AI::TopAggroFilter >( negate );
+          pFilter = std::make_shared< World::AI::TopAggroFilter >();
         }
         break;
         case World::AI::TargetSelectFilter::Type::SecondAggro:
         {
-          pFilter = std::make_shared< World::AI::SecondAggroFilter >( negate );
+          pFilter = std::make_shared< World::AI::SecondAggroFilter >();
         }
         break;
 
         case World::AI::TargetSelectFilter::Type::PartyMember:
         {
-          pFilter = std::make_shared< World::AI::PartyMemberFilter >( negate );
+          pFilter = std::make_shared< World::AI::PartyMemberFilter >();
         }
         break;
 
         default:
           break;
       }
+      pFilter->setNegate( negate );
+      pFilter->setEnforcedOnRandomFill( enforceOnRandom );
       m_filters.push_back( pFilter );
     }
   }

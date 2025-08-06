@@ -445,7 +445,7 @@
             },
             {
               "data": {
-                "actionId": 453,
+                "actionId": 455,
                 "selectorIndex": 0,
                 "selectorName": "<unset>",
                 "snapshot": false,
@@ -1209,14 +1209,16 @@
       "count": 1,
       "description": "",
       "excludeSelectorName": "",
-      "fillRandomEntries": false,
+      "fillRandomEntries": true,
       "filters": [
         {
+          "enforceOnRandom": false,
           "negate": true,
           "param": null,
           "type": "topAggro"
         },
         {
+          "enforceOnRandom": true,
           "negate": false,
           "param": null,
           "type": "player"

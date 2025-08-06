@@ -45,13 +45,21 @@ namespace Sapphire::World::AI
   protected:
     Type m_type;
     bool m_negate{ false };
+    bool m_enforceOnRandom{ false };
 
   public:
-    TargetSelectFilter( Type type, bool negate ) :
+    TargetSelectFilter( Type type, bool negate, bool enforceOnRandom ) :
       m_type( type ),
-      m_negate( negate )
+      m_negate( negate ),
+      m_enforceOnRandom( enforceOnRandom )
     {
     }
+
+    TargetSelectFilter( Type type ) :
+      m_type( type )
+    {
+    }
+
     virtual ~TargetSelectFilter()
     {
     }
@@ -61,9 +69,24 @@ namespace Sapphire::World::AI
       return false;
     };
 
+    void setNegate( bool val )
+    {
+      m_negate = val;
+    }
+
     bool isNegate() const
     {
       return m_negate;
+    }
+
+    bool isEnforcedOnRandomFill() const
+    {
+      return m_enforceOnRandom;
+    }
+
+    void setEnforcedOnRandomFill( bool val )
+    {
+      m_enforceOnRandom = val;
     }
   };
   using TargetSelectFilterPtr = std::shared_ptr< TargetSelectFilter >;
@@ -74,8 +97,8 @@ namespace Sapphire::World::AI
     float m_distance{ 0 };
 
   public:
-    InsideRadiusFilter( float distance, bool negate ) :
-      TargetSelectFilter( Type::InsideRadius, negate ),
+    InsideRadiusFilter( float distance ) :
+      TargetSelectFilter( Type::InsideRadius ),
       m_distance( distance )
     {
     }
@@ -88,8 +111,8 @@ namespace Sapphire::World::AI
   private:
     float m_distance{ 0 };
   public:
-    OutsideRadiusFilter( float distance, bool negate ) :
-      TargetSelectFilter( Type::OutsideRadius, negate ),
+    OutsideRadiusFilter( float distance ) :
+      TargetSelectFilter( Type::OutsideRadius ),
       m_distance( distance )
     {
     }
@@ -100,8 +123,8 @@ namespace Sapphire::World::AI
   class PlayerFilter : public TargetSelectFilter
   {
   public:
-    PlayerFilter( bool negate ) :
-      TargetSelectFilter( Type::Player, negate )
+    PlayerFilter(  ) :
+      TargetSelectFilter( Type::Player )
     {
     }
 
@@ -111,8 +134,8 @@ namespace Sapphire::World::AI
   class AllyFilter : public TargetSelectFilter
   {
   public:
-    AllyFilter( bool negate ) :
-      TargetSelectFilter( Type::Ally, negate )
+    AllyFilter(  ) :
+      TargetSelectFilter( Type::Ally )
     {
     }
 
@@ -122,8 +145,8 @@ namespace Sapphire::World::AI
   class OwnBattalionFilter : public TargetSelectFilter
   {
   public:
-    OwnBattalionFilter( bool negate ) :
-      TargetSelectFilter( Type::OwnBattalion, negate )
+    OwnBattalionFilter(  ) :
+      TargetSelectFilter( Type::OwnBattalion )
     {
     }
 
@@ -133,8 +156,8 @@ namespace Sapphire::World::AI
   class TankFilter : public TargetSelectFilter
   {
   public:
-    TankFilter( bool negate ) :
-      TargetSelectFilter( Type::Tank, negate )
+    TankFilter(  ) :
+      TargetSelectFilter( Type::Tank )
     {
     }
 
@@ -144,8 +167,8 @@ namespace Sapphire::World::AI
   class HealerFilter : public TargetSelectFilter
   {
   public:
-    HealerFilter( bool negate ) :
-      TargetSelectFilter( Type::Healer, negate )
+    HealerFilter(  ) :
+      TargetSelectFilter( Type::Healer )
     {
     }
 
@@ -155,8 +178,8 @@ namespace Sapphire::World::AI
   class DpsFilter : public TargetSelectFilter
   {
   public:
-    DpsFilter( bool negate ) :
-      TargetSelectFilter( Type::Dps, negate )
+    DpsFilter(  ) :
+      TargetSelectFilter( Type::Dps )
     {
     }
 
@@ -168,8 +191,8 @@ namespace Sapphire::World::AI
   private:
     uint32_t m_statusId{ 0 };
   public:
-    HasStatusEffectFilter( uint32_t statusId, bool negate ) :
-      TargetSelectFilter( Type::HasStatusEffect, negate ),
+    HasStatusEffectFilter( uint32_t statusId ) :
+      TargetSelectFilter( Type::HasStatusEffect ),
       m_statusId( statusId )
     {
     }
@@ -180,8 +203,8 @@ namespace Sapphire::World::AI
   class TopAggroFilter : public TargetSelectFilter
   {
   public:
-    TopAggroFilter( bool negate ) :
-      TargetSelectFilter( Type::TopAggro, negate )
+    TopAggroFilter() :
+      TargetSelectFilter( Type::TopAggro )
     {
     }
 
@@ -191,8 +214,8 @@ namespace Sapphire::World::AI
   class SecondAggroFilter : public TargetSelectFilter
   {
   public:
-    SecondAggroFilter( bool negate ) :
-      TargetSelectFilter( Type::SecondAggro, negate )
+    SecondAggroFilter(  ) :
+      TargetSelectFilter( Type::SecondAggro )
     {
     }
 
@@ -202,8 +225,8 @@ namespace Sapphire::World::AI
   class PartyMemberFilter : public TargetSelectFilter
   {
   public:
-    PartyMemberFilter( bool negate ) :
-      TargetSelectFilter( Type::PartyMember, negate )
+    PartyMemberFilter(  ) :
+      TargetSelectFilter( Type::PartyMember )
     {
     }
 
