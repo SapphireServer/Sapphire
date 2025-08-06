@@ -95,7 +95,11 @@ PacketParseResult Network::Packets::getPacket( const std::vector< uint8_t >& buf
     return Malformed;
 
   const auto dataOffset = offset + sizeof( struct FFXIVARR_PACKET_SEGMENT_HEADER );
-  const auto dataSize = packet.segHdr.size;
+  const auto dataSize = packet.segHdr.size - sizeof( struct FFXIVARR_PACKET_SEGMENT_HEADER );
+
+  // Check if the packet is complete
+  if( dataOffset + dataSize > buffer.size() )
+    return Incomplete;
 
   // Allocate data buffer and copy
   packet.data.resize( dataSize );
@@ -121,6 +125,10 @@ bool Network::Packets::checkSegmentHeader( const FFXIVARR_PACKET_SEGMENT_HEADER&
 {
   // Max size of individual message is capped at 256KB for now.
   if( header.size > 256 * 1024 )
+    return false;
+
+  // The size of the segment header itself is included in the packet size.
+  if( header.size < sizeof( struct FFXIVARR_PACKET_SEGMENT_HEADER ) )
     return false;
 
   return true;

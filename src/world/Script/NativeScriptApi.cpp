@@ -77,6 +77,10 @@ namespace Sapphire::ScriptAPI
   {
   }
 
+  void ActionScript::onBeforeBootstrap( Sapphire::World::Action::Action& action )
+  {
+  }
+
   void ActionScript::onStart( Sapphire::World::Action::Action& action )
   {
   }
@@ -86,6 +90,10 @@ namespace Sapphire::ScriptAPI
   }
 
   void ActionScript::onInterrupt( Sapphire::World::Action::Action& action )
+  {
+  }
+
+  void ActionScript::onAfterBuildEffect( Sapphire::World::Action::Action& action )
   {
   }
 

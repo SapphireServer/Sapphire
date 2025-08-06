@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <map>
 #include <Common.h>
 
 struct LGB_MAP_RANGE_ENTRY;
@@ -107,6 +108,7 @@ namespace Sapphire
 
 
     EObjPtr getEObj( uint32_t eObjId );
+    EObjPtr getEObjByBaseId( uint16_t zoneId, uint32_t baseId );
     ENpcPtr getENpc( uint32_t eNpcId );
 
     EObjMapPtr getAllEObj( uint16_t zoneId );
@@ -122,6 +124,7 @@ namespace Sapphire
     ObjectCache< LGB_ENPC_ENTRY > m_enpcCache;
     ObjectCache< LGB_EVENT_RANGE_ENTRY > m_eventRangeCache;
 
+    std::map< std::pair< uint16_t, uint32_t >, uint32_t > m_eobjBaseInstanceMap;
     std::shared_ptr< Framework > m_pFramework;
 
   };

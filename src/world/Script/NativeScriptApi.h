@@ -42,6 +42,8 @@ namespace Sapphire::ScriptAPI
     */
     ScriptObject( uint32_t id, std::size_t type );
 
+    virtual ~ScriptObject() = default;
+
     /*!
     * @brief Gets the ID set for this script
     *
@@ -139,11 +141,15 @@ namespace Sapphire::ScriptAPI
   public:
     explicit ActionScript( uint32_t actionId );
 
+    virtual void onBeforeBootstrap( Sapphire::World::Action::Action& action );
+
     virtual void onStart( Sapphire::World::Action::Action& action );
 
     virtual void onExecute( Sapphire::World::Action::Action& action );
 
     virtual void onInterrupt( Sapphire::World::Action::Action& action );
+
+    virtual void onAfterBuildEffect( Sapphire::World::Action::Action& action );
 
     World::Manager::WarpMgr& warpMgr()
     {

@@ -157,6 +157,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
 {
   using namespace Sapphire;
 
+  auto start = Common::Util::getTimeMs();
+
   Logger::init( "log/world" );
 
   printBanner();
@@ -263,6 +265,11 @@ void WorldServer::run( int32_t argc, char* argv[] )
     Logger::fatal( "Unable to cache actions!" );
     return;
   }
+  if( !pActionMgr->cacheActionShapeLut() )
+  {
+    Logger::fatal( "Unable to cache action shapes!" );
+    return;
+  }
   Common::Service< Manager::ActionMgr >::set( pActionMgr );
 
   auto pMapMgr = std::make_shared< Manager::MapMgr >();
@@ -316,7 +323,14 @@ void WorldServer::run( int32_t argc, char* argv[] )
 
 
   Network::HivePtr hive( new Network::Hive() );
-  Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
+  try
+  {
+    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
+  } catch( std::exception& e )
+  {
+    Logger::fatal( "Error starting server: {0}", e.what() );
+    return;
+  }
 
   std::vector< std::thread > thread_list;
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
@@ -346,6 +360,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
 
+  Logger::debug( "Initialization took {0}ms", Common::Util::getTimeMs() - start );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 

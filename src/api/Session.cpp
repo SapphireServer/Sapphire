@@ -19,7 +19,7 @@ uint32_t Session::getIp() const
 
 void Session::setSessionId( const char* sessionId )
 {
-  memcpy( m_sessionId, sessionId, sizeof( m_sessionId ) );
+  m_sessionId = sessionId;
 }
 
 void Session::setIp( uint32_t ip )

@@ -1,6 +1,3 @@
-cmake_minimum_required( VERSION 3.0.2 )
-project( Sapphire )
-
 file(GLOB UTILS_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Config/*.cpp"

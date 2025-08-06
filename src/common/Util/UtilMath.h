@@ -29,6 +29,10 @@ namespace Sapphire::Common::Util
 
   uint8_t floatToUInt8Rot( float val );
 
+  float radiansToDegrees( float val );
+
+  float degreesToRadians( float val );
+
   template < typename T >
   T clamp( T val, T minimum, T maximum )
   {

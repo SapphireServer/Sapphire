@@ -134,7 +134,8 @@ Sapphire::InstanceObjectCache::InstanceObjectCache()
             case LgbEntryType::EventObject:
             {
               auto pEObj = std::reinterpret_pointer_cast< LGB_EOBJ_ENTRY >( pEntry );
-              m_eobjCache.insert( id, pEObj );
+              m_eobjCache.insert( 0, pEObj );
+              m_eobjBaseInstanceMap.emplace( std::make_pair( id, pEObj->data.BaseId ), pEObj->header.instanceId );
               break;
             }
             case LgbEntryType::EventNpc:
@@ -186,6 +187,16 @@ Sapphire::InstanceObjectCache::EObjPtr
   Sapphire::InstanceObjectCache::getEObj( uint32_t eObjId )
 {
   return m_eobjCache.get( 0, eObjId );
+}
+
+Sapphire::InstanceObjectCache::EObjPtr
+Sapphire::InstanceObjectCache::getEObjByBaseId( uint16_t zoneId, uint32_t baseId )
+{
+  auto find = std::make_pair( zoneId, baseId );
+  auto it = m_eobjBaseInstanceMap.find( find );
+  if( it != m_eobjBaseInstanceMap.end() )
+    return getEObj( it->second );
+  return nullptr;
 }
 
 Sapphire::InstanceObjectCache::ENpcPtr

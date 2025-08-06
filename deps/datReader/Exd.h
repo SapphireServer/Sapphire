@@ -94,6 +94,10 @@ namespace xiv::exd
 
     ~Exd();
 
+    // Prevent implicit copying
+    Exd( const Exd& ) = delete;
+    Exd& operator=( const Exd& ) = delete;
+
     // Get a row by its id
     const std::vector< Field > get_row( uint32_t id );
 
@@ -376,7 +380,7 @@ namespace xiv::exd
     std::map< uint32_t, std::vector< Field > > _data;
     std::vector< std::shared_ptr< dat::File > > _files;
     std::shared_ptr< Exh > _exh;
-    std::map< uint32_t, ExdCacheEntry > _idCache;
+    std::unordered_map< uint32_t, ExdCacheEntry > _idCache;
   };
 
 }
