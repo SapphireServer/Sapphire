@@ -1016,11 +1016,19 @@ bool Player::hateListHasEntry( const BNpc& bnpc )
                      [ bnpc ]( const auto& entry ) { return entry.first == bnpc.getId(); } );
 }
 
-/*std::vector< Chara& > Player::getHateList() override
+std::vector< CharaPtr > Player::getHateList()
 {
-  std::vector hateList = {};
+  std::vector< CharaPtr > hateList = {};
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  for( auto entry : m_actorIdTohateSlotMap )
+  {
+    hateList.push_back( pZone->getActiveBNpcByEntityId( entry.first ) );
+  }
+
   return hateList;
-}*/
+}
 
 const std::map< uint32_t, uint8_t >& Player::getActorIdToHateSlotMap()
 {

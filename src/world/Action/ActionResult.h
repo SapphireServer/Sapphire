@@ -20,15 +20,15 @@ namespace Sapphire::World::Action
     void restoreMP( uint32_t amount, Common::ActionResultFlag flag = Common::ActionResultFlag::None );
     void startCombo( uint16_t actionId );
     void comboSucceed();
-    void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride );
-    void applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
+    void applyStatusEffect( uint32_t id, int32_t aggro, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride );
+    void applyStatusEffect( uint32_t id, int32_t aggro, int32_t duration, Entity::Chara& source, uint8_t param,
                             const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool shouldOverride );
-    void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, bool shouldOverride );
-    void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
+    void applyStatusEffectSelf( uint32_t id, int32_t aggro, int32_t duration, uint8_t param, bool shouldOverride );
+    void applyStatusEffectSelf( uint32_t id, int32_t aggro, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                 uint32_t flag, bool shouldOverride );
-    void replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
+    void replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t aggro, int32_t duration, Entity::Chara& source, uint8_t param,
                               const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource );
-    void replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
+    void replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t aggro, int32_t duration, uint8_t param,
                                   const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag );
     void mount( uint16_t mountId );
 

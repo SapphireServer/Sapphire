@@ -4,6 +4,7 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -21,7 +22,6 @@ public:
   void onExecute( Sapphire::World::Action::Action& action ) override
   {
     auto pSource = action.getSourceChara();
-    auto pTarget = action.getHitChara();
     auto pActionBuilder = action.getActionResultBuilder();
 
     if( !pActionBuilder )
@@ -30,7 +30,10 @@ public:
     if( pSource->hasStatusEffect( SwiftsongAura ) )
       pSource->removeSingleStatusEffectById( SwiftsongAura );
     else
-      pActionBuilder->applyStatusEffectSelf( SwiftsongAura, 0, 20, {}, Flags, false );
+    {
+      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
+      pActionBuilder->applyStatusEffectSelf( SwiftsongAura, aggro, 0, 20, {}, Flags, false );
+    }
   }
 };
 

@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -51,7 +52,8 @@ public:
     }
 
     auto dmg = action.calcDamage( potency );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, 1, dmg.second );
+    int32_t aggro = Sapphire::Math::CalcStats::calcDamageAggro( *pSource, dmg.first );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, aggro, dmg.second );
   }
 };
 

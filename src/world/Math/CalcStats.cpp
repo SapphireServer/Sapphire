@@ -663,6 +663,32 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionHealin
   return std::pair( factor, hitType );
 }
 
+int32_t CalcStats::calcDamageAggro( const Sapphire::Entity::Chara& source, int32_t damage, uint8_t actionAggroModifier )
+{
+  int32_t aggro = damage * actionAggroModifier;
+  auto aggroMod = source.getModifier( Common::ParamModifier::EnmityPercent );
+  return aggro * aggroMod;
+}
+
+int32_t CalcStats::calcHealAggro( const Sapphire::Entity::Chara& source, int32_t heal, bool isSpell )
+{
+  int32_t aggro = heal;
+  auto aggroMod = source.getModifier( Common::ParamModifier::EnmityPercent );
+  if( isSpell )
+    aggro = aggro / 2;
+  else
+    aggro = aggro * 3 / 5;
+
+  return aggro * aggroMod;
+}
+
+int32_t CalcStats::calcStatusAggro( const Sapphire::Entity::Chara& source )
+{
+  int32_t aggro = static_cast< int32_t >( levelTable[ source.getLevel() ][ Common::LevelTableEntry::THREAT ] );
+  auto aggroMod = source.getModifier( Common::ParamModifier::EnmityPercent );
+  return aggro * aggroMod;
+}
+
 uint32_t CalcStats::calcMpRefresh(uint32_t potency, uint8_t level)
 {
   auto& exdData = Common::Service< Data::ExdData >::ref();

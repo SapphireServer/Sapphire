@@ -4,6 +4,7 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -29,7 +30,10 @@ public:
     if( pSource->hasStatusEffect( TheWanderersMinuetStatus ) )
       pSource->removeSingleStatusEffectById( TheWanderersMinuetStatus );
     else
-      pActionBuilder->applyStatusEffectSelf( TheWanderersMinuetStatus, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, 30 } }, Flags, false );
+    {
+      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
+      pActionBuilder->applyStatusEffectSelf( TheWanderersMinuetStatus, aggro, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, 30 } }, Flags, false );
+    }
   }
 };
 

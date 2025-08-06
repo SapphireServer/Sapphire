@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -28,7 +29,8 @@ public:
     if( !pActionBuilder || !pTarget )
       return;
 
-    pActionBuilder->applyStatusEffect( pTarget, Bind, 10000, 0, { }, Flags, false, false );
+    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
+    pActionBuilder->applyStatusEffect( pTarget, Bind, aggro, 10000, 0, { }, Flags, false, false );
   }
 };
 

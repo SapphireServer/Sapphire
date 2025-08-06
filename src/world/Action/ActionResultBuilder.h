@@ -26,15 +26,15 @@ namespace Sapphire::World::Action
 
     void comboSucceed( Entity::CharaPtr& target );
 
-    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false );
-    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
+    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param, bool shouldOverride = false );
+    void applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param,
                             const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag = 0, bool statusToSource = false, bool shouldOverride = false );
-    void applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride = false );
-    void applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
+    void applyStatusEffectSelf( uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param, bool shouldOverride = false );
+    void applyStatusEffectSelf( uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                 uint32_t flag = 0, bool shouldOverride = false );
-    void replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
+    void replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, Entity::CharaPtr& target, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param,
                               const std::vector< StatusModifier >& modifiers, uint32_t flag = 0, bool statusToSource = false );
-    void replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint16_t statusId, uint32_t duration, uint8_t param,
+    void replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param,
                                   const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag = 0 );
     void mount( Entity::CharaPtr& target, uint16_t mountId );
 

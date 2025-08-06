@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -41,7 +42,8 @@ public:
     }
 
     auto dmg = action.calcDamage( Potency );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, 1, dmg.second );
+    int32_t aggro = Sapphire::Math::CalcStats::calcDamageAggro( *pSource, dmg.first );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, aggro, dmg.second );
 
     if( pTarget->getObjKind() != pSource->getObjKind() )
     {
@@ -50,11 +52,11 @@ public:
 
     if( applyVenomousBite )
     {
-      pActionBuilder->applyStatusEffect( pTarget, VenomousBiteStatus, 18000, 0, {}, Flags, false, true );
+      pActionBuilder->applyStatusEffect( pTarget, VenomousBiteStatus, 0, 18000, 0, {}, Flags, false, true );
     }
     if( applyWindbite )
     {
-      pActionBuilder->applyStatusEffect( pTarget, WindbiteStatus, 18000, 0, {}, Flags, false, true );
+      pActionBuilder->applyStatusEffect( pTarget, WindbiteStatus, 0, 18000, 0, {}, Flags, false, true );
     }
   }
 };

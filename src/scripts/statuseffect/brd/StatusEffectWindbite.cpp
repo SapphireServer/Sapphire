@@ -43,11 +43,6 @@ public:
       playerMgr().onSkillProc( *pPlayer, 1 );
     }
 
-    if( damageVal > 0 )
-    {
-      actor.onActionHostile( pSource );
-    }
-
     Network::Util::Packet::sendActorControl( actor.getInRangePlayerIds( actor.isPlayer() ), actor.getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
       Common::CalcResultType::TypeDamageHp, damageVal );
     Network::Util::Packet::sendHudParam( actor );

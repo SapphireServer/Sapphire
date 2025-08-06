@@ -597,11 +597,17 @@ bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
                       [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
 }
 
-/*std::vector< Chara& > BNpc::getHateList() override
+std::vector< CharaPtr > BNpc::getHateList()
 {
-  std::vector hateList = {};
+  std::vector< CharaPtr > hateList = {};
+
+  for( auto& entry : m_hateList )
+  {
+    hateList.push_back( entry->m_pChara );
+  }
+
   return hateList;
-}*/
+}
 
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
@@ -684,9 +690,9 @@ void BNpc::restHp()
   Network::Util::Packet::sendHudParam( *this );
 }
 
-void BNpc::onActionHostile( CharaPtr pSource )
+void BNpc::onActionHostile( CharaPtr pSource, int32_t aggro )
 {
-  hateListUpdate( pSource, 1 );
+  hateListUpdate( pSource, aggro );
 
   if( getCanSwapTarget() ) // todo: only call on global server tick
     updateAggroTarget();

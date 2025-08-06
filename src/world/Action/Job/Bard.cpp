@@ -21,7 +21,7 @@ void Bard::onAction( Entity::Player& player, Action& action )
         if( !pActionBuilder )
           return;
 
-        pActionBuilder->applyStatusEffectSelf( StraightShotReady, 10000, 0, {}, 1025, true );
+        pActionBuilder->applyStatusEffectSelf( StraightShotReady, 0, 10000, 0, {}, 1025, true );
       }
       break;
     }

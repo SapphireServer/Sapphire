@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -26,7 +27,8 @@ public:
     if( auto status = pPlayer->getStatusEffectById( Defiance ); status )
       status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
-    pActionBuilder->applyStatusEffectSelf( Unchained, 20000, 0 );
+    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pPlayer );
+    pActionBuilder->applyStatusEffectSelf( Unchained, aggro, 20000, 0 );
   }
 };
 

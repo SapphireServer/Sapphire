@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 #include <Network/Util/PacketUtil.h>
 
@@ -35,7 +36,8 @@ public:
     }
 
     pTarget->removeSingleStatusEffectByFlag( Common::StatusEffectFlag::CanDispel );
-    pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, 30000, 0, {}, Flags, false, true );
+    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
+    pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, aggro, 30000, 0, {}, Flags, false, true );
 
     Network::Util::Packet::sendHudParam( *pTarget );
   }

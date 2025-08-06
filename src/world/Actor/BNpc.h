@@ -112,7 +112,7 @@ namespace Sapphire::Entity
     void hateListUpdate( const CharaPtr& pChara, int32_t hateAmount );
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );
-    //std::vector< Chara& > getHateList() override;
+    std::vector< CharaPtr > getHateList() override;
 
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );
@@ -121,7 +121,7 @@ namespace Sapphire::Entity
     void update( uint64_t tickCount ) override;
     void onTick() override;
 
-    void onActionHostile( CharaPtr pSource ) override;
+    void onActionHostile( CharaPtr pSource, int32_t aggro ) override;
 
     void onDeath() override;
 

@@ -4,6 +4,7 @@
 #include <Action/CommonAction.h>
 #include <Action/Action.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -31,10 +32,11 @@ public:
       status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
     auto dmg = action.calcDamage( Potency );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, 1, dmg.second );
-    pActionBuilder->heal( pTarget, pSource, dmg.first, 1, Common::CalcResultType::TypeRecoverHp, Common::ActionResultFlag::EffectOnSource );
+    int32_t aggro = Sapphire::Math::CalcStats::calcDamageAggro( *pSource, dmg.first );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, aggro, dmg.second );
+    pActionBuilder->heal( pTarget, pSource, dmg.first, 0, Common::CalcResultType::TypeRecoverHp, Common::ActionResultFlag::EffectOnSource );
 
-    pActionBuilder->applyStatusEffectSelf( InnerBeast, 15000, 0, { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
+    pActionBuilder->applyStatusEffectSelf( InnerBeast, 0, 15000, 0, { StatusModifier{ Common::ParamModifier::DamageTakenPercent, -20 } } );
     
     if( !pPlayer->hasStatusEffect( Unchained ) )
     {

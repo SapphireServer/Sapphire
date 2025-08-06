@@ -4,6 +4,7 @@
 #include <Script/NativeScriptApi.h>
 #include <ScriptObject.h>
 #include <StatusEffect/StatusEffect.h>
+#include <Math/CalcStats.h>
 
 using namespace Sapphire;
 using namespace Sapphire::World::Action;
@@ -32,7 +33,10 @@ public:
     if( pSource->hasStatusEffect( FoeRequiemAura ) )
       pSource->removeSingleStatusEffectById( FoeRequiemAura );
     else
-      pActionBuilder->applyStatusEffectSelf( FoeRequiemAura, 0, 0, {}, Flags, false );
+    {
+      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
+      pActionBuilder->applyStatusEffectSelf( FoeRequiemAura, aggro, 0, 0, {}, Flags, false );
+    }
   }
 };
 

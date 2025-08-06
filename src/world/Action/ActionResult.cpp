@@ -72,7 +72,7 @@ void ActionResult::comboSucceed()
   m_result.Type = CalcResultType::TypeComboHit;
 }
 
-void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride )
+void ActionResult::applyStatusEffect( uint32_t id, int32_t aggro, int32_t duration, Entity::Chara& source, uint8_t param, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
@@ -83,7 +83,7 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
   m_pStatus->setParam( param );
 }
 
-void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
+void ActionResult::applyStatusEffect( uint32_t id, int32_t aggro, int32_t duration, Entity::Chara& source, uint8_t param,
                                       const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
@@ -97,7 +97,7 @@ void ActionResult::applyStatusEffect( uint32_t id, int32_t duration, Entity::Cha
   m_pStatus->setParam( param );
 }
 
-void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, bool shouldOverride )
+void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t aggro, int32_t duration, uint8_t param, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
   m_result.Arg2 = param;
@@ -109,7 +109,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_pStatus->setParam( param );
 }
 
-void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
+void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t aggro, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                           uint32_t flag, bool shouldOverride )
 {
   m_result.Value = static_cast< int16_t >( id );
@@ -122,18 +122,18 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
   m_pStatus->setParam( param );
 }
 
-void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
+void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t aggro, int32_t duration, Entity::Chara& source, uint8_t param,
                                         const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource )
 {
-  applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, false );
+  applyStatusEffect( id, aggro, duration, source, param, modifiers, flag, statusToSource, false );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
 
-void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
+void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t aggro, int32_t duration, uint8_t param,
                                             const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag )
 {
-  applyStatusEffectSelf( id, duration, param, modifiers, flag, false );
+  applyStatusEffectSelf( id, aggro, duration, param, modifiers, flag, false );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
 }
@@ -173,7 +173,7 @@ void ActionResult::execute()
       }
 
       m_target->takeDamage( m_result.Value );
-      m_target->onActionHostile( m_source );
+      m_target->onActionHostile( m_source, m_aggro );
       break;
     }
 
@@ -181,6 +181,13 @@ void ActionResult::execute()
     case CalcResultType::TypeCriticalRecoverHp:
     {
       m_target->heal( m_result.Value );
+
+      auto hateList = m_target->getHateList();
+      auto aggro = m_aggro / hateList.size();
+      for( auto entry : hateList )
+      {
+        entry->onActionHostile( m_source, aggro );
+      }
       break;
     }
 
@@ -193,25 +200,39 @@ void ActionResult::execute()
     case CalcResultType::TypeSetStatus:
     case CalcResultType::TypeSetStatusMe:
     {
-      for( auto const& entry : m_target->getStatusEffectMap() )
-      {
-        auto statusEffect = entry.second;
-        if( statusEffect->getId() == m_result.Value && m_bShouldOverride && statusEffect->getSrcActorId() == m_pStatus->getSrcActorId() )
-        {
-          statusEffect->refresh( m_pStatus->getDuration() );
-          m_pStatus->setSlot( statusEffect->getSlot() );
-          
-          Network::Util::Packet::sendHudParam( *m_target );
-          return;
-        }
-      }
-
       if( m_pOldStatus )
         m_target->replaceSingleStatusEffect( m_pOldStatus->getSlot(), m_pStatus );
+      else if( m_bShouldOverride )
+      {
+        for( auto const& entry : m_target->getStatusEffectMap() )
+        {
+          auto statusEffect = entry.second;
+          if( statusEffect->getId() == m_result.Value && statusEffect->getSrcActorId() == m_pStatus->getSrcActorId() )
+          {
+            statusEffect->refresh( m_pStatus->getDuration() );
+            m_pStatus->setSlot( statusEffect->getSlot() );
+
+            Network::Util::Packet::sendHudParam( *m_target );
+            break;
+          }
+        }
+      }
       else if( !m_bShouldOverride )
         m_target->addStatusEffectByIdIfNotExist( m_pStatus );
       else
         m_target->addStatusEffectById( m_pStatus );
+
+      if( m_result.Flag & static_cast< uint8_t >( StatusEffectFlag::BuffCategory ) )
+      {
+        auto hateList = m_target->getHateList();
+        auto aggro = m_aggro / hateList.size();
+        for( auto entry : hateList )
+        {
+          entry->onActionHostile( m_source, aggro );
+        }
+      }
+      else if( m_result.Flag & static_cast< uint8_t >( StatusEffectFlag::DebuffCategory ) )
+        m_target->onActionHostile( m_source, m_aggro );
       break;
     }
 

@@ -551,7 +551,8 @@ void Action::Action::buildActionResults()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, 1, dmg.second );
+      int32_t aggro = Math::CalcStats::calcDamageAggro( *m_pSource, dmg.first );
+      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, aggro, dmg.second );
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
@@ -580,7 +581,8 @@ void Action::Action::buildActionResults()
     else if( m_lutEntry.curePotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.curePotency );
-      m_actionResultBuilder->heal( actor, actor, heal.first, 1, heal.second );
+      int32_t aggro = Math::CalcStats::calcHealAggro( *m_pSource, heal.first ); // todo: check if spell or ability
+      m_actionResultBuilder->heal( actor, actor, heal.first, aggro, heal.second );
 
       if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
@@ -644,19 +646,20 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   }
 
   auto policy = getStatusRefreshPolicy( status.statusRefreshPolicy, isSelf );
+  int32_t aggro = Math::CalcStats::calcStatusAggro( *source );
   switch( policy )
   {
     case Common::StatusRefreshPolicy::Stack:
     {
-      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
+      pActionBuilder->applyStatusEffect( target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
       break;
     }
     case Common::StatusRefreshPolicy::ReplaceOrApply:
     {
       if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
-        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
       else
-        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       break;
     }
     case Common::StatusRefreshPolicy::Extend:
@@ -672,7 +675,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
 
       if( hasSameStatus || policy == Common::StatusRefreshPolicy::ExtendOrApply )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, aggro, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       }
       break;
     }
@@ -680,7 +683,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
     {
       if( !hasSameStatus )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       }
       else
       {
@@ -730,9 +733,6 @@ void Action::Action::handleStatusEffects()
         applyStatusEffect( false, actor, m_pSource, status );
         // pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
-
-      if( !actor->getStatusEffectMap().empty() )
-        actor->onActionHostile( m_pSource );
     }
   }
 }

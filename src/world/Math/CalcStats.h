@@ -142,6 +142,31 @@ namespace Sapphire::Math
 
     static std::pair< float, Common::CalcResultType > calcActionHealing( const Sapphire::Entity::Chara& chara, uint32_t ptc, float wepDmg );
 
+    /*!
+     * @brief Calculates aggro generated from damage including modifiers
+     *
+     * @param source The source/casting character
+     * @param damage Damage dealt
+     * @param actionAggroModifier Aggro modifier from action (eg. 3 for Tomahawk)
+     */
+    static int32_t calcDamageAggro( const Sapphire::Entity::Chara& source, int32_t damage, uint8_t actionAggroModifier = 1 );
+
+    /*!
+     * @brief Calculates aggro generated from heals including modifiers. This does not include the equal aggro split between all targets at the end
+     *
+     * @param source The source/casting character
+     * @param heal Healing value
+     * @param isSpell True if the action is a spell. Otherwise it is an ability specifically for healing (eg. Second Wind)
+     */
+    static int32_t calcHealAggro( const Sapphire::Entity::Chara& source, int32_t heal, bool isSpell = true );
+
+    /*!
+     * @brief Calculates aggro generated from applying a status effect. This does not include the equal aggro split between all targets at the end if the status effect is a buff
+     *
+     * @param source The source/casting character
+     */
+    static int32_t calcStatusAggro( const Sapphire::Entity::Chara& source );
+
     static uint32_t calcMpRefresh( uint32_t potency, uint8_t level );
 
     static uint32_t primaryStatValue( const Sapphire::Entity::Chara& chara );
