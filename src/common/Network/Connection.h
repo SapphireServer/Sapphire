@@ -140,18 +140,11 @@ namespace Sapphire::Network
   template< class T >
   std::shared_ptr< T > addServerToHive( const std::string& listenIp, uint32_t port, HivePtr pHive )
   {
-    try
-    {
-      AcceptorPtr acceptor( new Acceptor( pHive ) );
-      acceptor->listen( listenIp, port );
-      std::shared_ptr< T > connection( new T( pHive, acceptor ) );
-      acceptor->accept( connection );
-      return connection;
-    }
-    catch( std::runtime_error e )
-    {
-      throw;
-    }
+    AcceptorPtr acceptor( new Acceptor( pHive ) );
+    acceptor->listen( listenIp, port );
+    std::shared_ptr< T > connection( new T( pHive, acceptor ) );
+    acceptor->accept( connection );
+    return connection;
   }
 
 }
