@@ -62,12 +62,12 @@ namespace xiv::exd
     return _name;
   }
 
-  const Exh& Cat::get_header() const
+  Exh& Cat::get_header()
   {
     return *_header;
   }
 
-  const Exd& Cat::get_data_ln( Language i_language ) const
+  Exd& Cat::get_data_ln( Language i_language )
   {
     auto ln_it = _data.find( i_language );
     if( ln_it == _data.end() )
@@ -78,7 +78,7 @@ namespace xiv::exd
     return *( ln_it->second );
   }
 
-  const Exd& Cat::get_data( Language language ) const
+  Exd& Cat::get_data( Language language )
   {
     auto ln_it = _data.find( language );
     if( ln_it == _data.end() )

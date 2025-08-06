@@ -64,7 +64,15 @@ namespace Sapphire::Lobby
     Logger::setLogLevel( m_config.global.general.logLevel );
 
     auto hive = Network::make_Hive();
-    Network::addServerToHive< GameConnection >( m_ip, m_port, hive );
+
+    try
+    {
+      Network::addServerToHive< GameConnection >( m_ip, m_port, hive );
+    } catch( std::exception& e )
+    {
+      Logger::fatal( "Error starting server: {0}", e.what() );
+      return;
+    }
 
     Logger::info( "Lobby server running on {0}:{1}", m_ip, m_port );
 

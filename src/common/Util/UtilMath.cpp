@@ -39,8 +39,8 @@ float Util::distance2D( float x, float y, float x1, float y1 )
 
 float Util::calcAngTo( float x, float y, float x1, float y1 )
 {
-  float dx = x - x1;
-  float dy = y - y1;
+  float dx = x1 - x;
+  float dy = y1 - y;
   if( dy != 0.0f )
   {
     return atan2( dy, dx );
@@ -78,6 +78,16 @@ uint16_t Util::floatToUInt16Rot( float val )
 uint8_t Util::floatToUInt8Rot( float val )
 {
   return static_cast< uint8_t >( 0x80 * ( ( val + PI ) ) / PI );
+}
+
+float Util::radiansToDegrees( float val )
+{
+  return  val * ( 180 / PI );
+}
+
+float Util::degreesToRadians(float val)
+{
+  return val * ( PI / 180 );
 }
 
 FFXIVARR_POSITION3 Util::transform( const FFXIVARR_POSITION3& vector, const Matrix33& matrix )

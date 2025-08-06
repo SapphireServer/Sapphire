@@ -233,7 +233,7 @@ namespace xiv::dat
       }
     }
 
-    throw std::runtime_error( "Chunk not found for path: " + path );
+    throw std::runtime_error( "Chunk not found for path: '" + path + "'" );
   }
 
   const Cat& GameData::getCategoryFromPath( const std::string& path )

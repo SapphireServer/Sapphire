@@ -45,12 +45,12 @@ namespace xiv
          const std::string& get_name() const;
 
          // Returns the header
-         const Exh& get_header() const;
+         Exh& get_header();
 
          // Returns data for a specific language
-         const Exd& get_data_ln( Language i_language = Language::none ) const;
+         Exd& get_data_ln( Language i_language = Language::none );
 
-         const Exd& get_data( Language language = Language::none ) const;
+         Exd& get_data( Language language = Language::none );
       protected:
          const std::string _name;
 
