@@ -53,6 +53,7 @@ find_package( MySQL )
 ##############################
 #        Dependencies        #
 ##############################
+set( CMAKE_FOLDER "deps" )
 add_subdirectory( "deps/zlib" )
 add_subdirectory( "deps/MySQL" )
 add_subdirectory( "deps/datReader" )
@@ -63,14 +64,18 @@ add_subdirectory( "deps/recastnavigation" )
 ##############################
 #  Main Sapphire Components  #
 ##############################
+set( CMAKE_FOLDER "" )
 add_subdirectory( "src/common" )
 add_subdirectory( "src/api" )
 add_subdirectory( "src/lobby" )
 add_subdirectory( "src/world" )
-add_subdirectory( "src/scripts" )
 add_subdirectory( "src/dbm" )
+
+set( CMAKE_FOLDER "scripts" )
+add_subdirectory( "src/scripts" )
 
 ##############################
 #           Tools            #
 ##############################
+set( CMAKE_FOLDER "tools" )
 add_subdirectory( "src/tools" )
