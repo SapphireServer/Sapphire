@@ -157,6 +157,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
 {
   using namespace Sapphire;
 
+  auto start = Common::Util::getTimeMs();
+
   Logger::init( "log/world" );
 
   printBanner();
@@ -351,6 +353,7 @@ void WorldServer::run( int32_t argc, char* argv[] )
   Common::Service< ContentFinder >::set( contentFinder );
   Common::Service< Manager::TaskMgr >::set( taskMgr );
 
+  Logger::debug( "Initialization took {0}ms", Common::Util::getTimeMs() - start );
 
   Logger::info( "World server running on {0}:{1}", m_ip, m_port );
 
