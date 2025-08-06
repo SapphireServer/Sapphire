@@ -40,7 +40,7 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   // ignore logging/bullshit/etc
   m_ctx = new rcContext( false );
 
-  printf( "[Navmesh] loading obj: %s\n", path.substr( path.find( "pcb_export" ) - 1 ).c_str() );
+  printf( "[Navmesh] loading obj: %s\n", path.substr( path.find( "pcb_export" ) ).c_str() );
 
   m_mesh = new rcMeshLoaderObj;
   assert( m_mesh );
@@ -109,12 +109,12 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
   // fuck this gay earth
   auto mesh = const_cast< const dtNavMesh* >( m_navMesh );
 
-  auto dir = fs::current_path().string() + "/pcb_export/" + name + "/";
-  auto fileName = dir + name + ".nav";
+  auto dir = fs::current_path() / "pcb_export" / name;
+  auto fileName = dir / ( name + ".nav" );
 
   fs::create_directories( dir );
 
-  FILE* fp = fopen( fileName.c_str(), "wb" );
+  FILE* fp = fopen( fileName.string().c_str(), "wb" );
   if( !fp )
     return;
 
@@ -152,10 +152,7 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
 
   fclose( fp );
 
-  auto pos = fileName.find( "pcb_export" );
-  fileName = fileName.substr( pos - 1 );
-
-  printf( "[Navmesh] Saved navmesh to '%s'\n", fileName.c_str() );
+  printf( "[Navmesh] Saved navmesh to '%s.nav'\n", name.c_str() );
 }
 
 bool TiledNavmeshGenerator::buildNavmesh()

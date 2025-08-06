@@ -23,19 +23,17 @@ public:
   {
     auto start = std::chrono::high_resolution_clock::now();
 
-    static std::string currPath = std::filesystem::current_path().string();
+    static auto exportPath = std::filesystem::current_path() / "pcb_export";
 
-    auto dir = fs::current_path().string() + "/pcb_export/" + zone.name + "/";
-    auto fileName = dir + zone.name;
-    auto objName = fileName + ".obj";
+    auto objPath = exportPath / zone.name / ( zone.name + ".obj" );
 
     std::error_code e;
-    if( !fs::exists( objName, e ) )
+    if( !fs::exists( objPath, e ) )
       ObjExporter::exportZone( zone );
 
     TiledNavmeshGenerator gen;
 
-    if( !gen.init( objName ) )
+    if( !gen.init( objPath.string() ) )
     {
       printf( "[Navmesh] failed to init TiledNavmeshGenerator for file '%s'\n", zone.name.c_str() );
       return;
