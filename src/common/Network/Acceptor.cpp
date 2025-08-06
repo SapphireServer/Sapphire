@@ -87,23 +87,14 @@ void Network::Acceptor::accept( ConnectionPtr connection )
 
 void Network::Acceptor::listen( const std::string& host, const uint16_t& port )
 {
-  try
-  {
-    asio::ip::tcp::resolver resolver( m_hive->getService() );
-    asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
-    asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
+  asio::ip::tcp::resolver resolver( m_hive->getService() );
+  asio::ip::tcp::resolver::query query( host, std::to_string( port ) );
+  asio::ip::tcp::endpoint endpoint = *resolver.resolve( query );
 
-    m_acceptor.open( endpoint.protocol() );
-    m_acceptor.set_option( asio::ip::tcp::acceptor::reuse_address( false ) );
-    m_acceptor.bind( endpoint );
-    m_acceptor.listen( asio::socket_base::max_connections );
-  }
-  catch( ... )
-  {
-    // this should not happen
-    assert( true );
-  }
-
+  m_acceptor.open( endpoint.protocol() );
+  m_acceptor.set_option( asio::ip::tcp::acceptor::reuse_address( false ) );
+  m_acceptor.bind( endpoint );
+  m_acceptor.listen( asio::socket_base::max_connections );
 }
 
 Network::HivePtr Network::Acceptor::getHive()

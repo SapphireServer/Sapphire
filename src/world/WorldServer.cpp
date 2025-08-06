@@ -323,7 +323,14 @@ void WorldServer::run( int32_t argc, char* argv[] )
 
 
   Network::HivePtr hive( new Network::Hive() );
-  Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
+  try
+  {
+    Network::addServerToHive< Network::GameConnection >( m_ip, m_port, hive );
+  } catch( std::exception& e )
+  {
+    Logger::fatal( "Error starting server: {0}", e.what() );
+    return;
+  }
 
   std::vector< std::thread > thread_list;
   thread_list.emplace_back( std::thread( std::bind( &Network::Hive::run, hive.get() ) ) );
