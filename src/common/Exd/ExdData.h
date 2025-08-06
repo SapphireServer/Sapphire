@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 
 #include <typeindex>
 
@@ -31,32 +31,16 @@ namespace Sapphire::Data
     template< typename T >
     std::shared_ptr< Excel::ExcelStruct< T > > getRow( uint32_t row, uint32_t subrow = 0 )
     {
-      xiv::exd::Exd sheet;
-      auto needle = m_sheets.find( typeid( T ) );
-      if( needle == m_sheets.end() )
-      {
-        auto sheetName = getSheetName< T >();
-
-        // load sheet
-        auto& cat = m_exd_data->get_category( sheetName );
-        m_sheets[ typeid( T ) ] = sheet = static_cast< xiv::exd::Exd >( cat.get_data( xiv::exd::Language::en ) );
-      }
-      else
-      {
-        sheet = needle->second;
-      }
-
+      auto& sheet = getSheet< T >();
       try
       {
-        return sheet.get_row< T >( row );
-      }
-      catch( const std::runtime_error& ex )
+        return sheet.template get_row< T >( row );
+      } catch( const std::runtime_error& ex )
       {
         Logger::error( "Error fetching row from sheet {}: {}", getSheetName< T >(), ex.what() );
 
         return nullptr;
-      }
-      catch( const std::out_of_range& )
+      } catch( const std::out_of_range& )
       {
         return nullptr;
       }
@@ -65,23 +49,10 @@ namespace Sapphire::Data
     template< typename T >
     std::vector< uint32_t > getIdList()
     {
-      xiv::exd::Exd sheet;
-      auto needle = m_sheets.find( typeid( T ) );
-      if( needle == m_sheets.end() )
-      {
-        auto sheetName = getSheetName< T >();
-
-        // load sheet
-        auto& cat = m_exd_data->get_category( sheetName );
-        m_sheets[ typeid( T ) ] = sheet = static_cast< xiv::exd::Exd >( cat.get_data( xiv::exd::Language::en ) );
-      }
-      else
-      {
-        sheet = needle->second;
-      }
-
-      auto rows = sheet.get_rows();
+      auto& sheet = getSheet< T >();
+      const auto& rows = sheet.get_rows();
       std::vector< uint32_t > ids;
+      ids.reserve( rows.size() );
 
       for( const auto& row : rows )
       {
@@ -94,22 +65,8 @@ namespace Sapphire::Data
     template< typename T >
     std::unordered_map< uint32_t, std::shared_ptr< Excel::ExcelStruct< T > > > getRows()
     {
-      xiv::exd::Exd sheet;
-      auto needle = m_sheets.find( typeid( T ) );
-      if( needle == m_sheets.end() )
-      {
-        auto sheetName = getSheetName< T >();
-
-        // load sheet
-        auto& cat = m_exd_data->get_category( sheetName );
-        m_sheets[ typeid( T ) ] = sheet = static_cast< xiv::exd::Exd >( cat.get_data( xiv::exd::Language::en ) );
-      }
-      else
-      {
-        sheet = needle->second;
-      }
-
-      return sheet.get_sheet_rows< T >();
+      auto& sheet = getSheet< T >();
+      return sheet.template get_sheet_rows< T >();
     }
 
     std::shared_ptr< xiv::dat::GameData > getGameData()
@@ -123,10 +80,10 @@ namespace Sapphire::Data
     {
       auto origName = std::string( typeid( T ).name() );
 #if _WIN32
-      auto pos = origName.find_last_of(':');
-      if (pos != std::string::npos)
+      auto pos = origName.find_last_of( ':' );
+      if( pos != std::string::npos )
       {
-          return origName.substr(pos + 1);
+        return origName.substr( pos + 1 );
       }
 
       return "[something fucking died]";
@@ -152,11 +109,30 @@ namespace Sapphire::Data
 #endif
     }
 
-    std::unordered_map< std::type_index, xiv::exd::Exd > m_sheets;
+    template< typename T >
+    xiv::exd::Exd& getSheet()
+    {
+      auto needle = m_sheets.find( typeid( T ) );
+      if( needle == m_sheets.end() )
+      {
+        auto sheetName = getSheetName< T >();
+
+        // load sheet
+        auto& cat = m_exd_data->get_category( sheetName );
+        auto& data = cat.get_data( xiv::exd::Language::en );
+        m_sheets.emplace( typeid( T ), &data );
+        return data;
+      }
+      else
+      {
+        return *needle->second;
+      }
+    }
+
+    std::unordered_map< std::type_index, xiv::exd::Exd* > m_sheets;
 
     std::shared_ptr< xiv::dat::GameData > m_data;
     std::shared_ptr< xiv::exd::ExdData > m_exd_data;
   };
 
 }
-

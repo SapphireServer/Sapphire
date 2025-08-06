@@ -32,7 +32,7 @@ namespace xiv
           const std::vector<std::string>& get_cat_names() const;
 
           // Get a category by its name
-          const Cat& get_category(const std::string& i_cat_name);
+          Cat& get_category(const std::string& i_cat_name);
 
           // Export in csv in base flder i_ouput_path
           void export_as_csvs(const std::filesystem::path& i_output_path);
