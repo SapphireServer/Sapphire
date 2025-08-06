@@ -84,10 +84,10 @@ std::string getEobjSgbPath( uint32_t eobjId )
     return exportedSgMap[ eobjSgbPaths[ eobjId ] ];
 
   auto& eobjCat = eData->get_category( "EObj" );
-  auto eObjExd = static_cast< xiv::exd::Exd >( eobjCat.get_data_ln( xiv::exd::Language::none ) );
+  auto& eObjExd = eobjCat.get_data_ln( xiv::exd::Language::none );
 
   auto& exportedSgCat = eData->get_category( "ExportedSG" );
-  auto exportedSgExd = static_cast< xiv::exd::Exd >( exportedSgCat.get_data_ln( xiv::exd::Language::none ) );
+  auto& exportedSgExd = exportedSgCat.get_data_ln( xiv::exd::Language::none );
 
   for( auto& row : exportedSgExd.get_rows() )
   {
@@ -116,7 +116,7 @@ std::string zoneNameToPath( const std::string& name )
   bool found = false;
 
   auto& cat = eData->get_category( "TerritoryType" );
-  auto exd = static_cast< xiv::exd::Exd >( cat.get_data_ln( xiv::exd::Language::none ) );
+  auto& exd = cat.get_data_ln( xiv::exd::Language::none );
   for( auto& row : exd.get_rows() )
   {
     auto& fields = row.second;

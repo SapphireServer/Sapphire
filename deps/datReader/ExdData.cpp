@@ -60,7 +60,7 @@ const std::vector< std::string >& ExdData::get_cat_names() const
   return _cat_names;
 }
 
-const Cat& ExdData::get_category( const std::string& i_cat_name )
+Cat& ExdData::get_category( const std::string& i_cat_name )
 {
   // Get the category from its name
   auto cat_it = _cats.find( i_cat_name );
