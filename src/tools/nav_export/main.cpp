@@ -358,7 +358,7 @@ int main( int argc, char* argv[] )
       if( exportedTeriMap.find( zonePath ) != exportedTeriMap.end() )
         continue;
 
-      std::string zoneNameShort = zonePath.substr( zonePath.find_last_of( '/' ) );
+      std::string zoneNameShort = zonePath.substr( zonePath.find_last_of( '/' ) + 1 );
 
       ExportedZone exportedZone;
       exportedZone.name = zoneNameShort;
