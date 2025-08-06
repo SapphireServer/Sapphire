@@ -16,7 +16,7 @@ class ObjExporter
 public:
   static std::string exportZone( const ExportedZone& zone )
   {
-    static auto exportPath = std::filesystem::current_path() / "pcb_export";
+    static auto exportPath = std::filesystem::current_path() / "navi";
 
     auto start = std::chrono::high_resolution_clock::now();
 
@@ -59,7 +59,7 @@ public:
 
   static std::string exportGroup( const std::string& zoneName, const ExportedGroup& group )
   {
-    static auto exportPath = std::filesystem::current_path() / "pcb_export";
+    static auto exportPath = std::filesystem::current_path() / "navi";
 
     auto start = std::chrono::high_resolution_clock::now();
 

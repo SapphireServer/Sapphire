@@ -40,7 +40,7 @@ bool TiledNavmeshGenerator::init( const std::string& path )
   // ignore logging/bullshit/etc
   m_ctx = new rcContext( false );
 
-  printf( "[Navmesh] loading obj: %s\n", path.substr( path.find( "pcb_export" ) ).c_str() );
+  printf( "[Navmesh] loading obj: %s\n", path.substr( path.find( "navi" ) ).c_str() );
 
   m_mesh = new rcMeshLoaderObj;
   assert( m_mesh );
@@ -109,7 +109,7 @@ void TiledNavmeshGenerator::saveNavmesh( const std::string& name )
   // fuck this gay earth
   auto mesh = const_cast< const dtNavMesh* >( m_navMesh );
 
-  auto dir = fs::current_path() / "pcb_export" / name;
+  auto dir = fs::current_path() / "navi" / name;
   auto fileName = dir / ( name + ".nav" );
 
   fs::create_directories( dir );

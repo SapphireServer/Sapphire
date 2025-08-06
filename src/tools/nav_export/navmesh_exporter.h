@@ -23,7 +23,7 @@ public:
   {
     auto start = std::chrono::high_resolution_clock::now();
 
-    static auto exportPath = std::filesystem::current_path() / "pcb_export";
+    static auto exportPath = std::filesystem::current_path() / "navi";
 
     auto objPath = exportPath / zone.name / ( zone.name + ".obj" );
 
