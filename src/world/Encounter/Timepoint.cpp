@@ -464,7 +464,8 @@ namespace Sapphire
 
           if( pNaviProvider )
           {
-            pNaviProvider->updateAgentPosition( *pBNpc );
+            auto newAgentId = pNaviProvider->updateAgentPosition( pBNpc->getAgentId(), pBNpc->getPos(), pBNpc->getRadius() );
+            pBNpc->setAgentId( newAgentId );
           }
           pBNpc->sendPositionUpdate();
         }

@@ -1,10 +1,8 @@
 #pragma once
 
-#include "Forwards.h"
 
 #include <array>
 #include <algorithm>
-#include <chrono>
 #include <random>
 #include <memory>
 #include <type_traits>
@@ -12,7 +10,7 @@
 
 #include <Logging/Logger.h>
 
-namespace Sapphire::World::Manager
+namespace Sapphire::Common::Random
 {
   /*!
    * @brief Generator object that is used on multiple state situations
@@ -114,8 +112,8 @@ namespace Sapphire::World::Manager
 
       // check if kernel can supply sufficiently non-deterministic output
 
-      if( rd.entropy() == 0.f )
-        Logger::error( "Kernel random device entropy reported zero - Random number generator may be poor quality" );
+      //if( rd.entropy() == 0.f )
+      //  Logger::error( "Kernel random device entropy reported zero - Random number generator may be poor quality" );
 
       std::generate_n( seedArray.data(), seedArray.size(), std::ref( rd ) );
       auto pSeq = std::make_unique< std::seed_seq >( std::begin( seedArray ), std::end( seedArray ) );

@@ -43,7 +43,7 @@
 #include "Manager/AchievementMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Manager/LinkshellMgr.h"
-#include "Manager/RNGMgr.h"
+#include "../../common/Random/RNGMgr.h"
 #include "Manager/MgrUtil.h"
 
 #include "Event/EventDefs.h"

@@ -7,6 +7,8 @@
 #include <Territory/Territory.h>
 #include <Navi/NaviProvider.h>
 
+#include "StateRetreat.h"
+
 using namespace Sapphire::World;
 
 void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
@@ -23,7 +25,10 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     return;
 
   if( pNaviProvider && bnpc.pathingActive() )
-    pNaviProvider->updateAgentParameters( bnpc );
+  {
+    auto state = bnpc.getState();
+    pNaviProvider->updateAgentParameters( bnpc.getAgentId(), bnpc.getRadius(), state == Entity::BNpcState::Retreat || state == Entity::BNpcState::Combat );
+  }
 
   auto distanceOrig = Common::Util::distance( bnpc.getPos(), bnpc.getSpawnPos() );
 
@@ -49,12 +54,14 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
   {
 
     if( pNaviProvider )
-      pNaviProvider->setMoveTarget( bnpc, pHatedActor->getPos() );
+      pNaviProvider->setMoveTarget( bnpc.getAgentId(), pHatedActor->getPos() );
 
     bnpc.moveTo( *pHatedActor );
   }
 
-  pNaviProvider->syncPosToChara( bnpc );
+  auto pos = pNaviProvider->getMovePos( bnpc.getAgentId() );
+  if( pos.x != bnpc.getPos().x || pos.y != bnpc.getPos().y || pos.z != bnpc.getPos().z )
+    bnpc.setPos( pos );
 
   if( !hasQueuedAction && (distance < ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) || !bnpc.pathingActive() ) )
   {

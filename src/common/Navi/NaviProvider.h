@@ -1,12 +1,11 @@
 #pragma once
 
 #include <Common.h>
-#include "ForwardsZone.h"
-#include <recastnavigation/Detour/Include/DetourNavMesh.h>
-#include <recastnavigation/Detour/Include/DetourNavMeshQuery.h>
-#include <recastnavigation/DetourCrowd/Include/DetourCrowd.h>
+#include "recastnavigation/Detour/Include/DetourNavMesh.h"
+#include "recastnavigation/Detour/Include/DetourNavMeshQuery.h"
+#include "recastnavigation/DetourCrowd/Include/DetourCrowd.h"
 
-namespace Sapphire::World::Navi
+namespace Sapphire::Common::Navi
 {
   const int32_t MAX_POLYS = 32;
   const int32_t MAX_SMOOTH = 2048;
@@ -33,7 +32,7 @@ namespace Sapphire::World::Navi
   public:
     explicit NaviProvider( const std::string& internalName );
 
-    bool init();
+    bool init( const std::string& naviPath );
     bool loadMesh( const std::string& path );
     void initQuery();
 
@@ -42,35 +41,33 @@ namespace Sapphire::World::Navi
 
     std::vector< Common::FFXIVARR_POSITION3 > findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
                                                               const Common::FFXIVARR_POSITION3& endPos );
-    Common::FFXIVARR_POSITION3 findRandomPositionInCircle( const Sapphire::Common::FFXIVARR_POSITION3& startPos,
+    Common::FFXIVARR_POSITION3 findRandomPositionInCircle( const Common::FFXIVARR_POSITION3& startPos,
                                                            float maxRadius );
 
     bool hasNaviMesh() const;
 
-    int32_t addAgent( Entity::Chara& chara );
+    int32_t addAgent( const Common::FFXIVARR_POSITION3& pos, float radius );
 
-    void removeAgent( Entity::Chara& chara );
+    void removeAgent( int32_t naviAgentId );
 
     void updateCrowd( float timeInSeconds );
 
     static void calcVel( float* vel, const float* pos, const float* tgt, const float speed );
 
-    void setMoveTarget( Entity::Chara& chara, const Common::FFXIVARR_POSITION3& endPos );
-    void resetMoveTarget( Entity::Chara& chara );
+    void setMoveTarget( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& endPos );
+    void resetMoveTarget( int32_t naviAgentId );
 
-    Common::FFXIVARR_POSITION3 getMovePos( Entity::Chara& chara );
+    Common::FFXIVARR_POSITION3 getMovePos( int32_t naviAgentId );
 
-    bool isAgentActive( Entity::Chara& chara ) const;
-    bool hasTargetState( Entity::Chara& chara ) const;
+    bool isAgentActive( int32_t naviAgentId ) const;
+    bool hasTargetState( int32_t naviAgentId ) const;
 
-    void updateAgentPosition( Entity::Chara& chara );
+    int32_t updateAgentPosition( int32_t naviAgentId, const Common::FFXIVARR_POSITION3& pos, float radius );
 
-    bool syncPosToChara( Entity::Chara& chara );
+    void addAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
+    void removeAgentUpdateFlag( int32_t naviAgentId, uint8_t flags );
 
-    void addAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
-    void removeAgentUpdateFlag( Entity::Chara& chara, uint8_t flags );
-
-    void updateAgentParameters( Entity::BNpc& bnpc );
+    void updateAgentParameters( int32_t naviAgentId, float radius, bool isRunning );
 
   protected:
     std::string m_internalName;

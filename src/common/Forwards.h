@@ -31,3 +31,10 @@ namespace Sapphire::Network::Packets
   using GamePacketPtr = std::shared_ptr< GamePacket >;
   using FFXIVPacketBasePtr = std::shared_ptr< FFXIVPacketBase >;
 }
+
+namespace Sapphire::Common::Navi
+{
+  class NaviProvider;
+  using NaviProviderPtr = std::shared_ptr< NaviProvider >;
+
+}

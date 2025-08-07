@@ -44,6 +44,8 @@
 #include "Common.h"
 #include "PreparedResultSet.h"
 
+#include <Navi/NaviProvider.h>
+
 extern Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
 
 ZoneEditor::ZoneEditor()

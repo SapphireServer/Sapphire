@@ -39,8 +39,8 @@
 #include "WorldServer.h"
 #include "CellHandler.h"
 
-#include "Manager/RNGMgr.h"
-#include "Manager/NaviMgr.h"
+#include <Random/RNGMgr.h>
+#include <Navi/NaviMgr.h>
 #include "Math/CalcStats.h"
 
 using namespace Sapphire;
@@ -129,10 +129,12 @@ bool Territory::init()
     // all good
   }
 
-  auto& naviMgr = Common::Service< NaviMgr >::ref();
+  auto& naviMgr = Common::Service< Common::Navi::NaviMgr >::ref();
   std::string lvb = m_territoryTypeInfo->getString( m_territoryTypeInfo->data().LVB );
 
-  naviMgr.setupTerritory( lvb, m_guId );
+  auto& server = Common::Service< World::WorldServer >::ref();
+  auto& cfg = server.getConfig();
+  naviMgr.setupTerritory( cfg.navigation.meshPath, lvb, m_guId );
 
   m_pNaviProvider = naviMgr.getNaviProvider( lvb, m_guId );
 
@@ -249,7 +251,7 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
     auto pPlayer = pActor->getAsPlayer();
 
     if( m_pNaviProvider )
-      agentId = m_pNaviProvider->addAgent( *pPlayer );
+      agentId = m_pNaviProvider->addAgent( pPlayer->getPos(), pPlayer->getRadius() );
     pPlayer->setAgentId( agentId );
 
     m_playerMap[ pPlayer->getId() ] = pPlayer;
@@ -261,7 +263,7 @@ void Territory::pushActor( const Entity::GameObjectPtr& pActor )
 
     if( m_pNaviProvider && !pBNpc->hasFlag( Entity::Immobile ) )
     {
-      agentId = m_pNaviProvider->addAgent( *pBNpc );
+      agentId = m_pNaviProvider->addAgent( pBNpc->getPos(), pBNpc->getRadius() );
       pBNpc->setAgentId( agentId );
       pBNpc->setPathingActive( true );
     }
@@ -289,7 +291,7 @@ void Territory::removeActor( const Entity::GameObjectPtr& pActor )
   {
 
     if( m_pNaviProvider )
-      m_pNaviProvider->removeAgent( *pActor->getAsChara() );
+      m_pNaviProvider->removeAgent( pActor->getAsChara()->getAgentId() );
 
     // If it's a player and he's inside boundaries - update his nearby cells
     if( pActor->getPos().x <= _maxX && pActor->getPos().x >= _minX &&
@@ -307,7 +309,7 @@ void Territory::removeActor( const Entity::GameObjectPtr& pActor )
   else if( pActor->isBattleNpc() )
   {
     if( m_pNaviProvider )
-      m_pNaviProvider->removeAgent( *pActor->getAsChara() );
+      m_pNaviProvider->removeAgent( pActor->getAsChara()->getAgentId() );
     m_bNpcMap.erase( pActor->getId() );
   }
   else if( pActor->isEventObj() )
@@ -898,7 +900,7 @@ Entity::BNpcPtr Territory::getActiveBNpcByLayoutIdAndTriggerOwner( uint32_t inst
   return nullptr;
 }
 
-std::shared_ptr< World::Navi::NaviProvider > Territory::getNaviProvider()
+std::shared_ptr< Common::Navi::NaviProvider > Territory::getNaviProvider()
 {
   return m_pNaviProvider;
 }

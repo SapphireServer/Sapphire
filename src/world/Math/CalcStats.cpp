@@ -14,6 +14,7 @@
 #include "CalcStats.h"
 
 #include "Manager/PlayerMgr.h"
+#include <Random/RNGMgr.h>
 
 using namespace Sapphire::Math;
 using namespace Sapphire::Entity;
@@ -85,7 +86,7 @@ const int levelTable[61][6] =
   { 218, 354, 858, 2600, 282, 215 },
 };
 
-std::unique_ptr< RandGenerator< float > > CalcStats::rnd = nullptr;
+std::unique_ptr< Sapphire::Common::Random::RandGenerator< float > > CalcStats::rnd = nullptr;
 
 /*
    Class used for battle-related formulas and calculations.
@@ -666,7 +667,7 @@ float CalcStats::getRandomNumber0To100()
 {
   if( !rnd )
   {
-    rnd = std::make_unique< RandGenerator< float > >( Common::Service< RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
+    rnd = std::make_unique< Common::Random::RandGenerator< float > >( Common::Service< Common::Random::RNGMgr >::ref().getRandGenerator< float >( 0, 100 ) );
   }
   return rnd->next();
 }

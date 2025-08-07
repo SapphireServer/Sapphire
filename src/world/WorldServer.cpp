@@ -42,8 +42,8 @@
 #include "Manager/EventMgr.h"
 #include "Manager/ItemMgr.h"
 #include "Manager/MarketMgr.h"
-#include "Manager/RNGMgr.h"
-#include "Manager/NaviMgr.h"
+#include "../common/Random/RNGMgr.h"
+#include "../common/Navi/NaviMgr.h"
 #include "Manager/ActionMgr.h"
 #include "Manager/ChatChannelMgr.h"
 #include "Manager/QuestMgr.h"
@@ -208,8 +208,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Db::DbWorkerPool< Db::ZoneDbConnection > >::set( pDb );
 
-  auto pRNGMgr = std::make_shared< Manager::RNGMgr >();
-  Common::Service< Manager::RNGMgr >::set( pRNGMgr );
+  auto pRNGMgr = std::make_shared< Common::Random::RNGMgr >();
+  Common::Service< Common::Random::RNGMgr >::set( pRNGMgr );
 
   auto pPlayerMgr = std::make_shared< Manager::PlayerMgr >();
   Logger::info( "Loading all players" );
@@ -275,8 +275,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Manager::MapMgr >::set( pMapMgr );
 
-  auto pNaviMgr = std::make_shared< Manager::NaviMgr >();
-  Common::Service< Manager::NaviMgr >::set( pNaviMgr );
+  auto pNaviMgr = std::make_shared< Common::Navi::NaviMgr >();
+  Common::Service< Common::Navi::NaviMgr >::set( pNaviMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );
   auto pTeriMgr = std::make_shared< Manager::TerritoryMgr >();

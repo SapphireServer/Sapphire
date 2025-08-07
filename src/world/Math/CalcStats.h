@@ -2,7 +2,7 @@
 
 #include <Common.h>
 #include "Forwards.h"
-#include "Manager/RNGMgr.h"
+#include <Random/RNGMgr.h>
 
 namespace Sapphire::Math
 {
@@ -153,7 +153,7 @@ namespace Sapphire::Math
     static float calcAttackPower( const Sapphire::Entity::Chara& chara, uint32_t attackPower );
 
     static float getRandomNumber0To100();
-    static std::unique_ptr< RandGenerator< float > > rnd;
+    static std::unique_ptr< Common::Random::RandGenerator< float > > rnd;
   };
 
 }

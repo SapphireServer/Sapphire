@@ -9,7 +9,7 @@ file(GLOB SERVER_SOURCE_FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Engine/*.cpp")
 
-include_directories( "." )
+include_directories( "." "../"  "../../" )
 
 find_package( OpenGL REQUIRED COMPONENTS OpenGL )
 
@@ -41,7 +41,7 @@ else()
             uuid
             odbc32
             odbccp32
-            common xivdat mysql zlib
+            common world xivdat mysql zlib
     )
 
 endif()

@@ -13,7 +13,7 @@
 #include "BNpc.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Manager/RNGMgr.h"
+#include "../../common/Random/RNGMgr.h"
 #include "Manager/PlayerMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/WarpMgr.h"
@@ -1170,7 +1170,7 @@ void Player::autoAttack( CharaPtr pTarget )
 
   pTarget->onActionHostile( getAsChara() );
 
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
   actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );

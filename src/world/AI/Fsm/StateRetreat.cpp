@@ -29,7 +29,7 @@ void AI::Fsm::StateRetreat::onEnter( Entity::BNpc& bnpc )
   bnpc.setInvincibilityType( Common::InvincibilityType::InvincibilityIgnoreDamage );
 
   if( pNaviProvider )
-    pNaviProvider->setMoveTarget( bnpc, bnpc.getSpawnPos() );
+    pNaviProvider->setMoveTarget( bnpc.getAgentId(), bnpc.getSpawnPos() );
 }
 
 void AI::Fsm::StateRetreat::onExit( Entity::BNpc& bnpc )

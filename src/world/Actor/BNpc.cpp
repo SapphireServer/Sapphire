@@ -32,7 +32,7 @@
 #include "Common.h"
 
 #include <Manager/TerritoryMgr.h>
-#include <Manager/RNGMgr.h>
+#include <../../common/Random/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>
@@ -371,7 +371,7 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( *this );
+  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
   auto distance = Common::Util::distance( pos1, pos );
 
   if( distance < getNaviTargetReachedDistance() )
@@ -379,7 +379,8 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    pNaviProvider->updateAgentPosition( *this );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    setAgentId( newAgentId );
     return true;
   }
 
@@ -407,7 +408,7 @@ bool BNpc::moveTo( const Chara& targetChara )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( *this );
+  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
   auto distance = Common::Util::distance( pos1, targetChara.getPos() );
 
   if( distance <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
@@ -415,8 +416,9 @@ bool BNpc::moveTo( const Chara& targetChara )
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
-    pNaviProvider->resetMoveTarget( *this );
-    pNaviProvider->updateAgentPosition( *this );
+    pNaviProvider->resetMoveTarget( getAgentId() );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    setAgentId( newAgentId );
     return true;
   }
 
@@ -603,7 +605,7 @@ bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
 
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
-  auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& pRNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( pRNGMgr.getRandGenerator< float >( 500, 1000 ).next() );
 
   if( m_pGambitPack && m_pGambitPack->getAsTimeLine() )
@@ -846,7 +848,7 @@ void BNpc::resetFlags( uint32_t flags )
   {
     Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
     auto pNaviProvider = pZone->getNaviProvider();
-    pNaviProvider->removeAgent( *this );
+    pNaviProvider->removeAgent( getAgentId() );
     setPathingActive( false );
   }
   else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
@@ -855,8 +857,8 @@ void BNpc::resetFlags( uint32_t flags )
     Logger::debug( "{} Pathing activated", m_id );
     auto pNaviProvider = pZone->getNaviProvider();
     if( getAgentId() != -1 )
-      pNaviProvider->removeAgent( *this );
-    auto agentId = pNaviProvider->addAgent( *this );
+      pNaviProvider->removeAgent( getAgentId() );
+    auto agentId = pNaviProvider->addAgent( getPos(), getRadius() );
     setAgentId( agentId );
     setPathingActive( true );
   }
@@ -877,7 +879,7 @@ void BNpc::setFlag( uint32_t flag )
   {
     Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
     auto pNaviProvider = pZone->getNaviProvider();
-    pNaviProvider->removeAgent( *this );
+    pNaviProvider->removeAgent( getAgentId() );
     setPathingActive( false );
   }
   else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
@@ -886,8 +888,8 @@ void BNpc::setFlag( uint32_t flag )
     Logger::debug( "{} Pathing activated", m_id );
     auto pNaviProvider = pZone->getNaviProvider();
     if( getAgentId() != -1 )
-      pNaviProvider->removeAgent( *this );
-    auto agentId = pNaviProvider->addAgent( *this );
+      pNaviProvider->removeAgent( getAgentId() );
+    auto agentId = pNaviProvider->addAgent( getPos(), getRadius() );
     setAgentId( agentId );
     setPathingActive( true );
   }

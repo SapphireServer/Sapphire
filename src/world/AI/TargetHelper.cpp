@@ -6,7 +6,7 @@
 #include <Actor/Chara.h>
 #include <Actor/Player.h>
 #include <Manager/PartyMgr.h>
-#include <Manager/RNGMgr.h>
+#include <Random/RNGMgr.h>
 #include <Util/UtilMath.h>
 #include <Service.h>
 
@@ -166,7 +166,7 @@ namespace Sapphire::World::AI
     m_results.clear();
     m_targetIds.clear();
 
-    auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+    auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
     for( const auto& pActor : inRange )
     {
       auto pChara = pActor->getAsChara();
