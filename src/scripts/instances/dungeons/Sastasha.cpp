@@ -1,6 +1,6 @@
 #include <ScriptObject.h>
 #include <Territory/InstanceContent.h>
-#include <../../../common/Random/RNGMgr.h>
+#include <Random/RNGMgr.h>
 
 #include <Actor/EventObject.h>
 #include <Actor/Player.h>

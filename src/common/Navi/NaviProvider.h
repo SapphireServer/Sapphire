@@ -44,6 +44,8 @@ namespace Sapphire::Common::Navi
     Common::FFXIVARR_POSITION3 findRandomPositionInCircle( const Common::FFXIVARR_POSITION3& startPos,
                                                            float maxRadius );
 
+    Common::FFXIVARR_POSITION3 findNearestPosition( float x, float z );
+
     bool hasNaviMesh() const;
 
     int32_t addAgent( const Common::FFXIVARR_POSITION3& pos, float radius );

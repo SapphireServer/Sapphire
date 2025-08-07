@@ -8,6 +8,7 @@
 #include "Exd/ExdData.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include <Navi/NaviProvider.h>
 
 struct CachedBnpc
 {
@@ -104,6 +105,7 @@ private:
   std::string m_lastBnpcSearchTerm = "N/A";
   std::vector<CachedBnpc*> m_filteredBnpcs;
   int m_selectedBnpcIndex = -1;
+  std::shared_ptr< Sapphire::Common::Navi::NaviProvider > m_pNaviProvider;
 
   // Add these methods
   void showBnpcWindow();

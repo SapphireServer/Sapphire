@@ -34,6 +34,7 @@
 #include "Engine/Service.h"
 #include "Engine/Logger.h"
 
+#include <Navi/NaviMgr.h>
 #include <math.h>
 #include <vector>
 
@@ -78,6 +79,9 @@ bool EditorState::initGameData()
     Engine::Service< Sapphire::Data::ExdData >::set( exdData );
     Engine::Service< xiv::dat::GameData >::set( gameData );
 
+    auto pNaviMgr = std::make_shared< Sapphire::Common::Navi::NaviMgr >( m_navMeshPath );
+    Engine::Service< Sapphire::Common::Navi::NaviMgr >::set( pNaviMgr );
+
     return true;
   }
   return false;
@@ -106,7 +110,7 @@ bool EditorState::initMySQLConnection()
 
 void EditorState::load()
 {
-  Sapphire::Logger::init( "api" );
+  Sapphire::Logger::init( "logger" );
   auto& graphics = Engine::Service< Engine::Rendering::Graphics >::ref();
   auto windowHeight = graphics.getWindowHeight();
   auto windowWidth = graphics.getWindowWidth();
@@ -346,9 +350,71 @@ void EditorState::showSettingsDialog()
     }
 
     // MySQL Tab
+   // MySQL Tab
     if( ImGui::BeginTabItem( "Database" ) )
     {
-      // MySQL configuration content
+      ImGui::Text( "MySQL Connection Settings" );
+      ImGui::Separator();
+
+      ImGui::Text( "Host:" );
+      ImGui::SetNextItemWidth( 200 );
+      ImGui::InputText( "##MySQLHost", m_mysqlHostBuffer, sizeof( m_mysqlHostBuffer ) );
+
+      ImGui::Text( "Port:" );
+      ImGui::SetNextItemWidth( 100 );
+      ImGui::InputInt( "##MySQLPort", &m_mysqlPortBuffer );
+
+      ImGui::Text( "Username:" );
+      ImGui::SetNextItemWidth( 200 );
+      ImGui::InputText( "##MySQLUser", m_mysqlUserBuffer, sizeof( m_mysqlUserBuffer ) );
+
+      ImGui::Text( "Password:" );
+      ImGui::SetNextItemWidth( 200 );
+      ImGui::InputText( "##MySQLPassword", m_mysqlPasswordBuffer, sizeof( m_mysqlPasswordBuffer ),
+                        ImGuiInputTextFlags_Password );
+
+      ImGui::Text( "Database:" );
+      ImGui::SetNextItemWidth( 200 );
+      ImGui::InputText( "##MySQLDatabase", m_mysqlDatabaseBuffer, sizeof( m_mysqlDatabaseBuffer ) );
+
+      ImGui::Separator();
+
+      if( ImGui::Button( "Test Connection" ) )
+      {
+        // Test MySQL connection here
+        // You would implement testMySQLConnection() method
+        // m_mysqlConnected = testMySQLConnection();
+        ImGui::OpenPopup( "Connection Test" );
+      }
+
+      if( ImGui::BeginPopup( "Connection Test" ) )
+      {
+        if( m_mysqlConnected )
+        {
+          ImGui::TextColored( ImVec4( 0, 1, 0, 1 ), "Connection successful!" );
+        }
+        else
+        {
+          ImGui::TextColored( ImVec4( 1, 0, 0, 1 ), "Connection failed!" );
+        }
+        if( ImGui::Button( "Close" ) )
+        {
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+      }
+
+      ImGui::Text( "Connection Status: %s", m_mysqlConnected ? "Connected" : "Disconnected" );
+
+      if( ImGui::Button( "Reset to Defaults" ) )
+      {
+        strcpy( m_mysqlHostBuffer, "localhost" );
+        strcpy( m_mysqlUserBuffer, "root" );
+        strcpy( m_mysqlPasswordBuffer, "" );
+        strcpy( m_mysqlDatabaseBuffer, "sapphire" );
+        m_mysqlPortBuffer = 3306;
+      }
+
       ImGui::EndTabItem();
     }
 

@@ -5,7 +5,7 @@
 
 using namespace Sapphire;
 
-bool Common::Navi::NaviMgr::setupTerritory( const std::string& naviPath, const std::string& bgPath, uint32_t guid )
+bool Common::Navi::NaviMgr::setupTerritory( const std::string& bgPath, uint32_t guid )
 {
   std::string bg = getBgName( bgPath );
 
@@ -15,7 +15,7 @@ bool Common::Navi::NaviMgr::setupTerritory( const std::string& naviPath, const s
 
   auto provider = std::make_shared< Common::Navi::NaviProvider >( bg );
 
-  if( provider->init( naviPath ) )
+  if( provider->init( m_naviPath ) )
   {
     m_naviProviderTerritoryMap[ guid ] = provider;
     return true;

@@ -132,9 +132,7 @@ bool Territory::init()
   auto& naviMgr = Common::Service< Common::Navi::NaviMgr >::ref();
   std::string lvb = m_territoryTypeInfo->getString( m_territoryTypeInfo->data().LVB );
 
-  auto& server = Common::Service< World::WorldServer >::ref();
-  auto& cfg = server.getConfig();
-  naviMgr.setupTerritory( cfg.navigation.meshPath, lvb, m_guId );
+  naviMgr.setupTerritory( lvb, m_guId );
 
   m_pNaviProvider = naviMgr.getNaviProvider( lvb, m_guId );
 

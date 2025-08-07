@@ -275,7 +275,8 @@ void WorldServer::run( int32_t argc, char* argv[] )
   }
   Common::Service< Manager::MapMgr >::set( pMapMgr );
 
-  auto pNaviMgr = std::make_shared< Common::Navi::NaviMgr >();
+  auto& cfg = getConfig();
+  auto pNaviMgr = std::make_shared< Common::Navi::NaviMgr >( cfg.navigation.meshPath );
   Common::Service< Common::Navi::NaviMgr >::set( pNaviMgr );
 
   Logger::info( "TerritoryMgr: Setting up zones" );

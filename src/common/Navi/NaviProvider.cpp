@@ -301,6 +301,53 @@ Sapphire::Common::FFXIVARR_POSITION3
   return { randomPt[ 0 ], randomPt[ 1 ], randomPt[ 2 ] };
 }
 
+
+
+Sapphire::Common::FFXIVARR_POSITION3
+  Sapphire::Common::Navi::NaviProvider::findNearestPosition( float x, float z )
+{
+  dtStatus status;
+
+  float spos[ 3 ] = { x, 50, z };
+
+  float polyPickExt[ 3 ];
+  polyPickExt[ 0 ] = 0.1f;
+  polyPickExt[ 1 ] = 300;
+  polyPickExt[ 2 ] = 0.1f;
+  float snearest[ 3 ];
+
+  dtQueryFilter filter;
+  filter.setIncludeFlags( 0xffff );
+  filter.setExcludeFlags( 0 );
+
+  dtPolyRef startRef;
+
+  status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+  if( dtStatusFailed( status ) )
+  {
+    // Key improvement 3: Try with larger search radius if first attempt fails
+    polyPickExt[ 0 ] = 0.1f;
+    polyPickExt[ 1 ] = 500.0f;
+    polyPickExt[ 2 ] = 0.1f;
+
+    status = m_naviMeshQuery->findNearestPoly( spos, polyPickExt, &filter, &startRef, snearest );
+
+    if( dtStatusFailed( status ) )
+    {
+      return {};
+    }
+  }
+
+
+  if( !m_naviMesh->isValidPolyRef( startRef ) )
+  {
+    return {};
+  }
+
+  return { snearest[ 0 ], snearest[ 1 ], snearest[ 2 ] };
+}
+
 std::vector< Sapphire::Common::FFXIVARR_POSITION3 >
   Sapphire::Common::Navi::NaviProvider::findFollowPath( const Common::FFXIVARR_POSITION3& startPos,
                                                         const Common::FFXIVARR_POSITION3& endPos )

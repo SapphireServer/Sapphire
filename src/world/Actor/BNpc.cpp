@@ -32,7 +32,7 @@
 #include "Common.h"
 
 #include <Manager/TerritoryMgr.h>
-#include <../../common/Random/RNGMgr.h>
+#include <Random/RNGMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>

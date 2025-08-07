@@ -15,6 +15,9 @@
 #include "Engine/ResourceManager.h"
 #include "Engine/ShaderResource.h"
 
+#include <Navi/NaviMgr.h>
+#include <Navi/NaviProvider.h>
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -446,6 +449,19 @@ void ZoneEditor::onSelectionChanged()
     memset( m_bnpcSearchBuffer, 0, sizeof( m_bnpcSearchBuffer ) );
     updateBnpcSearchFilter();
     m_lastBnpcSearchTerm = "";
+
+    auto& naviMgr = Engine::Service< Sapphire::Common::Navi::NaviMgr >::ref();
+    auto& exdD = Engine::Service< Sapphire::Data::ExdData >::ref();
+    auto zoneRow = exdD.getRow< Excel::TerritoryType >( m_selectedZone->id );
+    if( zoneRow )
+    {
+      std::string lvb = zoneRow->getString( zoneRow->data().LVB );
+
+      if( naviMgr.setupTerritory( lvb, m_selectedZone->id ) )
+        m_pNaviProvider = naviMgr.getNaviProvider( lvb, m_selectedZone->id );
+      else
+        m_pNaviProvider = nullptr;
+    }
   }
 }
 
@@ -784,6 +800,9 @@ void ZoneEditor::showMapWindow()
     // Display the map image
     ImGui::Image( reinterpret_cast< void * >( static_cast< intptr_t >( m_mapTextureId ) ), imageSize );
 
+    // Check if mouse is hovering over the image
+    bool mouseOverImage = ImGui::IsItemHovered();
+
     // Draw BNPC icons if enabled
     if( m_showBnpcIcons && !m_bnpcs.empty() )
     {
@@ -796,6 +815,142 @@ void ZoneEditor::showMapWindow()
       ImVec2 delta = ImGui::GetIO().MouseDelta;
       ImGui::SetScrollX( ImGui::GetScrollX() - delta.x );
       ImGui::SetScrollY( ImGui::GetScrollY() - delta.y );
+    }
+
+    // Display nav mesh warning if no nav provider is loaded
+    if( !m_pNaviProvider )
+    {
+      // Get draw list for drawing overlay text
+      ImDrawList *drawList = ImGui::GetWindowDrawList();
+
+      // Get the child window bounds for clipping
+      ImVec2 childWindowPos = ImGui::GetWindowPos();
+      ImVec2 childWindowSize = ImGui::GetWindowSize();
+
+      // Calculate visible area of the image (intersection with child window)
+      ImVec2 visibleImageMin = ImVec2(
+        std::max( imagePos.x, childWindowPos.x ),
+        std::max( imagePos.y, childWindowPos.y )
+      );
+
+      ImVec2 visibleImageMax = ImVec2(
+        std::min( imagePos.x + imageSize.x, childWindowPos.x + childWindowSize.x ),
+        std::min( imagePos.y + imageSize.y, childWindowPos.y + childWindowSize.y )
+      );
+
+      // Only draw if there's a visible area
+      if( visibleImageMin.x < visibleImageMax.x && visibleImageMin.y < visibleImageMax.y )
+      {
+        // Position text at the top-center of the visible image area
+        ImVec2 textPos = ImVec2(
+          ( visibleImageMin.x + visibleImageMax.x ) * 0.5f,
+          visibleImageMin.y + 20.0f
+        );
+
+        // Warning text
+        const char *warningText = "No nav mesh found!";
+        ImVec2 textSize = ImGui::CalcTextSize( warningText );
+
+        // Center the text horizontally
+        textPos.x -= textSize.x * 0.5f;
+
+        // Ensure text stays within visible bounds
+        if( textPos.y + textSize.y > visibleImageMax.y )
+        {
+          textPos.y = visibleImageMax.y - textSize.y - 5.0f;
+        }
+
+        // Draw background rectangle for better visibility
+        ImVec2 rectMin = ImVec2( textPos.x - 10.0f, textPos.y - 5.0f );
+        ImVec2 rectMax = ImVec2( textPos.x + textSize.x + 10.0f, textPos.y + textSize.y + 5.0f );
+        drawList->AddRectFilled( rectMin, rectMax, IM_COL32( 0, 0, 0, 180 ) ); // Semi-transparent black background
+        drawList->AddRect( rectMin, rectMax, IM_COL32( 255, 0, 0, 255 ), 2.0f ); // Red border
+
+        // Draw the warning text in red
+        drawList->AddText( textPos, IM_COL32( 255, 0, 0, 255 ), warningText );
+      }
+    }
+
+    // Display cursor position information when hovering over the image
+    if( mouseOverImage )
+    {
+      ImDrawList *drawList = ImGui::GetWindowDrawList();
+
+      // Get the child window bounds
+      ImVec2 childWindowPos = ImGui::GetWindowPos();
+      ImVec2 childWindowSize = ImGui::GetWindowSize();
+
+      // Calculate mouse position relative to the image
+      ImVec2 mouseRelativeToImage = ImVec2(
+        mousePos.x - imagePos.x,
+        mousePos.y - imagePos.y
+      );
+
+      // Convert to normalized coordinates (0.0 to 1.0)
+      float normalizedX = mouseRelativeToImage.x / imageSize.x;
+      float normalizedY = mouseRelativeToImage.y / imageSize.y;
+
+      // Convert to map coordinates (assuming 2048x2048 map)
+      float mapX = normalizedX * 2048.0f;
+      float mapY = normalizedY * 2048.0f;
+
+      // Convert to estimated world coordinates using your existing function
+      // Note: This is the inverse of get2dPosFrom3d
+      float worldX = ( mapX - 1024.0f ) / ( m_mapScale / 100.0f );
+      float worldZ = ( mapY - 1024.0f ) / ( m_mapScale / 100.0f );
+
+      // Format the position strings
+      char mapPosText[ 128 ];
+      char worldPosText[ 128 ];
+      snprintf( mapPosText, sizeof( mapPosText ), "Map: %.1f, %.1f", mapX, mapY );
+      snprintf( worldPosText, sizeof( worldPosText ), "World: %.1f, %.1f", worldX, worldZ );
+
+      if( m_pNaviProvider )
+      {
+        auto p1 = m_pNaviProvider->findNearestPosition( worldX, worldZ );
+
+        snprintf( worldPosText, sizeof( worldPosText ), "World-Est: %.1f, %.1f, %.1f", p1.x, p1.y, p1.z );
+      }
+
+      // Calculate text sizes
+      ImVec2 mapTextSize = ImGui::CalcTextSize( mapPosText );
+      ImVec2 worldTextSize = ImGui::CalcTextSize( worldPosText );
+      float maxTextWidth = std::max( mapTextSize.x, worldTextSize.x );
+      float totalTextHeight = mapTextSize.y + worldTextSize.y + 5.0f; // 5px spacing
+
+      // Position in top-right corner of visible area
+      ImVec2 visibleImageMin = ImVec2(
+        std::max( imagePos.x, childWindowPos.x ),
+        std::max( imagePos.y, childWindowPos.y )
+      );
+
+      ImVec2 visibleImageMax = ImVec2(
+        std::min( imagePos.x + imageSize.x, childWindowPos.x + childWindowSize.x ),
+        std::min( imagePos.y + imageSize.y, childWindowPos.y + childWindowSize.y )
+      );
+
+      // Position text in top-right corner of visible image
+      ImVec2 textPos = ImVec2(
+        visibleImageMax.x - maxTextWidth - 20.0f, // 20px margin from right edge
+        visibleImageMin.y + 10.0f // 10px margin from top edge
+      );
+
+      // Ensure text doesn't go outside visible bounds
+      if( textPos.x < visibleImageMin.x )
+        textPos.x = visibleImageMin.x + 10.0f;
+      if( textPos.y + totalTextHeight > visibleImageMax.y )
+        textPos.y = visibleImageMax.y - totalTextHeight - 10.0f;
+
+      // Draw background rectangle
+      ImVec2 rectMin = ImVec2( textPos.x - 8.0f, textPos.y - 5.0f );
+      ImVec2 rectMax = ImVec2( textPos.x + maxTextWidth + 8.0f, textPos.y + totalTextHeight + 5.0f );
+      drawList->AddRectFilled( rectMin, rectMax, IM_COL32( 0, 0, 0, 200 ) ); // Semi-transparent black background
+      drawList->AddRect( rectMin, rectMax, IM_COL32( 100, 100, 100, 255 ), 1.0f ); // Gray border
+
+      // Draw the text
+      drawList->AddText( ImVec2( textPos.x, textPos.y ), IM_COL32( 255, 255, 255, 255 ), mapPosText );
+      drawList->AddText( ImVec2( textPos.x, textPos.y + mapTextSize.y + 5.0f ), IM_COL32( 255, 255, 255, 255 ),
+                         worldPosText );
     }
   }
   ImGui::EndChild();

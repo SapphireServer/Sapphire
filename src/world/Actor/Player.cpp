@@ -13,7 +13,7 @@
 #include "BNpc.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "../../common/Random/RNGMgr.h"
+#include <Random/RNGMgr.h>
 #include "Manager/PlayerMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/WarpMgr.h"
