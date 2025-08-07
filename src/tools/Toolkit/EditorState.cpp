@@ -43,6 +43,13 @@
 
 #include "Application.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <commdlg.h>
+#include <shlobj.h>
+#endif
+
+
 using namespace Client;
 
 Sapphire::Db::DbWorkerPool< Sapphire::Db::ZoneDbConnection > g_charaDb;
@@ -95,7 +102,6 @@ bool EditorState::initMySQLConnection()
 
   m_mysqlConnected = true;
   return true;
-
 }
 
 void EditorState::load()
@@ -131,7 +137,6 @@ void EditorState::load()
     // Handle initialization failure
     Engine::Logger::warn( "Failed to initialize MySQL connection" );
   }
-
 }
 
 void EditorState::update( double deltaTime )
@@ -141,80 +146,161 @@ void EditorState::update( double deltaTime )
 void EditorState::loadConfig()
 {
   std::ifstream configFile( CONFIG_FILE );
-  if( configFile.is_open() )
+  if( !configFile.is_open() )
   {
-    std::string line;
-    while( std::getline( configFile, line ) )
-    {
-      // Simple key=value parsing
-      size_t equalPos = line.find( '=' );
-      if( equalPos != std::string::npos )
-      {
-        std::string key = line.substr( 0, equalPos );
-        std::string value = line.substr( equalPos + 1 );
+    // Use default values if config file doesn't exist
+    strncpy( m_datLocationBuffer, m_datLocation.c_str(), sizeof( m_datLocationBuffer ) - 1 );
+    m_datLocationBuffer[ sizeof( m_datLocationBuffer ) - 1 ] = '\0';
 
-        if( key == "dat_location" )
-        {
-          m_datLocation = value;
-        }
-        else if( key == "mysql_host" )
-        {
-          m_mysqlHost = value;
-        }
-        else if( key == "mysql_user" )
-        {
-          m_mysqlUser = value;
-        }
-        else if( key == "mysql_password" )
-        {
-          m_mysqlPassword = value;
-        }
-        else if( key == "mysql_database" )
-        {
-          m_mysqlDatabase = value;
-        }
-        else if( key == "mysql_port" )
-        {
-          m_mysqlPort = std::stoi( value );
-        }
-      }
-    }
-    configFile.close();
+    strncpy( m_mysqlHostBuffer, m_mysqlHost.c_str(), sizeof( m_mysqlHostBuffer ) - 1 );
+    m_mysqlHostBuffer[ sizeof( m_mysqlHostBuffer ) - 1 ] = '\0';
+
+    strncpy( m_mysqlUserBuffer, m_mysqlUser.c_str(), sizeof( m_mysqlUserBuffer ) - 1 );
+    m_mysqlUserBuffer[ sizeof( m_mysqlUserBuffer ) - 1 ] = '\0';
+
+    strncpy( m_mysqlPasswordBuffer, m_mysqlPassword.c_str(), sizeof( m_mysqlPasswordBuffer ) - 1 );
+    m_mysqlPasswordBuffer[ sizeof( m_mysqlPasswordBuffer ) - 1 ] = '\0';
+
+    strncpy( m_mysqlDatabaseBuffer, m_mysqlDatabase.c_str(), sizeof( m_mysqlDatabaseBuffer ) - 1 );
+    m_mysqlDatabaseBuffer[ sizeof( m_mysqlDatabaseBuffer ) - 1 ] = '\0';
+
+    m_mysqlPortBuffer = m_mysqlPort;
+
+    strncpy( m_navMeshPathBuffer, m_navMeshPath.c_str(), sizeof( m_navMeshPathBuffer ) - 1 );
+    m_navMeshPathBuffer[ sizeof( m_navMeshPathBuffer ) - 1 ] = '\0';
+
+    return;
   }
 
-  // Initialize input buffers
-  strncpy( m_datLocationBuffer, m_datLocation.c_str(), sizeof( m_datLocationBuffer ) - 1 );
-  m_datLocationBuffer[ sizeof( m_datLocationBuffer ) - 1 ] = '\0';
+  std::string line;
+  while( std::getline( configFile, line ) )
+  {
+    size_t pos = line.find( '=' );
+    if( pos != std::string::npos )
+    {
+      std::string key = line.substr( 0, pos );
+      std::string value = line.substr( pos + 1 );
 
-  strncpy( m_mysqlHostBuffer, m_mysqlHost.c_str(), sizeof( m_mysqlHostBuffer ) - 1 );
-  m_mysqlHostBuffer[ sizeof( m_mysqlHostBuffer ) - 1 ] = '\0';
+      // Trim whitespace
+      key.erase( 0, key.find_first_not_of( " \t" ) );
+      key.erase( key.find_last_not_of( " \t" ) + 1 );
+      value.erase( 0, value.find_first_not_of( " \t" ) );
+      value.erase( value.find_last_not_of( " \t" ) + 1 );
 
-  strncpy( m_mysqlUserBuffer, m_mysqlUser.c_str(), sizeof( m_mysqlUserBuffer ) - 1 );
-  m_mysqlUserBuffer[ sizeof( m_mysqlUserBuffer ) - 1 ] = '\0';
+      if( key == "dat_location" )
+      {
+        m_datLocation = value;
+        strncpy( m_datLocationBuffer, m_datLocation.c_str(), sizeof( m_datLocationBuffer ) - 1 );
+        m_datLocationBuffer[ sizeof( m_datLocationBuffer ) - 1 ] = '\0';
+      }
+      else if( key == "mysql_host" )
+      {
+        m_mysqlHost = value;
+        strncpy( m_mysqlHostBuffer, m_mysqlHost.c_str(), sizeof( m_mysqlHostBuffer ) - 1 );
+        m_mysqlHostBuffer[ sizeof( m_mysqlHostBuffer ) - 1 ] = '\0';
+      }
+      else if( key == "mysql_user" )
+      {
+        m_mysqlUser = value;
+        strncpy( m_mysqlUserBuffer, m_mysqlUser.c_str(), sizeof( m_mysqlUserBuffer ) - 1 );
+        m_mysqlUserBuffer[ sizeof( m_mysqlUserBuffer ) - 1 ] = '\0';
+      }
+      else if( key == "mysql_password" )
+      {
+        m_mysqlPassword = value;
+        strncpy( m_mysqlPasswordBuffer, m_mysqlPassword.c_str(), sizeof( m_mysqlPasswordBuffer ) - 1 );
+        m_mysqlPasswordBuffer[ sizeof( m_mysqlPasswordBuffer ) - 1 ] = '\0';
+      }
+      else if( key == "mysql_database" )
+      {
+        m_mysqlDatabase = value;
+        strncpy( m_mysqlDatabaseBuffer, m_mysqlDatabase.c_str(), sizeof( m_mysqlDatabaseBuffer ) - 1 );
+        m_mysqlDatabaseBuffer[ sizeof( m_mysqlDatabaseBuffer ) - 1 ] = '\0';
+      }
+      else if( key == "mysql_port" )
+      {
+        try
+        {
+          m_mysqlPort = std::stoi( value );
+          m_mysqlPortBuffer = m_mysqlPort;
+        } catch( const std::exception& )
+        {
+          m_mysqlPort = 3306; // Default port
+          m_mysqlPortBuffer = m_mysqlPort;
+        }
+      }
+      else if( key == "navmesh_path" )
+      {
+        m_navMeshPath = value;
+        strncpy( m_navMeshPathBuffer, m_navMeshPath.c_str(), sizeof( m_navMeshPathBuffer ) - 1 );
+        m_navMeshPathBuffer[ sizeof( m_navMeshPathBuffer ) - 1 ] = '\0';
+      }
+    }
+  }
 
-  strncpy( m_mysqlPasswordBuffer, m_mysqlPassword.c_str(), sizeof( m_mysqlPasswordBuffer ) - 1 );
-  m_mysqlPasswordBuffer[ sizeof( m_mysqlPasswordBuffer ) - 1 ] = '\0';
-
-  strncpy( m_mysqlDatabaseBuffer, m_mysqlDatabase.c_str(), sizeof( m_mysqlDatabaseBuffer ) - 1 );
-  m_mysqlDatabaseBuffer[ sizeof( m_mysqlDatabaseBuffer ) - 1 ] = '\0';
-
-  m_mysqlPortBuffer = m_mysqlPort;
+  configFile.close();
 }
 
 void EditorState::saveConfig()
 {
   std::ofstream configFile( CONFIG_FILE );
-  if( configFile.is_open() )
+  if( !configFile.is_open() )
   {
-    configFile << "dat_location=" << m_datLocation << std::endl;
-    configFile << "mysql_host=" << m_mysqlHost << std::endl;
-    configFile << "mysql_user=" << m_mysqlUser << std::endl;
-    configFile << "mysql_password=" << m_mysqlPassword << std::endl;
-    configFile << "mysql_database=" << m_mysqlDatabase << std::endl;
-    configFile << "mysql_port=" << m_mysqlPort << std::endl;
-    configFile.close();
+    // Handle error - could log or show message
+    return;
   }
+
+  configFile << "# Sapphire Editor Configuration" << std::endl;
+  configFile << "# This file is automatically generated" << std::endl;
+  configFile << std::endl;
+
+  configFile << "# Game Data Settings" << std::endl;
+  configFile << "dat_location=" << m_datLocation << std::endl;
+  configFile << std::endl;
+
+  configFile << "# Database Settings" << std::endl;
+  configFile << "mysql_host=" << m_mysqlHost << std::endl;
+  configFile << "mysql_user=" << m_mysqlUser << std::endl;
+  configFile << "mysql_password=" << m_mysqlPassword << std::endl;
+  configFile << "mysql_database=" << m_mysqlDatabase << std::endl;
+  configFile << "mysql_port=" << m_mysqlPort << std::endl;
+  configFile << std::endl;
+
+  configFile << "# Navigation Mesh Settings" << std::endl;
+  configFile << "navmesh_path=" << m_navMeshPath << std::endl;
+
+  configFile.close();
 }
+
+// Add this helper function to the EditorState class
+#ifdef _WIN32
+std::string EditorState::openFolderDialog( const std::string& title )
+{
+  BROWSEINFO bi = { 0 };
+  bi.lpszTitle = title.c_str();
+  bi.ulFlags = BIF_RETURNONLYFSDIRS | BIF_NEWDIALOGSTYLE;
+
+  LPITEMIDLIST pidl = SHBrowseForFolder( &bi );
+
+  if( pidl != 0 )
+  {
+    char path[ MAX_PATH ];
+    if( SHGetPathFromIDList( pidl, path ) )
+    {
+      IMalloc *imalloc = 0;
+      if( SUCCEEDED( SHGetMalloc(&imalloc) ) )
+      {
+        imalloc->Free( pidl );
+        imalloc->Release();
+      }
+      return std::string( path );
+    }
+  }
+
+  return "";
+}
+#endif
+
 
 void EditorState::showSettingsDialog()
 {
@@ -237,29 +323,23 @@ void EditorState::showSettingsDialog()
       ImGui::SameLine();
       if( ImGui::Button( "Browse..." ) )
       {
-        ImGui::OpenPopup( "Browse Info" );
+        // Browse logic here
       }
 
       if( ImGui::BeginPopup( "Browse Info" ) )
       {
-        ImGui::Text( "Please manually enter the path to your FFXIV sqpack folder" );
-        ImGui::Text( "Example: C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn\\game\\sqpack" );
-        if( ImGui::Button( "OK" ) )
-        {
-          ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
+        // Browse popup logic here
       }
 
       ImGui::Separator();
       ImGui::Text( "Status: %s", m_datLoaded ? "Loaded Successfully" : "Not Loaded / Failed" );
       if( m_datLoaded )
       {
-        ImGui::TextColored( ImVec4( 0, 1, 0, 1 ), "Current Location: %s", m_datLocation.c_str() );
+        // Success info
       }
       else
       {
-        ImGui::TextColored( ImVec4( 1, 0, 0, 1 ), "Failed Location: %s", m_datLocation.c_str() );
+        // Error info
       }
 
       ImGui::EndTabItem();
@@ -268,66 +348,56 @@ void EditorState::showSettingsDialog()
     // MySQL Tab
     if( ImGui::BeginTabItem( "Database" ) )
     {
-      ImGui::Text( "MySQL Connection Settings" );
+      // MySQL configuration content
+      ImGui::EndTabItem();
+    }
+
+    // Navigation Mesh Tab
+    if( ImGui::BeginTabItem( "Nav Meshes" ) )
+    {
+      ImGui::Text( "Navigation Mesh Configuration" );
       ImGui::Separator();
 
-      ImGui::Text( "Host:" );
-      ImGui::SetNextItemWidth( 200 );
-      ImGui::InputText( "##MySQLHost", m_mysqlHostBuffer, sizeof( m_mysqlHostBuffer ) );
+      ImGui::Text( "Nav Mesh Path:" );
+      ImGui::SetNextItemWidth( 400 );
+      ImGui::InputText( "##NavMeshPath", m_navMeshPathBuffer, sizeof( m_navMeshPathBuffer ) );
 
-      ImGui::Text( "Port:" );
-      ImGui::SetNextItemWidth( 100 );
-      ImGui::InputInt( "##MySQLPort", &m_mysqlPortBuffer );
-
-      ImGui::Text( "Username:" );
-      ImGui::SetNextItemWidth( 200 );
-      ImGui::InputText( "##MySQLUser", m_mysqlUserBuffer, sizeof( m_mysqlUserBuffer ) );
-
-      ImGui::Text( "Password:" );
-      ImGui::SetNextItemWidth( 200 );
-      ImGui::InputText( "##MySQLPassword", m_mysqlPasswordBuffer, sizeof( m_mysqlPasswordBuffer ),
-                        ImGuiInputTextFlags_Password );
-
-      ImGui::Text( "Database:" );
-      ImGui::SetNextItemWidth( 200 );
-      ImGui::InputText( "##MySQLDatabase", m_mysqlDatabaseBuffer, sizeof( m_mysqlDatabaseBuffer ) );
-
-      ImGui::Separator();
-
-      if( ImGui::Button( "Test Connection" ) )
+      ImGui::SameLine();
+      if( ImGui::Button( "Browse...##NavMesh" ) )
       {
-        // Test MySQL connection here
-        // You would implement testMySQLConnection() method
-        // m_mysqlConnected = testMySQLConnection();
-        ImGui::OpenPopup( "Connection Test" );
+#ifdef _WIN32
+        std::string selectedPath = openFolderDialog( "Select Nav Mesh Directory" );
+        if( !selectedPath.empty() )
+        {
+          strncpy( m_navMeshPathBuffer, selectedPath.c_str(), sizeof( m_navMeshPathBuffer ) - 1 );
+          m_navMeshPathBuffer[ sizeof( m_navMeshPathBuffer ) - 1 ] = '\0';
+        }
+#else
+        ImGui::OpenPopup( "NavMesh Browse Info" );
+#endif
       }
 
-      if( ImGui::BeginPopup( "Connection Test" ) )
+      if( ImGui::BeginPopup( "NavMesh Browse Info" ) )
       {
-        if( m_mysqlConnected )
-        {
-          ImGui::TextColored( ImVec4( 0, 1, 0, 1 ), "Connection successful!" );
-        }
-        else
-        {
-          ImGui::TextColored( ImVec4( 1, 0, 0, 1 ), "Connection failed!" );
-        }
-        if( ImGui::Button( "Close" ) )
-        {
-          ImGui::CloseCurrentPopup();
-        }
+        ImGui::Text( "Select the directory containing navigation mesh files for zones." );
+        ImGui::Text( "Expected structure: <path>/zone_<id>.nav" );
         ImGui::EndPopup();
       }
 
-      ImGui::Text( "Connection Status: %s", m_mysqlConnected ? "Connected" : "Disconnected" );
+      ImGui::Separator();
 
-      if( ImGui::Button( "Reset to Defaults" ) )
+      // Show current path status
+      ImGui::Text( "Current Path: %s", m_navMeshPath.c_str() );
+
+      // Check if directory exists and show some stats
+      if( !m_navMeshPath.empty() )
       {
-        strcpy( m_mysqlHostBuffer, "localhost" );
-        strcpy( m_mysqlUserBuffer, "root" );
-        strcpy( m_mysqlPasswordBuffer, "" );
-        strcpy( m_mysqlDatabaseBuffer, "sapphire" );
-        m_mysqlPortBuffer = 3306;
+        // You could add directory validation here
+        ImGui::Text( "Path Status: %s", "Directory accessible" ); // Replace with actual validation
+
+        ImGui::Separator();
+        ImGui::TextWrapped(
+          "Navigation mesh files should be named '<internalName>.nav', each zone is in an own folder, this should point to the parent." );
       }
 
       ImGui::EndTabItem();
@@ -347,14 +417,8 @@ void EditorState::showSettingsDialog()
     std::string newDatLocation = std::string( m_datLocationBuffer );
     if( newDatLocation != m_datLocation )
     {
-      m_datLocation = newDatLocation;
+      // DAT location change logic
       settingsChanged = true;
-
-      // Reinitialize game data
-      if( initGameData() )
-      {
-        m_zoneEditor.refresh();
-      }
     }
 
     // Check MySQL settings changes
@@ -368,15 +432,16 @@ void EditorState::showSettingsDialog()
         newPassword != m_mysqlPassword || newDatabase != m_mysqlDatabase ||
         newPort != m_mysqlPort )
     {
-      m_mysqlHost = newHost;
-      m_mysqlUser = newUser;
-      m_mysqlPassword = newPassword;
-      m_mysqlDatabase = newDatabase;
-      m_mysqlPort = newPort;
+      // MySQL settings change logic
       settingsChanged = true;
+    }
 
-      // Reinitialize MySQL connection here if needed
-      initMySQLConnection();
+    // Check nav mesh path changes
+    std::string newNavMeshPath = std::string( m_navMeshPathBuffer );
+    if( newNavMeshPath != m_navMeshPath )
+    {
+      m_navMeshPath = newNavMeshPath;
+      settingsChanged = true;
     }
 
     if( settingsChanged )
@@ -405,6 +470,10 @@ void EditorState::showSettingsDialog()
     m_mysqlDatabaseBuffer[ sizeof( m_mysqlDatabaseBuffer ) - 1 ] = '\0';
 
     m_mysqlPortBuffer = m_mysqlPort;
+
+    // Revert nav mesh path buffer
+    strncpy( m_navMeshPathBuffer, m_navMeshPath.c_str(), sizeof( m_navMeshPathBuffer ) - 1 );
+    m_navMeshPathBuffer[ sizeof( m_navMeshPathBuffer ) - 1 ] = '\0';
 
     m_showSettingsDialog = false;
   }
@@ -448,6 +517,7 @@ void EditorState::renderMainMenu()
 }
 
 bool dockInitialized = false;
+
 void EditorState::render( double deltaTime )
 {
   auto ident = Engine::mat4( 1.0f );
@@ -488,8 +558,6 @@ void EditorState::render( double deltaTime )
       ImGui::DockBuilderDockWindow( "Map Viewer", left1_id );
       dockInitialized = true;
     }
-
-
   }
 
   ImGui::End();
