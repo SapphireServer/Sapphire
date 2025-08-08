@@ -35,8 +35,7 @@ public:
     
 
     auto dmg = action.calcDamage( Potency );
-    int32_t aggro = Sapphire::Math::CalcStats::calcDamageAggro( *pSource, dmg.first );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, aggro, dmg.second );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
 
     if( pTarget->getObjKind() != pSource->getObjKind() )
     {
@@ -44,7 +43,7 @@ public:
     }
 
     pSource->removeSingleStatusEffectById( StraightShotReady );
-    pActionBuilder->applyStatusEffectSelf( StraightShotStatus, 0, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, Flags, true );
+    pActionBuilder->applyStatusEffectSelf( StraightShotStatus, 20000, 0, { StatusModifier{ Common::ParamModifier::CriticalHitPercent, 10 } }, Flags, true );
   }
 };
 

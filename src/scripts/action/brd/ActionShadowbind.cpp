@@ -29,8 +29,7 @@ public:
     if( !pActionBuilder || !pTarget )
       return;
 
-    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-    pActionBuilder->applyStatusEffect( pTarget, Bind, aggro, 10000, 0, { }, Flags, false, false );
+    pActionBuilder->applyStatusEffect( pTarget, Bind, 10000, 0, { }, Flags, false, false );
   }
 };
 

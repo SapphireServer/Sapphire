@@ -31,8 +31,7 @@ public:
       pSource->removeSingleStatusEffectById( SwiftsongAura );
     else
     {
-      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-      pActionBuilder->applyStatusEffectSelf( SwiftsongAura, aggro, 0, 20, {}, Flags, false );
+      pActionBuilder->applyStatusEffectSelf( SwiftsongAura, 0, 20, {}, Flags, false );
     }
   }
 };

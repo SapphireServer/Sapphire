@@ -34,8 +34,7 @@ public:
       pSource->removeSingleStatusEffectById( FoeRequiemAura );
     else
     {
-      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-      pActionBuilder->applyStatusEffectSelf( FoeRequiemAura, aggro, 0, 0, {}, Flags, false );
+      pActionBuilder->applyStatusEffectSelf( FoeRequiemAura, 0, 0, {}, Flags, false );
     }
   }
 };

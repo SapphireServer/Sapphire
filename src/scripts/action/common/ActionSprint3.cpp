@@ -18,9 +18,8 @@ public:
     if( !sourceChara->isPlayer() )
       return;
 
-    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *sourceChara );
     uint32_t duration = ( sourceChara->getAsPlayer()->getTp() / 50 ) * 1000;
-    action.getActionResultBuilder()->applyStatusEffectSelf( 50, aggro, duration, 30, false );
+    action.getActionResultBuilder()->applyStatusEffectSelf( 50, duration, 30, false );
     sourceChara->getAsPlayer()->setTp( 0 );
   }
 };

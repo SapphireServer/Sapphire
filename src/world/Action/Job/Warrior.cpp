@@ -77,8 +77,8 @@ void Warrior::handleWrath( Entity::Player& player, Action& action )
   if( !player.hasStatusEffect( Infuriated ) )
   {
     if( oldStatus )
-      pActionBuilder->replaceStatusEffectSelf( oldStatus, effectToApply, 0, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
+      pActionBuilder->replaceStatusEffectSelf( oldStatus, effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
     else
-      pActionBuilder->applyStatusEffectSelf( effectToApply, 0, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
+      pActionBuilder->applyStatusEffectSelf( effectToApply, 30000, 0, { StatusModifier{ Common::ParamModifier::ParryPercent, parry } } );
   }
 }

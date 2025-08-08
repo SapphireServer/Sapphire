@@ -32,15 +32,14 @@ public:
       return;
 
     auto dmg = action.calcDamage( Potency );
-    int32_t aggro = Sapphire::Math::CalcStats::calcDamageAggro( *pSource, dmg.first );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, aggro, dmg.second );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
 
     if( pTarget->getObjKind() != pSource->getObjKind() )
     {
       pSource->removeStatusEffectByFlag( Common::StatusEffectFlag::RemoveOnSuccessfulHit );
     }
 
-    pActionBuilder->applyStatusEffect( pTarget, WindbiteStatus, 0, 18000, 0, {}, Flags, false, true );
+    pActionBuilder->applyStatusEffect( pTarget, WindbiteStatus, 18000, 0, {}, Flags, false, true );
   }
 };
 

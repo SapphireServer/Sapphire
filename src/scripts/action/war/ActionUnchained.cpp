@@ -27,8 +27,7 @@ public:
     if( auto status = pPlayer->getStatusEffectById( Defiance ); status )
       status->setModifier( Common::ParamModifier::DamageDealtPercent, 0 );
 
-    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pPlayer );
-    pActionBuilder->applyStatusEffectSelf( Unchained, aggro, 20000, 0 );
+    pActionBuilder->applyStatusEffectSelf( Unchained, 20000, 0 );
   }
 };
 

@@ -663,22 +663,10 @@ std::pair< float, Sapphire::Common::CalcResultType > CalcStats::calcActionHealin
   return std::pair( factor, hitType );
 }
 
-int32_t CalcStats::calcDamageAggro( const Sapphire::Entity::Chara& source, int32_t damage, uint8_t actionAggroModifier )
+int32_t CalcStats::calcAggro( const Sapphire::Entity::Chara& source, int32_t value, uint8_t actionAggroModifier )
 {
-  int32_t aggro = damage * actionAggroModifier;
+  int32_t aggro = value * actionAggroModifier;
   auto aggroMod = source.getModifier( Common::ParamModifier::EnmityPercent );
-  return aggro * aggroMod;
-}
-
-int32_t CalcStats::calcHealAggro( const Sapphire::Entity::Chara& source, int32_t heal, bool isSpell )
-{
-  int32_t aggro = heal;
-  auto aggroMod = source.getModifier( Common::ParamModifier::EnmityPercent );
-  if( isSpell )
-    aggro = aggro / 2;
-  else
-    aggro = aggro * 3 / 5;
-
   return aggro * aggroMod;
 }
 

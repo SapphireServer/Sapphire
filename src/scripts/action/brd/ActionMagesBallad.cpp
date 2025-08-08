@@ -34,8 +34,7 @@ public:
       pSource->removeSingleStatusEffectById( MagesBalladAura );
     else
     {
-      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-      pActionBuilder->applyStatusEffectSelf( MagesBalladAura, aggro, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, Flags, false );
+      pActionBuilder->applyStatusEffectSelf( MagesBalladAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, Flags, false );
     }
   }
 };

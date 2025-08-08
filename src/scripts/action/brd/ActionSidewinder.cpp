@@ -52,8 +52,7 @@ public:
     }
 
     auto dmg = action.calcDamage( potency );
-    int32_t aggro = Sapphire::Math::CalcStats::calcDamageAggro( *pSource, dmg.first );
-    pActionBuilder->damage( pSource, pTarget, dmg.first, aggro, dmg.second );
+    pActionBuilder->damage( pSource, pTarget, dmg.first, dmg.second );
   }
 };
 

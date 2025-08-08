@@ -26,9 +26,10 @@ using namespace Sapphire::World::Manager;
 using namespace Sapphire::Network::Packets;
 using namespace Sapphire::Network::Packets::WorldPackets::Server;
 
-ActionResultBuilder::ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, uint32_t resultId, uint16_t requestId ) :
+ActionResultBuilder::ActionResultBuilder( Entity::CharaPtr source, uint32_t actionId, float aggroModifier, uint32_t resultId, uint16_t requestId ) :
   m_sourceChara( std::move( source ) ),
   m_actionId( actionId ),
+  m_aggroModifier( aggroModifier ),
   m_resultId( resultId ),
   m_requestId( requestId )
 {
@@ -47,12 +48,17 @@ void ActionResultBuilder::addResultToActor( Entity::CharaPtr& chara, ActionResul
   it->second.push_back( std::move( result ) );
 }
 
-void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, int32_t aggro, Common::CalcResultType hitType, Common::ActionResultFlag flag )
+void ActionResultBuilder::heal( Entity::CharaPtr& effectTarget, Entity::CharaPtr& healingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
+  float aggro = m_aggroModifier;
+  if( !m_applyHealAggro )
+    aggro = 0;
+
+  m_applyStatusAggro = false; // Status effects only apply aggro if there is no damage or heal from the action itself
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, healingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionData = exdData.getRow< Excel::Action >( m_actionId );
-  nextResult->heal( amount, aggro, hitType, std::abs( actionData->data().AttackType ), flag );
+  nextResult->heal( amount, hitType, std::abs( actionData->data().AttackType ), flag, aggro );
   addResultToActor( effectTarget, nextResult );
 }
 
@@ -63,12 +69,14 @@ void ActionResultBuilder::restoreMP( Entity::CharaPtr& target, Entity::CharaPtr&
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, int32_t aggro, Common::CalcResultType hitType, Common::ActionResultFlag flag )
+void ActionResultBuilder::damage( Entity::CharaPtr& effectTarget, Entity::CharaPtr& damagingTarget, uint32_t amount, Common::CalcResultType hitType, Common::ActionResultFlag flag )
 {
+  m_applyHealAggro = false; // Heal as a secondary effect does not apply aggro
+  m_applyStatusAggro = false; // Status effects only apply aggro if there is no damage or heal from the action itself
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, damagingTarget );
   auto& exdData = Common::Service< Data::ExdData >::ref();
   auto actionData = exdData.getRow< Excel::Action >( m_actionId );
-  nextResult->damage( amount, aggro, hitType, std::abs( actionData->data().AttackType ), flag );
+  nextResult->damage( amount, hitType, std::abs( actionData->data().AttackType ), flag, m_aggroModifier );
   addResultToActor( damagingTarget, nextResult );
 }
 
@@ -86,49 +94,49 @@ void ActionResultBuilder::comboSucceed( Entity::CharaPtr& target )
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param, bool shouldOverride )
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
-  nextResult->applyStatusEffect( statusId, aggro, duration, *m_sourceChara, param, shouldOverride );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, m_applyStatusAggro, shouldOverride );
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param,
+void ActionResultBuilder::applyStatusEffect( Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
                                              const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
-  nextResult->applyStatusEffect( statusId, aggro, duration, *m_sourceChara, param, modifiers, flag, statusToSource, shouldOverride );
+  nextResult->applyStatusEffect( statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, m_applyStatusAggro, shouldOverride );
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param, bool shouldOverride )
+void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
-  nextResult->applyStatusEffectSelf( statusId, aggro, duration, param, shouldOverride );
+  nextResult->applyStatusEffectSelf( statusId, duration, param, m_applyStatusAggro, shouldOverride );
   addResultToActor( m_sourceChara, nextResult );
 }
 
-void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
+void ActionResultBuilder::applyStatusEffectSelf( uint16_t statusId, uint32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                                  uint32_t flag, bool shouldOverride )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
-  nextResult->applyStatusEffectSelf( statusId, aggro, duration, param, modifiers, flag, shouldOverride );
+  nextResult->applyStatusEffectSelf( statusId, duration, param, modifiers, flag, m_applyStatusAggro, shouldOverride );
   addResultToActor( m_sourceChara, nextResult );
 }
 
-void ActionResultBuilder::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, Entity::CharaPtr& target, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param,
+void ActionResultBuilder::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, Entity::CharaPtr& target, uint16_t statusId, uint32_t duration, uint8_t param,
                                                const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool statusToSource )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, target );
-  nextResult->replaceStatusEffect( pOldStatus, statusId, aggro, duration, *m_sourceChara, param, modifiers, flag, statusToSource );
+  nextResult->replaceStatusEffect( pOldStatus, statusId, duration, *m_sourceChara, param, modifiers, flag, statusToSource, m_applyStatusAggro );
   addResultToActor( target, nextResult );
 }
 
-void ActionResultBuilder::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint16_t statusId, int32_t aggro, uint32_t duration, uint8_t param,
+void ActionResultBuilder::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint16_t statusId, uint32_t duration, uint8_t param,
                                                    const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag )
 {
   ActionResultPtr nextResult = make_ActionResult( m_sourceChara, m_sourceChara );
-  nextResult->replaceStatusEffectSelf( pOldStatus, statusId, aggro, duration, param, modifiers, flag );
+  nextResult->replaceStatusEffectSelf( pOldStatus, statusId, duration, param, modifiers, flag, m_applyStatusAggro );
   addResultToActor( m_sourceChara, nextResult );
 }
 

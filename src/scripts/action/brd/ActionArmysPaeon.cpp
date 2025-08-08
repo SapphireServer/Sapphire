@@ -34,8 +34,7 @@ public:
       pSource->removeSingleStatusEffectById( ArmysPaeonAura );
     else
     {
-      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, aggro, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, Flags, false );
+      pActionBuilder->applyStatusEffectSelf( ArmysPaeonAura, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, -10 } }, Flags, false );
     }
   }
 };

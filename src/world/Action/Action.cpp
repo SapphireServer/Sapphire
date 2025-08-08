@@ -99,8 +99,6 @@ bool Action::Action::init()
   auto zone = teriMgr.getTerritoryByGuId( m_pSource->getTerritoryId() );
   m_resultId = zone->getNextActionResultId();
 
-  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_resultId, m_requestId );
-
   m_castTimeMs = static_cast< uint32_t >( m_actionData->data().CastTime * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->data().RecastTime * 100 );
   m_cooldownGroup = m_actionData->data().RecastGroup;
@@ -168,8 +166,10 @@ bool Action::Action::init()
     m_lutEntry.rearPotency = 0;
     m_lutEntry.frontPotency = 0;
     m_lutEntry.nextCombo.clear();
+    m_lutEntry.aggroModifier = 1;
   }
 
+  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_lutEntry.aggroModifier, m_resultId, m_requestId );
   addDefaultActorFilters();
 
   return true;
@@ -540,6 +540,7 @@ void Action::Action::buildActionResults()
     Manager::PlayerMgr::sendDebug( *player, "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
                                    m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
                                    m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
+    Manager::PlayerMgr::sendDebug( *player, "mod: {}", m_lutEntry.aggroModifier );
   }
 
   // when aoe, these effects are in the target whatever is hit first
@@ -551,8 +552,7 @@ void Action::Action::buildActionResults()
     if( m_lutEntry.potency > 0 )
     {
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
-      int32_t aggro = Math::CalcStats::calcDamageAggro( *m_pSource, dmg.first );
-      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, aggro, dmg.second );
+      m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
@@ -565,7 +565,7 @@ void Action::Action::buildActionResults()
         if( m_lutEntry.curePotency > 0 ) // actions with self heal
         {
           auto heal = calcHealing( m_lutEntry.curePotency );
-          m_actionResultBuilder->heal( actor, m_pSource, heal.first, 1, heal.second, Common::ActionResultFlag::EffectOnSource );
+          m_actionResultBuilder->heal( actor, m_pSource, heal.first, heal.second, Common::ActionResultFlag::EffectOnSource );
         }
 
         if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
@@ -581,8 +581,7 @@ void Action::Action::buildActionResults()
     else if( m_lutEntry.curePotency > 0 )
     {
       auto heal = calcHealing( m_lutEntry.curePotency );
-      int32_t aggro = Math::CalcStats::calcHealAggro( *m_pSource, heal.first ); // todo: check if spell or ability
-      m_actionResultBuilder->heal( actor, actor, heal.first, aggro, heal.second );
+      m_actionResultBuilder->heal( actor, actor, heal.first, heal.second );
 
       if( m_lutEntry.restoreMPPercentage > 0 && shouldRestoreMP )
       {
@@ -646,20 +645,19 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
   }
 
   auto policy = getStatusRefreshPolicy( status.statusRefreshPolicy, isSelf );
-  int32_t aggro = Math::CalcStats::calcStatusAggro( *source );
   switch( policy )
   {
     case Common::StatusRefreshPolicy::Stack:
     {
-      pActionBuilder->applyStatusEffect( target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
+      pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, false );
       break;
     }
     case Common::StatusRefreshPolicy::ReplaceOrApply:
     {
       if( (status.flag & static_cast< uint32_t >( Common::StatusEffectFlag::ReplaceSameCaster ) && hasSameStatusFromSameCaster) || hasSameStatus )
-        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
+        pActionBuilder->replaceStatusEffect( referenceStatus, target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource );
       else
-        pActionBuilder->applyStatusEffect( target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       break;
     }
     case Common::StatusRefreshPolicy::Extend:
@@ -675,7 +673,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
 
       if( hasSameStatus || policy == Common::StatusRefreshPolicy::ExtendOrApply )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, aggro, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, std::min( status.duration + remainingDuration, static_cast< int64_t >( status.maxDuration ) ), 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       }
       break;
     }
@@ -683,7 +681,7 @@ void Action::Action::applyStatusEffect( bool isSelf, Entity::CharaPtr& target, E
     {
       if( !hasSameStatus )
       {
-        pActionBuilder->applyStatusEffect( target, status.id, aggro, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
+        pActionBuilder->applyStatusEffect( target, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, statusToSource, true );
       }
       else
       {
@@ -1103,11 +1101,6 @@ uint8_t Action::Action::getActionKind() const
 void Action::Action::setActionKind( uint8_t actionKind )
 {
   m_actionKind = actionKind;
-}
-
-void Action::Action::setAggroMultiplier( float aggroMultiplier )
-{
-  m_aggroMultiplier = aggroMultiplier;
 }
 
 uint64_t Action::Action::getCastTimeRest() const

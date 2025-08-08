@@ -31,8 +31,7 @@ public:
       pSource->removeSingleStatusEffectById( TheWanderersMinuetStatus );
     else
     {
-      int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-      pActionBuilder->applyStatusEffectSelf( TheWanderersMinuetStatus, aggro, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, 30 } }, Flags, false );
+      pActionBuilder->applyStatusEffectSelf( TheWanderersMinuetStatus, 0, 0, { StatusModifier{ Common::ParamModifier::DamageDealtPercent, 30 } }, Flags, false );
     }
   }
 };

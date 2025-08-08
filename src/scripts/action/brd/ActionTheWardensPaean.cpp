@@ -36,8 +36,7 @@ public:
     }
 
     pTarget->removeSingleStatusEffectByFlag( Common::StatusEffectFlag::CanDispel );
-    int32_t aggro = Sapphire::Math::CalcStats::calcStatusAggro( *pSource );
-    pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, aggro, 30000, 0, {}, Flags, false, true );
+    pActionBuilder->applyStatusEffect( pTarget, TheWardensPaeanStatus, 30000, 0, {}, Flags, false, true );
 
     Network::Util::Packet::sendHudParam( *pTarget );
   }
