@@ -811,6 +811,14 @@ namespace Sapphire::Common
 
   };
 
+  struct QuestEobject
+  {
+    uint32_t id;
+    uint32_t teri;
+    FFXIVARR_POSITION3 pos;
+    float radius;
+  };
+
   enum class ParamModifier : uint16_t
   {
     None = 0,

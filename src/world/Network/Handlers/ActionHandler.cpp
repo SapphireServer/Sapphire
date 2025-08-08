@@ -101,24 +101,44 @@ void Sapphire::Network::GameConnection::selectGroundActionRequest( const Packets
   const auto requestId = packet.data().RequestId;
   const auto pos = packet.data().Pos;
 
-  // todo: find out if there are any other action types which actually use this handler
-  if( type != Common::ActionKind::ACTION_KIND_NORMAL )
+  auto& exdData = Common::Service< Data::ExdData >::ref();
+  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
+
+  switch( type )
   {
-    PlayerMgr::sendDebug( player, "Skill type {0} not supported by aoe action handler!", type );
-    return;
+    case Common::ActionKind::ACTION_KIND_NORMAL:
+    {
+      PlayerMgr::sendDebug( player, "Skill type: {0}, requestId: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
+                            type, requestId, actionId, pos.x, pos.y, pos.z );
+
+      auto action = exdData.getRow< Excel::Action >( actionId );
+
+      // ignore invalid actions
+      if( !action )
+        return;
+
+      actionMgr.handlePlacedAction( player, actionId, pos, requestId );
+      break;
+    }
+
+    case Common::ActionKind::ACTION_KIND_EVENT_ITEM:
+    {
+      PlayerMgr::sendDebug( player, "Skill type: {0}, requestId: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
+                            type, requestId, actionId, pos.x, pos.y, pos.z );
+
+      Common::FFXIVARR_POSITION3 targetPos = { pos.x, pos.y, pos.z };
+      auto action = exdData.getRow< Excel::EventItem >( actionId );
+      assert( action );
+      actionMgr.handlePlacedEventItemAction( player, actionId, action, requestId, targetPos );
+      break;
+    }
+
+    default:
+    {
+      // todo: find out if there are any other action types which actually use this handler
+      PlayerMgr::sendDebug( player, "Skill type {0} not supported by aoe action handler!", type );
+    }
   }
 
-  PlayerMgr::sendDebug( player, "Skill type: {0}, requestId: {1}, actionId: {2}, x:{3}, y:{4}, z:{5}",
-                        type, requestId, actionId, pos.x, pos.y, pos.z );
 
-  auto& exdData = Common::Service< Data::ExdData >::ref();
-
-  auto action = exdData.getRow< Excel::Action >( actionId );
-
-  // ignore invalid actions
-  if( !action )
-    return;
-
-  auto& actionMgr = Common::Service< World::Manager::ActionMgr >::ref();
-  actionMgr.handlePlacedAction( player, actionId, pos, requestId );
 }

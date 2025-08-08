@@ -58,7 +58,7 @@ void Action::EventAction::start()
   if( m_pSource->isPlayer() )
   {
     auto pPlayer = m_pSource->getAsPlayer();
-
+    
     server().queueForPlayers( m_pSource->getInRangePlayerIds( true ), control );
 
     if( pPlayer->hasCondition( PlayerCondition::InNpcEvent ) )

@@ -36,6 +36,21 @@ EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t ev
   m_targetId = targetId;
   m_interruptType = Common::ActionInterruptType::None;
   m_actionKind = Common::ActionKind::ACTION_KIND_EVENT_ITEM;
+  m_castType = Common::CastType::SingleTarget;
+}
+
+EventItemAction::EventItemAction( Sapphire::Entity::CharaPtr source, uint32_t eventItemId,
+                                  std::shared_ptr< Excel::ExcelStruct< Excel::EventItem > > eventItemActionData,
+                                  uint32_t requestId, Common::FFXIVARR_POSITION3 pos, Common::CastType castType ) : m_eventItemAction( std::move( eventItemActionData ) )
+{
+  m_id = eventItemId;
+  m_eventItem = eventItemId;
+  m_pSource = std::move( source );
+  m_requestId = requestId;
+  m_pos = pos;
+  m_interruptType = Common::ActionInterruptType::None;
+  m_actionKind = Common::ActionKind::ACTION_KIND_EVENT_ITEM;
+  m_castType = castType;
 }
 
 bool EventItemAction::init()
@@ -60,9 +75,25 @@ void EventItemAction::execute()
   auto& scriptMgr = Common::Service< Scripting::ScriptMgr >::ref();
   auto& eventMgr = Common::Service< World::Manager::EventMgr >::ref();
 
-  eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler, Event::EventHandler::ActionResult, 0, 0 );
-  scriptMgr.onEventItem( *pPlayer, m_eventItem, m_eventItemAction->data().EventHandler, m_targetId );
-  eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
+  switch( m_castType )
+  {
+    case Common::CastType::SingleTarget:
+    {
+      eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler, Event::EventHandler::ActionResult, 0, 0 );
+      scriptMgr.onEventItem( *pPlayer, m_eventItem, m_eventItemAction->data().EventHandler, m_targetId );
+      eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
+      break;
+    }
+
+    case Common::CastType::Circle:
+    {
+      eventMgr.eventStart( *pPlayer, m_targetId, m_eventItemAction->data().EventHandler, Event::EventHandler::ActionResult, 0, 0 );
+      scriptMgr.onEventGroundItem( *pPlayer, m_eventItem, m_eventItemAction->data().EventHandler, m_pos );
+      eventMgr.checkEvent( *pPlayer, m_eventItemAction->data().EventHandler );
+      break;
+    }
+  }
+  
 }
 
 void EventItemAction::onStart()
