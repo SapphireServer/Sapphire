@@ -40,6 +40,7 @@ namespace Sapphire::World::Action
     uint16_t restoreMPPercentage;
     std::vector< uint32_t > nextCombo;
     Common::TargetFilter targetFilter;
+    float aggroModifier;
     StatusEffect statuses;
   };
 

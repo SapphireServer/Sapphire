@@ -99,8 +99,6 @@ bool Action::Action::init()
   auto zone = teriMgr.getTerritoryByGuId( m_pSource->getTerritoryId() );
   m_resultId = zone->getNextActionResultId();
 
-  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_resultId, m_requestId );
-
   m_castTimeMs = static_cast< uint32_t >( m_actionData->data().CastTime * 100 );
   m_recastTimeMs = static_cast< uint32_t >( m_actionData->data().RecastTime * 100 );
   m_cooldownGroup = m_actionData->data().RecastGroup;
@@ -168,8 +166,10 @@ bool Action::Action::init()
     m_lutEntry.rearPotency = 0;
     m_lutEntry.frontPotency = 0;
     m_lutEntry.nextCombo.clear();
+    m_lutEntry.aggroModifier = 1;
   }
 
+  m_actionResultBuilder = make_ActionResultBuilder( m_pSource, getId(), m_lutEntry.aggroModifier, m_resultId, m_requestId );
   addDefaultActorFilters();
 
   return true;
@@ -553,9 +553,6 @@ void Action::Action::buildActionResults()
       auto dmg = calcDamage( isCorrectCombo() ? m_lutEntry.comboPotency : m_lutEntry.potency );
       m_actionResultBuilder->damage( m_pSource, actor, dmg.first, dmg.second );
 
-      if( dmg.first > 0 )
-        actor->onActionHostile( m_pSource );
-
       if( isCorrectCombo() && shouldApplyComboSucceedEffect )
       {
         m_actionResultBuilder->comboSucceed( m_pSource );
@@ -733,9 +730,6 @@ void Action::Action::handleStatusEffects()
         applyStatusEffect( false, actor, m_pSource, status );
         // pActionBuilder->applyStatusEffect( actor, status.id, status.duration, 0, std::move( status.modifiers ), status.flag, true );
       }
-
-      if( !actor->getStatusEffectMap().empty() )
-        actor->onActionHostile( m_pSource );
     }
   }
 }
@@ -1106,11 +1100,6 @@ uint8_t Action::Action::getActionKind() const
 void Action::Action::setActionKind( uint8_t actionKind )
 {
   m_actionKind = actionKind;
-}
-
-void Action::Action::setAggroMultiplier( float aggroMultiplier )
-{
-  m_aggroMultiplier = aggroMultiplier;
 }
 
 uint64_t Action::Action::getCastTimeRest() const

@@ -538,8 +538,15 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   {
     if( listEntry->m_pChara == pChara )
     {
-      listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
+      auto currentHate = listEntry->m_hateAmount;
+      if( hateAmount >= 0 || currentHate > abs( hateAmount ) )
+        listEntry->m_hateAmount += hateAmount;
+      else
+        listEntry->m_hateAmount = 0;
       hasEntry = true;
+
+      if( auto player = pChara->getAsPlayer() )
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount, hateAmount );
       break;
     }
   }
@@ -547,9 +554,15 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   if( !hasEntry )
   {
     auto hateEntry = std::make_shared< HateListEntry >();
-    hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
-    hateEntry->m_pChara = pChara;
-    m_hateList.insert( hateEntry );
+    if( hateAmount > 0 )
+    {
+      hateEntry->m_hateAmount = hateAmount;
+      hateEntry->m_pChara = pChara;
+      m_hateList.insert( hateEntry );
+
+      if( auto player = pChara->getAsPlayer() )
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+    }
   }
 
   for( const auto& listEntry : m_hateList )
@@ -595,6 +608,18 @@ bool BNpc::hateListHasActor( const Sapphire::Entity::CharaPtr& pChara )
 {
   return std::any_of( m_hateList.begin(), m_hateList.end(),
                       [ pChara ]( const auto& entry ) { return entry->m_pChara == pChara; } );
+}
+
+std::vector< CharaPtr > BNpc::getHateList()
+{
+  std::vector< CharaPtr > hateList = {};
+
+  for( auto& entry : m_hateList )
+  {
+    hateList.push_back( entry->m_pChara );
+  }
+
+  return hateList;
 }
 
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
@@ -678,12 +703,12 @@ void BNpc::restHp()
   Network::Util::Packet::sendHudParam( *this );
 }
 
-void BNpc::onActionHostile( CharaPtr pSource )
+void BNpc::onActionHostile( CharaPtr pSource, int32_t aggro )
 {
-  if( !hateListGetHighest() )
-    aggro( pSource );
+  hateListUpdate( pSource, aggro );
 
-  hateListUpdate( pSource, 1 );
+  if( getCanSwapTarget() ) // todo: only call on global server tick
+    updateAggroTarget();
 
   if( !m_pOwner )
     setOwner( pSource );
@@ -806,8 +831,8 @@ void BNpc::setOwner( const CharaPtr& m_pChara )
   setOwnerPacket->data().Id = targetId;
   server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
 
-  if( m_pChara && m_pChara->isPlayer() )
-    Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
+  //if( m_pChara && m_pChara->isPlayer() )
+  //  Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
 
 }
 
@@ -843,7 +868,6 @@ void BNpc::autoAttack( CharaPtr pTarget )
   // todo: this needs to use the auto attack delay for the equipped weapon
   if( ( tick - m_lastAttack ) > 2500 )
   {
-    pTarget->onActionHostile( getAsChara() );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
     actionMgr.handleTargetedAction( *this, 7, pTarget->getId(), 0 );
@@ -891,6 +915,16 @@ void BNpc::calculateStats()
   setStatValue( BaseParam::AttackMagicPotency, inte );
   setStatValue( BaseParam::HealingMagicPotency, mnd );
 
+}
+
+void BNpc::updateAggroTarget()
+{
+  auto highestAggro = hateListGetHighest();
+  if( highestAggro && getTargetId() != highestAggro->getId() )
+  {
+    aggro( highestAggro );
+  }
+    
 }
 
 uint32_t BNpc::getRank() const
@@ -1012,4 +1046,19 @@ const Common::FFXIVARR_POSITION3& BNpc::getRoamTargetPos() const
 const Common::FFXIVARR_POSITION3& BNpc::getSpawnPos() const
 {
   return m_spawnPos;
+}
+
+bool BNpc::getCanSwapTarget()
+{
+  return m_canSwapTarget;
+}
+
+void BNpc::setCanSwapTarget( bool value )
+{
+  m_canSwapTarget = value;
+
+  if( m_canSwapTarget ) // todo: only call on global server tick
+  {
+    updateAggroTarget();
+  }
 }

@@ -54,6 +54,7 @@ namespace Sapphire::World::Action
     j.at( "restorePercentage" ).get_to( action.restoreMPPercentage );
     j.at( "nextCombo" ).get_to( action.nextCombo );
     j.at( "targetFilter" ).get_to( action.targetFilter );
+    j.at( "aggroModifier" ).get_to( action.aggroModifier );
     j.at( "statuses" ).at( "caster" ).get_to( action.statuses.caster );
     j.at( "statuses" ).at( "target" ).get_to( action.statuses.target );
   }

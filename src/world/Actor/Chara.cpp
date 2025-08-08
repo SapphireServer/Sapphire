@@ -458,7 +458,7 @@ void Chara::autoAttack( CharaPtr pTarget )
   // todo: this needs to use the auto attack delay for the equipped weapon
   if( ( tick - m_lastAttack ) > 2500 )
   {
-    pTarget->onActionHostile( getAsChara() );
+    pTarget->onActionHostile( getAsChara(), 1 );
     m_lastAttack = tick;
     srand( static_cast< uint32_t >( tick ) );
 
@@ -788,6 +788,12 @@ void Chara::setAgentId( uint32_t agentId )
   m_agentId = agentId;
 }
 
+std::vector< CharaPtr > Chara::getHateList()
+{
+  std::vector< CharaPtr > hateList = {};
+  return hateList;
+}
+
 float Chara::getRadius() const
 {
   return m_radius;
@@ -846,10 +852,10 @@ float Chara::getModifier( Common::ParamModifier paramModifier ) const
       if( mod != paramModifier )
         continue;
 
-      if( paramModifier >= Common::ParamModifier::StrengthPercent )
-        result *= 1.0f + ( val / 100.0f );
-      else
+      if( paramModifier < Common::ParamModifier::StrengthPercent )
         result += val;
+      else
+        result *= 1.0f + ( val / 100.0f );
     }
   }
 
