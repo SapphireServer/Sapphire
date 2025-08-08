@@ -65,11 +65,6 @@ public:
     }
   }
 
-  void onEventItem( World::Quest& quest, Entity::Player& player, uint64_t actorId ) override
-  {
-  }
-
-
 private:
   //////////////////////////////////////////////////////////////////////
   // Available Scenes in this quest, not necessarly all are used
