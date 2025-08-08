@@ -538,8 +538,15 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   {
     if( listEntry->m_pChara == pChara )
     {
-      listEntry->m_hateAmount += static_cast< uint32_t >( hateAmount );
+      auto currentHate = listEntry->m_hateAmount;
+      if( hateAmount >= 0 || currentHate > abs( hateAmount ) )
+        listEntry->m_hateAmount += hateAmount;
+      else
+        listEntry->m_hateAmount = 0;
       hasEntry = true;
+
+      if( auto player = pChara->getAsPlayer() )
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount, hateAmount );
       break;
     }
   }
@@ -547,9 +554,16 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   if( !hasEntry )
   {
     auto hateEntry = std::make_shared< HateListEntry >();
-    hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
+    if( hateAmount > 0 )
+      hateEntry->m_hateAmount = hateAmount;
+    else
+      hateEntry->m_hateAmount = 0;
+
     hateEntry->m_pChara = pChara;
     m_hateList.insert( hateEntry );
+
+    if( auto player = pChara->getAsPlayer() )
+      World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
   }
 
   for( const auto& listEntry : m_hateList )

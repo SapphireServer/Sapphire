@@ -540,7 +540,6 @@ void Action::Action::buildActionResults()
     Manager::PlayerMgr::sendDebug( *player, "Hit target: pot: {} (c: {}, f: {}, r: {}), heal pot: {}, mpp: {}",
                                    m_lutEntry.potency, m_lutEntry.comboPotency, m_lutEntry.flankPotency, m_lutEntry.rearPotency,
                                    m_lutEntry.curePotency, m_lutEntry.restoreMPPercentage );
-    Manager::PlayerMgr::sendDebug( *player, "mod: {}", m_lutEntry.aggroModifier );
   }
 
   // when aoe, these effects are in the target whatever is hit first

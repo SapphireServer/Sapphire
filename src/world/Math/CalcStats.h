@@ -149,7 +149,7 @@ namespace Sapphire::Math
      * @param damage Damage dealt
      * @param actionAggroModifier Aggro modifier from action (eg. 3 for Tomahawk, 0.5 for Cure)
      */
-    static int32_t calcAggro( const Sapphire::Entity::Chara& source, int32_t damage, uint8_t actionAggroModifier = 1 );
+    static int32_t calcAggro( const Sapphire::Entity::Chara& source, int32_t damage, float actionAggroModifier = 1.0f );
 
     /*!
      * @brief Calculates aggro generated from applying a status effect. This does not include the equal aggro split between all targets at the end if the status effect is a buff

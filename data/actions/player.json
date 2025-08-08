@@ -2162,7 +2162,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -2230,7 +2230,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -2349,7 +2349,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -2383,7 +2383,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": [
@@ -2431,7 +2431,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -2465,7 +2465,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": [
@@ -3335,7 +3335,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -3352,7 +3352,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -3403,7 +3403,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -3420,7 +3420,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -11223,7 +11223,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -11240,7 +11240,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -11291,7 +11291,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -11529,7 +11529,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -11563,7 +11563,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -11580,7 +11580,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -23072,7 +23072,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -23463,7 +23463,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -50738,7 +50738,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -50925,7 +50925,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -51214,7 +51214,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -51231,7 +51231,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -51452,7 +51452,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -51605,7 +51605,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -51622,7 +51622,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -51707,7 +51707,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -51724,7 +51724,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -51877,7 +51877,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.5,
     "statuses": {
       "caster": [],
       "target": []
@@ -51928,7 +51928,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []
@@ -51945,7 +51945,7 @@
     "restorePercentage": 0,
     "nextCombo": [],
     "targetFilter": 0,
-    "aggroModifier": 1,
+    "aggroModifier": 0.6,
     "statuses": {
       "caster": [],
       "target": []

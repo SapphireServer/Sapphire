@@ -852,7 +852,7 @@ float Chara::getModifier( Common::ParamModifier paramModifier ) const
       if( mod != paramModifier )
         continue;
 
-      if( paramModifier < Common::ParamModifier::StrengthPercent || paramModifier == Common::ParamModifier::EnmityPercent )
+      if( paramModifier < Common::ParamModifier::StrengthPercent )
         result += val;
       else
         result *= 1.0f + ( val / 100.0f );
