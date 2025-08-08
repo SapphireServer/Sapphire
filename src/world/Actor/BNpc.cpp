@@ -555,15 +555,14 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
   {
     auto hateEntry = std::make_shared< HateListEntry >();
     if( hateAmount > 0 )
+    {
       hateEntry->m_hateAmount = hateAmount;
-    else
-      hateEntry->m_hateAmount = 0;
+      hateEntry->m_pChara = pChara;
+      m_hateList.insert( hateEntry );
 
-    hateEntry->m_pChara = pChara;
-    m_hateList.insert( hateEntry );
-
-    if( auto player = pChara->getAsPlayer() )
-      World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+      if( auto player = pChara->getAsPlayer() )
+        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+    }
   }
 
   for( const auto& listEntry : m_hateList )

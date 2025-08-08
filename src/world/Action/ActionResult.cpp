@@ -139,8 +139,6 @@ void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr&
   applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, false, applyAggro );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
-
-  m_applyStatusAggro = applyAggro;
 }
 
 void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
@@ -149,8 +147,6 @@ void ActionResult::replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffect
   applyStatusEffectSelf( id, duration, param, modifiers, flag, applyAggro, false );
   m_pOldStatus = std::move( pOldStatus );
   m_pStatus->setSlot( m_pOldStatus->getSlot() );
-
-  m_applyStatusAggro = applyAggro;
 }
 
 void ActionResult::mount( uint16_t mountId )
@@ -245,7 +241,7 @@ void ActionResult::execute()
       if( m_applyStatusAggro )
       {
         auto aggro = Sapphire::Math::CalcStats::calcStatusAggro( *m_source );
-        if( m_result.Flag & static_cast< uint8_t >( StatusEffectFlag::BuffCategory ) )
+        if( m_pStatus->getFlag() & static_cast< uint8_t >( StatusEffectFlag::BuffCategory ) )
         {
           auto hateList = m_target->getHateList();
           aggro = aggro / hateList.size();
@@ -254,8 +250,10 @@ void ActionResult::execute()
             entry->onActionHostile( m_source, aggro );
           }
         }
-        else if( m_result.Flag & static_cast< uint8_t >( StatusEffectFlag::DebuffCategory ) )
+        else if( m_pStatus->getFlag() & static_cast< uint8_t >( StatusEffectFlag::DebuffCategory ) )
+        {
           m_target->onActionHostile( m_source, aggro );
+        }
       }
       break;
     }
