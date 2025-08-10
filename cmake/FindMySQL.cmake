@@ -123,7 +123,7 @@ if( UNIX )
       "if more libraries are necessary to link in a MySQL client (typically zlib), specify them here."
   )
 
-  find_program( MYSQL_EXECUTABLE mysql
+  find_program( MYSQL_EXECUTABLE mysql mariadb
     PATHS
       ${MYSQL_CONFIG_PREFER_PATH}
       /usr/local/mysql/bin/
