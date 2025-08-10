@@ -1,5 +1,5 @@
-#include <ScriptObject.h>
 #include <Actor/Player.h>
+#include <ScriptObject.h>
 
 #include <datReader/DatCategories/bg/LgbTypes.h>
 #include <datReader/DatCategories/bg/lgb.h>
@@ -15,47 +15,49 @@ using namespace Sapphire;
 
 class WarpInnGridania : public Sapphire::ScriptAPI::EventScript
 {
-public:
-  constexpr static auto InnTerritoryType = 179;
+  public:
+    constexpr static auto InnTerritoryType = 179;
 
-  WarpInnGridania() :
-    Sapphire::ScriptAPI::EventScript( 131080 )
-  {
-  }
-
-  void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
-  {
-   auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
-
-    auto warp = exdData.getRow< Excel::Warp >( eventId );
-    if( !warp )
-      return;
-
-    auto qualifiedPreResult = [ this ]( Entity::Player& player, const Event::SceneResult& result )
+    WarpInnGridania() : Sapphire::ScriptAPI::EventScript( 131080 )
     {
-      auto warpChoice = [ this ]( Entity::Player& player, const Event::SceneResult& result )
+    }
+
+    void onTalk( uint32_t eventId, Entity::Player& player, uint64_t actorId ) override
+    {
+      auto& exdData = Common::Service< Sapphire::Data::ExdData >::ref();
+
+      auto warp = exdData.getRow< Excel::Warp >( eventId );
+      if( !warp )
+        return;
+
+      auto qualifiedPreResult = [ this ]( Entity::Player& player, const Event::SceneResult& result )
       {
-        auto warp = this->exdData().getRow< Excel::Warp >( result.eventId );
-        if( warp )
+        auto warpChoice = [ this ]( Entity::Player& player, const Event::SceneResult& result )
         {
-          auto popRangeInfo = instanceObjectCache().getPopRangeInfo( warp->data().PopRange );
-          if( popRangeInfo )
+          if( result.numOfResults > 0 && result.results[ 0 ] == 1 )
           {
-            auto pTeri = teriMgr().getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
-            warpMgr().requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
-                                            pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
+            auto warp = this->exdData().getRow< Excel::Warp >( result.eventId );
+            if( warp )
+            {
+              auto popRangeInfo = instanceObjectCache().getPopRangeInfo( warp->data().PopRange );
+              if( popRangeInfo )
+              {
+                auto pTeri = teriMgr().getTerritoryByTypeId( popRangeInfo->m_territoryTypeId );
+                warpMgr().requestMoveTerritory( player, Sapphire::Common::WARP_TYPE_TOWN_TRANSLATE,
+                                                pTeri->getGuId(), popRangeInfo->m_pos, popRangeInfo->m_rotation );
+              }
+            }
           }
-        }
+        };
+
+        eventMgr().playScene( player, result.eventId, 1, HIDE_HOTBAR, { 1 }, warpChoice );
       };
 
-      eventMgr().playScene( player, result.eventId, 1, HIDE_HOTBAR, { 1 }, warpChoice );
-    };
-
-    if( player.hasReward( Common::UnlockEntry::InnRoom ) )
-      eventMgr().playScene( player, eventId, 0, HIDE_HOTBAR, { 1 }, qualifiedPreResult );
-    else
-      eventMgr().playScene( player, eventId, 2, HIDE_HOTBAR, { 1 }, nullptr );
-  }
+      if( player.hasReward( Common::UnlockEntry::InnRoom ) )
+        eventMgr().playScene( player, eventId, 0, HIDE_HOTBAR, { 1 }, qualifiedPreResult );
+      else
+        eventMgr().playScene( player, eventId, 2, HIDE_HOTBAR, { 1 }, nullptr );
+    }
 };
 
 EXPOSE_SCRIPT( WarpInnGridania );
