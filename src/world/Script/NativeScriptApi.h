@@ -7,6 +7,7 @@
 #include "Manager/EventMgr.h"
 #include "Manager/LinkshellMgr.h"
 #include "Manager/PlayerMgr.h"
+#include "Manager/StatusEffectMgr.h"
 #include "Manager/TerritoryMgr.h"
 #include "Manager/WarpMgr.h"
 #include "Exd/ExdData.h"
@@ -129,6 +130,11 @@ namespace Sapphire::ScriptAPI
     World::Manager::PlayerMgr& playerMgr()
     {
       return Common::Service< World::Manager::PlayerMgr >::ref();
+    }
+
+    World::Manager::StatusEffectMgr& statusEffectMgr()
+    {
+      return Common::Service< World::Manager::StatusEffectMgr >::ref();
     }
   };
 

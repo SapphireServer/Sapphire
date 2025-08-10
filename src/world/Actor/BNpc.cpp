@@ -138,6 +138,8 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
   m_state = BNpcState::Idle;
   m_status = ActorStatus::Idle;
 
+  m_bnpcType = BNpcType::Enemy;
+
   memset( m_customize, 0, sizeof( m_customize ) );
   memset( m_modelEquip, 0, sizeof( m_modelEquip ) );
 
@@ -178,8 +180,8 @@ BNpc::BNpc( uint32_t id, std::shared_ptr< Common::BNPCInstanceObject > pInfo, co
 
   calculateStats();
 
-  if( m_bnpcType == BNpcType::Friendly )
-    m_maxHp *= 5;
+  //if( m_bnpcType == BNpcType::Friendly )
+  //  m_maxHp *= 5;
 
 }
 
@@ -444,6 +446,9 @@ void BNpc::sendPositionUpdate()
 
 void BNpc::hateListClear()
 {
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+
   for( auto& listEntry : m_hateList )
   {
     if( isInRangeSet( listEntry->m_pChara ) )
@@ -560,17 +565,21 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
       hateEntry->m_pChara = pChara;
       m_hateList.insert( hateEntry );
 
-      if( auto player = pChara->getAsPlayer() )
-        World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+      if( pChara->isPlayer() )
+      {
+        PlayerPtr tmpPlayer = pChara->getAsPlayer();
+        tmpPlayer->onMobAggro( *getAsBNpc() );
+        World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+      }
     }
   }
 
   for( const auto& listEntry : m_hateList )
   {
     // update entire hatelist for all players who are on aggro with this bnpc
-    if( pChara->isPlayer() )
+    if( listEntry->m_pChara->isPlayer() )
     {
-      auto pPlayer = pChara->getAsPlayer();
+      auto pPlayer = listEntry->m_pChara->getAsPlayer();
       Network::Util::Packet::sendHateList( *pPlayer );
     }
   }
@@ -640,19 +649,22 @@ void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
   Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle, 1 );
 
   changeTarget( pChara->getId() );
-
-  if( pChara->isPlayer() )
-  {
-    PlayerPtr tmpPlayer = pChara->getAsPlayer();
-    tmpPlayer->onMobAggro( *getAsBNpc() );
-  }
-
 }
 
 void BNpc::deaggro( const CharaPtr& pChara )
 {
   if( hateListHasActor( pChara ) )
+  {
     hateListRemove( pChara );
+    if( getTargetId() == pChara->getId() )
+    {
+      updateAggroTarget();
+    }
+    if( m_pOwner == pChara  )
+    {
+      setOwner( nullptr );
+    }
+  }
 
   if( pChara->isPlayer() )
     notifyPlayerDeaggro( pChara );
@@ -660,9 +672,13 @@ void BNpc::deaggro( const CharaPtr& pChara )
 
 void BNpc::notifyPlayerDeaggro(const CharaPtr& pChara)
 {
+  if( m_hateList.empty() )
+  {
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
+    Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
+  }
+
   PlayerPtr tmpPlayer = pChara->getAsPlayer();
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), ToggleWeapon, 0, 1, 1 );
-  Network::Util::Packet::sendActorControl( getInRangePlayerIds(), getId(), SetBattle );
   tmpPlayer->onMobDeaggro( *this );
 
   if( getTriggerOwnerId() == pChara->getId() )
@@ -830,10 +846,6 @@ void BNpc::setOwner( const CharaPtr& m_pChara )
   setOwnerPacket->data().Type = 0x01;
   setOwnerPacket->data().Id = targetId;
   server().queueForPlayers( getInRangePlayerIds(), setOwnerPacket );
-
-  //if( m_pChara && m_pChara->isPlayer() )
-  //  Network::Util::Packet::sendActorControl( *m_pChara->getAsPlayer(), getId(), SetHateLetter, 1, getId(), 0 );
-
 }
 
 void BNpc::setLevelId( uint32_t levelId )
@@ -924,7 +936,11 @@ void BNpc::updateAggroTarget()
   {
     aggro( highestAggro );
   }
-    
+  else if( highestAggro == nullptr )
+  {
+    setTargetId( INVALID_GAME_OBJECT_ID64 );
+    Network::Util::Packet::sendActorControlTarget( getInRangePlayerIds(), getId(), SetTarget, 0, 0, 0, 0, INVALID_GAME_OBJECT_ID64 );
+  }
 }
 
 uint32_t BNpc::getRank() const

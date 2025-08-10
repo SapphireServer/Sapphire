@@ -27,7 +27,7 @@ namespace Sapphire::World::Action
     void applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t param, const std::vector< World::Action::StatusModifier >& modifiers,
                                 uint32_t flag, bool applyAggro, bool shouldOverride );
     void replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                              const std::vector< StatusModifier >& modifiers, uint32_t flag, bool applyAggro, bool statusToSource );
+                              const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro );
     void replaceStatusEffectSelf( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, uint8_t param,
                                   const std::vector< World::Action::StatusModifier >& modifiers, uint32_t flag, bool applyAggro );
     void mount( uint16_t mountId );
@@ -51,6 +51,7 @@ namespace Sapphire::World::Action
     Sapphire::StatusEffect::StatusEffectPtr m_pStatus;
     Sapphire::StatusEffect::StatusEffectPtr m_pOldStatus;
 
+    void splitAggroApplication( float aggro );
   };
 
   using ActionResultList = std::vector< ActionResultPtr >;

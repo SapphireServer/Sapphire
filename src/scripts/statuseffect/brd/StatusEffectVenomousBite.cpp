@@ -2,8 +2,8 @@
 #include <ScriptObject.h>
 #include "StatusEffect/StatusEffect.h"
 #include <Actor/Player.h>
-#include <Action/CommonAction.h>
 #include <Actor/Chara.h>
+#include <Action/CommonAction.h>
 
 #include "Manager/PlayerMgr.h"
 
@@ -36,16 +36,12 @@ public:
     float damageVal = dmg.first;
     Common::CalcResultType damageType = dmg.second;
 
-    actor.takeDamage( damageVal );
+    statusEffectMgr().damage( pSource, actor.getAsChara(), static_cast< int32_t >( damageVal ) );
 
     if( pPlayer && damageType == Common::CalcResultType::TypeCriticalDamageHp && pPlayer->getLevel() >= 48 && ( float ) rand() / ( float ) RAND_MAX <= 0.5 )
     {
       playerMgr().onSkillProc( *pPlayer, 1 );
     }
-
-    Network::Util::Packet::sendActorControl( actor.getInRangePlayerIds( actor.isPlayer() ), actor.getId(), Network::ActorControl::ActorControlType::HPFloatingText, 0,
-      Common::CalcResultType::TypeDamageHp, damageVal );
-    Network::Util::Packet::sendHudParam( actor );
   }
 };
 

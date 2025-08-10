@@ -134,7 +134,7 @@ void ActionResult::applyStatusEffectSelf( uint32_t id, int32_t duration, uint8_t
 }
 
 void ActionResult::replaceStatusEffect( Sapphire::StatusEffect::StatusEffectPtr& pOldStatus, uint32_t id, int32_t duration, Entity::Chara& source, uint8_t param,
-                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool applyAggro, bool statusToSource )
+                                        const std::vector< StatusModifier >& modifiers, uint32_t flag, bool statusToSource, bool applyAggro )
 {
   applyStatusEffect( id, duration, source, param, modifiers, flag, statusToSource, false, applyAggro );
   m_pOldStatus = std::move( pOldStatus );
@@ -197,12 +197,7 @@ void ActionResult::execute()
       if( m_aggroModifier != 0 )
       {
         int32_t aggro = Sapphire::Math::CalcStats::calcAggro( *m_source, m_result.Value, m_aggroModifier );
-        auto hateList = m_target->getHateList();
-        aggro = aggro / hateList.size();
-        for( auto entry : hateList )
-        {
-          entry->onActionHostile( m_source, aggro );
-        }
+        splitAggroApplication( aggro );
       }
       break;
     }
@@ -216,9 +211,7 @@ void ActionResult::execute()
     case CalcResultType::TypeSetStatus:
     case CalcResultType::TypeSetStatusMe:
     {
-      if( m_pOldStatus )
-        m_target->replaceSingleStatusEffect( m_pOldStatus->getSlot(), m_pStatus );
-      else if( m_bShouldOverride )
+      if( m_bShouldOverride )
       {
         for( auto const& entry : m_target->getStatusEffectMap() )
         {
@@ -229,10 +222,26 @@ void ActionResult::execute()
             m_pStatus->setSlot( statusEffect->getSlot() );
 
             Network::Util::Packet::sendHudParam( *m_target );
-            break;
+
+            if( m_applyStatusAggro )
+            {
+              auto aggro = Sapphire::Math::CalcStats::calcStatusAggro( *m_source );
+              if( m_pStatus->getFlag() & static_cast< uint8_t >( StatusEffectFlag::BuffCategory ) )
+              {
+                splitAggroApplication( aggro );
+              }
+              else if( m_pStatus->getFlag() & static_cast< uint8_t >( StatusEffectFlag::DebuffCategory ) )
+              {
+                m_target->onActionHostile( m_source, aggro );
+              }
+            }
+            return;
           }
         }
       }
+
+      if( m_pOldStatus )
+        m_target->replaceSingleStatusEffect( m_pOldStatus->getSlot(), m_pStatus );
       else if( !m_bShouldOverride )
         m_target->addStatusEffectByIdIfNotExist( m_pStatus );
       else
@@ -243,12 +252,7 @@ void ActionResult::execute()
         auto aggro = Sapphire::Math::CalcStats::calcStatusAggro( *m_source );
         if( m_pStatus->getFlag() & static_cast< uint8_t >( StatusEffectFlag::BuffCategory ) )
         {
-          auto hateList = m_target->getHateList();
-          aggro = aggro / hateList.size();
-          for( auto entry : hateList )
-          {
-            entry->onActionHostile( m_source, aggro );
-          }
+          splitAggroApplication( aggro );
         }
         else if( m_pStatus->getFlag() & static_cast< uint8_t >( StatusEffectFlag::DebuffCategory ) )
         {
@@ -267,5 +271,15 @@ void ActionResult::execute()
 
     default:
       break;
+  }
+}
+
+void ActionResult::splitAggroApplication( float aggro )
+{
+  auto hateList = m_target->getHateList();
+  aggro = aggro / hateList.size();
+  for( auto entry : hateList )
+  {
+    entry->onActionHostile( m_source, aggro );
   }
 }
