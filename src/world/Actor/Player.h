@@ -603,6 +603,8 @@ namespace Sapphire::Entity
 
     Entity::GameObjectPtr lookupTargetById( uint64_t targetId );
 
+    void hateListLetterUpdate( const BNpc& bnpc );
+
     bool isLogin() const;
 
     void setIsLogin( bool bIsLogin );

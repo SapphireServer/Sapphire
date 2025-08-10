@@ -113,6 +113,7 @@ namespace Sapphire::Entity
     void hateListRemove( const CharaPtr& pChara );
     bool hateListHasActor( const CharaPtr& pChara );
     std::vector< CharaPtr > getHateList() override;
+    void hateListUpdatePlayers();
 
     void aggro( const CharaPtr& pChara );
     void deaggro( const CharaPtr& pChara );

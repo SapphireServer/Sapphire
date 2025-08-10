@@ -516,15 +516,19 @@ CharaPtr BNpc::hateListGetHighest()
 
 void BNpc::hateListAdd( const CharaPtr& pChara, int32_t hateAmount )
 {
-  auto hateEntry = std::make_shared< HateListEntry >();
-  hateEntry->m_hateAmount = static_cast< uint32_t >( hateAmount );
-  hateEntry->m_pChara = pChara;
-
-  m_hateList.insert( hateEntry );
-  if( pChara->isPlayer() )
+  if( hateAmount > 0 )
   {
-    auto pPlayer = pChara->getAsPlayer();
-    pPlayer->hateListAdd( *this );
+    auto hateEntry = std::make_shared< HateListEntry >();
+    hateEntry->m_hateAmount = hateAmount;
+    hateEntry->m_pChara = pChara;
+
+    m_hateList.insert( hateEntry );
+    if( pChara->isPlayer() )
+    {
+      auto pPlayer = pChara->getAsPlayer();
+      pPlayer->hateListAdd( *this );
+      World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
+    }
   }
 }
 
@@ -551,38 +555,20 @@ void BNpc::hateListUpdate( const CharaPtr& pChara, int32_t hateAmount )
       hasEntry = true;
 
       if( auto player = pChara->getAsPlayer() )
+      {
+        player->hateListLetterUpdate( *this );
         World::Manager::PlayerMgr::sendDebug( *player, "New Aggro: {}, Aggro gained: {}", listEntry->m_hateAmount, hateAmount );
+      }
       break;
     }
   }
 
   if( !hasEntry )
   {
-    auto hateEntry = std::make_shared< HateListEntry >();
-    if( hateAmount > 0 )
-    {
-      hateEntry->m_hateAmount = hateAmount;
-      hateEntry->m_pChara = pChara;
-      m_hateList.insert( hateEntry );
-
-      if( pChara->isPlayer() )
-      {
-        PlayerPtr tmpPlayer = pChara->getAsPlayer();
-        tmpPlayer->onMobAggro( *getAsBNpc() );
-        World::Manager::PlayerMgr::sendDebug( *pChara->getAsPlayer(), "New Aggro: {}, Aggro gained: {}", hateAmount, hateAmount );
-      }
-    }
+    hateListAdd( pChara, hateAmount );
   }
 
-  for( const auto& listEntry : m_hateList )
-  {
-    // update entire hatelist for all players who are on aggro with this bnpc
-    if( listEntry->m_pChara->isPlayer() )
-    {
-      auto pPlayer = listEntry->m_pChara->getAsPlayer();
-      Network::Util::Packet::sendHateList( *pPlayer );
-    }
-  }
+  hateListUpdatePlayers();
 }
 
 void BNpc::hateListRemove( const CharaPtr& pChara )
@@ -631,6 +617,19 @@ std::vector< CharaPtr > BNpc::getHateList()
   return hateList;
 }
 
+void BNpc::hateListUpdatePlayers()
+{
+  for( const auto& listEntry : m_hateList )
+  {
+    // update entire hatelist for all players who are on aggro with this bnpc
+    if( listEntry->m_pChara->isPlayer() )
+    {
+      auto pPlayer = listEntry->m_pChara->getAsPlayer();
+      Network::Util::Packet::sendHateList( *pPlayer );
+    }
+  }
+}
+
 void BNpc::aggro( const Sapphire::Entity::CharaPtr& pChara )
 {
   auto& pRNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
@@ -659,10 +658,11 @@ void BNpc::deaggro( const CharaPtr& pChara )
     if( getTargetId() == pChara->getId() )
     {
       updateAggroTarget();
+      hateListUpdatePlayers();
     }
     if( m_pOwner == pChara  )
     {
-      setOwner( nullptr );
+      setOwner( hateListGetHighest() );
     }
   }
 
@@ -935,11 +935,6 @@ void BNpc::updateAggroTarget()
   if( highestAggro && getTargetId() != highestAggro->getId() )
   {
     aggro( highestAggro );
-  }
-  else if( highestAggro == nullptr )
-  {
-    setTargetId( INVALID_GAME_OBJECT_ID64 );
-    Network::Util::Packet::sendActorControlTarget( getInRangePlayerIds(), getId(), SetTarget, 0, 0, 0, 0, INVALID_GAME_OBJECT_ID64 );
   }
 }
 

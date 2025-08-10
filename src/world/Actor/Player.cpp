@@ -1052,6 +1052,18 @@ void Player::onMobDeaggro( const BNpc& bnpc )
   }
 }
 
+void Player::hateListLetterUpdate( const BNpc& bnpc )
+{
+  uint8_t hateId = m_actorIdTohateSlotMap[ bnpc.getId() ];
+  if( hateId < 26 || m_freeHateSlotQueue.empty() )
+    return;
+
+  hateId = m_freeHateSlotQueue.front();
+  m_freeHateSlotQueue.pop();
+  m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
+  Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
+}
+
 bool Player::isLogin() const
 {
   return m_bIsLogin;
