@@ -53,7 +53,7 @@ foreach(_scriptDir ${children})
                          "${SCRIPT_INCLUDE_FILES}"
                          "${_scriptDir}/ScriptLoader.cpp" )
 
-        target_link_libraries( "script_${_name}" world )
+        target_link_libraries( "script_${_name}" PRIVATE world ${CMAKE_DL_LIBS} )
 
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_SOURCE_DIR}/src/scripts")
         target_include_directories("script_${_name}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

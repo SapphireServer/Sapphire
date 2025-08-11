@@ -1,47 +1,15 @@
 
-file( GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        *.cpp
-        Actor/*.cpp
-        Action/*.cpp
-        Action/Job/*.cpp
-        AI/*.cpp
-        AI/Fsm/*.cpp
-        ContentFinder/*.cpp
-        DebugCommand/*.cpp
-        Event/*.cpp
-        FreeCompany/*.cpp
-        Inventory/*.cpp
-        Linkshell/*.cpp
-        Manager/*.cpp
-        Math/*.cpp
-        Network/*.cpp
-        Network/Util/*.cpp
-        Network/Handlers/*.cpp
-        Network/PacketWrappers/*.cpp
-        Script/*.cpp
-        StatusEffect/*.cpp
-        Territory/*.cpp
-        Territory/Housing/*.cpp
-        Util/*.cpp
-        Navi/*.cpp
-        Task/*.cpp
-        Quest/*.cpp )
+file( GLOB_RECURSE SOURCES
+  *.cpp
+  *.h
+)
 
-add_executable( world ${SERVER_SOURCE_FILES} )
+add_executable( world ${SOURCES} )
 
-set_target_properties( world
-                         PROPERTIES
-                           ENABLE_EXPORTS ON
-                           WINDOWS_EXPORT_ALL_SYMBOLS ON )
+set_target_properties( world PROPERTIES
+  ENABLE_EXPORTS ON
+  WINDOWS_EXPORT_ALL_SYMBOLS ON
+)
 
-target_link_libraries( world
-                         PUBLIC
-                           common 
-                            Detour
-                            DetourCrowd )
-target_include_directories( world
-                              PUBLIC
-                                "${CMAKE_CURRENT_SOURCE_DIR}"
-                                    Detour )
-
-
+target_link_libraries( world PUBLIC common )
+target_include_directories( world PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" )

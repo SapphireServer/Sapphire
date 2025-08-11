@@ -1,10 +1,9 @@
-file( GLOB UTILS_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*" )
-file( GLOB UTILS_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*" )
+file( GLOB_RECURSE SOURCES
+  *.cpp
+  *.h
+)
 
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
-
-add_library( mysqlConnector ${UTILS_PUBLIC_INCLUDE_FILES} ${UTILS_SOURCE_FILES} )
+add_library( mysqlConnector ${SOURCES} )
 
 target_include_directories( mysqlConnector PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
 target_link_libraries( mysqlConnector PUBLIC mysql )
-#cotire(mysqlConnector)

@@ -6,7 +6,7 @@
 #include <sstream>
 #include <Logging/Logger.h>
 
-#include <common/Util/Util.h>
+#include <Util/Util.h>
 
 using namespace Sapphire;
 using namespace Sapphire::Common;
@@ -20,7 +20,7 @@ DbManager::DbManager( const std::string& host, const std::string& database, cons
   m_database( database ),
   m_user( user ),
   m_password( pw ),
-  m_port( port ),	
+  m_port( port ),
   m_sFile( "sql/schema/schema.sql" ),
   m_iFile( "sql/schema/inserts.sql" ),
   m_force( false )
@@ -72,7 +72,7 @@ bool DbManager::selectSchema()
 {
   if( !m_pConnection )
   {
-    m_lastError = "No valid db connection!";	  
+    m_lastError = "No valid db connection!";
     return false;
   }
 
