@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include <map>
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 #include "bparse.h"
 #include "DatCat.h"

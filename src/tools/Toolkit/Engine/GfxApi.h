@@ -409,9 +409,7 @@ namespace Engine::Rendering
 
     ~Graphics();
 
-
-    void initializeGlew();
-    int init( const std::string& title, int screenWidth, int screenHeight, bool fullscreen, bool resizeable );
+    const char* init( const std::string& title, int screenWidth, int screenHeight, bool fullscreen, bool resizeable );
 
     int getWindowHeight();
     int getWindowWidth();
@@ -468,6 +466,7 @@ namespace Engine::Rendering
 
 
   private:
+    void initializeGlew();
     GLFWwindow* m_pWindow;
     std::string m_windowTitle;
     int m_windowWidth;

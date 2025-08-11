@@ -2,10 +2,10 @@
 #include <iostream>
 #include <cctype>
 #include <set>
-#include <common/Logging/Logger.h>
+#include <Logging/Logger.h>
 #include <MySqlConnector.h>
-#include <common/Util/CrashHandler.h>
-#include <common/Config/ConfigMgr.h>
+#include <Util/CrashHandler.h>
+#include <Config/ConfigMgr.h>
 
 Sapphire::Common::Util::CrashHandler crashHandler;
 

@@ -1,18 +1,11 @@
-file(GLOB SERVER_PUBLIC_INCLUDE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*")
-file(GLOB SERVER_SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-        *.c*
-        nav/*.c*
-        nav/ext/*.c*)
+file( GLOB_RECURSE SOURCES
+  *.cpp
+  *.h
+)
 
-add_executable( nav_export ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
+add_executable( nav_export ${SOURCES} )
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
+target_link_libraries( nav_export PRIVATE common Recast DetourTileCache )
 
-if (UNIX)
-    target_link_libraries( nav_export common xivdat pthread mysql dl z stdc++fs Recast Detour DetourTileCache )
-else()
-    target_link_libraries( nav_export common xivdat mysql zlib Recast Detour DetourTileCache )
-endif()
-
-target_include_directories( nav_export
-        PUBLIC
-            "${CMAKE_CURRENT_SOURCE_DIR}/../../deps/" )
-
+# NOTE: This is for #include <datReader/xxx>
+target_include_directories( nav_export PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../../deps" )

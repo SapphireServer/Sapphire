@@ -1,5 +1,5 @@
-#include "server_http.hpp"
-#include "client_http.hpp"
+#include "server_http.h"
+#include "client_http.h"
 
 #include <nlohmann/json.hpp>
 
@@ -585,9 +585,9 @@ void getCharacterList( shared_ptr< HttpServer::Response > response, shared_ptr< 
             { "infoJson", std::string( entry.getInfoJson() ) }
           } );
         }
-        
+
         json["result"] = "success";
-        
+
         *response << buildHttpResponse( 200, json.dump(1), JSON );
       }
     }
