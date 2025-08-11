@@ -44,6 +44,7 @@
 #include <Task/FadeBNpcTask.h>
 #include <Task/DelayedEmnityTask.h>
 #include <Task/ActionIntegrityTask.h>
+#include <Task/LootBNpcTask.h>
 #include <Service.h>
 
 #include <Action/Action.h>
@@ -715,12 +716,8 @@ void BNpc::onDeath()
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {
-      auto lootResult = lootTableMgr.rollLoot( "testTable" );
-      // todo: make this a task? it's too fast and good to be retail-like
-      for( auto resultItem : lootResult.items )
-      {
-        auto item = pPlayer->addItem( resultItem.id, resultItem.quantity, resultItem.isHq, false, true );
-      }
+      // todo: get this outta here!
+      taskMgr.queueTask( makeLootBNpcTask( *pPlayer, "testTable", 2000 ) );
 
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
