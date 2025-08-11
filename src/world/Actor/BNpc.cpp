@@ -33,6 +33,7 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Manager/LootTableMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>
@@ -708,7 +709,11 @@ void BNpc::onDeath()
 
   for( const auto& pHateEntry : m_hateList )
   {
-    // TODO: handle drops 
+    // TODO: handle drops
+    auto& lootTableMgr = Common::Service< World::Manager::LootTableMgr >::ref();
+
+    auto lootResult = lootTableMgr.rollLoot( "testTable" );
+
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {

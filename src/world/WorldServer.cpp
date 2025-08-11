@@ -33,7 +33,7 @@
 #include <Service.h>
 #include "Manager/AchievementMgr.h"
 #include "Manager/LinkshellMgr.h"
-#include "Manager/TerritoryMgr.h"
+#include "Manager/LootTableMgr.h"
 #include "Manager/HousingMgr.h"
 #include "Manager/DebugCommandMgr.h"
 #include "Manager/PlayerMgr.h"
@@ -252,6 +252,16 @@ void WorldServer::run( int32_t argc, char* argv[] )
     return;
   }
   Common::Service< Manager::AchievementMgr >::set( pAchvMgr );
+
+  auto pLootTableMgr = std::make_shared< Manager::LootTableMgr >();
+
+  Logger::info( "LootTableMgr: Caching loot tables" );
+  if( !pLootTableMgr->cacheLootTables() )
+  {
+    Logger::fatal( "Unable to cache loot tables!" );
+    return;
+  }
+  Common::Service< Manager::LootTableMgr >::set( pLootTableMgr );
 
   Logger::info( "Setting up InstanceObjectCache" );
   auto pInstanceObjCache = std::make_shared< Sapphire::InstanceObjectCache >();
