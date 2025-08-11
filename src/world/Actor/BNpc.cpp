@@ -33,6 +33,8 @@
 
 #include <Manager/TerritoryMgr.h>
 #include <Manager/RNGMgr.h>
+#include <Manager/InventoryMgr.h>
+#include <Manager/LootTableMgr.h>
 #include <Manager/PlayerMgr.h>
 #include <Manager/TaskMgr.h>
 #include <Manager/MgrUtil.h>
@@ -42,6 +44,7 @@
 #include <Task/FadeBNpcTask.h>
 #include <Task/DelayedEmnityTask.h>
 #include <Task/ActionIntegrityTask.h>
+#include <Task/LootBNpcTask.h>
 #include <Service.h>
 
 #include <Action/Action.h>
@@ -693,6 +696,8 @@ void BNpc::onDeath()
 {
   auto& playerMgr = Common::Service< World::Manager::PlayerMgr >::ref();
   auto& taskMgr = Common::Service< World::Manager::TaskMgr >::ref();
+  auto& lootTableMgr = Common::Service< World::Manager::LootTableMgr >::ref();
+  auto& inventoryMgr = Common::Service< World::Manager::InventoryMgr >::ref();
 
   setTargetId( INVALID_GAME_OBJECT_ID64 );
   m_currentStance = Stance::Passive;
@@ -708,10 +713,12 @@ void BNpc::onDeath()
 
   for( const auto& pHateEntry : m_hateList )
   {
-    // TODO: handle drops 
     auto pPlayer = pHateEntry->m_pChara->getAsPlayer();
     if( pPlayer )
     {
+      // todo: get this outta here!
+      taskMgr.queueTask( makeLootBNpcTask( *pPlayer, "testTable", 2000 ) );
+
       playerMgr.onMobKill( *pPlayer, *this );
       playerMgr.onGainExp( *pPlayer, paramGrowthInfo->data().BaseExp );
     }
