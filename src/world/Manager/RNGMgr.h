@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Forwards.h"
+#include <Logging/Logger.h>
 
 #include <array>
 #include <algorithm>

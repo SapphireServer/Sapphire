@@ -353,7 +353,7 @@ void DebugCommandMgr::set( char* data, Entity::Player& player, std::shared_ptr< 
     {
       if( actor->getId() == player.getTargetId() && actor->getAsChara()->isAlive() )
       {
-        actor->getAsBNpc()->onActionHostile( player.getAsChara() );
+        actor->getAsBNpc()->onActionHostile( player.getAsChara(), 1 );
       }
     }
   }

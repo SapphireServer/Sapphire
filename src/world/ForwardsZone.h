@@ -106,6 +106,7 @@ TYPE_FORWARD( LootTableMgr );
 namespace StatusEffect
 {
 TYPE_FORWARD( StatusEffect );
+TYPE_FORWARD( StatusEffectResult );
 TYPE_FORWARD( StatusEffectContainer );
 }
 

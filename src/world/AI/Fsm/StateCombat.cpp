@@ -45,6 +45,10 @@ void AI::Fsm::StateCombat::onUpdate( Entity::BNpc& bnpc, uint64_t tickCount )
     {
       bnpc.deaggro( pHatedActor );
     }
+    else if( distance > 80.0f )
+    {
+      bnpc.deaggro( pHatedActor );
+    }
   }
 
   if( !bnpc.hasFlag( Entity::Immobile ) && distance > ( bnpc.getNaviTargetReachedDistance() + pHatedActor->getRadius() ) )
