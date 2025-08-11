@@ -1,6 +1,7 @@
 #include "Input.h"
 
 #include <memory>
+#include <cstring>
 
 #include "glcommon.h"
 

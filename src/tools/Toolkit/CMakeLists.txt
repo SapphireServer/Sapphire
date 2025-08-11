@@ -11,37 +11,10 @@ file(GLOB SERVER_SOURCE_FILES
 
 include_directories( "." "../"  "../../" )
 
-find_package( OpenGL REQUIRED COMPONENTS OpenGL )
-
-if(NOT ${OPENGL_FOUND})
-    message("OPENGL not found")
-endif()
-
 add_executable( Toolkit ${SERVER_PUBLIC_INCLUDE_FILES} ${SERVER_SOURCE_FILES})
 
-if (UNIX)
-#  target_link_libraries( Toolkit common xivdat pthread mysql dl z stdc++fs )
-    message( "Tool only supported on windows for now" )
-else()
-    target_link_libraries( Toolkit
-            PRIVATE
-            ${OPENGL_gl_LIBRARY}
-            ${OPENGL_glu_LIBRARY}
-            glew32
-            glfw3
-            kernel32
-            user32
-            gdi32
-            winspool
-            comdlg32
-            advapi32
-            shell32
-            ole32
-            oleaut32
-            uuid
-            odbc32
-            odbccp32
-            common world xivdat mysql zlib
-    )
-
-endif()
+target_link_libraries( Toolkit 
+        PRIVATE
+        libglew_static
+        glfw
+        common world xivdat mysql zlib )

@@ -12,6 +12,7 @@
 #include <set>
 
 #include <glm/gtc/type_ptr.hpp>
+#include "Engine/glcommon.h"
 #include "Service.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +28,7 @@ int Engine::Rendering::checkOglError( const char* func )
   if( glErr != GL_NO_ERROR )
   {
     std::string msg = "glError in " + std::string( func ) + ": " +
-                      std::string( reinterpret_cast< const char* >( gluErrorString( glErr ) ) );
+                      std::string( reinterpret_cast< const char* >( glewGetErrorString( glErr ) ) );
     std::cout << msg << std::endl;
     //throw std::runtime_error( msg );
     retCode = 1;
@@ -794,6 +795,7 @@ void Graphics::initializeGlew()
 
 int Graphics::init( const std::string& title, int screenWidth, int screenHeight, bool fullscreen, bool resizeable )
 {
+  glewExperimental = true;
   if( !glfwInit() )
     throw std::runtime_error( "Error initializing GLFW" );
 
@@ -830,6 +832,7 @@ int Graphics::init( const std::string& title, int screenWidth, int screenHeight,
 
   /* Make the window's context current */
   glfwMakeContextCurrent( m_pWindow );
+  glewExperimental = true;
 
   glfwSetInputMode( m_pWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN );
   glfwSetInputMode( m_pWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED );

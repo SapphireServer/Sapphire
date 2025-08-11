@@ -24,8 +24,8 @@ include( "cmake/paths.cmake" )
 include( "cmake/compiler.cmake" )
 
 include_directories(
-        "deps/glew-1.9.0/include"
-        "deps/glfw-3.2.1/include"
+        "deps/glew/include"
+        "deps/glfw/include"
         "deps/glm"
         "deps/freetype/include"
         "deps/"
@@ -41,14 +41,17 @@ configure_file( "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp.in"
                 "${CMAKE_CURRENT_SOURCE_DIR}/src/common/Version.cpp" @ONLY )
 
 link_directories(
-        "${CMAKE_SOURCE_DIR}/deps/glew-1.9.0/lib/Release/x64"
-        "${CMAKE_SOURCE_DIR}/deps/glfw-3.2.1/lib-vc2015"
+        "${CMAKE_SOURCE_DIR}/deps/glew/lib/Release/x64"
+        "${CMAKE_SOURCE_DIR}/deps/glfw/lib-vc2015"
         "${CMAKE_BUILD_PATH}"
         "${CMAKE_BUILD_PATH}/../")
 
 
 set( FREETYPE_LIBRARY "${CMAKE_SOURCE_DIR}/lib/freetype.lib" )
 set( FREETYPE_INCLUDE_DIRS "${CMAKE_SOURCE_DIR}/deps/freetype/include" )
+set( ONLY_LIBS ON )
+set( glew-cmake_BUILD_SHARED OFF )
+add_definitions(-DGLEW_STATIC)
 
 ##############################
 #           Mysql            #
@@ -65,7 +68,11 @@ add_subdirectory( "deps/datReaderPs3" )
 add_subdirectory( "deps/mysqlConnector" )
 add_subdirectory( "deps/recastnavigation" )
 add_subdirectory( "deps/glm" )
-add_subdirectory( "deps/freetype" )
+add_subdirectory( "deps/glfw" )
+add_subdirectory( "deps/glew" )
+if( WIN32 )
+        add_subdirectory( "deps/freetype" )
+endif()
 
 ##############################
 #  Main Sapphire Components  #
