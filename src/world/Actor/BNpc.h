@@ -140,6 +140,7 @@ namespace Sapphire::Entity
     uint32_t getBoundInstanceId() const;
 
     bool hasFlag( uint32_t flag ) const;
+    void resetFlags( uint32_t flags );
     void setFlag( uint32_t flags );
 
     void calculateStats() override;

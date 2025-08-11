@@ -37,10 +37,7 @@ TYPE_FORWARD( Quest );
 TYPE_FORWARD( Task );
 }
 
-namespace World::Navi
-{
-TYPE_FORWARD( NaviProvider );
-}
+
 
 namespace World::Territory::Housing
 {

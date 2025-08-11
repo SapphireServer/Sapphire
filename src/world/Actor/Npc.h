@@ -23,6 +23,11 @@ namespace Sapphire::Entity
     Npc( Common::ObjKind type );
 
     virtual ~Npc() override;
+    bool pathingActive() const;
+    void setPathingActive( bool pathing );
+
+  private:
+    bool m_bPathingActive{false};
 
   };
 

@@ -372,7 +372,7 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( *this );
+  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
   auto distance = Common::Util::distance( pos1, pos );
 
   if( distance < getNaviTargetReachedDistance() )
@@ -380,8 +380,8 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
     // Reached destination
     face( pos );
     setPos( pos1 );
-    sendPositionUpdate();
-    pNaviProvider->updateAgentPosition( *this );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    setAgentId( newAgentId );
     return true;
   }
 
@@ -392,7 +392,6 @@ bool BNpc::moveTo( const FFXIVARR_POSITION3& pos )
   else
     face( pos );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -410,7 +409,7 @@ bool BNpc::moveTo( const Chara& targetChara )
     return false;
   }
 
-  auto pos1 = pNaviProvider->getMovePos( *this );
+  auto pos1 = pNaviProvider->getMovePos( getAgentId() );
   auto distance = Common::Util::distance( pos1, targetChara.getPos() );
 
   if( distance <= ( getNaviTargetReachedDistance() + targetChara.getRadius() ) )
@@ -418,9 +417,9 @@ bool BNpc::moveTo( const Chara& targetChara )
     // Reached destination
     face( targetChara.getPos() );
     setPos( pos1 );
-    sendPositionUpdate();
-    pNaviProvider->resetMoveTarget( *this );
-    pNaviProvider->updateAgentPosition( *this );
+    pNaviProvider->resetMoveTarget( getAgentId() );
+    auto newAgentId = pNaviProvider->updateAgentPosition( getAgentId(), pos1, getRadius() );
+    setAgentId( newAgentId );
     return true;
   }
 
@@ -430,7 +429,6 @@ bool BNpc::moveTo( const Chara& targetChara )
   else
     face( targetChara.getPos() );
   setPos( pos1 );
-  sendPositionUpdate();
   return false;
 }
 
@@ -833,9 +831,68 @@ bool BNpc::hasFlag( uint32_t flag ) const
   return m_flags & flag;
 }
 
+
+void BNpc::resetFlags( uint32_t flags )
+{
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
+  m_flags |= flags;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( getAgentId() );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+           ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( getAgentId() );
+    auto agentId = pNaviProvider->addAgent( getPos(), getRadius() );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
+}
+
+
 void BNpc::setFlag( uint32_t flag )
 {
+  uint32_t oldFlags = m_flags;
+  m_flags = 0;
   m_flags |= flag;
+
+  auto& teriMgr = Common::Service< World::Manager::TerritoryMgr >::ref();
+  auto pZone = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+
+  if( pZone && getAgentId() != -1 && ( oldFlags & Entity::Immobile ) != Entity::Immobile &&
+      ( m_flags & Entity::Immobile ) == Entity::Immobile )
+  {
+    Logger::debug( "{} {} Pathing deactivated", m_id, getAgentId() );
+    auto pNaviProvider = pZone->getNaviProvider();
+    pNaviProvider->removeAgent( getAgentId() );
+    setPathingActive( false );
+  }
+  else if( pZone && ( oldFlags & Entity::Immobile ) == Entity::Immobile  &&
+             ( m_flags & Entity::Immobile ) != Entity::Immobile )
+  {
+    Logger::debug( "{} Pathing activated", m_id );
+    auto pNaviProvider = pZone->getNaviProvider();
+    if( getAgentId() != -1 )
+      pNaviProvider->removeAgent( getAgentId() );
+    auto agentId = pNaviProvider->addAgent( getPos(), getRadius() );
+    setAgentId( agentId );
+    setPathingActive( true );
+  }
 }
 
 void BNpc::autoAttack( CharaPtr pTarget )

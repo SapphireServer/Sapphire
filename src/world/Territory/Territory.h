@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstring>
 #include <Exd/Structs.h>
+#include <Navi/NaviProvider.h>
 
 namespace Sapphire
 {
@@ -70,7 +71,7 @@ namespace Sapphire
     std::vector< SpawnInfo > m_spawnInfo;
 
     uint32_t m_effectCounter{};
-    std::shared_ptr< World::Navi::NaviProvider > m_pNaviProvider;
+    std::shared_ptr< Common::Navi::NaviProvider > m_pNaviProvider;
 
     Common::TerritoryIdent m_ident;
 
@@ -194,7 +195,7 @@ namespace Sapphire
 
     uint32_t getNextActionResultId();
 
-    std::shared_ptr< World::Navi::NaviProvider > getNaviProvider();
+    std::shared_ptr< Common::Navi::NaviProvider > getNaviProvider();
   };
 
 }
