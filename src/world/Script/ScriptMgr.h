@@ -7,6 +7,7 @@
 
 #include <Common.h>
 #include "Forwards.h"
+#include "Territory/InstanceContent.h"
 
 namespace Sapphire::Scripting
 {
@@ -108,7 +109,13 @@ namespace Sapphire::Scripting
 
     bool onInstanceInit( InstanceContent& instance );
 
+    bool onInstanceReset( InstanceContent& instance );
+
     bool onInstanceUpdate( InstanceContent& instance, uint64_t tickCount );
+
+    bool onInstanceStateChange( InstanceContent& instance,
+                                InstanceContentState oldState,
+                                InstanceContentState newState );
 
     bool
     onInstanceEnterTerritory( InstanceContent& instance, Entity::Player& player, uint32_t eventId, uint16_t param1,

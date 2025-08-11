@@ -2104,7 +2104,7 @@
             {
               "modifier": "EvasionPercent",
               "value": -10
-            }
+    }
           ]
         }
       ]
@@ -2397,7 +2397,7 @@
             {
               "modifier": "TickHeal",
               "value": 50
-            }
+    }
           ]
         }
       ]
@@ -2479,7 +2479,7 @@
             {
               "modifier": "TickHeal",
               "value": 150
-            }
+    }
           ]
         }
       ]
@@ -6197,93 +6197,10 @@
       "target": []
     }
   },
-  "453": {
-    "name": "Incinerate",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
-  "454": {
-    "name": "Vulcan Burst",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
-  "455": {
-    "name": "Eruption",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
-  "456": {
-    "name": "Radiant Plume",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
+
+
   "457": {
     "name": "Crimson Cyclone",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
-  "458": {
-    "name": "Hellfire",
     "potency": 0,
     "comboPotency": 0,
     "flankPotency": 0,
@@ -10211,40 +10128,6 @@
   },
   "732": {
     "name": "Silken Fingers",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
-  "733": {
-    "name": "Eruption",
-    "potency": 0,
-    "comboPotency": 0,
-    "flankPotency": 0,
-    "frontPotency": 0,
-    "rearPotency": 0,
-    "curePotency": 0,
-    "restorePercentage": 0,
-    "nextCombo": [],
-    "targetFilter": 0,
-    "aggroModifier": 1.0,
-    "statuses": {
-      "caster": [],
-      "target": []
-    }
-  },
-  "734": {
-    "name": "Radiant Plume",
     "potency": 0,
     "comboPotency": 0,
     "flankPotency": 0,

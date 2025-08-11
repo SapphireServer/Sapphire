@@ -191,21 +191,21 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
 
   animationType |= clientAnimationType;
 
-  if( animationType & MoveType::Strafing )
+  if( animationType & Strafing )
   {
-    if( animationType & MoveType::Walking )
+    if( animationType & Walking )
       headRotation = 0xFF;
     else if( headRotation < 0x7F )
       headRotation += 0x7F;
     else if( headRotation > 0x7F )
       headRotation -= 0x7F;
   }
-  if( animationType == MoveType::Running )
+  if( animationType == Running )
   {
     headRotation = 0x7F;
     animationSpeed = MoveSpeed::Run;
   }
-  if( animationType & MoveType::Jumping )
+  if( animationType & Jumping )
   {
 
     if( animColType == MoveState::LeaveCollision )
@@ -243,6 +243,7 @@ void Sapphire::Network::GameConnection::moveHandler( const Packets::FFXIVARR_PAC
   if( !player.hasInRangeActor() )
     return;
 
+  // todo: probably move this into a builder and send the packet on Player::update if( m_dirtyFlags & DirtyFlag::Position )
   //auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, animationType, animationState, animationSpeed, unknownRotation );
   auto movePacket = std::make_shared< MoveActorPacket >( player, headRotation, data.flag, data.flag2, animationSpeed, unknownRotation );
   server().queueForPlayers( player.getInRangePlayerIds(), movePacket );

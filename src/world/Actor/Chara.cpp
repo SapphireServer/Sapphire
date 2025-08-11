@@ -14,6 +14,8 @@
 #include "Network/PacketWrappers/ActorControlTargetPacket.h"
 #include "Network/PacketWrappers/EffectPacket1.h"
 #include "Network/PacketWrappers/HudParamPacket.h"
+#include "Network/PacketWrappers/MoveActorPacket.h"
+
 #include "Network/Util/PacketUtil.h"
 
 #include "Action/Action.h"
@@ -25,6 +27,7 @@
 #include "Manager/TerritoryMgr.h"
 #include "Manager/MgrUtil.h"
 #include "Manager/PlayerMgr.h"
+#include "Navi/NaviProvider.h"
 #include "Common.h"
 
 using namespace Sapphire;
@@ -191,6 +194,24 @@ uint64_t Chara::getTargetId() const
 bool Chara::isAlive() const
 {
   return ( m_hp > 0 );
+}
+
+void Chara::setPos( const Common::FFXIVARR_POSITION3& pos, bool broadcastUpdate )
+{
+  GameObject::setPos( pos, broadcastUpdate );
+  m_dirtyFlag |= DirtyFlag::Position;
+}
+
+void Chara::setPos( float x, float y, float z, bool broadcastUpdate )
+{
+  GameObject::setPos( x, y, z, broadcastUpdate );
+  m_dirtyFlag |= DirtyFlag::Position;
+}
+
+void Sapphire::Entity::Chara::setRot( float rot )
+{
+  GameObject::setRot( rot );
+  m_dirtyFlag |= DirtyFlag::Position;
 }
 
 /*! \return max hp for the actor */
@@ -393,7 +414,7 @@ void Chara::takeDamage( uint32_t damage )
         resetHp();
         break;
       case InvincibilityStayAlive:
-        setHp( 0 );
+        setHp( 1 );
         break;
       case InvincibilityIgnoreDamage:
         break;
@@ -778,12 +799,12 @@ void Chara::setDirectorId( uint32_t directorId )
   m_directorId = directorId;
 }
 
-uint32_t Chara::getAgentId() const
+int32_t Chara::getAgentId() const
 {
   return m_agentId;
 }
 
-void Chara::setAgentId( uint32_t agentId )
+void Chara::setAgentId( int32_t agentId )
 {
   m_agentId = agentId;
 }
@@ -937,4 +958,38 @@ void Chara::onTick()
 
     Network::Util::Packet::sendHudParam( *this );
   }
+}
+
+void Chara::knockback( const FFXIVARR_POSITION3& origin, float distance, bool ignoreNav )
+{
+  auto kbPos = Common::Util::getKnockbackPosition( origin, m_pos, distance );
+  auto& teriMgr = Common::Service< Manager::TerritoryMgr >::ref();
+  auto pTeri = teriMgr.getTerritoryByGuId( getTerritoryId() );
+
+  if( !ignoreNav )
+  {
+    auto pNav = pTeri->getNaviProvider();
+    auto path = pNav->findFollowPath( m_pos, kbPos );
+
+    FFXIVARR_POSITION3 navPos{origin};
+    float prevDistance{1000.f};
+    for( const auto& point : path )
+    {
+      auto navDist = Common::Util::distance( kbPos, point );  
+      if( navDist < prevDistance )
+      {
+        navPos = point;
+        prevDistance = navDist;
+      }
+    }
+    setPos( navPos );
+    pNav->updateAgentPosition( getAgentId(), getPos(), getRadius() );
+  }
+  else
+  {
+    setPos( kbPos );
+  }
+  pTeri->updateActorPosition( *this );
+  // todo: send the correct knockback packet to player
+  server().queueForPlayers( getInRangePlayerIds(), std::make_shared< MoveActorPacket >( *this, getRot(), 2, 0, 0, 0x5A / 4 ) );
 }

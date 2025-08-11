@@ -13,7 +13,7 @@
 #include "BNpc.h"
 
 #include "Manager/TerritoryMgr.h"
-#include "Manager/RNGMgr.h"
+#include <Random/RNGMgr.h>
 #include "Manager/PlayerMgr.h"
 #include "Manager/PartyMgr.h"
 #include "Manager/WarpMgr.h"
@@ -986,7 +986,7 @@ void Player::hateListAdd( const BNpc& bnpc )
     m_actorIdTohateSlotMap[ bnpc.getId() ] = hateId;
     Network::Util::Packet::sendHateList( *this );
     Network::Util::Packet::sendActorControl( *this, bnpc.getId(), SetHateLetter, hateId, bnpc.getId(), 0 );
-  }
+}
 }
 
 void Player::hateListRemove( const BNpc& bnpc )
@@ -999,10 +999,10 @@ void Player::hateListRemove( const BNpc& bnpc )
   uint8_t hateSlot = m_actorIdTohateSlotMap[ bnpcId ];
   if( hateSlot < 26 )
   {
-    m_freeHateSlotQueue.push( hateSlot );
+      m_freeHateSlotQueue.push( hateSlot );
     m_actorIdTohateSlotMap.erase( bnpcId );
-    Network::Util::Packet::sendHateList( *this );
-  }
+      Network::Util::Packet::sendHateList( *this );
+    }
   else
   {
     m_actorIdTohateSlotMap.erase( bnpcId );
@@ -1209,7 +1209,7 @@ void Player::autoAttack( CharaPtr pTarget )
   if( weaponType == ItemUICategory::ArchersArm || weaponType == ItemUICategory::MachinistsArm)
     attackId = 8;
 
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   auto variation = static_cast< uint32_t >( RNGMgr.getRandGenerator< float >( 0, 3 ).next() );
 
   actionMgr.handleTargetedAction( *this, attackId, pTarget->getId(), 0 );

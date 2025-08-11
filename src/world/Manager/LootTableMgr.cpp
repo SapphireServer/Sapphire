@@ -7,7 +7,7 @@
 #include <Service.h>
 #include <Logging/Logger.h>
 
-#include "RNGMgr.h"
+#include <Random/RNGMgr.h>
 #include "LootTableMgr.h"
 
 using namespace Sapphire;
@@ -50,7 +50,7 @@ LootTablePtr LootTableMgr::getLootTableByName( const std::string& name )
 
 LootTableResult LootTableMgr::rollLoot( const std::string& name )
 {
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
 
   LootTableResult result;
 
@@ -92,7 +92,7 @@ LootTableResult LootTableMgr::rollLoot( const std::string& name )
 
 const LootTableItem& LootTableMgr::pickWeightedItem( const std::vector< LootTableItem >& items )
 {
-  auto& RNGMgr = Common::Service< World::Manager::RNGMgr >::ref();
+  auto& RNGMgr = Common::Service< Common::Random::RNGMgr >::ref();
   // calc total weight
   uint32_t totalWeight = 0;
   for( const auto& it : items )
